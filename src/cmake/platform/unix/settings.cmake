@@ -51,8 +51,4 @@ elseif(CMAKE_C_COMPILER MATCHES "icc")
   include(${CMAKE_SOURCE_DIR}/src/cmake/compiler/icc/settings.cmake)
 elseif(CMAKE_C_COMPILER MATCHES "clang" OR CMAKE_C_COMPILER_ID MATCHES "Clang")
   include(${CMAKE_SOURCE_DIR}/src/cmake/compiler/clang/settings.cmake)
-else()
-  target_compile_definitions(acore-compile-option-interface
-    INTERFACE
-      -D_BUILD_DIRECTIVE="${CMAKE_BUILD_TYPE}")
 endif()

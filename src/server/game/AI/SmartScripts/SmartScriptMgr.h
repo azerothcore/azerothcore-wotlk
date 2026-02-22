@@ -725,8 +725,9 @@ enum SMART_ACTION
     SMART_ACTION_DISABLE_REWARD                     = 238,    // reputation 0/1, loot 0/1
     SMART_ACTION_SET_ANIM_TIER                      = 239,    // animtier
     SMART_ACTION_SET_GOSSIP_MENU                    = 240,    // gossipMenuId
+    SMART_ACTION_SUMMON_GAMEOBJECT_GROUP            = 241,    // group
 
-    SMART_ACTION_AC_END                             = 241,    // placeholder
+    SMART_ACTION_AC_END                             = 242,    // placeholder
 };
 
 enum class SmartActionSummonCreatureFlags
@@ -1517,6 +1518,11 @@ struct SmartAction
         {
             uint32 gossipMenuId;
         } setGossipMenu;
+
+        struct
+        {
+            uint32 group;
+        } gameobjectGroup;
     };
 };
 

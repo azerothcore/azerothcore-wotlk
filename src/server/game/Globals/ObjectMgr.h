@@ -507,6 +507,7 @@ typedef std::map<ObjectGuid, ObjectGuid> LinkedRespawnContainer;
 typedef std::unordered_map<ObjectGuid::LowType, CreatureData> CreatureDataContainer;
 typedef std::unordered_map<ObjectGuid::LowType, GameObjectData> GameObjectDataContainer;
 typedef std::map<TempSummonGroupKey, std::vector<TempSummonData> > TempSummonDataContainer;
+typedef std::map<TempSummonGroupKey, std::vector<GameObjectSummonData> > GameObjectSummonDataContainer;
 typedef std::unordered_map<uint32, CreatureLocale> CreatureLocaleContainer;
 typedef std::unordered_map<uint32, GameObjectLocale> GameObjectLocaleContainer;
 typedef std::unordered_map<uint32, ItemLocale> ItemLocaleContainer;
@@ -1036,6 +1037,7 @@ public:
     void LoadGameObjectQuestItems();
     void LoadCreatureQuestItems();
     void LoadTempSummons();
+    void LoadGameObjectSummons();
     void LoadCreatures();
     void LoadCreatureSparring();
     void LoadLinkedRespawn();
@@ -1203,6 +1205,15 @@ public:
     {
         TempSummonDataContainer::const_iterator itr = _tempSummonDataStore.find(TempSummonGroupKey(summonerId, summonerType, group));
         if (itr != _tempSummonDataStore.end())
+            return &itr->second;
+
+        return nullptr;
+    }
+
+    [[nodiscard]] std::vector<GameObjectSummonData> const* GetGameObjectSummonGroup(uint32 summonerId, SummonerType summonerType, uint8 group) const
+    {
+        GameObjectSummonDataContainer::const_iterator itr = _goSummonDataStore.find(TempSummonGroupKey(summonerId, summonerType, group));
+        if (itr != _goSummonDataStore.end())
             return &itr->second;
 
         return nullptr;
@@ -1635,6 +1646,8 @@ private:
     GameObjectTemplateAddonContainer _gameObjectTemplateAddonStore;
     /// Stores temp summon data grouped by summoner's entry, summoner's type and group id
     TempSummonDataContainer _tempSummonDataStore;
+    /// Stores gameobject summon data grouped by summoner's entry, summoner's type and group id
+    GameObjectSummonDataContainer _goSummonDataStore;
 
     BroadcastTextContainer _broadcastTextStore;
     ItemTemplateContainer _itemTemplateStore;

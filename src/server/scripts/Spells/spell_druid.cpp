@@ -17,6 +17,7 @@
 
 #include "Containers.h"
 #include "CreatureScript.h"
+#include "GameTime.h"
 #include "GridNotifiers.h"
 #include "Player.h"
 #include "SpellAuraEffects.h"
@@ -60,12 +61,52 @@ enum DruidSpells
     SPELL_DRUID_ENRAGE                      = 5229,
     SPELL_DRUID_ENRAGED_DEFENSE             = 70725,
     SPELL_DRUID_ITEM_T10_FERAL_4P_BONUS     = 70726,
-    SPELL_DRUID_MOONGLADE_2P_BONUS          = 37286
+    SPELL_DRUID_MAIM_INTERRUPT              = 32747,
+    SPELL_DRUID_MOONGLADE_2P_BONUS          = 37286,
+    // Proc system spells
+    SPELL_DRUID_GLYPH_OF_INNERVATE_MANA     = 54833,
+    SPELL_DRUID_GLYPH_OF_STARFIRE_PROC      = 54846,
+    SPELL_DRUID_GLYPH_OF_RAKE_STUN          = 54820,
+    SPELL_DRUID_LEADER_OF_THE_PACK_HEAL     = 34299,
+    SPELL_DRUID_LEADER_OF_THE_PACK_MANA     = 68285,
+    SPELL_DRUID_GLYPH_OF_REJUV_HEAL         = 54755,
+    SPELL_DRUID_ECLIPSE_LUNAR               = 48518,
+    SPELL_DRUID_ECLIPSE_SOLAR               = 48517,
+    SPELL_DRUID_T3_PROC_ENERGIZE_MANA       = 28722,
+    SPELL_DRUID_T3_PROC_ENERGIZE_RAGE       = 28723,
+    SPELL_DRUID_T3_PROC_ENERGIZE_ENERGY     = 28724,
+    SPELL_DRUID_BLESSING_OF_THE_CLAW        = 28750,
+    SPELL_DRUID_EXHILARATE                  = 28742,
+    SPELL_DRUID_INFUSION                    = 37238,
+    SPELL_DRUID_BLESSING_OF_REMULOS         = 40445,
+    SPELL_DRUID_BLESSING_OF_ELUNE           = 40446,
+    SPELL_DRUID_BLESSING_OF_CENARIUS        = 40452,
+    SPELL_DRUID_REVITALIZE_ENERGIZE_MANA    = 48542,
+    SPELL_DRUID_REVITALIZE_ENERGIZE_RAGE    = 48541,
+    SPELL_DRUID_REVITALIZE_ENERGIZE_ENERGY  = 48540,
+    SPELL_DRUID_REVITALIZE_ENERGIZE_RP      = 48543,
+    SPELL_DRUID_GLYPH_OF_RIP                = 54818,
+    SPELL_DRUID_RIP_DURATION_LACERATE_DMG   = 60141,
+    SPELL_DRUID_REJUVENATION_T10_PROC       = 70691,
+    SPELL_DRUID_LANGUISH                    = 71023,
+    // T9 Feral Relic
+    SPELL_DRUID_T9_FERAL_RELIC_BEAR         = 67354,
+    SPELL_DRUID_T9_FERAL_RELIC_CAT          = 67355,
+    // Frenzied Regeneration
+    SPELL_DRUID_FRENZIED_REGENERATION_HEAL  = 22845,
+    // Insect Swarm
+    SPELL_DRUID_ITEM_T8_BALANCE_RELIC       = 64950,
+    // Nourish
+    SPELL_DRUID_GLYPH_OF_NOURISH            = 62971,
+    // Wild Growth
+    SPELL_DRUID_RESTORATION_T10_2P_BONUS    = 70658
 };
 
 enum DruidIcons
 {
-    SPELL_ICON_REVITALIZE                   = 2862
+    SPELL_ICON_REVITALIZE                   = 2862,
+    SPELL_ICON_ECLIPSE                      = 2856,
+    SPELL_ICON_INNERVATE                    = 62
 };
 
 // 1178 - Bear Form (Passive)
@@ -113,27 +154,27 @@ class spell_dru_t10_balance_4p_bonus : public AuraScript
 {
     PrepareAuraScript(spell_dru_t10_balance_4p_bonus);
 
-    bool CheckProc(ProcEventInfo& eventInfo)
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return eventInfo.GetActor() && eventInfo.GetProcTarget();
+        return ValidateSpellInfo({ SPELL_DRUID_LANGUISH });
     }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
 
-        uint32 triggered_spell_id = 71023;
-        SpellInfo const* triggeredSpell = sSpellMgr->GetSpellInfo(triggered_spell_id);
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        if (!damageInfo || !damageInfo->GetDamage())
+            return;
 
-        int32 amount = CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), aurEff->GetAmount()) / triggeredSpell->GetMaxTicks();
-        eventInfo.GetProcTarget()->CastDelayedSpellWithPeriodicAmount(GetTarget(), triggered_spell_id, SPELL_AURA_PERIODIC_DAMAGE, amount, EFFECT_0);
+        SpellInfo const* triggeredSpell = sSpellMgr->GetSpellInfo(SPELL_DRUID_LANGUISH);
 
-        //GetTarget()->CastCustomSpell(triggered_spell_id, SPELLVALUE_BASE_POINT0, amount, eventInfo.GetProcTarget(), true, nullptr, aurEff);
+        int32 amount = CalculatePct(static_cast<int32>(damageInfo->GetDamage()), aurEff->GetAmount()) / triggeredSpell->GetMaxTicks();
+        eventInfo.GetProcTarget()->CastDelayedSpellWithPeriodicAmount(GetTarget(), SPELL_DRUID_LANGUISH, SPELL_AURA_PERIODIC_DAMAGE, amount, EFFECT_0);
     }
 
     void Register() override
     {
-        DoCheckProc += AuraCheckProcFn(spell_dru_t10_balance_4p_bonus::CheckProc);
         OnEffectProc += AuraEffectProcFn(spell_dru_t10_balance_4p_bonus::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
     }
 };
@@ -197,44 +238,32 @@ class spell_dru_omen_of_clarity : public AuraScript
     {
         SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
         if (!spellInfo)
-        {
             return true;
-        }
 
-        // Prevent passive spells to proc. (I.e shapeshift passives & passive talents)
         if (spellInfo->IsPassive())
-        {
             return false;
-        }
 
-        // Don't proc on crafting items.
         if (spellInfo->HasEffect(SPELL_EFFECT_CREATE_ITEM))
-        {
             return false;
-        }
+
+        // Reject energize spells (e.g. Furor) - they are not real casts
+        if (spellInfo->HasEffect(SPELL_EFFECT_ENERGIZE))
+            return false;
 
         if (eventInfo.GetTypeMask() & PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS)
-        {
             return spellInfo->HasAttribute(SPELL_ATTR0_ON_NEXT_SWING) || spellInfo->HasAttribute(SPELL_ATTR0_ON_NEXT_SWING_NO_DAMAGE);
-        }
 
         // Non-damaged/Non-healing spells - only druid abilities
         if (!spellInfo->HasAttribute(SpellCustomAttributes(SPELL_ATTR0_CU_DIRECT_DAMAGE | SPELL_ATTR0_CU_NO_INITIAL_THREAT)))
         {
             if (spellInfo->SpellFamilyName == SPELLFAMILY_DRUID)
-            {
-                // Exclude shapeshifting
                 return !spellInfo->HasAura(SPELL_AURA_MOD_SHAPESHIFT);
-            }
 
             return false;
         }
 
-        // Revitalize
         if (spellInfo->SpellIconID == SPELL_ICON_REVITALIZE)
-        {
             return false;
-        }
 
         return true;
     }
@@ -286,21 +315,41 @@ class spell_dru_barkskin : public AuraScript
 {
     PrepareAuraScript(spell_dru_barkskin);
 
-    void AfterApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        if (GetUnitOwner()->HasAura(SPELL_DRUID_GLYPH_OF_BARKSKIN, GetUnitOwner()->GetGUID()))
-            GetUnitOwner()->CastSpell(GetUnitOwner(), SPELL_DRUID_GLYPH_OF_BARKSKIN_TRIGGER, true);
+        return ValidateSpellInfo({ SPELL_DRUID_GLYPH_OF_BARKSKIN_TRIGGER });
     }
 
-    void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        GetUnitOwner()->RemoveAurasDueToSpell(SPELL_DRUID_GLYPH_OF_BARKSKIN_TRIGGER, GetUnitOwner()->GetGUID());
+        GetTarget()->RemoveAurasDueToSpell(SPELL_DRUID_GLYPH_OF_BARKSKIN_TRIGGER);
     }
 
     void Register() override
     {
-        AfterEffectApply += AuraEffectApplyFn(spell_dru_barkskin::AfterApply, EFFECT_0, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
-        AfterEffectRemove += AuraEffectRemoveFn(spell_dru_barkskin::AfterRemove, EFFECT_0, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_dru_barkskin::OnRemove, EFFECT_1, SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+// 63057 - Glyph of Barkskin
+class spell_dru_glyph_of_barkskin : public AuraScript
+{
+    PrepareAuraScript(spell_dru_glyph_of_barkskin);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DRUID_GLYPH_OF_BARKSKIN_TRIGGER });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        eventInfo.GetActor()->CastSpell(eventInfo.GetActor(), SPELL_DRUID_GLYPH_OF_BARKSKIN_TRIGGER, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_dru_glyph_of_barkskin::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
     }
 };
 
@@ -1265,6 +1314,773 @@ private:
     ObjectGuid _casterGUID;
 };
 
+// 54832 - Glyph of Innervate
+class spell_dru_glyph_of_innervate : public AuraScript
+{
+    PrepareAuraScript(spell_dru_glyph_of_innervate);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DRUID_GLYPH_OF_INNERVATE_MANA });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        return spellInfo && spellInfo->SpellIconID == SPELL_ICON_INNERVATE;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+    {
+        PreventDefaultAction();
+        Unit* caster = GetTarget();
+        int32 manaPercent = aurEff->GetAmount();
+        int32 bp = caster->GetCreatePowers(POWER_MANA) * manaPercent / 100 / 10;
+        caster->CastCustomSpell(SPELL_DRUID_GLYPH_OF_INNERVATE_MANA, SPELLVALUE_BASE_POINT0, bp, caster, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_dru_glyph_of_innervate::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_dru_glyph_of_innervate::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// 54821 - Glyph of Rake
+class spell_dru_glyph_of_rake : public AuraScript
+{
+    PrepareAuraScript(spell_dru_glyph_of_rake);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DRUID_GLYPH_OF_RAKE_STUN });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        if (!spellInfo)
+            return false;
+
+        // Check if it's Rake (SpellVisual 750 and Effect 1 is periodic damage)
+        if (spellInfo->SpellVisual[0] != 750 || spellInfo->Effects[EFFECT_1].ApplyAuraName != SPELL_AURA_PERIODIC_DAMAGE)
+            return false;
+
+        Unit* target = eventInfo.GetActionTarget();
+        return target && target->IsCreature();
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        GetTarget()->CastSpell(eventInfo.GetActionTarget(), SPELL_DRUID_GLYPH_OF_RAKE_STUN, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_dru_glyph_of_rake::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_dru_glyph_of_rake::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// 24932 - Leader of the Pack
+class spell_dru_leader_of_the_pack : public AuraScript
+{
+    PrepareAuraScript(spell_dru_leader_of_the_pack);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DRUID_LEADER_OF_THE_PACK_HEAL, SPELL_DRUID_LEADER_OF_THE_PACK_MANA });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+    {
+        PreventDefaultAction();
+        Unit* target = GetTarget();
+        int32 healAmount = aurEff->GetAmount();
+        if (healAmount <= 0)
+            return;
+
+        // 6 second internal cooldown
+        if (target->IsPlayer() && target->ToPlayer()->HasSpellCooldown(SPELL_DRUID_LEADER_OF_THE_PACK_HEAL))
+            return;
+
+        int32 bp = target->CountPctFromMaxHealth(healAmount);
+        target->CastCustomSpell(SPELL_DRUID_LEADER_OF_THE_PACK_HEAL, SPELLVALUE_BASE_POINT0, bp, target, true, nullptr, aurEff);
+
+        if (target->IsPlayer())
+            target->ToPlayer()->AddSpellCooldown(SPELL_DRUID_LEADER_OF_THE_PACK_HEAL, 0, 6 * IN_MILLISECONDS);
+
+        // Improved Leader of the Pack - mana regen (only for self-cast aura)
+        if (aurEff->GetCasterGUID() == target->GetGUID())
+        {
+            int32 manaAmount = CalculatePct(target->GetMaxPower(POWER_MANA), healAmount * 2);
+            target->CastCustomSpell(SPELL_DRUID_LEADER_OF_THE_PACK_MANA, SPELLVALUE_BASE_POINT0, manaAmount, target, true, nullptr, aurEff);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_dru_leader_of_the_pack::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
+    }
+};
+
+// 54754 - Glyph of Rejuvenation
+class spell_dru_glyph_of_rejuvenation : public AuraScript
+{
+    PrepareAuraScript(spell_dru_glyph_of_rejuvenation);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DRUID_GLYPH_OF_REJUV_HEAL });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        Unit* target = eventInfo.GetActionTarget();
+        if (!target)
+            return false;
+
+        // Only proc if target is below health threshold
+        return target->HealthBelowPct(GetSpellInfo()->Effects[EFFECT_0].CalcValue());
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        int32 bp = CalculatePct(static_cast<int32>(eventInfo.GetHealInfo()->GetHeal()), aurEff->GetAmount());
+        GetTarget()->CastCustomSpell(SPELL_DRUID_GLYPH_OF_REJUV_HEAL, SPELLVALUE_BASE_POINT0, bp, eventInfo.GetActionTarget(), true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_dru_glyph_of_rejuvenation::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_dru_glyph_of_rejuvenation::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// -48516 - Eclipse
+class spell_dru_eclipse : public AuraScript
+{
+    PrepareAuraScript(spell_dru_eclipse);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DRUID_ECLIPSE_LUNAR, SPELL_DRUID_ECLIPSE_SOLAR });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        if (!spellInfo)
+            return false;
+
+        Unit* target = GetTarget();
+        if (!target->IsPlayer())
+            return false;
+
+        bool isWrathSpell = (spellInfo->SpellFamilyFlags[0] & 1);
+        bool isStarfireSpell = (spellInfo->SpellFamilyFlags[0] & 4);
+
+        // Must be Wrath or Starfire
+        if (!isWrathSpell && !isStarfireSpell)
+            return false;
+
+        // Check 30 second internal cooldown
+        uint32 now = GameTime::GetGameTimeMS().count();
+        if (isWrathSpell && _lunarProcCooldownEnd > now)
+            return false;
+        if (isStarfireSpell && _solarProcCooldownEnd > now)
+            return false;
+
+        // Don't proc if already have any eclipse aura
+        if (target->HasAura(SPELL_DRUID_ECLIPSE_LUNAR) || target->HasAura(SPELL_DRUID_ECLIPSE_SOLAR))
+            return false;
+
+        // Check proc chance (60% for Wrath, 100% for Starfire)
+        if (!roll_chance_f(GetSpellInfo()->ProcChance * (isWrathSpell ? 0.6f : 1.0f)))
+            return false;
+
+        return true;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        bool isWrathSpell = (spellInfo->SpellFamilyFlags[0] & 1);
+        uint32 triggeredSpell = isWrathSpell ? SPELL_DRUID_ECLIPSE_LUNAR : SPELL_DRUID_ECLIPSE_SOLAR;
+
+        // Set 30 second internal cooldown
+        uint32 now = GameTime::GetGameTimeMS().count();
+        if (isWrathSpell)
+            _lunarProcCooldownEnd = now + 30000;
+        else
+            _solarProcCooldownEnd = now + 30000;
+
+        GetTarget()->CastSpell(GetTarget(), triggeredSpell, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_dru_eclipse::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_dru_eclipse::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+
+private:
+    uint32 _lunarProcCooldownEnd = 0;
+    uint32 _solarProcCooldownEnd = 0;
+};
+
+// -48539 - Revitalize
+class spell_dru_revitalize : public AuraScript
+{
+    PrepareAuraScript(spell_dru_revitalize);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({
+            SPELL_DRUID_REVITALIZE_ENERGIZE_MANA,
+            SPELL_DRUID_REVITALIZE_ENERGIZE_RAGE,
+            SPELL_DRUID_REVITALIZE_ENERGIZE_ENERGY,
+            SPELL_DRUID_REVITALIZE_ENERGIZE_RP
+        });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        if (!roll_chance_i(aurEff->GetAmount()))
+            return;
+
+        Unit* target = eventInfo.GetActionTarget();
+        uint32 spellId;
+
+        switch (target->getPowerType())
+        {
+            case POWER_MANA:
+                spellId = SPELL_DRUID_REVITALIZE_ENERGIZE_MANA;
+                break;
+            case POWER_RAGE:
+                spellId = SPELL_DRUID_REVITALIZE_ENERGIZE_RAGE;
+                break;
+            case POWER_ENERGY:
+                spellId = SPELL_DRUID_REVITALIZE_ENERGIZE_ENERGY;
+                break;
+            case POWER_RUNIC_POWER:
+                spellId = SPELL_DRUID_REVITALIZE_ENERGIZE_RP;
+                break;
+            default:
+                return;
+        }
+
+        eventInfo.GetActor()->CastSpell(target, spellId, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_dru_revitalize::HandleProc, EFFECT_0, SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
+    }
+};
+
+// 28716 - Rejuvenation (T3 2P Bonus)
+class spell_dru_t3_2p_bonus : public AuraScript
+{
+    PrepareAuraScript(spell_dru_t3_2p_bonus);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({
+            SPELL_DRUID_T3_PROC_ENERGIZE_MANA,
+            SPELL_DRUID_T3_PROC_ENERGIZE_RAGE,
+            SPELL_DRUID_T3_PROC_ENERGIZE_ENERGY
+        });
+    }
+
+    bool CheckProc(ProcEventInfo& /*eventInfo*/)
+    {
+        return roll_chance_i(50);
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* target = eventInfo.GetActionTarget();
+        uint32 spellId;
+
+        switch (target->getPowerType())
+        {
+            case POWER_MANA:
+                spellId = SPELL_DRUID_T3_PROC_ENERGIZE_MANA;
+                break;
+            case POWER_RAGE:
+                spellId = SPELL_DRUID_T3_PROC_ENERGIZE_RAGE;
+                break;
+            case POWER_ENERGY:
+                spellId = SPELL_DRUID_T3_PROC_ENERGIZE_ENERGY;
+                break;
+            default:
+                return;
+        }
+
+        eventInfo.GetActor()->CastSpell(target, spellId, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_dru_t3_2p_bonus::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_dru_t3_2p_bonus::HandleProc, EFFECT_0, SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
+    }
+};
+
+// 28744 - Regrowth (T3 6P Bonus)
+class spell_dru_t3_6p_bonus : public AuraScript
+{
+    PrepareAuraScript(spell_dru_t3_6p_bonus);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DRUID_BLESSING_OF_THE_CLAW });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        eventInfo.GetActor()->CastSpell(eventInfo.GetActionTarget(), SPELL_DRUID_BLESSING_OF_THE_CLAW, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_dru_t3_6p_bonus::HandleProc, EFFECT_0, SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
+    }
+};
+
+// 28719 - Healing Touch (T3 8P Bonus)
+class spell_dru_t3_8p_bonus : public AuraScript
+{
+    PrepareAuraScript(spell_dru_t3_8p_bonus);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DRUID_EXHILARATE });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        if (!spellInfo)
+            return;
+
+        Unit* caster = eventInfo.GetActor();
+        int32 amount = CalculatePct(spellInfo->CalcPowerCost(caster, spellInfo->GetSchoolMask()), aurEff->GetAmount());
+        caster->CastCustomSpell(SPELL_DRUID_EXHILARATE, SPELLVALUE_BASE_POINT0, amount, caster, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_dru_t3_8p_bonus::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// 37288, 37295 - Mana Restore (T4 2P Bonus)
+class spell_dru_t4_2p_bonus : public AuraScript
+{
+    PrepareAuraScript(spell_dru_t4_2p_bonus);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DRUID_INFUSION });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+    {
+        PreventDefaultAction();
+        GetTarget()->CastSpell(nullptr, SPELL_DRUID_INFUSION, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_dru_t4_2p_bonus::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// 40442 - Druid Tier 6 Trinket
+class spell_dru_item_t6_trinket : public AuraScript
+{
+    PrepareAuraScript(spell_dru_item_t6_trinket);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({
+            SPELL_DRUID_BLESSING_OF_REMULOS,
+            SPELL_DRUID_BLESSING_OF_ELUNE,
+            SPELL_DRUID_BLESSING_OF_CENARIUS
+        });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        if (!spellInfo)
+            return;
+
+        uint32 spellId;
+        int32 chance;
+
+        // Starfire
+        if (spellInfo->SpellFamilyFlags[0] & 0x00000004)
+        {
+            spellId = SPELL_DRUID_BLESSING_OF_REMULOS;
+            chance = 25;
+        }
+        // Rejuvenation
+        else if (spellInfo->SpellFamilyFlags[0] & 0x00000010)
+        {
+            spellId = SPELL_DRUID_BLESSING_OF_ELUNE;
+            chance = 25;
+        }
+        // Mangle (Bear) and Mangle (Cat)
+        else if (spellInfo->SpellFamilyFlags[1] & 0x00000440)
+        {
+            spellId = SPELL_DRUID_BLESSING_OF_CENARIUS;
+            chance = 40;
+        }
+        else
+            return;
+
+        if (roll_chance_i(chance))
+            eventInfo.GetActor()->CastSpell(nullptr, spellId, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_dru_item_t6_trinket::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// 54815 - Glyph of Shred
+class spell_dru_glyph_of_shred : public AuraScript
+{
+    PrepareAuraScript(spell_dru_glyph_of_shred);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({
+            SPELL_DRUID_GLYPH_OF_RIP,
+            SPELL_DRUID_RIP_DURATION_LACERATE_DMG
+        });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        Unit* caster = eventInfo.GetActor();
+        // Try to find Rip on the target
+        if (AuraEffect const* rip = eventInfo.GetActionTarget()->GetAuraEffect(SPELL_AURA_PERIODIC_DAMAGE, SPELLFAMILY_DRUID, 0x00800000, 0x0, 0x0, caster->GetGUID()))
+        {
+            // Rip's max duration, includes modifiers like Glyph of Rip
+            uint32 countMin = rip->GetBase()->GetMaxDuration();
+
+            // Just Rip's max duration without other spells
+            uint32 countMax = rip->GetSpellInfo()->GetMaxDuration();
+
+            // Add possible auras' and Glyph of Shred's max duration
+            countMax += 3 * aurEff->GetAmount() * IN_MILLISECONDS;                                          // Glyph of Shred -> +6 seconds
+            countMax += caster->HasAura(SPELL_DRUID_GLYPH_OF_RIP) ? 4 * IN_MILLISECONDS : 0;                // Glyph of Rip -> +4 seconds
+            countMax += caster->HasAura(SPELL_DRUID_RIP_DURATION_LACERATE_DMG) ? 4 * IN_MILLISECONDS : 0;   // T7 set bonus -> +4 seconds
+
+            // If min < max that means caster didn't cast 3 shred yet
+            if (countMin < countMax)
+            {
+                rip->GetBase()->SetDuration(rip->GetBase()->GetDuration() + aurEff->GetAmount() * IN_MILLISECONDS);
+                rip->GetBase()->SetMaxDuration(countMin + aurEff->GetAmount() * IN_MILLISECONDS);
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_dru_glyph_of_shred::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// 54845 - Glyph of Starfire (Dummy)
+class spell_dru_glyph_of_starfire_dummy : public AuraScript
+{
+    PrepareAuraScript(spell_dru_glyph_of_starfire_dummy);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DRUID_GLYPH_OF_STARFIRE_PROC });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        eventInfo.GetActor()->CastSpell(eventInfo.GetActionTarget(), SPELL_DRUID_GLYPH_OF_STARFIRE_PROC, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_dru_glyph_of_starfire_dummy::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// 70664 - Item - Druid T10 Restoration 4P Bonus (Rejuvenation)
+class spell_dru_t10_restoration_4p_bonus_dummy : public AuraScript
+{
+    PrepareAuraScript(spell_dru_t10_restoration_4p_bonus_dummy);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DRUID_REJUVENATION_T10_PROC });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        if (!spellInfo || spellInfo->Id == SPELL_DRUID_REJUVENATION_T10_PROC)
+            return false;
+
+        HealInfo* healInfo = eventInfo.GetHealInfo();
+        if (!healInfo || !healInfo->GetHeal())
+            return false;
+
+        Player* caster = eventInfo.GetActor()->ToPlayer();
+        if (!caster)
+            return false;
+
+        return caster->GetGroup() || caster != eventInfo.GetActionTarget();
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        int32 amount = eventInfo.GetHealInfo()->GetHeal();
+        eventInfo.GetActor()->CastCustomSpell(SPELL_DRUID_REJUVENATION_T10_PROC, SPELLVALUE_BASE_POINT0, amount, nullptr, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_dru_t10_restoration_4p_bonus_dummy::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_dru_t10_restoration_4p_bonus_dummy::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// 44835 - Maim Interrupt
+class spell_dru_maim_interrupt : public AuraScript
+{
+    PrepareAuraScript(spell_dru_maim_interrupt);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DRUID_MAIM_INTERRUPT });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+    {
+        PreventDefaultAction();
+        GetTarget()->CastSpell(GetTarget(), SPELL_DRUID_MAIM_INTERRUPT, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_dru_maim_interrupt::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// 67353 - T9 Feral Relic (Idol of Mutilation)
+class spell_dru_t9_feral_relic : public AuraScript
+{
+    PrepareAuraScript(spell_dru_t9_feral_relic);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({
+            SPELL_DRUID_T9_FERAL_RELIC_BEAR,
+            SPELL_DRUID_T9_FERAL_RELIC_CAT
+        });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        Unit* target = eventInfo.GetActor();
+
+        switch (target->GetShapeshiftForm())
+        {
+            case FORM_BEAR:
+            case FORM_DIREBEAR:
+            case FORM_CAT:
+                return true;
+            default:
+                break;
+        }
+
+        return false;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        uint32 triggerspell = 0;
+
+        Unit* target = eventInfo.GetActor();
+
+        switch (target->GetShapeshiftForm())
+        {
+            case FORM_BEAR:
+            case FORM_DIREBEAR:
+                triggerspell = SPELL_DRUID_T9_FERAL_RELIC_BEAR;
+                break;
+            case FORM_CAT:
+                triggerspell = SPELL_DRUID_T9_FERAL_RELIC_CAT;
+                break;
+            default:
+                return;
+        }
+
+        target->CastSpell(target, triggerspell, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_dru_t9_feral_relic::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_dru_t9_feral_relic::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
+// 22842 - Frenzied Regeneration
+class spell_dru_frenzied_regeneration : public AuraScript
+{
+    PrepareAuraScript(spell_dru_frenzied_regeneration);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DRUID_FRENZIED_REGENERATION_HEAL });
+    }
+
+    void HandlePeriodic(AuraEffect const* aurEff)
+    {
+        Unit* target = GetTarget();
+        if (target->getPowerType() != POWER_RAGE)
+            return;
+
+        uint32 rage = target->GetPower(POWER_RAGE);
+        if (!rage)
+            return;
+
+        int32 const mod = std::min(static_cast<int32>(rage), 100);
+        int32 const points = GetSpellInfo()->Effects[EFFECT_1].CalcValue(target);
+        int32 const regen = CalculatePct(target->GetMaxHealth(), points * mod / 100.f);
+        target->CastCustomSpell(SPELL_DRUID_FRENZIED_REGENERATION_HEAL, SPELLVALUE_BASE_POINT0, regen, target, true, nullptr, aurEff);
+        target->SetPower(POWER_RAGE, rage - mod);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_dru_frenzied_regeneration::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+    }
+};
+
+// -5570 - Insect Swarm
+class spell_dru_insect_swarm : public AuraScript
+{
+    PrepareAuraScript(spell_dru_insect_swarm);
+
+    void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
+    {
+        if (Unit* caster = GetCaster())
+            if (AuraEffect const* relicAurEff = caster->GetAuraEffect(SPELL_DRUID_ITEM_T8_BALANCE_RELIC, EFFECT_0))
+                amount += relicAurEff->GetAmount() / aurEff->GetTotalTicks();
+    }
+
+    void Register() override
+    {
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dru_insect_swarm::CalculateAmount, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
+    }
+};
+
+// 50464 - Nourish
+class spell_dru_nourish : public SpellScript
+{
+    PrepareSpellScript(spell_dru_nourish);
+
+    void HandleHeal(SpellEffIndex /*effIndex*/)
+    {
+        Unit* caster = GetCaster();
+        Unit* target = GetHitUnit();
+        if (!target)
+            return;
+
+        int32 heal = GetHitHeal();
+
+        // Glyph of Nourish
+        if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_DRUID_GLYPH_OF_NOURISH, EFFECT_0))
+        {
+            uint32 auraCount = 0;
+
+            Unit::AuraEffectList const& periodicHeals = target->GetAuraEffectsByType(SPELL_AURA_PERIODIC_HEAL);
+            for (AuraEffect const* hot : periodicHeals)
+            {
+                if (caster->GetGUID() == hot->GetCasterGUID())
+                    ++auraCount;
+            }
+
+            AddPct(heal, aurEff->GetAmount() * auraCount);
+        }
+
+        SetHitHeal(heal);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_dru_nourish::HandleHeal, EFFECT_0, SPELL_EFFECT_HEAL);
+    }
+};
+
+// -48438 - Wild Growth (AuraScript)
+class spell_dru_wild_growth_aura : public AuraScript
+{
+    PrepareAuraScript(spell_dru_wild_growth_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DRUID_RESTORATION_T10_2P_BONUS });
+    }
+
+    void SetTickHeal(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
+    {
+        _baseTick = amount;
+        if (Unit* caster = GetCaster())
+            if (AuraEffect const* bonus = caster->GetAuraEffect(SPELL_DRUID_RESTORATION_T10_2P_BONUS, EFFECT_0))
+                AddPct(_baseReduction, -bonus->GetAmount());
+    }
+
+    void HandleTickUpdate(AuraEffect* aurEff)
+    {
+        // Wild Growth = first tick gains a 6% bonus, reduced by 2% each tick
+        float reduction = _baseReduction;
+        reduction *= (aurEff->GetTickNumber() - 1);
+
+        float const bonus = 6.f - reduction;
+        int32 const amount = int32(_baseTick + CalculatePct(_baseTick, bonus));
+        aurEff->SetAmount(amount);
+    }
+
+    void Register() override
+    {
+        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_dru_wild_growth_aura::SetTickHeal, EFFECT_0, SPELL_AURA_PERIODIC_HEAL);
+        OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_dru_wild_growth_aura::HandleTickUpdate, EFFECT_0, SPELL_AURA_PERIODIC_HEAL);
+    }
+
+    float _baseTick = 0.f;
+    float _baseReduction = 2.f;
+};
+
 void AddSC_druid_spell_scripts()
 {
     RegisterSpellScript(spell_dru_bear_form_passive);
@@ -1274,6 +2090,7 @@ void AddSC_druid_spell_scripts()
     RegisterSpellScript(spell_dru_omen_of_clarity);
     RegisterSpellScript(spell_dru_brambles_treant);
     RegisterSpellScript(spell_dru_barkskin);
+    RegisterSpellScript(spell_dru_glyph_of_barkskin);
     RegisterSpellScript(spell_dru_treant_scaling);
     RegisterSpellScript(spell_dru_berserk);
     RegisterSpellAndAuraScriptPair(spell_dru_dash, spell_dru_dash_aura);
@@ -1298,7 +2115,27 @@ void AddSC_druid_spell_scripts()
     RegisterSpellScript(spell_dru_tiger_s_fury);
     RegisterSpellScript(spell_dru_typhoon);
     RegisterSpellScript(spell_dru_t10_restoration_4p_bonus);
-    RegisterSpellScript(spell_dru_wild_growth);
+    RegisterSpellAndAuraScriptPair(spell_dru_wild_growth, spell_dru_wild_growth_aura);
     RegisterSpellScript(spell_dru_moonkin_form_passive_proc);
     RegisterSpellScript(spell_dru_rejuvenation_moonglade_2_set);
+    // Proc system scripts
+    RegisterSpellScript(spell_dru_glyph_of_innervate);
+    RegisterSpellScript(spell_dru_glyph_of_rake);
+    RegisterSpellScript(spell_dru_leader_of_the_pack);
+    RegisterSpellScript(spell_dru_glyph_of_rejuvenation);
+    RegisterSpellScript(spell_dru_eclipse);
+    RegisterSpellScript(spell_dru_revitalize);
+    RegisterSpellScript(spell_dru_t3_2p_bonus);
+    RegisterSpellScript(spell_dru_t3_6p_bonus);
+    RegisterSpellScript(spell_dru_t3_8p_bonus);
+    RegisterSpellScript(spell_dru_t4_2p_bonus);
+    RegisterSpellScript(spell_dru_item_t6_trinket);
+    RegisterSpellScript(spell_dru_glyph_of_shred);
+    RegisterSpellScript(spell_dru_glyph_of_starfire_dummy);
+    RegisterSpellScript(spell_dru_t10_restoration_4p_bonus_dummy);
+    RegisterSpellScript(spell_dru_maim_interrupt);
+    RegisterSpellScript(spell_dru_t9_feral_relic);
+    RegisterSpellScript(spell_dru_frenzied_regeneration);
+    RegisterSpellScript(spell_dru_insect_swarm);
+    RegisterSpellScript(spell_dru_nourish);
 }

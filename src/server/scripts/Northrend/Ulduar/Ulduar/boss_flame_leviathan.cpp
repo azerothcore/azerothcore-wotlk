@@ -193,319 +193,300 @@ enum Misc
 
 const Position homePos = {322.39f, -14.5f, 409.8f, 3.14f};
 
-class boss_flame_leviathan : public CreatureScript
+struct boss_flame_leviathan : public BossAI
 {
-public:
-    boss_flame_leviathan() : CreatureScript("boss_flame_leviathan") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
+    boss_flame_leviathan(Creature* pCreature) : BossAI(pCreature, BOSS_LEVIATHAN), vehicle(me->GetVehicleKit())
     {
-        return GetUlduarAI<boss_flame_leviathanAI>(pCreature);
+        assert(vehicle);
     }
 
-    struct boss_flame_leviathanAI : public ScriptedAI
+    Vehicle* vehicle;
+
+    uint32 _startTimer;
+    uint32 _speakTimer;
+    uint8 _towersCount;
+    bool _shutdown;
+    uint32 _destroyedTurretCount;
+
+    // Custom
+    void BindPlayers();
+    void RadioSay(uint8 textid);
+    void ActivateTowers();
+    void TurnGates(bool _start, bool _death);
+    void TurnHealStations(bool _apply);
+    void ScheduleEvents();
+    void SummonTowerHelpers(uint8 towerId);
+
+    // Original
+    void JustReachedHome() override
     {
-        boss_flame_leviathanAI(Creature* pCreature) : ScriptedAI(pCreature), vehicle(me->GetVehicleKit()), summons(me)
+        _JustReachedHome();
+        // For achievement
+        instance->SetData(DATA_UNBROKEN_ACHIEVEMENT, 0);
+        me->setActive(false);
+    }
+
+    void MoveInLineOfSight(Unit*) override {}
+    void JustSummoned(Creature* cr)  override
+    {
+        if (cr->GetEntry() != NPC_FLAME_LEVIATHAN_TURRET && cr->GetEntry() != NPC_SEAT)
+            summons.Summon(cr);
+    }
+
+    void SummonedCreatureDespawn(Creature* cr) override { summons.Despawn(cr); }
+    void SpellHit(Unit* caster, SpellInfo const* spellInfo) override;
+    void JustDied(Unit*) override;
+    void KilledUnit(Unit* who) override;
+    void SpellHitTarget(Unit* target, SpellInfo const* spell) override;
+
+    void AttackStart(Unit* who) override
+    {
+        if (Unit* veh = who->GetVehicleBase())
+            BossAI::AttackStart(veh);
+        else
+            BossAI::AttackStart(who);
+    }
+
+    void JustEngagedWith(Unit*) override
+    {
+        ScheduleEvents();
+        Talk(FLAME_LEVIATHAN_SAY_AGGRO);
+
+        me->setActive(true);
+        me->SetHomePosition(homePos);
+        TurnHealStations(false);
+        ActivateTowers();
+        instance->SetBossState(BOSS_LEVIATHAN, SPECIAL);
+
+        BindPlayers();
+        me->SetInCombatWithZone();
+
+        if (!_startTimer)
         {
-            m_pInstance = pCreature->GetInstanceScript();
-            assert(vehicle);
+            TurnGates(true, false);
         }
+    }
 
-        InstanceScript* m_pInstance;
-        Vehicle* vehicle;
-        EventMap events;
-        SummonList summons;
-
-        uint32 _startTimer;
-        uint32 _speakTimer;
-        uint8 _towersCount;
-        bool _shutdown;
-        uint32 _destroyedTurretCount;
-
-        // Custom
-        void BindPlayers();
-        void RadioSay(uint8 textid);
-        void ActivateTowers();
-        void TurnGates(bool _start, bool _death);
-        void TurnHealStations(bool _apply);
-        void ScheduleEvents();
-        void SummonTowerHelpers(uint8 towerId);
-
-        // Original
-        void JustReachedHome() override
+    void InitializeAI() override
+    {
+        if (instance->GetBossState(BOSS_LEVIATHAN) == SPECIAL)
         {
-            // For achievement
-            if (m_pInstance)
-                m_pInstance->SetData(DATA_UNBROKEN_ACHIEVEMENT, 0);
-            me->setActive(false);
-        }
-
-        void MoveInLineOfSight(Unit*) override {}
-        void JustSummoned(Creature* cr)  override
-        {
-            if (cr->GetEntry() != NPC_FLAME_LEVIATHAN_TURRET && cr->GetEntry() != NPC_SEAT)
-                summons.Summon(cr);
-        }
-
-        void SummonedCreatureDespawn(Creature* cr) override { summons.Despawn(cr); }
-        void SpellHit(Unit* caster, SpellInfo const* spellInfo) override;
-        void JustDied(Unit*) override;
-        void KilledUnit(Unit* who) override;
-        void SpellHitTarget(Unit* target, SpellInfo const* spell) override;
-
-        void AttackStart(Unit* who) override
-        {
-            if (Unit* veh = who->GetVehicleBase())
-                ScriptedAI::AttackStart(veh);
-            else
-                ScriptedAI::AttackStart(who);
-        }
-
-        void JustEngagedWith(Unit*) override
-        {
-            ScheduleEvents();
-            Talk(FLAME_LEVIATHAN_SAY_AGGRO);
-
-            me->setActive(true);
             me->SetHomePosition(homePos);
-            TurnHealStations(false);
-            ActivateTowers();
-            if (m_pInstance)
-                m_pInstance->SetData(TYPE_LEVIATHAN, SPECIAL);
-
-            BindPlayers();
-            me->SetInCombatWithZone();
-
-            if (!_startTimer)
-            {
-                TurnGates(true, false);
-            }
+            me->UpdatePosition(homePos);
+            me->StopMovingOnCurrentPos();
         }
 
-        void InitializeAI() override
-        {
-            if (m_pInstance && m_pInstance->GetData(TYPE_LEVIATHAN) == SPECIAL)
-            {
-                me->SetHomePosition(homePos);
-                me->UpdatePosition(homePos);
-                me->StopMovingOnCurrentPos();
-            }
+        BossAI::InitializeAI();
+    }
 
-            ScriptedAI::InitializeAI();
+    void Reset() override
+    {
+        // Special immunity case
+        me->CastSpell(me, SPELL_INVIS_AND_STEALTH_DETECT, true);
+        me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_USE_NORMAL_MOVEMENT_SPEED, true);
+
+        summons.DoAction(ACTION_DESPAWN_ADDS);
+        summons.DespawnAll();
+        events.Reset();
+
+        _shutdown = false;
+        _startTimer = 1;
+        _speakTimer = 0;
+        _towersCount = 0;
+        _destroyedTurretCount = 0;
+
+        if (instance->GetBossState(BOSS_LEVIATHAN) != SPECIAL)
+        {
+            instance->SetBossState(BOSS_LEVIATHAN, NOT_STARTED);
+            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+        }
+        else
+        {
+            me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+            instance->SetData(DATA_VEHICLE_SPAWN, VEHICLE_POS_LEVIATHAN);
+            _startTimer = 0;
         }
 
-        void Reset() override
+        TurnGates(false, false);
+        TurnHealStations(true);
+    }
+
+    uint32 GetData(uint32 param) const override
+    {
+        if (param == DATA_GET_TOWER_COUNT)
+            return _towersCount;
+        if (param == DATA_GET_SHUTDOWN)
+            return !_shutdown;
+
+        return 0;
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        // THIS IS USED ONLY FOR FIRST ENGAGE!
+        if (_startTimer)
         {
-            // Special immunity case
-            me->CastSpell(me, SPELL_INVIS_AND_STEALTH_DETECT, true);
-            me->ApplySpellImmune(0, IMMUNITY_STATE, SPELL_AURA_USE_NORMAL_MOVEMENT_SPEED, true);
-
-            summons.DoAction(ACTION_DESPAWN_ADDS);
-            summons.DespawnAll();
-            events.Reset();
-
-            _shutdown = false;
-            _startTimer = 1;
-            _speakTimer = 0;
-            _towersCount = 0;
-            _destroyedTurretCount = 0;
-
-            if (m_pInstance)
+            _startTimer += diff;
+            if (_startTimer >= 4000)
             {
-                if (m_pInstance->GetData(TYPE_LEVIATHAN) != SPECIAL)
-                {
-                    m_pInstance->SetData(TYPE_LEVIATHAN, NOT_STARTED);
-                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                }
+                // Colossus dead, players in range
+                if (me->FindNearestCreature(NPC_ULDUAR_COLOSSUS, 250.0f, true) || !SelectTargetFromPlayerList(250.0f))
+                    _startTimer = 1;
                 else
                 {
-                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                    m_pInstance->SetData(DATA_VEHICLE_SPAWN, VEHICLE_POS_LEVIATHAN);
                     _startTimer = 0;
+                    _speakTimer = 1;
                 }
             }
-
-            TurnGates(false, false);
-            TurnHealStations(true);
+            return;
         }
 
-        uint32 GetData(uint32 param) const override
+        if (_speakTimer)
         {
-            if (param == DATA_GET_TOWER_COUNT)
-                return _towersCount;
-            if (param == DATA_GET_SHUTDOWN)
-                return !_shutdown;
-
-            return 0;
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            // THIS IS USED ONLY FOR FIRST ENGAGE!
-            if (_startTimer)
+            _speakTimer += diff;
+            if (_speakTimer <= 10000)
             {
-                _startTimer += diff;
-                if (_startTimer >= 4000)
-                {
-                    // Colossus dead, players in range
-                    if (me->FindNearestCreature(NPC_ULDUAR_COLOSSUS, 250.0f, true) || !SelectTargetFromPlayerList(250.0f))
-                        _startTimer = 1;
-                    else
-                    {
-                        _startTimer = 0;
-                        _speakTimer = 1;
-                    }
-                }
-                return;
+                _speakTimer = 10000;
+                RadioSay(BRANN_RADIO_SAY_FL_START_0);
             }
-
-            if (_speakTimer)
+            else if (_speakTimer > 16000 && _speakTimer < 20000)
             {
-                _speakTimer += diff;
-                if (_speakTimer <= 10000)
-                {
-                    _speakTimer = 10000;
-                    RadioSay(BRANN_RADIO_SAY_FL_START_0);
-                }
-                else if (_speakTimer > 16000 && _speakTimer < 20000)
-                {
-                    _speakTimer = 20000;
-                    RadioSay(BRANN_RADIO_SAY_FL_START_1);
-                }
-                else if (_speakTimer > 24000 && _speakTimer < 40000)
-                {
-                    _speakTimer = 40000;
-                    RadioSay(BRANN_RADIO_SAY_FL_START_2);
-                }
-                else if (_speakTimer > 41000 && _speakTimer < 60000)
-                {
-                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                    TurnGates(true, false);
-                    me->GetMotionMaster()->MovePoint(0, homePos.GetPositionX(), homePos.GetPositionY(), homePos.GetPositionZ(), FORCED_MOVEMENT_NONE, 100.0f);
-                    _speakTimer = 60000;
-                }
-                else if (_speakTimer > 63500)
-                {
-                    me->SetInCombatWithZone();
-                    if (!me->GetVictim())
-                    {
-                        me->CastSpell(me, SPELL_PURSUED, false);
-                        events.RescheduleEvent(EVENT_PURSUE, 31s);
-                    }
-                    _speakTimer = 0;
-                }
-                return;
+                _speakTimer = 20000;
+                RadioSay(BRANN_RADIO_SAY_FL_START_1);
             }
-
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
+            else if (_speakTimer > 24000 && _speakTimer < 40000)
             {
-                case EVENT_POSITION_CHECK:
-                    if (me->GetPositionX() > 450 || me->GetPositionX() < 120)
-                    {
-                        EnterEvadeMode();
-                        return;
-                    }
-                    events.Repeat(5s);
-                    break;
-                case EVENT_PURSUE:
-                    Talk(FLAME_LEVIATHAN_SAY_PURSUE);
+                _speakTimer = 40000;
+                RadioSay(BRANN_RADIO_SAY_FL_START_2);
+            }
+            else if (_speakTimer > 41000 && _speakTimer < 60000)
+            {
+                me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                TurnGates(true, false);
+                me->GetMotionMaster()->MovePoint(0, homePos.GetPositionX(), homePos.GetPositionY(), homePos.GetPositionZ(), FORCED_MOVEMENT_NONE, 100.0f);
+                _speakTimer = 60000;
+            }
+            else if (_speakTimer > 63500)
+            {
+                me->SetInCombatWithZone();
+                if (!me->GetVictim())
+                {
                     me->CastSpell(me, SPELL_PURSUED, false);
                     events.RescheduleEvent(EVENT_PURSUE, 31s);
-                    return;
-                case EVENT_SPEED:
-                    me->CastSpell(me, SPELL_GATHERING_SPEED, false);
-                    events.Repeat(15s);
-                    return;
-                case EVENT_MISSILE:
-                    me->CastSpell(me, SPELL_MISSILE_BARRAGE, true);
-                    events.Repeat(4s);
-                    return;
-                case EVENT_VENT:
-                    me->CastSpell(me, SPELL_FLAME_VENTS, false);
-                    events.Repeat(20s);
-                    return;
-                case EVENT_SUMMON:
-                    if (summons.size() < 20)
-                        if (Creature* lift = DoSummonFlyer(NPC_MECHANOLIFT, me, 30.0f, 50.0f, 0))
-                            lift->GetMotionMaster()->MoveRandom(100);
-
-                    events.Repeat(4s);
-                    return;
-                case EVENT_SOUND_BEGINNING:
-                    if (_towersCount)
-                        Talk(FLAME_LEVIATHAN_SAY_HARDMODE);
-                    else
-                        Talk(FLAME_LEVIATHAN_SAY_TOWER_NONE);
-                    return;
-                case EVENT_REINSTALL:
-                    for (uint8 i = RAID_MODE(0, 2); i < 4; ++i)
-                        if (Unit* seat = vehicle->GetPassenger(i))
-                            if (seat->IsCreature())
-                                seat->ToCreature()->AI()->EnterEvadeMode();
-                    Talk(FLAME_LEVIATHAN_EMOTE_REACTIVATE);
-                    return;
-                case EVENT_THORIMS_HAMMER:
-                    SummonTowerHelpers(TOWER_OF_STORMS);
-                    events.Repeat(1min, 2min);
-                    Talk(FLAME_LEVIATHAN_EMOTE_STORM);
-                    Talk(FLAME_LEVIATHAN_SAY_TOWER_STORM);
-                    return;
-                case EVENT_FREYA:
-                    SummonTowerHelpers(TOWER_OF_LIFE);
-                    Talk(FLAME_LEVIATHAN_EMOTE_NATURE);
-                    Talk(FLAME_LEVIATHAN_SAY_TOWER_NATURE);
-                    return;
-                case EVENT_MIMIRONS_INFERNO:
-                    SummonTowerHelpers(TOWER_OF_FLAMES);
-                    Talk(FLAME_LEVIATHAN_EMOTE_FLAME);
-                    Talk(FLAME_LEVIATHAN_SAY_TOWER_FLAME);
-                    return;
-                case EVENT_HODIRS_FURY:
-                    SummonTowerHelpers(TOWER_OF_FROST);
-                    Talk(FLAME_LEVIATHAN_EMOTE_FROST);
-                    Talk(FLAME_LEVIATHAN_SAY_TOWER_FROST);
-                    return;
-            }
-
-            if (me->isAttackReady() && !me->HasUnitState(UNIT_STATE_STUNNED))
-            {
-                if (me->IsWithinCombatRange(me->GetVictim(), 15.0f))
-                {
-                    me->CastSpell(me->GetVictim(), SPELL_BATTERING_RAM, false);
-                    me->resetAttackTimer();
                 }
+                _speakTimer = 0;
             }
+            return;
         }
 
-        void DoAction(int32 action) override
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
         {
-            if (action == ACTION_DESTROYED_TURRET)
-            {
-                ++_destroyedTurretCount;
-
-                if (_destroyedTurretCount == RAID_MODE<uint32>(2, 4))
+            case EVENT_POSITION_CHECK:
+                if (me->GetPositionX() > 450 || me->GetPositionX() < 120)
                 {
-                    _destroyedTurretCount = 0;
-                    me->CastSpell(me, SPELL_SYSTEMS_SHUTDOWN, true);
+                    EnterEvadeMode();
+                    return;
                 }
+                events.Repeat(5s);
+                break;
+            case EVENT_PURSUE:
+                Talk(FLAME_LEVIATHAN_SAY_PURSUE);
+                me->CastSpell(me, SPELL_PURSUED, false);
+                events.RescheduleEvent(EVENT_PURSUE, 31s);
+                return;
+            case EVENT_SPEED:
+                me->CastSpell(me, SPELL_GATHERING_SPEED, false);
+                events.Repeat(15s);
+                return;
+            case EVENT_MISSILE:
+                me->CastSpell(me, SPELL_MISSILE_BARRAGE, true);
+                events.Repeat(4s);
+                return;
+            case EVENT_VENT:
+                me->CastSpell(me, SPELL_FLAME_VENTS, false);
+                events.Repeat(20s);
+                return;
+            case EVENT_SUMMON:
+                if (summons.size() < 20)
+                    if (Creature* lift = DoSummonFlyer(NPC_MECHANOLIFT, me, 30.0f, 50.0f, 0))
+                        lift->GetMotionMaster()->MoveRandom(100);
+
+                events.Repeat(4s);
+                return;
+            case EVENT_SOUND_BEGINNING:
+                if (_towersCount)
+                    Talk(FLAME_LEVIATHAN_SAY_HARDMODE);
+                else
+                    Talk(FLAME_LEVIATHAN_SAY_TOWER_NONE);
+                return;
+            case EVENT_REINSTALL:
+                for (uint8 i = RAID_MODE(0, 2); i < 4; ++i)
+                    if (Unit* seat = vehicle->GetPassenger(i))
+                        if (seat->IsCreature())
+                            seat->ToCreature()->AI()->EnterEvadeMode();
+                Talk(FLAME_LEVIATHAN_EMOTE_REACTIVATE);
+                return;
+            case EVENT_THORIMS_HAMMER:
+                SummonTowerHelpers(TOWER_OF_STORMS);
+                events.Repeat(1min, 2min);
+                Talk(FLAME_LEVIATHAN_EMOTE_STORM);
+                Talk(FLAME_LEVIATHAN_SAY_TOWER_STORM);
+                return;
+            case EVENT_FREYA:
+                SummonTowerHelpers(TOWER_OF_LIFE);
+                Talk(FLAME_LEVIATHAN_EMOTE_NATURE);
+                Talk(FLAME_LEVIATHAN_SAY_TOWER_NATURE);
+                return;
+            case EVENT_MIMIRONS_INFERNO:
+                SummonTowerHelpers(TOWER_OF_FLAMES);
+                Talk(FLAME_LEVIATHAN_EMOTE_FLAME);
+                Talk(FLAME_LEVIATHAN_SAY_TOWER_FLAME);
+                return;
+            case EVENT_HODIRS_FURY:
+                SummonTowerHelpers(TOWER_OF_FROST);
+                Talk(FLAME_LEVIATHAN_EMOTE_FROST);
+                Talk(FLAME_LEVIATHAN_SAY_TOWER_FROST);
+                return;
+        }
+
+        if (me->isAttackReady() && !me->HasUnitState(UNIT_STATE_STUNNED))
+        {
+            if (me->IsWithinCombatRange(me->GetVictim(), 15.0f))
+            {
+                me->CastSpell(me->GetVictim(), SPELL_BATTERING_RAM, false);
+                me->resetAttackTimer();
             }
         }
-    };
+    }
+
+    void DoAction(int32 action) override
+    {
+        if (action == ACTION_DESTROYED_TURRET)
+        {
+            ++_destroyedTurretCount;
+
+            if (_destroyedTurretCount == RAID_MODE<uint32>(2, 4))
+            {
+                _destroyedTurretCount = 0;
+                me->CastSpell(me, SPELL_SYSTEMS_SHUTDOWN, true);
+            }
+        }
+    }
 };
 
-void boss_flame_leviathan::boss_flame_leviathanAI::BindPlayers()
+void boss_flame_leviathan::BindPlayers()
 {
     me->GetMap()->ToInstanceMap()->PermBindAllPlayers();
 }
 
-void boss_flame_leviathan::boss_flame_leviathanAI::RadioSay(uint8 textid)
+void boss_flame_leviathan::RadioSay(uint8 textid)
 {
     if (Creature* r = me->SummonCreature(NPC_BRANN_RADIO, me->GetPositionX() - 150, me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 5000))
     {
@@ -513,13 +494,13 @@ void boss_flame_leviathan::boss_flame_leviathanAI::RadioSay(uint8 textid)
     }
 }
 
-void boss_flame_leviathan::boss_flame_leviathanAI::ActivateTowers()
+void boss_flame_leviathan::ActivateTowers()
 {
     _towersCount = 0;
     me->ResetLootMode();
     for (uint32 i = EVENT_TOWER_OF_LIFE_DESTROYED; i <= EVENT_TOWER_OF_FLAMES_DESTROYED; ++i)
     {
-        if (m_pInstance->GetData(i))
+        if (instance->GetData(i))
         {
             ++_towersCount;
 
@@ -547,35 +528,35 @@ void boss_flame_leviathan::boss_flame_leviathanAI::ActivateTowers()
     }
 }
 
-void boss_flame_leviathan::boss_flame_leviathanAI::TurnGates(bool _start, bool _death)
+void boss_flame_leviathan::TurnGates(bool _start, bool _death)
 {
-    if (!m_pInstance)
+    if (!instance)
         return;
 
     if (_start)
     {
         // first one is ALWAYS turned on, unless leviathan is beaten
         GameObject* go = nullptr;
-        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(DATA_LIGHTNING_WALL2))))
+        if ((go = instance->GetGameObject(DATA_LIGHTNING_WALL2)))
             go->SetGoState(GO_STATE_READY);
 
-        if (m_pInstance->GetData(TYPE_LEVIATHAN) == NOT_STARTED)
-            if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(GO_LEVIATHAN_DOORS))))
+        if (instance->GetBossState(BOSS_LEVIATHAN) == NOT_STARTED)
+            if ((go = instance->GetGameObject(DATA_LEVIATHAN_DOORS)))
                 go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
     }
     else
     {
         GameObject* go = nullptr;
         if (_death)
-            if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(DATA_LIGHTNING_WALL1))))
+            if ((go = instance->GetGameObject(DATA_LIGHTNING_WALL1)))
                 go->SetGoState(GO_STATE_ACTIVE);
 
-        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(DATA_LIGHTNING_WALL2))))
+        if ((go = instance->GetGameObject(DATA_LIGHTNING_WALL2)))
             go->SetGoState(GO_STATE_ACTIVE);
 
-        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(GO_LEVIATHAN_DOORS))))
+        if ((go = instance->GetGameObject(DATA_LEVIATHAN_DOORS)))
         {
-            if (m_pInstance->GetData(TYPE_LEVIATHAN) == SPECIAL || m_pInstance->GetData(TYPE_LEVIATHAN) == DONE)
+            if (instance->GetBossState(BOSS_LEVIATHAN) == SPECIAL || instance->GetBossState(BOSS_LEVIATHAN) == DONE)
                 go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
             else
                 go->SetGoState(GO_STATE_READY);
@@ -583,29 +564,29 @@ void boss_flame_leviathan::boss_flame_leviathanAI::TurnGates(bool _start, bool _
     }
 }
 
-void boss_flame_leviathan::boss_flame_leviathanAI::TurnHealStations(bool _apply)
+void boss_flame_leviathan::TurnHealStations(bool _apply)
 {
-    if (!m_pInstance)
+    if (!instance)
         return;
 
     GameObject* go = nullptr;
     if (_apply)
     {
-        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(DATA_REPAIR_STATION1))))
+        if ((go = instance->GetGameObject(DATA_REPAIR_STATION1)))
             go->SetLootState(GO_READY);
-        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(DATA_REPAIR_STATION2))))
+        if ((go = instance->GetGameObject(DATA_REPAIR_STATION2)))
             go->SetLootState(GO_READY);
     }
     else
     {
-        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(DATA_REPAIR_STATION1))))
+        if ((go = instance->GetGameObject(DATA_REPAIR_STATION1)))
             go->SetLootState(GO_ACTIVATED);
-        if ((go = ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(DATA_REPAIR_STATION2))))
+        if ((go = instance->GetGameObject(DATA_REPAIR_STATION2)))
             go->SetLootState(GO_ACTIVATED);
     }
 }
 
-void boss_flame_leviathan::boss_flame_leviathanAI::ScheduleEvents()
+void boss_flame_leviathan::ScheduleEvents()
 {
     events.RescheduleEvent(EVENT_MISSILE, 5s);
     events.RescheduleEvent(EVENT_VENT, 20s);
@@ -617,7 +598,7 @@ void boss_flame_leviathan::boss_flame_leviathanAI::ScheduleEvents()
     events.RescheduleEvent(EVENT_PURSUE, 0ms);
 }
 
-void boss_flame_leviathan::boss_flame_leviathanAI::SpellHit(Unit*  /*caster*/, SpellInfo const* spellInfo)
+void boss_flame_leviathan::SpellHit(Unit*  /*caster*/, SpellInfo const* spellInfo)
 {
     if (spellInfo->Id == SPELL_SYSTEMS_SHUTDOWN)
     {
@@ -634,17 +615,14 @@ void boss_flame_leviathan::boss_flame_leviathanAI::SpellHit(Unit*  /*caster*/, S
         me->InterruptNonMeleeSpells(false);
 }
 
-void boss_flame_leviathan::boss_flame_leviathanAI::JustDied(Unit*)
+void boss_flame_leviathan::JustDied(Unit*)
 {
     // Despawn Lashers, do before summons clear
     summons.DoAction(ACTION_DESPAWN_ADDS);
     summons.DespawnAll();
 
-    if (m_pInstance)
-    {
-        m_pInstance->SetData(TYPE_LEVIATHAN, DONE);
-        m_pInstance->SetData(DATA_VEHICLE_SPAWN, VEHICLE_POS_NONE);
-    }
+    instance->SetBossState(BOSS_LEVIATHAN, DONE);
+    instance->SetData(DATA_VEHICLE_SPAWN, VEHICLE_POS_NONE);
 
     Talk(FLAME_LEVIATHAN_SAY_DEATH);
 
@@ -652,7 +630,7 @@ void boss_flame_leviathan::boss_flame_leviathanAI::JustDied(Unit*)
     BindPlayers();
 }
 
-void boss_flame_leviathan::boss_flame_leviathanAI::KilledUnit(Unit* who)
+void boss_flame_leviathan::KilledUnit(Unit* who)
 {
     if (who == me->GetVictim())
         events.RescheduleEvent(EVENT_PURSUE, 0ms);
@@ -661,7 +639,7 @@ void boss_flame_leviathan::boss_flame_leviathanAI::KilledUnit(Unit* who)
         Talk(FLAME_LEVIATHAN_SAY_SLAY);
 }
 
-void boss_flame_leviathan::boss_flame_leviathanAI::SummonTowerHelpers(uint8 towerId)
+void boss_flame_leviathan::SummonTowerHelpers(uint8 towerId)
 {
     if (towerId == TOWER_OF_LIFE)
     {
@@ -691,7 +669,7 @@ void boss_flame_leviathan::boss_flame_leviathanAI::SummonTowerHelpers(uint8 towe
     }
 }
 
-void boss_flame_leviathan::boss_flame_leviathanAI::SpellHitTarget(Unit* target, SpellInfo const* spell)
+void boss_flame_leviathan::SpellHitTarget(Unit* target, SpellInfo const* spell)
 {
     if (spell->Id != SPELL_PURSUED)
         return;
@@ -706,729 +684,597 @@ void boss_flame_leviathan::boss_flame_leviathanAI::SpellHitTarget(Unit* target, 
     }
 }
 
-class boss_flame_leviathan_seat : public CreatureScript
+struct boss_flame_leviathan_seat : public VehicleAI
 {
-public:
-    boss_flame_leviathan_seat() : CreatureScript("boss_flame_leviathan_seat") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
+    boss_flame_leviathan_seat(Creature* creature) : VehicleAI(creature), vehicle(creature->GetVehicleKit())
     {
-        return GetUlduarAI<boss_flame_leviathan_seatAI>(pCreature);
+        ASSERT(vehicle);
+        me->SetReactState(REACT_PASSIVE);
     }
 
-    struct boss_flame_leviathan_seatAI : public VehicleAI
+    Vehicle* vehicle;
+    uint32 _despawnTimer;
+
+    void EnterEvadeMode(EvadeReason /*why*/) override
     {
-        boss_flame_leviathan_seatAI(Creature* creature) : VehicleAI(creature), vehicle(creature->GetVehicleKit())
-        {
-            ASSERT(vehicle);
-            me->SetReactState(REACT_PASSIVE);
-        }
-
-        Vehicle* vehicle;
-        uint32 _despawnTimer;
-
-        void EnterEvadeMode(EvadeReason /*why*/) override
-        {
-            vehicle->InstallAllAccessories(false);
-        }
-
-        void Reset() override
-        {
-            _despawnTimer = !me->GetMap()->Is25ManRaid();
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (_despawnTimer)
-            {
-                _despawnTimer += diff;
-                if (_despawnTimer >= 2000)
-                {
-                    _despawnTimer = 0;
-                    if (Vehicle* veh = me->GetVehicle())
-                        if (veh->GetPassenger(0) == me || veh->GetPassenger(1) == me)
-                            me->DespawnOrUnsummon(1ms);
-                }
-            }
-
-            VehicleAI::UpdateAI(diff);
-        }
-
-        void AttackStart(Unit*) override { }
-
-        void PassengerBoarded(Unit* who, int8 seatId, bool apply) override
-        {
-            if (!who->IsPlayer() || !me->GetVehicle())
-                return;
-
-            who->ApplySpellImmune(63847, IMMUNITY_ID, 63847, apply); // SPELL_FLAME_VENTS_TRIGGER
-            who->ApplySpellImmune(SPELL_MISSILE_BARRAGE, IMMUNITY_ID, SPELL_MISSILE_BARRAGE, apply);
-            who->ApplySpellImmune(SPELL_BATTERING_RAM, IMMUNITY_ID, SPELL_BATTERING_RAM, apply);
-
-            if (seatId == SEAT_PLAYER)
-            {
-                if (Unit* turret = me->GetVehicleKit()->GetPassenger(SEAT_TURRET))
-                {
-                    if (apply)
-                    {
-                        turret->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
-                        turret->GetAI()->AttackStart(who);
-                        if (Creature* leviathan = me->GetVehicleCreatureBase())
-                            leviathan->AI()->Talk(FLAME_LEVIATHAN_SAY_PLAYER_RIDING);
-                    }
-                    else
-                    {
-                        turret->ReplaceAllUnitFlags(UNIT_FLAG_NOT_SELECTABLE);
-                        turret->SetImmuneToAll(true);
-                        if (turret->IsCreature())
-                            turret->ToCreature()->AI()->EnterEvadeMode();
-                    }
-                }
-            }
-        }
-    };
-};
-
-class boss_flame_leviathan_defense_turret : public CreatureScript
-{
-public:
-    boss_flame_leviathan_defense_turret() : CreatureScript("boss_flame_leviathan_defense_turret") { }
-
-    struct boss_flame_leviathan_defense_turretAI : public TurretAI
-    {
-        boss_flame_leviathan_defense_turretAI(Creature* creature) : TurretAI(creature)
-        {
-            _setHealth = false;
-            _instance = creature->GetInstanceScript();
-        }
-
-        InstanceScript* _instance;
-
-        bool _setHealth;
-        void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
-        {
-            if (!CanAIAttack(who))
-            {
-                _setHealth = true;
-                damage = 0;
-            }
-        }
-
-        void JustDied(Unit* killer) override
-        {
-            if (Player* player = killer->ToPlayer())
-                player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS, 1, 0, me);
-
-            if (Vehicle* vehicle = me->GetVehicle())
-                if (Unit* device = vehicle->GetPassenger(SEAT_DEVICE))
-                    device->ReplaceAllUnitFlags(UNIT_FLAG_NONE); // unselectable
-
-            if (Creature* leviathan = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(TYPE_LEVIATHAN)))
-                leviathan->AI()->DoAction(ACTION_DESTROYED_TURRET);
-        }
-
-        bool CanAIAttack(Unit const* who) const override
-        {
-            if (!who || !who->IsPlayer() || !who->GetVehicle() || who->GetVehicleBase()->GetEntry() != NPC_SEAT)
-                return false;
-            return true;
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (_setHealth)
-            {
-                me->SetHealth(std::min(me->GetHealth() + 1, me->GetMaxHealth()));
-                _setHealth = false;
-            }
-
-            TurretAI::UpdateAI(diff);
-        }
-
-        void KilledUnit(Unit* who) override
-        {
-            if (Player* plr = who->ToPlayer()) // make sure that there's no death player on the seat.
-                if (plr->GetVehicle())
-                    plr->ExitVehicle();
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetUlduarAI<boss_flame_leviathan_defense_turretAI>(creature);
-    }
-};
-
-class boss_flame_leviathan_overload_device : public CreatureScript
-{
-public:
-    boss_flame_leviathan_overload_device() : CreatureScript("boss_flame_leviathan_overload_device") { }
-
-    struct boss_flame_leviathan_overload_deviceAI : public NullCreatureAI
-    {
-        boss_flame_leviathan_overload_deviceAI(Creature* creature) : NullCreatureAI(creature)
-        {
-        }
-
-        void OnSpellClick(Unit* /*clicker*/, bool& result) override
-        {
-            if (!result)
-                return;
-
-            if (me->GetVehicle())
-            {
-                me->RemoveNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
-                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-
-                if (Unit* player = me->GetVehicle()->GetPassenger(SEAT_PLAYER))
-                {
-                    me->GetVehicleBase()->CastSpell(player, SPELL_SMOKE_TRAIL, true);
-                    player->ExitVehicle();
-                }
-            }
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetUlduarAI<boss_flame_leviathan_overload_deviceAI>(creature);
-    }
-};
-
-class npc_freya_ward : public CreatureScript
-{
-public:
-    npc_freya_ward() : CreatureScript("npc_freya_ward") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
-    {
-        return GetUlduarAI<npc_freya_wardAI>(pCreature);
+        vehicle->InstallAllAccessories(false);
     }
 
-    struct npc_freya_wardAI : public NullCreatureAI
+    void Reset() override
     {
-        npc_freya_wardAI(Creature* c) : NullCreatureAI(c), summons(c)
-        {
-        }
-
-        SummonList summons;
-        uint32 _castTimer;
-        bool _summoned;
-
-        void Reset() override
-        {
-            _summoned = false;
-            _castTimer = 25000;
-            summons.DespawnAll();
-            if (Creature* cr = me->FindNearestCreature(NPC_FREYA_WARD_TARGET, 60.0f, true))
-                if (Aura* aur = cr->AddAura(SPELL_FREYA_DUMMY_GREEN, cr))
-                {
-                    aur->SetMaxDuration(-1);
-                    aur->SetDuration(-1);
-                }
-        }
-
-        void JustSummoned(Creature* cr) override
-        {
-            _summoned = true;
-            summons.Summon(cr);
-        }
-
-        void SummonedCreatureDespawn(Creature* cr) override { summons.Despawn(cr); }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (_summoned)
-            {
-                for (SummonList::const_iterator itr = summons.begin(); itr != summons.end();)
-                {
-                    Creature* summon = ObjectAccessor::GetCreature(*me, *itr);
-                    ++itr;
-                    if (summon)
-                    {
-                        summon->ToTempSummon()->SetTempSummonType(TEMPSUMMON_MANUAL_DESPAWN);
-                        if (Unit* target = summon->SelectNearestTarget(200.0f))
-                            summon->AI()->AttackStart(target);
-                    }
-                }
-                _summoned = false;
-            }
-
-            _castTimer += diff;
-            if (_castTimer >= 29 * IN_MILLISECONDS)
-            {
-                if (Creature* cr = me->FindNearestCreature(NPC_FREYA_WARD_TARGET, 60.0f, true))
-                {
-                    me->CastSpell(cr, SPELL_FREYA_WARD, false);
-                    me->CastSpell(cr, 62947 /*SPELL_FREYA_WARD_SECOND_SUMMON*/, false);
-                }
-
-                _castTimer = 0;
-            }
-        }
-
-        void DoAction(int32 param) override
-        {
-            if (param == ACTION_DESPAWN_ADDS)
-                summons.DespawnAll();
-        }
-    };
-};
-
-class npc_hodirs_fury : public CreatureScript
-{
-public:
-    npc_hodirs_fury() : CreatureScript("npc_hodirs_fury") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
-    {
-        return GetUlduarAI<npc_hodirs_furyAI>(pCreature);
+        _despawnTimer = !me->GetMap()->Is25ManRaid();
     }
 
-    struct npc_hodirs_furyAI : public NullCreatureAI
+    void UpdateAI(uint32 diff) override
     {
-        npc_hodirs_furyAI(Creature* c) : NullCreatureAI(c)
+        if (_despawnTimer)
         {
-        }
-
-        uint32 _timeToHit;
-        uint32 _switchTargetTimer;
-
-        void Reset() override
-        {
-            _timeToHit = 0;
-            _switchTargetTimer = 30000;
-            me->SetWalk(true);
-
-            if (Aura* aur = me->AddAura(SPELL_FREYA_DUMMY_BLUE, me))
+            _despawnTimer += diff;
+            if (_despawnTimer >= 2000)
             {
-                aur->SetMaxDuration(-1);
-                aur->SetDuration(-1);
+                _despawnTimer = 0;
+                if (Vehicle* veh = me->GetVehicle())
+                    if (veh->GetPassenger(0) == me || veh->GetPassenger(1) == me)
+                        me->DespawnOrUnsummon(1ms);
             }
         }
 
-        void MovementInform(uint32 type, uint32  /*param*/) override
-        {
-            if (type == FOLLOW_MOTION_TYPE && !_timeToHit)
-            {
-                _timeToHit = 1;
-                _switchTargetTimer = 0;
-                me->SetControlled(true, UNIT_STATE_STUNNED);
-            }
-        }
+        VehicleAI::UpdateAI(diff);
+    }
 
-        void UpdateAI(uint32 diff) override
+    void AttackStart(Unit*) override { }
+
+    void PassengerBoarded(Unit* who, int8 seatId, bool apply) override
+    {
+        if (!who->IsPlayer() || !me->GetVehicle())
+            return;
+
+        who->ApplySpellImmune(63847, IMMUNITY_ID, 63847, apply); // SPELL_FLAME_VENTS_TRIGGER
+        who->ApplySpellImmune(SPELL_MISSILE_BARRAGE, IMMUNITY_ID, SPELL_MISSILE_BARRAGE, apply);
+        who->ApplySpellImmune(SPELL_BATTERING_RAM, IMMUNITY_ID, SPELL_BATTERING_RAM, apply);
+
+        if (seatId == SEAT_PLAYER)
         {
-            if (_timeToHit)
+            if (Unit* turret = me->GetVehicleKit()->GetPassenger(SEAT_TURRET))
             {
-                _timeToHit += diff;
-                if (_timeToHit >= 5000)
+                if (apply)
                 {
-                    if (Creature* cr = me->SummonCreature(NPC_HODIRS_FURY, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 40, 0, TEMPSUMMON_TIMED_DESPAWN, 10000))
-                        cr->CastSpell(me, SPELL_HODIRS_FURY, true);
-
-                    _switchTargetTimer = 25000; // Switch target soon
-                    _timeToHit = 0;
-                }
-                return;
-            }
-
-            _switchTargetTimer += diff;
-            if (_switchTargetTimer >= 30000)
-            {
-                if (Unit* target = me->SelectNearbyTarget(nullptr, 200.0f))
-                {
-                    if (target->GetVehicleBase() && target->GetVehicleBase()->GetEntry() == NPC_SEAT)
-                    {
-                        _switchTargetTimer = 20000;
-                        return;
-                    }
-                    me->SetControlled(false, UNIT_STATE_STUNNED);
-                    me->GetMotionMaster()->MoveFollow(target, 0.0f, 0.0f);
-                    _switchTargetTimer = 0;
+                    turret->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
+                    turret->GetAI()->AttackStart(who);
+                    if (Creature* leviathan = me->GetVehicleCreatureBase())
+                        leviathan->AI()->Talk(FLAME_LEVIATHAN_SAY_PLAYER_RIDING);
                 }
                 else
-                    _switchTargetTimer = 25000;
+                {
+                    turret->ReplaceAllUnitFlags(UNIT_FLAG_NOT_SELECTABLE);
+                    turret->SetImmuneToAll(true);
+                    if (turret->IsCreature())
+                        turret->ToCreature()->AI()->EnterEvadeMode();
+                }
             }
         }
-    };
+    }
 };
 
-class npc_mimirons_inferno : public CreatureScript
+struct boss_flame_leviathan_defense_turret : public TurretAI
 {
-public:
-    npc_mimirons_inferno() : CreatureScript("npc_mimirons_inferno") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
+    boss_flame_leviathan_defense_turret(Creature* creature) : TurretAI(creature)
     {
-        return GetUlduarAI<npc_mimirons_infernoAI>(creature);
+        _setHealth = false;
+        _instance = creature->GetInstanceScript();
     }
 
-    struct npc_mimirons_infernoAI : public npc_escortAI
+    InstanceScript* _instance;
+
+    bool _setHealth;
+    void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
     {
-        npc_mimirons_infernoAI(Creature* creature) : npc_escortAI(creature), summons(me)
+        if (!CanAIAttack(who))
         {
-            me->SetReactState(REACT_PASSIVE);
+            _setHealth = true;
+            damage = 0;
+        }
+    }
+
+    void JustDied(Unit* killer) override
+    {
+        if (Player* player = killer->ToPlayer())
+            player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS, 1, 0, me);
+
+        if (Vehicle* vehicle = me->GetVehicle())
+            if (Unit* device = vehicle->GetPassenger(SEAT_DEVICE))
+                device->ReplaceAllUnitFlags(UNIT_FLAG_NONE); // unselectable
+
+        if (Creature* leviathan = _instance->GetCreature(BOSS_LEVIATHAN))
+            leviathan->AI()->DoAction(ACTION_DESTROYED_TURRET);
+    }
+
+    bool CanAIAttack(Unit const* who) const override
+    {
+        if (!who || !who->IsPlayer() || !who->GetVehicle() || who->GetVehicleBase()->GetEntry() != NPC_SEAT)
+            return false;
+        return true;
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (_setHealth)
+        {
+            me->SetHealth(std::min(me->GetHealth() + 1, me->GetMaxHealth()));
+            _setHealth = false;
         }
 
-        SummonList summons;
-        uint32 _spellTimer;
-        uint32 _recastTimer;
+        TurretAI::UpdateAI(diff);
+    }
 
-        void AttackStart(Unit*) override { }
-        void MoveInLineOfSight(Unit*) override { }
-        void WaypointReached(uint32 /*waypointId*/) override { }
+    void KilledUnit(Unit* who) override
+    {
+        if (Player* plr = who->ToPlayer()) // make sure that there's no death player on the seat.
+            if (plr->GetVehicle())
+                plr->ExitVehicle();
+    }
+};
 
-        void DoAction(int32 param) override
+struct boss_flame_leviathan_overload_device : public NullCreatureAI
+{
+    boss_flame_leviathan_overload_device(Creature* creature) : NullCreatureAI(creature)
+    {
+    }
+
+    void OnSpellClick(Unit* /*clicker*/, bool& result) override
+    {
+        if (!result)
+            return;
+
+        if (me->GetVehicle())
         {
-            if (param == ACTION_DESPAWN_ADDS)
-                summons.DespawnAll();
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+
+            if (Unit* player = me->GetVehicle()->GetPassenger(SEAT_PLAYER))
+            {
+                me->GetVehicleBase()->CastSpell(player, SPELL_SMOKE_TRAIL, true);
+                player->ExitVehicle();
+            }
         }
+    }
+};
 
-        void Reset() override
-        {
-            summons.DespawnAll();
-            _spellTimer = 0;
-            me->SetWalk(true);
-            Start(false, ObjectGuid::Empty, nullptr, false, true);
-            if (Aura* aur = me->AddAura(SPELL_FREYA_DUMMY_YELLOW, me))
+struct npc_freya_ward : public NullCreatureAI
+{
+    npc_freya_ward(Creature* c) : NullCreatureAI(c), summons(c)
+    {
+    }
+
+    SummonList summons;
+    uint32 _castTimer;
+    bool _summoned;
+
+    void Reset() override
+    {
+        _summoned = false;
+        _castTimer = 25000;
+        summons.DespawnAll();
+        if (Creature* cr = me->FindNearestCreature(NPC_FREYA_WARD_TARGET, 60.0f, true))
+            if (Aura* aur = cr->AddAura(SPELL_FREYA_DUMMY_GREEN, cr))
             {
                 aur->SetMaxDuration(-1);
                 aur->SetDuration(-1);
             }
-        }
-
-        void JustSummoned(Creature* cr) override { summons.Summon(cr); }
-        void SummonedCreatureDespawn(Creature* cr)  override { summons.Despawn(cr); }
-
-        void UpdateAI(uint32 diff) override
-        {
-            npc_escortAI::UpdateAI(diff);
-
-            _spellTimer += diff;
-            if (_spellTimer >= 2000)
-            {
-                if (Creature* cr = me->SummonCreature(NPC_MIMIRONS_INFERNO, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 40.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 30000))
-                    cr->CastSpell(me, SPELL_MIMIRONS_INFERNO, true);
-
-                _spellTimer = 0;
-            }
-        }
-    };
-};
-
-class npc_thorims_hammer : public CreatureScript
-{
-public:
-    npc_thorims_hammer() : CreatureScript("npc_thorims_hammer") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
-    {
-        return GetUlduarAI<npc_thorims_hammerAI>(pCreature);
     }
 
-    struct npc_thorims_hammerAI : public NullCreatureAI
+    void JustSummoned(Creature* cr) override
     {
-        npc_thorims_hammerAI(Creature* c) : NullCreatureAI(c)
-        {
-        }
+        _summoned = true;
+        summons.Summon(cr);
+    }
 
-        uint32 _beamTimer;
-        uint32 _finishTime;
-        uint32 _removeTimer;
+    void SummonedCreatureDespawn(Creature* cr) override { summons.Despawn(cr); }
 
-        void Reset() override
+    void UpdateAI(uint32 diff) override
+    {
+        if (_summoned)
         {
-            _finishTime = 5000 + rand() % 15000;
-            _beamTimer = 1;
-            _removeTimer = 0;
-            me->CastSpell(me, SPELL_FREYA_DUMMY_BLUE, true);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (_beamTimer)
+            for (SummonList::const_iterator itr = summons.begin(); itr != summons.end();)
             {
-                _beamTimer += diff;
-                if (_beamTimer >= _finishTime)
+                Creature* summon = ObjectAccessor::GetCreature(*me, *itr);
+                ++itr;
+                if (summon)
                 {
-                    if (Creature* cr = me->SummonCreature(NPC_THORIM_HAMMER, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 40, 0, TEMPSUMMON_TIMED_DESPAWN, 5000))
-                        cr->CastSpell(me, SPELL_THORIMS_HAMMER, false);
-
-                    _beamTimer = 0;
-                    _removeTimer = 1;
-                    me->DespawnOrUnsummon(5s);
+                    summon->ToTempSummon()->SetTempSummonType(TEMPSUMMON_MANUAL_DESPAWN);
+                    if (Unit* target = summon->SelectNearestTarget(200.0f))
+                        summon->AI()->AttackStart(target);
                 }
             }
-            if (_removeTimer)
+            _summoned = false;
+        }
+
+        _castTimer += diff;
+        if (_castTimer >= 29 * IN_MILLISECONDS)
+        {
+            if (Creature* cr = me->FindNearestCreature(NPC_FREYA_WARD_TARGET, 60.0f, true))
             {
-                _removeTimer += diff;
-                if (_removeTimer >= 3 * IN_MILLISECONDS)
-                {
-                    _removeTimer = 0;
-                    me->RemoveAura(SPELL_FREYA_DUMMY_BLUE);
-                }
+                me->CastSpell(cr, SPELL_FREYA_WARD, false);
+                me->CastSpell(cr, 62947 /*SPELL_FREYA_WARD_SECOND_SUMMON*/, false);
             }
+
+            _castTimer = 0;
         }
-    };
-};
-
-class npc_pool_of_tar : public CreatureScript
-{
-public:
-    npc_pool_of_tar() : CreatureScript("npc_pool_of_tar") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
-    {
-        return GetUlduarAI<npc_pool_of_tarAI>(pCreature);
     }
 
-    struct npc_pool_of_tarAI : public NullCreatureAI
+    void DoAction(int32 param) override
     {
-        npc_pool_of_tarAI(Creature* c) : NullCreatureAI(c)
-        {
-        }
-
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
-        {
-            damage = 0;
-        }
-
-        void SpellHit(Unit*  /*caster*/, SpellInfo const* spellInfo) override
-        {
-            if (spellInfo->SchoolMask & SPELL_SCHOOL_MASK_FIRE && !me->HasAura(SPELL_BLAZE))
-                me->CastSpell(me, SPELL_BLAZE, true);
-        }
-    };
+        if (param == ACTION_DESPAWN_ADDS)
+            summons.DespawnAll();
+    }
 };
 
-class npc_brann_radio : public CreatureScript
+struct npc_hodirs_fury : public NullCreatureAI
 {
-public:
-    npc_brann_radio() : CreatureScript("npc_brann_radio") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
+    npc_hodirs_fury(Creature* c) : NullCreatureAI(c)
     {
-        return GetUlduarAI<npc_brann_radioAI>(pCreature);
     }
 
-    struct npc_brann_radioAI : public NullCreatureAI
+    uint32 _timeToHit;
+    uint32 _switchTargetTimer;
+
+    void Reset() override
     {
-        npc_brann_radioAI(Creature* c) : NullCreatureAI(c)
+        _timeToHit = 0;
+        _switchTargetTimer = 30000;
+        me->SetWalk(true);
+
+        if (Aura* aur = me->AddAura(SPELL_FREYA_DUMMY_BLUE, me))
         {
-            _lock = (me->GetInstanceScript() && me->GetInstanceScript()->GetData(TYPE_LEVIATHAN) > NOT_STARTED);
-            _helpLock = _lock;
+            aur->SetMaxDuration(-1);
+            aur->SetDuration(-1);
         }
+    }
 
-        bool _lock;
-        bool _helpLock;
-
-        void Reset() override
+    void MovementInform(uint32 type, uint32  /*param*/) override
+    {
+        if (type == FOLLOW_MOTION_TYPE && !_timeToHit)
         {
-            me->SetReactState(REACT_AGGRESSIVE);
+            _timeToHit = 1;
+            _switchTargetTimer = 0;
+            me->SetControlled(true, UNIT_STATE_STUNNED);
         }
+    }
 
-        void MoveInLineOfSight(Unit* who) override
+    void UpdateAI(uint32 diff) override
+    {
+        if (_timeToHit)
         {
-            if (!_lock)
+            _timeToHit += diff;
+            if (_timeToHit >= 5000)
             {
-                if (!who->IsPlayer() && !who->IsVehicle())
+                if (Creature* cr = me->SummonCreature(NPC_HODIRS_FURY, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 40, 0, TEMPSUMMON_TIMED_DESPAWN, 10000))
+                    cr->CastSpell(me, SPELL_HODIRS_FURY, true);
+
+                _switchTargetTimer = 25000; // Switch target soon
+                _timeToHit = 0;
+            }
+            return;
+        }
+
+        _switchTargetTimer += diff;
+        if (_switchTargetTimer >= 30000)
+        {
+            if (Unit* target = me->SelectNearbyTarget(nullptr, 200.0f))
+            {
+                if (target->GetVehicleBase() && target->GetVehicleBase()->GetEntry() == NPC_SEAT)
+                {
+                    _switchTargetTimer = 20000;
                     return;
-
-                // MIMIRON
-                else if (me->GetDistance2d(-81.9207f, 111.432f) < 5.0f)
-                {
-                    if (me->GetDistance2d(who) <= 60.0f && who->GetPositionZ() > 430.0f)
-                    {
-                        Talk(BRANN_RADIO_SAY_TOWER_MIMIRON);
-                        _lock = true;
-                    }
                 }
-                // FREYA
-                else if (me->GetDistance2d(-221.475f, -271.087f) < 5.0f)
-                {
-                    if (me->GetDistance2d(who) <= 60.0f && who->GetPositionZ() < 380.0f)
-                    {
-                        Talk(BRANN_RADIO_SAY_TOWER_FREYA);
-                        _lock = true;
-                    }
-                }
-                // STATIONS
-                else if (me->GetDistance2d(73.8978f, -29.3306f) < 5.0f)
-                {
-                    if (me->GetDistance2d(who) <= 40.0f)
-                    {
-                        Talk(BRANN_RADIO_SAY_STATIONS);
-                        _lock = true;
-                    }
-                }
-                // HODIR
-                else if (me->GetDistance2d(68.7679f, -325.026f) < 5.0f)
-                {
-                    if (me->GetDistance2d(who) <= 40.0f)
-                    {
-                        Talk(BRANN_RADIO_SAY_TOWER_HODIR);
-                        _lock = true;
-                    }
-                }
-                // THORIM
-                else if (me->GetDistance2d(174.442f, 345.679f) < 5.0f)
-                {
-                    if (me->GetDistance2d(who) <= 60.0f)
-                    {
-                        Talk(BRANN_RADIO_SAY_TOWER_THORIM);
-                        _lock = true;
-                    }
-                }
-                // COME A BIT CLOSER
-                else if (me->GetDistance2d(-508.898f, -32.9631f) < 5.0f)
-                {
-                    if (who->GetPositionX() >= -480.0f)
-                    {
-                        Talk(BRANN_RADIO_SAY_GENERATORS);
-                        _lock = true;
-                    }
-                }
+                me->SetControlled(false, UNIT_STATE_STUNNED);
+                me->GetMotionMaster()->MoveFollow(target, 0.0f, 0.0f);
+                _switchTargetTimer = 0;
             }
+            else
+                _switchTargetTimer = 25000;
         }
-    };
+    }
 };
 
-class npc_storm_beacon_spawn : public CreatureScript
+struct npc_mimirons_inferno : public npc_escortAI
 {
-public:
-    npc_storm_beacon_spawn() : CreatureScript("npc_storm_beacon_spawn") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
+    npc_mimirons_inferno(Creature* creature) : npc_escortAI(creature), summons(me)
     {
-        return GetUlduarAI<npc_storm_beacon_spawnAI>(pCreature);
+        me->SetReactState(REACT_PASSIVE);
     }
 
-    struct npc_storm_beacon_spawnAI : public NullCreatureAI
+    SummonList summons;
+    uint32 _spellTimer;
+    uint32 _recastTimer;
+
+    void AttackStart(Unit*) override { }
+    void MoveInLineOfSight(Unit*) override { }
+    void WaypointReached(uint32 /*waypointId*/) override { }
+
+    void DoAction(int32 param) override
     {
-        npc_storm_beacon_spawnAI(Creature* c) : NullCreatureAI(c)
+        if (param == ACTION_DESPAWN_ADDS)
+            summons.DespawnAll();
+    }
+
+    void Reset() override
+    {
+        summons.DespawnAll();
+        _spellTimer = 0;
+        me->SetWalk(true);
+        Start(false, ObjectGuid::Empty, nullptr, false, true);
+        if (Aura* aur = me->AddAura(SPELL_FREYA_DUMMY_YELLOW, me))
         {
-            _amount = 0;
-            _checkTimer = 0;
+            aur->SetMaxDuration(-1);
+            aur->SetDuration(-1);
         }
+    }
 
-        uint8 _amount;
-        uint32 _checkTimer;
+    void JustSummoned(Creature* cr) override { summons.Summon(cr); }
+    void SummonedCreatureDespawn(Creature* cr)  override { summons.Despawn(cr); }
 
-        void UpdateAI(uint32 diff) override
+    void UpdateAI(uint32 diff) override
+    {
+        npc_escortAI::UpdateAI(diff);
+
+        _spellTimer += diff;
+        if (_spellTimer >= 2000)
         {
-            if (_amount < 40)
+            if (Creature* cr = me->SummonCreature(NPC_MIMIRONS_INFERNO, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 40.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 30000))
+                cr->CastSpell(me, SPELL_MIMIRONS_INFERNO, true);
+
+            _spellTimer = 0;
+        }
+    }
+};
+
+struct npc_thorims_hammer : public NullCreatureAI
+{
+    npc_thorims_hammer(Creature* c) : NullCreatureAI(c)
+    {
+    }
+
+    uint32 _beamTimer;
+    uint32 _finishTime;
+    uint32 _removeTimer;
+
+    void Reset() override
+    {
+        _finishTime = 5000 + rand() % 15000;
+        _beamTimer = 1;
+        _removeTimer = 0;
+        me->CastSpell(me, SPELL_FREYA_DUMMY_BLUE, true);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (_beamTimer)
+        {
+            _beamTimer += diff;
+            if (_beamTimer >= _finishTime)
             {
-                _checkTimer += diff;
-                if (_checkTimer >= 4000)
+                if (Creature* cr = me->SummonCreature(NPC_THORIM_HAMMER, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 40, 0, TEMPSUMMON_TIMED_DESPAWN, 5000))
+                    cr->CastSpell(me, SPELL_THORIMS_HAMMER, false);
+
+                _beamTimer = 0;
+                _removeTimer = 1;
+                me->DespawnOrUnsummon(5s);
+            }
+        }
+        if (_removeTimer)
+        {
+            _removeTimer += diff;
+            if (_removeTimer >= 3 * IN_MILLISECONDS)
+            {
+                _removeTimer = 0;
+                me->RemoveAura(SPELL_FREYA_DUMMY_BLUE);
+            }
+        }
+    }
+};
+
+struct npc_pool_of_tar : public NullCreatureAI
+{
+    npc_pool_of_tar(Creature* c) : NullCreatureAI(c)
+    {
+    }
+
+    void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
+    {
+        damage = 0;
+    }
+
+    void SpellHit(Unit*  /*caster*/, SpellInfo const* spellInfo) override
+    {
+        if (spellInfo->SchoolMask & SPELL_SCHOOL_MASK_FIRE && !me->HasAura(SPELL_BLAZE))
+            me->CastSpell(me, SPELL_BLAZE, true);
+    }
+};
+
+struct npc_brann_radio : public NullCreatureAI
+{
+    npc_brann_radio(Creature* c) : NullCreatureAI(c)
+    {
+        _lock = (me->GetInstanceScript() && me->GetInstanceScript()->GetBossState(BOSS_LEVIATHAN) > NOT_STARTED);
+        _helpLock = _lock;
+    }
+
+    bool _lock;
+    bool _helpLock;
+
+    void Reset() override
+    {
+        me->SetReactState(REACT_AGGRESSIVE);
+    }
+
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (!_lock)
+        {
+            if (!who->IsPlayer() && !who->IsVehicle())
+                return;
+
+            // MIMIRON
+            else if (me->GetDistance2d(-81.9207f, 111.432f) < 5.0f)
+            {
+                if (me->GetDistance2d(who) <= 60.0f && who->GetPositionZ() > 430.0f)
                 {
-                    _checkTimer = 0;
-                    if (Unit* target = me->SelectNearbyTarget(nullptr, 80.0f))
-                    {
-                        ++_amount;
-                        if (Creature* cr = me->SummonCreature(NPC_DEFENDER_GENERATED, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 4, me->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 900000))
-                            cr->AI()->AttackStart(target);
-                    }
+                    Talk(BRANN_RADIO_SAY_TOWER_MIMIRON);
+                    _lock = true;
+                }
+            }
+            // FREYA
+            else if (me->GetDistance2d(-221.475f, -271.087f) < 5.0f)
+            {
+                if (me->GetDistance2d(who) <= 60.0f && who->GetPositionZ() < 380.0f)
+                {
+                    Talk(BRANN_RADIO_SAY_TOWER_FREYA);
+                    _lock = true;
+                }
+            }
+            // STATIONS
+            else if (me->GetDistance2d(73.8978f, -29.3306f) < 5.0f)
+            {
+                if (me->GetDistance2d(who) <= 40.0f)
+                {
+                    Talk(BRANN_RADIO_SAY_STATIONS);
+                    _lock = true;
+                }
+            }
+            // HODIR
+            else if (me->GetDistance2d(68.7679f, -325.026f) < 5.0f)
+            {
+                if (me->GetDistance2d(who) <= 40.0f)
+                {
+                    Talk(BRANN_RADIO_SAY_TOWER_HODIR);
+                    _lock = true;
+                }
+            }
+            // THORIM
+            else if (me->GetDistance2d(174.442f, 345.679f) < 5.0f)
+            {
+                if (me->GetDistance2d(who) <= 60.0f)
+                {
+                    Talk(BRANN_RADIO_SAY_TOWER_THORIM);
+                    _lock = true;
+                }
+            }
+            // COME A BIT CLOSER
+            else if (me->GetDistance2d(-508.898f, -32.9631f) < 5.0f)
+            {
+                if (who->GetPositionX() >= -480.0f)
+                {
+                    Talk(BRANN_RADIO_SAY_GENERATORS);
+                    _lock = true;
                 }
             }
         }
-    };
+    }
 };
 
-class boss_flame_leviathan_safety_container : public CreatureScript
+struct npc_storm_beacon_spawn : public NullCreatureAI
 {
-public:
-    boss_flame_leviathan_safety_container() : CreatureScript("boss_flame_leviathan_safety_container") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
+    npc_storm_beacon_spawn(Creature* c) : NullCreatureAI(c)
     {
-        return GetUlduarAI<boss_flame_leviathan_safety_containerAI>(pCreature);
+        _amount = 0;
+        _checkTimer = 0;
     }
 
-    struct boss_flame_leviathan_safety_containerAI : public NullCreatureAI
+    uint8 _amount;
+    uint32 _checkTimer;
+
+    void UpdateAI(uint32 diff) override
     {
-        boss_flame_leviathan_safety_containerAI(Creature* c) : NullCreatureAI(c)
+        if (_amount < 40)
         {
-            _allowTimer = 0;
-        }
-
-        uint32 _allowTimer;
-
-        void MovementInform(uint32  /*type*/, uint32 id) override
-        {
-            if (id == me->GetEntry())
+            _checkTimer += diff;
+            if (_checkTimer >= 4000)
             {
-                if (Creature* liquid = me->SummonCreature(NPC_LIQUID, *me))
+                _checkTimer = 0;
+                if (Unit* target = me->SelectNearbyTarget(nullptr, 80.0f))
                 {
-                    liquid->CastSpell(liquid, SPELL_LIQUID_PYRITE, true);
-                    liquid->CastSpell(liquid, SPELL_DUST_CLOUD_IMPACT, true);
+                    ++_amount;
+                    if (Creature* cr = me->SummonCreature(NPC_DEFENDER_GENERATED, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 4, me->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 900000))
+                        cr->AI()->AttackStart(target);
                 }
-
-                me->DespawnOrUnsummon(1ms);
             }
         }
-
-        void UpdateAI(uint32 diff) override
-        {
-            _allowTimer += diff;
-            if (_allowTimer >= 5000 && !me->GetVehicle() && me->GetMotionMaster()->GetCurrentMovementGeneratorType() != POINT_MOTION_TYPE)
-            {
-                float x, y, z;
-                me->GetPosition(x, y, z);
-                z = me->GetMapHeight(x, y, z);
-                me->GetMotionMaster()->MovePoint(me->GetEntry(), x, y, z);
-                me->SetPosition(x, y, z, 0);
-            }
-        }
-    };
+    }
 };
 
-class npc_mechanolift : public CreatureScript
+struct boss_flame_leviathan_safety_container : public NullCreatureAI
 {
-public:
-    npc_mechanolift() : CreatureScript("npc_mechanolift") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
+    boss_flame_leviathan_safety_container(Creature* c) : NullCreatureAI(c)
     {
-        return GetUlduarAI<npc_mechanoliftAI>(pCreature);
+        _allowTimer = 0;
     }
 
-    struct npc_mechanoliftAI : public NullCreatureAI
+    uint32 _allowTimer;
+
+    void MovementInform(uint32  /*type*/, uint32 id) override
     {
-        npc_mechanoliftAI(Creature* c) : NullCreatureAI(c)
+        if (id == me->GetEntry())
         {
-            me->SetSpeed(MOVE_RUN, rand_norm() + 0.5f);
+            if (Creature* liquid = me->SummonCreature(NPC_LIQUID, *me))
+            {
+                liquid->CastSpell(liquid, SPELL_LIQUID_PYRITE, true);
+                liquid->CastSpell(liquid, SPELL_DUST_CLOUD_IMPACT, true);
+            }
+
+            me->DespawnOrUnsummon(1ms);
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        _allowTimer += diff;
+        if (_allowTimer >= 5000 && !me->GetVehicle() && me->GetMotionMaster()->GetCurrentMovementGeneratorType() != POINT_MOTION_TYPE)
+        {
+            float x, y, z;
+            me->GetPosition(x, y, z);
+            z = me->GetMapHeight(x, y, z);
+            me->GetMotionMaster()->MovePoint(me->GetEntry(), x, y, z);
+            me->SetPosition(x, y, z, 0);
+        }
+    }
+};
+
+struct npc_mechanolift : public NullCreatureAI
+{
+    npc_mechanolift(Creature* c) : NullCreatureAI(c)
+    {
+        me->SetSpeed(MOVE_RUN, rand_norm() + 0.5f);
+    }
+
+    int32 _startTimer;
+    uint32 _evadeTimer;
+
+    void Reset() override
+    {
+        _startTimer = urand(1, 5000);
+        _evadeTimer = 0;
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (_startTimer)
+        {
+            _startTimer -= diff;
+            if (_startTimer <= 0)
+            {
+                me->GetMotionMaster()->MoveWaypoint(3000000 + urand(0, 11), true);
+                _startTimer = 0;
+            }
         }
 
-        int32 _startTimer;
-        uint32 _evadeTimer;
-
-        void Reset() override
+        _evadeTimer += diff;
+        if (_evadeTimer >= 10000)
         {
-            _startTimer = urand(1, 5000);
+            _EnterEvadeMode();
             _evadeTimer = 0;
         }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (_startTimer)
-            {
-                _startTimer -= diff;
-                if (_startTimer <= 0)
-                {
-                    me->GetMotionMaster()->MoveWaypoint(3000000 + urand(0, 11), true);
-                    _startTimer = 0;
-                }
-            }
-
-            _evadeTimer += diff;
-            if (_evadeTimer >= 10000)
-            {
-                _EnterEvadeMode();
-                _evadeTimer = 0;
-            }
-        }
-    };
+    }
 };
 
 class go_ulduar_tower : public GameObjectScript
@@ -2018,23 +1864,23 @@ public:
 
 void AddSC_boss_flame_leviathan()
 {
-    new boss_flame_leviathan();
-    new boss_flame_leviathan_seat();
-    new boss_flame_leviathan_defense_turret();
-    new boss_flame_leviathan_overload_device();
-    new npc_pool_of_tar();
+    RegisterUlduarCreatureAI(boss_flame_leviathan);
+    RegisterUlduarCreatureAI(boss_flame_leviathan_seat);
+    RegisterUlduarCreatureAI(boss_flame_leviathan_defense_turret);
+    RegisterUlduarCreatureAI(boss_flame_leviathan_overload_device);
+    RegisterUlduarCreatureAI(npc_pool_of_tar);
 
     // Hard Mode
-    new npc_freya_ward();
-    new npc_thorims_hammer();
-    new npc_mimirons_inferno();
-    new npc_hodirs_fury();
+    RegisterUlduarCreatureAI(npc_freya_ward);
+    RegisterUlduarCreatureAI(npc_thorims_hammer);
+    RegisterUlduarCreatureAI(npc_mimirons_inferno);
+    RegisterUlduarCreatureAI(npc_hodirs_fury);
 
     // Helpers
-    new npc_brann_radio();
-    new npc_storm_beacon_spawn();
-    new boss_flame_leviathan_safety_container();
-    new npc_mechanolift();
+    RegisterUlduarCreatureAI(npc_brann_radio);
+    RegisterUlduarCreatureAI(npc_storm_beacon_spawn);
+    RegisterUlduarCreatureAI(boss_flame_leviathan_safety_container);
+    RegisterUlduarCreatureAI(npc_mechanolift);
 
     // GOs
     new go_ulduar_tower();

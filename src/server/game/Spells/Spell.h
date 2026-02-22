@@ -273,6 +273,7 @@ struct TargetInfo
     bool   crit:1;
     bool   scaleAura:1;
     int32  damage;
+    int32  damageBeforeTakenMods;
 };
 
 static const uint32 SPELL_INTERRUPT_NONPLAYER = 32747;
@@ -599,6 +600,7 @@ public:
     std::list<TargetInfo>* GetUniqueTargetInfo() { return &m_UniqueTargetInfo; }
 
     [[nodiscard]] uint32 GetTriggeredByAuraTickNumber() const { return m_triggeredByAuraSpell.tickNumber; }
+    [[nodiscard]] SpellInfo const* GetTriggeredByAuraSpellInfo() const { return m_triggeredByAuraSpell.spellInfo; }
 
     [[nodiscard]] TriggerCastFlags GetTriggeredCastFlags() const { return _triggeredCastFlags; }
 
@@ -682,6 +684,7 @@ public:
     // Damage and healing in effects need just calculate
     int32 m_damage;           // Damge   in effects count here
     int32 m_healing;          // Healing in effects count here
+    int32 m_damageBeforeTakenMods;
 
     // ******************************************
     // Spell trigger system
