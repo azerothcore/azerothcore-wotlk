@@ -2040,13 +2040,17 @@ void SpellMgr::LoadSpellProcs()
         // Generate default proc entry from DBC data
         SpellProcEntry procEntry;
         procEntry.SchoolMask      = 0;
-        procEntry.SpellFamilyName = spellInfo->SpellFamilyName;
         procEntry.SpellFamilyMask[0] = 0;
         procEntry.SpellFamilyMask[1] = 0;
         procEntry.SpellFamilyMask[2] = 0;
         for (uint32 i = 0; i < MAX_SPELL_EFFECTS; ++i)
             if (spellInfo->Effects[i].IsEffect() && isTriggerAura[spellInfo->Effects[i].ApplyAuraName])
                 procEntry.SpellFamilyMask |= spellInfo->Effects[i].SpellClassMask;
+
+        if (procEntry.SpellFamilyMask)
+            procEntry.SpellFamilyName = spellInfo->SpellFamilyName;
+        else
+            procEntry.SpellFamilyName = 0;
 
         procEntry.ProcFlags = spellInfo->ProcFlags;
         procEntry.SpellTypeMask   = procSpellTypeMask;
