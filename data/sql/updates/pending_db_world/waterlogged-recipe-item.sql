@@ -1,0 +1,2 @@
+UPDATE `reference_loot_template` SET `Item` = 49667 WHERE `Item` = 48679 AND `entry` = 10016;
+UPDATE `conditions` SET `SourceEntry` = 49667, `Comment` = 'Only drop "Waterlogged Recipe" (49667) from "Bag of Fishing Treasures" (46007) if the player has at least 300 cooking skill' WHERE (`SourceTypeOrReferenceId` = 10) AND (`SourceGroup` = 10016) AND (`SourceEntry` = 48679) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 7) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 185) AND (`ConditionValue2` = 300) AND (`ConditionValue3` = 0);
