@@ -97,7 +97,8 @@ enum eAchiev
 enum EoEMisc : uint32
 {
     AREA_EYE_OF_ETERNITY                    = 4500,
-    EVENT_IRIS_ACTIVATED                    = 20158,
+    EVENT_DESTROY_PLATFORM                  = 20158,
+    EVENT_IRIS_ACTIVATED                    = 20711,
     PLATFORM_DESTROY_DAMAGE                 = 6500000,
     INTRO_MOVEMENT_INTERVAL                 = 25000,
 };
