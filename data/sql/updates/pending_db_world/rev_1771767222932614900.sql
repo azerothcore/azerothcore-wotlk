@@ -84,3 +84,6 @@ UPDATE `acore_string` SET `locale_esES` = '{} ha sido capturado por {}', `locale
 UPDATE `acore_string` SET `locale_esES` = '{} está bajo ataque por {}', `locale_esMX` = '{} está bajo ataque por {}' WHERE `entry` = 12051;
 UPDATE `acore_string` SET `locale_esES` = 'El taller del asedio del Templo Roto', `locale_esMX` = 'El taller del asedio del Templo Roto' WHERE `entry` = 12052;
 UPDATE `acore_string` SET `locale_esES` = 'El taller de asedio del Anillo Hundido', `locale_esMX` = 'El taller de asedio del Anillo Hundido' WHERE `entry` = 12055;
+UPDATE `acore_string` SET `locale_esES`='Activar o desactivar vuelo instantáneo', `locale_esMX`='Activar o desactivar vuelo instantáneo' WHERE `entry`=30077;
+UPDATE `acore_string` SET `locale_esES`='Vuelo instantáneo activado.', `locale_esMX`='Vuelo instantáneo activado.' WHERE `entry`=30078;
+UPDATE `acore_string` SET `locale_esES`='Vuelo instantáneo desactivado.', `locale_esMX`='Vuelo instantáneo desactivado.' WHERE `entry`=30079;
