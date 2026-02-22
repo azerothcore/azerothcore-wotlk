@@ -17,6 +17,7 @@
 
 #include "MapMgr.h"
 #include "Chat.h"
+#include "Config.h"
 #include "DatabaseEnv.h"
 #include "GridDefines.h"
 #include "GridTerrainLoader.h"
@@ -28,6 +29,7 @@
 #include "MapInstanced.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
+#include "PartitionedMap.h"
 #include "Opcodes.h"
 #include "Player.h"
 #include "ScriptMgr.h"
@@ -84,7 +86,19 @@ Map* MapMgr::CreateBaseMap(uint32 id)
             if (entry->Instanceable())
                 map = new MapInstanced(id);
             else
-                map = new Map(id, 0, REGULAR_DIFFICULTY);
+            {
+                bool partitioningEnabled = sConfigMgr->GetOption<bool>("MapPartitioning.Enable", false);
+                bool isContinentMap = (id == 0 || id == 1 || id == 530 || id == 571);
+                
+                if (isContinentMap && partitioningEnabled)
+                {
+                    PartitionedMap* partitionedMap = new PartitionedMap(id, 0, REGULAR_DIFFICULTY);
+                    partitionedMap->InitializePartitions();
+                    map = partitionedMap;
+                }
+                else
+                    map = new Map(id, 0, REGULAR_DIFFICULTY);
+            }
 
             i_maps[id] = map;
 
@@ -269,7 +283,12 @@ void MapMgr::Update(uint32 diff)
     for (; iter != i_maps.end(); ++iter)
     {
         bool full = mapUpdateStep < 3 && ((mapUpdateStep == 0 && !iter->second->IsBattlegroundOrArena() && !iter->second->IsDungeon()) || (mapUpdateStep == 1 && iter->second->IsBattlegroundOrArena()) || (mapUpdateStep == 2 && iter->second->IsDungeon()));
-        if (m_updater.activated())
+        if (iter->second->IsPartitioned())
+        {
+			//handles own threading
+            iter->second->Update(uint32(full ? i_timer[mapUpdateStep].GetCurrent() : 0), diff);
+        }
+        else if (m_updater.activated())
             m_updater.schedule_update(*iter->second, uint32(full ? i_timer[mapUpdateStep].GetCurrent() : 0), diff);
         else
             iter->second->Update(uint32(full ? i_timer[mapUpdateStep].GetCurrent() : 0), diff);
