@@ -84,4 +84,3 @@ UPDATE `acore_string` SET `locale_esES` = '{} ha sido capturado por {}', `locale
 UPDATE `acore_string` SET `locale_esES` = '{} está bajo ataque por {}', `locale_esMX` = '{} está bajo ataque por {}' WHERE `entry` = 12051;
 UPDATE `acore_string` SET `locale_esES` = 'El taller del asedio del Templo Roto', `locale_esMX` = 'El taller del asedio del Templo Roto' WHERE `entry` = 12052;
 UPDATE `acore_string` SET `locale_esES` = 'El taller de asedio del Anillo Hundido', `locale_esMX` = 'El taller de asedio del Anillo Hundido' WHERE `entry` = 12055;
-	
