@@ -67,6 +67,7 @@ enum HunterSpells
     SPELL_HUNTER_GLYPH_OF_ARCANE_SHOT               = 61389,
     SPELL_LOCK_AND_LOAD_TRIGGER                     = 56453,
     SPELL_LOCK_AND_LOAD_MARKER                      = 67544,
+    SPELL_FROST_TRAP_SLOW                           = 67035,
     SPELL_HUNTER_PET_LEGGINGS_OF_BEAST_MASTERY      = 38297, // Leggings of Beast Mastery
 
     // Proc system spells
@@ -1177,7 +1178,8 @@ class spell_hun_lock_and_load : public AuraScript
         return ValidateSpellInfo(
         {
             SPELL_LOCK_AND_LOAD_TRIGGER,
-            SPELL_LOCK_AND_LOAD_MARKER
+            SPELL_LOCK_AND_LOAD_MARKER,
+            SPELL_FROST_TRAP_SLOW
         });
     }
 
@@ -1196,6 +1198,12 @@ class spell_hun_lock_and_load : public AuraScript
         SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
         if (!spellInfo || !(spellInfo->GetSchoolMask() & (SPELL_SCHOOL_MASK_FROST | SPELL_SCHOOL_MASK_FIRE)))
             return false;
+
+        // Do not proc on targets immune to Frost Trap slow (bosses)
+        if (Spell const* procSpell = eventInfo.GetProcSpell())
+            if (Unit* target = procSpell->GetOriginalTarget())
+                if (target->IsImmunedToSpell(sSpellMgr->GetSpellInfo(SPELL_FROST_TRAP_SLOW)))
+                    return false;
 
         return roll_chance_i(aurEff->GetAmount());
     }
