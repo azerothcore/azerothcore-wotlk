@@ -153,7 +153,7 @@ void AddSC_elwynn_forest();
 void AddSC_eversong_woods();
 void AddSC_ghostlands();
 void AddSC_hinterlands();
-//void AddSC_ironforge();
+void AddSC_ironforge();
 void AddSC_isle_of_queldanas();
 void AddSC_redridge_mountains();
 void AddSC_silverpine_forest();
@@ -305,7 +305,7 @@ void AddEasternKingdomsScripts()
     AddSC_eversong_woods();
     AddSC_ghostlands();
     AddSC_hinterlands();
-//    AddSC_ironforge();
+    AddSC_ironforge();
     AddSC_isle_of_queldanas();
     AddSC_redridge_mountains();
     AddSC_silverpine_forest();
