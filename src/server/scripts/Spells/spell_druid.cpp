@@ -238,44 +238,32 @@ class spell_dru_omen_of_clarity : public AuraScript
     {
         SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
         if (!spellInfo)
-        {
             return true;
-        }
 
-        // Prevent passive spells to proc. (I.e shapeshift passives & passive talents)
         if (spellInfo->IsPassive())
-        {
             return false;
-        }
 
-        // Don't proc on crafting items.
         if (spellInfo->HasEffect(SPELL_EFFECT_CREATE_ITEM))
-        {
             return false;
-        }
+
+        // Reject energize spells (e.g. Furor) - they are not real casts
+        if (spellInfo->HasEffect(SPELL_EFFECT_ENERGIZE))
+            return false;
 
         if (eventInfo.GetTypeMask() & PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS)
-        {
             return spellInfo->HasAttribute(SPELL_ATTR0_ON_NEXT_SWING) || spellInfo->HasAttribute(SPELL_ATTR0_ON_NEXT_SWING_NO_DAMAGE);
-        }
 
         // Non-damaged/Non-healing spells - only druid abilities
         if (!spellInfo->HasAttribute(SpellCustomAttributes(SPELL_ATTR0_CU_DIRECT_DAMAGE | SPELL_ATTR0_CU_NO_INITIAL_THREAT)))
         {
             if (spellInfo->SpellFamilyName == SPELLFAMILY_DRUID)
-            {
-                // Exclude shapeshifting
                 return !spellInfo->HasAura(SPELL_AURA_MOD_SHAPESHIFT);
-            }
 
             return false;
         }
 
-        // Revitalize
         if (spellInfo->SpellIconID == SPELL_ICON_REVITALIZE)
-        {
             return false;
-        }
 
         return true;
     }

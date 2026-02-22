@@ -772,32 +772,6 @@ class spell_item_essence_of_life : public AuraScript
     }
 };
 
-const uint32 crazyAlchemistTable[5] =
-{
-    53909, // Wild Magic
-    53908, // Potion of Speed
-    53762, // Indestructible Potion
-    43185, // Runic Healing Potion
-    43186  // Runic Mana Potion
-};
-
-class spell_item_crazy_alchemists_potion : public SpellScript
-{
-    PrepareSpellScript(spell_item_crazy_alchemists_potion);
-
-    void HandleHeal(SpellEffIndex /*effIndex*/)
-    {
-        // Xinef: 20% to get additional effect, guessed
-        if (roll_chance_i(20))
-            GetCaster()->CastSpell(GetCaster(), crazyAlchemistTable[urand(0, (GetCaster()->getPowerType() == POWER_MANA ? 4 : 3))], true);
-    }
-
-    void Register() override
-    {
-        OnEffectHitTarget += SpellEffectFn(spell_item_crazy_alchemists_potion::HandleHeal, EFFECT_0, SPELL_EFFECT_HEAL);
-    }
-};
-
 class spell_item_skull_of_impeding_doom : public AuraScript
 {
     PrepareAuraScript(spell_item_skull_of_impeding_doom);
@@ -5071,7 +5045,7 @@ class spell_item_darkmoon_card_illusion : public AuraScript
     }
 };
 
-// 28374 - Mad Alchemist's Potion
+// 45051 - Mad Alchemist's Potion (34440)
 class spell_item_mad_alchemists_potion : public SpellScript
 {
     PrepareSpellScript(spell_item_mad_alchemists_potion);
@@ -5081,32 +5055,32 @@ class spell_item_mad_alchemists_potion : public SpellScript
         std::vector<uint32> availableElixirs =
         {
             // Battle Elixirs
-            33720, // Onslaught Elixir
-            54452, // Adept's Elixir
-            33726, // Elixir of Mastery
-            28490, // Elixir of Major Strength
-            28491, // Elixir of Healing Power
-            28493, // Elixir of Major Frost Power
-            54494, // Elixir of Major Agility
-            28501, // Elixir of Major Firepower
-            28503, // Elixir of Major Shadow Power
-            38954, // Fel Strength Elixir
+            33720, // Onslaught Elixir (28102)
+            54452, // Adept's Elixir (28103)
+            33726, // Elixir of Mastery (28104)
+            28490, // Elixir of Major Strength (22824)
+            28491, // Elixir of Healing Power (22825)
+            28493, // Elixir of Major Frost Power (22827)
+            54494, // Elixir of Major Agility (22831)
+            28501, // Elixir of Major Firepower (22833)
+            28503, // Elixir of Major Shadow Power (22835)
+            38954, // Fel Strength Elixir (31679)
             // Guardian Elixirs
-            39625, // Elixir of Major Fortitude
-            39626, // Earthen Elixir
-            39627, // Elixir of Draenic Wisdom
-            39628, // Elixir of Ironskin
-            28502, // Elixir of Major Defense
-            28514, // Elixir of Empowerment
+            39625, // Elixir of Major Fortitude (32062)
+            39626, // Earthen Elixir (32063)
+            39627, // Elixir of Draenic Wisdom (32067)
+            39628, // Elixir of Ironskin (32068)
+            28502, // Elixir of Major Defense (22834)
+            28514, // Elixir of Empowerment (22848)
             // Other
-            28489, // Elixir of Camouflage
-            28496  // Elixir of the Searching Eye
+            28489, // Elixir of Camouflage (22823)
+            28496  // Elixir of the Searching Eye (22830)
         };
 
         Unit* target = GetCaster();
 
         if (target->getPowerType() == POWER_MANA)
-            availableElixirs.push_back(28509); // Elixir of Major Mageblood
+            availableElixirs.push_back(28509); // Elixir of Major Mageblood (22840)
 
         uint32 chosenElixir = Acore::Containers::SelectRandomContainerElement(availableElixirs);
 
@@ -5117,7 +5091,7 @@ class spell_item_mad_alchemists_potion : public SpellScript
             chosenSpellGroup = SPELL_GROUP_ELIXIR_BATTLE;
         if (sSpellMgr->IsSpellMemberOfSpellGroup(chosenElixir, SPELL_GROUP_ELIXIR_GUARDIAN))
             chosenSpellGroup = SPELL_GROUP_ELIXIR_GUARDIAN;
-
+        // If another spell of the same group is already active the elixir should not be cast
         if (chosenSpellGroup != SPELL_GROUP_NONE)
         {
             Unit::AuraApplicationMap const& auraMap = target->GetAppliedAuras();
@@ -5139,6 +5113,46 @@ class spell_item_mad_alchemists_potion : public SpellScript
     void Register() override
     {
         AfterCast += SpellCastFn(spell_item_mad_alchemists_potion::SecondaryEffect);
+    }
+};
+
+// 53750 - Crazy Alchemist's Potion (40077)
+class spell_item_crazy_alchemists_potion : public SpellScript
+{
+    PrepareSpellScript(spell_item_crazy_alchemists_potion);
+
+    void SecondaryEffect()
+    {
+        std::vector<uint32> availableElixirs =
+        {
+            43185, // Runic Healing Potion (33447)
+            53750, // Crazy Alchemist's Potion (40077)
+            53761, // Powerful Rejuvenation Potion (40087)
+            53762, // Indestructible Potion (40093)
+            53908, // Potion of Speed (40211)
+            53909, // Potion of Wild Magic (40212)
+            53910, // Mighty Arcane Protection Potion (40213)
+            53911, // Mighty Fire Protection Potion (40214)
+            53913, // Mighty Frost Protection Potion (40215)
+            53914, // Mighty Nature Protection Potion (40216)
+            53915  // Mighty Shadow Protection Potion (40217)
+        };
+
+        Unit* target = GetCaster();
+
+        if (!target->IsInCombat())
+            availableElixirs.push_back(53753); // Potion of Nightmares (40081)
+        if (target->getPowerType() == POWER_MANA)
+            availableElixirs.push_back(43186); // Runic Mana Potion (33448)
+
+        uint32 chosenElixir = Acore::Containers::SelectRandomContainerElement(availableElixirs);
+
+        target->CastSpell(target, chosenElixir, GetCastItem());
+    }
+
+    void Register() override
+    {
+        AfterCast += SpellCastFn(spell_item_crazy_alchemists_potion::SecondaryEffect);
     }
 };
 
@@ -6209,7 +6223,6 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_toxic_wasteling);
     RegisterSpellScript(spell_item_lil_xt);
     RegisterSpellScript(spell_item_essence_of_life);
-    RegisterSpellScript(spell_item_crazy_alchemists_potion);
     RegisterSpellScript(spell_item_skull_of_impeding_doom);
     RegisterSpellScript(spell_item_feast);
     RegisterSpellScript(spell_item_gnomish_universal_remote);
@@ -6341,6 +6354,7 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_drums_of_the_wild);
     RegisterSpellScript(spell_item_darkmoon_card_illusion);
     RegisterSpellScript(spell_item_mad_alchemists_potion);
+    RegisterSpellScript(spell_item_crazy_alchemists_potion);
     RegisterSpellScript(spell_item_decahedral_dwarven_dice);
     RegisterSpellScript(spell_item_aura_of_madness);
     RegisterSpellScript(spell_item_dementia);

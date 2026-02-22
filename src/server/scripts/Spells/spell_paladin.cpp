@@ -288,106 +288,6 @@ class spell_pal_sacred_shield : public AuraScript
     }
 };
 
-class spell_pal_sacred_shield_base : public AuraScript
-{
-    PrepareAuraScript(spell_pal_sacred_shield_base);
-
-    static constexpr uint32 SACRED_SHIELD_ICD = 6 * IN_MILLISECONDS;
-    uint32 _cooldownEnd = 0;
-
-    void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
-    {
-        if (Unit* caster = GetCaster())
-        {
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell);
-            amount = spellInfo->Effects[EFFECT_0].CalcValue();
-
-            // +75.00% from sp bonus
-            amount += CalculatePct(caster->SpellBaseDamageBonusDone(spellInfo->GetSchoolMask()), 75.0f);
-
-            // Xinef: removed divine guardian because it will affect triggered spell with increased amount
-            // Arena - Dampening
-            if (AuraEffect const* dampening = caster->GetAuraEffect(SPELL_GENERIC_ARENA_DAMPENING, EFFECT_0))
-            {
-                AddPct(amount, dampening->GetAmount());
-            }
-            // Battleground - Dampening
-            else if (AuraEffect const* dampening2 = caster->GetAuraEffect(SPELL_GENERIC_BATTLEGROUND_DAMPENING, EFFECT_0))
-            {
-                AddPct(amount, dampening2->GetAmount());
-            }
-        }
-    }
-
-    bool CheckProc(ProcEventInfo& eventInfo)
-    {
-        HealInfo* healinfo = eventInfo.GetHealInfo();
-        DamageInfo* damageinfo = eventInfo.GetDamageInfo();
-        return !(eventInfo.GetHitMask() & PROC_EX_INTERNAL_HOT) && ((healinfo && healinfo->GetHeal() > 0) || (damageinfo && damageinfo->GetDamage() > 0));
-    }
-
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
-    {
-        PreventDefaultAction();
-
-        if (eventInfo.GetTypeMask() & PROC_FLAG_TAKEN_SPELL_MAGIC_DMG_CLASS_POS)
-        {
-            Unit* caster = eventInfo.GetActor();
-
-            HealInfo* healinfo = eventInfo.GetHealInfo();
-
-            if (!healinfo || !healinfo->GetHeal())
-            {
-                return;
-            }
-
-            SpellInfo const* procSpell = healinfo->GetSpellInfo();
-            if (!procSpell)
-            {
-                return;
-            }
-
-            if (caster && procSpell->SpellFamilyName == SPELLFAMILY_PALADIN &&
-                    procSpell->SpellFamilyFlags.HasFlag(0x40000000) && caster->GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL, SPELLFAMILY_PALADIN, 3021, 0)) // need infusion of light
-            {
-                int32 basepoints = int32(float(healinfo->GetHeal()) / 12.0f);
-                // Item - Paladin T9 Holy 4P Bonus (Flash of Light)
-                if (AuraEffect const* aurEffect = caster->GetAuraEffect(67191, EFFECT_0))
-                    AddPct(basepoints, aurEffect->GetAmount());
-
-                caster->CastCustomSpell(eventInfo.GetActionTarget(), 66922, &basepoints, nullptr, nullptr, true, nullptr, aurEff, caster->GetGUID());
-                return;
-            }
-
-            return;
-        }
-
-        uint32 now = GameTime::GetGameTimeMS().count();
-        if (_cooldownEnd > now)
-            return;
-
-        uint32 cooldown = SACRED_SHIELD_ICD;
-
-        // Item - Paladin T8 Holy 4P Bonus
-        if (Unit* caster = aurEff->GetCaster())
-            if (AuraEffect const* aurEffect = caster->GetAuraEffect(64895, 0))
-                cooldown = aurEffect->GetAmount() * IN_MILLISECONDS;
-
-        _cooldownEnd = now + cooldown;
-
-        uint32 triggered_spell_id = GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell;
-        int32 basepoints = aurEff->GetAmount();
-        eventInfo.GetActionTarget()->CastCustomSpell(eventInfo.GetActionTarget(), triggered_spell_id, &basepoints, nullptr, nullptr, true, nullptr, aurEff, eventInfo.GetActionTarget()->GetGUID());
-    }
-
-    void Register() override
-    {
-        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_pal_sacred_shield_base::CalculateAmount, EFFECT_0, SPELL_AURA_DUMMY);
-        DoCheckProc += AuraCheckProcFn(spell_pal_sacred_shield_base::CheckProc);
-        OnEffectProc += AuraEffectProcFn(spell_pal_sacred_shield_base::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
-    }
-};
-
 // 31850 - Ardent Defender
 class spell_pal_ardent_defender : public AuraScript
 {
@@ -556,18 +456,15 @@ class spell_pal_avenging_wrath : public AuraScript
         });
     }
 
-    void HandleApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         Unit* target = GetTarget();
+
         if (AuraEffect const* sanctifiedWrathAurEff = target->GetAuraEffectOfRankedSpell(SPELL_PALADIN_SANCTIFIED_WRATH_TALENT_R1, EFFECT_2))
         {
             int32 basepoints = sanctifiedWrathAurEff->GetAmount();
             target->CastCustomSpell(target, SPELL_PALADIN_SANCTIFIED_WRATH, &basepoints, &basepoints, nullptr, true, nullptr, sanctifiedWrathAurEff);
         }
-
-        target->CastSpell(target, SPELL_PALADIN_AVENGING_WRATH_MARKER, true, nullptr, aurEff);
-        // Blizz seems to just apply aura without bothering to cast
-        target->AddAura(SPELL_PALADIN_IMMUNE_SHIELD_MARKER, target);
     }
 
     void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -2218,12 +2115,18 @@ class spell_pal_light_s_beacon : public AuraScript
             SPELL_PALADIN_BEACON_OF_LIGHT_AURA,
             SPELL_PALADIN_BEACON_OF_LIGHT_FLASH,
             SPELL_PALADIN_BEACON_OF_LIGHT_HOLY,
-            SPELL_PALADIN_HOLY_LIGHT_R1
+            SPELL_PALADIN_HOLY_LIGHT_R1,
+            SPELL_PALADIN_JUDGEMENT_OF_LIGHT_HEAL
         });
     }
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
+        // Don't proc from Judgement of Light heals — JoL sets originalCaster to
+        // the paladin for combat log, but the heal is actually cast by the attacker.
+        if (eventInfo.GetSpellInfo() && eventInfo.GetSpellInfo()->Id == SPELL_PALADIN_JUDGEMENT_OF_LIGHT_HEAL)
+            return false;
+
         // Don't proc if the heal target is the beacon target (no double heal)
         if (GetTarget()->HasAura(SPELL_PALADIN_BEACON_OF_LIGHT_AURA, eventInfo.GetActor()->GetGUID()))
             return false;
@@ -2245,7 +2148,10 @@ class spell_pal_light_s_beacon : public AuraScript
         // Holy Light heals for 100%, Flash of Light heals for 50%
         uint32 healSpellId = procSpell->IsRankOf(sSpellMgr->AssertSpellInfo(SPELL_PALADIN_HOLY_LIGHT_R1)) ?
             SPELL_PALADIN_BEACON_OF_LIGHT_FLASH : SPELL_PALADIN_BEACON_OF_LIGHT_HOLY;
-        int32 heal = CalculatePct(healInfo->GetHeal(), aurEff->GetAmount());
+
+        // Use heal amount before target-specific modifiers to avoid copying them
+        uint32 healAmount = healInfo->GetHealBeforeTakenMods();
+        int32 heal = CalculatePct(healAmount, aurEff->GetAmount());
 
         Unit* beaconTarget = GetCaster();
         if (!beaconTarget || !beaconTarget->HasAura(SPELL_PALADIN_BEACON_OF_LIGHT_AURA, eventInfo.GetActor()->GetGUID()))
@@ -2268,7 +2174,6 @@ void AddSC_paladin_spell_scripts()
     RegisterSpellScript(spell_pal_divine_purpose);
     RegisterSpellScript(spell_pal_seal_of_light);
     RegisterSpellScript(spell_pal_sacred_shield);
-    RegisterSpellScript(spell_pal_sacred_shield_base);
     RegisterSpellScript(spell_pal_ardent_defender);
     RegisterSpellScript(spell_pal_aura_mastery);
     RegisterSpellScript(spell_pal_aura_mastery_immune);
