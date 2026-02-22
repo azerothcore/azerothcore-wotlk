@@ -4067,15 +4067,15 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
         {
             if (me)
             {
-                if (CreatureGroup* formation = me->GetFormation())
+                if (CreatureGroup* group = me->GetFormation())
                 {
-                    uint32 type = e.target.formation.type;
+                    uint32 formationType = e.target.formation.type;
                     uint32 entry = e.target.formation.entry;
                     bool excludeSelf = e.target.formation.excludeSelf;
 
-                    if (type == 1) // Leader only
+                    if (formationType == 1) // Leader only
                     {
-                        if (Creature* leader = formation->GetLeader())
+                        if (Creature* leader = group->GetLeader())
                         {
                             if ((!excludeSelf || leader != me) && (!entry || leader->GetEntry() == entry))
                                 targets.push_back(leader);
@@ -4083,9 +4083,11 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
                     }
                     else // 0 = Members only, 2 = All
                     {
-                        for (auto const& [member, formationInfo] : formation->GetMembers())
+                        for (auto const& itr : group->GetMembers())
                         {
-                            if (!member || !member->IsAlive())
+                            Creature* member = itr.first;
+
+                            if (!member)
                                 continue;
 
                             if (excludeSelf && member == me)
@@ -4094,8 +4096,7 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
                             if (entry && member->GetEntry() != entry)
                                 continue;
 
-                            // Type 0: skip the leader (members only)
-                            if (type == 0 && member == formation->GetLeader())
+                            if (formationType == 0 && member == group->GetLeader())
                                 continue;
 
                             targets.push_back(member);
