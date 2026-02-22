@@ -177,6 +177,8 @@ public:
                     {
                         if (Creature* Gandling = instance->GetCreature(GandlingGUID))
                         {
+                            Gandling->SetVisible(true);
+                            Gandling->SetFaction(21);
                             Gandling->AI()->Talk(0);
                             Gandling->AI()->Reset();
                         }

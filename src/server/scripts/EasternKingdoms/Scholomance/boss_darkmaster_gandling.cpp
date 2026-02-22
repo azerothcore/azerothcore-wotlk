@@ -236,17 +236,12 @@ public:
         void Reset() override
         {
             _Reset();
-            instance->SetData(DATA_DARKMASTER_GANDLING, NOT_STARTED);
-            if (instance->GetData(DATA_MINI_BOSSES) != 6)
+            if (!me->IsInEvadeMode())
             {
                 me->SetVisible(false);
                 me->SetFaction(35);
             }
-            else
-            {
-                me->SetVisible(true);
-                me->SetFaction(21);
-            }
+            instance->SetData(DATA_DARKMASTER_GANDLING, NOT_STARTED);
             OpenAllGates();
             summons.DespawnAll();
             for (int i = 0; i < 6; i++)
