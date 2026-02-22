@@ -746,7 +746,6 @@ struct npc_power_spark : public NullCreatureAI
     npc_power_spark(Creature* creature) : NullCreatureAI(creature)
     {
         _instance = me->GetInstanceScript();
-        me->CastSpell(me, SPELL_POWER_SPARK_VISUAL, false);
         _checkTimer = 1000;
         _moveTimer = 0;
     }
