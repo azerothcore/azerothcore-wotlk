@@ -57,6 +57,7 @@ struct AuctionEntry;
 struct DeclinedName;
 struct ItemTemplate;
 struct MovementInfo;
+struct TradeStatusInfo;
 
 namespace lfg
 {
@@ -203,6 +204,14 @@ namespace WorldPackets
     {
         class Hello;
         class TrainerBuySpell;
+    }
+
+    namespace Instance
+    {
+        class SetDungeonDifficultyClient;
+        class SetRaidDifficultyClient;
+        class ResetInstances;
+        class InstanceLockResponse;
     }
 }
 
@@ -502,7 +511,7 @@ public:
 
     void SendBattleGroundList(ObjectGuid guid, BattlegroundTypeId bgTypeId = BATTLEGROUND_RB);
 
-    void SendTradeStatus(TradeStatus status);
+    void SendTradeStatus(TradeStatusInfo const& info);
     void SendUpdateTrade(bool trader_data = true);
     void SendCancelTrade(TradeStatus status);
 
@@ -988,16 +997,16 @@ public:                                                 // opcodes handlers
     void HandleMinimapPingOpcode(WorldPackets::Misc::MinimapPingClient& packet);
     void HandleRandomRollOpcode(WorldPackets::Misc::RandomRollClient& packet);
     void HandleFarSightOpcode(WorldPacket& recvData);
-    void HandleSetDungeonDifficultyOpcode(WorldPacket& recvData);
-    void HandleSetRaidDifficultyOpcode(WorldPacket& recvData);
+    void HandleSetDungeonDifficultyOpcode(WorldPackets::Instance::SetDungeonDifficultyClient& packet);
+    void HandleSetRaidDifficultyOpcode(WorldPackets::Instance::SetRaidDifficultyClient& packet);
     void HandleMoveFlagChangeOpcode(WorldPacket& recvData);
     void HandleSetTitleOpcode(WorldPacket& recvData);
     void HandleRealmSplitOpcode(WorldPacket& recvData);
     void HandleTimeSyncResp(WorldPacket& recvData);
     void HandleWhoisOpcode(WorldPacket& recvData);
-    void HandleResetInstancesOpcode(WorldPacket& recvData);
+    void HandleResetInstancesOpcode(WorldPackets::Instance::ResetInstances& packet);
     void HandleHearthAndResurrect(WorldPacket& recvData);
-    void HandleInstanceLockResponse(WorldPacket& recvPacket);
+    void HandleInstanceLockResponse(WorldPackets::Instance::InstanceLockResponse& packet);
     void HandleUpdateMissileTrajectory(WorldPacket& recvPacket);
 
     // Battlefield
