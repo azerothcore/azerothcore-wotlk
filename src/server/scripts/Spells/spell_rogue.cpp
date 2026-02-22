@@ -939,13 +939,9 @@ class spell_rog_honor_among_thieves : public AuraScript
 {
     PrepareAuraScript(spell_rog_honor_among_thieves);
 
-    bool Validate(SpellInfo const* spellInfo) override
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo(
-        {
-            SPELL_ROGUE_HONOR_AMONG_THIEVES_TRIGGERED,
-            spellInfo->Effects[EFFECT_0].TriggerSpell
-        });
+        return ValidateSpellInfo({ SPELL_ROGUE_HONOR_AMONG_THIEVES_TRIGGERED });
     }
 
     bool CheckProc(ProcEventInfo& /*eventInfo*/)
