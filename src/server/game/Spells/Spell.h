@@ -273,6 +273,7 @@ struct TargetInfo
     bool   crit:1;
     bool   scaleAura:1;
     int32  damage;
+    int32  damageBeforeTakenMods;
 };
 
 static const uint32 SPELL_INTERRUPT_NONPLAYER = 32747;
@@ -683,6 +684,7 @@ public:
     // Damage and healing in effects need just calculate
     int32 m_damage;           // Damge   in effects count here
     int32 m_healing;          // Healing in effects count here
+    int32 m_damageBeforeTakenMods;
 
     // ******************************************
     // Spell trigger system
