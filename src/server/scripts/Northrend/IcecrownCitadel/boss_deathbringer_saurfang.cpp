@@ -1342,6 +1342,28 @@ public:
     }
 };
 
+// 72176 - Blood Beast Blood Link
+class spell_deathbringer_blood_beast_blood_link : public AuraScript
+{
+    PrepareAuraScript(spell_deathbringer_blood_beast_blood_link);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_BLOOD_LINK_DUMMY });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        eventInfo.GetActionTarget()->CastCustomSpell(SPELL_BLOOD_LINK_DUMMY, SPELLVALUE_BASE_POINT0, 3, nullptr, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_deathbringer_blood_beast_blood_link::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_boss_deathbringer_saurfang()
 {
     new boss_deathbringer_saurfang();
@@ -1350,6 +1372,7 @@ void AddSC_boss_deathbringer_saurfang()
     new npc_saurfang_event();
     RegisterSpellScript(spell_deathbringer_blood_link_aura);
     RegisterSpellScript(spell_deathbringer_blood_link_blood_beast_aura);
+    RegisterSpellScript(spell_deathbringer_blood_beast_blood_link);
     RegisterSpellScript(spell_deathbringer_blood_link);
     RegisterSpellAndAuraScriptPair(spell_deathbringer_blood_power, spell_deathbringer_blood_power_aura);
     RegisterSpellScript(spell_deathbringer_blood_nova_targeting);

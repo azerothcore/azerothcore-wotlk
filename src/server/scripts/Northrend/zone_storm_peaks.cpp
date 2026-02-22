@@ -221,15 +221,22 @@ public:
     {
         npc_time_lost_proto_drakeAI(Creature* creature) : ScriptedAI(creature) {}
 
+        void Reset() override
+        {
+            scheduler.CancelAll();
+        }
+
         void InitializeAI() override
         {
             ScriptedAI::InitializeAI();
             me->SetAnimTier(AnimTier::Fly);
             me->setActive(true);
             me->SetVisible(false);
+            me->SetImmuneToAll(true);
 
             me->m_Events.AddEventAtOffset([&] {
                 me->SetVisible(true);
+                me->SetImmuneToAll(false);
             }, Hours(urand(6, 22)));
         }
 

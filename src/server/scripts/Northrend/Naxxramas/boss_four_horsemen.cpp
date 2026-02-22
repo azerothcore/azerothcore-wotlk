@@ -258,7 +258,10 @@ public:
 
             if (instance->IsBossDone(BOSS_HORSEMAN))
                 if (GameObject* chest = me->GetMap()->SummonGameObject(RAID_MODE(GO_HORSEMEN_CHEST_10, GO_HORSEMEN_CHEST_25), 2514.8f, -2944.9f, 245.55f, 5.51f, 0, 0, 0, 0, 0))
+                {
+                    chest->SetRespawnTime(7 * DAY);
                     chest->SetLootRecipient(me);
+                }
         }
 
         void JustEngagedWith(Unit* who) override

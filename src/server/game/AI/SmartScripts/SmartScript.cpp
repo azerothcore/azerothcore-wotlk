@@ -3332,6 +3332,14 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             }
             break;
         }
+        case SMART_ACTION_SUMMON_GAMEOBJECT_GROUP:
+        {
+            if (!GetBaseObject())
+                break;
+
+            GetBaseObject()->SummonGameObjectGroup(e.action.gameobjectGroup.group);
+            break;
+        }
         default:
             LOG_ERROR("sql.sql", "SmartScript::ProcessAction: Entry {} SourceType {}, Event {}, Unhandled Action type {}", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
             break;
