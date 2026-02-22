@@ -41,6 +41,7 @@
 #include "PacketUtilities.h"
 #include "Pet.h"
 #include "Player.h"
+#include "Realm.h"
 #include "QueryHolder.h"
 #include "ScriptMgr.h"
 #include "SocialMgr.h"
@@ -115,6 +116,7 @@ WorldSession::WorldSession(uint32 id, std::string&& name, uint32 accountFlags, s
     _security(sec),
     _skipQueue(skipQueue),
     _accountId(id),
+    _RBACData(nullptr),
     _accountName(std::move(name)),
     _accountFlags(accountFlags),
     m_expansion(expansion),
@@ -170,6 +172,8 @@ WorldSession::~WorldSession()
         m_Socket->CloseSocket();
         m_Socket = nullptr;
     }
+
+    delete _RBACData;
 
     ///- empty incoming packet queue
     WorldPacket* packet = nullptr;
@@ -360,7 +364,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
     ///- Before we process anything:
     /// If necessary, kick the player because the client didn't send anything for too long
     /// (or they've been idling in character select)
-    if (sWorld->getBoolConfig(CONFIG_CLOSE_IDLE_CONNECTIONS) && IsConnectionIdle() && m_Socket)
+    if (IsConnectionIdle() && !HasPermission(rbac::RBAC_PERM_IGNORE_IDLE_CONNECTION))
         m_Socket->CloseSocket();
 
     if (updater.ProcessUnsafe())
@@ -1546,4 +1550,55 @@ void WorldSession::SetPacketLogging(bool state)
 {
     if (m_Socket)
         m_Socket->SetPacketLogging(state);
+}
+
+void WorldSession::LoadPermissions()
+{
+    uint32 id = GetAccountId();
+    uint8 secLevel = GetSecurity();
+
+    LOG_DEBUG("rbac", "WorldSession::LoadPermissions [AccountId: {}, Name: {}, realmId: {}, secLevel: {}]",
+        id, _accountName, realm.Id.Realm, secLevel);
+
+    _RBACData = new rbac::RBACData(id, _accountName, realm.Id.Realm, secLevel);
+    _RBACData->LoadFromDB();
+}
+
+QueryCallback WorldSession::LoadPermissionsAsync()
+{
+    uint32 id = GetAccountId();
+    uint8 secLevel = GetSecurity();
+
+    LOG_DEBUG("rbac", "WorldSession::LoadPermissions [AccountId: {}, Name: {}, realmId: {}, secLevel: {}]",
+        id, _accountName, realm.Id.Realm, secLevel);
+
+    _RBACData = new rbac::RBACData(id, _accountName, realm.Id.Realm, secLevel);
+    return _RBACData->LoadFromDBAsync();
+}
+
+bool WorldSession::HasPermission(uint32 permission)
+{
+    if (!_RBACData)
+        LoadPermissions();
+
+    bool hasPermission = _RBACData->HasPermission(permission);
+    LOG_DEBUG("rbac", "WorldSession::HasPermission [AccountId: {}, Name: {}, realmId: {}]",
+                   _RBACData->GetId(), _RBACData->GetName(), realm.Id.Realm);
+
+    return hasPermission;
+}
+
+void WorldSession::InvalidateRBACData()
+{
+    LOG_DEBUG("rbac", "WorldSession::InvalidateRBACData [AccountId: {}, Name: {}, realmId: {}]",
+                   _RBACData->GetId(), _RBACData->GetName(), realm.Id.Realm);
+    delete _RBACData;
+    _RBACData = nullptr;
+}
+
+void WorldSession::InitRBACDataForTest()
+{
+    delete _RBACData;
+    _RBACData = new rbac::RBACData(_accountId, _accountName, realm.Id.Realm, _security);
+    _RBACData->LoadFromDBCallback(nullptr);
 }

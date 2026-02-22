@@ -15,12 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ArenaTeamMgr.h"
 #include "ArenaSeasonMgr.h"
 #include "ArenaTeamFilter.h"
+#include "ArenaTeamMgr.h"
 #include "Chat.h"
 #include "CommandScript.h"
 #include "Player.h"
+#include "RBAC.h"
 
 using namespace Acore::ChatCommands;
 
@@ -33,25 +34,25 @@ public:
     {
         static ChatCommandTable arenaSeasonSetCommandTable =
         {
-            { "state",          HandleArenaSeasonSetStateCommand, SEC_ADMINISTRATOR, Console::Yes }
+            { "state",          HandleArenaSeasonSetStateCommand, rbac::RBAC_PERM_COMMAND_ARENA_SEASON, Console::Yes }
         };
 
         static ChatCommandTable arenaSeasonCommandTable =
         {
-            { "reward",         HandleArenaSeasonRewardCommand,      SEC_ADMINISTRATOR, Console::Yes },
-            { "deleteteams",    HandleArenaSeasonDeleteTeamsCommand, SEC_ADMINISTRATOR, Console::Yes },
-            { "start",          HandleArenaSeasonStartCommand,       SEC_ADMINISTRATOR, Console::Yes },
+            { "reward",         HandleArenaSeasonRewardCommand,      rbac::RBAC_PERM_COMMAND_ARENA_SEASON_REWARD,      Console::Yes },
+            { "deleteteams",    HandleArenaSeasonDeleteTeamsCommand, rbac::RBAC_PERM_COMMAND_ARENA_SEASON_DELETETEAMS,  Console::Yes },
+            { "start",          HandleArenaSeasonStartCommand,       rbac::RBAC_PERM_COMMAND_ARENA_SEASON_START,        Console::Yes },
             { "set",            arenaSeasonSetCommandTable }
         };
 
         static ChatCommandTable arenaCommandTable =
         {
-            { "create",         HandleArenaCreateCommand,   SEC_ADMINISTRATOR, Console::Yes },
-            { "disband",        HandleArenaDisbandCommand,  SEC_ADMINISTRATOR, Console::Yes },
-            { "rename",         HandleArenaRenameCommand,   SEC_ADMINISTRATOR, Console::Yes },
-            { "captain",        HandleArenaCaptainCommand,  SEC_ADMINISTRATOR, Console::No  },
-            { "info",           HandleArenaInfoCommand,     SEC_GAMEMASTER,    Console::Yes },
-            { "lookup",         HandleArenaLookupCommand,   SEC_GAMEMASTER,    Console::Yes },
+            { "create",         HandleArenaCreateCommand,   rbac::RBAC_PERM_COMMAND_ARENA_CREATE,  Console::Yes },
+            { "disband",        HandleArenaDisbandCommand,  rbac::RBAC_PERM_COMMAND_ARENA_DISBAND, Console::Yes },
+            { "rename",         HandleArenaRenameCommand,   rbac::RBAC_PERM_COMMAND_ARENA_RENAME,  Console::Yes },
+            { "captain",        HandleArenaCaptainCommand,  rbac::RBAC_PERM_COMMAND_ARENA_CAPTAIN, Console::No  },
+            { "info",           HandleArenaInfoCommand,     rbac::RBAC_PERM_COMMAND_ARENA_INFO,    Console::Yes },
+            { "lookup",         HandleArenaLookupCommand,   rbac::RBAC_PERM_COMMAND_ARENA_LOOKUP,  Console::Yes },
             { "season",         arenaSeasonCommandTable  }
         };
 

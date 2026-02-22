@@ -17,6 +17,7 @@
 
 #include "AccountMgr.h"
 #include "BattlefieldMgr.h"
+#include "RBAC.h"
 #include "Battleground.h"
 #include "BattlegroundMgr.h"
 #include "CharacterPackets.h"
@@ -277,8 +278,6 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
         levelMax = STRONG_MAX_LEVEL;
 
     uint32 team = _player->GetTeamId();
-    uint32 security = GetSecurity();
-    bool allowTwoSideWhoList = sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_WHO_LIST);
     uint32 gmLevelInWhoList = sWorld->getIntConfig(CONFIG_GM_LEVEL_IN_WHO_LIST);
     uint32 displaycount = 0;
 
@@ -288,20 +287,13 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
 
     for (auto const& target : sWhoListCacheMgr->GetWhoList())
     {
-        if (AccountMgr::IsPlayerAccount(security))
-        {
-            // player can see member of other team only if CONFIG_ALLOW_TWO_SIDE_WHO_LIST
-            if (target.GetTeamId() != team && !allowTwoSideWhoList)
-            {
-                continue;
-            }
+        // player can see member of other team only if CONFIG_ALLOW_TWO_SIDE_WHO_LIST
+        if (target.GetTeamId() != team && !HasPermission(rbac::RBAC_PERM_TWO_SIDE_WHO_LIST))
+            continue;
 
-            // player can see MODERATOR, GAME MASTER, ADMINISTRATOR only if CONFIG_GM_IN_WHO_LIST
-            if (target.GetSecurity() > AccountTypes(gmLevelInWhoList))
-            {
-                continue;
-            }
-        }
+        // player can see MODERATOR, GAME MASTER, ADMINISTRATOR only if CONFIG_GM_IN_WHO_LIST
+        if (!HasPermission(rbac::RBAC_PERM_WHO_SEE_ALL_SEC_LEVELS) && target.GetSecurity() > AccountTypes(gmLevelInWhoList))
+            continue;
 
         // check if target is globally visible for player
         if ((_player->GetGUID() != target.GetGuid() && !target.IsVisible()) &&
@@ -423,7 +415,7 @@ void WorldSession::HandleLogoutRequestOpcode(WorldPackets::Character::LogoutRequ
     if (ObjectGuid lguid = GetPlayer()->GetLootGUID())
         DoLootRelease(lguid);
 
-    bool instantLogout = ((GetSecurity() >= 0 && uint32(GetSecurity()) >= sWorld->getIntConfig(CONFIG_INSTANT_LOGOUT))
+    bool instantLogout = (HasPermission(rbac::RBAC_PERM_INSTANT_LOGOUT)
                           || (GetPlayer()->HasPlayerFlag(PLAYER_FLAGS_RESTING) && !GetPlayer()->IsInCombat())) || GetPlayer()->IsInFlight();
 
     bool preventAfkSanctuaryLogout = sWorld->getIntConfig(CONFIG_AFK_PREVENT_LOGOUT) == 1
@@ -1003,7 +995,7 @@ void WorldSession::HandleInspectOpcode(WorldPacket& recv_data)
     WorldPacket data(SMSG_INSPECT_TALENT, guid_size + 4 + talent_points);
     data << player->GetPackGUID();
 
-    if (sWorld->getBoolConfig(CONFIG_TALENTS_INSPECTING) || _player->IsGameMaster())
+    if (sWorld->getBoolConfig(CONFIG_TALENTS_INSPECTING) || _player->CanBeGameMaster())
     {
         player->BuildPlayerTalentsInfoData(&data);
     }
@@ -1074,7 +1066,7 @@ void WorldSession::HandleWorldTeleportOpcode(WorldPacket& recv_data)
 
     LOG_DEBUG("network", "CMSG_WORLD_TELEPORT: Player = {}, Time = {}, map = {}, x = {}, y = {}, z = {}, o = {}", GetPlayer()->GetName(), time, mapid, PositionX, PositionY, PositionZ, Orientation);
 
-    if (AccountMgr::IsAdminAccount(GetSecurity()))
+    if (HasPermission(rbac::RBAC_PERM_OPCODE_WORLD_TELEPORT))
         GetPlayer()->TeleportTo(mapid, PositionX, PositionY, PositionZ, Orientation);
     else
         ChatHandler(this).SendNotification(LANG_PERMISSION_DENIED);
@@ -1086,7 +1078,7 @@ void WorldSession::HandleWhoisOpcode(WorldPacket& recv_data)
     std::string charname;
     recv_data >> charname;
 
-    if (!AccountMgr::IsAdminAccount(GetSecurity()))
+    if (!HasPermission(rbac::RBAC_PERM_OPCODE_WHOIS))
     {
         ChatHandler(this).SendNotification(LANG_PERMISSION_DENIED);
         return;

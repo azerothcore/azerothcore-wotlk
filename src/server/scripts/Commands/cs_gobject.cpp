@@ -28,6 +28,7 @@
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "PoolMgr.h"
+#include "RBAC.h"
 #include "Transport.h"
 #include <unordered_set>
 
@@ -45,19 +46,19 @@ public:
     {
         static ChatCommandTable gobjectCommandTable =
         {
-            { "activate",  HandleGameObjectActivateCommand, SEC_GAMEMASTER,    Console::No },
-            { "delete",    HandleGameObjectDeleteCommand,   SEC_ADMINISTRATOR, Console::No },
-            { "info",      HandleGameObjectInfoCommand,     SEC_MODERATOR,     Console::No },
-            { "move",      HandleGameObjectMoveCommand,     SEC_ADMINISTRATOR, Console::No },
-            { "near",      HandleGameObjectNearCommand,     SEC_MODERATOR,     Console::No },
-            { "target",    HandleGameObjectTargetCommand,   SEC_MODERATOR,     Console::No },
-            { "turn",      HandleGameObjectTurnCommand,     SEC_ADMINISTRATOR, Console::No },
-            { "add temp",  HandleGameObjectAddTempCommand,  SEC_GAMEMASTER,    Console::No },
-            { "add",       HandleGameObjectAddCommand,      SEC_ADMINISTRATOR, Console::No },
-            { "load",      HandleGameObjectLoadCommand,     SEC_ADMINISTRATOR, Console::Yes },
-            { "set phase", HandleGameObjectSetPhaseCommand, SEC_ADMINISTRATOR, Console::No },
-            { "set state", HandleGameObjectSetStateCommand, SEC_ADMINISTRATOR, Console::No },
-            { "respawn",   HandleGameObjectRespawn,         SEC_GAMEMASTER,    Console::No }
+            { "activate",  HandleGameObjectActivateCommand, rbac::RBAC_PERM_COMMAND_GOBJECT_ACTIVATE,  Console::No },
+            { "delete",    HandleGameObjectDeleteCommand,   rbac::RBAC_PERM_COMMAND_GOBJECT_DELETE,    Console::No },
+            { "info",      HandleGameObjectInfoCommand,     rbac::RBAC_PERM_COMMAND_GOBJECT_INFO,      Console::No },
+            { "move",      HandleGameObjectMoveCommand,     rbac::RBAC_PERM_COMMAND_GOBJECT_MOVE,      Console::No },
+            { "near",      HandleGameObjectNearCommand,     rbac::RBAC_PERM_COMMAND_GOBJECT_NEAR,      Console::No },
+            { "target",    HandleGameObjectTargetCommand,   rbac::RBAC_PERM_COMMAND_GOBJECT_TARGET,    Console::No },
+            { "turn",      HandleGameObjectTurnCommand,     rbac::RBAC_PERM_COMMAND_GOBJECT_TURN,      Console::No },
+            { "add temp",  HandleGameObjectAddTempCommand,  rbac::RBAC_PERM_COMMAND_GOBJECT_ADD_TEMP,  Console::No },
+            { "add",       HandleGameObjectAddCommand,      rbac::RBAC_PERM_COMMAND_GOBJECT_ADD,       Console::No },
+            { "load",      HandleGameObjectLoadCommand,     rbac::RBAC_PERM_COMMAND_GOBJECT_LOAD,      Console::Yes },
+            { "set phase", HandleGameObjectSetPhaseCommand, rbac::RBAC_PERM_COMMAND_GOBJECT_SET_PHASE, Console::No },
+            { "set state", HandleGameObjectSetStateCommand, rbac::RBAC_PERM_COMMAND_GOBJECT_SET_STATE, Console::No },
+            { "respawn",   HandleGameObjectRespawn,         rbac::RBAC_PERM_COMMAND_GOBJECT_ACTIVATE,  Console::No }
         };
         static ChatCommandTable commandTable =
         {

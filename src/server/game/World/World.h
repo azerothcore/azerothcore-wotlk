@@ -235,6 +235,7 @@ public:
     [[nodiscard]] uint32 GetCleaningFlags() const override { return _cleaningFlags; }
     void   SetCleaningFlags(uint32 flags) override { _cleaningFlags = flags; }
     void   ResetEventSeasonalQuests(uint16 event_id) override;
+    void   ReloadRBAC() override;
 
     [[nodiscard]] std::string const& GetRealmName() const override { return _realmName; } // pussywizard
     void SetRealmName(std::string name) override { _realmName = name; } // pussywizard

@@ -22,6 +22,7 @@
 #include "GameTime.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "ReputationMgr.h"
 
 using namespace Acore::ChatCommands;
@@ -35,11 +36,11 @@ public:
     {
         static ChatCommandTable questCommandTable =
         {
-            { "add",      HandleQuestAdd,      SEC_GAMEMASTER, Console::Yes },
-            { "complete", HandleQuestComplete, SEC_GAMEMASTER, Console::Yes },
-            { "remove",   HandleQuestRemove,   SEC_GAMEMASTER, Console::Yes },
-            { "reward",   HandleQuestReward,   SEC_GAMEMASTER, Console::Yes },
-            { "status",   HandleQuestStatus,   SEC_GAMEMASTER, Console::Yes },
+            { "add",      HandleQuestAdd,      rbac::RBAC_PERM_COMMAND_QUEST_ADD,      Console::Yes },
+            { "complete", HandleQuestComplete, rbac::RBAC_PERM_COMMAND_QUEST_COMPLETE, Console::Yes },
+            { "remove",   HandleQuestRemove,   rbac::RBAC_PERM_COMMAND_QUEST_REMOVE,   Console::Yes },
+            { "reward",   HandleQuestReward,   rbac::RBAC_PERM_COMMAND_QUEST_REWARD,   Console::Yes },
+            { "status",   HandleQuestStatus,   rbac::RBAC_PERM_COMMAND_QUEST,          Console::Yes },
         };
         static ChatCommandTable commandTable =
         {

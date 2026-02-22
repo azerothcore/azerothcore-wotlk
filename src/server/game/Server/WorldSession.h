@@ -440,6 +440,16 @@ public:
 
     AccountTypes GetSecurity() const { return _security; }
     bool CanSkipQueue() const { return _skipQueue; }
+
+    // RBAC
+    rbac::RBACData* GetRBACData() const { return _RBACData; }
+    bool HasPermission(uint32 permissionId);
+    void LoadPermissions();
+    QueryCallback LoadPermissionsAsync();
+    void InvalidateRBACData();
+
+    /// For unit testing - initializes RBAC data without database access
+    void InitRBACDataForTest();
     uint32 GetAccountId() const { return _accountId; }
     Player* GetPlayer() const { return _player; }
     std::string const& GetPlayerName() const;
@@ -1225,6 +1235,7 @@ private:
     AccountTypes _security;
     bool _skipQueue;
     uint32 _accountId;
+    rbac::RBACData* _RBACData;
     std::string _accountName;
     uint32 _accountFlags;
     uint8 m_expansion;

@@ -21,6 +21,7 @@
 #include "Opcodes.h"
 #include "Pet.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "ReputationMgr.h"
 #include "StringConvert.h"
 
@@ -35,43 +36,43 @@ public:
     {
         static ChatCommandTable modifyspeedCommandTable =
         {
-            { "fly",            HandleModifyFlyCommand,           SEC_GAMEMASTER,       Console::No },
-            { "all",            HandleModifyASpeedCommand,        SEC_GAMEMASTER,       Console::No },
-            { "walk",           HandleModifySpeedCommand,         SEC_GAMEMASTER,       Console::No },
-            { "backwalk",       HandleModifyBWalkCommand,         SEC_GAMEMASTER,       Console::No },
-            { "swim",           HandleModifySwimCommand,          SEC_GAMEMASTER,       Console::No },
-            { "",               HandleModifyASpeedCommand,        SEC_GAMEMASTER,       Console::No }
+            { "fly",            HandleModifyFlyCommand,           rbac::RBAC_PERM_COMMAND_MODIFY_SPEED_FLY,       Console::No },
+            { "all",            HandleModifyASpeedCommand,        rbac::RBAC_PERM_COMMAND_MODIFY_SPEED_ALL,       Console::No },
+            { "walk",           HandleModifySpeedCommand,         rbac::RBAC_PERM_COMMAND_MODIFY_SPEED_WALK,      Console::No },
+            { "backwalk",       HandleModifyBWalkCommand,         rbac::RBAC_PERM_COMMAND_MODIFY_SPEED_BACKWALK,  Console::No },
+            { "swim",           HandleModifySwimCommand,          rbac::RBAC_PERM_COMMAND_MODIFY_SPEED_SWIM,      Console::No },
+            { "",               HandleModifyASpeedCommand,        rbac::RBAC_PERM_COMMAND_MODIFY_SPEED,           Console::No }
         };
 
         static ChatCommandTable modifyCommandTable =
         {
-            { "hp",             HandleModifyHPCommand,            SEC_GAMEMASTER,       Console::No },
-            { "mana",           HandleModifyManaCommand,          SEC_GAMEMASTER,       Console::No },
-            { "rage",           HandleModifyRageCommand,          SEC_GAMEMASTER,       Console::No },
-            { "runicpower",     HandleModifyRunicPowerCommand,    SEC_GAMEMASTER,       Console::No },
-            { "energy",         HandleModifyEnergyCommand,        SEC_GAMEMASTER,       Console::No },
-            { "money",          HandleModifyMoneyCommand,         SEC_GAMEMASTER,       Console::No },
-            { "scale",          HandleModifyScaleCommand,         SEC_GAMEMASTER,       Console::No },
-            { "bit",            HandleModifyBitCommand,           SEC_GAMEMASTER,       Console::No },
-            { "faction",        HandleModifyFactionCommand,       SEC_ADMINISTRATOR,    Console::No },
-            { "spell",          HandleModifySpellCommand,         SEC_CONSOLE,          Console::No },
-            { "talentpoints",   HandleModifyTalentCommand,        SEC_GAMEMASTER,       Console::No },
-            { "mount",          HandleModifyMountCommand,         SEC_GAMEMASTER,       Console::No },
-            { "honor",          HandleModifyHonorCommand,         SEC_GAMEMASTER,       Console::No },
-            { "reputation",     HandleModifyRepCommand,           SEC_GAMEMASTER,       Console::No },
-            { "arenapoints",    HandleModifyArenaCommand,         SEC_GAMEMASTER,       Console::No },
-            { "drunk",          HandleModifyDrunkCommand,         SEC_GAMEMASTER,       Console::No },
-            { "standstate",     HandleModifyStandStateCommand,    SEC_GAMEMASTER,       Console::No },
-            { "phase",          HandleModifyPhaseCommand,         SEC_GAMEMASTER,       Console::No },
-            { "gender",         HandleModifyGenderCommand,        SEC_GAMEMASTER,       Console::No },
+            { "hp",             HandleModifyHPCommand,            rbac::RBAC_PERM_COMMAND_MODIFY_HP,              Console::No },
+            { "mana",           HandleModifyManaCommand,          rbac::RBAC_PERM_COMMAND_MODIFY_MANA,            Console::No },
+            { "rage",           HandleModifyRageCommand,          rbac::RBAC_PERM_COMMAND_MODIFY_RAGE,            Console::No },
+            { "runicpower",     HandleModifyRunicPowerCommand,    rbac::RBAC_PERM_COMMAND_MODIFY_RUNICPOWER,      Console::No },
+            { "energy",         HandleModifyEnergyCommand,        rbac::RBAC_PERM_COMMAND_MODIFY_ENERGY,          Console::No },
+            { "money",          HandleModifyMoneyCommand,         rbac::RBAC_PERM_COMMAND_MODIFY_MONEY,           Console::No },
+            { "scale",          HandleModifyScaleCommand,         rbac::RBAC_PERM_COMMAND_MODIFY_SCALE,           Console::No },
+            { "bit",            HandleModifyBitCommand,           rbac::RBAC_PERM_COMMAND_MODIFY_BIT,             Console::No },
+            { "faction",        HandleModifyFactionCommand,       rbac::RBAC_PERM_COMMAND_MODIFY_FACTION,         Console::No },
+            { "spell",          HandleModifySpellCommand,         rbac::RBAC_PERM_COMMAND_MODIFY_SPELL,           Console::No },
+            { "talentpoints",   HandleModifyTalentCommand,        rbac::RBAC_PERM_COMMAND_MODIFY_TALENTPOINTS,    Console::No },
+            { "mount",          HandleModifyMountCommand,         rbac::RBAC_PERM_COMMAND_MODIFY_MOUNT,           Console::No },
+            { "honor",          HandleModifyHonorCommand,         rbac::RBAC_PERM_COMMAND_MODIFY_HONOR,           Console::No },
+            { "reputation",     HandleModifyRepCommand,           rbac::RBAC_PERM_COMMAND_MODIFY_REPUTATION,      Console::No },
+            { "arenapoints",    HandleModifyArenaCommand,         rbac::RBAC_PERM_COMMAND_MODIFY_ARENAPOINTS,     Console::No },
+            { "drunk",          HandleModifyDrunkCommand,         rbac::RBAC_PERM_COMMAND_MODIFY_DRUNK,           Console::No },
+            { "standstate",     HandleModifyStandStateCommand,    rbac::RBAC_PERM_COMMAND_MODIFY_STANDSTATE,      Console::No },
+            { "phase",          HandleModifyPhaseCommand,         rbac::RBAC_PERM_COMMAND_MODIFY_PHASE,           Console::No },
+            { "gender",         HandleModifyGenderCommand,        rbac::RBAC_PERM_COMMAND_MODIFY_GENDER,          Console::No },
             { "speed",          modifyspeedCommandTable }
         };
 
         static ChatCommandTable morphCommandTable =
         {
-            { "reset",          HandleMorphResetCommand,          SEC_MODERATOR,        Console::No },
-            { "target",         HandleMorphTargetCommand,         SEC_MODERATOR,        Console::No },
-            { "mount",          HandleMorphMountCommand,          SEC_MODERATOR,        Console::No }
+            { "reset",          HandleMorphResetCommand,          rbac::RBAC_PERM_COMMAND_DEMORPH,                Console::No },
+            { "target",         HandleMorphTargetCommand,         rbac::RBAC_PERM_COMMAND_MORPH,                  Console::No },
+            { "mount",          HandleMorphMountCommand,          rbac::RBAC_PERM_COMMAND_MORPH,                  Console::No }
         };
 
         static ChatCommandTable commandTable =

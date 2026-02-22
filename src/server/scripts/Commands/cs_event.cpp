@@ -20,6 +20,7 @@
 #include "GameEventMgr.h"
 #include "GameTime.h"
 #include "Language.h"
+#include "RBAC.h"
 #include "Timer.h"
 
 using namespace Acore::ChatCommands;
@@ -35,10 +36,10 @@ public:
     {
         static ChatCommandTable eventCommandTable =
         {
-            { "activelist", HandleEventActiveListCommand, SEC_GAMEMASTER, Console::Yes },
-            { "start",      HandleEventStartCommand,      SEC_GAMEMASTER, Console::Yes },
-            { "stop",       HandleEventStopCommand,       SEC_GAMEMASTER, Console::Yes },
-            { "info",       HandleEventInfoCommand,       SEC_GAMEMASTER, Console::Yes }
+            { "activelist", HandleEventActiveListCommand, rbac::RBAC_PERM_COMMAND_EVENT_ACTIVELIST, Console::Yes },
+            { "start",      HandleEventStartCommand,      rbac::RBAC_PERM_COMMAND_EVENT_START,      Console::Yes },
+            { "stop",       HandleEventStopCommand,       rbac::RBAC_PERM_COMMAND_EVENT_STOP,       Console::Yes },
+            { "info",       HandleEventInfoCommand,       rbac::RBAC_PERM_COMMAND_EVENT_INFO,       Console::Yes }
         };
         static ChatCommandTable commandTable =
         {

@@ -19,6 +19,7 @@
 #include "CommandScript.h"
 #include "DBCStores.h"
 #include "Player.h"
+#include "RBAC.h"
 
 using namespace Acore::ChatCommands;
 
@@ -31,13 +32,13 @@ public:
     {
         static ChatCommandTable titlesSetCommandTable =
         {
-            { "mask", HandleTitlesSetMaskCommand, SEC_GAMEMASTER, Console::No },
+            { "mask", HandleTitlesSetMaskCommand, rbac::RBAC_PERM_COMMAND_TITLES_SET_MASK, Console::No },
         };
         static ChatCommandTable titlesCommandTable =
         {
-            { "add",     HandleTitlesAddCommand,     SEC_GAMEMASTER, Console::No },
-            { "current", HandleTitlesCurrentCommand, SEC_GAMEMASTER, Console::No },
-            { "remove",  HandleTitlesRemoveCommand,  SEC_GAMEMASTER, Console::No },
+            { "add",     HandleTitlesAddCommand,     rbac::RBAC_PERM_COMMAND_TITLES_ADD,     Console::No },
+            { "current", HandleTitlesCurrentCommand, rbac::RBAC_PERM_COMMAND_TITLES_CURRENT, Console::No },
+            { "remove",  HandleTitlesRemoveCommand,  rbac::RBAC_PERM_COMMAND_TITLES_REMOVE,  Console::No },
             { "set",     titlesSetCommandTable },
         };
         static ChatCommandTable commandTable =
