@@ -26,8 +26,8 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 (7784, 17, -8352.005, -4447.594, 10.134734, NULL, 'Homing Robot OOX-17/TN'),
 (7784, 18, -8352.005, -4447.594, 10.134734, 0.0104949, 'Homing Robot OOX-17/TN'),
 -- Fly waypoints to give lift off time to play
-(7784, 19, -8327.56, -4442.51, 18.5852, NULL, 'Homing Robot OOX-17/TN'),
-(7784, 20, -8262.68, -4426.01, 34.8352, NULL, 'Homing Robot OOX-17/TN'),
+(7784, 19, -8327.56, -4442.5103, 18.585197, NULL, 'Homing Robot OOX-17/TN'),
+(7784, 20, -8262.676, -4426.0054, 34.8352, NULL, 'Homing Robot OOX-17/TN'),
 (7784, 21, -8161.7275, -4410.5435, 58.08519, NULL, 'Homing Robot OOX-17/TN');
 
 -- Update SmartAI waypoint references to match sniffed data
