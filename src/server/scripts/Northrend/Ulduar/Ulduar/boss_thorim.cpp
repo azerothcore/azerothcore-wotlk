@@ -299,503 +299,468 @@ enum Misc
 
 const Position Middle = {2134.68f, -263.13f, 419.44f, M_PI * 1.5f};
 
-class boss_thorim : public CreatureScript
+struct boss_thorim : public BossAI
 {
-public:
-    boss_thorim() : CreatureScript("boss_thorim") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
+    boss_thorim(Creature* creature) : BossAI(creature, BOSS_THORIM)
     {
-        return GetUlduarAI<boss_thorimAI>(pCreature);
+        _encounterFinished = !me->IsAlive();
+        if (_encounterFinished)
+            instance->SetBossState(BOSS_THORIM, DONE);
     }
 
-    struct boss_thorimAI : public ScriptedAI
+    bool _isArenaEmpty;
+    bool _encounterFinished;
+    bool _spawnCommoners;
+    bool _hardMode;
+    bool _isHitAllowed;
+    bool _isAlly;
+    uint8 _trashCounter;
+
+    bool _hitByLightning;
+
+    void DisableThorim(bool apply)
     {
-        boss_thorimAI(Creature* pCreature) : ScriptedAI(pCreature), summons(me)
+        if (apply)
         {
-            m_pInstance = pCreature->GetInstanceScript();
-            if ((_encounterFinished = (!me->IsAlive())))
-                if (m_pInstance)
-                    m_pInstance->SetData(TYPE_THORIM, DONE);
+            me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_PACIFIED);
+            me->DisableRotate(true);
+            me->AddUnitState(UNIT_STATE_ROOT);
         }
-
-        bool _isArenaEmpty;
-        bool _encounterFinished;
-        bool _spawnCommoners;
-        bool _hardMode;
-        bool _isHitAllowed;
-        bool _isAlly;
-        uint8 _trashCounter;
-
-        InstanceScript* m_pInstance;
-        EventMap events;
-        SummonList summons;
-
-        bool _hitByLightning;
-
-        void DisableThorim(bool apply)
+        else
         {
-            if (apply)
+            me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_PACIFIED);
+            me->DisableRotate(false);
+            me->ClearUnitState(UNIT_STATE_ROOT);
+            me->resetAttackTimer(BASE_ATTACK);
+        }
+    }
+
+    GameObject* GetThorimObject(uint32 entry)
+    {
+        return instance->GetGameObject(entry);
+    }
+
+    void SpawnAllNPCs()
+    {
+        // Jormungar Behemoth 32882
+        me->SummonCreature(NPC_JORMUNGAR_BEHEMOT, 2149.68f, -263.477f, 419.679f, 3.12102f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
+
+        // Captured Mercenary Soldier 32885
+        me->SummonCreature(_isAlly ? NPC_CAPTURED_MERCENARY_SOLDIER_ALLY : NPC_CAPTURED_MERCENARY_SOLDIER_HORDE, 2127.24f, -251.309f, 419.793f, 5.89921f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
+        me->SummonCreature(_isAlly ? NPC_CAPTURED_MERCENARY_SOLDIER_ALLY : NPC_CAPTURED_MERCENARY_SOLDIER_HORDE, 2120.1f, -258.99f, 419.764f, 6.24828f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
+        me->SummonCreature(_isAlly ? NPC_CAPTURED_MERCENARY_SOLDIER_ALLY : NPC_CAPTURED_MERCENARY_SOLDIER_HORDE, 2123.32f, -254.771f, 419.789f, 6.17846f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
+
+        // Captured Mercenary Captain 32908
+        me->SummonCreature(_isAlly ? NPC_CAPTURED_MERCENARY_CAPTAIN_ALLY : NPC_CAPTURED_MERCENARY_CAPTAIN_HORDE, 2131.31f, -259.182f, 419.974f, 5.91667f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
+
+        // Dark Rune Acolyte (arena) 32886
+        me->SummonCreature(NPC_DARK_RUNE_ACOLYTE_I, 2129.09f, -277.142f, 419.756f, 1.22173f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
+
+        // Iron Ring Guard 32874
+        me->SummonCreature(NPC_IRON_RING_GUARD, 2217.69f, -337.394f, 412.177f, 1.23918f);
+        me->SummonCreature(NPC_IRON_RING_GUARD, 2218.38f, -297.505f, 412.176f, 1.02974f);
+        me->SummonCreature(NPC_IRON_RING_GUARD, 2235.26f, -338.345f, 412.134f, 1.58979f);
+        me->SummonCreature(NPC_IRON_RING_GUARD, 2235.07f, -297.985f, 412.134f, 1.61336f);
+
+        // Dark Rune Acolyte (gauntlet) 33110
+        me->SummonCreature(NPC_DARK_RUNE_ACOLYTE_G, 2198.29f, -436.92f, 419.985f, 0.261799f);
+        me->SummonCreature(NPC_DARK_RUNE_ACOLYTE_G, 2227.58f, -308.303f, 412.134f, 1.59372f);
+        me->SummonCreature(NPC_DARK_RUNE_ACOLYTE_G, 2227.47f, -345.375f, 412.134f, 1.56622f);
+
+        // Iron Honor Guard 32875
+        me->SummonCreature(NPC_IRON_HONOR_GUARD, 2198.05f, -428.769f, 419.985f, 6.05629f);
+        me->SummonCreature(NPC_IRON_HONOR_GUARD, 2220.31f, -436.22f, 412.26f, 1.06465f);
+
+        // Runic Colossus 32872
+        me->SummonCreature(NPC_RUNIC_COLOSSUS, 2227.5f, -396.179f, 412.176f, 1.79769f);
+
+        // Ancient Rune Giant 32873
+        me->SummonCreature(NPC_ANCIENT_RUNE_GIANT, 2134.57f, -440.318f, 438.331f, 0.226893f);
+
+        // Sif 33196
+        me->SummonCreature(NPC_SIF, 2147.86f, -301.2f, 438.246f, 2.488f);
+    }
+
+    void CloseDoors()
+    {
+        GameObject* go;
+        if ((go = GetThorimObject(DATA_THORIM_LEVER)))
+        {
+            go->ReplaceAllGameObjectFlags((GameObjectFlags)48);
+            go->SetGoState(GO_STATE_READY);
+        }
+        if ((go = GetThorimObject(DATA_THORIM_FIRST_DOORS)))
+            go->SetGoState(GO_STATE_READY);
+
+        if ((go = GetThorimObject(DATA_THORIM_SECOND_DOORS)))
+            go->SetGoState(GO_STATE_READY);
+
+        if ((go = GetThorimObject(DATA_THORIM_FENCE)))
+            go->SetGoState(GO_STATE_ACTIVE);
+    }
+
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        DisableThorim(false);
+        BossAI::EnterEvadeMode(why);
+    }
+
+    void Reset() override
+    {
+        if (!_encounterFinished)
+            _Reset();
+
+        _trashCounter = 0;
+        _isAlly = true;
+        _isHitAllowed = false;
+        _spawnCommoners = false;
+        _hardMode = false;
+        _isArenaEmpty = false;
+        _hitByLightning = false;
+
+        if (Player* t = SelectTargetFromPlayerList(1000))
+            if (t->GetTeamId() == TEAM_HORDE)
+                _isAlly = false;
+
+        SpawnAllNPCs();
+
+        CloseDoors();
+        DisableThorim(false);
+    }
+
+    uint32 GetData(uint32 param) const override
+    {
+        if (param == DATA_HIT_BY_LIGHTNING)
+            return !_hitByLightning;
+        if (param == DATA_LOSE_YOUR_ILLUSION)
+            return _hardMode;
+
+        return 0;
+    }
+
+    void DoAction(int32 param) override
+    {
+        if (param == ACTION_START_TRASH_DIED)
+        {
+            _trashCounter++;
+            // activate levar
+            if (_trashCounter >= 6)
             {
-                me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_PACIFIED);
-                me->DisableRotate(true);
-                me->AddUnitState(UNIT_STATE_ROOT);
-            }
-            else
-            {
-                me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_PACIFIED);
-                me->DisableRotate(false);
-                me->ClearUnitState(UNIT_STATE_ROOT);
-                me->resetAttackTimer(BASE_ATTACK);
+                if (GameObject* go = GetThorimObject(DATA_THORIM_LEVER))
+                    go->RemoveGameObjectFlag((GameObjectFlags)48);
+
+                events.ScheduleEvent(EVENT_THORIM_AGGRO, 0ms);
+                events.SetPhase(EVENT_PHASE_START);
+                events.ScheduleEvent(EVENT_THORIM_START_PHASE1, 20s);
+                _trashCounter = 0;
             }
         }
+        else if (param == ACTION_ALLOW_HIT)
+            _isHitAllowed = true;
+    }
 
-        GameObject* GetThorimObject(uint32 entry)
+    void KilledUnit(Unit* victim) override
+    {
+        if (victim->IsPlayer())
+            Talk(SAY_SLAY);
+    }
+
+    void JustReachedHome() override
+    {
+        _JustReachedHome();
+        me->setActive(false);
+    }
+
+    void JustEngagedWith(Unit*) override
+    {
+        if (!_encounterFinished)
+            instance->SetBossState(BOSS_THORIM, IN_PROGRESS);
+        me->setActive(true);
+        DisableThorim(true);
+        me->CastSpell(me, SPELL_SHEATH_OF_LIGHTNING, true);
+        //me->CastSpell(me, SPELL_TOUCH_OF_DOMINION, true);
+    }
+
+    void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
+    {
+        if (who && _isHitAllowed && who->GetPositionZ() > 430 && who->IsPlayer())
         {
-            if (m_pInstance)
-                return ObjectAccessor::GetGameObject(*me, m_pInstance->GetGuidData(entry));
-            return nullptr;
-        }
-
-        void JustSummoned(Creature* cr) override { summons.Summon(cr); }
-
-        void SpawnAllNPCs()
-        {
-            // Jormungar Behemoth 32882
-            me->SummonCreature(NPC_JORMUNGAR_BEHEMOT, 2149.68f, -263.477f, 419.679f, 3.12102f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
-
-            // Captured Mercenary Soldier 32885
-            me->SummonCreature(_isAlly ? NPC_CAPTURED_MERCENARY_SOLDIER_ALLY : NPC_CAPTURED_MERCENARY_SOLDIER_HORDE, 2127.24f, -251.309f, 419.793f, 5.89921f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
-            me->SummonCreature(_isAlly ? NPC_CAPTURED_MERCENARY_SOLDIER_ALLY : NPC_CAPTURED_MERCENARY_SOLDIER_HORDE, 2120.1f, -258.99f, 419.764f, 6.24828f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
-            me->SummonCreature(_isAlly ? NPC_CAPTURED_MERCENARY_SOLDIER_ALLY : NPC_CAPTURED_MERCENARY_SOLDIER_HORDE, 2123.32f, -254.771f, 419.789f, 6.17846f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
-
-            // Captured Mercenary Captain 32908
-            me->SummonCreature(_isAlly ? NPC_CAPTURED_MERCENARY_CAPTAIN_ALLY : NPC_CAPTURED_MERCENARY_CAPTAIN_HORDE, 2131.31f, -259.182f, 419.974f, 5.91667f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
-
-            // Dark Rune Acolyte (arena) 32886
-            me->SummonCreature(NPC_DARK_RUNE_ACOLYTE_I, 2129.09f, -277.142f, 419.756f, 1.22173f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
-
-            // Iron Ring Guard 32874
-            me->SummonCreature(NPC_IRON_RING_GUARD, 2217.69f, -337.394f, 412.177f, 1.23918f);
-            me->SummonCreature(NPC_IRON_RING_GUARD, 2218.38f, -297.505f, 412.176f, 1.02974f);
-            me->SummonCreature(NPC_IRON_RING_GUARD, 2235.26f, -338.345f, 412.134f, 1.58979f);
-            me->SummonCreature(NPC_IRON_RING_GUARD, 2235.07f, -297.985f, 412.134f, 1.61336f);
-
-            // Dark Rune Acolyte (gauntlet) 33110
-            me->SummonCreature(NPC_DARK_RUNE_ACOLYTE_G, 2198.29f, -436.92f, 419.985f, 0.261799f);
-            me->SummonCreature(NPC_DARK_RUNE_ACOLYTE_G, 2227.58f, -308.303f, 412.134f, 1.59372f);
-            me->SummonCreature(NPC_DARK_RUNE_ACOLYTE_G, 2227.47f, -345.375f, 412.134f, 1.56622f);
-
-            // Iron Honor Guard 32875
-            me->SummonCreature(NPC_IRON_HONOR_GUARD, 2198.05f, -428.769f, 419.985f, 6.05629f);
-            me->SummonCreature(NPC_IRON_HONOR_GUARD, 2220.31f, -436.22f, 412.26f, 1.06465f);
-
-            // Runic Colossus 32872
-            me->SummonCreature(NPC_RUNIC_COLOSSUS, 2227.5f, -396.179f, 412.176f, 1.79769f);
-
-            // Ancient Rune Giant 32873
-            me->SummonCreature(NPC_ANCIENT_RUNE_GIANT, 2134.57f, -440.318f, 438.331f, 0.226893f);
-
-            // Sif 33196
-            me->SummonCreature(NPC_SIF, 2147.86f, -301.2f, 438.246f, 2.488f);
-        }
-
-        void CloseDoors()
-        {
-            GameObject* go;
-            if ((go = GetThorimObject(DATA_THORIM_LEVER)))
-            {
-                go->ReplaceAllGameObjectFlags((GameObjectFlags)48);
-                go->SetGoState(GO_STATE_READY);
-            }
-            if ((go = GetThorimObject(DATA_THORIM_FIRST_DOORS)))
-                go->SetGoState(GO_STATE_READY);
-
-            if ((go = GetThorimObject(DATA_THORIM_SECOND_DOORS)))
-                go->SetGoState(GO_STATE_READY);
-
-            if ((go = GetThorimObject(DATA_THORIM_FENCE)))
-                go->SetGoState(GO_STATE_ACTIVE);
-        }
-
-        void EnterEvadeMode(EvadeReason why) override
-        {
-            DisableThorim(false);
-            CreatureAI::EnterEvadeMode(why);
-        }
-
-        void Reset() override
-        {
-            if (m_pInstance && !_encounterFinished)
-                m_pInstance->SetData(TYPE_THORIM, NOT_STARTED);
-
-            events.Reset();
-            events.SetPhase(0);
-            summons.DespawnAll();
-
-            _trashCounter = 0;
-            _isAlly = true;
             _isHitAllowed = false;
-            _spawnCommoners = false;
-            _hardMode = false;
-            _isArenaEmpty = false;
-            _hitByLightning = false;
-
-            if (Player* t = SelectTargetFromPlayerList(1000))
-                if (t->GetTeamId() == TEAM_HORDE)
-                    _isAlly = false;
-
-            SpawnAllNPCs();
-
-            CloseDoors();
             DisableThorim(false);
-        }
 
-        uint32 GetData(uint32 param) const override
-        {
-            if (param == DATA_HIT_BY_LIGHTNING)
-                return !_hitByLightning;
-            if (param == DATA_LOSE_YOUR_ILLUSION)
-                return _hardMode;
+            events.SetPhase(EVENT_PHASE_RING);
+            events.ScheduleEvent(EVENT_THORIM_UNBALANCING_STRIKE, 8s, 0, EVENT_PHASE_RING);
+            events.ScheduleEvent(EVENT_THORIM_LIGHTNING_CHARGE, 12s + 500ms, 0, EVENT_PHASE_RING);
+            events.ScheduleEvent(EVENT_THORIM_CHAIN_LIGHTNING, 13s, 0, EVENT_PHASE_RING);
+            events.ScheduleEvent(EVENT_THORIM_BERSERK, 5min, 0, EVENT_PHASE_RING);
 
-            return 0;
-        }
+            me->GetMotionMaster()->MoveChase(me->GetVictim());
+            me->GetMotionMaster()->MoveJump(Middle.GetPositionX(), Middle.GetPositionY(), Middle.GetPositionZ(), 20, 20);
+            me->RemoveAura(SPELL_SHEATH_OF_LIGHTNING);
 
-        void DoAction(int32 param) override
-        {
-            if (param == ACTION_START_TRASH_DIED)
+            Talk(SAY_JUMPDOWN);
+
+            // Hard Mode
+            if (!me->HasAura(62565 /*TOUCH OF DOMINION TRIGGER*/))
             {
-                _trashCounter++;
-                // activate levar
-                if (_trashCounter >= 6)
-                {
-                    if (GameObject* go = GetThorimObject(DATA_THORIM_LEVER))
-                        go->RemoveGameObjectFlag((GameObjectFlags)48);
+                instance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, 64980 /*SIFFED ACHIEVEMENT*/);
 
-                    events.ScheduleEvent(EVENT_THORIM_AGGRO, 0ms);
-                    events.SetPhase(EVENT_PHASE_START);
-                    events.ScheduleEvent(EVENT_THORIM_START_PHASE1, 20s);
-                    _trashCounter = 0;
-                }
-            }
-            else if (param == ACTION_ALLOW_HIT)
-                _isHitAllowed = true;
-        }
-
-        void KilledUnit(Unit* victim) override
-        {
-            if (victim->IsPlayer())
-                Talk(SAY_SLAY);
-        }
-
-        void JustReachedHome() override { me->setActive(false); }
-
-        void JustEngagedWith(Unit*) override
-        {
-            if (m_pInstance && !_encounterFinished)
-                m_pInstance->SetData(TYPE_THORIM, IN_PROGRESS);
-            me->setActive(true);
-            DisableThorim(true);
-            me->CastSpell(me, SPELL_SHEATH_OF_LIGHTNING, true);
-            //me->CastSpell(me, SPELL_TOUCH_OF_DOMINION, true);
-        }
-
-        void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
-        {
-            if (who && _isHitAllowed && who->GetPositionZ() > 430 && who->IsPlayer())
-            {
-                _isHitAllowed = false;
-                DisableThorim(false);
-
-                events.SetPhase(EVENT_PHASE_RING);
-                events.ScheduleEvent(EVENT_THORIM_UNBALANCING_STRIKE, 8s, 0, EVENT_PHASE_RING);
-                events.ScheduleEvent(EVENT_THORIM_LIGHTNING_CHARGE, 12s + 500ms, 0, EVENT_PHASE_RING);
-                events.ScheduleEvent(EVENT_THORIM_CHAIN_LIGHTNING, 13s, 0, EVENT_PHASE_RING);
-                events.ScheduleEvent(EVENT_THORIM_BERSERK, 5min, 0, EVENT_PHASE_RING);
-
-                me->GetMotionMaster()->MoveChase(me->GetVictim());
-                me->GetMotionMaster()->MoveJump(Middle.GetPositionX(), Middle.GetPositionY(), Middle.GetPositionZ(), 20, 20);
-                me->RemoveAura(SPELL_SHEATH_OF_LIGHTNING);
-
-                Talk(SAY_JUMPDOWN);
-
-                // Hard Mode
-                if (!me->HasAura(62565 /*TOUCH OF DOMINION TRIGGER*/))
-                {
-                    if (m_pInstance)
-                        m_pInstance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_BE_SPELL_TARGET, 64980 /*SIFFED ACHIEVEMENT*/);
-
-                    _hardMode = true;
-                    EntryCheckPredicate pred(NPC_SIF);
-                    summons.DoAction(ACTION_SIF_JOIN_FIGHT, pred);
-                }
-
-                DoResetThreatList();
-                if (Player* player = GetArenaPlayer())
-                    me->AddThreat(player, 1000.0f);
+                _hardMode = true;
+                EntryCheckPredicate pred(NPC_SIF);
+                summons.DoAction(ACTION_SIF_JOIN_FIGHT, pred);
             }
 
-            if (damage >= me->GetHealth()|| me->GetHealth()<2)
-            {
-                damage = 0;
-                if (!_encounterFinished)
-                {
-                    _encounterFinished = true;
-                    me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                    me->SetFaction(FACTION_FRIENDLY);
-                    me->SetHealth(me->GetMaxHealth());
-                    me->CombatStop();
-                    me->RemoveAllAuras();
-                    events.Reset();
-                    DisableThorim(true);
-
-                    Talk(SAY_DEATH);
-
-                    events.SetPhase(EVENT_PHASE_OUTRO);
-                    events.ScheduleEvent(EVENT_THORIM_OUTRO1, 2s, 0, EVENT_PHASE_OUTRO);
-
-                    GameObject* go = nullptr;
-                    if ((go = GetThorimObject(DATA_THORIM_FENCE)))
-                        go->SetGoState(GO_STATE_ACTIVE);
-
-                    uint32 chestId = me->GetMap()->Is25ManRaid() ? GO_THORIM_CHEST_HERO : GO_THORIM_CHEST;
-                    if (_hardMode)
-                        chestId += 1; // hard mode offset
-
-                    if ((go = me->SummonGameObject(chestId, 2134.73f, -286.32f, 419.51f, 4.65f, 0, 0, 0, 0, 0)))
-                    {
-                        go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
-                        go->SetLootRecipient(me->GetMap());
-                    }
-
-                    // Defeat credit
-                    if (m_pInstance)
-                    {
-                        me->CastSpell(me, 64985, true); // credit
-                        m_pInstance->SetData(TYPE_THORIM, DONE);
-                    }
-                }
-            }
+            DoResetThreatList();
+            if (Player* player = GetArenaPlayer())
+                me->AddThreat(player, 1000.0f);
         }
 
-        void SpawnAnArenaNPC(uint32 arenaNpc)
+        if (damage >= me->GetHealth()|| me->GetHealth()<2)
         {
-            Creature* cr;
-            uint8 rnd = urand(0,13);
-            if ((cr = me->SummonCreature(arenaNpc, ArenaNPCs[rnd], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000)))
-                cr->GetMotionMaster()->MoveJump(
-                    Middle.GetPositionX() + urand(19, 24) * cos(Middle.GetAngle(cr)),
-                    Middle.GetPositionY() + urand(19, 24) * std::sin(Middle.GetAngle(cr)),
-                    Middle.GetPositionZ(), 20, 20);
-        }
-
-        void SpawnCommoners()
-        {
-            uint8 rnd = urand(6,7);
-            for (uint8 i = 0; i < rnd; ++i)
-                SpawnAnArenaNPC(NPC_DARK_RUNE_COMMONER);
-        }
-
-        void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
-        {
-            if (spellInfo->Id == SPELL_LIGHTNING_ORB_CHARGER)
-            {
-                me->SetOrientation(me->GetAngle(caster));
-                me->CastSpell(caster, SPELL_LIGHTNING_CHARGE_DAMAGE, true);
-                me->CastSpell(me, SPELL_LIGHTNING_CHARGE_BUFF, true);
-                events.RescheduleEvent(EVENT_THORIM_LIGHTNING_CHARGE, 10s, 0, EVENT_PHASE_RING);
-            }
-            else if (spellInfo->Id == SPELL_TELEPORT)
-            {
-                me->DespawnOrUnsummon();
-                m_pInstance->SetData(EVENT_KEEPER_TELEPORTED, DONE);
-            }
-        }
-
-        void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
-        {
-            if (spellInfo->Id == SPELL_LIGHTNING_CHARGE_DAMAGE && target->IsPlayer())
-                _hitByLightning = true;
-        }
-
-        Player* GetArenaPlayer()
-        {
-            Map::PlayerList const& pList = me->GetMap()->GetPlayers();
-            for(Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
-                if (Player* p = itr->GetSource())
-                    if (p->GetPositionX() > 2085 && p->GetPositionX() < 2185 && p->GetPositionY() < -214 && p->GetPositionY() > -305 && p->IsAlive() && p->GetPositionZ() < 425)
-                        return p;
-            return nullptr;
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!_encounterFinished && !UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_THORIM_AGGRO:
-                    Talk(SAY_AGGRO_1);
-                    events.ScheduleEvent(EVENT_THORIM_AGGRO2, 9s);
-
-                    if (GameObject* go = GetThorimObject(DATA_THORIM_FENCE))
-                        go->SetGoState(GO_STATE_READY);
-
-                    break;
-                case EVENT_THORIM_AGGRO2:
-                    {
-                        Talk(SAY_AGGRO_2);
-
-                        EntryCheckPredicate pred(NPC_SIF);
-                        summons.DoAction(ACTION_SIF_START_TALK, pred);
-                        break;
-                    }
-                case EVENT_THORIM_START_PHASE1:
-                    {
-                        events.ScheduleEvent(EVENT_THORIM_STORMHAMMER, 8s, 0, EVENT_PHASE_START);
-                        events.ScheduleEvent(EVENT_THORIM_CHARGE_ORB, 14s, 0, EVENT_PHASE_START);
-                        events.ScheduleEvent(EVENT_THORIM_ARENA_SPAWN_WARBRINGER, 0ms, 0, EVENT_PHASE_START);
-                        events.ScheduleEvent(EVENT_THORIM_ARENA_SPAWN_EVOKER, 5s, 0, EVENT_PHASE_START);
-                        events.ScheduleEvent(EVENT_THORIM_ARENA_SPAWN_COMMONER, 7s, 0, EVENT_PHASE_START);
-                        events.ScheduleEvent(EVENT_THORIM_ARENA_SPAWN_CHAMPION, 10s, 0, EVENT_PHASE_START);
-                        events.ScheduleEvent(EVENT_THORIM_LIGHTNING_ORB, 5s, 0, EVENT_PHASE_START); // checked every 5 secs if there are players on arena
-                        events.ScheduleEvent(EVENT_THORIM_NOT_REACH_IN_TIME, 5min, 0, EVENT_PHASE_START);
-                        EntryCheckPredicate pred(NPC_SIF);
-                        summons.DoAction(ACTION_SIF_START_DOMINION, pred);
-                        break;
-                    }
-                case EVENT_THORIM_STORMHAMMER:
-                    me->CastCustomSpell(SPELL_STORMHAMMER, SPELLVALUE_MAX_TARGETS, 1, me->GetVictim(), false);
-                    events.Repeat(16s);
-                    break;
-                case EVENT_THORIM_CHARGE_ORB:
-                    me->CastCustomSpell(SPELL_CHARGE_ORB, SPELLVALUE_MAX_TARGETS, 1, me, false);
-                    events.Repeat(16s);
-                    break;
-                case EVENT_THORIM_LIGHTNING_ORB:
-                    {
-                        if (GetArenaPlayer())
-                        {
-                            // Player found, repeat and return
-                            events.Repeat(5s);
-                            return;
-                        }
-
-                        // No players found
-                        Talk(SAY_WIPE);
-                        me->SummonCreature(NPC_LIGHTNING_ORB, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
-
-                        _isArenaEmpty = true;
-                        events.CancelEvent(EVENT_THORIM_NOT_REACH_IN_TIME);
-                        break;
-                    }
-                case EVENT_THORIM_NOT_REACH_IN_TIME:
-                    _isArenaEmpty = true;
-                    events.CancelEvent(EVENT_THORIM_LIGHTNING_ORB);
-                    me->CastSpell(me, SPELL_BERSERK_FRIENDS, true);
-                    me->SummonCreature(NPC_LIGHTNING_ORB, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
-                    break;
-                case EVENT_THORIM_ARENA_SPAWN_WARBRINGER:
-                    SpawnAnArenaNPC(NPC_DARK_RUNE_WARBRINGER);
-                    events.Repeat(15s);
-                    break;
-                case EVENT_THORIM_ARENA_SPAWN_EVOKER:
-                    SpawnAnArenaNPC(NPC_DARK_RUNE_EVOKER);
-                    events.Repeat(20s);
-                    break;
-                case EVENT_THORIM_ARENA_SPAWN_COMMONER:
-                    SpawnCommoners();
-                    events.Repeat(21s);
-                    break;
-                case EVENT_THORIM_ARENA_SPAWN_CHAMPION:
-                    SpawnAnArenaNPC(NPC_DARK_RUNE_CHAMPION);
-                    events.Repeat(25s);
-                    break;
-                case EVENT_THORIM_UNBALANCING_STRIKE:
-                    me->CastSpell(me->GetVictim(), SPELL_UNBALANCING_STRIKE, false);
-                    events.Repeat(20s);
-                    break;
-                case EVENT_THORIM_LIGHTNING_CHARGE:
-                    me->CastSpell(me, SPELL_LIGHTNING_PILLAR_P2, true);
-                    break;
-                case EVENT_THORIM_CHAIN_LIGHTNING:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                        me->CastSpell(target, SPELL_CHAIN_LIGHTNING, false);
-                    events.Repeat(15s);
-                    break;
-                case EVENT_THORIM_BERSERK:
-                    me->CastSpell(me, SPELL_BERSERK, true);
-                    Talk(SAY_BERSERK);
-                    break;
-                case EVENT_THORIM_OUTRO1:
-                    if (_hardMode)
-                    {
-                        Talk(SAY_END_HARD_1);
-                        events.ScheduleEvent(EVENT_THORIM_OUTRO2, 5s, 0, 3);
-                        EntryCheckPredicate pred(NPC_SIF);
-                        summons.DoAction(ACTION_SIF_TRANSFORM, pred);
-                    }
-                    else
-                    {
-                        Talk(SAY_END_NORMAL_1);
-                        events.ScheduleEvent(EVENT_THORIM_OUTRO2, 9s, 0, 3);
-                    }
-                    break;
-                case EVENT_THORIM_OUTRO2:
-                    if (_hardMode)
-                    {
-                        Talk(SAY_END_HARD_2);
-                        events.ScheduleEvent(EVENT_THORIM_OUTRO3, 12s, 0, 3);
-                    }
-                    else
-                    {
-                        Talk(SAY_END_NORMAL_2);
-                        events.ScheduleEvent(EVENT_THORIM_OUTRO3, 10s, 0, 3);
-                    }
-                    break;
-                case EVENT_THORIM_OUTRO3:
-                    if (_hardMode)
-                    {
-                        Talk(SAY_END_HARD_3);
-                    }
-                    else
-                    {
-                        Talk(SAY_END_NORMAL_3);
-                    }
-                    // Defeat credit
-                    if (m_pInstance)
-                        m_pInstance->SetData(TYPE_THORIM, DONE);
-                    events.ScheduleEvent(EVENT_THORIM_OUTRO4, 14s, 0, 3);
-                    break;
-                case EVENT_THORIM_OUTRO4:
-                    DoCastSelf(SPELL_TELEPORT);
-                    break;
-            }
-
+            damage = 0;
             if (!_encounterFinished)
-                DoMeleeAttackIfReady();
+            {
+                _encounterFinished = true;
+                me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                me->SetFaction(FACTION_FRIENDLY);
+                me->SetHealth(me->GetMaxHealth());
+                me->CombatStop();
+                me->RemoveAllAuras();
+                events.Reset();
+                DisableThorim(true);
+
+                Talk(SAY_DEATH);
+
+                events.SetPhase(EVENT_PHASE_OUTRO);
+                events.ScheduleEvent(EVENT_THORIM_OUTRO1, 2s, 0, EVENT_PHASE_OUTRO);
+
+                GameObject* go = nullptr;
+                if ((go = GetThorimObject(DATA_THORIM_FENCE)))
+                    go->SetGoState(GO_STATE_ACTIVE);
+
+                uint32 chestId = me->GetMap()->Is25ManRaid() ? GO_THORIM_CHEST_HERO : GO_THORIM_CHEST;
+                if (_hardMode)
+                    chestId += 1; // hard mode offset
+
+                if ((go = me->SummonGameObject(chestId, 2134.73f, -286.32f, 419.51f, 4.65f, 0, 0, 0, 0, 0)))
+                {
+                    go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
+                    go->SetLootRecipient(me->GetMap());
+                }
+
+                // Defeat credit
+                me->CastSpell(me, 64985, true); // credit
+                instance->SetBossState(BOSS_THORIM, DONE);
+            }
         }
-    };
+    }
+
+    void SpawnAnArenaNPC(uint32 arenaNpc)
+    {
+        Creature* cr;
+        uint8 rnd = urand(0,13);
+        if ((cr = me->SummonCreature(arenaNpc, ArenaNPCs[rnd], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000)))
+            cr->GetMotionMaster()->MoveJump(
+                Middle.GetPositionX() + urand(19, 24) * cos(Middle.GetAngle(cr)),
+                Middle.GetPositionY() + urand(19, 24) * std::sin(Middle.GetAngle(cr)),
+                Middle.GetPositionZ(), 20, 20);
+    }
+
+    void SpawnCommoners()
+    {
+        uint8 rnd = urand(6,7);
+        for (uint8 i = 0; i < rnd; ++i)
+            SpawnAnArenaNPC(NPC_DARK_RUNE_COMMONER);
+    }
+
+    void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
+    {
+        if (spellInfo->Id == SPELL_LIGHTNING_ORB_CHARGER)
+        {
+            me->SetOrientation(me->GetAngle(caster));
+            me->CastSpell(caster, SPELL_LIGHTNING_CHARGE_DAMAGE, true);
+            me->CastSpell(me, SPELL_LIGHTNING_CHARGE_BUFF, true);
+            events.RescheduleEvent(EVENT_THORIM_LIGHTNING_CHARGE, 10s, 0, EVENT_PHASE_RING);
+        }
+        else if (spellInfo->Id == SPELL_TELEPORT)
+        {
+            me->DespawnOrUnsummon();
+            instance->SetData(EVENT_KEEPER_TELEPORTED, DONE);
+        }
+    }
+
+    void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
+    {
+        if (spellInfo->Id == SPELL_LIGHTNING_CHARGE_DAMAGE && target->IsPlayer())
+            _hitByLightning = true;
+    }
+
+    Player* GetArenaPlayer()
+    {
+        Map::PlayerList const& pList = me->GetMap()->GetPlayers();
+        for(Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
+            if (Player* p = itr->GetSource())
+                if (p->GetPositionX() > 2085 && p->GetPositionX() < 2185 && p->GetPositionY() < -214 && p->GetPositionY() > -305 && p->IsAlive() && p->GetPositionZ() < 425)
+                    return p;
+        return nullptr;
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!_encounterFinished && !UpdateVictim())
+            return;
+
+        events.Update(diff);
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
+        {
+            case EVENT_THORIM_AGGRO:
+                Talk(SAY_AGGRO_1);
+                events.ScheduleEvent(EVENT_THORIM_AGGRO2, 9s);
+
+                if (GameObject* go = GetThorimObject(DATA_THORIM_FENCE))
+                    go->SetGoState(GO_STATE_READY);
+
+                break;
+            case EVENT_THORIM_AGGRO2:
+                {
+                    Talk(SAY_AGGRO_2);
+
+                    EntryCheckPredicate pred(NPC_SIF);
+                    summons.DoAction(ACTION_SIF_START_TALK, pred);
+                    break;
+                }
+            case EVENT_THORIM_START_PHASE1:
+                {
+                    events.ScheduleEvent(EVENT_THORIM_STORMHAMMER, 8s, 0, EVENT_PHASE_START);
+                    events.ScheduleEvent(EVENT_THORIM_CHARGE_ORB, 14s, 0, EVENT_PHASE_START);
+                    events.ScheduleEvent(EVENT_THORIM_ARENA_SPAWN_WARBRINGER, 0ms, 0, EVENT_PHASE_START);
+                    events.ScheduleEvent(EVENT_THORIM_ARENA_SPAWN_EVOKER, 5s, 0, EVENT_PHASE_START);
+                    events.ScheduleEvent(EVENT_THORIM_ARENA_SPAWN_COMMONER, 7s, 0, EVENT_PHASE_START);
+                    events.ScheduleEvent(EVENT_THORIM_ARENA_SPAWN_CHAMPION, 10s, 0, EVENT_PHASE_START);
+                    events.ScheduleEvent(EVENT_THORIM_LIGHTNING_ORB, 5s, 0, EVENT_PHASE_START); // checked every 5 secs if there are players on arena
+                    events.ScheduleEvent(EVENT_THORIM_NOT_REACH_IN_TIME, 5min, 0, EVENT_PHASE_START);
+                    EntryCheckPredicate pred(NPC_SIF);
+                    summons.DoAction(ACTION_SIF_START_DOMINION, pred);
+                    break;
+                }
+            case EVENT_THORIM_STORMHAMMER:
+                me->CastCustomSpell(SPELL_STORMHAMMER, SPELLVALUE_MAX_TARGETS, 1, me->GetVictim(), false);
+                events.Repeat(16s);
+                break;
+            case EVENT_THORIM_CHARGE_ORB:
+                me->CastCustomSpell(SPELL_CHARGE_ORB, SPELLVALUE_MAX_TARGETS, 1, me, false);
+                events.Repeat(16s);
+                break;
+            case EVENT_THORIM_LIGHTNING_ORB:
+                {
+                    if (GetArenaPlayer())
+                    {
+                        // Player found, repeat and return
+                        events.Repeat(5s);
+                        return;
+                    }
+
+                    // No players found
+                    Talk(SAY_WIPE);
+                    me->SummonCreature(NPC_LIGHTNING_ORB, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
+
+                    _isArenaEmpty = true;
+                    events.CancelEvent(EVENT_THORIM_NOT_REACH_IN_TIME);
+                    break;
+                }
+            case EVENT_THORIM_NOT_REACH_IN_TIME:
+                _isArenaEmpty = true;
+                events.CancelEvent(EVENT_THORIM_LIGHTNING_ORB);
+                me->CastSpell(me, SPELL_BERSERK_FRIENDS, true);
+                me->SummonCreature(NPC_LIGHTNING_ORB, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
+                break;
+            case EVENT_THORIM_ARENA_SPAWN_WARBRINGER:
+                SpawnAnArenaNPC(NPC_DARK_RUNE_WARBRINGER);
+                events.Repeat(15s);
+                break;
+            case EVENT_THORIM_ARENA_SPAWN_EVOKER:
+                SpawnAnArenaNPC(NPC_DARK_RUNE_EVOKER);
+                events.Repeat(20s);
+                break;
+            case EVENT_THORIM_ARENA_SPAWN_COMMONER:
+                SpawnCommoners();
+                events.Repeat(21s);
+                break;
+            case EVENT_THORIM_ARENA_SPAWN_CHAMPION:
+                SpawnAnArenaNPC(NPC_DARK_RUNE_CHAMPION);
+                events.Repeat(25s);
+                break;
+            case EVENT_THORIM_UNBALANCING_STRIKE:
+                me->CastSpell(me->GetVictim(), SPELL_UNBALANCING_STRIKE, false);
+                events.Repeat(20s);
+                break;
+            case EVENT_THORIM_LIGHTNING_CHARGE:
+                me->CastSpell(me, SPELL_LIGHTNING_PILLAR_P2, true);
+                break;
+            case EVENT_THORIM_CHAIN_LIGHTNING:
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                    me->CastSpell(target, SPELL_CHAIN_LIGHTNING, false);
+                events.Repeat(15s);
+                break;
+            case EVENT_THORIM_BERSERK:
+                me->CastSpell(me, SPELL_BERSERK, true);
+                Talk(SAY_BERSERK);
+                break;
+            case EVENT_THORIM_OUTRO1:
+                if (_hardMode)
+                {
+                    Talk(SAY_END_HARD_1);
+                    events.ScheduleEvent(EVENT_THORIM_OUTRO2, 5s, 0, 3);
+                    EntryCheckPredicate pred(NPC_SIF);
+                    summons.DoAction(ACTION_SIF_TRANSFORM, pred);
+                }
+                else
+                {
+                    Talk(SAY_END_NORMAL_1);
+                    events.ScheduleEvent(EVENT_THORIM_OUTRO2, 9s, 0, 3);
+                }
+                break;
+            case EVENT_THORIM_OUTRO2:
+                if (_hardMode)
+                {
+                    Talk(SAY_END_HARD_2);
+                    events.ScheduleEvent(EVENT_THORIM_OUTRO3, 12s, 0, 3);
+                }
+                else
+                {
+                    Talk(SAY_END_NORMAL_2);
+                    events.ScheduleEvent(EVENT_THORIM_OUTRO3, 10s, 0, 3);
+                }
+                break;
+            case EVENT_THORIM_OUTRO3:
+                if (_hardMode)
+                {
+                    Talk(SAY_END_HARD_3);
+                }
+                else
+                {
+                    Talk(SAY_END_NORMAL_3);
+                }
+                // Defeat credit
+                instance->SetBossState(BOSS_THORIM, DONE);
+                events.ScheduleEvent(EVENT_THORIM_OUTRO4, 14s, 0, 3);
+                break;
+            case EVENT_THORIM_OUTRO4:
+                DoCastSelf(SPELL_TELEPORT);
+                break;
+        }
+
+        if (!_encounterFinished)
+            DoMeleeAttackIfReady();
+    }
 };
 
-class boss_thorim_sif : public CreatureScript
+struct boss_thorim_sif : public ScriptedAI
 {
-public:
-    boss_thorim_sif() : CreatureScript("boss_thorim_sif") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
-    {
-        return GetUlduarAI<boss_thorim_sifAI>(pCreature);
-    }
-
-    struct boss_thorim_sifAI : public ScriptedAI
-    {
-        boss_thorim_sifAI(Creature* pCreature) : ScriptedAI(pCreature) { }
+    boss_thorim_sif(Creature* creature) : ScriptedAI(creature) { }
 
         void MoveInLineOfSight(Unit*) override {}
         void AttackStart(Unit*) override {}
@@ -817,7 +782,7 @@ public:
             else if (param == ACTION_SIF_START_DOMINION)
             {
                 if (me->GetInstanceScript())
-                    if (Creature* cr = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_THORIM)))
+                    if (Creature* cr = me->GetInstanceScript()->GetCreature(BOSS_THORIM))
                         me->CastSpell(cr, SPELL_TOUCH_OF_DOMINION, false);
 
                 events.ScheduleEvent(EVENT_SIF_FINISH_DOMINION, 150s);
@@ -888,22 +853,11 @@ public:
                     me->StopMoving();
                 }
         }
-    };
 };
 
-class boss_thorim_lightning_orb : public CreatureScript
+struct boss_thorim_lightning_orb : public npc_escortAI
 {
-public:
-    boss_thorim_lightning_orb() : CreatureScript("boss_thorim_lightning_orb") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
-    {
-        return GetUlduarAI<boss_thorim_lightning_orbAI>(pCreature);
-    }
-
-    struct boss_thorim_lightning_orbAI : public npc_escortAI
-    {
-        boss_thorim_lightning_orbAI(Creature* pCreature) : npc_escortAI(pCreature)
+    boss_thorim_lightning_orb(Creature* creature) : npc_escortAI(creature)
         {
             InitWaypoint();
             Reset();
@@ -936,22 +890,11 @@ public:
         void WaypointReached(uint32  /*point*/) override
         {
         }
-    };
 };
 
-class boss_thorim_trap : public CreatureScript
+struct boss_thorim_trap : public NullCreatureAI
 {
-public:
-    boss_thorim_trap() : CreatureScript("boss_thorim_trap") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
-    {
-        return GetUlduarAI<boss_thorim_trapAI>(pCreature);
-    }
-
-    struct boss_thorim_trapAI : public NullCreatureAI
-    {
-        boss_thorim_trapAI(Creature* pCreature) : NullCreatureAI(pCreature) { }
+    boss_thorim_trap(Creature* creature) : NullCreatureAI(creature) { }
 
         uint32 _checkTimer;
 
@@ -974,22 +917,11 @@ public:
                 }
             }
         }
-    };
 };
 
-class boss_thorim_sif_blizzard : public CreatureScript
+struct boss_thorim_sif_blizzard : public npc_escortAI
 {
-public:
-    boss_thorim_sif_blizzard() : CreatureScript("boss_thorim_sif_blizzard") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
-    {
-        return GetUlduarAI<boss_thorim_sif_blizzardAI>(pCreature);
-    }
-
-    struct boss_thorim_sif_blizzardAI : public npc_escortAI
-    {
-        boss_thorim_sif_blizzardAI(Creature* pCreature) : npc_escortAI(pCreature)
+    boss_thorim_sif_blizzard(Creature* creature) : npc_escortAI(creature)
         {
             InitWaypoint();
             Reset();
@@ -1023,22 +955,11 @@ public:
         void WaypointReached(uint32  /*point*/) override
         {
         }
-    };
 };
 
-class boss_thorim_pillar : public CreatureScript
+struct boss_thorim_pillar : public NullCreatureAI
 {
-public:
-    boss_thorim_pillar() : CreatureScript("boss_thorim_pillar") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
-    {
-        return GetUlduarAI<boss_thorim_pillarAI>(pCreature);
-    }
-
-    struct boss_thorim_pillarAI : public NullCreatureAI
-    {
-        boss_thorim_pillarAI(Creature* pCreature) : NullCreatureAI(pCreature) { }
+    boss_thorim_pillar(Creature* pCreature) : NullCreatureAI(pCreature) { }
 
         uint32 _resetTimer;
 
@@ -1066,22 +987,11 @@ public:
             if (_resetTimer >= 10000)
                 Reset(); // _resetTimer set to 0
         }
-    };
 };
 
-class boss_thorim_start_npcs : public CreatureScript
+struct boss_thorim_start_npcs : public ScriptedAI
 {
-public:
-    boss_thorim_start_npcs() : CreatureScript("boss_thorim_start_npcs") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
-    {
-        return GetUlduarAI<boss_thorim_start_npcsAI>(pCreature);
-    }
-
-    struct boss_thorim_start_npcsAI : public ScriptedAI
-    {
-        boss_thorim_start_npcsAI(Creature* pCreature) : ScriptedAI(pCreature) { }
+    boss_thorim_start_npcs(Creature* pCreature) : ScriptedAI(pCreature) { }
 
         EventMap events;
         bool _isCaster;
@@ -1102,7 +1012,7 @@ public:
             if (!_playerAttack && who && (who->IsPlayer() || who->GetOwnerGUID().IsPlayer()))
             {
                 if (me->GetInstanceScript())
-                    if (Creature* thorim = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_THORIM)))
+                    if (Creature* thorim = me->GetInstanceScript()->GetCreature(BOSS_THORIM))
                     {
                         if (!thorim->IsInCombat())
                         {
@@ -1123,7 +1033,7 @@ public:
         void JustDied(Unit*) override
         {
             if (me->GetInstanceScript())
-                if (Creature* thorim = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_THORIM)))
+                if (Creature* thorim = me->GetInstanceScript()->GetCreature(BOSS_THORIM))
                     thorim->AI()->DoAction(ACTION_START_TRASH_DIED);
         }
 
@@ -1220,22 +1130,11 @@ public:
             if (!_isCaster || (me->GetPower(POWER_MANA) * 100 / me->GetMaxPower(POWER_MANA) < 10))
                 DoMeleeAttackIfReady();
         }
-    };
 };
 
-class boss_thorim_gauntlet_npcs : public CreatureScript
+struct boss_thorim_gauntlet_npcs : public ScriptedAI
 {
-public:
-    boss_thorim_gauntlet_npcs() : CreatureScript("boss_thorim_gauntlet_npcs") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
-    {
-        return GetUlduarAI<boss_thorim_gauntlet_npcsAI>(pCreature);
-    }
-
-    struct boss_thorim_gauntlet_npcsAI : public ScriptedAI
-    {
-        boss_thorim_gauntlet_npcsAI(Creature* pCreature) : ScriptedAI(pCreature) { }
+    boss_thorim_gauntlet_npcs(Creature* pCreature) : ScriptedAI(pCreature) { }
 
         EventMap events;
         bool _isCaster;
@@ -1327,22 +1226,11 @@ public:
             if (!_isCaster || (me->GetPower(POWER_MANA) * 100 / me->GetMaxPower(POWER_MANA) < 10))
                 DoMeleeAttackIfReady();
         }
-    };
 };
 
-class boss_thorim_runic_colossus : public CreatureScript
+struct boss_thorim_runic_colossus : public ScriptedAI
 {
-public:
-    boss_thorim_runic_colossus() : CreatureScript("boss_thorim_runic_colossus") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
-    {
-        return GetUlduarAI<boss_thorim_runic_colossusAI>(pCreature);
-    }
-
-    struct boss_thorim_runic_colossusAI : public ScriptedAI
-    {
-        boss_thorim_runic_colossusAI(Creature* pCreature) : ScriptedAI(pCreature) { }
+    boss_thorim_runic_colossus(Creature* pCreature) : ScriptedAI(pCreature) { }
 
         EventMap events;
         bool _leftHand;
@@ -1374,10 +1262,10 @@ public:
         {
             if (me->GetInstanceScript())
             {
-                if (GameObject* go = ObjectAccessor::GetGameObject(*me, me->GetInstanceScript()->GetGuidData(DATA_THORIM_FIRST_DOORS)))
+                if (GameObject* go = me->GetInstanceScript()->GetGameObject(DATA_THORIM_FIRST_DOORS))
                     go->SetGoState(GO_STATE_ACTIVE);
 
-                if (Creature* cr = ObjectAccessor::GetCreature(*me, me->GetInstanceScript()->GetGuidData(TYPE_THORIM)))
+                if (Creature* cr = me->GetInstanceScript()->GetCreature(BOSS_THORIM))
                     cr->AI()->Talk(SAY_SPECIAL_2);
             }
         }
@@ -1468,238 +1356,215 @@ public:
 
             DoMeleeAttackIfReady();
         }
-    };
 };
 
-class boss_thorim_ancient_rune_giant : public CreatureScript
+struct boss_thorim_ancient_rune_giant : public ScriptedAI
 {
-public:
-    boss_thorim_ancient_rune_giant() : CreatureScript("boss_thorim_ancient_rune_giant") { }
+    boss_thorim_ancient_rune_giant(Creature* pCreature) : ScriptedAI(pCreature) { }
 
-    CreatureAI* GetAI(Creature* pCreature) const override
+    EventMap events;
+    bool _isInCombat;
+
+    void Reset() override
     {
-        return GetUlduarAI<boss_thorim_ancient_rune_giantAI>(pCreature);
+        _isInCombat = false;
+        events.Reset();
     }
 
-    struct boss_thorim_ancient_rune_giantAI : public ScriptedAI
+    void JustEngagedWith(Unit*) override
     {
-        boss_thorim_ancient_rune_giantAI(Creature* pCreature) : ScriptedAI(pCreature) { }
+        _isInCombat = true;
+        events.CancelEvent(EVENT_ARG_SPAWN);
+        events.ScheduleEvent(EVENT_ARG_RD, 12s);
+        events.ScheduleEvent(EVENT_ARG_STOMP, 8s);
 
-        EventMap events;
-        bool _isInCombat;
+        me->CastSpell(me, SPELL_RUNIC_FORTIFICATION, false);
+        Talk(SAY_GIANT_RUNIC_MIGHT);
+    }
 
-        void Reset() override
+    void JustDied(Unit*) override
+    {
+        if (InstanceScript* pInstance = me->GetInstanceScript())
         {
-            _isInCombat = false;
-            events.Reset();
+            if (GameObject* go = pInstance->GetGameObject(DATA_THORIM_SECOND_DOORS))
+                go->SetGoState(GO_STATE_ACTIVE);
+
+            if (Creature* thorim = pInstance->GetCreature(BOSS_THORIM))
+                thorim->AI()->DoAction(ACTION_ALLOW_HIT);
+        }
+    }
+
+    void DoAction(int32 param) override
+    {
+        if (param == ACTION_IRON_HONOR_DIED)
+            events.RescheduleEvent(EVENT_ARG_SPAWN, 20s);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (_isInCombat && !UpdateVictim())
+            return;
+
+        events.Update(diff);
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
+        {
+            case EVENT_ARG_RD:
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                    me->CastSpell(target, SPELL_RUNE_DETONATION, false);
+                events.Repeat(12s);
+                break;
+            case EVENT_ARG_STOMP:
+                me->CastSpell(me->GetVictim(), SPELL_STOMP, false);
+                events.Repeat(8s);
+                break;
+            case EVENT_ARG_SPAWN:
+                if (Creature* cr = me->SummonCreature(NPC_IRON_HONOR_GUARD, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 20000))
+                    if (Unit* target = SelectTargetFromPlayerList(150.0f))
+                        cr->AI()->AttackStart(target);
+                events.Repeat(10s);
+                break;
         }
 
-        void JustEngagedWith(Unit*) override
-        {
-            _isInCombat = true;
-            events.CancelEvent(EVENT_ARG_SPAWN);
-            events.ScheduleEvent(EVENT_ARG_RD, 12s);
-            events.ScheduleEvent(EVENT_ARG_STOMP, 8s);
-
-            me->CastSpell(me, SPELL_RUNIC_FORTIFICATION, false);
-            Talk(SAY_GIANT_RUNIC_MIGHT);
-        }
-
-        void JustDied(Unit*) override
-        {
-            if (InstanceScript* pInstance = me->GetInstanceScript())
-            {
-                if (GameObject* go = ObjectAccessor::GetGameObject(*me, pInstance->GetGuidData(DATA_THORIM_SECOND_DOORS)))
-                    go->SetGoState(GO_STATE_ACTIVE);
-
-                if (Creature* thorim = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(TYPE_THORIM)))
-                    thorim->AI()->DoAction(ACTION_ALLOW_HIT);
-            }
-        }
-
-        void DoAction(int32 param) override
-        {
-            if (param == ACTION_IRON_HONOR_DIED)
-                events.RescheduleEvent(EVENT_ARG_SPAWN, 20s);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (_isInCombat && !UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_ARG_RD:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                        me->CastSpell(target, SPELL_RUNE_DETONATION, false);
-                    events.Repeat(12s);
-                    break;
-                case EVENT_ARG_STOMP:
-                    me->CastSpell(me->GetVictim(), SPELL_STOMP, false);
-                    events.Repeat(8s);
-                    break;
-                case EVENT_ARG_SPAWN:
-                    if (Creature* cr = me->SummonCreature(NPC_IRON_HONOR_GUARD, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 20000))
-                        if (Unit* target = SelectTargetFromPlayerList(150.0f))
-                            cr->AI()->AttackStart(target);
-                    events.Repeat(10s);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
+        DoMeleeAttackIfReady();
+    }
 };
 
-class boss_thorim_arena_npcs : public CreatureScript
+struct boss_thorim_arena_npcs : public ScriptedAI
 {
-public:
-    boss_thorim_arena_npcs() : CreatureScript("boss_thorim_arena_npcs") { }
+    boss_thorim_arena_npcs(Creature* pCreature) : ScriptedAI(pCreature) { }
 
-    CreatureAI* GetAI(Creature* pCreature) const override
+    EventMap events;
+    bool _isCaster;
+
+    void Reset() override
     {
-        return GetUlduarAI<boss_thorim_arena_npcsAI>(pCreature);
+        _isCaster = (me->GetEntry() == NPC_DARK_RUNE_EVOKER);
+        events.Reset();
+        if (me->GetEntry() == NPC_DARK_RUNE_WARBRINGER)
+            me->CastSpell(me, SPELL_AURA_OF_CELERITY, true);
     }
 
-    struct boss_thorim_arena_npcsAI : public ScriptedAI
+    void JustEngagedWith(Unit*) override
     {
-        boss_thorim_arena_npcsAI(Creature* pCreature) : ScriptedAI(pCreature) { }
-
-        EventMap events;
-        bool _isCaster;
-
-        void Reset() override
+        if (me->GetEntry() == NPC_DARK_RUNE_WARBRINGER)
         {
-            _isCaster = (me->GetEntry() == NPC_DARK_RUNE_EVOKER);
-            events.Reset();
-            if (me->GetEntry() == NPC_DARK_RUNE_WARBRINGER)
-                me->CastSpell(me, SPELL_AURA_OF_CELERITY, true);
+            events.ScheduleEvent(EVENT_DR_WARBRINGER_RS, 8s);
+        }
+        else if (me->GetEntry() == NPC_DARK_RUNE_EVOKER)
+        {
+            events.ScheduleEvent(EVENT_DR_EVOKER_RL, 2500ms);
+            events.ScheduleEvent(EVENT_DR_EVOKER_RM, 4s);
+            events.ScheduleEvent(EVENT_DR_EVOKER_RS, 10s);
+        }
+        else if (me->GetEntry() == NPC_DARK_RUNE_CHAMPION)
+        {
+            events.ScheduleEvent(EVENT_DR_CHAMPION_WH, 6s);
+            events.ScheduleEvent(EVENT_DR_CHAMPION_CH, 12s);
+            events.ScheduleEvent(EVENT_DR_CHAMPION_MS, 8s);
+        }
+        else if (me->GetEntry() == NPC_DARK_RUNE_COMMONER)
+        {
+            events.ScheduleEvent(EVENT_DR_COMMONER_LB, 5s);
+            events.ScheduleEvent(EVENT_DR_COMMONER_PM, 6s);
+        }
+    }
+
+    bool CanAIAttack(Unit const* target) const override
+    {
+        return target->GetPositionX() < 2180 && target->GetPositionZ() < 425;
+    }
+
+    bool SelectT()
+    {
+        Player* target = nullptr;
+        Map::PlayerList const& pList = me->GetMap()->GetPlayers();
+        uint8 num = urand(0, pList.getSize() - 1);
+        uint8 count = 0;
+        for (Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr, ++count)
+        {
+            if (itr->GetSource()->GetPositionX() > 2180 || !itr->GetSource()->IsAlive() || itr->GetSource()->GetPositionZ() > 425)
+                continue;
+
+            if (count <= num || !target)
+                target = itr->GetSource();
+            else
+                break;
         }
 
-        void JustEngagedWith(Unit*) override
+        if (target)
         {
-            if (me->GetEntry() == NPC_DARK_RUNE_WARBRINGER)
-            {
-                events.ScheduleEvent(EVENT_DR_WARBRINGER_RS, 8s);
-            }
-            else if (me->GetEntry() == NPC_DARK_RUNE_EVOKER)
-            {
-                events.ScheduleEvent(EVENT_DR_EVOKER_RL, 2500ms);
-                events.ScheduleEvent(EVENT_DR_EVOKER_RM, 4s);
-                events.ScheduleEvent(EVENT_DR_EVOKER_RS, 10s);
-            }
-            else if (me->GetEntry() == NPC_DARK_RUNE_CHAMPION)
-            {
-                events.ScheduleEvent(EVENT_DR_CHAMPION_WH, 6s);
-                events.ScheduleEvent(EVENT_DR_CHAMPION_CH, 12s);
-                events.ScheduleEvent(EVENT_DR_CHAMPION_MS, 8s);
-            }
-            else if (me->GetEntry() == NPC_DARK_RUNE_COMMONER)
-            {
-                events.ScheduleEvent(EVENT_DR_COMMONER_LB, 5s);
-                events.ScheduleEvent(EVENT_DR_COMMONER_PM, 6s);
-            }
+            AttackStart(target);
+            me->AddThreat(target, 500.0f);
+            if (me->GetEntry() == NPC_DARK_RUNE_EVOKER && urand(0, 1))
+                me->CastSpell(me, SPELL_RUNIC_SHIELD, false);
+            else if (me->GetEntry() == NPC_DARK_RUNE_CHAMPION && !urand(0, 2))
+                me->CastSpell(target, SPELL_CHARGE, false);
+            return true;
         }
+        return false;
+    }
 
-        bool CanAIAttack(Unit const* target) const override
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim() && !SelectT())
+            return;
+
+        events.Update(diff);
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
         {
-            return target->GetPositionX() < 2180 && target->GetPositionZ() < 425;
-        }
-
-        bool SelectT()
-        {
-            Player* target = nullptr;
-            Map::PlayerList const& pList = me->GetMap()->GetPlayers();
-            uint8 num = urand(0, pList.getSize() - 1);
-            uint8 count = 0;
-            for (Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr, ++count)
-            {
-                if (itr->GetSource()->GetPositionX() > 2180 || !itr->GetSource()->IsAlive() || itr->GetSource()->GetPositionZ() > 425)
-                    continue;
-
-                if (count <= num || !target)
-                    target = itr->GetSource();
+            case EVENT_DR_WARBRINGER_RS:
+                me->CastSpell(me->GetVictim(), SPELL_RUNIC_STRIKE, false);
+                events.Repeat(8s);
+                break;
+            case EVENT_DR_EVOKER_RL:
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
+                    me->CastSpell(target, SPELL_RUNIC_LIGHTNING, false);
+                events.Repeat(2500ms);
+                break;
+            case EVENT_DR_EVOKER_RM:
+                if (Unit* target = DoSelectLowestHpFriendly(40.0f, 15))
+                    me->CastSpell(target, SPELL_RUNIC_MENDING, false);
                 else
-                    break;
-            }
-
-            if (target)
-            {
-                AttackStart(target);
-                me->AddThreat(target, 500.0f);
-                if (me->GetEntry() == NPC_DARK_RUNE_EVOKER && urand(0, 1))
-                    me->CastSpell(me, SPELL_RUNIC_SHIELD, false);
-                else if (me->GetEntry() == NPC_DARK_RUNE_CHAMPION && !urand(0, 2))
+                    me->CastSpell(me, SPELL_RUNIC_MENDING, false);
+                events.Repeat(4s);
+                break;
+            case EVENT_DR_EVOKER_RS:
+                me->CastSpell(me, SPELL_RUNIC_SHIELD, false);
+                events.Repeat(10s);
+                break;
+            case EVENT_DR_CHAMPION_CH:
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                     me->CastSpell(target, SPELL_CHARGE, false);
-                return true;
-            }
-            return false;
+                events.Repeat(12s);
+                break;
+            case EVENT_DR_CHAMPION_WH:
+                if (!me->HasUnitFlag(UNIT_FLAG_DISARMED))
+                    me->CastSpell(me, SPELL_WHIRLWIND, false);
+                events.Repeat(6s);
+                break;
+            case EVENT_DR_CHAMPION_MS:
+                me->CastSpell(me->GetVictim(), SPELL_MORTAL_STRIKE, false);
+                events.Repeat(8s);
+                break;
+            case EVENT_DR_COMMONER_LB:
+                me->CastSpell(me->GetVictim(), SPELL_LOW_BLOW, false);
+                events.Repeat(5s);
+                break;
+            case EVENT_DR_COMMONER_PM:
+                me->CastSpell(me->GetVictim(), SPELL_PUMMEL, false);
+                events.Repeat(6s);
+                break;
         }
 
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim() && !SelectT())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_DR_WARBRINGER_RS:
-                    me->CastSpell(me->GetVictim(), SPELL_RUNIC_STRIKE, false);
-                    events.Repeat(8s);
-                    break;
-                case EVENT_DR_EVOKER_RL:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                        me->CastSpell(target, SPELL_RUNIC_LIGHTNING, false);
-                    events.Repeat(2500ms);
-                    break;
-                case EVENT_DR_EVOKER_RM:
-                    if (Unit* target = DoSelectLowestHpFriendly(40.0f, 15))
-                        me->CastSpell(target, SPELL_RUNIC_MENDING, false);
-                    else
-                        me->CastSpell(me, SPELL_RUNIC_MENDING, false);
-                    events.Repeat(4s);
-                    break;
-                case EVENT_DR_EVOKER_RS:
-                    me->CastSpell(me, SPELL_RUNIC_SHIELD, false);
-                    events.Repeat(10s);
-                    break;
-                case EVENT_DR_CHAMPION_CH:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                        me->CastSpell(target, SPELL_CHARGE, false);
-                    events.Repeat(12s);
-                    break;
-                case EVENT_DR_CHAMPION_WH:
-                    if (!me->HasUnitFlag(UNIT_FLAG_DISARMED))
-                        me->CastSpell(me, SPELL_WHIRLWIND, false);
-                    events.Repeat(6s);
-                    break;
-                case EVENT_DR_CHAMPION_MS:
-                    me->CastSpell(me->GetVictim(), SPELL_MORTAL_STRIKE, false);
-                    events.Repeat(8s);
-                    break;
-                case EVENT_DR_COMMONER_LB:
-                    me->CastSpell(me->GetVictim(), SPELL_LOW_BLOW, false);
-                    events.Repeat(5s);
-                    break;
-                case EVENT_DR_COMMONER_PM:
-                    me->CastSpell(me->GetVictim(), SPELL_PUMMEL, false);
-                    events.Repeat(6s);
-                    break;
-            }
-
-            if (!_isCaster || (me->GetPower(POWER_MANA) * 100 / me->GetMaxPower(POWER_MANA) < 10))
-                DoMeleeAttackIfReady();
-        }
-    };
+        if (!_isCaster || (me->GetPower(POWER_MANA) * 100 / me->GetMaxPower(POWER_MANA) < 10))
+            DoMeleeAttackIfReady();
+    }
 };
 
 class go_thorim_lever : public GameObjectScript
@@ -1759,7 +1624,7 @@ public:
     bool OnCheck(Player* player, Unit*, uint32 /*criteria_id*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
-            if (Creature* cr = ObjectAccessor::GetCreature(*player, instance->GetGuidData(TYPE_THORIM)))
+            if (Creature* cr = instance->GetCreature(BOSS_THORIM))
                 return cr->AI()->GetData(DATA_HIT_BY_LIGHTNING);
 
         return false;
@@ -1774,7 +1639,7 @@ public:
     bool OnCheck(Player* player, Unit*, uint32 /*criteria_id*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
-            if (Creature* cr = ObjectAccessor::GetCreature(*player, instance->GetGuidData(TYPE_THORIM)))
+            if (Creature* cr = instance->GetCreature(BOSS_THORIM))
                 return cr->AI()->GetData(DATA_LOSE_YOUR_ILLUSION);
 
         return false;
@@ -1784,21 +1649,21 @@ public:
 void AddSC_boss_thorim()
 {
     // Main encounter
-    new boss_thorim();
-    new boss_thorim_sif();
-    new boss_thorim_lightning_orb();
-    new boss_thorim_trap();
-    new boss_thorim_pillar();
-    new boss_thorim_sif_blizzard();
+    RegisterUlduarCreatureAI(boss_thorim);
+    RegisterUlduarCreatureAI(boss_thorim_sif);
+    RegisterUlduarCreatureAI(boss_thorim_lightning_orb);
+    RegisterUlduarCreatureAI(boss_thorim_trap);
+    RegisterUlduarCreatureAI(boss_thorim_pillar);
+    RegisterUlduarCreatureAI(boss_thorim_sif_blizzard);
 
     // Trash
-    new boss_thorim_start_npcs();
-    new boss_thorim_gauntlet_npcs();
-    new boss_thorim_arena_npcs();
+    RegisterUlduarCreatureAI(boss_thorim_start_npcs);
+    RegisterUlduarCreatureAI(boss_thorim_gauntlet_npcs);
+    RegisterUlduarCreatureAI(boss_thorim_arena_npcs);
 
     // Mini bosses
-    new boss_thorim_runic_colossus();
-    new boss_thorim_ancient_rune_giant();
+    RegisterUlduarCreatureAI(boss_thorim_runic_colossus);
+    RegisterUlduarCreatureAI(boss_thorim_ancient_rune_giant);
 
     // GOs
     new go_thorim_lever();

@@ -43,6 +43,17 @@ bool QuaternionData::IsUnit() const
     return fabs(x * x + y * y + z * z + w * w - 1.0f) < 1e-5f;
 }
 
+void QuaternionData::ToEulerAnglesZYX(float& Z, float& Y, float& X) const
+{
+    G3D::Matrix3(G3D::Quat(x, y, z, w)).toEulerAnglesZYX(Z, Y, X);
+}
+
+QuaternionData QuaternionData::FromEulerAnglesZYX(float Z, float Y, float X)
+{
+    G3D::Quat quat(G3D::Matrix3::fromEulerAnglesZYX(Z, Y, X));
+    return QuaternionData(quat.x, quat.y, quat.z, quat.w);
+}
+
 GameObject::GameObject() : WorldObject(), MovableMapObject(),
     m_model(nullptr), m_goValue(), m_AI(nullptr)
 {
@@ -2209,6 +2220,10 @@ void GameObject::UpdatePackedRotation()
 void GameObject::SetWorldRotation(G3D::Quat const& rot)
 {
     G3D::Quat rotation = rot;
+    // If the quaternion is zero (e.g. dynamically spawned GOs with no rotation),
+    // fall back to computing rotation from orientation to avoid NaN from unitize()
+    if (G3D::fuzzyEq(rotation.magnitude(), 0.0f))
+        rotation = G3D::Quat::fromAxisAngleRotation(G3D::Vector3::unitZ(), GetOrientation());
     rotation.unitize();
     WorldRotation = rotation;
     UpdatePackedRotation();
