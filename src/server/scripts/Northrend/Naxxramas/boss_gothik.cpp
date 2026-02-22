@@ -406,16 +406,19 @@ public:
                     events.Repeat(15s);
                     break;
                 case EVENT_TELEPORT:
+                {
                     me->AttackStop();
                     if (IN_LIVE_SIDE(me))
-                    {
                         me->CastSpell(me, SPELL_TELEPORT_DEAD, false);
-                    }
                     else
-                    {
                         me->CastSpell(me, SPELL_TELEPORT_LIVE, false);
-                    }
-                    me->GetThreatMgr().resetAggro(NotOnSameSide(me));
+
+                    // Clear threat from targets not on the same side as Gothik
+                    NotOnSameSide notOnSameSide(me);
+                    for (ThreatReference const* ref : me->GetThreatMgr().GetUnsortedThreatList())
+                        if (notOnSameSide(ref->GetVictim()))
+                            me->GetThreatMgr().ClearThreat(ref->GetVictim());
+
                     if (Unit* pTarget = SelectTarget(SelectTargetMethod::MaxDistance, 0))
                     {
                         me->GetThreatMgr().AddThreat(pTarget, 100.0f);
@@ -423,6 +426,7 @@ public:
                     }
                     events.Repeat(20s);
                     break;
+                }
                 case EVENT_CHECK_HEALTH:
                     if (me->HealthBelowPct(30))
                     {

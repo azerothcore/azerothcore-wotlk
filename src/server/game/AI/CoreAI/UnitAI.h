@@ -63,7 +63,7 @@ struct DefaultTargetSelector : public Acore::unary_function<Unit*, bool>
     // playerOnly: self explaining
     // withMainTank: allow current tank to be selected
     // aura: if 0: ignored, if > 0: the target shall have the aura, if < 0, the target shall NOT have the aura
-    DefaultTargetSelector(Unit const* unit, float dist, bool playerOnly, bool withMainTank, int32 aura) : me(unit), m_dist(dist), except(!withMainTank ? me->GetThreatMgr().GetCurrentVictim() : nullptr), m_playerOnly(playerOnly), m_aura(aura) {}
+    DefaultTargetSelector(Unit const* unit, float dist, bool playerOnly, bool withMainTank, int32 aura) : me(unit), m_dist(dist), except(!withMainTank ? me->GetThreatMgr().GetLastVictim() : nullptr), m_playerOnly(playerOnly), m_aura(aura) {}
 
     bool operator()(Unit const* target) const
     {
@@ -146,7 +146,7 @@ struct PowerUsersSelector : public Acore::unary_function<Unit*, bool>
         if (!_me || !target)
             return false;
 
-        if (!_withTank && target == _me->GetThreatMgr().GetCurrentVictim())
+        if (!_withTank && target == _me->GetThreatMgr().GetLastVictim())
             return false;
 
         if (target->getPowerType() != _power)
@@ -237,7 +237,7 @@ public:
     template <class PREDICATE>
     Unit* SelectTarget(SelectTargetMethod targetType, uint32 position, PREDICATE const& predicate)
     {
-        ThreatMgr& mgr = GetThreatMgr();
+        ThreatManager& mgr = GetThreatMgr();
         // shortcut: if we ignore the first <offset> elements, and there are at most <offset> elements, then we ignore ALL elements
         if (mgr.GetThreatListSize() <= position)
             return nullptr;
@@ -282,7 +282,7 @@ public:
     void SelectTargetList(std::list<Unit*>& targetList, uint32 num, SelectTargetMethod targetType, uint32 position, PREDICATE const& predicate)
     {
         targetList.clear();
-        ThreatMgr& mgr = GetThreatMgr();
+        ThreatManager& mgr = GetThreatMgr();
         // shortcut: we're gonna ignore the first <offset> elements, and there's at most <offset> elements, so we ignore them all - nothing to do here
         if (mgr.GetThreatListSize() <= position)
             return;
@@ -352,10 +352,13 @@ public:
 
     /**
      * @brief Called when the unit leaves combat
-     *
-     * @todo Never invoked right now. Preparation for Combat Threat refactor
      */
     virtual void JustExitedCombat() { }
+
+    /**
+     * @brief Called when evade timer expires (target unreachable for too long)
+     */
+    virtual void EvadeTimerExpired();
 
     /// @brief Called at any Damage to any victim (before damage apply)
     virtual void DamageDealt(Unit* /*victim*/, uint32& /*damage*/, DamageEffectType /*damageType*/, SpellSchoolMask /*damageSchoolMask*/) {}
@@ -421,7 +424,7 @@ public:
     virtual std::string GetDebugInfo() const;
 
 private:
-    ThreatMgr& GetThreatMgr();
+    ThreatManager& GetThreatMgr();
     void SortByDistance(std::list<Unit*>& list, bool ascending = true);
 };
 

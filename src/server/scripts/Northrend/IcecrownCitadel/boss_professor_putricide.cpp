@@ -209,7 +209,7 @@ public:
 
     bool operator()(Unit const* target) const
     {
-        if (!me || !target || !target->IsPlayer() || target == me->GetThreatMgr().GetCurrentVictim())
+        if (!me || !target || !target->IsPlayer() || target == me->GetThreatMgr().GetLastVictim())
             return false;
 
         if (me->IsWithinCombatRange(target, 7.0f))

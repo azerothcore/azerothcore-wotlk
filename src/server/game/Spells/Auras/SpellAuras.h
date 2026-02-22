@@ -237,6 +237,12 @@ public:
 
     AuraScript* GetScriptByName(std::string const& scriptName) const;
 
+    template <class Script>
+    Script* GetScript(std::string const& scriptName) const
+    {
+        return dynamic_cast<Script*>(GetScriptByName(scriptName));
+    }
+
     std::list<AuraScript*> m_loadedScripts;
 
     virtual std::string GetDebugInfo() const;
