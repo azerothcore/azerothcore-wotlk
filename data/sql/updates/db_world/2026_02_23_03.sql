@@ -1,3 +1,4 @@
+-- DB update 2026_02_23_02 -> 2026_02_23_03
 UPDATE `acore_string` SET `locale_esES` = 'El comando ''{}'' no existe.', `locale_esMX` = 'El comando ''{}'' no existe.' WHERE `entry` = 6;
 UPDATE `acore_string` SET `locale_esES` = 'El subcomando ''{}{}{}'' es ambiguo:', `locale_esMX` = 'El subcomando ''{}{}{}'' es ambiguo:' WHERE `entry` = 7;
 UPDATE `acore_string` SET `locale_esES` = 'Posibles subcomandos:', `locale_esMX` = 'Posibles subcomandos:' WHERE `entry` = 8;
