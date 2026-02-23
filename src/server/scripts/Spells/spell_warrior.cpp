@@ -62,11 +62,22 @@ enum WarriorSpells
     SPELL_WARRIOR_WHIRLWIND_MAIN                    = 50622,
     SPELL_WARRIOR_WHIRLWIND_OFF                     = 44949,
     SPELL_WARRIOR_EXECUTE_R1                        = 5308,
+    SPELL_WARRIOR_SECOND_WIND_HEAL_R1               = 29841,
+    SPELL_WARRIOR_SECOND_WIND_HEAL_R2               = 29842,
+    SPELL_WARRIOR_SECOND_WIND_UK                    = 42771,
+    SPELL_WARRIOR_T10_PROT_4P_ABSORB                = 70845,
+    SPELL_WARRIOR_GLYPH_OF_BLOCKING_BUFF            = 58374,
+    SPELL_WARRIOR_T10_MELEE_4P_BONUS                = 70847,
+    SPELL_WARRIOR_T10_MELEE_4P_EXTRA_CHARGE         = 70849,
+    SPELL_WARRIOR_SLAM_GCD_REDUCED                  = 71072,
+    SPELL_WARRIOR_EXECUTE_GCD_REDUCED               = 71069,
+    SPELL_WARRIOR_WARRIORS_WRATH                    = 21887,
 };
 
 enum WarriorSpellIcons
 {
-    WARRIOR_ICON_ID_SUDDEN_DEATH                    = 1989
+    WARRIOR_ICON_ID_SUDDEN_DEATH                    = 1989,
+    WARRIOR_ICON_ID_SECOND_WIND                     = 1697
 };
 
 enum MiscSpells
@@ -726,17 +737,6 @@ class spell_warr_vigilance : public AuraScript
             target->CastSpell(caster, SPELL_WARRIOR_VIGILANCE_REDIRECT_THREAT, true);
     }
 
-    void HandleAfterApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        //! WORKAROUND
-        //! this glyph is a proc
-        if (Unit* caster = GetCaster())
-        {
-            if (AuraEffect const* glyph = caster->GetAuraEffect(SPELL_WARRIOR_GLYPH_OF_VIGILANCE, EFFECT_0))
-                GetTarget()->ModifyRedirectThreat(glyph->GetAmount());
-        }
-    }
-
     void HandleRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         Unit* target = GetTarget();
@@ -766,7 +766,6 @@ class spell_warr_vigilance : public AuraScript
     void Register() override
     {
         OnEffectApply += AuraEffectApplyFn(spell_warr_vigilance::HandleApply, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
-        AfterEffectApply += AuraEffectApplyFn(spell_warr_vigilance::HandleAfterApply, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
         OnEffectRemove += AuraEffectRemoveFn(spell_warr_vigilance::HandleRemove, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
         DoCheckProc += AuraCheckProcFn(spell_warr_vigilance::CheckProc);
         OnEffectProc += AuraEffectProcFn(spell_warr_vigilance::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
@@ -774,6 +773,29 @@ class spell_warr_vigilance : public AuraScript
 
 private:
     Unit* _procTarget;
+};
+
+// 59665 - Vigilance (Redirect Threat)
+class spell_warr_vigilance_redirect_threat : public SpellScript
+{
+    PrepareSpellScript(spell_warr_vigilance_redirect_threat);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_WARRIOR_GLYPH_OF_VIGILANCE });
+    }
+
+    void HandleGlyph(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* warrior = GetHitUnit())
+            if (AuraEffect const* glyph = warrior->GetAuraEffect(SPELL_WARRIOR_GLYPH_OF_VIGILANCE, EFFECT_0))
+                SetEffectValue(GetEffectValue() + glyph->GetAmount());
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_warr_vigilance_redirect_threat::HandleGlyph, EFFECT_0, SPELL_EFFECT_REDIRECT_THREAT);
+    }
 };
 
 // 50725 - Vigilance
@@ -826,35 +848,27 @@ class spell_warr_glyph_of_sunder_armor : public AuraScript
     }
 };
 
-// Spell 28845 - Cheat Death
-
-enum CheatDeath
-{
-    SPELL_CHEAT_DEATH_TRIGGER  = 28846
-};
-
+// 28845 - Cheat Death
 class spell_warr_t3_prot_8p_bonus : public AuraScript
 {
     PrepareAuraScript(spell_warr_t3_prot_8p_bonus);
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        return eventInfo.GetActionTarget() && eventInfo.GetActionTarget()->GetHealthPct() <= 20.0f;
-    }
+        if (eventInfo.GetActionTarget()->HealthBelowPct(20))
+            return true;
 
-    void HandleEffectProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
-    {
-        PreventDefaultAction();
-        if (Unit* target = eventInfo.GetActionTarget())
-        {
-            target->CastSpell(target, SPELL_CHEAT_DEATH_TRIGGER, true);
-        }
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        if (damageInfo && damageInfo->GetDamage())
+            if (GetTarget()->HealthBelowPctDamaged(20, damageInfo->GetDamage()))
+                return true;
+
+        return false;
     }
 
     void Register() override
     {
         DoCheckProc += AuraCheckProcFn(spell_warr_t3_prot_8p_bonus::CheckProc);
-        OnEffectProc += AuraEffectProcFn(spell_warr_t3_prot_8p_bonus::HandleEffectProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
     }
 };
 
@@ -980,6 +994,235 @@ class spell_war_sudden_death_aura : public AuraScript
     }
 };
 
+// Second Wind - triggers health regen when stunned or immobilized
+class spell_warr_second_wind : public AuraScript
+{
+    PrepareAuraScript(spell_warr_second_wind);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({
+            SPELL_WARRIOR_SECOND_WIND_HEAL_R1,
+            SPELL_WARRIOR_SECOND_WIND_HEAL_R2,
+            SPELL_WARRIOR_SECOND_WIND_UK
+        });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        SpellInfo const* procSpell = eventInfo.GetSpellInfo();
+        if (!procSpell)
+            return false;
+
+        // Must be from stun or root mechanic
+        if (!(procSpell->GetAllEffectsMechanicMask() & ((1 << MECHANIC_ROOT) | (1 << MECHANIC_STUN))))
+            return false;
+
+        // Not from self
+        if (eventInfo.GetActionTarget() == eventInfo.GetActor())
+            return false;
+
+        return true;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+    {
+        PreventDefaultAction();
+
+        uint32 triggeredSpellId = 0;
+        switch (GetId())
+        {
+            case 29838: triggeredSpellId = SPELL_WARRIOR_SECOND_WIND_HEAL_R2; break;
+            case 29834: triggeredSpellId = SPELL_WARRIOR_SECOND_WIND_HEAL_R1; break;
+            case 42770: triggeredSpellId = SPELL_WARRIOR_SECOND_WIND_UK; break;
+            default:
+                return;
+        }
+
+        GetTarget()->CastSpell(GetTarget(), triggeredSpellId, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_warr_second_wind::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_warr_second_wind::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// Deep Wounds - calculates bleed damage based on weapon damage
+class spell_warr_deep_wounds_aura : public AuraScript
+{
+    PrepareAuraScript(spell_warr_deep_wounds_aura);
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        Unit* caster = GetTarget();
+        if (!caster->IsPlayer())
+            return;
+
+        int32 basepoints;
+        if (eventInfo.GetTypeMask() & PROC_FLAG_DONE_OFFHAND_ATTACK)
+            basepoints = int32((caster->GetFloatValue(UNIT_FIELD_MAXOFFHANDDAMAGE) + caster->GetFloatValue(UNIT_FIELD_MINOFFHANDDAMAGE)) / 2.0f);
+        else
+            basepoints = int32((caster->GetFloatValue(UNIT_FIELD_MAXDAMAGE) + caster->GetFloatValue(UNIT_FIELD_MINDAMAGE)) / 2.0f);
+
+        uint32 triggeredSpellId = GetSpellInfo()->Effects[EFFECT_0].TriggerSpell;
+        if (Unit* target = eventInfo.GetActionTarget())
+            caster->CastCustomSpell(target, triggeredSpellId, &basepoints, nullptr, nullptr, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_warr_deep_wounds_aura::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
+// Warrior T10 Melee 4P Bonus - extra effects for Sudden Death/Bloodsurge procs
+class spell_warr_extra_proc : public AuraScript
+{
+    PrepareAuraScript(spell_warr_extra_proc);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({
+            SPELL_WARRIOR_T10_MELEE_4P_BONUS,
+            SPELL_WARRIOR_T10_MELEE_4P_EXTRA_CHARGE,
+            SPELL_WARRIOR_SLAM_GCD_REDUCED,
+            SPELL_WARRIOR_EXECUTE_GCD_REDUCED
+        });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+    {
+        Unit* caster = GetTarget();
+        uint32 triggeredSpellId = GetSpellInfo()->Effects[EFFECT_0].TriggerSpell;
+
+        // Triggered spell IDs: 46916 = Slam!, 52437 = Sudden Death
+        bool isBloodsurge = (triggeredSpellId == 46916);
+
+        // Item - Warrior T10 Melee 4P Bonus
+        if (AuraEffect const* t10Bonus = caster->GetAuraEffect(SPELL_WARRIOR_T10_MELEE_4P_BONUS, EFFECT_0))
+        {
+            if (!roll_chance_i(t10Bonus->GetAmount()))
+            {
+                // Don't allow normal proc to override set one
+                if (caster->GetAura(isBloodsurge ? SPELL_WARRIOR_SLAM_GCD_REDUCED : SPELL_WARRIOR_EXECUTE_GCD_REDUCED))
+                {
+                    PreventDefaultAction();
+                    return;
+                }
+                // Just to be sure
+                caster->RemoveAurasDueToSpell(SPELL_WARRIOR_T10_MELEE_4P_EXTRA_CHARGE);
+                return;
+            }
+
+            PreventDefaultAction();
+
+            // Fully remove all auras and reapply once more
+            caster->RemoveAurasDueToSpell(SPELL_WARRIOR_T10_MELEE_4P_EXTRA_CHARGE);
+            caster->RemoveAurasDueToSpell(SPELL_WARRIOR_SLAM_GCD_REDUCED);
+            caster->RemoveAurasDueToSpell(SPELL_WARRIOR_EXECUTE_GCD_REDUCED);
+
+            caster->CastSpell(caster, SPELL_WARRIOR_T10_MELEE_4P_EXTRA_CHARGE, true, nullptr, aurEff);
+            caster->CastSpell(caster, triggeredSpellId, true, nullptr, aurEff);
+            caster->CastSpell(caster, isBloodsurge ? SPELL_WARRIOR_SLAM_GCD_REDUCED : SPELL_WARRIOR_EXECUTE_GCD_REDUCED, true, nullptr, aurEff);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_warr_extra_proc::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
+// Sword and Board proc - remove Shield Slam cooldown
+class spell_warr_sword_and_board : public AuraScript
+{
+    PrepareAuraScript(spell_warr_sword_and_board);
+
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& /*eventInfo*/)
+    {
+        Unit* caster = GetTarget();
+        if (caster->IsPlayer())
+            caster->ToPlayer()->RemoveCategoryCooldown(1209); // Shield Slam category
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_warr_sword_and_board::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
+// Glyph of Blocking - triggers block value buff
+class spell_warr_glyph_of_blocking : public AuraScript
+{
+    PrepareAuraScript(spell_warr_glyph_of_blocking);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_WARRIOR_GLYPH_OF_BLOCKING_BUFF });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+    {
+        PreventDefaultAction();
+        GetTarget()->CastSpell(GetTarget(), SPELL_WARRIOR_GLYPH_OF_BLOCKING_BUFF, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_warr_glyph_of_blocking::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// Item - Warrior T10 Protection 4P Bonus
+class spell_warr_item_t10_prot_4p_bonus : public AuraScript
+{
+    PrepareAuraScript(spell_warr_item_t10_prot_4p_bonus);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_WARRIOR_T10_PROT_4P_ABSORB });
+    }
+
+    void HandleProc(ProcEventInfo& /*eventInfo*/)
+    {
+        PreventDefaultAction();
+
+        Unit* caster = GetTarget();
+        int32 basepoints = CalculatePct(static_cast<int32>(caster->GetMaxHealth()), GetSpellInfo()->Effects[EFFECT_1].CalcValue());
+        caster->CastCustomSpell(caster, SPELL_WARRIOR_T10_PROT_4P_ABSORB, &basepoints, nullptr, nullptr, true, nullptr, GetEffect(EFFECT_0));
+    }
+
+    void Register() override
+    {
+        OnProc += AuraProcFn(spell_warr_item_t10_prot_4p_bonus::HandleProc);
+    }
+};
+
+// 21977 - Warrior's Wrath (T3 8P Bonus)
+class spell_warr_warriors_wrath : public SpellScript
+{
+    PrepareSpellScript(spell_warr_warriors_wrath);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_WARRIOR_WARRIORS_WRATH });
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        GetCaster()->CastSpell(GetCaster(), SPELL_WARRIOR_WARRIORS_WRATH, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_warr_warriors_wrath::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
 void AddSC_warrior_spell_scripts()
 {
     RegisterSpellScript(spell_warr_mocking_blow);
@@ -1004,8 +1247,16 @@ void AddSC_warrior_spell_scripts()
     RegisterSpellScript(spell_warr_slam);
     RegisterSpellScript(spell_warr_sweeping_strikes);
     RegisterSpellScript(spell_warr_vigilance);
+    RegisterSpellScript(spell_warr_vigilance_redirect_threat);
     RegisterSpellScript(spell_warr_vigilance_trigger);
+    RegisterSpellScript(spell_warr_warriors_wrath);
     RegisterSpellScript(spell_warr_t3_prot_8p_bonus);
     RegisterSpellScript(spell_warr_heroic_strike);
     RegisterSpellScript(spell_war_sudden_death_aura);
+    RegisterSpellScript(spell_warr_second_wind);
+    RegisterSpellScript(spell_warr_deep_wounds_aura);
+    RegisterSpellScript(spell_warr_extra_proc);
+    RegisterSpellScript(spell_warr_sword_and_board);
+    RegisterSpellScript(spell_warr_glyph_of_blocking);
+    RegisterSpellScript(spell_warr_item_t10_prot_4p_bonus);
 }

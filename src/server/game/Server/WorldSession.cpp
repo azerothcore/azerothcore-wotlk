@@ -208,6 +208,37 @@ bool WorldSession::IsGMAccount() const
     return GetSecurity() >= SEC_GAMEMASTER;
 }
 
+bool WorldSession::IsTrialAccount() const
+{
+    return HasAccountFlag(ACCOUNT_FLAG_TRIAL);
+}
+
+bool WorldSession::IsInternetGameRoomAccount() const
+{
+    return HasAccountFlag(ACCOUNT_FLAG_IGR);
+}
+
+bool WorldSession::IsRecurringBillingAccount() const
+{
+    return HasAccountFlag(ACCOUNT_FLAG_RECURRING_BILLING);
+}
+
+uint8 WorldSession::GetBillingPlanFlags() const
+{
+    uint8 flags = SESSION_NONE;
+
+    if (IsRecurringBillingAccount())
+        flags |= SESSION_RECURRING_BILL;
+
+    if (IsTrialAccount())
+        flags |= SESSION_FREE_TRIAL;
+
+    if (IsInternetGameRoomAccount())
+        flags |= SESSION_IGR;
+
+    return flags;
+}
+
 std::string const& WorldSession::GetPlayerName() const
 {
     return _player ? _player->GetName() : DefaultPlayerName;

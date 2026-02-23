@@ -129,6 +129,10 @@ struct boss_priestess_delrissa : public BossAI
         Talk(SAY_AGGRO);
         _JustEngagedWith();
 
+        // Prevent Splitting
+        DoZoneInCombat();
+        summons.DoZoneInCombat();
+
         ScheduleTimedEvent(15s, [&] {
             if (Unit* target = DoSelectLowestHpFriendly(40.0f, 1000))
                 DoCast(target, SPELL_FLASH_HEAL);

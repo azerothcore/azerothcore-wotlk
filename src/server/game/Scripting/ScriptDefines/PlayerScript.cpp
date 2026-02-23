@@ -910,6 +910,16 @@ void ScriptMgr::OnPlayerSendListInventory(Player* player, ObjectGuid vendorGuid,
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_SEND_LIST_INVENTORY, script->OnPlayerSendListInventory(player, vendorGuid, vendorEntry));
 }
 
+void ScriptMgr::OnPlayerGetReputationPriceDiscount(Player const* player, Creature const* creature, float& discount)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_GET_REPUTATION_PRICE_DISCOUNT, script->OnPlayerGetReputationPriceDiscount(player, creature, discount));
+}
+
+void ScriptMgr::OnPlayerGetReputationPriceDiscount(Player const* player, FactionTemplateEntry const* factionTemplate, float& discount)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_GET_REPUTATION_PRICE_DISCOUNT, script->OnPlayerGetReputationPriceDiscount(player, factionTemplate, discount));
+}
+
 PlayerScript::PlayerScript(const char* name, std::vector<uint16> enabledHooks)
     : ScriptObject(name, PLAYERHOOK_END)
 {

@@ -92,9 +92,8 @@ enum Events
     EVENT_THADDIUS_INIT                 = 5,
     EVENT_THADDIUS_ENTER_COMBAT         = 6,
     EVENT_THADDIUS_CHAIN_LIGHTNING      = 7,
-    EVENT_THADDIUS_BERSERK              = 8,
-    EVENT_THADDIUS_POLARITY_SHIFT       = 9,
-    EVENT_ALLOW_BALL_LIGHTNING          = 10
+    EVENT_THADDIUS_POLARITY_SHIFT       = 8,
+    EVENT_ALLOW_BALL_LIGHTNING          = 9
 };
 
 enum Misc
@@ -119,11 +118,9 @@ public:
 
     struct boss_thaddiusAI : public BossAI
     {
-        explicit boss_thaddiusAI(Creature* c) : BossAI(c, BOSS_THADDIUS), summons(me), ballLightningEnabled(false)
+        explicit boss_thaddiusAI(Creature* c) : BossAI(c, BOSS_THADDIUS), ballLightningEnabled(false)
         {}
 
-        EventMap events;
-        SummonList summons;
         uint32 summonTimer{};
         uint32 reviveTimer{};
         uint32 resetTimer{};
@@ -238,7 +235,7 @@ public:
                 if (resetTimer > 1000)
                 {
                     resetTimer = 0;
-                    me->CastSpell(me, SPELL_THADDIUS_SPAWN_STUN, true);
+                    DoCastSelf(SPELL_THADDIUS_SPAWN_STUN, true);
                 }
                 return;
             }
@@ -247,17 +244,15 @@ public:
                 reviveTimer += diff;
                 if (reviveTimer >= 12000)
                 {
-                    for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
+                    summons.DoForAllSummons([this](WorldObject* summon)
                     {
-                        if (Creature* cr = ObjectAccessor::GetCreature(*me, (*itr)))
+                        if (summon->GetEntry() == NPC_TESLA_COIL)
                         {
-                            if (cr->GetEntry() == NPC_TESLA_COIL)
-                            {
-                                cr->AI()->Talk(EMOTE_TESLA_OVERLOAD);
-                                cr->CastSpell(me, SPELL_SHOCK_VISUAL, true);
-                            }
+                            summon->ToCreature()->AI()->Talk(EMOTE_TESLA_OVERLOAD);
+                            summon->ToCreature()->CastSpell(me, SPELL_SHOCK_VISUAL, true);
                         }
-                    }
+                    });
+
                     reviveTimer = 0;
                     events.ScheduleEvent(EVENT_THADDIUS_INIT, 750ms);
                 }
@@ -268,8 +263,6 @@ public:
                 return;
 
             events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
 
             if (summonTimer) // Revive
             {
@@ -287,25 +280,19 @@ public:
                 {
                     me->RemoveAllAuras();
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                    for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
+                    summons.DoForAllSummons([](WorldObject* summon)
                     {
-                        if (Creature* cr = ObjectAccessor::GetCreature(*me, (*itr)))
-                        {
-                            if (cr->GetEntry() == NPC_TESLA_COIL)
-                            {
-                                Unit::Kill(cr, cr);
-                            }
-                        }
-                    }
+                        if (summon->GetEntry() == NPC_TESLA_COIL)
+                            summon->ToCreature()->KillSelf();
+                    });
+
                     if (GameObject* go = me->FindNearestGameObject(GO_TESLA_COIL_LEFT, 100.0f))
-                    {
                         go->SetGoState(GO_STATE_READY);
-                    }
+
                     if (GameObject* go = me->FindNearestGameObject(GO_TESLA_COIL_RIGHT, 100.0f))
-                    {
                         go->SetGoState(GO_STATE_READY);
-                    }
-                    me->CastSpell(me, SPELL_THADDIUS_VISUAL_LIGHTNING, true);
+
+                    DoCastSelf(SPELL_THADDIUS_VISUAL_LIGHTNING, true);
                     events.ScheduleEvent(EVENT_THADDIUS_ENTER_COMBAT, 1s);
                     break;
                 }
@@ -316,19 +303,32 @@ public:
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     me->SetControlled(false, UNIT_STATE_ROOT);
                     events.ScheduleEvent(EVENT_THADDIUS_CHAIN_LIGHTNING, 14s);
-                    events.ScheduleEvent(EVENT_THADDIUS_BERSERK, 6min);
                     events.ScheduleEvent(EVENT_THADDIUS_POLARITY_SHIFT, 20s);
                     events.ScheduleEvent(EVENT_ALLOW_BALL_LIGHTNING, 5s);
+                    ScheduleEnrageTimer(SPELL_BERSERK, 6min);
                     return;
-                case EVENT_THADDIUS_BERSERK:
-                    me->CastSpell(me, SPELL_BERSERK, true);
-                    break;
                 case EVENT_THADDIUS_CHAIN_LIGHTNING:
-                    me->CastSpell(me->GetVictim(), SPELL_CHAIN_LIGHTNING, false);
+                    if (me->HasUnitState(UNIT_STATE_CASTING))
+                    {
+                        events.Repeat(1s);
+                        ballLightningEnabled = false;
+                        return;
+                    }
+
+                    DoCastVictim(SPELL_CHAIN_LIGHTNING);
+                    events.ScheduleEvent(EVENT_ALLOW_BALL_LIGHTNING, 1s);
                     events.Repeat(15s);
                     break;
                 case EVENT_THADDIUS_POLARITY_SHIFT:
-                    me->CastSpell(me, SPELL_POLARITY_SHIFT, false);
+                    if (me->HasUnitState(UNIT_STATE_CASTING))
+                    {
+                        events.Repeat(1s);
+                        ballLightningEnabled = false;
+                        return;
+                    }
+
+                    DoCastAOE(SPELL_POLARITY_SHIFT);
+                    events.ScheduleEvent(EVENT_ALLOW_BALL_LIGHTNING, 3s);
                     events.Repeat(30s);
                     break;
                 case EVENT_ALLOW_BALL_LIGHTNING:
@@ -338,7 +338,7 @@ public:
 
             if (IsAnyPlayerInMeleeRange())
                 DoMeleeAttackIfReady();
-            else if (ballLightningEnabled && !IsAnyPlayerInMeleeRange())
+            else if (ballLightningEnabled && !IsAnyPlayerInMeleeRange() && !me->HasUnitState(UNIT_STATE_CASTING))
                 if (Unit* target = SelectTarget(SelectTargetMethod::MaxThreat))
                     me->CastSpell(target, SPELL_BALL_LIGHTNING, false);
         }
@@ -391,7 +391,8 @@ public:
             me->SetControlled(false, UNIT_STATE_STUNNED);
 
             if (why == EVADE_REASON_BOUNDARY)
-                instance->GetCreature(DATA_THADDIUS_BOSS)->AI()->EnterEvadeMode(EVADE_REASON_BOUNDARY);
+                if (Creature* thaddius = instance->GetCreature(DATA_THADDIUS_BOSS))
+                    thaddius->AI()->EnterEvadeMode(EVADE_REASON_BOUNDARY);
 
             ScriptedAI::EnterEvadeMode(why);
         }

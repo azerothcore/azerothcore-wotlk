@@ -67,7 +67,27 @@ enum HunterSpells
     SPELL_HUNTER_GLYPH_OF_ARCANE_SHOT               = 61389,
     SPELL_LOCK_AND_LOAD_TRIGGER                     = 56453,
     SPELL_LOCK_AND_LOAD_MARKER                      = 67544,
+    SPELL_FROST_TRAP_SLOW                           = 67035,
     SPELL_HUNTER_PET_LEGGINGS_OF_BEAST_MASTERY      = 38297, // Leggings of Beast Mastery
+
+    // Proc system spells
+    SPELL_HUNTER_THRILL_OF_THE_HUNT_MANA            = 34720,
+    SPELL_HUNTER_REPLENISHMENT                      = 57669,
+    SPELL_HUNTER_RAPID_RECUPERATION_R1              = 56654,
+    SPELL_HUNTER_RAPID_RECUPERATION_R2              = 58882,
+    SPELL_HUNTER_GLYPH_OF_MEND_PET_HAPPINESS        = 57894,
+    SPELL_HUNTER_KILL_COMMAND_HUNTER                = 34027,
+    SPELL_HUNTER_RAPID_RECUPERATION_MANA_R1         = 56654,
+    SPELL_HUNTER_RAPID_RECUPERATION_MANA_R2         = 58882,
+    SPELL_HUNTER_PIERCING_SHOTS                     = 63468,
+    SPELL_HUNTER_T9_4P_GREATNESS                    = 68130
+};
+
+enum HunterSpellIcons
+{
+    HUNTER_ICON_THRILL_OF_THE_HUNT                  = 2236,
+    HUNTER_ICON_HUNTING_PARTY                       = 3406,
+    HUNTER_ICON_RAPID_RECUPERATION                  = 3560
 };
 
 class spell_hun_check_pet_los : public SpellScript
@@ -738,18 +758,15 @@ class spell_hun_sniper_training : public AuraScript
         PreventDefaultAction();
         if (aurEff->GetAmount() <= 0)
         {
-            if (!GetCaster() || !GetTarget())
-            {
-                return;
-            }
-
             Unit* target = GetTarget();
-
             uint32 spellId = SPELL_HUNTER_SNIPER_TRAINING_BUFF_R1 + GetId() - SPELL_HUNTER_SNIPER_TRAINING_R1;
-            if (SpellInfo const* triggeredSpellInfo = sSpellMgr->GetSpellInfo(spellId))
+            target->CastSpell(target, spellId, true, nullptr, aurEff);
+
+            if (Player* playerTarget = GetUnitOwner()->ToPlayer())
             {
-                Unit* triggerCaster = triggeredSpellInfo->NeedsToBeTriggeredByCaster(GetSpellInfo()) ? GetCaster() : target;
-                triggerCaster->CastSpell(target, triggeredSpellInfo, true, 0, aurEff);
+                int32 baseAmount = aurEff->GetBaseAmount();
+                int32 amount = playerTarget->CalculateSpellDamage(playerTarget, GetSpellInfo(), aurEff->GetEffIndex(), &baseAmount);
+                GetEffect(EFFECT_0)->SetAmount(amount);
             }
         }
     }
@@ -759,7 +776,7 @@ class spell_hun_sniper_training : public AuraScript
         if (Player* playerTarget = GetUnitOwner()->ToPlayer())
         {
             int32 baseAmount = aurEff->GetBaseAmount();
-            int32 amount = playerTarget->isMoving() || aurEff->GetAmount() <= 0 ?
+            int32 amount = playerTarget->isMoving() ?
                             playerTarget->CalculateSpellDamage(playerTarget, GetSpellInfo(), aurEff->GetEffIndex(), &baseAmount) :
                             aurEff->GetAmount() - 1;
             aurEff->SetAmount(amount);
@@ -1151,11 +1168,6 @@ private:
     WorldObject* _target = nullptr;
 };
 
-enum LocknLoadSpells
-{
-    SPELL_FROST_TRAP_SLOW = 67035
-};
-
 // -56342 - Lock and Load
 class spell_hun_lock_and_load : public AuraScript
 {
@@ -1163,103 +1175,66 @@ class spell_hun_lock_and_load : public AuraScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_LOCK_AND_LOAD_TRIGGER, SPELL_LOCK_AND_LOAD_MARKER, SPELL_FROST_TRAP_SLOW });
+        return ValidateSpellInfo(
+        {
+            SPELL_LOCK_AND_LOAD_TRIGGER,
+            SPELL_LOCK_AND_LOAD_MARKER,
+            SPELL_FROST_TRAP_SLOW
+        });
     }
 
-    bool CheckTrapProc(ProcEventInfo& eventInfo)
+    bool CheckProc(ProcEventInfo& eventInfo)
     {
-        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
-        if (!spellInfo || !eventInfo.GetActor())
-        {
+        if (eventInfo.GetActor()->HasAura(SPELL_LOCK_AND_LOAD_MARKER))
             return false;
-        }
-
-        // Black Arrow and Fire traps may trigger on periodic tick only.
-        if (((spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FIRE) || (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_SHADOW))
-            && (spellInfo->Effects[0].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE || spellInfo->Effects[1].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE))
-        {
-            return true;
-        }
-
-        return IsTargetValid(spellInfo, eventInfo.GetProcTarget()) && !eventInfo.GetActor()->HasAura(SPELL_LOCK_AND_LOAD_MARKER);
-    }
-
-    bool IsTargetValid(SpellInfo const* spellInfo, Unit* target)
-    {
-        if (!spellInfo || !target)
-        {
-            return false;
-        }
-
-        // Don't check it for fire traps and black arrow, they proc on periodic only and not spell hit.
-        // So it's wrong to check for immunity, it was already checked when the spell was applied.
-        if ((spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FIRE) || (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_SHADOW))
-        {
-            return false;
-        }
-
-        // HitMask for Frost Trap can't be checked correctly as it is.
-        // That's because the talent is triggered by the spell that fires the trap (63487)...
-        // ...and not the actual spell that applies the slow effect (67035).
-        // So the IMMUNE result is never sent by the spell that triggers this.
-        if (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_NATURE)
-        {
-            if (SpellInfo const* triggerSpell = sSpellMgr->GetSpellInfo(SPELL_FROST_TRAP_SLOW))
-            {
-                return !target->IsImmunedToSpell(triggerSpell);
-            }
-        }
-
         return true;
     }
 
-    template <uint32 mask>
-    void HandleProcs(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    bool CheckTrapProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        if (!(eventInfo.GetTypeMask() & PROC_FLAG_DONE_TRAP_ACTIVATION))
+            return false;
+
+        // Patch 3.3.3: Lock and Load no longer triggers from Explosive Trap activation,
+        // only from frost trap activation. Fire traps proc via CheckPeriodicProc instead.
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        if (!spellInfo || !(spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST))
+            return false;
+
+        // immune to Frost Trap slow (bosses) in WotLK patch 3.2.0
+        if (Spell const* procSpell = eventInfo.GetProcSpell())
+             if (Unit* target = procSpell->GetOriginalTarget())
+                 if (target->IsImmunedToSpell(sSpellMgr->GetSpellInfo(SPELL_FROST_TRAP_SLOW)))
+                     return false;
+
+        return roll_chance_i(aurEff->GetAmount());
+    }
+
+    bool CheckPeriodicProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        if (!(eventInfo.GetTypeMask() & PROC_FLAG_DONE_PERIODIC))
+            return false;
+
+        return roll_chance_i(aurEff->GetAmount());
+    }
+
+    void HandleProc(ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
 
-        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
-
-        if (!(eventInfo.GetTypeMask() & mask) || !spellInfo)
-        {
-            return;
-        }
-
-        // Also check if the proc from the fire traps and black arrow actually comes from the periodic ticks here.
-        // Normally this wouldn't be required, but we are circumventing the current proc system limitations.
-        if (((spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FIRE) || (spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_SHADOW))
-            && (spellInfo->Effects[0].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE || spellInfo->Effects[1].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE)
-            && !(mask & PROC_FLAG_DONE_PERIODIC))
-        {
-            return;
-        }
-
-        if (!roll_chance_i(aurEff->GetAmount()))
-        {
-            return;
-        }
-
         Unit* caster = eventInfo.GetActor();
         caster->CastSpell(caster, SPELL_LOCK_AND_LOAD_TRIGGER, true);
-    }
-
-    void ApplyMarker(ProcEventInfo& eventInfo)
-    {
-        if (IsTargetValid(eventInfo.GetSpellInfo(), eventInfo.GetProcTarget()))
-        {
-            Unit* caster = eventInfo.GetActor();
-            caster->CastSpell(caster, SPELL_LOCK_AND_LOAD_MARKER, true);
-        }
+        caster->CastSpell(caster, SPELL_LOCK_AND_LOAD_MARKER, true);
     }
 
     void Register() override
     {
-        DoCheckProc += AuraCheckProcFn(spell_hun_lock_and_load::CheckTrapProc);
+        DoCheckProc += AuraCheckProcFn(spell_hun_lock_and_load::CheckProc);
 
-        OnEffectProc += AuraEffectProcFn(spell_hun_lock_and_load::HandleProcs<PROC_FLAG_DONE_TRAP_ACTIVATION>, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
-        OnEffectProc += AuraEffectProcFn(spell_hun_lock_and_load::HandleProcs<PROC_FLAG_DONE_PERIODIC>, EFFECT_1, SPELL_AURA_DUMMY);
+        DoCheckEffectProc += AuraCheckEffectProcFn(spell_hun_lock_and_load::CheckTrapProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+        DoCheckEffectProc += AuraCheckEffectProcFn(spell_hun_lock_and_load::CheckPeriodicProc, EFFECT_1, SPELL_AURA_DUMMY);
 
-        AfterProc += AuraProcFn(spell_hun_lock_and_load::ApplyMarker);
+        OnProc += AuraProcFn(spell_hun_lock_and_load::HandleProc);
     }
 };
 
@@ -1343,6 +1318,162 @@ class spell_hun_target_self_and_pet : public SpellScript
     }
 };
 
+// -34497 - Thrill of the Hunt
+class spell_hun_thrill_of_the_hunt : public AuraScript
+{
+    PrepareAuraScript(spell_hun_thrill_of_the_hunt);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_HUNTER_THRILL_OF_THE_HUNT_MANA });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        SpellInfo const* procSpell = eventInfo.GetSpellInfo();
+        if (!procSpell)
+            return;
+
+        Unit* caster = GetTarget();
+        if (!caster->IsPlayer())
+            return;
+
+        int32 mana = 0;
+
+        Spell* spell = caster->ToPlayer()->m_spellModTakingSpell;
+
+        // Disable charge drop because of Lock and Load
+        if (spell)
+            caster->ToPlayer()->SetSpellModTakingSpell(spell, false);
+
+        // Explosive Shot
+        if (procSpell->SpellFamilyFlags[2] & 0x200)
+        {
+            Unit* victim = eventInfo.GetActionTarget();
+            if (!victim)
+            {
+                if (spell)
+                    caster->ToPlayer()->SetSpellModTakingSpell(spell, true);
+                return;
+            }
+            if (AuraEffect const* pEff = victim->GetAuraEffect(SPELL_AURA_PERIODIC_DUMMY, SPELLFAMILY_HUNTER, 0x0, 0x80000000, 0x0, caster->GetGUID()))
+            {
+                SpellInfo const* expSpell = pEff->GetSpellInfo();
+                mana = (expSpell->ManaCost + int32(CalculatePct(caster->GetCreateMana(), expSpell->ManaCostPercentage))) * 4 / 10 / 3;
+            }
+        }
+        else
+            mana = (procSpell->ManaCost + int32(CalculatePct(caster->GetCreateMana(), procSpell->ManaCostPercentage))) * 4 / 10;
+
+        if (spell)
+            caster->ToPlayer()->SetSpellModTakingSpell(spell, true);
+
+        if (mana <= 0)
+            return;
+
+        caster->CastCustomSpell(SPELL_HUNTER_THRILL_OF_THE_HUNT_MANA, SPELLVALUE_BASE_POINT0, mana, caster, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_hun_thrill_of_the_hunt::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// -53290 - Hunting Party
+class spell_hun_hunting_party : public AuraScript
+{
+    PrepareAuraScript(spell_hun_hunting_party);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_HUNTER_REPLENISHMENT });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        eventInfo.GetActor()->CastSpell(nullptr, SPELL_HUNTER_REPLENISHMENT, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_hun_hunting_party::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// -53228 - Rapid Recuperation
+class spell_hun_rapid_recuperation : public AuraScript
+{
+    PrepareAuraScript(spell_hun_rapid_recuperation);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_HUNTER_RAPID_RECUPERATION_R1, SPELL_HUNTER_RAPID_RECUPERATION_R2 });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        SpellInfo const* procSpell = eventInfo.GetSpellInfo();
+        if (!procSpell)
+            return false;
+
+        // This effect only from Rapid Killing (mana regen)
+        return (procSpell->SpellFamilyFlags[1] & 0x01000000) != 0;
+    }
+
+    void HandleProc(ProcEventInfo& /*eventInfo*/)
+    {
+        PreventDefaultAction();
+        uint32 triggeredSpell = 0;
+        switch (GetSpellInfo()->Id)
+        {
+            case 53228: // Rank 1
+                triggeredSpell = SPELL_HUNTER_RAPID_RECUPERATION_R1;
+                break;
+            case 53232: // Rank 2
+                triggeredSpell = SPELL_HUNTER_RAPID_RECUPERATION_R2;
+                break;
+            default:
+                return;
+        }
+        GetTarget()->CastSpell(GetTarget(), triggeredSpell, true);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_hun_rapid_recuperation::CheckProc);
+        OnProc += AuraProcFn(spell_hun_rapid_recuperation::HandleProc);
+    }
+};
+
+// 57870 - Glyph of Mend Pet
+class spell_hun_glyph_of_mend_pet : public AuraScript
+{
+    PrepareAuraScript(spell_hun_glyph_of_mend_pet);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_HUNTER_GLYPH_OF_MEND_PET_HAPPINESS });
+    }
+
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* target = eventInfo.GetActionTarget();
+        if (!target)
+            return;
+
+        target->CastSpell(target, SPELL_HUNTER_GLYPH_OF_MEND_PET_HAPPINESS, true, nullptr, nullptr, GetTarget()->GetGUID());
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_hun_glyph_of_mend_pet::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
 // -53301 - Explosive Shot
 class spell_hun_explosive_shot : public SpellScript
 {
@@ -1361,6 +1492,153 @@ class spell_hun_explosive_shot : public SpellScript
     void Register() override
     {
         AfterCast += SpellCastFn(spell_hun_explosive_shot::HandleFinish);
+    }
+};
+
+// 58914 - Kill Command (Pet Aura)
+class spell_hun_kill_command_pet : public AuraScript
+{
+    PrepareAuraScript(spell_hun_kill_command_pet);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_HUNTER_KILL_COMMAND_HUNTER });
+    }
+
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        // prevent charge drop (aura has both proc charge and stacks)
+        PreventDefaultAction();
+
+        if (Unit* owner = eventInfo.GetActor()->GetOwner())
+            owner->RemoveAuraFromStack(SPELL_HUNTER_KILL_COMMAND_HUNTER);
+
+        ModStackAmount(-1);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_hun_kill_command_pet::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// -53228 - Rapid Recuperation (trigger)
+class spell_hun_rapid_recuperation_trigger : public AuraScript
+{
+    PrepareAuraScript(spell_hun_rapid_recuperation_trigger);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+        {
+            SPELL_HUNTER_RAPID_RECUPERATION_MANA_R1,
+            SPELL_HUNTER_RAPID_RECUPERATION_MANA_R2
+        });
+    }
+
+    void HandleRapidFireProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        // Proc only from Rapid Fire
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        if (!spellInfo || !(spellInfo->SpellFamilyFlags[0] & 0x00000020))
+        {
+            PreventDefaultAction();
+            return;
+        }
+    }
+
+    void HandleRapidKillingProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        static uint32 const triggerSpells[2] = { SPELL_HUNTER_RAPID_RECUPERATION_MANA_R1, SPELL_HUNTER_RAPID_RECUPERATION_MANA_R2 };
+
+        PreventDefaultAction();
+
+        // Proc only from Rapid Killing
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        if (!spellInfo || !(spellInfo->SpellFamilyFlags[1] & 0x01000000))
+            return;
+
+        uint8 rank = GetSpellInfo()->GetRank();
+        if (rank > 0 && rank <= 2)
+            GetTarget()->CastSpell(GetTarget(), triggerSpells[rank - 1], true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_hun_rapid_recuperation_trigger::HandleRapidFireProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+        OnEffectProc += AuraEffectProcFn(spell_hun_rapid_recuperation_trigger::HandleRapidKillingProc, EFFECT_1, SPELL_AURA_DUMMY);
+    }
+};
+
+// -53234 - Piercing Shots
+class spell_hun_piercing_shots : public AuraScript
+{
+    PrepareAuraScript(spell_hun_piercing_shots);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_HUNTER_PIERCING_SHOTS });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        return eventInfo.GetActionTarget() != nullptr;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        DamageInfo* dmgInfo = eventInfo.GetDamageInfo();
+        if (!dmgInfo || !dmgInfo->GetDamage())
+            return;
+
+        Unit* caster = eventInfo.GetActor();
+        Unit* target = eventInfo.GetActionTarget();
+
+        SpellInfo const* piercingShots = sSpellMgr->AssertSpellInfo(SPELL_HUNTER_PIERCING_SHOTS);
+        int32 bp = CalculatePct(static_cast<int32>(dmgInfo->GetDamage()), aurEff->GetAmount());
+
+        ASSERT(piercingShots->GetMaxTicks() > 0);
+        bp /= piercingShots->GetMaxTicks();
+
+        caster->CastCustomSpell(target, SPELL_HUNTER_PIERCING_SHOTS, &bp, nullptr, nullptr, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_hun_piercing_shots::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_hun_piercing_shots::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
+// 67151 - Item - Hunter T9 4P Bonus (Steady Shot)
+class spell_hun_t9_4p_bonus : public AuraScript
+{
+    PrepareAuraScript(spell_hun_t9_4p_bonus);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_HUNTER_T9_4P_GREATNESS });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        Unit* actor = eventInfo.GetActor();
+        return actor && actor->IsPlayer() && actor->ToPlayer()->GetPet();
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        Unit* caster = eventInfo.GetActor();
+        caster->CastSpell(caster->ToPlayer()->GetPet(), SPELL_HUNTER_T9_4P_GREATNESS, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_hun_t9_4p_bonus::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_hun_t9_4p_bonus::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
     }
 };
 
@@ -1396,4 +1674,13 @@ void AddSC_hunter_spell_scripts()
     RegisterSpellScript(spell_hun_bestial_wrath);
     RegisterSpellScript(spell_hun_target_self_and_pet);
     RegisterSpellScript(spell_hun_explosive_shot);
+    RegisterSpellScript(spell_hun_thrill_of_the_hunt);
+    RegisterSpellScript(spell_hun_hunting_party);
+    RegisterSpellScript(spell_hun_rapid_recuperation);
+    RegisterSpellScript(spell_hun_glyph_of_mend_pet);
+    // Proc system scripts
+    RegisterSpellScript(spell_hun_kill_command_pet);
+    RegisterSpellScript(spell_hun_piercing_shots);
+    RegisterSpellScript(spell_hun_rapid_recuperation_trigger);
+    RegisterSpellScript(spell_hun_t9_4p_bonus);
 }

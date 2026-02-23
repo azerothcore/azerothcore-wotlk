@@ -28,6 +28,7 @@ enum Spells
     SPELL_SLEEP               = 31298,
     SPELL_INFERNO             = 31299,
     SPELL_VAMPIRIC_AURA       = 31317,
+    SPELL_VAMPIRIC_AURA_HEAL  = 31285,
     SPELL_ENRAGE              = 26662,
     SPELL_INFERNAL_STUN       = 31302,
     SPELL_INFERNAL_IMMOLATION = 31304
@@ -160,8 +161,37 @@ class spell_anetheron_sleep : public SpellScript
     }
 };
 
+// 31317 - Vampiric Aura
+class spell_anetheron_vampiric_aura : public AuraScript
+{
+    PrepareAuraScript(spell_anetheron_vampiric_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_VAMPIRIC_AURA_HEAL });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        if (!damageInfo || !damageInfo->GetDamage())
+            return;
+
+        Unit* actor = eventInfo.GetActor();
+        int32 bp = damageInfo->GetDamage() * 3;
+        actor->CastCustomSpell(SPELL_VAMPIRIC_AURA_HEAL, SPELLVALUE_BASE_POINT0, bp, actor, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_anetheron_vampiric_aura::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
 void AddSC_boss_anetheron()
 {
     RegisterHyjalAI(boss_anetheron);
     RegisterSpellScript(spell_anetheron_sleep);
+    RegisterSpellScript(spell_anetheron_vampiric_aura);
 }

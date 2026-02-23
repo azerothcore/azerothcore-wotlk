@@ -300,56 +300,148 @@ private:
     uint8 _counter;
 };
 
-class npc_ulduar_storm_tempered_keeper : public CreatureScript
+struct npc_ulduar_storm_tempered_keeper : public ScriptedAI
 {
-public:
-    npc_ulduar_storm_tempered_keeper() : CreatureScript("npc_ulduar_storm_tempered_keeper") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
+    npc_ulduar_storm_tempered_keeper(Creature* creature) : ScriptedAI(creature)
     {
-        return GetUlduarAI<npc_ulduar_storm_tempered_keeperAI>(creature);
+        otherGUID.Clear();
     }
 
-    struct npc_ulduar_storm_tempered_keeperAI : public ScriptedAI
+    EventMap events;
+    ObjectGuid otherGUID;
+
+    void Reset() override
     {
-        npc_ulduar_storm_tempered_keeperAI(Creature* creature) : ScriptedAI(creature)
+        events.Reset();
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        events.Reset();
+        events.ScheduleEvent(1, 2s); // checking Separation Anxiety, Charged Sphere
+        events.ScheduleEvent(2, 5s, 8s); // Forked Lightning
+        events.ScheduleEvent(3, (me->GetEntry() == 33722 ? 20s : 50s)); // Summon Charged Sphere
+        if (Creature* c = me->FindNearestCreature((me->GetEntry() == 33722 ? 33699 : 33722), 30.0f, true))
+            otherGUID = c->GetGUID();
+        else
+            me->CastSpell(me, 63630, true); // Vengeful Surge
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        if (Creature* c = ObjectAccessor::GetCreature(*me, otherGUID))
+            c->CastSpell(c, 63630, true); // Vengeful Surge
+    }
+
+    void JustSummoned(Creature* s) override
+    {
+        if (Creature* c = ObjectAccessor::GetCreature(*me, otherGUID))
+            s->GetMotionMaster()->MoveFollow(c, 0.0f, 0.0f);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
         {
-            otherGUID.Clear();
+            case 0:
+                break;
+            case 1:
+                if (Creature* c = ObjectAccessor::GetCreature(*me, otherGUID))
+                    if (c->IsAlive() && me->GetExactDist2d(c) > 45.0f)
+                        me->CastSpell(me, 63539, true);
+                if (Creature* c = me->FindNearestCreature(33715, 2.0f, true))
+                    if (c->IsSummon())
+                        if (c->ToTempSummon()->GetSummonerGUID() != me->GetGUID())
+                            me->CastSpell(me, 63528, true);
+                events.Repeat(2s);
+                break;
+            case 2:
+                me->CastSpell(me->GetVictim(), 63541, false);
+                events.Repeat(10s, 14s);
+                break;
+            case 3:
+                if (!me->HasAura(63630))
+                    me->CastSpell(me, 63527, false);
+                events.Repeat(1min);
+                break;
         }
 
-        EventMap events;
-        ObjectGuid otherGUID;
+        DoMeleeAttackIfReady();
+    }
+};
 
-        void Reset() override
+struct npc_ulduar_arachnopod_destroyer : public ScriptedAI
+{
+    npc_ulduar_arachnopod_destroyer(Creature* creature) : ScriptedAI(creature)
+    {
+        _spawnedMechanic = false;
+        me->ApplySpellImmune(0, IMMUNITY_ID, 64919, true); // Ice Nova from Ice Turret
+    }
+
+    EventMap events;
+    bool _spawnedMechanic;
+
+    void Reset() override
+    {
+        events.Reset();
+        events.ScheduleEvent(1, 5s, 8s); // Flame Spray
+        events.ScheduleEvent(2, 3s, 6s); // Machine Gun
+        events.ScheduleEvent(3, 1s); // Charged Leap
+    }
+
+    void PassengerBoarded(Unit* p, int8  /*seat*/, bool  /*apply*/) override
+    {
+        me->SetFaction(p->GetFaction());
+        me->SetReactState(REACT_PASSIVE);
+    }
+
+    void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
+    {
+        if (!_spawnedMechanic && me->HealthBelowPctDamaged(20, damage))
         {
-            events.Reset();
+            _spawnedMechanic = true;
+            if (Creature* c = me->SummonCreature(34184, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN, 0))
+                c->AI()->AttackStart(me->GetVictim());
+            me->InterruptNonMeleeSpells(false);
+            me->CombatStop(true);
+            me->SetReactState(REACT_PASSIVE);
+            me->SetRegeneratingHealth(false);
+            me->SetFaction(FACTION_PREY);
+            me->SetNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
+            me->CastSpell(me, 64770, true);
         }
+    }
 
-        void JustEngagedWith(Unit* /*who*/) override
+    void AttackStart(Unit* who) override
+    {
+        if (me->GetFaction() == FACTION_MONSTER_2)
+            ScriptedAI::AttackStart(who);
+    }
+
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        if (me->GetFaction() == FACTION_MONSTER_2)
+            ScriptedAI::EnterEvadeMode(why);
+    }
+
+    void OnCharmed(bool  /*apply*/) override {}
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (me->GetFaction() != FACTION_MONSTER_2)
         {
-            events.Reset();
-            events.ScheduleEvent(1, 2s); // checking Separation Anxiety, Charged Sphere
-            events.ScheduleEvent(2, 5s, 8s); // Forked Lightning
-            events.ScheduleEvent(3, (me->GetEntry() == 33722 ? 20s : 50s)); // Summon Charged Sphere
-            if (Creature* c = me->FindNearestCreature((me->GetEntry() == 33722 ? 33699 : 33722), 30.0f, true))
-                otherGUID = c->GetGUID();
-            else
-                me->CastSpell(me, 63630, true); // Vengeful Surge
+            if (me->IsAlive() && (me->GetExactDist2dSq(2058.0f, 42.0f) < 25.0f * 25.0f || me->GetExactDist2dSq(2203.0f, 292.0f) < 25.0f * 25.0f || me->GetExactDist2dSq(2125.0f, 170.0f) > 160.0f * 160.0f))
+                Unit::Kill(me, me, false);
         }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            if (Creature* c = ObjectAccessor::GetCreature(*me, otherGUID))
-                c->CastSpell(c, 63630, true); // Vengeful Surge
-        }
-
-        void JustSummoned(Creature* s) override
-        {
-            if (Creature* c = ObjectAccessor::GetCreature(*me, otherGUID))
-                s->GetMotionMaster()->MoveFollow(c, 0.0f, 0.0f);
-        }
-
-        void UpdateAI(uint32 diff) override
+        else
         {
             if (!UpdateVictim())
                 return;
@@ -364,144 +456,30 @@ public:
                 case 0:
                     break;
                 case 1:
-                    if (Creature* c = ObjectAccessor::GetCreature(*me, otherGUID))
-                        if (c->IsAlive() && me->GetExactDist2d(c) > 45.0f)
-                            me->CastSpell(me, 63539, true);
-                    if (Creature* c = me->FindNearestCreature(33715, 2.0f, true))
-                        if (c->IsSummon())
-                            if (c->ToTempSummon()->GetSummonerGUID() != me->GetGUID())
-                                me->CastSpell(me, 63528, true);
-                    events.Repeat(2s);
+                    me->CastSpell(me->GetVictim(), SPELL_FLAME_SPRAY, false);
+                    events.Repeat(15s, 25s);
                     break;
                 case 2:
-                    me->CastSpell(me->GetVictim(), 63541, false);
-                    events.Repeat(10s, 14s);
+                    me->CastSpell(me->GetVictim(), SPELL_MACHINE_GUN, false);
+                    events.Repeat(10s, 15s);
                     break;
                 case 3:
-                    if (!me->HasAura(63630))
-                        me->CastSpell(me, 63527, false);
-                    events.Repeat(1min);
+                    {
+                        float dist = me->GetDistance(me->GetVictim());
+                        if (dist > 10.0f && dist < 40.0f)
+                        {
+                            me->CastSpell(me->GetVictim(), 64779, false);
+                            events.Repeat(25s);
+                        }
+                        else
+                            events.Repeat(3s);
+                    }
                     break;
             }
 
             DoMeleeAttackIfReady();
         }
-    };
-};
-
-class npc_ulduar_arachnopod_destroyer : public CreatureScript
-{
-public:
-    npc_ulduar_arachnopod_destroyer() : CreatureScript("npc_ulduar_arachnopod_destroyer") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetUlduarAI<npc_ulduar_arachnopod_destroyerAI>(creature);
     }
-
-    struct npc_ulduar_arachnopod_destroyerAI : public ScriptedAI
-    {
-        npc_ulduar_arachnopod_destroyerAI(Creature* creature) : ScriptedAI(creature)
-        {
-            _spawnedMechanic = false;
-            me->ApplySpellImmune(0, IMMUNITY_ID, 64919, true); // Ice Nova from Ice Turret
-        }
-
-        EventMap events;
-        bool _spawnedMechanic;
-
-        void Reset() override
-        {
-            events.Reset();
-            events.ScheduleEvent(1, 5s, 8s); // Flame Spray
-            events.ScheduleEvent(2, 3s, 6s); // Machine Gun
-            events.ScheduleEvent(3, 1s); // Charged Leap
-        }
-
-        void PassengerBoarded(Unit* p, int8  /*seat*/, bool  /*apply*/) override
-        {
-            me->SetFaction(p->GetFaction());
-            me->SetReactState(REACT_PASSIVE);
-        }
-
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
-        {
-            if (!_spawnedMechanic && me->HealthBelowPctDamaged(20, damage))
-            {
-                _spawnedMechanic = true;
-                if (Creature* c = me->SummonCreature(34184, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), TEMPSUMMON_MANUAL_DESPAWN, 0))
-                    c->AI()->AttackStart(me->GetVictim());
-                me->InterruptNonMeleeSpells(false);
-                me->CombatStop(true);
-                me->SetReactState(REACT_PASSIVE);
-                me->SetRegeneratingHealth(false);
-                me->SetFaction(FACTION_PREY);
-                me->SetNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
-                me->CastSpell(me, 64770, true);
-            }
-        }
-
-        void AttackStart(Unit* who) override
-        {
-            if (me->GetFaction() == FACTION_MONSTER_2)
-                ScriptedAI::AttackStart(who);
-        }
-
-        void EnterEvadeMode(EvadeReason why) override
-        {
-            if (me->GetFaction() == FACTION_MONSTER_2)
-                ScriptedAI::EnterEvadeMode(why);
-        }
-
-        void OnCharmed(bool  /*apply*/) override {}
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (me->GetFaction() != FACTION_MONSTER_2)
-            {
-                if (me->IsAlive() && (me->GetExactDist2dSq(2058.0f, 42.0f) < 25.0f * 25.0f || me->GetExactDist2dSq(2203.0f, 292.0f) < 25.0f * 25.0f || me->GetExactDist2dSq(2125.0f, 170.0f) > 160.0f * 160.0f))
-                    Unit::Kill(me, me, false);
-            }
-            else
-            {
-                if (!UpdateVictim())
-                    return;
-
-                events.Update(diff);
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
-
-                switch (events.ExecuteEvent())
-                {
-                    case 0:
-                        break;
-                    case 1:
-                        me->CastSpell(me->GetVictim(), SPELL_FLAME_SPRAY, false);
-                        events.Repeat(15s, 25s);
-                        break;
-                    case 2:
-                        me->CastSpell(me->GetVictim(), SPELL_MACHINE_GUN, false);
-                        events.Repeat(10s, 15s);
-                        break;
-                    case 3:
-                        {
-                            float dist = me->GetDistance(me->GetVictim());
-                            if (dist > 10.0f && dist < 40.0f)
-                            {
-                                me->CastSpell(me->GetVictim(), 64779, false);
-                                events.Repeat(25s);
-                            }
-                            else
-                                events.Repeat(3s);
-                        }
-                        break;
-                }
-
-                DoMeleeAttackIfReady();
-            }
-        }
-    };
 };
 
 class spell_ulduar_arachnopod_damaged_aura : public AuraScript
@@ -571,8 +549,8 @@ void AddSC_ulduar()
     new npc_ulduar_keeper();
     RegisterSpellScript(spell_ulduar_energy_sap_aura);
     RegisterUlduarCreatureAI(npc_ulduar_snow_mound);
-    new npc_ulduar_storm_tempered_keeper();
-    new npc_ulduar_arachnopod_destroyer();
+    RegisterUlduarCreatureAI(npc_ulduar_storm_tempered_keeper);
+    RegisterUlduarCreatureAI(npc_ulduar_arachnopod_destroyer);
     RegisterSpellScript(spell_ulduar_arachnopod_damaged_aura);
     new AreaTrigger_at_celestial_planetarium_enterance();
     RegisterCreatureAI(npc_salvaged_siege_engine);

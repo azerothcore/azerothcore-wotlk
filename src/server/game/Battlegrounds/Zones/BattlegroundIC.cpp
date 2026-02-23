@@ -179,7 +179,7 @@ void BattlegroundIC::PostUpdateImpl(uint32 diff)
                 if (siegeEngineWorkshopTimer <= diff)
                 {
                     uint8 siegeType = (nodePoint[i].faction == TEAM_ALLIANCE ? BG_IC_NPC_SIEGE_ENGINE_A : BG_IC_NPC_SIEGE_ENGINE_H);
-                    if (Creature* siege = GetBGCreature(siegeType)) // this always should be true
+                    if (Creature* siege = GetBgMap()->GetCreature(BgCreatures[siegeType]))
                         if (!siege->IsAlive())
                         {
                             // Check if creature respawn time is properly saved
@@ -749,6 +749,37 @@ void BattlegroundIC::HandleContestedNodes(ICNodePoint* nodePoint)
     {
         DelObject(BG_IC_GO_SEAFORIUM_BOMBS_1);
         DelObject(BG_IC_GO_SEAFORIUM_BOMBS_2);
+
+        for (uint8 i = 0; i < MAX_DEMOLISHERS_SPAWNS_PER_FACTION; ++i)
+        {
+            uint8 type = (nodePoint->faction == TEAM_ALLIANCE ? BG_IC_NPC_DEMOLISHER_1_H : BG_IC_NPC_DEMOLISHER_1_A) + i;
+            if (BgCreatures[type] && GetBgMap()->GetCreature(BgCreatures[type]))
+            {
+                if (Creature* demolisher = GetBgMap()->GetCreature(BgCreatures[type]))
+                {
+                    if (Vehicle* veh = demolisher->GetVehicleKit())
+                        if (!veh->IsVehicleInUse())
+                        {
+                            respawnMap.erase(demolisher->GetGUID());
+                            DelCreature(type);
+                        }
+                }
+            }
+        }
+
+        uint8 siegeType = (nodePoint->faction == TEAM_ALLIANCE ? BG_IC_NPC_SIEGE_ENGINE_H : BG_IC_NPC_SIEGE_ENGINE_A);
+        if (BgCreatures[siegeType] && GetBgMap()->GetCreature(BgCreatures[siegeType]))
+        {
+            if (Creature* siege = GetBgMap()->GetCreature(BgCreatures[siegeType]))
+            {
+                if (Vehicle* veh = siege->GetVehicleKit())
+                    if (!veh->IsVehicleInUse())
+                    {
+                        respawnMap.erase(siege->GetGUID());
+                        DelCreature(siegeType);
+                    }
+            }
+        }
     }
 }
 
@@ -865,43 +896,45 @@ void BattlegroundIC::HandleCapturedNodes(ICNodePoint* nodePoint, bool recapture)
                 if (siegeEngineWorkshopTimer < WORKSHOP_UPDATE_TIME)
                     siegeEngineWorkshopTimer = WORKSHOP_UPDATE_TIME;
 
-                if (!recapture)
+                for (uint8 i = 0; i < MAX_DEMOLISHERS_SPAWNS_PER_FACTION; ++i)
                 {
-                    for (uint8 i = 0; i < MAX_DEMOLISHERS_SPAWNS_PER_FACTION; ++i)
-                    {
-                        uint8 type = (nodePoint->faction == TEAM_ALLIANCE ? BG_IC_NPC_DEMOLISHER_1_A : BG_IC_NPC_DEMOLISHER_1_H) + i;
+                    uint8 type = (nodePoint->faction == TEAM_ALLIANCE ? BG_IC_NPC_DEMOLISHER_1_A : BG_IC_NPC_DEMOLISHER_1_H) + i;
 
-                        if (GetBgMap()->GetCreature(BgCreatures[type]))
-                            continue;
+                    if (GetBgMap()->GetCreature(BgCreatures[type]))
+                        continue;
 
-                        if (AddCreature(NPC_DEMOLISHER, type,
-                                        BG_IC_WorkshopVehicles[i].GetPositionX(), BG_IC_WorkshopVehicles[i].GetPositionY(),
-                                        BG_IC_WorkshopVehicles[i].GetPositionZ(), BG_IC_WorkshopVehicles[i].GetOrientation(),
-                                        RESPAWN_ONE_DAY))
-                            GetBGCreature(type)->SetFaction(BG_IC_Factions[(nodePoint->faction == TEAM_ALLIANCE ? TEAM_ALLIANCE : TEAM_HORDE)]);
-                    }
+                    if (AddCreature(NPC_DEMOLISHER, type,
+                                    BG_IC_WorkshopVehicles[i].GetPositionX(), BG_IC_WorkshopVehicles[i].GetPositionY(),
+                                    BG_IC_WorkshopVehicles[i].GetPositionZ(), BG_IC_WorkshopVehicles[i].GetOrientation(),
+                                    RESPAWN_ONE_DAY))
+                        GetBGCreature(type)->SetFaction(BG_IC_Factions[(nodePoint->faction == TEAM_ALLIANCE ? TEAM_ALLIANCE : TEAM_HORDE)]);
+                }
 
-                    uint8 siegeType = (nodePoint->faction == TEAM_ALLIANCE ? BG_IC_NPC_SIEGE_ENGINE_A : BG_IC_NPC_SIEGE_ENGINE_H);
-                    if (!GetBgMap()->GetCreature(BgCreatures[siegeType]))
-                    {
-                        AddCreature((nodePoint->faction == TEAM_ALLIANCE ? NPC_SIEGE_ENGINE_A : NPC_SIEGE_ENGINE_H), siegeType,
-                                    BG_IC_WorkshopVehicles[4].GetPositionX(), BG_IC_WorkshopVehicles[4].GetPositionY(),
-                                    BG_IC_WorkshopVehicles[4].GetPositionZ(), BG_IC_WorkshopVehicles[4].GetOrientation(),
-                                    RESPAWN_ONE_DAY);
-                    }
+                uint8 siegeType = (nodePoint->faction == TEAM_ALLIANCE ? BG_IC_NPC_SIEGE_ENGINE_A : BG_IC_NPC_SIEGE_ENGINE_H);
+                uint8 oppositeSiegeType = (nodePoint->faction == TEAM_ALLIANCE ? BG_IC_NPC_SIEGE_ENGINE_H : BG_IC_NPC_SIEGE_ENGINE_A);
 
-                    if (Creature* siegeEngine = GetBgMap()->GetCreature(BgCreatures[siegeType]))
-                    {
-                        siegeEngine->SetFaction(BG_IC_Factions[(nodePoint->faction == TEAM_ALLIANCE ? TEAM_ALLIANCE : TEAM_HORDE)]);
-                        siegeEngine->SetCorpseDelay(5 * MINUTE);
+                if (Creature* oppositeSiege = GetBgMap()->GetCreature(BgCreatures[oppositeSiegeType]))
+                {
+                    if (oppositeSiege->IsAlive())
+                        if (Vehicle* siegeVehicle = oppositeSiege->GetVehicleKit())
+                            if (!siegeVehicle->IsVehicleInUse())
+                                Unit::Kill(oppositeSiege, oppositeSiege);
+                }
 
-                        if (siegeEngine->IsAlive())
-                            if (Vehicle* siegeVehicle = siegeEngine->GetVehicleKit())
-                                if (!siegeVehicle->IsVehicleInUse())
-                                    Unit::Kill(siegeEngine, siegeEngine);
+                if (!GetBgMap()->GetCreature(BgCreatures[siegeType]))
+                {
+                    AddCreature((nodePoint->faction == TEAM_ALLIANCE ? NPC_SIEGE_ENGINE_A : NPC_SIEGE_ENGINE_H), siegeType,
+                                BG_IC_WorkshopVehicles[4].GetPositionX(), BG_IC_WorkshopVehicles[4].GetPositionY(),
+                                BG_IC_WorkshopVehicles[4].GetPositionZ(), BG_IC_WorkshopVehicles[4].GetOrientation(),
+                                RESPAWN_ONE_DAY);
+                }
 
-                        respawnMap[siegeEngine->GetGUID()] = GameTime::GetGameTime().count() + VEHICLE_RESPAWN_TIME;
-                    }
+                if (Creature* siegeEngine = GetBgMap()->GetCreature(BgCreatures[siegeType]))
+                {
+                    siegeEngine->SetFaction(BG_IC_Factions[(nodePoint->faction == TEAM_ALLIANCE ? TEAM_ALLIANCE : TEAM_HORDE)]);
+                    siegeEngine->SetCorpseDelay(5 * MINUTE);
+
+                    respawnMap[siegeEngine->GetGUID()] = GameTime::GetGameTime().count() + VEHICLE_RESPAWN_TIME;
                 }
 
                 for (uint8 i = 0; i < MAX_WORKSHOP_BOMBS_SPAWNS_PER_FACTION; ++i)
