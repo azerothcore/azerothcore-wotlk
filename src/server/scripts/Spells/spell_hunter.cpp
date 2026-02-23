@@ -67,6 +67,7 @@ enum HunterSpells
     SPELL_HUNTER_GLYPH_OF_ARCANE_SHOT               = 61389,
     SPELL_LOCK_AND_LOAD_TRIGGER                     = 56453,
     SPELL_LOCK_AND_LOAD_MARKER                      = 67544,
+    SPELL_FROST_TRAP_SLOW                           = 67035,
     SPELL_HUNTER_PET_LEGGINGS_OF_BEAST_MASTERY      = 38297, // Leggings of Beast Mastery
 
     // Proc system spells
@@ -75,7 +76,7 @@ enum HunterSpells
     SPELL_HUNTER_RAPID_RECUPERATION_R1              = 56654,
     SPELL_HUNTER_RAPID_RECUPERATION_R2              = 58882,
     SPELL_HUNTER_GLYPH_OF_MEND_PET_HAPPINESS        = 57894,
-    SPELL_HUNTER_KILL_COMMAND_HUNTER                = 34026,
+    SPELL_HUNTER_KILL_COMMAND_HUNTER                = 34027,
     SPELL_HUNTER_RAPID_RECUPERATION_MANA_R1         = 56654,
     SPELL_HUNTER_RAPID_RECUPERATION_MANA_R2         = 58882,
     SPELL_HUNTER_PIERCING_SHOTS                     = 63468,
@@ -1177,7 +1178,8 @@ class spell_hun_lock_and_load : public AuraScript
         return ValidateSpellInfo(
         {
             SPELL_LOCK_AND_LOAD_TRIGGER,
-            SPELL_LOCK_AND_LOAD_MARKER
+            SPELL_LOCK_AND_LOAD_MARKER,
+            SPELL_FROST_TRAP_SLOW
         });
     }
 
@@ -1193,9 +1195,17 @@ class spell_hun_lock_and_load : public AuraScript
         if (!(eventInfo.GetTypeMask() & PROC_FLAG_DONE_TRAP_ACTIVATION))
             return false;
 
+        // Patch 3.3.3: Lock and Load no longer triggers from Explosive Trap activation,
+        // only from frost trap activation. Fire traps proc via CheckPeriodicProc instead.
         SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
-        if (!spellInfo || !(spellInfo->GetSchoolMask() & (SPELL_SCHOOL_MASK_FROST | SPELL_SCHOOL_MASK_FIRE)))
+        if (!spellInfo || !(spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST))
             return false;
+
+        // immune to Frost Trap slow (bosses) in WotLK patch 3.2.0
+        if (Spell const* procSpell = eventInfo.GetProcSpell())
+             if (Unit* target = procSpell->GetOriginalTarget())
+                 if (target->IsImmunedToSpell(sSpellMgr->GetSpellInfo(SPELL_FROST_TRAP_SLOW)))
+                     return false;
 
         return roll_chance_i(aurEff->GetAmount());
     }
