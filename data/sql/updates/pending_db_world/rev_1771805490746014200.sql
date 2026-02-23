@@ -187,7 +187,7 @@ INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `
 (1200369, 2, 1226870, 5, 0, 1, 1, 1, 1, 'WotLK Greens 68-70 Level Range'),
 (1200369, 3, 1226971, 5, 0, 1, 1, 1, 1, 'WotLK Greens 69-71 Level Range'),
 (1200369, 4, 1236871, 0.1, 0, 1, 0, 1, 1, 'WotLK Blues 68-71 Level Range'),
-(1200369, 5, 1266870, 100, 0, 1, 0, 1, 1, 'WoLK Profession Drops 68-70 Level Range'),
+(1200369, 5, 1266870, 100, 0, 1, 0, 1, 1, 'WotLK Profession Drops 68-70 Level Range'),
 (1200369, 6, 1256875, 3, 0, 1, 0, 1, 1, 'WotLK Potions 68-75 Level Range'),
 (1200369, 7, 1256883, 1, 0, 1, 0, 1, 1, 'WotLK Scrolls'),
 
@@ -198,21 +198,21 @@ INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `
 (1200275, 5, 1237375, 0.033, 0, 1, 2, 1, 1, 'WotLK Blues 73-75 Level Range'),
 (1200275, 6, 1237476, 0.033, 0, 1, 2, 1, 1, 'WotLK Blues 74-76 Level Range'),
 (1200275, 7, 1237577, 0.033, 0, 1, 2, 1, 1, 'WotLK Blues 75-77 Level Range'),
-(1200275, 8, 1267579, 100, 0, 1, 0, 1, 1, 'WoLK Profession Drops 75-79 Level Range'),
+(1200275, 8, 1267579, 100, 0, 1, 0, 1, 1, 'WotLK Profession Drops 75-79 Level Range'),
 
 (1200282, 1, 1207583, 10, 0, 1, 0, 1, 1, 'WotLK Greys 75+ Level Range'),
 (1200282, 2, 1228082, 5, 0, 1, 1, 1, 1, 'WotLK Greens 80-82 Level Range'),
 (1200282, 3, 1228183, 5, 0, 1, 1, 1, 1, 'WotLK Greens 81-83 Level Range'),
 (1200282, 4, 1238083, 0.1, 0, 1, 2, 1, 1, 'WotLK Blues 80-83 Level Range'),
 (1200282, 5, 1248083, 0.01, 0, 1, 0, 1, 1, 'WotLK Purples 80+ Level Range'),
-(1200282, 6, 1268083, 100, 0, 1, 0, 1, 1, 'WoLK Profession Drops 80+ Level Range'),
+(1200282, 6, 1268083, 100, 0, 1, 0, 1, 1, 'WotLK Profession Drops 80+ Level Range'),
 
 (1200382, 1, 1207583, 10, 0, 1, 0, 1, 1, 'WotLK Greys 75+ Level Range'),
 (1200382, 2, 1228082, 5, 0, 1, 1, 1, 1, 'WotLK Greens 80-82 Level Range'),
 (1200382, 3, 1228183, 5, 0, 1, 1, 1, 1, 'WotLK Greens 81-83 Level Range'),
 (1200382, 4, 1238083, 0.1, 0, 1, 2, 1, 1, 'WotLK Blues 80-83 Level Range'),
 (1200382, 5, 1248083, 0.01, 0, 1, 0, 1, 1, 'WotLK Purples 80+ Level Range'),
-(1200382, 6, 1268083, 100, 0, 1, 0, 1, 1, 'WoLK Profession Drops 80+ Level Range'),
+(1200382, 6, 1268083, 100, 0, 1, 0, 1, 1, 'WotLK Profession Drops 80+ Level Range'),
 (1200382, 7, 1257683, 3, 0, 1, 0, 1, 1, 'WotLK Potions 76-83 Level Range'),
 (1200382, 8, 1256883, 1, 0, 1, 0, 1, 1, 'WotLK Scrolls');
 
