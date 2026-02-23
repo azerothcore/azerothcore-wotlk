@@ -1195,16 +1195,17 @@ class spell_hun_lock_and_load : public AuraScript
         if (!(eventInfo.GetTypeMask() & PROC_FLAG_DONE_TRAP_ACTIVATION))
             return false;
 
+        // Patch 3.3.3: Lock and Load no longer triggers from Explosive Trap activation,
+        // only from frost trap activation. Fire traps proc via CheckPeriodicProc instead.
         SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
-        if (!spellInfo || !(spellInfo->GetSchoolMask() & (SPELL_SCHOOL_MASK_FROST | SPELL_SCHOOL_MASK_FIRE)))
+        if (!spellInfo || !(spellInfo->GetSchoolMask() & SPELL_SCHOOL_MASK_FROST))
             return false;
 
-        // TODO: Research whether Lock and Load should proc on targets
-        // immune to Frost Trap slow (bosses) in WotLK 3.3.5a.
-        // if (Spell const* procSpell = eventInfo.GetProcSpell())
-        //     if (Unit* target = procSpell->GetOriginalTarget())
-        //         if (target->IsImmunedToSpell(sSpellMgr->GetSpellInfo(SPELL_FROST_TRAP_SLOW)))
-        //             return false;
+        // immune to Frost Trap slow (bosses) in WotLK patch 3.2.0
+        if (Spell const* procSpell = eventInfo.GetProcSpell())
+             if (Unit* target = procSpell->GetOriginalTarget())
+                 if (target->IsImmunedToSpell(sSpellMgr->GetSpellInfo(SPELL_FROST_TRAP_SLOW)))
+                     return false;
 
         return roll_chance_i(aurEff->GetAmount());
     }

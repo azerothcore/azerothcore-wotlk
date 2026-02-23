@@ -246,7 +246,7 @@ enum SunwellExaltedNeck
 
 enum SwiftHandOfJustice
 {
-    SPELL_SWIFT_HAND_OF_JUSTICE_HEAL = 59914
+    SPELL_SWIFT_HAND_OF_JUSTICE_HEAL = 59913
 };
 
 enum TinyAbominationInAJar
