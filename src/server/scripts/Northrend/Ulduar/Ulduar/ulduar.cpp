@@ -561,7 +561,7 @@ class spell_ulduar_teleporter : public SpellScript
     SpellCastResult CheckRequirement()
     {
         Unit* target = GetExplTargetUnit();
-        if (!target || target->GetTypeId() != TYPEID_PLAYER)
+        if (!target || !target->IsPlayer())
             return SPELL_FAILED_DONT_REPORT;
 
         if (target->IsInCombat())
