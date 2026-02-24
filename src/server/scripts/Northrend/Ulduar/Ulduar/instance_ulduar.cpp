@@ -154,7 +154,6 @@ public:
         uint32 m_unbrokenAchievement;
         uint32 m_mageBarrier;
 
-
         // Hodir
         bool hmHodir;
         Position normalChestPosition = { 1967.152588f, -204.188461f, 432.686951f, 5.50957f };
