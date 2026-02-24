@@ -154,8 +154,6 @@ public:
         uint32 m_unbrokenAchievement;
         uint32 m_mageBarrier;
 
-        // Razorscale
-        ObjectGuid m_RazorscaleHarpoonFireStateGUID[4];
 
         // Hodir
         bool hmHodir;
@@ -471,18 +469,6 @@ public:
                 case NPC_ALGALON:
                     if (!m_algalonTimer)
                         creature->DespawnOrUnsummon();
-                    break;
-                case NPC_HARPOON_FIRE_STATE:
-                    {
-                        if (creature->GetPositionX() > 595 )
-                            m_RazorscaleHarpoonFireStateGUID[3] = creature->GetGUID();
-                        else if (creature->GetPositionX() > 585 )
-                            m_RazorscaleHarpoonFireStateGUID[2] = creature->GetGUID();
-                        else if (creature->GetPositionX() > 575 )
-                            m_RazorscaleHarpoonFireStateGUID[1] = creature->GetGUID();
-                        else
-                            m_RazorscaleHarpoonFireStateGUID[0] = creature->GetGUID();
-                    }
                     break;
                 //! These creatures are summoned by something else than Algalon
                 //! but need to be controlled/despawned by him - so they need to be
@@ -803,12 +789,6 @@ public:
                 case DATA_REPAIR_STATION2:
                     return m_RepairSGUID[1];
 
-                // Razorscales Harpoon Fire State GUIDs
-                case DATA_HARPOON_FIRE_STATE_1:
-                case DATA_HARPOON_FIRE_STATE_2:
-                case DATA_HARPOON_FIRE_STATE_3:
-                case DATA_HARPOON_FIRE_STATE_4:
-                    return m_RazorscaleHarpoonFireStateGUID[data - 200];
             }
 
             return GetObjectGuid(data);
