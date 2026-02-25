@@ -30,4 +30,4 @@ UPDATE `item_template` SET `dmg_min1` = 136, `dmg_max1` = 253 WHERE `entry` = 36
 UPDATE `item_template` SET `dmg_min1` = 339, `dmg_max1` = 632, `dmg_type1` = 0 WHERE `entry` = 42238;
 
 -- Wand of the Drowned Contessa (ILVL 264 Epic Wand)
-UPDATE `item_template` SET `dmg_min1` = 583, `dmg_max1` = 1083, `dmg_type1` = 5 WHERE `entry` = 50204;
+UPDATE `item_template` SET `dmg_min1` = 583, `dmg_max1` = 1083, `dmg_type1` = 4 WHERE `entry` = 50204;
