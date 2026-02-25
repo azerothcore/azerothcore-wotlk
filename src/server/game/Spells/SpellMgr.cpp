@@ -2073,6 +2073,20 @@ void SpellMgr::LoadSpellProcs()
         if (addTriggerFlag)
             procEntry.AttributesMask |= PROC_ATTR_TRIGGERED_CAN_PROC;
 
+        // Modifier auras with charges should require spellmod validation
+        if (spellInfo->ProcCharges)
+        {
+            for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+            {
+                if (spellInfo->Effects[i].IsAura(SPELL_AURA_ADD_FLAT_MODIFIER) ||
+                    spellInfo->Effects[i].IsAura(SPELL_AURA_ADD_PCT_MODIFIER))
+                {
+                    procEntry.AttributesMask |= PROC_ATTR_REQ_SPELLMOD;
+                    break;
+                }
+            }
+        }
+
         // Calculate DisableEffectsMask for effects that shouldn't trigger procs
         uint32 nonProcMask = 0;
         for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)

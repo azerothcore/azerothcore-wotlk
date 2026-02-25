@@ -4667,6 +4667,14 @@ Debug.Battleground = 0
 Debug.Arena = 0
 
 #
+#    Debug.LFG
+#        Description: Enable or disable LFG 1 player queue mode. (If enabled, the in-game command is disabled.)
+#        Default: 0 - (Disabled)
+#                 1 - (Enabled)
+
+Debug.LFG = 0
+
+#
 ###################################################################################################
 
 ###################################################################################################

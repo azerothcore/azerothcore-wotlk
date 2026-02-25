@@ -5340,11 +5340,10 @@ void AuraEffect::HandleModDamageDone(AuraApplication const* aurApp, uint8 mode, 
     // This information for client side use only
     if (target->IsPlayer())
     {
-
         uint16 baseField = GetAmount() >= 0 ? PLAYER_FIELD_MOD_DAMAGE_DONE_POS : PLAYER_FIELD_MOD_DAMAGE_DONE_NEG;
         for (uint16 i = 0; i < MAX_SPELL_SCHOOL; ++i)
             if (GetMiscValue() & (1 << i))
-                target->ApplyModUInt32Value(baseField + i, GetAmount(), apply);
+                target->ApplyModInt32Value(baseField + i, GetAmount(), apply);
 
         if (Guardian* pet = target->ToPlayer()->GetGuardianPet())
             pet->UpdateAttackPowerAndDamage();
@@ -6563,12 +6562,6 @@ void AuraEffect::HandlePeriodicTriggerSpellAuraTick(Unit* target, Unit* caster) 
                         caster->CastSpell(target, triggerSpellId, false);
                     return;
                 }
-            // Hunter - Rapid Recuperation
-            case 56654:
-            case 58882:
-                int32 amount = int32(target->GetMaxPower(POWER_MANA) * GetAmount() / 100.0f);
-                target->CastCustomSpell(target, triggerSpellId, &amount, nullptr, nullptr, true, nullptr, this);
-                return;
         }
     }
 

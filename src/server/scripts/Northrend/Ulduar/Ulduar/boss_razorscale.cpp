@@ -44,7 +44,6 @@ enum Spells
     SPELL_CHAIN_2                           = 49682,
     SPELL_CHAIN_3                           = 49683,
     SPELL_CHAIN_4                           = 49684,
-    SPELL_LAUNCH_CHAIN                      = 62505,
 
     // Dark Rune Sentinel
     SPELL_WHIRLWIND                         = 63808,
@@ -207,31 +206,11 @@ struct boss_razorscale : public BossAI
 
     void SpellHit(Unit* caster, SpellInfo const* spell) override
     {
-        if (!caster || !instance)
+        if (!caster)
             return;
 
         switch (spell->Id)
         {
-            case SPELL_LAUNCH_CHAIN:
-                {
-                    uint32 spellId = SPELL_CHAIN_4;
-
-                    if (caster->GetGUID() == instance->GetGuidData(DATA_HARPOON_FIRE_STATE_1))
-                    {
-                        spellId = SPELL_CHAIN_1;
-                    }
-                    else if (caster->GetGUID() == instance->GetGuidData(DATA_HARPOON_FIRE_STATE_2))
-                    {
-                        spellId = SPELL_CHAIN_2;
-                    }
-                    else if (caster->GetGUID() == instance->GetGuidData(DATA_HARPOON_FIRE_STATE_3))
-                    {
-                        spellId = SPELL_CHAIN_3;
-                    }
-
-                    caster->CastSpell(me, spellId, true);
-                }
-                break;
             case SPELL_CHAIN_1:
             case SPELL_CHAIN_2:
             case SPELL_CHAIN_3:
@@ -447,16 +426,16 @@ struct boss_razorscale : public BossAI
                 events.ScheduleEvent(EVENT_FLY_UP, 2s);
                 break;
             case EVENT_FLY_UP:
+                {
                 me->SetInCombatWithZone(); // just in case
-                if (instance)
-                    for( int i = 0; i < 4; ++i )
-                        if (Creature* hfs = instance->GetCreature(DATA_HARPOON_FIRE_STATE_1 + i))
-                            {
-                                me->SummonCreature(34188, hfs->GetPositionX(), hfs->GetPositionY(), hfs->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 22000);
-                                hfs->AI()->SetData(1, 0);
-                            }
+                std::list<Creature*> hfsList;
+                me->GetCreaturesWithEntryInRange(hfsList, 300.0f, NPC_HARPOON_FIRE_STATE);
+                for (Creature* hfs : hfsList)
+                {
+                    me->SummonCreature(34188, hfs->GetPositionX(), hfs->GetPositionY(), hfs->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 22000);
+                    hfs->AI()->SetData(1, 0);
+                }
 
-                me->RemoveAura(SPELL_LAUNCH_CHAIN);
                 me->RemoveAura(SPELL_CHAIN_1);
                 me->RemoveAura(SPELL_CHAIN_3);
                 if (RAID_MODE(0, 1))
@@ -506,6 +485,7 @@ struct boss_razorscale : public BossAI
                 }
 
                 break;
+                }
             case EVENT_RESUME_FIXING:
                 for (uint8 i = 0; i < 3; ++i)
                     if (Creature* c = ObjectAccessor::GetCreature(*me, ExpeditionEngineerGUIDs[i]))
@@ -621,9 +601,10 @@ public:
                 creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
 
                 // reset npcs NPC_HARPOON_FIRE_STATE
-                for (uint8 i = 0; i < 4; ++i)
-                    if (Creature* hfs = instance->GetCreature(DATA_HARPOON_FIRE_STATE_1 + i))
-                        hfs->AI()->SetData(1, 0);
+                std::list<Creature*> hfsList;
+                razorscale->GetCreaturesWithEntryInRange(hfsList, 300.0f, NPC_HARPOON_FIRE_STATE);
+                for (Creature* hfs : hfsList)
+                    hfs->AI()->SetData(1, 0);
 
                 if (razorscale->AI())
                 {
@@ -687,18 +668,19 @@ struct npc_ulduar_harpoonfirestate : public NullCreatureAI
 
     uint32 GetHarpoonGunIdForThisHFS()
     {
-        if (pInstance)
-        {
-            if (me->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_1))
-                return GO_HARPOON_GUN_1;
-            else if (me->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_2))
-                return GO_HARPOON_GUN_2;
-            else if (me->GetGUID() == pInstance->GetGuidData(DATA_HARPOON_FIRE_STATE_3))
-                return GO_HARPOON_GUN_3;
-            else
-                return GO_HARPOON_GUN_4;
-        }
-        return 0;
+        static uint32 const harpoonEntries[] = { GO_HARPOON_GUN_1, GO_HARPOON_GUN_2, GO_HARPOON_GUN_3, GO_HARPOON_GUN_4 };
+        for (uint32 entry : harpoonEntries)
+            if (me->FindNearestGameObject(entry, 5.0f))
+                return entry;
+
+        // Fallback: determine by X position
+        if (me->GetPositionX() > 595)
+            return GO_HARPOON_GUN_4;
+        else if (me->GetPositionX() > 585)
+            return GO_HARPOON_GUN_3;
+        else if (me->GetPositionX() > 575)
+            return GO_HARPOON_GUN_2;
+        return GO_HARPOON_GUN_1;
     }
 
     void SetData(uint32 id, uint32 value) override
@@ -706,7 +688,6 @@ struct npc_ulduar_harpoonfirestate : public NullCreatureAI
         switch (id)
         {
             case 1: // cleanup at the start of the fight
-                if (pInstance)
                 {
                     uint32 h_entry = GetHarpoonGunIdForThisHFS();
                     if (GameObject* wh = me->FindNearestGameObject(h_entry, 5.0f))
@@ -743,7 +724,7 @@ struct npc_ulduar_harpoonfirestate : public NullCreatureAI
                     if (!razorscale)
                         return;
                     if (!razorscale->HasAura(value))
-                        me->CastSpell(razorscale, SPELL_LAUNCH_CHAIN, true);
+                        me->CastSpell(razorscale, value, true);
                 }
                 break;
         }
@@ -832,15 +813,16 @@ struct npc_ulduar_expedition_engineer : public NullCreatureAI
                         return;
                     }
 
-                    for( int i = 0; i < 4; ++i )
-                        if (Creature* fs = pInstance->GetCreature(DATA_HARPOON_FIRE_STATE_1 + i))
-                                if (!fs->AI()->GetData(2))
-                                {
-                                    float a = rand_norm() * M_PI;
-                                    me->GetMotionMaster()->MovePoint(0, fs->GetPositionX() + 3.0f * cos(a), fs->GetPositionY() + 3.0f * std::sin(a), fs->GetPositionZ());
-                                    fixingGUID = fs->GetGUID();
-                                    return;
-                                }
+                    std::list<Creature*> hfsList;
+                    me->GetCreaturesWithEntryInRange(hfsList, 300.0f, NPC_HARPOON_FIRE_STATE);
+                    for (Creature* fs : hfsList)
+                        if (!fs->AI()->GetData(2))
+                        {
+                            float a = rand_norm() * M_PI;
+                            me->GetMotionMaster()->MovePoint(0, fs->GetPositionX() + 3.0f * cos(a), fs->GetPositionY() + 3.0f * std::sin(a), fs->GetPositionZ());
+                            fixingGUID = fs->GetGUID();
+                            return;
+                        }
 
                     Reset(); // all harpoons repaired
                     me->GetMotionMaster()->MoveTargetedHome();
@@ -877,30 +859,17 @@ public:
             return true;
         }
 
-        uint32 npc = 0;
         uint32 spell = 0;
         switch (go->GetEntry())
         {
-            case GO_HARPOON_GUN_1:
-                npc = DATA_HARPOON_FIRE_STATE_1;
-                spell = SPELL_CHAIN_1;
-                break;
-            case GO_HARPOON_GUN_2:
-                npc = DATA_HARPOON_FIRE_STATE_2;
-                spell = SPELL_CHAIN_2;
-                break;
-            case GO_HARPOON_GUN_3:
-                npc = DATA_HARPOON_FIRE_STATE_3;
-                spell = SPELL_CHAIN_3;
-                break;
-            case GO_HARPOON_GUN_4:
-                npc = DATA_HARPOON_FIRE_STATE_4;
-                spell = SPELL_CHAIN_4;
-                break;
+            case GO_HARPOON_GUN_1: spell = SPELL_CHAIN_1; break;
+            case GO_HARPOON_GUN_2: spell = SPELL_CHAIN_2; break;
+            case GO_HARPOON_GUN_3: spell = SPELL_CHAIN_3; break;
+            case GO_HARPOON_GUN_4: spell = SPELL_CHAIN_4; break;
         }
 
-        if (Creature* hfs = pInstance->GetCreature(npc))
-                hfs->AI()->SetData(3, spell);
+        if (Creature* hfs = go->FindNearestCreature(NPC_HARPOON_FIRE_STATE, 5.0f))
+            hfs->AI()->SetData(3, spell);
 
         go->SetLootState(GO_JUST_DEACTIVATED);
         return true;

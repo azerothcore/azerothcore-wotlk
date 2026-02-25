@@ -644,6 +644,7 @@ void WorldConfig::BuildConfigCache()
     //Debug
     SetConfigValue<bool>(CONFIG_DEBUG_BATTLEGROUND, "Debug.Battleground", false);
     SetConfigValue<bool>(CONFIG_DEBUG_ARENA, "Debug.Arena", false);
+    SetConfigValue<bool>(CONFIG_DEBUG_LFG, "Debug.LFG", false);
 
     SetConfigValue<uint32>(CONFIG_GM_LEVEL_CHANNEL_MODERATION, "Channel.ModerationGMLevel", 1);
 

@@ -268,9 +268,13 @@ public:
 
         // Check if triggered spell filtering applies
         // SpellAuras.cpp:2195-2208
+        static constexpr uint32 KILL_DEATH_PROC_FLAG_MASK =
+            PROC_FLAG_KILL | PROC_FLAG_KILLED | PROC_FLAG_DEATH;
+
         if (!config.auraHasCanProcFromProcs &&
             !(procEntry.AttributesMask & PROC_ATTR_TRIGGERED_CAN_PROC) &&
-            !(eventTypeMask & AUTO_ATTACK_PROC_FLAG_MASK))
+            !(eventTypeMask & AUTO_ATTACK_PROC_FLAG_MASK) &&
+            !(eventTypeMask & KILL_DEATH_PROC_FLAG_MASK))
         {
             // Filter triggered spells unless they have NOT_A_PROC
             if (config.isTriggered && !config.spellHasNotAProc)

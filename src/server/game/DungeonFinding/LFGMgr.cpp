@@ -42,7 +42,7 @@
 
 namespace lfg
 {
-    LFGMgr::LFGMgr(): m_lfgProposalId(1), m_options(sWorld->getIntConfig(CONFIG_LFG_OPTIONSMASK)), m_Testing(false)
+    LFGMgr::LFGMgr(): m_lfgProposalId(1), m_options(sWorld->getIntConfig(CONFIG_LFG_OPTIONSMASK)), m_Testing(sWorld->getBoolConfig(CONFIG_DEBUG_LFG))
     {
         for (uint8 team = 0; team < 2; ++team)
         {
@@ -805,8 +805,16 @@ namespace lfg
 
     void LFGMgr::ToggleTesting()
     {
-        m_Testing = !m_Testing;
-        ChatHandler(nullptr).SendWorldText(m_Testing ? LANG_DEBUG_LFG_ON : LANG_DEBUG_LFG_OFF);
+        if (sWorld->getBoolConfig(CONFIG_DEBUG_LFG))
+        {
+            m_Testing = true;
+            ChatHandler(nullptr).SendWorldText(LANG_DEBUG_LFG_CONF);
+        }
+        else
+        {
+            m_Testing = !m_Testing;
+            ChatHandler(nullptr).SendWorldText(m_Testing ? LANG_DEBUG_LFG_ON : LANG_DEBUG_LFG_OFF);
+        }
     }
 
     /**
