@@ -746,10 +746,13 @@ bool PetAI::CanAttack(Unit* target, SpellInfo const* spellInfo)
 
         // Check if our owner selected this target and clicked "attack"
         Unit* ownerTarget = nullptr;
-        if (Player* owner = me->GetCharmerOrOwner()->ToPlayer())
+        Unit* charmerOrOwner = me->GetCharmerOrOwner();
+        if (!charmerOrOwner)
+            return false;
+        if (Player* owner = charmerOrOwner->ToPlayer())
             ownerTarget = owner->GetSelectedUnit();
         else
-            ownerTarget = me->GetCharmerOrOwner()->GetVictim();
+            ownerTarget = charmerOrOwner->GetVictim();
 
         if (ownerTarget && me->GetCharmInfo()->IsCommandAttack())
             return (target->GetGUID() == ownerTarget->GetGUID());
