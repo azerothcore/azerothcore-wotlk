@@ -1368,6 +1368,7 @@ enum AcoreStrings
     // 30087-30095 reserved for passive anticheat
 
     LANG_DEBUG_LFG_ON                             = 30096,
-    LANG_DEBUG_LFG_OFF                            = 30097
+    LANG_DEBUG_LFG_OFF                            = 30097,
+    LANG_DEBUG_LFG_CONF                           = 30098
 };
 #endif

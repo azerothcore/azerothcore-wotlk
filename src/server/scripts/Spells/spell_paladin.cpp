@@ -2157,7 +2157,7 @@ class spell_pal_light_s_beacon : public AuraScript
         if (!beaconTarget || !beaconTarget->HasAura(SPELL_PALADIN_BEACON_OF_LIGHT_AURA, eventInfo.GetActor()->GetGUID()))
             return;
 
-        eventInfo.GetActor()->CastCustomSpell(healSpellId, SPELLVALUE_BASE_POINT0, heal, beaconTarget, true, nullptr, aurEff);
+        eventInfo.GetActor()->CastCustomSpell(healSpellId, SPELLVALUE_BASE_POINT0, heal, beaconTarget, true, nullptr, aurEff, eventInfo.GetActor()->GetGUID());
     }
 
     void Register() override

@@ -1296,45 +1296,6 @@ class spell_sha_flurry_proc : public AuraScript
     }
 };
 
-// 64928 - Item - Shaman T8 Elemental 4P Bonus
-class spell_sha_t8_electrified : public AuraScript
-{
-    PrepareAuraScript(spell_sha_t8_electrified);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_SHAMAN_ELECTRIFIED });
-    }
-
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
-    {
-        PreventDefaultAction();
-
-        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
-        if (!damageInfo || !damageInfo->GetDamage())
-            return;
-
-        // Do not proc from Lightning Overload (patch 3.1~)
-        if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
-        {
-            if (spellInfo->Id == SPELL_SHAMAN_LIGHTNING_BOLT_OVERLOAD)
-            {
-                return;
-            }
-        }
-
-        SpellInfo const* electrifiedDot = sSpellMgr->AssertSpellInfo(SPELL_SHAMAN_ELECTRIFIED);
-        int32 amount = int32(CalculatePct(eventInfo.GetDamageInfo()->GetDamage(), aurEff->GetAmount()) / electrifiedDot->GetMaxTicks());
-
-        eventInfo.GetProcTarget()->CastDelayedSpellWithPeriodicAmount(eventInfo.GetActor(), SPELL_SHAMAN_ELECTRIFIED, SPELL_AURA_PERIODIC_DAMAGE, amount);
-    }
-
-    void Register() override
-    {
-        OnEffectProc += AuraEffectProcFn(spell_sha_t8_electrified::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
-    }
-};
-
 // 55440 - Glyph of Healing Wave
 class spell_sha_glyph_of_healing_wave : public AuraScript
 {
@@ -2063,16 +2024,18 @@ class spell_sha_t8_elemental_4p_bonus : public AuraScript
         if (!damageInfo || !damageInfo->GetDamage())
             return;
 
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_SHAMAN_ELECTRIFIED);
-        if (!spellInfo)
-            return;
+        // Do not proc from Lightning Overload (patch 3.1~)
+        if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
+        {
+            if (spellInfo->Id == SPELL_SHAMAN_LIGHTNING_BOLT_OVERLOAD)
+                return;
+        }
 
+        SpellInfo const* electrifiedDot = sSpellMgr->AssertSpellInfo(SPELL_SHAMAN_ELECTRIFIED);
         int32 amount = CalculatePct(static_cast<int32>(damageInfo->GetDamage()), aurEff->GetAmount());
-        amount /= spellInfo->GetMaxTicks();
+        amount /= electrifiedDot->GetMaxTicks();
 
-        Unit* caster = eventInfo.GetActor();
-        Unit* target = eventInfo.GetActionTarget();
-        target->CastDelayedSpellWithPeriodicAmount(caster, SPELL_SHAMAN_ELECTRIFIED, SPELL_AURA_PERIODIC_DAMAGE, amount);
+        eventInfo.GetProcTarget()->CastDelayedSpellWithPeriodicAmount(eventInfo.GetActor(), SPELL_SHAMAN_ELECTRIFIED, SPELL_AURA_PERIODIC_DAMAGE, amount);
     }
 
     void Register() override
@@ -2242,7 +2205,6 @@ void AddSC_shaman_spell_scripts()
     RegisterSpellScript(spell_sha_stoneclaw_totem);
     RegisterSpellScript(spell_sha_thunderstorm);
     RegisterSpellScript(spell_sha_flurry_proc);
-    RegisterSpellScript(spell_sha_t8_electrified);
     RegisterSpellScript(spell_sha_glyph_of_healing_wave);
     RegisterSpellScript(spell_sha_spirit_hunt);
     RegisterSpellScript(spell_sha_frozen_power);
