@@ -1306,54 +1306,6 @@ class spell_warl_voidwalker_pet_passive : public AuraScript
     }
 };
 
-// 54909, 53646 - Demonic Pact
-class spell_warl_demonic_pact_aura : public AuraScript
-{
-    PrepareAuraScript(spell_warl_demonic_pact_aura);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_WARLOCK_DEMONIC_PACT_PROC });
-    }
-
-    bool AfterCheckProc(ProcEventInfo& eventInfo, bool isTriggeredAtSpellProcEvent)
-    {
-        return isTriggeredAtSpellProcEvent && eventInfo.GetActor() && eventInfo.GetActor()->IsPet();
-    }
-
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
-    {
-        PreventDefaultAction();
-
-        if (eventInfo.GetActor()->HasSpellCooldown(aurEff->GetId()))
-            return;
-
-        if (Unit* owner = eventInfo.GetActor()->GetOwner())
-        {
-            int32 currentBonus = 0;
-            if (AuraEffect* demonicAurEff = owner->GetAuraEffect(SPELL_WARLOCK_DEMONIC_PACT_PROC, EFFECT_0))
-            {
-                currentBonus = demonicAurEff->GetAmount();
-            }
-
-            if (AuraEffect* talentAurEff = owner->GetDummyAuraEffect(SPELLFAMILY_WARLOCK, WARLOCK_ICON_ID_DEMONIC_PACT, EFFECT_0))
-            {
-                int32 spellDamageMinusBonus = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_MAGIC) - currentBonus;
-                if (spellDamageMinusBonus < 0)
-                    return;
-                int32 bp = int32((talentAurEff->GetAmount() / 100.0f) * spellDamageMinusBonus);
-                owner->CastCustomSpell((Unit*)nullptr, SPELL_WARLOCK_DEMONIC_PACT_PROC, &bp, &bp, 0, true, nullptr, talentAurEff);
-                eventInfo.GetActor()->AddSpellCooldown(aurEff->GetId(), 0, eventInfo.GetProcCooldown());
-            }
-        }
-    }
-
-    void Register() override
-    {
-        OnEffectProc += AuraEffectProcFn(spell_warl_demonic_pact_aura::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
-    }
-};
-
 // -980 - Curse of Agony
 class spell_warl_curse_of_agony : public AuraScript
 {
@@ -1861,7 +1813,6 @@ void AddSC_warlock_spell_scripts()
     RegisterSpellScript(spell_warl_drain_soul);
     RegisterSpellScript(spell_warl_shadowburn);
     RegisterSpellScript(spell_warl_voidwalker_pet_passive);
-    RegisterSpellScript(spell_warl_demonic_pact_aura);
     RegisterSpellScript(spell_warl_curse_of_agony);
     RegisterSpellScript(spell_warl_glyph_of_corruption_nightfall);
     RegisterSpellScript(spell_warl_nightfall);
