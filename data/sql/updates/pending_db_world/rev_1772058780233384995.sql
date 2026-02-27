@@ -31,3 +31,24 @@ UPDATE `item_template` SET `dmg_min1` = 339, `dmg_max1` = 632, `dmg_type1` = 0 W
 
 -- Wand of the Drowned Contessa (ILVL 264 Epic Wand)
 UPDATE `item_template` SET `dmg_min1` = 583, `dmg_max1` = 1083, `dmg_type1` = 4 WHERE `entry` = 50204;
+
+UPDATE `item_template` SET `MaxDurability`=55, `DisenchantID`=15, `RequiredDisenchantSkill`=325 WHERE `entry`=36477;
+UPDATE `item_template` SET `MaxDurability`=75, `DisenchantID`=15, `RequiredDisenchantSkill`=325 WHERE `entry`=36491;
+UPDATE `item_template` SET `MaxDurability`=85, `DisenchantID`=15, `RequiredDisenchantSkill`=325 WHERE `entry`=36505;
+UPDATE `item_template` SET `MaxDurability`=75, `DisenchantID`=15, `RequiredDisenchantSkill`=325 WHERE `entry`=36519;
+UPDATE `item_template` SET `MaxDurability`=85, `DisenchantID`=15, `RequiredDisenchantSkill`=325 WHERE `entry`=36533;
+UPDATE `item_template` SET `MaxDurability`=85, `DisenchantID`=15, `RequiredDisenchantSkill`=325 WHERE `entry`=36547;
+UPDATE `item_template` SET `MaxDurability`=75, `DisenchantID`=15, `RequiredDisenchantSkill`=325 WHERE `entry`=36575;
+UPDATE `item_template` SET `MaxDurability`=85, `DisenchantID`=15, `RequiredDisenchantSkill`=325 WHERE `entry`=36589;
+UPDATE `item_template` SET `MaxDurability`=85, `DisenchantID`=15, `RequiredDisenchantSkill`=325 WHERE `entry`=36603;
+UPDATE `item_template` SET `MaxDurability`=65, `DisenchantID`=15, `RequiredDisenchantSkill`=325 WHERE `entry`=36617;
+UPDATE `item_template` SET `MaxDurability`=65, `DisenchantID`=15, `RequiredDisenchantSkill`=325 WHERE `entry`=36631;
+UPDATE `item_template` SET `MaxDurability`=65, `DisenchantID`=15, `RequiredDisenchantSkill`=325 WHERE `entry`=36645;
+UPDATE `item_template` SET `MaxDurability`=55, `DisenchantID`=15, `RequiredDisenchantSkill`=325 WHERE `entry`=36659;
+UPDATE `item_template` SET `MaxDurability`=55, `DisenchantID`=15, `RequiredDisenchantSkill`=325 WHERE `entry`=36673;
+UPDATE `item_template` SET `MaxDurability`=75, `DisenchantID`=15, `RequiredDisenchantSkill`=325 WHERE `entry`=36687;
+UPDATE `item_template` SET `MaxDurability`=85, `DisenchantID`=15, `RequiredDisenchantSkill`=325 WHERE `entry`=36701;
+UPDATE `item_template` SET `MaxDurability`=0, `DisenchantID`=15, `RequiredDisenchantSkill`=325 WHERE `entry`=36715;
+
+UPDATE `item_template` SET `MaxDurability`=105 WHERE `entry`=42238;
+UPDATE `item_template` SET `MaxDurability`=75, `DisenchantID`=68, `RequiredDisenchantSkill`=375 WHERE `entry`=50204;
