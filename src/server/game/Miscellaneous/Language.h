@@ -1347,6 +1347,8 @@ enum AcoreStrings
     LANG_BAN_IP_YOUBANNEDMESSAGE_WORLD            = 11017,
     LANG_BAN_IP_YOUPERMBANNEDMESSAGE_WORLD        = 11018,
 
+    LANG_LFG_COOLDOWN_CLEARED                     = 11019,
+
     LANG_MUTED_PLAYER                             = 30000, // Mute for player 2 hour
 
     // Instant Flight

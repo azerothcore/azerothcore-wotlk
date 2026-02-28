@@ -3405,6 +3405,16 @@ DungeonFinder.CastDeserter = 1
 DungeonFinder.AllowCompleted = 1
 
 #
+#    DungeonFinder.DungeonSelectionCooldown
+#
+#        Description: Duration in minutes for the dungeon selection cooldown. Players who complete a
+#                     random dungeon via LFG will not be assigned the same dungeon again for this
+#                     duration. This reduces the chance of getting the same dungeon in a row.
+#        Default:     0 - (Disabled)
+
+DungeonFinder.DungeonSelectionCooldown = 0
+
+#
 ###################################################################################################
 
 ###################################################################################################

@@ -1518,6 +1518,30 @@ class spell_hun_explosive_shot : public SpellScript
     }
 };
 
+// 34026 - Kill Command
+class spell_hun_kill_command : public SpellScript
+{
+    PrepareSpellScript(spell_hun_kill_command);
+
+    SpellCastResult CheckCast()
+    {
+        Unit* caster = GetCaster();
+        if (!caster || !caster->IsPlayer())
+            return SPELL_FAILED_NO_VALID_TARGETS;
+
+        Pet* pet = caster->ToPlayer()->GetPet();
+        if (!pet)
+            return SPELL_FAILED_NO_PET;
+
+        return SPELL_CAST_OK;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_hun_kill_command::CheckCast);
+    }
+};
+
 // 58914 - Kill Command (Pet Aura)
 class spell_hun_kill_command_pet : public AuraScript
 {
@@ -1704,6 +1728,7 @@ void AddSC_hunter_spell_scripts()
     RegisterSpellScript(spell_hun_glyph_of_mend_pet);
     // Proc system scripts
     RegisterSpellScript(spell_hun_rapid_recuperation);
+    RegisterSpellScript(spell_hun_kill_command);
     RegisterSpellScript(spell_hun_kill_command_pet);
     RegisterSpellScript(spell_hun_piercing_shots);
     RegisterSpellScript(spell_hun_rapid_recuperation_trigger);
