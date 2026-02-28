@@ -643,7 +643,7 @@ namespace lfg
 
         // Dungeon cooldown system - prevents same dungeon being assigned in a row
         typedef std::unordered_map<uint32 /*dungeonId*/, TimePoint /*completionTime*/> LfgDungeonCooldownMap;
-        typedef std::unordered_map<uint32 /*playerGuidLow*/, LfgDungeonCooldownMap> LfgDungeonCooldownContainer;
+        typedef std::unordered_map<ObjectGuid /*playerGuid*/, LfgDungeonCooldownMap> LfgDungeonCooldownContainer;
         LfgDungeonCooldownContainer DungeonCooldownStore;  ///< Stores dungeon cooldowns per player
         void AddDungeonCooldown(ObjectGuid guid, uint32 dungeonId);
         void CleanupDungeonCooldowns();

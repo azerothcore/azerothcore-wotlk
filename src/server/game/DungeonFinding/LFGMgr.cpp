@@ -170,9 +170,7 @@ namespace lfg
         if (!sWorld->getIntConfig(CONFIG_LFG_DUNGEON_SELECTION_COOLDOWN))
             return;
 
-        uint32 guidLow = guid.GetCounter();
-
-        DungeonCooldownStore[guidLow][dungeonId] = GameTime::Now();
+        DungeonCooldownStore[guid][dungeonId] = GameTime::Now();
     }
 
     void LFGMgr::CleanupDungeonCooldowns()
@@ -222,8 +220,7 @@ namespace lfg
             bool onCooldown = false;
             for (auto const& playerPair : players)
             {
-                uint32 guidLow = playerPair.first.GetCounter();
-                auto itPlayer = DungeonCooldownStore.find(guidLow);
+                auto itPlayer = DungeonCooldownStore.find(playerPair.first);
                 if (itPlayer != DungeonCooldownStore.end())
                 {
                     auto itDungeon = itPlayer->second.find(dungeonId);
