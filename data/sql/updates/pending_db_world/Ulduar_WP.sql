@@ -74,7 +74,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (13724500, 10, -250.02821, -26.687283, 409.80362, NULL, 0, 0, 0, 100, 0),
 (13724500, 11, -248.88693, 1.644477, 409.8046, NULL, 0, 0, 0, 100, 0);
 
--- Set MT, WD  (Mechagnome Battletank & Runeforged Sentry)
+-- Set MT, WD  (Mechagnome Battletank, Runeforged Sentry & Steelforged Defenders)
 UPDATE `creature` SET `MovementType` = 2 WHERE (`guid` IN (136790, 136789, 136799, 136812, 136792, 136806, 136791, 136794)) AND (`id1` = 34234);
 UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 0 WHERE (`id1` = 33236) AND (`guid` IN (137244, 137246, 137247, 137248, 137249, 137250, 137251));
 UPDATE `creature` SET `MovementType` = 2 WHERE (`guid` IN (136453)) AND (`id1` = 34164);
