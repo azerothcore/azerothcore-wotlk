@@ -3956,11 +3956,8 @@ void Spell::_cast(bool skipCheck)
     }
     else
     {
-        // CAST phase procs for non-channeled immediate spells
-        // (channeled spells handle this below to preserve spell mods)
-        // Note: triggered spells are allowed here; per-aura filtering via
-        // PROC_ATTR_TRIGGERED_CAN_PROC in SpellAuras.cpp handles rejection.
-        if (!m_spellInfo->IsChanneled() && m_originalCaster)
+        // CAST phase procs for immediate spells (including channeled)
+        if (m_originalCaster)
         {
             uint32 procAttacker = m_procAttacker;
             if (!procAttacker)
@@ -3996,6 +3993,31 @@ void Spell::_cast(bool skipCheck)
 
         // Immediate spell, no big deal
         handle_immediate();
+
+        // Clean up deferred 0-charge spell modifier auras
+        for (Aura* aura : m_appliedMods)
+        {
+            if (!aura->IsRemoved() && aura->IsUsingCharges()
+                && !aura->GetCharges())
+                aura->Remove();
+        }
+
+        // Also clean up deferred modifier auras not in m_appliedMods
+        if (Unit* caster = m_caster)
+        {
+            std::vector<Aura*> deferred;
+            for (auto const& [id, aura] : caster->GetOwnedAuras())
+            {
+                if (!aura->IsRemoved() && aura->IsUsingCharges()
+                    && !aura->GetCharges()
+                    && (aura->HasEffectType(SPELL_AURA_ADD_FLAT_MODIFIER)
+                        || aura->HasEffectType(SPELL_AURA_ADD_PCT_MODIFIER)))
+                    deferred.push_back(aura);
+            }
+            for (Aura* aura : deferred)
+                if (!aura->IsRemoved())
+                    aura->Remove();
+        }
     }
 
     if (resetAttackTimers)
@@ -4023,10 +4045,8 @@ void Spell::_cast(bool skipCheck)
     if (modOwner)
         modOwner->SetSpellModTakingSpell(this, false);
 
-    // CAST phase procs for delayed and channeled spells
-    // Note: triggered spells are allowed here; per-aura filtering via
-    // PROC_ATTR_TRIGGERED_CAN_PROC in SpellAuras.cpp handles rejection.
-    if ((m_spellState == SPELL_STATE_DELAYED || m_spellInfo->IsChanneled())
+    // CAST phase procs for delayed spells
+    if (m_spellState == SPELL_STATE_DELAYED
         && m_originalCaster)
     {
         uint32 procAttacker = m_procAttacker;
@@ -4137,6 +4157,14 @@ void Spell::handle_immediate()
 
     // process immediate effects (items, ground, etc.) also initialize some variables
     _handle_immediate_phase();
+
+    // Sync persistent area aura duration with hasted channel duration
+    if (m_spellInfo->IsChanneled() && m_spellAura && m_channeledDuration > 0
+        && m_spellAura->GetType() == DYNOBJ_AURA_TYPE)
+    {
+        m_spellAura->SetMaxDuration(m_channeledDuration);
+        m_spellAura->SetDuration(m_channeledDuration);
+    }
 
     for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
         DoAllEffectOnTarget(&(*ihit));
