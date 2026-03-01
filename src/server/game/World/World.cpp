@@ -436,6 +436,9 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading Spell Jump Distances...");
     sSpellMgr->LoadSpellJumpDistances();
 
+    LOG_INFO("server.loading", "Loading SpellInfo Immunity infos...");
+    sSpellMgr->LoadSpellInfoImmunities();
+
     LOG_INFO("server.loading", "Loading Player Totem models...");
     sObjectMgr->LoadPlayerTotemModels();
 

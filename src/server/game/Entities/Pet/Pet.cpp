@@ -491,7 +491,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
         }
 
         // must be after SetMinion (owner guid check)
-        //LoadTemplateImmunities();
+        LoadTemplateImmunities(0);
         //LoadMechanicTemplateImmunity();
         m_loading = false;
     });

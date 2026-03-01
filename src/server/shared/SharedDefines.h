@@ -420,7 +420,7 @@ enum SpellAttr1 : uint32
     SPELL_ATTR1_TOGGLE_FAR_SIGHT                         = 0x00002000, // TITLE Farsight aura (client only)
     SPELL_ATTR1_TRACK_TARGET_IN_CHANNEL                  = 0x00004000, // TITLE Track target while channeling DESCRIPTION While channeling, adjust facing to face target
     SPELL_ATTR1_IMMUNITY_PURGES_EFFECT                   = 0x00008000, // TITLE Immunity cancels preapplied auras DESCRIPTION For immunity spells, cancel all auras that this spell would make you immune to when the spell is applied
-    SPELL_ATTR1_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS = 0x00010000, // TITLE Unaffected by school immunities DESCRIPTION Will not pierce Divine Shield, Ice Block and other full invulnerabilities
+    SPELL_ATTR1_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS = 0x00010000, // TITLE Immunity to Hostile & Friendly Effects DESCRIPTION Immunity applied by this aura will also be checked for friendly spells (school immunity only) - used by Cyclone for example to cause friendly spells and healing over time to be immune
     SPELL_ATTR1_NO_AUTOCAST_AI                           = 0x00020000, // TITLE Cannot be autocast by pet DESCRIPTION (AI)
     SPELL_ATTR1_PREVENTS_ANIM                            = 0x00040000, // TITLE NYI, auras apply UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT
     SPELL_ATTR1_EXCLUDE_CASTER                           = 0x00080000, // TITLE Cannot be self-cast
@@ -1285,7 +1285,7 @@ enum AuraStateType
     //AURA_STATE_UNKNOWN6                   = 6,            //     | not used
     AURA_STATE_HUNTER_PARRY                 = 7,            // C   |
     //AURA_STATE_UNKNOWN7                   = 7,            //  c  | creature cheap shot / focused bursts spells
-    //AURA_STATE_UNKNOWN8                   = 8,            //    t| test spells
+    AURA_STATE_BANISHED                     = 8,            //  c t| banished
     //AURA_STATE_UNKNOWN9                   = 9,            //     |
     AURA_STATE_WARRIOR_VICTORY_RUSH         = 10,           // C   | warrior victory rush
     //AURA_STATE_UNKNOWN11                  = 11,           // C  t| 60348 - Maelstrom Ready!, test spells
@@ -1342,17 +1342,34 @@ enum Mechanics : uint32
     MECHANIC_IMMUNE_SHIELD    = 29,                         // Divine (Blessing) Shield/Protection and Ice Block
     MECHANIC_SAPPED           = 30,
     MECHANIC_ENRAGED          = 31,
-    MAX_MECHANIC              = 32 // SKIP
+    MECHANIC_WOUNDED          = 32,
+    MECHANIC_INFECTED_2       = 33,
+    MECHANIC_INFECTED_3       = 34,
+    MECHANIC_INFECTED_4       = 35,
+    MECHANIC_TAUNTED          = 36,
+    MAX_MECHANIC              = 37 // SKIP
 };
 
 // Used for spell 42292 Immune Movement Impairment and Loss of Control (0x49967ca6)
-#define IMMUNE_TO_MOVEMENT_IMPAIRMENT_AND_LOSS_CONTROL_MASK (\
-    (1<<MECHANIC_CHARM)|(1<<MECHANIC_DISORIENTED)|(1<<MECHANIC_FEAR)| \
-    (1<<MECHANIC_ROOT)|(1<<MECHANIC_SLEEP)|(1<<MECHANIC_SNARE)| \
-    (1<<MECHANIC_STUN)|(1<<MECHANIC_FREEZE)|(1<<MECHANIC_KNOCKOUT)| \
-    (1<<MECHANIC_POLYMORPH)|(1<<MECHANIC_BANISH)|(1<<MECHANIC_SHACKLE)| \
-    (1<<MECHANIC_TURN)|(1<<MECHANIC_HORROR)|(1<<MECHANIC_DAZE)| \
-    (1<<MECHANIC_SAPPED))
+inline constexpr uint64 IMMUNE_TO_MOVEMENT_IMPAIRMENT_AND_LOSS_CONTROL_MASK =
+    (UI64LIT(1) << MECHANIC_CHARM) |
+    (UI64LIT(1) << MECHANIC_DISORIENTED) |
+    (UI64LIT(1) << MECHANIC_FEAR) |
+    (UI64LIT(1) << MECHANIC_ROOT) |
+    (UI64LIT(1) << MECHANIC_SLEEP) |
+    (UI64LIT(1) << MECHANIC_SNARE) |
+    (UI64LIT(1) << MECHANIC_STUN) |
+    (UI64LIT(1) << MECHANIC_FREEZE) |
+    (UI64LIT(1) << MECHANIC_SILENCE) |
+    (UI64LIT(1) << MECHANIC_DISARM) |
+    (UI64LIT(1) << MECHANIC_KNOCKOUT) |
+    (UI64LIT(1) << MECHANIC_POLYMORPH) |
+    (UI64LIT(1) << MECHANIC_BANISH) |
+    (UI64LIT(1) << MECHANIC_SHACKLE) |
+    (UI64LIT(1) << MECHANIC_TURN) |
+    (UI64LIT(1) << MECHANIC_HORROR) |
+    (UI64LIT(1) << MECHANIC_DAZE) |
+    (UI64LIT(1) << MECHANIC_SAPPED);
 
 // Spell dispel type
 enum DispelType
@@ -1368,7 +1385,8 @@ enum DispelType
     DISPEL_SPE_NPC_ONLY = 8,
     DISPEL_ENRAGE       = 9,
     DISPEL_ZG_TICKET    = 10,
-    DESPEL_OLD_UNUSED   = 11
+    DESPEL_OLD_UNUSED   = 11,
+    DISPEL_MAX
 };
 
 #define DISPEL_ALL_MASK ((1<<DISPEL_MAGIC) | (1<<DISPEL_CURSE) | (1<<DISPEL_DISEASE) | (1<<DISPEL_POISON))
