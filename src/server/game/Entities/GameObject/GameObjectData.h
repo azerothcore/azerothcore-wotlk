@@ -689,6 +689,8 @@ struct AC_GAME_API QuaternionData
     QuaternionData(float X, float Y, float Z, float W) : x(X), y(Y), z(Z), w(W) { }
 
     [[nodiscard]] bool IsUnit() const;
+    void ToEulerAnglesZYX(float& Z, float& Y, float& X) const;
+    [[nodiscard]] static QuaternionData FromEulerAnglesZYX(float Z, float Y, float X);
 };
 
 // `gameobject_addon` table

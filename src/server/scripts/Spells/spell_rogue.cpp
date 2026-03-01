@@ -51,7 +51,10 @@ enum RogueSpells
     SPELL_ROGUE_TURN_THE_TABLES_R1              = 52910,
     SPELL_ROGUE_TURN_THE_TABLES_R2              = 52914,
     SPELL_ROGUE_TURN_THE_TABLES_R3              = 52915,
-    SPELL_ROGUE_OVERKILL_TRIGGERED              = 58427
+    SPELL_ROGUE_OVERKILL_TRIGGERED              = 58427,
+    SPELL_ROGUE_HONOR_AMONG_THIEVES_PROC        = 52916,
+    SPELL_ROGUE_HONOR_AMONG_THIEVES_TRIGGERED   = 51699,
+    SPELL_ROGUE_COLD_BLOOD                      = 14177
 };
 
 enum RogueSpellIcons
@@ -842,19 +845,22 @@ class spell_rog_cut_to_the_chase : public AuraScript
 {
     PrepareAuraScript(spell_rog_cut_to_the_chase);
 
-    void HandleProc(ProcEventInfo& /*eventInfo*/)
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-        // Refresh Slice and Dice to 5 combo point max duration
-        if (AuraEffect const* snDEffect = GetTarget()->GetAuraEffect(SPELL_AURA_MOD_MELEE_HASTE, SPELLFAMILY_ROGUE, 0x40000, 0, 0))
+        // Refresh Slice and Dice to its 5 combo point maximum duration
+        Unit* caster = eventInfo.GetActor();
+        if (AuraEffect const* snd = caster->GetAuraEffect(SPELL_AURA_MOD_MELEE_HASTE, SPELLFAMILY_ROGUE, 0x40000, 0, 0, caster->GetGUID()))
         {
-            snDEffect->GetBase()->SetDuration(snDEffect->GetSpellInfo()->GetMaxDuration(), true);
+            int32 maxDuration = snd->GetSpellInfo()->GetMaxDuration();
+            snd->GetBase()->SetDuration(maxDuration, true);
+            snd->GetBase()->SetMaxDuration(snd->GetBase()->GetDuration());
         }
     }
 
     void Register() override
     {
-        OnProc += AuraProcFn(spell_rog_cut_to_the_chase::HandleProc);
+        OnEffectProc += AuraEffectProcFn(spell_rog_cut_to_the_chase::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
     }
 };
 
@@ -932,6 +938,87 @@ class spell_rog_setup : public AuraScript
     }
 };
 
+// 51698, 51700, 51701 - Honor Among Thieves
+class spell_rog_honor_among_thieves : public AuraScript
+{
+    PrepareAuraScript(spell_rog_honor_among_thieves);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_ROGUE_HONOR_AMONG_THIEVES_TRIGGERED });
+    }
+
+    bool CheckProc(ProcEventInfo& /*eventInfo*/)
+    {
+        Unit* caster = GetCaster();
+        if (!caster || caster->HasAura(SPELL_ROGUE_HONOR_AMONG_THIEVES_TRIGGERED))
+            return false;
+
+        return true;
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+    {
+        PreventDefaultAction();
+
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+
+        Unit* target = GetTarget();
+        target->CastSpell(target, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true, nullptr, aurEff, caster->GetGUID());
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_rog_honor_among_thieves::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_rog_honor_among_thieves::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
+// 52916 - Honor Among Thieves (Proc)
+class spell_rog_honor_among_thieves_proc : public SpellScript
+{
+    PrepareSpellScript(spell_rog_honor_among_thieves_proc);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        targets.clear();
+
+        Unit* target = GetOriginalCaster();
+        if (!target)
+            return;
+
+        targets.push_back(target);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_rog_honor_among_thieves_proc::FilterTargets, EFFECT_0, TARGET_UNIT_CASTER_AREA_PARTY);
+    }
+};
+
+// 52916 - Honor Among Thieves (Proc Aura)
+class spell_rog_honor_among_thieves_proc_aura : public AuraScript
+{
+    PrepareAuraScript(spell_rog_honor_among_thieves_proc_aura);
+
+    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+
+        if (Player* player = caster->ToPlayer())
+            player->CastSpell(static_cast<Unit*>(nullptr), SPELL_ROGUE_HONOR_AMONG_THIEVES_TRIGGERED, true);
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_rog_honor_among_thieves_proc_aura::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+    }
+};
+
 // -51627 - Turn the Tables
 class spell_rog_turn_the_tables : public AuraScript
 {
@@ -960,13 +1047,105 @@ class spell_rog_turn_the_tables : public AuraScript
 };
 
 // 52910, 52914, 52915 - Turn the Tables (proc)
-class spell_rog_turn_the_tables_proc : public AuraScript
+class spell_rog_turn_the_tables_proc : public SpellScript
 {
-    PrepareAuraScript(spell_rog_turn_the_tables_proc);
+    PrepareSpellScript(spell_rog_turn_the_tables_proc);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        targets.clear();
+        targets.push_back(GetCaster());
+    }
 
     void Register() override
     {
-        // No special handling needed - default behavior
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_rog_turn_the_tables_proc::FilterTargets, EFFECT_0, TARGET_UNIT_CASTER_AREA_RAID);
+    }
+};
+
+// -51634 - Focused Attacks
+// Block Fan of Knives offhand from proccing
+class spell_rog_focused_attacks : public AuraScript
+{
+    PrepareAuraScript(spell_rog_focused_attacks);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        // Block Fan of Knives offhand (0x40000) from proccing
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        if (spellInfo && spellInfo->SpellFamilyName == SPELLFAMILY_ROGUE
+            && (spellInfo->SpellFamilyFlags[1] & 0x40000)
+            && (eventInfo.GetTypeMask() & PROC_FLAG_DONE_OFFHAND_ATTACK))
+            return false;
+
+        return true;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_rog_focused_attacks::CheckProc);
+    }
+};
+
+// 14177 - Cold Blood
+class spell_rog_cold_blood : public AuraScript
+{
+    PrepareAuraScript(spell_rog_cold_blood);
+
+    bool _usedByMutilate = false;
+
+public:
+    bool WasUsedByMutilate() const { return _usedByMutilate; }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        if (!spellInfo)
+            return true;
+
+        // Block Mutilate MH (0x2) and OH (0x4) from consuming the charge
+        if (spellInfo->SpellFamilyName == SPELLFAMILY_ROGUE
+            && (spellInfo->SpellFamilyFlags[1] & 0x6))
+        {
+            _usedByMutilate = true;
+            return false;
+        }
+
+        return true;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_rog_cold_blood::CheckProc);
+    }
+};
+
+// 1329 - Mutilate (parent spell, all ranks)
+class spell_rog_mutilate : public SpellScript
+{
+    PrepareSpellScript(spell_rog_mutilate);
+
+    void HandleAfterCast()
+    {
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+
+        Aura* cb = caster->GetAura(SPELL_ROGUE_COLD_BLOOD);
+        if (!cb)
+            return;
+
+        auto* script = dynamic_cast<spell_rog_cold_blood*>(
+            cb->GetScriptByName("spell_rog_cold_blood"));
+        if (!script || !script->WasUsedByMutilate())
+            return;
+
+        cb->Remove();
+    }
+
+    void Register() override
+    {
+        AfterCast += SpellCastFn(spell_rog_mutilate::HandleAfterCast);
     }
 };
 
@@ -996,6 +1175,11 @@ void AddSC_rogue_spell_scripts()
     RegisterSpellScript(spell_rog_deadly_brew);
     RegisterSpellScript(spell_rog_quick_recovery);
     RegisterSpellScript(spell_rog_setup);
+    RegisterSpellScript(spell_rog_honor_among_thieves);
+    RegisterSpellAndAuraScriptPair(spell_rog_honor_among_thieves_proc, spell_rog_honor_among_thieves_proc_aura);
     RegisterSpellScript(spell_rog_turn_the_tables);
     RegisterSpellScript(spell_rog_turn_the_tables_proc);
+    RegisterSpellScript(spell_rog_focused_attacks);
+    RegisterSpellScript(spell_rog_mutilate);
+    RegisterSpellScript(spell_rog_cold_blood);
 }

@@ -23,6 +23,7 @@
 #include "InstanceScript.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "RaceMgr.h"
 #include "ScriptMgr.h"
 #include "SharedDefines.h"
 #include "Spell.h"
@@ -1773,6 +1774,7 @@ void SpellMgr::LoadSpellGroupStackRules()
 static bool InitTriggerAuraData();
 static bool isTriggerAura[TOTAL_AURAS];
 static bool isAlwaysTriggeredAura[TOTAL_AURAS];
+static uint32 spellTypeMask[TOTAL_AURAS];
 static bool procPrepared = InitTriggerAuraData();
 
 // List of auras that CAN trigger but may not exist in spell_proc
@@ -1785,6 +1787,7 @@ bool InitTriggerAuraData()
     {
         isTriggerAura[i] = false;
         isAlwaysTriggeredAura[i] = false;
+        spellTypeMask[i] = PROC_SPELL_TYPE_MASK_ALL;
     }
     isTriggerAura[SPELL_AURA_DUMMY] = true;                                 // Most dummy auras should require scripting
     isTriggerAura[SPELL_AURA_MOD_CONFUSE] = true;                           // "Any direct damaging attack will revive targets"
@@ -1820,6 +1823,7 @@ bool InitTriggerAuraData()
     isTriggerAura[SPELL_AURA_ABILITY_IGNORE_AURASTATE] = true;
 
     isAlwaysTriggeredAura[SPELL_AURA_OVERRIDE_CLASS_SCRIPTS] = true;
+    isAlwaysTriggeredAura[SPELL_AURA_MOD_CONFUSE] = true;
     isAlwaysTriggeredAura[SPELL_AURA_MOD_FEAR] = true;
     isAlwaysTriggeredAura[SPELL_AURA_MOD_ROOT] = true;
     isAlwaysTriggeredAura[SPELL_AURA_MOD_STUN] = true;
@@ -1827,6 +1831,13 @@ bool InitTriggerAuraData()
     isAlwaysTriggeredAura[SPELL_AURA_SPELL_MAGNET] = true;
     isAlwaysTriggeredAura[SPELL_AURA_SCHOOL_ABSORB] = true;
     isAlwaysTriggeredAura[SPELL_AURA_MOD_STEALTH] = true;
+
+    spellTypeMask[SPELL_AURA_MOD_STEALTH]       = PROC_SPELL_TYPE_DAMAGE | PROC_SPELL_TYPE_NO_DMG_HEAL;
+    spellTypeMask[SPELL_AURA_MOD_CONFUSE]        = PROC_SPELL_TYPE_DAMAGE;
+    spellTypeMask[SPELL_AURA_MOD_FEAR]           = PROC_SPELL_TYPE_DAMAGE;
+    spellTypeMask[SPELL_AURA_MOD_ROOT]           = PROC_SPELL_TYPE_DAMAGE;
+    spellTypeMask[SPELL_AURA_MOD_STUN]           = PROC_SPELL_TYPE_DAMAGE;
+    spellTypeMask[SPELL_AURA_TRANSFORM]          = PROC_SPELL_TYPE_DAMAGE;
 
     return true;
 }
@@ -2000,6 +2011,7 @@ void SpellMgr::LoadSpellProcs()
 
         // Check if spell has any trigger aura effects
         bool found = false, addTriggerFlag = false;
+        uint32 procSpellTypeMask = PROC_SPELL_TYPE_NONE;
         for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
         {
             if (!spellInfo->Effects[i].IsEffect())
@@ -2013,10 +2025,10 @@ void SpellMgr::LoadSpellProcs()
                 continue;
 
             found = true;
+            procSpellTypeMask |= spellTypeMask[auraName];
 
             if (!addTriggerFlag && isAlwaysTriggeredAura[auraName])
                 addTriggerFlag = true;
-            break;
         }
 
         if (!found)
@@ -2029,7 +2041,6 @@ void SpellMgr::LoadSpellProcs()
         // Generate default proc entry from DBC data
         SpellProcEntry procEntry;
         procEntry.SchoolMask      = 0;
-        procEntry.SpellFamilyName = spellInfo->SpellFamilyName;
         procEntry.SpellFamilyMask[0] = 0;
         procEntry.SpellFamilyMask[1] = 0;
         procEntry.SpellFamilyMask[2] = 0;
@@ -2037,8 +2048,13 @@ void SpellMgr::LoadSpellProcs()
             if (spellInfo->Effects[i].IsEffect() && isTriggerAura[spellInfo->Effects[i].ApplyAuraName])
                 procEntry.SpellFamilyMask |= spellInfo->Effects[i].SpellClassMask;
 
+        if (procEntry.SpellFamilyMask)
+            procEntry.SpellFamilyName = spellInfo->SpellFamilyName;
+        else
+            procEntry.SpellFamilyName = 0;
+
         procEntry.ProcFlags = spellInfo->ProcFlags;
-        procEntry.SpellTypeMask   = PROC_SPELL_TYPE_MASK_ALL;
+        procEntry.SpellTypeMask   = procSpellTypeMask;
         procEntry.SpellPhaseMask  = PROC_SPELL_PHASE_HIT;
         procEntry.HitMask         = PROC_HIT_NONE; // uses default proc @see SpellMgr::CanSpellTriggerProcOnEvent
 
@@ -2057,6 +2073,20 @@ void SpellMgr::LoadSpellProcs()
             procEntry.AttributesMask |= PROC_ATTR_REQ_EXP_OR_HONOR;
         if (addTriggerFlag)
             procEntry.AttributesMask |= PROC_ATTR_TRIGGERED_CAN_PROC;
+
+        // Modifier auras with charges should require spellmod validation
+        if (spellInfo->ProcCharges)
+        {
+            for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+            {
+                if (spellInfo->Effects[i].IsAura(SPELL_AURA_ADD_FLAT_MODIFIER) ||
+                    spellInfo->Effects[i].IsAura(SPELL_AURA_ADD_PCT_MODIFIER))
+                {
+                    procEntry.AttributesMask |= PROC_ATTR_REQ_SPELLMOD;
+                    break;
+                }
+            }
+        }
 
         // Calculate DisableEffectsMask for effects that shouldn't trigger procs
         uint32 nonProcMask = 0;
@@ -2750,7 +2780,7 @@ void SpellMgr::LoadSpellAreas()
             }
         }
 
-        if (spellArea.raceMask && (spellArea.raceMask & RACEMASK_ALL_PLAYABLE) == 0)
+        if (spellArea.raceMask && (spellArea.raceMask & sRaceMgr->GetPlayableRaceMask()) == 0)
         {
             LOG_ERROR("sql.sql", "Spell {} listed in `spell_area` have wrong race mask ({}) requirement", spell, spellArea.raceMask);
             continue;

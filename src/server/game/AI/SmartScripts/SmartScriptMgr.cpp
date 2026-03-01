@@ -531,6 +531,18 @@ bool SmartAIMgr::IsTargetValid(SmartScriptHolder const& e)
             }
             break;
         }
+        case SMART_TARGET_FORMATION:
+        {
+            if (e.target.formation.type > 2)
+            {
+                LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} has invalid formation target type ({}, must be 0-2).",
+                    e.entryOrGuid, e.GetScriptType(), e.GetEventType(), e.GetActionType(), e.target.formation.type);
+                return false;
+            }
+            if (e.target.formation.entry && !IsCreatureValid(e, e.target.formation.entry))
+                return false;
+            return IsSAIBoolValid(e, e.target.formation.excludeSelf);
+        }
         case SMART_TARGET_HOSTILE_SECOND_AGGRO:
         case SMART_TARGET_HOSTILE_LAST_AGGRO:
         case SMART_TARGET_HOSTILE_RANDOM:
@@ -955,6 +967,7 @@ bool SmartAIMgr::CheckUnusedTargetParams(SmartScriptHolder const& e)
             case SMART_TARGET_RANDOM_POINT: return sizeof(SmartTarget::randomPoint);
             case SMART_TARGET_SUMMONED_CREATURES: return sizeof(SmartTarget::summonedCreatures);
             case SMART_TARGET_INSTANCE_STORAGE: return sizeof(SmartTarget::instanceStorage);
+            case SMART_TARGET_FORMATION: return sizeof(SmartTarget::formation);
             default:
                 LOG_WARN("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} is using a target {} with no unused params specified in SmartAIMgr::CheckUnusedTargetParams(), please report this.",
                             e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetTargetType());
