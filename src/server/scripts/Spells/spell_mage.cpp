@@ -958,23 +958,11 @@ class spell_mage_fingers_of_frost : public AuraScript
 
     void PrepareProc(ProcEventInfo& eventInfo)
     {
+        // Block channeled spells (e.g. Blizzard channel start) from consuming charges.
+        // All other filtering is handled by SpellPhaseMask=1 (CAST only) in spell_proc.
         if (Spell const* spell = eventInfo.GetProcSpell())
-        {
-            bool isTriggered = spell->IsTriggered();
-            bool isCastPhase = (eventInfo.GetSpellPhaseMask() & PROC_SPELL_PHASE_CAST) != 0;
-            bool isChanneled = spell->GetSpellInfo()->IsChanneled();
-            bool prevent = false;
-
-            if (isTriggered)
-                prevent = false;
-            else if (isChanneled)
-                prevent = true;
-            else if (!isCastPhase)
-                prevent = true;
-
-            if (prevent)
+            if (spell->GetSpellInfo()->IsChanneled())
                 PreventDefaultAction();
-        }
     }
 
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)

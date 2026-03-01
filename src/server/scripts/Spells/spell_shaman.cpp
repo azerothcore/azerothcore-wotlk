@@ -1384,7 +1384,7 @@ class spell_sha_frozen_power : public AuraScript
         if (GetTarget()->GetDistance(target) < 15.0f)
             return false;
 
-        return roll_chance_i(GetEffect(EFFECT_0)->GetAmount());
+        return roll_chance_i(GetEffect(EFFECT_1)->GetAmount());
     }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)

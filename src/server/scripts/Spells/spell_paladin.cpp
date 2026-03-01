@@ -2088,18 +2088,12 @@ class spell_pal_light_s_beacon : public AuraScript
             SPELL_PALADIN_BEACON_OF_LIGHT_AURA,
             SPELL_PALADIN_BEACON_OF_LIGHT_FLASH,
             SPELL_PALADIN_BEACON_OF_LIGHT_HOLY,
-            SPELL_PALADIN_HOLY_LIGHT_R1,
-            SPELL_PALADIN_JUDGEMENT_OF_LIGHT_HEAL
+            SPELL_PALADIN_HOLY_LIGHT_R1
         });
     }
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        // Don't proc from Judgement of Light heals — JoL sets originalCaster to
-        // the paladin for combat log, but the heal is actually cast by the attacker.
-        if (eventInfo.GetSpellInfo() && eventInfo.GetSpellInfo()->Id == SPELL_PALADIN_JUDGEMENT_OF_LIGHT_HEAL)
-            return false;
-
         // Don't proc if the heal target is the beacon target (no double heal)
         if (GetTarget()->HasAura(SPELL_PALADIN_BEACON_OF_LIGHT_AURA, eventInfo.GetActor()->GetGUID()))
             return false;

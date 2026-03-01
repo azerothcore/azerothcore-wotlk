@@ -5903,7 +5903,10 @@ class spell_item_swift_hand_justice_dummy : public AuraScript
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-        eventInfo.GetActor()->CastSpell(nullptr, SPELL_SWIFT_HAND_OF_JUSTICE_HEAL, true, nullptr, aurEff);
+
+        Unit* caster = eventInfo.GetActor();
+        int32 bp0 = static_cast<int32>(caster->CountPctFromMaxHealth(aurEff->GetAmount()));
+        caster->CastCustomSpell(SPELL_SWIFT_HAND_OF_JUSTICE_HEAL, SPELLVALUE_BASE_POINT0, bp0, nullptr, true, nullptr, aurEff);
     }
 
     void Register() override
