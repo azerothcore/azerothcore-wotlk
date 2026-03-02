@@ -493,6 +493,40 @@ public:
     }
 
     // =============================================================================
+    // Cascade Proc Suppression - simulates Unit.cpp TriggerAurasProcOnEvent
+    // =============================================================================
+
+    /**
+     * @brief Configuration for simulating cascade proc suppression
+     *
+     * Models the two paths in TriggerAurasProcOnEvent that call SetCantProc():
+     * 1. Outer check: triggering spell has TRIGGERED_DISALLOW_PROC_EVENTS
+     * 2. Per-aura check: aura has SPELL_ATTR3_INSTANT_TARGET_PROCS (0x80000)
+     */
+    struct CascadeProcConfig
+    {
+        bool triggeringSpellIsProcDisabled = false;  // Spell::IsProcDisabled()
+        bool auraHasDisableProcAttr = false;         // SpellInfo::HasAttribute(SPELL_ATTR3_INSTANT_TARGET_PROCS)
+    };
+
+    /**
+     * @brief Returns true if cascading procs should be suppressed for this aura
+     *
+     * @param config Cascade proc configuration
+     * @return true if SetCantProc(true) would be active during this aura's proc
+     */
+    static bool ShouldSuppressCascadingProc(CascadeProcConfig const& config)
+    {
+        // Outer check: triggering spell disables all cascading procs
+        if (config.triggeringSpellIsProcDisabled)
+            return true;
+        // Per-aura check: aura itself suppresses cascading
+        if (config.auraHasDisableProcAttr)
+            return true;
+        return false;
+    }
+
+    // =============================================================================
     // Conditions System - simulates SpellAuras.cpp:2232-2236
     // =============================================================================
 
