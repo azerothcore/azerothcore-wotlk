@@ -434,6 +434,8 @@ void Battlefield::PlayerAcceptInviteToWar(Player* player)
     if (!IsWarTime())
         return;
 
+    sScriptMgr->OnBattlefieldPlayerJoinWar(this, player);
+
     if (AddOrSetPlayerToCorrectBfGroup(player))
     {
         player->GetSession()->SendBfEntered(m_BattleId);
@@ -444,7 +446,6 @@ void Battlefield::PlayerAcceptInviteToWar(Player* player)
             player->ToggleAFK();
 
         OnPlayerJoinWar(player);                               //for scripting
-        sScriptMgr->OnBattlefieldPlayerJoinWar(this, player);
     }
 }
 
