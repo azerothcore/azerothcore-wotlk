@@ -39,6 +39,11 @@ void ScriptMgr::OnBattlefieldPlayerLeaveWar(Battlefield* bf, Player* player)
     CALL_ENABLED_HOOKS(BattlefieldScript, BATTLEFIELDHOOK_ON_PLAYER_LEAVE_WAR, script->OnBattlefieldPlayerLeaveWar(bf, player));
 }
 
+void ScriptMgr::OnBattlefieldBeforeInvitePlayerToWar(Battlefield* bf, Player* player)
+{
+    CALL_ENABLED_HOOKS(BattlefieldScript, BATTLEFIELDHOOK_BEFORE_INVITE_PLAYER_TO_WAR, script->OnBattlefieldBeforeInvitePlayerToWar(bf, player));
+}
+
 BattlefieldScript::BattlefieldScript(char const* name, std::vector<uint16> enabledHooks) :
     ScriptObject(name, BATTLEFIELDHOOK_END)
 {
