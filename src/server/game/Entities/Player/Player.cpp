@@ -5366,7 +5366,10 @@ void Player::SetSkill(uint16 id, uint16 step, uint16 newVal, uint16 maxVal)
 
             // remove all spells that related to this skill
             for (SkillLineAbilityEntry const* pAbility : GetSkillLineAbilitiesBySkillLine(id))
+            {
                 removeSpell(sSpellMgr->GetFirstSpellInChain(pAbility->Spell), SPEC_MASK_ALL, false);
+                RemoveAurasDueToSpell(pAbility->Spell);
+            }
         }
     }
     else if (newVal)                                        //add
@@ -10027,9 +10030,10 @@ bool Player::HasSpellModApplied(SpellModifier* mod, Spell* spell)
 
 void Player::SetSpellModTakingSpell(Spell* spell, bool apply)
 {
-    if (apply && m_spellModTakingSpell && m_spellModTakingSpell != spell)
+    if (apply && m_spellModTakingSpell != nullptr)
         return;
-    else if (!apply && m_spellModTakingSpell != spell)
+
+    if (!apply && (!m_spellModTakingSpell || m_spellModTakingSpell != spell))
         return;
 
     m_spellModTakingSpell = apply ? spell : nullptr;

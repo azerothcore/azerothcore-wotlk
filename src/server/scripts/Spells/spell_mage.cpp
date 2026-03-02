@@ -71,7 +71,8 @@ enum MageSpells
     SPELL_MAGE_CHILLED_R3                        = 12486,
     SPELL_MAGE_MANA_SURGE                        = 37445,
     SPELL_MAGE_FROST_NOVA                        = 122,
-    SPELL_MAGE_LIVING_BOMB_R1                    = 44457
+    SPELL_MAGE_LIVING_BOMB_R1                    = 44457,
+    SPELL_MAGE_MISSILE_BARRAGE_PROC              = 44401
 };
 
 enum MageSpellIcons
@@ -1504,6 +1505,31 @@ class spell_mage_ice_block : public SpellScript
     }
 };
 
+// 12536 - Clearcasting
+class spell_mage_clearcasting : public AuraScript
+{
+    PrepareAuraScript(spell_mage_clearcasting);
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        if (!spellInfo)
+            return true;
+
+        // Missile Barrage has priority over Clearcasting for Arcane Missiles
+        if (spellInfo->SpellFamilyName == SPELLFAMILY_MAGE && (spellInfo->SpellFamilyFlags[0] & 0x800))
+            if (GetTarget()->HasAura(SPELL_MAGE_MISSILE_BARRAGE_PROC))
+                return false;
+
+        return true;
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_mage_clearcasting::CheckProc);
+    }
+};
+
 // 44401 - Missile Barrage (proc buff)
 class spell_mage_missile_barrage_proc : public AuraScript
 {
@@ -1575,6 +1601,7 @@ void AddSC_mage_spell_scripts()
     RegisterSpellScript(spell_mage_ice_block);
     RegisterSpellScript(spell_mage_imp_blizzard);
     RegisterSpellScript(spell_mage_imp_mana_gems);
+    RegisterSpellScript(spell_mage_clearcasting);
     RegisterSpellScript(spell_mage_missile_barrage);
     RegisterSpellScript(spell_mage_missile_barrage_proc);
     RegisterSpellScript(spell_mage_blast_wave);

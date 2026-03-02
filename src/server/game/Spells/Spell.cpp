@@ -3911,9 +3911,6 @@ void Spell::_cast(bool skipCheck)
     // we must send smsg_spell_go packet before m_castItem delete in TakeCastItem()...
     SendSpellGo();
 
-    if (modOwner)
-        modOwner->SetSpellModTakingSpell(this, true);
-
     bool resetAttackTimers = IsAutoActionResetSpell() && !m_spellInfo->HasAttribute(SPELL_ATTR2_DO_NOT_RESET_COMBAT_TIMERS);
     if (resetAttackTimers)
     {

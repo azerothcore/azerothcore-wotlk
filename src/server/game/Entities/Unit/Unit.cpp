@@ -13058,11 +13058,28 @@ void Unit::TriggerAurasProcOnEvent(std::list<AuraApplication*>* myProcAuras, std
 
 void Unit::TriggerAurasProcOnEvent(ProcEventInfo& eventInfo, AuraApplicationProcContainer& aurasTriggeringProc)
 {
+    Spell const* triggeringSpell = eventInfo.GetProcSpell();
+    bool const disableProcs = triggeringSpell && triggeringSpell->IsProcDisabled();
+    if (disableProcs)
+        SetCantProc(true);
+
     for (auto const& [procEffectMask, aurApp] : aurasTriggeringProc)
     {
-        if (!aurApp->GetRemoveMode())
-            aurApp->GetBase()->TriggerProcOnEvent(procEffectMask, aurApp, eventInfo);
+        if (aurApp->GetRemoveMode())
+            continue;
+
+        SpellInfo const* spellInfo = aurApp->GetBase()->GetSpellInfo();
+        if (spellInfo->HasAttribute(SPELL_ATTR3_INSTANT_TARGET_PROCS))
+            SetCantProc(true);
+
+        aurApp->GetBase()->TriggerProcOnEvent(procEffectMask, aurApp, eventInfo);
+
+        if (spellInfo->HasAttribute(SPELL_ATTR3_INSTANT_TARGET_PROCS))
+            SetCantProc(false);
     }
+
+    if (disableProcs)
+        SetCantProc(false);
 }
 
 Player* Unit::GetSpellModOwner() const
