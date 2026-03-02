@@ -31,6 +31,7 @@
 #include "Chat.h"
 #include "ChatCommand.h"
 #include <cstring>
+#include <iostream>
 #include <readline/history.h>
 #include <readline/readline.h>
 #endif
