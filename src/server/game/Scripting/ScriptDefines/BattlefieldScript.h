@@ -27,7 +27,7 @@ enum BattlefieldHook
     BATTLEFIELDHOOK_ON_PLAYER_LEAVE_ZONE,          // 1 - fires at end of HandlePlayerLeaveZone, after all cleanup
     BATTLEFIELDHOOK_ON_PLAYER_JOIN_WAR,            // 2 - fires after player is added to the active war
     BATTLEFIELDHOOK_ON_PLAYER_LEAVE_WAR,           // 3 - fires after player is removed from the active war
-    BATTLEFIELDHOOK_BEFORE_INVITE_PLAYER_TO_WAR,   // 4 - fires in InvitePlayerToWar after WillBeKick erase, before InvitedPlayers insert
+    BATTLEFIELDHOOK_BEFORE_INVITE_PLAYER_TO_WAR,   // 4 - fires in InvitePlayerToWar before InvitedPlayers insert
     BATTLEFIELDHOOK_END
 };
 
