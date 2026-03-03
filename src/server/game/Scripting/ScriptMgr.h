@@ -583,6 +583,7 @@ public: /* BattlefieldScript */
     void OnBattlefieldPlayerLeaveZone(Battlefield* bf, Player* player);
     void OnBattlefieldPlayerJoinWar(Battlefield* bf, Player* player);
     void OnBattlefieldPlayerLeaveWar(Battlefield* bf, Player* player);
+    void OnBattlefieldBeforeInvitePlayerToWar(Battlefield* bf, Player* player);
 
 public: /* BGScript */
     void OnBattlegroundStart(Battleground* bg);

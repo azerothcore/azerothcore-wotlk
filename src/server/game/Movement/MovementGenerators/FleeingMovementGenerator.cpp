@@ -240,7 +240,13 @@ void TimedFleeingMovementGenerator::Finalize(Unit* owner)
 
     if (Unit* victim = owner->GetVictim())
     {
-        owner->SetTarget(victim->GetGUID());
+        if (owner->IsAlive())
+        {
+            owner->AttackStop();
+            if (Creature* ownerCreature = owner->ToCreature())
+                if (CreatureAI* AI = ownerCreature->AI())
+                    AI->AttackStart(victim);
+        }
     }
 
     if (Creature* ownerCreature = owner->ToCreature())

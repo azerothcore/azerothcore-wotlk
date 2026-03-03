@@ -3073,9 +3073,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
     }
 
     if (m_caster != unit && m_caster->IsHostileTo(unit) && !m_spellInfo->IsPositive() && !m_triggeredByAuraSpell && !m_spellInfo->HasAttribute(SPELL_ATTR0_CU_DONT_BREAK_STEALTH))
-    {
         unit->RemoveAurasByType(SPELL_AURA_MOD_STEALTH);
-    }
 
     if (aura_effmask)
     {
@@ -3992,7 +3990,9 @@ void Spell::_cast(bool skipCheck)
         handle_immediate();
 
         // Clean up deferred 0-charge spell modifier auras
-        for (Aura* aura : m_appliedMods)
+        // Copy to vector first — aura->Remove() can modify m_appliedMods
+        std::vector<Aura*> appliedModsCopy(m_appliedMods.begin(), m_appliedMods.end());
+        for (Aura* aura : appliedModsCopy)
         {
             if (!aura->IsRemoved() && aura->IsUsingCharges()
                 && !aura->GetCharges())

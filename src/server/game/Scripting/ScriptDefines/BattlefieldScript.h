@@ -23,10 +23,11 @@
 
 enum BattlefieldHook
 {
-    BATTLEFIELDHOOK_ON_PLAYER_ENTER_ZONE,   // 0 - fires at start of HandlePlayerEnterZone, before team assignment
-    BATTLEFIELDHOOK_ON_PLAYER_LEAVE_ZONE,   // 1 - fires at end of HandlePlayerLeaveZone, after all cleanup
-    BATTLEFIELDHOOK_ON_PLAYER_JOIN_WAR,     // 2 - fires after player is added to the active war
-    BATTLEFIELDHOOK_ON_PLAYER_LEAVE_WAR,    // 3 - fires after player is removed from the active war
+    BATTLEFIELDHOOK_ON_PLAYER_ENTER_ZONE,          // 0 - fires at start of HandlePlayerEnterZone, before team assignment
+    BATTLEFIELDHOOK_ON_PLAYER_LEAVE_ZONE,          // 1 - fires at end of HandlePlayerLeaveZone, after all cleanup
+    BATTLEFIELDHOOK_ON_PLAYER_JOIN_WAR,            // 2 - fires after player is added to the active war
+    BATTLEFIELDHOOK_ON_PLAYER_LEAVE_WAR,           // 3 - fires after player is removed from the active war
+    BATTLEFIELDHOOK_BEFORE_INVITE_PLAYER_TO_WAR,   // 4 - fires in InvitePlayerToWar before InvitedPlayers insert
     BATTLEFIELDHOOK_END
 };
 
@@ -74,6 +75,18 @@ public:
      * @param player The player leaving the war
      */
     virtual void OnBattlefieldPlayerLeaveWar(Battlefield* /*bf*/, Player* /*player*/) { }
+
+    /**
+     * @brief Called inside InvitePlayerToWar after the WillBeKick entry is erased
+     * (using the player's current team) and before the player is inserted into
+     * m_InvitedPlayers. This is the correct place to reassign a player's effective
+     * team for pre-war zone players: the invite bucket write that follows will use
+     * the newly assigned team, keeping all subsequent core operations consistent.
+     *
+     * @param bf   The Battlefield instance
+     * @param player The player being invited to war
+     */
+    virtual void OnBattlefieldBeforeInvitePlayerToWar(Battlefield* /*bf*/, Player* /*player*/) { }
 };
 
 #endif // SCRIPT_OBJECT_BATTLEFIELD_SCRIPT_H_
