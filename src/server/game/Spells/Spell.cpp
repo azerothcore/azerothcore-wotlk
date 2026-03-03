@@ -3994,9 +3994,12 @@ void Spell::_cast(bool skipCheck)
         std::vector<Aura*> appliedModsCopy(m_appliedMods.begin(), m_appliedMods.end());
         for (Aura* aura : appliedModsCopy)
         {
-            if (!aura->IsRemoved() && aura->IsUsingCharges()
+            if (aura && !aura->IsRemoved() && aura->IsUsingCharges()
                 && !aura->GetCharges())
-                aura->Remove();
+            {
+                if (!aura->IsRemoved())
+                    aura->Remove();
+            }
         }
 
         // Also clean up deferred modifier auras not in m_appliedMods
@@ -8195,14 +8198,18 @@ SpellEvent::~SpellEvent()
     }
     else
     {
+        Unit* caster = m_Spell->GetCaster();
         LOG_ERROR("spells", "~SpellEvent: {} {} tried to delete non-deletable spell {}. Was not deleted, causes memory leak.",
-                       (m_Spell->GetCaster()->IsPlayer() ? "Player" : "Creature"), m_Spell->GetCaster()->GetGUID().ToString(), m_Spell->m_spellInfo->Id);
+                       (caster && caster->IsPlayer() ? "Player" : "Creature"), (caster ? caster->GetGUID().ToString() : "<no caster>"), m_Spell->m_spellInfo->Id);
         ABORT();
     }
 }
 
 bool SpellEvent::Execute(uint64 e_time, uint32 p_time)
 {
+    if (!m_Spell)
+        return true;
+
     // update spell if it is not finished
     if (m_Spell->getState() != SPELL_STATE_FINISHED)
         m_Spell->update(p_time);
@@ -8233,8 +8240,12 @@ bool SpellEvent::Execute(uint64 e_time, uint32 p_time)
                         uint64 n_offset = m_Spell->handle_delayed(t_offset);
                         if (n_offset)
                         {
+                            Unit* caster = m_Spell->GetCaster();
+                            if (!caster)
+                                return true;
+
                             // re-add us to the queue
-                            m_Spell->GetCaster()->m_Events.AddEvent(this, m_Spell->GetDelayStart() + n_offset, false);
+                            caster->m_Events.AddEvent(this, m_Spell->GetDelayStart() + n_offset, false);
                             return false;                       // event not complete
                         }
                         // event complete
@@ -8243,10 +8254,14 @@ bool SpellEvent::Execute(uint64 e_time, uint32 p_time)
                 }
                 else
                 {
+                    Unit* caster = m_Spell->GetCaster();
+                    if (!caster)
+                        return true;
+
                     // delaying had just started, record the moment
                     m_Spell->SetDelayStart(e_time);
                     // re-plan the event for the delay moment
-                    m_Spell->GetCaster()->m_Events.AddEvent(this, e_time + m_Spell->GetDelayMoment(), false);
+                    caster->m_Events.AddEvent(this, e_time + m_Spell->GetDelayMoment(), false);
                     return false;                               // event not complete
                 }
             }
@@ -8259,8 +8274,12 @@ bool SpellEvent::Execute(uint64 e_time, uint32 p_time)
             } break;
     }
 
+    Unit* caster = m_Spell->GetCaster();
+    if (!caster)
+        return true;
+
     // spell processing not complete, plan event on the next update interval
-    m_Spell->GetCaster()->m_Events.AddEvent(this, e_time + 1, false);
+    caster->m_Events.AddEvent(this, e_time + 1, false);
     return false;                                           // event not complete
 }
 
