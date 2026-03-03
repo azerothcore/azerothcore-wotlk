@@ -3997,8 +3997,7 @@ void Spell::_cast(bool skipCheck)
             if (aura && !aura->IsRemoved() && aura->IsUsingCharges()
                 && !aura->GetCharges())
             {
-                if (!aura->IsRemoved())
-                    aura->Remove();
+                aura->Remove();
             }
         }
 
@@ -8207,9 +8206,6 @@ SpellEvent::~SpellEvent()
 
 bool SpellEvent::Execute(uint64 e_time, uint32 p_time)
 {
-    if (!m_Spell)
-        return true;
-
     // update spell if it is not finished
     if (m_Spell->getState() != SPELL_STATE_FINISHED)
         m_Spell->update(p_time);
