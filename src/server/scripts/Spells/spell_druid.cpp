@@ -88,6 +88,8 @@ enum DruidSpells
     SPELL_DRUID_GLYPH_OF_RIP                = 54818,
     SPELL_DRUID_RIP_DURATION_LACERATE_DMG   = 60141,
     SPELL_DRUID_REJUVENATION_T10_PROC       = 70691,
+    SPELL_DRUID_BALANCE_T10_BONUS           = 70718,
+    SPELL_DRUID_BALANCE_T10_BONUS_PROC      = 70721,
     SPELL_DRUID_LANGUISH                    = 71023,
     // T9 Feral Relic
     SPELL_DRUID_T9_FERAL_RELIC_BEAR         = 67354,
@@ -234,6 +236,11 @@ class spell_dru_omen_of_clarity : public AuraScript
 {
     PrepareAuraScript(spell_dru_omen_of_clarity);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DRUID_BALANCE_T10_BONUS, SPELL_DRUID_BALANCE_T10_BONUS_PROC });
+    }
+
     bool CheckProc(ProcEventInfo& eventInfo)
     {
         SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
@@ -268,9 +275,17 @@ class spell_dru_omen_of_clarity : public AuraScript
         return true;
     }
 
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
+    {
+        Unit* target = GetTarget();
+        if (target->HasAura(SPELL_DRUID_BALANCE_T10_BONUS))
+            target->CastSpell(nullptr, SPELL_DRUID_BALANCE_T10_BONUS_PROC, true, nullptr, aurEff);
+    }
+
     void Register() override
     {
         DoCheckProc += AuraCheckProcFn(spell_dru_omen_of_clarity::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_dru_omen_of_clarity::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
     }
 };
 

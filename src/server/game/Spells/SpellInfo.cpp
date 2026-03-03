@@ -1313,10 +1313,10 @@ bool SpellInfo::IsAffectedBySpellMod(SpellModifier const* mod) const
     if (affectSpell->SpellFamilyName != SpellFamilyName)
         return false;
 
-    if (mod->mask & SpellFamilyFlags)
-        return true;
+    if (mod->mask && !(mod->mask & SpellFamilyFlags))
+        return false;
 
-    return false;
+    return true;
 }
 
 bool SpellInfo::CanPierceImmuneAura(SpellInfo const* aura) const

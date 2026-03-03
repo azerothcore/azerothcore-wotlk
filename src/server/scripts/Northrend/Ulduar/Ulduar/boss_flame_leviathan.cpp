@@ -90,7 +90,6 @@ enum GosNpcs
 {
     NPC_FLAME_LEVIATHAN_TURRET          = 33139,
     NPC_SEAT                            = 33114,
-    NPC_MECHANOLIFT                     = 33214,
     NPC_LIQUID                          = 33189,
 
     // Starting event
@@ -116,14 +115,13 @@ enum Events
     EVENT_MISSILE                       = 2,
     EVENT_VENT                          = 3,
     EVENT_SPEED                         = 4,
-    EVENT_SUMMON                        = 5,
-    EVENT_REINSTALL                     = 6,
-    EVENT_HODIRS_FURY                   = 7,
-    EVENT_FREYA                         = 8,
-    EVENT_MIMIRONS_INFERNO              = 9,
-    EVENT_THORIMS_HAMMER                = 10,
-    EVENT_SOUND_BEGINNING               = 11,
-    EVENT_POSITION_CHECK                = 12,
+    EVENT_REINSTALL                     = 5,
+    EVENT_HODIRS_FURY                   = 6,
+    EVENT_FREYA                         = 7,
+    EVENT_MIMIRONS_INFERNO              = 8,
+    EVENT_THORIMS_HAMMER                = 9,
+    EVENT_SOUND_BEGINNING               = 10,
+    EVENT_POSITION_CHECK                = 11,
 };
 
 enum Texts
@@ -413,13 +411,6 @@ struct boss_flame_leviathan : public BossAI
                 me->CastSpell(me, SPELL_FLAME_VENTS, false);
                 events.Repeat(20s);
                 return;
-            case EVENT_SUMMON:
-                if (summons.size() < 20)
-                    if (Creature* lift = DoSummonFlyer(NPC_MECHANOLIFT, me, 30.0f, 50.0f, 0))
-                        lift->GetMotionMaster()->MoveRandom(100);
-
-                events.Repeat(4s);
-                return;
             case EVENT_SOUND_BEGINNING:
                 if (_towersCount)
                     Talk(FLAME_LEVIATHAN_SAY_HARDMODE);
@@ -591,7 +582,6 @@ void boss_flame_leviathan::ScheduleEvents()
     events.RescheduleEvent(EVENT_MISSILE, 5s);
     events.RescheduleEvent(EVENT_VENT, 20s);
     events.RescheduleEvent(EVENT_SPEED, 15s);
-    events.RescheduleEvent(EVENT_SUMMON, 10s);
     events.RescheduleEvent(EVENT_SOUND_BEGINNING, 10s);
     events.RescheduleEvent(EVENT_POSITION_CHECK, 5s);
 
@@ -1240,43 +1230,6 @@ struct boss_flame_leviathan_safety_container : public NullCreatureAI
     }
 };
 
-struct npc_mechanolift : public NullCreatureAI
-{
-    npc_mechanolift(Creature* c) : NullCreatureAI(c)
-    {
-        me->SetSpeed(MOVE_RUN, rand_norm() + 0.5f);
-    }
-
-    int32 _startTimer;
-    uint32 _evadeTimer;
-
-    void Reset() override
-    {
-        _startTimer = urand(1, 5000);
-        _evadeTimer = 0;
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (_startTimer)
-        {
-            _startTimer -= diff;
-            if (_startTimer <= 0)
-            {
-                me->GetMotionMaster()->MoveWaypoint(3000000 + urand(0, 11), true);
-                _startTimer = 0;
-            }
-        }
-
-        _evadeTimer += diff;
-        if (_evadeTimer >= 10000)
-        {
-            _EnterEvadeMode();
-            _evadeTimer = 0;
-        }
-    }
-};
-
 class go_ulduar_tower : public GameObjectScript
 {
 public:
@@ -1880,7 +1833,6 @@ void AddSC_boss_flame_leviathan()
     RegisterUlduarCreatureAI(npc_brann_radio);
     RegisterUlduarCreatureAI(npc_storm_beacon_spawn);
     RegisterUlduarCreatureAI(boss_flame_leviathan_safety_container);
-    RegisterUlduarCreatureAI(npc_mechanolift);
 
     // GOs
     new go_ulduar_tower();
