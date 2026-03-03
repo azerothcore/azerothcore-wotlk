@@ -1182,7 +1182,7 @@ enum AcoreStrings
     LANG_CMD_QUEST_STATUS_CONDITION     = 5108,
     LANG_CMD_QUEST_STATUS_LOG_FULL      = 5109,
     LANG_CMD_QUEST_STATUS_COND_DETAIL   = 5110,
-  
+
     // Battlefield commands
     LANG_BF_NOT_FOUND                   = 5111,
     LANG_BF_STARTED                     = 5112,
