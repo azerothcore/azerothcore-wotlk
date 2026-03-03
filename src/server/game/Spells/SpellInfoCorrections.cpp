@@ -1546,6 +1546,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(13); // 0-50000yd
     });
 
+    // Orc Warlock (Karazhan Chess) - Poison Cloud
+    ApplySpellFix({ 37469 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_6_YARDS);
+    });
+
     // Watery Grave Explosion
     ApplySpellFix({ 37852 }, [](SpellInfo* spellInfo)
     {
