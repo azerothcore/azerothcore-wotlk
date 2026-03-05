@@ -34,3 +34,13 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-1975201, 0, 0, 0, 72, 0, 100, 257, 24, 0, 0, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bronzebeard Radio - On Action 24 Done - Say Line 4 (No Repeat)'),
 (-1975202, 0, 0, 0, 72, 0, 100, 257, 26, 0, 0, 0, 0, 0, 1, 6, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bronzebeard Radio - On Action 26 Done - Say Line 6 (No Repeat)'),
 (-1975203, 0, 0, 0, 72, 0, 100, 257, 25, 0, 0, 0, 0, 0, 1, 5, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Bronzebeard Radio - On Action 25 Done - Say Line 5 (No Repeat)');
+
+-- Set Conditions
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceEntry` IN (-1975198, -1975199, -1975200, -1975201, -1975202, -1975203)) AND (`SourceId` = 0);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(22, 1, -1975198, 0, 0, 13, 1, 0, 0, 2, 0, 0, 0, '', 'Bronzebeard Radio event only occours if Leviathan in not started'),
+(22, 1, -1975199, 0, 0, 13, 1, 0, 0, 2, 0, 0, 0, '', 'Bronzebeard Radio event only occours if Leviathan in not started'),
+(22, 1, -1975200, 0, 0, 13, 1, 0, 0, 2, 0, 0, 0, '', 'Bronzebeard Radio event only occours if Leviathan in not started'),
+(22, 1, -1975201, 0, 0, 13, 1, 0, 0, 2, 0, 0, 0, '', 'Bronzebeard Radio event only occours if Leviathan in not started'),
+(22, 1, -1975202, 0, 0, 13, 1, 0, 0, 2, 0, 0, 0, '', 'Bronzebeard Radio event only occours if Leviathan in not started'),
+(22, 1, -1975203, 0, 0, 13, 1, 0, 0, 2, 0, 0, 0, '', 'Bronzebeard Radio event only occours if Leviathan in not started');
