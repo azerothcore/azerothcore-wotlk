@@ -1,0 +1,3 @@
+<componentinfo format="1">
+    <component name="wow-enus" version="12340" />
+</componentinfo>
