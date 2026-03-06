@@ -90,7 +90,6 @@ enum GosNpcs
 {
     NPC_FLAME_LEVIATHAN_TURRET          = 33139,
     NPC_SEAT                            = 33114,
-    NPC_MECHANOLIFT                     = 33214,
     NPC_LIQUID                          = 33189,
 
     // Starting event
@@ -116,14 +115,13 @@ enum Events
     EVENT_MISSILE                       = 2,
     EVENT_VENT                          = 3,
     EVENT_SPEED                         = 4,
-    EVENT_SUMMON                        = 5,
-    EVENT_REINSTALL                     = 6,
-    EVENT_HODIRS_FURY                   = 7,
-    EVENT_FREYA                         = 8,
-    EVENT_MIMIRONS_INFERNO              = 9,
-    EVENT_THORIMS_HAMMER                = 10,
-    EVENT_SOUND_BEGINNING               = 11,
-    EVENT_POSITION_CHECK                = 12,
+    EVENT_REINSTALL                     = 5,
+    EVENT_HODIRS_FURY                   = 6,
+    EVENT_FREYA                         = 7,
+    EVENT_MIMIRONS_INFERNO              = 8,
+    EVENT_THORIMS_HAMMER                = 9,
+    EVENT_SOUND_BEGINNING               = 10,
+    EVENT_POSITION_CHECK                = 11,
 };
 
 enum Texts
@@ -153,12 +151,6 @@ enum Texts
     BRANN_RADIO_SAY_FL_START_0          = 0,
     BRANN_RADIO_SAY_FL_START_1          = 1,
     BRANN_RADIO_SAY_FL_START_2          = 2,
-    BRANN_RADIO_SAY_GENERATORS          = 3,
-    BRANN_RADIO_SAY_STATIONS            = 4,
-    BRANN_RADIO_SAY_TOWER_THORIM        = 5,
-    BRANN_RADIO_SAY_TOWER_HODIR         = 6,
-    BRANN_RADIO_SAY_TOWER_FREYA         = 7,
-    BRANN_RADIO_SAY_TOWER_MIMIRON       = 8,
 
     // Vehicle Repair - Said by a spell, BroadcastTextID, same as FLAME_LEVIATHAN_EMOTE_REPAIR
     VEHICLE_EMOTE_REPAIR                = 33538,
@@ -413,13 +405,6 @@ struct boss_flame_leviathan : public BossAI
                 me->CastSpell(me, SPELL_FLAME_VENTS, false);
                 events.Repeat(20s);
                 return;
-            case EVENT_SUMMON:
-                if (summons.size() < 20)
-                    if (Creature* lift = DoSummonFlyer(NPC_MECHANOLIFT, me, 30.0f, 50.0f, 0))
-                        lift->GetMotionMaster()->MoveRandom(100);
-
-                events.Repeat(4s);
-                return;
             case EVENT_SOUND_BEGINNING:
                 if (_towersCount)
                     Talk(FLAME_LEVIATHAN_SAY_HARDMODE);
@@ -591,7 +576,6 @@ void boss_flame_leviathan::ScheduleEvents()
     events.RescheduleEvent(EVENT_MISSILE, 5s);
     events.RescheduleEvent(EVENT_VENT, 20s);
     events.RescheduleEvent(EVENT_SPEED, 15s);
-    events.RescheduleEvent(EVENT_SUMMON, 10s);
     events.RescheduleEvent(EVENT_SOUND_BEGINNING, 10s);
     events.RescheduleEvent(EVENT_POSITION_CHECK, 5s);
 
@@ -1092,87 +1076,6 @@ struct npc_pool_of_tar : public NullCreatureAI
     }
 };
 
-struct npc_brann_radio : public NullCreatureAI
-{
-    npc_brann_radio(Creature* c) : NullCreatureAI(c)
-    {
-        _lock = (me->GetInstanceScript() && me->GetInstanceScript()->GetBossState(BOSS_LEVIATHAN) > NOT_STARTED);
-        _helpLock = _lock;
-    }
-
-    bool _lock;
-    bool _helpLock;
-
-    void Reset() override
-    {
-        me->SetReactState(REACT_AGGRESSIVE);
-    }
-
-    void MoveInLineOfSight(Unit* who) override
-    {
-        if (!_lock)
-        {
-            if (!who->IsPlayer() && !who->IsVehicle())
-                return;
-
-            // MIMIRON
-            else if (me->GetDistance2d(-81.9207f, 111.432f) < 5.0f)
-            {
-                if (me->GetDistance2d(who) <= 60.0f && who->GetPositionZ() > 430.0f)
-                {
-                    Talk(BRANN_RADIO_SAY_TOWER_MIMIRON);
-                    _lock = true;
-                }
-            }
-            // FREYA
-            else if (me->GetDistance2d(-221.475f, -271.087f) < 5.0f)
-            {
-                if (me->GetDistance2d(who) <= 60.0f && who->GetPositionZ() < 380.0f)
-                {
-                    Talk(BRANN_RADIO_SAY_TOWER_FREYA);
-                    _lock = true;
-                }
-            }
-            // STATIONS
-            else if (me->GetDistance2d(73.8978f, -29.3306f) < 5.0f)
-            {
-                if (me->GetDistance2d(who) <= 40.0f)
-                {
-                    Talk(BRANN_RADIO_SAY_STATIONS);
-                    _lock = true;
-                }
-            }
-            // HODIR
-            else if (me->GetDistance2d(68.7679f, -325.026f) < 5.0f)
-            {
-                if (me->GetDistance2d(who) <= 40.0f)
-                {
-                    Talk(BRANN_RADIO_SAY_TOWER_HODIR);
-                    _lock = true;
-                }
-            }
-            // THORIM
-            else if (me->GetDistance2d(174.442f, 345.679f) < 5.0f)
-            {
-                if (me->GetDistance2d(who) <= 60.0f)
-                {
-                    Talk(BRANN_RADIO_SAY_TOWER_THORIM);
-                    _lock = true;
-                }
-            }
-            // COME A BIT CLOSER
-            else if (me->GetDistance2d(-508.898f, -32.9631f) < 5.0f)
-            {
-                if (who->GetPositionX() >= -480.0f)
-                {
-                    Talk(BRANN_RADIO_SAY_GENERATORS);
-                    _lock = true;
-                }
-            }
-        }
-    }
-};
-
 struct npc_storm_beacon_spawn : public NullCreatureAI
 {
     npc_storm_beacon_spawn(Creature* c) : NullCreatureAI(c)
@@ -1236,43 +1139,6 @@ struct boss_flame_leviathan_safety_container : public NullCreatureAI
             z = me->GetMapHeight(x, y, z);
             me->GetMotionMaster()->MovePoint(me->GetEntry(), x, y, z);
             me->SetPosition(x, y, z, 0);
-        }
-    }
-};
-
-struct npc_mechanolift : public NullCreatureAI
-{
-    npc_mechanolift(Creature* c) : NullCreatureAI(c)
-    {
-        me->SetSpeed(MOVE_RUN, rand_norm() + 0.5f);
-    }
-
-    int32 _startTimer;
-    uint32 _evadeTimer;
-
-    void Reset() override
-    {
-        _startTimer = urand(1, 5000);
-        _evadeTimer = 0;
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (_startTimer)
-        {
-            _startTimer -= diff;
-            if (_startTimer <= 0)
-            {
-                me->GetMotionMaster()->MoveWaypoint(3000000 + urand(0, 11), true);
-                _startTimer = 0;
-            }
-        }
-
-        _evadeTimer += diff;
-        if (_evadeTimer >= 10000)
-        {
-            _EnterEvadeMode();
-            _evadeTimer = 0;
         }
     }
 };
@@ -1427,7 +1293,7 @@ public:
 
     bool operator()(WorldObject* target) const
     {
-        //! No players, only vehicles (todo: check if blizzlike)
+        //! No players, only vehicles. Pursue is never cast on players.
         Creature* creatureTarget = target->ToCreature();
         if (!creatureTarget)
             return true;
@@ -1462,12 +1328,7 @@ class spell_pursue : public SpellScript
     void FilterTargets(std::list<WorldObject*>& targets)
     {
         targets.remove_if(FlameLeviathanPursuedTargetSelector());
-        if (targets.empty())
-        {
-            if (Creature* caster = GetCaster()->ToCreature())
-                caster->AI()->EnterEvadeMode();
-        }
-        else
+        if (!targets.empty())
         {
             //! In the end, only one target should be selected
             WorldObject* _target = Acore::Containers::SelectRandomContainerElement(targets);
@@ -1877,10 +1738,8 @@ void AddSC_boss_flame_leviathan()
     RegisterUlduarCreatureAI(npc_hodirs_fury);
 
     // Helpers
-    RegisterUlduarCreatureAI(npc_brann_radio);
     RegisterUlduarCreatureAI(npc_storm_beacon_spawn);
     RegisterUlduarCreatureAI(boss_flame_leviathan_safety_container);
-    RegisterUlduarCreatureAI(npc_mechanolift);
 
     // GOs
     new go_ulduar_tower();

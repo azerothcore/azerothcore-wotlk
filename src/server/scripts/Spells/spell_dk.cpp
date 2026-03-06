@@ -614,16 +614,18 @@ class spell_dk_hungering_cold : public AuraScript
 {
     PrepareAuraScript(spell_dk_hungering_cold);
 
-    void HandleProc(ProcEventInfo& eventInfo)
+    bool CheckProc(ProcEventInfo& eventInfo)
     {
-        PreventDefaultAction();
-        if (eventInfo.GetDamageInfo() && eventInfo.GetDamageInfo()->GetDamage() > 0 && (!eventInfo.GetSpellInfo() || eventInfo.GetSpellInfo()->Dispel != DISPEL_DISEASE))
-            SetDuration(0);
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        if (!spellInfo)
+            return true;
+
+        return spellInfo->Dispel != DISPEL_DISEASE;
     }
 
     void Register() override
     {
-        OnProc += AuraProcFn(spell_dk_hungering_cold::HandleProc);
+        DoCheckProc += AuraCheckProcFn(spell_dk_hungering_cold::CheckProc);
     }
 };
 

@@ -386,6 +386,7 @@ private:
     Unit* const m_healer;
     Unit* const m_target;
     uint32 m_heal;
+    uint32 m_healBeforeTakenMods;
     uint32 m_effectiveHeal;
     uint32 m_absorb;
     SpellInfo const* const m_spellInfo;
@@ -393,7 +394,7 @@ private:
     uint32 m_hitMask;
 public:
     explicit HealInfo(Unit* _healer, Unit* _target, uint32 _heal, SpellInfo const* _spellInfo, SpellSchoolMask _schoolMask)
-        : m_healer(_healer), m_target(_target), m_heal(_heal), m_spellInfo(_spellInfo), m_schoolMask(_schoolMask), m_hitMask(0)
+        : m_healer(_healer), m_target(_target), m_heal(_heal), m_healBeforeTakenMods(0), m_spellInfo(_spellInfo), m_schoolMask(_schoolMask), m_hitMask(0)
     {
         m_absorb = 0;
         m_effectiveHeal = 0;
@@ -414,6 +415,11 @@ public:
         m_heal = amount;
     }
 
+    void SetHealBeforeTakenMods(uint32 amount)
+    {
+        m_healBeforeTakenMods = amount;
+    }
+
     void SetEffectiveHeal(uint32 amount)
     {
         m_effectiveHeal = amount;
@@ -422,6 +428,7 @@ public:
     [[nodiscard]] Unit* GetHealer() const { return m_healer; }
     [[nodiscard]] Unit* GetTarget() const { return m_target; }
     [[nodiscard]] uint32 GetHeal() const { return m_heal; }
+    [[nodiscard]] uint32 GetHealBeforeTakenMods() const { return m_healBeforeTakenMods; }
     [[nodiscard]] uint32 GetEffectiveHeal() const { return m_effectiveHeal; }
     [[nodiscard]] uint32 GetAbsorb() const { return m_absorb; }
     [[nodiscard]] SpellInfo const* GetSpellInfo() const { return m_spellInfo; };

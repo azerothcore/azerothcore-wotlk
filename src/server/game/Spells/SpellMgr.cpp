@@ -23,6 +23,7 @@
 #include "InstanceScript.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "RaceMgr.h"
 #include "ScriptMgr.h"
 #include "SharedDefines.h"
 #include "Spell.h"
@@ -2028,6 +2029,24 @@ void SpellMgr::LoadSpellProcs()
 
             if (!addTriggerFlag && isAlwaysTriggeredAura[auraName])
                 addTriggerFlag = true;
+
+            // Many proc auras with taken procFlag mask don't have
+            // attribute "can proc with triggered" — they should
+            // proc nevertheless (e.g. mage armor spells with
+            // judgement)
+            if (!addTriggerFlag
+                && (spellInfo->ProcFlags & TAKEN_HIT_PROC_FLAG_MASK))
+            {
+                switch (auraName)
+                {
+                    case SPELL_AURA_PROC_TRIGGER_SPELL:
+                    case SPELL_AURA_PROC_TRIGGER_DAMAGE:
+                        addTriggerFlag = true;
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
 
         if (!found)
@@ -2040,13 +2059,17 @@ void SpellMgr::LoadSpellProcs()
         // Generate default proc entry from DBC data
         SpellProcEntry procEntry;
         procEntry.SchoolMask      = 0;
-        procEntry.SpellFamilyName = spellInfo->SpellFamilyName;
         procEntry.SpellFamilyMask[0] = 0;
         procEntry.SpellFamilyMask[1] = 0;
         procEntry.SpellFamilyMask[2] = 0;
         for (uint32 i = 0; i < MAX_SPELL_EFFECTS; ++i)
             if (spellInfo->Effects[i].IsEffect() && isTriggerAura[spellInfo->Effects[i].ApplyAuraName])
                 procEntry.SpellFamilyMask |= spellInfo->Effects[i].SpellClassMask;
+
+        if (procEntry.SpellFamilyMask)
+            procEntry.SpellFamilyName = spellInfo->SpellFamilyName;
+        else
+            procEntry.SpellFamilyName = 0;
 
         procEntry.ProcFlags = spellInfo->ProcFlags;
         procEntry.SpellTypeMask   = procSpellTypeMask;
@@ -2068,6 +2091,20 @@ void SpellMgr::LoadSpellProcs()
             procEntry.AttributesMask |= PROC_ATTR_REQ_EXP_OR_HONOR;
         if (addTriggerFlag)
             procEntry.AttributesMask |= PROC_ATTR_TRIGGERED_CAN_PROC;
+
+        // Modifier auras with charges should require spellmod validation
+        if (spellInfo->ProcCharges)
+        {
+            for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+            {
+                if (spellInfo->Effects[i].IsAura(SPELL_AURA_ADD_FLAT_MODIFIER) ||
+                    spellInfo->Effects[i].IsAura(SPELL_AURA_ADD_PCT_MODIFIER))
+                {
+                    procEntry.AttributesMask |= PROC_ATTR_REQ_SPELLMOD;
+                    break;
+                }
+            }
+        }
 
         // Calculate DisableEffectsMask for effects that shouldn't trigger procs
         uint32 nonProcMask = 0;
@@ -2761,7 +2798,7 @@ void SpellMgr::LoadSpellAreas()
             }
         }
 
-        if (spellArea.raceMask && (spellArea.raceMask & RACEMASK_ALL_PLAYABLE) == 0)
+        if (spellArea.raceMask && (spellArea.raceMask & sRaceMgr->GetPlayableRaceMask()) == 0)
         {
             LOG_ERROR("sql.sql", "Spell {} listed in `spell_area` have wrong race mask ({}) requirement", spell, spellArea.raceMask);
             continue;
