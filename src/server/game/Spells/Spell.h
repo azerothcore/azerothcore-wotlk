@@ -273,6 +273,7 @@ struct TargetInfo
     bool   crit:1;
     bool   scaleAura:1;
     int32  damage;
+    int32  damageBeforeTakenMods;
 };
 
 static const uint32 SPELL_INTERRUPT_NONPLAYER = 32747;
@@ -508,6 +509,7 @@ public:
     void SendPetCastResult(SpellCastResult result);
     void SendSpellStart();
     void SendSpellGo();
+
     void SendSpellCooldown();
     void SendLogExecute();
     void ExecuteLogEffectTakeTargetPower(uint8 effIndex, Unit* target, uint32 PowerType, uint32 powerTaken, float gainMultiplier);
@@ -563,6 +565,7 @@ public:
     bool IsNextMeleeSwingSpell() const;
     bool IsTriggered() const { return HasTriggeredCastFlag(TRIGGERED_FULL_MASK); };
     bool HasTriggeredCastFlag(TriggerCastFlags flag) const { return _triggeredCastFlags & flag; };
+    [[nodiscard]] bool IsProcDisabled() const { return HasTriggeredCastFlag(TRIGGERED_DISALLOW_PROC_EVENTS); }
     bool IsChannelActive() const { return m_caster->GetUInt32Value(UNIT_CHANNEL_SPELL) != 0; }
     bool IsAutoActionResetSpell() const;
     bool IsIgnoringCooldowns() const;
@@ -584,6 +587,7 @@ public:
 
     Unit* GetCaster() const { return m_caster; }
     Unit* GetOriginalCaster() const { return m_originalCaster; }
+    Unit* GetOriginalTarget() const;
     SpellInfo const* GetSpellInfo() const { return m_spellInfo; }
     int32 GetPowerCost() const { return m_powerCost; }
 
@@ -619,6 +623,8 @@ public:
     ObjectGuid m_originalCasterGUID;                    // real source of cast (aura caster/etc), used for spell targets selection
     // e.g. damage around area spell trigered by victim aura and damage enemies of aura caster
     Unit* m_originalCaster;                             // cached pointer for m_originalCaster, updated at Spell::UpdatePointers()
+
+    ObjectGuid m_originalTargetGUID;                    // unit target saved before InitExplicitTargets strips it
 
     Spell** m_selfContainer;                            // pointer to our spell container (if applicable)
 
@@ -683,6 +689,7 @@ public:
     // Damage and healing in effects need just calculate
     int32 m_damage;           // Damge   in effects count here
     int32 m_healing;          // Healing in effects count here
+    int32 m_damageBeforeTakenMods;
 
     // ******************************************
     // Spell trigger system

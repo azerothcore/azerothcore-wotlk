@@ -96,6 +96,12 @@ public:
         return *this;
     }
 
+    TestSpellEntryHelper& WithAttributesEx3(uint32 attr)
+    {
+        _entry.AttributesEx3 = attr;
+        return *this;
+    }
+
     TestSpellEntryHelper& WithEffect(uint8 effIndex, uint32 effect, uint32 auraType = 0)
     {
         if (effIndex < MAX_SPELL_EFFECTS)
@@ -180,6 +186,12 @@ public:
     SpellInfoBuilder& WithDmgClass(uint32 dmgClass)
     {
         _entryHelper.WithDmgClass(dmgClass);
+        return *this;
+    }
+
+    SpellInfoBuilder& WithAttributesEx3(uint32 attr)
+    {
+        _entryHelper.WithAttributesEx3(attr);
         return *this;
     }
 
