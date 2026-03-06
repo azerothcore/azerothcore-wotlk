@@ -19,7 +19,6 @@ UPDATE `acore_string` SET `locale_deDE` = 'Konto {} ({}) hat Berechtigungen durc
 UPDATE `acore_string` SET `locale_deDE` = 'Berechtigungen:' WHERE `entry` = 68;
 UPDATE `acore_string` SET `locale_deDE` = 'Verknüpfte Berechtigungen:' WHERE `entry` = 69;
 UPDATE `acore_string` SET `locale_deDE` = 'Leere Liste' WHERE `entry` = 70;
-UPDATE `acore_string` SET `locale_deDE` = '- {} ({})' WHERE `entry` = 71;
 UPDATE `acore_string` SET `locale_deDE` = 'Berechtigung {} ({}) realmId {} konnte nicht erteilt werden. Konto {} ({}) besitzt diese Berechtigung bereits.' WHERE `entry` = 72;
 UPDATE `acore_string` SET `locale_deDE` = 'Berechtigung {} ({}) realmId {} konnte nicht erteilt werden. Konto {} ({}) hat diese Berechtigung in der Sperrliste.' WHERE `entry` = 73;
 UPDATE `acore_string` SET `locale_deDE` = 'Berechtigung {} ({}) realmId {} wurde Konto {} ({}) erteilt.' WHERE `entry` = 74;
@@ -58,9 +57,6 @@ UPDATE `acore_string` SET `locale_deDE` = 'Ungültiger Spielobjekttyp, muss ein 
 UPDATE `acore_string` SET `locale_deDE` = 'Spielobjekt {} (GUID: {}) hat {} Schaden genommen (aktuelle Gesundheit: {}).' WHERE `entry` = 177;
 UPDATE `acore_string` SET `locale_deDE` = '| Kontoflags:' WHERE `entry` = 179;
 
--- Item recovery / command formatting
-UPDATE `acore_string` SET `locale_deDE` = '|- {}' WHERE `entry` = 191;
-UPDATE `acore_string` SET `locale_deDE` = '|- {} ...' WHERE `entry` = 192;
 UPDATE `acore_string` SET `locale_deDE` = 'Wiederherstellungs-ID: {} | Gegenstand: {} ({}) | Anzahl: {}' WHERE `entry` = 197;
 UPDATE `acore_string` SET `locale_deDE` = 'Der Spieler hat keine wiederherstellbaren Gegenstände.' WHERE `entry` = 198;
 UPDATE `acore_string` SET `locale_deDE` = 'Der Spieler hat keinen wiederherstellbaren Gegenstand mit ID {}.' WHERE `entry` = 199;
@@ -192,7 +188,6 @@ UPDATE `acore_string` SET `locale_deDE` = '| Gildenbank: {} Gold' WHERE `entry` 
 UPDATE `acore_string` SET `locale_deDE` = '| Gilden-MOTD: {}' WHERE `entry` = 1182;
 UPDATE `acore_string` SET `locale_deDE` = '| Gildeninformationen: {}' WHERE `entry` = 1183;
 UPDATE `acore_string` SET `locale_deDE` = '| Gildenränge:' WHERE `entry` = 1184;
-UPDATE `acore_string` SET `locale_deDE` = '| {} - {}' WHERE `entry` = 1185;
 
 -- Tickets (player-facing)
 UPDATE `acore_string` SET `locale_deDE` = 'Euer Ticket wurde geschlossen.' WHERE `entry` = 1334;
@@ -358,7 +353,6 @@ UPDATE `acore_string` SET `locale_deDE` = 'Belagerungswerkstatt des Zerbrochenen
 UPDATE `acore_string` SET `locale_deDE` = 'Ostspark-Belagerungswerkstatt' WHERE `entry` = 12053;
 UPDATE `acore_string` SET `locale_deDE` = 'Westspark-Belagerungswerkstatt' WHERE `entry` = 12054;
 UPDATE `acore_string` SET `locale_deDE` = 'Belagerungswerkstatt des Gesunkenen Rings' WHERE `entry` = 12055;
-UPDATE `acore_string` SET `locale_deDE` = 'Horde' WHERE `entry` = 12056;
 UPDATE `acore_string` SET `locale_deDE` = 'Allianz' WHERE `entry` = 12057;
 UPDATE `acore_string` SET `locale_deDE` = 'Die Schlacht um Wintersturm beginnt gleich!' WHERE `entry` = 12058;
 UPDATE `acore_string` SET `locale_deDE` = 'Ihr habt Rang 1 erreicht: Gefreiter' WHERE `entry` = 12059;
