@@ -678,6 +678,7 @@ Allow.IP.Based.Action.Logging = 0
 
 Appender.Console=1,4,0,"1 9 3 6 5 8"
 Appender.Server=2,5,0,Server.log,w
+Appender.Playerbots=2,5,0,Playerbots.log,w
 # Appender.GM=2,5,15,gm_%s.log
 Appender.Errors=2,2,0,Errors.log,w
 # Appender.DB=3,5,0
@@ -714,6 +715,7 @@ Logger.sql=4,Console Server
 Logger.time.update=4,Console Server
 Logger.module=4,Console Server
 Logger.spells.scripts=2,Console Errors
+Logger.playerbots=5,Console Playerbots
 #Logger.achievement=4,Console Server
 #Logger.addon=4,Console Server
 #Logger.auctionHouse=4,Console Server
@@ -2186,7 +2188,7 @@ Rate.MissChanceMultiplier.OnlyAffectsPlayer = 0
 
 #
 #     LevelReq.Trade
-#        Description: Level requirement for characters to be able to trade.
+#        Description: Level requirement for characters to be able to initiate a trade.
 #        Default:     1
 
 LevelReq.Trade = 1
@@ -2422,6 +2424,13 @@ Rate.XP.BattlegroundKillSOTA = 1
 Rate.XP.BattlegroundKillIC   = 1
 
 #
+#    Rate.XP.BattlegroundBonus
+#        Description: Experience rate multiplier for battleground objectives (flag captures, base assaults, etc.).
+#        Default:     1
+
+Rate.XP.BattlegroundBonus = 1
+
+#
 #    Rate.Pet.LevelXP
 #        Description: Modifies the amount of experience required to level up a pet.
 #       The lower the rate the less experience is required.
@@ -2500,6 +2509,20 @@ Arena.LegacyArenaPoints = 0
 #        Default:     1
 
 Rate.ArenaPoints = 1
+
+#
+#    Rate.ArenaPoints2v2
+#        Description: Arena points gain rate for 2v2 bracket.
+#        Default:     0.76
+
+Rate.ArenaPoints2v2 = 0.76
+
+#
+#    Rate.ArenaPoints3v3
+#        Description: Arena points gain rate for 3v3 bracket.
+#        Default:     0.88
+
+Rate.ArenaPoints3v3 = 0.88
 
 #
 #    PvPToken.Enable
@@ -4644,6 +4667,14 @@ Debug.Battleground = 0
 #                 1 - (Enabled)
 
 Debug.Arena = 0
+
+#
+#    Debug.LFG
+#        Description: Enable or disable LFG 1 player queue mode. (If enabled, the in-game command is disabled.)
+#        Default: 0 - (Disabled)
+#                 1 - (Enabled)
+
+Debug.LFG = 0
 
 #
 ###################################################################################################

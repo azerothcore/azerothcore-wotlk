@@ -39,16 +39,16 @@ namespace WorldPackets
 
 enum GuildMisc
 {
-    GUILD_BANK_MAX_TABS                 = 6,                    // send by client for money log also
-    GUILD_BANK_MAX_SLOTS                = 98,
-    GUILD_BANK_MONEY_LOGS_TAB           = 100,                  // used for money log in DB
-    GUILD_RANKS_MIN_COUNT               = 5,
-    GUILD_RANKS_MAX_COUNT               = 10,
-    GUILD_RANK_NONE                     = 0xFF,
-    GUILD_WITHDRAW_MONEY_UNLIMITED      = 0xFFFFFFFF,
-    GUILD_WITHDRAW_SLOT_UNLIMITED       = 0xFFFFFFFF,
-    GUILD_EVENT_LOG_GUID_UNDEFINED      = 0xFFFFFFFF,
-    TAB_UNDEFINED                       = 0xFF,
+    GUILD_BANK_MAX_TABS = 6,                    // send by client for money log also
+    GUILD_BANK_MAX_SLOTS = 98,
+    GUILD_BANK_MONEY_LOGS_TAB = 100,                  // used for money log in DB
+    GUILD_RANKS_MIN_COUNT = 5,
+    GUILD_RANKS_MAX_COUNT = 10,
+    GUILD_RANK_NONE = 0xFF,
+    GUILD_WITHDRAW_MONEY_UNLIMITED = 0xFFFFFFFF,
+    GUILD_WITHDRAW_SLOT_UNLIMITED = 0xFFFFFFFF,
+    GUILD_EVENT_LOG_GUID_UNDEFINED = 0xFFFFFFFF,
+    TAB_UNDEFINED = 0xFF,
 };
 
 constexpr uint64 GUILD_BANK_MONEY_LIMIT = UI64LIT(0x7FFFFFFFFFFFF);
@@ -62,183 +62,185 @@ enum GuildMemberData
 enum GuildDefaultRanks
 {
     // These ranks can be modified, but they cannot be deleted
-    GR_GUILDMASTER  = 0,
-    GR_OFFICER      = 1,
-    GR_VETERAN      = 2,
-    GR_MEMBER       = 3,
-    GR_INITIATE     = 4
-                      // When promoting member server does: rank--
-                      // When demoting member server does: rank++
+    GR_GUILDMASTER = 0,
+    GR_OFFICER = 1,
+    GR_VETERAN = 2,
+    GR_MEMBER = 3,
+    GR_INITIATE = 4
+    // When promoting member server does: rank--
+    // When demoting member server does: rank++
 };
 
 enum GuildRankRights
 {
-    GR_RIGHT_EMPTY                      = 0x00000040,
-    GR_RIGHT_GCHATLISTEN                = GR_RIGHT_EMPTY | 0x00000001,
-    GR_RIGHT_GCHATSPEAK                 = GR_RIGHT_EMPTY | 0x00000002,
-    GR_RIGHT_OFFCHATLISTEN              = GR_RIGHT_EMPTY | 0x00000004,
-    GR_RIGHT_OFFCHATSPEAK               = GR_RIGHT_EMPTY | 0x00000008,
-    GR_RIGHT_INVITE                     = GR_RIGHT_EMPTY | 0x00000010,
-    GR_RIGHT_REMOVE                     = GR_RIGHT_EMPTY | 0x00000020,
-    GR_RIGHT_PROMOTE                    = GR_RIGHT_EMPTY | 0x00000080,
-    GR_RIGHT_DEMOTE                     = GR_RIGHT_EMPTY | 0x00000100,
-    GR_RIGHT_SETMOTD                    = GR_RIGHT_EMPTY | 0x00001000,
-    GR_RIGHT_EPNOTE                     = GR_RIGHT_EMPTY | 0x00002000,
-    GR_RIGHT_VIEWOFFNOTE                = GR_RIGHT_EMPTY | 0x00004000,
-    GR_RIGHT_EOFFNOTE                   = GR_RIGHT_EMPTY | 0x00008000,
-    GR_RIGHT_MODIFY_GUILD_INFO          = GR_RIGHT_EMPTY | 0x00010000,
-    GR_RIGHT_WITHDRAW_GOLD_LOCK         = 0x00020000,                   // remove money withdraw capacity
-    GR_RIGHT_WITHDRAW_REPAIR            = 0x00040000,                   // withdraw for repair
-    GR_RIGHT_WITHDRAW_GOLD              = 0x00080000,                   // withdraw gold
-    GR_RIGHT_CREATE_GUILD_EVENT         = 0x00100000,                   // wotlk
-    GR_RIGHT_ALL                        = 0x001DF1FF
+    GR_RIGHT_EMPTY = 0x00000040,
+    GR_RIGHT_GCHATLISTEN = GR_RIGHT_EMPTY | 0x00000001,
+    GR_RIGHT_GCHATSPEAK = GR_RIGHT_EMPTY | 0x00000002,
+    GR_RIGHT_OFFCHATLISTEN = GR_RIGHT_EMPTY | 0x00000004,
+    GR_RIGHT_OFFCHATSPEAK = GR_RIGHT_EMPTY | 0x00000008,
+    GR_RIGHT_INVITE = GR_RIGHT_EMPTY | 0x00000010,
+    GR_RIGHT_REMOVE = GR_RIGHT_EMPTY | 0x00000020,
+    GR_RIGHT_PROMOTE = GR_RIGHT_EMPTY | 0x00000080,
+    GR_RIGHT_DEMOTE = GR_RIGHT_EMPTY | 0x00000100,
+    GR_RIGHT_SETMOTD = GR_RIGHT_EMPTY | 0x00001000,
+    GR_RIGHT_EPNOTE = GR_RIGHT_EMPTY | 0x00002000,
+    GR_RIGHT_VIEWOFFNOTE = GR_RIGHT_EMPTY | 0x00004000,
+    GR_RIGHT_EOFFNOTE = GR_RIGHT_EMPTY | 0x00008000,
+    GR_RIGHT_MODIFY_GUILD_INFO = GR_RIGHT_EMPTY | 0x00010000,
+    GR_RIGHT_WITHDRAW_GOLD_LOCK = 0x00020000,                   // remove money withdraw capacity
+    GR_RIGHT_WITHDRAW_REPAIR = 0x00040000,                   // withdraw for repair
+    GR_RIGHT_WITHDRAW_GOLD = 0x00080000,                   // withdraw gold
+    GR_RIGHT_CREATE_GUILD_EVENT = 0x00100000,                   // wotlk
+    GR_RIGHT_ALL = 0x001DF1FF
 };
 
 enum GuildCommandType
 {
-    GUILD_COMMAND_CREATE                = 0,
-    GUILD_COMMAND_INVITE                = 1,
-    GUILD_COMMAND_QUIT                  = 3,
-    GUILD_COMMAND_ROSTER                = 5,
-    GUILD_COMMAND_PROMOTE               = 6,
-    GUILD_COMMAND_DEMOTE                = 7,
-    GUILD_COMMAND_REMOVE                = 8,
-    GUILD_COMMAND_CHANGE_LEADER         = 10,
-    GUILD_COMMAND_EDIT_MOTD             = 11,
-    GUILD_COMMAND_GUILD_CHAT            = 13,
-    GUILD_COMMAND_FOUNDER               = 14,
-    GUILD_COMMAND_CHANGE_RANK           = 16,
-    GUILD_COMMAND_PUBLIC_NOTE           = 19,
-    GUILD_COMMAND_VIEW_TAB              = 21,
-    GUILD_COMMAND_MOVE_ITEM             = 22,
-    GUILD_COMMAND_REPAIR                = 25,
+    GUILD_COMMAND_CREATE = 0,
+    GUILD_COMMAND_INVITE = 1,
+    GUILD_COMMAND_QUIT = 3,
+    GUILD_COMMAND_ROSTER = 5,
+    GUILD_COMMAND_PROMOTE = 6,
+    GUILD_COMMAND_DEMOTE = 7,
+    GUILD_COMMAND_REMOVE = 8,
+    GUILD_COMMAND_CHANGE_LEADER = 10,
+    GUILD_COMMAND_EDIT_MOTD = 11,
+    GUILD_COMMAND_GUILD_CHAT = 13,
+    GUILD_COMMAND_FOUNDER = 14,
+    GUILD_COMMAND_CHANGE_RANK = 16,
+    GUILD_COMMAND_PUBLIC_NOTE = 19,
+    GUILD_COMMAND_VIEW_TAB = 21,
+    GUILD_COMMAND_MOVE_ITEM = 22,
+    GUILD_COMMAND_REPAIR = 25,
 };
 
 enum GuildCommandError
 {
-    ERR_GUILD_COMMAND_SUCCESS           = 0,
-    ERR_GUILD_INTERNAL                  = 1,
-    ERR_ALREADY_IN_GUILD                = 2,
-    ERR_ALREADY_IN_GUILD_S              = 3,
-    ERR_INVITED_TO_GUILD                = 4,
-    ERR_ALREADY_INVITED_TO_GUILD_S      = 5,
-    ERR_GUILD_NAME_INVALID              = 6,
-    ERR_GUILD_NAME_EXISTS_S             = 7,
-    ERR_GUILD_LEADER_LEAVE              = 8,
-    ERR_GUILD_PERMISSIONS               = 8,
-    ERR_GUILD_PLAYER_NOT_IN_GUILD       = 9,
-    ERR_GUILD_PLAYER_NOT_IN_GUILD_S     = 10,
-    ERR_GUILD_PLAYER_NOT_FOUND_S        = 11,
-    ERR_GUILD_NOT_ALLIED                = 12,
-    ERR_GUILD_RANK_TOO_HIGH_S           = 13,
-    ERR_GUILD_RANK_TOO_LOW_S            = 14,
-    ERR_GUILD_RANKS_LOCKED              = 17,
-    ERR_GUILD_RANK_IN_USE               = 18,
-    ERR_GUILD_IGNORING_YOU_S            = 19,
-    ERR_GUILD_UNK1                      = 20, // Forces roster update
-    ERR_GUILD_WITHDRAW_LIMIT            = 25,
-    ERR_GUILD_NOT_ENOUGH_MONEY          = 26,
-    ERR_GUILD_BANK_FULL                 = 28,
-    ERR_GUILD_ITEM_NOT_FOUND            = 29,
+    ERR_GUILD_COMMAND_SUCCESS = 0,
+    ERR_GUILD_INTERNAL = 1,
+    ERR_ALREADY_IN_GUILD = 2,
+    ERR_ALREADY_IN_GUILD_S = 3,
+    ERR_INVITED_TO_GUILD = 4,
+    ERR_ALREADY_INVITED_TO_GUILD_S = 5,
+    ERR_GUILD_NAME_INVALID = 6,
+    ERR_GUILD_NAME_EXISTS_S = 7,
+    ERR_GUILD_LEADER_LEAVE = 8,
+    ERR_GUILD_PERMISSIONS = 8,
+    ERR_GUILD_PLAYER_NOT_IN_GUILD = 9,
+    ERR_GUILD_PLAYER_NOT_IN_GUILD_S = 10,
+    ERR_GUILD_PLAYER_NOT_FOUND_S = 11,
+    ERR_GUILD_NOT_ALLIED = 12,
+    ERR_GUILD_RANK_TOO_HIGH_S = 13,
+    ERR_GUILD_RANK_TOO_LOW_S = 14,
+    ERR_GUILD_RANKS_LOCKED = 17,
+    ERR_GUILD_RANK_IN_USE = 18,
+    ERR_GUILD_IGNORING_YOU_S = 19,
+    ERR_GUILD_UNK1 = 20, // Forces roster update
+    ERR_GUILD_WITHDRAW_LIMIT = 25,
+    ERR_GUILD_NOT_ENOUGH_MONEY = 26,
+    ERR_GUILD_BANK_FULL = 28,
+    ERR_GUILD_ITEM_NOT_FOUND = 29,
 };
 
 enum GuildEvents
 {
-    GE_PROMOTION                        = 0,
-    GE_DEMOTION                         = 1,
-    GE_MOTD                             = 2,
-    GE_JOINED                           = 3,
-    GE_LEFT                             = 4,
-    GE_REMOVED                          = 5,
-    GE_LEADER_IS                        = 6,
-    GE_LEADER_CHANGED                   = 7,
-    GE_DISBANDED                        = 8,
-    GE_TABARDCHANGE                     = 9,
-    GE_RANK_UPDATED                     = 10,
-    GE_RANK_DELETED                     = 11,
-    GE_SIGNED_ON                        = 12,
-    GE_SIGNED_OFF                       = 13,
-    GE_GUILDBANKBAGSLOTS_CHANGED        = 14,   /// @todo: Sent when items are moved in gbank - all players with bank open will send tab query
-    GE_BANK_TAB_PURCHASED               = 15,
-    GE_BANK_TAB_UPDATED                 = 16,
-    GE_BANK_MONEY_SET                   = 17,
-    GE_BANK_TAB_AND_MONEY_UPDATED       = 18,
-    GE_BANK_TEXT_CHANGED                = 19,
+    GE_PROMOTION = 0,
+    GE_DEMOTION = 1,
+    GE_MOTD = 2,
+    GE_JOINED = 3,
+    GE_LEFT = 4,
+    GE_REMOVED = 5,
+    GE_LEADER_IS = 6,
+    GE_LEADER_CHANGED = 7,
+    GE_DISBANDED = 8,
+    GE_TABARDCHANGE = 9,
+    GE_RANK_UPDATED = 10,
+    GE_RANK_DELETED = 11,
+    GE_SIGNED_ON = 12,
+    GE_SIGNED_OFF = 13,
+    GE_GUILDBANKBAGSLOTS_CHANGED = 14,   /// @todo: Sent when items are moved in gbank - all players with bank open will send tab query
+    GE_BANK_TAB_PURCHASED = 15,
+    GE_BANK_TAB_UPDATED = 16,
+    GE_BANK_MONEY_SET = 17,
+    GE_BANK_TAB_AND_MONEY_UPDATED = 18,
+    GE_BANK_TEXT_CHANGED = 19,
 };
 
 enum PetitionTurns
 {
-    PETITION_TURN_OK                    = 0,
-    PETITION_TURN_ALREADY_IN_GUILD      = 2,
-    PETITION_TURN_NEED_MORE_SIGNATURES  = 4
+    PETITION_TURN_OK = 0,
+    PETITION_TURN_ALREADY_IN_GUILD = 2,
+    PETITION_TURN_NEED_MORE_SIGNATURES = 4
 };
 
 enum PetitionSigns
 {
-    PETITION_SIGN_OK                    = 0,
-    PETITION_SIGN_ALREADY_SIGNED        = 1,
-    PETITION_SIGN_ALREADY_IN_GUILD      = 2,
-    PETITION_SIGN_CANT_SIGN_OWN         = 3,
-    PETITION_SIGN_NOT_SERVER            = 4
+    PETITION_SIGN_OK = 0,
+    PETITION_SIGN_ALREADY_SIGNED = 1,
+    PETITION_SIGN_ALREADY_IN_GUILD = 2,
+    PETITION_SIGN_CANT_SIGN_OWN = 3,
+    PETITION_SIGN_NOT_SERVER = 4
 };
 
 enum GuildBankRights
 {
-    GUILD_BANK_RIGHT_VIEW_TAB           = 0x01,
-    GUILD_BANK_RIGHT_PUT_ITEM           = 0x02,
-    GUILD_BANK_RIGHT_UPDATE_TEXT        = 0x04,
+    GUILD_BANK_RIGHT_VIEW_TAB = 0x01,
+    GUILD_BANK_RIGHT_PUT_ITEM = 0x02,
+    GUILD_BANK_RIGHT_UPDATE_TEXT = 0x04,
 
-    GUILD_BANK_RIGHT_DEPOSIT_ITEM       = GUILD_BANK_RIGHT_VIEW_TAB | GUILD_BANK_RIGHT_PUT_ITEM,
-    GUILD_BANK_RIGHT_FULL               = 0xFF
+    GUILD_BANK_RIGHT_DEPOSIT_ITEM = GUILD_BANK_RIGHT_VIEW_TAB | GUILD_BANK_RIGHT_PUT_ITEM,
+    GUILD_BANK_RIGHT_FULL = 0xFF
 };
 
 enum GuildBankEventLogTypes
 {
-    GUILD_BANK_LOG_DEPOSIT_ITEM         = 1,
-    GUILD_BANK_LOG_WITHDRAW_ITEM        = 2,
-    GUILD_BANK_LOG_MOVE_ITEM            = 3,
-    GUILD_BANK_LOG_DEPOSIT_MONEY        = 4,
-    GUILD_BANK_LOG_WITHDRAW_MONEY       = 5,
-    GUILD_BANK_LOG_REPAIR_MONEY         = 6,
-    GUILD_BANK_LOG_MOVE_ITEM2           = 7,
-    GUILD_BANK_LOG_UNK1                 = 8,
-    GUILD_BANK_LOG_BUY_SLOT             = 9
+    GUILD_BANK_LOG_DEPOSIT_ITEM = 1,
+    GUILD_BANK_LOG_WITHDRAW_ITEM = 2,
+    GUILD_BANK_LOG_MOVE_ITEM = 3,
+    GUILD_BANK_LOG_DEPOSIT_MONEY = 4,
+    GUILD_BANK_LOG_WITHDRAW_MONEY = 5,
+    GUILD_BANK_LOG_REPAIR_MONEY = 6,
+    GUILD_BANK_LOG_MOVE_ITEM2 = 7,
+    GUILD_BANK_LOG_UNK1 = 8,
+    GUILD_BANK_LOG_BUY_SLOT = 9
 };
 
 enum GuildEventLogTypes
 {
-    GUILD_EVENT_LOG_INVITE_PLAYER       = 1,
-    GUILD_EVENT_LOG_JOIN_GUILD          = 2,
-    GUILD_EVENT_LOG_PROMOTE_PLAYER      = 3,
-    GUILD_EVENT_LOG_DEMOTE_PLAYER       = 4,
-    GUILD_EVENT_LOG_UNINVITE_PLAYER     = 5,
-    GUILD_EVENT_LOG_LEAVE_GUILD         = 6
+    GUILD_EVENT_LOG_INVITE_PLAYER = 1,
+    GUILD_EVENT_LOG_JOIN_GUILD = 2,
+    GUILD_EVENT_LOG_PROMOTE_PLAYER = 3,
+    GUILD_EVENT_LOG_DEMOTE_PLAYER = 4,
+    GUILD_EVENT_LOG_UNINVITE_PLAYER = 5,
+    GUILD_EVENT_LOG_LEAVE_GUILD = 6
 };
 
 enum GuildEmblemError
 {
-    ERR_GUILDEMBLEM_SUCCESS               = 0,
+    ERR_GUILDEMBLEM_SUCCESS = 0,
     ERR_GUILDEMBLEM_INVALID_TABARD_COLORS = 1,
-    ERR_GUILDEMBLEM_NOGUILD               = 2,
-    ERR_GUILDEMBLEM_NOTGUILDMASTER        = 3,
-    ERR_GUILDEMBLEM_NOTENOUGHMONEY        = 4,
-    ERR_GUILDEMBLEM_INVALIDVENDOR         = 5
+    ERR_GUILDEMBLEM_NOGUILD = 2,
+    ERR_GUILDEMBLEM_NOTGUILDMASTER = 3,
+    ERR_GUILDEMBLEM_NOTENOUGHMONEY = 4,
+    ERR_GUILDEMBLEM_INVALIDVENDOR = 5
 };
 
 enum GuildMemberFlags
 {
-    GUILDMEMBER_STATUS_NONE             = 0x0000,
-    GUILDMEMBER_STATUS_ONLINE           = 0x0001,
-    GUILDMEMBER_STATUS_AFK              = 0x0002,
-    GUILDMEMBER_STATUS_DND              = 0x0004,
-    GUILDMEMBER_STATUS_MOBILE           = 0x0008, // remote chat from mobile app
+    GUILDMEMBER_STATUS_NONE = 0x0000,
+    GUILDMEMBER_STATUS_ONLINE = 0x0001,
+    GUILDMEMBER_STATUS_AFK = 0x0002,
+    GUILDMEMBER_STATUS_DND = 0x0004,
+    GUILDMEMBER_STATUS_MOBILE = 0x0008, // remote chat from mobile app
 };
 
 // Emblem info
 class EmblemInfo
 {
 public:
-    EmblemInfo() : m_style(0), m_color(0), m_borderStyle(0), m_borderColor(0), m_backgroundColor(0) { }
+    EmblemInfo(uint32 /*style*/ = 0, uint32 /*color*/ = 0, uint32 /*borderStyle*/ = 0, uint32 /*borderColor*/ = 0, uint32 /*backgroundColor*/ = 0) :
+        m_style(0), m_color(0), m_borderStyle(0), m_borderColor(0), m_backgroundColor(0) {
+    }
 
     void LoadFromDB(Field* fields);
     void SaveToDB(uint32 guildId) const;
@@ -262,9 +264,9 @@ private:
 class GuildBankRightsAndSlots
 {
 public:
-    GuildBankRightsAndSlots() : tabId(TAB_UNDEFINED), rights(0), slots(0) { }
-    GuildBankRightsAndSlots(uint8 _tabId) : tabId(_tabId), rights(0), slots(0) { }
-    GuildBankRightsAndSlots(uint8 _tabId, uint8 _rights, uint32 _slots) : tabId(_tabId), rights(_rights), slots(_slots) { }
+    GuildBankRightsAndSlots() : tabId(TAB_UNDEFINED), rights(0), slots(0) {}
+    GuildBankRightsAndSlots(uint8 _tabId) : tabId(_tabId), rights(0), slots(0) {}
+    GuildBankRightsAndSlots(uint8 _tabId, uint8 _rights, uint32 _slots) : tabId(_tabId), rights(_rights), slots(_slots) {}
 
     void SetGuildMasterValues()
     {
@@ -295,7 +297,7 @@ public: // pussywizard: public class Member
     class Member
     {
     public:
-        Member(uint32 guildId, ObjectGuid guid, uint8 rankId):
+        Member(uint32 guildId, ObjectGuid guid, uint8 rankId) :
             m_guildId(guildId),
             m_guid(guid),
             m_zoneId(0),
@@ -403,8 +405,8 @@ private:
     {
     public:
         LogEntry(uint32 guildId, ObjectGuid::LowType guid);
-        LogEntry(uint32 guildId, ObjectGuid::LowType guid, time_t timestamp) : m_guildId(guildId), m_guid(guid), m_timestamp(timestamp) { }
-        virtual ~LogEntry() { }
+        LogEntry(uint32 guildId, ObjectGuid::LowType guid, time_t timestamp) : m_guildId(guildId), m_guid(guid), m_timestamp(timestamp) {}
+        virtual ~LogEntry() {}
 
         ObjectGuid::LowType GetGUID() const { return m_guid; }
         uint64 GetTimestamp() const { return m_timestamp; }
@@ -422,12 +424,14 @@ private:
     {
     public:
         EventLogEntry(uint32 guildId, ObjectGuid::LowType guid, GuildEventLogTypes eventType, ObjectGuid playerGuid1, ObjectGuid playerGuid2, uint8 newRank) :
-            LogEntry(guildId, guid), m_eventType(eventType), m_playerGuid1(playerGuid1), m_playerGuid2(playerGuid2), m_newRank(newRank) { }
+            LogEntry(guildId, guid), m_eventType(eventType), m_playerGuid1(playerGuid1), m_playerGuid2(playerGuid2), m_newRank(newRank) {
+        }
 
         EventLogEntry(uint32 guildId, ObjectGuid::LowType guid, time_t timestamp, GuildEventLogTypes eventType, ObjectGuid playerGuid1, ObjectGuid playerGuid2, uint8 newRank) :
-            LogEntry(guildId, guid, timestamp), m_eventType(eventType), m_playerGuid1(playerGuid1), m_playerGuid2(playerGuid2), m_newRank(newRank) { }
+            LogEntry(guildId, guid, timestamp), m_eventType(eventType), m_playerGuid1(playerGuid1), m_playerGuid2(playerGuid2), m_newRank(newRank) {
+        }
 
-        ~EventLogEntry() override { }
+        ~EventLogEntry() override {}
 
         void SaveToDB(CharacterDatabaseTransaction trans) const override;
         void WritePacket(WorldPackets::Guild::GuildEventLogQueryResults& packet) const;
@@ -458,13 +462,15 @@ private:
 
         BankEventLogEntry(uint32 guildId, ObjectGuid::LowType guid, GuildBankEventLogTypes eventType, uint8 tabId, ObjectGuid playerGuid, uint32 itemOrMoney, uint16 itemStackCount, uint8 destTabId) :
             LogEntry(guildId, guid), m_eventType(eventType), m_bankTabId(tabId), m_playerGuid(playerGuid),
-            m_itemOrMoney(itemOrMoney), m_itemStackCount(itemStackCount), m_destTabId(destTabId) { }
+            m_itemOrMoney(itemOrMoney), m_itemStackCount(itemStackCount), m_destTabId(destTabId) {
+        }
 
         BankEventLogEntry(uint32 guildId, ObjectGuid::LowType guid, time_t timestamp, uint8 tabId, GuildBankEventLogTypes eventType, ObjectGuid playerGuid, uint32 itemOrMoney, uint16 itemStackCount, uint8 destTabId) :
             LogEntry(guildId, guid, timestamp), m_eventType(eventType), m_bankTabId(tabId), m_playerGuid(playerGuid),
-            m_itemOrMoney(itemOrMoney), m_itemStackCount(itemStackCount), m_destTabId(destTabId) { }
+            m_itemOrMoney(itemOrMoney), m_itemStackCount(itemStackCount), m_destTabId(destTabId) {
+        }
 
-        ~BankEventLogEntry() override { }
+        ~BankEventLogEntry() override {}
 
         void SaveToDB(CharacterDatabaseTransaction trans) const override;
         void WritePacket(WorldPackets::Guild::GuildBankLogQueryResults& packet) const;
@@ -509,11 +515,12 @@ private:
     class RankInfo
     {
     public:
-        RankInfo(): m_guildId(0), m_rankId(GUILD_RANK_NONE), m_rights(GR_RIGHT_EMPTY), m_bankMoneyPerDay(0) { }
-        RankInfo(uint32 guildId) : m_guildId(guildId), m_rankId(GUILD_RANK_NONE), m_rights(GR_RIGHT_EMPTY), m_bankMoneyPerDay(0) { }
+        RankInfo() : m_guildId(0), m_rankId(GUILD_RANK_NONE), m_rights(GR_RIGHT_EMPTY), m_bankMoneyPerDay(0) {}
+        RankInfo(uint32 guildId) : m_guildId(guildId), m_rankId(GUILD_RANK_NONE), m_rights(GR_RIGHT_EMPTY), m_bankMoneyPerDay(0) {}
         RankInfo(uint32 guildId, uint8 rankId, std::string_view name, uint32 rights, uint32 money) :
             m_guildId(guildId), m_rankId(rankId), m_name(name), m_rights(rights),
-            m_bankMoneyPerDay(rankId != GR_GUILDMASTER ? money : GUILD_WITHDRAW_MONEY_UNLIMITED) { }
+            m_bankMoneyPerDay(rankId != GR_GUILDMASTER ? money : GUILD_WITHDRAW_MONEY_UNLIMITED) {
+        }
 
         void LoadFromDB(Field* fields);
         void SaveToDB(CharacterDatabaseTransaction trans) const;
@@ -572,7 +579,7 @@ private:
         std::string const& GetIcon() const { return m_icon; }
         std::string const& GetText() const { return m_text; }
 
-        inline Item* GetItem(uint8 slotId) const { return slotId < GUILD_BANK_MAX_SLOTS ?  m_items[slotId] : nullptr; }
+        inline Item* GetItem(uint8 slotId) const { return slotId < GUILD_BANK_MAX_SLOTS ? m_items[slotId] : nullptr; }
         bool SetItem(CharacterDatabaseTransaction trans, uint8 slotId, Item* pItem);
 
     private:
@@ -590,8 +597,9 @@ private:
     {
     public:
         MoveItemData(Guild* guild, Player* player, uint8 container, uint8 slotId) : m_pGuild(guild), m_pPlayer(player),
-            m_container(container), m_slotId(slotId), m_pItem(nullptr), m_pClonedItem(nullptr) { }
-        virtual ~MoveItemData() { }
+            m_container(container), m_slotId(slotId), m_pItem(nullptr), m_pClonedItem(nullptr) {
+        }
+        virtual ~MoveItemData() {}
 
         virtual bool IsBank() const = 0;
         // Initializes item pointer. Returns true, if item exists, false otherwise.
@@ -637,7 +645,8 @@ private:
     {
     public:
         PlayerMoveItemData(Guild* guild, Player* player, uint8 container, uint8 slotId) :
-            MoveItemData(guild, player, container, slotId) { }
+            MoveItemData(guild, player, container, slotId) {
+        }
 
         bool IsBank() const override { return false; }
         bool InitItem() override;
@@ -652,7 +661,8 @@ private:
     {
     public:
         BankMoveItemData(Guild* guild, Player* player, uint8 container, uint8 slotId) :
-            MoveItemData(guild, player, container, slotId) { }
+            MoveItemData(guild, player, container, slotId) {
+        }
 
         bool IsBank() const override { return true; }
         bool InitItem() override;
@@ -696,11 +706,13 @@ public:
     void HandleQuery(WorldSession* session);
     void HandleSetMOTD(WorldSession* session, std::string_view motd);
     void HandleSetInfo(WorldSession* session, std::string_view info);
-    void HandleSetEmblem(WorldSession* session, const EmblemInfo& emblemInfo);
+    void HandleSetEmblem(WorldSession* session, EmblemInfo const& emblemInfo);
+    void HandleSetEmblem(EmblemInfo const& emblemInfo);
     void HandleSetLeader(WorldSession* session, std::string_view name);
     void HandleSetBankTabInfo(WorldSession* session, uint8 tabId, std::string_view name, std::string_view icon);
     void HandleSetMemberNote(WorldSession* session, std::string_view name, std::string_view note, bool isPublic);
     void HandleSetRankInfo(WorldSession* session, uint8 rankId, std::string_view name, uint32 rights, uint32 moneyPerDay, std::array<GuildBankRightsAndSlots, GUILD_BANK_MAX_TABS> const& rightsAndSlots);
+    void HandleSetRankInfo(uint8 rankId, uint32 rights = 0, std::string_view name = "", uint32 moneyPerDay = 0);
     void HandleBuyBankTab(WorldSession* session, uint8 tabId);
     void HandleInviteMember(WorldSession* session, std::string const& name);
     void HandleAcceptMember(WorldSession* session);
@@ -779,6 +791,10 @@ public:
     [[nodiscard]] bool ModifyBankMoney(CharacterDatabaseTransaction trans, const uint64& amount, bool add) { return _ModifyBankMoney(trans, amount, add); }
     [[nodiscard]] uint32 GetMemberSize() const { return m_members.size(); }
 
+    bool MemberHasTabRights(ObjectGuid guid, uint8 tabId, uint32 rights) const;
+    bool HasRankRight(Player* player, uint32 right) const;
+    uint32 GetRankRights(uint8 rankId) const;
+
 protected:
     uint32 m_id;
     std::string m_name;
@@ -803,13 +819,6 @@ private:
     inline uint8 _GetRanksSize() const { return uint8(m_ranks.size()); }
     inline const RankInfo* GetRankInfo(uint8 rankId) const { return rankId < _GetRanksSize() ? &m_ranks[rankId] : nullptr; }
     inline RankInfo* GetRankInfo(uint8 rankId) { return rankId < _GetRanksSize() ? &m_ranks[rankId] : nullptr; }
-    inline bool _HasRankRight(Player* player, uint32 right) const
-    {
-        if (player)
-            if (Member const* member = GetMember(player->GetGUID()))
-                return (_GetRankRights(member->GetRankId()) & right) != GR_RIGHT_EMPTY;
-        return false;
-    }
 
     inline uint8 _GetLowestRankId() const { return uint8(m_ranks.size() - 1); }
 
@@ -840,7 +849,6 @@ private:
     void _SetRankBankMoneyPerDay(uint8 rankId, uint32 moneyPerDay);
     void _SetRankBankTabRightsAndSlots(uint8 rankId, GuildBankRightsAndSlots rightsAndSlots, bool saveToDB = true);
     int8 _GetRankBankTabRights(uint8 rankId, uint8 tabId) const;
-    uint32 _GetRankRights(uint8 rankId) const;
     int32 _GetRankBankMoneyPerDay(uint8 rankId) const;
     int32 _GetRankBankTabSlotsPerDay(uint8 rankId, uint8 tabId) const;
     std::string _GetRankName(uint8 rankId) const;
@@ -848,7 +856,6 @@ private:
     int32 _GetMemberRemainingSlots(Member const& member, uint8 tabId) const;
     int32 _GetMemberRemainingMoney(Member const& member) const;
     void _UpdateMemberWithdrawSlots(CharacterDatabaseTransaction trans, ObjectGuid guid, uint8 tabId);
-    bool _MemberHasTabRights(ObjectGuid guid, uint8 tabId, uint32 rights) const;
 
     void _LogEvent(GuildEventLogTypes eventType, ObjectGuid playerGuid1, ObjectGuid playerGuid2 = ObjectGuid::Empty, uint8 newRank = 0);
     void _LogBankEvent(CharacterDatabaseTransaction trans, GuildBankEventLogTypes eventType, uint8 tabId, ObjectGuid playerGuid, uint32 itemOrMoney, uint16 itemStackCount = 0, uint8 destTabId = 0);

@@ -73,14 +73,14 @@ enum WorldTimers
 enum BillingPlanFlags
 {
     SESSION_NONE            = 0x00,
-    SESSION_UNUSED          = 0x01,
+    SESSION_UNUSED          = 0x01, // Unk, NYI
     SESSION_RECURRING_BILL  = 0x02,
     SESSION_FREE_TRIAL      = 0x04,
-    SESSION_IGR             = 0x08,
-    SESSION_USAGE           = 0x10,
-    SESSION_TIME_MIXTURE    = 0x20,
-    SESSION_RESTRICTED      = 0x40,
-    SESSION_ENABLE_CAIS     = 0x80,
+    SESSION_IGR             = 0x08, // Internet Game Room
+    SESSION_USAGE           = 0x10, // Unk, NYI
+    SESSION_TIME_MIXTURE    = 0x20, // Unk, NYI
+    SESSION_RESTRICTED      = 0x40, // Unk, NYI
+    SESSION_ENABLE_CAIS     = 0x80, // Unk, NYI, possibly account play time limit related for China?
 };
 
 enum RealmZone
@@ -229,6 +229,9 @@ public:
     // used World DB version
     void LoadDBVersion() override;
     [[nodiscard]] char const* GetDBVersion() const override { return _dbVersion.c_str(); }
+#ifdef MOD_PLAYERBOTS
+    [[nodiscard]] char const* GetPlayerbotsDBRevision() const override { return m_PlayerbotsDBRevision.c_str(); }
+#endif
 
     void UpdateAreaDependentAuras() override;
 
@@ -256,6 +259,9 @@ protected:
     void ResetRandomBG();
     void CalendarDeleteOldEvents();
     void ResetGuildCap();
+
+    SQLQueryHolderCallback& AddQueryHolderCallback(SQLQueryHolderCallback&& callback) override;
+
 private:
     WorldConfig _worldConfig;
 
@@ -300,9 +306,13 @@ private:
     // used versions
     std::string _dbVersion;
     uint32 _dbClientCacheVersion;
+#ifdef MOD_PLAYERBOTS
+    std::string m_PlayerbotsDBRevision;
+#endif
 
     void ProcessQueryCallbacks();
     QueryCallbackProcessor _queryProcessor;
+    AsyncCallbackProcessor<SQLQueryHolderCallback> _queryHolderProcessor;
 
     /**
      * @brief Executed when a World Session is being finalized. Be it from a normal login or via queue popping.

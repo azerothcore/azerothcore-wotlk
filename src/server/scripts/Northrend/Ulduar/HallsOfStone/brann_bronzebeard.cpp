@@ -753,7 +753,6 @@ public:
                 if (cr)
                 {
                     cr->AI()->AttackStart(me);
-                    cr->AddThreat(me, 0.0f);
                     cr->SetInCombatWithZone();
                 }
             }
@@ -911,6 +910,28 @@ void brann_bronzebeard::brann_bronzebeardAI::WaypointReached(uint32 id)
     }
 }
 
+// 51774 - Taunt
+class spell_taunt_brann : public SpellScript
+{
+    PrepareSpellScript(spell_taunt_brann);
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        Unit* caster = GetCaster();
+        Unit* target = GetHitUnit();
+        if (!caster || !target)
+            return;
+
+        uint32 spellId = GetEffectValue(); // 51775
+        target->CastSpell(caster, spellId, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_taunt_brann::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
 class spell_hos_dark_matter : public AuraScript
 {
     PrepareAuraScript(spell_hos_dark_matter);
@@ -953,4 +974,5 @@ void AddSC_brann_bronzebeard()
     new brann_bronzebeard();
     RegisterSpellScript(spell_hos_dark_matter);
     RegisterSpellScript(spell_hos_dark_matter_size);
+    RegisterSpellScript(spell_taunt_brann);
 }

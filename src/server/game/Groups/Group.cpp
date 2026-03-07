@@ -350,13 +350,20 @@ bool Group::AddLeaderInvite(Player* player)
 
 void Group::RemoveInvite(Player* player)
 {
-    if (player)
-    {
-        if (!m_invitees.empty())
-            m_invitees.erase(player);
-        player->SetGroupInvite(nullptr);
-    }
+    if (!player)
+        return;
+
+    // mod_playerbots: double invite hack workaround
+    if (player->GetGroupInvite() != this)
+        return;
+
+    auto itr = m_invitees.find(player);
+    if (itr != m_invitees.end())
+        m_invitees.erase(itr);
+
+    player->SetGroupInvite(nullptr);
 }
+
 
 void Group::RemoveAllInvites()
 {
@@ -2150,7 +2157,7 @@ void Group::ResetInstances(uint8 method, bool isRaid, Player* leader)
                     }
                     else
                     {
-                        leader->SendResetInstanceFailed(0, instanceSave->GetMapId());
+                        leader->SendResetInstanceFailed(INSTANCE_RESET_FAILED, instanceSave->GetMapId());
                     }
 
                     sInstanceSaveMgr->DeleteInstanceSavedData(instanceSave->GetInstanceId());
@@ -2178,7 +2185,7 @@ void Group::ResetInstances(uint8 method, bool isRaid, Player* leader)
                     }
                     else
                     {
-                        leader->SendResetInstanceFailed(0, instanceSave->GetMapId());
+                        leader->SendResetInstanceFailed(INSTANCE_RESET_FAILED, instanceSave->GetMapId());
                     }
 
                     sInstanceSaveMgr->DeleteInstanceSavedData(instanceSave->GetInstanceId());

@@ -1084,7 +1084,7 @@ void Item::SendTimeUpdate(Player* owner)
     owner->SendDirectMessage(&data);
 }
 
-Item* Item::CreateItem(uint32 item, uint32 count, Player const* player, bool clone, uint32 randomPropertyId)
+Item* Item::CreateItem(uint32 item, uint32 count, Player const* player, bool clone, uint32 randomPropertyId, bool temp)
 {
     if (count < 1)
         return nullptr;                                        //don't create item at zero count
@@ -1098,7 +1098,8 @@ Item* Item::CreateItem(uint32 item, uint32 count, Player const* player, bool clo
         ASSERT_NODEBUGINFO(count != 0 && "pProto->Stackable == 0 but checked at loading already");
 
         Item* pItem = NewItemOrBag(pProto);
-        if (pItem->Create(sObjectMgr->GetGenerator<HighGuid::Item>().Generate(), item, player))
+        uint32 guid = temp ? 0xFFFFFFFF : sObjectMgr->GetGenerator<HighGuid::Item>().Generate();
+        if (pItem->Create(guid, item, player))
         {
             pItem->SetCount(count);
             if (!clone)
@@ -1276,10 +1277,15 @@ void Item::ClearSoulboundTradeable(Player* currentOwner)
 
 bool Item::CheckSoulboundTradeExpire()
 {
-    // called from owner's update - GetOwner() MUST be valid
-    if (GetUInt32Value(ITEM_FIELD_CREATE_PLAYED_TIME) + 2 * HOUR < GetOwner()->GetTotalPlayedTime())
+    // we have to check the owner for mod_playerbots since bots programically call methods like DestroyItem, 
+    // MoveItemToMail, DestroyItemCount which do not handle soulboundTradeable clearing.
+    Player* owner = GetOwner();
+    if (!owner)
+        return true; // remove from tradeable list
+    
+    if (GetUInt32Value(ITEM_FIELD_CREATE_PLAYED_TIME) + 2 * HOUR < owner->GetTotalPlayedTime())
     {
-        ClearSoulboundTradeable(GetOwner());
+        ClearSoulboundTradeable(owner);
         return true; // remove from tradeable list
     }
 

@@ -136,13 +136,13 @@ std::unordered_map<uint8, AuthHandler> const Handlers = AuthSession::InitHandler
 
 void AccountInfo::LoadResult(Field* fields)
 {
-    //          0        1          2           3             4             5
-    // SELECT a.id, a.username, a.locked, a.lock_country, a.last_ip, a.failed_logins,
-    //                                 6                                        7
+    //          0        1          2           3             4         5            6
+    // SELECT a.id, a.username, a.locked, a.lock_country, a.last_ip, a.Flags, a.failed_logins,
+    //                                 7                                        8
     // ab.unbandate > UNIX_TIMESTAMP() OR ab.unbandate = ab.bandate, ab.unbandate = ab.bandate,
-    //                                 8                                             9
+    //                                 9                                             10
     // ipb.unbandate > UNIX_TIMESTAMP() OR ipb.unbandate = ipb.bandate, ipb.unbandate = ipb.bandate,
-    //      10
+    //      11
     // aa.gmlevel (, more query-specific fields)
     // FROM account a LEFT JOIN account_access aa ON a.id = aa.id LEFT JOIN account_banned ab ON ab.id = a.id AND ab.active = 1 LEFT JOIN ip_banned ipb ON ipb.ip = ? WHERE a.username = ?
 
@@ -151,10 +151,11 @@ void AccountInfo::LoadResult(Field* fields)
     IsLockedToIP = fields[2].Get<bool>();
     LockCountry = fields[3].Get<std::string>();
     LastIP = fields[4].Get<std::string>();
-    FailedLogins = fields[5].Get<uint32>();
-    IsBanned = fields[6].Get<bool>() || fields[8].Get<bool>();
-    IsPermanentlyBanned = fields[7].Get<bool>() || fields[9].Get<bool>();
-    SecurityLevel = static_cast<AccountTypes>(fields[10].Get<uint8>()) > SEC_CONSOLE ? SEC_CONSOLE : static_cast<AccountTypes>(fields[10].Get<uint8>());
+    Flags = fields[5].Get<uint32>();
+    FailedLogins = fields[6].Get<uint32>();
+    IsBanned = fields[7].Get<bool>() || fields[9].Get<bool>();
+    IsPermanentlyBanned = fields[8].Get<bool>() || fields[10].Get<bool>();
+    SecurityLevel = static_cast<AccountTypes>(fields[11].Get<uint8>()) > SEC_CONSOLE ? SEC_CONSOLE : static_cast<AccountTypes>(fields[11].Get<uint8>());
 
     // Use our own uppercasing of the account name instead of using UPPER() in mysql query
     // This is how the account was created in the first place and changing it now would result in breaking
@@ -387,10 +388,10 @@ void AuthSession::LogonChallengeCallback(PreparedQueryResult result)
     uint8 securityFlags = 0;
 
     // Check if a TOTP token is needed
-    if (!fields[11].IsNull())
+    if (!fields[12].IsNull())
     {
         securityFlags = 4;
-        _totpSecret = fields[11].Get<Binary>();
+        _totpSecret = fields[12].Get<Binary>();
 
         if (auto const& secret = sSecretMgr->GetSecret(SECRET_TOTP_MASTER_KEY))
         {
@@ -406,8 +407,8 @@ void AuthSession::LogonChallengeCallback(PreparedQueryResult result)
     }
 
     _srp6.emplace(_accountInfo.Login,
-        fields[12].Get<Binary, Acore::Crypto::SRP6::SALT_LENGTH>(),
-        fields[13].Get<Binary, Acore::Crypto::SRP6::VERIFIER_LENGTH>());
+        fields[13].Get<Binary, Acore::Crypto::SRP6::SALT_LENGTH>(),
+        fields[14].Get<Binary, Acore::Crypto::SRP6::VERIFIER_LENGTH>());
 
     // Fill the response packet with the result
     if (AuthHelper::IsAcceptedClientBuild(_build))
@@ -531,7 +532,7 @@ bool AuthSession::HandleLogonProof()
                 proof.M2 = M2;
                 proof.cmd = AUTH_LOGON_PROOF;
                 proof.error = 0;
-                proof.AccountFlags = ACCOUNT_FLAG_PROPASS_LOCK;    // enum AccountFlag
+                proof.AccountFlags = _accountInfo.Flags;
                 proof.SurveyId = 0;
                 proof.LoginFlags = 0;               // 0x1 = has account message
 
@@ -667,7 +668,7 @@ void AuthSession::ReconnectChallengeCallback(PreparedQueryResult result)
     Field* fields = result->Fetch();
 
     _accountInfo.LoadResult(fields);
-    _sessionKey = fields[11].Get<Binary, SESSION_KEY_LENGTH>();
+    _sessionKey = fields[12].Get<Binary, SESSION_KEY_LENGTH>();
     Acore::Crypto::GetRandomBytes(_reconnectProof);
     _status = STATUS_RECONNECT_PROOF;
 

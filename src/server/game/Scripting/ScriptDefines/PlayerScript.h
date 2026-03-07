@@ -20,6 +20,7 @@
 
 #include "ScriptObject.h"
 #include "SharedDefines.h"
+#include "DBCStructure.h"
 #include <vector>
 
 // TODO to remove
@@ -45,6 +46,7 @@ enum PlayerHook
     PLAYERHOOK_ON_AFTER_SPEC_SLOT_CHANGED,
     PLAYERHOOK_ON_BEFORE_UPDATE,
     PLAYERHOOK_ON_UPDATE,
+    PLAYERHOOK_ON_AFTER_UPDATE,
     PLAYERHOOK_ON_MONEY_CHANGED,
     PLAYERHOOK_ON_BEFORE_LOOT_MONEY,
     PLAYERHOOK_ON_GIVE_EXP,
@@ -55,7 +57,12 @@ enum PlayerHook
     PLAYERHOOK_ON_DUEL_REQUEST,
     PLAYERHOOK_ON_DUEL_START,
     PLAYERHOOK_ON_DUEL_END,
+    PLAYERHOOK_ON_CHAT,
     PLAYERHOOK_ON_BEFORE_SEND_CHAT_MESSAGE,
+    PLAYERHOOK_ON_CHAT_WITH_RECEIVER,
+    PLAYERHOOK_ON_CHAT_WITH_GROUP,
+    PLAYERHOOK_ON_CHAT_WITH_GUILD,
+    PLAYERHOOK_ON_CHAT_WITH_CHANNEL,
     PLAYERHOOK_ON_EMOTE,
     PLAYERHOOK_ON_TEXT_EMOTE,
     PLAYERHOOK_ON_SPELL_CAST,
@@ -207,6 +214,7 @@ enum PlayerHook
     PLAYERHOOK_ON_CAN_GIVE_LEVEL,
     PLAYERHOOK_ON_SEND_LIST_INVENTORY,
     PLAYERHOOK_ON_GIVE_REPUTATION,
+    PLAYERHOOK_ON_GET_REPUTATION_PRICE_DISCOUNT,
     PLAYERHOOK_END
 };
 
@@ -263,6 +271,7 @@ public:
 
     // Called for player::update
     virtual void OnPlayerBeforeUpdate(Player* /*player*/, uint32 /*p_time*/) { }
+    virtual void OnPlayerAfterUpdate(Player* /*player*/, uint32 /*p_time*/) { }
     virtual void OnPlayerUpdate(Player* /*player*/, uint32 /*p_time*/) { }
 
     // Called when a player's money is modified (before the modification is done)
@@ -796,6 +805,24 @@ public:
      * @param vendorEntry Entry of the vendor player is interacting with
      */
     virtual void OnPlayerSendListInventory(Player* /*player*/, ObjectGuid /*vendorGuid*/, uint32& /*vendorEntry*/) {}
+
+    /**
+     * @brief This hook is called whenever a player attempts to buy items, repair, take taxis, or learn spells. This then uses this information to call OnPlayerGetReputationPriceDiscoun(Player, FactionTemplateEntry, float)
+     *
+     * @param player Contains information about the Player
+     * @param creature Contains information about the creature involved in the transaction
+     * @param discount Float value of the discount, as a multiplier of the base price
+     */
+    virtual void OnPlayerGetReputationPriceDiscount(Player const* /*player*/, Creature const* /*creature*/, float& /*discount*/) {}
+
+    /**
+     * @brief This hook is called whenever a player attempts to buy items, repair, take taxis, or learn spells. It is also called when continuing along taxis
+     *
+     * @param player Contains information about the Player
+     * @param factionTemplate Contains information about the faction template involved in the transaction. Can be null!
+     * @param discount Float value of the discount, as a multiplier of the base price
+     */
+    virtual void OnPlayerGetReputationPriceDiscount(Player const* /*player*/, FactionTemplateEntry const* /*factionTemplate*/, float& /*discount*/) {}
 };
 
 #endif

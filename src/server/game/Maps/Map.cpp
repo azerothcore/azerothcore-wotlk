@@ -568,7 +568,7 @@ void Map::AddObjectToPendingUpdateList(WorldObject* obj)
         return;
 
     UpdatableMapObject* mapUpdatableObject = dynamic_cast<UpdatableMapObject*>(obj);
-    if (mapUpdatableObject->GetUpdateState() != UpdatableMapObject::UpdateState::NotUpdating)
+    if (!mapUpdatableObject || mapUpdatableObject->GetUpdateState() != UpdatableMapObject::UpdateState::NotUpdating)
         return;
 
     _pendingAddUpdatableObjectList.insert(obj);
@@ -1722,6 +1722,13 @@ void Map::SendObjectUpdates()
     WorldPacket packet;                                     // here we allocate a std::vector with a size of 0x10000
     for (UpdateDataMapType::iterator iter = update_players.begin(); iter != update_players.end(); ++iter)
     {
+        if (!sScriptMgr->OnPlayerbotCheckUpdatesToSend(iter->first))
+        {
+            iter->second.Clear();
+            continue;
+        }
+
+
         iter->second.BuildPacket(packet);
         iter->first->SendDirectMessage(&packet);
         packet.clear();                                     // clean the string

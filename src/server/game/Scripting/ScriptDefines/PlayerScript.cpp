@@ -194,10 +194,16 @@ void ScriptMgr::OnPlayerBeforeUpdate(Player* player, uint32 p_time)
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_UPDATE, script->OnPlayerBeforeUpdate(player, p_time));
 }
 
+void ScriptMgr::OnPlayerAfterUpdate(Player* player, uint32 p_time)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_AFTER_UPDATE, script->OnPlayerAfterUpdate(player, p_time));
+}
+
 void ScriptMgr::OnPlayerUpdate(Player* player, uint32 p_time)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_UPDATE, script->OnPlayerUpdate(player, p_time));
 }
+
 
 void ScriptMgr::OnPlayerLogin(Player* player)
 {
@@ -908,6 +914,16 @@ bool ScriptMgr::OnPlayerCanGiveLevel(Player* player, uint8 newLevel)
 void ScriptMgr::OnPlayerSendListInventory(Player* player, ObjectGuid vendorGuid, uint32& vendorEntry)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_SEND_LIST_INVENTORY, script->OnPlayerSendListInventory(player, vendorGuid, vendorEntry));
+}
+
+void ScriptMgr::OnPlayerGetReputationPriceDiscount(Player const* player, Creature const* creature, float& discount)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_GET_REPUTATION_PRICE_DISCOUNT, script->OnPlayerGetReputationPriceDiscount(player, creature, discount));
+}
+
+void ScriptMgr::OnPlayerGetReputationPriceDiscount(Player const* player, FactionTemplateEntry const* factionTemplate, float& discount)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_GET_REPUTATION_PRICE_DISCOUNT, script->OnPlayerGetReputationPriceDiscount(player, factionTemplate, discount));
 }
 
 PlayerScript::PlayerScript(const char* name, std::vector<uint16> enabledHooks)

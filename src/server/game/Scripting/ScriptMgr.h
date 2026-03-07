@@ -105,7 +105,26 @@ namespace Acore::ChatCommands
 
 */
 
-// Manages registration, loading, and execution of scripts.
+class PlayerbotScript : public ScriptObject
+{
+protected:
+
+    PlayerbotScript(const char* name);
+
+public:
+    bool IsDatabaseBound() const { return false; }
+
+    [[nodiscard]] virtual bool OnPlayerbotCheckLFGQueue(lfg::Lfg5Guids const& /*guidsList*/) { return true; }
+    virtual void OnPlayerbotCheckKillTask(Player* /*player*/, Unit* /*victim*/) { }
+    virtual void OnPlayerbotCheckPetitionAccount(Player* /*player*/, bool& /*found*/) { }
+    [[nodiscard]] virtual bool OnPlayerbotCheckUpdatesToSend(Player* /*player*/) { return true; }
+    virtual void OnPlayerbotPacketSent(Player* /*player*/, WorldPacket const* /*packet*/) { }
+    virtual void OnPlayerbotUpdate(uint32 /*diff*/) { }
+    virtual void OnPlayerbotUpdateSessions(Player* /*player*/) { }
+    virtual void OnPlayerbotLogout(Player* /*player*/) { }
+    virtual void OnPlayerbotLogoutBots() { }
+};
+
 class ScriptMgr
 {
     friend class ScriptObject;
@@ -158,6 +177,7 @@ public: /* ServerScript */
     void OnSocketOpen(std::shared_ptr<WorldSocket> const& socket);
     void OnSocketClose(std::shared_ptr<WorldSocket> const& socket);
     bool CanPacketReceive(WorldSession* session, WorldPacket const& packet);
+    void OnPacketReceived(WorldSession* session, WorldPacket const& packet);
     bool CanPacketSend(WorldSession* session, WorldPacket const& packet);
 
 public: /* WorldScript */
@@ -298,6 +318,7 @@ public: /* PlayerScript */
     void OnPlayerReleasedGhost(Player* player);
     void OnPlayerSendInitialPacketsBeforeAddToMap(Player* player, WorldPacket& data);
     void OnPlayerBeforeUpdate(Player* player, uint32 p_time);
+    void OnPlayerAfterUpdate(Player* player, uint32 diff);
     void OnPlayerUpdate(Player* player, uint32 p_time);
     void OnPlayerPVPKill(Player* killer, Player* killed);
     void OnPlayerPVPFlagChange(Player* player, bool state);
@@ -462,6 +483,8 @@ public: /* PlayerScript */
     bool OnPlayerCanResurrect(Player* player);
     bool OnPlayerCanGiveLevel(Player* player, uint8 newLevel);
     void OnPlayerSendListInventory(Player* player, ObjectGuid vendorGuid, uint32& vendorEntry);
+    void OnPlayerGetReputationPriceDiscount(Player const* player, Creature const* creature, float& discount);
+    void OnPlayerGetReputationPriceDiscount(Player const* player, FactionTemplateEntry const* factionTemplate, float& discount);
 
     // Anti cheat
     void AnticheatSetCanFlybyServer(Player* player, bool apply);
@@ -594,6 +617,8 @@ public: /* BGScript */
     void OnBattlegroundEnd(Battleground* bg, TeamId winnerTeamId);
     void OnBattlegroundDestroy(Battleground* bg);
     void OnBattlegroundCreate(Battleground* bg);
+    bool CanAddGroupToMatchingPool(BattlegroundQueue* queue, GroupQueueInfo* group, uint32 poolPlayerCount, Battleground* bg, BattlegroundBracketId bracketId);
+    bool GetPlayerMatchmakingRating(ObjectGuid playerGuid, BattlegroundTypeId bgTypeId, float& outRating);
 
 public: /* Arena Team Script */
     void OnGetSlotByType(const uint32 type, uint8& slot);
@@ -649,6 +674,8 @@ public: /* ArenaScript */
     bool CanSaveToDB(ArenaTeam* team);
     bool OnBeforeArenaCheckWinConditions(Battleground* const bg);
     void OnArenaStart(Battleground* const bg);
+    bool OnBeforeArenaTeamMemberUpdate(ArenaTeam* team, Player* player, bool won, uint32 opponentMatchmakerRating, int32 matchmakerChange);
+    bool CanSaveArenaStatsForMember(ArenaTeam* team, ObjectGuid playerGuid);
 
 public: /* MiscScript */
 
@@ -679,8 +706,14 @@ public: /* CommandSC */
 
 public: /* DatabaseScript */
 
+    bool OnDatabasesLoading();
     void OnAfterDatabasesLoaded(uint32 updateFlags);
     void OnAfterDatabaseLoadCreatureTemplates(std::vector<CreatureTemplate*> creatureTemplateStore);
+    void OnDatabasesKeepAlive();
+    void OnDatabasesClosing();
+    void OnDatabaseWarnAboutSyncQueries(bool apply);
+    void OnDatabaseSelectIndexLogout(Player* player, uint32& statementIndex, uint32& statementParam);
+    void OnDatabaseGetDBRevision(std::string& revision);
 
 public: /* WorldObjectScript */
 
@@ -697,6 +730,18 @@ public: /* PetScript */
 public: /* LootScript */
 
     void OnLootMoney(Player* player, uint32 gold);
+
+public: /* PlayerbotScript */
+    
+    bool OnPlayerbotCheckLFGQueue(lfg::Lfg5Guids const& guidsList);
+    void OnPlayerbotCheckKillTask(Player* player, Unit* victim);
+    void OnPlayerbotCheckPetitionAccount(Player* player, bool& found);
+    bool OnPlayerbotCheckUpdatesToSend(Player* player);
+    void OnPlayerbotPacketSent(Player* player, WorldPacket const* packet);
+    void OnPlayerbotUpdate(uint32 diff);
+    void OnPlayerbotUpdateSessions(Player* player);
+    void OnPlayerbotLogout(Player* player);
+    void OnPlayerbotLogoutBots();
 
 public: /* TicketScript */
 

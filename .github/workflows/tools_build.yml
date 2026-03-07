@@ -32,9 +32,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}-${{ matrix.compiler.CC }}
     if: |
-      github.repository == 'azerothcore/azerothcore-wotlk'
-      && !github.event.pull_request.draft
-      && (github.ref == 'refs/heads/master' || contains(github.event.pull_request.labels.*.name, 'run-build') || github.event.label.name == 'run-build')
+      github.repository == 'mod-playerbots/azerothcore-wotlk' && !github.event.pull_request.draft
+      && (
+        contains(github.event.pull_request.labels.*.name, 'run-build')
+        || github.event.label.name == 'run-build'
+      )
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/linux-build

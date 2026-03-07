@@ -2295,27 +2295,6 @@ class spell_icc_web_wrap_aura : public AuraScript
     }
 };
 
-class spell_icc_dark_reckoning_aura : public AuraScript
-{
-    PrepareAuraScript(spell_icc_dark_reckoning_aura);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ 69482 });
-    }
-
-    void OnPeriodic(AuraEffect const* /*aurEff*/)
-    {
-        if (Unit* caster = GetCaster())
-            caster->CastSpell(GetTarget(), 69482, true);
-    }
-
-    void Register() override
-    {
-        OnEffectPeriodic += AuraEffectPeriodicFn(spell_icc_dark_reckoning_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-    }
-};
-
 class spell_stinky_precious_decimate : public SpellScript
 {
     PrepareSpellScript(spell_stinky_precious_decimate);
@@ -3681,7 +3660,6 @@ void AddSC_icecrown_citadel()
 
     // pussywizard below:
     RegisterSpellScript(spell_icc_web_wrap_aura);
-    RegisterSpellScript(spell_icc_dark_reckoning_aura);
     RegisterSpellScript(spell_stinky_precious_decimate);
     RegisterSpellScript(spell_icc_yf_frozen_orb_aura);
     RegisterSpellScript(spell_icc_yh_volley_aura);
