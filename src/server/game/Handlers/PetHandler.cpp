@@ -231,19 +231,9 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                                 if (!creaturePet->CanCreatureAttack(TargetUnit))
                                     return;
 
-                        // Not let attack through obstructions
-                        bool checkLos = !sDisableMgr->IsPathfindingEnabled(pet->GetMap()) ||
-                                        (TargetUnit->IsCreature() && (TargetUnit->ToCreature()->isWorldBoss() || TargetUnit->ToCreature()->IsDungeonBoss()));
-
-                        if (checkLos && !pet->IsWithinLOSInMap(TargetUnit))
-                        {
-                            WorldPacket data(SMSG_CAST_FAILED, 1 + 4 + 1);
-                            data << uint8(0);
-                            data << uint32(7389);
-                            data << uint8(SPELL_FAILED_LINE_OF_SIGHT);
-                            SendPacket(&data);
+                        // Don't bother if pet is already attacking target
+                        if (pet->GetVictim() == TargetUnit && pet->GetCharmInfo()->IsCommandAttack())
                             return;
-                        }
 
                         pet->ClearUnitState(UNIT_STATE_FOLLOW);
                         // This is true if pet has no target or has target but targets differs.
@@ -428,8 +418,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                         // This is true if pet has no target or has target but targets differs.
                         if (pet->GetVictim() != unit_target)
                         {
-                            if (pet->ToCreature()->IsAIEnabled)
-                                pet->ToCreature()->AI()->AttackStart(unit_target);
+                            pet->ToCreature()->AI()->AttackStart(unit_target);
                         }
                     }
 

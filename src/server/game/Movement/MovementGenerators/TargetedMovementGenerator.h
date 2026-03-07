@@ -91,7 +91,7 @@ class FollowMovementGenerator : public MovementGeneratorMedium<T, FollowMovement
 {
 public:
     FollowMovementGenerator(Unit* target, float range, ChaseAngle angle, bool inheritWalkState, bool inheritSpeed)
-        : TargetedMovementGeneratorBase(target), i_path(nullptr), i_recheckPredictedDistanceTimer(0), i_recheckPredictedDistance(false), _range(range), _angle(angle),_inheritWalkState(inheritWalkState), _inheritSpeed(inheritSpeed) {}
+        : TargetedMovementGeneratorBase(target), i_path(nullptr), i_recheckPredictedDistanceTimer(0), i_recheckPredictedDistance(false), _range(range), _angle(angle), _inheritWalkState(inheritWalkState), _inheritSpeed(inheritSpeed) {}
     ~FollowMovementGenerator() { }
 
     MovementGeneratorType GetMovementGeneratorType() { return FOLLOW_MOTION_TYPE; }

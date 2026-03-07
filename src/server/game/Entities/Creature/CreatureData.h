@@ -215,10 +215,6 @@ struct CreatureTemplate
     uint32  unit_flags2;                                    // enum UnitFlags2 mask values
     uint32  dynamicflags;
     uint32  family;                                         // enum CreatureFamily values (optional)
-    uint32  trainer_type;
-    uint32  trainer_spell;
-    uint32  trainer_class;
-    uint32  trainer_race;
     uint32  type;                                           // enum CreatureType values
     uint32  type_flags;                                     // enum CreatureTypeFlags mask values
     uint32  lootid;
@@ -502,39 +498,6 @@ struct VendorItemCount
 };
 
 typedef std::list<VendorItemCount> VendorItemCounts;
-
-struct TrainerSpell
-{
-    TrainerSpell()
-    {
-        for (unsigned int & i : learnedSpell)
-            i = 0;
-    }
-
-    uint32 spell{0};
-    uint32 spellCost{0};
-    uint32 reqSkill{0};
-    uint32 reqSkillValue{0};
-    uint32 reqLevel{0};
-    uint32 learnedSpell[3];
-    uint32 reqSpell{0};
-
-    // helpers
-    [[nodiscard]] bool IsCastable() const { return learnedSpell[0] != spell; }
-};
-
-typedef std::unordered_map<uint32 /*spellid*/, TrainerSpell> TrainerSpellMap;
-
-struct TrainerSpellData
-{
-    TrainerSpellData()  = default;
-    ~TrainerSpellData() { spellList.clear(); }
-
-    TrainerSpellMap spellList;
-    uint32 trainerType{0};                                     // trainer type based at trainer spells, can be different from creature_template value.
-    // req. for correct show non-prof. trainers like weaponmaster, allowed values 0 and 2.
-    [[nodiscard]] TrainerSpell const* Find(uint32 spell_id) const;
-};
 
 struct CreatureSpellCooldown
 {

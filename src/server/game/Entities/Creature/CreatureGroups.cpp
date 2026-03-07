@@ -417,6 +417,15 @@ void CreatureGroup::LeaderMoveTo(float x, float y, float z, uint32 move_type)
     }
 }
 
+void CreatureGroup::DespawnFormation(Milliseconds timeToDespawn /*=0ms*/, Seconds forcedRespawnTimer /*=0s*/)
+{
+    for (auto const& itr : m_members)
+    {
+        if (itr.first)
+            itr.first->DespawnOrUnsummon(timeToDespawn, forcedRespawnTimer);
+    }
+}
+
 void CreatureGroup::RespawnFormation(bool force)
 {
     for (auto const& itr : m_members)

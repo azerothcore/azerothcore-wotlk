@@ -40,7 +40,7 @@ enum Spells
     SPELL_PSYCHIC_SCREAM                = 34322,
     SPELL_VOID_BOLT                     = 39329,
     SPELL_TRUE_BEAM                     = 33365,
-    SPELL_TELEPORT_START_POSITION       = 33244,
+    SPELL_TELEPORT_START_POSITION       = 33244, // Serverside
 };
 
 enum Misc
@@ -153,7 +153,7 @@ struct boss_high_astromancer_solarian : public BossAI
         {
             me->SetReactState(REACT_PASSIVE);
             scheduler.DelayAll(22s);
-            // blink to room center in this line using SPELL_TELEPORT_START_POSITION and START_POSITION_X, START_POSITION_Y, START_POSITION_Z
+            DoCastSelf(SPELL_TELEPORT_START_POSITION);
             scheduler.Schedule(1s, [this](TaskContext)
             {
                 for (uint8 i = 0; i < 3; ++i)
@@ -198,6 +198,7 @@ struct boss_high_astromancer_solarian : public BossAI
                 });
             }).Schedule(23s, [this](TaskContext)
             {
+                me->GetThreatMgr().ClearAllThreat();
                 me->SetReactState(REACT_AGGRESSIVE);
                 summons.DoForAllSummons([&](WorldObject* summon)
                 {
