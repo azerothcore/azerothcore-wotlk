@@ -190,10 +190,16 @@ class spell_pal_seal_of_command_aura : public AuraScript
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
-        // Only auto-attacks (no spell info) should trigger SoC's cleave.
-        // Spells like HotR/ShoR should proc SoC but not cleave.
+        // All melee procs should cleave except Hammer of the Righteous.
         // Judgement cleave is handled separately via JotJ code path.
-        int32 targets = eventInfo.GetSpellInfo() ? 1 : 3;
+        int32 targets = 3;
+        if (SpellInfo const* procSpell = eventInfo.GetSpellInfo())
+        {
+            // HotR: flag1 0x40000, DS: flag1 0x20000
+            if (procSpell->SpellFamilyName == SPELLFAMILY_PALADIN &&
+                (procSpell->SpellFamilyFlags[1] & 0x60000))
+                targets = 1;
+        }
 
         Unit* target = eventInfo.GetActionTarget();
         if (target->IsAlive())
