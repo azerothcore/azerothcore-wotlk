@@ -6991,11 +6991,11 @@ UPDATE `creature_template_locale` SET `Name` = 'Taschendieb der Defias', `Verifi
 UPDATE `creature_template_locale` SET `Name` = 'Kodobestie', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 106;
 -- AC datas : OLD Name : "Bandit", Name AC enUS : "Defias Bandit" ; Wowhead enUS : "Defias Bandit"
 UPDATE `creature_template_locale` SET `Name` = 'Bandit der Defias', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 116;
--- AC datas : OLD Subname : "Magierlehrer", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Magielehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 198;
+-- AC datas : OLD Name : "Khelden Bremen", Name AC enUS : "Khelden Bremen" ; Wowhead enUS : "Khelden Bremen",  OLD Subname : "Magierlehrer", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Magielehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 198;
 -- AC datas : OLD Name : "Verrottender Schrecken", Name AC enUS : "Skeletal Horror" ; Wowhead enUS : "Skeletal Horror"
 UPDATE `creature_template_locale` SET `Name` = 'Skelettschrecken', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 202;
--- AC datas : OLD Name : "Marschall Gryan Starkmantel", Name AC enUS : "Gryan Stoutmantle" ; Wowhead enUS : "Gryan Stoutmantle",  OLD Subname : "Die Westfallbrigade", Subname AC enUS : "The People's Militia"" ; Wowhead enUS : "The People's Militia"
+-- AC datas : OLD Name : "Marschall Gryan Starkmantel", Name AC enUS : "Gryan Stoutmantle" ; Wowhead enUS : "Gryan Stoutmantle",  OLD Subname : "Die Westfallbrigade", Subname AC enUS : "The People's Militia" ; Wowhead enUS : "The People's Militia"
 UPDATE `creature_template_locale` SET `Name` = 'Gryan Starkmantel', `Title` = 'Die Volksmiliz', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 234;
 -- AC datas : OLD Name : "[DND] Wounded Lion's Footman", Name AC enUS : "Half-eaten body" ; Wowhead enUS : "Half-eaten body"
 UPDATE `creature_template_locale` SET `Name` = 'Ein halb aufgefressener Körper', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 262;
@@ -7003,26 +7003,22 @@ UPDATE `creature_template_locale` SET `Name` = 'Ein halb aufgefressener Körper'
 UPDATE `creature_template_locale` SET `Name` = 'Koboldtank', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 281;
 -- AC datas : OLD Name : "Junger Wolf", Name AC enUS : "Diseased Young Wolf" ; Wowhead enUS : "Diseased Young Wolf"
 UPDATE `creature_template_locale` SET `Name` = 'Erkrankter junger Wolf', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 299;
--- AC datas : OLD Name : "Platzhalter interaktiver Doodad - jk", Name AC enUS : "Placeholder Interactive Doodad - jk" ; Wowhead enUS : "Placeholder Interactive Doodad - jk"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 303;
 -- AC datas : OLD Name : "Schimmel", Name AC enUS : "White Stallion" ; Wowhead enUS : "White Stallion"
 UPDATE `creature_template_locale` SET `Name` = 'Reitpferd (Schimmel)', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 305;
 -- AC datas : OLD Name : "Palomino", Name AC enUS : "Palomino" ; Wowhead enUS : "Palomino"
 UPDATE `creature_template_locale` SET `Name` = 'Reitpferd (Palomino)', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 306;
 -- AC datas : OLD Name : ""Buried Upside-Down" Vehicle", Name AC enUS : "Rolf's corpse" ; Wowhead enUS : "Rolf's corpse"
 UPDATE `creature_template_locale` SET `Name` = 'Rolfs Leichnam', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 309;
--- AC datas : OLD Subname : "Magierlehrer", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Magielehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 328;
--- AC datas : OLD Subname : "Anführer des SI:7", Subname AC enUS : "Leader of SI:7"" ; Wowhead enUS : "Leader of SI:7"
+-- AC datas : OLD Name : "Zaldimar Wefhellt", Name AC enUS : "Zaldimar Wefhellt" ; Wowhead enUS : "Zaldimar Wefhellt",  OLD Subname : "Magierlehrer", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Magielehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 328;
+-- AC datas : OLD Subname : "Anführer des SI:7", Subname AC enUS : "Leader of SI:7" ; Wowhead enUS : "Leader of SI:7"
 UPDATE `creature_template_locale` SET `Title` = 'Anführer von SI:7', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 332;
--- AC datas : OLD Name : "[UNUSED] Grall Zwillingsmond", Name AC enUS : "[UNUSED] Grall Twomoons" ; Wowhead enUS : "[UNUSED] Grall Twomoons"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 354;
 -- AC datas : OLD Name : "Winterwolf", Name AC enUS : "Winter Wolf" ; Wowhead enUS : "Winter Wolf"
 UPDATE `creature_template_locale` SET `Name` = 'Reitwolf (Winter)', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 359;
 -- AC datas : OLD Name : "Murak Winterborn", Name AC enUS : "Murak Winterborn" ; Wowhead enUS : "Murak Winterborn"
 UPDATE `creature_template_locale` SET `Name` = 'Marek Winterborn', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 373;
--- AC datas : OLD Name : "Darcy Parker", Name AC enUS : "Darcy" ; Wowhead enUS : "Darcy",  OLD Subname : "", Subname AC enUS : "Waitress"" ; Wowhead enUS : "Waitress"
-UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Kellnerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 379;
+-- AC datas : OLD Subname : "", Subname AC enUS : "Waitress" ; Wowhead enUS : "Waitress"
+UPDATE `creature_template_locale` SET `Title` = 'Kellnerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 379;
 -- AC datas : OLD Name : "Katie Weidmann", Name AC enUS : "Katie Hunter" ; Wowhead enUS : "Katie Hunter"
 UPDATE `creature_template_locale` SET `Name` = 'Katie Waidmann', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 384;
 -- AC datas : OLD Name : "Niederer Leerwandler", Name AC enUS : "Lesser Voidwalker" ; Wowhead enUS : "Lesser Voidwalker"
@@ -7033,17 +7029,17 @@ UPDATE `creature_template_locale` SET `Name` = 'Held des Schwarzfels', `Verified
 UPDATE `creature_template_locale` SET `Name` = 'Wache Parker', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 464;
 -- AC datas : OLD Name : "Abtrünniger Hexer", Name AC enUS : "Defias Rogue Wizard" ; Wowhead enUS : "Defias Rogue Wizard"
 UPDATE `creature_template_locale` SET `Name` = 'Abtrünniger Hexer der Defias', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 474;
--- AC datas : OLD Subname : "Die Westfallbrigade", Subname AC enUS : "The People's Militia"" ; Wowhead enUS : "The People's Militia"
+-- AC datas : OLD Subname : "Die Westfallbrigade", Subname AC enUS : "The People's Militia" ; Wowhead enUS : "The People's Militia"
 UPDATE `creature_template_locale` SET `Title` = 'Die Volksmiliz', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 487;
--- AC datas : OLD Subname : "Die Westfallbrigade", Subname AC enUS : "The People's Militia"" ; Wowhead enUS : "The People's Militia"
+-- AC datas : OLD Subname : "Die Westfallbrigade", Subname AC enUS : "The People's Militia" ; Wowhead enUS : "The People's Militia"
 UPDATE `creature_template_locale` SET `Title` = 'Die Volksmiliz', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 488;
--- AC datas : OLD Subname : "Die Westfallbrigade", Subname AC enUS : "The People's Militia"" ; Wowhead enUS : "The People's Militia"
+-- AC datas : OLD Subname : "Die Westfallbrigade", Subname AC enUS : "The People's Militia" ; Wowhead enUS : "The People's Militia"
 UPDATE `creature_template_locale` SET `Title` = 'Die Volksmiliz', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 489;
--- AC datas : OLD Name : "Beschützerin Gariel", Name AC enUS : "Protector Gariel" ; Wowhead enUS : "Protector Gariel",  OLD Subname : "Die Westfallbrigade", Subname AC enUS : "The People's Militia"" ; Wowhead enUS : "The People's Militia"
+-- AC datas : OLD Name : "Beschützerin Gariel", Name AC enUS : "Protector Gariel" ; Wowhead enUS : "Protector Gariel",  OLD Subname : "Die Westfallbrigade", Subname AC enUS : "The People's Militia" ; Wowhead enUS : "The People's Militia"
 UPDATE `creature_template_locale` SET `Name` = 'Beschützer Gariel', `Title` = 'Die Volksmiliz', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 490;
 -- AC datas : OLD Name : "Wegelagerer", Name AC enUS : "Defias Ambusher" ; Wowhead enUS : "Defias Ambusher"
 UPDATE `creature_template_locale` SET `Name` = 'Wegelagerer der Defias', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 583;
--- AC datas : OLD Name : "Geschriebene Worte", Name AC enUS : "Secondary Skill Trainer" ; Wowhead enUS : "Secondary Skill Trainer",  OLD Subname : "", Subname AC enUS : "Trainer"" ; Wowhead enUS : "Trainer"
+-- AC datas : OLD Name : "Geschriebene Worte", Name AC enUS : "Secondary Skill Trainer" ; Wowhead enUS : "Secondary Skill Trainer",  OLD Subname : "", Subname AC enUS : "Trainer" ; Wowhead enUS : "Trainer"
 UPDATE `creature_template_locale` SET `Name` = 'Lehrer für sekundäre Fertigkeiten', `Title` = 'Lehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 693;
 -- AC datas : OLD Name : "General Fangor", Name AC enUS : "Lieutenant Fangore" ; Wowhead enUS : "Lieutenant Fangore"
 UPDATE `creature_template_locale` SET `Name` = 'Leutnant Fangor', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 703;
@@ -7055,11 +7051,11 @@ UPDATE `creature_template_locale` SET `Name` = 'Bulliger Trogg der Felsenkiefer'
 UPDATE `creature_template_locale` SET `Name` = 'Unteroffizier Yohwa', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 733;
 -- AC datas : OLD Name : "Matschwirbler der Verirrten", Name AC enUS : "Lost One Muckdweller" ; Wowhead enUS : "Lost One Muckdweller"
 UPDATE `creature_template_locale` SET `Name` = 'Matschkrabbler der Verirrten', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 760;
--- AC datas : OLD Subname : "Bogenmacherin", Subname AC enUS : "Fletcher"" ; Wowhead enUS : "Fletcher"
-UPDATE `creature_template_locale` SET `Title` = 'Pfeilmacherin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 789;
--- AC datas : OLD Subname : "Die Westfallbrigade", Subname AC enUS : "The People's Militia"" ; Wowhead enUS : "The People's Militia"
+-- AC datas : OLD Name : "Kimberly Hiett", Name AC enUS : "Kimberly Hiett" ; Wowhead enUS : "Kimberly Hiett",  OLD Subname : "Bogenmacherin", Subname AC enUS : "Fletcher" ; Wowhead enUS : "Fletcher"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Pfeilmacherin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 789;
+-- AC datas : OLD Subname : "Die Westfallbrigade", Subname AC enUS : "The People's Militia" ; Wowhead enUS : "The People's Militia"
 UPDATE `creature_template_locale` SET `Title` = 'Die Volksmiliz', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 820;
--- AC datas : OLD Subname : "Die Westfallbrigade", Subname AC enUS : "The People's Militia"" ; Wowhead enUS : "The People's Militia"
+-- AC datas : OLD Subname : "Die Westfallbrigade", Subname AC enUS : "The People's Militia" ; Wowhead enUS : "The People's Militia"
 UPDATE `creature_template_locale` SET `Title` = 'Die Volksmiliz', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 821;
 -- AC datas : OLD Name : "Unteroffizier Willem", Name AC enUS : "Deputy Willem" ; Wowhead enUS : "Deputy Willem"
 UPDATE `creature_template_locale` SET `Name` = 'Stellvertreter Willem', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 823;
@@ -7067,23 +7063,23 @@ UPDATE `creature_template_locale` SET `Name` = 'Stellvertreter Willem', `Verifie
 UPDATE `creature_template_locale` SET `Name` = 'Staubteufel', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 832;
 -- AC datas : OLD Name : "Wolfsbegleiter", Name AC enUS : "Pet Wolf" ; Wowhead enUS : "Pet Wolf"
 UPDATE `creature_template_locale` SET `Name` = 'Wolfstier', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 860;
--- AC datas : OLD Subname : "Die Westfallbrigade", Subname AC enUS : "The People's Militia"" ; Wowhead enUS : "The People's Militia"
+-- AC datas : OLD Subname : "Die Westfallbrigade", Subname AC enUS : "The People's Militia" ; Wowhead enUS : "The People's Militia"
 UPDATE `creature_template_locale` SET `Title` = 'Die Volksmiliz', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 869;
--- AC datas : OLD Subname : "Die Westfallbrigade", Subname AC enUS : "The People's Militia"" ; Wowhead enUS : "The People's Militia"
+-- AC datas : OLD Subname : "Die Westfallbrigade", Subname AC enUS : "The People's Militia" ; Wowhead enUS : "The People's Militia"
 UPDATE `creature_template_locale` SET `Title` = 'Die Volksmiliz', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 870;
--- AC datas : OLD Subname : "Die Westfallbrigade", Subname AC enUS : "The People's Militia"" ; Wowhead enUS : "The People's Militia"
+-- AC datas : OLD Subname : "Die Westfallbrigade", Subname AC enUS : "The People's Militia" ; Wowhead enUS : "The People's Militia"
 UPDATE `creature_template_locale` SET `Title` = 'Die Volksmiliz', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 874;
--- AC datas : OLD Subname : "Die Westfallbrigade", Subname AC enUS : "The People's Militia"" ; Wowhead enUS : "The People's Militia"
+-- AC datas : OLD Subname : "Die Westfallbrigade", Subname AC enUS : "The People's Militia" ; Wowhead enUS : "The People's Militia"
 UPDATE `creature_template_locale` SET `Title` = 'Die Volksmiliz', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 876;
--- AC datas : OLD Subname : "Die Westfallbrigade", Subname AC enUS : "The People's Militia"" ; Wowhead enUS : "The People's Militia"
+-- AC datas : OLD Subname : "Die Westfallbrigade", Subname AC enUS : "The People's Militia" ; Wowhead enUS : "The People's Militia"
 UPDATE `creature_template_locale` SET `Title` = 'Die Volksmiliz', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 878;
--- AC datas : OLD Subname : "Magierlehrer", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Magielehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 944;
--- AC datas : OLD Subname : "", Subname AC enUS : "Librarian"" ; Wowhead enUS : "Librarian"
+-- AC datas : OLD Name : "Marryk Nurribit", Name AC enUS : "Marryk Nurribit" ; Wowhead enUS : "Marryk Nurribit",  OLD Subname : "Magierlehrer", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Magielehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 944;
+-- AC datas : OLD Subname : "", Subname AC enUS : "Librarian" ; Wowhead enUS : "Librarian"
 UPDATE `creature_template_locale` SET `Title` = 'Bibliothekar', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 951;
--- AC datas : OLD Name : "Erik Dodds der Dritte", Name AC enUS : "Master Tailor" ; Wowhead enUS : "Master Tailor",  OLD Subname : "Schneiderlehrer", Subname AC enUS : "Cheesy Test Tailor"" ; Wowhead enUS : "Cheesy Test Tailor"
-UPDATE `creature_template_locale` SET `Name` = 'Schneidermeister', `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 996;
--- AC datas : OLD Name : "Unkillable Test Dummy", Name AC enUS : "Unkillable Test Dummy" ; Wowhead enUS : "Unkillable Test Dummy",  OLD Subname : "", Subname AC enUS : """ ; Wowhead enUS : ""
+-- AC datas : OLD Name : "Erik Dodds der Dritte", Name AC enUS : "Master Tailor" ; Wowhead enUS : "Master Tailor"
+UPDATE `creature_template_locale` SET `Name` = 'Schneidermeister', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 996;
+-- AC datas : OLD Name : "Unkillable Test Dummy", Name AC enUS : "Unkillable Test Dummy" ; Wowhead enUS : "Unkillable Test Dummy",  OLD Subname : "", Subname AC enUS : "" ; Wowhead enUS : ""
 UPDATE `creature_template_locale` SET `Name` = 'Behüter Blomberg', `Title` = 'Die Nachtwache', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1000;
 -- AC datas : OLD Name : "Matschwirbler der Blaukiemen", Name AC enUS : "Bluegill Muckdweller" ; Wowhead enUS : "Bluegill Muckdweller"
 UPDATE `creature_template_locale` SET `Name` = 'Matschkrabbler der Blaukiemen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1028;
@@ -7097,30 +7093,28 @@ UPDATE `creature_template_locale` SET `Name` = 'Knochenknacker der Felsenkiefer'
 UPDATE `creature_template_locale` SET `Name` = 'Kreuzbrecher der Felsenkiefer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1118;
 -- AC datas : OLD Name : "Schwarzbär", Name AC enUS : "Elder Black Bear" ; Wowhead enUS : "Elder Black Bear"
 UPDATE `creature_template_locale` SET `Name` = 'Alter Schwarzbär', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1186;
--- AC datas : OLD Subname : "Magierlehrer", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
+-- AC datas : OLD Subname : "Magierlehrer", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Magielehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1228;
--- AC datas : OLD Name : "Shaethis Dunkeleiche", Name AC enUS : "[UNUSED] Shaethis Darkoak" ; Wowhead enUS : "[UNUSED] Shaethis Darkoak"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1233;
 -- AC datas : OLD Name : "Weißer Widder X", Name AC enUS : "White Ram X" ; Wowhead enUS : "White Ram X"
 UPDATE `creature_template_locale` SET `Name` = 'Weißer Widder', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1262;
--- AC datas : OLD Subname : "Händler für Kettenrüstungen", Subname AC enUS : "Mail Armor Merchant"" ; Wowhead enUS : "Mail Armor Merchant"
+-- AC datas : OLD Subname : "Händler für Kettenrüstungen", Subname AC enUS : "Mail Armor Merchant" ; Wowhead enUS : "Mail Armor Merchant"
 UPDATE `creature_template_locale` SET `Title` = 'Händler für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1294;
--- AC datas : OLD Subname : "Bogenhändler", Subname AC enUS : "Bow & Arrow Merchant"" ; Wowhead enUS : "Bow & Arrow Merchant"
+-- AC datas : OLD Subname : "Bogenhändler", Subname AC enUS : "Bow & Arrow Merchant" ; Wowhead enUS : "Bow & Arrow Merchant"
 UPDATE `creature_template_locale` SET `Title` = 'Bogen- & Pfeilhändler', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1298;
--- AC datas : OLD Subname : "Händler für Kettenrüstungen", Subname AC enUS : "Mail Armor Merchant"" ; Wowhead enUS : "Mail Armor Merchant"
-UPDATE `creature_template_locale` SET `Title` = 'Händler für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1322;
--- AC datas : OLD Subname : "Händler für Kettenrüstungen", Subname AC enUS : "Heavy Armor Merchant"" ; Wowhead enUS : "Heavy Armor Merchant"
-UPDATE `creature_template_locale` SET `Title` = 'Händler für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1323;
--- AC datas : OLD Subname : "Händler für Kettenrüstungen", Subname AC enUS : "Mail Armor Merchant"" ; Wowhead enUS : "Mail Armor Merchant"
-UPDATE `creature_template_locale` SET `Title` = 'Händler für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1341;
--- AC datas : OLD Subname : "Händler für Kettenrüstungen", Subname AC enUS : "Mail Armor Merchant"" ; Wowhead enUS : "Mail Armor Merchant"
-UPDATE `creature_template_locale` SET `Title` = 'Händler für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1349;
--- AC datas : OLD Subname : "Kochkunstlehrer", Subname AC enUS : "Superior Cook"" ; Wowhead enUS : "Superior Cook"
-UPDATE `creature_template_locale` SET `Title` = 'Überragender Koch', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1382;
--- AC datas : OLD Subname : "Kochkunstlehrer", Subname AC enUS : "Cook"" ; Wowhead enUS : "Cook"
-UPDATE `creature_template_locale` SET `Title` = 'Koch', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1430;
--- AC datas : OLD Subname : "Bogenmacherin", Subname AC enUS : "Fletcher"" ; Wowhead enUS : "Fletcher"
-UPDATE `creature_template_locale` SET `Title` = 'Pfeilmacherin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1462;
+-- AC datas : OLD Name : "Maxton Strang", Name AC enUS : "Maxton Strang" ; Wowhead enUS : "Maxton Strang",  OLD Subname : "Händler für Kettenrüstungen", Subname AC enUS : "Mail Armor Merchant" ; Wowhead enUS : "Mail Armor Merchant"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Händler für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1322;
+-- AC datas : OLD Name : "Osric Strang", Name AC enUS : "Osric Strang" ; Wowhead enUS : "Osric Strang",  OLD Subname : "Händler für Kettenrüstungen", Subname AC enUS : "Heavy Armor Merchant" ; Wowhead enUS : "Heavy Armor Merchant"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Händler für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1323;
+-- AC datas : OLD Name : "Wilhelm Strang", Name AC enUS : "Wilhelm Strang" ; Wowhead enUS : "Wilhelm Strang",  OLD Subname : "Händler für Kettenrüstungen", Subname AC enUS : "Mail Armor Merchant" ; Wowhead enUS : "Mail Armor Merchant"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Händler für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1341;
+-- AC datas : OLD Name : "Agustus Moulaine", Name AC enUS : "Agustus Moulaine" ; Wowhead enUS : "Agustus Moulaine",  OLD Subname : "Händler für Kettenrüstungen", Subname AC enUS : "Mail Armor Merchant" ; Wowhead enUS : "Mail Armor Merchant"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Händler für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1349;
+-- AC datas : OLD Name : "Mudduk", Name AC enUS : "Mudduk" ; Wowhead enUS : "Mudduk",  OLD Subname : "Kochkunstlehrer", Subname AC enUS : "Superior Cook" ; Wowhead enUS : "Superior Cook"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Überragender Koch', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1382;
+-- AC datas : OLD Name : "Tomas", Name AC enUS : "Tomas" ; Wowhead enUS : "Tomas",  OLD Subname : "Kochkunstlehrer", Subname AC enUS : "Cook" ; Wowhead enUS : "Cook"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Koch', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1430;
+-- AC datas : OLD Name : "Edwina Monzor", Name AC enUS : "Edwina Monzor" ; Wowhead enUS : "Edwina Monzor",  OLD Subname : "Bogenmacherin", Subname AC enUS : "Fletcher" ; Wowhead enUS : "Fletcher"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Pfeilmacherin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1462;
 -- AC datas : OLD Name : "Todeswache Simmer", Name AC enUS : "Deathguard Simmer" ; Wowhead enUS : "Deathguard Simmer"
 UPDATE `creature_template_locale` SET `Name` = 'Todeswache Brodler', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1519;
 -- AC datas : OLD Name : "Matschwirbler der Finsterflossen", Name AC enUS : "Vile Fin Muckdweller" ; Wowhead enUS : "Vile Fin Muckdweller"
@@ -7129,10 +7123,10 @@ UPDATE `creature_template_locale` SET `Name` = 'Matschkrabbler der Finsterflosse
 UPDATE `creature_template_locale` SET `Name` = 'Rogue 40', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1601;
 -- AC datas : OLD Name : "Novizin Elreth", Name AC enUS : "Novice Elreth" ; Wowhead enUS : "Novice Elreth"
 UPDATE `creature_template_locale` SET `Name` = 'Novize Elreth', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1661;
--- AC datas : OLD Name : "[UNUSED] Curtis Aschenlocke", Name AC enUS : "[UNUSED] Curtis Ashlock" ; Wowhead enUS : "[UNUSED] Curtis Ashlock",  OLD Subname : "", Subname AC enUS : "Cook"" ; Wowhead enUS : "Cook"
-UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Koch', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1677;
--- AC datas : OLD Subname : "Lederrüstungshändlerin", Subname AC enUS : "Leather Armor Merchant"" ; Wowhead enUS : "Leather Armor Merchant"
-UPDATE `creature_template_locale` SET `Title` = 'Lederrüstungshändler', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1695;
+-- AC datas : OLD Subname : "", Subname AC enUS : "Cook" ; Wowhead enUS : "Cook"
+UPDATE `creature_template_locale` SET `Title` = 'Koch', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1677;
+-- AC datas : OLD Name : "Rendow", Name AC enUS : "Rendow" ; Wowhead enUS : "Rendow",  OLD Subname : "Lederrüstungshändlerin", Subname AC enUS : "Leather Armor Merchant" ; Wowhead enUS : "Leather Armor Merchant"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Lederrüstungshändler', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1695;
 -- AC datas : OLD Name : "Gefangener", Name AC enUS : "Defias Prisoner" ; Wowhead enUS : "Defias Prisoner"
 UPDATE `creature_template_locale` SET `Name` = 'Gefangener Defias', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1706;
 -- AC datas : OLD Name : "Eingekerkerter", Name AC enUS : "Defias Convict" ; Wowhead enUS : "Defias Convict"
@@ -7141,10 +7135,6 @@ UPDATE `creature_template_locale` SET `Name` = 'Eingekerkerter Defias', `Verifie
 UPDATE `creature_template_locale` SET `Name` = 'Aufrührer der Defias', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1715;
 -- AC datas : OLD Name : "Räuber der Felsenkiefertroggs", Name AC enUS : "Rockjaw Raider" ; Wowhead enUS : "Rockjaw Raider"
 UPDATE `creature_template_locale` SET `Name` = 'Räuber der Felsenkiefer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1718;
--- AC datas : OLD Subname : "Platzhalter", Subname AC enUS : "Placeholder"" ; Wowhead enUS : "Placeholder"
-UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1723;
--- AC datas : OLD Subname : "Platzhalter", Subname AC enUS : "Placeholder"" ; Wowhead enUS : "Placeholder"
-UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1724;
 -- AC datas : OLD Name : "Großadmiralin Jes-Tereth", Name AC enUS : "Grand Admiral Jes-Tereth" ; Wowhead enUS : "Grand Admiral Jes-Tereth"
 UPDATE `creature_template_locale` SET `Name` = 'Großadmiral Jes-Tereth', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1750;
 -- AC datas : OLD Name : "Tollwütiger Worg", Name AC enUS : "Mottled Worg" ; Wowhead enUS : "Mottled Worg"
@@ -7173,7 +7163,7 @@ UPDATE `creature_template_locale` SET `Name` = 'Magier von Dalaran', `VerifiedBu
 UPDATE `creature_template_locale` SET `Name` = 'Herbeizauberer von Dalaran', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1915;
 -- AC datas : OLD Name : "Zauberschreiber von Mühlenbern", Name AC enUS : "Dalaran Spellscribe" ; Wowhead enUS : "Dalaran Spellscribe"
 UPDATE `creature_template_locale` SET `Name` = 'Zauberschreiber von Dalaran', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1920;
--- AC datas : OLD Subname : "Immun gegen Körperliches", Subname AC enUS : "Immune to Physical"" ; Wowhead enUS : "Immune to Physical"
+-- AC datas : OLD Subname : "Immun gegen Körperliches", Subname AC enUS : "Immune to Physical" ; Wowhead enUS : "Immune to Physical"
 UPDATE `creature_template_locale` SET `Title` = 'Immun gegen Körperschäden', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1930;
 -- AC datas : OLD Name : "Uralter Beschützer", Name AC enUS : "Ancient Protector" ; Wowhead enUS : "Ancient Protector"
 UPDATE `creature_template_locale` SET `Name` = 'Urtumbeschützer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2041;
@@ -7181,22 +7171,20 @@ UPDATE `creature_template_locale` SET `Name` = 'Urtumbeschützer', `VerifiedBuil
 UPDATE `creature_template_locale` SET `Name` = 'Athridas Bärenpelz', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2078;
 -- AC datas : OLD Name : "Ilthalaine", Name AC enUS : "Conservator Ilthalaine" ; Wowhead enUS : "Conservator Ilthalaine"
 UPDATE `creature_template_locale` SET `Name` = 'Konservator Ilthalaine', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2079;
--- AC datas : OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Magielehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2124;
--- AC datas : OLD Subname : "Magierlehrer", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
+-- AC datas : OLD Name : "Isabella", Name AC enUS : "Isabella" ; Wowhead enUS : "Isabella",  OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Magielehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2124;
+-- AC datas : OLD Subname : "Magierlehrer", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Magielehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2128;
--- AC datas : OLD Subname : "", Subname AC enUS : "Blacksmith Trainer"" ; Wowhead enUS : "Blacksmith Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Schmiedekunstlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2220;
--- AC datas : OLD Name : "[UNUSED] Untoter Kochkunstlehrer", Name AC enUS : "[UNUSED] Undead Cooking Trainer" ; Wowhead enUS : "[UNUSED] Undead Cooking Trainer",  OLD Subname : "", Subname AC enUS : "Cooking Trainer"" ; Wowhead enUS : "Cooking Trainer"
-UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Kochkunstlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2223;
--- AC datas : OLD Name : "Maggarrak", Name AC enUS : "Stone Fury" ; Wowhead enUS : "Stone Fury",  OLD Subname : "Der Herr des Berges", Subname AC enUS : """ ; Wowhead enUS : ""
-UPDATE `creature_template_locale` SET `Name` = 'Steinwüter', `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2258;
--- AC datas : OLD Name : "Orgrun Eiswelle", Name AC enUS : "[PH] Orgrun Iceflow" ; Wowhead enUS : "[PH] Orgrun Iceflow"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2282;
--- AC datas : OLD Subname : "Lehrer für Erste Hilfe", Subname AC enUS : "Physician"" ; Wowhead enUS : "Physician"
-UPDATE `creature_template_locale` SET `Title` = 'Arzt', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2326;
--- AC datas : OLD Subname : "Lehrerin für Erste Hilfe", Subname AC enUS : "Physician"" ; Wowhead enUS : "Physician"
-UPDATE `creature_template_locale` SET `Title` = 'Ärztin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2329;
+-- AC datas : OLD Name : "[UNUSED] Undead Blacksmith Trainer", Name AC enUS : "[UNUSED] Undead Blacksmith Trainer" ; Wowhead enUS : "[UNUSED] Undead Blacksmith Trainer",  OLD Subname : "", Subname AC enUS : "Blacksmith Trainer" ; Wowhead enUS : "Blacksmith Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Schmiedekunstlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2220;
+-- AC datas : OLD Subname : "", Subname AC enUS : "Cooking Trainer" ; Wowhead enUS : "Cooking Trainer"
+UPDATE `creature_template_locale` SET `Title` = 'Kochkunstlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2223;
+-- AC datas : OLD Name : "Maggarrak", Name AC enUS : "Stone Fury" ; Wowhead enUS : "Stone Fury"
+UPDATE `creature_template_locale` SET `Name` = 'Steinwüter', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2258;
+-- AC datas : OLD Name : "Thamner Pol", Name AC enUS : "Thamner Pol" ; Wowhead enUS : "Thamner Pol",  OLD Subname : "Lehrer für Erste Hilfe", Subname AC enUS : "Physician" ; Wowhead enUS : "Physician"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Arzt', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2326;
+-- AC datas : OLD Name : "Michelle Belle", Name AC enUS : "Michelle Belle" ; Wowhead enUS : "Michelle Belle",  OLD Subname : "Lehrerin für Erste Hilfe", Subname AC enUS : "Physician" ; Wowhead enUS : "Physician"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Ärztin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2329;
 -- AC datas : OLD Name : "Fanatikerin des Dunklen Strangs", Name AC enUS : "Dark Strand Fanatic" ; Wowhead enUS : "Dark Strand Fanatic"
 UPDATE `creature_template_locale` SET `Name` = 'Fanatikerin des dunklen Strangs', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2336;
 -- AC datas : OLD Name : "Leerruferin des Dunklen Strangs", Name AC enUS : "Dark Strand Voidcaller" ; Wowhead enUS : "Dark Strand Voidcaller"
@@ -7213,20 +7201,20 @@ UPDATE `creature_template_locale` SET `Name` = 'Matschkrabbler der Fetzenflossen
 UPDATE `creature_template_locale` SET `Name` = 'Wilder Berglöwe', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2385;
 -- AC datas : OLD Name : "Wächter der Allianz", Name AC enUS : "Southshore Guard" ; Wowhead enUS : "Southshore Guard"
 UPDATE `creature_template_locale` SET `Name` = 'Wache von Süderstade', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2386;
--- AC datas : OLD Name : "Gosh-Haldir", Name AC enUS : "Large Loch Crocolisk" ; Wowhead enUS : "Large Loch Crocolisk",  OLD Subname : "Die Brutmutter", Subname AC enUS : """ ; Wowhead enUS : ""
-UPDATE `creature_template_locale` SET `Name` = 'Großer Lochkrokilisk', `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2476;
+-- AC datas : OLD Name : "Gosh-Haldir", Name AC enUS : "Large Loch Crocolisk" ; Wowhead enUS : "Large Loch Crocolisk"
+UPDATE `creature_template_locale` SET `Name` = 'Großer Lochkrokilisk', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2476;
 -- AC datas : OLD Name : "Himmelsmähnengorilla", Name AC enUS : "Skymane Gorilla" ; Wowhead enUS : "Skymane Gorilla"
 UPDATE `creature_template_locale` SET `Name` = 'Blaumähnengorilla', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2521;
--- AC datas : OLD Subname : "Gesandter von Zanzil", Subname AC enUS : "Darkspear Hostage"" ; Wowhead enUS : "Darkspear Hostage"
-UPDATE `creature_template_locale` SET `Title` = 'Geisel der Dunkelspeere', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2530;
+-- AC datas : OLD Name : "Yenniku", Name AC enUS : "Yenniku" ; Wowhead enUS : "Yenniku",  OLD Subname : "Gesandter von Zanzil", Subname AC enUS : "Darkspear Hostage" ; Wowhead enUS : "Darkspear Hostage"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Geisel der Dunkelspeere', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2530;
 -- AC datas : OLD Name : "Diener von Doane", Name AC enUS : "Minion of Morganth" ; Wowhead enUS : "Minion of Morganth"
 UPDATE `creature_template_locale` SET `Name` = 'Diener von Morganth', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2531;
 -- AC datas : OLD Name : "Schlange von Mühlenbern", Name AC enUS : "Dalaran Serpent" ; Wowhead enUS : "Dalaran Serpent"
 UPDATE `creature_template_locale` SET `Name` = 'Schlange von Dalaran', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2540;
 -- AC datas : OLD Name : "Soldat von Stromgarde", Name AC enUS : "Stromgarde Vindicator" ; Wowhead enUS : "Stromgarde Vindicator"
 UPDATE `creature_template_locale` SET `Name` = 'Verteidiger von Stromgarde', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2585;
--- AC datas : OLD Subname : "", Subname AC enUS : "Shadow Council Warlock"" ; Wowhead enUS : "Shadow Council Warlock"
-UPDATE `creature_template_locale` SET `Title` = 'Hexenmeister des Schattenrats', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2598;
+-- AC datas : OLD Name : "Darbel Montrose", Name AC enUS : "Darbel Montrose" ; Wowhead enUS : "Darbel Montrose",  OLD Subname : "", Subname AC enUS : "Shadow Council Warlock" ; Wowhead enUS : "Shadow Council Warlock"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Hexenmeister des Schattenrats', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2598;
 -- AC datas : OLD Name : "Sängerin", Name AC enUS : "Singer" ; Wowhead enUS : "Singer"
 UPDATE `creature_template_locale` SET `Name` = 'Sänger', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2600;
 -- AC datas : OLD Name : "Kommandantin Amaren", Name AC enUS : "Commander Amaren" ; Wowhead enUS : "Commander Amaren"
@@ -7237,52 +7225,48 @@ UPDATE `creature_template_locale` SET `Name` = 'Alter Salzwasserkrokilisk', `Ver
 UPDATE `creature_template_locale` SET `Name` = 'Belagerungsgolem', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2749;
 -- AC datas : OLD Name : "Ausgedörrter Bussard", Name AC enUS : "Buzzard" ; Wowhead enUS : "Buzzard"
 UPDATE `creature_template_locale` SET `Name` = 'Bussard', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2830;
--- AC datas : OLD Name : "Gossip Greifenmeister", Name AC enUS : "DEBUG - Gossip Gryphon Master" ; Wowhead enUS : "DEBUG - Gossip Gryphon Master"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2833;
--- AC datas : OLD Subname : "Klingenhändlerin", Subname AC enUS : "Blade Trader"" ; Wowhead enUS : "Blade Trader"
-UPDATE `creature_template_locale` SET `Title` = 'Klingentrödlerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2843;
--- AC datas : OLD Subname : "", Subname AC enUS : "Crocilisk Trainer"" ; Wowhead enUS : "Crocilisk Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Krokiliskenausbilder', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2876;
--- AC datas : OLD Subname : "", Subname AC enUS : "Ranged Skills Trainer"" ; Wowhead enUS : "Ranged Skills Trainer"
+-- AC datas : OLD Name : "Jutak", Name AC enUS : "Jutak" ; Wowhead enUS : "Jutak",  OLD Subname : "Klingenhändlerin", Subname AC enUS : "Blade Trader" ; Wowhead enUS : "Blade Trader"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Klingentrödlerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2843;
+-- AC datas : OLD Name : "Grunenstur Balindom", Name AC enUS : "Grunenstur Balindom" ; Wowhead enUS : "Grunenstur Balindom",  OLD Subname : "", Subname AC enUS : "Crocilisk Trainer" ; Wowhead enUS : "Crocilisk Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Krokiliskenausbilder', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2876;
+-- AC datas : OLD Subname : "", Subname AC enUS : "Ranged Skills Trainer" ; Wowhead enUS : "Ranged Skills Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Fertigkeitenlehrer für Distanzwaffen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2886;
--- AC datas : OLD Name : "[PH] Dämonenmeister", Name AC enUS : "[PH] Demon Master" ; Wowhead enUS : "[PH] Demon Master",  OLD Subname : "", Subname AC enUS : """ ; Wowhead enUS : ""
-UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Dämonenausbilder', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2935;
--- AC datas : OLD Name : "Aldric Weidmann", Name AC enUS : "Aldric Hunter" ; Wowhead enUS : "Aldric Hunter",  OLD Subname : "", Subname AC enUS : "Bear Trainer"" ; Wowhead enUS : "Bear Trainer"
+-- AC datas : OLD Subname : "", Subname AC enUS : "" ; Wowhead enUS : ""
+UPDATE `creature_template_locale` SET `Title` = 'Dämonenausbilder', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2935;
+-- AC datas : OLD Name : "Aldric Weidmann", Name AC enUS : "Aldric Hunter" ; Wowhead enUS : "Aldric Hunter",  OLD Subname : "", Subname AC enUS : "Bear Trainer" ; Wowhead enUS : "Bear Trainer"
 UPDATE `creature_template_locale` SET `Name` = 'Aldric Waidmann', `Title` = 'Bärenausbilder', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2938;
--- AC datas : OLD Subname : "", Subname AC enUS : "Wolf Trainer"" ; Wowhead enUS : "Wolf Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Wolfausbilder', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2942;
+-- AC datas : OLD Name : "Dylan Bissel", Name AC enUS : "Dylan Bissel" ; Wowhead enUS : "Dylan Bissel",  OLD Subname : "", Subname AC enUS : "Wolf Trainer" ; Wowhead enUS : "Wolf Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Wolfausbilder', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2942;
 -- AC datas : OLD Name : "Eindringling der Borstennacken", Name AC enUS : "Bristleback Quilboar" ; Wowhead enUS : "Bristleback Quilboar"
 UPDATE `creature_template_locale` SET `Name` = 'Stacheleber der Borstennacken', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2952;
 -- AC datas : OLD Name : "Junger Kampfeber", Name AC enUS : "Battleboar" ; Wowhead enUS : "Battleboar"
 UPDATE `creature_template_locale` SET `Name` = 'Kampfeber', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2966;
 -- AC datas : OLD Name : "Geist der Ahnen", Name AC enUS : "Ancestral Spirit" ; Wowhead enUS : "Ancestral Spirit"
 UPDATE `creature_template_locale` SET `Name` = 'Vorfahrengeist', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 2994;
--- AC datas : OLD Subname : "Schneiderbedarf", Subname AC enUS : "Leatherworking & Tailoring Supplies"" ; Wowhead enUS : "Leatherworking & Tailoring Supplies"
-UPDATE `creature_template_locale` SET `Title` = 'Lederverarbeitungs- & Schneiderbedarf', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3005;
--- AC datas : OLD Subname : "Lederverarbeitungsbedarf", Subname AC enUS : "Apprentice Leatherworker"" ; Wowhead enUS : "Apprentice Leatherworker"
-UPDATE `creature_template_locale` SET `Title` = 'Lederverarbeitungslehrling', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3008;
--- AC datas : OLD Subname : "Magierlehrer", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
+-- AC datas : OLD Name : "Mahu", Name AC enUS : "Mahu" ; Wowhead enUS : "Mahu",  OLD Subname : "Schneiderbedarf", Subname AC enUS : "Leatherworking & Tailoring Supplies" ; Wowhead enUS : "Leatherworking & Tailoring Supplies"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Lederverarbeitungs- & Schneiderbedarf', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3005;
+-- AC datas : OLD Name : "Mak", Name AC enUS : "Mak" ; Wowhead enUS : "Mak",  OLD Subname : "Lederverarbeitungsbedarf", Subname AC enUS : "Apprentice Leatherworker" ; Wowhead enUS : "Apprentice Leatherworker"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Lederverarbeitungslehrling', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3008;
+-- AC datas : OLD Subname : "Magierlehrer", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Magielehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3047;
--- AC datas : OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Magielehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3048;
--- AC datas : OLD Subname : "Magierlehrer", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Magielehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3049;
--- AC datas : OLD Subname : "Kochkunstlehrer", Subname AC enUS : "Cook"" ; Wowhead enUS : "Cook"
+-- AC datas : OLD Name : "Ursyn Ghull", Name AC enUS : "Ursyn Ghull" ; Wowhead enUS : "Ursyn Ghull",  OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Magielehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3048;
+-- AC datas : OLD Name : "Thurston Xane", Name AC enUS : "Thurston Xane" ; Wowhead enUS : "Thurston Xane",  OLD Subname : "Magierlehrer", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Magielehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3049;
+-- AC datas : OLD Subname : "Kochkunstlehrer", Subname AC enUS : "Cook" ; Wowhead enUS : "Cook"
 UPDATE `creature_template_locale` SET `Title` = 'Koch', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3067;
--- AC datas : OLD Subname : "Geselle des Alchemiehandwerks", Subname AC enUS : "Alchemist <Needs Model>"" ; Wowhead enUS : "Alchemist <Needs Model>"
-UPDATE `creature_template_locale` SET `Title` = 'Alchimist <Needs Model>', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3070;
--- AC datas : OLD Subname : "Kräuterkundelehrer", Subname AC enUS : "Herbalist <Needs Model>"" ; Wowhead enUS : "Herbalist <Needs Model>"
-UPDATE `creature_template_locale` SET `Title` = 'Kräuterkundiger <Needs Model>', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3071;
--- AC datas : OLD Subname : "Händlerin für Kettenrüstungen", Subname AC enUS : "Heavy Armor Merchant"" ; Wowhead enUS : "Heavy Armor Merchant"
-UPDATE `creature_template_locale` SET `Title` = 'Händlerin für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3095;
+-- AC datas : OLD Name : "[UNUSED] [PH] Mulgore Alchemy Trainer", Name AC enUS : "[UNUSED] [PH] Mulgore Alchemy Trainer" ; Wowhead enUS : "[UNUSED] [PH] Mulgore Alchemy Trainer",  OLD Subname : "Geselle des Alchemiehandwerks", Subname AC enUS : "Alchemist <Needs Model>" ; Wowhead enUS : "Alchemist <Needs Model>"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Alchimist <Needs Model>', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3070;
+-- AC datas : OLD Name : "[UNUSED] [PH] Mulgore Herbalism Trainer", Name AC enUS : "[UNUSED] [PH] Mulgore Herbalism Trainer" ; Wowhead enUS : "[UNUSED] [PH] Mulgore Herbalism Trainer",  OLD Subname : "Kräuterkundelehrer", Subname AC enUS : "Herbalist <Needs Model>" ; Wowhead enUS : "Herbalist <Needs Model>"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Kräuterkundiger <Needs Model>', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3071;
+-- AC datas : OLD Name : "Fela", Name AC enUS : "Fela" ; Wowhead enUS : "Fela",  OLD Subname : "Händlerin für Kettenrüstungen", Subname AC enUS : "Heavy Armor Merchant" ; Wowhead enUS : "Heavy Armor Merchant"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Händlerin für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3095;
 -- AC datas : OLD Name : "Brandungskriecher", Name AC enUS : "Pygmy Surf Crawler" ; Wowhead enUS : "Pygmy Surf Crawler"
 UPDATE `creature_template_locale` SET `Name` = 'Zwergbrandungskriecher', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3106;
 -- AC datas : OLD Name : "Ausgewachsener Brandungskriecher", Name AC enUS : "Surf Crawler" ; Wowhead enUS : "Surf Crawler"
 UPDATE `creature_template_locale` SET `Name` = 'Brandungskriecher', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3107;
--- AC datas : OLD Subname : "Zeppelinmeister, Orgrimmar", Subname AC enUS : "Durotar Zeppelin Master"" ; Wowhead enUS : "Durotar Zeppelin Master"
-UPDATE `creature_template_locale` SET `Title` = 'Zeppelinmeister, Durotar', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3149;
--- AC datas : OLD Name : "Käpt'n Copyright", Name AC enUS : "Cap'n Copyright" ; Wowhead enUS : "Cap'n Copyright"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3152;
+-- AC datas : OLD Name : "Nez'raz", Name AC enUS : "Nez'raz" ; Wowhead enUS : "Nez'raz",  OLD Subname : "Zeppelinmeister, Orgrimmar", Subname AC enUS : "Durotar Zeppelin Master" ; Wowhead enUS : "Durotar Zeppelin Master"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Zeppelinmeister, Durotar', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3149;
 -- AC datas : OLD Name : "Neeru Fireblade", Name AC enUS : "Eric's AAA Special Vendor" ; Wowhead enUS : "Eric's AAA Special Vendor"
 UPDATE `creature_template_locale` SET `Name` = 'Erics Superspezialbedarfverkäufer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3200;
 -- AC datas : OLD Name : "Scott Mercer", Name AC enUS : "Scott Mercer" ; Wowhead enUS : "Scott Mercer"
@@ -7301,40 +7285,36 @@ UPDATE `creature_template_locale` SET `Name` = 'Bluthornsensenklaue', `VerifiedB
 UPDATE `creature_template_locale` SET `Name` = 'Wassersucher der Klingenmähnen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3267;
 -- AC datas : OLD Name : "Schlickanomalie", Name AC enUS : "Sludge Beast" ; Wowhead enUS : "Sludge Beast"
 UPDATE `creature_template_locale` SET `Name` = 'Schlickbestie', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3295;
--- AC datas : OLD Subname : "Stoffrüstungshändler", Subname AC enUS : "Light Armor Merchant"" ; Wowhead enUS : "Light Armor Merchant"
-UPDATE `creature_template_locale` SET `Title` = 'Händler für leichte Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3317;
--- AC datas : OLD Subname : "Händlerin für Kettenrüstungen", Subname AC enUS : "Mail Armor Merchant"" ; Wowhead enUS : "Mail Armor Merchant"
-UPDATE `creature_template_locale` SET `Title` = 'Händlerin für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3319;
--- AC datas : OLD Subname : "Verkäuferin für Bögen & Gewehre", Subname AC enUS : "Guns & Ammunition"" ; Wowhead enUS : "Guns & Ammunition"
-UPDATE `creature_template_locale` SET `Title` = 'Schusswaffen & Munition', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3322;
--- AC datas : OLD Subname : "Reagenzien & Gifte", Subname AC enUS : "Herbalism Supplies"" ; Wowhead enUS : "Herbalism Supplies"
-UPDATE `creature_template_locale` SET `Title` = 'Kräuterkundebedarf', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3405;
+-- AC datas : OLD Name : "Ollanus", Name AC enUS : "Ollanus" ; Wowhead enUS : "Ollanus",  OLD Subname : "Stoffrüstungshändler", Subname AC enUS : "Light Armor Merchant" ; Wowhead enUS : "Light Armor Merchant"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Händler für leichte Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3317;
+-- AC datas : OLD Name : "Sana", Name AC enUS : "Sana" ; Wowhead enUS : "Sana",  OLD Subname : "Händlerin für Kettenrüstungen", Subname AC enUS : "Mail Armor Merchant" ; Wowhead enUS : "Mail Armor Merchant"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Händlerin für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3319;
+-- AC datas : OLD Name : "Kaja", Name AC enUS : "Kaja" ; Wowhead enUS : "Kaja",  OLD Subname : "Verkäuferin für Bögen & Gewehre", Subname AC enUS : "Guns & Ammunition" ; Wowhead enUS : "Guns & Ammunition"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Schusswaffen & Munition', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3322;
+-- AC datas : OLD Name : "Zeal'aya", Name AC enUS : "Zeal'aya" ; Wowhead enUS : "Zeal'aya",  OLD Subname : "Reagenzien & Gifte", Subname AC enUS : "Herbalism Supplies" ; Wowhead enUS : "Herbalism Supplies"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Kräuterkundebedarf', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3405;
 -- AC datas : OLD Name : "Lebende Flamme", Name AC enUS : "Living Flame" ; Wowhead enUS : "Living Flame"
 UPDATE `creature_template_locale` SET `Name` = 'Lebendige Flamme', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3417;
--- AC datas : OLD Subname : "Unabhängiger Vertragspartner", Subname AC enUS : "Tinkers' Union"" ; Wowhead enUS : "Tinkers' Union"
+-- AC datas : OLD Subname : "Unabhängiger Vertragspartner", Subname AC enUS : "Tinkers' Union" ; Wowhead enUS : "Tinkers' Union"
 UPDATE `creature_template_locale` SET `Title` = 'Tüftlerverband', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3442;
--- AC datas : OLD Subname : "Händler für Leder- & Kettenrüstungen", Subname AC enUS : "Leather & Mail Armor Merchant"" ; Wowhead enUS : "Leather & Mail Armor Merchant"
+-- AC datas : OLD Subname : "Händler für Leder- & Kettenrüstungen", Subname AC enUS : "Leather & Mail Armor Merchant" ; Wowhead enUS : "Leather & Mail Armor Merchant"
 UPDATE `creature_template_locale` SET `Title` = 'Händler für Leder- & schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3483;
--- AC datas : OLD Name : "[UNUSED] Schildkrötenausbilder", Name AC enUS : "[UNUSED] Turtle Trainer" ; Wowhead enUS : "[UNUSED] Turtle Trainer"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3525;
--- AC datas : OLD Subname : "Gifte", Subname AC enUS : "Poison Supplies"" ; Wowhead enUS : "Poison Supplies"
-UPDATE `creature_template_locale` SET `Title` = 'Giftreagenzien', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3558;
--- AC datas : OLD Name : "Temp Giftmischereibedarfsverkäufer Zwerg", Name AC enUS : "Temp Poisoning Vendor Dwarf" ; Wowhead enUS : "Temp Poisoning Vendor Dwarf",  OLD Subname : "Gifte", Subname AC enUS : "Poison Supplies"" ; Wowhead enUS : "Poison Supplies"
+-- AC datas : OLD Name : "[UNUSED] Temp Poisoning Vendor Undead", Name AC enUS : "[UNUSED] Temp Poisoning Vendor Undead" ; Wowhead enUS : "[UNUSED] Temp Poisoning Vendor Undead",  OLD Subname : "Gifte", Subname AC enUS : "Poison Supplies" ; Wowhead enUS : "Poison Supplies"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Giftreagenzien', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3558;
+-- AC datas : OLD Name : "Temp Giftmischereibedarfsverkäufer Zwerg", Name AC enUS : "Temp Poisoning Vendor Dwarf" ; Wowhead enUS : "Temp Poisoning Vendor Dwarf",  OLD Subname : "Gifte", Subname AC enUS : "Poison Supplies" ; Wowhead enUS : "Poison Supplies"
 UPDATE `creature_template_locale` SET `Name` = 'Temp Giftmischereibedarfverkäufer Zwerg', `Title` = 'Giftreagenzien', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3559;
 -- AC datas : OLD Name : "Braumeister von Mühlenbern", Name AC enUS : "Dalaran Brewmaster" ; Wowhead enUS : "Dalaran Brewmaster"
 UPDATE `creature_template_locale` SET `Name` = 'Braumeister von Dalaran', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3577;
 -- AC datas : OLD Name : "Minenarbeiter von Mühlenbern", Name AC enUS : "Dalaran Miner" ; Wowhead enUS : "Dalaran Miner"
 UPDATE `creature_template_locale` SET `Name` = 'Minenarbeiter von Dalaran', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3578;
--- AC datas : OLD Subname : "Kult des Dunklen Strangs", Subname AC enUS : "Cult of the Dark Strand"" ; Wowhead enUS : "Cult of the Dark Strand"
-UPDATE `creature_template_locale` SET `Title` = 'Kult des dunklen Strangs', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3660;
--- AC datas : OLD Name : "Lady Anakondra", Name AC enUS : "Lady Anacondra" ; Wowhead enUS : "Lady Anacondra"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3671;
--- AC datas : OLD Name : "Muyoh", Name AC enUS : "Disciple of Naralex" ; Wowhead enUS : "Disciple of Naralex",  OLD Subname : "Jünger von Naralex", Subname AC enUS : """ ; Wowhead enUS : ""
-UPDATE `creature_template_locale` SET `Name` = 'Jünger von Naralex', `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3678;
--- AC datas : OLD Subname : "", Subname AC enUS : "Pet Trainer"" ; Wowhead enUS : "Pet Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Tierausbilder', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3698;
--- AC datas : OLD Subname : "", Subname AC enUS : "Cat Trainer"" ; Wowhead enUS : "Cat Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Katzenausbilderin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3699;
+-- AC datas : OLD Name : "Athrikus Narassin", Name AC enUS : "Athrikus Narassin" ; Wowhead enUS : "Athrikus Narassin",  OLD Subname : "Kult des Dunklen Strangs", Subname AC enUS : "Cult of the Dark Strand" ; Wowhead enUS : "Cult of the Dark Strand"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Kult des dunklen Strangs', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3660;
+-- AC datas : OLD Name : "Muyoh", Name AC enUS : "Disciple of Naralex" ; Wowhead enUS : "Disciple of Naralex"
+UPDATE `creature_template_locale` SET `Name` = 'Jünger von Naralex', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3678;
+-- AC datas : OLD Name : "Bolyun", Name AC enUS : "Bolyun" ; Wowhead enUS : "Bolyun",  OLD Subname : "", Subname AC enUS : "Pet Trainer" ; Wowhead enUS : "Pet Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Tierausbilder', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3698;
+-- AC datas : OLD Name : "Nerra", Name AC enUS : "Nerra" ; Wowhead enUS : "Nerra",  OLD Subname : "", Subname AC enUS : "Cat Trainer" ; Wowhead enUS : "Cat Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Katzenausbilderin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3699;
 -- AC datas : OLD Name : "Nebelpeitscherhydra", Name AC enUS : "Mystlash Hydra" ; Wowhead enUS : "Mystlash Hydra"
 UPDATE `creature_template_locale` SET `Name` = 'Mythosschuppenhydra', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3721;
 -- AC datas : OLD Name : "Nebelpeitscherschinder", Name AC enUS : "Mystlash Flayer" ; Wowhead enUS : "Mystlash Flayer"
@@ -7363,11 +7343,11 @@ UPDATE `creature_template_locale` SET `Name` = 'Geringer Gargoyle', `VerifiedBui
 UPDATE `creature_template_locale` SET `Name` = 'Auftragsmörder des dunklen Strangs', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3879;
 -- AC datas : OLD Name : "Siechendes Urtum", Name AC enUS : "Withered Ancient" ; Wowhead enUS : "Withered Ancient"
 UPDATE `creature_template_locale` SET `Name` = 'Welkes Urtum', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3919;
--- AC datas : OLD Subname : "Generalin der Schildwachenarmee", Subname AC enUS : "General of the Sentinel Army"" ; Wowhead enUS : "General of the Sentinel Army"
+-- AC datas : OLD Subname : "Generalin der Schildwachenarmee", Subname AC enUS : "General of the Sentinel Army" ; Wowhead enUS : "General of the Sentinel Army"
 UPDATE `creature_template_locale` SET `Title` = 'General der Schildwachenarmee', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3936;
--- AC datas : OLD Subname : "Kochkunstlehrer", Subname AC enUS : "Cook"" ; Wowhead enUS : "Cook"
-UPDATE `creature_template_locale` SET `Title` = 'Koch', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3966;
--- AC datas : OLD Subname : "Giftverkäufer", Subname AC enUS : "Tools & Supplies"" ; Wowhead enUS : "Tools & Supplies"
+-- AC datas : OLD Name : "Kaleem", Name AC enUS : "Kaleem" ; Wowhead enUS : "Kaleem",  OLD Subname : "Kochkunstlehrer", Subname AC enUS : "Cook" ; Wowhead enUS : "Cook"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Koch', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3966;
+-- AC datas : OLD Subname : "Giftverkäufer", Subname AC enUS : "Tools & Supplies" ; Wowhead enUS : "Tools & Supplies"
 UPDATE `creature_template_locale` SET `Title` = 'Werkzeuge und Bedarfsartikel', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3969;
 -- AC datas : OLD Name : "Bewacher der Venture Co.", Name AC enUS : "Venture Co. Engineer" ; Wowhead enUS : "Venture Co. Engineer"
 UPDATE `creature_template_locale` SET `Name` = 'Ingenieur der Venture Co.', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3992;
@@ -7381,27 +7361,27 @@ UPDATE `creature_template_locale` SET `Name` = 'Verschlagener Siechdrache', `Ver
 UPDATE `creature_template_locale` SET `Name` = 'Ätzblutsaftbestie', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4021;
 -- AC datas : OLD Name : "Schwarzgebratener Basilisk", Name AC enUS : "Blackened Basilisk" ; Wowhead enUS : "Blackened Basilisk"
 UPDATE `creature_template_locale` SET `Name` = 'Geschwärzter Basilisk', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4044;
--- AC datas : OLD Name : "JEFF CHOW TEST", Name AC enUS : "JEFF CHOW TEST" ; Wowhead enUS : "JEFF CHOW TEST",  OLD Subname : "Unbekleideter NSC", Subname AC enUS : "No Clothes NPC"" ; Wowhead enUS : "No Clothes NPC"
-UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4045;
+-- AC datas : OLD Name : "JEFF CHOW TEST", Name AC enUS : "JEFF CHOW TEST" ; Wowhead enUS : "JEFF CHOW TEST"
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4045;
 -- AC datas : OLD Name : "Steilhangwyvern", Name AC enUS : "Highperch Wyvern" ; Wowhead enUS : "Highperch Wyvern"
 UPDATE `creature_template_locale` SET `Name` = 'Steilhangflügeldrache', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4107;
 -- AC datas : OLD Name : "Krkk'kx", Name AC enUS : "Silithid Ravager" ; Wowhead enUS : "Silithid Ravager"
 UPDATE `creature_template_locale` SET `Name` = 'Silithidverheerer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4132;
 -- AC datas : OLD Name : "Skorpidschrecken", Name AC enUS : "Scorpid Terror" ; Wowhead enUS : "Scorpid Terror"
 UPDATE `creature_template_locale` SET `Name` = 'Skorpidschrecker', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4139;
--- AC datas : OLD Subname : "", Subname AC enUS : "Foraging Trainer"" ; Wowhead enUS : "Foraging Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Nahrungssuchelehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4149;
--- AC datas : OLD Subname : "", Subname AC enUS : "Cat Trainer"" ; Wowhead enUS : "Cat Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Katzenausbilderin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4153;
--- AC datas : OLD Subname : "", Subname AC enUS : "Cartography Trainer"" ; Wowhead enUS : "Cartography Trainer"
+-- AC datas : OLD Name : "Kesteryth", Name AC enUS : "Kesteryth" ; Wowhead enUS : "Kesteryth",  OLD Subname : "", Subname AC enUS : "Foraging Trainer" ; Wowhead enUS : "Foraging Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Nahrungssuchelehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4149;
+-- AC datas : OLD Name : "Kysandia", Name AC enUS : "Kysandia" ; Wowhead enUS : "Kysandia",  OLD Subname : "", Subname AC enUS : "Cat Trainer" ; Wowhead enUS : "Cat Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Katzenausbilderin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4153;
+-- AC datas : OLD Subname : "", Subname AC enUS : "Cartography Trainer" ; Wowhead enUS : "Cartography Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Kartografielehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4157;
--- AC datas : OLD Subname : "Händlerin für Kettenrüstungen", Subname AC enUS : "Mail Armor Merchant"" ; Wowhead enUS : "Mail Armor Merchant"
-UPDATE `creature_template_locale` SET `Title` = 'Händlerin für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4177;
--- AC datas : OLD Subname : "Händlerin für Kettenrüstungen", Subname AC enUS : "Mail Armor Merchant"" ; Wowhead enUS : "Mail Armor Merchant"
-UPDATE `creature_template_locale` SET `Title` = 'Händlerin für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4178;
--- AC datas : OLD Subname : "", Subname AC enUS : "Bear Trainer"" ; Wowhead enUS : "Bear Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Bärenausbilder', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4206;
--- AC datas : OLD Subname : "", Subname AC enUS : "Wolf Trainer"" ; Wowhead enUS : "Wolf Trainer"
+-- AC datas : OLD Name : "Melea", Name AC enUS : "Melea" ; Wowhead enUS : "Melea",  OLD Subname : "Händlerin für Kettenrüstungen", Subname AC enUS : "Mail Armor Merchant" ; Wowhead enUS : "Mail Armor Merchant"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Händlerin für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4177;
+-- AC datas : OLD Name : "Shaia", Name AC enUS : "Shaia" ; Wowhead enUS : "Shaia",  OLD Subname : "Händlerin für Kettenrüstungen", Subname AC enUS : "Mail Armor Merchant" ; Wowhead enUS : "Mail Armor Merchant"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Händlerin für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4178;
+-- AC datas : OLD Name : "Talar", Name AC enUS : "Talar" ; Wowhead enUS : "Talar",  OLD Subname : "", Subname AC enUS : "Bear Trainer" ; Wowhead enUS : "Bear Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Bärenausbilder', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4206;
+-- AC datas : OLD Subname : "", Subname AC enUS : "Wolf Trainer" ; Wowhead enUS : "Wolf Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Wolfausbilder', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4207;
 -- AC datas : OLD Name : "Grauer Wolf", Name AC enUS : "Gray Wolf" ; Wowhead enUS : "Gray Wolf"
 UPDATE `creature_template_locale` SET `Name` = 'Reitwolf (Grau)', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4268;
@@ -7411,8 +7391,6 @@ UPDATE `creature_template_locale` SET `Name` = 'Reitwolf (Rot)', `VerifiedBuild`
 UPDATE `creature_template_locale` SET `Name` = 'Scharlachroter Held', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4302;
 -- AC datas : OLD Name : "Scharlachroter Folterer", Name AC enUS : "Scarlet Torturer" ; Wowhead enUS : "Scarlet Torturer"
 UPDATE `creature_template_locale` SET `Name` = 'Scharlachroter Folterknecht', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4306;
--- AC datas : OLD Name : "Delyka", Name AC enUS : "[UNUSED] Delyka" ; Wowhead enUS : "[UNUSED] Delyka"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4318;
 -- AC datas : OLD Name : "Matschwirbler der Schlammflossen", Name AC enUS : "Mirefin Muckdweller" ; Wowhead enUS : "Mirefin Muckdweller"
 UPDATE `creature_template_locale` SET `Name` = 'Matschkrabbler der Schlammflossen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4361;
 -- AC datas : OLD Name : "Sumpfschlamm", Name AC enUS : "Swamp Ooze" ; Wowhead enUS : "Swamp Ooze"
@@ -7423,26 +7401,24 @@ UPDATE `creature_template_locale` SET `Name` = 'Ätzender Sumpfbrühschlammer', 
 UPDATE `creature_template_locale` SET `Name` = 'Wallender Sumpfbrühschlammer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4395;
 -- AC datas : OLD Name : "Rennmeister", Name AC enUS : "Race Master Kronkrider" ; Wowhead enUS : "Race Master Kronkrider"
 UPDATE `creature_template_locale` SET `Name` = 'Rennmeister Kronkreiter', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4419;
--- AC datas : OLD Subname : "Rennausstatter", Subname AC enUS : "Race Vendor"" ; Wowhead enUS : "Race Vendor"
-UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4446;
 -- AC datas : OLD Name : "Blut von Agamaggan", Name AC enUS : "Blood of Agamaggan" ; Wowhead enUS : "Blood of Agamaggan"
 UPDATE `creature_template_locale` SET `Name` = 'Blut von Agammagan', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4541;
--- AC datas : OLD Subname : "Händler für Kettenrüstungen", Subname AC enUS : "Heavy Armor Merchant"" ; Wowhead enUS : "Heavy Armor Merchant"
-UPDATE `creature_template_locale` SET `Title` = 'Händler für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4559;
--- AC datas : OLD Subname : "Händler für Kettenrüstungen", Subname AC enUS : "Heavy Armor Merchant"" ; Wowhead enUS : "Heavy Armor Merchant"
-UPDATE `creature_template_locale` SET `Title` = 'Händler für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4560;
--- AC datas : OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
+-- AC datas : OLD Name : "Timothy Weldon", Name AC enUS : "Timothy Weldon" ; Wowhead enUS : "Timothy Weldon",  OLD Subname : "Händler für Kettenrüstungen", Subname AC enUS : "Heavy Armor Merchant" ; Wowhead enUS : "Heavy Armor Merchant"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Händler für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4559;
+-- AC datas : OLD Name : "Walter Ellingson", Name AC enUS : "Walter Ellingson" ; Wowhead enUS : "Walter Ellingson",  OLD Subname : "Händler für Kettenrüstungen", Subname AC enUS : "Heavy Armor Merchant" ; Wowhead enUS : "Heavy Armor Merchant"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Händler für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4560;
+-- AC datas : OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Magielehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4566;
--- AC datas : OLD Subname : "Magierlehrer", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
+-- AC datas : OLD Subname : "Magierlehrer", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Magielehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4567;
--- AC datas : OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
+-- AC datas : OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Magielehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4568;
--- AC datas : OLD Subname : "Schneiderlehrerin", Subname AC enUS : "Master Shadoweave Tailor"" ; Wowhead enUS : "Master Shadoweave Tailor"
-UPDATE `creature_template_locale` SET `Title` = 'Schattengewebeschneidermeisterin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4578;
--- AC datas : OLD Name : "Alexander Lister", Name AC enUS : "[UNUSED] Alexander Lister" ; Wowhead enUS : "[UNUSED] Alexander Lister",  OLD Subname : "", Subname AC enUS : "Cartography Trainer"" ; Wowhead enUS : "Cartography Trainer"
-UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Kartografielehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4579;
--- AC datas : OLD Subname : "", Subname AC enUS : "Raptor Trainer"" ; Wowhead enUS : "Raptor Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Raptorausbilder', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4621;
+-- AC datas : OLD Name : "Josephine Lister", Name AC enUS : "Josephine Lister" ; Wowhead enUS : "Josephine Lister",  OLD Subname : "Schneiderlehrerin", Subname AC enUS : "Master Shadoweave Tailor" ; Wowhead enUS : "Master Shadoweave Tailor"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Schattengewebeschneidermeisterin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4578;
+-- AC datas : OLD Subname : "", Subname AC enUS : "Cartography Trainer" ; Wowhead enUS : "Cartography Trainer"
+UPDATE `creature_template_locale` SET `Title` = 'Kartografielehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4579;
+-- AC datas : OLD Name : "Rebald Yorglun", Name AC enUS : "Rebald Yorglun" ; Wowhead enUS : "Rebald Yorglun",  OLD Subname : "", Subname AC enUS : "Raptor Trainer" ; Wowhead enUS : "Raptor Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Raptorausbilder', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4621;
 -- AC datas : OLD Name : "Kolkarzentaure", Name AC enUS : "Kolkar Centaur" ; Wowhead enUS : "Kolkar Centaur"
 UPDATE `creature_template_locale` SET `Name` = 'Zentaur der Kolkar', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4632;
 -- AC datas : OLD Name : "Randal Weidmann", Name AC enUS : "Randal Hunter" ; Wowhead enUS : "Randal Hunter"
@@ -7455,108 +7431,102 @@ UPDATE `creature_template_locale` SET `Name` = 'Reitwidder (Schwarz)', `Verified
 UPDATE `creature_template_locale` SET `Name` = 'Akolyth des Schattenhammers', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4809;
 -- AC datas : OLD Name : "Matschwirbler der Nachtaugen", Name AC enUS : "Blindlight Muckdweller" ; Wowhead enUS : "Blindlight Muckdweller"
 UPDATE `creature_template_locale` SET `Name` = 'Matschkrabbler der Nachtaugen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4819;
--- AC datas : OLD Subname : "Wissenshüter", Subname AC enUS : "Lorekeeper"" ; Wowhead enUS : "Lorekeeper"
-UPDATE `creature_template_locale` SET `Title` = 'Bewahrer der Lehren', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4878;
--- AC datas : OLD Subname : "", Subname AC enUS : "Turtle Trainer"" ; Wowhead enUS : "Turtle Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Schildkrötenausbilder', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4881;
--- AC datas : OLD Subname : "Rüstungs- & Waffenschmied", Subname AC enUS : "Armorer & Shieldsmith"" ; Wowhead enUS : "Armorer & Shieldsmith"
-UPDATE `creature_template_locale` SET `Title` = 'Rüstungs- & Schildschmied', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4886;
--- AC datas : OLD Subname : "Schmiedekunstlehrerin", Subname AC enUS : "Weaponsmith"" ; Wowhead enUS : "Weaponsmith"
+-- AC datas : OLD Name : "Montarr", Name AC enUS : "Montarr" ; Wowhead enUS : "Montarr",  OLD Subname : "Wissenshüter", Subname AC enUS : "Lorekeeper" ; Wowhead enUS : "Lorekeeper"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Bewahrer der Lehren', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4878;
+-- AC datas : OLD Name : "Varng", Name AC enUS : "Varng" ; Wowhead enUS : "Varng",  OLD Subname : "", Subname AC enUS : "Turtle Trainer" ; Wowhead enUS : "Turtle Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Schildkrötenausbilder', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4881;
+-- AC datas : OLD Name : "Hans Weston", Name AC enUS : "Hans Weston" ; Wowhead enUS : "Hans Weston",  OLD Subname : "Rüstungs- & Waffenschmied", Subname AC enUS : "Armorer & Shieldsmith" ; Wowhead enUS : "Armorer & Shieldsmith"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Rüstungs- & Schildschmied', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4886;
+-- AC datas : OLD Subname : "Schmiedekunstlehrerin", Subname AC enUS : "Weaponsmith" ; Wowhead enUS : "Weaponsmith"
 UPDATE `creature_template_locale` SET `Title` = 'Waffenschmiedin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4888;
--- AC datas : OLD Subname : "Jägerlehrer & Bogenmacher", Subname AC enUS : "Bowyer"" ; Wowhead enUS : "Bowyer"
-UPDATE `creature_template_locale` SET `Title` = 'Bogenmacher', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4892;
--- AC datas : OLD Subname : "Kochlehrer", Subname AC enUS : "Cook"" ; Wowhead enUS : "Cook"
+-- AC datas : OLD Name : "Jensen Farran", Name AC enUS : "Jensen Farran" ; Wowhead enUS : "Jensen Farran",  OLD Subname : "Jägerlehrer & Bogenmacher", Subname AC enUS : "Bowyer" ; Wowhead enUS : "Bowyer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Bogenmacher', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4892;
+-- AC datas : OLD Subname : "Kochlehrer", Subname AC enUS : "Cook" ; Wowhead enUS : "Cook"
 UPDATE `creature_template_locale` SET `Title` = 'Koch', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4894;
--- AC datas : OLD Subname : "Gemischtwaren & Reagenzien", Subname AC enUS : "General Goods"" ; Wowhead enUS : "General Goods"
-UPDATE `creature_template_locale` SET `Title` = 'Gemischtwaren', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4896;
+-- AC datas : OLD Name : "Charity Mipsy", Name AC enUS : "Charity Mipsy" ; Wowhead enUS : "Charity Mipsy",  OLD Subname : "Gemischtwaren & Reagenzien", Subname AC enUS : "General Goods" ; Wowhead enUS : "General Goods"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Gemischtwaren', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4896;
 -- AC datas : OLD Name : "Wasserschlange", Name AC enUS : "Moccasin" ; Wowhead enUS : "Moccasin"
 UPDATE `creature_template_locale` SET `Name` = 'Mokassin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4953;
--- AC datas : OLD Subname : "Herrscherin über Theramore", Subname AC enUS : "Ruler of Theramore"" ; Wowhead enUS : "Ruler of Theramore"
+-- AC datas : OLD Subname : "Herrscherin über Theramore", Subname AC enUS : "Ruler of Theramore" ; Wowhead enUS : "Ruler of Theramore"
 UPDATE `creature_template_locale` SET `Title` = 'Herrscherin von Theramore', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4968;
--- AC datas : OLD Name : "Welt Magierlehrerin", Name AC enUS : "World Mage Trainer" ; Wowhead enUS : "World Mage Trainer",  OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
+-- AC datas : OLD Name : "Welt Magierlehrerin", Name AC enUS : "World Mage Trainer" ; Wowhead enUS : "World Mage Trainer",  OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
 UPDATE `creature_template_locale` SET `Name` = 'Welt Magielehrerin', `Title` = 'Magielehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4987;
--- AC datas : OLD Subname : "", Subname AC enUS : "Wolf Pet Trainer"" ; Wowhead enUS : "Wolf Pet Trainer"
+-- AC datas : OLD Subname : "", Subname AC enUS : "Wolf Pet Trainer" ; Wowhead enUS : "Wolf Pet Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Tierausbilderin für Wölfe', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4994;
--- AC datas : OLD Subname : "", Subname AC enUS : "Bird Pet Trainer"" ; Wowhead enUS : "Bird Pet Trainer"
+-- AC datas : OLD Subname : "", Subname AC enUS : "Bird Pet Trainer" ; Wowhead enUS : "Bird Pet Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Tierausbilderin für Vögel', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5001;
--- AC datas : OLD Subname : "", Subname AC enUS : "Cat Pet Trainer"" ; Wowhead enUS : "Cat Pet Trainer"
+-- AC datas : OLD Subname : "", Subname AC enUS : "Cat Pet Trainer" ; Wowhead enUS : "Cat Pet Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Tierausbilder für Katzen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5003;
--- AC datas : OLD Subname : "", Subname AC enUS : "Crawler Pet Trainer"" ; Wowhead enUS : "Crawler Pet Trainer"
+-- AC datas : OLD Subname : "", Subname AC enUS : "Crawler Pet Trainer" ; Wowhead enUS : "Crawler Pet Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Tierausbilder für Kriecher', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5004;
--- AC datas : OLD Subname : "", Subname AC enUS : "Crocodile Pet Trainer"" ; Wowhead enUS : "Crocodile Pet Trainer"
+-- AC datas : OLD Subname : "", Subname AC enUS : "Crocodile Pet Trainer" ; Wowhead enUS : "Crocodile Pet Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Tierausbilder für Krokodile', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5005;
--- AC datas : OLD Name : "Weltdämonenausbilderin", Name AC enUS : "World Demon Trainer - old" ; Wowhead enUS : "World Demon Trainer - old",  OLD Subname : "", Subname AC enUS : """ ; Wowhead enUS : ""
+-- AC datas : OLD Name : "Weltdämonenausbilderin", Name AC enUS : "World Demon Trainer - old" ; Wowhead enUS : "World Demon Trainer - old",  OLD Subname : "", Subname AC enUS : "" ; Wowhead enUS : ""
 UPDATE `creature_template_locale` SET `Name` = 'Welt Dämonenausbilderin', `Title` = 'Dämonenausbilderin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5006;
--- AC datas : OLD Subname : "", Subname AC enUS : "Gorilla Pet Trainer"" ; Wowhead enUS : "Gorilla Pet Trainer"
+-- AC datas : OLD Subname : "", Subname AC enUS : "Gorilla Pet Trainer" ; Wowhead enUS : "Gorilla Pet Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Tierausbilderin für Gorillas', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5008;
--- AC datas : OLD Subname : "", Subname AC enUS : "Horse Pet Trainer"" ; Wowhead enUS : "Horse Pet Trainer"
+-- AC datas : OLD Subname : "", Subname AC enUS : "Horse Pet Trainer" ; Wowhead enUS : "Horse Pet Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Tierausbilderin für Pferde', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5009;
--- AC datas : OLD Subname : "", Subname AC enUS : "Raptor Pet Trainer"" ; Wowhead enUS : "Raptor Pet Trainer"
+-- AC datas : OLD Subname : "", Subname AC enUS : "Raptor Pet Trainer" ; Wowhead enUS : "Raptor Pet Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Tierausbilderin für Raptoren', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5011;
--- AC datas : OLD Subname : "", Subname AC enUS : "Scorpid Pet Trainer"" ; Wowhead enUS : "Scorpid Pet Trainer"
+-- AC datas : OLD Subname : "", Subname AC enUS : "Scorpid Pet Trainer" ; Wowhead enUS : "Scorpid Pet Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Skorpidtierausbilder', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5012;
--- AC datas : OLD Subname : "", Subname AC enUS : "Spider Pet Trainer"" ; Wowhead enUS : "Spider Pet Trainer"
+-- AC datas : OLD Subname : "", Subname AC enUS : "Spider Pet Trainer" ; Wowhead enUS : "Spider Pet Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Tierausbilderin für Spinnen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5013;
--- AC datas : OLD Subname : "", Subname AC enUS : "Tallstrider Pet Trainer"" ; Wowhead enUS : "Tallstrider Pet Trainer"
+-- AC datas : OLD Subname : "", Subname AC enUS : "Tallstrider Pet Trainer" ; Wowhead enUS : "Tallstrider Pet Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Tierausbilderin für Weitschreiter', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5015;
--- AC datas : OLD Subname : "", Subname AC enUS : "Turtle Pet Trainer"" ; Wowhead enUS : "Turtle Pet Trainer"
+-- AC datas : OLD Subname : "", Subname AC enUS : "Turtle Pet Trainer" ; Wowhead enUS : "Turtle Pet Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Tierausbilder für Schildkröten', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5017;
--- AC datas : OLD Subname : "", Subname AC enUS : "Horse Riding Trainer"" ; Wowhead enUS : "Horse Riding Trainer"
+-- AC datas : OLD Subname : "", Subname AC enUS : "Horse Riding Trainer" ; Wowhead enUS : "Horse Riding Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Pferdereitlehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5026;
--- AC datas : OLD Name : "[PH] Schmerzbanner der Mogu", Name AC enUS : "World Lockpicking Trainer" ; Wowhead enUS : "World Lockpicking Trainer",  OLD Subname : "", Subname AC enUS : "Lockpicking Trainer"" ; Wowhead enUS : "Lockpicking Trainer"
+-- AC datas : OLD Name : "[PH] Schmerzbanner der Mogu", Name AC enUS : "World Lockpicking Trainer" ; Wowhead enUS : "World Lockpicking Trainer",  OLD Subname : "", Subname AC enUS : "Lockpicking Trainer" ; Wowhead enUS : "Lockpicking Trainer"
 UPDATE `creature_template_locale` SET `Name` = 'Welt Schlossknackenlehrerin', `Title` = 'Schlossknackenlehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5027;
--- AC datas : OLD Name : "Jiming", Name AC enUS : "World Survival Trainer" ; Wowhead enUS : "World Survival Trainer",  OLD Subname : "", Subname AC enUS : "Survival Trainer"" ; Wowhead enUS : "Survival Trainer"
+-- AC datas : OLD Name : "Jiming", Name AC enUS : "World Survival Trainer" ; Wowhead enUS : "World Survival Trainer",  OLD Subname : "", Subname AC enUS : "Survival Trainer" ; Wowhead enUS : "Survival Trainer"
 UPDATE `creature_template_locale` SET `Name` = 'Welt Überlebenskunstlehrerin', `Title` = 'Überlebenskunstlehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5029;
--- AC datas : OLD Subname : "", Subname AC enUS : "Tiger Riding Trainer"" ; Wowhead enUS : "Tiger Riding Trainer"
+-- AC datas : OLD Subname : "", Subname AC enUS : "Tiger Riding Trainer" ; Wowhead enUS : "Tiger Riding Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Tigerreitlehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5030;
--- AC datas : OLD Name : "Welt-Alchemielehrerin", Name AC enUS : "World Alchemy Trainer" ; Wowhead enUS : "World Alchemy Trainer",  OLD Subname : "Alchemielehrerin", Subname AC enUS : "Grand Master Alchemy Trainer"" ; Wowhead enUS : "Grand Master Alchemy Trainer"
+-- AC datas : OLD Name : "Welt-Alchemielehrerin", Name AC enUS : "World Alchemy Trainer" ; Wowhead enUS : "World Alchemy Trainer",  OLD Subname : "Alchemielehrerin", Subname AC enUS : "Grand Master Alchemy Trainer" ; Wowhead enUS : "Grand Master Alchemy Trainer"
 UPDATE `creature_template_locale` SET `Name` = 'Welt Alchimielehrerin', `Title` = 'Alchimielehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5032;
--- AC datas : OLD Name : "Winwa", Name AC enUS : "World Brewing Trainer" ; Wowhead enUS : "World Brewing Trainer",  OLD Subname : "", Subname AC enUS : "Brewing Trainer"" ; Wowhead enUS : "Brewing Trainer"
+-- AC datas : OLD Name : "Winwa", Name AC enUS : "World Brewing Trainer" ; Wowhead enUS : "World Brewing Trainer",  OLD Subname : "", Subname AC enUS : "Brewing Trainer" ; Wowhead enUS : "Brewing Trainer"
 UPDATE `creature_template_locale` SET `Name` = 'Welt Braukunstlehrerin', `Title` = 'Brauskunstlehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5034;
--- AC datas : OLD Subname : "", Subname AC enUS : "Cartography Trainer"" ; Wowhead enUS : "Cartography Trainer"
+-- AC datas : OLD Subname : "", Subname AC enUS : "Cartography Trainer" ; Wowhead enUS : "Cartography Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Kartografielehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5035;
--- AC datas : OLD Subname : "Hexenmeisterlehrerin", Subname AC enUS : "Tracking Trainer"" ; Wowhead enUS : "Tracking Trainer"
+-- AC datas : OLD Subname : "Hexenmeisterlehrerin", Subname AC enUS : "Tracking Trainer" ; Wowhead enUS : "Tracking Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Fährtenlesekunstlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5039;
 -- AC datas : OLD Name : "Rabauke", Name AC enUS : "Defias Rioter" ; Wowhead enUS : "Defias Rioter"
 UPDATE `creature_template_locale` SET `Name` = 'Rabauke der Defias', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5043;
--- AC datas : OLD Name : "Rallus", Name AC enUS : "[UNUSED] Rallus" ; Wowhead enUS : "[UNUSED] Rallus"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5050;
--- AC datas : OLD Name : "Frewa", Name AC enUS : "[UNUSED] Frewa" ; Wowhead enUS : "[UNUSED] Frewa"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5051;
--- AC datas : OLD Name : "Zahlmeister Lendry", Name AC enUS : "Clerk Lendry" ; Wowhead enUS : "Clerk Lendry",  OLD Subname : "Bankier", Subname AC enUS : """ ; Wowhead enUS : ""
-UPDATE `creature_template_locale` SET `Name` = 'Amtmann Lendry', `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5083;
--- AC datas : OLD Subname : "", Subname AC enUS : "Gun Trainer"" ; Wowhead enUS : "Gun Trainer"
+-- AC datas : OLD Name : "Zahlmeister Lendry", Name AC enUS : "Clerk Lendry" ; Wowhead enUS : "Clerk Lendry"
+UPDATE `creature_template_locale` SET `Name` = 'Amtmann Lendry', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5083;
+-- AC datas : OLD Subname : "", Subname AC enUS : "Gun Trainer" ; Wowhead enUS : "Gun Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Schusswaffenlehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5104;
--- AC datas : OLD Subname : "Händler für Kettenrüstungen", Subname AC enUS : "Heavy Armor Merchant"" ; Wowhead enUS : "Heavy Armor Merchant"
-UPDATE `creature_template_locale` SET `Title` = 'Händler für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5106;
--- AC datas : OLD Subname : "Händler für Kettenrüstungen", Subname AC enUS : "Heavy Armor Merchant"" ; Wowhead enUS : "Heavy Armor Merchant"
-UPDATE `creature_template_locale` SET `Title` = 'Händler für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5107;
--- AC datas : OLD Subname : "Händler für Kettenrüstungen", Subname AC enUS : "Mail Armor Merchant"" ; Wowhead enUS : "Mail Armor Merchant"
+-- AC datas : OLD Name : "Bromiir Ormsen", Name AC enUS : "Bromiir Ormsen" ; Wowhead enUS : "Bromiir Ormsen",  OLD Subname : "Händler für Kettenrüstungen", Subname AC enUS : "Heavy Armor Merchant" ; Wowhead enUS : "Heavy Armor Merchant"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Händler für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5106;
+-- AC datas : OLD Name : "Mangorn Flinthammer", Name AC enUS : "Mangorn Flinthammer" ; Wowhead enUS : "Mangorn Flinthammer",  OLD Subname : "Händler für Kettenrüstungen", Subname AC enUS : "Heavy Armor Merchant" ; Wowhead enUS : "Heavy Armor Merchant"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Händler für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5107;
+-- AC datas : OLD Subname : "Händler für Kettenrüstungen", Subname AC enUS : "Mail Armor Merchant" ; Wowhead enUS : "Mail Armor Merchant"
 UPDATE `creature_template_locale` SET `Title` = 'Händler für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5125;
--- AC datas : OLD Subname : "Händler für Kettenrüstungen", Subname AC enUS : "Heavy Armor Merchant"" ; Wowhead enUS : "Heavy Armor Merchant"
+-- AC datas : OLD Subname : "Händler für Kettenrüstungen", Subname AC enUS : "Heavy Armor Merchant" ; Wowhead enUS : "Heavy Armor Merchant"
 UPDATE `creature_template_locale` SET `Title` = 'Händler für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5126;
--- AC datas : OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Magielehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5144;
--- AC datas : OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
+-- AC datas : OLD Name : "Bink", Name AC enUS : "Bink" ; Wowhead enUS : "Bink",  OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Magielehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5144;
+-- AC datas : OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Magielehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5145;
--- AC datas : OLD Subname : "Magierlehrer", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
+-- AC datas : OLD Subname : "Magierlehrer", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Magielehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5146;
--- AC datas : OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Armorsmith Trainer"" ; Wowhead enUS : "Armorsmith Trainer"
+-- AC datas : OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Armorsmith Trainer" ; Wowhead enUS : "Armorsmith Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Rüstungsschmiedelehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5164;
--- AC datas : OLD Name : "[UNUSED] Nils Steinbraue", Name AC enUS : "[UNUSED] Nils Stonebrow" ; Wowhead enUS : "[UNUSED] Nils Stonebrow"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5192;
--- AC datas : OLD Name : "Jeremys Testmonster", Name AC enUS : "Coast Crawl Clacker" ; Wowhead enUS : "Coast Crawl Clacker",  OLD Subname : "Muffinus' Diener", Subname AC enUS : """ ; Wowhead enUS : ""
-UPDATE `creature_template_locale` SET `Name` = 'Küstenkriecherklacker', `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5326;
--- AC datas : OLD Subname : "Juwelierskunstlehrer & Handwerkswaren", Subname AC enUS : "Explorers' League"" ; Wowhead enUS : "Explorers' League"
+-- AC datas : OLD Name : "Jeremys Testmonster", Name AC enUS : "Coast Crawl Clacker" ; Wowhead enUS : "Coast Crawl Clacker"
+UPDATE `creature_template_locale` SET `Name` = 'Küstenkriecherklacker', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5326;
+-- AC datas : OLD Subname : "Juwelierskunstlehrer & Handwerkswaren", Subname AC enUS : "Explorers' League" ; Wowhead enUS : "Explorers' League"
 UPDATE `creature_template_locale` SET `Title` = 'Forscherliga', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5388;
 -- AC datas : OLD Name : "Versklavter Ernter", Name AC enUS : "Harvester Swarm" ; Wowhead enUS : "Harvester Swarm"
 UPDATE `creature_template_locale` SET `Name` = 'Sammlerschwarm', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5409;
--- AC datas : OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
+-- AC datas : OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Magielehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5497;
--- AC datas : OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Magielehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5498;
--- AC datas : OLD Subname : "", Subname AC enUS : "Tallstrider Trainer"" ; Wowhead enUS : "Tallstrider Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Weitschreiterausbilder', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5507;
+-- AC datas : OLD Name : "Elsharin", Name AC enUS : "Elsharin" ; Wowhead enUS : "Elsharin",  OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Magielehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5498;
+-- AC datas : OLD Name : "Celmoridan", Name AC enUS : "Celmoridan" ; Wowhead enUS : "Celmoridan",  OLD Subname : "", Subname AC enUS : "Tallstrider Trainer" ; Wowhead enUS : "Tallstrider Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Weitschreiterausbilder', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5507;
 -- AC datas : OLD Name : "Grunzerin Mojka", Name AC enUS : "Grunt Mojka" ; Wowhead enUS : "Grunt Mojka"
 UPDATE `creature_template_locale` SET `Name` = 'Grunzer Mojka', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5603;
 -- AC datas : OLD Name : "Trainingsattrappe von Unterstadt", Name AC enUS : "Undercity Practice Dummy" ; Wowhead enUS : "Undercity Practice Dummy"
@@ -7565,40 +7535,40 @@ UPDATE `creature_template_locale` SET `Name` = 'Übungsattrappe von Unterstadt',
 UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5683;
 -- AC datas : OLD Name : "Comar-Villard-Projektion", Name AC enUS : "Comar Villard Projection" ; Wowhead enUS : "Corma Villard Projection"
 UPDATE `creature_template_locale` SET `Name` = 'Corma-Villard-Projektion', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5692;
--- AC datas : OLD Subname : "Gerards Gedankensklavin", Subname AC enUS : "Gerard's Mindslave"" ; Wowhead enUS : "Gerard's Experiment"
-UPDATE `creature_template_locale` SET `Title` = 'Gerards Experiment', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5697;
+-- AC datas : OLD Name : "Theresa", Name AC enUS : "Theresa" ; Wowhead enUS : "Theresa",  OLD Subname : "Gerards Gedankensklavin", Subname AC enUS : "Gerard's Mindslave" ; Wowhead enUS : "Gerard's Experiment"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Gerards Experiment', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5697;
 -- AC datas : OLD Name : "Wächter von Blizzard", Name AC enUS : "Guardian of Blizzard" ; Wowhead enUS : "Guardian of Blizzard"
 UPDATE `creature_template_locale` SET `Name` = 'Blizzardwächter', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5764;
 -- AC datas : OLD Name : "Unteroffizier Curtis", Name AC enUS : "Watch Commander Zalaphil" ; Wowhead enUS : "Watch Commander Zalaphil"
 UPDATE `creature_template_locale` SET `Name` = 'Wachkommandant Zalaphil', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5809;
--- AC datas : OLD Subname : "Händlerin für Kettenrüstungen", Subname AC enUS : "Heavy Armor Merchant"" ; Wowhead enUS : "Heavy Armor Merchant"
-UPDATE `creature_template_locale` SET `Title` = 'Händlerin für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5812;
--- AC datas : OLD Subname : "Händlerin für Kettenrüstungen", Subname AC enUS : "Heavy Armor Merchant"" ; Wowhead enUS : "Heavy Armor Merchant"
-UPDATE `creature_template_locale` SET `Title` = 'Händlerin für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5819;
+-- AC datas : OLD Name : "Tumi", Name AC enUS : "Tumi" ; Wowhead enUS : "Tumi",  OLD Subname : "Händlerin für Kettenrüstungen", Subname AC enUS : "Heavy Armor Merchant" ; Wowhead enUS : "Heavy Armor Merchant"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Händlerin für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5812;
+-- AC datas : OLD Name : "Mirelle Tremayne", Name AC enUS : "Mirelle Tremayne" ; Wowhead enUS : "Mirelle Tremayne",  OLD Subname : "Händlerin für Kettenrüstungen", Subname AC enUS : "Heavy Armor Merchant" ; Wowhead enUS : "Heavy Armor Merchant"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Händlerin für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5819;
 -- AC datas : OLD Name : "Geofürst Sprenkel", Name AC enUS : "Geolord Mottle" ; Wowhead enUS : "Geolord Mottle"
 UPDATE `creature_template_locale` SET `Name` = 'Geolord Sprenkel', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5826;
--- AC datas : OLD Subname : "Magierlehrer", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Magielehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5880;
--- AC datas : OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Magielehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5882;
--- AC datas : OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Magielehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5883;
--- AC datas : OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Magielehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5884;
--- AC datas : OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Magielehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5885;
+-- AC datas : OLD Name : "Un'Thuwa", Name AC enUS : "Un'Thuwa" ; Wowhead enUS : "Un'Thuwa",  OLD Subname : "Magierlehrer", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Magielehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5880;
+-- AC datas : OLD Name : "Pephredo", Name AC enUS : "Pephredo" ; Wowhead enUS : "Pephredo",  OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Magielehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5882;
+-- AC datas : OLD Name : "Enyo", Name AC enUS : "Enyo" ; Wowhead enUS : "Enyo",  OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Magielehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5883;
+-- AC datas : OLD Name : "Mai'ah", Name AC enUS : "Mai'ah" ; Wowhead enUS : "Mai'ah",  OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Magielehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5884;
+-- AC datas : OLD Name : "Deino", Name AC enUS : "Deino" ; Wowhead enUS : "Deino",  OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Magielehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5885;
 -- AC datas : OLD Name : "Totem der Läuterung", Name AC enUS : "Cleansing Totem" ; Wowhead enUS : "Cleansing Totem"
 UPDATE `creature_template_locale` SET `Name` = 'Totem der Reinigung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5924;
 -- AC datas : OLD Name : "Totem des Elementarwiderstands", Name AC enUS : "Fire Resistance Totem" ; Wowhead enUS : "Fire Resistance Totem"
 UPDATE `creature_template_locale` SET `Name` = 'Totem des Feuerwiderstands', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5927;
--- AC datas : OLD Name : "Welt Gnom Männlich Magierlehrer", Name AC enUS : "World Gnome Male Mage Trainer" ; Wowhead enUS : "World Gnome Male Mage Trainer",  OLD Subname : "Magierlehrer", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
+-- AC datas : OLD Name : "Welt Gnom Männlich Magierlehrer", Name AC enUS : "World Gnome Male Mage Trainer" ; Wowhead enUS : "World Gnome Male Mage Trainer",  OLD Subname : "Magierlehrer", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
 UPDATE `creature_template_locale` SET `Name` = 'Welt Gnom Männlich Magielehrer', `Title` = 'Magielehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5961;
--- AC datas : OLD Name : "Welt Gnom Magierlehrerin", Name AC enUS : "World Gnome Female Mage Trainer" ; Wowhead enUS : "World Gnome Female Mage Trainer",  OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
+-- AC datas : OLD Name : "Welt Gnom Magierlehrerin", Name AC enUS : "World Gnome Female Mage Trainer" ; Wowhead enUS : "World Gnome Female Mage Trainer",  OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
 UPDATE `creature_template_locale` SET `Name` = 'Welt Gnom Magielehrerin', `Title` = 'Magielehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5969;
 -- AC datas : OLD Name : "Ritualist der Schattenanbeter", Name AC enUS : "Shadowsworn Cultist" ; Wowhead enUS : "Shadowsworn Cultist"
 UPDATE `creature_template_locale` SET `Name` = 'Kultist der Schattenanbeter', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 6004;
--- AC datas : OLD Subname : "Händler für Kettenrüstungen", Subname AC enUS : "Heavy Armor Merchant"" ; Wowhead enUS : "Heavy Armor Merchant"
-UPDATE `creature_template_locale` SET `Title` = 'Händler für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 6028;
+-- AC datas : OLD Name : "Burkrum", Name AC enUS : "Burkrum" ; Wowhead enUS : "Burkrum",  OLD Subname : "Händler für Kettenrüstungen", Subname AC enUS : "Heavy Armor Merchant" ; Wowhead enUS : "Heavy Armor Merchant"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Händler für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 6028;
 -- AC datas : OLD Name : "Totem des Erdgriffs", Name AC enUS : "Earthgrab Totem" ; Wowhead enUS : "Earthgrab Totem"
 UPDATE `creature_template_locale` SET `Name` = 'Totem des Erdengriffs', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 6066;
 -- AC datas : OLD Name : "Drakonischer Magierlord", Name AC enUS : "Draconic Magelord" ; Wowhead enUS : "Draconic Magelord"
@@ -7617,18 +7587,14 @@ UPDATE `creature_template_locale` SET `Name` = 'Akolyth Magaz', `VerifiedBuild` 
 UPDATE `creature_template_locale` SET `Name` = 'Akolyth Wytula', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 6254;
 -- AC datas : OLD Name : "Akolythin Porena", Name AC enUS : "Acolyte Porena" ; Wowhead enUS : "Acolyte Porena"
 UPDATE `creature_template_locale` SET `Name` = 'Akolyth Porena', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 6267;
--- AC datas : OLD Subname : "Kochkunstlehrer", Subname AC enUS : "Cook"" ; Wowhead enUS : "Cook"
-UPDATE `creature_template_locale` SET `Title` = 'Koch', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 6286;
+-- AC datas : OLD Name : "Zarrin", Name AC enUS : "Zarrin" ; Wowhead enUS : "Zarrin",  OLD Subname : "Kochkunstlehrer", Subname AC enUS : "Cook" ; Wowhead enUS : "Cook"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Koch', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 6286;
 -- AC datas : OLD Name : "Gefallener Champion", Name AC enUS : "Fallen Champion" ; Wowhead enUS : "Fallen Champion"
 UPDATE `creature_template_locale` SET `Name` = 'Gestürzter Held', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 6488;
 -- AC datas : OLD Name : ""Hahnentritt" Johnson", Name AC enUS : ""Plucky" Johnson" ; Wowhead enUS : ""Plucky" Johnson"
 UPDATE `creature_template_locale` SET `Name` = 'Eisenherz Johnson', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 6626;
 -- AC datas : OLD Name : ""Hahnentritt" Johnsons Menschengestalt", Name AC enUS : ""Plucky" Johnson's Human Form" ; Wowhead enUS : ""Plucky" Johnson's Human Form"
 UPDATE `creature_template_locale` SET `Name` = 'Eisenherz Johnsons Menschengestalt', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 6666;
--- AC datas : OLD Name : "Rabenholdtfalkner", Name AC enUS : "[UNUSED] Ravenholdt Falconer" ; Wowhead enUS : "[UNUSED] Ravenholdt Falconer"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 6769;
--- AC datas : OLD Name : "Rabenholdthundemeister", Name AC enUS : "[UNUSED] Ravenholdt Houndmaster" ; Wowhead enUS : "[UNUSED] Ravenholdt Houndmaster"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 6770;
 -- AC datas : OLD Name : "Strandkrebs", Name AC enUS : "Crab" ; Wowhead enUS : "Crab"
 UPDATE `creature_template_locale` SET `Name` = 'Krebs', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 6827;
 -- AC datas : OLD Name : "Dockmeister", Name AC enUS : "Defias Dockmaster" ; Wowhead enUS : "Defias Dockmaster"
@@ -7647,33 +7613,31 @@ UPDATE `creature_template_locale` SET `Name` = 'Wanderer der Eisenstämme', `Ver
 UPDATE `creature_template_locale` SET `Name` = 'Donnerstampfer der Eisenstämme', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 7139;
 -- AC datas : OLD Name : "Siechender Treant", Name AC enUS : "Withered Treant" ; Wowhead enUS : "Withered Treant"
 UPDATE `creature_template_locale` SET `Name` = 'Welker Treant', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 7144;
--- AC datas : OLD Subname : "Schmiedekunstlehrerin", Subname AC enUS : "Armorsmithing Trainer"" ; Wowhead enUS : "Armorsmithing Trainer"
+-- AC datas : OLD Subname : "Schmiedekunstlehrerin", Subname AC enUS : "Armorsmithing Trainer" ; Wowhead enUS : "Armorsmithing Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Rüstungsschmiedelehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 7174;
--- AC datas : OLD Subname : "Schmiedekunstlehrerin", Subname AC enUS : "Armorsmith Trainer"" ; Wowhead enUS : "Armorsmith Trainer"
+-- AC datas : OLD Subname : "Schmiedekunstlehrerin", Subname AC enUS : "Armorsmith Trainer" ; Wowhead enUS : "Armorsmith Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Rüstungsschmiedelehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 7230;
--- AC datas : OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Weaponsmith Trainer"" ; Wowhead enUS : "Weaponsmith Trainer"
+-- AC datas : OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Weaponsmith Trainer" ; Wowhead enUS : "Weaponsmith Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Waffenschmiedelehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 7231;
--- AC datas : OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Weaponsmith Trainer"" ; Wowhead enUS : "Weaponsmith Trainer"
+-- AC datas : OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Weaponsmith Trainer" ; Wowhead enUS : "Weaponsmith Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Waffenschmiedelehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 7232;
 -- AC datas : OLD Name : "Aufklärer der Venture Co.", Name AC enUS : "Venture Co. Lookout" ; Wowhead enUS : "Venture Co. Lookout"
 UPDATE `creature_template_locale` SET `Name` = 'Ausguck der Venture Co.', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 7307;
--- AC datas : OLD Subname : "Magierlehrer", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Magielehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 7311;
--- AC datas : OLD Subname : "Magierlehrer", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Magielehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 7312;
--- AC datas : OLD Name : "Test-Kampfmeister", Name AC enUS : "Test BattleMaster" ; Wowhead enUS : "Test BattleMaster"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 7314;
+-- AC datas : OLD Name : "Uthel'nay", Name AC enUS : "Uthel'nay" ; Wowhead enUS : "Uthel'nay",  OLD Subname : "Magierlehrer", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Magielehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 7311;
+-- AC datas : OLD Name : "Dink", Name AC enUS : "Dink" ; Wowhead enUS : "Dink",  OLD Subname : "Magierlehrer", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Magielehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 7312;
 -- AC datas : OLD Name : "Kakerlake von Unterstadt", Name AC enUS : "Cockroach" ; Wowhead enUS : "Cockroach"
 UPDATE `creature_template_locale` SET `Name` = 'Kakerlake', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 7395;
 -- AC datas : OLD Name : "Junger Frostsäbler", Name AC enUS : "Frostsaber Cub" ; Wowhead enUS : "Frostsaber Cub"
 UPDATE `creature_template_locale` SET `Name` = 'Frostsäblerjunges', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 7430;
--- AC datas : OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Magielehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 7488;
--- AC datas : OLD Subname : "Lederverarbeitungslehrerin", Subname AC enUS : "Dragonscale Leatherworking Trainer"" ; Wowhead enUS : "Dragonscale Leatherworking Trainer"
+-- AC datas : OLD Name : "Haka'wani", Name AC enUS : "Haka'wani" ; Wowhead enUS : "Haka'wani",  OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Magielehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 7488;
+-- AC datas : OLD Subname : "Lederverarbeitungslehrerin", Subname AC enUS : "Dragonscale Leatherworking Trainer" ; Wowhead enUS : "Dragonscale Leatherworking Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Drachenlederverarbeitungslehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 7525;
--- AC datas : OLD Subname : "Lederverarbeitungslehrerin", Subname AC enUS : "Elemental Leatherworking Trainer"" ; Wowhead enUS : "Elemental Leatherworking Trainer"
+-- AC datas : OLD Subname : "Lederverarbeitungslehrerin", Subname AC enUS : "Elemental Leatherworking Trainer" ; Wowhead enUS : "Elemental Leatherworking Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Elementarlederverarbeitungslehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 7526;
--- AC datas : OLD Subname : "Lederverarbeitungslehrerin", Subname AC enUS : "Tribal Leatherworking Trainer"" ; Wowhead enUS : "Tribal Leatherworking Trainer"
+-- AC datas : OLD Subname : "Lederverarbeitungslehrerin", Subname AC enUS : "Tribal Leatherworking Trainer" ; Wowhead enUS : "Tribal Leatherworking Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Stammeslederverarbeitungslehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 7528;
 -- AC datas : OLD Name : "Slims Testtodesritter", Name AC enUS : "Slim's Test Death Knight" ; Wowhead enUS : "Slim's Test Death Knight"
 UPDATE `creature_template_locale` SET `Name` = 'Test Death Knight', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 7624;
@@ -7689,36 +7653,36 @@ UPDATE `creature_template_locale` SET `Name` = 'Reitraptor (Obsidianschwarz)', `
 UPDATE `creature_template_locale` SET `Name` = 'Reitraptor (Purpurrot)', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 7704;
 -- AC datas : OLD Name : "Elfenbeinfarbener Raptor", Name AC enUS : "Ivory Raptor" ; Wowhead enUS : "Ivory Raptor"
 UPDATE `creature_template_locale` SET `Name` = 'Reitraptor (Elfenbeinfarben)', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 7706;
--- AC datas : OLD Name : "Byula", Name AC enUS : "Innkeeper Byula" ; Wowhead enUS : "Innkeeper Byula",  OLD Subname : "Ehemaliger Gastwirt", Subname AC enUS : "Innkeeper"" ; Wowhead enUS : "Innkeeper"
+-- AC datas : OLD Name : "Byula", Name AC enUS : "Innkeeper Byula" ; Wowhead enUS : "Innkeeper Byula",  OLD Subname : "Ehemaliger Gastwirt", Subname AC enUS : "Innkeeper" ; Wowhead enUS : "Innkeeper"
 UPDATE `creature_template_locale` SET `Name` = 'Gastwirt Byula', `Title` = 'Gastwirt', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 7714;
 -- AC datas : OLD Name : "Hydromantin Velratha", Name AC enUS : "Hydromancer Velratha" ; Wowhead enUS : "Hydromancer Velratha"
 UPDATE `creature_template_locale` SET `Name` = 'Wasserbeschwörerin Velratha', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 7795;
--- AC datas : OLD Subname : "Lederverarbeitungslehrer", Subname AC enUS : "Dragonscale Leatherworking Trainer"" ; Wowhead enUS : "Dragonscale Leatherworking Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Drachenlederverarbeitungslehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 7866;
--- AC datas : OLD Subname : "Lederverarbeitungslehrer", Subname AC enUS : "Dragonscale Leatherworking Trainer"" ; Wowhead enUS : "Dragonscale Leatherworking Trainer"
+-- AC datas : OLD Name : "Peter Galen", Name AC enUS : "Peter Galen" ; Wowhead enUS : "Peter Galen",  OLD Subname : "Lederverarbeitungslehrer", Subname AC enUS : "Dragonscale Leatherworking Trainer" ; Wowhead enUS : "Dragonscale Leatherworking Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Drachenlederverarbeitungslehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 7866;
+-- AC datas : OLD Subname : "Lederverarbeitungslehrer", Subname AC enUS : "Dragonscale Leatherworking Trainer" ; Wowhead enUS : "Dragonscale Leatherworking Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Drachenlederverarbeitungslehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 7867;
--- AC datas : OLD Subname : "Lederverarbeitungslehrerin", Subname AC enUS : "Elemental Leatherworking Trainer"" ; Wowhead enUS : "Elemental Leatherworking Trainer"
+-- AC datas : OLD Subname : "Lederverarbeitungslehrerin", Subname AC enUS : "Elemental Leatherworking Trainer" ; Wowhead enUS : "Elemental Leatherworking Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Elementarlederverarbeitungslehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 7868;
--- AC datas : OLD Subname : "Lederverarbeitungslehrer", Subname AC enUS : "Elemental Leatherworking Trainer"" ; Wowhead enUS : "Elemental Leatherworking Trainer"
+-- AC datas : OLD Subname : "Lederverarbeitungslehrer", Subname AC enUS : "Elemental Leatherworking Trainer" ; Wowhead enUS : "Elemental Leatherworking Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Elementarlederverarbeitungslehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 7869;
--- AC datas : OLD Subname : "Lederverarbeitungslehrerin", Subname AC enUS : "Tribal Leatherworking Trainer"" ; Wowhead enUS : "Tribal Leatherworking Trainer"
+-- AC datas : OLD Subname : "Lederverarbeitungslehrerin", Subname AC enUS : "Tribal Leatherworking Trainer" ; Wowhead enUS : "Tribal Leatherworking Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Stammeslederverarbeitungslehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 7870;
--- AC datas : OLD Subname : "Lederverarbeitungslehrer", Subname AC enUS : "Tribal Leatherworking Trainer"" ; Wowhead enUS : "Tribal Leatherworking Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Stammeslederverarbeitungslehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 7871;
--- AC datas : OLD Subname : "Reitlehrer", Subname AC enUS : "Mechanostrider Pilot"" ; Wowhead enUS : "Mechanostrider Pilot"
+-- AC datas : OLD Name : "Se'Jib", Name AC enUS : "Se'Jib" ; Wowhead enUS : "Se'Jib",  OLD Subname : "Lederverarbeitungslehrer", Subname AC enUS : "Tribal Leatherworking Trainer" ; Wowhead enUS : "Tribal Leatherworking Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Stammeslederverarbeitungslehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 7871;
+-- AC datas : OLD Subname : "Reitlehrer", Subname AC enUS : "Mechanostrider Pilot" ; Wowhead enUS : "Mechanostrider Pilot"
 UPDATE `creature_template_locale` SET `Title` = 'Roboschreiterpilot', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 7954;
 -- AC datas : OLD Name : "Kriegerheld von Camp Narache", Name AC enUS : "Mulgore Protector" ; Wowhead enUS : "Mulgore Protector"
 UPDATE `creature_template_locale` SET `Name` = 'Beschützer von Mulgore', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 7975;
--- AC datas : OLD Name : "Wache der Westfallbrigade", Name AC enUS : "Protector of the People" ; Wowhead enUS : "Protector of the People",  OLD Subname : "", Subname AC enUS : "The People's Militia"" ; Wowhead enUS : "The People's Militia"
+-- AC datas : OLD Name : "Wache der Westfallbrigade", Name AC enUS : "Protector of the People" ; Wowhead enUS : "Protector of the People",  OLD Subname : "", Subname AC enUS : "The People's Militia" ; Wowhead enUS : "The People's Militia"
 UPDATE `creature_template_locale` SET `Name` = 'Beschützer des Volks', `Title` = 'Die Volksmiliz', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 8096;
--- AC datas : OLD Subname : "Speis & Trank", Subname AC enUS : "Food & Drink"" ; Wowhead enUS : "Food & Drink"
-UPDATE `creature_template_locale` SET `Title` = 'Essen & Getränke', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 8148;
+-- AC datas : OLD Name : "Waurg", Name AC enUS : "Waurg" ; Wowhead enUS : "Waurg",  OLD Subname : "Speis & Trank", Subname AC enUS : "Food & Drink" ; Wowhead enUS : "Food & Drink"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Essen & Getränke', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 8148;
 -- AC datas : OLD Name : "Glutschwinge", Name AC enUS : "Greater Firebird" ; Wowhead enUS : "Greater Firebird"
 UPDATE `creature_template_locale` SET `Name` = 'Großer Feuervogel', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 8207;
--- AC datas : OLD Subname : "Kochkunstlehrer", Subname AC enUS : "Cook"" ; Wowhead enUS : "Cook"
-UPDATE `creature_template_locale` SET `Title` = 'Koch', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 8306;
--- AC datas : OLD Subname : "Händler für Kettenrüstungen", Subname AC enUS : "Mail Armor Merchant"" ; Wowhead enUS : "Mail Armor Merchant"
-UPDATE `creature_template_locale` SET `Title` = 'Händler für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 8360;
+-- AC datas : OLD Name : "Duhng", Name AC enUS : "Duhng" ; Wowhead enUS : "Duhng",  OLD Subname : "Kochkunstlehrer", Subname AC enUS : "Cook" ; Wowhead enUS : "Cook"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Koch', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 8306;
+-- AC datas : OLD Name : "Elki", Name AC enUS : "Elki" ; Wowhead enUS : "Elki",  OLD Subname : "Händler für Kettenrüstungen", Subname AC enUS : "Mail Armor Merchant" ; Wowhead enUS : "Mail Armor Merchant"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Händler für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 8360;
 -- AC datas : OLD Name : "Hauptmann Vanessa Beltis", Name AC enUS : "Captain Vanessa Beltis" ; Wowhead enUS : "Captain Vanessa Beltis"
 UPDATE `creature_template_locale` SET `Name` = 'Kapitän Vanessa Beltis', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 8380;
 -- AC datas : OLD Name : "Handwerksmeister Kovic", Name AC enUS : "Trade Master Kovic" ; Wowhead enUS : "Trade Master Kovic"
@@ -7741,55 +7705,53 @@ UPDATE `creature_template_locale` SET `Name` = 'Pfadwanderer', `VerifiedBuild` =
 UPDATE `creature_template_locale` SET `Name` = 'Ausguck der Dunkeleisenzwerge', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 8566;
 -- AC datas : OLD Name : "Großer Seuchenhund", Name AC enUS : "Plaguehound Mastiff" ; Wowhead enUS : "Plaguehound Mastiff"
 UPDATE `creature_template_locale` SET `Name` = 'Seuchenmastiff', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 8599;
--- AC datas : OLD Name : "Sonnenläuferin Saern", Name AC enUS : "Saern Priderunner" ; Wowhead enUS : "Saern Priderunner",  OLD Subname : "Paladinlehrerin", Subname AC enUS : """ ; Wowhead enUS : ""
-UPDATE `creature_template_locale` SET `Name` = 'Saern Stolzlauf', `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 8664;
+-- AC datas : OLD Name : "Sonnenläuferin Saern", Name AC enUS : "Saern Priderunner" ; Wowhead enUS : "Saern Priderunner"
+UPDATE `creature_template_locale` SET `Name` = 'Saern Stolzlauf', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 8664;
 -- AC datas : OLD Name : "Folterer des Schattenhammers", Name AC enUS : "Twilight's Hammer Torturer" ; Wowhead enUS : "Twilight's Hammer Torturer"
 UPDATE `creature_template_locale` SET `Name` = 'Folterknecht des Schattenhammers', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 8912;
--- AC datas : OLD Subname : "Befrager des Schattenhammers", Subname AC enUS : "Twilight's Hammer Interrogator"" ; Wowhead enUS : "Twilight's Hammer Interrogator"
+-- AC datas : OLD Subname : "Befrager des Schattenhammers", Subname AC enUS : "Twilight's Hammer Interrogator" ; Wowhead enUS : "Twilight's Hammer Interrogator"
 UPDATE `creature_template_locale` SET `Title` = 'Befrager des Schattenhammerklans', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 9018;
--- AC datas : OLD Subname : "Der Smaragdkreis", Subname AC enUS : "Emerald Circle"" ; Wowhead enUS : "Emerald Circle"
+-- AC datas : OLD Subname : "Der Smaragdkreis", Subname AC enUS : "Emerald Circle" ; Wowhead enUS : "Emerald Circle"
 UPDATE `creature_template_locale` SET `Title` = 'Smaragdkreis', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 9116;
 -- AC datas : OLD Name : "Wütender Wyvern", Name AC enUS : "Enraged Wyvern" ; Wowhead enUS : "Enraged Wyvern"
 UPDATE `creature_template_locale` SET `Name` = 'Wütender Flügeldrache', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 9297;
 -- AC datas : OLD Name : "Ausgegrabenes Fossil", Name AC enUS : "Living Storm" ; Wowhead enUS : "Living Storm"
 UPDATE `creature_template_locale` SET `Name` = 'Lebendiger Sturm', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 9397;
--- AC datas : OLD Subname : "Der Smaragdkreis", Subname AC enUS : "Emerald Circle"" ; Wowhead enUS : "Emerald Circle"
+-- AC datas : OLD Subname : "Der Smaragdkreis", Subname AC enUS : "Emerald Circle" ; Wowhead enUS : "Emerald Circle"
 UPDATE `creature_template_locale` SET `Title` = 'Smaragdkreis', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 9528;
--- AC datas : OLD Subname : "Der Smaragdkreis", Subname AC enUS : "Emerald Circle"" ; Wowhead enUS : "Emerald Circle"
+-- AC datas : OLD Subname : "Der Smaragdkreis", Subname AC enUS : "Emerald Circle" ; Wowhead enUS : "Emerald Circle"
 UPDATE `creature_template_locale` SET `Title` = 'Smaragdkreis', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 9529;
--- AC datas : OLD Subname : "Zeppelinmeister, Orgrimmar", Subname AC enUS : "Durotar Zeppelin Master"" ; Wowhead enUS : "Durotar Zeppelin Master"
-UPDATE `creature_template_locale` SET `Title` = 'Zeppelinmeister, Durotar', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 9566;
--- AC datas : OLD Subname : "Talentmeister", Subname AC enUS : "Talent Master"" ; Wowhead enUS : "Talent Master"
+-- AC datas : OLD Name : "Zapetta", Name AC enUS : "Zapetta" ; Wowhead enUS : "Zapetta",  OLD Subname : "Zeppelinmeister, Orgrimmar", Subname AC enUS : "Durotar Zeppelin Master" ; Wowhead enUS : "Durotar Zeppelin Master"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Zeppelinmeister, Durotar', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 9566;
+-- AC datas : OLD Subname : "Talentmeister", Subname AC enUS : "Talent Master" ; Wowhead enUS : "Talent Master"
 UPDATE `creature_template_locale` SET `Title` = 'Talentmeisterin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 9578;
--- AC datas : OLD Name : "Talentmeister von Darnassus", Name AC enUS : "Darnassus Talent Master" ; Wowhead enUS : "Darnassus Talent Master",  OLD Subname : "Talentmeister", Subname AC enUS : "Talent Master"" ; Wowhead enUS : "Talent Master"
+-- AC datas : OLD Name : "Talentmeister von Darnassus", Name AC enUS : "Darnassus Talent Master" ; Wowhead enUS : "Darnassus Talent Master",  OLD Subname : "Talentmeister", Subname AC enUS : "Talent Master" ; Wowhead enUS : "Talent Master"
 UPDATE `creature_template_locale` SET `Name` = 'Talentmeisterin von Darnassus', `Title` = 'Talentmeisterin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 9579;
--- AC datas : OLD Subname : "Talentmeister", Subname AC enUS : "Talent Master"" ; Wowhead enUS : "Talent Master"
+-- AC datas : OLD Subname : "Talentmeister", Subname AC enUS : "Talent Master" ; Wowhead enUS : "Talent Master"
 UPDATE `creature_template_locale` SET `Title` = 'Talentmeisterin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 9582;
--- AC datas : OLD Subname : "Schneiderlehrerin", Subname AC enUS : "Master Shadoweave Tailor"" ; Wowhead enUS : "Master Shadoweave Tailor"
-UPDATE `creature_template_locale` SET `Title` = 'Schattengewebeschneidermeisterin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 9584;
--- AC datas : OLD Subname : "Blutaxtlegion", Subname AC enUS : "Scarshield Legion"" ; Wowhead enUS : "Scarshield Legion"
+-- AC datas : OLD Name : "Jalane Ayrole", Name AC enUS : "Jalane Ayrole" ; Wowhead enUS : "Jalane Ayrole",  OLD Subname : "Schneiderlehrerin", Subname AC enUS : "Master Shadoweave Tailor" ; Wowhead enUS : "Master Shadoweave Tailor"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Schattengewebeschneidermeisterin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 9584;
+-- AC datas : OLD Subname : "Blutaxtlegion", Subname AC enUS : "Scarshield Legion" ; Wowhead enUS : "Scarshield Legion"
 UPDATE `creature_template_locale` SET `Title` = 'Schmetterschildlegion', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 9696;
--- AC datas : OLD Subname : "Ehemaliger Stallmeister", Subname AC enUS : "Stable Master"" ; Wowhead enUS : "Stable Master"
-UPDATE `creature_template_locale` SET `Title` = 'Stallmeister', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 9983;
--- AC datas : OLD Subname : "Stallmeisterin", Subname AC enUS : "Stable Master"" ; Wowhead enUS : "Stable Master"
-UPDATE `creature_template_locale` SET `Title` = 'Stallmeister', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10046;
--- AC datas : OLD Subname : "Stallmeisterin", Subname AC enUS : "Stable Master"" ; Wowhead enUS : "Stable Master"
-UPDATE `creature_template_locale` SET `Title` = 'Stallmeister', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10053;
+-- AC datas : OLD Name : "Kelsuwa", Name AC enUS : "Kelsuwa" ; Wowhead enUS : "Kelsuwa",  OLD Subname : "Ehemaliger Stallmeister", Subname AC enUS : "Stable Master" ; Wowhead enUS : "Stable Master"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Stallmeister', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 9983;
+-- AC datas : OLD Name : "Bethaine Flinthammer", Name AC enUS : "Bethaine Flinthammer" ; Wowhead enUS : "Bethaine Flinthammer",  OLD Subname : "Stallmeisterin", Subname AC enUS : "Stable Master" ; Wowhead enUS : "Stable Master"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Stallmeister', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10046;
+-- AC datas : OLD Name : "Anya Maulray", Name AC enUS : "Anya Maulray" ; Wowhead enUS : "Anya Maulray",  OLD Subname : "Stallmeisterin", Subname AC enUS : "Stable Master" ; Wowhead enUS : "Stable Master"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Stallmeister', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10053;
 -- AC datas : OLD Name : "Leuchtend grüner Roboschreiter", Name AC enUS : "Fluorescent Green Mechanostrider" ; Wowhead enUS : "Fluorescent Green Mechanostrider"
 UPDATE `creature_template_locale` SET `Name` = 'Reitroboschreiter (Leuchtendgrün)', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10178;
 -- AC datas : OLD Name : "Weißer Roboschreiter Mod. B", Name AC enUS : "White Mechanostrider Mod B" ; Wowhead enUS : "White Mechanostrider Mod B"
 UPDATE `creature_template_locale` SET `Name` = 'Reitroboschreiter (schwarz)', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10179;
--- AC datas : OLD Subname : "", Subname AC enUS : """ ; Wowhead enUS : "UNUSED"
-UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10237;
--- AC datas : OLD Subname : "", Subname AC enUS : "Dagger Trainer"" ; Wowhead enUS : "Dagger Trainer"
+-- AC datas : OLD Subname : "", Subname AC enUS : "Dagger Trainer" ; Wowhead enUS : "Dagger Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Dolchlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10292;
--- AC datas : OLD Subname : "", Subname AC enUS : "Fist Weapons Trainer"" ; Wowhead enUS : "Fist Weapons Trainer"
+-- AC datas : OLD Subname : "", Subname AC enUS : "Fist Weapons Trainer" ; Wowhead enUS : "Fist Weapons Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Faustwaffenlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10294;
--- AC datas : OLD Subname : "", Subname AC enUS : "Bow Trainer"" ; Wowhead enUS : "Bow Trainer"
+-- AC datas : OLD Subname : "", Subname AC enUS : "Bow Trainer" ; Wowhead enUS : "Bow Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Bogenlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10297;
 -- AC datas : OLD Name : "Acride", Name AC enUS : "Scarshield Infiltrator" ; Wowhead enUS : "Scarshield Infiltrator"
 UPDATE `creature_template_locale` SET `Name` = 'Spitzel der Schmetterschilde', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10299;
--- AC datas : OLD Subname : "", Subname AC enUS : "Explorers' League"" ; Wowhead enUS : "Explorers' League"
+-- AC datas : OLD Subname : "", Subname AC enUS : "Explorers' League" ; Wowhead enUS : "Explorers' League"
 UPDATE `creature_template_locale` SET `Title` = 'Forscherliga', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10301;
 -- AC datas : OLD Name : "Uralter Frostsäbler", Name AC enUS : "Ancient Frostsaber" ; Wowhead enUS : "Ancient Frostsaber"
 UPDATE `creature_template_locale` SET `Name` = 'Reittiger (weiß)', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10322;
@@ -7817,17 +7779,15 @@ UPDATE `creature_template_locale` SET `Name` = 'Purpurroter Kavalier', `Verified
 UPDATE `creature_template_locale` SET `Name` = 'Purpurroter Kampfmagier', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10425;
 -- AC datas : OLD Name : "Auferstandener Inquisitor", Name AC enUS : "Crimson Inquisitor" ; Wowhead enUS : "Crimson Inquisitor"
 UPDATE `creature_template_locale` SET `Name` = 'Purpurroter Inquisitor', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10426;
--- AC datas : OLD Name : "[UNUSED] Mallory Welsch", Name AC enUS : "[UNUSED] Mallory Welsh" ; Wowhead enUS : "[UNUSED] Mallory Welsh"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10444;
--- AC datas : OLD Subname : "", Subname AC enUS : "Crossbow Trainer"" ; Wowhead enUS : "Crossbow Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Armbrustlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10446;
--- AC datas : OLD Subname : "", Subname AC enUS : "Crossbow Trainer"" ; Wowhead enUS : "Crossbow Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Armbrustlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10450;
--- AC datas : OLD Subname : "", Subname AC enUS : "Mace Trainer"" ; Wowhead enUS : "Mace Trainer"
+-- AC datas : OLD Name : "[UNUSED] Elliott Jacks", Name AC enUS : "[UNUSED] Elliott Jacks" ; Wowhead enUS : "[UNUSED] Elliott Jacks",  OLD Subname : "", Subname AC enUS : "Crossbow Trainer" ; Wowhead enUS : "Crossbow Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Armbrustlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10446;
+-- AC datas : OLD Name : "[UNUSED] Paul Burges", Name AC enUS : "[UNUSED] Paul Burges" ; Wowhead enUS : "[UNUSED] Paul Burges",  OLD Subname : "", Subname AC enUS : "Crossbow Trainer" ; Wowhead enUS : "Crossbow Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Armbrustlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10450;
+-- AC datas : OLD Subname : "", Subname AC enUS : "Mace Trainer" ; Wowhead enUS : "Mace Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Streitkolbenlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10452;
--- AC datas : OLD Subname : "", Subname AC enUS : "Axe Trainer"" ; Wowhead enUS : "Axe Trainer"
+-- AC datas : OLD Subname : "", Subname AC enUS : "Axe Trainer" ; Wowhead enUS : "Axe Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Axtlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10453;
--- AC datas : OLD Subname : "", Subname AC enUS : "Crossbow Trainer"" ; Wowhead enUS : "Crossbow Trainer"
+-- AC datas : OLD Subname : "", Subname AC enUS : "Crossbow Trainer" ; Wowhead enUS : "Crossbow Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Armbrustlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10454;
 -- AC datas : OLD Name : "Nekrolyt aus Scholomance", Name AC enUS : "Scholomance Necrolyte" ; Wowhead enUS : "Scholomance Necrolyte"
 UPDATE `creature_template_locale` SET `Name` = 'Nekrolyth aus Scholomance', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10476;
@@ -7843,37 +7803,37 @@ UPDATE `creature_template_locale` SET `Name` = 'Pip Flitzwitz', `VerifiedBuild` 
 UPDATE `creature_template_locale` SET `Name` = 'Archivar Galford', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10811;
 -- AC datas : OLD Name : "Todesjäger Falkenspeer", Name AC enUS : "Ranger Lord Hawkspear" ; Wowhead enUS : "Ranger Lord Hawkspear"
 UPDATE `creature_template_locale` SET `Name` = 'Waldläuferlord Falkenspeer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10824;
--- AC datas : OLD Name : "Lynnia Abbendis", Name AC enUS : "High General Abbendis" ; Wowhead enUS : "High General Abbendis",  OLD Subname : "Die Verlorene Hoffnung", Subname AC enUS : """ ; Wowhead enUS : ""
-UPDATE `creature_template_locale` SET `Name` = 'Hochgeneral Abbendis', `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10828;
--- AC datas : OLD Subname : "Der Argentumkreuzzug", Subname AC enUS : "The Argent Dawn"" ; Wowhead enUS : "The Argent Dawn"
+-- AC datas : OLD Name : "Lynnia Abbendis", Name AC enUS : "High General Abbendis" ; Wowhead enUS : "High General Abbendis"
+UPDATE `creature_template_locale` SET `Name` = 'Hochgeneral Abbendis', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10828;
+-- AC datas : OLD Subname : "Der Argentumkreuzzug", Subname AC enUS : "The Argent Dawn" ; Wowhead enUS : "The Argent Dawn"
 UPDATE `creature_template_locale` SET `Title` = 'Die Argentumdämmerung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10839;
--- AC datas : OLD Name : "Argentumoffizierin Reinherz", Name AC enUS : "Argent Officer Pureheart" ; Wowhead enUS : "Argent Officer Pureheart",  OLD Subname : "Der Argentumkreuzzug", Subname AC enUS : "The Argent Dawn"" ; Wowhead enUS : "The Argent Dawn"
+-- AC datas : OLD Name : "Argentumoffizierin Reinherz", Name AC enUS : "Argent Officer Pureheart" ; Wowhead enUS : "Argent Officer Pureheart",  OLD Subname : "Der Argentumkreuzzug", Subname AC enUS : "The Argent Dawn" ; Wowhead enUS : "The Argent Dawn"
 UPDATE `creature_template_locale` SET `Name` = 'Argentumoffizier Reinherz', `Title` = 'Die Argentumdämmerung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10840;
--- AC datas : OLD Subname : "Der Argentumkreuzzug", Subname AC enUS : "The Argent Dawn"" ; Wowhead enUS : "The Argent Dawn"
+-- AC datas : OLD Subname : "Der Argentumkreuzzug", Subname AC enUS : "The Argent Dawn" ; Wowhead enUS : "The Argent Dawn"
 UPDATE `creature_template_locale` SET `Title` = 'Die Argentumdämmerung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10857;
 -- AC datas : OLD Name : "Wissenshüter Polkelt", Name AC enUS : "Lorekeeper Polkelt" ; Wowhead enUS : "Lorekeeper Polkelt"
 UPDATE `creature_template_locale` SET `Name` = 'Hüter des Wissens Polkelt', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10901;
--- AC datas : OLD Subname : "Der Smaragdkreis", Subname AC enUS : "Emerald Circle"" ; Wowhead enUS : "Emerald Circle"
+-- AC datas : OLD Subname : "Der Smaragdkreis", Subname AC enUS : "Emerald Circle" ; Wowhead enUS : "Emerald Circle"
 UPDATE `creature_template_locale` SET `Title` = 'Smaragdkreis', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10920;
--- AC datas : OLD Subname : "Der Smaragdkreis", Subname AC enUS : "Emerald Circle"" ; Wowhead enUS : "Emerald Circle"
+-- AC datas : OLD Subname : "Der Smaragdkreis", Subname AC enUS : "Emerald Circle" ; Wowhead enUS : "Emerald Circle"
 UPDATE `creature_template_locale` SET `Title` = 'Smaragdkreis', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10921;
--- AC datas : OLD Subname : "Der Smaragdkreis", Subname AC enUS : "Emerald Circle"" ; Wowhead enUS : "Emerald Circle"
+-- AC datas : OLD Subname : "Der Smaragdkreis", Subname AC enUS : "Emerald Circle" ; Wowhead enUS : "Emerald Circle"
 UPDATE `creature_template_locale` SET `Title` = 'Smaragdkreis', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10922;
--- AC datas : OLD Subname : "Der Smaragdkreis", Subname AC enUS : "Emerald Circle"" ; Wowhead enUS : "Emerald Circle"
+-- AC datas : OLD Subname : "Der Smaragdkreis", Subname AC enUS : "Emerald Circle" ; Wowhead enUS : "Emerald Circle"
 UPDATE `creature_template_locale` SET `Title` = 'Smaragdkreis', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10923;
--- AC datas : OLD Subname : "Der Smaragdkreis", Subname AC enUS : "Emerald Circle"" ; Wowhead enUS : "Emerald Circle"
+-- AC datas : OLD Subname : "Der Smaragdkreis", Subname AC enUS : "Emerald Circle" ; Wowhead enUS : "Emerald Circle"
 UPDATE `creature_template_locale` SET `Title` = 'Smaragdkreis', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10924;
 -- AC datas : OLD Name : "Jünger der Silbernen Hand", Name AC enUS : "Silver Hand Disciple" ; Wowhead enUS : "Silver Hand Disciple"
 UPDATE `creature_template_locale` SET `Name` = 'Silberhandjünger', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10949;
--- AC datas : OLD Name : "Willey Hoffnungsbrecher", Name AC enUS : "Cannon Master Willey" ; Wowhead enUS : "Cannon Master Willey",  OLD Subname : "Kanonenmeister", Subname AC enUS : """ ; Wowhead enUS : ""
-UPDATE `creature_template_locale` SET `Name` = 'Kanonenmeister Willey', `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10997;
+-- AC datas : OLD Name : "Willey Hoffnungsbrecher", Name AC enUS : "Cannon Master Willey" ; Wowhead enUS : "Cannon Master Willey"
+UPDATE `creature_template_locale` SET `Name` = 'Kanonenmeister Willey', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 10997;
 -- AC datas : OLD Name : "Kommandant Malor", Name AC enUS : "Malor the Zealous" ; Wowhead enUS : "Malor the Zealous"
 UPDATE `creature_template_locale` SET `Name` = 'Malor der Eifrige', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11032;
--- AC datas : OLD Subname : "Der Argentumkreuzzug", Subname AC enUS : "The Argent Dawn"" ; Wowhead enUS : "The Argent Dawn"
-UPDATE `creature_template_locale` SET `Title` = 'Die Argentumdämmerung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11034;
--- AC datas : OLD Subname : "Der Argentumkreuzzug", Subname AC enUS : "The Argent Dawn"" ; Wowhead enUS : "The Argent Dawn"
+-- AC datas : OLD Name : "Lord Maxwell Tyrosus", Name AC enUS : "Lord Maxwell Tyrosus" ; Wowhead enUS : "Lord Maxwell Tyrosus",  OLD Subname : "Der Argentumkreuzzug", Subname AC enUS : "The Argent Dawn" ; Wowhead enUS : "The Argent Dawn"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Die Argentumdämmerung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11034;
+-- AC datas : OLD Subname : "Der Argentumkreuzzug", Subname AC enUS : "The Argent Dawn" ; Wowhead enUS : "The Argent Dawn"
 UPDATE `creature_template_locale` SET `Title` = 'Die Argentumdämmerung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11036;
--- AC datas : OLD Subname : "Der Argentumkreuzzug", Subname AC enUS : "The Argent Dawn"" ; Wowhead enUS : "The Argent Dawn"
+-- AC datas : OLD Subname : "Der Argentumkreuzzug", Subname AC enUS : "The Argent Dawn" ; Wowhead enUS : "The Argent Dawn"
 UPDATE `creature_template_locale` SET `Title` = 'Die Argentumdämmerung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11039;
 -- AC datas : OLD Name : "Behüterin Braunell", Name AC enUS : "Watcher Brownell" ; Wowhead enUS : "Watcher Brownell"
 UPDATE `creature_template_locale` SET `Name` = 'Behüter Braunell', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11040;
@@ -7883,13 +7843,13 @@ UPDATE `creature_template_locale` SET `Name` = 'Purpurroter Mönch', `VerifiedBu
 UPDATE `creature_template_locale` SET `Name` = 'Purpurroter Scharfschütze', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11054;
 -- AC datas : OLD Name : "Fras Siabi", Name AC enUS : "Fras Siabi" ; Wowhead enUS : "Ezra Grimm"
 UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11058;
--- AC datas : OLD Subname : "Der Argentumkreuzzug", Subname AC enUS : "The Argent Dawn"" ; Wowhead enUS : "The Argent Dawn"
+-- AC datas : OLD Subname : "Der Argentumkreuzzug", Subname AC enUS : "The Argent Dawn" ; Wowhead enUS : "The Argent Dawn"
 UPDATE `creature_template_locale` SET `Title` = 'Die Argentumdämmerung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11063;
--- AC datas : OLD Subname : "Der Argentumkreuzzug", Subname AC enUS : "The Argent Dawn"" ; Wowhead enUS : "The Argent Dawn"
+-- AC datas : OLD Subname : "Der Argentumkreuzzug", Subname AC enUS : "The Argent Dawn" ; Wowhead enUS : "The Argent Dawn"
 UPDATE `creature_template_locale` SET `Title` = 'Die Argentumdämmerung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11102;
 -- AC datas : OLD Name : "Auferstandener Hammerschmied", Name AC enUS : "Crimson Hammersmith" ; Wowhead enUS : "Crimson Hammersmith"
 UPDATE `creature_template_locale` SET `Name` = 'Purpurroter Hammerschmied', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11120;
--- AC datas : OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Weaponsmith Trainer"" ; Wowhead enUS : "Weaponsmith Trainer"
+-- AC datas : OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Weaponsmith Trainer" ; Wowhead enUS : "Weaponsmith Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Waffenschmiedelehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11146;
 -- AC datas : OLD Name : "Lila Roboschreiter", Name AC enUS : "Purple Mechanostrider" ; Wowhead enUS : "Purple Mechanostrider"
 UPDATE `creature_template_locale` SET `Name` = 'Reitroboschreiter (Lila)', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11148;
@@ -7897,23 +7857,23 @@ UPDATE `creature_template_locale` SET `Name` = 'Reitroboschreiter (Lila)', `Veri
 UPDATE `creature_template_locale` SET `Name` = 'Reitroboschreiter (Rot/Blau)', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11149;
 -- AC datas : OLD Name : "Eisblauer Roboschreiter Mod. A", Name AC enUS : "Icy Blue Mechanostrider Mod A" ; Wowhead enUS : "Icy Blue Mechanostrider Mod A"
 UPDATE `creature_template_locale` SET `Name` = 'Reitroboschreiter (Eisblau)', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11150;
--- AC datas : OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Armorsmith"" ; Wowhead enUS : "Armorsmith"
+-- AC datas : OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Armorsmith" ; Wowhead enUS : "Armorsmith"
 UPDATE `creature_template_locale` SET `Title` = 'Rüstungsschmied', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11177;
--- AC datas : OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Weaponsmith"" ; Wowhead enUS : "Weaponsmith"
+-- AC datas : OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Weaponsmith" ; Wowhead enUS : "Weaponsmith"
 UPDATE `creature_template_locale` SET `Title` = 'Waffenschmied', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11178;
--- AC datas : OLD Subname : "Händler für Kettenrüstungen", Subname AC enUS : "Heavy Armor Merchant"" ; Wowhead enUS : "Heavy Armor Merchant"
-UPDATE `creature_template_locale` SET `Title` = 'Händler für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11182;
--- AC datas : OLD Subname : "Der Argentumkreuzzug", Subname AC enUS : "The Argent Dawn"" ; Wowhead enUS : "The Argent Dawn"
+-- AC datas : OLD Name : "Nixxrak", Name AC enUS : "Nixxrak" ; Wowhead enUS : "Nixxrak",  OLD Subname : "Händler für Kettenrüstungen", Subname AC enUS : "Heavy Armor Merchant" ; Wowhead enUS : "Heavy Armor Merchant"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Händler für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11182;
+-- AC datas : OLD Subname : "Der Argentumkreuzzug", Subname AC enUS : "The Argent Dawn" ; Wowhead enUS : "The Argent Dawn"
 UPDATE `creature_template_locale` SET `Title` = 'Die Argentumdämmerung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11194;
 -- AC datas : OLD Name : "Todesstreitross", Name AC enUS : "Deathcharger" ; Wowhead enUS : "Deathcharger"
 UPDATE `creature_template_locale` SET `Name` = 'Schwarzes Skelettschlachtross', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11195;
--- AC datas : OLD Name : "Hochgeborener Beschwörer", Name AC enUS : "Highborne Summoner" ; Wowhead enUS : "Highborne Summoner",  OLD Subname : "Haus Shen'dralar", Subname AC enUS : "House of Shen'dralar"" ; Wowhead enUS : ""
-UPDATE `creature_template_locale` SET `Name` = 'Hochgeborenenbeschwörer', `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11466;
+-- AC datas : OLD Name : "Hochgeborener Beschwörer", Name AC enUS : "Highborne Summoner" ; Wowhead enUS : "Highborne Summoner"
+UPDATE `creature_template_locale` SET `Name` = 'Hochgeborenenbeschwörer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11466;
 -- AC datas : OLD Name : "Versenger der Eldreth", Name AC enUS : "Eldreth Seether" ; Wowhead enUS : "Eldreth Seether"
 UPDATE `creature_template_locale` SET `Name` = 'Schnauber der Eldreth', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11469;
 -- AC datas : OLD Name : "Skarr der Gebrochene", Name AC enUS : "Skarr the Unbreakable" ; Wowhead enUS : "Skarr the Unbreakable"
 UPDATE `creature_template_locale` SET `Name` = 'Skarr der Unbezwingbare', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11498;
--- AC datas : OLD Name : "Rüstmeisterin Miranda Knackschloss", Name AC enUS : "Quartermaster Miranda Breechlock" ; Wowhead enUS : "Quartermaster Miranda Breechlock",  OLD Subname : "Der Argentumkreuzzug", Subname AC enUS : "The Argent Dawn"" ; Wowhead enUS : "The Argent Dawn"
+-- AC datas : OLD Name : "Rüstmeisterin Miranda Knackschloss", Name AC enUS : "Quartermaster Miranda Breechlock" ; Wowhead enUS : "Quartermaster Miranda Breechlock",  OLD Subname : "Der Argentumkreuzzug", Subname AC enUS : "The Argent Dawn" ; Wowhead enUS : "The Argent Dawn"
 UPDATE `creature_template_locale` SET `Name` = 'Rüstmeisterin Miranda Breechlock', `Title` = 'Die Argentumdämmerung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11536;
 -- AC datas : OLD Name : "Flammenschürer", Name AC enUS : "Flamewaker" ; Wowhead enUS : "Flamewaker"
 UPDATE `creature_template_locale` SET `Name` = 'Feuerschuppe', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11661;
@@ -7929,25 +7889,25 @@ UPDATE `creature_template_locale` SET `Name` = 'Uralter Kernhund', `VerifiedBuil
 UPDATE `creature_template_locale` SET `Name` = 'Roder der Horde', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11681;
 -- AC datas : OLD Name : "Goblinroder", Name AC enUS : "Warsong Shredder" ; Wowhead enUS : "Warsong Shredder"
 UPDATE `creature_template_locale` SET `Name` = 'Schredder des Kriegshymnenklans', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11684;
--- AC datas : OLD Subname : "Wintersäblerausbilderin", Subname AC enUS : "Wintersaber Trainers"" ; Wowhead enUS : "Wintersaber Trainers"
+-- AC datas : OLD Subname : "Wintersäblerausbilderin", Subname AC enUS : "Wintersaber Trainers" ; Wowhead enUS : "Wintersaber Trainers"
 UPDATE `creature_template_locale` SET `Title` = 'Wintersäblerausbilder', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11696;
--- AC datas : OLD Subname : "Händler für Kettenrüstungen", Subname AC enUS : "Mail Armor Merchant"" ; Wowhead enUS : "Mail Armor Merchant"
+-- AC datas : OLD Subname : "Händler für Kettenrüstungen", Subname AC enUS : "Mail Armor Merchant" ; Wowhead enUS : "Mail Armor Merchant"
 UPDATE `creature_template_locale` SET `Title` = 'Händler für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11703;
--- AC datas : OLD Name : "Zwielichtbewahrer Exeter", Name AC enUS : "Twilight Keeper Exeter" ; Wowhead enUS : "Twilight Keeper Exeter",  OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer"" ; Wowhead enUS : "Twilight's Hammer"
+-- AC datas : OLD Name : "Zwielichtbewahrer Exeter", Name AC enUS : "Twilight Keeper Exeter" ; Wowhead enUS : "Twilight Keeper Exeter",  OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer" ; Wowhead enUS : "Twilight's Hammer"
 UPDATE `creature_template_locale` SET `Name` = 'Bewahrer des Schattenhammers Exeter', `Title` = 'Schattenhammerklan', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11803;
--- AC datas : OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer"" ; Wowhead enUS : "Twilight's Hammer"
+-- AC datas : OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer" ; Wowhead enUS : "Twilight's Hammer"
 UPDATE `creature_template_locale` SET `Title` = 'Schattenhammerklan', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11804;
 -- AC datas : OLD Name : "Scholli Klauengriff", Name AC enUS : "Darn Talongrip" ; Wowhead enUS : "Darn Talongrip"
 UPDATE `creature_template_locale` SET `Name` = 'Darn Klauengriff', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11821;
--- AC datas : OLD Name : "Grundig Düsterwolke", Name AC enUS : "Grundig Darkcloud" ; Wowhead enUS : "Grundig Darkcloud",  OLD Subname : "Häuptling", Subname AC enUS : """ ; Wowhead enUS : ""
-UPDATE `creature_template_locale` SET `Name` = 'Grundig Finsterwolke', `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11858;
--- AC datas : OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer"" ; Wowhead enUS : "Twilight's Hammer"
+-- AC datas : OLD Name : "Grundig Düsterwolke", Name AC enUS : "Grundig Darkcloud" ; Wowhead enUS : "Grundig Darkcloud"
+UPDATE `creature_template_locale` SET `Name` = 'Grundig Finsterwolke', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11858;
+-- AC datas : OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer" ; Wowhead enUS : "Twilight's Hammer"
 UPDATE `creature_template_locale` SET `Title` = 'Schattenhammerklan', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11880;
--- AC datas : OLD Name : "Zwielichtgeofürst", Name AC enUS : "Twilight Geolord" ; Wowhead enUS : "Twilight Geolord",  OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer"" ; Wowhead enUS : "Twilight's Hammer"
+-- AC datas : OLD Name : "Zwielichtgeofürst", Name AC enUS : "Twilight Geolord" ; Wowhead enUS : "Twilight Geolord",  OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer" ; Wowhead enUS : "Twilight's Hammer"
 UPDATE `creature_template_locale` SET `Name` = 'Zwielichtgeolord', `Title` = 'Schattenhammerklan', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11881;
--- AC datas : OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer"" ; Wowhead enUS : "Twilight's Hammer"
+-- AC datas : OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer" ; Wowhead enUS : "Twilight's Hammer"
 UPDATE `creature_template_locale` SET `Title` = 'Schattenhammerklan', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11882;
--- AC datas : OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer"" ; Wowhead enUS : "Twilight's Hammer"
+-- AC datas : OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer" ; Wowhead enUS : "Twilight's Hammer"
 UPDATE `creature_template_locale` SET `Title` = 'Schattenhammerklan', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11883;
 -- AC datas : OLD Name : "Steinschlagfelsbewahrer", Name AC enUS : "Gogger Rock Keeper" ; Wowhead enUS : "Gogger Rock Keeper"
 UPDATE `creature_template_locale` SET `Name` = 'Felsbewahrer der Gogger', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11915;
@@ -7955,16 +7915,14 @@ UPDATE `creature_template_locale` SET `Name` = 'Felsbewahrer der Gogger', `Verif
 UPDATE `creature_template_locale` SET `Name` = 'Geomant der Gogger', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11917;
 -- AC datas : OLD Name : "Steinschlagsteinklopfer", Name AC enUS : "Gogger Stonepounder" ; Wowhead enUS : "Gogger Stonepounder"
 UPDATE `creature_template_locale` SET `Name` = 'Steinklopfer der Gogger', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11918;
--- AC datas : OLD Name : "Alchemielehrer der Mondlichtung", Name AC enUS : "Moonglade Alchemy Trainer" ; Wowhead enUS : "Moonglade Alchemy Trainer",  OLD Subname : "Alchemielehrer", Subname AC enUS : "Artisan Alchemist"" ; Wowhead enUS : "Artisan Alchemist"
+-- AC datas : OLD Name : "Alchemielehrer der Mondlichtung", Name AC enUS : "Moonglade Alchemy Trainer" ; Wowhead enUS : "Moonglade Alchemy Trainer",  OLD Subname : "Alchemielehrer", Subname AC enUS : "Artisan Alchemist" ; Wowhead enUS : "Artisan Alchemist"
 UPDATE `creature_template_locale` SET `Name` = 'Alchimielehrer der Mondlichtung', `Title` = 'Alchimiefachmann', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 12020;
--- AC datas : OLD Subname : "Waffenschmiedin", Subname AC enUS : "Weaponsmith"" ; Wowhead enUS : "Weaponsmith"
-UPDATE `creature_template_locale` SET `Title` = 'Waffenschmied', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 12024;
--- AC datas : OLD Subname : "Bogenmacherin", Subname AC enUS : "Bowyer"" ; Wowhead enUS : "Bowyer"
-UPDATE `creature_template_locale` SET `Title` = 'Bogenmacher', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 12029;
+-- AC datas : OLD Name : "Meliri", Name AC enUS : "Meliri" ; Wowhead enUS : "Meliri",  OLD Subname : "Waffenschmiedin", Subname AC enUS : "Weaponsmith" ; Wowhead enUS : "Weaponsmith"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Waffenschmied', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 12024;
+-- AC datas : OLD Name : "Narianna", Name AC enUS : "Narianna" ; Wowhead enUS : "Narianna",  OLD Subname : "Bogenmacherin", Subname AC enUS : "Bowyer" ; Wowhead enUS : "Bowyer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Bogenmacher', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 12029;
 -- AC datas : OLD Name : "Grella Steinfaust", Name AC enUS : "Aerie Peak General Goods" ; Wowhead enUS : "Aerie Peak General Goods"
 UPDATE `creature_template_locale` SET `Name` = 'Gemischtwaren des Nistgipfels', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 12036;
--- AC datas : OLD Name : "[UNUSED] Nistgipfel - Kochbedarf", Name AC enUS : "[UNUSED] Aerie Peak Cooking Supplies" ; Wowhead enUS : "[UNUSED] Aerie Peak Cooking Supplies"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 12038;
 -- AC datas : OLD Name : "Brannik Eisenbauch", Name AC enUS : "Aerie Peak Mail Armor Vendor" ; Wowhead enUS : "Aerie Peak Mail Armor Vendor"
 UPDATE `creature_template_locale` SET `Name` = 'Verkäufer für schwere Rüstungen des Nistgipfels', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 12040;
 -- AC datas : OLD Name : "Schmiedekunstbedarf von Sonnenfels", Name AC enUS : "Sun Rock Blacksmithing Supplies" ; Wowhead enUS : "Sun Rock Blacksmithing Supplies"
@@ -7977,13 +7935,13 @@ UPDATE `creature_template_locale` SET `Name` = 'Feuerschuppenwächter', `Verifie
 UPDATE `creature_template_locale` SET `Name` = 'Reitkodo (Graublau)', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 12148;
 -- AC datas : OLD Name : "Grüner Kodo", Name AC enUS : "Green Kodo" ; Wowhead enUS : "Green Kodo"
 UPDATE `creature_template_locale` SET `Name` = 'Reitkodo (Grün)', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 12151;
--- AC datas : OLD Subname : "Der Erste Khan", Subname AC enUS : "The First Kahn"" ; Wowhead enUS : "The First Kahn"
+-- AC datas : OLD Subname : "Der Erste Khan", Subname AC enUS : "The First Kahn" ; Wowhead enUS : "The First Kahn"
 UPDATE `creature_template_locale` SET `Title` = 'Der erste Khan', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 12240;
--- AC datas : OLD Subname : "Der Dritte Khan", Subname AC enUS : "The Third Kahn"" ; Wowhead enUS : "The Third Kahn"
+-- AC datas : OLD Subname : "Der Dritte Khan", Subname AC enUS : "The Third Kahn" ; Wowhead enUS : "The Third Kahn"
 UPDATE `creature_template_locale` SET `Title` = 'Der dritte Khan', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 12241;
--- AC datas : OLD Subname : "Der Vierte Khan", Subname AC enUS : "The Fourth Kahn"" ; Wowhead enUS : "The Fourth Kahn"
+-- AC datas : OLD Subname : "Der Vierte Khan", Subname AC enUS : "The Fourth Kahn" ; Wowhead enUS : "The Fourth Kahn"
 UPDATE `creature_template_locale` SET `Title` = 'Der vierte Khan', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 12242;
--- AC datas : OLD Subname : "Der Fünfte Khan", Subname AC enUS : "The Fifth Kahn"" ; Wowhead enUS : "The Fifth Kahn"
+-- AC datas : OLD Subname : "Der Fünfte Khan", Subname AC enUS : "The Fifth Kahn" ; Wowhead enUS : "The Fifth Kahn"
 UPDATE `creature_template_locale` SET `Title` = 'Der fünfte Khan', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 12243;
 -- AC datas : OLD Name : "Scheckiger scharlachroter Raptor", Name AC enUS : "Mottled Crimson Raptor" ; Wowhead enUS : "Mottled Crimson Raptor"
 UPDATE `creature_template_locale` SET `Name` = 'Scheckiger roter Raptor', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 12345;
@@ -7997,67 +7955,63 @@ UPDATE `creature_template_locale` SET `Name` = 'Großer böser Brühschleimer', 
 UPDATE `creature_template_locale` SET `Name` = 'Kommandant der Verdammniswache', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 12396;
 -- AC datas : OLD Name : "Hauptmann der Todeskrallen", Name AC enUS : "Death Talon Captain" ; Wowhead enUS : "Death Talon Captain"
 UPDATE `creature_template_locale` SET `Name` = 'Captain der Todeskrallen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 12467;
--- AC datas : OLD Subname : "Windreitermeisterin", Subname AC enUS : "Wind Rider Master"" ; Wowhead enUS : "Wind Rider Master"
-UPDATE `creature_template_locale` SET `Title` = 'Windreitermeister', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 12616;
--- AC datas : OLD Subname : "Rüstmeister für Zubehör", Subname AC enUS : "Accessories Quartermaster"" ; Wowhead enUS : "Accessories Quartermaster"
+-- AC datas : OLD Name : "Vhulgra", Name AC enUS : "Vhulgra" ; Wowhead enUS : "Vhulgra",  OLD Subname : "Windreitermeisterin", Subname AC enUS : "Wind Rider Master" ; Wowhead enUS : "Wind Rider Master"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Windreitermeister', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 12616;
+-- AC datas : OLD Subname : "Rüstmeister für Zubehör", Subname AC enUS : "Accessories Quartermaster" ; Wowhead enUS : "Accessories Quartermaster"
 UPDATE `creature_template_locale` SET `Title` = 'Rüstmeister für Offizierszubehör', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 12781;
--- AC datas : OLD Subname : "Rüstmeisterin für Kriegsreittiere", Subname AC enUS : "War Mount Quartermaster"" ; Wowhead enUS : "War Mount Quartermaster"
+-- AC datas : OLD Subname : "Rüstmeisterin für Kriegsreittiere", Subname AC enUS : "War Mount Quartermaster" ; Wowhead enUS : "War Mount Quartermaster"
 UPDATE `creature_template_locale` SET `Title` = 'Kriegsreittierverkäuferin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 12783;
 -- AC datas : OLD Name : "Häuptling Erdbinder", Name AC enUS : "Chieftain Earthbind" ; Wowhead enUS : "Chieftain Earthbind"
 UPDATE `creature_template_locale` SET `Name` = 'Häuptling Erdenbund', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 12791;
 -- AC datas : OLD Name : "Grunzerin Bek'rah", Name AC enUS : "Grunt Bek'rah" ; Wowhead enUS : "Grunt Bek'rah"
 UPDATE `creature_template_locale` SET `Name` = 'Grunzer Bek''rah', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 12798;
--- AC datas : OLD Subname : "Lehrer für Erste Hilfe", Subname AC enUS : "Trauma Surgeon"" ; Wowhead enUS : "Trauma Surgeon"
+-- AC datas : OLD Subname : "Lehrer für Erste Hilfe", Subname AC enUS : "Trauma Surgeon" ; Wowhead enUS : "Trauma Surgeon"
 UPDATE `creature_template_locale` SET `Title` = 'Traumachirurg', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 12939;
 -- AC datas : OLD Name : "Jagdhund der Gordok", Name AC enUS : "Gordok Mastiff" ; Wowhead enUS : "Gordok Mastiff"
 UPDATE `creature_template_locale` SET `Name` = 'Mastiff der Gordok', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 13036;
--- AC datas : OLD Subname : "Waffenmeisterin", Subname AC enUS : "Weapon Master"" ; Wowhead enUS : "Weapon Master"
+-- AC datas : OLD Subname : "Waffenmeisterin", Subname AC enUS : "Weapon Master" ; Wowhead enUS : "Weapon Master"
 UPDATE `creature_template_locale` SET `Title` = 'Waffenmeister', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 13084;
 -- AC datas : OLD Name : "Schwadronskommandantin Guse", Name AC enUS : "Wing Commander Guse" ; Wowhead enUS : "Wing Commander Guse"
 UPDATE `creature_template_locale` SET `Name` = 'Schwadronskommandant Guse', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 13179;
 -- AC datas : OLD Name : "Schwadronskommandantin Jeztor", Name AC enUS : "Wing Commander Jeztor" ; Wowhead enUS : "Wing Commander Jeztor"
 UPDATE `creature_template_locale` SET `Name` = 'Schwadronskommandant Jeztor', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 13180;
--- AC datas : OLD Name : "Jorek Eisenflanke", Name AC enUS : "Jekyll Flandring" ; Wowhead enUS : "Jekyll Flandring"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 13219;
 -- AC datas : OLD Name : "Kleiner Frosch", Name AC enUS : "Frog" ; Wowhead enUS : "Frog"
 UPDATE `creature_template_locale` SET `Name` = 'Frosch', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 13321;
 -- AC datas : OLD Name : "Legionärsveteran", Name AC enUS : "Veteran Legionnaire" ; Wowhead enUS : "Veteran Legionnaire"
 UPDATE `creature_template_locale` SET `Name` = 'Legionärveteran', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 13334;
 -- AC datas : OLD Name : "Erzdruidin Renferal", Name AC enUS : "Arch Druid Renferal" ; Wowhead enUS : "Arch Druid Renferal"
 UPDATE `creature_template_locale` SET `Name` = 'Erzdruide Renferal', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 13442;
--- AC datas : OLD Name : "Stallmeister der Frostwölfe", Name AC enUS : "Frostwolf Stable Master" ; Wowhead enUS : "Frostwolf Stable Master",  OLD Subname : "Stallmeister", Subname AC enUS : "Stable Master"" ; Wowhead enUS : "Stable Master"
+-- AC datas : OLD Name : "Stallmeister der Frostwölfe", Name AC enUS : "Frostwolf Stable Master" ; Wowhead enUS : "Frostwolf Stable Master",  OLD Subname : "Stallmeister", Subname AC enUS : "Stable Master" ; Wowhead enUS : "Stable Master"
 UPDATE `creature_template_locale` SET `Name` = 'Stallmeisterin der Frostwölfe', `Title` = 'Stallmeisterin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 13616;
--- AC datas : OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer"" ; Wowhead enUS : "Twilight's Hammer"
+-- AC datas : OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer" ; Wowhead enUS : "Twilight's Hammer"
 UPDATE `creature_template_locale` SET `Title` = 'Schattenhammerklan', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 13656;
--- AC datas : OLD Subname : "Der Fünfte Khan", Subname AC enUS : "The Fifth Kahn"" ; Wowhead enUS : "The Fifth Kahn"
-UPDATE `creature_template_locale` SET `Title` = 'Der fünfte Khan', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 13738;
--- AC datas : OLD Subname : "Der Vierte Khan", Subname AC enUS : "The Fourth Kahn"" ; Wowhead enUS : "The Fourth Kahn"
-UPDATE `creature_template_locale` SET `Title` = 'Der vierte Khan', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 13739;
--- AC datas : OLD Subname : "Der Dritte Khan", Subname AC enUS : "The Third Kahn"" ; Wowhead enUS : "The Third Kahn"
-UPDATE `creature_template_locale` SET `Title` = 'Der dritte Khan', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 13740;
--- AC datas : OLD Subname : "Der Zweite Khan", Subname AC enUS : "The Second Kahn"" ; Wowhead enUS : "The Second Kahn"
-UPDATE `creature_template_locale` SET `Title` = 'Der zweite Khan', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 13741;
--- AC datas : OLD Subname : "Der Erste Khan", Subname AC enUS : "The First Kahn"" ; Wowhead enUS : "The First Kahn"
-UPDATE `creature_template_locale` SET `Title` = 'Der erste Khan', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 13742;
--- AC datas : OLD Name : "Sulhasa", Name AC enUS : "[UNUSED] Sulhasa" ; Wowhead enUS : "[UNUSED] Sulhasa"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 14242;
+-- AC datas : OLD Name : "Veng", Name AC enUS : "Veng" ; Wowhead enUS : "Veng",  OLD Subname : "Der Fünfte Khan", Subname AC enUS : "The Fifth Kahn" ; Wowhead enUS : "The Fifth Kahn"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Der fünfte Khan', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 13738;
+-- AC datas : OLD Name : "Maraudos", Name AC enUS : "Maraudos" ; Wowhead enUS : "Maraudos",  OLD Subname : "Der Vierte Khan", Subname AC enUS : "The Fourth Kahn" ; Wowhead enUS : "The Fourth Kahn"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Der vierte Khan', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 13739;
+-- AC datas : OLD Name : "Magra", Name AC enUS : "Magra" ; Wowhead enUS : "Magra",  OLD Subname : "Der Dritte Khan", Subname AC enUS : "The Third Kahn" ; Wowhead enUS : "The Third Kahn"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Der dritte Khan', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 13740;
+-- AC datas : OLD Name : "Gelk", Name AC enUS : "Gelk" ; Wowhead enUS : "Gelk",  OLD Subname : "Der Zweite Khan", Subname AC enUS : "The Second Kahn" ; Wowhead enUS : "The Second Kahn"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Der zweite Khan', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 13741;
+-- AC datas : OLD Name : "Kolk", Name AC enUS : "Kolk" ; Wowhead enUS : "Kolk",  OLD Subname : "Der Erste Khan", Subname AC enUS : "The First Kahn" ; Wowhead enUS : "The First Kahn"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Der erste Khan', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 13742;
 -- AC datas : OLD Name : "Der Große Samras", Name AC enUS : "Big Samras" ; Wowhead enUS : "Big Samras"
 UPDATE `creature_template_locale` SET `Name` = 'Samras', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 14280;
--- AC datas : OLD Name : "Wissenshüter Lydros", Name AC enUS : "Lorekeeper Lydros" ; Wowhead enUS : "Lorekeeper Lydros",  OLD Subname : "Haus Shen'dralar", Subname AC enUS : "House of Shen'dralar"" ; Wowhead enUS : ""
-UPDATE `creature_template_locale` SET `Name` = 'Hüter des Wissens Lydros', `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 14368;
--- AC datas : OLD Name : "Wissenshüter Javon", Name AC enUS : "Lorekeeper Javon" ; Wowhead enUS : "Lorekeeper Javon",  OLD Subname : "Haus Shen'dralar", Subname AC enUS : "House of Shen'dralar"" ; Wowhead enUS : ""
-UPDATE `creature_template_locale` SET `Name` = 'Hüter des Wissens Javon', `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 14381;
--- AC datas : OLD Name : "Wissenshüterin Mykos", Name AC enUS : "Lorekeeper Mykos" ; Wowhead enUS : "Lorekeeper Mykos",  OLD Subname : "Haus Shen'dralar", Subname AC enUS : "House of Shen'dralar"" ; Wowhead enUS : ""
-UPDATE `creature_template_locale` SET `Name` = 'Hüterin des Wissens Mykos', `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 14382;
--- AC datas : OLD Name : "Wissenshüter Kildrath", Name AC enUS : "Lorekeeper Kildrath" ; Wowhead enUS : "Lorekeeper Kildrath",  OLD Subname : "Haus Shen'dralar", Subname AC enUS : "House of Shen'dralar"" ; Wowhead enUS : ""
-UPDATE `creature_template_locale` SET `Name` = 'Hüter des Wissens Kildrath', `Title` = '', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 14383;
+-- AC datas : OLD Name : "Wissenshüter Lydros", Name AC enUS : "Lorekeeper Lydros" ; Wowhead enUS : "Lorekeeper Lydros"
+UPDATE `creature_template_locale` SET `Name` = 'Hüter des Wissens Lydros', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 14368;
+-- AC datas : OLD Name : "Wissenshüter Javon", Name AC enUS : "Lorekeeper Javon" ; Wowhead enUS : "Lorekeeper Javon"
+UPDATE `creature_template_locale` SET `Name` = 'Hüter des Wissens Javon', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 14381;
+-- AC datas : OLD Name : "Wissenshüterin Mykos", Name AC enUS : "Lorekeeper Mykos" ; Wowhead enUS : "Lorekeeper Mykos"
+UPDATE `creature_template_locale` SET `Name` = 'Hüterin des Wissens Mykos', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 14382;
+-- AC datas : OLD Name : "Wissenshüter Kildrath", Name AC enUS : "Lorekeeper Kildrath" ; Wowhead enUS : "Lorekeeper Kildrath"
+UPDATE `creature_template_locale` SET `Name` = 'Hüter des Wissens Kildrath', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 14383;
 -- AC datas : OLD Name : "Verdammniswachendiener", Name AC enUS : "Doomguard Minion" ; Wowhead enUS : "Doomguard Minion"
 UPDATE `creature_template_locale` SET `Name` = 'Diener der Verdammniswache', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 14385;
--- AC datas : OLD Name : "Hauptmann Wyrmak", Name AC enUS : "Lord Captain Wyrmak" ; Wowhead enUS : "Lord Captain Wyrmak",  OLD Subname : "Opfer des Alptraums", Subname AC enUS : """ ; Wowhead enUS : ""
-UPDATE `creature_template_locale` SET `Name` = 'Lordkommandant Wyrmak', `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 14445;
+-- AC datas : OLD Name : "Hauptmann Wyrmak", Name AC enUS : "Lord Captain Wyrmak" ; Wowhead enUS : "Lord Captain Wyrmak"
+UPDATE `creature_template_locale` SET `Name` = 'Lordkommandant Wyrmak', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 14445;
 -- AC datas : OLD Name : "Versklavter Verdammniswachenkommandant", Name AC enUS : "Enslaved Doomguard Commander" ; Wowhead enUS : "Enslaved Doomguard Commander"
 UPDATE `creature_template_locale` SET `Name` = 'Versklavter Kommandant der Verdammniswache', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 14452;
--- AC datas : OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer"" ; Wowhead enUS : "Twilight's Hammer"
+-- AC datas : OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer" ; Wowhead enUS : "Twilight's Hammer"
 UPDATE `creature_template_locale` SET `Title` = 'Schattenhammerklan', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 14479;
 -- AC datas : OLD Name : "Schneller Dämmersäbler", Name AC enUS : "Swift Dawnsaber" ; Wowhead enUS : "Swift Dawnsaber"
 UPDATE `creature_template_locale` SET `Name` = 'Schneller Dämmerungssäbler', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 14557;
@@ -8071,22 +8025,22 @@ UPDATE `creature_template_locale` SET `Name` = 'Verderbtes Totem des heilenden F
 UPDATE `creature_template_locale` SET `Name` = 'Geflügelter Horror', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 14714;
 -- AC datas : OLD Name : "Feldmarschall Afrasiabi", Name AC enUS : "Field Marshal Afrasiabi" ; Wowhead enUS : "Field Marshal Stonebridge"
 UPDATE `creature_template_locale` SET `Name` = 'Feldmarschall Steinsteg', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 14721;
--- AC datas : OLD Subname : "Stoffrüstmeisterin der Allianz", Subname AC enUS : "Alliance Cloth Quartermaster"" ; Wowhead enUS : "Alliance Cloth Quartermaster"
+-- AC datas : OLD Subname : "Stoffrüstmeisterin der Allianz", Subname AC enUS : "Alliance Cloth Quartermaster" ; Wowhead enUS : "Alliance Cloth Quartermaster"
 UPDATE `creature_template_locale` SET `Title` = 'Stoffrüstmeister der Allianz', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 14723;
 -- AC datas : OLD Name : "Entführer der Blutfratzen", Name AC enUS : "Vilebranch Kidnapper" ; Wowhead enUS : "Vilebranch Kidnapper"
 UPDATE `creature_template_locale` SET `Name` = 'Kidnapper der Blutfratzen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 14748;
--- AC datas : OLD Subname : "Souvenir- & Spielzeuggewinne", Subname AC enUS : "Darkmoon Faire Ticket Redemption"" ; Wowhead enUS : "Darkmoon Faire Ticket Redemption"
+-- AC datas : OLD Subname : "Souvenir- & Spielzeuggewinne", Subname AC enUS : "Darkmoon Faire Ticket Redemption" ; Wowhead enUS : "Darkmoon Faire Ticket Redemption"
 UPDATE `creature_template_locale` SET `Title` = 'Losverkauf des Dunkelmond-Jahrmarkts', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 14828;
--- AC datas : OLD Subname : "Der, der niemals vergisst!", Subname AC enUS : "He Who Never Forgets!"" ; Wowhead enUS : "He Who Never Forgets!"
-UPDATE `creature_template_locale` SET `Title` = 'Der der niemals vergisst!', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 14833;
--- AC datas : OLD Subname : "Getränkeverkäuferin des Dunkelmond-Jahrmarkts", Subname AC enUS : "Darkmoon Faire Drink Vendor"" ; Wowhead enUS : "Darkmoon Faire Drink Vendor"
-UPDATE `creature_template_locale` SET `Title` = 'Getränkeverkäufer des Dunkelmond-Jahrmarkts', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 14844;
--- AC datas : OLD Subname : "Lebensmittelverkäufer", Subname AC enUS : "Darkmoon Faire Food Vendor"" ; Wowhead enUS : "Darkmoon Faire Food Vendor"
+-- AC datas : OLD Name : "Chronos", Name AC enUS : "Chronos" ; Wowhead enUS : "Chronos",  OLD Subname : "Der, der niemals vergisst!", Subname AC enUS : "He Who Never Forgets!" ; Wowhead enUS : "He Who Never Forgets!"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Der der niemals vergisst!', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 14833;
+-- AC datas : OLD Name : "Sylannia", Name AC enUS : "Sylannia" ; Wowhead enUS : "Sylannia",  OLD Subname : "Getränkeverkäuferin des Dunkelmond-Jahrmarkts", Subname AC enUS : "Darkmoon Faire Drink Vendor" ; Wowhead enUS : "Darkmoon Faire Drink Vendor"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Getränkeverkäufer des Dunkelmond-Jahrmarkts', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 14844;
+-- AC datas : OLD Subname : "Lebensmittelverkäufer", Subname AC enUS : "Darkmoon Faire Food Vendor" ; Wowhead enUS : "Darkmoon Faire Food Vendor"
 UPDATE `creature_template_locale` SET `Title` = 'Lebensmittelverkäufer des Dunkelmond-Jahrmarkts', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 14845;
--- AC datas : OLD Subname : "Haus- & Reittiergewinne", Subname AC enUS : "Darkmoon Faire Exotic Goods"" ; Wowhead enUS : "Darkmoon Faire Exotic Goods"
-UPDATE `creature_template_locale` SET `Title` = 'Exotische Waren des Dunkelmond-Jahrmarkts', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 14846;
--- AC datas : OLD Subname : "Karten des Dunkelmond-Jahrmarkts", Subname AC enUS : "Darkmoon Faire Cards & Exotic Goods"" ; Wowhead enUS : "Darkmoon Faire Cards & Exotic Goods"
-UPDATE `creature_template_locale` SET `Title` = 'Karten & Exotische Waren des Dunkelmond-Jahrmarkts', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 14847;
+-- AC datas : OLD Name : "Lhara", Name AC enUS : "Lhara" ; Wowhead enUS : "Lhara",  OLD Subname : "Haus- & Reittiergewinne", Subname AC enUS : "Darkmoon Faire Exotic Goods" ; Wowhead enUS : "Darkmoon Faire Exotic Goods"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Exotische Waren des Dunkelmond-Jahrmarkts', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 14846;
+-- AC datas : OLD Name : "Professor Thaddeus Paleo", Name AC enUS : "Professor Thaddeus Paleo" ; Wowhead enUS : "Professor Thaddeus Paleo",  OLD Subname : "Karten des Dunkelmond-Jahrmarkts", Subname AC enUS : "Darkmoon Faire Cards & Exotic Goods" ; Wowhead enUS : "Darkmoon Faire Cards & Exotic Goods"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Karten & Exotische Waren des Dunkelmond-Jahrmarkts', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 14847;
 -- AC datas : OLD Name : "Blutdienerin von Kirtonos", Name AC enUS : "Blood Steward of Kirtonos" ; Wowhead enUS : "Blood Steward of Kirtonos"
 UPDATE `creature_template_locale` SET `Name` = 'Blutdiener von Kirtonos', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 14861;
 -- AC datas : OLD Name : "Zwerg-Cockatrice", Name AC enUS : "Pygmy Cockatrice" ; Wowhead enUS : "Pygmy Cockatrice"
@@ -8097,69 +8051,61 @@ UPDATE `creature_template_locale` SET `Name` = 'Abgesandter der Entweihten', `Ve
 UPDATE `creature_template_locale` SET `Name` = 'Abgesandter des Kriegshymnenklans', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15105;
 -- AC datas : OLD Name : "Gesandter der Frostwölfe", Name AC enUS : "Frostwolf Emissary" ; Wowhead enUS : "Frostwolf Emissary"
 UPDATE `creature_template_locale` SET `Name` = 'Abgesandter der Frostwölfe', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15106;
--- AC datas : OLD Name : "Runk Windlenker", Name AC enUS : "Runk Windtamer" ; Wowhead enUS : "Runk Windtamer"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15178;
 -- AC datas : OLD Name : "Infanterist der Burg Cenarius", Name AC enUS : "Cenarion Hold Infantry" ; Wowhead enUS : "Cenarion Hold Infantry"
 UPDATE `creature_template_locale` SET `Name` = 'Soldat der Burg Cenarius', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15184;
--- AC datas : OLD Name : "Fürstin Sylvanas Windläufer", Name AC enUS : "The Banshee Queen" ; Wowhead enUS : "The Banshee Queen",  OLD Subname : "Bansheekönigin", Subname AC enUS : """ ; Wowhead enUS : ""
-UPDATE `creature_template_locale` SET `Name` = 'Die Bansheekönigin', `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15193;
--- AC datas : OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer"" ; Wowhead enUS : "Twilight's Hammer"
+-- AC datas : OLD Name : "Fürstin Sylvanas Windläufer", Name AC enUS : "The Banshee Queen" ; Wowhead enUS : "The Banshee Queen"
+UPDATE `creature_template_locale` SET `Name` = 'Die Bansheekönigin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15193;
+-- AC datas : OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer" ; Wowhead enUS : "Twilight's Hammer"
 UPDATE `creature_template_locale` SET `Title` = 'Schattenhammerklan', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15200;
 -- AC datas : OLD Name : "Zwielichtflammenhäscher", Name AC enUS : "Twilight Flamereaver" ; Wowhead enUS : "Twilight Flamereaver"
 UPDATE `creature_template_locale` SET `Name` = 'Flammenhäscher des Schattenhammers', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15201;
--- AC datas : OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer"" ; Wowhead enUS : "Twilight's Hammer"
+-- AC datas : OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer" ; Wowhead enUS : "Twilight's Hammer"
 UPDATE `creature_template_locale` SET `Title` = 'Schattenhammerklan', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15202;
--- AC datas : OLD Name : "Vulculon", Name AC enUS : "Vulculon UNUSED" ; Wowhead enUS : "Vulculon UNUSED"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15210;
--- AC datas : OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer"" ; Wowhead enUS : "Twilight's Hammer"
+-- AC datas : OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer" ; Wowhead enUS : "Twilight's Hammer"
 UPDATE `creature_template_locale` SET `Title` = 'Schattenhammerklan', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15213;
 -- AC datas : OLD Name : "Trick - Kleintier", Name AC enUS : "Trick - Critter" ; Wowhead enUS : "Trick - Critter"
 UPDATE `creature_template_locale` SET `Name` = 'Trick - Tierchen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15219;
--- AC datas : OLD Name : "Fürstlicher Inquisitor Opalezzix", Name AC enUS : "[PH] [UNUSED] Lord Inquisitor Opalezzix" ; Wowhead enUS : "[PH] [UNUSED] Lord Inquisitor Opalezzix"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15223;
--- AC datas : OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
+-- AC datas : OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Magielehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15279;
 -- AC datas : OLD Name : "Pfadpirscher Kariel", Name AC enUS : "Pathstalker Kariel" ; Wowhead enUS : "Pathstalker Avokor"
 UPDATE `creature_template_locale` SET `Name` = 'Pfadpirscher Avokor', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15285;
--- AC datas : OLD Subname : "Kanonierin des Dunkelmond-Jahrmarkts", Subname AC enUS : "Darkmoon Faire Cannoneer"" ; Wowhead enUS : "Darkmoon Faire Cannoneer"
-UPDATE `creature_template_locale` SET `Title` = 'Kanonier des Dunkelmond-Jahrmarkts', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15303;
--- AC datas : OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer"" ; Wowhead enUS : "Twilight's Hammer"
+-- AC datas : OLD Name : "Maxima Blastenheimer", Name AC enUS : "Maxima Blastenheimer" ; Wowhead enUS : "Maxima Blastenheimer",  OLD Subname : "Kanonierin des Dunkelmond-Jahrmarkts", Subname AC enUS : "Darkmoon Faire Cannoneer" ; Wowhead enUS : "Darkmoon Faire Cannoneer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Kanonier des Dunkelmond-Jahrmarkts', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15303;
+-- AC datas : OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer" ; Wowhead enUS : "Twilight's Hammer"
 UPDATE `creature_template_locale` SET `Title` = 'Schattenhammerklan', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15308;
 -- AC datas : OLD Name : "Dunkelmond-Dampfpanzer", Name AC enUS : "Darkmoon Steam Tonk" ; Wowhead enUS : "Darkmoon Steam Tonk"
 UPDATE `creature_template_locale` SET `Name` = 'Dunkelmonddampfpanzer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15328;
--- AC datas : OLD Name : "RC Blimp <PH>", Name AC enUS : "RC Blimp <PH>" ; Wowhead enUS : "RC Blimp",  OLD Subname : "", Subname AC enUS : """ ; Wowhead enUS : "PH"
-UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15349;
--- AC datas : OLD Name : "RC Mörserpanzer", Name AC enUS : "RC Mortar Tank <PH>" ; Wowhead enUS : "RC Mortar Tank",  OLD Subname : "", Subname AC enUS : """ ; Wowhead enUS : "PH"
-UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15364;
+-- AC datas : OLD Name : "RC Blimp <PH>", Name AC enUS : "RC Blimp <PH>" ; Wowhead enUS : "RC Blimp"
+UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15349;
 -- AC datas : OLD Name : "Ayamiss die Jägerin", Name AC enUS : "Ayamiss the Hunter" ; Wowhead enUS : "Ayamiss the Hunter"
 UPDATE `creature_template_locale` SET `Name` = 'Ayamiss der Jäger', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15369;
--- AC datas : OLD Name : "Welt Juwelierskunstlehrer", Name AC enUS : "World Jewelcrafting Trainer" ; Wowhead enUS : "World Jewelcrafting Trainer",  OLD Subname : "Juwelierskunstlehrerin", Subname AC enUS : "Jewelcrafting Trainer"" ; Wowhead enUS : "Jewelcrafting Trainer"
+-- AC datas : OLD Name : "Welt Juwelierskunstlehrer", Name AC enUS : "World Jewelcrafting Trainer" ; Wowhead enUS : "World Jewelcrafting Trainer",  OLD Subname : "Juwelierskunstlehrerin", Subname AC enUS : "Jewelcrafting Trainer" ; Wowhead enUS : "Jewelcrafting Trainer"
 UPDATE `creature_template_locale` SET `Name` = 'Welt Juwelenschleiferlehrer', `Title` = 'Juwelenschleiferlehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15465;
 -- AC datas : OLD Name : "Skorpid", Name AC enUS : "Scorpion" ; Wowhead enUS : "Scorpion"
 UPDATE `creature_template_locale` SET `Name` = 'Skorpion', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15476;
 -- AC datas : OLD Name : "Totem der Feuernova", Name AC enUS : "Fire Nova Totem VII" ; Wowhead enUS : "Fire Nova Totem VII"
 UPDATE `creature_template_locale` SET `Name` = 'Totem der Feuernova VII', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15483;
--- AC datas : OLD Subname : "Juwelierskunstlehrerin", Subname AC enUS : "Jewelcrafting Trainer"" ; Wowhead enUS : "Jewelcrafting Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Juwelenschleiferlehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15501;
--- AC datas : OLD Name : "Zwielichtmeister Xarvos", Name AC enUS : "Twilight Master Xarvos" ; Wowhead enUS : "Twilight Master Xarvos",  OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer"" ; Wowhead enUS : "Twilight's Hammer"
+-- AC datas : OLD Name : "Aleinia", Name AC enUS : "Aleinia" ; Wowhead enUS : "Aleinia",  OLD Subname : "Juwelierskunstlehrerin", Subname AC enUS : "Jewelcrafting Trainer" ; Wowhead enUS : "Jewelcrafting Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Juwelenschleiferlehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15501;
+-- AC datas : OLD Name : "Zwielichtmeister Xarvos", Name AC enUS : "Twilight Master Xarvos" ; Wowhead enUS : "Twilight Master Xarvos",  OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer" ; Wowhead enUS : "Twilight's Hammer"
 UPDATE `creature_template_locale` SET `Name` = 'Meister des Schattenhammers Xarvos', `Title` = 'Schattenhammerklan', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15530;
 -- AC datas : OLD Name : "Steingardist Lehmhuf", Name AC enUS : "Stoneguard Clayhoof" ; Wowhead enUS : "Stoneguard Clayhoof"
 UPDATE `creature_template_locale` SET `Name` = 'Steinwache Lehmhuf', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15532;
--- AC datas : OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer"" ; Wowhead enUS : "Twilight's Hammer"
+-- AC datas : OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer" ; Wowhead enUS : "Twilight's Hammer"
 UPDATE `creature_template_locale` SET `Title` = 'Schattenhammerklan', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15541;
--- AC datas : OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer"" ; Wowhead enUS : "Twilight's Hammer"
+-- AC datas : OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer" ; Wowhead enUS : "Twilight's Hammer"
 UPDATE `creature_template_locale` SET `Title` = 'Schattenhammerklan', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15542;
 -- AC datas : OLD Name : "Zwielichtverderber", Name AC enUS : "Twilight Corrupter" ; Wowhead enUS : "Twilight Corrupter"
 UPDATE `creature_template_locale` SET `Name` = 'Seelenverderber des Zwielichts', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15625;
--- AC datas : OLD Subname : "Träger des Gongs", Subname AC enUS : "HOLDER OF THE GONG"" ; Wowhead enUS : "HOLDER OF THE GONG"
-UPDATE `creature_template_locale` SET `Title` = 'TRÄGER DES GONGS', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15801;
+-- AC datas : OLD Name : "GONG BOY DND DNR", Name AC enUS : "GONG BOY DND DNR" ; Wowhead enUS : "GONG BOY DND DNR",  OLD Subname : "Träger des Gongs", Subname AC enUS : "HOLDER OF THE GONG" ; Wowhead enUS : "HOLDER OF THE GONG"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'TRÄGER DES GONGS', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15801;
 -- AC datas : OLD Name : "Infanterist der Macht von Kalimdor", Name AC enUS : "Might of Kalimdor Infantry" ; Wowhead enUS : "Might of Kalimdor Infantry"
 UPDATE `creature_template_locale` SET `Name` = 'Infanterie der Macht von Kalimdor', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15848;
 -- AC datas : OLD Name : "Hochlord Leoric von Zeldig", Name AC enUS : "Highlord Leoric Von Zeldig" ; Wowhead enUS : "Highlord Leoric Von Zeldig"
 UPDATE `creature_template_locale` SET `Name` = 'Hochlord Leoric Von Zeldig', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15868;
 -- AC datas : OLD Name : "Herzog August Feindhammer", Name AC enUS : "Duke August Foehammer" ; Wowhead enUS : "Duke August Foehammer"
 UPDATE `creature_template_locale` SET `Name` = 'Fürst August Feindhammer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15870;
--- AC datas : OLD Subname : "Sammlerin für Münzen der Urahnen", Subname AC enUS : "Coin of Ancestry Collector"" ; Wowhead enUS : "Coin of Ancestry Collector"
+-- AC datas : OLD Subname : "Sammlerin für Münzen der Urahnen", Subname AC enUS : "Coin of Ancestry Collector" ; Wowhead enUS : "Coin of Ancestry Collector"
 UPDATE `creature_template_locale` SET `Title` = 'Sammler für Münzen der Urahnen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15909;
 -- AC datas : OLD Name : "Sumpfbiest", Name AC enUS : "[UNUSED] Bog Beast B [PH]" ; Wowhead enUS : "[UNUSED] Bog Beast B [PH]"
 UPDATE `creature_template_locale` SET `Name` = 'Bog Beast B [PH]', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16035;
@@ -8169,31 +8115,31 @@ UPDATE `creature_template_locale` SET `Name` = 'Korfax, Held des Lichts', `Verif
 UPDATE `creature_template_locale` SET `Name` = 'Scharlachroter Kommandant Marjhan', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16114;
 -- AC datas : OLD Name : "Kreuzzugskommandant Eligor Morgenbringer", Name AC enUS : "Commander Eligor Dawnbringer" ; Wowhead enUS : "Commander Eligor Dawnbringer"
 UPDATE `creature_template_locale` SET `Name` = 'Kommandant Eligor Morgenbringer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16115;
--- AC datas : OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Magielehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16269;
--- AC datas : OLD Subname : "Kochkunstlehrerin", Subname AC enUS : "Cooking Trainer"" ; Wowhead enUS : "Cooking Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Kochkunstlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16277;
--- AC datas : OLD Subname : "Schurkenlehrerin", Subname AC enUS : "Rogue Trainer"" ; Wowhead enUS : "Rogue Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Schurkenlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16279;
--- AC datas : OLD Subname : "Der Argentumkreuzzug", Subname AC enUS : "The Argent Dawn"" ; Wowhead enUS : "The Argent Dawn"
+-- AC datas : OLD Name : "Garridel", Name AC enUS : "Garridel" ; Wowhead enUS : "Garridel",  OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Magielehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16269;
+-- AC datas : OLD Name : "Quarelestra", Name AC enUS : "Quarelestra" ; Wowhead enUS : "Quarelestra",  OLD Subname : "Kochkunstlehrerin", Subname AC enUS : "Cooking Trainer" ; Wowhead enUS : "Cooking Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Kochkunstlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16277;
+-- AC datas : OLD Name : "Tannaria", Name AC enUS : "Tannaria" ; Wowhead enUS : "Tannaria",  OLD Subname : "Schurkenlehrerin", Subname AC enUS : "Rogue Trainer" ; Wowhead enUS : "Rogue Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Schurkenlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16279;
+-- AC datas : OLD Subname : "Der Argentumkreuzzug", Subname AC enUS : "The Argent Dawn" ; Wowhead enUS : "The Argent Dawn"
 UPDATE `creature_template_locale` SET `Title` = 'Die Argentumdämmerung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16378;
 -- AC datas : OLD Name : "Flickwerkschrecken", Name AC enUS : "Patchwork Terror" ; Wowhead enUS : "Patchwork Terror"
 UPDATE `creature_template_locale` SET `Name` = 'Flickwerkschrecker', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16382;
--- AC datas : OLD Name : "Sie Nummer Eins", Name AC enUS : "She number one" ; Wowhead enUS : "She number one",  OLD Subname : "Botschafterin von CocaCola", Subname AC enUS : "CocaCola Ambassador"" ; Wowhead enUS : "CocaCola Ambassador"
+-- AC datas : OLD Name : "Sie Nummer Eins", Name AC enUS : "She number one" ; Wowhead enUS : "She number one",  OLD Subname : "Botschafterin von CocaCola", Subname AC enUS : "CocaCola Ambassador" ; Wowhead enUS : "CocaCola Ambassador"
 UPDATE `creature_template_locale` SET `Name` = 'S.H.E. Nummer Eins', `Title` = 'Botschafterin von Coca-Cola', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16450;
 -- AC datas : OLD Name : "Verteidiger der Todesritter", Name AC enUS : "[UNUSED] Death Knight Vindicator" ; Wowhead enUS : "[UNUSED] Death Knight Vindicator"
 UPDATE `creature_template_locale` SET `Name` = 'Vollstrecker der Todesritter', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16451;
--- AC datas : OLD Name : "Sie Nummer Zwei", Name AC enUS : "She number two" ; Wowhead enUS : "She number two",  OLD Subname : "Botschafterin von CocaCola", Subname AC enUS : "CocaCola Ambassador"" ; Wowhead enUS : "CocaCola Ambassador"
+-- AC datas : OLD Name : "Sie Nummer Zwei", Name AC enUS : "She number two" ; Wowhead enUS : "She number two",  OLD Subname : "Botschafterin von CocaCola", Subname AC enUS : "CocaCola Ambassador" ; Wowhead enUS : "CocaCola Ambassador"
 UPDATE `creature_template_locale` SET `Name` = 'S.H.E. Nummer Zwei', `Title` = 'Botschafterin von Coca-Cola', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16454;
--- AC datas : OLD Name : "Sie Nummer Drei", Name AC enUS : "She number three" ; Wowhead enUS : "She number three",  OLD Subname : "Botschafterin von CocaCola", Subname AC enUS : "CocaCola Ambassador"" ; Wowhead enUS : "CocaCola Ambassador"
+-- AC datas : OLD Name : "Sie Nummer Drei", Name AC enUS : "She number three" ; Wowhead enUS : "She number three",  OLD Subname : "Botschafterin von CocaCola", Subname AC enUS : "CocaCola Ambassador" ; Wowhead enUS : "CocaCola Ambassador"
 UPDATE `creature_template_locale` SET `Name` = 'S.H.E. Nummer Drei', `Title` = 'Botschafterin von Coca-Cola', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16455;
 -- AC datas : OLD Name : "Konkubine", Name AC enUS : "Concubine" ; Wowhead enUS : "Zealous Paramour"
 UPDATE `creature_template_locale` SET `Name` = 'Eifrige Dienerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16461;
--- AC datas : OLD Name : "Alchemiemeister", Name AC enUS : "Master Alchemist" ; Wowhead enUS : "Master Alchemist",  OLD Subname : "Alchemielehrer", Subname AC enUS : "Cheesy Test Alchemist"" ; Wowhead enUS : "Cheesy Test Alchemist"
-UPDATE `creature_template_locale` SET `Name` = 'Alchimiemeister', `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16487;
--- AC datas : OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Magielehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16500;
--- AC datas : OLD Subname : "Kräuterkundelehrerin", Subname AC enUS : "Master Herbalism Trainer"" ; Wowhead enUS : "Master Herbalism Trainer"
+-- AC datas : OLD Name : "Alchemiemeister", Name AC enUS : "Master Alchemist" ; Wowhead enUS : "Master Alchemist"
+UPDATE `creature_template_locale` SET `Name` = 'Alchimiemeister', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16487;
+-- AC datas : OLD Name : "Valaatu", Name AC enUS : "Valaatu" ; Wowhead enUS : "Valaatu",  OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Magielehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16500;
+-- AC datas : OLD Subname : "Kräuterkundelehrerin", Subname AC enUS : "Master Herbalism Trainer" ; Wowhead enUS : "Master Herbalism Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Kräuterkundemeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16527;
 -- AC datas : OLD Name : "Homunculus", Name AC enUS : "Homunculus" ; Wowhead enUS : "Homunculus"
 UPDATE `creature_template_locale` SET `Name` = 'Homonculus', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16539;
@@ -8201,60 +8147,60 @@ UPDATE `creature_template_locale` SET `Name` = 'Homonculus', `VerifiedBuild` = 0
 UPDATE `creature_template_locale` SET `Name` = 'Myconite Warrior (PH)', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16565;
 -- AC datas : OLD Name : "Blutelfischer Pilger", Name AC enUS : "Blood Elf Pilgrim" ; Wowhead enUS : "Blood Elf Pilgrim"
 UPDATE `creature_template_locale` SET `Name` = 'Blutelfenpilger', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16578;
--- AC datas : OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Master Blacksmithing Trainer"" ; Wowhead enUS : "Master Blacksmithing Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Schmiedekunstmeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16583;
--- AC datas : OLD Subname : "Alchemielehrer", Subname AC enUS : "Master Alchemy Trainer"" ; Wowhead enUS : "Master Alchemy Trainer"
+-- AC datas : OLD Name : "Rohok", Name AC enUS : "Rohok" ; Wowhead enUS : "Rohok",  OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Master Blacksmithing Trainer" ; Wowhead enUS : "Master Blacksmithing Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Schmiedekunstmeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16583;
+-- AC datas : OLD Subname : "Alchemielehrer", Subname AC enUS : "Master Alchemy Trainer" ; Wowhead enUS : "Master Alchemy Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Alchemiemeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16588;
 -- AC datas : OLD Name : "Wolfsreiter von Thrallmar", Name AC enUS : "Thrallmar Wolf Rider" ; Wowhead enUS : "Thrallmar Wolf Rider"
 UPDATE `creature_template_locale` SET `Name` = 'Wolfreiter von Thrallmar', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16599;
 -- AC datas : OLD Name : "Bris Testcharakter", Name AC enUS : "Bri's Test Character" ; Wowhead enUS : "Bri's Test Character"
 UPDATE `creature_template_locale` SET `Name` = 'Brianna Schneider', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16605;
--- AC datas : OLD Subname : "Waffenverkäufer", Subname AC enUS : "Weapon Vendor"" ; Wowhead enUS : "Weapon Vendor"
-UPDATE `creature_template_locale` SET `Title` = 'Waffenhändler', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16622;
--- AC datas : OLD Subname : "Juwelierskunstbedarf", Subname AC enUS : "Jewelcrafting Supplies"" ; Wowhead enUS : "Jewelcrafting Supplies"
-UPDATE `creature_template_locale` SET `Title` = 'Juwelenschleiferbedarf', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16624;
--- AC datas : OLD Subname : "Händlerin für Kettenrüstungen", Subname AC enUS : "Mail Armor Merchant"" ; Wowhead enUS : "Mail Armor Merchant"
-UPDATE `creature_template_locale` SET `Title` = 'Händlerin für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16625;
--- AC datas : OLD Subname : "Hexenmeisterlehrerin", Subname AC enUS : "Warlock Trainer"" ; Wowhead enUS : "Warlock Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Hexenmeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16647;
--- AC datas : OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Magielehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16651;
--- AC datas : OLD Subname : "Magierlehrer", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Magielehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16652;
--- AC datas : OLD Subname : "Magierlehrer", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Magielehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16653;
--- AC datas : OLD Subname : "Kochkunstlehrerin", Subname AC enUS : "Cook"" ; Wowhead enUS : "Cook"
-UPDATE `creature_template_locale` SET `Title` = 'Köchin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16676;
--- AC datas : OLD Subname : "Juwelierskunstlehrling", Subname AC enUS : "Apprentice Jewelcrafter"" ; Wowhead enUS : "Apprentice Jewelcrafter"
-UPDATE `creature_template_locale` SET `Title` = 'Juwelenschleiferlehrling', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16702;
--- AC datas : OLD Subname : "Juwelierskunstlehrling", Subname AC enUS : "Apprentice Jewelcrafter"" ; Wowhead enUS : "Apprentice Jewelcrafter"
-UPDATE `creature_template_locale` SET `Title` = 'Juwelenschleiferlehrling', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16703;
--- AC datas : OLD Subname : "Kochkunstlehrerin", Subname AC enUS : "Cook"" ; Wowhead enUS : "Cook"
-UPDATE `creature_template_locale` SET `Title` = 'Köchin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16719;
--- AC datas : OLD Subname : "", Subname AC enUS : """ ; Wowhead enUS : ""
-UPDATE `creature_template_locale` SET `Title` = 'Dämonenausbilderin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16720;
--- AC datas : OLD Subname : "Juwelierskunstlehrling", Subname AC enUS : "Apprentice Jewelcrafter"" ; Wowhead enUS : "Apprentice Jewelcrafter"
-UPDATE `creature_template_locale` SET `Title` = 'Juwelenschleiferlehrling', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16727;
--- AC datas : OLD Subname : "Juwelierskunstlehrling", Subname AC enUS : "Apprentice Jewelcrafter"" ; Wowhead enUS : "Apprentice Jewelcrafter"
-UPDATE `creature_template_locale` SET `Title` = 'Juwelenschleiferlehrling', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16744;
--- AC datas : OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Magielehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16749;
--- AC datas : OLD Subname : "Händler für Kettenrüstungen", Subname AC enUS : "Mail Armor Merchant"" ; Wowhead enUS : "Mail Armor Merchant"
-UPDATE `creature_template_locale` SET `Title` = 'Händler für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16750;
--- AC datas : OLD Subname : "Gifte", Subname AC enUS : "Poison Supplies"" ; Wowhead enUS : "Poison Supplies"
+-- AC datas : OLD Name : "Ithene", Name AC enUS : "Ithene" ; Wowhead enUS : "Ithene",  OLD Subname : "Waffenverkäufer", Subname AC enUS : "Weapon Vendor" ; Wowhead enUS : "Weapon Vendor"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Waffenhändler', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16622;
+-- AC datas : OLD Name : "Gelanthis", Name AC enUS : "Gelanthis" ; Wowhead enUS : "Gelanthis",  OLD Subname : "Juwelierskunstbedarf", Subname AC enUS : "Jewelcrafting Supplies" ; Wowhead enUS : "Jewelcrafting Supplies"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Juwelenschleiferbedarf', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16624;
+-- AC datas : OLD Name : "Keeli", Name AC enUS : "Keeli" ; Wowhead enUS : "Keeli",  OLD Subname : "Händlerin für Kettenrüstungen", Subname AC enUS : "Mail Armor Merchant" ; Wowhead enUS : "Mail Armor Merchant"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Händlerin für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16625;
+-- AC datas : OLD Name : "Talionia", Name AC enUS : "Talionia" ; Wowhead enUS : "Talionia",  OLD Subname : "Hexenmeisterlehrerin", Subname AC enUS : "Warlock Trainer" ; Wowhead enUS : "Warlock Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Hexenmeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16647;
+-- AC datas : OLD Name : "Zaedana", Name AC enUS : "Zaedana" ; Wowhead enUS : "Zaedana",  OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Magielehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16651;
+-- AC datas : OLD Name : "Quithas", Name AC enUS : "Quithas" ; Wowhead enUS : "Quithas",  OLD Subname : "Magierlehrer", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Magielehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16652;
+-- AC datas : OLD Name : "Inethven", Name AC enUS : "Inethven" ; Wowhead enUS : "Inethven",  OLD Subname : "Magierlehrer", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Magielehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16653;
+-- AC datas : OLD Name : "Sylann", Name AC enUS : "Sylann" ; Wowhead enUS : "Sylann",  OLD Subname : "Kochkunstlehrerin", Subname AC enUS : "Cook" ; Wowhead enUS : "Cook"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Köchin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16676;
+-- AC datas : OLD Name : "Telia", Name AC enUS : "Telia" ; Wowhead enUS : "Telia",  OLD Subname : "Juwelierskunstlehrling", Subname AC enUS : "Apprentice Jewelcrafter" ; Wowhead enUS : "Apprentice Jewelcrafter"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Juwelenschleiferlehrling', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16702;
+-- AC datas : OLD Name : "Amin", Name AC enUS : "Amin" ; Wowhead enUS : "Amin",  OLD Subname : "Juwelierskunstlehrling", Subname AC enUS : "Apprentice Jewelcrafter" ; Wowhead enUS : "Apprentice Jewelcrafter"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Juwelenschleiferlehrling', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16703;
+-- AC datas : OLD Name : "Mumman", Name AC enUS : "Mumman" ; Wowhead enUS : "Mumman",  OLD Subname : "Kochkunstlehrerin", Subname AC enUS : "Cook" ; Wowhead enUS : "Cook"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Köchin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16719;
+-- AC datas : OLD Name : "Oktan", Name AC enUS : "Oktan" ; Wowhead enUS : "Oktan",  OLD Subname : "", Subname AC enUS : "" ; Wowhead enUS : ""
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Dämonenausbilderin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16720;
+-- AC datas : OLD Name : "Padaar", Name AC enUS : "Padaar" ; Wowhead enUS : "Padaar",  OLD Subname : "Juwelierskunstlehrling", Subname AC enUS : "Apprentice Jewelcrafter" ; Wowhead enUS : "Apprentice Jewelcrafter"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Juwelenschleiferlehrling', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16727;
+-- AC datas : OLD Name : "Driaan", Name AC enUS : "Driaan" ; Wowhead enUS : "Driaan",  OLD Subname : "Juwelierskunstlehrling", Subname AC enUS : "Apprentice Jewelcrafter" ; Wowhead enUS : "Apprentice Jewelcrafter"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Juwelenschleiferlehrling', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16744;
+-- AC datas : OLD Name : "Edirah", Name AC enUS : "Edirah" ; Wowhead enUS : "Edirah",  OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Magielehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16749;
+-- AC datas : OLD Name : "Yil", Name AC enUS : "Yil" ; Wowhead enUS : "Yil",  OLD Subname : "Händler für Kettenrüstungen", Subname AC enUS : "Mail Armor Merchant" ; Wowhead enUS : "Mail Armor Merchant"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Händler für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16750;
+-- AC datas : OLD Subname : "Gifte", Subname AC enUS : "Poison Supplies" ; Wowhead enUS : "Poison Supplies"
 UPDATE `creature_template_locale` SET `Title` = 'Giftreagenzien', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16754;
--- AC datas : OLD Subname : "Portallehrerin", Subname AC enUS : "Portal Trainer"" ; Wowhead enUS : "Portal Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Portallehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16755;
--- AC datas : OLD Subname : "Angellehrerin", Subname AC enUS : "Fishing Trainer"" ; Wowhead enUS : "Fishing Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Angellehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16774;
+-- AC datas : OLD Name : "Lunaraa", Name AC enUS : "Lunaraa" ; Wowhead enUS : "Lunaraa",  OLD Subname : "Portallehrerin", Subname AC enUS : "Portal Trainer" ; Wowhead enUS : "Portal Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Portallehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16755;
+-- AC datas : OLD Name : "Erett", Name AC enUS : "Erett" ; Wowhead enUS : "Erett",  OLD Subname : "Angellehrerin", Subname AC enUS : "Fishing Trainer" ; Wowhead enUS : "Fishing Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Angellehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16774;
 -- AC datas : OLD Name : "Blauer Seuchenschleim", Name AC enUS : "Plague Slime (Blue)" ; Wowhead enUS : "Plague Slime (Blue)"
 UPDATE `creature_template_locale` SET `Name` = 'Blauer Seuchenbrühschleimer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16783;
 -- AC datas : OLD Name : "Roter Seuchenschleim", Name AC enUS : "Plague Slime (Red)" ; Wowhead enUS : "Plague Slime (Red)"
 UPDATE `creature_template_locale` SET `Name` = 'Roter Seuchenbrühschleimer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16784;
 -- AC datas : OLD Name : "Grüner Seuchenschleim", Name AC enUS : "Plague Slime (Green)" ; Wowhead enUS : "Plague Slime (Green)"
 UPDATE `creature_template_locale` SET `Name` = 'Grüner Seuchenbrühschleimer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16785;
--- AC datas : OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Master Blacksmithing Trainer"" ; Wowhead enUS : "Master Blacksmithing Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Schmiedekunstmeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16823;
+-- AC datas : OLD Name : "Humphry", Name AC enUS : "Humphry" ; Wowhead enUS : "Humphry",  OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Master Blacksmithing Trainer" ; Wowhead enUS : "Master Blacksmithing Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Schmiedekunstmeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16823;
 -- AC datas : OLD Name : "Winsum", Name AC enUS : "Laughing Skull Slayer" ; Wowhead enUS : "Laughing Skull Slayer"
 UPDATE `creature_template_locale` SET `Name` = 'Töter des Lachenden Schädels', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16868;
 -- AC datas : OLD Name : "Jising", Name AC enUS : "Laughing Skull Neophyte" ; Wowhead enUS : "Laughing Skull Neophyte"
@@ -8265,54 +8211,50 @@ UPDATE `creature_template_locale` SET `Name` = 'Wolfreiter der Knochenmalmer', `
 UPDATE `creature_template_locale` SET `Name` = 'Maid der Seelenpein', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16961;
 -- AC datas : OLD Name : "Sonnenwendhändlerkostüm der Allianz", Name AC enUS : "Midsummer Merchant Alliance Costume" ; Wowhead enUS : "Midsummer Merchant Alliance Costume"
 UPDATE `creature_template_locale` SET `Name` = 'Sonnenwendhändlerkostüm der Alliant', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16986;
--- AC datas : OLD Subname : "Bot der öffentlichen Testrealms", Subname AC enUS : "Public Test Realm Bot"" ; Wowhead enUS : "Public Test Realm Bot"
-UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16999;
 -- AC datas : OLD Name : "Soldat des Schattenhammerklans", Name AC enUS : "Twilight's Hammer Clan Soldier" ; Wowhead enUS : "Twilight's Hammer Clan Soldier"
 UPDATE `creature_template_locale` SET `Name` = 'Soldat des Schattenhammers', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17022;
 -- AC datas : OLD Name : "Saphirons Flügelschlag", Name AC enUS : "Sapphiron's Wing Buffet" ; Wowhead enUS : "Sapphiron's Wing Buffet"
 UPDATE `creature_template_locale` SET `Name` = 'Saphirons Flügelstoß', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17025;
 -- AC datas : OLD Name : "Kleine Höllenfeuerkampfattrappe", Name AC enUS : "Hellfire Combat Dummy Small" ; Wowhead enUS : "Hellfire Combat Dummy Small"
 UPDATE `creature_template_locale` SET `Name` = 'kleine Höllenfeuerkamfattrappe', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17060;
--- AC datas : OLD Subname : "", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
+-- AC datas : OLD Subname : "", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Magierlehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17105;
 -- AC datas : OLD Name : "Erdenruferin Ryga", Name AC enUS : "Earthcaller Ryga" ; Wowhead enUS : "Earthcaller Ryga"
 UPDATE `creature_template_locale` SET `Name` = 'Erdruferin Ryga', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17123;
 -- AC datas : OLD Name : "Scharfseher Nobundo", Name AC enUS : "Farseer Nobundo" ; Wowhead enUS : "Farseer Nobundo"
 UPDATE `creature_template_locale` SET `Name` = 'Weissager Nobundo', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17204;
--- AC datas : OLD Subname : "Spektralgreifenmeister", Subname AC enUS : "Spectral Gryphon Master"" ; Wowhead enUS : "Spectral Gryphon Master"
-UPDATE `creature_template_locale` SET `Title` = 'Spektraler Greifenmeister', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17209;
+-- AC datas : OLD Name : "William Kielar", Name AC enUS : "William Kielar" ; Wowhead enUS : "William Kielar",  OLD Subname : "Spektralgreifenmeister", Subname AC enUS : "Spectral Gryphon Master" ; Wowhead enUS : "Spectral Gryphon Master"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Spektraler Greifenmeister', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17209;
 -- AC datas : OLD Name : "Slims untötbarer Testdummy", Name AC enUS : "Slim's Unkillable Test Dummy" ; Wowhead enUS : "Slim's Unkillable Test Dummy"
 UPDATE `creature_template_locale` SET `Name` = 'Unkillable Test Dummy Spammer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17313;
 -- AC datas : OLD Name : "Zauberer des Schattenmondklans", Name AC enUS : "Shadowmoon Sorcerer" ; Wowhead enUS : "Shadowmoon Sorcerer"
 UPDATE `creature_template_locale` SET `Name` = 'Zauberhexer des Schattenmondklans', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17396;
--- AC datas : OLD Subname : "Kriegerlehrerin", Subname AC enUS : "Warrior Trainer"" ; Wowhead enUS : "Warrior Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Kriegerlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17480;
--- AC datas : OLD Subname : "Magierlehrer", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Magielehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17481;
--- AC datas : OLD Subname : "Stallmeisterin", Subname AC enUS : "Stable Master"" ; Wowhead enUS : "Stable Master"
-UPDATE `creature_template_locale` SET `Title` = 'Stallmeister', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17485;
--- AC datas : OLD Subname : "Juwelierskunstbedarf", Subname AC enUS : "Jewelcrafting Supplies"" ; Wowhead enUS : "Jewelcrafting Supplies"
-UPDATE `creature_template_locale` SET `Title` = 'Juwelenschleiferbedarf', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17512;
--- AC datas : OLD Subname : "Magierlehrer", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Magielehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17513;
--- AC datas : OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Magielehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17514;
+-- AC datas : OLD Name : "Ruada", Name AC enUS : "Ruada" ; Wowhead enUS : "Ruada",  OLD Subname : "Kriegerlehrerin", Subname AC enUS : "Warrior Trainer" ; Wowhead enUS : "Warrior Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Kriegerlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17480;
+-- AC datas : OLD Name : "Semid", Name AC enUS : "Semid" ; Wowhead enUS : "Semid",  OLD Subname : "Magierlehrer", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Magielehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17481;
+-- AC datas : OLD Name : "Esbina", Name AC enUS : "Esbina" ; Wowhead enUS : "Esbina",  OLD Subname : "Stallmeisterin", Subname AC enUS : "Stable Master" ; Wowhead enUS : "Stable Master"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Stallmeister', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17485;
+-- AC datas : OLD Name : "Arred", Name AC enUS : "Arred" ; Wowhead enUS : "Arred",  OLD Subname : "Juwelierskunstbedarf", Subname AC enUS : "Jewelcrafting Supplies" ; Wowhead enUS : "Jewelcrafting Supplies"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Juwelenschleiferbedarf', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17512;
+-- AC datas : OLD Name : "Harnan", Name AC enUS : "Harnan" ; Wowhead enUS : "Harnan",  OLD Subname : "Magierlehrer", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Magielehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17513;
+-- AC datas : OLD Name : "Bati", Name AC enUS : "Bati" ; Wowhead enUS : "Bati",  OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Magielehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17514;
 -- AC datas : OLD Name : "Junger Draenei", Name AC enUS : "Draenei Youngling" ; Wowhead enUS : "Draenei Youngling"
 UPDATE `creature_template_locale` SET `Name` = 'Draeneijüngling', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17587;
 -- AC datas : OLD Name : "Höllenfeuerwolfsreiter", Name AC enUS : "Hellfire Wolf Rider" ; Wowhead enUS : "Hellfire Wolf Rider"
 UPDATE `creature_template_locale` SET `Name` = 'Höllenfeuerwolfreiter', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17593;
--- AC datas : OLD Subname : "", Subname AC enUS : "Ammunition Vendor"" ; Wowhead enUS : "Ammunition Vendor"
-UPDATE `creature_template_locale` SET `Title` = 'Munitionsverkäufer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17598;
--- AC datas : OLD Name : "K. Lee Kleinkram", Name AC enUS : "K. Lee Smallfry" ; Wowhead enUS : "K. Lee Smallfry",  OLD Subname : "Ingenieurskunstlehrerin", Subname AC enUS : "Master Engineering Trainer"" ; Wowhead enUS : "Master Engineering Trainer"
+-- AC datas : OLD Name : "Renn'az", Name AC enUS : "Renn'az" ; Wowhead enUS : "Renn'az",  OLD Subname : "", Subname AC enUS : "Ammunition Vendor" ; Wowhead enUS : "Ammunition Vendor"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Munitionsverkäufer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17598;
+-- AC datas : OLD Name : "K. Lee Kleinkram", Name AC enUS : "K. Lee Smallfry" ; Wowhead enUS : "K. Lee Smallfry",  OLD Subname : "Ingenieurskunstlehrerin", Subname AC enUS : "Master Engineering Trainer" ; Wowhead enUS : "Master Engineering Trainer"
 UPDATE `creature_template_locale` SET `Name` = 'K. Lee Kleinfrey', `Title` = 'Meisteringenieurslehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17634;
--- AC datas : OLD Subname : "Ingenieurskunstlehrer", Subname AC enUS : "Master Engineering Trainer"" ; Wowhead enUS : "Master Engineering Trainer"
+-- AC datas : OLD Subname : "Ingenieurskunstlehrer", Subname AC enUS : "Master Engineering Trainer" ; Wowhead enUS : "Master Engineering Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Meisteringenieurslehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17637;
 -- AC datas : OLD Name : "Teufelsjägerdiener", Name AC enUS : "Felhunter Minion" ; Wowhead enUS : "Felhunter Minion"
 UPDATE `creature_template_locale` SET `Name` = 'Diener der Teufelsjäger', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17648;
 -- AC datas : OLD Name : "Schmiedin Frances", Name AC enUS : "Blacksmith Frances" ; Wowhead enUS : "Blacksmith Frances"
 UPDATE `creature_template_locale` SET `Name` = 'Schmied Frances', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17655;
--- AC datas : OLD Name : "Jessera von Mac'Aree", Name AC enUS : "Jessera of Mac'Aree" ; Wowhead enUS : "Maatparm"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17663;
 -- AC datas : OLD Name : "Wyvernreiter von Orgrimmar", Name AC enUS : "Orgrimmar Wyvern Rider" ; Wowhead enUS : "Orgrimmar Wyvern Rider"
 UPDATE `creature_template_locale` SET `Name` = 'Flügeldrachenreiter von Orgrimmar', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17720;
 -- AC datas : OLD Name : "Tiefenseglerschwärmer", Name AC enUS : "Underbat Swarmer" ; Wowhead enUS : "Underbat Swarmer"
@@ -8323,8 +8265,6 @@ UPDATE `creature_template_locale` SET `Name` = 'Bergriese der Scherbenwelt, Zang
 UPDATE `creature_template_locale` SET `Name` = 'Wasserbeschwörerin Thespia', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17797;
 -- AC datas : OLD Name : "Wahnsinniger Worgen", Name AC enUS : "Crazed Worgen" ; Wowhead enUS : "Crazed Worgen"
 UPDATE `creature_template_locale` SET `Name` = 'Verrückter Worgen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17823;
--- AC datas : OLD Name : "Krunz", Name AC enUS : "[UNUSED] Fnort" ; Wowhead enUS : "[UNUSED] Fnort"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17828;
 -- AC datas : OLD Name : "Kommandantin Sarannis", Name AC enUS : "Commander Sarannis" ; Wowhead enUS : "Commander Sarannis"
 UPDATE `creature_template_locale` SET `Name` = 'Kommandant Sarannis', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17976;
 -- AC datas : OLD Name : "Wasserlementarwächter", Name AC enUS : "Guardian Water Elemental" ; Wowhead enUS : "Guardian Water Elemental"
@@ -8365,39 +8305,39 @@ UPDATE `creature_template_locale` SET `Name` = 'Ausbilder Cel', `VerifiedBuild` 
 UPDATE `creature_template_locale` SET `Name` = 'Unterwerfer Vaz''shir', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18660;
 -- AC datas : OLD Name : "Abgesandte des Echsenkessels", Name AC enUS : "Coilfang Emissary" ; Wowhead enUS : "Coilfang Emissary"
 UPDATE `creature_template_locale` SET `Name` = 'Abgesandter des Echsenkessels', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18681;
--- AC datas : OLD Subname : "Bergbaulehrer", Subname AC enUS : "Master Mining Trainer"" ; Wowhead enUS : "Master Mining Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Bergbaumeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18747;
--- AC datas : OLD Subname : "Kräuterkundelehrer", Subname AC enUS : "Master Herbalism Trainer"" ; Wowhead enUS : "Master Herbalism Trainer"
+-- AC datas : OLD Name : "Krugosh", Name AC enUS : "Krugosh" ; Wowhead enUS : "Krugosh",  OLD Subname : "Bergbaulehrer", Subname AC enUS : "Master Mining Trainer" ; Wowhead enUS : "Master Mining Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Bergbaumeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18747;
+-- AC datas : OLD Subname : "Kräuterkundelehrer", Subname AC enUS : "Master Herbalism Trainer" ; Wowhead enUS : "Master Herbalism Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Kräuterkundemeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18748;
--- AC datas : OLD Subname : "Schneiderlehrerin", Subname AC enUS : "Master Tailoring Trainer"" ; Wowhead enUS : "Master Tailoring Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Schneidermeisterlehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18749;
--- AC datas : OLD Subname : "Juwelierskunstlehrer", Subname AC enUS : "Master Jewelcrafting Trainer"" ; Wowhead enUS : "Master Jewelcrafting Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Juwelenschleifermeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18751;
--- AC datas : OLD Subname : "Ingenieurskunstlehrer", Subname AC enUS : "Master Engineering Trainer"" ; Wowhead enUS : "Master Engineering Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Meisteringenieurslehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18752;
--- AC datas : OLD Subname : "Verzauberkunstlehrerin", Subname AC enUS : "Master Enchanting Trainer"" ; Wowhead enUS : "Master Enchanting Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Verzauberkunstmeisterlehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18753;
--- AC datas : OLD Subname : "Lederverarbeitungslehrer", Subname AC enUS : "Master Leatherworking Trainer"" ; Wowhead enUS : "Master Leatherworking Trainer"
+-- AC datas : OLD Name : "Dalinna", Name AC enUS : "Dalinna" ; Wowhead enUS : "Dalinna",  OLD Subname : "Schneiderlehrerin", Subname AC enUS : "Master Tailoring Trainer" ; Wowhead enUS : "Master Tailoring Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Schneidermeisterlehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18749;
+-- AC datas : OLD Name : "Kalaen", Name AC enUS : "Kalaen" ; Wowhead enUS : "Kalaen",  OLD Subname : "Juwelierskunstlehrer", Subname AC enUS : "Master Jewelcrafting Trainer" ; Wowhead enUS : "Master Jewelcrafting Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Juwelenschleifermeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18751;
+-- AC datas : OLD Name : "Zebig", Name AC enUS : "Zebig" ; Wowhead enUS : "Zebig",  OLD Subname : "Ingenieurskunstlehrer", Subname AC enUS : "Master Engineering Trainer" ; Wowhead enUS : "Master Engineering Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Meisteringenieurslehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18752;
+-- AC datas : OLD Name : "Felannia", Name AC enUS : "Felannia" ; Wowhead enUS : "Felannia",  OLD Subname : "Verzauberkunstlehrerin", Subname AC enUS : "Master Enchanting Trainer" ; Wowhead enUS : "Master Enchanting Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Verzauberkunstmeisterlehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18753;
+-- AC datas : OLD Subname : "Lederverarbeitungslehrer", Subname AC enUS : "Master Leatherworking Trainer" ; Wowhead enUS : "Master Leatherworking Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Lederverarbeitungsmeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18754;
--- AC datas : OLD Subname : "Kürschnerlehrer", Subname AC enUS : "Master Skinning Trainer"" ; Wowhead enUS : "Master Skinning Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Kürschnermeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18755;
--- AC datas : OLD Subname : "Lederverarbeitungslehrer", Subname AC enUS : "Master Leatherworking Trainer"" ; Wowhead enUS : "Master Leatherworking Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Lederverarbeitungsmeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18771;
--- AC datas : OLD Subname : "Schneiderlehrerin", Subname AC enUS : "Master Tailoring Trainer"" ; Wowhead enUS : "Master Tailoring Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Schneidermeisterlehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18772;
--- AC datas : OLD Subname : "Verzauberkunstlehrer", Subname AC enUS : "Master Enchanting Trainer"" ; Wowhead enUS : "Master Enchanting Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Verzauberkunstmeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18773;
--- AC datas : OLD Subname : "Juwelierskunstlehrerin", Subname AC enUS : "Master Jewelcrafting Trainer"" ; Wowhead enUS : "Master Jewelcrafting Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Juwelenschleifermeisterlehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18774;
--- AC datas : OLD Subname : "Ingenieurskunstlehrer", Subname AC enUS : "Master Engineering Trainer"" ; Wowhead enUS : "Master Engineering Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Meisteringenieurslehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18775;
--- AC datas : OLD Subname : "Kräuterkundelehrerin", Subname AC enUS : "Master Herbalism Trainer"" ; Wowhead enUS : "Master Herbalism Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Kräuterkundemeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18776;
--- AC datas : OLD Subname : "Kürschnerlehrerin", Subname AC enUS : "Master Skinning Trainer"" ; Wowhead enUS : "Master Skinning Trainer"
+-- AC datas : OLD Name : "Moorutu", Name AC enUS : "Moorutu" ; Wowhead enUS : "Moorutu",  OLD Subname : "Kürschnerlehrer", Subname AC enUS : "Master Skinning Trainer" ; Wowhead enUS : "Master Skinning Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Kürschnermeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18755;
+-- AC datas : OLD Name : "Brumman", Name AC enUS : "Brumman" ; Wowhead enUS : "Brumman",  OLD Subname : "Lederverarbeitungslehrer", Subname AC enUS : "Master Leatherworking Trainer" ; Wowhead enUS : "Master Leatherworking Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Lederverarbeitungsmeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18771;
+-- AC datas : OLD Name : "Hama", Name AC enUS : "Hama" ; Wowhead enUS : "Hama",  OLD Subname : "Schneiderlehrerin", Subname AC enUS : "Master Tailoring Trainer" ; Wowhead enUS : "Master Tailoring Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Schneidermeisterlehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18772;
+-- AC datas : OLD Name : "Johan Barnes", Name AC enUS : "Johan Barnes" ; Wowhead enUS : "Johan Barnes",  OLD Subname : "Verzauberkunstlehrer", Subname AC enUS : "Master Enchanting Trainer" ; Wowhead enUS : "Master Enchanting Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Verzauberkunstmeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18773;
+-- AC datas : OLD Name : "Tatiana", Name AC enUS : "Tatiana" ; Wowhead enUS : "Tatiana",  OLD Subname : "Juwelierskunstlehrerin", Subname AC enUS : "Master Jewelcrafting Trainer" ; Wowhead enUS : "Master Jewelcrafting Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Juwelenschleifermeisterlehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18774;
+-- AC datas : OLD Name : "Lebowski", Name AC enUS : "Lebowski" ; Wowhead enUS : "Lebowski",  OLD Subname : "Ingenieurskunstlehrer", Subname AC enUS : "Master Engineering Trainer" ; Wowhead enUS : "Master Engineering Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Meisteringenieurslehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18775;
+-- AC datas : OLD Name : "Rorelien", Name AC enUS : "Rorelien" ; Wowhead enUS : "Rorelien",  OLD Subname : "Kräuterkundelehrerin", Subname AC enUS : "Master Herbalism Trainer" ; Wowhead enUS : "Master Herbalism Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Kräuterkundemeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18776;
+-- AC datas : OLD Subname : "Kürschnerlehrerin", Subname AC enUS : "Master Skinning Trainer" ; Wowhead enUS : "Master Skinning Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Kürschnermeisterlehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18777;
--- AC datas : OLD Subname : "Bergbaulehrer", Subname AC enUS : "Master Mining Trainer"" ; Wowhead enUS : "Master Mining Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Bergbaumeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18779;
--- AC datas : OLD Subname : "Alchemielehrer", Subname AC enUS : "Master Alchemy Trainer"" ; Wowhead enUS : "Master Alchemy Trainer"
+-- AC datas : OLD Name : "Hurnak Grimmord", Name AC enUS : "Hurnak Grimmord" ; Wowhead enUS : "Hurnak Grimmord",  OLD Subname : "Bergbaulehrer", Subname AC enUS : "Master Mining Trainer" ; Wowhead enUS : "Master Mining Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Bergbaumeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18779;
+-- AC datas : OLD Subname : "Alchemielehrer", Subname AC enUS : "Master Alchemy Trainer" ; Wowhead enUS : "Master Alchemy Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Alchemiemeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18802;
 -- AC datas : OLD Name : "Botschafter Frasaboo der Tannenruhfeste", Name AC enUS : "Stillpine Ambassador Frasaboo" ; Wowhead enUS : "Stillpine Ambassador Olorg"
 UPDATE `creature_template_locale` SET `Name` = 'Botschafter Olorg der Tannenruhfeste', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18803;
@@ -8405,97 +8345,97 @@ UPDATE `creature_template_locale` SET `Name` = 'Botschafter Olorg der Tannenruhf
 UPDATE `creature_template_locale` SET `Name` = 'Lord der Leere', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18871;
 -- AC datas : OLD Name : "Wache des Sumpfrattenpostens", Name AC enUS : "Swamprat Guard" ; Wowhead enUS : "Swamprat Guard"
 UPDATE `creature_template_locale` SET `Name` = 'Sumpfrattenwache', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18910;
--- AC datas : OLD Subname : "Angellehrer", Subname AC enUS : "Master Fishing Trainer"" ; Wowhead enUS : "Master Fishing Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Großmeister des Angelns', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18911;
--- AC datas : OLD Subname : "Kochkunstlehrer", Subname AC enUS : "Chef"" ; Wowhead enUS : "Chef"
-UPDATE `creature_template_locale` SET `Title` = 'Küchenchef', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18987;
--- AC datas : OLD Subname : "Kochkunstlehrer", Subname AC enUS : "Chef"" ; Wowhead enUS : "Chef"
-UPDATE `creature_template_locale` SET `Title` = 'Küchenchef', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18988;
--- AC datas : OLD Subname : "Lehrer für Erste Hilfe", Subname AC enUS : "Medic"" ; Wowhead enUS : "Medic"
-UPDATE `creature_template_locale` SET `Title` = 'Sanitäter', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18990;
--- AC datas : OLD Subname : "Lehrerin für Erste Hilfe", Subname AC enUS : "Medic"" ; Wowhead enUS : "Medic"
-UPDATE `creature_template_locale` SET `Title` = 'Sanitäter', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18991;
--- AC datas : OLD Subname : "Kochkunstlehrerin & -bedarf", Subname AC enUS : "Cooking Supplies"" ; Wowhead enUS : "Cooking Supplies"
-UPDATE `creature_template_locale` SET `Title` = 'Kochbedarf', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18993;
--- AC datas : OLD Subname : "Alchemielehrer", Subname AC enUS : "Master Alchemy Trainer"" ; Wowhead enUS : "Master Alchemy Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Alchemiemeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19052;
--- AC datas : OLD Subname : "Juwelierskunstlehrer", Subname AC enUS : "Master Jewelcrafting Trainer"" ; Wowhead enUS : "Master Jewelcrafting Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Juwelenschleifermeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19063;
--- AC datas : OLD Subname : "Juwelierskunstbedarf", Subname AC enUS : "Jewelcrafting Supplies Vendor"" ; Wowhead enUS : "Jewelcrafting Supplies Vendor"
-UPDATE `creature_template_locale` SET `Title` = 'Juwelenschleiferbedarf', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19065;
+-- AC datas : OLD Name : "Juno Dufrain", Name AC enUS : "Juno Dufrain" ; Wowhead enUS : "Juno Dufrain",  OLD Subname : "Angellehrer", Subname AC enUS : "Master Fishing Trainer" ; Wowhead enUS : "Master Fishing Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Großmeister des Angelns', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18911;
+-- AC datas : OLD Name : "Gaston", Name AC enUS : "Gaston" ; Wowhead enUS : "Gaston",  OLD Subname : "Kochkunstlehrer", Subname AC enUS : "Chef" ; Wowhead enUS : "Chef"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Küchenchef', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18987;
+-- AC datas : OLD Name : "Baxter", Name AC enUS : "Baxter" ; Wowhead enUS : "Baxter",  OLD Subname : "Kochkunstlehrer", Subname AC enUS : "Chef" ; Wowhead enUS : "Chef"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Küchenchef', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18988;
+-- AC datas : OLD Name : "Burko", Name AC enUS : "Burko" ; Wowhead enUS : "Burko",  OLD Subname : "Lehrer für Erste Hilfe", Subname AC enUS : "Medic" ; Wowhead enUS : "Medic"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Sanitäter', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18990;
+-- AC datas : OLD Name : "Aresella", Name AC enUS : "Aresella" ; Wowhead enUS : "Aresella",  OLD Subname : "Lehrerin für Erste Hilfe", Subname AC enUS : "Medic" ; Wowhead enUS : "Medic"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Sanitäter', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18991;
+-- AC datas : OLD Name : "Naka", Name AC enUS : "Naka" ; Wowhead enUS : "Naka",  OLD Subname : "Kochkunstlehrerin & -bedarf", Subname AC enUS : "Cooking Supplies" ; Wowhead enUS : "Cooking Supplies"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Kochbedarf', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18993;
+-- AC datas : OLD Name : "Lorokeem", Name AC enUS : "Lorokeem" ; Wowhead enUS : "Lorokeem",  OLD Subname : "Alchemielehrer", Subname AC enUS : "Master Alchemy Trainer" ; Wowhead enUS : "Master Alchemy Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Alchemiemeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19052;
+-- AC datas : OLD Name : "Hamanar", Name AC enUS : "Hamanar" ; Wowhead enUS : "Hamanar",  OLD Subname : "Juwelierskunstlehrer", Subname AC enUS : "Master Jewelcrafting Trainer" ; Wowhead enUS : "Master Jewelcrafting Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Juwelenschleifermeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19063;
+-- AC datas : OLD Name : "Inessera", Name AC enUS : "Inessera" ; Wowhead enUS : "Inessera",  OLD Subname : "Juwelierskunstbedarf", Subname AC enUS : "Jewelcrafting Supplies Vendor" ; Wowhead enUS : "Jewelcrafting Supplies Vendor"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Juwelenschleiferbedarf', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19065;
 -- AC datas : OLD Name : "Wolfsreiter von Garadar", Name AC enUS : "Garadar Wolf Rider" ; Wowhead enUS : "Garadar Wolf Rider"
 UPDATE `creature_template_locale` SET `Name` = 'Wolfreiter von Garadar', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19068;
 -- AC datas : OLD Name : "Wichtel der Flammenschürer", Name AC enUS : "Flamewaker Imp" ; Wowhead enUS : "Flamewaker Imp"
 UPDATE `creature_template_locale` SET `Name` = 'Flammenschürerwichtel', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19136;
--- AC datas : OLD Subname : "", Subname AC enUS : "Horse Pet Trainer"" ; Wowhead enUS : "Horse Pet Trainer"
+-- AC datas : OLD Subname : "", Subname AC enUS : "Horse Pet Trainer" ; Wowhead enUS : "Horse Pet Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Tierausbilderin für Pferde', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19145;
--- AC datas : OLD Subname : "Kürschnerlehrer", Subname AC enUS : "Master Skinning Trainer"" ; Wowhead enUS : "Master Skinning Trainer"
+-- AC datas : OLD Subname : "Kürschnerlehrer", Subname AC enUS : "Master Skinning Trainer" ; Wowhead enUS : "Master Skinning Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Kürschnermeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19180;
--- AC datas : OLD Subname : "Lehrerin für Erste Hilfe", Subname AC enUS : "Physician"" ; Wowhead enUS : "Physician"
-UPDATE `creature_template_locale` SET `Title` = 'Heilerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19184;
--- AC datas : OLD Subname : "Kochkunstlehrer", Subname AC enUS : "Cook"" ; Wowhead enUS : "Cook"
-UPDATE `creature_template_locale` SET `Title` = 'Koch', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19185;
--- AC datas : OLD Subname : "Lederverarbeitungslehrerin", Subname AC enUS : "Master Leatherworking Trainer"" ; Wowhead enUS : "Master Leatherworking Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Lederverarbeitungsmeisterlehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19187;
+-- AC datas : OLD Name : "Mildred Fletcher", Name AC enUS : "Mildred Fletcher" ; Wowhead enUS : "Mildred Fletcher",  OLD Subname : "Lehrerin für Erste Hilfe", Subname AC enUS : "Physician" ; Wowhead enUS : "Physician"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Heilerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19184;
+-- AC datas : OLD Name : "Jack Trapper", Name AC enUS : "Jack Trapper" ; Wowhead enUS : "Jack Trapper",  OLD Subname : "Kochkunstlehrer", Subname AC enUS : "Cook" ; Wowhead enUS : "Cook"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Koch', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19185;
+-- AC datas : OLD Name : "Darmari", Name AC enUS : "Darmari" ; Wowhead enUS : "Darmari",  OLD Subname : "Lederverarbeitungslehrerin", Subname AC enUS : "Master Leatherworking Trainer" ; Wowhead enUS : "Master Leatherworking Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Lederverarbeitungsmeisterlehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19187;
 -- AC datas : OLD Name : "Leerenreisender", Name AC enUS : "Void Traveler" ; Wowhead enUS : "Void Traveler"
 UPDATE `creature_template_locale` SET `Name` = 'Leerreisender', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19226;
--- AC datas : OLD Subname : "Verzauberkunstlehrer", Subname AC enUS : "Master Enchanting Trainer"" ; Wowhead enUS : "Master Enchanting Trainer"
+-- AC datas : OLD Subname : "Verzauberkunstlehrer", Subname AC enUS : "Master Enchanting Trainer" ; Wowhead enUS : "Master Enchanting Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Verzauberkunstmeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19252;
 -- AC datas : OLD Name : "Gepanzerter Wyvernzerstörer", Name AC enUS : "Armored Wyvern Destroyer" ; Wowhead enUS : "Armored Wyvern Destroyer"
 UPDATE `creature_template_locale` SET `Name` = 'Gepanzerter Flügeldrachenzerstörer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19275;
 -- AC datas : OLD Name : "Unteroffizierin Altumus", Name AC enUS : "Sergeant Altumus" ; Wowhead enUS : "Sergeant Altumus"
 UPDATE `creature_template_locale` SET `Name` = 'Unteroffizier Altumus', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19309;
--- AC datas : OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Master Blacksmithing Trainer"" ; Wowhead enUS : "Master Blacksmithing Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Schmiedekunstmeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19341;
--- AC datas : OLD Subname : "Schusswaffen", Subname AC enUS : "Guns & Ammunition"" ; Wowhead enUS : "Guns & Ammunition"
+-- AC datas : OLD Name : "Grutah", Name AC enUS : "Grutah" ; Wowhead enUS : "Grutah",  OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Master Blacksmithing Trainer" ; Wowhead enUS : "Master Blacksmithing Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Schmiedekunstmeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19341;
+-- AC datas : OLD Subname : "Schusswaffen", Subname AC enUS : "Guns & Ammunition" ; Wowhead enUS : "Guns & Ammunition"
 UPDATE `creature_template_locale` SET `Title` = 'Schusswaffen & Munition', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19351;
--- AC datas : OLD Subname : "Kochkunstlehrerin", Subname AC enUS : "Cook"" ; Wowhead enUS : "Cook"
+-- AC datas : OLD Subname : "Kochkunstlehrerin", Subname AC enUS : "Cook" ; Wowhead enUS : "Cook"
 UPDATE `creature_template_locale` SET `Title` = 'Köchin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19369;
 -- AC datas : OLD Name : "Nekrolyt des Blutenden Auges", Name AC enUS : "Bleeding Hollow Necrolyte" ; Wowhead enUS : "Bleeding Hollow Necrolyte"
 UPDATE `creature_template_locale` SET `Name` = 'Nekrolyth des Blutenden Auges', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19422;
--- AC datas : OLD Subname : "Wurfwaffen", Subname AC enUS : "Throwing Weapons & Ammunition"" ; Wowhead enUS : "Throwing Weapons & Ammunition"
-UPDATE `creature_template_locale` SET `Title` = 'Wurfwaffen und Munition', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19473;
+-- AC datas : OLD Name : "Raiza", Name AC enUS : "Raiza" ; Wowhead enUS : "Raiza",  OLD Subname : "Wurfwaffen", Subname AC enUS : "Throwing Weapons & Ammunition" ; Wowhead enUS : "Throwing Weapons & Ammunition"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Wurfwaffen und Munition', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19473;
 -- AC datas : OLD Name : "Welt Ausbilder für fliegende Reittiere", Name AC enUS : "World Flying Mount Trainer" ; Wowhead enUS : "World Flying Mount Trainer"
 UPDATE `creature_template_locale` SET `Name` = 'Welt Ausblider für fliegende Reittiere', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19490;
--- AC datas : OLD Subname : "Stallmeisterin", Subname AC enUS : "Horse Riding Trainer"" ; Wowhead enUS : "Horse Riding Trainer"
+-- AC datas : OLD Subname : "Stallmeisterin", Subname AC enUS : "Horse Riding Trainer" ; Wowhead enUS : "Horse Riding Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Pferdereitlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19491;
--- AC datas : OLD Subname : "Stallmeisterin", Subname AC enUS : "Horse Riding Trainer"" ; Wowhead enUS : "Horse Riding Trainer"
+-- AC datas : OLD Subname : "Stallmeisterin", Subname AC enUS : "Horse Riding Trainer" ; Wowhead enUS : "Horse Riding Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Pferdereitlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19492;
 -- AC datas : OLD Name : "Agent des Unteren Viertels", Name AC enUS : "Lower City Operative" ; Wowhead enUS : "Lower City Operative"
 UPDATE `creature_template_locale` SET `Name` = 'Agent des unteren Viertels', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19501;
 -- AC datas : OLD Name : "Heiler des Unteren Viertels", Name AC enUS : "Lower City Healer" ; Wowhead enUS : "Lower City Healer"
 UPDATE `creature_template_locale` SET `Name` = 'Heiler des unteren Viertels', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19502;
--- AC datas : OLD Subname : "Rüstungsschmiedin", Subname AC enUS : "Armorer"" ; Wowhead enUS : "Armorer"
-UPDATE `creature_template_locale` SET `Title` = 'Rüstungsschmied', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19517;
--- AC datas : OLD Subname : "Edelsteine & Juwelierskunstbedarf", Subname AC enUS : "Gems & Jewelcrafting Supplies"" ; Wowhead enUS : "Gems & Jewelcrafting Supplies"
+-- AC datas : OLD Name : "Alorra", Name AC enUS : "Alorra" ; Wowhead enUS : "Alorra",  OLD Subname : "Rüstungsschmiedin", Subname AC enUS : "Armorer" ; Wowhead enUS : "Armorer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Rüstungsschmied', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19517;
+-- AC datas : OLD Subname : "Edelsteine & Juwelierskunstbedarf", Subname AC enUS : "Gems & Jewelcrafting Supplies" ; Wowhead enUS : "Gems & Jewelcrafting Supplies"
 UPDATE `creature_template_locale` SET `Title` = 'Edelsteine & Juwelenschleiferbedarf', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19538;
--- AC datas : OLD Subname : "Juwelierskunstlehrer", Subname AC enUS : "Master Jewelcrafting Trainer"" ; Wowhead enUS : "Master Jewelcrafting Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Juwelenschleifermeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19539;
--- AC datas : OLD Subname : "Verzauberkunstlehrer", Subname AC enUS : "Master Enchanting Trainer"" ; Wowhead enUS : "Master Enchanting Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Verzauberkunstmeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19540;
--- AC datas : OLD Subname : "Ingenieurskunstlehrer", Subname AC enUS : "Master Engineering Trainer"" ; Wowhead enUS : "Master Engineering Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Meisteringenieurslehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19576;
--- AC datas : OLD Subname : "Juwelierskunstlehrling", Subname AC enUS : "Apprentice Jewelcrafter"" ; Wowhead enUS : "Apprentice Jewelcrafter"
-UPDATE `creature_template_locale` SET `Title` = 'Juwelenschleiferlehrling', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19774;
--- AC datas : OLD Subname : "Juwelierskunstlehrerin", Subname AC enUS : "Jewelcrafting Trainer"" ; Wowhead enUS : "Jewelcrafting Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Juwelenschleiferlehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19775;
--- AC datas : OLD Subname : "Juwelierskunstlehrling", Subname AC enUS : "Apprentice Jewelcrafter"" ; Wowhead enUS : "Apprentice Jewelcrafter"
-UPDATE `creature_template_locale` SET `Title` = 'Juwelenschleiferlehrling', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19777;
--- AC datas : OLD Subname : "Juwelierskunstlehrerin", Subname AC enUS : "Jewelcrafting Trainer"" ; Wowhead enUS : "Jewelcrafting Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Juwelenschleiferlehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19778;
+-- AC datas : OLD Name : "Jazdalaad", Name AC enUS : "Jazdalaad" ; Wowhead enUS : "Jazdalaad",  OLD Subname : "Juwelierskunstlehrer", Subname AC enUS : "Master Jewelcrafting Trainer" ; Wowhead enUS : "Master Jewelcrafting Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Juwelenschleifermeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19539;
+-- AC datas : OLD Name : "Asarnan", Name AC enUS : "Asarnan" ; Wowhead enUS : "Asarnan",  OLD Subname : "Verzauberkunstlehrer", Subname AC enUS : "Master Enchanting Trainer" ; Wowhead enUS : "Master Enchanting Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Verzauberkunstmeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19540;
+-- AC datas : OLD Name : "Xyrol", Name AC enUS : "Xyrol" ; Wowhead enUS : "Xyrol",  OLD Subname : "Ingenieurskunstlehrer", Subname AC enUS : "Master Engineering Trainer" ; Wowhead enUS : "Master Engineering Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Meisteringenieurslehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19576;
+-- AC datas : OLD Name : "Toban", Name AC enUS : "Toban" ; Wowhead enUS : "Toban",  OLD Subname : "Juwelierskunstlehrling", Subname AC enUS : "Apprentice Jewelcrafter" ; Wowhead enUS : "Apprentice Jewelcrafter"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Juwelenschleiferlehrling', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19774;
+-- AC datas : OLD Name : "Kalinda", Name AC enUS : "Kalinda" ; Wowhead enUS : "Kalinda",  OLD Subname : "Juwelierskunstlehrerin", Subname AC enUS : "Jewelcrafting Trainer" ; Wowhead enUS : "Jewelcrafting Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Juwelenschleiferlehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19775;
+-- AC datas : OLD Name : "Elaando", Name AC enUS : "Elaando" ; Wowhead enUS : "Elaando",  OLD Subname : "Juwelierskunstlehrling", Subname AC enUS : "Apprentice Jewelcrafter" ; Wowhead enUS : "Apprentice Jewelcrafter"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Juwelenschleiferlehrling', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19777;
+-- AC datas : OLD Name : "Farii", Name AC enUS : "Farii" ; Wowhead enUS : "Farii",  OLD Subname : "Juwelierskunstlehrerin", Subname AC enUS : "Jewelcrafting Trainer" ; Wowhead enUS : "Jewelcrafting Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Juwelenschleiferlehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19778;
 -- AC datas : OLD Name : "Bild von Kommandantin Sarannis", Name AC enUS : "Image of Commander Sarannis" ; Wowhead enUS : "Image of Commander Sarannis"
 UPDATE `creature_template_locale` SET `Name` = 'Bild von Kommandant Sarannis', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19938;
 -- AC datas : OLD Name : "Astromantenfürst", Name AC enUS : "Astromancer Lord" ; Wowhead enUS : "Astromancer Lord"
 UPDATE `creature_template_locale` SET `Name` = 'Astromantenlord', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 20046;
 -- AC datas : OLD Name : "Versuchsobjekt: Wachposten von Lodaeron", Name AC enUS : "Lodaeron Sentry Specimen" ; Wowhead enUS : "Lodaeron Sentry Specimen"
 UPDATE `creature_template_locale` SET `Name` = 'Versuchsobjekt: Wachposten von Lordaeron', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 20053;
--- AC datas : OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Weaponsmith Trainer"" ; Wowhead enUS : "Weaponsmith Trainer"
+-- AC datas : OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Weaponsmith Trainer" ; Wowhead enUS : "Weaponsmith Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Waffenschmiedelehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 20124;
--- AC datas : OLD Subname : "Schmiedekunstlehrerin", Subname AC enUS : "Armorsmith Trainer"" ; Wowhead enUS : "Armorsmith Trainer"
+-- AC datas : OLD Subname : "Schmiedekunstlehrerin", Subname AC enUS : "Armorsmith Trainer" ; Wowhead enUS : "Armorsmith Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Rüstungsschmiedelehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 20125;
 -- AC datas : OLD Name : "Blutdürstiger Marschenfang", Name AC enUS : "Bloodthirsty Marshfang" ; Wowhead enUS : "Bloodthirsty Marshfang"
 UPDATE `creature_template_locale` SET `Name` = 'Blutdurstiger Marschenfänger', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 20196;
--- AC datas : OLD Subname : "Überholte Arenarüstungen", Subname AC enUS : "Brutal Arena Vendor"" ; Wowhead enUS : "Brutal Arena Vendor"
+-- AC datas : OLD Subname : "Überholte Arenarüstungen", Subname AC enUS : "Brutal Arena Vendor" ; Wowhead enUS : "Brutal Arena Vendor"
 UPDATE `creature_template_locale` SET `Title` = 'Brutaler Arenaverkäufer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 20278;
 -- AC datas : OLD Name : "Käpt'n Sanders", Name AC enUS : "Captain Sanders" ; Wowhead enUS : "Captain Sanders"
 UPDATE `creature_template_locale` SET `Name` = 'Kapitän Sanders', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 20351;
@@ -8517,16 +8457,16 @@ UPDATE `creature_template_locale` SET `Name` = 'Bürger des Hügellands', `Verif
 UPDATE `creature_template_locale` SET `Name` = 'Brauner Hase', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 20472;
 -- AC datas : OLD Name : "Lohfarbener Windreiter", Name AC enUS : "Tawny Wind Rider" ; Wowhead enUS : "Tawny Wind Rider"
 UPDATE `creature_template_locale` SET `Name` = 'Gelbbrauner Windreiter', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 20488;
--- AC datas : OLD Subname : "Fluglehrer", Subname AC enUS : "Riding Trainer"" ; Wowhead enUS : "Riding Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Reitlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 20500;
--- AC datas : OLD Subname : "Fluglehrerin", Subname AC enUS : "Riding Trainer"" ; Wowhead enUS : "Riding Trainer"
+-- AC datas : OLD Name : "Olrokk", Name AC enUS : "Olrokk" ; Wowhead enUS : "Olrokk",  OLD Subname : "Fluglehrer", Subname AC enUS : "Riding Trainer" ; Wowhead enUS : "Riding Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Reitlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 20500;
+-- AC datas : OLD Subname : "Fluglehrerin", Subname AC enUS : "Riding Trainer" ; Wowhead enUS : "Riding Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Reitlehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 20511;
 -- AC datas : OLD Name : "Aragas Junges", Name AC enUS : "Darkmaw Cub" ; Wowhead enUS : "Darkmaw Cub"
 UPDATE `creature_template_locale` SET `Name` = 'Dunkeltatzenjunges', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 20615;
 -- AC datas : OLD Name : "Feendrache", Name AC enUS : "Fey Drake" ; Wowhead enUS : "Fey Drake"
 UPDATE `creature_template_locale` SET `Name` = 'Siechdrache', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 20713;
--- AC datas : OLD Name : "Rek'tor", Name AC enUS : "Outland Raptor, Black" ; Wowhead enUS : "Outland Raptor, Black",  OLD Subname : "Colin O'Rourkes Tier", Subname AC enUS : """ ; Wowhead enUS : ""
-UPDATE `creature_template_locale` SET `Name` = 'Scherbenweltraptor, Schwarz', `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 20716;
+-- AC datas : OLD Name : "Rek'tor", Name AC enUS : "Outland Raptor, Black" ; Wowhead enUS : "Outland Raptor, Black"
+UPDATE `creature_template_locale` SET `Name` = 'Scherbenweltraptor, Schwarz', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 20716;
 -- AC datas : OLD Name : "Erstarrter Leerenschrecken", Name AC enUS : "Congealed Void Horror" ; Wowhead enUS : "Congealed Void Horror"
 UPDATE `creature_template_locale` SET `Name` = 'Erstarrter Schrecken der Leere', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 20779;
 -- AC datas : OLD Name : "Akkiris-Blitzrufer", Name AC enUS : "Akkiris Lightning-Waker" ; Wowhead enUS : "Akkiris Lightning-Waker"
@@ -8535,30 +8475,28 @@ UPDATE `creature_template_locale` SET `Name` = 'Akkiris Blitzrufer', `VerifiedBu
 UPDATE `creature_template_locale` SET `Name` = 'Unkillable Test Dummy 73 Raid Debuffed Warrior', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 21003;
 -- AC datas : OLD Name : "Verteidiger des Lebenden Hains", Name AC enUS : "Living Grove Defender" ; Wowhead enUS : "Living Grove Defender"
 UPDATE `creature_template_locale` SET `Name` = 'Verteidiger des lebenden Hains', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 21072;
--- AC datas : OLD Subname : "Lederverarbeitungslehrerin", Subname AC enUS : "Master Leatherworking Trainer"" ; Wowhead enUS : "Master Leatherworking Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Lederverarbeitungsmeisterlehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 21087;
+-- AC datas : OLD Name : "Grikka", Name AC enUS : "Grikka" ; Wowhead enUS : "Grikka",  OLD Subname : "Lederverarbeitungslehrerin", Subname AC enUS : "Master Leatherworking Trainer" ; Wowhead enUS : "Master Leatherworking Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Lederverarbeitungsmeisterlehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 21087;
 -- AC datas : OLD Name : "Wyvernreiter der Kor'kron", Name AC enUS : "Kor'kron Wyvern Rider" ; Wowhead enUS : "Kor'kron Wyvern Rider"
 UPDATE `creature_template_locale` SET `Name` = 'Flügeldrachenreiter der Kor''kron', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 21153;
 -- AC datas : OLD Name : "Gepanzerter Reitwyvern der Kor'kron", Name AC enUS : "Kor'kron Armored Wyvern Mount" ; Wowhead enUS : "Kor'kron Armored Wyvern Mount"
 UPDATE `creature_template_locale` SET `Name` = 'Gepanzerter Reitflügeldrache der Kor''kron', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 21154;
--- AC datas : OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Master Blacksmithing Trainer"" ; Wowhead enUS : "Master Blacksmithing Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Schmiedekunstmeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 21209;
+-- AC datas : OLD Name : "Dumphry", Name AC enUS : "Dumphry" ; Wowhead enUS : "Dumphry",  OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Master Blacksmithing Trainer" ; Wowhead enUS : "Master Blacksmithing Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Schmiedekunstmeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 21209;
 -- AC datas : OLD Name : "Hydromant der Gezeitenwandler", Name AC enUS : "Tidewalker Hydromancer" ; Wowhead enUS : "Tidewalker Hydromancer"
 UPDATE `creature_template_locale` SET `Name` = 'Wasserbeschwörer der Gezeitenwandler', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 21228;
 -- AC datas : OLD Name : "Sickernder Schlamm", Name AC enUS : "Seeping Ooze" ; Wowhead enUS : "Seeping Ooze"
 UPDATE `creature_template_locale` SET `Name` = 'Sickernder Brühschlammer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 21264;
 -- AC datas : OLD Name : "Gesandter Icarius", Name AC enUS : "Envoy Icarius" ; Wowhead enUS : "Envoy Icarius"
 UPDATE `creature_template_locale` SET `Name` = 'Entsandter Icarius', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 21409;
--- AC datas : OLD Name : "Gnomenverteidiger", Name AC enUS : "Gnome Defender - 209" ; Wowhead enUS : "Gnome Defender - 209"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 21426;
--- AC datas : OLD Subname : "", Subname AC enUS : "Ammunition"" ; Wowhead enUS : "Ammunition"
-UPDATE `creature_template_locale` SET `Title` = 'Munition', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 21483;
--- AC datas : OLD Subname : "", Subname AC enUS : "Ammunition"" ; Wowhead enUS : "Ammunition"
-UPDATE `creature_template_locale` SET `Title` = 'Munition', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 21488;
--- AC datas : OLD Subname : "Reagenzien & Gifte", Subname AC enUS : "Reagents & Poison Supplies"" ; Wowhead enUS : "Reagents & Poison Supplies"
-UPDATE `creature_template_locale` SET `Title` = 'Reagenzien & Giftreagenzien', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 21642;
--- AC datas : OLD Subname : "Rüstmeister des Unteren Viertels", Subname AC enUS : "Lower City Quartermaster"" ; Wowhead enUS : "Lower City Quartermaster"
-UPDATE `creature_template_locale` SET `Title` = 'Rüstmeister des unteren Viertels', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 21655;
+-- AC datas : OLD Name : "Tasaldan", Name AC enUS : "Tasaldan" ; Wowhead enUS : "Tasaldan",  OLD Subname : "", Subname AC enUS : "Ammunition" ; Wowhead enUS : "Ammunition"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Munition', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 21483;
+-- AC datas : OLD Name : "Banro", Name AC enUS : "Banro" ; Wowhead enUS : "Banro",  OLD Subname : "", Subname AC enUS : "Ammunition" ; Wowhead enUS : "Ammunition"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Munition', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 21488;
+-- AC datas : OLD Name : "Alrumi", Name AC enUS : "Alrumi" ; Wowhead enUS : "Alrumi",  OLD Subname : "Reagenzien & Gifte", Subname AC enUS : "Reagents & Poison Supplies" ; Wowhead enUS : "Reagents & Poison Supplies"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Reagenzien & Giftreagenzien', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 21642;
+-- AC datas : OLD Name : "Nakodu", Name AC enUS : "Nakodu" ; Wowhead enUS : "Nakodu",  OLD Subname : "Rüstmeister des Unteren Viertels", Subname AC enUS : "Lower City Quartermaster" ; Wowhead enUS : "Lower City Quartermaster"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Rüstmeister des unteren Viertels', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 21655;
 -- AC datas : OLD Name : "Orcnekrolyt", Name AC enUS : "Orc Necrolyte" ; Wowhead enUS : "Orc Necrolyte"
 UPDATE `creature_template_locale` SET `Name` = 'Orcnekrolyth', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 21747;
 -- AC datas : OLD Name : "Sturm der Leere des Singenden Bergrückens", Name AC enUS : "Singing Ridge Void Storm" ; Wowhead enUS : "Singing Ridge Void Storm"
@@ -8571,18 +8509,18 @@ UPDATE `creature_template_locale` SET `Name` = 'Entsandter vom Auge des Sturms',
 UPDATE `creature_template_locale` SET `Name` = 'Arenapromoter', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 22101;
 -- AC datas : OLD Name : "Feuriger Brocken", Name AC enUS : "Fiery Boulder" ; Wowhead enUS : "Fiery Boulder"
 UPDATE `creature_template_locale` SET `Name` = 'Feuriger Felsen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 22161;
--- AC datas : OLD Subname : "Spezialistin für Mondstoffschneiderei", Subname AC enUS : "Mooncloth Specialist"" ; Wowhead enUS : "Mooncloth Specialist"
+-- AC datas : OLD Subname : "Spezialistin für Mondstoffschneiderei", Subname AC enUS : "Mooncloth Specialist" ; Wowhead enUS : "Mooncloth Specialist"
 UPDATE `creature_template_locale` SET `Title` = 'Mondstoffspezialistin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 22208;
--- AC datas : OLD Subname : "Spezialist für Schattenzwirnschneiderei", Subname AC enUS : "Shadoweave Specialist"" ; Wowhead enUS : "Shadoweave Specialist"
+-- AC datas : OLD Subname : "Spezialist für Schattenzwirnschneiderei", Subname AC enUS : "Shadoweave Specialist" ; Wowhead enUS : "Shadoweave Specialist"
 UPDATE `creature_template_locale` SET `Title` = 'Schattenzwirnspezialist', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 22212;
--- AC datas : OLD Subname : "Spezialistin für Zauberfeuerschneiderei", Subname AC enUS : "Spellfire Specialist"" ; Wowhead enUS : "Spellfire Specialist"
+-- AC datas : OLD Subname : "Spezialistin für Zauberfeuerschneiderei", Subname AC enUS : "Spellfire Specialist" ; Wowhead enUS : "Spellfire Specialist"
 UPDATE `creature_template_locale` SET `Title` = 'Zauberfeuerspezialistin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 22213;
--- AC datas : OLD Subname : "Botschafterin von CocaCola", Subname AC enUS : "CocaCola Ambassador"" ; Wowhead enUS : "CocaCola Ambassador"
-UPDATE `creature_template_locale` SET `Title` = 'Botschafterin von Coca-Cola', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 22247;
--- AC datas : OLD Subname : "Botschafterin von CocaCola", Subname AC enUS : "CocaCola Ambassador"" ; Wowhead enUS : "CocaCola Ambassador"
-UPDATE `creature_template_locale` SET `Title` = 'Botschafterin von Coca-Cola', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 22248;
--- AC datas : OLD Subname : "Botschafterin von CocaCola", Subname AC enUS : "CocaCola Ambassador"" ; Wowhead enUS : "CocaCola Ambassador"
-UPDATE `creature_template_locale` SET `Title` = 'Botschafterin von Coca-Cola', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 22249;
+-- AC datas : OLD Name : "Cokeplay.com redemption vendor 01", Name AC enUS : "Cokeplay.com redemption vendor 01" ; Wowhead enUS : "Cokeplay.com redemption vendor 01",  OLD Subname : "Botschafterin von CocaCola", Subname AC enUS : "CocaCola Ambassador" ; Wowhead enUS : "CocaCola Ambassador"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Botschafterin von Coca-Cola', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 22247;
+-- AC datas : OLD Name : "Cokeplay.com redemption vendor 03", Name AC enUS : "Cokeplay.com redemption vendor 03" ; Wowhead enUS : "Cokeplay.com redemption vendor 03",  OLD Subname : "Botschafterin von CocaCola", Subname AC enUS : "CocaCola Ambassador" ; Wowhead enUS : "CocaCola Ambassador"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Botschafterin von Coca-Cola', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 22248;
+-- AC datas : OLD Name : "Cokeplay.com redemption vendor 02", Name AC enUS : "Cokeplay.com redemption vendor 02" ; Wowhead enUS : "Cokeplay.com redemption vendor 02",  OLD Subname : "Botschafterin von CocaCola", Subname AC enUS : "CocaCola Ambassador" ; Wowhead enUS : "CocaCola Ambassador"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Botschafterin von Coca-Cola', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 22249;
 -- AC datas : OLD Name : "Schildwache der Thronwache", Name AC enUS : "Throne-Guard Sentinel" ; Wowhead enUS : "Throne-Guard Sentinel"
 UPDATE `creature_template_locale` SET `Name` = 'Späher der Thronwache', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 22301;
 -- AC datas : OLD Name : "Herz der Bebenden Erde", Name AC enUS : "Rumbling Earth-Heart" ; Wowhead enUS : "Rumbling Earth-Heart"
@@ -8595,14 +8533,10 @@ UPDATE `creature_template_locale` SET `Name` = 'Druide des ewigen Hains', `Verif
 UPDATE `creature_template_locale` SET `Name` = 'Druide des ewigen Hains', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 22426;
 -- AC datas : OLD Name : "Urtum des Ewigen Hains", Name AC enUS : "Evergrove Ancient" ; Wowhead enUS : "Evergrove Ancient"
 UPDATE `creature_template_locale` SET `Name` = 'Urtum des ewigen Hains', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 22478;
--- AC datas : OLD Subname : "Forscherliga", Subname AC enUS : "Expedition Leader"" ; Wowhead enUS : "Expedition Leader"
+-- AC datas : OLD Subname : "Forscherliga", Subname AC enUS : "Expedition Leader" ; Wowhead enUS : "Expedition Leader"
 UPDATE `creature_template_locale` SET `Title` = 'Expeditionsleiter', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 22481;
 -- AC datas : OLD Name : "Gorgolon der Allsehende", Name AC enUS : "Gorgolon the All-seeing" ; Wowhead enUS : "Gorgolon the All-seeing"
 UPDATE `creature_template_locale` SET `Name` = 'Gorgolon der Allessehende', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 22827;
--- AC datas : OLD Name : "Schreckenslord", Name AC enUS : "[UNUSED] Dread Lord" ; Wowhead enUS : "[UNUSED] Dread Lord"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 22852;
--- AC datas : OLD Name : "Teufelspirscher der Illidari", Name AC enUS : "[UNUSED] Illidari Felstalker" ; Wowhead enUS : "[UNUSED] Illidari Felstalker"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 22854;
 -- AC datas : OLD Name : "Tempelkonkubine", Name AC enUS : "Temple Concubine" ; Wowhead enUS : "Temple Acolyte"
 UPDATE `creature_template_locale` SET `Name` = 'Tempelakolyth', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 22939;
 -- AC datas : OLD Name : "Bezaubernde Kurtisane", Name AC enUS : "Charming Courtesan" ; Wowhead enUS : "Charming Patron"
@@ -8621,7 +8555,7 @@ UPDATE `creature_template_locale` SET `Name` = 'Priesterin der Wonne', `Verified
 UPDATE `creature_template_locale` SET `Name` = 'Ergebener Diener', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 22965;
 -- AC datas : OLD Name : "Zerrütter der Teufelwache", Name AC enUS : "Felguard Degrader" ; Wowhead enUS : "Felguard Degrader"
 UPDATE `creature_template_locale` SET `Name` = 'Zerrütter der Teufelswache', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 23055;
--- AC datas : OLD Subname : "Magierlehrer", Subname AC enUS : "Mage Trainer"" ; Wowhead enUS : "Mage Trainer"
+-- AC datas : OLD Subname : "Magierlehrer", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Magielehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 23103;
 -- AC datas : OLD Name : "Verdammniswachenbestrafer", Name AC enUS : "Doomguard Punisher" ; Wowhead enUS : "Doomguard Punisher"
 UPDATE `creature_template_locale` SET `Name` = 'Bestrafer der Verdammniswache', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 23113;
@@ -8647,9 +8581,9 @@ UPDATE `creature_template_locale` SET `Name` = 'Verrückter Minenarbeiter der Fi
 UPDATE `creature_template_locale` SET `Name` = 'Rechnungsführer von Bash''ir', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 23332;
 -- AC datas : OLD Name : "Schwarzdrachenwelpe", Name AC enUS : "Black Dragon Whelpling" ; Wowhead enUS : "Black Dragon Whelpling"
 UPDATE `creature_template_locale` SET `Name` = 'Schwarzer Drachenwelpe', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 23364;
--- AC datas : OLD Subname : "Klassische Ketten- & Plattenrüstungen der Allianz", Subname AC enUS : "Brutal Arena Vendor"" ; Wowhead enUS : "Brutal Arena Vendor"
+-- AC datas : OLD Subname : "Klassische Ketten- & Plattenrüstungen der Allianz", Subname AC enUS : "Brutal Arena Vendor" ; Wowhead enUS : "Brutal Arena Vendor"
 UPDATE `creature_template_locale` SET `Title` = 'Arenaverkäufer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 23396;
--- AC datas : OLD Subname : "", Subname AC enUS : """ ; Wowhead enUS : "PTR Consumables"
+-- AC datas : OLD Subname : "", Subname AC enUS : "" ; Wowhead enUS : "PTR Consumables"
 UPDATE `creature_template_locale` SET `Title` = 'PTR-Verbrauchsgüter', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 23405;
 -- AC datas : OLD Name : "Stellvertreter der Gordunni", Name AC enUS : "Gordunni Proxy" ; Wowhead enUS : "Gordunni Proxy"
 UPDATE `creature_template_locale` SET `Name` = 'Fernmelder der Gordunni', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 23450;
@@ -8663,13 +8597,13 @@ UPDATE `creature_template_locale` SET `Name` = 'Festtagsfass der Gerstenbräus',
 UPDATE `creature_template_locale` SET `Name` = 'Festtagsfass der Donnerbräus', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 23702;
 -- AC datas : OLD Name : "Festagsfass der Gordok", Name AC enUS : "Gordok Festive Keg" ; Wowhead enUS : "Gordok Festive Keg"
 UPDATE `creature_template_locale` SET `Name` = 'Festtagsfass der Gordok', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 23706;
--- AC datas : OLD Subname : "Lehrerin für Erste Hilfe", Subname AC enUS : "Grand Master First Aid Trainer"" ; Wowhead enUS : "Grand Master First Aid Trainer"
+-- AC datas : OLD Subname : "Lehrerin für Erste Hilfe", Subname AC enUS : "Grand Master First Aid Trainer" ; Wowhead enUS : "Grand Master First Aid Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin der Ersten Hilfe', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 23734;
 -- AC datas : OLD Name : "Unteroffizierin Amelyn", Name AC enUS : "Sergeant Amelyn" ; Wowhead enUS : "Sergeant Amelyn"
 UPDATE `creature_template_locale` SET `Name` = 'Unteroffizier Amelyn', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 23835;
--- AC datas : OLD Subname : "", Subname AC enUS : "Ammunition"" ; Wowhead enUS : "Ammunition"
+-- AC datas : OLD Subname : "", Subname AC enUS : "Ammunition" ; Wowhead enUS : "Ammunition"
 UPDATE `creature_template_locale` SET `Title` = 'Munition', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 23862;
--- AC datas : OLD Subname : "Angellehrer & Handwerkswaren", Subname AC enUS : "Fish Merchant"" ; Wowhead enUS : "Fish Merchant"
+-- AC datas : OLD Subname : "Angellehrer & Handwerkswaren", Subname AC enUS : "Fish Merchant" ; Wowhead enUS : "Fish Merchant"
 UPDATE `creature_template_locale` SET `Title` = 'Fischhändler', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 23896;
 -- AC datas : OLD Name : "Gastwirtin Celeste Gutstall", Name AC enUS : "Innkeeper Celeste Goodhutch" ; Wowhead enUS : "Innkeeper Celeste Goodhutch"
 UPDATE `creature_template_locale` SET `Name` = 'Gastwirt Celeste Gutstall', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 23937;
@@ -8683,7 +8617,7 @@ UPDATE `creature_template_locale` SET `Name` = 'Ausguck der Amani''shi', `Verifi
 UPDATE `creature_template_locale` SET `Name` = 'Ghul aus der Armee der Toten', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 24207;
 -- AC datas : OLD Name : "Kriecher", Name AC enUS : "Slither" ; Wowhead enUS : "Slither"
 UPDATE `creature_template_locale` SET `Name` = 'Glibber', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 24242;
--- AC datas : OLD Name : "Jason Gutstall", Name AC enUS : "Bartender Jason Goodhutch" ; Wowhead enUS : "Bartender Jason Goodhutch",  OLD Subname : "Barkeeper", Subname AC enUS : "Drinks"" ; Wowhead enUS : "Drinks"
+-- AC datas : OLD Name : "Jason Gutstall", Name AC enUS : "Bartender Jason Goodhutch" ; Wowhead enUS : "Bartender Jason Goodhutch",  OLD Subname : "Barkeeper", Subname AC enUS : "Drinks" ; Wowhead enUS : "Drinks"
 UPDATE `creature_template_locale` SET `Name` = 'Schankkellner Jason Gutstall', `Title` = 'Getränke', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 24333;
 -- AC datas : OLD Name : "Harrisons Leichnam", Name AC enUS : "Willie's Corpse" ; Wowhead enUS : "Willie's Corpse"
 UPDATE `creature_template_locale` SET `Name` = 'Willies Leichnam', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 24365;
@@ -8691,19 +8625,19 @@ UPDATE `creature_template_locale` SET `Name` = 'Willies Leichnam', `VerifiedBuil
 UPDATE `creature_template_locale` SET `Name` = 'Blutdurstiger Worg', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 24475;
 -- AC datas : OLD Name : "Froschtransformation", Name AC enUS : "Frog Transform" ; Wowhead enUS : "Frog Transform"
 UPDATE `creature_template_locale` SET `Name` = 'Transformation des Froschs', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 24483;
--- AC datas : OLD Subname : "Rüstmeisterin für Rüstungen", Subname AC enUS : "Armor Quartermaster"" ; Wowhead enUS : "Armor Quartermaster"
-UPDATE `creature_template_locale` SET `Title` = 'Rüstmeister für Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 24520;
--- AC datas : OLD Subname : "Garaxxas Tier", Subname AC enUS : "Garaxxas' Pet"" ; Wowhead enUS : "Garaxxas' Pet"
+-- AC datas : OLD Name : "Doris Volanthius", Name AC enUS : "Doris Volanthius" ; Wowhead enUS : "Doris Volanthius",  OLD Subname : "Rüstmeisterin für Rüstungen", Subname AC enUS : "Armor Quartermaster" ; Wowhead enUS : "Armor Quartermaster"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Rüstmeister für Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 24520;
+-- AC datas : OLD Subname : "Garaxxas Tier", Subname AC enUS : "Garaxxas' Pet" ; Wowhead enUS : "Garaxxas' Pet"
 UPDATE `creature_template_locale` SET `Title` = 'Garaxxas'' Begleiter', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 24552;
 -- AC datas : OLD Name : "Behüter des Nexus", Name AC enUS : "Nexus Watcher" ; Wowhead enUS : "Nexus Watcher"
 UPDATE `creature_template_locale` SET `Name` = 'Behüter des Nexus''', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 24770;
 -- AC datas : OLD Name : "Ross des kopflosen Reiters", Name AC enUS : "Headless Horseman's Mount" ; Wowhead enUS : "Headless Horseman's Mount"
 UPDATE `creature_template_locale` SET `Name` = 'Reittier des kopflosen Reiters', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 24814;
--- AC datas : OLD Subname : "Ingenieurskunstlehrerin", Subname AC enUS : "Master Engineering Trainer"" ; Wowhead enUS : "Master Engineering Trainer"
+-- AC datas : OLD Subname : "Ingenieurskunstlehrerin", Subname AC enUS : "Master Engineering Trainer" ; Wowhead enUS : "Master Engineering Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Meisteringenieurslehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 24868;
 -- AC datas : OLD Name : "Erste Offizierin Kupferbolz", Name AC enUS : "Chief Officer Brassbolt" ; Wowhead enUS : "Chief Officer Brassbolt"
 UPDATE `creature_template_locale` SET `Name` = 'Erster Offizier Kupferbolz', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 24926;
--- AC datas : OLD Name : "Madame Flaschatauren", Name AC enUS : "Mrs. Flaskataur" ; Wowhead enUS : "Mrs. Flaskataur",  OLD Subname : "Gefährtin des Flaschatauren", Subname AC enUS : "Mate of the Flaskataur"" ; Wowhead enUS : "PTR Enchants"
+-- AC datas : OLD Name : "Madame Flaschatauren", Name AC enUS : "Mrs. Flaskataur" ; Wowhead enUS : "Mrs. Flaskataur",  OLD Subname : "Gefährtin des Flaschatauren", Subname AC enUS : "Mate of the Flaskataur" ; Wowhead enUS : "PTR Enchants"
 UPDATE `creature_template_locale` SET `Name` = 'Frau Flaschatauren', `Title` = 'PTR-Verzauberungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 24982;
 -- AC datas : OLD Name : "Winterhauptmann Skarloc", Name AC enUS : "Christmas Captain Skarloc" ; Wowhead enUS : "Christmas Captain Skarloc"
 UPDATE `creature_template_locale` SET `Name` = 'Winterkapitän Skarloc', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 24987;
@@ -8713,27 +8647,25 @@ UPDATE `creature_template_locale` SET `Name` = 'Wächter', `VerifiedBuild` = 0 W
 UPDATE `creature_template_locale` SET `Name` = 'Erster Offizier Kupfernuss', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 25070;
 -- AC datas : OLD Name : "Grunzerin Ounda", Name AC enUS : "Grunt Ounda" ; Wowhead enUS : "Grunt Ounda"
 UPDATE `creature_template_locale` SET `Name` = 'Grunzer Ounda', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 25081;
--- AC datas : OLD Subname : "Ingenieurskunstlehrer", Subname AC enUS : "Master Engineering Trainer"" ; Wowhead enUS : "Master Engineering Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Meisteringenieurslehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 25099;
+-- AC datas : OLD Name : "Jonathan Garrett", Name AC enUS : "Jonathan Garrett" ; Wowhead enUS : "Jonathan Garrett",  OLD Subname : "Ingenieurskunstlehrer", Subname AC enUS : "Master Engineering Trainer" ; Wowhead enUS : "Master Engineering Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Meisteringenieurslehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 25099;
 -- AC datas : OLD Name : "Frixi Messingkipper", Name AC enUS : "Frixee Brasstumbler" ; Wowhead enUS : "Frixee Brasstumbler"
 UPDATE `creature_template_locale` SET `Name` = 'Frixee Messingkipper', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 25179;
 -- AC datas : OLD Name : "Moorbiss' Wyvern", Name AC enUS : "Muckjaw's Wyvern" ; Wowhead enUS : "Muckjaw's Wyvern"
 UPDATE `creature_template_locale` SET `Name` = 'Moorbiss'' Flügeldrache', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 25185;
 -- AC datas : OLD Name : "Skarlocs Schlachtross", Name AC enUS : "Skarloc's Warhorse" ; Wowhead enUS : "Skarloc's Warhorse"
 UPDATE `creature_template_locale` SET `Name` = 'Skarlocs Schlachtroß', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 25190;
--- AC datas : OLD Subname : "", Subname AC enUS : "Specialty Ammunition Vendor"" ; Wowhead enUS : "Specialty Ammunition Vendor"
+-- AC datas : OLD Subname : "", Subname AC enUS : "Specialty Ammunition Vendor" ; Wowhead enUS : "Specialty Ammunition Vendor"
 UPDATE `creature_template_locale` SET `Title` = 'Händler für Spezialmunition', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 25195;
--- AC datas : OLD Subname : "", Subname AC enUS : "Specialty Ammunition Vendor"" ; Wowhead enUS : "Specialty Ammunition Vendor"
+-- AC datas : OLD Subname : "", Subname AC enUS : "Specialty Ammunition Vendor" ; Wowhead enUS : "Specialty Ammunition Vendor"
 UPDATE `creature_template_locale` SET `Title` = 'Händler für Spezialmunition', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 25196;
 -- AC datas : OLD Name : "Trainingsattrappe", Name AC enUS : "Practice Dummy" ; Wowhead enUS : "Practice Dummy"
 UPDATE `creature_template_locale` SET `Name` = 'Übungsattrappe', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 25225;
 -- AC datas : OLD Name : "Hordezeppelin (Nordend)", Name AC enUS : "Horde Zeppelin (Northrend)" ; Wowhead enUS : "Horde Zeppelin (Northrend)"
 UPDATE `creature_template_locale` SET `Name` = 'Hordenzeppelin (Nordend)', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 25269;
--- AC datas : OLD Subname : "Ingenieurkunstlehrer", Subname AC enUS : "Grand Master Engineer"" ; Wowhead enUS : "Grand Master Engineer"
+-- AC datas : OLD Subname : "Ingenieurkunstlehrer", Subname AC enUS : "Grand Master Engineer" ; Wowhead enUS : "Grand Master Engineer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Ingenieurskunst', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 25277;
--- AC datas : OLD Name : "Gortsch der Leichenmalmer", Name AC enUS : "Gorge the Corpsegrinder" ; Wowhead enUS : "Annihilator Grek'lor"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 25329;
--- AC datas : OLD Name : "Zwielichtspion Viktor", Name AC enUS : "Twilight Spy Viktor" ; Wowhead enUS : "Twilight Spy Viktor",  OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer"" ; Wowhead enUS : "Twilight's Hammer"
+-- AC datas : OLD Name : "Zwielichtspion Viktor", Name AC enUS : "Twilight Spy Viktor" ; Wowhead enUS : "Twilight Spy Viktor",  OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer" ; Wowhead enUS : "Twilight's Hammer"
 UPDATE `creature_template_locale` SET `Name` = 'Spion Viktor des Schattenhammers', `Title` = 'Schattenhammerklan', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 25346;
 -- AC datas : OLD Name : "Vision von Scharfseher Grimmläufer", Name AC enUS : "Vision of Farseer Grimwalker" ; Wowhead enUS : "Vision of Farseer Grimwalker"
 UPDATE `creature_template_locale` SET `Name` = 'Vision des Weissagers Grimmläufer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 25424;
@@ -8747,9 +8679,9 @@ UPDATE `creature_template_locale` SET `Name` = 'Weissager Grimmläufer', `Verifi
 UPDATE `creature_template_locale` SET `Name` = 'Flämmling', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 25706;
 -- AC datas : OLD Name : "Leerenschildwache", Name AC enUS : "Void Sentinel" ; Wowhead enUS : "Void Sentinel"
 UPDATE `creature_template_locale` SET `Name` = 'Leerenwache', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 25772;
--- AC datas : OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer"" ; Wowhead enUS : "Twilight's Hammer"
+-- AC datas : OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer" ; Wowhead enUS : "Twilight's Hammer"
 UPDATE `creature_template_locale` SET `Title` = 'Schattenhammerklan', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 25863;
--- AC datas : OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer"" ; Wowhead enUS : "Twilight's Hammer"
+-- AC datas : OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer" ; Wowhead enUS : "Twilight's Hammer"
 UPDATE `creature_template_locale` SET `Title` = 'Schattenhammerklan', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 25866;
 -- AC datas : OLD Name : "Flammenwächter der Verwüsteten Lande", Name AC enUS : "Blasted Lands Flame Warden" ; Wowhead enUS : "Blasted Lands Flame Warden"
 UPDATE `creature_template_locale` SET `Name` = 'Flammenwächter der verwüsteten Lande', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 25890;
@@ -8759,7 +8691,7 @@ UPDATE `creature_template_locale` SET `Name` = 'Flammenwächter der brennenden S
 UPDATE `creature_template_locale` SET `Name` = 'Flammenwächter des Schlingendorntals', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 25915;
 -- AC datas : OLD Name : "Flammenbewahrer des Schlingendornkaps", Name AC enUS : "Stranglethorn Vale Flame Keeper" ; Wowhead enUS : "Stranglethorn Vale Flame Keeper"
 UPDATE `creature_template_locale` SET `Name` = 'Flammenbewahrer des Schlingendorntals', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 25920;
--- AC datas : OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer"" ; Wowhead enUS : "Twilight's Hammer"
+-- AC datas : OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer" ; Wowhead enUS : "Twilight's Hammer"
 UPDATE `creature_template_locale` SET `Title` = 'Schattenhammerklan', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 25924;
 -- AC datas : OLD Name : "Flammenbewahrer der Brennenden Steppe", Name AC enUS : "Burning Steppes Flame Keeper" ; Wowhead enUS : "Burning Steppes Flame Keeper"
 UPDATE `creature_template_locale` SET `Name` = 'Flammenbewahrer der brennenden Steppe', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 25927;
@@ -8767,15 +8699,15 @@ UPDATE `creature_template_locale` SET `Name` = 'Flammenbewahrer der brennenden S
 UPDATE `creature_template_locale` SET `Name` = 'Flammenbewahrer der Höllenfeuerhalbinsel', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 25934;
 -- AC datas : OLD Name : "Flammenbewahrer des Nördlichen Brachlands", Name AC enUS : "The Barrens Flame Keeper" ; Wowhead enUS : "The Barrens Flame Keeper"
 UPDATE `creature_template_locale` SET `Name` = 'Flammenbewahrer des Brachlands', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 25943;
--- AC datas : OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer"" ; Wowhead enUS : "Twilight's Hammer"
+-- AC datas : OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer" ; Wowhead enUS : "Twilight's Hammer"
 UPDATE `creature_template_locale` SET `Title` = 'Schattenhammerklan', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 25949;
--- AC datas : OLD Subname : "Juwelierskunstbedarf", Subname AC enUS : "Jewelcrafting Supplies"" ; Wowhead enUS : "Jewelcrafting Supplies"
-UPDATE `creature_template_locale` SET `Title` = 'Juwelenschleiferbedarf', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 25950;
+-- AC datas : OLD Name : "Shaani", Name AC enUS : "Shaani" ; Wowhead enUS : "Shaani",  OLD Subname : "Juwelierskunstbedarf", Subname AC enUS : "Jewelcrafting Supplies" ; Wowhead enUS : "Jewelcrafting Supplies"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Juwelenschleiferbedarf', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 25950;
 -- AC datas : OLD Name : "Elitesoldat der Kor'kron", Name AC enUS : "Kor'kron Elite" ; Wowhead enUS : "Kor'kron Elite"
 UPDATE `creature_template_locale` SET `Name` = 'Elite der Kor''kron', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26183;
--- AC datas : OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer"" ; Wowhead enUS : "Twilight's Hammer"
+-- AC datas : OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer" ; Wowhead enUS : "Twilight's Hammer"
 UPDATE `creature_template_locale` SET `Title` = 'Schattenhammerklan', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26222;
--- AC datas : OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer"" ; Wowhead enUS : "Twilight's Hammer"
+-- AC datas : OLD Subname : "Schattenhammer", Subname AC enUS : "Twilight's Hammer" ; Wowhead enUS : "Twilight's Hammer"
 UPDATE `creature_template_locale` SET `Title` = 'Schattenhammerklan', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26223;
 -- AC datas : OLD Name : "Gischtalbatros", Name AC enUS : "Seaspray Albatross" ; Wowhead enUS : "Seaspray Albatross"
 UPDATE `creature_template_locale` SET `Name` = 'Gischtalbatross', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26240;
@@ -8795,23 +8727,23 @@ UPDATE `creature_template_locale` SET `Name` = 'Händler für schwere Rüstungen
 UPDATE `creature_template_locale` SET `Name` = 'Händler für Plattenrüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26308;
 -- AC datas : OLD Name : "Zokk "Lulatsch" Drillzang", Name AC enUS : "Big Zokk Torquewrench" ; Wowhead enUS : "Big Zokk Torquewrench"
 UPDATE `creature_template_locale` SET `Name` = 'Bigzokk Drillzang', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26352;
--- AC datas : OLD Subname : "Rüstmeisterin für Rüstungen", Subname AC enUS : "Armor Quartermaster"" ; Wowhead enUS : "Armor Quartermaster"
+-- AC datas : OLD Subname : "Rüstmeisterin für Rüstungen", Subname AC enUS : "Armor Quartermaster" ; Wowhead enUS : "Armor Quartermaster"
 UPDATE `creature_template_locale` SET `Title` = 'Rüstmeister für Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26397;
--- AC datas : OLD Subname : "Rüstmeisterin für Rüstungen", Subname AC enUS : "Armor Quartermaster"" ; Wowhead enUS : "Armor Quartermaster"
-UPDATE `creature_template_locale` SET `Title` = 'Rüstmeister für Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26398;
+-- AC datas : OLD Name : "Doris Volanthius", Name AC enUS : "Doris Volanthius" ; Wowhead enUS : "Doris Volanthius",  OLD Subname : "Rüstmeisterin für Rüstungen", Subname AC enUS : "Armor Quartermaster" ; Wowhead enUS : "Armor Quartermaster"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Rüstmeister für Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26398;
 -- AC datas : OLD Name : "Aufklärer von Kaskala", Name AC enUS : "Kaskala Lookout" ; Wowhead enUS : "Kaskala Lookout"
 UPDATE `creature_template_locale` SET `Name` = 'Warte von Kaskala', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26403;
 -- AC datas : OLD Name : "Gesandter Reißzahn", Name AC enUS : "Envoy Ripfang" ; Wowhead enUS : "Envoy Ripfang"
 UPDATE `creature_template_locale` SET `Name` = 'Entsandter Reißzahn', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26441;
 -- AC datas : OLD Name : "Kranker Drakkari", Name AC enUS : "Diseased Drakkari" ; Wowhead enUS : "Diseased Drakkari"
 UPDATE `creature_template_locale` SET `Name` = 'Verstorbener Drakkari', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26457;
--- AC datas : OLD Subname : "Zeppelinmeister, Boreanische Tundra", Subname AC enUS : "Borean Tundra Zeppelin Master"" ; Wowhead enUS : "Borean Tundra Zeppelin Master"
+-- AC datas : OLD Subname : "Zeppelinmeister, Boreanische Tundra", Subname AC enUS : "Borean Tundra Zeppelin Master" ; Wowhead enUS : "Borean Tundra Zeppelin Master"
 UPDATE `creature_template_locale` SET `Title` = 'Zeppelinmeister, boreanische Tundra', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26537;
--- AC datas : OLD Subname : "Zeppelinmeister, Orgrimmar", Subname AC enUS : "Durotar Zeppelin Master"" ; Wowhead enUS : "Durotar Zeppelin Master"
+-- AC datas : OLD Subname : "Zeppelinmeister, Orgrimmar", Subname AC enUS : "Durotar Zeppelin Master" ; Wowhead enUS : "Durotar Zeppelin Master"
 UPDATE `creature_template_locale` SET `Title` = 'Zeppelinmeister, Durotar', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26538;
--- AC datas : OLD Subname : "Zeppelinmeisterin, Heulender Fjord", Subname AC enUS : "Howling Fjord Zeppelin Master"" ; Wowhead enUS : "Howling Fjord Zeppelin Master"
+-- AC datas : OLD Subname : "Zeppelinmeisterin, Heulender Fjord", Subname AC enUS : "Howling Fjord Zeppelin Master" ; Wowhead enUS : "Howling Fjord Zeppelin Master"
 UPDATE `creature_template_locale` SET `Title` = 'Zeppelinmeister, heulender Fjord', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26539;
--- AC datas : OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Grand Master Blacksmithing Trainer"" ; Wowhead enUS : "Grand Master Blacksmithing Trainer"
+-- AC datas : OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Grand Master Blacksmithing Trainer" ; Wowhead enUS : "Grand Master Blacksmithing Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Schmiedekunst', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26564;
 -- AC datas : OLD Name : "Fallschirmjäger von Kurbelzisch", Name AC enUS : "Fizzcrank Paratrooper" ; Wowhead enUS : "Fizzcrank Paratrooper"
 UPDATE `creature_template_locale` SET `Name` = 'Fallschirmspringer von Kurbelzisch', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26619;
@@ -8829,125 +8761,125 @@ UPDATE `creature_template_locale` SET `Name` = 'Waldläufer der Allianz', `Verif
 UPDATE `creature_template_locale` SET `Name` = 'Entsandter Ducal', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26821;
 -- AC datas : OLD Name : "Erdwächter Graif", Name AC enUS : "Earthwarden Grife" ; Wowhead enUS : "Earthwarden Grife"
 UPDATE `creature_template_locale` SET `Name` = 'Erdenwächter Graif', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26854;
--- AC datas : OLD Subname : "", Subname AC enUS : "Ammunition"" ; Wowhead enUS : "Ammunition"
-UPDATE `creature_template_locale` SET `Title` = 'Munition', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26901;
--- AC datas : OLD Subname : "Alchemielehrer", Subname AC enUS : "Grand Master Alchemy Trainer"" ; Wowhead enUS : "Grand Master Alchemy Trainer"
+-- AC datas : OLD Name : "Torik", Name AC enUS : "Torik" ; Wowhead enUS : "Torik",  OLD Subname : "", Subname AC enUS : "Ammunition" ; Wowhead enUS : "Ammunition"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Munition', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26901;
+-- AC datas : OLD Subname : "Alchemielehrer", Subname AC enUS : "Grand Master Alchemy Trainer" ; Wowhead enUS : "Grand Master Alchemy Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Alchemie', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26903;
--- AC datas : OLD Subname : "Schmiedekunstlehrerin", Subname AC enUS : "Grand Master Blacksmithing Trainer"" ; Wowhead enUS : "Grand Master Blacksmithing Trainer"
+-- AC datas : OLD Subname : "Schmiedekunstlehrerin", Subname AC enUS : "Grand Master Blacksmithing Trainer" ; Wowhead enUS : "Grand Master Blacksmithing Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin der Schmiedekunst', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26904;
--- AC datas : OLD Subname : "Kochkunstlehrer", Subname AC enUS : "Grand Master Cooking Trainer"" ; Wowhead enUS : "Grand Master Cooking Trainer"
+-- AC datas : OLD Subname : "Kochkunstlehrer", Subname AC enUS : "Grand Master Cooking Trainer" ; Wowhead enUS : "Grand Master Cooking Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Kochkunst', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26905;
--- AC datas : OLD Subname : "Verzauberkunstlehrerin", Subname AC enUS : "Grand Master Enchanting Trainer"" ; Wowhead enUS : "Grand Master Enchanting Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin der Verzauberkunst', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26906;
--- AC datas : OLD Subname : "Ingenieurskunstlehrerin", Subname AC enUS : "Grand Master Engineering Trainer"" ; Wowhead enUS : "Grand Master Engineering Trainer"
+-- AC datas : OLD Name : "Elizabeth Jackson", Name AC enUS : "Elizabeth Jackson" ; Wowhead enUS : "Elizabeth Jackson",  OLD Subname : "Verzauberkunstlehrerin", Subname AC enUS : "Grand Master Enchanting Trainer" ; Wowhead enUS : "Grand Master Enchanting Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Großmeisterin der Verzauberkunst', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26906;
+-- AC datas : OLD Subname : "Ingenieurskunstlehrerin", Subname AC enUS : "Grand Master Engineering Trainer" ; Wowhead enUS : "Grand Master Engineering Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin der Ingenieurskunst', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26907;
--- AC datas : OLD Subname : "Angellehrer", Subname AC enUS : "Grand Master Fishing Trainer"" ; Wowhead enUS : "Grand Master Fishing Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Großmeister des Angelns', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26909;
--- AC datas : OLD Subname : "Kräuterkundelehrer", Subname AC enUS : "Grand Master Herbalism Trainer"" ; Wowhead enUS : "Grand Master Herbalism Trainer"
+-- AC datas : OLD Name : "Byron Welwick", Name AC enUS : "Byron Welwick" ; Wowhead enUS : "Byron Welwick",  OLD Subname : "Angellehrer", Subname AC enUS : "Grand Master Fishing Trainer" ; Wowhead enUS : "Grand Master Fishing Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Großmeister des Angelns', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26909;
+-- AC datas : OLD Subname : "Kräuterkundelehrer", Subname AC enUS : "Grand Master Herbalism Trainer" ; Wowhead enUS : "Grand Master Herbalism Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Kräuterkunde', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26910;
--- AC datas : OLD Subname : "Lederverarbeitungslehrerin", Subname AC enUS : "Grand Master Leatherworking Trainer"" ; Wowhead enUS : "Grand Master Leatherworking Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin der Lederverarbeitung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26911;
--- AC datas : OLD Subname : "Bergbaulehrer", Subname AC enUS : "Grand Master Mining Trainer"" ; Wowhead enUS : "Grand Master Mining Trainer"
+-- AC datas : OLD Name : "Bernadette Dexter", Name AC enUS : "Bernadette Dexter" ; Wowhead enUS : "Bernadette Dexter",  OLD Subname : "Lederverarbeitungslehrerin", Subname AC enUS : "Grand Master Leatherworking Trainer" ; Wowhead enUS : "Grand Master Leatherworking Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Großmeisterin der Lederverarbeitung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26911;
+-- AC datas : OLD Subname : "Bergbaulehrer", Subname AC enUS : "Grand Master Mining Trainer" ; Wowhead enUS : "Grand Master Mining Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeister des Bergbaus', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26912;
--- AC datas : OLD Subname : "Kürschnerlehrer", Subname AC enUS : "Grand Master Skinning Trainer"" ; Wowhead enUS : "Grand Master Skinning Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Kürschnerei', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26913;
--- AC datas : OLD Subname : "Schneiderlehrer", Subname AC enUS : "Grand Master Tailoring Trainer"" ; Wowhead enUS : "Grand Master Tailoring Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Schneiderei', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26914;
--- AC datas : OLD Subname : "Juwelierskunstlehrer", Subname AC enUS : "Grand Master Jewelcrafting Trainer"" ; Wowhead enUS : "Grand Master Jewelcrafting Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Großmeister des Juwelenschleifens', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26915;
--- AC datas : OLD Subname : "Inschriftenkundelehrerin", Subname AC enUS : "Grand Master Inscription Trainer"" ; Wowhead enUS : "Grand Master Inscription Trainer"
+-- AC datas : OLD Name : "Frederic Burrhus", Name AC enUS : "Frederic Burrhus" ; Wowhead enUS : "Frederic Burrhus",  OLD Subname : "Kürschnerlehrer", Subname AC enUS : "Grand Master Skinning Trainer" ; Wowhead enUS : "Grand Master Skinning Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Großmeister der Kürschnerei', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26913;
+-- AC datas : OLD Name : "Benjamin Clegg", Name AC enUS : "Benjamin Clegg" ; Wowhead enUS : "Benjamin Clegg",  OLD Subname : "Schneiderlehrer", Subname AC enUS : "Grand Master Tailoring Trainer" ; Wowhead enUS : "Grand Master Tailoring Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Großmeister der Schneiderei', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26914;
+-- AC datas : OLD Name : "Ounhulo", Name AC enUS : "Ounhulo" ; Wowhead enUS : "Ounhulo",  OLD Subname : "Juwelierskunstlehrer", Subname AC enUS : "Grand Master Jewelcrafting Trainer" ; Wowhead enUS : "Grand Master Jewelcrafting Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Großmeister des Juwelenschleifens', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26915;
+-- AC datas : OLD Subname : "Inschriftenkundelehrerin", Subname AC enUS : "Grand Master Inscription Trainer" ; Wowhead enUS : "Grand Master Inscription Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin der Inschriftenkunde', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26916;
--- AC datas : OLD Subname : "Alchemielehrerin", Subname AC enUS : "Grand Master Alchemy Trainer"" ; Wowhead enUS : "Grand Master Alchemy Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin der Alchemie', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26951;
--- AC datas : OLD Subname : "Schmiedekunstlehrerin", Subname AC enUS : "Grand Master Blacksmithing Trainer"" ; Wowhead enUS : "Grand Master Blacksmithing Trainer"
+-- AC datas : OLD Name : "Wilhelmina Renel", Name AC enUS : "Wilhelmina Renel" ; Wowhead enUS : "Wilhelmina Renel",  OLD Subname : "Alchemielehrerin", Subname AC enUS : "Grand Master Alchemy Trainer" ; Wowhead enUS : "Grand Master Alchemy Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Großmeisterin der Alchemie', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26951;
+-- AC datas : OLD Subname : "Schmiedekunstlehrerin", Subname AC enUS : "Grand Master Blacksmithing Trainer" ; Wowhead enUS : "Grand Master Blacksmithing Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin der Schmiedekunst', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26952;
--- AC datas : OLD Subname : "Kochkunstlehrer", Subname AC enUS : "Grand Master Cooking Trainer"" ; Wowhead enUS : "Grand Master Cooking Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Kochkunst', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26953;
--- AC datas : OLD Subname : "Verzauberkunstlehrer", Subname AC enUS : "Grand Master Enchanting Trainer"" ; Wowhead enUS : "Grand Master Enchanting Trainer"
+-- AC datas : OLD Name : "Thomas Kolichio", Name AC enUS : "Thomas Kolichio" ; Wowhead enUS : "Thomas Kolichio",  OLD Subname : "Kochkunstlehrer", Subname AC enUS : "Grand Master Cooking Trainer" ; Wowhead enUS : "Grand Master Cooking Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Großmeister der Kochkunst', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26953;
+-- AC datas : OLD Subname : "Verzauberkunstlehrer", Subname AC enUS : "Grand Master Enchanting Trainer" ; Wowhead enUS : "Grand Master Enchanting Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Verzauberkunst', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26954;
--- AC datas : OLD Subname : "Ingenieurskunstlehrerin", Subname AC enUS : "Grand Master Engineering Trainer"" ; Wowhead enUS : "Grand Master Engineering Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin der Ingenieurskunst', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26955;
--- AC datas : OLD Subname : "Lehrerin für Erste Hilfe", Subname AC enUS : "Grand Master First Aid Trainer"" ; Wowhead enUS : "Grand Master First Aid Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin der Ersten Hilfe', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26956;
--- AC datas : OLD Subname : "Angellehrerin", Subname AC enUS : "Grand Master Fishing Trainer"" ; Wowhead enUS : "Grand Master Fishing Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin des Angelns', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26957;
--- AC datas : OLD Subname : "Kräuterkundelehrerin", Subname AC enUS : "Grand Master Herbalism Trainer"" ; Wowhead enUS : "Grand Master Herbalism Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin der Kräuterkunde', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26958;
--- AC datas : OLD Subname : "Inschriftenkundelehrer", Subname AC enUS : "Grand Master Inscription Trainer"" ; Wowhead enUS : "Grand Master Inscription Trainer"
+-- AC datas : OLD Name : "Jamesina Watterly", Name AC enUS : "Jamesina Watterly" ; Wowhead enUS : "Jamesina Watterly",  OLD Subname : "Ingenieurskunstlehrerin", Subname AC enUS : "Grand Master Engineering Trainer" ; Wowhead enUS : "Grand Master Engineering Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Großmeisterin der Ingenieurskunst', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26955;
+-- AC datas : OLD Name : "Sally Tompkins", Name AC enUS : "Sally Tompkins" ; Wowhead enUS : "Sally Tompkins",  OLD Subname : "Lehrerin für Erste Hilfe", Subname AC enUS : "Grand Master First Aid Trainer" ; Wowhead enUS : "Grand Master First Aid Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Großmeisterin der Ersten Hilfe', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26956;
+-- AC datas : OLD Name : "Angelina Soren", Name AC enUS : "Angelina Soren" ; Wowhead enUS : "Angelina Soren",  OLD Subname : "Angellehrerin", Subname AC enUS : "Grand Master Fishing Trainer" ; Wowhead enUS : "Grand Master Fishing Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Großmeisterin des Angelns', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26957;
+-- AC datas : OLD Name : "Marjory Kains", Name AC enUS : "Marjory Kains" ; Wowhead enUS : "Marjory Kains",  OLD Subname : "Kräuterkundelehrerin", Subname AC enUS : "Grand Master Herbalism Trainer" ; Wowhead enUS : "Grand Master Herbalism Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Großmeisterin der Kräuterkunde', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26958;
+-- AC datas : OLD Subname : "Inschriftenkundelehrer", Subname AC enUS : "Grand Master Inscription Trainer" ; Wowhead enUS : "Grand Master Inscription Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Inschriftenkunde', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26959;
--- AC datas : OLD Subname : "Juwelierskunstlehrer", Subname AC enUS : "Grand Master Jewelcrafting Trainer"" ; Wowhead enUS : "Grand Master Jewelcrafting Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Großmeister des Juwelenschleifens', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26960;
--- AC datas : OLD Subname : "Lederverarbeitungslehrer", Subname AC enUS : "Grand Master Leatherworking Trainer"" ; Wowhead enUS : "Grand Master Leatherworking Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Lederverarbeitung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26961;
--- AC datas : OLD Subname : "Bergbaulehrer", Subname AC enUS : "Grand Master Mining Trainer"" ; Wowhead enUS : "Grand Master Mining Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Großmeister des Bergbaus', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26962;
--- AC datas : OLD Subname : "Kürschnerlehrerin", Subname AC enUS : "Grand Master Skinning Trainer"" ; Wowhead enUS : "Grand Master Skinning Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin der Kürschnerei', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26963;
--- AC datas : OLD Subname : "Schneiderlehrerin", Subname AC enUS : "Grand Master Tailoring Trainer"" ; Wowhead enUS : "Grand Master Tailoring Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin der Schneiderei', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26964;
--- AC datas : OLD Subname : "Schneiderlehrerin", Subname AC enUS : "Grand Master Tailoring Trainer"" ; Wowhead enUS : "Grand Master Tailoring Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin der Schneiderei', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26969;
--- AC datas : OLD Subname : "Kochkunstlehrer", Subname AC enUS : "Grand Master Cooking Trainer"" ; Wowhead enUS : "Grand Master Cooking Trainer"
+-- AC datas : OLD Name : "Carter Tiffens", Name AC enUS : "Carter Tiffens" ; Wowhead enUS : "Carter Tiffens",  OLD Subname : "Juwelierskunstlehrer", Subname AC enUS : "Grand Master Jewelcrafting Trainer" ; Wowhead enUS : "Grand Master Jewelcrafting Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Großmeister des Juwelenschleifens', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26960;
+-- AC datas : OLD Name : "Gunter Hansen", Name AC enUS : "Gunter Hansen" ; Wowhead enUS : "Gunter Hansen",  OLD Subname : "Lederverarbeitungslehrer", Subname AC enUS : "Grand Master Leatherworking Trainer" ; Wowhead enUS : "Grand Master Leatherworking Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Großmeister der Lederverarbeitung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26961;
+-- AC datas : OLD Name : "Jonathan Lewis", Name AC enUS : "Jonathan Lewis" ; Wowhead enUS : "Jonathan Lewis",  OLD Subname : "Bergbaulehrer", Subname AC enUS : "Grand Master Mining Trainer" ; Wowhead enUS : "Grand Master Mining Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Großmeister des Bergbaus', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26962;
+-- AC datas : OLD Name : "Roberta Jacks", Name AC enUS : "Roberta Jacks" ; Wowhead enUS : "Roberta Jacks",  OLD Subname : "Kürschnerlehrerin", Subname AC enUS : "Grand Master Skinning Trainer" ; Wowhead enUS : "Grand Master Skinning Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Großmeisterin der Kürschnerei', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26963;
+-- AC datas : OLD Name : "Alexandra McQueen", Name AC enUS : "Alexandra McQueen" ; Wowhead enUS : "Alexandra McQueen",  OLD Subname : "Schneiderlehrerin", Subname AC enUS : "Grand Master Tailoring Trainer" ; Wowhead enUS : "Grand Master Tailoring Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Großmeisterin der Schneiderei', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26964;
+-- AC datas : OLD Name : "Raenah", Name AC enUS : "Raenah" ; Wowhead enUS : "Raenah",  OLD Subname : "Schneiderlehrerin", Subname AC enUS : "Grand Master Tailoring Trainer" ; Wowhead enUS : "Grand Master Tailoring Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Großmeisterin der Schneiderei', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26969;
+-- AC datas : OLD Subname : "Kochkunstlehrer", Subname AC enUS : "Grand Master Cooking Trainer" ; Wowhead enUS : "Grand Master Cooking Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Kochkunst', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26972;
--- AC datas : OLD Subname : "Kräuterkundelehrerin", Subname AC enUS : "Grand Master Herbalism Trainer"" ; Wowhead enUS : "Grand Master Herbalism Trainer"
+-- AC datas : OLD Subname : "Kräuterkundelehrerin", Subname AC enUS : "Grand Master Herbalism Trainer" ; Wowhead enUS : "Grand Master Herbalism Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin der Kräuterkunde', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26974;
--- AC datas : OLD Subname : "Alchemielehrer", Subname AC enUS : "Grand Master Alchemy Trainer"" ; Wowhead enUS : "Grand Master Alchemy Trainer"
+-- AC datas : OLD Subname : "Alchemielehrer", Subname AC enUS : "Grand Master Alchemy Trainer" ; Wowhead enUS : "Grand Master Alchemy Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Alchemie', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26975;
--- AC datas : OLD Subname : "Bergbaulehrerin", Subname AC enUS : "Grand Master Mining Trainer"" ; Wowhead enUS : "Grand Master Mining Trainer"
+-- AC datas : OLD Subname : "Bergbaulehrerin", Subname AC enUS : "Grand Master Mining Trainer" ; Wowhead enUS : "Grand Master Mining Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin des Bergbaus', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26976;
--- AC datas : OLD Subname : "Inschriftenkundelehrerin", Subname AC enUS : "Grand Master Inscription Trainer"" ; Wowhead enUS : "Grand Master Inscription Trainer"
+-- AC datas : OLD Subname : "Inschriftenkundelehrerin", Subname AC enUS : "Grand Master Inscription Trainer" ; Wowhead enUS : "Grand Master Inscription Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin der Inschriftenkunde', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26977;
--- AC datas : OLD Subname : "Verzauberkunstlehrer", Subname AC enUS : "Grand Master Enchanting Trainer"" ; Wowhead enUS : "Grand Master Enchanting Trainer"
+-- AC datas : OLD Subname : "Verzauberkunstlehrer", Subname AC enUS : "Grand Master Enchanting Trainer" ; Wowhead enUS : "Grand Master Enchanting Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Verzauberkunst', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26980;
--- AC datas : OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Grand Master Blacksmithing Trainer"" ; Wowhead enUS : "Grand Master Blacksmithing Trainer"
+-- AC datas : OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Grand Master Blacksmithing Trainer" ; Wowhead enUS : "Grand Master Blacksmithing Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Schmiedekunst', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26981;
--- AC datas : OLD Subname : "Juwelierskunstlehrer", Subname AC enUS : "Grand Master Jewelcrafting Trainer"" ; Wowhead enUS : "Grand Master Jewelcrafting Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Großmeister des Juwelenschleifens', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26982;
--- AC datas : OLD Subname : "Kürschnerlehrerin", Subname AC enUS : "Grand Master Skinning Trainer"" ; Wowhead enUS : "Grand Master Skinning Trainer"
+-- AC datas : OLD Name : "Geba'li", Name AC enUS : "Geba'li" ; Wowhead enUS : "Geba'li",  OLD Subname : "Juwelierskunstlehrer", Subname AC enUS : "Grand Master Jewelcrafting Trainer" ; Wowhead enUS : "Grand Master Jewelcrafting Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Großmeister des Juwelenschleifens', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26982;
+-- AC datas : OLD Subname : "Kürschnerlehrerin", Subname AC enUS : "Grand Master Skinning Trainer" ; Wowhead enUS : "Grand Master Skinning Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Kürschnermeisterlehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26986;
--- AC datas : OLD Subname : "Alchemielehrer", Subname AC enUS : "Grand Master Alchemy Trainer"" ; Wowhead enUS : "Grand Master Alchemy Trainer"
+-- AC datas : OLD Subname : "Alchemielehrer", Subname AC enUS : "Grand Master Alchemy Trainer" ; Wowhead enUS : "Grand Master Alchemy Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Alchemie', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26987;
--- AC datas : OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Grand Master Blacksmithing Trainer"" ; Wowhead enUS : "Grand Master Blacksmithing Trainer"
+-- AC datas : OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Grand Master Blacksmithing Trainer" ; Wowhead enUS : "Grand Master Blacksmithing Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Schmiedekunst', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26988;
--- AC datas : OLD Subname : "Kochkunstlehrer", Subname AC enUS : "Grand Master Cooking Trainer"" ; Wowhead enUS : "Grand Master Cooking Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Kochkunst', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26989;
--- AC datas : OLD Subname : "Verzauberkunstlehrerin", Subname AC enUS : "Grand Master Enchanting Trainer"" ; Wowhead enUS : "Grand Master Enchanting Trainer"
+-- AC datas : OLD Name : "Rollick MacKreel", Name AC enUS : "Rollick MacKreel" ; Wowhead enUS : "Rollick MacKreel",  OLD Subname : "Kochkunstlehrer", Subname AC enUS : "Grand Master Cooking Trainer" ; Wowhead enUS : "Grand Master Cooking Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Großmeister der Kochkunst', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26989;
+-- AC datas : OLD Subname : "Verzauberkunstlehrerin", Subname AC enUS : "Grand Master Enchanting Trainer" ; Wowhead enUS : "Grand Master Enchanting Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin der Verzauberkunst', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26990;
--- AC datas : OLD Subname : "Ingenieurskunstlehrer", Subname AC enUS : "Grand Master Engineering Trainer"" ; Wowhead enUS : "Grand Master Engineering Trainer"
+-- AC datas : OLD Subname : "Ingenieurskunstlehrer", Subname AC enUS : "Grand Master Engineering Trainer" ; Wowhead enUS : "Grand Master Engineering Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Ingenieurskunst', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26991;
--- AC datas : OLD Subname : "Lehrerin für Erste Hilfe", Subname AC enUS : "Grand Master First Aid Trainer"" ; Wowhead enUS : "Grand Master First Aid Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin für Erste Hilfe', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26992;
--- AC datas : OLD Subname : "Angellehrer", Subname AC enUS : "Grand Master Fishing Trainer"" ; Wowhead enUS : "Grand Master Fishing Trainer"
+-- AC datas : OLD Name : "Brynna Wilson", Name AC enUS : "Brynna Wilson" ; Wowhead enUS : "Brynna Wilson",  OLD Subname : "Lehrerin für Erste Hilfe", Subname AC enUS : "Grand Master First Aid Trainer" ; Wowhead enUS : "Grand Master First Aid Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Großmeisterin für Erste Hilfe', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26992;
+-- AC datas : OLD Subname : "Angellehrer", Subname AC enUS : "Grand Master Fishing Trainer" ; Wowhead enUS : "Grand Master Fishing Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeister des Angelns', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26993;
--- AC datas : OLD Subname : "Kräuterkundelehrerin", Subname AC enUS : "Grand Master Herbalism Trainer"" ; Wowhead enUS : "Grand Master Herbalism Trainer"
+-- AC datas : OLD Subname : "Kräuterkundelehrerin", Subname AC enUS : "Grand Master Herbalism Trainer" ; Wowhead enUS : "Grand Master Herbalism Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin der Kräuterkunde', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26994;
--- AC datas : OLD Name : "Klimper Hellblitz", Name AC enUS : "Tink Brightbolt" ; Wowhead enUS : "Tink Brightbolt",  OLD Subname : "Inschriftenkundelehrerin", Subname AC enUS : "Grand Master Inscription Trainer"" ; Wowhead enUS : "Grand Master Inscription Trainer"
+-- AC datas : OLD Name : "Klimper Hellblitz", Name AC enUS : "Tink Brightbolt" ; Wowhead enUS : "Tink Brightbolt",  OLD Subname : "Inschriftenkundelehrerin", Subname AC enUS : "Grand Master Inscription Trainer" ; Wowhead enUS : "Grand Master Inscription Trainer"
 UPDATE `creature_template_locale` SET `Name` = 'Bastel Hellblitz', `Title` = 'Großmeisterin der Inschriftenkunde', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26995;
--- AC datas : OLD Subname : "Lederverarbeitungslehrer", Subname AC enUS : "Grand Master Leatherworker"" ; Wowhead enUS : "Grand Master Leatherworker"
+-- AC datas : OLD Subname : "Lederverarbeitungslehrer", Subname AC enUS : "Grand Master Leatherworker" ; Wowhead enUS : "Grand Master Leatherworker"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Lederverarbeitung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26996;
--- AC datas : OLD Subname : "Juwelierskunstlehrer", Subname AC enUS : "Grand Master Jewelcrafting Trainer"" ; Wowhead enUS : "Grand Master Jewelcrafting Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Großmeister des Juwelenschleifens', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26997;
--- AC datas : OLD Subname : "Lederverarbeitungslehrerin", Subname AC enUS : "Grand Master Leatherworking Trainer"" ; Wowhead enUS : "Grand Master Leatherworking Trainer"
+-- AC datas : OLD Name : "Alestos", Name AC enUS : "Alestos" ; Wowhead enUS : "Alestos",  OLD Subname : "Juwelierskunstlehrer", Subname AC enUS : "Grand Master Jewelcrafting Trainer" ; Wowhead enUS : "Grand Master Jewelcrafting Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Großmeister des Juwelenschleifens', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26997;
+-- AC datas : OLD Subname : "Lederverarbeitungslehrerin", Subname AC enUS : "Grand Master Leatherworking Trainer" ; Wowhead enUS : "Grand Master Leatherworking Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin der Lederverarbeitung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26998;
--- AC datas : OLD Subname : "Bergbaulehrer", Subname AC enUS : "Grand Master Mining Trainer"" ; Wowhead enUS : "Grand Master Mining Trainer"
+-- AC datas : OLD Subname : "Bergbaulehrer", Subname AC enUS : "Grand Master Mining Trainer" ; Wowhead enUS : "Grand Master Mining Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeister des Bergbaus', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26999;
--- AC datas : OLD Subname : "Kürschnerlehrer", Subname AC enUS : "Grand Master Skinning Trainer"" ; Wowhead enUS : "Grand Master Skinning Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Kürschnerei', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 27000;
--- AC datas : OLD Subname : "Schneiderlehrer", Subname AC enUS : "Grand Master Tailoring Trainer"" ; Wowhead enUS : "Grand Master Tailoring Trainer"
+-- AC datas : OLD Name : "Trapper Jack", Name AC enUS : "Trapper Jack" ; Wowhead enUS : "Trapper Jack",  OLD Subname : "Kürschnerlehrer", Subname AC enUS : "Grand Master Skinning Trainer" ; Wowhead enUS : "Grand Master Skinning Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Großmeister der Kürschnerei', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 27000;
+-- AC datas : OLD Subname : "Schneiderlehrer", Subname AC enUS : "Grand Master Tailoring Trainer" ; Wowhead enUS : "Grand Master Tailoring Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Schneiderei', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 27001;
--- AC datas : OLD Subname : "Alchemielehrerin", Subname AC enUS : "Master Alchemy Trainer"" ; Wowhead enUS : "Master Alchemy Trainer"
+-- AC datas : OLD Subname : "Alchemielehrerin", Subname AC enUS : "Master Alchemy Trainer" ; Wowhead enUS : "Master Alchemy Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Alchemiemeisterlehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 27023;
--- AC datas : OLD Subname : "Alchemielehrer", Subname AC enUS : "Master Alchemy Trainer"" ; Wowhead enUS : "Master Alchemy Trainer"
+-- AC datas : OLD Subname : "Alchemielehrer", Subname AC enUS : "Master Alchemy Trainer" ; Wowhead enUS : "Master Alchemy Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Alchemiemeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 27029;
--- AC datas : OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Grand Master Blacksmithing Trainer"" ; Wowhead enUS : "Grand Master Blacksmithing Trainer"
+-- AC datas : OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Grand Master Blacksmithing Trainer" ; Wowhead enUS : "Grand Master Blacksmithing Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Schmiedekunst', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 27034;
 -- AC datas : OLD Name : "Kriegerheld von Oneqwah", Name AC enUS : "Camp Oneqwah Brave" ; Wowhead enUS : "Camp Oneqwah Brave"
 UPDATE `creature_template_locale` SET `Name` = 'Kriegsheld von Oneqwah', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 27126;
--- AC datas : OLD Subname : "Rüstungsschmiedin", Subname AC enUS : "Armorer"" ; Wowhead enUS : "Armorer"
+-- AC datas : OLD Subname : "Rüstungsschmiedin", Subname AC enUS : "Armorer" ; Wowhead enUS : "Armorer"
 UPDATE `creature_template_locale` SET `Title` = 'Rüstungsschmied', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 27134;
 -- AC datas : OLD Name : "Hochkommandant Halford Wyrmbann", Name AC enUS : "High Commander Halford Wyrmbane" ; Wowhead enUS : "High Commander Halford Wyrmbane"
 UPDATE `creature_template_locale` SET `Name` = 'Oberkommandant Halford Wyrmbann', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 27136;
--- AC datas : OLD Subname : "Juwelierskunstbedarf", Subname AC enUS : "Jewelcrafting Supplies"" ; Wowhead enUS : "Jewelcrafting Supplies"
+-- AC datas : OLD Subname : "Juwelierskunstbedarf", Subname AC enUS : "Jewelcrafting Supplies" ; Wowhead enUS : "Jewelcrafting Supplies"
 UPDATE `creature_template_locale` SET `Title` = 'Juwelenschleiferbedarf', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 27142;
 -- AC datas : OLD Name : "Folterer LeCraft", Name AC enUS : "Torturer LeCraft" ; Wowhead enUS : "Torturer Alphonse"
 UPDATE `creature_template_locale` SET `Name` = 'Folterer Alphonse', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 27209;
@@ -8975,8 +8907,8 @@ UPDATE `creature_template_locale` SET `Name` = 'Chefschreiber Kinnedius', `Verif
 UPDATE `creature_template_locale` SET `Name` = 'Zenturion Kaggrum', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 27563;
 -- AC datas : OLD Name : "Lord Afrasastrasz", Name AC enUS : "Lord Afrasastrasz" ; Wowhead enUS : "Lord Devrestrasz"
 UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 27575;
--- AC datas : OLD Subname : "Juwelierskunstbedarf", Subname AC enUS : "Jewelcrafting Supplies"" ; Wowhead enUS : "Jewelcrafting Supplies"
-UPDATE `creature_template_locale` SET `Title` = 'Juwelenschleiferbedarf', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 27666;
+-- AC datas : OLD Name : "Ontuvo", Name AC enUS : "Ontuvo" ; Wowhead enUS : "Ontuvo",  OLD Subname : "Juwelierskunstbedarf", Subname AC enUS : "Jewelcrafting Supplies" ; Wowhead enUS : "Jewelcrafting Supplies"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Juwelenschleiferbedarf', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 27666;
 -- AC datas : OLD Name : "Reitkodo des Braufests", Name AC enUS : "Brewfest Riding Kodo" ; Wowhead enUS : "Brewfest Riding Kodo"
 UPDATE `creature_template_locale` SET `Name` = 'Reitkodo des Brausfests', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 27706;
 -- AC datas : OLD Name : "Akolyth", Name AC enUS : "Acolyte" ; Wowhead enUS : "Acolyte"
@@ -8991,7 +8923,7 @@ UPDATE `creature_template_locale` SET `Name` = 'Bierblase', `VerifiedBuild` = 0 
 UPDATE `creature_template_locale` SET `Name` = 'Verrottende Montrosität', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28023;
 -- AC datas : OLD Name : "Die Geist von Gnomeregan", Name AC enUS : "The Spirit of Gnomeregan" ; Wowhead enUS : "The Spirit of Gnomeregan"
 UPDATE `creature_template_locale` SET `Name` = 'Die ''Geist von Gnomeregan''', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28037;
--- AC datas : OLD Subname : "Geißel der Südlichen Meere", Subname AC enUS : "Scourge of the South Seas"" ; Wowhead enUS : "Scourge of the South Seas"
+-- AC datas : OLD Subname : "Geißel der Südlichen Meere", Subname AC enUS : "Scourge of the South Seas" ; Wowhead enUS : "Scourge of the South Seas"
 UPDATE `creature_template_locale` SET `Title` = 'Geißel der südlichen Meere', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28048;
 -- AC datas : OLD Name : "Ol' Chumbucket", Name AC enUS : "Ol' Chumbucket" ; Wowhead enUS : "Ol' Chumbucket"
 UPDATE `creature_template_locale` SET `Name` = 'Der Alte Fischkübel', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28050;
@@ -8999,8 +8931,8 @@ UPDATE `creature_template_locale` SET `Name` = 'Der Alte Fischkübel', `Verified
 UPDATE `creature_template_locale` SET `Name` = 'Käpt''n Slappy', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28051;
 -- AC datas : OLD Name : "Saphirblaue Schwarmdrohne", Name AC enUS : "Sapphire Hive Drone" ; Wowhead enUS : "Sapphire Hive Drone"
 UPDATE `creature_template_locale` SET `Name` = 'Saphirblaue Schwarmdrone', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28085;
--- AC datas : OLD Subname : "Der Zirkel des Cenarius", Subname AC enUS : "Cenarion Circle"" ; Wowhead enUS : "Cenarion Circle"
-UPDATE `creature_template_locale` SET `Title` = 'Zirkel des Cenarius', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28177;
+-- AC datas : OLD Name : "Rayne", Name AC enUS : "Rayne" ; Wowhead enUS : "Rayne",  OLD Subname : "Der Zirkel des Cenarius", Subname AC enUS : "Cenarion Circle" ; Wowhead enUS : "Cenarion Circle"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Zirkel des Cenarius', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28177;
 -- AC datas : OLD Name : "Hartknöchelmatriarchin", Name AC enUS : "Hardknuckle Matriarch" ; Wowhead enUS : "Hardknuckle Matriarch"
 UPDATE `creature_template_locale` SET `Name` = 'Hartknöchelmatriachin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28213;
 -- AC datas : OLD Name : "Koyotengeist", Name AC enUS : "Coyote Spirit" ; Wowhead enUS : "Coyote Spirit"
@@ -9021,52 +8953,52 @@ UPDATE `creature_template_locale` SET `Name` = 'Wasserstrahl', `VerifiedBuild` =
 UPDATE `creature_template_locale` SET `Name` = 'Maurermeister van der Gülden', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28572;
 -- AC datas : OLD Name : "Akolyth der Todeshand", Name AC enUS : "Death's Hand Acolyte" ; Wowhead enUS : "Death's Hand Acolyte"
 UPDATE `creature_template_locale` SET `Name` = 'Akolyt der Todeshand', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28602;
--- AC datas : OLD Subname : "Verzauberkunstlehrer", Subname AC enUS : "Grand Master Enchanting Trainer"" ; Wowhead enUS : "Grand Master Enchanting Trainer"
+-- AC datas : OLD Subname : "Verzauberkunstlehrer", Subname AC enUS : "Grand Master Enchanting Trainer" ; Wowhead enUS : "Grand Master Enchanting Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Verzauberkunst', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28693;
--- AC datas : OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Grand Master Blacksmithing Trainer"" ; Wowhead enUS : "Grand Master Blacksmithing Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Schmiedekunst', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28694;
--- AC datas : OLD Subname : "Kürschnerlehrer", Subname AC enUS : "Grand Master Skinning Trainer"" ; Wowhead enUS : "Grand Master Skinning Trainer"
+-- AC datas : OLD Name : "Alard Schmied", Name AC enUS : "Alard Schmied" ; Wowhead enUS : "Alard Schmied",  OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Grand Master Blacksmithing Trainer" ; Wowhead enUS : "Grand Master Blacksmithing Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Großmeister der Schmiedekunst', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28694;
+-- AC datas : OLD Subname : "Kürschnerlehrer", Subname AC enUS : "Grand Master Skinning Trainer" ; Wowhead enUS : "Grand Master Skinning Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Kürschnerei', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28696;
--- AC datas : OLD Subname : "Ingenieurskunstlehrer", Subname AC enUS : "Grand Master Engineering Trainer"" ; Wowhead enUS : "Grand Master Engineering Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Ingenieurskunst', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28697;
--- AC datas : OLD Subname : "Bergbaulehrer", Subname AC enUS : "Grand Master Mining Trainer"" ; Wowhead enUS : "Grand Master Mining Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Großmeister des Bergbaus', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28698;
--- AC datas : OLD Subname : "Schneiderlehrer", Subname AC enUS : "Grand Master Tailoring Trainer"" ; Wowhead enUS : "Grand Master Tailoring Trainer"
+-- AC datas : OLD Name : "Timofey Oshenko", Name AC enUS : "Timofey Oshenko" ; Wowhead enUS : "Timofey Oshenko",  OLD Subname : "Ingenieurskunstlehrer", Subname AC enUS : "Grand Master Engineering Trainer" ; Wowhead enUS : "Grand Master Engineering Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Großmeister der Ingenieurskunst', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28697;
+-- AC datas : OLD Name : "Jedidiah Handers", Name AC enUS : "Jedidiah Handers" ; Wowhead enUS : "Jedidiah Handers",  OLD Subname : "Bergbaulehrer", Subname AC enUS : "Grand Master Mining Trainer" ; Wowhead enUS : "Grand Master Mining Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Großmeister des Bergbaus', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28698;
+-- AC datas : OLD Subname : "Schneiderlehrer", Subname AC enUS : "Grand Master Tailoring Trainer" ; Wowhead enUS : "Grand Master Tailoring Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Schneiderei', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28699;
--- AC datas : OLD Subname : "Lederverarbeitungslehrerin", Subname AC enUS : "Grand Master Leatherworking Trainer"" ; Wowhead enUS : "Grand Master Leatherworking Trainer"
+-- AC datas : OLD Subname : "Lederverarbeitungslehrerin", Subname AC enUS : "Grand Master Leatherworking Trainer" ; Wowhead enUS : "Grand Master Leatherworking Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin der Lederverarbeitung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28700;
--- AC datas : OLD Subname : "Juwelierskunstlehrer", Subname AC enUS : "Grand Master Jewelcrafting Trainer"" ; Wowhead enUS : "Grand Master Jewelcrafting Trainer"
+-- AC datas : OLD Subname : "Juwelierskunstlehrer", Subname AC enUS : "Grand Master Jewelcrafting Trainer" ; Wowhead enUS : "Grand Master Jewelcrafting Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeister des Juwelenschleifens', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28701;
--- AC datas : OLD Subname : "Inschriftenkundelehrer", Subname AC enUS : "Grand Master Inscription Trainer"" ; Wowhead enUS : "Grand Master Inscription Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Inschriftenkunde', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28702;
--- AC datas : OLD Subname : "Alchemielehrerin", Subname AC enUS : "Grand Master Alchemy Trainer"" ; Wowhead enUS : "Grand Master Alchemy Trainer"
+-- AC datas : OLD Name : "Professor Pallin", Name AC enUS : "Professor Pallin" ; Wowhead enUS : "Professor Pallin",  OLD Subname : "Inschriftenkundelehrer", Subname AC enUS : "Grand Master Inscription Trainer" ; Wowhead enUS : "Grand Master Inscription Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Großmeister der Inschriftenkunde', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28702;
+-- AC datas : OLD Subname : "Alchemielehrerin", Subname AC enUS : "Grand Master Alchemy Trainer" ; Wowhead enUS : "Grand Master Alchemy Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin der Alchemie', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28703;
--- AC datas : OLD Subname : "Kräuterkundelehrerin", Subname AC enUS : "Grand Master Herbalism Trainer"" ; Wowhead enUS : "Grand Master Herbalism Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin der Kräuterkunde', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28704;
--- AC datas : OLD Subname : "Kochkunstlehrerin", Subname AC enUS : "Grand Master Cooking Trainer"" ; Wowhead enUS : "Grand Master Cooking Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin der Kochkunst', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28705;
--- AC datas : OLD Subname : "Lehrerin für Erste Hilfe", Subname AC enUS : "Grand Master First Aid Trainer"" ; Wowhead enUS : "Grand Master First Aid Trainer"
+-- AC datas : OLD Name : "Dorothy Egan", Name AC enUS : "Dorothy Egan" ; Wowhead enUS : "Dorothy Egan",  OLD Subname : "Kräuterkundelehrerin", Subname AC enUS : "Grand Master Herbalism Trainer" ; Wowhead enUS : "Grand Master Herbalism Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Großmeisterin der Kräuterkunde', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28704;
+-- AC datas : OLD Name : "Katherine Lee", Name AC enUS : "Katherine Lee" ; Wowhead enUS : "Katherine Lee",  OLD Subname : "Kochkunstlehrerin", Subname AC enUS : "Grand Master Cooking Trainer" ; Wowhead enUS : "Grand Master Cooking Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Großmeisterin der Kochkunst', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28705;
+-- AC datas : OLD Subname : "Lehrerin für Erste Hilfe", Subname AC enUS : "Grand Master First Aid Trainer" ; Wowhead enUS : "Grand Master First Aid Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin für Erste Hilfe', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28706;
 -- AC datas : OLD Name : "Seelenbrunnenzone der Leere", Name AC enUS : "Soul Font Void Zone" ; Wowhead enUS : "Soul Font Void Zone"
 UPDATE `creature_template_locale` SET `Name` = 'Leerenzone des Seelenbrunnens', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28719;
--- AC datas : OLD Subname : "Juwelierskunstbedarf", Subname AC enUS : "Jewelcrafting Supplies"" ; Wowhead enUS : "Jewelcrafting Supplies"
-UPDATE `creature_template_locale` SET `Title` = 'Juwelenschleiferbedarf', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28721;
--- AC datas : OLD Subname : "Angellehrerin & Angelbedarf", Subname AC enUS : "Grand Master Fishing Trainer & Supplies"" ; Wowhead enUS : "Grand Master Fishing Trainer & Supplies"
+-- AC datas : OLD Name : "Tiffany Cartier", Name AC enUS : "Tiffany Cartier" ; Wowhead enUS : "Tiffany Cartier",  OLD Subname : "Juwelierskunstbedarf", Subname AC enUS : "Jewelcrafting Supplies" ; Wowhead enUS : "Jewelcrafting Supplies"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Juwelenschleiferbedarf', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28721;
+-- AC datas : OLD Subname : "Angellehrerin & Angelbedarf", Subname AC enUS : "Grand Master Fishing Trainer & Supplies" ; Wowhead enUS : "Grand Master Fishing Trainer & Supplies"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin des Angelns & Angelbedarf', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28742;
--- AC datas : OLD Subname : "Fluglehrer", Subname AC enUS : "Cold Weather Flying Trainer"" ; Wowhead enUS : "Cold Weather Flying Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Lehrer für Kaltwetterflug', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28746;
+-- AC datas : OLD Name : "Pilot Vic", Name AC enUS : "Pilot Vic" ; Wowhead enUS : "Pilot Vic",  OLD Subname : "Fluglehrer", Subname AC enUS : "Cold Weather Flying Trainer" ; Wowhead enUS : "Cold Weather Flying Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Lehrer für Kaltwetterflug', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28746;
 -- AC datas : OLD Name : "Hargus der Krüppel", Name AC enUS : "Hargus the Gimp" ; Wowhead enUS : "Hargus the Geist"
 UPDATE `creature_template_locale` SET `Name` = 'Hargus der Spuk', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28760;
 -- AC datas : OLD Name : "Schattenhafter Peiniger", Name AC enUS : "Shadowy Tormentor" ; Wowhead enUS : "Shadowy Tormentor"
 UPDATE `creature_template_locale` SET `Name` = 'Schattenhafter Foltermeister', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28769;
 -- AC datas : OLD Name : "Ausgelaugter Prophet von Quetz'lun", Name AC enUS : "Drained Prophet of Quetz'lun" ; Wowhead enUS : "Drained Prophet of Quetz'lun"
 UPDATE `creature_template_locale` SET `Name` = 'Ausgelaugter Prophet von Quetz''lin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28795;
--- AC datas : OLD Subname : "Juwelierskunstbedarf", Subname AC enUS : "Jewelcafting Supplies"" ; Wowhead enUS : "Jewelcafting Supplies"
-UPDATE `creature_template_locale` SET `Title` = 'Juwelenschleiferbedarf', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28799;
--- AC datas : OLD Subname : "", Subname AC enUS : "Ammunition"" ; Wowhead enUS : "Ammunition"
+-- AC datas : OLD Name : "Alanna", Name AC enUS : "Alanna" ; Wowhead enUS : "Alanna",  OLD Subname : "Juwelierskunstbedarf", Subname AC enUS : "Jewelcafting Supplies" ; Wowhead enUS : "Jewelcafting Supplies"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Juwelenschleiferbedarf', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28799;
+-- AC datas : OLD Subname : "", Subname AC enUS : "Ammunition" ; Wowhead enUS : "Ammunition"
 UPDATE `creature_template_locale` SET `Title` = 'Munition', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28800;
--- AC datas : OLD Subname : "", Subname AC enUS : "Ammunition"" ; Wowhead enUS : "Ammunition"
-UPDATE `creature_template_locale` SET `Title` = 'Munition', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28813;
+-- AC datas : OLD Name : "Elizabeth Hollingsworth", Name AC enUS : "Elizabeth Hollingsworth" ; Wowhead enUS : "Elizabeth Hollingsworth",  OLD Subname : "", Subname AC enUS : "Ammunition" ; Wowhead enUS : "Ammunition"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Munition', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28813;
 -- AC datas : OLD Name : "Scharlachroter Flottenverteidiger", Name AC enUS : "Scarlet Fleet Guardian" ; Wowhead enUS : "Scarlet Fleet Guardian"
 UPDATE `creature_template_locale` SET `Name` = 'Wächter der Scharlachroten Flotte', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28856;
 -- AC datas : OLD Name : "Scharlachroter Hauptmann", Name AC enUS : "Scarlet Captain" ; Wowhead enUS : "Scarlet Captain"
@@ -9075,46 +9007,46 @@ UPDATE `creature_template_locale` SET `Name` = 'Schalachroter Hauptmann', `Verif
 UPDATE `creature_template_locale` SET `Name` = 'Scharlachroter Lord Borugh', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28964;
 -- AC datas : OLD Name : "Purpurroter Akolyth", Name AC enUS : "Crimson Acolyte" ; Wowhead enUS : "Crimson Acolyte"
 UPDATE `creature_template_locale` SET `Name` = 'Purpurroter Akolyt', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 29007;
--- AC datas : OLD Subname : "Bogenmacher", Subname AC enUS : "Fletcher"" ; Wowhead enUS : "Fletcher"
-UPDATE `creature_template_locale` SET `Title` = 'Pfeilmacher', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 29014;
+-- AC datas : OLD Name : "Grakjek", Name AC enUS : "Grakjek" ; Wowhead enUS : "Grakjek",  OLD Subname : "Bogenmacher", Subname AC enUS : "Fletcher" ; Wowhead enUS : "Fletcher"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Pfeilmacher', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 29014;
 -- AC datas : OLD Name : "Blutklauenmatriarchin", Name AC enUS : "Goretalon Matriarch" ; Wowhead enUS : "Goretalon Matriarch"
 UPDATE `creature_template_locale` SET `Name` = 'Blutklauenmatriarch', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 29044;
--- AC datas : OLD Subname : "Reagenzienverkäufer", Subname AC enUS : "Corpse Dust Vendor"" ; Wowhead enUS : "Corpse Dust Vendor"
-UPDATE `creature_template_locale` SET `Title` = 'Leichenstaubverkäufer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 29203;
+-- AC datas : OLD Name : "Alchemist Karloff", Name AC enUS : "Alchemist Karloff" ; Wowhead enUS : "Alchemist Karloff",  OLD Subname : "Reagenzienverkäufer", Subname AC enUS : "Corpse Dust Vendor" ; Wowhead enUS : "Corpse Dust Vendor"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Leichenstaubverkäufer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 29203;
 -- AC datas : OLD Name : "Cenarischer Späher", Name AC enUS : "Cenarion Scout" ; Wowhead enUS : "Cenarion Scout"
 UPDATE `creature_template_locale` SET `Name` = 'Aufklärer des Cenarius', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 29220;
 -- AC datas : OLD Name : "Antimagisches Feld", Name AC enUS : "Anti-Magic Zone" ; Wowhead enUS : "Anti-Magic Zone"
 UPDATE `creature_template_locale` SET `Name` = 'Antimagiezone', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 29225;
--- AC datas : OLD Subname : "Lehrerin für Erste Hilfe", Subname AC enUS : "Grand Master First Aid Trainer"" ; Wowhead enUS : "Grand Master First Aid Trainer"
+-- AC datas : OLD Subname : "Lehrerin für Erste Hilfe", Subname AC enUS : "Grand Master First Aid Trainer" ; Wowhead enUS : "Grand Master First Aid Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin der Ersten Hilfe', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 29233;
 -- AC datas : OLD Name : "Land Mine Bunny", Name AC enUS : "Land Mine Bunny" ; Wowhead enUS : "Land Mine Bunny"
 UPDATE `creature_template_locale` SET `Name` = 'Landminenhäschen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 29397;
--- AC datas : OLD Subname : "", Subname AC enUS : "Specialty Ammunition"" ; Wowhead enUS : "Specialty Ammunition"
+-- AC datas : OLD Subname : "", Subname AC enUS : "Specialty Ammunition" ; Wowhead enUS : "Specialty Ammunition"
 UPDATE `creature_template_locale` SET `Title` = 'Spezialmunition', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 29493;
--- AC datas : OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Weaponsmithing Trainer"" ; Wowhead enUS : "Weaponsmithing Trainer"
+-- AC datas : OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Weaponsmithing Trainer" ; Wowhead enUS : "Weaponsmithing Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Waffenschmiedekunstlehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 29505;
--- AC datas : OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Armorsmithing Trainer"" ; Wowhead enUS : "Armorsmithing Trainer"
+-- AC datas : OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Armorsmithing Trainer" ; Wowhead enUS : "Armorsmithing Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Rüstungsschmiedekunstlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 29506;
--- AC datas : OLD Subname : "Lederverarbeitungslehrer", Subname AC enUS : "Elemental Leatherworking Trainer"" ; Wowhead enUS : "Elemental Leatherworking Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Elementarlederverarbeitungslehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 29507;
--- AC datas : OLD Subname : "Lederverarbeitungslehrer", Subname AC enUS : "Dragonscale Leatherworking Trainer"" ; Wowhead enUS : "Dragonscale Leatherworking Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Drachenlederverarbeitungslehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 29508;
--- AC datas : OLD Subname : "Lederverarbeitungslehrerin", Subname AC enUS : "Tribal Leatherworking Trainer"" ; Wowhead enUS : "Tribal Leatherworking Trainer"
+-- AC datas : OLD Name : "Manfred Staller", Name AC enUS : "Manfred Staller" ; Wowhead enUS : "Manfred Staller",  OLD Subname : "Lederverarbeitungslehrer", Subname AC enUS : "Elemental Leatherworking Trainer" ; Wowhead enUS : "Elemental Leatherworking Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Elementarlederverarbeitungslehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 29507;
+-- AC datas : OLD Name : "Andellion", Name AC enUS : "Andellion" ; Wowhead enUS : "Andellion",  OLD Subname : "Lederverarbeitungslehrer", Subname AC enUS : "Dragonscale Leatherworking Trainer" ; Wowhead enUS : "Dragonscale Leatherworking Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Drachenlederverarbeitungslehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 29508;
+-- AC datas : OLD Subname : "Lederverarbeitungslehrerin", Subname AC enUS : "Tribal Leatherworking Trainer" ; Wowhead enUS : "Tribal Leatherworking Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Stammeslederverarbeitungslehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 29509;
--- AC datas : OLD Subname : "Gnomischer Ingenieurslehrer", Subname AC enUS : "Gnome Engineering Trainer"" ; Wowhead enUS : "Gnome Engineering Trainer"
+-- AC datas : OLD Subname : "Gnomischer Ingenieurslehrer", Subname AC enUS : "Gnome Engineering Trainer" ; Wowhead enUS : "Gnome Engineering Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Gnomeningenieurslehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 29514;
--- AC datas : OLD Subname : "Händler für Kettenrüstungen", Subname AC enUS : "Mail Armor Merchant"" ; Wowhead enUS : "Mail Armor Merchant"
+-- AC datas : OLD Subname : "Händler für Kettenrüstungen", Subname AC enUS : "Mail Armor Merchant" ; Wowhead enUS : "Mail Armor Merchant"
 UPDATE `creature_template_locale` SET `Title` = 'Händler für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 29523;
--- AC datas : OLD Subname : "Kochkunstlehrer", Subname AC enUS : "Grand Master Cooking Trainer"" ; Wowhead enUS : "Grand Master Cooking Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Kochkunst', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 29631;
+-- AC datas : OLD Name : "Awilo Lon'gomba", Name AC enUS : "Awilo Lon'gomba" ; Wowhead enUS : "Awilo Lon'gomba",  OLD Subname : "Kochkunstlehrer", Subname AC enUS : "Grand Master Cooking Trainer" ; Wowhead enUS : "Grand Master Cooking Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Großmeister der Kochkunst', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 29631;
 -- AC datas : OLD Name : "Exemplar eines Jungen von Stratholme", Name AC enUS : "Stratholme Child Specimen" ; Wowhead enUS : "Stratholme Child Specimen"
 UPDATE `creature_template_locale` SET `Name` = 'Exemplar eines Kindes von Stratholme', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 29868;
 -- AC datas : OLD Name : "Runenlord der Vargul", Name AC enUS : "Vargul Runelord" ; Wowhead enUS : "Vargul Runelord"
 UPDATE `creature_template_locale` SET `Name` = 'Runenlord', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 29891;
 -- AC datas : OLD Name : "Seuchenklaue der Vargul", Name AC enUS : "Vargul Plaguetalon" ; Wowhead enUS : "Vargul Plaguetalon"
 UPDATE `creature_template_locale` SET `Name` = 'Vargul Seuchenklaue', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 29894;
--- AC datas : OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Grand Master Blacksmithing Trainer"" ; Wowhead enUS : "Grand Master Blacksmithing Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Schmiedekunst', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 29924;
+-- AC datas : OLD Name : "Brandig", Name AC enUS : "Brandig" ; Wowhead enUS : "Brandig",  OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Grand Master Blacksmithing Trainer" ; Wowhead enUS : "Grand Master Blacksmithing Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Großmeister der Schmiedekunst', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 29924;
 -- AC datas : OLD Name : "Akolyth der Pein", Name AC enUS : "Acolyte of Agony" ; Wowhead enUS : "Acolyte of Agony"
 UPDATE `creature_template_locale` SET `Name` = 'Akolyt der Pein', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 29934;
 -- AC datas : OLD Name : "Akolyth des Schmerzes", Name AC enUS : "Acolyte of Pain" ; Wowhead enUS : "Acolyte of Pain"
@@ -9127,7 +9059,7 @@ UPDATE `creature_template_locale` SET `Name` = 'Initiant Claget', `VerifiedBuild
 UPDATE `creature_template_locale` SET `Name` = 'Initiant Roderick', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 30069;
 -- AC datas : OLD Name : "Initiand Gahark", Name AC enUS : "Initiate Gahark" ; Wowhead enUS : "Initiate Gahark"
 UPDATE `creature_template_locale` SET `Name` = 'Initiant Gahark', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 30070;
--- AC datas : OLD Subname : "Waldläufergeneralin des Silberbunds", Subname AC enUS : "Ranger General of the Silver Covenant"" ; Wowhead enUS : "Ranger General of the Silver Covenant"
+-- AC datas : OLD Subname : "Waldläufergeneralin des Silberbunds", Subname AC enUS : "Ranger General of the Silver Covenant" ; Wowhead enUS : "Ranger General of the Silver Covenant"
 UPDATE `creature_template_locale` SET `Title` = 'Waldläufergeneral des Silberbunds', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 30115;
 -- AC datas : OLD Name : "Himmelsklaue des Wyrmruhtempels", Name AC enUS : "Wyrmrest Skytalon" ; Wowhead enUS : "Wyrmrest Skytalon"
 UPDATE `creature_template_locale` SET `Name` = 'Himmelsklaue von Wyrmruh', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 30161;
@@ -9141,11 +9073,11 @@ UPDATE `creature_template_locale` SET `Name` = 'Hüter des Wissens Randvir', `Ve
 UPDATE `creature_template_locale` SET `Name` = 'Feldspäherhauptmann Daelin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 30261;
 -- AC datas : OLD Name : "Jormuttar", Name AC enUS : "Jormuttar" ; Wowhead enUS : "Jorcuttar"
 UPDATE `creature_template_locale` SET `Name` = 'Jorkuttar', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 30340;
--- AC datas : OLD Subname : "Verwüsteringenieur", Subname AC enUS : "Demolisher Engineer"" ; Wowhead enUS : "Demolisher Engineer"
+-- AC datas : OLD Subname : "Verwüsteringenieur", Subname AC enUS : "Demolisher Engineer" ; Wowhead enUS : "Demolisher Engineer"
 UPDATE `creature_template_locale` SET `Title` = 'Verwüstungsingenieur', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 30400;
--- AC datas : OLD Subname : "", Subname AC enUS : "Ammunition"" ; Wowhead enUS : "Ammunition"
+-- AC datas : OLD Subname : "", Subname AC enUS : "Ammunition" ; Wowhead enUS : "Ammunition"
 UPDATE `creature_template_locale` SET `Title` = 'Munition', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 30437;
--- AC datas : OLD Subname : "Gifte, Reagenzien & Handwerkswaren", Subname AC enUS : "Poisons, Reagents & Trade Supplies"" ; Wowhead enUS : "Poisons, Reagents & Trade Supplies"
+-- AC datas : OLD Subname : "Gifte, Reagenzien & Handwerkswaren", Subname AC enUS : "Poisons, Reagents & Trade Supplies" ; Wowhead enUS : "Poisons, Reagents & Trade Supplies"
 UPDATE `creature_template_locale` SET `Title` = 'Gifte, Reagenzien & Handelswaren', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 30438;
 -- AC datas : OLD Name : "Gnomeningenieur", Name AC enUS : "Gnomish Engineer" ; Wowhead enUS : "Gnomish Engineer"
 UPDATE `creature_template_locale` SET `Name` = 'Gnomingenieur', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 30499;
@@ -9153,26 +9085,26 @@ UPDATE `creature_template_locale` SET `Name` = 'Gnomingenieur', `VerifiedBuild` 
 UPDATE `creature_template_locale` SET `Name` = 'Sturmgeschmiedeter Kriegstreiber', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 30504;
 -- AC datas : OLD Name : "Fras Siabi", Name AC enUS : "Fras Siabi" ; Wowhead enUS : "Ezra Grimm"
 UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 30552;
--- AC datas : OLD Subname : "Schankkellner", Subname AC enUS : "Barkeep"" ; Wowhead enUS : "Barkeep"
-UPDATE `creature_template_locale` SET `Title` = 'Barkeeper', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 30570;
--- AC datas : OLD Subname : "", Subname AC enUS : "Ammunition"" ; Wowhead enUS : "Ammunition"
-UPDATE `creature_template_locale` SET `Title` = 'Munition', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 30572;
--- AC datas : OLD Subname : "", Subname AC enUS : "Arena Organizer"" ; Wowhead enUS : "Arena Organizer"
+-- AC datas : OLD Name : "Emery Neill", Name AC enUS : "Emery Neill" ; Wowhead enUS : "Emery Neill",  OLD Subname : "Schankkellner", Subname AC enUS : "Barkeep" ; Wowhead enUS : "Barkeep"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Barkeeper', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 30570;
+-- AC datas : OLD Name : "Nofal", Name AC enUS : "Nofal" ; Wowhead enUS : "Nofal",  OLD Subname : "", Subname AC enUS : "Ammunition" ; Wowhead enUS : "Ammunition"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Munition', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 30572;
+-- AC datas : OLD Subname : "", Subname AC enUS : "Arena Organizer" ; Wowhead enUS : "Arena Organizer"
 UPDATE `creature_template_locale` SET `Title` = 'Arenaveranstalterin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 30611;
 -- AC datas : OLD Name : "Zwielichtriss", Name AC enUS : "Twilight Fissure" ; Wowhead enUS : "Twilight Fissure"
 UPDATE `creature_template_locale` SET `Name` = 'Zwielichtspalt', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 30641;
 -- AC datas : OLD Name : "Azurblauer Zauberer", Name AC enUS : "Azure Sorceror" ; Wowhead enUS : "Azure Sorcerer"
 UPDATE `creature_template_locale` SET `Name` = 'Azurblaue Zauberin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 30667;
--- AC datas : OLD Subname : "Inschriftenkundelehrer", Subname AC enUS : "Master Inscription Trainer"" ; Wowhead enUS : "Master Inscription Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Inschriftenkundemeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 30721;
--- AC datas : OLD Subname : "Inschriftenkundelehrerin", Subname AC enUS : "Master Inscription Trainer"" ; Wowhead enUS : "Master Inscription Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Inschriftenkundemeisterlehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 30722;
--- AC datas : OLD Subname : "Überholte Arenarüstungen", Subname AC enUS : "Water Vendor"" ; Wowhead enUS : "Water Vendor"
+-- AC datas : OLD Name : "Michael Schwan", Name AC enUS : "Michael Schwan" ; Wowhead enUS : "Michael Schwan",  OLD Subname : "Inschriftenkundelehrer", Subname AC enUS : "Master Inscription Trainer" ; Wowhead enUS : "Master Inscription Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Inschriftenkundemeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 30721;
+-- AC datas : OLD Name : "Neferatti", Name AC enUS : "Neferatti" ; Wowhead enUS : "Neferatti",  OLD Subname : "Inschriftenkundelehrerin", Subname AC enUS : "Master Inscription Trainer" ; Wowhead enUS : "Master Inscription Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Inschriftenkundemeisterlehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 30722;
+-- AC datas : OLD Subname : "Überholte Arenarüstungen", Subname AC enUS : "Water Vendor" ; Wowhead enUS : "Water Vendor"
 UPDATE `creature_template_locale` SET `Title` = 'Wasserverkäufer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 30885;
 -- AC datas : OLD Name : "Azurblauer Magiertöter", Name AC enUS : "Azure Mage Slayer" ; Wowhead enUS : "Azure Mage Slayer"
 UPDATE `creature_template_locale` SET `Name` = 'Azurblauer Pirscher', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 30963;
--- AC datas : OLD Subname : "Schankkellner", Subname AC enUS : "Barkeep"" ; Wowhead enUS : "Barkeep"
-UPDATE `creature_template_locale` SET `Title` = 'Barkeeper', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 31017;
+-- AC datas : OLD Name : "Mal Corricks", Name AC enUS : "Mal Corricks" ; Wowhead enUS : "Mal Corricks",  OLD Subname : "Schankkellner", Subname AC enUS : "Barkeep" ; Wowhead enUS : "Barkeep"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Barkeeper', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 31017;
 -- AC datas : OLD Name : "Entmutigter Ent", Name AC enUS : "Dispirited Ent" ; Wowhead enUS : "Dispirited Ent"
 UPDATE `creature_template_locale` SET `Name` = 'Zweigeistiger Ent', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 31041;
 -- AC datas : OLD Name : "Trainingsattrappe", Name AC enUS : "Grandmaster's Training Dummy" ; Wowhead enUS : "Grandmaster's Training Dummy"
@@ -9183,28 +9115,28 @@ UPDATE `creature_template_locale` SET `Name` = 'Heroische Trainingsattrappe', `V
 UPDATE `creature_template_locale` SET `Name` = 'Akolyt von Shadron', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 31218;
 -- AC datas : OLD Name : "Akolyth von Vesperon", Name AC enUS : "Acolyte of Vesperon" ; Wowhead enUS : "Acolyte of Vesperon"
 UPDATE `creature_template_locale` SET `Name` = 'Akolyt von Vesperon', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 31219;
--- AC datas : OLD Subname : "Fluglehrerin", Subname AC enUS : "Cold Weather Flying Trainer"" ; Wowhead enUS : "Cold Weather Flying Trainer"
+-- AC datas : OLD Subname : "Fluglehrerin", Subname AC enUS : "Cold Weather Flying Trainer" ; Wowhead enUS : "Cold Weather Flying Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Lehrerin für Kaltwetterflug', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 31238;
--- AC datas : OLD Subname : "Fluglehrer", Subname AC enUS : "Cold Weather Flying Trainer"" ; Wowhead enUS : "Cold Weather Flying Trainer"
+-- AC datas : OLD Subname : "Fluglehrer", Subname AC enUS : "Cold Weather Flying Trainer" ; Wowhead enUS : "Cold Weather Flying Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Lehrer für Kaltwetterflug', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 31247;
 -- AC datas : OLD Name : "Eine geheimnisvolle Stimme", Name AC enUS : "A Mysterious Voice" ; Wowhead enUS : "A Mysterious Voice"
 UPDATE `creature_template_locale` SET `Name` = 'Eine mysteriöse Stimme', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 31264;
 -- AC datas : OLD Name : "Kampfwyvern der Kor'kron", Name AC enUS : "Kor'kron Battle Wyvern" ; Wowhead enUS : "Kor'kron Battle Wyvern"
 UPDATE `creature_template_locale` SET `Name` = 'Kampfflügeldrache der Kor''kron', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 31269;
--- AC datas : OLD Subname : "Schusswaffenverkäuferin", Subname AC enUS : "Guns & Ammunition"" ; Wowhead enUS : "Guns & Ammunition"
-UPDATE `creature_template_locale` SET `Title` = 'Schusswaffen & Munition', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 31423;
--- AC datas : OLD Subname : "Händlerin für Kettenrüstungen", Subname AC enUS : "Mail Armor Merchant"" ; Wowhead enUS : "Mail Armor Merchant"
-UPDATE `creature_template_locale` SET `Title` = 'Händlerin für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 31429;
+-- AC datas : OLD Name : "Kaja", Name AC enUS : "Kaja" ; Wowhead enUS : "Kaja",  OLD Subname : "Schusswaffenverkäuferin", Subname AC enUS : "Guns & Ammunition" ; Wowhead enUS : "Guns & Ammunition"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Schusswaffen & Munition', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 31423;
+-- AC datas : OLD Name : "Sana", Name AC enUS : "Sana" ; Wowhead enUS : "Sana",  OLD Subname : "Händlerin für Kettenrüstungen", Subname AC enUS : "Mail Armor Merchant" ; Wowhead enUS : "Mail Armor Merchant"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Händlerin für schwere Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 31429;
 -- AC datas : OLD Name : "Auktionator Thathung", Name AC enUS : "Auctioneer Thathung" ; Wowhead enUS : "Auctioneer Thathung"
 UPDATE `creature_template_locale` SET `Name` = 'Auktionator Thatung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 31430;
--- AC datas : OLD Subname : "Emblem der Ehre Rüstmeister", Subname AC enUS : "Emblem of Valor Quartermaster"" ; Wowhead enUS : "Emblem of Valor Quartermaster"
+-- AC datas : OLD Subname : "Emblem der Ehre Rüstmeister", Subname AC enUS : "Emblem of Valor Quartermaster" ; Wowhead enUS : "Emblem of Valor Quartermaster"
 UPDATE `creature_template_locale` SET `Title` = 'Rüstmeister für Embleme der Ehre', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 31579;
--- AC datas : OLD Subname : "Emblem des Heldentums Rüstmeister", Subname AC enUS : "Emblem of Heroism Quartermaster"" ; Wowhead enUS : "Emblem of Heroism Quartermaster"
+-- AC datas : OLD Subname : "Emblem des Heldentums Rüstmeister", Subname AC enUS : "Emblem of Heroism Quartermaster" ; Wowhead enUS : "Emblem of Heroism Quartermaster"
 UPDATE `creature_template_locale` SET `Title` = 'Rüstmeisterin für Embleme des Heldentums', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 31580;
--- AC datas : OLD Subname : "Emblem der Ehre Rüstmeister", Subname AC enUS : "Emblem of Valor Quartermaster"" ; Wowhead enUS : "Emblem of Valor Quartermaster"
-UPDATE `creature_template_locale` SET `Title` = 'Rüstmeister für Embleme der Ehre', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 31581;
--- AC datas : OLD Subname : "Emblem des Heldentums Rüstmeister", Subname AC enUS : "Emblem of Heroism Quartermaster"" ; Wowhead enUS : "Emblem of Heroism Quartermaster"
-UPDATE `creature_template_locale` SET `Title` = 'Rüstmeisterin für Embleme des Heldentums', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 31582;
+-- AC datas : OLD Name : "Magister Brasael", Name AC enUS : "Magister Brasael" ; Wowhead enUS : "Magister Brasael",  OLD Subname : "Emblem der Ehre Rüstmeister", Subname AC enUS : "Emblem of Valor Quartermaster" ; Wowhead enUS : "Emblem of Valor Quartermaster"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Rüstmeister für Embleme der Ehre', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 31581;
+-- AC datas : OLD Name : "Magistrix Lambriesse", Name AC enUS : "Magistrix Lambriesse" ; Wowhead enUS : "Magistrix Lambriesse",  OLD Subname : "Emblem des Heldentums Rüstmeister", Subname AC enUS : "Emblem of Heroism Quartermaster" ; Wowhead enUS : "Emblem of Heroism Quartermaster"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Rüstmeisterin für Embleme des Heldentums', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 31582;
 -- AC datas : OLD Name : "Zwielichtdrache", Name AC enUS : "Twilight Drake Mount" ; Wowhead enUS : "Twilight Drake Mount"
 UPDATE `creature_template_locale` SET `Name` = 'Zwielichtreitdrache', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 31698;
 -- AC datas : OLD Name : "Grunzerin Grikee", Name AC enUS : "Grunt Grikee" ; Wowhead enUS : "Grunt Grikee"
@@ -9221,25 +9153,25 @@ UPDATE `creature_template_locale` SET `Name` = 'Späher von Aldur''thar', `Verif
 UPDATE `creature_template_locale` SET `Name` = 'Bigzokk Drillzang', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32355;
 -- AC datas : OLD Name : "Kezzik der Meuchler", Name AC enUS : "Kezzik the Striker" ; Wowhead enUS : "Kezzik the Striker"
 UPDATE `creature_template_locale` SET `Name` = 'Kezzik der Stürmer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32356;
--- AC datas : OLD Subname : "Rüstmeister für Juwelierskunst", Subname AC enUS : "Jewelcrafting Quartermaster"" ; Wowhead enUS : "Jewelcrafting Quartermaster"
+-- AC datas : OLD Subname : "Rüstmeister für Juwelierskunst", Subname AC enUS : "Jewelcrafting Quartermaster" ; Wowhead enUS : "Jewelcrafting Quartermaster"
 UPDATE `creature_template_locale` SET `Title` = 'Rüstmeister für Juwelenschleifen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32379;
--- AC datas : OLD Subname : "Rüstmeisterin für Veteranenrüstungen", Subname AC enUS : "Veteran Armor Quartermaster"" ; Wowhead enUS : "Veteran Armor Quartermaster"
+-- AC datas : OLD Subname : "Rüstmeisterin für Veteranenrüstungen", Subname AC enUS : "Veteran Armor Quartermaster" ; Wowhead enUS : "Veteran Armor Quartermaster"
 UPDATE `creature_template_locale` SET `Title` = 'Rüstmeisterveteran für Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32380;
--- AC datas : OLD Name : "Lady Palanseher", Name AC enUS : "Lady Palanseer" ; Wowhead enUS : "Lady Palanseer",  OLD Subname : "Rüstmeisterin für Juwelierskunst", Subname AC enUS : "Jewelcrafting Quartermaster"" ; Wowhead enUS : "Jewelcrafting Quartermaster"
-UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Rüstmeisterin für Juwelenschleifen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32382;
--- AC datas : OLD Subname : "Rüstmeisterin für Veteranenrüstungen", Subname AC enUS : "Veteran Armor Quartermaster"" ; Wowhead enUS : "Veteran Armor Quartermaster"
-UPDATE `creature_template_locale` SET `Title` = 'Rüstmeisterveteran für Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32385;
+-- AC datas : OLD Subname : "Rüstmeisterin für Juwelierskunst", Subname AC enUS : "Jewelcrafting Quartermaster" ; Wowhead enUS : "Jewelcrafting Quartermaster"
+UPDATE `creature_template_locale` SET `Title` = 'Rüstmeisterin für Juwelenschleifen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32382;
+-- AC datas : OLD Name : "Doris Volanthius", Name AC enUS : "Doris Volanthius" ; Wowhead enUS : "Doris Volanthius",  OLD Subname : "Rüstmeisterin für Veteranenrüstungen", Subname AC enUS : "Veteran Armor Quartermaster" ; Wowhead enUS : "Veteran Armor Quartermaster"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Rüstmeisterveteran für Rüstungen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32385;
 -- AC datas : OLD Name : "Wahnsinniger Überlebender von Indu'le", Name AC enUS : "Crazed Indu'le Survivor" ; Wowhead enUS : "Crazed Indu'le Survivor"
 UPDATE `creature_template_locale` SET `Name` = 'Verrückter Überlebender von Indu''le', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32409;
 -- AC datas : OLD Name : "Isirami Sanftwind", Name AC enUS : "Isirami Fairwind" ; Wowhead enUS : "Isirami Fairwind"
 UPDATE `creature_template_locale` SET `Name` = 'Isimari Sanftwind', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32413;
--- AC datas : OLD Subname : "Schankkellnerin", Subname AC enUS : "Bartender"" ; Wowhead enUS : "Bartender"
-UPDATE `creature_template_locale` SET `Title` = 'Barkeeper', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32415;
--- AC datas : OLD Subname : "Schankkellner", Subname AC enUS : "Bartender"" ; Wowhead enUS : "Bartender"
-UPDATE `creature_template_locale` SET `Title` = 'Barkeeper', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32416;
+-- AC datas : OLD Name : "Hamaka", Name AC enUS : "Hamaka" ; Wowhead enUS : "Hamaka",  OLD Subname : "Schankkellnerin", Subname AC enUS : "Bartender" ; Wowhead enUS : "Bartender"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Barkeeper', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32415;
+-- AC datas : OLD Name : "Stefen Cotter", Name AC enUS : "Stefen Cotter" ; Wowhead enUS : "Stefen Cotter",  OLD Subname : "Schankkellner", Subname AC enUS : "Bartender" ; Wowhead enUS : "Bartender"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Barkeeper', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32416;
 -- AC datas : OLD Name : "Scharlachrote Hochfürstin Daion", Name AC enUS : "Scarlet Highlord Daion" ; Wowhead enUS : "Scarlet Highlord Daion"
 UPDATE `creature_template_locale` SET `Name` = 'Scharlachroter Hochlord Daion', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32417;
--- AC datas : OLD Subname : "Angellehrer", Subname AC enUS : "Grand Master Fishing Trainer"" ; Wowhead enUS : "Grand Master Fishing Trainer"
+-- AC datas : OLD Subname : "Angellehrer", Subname AC enUS : "Grand Master Fishing Trainer" ; Wowhead enUS : "Grand Master Fishing Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeister des Angelns', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32474;
 -- AC datas : OLD Name : "Vollgesogener Seuchenwurm", Name AC enUS : "Engorged Blight Worm" ; Wowhead enUS : "Engorged Blight Worm"
 UPDATE `creature_template_locale` SET `Name` = 'Verstopfter Seuchenwurm', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32483;
@@ -9259,10 +9191,10 @@ UPDATE `creature_template_locale` SET `Name` = 'Übungsattrappe des Initianden',
 UPDATE `creature_template_locale` SET `Name` = 'Übungsattrappe des Schwarzritters', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32546;
 -- AC datas : OLD Name : "Nemesislehrer des Hochlords", Name AC enUS : "Highlord's Nemesis Trainer" ; Wowhead enUS : "Highlord's Nemesis Trainer"
 UPDATE `creature_template_locale` SET `Name` = 'Nemesisattrappe des Hochlords', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32547;
--- AC datas : OLD Subname : "Handelsreisender", Subname AC enUS : "Traveling Trader"" ; Wowhead enUS : "Traveling Trader"
+-- AC datas : OLD Subname : "Handelsreisender", Subname AC enUS : "Traveling Trader" ; Wowhead enUS : "Traveling Trader"
 UPDATE `creature_template_locale` SET `Title` = 'Handlungsreisender', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32638;
--- AC datas : OLD Subname : "Handelsreisende", Subname AC enUS : "Traveling Trader"" ; Wowhead enUS : "Traveling Trader"
-UPDATE `creature_template_locale` SET `Title` = 'Handlungsreisender', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32642;
+-- AC datas : OLD Name : "Mojodishu", Name AC enUS : "Mojodishu" ; Wowhead enUS : "Mojodishu",  OLD Subname : "Handelsreisende", Subname AC enUS : "Traveling Trader" ; Wowhead enUS : "Traveling Trader"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Handlungsreisender', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32642;
 -- AC datas : OLD Name : "Trainingsattrappe der Kriegshymnenfeste", Name AC enUS : "Warsong Hold Practice Dummy" ; Wowhead enUS : "Warsong Hold Practice Dummy"
 UPDATE `creature_template_locale` SET `Name` = 'Übungsattrappe der Kriegshymnenfeste', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32647;
 -- AC datas : OLD Name : "Trainingsattrappe", Name AC enUS : "Expert's Training Dummy" ; Wowhead enUS : "Expert's Training Dummy"
@@ -9273,26 +9205,26 @@ UPDATE `creature_template_locale` SET `Name` = 'Übungsattrappe des Meisters', `
 UPDATE `creature_template_locale` SET `Name` = 'Garl Grimgrizzel', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32710;
 -- AC datas : OLD Name : "Erzmagierin Rheaume", Name AC enUS : "Archmage Rheaume" ; Wowhead enUS : "Archmage Rheaume"
 UPDATE `creature_template_locale` SET `Name` = 'Erzmagier Rheaume', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32740;
--- AC datas : OLD Subname : "Todesritterglyphen", Subname AC enUS : "Death Knight Glyphs"" ; Wowhead enUS : "Death Knight Supplies"
-UPDATE `creature_template_locale` SET `Title` = 'Todesritterausrüstung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32753;
--- AC datas : OLD Subname : "Druidenglyphen", Subname AC enUS : "Druid Glyphs"" ; Wowhead enUS : "Druid Supplies"
-UPDATE `creature_template_locale` SET `Title` = 'Druidenausrüstung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32754;
--- AC datas : OLD Subname : "Jägerglyphen", Subname AC enUS : "Hunter Glyphs"" ; Wowhead enUS : "Hunter Supplies"
-UPDATE `creature_template_locale` SET `Title` = 'Jägerausrüstung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32755;
--- AC datas : OLD Subname : "Magierglyphen", Subname AC enUS : "Mage Glyphs"" ; Wowhead enUS : "Mage Supplies"
+-- AC datas : OLD Name : "Lok", Name AC enUS : "Lok" ; Wowhead enUS : "Lok",  OLD Subname : "Todesritterglyphen", Subname AC enUS : "Death Knight Glyphs" ; Wowhead enUS : "Death Knight Supplies"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Todesritterausrüstung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32753;
+-- AC datas : OLD Name : "Austeen", Name AC enUS : "Austeen" ; Wowhead enUS : "Austeen",  OLD Subname : "Druidenglyphen", Subname AC enUS : "Druid Glyphs" ; Wowhead enUS : "Druid Supplies"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Druidenausrüstung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32754;
+-- AC datas : OLD Name : "Holloway Fjordhammer", Name AC enUS : "Holloway Fjordhammer" ; Wowhead enUS : "Holloway Fjordhammer",  OLD Subname : "Jägerglyphen", Subname AC enUS : "Hunter Glyphs" ; Wowhead enUS : "Hunter Supplies"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Jägerausrüstung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32755;
+-- AC datas : OLD Subname : "Magierglyphen", Subname AC enUS : "Mage Glyphs" ; Wowhead enUS : "Mage Supplies"
 UPDATE `creature_template_locale` SET `Title` = 'Magierausrüstung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32756;
--- AC datas : OLD Subname : "Paladinglyphen", Subname AC enUS : "Paladin Glyphs"" ; Wowhead enUS : "Paladin Supplies"
-UPDATE `creature_template_locale` SET `Title` = 'Paladinausrüstung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32757;
--- AC datas : OLD Subname : "Priesterglyphen", Subname AC enUS : "Priest Glyphs"" ; Wowhead enUS : "Priest Supplies"
-UPDATE `creature_template_locale` SET `Title` = 'Priesterausrüstung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32758;
--- AC datas : OLD Subname : "Schurkenglyphen", Subname AC enUS : "Rogue Glyphs"" ; Wowhead enUS : "Rogue Supplies"
+-- AC datas : OLD Name : "Harold Dawson", Name AC enUS : "Harold Dawson" ; Wowhead enUS : "Harold Dawson",  OLD Subname : "Paladinglyphen", Subname AC enUS : "Paladin Glyphs" ; Wowhead enUS : "Paladin Supplies"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Paladinausrüstung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32757;
+-- AC datas : OLD Name : "Charlotte Mader", Name AC enUS : "Charlotte Mader" ; Wowhead enUS : "Charlotte Mader",  OLD Subname : "Priesterglyphen", Subname AC enUS : "Priest Glyphs" ; Wowhead enUS : "Priest Supplies"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Priesterausrüstung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32758;
+-- AC datas : OLD Subname : "Schurkenglyphen", Subname AC enUS : "Rogue Glyphs" ; Wowhead enUS : "Rogue Supplies"
 UPDATE `creature_template_locale` SET `Title` = 'Schurkenausrüstung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32759;
--- AC datas : OLD Subname : "Schamanenglyphen", Subname AC enUS : "Shaman Glyphs"" ; Wowhead enUS : "Shaman Supplies"
-UPDATE `creature_template_locale` SET `Title` = 'Schamanenausrüstung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32760;
--- AC datas : OLD Subname : "Hexenmeisterglyphen", Subname AC enUS : "Warlock Glyphs"" ; Wowhead enUS : "Warlock Supplies"
+-- AC datas : OLD Name : "Juliet Stonehelm", Name AC enUS : "Juliet Stonehelm" ; Wowhead enUS : "Juliet Stonehelm",  OLD Subname : "Schamanenglyphen", Subname AC enUS : "Shaman Glyphs" ; Wowhead enUS : "Shaman Supplies"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Schamanenausrüstung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32760;
+-- AC datas : OLD Subname : "Hexenmeisterglyphen", Subname AC enUS : "Warlock Glyphs" ; Wowhead enUS : "Warlock Supplies"
 UPDATE `creature_template_locale` SET `Title` = 'Hexenmeisterausrüstung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32761;
--- AC datas : OLD Subname : "Kriegerglyphen", Subname AC enUS : "Warrior Glyphs"" ; Wowhead enUS : "Warrior Supplies"
-UPDATE `creature_template_locale` SET `Title` = 'Kriegerausrüstung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32762;
+-- AC datas : OLD Name : "David Hume", Name AC enUS : "David Hume" ; Wowhead enUS : "David Hume",  OLD Subname : "Kriegerglyphen", Subname AC enUS : "Warrior Glyphs" ; Wowhead enUS : "Warrior Supplies"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Kriegerausrüstung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32762;
 -- AC datas : OLD Name : "Flammenwächter der Boreanischen Tundra", Name AC enUS : "Borean Tundra Flame Warden" ; Wowhead enUS : "Borean Tundra Flame Warden"
 UPDATE `creature_template_locale` SET `Name` = 'Flammenwächter der boreanischen Tundra', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32801;
 -- AC datas : OLD Name : "Flammenwächter des Heulenden Fjords", Name AC enUS : "Howling Fjord Flame Warden" ; Wowhead enUS : "Howling Fjord Flame Warden"
@@ -9311,8 +9243,8 @@ UPDATE `creature_template_locale` SET `Name` = 'Dunkler Runenakolyt', `VerifiedB
 UPDATE `creature_template_locale` SET `Name` = 'Glimmendes Skelett', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33016;
 -- AC datas : OLD Name : "Schwelendes Konstrukt", Name AC enUS : "Smoldering Construct" ; Wowhead enUS : "Smoldering Construct"
 UPDATE `creature_template_locale` SET `Name` = 'Glimmendes Konstrukt', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33017;
--- AC datas : OLD Subname : "Hochprozentiges", Subname AC enUS : "Alcohol"" ; Wowhead enUS : "Alcohol"
-UPDATE `creature_template_locale` SET `Title` = 'Alkohol', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33026;
+-- AC datas : OLD Name : "Sarah Brady", Name AC enUS : "Sarah Brady" ; Wowhead enUS : "Sarah Brady",  OLD Subname : "Hochprozentiges", Subname AC enUS : "Alcohol" ; Wowhead enUS : "Alcohol"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Alkohol', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33026;
 -- AC datas : OLD Name : "Instabiler Sonnenstrahl", Name AC enUS : "Unstable Sun Beam" ; Wowhead enUS : "Unstable Sun Beam"
 UPDATE `creature_template_locale` SET `Name` = 'Unstabiler Sonnenstrahl', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33050;
 -- AC datas : OLD Name : "Dunkler Runenakolyth", Name AC enUS : "Dark Rune Acolyte" ; Wowhead enUS : "Dark Rune Acolyte"
@@ -9325,89 +9257,89 @@ UPDATE `creature_template_locale` SET `Name` = 'Klingenschuppen Spawner', `Verif
 UPDATE `creature_template_locale` SET `Name` = 'Falkenschreiter aus Silbermond', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33418;
 -- AC datas : OLD Name : "Neugieriges Gorlocjunges", Name AC enUS : "Curious Oracle Hatchling" ; Wowhead enUS : "Curious Oracle Hatchling"
 UPDATE `creature_template_locale` SET `Name` = 'Neugieriges Orakeljunges', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33530;
--- AC datas : OLD Name : "Dustin Schlaier", Name AC enUS : "Dustin Vail" ; Wowhead enUS : "Dustin Vail",  OLD Subname : "Schneiderlehrer", Subname AC enUS : "Grand Master Tailoring Trainer"" ; Wowhead enUS : "Grand Master Tailoring Trainer"
-UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Großmeister der Schneiderei', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33580;
--- AC datas : OLD Subname : "Lederverarbeitungslehrer", Subname AC enUS : "Grand Master Leatherworking Trainer"" ; Wowhead enUS : "Grand Master Leatherworking Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Lederverarbeitung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33581;
--- AC datas : OLD Subname : "Verzauberkunstlehrer", Subname AC enUS : "Grand Master Enchanting Trainer"" ; Wowhead enUS : "Grand Master Enchanting Trainer"
+-- AC datas : OLD Subname : "Schneiderlehrer", Subname AC enUS : "Grand Master Tailoring Trainer" ; Wowhead enUS : "Grand Master Tailoring Trainer"
+UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Schneiderei', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33580;
+-- AC datas : OLD Name : "Kul'de", Name AC enUS : "Kul'de" ; Wowhead enUS : "Kul'de",  OLD Subname : "Lederverarbeitungslehrer", Subname AC enUS : "Grand Master Leatherworking Trainer" ; Wowhead enUS : "Grand Master Leatherworking Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Großmeister der Lederverarbeitung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33581;
+-- AC datas : OLD Subname : "Verzauberkunstlehrer", Subname AC enUS : "Grand Master Enchanting Trainer" ; Wowhead enUS : "Grand Master Enchanting Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Verzauberkunst', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33583;
--- AC datas : OLD Subname : "Ingenieurskunstlehrerin", Subname AC enUS : "Grand Master Engineering Trainer"" ; Wowhead enUS : "Grand Master Engineering Trainer"
+-- AC datas : OLD Subname : "Ingenieurskunstlehrerin", Subname AC enUS : "Grand Master Engineering Trainer" ; Wowhead enUS : "Grand Master Engineering Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin der Ingenieurskunst', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33586;
--- AC datas : OLD Subname : "Kochkunstlehrerin", Subname AC enUS : "Grand Master Cooking Trainer"" ; Wowhead enUS : "Grand Master Cooking Trainer"
+-- AC datas : OLD Subname : "Kochkunstlehrerin", Subname AC enUS : "Grand Master Cooking Trainer" ; Wowhead enUS : "Grand Master Cooking Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin der Kochkunst', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33587;
--- AC datas : OLD Name : "Krista Hellfunk", Name AC enUS : "Crystal Brightspark" ; Wowhead enUS : "Crystal Brightspark",  OLD Subname : "Alchemielehrerin", Subname AC enUS : "Grand Master Alchemy Trainer"" ; Wowhead enUS : "Grand Master Alchemy Trainer"
+-- AC datas : OLD Name : "Krista Hellfunk", Name AC enUS : "Crystal Brightspark" ; Wowhead enUS : "Crystal Brightspark",  OLD Subname : "Alchemielehrerin", Subname AC enUS : "Grand Master Alchemy Trainer" ; Wowhead enUS : "Grand Master Alchemy Trainer"
 UPDATE `creature_template_locale` SET `Name` = 'Christa Hellfunk', `Title` = 'Großmeisterin der Alchemie', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33588;
--- AC datas : OLD Subname : "Lehrer für Erste Hilfe", Subname AC enUS : "Grand Master First Aid Trainer"" ; Wowhead enUS : "Grand Master First Aid Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Großmeister für Erste Hilfe', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33589;
--- AC datas : OLD Subname : "Juwelierskunstlehrer", Subname AC enUS : "Grand Master Jewelcrafting Trainer"" ; Wowhead enUS : "Grand Master Jewelcrafting Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Großmeister des Juwelenschleifens', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33590;
--- AC datas : OLD Subname : "Schmiedekunstlehrerin", Subname AC enUS : "Grand Master Blacksmithing Trainer"" ; Wowhead enUS : "Grand Master Blacksmithing Trainer"
+-- AC datas : OLD Name : "Joseph Wilson", Name AC enUS : "Joseph Wilson" ; Wowhead enUS : "Joseph Wilson",  OLD Subname : "Lehrer für Erste Hilfe", Subname AC enUS : "Grand Master First Aid Trainer" ; Wowhead enUS : "Grand Master First Aid Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Großmeister für Erste Hilfe', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33589;
+-- AC datas : OLD Name : "Oluros", Name AC enUS : "Oluros" ; Wowhead enUS : "Oluros",  OLD Subname : "Juwelierskunstlehrer", Subname AC enUS : "Grand Master Jewelcrafting Trainer" ; Wowhead enUS : "Grand Master Jewelcrafting Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Großmeister des Juwelenschleifens', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33590;
+-- AC datas : OLD Subname : "Schmiedekunstlehrerin", Subname AC enUS : "Grand Master Blacksmithing Trainer" ; Wowhead enUS : "Grand Master Blacksmithing Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Großmeisterin der Schmiedekunst', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33591;
--- AC datas : OLD Subname : "Juwelierskunstbedarf", Subname AC enUS : "Jewelcrafting Supplies"" ; Wowhead enUS : "Jewelcrafting Supplies"
-UPDATE `creature_template_locale` SET `Title` = 'Juweliersbedarf', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33602;
--- AC datas : OLD Subname : "Inschriftenkundelehrer", Subname AC enUS : "Grand Master Inscription Trainer"" ; Wowhead enUS : "Grand Master Inscription Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Großmeister der Inschriftenkunde', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33603;
--- AC datas : OLD Subname : "Alchemielehrer", Subname AC enUS : "Master Alchemy Trainer"" ; Wowhead enUS : "Master Alchemy Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Alchemiemeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33630;
--- AC datas : OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Master Blacksmithing Trainer"" ; Wowhead enUS : "Master Blacksmithing Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Schmiedekunstmeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33631;
--- AC datas : OLD Subname : "Verzauberkunstlehrerin", Subname AC enUS : "Master Enchanting Trainer"" ; Wowhead enUS : "Master Enchanting Trainer"
+-- AC datas : OLD Name : "Anuur", Name AC enUS : "Anuur" ; Wowhead enUS : "Anuur",  OLD Subname : "Juwelierskunstbedarf", Subname AC enUS : "Jewelcrafting Supplies" ; Wowhead enUS : "Jewelcrafting Supplies"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Juweliersbedarf', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33602;
+-- AC datas : OLD Name : "Arthur Denny", Name AC enUS : "Arthur Denny" ; Wowhead enUS : "Arthur Denny",  OLD Subname : "Inschriftenkundelehrer", Subname AC enUS : "Grand Master Inscription Trainer" ; Wowhead enUS : "Grand Master Inscription Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Großmeister der Inschriftenkunde', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33603;
+-- AC datas : OLD Name : "Aelthin", Name AC enUS : "Aelthin" ; Wowhead enUS : "Aelthin",  OLD Subname : "Alchemielehrer", Subname AC enUS : "Master Alchemy Trainer" ; Wowhead enUS : "Master Alchemy Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Alchemiemeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33630;
+-- AC datas : OLD Name : "Barien", Name AC enUS : "Barien" ; Wowhead enUS : "Barien",  OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Master Blacksmithing Trainer" ; Wowhead enUS : "Master Blacksmithing Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Schmiedekunstmeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33631;
+-- AC datas : OLD Subname : "Verzauberkunstlehrerin", Subname AC enUS : "Master Enchanting Trainer" ; Wowhead enUS : "Master Enchanting Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Verzauberkunstmeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33633;
--- AC datas : OLD Subname : "Ingenieurskunstlehrerin", Subname AC enUS : "Master Engineering Trainer"" ; Wowhead enUS : "Master Engineering Trainer"
+-- AC datas : OLD Subname : "Ingenieurskunstlehrerin", Subname AC enUS : "Master Engineering Trainer" ; Wowhead enUS : "Master Engineering Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Meisteringenieurslehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33634;
--- AC datas : OLD Subname : "Lederverarbeitungslehrer", Subname AC enUS : "Master Leatherworking Trainer"" ; Wowhead enUS : "Master Leatherworking Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Lederverarbeitungsmeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33635;
--- AC datas : OLD Subname : "Schneiderlehrerin", Subname AC enUS : "Master Tailoring Trainer"" ; Wowhead enUS : "Master Tailoring Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Schneidermeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33636;
--- AC datas : OLD Subname : "Juwelierskunstlehrer", Subname AC enUS : "Master Jewelcrafting Trainer"" ; Wowhead enUS : "Master Jewelcrafting Trainer"
+-- AC datas : OLD Name : "Daenril", Name AC enUS : "Daenril" ; Wowhead enUS : "Daenril",  OLD Subname : "Lederverarbeitungslehrer", Subname AC enUS : "Master Leatherworking Trainer" ; Wowhead enUS : "Master Leatherworking Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Lederverarbeitungsmeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33635;
+-- AC datas : OLD Name : "Miralisse", Name AC enUS : "Miralisse" ; Wowhead enUS : "Miralisse",  OLD Subname : "Schneiderlehrerin", Subname AC enUS : "Master Tailoring Trainer" ; Wowhead enUS : "Master Tailoring Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Schneidermeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33636;
+-- AC datas : OLD Subname : "Juwelierskunstlehrer", Subname AC enUS : "Master Jewelcrafting Trainer" ; Wowhead enUS : "Master Jewelcrafting Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Juwelenschleifermeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33637;
--- AC datas : OLD Subname : "Inschriftenkundelehrer", Subname AC enUS : "Master Inscription Trainer"" ; Wowhead enUS : "Master Inscription Trainer"
+-- AC datas : OLD Subname : "Inschriftenkundelehrer", Subname AC enUS : "Master Inscription Trainer" ; Wowhead enUS : "Master Inscription Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Inschriftenkundemeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33638;
--- AC datas : OLD Subname : "Kräuterkundelehrerin", Subname AC enUS : "Master Herbalism Trainer"" ; Wowhead enUS : "Master Herbalism Trainer"
+-- AC datas : OLD Subname : "Kräuterkundelehrerin", Subname AC enUS : "Master Herbalism Trainer" ; Wowhead enUS : "Master Herbalism Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Kräuterkundemeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33639;
--- AC datas : OLD Subname : "Bergbaulehrer", Subname AC enUS : "Master Mining Trainer"" ; Wowhead enUS : "Master Mining Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Bergbaumeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33640;
--- AC datas : OLD Subname : "Kürschnerlehrer", Subname AC enUS : "Master Skinning Trainer"" ; Wowhead enUS : "Master Skinning Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Kürschnermeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33641;
--- AC datas : OLD Subname : "Alchemielehrer", Subname AC enUS : "Master Alchemy Trainer"" ; Wowhead enUS : "Master Alchemy Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Alchemiemeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33674;
--- AC datas : OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Master Blacksmithing Trainer"" ; Wowhead enUS : "Master Blacksmithing Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Schmiedekunstmeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33675;
--- AC datas : OLD Subname : "Verzauberkunstlehrerin", Subname AC enUS : "Master Enchanting Trainer"" ; Wowhead enUS : "Master Enchanting Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Verzauberkunstmeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33676;
--- AC datas : OLD Name : "Technikerin Mihila", Name AC enUS : "Technician Mihila" ; Wowhead enUS : "Technician Mihila",  OLD Subname : "Ingenieurskunstlehrerin", Subname AC enUS : "Master Engineering Trainer"" ; Wowhead enUS : "Master Engineering Trainer"
+-- AC datas : OLD Name : "Hanlir", Name AC enUS : "Hanlir" ; Wowhead enUS : "Hanlir",  OLD Subname : "Bergbaulehrer", Subname AC enUS : "Master Mining Trainer" ; Wowhead enUS : "Master Mining Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Bergbaumeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33640;
+-- AC datas : OLD Name : "Irduil", Name AC enUS : "Irduil" ; Wowhead enUS : "Irduil",  OLD Subname : "Kürschnerlehrer", Subname AC enUS : "Master Skinning Trainer" ; Wowhead enUS : "Master Skinning Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Kürschnermeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33641;
+-- AC datas : OLD Name : "Alchemist Kanhu", Name AC enUS : "Alchemist Kanhu" ; Wowhead enUS : "Alchemist Kanhu",  OLD Subname : "Alchemielehrer", Subname AC enUS : "Master Alchemy Trainer" ; Wowhead enUS : "Master Alchemy Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Alchemiemeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33674;
+-- AC datas : OLD Name : "Onodo", Name AC enUS : "Onodo" ; Wowhead enUS : "Onodo",  OLD Subname : "Schmiedekunstlehrer", Subname AC enUS : "Master Blacksmithing Trainer" ; Wowhead enUS : "Master Blacksmithing Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Schmiedekunstmeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33675;
+-- AC datas : OLD Name : "Zurii", Name AC enUS : "Zurii" ; Wowhead enUS : "Zurii",  OLD Subname : "Verzauberkunstlehrerin", Subname AC enUS : "Master Enchanting Trainer" ; Wowhead enUS : "Master Enchanting Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Verzauberkunstmeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33676;
+-- AC datas : OLD Name : "Technikerin Mihila", Name AC enUS : "Technician Mihila" ; Wowhead enUS : "Technician Mihila",  OLD Subname : "Ingenieurskunstlehrerin", Subname AC enUS : "Master Engineering Trainer" ; Wowhead enUS : "Master Engineering Trainer"
 UPDATE `creature_template_locale` SET `Name` = 'Techniker Mihila', `Title` = 'Meisteringenieurslehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33677;
--- AC datas : OLD Subname : "Kräuterkundelehrerin", Subname AC enUS : "Master Herbalism Trainer"" ; Wowhead enUS : "Master Herbalism Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Kräuterkundemeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33678;
--- AC datas : OLD Subname : "Inschriftenkundelehrer", Subname AC enUS : "Master Inscription Trainer"" ; Wowhead enUS : "Master Inscription Trainer"
+-- AC datas : OLD Name : "Jijia", Name AC enUS : "Jijia" ; Wowhead enUS : "Jijia",  OLD Subname : "Kräuterkundelehrerin", Subname AC enUS : "Master Herbalism Trainer" ; Wowhead enUS : "Master Herbalism Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Kräuterkundemeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33678;
+-- AC datas : OLD Subname : "Inschriftenkundelehrer", Subname AC enUS : "Master Inscription Trainer" ; Wowhead enUS : "Master Inscription Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Inschriftenkundemeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33679;
--- AC datas : OLD Subname : "Juwelierskunstlehrerin", Subname AC enUS : "Master Jewelcrafting Trainer"" ; Wowhead enUS : "Master Jewelcrafting Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Juwelenschleifermeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33680;
--- AC datas : OLD Subname : "Lederverarbeitungslehrer", Subname AC enUS : "Master Leatherworking Trainer"" ; Wowhead enUS : "Master Leatherworking Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Lederverarbeitungsmeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33681;
--- AC datas : OLD Subname : "Bergbaulehrer", Subname AC enUS : "Master Mining Trainer"" ; Wowhead enUS : "Master Mining Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Bergbaumeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33682;
--- AC datas : OLD Subname : "Kürschnerlehrer", Subname AC enUS : "Master Skinning Trainer"" ; Wowhead enUS : "Master Skinning Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Kürschnermeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33683;
--- AC datas : OLD Name : "Weberin Aoa", Name AC enUS : "Weaver Aoa" ; Wowhead enUS : "Weaver Aoa",  OLD Subname : "Schneiderlehrerin", Subname AC enUS : "Master Tailoring Trainer"" ; Wowhead enUS : "Master Tailoring Trainer"
+-- AC datas : OLD Name : "Nemiha", Name AC enUS : "Nemiha" ; Wowhead enUS : "Nemiha",  OLD Subname : "Juwelierskunstlehrerin", Subname AC enUS : "Master Jewelcrafting Trainer" ; Wowhead enUS : "Master Jewelcrafting Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Juwelenschleifermeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33680;
+-- AC datas : OLD Name : "Korim", Name AC enUS : "Korim" ; Wowhead enUS : "Korim",  OLD Subname : "Lederverarbeitungslehrer", Subname AC enUS : "Master Leatherworking Trainer" ; Wowhead enUS : "Master Leatherworking Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Lederverarbeitungsmeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33681;
+-- AC datas : OLD Name : "Fono", Name AC enUS : "Fono" ; Wowhead enUS : "Fono",  OLD Subname : "Bergbaulehrer", Subname AC enUS : "Master Mining Trainer" ; Wowhead enUS : "Master Mining Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Bergbaumeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33682;
+-- AC datas : OLD Name : "Dremm", Name AC enUS : "Dremm" ; Wowhead enUS : "Dremm",  OLD Subname : "Kürschnerlehrer", Subname AC enUS : "Master Skinning Trainer" ; Wowhead enUS : "Master Skinning Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Kürschnermeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33683;
+-- AC datas : OLD Name : "Weberin Aoa", Name AC enUS : "Weaver Aoa" ; Wowhead enUS : "Weaver Aoa",  OLD Subname : "Schneiderlehrerin", Subname AC enUS : "Master Tailoring Trainer" ; Wowhead enUS : "Master Tailoring Trainer"
 UPDATE `creature_template_locale` SET `Name` = 'Weber Aoa', `Title` = 'Schneidermeisterlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33684;
--- AC datas : OLD Subname : "Der Zirkel des Cenarius", Subname AC enUS : "Cenarion Circle"" ; Wowhead enUS : "Cenarion Circle"
+-- AC datas : OLD Subname : "Der Zirkel des Cenarius", Subname AC enUS : "Cenarion Circle" ; Wowhead enUS : "Cenarion Circle"
 UPDATE `creature_template_locale` SET `Title` = 'Zirkel des Cenarius', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33788;
 -- AC datas : OLD Name : "Rubble Stalker Kologarn", Name AC enUS : "Rubble Stalker Kologarn" ; Wowhead enUS : "Rubble Stalker Kologarn"
 UPDATE `creature_template_locale` SET `Name` = 'Geröllpirscher Kologarn', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33809;
 -- AC datas : OLD Name : "Streitross der Quel'dorei", Name AC enUS : "Quel'dorei Steed" ; Wowhead enUS : "Quel'dorei Steed"
 UPDATE `creature_template_locale` SET `Name` = 'Ross der Quel''dorei', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33840;
--- AC datas : OLD Subname : "Emblem der Eroberung Rüstmeister", Subname AC enUS : "Emblem of Conquest Quartermaster"" ; Wowhead enUS : "Emblem of Conquest Quartermaster"
-UPDATE `creature_template_locale` SET `Title` = 'Rüstmeister für Embleme der Eroberung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33963;
--- AC datas : OLD Subname : "Emblem der Eroberung Rüstmeister", Subname AC enUS : "Emblem of Conquest Quartermaster"" ; Wowhead enUS : "Emblem of Conquest Quartermaster"
+-- AC datas : OLD Name : "Magister Sarien", Name AC enUS : "Magister Sarien" ; Wowhead enUS : "Magister Sarien",  OLD Subname : "Emblem der Eroberung Rüstmeister", Subname AC enUS : "Emblem of Conquest Quartermaster" ; Wowhead enUS : "Emblem of Conquest Quartermaster"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Rüstmeister für Embleme der Eroberung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33963;
+-- AC datas : OLD Subname : "Emblem der Eroberung Rüstmeister", Subname AC enUS : "Emblem of Conquest Quartermaster" ; Wowhead enUS : "Emblem of Conquest Quartermaster"
 UPDATE `creature_template_locale` SET `Title` = 'Rüstmeister für Embleme der Eroberung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33964;
--- AC datas : OLD Subname : "Meister des Sturmangriffs", Subname AC enUS : "Master of the Charge"" ; Wowhead enUS : "Master of the Charge"
+-- AC datas : OLD Subname : "Meister des Sturmangriffs", Subname AC enUS : "Master of the Charge" ; Wowhead enUS : "Master of the Charge"
 UPDATE `creature_template_locale` SET `Title` = 'Meister des Anstürmens', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33972;
 -- AC datas : OLD Name : "Zone der Leere", Name AC enUS : "Void Zone" ; Wowhead enUS : "Void Zone"
 UPDATE `creature_template_locale` SET `Name` = 'Leerenzone', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 34001;
--- AC datas : OLD Subname : "Rüstmeisterin für Juwelierskunst", Subname AC enUS : "Jewelcrafting Quartermaster"" ; Wowhead enUS : "Jewelcrafting Quartermaster"
+-- AC datas : OLD Subname : "Rüstmeisterin für Juwelierskunst", Subname AC enUS : "Jewelcrafting Quartermaster" ; Wowhead enUS : "Jewelcrafting Quartermaster"
 UPDATE `creature_template_locale` SET `Title` = 'Rüstmeisterin für Juwelenschleifen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 34043;
--- AC datas : OLD Subname : "Rüstmeister für Juwelierskunst", Subname AC enUS : "Jewelcrafting Quartermaster"" ; Wowhead enUS : "Jewelcrafting Quartermaster"
+-- AC datas : OLD Subname : "Rüstmeister für Juwelierskunst", Subname AC enUS : "Jewelcrafting Quartermaster" ; Wowhead enUS : "Jewelcrafting Quartermaster"
 UPDATE `creature_template_locale` SET `Title` = 'Rüstmeister für Juwelenschleifen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 34079;
 -- AC datas : OLD Name : "Eisenfang Rüsti", Name AC enUS : "Trapjaw Rix" ; Wowhead enUS : "Trapjaw Rix"
 UPDATE `creature_template_locale` SET `Name` = 'Eisenfang Rix', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 34087;
@@ -9431,34 +9363,34 @@ UPDATE `creature_template_locale` SET `Name` = 'Botschafter der Insel der Erober
 UPDATE `creature_template_locale` SET `Name` = 'Kanonenbootkapitän der Allianz', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 34960;
 -- AC datas : OLD Name : "Scharfseher Eannu", Name AC enUS : "Farseer Eannu" ; Wowhead enUS : "Farseer Eannu"
 UPDATE `creature_template_locale` SET `Name` = 'Weitseher Eannu', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 35073;
--- AC datas : OLD Subname : "Fluglehrer", Subname AC enUS : "Riding Trainer"" ; Wowhead enUS : "Riding Trainer"
+-- AC datas : OLD Subname : "Fluglehrer", Subname AC enUS : "Riding Trainer" ; Wowhead enUS : "Riding Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Reitlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 35093;
--- AC datas : OLD Subname : "Fluglehrer", Subname AC enUS : "Riding Trainer"" ; Wowhead enUS : "Riding Trainer"
+-- AC datas : OLD Subname : "Fluglehrer", Subname AC enUS : "Riding Trainer" ; Wowhead enUS : "Riding Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Reitlehrer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 35100;
 -- AC datas : OLD Name : "Assassine des Kults", Name AC enUS : "Cult Assassin" ; Wowhead enUS : "Cult Assassin"
 UPDATE `creature_template_locale` SET `Name` = 'Assassin des Kults', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 35127;
--- AC datas : OLD Subname : "Fluglehrerin", Subname AC enUS : "Riding Trainer"" ; Wowhead enUS : "Riding Trainer"
+-- AC datas : OLD Subname : "Fluglehrerin", Subname AC enUS : "Riding Trainer" ; Wowhead enUS : "Riding Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Reitlehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 35133;
--- AC datas : OLD Subname : "Fluglehrerin", Subname AC enUS : "Riding Trainer"" ; Wowhead enUS : "Riding Trainer"
+-- AC datas : OLD Subname : "Fluglehrerin", Subname AC enUS : "Riding Trainer" ; Wowhead enUS : "Riding Trainer"
 UPDATE `creature_template_locale` SET `Title` = 'Reitlehrerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 35135;
--- AC datas : OLD Subname : "Oberanführer der Kriegshymnenoffensive", Subname AC enUS : "Overlord of the Warsong Offensive"" ; Wowhead enUS : "Overlord of the Warsong Offensive"
+-- AC datas : OLD Subname : "Oberanführer der Kriegshymnenoffensive", Subname AC enUS : "Overlord of the Warsong Offensive" ; Wowhead enUS : "Overlord of the Warsong Offensive"
 UPDATE `creature_template_locale` SET `Title` = 'Hochlord der Kriegshymnenoffensive', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 35372;
 -- AC datas : OLD Name : "Elitesoldat der Kor'kron", Name AC enUS : "Kor'kron Elite" ; Wowhead enUS : "Kor'kron Elite"
 UPDATE `creature_template_locale` SET `Name` = 'Elite der Kor''kron', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 35460;
--- AC datas : OLD Subname : "Emblem des Triumph Rüstmeister", Subname AC enUS : "Emblem of Triumph Quartermaster"" ; Wowhead enUS : "Emblem of Triumph Quartermaster"
+-- AC datas : OLD Subname : "Emblem des Triumph Rüstmeister", Subname AC enUS : "Emblem of Triumph Quartermaster" ; Wowhead enUS : "Emblem of Triumph Quartermaster"
 UPDATE `creature_template_locale` SET `Title` = 'Rüstmeisterin für Embleme des Triumphs', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 35494;
--- AC datas : OLD Subname : "Emblem des Triumph Rüstmeister", Subname AC enUS : "Emblem of Triumph Quartermaster"" ; Wowhead enUS : "Emblem of Triumph Quartermaster"
-UPDATE `creature_template_locale` SET `Title` = 'Rüstmeisterin für Embleme des Triumphs', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 35495;
--- AC datas : OLD Subname : "Stoffrüstungshändler", Subname AC enUS : "Cloth Armor Merchant"" ; Wowhead enUS : "Cloth Armor Merchant"
-UPDATE `creature_template_locale` SET `Title` = 'Händler für Stoffrüstung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 35496;
--- AC datas : OLD Subname : "Lederrüstungshändler", Subname AC enUS : "Leather Armor Merchant"" ; Wowhead enUS : "Leather Armor Merchant"
-UPDATE `creature_template_locale` SET `Title` = 'Händler für Lederrüstung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 35497;
--- AC datas : OLD Subname : "Händlerin für Kettenrüstungen", Subname AC enUS : "Mail Armor Merchant"" ; Wowhead enUS : "Mail Armor Merchant"
+-- AC datas : OLD Name : "Magistrix Vesara", Name AC enUS : "Magistrix Vesara" ; Wowhead enUS : "Magistrix Vesara",  OLD Subname : "Emblem des Triumph Rüstmeister", Subname AC enUS : "Emblem of Triumph Quartermaster" ; Wowhead enUS : "Emblem of Triumph Quartermaster"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Rüstmeisterin für Embleme des Triumphs', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 35495;
+-- AC datas : OLD Name : "Rueben Lauren", Name AC enUS : "Rueben Lauren" ; Wowhead enUS : "Rueben Lauren",  OLD Subname : "Stoffrüstungshändler", Subname AC enUS : "Cloth Armor Merchant" ; Wowhead enUS : "Cloth Armor Merchant"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Händler für Stoffrüstung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 35496;
+-- AC datas : OLD Name : "Rafael Langrom", Name AC enUS : "Rafael Langrom" ; Wowhead enUS : "Rafael Langrom",  OLD Subname : "Lederrüstungshändler", Subname AC enUS : "Leather Armor Merchant" ; Wowhead enUS : "Leather Armor Merchant"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Händler für Lederrüstung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 35497;
+-- AC datas : OLD Subname : "Händlerin für Kettenrüstungen", Subname AC enUS : "Mail Armor Merchant" ; Wowhead enUS : "Mail Armor Merchant"
 UPDATE `creature_template_locale` SET `Title` = 'Händlerin für Schwere Rüstung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 35500;
--- AC datas : OLD Subname : "Antiquitätenrüstmeisterin für Gerechtigkeitspunkte", Subname AC enUS : "Emblem of Triumph Quartermaster"" ; Wowhead enUS : "Emblem of Triumph Quartermaster"
+-- AC datas : OLD Subname : "Antiquitätenrüstmeisterin für Gerechtigkeitspunkte", Subname AC enUS : "Emblem of Triumph Quartermaster" ; Wowhead enUS : "Emblem of Triumph Quartermaster"
 UPDATE `creature_template_locale` SET `Title` = 'Rüstmeisterin für Embleme des Triumphs', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 35573;
--- AC datas : OLD Subname : "Antiquitätenrüstmeisterin für Gerechtigkeitspunkte", Subname AC enUS : "Emblem of Triumph Quartermaster"" ; Wowhead enUS : "Emblem of Triumph Quartermaster"
-UPDATE `creature_template_locale` SET `Title` = 'Rüstmeisterin für Embleme des Triumphs', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 35574;
+-- AC datas : OLD Name : "Magistrix Iruvia", Name AC enUS : "Magistrix Iruvia" ; Wowhead enUS : "Magistrix Iruvia",  OLD Subname : "Antiquitätenrüstmeisterin für Gerechtigkeitspunkte", Subname AC enUS : "Emblem of Triumph Quartermaster" ; Wowhead enUS : "Emblem of Triumph Quartermaster"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Rüstmeisterin für Embleme des Triumphs', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 35574;
 -- AC datas : OLD Name : "Die Schwarze Schankmaid", Name AC enUS : "The Black Brewmaiden" ; Wowhead enUS : "The Black Brewmaiden"
 UPDATE `creature_template_locale` SET `Name` = 'Die schwarze Schankmaid', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 36024;
 -- AC datas : OLD Name : "Häscher der Kor'kron", Name AC enUS : "Kor'kron Reaver" ; Wowhead enUS : "Kor'kron Reaver"
@@ -9481,19 +9413,19 @@ UPDATE `creature_template_locale` SET `Name` = 'Lakei der Manufaktur Krone', `Ve
 UPDATE `creature_template_locale` SET `Name` = 'Überreste von Thalorien Dämmersucher', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 37552;
 -- AC datas : OLD Name : "Mutierte Monstrosität", Name AC enUS : "Mutated Abomination" ; Wowhead enUS : "Mutated Abomination"
 UPDATE `creature_template_locale` SET `Name` = 'Mutierte Monströsität', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 37672;
--- AC datas : OLD Subname : "Emblem des Frost Rüstmeister", Subname AC enUS : "Emblem of Frost Quartermaster"" ; Wowhead enUS : "Emblem of Frost Quartermaster"
-UPDATE `creature_template_locale` SET `Title` = 'Rüstmeister für Embleme des Frosts', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 37941;
--- AC datas : OLD Subname : "Emblem des Frost Rüstmeister", Subname AC enUS : "Emblem of Frost Quartermaster"" ; Wowhead enUS : "Emblem of Frost Quartermaster"
+-- AC datas : OLD Name : "Magister Arlan", Name AC enUS : "Magister Arlan" ; Wowhead enUS : "Magister Arlan",  OLD Subname : "Emblem des Frost Rüstmeister", Subname AC enUS : "Emblem of Frost Quartermaster" ; Wowhead enUS : "Emblem of Frost Quartermaster"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Rüstmeister für Embleme des Frosts', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 37941;
+-- AC datas : OLD Subname : "Emblem des Frost Rüstmeister", Subname AC enUS : "Emblem of Frost Quartermaster" ; Wowhead enUS : "Emblem of Frost Quartermaster"
 UPDATE `creature_template_locale` SET `Title` = 'Rüstmeister für Embleme des Frosts', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 37942;
 -- AC datas : OLD Name : "Große Liebesrakete", Name AC enUS : "Big Love Rocket" ; Wowhead enUS : "X-45 Heartbreaker"
 UPDATE `creature_template_locale` SET `Name` = 'Herzbrecher X-45', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 38204;
 -- AC datas : OLD Name : "Fürstin Sylvanas Windläufer", Name AC enUS : "Lady Sylvanas Windrunner" ; Wowhead enUS : "Lady Sylvanas Windrunner"
 UPDATE `creature_template_locale` SET `Name` = 'Lady Sylvanas Windläufer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 38609;
--- AC datas : OLD Subname : "Antiquitätenrüstmeister für Gerechtigkeitspunkte", Subname AC enUS : "Emblem of Frost Quartermaster"" ; Wowhead enUS : "Emblem of Frost Quartermaster"
+-- AC datas : OLD Subname : "Antiquitätenrüstmeister für Gerechtigkeitspunkte", Subname AC enUS : "Emblem of Frost Quartermaster" ; Wowhead enUS : "Emblem of Frost Quartermaster"
 UPDATE `creature_template_locale` SET `Title` = 'Rüstmeister für Embleme des Frosts', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 38858;
 -- AC datas : OLD Name : "Marschall Magruder", Name AC enUS : "Marshal Magruder" ; Wowhead enUS : "Marshal Magruder"
 UPDATE `creature_template_locale` SET `Name` = 'Marshall Magruder', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 39172;
--- AC datas : OLD Name : "Eisenfang Rüsti", Name AC enUS : "Trapjaw Rix" ; Wowhead enUS : "Trapjaw Rix",  OLD Subname : "Überholte Arenawaffen", Subname AC enUS : "Exceptional Arena Weaponry"" ; Wowhead enUS : "Exceptional Arena Weaponry"
+-- AC datas : OLD Name : "Eisenfang Rüsti", Name AC enUS : "Trapjaw Rix" ; Wowhead enUS : "Trapjaw Rix",  OLD Subname : "Überholte Arenawaffen", Subname AC enUS : "Exceptional Arena Weaponry" ; Wowhead enUS : "Exceptional Arena Weaponry"
 UPDATE `creature_template_locale` SET `Name` = 'Eisenfang Rix', `Title` = 'Außergewöhnliche Arenawaffen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 40212;
 -- AC datas : OLD Name : "Blauer Aufziehraketenbot", Name AC enUS : "Clockwork Rocket Bot" ; Wowhead enUS : "Clockwork Rocket Bot"
 UPDATE `creature_template_locale` SET `Name` = 'Uhrwerkraketenbot', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 40295;
@@ -9501,14 +9433,16 @@ UPDATE `creature_template_locale` SET `Name` = 'Uhrwerkraketenbot', `VerifiedBui
 -- Update existing entries, from TBC
 -- AC datas : OLD Name : "Alchemist Arbington", Name AC enUS : "Alchemist Arbington" ; Wowhead enUS : "Alchemist Arbington"
 UPDATE `creature_template_locale` SET `Name` = 'Alchimist Arbington', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 11056;
--- AC datas : OLD Subname : "", Subname AC enUS : """ ; Wowhead enUS : "Demon Trainer"
-UPDATE `creature_template_locale` SET `Title` = 'Dämonenausbilderin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 12807;
+-- AC datas : OLD Name : "Greshka", Name AC enUS : "Greshka" ; Wowhead enUS : "Greshka",  OLD Subname : "", Subname AC enUS : "" ; Wowhead enUS : "Demon Trainer"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Dämonenausbilderin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 12807;
 -- AC datas : OLD Name : "Sir Zeliek", Name AC enUS : "Sir Zeliek" ; Wowhead enUS : "Sir Zeliek"
 UPDATE `creature_template_locale` SET `Name` = 'Sire Zeliek', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16063;
--- AC datas : OLD Subname : "Stallmeisterin", Subname AC enUS : "Stable Master"" ; Wowhead enUS : "Stable Master"
-UPDATE `creature_template_locale` SET `Title` = 'Stallmeister', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16185;
+-- AC datas : OLD Name : "Anathos", Name AC enUS : "Anathos" ; Wowhead enUS : "Anathos",  OLD Subname : "Stallmeisterin", Subname AC enUS : "Stable Master" ; Wowhead enUS : "Stable Master"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Stallmeister', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16185;
 -- AC datas : OLD Name : "Coilfang Door Controller", Name AC enUS : "Coilfang Door Controller" ; Wowhead enUS : "Invisible Stalker Coilfang Doors"
 UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 20926;
+-- AC datas : OLD Subname : "Razaks Raunacken", Subname AC enUS : "Razak's Roughriders" ; Wowhead enUS : "Razak's Roughriders"
+UPDATE `creature_template_locale` SET `Title` = 'Razaks Steppenreiter', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 21426;
 -- AC datas : OLD Name : "Dizzy Dina", Name AC enUS : "Dizzy Dina" ; Wowhead enUS : "Dizzy Dina"
 UPDATE `creature_template_locale` SET `Name` = 'Taumel Dina', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 21824;
 -- AC datas : OLD Name : "Coilfang Raid Control Emote Stalker", Name AC enUS : "Coilfang Raid Control Emote Stalker" ; Wowhead enUS : "Invisible Stalker Coilfang Raid Console Emotes"
@@ -9523,6 +9457,10 @@ UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `
 -- Update existing entries, from CLASSIC
 -- AC datas : OLD Name : "Hemet Nesingwary Jr.", Name AC enUS : "Hemet Nesingwary Jr." ; Wowhead enUS : "Hemet Nesingwary"
 UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 715;
+-- AC datas : OLD Name : "Bürgerin von Sturmwind", Name AC enUS : "Stormwind Citizen" ; Wowhead enUS : "Stormwind Citizen"
+UPDATE `creature_template_locale` SET `Name` = 'Bürgerin von Stormwind', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1723;
+-- AC datas : OLD Name : "Bürger von Sturmwind", Name AC enUS : "Stormwind Citizen Masculine" ; Wowhead enUS : "Stormwind Citizen Masculine"
+UPDATE `creature_template_locale` SET `Name` = 'Bürger von Stormwind', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1724;
 -- AC datas : OLD Name : "Crafticus Rabbitus", Name AC enUS : "Crafticus Rabbitus" ; Wowhead enUS : "Invisibility Totem"
 UPDATE `creature_template_locale` SET `Name` = 'Totem der Unsichtbarkeit', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3580;
 -- AC datas : OLD Name : "Hetaera", Name AC enUS : "Hetaera" ; Wowhead enUS : "Hetaera"
@@ -9539,6 +9477,8 @@ UPDATE `creature_template_locale` SET `Name` = 'Todeskrallen-Erderschütterer', 
 UPDATE `creature_template_locale` SET `Name` = 'Todeskrallen-Feuerzunge', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 12470;
 -- AC datas : OLD Name : "Auslöser für Onyxia", Name AC enUS : "Onyxia Trigger" ; Wowhead enUS : "Onyxia Trigger"
 UPDATE `creature_template_locale` SET `Name` = 'Onxia-Auslöser', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 12758;
+-- AC datas : OLD Subname : "Versorgungsoffizier der Frostwölfe", Subname AC enUS : "Frostwolf Supply Officer" ; Wowhead enUS : "Frostwolf Supply Officer"
+UPDATE `creature_template_locale` SET `Title` = 'Versorgungsoffizier der Frostwolf', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 13219;
 -- AC datas : OLD Name : "Auslöser von Noxxion", Name AC enUS : "Noxxion Trigger" ; Wowhead enUS : "Noxxion Trigger"
 UPDATE `creature_template_locale` SET `Name` = 'Noxxion-Auslöser', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 13477;
 -- AC datas : OLD Name : "Auslöser Mulverick", Name AC enUS : "Trigger Mulverick" ; Wowhead enUS : "Trigger Mulverick"
@@ -9553,8 +9493,6 @@ UPDATE `creature_template_locale` SET `Name` = 'Zul''Gurub-Auslöser', `Verified
 UPDATE `creature_template_locale` SET `Name` = 'Auslöser für Jahrmarktskanone', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15218;
 -- AC datas : OLD Name : "Lurky", Name AC enUS : "Lurky" ; Wowhead enUS : "White Baby Murloc"
 UPDATE `creature_template_locale` SET `Name` = 'Weißes Murlocbaby', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15358;
--- AC datas : OLD Name : "ALTWorld Trigger", Name AC enUS : "OLDWorld Trigger (DO NOT DELETE)" ; Wowhead enUS : "World Trigger"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15384;
 -- AC datas : OLD Name : "Viscidus-Auslöser", Name AC enUS : "Viscidus Trigger" ; Wowhead enUS : "Viscidus Trigger"
 UPDATE `creature_template_locale` SET `Name` = 'Viscidus Auslöser', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15922;
 -- AC datas : OLD Name : "ImKampfauslöser", Name AC enUS : "InCombat Trigger" ; Wowhead enUS : "InCombat Trigger"
@@ -9579,8 +9517,10 @@ UPDATE `creature_template_locale` SET `Name` = 'Schergrat - Todesseelenkugel Flu
 UPDATE `creature_template_locale` SET `Name` = 'Schergrat - Toshleys - Unsichtbarer Pirscher - Ziel angreifen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 21422;
 -- AC datas : OLD Name : "Schergrat - Toshleys - Invisible Stalker - Def Gun Target", Name AC enUS : "Blade's Edge - Toshley's - Invisible Stalker - Def Gun Target" ; Wowhead enUS : "Blade's Edge - Toshley's - Invisible Stalker - Def Gun Target"
 UPDATE `creature_template_locale` SET `Name` = 'Schergrat - Toshleys - Unsichtbarer Pirscher - Verteidigungsgewehr Ziel', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 21819;
--- AC datas : OLD Name : "Zul'jin", Name AC enUS : "Zul'jin" ; Wowhead enUS : "Daakara",  OLD Subname : "", Subname AC enUS : """ ; Wowhead enUS : "The Invincible"
+-- AC datas : OLD Name : "Zul'jin", Name AC enUS : "Zul'jin" ; Wowhead enUS : "Daakara",  OLD Subname : "", Subname AC enUS : "" ; Wowhead enUS : "The Invincible"
 UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Der Unbesiegbare', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 23863;
+-- AC datas : OLD Name : "Gortsch der Leichenmalmer", Name AC enUS : "Gorge the Corpsegrinder" ; Wowhead enUS : "Annihilator Grek'lor"
+UPDATE `creature_template_locale` SET `Name` = 'Vernichter Grek''lor', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 25329;
 -- AC datas : OLD Name : "Heckenschützenkanone", Name AC enUS : "Sniper Rifle" ; Wowhead enUS : "Sniper Cannon"
 UPDATE `creature_template_locale` SET `Name` = 'Scharfschützenkanone', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32254;
 -- AC datas : OLD Name : "Abbild von Thalorien Morgensucher", Name AC enUS : "Image of Thalorien Dawnseeker" ; Wowhead enUS : "Image of Thalorien Dawnseeker"
@@ -9597,66 +9537,46 @@ UPDATE `creature_template_locale` SET `Name` = 'Schergrat - Nexusprinzereignis -
 -- Update existing entries, from RETAIL
 -- AC datas : OLD Name : "[UNUSED] Luglar the Clogger", Name AC enUS : "[UNUSED] Luglar the Clogger" ; Wowhead enUS : "Holiday - Hallow's End - Garrison - Spectral Alemental"
 UPDATE `creature_template_locale` SET `Name` = 'Holiday - Halloween - Garrison - Spectral Alemental', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 81;
--- AC datas : OLD Name : "Platzhalter - Jaspismine", Name AC enUS : "Placeholder - Jasperlode Mine" ; Wowhead enUS : "Placeholder - Jasperlode Mine"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 280;
 -- AC datas : OLD Name : "Junge - Platzhalter 05", Name AC enUS : "Boy - placeholder 05" ; Wowhead enUS : "Patrol Guy"
 UPDATE `creature_template_locale` SET `Name` = 'Patrouille', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 399;
 -- AC datas : OLD Name : "Pausbacke", Name AC enUS : "[UNUSED] Goreripper" ; Wowhead enUS : "Lord Piglet"
 UPDATE `creature_template_locale` SET `Name` = 'Graf Ferkel', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 444;
--- AC datas : OLD Subname : "Schamanenlehrer *Temp*", Subname AC enUS : "Shaman Trainer *Temp*"" ; Wowhead enUS : "Shaman Trainer *Temp*"
-UPDATE `creature_template_locale` SET `Title` = 'Schamanenlehrerin *Temp*', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 919;
--- AC datas : OLD Name : "[UNUSED] Coleman Mühlens", Name AC enUS : "[UNUSED] Coleman Mills" ; Wowhead enUS : "[UNUSED] Coleman Mills"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 1659;
--- AC datas : OLD Name : "[UNUSED] JoshTest", Name AC enUS : "[UNUSED] Josh Test" ; Wowhead enUS : "[UNUSED] Josh Test"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3202;
+-- AC datas : OLD Name : "[UNUSED] [PH] Berail Spiritwhisper", Name AC enUS : "[UNUSED] [PH] Berail Spiritwhisper" ; Wowhead enUS : "[UNUSED] [PH] Berail Spiritwhisper",  OLD Subname : "Schamanenlehrer *Temp*", Subname AC enUS : "Shaman Trainer *Temp*" ; Wowhead enUS : "Shaman Trainer *Temp*"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Schamanenlehrerin *Temp*', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 919;
 -- AC datas : OLD Name : "Ak'Zeloth", Name AC enUS : "Ak'Zeloth" ; Wowhead enUS : "Ak'Zeloth"
 UPDATE `creature_template_locale` SET `Name` = 'Ak''zeloth', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 3521;
--- AC datas : OLD Name : "Wegelagerer der Bruchschnauzen", Name AC enUS : "[UNUSED] Gravelsnout Ambusher" ; Wowhead enUS : "[Deprecated for 4.x] Gravelsnout Ambusher"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4115;
+-- AC datas : OLD Subname : "<Needs Scale>", Subname AC enUS : "<Needs Scale>" ; Wowhead enUS : "<Needs Scale>"
+UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4115;
 -- AC datas : OLD Name : "Griznak", Name AC enUS : "Griznak" ; Wowhead enUS : "[Deprecated for 4.x]Griznak"
 UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 4445;
--- AC datas : OLD Subname : "", Subname AC enUS : """ ; Wowhead enUS : "Hero of Orgrimmar"
-UPDATE `creature_template_locale` SET `Title` = 'Held von Orgrimmar', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 6466;
--- AC datas : OLD Subname : "", Subname AC enUS : """ ; Wowhead enUS : "Heirloom "Curator""
-UPDATE `creature_template_locale` SET `Title` = '"Kuratorin" für Erbstücke', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 6566;
+-- AC datas : OLD Subname : "Schneider für Gildenwappenröcke", Subname AC enUS : "Guild Tabard Designer" ; Wowhead enUS : "Guild Tabard Designer"
+UPDATE `creature_template_locale` SET `Title` = 'Designer für Gildenwappenröcke', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5050;
+-- AC datas : OLD Subname : "Schneiderin für Gildenwappenröcke", Subname AC enUS : "Guild Tabard Designer" ; Wowhead enUS : "Guild Tabard Designer"
+UPDATE `creature_template_locale` SET `Title` = 'Designerin für Gildenwappenröcke', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 5051;
+-- AC datas : OLD Name : "Gamon", Name AC enUS : "Gamon" ; Wowhead enUS : "Gamon",  OLD Subname : "", Subname AC enUS : "" ; Wowhead enUS : "Hero of Orgrimmar"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Held von Orgrimmar', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 6466;
+-- AC datas : OLD Name : "Estelle Gendry", Name AC enUS : "Estelle Gendry" ; Wowhead enUS : "Estelle Gendry",  OLD Subname : "", Subname AC enUS : "" ; Wowhead enUS : "Heirloom "Curator""
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = '"Kuratorin" für Erbstücke', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 6566;
 -- AC datas : OLD Name : "[UNUSED] Lorek Belm", Name AC enUS : "[UNUSED] Lorek Belm" ; Wowhead enUS : "Gorgrond Smokebelcher Depot NPC Invisible Stalker "Our Gun's Bigger" Quest Target ELM"
 UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 6783;
 -- AC datas : OLD Name : "Primalist Thurloga", Name AC enUS : "Primalist Thurloga" ; Wowhead enUS : "Primalist Thurloga"
 UPDATE `creature_template_locale` SET `Name` = 'Primalistin Thurloga', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 13236;
--- AC datas : OLD Name : "Nicht tötbarer Test-Dummy 60 Krieger", Name AC enUS : "Unkillable Test Dummy 60 Warrior" ; Wowhead enUS : "Unkillable Test Dummy Warrior"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 14830;
 -- AC datas : OLD Name : "Luis Barriga", Name AC enUS : "Luis Barriga" ; Wowhead enUS : "Wayneth Antonius"
 UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15166;
--- AC datas : OLD Name : "Naxxramas Test Boss", Name AC enUS : "[PH] Naxxramas Test Boss" ; Wowhead enUS : "[PH] Naxxramas Test Boss"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16099;
 -- AC datas : OLD Name : "Orcnekrolyt", Name AC enUS : "Orc Necrolyte UNUSED" ; Wowhead enUS : "Orc Necrolyte UNUSED"
 UPDATE `creature_template_locale` SET `Name` = 'Orcnekrolyth', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16560;
 -- AC datas : OLD Name : "Konkubine", Name AC enUS : "Concubine Transform Visual" ; Wowhead enUS : "Zealous Paramour Transform Visual"
 UPDATE `creature_template_locale` SET `Name` = 'Verwandlung der eifrigen Geliebten, visuell', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17065;
--- AC datas : OLD Name : "Wasserelementar", Name AC enUS : "" ; Wowhead enUS : "Water Elemental [UNUSED]"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17165;
--- AC datas : OLD Name : "Testmonster", Name AC enUS : "" ; Wowhead enUS : "Test Monster"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17582;
 -- AC datas : OLD Name : "Reitwyvern der Scherbenwelt (Gepanzert)", Name AC enUS : "UNUSED Outland Wyvern Mount (Armored)" ; Wowhead enUS : "Test Sigil"
 UPDATE `creature_template_locale` SET `Name` = 'Testsiegel', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18366;
--- AC datas : OLD Name : "Anachoret Lyteera", Name AC enUS : "[UNUSED]Anchorite Lyteera" ; Wowhead enUS : "Summoned Satchel Charge A"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18674;
 -- AC datas : OLD Name : "Invis Footlocker", Name AC enUS : "Invis Footlocker" ; Wowhead enUS : "Invis Footlocker"
 UPDATE `creature_template_locale` SET `Name` = 'Unsichtbare Schließkiste', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 19550;
 -- AC datas : OLD Name : "Vision Guide Transform", Name AC enUS : "Vision Guide Transform" ; Wowhead enUS : "Vision Guide"
 UPDATE `creature_template_locale` SET `Name` = 'Visionswegweiser', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 21320;
 -- AC datas : OLD Name : "Exarch Onaala", Name AC enUS : "Exarch Onaala" ; Wowhead enUS : "Exarch Onaala"
 UPDATE `creature_template_locale` SET `Name` = 'Exarchin Onaala', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 21860;
--- AC datas : OLD Name : "Claytons Testkreatur", Name AC enUS : "Clayton's Test Creature" ; Wowhead enUS : "Clayton's Test Creature (2)"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 23715;
 -- AC datas : OLD Name : "Fass des Braufests zum Ziel bewegen", Name AC enUS : "[DND] Brewfest Keg Move to Target" ; Wowhead enUS : "Brewfest Keg Move to Target"
 UPDATE `creature_template_locale` SET `Name` = 'Braufest: Bierfässchen zum Ziel bewegen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 23808;
--- AC datas : OLD Name : "Zielattrappe des Braufests zum Ziel bewegen", Name AC enUS : "[DND] Brewfest Target Dummy Move To Target" ; Wowhead enUS : "Brewfest Target Dummy Move To Target"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 24109;
--- AC datas : OLD Name : "Geist von Forscher Jaren", Name AC enUS : "[UNUSED]Ghost of Explorer Jaren" ; Wowhead enUS : "Summoned Satchel Charge B"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 24181;
--- AC datas : OLD Name : "Björn Kill Credit", Name AC enUS : "Bjorn Kill Credit" ; Wowhead enUS : "Bjorn Kill Credit"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 24275;
 -- AC datas : OLD Name : "Nordendtransportmittel der Blizzcon", Name AC enUS : "Blizzcon Northrend Transport" ; Wowhead enUS : "Blizzcon Northrend Transport"
 UPDATE `creature_template_locale` SET `Name` = 'Nordendtransportmittel der BlizzCon', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 24331;
 -- AC datas : OLD Name : "[UNUSED]Vazruden Kill Credit", Name AC enUS : "[UNUSED]Vazruden Kill Credit" ; Wowhead enUS : "Summoned Satchel Charge C"
@@ -9665,68 +9585,38 @@ UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `
 UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 24378;
 -- AC datas : OLD Name : "Begrüßer der Blizzcon", Name AC enUS : "Blizzcon Greeter" ; Wowhead enUS : "Blizzcon Greeter"
 UPDATE `creature_template_locale` SET `Name` = 'Begrüßer der BlizzCon', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 24380;
--- AC datas : OLD Name : "Inschriftenkundelehrer", Name AC enUS : "World Inscription Trainer" ; Wowhead enUS : "World Inscription Trainer"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 25263;
 -- AC datas : OLD Name : "Krieger der Horde", Name AC enUS : "Horde Warrior" ; Wowhead enUS : "Horde Warrior"
 UPDATE `creature_template_locale` SET `Name` = 'Hordekrieger', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26486;
 -- AC datas : OLD Name : "Transformation der spirituellen Einsicht", Name AC enUS : "Spiritual Insight Transform" ; Wowhead enUS : "Spiritual Insight"
 UPDATE `creature_template_locale` SET `Name` = 'Spirituelle Eingebung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26594;
--- AC datas : OLD Subname : "Windreitermeister", Subname AC enUS : "Wind Rider Master"" ; Wowhead enUS : "Wind Rider Master"
-UPDATE `creature_template_locale` SET `Title` = 'Windreitermeisterin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26842;
--- AC datas : OLD Name : "Tatjana", Name AC enUS : "Tatjana (Unconscious)" ; Wowhead enUS : "Tatjana (Unconscious)",  OLD Subname : "Initiand des Wolfskults", Subname AC enUS : "Wolfcult Initiate"" ; Wowhead enUS : "Wolfcult Initiate"
-UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Initiandin des Wolfskults', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 27632;
--- AC datas : OLD Name : "Patty's test vehicle TEST", Name AC enUS : "Patty's test vehicle" ; Wowhead enUS : "PattyMack - Test - vehicle"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 27862;
--- AC datas : OLD Name : "Moveto Test - Bewegungen", Name AC enUS : "Moveto Test - Moves" ; Wowhead enUS : "Moveto Test - Moves"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28088;
+-- AC datas : OLD Name : "[PH] Vanguard Landing Flight Master", Name AC enUS : "[PH] Vanguard Landing Flight Master" ; Wowhead enUS : "[PH] Vanguard Landing Flight Master",  OLD Subname : "Windreitermeister", Subname AC enUS : "Wind Rider Master" ; Wowhead enUS : "Wind Rider Master"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Windreitermeisterin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26842;
+-- AC datas : OLD Subname : "Initiand des Wolfskults", Subname AC enUS : "Wolfcult Initiate" ; Wowhead enUS : "Wolfcult Initiate"
+UPDATE `creature_template_locale` SET `Title` = 'Initiandin des Wolfskults', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 27632;
 -- AC datas : OLD Name : "Mysteriöser Zigeuner", Name AC enUS : "Mysterious Gypsy" ; Wowhead enUS : "Mysterious Trader"
 UPDATE `creature_template_locale` SET `Name` = 'Mysteriöser Händler', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28652;
--- AC datas : OLD Subname : "Bankier", Subname AC enUS : "Banker"" ; Wowhead enUS : "Banker"
+-- AC datas : OLD Subname : "Bankier", Subname AC enUS : "Banker" ; Wowhead enUS : "Banker"
 UPDATE `creature_template_locale` SET `Title` = 'Bankierin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28678;
--- AC datas : OLD Subname : "Bankier", Subname AC enUS : "Banker"" ; Wowhead enUS : "Banker"
+-- AC datas : OLD Subname : "Bankier", Subname AC enUS : "Banker" ; Wowhead enUS : "Banker"
 UPDATE `creature_template_locale` SET `Title` = 'Bankierin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28679;
 -- AC datas : OLD Name : "Totally Generic Bunny x8.0 (JSB)", Name AC enUS : "Totally Generic Bunny x8.0 (JSB)" ; Wowhead enUS : "Universal Bunny - DNT"
 UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 29100;
--- AC datas : OLD Subname : "PH Textur", Subname AC enUS : "PH Texture"" ; Wowhead enUS : "PH Texture"
-UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 29734;
--- AC datas : OLD Name : "Sichtbares Moorabimammut", Name AC enUS : "Moorabi Mammoth Visual" ; Wowhead enUS : "Moorabi Mammoth Visual"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 29741;
--- AC datas : OLD Subname : "Flugmeister", Subname AC enUS : "Flight Master"" ; Wowhead enUS : "Flight Master"
+-- AC datas : OLD Subname : "Flugmeister", Subname AC enUS : "Flight Master" ; Wowhead enUS : "Flight Master"
 UPDATE `creature_template_locale` SET `Title` = 'Flugmeisterin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 29749;
 -- AC datas : OLD Name : "Motorrad der Horde", Name AC enUS : "Alliance Motorcycle" ; Wowhead enUS : "Alliance Motorcycle"
 UPDATE `creature_template_locale` SET `Name` = 'Motorrad der Allianz', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 29930;
--- AC datas : OLD Subname : "PH: Name, Modell", Subname AC enUS : "PH: Name, Model"" ; Wowhead enUS : "PH: Name, Model"
-UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 29933;
--- AC datas : OLD Name : "Kel''Thuzad", Name AC enUS : "Kel'Thuzad (1)" ; Wowhead enUS : "Kel'Thuzad"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 30061;
--- AC datas : OLD Name : "Nicole Morris", Name AC enUS : "UNUSED Nicole Morris" ; Wowhead enUS : "UNUSED Nicole Morris"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 30155;
--- AC datas : OLD Name : "QA Test Dummy 80 Hostile Low Damage", Name AC enUS : "QA Test Dummy 80 Hostile Low Damage" ; Wowhead enUS : "Andrew Test Dummy 80 Hostile Low Damage"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 30888;
+-- AC datas : OLD Name : "QA Test Dummy 80 Hostile Low Damage", Name AC enUS : "QA Test Dummy 80 Hostile Low Damage" ; Wowhead enUS : "Andrew Test Dummy 80 Hostile Low Damage",  OLD Subname : "QA Punching Bag", Subname AC enUS : "QA Punching Bag" ; Wowhead enUS : "QA Punching Bag"
+UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 30888;
 -- AC datas : OLD Name : "Russell Bernau Test NPC", Name AC enUS : "Russell Bernau Test NPC" ; Wowhead enUS : "Ali Garchanter [TEST]"
 UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 31060;
--- AC datas : OLD Name : "Indalamars Nax-10-Verkäufer", Name AC enUS : "Indalamar's Nax 10 Vendor" ; Wowhead enUS : "Indalamar's Nax 10 Vendor"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 31076;
--- AC datas : OLD Name : "Indalamars Nax-25-Verkäufer", Name AC enUS : "Indalamar's Nax 25 Vendor" ; Wowhead enUS : "Indalamar's Nax 25 Vendor"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 31116;
 -- AC datas : OLD Name : "V", Name AC enUS : "V" ; Wowhead enUS : "zzOLDV"
 UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 31168;
--- AC datas : OLD Name : "Kosmetische Plünderpiñata", Name AC enUS : "Cooking Loot Pinata" ; Wowhead enUS : "Cooking Loot Pinata"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 31744;
--- AC datas : OLD Name : "Transformation des dunklen Unterwerfers", Name AC enUS : "Dark Subjugator Transform" ; Wowhead enUS : "Dark Subjugator Transform"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32293;
 -- AC datas : OLD Name : "Blauer Reitprotodrache", Name AC enUS : "Riding Protodrake, Blue" ; Wowhead enUS : "Riding Proto-Drake, Blue"
 UPDATE `creature_template_locale` SET `Name` = 'Blauer Protoreitdrache', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32585;
 -- AC datas : OLD Name : "Bronzefarbener Protodrache", Name AC enUS : "Riding Protodrake, Bronze" ; Wowhead enUS : "Riding Proto-Drake, Bronze"
 UPDATE `creature_template_locale` SET `Name` = 'Bronzefarbener Protoreitdrache', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32586;
--- AC datas : OLD Name : "Untötbare Testdummy 80 S1 Resil-Priester", Name AC enUS : "Unkillable Test Dummy 80 S1 Resil Priest" ; Wowhead enUS : "Unkillable Test Dummy 80 S1 Resil Priest"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32848;
--- AC datas : OLD Name : "Untötbare Testdummy 80 S1 Resil-Krieger", Name AC enUS : "Unkillable Test Dummy 80 S1 Resil Warrior" ; Wowhead enUS : "Unkillable Test Dummy 80 S1 Resil Warrior"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 32849;
--- AC datas : OLD Subname : "Emporium des UNGLAUBLICHEN", Subname AC enUS : "Emporium of AWESOME"" ; Wowhead enUS : "Emporium of AWESOME"
+-- AC datas : OLD Subname : "Emporium des UNGLAUBLICHEN", Subname AC enUS : "Emporium of AWESOME" ; Wowhead enUS : "Emporium of AWESOME"
 UPDATE `creature_template_locale` SET `Title` = 'Tolles Emporium des UNGLAUBLICHEN', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 33946;
--- AC datas : OLD Subname : "Fahrzeugtestausrüstung für Ulduar 10er", Subname AC enUS : "Ulduar 10 Vehicle Test Gear"" ; Wowhead enUS : "Ulduar 10 Vehicle Test Gear"
-UPDATE `creature_template_locale` SET `Title` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 34168;
 -- AC datas : OLD Name : "Ogerpinata", Name AC enUS : "Ogre Pinata" ; Wowhead enUS : "Ogre Pinata"
 UPDATE `creature_template_locale` SET `Name` = 'Ogerpiñata', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 34632;
 -- AC datas : OLD Name : "Höllische Teufelsflammenkugel", Name AC enUS : "Felflame Infernal Ball" ; Wowhead enUS : "Felflame Infernal Ball"
@@ -9747,18 +9637,10 @@ UPDATE `creature_template_locale` SET `Name` = 'Taurenpriesterin', `VerifiedBuil
 UPDATE `creature_template_locale` SET `Name` = 'Trolldruidin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 36866;
 -- AC datas : OLD Name : "Untoter Jäger", Name AC enUS : "Undead Hunter" ; Wowhead enUS : "Undead Hunter"
 UPDATE `creature_template_locale` SET `Name` = 'Untote Jägerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 36867;
--- AC datas : OLD Subname : "Rüstmeisterin des Argentumkreuzzugs", Subname AC enUS : "Argent Crusade Quartermaster"" ; Wowhead enUS : "Argent Crusade Quartermaster"
+-- AC datas : OLD Subname : "Rüstmeisterin des Argentumkreuzzugs", Subname AC enUS : "Argent Crusade Quartermaster" ; Wowhead enUS : "Argent Crusade Quartermaster"
 UPDATE `creature_template_locale` SET `Title` = 'Rüstmeister des Argentumkreuzzugs', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 37693;
--- AC datas : OLD Name : "Argentumreckenverdienst (Streitertest)", Name AC enUS : "Argent Valiant Credit (Aspirant Test)" ; Wowhead enUS : "Argent Valiant Credit (Aspirant Test)"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 38595;
 -- AC datas : OLD Name : "ScottG Test", Name AC enUS : "ScottG Test" ; Wowhead enUS : "Idle Before Scaling"
 UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 38883;
--- AC datas : OLD Name : "Bankier der Grimmtotem", Name AC enUS : "[PH] Grimtotem Banker" ; Wowhead enUS : "[PH] Grimtotem Banker"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 38919;
--- AC datas : OLD Name : "Bankier der Grimmtotem", Name AC enUS : "[PH] Grimtotem Banker 2" ; Wowhead enUS : "[PH] Grimtotem Banker 2"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 38920;
--- AC datas : OLD Name : "Bankier der Grimmtotem", Name AC enUS : "[PH] Grimtotem Banker 3" ; Wowhead enUS : "[PH] Grimtotem Banker 3"
-UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 38921;
 -- AC datas : OLD Name : "Mechanopanzerpilot aus Gnomeregan", Name AC enUS : "Gnomeregan Mechano-Tank Pilot" ; Wowhead enUS : "Gnomeregan Mechano-Tank Pilot"
 UPDATE `creature_template_locale` SET `Name` = 'Mechanopanzerpilot von Gnomeregan', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 39230;
 -- AC datas : OLD Name : "Geretterter Flüchtling aus Gnomeregan", Name AC enUS : "Rescued Gnomeregan Evacuee" ; Wowhead enUS : "Rescued Gnomeregan Evacuee"
@@ -9803,93 +9685,20 @@ DELETE FROM `creature_template_locale` WHERE `entry` IN(128) AND `locale` = 'deD
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
 (128,'deDE','Wütender Programmierer Dideldum',NULL,0);
 
--- Insert new entries, from CATA
-DELETE FROM `creature_template_locale` WHERE `entry` IN(36795,38440) AND `locale` = 'deDE';
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
-(36795,'deDE','Ruckus',NULL,0),
-(38440,'deDE','Tortunga',NULL,0);
-
 -- Insert new entries, from RETAIL
-DELETE FROM `creature_template_locale` WHERE `entry` IN(29347,29823,29824,29825,29828,29831,29833,29835,29837,29842,29852,29898,29899,29900,29940,29941,29955,31366,31586,31587) AND `locale` = 'deDE';
+DELETE FROM `creature_template_locale` WHERE `entry` IN(70100,179820,182753,182754,182755,182756,182758,182759,182760,182761,182764,182768,182769,182770,182771,182772) AND `locale` = 'deDE';
 INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
-(29347,'deDE','Patchwork Golem',NULL,0),
-(29823,'deDE','Death Knight',NULL,0),
-(29824,'deDE','Death Knight Captain',NULL,0),
-(29825,'deDE','Shade of Naxxramas',NULL,0),
-(29828,'deDE','Necro Knight',NULL,0),
-(29831,'deDE','Risen Squire',NULL,0),
-(29833,'deDE','Dark Touched Warrior',NULL,0),
-(29835,'deDE','Bony Construct',NULL,0),
-(29837,'deDE','Skeletal Smith',NULL,0),
-(29842,'deDE','Death Knight Cavalier',NULL,0),
-(29852,'deDE','Deathcharger Steed',NULL,0),
-(29898,'deDE','Unholy Axe',NULL,0),
-(29899,'deDE','Unholy Staff',NULL,0),
-(29900,'deDE','Unholy Swords',NULL,0),
-(29940,'deDE','Instructor Razuvious',NULL,0),
-(29941,'deDE','Death Knight Understudy',NULL,0),
-(29955,'deDE','Gothik the Harvester',NULL,0),
-(31366,'deDE','Brann Bronzebeard',NULL,0),
-(31586,'deDE','Anub''ar Assassin',NULL,0),
-(31587,'deDE','Anub''ar Brood Keeper',NULL,0);
-
-DELETE FROM `creature_template_locale` WHERE `entry` IN(31589,31590,31591,31592,31594,31595,31596,31599,31601,31602,31604,31605,31606,31607,31608,31609,31610,31611,31612,31613) AND `locale` = 'deDE';
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
-(31589,'deDE','Anub''ar Champion',NULL,0),
-(31590,'deDE','Anub''ar Champion',NULL,0),
-(31591,'deDE','Anub''ar Champion',NULL,0),
-(31592,'deDE','Anub''ar Crusher',NULL,0),
-(31594,'deDE','Anub''ar Crypt Fiend',NULL,0),
-(31595,'deDE','Anub''ar Crypt Fiend',NULL,0),
-(31596,'deDE','Anub''ar Crypt Fiend',NULL,0),
-(31599,'deDE','Anub''ar Guardian',NULL,0),
-(31601,'deDE','Anub''ar Necromancer',NULL,0),
-(31602,'deDE','Anub''ar Necromancer',NULL,0),
-(31604,'deDE','Anub''ar Prime Guard',NULL,0),
-(31605,'deDE','Anub''ar Shadowcaster',NULL,0),
-(31606,'deDE','Anub''ar Skirmisher',NULL,0),
-(31607,'deDE','Anub''ar Venomancer',NULL,0),
-(31608,'deDE','Anub''ar Warrior',NULL,0),
-(31609,'deDE','Anub''ar Webspinner',NULL,0),
-(31610,'deDE','Anub''arak',NULL,0),
-(31611,'deDE','Hadronox',NULL,0),
-(31612,'deDE','Krik''thir the Gatewatcher',NULL,0),
-(31613,'deDE','Skittering Infector',NULL,0);
-
-DELETE FROM `creature_template_locale` WHERE `entry` IN(31614,31615,31616,31617,34045,34105,34113,34165,34185,34235,34254,34255,34256,34257,37294,70100,179820,182753,182754,182755) AND `locale` = 'deDE';
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
-(31614,'deDE','Skittering Swarmer',NULL,0),
-(31615,'deDE','Watcher Gashra',NULL,0),
-(31616,'deDE','Watcher Narjil',NULL,0),
-(31617,'deDE','Watcher Silthik',NULL,0),
-(34045,'deDE','Salvaged Chopper',NULL,0),
-(34105,'deDE','Ulduar Colossus',NULL,0),
-(34113,'deDE','Steelforged Defender',NULL,0),
-(34165,'deDE','Mechagnome Battletank',NULL,0),
-(34185,'deDE','Molten Colossus',NULL,0),
-(34235,'deDE','Runeforged Sentry',NULL,0),
-(34254,'deDE','Expedition Commander',NULL,0),
-(34255,'deDE','Expedition Defender',NULL,0),
-(34256,'deDE','Expedition Engineer',NULL,0),
-(34257,'deDE','Expedition Trapper',NULL,0),
-(37294,'deDE','Frostwolf',NULL,0),
 (70100,'deDE','Furorion',NULL,0),
 (179820,'deDE','Verdammnispirscher',NULL,0),
 (182753,'deDE','Feendrache','(T2) FIGHTER:ARCANE',0),
 (182754,'deDE','Feendrachenjunges',NULL,0),
-(182755,'deDE','Initiand der Ohn''ir','Zauberwirker der Stufe 1',0);
-
-DELETE FROM `creature_template_locale` WHERE `entry` IN(182756,182758,182759,182760,182761,182763,182764,182765,182766,182768,182769,182770,182771,182772) AND `locale` = 'deDE';
-INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `VerifiedBuild`) VALUES
+(182755,'deDE','Initiand der Ohn''ir','Zauberwirker der Stufe 1',0),
 (182756,'deDE','Seidenäffchen','(T0) SWARMER',0),
 (182758,'deDE','Roter Viperid',NULL,0),
 (182759,'deDE','Roter Viperid',NULL,0),
 (182760,'deDE','Königsviperid',NULL,0),
 (182761,'deDE','Königsviperid',NULL,0),
-(182763,'deDE','Kill Credit',NULL,0),
 (182764,'deDE','Hochlord Darion Mograine','Reiter der Schwarzen Klinge',0),
-(182765,'deDE','Kleia',NULL,0),
-(182766,'deDE','Pelagos',NULL,0),
 (182768,'deDE','Grüner Viperid',NULL,0),
 (182769,'deDE','Grüner Viperid',NULL,0),
 (182770,'deDE','Mystiker der Ohn''ir','Zauberwirker der Stufe 2',0),
@@ -9897,12 +9706,12 @@ INSERT INTO `creature_template_locale` (`entry`, `locale`, `Name`, `Title`, `Ver
 (182772,'deDE','Peitscher','(T0) SWARMER',0);
 
 -- List of entries using TBC datas :
--- 11056,12807,16063,16185,20926,21824,22057,23274,23288,24921
+-- 11056,12807,16063,16185,20926,21426,21824,22057,23274,23288,24921
 -- List of entries using CLASSIC datas :
--- 715,3580,6140,12121,12417,12421,12469,12470,12758,13477,14027,14422,14449,14758,15218,15358,15384,15922,16006,16083,128
+-- 715,1723,1724,3580,6140,12121,12417,12421,12469,12470,12758,13219,13477,14027,14422,14449,14758,15218,15358,15922,16006,16083,128
 -- List of entries using CATA datas :
--- 19555,20851,20852,20853,20855,20856,21422,21819,23863,32254,37828,38023,38207,36795,38440
+-- 19555,20851,20852,20853,20855,20856,21422,21819,23863,25329,32254,37828,38023,38207
 -- List of entries using MOP datas :
 -- 21025
 -- List of entries using RETAIL datas :
--- 81,280,399,444,919,1659,3202,3521,4115,4445,6466,6566,6783,13236,14830,15166,16099,16560,17065,17165,17582,18366,18674,19550,21320,21860,23715,23808,24109,24181,24275,24331,24377,24378,24380,25263,26486,26594,26842,27632,27862,28088,28652,28678,28679,29100,29734,29741,29749,29930,29933,30061,30155,30888,31060,31076,31116,31168,31744,32293,32585,32586,32848,32849,33946,34168,34632,34921,36217,36858,36860,36861,36863,36865,36866,36867,37693,38595,38883,38919,38920,38921,39230,39265,39860,40120,29347,29823,29824,29825,29828,29831,29833,29835,29837,29842,29852,29898,29899,29900,29940,29941,29955,31366,31586,31587,31589,31590,31591,31592,31594,31595,31596,31599,31601,31602,31604,31605,31606,31607,31608,31609,31610,31611,31612,31613,31614,31615,31616,31617,34045,34105,34113,34165,34185,34235,34254,34255,34256,34257,37294,70100,179820,182753,182754,182755,182756,182758,182759,182760,182761,182763,182764,182765,182766,182768,182769,182770,182771,182772
+-- 81,399,444,919,3521,4115,4445,5050,5051,6466,6566,6783,13236,15166,16560,17065,18366,19550,21320,21860,23808,24331,24377,24378,24380,26486,26594,26842,27632,28652,28678,28679,29100,29749,29930,30888,31060,31168,32585,32586,33946,34632,34921,36217,36858,36860,36861,36863,36865,36866,36867,37693,38883,39230,39265,39860,40120,70100,179820,182753,182754,182755,182756,182758,182759,182760,182761,182764,182768,182769,182770,182771,182772
