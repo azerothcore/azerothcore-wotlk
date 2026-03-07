@@ -72,6 +72,7 @@
 #include "Player.h"
 #include "PlayerDump.h"
 #include "PoolMgr.h"
+#include "RaceMgr.h"
 #include "Realm.h"
 #include "ScriptMgr.h"
 #include "ServerMailMgr.h"
@@ -385,6 +386,9 @@ void World::SetInitialWorldSettings()
 
     // Load cinematic cameras
     LoadM2Cameras(_dataPath);
+
+    LOG_INFO("server.loading", "Loading Player race data...");
+    sRaceMgr->LoadRaces();
 
     // Load IP Location Database
     sIPLocation->Load();

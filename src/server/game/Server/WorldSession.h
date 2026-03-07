@@ -1157,7 +1157,6 @@ public:                                                 // opcodes handlers
     void HandleEnterPlayerVehicle(WorldPacket& data);
     void HandleUpdateProjectilePosition(WorldPacket& recvPacket);
 
-    void HandleTeleportTimeout(bool updateInSessions);
     bool HandleSocketClosed();
     void SetOfflineTime(uint32 time) { _offlineTime = time; }
     uint32 GetOfflineTime() const { return _offlineTime; }

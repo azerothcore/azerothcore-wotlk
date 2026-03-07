@@ -3407,6 +3407,16 @@ DungeonFinder.CastDeserter = 1
 DungeonFinder.AllowCompleted = 1
 
 #
+#    DungeonFinder.DungeonSelectionCooldown
+#
+#        Description: Duration in minutes for the dungeon selection cooldown. Players who complete a
+#                     random dungeon via LFG will not be assigned the same dungeon again for this
+#                     duration. This reduces the chance of getting the same dungeon in a row.
+#        Default:     0 - (Disabled)
+
+DungeonFinder.DungeonSelectionCooldown = 0
+
+#
 ###################################################################################################
 
 ###################################################################################################
@@ -4604,20 +4614,6 @@ Calculate.Creature.Zone.Area.Data = 0
 #
 
 Calculate.Gameoject.Zone.Area.Data = 0
-
-#
-#    TeleportTimeoutNear
-#       Description:  No description
-#       Default:  25
-
-TeleportTimeoutNear = 25
-
-#
-#    TeleportTimeoutFar
-#       Description:  No description
-#       Default:  45
-
-TeleportTimeoutFar = 45
 
 #
 #    DailyRBGArenaPoints.MinLevel

@@ -96,12 +96,15 @@ enum PaladinSpells
     SPELL_PALADIN_HOLY_VENGEANCE                 = 31803,
     SPELL_PALADIN_BLOOD_CORRUPTION               = 53742,
     SPELL_PALADIN_SEAL_OF_VENGEANCE_EFFECT       = 42463,
-    SPELL_PALADIN_SEAL_OF_CORRUPTION_EFFECT      = 53739
+    SPELL_PALADIN_SEAL_OF_CORRUPTION_EFFECT      = 53739,
+
+    SPELL_PALADIN_SEAL_OF_COMMAND                = 20375
 };
 
 enum PaladinSpellIcons
 {
     PALADIN_ICON_ID_RETRIBUTION_AURA             = 555,
+    PALADIN_ICON_JUDGEMENTS_OF_THE_JUST          = 3015,
     PALADIN_ICON_JUDGEMENTS_OF_THE_WISE          = 3017,
     PALADIN_ICON_HAMMER_OF_THE_RIGHTEOUS         = 3023,
     PALADIN_ICON_RIGHTEOUS_VENGEANCE             = 3025,
@@ -148,6 +151,20 @@ enum PaladinProcSpells
     SPELL_PALADIN_T8_HOLY_4P_BONUS               = 64895
 };
 
+static bool IsJudgementDamageSpell(SpellInfo const* spellInfo)
+{
+    return spellInfo &&
+        spellInfo->SpellFamilyName == SPELLFAMILY_PALADIN &&
+        (spellInfo->SpellFamilyFlags[0] & 0x800000);
+}
+
+static bool HasJudgementsOfTheJust(Unit const* caster)
+{
+    return caster && caster->GetAuraEffect(
+        SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_PALADIN,
+        PALADIN_ICON_JUDGEMENTS_OF_THE_JUST, 0) != nullptr;
+}
+
 class spell_pal_seal_of_command_aura : public AuraScript
 {
     PrepareAuraScript(spell_pal_seal_of_command_aura);
@@ -173,13 +190,15 @@ class spell_pal_seal_of_command_aura : public AuraScript
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
+        // All melee procs should cleave except Hammer of the Righteous.
+        // Judgement cleave is handled separately via JotJ code path.
         int32 targets = 3;
         if (SpellInfo const* procSpell = eventInfo.GetSpellInfo())
         {
-            if (procSpell->IsAffectingArea())
-            {
+            // HotR: flag1 0x40000, DS: flag1 0x20000
+            if (procSpell->SpellFamilyName == SPELLFAMILY_PALADIN &&
+                (procSpell->SpellFamilyFlags[1] & 0x60000))
                 targets = 1;
-            }
         }
 
         Unit* target = eventInfo.GetActionTarget();
@@ -959,27 +978,26 @@ public:
             GetCaster()->CastSpell(GetCaster(), SPELL_IMPROVED_JUDGEMENT_ENERGIZE, true);
         }
 
-        // Judgement of the Just
-        if (GetCaster()->GetAuraEffect(SPELL_AURA_ADD_FLAT_MODIFIER, SPELLFAMILY_PALADIN, 3015, 0))
+        // Judgements of the Just
+        if (HasJudgementsOfTheJust(GetCaster()))
         {
-            if (GetCaster()->CastSpell(GetHitUnit(), SPELL_JUDGEMENTS_OF_THE_JUST, true) && (spellId2 == SPELL_JUDGEMENT_OF_VENGEANCE_EFFECT || spellId2 == SPELL_JUDGEMENT_OF_CORRUPTION_EFFECT))
-            {
-                //hidden effect only cast when spellcast of judgements of the just is succesful
-                GetCaster()->CastSpell(GetHitUnit(), SealApplication(spellId2), true); //add hidden seal apply effect for vengeance and corruption
-            }
-        }
-    }
+            GetCaster()->CastSpell(GetHitUnit(), SPELL_JUDGEMENTS_OF_THE_JUST, true);
 
-    uint32 SealApplication(uint32 correspondingSpellId)
-    {
-        switch (correspondingSpellId)
-        {
-            case SPELL_JUDGEMENT_OF_VENGEANCE_EFFECT:
-                return SPELL_HOLY_VENGEANCE;
-            case SPELL_JUDGEMENT_OF_CORRUPTION_EFFECT:
-                return SPELL_BLOOD_CORRUPTION;
-            default:
-                return 0;
+            // JotJ makes Judgements trigger Seal of Command's
+            // cleave effect
+            if (AuraEffect const* socEff =
+                GetCaster()->GetAuraEffect(
+                    SPELL_PALADIN_SEAL_OF_COMMAND, EFFECT_0))
+            {
+                if (GetHitUnit()->IsAlive())
+                {
+                    GetCaster()->CastCustomSpell(
+                        socEff->GetSpellInfo()->Effects[EFFECT_0]
+                            .TriggerSpell,
+                        SPELLVALUE_MAX_TARGETS, 3,
+                        GetHitUnit(), true, nullptr, socEff);
+                }
+            }
         }
     }
 
@@ -1164,11 +1182,14 @@ class spell_pal_seal_of_righteousness : public AuraScript
         DamageInfo* damageInfo = eventInfo.GetDamageInfo();
 
         if (!damageInfo || !damageInfo->GetDamage())
-        {
             return false;
-        }
 
-        return target->IsAlive() && !eventInfo.GetTriggerAuraSpell() && (damageInfo->GetDamage() || (eventInfo.GetHitMask() & PROC_EX_ABSORB));
+        if (IsJudgementDamageSpell(eventInfo.GetSpellInfo()))
+            return target->IsAlive();
+
+        return target->IsAlive() && !eventInfo.GetTriggerAuraSpell() &&
+            (damageInfo->GetDamage() ||
+            (eventInfo.GetHitMask() & PROC_EX_ABSORB));
     }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
@@ -1187,6 +1208,17 @@ class spell_pal_seal_of_righteousness : public AuraScript
 
         int32 bp = std::max<int32>(0, int32((ap * 0.022f + 0.044f * holy) * GetTarget()->GetAttackTime(BASE_ATTACK) / 1000));
         GetTarget()->CastCustomSpell(SPELL_PALADIN_SEAL_OF_RIGHTEOUSNESS, SPELLVALUE_BASE_POINT0, bp, eventInfo.GetProcTarget(), true, nullptr, aurEff);
+
+        // Judgements of the Just: Seal of Righteousness procs
+        // twice from Judgements
+        if (IsJudgementDamageSpell(eventInfo.GetSpellInfo()) &&
+            HasJudgementsOfTheJust(GetTarget()))
+        {
+            GetTarget()->CastCustomSpell(
+                SPELL_PALADIN_SEAL_OF_RIGHTEOUSNESS,
+                SPELLVALUE_BASE_POINT0, bp,
+                eventInfo.GetProcTarget(), true, nullptr, aurEff);
+        }
     }
 
     void Register() override
@@ -1342,7 +1374,8 @@ class spell_pal_judgement_of_wisdom_mana : public AuraScript
         if (!attacker)
             return;
 
-        int32 bp = int32(CalculatePct(attacker->GetCreateMana(), aurEff->GetAmount()));
+        SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(SPELL_PALADIN_JUDGEMENT_OF_WISDOM_MANA);
+        int32 bp = int32(CalculatePct(attacker->GetCreateMana(), spellInfo->Effects[EFFECT_0].CalcValue()));
         attacker->CastCustomSpell(attacker, SPELL_PALADIN_JUDGEMENT_OF_WISDOM_MANA, &bp, nullptr, nullptr, true, nullptr, aurEff, GetCasterGUID());
     }
 
@@ -1884,6 +1917,25 @@ class spell_pal_seal_of_vengeance_aura : public AuraScript
         return true;
     }
 
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        SpellInfo const* procSpell = eventInfo.GetSpellInfo();
+        if (procSpell &&
+            procSpell->SpellFamilyName == SPELLFAMILY_PALADIN)
+        {
+            // Block re-proc from seal damage effects
+            if ((procSpell->SpellFamilyFlags[1] & 0x800) &&
+                !(procSpell->SpellFamilyFlags[0] & 0x800000))
+                return false;
+
+            // Judgements only trigger seal procs with JotJ
+            if (procSpell->SpellFamilyFlags[0] & 0x800000)
+                return HasJudgementsOfTheJust(eventInfo.GetActor());
+        }
+
+        return true;
+    }
+
     void HandleApplyDoT(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
@@ -1925,8 +1977,11 @@ class spell_pal_seal_of_vengeance_aura : public AuraScript
 
     void Register() override
     {
-        OnEffectProc += AuraEffectProcFn(spell_pal_seal_of_vengeance_aura::HandleApplyDoT, EFFECT_0, SPELL_AURA_DUMMY);
+        DoCheckProc += AuraCheckProcFn(spell_pal_seal_of_vengeance_aura::CheckProc);
+        // HandleSeal reads stacks BEFORE HandleApplyDoT increments them,
+        // so the attacking hit does not benefit from its own stack application.
         OnEffectProc += AuraEffectProcFn(spell_pal_seal_of_vengeance_aura::HandleSeal, EFFECT_0, SPELL_AURA_DUMMY);
+        OnEffectProc += AuraEffectProcFn(spell_pal_seal_of_vengeance_aura::HandleApplyDoT, EFFECT_0, SPELL_AURA_DUMMY);
     }
 
 private:

@@ -1183,7 +1183,18 @@ enum AcoreStrings
     LANG_CMD_QUEST_STATUS_LOG_FULL      = 5109,
     LANG_CMD_QUEST_STATUS_COND_DETAIL   = 5110,
 
-    // Room for more strings    5111-9999
+    // Battlefield commands
+    LANG_BF_NOT_FOUND                   = 5111,
+    LANG_BF_STARTED                     = 5112,
+    LANG_BF_STOPPED                     = 5113,
+    LANG_BF_SWITCHED                    = 5114,
+    LANG_BF_TIMER_SET                   = 5115,
+    LANG_BF_ENABLED                     = 5116,
+    LANG_BF_DISABLED                    = 5117,
+
+    LANG_RESETALL_HONOR                 = 5118,
+    LANG_RESETALL_ARENA                 = 5119,
+    // Room for more strings    5120-9999
 
     // Level requirement notifications
     LANG_SAY_REQ                        = 6604,
@@ -1346,6 +1357,8 @@ enum AcoreStrings
     // Continue show Ban in world (ip)
     LANG_BAN_IP_YOUBANNEDMESSAGE_WORLD            = 11017,
     LANG_BAN_IP_YOUPERMBANNEDMESSAGE_WORLD        = 11018,
+
+    LANG_LFG_COOLDOWN_CLEARED                     = 11019,
 
     LANG_MUTED_PLAYER                             = 30000, // Mute for player 2 hour
 

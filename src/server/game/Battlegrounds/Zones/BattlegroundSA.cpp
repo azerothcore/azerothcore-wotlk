@@ -718,6 +718,8 @@ void BattlegroundSA::DemolisherStartState(bool start)
     if (!BgCreatures[0])
         return;
 
+    // Only lock demolishers during warmup - they are attacker vehicles.
+    // Cannons/turrets are defender weapons and must remain usable from the start.
     for (uint8 i = BG_SA_DEMOLISHER_1; i <= BG_SA_DEMOLISHER_4; i++)
         if (Creature* dem = GetBGCreature(i))
         {
@@ -725,15 +727,6 @@ void BattlegroundSA::DemolisherStartState(bool start)
                 dem->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
             else
                 dem->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-        }
-
-    for (uint8 i = BG_SA_GUN_1; i <= BG_SA_GUN_10; i++)
-        if (Creature* gun = GetBGCreature(i))
-        {
-            if (start)
-                gun->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-            else
-                gun->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
         }
 
     // xinef: enable first gates damaging at start

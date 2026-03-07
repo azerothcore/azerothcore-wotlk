@@ -493,6 +493,88 @@ public:
     }
 
     // =============================================================================
+    // Cascade Proc Suppression - simulates Unit.cpp TriggerAurasProcOnEvent
+    // =============================================================================
+
+    /**
+     * @brief Configuration for simulating cascade proc suppression
+     *
+     * Models the two paths in TriggerAurasProcOnEvent that call SetCantProc():
+     * 1. Outer check: triggering spell has TRIGGERED_DISALLOW_PROC_EVENTS
+     * 2. Per-aura check: aura has SPELL_ATTR3_INSTANT_TARGET_PROCS (0x80000)
+     */
+    struct CascadeProcConfig
+    {
+        bool triggeringSpellIsProcDisabled = false;  // Spell::IsProcDisabled()
+        bool auraHasDisableProcAttr = false;         // SpellInfo::HasAttribute(SPELL_ATTR3_INSTANT_TARGET_PROCS)
+    };
+
+    /**
+     * @brief Returns true if cascading procs should be suppressed for this aura
+     *
+     * @param config Cascade proc configuration
+     * @return true if SetCantProc(true) would be active during this aura's proc
+     */
+    static bool ShouldSuppressCascadingProc(CascadeProcConfig const& config)
+    {
+        // Outer check: triggering spell disables all cascading procs
+        if (config.triggeringSpellIsProcDisabled)
+            return true;
+        // Per-aura check: aura itself suppresses cascading
+        if (config.auraHasDisableProcAttr)
+            return true;
+
+        return false;
+    }
+
+    // =============================================================================
+    // TAKEN Auto-Trigger Logic - simulates SpellMgr.cpp:2033-2049
+    // =============================================================================
+
+    /**
+     * @brief Configuration for simulating the TAKEN auto-trigger logic
+     * from SpellMgr::LoadSpellProcs() auto-generation
+     */
+    struct TakenAutoTriggerConfig
+    {
+        uint32 procFlags = 0;                   // SpellInfo::ProcFlags
+        uint32 auraName = 0;                    // Effect's ApplyAuraName
+        bool isAlwaysTriggeredAura = false;     // Already set by isAlwaysTriggeredAura[]
+    };
+
+    /**
+     * @brief Simulate the TAKEN auto-trigger logic from SpellMgr::LoadSpellProcs()
+     *
+     * During auto-generation of proc entries, TAKEN-proc auras with
+     * SPELL_AURA_PROC_TRIGGER_SPELL or SPELL_AURA_PROC_TRIGGER_DAMAGE
+     * should get PROC_ATTR_TRIGGERED_CAN_PROC set automatically.
+     *
+     * @param config Configuration describing the aura
+     * @return true if addTriggerFlag should be set
+     */
+    static bool ShouldAutoAddTriggeredCanProc(TakenAutoTriggerConfig const& config)
+    {
+        // If already marked as always-triggered, keep it
+        if (config.isAlwaysTriggeredAura)
+            return true;
+
+        // TAKEN auto-trigger: TAKEN proc flags + PROC_TRIGGER_SPELL/DAMAGE
+        if (config.procFlags & TAKEN_HIT_PROC_FLAG_MASK)
+        {
+            switch (config.auraName)
+            {
+                case SPELL_AURA_PROC_TRIGGER_SPELL:
+                case SPELL_AURA_PROC_TRIGGER_DAMAGE:
+                    return true;
+                default:
+                    break;
+            }
+        }
+
+        return false;
+    }
+
+    // =============================================================================
     // Conditions System - simulates SpellAuras.cpp:2232-2236
     // =============================================================================
 
@@ -605,6 +687,96 @@ private:
     std::chrono::steady_clock::time_point _now;
     UnitStub _actor;
     std::unique_ptr<AuraStub> _aura;
+};
+
+/**
+ * @brief Simulates the proc chain guard logic from Unit::TriggerAurasProcOnEvent
+ *
+ * Tracks the m_procDeep counter to verify that:
+ * - TRIGGERED_DISALLOW_PROC_EVENTS on the triggering spell disables procs
+ *   for all auras in the container
+ * - SPELL_ATTR3_INSTANT_TARGET_PROCS on individual auras disables procs
+ *   only during that specific aura's TriggerProcOnEvent call
+ * - The counter is properly balanced (returns to 0 after function exits)
+ */
+class ProcChainGuardSimulator
+{
+public:
+    struct AuraConfig
+    {
+        uint32 spellId = 0;
+        bool hasInstantTargetProcs = false;  // SPELL_ATTR3_INSTANT_TARGET_PROCS
+        bool isRemoved = false;              // AuraApplication::GetRemoveMode()
+    };
+
+    struct ProcRecord
+    {
+        uint32 spellId;
+        bool canProcDuringTrigger;   // CanProc() state when TriggerProcOnEvent fires
+        int32 procDeepDuringTrigger; // m_procDeep value during trigger
+    };
+
+    ProcChainGuardSimulator() : _procDeep(0) {}
+
+    /**
+     * @brief Simulate Unit::TriggerAurasProcOnEvent
+     *
+     * @param triggeringSpellHasDisallowProcEvents Whether the triggering spell
+     *        has TRIGGERED_DISALLOW_PROC_EVENTS cast flag
+     * @param auras List of auras in the proc container
+     */
+    void SimulateTriggerAurasProc(
+        bool triggeringSpellHasDisallowProcEvents,
+        std::vector<AuraConfig> const& auras)
+    {
+        _records.clear();
+
+        bool const disableProcs = triggeringSpellHasDisallowProcEvents;
+        if (disableProcs)
+            SetCantProc(true);
+
+        for (auto const& aura : auras)
+        {
+            if (aura.isRemoved)
+                continue;
+
+            if (aura.hasInstantTargetProcs)
+                SetCantProc(true);
+
+            // Record CanProc() state during TriggerProcOnEvent
+            _records.push_back({
+                aura.spellId,
+                CanProc(),
+                _procDeep
+            });
+
+            if (aura.hasInstantTargetProcs)
+                SetCantProc(false);
+        }
+
+        if (disableProcs)
+            SetCantProc(false);
+    }
+
+    [[nodiscard]] std::vector<ProcRecord> const& GetRecords() const
+    {
+        return _records;
+    }
+
+    [[nodiscard]] int32 GetProcDeep() const { return _procDeep; }
+    [[nodiscard]] bool CanProc() const { return _procDeep == 0; }
+
+private:
+    void SetCantProc(bool apply)
+    {
+        if (apply)
+            ++_procDeep;
+        else
+            --_procDeep;
+    }
+
+    int32 _procDeep;
+    std::vector<ProcRecord> _records;
 };
 
 #endif // AZEROTHCORE_PROC_CHANCE_TEST_HELPER_H
