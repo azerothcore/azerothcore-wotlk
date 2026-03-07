@@ -62,10 +62,12 @@ enum SpellData
     SPELL_SPINNING_UP                               = 63414,
 
     // PHASE 3:
-    SPELL_PLASMA_BALL                               = 63689,
+    SPELL_PLASMA_BALL_P1                            = 63689,
+    SPELL_PLASMA_BALL_P2                            = 65647,
 
     SPELL_MAGNETIC_CORE                             = 64436,
-    SPELL_SPINNING                                  = 64438,
+    SPELL_MAGNETIC_CORE_VISUAL                      = 64438,
+    SPELL_MAGNETIC_CORE_SUMMON                      = 64444,
 
     SPELL_SUMMON_BOMB_BOT                           = 63811,
     SPELL_BB_EXPLODE                                = 63801,
@@ -194,9 +196,6 @@ enum EVENTS
     EVENT_BOMB_BOT_RELOCATE                         = 30,
     EVENT_SUMMON_ASSAULT_BOT                        = 40,
     EVENT_SUMMON_JUNK_BOT                           = 41,
-    EVENT_MAGNETIC_CORE_PULL_DOWN                   = 42,
-    EVENT_MAGNETIC_CORE_FREE                        = 43,
-    EVENT_MAGNETIC_CORE_REMOVE_IMMOBILIZE           = 44,
 
     // Hard mode:
     EVENT_COMPUTER_SAY_INITIATED                    = 60,
@@ -210,6 +209,12 @@ enum EVENTS
     EVENT_SUMMON_EMERGENCY_FIRE_BOTS                = 68,
     EVENT_EMERGENCY_BOT_CHECK                       = 69,
     EVENT_EMERGENCY_BOT_ATTACK                      = 70,
+};
+
+enum Actions
+{
+    DO_DISABLE_AERIAL = 1,
+    DO_ENABLE_AERIAL,
 };
 
 enum Texts
@@ -254,6 +259,8 @@ enum Texts
 #define GetLMK2() instance->GetCreature(DATA_MIMIRON_LEVIATHAN_MKII)
 #define GetVX001() instance->GetCreature(DATA_MIMIRON_VX001)
 #define GetACU() instance->GetCreature(DATA_MIMIRON_ACU)
+
+Position const ACUSummonPos = { 2742.6265f, 2568.0571f, 377.22076f, 0.0f }; /// @todo: replace with sniffed position
 
 struct boss_mimiron : public BossAI
 {
@@ -563,12 +570,9 @@ struct boss_mimiron : public BossAI
                 break;
             case EVENT_GET_OUT_VX001:
                 if (Creature* VX001 = GetVX001())
-                    if (Creature* ACU = me->SummonCreature(NPC_AERIAL_COMMAND_UNIT, 2743.91f, 2568.78f, 391.34f, M_PI, TEMPSUMMON_MANUAL_DESPAWN))
+                    if (me->SummonCreature(NPC_AERIAL_COMMAND_UNIT, ACUSummonPos, TEMPSUMMON_MANUAL_DESPAWN))
                     {
                         me->EnterVehicle(VX001, 4);
-                        float speed = ACU->GetDistance(2737.75f, 2574.22f, 381.34f) / 2.0f;
-                        ACU->GetMotionMaster()->MovePoint(0, 2737.75f, 2574.22f, 381.34f, FORCED_MOVEMENT_NONE, speed);
-                        ACU->SetPosition(2737.75f, 2574.22f, 381.34f, M_PI);
                         events.ScheduleEvent(EVENT_SAY_VX001_DEAD, 2s);
                         break;
                     }
@@ -1499,7 +1503,6 @@ struct npc_ulduar_aerial_command_unit : public ScriptedAI
     {
         instance = me->GetInstanceScript();
         bIsEvading = false;
-        immobilized = false;
         me->SetDisableGravity(true);
     }
 
@@ -1508,19 +1511,13 @@ struct npc_ulduar_aerial_command_unit : public ScriptedAI
     SummonList summons;
     bool bIsEvading;
     uint8 Phase;
-    bool immobilized;
 
     void Reset() override
     {
         Phase = 0;
         events.Reset();
         summons.DespawnAll();
-    }
-
-    void AttackStart(Unit* who) override
-    {
-        if (who)
-            me->Attack(who, true); // skip following
+        me->SetCombatMovement(false); /// @todo: research ACU behaviour
     }
 
     void SetData(uint32 id, uint32 value) override
@@ -1532,16 +1529,12 @@ struct npc_ulduar_aerial_command_unit : public ScriptedAI
                 case 0:
                     Phase = 0;
                     events.Reset();
-                    immobilized = false;
                     break;
                 case 3:
                     Phase = 3;
                     me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    if (Unit* target = SelectTargetFromPlayerList(75.0f))
-                        AttackStart(target);
                     DoZoneInCombat();
                     events.Reset();
-                    events.ScheduleEvent(EVENT_SPELL_PLASMA_BALL, 0ms);
                     events.ScheduleEvent(EVENT_SUMMON_BOMB_BOT, 15s);
                     events.ScheduleEvent(EVENT_SUMMON_ASSAULT_BOT, 1s);
                     events.ScheduleEvent(EVENT_SUMMON_JUNK_BOT, 10s);
@@ -1561,17 +1554,31 @@ struct npc_ulduar_aerial_command_unit : public ScriptedAI
                     events.ScheduleEvent(EVENT_SPELL_PLASMA_BALL, 0ms);
             }
         }
-        else if (id == 2 && !immobilized && Phase == 3) // magnetic core
-        {
-            immobilized = true;
-            events.ScheduleEvent(EVENT_MAGNETIC_CORE_PULL_DOWN, 2s);
-        }
     }
 
     void DoAction(int32 param) override
     {
-        if (param == 1337)
-            summons.DespawnAll();
+        switch (param)
+        {
+            case DO_DISABLE_AERIAL:
+                me->CastStop();
+                me->AttackStop();
+                me->SetReactState(REACT_PASSIVE);
+                me->SetDisableGravity(false);
+                me->GetMotionMaster()->MoveFall();
+                events.DelayEvents(25s);
+                break;
+            case DO_ENABLE_AERIAL:
+                me->SetDisableGravity(true);
+                me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 10.0f);
+                me->m_Events.AddEventAtOffset([&] {
+                    me->SetReactState(REACT_AGGRESSIVE);
+                }, 2s);
+                break;
+            case 1337:
+                summons.DespawnAll();
+                break;
+        }
     }
 
     void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -1624,42 +1631,11 @@ struct npc_ulduar_aerial_command_unit : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
-        if (!UpdateVictim())
+        if (me->HasUnitFlag(UNIT_FLAG_NOT_SELECTABLE) || me->HasAura(SPELL_MAGNETIC_CORE))
             return;
 
-        // following :D
-        if (Phase == 3 && !immobilized)
-            if (Unit* victim = me->GetVictim())
-                if (me->GetExactDist2d(victim) > 25.0f )
-                {
-                    float angle = victim->GetAngle(me->GetPositionX(), me->GetPositionY());
-                    me->SetOrientation( me->GetAngle(victim->GetPositionX(), victim->GetPositionY()));
-                    float x = victim->GetPositionX() + 15.0f * cos(angle);
-                    float y = victim->GetPositionY() + 15.0f * std::sin(angle);
-
-                    // check if there's magnetic core in line of movement
-                    Creature* mc = nullptr;
-                    std::list<Creature*> cl;
-                    me->GetCreaturesWithEntryInRange(cl, me->GetExactDist2d(victim), NPC_MAGNETIC_CORE);
-                    for( std::list<Creature*>::iterator itr = cl.begin(); itr != cl.end(); ++itr )
-                    {
-                        if ((*itr)->IsInBetween(me, victim, 4.0f) && (*itr)->GetExactDist2d(victim) >= 10.0f) // don't come very close just because there's a magnetic core
-                        {
-                            x = (*itr)->GetPositionX();
-                            y = (*itr)->GetPositionY();
-                            mc = (*itr);
-                            break;
-                        }
-                    }
-
-                    float speed = me->GetExactDist(x, y, 381.34f);
-                    me->GetMotionMaster()->MovePoint(0, x, y, 381.34f, FORCED_MOVEMENT_NONE, speed);
-                    if (mc)
-                    {
-                        mc->AI()->SetData(0, 0);
-                        SetData(2, 1);
-                    }
-                }
+        if (!UpdateVictim())
+            return;
 
         events.Update(diff);
 
@@ -1670,14 +1646,8 @@ struct npc_ulduar_aerial_command_unit : public ScriptedAI
         {
             case 0:
                 break;
-            case EVENT_SPELL_PLASMA_BALL:
-                if (!immobilized)
-                    DoCastVictim(SPELL_PLASMA_BALL);
-                events.Repeat(3s);
-                break;
             case EVENT_SUMMON_BOMB_BOT:
-                if (!immobilized)
-                    me->CastSpell(me, SPELL_SUMMON_BOMB_BOT, false);
+                me->CastSpell(me, SPELL_SUMMON_BOMB_BOT, false);
                 events.Repeat(15s);
                 break;
             case EVENT_SUMMON_ASSAULT_BOT:
@@ -1702,21 +1672,9 @@ struct npc_ulduar_aerial_command_unit : public ScriptedAI
                     events.Repeat(45s);
                 }
                 break;
-            case EVENT_MAGNETIC_CORE_PULL_DOWN:
-                me->CastSpell(me, SPELL_MAGNETIC_CORE, true);
-                me->CastSpell(me, SPELL_SPINNING, true);
-                me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), 365.34f, FORCED_MOVEMENT_NONE, me->GetExactDist(me->GetPositionX(), me->GetPositionY(), 365.34f));
-                events.ScheduleEvent(EVENT_MAGNETIC_CORE_FREE, 20s);
-                break;
-            case EVENT_MAGNETIC_CORE_FREE:
-                me->RemoveAura(SPELL_SPINNING);
-                me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), 381.34f, FORCED_MOVEMENT_NONE, me->GetDistance(me->GetPositionX(), me->GetPositionY(), 381.34f));
-                events.ScheduleEvent(EVENT_MAGNETIC_CORE_REMOVE_IMMOBILIZE, 1s);
-                break;
-            case EVENT_MAGNETIC_CORE_REMOVE_IMMOBILIZE:
-                immobilized = false;
-                break;
         }
+
+        DoSpellAttackIfReady(Phase == 3 ? SPELL_PLASMA_BALL_P1 : SPELL_PLASMA_BALL_P2);
     }
 
     void MoveInLineOfSight(Unit* /*mover*/) override {}
@@ -1871,44 +1829,6 @@ struct npc_ulduar_mimiron_rocket : public NullCreatureAI
     }
 };
 
-struct npc_ulduar_magnetic_core : public NullCreatureAI
-{
-    npc_ulduar_magnetic_core(Creature* pCreature) : NullCreatureAI(pCreature)
-    {
-        instance = me->GetInstanceScript();
-        if (Creature* c = GetACU())
-            if (c->GetExactDist2d(me) <= 10.0f)
-            {
-                me->SendMonsterMove(c->GetPositionX(), c->GetPositionY(), 364.313f, 1);
-                me->UpdatePosition(c->GetPositionX(), c->GetPositionY(), 364.313f, me->GetOrientation(), true);
-                me->StopMovingOnCurrentPos();
-                c->AI()->SetData(2, 1);
-                despawnTimer = 20000;
-                return;
-            }
-        despawnTimer = 60000;
-    }
-
-    InstanceScript* instance;
-    uint16 despawnTimer;
-
-    void SetData(uint32  /*id*/, uint32  /*value*/) override
-    {
-        despawnTimer = 20000;
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (despawnTimer <= diff)
-        {
-            despawnTimer = 60000;
-            me->DespawnOrUnsummon(1ms);
-        }
-        else
-            despawnTimer -= diff;
-    }
-};
-
 struct npc_ulduar_bot_summon_trigger : public NullCreatureAI
 {
     npc_ulduar_bot_summon_trigger(Creature* pCreature) : NullCreatureAI(pCreature) { }
@@ -1962,6 +1882,67 @@ struct npc_ulduar_bot_summon_trigger : public NullCreatureAI
         }
         else
             timer -= diff;
+    }
+};
+
+// 64444 - Magnetic Core Summon
+class spell_mimiron_magnetic_core_summon : public SpellScript
+{
+    PrepareSpellScript(spell_mimiron_magnetic_core_summon);
+
+    void ModDest(SpellDestination& dest)
+    {
+        Unit* caster = GetCaster();
+        Position pos = caster->GetPosition();
+        pos.m_positionZ = caster->GetMap()->GetHeight(pos);
+        dest.Relocate(pos);
+    }
+
+    void Register() override
+    {
+        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_mimiron_magnetic_core_summon::ModDest, EFFECT_0, TARGET_DEST_NEARBY_ENTRY);
+    }
+};
+
+// 64436 - Magnetic Core (aura)
+class spell_mimiron_magnetic_core_aura : public AuraScript
+{
+    PrepareAuraScript(spell_mimiron_magnetic_core_aura);
+
+    bool Validate(SpellInfo const* /*spell*/) override
+    {
+        return ValidateSpellInfo({ SPELL_MAGNETIC_CORE_VISUAL });
+    }
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Creature* target = GetTarget()->ToCreature())
+        {
+            target->AI()->DoAction(DO_DISABLE_AERIAL);
+            target->CastSpell(target, SPELL_MAGNETIC_CORE_VISUAL, true);
+        }
+    }
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Creature* target = GetTarget()->ToCreature())
+        {
+            target->AI()->DoAction(DO_ENABLE_AERIAL);
+            target->RemoveAurasDueToSpell(SPELL_MAGNETIC_CORE_VISUAL);
+        }
+    }
+
+    void OnRemoveSelf(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (TempSummon* summ = GetTarget()->ToTempSummon())
+            summ->DespawnOrUnsummon();
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_mimiron_magnetic_core_aura::OnApply, EFFECT_1, SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_mimiron_magnetic_core_aura::OnRemove, EFFECT_1, SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_mimiron_magnetic_core_aura::OnRemoveSelf, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -2325,8 +2306,9 @@ void AddSC_boss_mimiron()
 
     RegisterUlduarCreatureAI(npc_ulduar_proximity_mine);
     RegisterUlduarCreatureAI(npc_ulduar_mimiron_rocket);
-    RegisterUlduarCreatureAI(npc_ulduar_magnetic_core);
     RegisterUlduarCreatureAI(npc_ulduar_bot_summon_trigger);
+    RegisterSpellScript(spell_mimiron_magnetic_core_summon);
+    RegisterSpellScript(spell_mimiron_magnetic_core_aura);
     RegisterSpellScript(spell_mimiron_rapid_burst_aura);
     RegisterSpellScript(spell_mimiron_p3wx2_laser_barrage_aura);
     RegisterSpellScript(spell_ulduar_mimiron_mine_explosion);

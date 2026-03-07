@@ -4614,20 +4614,6 @@ Calculate.Creature.Zone.Area.Data = 0
 Calculate.Gameoject.Zone.Area.Data = 0
 
 #
-#    TeleportTimeoutNear
-#       Description:  No description
-#       Default:  25
-
-TeleportTimeoutNear = 25
-
-#
-#    TeleportTimeoutFar
-#       Description:  No description
-#       Default:  45
-
-TeleportTimeoutFar = 45
-
-#
 #    DailyRBGArenaPoints.MinLevel
 #        Description: Allows gaining arena points on the first RBG win at level 70.
 #        Default: 71 - (Blizzlike)
