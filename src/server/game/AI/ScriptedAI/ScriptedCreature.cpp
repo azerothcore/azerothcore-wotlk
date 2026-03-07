@@ -766,9 +766,26 @@ void BossAI::UpdateAI(uint32 diff)
         DoMeleeAttackIfReady();
 }
 
-void BossAI::OnSpellCastFinished(SpellInfo const* spellInfo, SpellFinishReason reason)
+void BossAI::OnSpellCast(SpellInfo const* spellInfo)
 {
-    ScriptedAI::OnSpellCastFinished(spellInfo, reason);
+    ScriptedAI::OnSpellCast(spellInfo);
+    _CheckHealthAfterCast();
+}
+
+void BossAI::OnChannelFinished(SpellInfo const* spellInfo)
+{
+    ScriptedAI::OnChannelFinished(spellInfo);
+    _CheckHealthAfterCast();
+}
+
+void BossAI::OnSpellFailed(SpellInfo const* spellInfo)
+{
+    ScriptedAI::OnSpellFailed(spellInfo);
+    _CheckHealthAfterCast();
+}
+
+void BossAI::_CheckHealthAfterCast()
+{
     // Check if any health check events are pending (i.e. waiting for the boss to stop casting.
     if (_nextHealthCheck.IsPending() && me->IsInCombat())
     {

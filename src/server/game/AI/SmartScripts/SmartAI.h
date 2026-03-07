@@ -216,7 +216,7 @@ public:
 
     bool IsMainSpellPrevented(SpellInfo const* spellInfo) const;
 
-    void OnSpellCastFinished(SpellInfo const* spell, SpellFinishReason reason) override;
+    void OnSpellFailed(SpellInfo const* spell) override;
 
 private:
     bool mIsCharmed;

@@ -1250,10 +1250,10 @@ bool SmartAI::IsMainSpellPrevented(SpellInfo const* spellInfo) const
     return false;
 }
 
-void SmartAI::OnSpellCastFinished(SpellInfo const* spell, SpellFinishReason reason)
+void SmartAI::OnSpellFailed(SpellInfo const* spell)
 {
-    CreatureAI::OnSpellCastFinished(spell, reason);
-    if (reason == SPELL_FINISHED_CANCELED && _mainSpellId == spell->Id)
+    CreatureAI::OnSpellFailed(spell);
+    if (_mainSpellId == spell->Id)
         if (_currentRangeMode && IsMainSpellPrevented(spell))
             SetCurrentRangeMode(false);
 }
