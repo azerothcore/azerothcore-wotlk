@@ -1,0 +1,49 @@
+"id";"type";"name";"tooltipName";"tooltipType";"tooltipText";"icon";"price";"currency";"hyperlinkId";"creatureEntry";"discountAmount";"flags";"reward_1";"reward_2";"reward_3";"reward_4";"reward_5";"reward_6";"reward_7";"reward_8";"rewardcount_1";"rewardcount_2";"rewardcount_3";"rewardcount_4";"rewardcount_5";"rewardcount_6";"rewardcount_7";"rewardcount_8";"new";"enabled"
+1;8;"Level Boost
++10 Levels";"Level Boost";"";"Increase your characters levels by 10.";"achievement_level_10";10;2;0;0;0;0;10;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;1
+2;7;"Faction Change";"Faction Change";"";"Allows you to change your characters faction. Available after relogging.";"vas_factionchange";5;1;0;0;0;0;64;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;1
+3;7;"Race Change";"Race Change";"";"Allows you to change your characters race. Available after relogging.";"vas_racechange";10;1;0;0;5;0;128;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;1
+4;7;"Name Change";"Name Change";"";"Allows you to change your characters name. Available after relogging.";"vas_namechange";5;1;0;0;0;0;1;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;1
+5;1;"Foam Sword
+(Two-Hand Sword)";"";"item";"|cff00FFFFClick to preview!|r";"inv_sword_22";10;1;45061;45061;0;1;45061;0;0;0;0;0;0;0;1;0;0;0;0;0;0;0;0;1
+8;3;"Swift Spectral Tiger
+(Mount)";"";"spell";"|cff00FFFFClick to preview!|r";"ability_mount_spectraltiger";30;1;42777;24004;0;0;42777;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;1
+12;1;"Epic Purple Shirt
+(Shirt)";"";"item";"|cff00FFFFClick to preview!|r";"inv_shirt_purple_01";10;1;45037;45037;5;1;45037;0;0;0;0;0;0;0;1;0;0;0;0;0;0;0;0;1
+13;4;"Prairie Chicken
+(Pet)";"";"spell";"|cff00FFFFClick to preview!|r";"spell_magic_polymorphchicken";10;1;10686;7392;0;0;10686;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;1
+14;8;"Level Boost
++20 Levels";"Level Boost";"";"Increase your characters levels by 20.";"achievement_level_20";20;1;0;0;0;0;20;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;1
+15;5;"Buff
+Blessing of Might";"Buff";"";"Buffs you with Blessing of Might.";"spell_holy_fistofjustice";1;1;0;0;0;0;27140;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;1
+16;9;"Title
+Champion of the Naaru";"Title";"";"Gives you the title Champion of the Naaru.";"inv_mace_51";10;1;0;0;0;0;53;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;1
+17;8;"Level 60 Boost";"Level Boost";"";"Boosts your characters level to level 60!";"achievement_level_60";40;1;0;0;0;1;60;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;0;1
+18;1;"Tuxedo Set";"Tuxedo Set";"";"Express your great fashion sense with this full Tuxedo set!
+
+Contains the following:
+
+1x Tuxedo Jacket
+1x Tuxedo Shirt
+1x Tuxedo Pants";"inv_shirt_black_01";50;1;0;0;0;1;10036;10035;10034;0;0;0;0;0;1;1;1;0;0;0;0;0;0;1
+21;10;"Strength";"Allocate Strength";"";"Increases your Strength by 5.";"spell_nature_strength";1;2;0;0;0;0;100001;0;0;0;0;0;0;0;1;0;0;0;0;0;0;0;0;1
+22;10;"Intellect";"Allocate Intellect";"";"Increases your Intellect by 5.";"spell_holy_arcaneintellect";1;2;0;0;0;0;100002;0;0;0;0;0;0;0;1;0;0;0;0;0;0;0;0;1
+23;10;"Agility";"Allocate Agility";"";"Increases your Agility by 5.";"spell_holy_blessingofagility";1;2;0;0;0;0;100003;0;0;0;0;0;0;0;1;0;0;0;0;0;0;0;0;1
+24;10;"Spirit";"Allocate Spirit";"";"Increases your Spirit by 5.";"spell_holy_prayerofspirit";1;2;0;0;0;0;100004;0;0;0;0;0;0;0;1;0;0;0;0;0;0;0;0;1
+25;10;"Stamina";"Allocate Stamina";"";"Increases your Stamina by 5.";"spell_holy_blessingofstamina";1;2;0;0;0;0;100005;0;0;0;0;0;0;0;1;0;0;0;0;0;0;0;0;1
+26;10;"Haste";"Allocate Haste rating";"";"Increases your Haste rating by 5.";"inv_jewelry_talisman_04";1;2;0;0;0;0;100016;0;0;0;0;0;0;0;1;0;0;0;0;0;0;0;0;1
+27;10;"Armor Penetration";"Allocate Armor Penetration rating";"";"Increases your Armor Penetration rating by 5.";"ability_warrior_sunder";1;2;0;0;0;0;100017;0;0;0;0;0;0;0;1;0;0;0;0;0;0;0;0;1
+28;10;"Spell Power";"Allocate Spell Power";"";"Increases your Spell Power by 10.";"spell_arcane_studentofmagic";1;2;0;0;0;0;100018;0;0;0;0;0;0;0;1;0;0;0;0;0;0;0;0;1
+29;10;"Crit";"Allocate Crit rating";"";"Increases your Crit rating by 10.";"ability_warrior_unrelentingassault";1;2;0;0;0;0;100019;0;0;0;0;0;0;0;1;0;0;0;0;0;0;0;0;1
+30;10;"Movement Speed";"Allocate Movement Speed";"";"Increases your Movement Speed by 1%.";"ability_rogue_sprint";1;2;0;0;0;0;100020;0;0;0;0;0;0;0;1;0;0;0;0;0;0;0;0;0
+31;10;"MP5";"Allocate MP5";"";"Increases your mana per 5 seconds by 5.";"spell_shadow_soulleech_2";1;2;0;0;0;0;100021;0;0;0;0;0;0;0;1;0;0;0;0;0;0;0;0;1
+32;10;"Hit";"Allocate Hit rating";"";"Increases your Hit rating by 10";"ability_hunter_snipertraining";1;2;0;0;0;0;100022;0;0;0;0;0;0;0;1;0;0;0;0;0;0;0;0;1
+33;10;"Block";"Allocate Block rating";"";"Increases your Block rating by 4.";"ability_warrior_shieldwall";1;2;0;0;0;0;100023;0;0;0;0;0;0;0;1;0;0;0;0;0;0;0;0;1
+34;10;"Expertise";"Allocate Expertise rating";"";"Increases your Expertise rating by 3.";"ability_warrior_offensivestance";1;2;0;0;0;0;100024;0;0;0;0;0;0;0;1;0;0;0;0;0;0;0;0;1
+35;10;"Parry";"Allocate Parry rating";"";"Increases your Parry rating by 10.";"spell_deathknight_spelldeflection";1;2;0;0;0;0;100025;0;0;0;0;0;0;0;1;0;0;0;0;0;0;0;0;1
+36;10;"Dodge";"Allocate Dodge rating";"";"Increases your Dodge rating by 10.";"ability_rogue_unfairadvantage";1;2;0;0;0;0;100026;0;0;0;0;0;0;0;1;0;0;0;0;0;0;0;0;1
+210;11;"Strength";"Remove Strength";"";"Decreases your Strength by 1.";"spell_nature_strength";1;2;0;0;0;0;100001;0;0;0;0;0;0;0;1;0;0;0;0;0;0;0;0;1
+220;11;"Intellect";"Remove Intellect";"";"Decreases your Intellect by 1.";"spell_holy_arcaneintellect";1;2;0;0;0;0;100002;0;0;0;0;0;0;0;1;0;0;0;0;0;0;0;0;1
+230;11;"Agility";"Remove Agility";"";"Decreases your Agility by 1.";"spell_holy_blessingofagility";1;2;0;0;0;0;100003;0;0;0;0;0;0;0;1;0;0;0;0;0;0;0;0;1
+240;11;"Spirit";"Remove Spirit";"";"Decreases your Spirit by 1.";"spell_holy_prayerofspirit";1;2;0;0;0;0;100004;0;0;0;0;0;0;0;1;0;0;0;0;0;0;0;0;1
+250;11;"Stamina";"Remove Stamina";"";"Decreases your Stamina by 1.";"spell_holy_blessingofstamina";1;2;0;0;0;0;100005;0;0;0;0;0;0;0;1;0;0;0;0;0;0;0;0;1
