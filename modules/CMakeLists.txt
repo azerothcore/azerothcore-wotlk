@@ -386,6 +386,21 @@ if (MOD_ALE_FOUND)
   endif()
 
   install(DIRECTORY "${MOD_ALE_PATH}/LuaEngine/extensions" DESTINATION "${CMAKE_INSTALL_PREFIX}/bin/lua_scripts/")
+
+  # Copy lua_scripts/ from each module that has one
+  foreach(SOURCE_MODULE ${MODULES_MODULE_LIST})
+    GetPathToModuleSource(${SOURCE_MODULE} MODULE_LUA_SOURCE_PATH)
+    if(EXISTS "${MODULE_LUA_SOURCE_PATH}/lua_scripts")
+      if (WIN32)
+        add_custom_command(TARGET modules
+          POST_BUILD
+          COMMAND ${CMAKE_COMMAND} -E copy_directory "${MODULE_LUA_SOURCE_PATH}/lua_scripts" "${CMAKE_BINARY_DIR}/bin/${MSVC_CONFIGURATION_NAME}lua_scripts/")
+      endif()
+
+      install(DIRECTORY "${MODULE_LUA_SOURCE_PATH}/lua_scripts/" DESTINATION "${CMAKE_INSTALL_PREFIX}/bin/lua_scripts/")
+      message(STATUS "  +- ${SOURCE_MODULE}: Lua scripts found")
+    endif()
+  endforeach()
 endif()
 
 message("")
