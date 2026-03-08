@@ -20,10 +20,10 @@
 
 #include "Reference.h"
 
-class TargetedMovementGeneratorBase;
+class AbstractFollower;
 class Unit;
 
-class FollowerReference : public Reference<Unit, TargetedMovementGeneratorBase>
+class FollowerReference : public Reference<Unit, AbstractFollower>
 {
 protected:
     void targetObjectBuildLink() override;

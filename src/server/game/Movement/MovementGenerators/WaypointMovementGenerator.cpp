@@ -222,8 +222,8 @@ bool WaypointMovementGenerator<Creature>::StartMove(Creature* creature)
     init.Launch();
 
     //Call for creature group update
-    if (creature->GetFormation() && creature->GetFormation()->GetLeader() == creature)
-        creature->GetFormation()->LeaderMoveTo(formationDest.x, formationDest.y, formationDest.z, node.move_type);
+    if (creature->GetFormation() && creature->GetFormation()->GetLeader() == creature && creature->GetFormation()->CanLeaderStartMoving())
+        creature->GetFormation()->LeaderStartedMoving();
 
     return true;
 }

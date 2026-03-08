@@ -67,8 +67,8 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
 
         init.SetWalk(walk);
         init.Launch();
-        if (creature->GetFormation() && creature->GetFormation()->GetLeader() == creature)
-            creature->GetFormation()->LeaderMoveTo(_currDestPosition.GetPositionX(), _currDestPosition.GetPositionY(), _currDestPosition.GetPositionZ(), 0);
+        if (creature->GetFormation() && creature->GetFormation()->GetLeader() == creature && creature->GetFormation()->CanLeaderStartMoving())
+            creature->GetFormation()->LeaderStartedMoving();
         return;
     }
 
@@ -242,8 +242,8 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
     }
 
     //Call for creature group update
-    if (creature->GetFormation() && creature->GetFormation()->GetLeader() == creature)
-        creature->GetFormation()->LeaderMoveTo(finalPoint.x, finalPoint.y, finalPoint.z, 0);
+    if (creature->GetFormation() && creature->GetFormation()->GetLeader() == creature && creature->GetFormation()->CanLeaderStartMoving())
+        creature->GetFormation()->LeaderStartedMoving();
 
     if (sWorld->getBoolConfig(CONFIG_DONT_CACHE_RANDOM_MOVEMENT_PATHS))
         _preComputedPaths.erase(pathIdx);

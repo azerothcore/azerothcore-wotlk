@@ -15,21 +15,29 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef ACORE_ABSTRACTFOLLOWER_H
+#define ACORE_ABSTRACTFOLLOWER_H
+
 #include "FollowerReference.h"
-#include "AbstractFollower.h"
-#include "Unit.h"
 
-void FollowerReference::targetObjectBuildLink()
-{
-    getTarget()->AddFollower(this);
-}
+class Unit;
 
-void FollowerReference::targetObjectDestroyLink()
+class AbstractFollower
 {
-    getTarget()->RemoveFollower(this);
-}
+public:
+    explicit AbstractFollower(Unit* target = nullptr) { SetTarget(target); }
+    virtual ~AbstractFollower() { SetTarget(nullptr); }
 
-void FollowerReference::sourceObjectDestroyLink()
-{
-    GetSource()->stopFollowing();
-}
+    void SetTarget(Unit* unit);
+    Unit* GetTarget() const { return _target; }
+    bool IsTargetValid() const { return i_target.isValid(); }
+
+    virtual void stopFollowing() { }
+
+    Unit* _target = nullptr;
+
+protected:
+    FollowerReference i_target;
+};
+
+#endif

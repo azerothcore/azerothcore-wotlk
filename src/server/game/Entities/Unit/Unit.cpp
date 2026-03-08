@@ -44,6 +44,7 @@
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
 #include "MovementGenerator.h"
+#include "AbstractFollower.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvP.h"
@@ -5525,6 +5526,16 @@ void Unit::RemoveAreaAurasDueToLeaveWorld()
         }
         else
             ++iter;
+    }
+}
+
+void Unit::RemoveAllFollowers()
+{
+    while (auto* ref = m_FollowingRefMgr.getFirst())
+    {
+        auto* source = ref->GetSource();
+        ref->delink();
+        source->SetTarget(nullptr);
     }
 }
 
@@ -12699,6 +12710,8 @@ void Unit::RemoveFromWorld()
         RemoveAllControlled();
 
         RemoveAreaAurasDueToLeaveWorld();
+
+        RemoveAllFollowers();
 
         if (GetCharmerGUID())
         {

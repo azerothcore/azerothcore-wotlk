@@ -1881,9 +1881,10 @@ public:
     [[nodiscard]] bool IsInDisallowedMountForm() const;
 
     // Followers
-    void addFollower(FollowerReference* pRef) { m_FollowingRefMgr.insertFirst(pRef); }
-    void removeFollower(FollowerReference* /*pRef*/) { /* nothing to do yet */ }
+    void AddFollower(FollowerReference* ref) { m_FollowingRefMgr.insertFirst(ref); }
     [[nodiscard]] virtual float GetFollowAngle() const { return static_cast<float>(M_PI / 2); }
+    void RemoveFollower(FollowerReference* /*ref*/ ) { /* nothing to do yet */ }
+    void RemoveAllFollowers();
 
     // Pets, guardians, minions...
     [[nodiscard]] Guardian* GetGuardianPet() const;
