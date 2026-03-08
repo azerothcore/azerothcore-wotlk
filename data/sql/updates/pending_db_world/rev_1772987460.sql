@@ -12,7 +12,7 @@ DELETE FROM `smart_scripts` WHERE (`entryorguid` IN  (-136525, -136526, -136537,
 DELETE FROM `waypoints` WHERE `entry` IN (13627100, 13627101,33624);
 DELETE FROM `waypoint_data` WHERE `id` IN (13627100, 13627101, 3362400);
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
-(13627100, 1, -856.854, -159.629, 458.894, NULL, 0, 0, 0, 100, 0), 
+(13627100, 1, -856.854, -159.629, 458.894, NULL, 0, 0, 0, 100, 0),
 (13627100, 2, -815.381, -160.206, 429.841, NULL, 0, 0, 0, 100, 0),
 (13627100, 3, -812.063, -160.252, 429.841, NULL, 0, 0, 0, 100, 0),
 (13627100, 4, -787.449, -186.878, 429.841, NULL, 0, 0, 0, 100, 0),
