@@ -3733,11 +3733,6 @@ void Spell::cancel(bool bySelf)
 
     sScriptMgr->OnSpellCastCancel(this, m_caster, m_spellInfo, bySelf);
 
-    // Call CreatureAI hook OnSpellFailed only for true interrupts/cancels, not prepare-time failures
-    if (Creature* creatureCaster = m_caster->ToCreature())
-        if (creatureCaster->IsAIEnabled)
-            creatureCaster->AI()->OnSpellFailed(m_spellInfo);
-
     finish(false);
 }
 
