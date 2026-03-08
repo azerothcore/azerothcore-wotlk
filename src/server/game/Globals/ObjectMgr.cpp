@@ -10431,6 +10431,11 @@ CreatureBaseStats const* ObjectMgr::GetCreatureBaseStats(uint8 level, uint8 unit
             BaseMana = 0;
             AttackPower = 0;
             RangedAttackPower = 0;
+            Strength = 0;
+            Agility = 0;
+            Stamina = 0;
+            Intellect = 0;
+            Spirit = 0;
         }
     };
     static const DefaultCreatureBaseStats defStats;
@@ -10441,7 +10446,7 @@ void ObjectMgr::LoadCreatureClassLevelStats()
 {
     uint32 oldMSTime = getMSTime();
 
-    QueryResult result = WorldDatabase.Query("SELECT level, class, basehp0, basehp1, basehp2, basemana, basearmor, attackpower, rangedattackpower, damage_base, damage_exp1, damage_exp2 FROM creature_classlevelstats");
+    QueryResult result = WorldDatabase.Query("SELECT level, class, basehp0, basehp1, basehp2, basemana, basearmor, attackpower, rangedattackpower, damage_base, damage_exp1, damage_exp2, Strength, Agility, Stamina, Intellect, Spirit FROM creature_classlevelstats");
 
     if (!result)
     {
@@ -10500,6 +10505,18 @@ void ObjectMgr::LoadCreatureClassLevelStats()
 
         stats.AttackPower = fields[7].Get<uint32>();
         stats.RangedAttackPower = fields[8].Get<uint32>();
+
+        stats.Strength = fields[12].Get<uint32>();
+        stats.Agility = fields[13].Get<uint32>();
+        stats.Stamina = fields[14].Get<uint32>();
+        stats.Intellect = fields[15].Get<uint32>();
+        stats.Spirit = fields[16].Get<uint32>();
+
+        if (!stats.Strength || !stats.Agility || !stats.Stamina || !stats.Intellect || !stats.Spirit)
+        {
+            // Once these attributes are implemented, this should probably be uncommented.
+            // LOG_WARN("server.loading", "Creature base attributes for class {}, level {} are missing!", Class, Level);
+        }
 
         _creatureBaseStatsStore[MAKE_PAIR16(Level, Class)] = stats;
 

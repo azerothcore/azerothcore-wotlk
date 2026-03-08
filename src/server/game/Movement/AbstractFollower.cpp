@@ -15,21 +15,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "FollowerReference.h"
 #include "AbstractFollower.h"
 #include "Unit.h"
 
-void FollowerReference::targetObjectBuildLink()
+void AbstractFollower::SetTarget(Unit* unit)
 {
-    getTarget()->AddFollower(this);
-}
+    if (unit == GetTarget())
+        return;
 
-void FollowerReference::targetObjectDestroyLink()
-{
-    getTarget()->RemoveFollower(this);
-}
-
-void FollowerReference::sourceObjectDestroyLink()
-{
-    GetSource()->stopFollowing();
+    i_target.link(unit, this);
+    _target = i_target.getTarget();
 }
