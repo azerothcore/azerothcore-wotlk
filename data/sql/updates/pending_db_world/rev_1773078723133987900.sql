@@ -1,4 +1,4 @@
--- Matched chances with before Normalization. 2% -> 3%
+-- Match chances to pre-normalization values (2% -> 3%)
 UPDATE `reference_loot_template` SET `Chance`=3 WHERE `Entry`=1200068 AND `Reference`=1226870;
 UPDATE `reference_loot_template` SET `Chance`=1.5 WHERE `Entry`=1200069 AND `Reference`=1226870;
 UPDATE `reference_loot_template` SET `Chance`=1.5 WHERE `Entry`=1200069 AND `Reference`=1226971;
