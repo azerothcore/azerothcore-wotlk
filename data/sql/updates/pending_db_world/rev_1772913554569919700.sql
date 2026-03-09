@@ -1,4 +1,4 @@
--- Update gameobject 'Deadmine Doors and Levers' with sniffed values
+-- Update gameobject 'Deadmines Doors and Levers' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (16399, 17153, 17154, 16400, 101831, 101834, 101832, 101833, 13965, 16397)) AND (`guid` IN (26182, 26183, 26184, 26185, 26188, 26192, 26197, 26206, 30533, 30534));
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`, `Comment`) VALUES
