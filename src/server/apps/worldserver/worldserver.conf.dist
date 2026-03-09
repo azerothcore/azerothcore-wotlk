@@ -34,6 +34,7 @@
 #    CHARACTER DELETE
 #    CHARACTER CREATION
 #    CHARACTER
+#    ACHIEVEMENT
 #    SKILL
 #    STATS
 #    REPUTATION
@@ -2221,6 +2222,22 @@ SpellQueue.Enabled = 1
 #        Default:     400 - (400ms)
 
 SpellQueue.Window = 400
+
+#
+###################################################################################################
+
+###################################################################################################
+# ACHIEVEMENT
+#
+#    Achievement.RealmFirstKillWindow
+#        Description: Time window (in seconds) for realm first kill achievements after the first
+#                     completion. This setting controls whether multiple groups can earn the
+#                     realm first kill achievement within a short time window.
+#        Default:     60 - (Allow additional groups to complete within 60 seconds/1 minute)
+#                     0  - (Strict mode, only the first group/player gets the achievement)
+#                     1+ - (Extended window, allow N seconds for additional completions)
+
+Achievement.RealmFirstKillWindow = 60
 
 #
 ###################################################################################################
@@ -4612,20 +4629,6 @@ Calculate.Creature.Zone.Area.Data = 0
 #
 
 Calculate.Gameoject.Zone.Area.Data = 0
-
-#
-#    TeleportTimeoutNear
-#       Description:  No description
-#       Default:  25
-
-TeleportTimeoutNear = 25
-
-#
-#    TeleportTimeoutFar
-#       Description:  No description
-#       Default:  45
-
-TeleportTimeoutFar = 45
 
 #
 #    DailyRBGArenaPoints.MinLevel

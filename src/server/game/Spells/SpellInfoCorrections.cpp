@@ -652,6 +652,19 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
     });
 
+    // Explosive Trap Effect
+    ApplySpellFix({
+        13812, // Explosive Trap Effect (Rank 1)
+        14314, // Explosive Trap Effect (Rank 2)
+        14315, // Explosive Trap Effect (Rank 3)
+        27026, // Explosive Trap Effect (Rank 4)
+        49064, // Explosive Trap Effect (Rank 5)
+        49065  // Explosive Trap Effect (Rank 6)
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
+    });
+
     // Kill Command
     // Kill Command, Overpower
     ApplySpellFix({ 34027, 37529 }, [](SpellInfo* spellInfo)
@@ -1885,9 +1898,8 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_1].Effect = 0;
     });
 
-    // Ulduar, Mimiron, Magnetic Core (summon)
     // Meeting Stone Summon
-    ApplySpellFix({ 64444, 23598 }, [](SpellInfo* spellInfo)
+    ApplySpellFix({ 23598 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_CASTER);
     });

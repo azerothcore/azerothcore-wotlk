@@ -144,6 +144,7 @@ private:
     uint8 const m_effIndex;
     bool m_canBeRecalculated;
     bool m_isPeriodic;
+    bool m_isRecalculatingPassiveAuras = false;
 private:
     float CalcPeriodicCritChance(Unit const* caster, Unit const* target) const;
 

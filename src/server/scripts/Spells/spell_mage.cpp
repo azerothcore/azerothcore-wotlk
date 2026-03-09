@@ -959,11 +959,23 @@ class spell_mage_fingers_of_frost : public AuraScript
 
     void PrepareProc(ProcEventInfo& eventInfo)
     {
-        // Block channeled spells (e.g. Blizzard channel start) from consuming charges.
-        // All other filtering is handled by SpellPhaseMask=1 (CAST only) in spell_proc.
         if (Spell const* spell = eventInfo.GetProcSpell())
-            if (spell->GetSpellInfo()->IsChanneled())
+        {
+            bool isTriggered = spell->IsTriggered();
+            bool isCastPhase = (eventInfo.GetSpellPhaseMask() & PROC_SPELL_PHASE_CAST) != 0;
+            bool isChanneled = spell->GetSpellInfo()->IsChanneled();
+            bool prevent = false;
+
+            if (isTriggered)
+                prevent = false;
+            else if (isChanneled)
+                prevent = true;
+            else if (!isCastPhase)
+                prevent = true;
+
+            if (prevent)
                 PreventDefaultAction();
+        }
     }
 
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -1207,7 +1219,7 @@ class spell_mage_glyph_of_polymorph : public AuraScript
             return;
 
         // Remove DoTs from target
-        target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE, ObjectGuid::Empty, nullptr, true);
+        target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE, ObjectGuid::Empty, target->GetAura(32409), true); // SW:D shall not be removed.
         target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT, ObjectGuid::Empty, nullptr, true);
         target->RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH, ObjectGuid::Empty, nullptr, true);
     }
