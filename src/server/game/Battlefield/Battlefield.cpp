@@ -312,6 +312,8 @@ void Battlefield::InvitePlayerToWar(Player* player)
     if (m_PlayersInWar[player->GetTeamId()].count(player->GetGUID()) || m_InvitedPlayers[player->GetTeamId()].count(player->GetGUID()))
         return;
 
+    sScriptMgr->OnBattlefieldBeforeInvitePlayerToWar(this, player);
+
     m_PlayersWillBeKick[player->GetTeamId()].erase(player->GetGUID());
     m_InvitedPlayers[player->GetTeamId()][player->GetGUID()] = GameTime::GetGameTime().count() + m_TimeForAcceptInvite;
     player->GetSession()->SendBfInvitePlayerToWar(m_BattleId, m_ZoneId, m_TimeForAcceptInvite);

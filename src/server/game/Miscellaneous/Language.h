@@ -1183,7 +1183,18 @@ enum AcoreStrings
     LANG_CMD_QUEST_STATUS_LOG_FULL      = 5109,
     LANG_CMD_QUEST_STATUS_COND_DETAIL   = 5110,
 
-    // Room for more strings    5111-9999
+    // Battlefield commands
+    LANG_BF_NOT_FOUND                   = 5111,
+    LANG_BF_STARTED                     = 5112,
+    LANG_BF_STOPPED                     = 5113,
+    LANG_BF_SWITCHED                    = 5114,
+    LANG_BF_TIMER_SET                   = 5115,
+    LANG_BF_ENABLED                     = 5116,
+    LANG_BF_DISABLED                    = 5117,
+
+    LANG_RESETALL_HONOR                 = 5118,
+    LANG_RESETALL_ARENA                 = 5119,
+    // Room for more strings    5120-9999
 
     // Level requirement notifications
     LANG_SAY_REQ                        = 6604,

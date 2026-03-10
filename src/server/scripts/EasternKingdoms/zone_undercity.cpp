@@ -118,6 +118,11 @@ public:
             _events.ScheduleEvent(EVENT_MULTI_SHOT, 10s);
         }
 
+        void JustDied(Unit* /*killer*/) override
+        {
+            DoRewardPlayersInArea();
+        }
+
         void SetGUID(ObjectGuid const& guid, int32 type) override
         {
             if (type == GUID_EVENT_INVOKER)

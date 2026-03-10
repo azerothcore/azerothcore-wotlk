@@ -158,6 +158,15 @@ void PetAI::UpdateAI(uint32 diff)
     else
         m_updateAlliesTimer -= diff;
 
+    if (owner && owner->IsPlayer() && !me->GetVictim() && me->CanNotReachTarget())
+    {
+        if (me->GetDistance(owner) > 40.0f)
+        {
+            me->NearTeleportTo(owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ(), me->GetOrientation());
+            me->SetCannotReachTarget(); // Clear flag after teleport
+        }
+    }
+
     if (me->GetVictim() && me->GetVictim()->IsAlive())
     {
         // is only necessary to stop casting, the pet must not exit combat
@@ -746,10 +755,15 @@ bool PetAI::CanAttack(Unit* target, SpellInfo const* spellInfo)
 
         // Check if our owner selected this target and clicked "attack"
         Unit* ownerTarget = nullptr;
-        if (Player* owner = me->GetCharmerOrOwner()->ToPlayer())
-            ownerTarget = owner->GetSelectedUnit();
-        else
-            ownerTarget = me->GetCharmerOrOwner()->GetVictim();
+        Unit* charmerOrOwner = me->GetCharmerOrOwner();
+
+        if (charmerOrOwner)
+        {
+            if (Player* owner = charmerOrOwner->ToPlayer())
+                ownerTarget = owner->GetSelectedUnit();
+            else
+                ownerTarget = charmerOrOwner->GetVictim();
+        }
 
         if (ownerTarget && me->GetCharmInfo()->IsCommandAttack())
             return (target->GetGUID() == ownerTarget->GetGUID());

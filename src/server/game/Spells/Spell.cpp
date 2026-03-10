@@ -3073,9 +3073,7 @@ SpellMissInfo Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask, bool scaleA
     }
 
     if (m_caster != unit && m_caster->IsHostileTo(unit) && !m_spellInfo->IsPositive() && !m_triggeredByAuraSpell && !m_spellInfo->HasAttribute(SPELL_ATTR0_CU_DONT_BREAK_STEALTH))
-    {
         unit->RemoveAurasByType(SPELL_AURA_MOD_STEALTH);
-    }
 
     if (aura_effmask)
     {
@@ -3257,7 +3255,7 @@ void Spell::DoTriggersOnSpellHit(Unit* unit, uint8 effMask)
                             Aura* aur = unit->GetAura(m_spellInfo->Id, m_caster->GetGUID());
                             _duration = aur ? aur->GetDuration() : -1;
                         }
-                        triggeredAur->SetDuration(_duration);
+                        triggeredAur->SetDuration(std::max(triggeredAur->GetDuration(), _duration));
                     }
                 }
             }
@@ -3631,6 +3629,12 @@ SpellCastResult Spell::prepare(SpellCastTargets const* targets, AuraEffect const
         m_caster->SetCurrentCastedSpell(this);
         SendSpellStart();
 
+        // Call CreatureAI hook OnSpellStart for spells with cast time or channeled spells
+        if (m_casttime > 0 || m_spellInfo->IsChanneled())
+            if (Creature* caster = m_caster->ToCreature())
+                if (caster->IsAIEnabled)
+                    caster->AI()->OnSpellStart(GetSpellInfo());
+
         // set target for proper facing
         if ((m_casttime || m_spellInfo->IsChanneled()) && !HasTriggeredCastFlag(TRIGGERED_IGNORE_SET_FACING))
         {
@@ -3953,68 +3957,8 @@ void Spell::_cast(bool skipCheck)
     }
     else
     {
-        // CAST phase procs for immediate spells (including channeled)
-        if (m_originalCaster)
-        {
-            uint32 procAttacker = m_procAttacker;
-            if (!procAttacker)
-            {
-                bool IsPositive = m_spellInfo->IsPositive();
-                if (m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MAGIC)
-                {
-                    procAttacker = IsPositive ? PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_POS : PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG;
-                }
-                else
-                {
-                    procAttacker = IsPositive ? PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_POS : PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_NEG;
-                }
-            }
-
-            uint32 hitMask = PROC_HIT_NORMAL;
-
-            for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
-            {
-                if (ihit->missCondition != SPELL_MISS_NONE)
-                    continue;
-
-                if (!ihit->crit)
-                    continue;
-
-                hitMask |= PROC_HIT_CRITICAL;
-                break;
-            }
-
-            Unit::ProcSkillsAndAuras(m_originalCaster, m_originalCaster, procAttacker, PROC_FLAG_NONE, hitMask, 1, BASE_ATTACK, m_spellInfo, m_triggeredByAuraSpell.spellInfo,
-                m_triggeredByAuraSpell.effectIndex, this, nullptr, nullptr, PROC_SPELL_PHASE_CAST);
-        }
-
         // Immediate spell, no big deal
         handle_immediate();
-
-        // Clean up deferred 0-charge spell modifier auras
-        for (Aura* aura : m_appliedMods)
-        {
-            if (!aura->IsRemoved() && aura->IsUsingCharges()
-                && !aura->GetCharges())
-                aura->Remove();
-        }
-
-        // Also clean up deferred modifier auras not in m_appliedMods
-        if (Unit* caster = m_caster)
-        {
-            std::vector<Aura*> deferred;
-            for (auto const& [id, aura] : caster->GetOwnedAuras())
-            {
-                if (!aura->IsRemoved() && aura->IsUsingCharges()
-                    && !aura->GetCharges()
-                    && (aura->HasEffectType(SPELL_AURA_ADD_FLAT_MODIFIER)
-                        || aura->HasEffectType(SPELL_AURA_ADD_PCT_MODIFIER)))
-                    deferred.push_back(aura);
-            }
-            for (Aura* aura : deferred)
-                if (!aura->IsRemoved())
-                    aura->Remove();
-        }
     }
 
     if (resetAttackTimers)
@@ -4042,9 +3986,13 @@ void Spell::_cast(bool skipCheck)
     if (modOwner)
         modOwner->SetSpellModTakingSpell(this, false);
 
-    // CAST phase procs for delayed spells
-    if (m_spellState == SPELL_STATE_DELAYED
-        && m_originalCaster)
+    // Handle procs on cast - only for non-triggered spells
+    // Triggered spells (from auras, items, etc.) should not fire CAST phase procs
+    // as they are not player-initiated casts. This prevents issues like Arcane Potency
+    // charges being consumed by periodic damage effects (e.g., Blizzard ticks).
+    // Must be called AFTER handle_immediate() so spell mods (like Missile Barrage's
+    // duration reduction) are applied before the aura is consumed by the proc.
+    if (m_originalCaster && !IsTriggered())
     {
         uint32 procAttacker = m_procAttacker;
         if (!procAttacker)
@@ -4110,11 +4058,10 @@ void Spell::_cast(bool skipCheck)
 
     SetExecutedCurrently(false);
 
-    // Call CreatureAI hook OnSpellCastFinished
-    if (m_originalCaster)
-        if (Creature* caster = m_originalCaster->ToCreature())
-            if (caster->IsAIEnabled)
-                caster->AI()->OnSpellCastFinished(GetSpellInfo(), SPELL_FINISHED_SUCCESSFUL_CAST);
+    // Call CreatureAI hook on successful cast
+    if (Creature* caster = m_caster->ToCreature())
+        if (caster->IsAIEnabled)
+            caster->AI()->OnSpellCast(GetSpellInfo());
 }
 
 void Spell::handle_immediate()
@@ -4474,7 +4421,7 @@ void Spell::update(uint32 difftime)
                     // We call the hook here instead of in Spell::finish because we only want to call it for completed channeling. Everything else is handled by interrupts
                     if (Creature* creatureCaster = m_caster->ToCreature())
                         if (creatureCaster->IsAIEnabled)
-                            creatureCaster->AI()->OnSpellCastFinished(m_spellInfo, SPELL_FINISHED_CHANNELING_COMPLETE);
+                            creatureCaster->AI()->OnChannelFinished(m_spellInfo);
                 }
                 // Xinef: Dont update channeled target list on last tick, allow auras to update duration properly
                 // Xinef: Added this strange check because of diffrent update routines for players / creatures
@@ -4536,8 +4483,8 @@ void Spell::finish(bool ok)
             // Xinef: Reset cooldown event in case of fail cast
             if (m_spellInfo->IsCooldownStartedOnEvent())
                 m_caster->ToPlayer()->SendCooldownEvent(m_spellInfo, 0, 0, false);
-
         }
+
         return;
     }
 
@@ -6936,9 +6883,9 @@ SpellCastResult Spell::CheckCasterAuras(bool preventionOnly) const
                 // Barkskin should skip sleep effects, sap and fears
                 if (m_spellInfo->Id == 22812)
                     mask |= 1 << MECHANIC_SAPPED | 1 << MECHANIC_HORROR | 1 << MECHANIC_SLEEP;
-                // Hand of Freedom, can be used while sapped
+                // Hand of Freedom, can be used while sapped and while under fear-mechanic stuns (e.g. Intimidating Shout primary target)
                 if (m_spellInfo->Id == 1044)
-                    mask |= 1 << MECHANIC_SAPPED;
+                    mask |= (1 << MECHANIC_SAPPED) | (1 << MECHANIC_FEAR);
                 Unit::AuraEffectList const& stunAuras = m_caster->GetAuraEffectsByType(SPELL_AURA_MOD_STUN);
                 for (Unit::AuraEffectList::const_iterator i = stunAuras.begin(); i != stunAuras.end(); ++i)
                 {
@@ -7001,9 +6948,9 @@ SpellCastResult Spell::CheckCasterAuras(bool preventionOnly) const
                                     // Barkskin should skip sleep effects, sap and fears
                                     if (m_spellInfo->Id == 22812)
                                         mask |= 1 << MECHANIC_SAPPED | 1 << MECHANIC_HORROR | 1 << MECHANIC_SLEEP;
-                                    // Hand of Freedom, can be used while sapped
+                                    // Hand of Freedom, can be used while sapped and while under fear-mechanic stuns (e.g. Intimidating Shout primary target)
                                     if (m_spellInfo->Id == 1044)
-                                        mask |= 1 << MECHANIC_SAPPED;
+                                        mask |= (1 << MECHANIC_SAPPED) | (1 << MECHANIC_FEAR);
 
                                     if (!usableInStun || !(auraInfo->GetAllEffectsMechanicMask() & mask))
                                         return SPELL_FAILED_STUNNED;

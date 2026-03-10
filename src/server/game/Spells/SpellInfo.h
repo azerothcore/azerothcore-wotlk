@@ -466,6 +466,8 @@ public:
     bool IsRangedWeaponSpell() const;
     bool IsAutoRepeatRangedSpell() const;
 
+    [[nodiscard]] bool IsAffected(uint32 familyName, flag96 const& familyFlags) const;
+
     bool IsAffectedBySpellMods() const;
     bool IsAffectedBySpellMod(SpellModifier const* mod) const;
 

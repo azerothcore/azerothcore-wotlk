@@ -190,13 +190,15 @@ class spell_pal_seal_of_command_aura : public AuraScript
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
+        // All melee procs should cleave except Hammer of the Righteous.
+        // Judgement cleave is handled separately via JotJ code path.
         int32 targets = 3;
         if (SpellInfo const* procSpell = eventInfo.GetSpellInfo())
         {
-            if (procSpell->IsAffectingArea())
-            {
+            // HotR: flag1 0x40000, DS: flag1 0x20000
+            if (procSpell->SpellFamilyName == SPELLFAMILY_PALADIN &&
+                (procSpell->SpellFamilyFlags[1] & 0x60000))
                 targets = 1;
-            }
         }
 
         Unit* target = eventInfo.GetActionTarget();
@@ -1372,7 +1374,8 @@ class spell_pal_judgement_of_wisdom_mana : public AuraScript
         if (!attacker)
             return;
 
-        int32 bp = int32(CalculatePct(attacker->GetCreateMana(), aurEff->GetAmount()));
+        SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(SPELL_PALADIN_JUDGEMENT_OF_WISDOM_MANA);
+        int32 bp = int32(CalculatePct(attacker->GetCreateMana(), spellInfo->Effects[EFFECT_0].CalcValue()));
         attacker->CastCustomSpell(attacker, SPELL_PALADIN_JUDGEMENT_OF_WISDOM_MANA, &bp, nullptr, nullptr, true, nullptr, aurEff, GetCasterGUID());
     }
 
@@ -1975,8 +1978,10 @@ class spell_pal_seal_of_vengeance_aura : public AuraScript
     void Register() override
     {
         DoCheckProc += AuraCheckProcFn(spell_pal_seal_of_vengeance_aura::CheckProc);
-        OnEffectProc += AuraEffectProcFn(spell_pal_seal_of_vengeance_aura::HandleApplyDoT, EFFECT_0, SPELL_AURA_DUMMY);
+        // HandleSeal reads stacks BEFORE HandleApplyDoT increments them,
+        // so the attacking hit does not benefit from its own stack application.
         OnEffectProc += AuraEffectProcFn(spell_pal_seal_of_vengeance_aura::HandleSeal, EFFECT_0, SPELL_AURA_DUMMY);
+        OnEffectProc += AuraEffectProcFn(spell_pal_seal_of_vengeance_aura::HandleApplyDoT, EFFECT_0, SPELL_AURA_DUMMY);
     }
 
 private:

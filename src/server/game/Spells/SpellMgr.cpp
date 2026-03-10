@@ -823,16 +823,9 @@ bool SpellMgr::CanSpellTriggerProcOnEvent(SpellProcEntry const& procEntry, ProcE
 
     // check spell family name/flags (if set) for spells
     if (eventInfo.GetTypeMask() & SPELL_PROC_FLAG_MASK)
-    {
         if (SpellInfo const* eventSpellInfo = eventInfo.GetSpellInfo())
-        {
-            if (procEntry.SpellFamilyName && procEntry.SpellFamilyName != eventSpellInfo->SpellFamilyName)
+            if (!eventSpellInfo->IsAffected(procEntry.SpellFamilyName, procEntry.SpellFamilyMask))
                 return false;
-
-            if (procEntry.SpellFamilyMask && !(procEntry.SpellFamilyMask & eventSpellInfo->SpellFamilyFlags))
-                return false;
-        }
-    }
 
     // check spell type mask (if set)
     if (eventInfo.GetTypeMask() & (SPELL_PROC_FLAG_MASK | PERIODIC_PROC_FLAG_MASK))
@@ -1970,7 +1963,8 @@ void SpellMgr::LoadSpellProcs()
                     if (!spellInfo->Effects[i].IsAura())
                         continue;
 
-                    if (spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_ADD_PCT_MODIFIER || spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_ADD_FLAT_MODIFIER)
+                    if (spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_ADD_PCT_MODIFIER || spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_ADD_FLAT_MODIFIER
+                        || spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_MOD_SPELL_CRIT_CHANCE || spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_MOD_SPELL_CRIT_CHANCE_SCHOOL)
                     {
                         found = true;
                         break;
@@ -2029,6 +2023,24 @@ void SpellMgr::LoadSpellProcs()
 
             if (!addTriggerFlag && isAlwaysTriggeredAura[auraName])
                 addTriggerFlag = true;
+
+            // Many proc auras with taken procFlag mask don't have
+            // attribute "can proc with triggered" — they should
+            // proc nevertheless (e.g. mage armor spells with
+            // judgement)
+            if (!addTriggerFlag
+                && (spellInfo->ProcFlags & TAKEN_HIT_PROC_FLAG_MASK))
+            {
+                switch (auraName)
+                {
+                    case SPELL_AURA_PROC_TRIGGER_SPELL:
+                    case SPELL_AURA_PROC_TRIGGER_DAMAGE:
+                        addTriggerFlag = true;
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
 
         if (!found)
@@ -3212,7 +3224,7 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
                                 continue;
                             [[fallthrough]]; /// @todo: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
                         default:
-                            if (!(spellInfo->Effects[j].CalcValue() &&
+                            if (!(spellInfo->Effects[j].CalcValue() ||
                                 ((spellInfo->Effects[j].Effect == SPELL_EFFECT_INTERRUPT_CAST || spellInfo->HasAttribute(SPELL_ATTR0_CU_DONT_BREAK_STEALTH)) &&
                                 !spellInfo->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES))))
                                 continue;

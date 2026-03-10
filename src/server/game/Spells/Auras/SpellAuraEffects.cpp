@@ -820,6 +820,17 @@ void AuraEffect::ApplySpellMod(Unit* target, bool apply)
     // Auras with charges do not mod amount of passive auras
     if (GetBase()->IsUsingCharges())
         return;
+
+    // Guard against infinite recursion: a spell mod recalculating an aura that
+    // triggers ApplySpellMod again (self-referencing or mutual spell mods).
+    if (m_isRecalculatingPassiveAuras)
+    {
+        LOG_DEBUG("spells.aura", "AuraEffect::ApplySpellMod: Recursion detected for spell {} effect {}, skipping passive aura recalculation",
+            GetId(), GetEffIndex());
+        return;
+    }
+    m_isRecalculatingPassiveAuras = true;
+
     // reapply some passive spells after add/remove related spellmods
     // Warning: it is a dead loop if 2 auras each other amount-shouldn't happen
     switch (GetMiscValue())
@@ -906,6 +917,8 @@ void AuraEffect::ApplySpellMod(Unit* target, bool apply)
         default:
             break;
     }
+
+    m_isRecalculatingPassiveAuras = false;
 }
 
 void AuraEffect::Update(uint32 diff, Unit* caster)
@@ -1092,14 +1105,12 @@ bool AuraEffect::IsAffectedOnSpell(SpellInfo const* spell) const
 {
     if (!spell)
         return false;
-    // Check family name
-    if (spell->SpellFamilyName != m_spellInfo->SpellFamilyName)
+
+    // Check family name and EffectClassMask
+    if (!spell->IsAffected(m_spellInfo->SpellFamilyName, m_spellInfo->Effects[m_effIndex].SpellClassMask))
         return false;
 
-    // Check EffectClassMask
-    if (m_spellInfo->Effects[m_effIndex].SpellClassMask & spell->SpellFamilyFlags)
-        return true;
-    return false;
+    return true;
 }
 
 bool AuraEffect::HasSpellClassMask() const
@@ -6756,7 +6767,9 @@ void AuraEffect::HandlePeriodicDamageAurasTick(Unit* target, Unit* caster) const
     // Set trigger flag
     uint32 procAttacker = PROC_FLAG_DONE_PERIODIC;
     uint32 procVictim   = PROC_FLAG_TAKEN_PERIODIC;
-    uint32 procEx = (crit ? PROC_EX_CRITICAL_HIT : PROC_EX_NORMAL_HIT) | PROC_EX_INTERNAL_DOT;
+    uint32 procEx = PROC_EX_INTERNAL_DOT;
+    if (damage)
+        procEx |= crit ? PROC_EX_CRITICAL_HIT : PROC_EX_NORMAL_HIT;
     if (absorb > 0)
         procEx |= PROC_EX_ABSORB;
 
@@ -6843,7 +6856,9 @@ void AuraEffect::HandlePeriodicHealthLeechAuraTick(Unit* target, Unit* caster) c
     // Set trigger flag
     uint32 procAttacker = PROC_FLAG_DONE_PERIODIC;
     uint32 procVictim   = PROC_FLAG_TAKEN_PERIODIC;
-    uint32 procEx = (crit ? PROC_EX_CRITICAL_HIT : PROC_EX_NORMAL_HIT) | PROC_EX_INTERNAL_DOT;
+    uint32 procEx = PROC_EX_INTERNAL_DOT;
+    if (dmgInfo.GetDamage())
+        procEx |= crit ? PROC_EX_CRITICAL_HIT : PROC_EX_NORMAL_HIT;
     if (absorb > 0)
         procEx |= PROC_EX_ABSORB;
 

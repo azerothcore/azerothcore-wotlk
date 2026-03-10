@@ -1348,28 +1348,6 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 }
                 switch (GetId())
                 {
-                    case 12536: // Clearcasting
-                    case 12043: // Presence of Mind
-                        // Arcane Potency
-                        if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_MAGE, 2120, 0))
-                        {
-                            uint32 spellId = 0;
-
-                            switch (aurEff->GetId())
-                            {
-                                case 31571:
-                                    spellId = 57529;
-                                    break;
-                                case 31572:
-                                    spellId = 57531;
-                                    break;
-                                default:
-                                    LOG_ERROR("spells.aura", "Aura::HandleAuraSpecificMods: Unknown rank of Arcane Potency ({}) found", aurEff->GetId());
-                            }
-                            if (spellId)
-                                caster->CastSpell(caster, spellId, true);
-                        }
-                        break;
                     case 44544: // Fingers of Frost
                         {
                             // See if we already have the indicator aura. If not, create one.
@@ -2354,20 +2332,7 @@ void Aura::ConsumeProcCharges(SpellProcEntry const* procEntry)
     else if (IsUsingCharges())
     {
         if (!GetCharges())
-        {
-            // Defer removal while spell mods are being consumed,
-            // cleaned up in Spell::_cast() after handle_immediate()
-            if (GetType() == UNIT_AURA_TYPE
-                && (HasEffectType(SPELL_AURA_ADD_FLAT_MODIFIER)
-                    || HasEffectType(SPELL_AURA_ADD_PCT_MODIFIER)))
-            {
-                if (Player* player = GetUnitOwner()->ToPlayer())
-                    if (player->m_spellModTakingSpell)
-                        return;
-            }
-
             Remove();
-        }
     }
 }
 
