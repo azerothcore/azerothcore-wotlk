@@ -1,4 +1,3 @@
-
 -- Update Spawn Time (check from retail)
 UPDATE `creature` SET `spawntimesecs` = 240 WHERE (`id1` = 28406);
 
@@ -13,7 +12,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (28406, 0, 3, 4, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 72, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - On Gossip Option 0 Selected - Close Gossip (Phase 1)'),
 (28406, 0, 4, 5, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 83, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - On Gossip Option 0 Selected - Remove Npc Flags Gossip (Phase 1)'),
 (28406, 0, 5, 6, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 64, 12, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - On Gossip Option 0 Selected - Store Targetlist (Phase 1)'),
-(28406, 0, 6, 7, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 52996, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - On Gossip Option 0 Selected - Cast \'Duel!\' (Phase 1)'),
+(28406, 0, 6, 7, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 52996, 0, 0, 0, 0, 0, 12, 12, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - On Gossip Option 0 Selected - Cast \'Duel!\' (Phase 1)'),
 (28406, 0, 7, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 12, 12, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - On Gossip Option 0 Selected - Set Orientation Stored (Phase 1)'),
 (28406, 0, 8, 9, 8, 2, 100, 0, 52990, 0, 0, 0, 0, 0, 11, 54238, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - On Spellhit \'Duel\' - Cast \'Duel Aura Check 01\' (Phase 2)'),
 (28406, 0, 9, 10, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 54238, 2, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - On Spellhit \'Duel\' - Cast \'Duel Aura Check 01\' (Phase 2)'),
@@ -60,6 +59,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2840602, 9, 1, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Actionlist - Despawn Instant');
 
 -- Set Condition.
-DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 15) AND (`SourceGroup` = 9765) AND (`SourceEntry` = 0) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 47) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 12733) AND (`ConditionValue2` = 8) AND (`ConditionValue3` = 0);
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 15) AND (`SourceGroup` = 9765) AND (`SourceEntry` = 0) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` IN (1, 47)) AND (`ConditionTarget` = 0) AND (`ConditionValue1` IN (12733, 54238)) AND (`ConditionValue2` IN (0, 8)) AND (`ConditionValue3` = 0);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(15, 9765, 0, 0, 0, 47, 0, 12733, 8, 0, 0, 0, 0, '', 'Death Knight Initiate challenge option only avaiable if the player has Death\'s Challenge quest incomplete.');
+(15, 9765, 0, 0, 0, 47, 0, 12733, 8, 0, 0, 0, 0, '', 'Death Knight Initiate challenge option only avaiable if the player has Death\'s Challenge quest incomplete.'),
+(15, 9765, 0, 0, 0, 1, 0, 54238, 0, 0, 1, 0, 0, '', 'Death Knight Initiate challenge option only avaiable if the player his not in duel.');
