@@ -27,11 +27,11 @@
 
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
 #include <windows.h>
+#include <iostream>
 #else
 #include "Chat.h"
 #include "ChatCommand.h"
 #include <cstring>
-#include <iostream>
 #include <readline/history.h>
 #include <readline/readline.h>
 #endif
