@@ -1963,7 +1963,8 @@ void SpellMgr::LoadSpellProcs()
                     if (!spellInfo->Effects[i].IsAura())
                         continue;
 
-                    if (spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_ADD_PCT_MODIFIER || spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_ADD_FLAT_MODIFIER)
+                    if (spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_ADD_PCT_MODIFIER || spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_ADD_FLAT_MODIFIER
+                        || spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_MOD_SPELL_CRIT_CHANCE || spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_MOD_SPELL_CRIT_CHANCE_SCHOOL)
                     {
                         found = true;
                         break;
@@ -3223,7 +3224,7 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
                                 continue;
                             [[fallthrough]]; /// @todo: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
                         default:
-                            if (!(spellInfo->Effects[j].CalcValue() &&
+                            if (!(spellInfo->Effects[j].CalcValue() ||
                                 ((spellInfo->Effects[j].Effect == SPELL_EFFECT_INTERRUPT_CAST || spellInfo->HasAttribute(SPELL_ATTR0_CU_DONT_BREAK_STEALTH)) &&
                                 !spellInfo->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES))))
                                 continue;

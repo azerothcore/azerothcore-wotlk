@@ -1219,7 +1219,7 @@ class spell_mage_glyph_of_polymorph : public AuraScript
             return;
 
         // Remove DoTs from target
-        target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE, ObjectGuid::Empty, nullptr, true);
+        target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE, ObjectGuid::Empty, target->GetAura(32409), true); // SW:D shall not be removed.
         target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT, ObjectGuid::Empty, nullptr, true);
         target->RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH, ObjectGuid::Empty, nullptr, true);
     }

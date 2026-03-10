@@ -8977,7 +8977,22 @@ float Unit::SpellDoneCritChance(Unit const* /*victim*/, SpellInfo const* spellPr
                     crit_chance = 0.0f;
                 // For other schools
                 else if (IsPlayer())
+                {
                     crit_chance = GetFloatValue(static_cast<uint16>(PLAYER_SPELL_CRIT_PERCENTAGE1) + GetFirstSchoolInMask(schoolMask));
+
+                    // register aura mod, this is needed for Arcane Potency
+                    if (Spell* spell = ToPlayer()->m_spellModTakingSpell)
+                    {
+                        Unit::AuraEffectList const& critAuras = GetAuraEffectsByType(SPELL_AURA_MOD_SPELL_CRIT_CHANCE);
+                        for (AuraEffect const* aurEff : critAuras)
+                            spell->m_appliedMods.insert(aurEff->GetBase());
+
+                        Unit::AuraEffectList const& critSchoolAuras = GetAuraEffectsByType(SPELL_AURA_MOD_SPELL_CRIT_CHANCE_SCHOOL);
+                        for (AuraEffect const* aurEff : critSchoolAuras)
+                            if (aurEff->GetMiscValue() & schoolMask)
+                                spell->m_appliedMods.insert(aurEff->GetBase());
+                    }
+                }
                 else
                 {
                     crit_chance = (float)m_baseSpellCritChance;
