@@ -432,7 +432,7 @@ bool ReputationMgr::SetOneFactionReputation(FactionEntry const* factionEntry, fl
             if (new_rank <= REP_HOSTILE)
                 SetAtWar(&itr->second, true);
 
-            if (old_rank == REP_HOSTILE && new_rank >= REP_UNFRIENDLY && factionEntry->CanBeSetAtWar())
+            if (old_rank <= REP_HOSTILE && new_rank >= REP_UNFRIENDLY && factionEntry->CanBeSetAtWar())
                 SetAtWar(&itr->second, false);
 
             if (new_rank > old_rank)
