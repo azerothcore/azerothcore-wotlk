@@ -41,9 +41,10 @@ enum Spells
     SPELL_MARK_OF_KAZZAK        = 32960,
     SPELL_MARK_OF_KAZZAK_DAMAGE = 32961,
     SPELL_ENRAGE                = 32964,
-    SPELL_CAPTURE_SOUL          = 32966,
-    SPELL_TWISTED_REFLECTION    = 21063,
-    SPELL_BERSERK               = 32965
+    SPELL_CAPTURE_SOUL              = 32966,
+    SPELL_TWISTED_REFLECTION        = 21063,
+    SPELL_TWISTED_REFLECTION_HEAL   = 21064,
+    SPELL_BERSERK                   = 32965
 };
 
 class boss_doomlord_kazzak : public CreatureScript
@@ -184,8 +185,35 @@ class spell_mark_of_kazzak_aura : public AuraScript
     }
 };
 
+// 21063 - Twisted Reflection
+class spell_twisted_reflection : public AuraScript
+{
+    PrepareAuraScript(spell_twisted_reflection);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_TWISTED_REFLECTION_HEAL });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        if (!damageInfo || !damageInfo->GetDamage())
+            return;
+
+        eventInfo.GetActionTarget()->CastSpell(eventInfo.GetActor(), SPELL_TWISTED_REFLECTION_HEAL, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_twisted_reflection::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
 void AddSC_boss_doomlordkazzak()
 {
     new boss_doomlord_kazzak();
     RegisterSpellScript(spell_mark_of_kazzak_aura);
+    RegisterSpellScript(spell_twisted_reflection);
 }

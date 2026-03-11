@@ -45,6 +45,23 @@ void OutdoorPvPGH::SendRemoveWorldStates(Player* player)
     player->SendUpdateWorldState(WORLD_STATE_OPVP_GH_UI_SLIDER_N, 0);
 }
 
+void OutdoorPvPGH::HandleKill(Player* killer, Unit* killed)
+{
+    if (!killed->IsPlayer())
+        return;
+
+    if (!killer->isHonorOrXPTarget(killed))
+        return;
+
+    if (killer->GetTeamId() == TEAM_ALLIANCE)
+        if (killer->GetQuestStatus(GH_QUEST_KICK_EM_WHILE_THEYRE_DOWN) == QUEST_STATUS_INCOMPLETE)
+            killer->KilledMonsterCredit(GH_CREATURE_QUEST_BUNNY);
+
+    if (killer->GetTeamId() == TEAM_HORDE)
+        if (killer->GetQuestStatus(GH_QUEST_KEEP_EM_ON_THEIR_HEELS) == QUEST_STATUS_INCOMPLETE)
+            killer->KilledMonsterCredit(GH_CREATURE_QUEST_BUNNY);
+}
+
 OPvPCapturePointGH::OPvPCapturePointGH(OutdoorPvP* pvp) : OPvPCapturePoint(pvp)
 {
     SetCapturePointData(189310, MAP_NORTHREND, 2483.68f, -1873.6f, 10.6877f, -0.104719f, 0.0f, 0.0f, 0.0f, 1.0f);

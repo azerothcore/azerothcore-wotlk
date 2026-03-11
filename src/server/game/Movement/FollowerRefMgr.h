@@ -21,9 +21,9 @@
 #include "RefMgr.h"
 
 class Unit;
-class TargetedMovementGeneratorBase;
+class AbstractFollower;
 
-class FollowerRefMgr : public RefMgr<Unit, TargetedMovementGeneratorBase>
+class FollowerRefMgr : public RefMgr<Unit, AbstractFollower>
 {
 };
 #endif

@@ -354,6 +354,13 @@ public:
     uint32 GetTimer() { return m_Timer; }
     void SetTimer(uint32 timer) { m_Timer = timer; }
 
+    // Returns combined count of players in war + invited (per team) for balance checking
+    uint32 GetPlayersInWarCount(TeamId teamId) const { return static_cast<uint32>(m_PlayersInWar[teamId].size() + m_InvitedPlayers[teamId].size()); }
+    // Returns total count of players in the battlefield zone per team
+    uint32 GetPlayersInZoneCount(TeamId teamId) const { return static_cast<uint32>(m_players[teamId].size()); }
+    // Returns the maximum players allowed per team
+    uint32 GetMaxPlayersPerTeam() const { return m_MaxPlayer; }
+
     void DoPlaySoundToAll(uint32 SoundID);
 
     void InvitePlayerToQueue(Player* player);

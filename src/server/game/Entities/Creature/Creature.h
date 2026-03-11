@@ -103,8 +103,7 @@ public:
 
     ///// @todo RENAME THIS!!!!!
     bool isCanInteractWithBattleMaster(Player* player, bool msg) const;
-    bool isCanTrainingAndResetTalentsOf(Player* player) const;
-    [[nodiscard]] bool IsValidTrainerForPlayer(Player* player, uint32* npcFlags = nullptr) const;
+    bool CanResetTalents(Player* player) const;
     bool CanCreatureAttack(Unit const* victim, bool skipDistCheck = false) const;
     void LoadSpellTemplateImmunity();
     bool IsImmunedToSpell(SpellInfo const* spellInfo, Spell const* spell = nullptr) override;
@@ -203,10 +202,10 @@ public:
     uint32 GetVendorItemCurrentCount(VendorItem const* vItem);
     uint32 UpdateVendorItemCurrentCount(VendorItem const* vItem, uint32 used_count);
 
-    [[nodiscard]] TrainerSpellData const* GetTrainerSpells() const;
-
     [[nodiscard]] CreatureTemplate const* GetCreatureTemplate() const { return m_creatureInfo; }
     [[nodiscard]] CreatureData const* GetCreatureData() const { return m_creatureData; }
+    [[nodiscard]] uint32 GetGossipMenuId() const { return _gossipMenuId ? _gossipMenuId : GetCreatureTemplate()->GossipMenuId; }
+    void SetGossipMenuId(uint32 gossipMenuId) { _gossipMenuId = gossipMenuId; }
     void SetDetectionDistance(float dist){ m_detectionDistance = dist; }
     [[nodiscard]] CreatureAddon const* GetCreatureAddon() const;
 
@@ -481,6 +480,7 @@ protected:
 
     SpellSchoolMask m_meleeDamageSchoolMask;
     uint32 m_originalEntry;
+    uint32 _gossipMenuId;
 
     bool m_moveInLineOfSightDisabled;
     bool m_moveInLineOfSightStrictlyDisabled;

@@ -286,6 +286,34 @@ public:
             if (!handler->GetSession())
                 handler->SendSysMessage(LANG_RESETALL_TALENTS);
         }
+        else if (caseName == "honor")
+        {
+            CharacterDatabase.Execute(CharacterDatabase.GetPreparedStatement(CHAR_UPD_ALL_HONOR_POINTS));
+
+            sWorldSessionMgr->DoForAllOnlinePlayers([](Player* player)
+            {
+                player->SetHonorPoints(0);
+            });
+
+            handler->SendWorldText(LANG_RESETALL_HONOR);
+            if (!handler->GetSession())
+                handler->SendSysMessage(LANG_RESETALL_HONOR);
+            return true;
+        }
+        else if (caseName == "arena")
+        {
+            CharacterDatabase.Execute(CharacterDatabase.GetPreparedStatement(CHAR_UPD_ALL_ARENA_POINTS));
+
+            sWorldSessionMgr->DoForAllOnlinePlayers([](Player* player)
+            {
+                player->SetArenaPoints(0);
+            });
+
+            handler->SendWorldText(LANG_RESETALL_ARENA);
+            if (!handler->GetSession())
+                handler->SendSysMessage(LANG_RESETALL_ARENA);
+            return true;
+        }
         else
         {
             handler->SendErrorMessage(LANG_RESETALL_UNKNOWN_CASE, caseName);

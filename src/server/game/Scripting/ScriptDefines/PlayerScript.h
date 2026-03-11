@@ -20,6 +20,7 @@
 
 #include "ScriptObject.h"
 #include "SharedDefines.h"
+#include "DBCStructure.h"
 #include <vector>
 
 // TODO to remove
@@ -88,6 +89,7 @@ enum PlayerHook
     PLAYERHOOK_ON_AFTER_SET_VISIBLE_ITEM_SLOT,
     PLAYERHOOK_ON_AFTER_MOVE_ITEM_FROM_INVENTORY,
     PLAYERHOOK_ON_EQUIP,
+    PLAYERHOOK_ON_UNEQUIP_ITEM,
     PLAYERHOOK_ON_PLAYER_JOIN_BG,
     PLAYERHOOK_ON_PLAYER_JOIN_ARENA,
     PLAYERHOOK_GET_CUSTOM_GET_ARENA_TEAM_ID,
@@ -206,6 +208,7 @@ enum PlayerHook
     PLAYERHOOK_ON_CAN_GIVE_LEVEL,
     PLAYERHOOK_ON_SEND_LIST_INVENTORY,
     PLAYERHOOK_ON_GIVE_REPUTATION,
+    PLAYERHOOK_ON_GET_REPUTATION_PRICE_DISCOUNT,
     PLAYERHOOK_END
 };
 
@@ -395,6 +398,9 @@ public:
     // After an item has been equipped
     virtual void OnPlayerEquip(Player* /*player*/, Item* /*it*/, uint8 /*bag*/, uint8 /*slot*/, bool /*update*/) { }
 
+    // After an item has been unequipped
+    virtual void OnPlayerUnequip(Player* /*player*/, Item* /*it*/) { }
+
     // After player enters queue for BG
     virtual void OnPlayerJoinBG(Player* /*player*/) { }
 
@@ -531,9 +537,9 @@ public:
 
     [[nodiscard]] virtual bool OnPlayerCanAreaExploreAndOutdoor(Player* /*player*/) { return true; }
 
-    virtual void OnPlayerVictimRewardBefore(Player* /*player*/, Player* /*victim*/, uint32& /*killer_title*/, uint32& /*victim_title*/) { }
+    virtual void OnPlayerVictimRewardBefore(Player* /*player*/, Player* /*victim*/, uint32& /*killer_title*/, int32& /*victim_rank*/) { }
 
-    virtual void OnPlayerVictimRewardAfter(Player* /*player*/, Player* /*victim*/, uint32& /*killer_title*/, uint32& /*victim_rank*/, float& /*honor_f*/) { }
+    virtual void OnPlayerVictimRewardAfter(Player* /*player*/, Player* /*victim*/, uint32& /*killer_title*/, int32& /*victim_rank*/, float& /*honor_f*/) { }
 
     virtual void OnPlayerCustomScalingStatValueBefore(Player* /*player*/, ItemTemplate const* /*proto*/, uint8 /*slot*/, bool /*apply*/, uint32& /*CustomScalingStatValue*/) { }
 
@@ -792,6 +798,24 @@ public:
      * @param vendorEntry Entry of the vendor player is interacting with
      */
     virtual void OnPlayerSendListInventory(Player* /*player*/, ObjectGuid /*vendorGuid*/, uint32& /*vendorEntry*/) {}
+
+    /**
+     * @brief This hook is called whenever a player attempts to buy items, repair, take taxis, or learn spells. This then uses this information to call OnPlayerGetReputationPriceDiscoun(Player, FactionTemplateEntry, float)
+     *
+     * @param player Contains information about the Player
+     * @param creature Contains information about the creature involved in the transaction
+     * @param discount Float value of the discount, as a multiplier of the base price
+     */
+    virtual void OnPlayerGetReputationPriceDiscount(Player const* /*player*/, Creature const* /*creature*/, float& /*discount*/) {}
+
+    /**
+     * @brief This hook is called whenever a player attempts to buy items, repair, take taxis, or learn spells. It is also called when continuing along taxis
+     *
+     * @param player Contains information about the Player
+     * @param factionTemplate Contains information about the faction template involved in the transaction. Can be null!
+     * @param discount Float value of the discount, as a multiplier of the base price
+     */
+    virtual void OnPlayerGetReputationPriceDiscount(Player const* /*player*/, FactionTemplateEntry const* /*factionTemplate*/, float& /*discount*/) {}
 };
 
 #endif
