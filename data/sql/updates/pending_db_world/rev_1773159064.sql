@@ -15,19 +15,24 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (28406, 0, 5, 6, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 66, 0, 0, 0, 0, 0, 0, 12, 12, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - On Gossip Option 0 Selected - Set Orientation Stored (Phase 1)'),
 (28406, 0, 6, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 52996, 2, 0, 0, 0, 0, 12, 12, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - On Gossip Option 0 Selected - Cast \'Duel!\' (Phase 1)'),
 (28406, 0, 7, 0, 8, 1, 100, 0, 52990, 0, 0, 0, 0, 0, 80, 2840600, 2, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - On Spellhit \'Duel\' - Run Script (Phase 1)'),
-(28406, 0, 10, 11, 2, 2, 100, 0, 0, 1, 500, 500, 0, 0, 18, 768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Between 0-1% Health - Set Flags Immune To Players & Immune To NPC\'s (Phase 2)'),
-(28406, 0, 11, 12, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 126, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Between 0-1% Health - Remove All Gameobjects (Phase 2)'),
-(28406, 0, 12, 13, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 2, 2082, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Between 0-1% Health - Set Faction 2082 (Phase 2)'),
-(28406, 0, 13, 14, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 224, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Between 0-1% Health - Stop Attack (Phase 2)'),
-(28406, 0, 14, 15, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 224, 0, 0, 0, 0, 0, 0, 12, 12, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Between 0-1% Health - Stop Attack (Phase 2)'),
-(28406, 0, 15, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 2840601, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Between 0-1% Health - Run Script (Phase 2)'),
-(28406, 0, 16, 17, 5, 2, 100, 0, 0, 0, 1, 0, 0, 0, 18, 768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - On Killed Unit - Set Flags Immune To Players & Immune To NPC\'s (Phase 2)'),
-(28406, 0, 17, 18, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 126, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - On Killed Unit - Remove All Gameobjects (Phase 2)'),
-(28406, 0, 18, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 2840602, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - On Killed Unit - Run Script (Phase 2)'),
-(28406, 0, 19, 0, 0, 0, 100, 0, 1000, 2000, 18000, 22000, 0, 0, 11, 52372, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - In Combat - Cast \'Icy Touch\''),
-(28406, 0, 20, 0, 0, 0, 100, 0, 500, 1500, 10000, 14000, 0, 0, 11, 52373, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - In Combat - Cast \'Plague Strike\''),
-(28406, 0, 21, 0, 0, 0, 100, 0, 3000, 4000, 4000, 6000, 0, 0, 11, 52374, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - In Combat - Cast \'Blood Strike\''),
-(28406, 0, 22, 0, 0, 0, 100, 0, 3000, 4000, 4000, 6000, 0, 0, 11, 52375, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - In Combat - Cast \'Death Coil\'');
+(28406, 0, 8, 9, 2, 2, 100, 0, 0, 1, 500, 500, 0, 0, 18, 768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Between 0-1% Health - Set Flags Immune To Players & Immune To NPC\'s (Phase 2)'),
+(28406, 0, 9, 10, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 126, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Between 0-1% Health - Remove All Gameobjects (Phase 2)'),
+(28406, 0, 10, 11, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 2, 2082, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Between 0-1% Health - Set Faction 2082 (Phase 2)'),
+(28406, 0, 11, 12, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 224, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Between 0-1% Health - Stop Attack (Phase 2)'),
+(28406, 0, 12, 13, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 224, 0, 0, 0, 0, 0, 0, 12, 12, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Between 0-1% Health - Stop Attack (Phase 2)'),
+(28406, 0, 13, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 2840601, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Between 0-1% Health - Run Script (Phase 2)'),
+(28406, 0, 14, 15, 5, 2, 100, 0, 0, 0, 1, 0, 0, 0, 18, 768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - On Killed Unit - Set Flags Immune To Players & Immune To NPC\'s (Phase 2)'),
+(28406, 0, 15, 16, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 126, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - On Killed Unit - Remove All Gameobjects (Phase 2)'),
+(28406, 0, 16, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 2840602, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - On Killed Unit - Run Script (Phase 2)'),
+(28406, 0, 17, 18, 104, 2, 100, 0, 1, 191126, 1, 20, 500, 0, 18, 768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - On Less Than 1 Units in Range - Set Flags Immune To Players & Immune To NPC\'s (Phase 2)'),
+(28406, 0, 18, 19, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 126, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - On Less Than 1 Units in Range - Remove All Gameobjects (Phase 2)'),
+(28406, 0, 19, 20, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 224, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - On Less Than 1 Units in Range - Stop Attack (Phase 2)'),
+(28406, 0, 20, 21, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 224, 0, 0, 0, 0, 0, 0, 12, 12, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - On Less Than 1 Units in Range - Stop Attack (Phase 2)'),
+(28406, 0, 21, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 2840602, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - On Less Than 1 Units in Range - Run Script (Phase 2)'),
+(28406, 0, 22, 0, 0, 0, 100, 0, 1000, 2000, 18000, 22000, 0, 0, 11, 52372, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - In Combat - Cast \'Icy Touch\''),
+(28406, 0, 23, 0, 0, 0, 100, 0, 500, 1500, 10000, 14000, 0, 0, 11, 52373, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - In Combat - Cast \'Plague Strike\''),
+(28406, 0, 24, 0, 0, 0, 100, 0, 3000, 4000, 4000, 6000, 0, 0, 11, 52374, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - In Combat - Cast \'Blood Strike\''),
+(28406, 0, 25, 0, 0, 0, 100, 0, 3000, 4000, 4000, 6000, 0, 0, 11, 52375, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - In Combat - Cast \'Death Coil\'');
 
 -- Set ActionLists.
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9) AND (`entryorguid` IN (2840600, 2840601, 2840602));
@@ -54,7 +59,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2840602, 9, 0, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 5, 71, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Actionlist - Play Emote 71'),
 (2840602, 9, 1, 0, 0, 0, 100, 0, 4000, 4000, 0, 0, 0, 0, 27, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Actionlist - Stop Combat'),
 (2840602, 9, 2, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 0, 28, 54238, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Actionlist - Remove Aura \'Duel Aura Check 01\''),
-(2840602, 9, 3, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Actionlist - Despawn Instant');
+(2840602, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 28, 54238, 0, 0, 0, 0, 0, 12, 12, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Actionlist - Remove Aura \'Duel Aura Check 01\''),
+(2840602, 9, 4, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Actionlist - Despawn Instant');
 
 -- Set Condition.
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 15) AND (`SourceGroup` = 9765) AND (`SourceEntry` = 0) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` IN (1, 47)) AND (`ConditionTarget` = 0) AND (`ConditionValue1` IN (12733, 54238)) AND (`ConditionValue2` IN (0, 8)) AND (`ConditionValue3` = 0);
