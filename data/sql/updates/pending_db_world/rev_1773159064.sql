@@ -29,10 +29,12 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (28406, 0, 19, 20, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 224, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - On Less Than 1 Units in Range - Stop Attack (Phase 2)'),
 (28406, 0, 20, 21, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 224, 0, 0, 0, 0, 0, 0, 12, 12, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - On Less Than 1 Units in Range - Stop Attack (Phase 2)'),
 (28406, 0, 21, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 2840602, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - On Less Than 1 Units in Range - Run Script (Phase 2)'),
-(28406, 0, 22, 0, 0, 0, 100, 0, 1000, 2000, 18000, 22000, 0, 0, 11, 52372, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - In Combat - Cast \'Icy Touch\''),
-(28406, 0, 23, 0, 0, 0, 100, 0, 500, 1500, 10000, 14000, 0, 0, 11, 52373, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - In Combat - Cast \'Plague Strike\''),
-(28406, 0, 24, 0, 0, 0, 100, 0, 3000, 4000, 4000, 6000, 0, 0, 11, 52374, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - In Combat - Cast \'Blood Strike\''),
-(28406, 0, 25, 0, 0, 0, 100, 0, 3000, 4000, 4000, 6000, 0, 0, 11, 52375, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - In Combat - Cast \'Death Coil\'');
+(28406, 0, 22, 0, 4, 1, 100, 0, 0, 0, 0, 0, 0, 0, 83, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - On Aggro - Remove Npc Flags Gossip (Phase 1)'),
+(28406, 0, 23, 0, 7, 1, 100, 0, 0, 0, 0, 0, 0, 0, 82, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - On Evade - Add Npc Flags Gossip (Phase 1)'),
+(28406, 0, 24, 0, 0, 0, 100, 0, 1000, 2000, 18000, 22000, 0, 0, 11, 52372, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - In Combat - Cast \'Icy Touch\''),
+(28406, 0, 25, 0, 0, 0, 100, 0, 500, 1500, 10000, 14000, 0, 0, 11, 52373, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - In Combat - Cast \'Plague Strike\''),
+(28406, 0, 26, 0, 0, 0, 100, 0, 3000, 4000, 4000, 6000, 0, 0, 11, 52374, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - In Combat - Cast \'Blood Strike\''),
+(28406, 0, 27, 0, 0, 0, 100, 0, 3000, 4000, 4000, 6000, 0, 0, 11, 52375, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - In Combat - Cast \'Death Coil\'');
 
 -- Set ActionLists.
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9) AND (`entryorguid` IN (2840600, 2840601, 2840602));
