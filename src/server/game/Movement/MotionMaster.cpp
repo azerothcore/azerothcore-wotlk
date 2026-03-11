@@ -21,6 +21,7 @@
 #include "CreatureAISelector.h"
 #include "EscortMovementGenerator.h"
 #include "FleeingMovementGenerator.h"
+#include "FormationMovementGenerator.h"
 #include "GameTime.h"
 #include "HomeMovementGenerator.h"
 #include "IdleMovementGenerator.h"
@@ -464,6 +465,17 @@ void MotionMaster::MoveFollow(Unit* target, float dist, float angle, MovementSlo
             _owner->GetGUID().ToString(), target->IsPlayer() ? "player" : "creature", target->GetGUID().ToString());
         Mutate(new FollowMovementGenerator<Creature>(target, dist, angle, inheritWalkState, inheritSpeed), slot);
     }
+}
+
+void MotionMaster::MoveFormation(Unit* leader, float dist, float angle, uint32 point1, uint32 point2)
+{
+    if (!leader || leader == _owner || _owner->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
+        return;
+
+    if (!_owner->IsCreature())
+        return;
+
+    Mutate(new FormationMovementGenerator(leader, dist, angle, point1, point2), MOTION_SLOT_IDLE);
 }
 
 /**

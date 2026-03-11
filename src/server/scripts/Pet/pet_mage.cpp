@@ -171,7 +171,7 @@ struct npc_pet_mage_mirror_image : CasterAI
         {
             Unit* selection = owner->ToPlayer()->GetSelectedUnit();
 
-            if (selection)
+            if (selection && me->CanSeeOrDetect(selection))
             {
                 me->GetThreatMgr().ResetAllThreat();
                 me->AddThreat(selection, 1000000.0f);
@@ -208,10 +208,10 @@ struct npc_pet_mage_mirror_image : CasterAI
 
         if (checktarget >= 1000)
         {
-            if (me->GetVictim()->HasBreakableByDamageCrowdControlAura() || !me->GetVictim()->IsAlive())
+            if (!me->GetVictim()->IsAlive() || me->GetVictim()->HasBreakableByDamageCrowdControlAura() || !me->CanSeeOrDetect(me->GetVictim()))
             {
                 MySelectNextTarget();
-                me->InterruptNonMeleeSpells(true); // Stop casting if target is CC or not Alive.
+                me->InterruptNonMeleeSpells(true);
                 return;
             }
         }

@@ -446,29 +446,6 @@ class spell_black_temple_curse_of_vitality_aura : public AuraScript
     }
 };
 
-class spell_black_temple_dementia_aura : public AuraScript
-{
-    PrepareAuraScript(spell_black_temple_dementia_aura);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_DEMENTIA1, SPELL_DEMENTIA2 });
-    }
-
-    void OnPeriodic(AuraEffect const*  /*aurEff*/)
-    {
-        if (roll_chance_i(50))
-            GetTarget()->CastSpell(GetTarget(), SPELL_DEMENTIA1, true);
-        else
-            GetTarget()->CastSpell(GetTarget(), SPELL_DEMENTIA2, true);
-    }
-
-    void Register() override
-    {
-        OnEffectPeriodic += AuraEffectPeriodicFn(spell_black_temple_dementia_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-    }
-};
-
 // 39649 - Summon Shadowfiends
 class spell_black_temple_summon_shadowfiends : public SpellScript
 {
@@ -525,7 +502,6 @@ void AddSC_instance_black_temple()
     RegisterSpellScript(spell_black_temple_bloodbolt);
     RegisterSpellScript(spell_black_temple_consuming_strikes_aura);
     RegisterSpellScript(spell_black_temple_curse_of_vitality_aura);
-    RegisterSpellScript(spell_black_temple_dementia_aura);
     RegisterSpellScript(spell_black_temple_summon_shadowfiends);
     RegisterSpellScript(spell_black_temple_l5_arcane_charge);
 }

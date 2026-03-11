@@ -96,6 +96,7 @@ enum AreaTableIDs : uint32
     AREA_EVERSONG_WOODS                                      = 3430,
     AREA_GHOSTLANDS                                          = 3433,
     AREA_HELLFIRE_PENINSULA                                  = 3483,
+    AREA_SILVERMOON_CITY                                     = 3487,
     AREA_NAGRAND                                             = 3518,
     AREA_TEROKKAR_FOREST                                     = 3519,
     AREA_SHADOWMOON_VALLEY                                   = 3520,
