@@ -32,6 +32,7 @@
 #include "ArenaScript.h"
 #include "ArenaTeamScript.h"
 #include "AuctionHouseScript.h"
+#include "BattlefieldScript.h"
 #include "BattlegroundMapScript.h"
 #include "BattlegroundScript.h"
 #include "CommandScript.h"

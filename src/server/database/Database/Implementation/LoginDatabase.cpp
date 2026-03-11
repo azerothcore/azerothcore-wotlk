@@ -24,7 +24,7 @@ void LoginDatabaseConnection::DoPrepareStatements()
         m_stmts.resize(MAX_LOGINDATABASE_STATEMENTS);
 
     PrepareStatement(LOGIN_SEL_LOGONCHALLENGE,
-        "SELECT a.id, a.username, a.locked, a.lock_country, a.last_ip, a.failed_logins, "
+        "SELECT a.id, a.username, a.locked, a.lock_country, a.last_ip, a.Flags, a.failed_logins, "
         "ab.unbandate > UNIX_TIMESTAMP() OR ab.unbandate = ab.bandate, ab.unbandate = ab.bandate, "
         "ipb.unbandate > UNIX_TIMESTAMP() OR ipb.unbandate = ipb.bandate, ipb.unbandate = ipb.bandate, "
         "aa.gmlevel, a.totp_secret, a.salt, a.verifier "
@@ -34,7 +34,7 @@ void LoginDatabaseConnection::DoPrepareStatements()
         "LEFT JOIN ip_banned ipb ON ipb.ip = ? "
         "WHERE a.username = ?", CONNECTION_ASYNC);
     PrepareStatement(LOGIN_SEL_RECONNECTCHALLENGE,
-        "SELECT a.id, a.username, a.locked, a.lock_country, a.last_ip, a.failed_logins, "
+        "SELECT a.id, a.username, a.locked, a.lock_country, a.last_ip, a.Flags, a.failed_logins, "
         "ab.unbandate > UNIX_TIMESTAMP() OR ab.unbandate = ab.bandate, ab.unbandate = ab.bandate, "
         "ipb.unbandate > UNIX_TIMESTAMP() OR ipb.unbandate = ipb.bandate, ipb.unbandate = ipb.bandate, "
         "aa.gmlevel, a.session_key "
