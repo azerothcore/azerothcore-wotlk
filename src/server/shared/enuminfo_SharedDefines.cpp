@@ -688,7 +688,7 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr4>::ToString(SpellAttr4 value)
         case SPELL_ATTR4_NO_PARTIAL_IMMUNITY: return { "SPELL_ATTR4_NO_PARTIAL_IMMUNITY", "Unknown attribute 11@Attr4", "" };
         case SPELL_ATTR4_AURA_IS_BUFF: return { "SPELL_ATTR4_AURA_IS_BUFF", "Unknown attribute 12@Attr4", "" };
         case SPELL_ATTR4_DO_NOT_LOG_CASTER: return { "SPELL_ATTR4_DO_NOT_LOG_CASTER", "Unknown attribute 13@Attr4", "" };
-        case SPELL_ATTR4_REACTIVE_DAMAGE_PROC: return { "SPELL_ATTR4_REACTIVE_DAMAGE_PROC", "Damage does not break auras", "" };
+        case SPELL_ATTR4_DAMAGE_DOESNT_BREAK_AURAS: return { "SPELL_ATTR4_DAMAGE_DOESNT_BREAK_AURAS", "Damage does not break auras", "" };
         case SPELL_ATTR4_NOT_IN_SPELLBOOK: return { "SPELL_ATTR4_NOT_IN_SPELLBOOK", "Unknown attribute 15@Attr4", "" };
         case SPELL_ATTR4_NOT_IN_ARENA_OR_RATED_BATTLEGROUND: return { "SPELL_ATTR4_NOT_IN_ARENA_OR_RATED_BATTLEGROUND", "Not usable in arena", "Makes spell unusable despite CD <= 10min" };
         case SPELL_ATTR4_IGNORE_DEFAULT_ARENA_RESTRICTIONS: return { "SPELL_ATTR4_IGNORE_DEFAULT_ARENA_RESTRICTIONS", "Usable in arena", "Makes spell usable despite CD > 10min" };
@@ -732,7 +732,7 @@ AC_API_EXPORT SpellAttr4 EnumUtils<SpellAttr4>::FromIndex(std::size_t index)
         case 11: return SPELL_ATTR4_NO_PARTIAL_IMMUNITY;
         case 12: return SPELL_ATTR4_AURA_IS_BUFF;
         case 13: return SPELL_ATTR4_DO_NOT_LOG_CASTER;
-        case 14: return SPELL_ATTR4_REACTIVE_DAMAGE_PROC;
+        case 14: return SPELL_ATTR4_DAMAGE_DOESNT_BREAK_AURAS;
         case 15: return SPELL_ATTR4_NOT_IN_SPELLBOOK;
         case 16: return SPELL_ATTR4_NOT_IN_ARENA_OR_RATED_BATTLEGROUND;
         case 17: return SPELL_ATTR4_IGNORE_DEFAULT_ARENA_RESTRICTIONS;
@@ -773,7 +773,7 @@ AC_API_EXPORT std::size_t EnumUtils<SpellAttr4>::ToIndex(SpellAttr4 value)
         case SPELL_ATTR4_NO_PARTIAL_IMMUNITY: return 11;
         case SPELL_ATTR4_AURA_IS_BUFF: return 12;
         case SPELL_ATTR4_DO_NOT_LOG_CASTER: return 13;
-        case SPELL_ATTR4_REACTIVE_DAMAGE_PROC: return 14;
+        case SPELL_ATTR4_DAMAGE_DOESNT_BREAK_AURAS: return 14;
         case SPELL_ATTR4_NOT_IN_SPELLBOOK: return 15;
         case SPELL_ATTR4_NOT_IN_ARENA_OR_RATED_BATTLEGROUND: return 16;
         case SPELL_ATTR4_IGNORE_DEFAULT_ARENA_RESTRICTIONS: return 17;

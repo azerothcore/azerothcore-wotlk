@@ -1063,7 +1063,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 44461, 55361, 55362 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPPRESS_TARGET_PROCS;
-        spellInfo->AttributesEx4 |= SPELL_ATTR4_REACTIVE_DAMAGE_PROC;
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_DAMAGE_DOESNT_BREAK_AURAS;
     });
 
     // Evocation
