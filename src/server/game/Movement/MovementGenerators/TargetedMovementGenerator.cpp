@@ -73,7 +73,7 @@ void ChaseMovementGenerator<T>::SetOffsetAndAngle(std::optional<ChaseRange> dist
 template<class T>
 void ChaseMovementGenerator<T>::SetNewTarget(Unit* target)
 {
-    i_target.link(target, this);
+    SetTarget(target);
     _lastTargetPosition.reset();
 }
 
