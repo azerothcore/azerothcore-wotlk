@@ -8133,8 +8133,6 @@ UPDATE `creature_template_locale` SET `Name` = 'Vollstrecker der Todesritter', `
 UPDATE `creature_template_locale` SET `Name` = 'S.H.E. Nummer Zwei', `Title` = 'Botschafterin von Coca-Cola', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16454;
 -- AC datas : OLD Name : "Sie Nummer Drei", Name AC enUS : "She number three" ; Wowhead enUS : "She number three",  OLD Subname : "Botschafterin von CocaCola", Subname AC enUS : "CocaCola Ambassador" ; Wowhead enUS : "CocaCola Ambassador"
 UPDATE `creature_template_locale` SET `Name` = 'S.H.E. Nummer Drei', `Title` = 'Botschafterin von Coca-Cola', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16455;
--- AC datas : OLD Name : "Konkubine", Name AC enUS : "Concubine" ; Wowhead enUS : "Zealous Paramour"
-UPDATE `creature_template_locale` SET `Name` = 'Eifrige Dienerin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16461;
 -- AC datas : OLD Name : "Alchemiemeister", Name AC enUS : "Master Alchemist" ; Wowhead enUS : "Master Alchemist"
 UPDATE `creature_template_locale` SET `Name` = 'Alchimiemeister', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16487;
 -- AC datas : OLD Name : "Valaatu", Name AC enUS : "Valaatu" ; Wowhead enUS : "Valaatu",  OLD Subname : "Magierlehrerin", Subname AC enUS : "Mage Trainer" ; Wowhead enUS : "Mage Trainer"
@@ -8537,8 +8535,6 @@ UPDATE `creature_template_locale` SET `Name` = 'Urtum des ewigen Hains', `Verifi
 UPDATE `creature_template_locale` SET `Title` = 'Expeditionsleiter', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 22481;
 -- AC datas : OLD Name : "Gorgolon der Allsehende", Name AC enUS : "Gorgolon the All-seeing" ; Wowhead enUS : "Gorgolon the All-seeing"
 UPDATE `creature_template_locale` SET `Name` = 'Gorgolon der Allessehende', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 22827;
--- AC datas : OLD Name : "Tempelkonkubine", Name AC enUS : "Temple Concubine" ; Wowhead enUS : "Temple Acolyte"
-UPDATE `creature_template_locale` SET `Name` = 'Tempelakolyth', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 22939;
 -- AC datas : OLD Name : "Bezaubernde Kurtisane", Name AC enUS : "Charming Courtesan" ; Wowhead enUS : "Charming Patron"
 UPDATE `creature_template_locale` SET `Name` = 'Bezaubernder Besucher', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 22955;
 -- AC datas : OLD Name : "Schwester der Schmerzen", Name AC enUS : "Sister of Pain" ; Wowhead enUS : "Priestess of Torment"
@@ -9417,8 +9413,6 @@ UPDATE `creature_template_locale` SET `Name` = 'Mutierte Monströsität', `Verif
 UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Rüstmeister für Embleme des Frosts', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 37941;
 -- AC datas : OLD Subname : "Emblem des Frost Rüstmeister", Subname AC enUS : "Emblem of Frost Quartermaster" ; Wowhead enUS : "Emblem of Frost Quartermaster"
 UPDATE `creature_template_locale` SET `Title` = 'Rüstmeister für Embleme des Frosts', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 37942;
--- AC datas : OLD Name : "Große Liebesrakete", Name AC enUS : "Big Love Rocket" ; Wowhead enUS : "X-45 Heartbreaker"
-UPDATE `creature_template_locale` SET `Name` = 'Herzbrecher X-45', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 38204;
 -- AC datas : OLD Name : "Fürstin Sylvanas Windläufer", Name AC enUS : "Lady Sylvanas Windrunner" ; Wowhead enUS : "Lady Sylvanas Windrunner"
 UPDATE `creature_template_locale` SET `Name` = 'Lady Sylvanas Windläufer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 38609;
 -- AC datas : OLD Subname : "Antiquitätenrüstmeister für Gerechtigkeitspunkte", Subname AC enUS : "Emblem of Frost Quartermaster" ; Wowhead enUS : "Emblem of Frost Quartermaster"
@@ -9527,8 +9521,6 @@ UPDATE `creature_template_locale` SET `Name` = 'Scharfschützenkanone', `Verifie
 UPDATE `creature_template_locale` SET `Name` = 'Abbild von Thalorien Dämmersucher', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 37828;
 -- AC datas : OLD Name : "Besprenkler der Manufaktur Krone", Name AC enUS : "Crown Sprinkler" ; Wowhead enUS : "Crown Sprinkler"
 UPDATE `creature_template_locale` SET `Name` = 'Besprinkler der Manufaktur Krone', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 38023;
--- AC datas : OLD Name : "Große Liebesrakete", Name AC enUS : "Flying Big Love Rocket" ; Wowhead enUS : "X-45 Heartbreaker"
-UPDATE `creature_template_locale` SET `Name` = 'Herzbrecher X-45', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 38207;
 
 -- Update existing entries, from MOP
 -- AC datas : OLD Name : "Blade's Edge - Nexus Prince Event - Orb01", Name AC enUS : "Blade's Edge - Nexus Prince Event - Orb01" ; Wowhead enUS : "Blade's Edge - Nexus Prince Event - Orb01"
@@ -9565,8 +9557,6 @@ UPDATE `creature_template_locale` SET `Name` = 'Primalistin Thurloga', `Verified
 UPDATE `creature_template_locale` SET `Name` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 15166;
 -- AC datas : OLD Name : "Orcnekrolyt", Name AC enUS : "Orc Necrolyte UNUSED" ; Wowhead enUS : "Orc Necrolyte UNUSED"
 UPDATE `creature_template_locale` SET `Name` = 'Orcnekrolyth', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 16560;
--- AC datas : OLD Name : "Konkubine", Name AC enUS : "Concubine Transform Visual" ; Wowhead enUS : "Zealous Paramour Transform Visual"
-UPDATE `creature_template_locale` SET `Name` = 'Verwandlung der eifrigen Geliebten, visuell', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 17065;
 -- AC datas : OLD Name : "Reitwyvern der Scherbenwelt (Gepanzert)", Name AC enUS : "UNUSED Outland Wyvern Mount (Armored)" ; Wowhead enUS : "Test Sigil"
 UPDATE `creature_template_locale` SET `Name` = 'Testsiegel', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 18366;
 -- AC datas : OLD Name : "Invis Footlocker", Name AC enUS : "Invis Footlocker" ; Wowhead enUS : "Invis Footlocker"
@@ -9593,8 +9583,6 @@ UPDATE `creature_template_locale` SET `Name` = 'Spirituelle Eingebung', `Verifie
 UPDATE `creature_template_locale` SET `Name` = NULL, `Title` = 'Windreitermeisterin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 26842;
 -- AC datas : OLD Subname : "Initiand des Wolfskults", Subname AC enUS : "Wolfcult Initiate" ; Wowhead enUS : "Wolfcult Initiate"
 UPDATE `creature_template_locale` SET `Title` = 'Initiandin des Wolfskults', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 27632;
--- AC datas : OLD Name : "Mysteriöser Zigeuner", Name AC enUS : "Mysterious Gypsy" ; Wowhead enUS : "Mysterious Trader"
-UPDATE `creature_template_locale` SET `Name` = 'Mysteriöser Händler', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28652;
 -- AC datas : OLD Subname : "Bankier", Subname AC enUS : "Banker" ; Wowhead enUS : "Banker"
 UPDATE `creature_template_locale` SET `Title` = 'Bankierin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `entry` = 28678;
 -- AC datas : OLD Subname : "Bankier", Subname AC enUS : "Banker" ; Wowhead enUS : "Banker"
