@@ -580,3 +580,27 @@ std::vector<uint32_t> HolidayDateCalculator::GetDarkmoonFaireDates(int locationO
 
     return dates;
 }
+
+time_t HolidayDateCalculator::FindStartTimeForStage(const uint32_t* packedDates, uint8_t numDates,
+    time_t stageOffset, uint32_t stageLengthMinutes, time_t curTime)
+{
+    for (uint8_t i = 0; i < numDates && packedDates[i]; ++i)
+    {
+        uint32_t date = packedDates[i];
+
+        std::tm timeInfo = {};
+        timeInfo.tm_year = static_cast<int>(((date >> 24) & 0x1F)) + 100;
+        timeInfo.tm_mon = static_cast<int>((date >> 20) & 0xF);
+        timeInfo.tm_mday = static_cast<int>(((date >> 14) & 0x3F)) + 1;
+        timeInfo.tm_hour = static_cast<int>((date >> 6) & 0x1F);
+        timeInfo.tm_min = static_cast<int>(date & 0x3F);
+        timeInfo.tm_sec = 0;
+        timeInfo.tm_isdst = -1;
+
+        time_t startTime = mktime(&timeInfo);
+        if (curTime < startTime + stageOffset + static_cast<time_t>(stageLengthMinutes) * 60)
+            return startTime + stageOffset;
+    }
+
+    return 0;
+}
