@@ -399,7 +399,7 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `groupAI`) VALUES
 (@GUID+2, @GUID+3, 3),
 
 (@GUID+26, @GUID+26, 3),
-(@GUID+26, @GUID+37, 3),
+(@GUID+26, @GUID+27, 3),
 
 (@GUID+38, @GUID+38, 3),
 (@GUID+38, @GUID+39, 3),
