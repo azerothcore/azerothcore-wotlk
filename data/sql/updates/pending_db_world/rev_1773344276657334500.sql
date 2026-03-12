@@ -394,30 +394,44 @@ DELETE FROM `creature_formations` WHERE `leaderGUID` IN (@GUID+32,@GUID+38,@GUID
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `groupAI`) VALUES
 (@GUID+32, @GUID+32, 3),
 (@GUID+32, @GUID+33, 3),
-
-(@GUID+2, @GUID+2, 3),
-(@GUID+2, @GUID+3, 3),
-
+(@GUID+2,  @GUID+2 , 3),
+(@GUID+2,  @GUID+3 , 3),
 (@GUID+26, @GUID+26, 3),
 (@GUID+26, @GUID+27, 3),
-
 (@GUID+38, @GUID+38, 3),
 (@GUID+38, @GUID+39, 3),
-
 (@GUID+41, @GUID+41, 3),
 (@GUID+41, @GUID+42, 3),
-
 (@GUID+47, @GUID+47, 3),
 (@GUID+47, @GUID+48, 3),
-
 (@GUID+16, @GUID+16, 3),
 (@GUID+16, @GUID+17, 3),
-
-(@GUID+4, @GUID+4, 3),
-(@GUID+4, @GUID+5, 3),
-
-(@GUID+9, @GUID+9, 3),
-(@GUID+9, @GUID+10, 3),
-
+(@GUID+4,  @GUID+4 , 3),
+(@GUID+4,  @GUID+5 , 3),
+(@GUID+9,  @GUID+9 , 3),
+(@GUID+9,  @GUID+10, 3),
 (@GUID+12, @GUID+12, 3),
 (@GUID+12, @GUID+13, 3);
+
+DELETE FROM `creature_addon` WHERE `guid` IN (@GUID+32,@GUID+33,@GUID+2 ,@GUID+3 ,@GUID+26,@GUID+27,@GUID+38,@GUID+39,@GUID+41,@GUID+42,@GUID+47,@GUID+48,@GUID+16,@GUID+17,@GUID+4 ,@GUID+5 ,@GUID+9 ,@GUID+10,@GUID+12,@GUID+13);
+INSERT INTO `creature_addon` (`guid`, `bytes1`) VALUES
+(@GUID+32, 1),
+(@GUID+33, 1),
+(@GUID+2 , 1),
+(@GUID+3 , 1),
+(@GUID+26, 1),
+(@GUID+27, 1),
+(@GUID+38, 1),
+(@GUID+39, 1),
+(@GUID+41, 1),
+(@GUID+42, 1),
+(@GUID+47, 1),
+(@GUID+48, 1),
+(@GUID+16, 1),
+(@GUID+17, 1),
+(@GUID+4 , 1),
+(@GUID+5 , 1),
+(@GUID+9 , 1),
+(@GUID+10, 1),
+(@GUID+12, 1),
+(@GUID+13, 1);
