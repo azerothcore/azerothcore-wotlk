@@ -136,6 +136,7 @@ INSERT INTO `disables` VALUES
 (0,58515,64,'','','Ignore LOS on Burn Corpse'),
 (0,58518,64,'','','Ignore LOS on Ahn kahet Brazier Kill Credit'),
 (0,58875,64,'','','Disable LOS for Spirit Walk'),
+(0,59661,64,'','','Icecrown Purple Beam (Ignore Los)'),
 (0,60535,64,'','','Windles Lighter, disable LOS'),
 (0,60946,64,'','','Disable LOS for Nightmare'),
 (0,60947,64,'','','Disable LOS for Nightmare'),
@@ -940,4 +941,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-07-19 12:08:53
+-- Dump completed on 2025-12-29 17:53:50

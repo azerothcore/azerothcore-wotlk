@@ -139,4 +139,13 @@ namespace lfg
         return m_KicksLeft;
     }
 
+    void LfgGroupData::AddRandomQueuedPlayer(ObjectGuid guid)
+    {
+        m_RandomQueuedPlayers.insert(guid);
+    }
+
+    [[nodiscard]] bool LfgGroupData::IsRandomQueuedPlayer(ObjectGuid guid) const
+    {
+        return m_RandomQueuedPlayers.contains(guid);
+    }
 } // namespace lfg

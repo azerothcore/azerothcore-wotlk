@@ -20,6 +20,7 @@
 
 #include "IpAddress.h"
 #include "Log.h"
+#include "Socket.h"
 #include "Systemd.h"
 #include <atomic>
 #include <boost/asio/ip/tcp.hpp>
@@ -32,7 +33,7 @@ constexpr auto ACORE_MAX_LISTEN_CONNECTIONS = boost::asio::socket_base::max_list
 class AsyncAcceptor
 {
 public:
-    typedef void(*AcceptCallback)(tcp::socket&& newSocket, uint32 threadIndex);
+    typedef void(*AcceptCallback)(IoContextTcpSocket&& newSocket, uint32 threadIndex);
 
     AsyncAcceptor(Acore::Asio::IoContext& ioContext, std::string const& bindIp, uint16 port, bool supportSocketActivation = false) :
         _acceptor(ioContext), _endpoint(Acore::Net::make_address(bindIp), port),
@@ -56,7 +57,7 @@ public:
     template<AcceptCallback acceptCallback>
     void AsyncAcceptWithCallback()
     {
-        tcp::socket* socket;
+        IoContextTcpSocket* socket;
         uint32 threadIndex;
         std::tie(socket, threadIndex) = _socketFactory();
         _acceptor.async_accept(*socket, [this, socket, threadIndex](boost::system::error_code error)
@@ -129,16 +130,16 @@ public:
         _acceptor.close(err);
     }
 
-    void SetSocketFactory(std::function<std::pair<tcp::socket*, uint32>()> func) { _socketFactory = func; }
+    void SetSocketFactory(std::function<std::pair<IoContextTcpSocket*, uint32>()> func) { _socketFactory = std::move(func); }
 
 private:
-    std::pair<tcp::socket*, uint32> DefaultSocketFactory() { return std::make_pair(&_socket, 0); }
+    std::pair<IoContextTcpSocket*, uint32> DefaultSocketFactory() { return std::make_pair(&_socket, 0); }
 
-    tcp::acceptor _acceptor;
-    tcp::endpoint _endpoint;
-    tcp::socket _socket;
+    boost::asio::basic_socket_acceptor<boost::asio::ip::tcp, IoContextTcpSocket::executor_type> _acceptor;
+    boost::asio::ip::tcp::endpoint _endpoint;
+    IoContextTcpSocket _socket;
     std::atomic<bool> _closed;
-    std::function<std::pair<tcp::socket*, uint32>()> _socketFactory;
+    std::function<std::pair<IoContextTcpSocket*, uint32>()> _socketFactory;
     bool _supportSocketActivation;
 };
 
