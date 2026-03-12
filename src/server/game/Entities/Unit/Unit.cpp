@@ -16,6 +16,7 @@
  */
 
 #include "Unit.h"
+#include "AbstractFollower.h"
 #include "AreaDefines.h"
 #include "ArenaSpectator.h"
 #include "Battlefield.h"
@@ -44,7 +45,6 @@
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
 #include "MovementGenerator.h"
-#include "AbstractFollower.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvP.h"
@@ -2234,7 +2234,7 @@ uint32 Unit::CalcArmorReducedDamage(Unit const* attacker, Unit const* victim, co
     return uint32(std::ceil(std::max(damage * (1.0f - tmpvalue), 0.0f)));
 }
 
-float Unit::GetEffectiveResistChance(Unit const* owner, SpellSchoolMask schoolMask, Unit const* victim)
+float Unit::GetEffectiveResistChance(Unit const* owner, SpellSchoolMask schoolMask, Unit const* victim, SpellInfo const* spellInfo /*= nullptr*/)
 {
     float victimResistance = static_cast<float>(victim->GetResistance(schoolMask));
     if (owner)
@@ -2252,7 +2252,8 @@ float Unit::GetEffectiveResistChance(Unit const* owner, SpellSchoolMask schoolMa
     }
 
     victimResistance = std::max(victimResistance, 0.0f);
-    if (owner)
+
+    if (owner && (!spellInfo || !spellInfo->HasAttribute(SPELL_ATTR0_CU_BINARY_SPELL)))
         victimResistance += std::max(static_cast<float>(victim->GetLevel() - owner->GetLevel()) * 5.0f, 0.0f);
 
     float level = static_cast<float>(victim->GetLevel());
@@ -3555,9 +3556,8 @@ SpellMissInfo Unit::MagicSpellHitResult(Unit* victim, SpellInfo const* spellInfo
             tmp += victim->GetMaxNegativeAuraModifierByMiscValue(SPELL_AURA_MOD_DEBUFF_RESISTANCE, int32(spellInfo->Dispel)) * 100;
         }
 
-        // Players resistance for binary spells
         if (spellInfo->HasAttribute(SPELL_ATTR0_CU_BINARY_SPELL) && (spellInfo->GetSchoolMask() & (SPELL_SCHOOL_MASK_NORMAL | SPELL_SCHOOL_MASK_HOLY)) == 0)
-            tmp += int32(Unit::GetEffectiveResistChance(this, spellInfo->GetSchoolMask(), victim) * 10000.0f); // 100 for spell calculations, and 100 for return value percentage
+            tmp += int32(Unit::GetEffectiveResistChance(this, spellInfo->GetSchoolMask(), victim, spellInfo) * 10000.0f);
     }
 
     // Roll chance
@@ -5530,12 +5530,8 @@ void Unit::RemoveAreaAurasDueToLeaveWorld()
 
 void Unit::RemoveAllFollowers()
 {
-    while (auto* ref = m_FollowingRefMgr.getFirst())
-    {
-        auto* source = ref->GetSource();
-        ref->delink();
-        source->SetTarget(nullptr);
-    }
+    while (!m_followingMe.empty())
+        (*m_followingMe.begin())->SetTarget(nullptr);
 }
 
 void Unit::RemoveAllAuras()

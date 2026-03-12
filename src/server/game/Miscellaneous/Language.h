@@ -1194,7 +1194,15 @@ enum AcoreStrings
 
     LANG_RESETALL_HONOR                 = 5118,
     LANG_RESETALL_ARENA                 = 5119,
-    // Room for more strings    5120-9999
+
+    // Battlefield queue display (.bf queue)
+    LANG_BF_QUEUE_HDR_WAR               = 5120,
+    LANG_BF_QUEUE_HDR_WAIT              = 5121,
+    LANG_BF_QUEUE_TEAM_HDR              = 5122,
+    LANG_BF_QUEUE_PLAYER_QUEUE          = 5123,
+    LANG_BF_QUEUE_PLAYER_INVITED        = 5124,
+    LANG_BF_QUEUE_PLAYER_WAR            = 5125,
+    // Room for more strings    5126-9999
 
     // Level requirement notifications
     LANG_SAY_REQ                        = 6604,
