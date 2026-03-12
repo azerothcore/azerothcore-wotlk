@@ -1,3 +1,4 @@
+
 -- Update Spawn Time (check from retail)
 UPDATE `creature` SET `spawntimesecs` = 240 WHERE (`id1` = 28406);
 
