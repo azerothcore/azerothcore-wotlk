@@ -142,7 +142,8 @@ void OutdoorPvPTF::ResetZoneToTeamControlled(TeamId team)
 
     for (auto& [guid, tower] : _capturePoints)
     {
-        dynamic_cast<OPvPCapturePointTF*>(tower)->ResetToTeamControlled(team);
+        if (auto* capturePoint = dynamic_cast<OPvPCapturePointTF*>(tower))
+            capturePoint->ResetToTeamControlled(team);
     }
 
     SendUpdateWorldState(WORLD_STATE_OPVP_TF_UI_TOWER_COUNT_H, m_HordeTowersControlled);

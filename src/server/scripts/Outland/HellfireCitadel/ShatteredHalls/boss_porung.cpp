@@ -291,10 +291,29 @@ class spell_tsh_shoot_flame_arrow : public SpellScript
 
         unitList.remove_if([&](WorldObject* target) -> bool
             {
-                return !target->SelectNearestPlayer(15.0f);
+                if (!target)
+                    return true;
+
+                if (!target->SelectNearestPlayer(15.0f))
+                    return true;
+
+                if (target->FindNearestGameObject(GO_BLAZE, 6.0f))
+                    return true;
+
+                // Don't stack arrows on the same target
+                if (InstanceScript* instance = caster->GetInstanceScript())
+                    if (target->GetGUID() == instance->GetGuidData(DATA_LAST_FLAME_ARROW))
+                        return true;
+
+                return false;
             });
 
         Acore::Containers::RandomResize(unitList, 1);
+
+        // Replace last arrow GUID
+        if (!unitList.empty())
+            if (InstanceScript* instance = caster->GetInstanceScript())
+                instance->SetGuidData(DATA_LAST_FLAME_ARROW, unitList.front()->GetGUID());
     }
 
     void HandleScriptEffect(SpellEffIndex effIndex)
