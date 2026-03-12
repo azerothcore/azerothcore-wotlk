@@ -1079,6 +1079,8 @@ INSERT INTO `spell_cooldown_overrides` VALUES
 (53625,10000,20000,0,0,'Argent Champion - Heroic Leap'),
 (54095,7000,9000,0,0,'Naxxramas Worshipper - Fireball'),
 (54096,7000,9000,0,0,'Naxxramas Worshipper (1) - Fireball'),
+(56570,200,200,0,0,'Jotunheim Rapid-Fire Harpoon: Rapid-Fire Harpoon'),
+(56585,30000,30000,0,0,'Jotunheim Rapid-Fire Harpoon: Energy Reserve'),
 (56843,15000,20000,0,0,'Thane Torvald Eriksson - Volley'),
 (59603,9000,17000,0,0,'Dragonflayer Heartsplitter (1), Proto-Drake Rider (1) - Throw'),
 (59604,9000,12500,0,0,'Dragonflayer Heartsplitter (1), Proto-Drake Rider (1) - Wing Clip'),
@@ -1112,4 +1114,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-07-19 12:09:39
+-- Dump completed on 2025-12-29 17:54:35

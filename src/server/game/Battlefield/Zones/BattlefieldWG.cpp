@@ -224,7 +224,7 @@ bool BattlefieldWG::Update(uint32 diff)
 void BattlefieldWG::OnBattleStart()
 {
     // Spawn titan relic
-    GameObject* go = SpawnGameObject(GO_WINTERGRASP_TITAN_S_RELIC, 5440.0f, 2840.8f, 430.43f, 0);
+    GameObject* go = SpawnGameObject(GO_WINTERGRASP_TITAN_S_RELIC, 5440.37890625f, 2840.493408203125f, 430.2816162109375, 4.45059061050415039f); // VerifiedBuild 51943
     if (go)
     {
         // Update faction of relic, only attacker can click on

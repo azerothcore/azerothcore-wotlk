@@ -21,233 +21,206 @@
 #include "Vehicle.h"
 #include "eye_of_eternity.h"
 
-bool EoEDrakeEnterVehicleEvent::Execute(uint64 /*eventTime*/, uint32 /*updateTime*/)
+ObjectData const creatureData[] =
 {
-    if (Player* p = ObjectAccessor::GetPlayer(_owner, _playerGUID))
-        if (p->IsInWorld() && !p->IsDuringRemoveFromWorld() && !p->isBeingLoaded() && p->FindMap() == _owner.FindMap())
-        {
-            p->CastCustomSpell(60683, SPELLVALUE_BASE_POINT0, 1, &_owner, true);
-            return true;
-        }
-    _owner.DespawnOrUnsummon(1ms);
-    return true;
-}
+    { NPC_MALYGOS, DATA_MALYGOS },
+    { 0, 0 }
+};
 
-class instance_eye_of_eternity : public InstanceMapScript
+ObjectData const gameobjectData[] =
 {
-public:
-    instance_eye_of_eternity() : InstanceMapScript("instance_eye_of_eternity", MAP_THE_EYE_OF_ETERNITY) { }
+    { GO_IRIS_N,         DATA_IRIS           },
+    { GO_IRIS_H,         DATA_IRIS           },
+    { GO_EXIT_PORTAL,    DATA_EXIT_PORTAL    },
+    { GO_NEXUS_PLATFORM, DATA_NEXUS_PLATFORM },
+    { 0, 0 }
+};
 
-    InstanceScript* GetInstanceScript(InstanceMap* pMap) const override
+struct instance_eye_of_eternity : public InstanceScript
+{
+    instance_eye_of_eternity(Map* pMap) : InstanceScript(pMap)
     {
-        return new instance_eye_of_eternity_InstanceMapScript(pMap);
+        SetHeaders(DataHeader);
+        SetBossNumber(EncounterCount);
+        LoadObjectData(creatureData, gameobjectData);
+        Initialize();
+        _pokeAchievementValid = false;
     }
 
-    struct instance_eye_of_eternity_InstanceMapScript : public InstanceScript
+    bool _pokeAchievementValid = false;
+    GuidVector _vortexTriggers;
+
+    void OnCreatureCreate(Creature* creature) override
     {
-        instance_eye_of_eternity_InstanceMapScript(Map* pMap) : InstanceScript(pMap) { Initialize(); }
+        InstanceScript::OnCreatureCreate(creature);
 
-        uint32 EncounterStatus;
-        std::string str_data;
+        if (creature->GetEntry() == NPC_VORTEX)
+            _vortexTriggers.push_back(creature->GetGUID());
+    }
 
-        ObjectGuid NPC_MalygosGUID;
-        ObjectGuid GO_IrisGUID;
-        ObjectGuid GO_ExitPortalGUID;
-        ObjectGuid GO_PlatformGUID;
-        bool bPokeAchiev;
+    ObjectGuid GetGuidData(uint32 data) const override
+    {
+        if (data == DATA_VORTEX_TRIGGER)
+            return !_vortexTriggers.empty() ? _vortexTriggers.front() : ObjectGuid::Empty;
 
-        void Initialize() override
+        return InstanceScript::GetGuidData(data);
+    }
+
+    void VortexHandling()
+    {
+        Creature* malygos = GetCreature(DATA_MALYGOS);
+        if (!malygos)
+            return;
+
+        for (ObjectGuid const& guid : _vortexTriggers)
         {
-            EncounterStatus = NOT_STARTED;
-
-            bPokeAchiev = false;
-        }
-
-        bool IsEncounterInProgress() const override
-        {
-            return EncounterStatus == IN_PROGRESS;
-        }
-
-        void OnPlayerEnter(Player* pPlayer) override
-        {
-            if (EncounterStatus == DONE)
+            uint8 counter = 0;
+            if (Creature* trigger = instance->GetCreature(guid))
             {
-                // destroy platform, hide iris (actually ensure, done at loading, but doesn't always work
-                ProcessEvent(nullptr, 20158);
-                if (GameObject* go = instance->GetGameObject(GO_IrisGUID))
-                    if (go->GetPhaseMask() != 2)
-                        go->SetPhaseMask(2, true);
-
-                // no floor, so put players on drakes
-                if (pPlayer)
+                for (auto* ref : malygos->GetThreatMgr().GetUnsortedThreatList())
                 {
-                    if (!pPlayer->IsAlive())
-                        return;
+                    if (counter >= 5)
+                        break;
 
-                    if (Creature* c = pPlayer->SummonCreature(NPC_WYRMREST_SKYTALON, pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ() - 20.0f, 0.0f, TEMPSUMMON_MANUAL_DESPAWN, 0))
+                    if (Player* player = ref->GetVictim()->ToPlayer())
                     {
-                        c->SetCanFly(true);
-                        c->SetFaction(pPlayer->GetFaction());
-                        //pPlayer->CastCustomSpell(60683, SPELLVALUE_BASE_POINT0, 1, c, true);
-                        c->m_Events.AddEventAtOffset(new EoEDrakeEnterVehicleEvent(*c, pPlayer->GetGUID()), 500ms);
+                        if (player->IsGameMaster() || player->HasAura(SPELL_VORTEX_4))
+                            continue;
+
+                        player->CastSpell(trigger, SPELL_VORTEX_4, true);
+                        counter++;
                     }
                 }
             }
         }
+    }
 
-        void OnCreatureCreate(Creature* creature) override
+    void OnPlayerEnter(Player* player) override
+    {
+        if (player && player->IsAlive() && IsBossDone(DATA_MALYGOS))
+            player->CastSpell(player, SPELL_SUMMON_RED_DRAGON_BUDDY, true);
+    }
+
+    void OnGameObjectCreate(GameObject* gameobject) override
+    {
+        InstanceScript::OnGameObjectCreate(gameobject);
+
+        uint32 entry = gameobject->GetEntry();
+
+        if (IsBossDone(DATA_MALYGOS))
         {
-            switch (creature->GetEntry())
+            if (entry == GO_IRIS_N || entry == GO_IRIS_H)
+                gameobject->SetPhaseMask(2, true);
+            else if (entry == GO_NEXUS_PLATFORM)
             {
-                case NPC_MALYGOS:
-                    NPC_MalygosGUID = creature->GetGUID();
-                    break;
+                gameobject->SetDestructibleState(GO_DESTRUCTIBLE_DESTROYED, nullptr, true);
+                gameobject->EnableCollision(false);
             }
         }
+    }
 
-        void OnGameObjectCreate(GameObject* go) override
+    void SetData(uint32 type, uint32 /*data*/) override
+    {
+        switch (type)
         {
-            switch (go->GetEntry())
+            case DATA_SET_IRIS_INACTIVE:
             {
-                case GO_IRIS_N:
-                case GO_IRIS_H:
-                    GO_IrisGUID = go->GetGUID();
-                    break;
-                case GO_EXIT_PORTAL:
-                    GO_ExitPortalGUID = go->GetGUID();
-                    break;
-                case GO_NEXUS_PLATFORM:
-                    GO_PlatformGUID = go->GetGUID();
-                    break;
+                if (GameObject* iris = GetGameObject(DATA_IRIS))
+                {
+                    HandleGameObject(ObjectGuid::Empty, true, iris);
+                    if (Creature* trigger = iris->SummonCreature(NPC_WORLD_TRIGGER_LAOI, *iris, TEMPSUMMON_TIMED_DESPAWN, 10000))
+                        trigger->CastSpell(trigger, SPELL_IRIS_ACTIVATED, true);
+                }
+                break;
             }
+            case DATA_HIDE_IRIS_AND_PORTAL:
+                if (GameObject* iris = GetGameObject(DATA_IRIS))
+                    iris->SetPhaseMask(2, true);
+                if (GameObject* portal = GetGameObject(DATA_EXIT_PORTAL))
+                    portal->SetPhaseMask(2, true);
+                break;
+            case DATA_VORTEX_HANDLING:
+                VortexHandling();
+                break;
         }
+    }
 
-        void SetData(uint32 type, uint32 data) override
-        {
-            switch (type)
-            {
-                case DATA_IRIS_ACTIVATED:
-                    if (EncounterStatus == NOT_STARTED)
-                        if (Creature* c = instance->GetCreature(NPC_MalygosGUID))
-                            if (Player* plr = c->SelectNearestPlayer(250.0f))
-                                c->AI()->AttackStart(plr);
-                    break;
-                case DATA_ENCOUNTER_STATUS:
-                    EncounterStatus = data;
-                    switch (data)
-                    {
-                        case NOT_STARTED:
-                            bPokeAchiev = false;
-                            if (GameObject* go = instance->GetGameObject(GO_IrisGUID))
-                            {
-                                go->SetPhaseMask(1, true);
-                                HandleGameObject(GO_IrisGUID, false, go);
-                            }
-                            if (GameObject* go = instance->GetGameObject(GO_ExitPortalGUID))
-                                go->SetPhaseMask(1, true);
-                            if (GameObject* go = instance->GetGameObject(GO_PlatformGUID))
-                            {
-                                go->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, nullptr, true);
-                                go->EnableCollision(true);
-                            }
-                            break;
-                        case IN_PROGRESS:
-                            bPokeAchiev = (instance->GetPlayersCountExceptGMs() < (instance->GetSpawnMode() == 0 ? (uint32)9 : (uint32)21));
-                            break;
-                        case DONE:
-                            bPokeAchiev = false;
-                            if (GameObject* go = instance->GetGameObject(GO_ExitPortalGUID))
-                                go->SetPhaseMask(1, true);
-                            if (Creature* c = instance->GetCreature(NPC_MalygosGUID))
-                                if (c->SummonCreature(NPC_ALEXSTRASZA, 798.0f, 1268.0f, 299.0f, 2.45f, TEMPSUMMON_TIMED_DESPAWN, 604800000))
-                                    break;
-                    }
-                    if (data == DONE)
-                        SaveToDB();
-                    break;
-                case DATA_SET_IRIS_INACTIVE:
-                    if (GameObject* go = instance->GetGameObject(GO_IrisGUID))
-                    {
-                        HandleGameObject(GO_IrisGUID, true, go);
-                        if (Creature* c = go->SummonCreature(NPC_WORLD_TRIGGER_LAOI, *go, TEMPSUMMON_TIMED_DESPAWN, 10000))
-                            c->CastSpell(c, SPELL_IRIS_ACTIVATED, true);
-                    }
-                    break;
-                case DATA_HIDE_IRIS_AND_PORTAL:
-                    if (GameObject* go = instance->GetGameObject(GO_IrisGUID))
-                        go->SetPhaseMask(2, true);
-                    if (GameObject* go = instance->GetGameObject(GO_ExitPortalGUID))
-                        go->SetPhaseMask(2, true);
-                    break;
-            }
-        }
-
-        ObjectGuid GetGuidData(uint32 type) const override
-        {
-            switch (type)
-            {
-                case DATA_MALYGOS_GUID:
-                    return NPC_MalygosGUID;
-            }
-
-            return ObjectGuid::Empty;
-        }
-
-        void ProcessEvent(WorldObject* /*unit*/, uint32 eventId) override
-        {
-            switch (eventId)
-            {
-                case 20158:
-                    if (GameObject* go = instance->GetGameObject(GO_PlatformGUID))
-                        if (Creature* c = instance->GetCreature(NPC_MalygosGUID))
-                        {
-                            go->ModifyHealth(-6500000, c); // We have HP 6 million in the database... So we have to do at least that
-                            go->EnableCollision(false);
-                        }
-                    break;
-            }
-        }
-
-        void ReadSaveDataMore(std::istringstream& data) override
-        {
-            data >> EncounterStatus;
-
-            switch (EncounterStatus)
-            {
-                case IN_PROGRESS:
-                    EncounterStatus = NOT_STARTED;
-                    break;
-                case DONE:
-                    // destroy platform, hide iris
-                    ProcessEvent(nullptr, 20158);
-                    if (GameObject* go = instance->GetGameObject(GO_IrisGUID))
-                        go->SetPhaseMask(2, true);
-                    break;
-            }
-        }
-
-        void WriteSaveDataMore(std::ostringstream& data) override
-        {
-            data << EncounterStatus;
-        }
-
-        bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* source, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
-        {
-            switch (criteria_id)
-            {
-                case ACHIEV_CRITERIA_A_POKE_IN_THE_EYE_10:
-                case ACHIEV_CRITERIA_A_POKE_IN_THE_EYE_25:
-                    return bPokeAchiev;
-                case ACHIEV_CRITERIA_DENYIN_THE_SCION_10:
-                case ACHIEV_CRITERIA_DENYIN_THE_SCION_25:
-                    return (source && source->GetVehicle() && source->GetVehicle()->GetVehicleInfo()->m_ID == 224);
-            }
+    bool SetBossState(uint32 type, EncounterState state) override
+    {
+        if (!InstanceScript::SetBossState(type, state))
             return false;
+
+        if (type != DATA_MALYGOS)
+            return true;
+
+        switch (state)
+        {
+            case NOT_STARTED:
+                _pokeAchievementValid = false;
+                if (GameObject* iris = GetGameObject(DATA_IRIS))
+                {
+                    iris->SetPhaseMask(1, true);
+                    HandleGameObject(iris->GetGUID(), false, iris);
+                }
+                if (GameObject* portal = GetGameObject(DATA_EXIT_PORTAL))
+                    portal->SetPhaseMask(1, true);
+                if (GameObject* platform = GetGameObject(DATA_NEXUS_PLATFORM))
+                {
+                    platform->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, nullptr, true);
+                    platform->EnableCollision(true);
+                }
+                break;
+            case IN_PROGRESS:
+                _pokeAchievementValid = (instance->GetPlayersCountExceptGMs() < (instance->GetSpawnMode() == 0 ? (uint32)9 : (uint32)21));
+                break;
+            case DONE:
+                _pokeAchievementValid = false;
+                if (GameObject* portal = GetGameObject(DATA_EXIT_PORTAL))
+                    portal->SetPhaseMask(1, true);
+                if (Creature* malygos = GetCreature(DATA_MALYGOS))
+                    malygos->SummonCreature(NPC_ALEXSTRASZA, 798.0f, 1268.0f, 299.0f, 2.45f, TEMPSUMMON_MANUAL_DESPAWN);
+                break;
+            default:
+                break;
         }
-    };
+
+        return true;
+    }
+
+    void ProcessEvent(WorldObject* /*unit*/, uint32 eventId) override
+    {
+        if (eventId == EVENT_IRIS_ACTIVATED)
+        {
+            if (Creature* malygos = GetCreature(DATA_MALYGOS))
+                if (Player* player = malygos->SelectNearestPlayer(250.0f))
+                    malygos->AI()->AttackStart(player);
+        }
+        else if (eventId == EVENT_DESTROY_PLATFORM)
+        {
+            if (GameObject* platform = GetGameObject(DATA_NEXUS_PLATFORM))
+            {
+                platform->SetDestructibleState(GO_DESTRUCTIBLE_DESTROYED, nullptr, true);
+                platform->EnableCollision(false);
+            }
+        }
+    }
+
+    bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* source, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
+    {
+        switch (criteria_id)
+        {
+            case ACHIEV_CRITERIA_A_POKE_IN_THE_EYE_10:
+            case ACHIEV_CRITERIA_A_POKE_IN_THE_EYE_25:
+                return _pokeAchievementValid;
+            case ACHIEV_CRITERIA_DENYIN_THE_SCION_10:
+            case ACHIEV_CRITERIA_DENYIN_THE_SCION_25:
+                return source && source->GetVehicle() && source->GetVehicle()->GetVehicleInfo()->m_ID == 224;
+        }
+        return false;
+    }
 };
 
 void AddSC_instance_eye_of_eternity()
 {
-    new instance_eye_of_eternity();
+    RegisterInstanceScript(instance_eye_of_eternity, MAP_THE_EYE_OF_ETERNITY);
 }

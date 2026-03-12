@@ -450,6 +450,10 @@ namespace lfg
         void LoadRewards();
         /// Loads dungeons from dbc and adds teleport coords
         void LoadLFGDungeons(bool reload = false);
+        /// Filters out recently completed dungeons from the proposal set for the given players
+        LfgDungeonSet FilterCooldownDungeons(LfgDungeonSet const& dungeons, LfgRolesMap const& players);
+        /// Clears all dungeon cooldowns for all players
+        void ClearDungeonCooldowns();
 
         // Multiple files
         /// Check if given guid applied for random dungeon
@@ -506,6 +510,9 @@ namespace lfg
         uint8 RemovePlayerFromGroup(ObjectGuid gguid, ObjectGuid guid);
         /// Adds player to group
         void AddPlayerToGroup(ObjectGuid gguid, ObjectGuid guid);
+        /// Store player that selected random queue to group
+        void AddPlayerQueuedForRandomDungeonToGroup(ObjectGuid gguid, ObjectGuid guid);
+        bool IsPlayerQueuedForRandomDungeon(ObjectGuid guid);
         /// Xinef: Set Random Players Count
         void SetRandomPlayersCount(ObjectGuid guid, uint8 count);
         /// Xinef: Get Random Players Count
@@ -633,6 +640,14 @@ namespace lfg
         LfgPlayerDataContainer PlayersStore;               ///< Player data
         LfgGroupDataContainer GroupsStore;                 ///< Group data
         bool m_Testing;
+
+        // Dungeon cooldown system - prevents same dungeon being assigned in a row
+        typedef std::unordered_map<uint32 /*dungeonId*/, TimePoint /*completionTime*/> LfgDungeonCooldownMap;
+        typedef std::unordered_map<ObjectGuid /*playerGuid*/, LfgDungeonCooldownMap> LfgDungeonCooldownContainer;
+        LfgDungeonCooldownContainer DungeonCooldownStore;  ///< Stores dungeon cooldowns per player
+        void AddDungeonCooldown(ObjectGuid guid, uint32 dungeonId);
+        void CleanupDungeonCooldowns();
+        [[nodiscard]] Seconds GetDungeonCooldownDuration() const;
     };
 
     template <typename T, FMT_ENABLE_IF(std::is_enum_v<T>)>
