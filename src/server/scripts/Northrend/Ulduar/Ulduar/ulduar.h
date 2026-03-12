@@ -66,12 +66,6 @@ enum UlduarData
     DATA_UNBROKEN_ACHIEVEMENT               = 105,
     DATA_LEVIATHAN_DOORS                    = 106,
 
-    // Razorscales Harpoon Fire State GUIDs
-    DATA_HARPOON_FIRE_STATE_1               = 200,
-    DATA_HARPOON_FIRE_STATE_2               = 201,
-    DATA_HARPOON_FIRE_STATE_3               = 202,
-    DATA_HARPOON_FIRE_STATE_4               = 203,
-
     // Mimiron creatures
     DATA_MIMIRON_LEVIATHAN_MKII             = 301,
     DATA_MIMIRON_VX001                      = 302,

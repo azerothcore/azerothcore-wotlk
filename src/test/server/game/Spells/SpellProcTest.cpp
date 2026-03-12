@@ -790,6 +790,52 @@ TEST_F(SpellProcTest, CanSpellTriggerProcOnEvent_SpellFamilyFlagsZeroAcceptsAll)
     EXPECT_TRUE(sSpellMgr->CanSpellTriggerProcOnEvent(procEntry, eventInfo));
 }
 
+TEST_F(SpellProcTest, CanSpellTriggerProcOnEvent_GenericFamilyIgnoresMask)
+{
+    // Generic family (0) should bypass family mask checks entirely
+    auto* spellInfo = SpellInfoBuilder()
+        .WithId(101)
+        .WithSpellFamilyName(SPELLFAMILY_MAGE)
+        .WithSpellFamilyFlags(0x1, 0, 0) // some mage flag
+        .Build();
+    _spellInfos.push_back(spellInfo);
+
+    DamageInfo damageInfo(nullptr, nullptr, 100, spellInfo, SPELL_SCHOOL_MASK_FIRE, SPELL_DIRECT_DAMAGE);
+
+    auto procEntry = SpellProcEntryBuilder()
+        .WithProcFlags(PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG)
+        .WithSpellFamilyName(0) // generic family
+        .WithSpellFamilyMask(flag96(0x2, 0, 0)) // does NOT match the spell's flags
+        .WithSpellPhaseMask(PROC_SPELL_PHASE_HIT)
+        .Build();
+
+    auto eventInfo = ProcEventInfoBuilder()
+        .WithTypeMask(PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG)
+        .WithSpellPhaseMask(PROC_SPELL_PHASE_HIT)
+        .WithHitMask(PROC_HIT_NORMAL)
+        .WithDamageInfo(&damageInfo)
+        .Build();
+
+    EXPECT_TRUE(sSpellMgr->CanSpellTriggerProcOnEvent(procEntry, eventInfo))
+        << "Generic family entries should ignore mask restrictions";
+}
+
+TEST_F(SpellProcTest, SpellInfo_IsAffected_GenericBehavior)
+{
+    auto* spellInfo = SpellInfoBuilder()
+        .WithId(102)
+        .WithSpellFamilyName(SPELLFAMILY_WARLOCK)
+        .WithSpellFamilyFlags(0x4, 0, 0)
+        .Build();
+    _spellInfos.push_back(spellInfo);
+
+    // generic family should return true regardless of mask
+    EXPECT_TRUE(spellInfo->IsAffected(0, flag96(0x4, 0, 0)));
+    EXPECT_TRUE(spellInfo->IsAffected(0, flag96(0x8, 0, 0)));
+    // a non-generic family still respects mask
+    EXPECT_FALSE(spellInfo->IsAffected(SPELLFAMILY_PALADIN, flag96(0x4, 0, 0)));
+}
+
 // =============================================================================
 // Real-world Spell Proc Examples
 // =============================================================================

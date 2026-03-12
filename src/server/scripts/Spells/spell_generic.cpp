@@ -2559,7 +2559,7 @@ class spell_gen_vehicle_scaling_aura: public AuraScript
 
     bool Load() override
     {
-        return GetCaster() && GetCaster()->IsPlayer() && GetOwner()->IsCreature();
+        return GetCaster() && GetCaster()->IsPlayer() && GetOwner() && GetOwner()->IsCreature();
     }
 
     void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)

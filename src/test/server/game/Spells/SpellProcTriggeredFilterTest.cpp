@@ -252,6 +252,114 @@ TEST_F(SpellProcTriggeredFilterTest, TakenAutoAttack_AllowsTriggeredSpells)
 }
 
 // =============================================================================
+// PROC_FLAG_KILL / PROC_FLAG_KILLED / PROC_FLAG_DEATH Exception
+// Kill/death events bypass the triggered-spell filter because
+// the kill itself is the proc trigger, not the spell that dealt
+// the killing blow.
+// =============================================================================
+
+TEST_F(SpellProcTriggeredFilterTest, KillEvent_AllowsTriggeredSpells)
+{
+    ProcChanceTestHelper::TriggeredSpellConfig config;
+    config.isTriggered = true;
+    config.auraHasCanProcFromProcs = false;
+    config.spellHasNotAProc = false;
+
+    auto procEntry = CreateBasicProcEntry();
+
+    // PROC_FLAG_KILL should bypass triggered-spell filter
+    EXPECT_FALSE(ProcChanceTestHelper::ShouldBlockTriggeredSpell(
+        config, procEntry, PROC_FLAG_KILL))
+        << "PROC_FLAG_KILL should allow triggered spells";
+}
+
+TEST_F(SpellProcTriggeredFilterTest, KilledEvent_AllowsTriggeredSpells)
+{
+    ProcChanceTestHelper::TriggeredSpellConfig config;
+    config.isTriggered = true;
+    config.auraHasCanProcFromProcs = false;
+    config.spellHasNotAProc = false;
+
+    auto procEntry = CreateBasicProcEntry();
+
+    // PROC_FLAG_KILLED should bypass triggered-spell filter
+    EXPECT_FALSE(ProcChanceTestHelper::ShouldBlockTriggeredSpell(
+        config, procEntry, PROC_FLAG_KILLED))
+        << "PROC_FLAG_KILLED should allow triggered spells";
+}
+
+TEST_F(SpellProcTriggeredFilterTest, DeathEvent_AllowsTriggeredSpells)
+{
+    ProcChanceTestHelper::TriggeredSpellConfig config;
+    config.isTriggered = true;
+    config.auraHasCanProcFromProcs = false;
+    config.spellHasNotAProc = false;
+
+    auto procEntry = CreateBasicProcEntry();
+
+    // PROC_FLAG_DEATH should bypass triggered-spell filter
+    EXPECT_FALSE(ProcChanceTestHelper::ShouldBlockTriggeredSpell(
+        config, procEntry, PROC_FLAG_DEATH))
+        << "PROC_FLAG_DEATH should allow triggered spells";
+}
+
+TEST_F(SpellProcTriggeredFilterTest, KillWithOtherFlags_StillAllowsTriggeredSpells)
+{
+    ProcChanceTestHelper::TriggeredSpellConfig config;
+    config.isTriggered = true;
+    config.auraHasCanProcFromProcs = false;
+    config.spellHasNotAProc = false;
+
+    auto procEntry = CreateBasicProcEntry();
+
+    // PROC_FLAG_KILL combined with other flags should still bypass
+    uint32 combinedEvent = PROC_FLAG_KILL | PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG;
+
+    EXPECT_FALSE(ProcChanceTestHelper::ShouldBlockTriggeredSpell(
+        config, procEntry, combinedEvent))
+        << "PROC_FLAG_KILL combined with other flags should still bypass filter";
+}
+
+TEST_F(SpellProcTriggeredFilterTest, Scenario_RapidKilling_AutoShotKill)
+{
+    // Rapid Killing (34949) has PROC_FLAG_KILL
+    // Auto Shot (75) repeated casts are IsTriggered=true
+    // Kill event should proc Rapid Killing regardless
+    ProcChanceTestHelper::TriggeredSpellConfig config;
+    config.isTriggered = true;                 // Auto Shot is triggered
+    config.auraHasCanProcFromProcs = false;    // Rapid Killing doesn't have this
+    config.spellHasNotAProc = false;           // Auto Shot doesn't have NOT_A_PROC
+
+    auto procEntry = SpellProcEntryBuilder()
+        .WithProcFlags(PROC_FLAG_KILL)
+        .WithChance(100.0f)
+        .Build();
+
+    // PROC_FLAG_KILL exemption should allow this
+    EXPECT_FALSE(ProcChanceTestHelper::ShouldBlockTriggeredSpell(
+        config, procEntry, PROC_FLAG_KILL))
+        << "Rapid Killing should proc from Auto Shot kill";
+}
+
+TEST_F(SpellProcTriggeredFilterTest, KillEvent_SelfLoopStillBlocked)
+{
+    // Even with kill event exemption, self-loop should still be blocked
+    ProcChanceTestHelper::TriggeredSpellConfig config;
+    config.isTriggered = true;
+    config.triggeredByAuraSpellId = 34949;  // Same as proc aura
+    config.procAuraSpellId = 34949;
+
+    auto procEntry = SpellProcEntryBuilder()
+        .WithProcFlags(PROC_FLAG_KILL)
+        .WithChance(100.0f)
+        .Build();
+
+    EXPECT_TRUE(ProcChanceTestHelper::ShouldBlockTriggeredSpell(
+        config, procEntry, PROC_FLAG_KILL))
+        << "Self-loop should still block even on kill events";
+}
+
+// =============================================================================
 // Combined Scenarios
 // =============================================================================
 

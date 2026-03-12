@@ -55,7 +55,8 @@ enum MovementGeneratorType
     ROTATE_MOTION_TYPE    = 15,
     EFFECT_MOTION_TYPE    = 16,
     ESCORT_MOTION_TYPE    = 17,                             // xinef: EscortMovementGenerator.h
-    NULL_MOTION_TYPE      = 18
+    FORMATION_MOTION_TYPE = 18,                             // FormationMovementGenerator.h
+    NULL_MOTION_TYPE      = 19
 };
 
 enum MovementSlot
@@ -227,6 +228,7 @@ public:
     void MoveTargetedHome(bool walk = false);
     void MoveRandom(float wanderDistance = 0.0f);
     void MoveFollow(Unit* target, float dist, float angle, MovementSlot slot = MOTION_SLOT_ACTIVE, bool inheritWalkState = true, bool inheritSpeed = true);
+    void MoveFormation(Unit* leader, float dist, float angle, uint32 point1, uint32 point2);
     void MoveChase(Unit* target, std::optional<ChaseRange> dist = {}, std::optional<ChaseAngle> angle = {});
     void MoveChase(Unit* target, float dist, float angle) { MoveChase(target, ChaseRange(dist), ChaseAngle(angle)); }
     void MoveChase(Unit* target, float dist) { MoveChase(target, ChaseRange(dist)); }

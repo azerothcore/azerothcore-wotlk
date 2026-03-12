@@ -63,12 +63,8 @@ enum WarlockSpells
     SPELL_WARLOCK_IMPROVED_HEALTH_FUNNEL_BUFF_R2    = 60956,
     SPELL_WARLOCK_LIFE_TAP_ENERGIZE                 = 31818,
     SPELL_WARLOCK_LIFE_TAP_ENERGIZE_2               = 32553,
-    SPELL_WARLOCK_SEED_OF_CORRUPTION_R1             = 27243,
     SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_R1      = 27285,
-    SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_R2      = 47833,
-    SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_R3      = 47834,
     SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_GENERIC = 32865,
-    SPELL_WARLOCK_SEED_OF_CORRUPTION_VISUAL         = 37826,
     SPELL_WARLOCK_SOULSHATTER                       = 32835,
     SPELL_WARLOCK_SIPHON_LIFE_HEAL                  = 63106,
     SPELL_WARLOCK_UNSTABLE_AFFLICTION_DISPEL        = 31117,
@@ -742,123 +738,6 @@ class spell_warl_seed_of_corruption_damage : public SpellScript
     }
 };
 
-// -27243 - Seed of Corruption
-class spell_warl_seed_of_corruption_aura: public AuraScript
-{
-    PrepareAuraScript(spell_warl_seed_of_corruption_aura);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({
-            SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_R1,
-            SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_R2,
-            SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_R3,
-            SPELL_WARLOCK_SEED_OF_CORRUPTION_VISUAL
-        });
-    }
-
-    void CalculateAmount(AuraEffect const* aurEff, int32& amount, bool& /*canBeRecalculated*/)
-    {
-        if (!GetCaster())
-            return;
-
-        // effect 1 scales with 14% of caster's SP (DBC data)
-        amount = GetCaster()->SpellDamageBonusDone(GetUnitOwner(), GetSpellInfo(), amount, DOT, aurEff->GetEffIndex(), aurEff->GetPctMods());
-    }
-
-    void Detonate(AuraEffect const* aurEff)
-    {
-        if (!GetCaster() || !GetTarget())
-            return;
-
-        GetTarget()->CastSpell(GetTarget(), SPELL_WARLOCK_SEED_OF_CORRUPTION_VISUAL, true, nullptr, aurEff);
-        GetCaster()->CastSpell(GetTarget(), sSpellMgr->GetSpellWithRank(SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_R1, GetSpellInfo()->GetRank()), true, nullptr, aurEff);
-    }
-
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
-    {
-        PreventDefaultAction();
-        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
-        if (!damageInfo || !damageInfo->GetDamage())
-            return;
-
-        int32 remainingDamage = aurEff->GetAmount() - damageInfo->GetDamage();
-        if (remainingDamage > 0)
-        {
-            GetAura()->GetEffect(EFFECT_1)->SetAmount(remainingDamage);
-        }
-        else // damage threshold has been reached
-        {
-            Remove(AURA_REMOVE_BY_DEFAULT);
-            Detonate(aurEff);
-        }
-    }
-
-    void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
-    {
-        AuraRemoveMode removeMode = GetTargetApplication()->GetRemoveMode();
-        if (removeMode == AURA_REMOVE_BY_DEATH)
-            Detonate(aurEff);
-    }
-
-    void Register() override
-    {
-        DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_warl_seed_of_corruption_aura::CalculateAmount, EFFECT_1, SPELL_AURA_DUMMY);
-        AfterEffectRemove += AuraEffectRemoveFn(spell_warl_seed_of_corruption_aura::OnRemove, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL);
-        OnEffectProc += AuraEffectProcFn(spell_warl_seed_of_corruption_aura::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
-    }
-};
-
-// Monster spells, triggered only on detonation threshold reached (not on death)
-// 32863 - Seed of Corruption
-// 36123 - Seed of Corruption
-// 38252 - Seed of Corruption
-// 39367 - Seed of Corruption
-// 44141 - Seed of Corruption
-// 70388 - Seed of Corruption
-class spell_warl_seed_of_corruption_generic_aura: public AuraScript
-{
-    PrepareAuraScript(spell_warl_seed_of_corruption_generic_aura);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_GENERIC, SPELL_WARLOCK_SEED_OF_CORRUPTION_VISUAL });
-    }
-
-    void Detonate(AuraEffect const* aurEff)
-    {
-        if (!GetCaster() || !GetTarget())
-            return;
-
-        GetTarget()->CastSpell(GetTarget(), SPELL_WARLOCK_SEED_OF_CORRUPTION_VISUAL, true, nullptr, aurEff);
-        GetCaster()->CastCustomSpell(SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE_GENERIC, SPELLVALUE_BASE_POINT0, GetSpellInfo()->GetEffect(EFFECT_1).CalcValue(), GetTarget(), true, nullptr, aurEff);
-    }
-
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
-    {
-        PreventDefaultAction();
-        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
-        if (!damageInfo || !damageInfo->GetDamage())
-            return;
-
-        int32 remainingDamage = aurEff->GetAmount() - damageInfo->GetDamage();
-        if (remainingDamage > 0)
-        {
-            GetAura()->GetEffect(EFFECT_1)->SetAmount(remainingDamage);
-        }
-        else // damage threshold has been reached
-        {
-            Remove(AURA_REMOVE_BY_DEFAULT);
-            Detonate(aurEff);
-        }
-    }
-
-    void Register() override
-    {
-        OnEffectProc += AuraEffectProcFn(spell_warl_seed_of_corruption_generic_aura::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
-    }
-};
-
 // 29858 - Soulshatter
 class spell_warl_soulshatter : public SpellScript
 {
@@ -1427,54 +1306,6 @@ class spell_warl_voidwalker_pet_passive : public AuraScript
     }
 };
 
-// 54909, 53646 - Demonic Pact
-class spell_warl_demonic_pact_aura : public AuraScript
-{
-    PrepareAuraScript(spell_warl_demonic_pact_aura);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_WARLOCK_DEMONIC_PACT_PROC });
-    }
-
-    bool AfterCheckProc(ProcEventInfo& eventInfo, bool isTriggeredAtSpellProcEvent)
-    {
-        return isTriggeredAtSpellProcEvent && eventInfo.GetActor() && eventInfo.GetActor()->IsPet();
-    }
-
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
-    {
-        PreventDefaultAction();
-
-        if (eventInfo.GetActor()->HasSpellCooldown(aurEff->GetId()))
-            return;
-
-        if (Unit* owner = eventInfo.GetActor()->GetOwner())
-        {
-            int32 currentBonus = 0;
-            if (AuraEffect* demonicAurEff = owner->GetAuraEffect(SPELL_WARLOCK_DEMONIC_PACT_PROC, EFFECT_0))
-            {
-                currentBonus = demonicAurEff->GetAmount();
-            }
-
-            if (AuraEffect* talentAurEff = owner->GetDummyAuraEffect(SPELLFAMILY_WARLOCK, WARLOCK_ICON_ID_DEMONIC_PACT, EFFECT_0))
-            {
-                int32 spellDamageMinusBonus = owner->SpellBaseDamageBonusDone(SPELL_SCHOOL_MASK_MAGIC) - currentBonus;
-                if (spellDamageMinusBonus < 0)
-                    return;
-                int32 bp = int32((talentAurEff->GetAmount() / 100.0f) * spellDamageMinusBonus);
-                owner->CastCustomSpell((Unit*)nullptr, SPELL_WARLOCK_DEMONIC_PACT_PROC, &bp, &bp, 0, true, nullptr, talentAurEff);
-                eventInfo.GetActor()->AddSpellCooldown(aurEff->GetId(), 0, eventInfo.GetProcCooldown());
-            }
-        }
-    }
-
-    void Register() override
-    {
-        OnEffectProc += AuraEffectProcFn(spell_warl_demonic_pact_aura::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
-    }
-};
-
 // -980 - Curse of Agony
 class spell_warl_curse_of_agony : public AuraScript
 {
@@ -1975,8 +1806,6 @@ void AddSC_warlock_spell_scripts()
     RegisterSpellScript(spell_warl_life_tap);
     RegisterSpellScript(spell_warl_ritual_of_doom_effect);
     RegisterSpellScript(spell_warl_seed_of_corruption_damage);
-    RegisterSpellScript(spell_warl_seed_of_corruption_aura);
-    RegisterSpellScript(spell_warl_seed_of_corruption_generic_aura);
     RegisterSpellScript(spell_warl_shadow_ward);
     RegisterSpellScript(spell_warl_siphon_life);
     RegisterSpellScript(spell_warl_soulshatter);
@@ -1984,7 +1813,6 @@ void AddSC_warlock_spell_scripts()
     RegisterSpellScript(spell_warl_drain_soul);
     RegisterSpellScript(spell_warl_shadowburn);
     RegisterSpellScript(spell_warl_voidwalker_pet_passive);
-    RegisterSpellScript(spell_warl_demonic_pact_aura);
     RegisterSpellScript(spell_warl_curse_of_agony);
     RegisterSpellScript(spell_warl_glyph_of_corruption_nightfall);
     RegisterSpellScript(spell_warl_nightfall);

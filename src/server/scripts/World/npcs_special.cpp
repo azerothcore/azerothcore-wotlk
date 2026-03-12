@@ -2674,7 +2674,8 @@ struct npc_controller : public PossessedAI
     {
         if (!apply)
         {
-            me->GetCharmerOrOwner()->InterruptNonMeleeSpells(false);
+            if (Unit* charmerOrOwner = me->GetCharmerOrOwner())
+                charmerOrOwner->InterruptNonMeleeSpells(false);
         }
     }
 };

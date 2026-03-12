@@ -91,21 +91,6 @@ enum Races
     //RACE_ICE_TROLL      = 21
 };
 
-// max+1 for player race
-#define MAX_RACES         12
-
-#define RACEMASK_ALL_PLAYABLE \
-    ((1<<(RACE_HUMAN-1))   |(1<<(RACE_ORC-1))          |(1<<(RACE_DWARF-1))   | \
-    (1<<(RACE_NIGHTELF-1))|(1<<(RACE_UNDEAD_PLAYER-1))|(1<<(RACE_TAUREN-1))  | \
-    (1<<(RACE_GNOME-1))   |(1<<(RACE_TROLL-1))        |(1<<(RACE_BLOODELF-1))| \
-    (1<<(RACE_DRAENEI-1)))
-
-#define RACEMASK_ALLIANCE \
-    ((1<<(RACE_HUMAN-1)) | (1<<(RACE_DWARF-1)) | (1<<(RACE_NIGHTELF-1)) | \
-    (1<<(RACE_GNOME-1)) | (1<<(RACE_DRAENEI-1)))
-
-#define RACEMASK_HORDE RACEMASK_ALL_PLAYABLE & ~RACEMASK_ALLIANCE
-
 // DisplayRace values from CreatureDisplayInfoExtra.dbc
 enum class DisplayRace : uint8
 {
@@ -161,15 +146,7 @@ enum Classes
     (1<<(CLASS_DEATH_KNIGHT-1)))
 
 // valid classes for creature_template.unit_class
-enum UnitClass
-{
-    UNIT_CLASS_WARRIOR                  = 1,
-    UNIT_CLASS_PALADIN                  = 2,
-    UNIT_CLASS_ROGUE                    = 4,
-    UNIT_CLASS_MAGE                     = 8,
-};
-
-#define CLASSMASK_ALL_CREATURES ((1<<(UNIT_CLASS_WARRIOR-1)) | (1<<(UNIT_CLASS_PALADIN-1)) | (1<<(UNIT_CLASS_ROGUE-1)) | (1<<(UNIT_CLASS_MAGE-1)))
+#define CLASSMASK_ALL_CREATURES ((1<<(CLASS_WARRIOR-1)) | (1<<(CLASS_PALADIN-1)) | (1<<(CLASS_ROGUE-1)) | (1<<(CLASS_MAGE-1)))
 
 #define CLASSMASK_WAND_USERS ((1<<(CLASS_PRIEST-1))|(1<<(CLASS_MAGE-1))|(1<<(CLASS_WARLOCK-1)))
 
@@ -552,7 +529,7 @@ enum SpellAttr4 : uint32
     SPELL_ATTR4_NO_PARTIAL_IMMUNITY                = 0x00000800, // TITLE Unknown attribute 11@Attr4
     SPELL_ATTR4_AURA_IS_BUFF                       = 0x00001000, // TITLE Unknown attribute 12@Attr4
     SPELL_ATTR4_DO_NOT_LOG_CASTER                  = 0x00002000, // TITLE Unknown attribute 13@Attr4
-    SPELL_ATTR4_REACTIVE_DAMAGE_PROC               = 0x00004000, // TITLE Damage does not break auras
+    SPELL_ATTR4_DAMAGE_DOESNT_BREAK_AURAS          = 0x00004000, // TITLE Damage does not break auras
     SPELL_ATTR4_NOT_IN_SPELLBOOK                   = 0x00008000, // TITLE Unknown attribute 15@Attr4
     SPELL_ATTR4_NOT_IN_ARENA_OR_RATED_BATTLEGROUND = 0x00010000, // TITLE Not usable in arena DESCRIPTION Makes spell unusable despite CD <= 10min
     SPELL_ATTR4_IGNORE_DEFAULT_ARENA_RESTRICTIONS  = 0x00020000, // TITLE Usable in arena DESCRIPTION Makes spell usable despite CD > 10min
@@ -3696,6 +3673,13 @@ enum PvPTeamId
     PVP_TEAM_HORDE       = 0, // Battleground: Horde,    Arena: Green
     PVP_TEAM_ALLIANCE    = 1, // Battleground: Alliance, Arena: Gold
     PVP_TEAM_NEUTRAL     = 2  // Battleground: Neutral,  Arena: None
+};
+
+enum AllianceId
+{
+    ALLIANCE_ALLIANCE = 0,
+    ALLIANCE_HORDE    = 1,
+    ALLIANCE_NEUTRAL  = 2
 };
 
 uint8 constexpr PVP_TEAMS_COUNT = 2;

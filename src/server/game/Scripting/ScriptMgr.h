@@ -43,6 +43,7 @@
 
 class AuctionHouseObject;
 class AuraScript;
+class Battlefield;
 class Battleground;
 class BattlegroundMap;
 class BattlegroundQueue;
@@ -576,6 +577,13 @@ public: /* AllGameobjectScript */
 public: /* AllMapScript */
     void OnBeforeCreateInstanceScript(InstanceMap* instanceMap, InstanceScript** instanceData, bool load, std::string data, uint32 completedEncounterMask);
     void OnDestroyInstance(MapInstanced* mapInstanced, Map* map);
+
+public: /* BattlefieldScript */
+    void OnBattlefieldPlayerEnterZone(Battlefield* bf, Player* player);
+    void OnBattlefieldPlayerLeaveZone(Battlefield* bf, Player* player);
+    void OnBattlefieldPlayerJoinWar(Battlefield* bf, Player* player);
+    void OnBattlefieldPlayerLeaveWar(Battlefield* bf, Player* player);
+    void OnBattlefieldBeforeInvitePlayerToWar(Battlefield* bf, Player* player);
 
 public: /* BGScript */
     void OnBattlegroundStart(Battleground* bg);

@@ -15,21 +15,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "FollowerReference.h"
-#include "TargetedMovementGenerator.h"
-#include "Unit.h"
+#ifndef ACORE_ABSTRACTFOLLOWER_H
+#define ACORE_ABSTRACTFOLLOWER_H
 
-void FollowerReference::targetObjectBuildLink()
-{
-    getTarget()->addFollower(this);
-}
+class Unit;
 
-void FollowerReference::targetObjectDestroyLink()
+class AbstractFollower
 {
-    getTarget()->removeFollower(this);
-}
+public:
+    explicit AbstractFollower(Unit* target = nullptr) { SetTarget(target); }
+    virtual ~AbstractFollower() { SetTarget(nullptr); }
 
-void FollowerReference::sourceObjectDestroyLink()
-{
-    GetSource()->stopFollowing();
-}
+    void SetTarget(Unit* unit);
+    [[nodiscard]] Unit* GetTarget() const { return _target; }
+
+private:
+    Unit* _target = nullptr;
+};
+
+#endif

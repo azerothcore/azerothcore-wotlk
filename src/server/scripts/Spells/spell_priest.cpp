@@ -360,38 +360,6 @@ class spell_pri_hymn_of_hope : public SpellScript
     }
 };
 
-// 37594 - Greater Heal Refund
-class spell_pri_item_greater_heal_refund : public AuraScript
-{
-    PrepareAuraScript(spell_pri_item_greater_heal_refund);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_PRIEST_ITEM_EFFICIENCY });
-    }
-
-    bool CheckProc(ProcEventInfo& eventInfo)
-    {
-        if (HealInfo* healInfo = eventInfo.GetHealInfo())
-            if (Unit* healTarget = healInfo->GetTarget())
-                if (eventInfo.GetHitMask() & PROC_EX_NO_OVERHEAL && healTarget->IsFullHealth())
-                    return true;
-        return false;
-    }
-
-    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& /*eventInfo*/)
-    {
-        PreventDefaultAction();
-        GetTarget()->CastSpell(GetTarget(), SPELL_PRIEST_ITEM_EFFICIENCY, true, nullptr, aurEff);
-    }
-
-    void Register() override
-    {
-        DoCheckProc += AuraCheckProcFn(spell_pri_item_greater_heal_refund::CheckProc);
-        OnEffectProc += AuraEffectProcFn(spell_pri_item_greater_heal_refund::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
-    }
-};
-
 // 60123 - Lightwell
 class spell_pri_lightwell : public SpellScript
 {
@@ -1448,7 +1416,6 @@ void AddSC_priest_spell_scripts()
     RegisterSpellScript(spell_pri_glyph_of_prayer_of_healing);
     RegisterSpellScript(spell_pri_guardian_spirit);
     RegisterSpellScript(spell_pri_hymn_of_hope);
-    RegisterSpellScript(spell_pri_item_greater_heal_refund);
     RegisterSpellScript(spell_pri_lightwell);
     RegisterSpellScript(spell_pri_lightwell_renew);
     RegisterSpellScript(spell_pri_mana_burn);

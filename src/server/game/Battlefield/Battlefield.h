@@ -354,6 +354,21 @@ public:
     uint32 GetTimer() { return m_Timer; }
     void SetTimer(uint32 timer) { m_Timer = timer; }
 
+    // Returns combined count of players in war + invited (per team) for balance checking
+    uint32 GetPlayersInWarCount(TeamId teamId) const { return static_cast<uint32>(m_PlayersInWar[teamId].size() + m_InvitedPlayers[teamId].size()); }
+    // Returns total count of players in the battlefield zone per team
+    uint32 GetPlayersInZoneCount(TeamId teamId) const { return static_cast<uint32>(m_players[teamId].size()); }
+    // Returns the maximum players allowed per team
+    uint32 GetMaxPlayersPerTeam() const { return m_MaxPlayer; }
+
+    /// Returns the set of players waiting in the pre-battle queue (per team, read-only).
+    GuidUnorderedSet const& GetPlayersQueueSet(TeamId teamId) const { return m_PlayersInQueue[teamId]; }
+    /// Returns the map of players invited to join the active war, value is invite expiry
+    /// timestamp (per team, read-only).
+    PlayerTimerMap const& GetInvitedPlayersMap(TeamId teamId) const { return m_InvitedPlayers[teamId]; }
+    /// Returns the set of players actively fighting in the war (per team, read-only).
+    GuidUnorderedSet const& GetPlayersInWarSet(TeamId teamId) const { return m_PlayersInWar[teamId]; }
+
     void DoPlaySoundToAll(uint32 SoundID);
 
     void InvitePlayerToQueue(Player* player);

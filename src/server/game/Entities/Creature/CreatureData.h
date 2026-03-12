@@ -303,6 +303,11 @@ struct CreatureBaseStats
     uint32 AttackPower;
     uint32 RangedAttackPower;
     float BaseDamage[MAX_EXPANSIONS];
+    uint32 Strength;
+    uint32 Agility;
+    uint32 Stamina;
+    uint32 Intellect;
+    uint32 Spirit;
 
     // Helpers
 
