@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -23,13 +23,10 @@ enum Spells
 {
     SPELL_CORE_AURA_PASSIVE             = 50798,
 
-    SPELL_AMPLIFY_MAGIC_N               = 51054,
-    SPELL_AMPLIFY_MAGIC_H               = 59371,
+    SPELL_AMPLIFY_MAGIC               = 51054,
 
-    SPELL_ENERGIZE_CORES_N              = 50785,
-    SPELL_ENERGIZE_CORES_H              = 59372,
-    SPELL_ENERGIZE_CORES_THIN_N         = 61407,
-    SPELL_ENERGIZE_CORES_THIN_H         = 62136,
+    SPELL_ENERGIZE_CORES                = 50785,
+    SPELL_ENERGIZE_CORES_THIN           = 61407,
     SPELL_ENERGIZE_CORES_TRIGGER_1      = 54069,
     SPELL_ENERGIZE_CORES_TRIGGER_2      = 56251,
 
@@ -62,10 +59,6 @@ enum Events
     EVENT_ENERGIZE_CORES_THIN           = 6,
     EVENT_ENERGIZE_CORES_DAMAGE         = 7,
 };
-
-#define SPELL_AMPLIFY_MAGIC             DUNGEON_MODE(SPELL_AMPLIFY_MAGIC_N, SPELL_AMPLIFY_MAGIC_H)
-#define SPELL_ENERGIZE_CORES            DUNGEON_MODE(SPELL_ENERGIZE_CORES_N, SPELL_ENERGIZE_CORES_H)
-#define SPELL_ENERGIZE_CORES_THIN       DUNGEON_MODE(SPELL_ENERGIZE_CORES_THIN_N, SPELL_ENERGIZE_CORES_THIN_H)
 
 enum Says
 {

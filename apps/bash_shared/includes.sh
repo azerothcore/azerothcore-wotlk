@@ -16,6 +16,8 @@ source "$AC_PATH_DEPS/acore/bash-lib/src/event/hooks.sh"
 # shellcheck source=./common.sh
 source "$AC_PATH_SHARED/common.sh"
 
+acore_common_loadConfig
+
 if [[ "$OSTYPE" = "msys" ]]; then
     AC_BINPATH_FULL="$BINPATH"
 else

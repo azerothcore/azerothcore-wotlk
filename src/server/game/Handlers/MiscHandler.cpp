@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -29,6 +29,7 @@
 #include "GossipDef.h"
 #include "Group.h"
 #include "GuildMgr.h"
+#include "InstancePackets.h"
 #include "InstanceScript.h"
 #include "Language.h"
 #include "Log.h"
@@ -94,6 +95,12 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recv_data)
     std::string code = "";
 
     recv_data >> guid >> menuId >> gossipListId;
+
+    if (!_player->PlayerTalkClass->GetGossipMenu().GetItem(gossipListId))
+    {
+        recv_data.rfinish();
+        return;
+    }
 
     if (_player->PlayerTalkClass->IsGossipOptionCoded(gossipListId))
         recv_data >> code;
@@ -656,7 +663,8 @@ void WorldSession::HandleReclaimCorpseOpcode(WorldPacket& recv_data)
     if (time_t(corpse->GetGhostTime() + _player->GetCorpseReclaimDelay(corpse->GetType() == CORPSE_RESURRECTABLE_PVP)) > time_t(GameTime::GetGameTime().count()))
         return;
 
-    if (!corpse->IsWithinDistInMap(_player, CORPSE_RECLAIM_RADIUS, true))
+    // skip phase check
+    if (!corpse->IsInMap(_player) || !corpse->IsWithinDist(_player, CORPSE_RECLAIM_RADIUS, true))
         return;
 
     // resurrect
@@ -1239,7 +1247,7 @@ void WorldSession::HandleSetTitleOpcode(WorldPacket& recv_data)
     GetPlayer()->SetUInt32Value(PLAYER_CHOSEN_TITLE, title);
 }
 
-void WorldSession::HandleResetInstancesOpcode(WorldPacket& /*recv_data*/)
+void WorldSession::HandleResetInstancesOpcode(WorldPackets::Instance::ResetInstances& /*packet*/)
 {
     LOG_DEBUG("network", "WORLD: CMSG_RESET_INSTANCES");
 
@@ -1252,17 +1260,14 @@ void WorldSession::HandleResetInstancesOpcode(WorldPacket& /*recv_data*/)
         Player::ResetInstances(_player->GetGUID(), INSTANCE_RESET_ALL, false);
 }
 
-void WorldSession::HandleSetDungeonDifficultyOpcode(WorldPacket& recv_data)
+void WorldSession::HandleSetDungeonDifficultyOpcode(WorldPackets::Instance::SetDungeonDifficultyClient& packet)
 {
     LOG_DEBUG("network", "MSG_SET_DUNGEON_DIFFICULTY");
 
-    uint32 mode;
-    recv_data >> mode;
-
-    if (mode >= MAX_DUNGEON_DIFFICULTY)
+    if (packet.Mode >= MAX_DUNGEON_DIFFICULTY)
         return;
 
-    if (Difficulty(mode) == _player->GetDungeonDifficulty())
+    if (Difficulty(packet.Mode) == _player->GetDungeonDifficulty())
         return;
 
     Group* group = _player->GetGroup();
@@ -1290,7 +1295,7 @@ void WorldSession::HandleSetDungeonDifficultyOpcode(WorldPacket& recv_data)
             }
 
             group->ResetInstances(INSTANCE_RESET_CHANGE_DIFFICULTY, false, _player);
-            group->SetDungeonDifficulty(Difficulty(mode));
+            group->SetDungeonDifficulty(Difficulty(packet.Mode));
         }
     }
     else
@@ -1301,21 +1306,18 @@ void WorldSession::HandleSetDungeonDifficultyOpcode(WorldPacket& recv_data)
             return;
         }
         Player::ResetInstances(_player->GetGUID(), INSTANCE_RESET_CHANGE_DIFFICULTY, false);
-        _player->SetDungeonDifficulty(Difficulty(mode));
+        _player->SetDungeonDifficulty(Difficulty(packet.Mode));
     }
 }
 
-void WorldSession::HandleSetRaidDifficultyOpcode(WorldPacket& recv_data)
+void WorldSession::HandleSetRaidDifficultyOpcode(WorldPackets::Instance::SetRaidDifficultyClient& packet)
 {
     LOG_DEBUG("network", "MSG_SET_RAID_DIFFICULTY");
 
-    uint32 mode;
-    recv_data >> mode;
-
-    if (mode >= MAX_RAID_DIFFICULTY)
+    if (packet.Mode >= MAX_RAID_DIFFICULTY)
         return;
 
-    if (Difficulty(mode) == _player->GetRaidDifficulty())
+    if (Difficulty(packet.Mode) == _player->GetRaidDifficulty())
         return;
 
     Group* group = _player->GetGroup();
@@ -1356,7 +1358,7 @@ void WorldSession::HandleSetRaidDifficultyOpcode(WorldPacket& recv_data)
                     return;
                 }
 
-                if (IsSharedDifficultyMap(groupGuy->GetMap()->GetId()) && (uint32(mode % 2) == uint32(_player->GetRaidDifficulty() % 2)) && group->isRaidGroup())
+                if (IsSharedDifficultyMap(groupGuy->GetMap()->GetId()) && (uint32(packet.Mode % 2) == uint32(_player->GetRaidDifficulty() % 2)) && group->isRaidGroup())
                 {
                     if (!currMap)
                         currMap = groupGuy->GetMap();
@@ -1370,7 +1372,7 @@ void WorldSession::HandleSetRaidDifficultyOpcode(WorldPacket& recv_data)
 
                     if (!groupGuy->IsAlive() || groupGuy->IsInCombat() || groupGuy->GetVictim() || groupGuy->m_mover != groupGuy || groupGuy->IsNonMeleeSpellCast(true) || (!groupGuy->GetMotionMaster()->empty() && groupGuy->GetMotionMaster()->GetCurrentMovementGeneratorType() != IDLE_MOTION_TYPE)
                             || !groupGuy->movespline->Finalized() || !groupGuy->GetMap()->ToInstanceMap() || !groupGuy->GetMap()->ToInstanceMap()->GetInstanceScript() || groupGuy->GetMap()->ToInstanceMap()->GetInstanceScript()->IsEncounterInProgress()
-                            || !groupGuy->Satisfy(sObjectMgr->GetAccessRequirement(groupGuy->GetMap()->GetId(), Difficulty(mode)), groupGuy->GetMap()->GetId(), false))
+                            || !groupGuy->Satisfy(sObjectMgr->GetAccessRequirement(groupGuy->GetMap()->GetId(), Difficulty(packet.Mode)), groupGuy->GetMap()->GetId(), false))
                     {
                         _player->SendRaidDifficulty(group != nullptr);
                         return;
@@ -1442,12 +1444,12 @@ void WorldSession::HandleSetRaidDifficultyOpcode(WorldPacket& recv_data)
 
             if (!anyoneInside) // pussywizard: don't reset if changing ICC/RS difficulty while inside
                 group->ResetInstances(INSTANCE_RESET_CHANGE_DIFFICULTY, true, _player);
-            group->SetRaidDifficulty(Difficulty(mode));
+            group->SetRaidDifficulty(Difficulty(packet.Mode));
             group->SetDifficultyChangePrevention(DIFFICULTY_PREVENTION_CHANGE_RECENTLY_CHANGED);
 
             for (std::map<Player*, Position>::iterator itr = playerTeleport.begin(); itr != playerTeleport.end(); ++itr)
             {
-                itr->first->SetRaidDifficulty(Difficulty(mode)); // needed for teleport not to fail
+                itr->first->SetRaidDifficulty(Difficulty(packet.Mode)); // needed for teleport not to fail
                 if (!itr->first->TeleportTo(*(foundMaps.begin()), itr->second.GetPositionX(), itr->second.GetPositionY(), itr->second.GetPositionZ(), itr->second.GetOrientation()))
                     itr->first->GetSession()->KickPlayer("HandleSetRaidDifficultyOpcode 2");
             }
@@ -1461,7 +1463,7 @@ void WorldSession::HandleSetRaidDifficultyOpcode(WorldPacket& recv_data)
             return;
         }
         Player::ResetInstances(_player->GetGUID(), INSTANCE_RESET_CHANGE_DIFFICULTY, true);
-        _player->SetRaidDifficulty(Difficulty(mode));
+        _player->SetRaidDifficulty(Difficulty(packet.Mode));
     }
 }
 
@@ -1490,6 +1492,8 @@ void WorldSession::HandleMoveFlagChangeOpcode(WorldPacket& recv_data)
 {
     LOG_DEBUG("network", "WORLD: {}", GetOpcodeNameForLogging((Opcodes)recv_data.GetOpcode()));
 
+    Opcodes opcode = (Opcodes)recv_data.GetOpcode();
+
     ObjectGuid guid;
     uint32 counter;
     uint32 isApplied;
@@ -1507,7 +1511,8 @@ void WorldSession::HandleMoveFlagChangeOpcode(WorldPacket& recv_data)
     movementInfo.guid = guid;
     ReadMovementInfo(recv_data, &movementInfo);
 
-    recv_data >> isApplied;
+    if (opcode != CMSG_MOVE_GRAVITY_DISABLE_ACK && opcode != CMSG_MOVE_GRAVITY_ENABLE_ACK)
+        recv_data >> isApplied;
 
     sScriptMgr->AnticheatSetCanFlybyServer(_player, movementInfo.HasMovementFlag(MOVEMENTFLAG_CAN_FLY));
 
@@ -1515,6 +1520,19 @@ void WorldSession::HandleMoveFlagChangeOpcode(WorldPacket& recv_data)
     Player* plrMover = mover->ToPlayer();
 
     mover->m_movementInfo.flags = movementInfo.GetMovementFlags();
+
+    // old map - async processing, ignore
+    if (counter <= _player->GetMapChangeOrderCounter())
+        return;
+
+    if (!ProcessMovementInfo(movementInfo, mover, plrMover, recv_data))
+    {
+        recv_data.rfinish();                     // prevent warnings spam
+        return;
+    }
+
+    if (_player->GetPendingFlightChange() == counter && opcode == CMSG_MOVE_SET_CAN_FLY_ACK)
+        _player->SetPendingFlightChange(false);
 
     Opcodes response;
 
@@ -1524,17 +1542,12 @@ void WorldSession::HandleMoveFlagChangeOpcode(WorldPacket& recv_data)
         case CMSG_MOVE_FEATHER_FALL_ACK: response = MSG_MOVE_FEATHER_FALL; break;
         case CMSG_MOVE_WATER_WALK_ACK: response = MSG_MOVE_WATER_WALK; break;
         case CMSG_MOVE_SET_CAN_FLY_ACK: response = MSG_MOVE_UPDATE_CAN_FLY; break;
+        case CMSG_MOVE_GRAVITY_DISABLE_ACK: response = MSG_MOVE_GRAVITY_CHNG; break;
+        case CMSG_MOVE_GRAVITY_ENABLE_ACK: response = MSG_MOVE_GRAVITY_CHNG; break;
         default: return;
     }
 
-    if (!ProcessMovementInfo(movementInfo, mover, plrMover, recv_data))
-    {
-        recv_data.rfinish();                     // prevent warnings spam
-        return;
-    }
-
     WorldPacket data(response, 8);
-    data << guid.WriteAsPacked();
     WriteMovementInfo(&data, &movementInfo);
     _player->m_mover->SendMessageToSet(&data, _player);
 }
@@ -1548,8 +1561,15 @@ void WorldSession::HandleRequestPetInfo(WorldPackets::Pet::RequestPetInfo& /*pac
 
     if (_player->GetPet())
         _player->PetSpellInitialize();
-    else if (_player->GetCharm())
-        _player->CharmSpellInitialize();
+    else if (Unit* charm = _player->GetCharm())
+    {
+        if (charm->HasUnitState(UNIT_STATE_POSSESSED))
+            _player->PossessSpellInitialize();
+        else if (charm->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && charm->HasUnitFlag(UNIT_FLAG_POSSESSED))
+            _player->VehicleSpellInitialize();
+        else
+            _player->CharmSpellInitialize();
+    }
 }
 
 void WorldSession::HandleSetTaxiBenchmarkOpcode(WorldPacket& recv_data)
@@ -1679,11 +1699,8 @@ void WorldSession::HandleHearthAndResurrect(WorldPacket& /*recv_data*/)
     _player->TeleportTo(_player->m_homebindMapId, _player->m_homebindX, _player->m_homebindY, _player->m_homebindZ, _player->GetOrientation());
 }
 
-void WorldSession::HandleInstanceLockResponse(WorldPacket& recvPacket)
+void WorldSession::HandleInstanceLockResponse(WorldPackets::Instance::InstanceLockResponse& packet)
 {
-    uint8 accept;
-    recvPacket >> accept;
-
     if (!_player->HasPendingBind() || _player->GetPendingBind() != _player->GetInstanceId() || (_player->GetGroup() && _player->GetGroup()->isLFGGroup() && _player->GetGroup()->IsLfgRandomInstance()))
     {
         LOG_DEBUG("network.opcode", "InstanceLockResponse: Player {} ({}) tried to bind himself/teleport to graveyard without a pending bind!",
@@ -1691,7 +1708,7 @@ void WorldSession::HandleInstanceLockResponse(WorldPacket& recvPacket)
         return;
     }
 
-    if (accept)
+    if (packet.Accept)
         _player->BindToInstance();
     else
         _player->RepopAtGraveyard();

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -1860,22 +1860,22 @@ struct dragonmaw_race_npc : public ScriptedAI
         switch (me->GetEntry())
         {
         case NPC_MUCKJAW:
-            me->GetMotionMaster()->MovePath(PATH_MUCKJAW, false);
+            me->GetMotionMaster()->MoveWaypoint(PATH_MUCKJAW, false);
             break;
         case NPC_TROPE:
-            me->GetMotionMaster()->MovePath(PATH_TROPE, false);
+            me->GetMotionMaster()->MoveWaypoint(PATH_TROPE, false);
             break;
         case NPC_CORLOK:
-            me->GetMotionMaster()->MovePath(PATH_CORLOK, false);
+            me->GetMotionMaster()->MoveWaypoint(PATH_CORLOK, false);
             break;
         case NPC_ICHMAN:
-            me->GetMotionMaster()->MovePath(PATH_ICHMAN, false);
+            me->GetMotionMaster()->MoveWaypoint(PATH_ICHMAN, false);
             break;
         case NPC_MULVERICK:
-            me->GetMotionMaster()->MovePath(PATH_MULVERICK, false);
+            me->GetMotionMaster()->MoveWaypoint(PATH_MULVERICK, false);
             break;
         case NPC_SKYSHATTER:
-            me->GetMotionMaster()->MovePath(PATH_SKYSHATTER, false);
+            me->GetMotionMaster()->MoveWaypoint(PATH_SKYSHATTER, false);
             break;
         default:
             break;

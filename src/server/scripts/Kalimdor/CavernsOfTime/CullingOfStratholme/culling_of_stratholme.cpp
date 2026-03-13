@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -141,8 +141,7 @@ enum Spells
 {
     // Combat spells
     SPELL_ARTHAS_AURA                       = 52442,
-    SPELL_ARTHAS_EXORCISM_N                 = 52445,
-    SPELL_ARTHAS_EXORCISM_H                 = 58822,
+    SPELL_ARTHAS_EXORCISM                   = 52445,
     SPELL_ARTHAS_HOLY_LIGHT                 = 52444,
 
     // Visuals
@@ -424,7 +423,7 @@ public:
             {
                 Talk(SAY_PHASE201);
                 actionEvents.ScheduleEvent(EVENT_ACTION_PHASE2, 12s);
-                SetRun(false);
+                me->SetWalk(true);
                 eventInRun = true;
 
                 me->SummonCreature(NPC_CITY_MAN, EventPos[EVENT_SRC_TOWN_CITYMAN1]);
@@ -434,14 +433,14 @@ public:
             {
                 waveGroupId = 10;
                 eventInRun = true;
-                SetRun(true);
+                me->SetWalk(false);
                 actionEvents.ScheduleEvent(EVENT_ACTION_PHASE2 + 9, 10s);
             }
             else if (param == ACTION_START_TOWN_HALL)
             {
                 Talk(SAY_PHASE301);
                 SetEscortPaused(false);
-                SetRun(false);
+                me->SetWalk(true);
 
                 if (Creature* cr = me->SummonCreature(NPC_CITY_MAN3, EventPos[EVENT_SRC_HALL_CITYMAN1]))
                 {
@@ -460,13 +459,13 @@ public:
             {
                 Talk(SAY_PHASE401);
                 SetEscortPaused(false);
-                SetRun(false);
+                me->SetWalk(true);
             }
             else if (param == ACTION_START_LAST_CITY)
             {
                 Talk(SAY_PHASE404);
                 SetEscortPaused(false);
-                SetRun(true);
+                me->SetWalk(false);
             }
             else if (param == ACTION_START_MALGANIS)
             {
@@ -480,7 +479,7 @@ public:
                 }
                 Talk(SAY_PHASE501);
                 SetEscortPaused(false);
-                SetRun(true);
+                me->SetWalk(false);
             }
             else if (param == ACTION_KILLED_MALGANIS)
             {
@@ -533,7 +532,7 @@ public:
                     break;
                 // After intro, in front of bridge
                 case 3:
-                    SetRun(true);
+                    me->SetWalk(false);
                     Talk(SAY_PHASE118);
                     summons.DespawnAll(); // uther, jaina and horses
                     break;
@@ -574,7 +573,7 @@ public:
                     if (pInstance)
                         pInstance->SetData(DATA_ARTHAS_EVENT, COS_PROGRESS_REACHED_TOWN_HALL);
                     me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                    SetRun(false);
+                    me->SetWalk(true);
                     SetEscortPaused(true);
                     break;
                 // Inside Town Hall first scene pos
@@ -600,7 +599,7 @@ public:
                     break;
                 // Town Hall, upper floor third fight
                 case 31:
-                    SetRun(false);
+                    me->SetWalk(true);
                     SpawnTimeRift();
                     SpawnTimeRift();
                     Talk(SAY_PHASE312);
@@ -616,14 +615,14 @@ public:
                     break;
                 // Reached book shelf
                 case 36:
-                    SetRun(true);
+                    me->SetWalk(false);
                     if (pInstance)
                         if (GameObject* pGate = pInstance->instance->GetGameObject(pInstance->GetGuidData(DATA_SHKAF_GATE)))
                             pGate->SetGoState(GO_STATE_ACTIVE);
                     break;
                 // Behind secred passage
                 case 45:
-                    SetRun(true);
+                    me->SetWalk(false);
                     me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     SetEscortPaused(true);
                     if (pInstance)
@@ -631,11 +630,11 @@ public:
                     break;
                 // Some walk talk
                 case 47:
-                    SetRun(false);
+                    me->SetWalk(true);
                     Talk(SAY_PHASE405);
                     break;
                 case 48:
-                    SetRun(true);
+                    me->SetWalk(false);
                     Talk(SAY_PHASE406);
                     break;
                 case 53:
@@ -674,7 +673,7 @@ public:
                 switch (uint32 currentEvent = actionEvents.ExecuteEvent())
                 {
                     case EVENT_ACTION_PHASE1:
-                        SetRun(false);
+                        me->SetWalk(true);
                         me->SummonCreature(NPC_JAINA, EventPos[EVENT_SRC_JAINA], TEMPSUMMON_DEAD_DESPAWN, 180000);
                         if (Creature* uther = me->SummonCreature(NPC_UTHER, EventPos[EVENT_SRC_UTHER], TEMPSUMMON_DEAD_DESPAWN, 180000))
                         {
@@ -690,6 +689,7 @@ public:
                         break;
                     case EVENT_ACTION_PHASE1+1:
                         // Start Event
+                        me->SetWalk(true);
                         Start(true);
                         SetDespawnAtEnd(false);
                         SetDespawnAtFar(false);
@@ -958,7 +958,7 @@ public:
                         break;
                     // After waypoint 23
                     case EVENT_ACTION_PHASE3+3:
-                        SetRun(true);
+                        me->SetWalk(false);
                         if (Creature* cr = GetEventNpc(NPC_CITY_MAN3))
                             me->CastSpell(cr, SPELL_ARTHAS_CRUSADER_STRIKE, true);
                         ScheduleNextEvent(currentEvent, 2s);
@@ -1153,8 +1153,6 @@ public:
                             pInstance->SetData(DATA_ARTHAS_EVENT, COS_PROGRESS_FINISHED);
                             if (GameObject* go = pInstance->instance->GetGameObject(pInstance->GetGuidData(DATA_EXIT_GATE)))
                                 go->SetGoState(GO_STATE_ACTIVE);
-
-                            pInstance->instance->SummonGameObject(DUNGEON_MODE(GO_MALGANIS_CHEST_N, GO_MALGANIS_CHEST_H), 2288.35f, 1498.73f, 128.414f, -0.994837f, 0, 0, 0, 0, 7 * DAY * IN_MILLISECONDS);
                         }
                         ScheduleNextEvent(currentEvent, 10s);
                         break;
@@ -1177,7 +1175,7 @@ public:
             {
                 case EVENT_COMBAT_EXORCISM:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                        me->CastSpell(target, DUNGEON_MODE(SPELL_ARTHAS_EXORCISM_N, SPELL_ARTHAS_EXORCISM_H), false);
+                        me->CastSpell(target, SPELL_ARTHAS_EXORCISM, false);
 
                     combatEvents.Repeat(7300ms);
                     break;
@@ -1297,7 +1295,7 @@ void npc_arthas::npc_arthasAI::ReorderInstance(uint32 data)
     if (data >= COS_PROGRESS_KILLED_EPOCH)
         if (pInstance)
             if (GameObject* pGate = pInstance->instance->GetGameObject(pInstance->GetGuidData(DATA_SHKAF_GATE)))
-                pGate->SetGoState(GO_STATE_READY);
+                pGate->SetGoState(GO_STATE_ACTIVE);
 
     pInstance->SetData(DATA_SHOW_INFINITE_TIMER, 1);
 }
@@ -1404,7 +1402,10 @@ enum chromie
     ITEM_ARCANE_DISRUPTOR               = 37888,
     QUEST_DISPELLING_ILLUSIONS          = 13149,
     QUEST_A_ROYAL_ESCORT                = 13151,
-    SPELL_SUMMON_ARCANE_DISRUPTOR       = 49591
+    SPELL_SUMMON_ARCANE_DISRUPTOR       = 49591,
+    GOSSIP_MENU_START                   = 9586,
+    GOSSIP_MENU_ACTION_MENU_SKIP        = 11277,
+    GOSSIP_MENU_ACTION_INTERFERE        = 9595
 };
 
 class npc_cos_chromie_start : public CreatureScript
@@ -1412,55 +1413,55 @@ class npc_cos_chromie_start : public CreatureScript
 public:
     npc_cos_chromie_start() : CreatureScript("npc_cos_chromie_start") { }
 
-    bool OnQuestAccept(Player*, Creature* creature, const Quest* pQuest)
+    bool OnQuestAccept(Player* /*player*/, Creature* creature, const Quest* quest) override
     {
-        if (pQuest->GetQuestId() == QUEST_DISPELLING_ILLUSIONS)
-        {
-            if (InstanceScript* pInstance = creature->GetInstanceScript())
-            {
-                pInstance->SetData(DATA_SHOW_CRATES, 1);
-            }
-        }
+        if (quest->GetQuestId() == QUEST_DISPELLING_ILLUSIONS)
+            if (InstanceScript* instance = creature->GetInstanceScript())
+                instance->SetData(DATA_SHOW_CRATES, 1);
 
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 /*action*/)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 /*action*/) override
     {
-        // final menu id, show crates if hidden and add item if missing
-        if (player->PlayerTalkClass->GetGossipMenu().GetMenuId() == 9595)
+        switch (player->PlayerTalkClass->GetGossipMenu().GetMenuId())
         {
-            if (InstanceScript* pInstance = creature->GetInstanceScript())
+            case GOSSIP_MENU_START:
             {
-                if (pInstance->GetData(DATA_ARTHAS_EVENT) == COS_PROGRESS_NOT_STARTED)
-                {
-                    pInstance->SetData(DATA_SHOW_CRATES, 1);
-                }
-            }
+                if (InstanceScript* instance = creature->GetInstanceScript())
+                    if (instance->GetData(DATA_ARTHAS_EVENT) == COS_PROGRESS_NOT_STARTED)
+                        instance->SetData(DATA_SHOW_CRATES, 1);
 
-            if (!player->HasItemCount(ITEM_ARCANE_DISRUPTOR))
-            {
-                creature->CastSpell(player, SPELL_SUMMON_ARCANE_DISRUPTOR);
+                break;
             }
-        }
-        // Skip Event
-        else if (player->PlayerTalkClass->GetGossipMenu().GetMenuId() == 11277)
-        {
-            if (InstanceScript* pInstance = creature->GetInstanceScript())
+            case GOSSIP_MENU_ACTION_INTERFERE:
             {
-                if (pInstance->GetData(DATA_ARTHAS_EVENT) == COS_PROGRESS_NOT_STARTED)
+                if (!player->HasItemCount(ITEM_ARCANE_DISRUPTOR))
+                    creature->CastSpell(player, SPELL_SUMMON_ARCANE_DISRUPTOR);
+
+                break;
+            }
+            // Since 3.3.3: "Players may now skip the initial introduction dialog to this dungeon once they have completed it at least once."
+            case GOSSIP_MENU_ACTION_MENU_SKIP:
+            {
+                if (InstanceScript* instance = creature->GetInstanceScript())
                 {
-                    pInstance->SetData(DATA_ARTHAS_EVENT, COS_PROGRESS_FINISHED_INTRO);
-                    if (Creature* arthas = ObjectAccessor::GetCreature(*creature, pInstance->GetGuidData(DATA_ARTHAS)))
+                    if (instance->GetData(DATA_ARTHAS_EVENT) == COS_PROGRESS_NOT_STARTED)
                     {
-                        arthas->AI()->Reset();
+                        instance->SetData(DATA_ARTHAS_EVENT, COS_PROGRESS_FINISHED_INTRO);
+
+                        if (Creature* arthas = ObjectAccessor::GetCreature(*creature, instance->GetGuidData(DATA_ARTHAS)))
+                            arthas->AI()->Reset();
                     }
+
+                    player->NearTeleportTo(LeaderIntroPos2.GetPositionX(), LeaderIntroPos2.GetPositionY(), LeaderIntroPos2.GetPositionZ(), LeaderIntroPos2.GetOrientation());
                 }
-                player->NearTeleportTo(LeaderIntroPos2.GetPositionX(), LeaderIntroPos2.GetPositionY(), LeaderIntroPos2.GetPositionZ(), LeaderIntroPos2.GetOrientation());
+                break;
             }
+            default:
+                break;
         }
 
-        // return false to display last windows
         return false;
     }
 };
@@ -1485,7 +1486,7 @@ public:
         if (!creature->GetInstanceScript() || creature->GetInstanceScript()->GetData(DATA_ARTHAS_EVENT) != COS_PROGRESS_CRATES_FOUND)
             return true;
 
-        // We can start event:)
+        // "Well, you're not going to sign recruitment papers or anything, but you are going to fight alongside him. ..."
         if (player->PlayerTalkClass->GetGossipMenu().GetMenuId() == 9612)
             creature->GetInstanceScript()->SetData(DATA_ARTHAS_EVENT, COS_PROGRESS_START_INTRO);
 

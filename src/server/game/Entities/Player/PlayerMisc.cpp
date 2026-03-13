@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -17,6 +17,7 @@
 
 #include "AccountMgr.h"
 #include "GameTime.h"
+#include "InstancePackets.h"
 #include "MapMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
@@ -78,7 +79,7 @@ bool Player::CanSpeak() const
 void Player::SendAttackSwingNotInRange()
 {
     WorldPacket data(SMSG_ATTACKSWING_NOTINRANGE, 0);
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 void Player::SavePositionInDB(uint32 mapid, float x, float y, float z, float o, uint32 zone, ObjectGuid guid)
@@ -128,25 +129,25 @@ void Player::Customize(CharacterCustomizeInfo const* customizeInfo, CharacterDat
 void Player::SendAttackSwingDeadTarget()
 {
     WorldPacket data(SMSG_ATTACKSWING_DEADTARGET, 0);
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 void Player::SendAttackSwingCantAttack()
 {
     WorldPacket data(SMSG_ATTACKSWING_CANT_ATTACK, 0);
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 void Player::SendAttackSwingCancelAttack()
 {
     WorldPacket data(SMSG_CANCEL_COMBAT, 0);
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 void Player::SendAttackSwingBadFacingAttack()
 {
     WorldPacket data(SMSG_ATTACKSWING_BADFACING, 0);
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 void Player::SendAutoRepeatCancel(Unit* target)
@@ -161,34 +162,30 @@ void Player::SendExplorationExperience(uint32 Area, uint32 Experience)
     WorldPacket data(SMSG_EXPLORATION_EXPERIENCE, 8);
     data << uint32(Area);
     data << uint32(Experience);
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 void Player::SendDungeonDifficulty(bool IsInGroup)
 {
-    uint8 val = 0x00000001;
-    WorldPacket data(MSG_SET_DUNGEON_DIFFICULTY, 12);
-    data << (uint32)GetDungeonDifficulty();
-    data << uint32(val);
-    data << uint32(IsInGroup);
-    GetSession()->SendPacket(&data);
+    WorldPackets::Instance::SetDungeonDifficulty setDungeonDifficulty;
+    setDungeonDifficulty.Difficulty = GetDungeonDifficulty();
+    setDungeonDifficulty.IsInGroup = IsInGroup;
+    SendDirectMessage(setDungeonDifficulty.Write());
 }
 
 void Player::SendRaidDifficulty(bool IsInGroup, int32 forcedDifficulty)
 {
-    uint8 val = 0x00000001;
-    WorldPacket data(MSG_SET_RAID_DIFFICULTY, 12);
-    data << uint32(forcedDifficulty == -1 ? GetRaidDifficulty() : forcedDifficulty);
-    data << uint32(val);
-    data << uint32(IsInGroup);
-    GetSession()->SendPacket(&data);
+    WorldPackets::Instance::SetRaidDifficulty setRaidDifficulty;
+    setRaidDifficulty.Difficulty = (forcedDifficulty == -1 ? GetRaidDifficulty() : forcedDifficulty);
+    setRaidDifficulty.IsInGroup = IsInGroup;
+    SendDirectMessage(setRaidDifficulty.Write());
 }
 
 void Player::SendResetFailedNotify(uint32 mapid)
 {
-    WorldPacket data(SMSG_RESET_FAILED_NOTIFY, 4);
-    data << uint32(mapid);
-    GetSession()->SendPacket(&data);
+    WorldPackets::Instance::ResetFailedNotify resetFailedNotify;
+    resetFailedNotify.MapId = mapid;
+    SendDirectMessage(resetFailedNotify.Write());
 }
 
 /// Reset all solo instances and optionally send a message on success for each
@@ -220,7 +217,7 @@ void Player::ResetInstances(ObjectGuid guid, uint8 method, bool isRaid)
                 }
                 else
                 {
-                    p->SendResetInstanceFailed(0, instanceSave->GetMapId());
+                    p->SendResetInstanceFailed(INSTANCE_RESET_FAILED, instanceSave->GetMapId());
                 }
 
                 sInstanceSaveMgr->DeleteInstanceSavedData(instanceSave->GetInstanceId());
@@ -255,7 +252,7 @@ void Player::ResetInstances(ObjectGuid guid, uint8 method, bool isRaid)
                 }
                 else
                 {
-                    p->SendResetInstanceFailed(0, instanceSave->GetMapId());
+                    p->SendResetInstanceFailed(INSTANCE_RESET_FAILED, instanceSave->GetMapId());
                 }
 
                 sInstanceSaveMgr->DeleteInstanceSavedData(instanceSave->GetInstanceId());
@@ -325,22 +322,17 @@ void Player::ResetInstances(ObjectGuid guid, uint8 method, bool isRaid)
 
 void Player::SendResetInstanceSuccess(uint32 MapId)
 {
-    WorldPacket data(SMSG_INSTANCE_RESET, 4);
-    data << uint32(MapId);
-    GetSession()->SendPacket(&data);
+    WorldPackets::Instance::InstanceReset instanceReset;
+    instanceReset.MapId = MapId;
+    SendDirectMessage(instanceReset.Write());
 }
 
-void Player::SendResetInstanceFailed(uint32 reason, uint32 MapId)
+void Player::SendResetInstanceFailed(InstanceResetFailureReason reason, uint32 MapId)
 {
-    /*reasons for instance reset failure:
-    // 0: There are players inside the instance.
-    // 1: There are players offline in your party.
-    // 2>: There are players in your party attempting to zone into an instance.
-    */
-    WorldPacket data(SMSG_INSTANCE_RESET_FAILED, 4);
-    data << uint32(reason);
-    data << uint32(MapId);
-    GetSession()->SendPacket(&data);
+    WorldPackets::Instance::InstanceResetFailed instanceResetFailed;
+    instanceResetFailed.Reason = reason;
+    instanceResetFailed.MapId = MapId;
+    SendDirectMessage(instanceResetFailed.Write());
 }
 
 /*********************************************************/

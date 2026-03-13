@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -23,8 +23,7 @@ enum Spells
 {
     SPELL_ENSNARING_MOSS    = 31948,
     SPELL_FRENZY            = 34970,
-    SPELL_GRIEVOUS_WOUND_N  = 31956,
-    SPELL_GRIEVOUS_WOUND_H  = 38801,
+    SPELL_GRIEVOUS_WOUND  = 31956,
     SPELL_WATER_SPIT        = 35008
 };
 
@@ -53,7 +52,7 @@ struct boss_rokmar_the_crackler : public BossAI
 
         scheduler.Schedule(8s, [this] (TaskContext context)
         {
-            DoCastVictim(DUNGEON_MODE(SPELL_GRIEVOUS_WOUND_N, SPELL_GRIEVOUS_WOUND_H));
+            DoCastVictim(SPELL_GRIEVOUS_WOUND);
             context.Repeat(20700ms);
         }).Schedule(15300ms, [this](TaskContext context)
         {

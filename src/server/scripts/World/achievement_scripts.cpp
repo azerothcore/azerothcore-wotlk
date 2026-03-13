@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -265,6 +265,23 @@ class achievement_flirt_with_disaster_perf_check : public AchievementCriteriaScr
         }
 };
 
+enum FaLaLaLaOgrila
+{
+    SPELL_FRESH_HOLLY     = 44824,
+    SPELL_PRESERVED_HOLLY = 62061,
+};
+
+class achievement_fa_la_la_la_ogrila : public AchievementCriteriaScript
+{
+public:
+    achievement_fa_la_la_la_ogrila() : AchievementCriteriaScript("achievement_fa_la_la_la_ogrila") {}
+
+    bool OnCheck(Player* player, Unit* /*target*/, uint32 /*criteria_id*/) override
+    {
+        return player->HasAura(SPELL_FRESH_HOLLY) || player->HasAura(SPELL_PRESERVED_HOLLY);
+    }
+};
+
 void AddSC_achievement_scripts()
 {
     new achievement_resilient_victory();
@@ -285,4 +302,5 @@ void AddSC_achievement_scripts()
     new achievement_not_even_a_scratch();
     new achievement_killed_exp_or_honor_target();
     new achievement_flirt_with_disaster_perf_check();
+    new achievement_fa_la_la_la_ogrila();
 }

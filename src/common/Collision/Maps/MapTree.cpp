@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -51,22 +51,6 @@ namespace VMAP
         bool hit;
     };
 
-    class AreaInfoCallback
-    {
-    public:
-        AreaInfoCallback(ModelInstance* val): prims(val) {}
-        void operator()(const Vector3& point, uint32 entry)
-        {
-#if defined(VMAP_DEBUG)
-            LOG_DEBUG("maps", "AreaInfoCallback: trying to intersect '{}'", prims[entry].name);
-#endif
-            prims[entry].intersectPoint(point, aInfo);
-        }
-
-        ModelInstance* prims;
-        AreaInfo aInfo;
-    };
-
     class LocationInfoCallback
     {
     public:
@@ -97,22 +81,6 @@ namespace VMAP
         //tilefilename << std::setw(2) << tileX << '_' << std::setw(2) << tileY << ".vmtile";
         tilefilename << std::setw(2) << tileY << '_' << std::setw(2) << tileX << ".vmtile";
         return tilefilename.str();
-    }
-
-    bool StaticMapTree::GetAreaInfo(Vector3& pos, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const
-    {
-        AreaInfoCallback intersectionCallBack(iTreeValues);
-        iTree.intersectPoint(pos, intersectionCallBack);
-        if (intersectionCallBack.aInfo.result)
-        {
-            flags = intersectionCallBack.aInfo.flags;
-            adtId = intersectionCallBack.aInfo.adtId;
-            rootId = intersectionCallBack.aInfo.rootId;
-            groupId = intersectionCallBack.aInfo.groupId;
-            pos.z = intersectionCallBack.aInfo.ground_Z;
-            return true;
-        }
-        return false;
     }
 
     bool StaticMapTree::GetLocationInfo(const Vector3& pos, LocationInfo& info) const

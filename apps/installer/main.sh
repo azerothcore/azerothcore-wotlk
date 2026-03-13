@@ -45,6 +45,7 @@ menu_items=(
     "docker|dr|Run docker tools"
     "version|v|Show AzerothCore version"
     "service-manager|sm|Run service manager to run authserver and worldserver in background"
+    "config|cf|Configuration manager"
     "quit|q|Exit from this menu"
 )
 
@@ -99,6 +100,9 @@ function handle_menu_command() {
         "service-manager")
             bash "$AC_PATH_APPS/startup-scripts/src/service-manager.sh" "$@"
             exit
+            ;;
+        "config")
+            bash "$AC_PATH_APPS/installer/includes/config/config-main.sh" "$@"
             ;;
         "quit")
             echo "Goodbye!"

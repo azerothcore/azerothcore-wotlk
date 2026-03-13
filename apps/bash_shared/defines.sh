@@ -25,4 +25,6 @@ export AC_PATH_MODULES="$AC_PATH_ROOT/modules"
 
 export AC_PATH_DEPS="$AC_PATH_ROOT/deps"
 
+export AC_BASH_LIB_PATH="$AC_PATH_DEPS/acore/bash-lib/src"
+
 export AC_PATH_VAR="$AC_PATH_ROOT/var"

@@ -527,9 +527,11 @@ float GridTerrainData::getLiquidLevel(float x, float y) const
 }
 
 // Get water state on map
-LiquidData const GridTerrainData::GetLiquidData(float x, float y, float z, float collisionHeight, uint8 ReqLiquidType) const
+LiquidData const GridTerrainData::GetLiquidData(float x, float y, float z, float collisionHeight, Optional<uint8> ReqLiquidType) const
 {
     LiquidData liquidData;
+    liquidData.Status = LIQUID_MAP_NO_WATER;
+
     if (!_loadedLiquidData)
         return liquidData;
 
@@ -575,7 +577,7 @@ LiquidData const GridTerrainData::GetLiquidData(float x, float y, float z, float
         }
 
         // Check req liquid type mask
-        if (type != 0 && (!ReqLiquidType || (ReqLiquidType & type) != 0))
+        if (type != 0 && (!ReqLiquidType || (*ReqLiquidType & type) != 0))
         {
             // Check water level:
             // Check water height map

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -347,7 +347,7 @@ struct boss_kaelthas : public BossAI
         }
         else if (point == POINT_AIR)
         {
-            me->SetDisableGravity(true, false, false); // updating AnimationTier will break drowning animation later
+            me->SetDisableGravity(true); // updating AnimationTier will break drowning animation later
         }
         else if (point == POINT_START_LAST_PHASE)
         {
@@ -1032,7 +1032,7 @@ public:
     bool Execute(uint64 /*execTime*/, uint32 /*diff*/) override
     {
         if (_owner->IsBeingTeleportedNear())
-            _owner->m_Events.AddEvent(new lapseTeleport(_owner), _owner->m_Events.CalculateTime(1));
+            _owner->m_Events.AddEventAtOffset(new lapseTeleport(_owner), 1ms);
         else if (!_owner->IsBeingTeleported())
         {
             _owner->CastSpell(_owner, SPELL_GRAVITY_LAPSE_KNOCKBACK, true);
@@ -1062,7 +1062,7 @@ class spell_kaelthas_gravity_lapse : public SpellScript
             if (Player* target = GetHitPlayer())
             {
                 GetCaster()->CastSpell(target, _currentSpellId++, true);
-                target->m_Events.AddEvent(new lapseTeleport(target), target->m_Events.CalculateTime(1));
+                target->m_Events.AddEventAtOffset(new lapseTeleport(target), 1ms);
             }
     }
 

@@ -34,6 +34,7 @@
 #    CHARACTER DELETE
 #    CHARACTER CREATION
 #    CHARACTER
+#    ACHIEVEMENT
 #    SKILL
 #    STATS
 #    REPUTATION
@@ -53,6 +54,7 @@
 #    CHARTER
 #    GUILD
 #    FFAPVP
+#    OUTDOORPVP
 #    WINTERGRASP
 #    BATTLEGROUND
 #    ARENA
@@ -398,6 +400,20 @@ Network.TcpNodelay = 1
 Network.EnableProxyProtocol = 0
 
 #
+#    Network.UseSocketActivation
+#        Description: [LINUX ONLY FEATURE] Enable systemd socket activation support for the worldserver.
+#                     When enabled and the process is started by systemd socket activation,
+#                     the server will use the socket passed by systemd instead of
+#                     creating and binding its own listening socket. Disabled by default.
+#
+#                     When enabled the realm is not automatically set as offline on shutdown.
+#
+#        Example:     1 - (Enabled)
+#        Default:     0 - (Disabled)
+
+Network.UseSocketActivation = 0
+
+#
 ###################################################################################################
 
 ###################################################################################################
@@ -666,6 +682,7 @@ Appender.Server=2,5,0,Server.log,w
 # Appender.GM=2,5,15,gm_%s.log
 Appender.Errors=2,2,0,Errors.log,w
 # Appender.DB=3,5,0
+# Appender.Dev=2,5,0,Dev.log,a
 
 #  Logger config values: Given a logger "name"
 #    Logger.name
@@ -700,7 +717,6 @@ Logger.module=4,Console Server
 Logger.spells.scripts=2,Console Errors
 #Logger.achievement=4,Console Server
 #Logger.addon=4,Console Server
-#Logger.ahbot=4,Console Server
 #Logger.auctionHouse=4,Console Server
 #Logger.autobroadcast=4, Console Server
 #Logger.bg.arena=4,Console Server
@@ -790,7 +806,7 @@ Logger.spells.scripts=2,Console Errors
 #Logger.spells.effect=4,Console Server
 #Logger.spells.scripts=4,Console Server
 #Logger.spells=4,Console Server
-#Logger.sql.dev=4,Console Server
+#Logger.sql.dev=4,Console Server Dev
 #Logger.sql.driver=4,Console Server
 #Logger.vehicles=4,Console Server
 #Logger.warden=4,Console Server
@@ -2171,7 +2187,7 @@ Rate.MissChanceMultiplier.OnlyAffectsPlayer = 0
 
 #
 #     LevelReq.Trade
-#        Description: Level requirement for characters to be able to trade.
+#        Description: Level requirement for characters to be able to initiate a trade.
 #        Default:     1
 
 LevelReq.Trade = 1
@@ -2206,6 +2222,22 @@ SpellQueue.Enabled = 1
 #        Default:     400 - (400ms)
 
 SpellQueue.Window = 400
+
+#
+###################################################################################################
+
+###################################################################################################
+# ACHIEVEMENT
+#
+#    Achievement.RealmFirstKillWindow
+#        Description: Time window (in seconds) for realm first kill achievements after the first
+#                     completion. This setting controls whether multiple groups can earn the
+#                     realm first kill achievement within a short time window.
+#        Default:     60 - (Allow additional groups to complete within 60 seconds/1 minute)
+#                     0  - (Strict mode, only the first group/player gets the achievement)
+#                     1+ - (Extended window, allow N seconds for additional completions)
+
+Achievement.RealmFirstKillWindow = 60
 
 #
 ###################################################################################################
@@ -2407,6 +2439,13 @@ Rate.XP.BattlegroundKillSOTA = 1
 Rate.XP.BattlegroundKillIC   = 1
 
 #
+#    Rate.XP.BattlegroundBonus
+#        Description: Experience rate multiplier for battleground objectives (flag captures, base assaults, etc.).
+#        Default:     1
+
+Rate.XP.BattlegroundBonus = 1
+
+#
 #    Rate.Pet.LevelXP
 #        Description: Modifies the amount of experience required to level up a pet.
 #       The lower the rate the less experience is required.
@@ -2485,6 +2524,20 @@ Arena.LegacyArenaPoints = 0
 #        Default:     1
 
 Rate.ArenaPoints = 1
+
+#
+#    Rate.ArenaPoints2v2
+#        Description: Arena points gain rate for 2v2 bracket.
+#        Default:     0.76
+
+Rate.ArenaPoints2v2 = 0.76
+
+#
+#    Rate.ArenaPoints3v3
+#        Description: Arena points gain rate for 3v3 bracket.
+#        Default:     0.88
+
+Rate.ArenaPoints3v3 = 0.88
 
 #
 #    PvPToken.Enable
@@ -2780,8 +2833,7 @@ QuestPOI.Enabled = 1
 #        Description: Level difference between player and quest level at which quests are
 #                     considered low-level and are not shown via exclamation mark (!) at quest
 #                     givers.
-#        Default:     4  - (Enabled, Hide quests that have 4 levels less than the character)
-#                     -1 - (Disabled, Show all available quest marks)
+#        Default:     4  - (Enabled, Hide quests that are more than 4 levels lower than the character)
 
 Quests.LowLevelHideDiff = 4
 
@@ -2790,8 +2842,7 @@ Quests.LowLevelHideDiff = 4
 #        Description: Level difference between player and quest level at which quests are
 #                     considered high-level and are not shown via exclamation mark (!) at quest
 #                     givers.
-#        Default:     7  - (Enabled, Hide quests that have 7 levels more than the character)
-#                     -1 - (Disabled, Show all available quest marks)
+#        Default:     7  - (Enabled, Hide quests that are more than 7 levels higher than the character)
 
 Quests.HighLevelHideDiff = 7
 
@@ -3362,6 +3413,25 @@ DungeonAccessRequirements.LFGLevelDBCOverride = 0
 DungeonFinder.CastDeserter = 1
 
 #
+#    DungeonFinder.AllowCompleted
+#
+#        Description: Controls whether completed heroic dungeons are excluded from LFG queue.
+#                     0 - (Classic WLK mode: Dungeons completed by any group member today are excluded (daily lockout enforced))
+#        Default:     1 - (Blizzlike: All dungeons are available for queue, even if already completed)
+
+DungeonFinder.AllowCompleted = 1
+
+#
+#    DungeonFinder.DungeonSelectionCooldown
+#
+#        Description: Duration in minutes for the dungeon selection cooldown. Players who complete a
+#                     random dungeon via LFG will not be assigned the same dungeon again for this
+#                     duration. This reduces the chance of getting the same dungeon in a row.
+#        Default:     0 - (Disabled)
+
+DungeonFinder.DungeonSelectionCooldown = 0
+
+#
 ###################################################################################################
 
 ###################################################################################################
@@ -3487,6 +3557,18 @@ Guild.MemberLimit = 0
 #        Default:     30 sec
 
 FFAPvPTimer = 30
+
+#
+###################################################################################################
+
+###################################################################################################
+# OUTDOORPVP
+#
+#     OutdoorPvPCaptureRate
+#        Description: Specify rate multiplier for outdoor PvP capture points. (e.g. Eastern Plaguelands, Hellfire Peninsula)
+#        Default:     1.0
+
+OutdoorPvPCaptureRate = 1.0
 
 #
 ###################################################################################################
@@ -4549,20 +4631,6 @@ Calculate.Creature.Zone.Area.Data = 0
 Calculate.Gameoject.Zone.Area.Data = 0
 
 #
-#    TeleportTimeoutNear
-#       Description:  No description
-#       Default:  25
-
-TeleportTimeoutNear = 25
-
-#
-#    TeleportTimeoutFar
-#       Description:  No description
-#       Default:  45
-
-TeleportTimeoutFar = 45
-
-#
 #    DailyRBGArenaPoints.MinLevel
 #        Description: Allows gaining arena points on the first RBG win at level 70.
 #        Default: 71 - (Blizzlike)
@@ -4610,6 +4678,14 @@ Debug.Battleground = 0
 #                 1 - (Enabled)
 
 Debug.Arena = 0
+
+#
+#    Debug.LFG
+#        Description: Enable or disable LFG 1 player queue mode. (If enabled, the in-game command is disabled.)
+#        Default: 0 - (Disabled)
+#                 1 - (Enabled)
+
+Debug.LFG = 0
 
 #
 ###################################################################################################

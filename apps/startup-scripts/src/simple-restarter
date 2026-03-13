@@ -50,6 +50,8 @@ fi
 # Main restart loop
 while true; do
     STARTING_TIME=$(date +%s)
+
+    echo "AC_CONFIG_POLICY: $AC_CONFIG_POLICY"
     
     # Use starter script to launch the binary with all parameters
     "$STARTER_SCRIPT" "$BINPATH" "$BINFILE" "$GDB_FILE" "$CONFIG" "$SYSLOG" "$SYSERR" "$GDB_ENABLED" "$CRASHES_PATH"

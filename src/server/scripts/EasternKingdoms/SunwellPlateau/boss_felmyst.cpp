@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -157,7 +157,7 @@ struct boss_felmyst : public BossAI
             me->SetCanFly(true);
             me->SetDisableGravity(true);
             me->SendMovementFlagUpdate();
-            me->GetMotionMaster()->MovePath(me->GetEntry() * 10, true);
+            me->GetMotionMaster()->MoveWaypoint(me->GetEntry() * 10, true);
         }
     }
 
@@ -319,9 +319,10 @@ struct boss_felmyst : public BossAI
                 break;
             case POINT_LANE:
                 Talk(EMOTE_BREATH);
-                me->m_Events.AddEventAtOffset([&] {
+                me->m_Events.AddEventAtOffset([this]()
+                {
                     for (uint8 i = 0; i < 16; ++i)
-                        me->m_Events.AddEvent(new CorruptTriggers(me, _currentLane), me->m_Events.CalculateTime(i*250));
+                        me->m_Events.AddEventAtOffset(new CorruptTriggers(me, _currentLane), Milliseconds(i * 250));
                 }, 5s);
 
                 me->m_Events.AddEventAtOffset([&] {
@@ -362,7 +363,7 @@ struct boss_felmyst : public BossAI
 
             me->m_Events.AddEventAtOffset([&] {
                 me->SetImmuneToPC(false);
-                me->GetMotionMaster()->MovePath(me->GetEntry() * 10, true);
+                me->GetMotionMaster()->MoveWaypoint(me->GetEntry() * 10, true);
             }, 8500ms);
         });
     }

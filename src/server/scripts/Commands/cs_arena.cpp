@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -51,7 +51,7 @@ public:
             { "rename",         HandleArenaRenameCommand,   SEC_ADMINISTRATOR, Console::Yes },
             { "captain",        HandleArenaCaptainCommand,  SEC_ADMINISTRATOR, Console::No  },
             { "info",           HandleArenaInfoCommand,     SEC_GAMEMASTER,    Console::Yes },
-            { "lookup",         HandleArenaLookupCommand,   SEC_GAMEMASTER,    Console::No  },
+            { "lookup",         HandleArenaLookupCommand,   SEC_GAMEMASTER,    Console::Yes },
             { "season",         arenaSeasonCommandTable  }
         };
 
@@ -209,7 +209,7 @@ public:
         handler->PSendSysMessage(LANG_ARENA_INFO_HEADER, arena->GetName(), arena->GetId(), arena->GetRating(), arena->GetType(), arena->GetType());
 
         for (auto const& itr : arena->GetMembers())
-            handler->PSendSysMessage(LANG_ARENA_INFO_MEMBERS, itr.Name, itr.Guid.ToString(), itr.PersonalRating, (arena->GetCaptain() == itr.Guid ? "- Captain" : ""));
+            handler->PSendSysMessage(LANG_ARENA_INFO_MEMBERS, itr.Name, itr.Guid.GetCounter(), itr.PersonalRating, (arena->GetCaptain() == itr.Guid ? "Captain" : ""));
 
         return true;
     }
@@ -224,17 +224,17 @@ public:
         {
             if (StringContainsStringI(team->GetName(), needle))
             {
-                if (handler->GetSession())
-                {
-                    handler->PSendSysMessage(LANG_ARENA_LOOKUP, team->GetName(), team->GetId(), team->GetType(), team->GetType());
-                    found = true;
-                    continue;
-                }
+                handler->PSendSysMessage(LANG_ARENA_LOOKUP, team->GetName(), team->GetId(), team->GetType(), team->GetType());
+                found = true;
+                continue;
             }
         }
 
         if (!found)
-            handler->PSendSysMessage(LANG_ARENA_ERROR_NAME_NOT_FOUND, std::string(needle));
+        {
+            handler->SendErrorMessage(LANG_ARENA_ERROR_NAME_NOT_FOUND, std::string(needle));
+            return false;
+        }
 
         return true;
     }
