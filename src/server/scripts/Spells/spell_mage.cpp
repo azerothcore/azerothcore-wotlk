@@ -1614,6 +1614,7 @@ void AddSC_mage_spell_scripts()
     RegisterSpellScript(spell_mage_glyph_of_polymorph);
     RegisterSpellScript(spell_mage_hot_streak);
     RegisterSpellScript(spell_mage_ice_barrier);
+    RegisterSpellScript(spell_mage_ice_barrier_aura);
     RegisterSpellScript(spell_mage_ice_block);
     RegisterSpellScript(spell_mage_imp_blizzard);
     RegisterSpellScript(spell_mage_imp_mana_gems);
