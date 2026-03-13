@@ -128,11 +128,11 @@ namespace Movement
             // MoveSplineFlag::Enter_Cycle support dropped
             //if (splineflags & SPLINEFLAG_ENTER_CYCLE)
             //cyclic_point = 1;   // shouldn't be modified, came from client
-            spline.init_cyclic_spline(&args.path[0], args.path.size(), modes[args.flags.isSmooth()], cyclic_point);
+            spline.init_cyclic_spline(&args.path[0], args.path.size(), modes[args.flags.isSmooth()], cyclic_point, args.initialOrientation);
         }
         else
         {
-            spline.init_spline(&args.path[0], args.path.size(), modes[args.flags.isSmooth()]);
+            spline.init_spline(&args.path[0], args.path.size(), modes[args.flags.isSmooth()], args.initialOrientation);
         }
 
         // init spline timestamps
@@ -166,6 +166,7 @@ namespace Movement
         time_passed = 0;
         vertical_acceleration = 0.f;
         effect_start_time = 0;
+        velocity = args.velocity;
 
         // Check if its a stop spline
         if (args.flags.done)
@@ -190,7 +191,7 @@ namespace Movement
     }
 
     MoveSpline::MoveSpline() : m_Id(0), time_passed(0),
-        vertical_acceleration(0.f), initialOrientation(0.f), effect_start_time(0), point_Idx(0), point_Idx_offset(0),
+        vertical_acceleration(0.f), initialOrientation(0.f), velocity(0.f), effect_start_time(0), point_Idx(0), point_Idx_offset(0),
         onTransport(false)
     {
         splineflags.done = true;

@@ -1522,11 +1522,37 @@ class spell_putricide_regurgitated_ooze : public SpellScript
     }
 };
 
+// 71770 - Ooze Tank Protection
+class spell_putricide_ooze_tank_protection : public AuraScript
+{
+    PrepareAuraScript(spell_putricide_ooze_tank_protection);
+
+    bool Validate(SpellInfo const* spellInfo) override
+    {
+        return ValidateSpellInfo({ spellInfo->Effects[EFFECT_0].TriggerSpell, spellInfo->Effects[EFFECT_1].TriggerSpell });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        Unit* actionTarget = eventInfo.GetActionTarget();
+        actionTarget->CastSpell(nullptr, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_putricide_ooze_tank_protection::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+        OnEffectProc += AuraEffectProcFn(spell_putricide_ooze_tank_protection::HandleProc, EFFECT_1, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_boss_professor_putricide()
 {
     new boss_professor_putricide();
     new npc_volatile_ooze();
     new npc_gas_cloud();
+    RegisterSpellScript(spell_putricide_ooze_tank_protection);
     RegisterSpellScript(spell_putricide_slime_puddle);
     RegisterSpellScript(spell_putricide_slime_puddle_spawn);
     RegisterSpellScript(spell_putricide_grow_stacker_aura);

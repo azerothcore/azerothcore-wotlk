@@ -113,7 +113,6 @@ INSERT INTO `pool_quest` VALUES
 (13422,354,'Maintaining Discipline'),
 (13423,354,'Defending Your Title'),
 (13424,354,'Back to the Pit'),
-(13425,354,'The Aberrations Must Die'),
 (13600,5669,'A Worthy Weapon Humans'),
 (13603,5669,'A Blade Fit For A Champion Humans'),
 (13616,5669,'The Edge of Winter Humans'),
@@ -209,4 +208,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-07-19 12:09:28
+-- Dump completed on 2025-12-29 17:54:23

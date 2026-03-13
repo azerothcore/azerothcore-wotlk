@@ -17,11 +17,13 @@
 
 #include "Chat.h"
 #include "CommandScript.h"
+#include "DBCStores.h"
 #include "GameTime.h"
 #include "InstanceSaveMgr.h"
 #include "InstanceScript.h"
 #include "Language.h"
 #include "MapMgr.h"
+#include "ObjectMgr.h"
 #include "Player.h"
 
 using namespace Acore::ChatCommands;
@@ -230,11 +232,51 @@ public:
             return false;
         }
 
+        // Build a map of encounterIndex -> encounterName from DBC data
+        std::unordered_map<uint32, char const*> encounterNames;
+        Difficulty difficulty = map->GetDifficulty();
+
+        // For heroic ICC/Ruby Sanctum, encounters are only defined
+        // for normal difficulty in the DBC, use the same fallback
+        // pattern as Map::UpdateEncounterState
+        DungeonEncounterList const* encounters = nullptr;
+        if ((map->GetId() == 631 || map->GetId() == 724)
+            && map->IsHeroic())
+        {
+            encounters = sObjectMgr->GetDungeonEncounterList(
+                map->GetId(),
+                !map->Is25ManRaid()
+                    ? RAID_DIFFICULTY_10MAN_NORMAL
+                    : RAID_DIFFICULTY_25MAN_NORMAL);
+        }
+        else
+        {
+            Difficulty diffFixed = IsSharedDifficultyMap(map->GetId())
+                ? Difficulty(difficulty % 2)
+                : difficulty;
+            encounters = sObjectMgr->GetDungeonEncounterList(
+                map->GetId(), diffFixed);
+        }
+
+        if (encounters)
+        {
+            for (auto const* encounter : *encounters)
+                encounterNames[encounter->dbcEntry->encounterIndex]
+                    = encounter->dbcEntry->encounterName[0];
+        }
+
         for (uint8 i = 0; i < map->GetInstanceScript()->GetEncounterCount(); ++i)
         {
             uint32 state = map->GetInstanceScript()->GetBossState(i);
             std::string stateName = InstanceScript::GetBossStateName(state);
-            handler->PSendSysMessage(LANG_COMMAND_INST_GET_BOSS_STATE, i, state, stateName);
+
+            auto it = encounterNames.find(i);
+            std::string bossName = (it != encounterNames.end()
+                && it->second) ? it->second : "Unknown";
+
+            handler->PSendSysMessage(
+                LANG_COMMAND_INST_GET_BOSS_STATE,
+                i, bossName, state, stateName);
         }
 
         return true;
