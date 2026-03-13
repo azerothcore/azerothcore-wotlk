@@ -254,6 +254,7 @@ public:
 
         bool CanAIAttack(Unit const* victim) const override
         {
+            // Used for Magma Blast handling to force EnterEvadeMode if there are no melee targets
             return me->IsWithinMeleeRange(victim);
         }
 

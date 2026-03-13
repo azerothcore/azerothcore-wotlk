@@ -18,18 +18,16 @@
 #ifndef __RASESSION_H__
 #define __RASESSION_H__
 
-#include <boost/asio/ip/tcp.hpp>
+#include "Socket.h"
 #include <boost/asio/streambuf.hpp>
 #include <future>
-
-using boost::asio::ip::tcp;
 
 const std::size_t bufferSize = 4096;
 
 class RASession : public std::enable_shared_from_this<RASession>
 {
 public:
-    RASession(tcp::socket&& socket) :
+    RASession(IoContextTcpSocket&& socket) :
         _socket(std::move(socket)), _commandExecuting(nullptr) { }
 
     void Start();
@@ -47,7 +45,7 @@ private:
     static void CommandPrint(void* callbackArg, std::string_view text);
     static void CommandFinished(void* callbackArg, bool);
 
-    tcp::socket _socket;
+    IoContextTcpSocket _socket;
     boost::asio::streambuf _readBuffer;
     boost::asio::streambuf _writeBuffer;
     std::promise<void>* _commandExecuting;

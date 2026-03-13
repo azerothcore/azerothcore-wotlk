@@ -216,6 +216,7 @@ INSERT INTO `acore_string` VALUES
 (176,'Invalid gameobject type, must be a destructible building.',NULL,NULL,NULL,'游戏对象类型无效，必须是一个可被破坏的建筑。',NULL,'Tipo de objeto de juego no inválido, debe ser un edificio destructible.','Tipo de objeto de juego no inválido, debe ser un edificio destructible.',NULL),
 (177,'Gameobject {} (GUID: {}) damaged {} (actual health: {}).',NULL,NULL,NULL,'游戏的对象 {} (GUID: {}) 损坏 {} (实际: {}).',NULL,'Objeto de juego {} (GUID: {}) dañado {} (salud real: {}).','Objeto de juego {} (GUID: {}) dañado {} (salud real: {}).',NULL),
 (178,'grid[{},{}]cell[{},{}] InstanceID: {}\n ZoneX: {} ZoneY: {}\nGroundZ: {} FloorZ: {} Have height data (Map: {} VMap: {} MMap: {})',NULL,NULL,NULL,NULL,NULL,'grid[{},{}]cell[{},{}] ID de la instancia: {}\n ZonaX: {} ZonaY: {}\nGroundZ: {} FloorZ: {} Tiene datos de altura (Map: {} VMap: {} MMap: {})','grid[{},{}]cell[{},{}] ID de la instancia: {}\n ZonaX: {} ZonaY: {}\nGroundZ: {} FloorZ: {} Tiene datos de altura (Map: {} VMap: {} MMap: {})',NULL),
+(179,'| AccountFlags:',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (186,'TransMapID: {} TransOffsetX: {} TransOffsetY: {} TransOffsetZ: {} TransOffsetO: {} (Transport ID: {} {})',NULL,NULL,NULL,NULL,NULL,'TransMapID: {} TransOffsetX: {} TransOffsetY: {} TransOffsetZ: {} TransOffsetO: {} (ID de transporte: {} {})','TransMapID: {} TransOffsetX: {} TransOffsetY: {} TransOffsetZ: {} TransOffsetO: {} (ID de transporte: {} {})',NULL),
 (187,'This name is profane, choose another one',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (188,'The provided two-factor authentication secret is too long.',NULL,NULL,NULL,NULL,NULL,'El secreto de autenticación de dos factores proporcionado es demasiado largo.','El secreto de autenticación de dos factores proporcionado es demasiado largo.',NULL),
@@ -871,6 +872,7 @@ INSERT INTO `acore_string` VALUES
 (1183,'| Guild Information: {}',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (1184,'| Guild Ranks:',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (1185,'| {} - {}',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(1186,'Beastmaster mode is {}',NULL,NULL,'Der Beastmaster mode ist an ({})!','兽王模式：{}',NULL,NULL,NULL,NULL),
 (1200,'You try to view cinematic {} but it doesn\'t exist.',NULL,NULL,'Ihr versucht den Film {} anzusehen, dieser existiert jedoch nicht.','你尝试播放动画{}，这个动画不存在。',NULL,NULL,NULL,NULL),
 (1201,'You try to view movie {} but it doesn\'t exist.',NULL,NULL,'Ihr versucht den Film {} anzusehen, dieser existiert jedoch nicht.','你尝试播放电影{}，这个电影不存在。',NULL,NULL,NULL,NULL),
 (1202,'Areatrigger debugging turned on.',NULL,NULL,'Areatrigger debugging eingeschaltet.','区域触发调试：开启。',NULL,NULL,NULL,NULL),
@@ -1013,6 +1015,8 @@ INSERT INTO `acore_string` VALUES
 (5085,'Object {} (entry :{} guid: {}) respawned!',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (5086,'No doors found within range ({} yards).',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (5087,'Door {} (Entry: {}) opened!',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(5088,'Quest: {} ({}) \nStatus: {}',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
+(5089,'Quest can\'t be taken!',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL),
 (6604,'You cannot say, yell or emote until you become level {}.',NULL,NULL,'Ihr müsst mindestens Level {} sein, bevor Ihr sprechen, rufen oder emotes nutzen dürft.','你的等级必须大于|CFF9900CC{}|R才可以说话或者使用表情。',NULL,NULL,NULL,NULL),
 (6605,'You cannot whisper until you become level {}.',NULL,NULL,'Ihr müsst mindestens Level {} sein, bevor Ihr flüstern dürft.','你的等级大于|CFF9900CC{}|R才可以说悄悄话。',NULL,NULL,NULL,NULL),
 (6606,'You cannot write to channels until you become level {}.',NULL,NULL,'Ihr müsst mindestens Level {} sein, bevor Ihr in Channels schreiben dürft.','你的等级大于|CFF9900CC{}|R才可以使用聊天频道。',NULL,NULL,NULL,NULL),
@@ -1211,4 +1215,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-07-19 12:08:36
+-- Dump completed on 2025-12-29 17:53:33
