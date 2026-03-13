@@ -29,6 +29,16 @@ namespace Acore
     template<typename... Args>
     using FormatString = fmt::format_string<Args...>;
 
+    using FormatStringView = fmt::string_view;
+
+    using FormatArgs = fmt::format_args;
+
+    template<typename... Args>
+    constexpr auto MakeFormatArgs(Args&&... args)
+    {
+        return fmt::make_format_args(args...);
+    }
+
     /// Default AC string format function.
     template<typename... Args>
     inline std::string StringFormat(FormatString<Args...> fmt, Args&&... args)
@@ -40,6 +50,47 @@ namespace Acore
         catch (std::exception const& e)
         {
             return fmt::format("Wrong format occurred ({}). Fmt string: '{}'", e.what(), fmt.get());
+        }
+    }
+
+    /// Format directly to an output iterator.
+    template<typename OutputIt, typename... Args>
+    inline OutputIt StringFormatTo(OutputIt out, FormatString<Args...> fmt, Args&&... args)
+    {
+        try
+        {
+            return fmt::format_to(out, fmt, std::forward<Args>(args)...);
+        }
+        catch (std::exception const& e)
+        {
+            return fmt::format_to(out, "Wrong format occurred ({}). Fmt string: '{}'", e.what(), fmt.get());
+        }
+    }
+
+    /// Format with pre-built format args.
+    inline std::string StringVFormat(FormatStringView fmt, FormatArgs args)
+    {
+        try
+        {
+            return fmt::vformat(fmt, args);
+        }
+        catch (std::exception const& e)
+        {
+            return fmt::format("Wrong format occurred ({}). Fmt string: '{}'", e.what(), fmt);
+        }
+    }
+
+    /// Format with pre-built format args directly to an output iterator.
+    template<typename OutputIt>
+    inline OutputIt StringVFormatTo(OutputIt out, FormatStringView fmt, FormatArgs args)
+    {
+        try
+        {
+            return fmt::vformat_to(out, fmt, args);
+        }
+        catch (std::exception const& e)
+        {
+            return fmt::format_to(out, "Wrong format occurred ({}). Fmt string: '{}'", e.what(), fmt);
         }
     }
 

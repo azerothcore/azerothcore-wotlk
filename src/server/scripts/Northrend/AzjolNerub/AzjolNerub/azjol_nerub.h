@@ -41,12 +41,16 @@ enum ANIds
     NPC_WATCHER_NARJIL                  = 28729,
     NPC_WATCHER_GASHRA                  = 28730,
     NPC_WATCHER_SILTHIK                 = 28731,
+    NPC_ANUBAR_SKIRMISHER               = 28734,
+    NPC_ANUBAR_SHADOWCASTER             = 28733,
+    NPC_ANUBAR_WARRIOR                  = 28732,
     NPC_SKITTERING_SWARMER              = 28735,
     NPC_SKITTERING_INFECTIOR            = 28736,
     NPC_KRIKTHIR_THE_GATEWATCHER        = 28684,
     NPC_HADRONOX                        = 28921,
     NPC_ANUBARAK                        = 29120,
 
+    NPC_WORLD_TRIGGER_LAOI              = 23472,
     NPC_ANUB_AR_CHAMPION                = 29062,
     NPC_ANUB_AR_NECROMANCER             = 29063,
     NPC_ANUB_AR_CRYPTFIEND              = 29064,
@@ -57,6 +61,11 @@ enum ANIds
     GO_ANUBARAK_DOORS3                  = 192398,
 
     SPELL_WEB_WRAP_TRIGGER              = 52087
+};
+
+enum ANActions
+{
+    ACTION_MINION_DIED                   = 2,
 };
 
 template <class AI, class T>

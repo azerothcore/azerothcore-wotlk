@@ -98,6 +98,7 @@ public:
     void PeriodicTick(AuraApplication* aurApp, Unit* caster) const;
 
     void HandleProc(AuraApplication* aurApp, ProcEventInfo& eventInfo);
+    bool CheckEffectProc(AuraApplication* aurApp, ProcEventInfo& eventInfo) const;
 
     void CleanupTriggeredSpells(Unit* target);
 
@@ -143,6 +144,7 @@ private:
     uint8 const m_effIndex;
     bool m_canBeRecalculated;
     bool m_isPeriodic;
+    bool m_isRecalculatingPassiveAuras = false;
 private:
     float CalcPeriodicCritChance(Unit const* caster, Unit const* target) const;
 
@@ -333,6 +335,7 @@ public:
     void HandlePeriodicPowerBurnAuraTick(Unit* target, Unit* caster) const;
 
     // aura effect proc handlers
+    void HandleBreakableCCAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo);
     void HandleProcTriggerSpellAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo);
     void HandleProcTriggerSpellWithValueAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo);
     void HandleProcTriggerDamageAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo);

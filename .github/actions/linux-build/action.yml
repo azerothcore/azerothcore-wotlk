@@ -213,8 +213,8 @@ runs:
     - name: Run unit tests
       shell: bash
       run: |
-        if [[ -f build/obj/src/test/unit_tests ]]; then
-          build/obj/src/test/unit_tests
+        if [[ -f build/src/test/unit_tests ]]; then
+          build/src/test/unit_tests
         else
           exit 0
         fi

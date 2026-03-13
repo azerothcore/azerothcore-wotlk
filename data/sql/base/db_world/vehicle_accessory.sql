@@ -38,6 +38,8 @@ CREATE TABLE `vehicle_accessory` (
 
 LOCK TABLES `vehicle_accessory` WRITE;
 /*!40000 ALTER TABLE `vehicle_accessory` DISABLE KEYS */;
+INSERT INTO `vehicle_accessory` VALUES
+(1971380,24849,0,0,'Proto Drake Rider mounted to Enslaved Proto Drake',6,30000);
 /*!40000 ALTER TABLE `vehicle_accessory` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -49,4 +51,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-07-19 12:09:50
+-- Dump completed on 2025-12-29 17:54:46

@@ -429,17 +429,17 @@ struct npc_eastvale_peasent : public ScriptedAI
                     switch (_path)
                     {
                     case PATH_PEASENT_0:
-                        me->PlayDirectSound(SOUND_PEASENT_GREETING_1);
+                        me->PlayDistanceSound(SOUND_PEASENT_GREETING_1);
                         _events.ScheduleEvent(EVENT_TALKTORAELEN2, 2s);
                         break;
                     case PATH_PEASENT_1:
                     case PATH_PEASENT_3:
-                        me->PlayDirectSound(SOUND_PEASENT_GREETING_3);
+                        me->PlayDistanceSound(SOUND_PEASENT_GREETING_3);
                         _events.ScheduleEvent(EVENT_RAELENTALK, 2s);
                         break;
                     case PATH_PEASENT_2:
                     case PATH_PEASENT_4:
-                        me->PlayDirectSound(SOUND_PEASENT_GREETING_2);
+                        me->PlayDistanceSound(SOUND_PEASENT_GREETING_2);
                         _events.ScheduleEvent(EVENT_RAELENTALK, 2s);
                         break;
                     }
@@ -451,7 +451,7 @@ struct npc_eastvale_peasent : public ScriptedAI
                 }
                 break;
             case EVENT_TALKTORAELEN2:
-                me->PlayDirectSound(SOUND_PEASENT_GREETING_2);
+                me->PlayDistanceSound(SOUND_PEASENT_GREETING_2);
                 _events.ScheduleEvent(EVENT_RAELENTALK, 2s);
                 break;
             case EVENT_RAELENTALK:
@@ -466,27 +466,27 @@ struct npc_eastvale_peasent : public ScriptedAI
                     switch (_path)
                     {
                     case PATH_PEASENT_0:
-                        me->PlayDirectSound(SOUND_PEASENT_LEAVING_1);
+                        me->PlayDistanceSound(SOUND_PEASENT_LEAVING_1);
                         _events.ScheduleEvent(EVENT_PATHBACK, 2s);
                         break;
                     case PATH_PEASENT_1:
                     case PATH_PEASENT_3:
-                        me->PlayDirectSound(SOUND_PEASENT_LEAVING_4);
+                        me->PlayDistanceSound(SOUND_PEASENT_LEAVING_4);
                         _events.ScheduleEvent(EVENT_TALKTORAELEN4, 2s);
                         break;
                     case PATH_PEASENT_2:
-                        me->PlayDirectSound(SOUND_PEASENT_LEAVING_3);
+                        me->PlayDistanceSound(SOUND_PEASENT_LEAVING_3);
                         _events.ScheduleEvent(EVENT_PATHBACK, 2s);
                         break;
                     case PATH_PEASENT_4:
-                        me->PlayDirectSound(SOUND_PEASENT_LEAVING_2);
+                        me->PlayDistanceSound(SOUND_PEASENT_LEAVING_2);
                         _events.ScheduleEvent(EVENT_PATHBACK, 2s);
                         break;
                     }
                 }
                 break;
             case EVENT_TALKTORAELEN4:
-                me->PlayDirectSound(SOUND_PEASENT_LEAVING_5);
+                me->PlayDistanceSound(SOUND_PEASENT_LEAVING_5);
                 _events.ScheduleEvent(EVENT_PATHBACK, 2s);
                 break;
             case EVENT_PATHBACK:

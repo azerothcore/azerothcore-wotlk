@@ -54,9 +54,9 @@ protected:
         return threads;
     }
 
-    static void OnSocketAccept(tcp::socket&& sock, uint32 threadIndex)
+    static void OnSocketAccept(IoContextTcpSocket&& sock, uint32 threadIndex)
     {
-        Instance().OnSocketOpen(std::forward<tcp::socket>(sock), threadIndex);
+        Instance().OnSocketOpen(std::move(sock), threadIndex);
     }
 };
 
