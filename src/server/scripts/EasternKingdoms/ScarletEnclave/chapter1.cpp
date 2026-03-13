@@ -276,10 +276,7 @@ public:
             }
 
             if (action == ACTION_DK_INITIATE_ASSAULT_ROAR)
-            {
                 me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
-            }
-
         }
 
         void MoveInLineOfSight(Unit* who) override
