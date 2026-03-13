@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -47,8 +47,7 @@ enum Misc
     SPELL_BALL_OF_FLAME                     = 48246,
     SPELL_RITUAL_OF_THE_SWORD               = 48276,
     SPELL_RITUAL_STRIKE                     = 48331,
-    SPELL_SINSTER_STRIKE_N                  = 15667,
-    SPELL_SINSTER_STRIKE_H                  = 59409,
+    SPELL_SINISTER_STRIKE                  = 15667,
     EQUIP_SWORD                             = 40343,
 
     // CHANNELERS
@@ -303,7 +302,7 @@ public:
             switch (events.ExecuteEvent())
             {
                 case EVENT_SORROWGRAVE_SS:
-                    me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_SINSTER_STRIKE_H : SPELL_SINSTER_STRIKE_N, false);
+                    me->CastSpell(me->GetVictim(), SPELL_SINISTER_STRIKE, false);
                     events.ScheduleEvent(EVENT_SORROWGRAVE_SS, 3s, 5s);
                     break;
                 case EVENT_SORROWGRAVE_FLAMES:

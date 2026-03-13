@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -533,7 +533,7 @@ public:
                     case EVENT_SAURFANG_RUN:
                         if (Creature* factionNPC = ObjectAccessor::GetCreature(*me, _factionNPC))
                         {
-                            factionNPC->GetMotionMaster()->MovePath(factionNPC->GetSpawnId() * 10, false);
+                            factionNPC->GetMotionMaster()->MoveWaypoint(factionNPC->GetSpawnId() * 10, false);
                             factionNPC->DespawnOrUnsummon(46500ms);
                             std::list<Creature*> followers;
                             factionNPC->GetCreaturesWithEntryInRange(followers, 30, _instance->GetData(DATA_TEAMID_IN_INSTANCE) == TEAM_HORDE ? NPC_KOR_KRON_GENERAL : NPC_ALLIANCE_COMMANDER);
@@ -2295,27 +2295,6 @@ class spell_icc_web_wrap_aura : public AuraScript
     }
 };
 
-class spell_icc_dark_reckoning_aura : public AuraScript
-{
-    PrepareAuraScript(spell_icc_dark_reckoning_aura);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ 69482 });
-    }
-
-    void OnPeriodic(AuraEffect const* /*aurEff*/)
-    {
-        if (Unit* caster = GetCaster())
-            caster->CastSpell(GetTarget(), 69482, true);
-    }
-
-    void Register() override
-    {
-        OnEffectPeriodic += AuraEffectPeriodicFn(spell_icc_dark_reckoning_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-    }
-};
-
 class spell_stinky_precious_decimate : public SpellScript
 {
     PrepareSpellScript(spell_stinky_precious_decimate);
@@ -3681,7 +3660,6 @@ void AddSC_icecrown_citadel()
 
     // pussywizard below:
     RegisterSpellScript(spell_icc_web_wrap_aura);
-    RegisterSpellScript(spell_icc_dark_reckoning_aura);
     RegisterSpellScript(spell_stinky_precious_decimate);
     RegisterSpellScript(spell_icc_yf_frozen_orb_aura);
     RegisterSpellScript(spell_icc_yh_volley_aura);

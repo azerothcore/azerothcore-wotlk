@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -428,7 +428,7 @@ struct npc_costumed_orphan_matron : public ScriptedAI
             GetInitXYZ(x, y, z, o, path);
             if (Creature* cr = me->SummonCreature(NPC_SHADE_OF_HORSEMAN, x, y, z, o, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
             {
-                cr->GetMotionMaster()->MovePath(path, true);
+                cr->GetMotionMaster()->MoveWaypoint(path, true);
                 cr->AI()->DoAction(path);
                 horseGUID = cr->GetGUID();
             }
@@ -1085,9 +1085,9 @@ struct boss_headless_horseman : public ScriptedAI
     {
         if (type == WAYPOINT_MOTION_TYPE)
         {
-            if (point == 0)
+            if (point == 1)
                 me->CastSpell(me, SPELL_HEAD_VISUAL, true);
-            else if (point == 11)
+            else if (point == 12)
             {
                 me->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
                 me->StopMoving();
@@ -1191,7 +1191,7 @@ struct boss_headless_horseman : public ScriptedAI
                             break;
                         case 3:
                             me->SetDisableGravity(true);
-                            me->GetMotionMaster()->MovePath(236820, false);
+                            me->GetMotionMaster()->MoveWaypoint(236820, false);
                             me->CastSpell(me, SPELL_SHAKE_CAMERA_SMALL, true);
                             player->Say(TALK_PLAYER_FELT_DEATH);
                             Talk(TALK_ENTRANCE);

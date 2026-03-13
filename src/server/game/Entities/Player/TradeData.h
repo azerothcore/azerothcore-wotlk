@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -36,9 +36,9 @@ class AC_GAME_API TradeData
 {
 public:                                                 // constructors
     TradeData(Player* player, Player* trader) :
-        m_player(player),  m_trader(trader), m_accepted(false), m_acceptProccess(false), m_money(0), m_spell(0) { }
+        _player(player),  _trader(trader), _accepted(false), m_acceptProccess(false), _money(0), m_spell(0) { }
 
-    [[nodiscard]] Player* GetTrader() const { return m_trader; }
+    [[nodiscard]] Player* GetTrader() const { return _trader; }
     [[nodiscard]] TradeData* GetTraderData() const;
 
     [[nodiscard]] Item* GetItem(TradeSlots slot) const;
@@ -52,11 +52,11 @@ public:                                                 // constructors
     [[nodiscard]] Item*  GetSpellCastItem() const;
     [[nodiscard]] bool HasSpellCastItem() const { return m_spellCastItem; }
 
-    [[nodiscard]] uint32 GetMoney() const { return m_money; }
+    [[nodiscard]] uint32 GetMoney() const { return _money; }
     void SetMoney(uint32 money);
 
-    [[nodiscard]] bool IsAccepted() const { return m_accepted; }
-    void SetAccepted(bool state, bool crosssend = false);
+    [[nodiscard]] bool IsAccepted() const { return _accepted; }
+    void SetAccepted(bool state, bool forTrader = false);
 
     [[nodiscard]] bool IsInAcceptProcess() const { return m_acceptProccess; }
     void SetInAcceptProcess(bool state) { m_acceptProccess = state; }
@@ -65,13 +65,13 @@ private:                                                // internal functions
     void Update(bool for_trader = true);
 
 private:                                                // fields
-    Player*    m_player;                                // Player who own of this TradeData
-    Player*    m_trader;                                // Player who trade with m_player
+    Player*    _player;                                // Player who own of this TradeData
+    Player*    _trader;                                // Player who trade with m_player
 
-    bool       m_accepted;                              // m_player press accept for trade list
+    bool       _accepted;                              // m_player press accept for trade list
     bool       m_acceptProccess;                        // one from player/trader press accept and this processed
 
-    uint32     m_money;                                 // m_player place money to trade
+    uint32     _money;                                 // m_player place money to trade
 
     uint32     m_spell;                                 // m_player apply spell to non-traded slot item
     ObjectGuid m_spellCastItem;                         // applied spell casted by item use

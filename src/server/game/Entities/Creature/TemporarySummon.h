@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -19,6 +19,7 @@
 #define AZEROTHCORE_TEMPSUMMON_H
 
 #include "Creature.h"
+#include "G3D/Quat.h"
 
 enum SummonerType
 {
@@ -34,6 +35,15 @@ struct TempSummonData
     Position pos;        ///< Position, where should be creature spawned
     TempSummonType type; ///< Summon type, see TempSummonType for available types
     uint32 time;         ///< Despawn time, usable only with certain temp summon types
+};
+
+/// Stores data for temp gameobject summons
+struct GameObjectSummonData
+{
+    uint32 entry;
+    Position pos;
+    G3D::Quat rot;
+    uint32 respawnTime;  ///< Duration in seconds; passed to SummonGameObject's respawnTime parameter
 };
 
 class TempSummon : public Creature

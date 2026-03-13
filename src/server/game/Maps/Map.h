@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -23,6 +23,7 @@
 #include "DataMap.h"
 #include "Define.h"
 #include "DynamicTree.h"
+#include "EventProcessor.h"
 #include "GameObjectModel.h"
 #include "GridDefines.h"
 #include "GridRefMgr.h"
@@ -33,7 +34,6 @@
 #include "PathGenerator.h"
 #include "Position.h"
 #include "SharedDefines.h"
-#include "TaskScheduler.h"
 #include "Timer.h"
 #include "GridTerrainData.h"
 #include <bitset>
@@ -172,7 +172,7 @@ public:
     // currently unused for normal maps
     bool CanUnload(uint32 diff)
     {
-        if (!m_unloadTimer)
+        if (!m_unloadTimer || Events.HasEvents())
             return false;
 
         if (m_unloadTimer <= diff)
@@ -239,12 +239,13 @@ public:
     // some calls like isInWater should not use vmaps due to processor power
     // can return INVALID_HEIGHT if under z+2 z coord not found height
     [[nodiscard]] float GetHeight(float x, float y, float z, bool checkVMap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const;
+    [[nodiscard]] float GetHeight(Position const& pos, bool checkVMap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const { return GetHeight(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), checkVMap, maxSearchDist); }
     [[nodiscard]] float GetGridHeight(float x, float y) const;
     [[nodiscard]] float GetMinHeight(float x, float y) const;
     Transport* GetTransportForPos(uint32 phase, float x, float y, float z, WorldObject* worldobject = nullptr);
 
-    void GetFullTerrainStatusForPosition(uint32 phaseMask, float x, float y, float z, float collisionHeight, PositionFullTerrainStatus& data, uint8 reqLiquidType = MAP_ALL_LIQUIDS);
-    LiquidData const GetLiquidData(uint32 phaseMask, float x, float y, float z, float collisionHeight, uint8 ReqLiquidType);
+    void GetFullTerrainStatusForPosition(uint32 phaseMask, float x, float y, float z, float collisionHeight, PositionFullTerrainStatus& data, Optional<uint8> reqLiquidType = {});
+    LiquidData const GetLiquidData(uint32 phaseMask, float x, float y, float z, float collisionHeight, Optional<uint8> ReqLiquidType);
 
     [[nodiscard]] bool GetAreaInfo(uint32 phaseMask, float x, float y, float z, uint32& mogpflags, int32& adtId, int32& rootId, int32& groupId) const;
     [[nodiscard]] uint32 GetAreaId(uint32 phaseMask, float x, float y, float z) const;
@@ -337,6 +338,7 @@ public:
     GameObject* SummonGameObject(uint32 entry, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime, bool checkTransport = true);
     GameObject* SummonGameObject(uint32 entry, Position const& pos, float rotation0 = 0.0f, float rotation1 = 0.0f, float rotation2 = 0.0f, float rotation3 = 0.0f, uint32 respawnTime = 100, bool checkTransport = true);
     void SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list = nullptr);
+    void SummonGameObjectGroup(uint8 group, std::list<GameObject*>* list = nullptr);
 
     Corpse* GetCorpse(ObjectGuid const& guid);
     Creature* GetCreature(ObjectGuid const& guid);
@@ -430,7 +432,7 @@ public:
     void UpdatePlayerZoneStats(uint32 oldZone, uint32 newZone);
     [[nodiscard]] uint32 ApplyDynamicModeRespawnScaling(WorldObject const* obj, uint32 respawnDelay) const;
 
-    TaskScheduler _creatureRespawnScheduler;
+    EventProcessor Events;
 
     void ScheduleCreatureRespawn(ObjectGuid /*creatureGuid*/, Milliseconds /*respawnTimer*/, Position pos = Position());
 

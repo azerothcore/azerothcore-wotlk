@@ -23,10 +23,12 @@ DROP TABLE IF EXISTS `petition`;
 CREATE TABLE `petition` (
   `ownerguid` int unsigned NOT NULL,
   `petitionguid` int unsigned DEFAULT '0',
+  `petition_id` int unsigned NOT NULL DEFAULT '0',
   `name` varchar(24) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
   `type` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`ownerguid`,`type`),
-  UNIQUE KEY `index_ownerguid_petitionguid` (`ownerguid`,`petitionguid`)
+  UNIQUE KEY `index_ownerguid_petitionguid` (`ownerguid`,`petitionguid`),
+  KEY `idx_petition_id` (`petition_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Guild System';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -47,4 +49,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-07-19 12:10:15
+-- Dump completed on 2025-12-29 17:55:13

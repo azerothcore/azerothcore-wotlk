@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -199,18 +199,20 @@ namespace Movement
         return length;
     }
 
-    void SplineBase::init_spline(const Vector3* controls, index_type count, EvaluationMode m)
+    void SplineBase::init_spline(const Vector3* controls, index_type count, EvaluationMode m, float orientation)
     {
         m_mode = m;
         cyclic = false;
+        initialOrientation = orientation;
 
         (this->*initializers[m_mode])(controls, count, cyclic, 0);
     }
 
-    void SplineBase::init_cyclic_spline(const Vector3* controls, index_type count, EvaluationMode m, index_type cyclic_point)
+    void SplineBase::init_cyclic_spline(const Vector3* controls, index_type count, EvaluationMode m, index_type cyclic_point, float orientation)
     {
         m_mode = m;
         cyclic = true;
+        initialOrientation = orientation;
 
         (this->*initializers[m_mode])(controls, count, cyclic, cyclic_point);
     }
@@ -253,14 +255,18 @@ namespace Movement
             if (cyclic_point == 0)
                 points[0] = controls[count - 1];
             else
-                points[0] = controls[0].lerp(controls[1], -1);
+                points[0] = controls[0] - G3D::Vector3{ std::cos(initialOrientation), std::sin(initialOrientation), 0.0f };
 
             points[high_index + 1] = controls[cyclic_point];
             points[high_index + 2] = controls[cyclic_point + 1];
         }
         else
         {
-            points[0] = controls[0].lerp(controls[1], -1);
+            if (m_mode == ModeCatmullrom)
+                points[0] = controls[0] - G3D::Vector3{ std::cos(initialOrientation), std::sin(initialOrientation), 0.0f };
+            else
+                points[0] = controls[0].lerp(controls[1], -1);
+
             points[high_index + 1] = controls[count - 1];
         }
 

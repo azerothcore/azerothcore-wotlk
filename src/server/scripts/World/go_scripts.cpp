@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -38,25 +38,6 @@ public:
         if (player->GetQuestStatus(12007) == QUEST_STATUS_INCOMPLETE)
             player->CastSpell(player, 47293, true);
         return true;
-    }
-};
-
-class go_mistwhisper_treasure : public GameObjectScript
-{
-public:
-    go_mistwhisper_treasure() : GameObjectScript("go_mistwhisper_treasure") { }
-
-    bool OnGossipHello(Player* pPlayer, GameObject* go) override
-    {
-        if (!go->FindNearestCreature(28105, 30.0f)) // Tartek
-        {
-            if (Creature* cr = go->SummonCreature(28105, 6708.7f, 5115.45f, -18.3f, 0.7f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
-            {
-                cr->Yell("My treasure! You no steal from Tartek, dumb big-tongue traitor thing. Tartek and nasty dragon going to kill you! You so dumb.", LANG_UNIVERSAL);
-                cr->AI()->AttackStart(pPlayer);
-            }
-        }
-        return false;
     }
 };
 
@@ -1896,7 +1877,6 @@ public:
 void AddSC_go_scripts()
 {
     new go_seer_of_zebhalak();
-    new go_mistwhisper_treasure();
     new go_witherbark_totem_bundle();
     new go_arena_ready_marker();
     new go_ethereum_prison();

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -17,6 +17,7 @@
 
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
+#include "ScriptMgr.h"
 #include "CellImpl.h"
 #include "CreatureTextMgr.h"
 #include "GameGraveyard.h"
@@ -81,6 +82,10 @@ Battlefield::~Battlefield()
 // Called when a player enters the zone
 void Battlefield::HandlePlayerEnterZone(Player* player, uint32 /*zone*/)
 {
+    // Allow scripts to adjust the player's effective team or appearance before
+    // any team-based battlefield containers (such as player lists or queues) are updated.
+    sScriptMgr->OnBattlefieldPlayerEnterZone(this, player);
+
     // Xinef: do not invite players on taxi
     if (!player->IsInFlight())
     {
@@ -126,6 +131,7 @@ void Battlefield::HandlePlayerLeaveZone(Player* player, uint32 /*zone*/)
                     group->RemoveMember(player->GetGUID());
 
             OnPlayerLeaveWar(player);
+            sScriptMgr->OnBattlefieldPlayerLeaveWar(this, player);
         }
     }
 
@@ -138,6 +144,10 @@ void Battlefield::HandlePlayerLeaveZone(Player* player, uint32 /*zone*/)
     SendRemoveWorldStates(player);
     RemovePlayerFromResurrectQueue(player->GetGUID());
     OnPlayerLeaveZone(player);
+    // Scripts must restore player->GetTeamId() here (e.g. ClearFakePlayer).
+    // All Battlefield data-structure cleanup above has already completed using
+    // the assigned team, so it is safe to restore the real team now.
+    sScriptMgr->OnBattlefieldPlayerLeaveZone(this, player);
 }
 
 bool Battlefield::Update(uint32 diff)
@@ -302,6 +312,8 @@ void Battlefield::InvitePlayerToWar(Player* player)
     if (m_PlayersInWar[player->GetTeamId()].count(player->GetGUID()) || m_InvitedPlayers[player->GetTeamId()].count(player->GetGUID()))
         return;
 
+    sScriptMgr->OnBattlefieldBeforeInvitePlayerToWar(this, player);
+
     m_PlayersWillBeKick[player->GetTeamId()].erase(player->GetGUID());
     m_InvitedPlayers[player->GetTeamId()][player->GetGUID()] = GameTime::GetGameTime().count() + m_TimeForAcceptInvite;
     player->GetSession()->SendBfInvitePlayerToWar(m_BattleId, m_ZoneId, m_TimeForAcceptInvite);
@@ -424,11 +436,13 @@ void Battlefield::PlayerAcceptInviteToWar(Player* player)
     if (!IsWarTime())
         return;
 
+    sScriptMgr->OnBattlefieldPlayerJoinWar(this, player);
+
     if (AddOrSetPlayerToCorrectBfGroup(player))
     {
         player->GetSession()->SendBfEntered(m_BattleId);
         m_PlayersInWar[player->GetTeamId()].insert(player->GetGUID());
-        m_InvitedPlayers[player->GetTeamId()].erase(player->GetGUID());
+        m_InvitedPlayers[player->GetTeamId(true)].erase(player->GetGUID());
 
         if (player->isAFK())
             player->ToggleAFK();
@@ -458,7 +472,7 @@ void Battlefield::BroadcastPacketToZone(WorldPacket const* data) const
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
         for (GuidUnorderedSet::const_iterator itr = m_players[team].begin(); itr != m_players[team].end(); ++itr)
             if (Player* player = ObjectAccessor::FindPlayer(*itr))
-                player->GetSession()->SendPacket(data);
+                player->SendDirectMessage(data);
 }
 
 void Battlefield::BroadcastPacketToQueue(WorldPacket const* data) const
@@ -466,7 +480,7 @@ void Battlefield::BroadcastPacketToQueue(WorldPacket const* data) const
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
         for (GuidUnorderedSet::const_iterator itr = m_PlayersInQueue[team].begin(); itr != m_PlayersInQueue[team].end(); ++itr)
             if (Player* player = ObjectAccessor::FindPlayer(*itr))
-                player->GetSession()->SendPacket(data);
+                player->SendDirectMessage(data);
 }
 
 void Battlefield::BroadcastPacketToWar(WorldPacket const* data) const
@@ -474,7 +488,7 @@ void Battlefield::BroadcastPacketToWar(WorldPacket const* data) const
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
         for (GuidUnorderedSet::const_iterator itr = m_PlayersInWar[team].begin(); itr != m_PlayersInWar[team].end(); ++itr)
             if (Player* player = ObjectAccessor::FindPlayer(*itr))
-                player->GetSession()->SendPacket(data);
+                player->SendDirectMessage(data);
 }
 
 void Battlefield::SendWarning(uint8 id, WorldObject const* target /*= nullptr*/)
@@ -663,7 +677,7 @@ void Battlefield::SendAreaSpiritHealerQueryOpcode(Player* player, const ObjectGu
 
     data << guid << time;
     ASSERT(player);
-    player->GetSession()->SendPacket(&data);
+    player->SendDirectMessage(&data);
 }
 
 // ----------------------
@@ -840,7 +854,8 @@ GameObject* Battlefield::SpawnGameObject(uint32 entry, float x, float y, float z
 
     // Create gameobject
     GameObject* go = sObjectMgr->IsGameObjectStaticTransport(entry) ? new StaticTransport() : new GameObject();
-    if (!go->Create(map->GenerateLowGuid<HighGuid::GameObject>(), entry, map, PHASEMASK_NORMAL, x, y, z, o, G3D::Quat(), 100, GO_STATE_READY))
+    G3D::Quat rotation = G3D::Quat::fromAxisAngleRotation(G3D::Vector3::unitZ(), o);
+    if (!go->Create(map->GenerateLowGuid<HighGuid::GameObject>(), entry, map, PHASEMASK_NORMAL, x, y, z, o, rotation, 100, GO_STATE_READY))
     {
         LOG_ERROR("sql.sql", "Battlefield::SpawnGameObject: Gameobject template {} not found in database! Battlefield not created!", entry);
         LOG_ERROR("bg.battlefield", "Battlefield::SpawnGameObject: Cannot create gameobject template {}! Battlefield not created!", entry);

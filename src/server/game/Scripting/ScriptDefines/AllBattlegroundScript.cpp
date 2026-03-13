@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -102,6 +102,16 @@ void ScriptMgr::OnBattlegroundDestroy(Battleground* bg)
 void ScriptMgr::OnBattlegroundCreate(Battleground* bg)
 {
     CALL_ENABLED_HOOKS(AllBattlegroundScript, ALLBATTLEGROUNDHOOK_ON_BATTLEGROUND_CREATE, script->OnBattlegroundCreate(bg));
+}
+
+bool ScriptMgr::CanAddGroupToMatchingPool(BattlegroundQueue* queue, GroupQueueInfo* group, uint32 poolPlayerCount, Battleground* bg, BattlegroundBracketId bracketId)
+{
+    CALL_ENABLED_BOOLEAN_HOOKS(AllBattlegroundScript, ALLBATTLEGROUNDHOOK_CAN_ADD_GROUP_TO_MATCHING_POOL, !script->CanAddGroupToMatchingPool(queue, group, poolPlayerCount, bg, bracketId));
+}
+
+bool ScriptMgr::GetPlayerMatchmakingRating(ObjectGuid playerGuid, BattlegroundTypeId bgTypeId, float& outRating)
+{
+    CALL_ENABLED_BOOLEAN_HOOKS_WITH_DEFAULT_FALSE(AllBattlegroundScript, ALLBATTLEGROUNDHOOK_GET_PLAYER_MATCHMAKING_RATING, script->GetPlayerMatchmakingRating(playerGuid, bgTypeId, outRating));
 }
 
 AllBattlegroundScript::AllBattlegroundScript(char const* name, std::vector<uint16> enabledHooks) :

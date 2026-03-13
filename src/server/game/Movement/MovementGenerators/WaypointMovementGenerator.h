@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -54,8 +54,8 @@ class WaypointMovementGenerator<Creature> : public MovementGeneratorMedium< Crea
     public PathMovementBase<Creature, WaypointPath const*>
 {
 public:
-    WaypointMovementGenerator(uint32 _path_id = 0, bool _repeating = true, bool _stalled = false)
-        : PathMovementBase((WaypointPath const*)nullptr), i_nextMoveTime(0), m_isArrivalDone(false), path_id(_path_id), repeating(_repeating), stalled(_stalled)  {}
+    WaypointMovementGenerator(uint32 _path_id = 0, PathSource pathSource = PathSource::WAYPOINT_MGR, bool _repeating = true, bool _stalled = false)
+        : PathMovementBase((WaypointPath const*)nullptr), i_nextMoveTime(0), m_isArrivalDone(false), path_id(_path_id), repeating(_repeating), stalled(_stalled), i_pathSource(pathSource) {}
     ~WaypointMovementGenerator() { i_path = nullptr; }
     void DoInitialize(Creature*);
     void DoFinalize(Creature*);
@@ -96,6 +96,7 @@ private:
     uint32 path_id;
     bool repeating;
     bool stalled;
+    PathSource i_pathSource;
 };
 
 /** FlightPathMovementGenerator generates movement of the player for the paths

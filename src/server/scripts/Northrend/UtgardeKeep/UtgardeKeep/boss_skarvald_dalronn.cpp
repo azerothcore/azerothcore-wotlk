@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -44,8 +44,7 @@ enum eSpells
     SPELL_ENRAGE                                = 48193,
     SPELL_SUMMON_SKARVALD_GHOST                 = 48613,
     // Dalronn
-    SPELL_SHADOW_BOLT_N                         = 43649,
-    SPELL_SHADOW_BOLT_H                         = 59575,
+    SPELL_SHADOW_BOLT                           = 43649,
     SPELL_DEBILITATE                            = 43650,
     SPELL_SUMMON_SKELETONS                      = 52611,
     SPELL_SUMMON_DALRONN_GHOST                  = 48612
@@ -353,7 +352,7 @@ struct boss_dalronn_the_controller : public ScriptedAI
                 case EVENT_SHADOW_BOLT:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
                     {
-                        me->CastSpell(target, DUNGEON_MODE(SPELL_SHADOW_BOLT_N, SPELL_SHADOW_BOLT_H), false);
+                        me->CastSpell(target, SPELL_SHADOW_BOLT, false);
                     }
                     events.Repeat(2s);
                     break;

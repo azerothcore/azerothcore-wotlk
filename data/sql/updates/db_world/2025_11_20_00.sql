@@ -1,0 +1,14 @@
+-- DB update 2025_11_18_02 -> 2025_11_20_00
+--
+DELETE FROM `creature_summon_groups` WHERE `summonerId` = 29310 AND `summonerType` = 0 AND `groupId` = 2;
+INSERT INTO `creature_summon_groups`(`summonerId`, `summonerType`, `groupId`, `entry`, `position_x`, `position_y`, `position_z`, `orientation`, `summonType`, `summonTime`, `Comment`) VALUES
+(29310, 0, 2, 30111, 434.00433349609375, -702.8974609375, -17.9579715728759765, 3.124139308929443359, 8, 0, 'Jedoga Shadowseeker - Twilight Worshipper'),
+(29310, 0, 2, 30111, 429.734161376953125, -712.18231201171875, -17.9568767547607421, 2.862339973449707031, 8, 0, 'Jedoga Shadowseeker - Twilight Worshipper'),
+(29310, 0, 2, 30111, 388.307830810546875, -766.78399658203125, -17.9607582092285156, 2.094395160675048828, 8, 0, 'Jedoga Shadowseeker - Twilight Worshipper'),
+(29310, 0, 2, 30111, 392.577484130859375, -765.63641357421875, -17.9589138031005859, 2.251474618911743164, 8, 0, 'Jedoga Shadowseeker - Twilight Worshipper'),
+(29310, 0, 2, 30111, 381.83843994140625, -773.3897705078125, -17.9530143737792968, 1.762782573699951171, 8, 0, 'Jedoga Shadowseeker - Twilight Worshipper'),
+(29310, 0, 2, 30111, 439.982635498046875, -699.070068359375, -17.9527797698974609, 3.193952560424804687, 8, 0, 'Jedoga Shadowseeker - Twilight Worshipper'),
+(29310, 0, 2, 30111, 394.354156494140625, -760.810791015625, -17.9546241760253906, 2.443460941314697265, 8, 0, 'Jedoga Shadowseeker - Twilight Worshipper'),
+(29310, 0, 2, 30111, 434.4365234375, -709.4752197265625, -17.961435317993164, 2.94960641860961914, 8, 0, 'Jedoga Shadowseeker - Twilight Worshipper'),
+(29310, 0, 2, 30111, 387.0694580078125, -770.94964599609375, -17.957611083984375, 1.972222089767456054, 8, 0, 'Jedoga Shadowseeker - Twilight Worshipper'),
+(29310, 0, 2, 30111, 427.302093505859375, -717.3992919921875, -17.9517745971679687, 2.705260276794433593, 8, 0, 'Jedoga Shadowseeker - Twilight Worshipper');

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -139,7 +139,10 @@ struct boss_anzu : public BossAI
         me->CastSpell(me, SPELL_BANISH_SELF, true);
         for (uint8 i = 0; i < 5; ++i)
         {
-            me->SummonCreature(NPC_BROOD_OF_ANZU, me->GetPositionX() + 20 * cos((float)i), me->GetPositionY() + 20 * std::sin((float)i), me->GetPositionZ() + 25.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+            Position spawnPos = me->GetNearPosition(20.0f, (float)i);
+            spawnPos.m_positionZ += 25.0f;
+            spawnPos.m_orientation = 0.0f;
+            me->SummonCreature(NPC_BROOD_OF_ANZU, spawnPos, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
         }
     }
 

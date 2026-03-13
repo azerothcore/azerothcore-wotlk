@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -52,6 +52,11 @@ DoorData const doorData[] =
     { 0,                       0,                    DOOR_TYPE_ROOM    } // END
 };
 
+BossBoundaryData const boundaries =
+{
+    { DATA_KAELTHAS, new RectangleBoundary(118.64f, 178.63f, 125.69f, 210.70f) }
+};
+
 Position const KalecgosSpawnPos = { 164.3747f, -397.1197f, 2.151798f, 1.66219f };
 
 class instance_magisters_terrace : public InstanceMapScript
@@ -65,6 +70,7 @@ public:
         {
             SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTER);
+            LoadBossBoundaries(boundaries);
             SetPersistentDataCount(MAX_PERSISTENT_DATA);
             LoadObjectData(creatureData, gameobjectData);
             LoadDoorData(doorData);
@@ -80,7 +86,7 @@ public:
                     {
                         if (Creature* kalecgos = instance->SummonCreature(NPC_KALECGOS, KalecgosSpawnPos))
                         {
-                            kalecgos->GetMotionMaster()->MovePath(PATH_KALECGOS_FLIGHT, false);
+                            kalecgos->GetMotionMaster()->MoveWaypoint(PATH_KALECGOS_FLIGHT, false);
                             kalecgos->AI()->Talk(SAY_KALECGOS_SPAWN);
                         }
                     });

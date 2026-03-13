@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -224,7 +224,7 @@ bool BattlefieldWG::Update(uint32 diff)
 void BattlefieldWG::OnBattleStart()
 {
     // Spawn titan relic
-    GameObject* go = SpawnGameObject(GO_WINTERGRASP_TITAN_S_RELIC, 5440.0f, 2840.8f, 430.43f, 0);
+    GameObject* go = SpawnGameObject(GO_WINTERGRASP_TITAN_S_RELIC, 5440.37890625f, 2840.493408203125f, 430.2816162109375, 4.45059061050415039f); // VerifiedBuild 51943
     if (go)
     {
         // Update faction of relic, only attacker can click on

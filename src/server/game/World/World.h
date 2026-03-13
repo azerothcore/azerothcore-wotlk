@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -73,14 +73,14 @@ enum WorldTimers
 enum BillingPlanFlags
 {
     SESSION_NONE            = 0x00,
-    SESSION_UNUSED          = 0x01,
+    SESSION_UNUSED          = 0x01, // Unk, NYI
     SESSION_RECURRING_BILL  = 0x02,
     SESSION_FREE_TRIAL      = 0x04,
-    SESSION_IGR             = 0x08,
-    SESSION_USAGE           = 0x10,
-    SESSION_TIME_MIXTURE    = 0x20,
-    SESSION_RESTRICTED      = 0x40,
-    SESSION_ENABLE_CAIS     = 0x80,
+    SESSION_IGR             = 0x08, // Internet Game Room
+    SESSION_USAGE           = 0x10, // Unk, NYI
+    SESSION_TIME_MIXTURE    = 0x20, // Unk, NYI
+    SESSION_RESTRICTED      = 0x40, // Unk, NYI
+    SESSION_ENABLE_CAIS     = 0x80, // Unk, NYI, possibly account play time limit related for China?
 };
 
 enum RealmZone

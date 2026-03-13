@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -353,6 +353,21 @@ public:
 
     uint32 GetTimer() { return m_Timer; }
     void SetTimer(uint32 timer) { m_Timer = timer; }
+
+    // Returns combined count of players in war + invited (per team) for balance checking
+    uint32 GetPlayersInWarCount(TeamId teamId) const { return static_cast<uint32>(m_PlayersInWar[teamId].size() + m_InvitedPlayers[teamId].size()); }
+    // Returns total count of players in the battlefield zone per team
+    uint32 GetPlayersInZoneCount(TeamId teamId) const { return static_cast<uint32>(m_players[teamId].size()); }
+    // Returns the maximum players allowed per team
+    uint32 GetMaxPlayersPerTeam() const { return m_MaxPlayer; }
+
+    /// Returns the set of players waiting in the pre-battle queue (per team, read-only).
+    GuidUnorderedSet const& GetPlayersQueueSet(TeamId teamId) const { return m_PlayersInQueue[teamId]; }
+    /// Returns the map of players invited to join the active war, value is invite expiry
+    /// timestamp (per team, read-only).
+    PlayerTimerMap const& GetInvitedPlayersMap(TeamId teamId) const { return m_InvitedPlayers[teamId]; }
+    /// Returns the set of players actively fighting in the war (per team, read-only).
+    GuidUnorderedSet const& GetPlayersInWarSet(TeamId teamId) const { return m_PlayersInWar[teamId]; }
 
     void DoPlaySoundToAll(uint32 SoundID);
 

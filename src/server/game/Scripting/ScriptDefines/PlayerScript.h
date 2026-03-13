@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -20,6 +20,7 @@
 
 #include "ScriptObject.h"
 #include "SharedDefines.h"
+#include "DBCStructure.h"
 #include <vector>
 
 // TODO to remove
@@ -55,12 +56,7 @@ enum PlayerHook
     PLAYERHOOK_ON_DUEL_REQUEST,
     PLAYERHOOK_ON_DUEL_START,
     PLAYERHOOK_ON_DUEL_END,
-    PLAYERHOOK_ON_CHAT,
     PLAYERHOOK_ON_BEFORE_SEND_CHAT_MESSAGE,
-    PLAYERHOOK_ON_CHAT_WITH_RECEIVER,
-    PLAYERHOOK_ON_CHAT_WITH_GROUP,
-    PLAYERHOOK_ON_CHAT_WITH_GUILD,
-    PLAYERHOOK_ON_CHAT_WITH_CHANNEL,
     PLAYERHOOK_ON_EMOTE,
     PLAYERHOOK_ON_TEXT_EMOTE,
     PLAYERHOOK_ON_SPELL_CAST,
@@ -93,6 +89,7 @@ enum PlayerHook
     PLAYERHOOK_ON_AFTER_SET_VISIBLE_ITEM_SLOT,
     PLAYERHOOK_ON_AFTER_MOVE_ITEM_FROM_INVENTORY,
     PLAYERHOOK_ON_EQUIP,
+    PLAYERHOOK_ON_UNEQUIP_ITEM,
     PLAYERHOOK_ON_PLAYER_JOIN_BG,
     PLAYERHOOK_ON_PLAYER_JOIN_ARENA,
     PLAYERHOOK_GET_CUSTOM_GET_ARENA_TEAM_ID,
@@ -211,6 +208,7 @@ enum PlayerHook
     PLAYERHOOK_ON_CAN_GIVE_LEVEL,
     PLAYERHOOK_ON_SEND_LIST_INVENTORY,
     PLAYERHOOK_ON_GIVE_REPUTATION,
+    PLAYERHOOK_ON_GET_REPUTATION_PRICE_DISCOUNT,
     PLAYERHOOK_END
 };
 
@@ -303,17 +301,7 @@ public:
     virtual void OnPlayerDuelEnd(Player* /*winner*/, Player* /*loser*/, DuelCompleteType /*type*/) { }
 
     // The following methods are called when a player sends a chat message.
-    virtual void OnPlayerChat(Player* /*player*/, uint32 /*type*/, uint32 /*lang*/, std::string& /*msg*/) { }
-
     virtual void OnPlayerBeforeSendChatMessage(Player* /*player*/, uint32& /*type*/, uint32& /*lang*/, std::string& /*msg*/) { }
-
-    virtual void OnPlayerChat(Player* /*player*/, uint32 /*type*/, uint32 /*lang*/, std::string& /*msg*/, Player* /*receiver*/) { }
-
-    virtual void OnPlayerChat(Player* /*player*/, uint32 /*type*/, uint32 /*lang*/, std::string& /*msg*/, Group* /*group*/) { }
-
-    virtual void OnPlayerChat(Player* /*player*/, uint32 /*type*/, uint32 /*lang*/, std::string& /*msg*/, Guild* /*guild*/) { }
-
-    virtual void OnPlayerChat(Player* /*player*/, uint32 /*type*/, uint32 /*lang*/, std::string& /*msg*/, Channel* /*channel*/) { }
 
     // Both of the below are called on emote opcodes.
     virtual void OnPlayerEmote(Player* /*player*/, uint32 /*emote*/) { }
@@ -409,6 +397,9 @@ public:
 
     // After an item has been equipped
     virtual void OnPlayerEquip(Player* /*player*/, Item* /*it*/, uint8 /*bag*/, uint8 /*slot*/, bool /*update*/) { }
+
+    // After an item has been unequipped
+    virtual void OnPlayerUnequip(Player* /*player*/, Item* /*it*/) { }
 
     // After player enters queue for BG
     virtual void OnPlayerJoinBG(Player* /*player*/) { }
@@ -546,9 +537,9 @@ public:
 
     [[nodiscard]] virtual bool OnPlayerCanAreaExploreAndOutdoor(Player* /*player*/) { return true; }
 
-    virtual void OnPlayerVictimRewardBefore(Player* /*player*/, Player* /*victim*/, uint32& /*killer_title*/, uint32& /*victim_title*/) { }
+    virtual void OnPlayerVictimRewardBefore(Player* /*player*/, Player* /*victim*/, uint32& /*killer_title*/, int32& /*victim_rank*/) { }
 
-    virtual void OnPlayerVictimRewardAfter(Player* /*player*/, Player* /*victim*/, uint32& /*killer_title*/, uint32& /*victim_rank*/, float& /*honor_f*/) { }
+    virtual void OnPlayerVictimRewardAfter(Player* /*player*/, Player* /*victim*/, uint32& /*killer_title*/, int32& /*victim_rank*/, float& /*honor_f*/) { }
 
     virtual void OnPlayerCustomScalingStatValueBefore(Player* /*player*/, ItemTemplate const* /*proto*/, uint8 /*slot*/, bool /*apply*/, uint32& /*CustomScalingStatValue*/) { }
 
@@ -807,6 +798,24 @@ public:
      * @param vendorEntry Entry of the vendor player is interacting with
      */
     virtual void OnPlayerSendListInventory(Player* /*player*/, ObjectGuid /*vendorGuid*/, uint32& /*vendorEntry*/) {}
+
+    /**
+     * @brief This hook is called whenever a player attempts to buy items, repair, take taxis, or learn spells. This then uses this information to call OnPlayerGetReputationPriceDiscoun(Player, FactionTemplateEntry, float)
+     *
+     * @param player Contains information about the Player
+     * @param creature Contains information about the creature involved in the transaction
+     * @param discount Float value of the discount, as a multiplier of the base price
+     */
+    virtual void OnPlayerGetReputationPriceDiscount(Player const* /*player*/, Creature const* /*creature*/, float& /*discount*/) {}
+
+    /**
+     * @brief This hook is called whenever a player attempts to buy items, repair, take taxis, or learn spells. It is also called when continuing along taxis
+     *
+     * @param player Contains information about the Player
+     * @param factionTemplate Contains information about the faction template involved in the transaction. Can be null!
+     * @param discount Float value of the discount, as a multiplier of the base price
+     */
+    virtual void OnPlayerGetReputationPriceDiscount(Player const* /*player*/, FactionTemplateEntry const* /*factionTemplate*/, float& /*discount*/) {}
 };
 
 #endif

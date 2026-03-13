@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -25,13 +25,13 @@
 class WorldSocketThread : public NetworkThread<WorldSocket>
 {
 public:
-    void SocketAdded(std::shared_ptr<WorldSocket> sock) override
+    void SocketAdded(std::shared_ptr<WorldSocket> const& sock) override
     {
         sock->SetSendBufferSize(sWorldSocketMgr.GetApplicationSendBufferSize());
         sScriptMgr->OnSocketOpen(sock);
     }
 
-    void SocketRemoved(std::shared_ptr<WorldSocket> sock) override
+    void SocketRemoved(std::shared_ptr<WorldSocket> const& sock) override
     {
         sScriptMgr->OnSocketClose(sock);
     }
@@ -81,7 +81,7 @@ void WorldSocketMgr::StopNetwork()
     sScriptMgr->OnNetworkStop();
 }
 
-void WorldSocketMgr::OnSocketOpen(tcp::socket&& sock, uint32 threadIndex)
+void WorldSocketMgr::OnSocketOpen(IoContextTcpSocket&& sock, uint32 threadIndex)
 {
     // set some options here
     if (_socketSystemSendBufferSize >= 0)
@@ -109,7 +109,7 @@ void WorldSocketMgr::OnSocketOpen(tcp::socket&& sock, uint32 threadIndex)
         }
     }
 
-    BaseSocketMgr::OnSocketOpen(std::forward<tcp::socket>(sock), threadIndex);
+    BaseSocketMgr::OnSocketOpen(std::move(sock), threadIndex);
 }
 
 NetworkThread<WorldSocket>* WorldSocketMgr::CreateThreads() const
