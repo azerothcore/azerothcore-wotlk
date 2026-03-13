@@ -107,7 +107,8 @@ struct npc_taldaram_flamesphere : public NullCreatureAI
     {
         if (type == POINT_MOTION_TYPE && id == POINT_ORB)
         {
-            me->KillSelf();
+            me->DespawnOrUnsummon(1s);
+            DoCastSelf(SPELL_FLAME_SPHERE_DEATH_EFFECT, true);
         }
     }
 
