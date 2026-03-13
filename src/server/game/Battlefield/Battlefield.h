@@ -361,6 +361,14 @@ public:
     // Returns the maximum players allowed per team
     uint32 GetMaxPlayersPerTeam() const { return m_MaxPlayer; }
 
+    /// Returns the set of players waiting in the pre-battle queue (per team, read-only).
+    GuidUnorderedSet const& GetPlayersQueueSet(TeamId teamId) const { return m_PlayersInQueue[teamId]; }
+    /// Returns the map of players invited to join the active war, value is invite expiry
+    /// timestamp (per team, read-only).
+    PlayerTimerMap const& GetInvitedPlayersMap(TeamId teamId) const { return m_InvitedPlayers[teamId]; }
+    /// Returns the set of players actively fighting in the war (per team, read-only).
+    GuidUnorderedSet const& GetPlayersInWarSet(TeamId teamId) const { return m_PlayersInWar[teamId]; }
+
     void DoPlaySoundToAll(uint32 SoundID);
 
     void InvitePlayerToQueue(Player* player);

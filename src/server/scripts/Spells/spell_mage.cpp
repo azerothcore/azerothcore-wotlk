@@ -1556,6 +1556,10 @@ class spell_mage_missile_barrage_proc : public AuraScript
     {
         Unit* caster = eventInfo.GetActor();
 
+        // Prevent double proc for Arcane Missiles
+        if (caster == eventInfo.GetActionTarget())
+            return false;
+
         // T8 4P bonus: chance to not consume the proc
         if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_MAGE_T8_4P_BONUS, EFFECT_0))
             if (roll_chance_i(aurEff->GetAmount()))

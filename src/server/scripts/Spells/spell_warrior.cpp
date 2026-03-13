@@ -884,6 +884,10 @@ class spell_warr_retaliation : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
+        // Prevent counterattacking yourself on activation
+        if (eventInfo.GetActor() == eventInfo.GetActionTarget())
+            return false;
+
         // check attack comes not from behind and warrior is not stunned
         return eventInfo.GetActionTarget()->isInFront(eventInfo.GetActor(), float(M_PI)) && !GetTarget()->HasUnitState(UNIT_STATE_STUNNED);
     }

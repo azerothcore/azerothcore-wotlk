@@ -442,7 +442,7 @@ void Battlefield::PlayerAcceptInviteToWar(Player* player)
     {
         player->GetSession()->SendBfEntered(m_BattleId);
         m_PlayersInWar[player->GetTeamId()].insert(player->GetGUID());
-        m_InvitedPlayers[player->GetTeamId()].erase(player->GetGUID());
+        m_InvitedPlayers[player->GetTeamId(true)].erase(player->GetGUID());
 
         if (player->isAFK())
             player->ToggleAFK();
