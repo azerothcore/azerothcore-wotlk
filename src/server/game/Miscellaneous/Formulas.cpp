@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -84,14 +84,9 @@ uint32 Acore::XP::Gain(Player* player, Unit* unit, bool isBattleGround /*= false
         if (gain && creature)
         {
             if (creature->isElite())
-            {
-                // Elites in instances have a 2.75x XP bonus instead of the regular 2x world bonus.
-                if (unit->GetMap() && unit->GetMap()->IsDungeon())
-                    xpMod *= 2.75f;
-                else
-                    xpMod *= 2.0f;
-            }
+                xpMod *= 2.0f;
 
+            // Instanced mobs (particularly bosses) oftentimes have higher bonuses, especially in later content levels
             xpMod *= creature->GetCreatureTemplate()->ModExperience;
         }
 

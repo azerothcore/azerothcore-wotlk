@@ -1,14 +1,14 @@
  /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -1557,11 +1557,13 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
         else if (m_spellInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT && m_spellInfo->SpellFamilyFlags[0] & 0x00080000)
         {
             addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, int32(caster->CountPctFromMaxHealth(damage)), HEAL, effIndex);
+            m_damageBeforeTakenMods -= addhealth;
             addhealth = unitTarget->SpellHealingBonusTaken(caster, m_spellInfo, addhealth, HEAL);
         }
         else if (m_spellInfo->Id != 33778) // not lifebloom
         {
             addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL, effIndex);
+            m_damageBeforeTakenMods -= addhealth;
             addhealth = unitTarget->SpellHealingBonusTaken(caster, m_spellInfo, addhealth, HEAL);
         }
 
@@ -1593,6 +1595,7 @@ void Spell::EffectHealPct(SpellEffIndex effIndex)
         return;
 
     uint32 heal = m_originalCaster->SpellHealingBonusDone(unitTarget, m_spellInfo, unitTarget->CountPctFromMaxHealth(damage), HEAL, effIndex);
+    m_damageBeforeTakenMods -= heal;
     heal = unitTarget->SpellHealingBonusTaken(m_originalCaster, m_spellInfo, heal, HEAL);
 
     m_damage -= heal;
@@ -1611,6 +1614,7 @@ void Spell::EffectHealMechanical(SpellEffIndex effIndex)
         return;
 
     uint32 heal = m_originalCaster->SpellHealingBonusDone(unitTarget, m_spellInfo, uint32(damage), HEAL, effIndex);
+    m_damageBeforeTakenMods -= heal;
 
     m_damage -= unitTarget->SpellHealingBonusTaken(m_originalCaster, m_spellInfo, heal, HEAL);
 }
@@ -1952,13 +1956,10 @@ void Spell::EffectEnergize(SpellEffIndex effIndex)
         Unit::AuraApplicationMap& Auras = unitTarget->GetAppliedAuras();
         for (Unit::AuraApplicationMap::iterator itr = Auras.begin(); itr != Auras.end(); ++itr)
         {
-            SpellGroupSpecialFlags sFlag = sSpellMgr->GetSpellGroupSpecialFlags(itr->second->GetBase()->GetId());
-            if (!guardianFound)
-                if (sFlag & SPELL_GROUP_SPECIAL_FLAG_ELIXIR_GUARDIAN)
-                    guardianFound = true;
-            if (!battleFound)
-                if (sFlag & SPELL_GROUP_SPECIAL_FLAG_ELIXIR_BATTLE)
-                    battleFound = true;
+            if (!guardianFound && sSpellMgr->IsSpellMemberOfSpellGroup(itr->second->GetBase()->GetId(), SPELL_GROUP_ELIXIR_GUARDIAN))
+                guardianFound = true;
+            if (!battleFound && sSpellMgr->IsSpellMemberOfSpellGroup(itr->second->GetBase()->GetId(), SPELL_GROUP_ELIXIR_BATTLE))
+                battleFound = true;
             if (battleFound && guardianFound)
                 break;
         }
@@ -1966,9 +1967,9 @@ void Spell::EffectEnergize(SpellEffIndex effIndex)
         // get all available elixirs by mask and spell level
         std::set<uint32> availableElixirs;
         if (!guardianFound)
-            sSpellMgr->GetSetOfSpellsInSpellGroupWithFlag(1, SPELL_GROUP_SPECIAL_FLAG_ELIXIR_GUARDIAN, availableElixirs);
+            sSpellMgr->GetSetOfSpellsInSpellGroup(SPELL_GROUP_ELIXIR_GUARDIAN, availableElixirs);
         if (!battleFound)
-            sSpellMgr->GetSetOfSpellsInSpellGroupWithFlag(1, SPELL_GROUP_SPECIAL_FLAG_ELIXIR_BATTLE, availableElixirs);
+            sSpellMgr->GetSetOfSpellsInSpellGroup(SPELL_GROUP_ELIXIR_BATTLE, availableElixirs);
         for (std::set<uint32>::iterator itr = availableElixirs.begin(); itr != availableElixirs.end();)
         {
             SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(*itr);
@@ -1995,6 +1996,12 @@ void Spell::EffectEnergizePct(SpellEffIndex effIndex)
         return;
     if (!unitTarget->IsAlive())
         return;
+
+    if (unitTarget->HasUnitState(UNIT_STATE_ISOLATED))
+    {
+        m_caster->SendSpellDamageImmune(unitTarget, GetSpellInfo()->Id);
+        return;
+    }
 
     if (m_spellInfo->Effects[effIndex].MiscValue < 0 || m_spellInfo->Effects[effIndex].MiscValue >= int8(MAX_POWERS))
         return;
@@ -3597,7 +3604,7 @@ void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
             unitMod = UNIT_MOD_DAMAGE_RANGED;
             break;
         }
-        float weapon_total_pct = m_caster->GetModifierValue(unitMod, TOTAL_PCT);
+        float weapon_total_pct = m_caster->GetPctModifierValue(unitMod, TOTAL_PCT);
         fixed_bonus = int32(fixed_bonus * weapon_total_pct);
         spell_bonus = int32(spell_bonus * weapon_total_pct);
     }
@@ -3753,7 +3760,8 @@ void Spell::EffectSummonObjectWild(SpellEffIndex effIndex)
 
     Map* map = target->GetMap();
 
-    if (!pGameObj->Create(map->GenerateLowGuid<HighGuid::GameObject>(), gameobject_id, map, m_caster->GetPhaseMask(), x, y, z, target->GetOrientation(), G3D::Quat(), 100, GO_STATE_READY))
+    G3D::Quat rotation = G3D::Quat::fromAxisAngleRotation(G3D::Vector3::unitZ(), target->GetOrientation());
+    if (!pGameObj->Create(map->GenerateLowGuid<HighGuid::GameObject>(), gameobject_id, map, m_caster->GetPhaseMask(), x, y, z, target->GetOrientation(), rotation, 100, GO_STATE_READY))
     {
         delete pGameObj;
         return;
@@ -3929,39 +3937,6 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
 
                             return;
                         }
-                    // Stoneclaw Totem
-                    case 55328: // Rank 1
-                    case 55329: // Rank 2
-                    case 55330: // Rank 3
-                    case 55332: // Rank 4
-                    case 55333: // Rank 5
-                    case 55335: // Rank 6
-                    case 55278: // Rank 7
-                    case 58589: // Rank 8
-                    case 58590: // Rank 9
-                    case 58591: // Rank 10
-                        {
-                            int32 basepoints0 = damage;
-                            // Cast Absorb on totems
-                            for (uint8 slot = SUMMON_SLOT_TOTEM_FIRE; slot < MAX_TOTEM_SLOT; ++slot)
-                            {
-                                if (!unitTarget->m_SummonSlot[slot])
-                                    continue;
-
-                                Creature* totem = unitTarget->GetMap()->GetCreature(unitTarget->m_SummonSlot[slot]);
-                                if (totem && totem->IsTotem())
-                                {
-                                    m_caster->CastCustomSpell(totem, 55277, &basepoints0, nullptr, nullptr, true);
-                                }
-                            }
-                            // Glyph of Stoneclaw Totem
-                            if (AuraEffect* aur = unitTarget->GetAuraEffect(63298, 0))
-                            {
-                                basepoints0 *= aur->GetAmount();
-                                m_caster->CastCustomSpell(unitTarget, 55277, &basepoints0, nullptr, nullptr, true);
-                            }
-                            break;
-                        }
                     case 61263: // for item Intravenous Healing Potion (44698)
                         {
                             if (!m_caster || !unitTarget)
@@ -4134,12 +4109,13 @@ void Spell::EffectDuel(SpellEffIndex effIndex)
     GameObject* pGameObj = sObjectMgr->IsGameObjectStaticTransport(gameobject_id) ? new StaticTransport() : new GameObject();
 
     Map* map = m_caster->GetMap();
+    G3D::Quat rotation = G3D::Quat::fromAxisAngleRotation(G3D::Vector3::unitZ(), m_caster->GetOrientation());
     if (!pGameObj->Create(map->GenerateLowGuid<HighGuid::GameObject>(), gameobject_id,
                           map, m_caster->GetPhaseMask(),
                           m_caster->GetPositionX() + (unitTarget->GetPositionX() - m_caster->GetPositionX()) / 2,
                           m_caster->GetPositionY() + (unitTarget->GetPositionY() - m_caster->GetPositionY()) / 2,
                           m_caster->GetPositionZ(),
-                          m_caster->GetOrientation(), G3D::Quat(), 0, GO_STATE_READY))
+                          m_caster->GetOrientation(), rotation, 0, GO_STATE_READY))
     {
         delete pGameObj;
         return;
@@ -4615,7 +4591,8 @@ void Spell::EffectSummonObject(SpellEffIndex effIndex)
         m_caster->GetClosePoint(x, y, z, DEFAULT_WORLD_OBJECT_SIZE);
 
     Map* map = m_caster->GetMap();
-    if (!pGameObj->Create(map->GenerateLowGuid<HighGuid::GameObject>(), gameobjectId, map, m_caster->GetPhaseMask(), x, y, z, m_caster->GetOrientation(), G3D::Quat(), 0, GO_STATE_READY))
+    G3D::Quat rotation = G3D::Quat::fromAxisAngleRotation(G3D::Vector3::unitZ(), m_caster->GetOrientation());
+    if (!pGameObj->Create(map->GenerateLowGuid<HighGuid::GameObject>(), gameobjectId, map, m_caster->GetPhaseMask(), x, y, z, m_caster->GetOrientation(), rotation, 0, GO_STATE_READY))
     {
         delete pGameObj;
         return;
@@ -5012,7 +4989,24 @@ void Spell::EffectKnockBack(SpellEffIndex effIndex)
         return;
 
     float x, y;
-    if (m_spellInfo->Effects[effIndex].Effect == SPELL_EFFECT_KNOCK_BACK_DEST)
+    Unit* reflectionSource = m_reflectionTarget;
+
+    if (!reflectionSource && !m_reflectionTargetGuid.IsEmpty())
+    {
+        if (Unit* resolvedSource = ObjectAccessor::GetUnit(*m_caster, m_reflectionTargetGuid))
+            reflectionSource = resolvedSource;
+    }
+
+    if (reflectionSource)
+    {
+        reflectionSource->GetPosition(x, y);
+    }
+    else if (!m_reflectionTargetGuid.IsEmpty())
+    {
+        x = m_reflectionTargetPosition.GetPositionX();
+        y = m_reflectionTargetPosition.GetPositionY();
+    }
+    else if (m_spellInfo->Effects[effIndex].Effect == SPELL_EFFECT_KNOCK_BACK_DEST)
     {
         if (m_targets.HasDst())
             destTarget->GetPosition(x, y);
@@ -5402,7 +5396,8 @@ void Spell::EffectTransmitted(SpellEffIndex effIndex)
 
     GameObject* pGameObj = sObjectMgr->IsGameObjectStaticTransport(name_id) ? new StaticTransport() : new GameObject();
 
-    if (!pGameObj->Create(cMap->GenerateLowGuid<HighGuid::GameObject>(), name_id, cMap, m_caster->GetPhaseMask(), fx, fy, fz, m_caster->GetOrientation(), G3D::Quat(), 100, GO_STATE_READY))
+    G3D::Quat rotation = G3D::Quat::fromAxisAngleRotation(G3D::Vector3::unitZ(), m_caster->GetOrientation());
+    if (!pGameObj->Create(cMap->GenerateLowGuid<HighGuid::GameObject>(), name_id, cMap, m_caster->GetPhaseMask(), fx, fy, fz, m_caster->GetOrientation(), rotation, 100, GO_STATE_READY))
     {
         delete pGameObj;
         return;

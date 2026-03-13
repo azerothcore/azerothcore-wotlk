@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -30,6 +30,7 @@ enum VolkahnSpells
 
     //Molten Golem
     SPELL_BLAST_WAVE                    = 23113,
+    SPELL_COOL_DOWN                     = 52443,
     SPELL_IMMOLATION_STRIKE             = 52433,
     SPELL_SHATTER                       = 52429,
 };
@@ -40,6 +41,7 @@ enum VolkhanOther
     NPC_VOLKHAN_ANVIL                   = 28823,
     NPC_MOLTEN_GOLEM                    = 28695,
     NPC_BRITTLE_GOLEM                   = 28681,
+    NPC_SLAG                            = 28585,
 
     // Misc
     ACTION_SHATTER                      = 1,
@@ -59,8 +61,8 @@ enum VolkhanEvents
     EVENT_MOVE_TO_ANVIL                 = 5,
 
     // Molten Golem
-    EVENT_BLAST                         = 11,
-    EVENT_IMMOLATION                    = 12,
+    EVENT_IMMOLATION_STRIKE             = 12,
+    EVENT_CHANGE_TARGET                 = 13,
 };
 
 enum Yells
@@ -76,13 +78,13 @@ enum Yells
 
 struct boss_volkhan : public BossAI
 {
-    boss_volkhan(Creature* creature) : BossAI(creature, DATA_VOLKHAN), summons(creature) { }
+    boss_volkhan(Creature* creature) : BossAI(creature, DATA_VOLKHAN) { }
 
     void Reset() override
     {
         _Reset();
         x = y = z = PointID = ShatteredCount = 0;
-        HealthCheck = 100;
+        shatteredStompCast = false;
         me->SetSpeed(MOVE_RUN, 1.2f, true);
         me->SetReactState(REACT_AGGRESSIVE);
         instance->SetData(DATA_VOLKHAN_ACHIEVEMENT, true);
@@ -93,13 +95,28 @@ struct boss_volkhan : public BossAI
         _JustEngagedWith();
         me->SetInCombatWithZone();
         Talk(SAY_AGGRO);
-        ScheduleEvents(false);
+        events.ScheduleEvent(EVENT_MOVE_TO_ANVIL, randtime(9s, 14s));
+        events.ScheduleEvent(EVENT_HEAT, randtime(18s, 38s));
+        events.ScheduleEvent(EVENT_CHECK_HEALTH, 1s);
+        events.ScheduleEvent(EVENT_POSITION, 4s);
     }
 
     void JustDied(Unit*) override
     {
         _JustDied();
         Talk(SAY_DEATH);
+
+        std::list<Creature*> slags;
+        GetCreatureListWithEntryInGrid(slags, me, NPC_SLAG, 100.0f);
+
+        if (!slags.empty())
+        {
+            for (Creature* slag : slags)
+            {
+                if (slag)
+                    slag->DespawnOrUnsummon();
+            }
+        }
     }
 
     void GetNextPos()
@@ -151,15 +168,6 @@ struct boss_volkhan : public BossAI
         Talk(SAY_SLAY);
     }
 
-    void ScheduleEvents(bool anvil)
-    {
-        events.SetPhase(1);
-        events.RescheduleEvent(EVENT_HEAT, 8s, 0, 1);
-        events.RescheduleEvent(EVENT_SHATTER, 10s, 0, 1);
-        events.RescheduleEvent(EVENT_CHECK_HEALTH, anvil ? 1s : 6s, 0, 1);
-        events.RescheduleEvent(EVENT_POSITION, 4s, 0, 1);
-    }
-
     void JustSummoned(Creature* summon) override
     {
         summons.Summon(summon);
@@ -182,6 +190,19 @@ struct boss_volkhan : public BossAI
         }
     }
 
+    bool HasActiveGolem()
+    {
+        for (ObjectGuid const& guid : summons)
+        {
+            if (Creature* golem = ObjectAccessor::GetCreature(*me, guid))
+            {
+                if (golem->GetEntry() == NPC_MOLTEN_GOLEM && golem->IsAlive())
+                    return true;
+            }
+        }
+        return false;
+    }
+
     void MovementInform(uint32 type, uint32 id) override
     {
         if (type != POINT_MOTION_TYPE)
@@ -190,39 +211,37 @@ struct boss_volkhan : public BossAI
         if (id == POINT_ANVIL)
         {
             me->SetSpeed(MOVE_RUN, 1.2f, true);
-            me->SetReactState(REACT_AGGRESSIVE);
-            me->CastSpell(me, SPELL_TEMPER, false);
+            DoCastSelf(SPELL_TEMPER);
             PointID = 0;
-            ScheduleEvents(true);
 
             // update orientation at server
             me->SetOrientation(2.19f);
 
             // and client
-            WorldPacket data;
-            me->BuildHeartBeatMsg(&data);
-            me->SendMessageToSet(&data, false);
+            me->SendMovementFlagUpdate(false);
             me->SetControlled(true, UNIT_STATE_ROOT);
         }
         else
-            events.ScheduleEvent(EVENT_MOVE_TO_ANVIL, 0ms, 0, 2);
+            me->GetMotionMaster()->MovePoint(PointID, x, y, z);
     }
 
     void SpellHitTarget(Unit* /*who*/, SpellInfo const* spellInfo) override
     {
         if (spellInfo->Id == SPELL_TEMPER)
         {
-            me->CastSpell(me, SPELL_SUMMON_MOLTEN_GOLEM, true);
-            me->CastSpell(me, SPELL_SUMMON_MOLTEN_GOLEM, true);
-            me->GetMotionMaster()->MoveChase(me->GetVictim());
+            DoCastSelf(SPELL_SUMMON_MOLTEN_GOLEM, true);
+            DoCastSelf(SPELL_SUMMON_MOLTEN_GOLEM, true);
             me->SetControlled(false, UNIT_STATE_ROOT);
+            me->SetReactState(REACT_AGGRESSIVE);
+            if (me->GetVictim())
+                me->GetMotionMaster()->MoveChase(me->GetVictim());
+
+            events.RescheduleEvent(EVENT_HEAT, randtime(9s, 24s));
         }
     }
 
     void GoToAnvil()
     {
-        events.SetPhase(2);
-        HealthCheck -= 20;
         me->SetSpeed(MOVE_RUN, 4.0f, true);
         me->SetReactState(REACT_PASSIVE);
 
@@ -231,12 +250,12 @@ struct boss_volkhan : public BossAI
         if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE)
             me->GetMotionMaster()->MovementExpired();
 
-        events.ScheduleEvent(EVENT_MOVE_TO_ANVIL, 0ms, 0, 2);
+        GetNextPos();
+        me->GetMotionMaster()->MovePoint(PointID, x, y, z);
     }
 
     void UpdateAI(uint32 diff) override
     {
-        //Return since we have no target
         if (!UpdateVictim())
             return;
 
@@ -248,31 +267,31 @@ struct boss_volkhan : public BossAI
         switch (events.ExecuteEvent())
         {
             case EVENT_HEAT:
-                me->CastSpell(me, SPELL_HEAT, true);
-                events.Repeat(8s);
+                if (HasActiveGolem())
+                {
+                    DoCastSelf(SPELL_HEAT);
+                    events.Repeat(randtime(9s, 24s));
+                }
                 break;
             case EVENT_CHECK_HEALTH:
-                if (HealthBelowPct(HealthCheck))
-                    GoToAnvil();
-
+                if (!shatteredStompCast && HealthBelowPct(25))
+                {
+                    shatteredStompCast = true;
+                    DoCastAOE(SPELL_SHATTERING_STOMP);
+                    Talk(SAY_STOMP);
+                    summons.DoAction(ACTION_SHATTER);
+                }
                 events.Repeat(1s);
                 return;
-            case EVENT_SHATTER:
-                {
-                    events.Repeat(10s);
-                    summons.DoAction(ACTION_SHATTER);
-                    break;
-                }
             case EVENT_MOVE_TO_ANVIL:
-                GetNextPos();
-                me->GetMotionMaster()->MovePoint(PointID, x, y, z);
+                GoToAnvil();
+                events.Repeat(randtime(30s, 36s));
                 return;
             case EVENT_POSITION:
                 if (me->GetDistance(1331.9f, -106, 56) > 95)
                     EnterEvadeMode();
                 else
                     events.Repeat(4s);
-
                 return;
         }
 
@@ -280,12 +299,10 @@ struct boss_volkhan : public BossAI
     }
 
     private:
-        EventMap events;
-        SummonList summons;
-        uint8 HealthCheck;
         float x, y, z;
         uint8 PointID;
         uint8 ShatteredCount;
+        bool shatteredStompCast;
 };
 
 struct npc_molten_golem : public ScriptedAI
@@ -298,8 +315,9 @@ struct npc_molten_golem : public ScriptedAI
     void Reset() override
     {
         events.Reset();
-        events.ScheduleEvent(EVENT_BLAST, 7s);
-        events.ScheduleEvent(EVENT_IMMOLATION, 3s);
+        events.ScheduleEvent(EVENT_IMMOLATION_STRIKE, 3s);
+        events.ScheduleEvent(EVENT_CHANGE_TARGET, 5s);
+        DoCastSelf(SPELL_COOL_DOWN, true);
     }
 
     void DamageTaken(Unit*, uint32& uiDamage, DamageEffectType, SpellSchoolMask) override
@@ -312,6 +330,9 @@ struct npc_molten_golem : public ScriptedAI
 
         if (uiDamage >= me->GetHealth())
         {
+            if (me->GetMap()->IsHeroic())
+                DoCastSelf(SPELL_BLAST_WAVE, true);
+
             me->UpdateEntry(NPC_BRITTLE_GOLEM, 0, false);
             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_DISABLE_MOVE);
             me->SetHealth(me->GetMaxHealth());
@@ -351,13 +372,18 @@ struct npc_molten_golem : public ScriptedAI
 
         switch (events.ExecuteEvent())
         {
-            case EVENT_BLAST:
-                me->CastSpell(me, SPELL_BLAST_WAVE, false);
-                events.Repeat(14s);
-                break;
-            case EVENT_IMMOLATION:
-                me->CastSpell(me->GetVictim(), SPELL_IMMOLATION_STRIKE, false);
+            case EVENT_IMMOLATION_STRIKE:
+                if (SelectTarget(SelectTargetMethod::MaxThreat, 0, 0.0f, true, true, -SPELL_IMMOLATION_STRIKE))
+                    DoCastVictim(SPELL_IMMOLATION_STRIKE);
                 events.Repeat(5s);
+                break;
+            case EVENT_CHANGE_TARGET:
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
+                {
+                    me->GetThreatMgr().ResetAllThreat();
+                    me->AddThreat(target, 30000.0f);
+                    AttackStart(target);
+                }
                 break;
         }
 

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -479,7 +479,7 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
     // 0x200
     if (flags & UPDATEFLAG_ROTATION)
     {
-        *data << int64(ToGameObject()->GetPackedLocalRotation());
+        *data << int64(ToGameObject()->GetPackedWorldRotation());
     }
 }
 
@@ -813,13 +813,6 @@ void Object::ApplyModSignedFloatValue(uint16 index, float  val, bool apply)
     float cur = GetFloatValue(index);
     cur += (apply ? val : -val);
     SetFloatValue(index, cur);
-}
-
-void Object::ApplyPercentModFloatValue(uint16 index, float val, bool apply)
-{
-    float value = GetFloatValue(index);
-    ApplyPercentModFloatVar(value, val, apply);
-    SetFloatValue(index, value);
 }
 
 void Object::ApplyModPositiveFloatValue(uint16 index, float  val, bool apply)
@@ -1232,10 +1225,14 @@ float WorldObject::GetDistanceZ(WorldObject const* obj) const
     return (dist > 0 ? dist : 0);
 }
 
-bool WorldObject::_IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D, bool useBoundingRadius) const
+bool WorldObject::_IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D, bool incOwnRadius, bool incTargetRadius) const
 {
-    float sizefactor = useBoundingRadius ? GetObjectSize() + obj->GetObjectSize() : 0.0f;
-    float maxdist = dist2compare + sizefactor;
+    float maxdist = dist2compare;
+    if (incOwnRadius)
+        maxdist += GetObjectSize();
+
+    if (incTargetRadius)
+        maxdist += obj->GetObjectSize();
 
     if (m_transport && obj->GetTransport() &&  obj->GetTransport()->GetGUID() == m_transport->GetGUID())
     {
@@ -1342,14 +1339,14 @@ bool WorldObject::IsWithinDist2d(const Position* pos, float dist) const
 }
 
 // use only if you will sure about placing both object at same map
-bool WorldObject::IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D, bool useBoundingRadius) const
+bool WorldObject::IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D, bool incOwnRadius, bool incTargetRadius) const
 {
-    return obj && _IsWithinDist(obj, dist2compare, is3D, useBoundingRadius);
+    return obj && _IsWithinDist(obj, dist2compare, is3D, incOwnRadius, incTargetRadius);
 }
 
-bool WorldObject::IsWithinDistInMap(WorldObject const* obj, float dist2compare, bool is3D, bool useBoundingRadius) const
+bool WorldObject::IsWithinDistInMap(WorldObject const* obj, float dist2compare, bool is3D, bool incOwnRadius, bool incTargetRadius) const
 {
-    return obj && IsInMap(obj) && InSamePhase(obj) && _IsWithinDist(obj, dist2compare, is3D, useBoundingRadius);
+    return obj && IsInMap(obj) && InSamePhase(obj) && _IsWithinDist(obj, dist2compare, is3D, incOwnRadius, incTargetRadius);
 }
 
 bool WorldObject::IsWithinLOS(float ox, float oy, float oz, VMAP::ModelIgnoreFlags ignoreFlags, LineOfSightChecks checks) const
@@ -1766,7 +1763,7 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
 
     // pussywizard: arena spectator
     if (obj->IsPlayer())
-        if (((Player const*)obj)->IsSpectator() && ((Player const*)obj)->FindMap()->IsBattleArena())
+        if (((Player const*)obj)->IsSpectator() && ((Player const*)obj)->FindMap() && ((Player const*)obj)->FindMap()->IsBattleArena())
             return false;
 
     bool corpseVisibility = false;
@@ -1810,11 +1807,12 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
                         return false;
 
                 // pussywizard: during arena preparation, don't allow to detect pets if can't see its owner (spoils enemy arena frames)
-                if (target->IsPet() && target->GetOwnerGUID() && target->FindMap()->IsBattleArena() && GetGUID() != target->GetOwnerGUID())
-                    if (BattlegroundMap* bgmap = target->FindMap()->ToBattlegroundMap())
-                        if (Battleground* bg = bgmap->GetBG())
-                            if (bg->GetStatus() < STATUS_IN_PROGRESS && !thisPlayer->HaveAtClient(target->GetOwnerGUID()))
-                                return false;
+                if (Map* targetMap = target->FindMap())
+                    if (target->IsPet() && target->GetOwnerGUID() && targetMap->IsBattleArena() && GetGUID() != target->GetOwnerGUID())
+                        if (BattlegroundMap* bgmap = targetMap->ToBattlegroundMap())
+                            if (Battleground* bg = bgmap->GetBG())
+                                if (bg->GetStatus() < STATUS_IN_PROGRESS && !thisPlayer->HaveAtClient(target->GetOwnerGUID()))
+                                    return false;
             }
 
             if (thisPlayer->GetFarSightDistance() && !thisPlayer->isInFront(obj))
@@ -1859,7 +1857,7 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
 
     // pussywizard: arena spectator
     if (this->IsPlayer())
-        if (((Player const*)this)->IsSpectator() && ((Player const*)this)->FindMap()->IsBattleArena() && (obj->m_invisibility.GetFlags() || obj->m_stealth.GetFlags()))
+        if (((Player const*)this)->IsSpectator() && ((Player const*)this)->FindMap() && ((Player const*)this)->FindMap()->IsBattleArena() && (obj->m_invisibility.GetFlags() || obj->m_stealth.GetFlags()))
             return false;
 
     if (!CanDetect(obj, ignoreStealth, !distanceCheck, checkAlert))
@@ -2287,6 +2285,18 @@ void Map::SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list /*= null
                 list->push_back(summon);
 }
 
+void Map::SummonGameObjectGroup(uint8 group, std::list<GameObject*>* list /*= nullptr*/)
+{
+    std::vector<GameObjectSummonData> const* data = sObjectMgr->GetGameObjectSummonGroup(GetId(), SUMMONER_TYPE_MAP, group);
+    if (!data)
+        return;
+
+    for (std::vector<GameObjectSummonData>::const_iterator itr = data->begin(); itr != data->end(); ++itr)
+        if (GameObject* go = SummonGameObject(itr->entry, itr->pos.GetPositionX(), itr->pos.GetPositionY(), itr->pos.GetPositionZ(), itr->pos.GetOrientation(), itr->rot.x, itr->rot.y, itr->rot.z, itr->rot.w, itr->respawnTime))
+            if (list)
+                list->push_back(go);
+}
+
 TempSummon* WorldObject::SummonCreature(uint32 id, float x, float y, float z, float ang, TempSummonType spwtype, uint32 despwtime, SummonPropertiesEntry const* properties, bool visibleBySummonerOnly)
 {
     if (!x && !y && !z)
@@ -2441,6 +2451,20 @@ void WorldObject::SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list 
         if (TempSummon* summon = SummonCreature(itr->entry, itr->pos, itr->type, itr->time))
             if (list)
                 list->push_back(summon);
+}
+
+void WorldObject::SummonGameObjectGroup(uint8 group, std::list<GameObject*>* list /*= nullptr*/)
+{
+    ASSERT((IsGameObject() || IsCreature()) && "Only GOs and creatures can summon gameobject groups!");
+
+    std::vector<GameObjectSummonData> const* data = sObjectMgr->GetGameObjectSummonGroup(GetEntry(), IsGameObject() ? SUMMONER_TYPE_GAMEOBJECT : SUMMONER_TYPE_CREATURE, group);
+    if (!data)
+        return;
+
+    for (std::vector<GameObjectSummonData>::const_iterator itr = data->begin(); itr != data->end(); ++itr)
+        if (GameObject* go = SummonGameObject(itr->entry, itr->pos.GetPositionX(), itr->pos.GetPositionY(), itr->pos.GetPositionZ(), itr->pos.GetOrientation(), itr->rot.x, itr->rot.y, itr->rot.z, itr->rot.w, itr->respawnTime))
+            if (list)
+                list->push_back(go);
 }
 
 Creature* WorldObject::FindNearestCreature(uint32 entry, float range, bool alive) const

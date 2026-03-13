@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -29,6 +29,12 @@ namespace VMAP
     class VMapMgr2;
     enum class ModelIgnoreFlags : uint32;
     enum class LoadResult : uint8;
+
+    struct GroupLocationInfo
+    {
+        const GroupModel* hitModel = nullptr;
+        int32 rootId = -1;
+    };
 
     struct LocationInfo
     {
@@ -73,7 +79,6 @@ namespace VMAP
         [[nodiscard]] bool isInLineOfSight(const G3D::Vector3& pos1, const G3D::Vector3& pos2, ModelIgnoreFlags ignoreFlags) const;
         bool GetObjectHitPos(const G3D::Vector3& pos1, const G3D::Vector3& pos2, G3D::Vector3& pResultHitPos, float pModifyDist) const;
         [[nodiscard]] float getHeight(const G3D::Vector3& pPos, float maxSearchDist) const;
-        bool GetAreaInfo(G3D::Vector3& pos, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const;
         bool GetLocationInfo(const G3D::Vector3& pos, LocationInfo& info) const;
 
         bool InitMap(const std::string& fname, VMapMgr2* vm);

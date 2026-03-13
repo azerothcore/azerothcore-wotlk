@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -573,6 +573,46 @@ private:
 };
 
 /*######
+## go_ancient_skull_pile
+######*/
+
+enum AncientSkullPile
+{
+    ITEM_TIME_LOST_OFFERING = 32720,
+    SPELL_SUMMON_TEROKK     = 41004,
+
+    GOSSIP_MENU_ANCIENT_SKULL_PILE        = 8687,
+    GOSSIP_MENU_TEXT_ANCIENT_SKULL_PILE   = 11058
+};
+
+class go_ancient_skull_pile : public GameObjectScript
+{
+public:
+    go_ancient_skull_pile() : GameObjectScript("go_ancient_skull_pile") {}
+
+    bool OnGossipSelect(Player* player, GameObject* go, uint32 sender, uint32 /*action*/) override
+    {
+        ClearGossipMenuFor(player);
+
+        if (sender == GOSSIP_SENDER_MAIN)
+        {
+            CloseGossipMenuFor(player);
+            if (player->HasItemCount(ITEM_TIME_LOST_OFFERING, 1))
+                go->DespawnOrUnsummon();
+            player->CastSpell(player, SPELL_SUMMON_TEROKK);
+        }
+        return true;
+    }
+
+    bool OnGossipHello(Player* player, GameObject* go) override
+    {
+        AddGossipItemFor(player, GOSSIP_MENU_ANCIENT_SKULL_PILE, 0, GOSSIP_SENDER_MAIN, 0);
+        SendGossipMenuFor(player, GOSSIP_MENU_TEXT_ANCIENT_SKULL_PILE, go->GetGUID());
+        return true;
+    }
+};
+
+/*######
 ## npc_slim
 ######*/
 
@@ -621,5 +661,6 @@ void AddSC_terokkar_forest()
     new npc_unkor_the_ruthless();
     new npc_isla_starmane();
     new go_skull_pile();
+    new go_ancient_skull_pile();
     new npc_slim();
 }

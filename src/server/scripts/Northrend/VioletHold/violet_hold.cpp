@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -182,7 +182,7 @@ public:
                 case EVENT_SUMMON_KEEPER_OR_GUARDIAN:
                     bKorG = true;
                     spawned = true;
-                    if (Creature* c = DoSummon(RAND(NPC_PORTAL_GUARDIAN, NPC_PORTAL_KEEPER), me, 2.0f, 0, TEMPSUMMON_DEAD_DESPAWN))
+                    if (Creature* c = DoSummon(RAND(NPC_PORTAL_GUARDIAN, NPC_PORTAL_KEEPER_1, NPC_PORTAL_KEEPER_2), me, 2.0f, 0, TEMPSUMMON_DEAD_DESPAWN))
                         me->CastSpell(c, SPELL_PORTAL_CHANNEL, false);
                     events.RescheduleEvent(EVENT_SUMMON_KEEPER_TRASH, 20s);
                     break;
@@ -220,11 +220,12 @@ public:
                     if (pInstance)
                         for (SummonList::iterator itr = listOfMobs.begin(); itr != listOfMobs.end(); ++itr)
                             if (Creature* c = pInstance->instance->GetCreature(*itr))
-                                if (c->IsAlive() && (c->GetEntry() == NPC_PORTAL_GUARDIAN || c->GetEntry() == NPC_PORTAL_KEEPER))
+                                if (c->IsAlive() && c->EntryEquals(NPC_PORTAL_GUARDIAN, NPC_PORTAL_KEEPER_1, NPC_PORTAL_KEEPER_2))
                                 {
                                     me->CastSpell(c, SPELL_PORTAL_CHANNEL, false);
                                     return;
                                 }
+
                     Unit::Kill(me, me, false);
                 }
             }

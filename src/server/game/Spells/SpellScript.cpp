@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -733,6 +733,10 @@ bool AuraScript::_Validate(SpellInfo const* entry)
         if (!entry->HasEffect(SPELL_EFFECT_APPLY_AURA) && !entry->HasAreaAuraEffect())
             LOG_ERROR("spells.scripts", "Spell `{}` of script `{}` does not have apply aura effect - handler bound to hook `DoCheckProc` of AuraScript won't be executed", entry->Id, m_scriptName->c_str());
 
+    for (std::list<CheckEffectProcHandler>::iterator itr = DoCheckEffectProc.begin(); itr != DoCheckEffectProc.end(); ++itr)
+        if (!itr->GetAffectedEffectsMask(entry))
+            LOG_ERROR("spells.scripts", "Spell `{}` Effect `{}` of script `{}` did not match dbc effect data - handler bound to hook `DoCheckEffectProc` of AuraScript won't be executed", entry->Id, itr->ToString(), m_scriptName->c_str());
+
     for (std::list<AfterCheckProcHandler>::iterator itr = DoAfterCheckProc.begin(); itr != DoAfterCheckProc.end(); ++itr)
         if (!entry->HasEffect(SPELL_EFFECT_APPLY_AURA) && !entry->HasAreaAuraEffect())
             LOG_ERROR("spells.scripts", "Spell `{}` of script `{}` does not have apply aura effect - handler bound to hook `DoAfterCheckProc` of AuraScript won't be executed", entry->Id, m_scriptName->c_str());
@@ -906,6 +910,17 @@ bool AuraScript::CheckProcHandler::Call(AuraScript* auraScript, ProcEventInfo& e
     return (auraScript->*_HandlerScript)(eventInfo);
 }
 
+AuraScript::CheckEffectProcHandler::CheckEffectProcHandler(AuraCheckEffectProcFnType handlerScript, uint8 effIndex, uint16 effName)
+    : EffectBase(effIndex, effName)
+{
+    _HandlerScript = handlerScript;
+}
+
+bool AuraScript::CheckEffectProcHandler::Call(AuraScript* auraScript, AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+{
+    return (auraScript->*_HandlerScript)(aurEff, eventInfo);
+}
+
 AuraScript::AfterCheckProcHandler::AfterCheckProcHandler(AuraAfterCheckProcFnType handlerScript)
 {
     _HandlerScript = handlerScript;
@@ -1037,9 +1052,9 @@ DynamicObject* AuraScript::GetDynobjOwner() const
     return m_aura->GetDynobjOwner();
 }
 
-void AuraScript::Remove(uint32 removeMode)
+void AuraScript::Remove(AuraRemoveMode removeMode)
 {
-    m_aura->Remove((AuraRemoveMode)removeMode);
+    m_aura->Remove(removeMode);
 }
 
 Aura* AuraScript::GetAura() const
@@ -1177,6 +1192,7 @@ Unit* AuraScript::GetTarget() const
         case AURA_SCRIPT_HOOK_EFFECT_AFTER_MANASHIELD:
         case AURA_SCRIPT_HOOK_EFFECT_SPLIT:
         case AURA_SCRIPT_HOOK_CHECK_PROC:
+        case AURA_SCRIPT_HOOK_CHECK_EFFECT_PROC:
         case AURA_SCRIPT_HOOK_AFTER_CHECK_PROC:
         case AURA_SCRIPT_HOOK_PREPARE_PROC:
         case AURA_SCRIPT_HOOK_PROC:

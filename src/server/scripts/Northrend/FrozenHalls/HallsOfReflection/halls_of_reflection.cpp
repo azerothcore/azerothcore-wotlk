@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -1950,14 +1950,14 @@ public:
             currentStopPoint = 0;
             events.Reset();
         }
-        void DoAction(int32 actionId) override
 
+        void DoAction(int32 actionId) override
         {
             switch (actionId)
             {
                 case ACTION_START_INTRO:
                     events.ScheduleEvent(EVENT_LK_SAY_AGGRO, 0ms);
-                    events.ScheduleEvent(EVENT_LK_BATTLE_1, 2s +500ms);
+                    events.ScheduleEvent(EVENT_LK_BATTLE_1, 2s + 500ms);
                     events.ScheduleEvent(EVENT_LK_BATTLE_2, 3s);
                     events.ScheduleEvent(me->GetEntry() == NPC_JAINA_PART2 ? EVENT_JAINA_IMMOBILIZE_LK : EVENT_SYLVANAS_IMMOBILIZE_JUMP, 9s);
                     break;
@@ -1989,7 +1989,7 @@ public:
             path.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
             for (uint8 i = WP_STOP[currentStopPoint - 1] + (currentStopPoint == 1 ? 0 : 1); i <= WP_STOP[currentStopPoint]; ++i)
                 path.push_back(G3D::Vector3(PathWaypoints[i].GetPositionX(), PathWaypoints[i].GetPositionY(), PathWaypoints[i].GetPositionZ()));
-            me->GetMotionMaster()->MoveSplinePath(&path);
+            me->GetMotionMaster()->MoveSplinePath(&path, FORCED_MOVEMENT_RUN);
         }
 
         void MovementInform(uint32 type, uint32 /*id*/) override

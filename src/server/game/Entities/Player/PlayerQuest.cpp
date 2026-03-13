@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -239,7 +239,7 @@ bool Player::CanSeeStartQuest(Quest const* quest)
     if (!sDisableMgr->IsDisabledFor(DISABLE_TYPE_QUEST, quest->GetQuestId(), this) && SatisfyQuestClass(quest, false) && SatisfyQuestRace(quest, false) &&
         SatisfyQuestSkill(quest, false) && SatisfyQuestExclusiveGroup(quest, false) && SatisfyQuestReputation(quest, false) &&
         SatisfyQuestPreviousQuest(quest, false) && SatisfyQuestNextChain(quest, false) &&
-        SatisfyQuestPrevChain(quest, false) && SatisfyQuestDay(quest, false) && SatisfyQuestWeek(quest, false) &&
+        SatisfyQuestPrevChain(quest, false) && SatisfyQuestBreadcrumb(quest, false) && SatisfyQuestDay(quest, false) && SatisfyQuestWeek(quest, false) &&
         SatisfyQuestMonth(quest, false) && SatisfyQuestSeasonal(quest, false))
     {
         return GetLevel() + sWorld->getIntConfig(CONFIG_QUEST_HIGH_LEVEL_HIDE_DIFF) >= quest->GetMinLevel();
@@ -256,6 +256,7 @@ bool Player::CanTakeQuest(Quest const* quest, bool msg)
            && SatisfyQuestSkill(quest, msg) && SatisfyQuestReputation(quest, msg)
            && SatisfyQuestPreviousQuest(quest, msg) && SatisfyQuestTimed(quest, msg)
            && SatisfyQuestNextChain(quest, msg) && SatisfyQuestPrevChain(quest, msg)
+           && SatisfyQuestBreadcrumb(quest, msg)
            && SatisfyQuestDay(quest, msg) && SatisfyQuestWeek(quest, msg)
            && SatisfyQuestMonth(quest, msg) && SatisfyQuestSeasonal(quest, msg)
            && SatisfyQuestConditions(quest, msg);
@@ -1217,6 +1218,39 @@ bool Player::SatisfyQuestExclusiveGroup(Quest const* qInfo, bool msg) const
     return true;
 }
 
+bool Player::SatisfyQuestBreadcrumb(Quest const* qInfo, bool msg) const
+{
+    uint32 breadcrumbForQuestId = qInfo->GetBreadcrumbForQuestId();
+    if (breadcrumbForQuestId)
+    {
+        QuestStatus status = GetQuestStatus(breadcrumbForQuestId);
+        if (status != QUEST_STATUS_NONE || IsQuestRewarded(breadcrumbForQuestId))
+        {
+            if (msg)
+                SendCanTakeQuestResponse(INVALIDREASON_DONT_HAVE_REQ);
+
+            return false;
+        }
+    }
+
+    if (std::vector<uint32> const* breadcrumbs = sObjectMgr->GetBreadcrumbsForQuest(qInfo->GetQuestId()))
+    {
+        for (uint32 breadcrumbQuestId : *breadcrumbs)
+        {
+            QuestStatus status = GetQuestStatus(breadcrumbQuestId);
+            if (status == QUEST_STATUS_INCOMPLETE || status == QUEST_STATUS_COMPLETE || status == QUEST_STATUS_FAILED)
+            {
+                if (msg)
+                    SendCanTakeQuestResponse(INVALIDREASON_DONT_HAVE_REQ);
+
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
 bool Player::SatisfyQuestNextChain(Quest const* qInfo, bool msg) const
 {
     uint32 nextQuest = qInfo->GetNextQuestInChain();
@@ -1405,9 +1439,7 @@ uint32 Player::CalculateQuestRewardXP(Quest const* quest)
     uint32 xp = uint32(quest->XPValue(GetLevel()) * GetQuestRate(quest->IsDFQuest()));
 
     // handle SPELL_AURA_MOD_XP_QUEST_PCT auras
-    Unit::AuraEffectList const& ModXPPctAuras = GetAuraEffectsByType(SPELL_AURA_MOD_XP_QUEST_PCT);
-    for (Unit::AuraEffectList::const_iterator i = ModXPPctAuras.begin(); i != ModXPPctAuras.end(); ++i)
-        AddPct(xp, (*i)->GetAmount());
+    xp *= GetTotalAuraMultiplier(SPELL_AURA_MOD_XP_QUEST_PCT);
 
     return xp;
 }

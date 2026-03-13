@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -21,15 +21,16 @@
 #include "Creature.h"
 #include "MovementGenerator.h"
 #include "MoveSplineInit.h"
+#include <optional>
 
 template<class T>
 class PointMovementGenerator : public MovementGeneratorMedium< T, PointMovementGenerator<T> >
 {
 public:
     PointMovementGenerator(uint32 _id, float _x, float _y, float _z, ForcedMovement forcedMovement, float _speed = 0.0f, float orientation = 0.0f, const Movement::PointsArray* _path = nullptr,
-        bool generatePath = false, bool forceDestination = false, ObjectGuid chargeTargetGUID = ObjectGuid::Empty, bool reverseOrientation = false, ObjectGuid facingTargetGuid = ObjectGuid())
+        bool generatePath = false, bool forceDestination = false, std::optional<AnimTier> animTier = std::nullopt, ObjectGuid chargeTargetGUID = ObjectGuid::Empty, bool reverseOrientation = false, ObjectGuid facingTargetGuid = ObjectGuid())
         : id(_id), i_x(_x), i_y(_y), i_z(_z), speed(_speed), i_orientation(orientation), _generatePath(generatePath), _forceDestination(forceDestination), _reverseOrientation(reverseOrientation),
-        _chargeTargetGUID(chargeTargetGUID), _forcedMovement(forcedMovement), _facingTargetGuid(facingTargetGuid)
+        _chargeTargetGUID(chargeTargetGUID), _forcedMovement(forcedMovement), _facingTargetGuid(facingTargetGuid), _animTier(animTier)
     {
         if (_path)
             m_precomputedPath = *_path;
@@ -60,6 +61,7 @@ private:
     ObjectGuid _chargeTargetGUID;
     ForcedMovement _forcedMovement;
     ObjectGuid _facingTargetGuid;
+    std::optional<AnimTier> _animTier;
 };
 
 class AssistanceMovementGenerator : public PointMovementGenerator<Creature>

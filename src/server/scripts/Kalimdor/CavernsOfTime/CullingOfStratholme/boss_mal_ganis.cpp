@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -112,13 +112,14 @@ public:
                 me->SetImmuneToAll(true);
                 me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetReactState(REACT_PASSIVE);
-                if (InstanceScript* pInstance = me->GetInstanceScript())
+                if (InstanceScript* instance = me->GetInstanceScript())
                 {
-                    if (Creature* cr = ObjectAccessor::GetCreature(*me, pInstance->GetGuidData(DATA_ARTHAS)))
+                    if (Creature* cr = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_ARTHAS)))
                         cr->AI()->DoAction(ACTION_KILLED_MALGANIS);
 
                     // give credit to players
                     me->CastSpell(me, 58630, true);
+                    instance->instance->SummonGameObject(DUNGEON_MODE(GO_MALGANIS_CHEST_N, GO_MALGANIS_CHEST_H), 2288.35f, 1498.73f, 128.414f, -0.994837f, 0, 0, 0, 0, 7 * DAY * IN_MILLISECONDS);
                 }
 
                 // quest completion

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -180,6 +180,7 @@ bool ArenaTeam::AddMember(ObjectGuid playerGuid)
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ARENA_TEAM_MEMBER);
     stmt->SetData(0, TeamId);
     stmt->SetData(1, playerGuid.GetCounter());
+    stmt->SetData(2, personalRating);
     CharacterDatabase.Execute(stmt);
 
     // Inform player if online
@@ -671,9 +672,9 @@ uint32 ArenaTeam::GetPoints(uint32 memberRating)
 
     // Type penalties for teams < 5v5
     if (Type == ARENA_TEAM_2v2)
-        points *= 0.76f;
+        points *= sWorld->getRate(RATE_ARENA_POINTS_2V2);
     else if (Type == ARENA_TEAM_3v3)
-        points *= 0.88f;
+        points *= sWorld->getRate(RATE_ARENA_POINTS_3V3);
 
     sScriptMgr->OnGetArenaPoints(this, points);
 
@@ -966,12 +967,15 @@ void ArenaTeam::SaveToDB(bool forceMemberSave)
         stmt->SetData(6, itr->Guid.GetCounter());
         trans->Append(stmt);
 
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CHARACTER_ARENA_STATS);
-        stmt->SetData(0, itr->Guid.GetCounter());
-        stmt->SetData(1, GetSlot());
-        stmt->SetData(2, itr->MatchMakerRating);
-        stmt->SetData(3, itr->MaxMMR);
-        trans->Append(stmt);
+        if (sScriptMgr->CanSaveArenaStatsForMember(this, itr->Guid))
+        {
+            stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CHARACTER_ARENA_STATS);
+            stmt->SetData(0, itr->Guid.GetCounter());
+            stmt->SetData(1, GetSlot());
+            stmt->SetData(2, itr->MatchMakerRating);
+            stmt->SetData(3, itr->MaxMMR);
+            trans->Append(stmt);
+        }
     }
 
     CharacterDatabase.CommitTransaction(trans);

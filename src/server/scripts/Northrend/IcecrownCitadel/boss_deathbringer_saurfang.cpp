@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -117,9 +117,6 @@ enum Spells
     SPELL_RIDE_VEHICLE                  = 70640, // Outro
     SPELL_ACHIEVEMENT                   = 72928,
 };
-
-// Helper to get id of the aura on different modes (HasAura(baseId) wont work)
-#define BOILING_BLOOD_HELPER RAID_MODE<int32>(72385, 72441, 72442, 72443)
 
 enum EventTypes
 {
@@ -1099,48 +1096,6 @@ class spell_deathbringer_blood_link_aura : public AuraScript
     }
 };
 
-class spell_deathbringer_blood_link_blood_beast_aura : public AuraScript
-{
-    PrepareAuraScript(spell_deathbringer_blood_link_blood_beast_aura);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_BLOOD_LINK_DUMMY });
-    }
-
-    bool CheckProc(ProcEventInfo& eventInfo)
-    {
-        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
-        SpellInfo const* procSpell = eventInfo.GetSpellInfo();
-        return eventInfo.GetActor() && eventInfo.GetActionTarget() && ((damageInfo && damageInfo->GetDamage()) || eventInfo.GetHitMask() & PROC_EX_ABSORB) && (!procSpell || procSpell->SpellIconID != 2731); // Xinef: Mark of the Fallen Champion
-    }
-
-    void HandleProc(AuraEffect const*  /*aurEff*/, ProcEventInfo& eventInfo)
-    {
-        PreventDefaultAction();
-
-        /*
-        uint32 markCount = 0;
-        if (Map* map = eventInfo.GetActor()->FindMap())
-            if (InstanceMap* imap = map->ToInstanceMap())
-                if (InstanceScript* isc = imap->GetInstanceScript())
-                    if (ObjectGuid sguid = isc->GetGuidData(3) //DATA_DEATHBRINGER_SAURFANG
-                        if (Creature* saurfang = ObjectAccessor::GetCreature(*eventInfo.GetActor(), sguid))
-                            markCount = saurfang->IsAIEnabled ? saurfang->AI()->GetData(123456) : 0; //FALLEN_CHAMPION_CAST_COUNT
-        */
-        int32 basepoints = int32(3.0f /*+ 0.5f + 0.5f*markCount*/);
-
-        eventInfo.GetActor()->CastCustomSpell(SPELL_BLOOD_LINK_DUMMY, SPELLVALUE_BASE_POINT0, basepoints, eventInfo.GetActionTarget(), true);
-        return;
-    }
-
-    void Register() override
-    {
-        DoCheckProc += AuraCheckProcFn(spell_deathbringer_blood_link_blood_beast_aura::CheckProc);
-        OnEffectProc += AuraEffectProcFn(spell_deathbringer_blood_link_blood_beast_aura::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
-    }
-};
-
 class spell_deathbringer_blood_link : public SpellScript
 {
     PrepareSpellScript(spell_deathbringer_blood_link);
@@ -1345,6 +1300,28 @@ public:
     }
 };
 
+// 72176 - Blood Beast Blood Link
+class spell_deathbringer_blood_beast_blood_link : public AuraScript
+{
+    PrepareAuraScript(spell_deathbringer_blood_beast_blood_link);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_BLOOD_LINK_DUMMY });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        eventInfo.GetActionTarget()->CastCustomSpell(SPELL_BLOOD_LINK_DUMMY, SPELLVALUE_BASE_POINT0, 3, nullptr, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_deathbringer_blood_beast_blood_link::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_boss_deathbringer_saurfang()
 {
     new boss_deathbringer_saurfang();
@@ -1352,7 +1329,7 @@ void AddSC_boss_deathbringer_saurfang()
     new npc_muradin_bronzebeard_icc();
     new npc_saurfang_event();
     RegisterSpellScript(spell_deathbringer_blood_link_aura);
-    RegisterSpellScript(spell_deathbringer_blood_link_blood_beast_aura);
+    RegisterSpellScript(spell_deathbringer_blood_beast_blood_link);
     RegisterSpellScript(spell_deathbringer_blood_link);
     RegisterSpellAndAuraScriptPair(spell_deathbringer_blood_power, spell_deathbringer_blood_power_aura);
     RegisterSpellScript(spell_deathbringer_blood_nova_targeting);

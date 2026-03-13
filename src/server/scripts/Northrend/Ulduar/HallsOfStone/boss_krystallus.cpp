@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -120,15 +120,13 @@ public:
             {
                 case EVENT_BOULDER:
                     {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true, 0))
-                            me->CastSpell(target, SPELL_BOULDER_TOSS, false);
-
+                        DoCastRandomTarget(SPELL_BOULDER_TOSS, 0, 50.0f);
                         events.Repeat(5s, 7s);
                         break;
                     }
                 case EVENT_GROUND_SPIKE:
                     {
-                        me->CastSpell(me->GetVictim(), SPELL_GROUND_SPIKE, false); // current enemy target
+                        DoCastRandomTarget(SPELL_GROUND_SPIKE, 0, 50.0f);
                         events.Repeat(8s, 11s);
                         break;
                     }
@@ -142,6 +140,8 @@ public:
                     {
                         events.Repeat(10s, 13s);
                         me->CastSpell(me->GetVictim(), SPELL_GROUND_SLAM, true);
+                        me->SetReactState(REACT_PASSIVE);
+                        me->AttackStop();
                         events.DelayEvents(10s);
                         events.RescheduleEvent(EVENT_SHATTER, 8s);
                         break;
@@ -151,6 +151,7 @@ public:
                         me->CastSpell((Unit*)nullptr, SPELL_SHATTER, false);
                         Talk(SAY_SHATTER);
                         events.RescheduleEvent(EVENT_REMOVE_STONED, 1500ms);
+                        me->SetReactState(REACT_AGGRESSIVE);
                         break;
                     }
                 case EVENT_REMOVE_STONED:
