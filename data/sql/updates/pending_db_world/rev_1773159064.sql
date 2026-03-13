@@ -54,10 +54,12 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2840600, 9, 12, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 12, 12, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Actionlist - Start Attacking'),
 (2840601, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Actionlist - Set Event Phase 3'),
 (2840601, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 52994, 0, 0, 0, 0, 0, 12, 12, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Actionlist - Cast \'Duel Victory\''),
-(2840601, 9, 2, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 5, 20, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Actionlist - Play Emote 20'),
-(2840601, 9, 3, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 0, 28, 54238, 0, 0, 0, 0, 0, 12, 12, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Actionlist - Remove Aura \'Duel Aura Check 01\''),
-(2840601, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 28, 54238, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Actionlist - Remove Aura \'Duel Aura Check 01\''),
-(2840601, 9, 5, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 1000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Actionlist - Despawn In 1000 ms'),
+(2840601, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 28, 52372, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Actionlist - Remove Aura \'Icy Touch\''),
+(2840601, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 28, 52373, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Actionlist - Remove Aura \'Plague Strike\''),
+(2840601, 9, 4, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 5, 20, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Actionlist - Play Emote 20'),
+(2840601, 9, 5, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 0, 28, 54238, 0, 0, 0, 0, 0, 12, 12, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Actionlist - Remove Aura \'Duel Aura Check 01\''),
+(2840601, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 28, 54238, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Actionlist - Remove Aura \'Duel Aura Check 01\''),
+(2840601, 9, 7, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 1000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Actionlist - Despawn In 1000 ms'),
 (2840602, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 4, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Actionlist - Set Event Phase 4'),
 (2840602, 9, 1, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 5, 71, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Actionlist - Play Emote 71'),
 (2840602, 9, 2, 0, 0, 0, 100, 0, 4000, 4000, 0, 0, 0, 0, 27, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Actionlist - Stop Combat'),
@@ -65,11 +67,13 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2840602, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 28, 54238, 0, 0, 0, 0, 0, 12, 12, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Actionlist - Remove Aura \'Duel Aura Check 01\''),
 (2840602, 9, 5, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 1000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Actionlist - Despawn In 1000 ms'),
 (2840611, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 5, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Actionlist - Set Event Phase 5'),
-(2840611, 9, 1, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 5, 71, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Actionlist - Play Emote 71'),
-(2840611, 9, 2, 0, 0, 0, 100, 0, 4000, 4000, 0, 0, 0, 0, 27, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Actionlist - Stop Combat'),
-(2840611, 9, 3, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 0, 28, 54238, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Actionlist - Remove Aura \'Duel Aura Check 01\''),
-(2840611, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 28, 54238, 0, 0, 0, 0, 0, 12, 12, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Actionlist - Remove Aura \'Duel Aura Check 01\''),
-(2840611, 9, 5, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 1000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Actionlist - Despawn In 1000 ms');
+(2840611, 9, 1, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 0, 28, 52372, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Actionlist - Remove Aura \'Icy Touch\''),
+(2840611, 9, 2, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 0, 28, 52373, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Actionlist - Remove Aura \'Plague Strike\''),
+(2840611, 9, 3, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 5, 71, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Actionlist - Play Emote 71'),
+(2840611, 9, 4, 0, 0, 0, 100, 0, 4000, 4000, 0, 0, 0, 0, 27, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Actionlist - Stop Combat'),
+(2840611, 9, 5, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 0, 28, 54238, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Actionlist - Remove Aura \'Duel Aura Check 01\''),
+(2840611, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 28, 54238, 0, 0, 0, 0, 0, 12, 12, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Actionlist - Remove Aura \'Duel Aura Check 01\''),
+(2840611, 9, 7, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 1000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight Initiate - Actionlist - Despawn In 1000 ms');
 
 -- Set Condition.
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 15) AND (`SourceGroup` = 9765) AND (`SourceEntry` = 0) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` IN (1, 47)) AND (`ConditionTarget` = 0) AND (`ConditionValue1` IN (12733, 54238)) AND (`ConditionValue2` IN (0, 8)) AND (`ConditionValue3` = 0);
