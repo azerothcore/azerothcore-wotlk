@@ -157,6 +157,7 @@ public:
     uint32 GetEntryCount(uint32 entry) const;
     void Respawn();
     Creature* GetCreatureWithEntry(uint32 entry) const;
+    Creature* GetRandomCreatureWithEntry(uint32 entry) const;
 
 private:
     Creature* me;
@@ -304,6 +305,9 @@ struct ScriptedAI : public CreatureAI
 
     //Stop attack of current victim
     void DoStopAttack();
+
+    //Reward kill credit to all players from the oposing faction in the area (faction leaders)
+    void DoRewardPlayersInArea();
 
     //Cast spell by spell info
     void DoCastSpell(Unit* target, SpellInfo const* spellInfo, bool triggered = false);
@@ -489,7 +493,9 @@ public:
 
     bool CanRespawn() override;
 
-    void OnSpellCastFinished(SpellInfo const* spell, SpellFinishReason reason) override;
+    void OnSpellCast(SpellInfo const* spell) override;
+    void OnChannelFinished(SpellInfo const* spell) override;
+    void OnSpellFailed(SpellInfo const* spell) override;
     void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask) override;
     void JustSummoned(Creature* summon) override;
     void SummonedCreatureDespawn(Creature* summon) override;
@@ -533,6 +539,7 @@ protected:
     SummonList summons;
 
 private:
+    void _CheckHealthAfterCast();
     uint32 const _bossId;
     std::list<HealthCheckEventData> _healthCheckEvents;
     HealthCheckEventData _nextHealthCheck;

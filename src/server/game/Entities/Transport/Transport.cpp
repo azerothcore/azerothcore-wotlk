@@ -99,7 +99,7 @@ bool MotionTransport::CreateMoTrans(ObjectGuid::LowType guidlow, uint32 entry, u
     SetName(goinfo->name);
 
     // pussywizard: no WorldRotation for MotionTransports
-    SetLocalRotation(G3D::Quat());
+    SetWorldRotation(G3D::Quat());
     // pussywizard: no PathRotation for MotionTransports
     SetTransportPathRotation(0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -766,11 +766,13 @@ bool StaticTransport::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* m
         return false;
     }
 
-    // pussywizard: temporarily calculate WorldRotation from orientation, do so until values in db are correct
-    //SetWorldRotation( /*for StaticTransport we need 2 rotation Quats in db for World- and Path- Rotation*/ );
-    SetLocalRotationAngles(NormalizeOrientation(GetOrientation()), 0.0f, 0.0f);
-    // pussywizard: PathRotation for StaticTransport (only StaticTransports have PathRotation)
-    SetTransportPathRotation(rotation.x, rotation.y, rotation.z, rotation.w);
+    SetWorldRotationAngles(NormalizeOrientation(GetOrientation()), 0.0f, 0.0f);
+
+    // Prefer gameobject_addon parent_rotation for path rotation, fall back to gameobject.rotation
+    if (GameObjectAddon const* addon = sObjectMgr->GetGameObjectAddon(GetSpawnId()))
+        SetTransportPathRotation(addon->ParentRotation.x, addon->ParentRotation.y, addon->ParentRotation.z, addon->ParentRotation.w);
+    else
+        SetTransportPathRotation(rotation.x, rotation.y, rotation.z, rotation.w);
 
     SetObjectScale(goinfo->size);
 

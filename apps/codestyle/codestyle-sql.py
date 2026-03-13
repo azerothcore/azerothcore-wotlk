@@ -191,7 +191,7 @@ def insert_delete_safety_check(file: io, file_path: str) -> None:
 
     # Parse all the file
     for line_number, line in enumerate(file, start = 1):
-        if line.startswith("--"):
+        if line.strip().startswith("--"):
             continue
         if "INSERT" in line and "DELETE" not in previous_line:
             print(f"❌ No DELETE keyword found before the INSERT in {file_path} at line {line_number}\nIf this error is intended, please notify a maintainer")
@@ -323,11 +323,13 @@ def backtick_check(file: io, file_path: str) -> None:
 
     for line_number, line in enumerate(file, start=1):
         # Ignore comments
-        if line.startswith('--'):
+        if line.strip().startswith('--'):
             continue
 
         # Sanitize single- and doublequotes to prevent false positives
         sanitized_line = quote_pattern.sub('', line)
+        # Strip inline comments (safe to do after removing quoted strings)
+        sanitized_line = re.sub(r'--.*$', '', sanitized_line)
         matches = pattern.findall(sanitized_line)
         
         for clause, content in matches:

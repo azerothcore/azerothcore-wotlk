@@ -29,8 +29,6 @@ class Unit;
 class Creature;
 class Player;
 class SpellInfo;
-enum SpellFinishReason : uint8;
-
 typedef std::vector<AreaBoundary const*> CreatureBoundary;
 
 #define TIME_INTERVAL_LOOK   5000
@@ -147,8 +145,17 @@ public:
     // Called when spell hits a target
     virtual void SpellHitTarget(Unit* /*target*/, SpellInfo const* /*spell*/) {}
 
-    // Called when a spell either finishes, interrupts or cancels a spell cast
-    virtual void OnSpellCastFinished(SpellInfo const* /*spell*/, SpellFinishReason /*reason*/) {}
+    // Called when the creature begins casting a spell (has cast time or is channeled)
+    virtual void OnSpellStart(SpellInfo const* /*spell*/) {}
+
+    // Called when the creature successfully executes a spell cast
+    virtual void OnSpellCast(SpellInfo const* /*spell*/) {}
+
+    // Called when a spell cast is interrupted or cancelled
+    virtual void OnSpellFailed(SpellInfo const* /*spell*/) {}
+
+    // Called when a channeled spell finishes its full duration
+    virtual void OnChannelFinished(SpellInfo const* /*spell*/) {}
 
     // Called when the creature is target of hostile action: swing, hostile spell landed, fear/etc)
     virtual void AttackedBy(Unit* /*attacker*/) {}

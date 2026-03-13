@@ -91,13 +91,13 @@ public:
         SocketAdded(sock);
     }
 
-    tcp::socket* GetSocketForAccept() { return &_acceptSocket; }
+    IoContextTcpSocket* GetSocketForAccept() { return &_acceptSocket; }
 
     void EnableProxyProtocol() { _proxyHeaderReadingEnabled = true; }
 
 protected:
-    virtual void SocketAdded(std::shared_ptr<SocketType> /*sock*/) { }
-    virtual void SocketRemoved(std::shared_ptr<SocketType> /*sock*/) { }
+    virtual void SocketAdded(std::shared_ptr<SocketType> const& /*sock*/) { }
+    virtual void SocketRemoved(std::shared_ptr<SocketType> const& /*sock*/) { }
 
     void AddNewSockets()
     {
@@ -229,7 +229,7 @@ private:
     SocketContainer _newSockets;
 
     Acore::Asio::IoContext _ioContext;
-    tcp::socket _acceptSocket;
+    IoContextTcpSocket _acceptSocket;
     boost::asio::steady_timer _updateTimer;
 
     bool _proxyHeaderReadingEnabled;

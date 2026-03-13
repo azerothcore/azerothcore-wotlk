@@ -15,12 +15,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ScriptedCreature.h"
 #include "Cell.h"
 #include "CellImpl.h"
+#include "Containers.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
 #include "ObjectMgr.h"
+#include "ScriptedCreature.h"
 #include "Spell.h"
 #include "TemporarySummon.h"
 
@@ -141,6 +142,23 @@ Creature* SummonList::GetCreatureWithEntry(uint32 entry) const
     return nullptr;
 }
 
+Creature* SummonList::GetRandomCreatureWithEntry(uint32 entry) const
+{
+    std::vector<ObjectGuid> candidates;
+    candidates.reserve(storage_.size());
+
+    for (auto const guid : storage_)
+        if (Creature* summon = ObjectAccessor::GetCreature(*me, guid))
+            if (summon->GetEntry() == entry)
+                candidates.push_back(guid);
+
+    if (candidates.empty())
+        return nullptr;
+
+    ObjectGuid randomGuid = Acore::Containers::SelectRandomContainerElement(candidates);
+    return ObjectAccessor::GetCreature(*me, randomGuid);
+}
+
 bool SummonList::IsAnyCreatureAlive() const
 {
     for (auto const& guid : storage_)
@@ -249,6 +267,16 @@ void ScriptedAI::DoStopAttack()
 {
     if (me->GetVictim())
         me->AttackStop();
+}
+
+void ScriptedAI::DoRewardPlayersInArea()
+{
+    me->GetMap()->DoForAllPlayers([&](Player* player)
+    {
+        if (player->GetFaction() != me->GetCreatureTemplate()->faction && !player->IsGameMaster())
+            if (player->GetAreaId() == me->GetAreaId())
+                player->KilledMonsterCredit(me->GetEntry());
+    });
 }
 
 void ScriptedAI::DoCastSpell(Unit* target, SpellInfo const* spellInfo, bool triggered)
@@ -738,9 +766,26 @@ void BossAI::UpdateAI(uint32 diff)
         DoMeleeAttackIfReady();
 }
 
-void BossAI::OnSpellCastFinished(SpellInfo const* spellInfo, SpellFinishReason reason)
+void BossAI::OnSpellCast(SpellInfo const* spellInfo)
 {
-    ScriptedAI::OnSpellCastFinished(spellInfo, reason);
+    ScriptedAI::OnSpellCast(spellInfo);
+    _CheckHealthAfterCast();
+}
+
+void BossAI::OnChannelFinished(SpellInfo const* spellInfo)
+{
+    ScriptedAI::OnChannelFinished(spellInfo);
+    _CheckHealthAfterCast();
+}
+
+void BossAI::OnSpellFailed(SpellInfo const* spellInfo)
+{
+    ScriptedAI::OnSpellFailed(spellInfo);
+    _CheckHealthAfterCast();
+}
+
+void BossAI::_CheckHealthAfterCast()
+{
     // Check if any health check events are pending (i.e. waiting for the boss to stop casting.
     if (_nextHealthCheck.IsPending() && me->IsInCombat())
     {

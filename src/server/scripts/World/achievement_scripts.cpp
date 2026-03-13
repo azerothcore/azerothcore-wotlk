@@ -265,6 +265,23 @@ class achievement_flirt_with_disaster_perf_check : public AchievementCriteriaScr
         }
 };
 
+enum FaLaLaLaOgrila
+{
+    SPELL_FRESH_HOLLY     = 44824,
+    SPELL_PRESERVED_HOLLY = 62061,
+};
+
+class achievement_fa_la_la_la_ogrila : public AchievementCriteriaScript
+{
+public:
+    achievement_fa_la_la_la_ogrila() : AchievementCriteriaScript("achievement_fa_la_la_la_ogrila") {}
+
+    bool OnCheck(Player* player, Unit* /*target*/, uint32 /*criteria_id*/) override
+    {
+        return player->HasAura(SPELL_FRESH_HOLLY) || player->HasAura(SPELL_PRESERVED_HOLLY);
+    }
+};
+
 void AddSC_achievement_scripts()
 {
     new achievement_resilient_victory();
@@ -285,4 +302,5 @@ void AddSC_achievement_scripts()
     new achievement_not_even_a_scratch();
     new achievement_killed_exp_or_honor_target();
     new achievement_flirt_with_disaster_perf_check();
+    new achievement_fa_la_la_la_ogrila();
 }
