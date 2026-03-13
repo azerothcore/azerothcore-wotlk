@@ -44,6 +44,11 @@ enum DeathComesFromOnHigh
     SPELL_CALL_OF_THE_DEAD = 51900
 };
 
+enum GothikActions
+{
+    ACTION_DK_INITIATE_ASSAULT_ROAR = 15
+};
+
 // 51904 - Summon Ghouls On Scarlet Crusade
 class spell_q12641_death_comes_from_on_high_summon_ghouls : public SpellScript
 {
@@ -270,7 +275,7 @@ public:
                 Talk(SAY_GOTHIK_PIT);
             }
 
-            if (action == 15)
+            if (action == ACTION_DK_INITIATE_ASSAULT_ROAR)
             {
                 me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
             }
