@@ -276,6 +276,7 @@ public:
                             orb->RemoveAurasDueToSpell(SPELL_AWAKEN_SUBBOSS);
 
                         me->RemoveAurasDueToSpell(SPELL_FREEZE);
+                        me->GetThreatMgr().ResetAllThreat();
                         me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
                         me->SetControlled(false, UNIT_STATE_STUNNED);
                         // SETINCOMBATWITHZONE
