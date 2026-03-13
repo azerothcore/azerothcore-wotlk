@@ -282,7 +282,6 @@ public:
                     summon->AI()->AttackStart(target);
                     summon->SetInCombatWithZone();
                     summon->SetReactState(REACT_AGGRESSIVE);
-                    summon->CallForHelp(150.0f);
                 }
             }
         }
@@ -465,6 +464,19 @@ public:
                             go->SetGoState(GO_STATE_ACTIVE);
 
                         gateOpened = true;
+                        summons.DoForAllSummons([&](WorldObject* summon)
+                        {
+                            if (Creature* gothikMinion = summon->ToCreature())
+                                if (gothikMinion->IsAlive())
+                                {
+                                    if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, 200.0f))
+                                    {
+                                        gothikMinion->AI()->AttackStart(target);
+                                        gothikMinion->SetReactState(REACT_AGGRESSIVE);
+                                        gothikMinion->SetInCombatWithZone();
+                                    }
+                                }
+                        });
                         Talk(EMOTE_GATE_OPENED);
                     }
                     break;
@@ -501,7 +513,7 @@ public:
             events.Reset();
         }
 
-        void JustEngagedWith(Unit*  /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             switch (me->GetEntry())
             {

@@ -260,847 +260,792 @@ private:
     Unit* _caster;
 };
 
-class boss_algalon_the_observer : public CreatureScript
+struct boss_algalon_the_observer : public ScriptedAI
 {
-public:
-    boss_algalon_the_observer() : CreatureScript("boss_algalon_the_observer") {}
-
-    struct boss_algalon_the_observerAI : public ScriptedAI
+    boss_algalon_the_observer(Creature* creature) : ScriptedAI(creature), summons(me)
     {
-        boss_algalon_the_observerAI(Creature* creature) : ScriptedAI(creature), summons(me)
-        {
-            _fedOnTears = true;
-            _firstPull = true;
-            _fightWon = false;
-            m_pInstance = me->GetInstanceScript();
-        }
+        _fedOnTears = true;
+        _firstPull = true;
+        _fightWon = false;
+        m_pInstance = me->GetInstanceScript();
+    }
 
-        EventMap events;
-        SummonList summons;
-        InstanceScript* m_pInstance;
+    EventMap events;
+    SummonList summons;
+    InstanceScript* m_pInstance;
 
-        bool _firstPull;
-        bool _fightWon;
-        bool _phaseTwo;
-        bool _fedOnTears;
-        bool _heraldOfTheTitans;
+    bool _firstPull;
+    bool _fightWon;
+    bool _phaseTwo;
+    bool _fedOnTears;
+    bool _heraldOfTheTitans;
 
-        bool IsValidHeraldItem(ItemTemplate const* item)
-        {
-            if (!item) // should not happen, but checked in GetAverageItemLevel()
-                return true;
-            if (item->ItemLevel <= 226 || (item->ItemLevel <= 232 && (
-                                               item->InventoryType == INVTYPE_SHIELD ||
-                                               item->Class == ITEM_CLASS_WEAPON ||
-                                               (item->Class == ITEM_CLASS_ARMOR && (item->InventoryType == INVTYPE_RELIC || item->InventoryType == INVTYPE_HOLDABLE))
-                                           )))
-                return true;
-            return false;
-        }
+    bool IsValidHeraldItem(ItemTemplate const* item)
+    {
+        if (!item) // should not happen, but checked in GetAverageItemLevel()
+            return true;
+        if (item->ItemLevel <= 226 || (item->ItemLevel <= 232 && (
+                                           item->InventoryType == INVTYPE_SHIELD ||
+                                           item->Class == ITEM_CLASS_WEAPON ||
+                                           (item->Class == ITEM_CLASS_ARMOR && (item->InventoryType == INVTYPE_RELIC || item->InventoryType == INVTYPE_HOLDABLE))
+                                       )))
+            return true;
+        return false;
+    }
 
-        bool DoCheckHeraldOfTheTitans()
-        {
-            if (!_heraldOfTheTitans)
-                return true;
+    bool DoCheckHeraldOfTheTitans()
+    {
+        if (!_heraldOfTheTitans)
+            return true;
 
-            Map::PlayerList const& pl = me->GetMap()->GetPlayers();
-            for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-                if (Player* plr = itr->GetSource())
-                    if (!plr->IsGameMaster() && plr->IsInCombat() /*performance*/)
-                    {
-                        for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i) // loop through equipped items
-                            if (Item* item = plr->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
-                                if (!IsValidHeraldItem(item->GetTemplate()))
-                                {
-                                    _heraldOfTheTitans = false;
-                                    return true;
-                                }
-                    }
-
-            return false;
-        }
-
-        void AttackStart(Unit* who) override
-        {
-            if (_fightWon)
-                return;
-            ScriptedAI::AttackStart(who);
-        }
-
-        uint32 GetData(uint32 param) const override
-        {
-            if (param == DATA_HAS_FED_ON_TEARS)
-                return _fedOnTears;
-            if (param == DATA_HERALD_OF_THE_TITANS)
-                return _heraldOfTheTitans;
-            return 0;
-        }
-
-        void CallConstellations()
-        {
-            uint8 _count = 0;
-            for (SummonList::const_iterator i = summons.begin(); i != summons.end(); )
-            {
-                Creature* summon = ObjectAccessor::GetCreature(*me, *i++);
-                if (summon && summon->GetEntry() == NPC_LIVING_CONSTELLATION && !summon->AI()->GetData(0))
+        Map::PlayerList const& pl = me->GetMap()->GetPlayers();
+        for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
+            if (Player* plr = itr->GetSource())
+                if (!plr->IsGameMaster() && plr->IsInCombat() /*performance*/)
                 {
-                    ++_count;
-                    summon->AI()->DoAction(ACTION_ACTIVATE_STAR);
-                    if (_count >= 3)
-                        break;
+                    for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i) // loop through equipped items
+                        if (Item* item = plr->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+                            if (!IsValidHeraldItem(item->GetTemplate()))
+                            {
+                                _heraldOfTheTitans = false;
+                                return true;
+                            }
                 }
-            }
-        }
 
-        void EnterEvadeMode(EvadeReason why) override
+        return false;
+    }
+
+    void AttackStart(Unit* who) override
+    {
+        if (_fightWon)
+            return;
+        ScriptedAI::AttackStart(who);
+    }
+
+    uint32 GetData(uint32 param) const override
+    {
+        if (param == DATA_HAS_FED_ON_TEARS)
+            return _fedOnTears;
+        if (param == DATA_HERALD_OF_THE_TITANS)
+            return _heraldOfTheTitans;
+        return 0;
+    }
+
+    void CallConstellations()
+    {
+        uint8 _count = 0;
+        for (SummonList::const_iterator i = summons.begin(); i != summons.end(); )
         {
-            if (_fightWon)
-                return;
-
-            if (SelectTargetFromPlayerList(120.0f))
+            Creature* summon = ObjectAccessor::GetCreature(*me, *i++);
+            if (summon && summon->GetEntry() == NPC_LIVING_CONSTELLATION && !summon->AI()->GetData(0))
             {
-                me->SetInCombatWithZone();
-                return;
-            }
-            else if (events.GetPhaseMask() & PHASE_NORMAL)
-            {
-                DoAction(ACTION_ASCEND);
-                return;
-            }
-
-            if (m_pInstance)
-                m_pInstance->SetData(TYPE_ALGALON, FAIL);
-
-            ScriptedAI::EnterEvadeMode(why);
-        }
-
-        void Reset() override
-        {
-            if (_fightWon)
-                return;
-
-            events.Reset();
-            summons.DespawnAll();
-            me->SetReactState(REACT_PASSIVE);
-            me->SetImmuneToPC(false);
-            me->SetSheath(SHEATH_STATE_UNARMED);
-            me->SetFaction(190);
-            me->CastSpell(me, SPELL_DUAL_WIELD, true);
-
-            _phaseTwo = false;
-            _heraldOfTheTitans = true;
-
-            if (m_pInstance->GetData(TYPE_ALGALON) == FAIL)
-            {
-                _firstPull = false;
-            }
-
-            if (m_pInstance)
-                m_pInstance->SetData(TYPE_ALGALON, NOT_STARTED);
-        }
-
-        void KilledUnit(Unit* victim) override
-        {
-            if (!victim->IsPlayer() || urand(0, 2))
-                return;
-
-            Talk(SAY_ALGALON_KILL);
-        }
-
-        void DoAction(int32 action) override
-        {
-            switch (action)
-            {
-                case ACTION_START_INTRO:
-                    {
-                        me->SetImmuneToPC(true);
-                        me->SetUnitFlag2(UNIT_FLAG2_DO_NOT_FADE_IN);
-                        me->SetDisableGravity(true);
-                        me->CastSpell(me, SPELL_ARRIVAL, true);
-                        me->CastSpell(me, SPELL_RIDE_THE_LIGHTNING, true);
-                        me->GetMotionMaster()->MovePoint(POINT_ALGALON_LAND, AlgalonLandPos);
-                        me->SetHomePosition(AlgalonLandPos);
-                        Movement::MoveSplineInit init(me);
-                        init.MoveTo(AlgalonLandPos.GetPositionX(), AlgalonLandPos.GetPositionY(), AlgalonLandPos.GetPositionZ());
-                        init.SetOrientationFixed(true);
-                        init.Launch();
-                        events.Reset();
-                        events.SetPhase(PHASE_ROLE_PLAY);
-                        events.ScheduleEvent(EVENT_INTRO_1, 5s, 0, PHASE_ROLE_PLAY);
-                        events.ScheduleEvent(EVENT_INTRO_2, 15s, 0, PHASE_ROLE_PLAY);
-                        events.ScheduleEvent(EVENT_INTRO_3, 23s, 0, PHASE_ROLE_PLAY);
-                        events.ScheduleEvent(EVENT_INTRO_FINISH, 36s, 0, PHASE_ROLE_PLAY);
-                        break;
-                    }
-                case ACTION_DESPAWN_ALGALON:
-                    _fightWon = true;
-                    events.Reset();
-                    summons.DespawnAll();
-                    events.SetPhase(PHASE_ROLE_PLAY);
-                    events.ScheduleEvent(EVENT_DESPAWN_ALGALON_1, 5s);
-                    events.ScheduleEvent(EVENT_DESPAWN_ALGALON_2, 17s);
-                    events.ScheduleEvent(EVENT_DESPAWN_ALGALON_3, 26s);
-                    if (me->IsInCombat())
-                        events.ScheduleEvent(EVENT_DESPAWN_ALGALON_4, 26s);
-                    events.ScheduleEvent(EVENT_DESPAWN_ALGALON_5, 32s);
-                    me->DespawnOrUnsummon(39s);
-
-                    me->SetReactState(REACT_PASSIVE);
-                    me->AttackStop();
-                    me->SetFaction(FACTION_FRIENDLY);
-                    me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    me->InterruptNonMeleeSpells(false);
-                    if (m_pInstance)
-                        m_pInstance->SetData(TYPE_ALGALON, NOT_STARTED);
+                ++_count;
+                summon->AI()->DoAction(ACTION_ACTIVATE_STAR);
+                if (_count >= 3)
                     break;
-                case ACTION_INIT_ALGALON:
-                    _firstPull = false;
-                    _fedOnTears = false;
-                    me->SetImmuneToPC(false);
-                    break;
-                case ACTION_ASCEND:
-                    summons.DespawnAll();
-                    events.SetPhase(PHASE_BIG_BANG);
-                    events.ScheduleEvent(EVENT_ASCEND_TO_THE_HEAVENS, 1500ms);
-                    break;
-                case ACTION_FEEDS_ON_TEARS_FAILED:
-                    _fedOnTears = false;
             }
         }
+    }
 
-        void JustReachedHome() override
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        if (_fightWon)
+            return;
+
+        if (SelectTargetFromPlayerList(120.0f))
         {
-            me->setActive(false);
-        }
-
-        void JustEngagedWith(Unit*) override
-        {
-            if (_fightWon)
-                return;
-
-            if (!m_pInstance)
-            {
-                EnterEvadeMode(EVADE_REASON_OTHER);
-                return;
-            }
-
-            Milliseconds  introDelay = 0ms;
-            me->setActive(true);
             me->SetInCombatWithZone();
-            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-            me->SetImmuneToNPC(true);
-            events.Reset();
-            events.SetPhase(PHASE_ROLE_PLAY);
-
-            if (!_firstPull)
-            {
-                events.ScheduleEvent(EVENT_START_COMBAT, 0ms);
-                introDelay = 8s;
-            }
-            else
-            {
-                summons.DespawnEntry(NPC_AZEROTH);
-                _firstPull = false;
-                Talk(SAY_ALGALON_START_TIMER);
-                introDelay = 22s;
-                events.ScheduleEvent(EVENT_START_COMBAT, 14s);
-                m_pInstance->SetData(DATA_DESPAWN_ALGALON, 0);
-            }
-
-            events.ScheduleEvent(EVENT_REMOVE_UNNATTACKABLE, introDelay - 500ms);
-            events.ScheduleEvent(EVENT_INTRO_TIMER_DONE, introDelay);
-            events.ScheduleEvent(EVENT_QUANTUM_STRIKE, 3500ms + introDelay);
-            events.ScheduleEvent(EVENT_PHASE_PUNCH, 15500ms + introDelay);
-            events.ScheduleEvent(EVENT_SUMMON_COLLAPSING_STAR, 16500ms + introDelay);
-            events.ScheduleEvent(EVENT_COSMIC_SMASH, 25s + introDelay);
-            events.ScheduleEvent(EVENT_ACTIVATE_LIVING_CONSTELLATION, 50500ms + introDelay);
-            events.ScheduleEvent(EVENT_BIG_BANG, 90s + introDelay);
-            events.ScheduleEvent(EVENT_ASCEND_TO_THE_HEAVENS, 360s + introDelay);
-
-            events.ScheduleEvent(EVENT_CHECK_HERALD_ITEMS, 5s);
-            DoCheckHeraldOfTheTitans();
+            return;
+        }
+        else if (events.GetPhaseMask() & PHASE_NORMAL)
+        {
+            DoAction(ACTION_ASCEND);
+            return;
         }
 
-        void MovementInform(uint32 movementType, uint32 pointId) override
-        {
-            if (movementType != POINT_MOTION_TYPE)
-                return;
+        if (m_pInstance)
+            m_pInstance->SetData(BOSS_ALGALON, FAIL);
 
-            if (pointId == POINT_ALGALON_LAND)
-                me->SetDisableGravity(false);
-            else if (pointId == POINT_ALGALON_OUTRO)
-            {
-                me->SetFacingTo(1.605703f);
-                events.ScheduleEvent(EVENT_OUTRO_3, 1200ms);
-                events.ScheduleEvent(EVENT_OUTRO_4, 2400ms);
-                events.ScheduleEvent(EVENT_OUTRO_5, 8500ms);
-                events.ScheduleEvent(EVENT_OUTRO_6, 15s + 500ms);
-                events.ScheduleEvent(EVENT_OUTRO_7, 55s + 500ms);
-                events.ScheduleEvent(EVENT_OUTRO_8, 73s + 500ms);
-                events.ScheduleEvent(EVENT_OUTRO_9, 85s + 500ms);
-                events.ScheduleEvent(EVENT_OUTRO_10, 101s + 500ms);
-                events.ScheduleEvent(EVENT_OUTRO_11, 117s + 500ms);
-            }
+        ScriptedAI::EnterEvadeMode(why);
+    }
+
+    void Reset() override
+    {
+        if (_fightWon)
+            return;
+
+        events.Reset();
+        summons.DespawnAll();
+        me->SetReactState(REACT_PASSIVE);
+        me->SetImmuneToPC(false);
+        me->SetSheath(SHEATH_STATE_UNARMED);
+        me->SetFaction(190);
+        me->CastSpell(me, SPELL_DUAL_WIELD, true);
+
+        _phaseTwo = false;
+        _heraldOfTheTitans = true;
+
+        if (m_pInstance->GetBossState(BOSS_ALGALON) == FAIL)
+        {
+            _firstPull = false;
         }
 
-        void JustSummoned(Creature* summon) override
+        if (m_pInstance)
+            m_pInstance->SetData(BOSS_ALGALON, NOT_STARTED);
+    }
+
+    void KilledUnit(Unit* victim) override
+    {
+        if (!victim->IsPlayer() || urand(0, 2))
+            return;
+
+        Talk(SAY_ALGALON_KILL);
+    }
+
+    void DoAction(int32 action) override
+    {
+        switch (action)
         {
-            summons.Summon(summon);
-            switch (summon->GetEntry())
-            {
-                case NPC_AZEROTH:
-                    me->CastSpell(summon, SPELL_REORIGINATION, true);
+            case ACTION_START_INTRO:
+                {
+                    me->SetImmuneToPC(true);
+                    me->SetUnitFlag2(UNIT_FLAG2_DO_NOT_FADE_IN);
+                    me->SetDisableGravity(true);
+                    me->CastSpell(me, SPELL_ARRIVAL, true);
+                    me->CastSpell(me, SPELL_RIDE_THE_LIGHTNING, true);
+                    me->GetMotionMaster()->MovePoint(POINT_ALGALON_LAND, AlgalonLandPos);
+                    me->SetHomePosition(AlgalonLandPos);
+                    Movement::MoveSplineInit init(me);
+                    init.MoveTo(AlgalonLandPos.GetPositionX(), AlgalonLandPos.GetPositionY(), AlgalonLandPos.GetPositionZ());
+                    init.SetOrientationFixed(true);
+                    init.Launch();
+                    events.Reset();
+                    events.SetPhase(PHASE_ROLE_PLAY);
+                    events.ScheduleEvent(EVENT_INTRO_1, 5s, 0, PHASE_ROLE_PLAY);
+                    events.ScheduleEvent(EVENT_INTRO_2, 15s, 0, PHASE_ROLE_PLAY);
+                    events.ScheduleEvent(EVENT_INTRO_3, 23s, 0, PHASE_ROLE_PLAY);
+                    events.ScheduleEvent(EVENT_INTRO_FINISH, 36s, 0, PHASE_ROLE_PLAY);
                     break;
-                case NPC_BLACK_HOLE:
-                    summon->CastSpell((Unit*)nullptr, SPELL_BLACK_HOLE_TRIGGER, true);
-                    summon->CastSpell(summon, SPELL_CONSTELLATION_PHASE_TRIGGER, true);
-                    summon->CastSpell((Unit*)nullptr, SPELL_BLACK_HOLE_EXPLOSION, false);
-                    summon->CastSpell(summon, SPELL_SUMMON_VOID_ZONE_VISUAL, true);
-                    break;
-                case NPC_ALGALON_VOID_ZONE_VISUAL_STALKER:
-                    summon->CastSpell(summon, SPELL_VOID_ZONE_VISUAL, true);
-                    break;
-                case NPC_ALGALON_STALKER_ASTEROID_TARGET_01:
-                    summon->CastSpell(summon, SPELL_COSMIC_SMASH_VISUAL_STATE, true);
-                    break;
-                case NPC_ALGALON_STALKER_ASTEROID_TARGET_02:
-                    {
-                        float x = summon->GetPositionX();
-                        float y = summon->GetPositionY();
-                        float z = summon->GetPositionZ() + 35.0f;
-                        float o = summon->GetOrientation();
-
-                        summon->GetMotionMaster()->Clear();
-                        summon->SetHomePosition(x, y, z, o);
-                        summon->UpdatePosition(x, y, z, o, true);
-                        summon->StopMovingOnCurrentPos();
-                        summon->m_Events.AddEventAtOffset(new CosmicSmashDamageEvent(summon), 4s);
-                        break;
-                    }
-                case NPC_UNLEASHED_DARK_MATTER:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
-                        if (summon->Attack(target, true))
-                            summon->GetMotionMaster()->MoveChase(target);
-                    break;
-            }
-        }
-
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
-        {
-            if (_fightWon)
-            {
-                damage = 0;
-                return;
-            }
-
-            if (!_phaseTwo && me->HealthBelowPctDamaged(20, damage))
-            {
-                _phaseTwo = true;
-                Talk(SAY_ALGALON_PHASE_TWO);
-                summons.DespawnEntry(NPC_LIVING_CONSTELLATION);
-                summons.DespawnEntry(NPC_COLLAPSING_STAR);
-                summons.DespawnEntry(NPC_BLACK_HOLE);
-                summons.DespawnEntry(NPC_ALGALON_VOID_ZONE_VISUAL_STALKER);
-                events.CancelEvent(EVENT_SUMMON_COLLAPSING_STAR);
-                events.CancelEvent(EVENT_ACTIVATE_LIVING_CONSTELLATION);
-
-                for (uint32 i = 0; i < COLLAPSING_STAR_COUNT; ++i)
-                    me->SummonCreature(NPC_WORM_HOLE, CollapsingStarPos[i], TEMPSUMMON_MANUAL_DESPAWN);
-            }
-            else if (me->HealthBelowPctDamaged(2, damage) && !_fightWon)
-            {
+                }
+            case ACTION_DESPAWN_ALGALON:
                 _fightWon = true;
-                damage = 0;
+                events.Reset();
+                summons.DespawnAll();
+                events.SetPhase(PHASE_ROLE_PLAY);
+                events.ScheduleEvent(EVENT_DESPAWN_ALGALON_1, 5s);
+                events.ScheduleEvent(EVENT_DESPAWN_ALGALON_2, 17s);
+                events.ScheduleEvent(EVENT_DESPAWN_ALGALON_3, 26s);
+                if (me->IsInCombat())
+                    events.ScheduleEvent(EVENT_DESPAWN_ALGALON_4, 26s);
+                events.ScheduleEvent(EVENT_DESPAWN_ALGALON_5, 32s);
+                me->DespawnOrUnsummon(39s);
+
                 me->SetReactState(REACT_PASSIVE);
                 me->AttackStop();
                 me->SetFaction(FACTION_FRIENDLY);
                 me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                events.Reset();
-                summons.DespawnAll();
                 me->InterruptNonMeleeSpells(false);
-                events.SetPhase(PHASE_ROLE_PLAY);
-                events.ScheduleEvent(EVENT_OUTRO_START, 1500ms);
-                events.ScheduleEvent(EVENT_OUTRO_1, 7200ms);
-                events.ScheduleEvent(EVENT_OUTRO_2, 8700ms);
-            }
+                if (m_pInstance)
+                    m_pInstance->SetData(BOSS_ALGALON, NOT_STARTED);
+                break;
+            case ACTION_INIT_ALGALON:
+                _firstPull = false;
+                _fedOnTears = false;
+                me->SetImmuneToPC(false);
+                break;
+            case ACTION_ASCEND:
+                summons.DespawnAll();
+                events.SetPhase(PHASE_BIG_BANG);
+                events.ScheduleEvent(EVENT_ASCEND_TO_THE_HEAVENS, 1500ms);
+                break;
+            case ACTION_FEEDS_ON_TEARS_FAILED:
+                _fedOnTears = false;
+        }
+    }
+
+    void JustReachedHome() override
+    {
+        me->setActive(false);
+    }
+
+    void JustEngagedWith(Unit*) override
+    {
+        if (_fightWon)
+            return;
+
+        if (!m_pInstance)
+        {
+            EnterEvadeMode(EVADE_REASON_OTHER);
+            return;
         }
 
-        bool IsInRoom()
-        {
-            if (me->GetExactDist2d(&me->GetHomePosition()) > 45.f || me->GetPositionZ() < 410.f)
-            {
-                DoAction(ACTION_ASCEND);
-                return false;
-            }
+        Milliseconds  introDelay = 0ms;
+        me->setActive(true);
+        me->SetInCombatWithZone();
+        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+        me->SetImmuneToNPC(true);
+        events.Reset();
+        events.SetPhase(PHASE_ROLE_PLAY);
 
-            return true;
+        if (!_firstPull)
+        {
+            events.ScheduleEvent(EVENT_START_COMBAT, 0ms);
+            introDelay = 8s;
+        }
+        else
+        {
+            summons.DespawnEntry(NPC_AZEROTH);
+            _firstPull = false;
+            Talk(SAY_ALGALON_START_TIMER);
+            introDelay = 22s;
+            events.ScheduleEvent(EVENT_START_COMBAT, 14s);
+            m_pInstance->SetData(DATA_DESPAWN_ALGALON, 0);
         }
 
-        void UpdateAI(uint32 diff) override
+        events.ScheduleEvent(EVENT_REMOVE_UNNATTACKABLE, introDelay - 500ms);
+        events.ScheduleEvent(EVENT_INTRO_TIMER_DONE, introDelay);
+        events.ScheduleEvent(EVENT_QUANTUM_STRIKE, 3500ms + introDelay);
+        events.ScheduleEvent(EVENT_PHASE_PUNCH, 15500ms + introDelay);
+        events.ScheduleEvent(EVENT_SUMMON_COLLAPSING_STAR, 16500ms + introDelay);
+        events.ScheduleEvent(EVENT_COSMIC_SMASH, 25s + introDelay);
+        events.ScheduleEvent(EVENT_ACTIVATE_LIVING_CONSTELLATION, 50500ms + introDelay);
+        events.ScheduleEvent(EVENT_BIG_BANG, 90s + introDelay);
+        events.ScheduleEvent(EVENT_ASCEND_TO_THE_HEAVENS, 360s + introDelay);
+
+        events.ScheduleEvent(EVENT_CHECK_HERALD_ITEMS, 5s);
+        DoCheckHeraldOfTheTitans();
+    }
+
+    void MovementInform(uint32 movementType, uint32 pointId) override
+    {
+        if (movementType != POINT_MOTION_TYPE)
+            return;
+
+        if (pointId == POINT_ALGALON_LAND)
+            me->SetDisableGravity(false);
+        else if (pointId == POINT_ALGALON_OUTRO)
         {
-            if (!(events.GetPhaseMask() & PHASE_MASK_NO_UPDATE) && (!UpdateVictim() || !IsInRoom()))
-                return;
+            me->SetFacingTo(1.605703f);
+            events.ScheduleEvent(EVENT_OUTRO_3, 1200ms);
+            events.ScheduleEvent(EVENT_OUTRO_4, 2400ms);
+            events.ScheduleEvent(EVENT_OUTRO_5, 8500ms);
+            events.ScheduleEvent(EVENT_OUTRO_6, 15s + 500ms);
+            events.ScheduleEvent(EVENT_OUTRO_7, 55s + 500ms);
+            events.ScheduleEvent(EVENT_OUTRO_8, 73s + 500ms);
+            events.ScheduleEvent(EVENT_OUTRO_9, 85s + 500ms);
+            events.ScheduleEvent(EVENT_OUTRO_10, 101s + 500ms);
+            events.ScheduleEvent(EVENT_OUTRO_11, 117s + 500ms);
+        }
+    }
 
-            events.Update(diff);
-            if (!(events.GetPhaseMask() & PHASE_MASK_NO_CAST_CHECK) && me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_INTRO_1:
-                    me->RemoveAurasDueToSpell(SPELL_RIDE_THE_LIGHTNING);
-                    Talk(SAY_ALGALON_INTRO_1);
-                    break;
-                case EVENT_INTRO_2:
-                    me->CastSpell((Unit*)nullptr, SPELL_SUMMON_AZEROTH, true);
-                    Talk(SAY_ALGALON_INTRO_2);
-                    break;
-                case EVENT_INTRO_3:
-                    Talk(SAY_ALGALON_INTRO_3);
-                    break;
-                case EVENT_INTRO_FINISH:
-                    events.Reset();
-                    me->SetImmuneToPC(false);
-                    if (Creature* brann = ObjectAccessor::GetCreature(*me, m_pInstance->GetGuidData(NPC_BRANN_BRONZBEARD_ALG)))
-                        brann->AI()->DoAction(ACTION_FINISH_INTRO);
-                    break;
-                case EVENT_START_COMBAT:
-                    m_pInstance->SetData(TYPE_ALGALON, IN_PROGRESS);
-                    Talk(SAY_ALGALON_AGGRO);
-                    break;
-                case EVENT_REMOVE_UNNATTACKABLE:
-                    me->SetSheath(SHEATH_STATE_MELEE);
-                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    me->SetImmuneToNPC(false);
-                    break;
-                case EVENT_INTRO_TIMER_DONE:
-                    events.SetPhase(PHASE_NORMAL);
-                    me->CastSpell((Unit*)nullptr, SPELL_SUPERMASSIVE_FAIL, true);
-                    // Hack: _IsValidTarget failed earlier due to flags, call AttackStart again
-                    me->SetReactState(REACT_AGGRESSIVE);
-                    me->SetFaction(FACTION_MONSTER);
-                    if (Player* target = SelectTargetFromPlayerList(150.0f))
-                        AttackStart(target);
-                    me->SetInCombatWithZone();
-
-                    for (uint32 i = 0; i < LIVING_CONSTELLATION_COUNT; ++i)
-                        me->SummonCreature(NPC_LIVING_CONSTELLATION, ConstellationPos[i], TEMPSUMMON_DEAD_DESPAWN);
-                    break;
-                case EVENT_QUANTUM_STRIKE:
-                    me->CastSpell(me->GetVictim(), SPELL_QUANTUM_STRIKE, false);
-                    events.Repeat(3s, 4500ms);
-                    break;
-                case EVENT_PHASE_PUNCH:
-                    me->CastSpell(me->GetVictim(), SPELL_PHASE_PUNCH, false);
-                    events.Repeat(15s + 500ms);
-                    break;
-                case EVENT_SUMMON_COLLAPSING_STAR:
-                    Talk(SAY_ALGALON_COLLAPSING_STAR);
-                    Talk(EMOTE_ALGALON_COLLAPSING_STAR);
-                    for (uint8 i = 0; i < COLLAPSING_STAR_COUNT; ++i)
-                        me->SummonCreature(NPC_COLLAPSING_STAR, CollapsingStarPos[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
-                    events.Repeat(1min);
-                    break;
-                case EVENT_COSMIC_SMASH:
-                    Talk(EMOTE_ALGALON_COSMIC_SMASH);
-                    me->CastCustomSpell(SPELL_COSMIC_SMASH, SPELLVALUE_MAX_TARGETS, RAID_MODE(1, 3), (Unit*)nullptr);
-                    events.Repeat(25s + 500ms);
-                    break;
-                case EVENT_ACTIVATE_LIVING_CONSTELLATION:
-                    {
-                        if (events.GetPhaseMask() & PHASE_MASK_NO_UPDATE)
-                        {
-                            events.Repeat(4s);
-                            break;
-                        }
-                        CallConstellations();
-                        //me->CastSpell(me, SPELL_TRIGGER_3_ADDS, true);
-                        events.Repeat(50s);
-                        break;
-                    }
-                case EVENT_BIG_BANG:
-                    {
-                        Talk(SAY_ALGALON_BIG_BANG);
-                        Talk(EMOTE_ALGALON_BIG_BANG);
-
-                        EntryCheckPredicate pred(NPC_LIVING_CONSTELLATION);
-                        summons.DoAction(ACTION_BIG_BANG, pred);
-
-                        me->CastSpell((Unit*)nullptr, SPELL_BIG_BANG, false);
-                        events.Repeat(90s + 500ms);
-                        break;
-                    }
-                case EVENT_ASCEND_TO_THE_HEAVENS:
-                    Talk(SAY_ALGALON_ASCEND);
-                    me->CastSpell((Unit*)nullptr, SPELL_ASCEND_TO_THE_HEAVENS, false);
-                    events.ScheduleEvent(EVENT_EVADE, 2500ms);
-                    break;
-                case EVENT_EVADE:
-                    events.Reset();
-                    ScriptedAI::EnterEvadeMode();
-                    return;
-                case EVENT_OUTRO_START:
-                    if (m_pInstance)
-                    {
-                        m_pInstance->SetData(TYPE_ALGALON, DONE);
-                        m_pInstance->SetData(DATA_ALGALON_DEFEATED, 1);
-                    }
-                    break;
-                case EVENT_OUTRO_1:
-                    me->RemoveAllAuras();
-                    me->SetUnitFlag(UNIT_FLAG_RENAME);
-                    break;
-                case EVENT_OUTRO_2:
+    void JustSummoned(Creature* summon) override
+    {
+        summons.Summon(summon);
+        switch (summon->GetEntry())
+        {
+            case NPC_AZEROTH:
+                me->CastSpell(summon, SPELL_REORIGINATION, true);
+                break;
+            case NPC_BLACK_HOLE:
+                summon->CastSpell((Unit*)nullptr, SPELL_BLACK_HOLE_TRIGGER, true);
+                summon->CastSpell(summon, SPELL_CONSTELLATION_PHASE_TRIGGER, true);
+                summon->CastSpell((Unit*)nullptr, SPELL_BLACK_HOLE_EXPLOSION, false);
+                summon->CastSpell(summon, SPELL_SUMMON_VOID_ZONE_VISUAL, true);
+                break;
+            case NPC_ALGALON_VOID_ZONE_VISUAL_STALKER:
+                summon->CastSpell(summon, SPELL_VOID_ZONE_VISUAL, true);
+                break;
+            case NPC_ALGALON_STALKER_ASTEROID_TARGET_01:
+                summon->CastSpell(summon, SPELL_COSMIC_SMASH_VISUAL_STATE, true);
+                break;
+            case NPC_ALGALON_STALKER_ASTEROID_TARGET_02:
                 {
-                    Player* lootRecipent = me->GetLootRecipient();
-                    _EnterEvadeMode();
-                    // LootRecipent is cleared in _EnterEvadeMode, restore it
-                    me->SetLootRecipient(lootRecipent);
-                    me->GetMotionMaster()->MovePoint(POINT_ALGALON_OUTRO, AlgalonOutroPos);
+                    float x = summon->GetPositionX();
+                    float y = summon->GetPositionY();
+                    float z = summon->GetPositionZ() + 35.0f;
+                    float o = summon->GetOrientation();
+
+                    summon->GetMotionMaster()->Clear();
+                    summon->SetHomePosition(x, y, z, o);
+                    summon->UpdatePosition(x, y, z, o, true);
+                    summon->StopMovingOnCurrentPos();
+                    summon->m_Events.AddEventAtOffset(new CosmicSmashDamageEvent(summon), 4s);
                     break;
                 }
-                case EVENT_OUTRO_3:
-                    me->CastSpell((Unit*)nullptr, SPELL_KILL_CREDIT);
-                    // Summon Chest
-                    if (GameObject* go = me->SummonGameObject(RAID_MODE(GO_ALGALON_CHEST, GO_ALGALON_CHEST_HERO), 1632.1f, -306.561f, 417.321f, 4.69494f, 0, 0, 0, 1, 0))
-                    {
-                        go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
-                        go->SetLootRecipient(me);
-                    }
-                    break;
-                case EVENT_OUTRO_4:
-                    me->CastSpell((Unit*)nullptr, SPELL_SUPERMASSIVE_FAIL);
-                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    break;
-                case EVENT_OUTRO_5:
-                    if (Creature* brann = me->SummonCreature(NPC_BRANN_BRONZBEARD_ALG, BrannOutroPos[0], TEMPSUMMON_TIMED_DESPAWN, 131500))
-                        brann->AI()->DoAction(ACTION_OUTRO);
-                    break;
-                case EVENT_OUTRO_6:
-                    Talk(SAY_ALGALON_OUTRO_1);
-                    me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                    break;
-                case EVENT_OUTRO_7:
-                    Talk(SAY_ALGALON_OUTRO_2);
-                    break;
-                case EVENT_OUTRO_8:
-                    Talk(SAY_ALGALON_OUTRO_3);
-                    break;
-                case EVENT_OUTRO_9:
-                    Talk(SAY_ALGALON_OUTRO_4);
-                    break;
-                case EVENT_OUTRO_10:
-                    Talk(SAY_ALGALON_OUTRO_5);
-                    break;
-                case EVENT_OUTRO_11:
-                    me->SetStandState(UNIT_STAND_STATE_STAND);
-                    me->CastSpell(me, SPELL_TELEPORT, false);
-                    me->DespawnOrUnsummon(3s);
-                    break;
-                case EVENT_DESPAWN_ALGALON_1:
-                    Talk(SAY_ALGALON_DESPAWN_1);
-                    break;
-                case EVENT_DESPAWN_ALGALON_2:
-                    Talk(SAY_ALGALON_DESPAWN_2);
-                    break;
-                case EVENT_DESPAWN_ALGALON_3:
-                    Talk(SAY_ALGALON_DESPAWN_3);
-                    break;
-                case EVENT_DESPAWN_ALGALON_4:
-                    me->CastSpell((Unit*)nullptr, SPELL_ASCEND_TO_THE_HEAVENS, false);
-                    break;
-                case EVENT_DESPAWN_ALGALON_5:
-                    me->SetStandState(UNIT_STAND_STATE_STAND);
-                    me->CastSpell(me, SPELL_TELEPORT, false);
-                    me->DespawnOrUnsummon(3s);
-                    break;
-                case EVENT_CHECK_HERALD_ITEMS:
-                    if (!DoCheckHeraldOfTheTitans())
-                        events.Repeat(5s);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
+            case NPC_UNLEASHED_DARK_MATTER:
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
+                    if (summon->Attack(target, true))
+                        summon->GetMotionMaster()->MoveChase(target);
+                break;
         }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetUlduarAI<boss_algalon_the_observerAI>(creature);
     }
-};
 
-class npc_brann_bronzebeard_algalon : public CreatureScript
-{
-public:
-    npc_brann_bronzebeard_algalon() : CreatureScript("npc_brann_bronzebeard_algalon") { }
-
-    struct npc_brann_bronzebeard_algalonAI : public CreatureAI
+    void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
     {
-        npc_brann_bronzebeard_algalonAI(Creature* creature) : CreatureAI(creature)
+        if (_fightWon)
         {
+            damage = 0;
+            return;
         }
 
-        EventMap events;
-        uint32 _currentPoint;
-
-        void DoAction(int32 action) override
+        if (!_phaseTwo && me->HealthBelowPctDamaged(20, damage))
         {
-            switch (action)
-            {
-                case ACTION_START_INTRO:
-                    me->SetWalk(false);
-                    _currentPoint = 0;
-                    events.Reset();
-                    events.ScheduleEvent(EVENT_BRANN_MOVE_INTRO, 1ms);
-                    break;
-                case ACTION_FINISH_INTRO:
-                    Talk(SAY_BRANN_ALGALON_INTRO_2);
-                    events.ScheduleEvent(EVENT_BRANN_MOVE_INTRO, 1ms);
-                    break;
-                case ACTION_OUTRO:
-                    me->GetMotionMaster()->MovePoint(POINT_BRANN_OUTRO, BrannOutroPos[1]);
-                    events.ScheduleEvent(EVENT_BRANN_OUTRO_1, 87s + 500ms);
-                    events.ScheduleEvent(EVENT_BRANN_OUTRO_2, 116s + 500ms);
-                    break;
-            }
+            _phaseTwo = true;
+            Talk(SAY_ALGALON_PHASE_TWO);
+            summons.DespawnEntry(NPC_LIVING_CONSTELLATION);
+            summons.DespawnEntry(NPC_COLLAPSING_STAR);
+            summons.DespawnEntry(NPC_BLACK_HOLE);
+            summons.DespawnEntry(NPC_ALGALON_VOID_ZONE_VISUAL_STALKER);
+            events.CancelEvent(EVENT_SUMMON_COLLAPSING_STAR);
+            events.CancelEvent(EVENT_ACTIVATE_LIVING_CONSTELLATION);
+
+            for (uint32 i = 0; i < COLLAPSING_STAR_COUNT; ++i)
+                me->SummonCreature(NPC_WORM_HOLE, CollapsingStarPos[i], TEMPSUMMON_MANUAL_DESPAWN);
         }
-
-        void MovementInform(uint32 movementType, uint32 pointId) override
+        else if (me->HealthBelowPctDamaged(2, damage) && !_fightWon)
         {
-            if (movementType != POINT_MOTION_TYPE)
-                return;
-
-            Milliseconds delay = 1ms;
-            _currentPoint = pointId + 1;
-            switch (pointId)
-            {
-                case 2:
-                    delay = 8s;
-                    me->SetWalk(true);
-                    break;
-                case 6:
-                    me->SetFacingTo(4.6156f);
-                    me->SetWalk(false);
-                    Talk(SAY_BRANN_ALGALON_INTRO_1);
-                    events.ScheduleEvent(EVENT_SUMMON_ALGALON, 7500ms);
-                    return;
-                case 10:
-                    me->DespawnOrUnsummon(1ms);
-                    return;
-                case POINT_BRANN_OUTRO:
-                case POINT_BRANN_OUTRO_END:
-                    return;
-            }
-
-            events.ScheduleEvent(EVENT_BRANN_MOVE_INTRO, delay);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            UpdateVictim();
-            events.Update(diff);
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_BRANN_MOVE_INTRO:
-                    if (_currentPoint < MAX_BRANN_WAYPOINTS_INTRO)
-                        me->GetMotionMaster()->MovePoint(_currentPoint, BrannIntroWaypoint[_currentPoint]);
-                    break;
-                case EVENT_SUMMON_ALGALON:
-                    if (me->GetInstanceScript() && !me->GetInstanceScript()->GetGuidData(TYPE_ALGALON))
-                        if (Creature* algalon = me->GetMap()->SummonCreature(NPC_ALGALON, AlgalonSummonPos))
-                            algalon->AI()->DoAction(ACTION_START_INTRO);
-                    break;
-                case EVENT_BRANN_OUTRO_1:
-                    Talk(SAY_BRANN_ALGALON_OUTRO);
-                    break;
-                case EVENT_BRANN_OUTRO_2:
-                    me->GetMotionMaster()->MovePoint(POINT_BRANN_OUTRO_END, BrannOutroPos[2]);
-                    break;
-            }
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetUlduarAI<npc_brann_bronzebeard_algalonAI>(creature);
-    }
-};
-
-class npc_collapsing_star : public CreatureScript
-{
-public:
-    npc_collapsing_star() : CreatureScript("npc_collapsing_star") { }
-
-    struct npc_collapsing_starAI : public NullCreatureAI
-    {
-        npc_collapsing_starAI(Creature* creature) : NullCreatureAI(creature)
-        {
-            creature->GetMotionMaster()->MoveRandom(25.0f);
-            creature->CastSpell(creature, SPELL_COLLAPSE, true);
-        }
-
-        void JustSummoned(Creature* summon) override
-        {
-            if (TempSummon* summ = me->ToTempSummon())
-                if (Creature* algalon = ObjectAccessor::GetCreature(*me, summ->GetSummonerGUID()))
-                    algalon->AI()->JustSummoned(summon);
-        }
-
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
-        {
-            if (damage >= me->GetHealth())
-            {
-                me->CastSpell(me, SPELL_BLACK_HOLE_SPAWN_VISUAL, true);
-                me->CastSpell(me, SPELL_SUMMON_BLACK_HOLE, true);
-            }
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetUlduarAI<npc_collapsing_starAI>(creature);
-    }
-};
-
-class npc_living_constellation : public CreatureScript
-{
-public:
-    npc_living_constellation() : CreatureScript("npc_living_constellation") { }
-
-    struct npc_living_constellationAI : public ScriptedAI
-    {
-        npc_living_constellationAI(Creature* creature) : ScriptedAI(creature)
-        {
+            _fightWon = true;
+            damage = 0;
             me->SetReactState(REACT_PASSIVE);
-        }
-
-        EventMap events;
-        bool _isActive;
-
-        void Reset() override
-        {
+            me->AttackStop();
+            me->SetFaction(FACTION_FRIENDLY);
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             events.Reset();
-            events.ScheduleEvent(EVENT_ARCANE_BARRAGE, 2500ms);
-            _isActive = false;
+            summons.DespawnAll();
+            me->InterruptNonMeleeSpells(false);
+            events.SetPhase(PHASE_ROLE_PLAY);
+            events.ScheduleEvent(EVENT_OUTRO_START, 1500ms);
+            events.ScheduleEvent(EVENT_OUTRO_1, 7200ms);
+            events.ScheduleEvent(EVENT_OUTRO_2, 8700ms);
         }
+    }
 
-        uint32 GetData(uint32  /*param*/) const override
-        {
-            return _isActive;
-        }
-
-        void DoAction(int32 action) override
-        {
-            switch (action)
-            {
-                case ACTION_ACTIVATE_STAR:
-                    me->SetReactState(REACT_AGGRESSIVE);
-                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    me->SetImmuneToAll(false);
-                    _isActive = true;
-
-                    if (Player* target = SelectTargetFromPlayerList(250.0f))
-                    {
-                        AttackStart(target);
-                        me->AddThreat(target, 100.0f);
-                    }
-                    me->SetInCombatWithZone();
-                    break;
-                case ACTION_BIG_BANG:
-                    events.SetPhase(PHASE_BIG_BANG);
-                    events.DelayEvents(9500ms);
-                    events.ScheduleEvent(EVENT_RESUME_UPDATING, 9500ms);
-                    break;
-            }
-        }
-
-        void SpellHit(Unit* caster, SpellInfo const* spell) override
-        {
-            if (spell->Id != SPELL_CONSTELLATION_PHASE_EFFECT || !caster->IsCreature())
-                return;
-
-            if (InstanceScript* instance = me->GetInstanceScript())
-                instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, EVENT_ID_SUPERMASSIVE_START);
-
-            caster->CastSpell((Unit*)nullptr, SPELL_BLACK_HOLE_CREDIT, TRIGGERED_FULL_MASK);
-            caster->ToCreature()->DespawnOrUnsummon(1ms);
-            me->DespawnOrUnsummon(1ms);
-            if (Creature* voidZone = caster->FindNearestCreature(NPC_ALGALON_VOID_ZONE_VISUAL_STALKER, 10.0f))
-                voidZone->DespawnOrUnsummon(1ms);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!(events.GetPhaseMask() & PHASE_MASK_NO_UPDATE) && !UpdateVictim())
-                return;
-
-            events.Update(diff);
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_ARCANE_BARRAGE:
-                    me->CastCustomSpell(SPELL_ARCANE_BARRAGE, SPELLVALUE_MAX_TARGETS, 1, (Unit*)nullptr, true);
-                    events.Repeat(2500ms);
-                    break;
-                case EVENT_RESUME_UPDATING:
-                    events.SetPhase(0);
-                    break;
-            }
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
+    bool IsInRoom()
     {
-        return GetUlduarAI<npc_living_constellationAI>(creature);
+        if (me->GetExactDist2d(&me->GetHomePosition()) > 45.f || me->GetPositionZ() < 410.f)
+        {
+            DoAction(ACTION_ASCEND);
+            return false;
+        }
+
+        return true;
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!(events.GetPhaseMask() & PHASE_MASK_NO_UPDATE) && (!UpdateVictim() || !IsInRoom()))
+            return;
+
+        events.Update(diff);
+        if (!(events.GetPhaseMask() & PHASE_MASK_NO_CAST_CHECK) && me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
+        {
+            case EVENT_INTRO_1:
+                me->RemoveAurasDueToSpell(SPELL_RIDE_THE_LIGHTNING);
+                Talk(SAY_ALGALON_INTRO_1);
+                break;
+            case EVENT_INTRO_2:
+                me->CastSpell((Unit*)nullptr, SPELL_SUMMON_AZEROTH, true);
+                Talk(SAY_ALGALON_INTRO_2);
+                break;
+            case EVENT_INTRO_3:
+                Talk(SAY_ALGALON_INTRO_3);
+                break;
+            case EVENT_INTRO_FINISH:
+                events.Reset();
+                me->SetImmuneToPC(false);
+                if (Creature* brann = m_pInstance->GetCreature(DATA_BRANN_BRONZEBEARD_ALG))
+                    brann->AI()->DoAction(ACTION_FINISH_INTRO);
+                break;
+            case EVENT_START_COMBAT:
+                m_pInstance->SetData(BOSS_ALGALON, IN_PROGRESS);
+                Talk(SAY_ALGALON_AGGRO);
+                break;
+            case EVENT_REMOVE_UNNATTACKABLE:
+                me->SetSheath(SHEATH_STATE_MELEE);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->SetImmuneToNPC(false);
+                break;
+            case EVENT_INTRO_TIMER_DONE:
+                events.SetPhase(PHASE_NORMAL);
+                me->CastSpell((Unit*)nullptr, SPELL_SUPERMASSIVE_FAIL, true);
+                // Hack: _IsValidTarget failed earlier due to flags, call AttackStart again
+                me->SetReactState(REACT_AGGRESSIVE);
+                me->SetFaction(FACTION_MONSTER);
+                if (Player* target = SelectTargetFromPlayerList(150.0f))
+                    AttackStart(target);
+                me->SetInCombatWithZone();
+
+                for (uint32 i = 0; i < LIVING_CONSTELLATION_COUNT; ++i)
+                    me->SummonCreature(NPC_LIVING_CONSTELLATION, ConstellationPos[i], TEMPSUMMON_DEAD_DESPAWN);
+                break;
+            case EVENT_QUANTUM_STRIKE:
+                me->CastSpell(me->GetVictim(), SPELL_QUANTUM_STRIKE, false);
+                events.Repeat(3s, 4500ms);
+                break;
+            case EVENT_PHASE_PUNCH:
+                me->CastSpell(me->GetVictim(), SPELL_PHASE_PUNCH, false);
+                events.Repeat(15s + 500ms);
+                break;
+            case EVENT_SUMMON_COLLAPSING_STAR:
+                Talk(SAY_ALGALON_COLLAPSING_STAR);
+                Talk(EMOTE_ALGALON_COLLAPSING_STAR);
+                for (uint8 i = 0; i < COLLAPSING_STAR_COUNT; ++i)
+                    me->SummonCreature(NPC_COLLAPSING_STAR, CollapsingStarPos[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
+                events.Repeat(1min);
+                break;
+            case EVENT_COSMIC_SMASH:
+                Talk(EMOTE_ALGALON_COSMIC_SMASH);
+                me->CastCustomSpell(SPELL_COSMIC_SMASH, SPELLVALUE_MAX_TARGETS, RAID_MODE(1, 3), (Unit*)nullptr);
+                events.Repeat(25s + 500ms);
+                break;
+            case EVENT_ACTIVATE_LIVING_CONSTELLATION:
+                {
+                    if (events.GetPhaseMask() & PHASE_MASK_NO_UPDATE)
+                    {
+                        events.Repeat(4s);
+                        break;
+                    }
+                    CallConstellations();
+                    //me->CastSpell(me, SPELL_TRIGGER_3_ADDS, true);
+                    events.Repeat(50s);
+                    break;
+                }
+            case EVENT_BIG_BANG:
+                {
+                    Talk(SAY_ALGALON_BIG_BANG);
+                    Talk(EMOTE_ALGALON_BIG_BANG);
+
+                    EntryCheckPredicate pred(NPC_LIVING_CONSTELLATION);
+                    summons.DoAction(ACTION_BIG_BANG, pred);
+
+                    me->CastSpell((Unit*)nullptr, SPELL_BIG_BANG, false);
+                    events.Repeat(90s + 500ms);
+                    break;
+                }
+            case EVENT_ASCEND_TO_THE_HEAVENS:
+                Talk(SAY_ALGALON_ASCEND);
+                me->CastSpell((Unit*)nullptr, SPELL_ASCEND_TO_THE_HEAVENS, false);
+                events.ScheduleEvent(EVENT_EVADE, 2500ms);
+                break;
+            case EVENT_EVADE:
+                events.Reset();
+                ScriptedAI::EnterEvadeMode();
+                return;
+            case EVENT_OUTRO_START:
+                if (m_pInstance)
+                {
+                    m_pInstance->SetData(BOSS_ALGALON, DONE);
+                    m_pInstance->SetData(DATA_ALGALON_DEFEATED, 1);
+                }
+                break;
+            case EVENT_OUTRO_1:
+                me->RemoveAllAuras();
+                me->SetUnitFlag(UNIT_FLAG_RENAME);
+                break;
+            case EVENT_OUTRO_2:
+            {
+                Player* lootRecipent = me->GetLootRecipient();
+                _EnterEvadeMode();
+                // LootRecipent is cleared in _EnterEvadeMode, restore it
+                me->SetLootRecipient(lootRecipent);
+                me->GetMotionMaster()->MovePoint(POINT_ALGALON_OUTRO, AlgalonOutroPos);
+                break;
+            }
+            case EVENT_OUTRO_3:
+                me->CastSpell((Unit*)nullptr, SPELL_KILL_CREDIT);
+                // Summon Chest
+                if (GameObject* go = me->SummonGameObject(RAID_MODE(GO_ALGALON_CHEST, GO_ALGALON_CHEST_HERO), 1632.1f, -306.561f, 417.321f, 4.69494f, 0, 0, 0, 1, 0))
+                {
+                    go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
+                    go->SetLootRecipient(me);
+                }
+                break;
+            case EVENT_OUTRO_4:
+                me->CastSpell((Unit*)nullptr, SPELL_SUPERMASSIVE_FAIL);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                break;
+            case EVENT_OUTRO_5:
+                if (Creature* brann = me->SummonCreature(NPC_BRANN_BRONZBEARD_ALG, BrannOutroPos[0], TEMPSUMMON_TIMED_DESPAWN, 131500))
+                    brann->AI()->DoAction(ACTION_OUTRO);
+                break;
+            case EVENT_OUTRO_6:
+                Talk(SAY_ALGALON_OUTRO_1);
+                me->SetStandState(UNIT_STAND_STATE_KNEEL);
+                break;
+            case EVENT_OUTRO_7:
+                Talk(SAY_ALGALON_OUTRO_2);
+                break;
+            case EVENT_OUTRO_8:
+                Talk(SAY_ALGALON_OUTRO_3);
+                break;
+            case EVENT_OUTRO_9:
+                Talk(SAY_ALGALON_OUTRO_4);
+                break;
+            case EVENT_OUTRO_10:
+                Talk(SAY_ALGALON_OUTRO_5);
+                break;
+            case EVENT_OUTRO_11:
+                me->SetStandState(UNIT_STAND_STATE_STAND);
+                me->CastSpell(me, SPELL_TELEPORT, false);
+                me->DespawnOrUnsummon(3s);
+                break;
+            case EVENT_DESPAWN_ALGALON_1:
+                Talk(SAY_ALGALON_DESPAWN_1);
+                break;
+            case EVENT_DESPAWN_ALGALON_2:
+                Talk(SAY_ALGALON_DESPAWN_2);
+                break;
+            case EVENT_DESPAWN_ALGALON_3:
+                Talk(SAY_ALGALON_DESPAWN_3);
+                break;
+            case EVENT_DESPAWN_ALGALON_4:
+                me->CastSpell((Unit*)nullptr, SPELL_ASCEND_TO_THE_HEAVENS, false);
+                break;
+            case EVENT_DESPAWN_ALGALON_5:
+                me->SetStandState(UNIT_STAND_STATE_STAND);
+                me->CastSpell(me, SPELL_TELEPORT, false);
+                me->DespawnOrUnsummon(3s);
+                break;
+            case EVENT_CHECK_HERALD_ITEMS:
+                if (!DoCheckHeraldOfTheTitans())
+                    events.Repeat(5s);
+                break;
+        }
+
+        DoMeleeAttackIfReady();
     }
 };
 
-class npc_algalon_worm_hole : public CreatureScript
+struct npc_brann_bronzebeard_algalon : public CreatureAI
 {
-public:
-    npc_algalon_worm_hole() : CreatureScript("npc_algalon_worm_hole") { }
-
-    struct npc_algalon_worm_holeAI : public NullCreatureAI
+    npc_brann_bronzebeard_algalon(Creature* creature) : CreatureAI(creature)
     {
-        npc_algalon_worm_holeAI(Creature* creature) : NullCreatureAI(creature)
+    }
+
+    EventMap events;
+    uint32 _currentPoint;
+
+    void DoAction(int32 action) override
+    {
+        switch (action)
         {
-            creature->CastSpell(creature, SPELL_WORM_HOLE_TRIGGER, true);
-            creature->CastSpell(creature, SPELL_SUMMON_VOID_ZONE_VISUAL, true);
+            case ACTION_START_INTRO:
+                me->SetWalk(false);
+                _currentPoint = 0;
+                events.Reset();
+                events.ScheduleEvent(EVENT_BRANN_MOVE_INTRO, 1ms);
+                break;
+            case ACTION_FINISH_INTRO:
+                Talk(SAY_BRANN_ALGALON_INTRO_2);
+                events.ScheduleEvent(EVENT_BRANN_MOVE_INTRO, 1ms);
+                break;
+            case ACTION_OUTRO:
+                me->GetMotionMaster()->MovePoint(POINT_BRANN_OUTRO, BrannOutroPos[1]);
+                events.ScheduleEvent(EVENT_BRANN_OUTRO_1, 87s + 500ms);
+                events.ScheduleEvent(EVENT_BRANN_OUTRO_2, 116s + 500ms);
+                break;
+        }
+    }
+
+    void MovementInform(uint32 movementType, uint32 pointId) override
+    {
+        if (movementType != POINT_MOTION_TYPE)
+            return;
+
+        Milliseconds delay = 1ms;
+        _currentPoint = pointId + 1;
+        switch (pointId)
+        {
+            case 2:
+                delay = 8s;
+                me->SetWalk(true);
+                break;
+            case 6:
+                me->SetFacingTo(4.6156f);
+                me->SetWalk(false);
+                Talk(SAY_BRANN_ALGALON_INTRO_1);
+                events.ScheduleEvent(EVENT_SUMMON_ALGALON, 7500ms);
+                return;
+            case 10:
+                me->DespawnOrUnsummon(1ms);
+                return;
+            case POINT_BRANN_OUTRO:
+            case POINT_BRANN_OUTRO_END:
+                return;
         }
 
-        uint32 _summonTimer;
+        events.ScheduleEvent(EVENT_BRANN_MOVE_INTRO, delay);
+    }
 
-        void Reset() override
+    void UpdateAI(uint32 diff) override
+    {
+        UpdateVictim();
+        events.Update(diff);
+
+        switch (events.ExecuteEvent())
         {
-            _summonTimer = urand(22000, 24000);
+            case EVENT_BRANN_MOVE_INTRO:
+                if (_currentPoint < MAX_BRANN_WAYPOINTS_INTRO)
+                    me->GetMotionMaster()->MovePoint(_currentPoint, BrannIntroWaypoint[_currentPoint]);
+                break;
+            case EVENT_SUMMON_ALGALON:
+                if (me->GetInstanceScript() && !me->GetInstanceScript()->GetCreature(BOSS_ALGALON))
+                    if (Creature* algalon = me->GetMap()->SummonCreature(NPC_ALGALON, AlgalonSummonPos))
+                        algalon->AI()->DoAction(ACTION_START_INTRO);
+                break;
+            case EVENT_BRANN_OUTRO_1:
+                Talk(SAY_BRANN_ALGALON_OUTRO);
+                break;
+            case EVENT_BRANN_OUTRO_2:
+                me->GetMotionMaster()->MovePoint(POINT_BRANN_OUTRO_END, BrannOutroPos[2]);
+                break;
         }
+    }
+};
 
-        void JustSummoned(Creature* summon) override
+struct npc_collapsing_star : public NullCreatureAI
+{
+    npc_collapsing_star(Creature* creature) : NullCreatureAI(creature)
+    {
+        creature->GetMotionMaster()->MoveRandom(25.0f);
+        creature->CastSpell(creature, SPELL_COLLAPSE, true);
+    }
+
+    void JustSummoned(Creature* summon) override
+    {
+        if (TempSummon* summ = me->ToTempSummon())
+            if (Creature* algalon = ObjectAccessor::GetCreature(*me, summ->GetSummonerGUID()))
+                algalon->AI()->JustSummoned(summon);
+    }
+
+    void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
+    {
+        if (damage >= me->GetHealth())
         {
-            if (TempSummon* summ = me->ToTempSummon())
-            {
-                if (Creature* algalon = ObjectAccessor::GetCreature(*me, summ->GetSummonerGUID()))
+            me->CastSpell(me, SPELL_BLACK_HOLE_SPAWN_VISUAL, true);
+            me->CastSpell(me, SPELL_SUMMON_BLACK_HOLE, true);
+        }
+    }
+};
+
+struct npc_living_constellation : public ScriptedAI
+{
+    npc_living_constellation(Creature* creature) : ScriptedAI(creature)
+    {
+        me->SetReactState(REACT_PASSIVE);
+    }
+
+    EventMap events;
+    bool _isActive;
+
+    void Reset() override
+    {
+        events.Reset();
+        events.ScheduleEvent(EVENT_ARCANE_BARRAGE, 2500ms);
+        _isActive = false;
+    }
+
+    uint32 GetData(uint32  /*param*/) const override
+    {
+        return _isActive;
+    }
+
+    void DoAction(int32 action) override
+    {
+        switch (action)
+        {
+            case ACTION_ACTIVATE_STAR:
+                me->SetReactState(REACT_AGGRESSIVE);
+                me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->SetImmuneToAll(false);
+                _isActive = true;
+
+                if (Player* target = SelectTargetFromPlayerList(250.0f))
                 {
-                    algalon->AI()->JustSummoned(summon);
+                    AttackStart(target);
+                    me->AddThreat(target, 100.0f);
                 }
-            }
+                me->SetInCombatWithZone();
+                break;
+            case ACTION_BIG_BANG:
+                events.SetPhase(PHASE_BIG_BANG);
+                events.DelayEvents(9500ms);
+                events.ScheduleEvent(EVENT_RESUME_UPDATING, 9500ms);
+                break;
         }
+    }
 
-        void UpdateAI(uint32 diff) override
-        {
-            _summonTimer += diff;
-            if (_summonTimer >= 30000)
-            {
-                me->CastSpell((Unit*)nullptr, SPELL_SUMMON_UNLEASHED_DARK_MATTER, true);
-                _summonTimer = 0;
-            }
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
+    void SpellHit(Unit* caster, SpellInfo const* spell) override
     {
-        return GetUlduarAI<npc_algalon_worm_holeAI>(creature);
+        if (spell->Id != SPELL_CONSTELLATION_PHASE_EFFECT || !caster->IsCreature())
+            return;
+
+        if (InstanceScript* instance = me->GetInstanceScript())
+            instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, EVENT_ID_SUPERMASSIVE_START);
+
+        caster->CastSpell((Unit*)nullptr, SPELL_BLACK_HOLE_CREDIT, TRIGGERED_FULL_MASK);
+        caster->ToCreature()->DespawnOrUnsummon(1ms);
+        me->DespawnOrUnsummon(1ms);
+        if (Creature* voidZone = caster->FindNearestCreature(NPC_ALGALON_VOID_ZONE_VISUAL_STALKER, 10.0f))
+            voidZone->DespawnOrUnsummon(1ms);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!(events.GetPhaseMask() & PHASE_MASK_NO_UPDATE) && !UpdateVictim())
+            return;
+
+        events.Update(diff);
+        switch (events.ExecuteEvent())
+        {
+            case EVENT_ARCANE_BARRAGE:
+                me->CastCustomSpell(SPELL_ARCANE_BARRAGE, SPELLVALUE_MAX_TARGETS, 1, (Unit*)nullptr, true);
+                events.Repeat(2500ms);
+                break;
+            case EVENT_RESUME_UPDATING:
+                events.SetPhase(0);
+                break;
+        }
+    }
+};
+
+struct npc_algalon_worm_hole : public NullCreatureAI
+{
+    npc_algalon_worm_hole(Creature* creature) : NullCreatureAI(creature)
+    {
+        creature->CastSpell(creature, SPELL_WORM_HOLE_TRIGGER, true);
+        creature->CastSpell(creature, SPELL_SUMMON_VOID_ZONE_VISUAL, true);
+    }
+
+    uint32 _summonTimer;
+
+    void Reset() override
+    {
+        _summonTimer = urand(22000, 24000);
+    }
+
+    void JustSummoned(Creature* summon) override
+    {
+        if (TempSummon* summ = me->ToTempSummon())
+        {
+            if (Creature* algalon = ObjectAccessor::GetCreature(*me, summ->GetSummonerGUID()))
+            {
+                algalon->AI()->JustSummoned(summon);
+            }
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        _summonTimer += diff;
+        if (_summonTimer >= 30000)
+        {
+            me->CastSpell((Unit*)nullptr, SPELL_SUMMON_UNLEASHED_DARK_MATTER, true);
+            _summonTimer = 0;
+        }
     }
 };
 
@@ -1153,10 +1098,10 @@ public:
             if (InstanceScript* instance = me->GetInstanceScript())
             {
                 instance->SetData(DATA_ALGALON_SUMMON_STATE, 1);
-                if (GameObject* sigil = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_DOODAD_UL_SIGILDOOR_01)))
+                if (GameObject* sigil = instance->GetGameObject(DATA_SIGILDOOR_01))
                     sigil->SetGoState(GO_STATE_ACTIVE);
 
-                if (GameObject* sigil = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(GO_DOODAD_UL_SIGILDOOR_02)))
+                if (GameObject* sigil = instance->GetGameObject(DATA_SIGILDOOR_02))
                     sigil->SetGoState(GO_STATE_ACTIVE);
 
                 if (Map* map = player->GetMap())
@@ -1394,11 +1339,11 @@ public:
 void AddSC_boss_algalon_the_observer()
 {
     // NPCs
-    new boss_algalon_the_observer();
-    new npc_brann_bronzebeard_algalon();
-    new npc_collapsing_star();
-    new npc_living_constellation();
-    new npc_algalon_worm_hole();
+    RegisterUlduarCreatureAI(boss_algalon_the_observer);
+    RegisterUlduarCreatureAI(npc_brann_bronzebeard_algalon);
+    RegisterUlduarCreatureAI(npc_collapsing_star);
+    RegisterUlduarCreatureAI(npc_living_constellation);
+    RegisterUlduarCreatureAI(npc_algalon_worm_hole);
 
     // GOs
     new go_celestial_planetarium_access();

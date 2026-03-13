@@ -6308,7 +6308,7 @@ INSERT INTO `quest_offer_reward` VALUES
 (11561,0,0,0,0,0,0,0,0,'I am pleased. I can smell the coppery tang of their blood on your hands.$b$bThis is a good start for you, $r.',12340),
 (11562,0,0,0,0,0,0,0,0,'Aw, so you must be the so-called King Mrgl-Mrgl\'s lackey. I suppose that night elf has sent you to appease me?$b$bGood, I have just the thing that needs doing for someone as powerful as you!',12340),
 (11563,0,0,0,0,0,0,0,0,'Not bad. This will make a nice feast!$b$bWith the king of the orcas dead the attacks upon us should diminish while the whales fight amongst themselves for dominance.',12340),
-(11564,0,0,0,0,0,0,0,0,'Aw yes, these will do nicely.$b$bJust plop them down anywhere. You can have some of my leftover stew from last night. And since you\'ve been helping us with our other problems, you can have my recipe, too.',12340),
+(11564,0,0,0,0,0,0,0,0,'Aw yes, these will do nicely.$b$bJust plop them down anywhere. You can have some of my leftover stew from last night.',12340),
 (11565,0,0,0,0,0,0,0,0,'<Upon seeing the spare murloc suit, the king rubs his costumed appendages together.>$b$bNicely done. Now, back to the pressing matter at hand. I\'ve got something of great importance for you to do.',12340),
 (11566,0,0,0,0,0,0,0,0,'Regrettable, but necessary. I\'ll take the claw, $N.$b$bThank you for all of the help you\'ve given us. With Claximus defeated, maybe we\'ll be able to reunite the remaining murlocs and seal off those caverns.$b$bPlease, my friend, take this... it\'s the least I can do for all of the help you have rendered us!',12340),
 (11567,1,1,0,0,0,0,0,0,'We must return all of the artifacts, $N. When all four are gathered, you will put them back in their graves.',12340),
@@ -7172,7 +7172,7 @@ INSERT INTO `quest_offer_reward` VALUES
 (12470,6,4,1,1,0,0,0,0,'You saw Nozdormu? That doesn\'t make any sense.$B$B<Chromie thinks a moment about what you\'ve said.>$B$BActually, that\'s great news! We had no idea of where or when the Lord of Time had gone to. We just knew that he had disappeared to deal with very important matters.$B$BSo, even though the leader of the Infinite Dragonflight wasn\'t revealed, you\'ve discovered that Nozdormu is alive and well, and fighting back against them!$B$BThank you, $N. I\'ll be seeing you soon!',12340),
 (12471,1,0,0,0,0,0,0,0,'I thank you, $N.  You\'ve shown a great deal of goodwill towards my clan.',12340),
 (12472,0,0,0,0,0,0,0,0,'When you\'re ready I\'ll place the phylactery out in front of the gateway and call forth Thel\'zan.',12340),
-(12473,0,0,0,0,0,0,0,0,'Wintergarde is saved because of you, $N. To think that one woman could so swiftly turn the tides of battle is hard for most to comprehend; yet here we are - victorious! You have managed to restore the faith of these people and earned the respect of your commanding officers.$B$B<Halford salutes.>$B$BLord Fordragon has returned to Angrathar to prepare our forces for the destruction of the Wrathgate and has requested that you join him! I couldn\'t recommend a better soldier for the job, $N.',12340),
+(12473,0,0,0,0,0,0,0,0,'Wintergarde is saved because of you, $N. To think that one $gman:woman; could so swiftly turn the tides of battle is hard for most to comprehend; yet here we are - victorious! You have managed to restore the faith of these people and earned the respect of your commanding officers.$B$B<Halford salutes.>$B$BLord Fordragon has returned to Angrathar to prepare our forces for the destruction of the Wrathgate and has requested that you join him! I couldn\'t recommend a better soldier for the job, $N.',12340),
 (12474,1,1,6,1,0,0,0,0,'This commendation is only given to those that have gone above and beyond the call of duty in the name of the Alliance. I could count the number of times I\'ve handed this one out on one hand, $N, and never has anyone been more deserving than you! Congratulations!$B$BNow, let us look upon the Wrathgate. Does it look familiar? It should. That strange ore you found at the Wintergarde Mine is exactly what the Wrathgate is made from. We will find its weakness and expose it for all to see! First, though...',12340),
 (12475,1,6,5,0,0,0,0,0,'A cave? Could it be? There can be no other correlation!',12340),
 (12476,1,1,0,0,0,0,0,0,'Hopefully the message is now clear to the Onslaught. I hope it was enough of a beating to make them doubt their affiliations.\n',12340),
@@ -7234,7 +7234,7 @@ INSERT INTO `quest_offer_reward` VALUES
 (12538,0,0,0,0,0,0,0,0,'I stab those big-tongues good.$B$BYou did okay I guess.$B$BNo, I just kidding! You good hunter. I glad to hunt with you.',12340),
 (12539,0,0,0,0,0,0,0,0,'Blown up by lightning?$B$B<Rakjak breaks out laughing for a moment.>$B$BYou good hunter. Rakjak like you. Maybe one day you can be honorary Frenzyheart!$B$BOnly maybe though!',12340),
 (12540,0,0,0,0,0,0,0,0,'No kill me please! We was just looking for fish. We not want to die.',12340),
-(12541,0,0,0,0,0,0,0,0,'You\'ve done it!$B$BThe intelligence gathered from that $r will undoubtedly be of great value. I\'ll be certain to make mention of your efforts in my report to the commander.$B$BThank you, $N.',12340),
+(12541,0,0,0,0,0,0,0,0,'You\'ve done it!$B$BThe intelligence gathered from that troll will undoubtedly be of great value. I\'ll be certain to make mention of your efforts in my report to the commander.$B$BThank you, $N.',12340),
 (12542,1,6,1,6,0,0,0,0,'Mere footsteps from here lies the Drakkari empire.$B$B<Valus points east.>$B$BFor thousands of years the Drakkari remained isolated, preferring to keep within the boundaries of their sprawling temple cities and ziggurats. It was surprising then, to come upon this wreckage. Further up, beyond the foreboding stairs leading into Zul\'Drak, Drak\'Tharon Keep lies in ruin. The entire first tier of Zul\'Drak, destroyed...$B$BWhy has the Scourge waited until now to attack?  ',12340),
 (12543,0,0,0,0,0,0,0,0,'<The oracle inspects the fangs.>$B$BWe approve! Bones of Nozronn will speak to $N!',12340),
 (12544,0,0,0,0,0,0,0,0,'<Hemet listens as you describe what you learned.>$B$BWay to go, $Glad:lass;. No dead rhino tells Hemet Nesingwary where and what he can hunt. We\'ll show that heap o\' bones.',12340),
@@ -8715,4 +8715,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-07-19 12:09:30
+-- Dump completed on 2025-12-29 17:54:26

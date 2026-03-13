@@ -671,6 +671,8 @@ enum AcoreStrings
 
     LANG_REWARDED                       = 602,
 
+    LANG_NPC_DO_ACTION                  = 603,
+
     // 603-704 - free
 
     LANG_WAIT_BEFORE_SPEAKING           = 705,
@@ -1159,8 +1161,48 @@ enum AcoreStrings
 
     LANG_CMD_QUEST_STATUS               = 5088,
     LANG_CMD_QUEST_UNAVAILABLE          = 5089,
+    LANG_CMD_QUEST_STATUS_DISABLED      = 5090,
+    LANG_CMD_QUEST_STATUS_ALREADY_DONE  = 5091,
+    LANG_CMD_QUEST_STATUS_CLASS         = 5092,
+    LANG_CMD_QUEST_STATUS_RACE          = 5093,
+    LANG_CMD_QUEST_STATUS_LOW_LEVEL     = 5094,
+    LANG_CMD_QUEST_STATUS_HIGH_LEVEL    = 5095,
+    LANG_CMD_QUEST_STATUS_SKILL         = 5096,
+    LANG_CMD_QUEST_STATUS_REPUTATION    = 5097,
+    LANG_CMD_QUEST_STATUS_PREV_QUEST    = 5098,
+    LANG_CMD_QUEST_STATUS_TIMED         = 5099,
+    LANG_CMD_QUEST_STATUS_EXCLUSIVE     = 5100,
+    LANG_CMD_QUEST_STATUS_NEXT_CHAIN    = 5101,
+    LANG_CMD_QUEST_STATUS_PREV_CHAIN    = 5102,
+    LANG_CMD_QUEST_STATUS_BREADCRUMB    = 5103,
+    LANG_CMD_QUEST_STATUS_DAY           = 5104,
+    LANG_CMD_QUEST_STATUS_WEEK          = 5105,
+    LANG_CMD_QUEST_STATUS_MONTH         = 5106,
+    LANG_CMD_QUEST_STATUS_SEASONAL      = 5107,
+    LANG_CMD_QUEST_STATUS_CONDITION     = 5108,
+    LANG_CMD_QUEST_STATUS_LOG_FULL      = 5109,
+    LANG_CMD_QUEST_STATUS_COND_DETAIL   = 5110,
 
-    // Room for more strings    5090-9999
+    // Battlefield commands
+    LANG_BF_NOT_FOUND                   = 5111,
+    LANG_BF_STARTED                     = 5112,
+    LANG_BF_STOPPED                     = 5113,
+    LANG_BF_SWITCHED                    = 5114,
+    LANG_BF_TIMER_SET                   = 5115,
+    LANG_BF_ENABLED                     = 5116,
+    LANG_BF_DISABLED                    = 5117,
+
+    LANG_RESETALL_HONOR                 = 5118,
+    LANG_RESETALL_ARENA                 = 5119,
+
+    // Battlefield queue display (.bf queue)
+    LANG_BF_QUEUE_HDR_WAR               = 5120,
+    LANG_BF_QUEUE_HDR_WAIT              = 5121,
+    LANG_BF_QUEUE_TEAM_HDR              = 5122,
+    LANG_BF_QUEUE_PLAYER_QUEUE          = 5123,
+    LANG_BF_QUEUE_PLAYER_INVITED        = 5124,
+    LANG_BF_QUEUE_PLAYER_WAR            = 5125,
+    // Room for more strings    5126-9999
 
     // Level requirement notifications
     LANG_SAY_REQ                        = 6604,
@@ -1324,6 +1366,8 @@ enum AcoreStrings
     LANG_BAN_IP_YOUBANNEDMESSAGE_WORLD            = 11017,
     LANG_BAN_IP_YOUPERMBANNEDMESSAGE_WORLD        = 11018,
 
+    LANG_LFG_COOLDOWN_CLEARED                     = 11019,
+
     LANG_MUTED_PLAYER                             = 30000, // Mute for player 2 hour
 
     // Instant Flight
@@ -1345,6 +1389,7 @@ enum AcoreStrings
     // 30087-30095 reserved for passive anticheat
 
     LANG_DEBUG_LFG_ON                             = 30096,
-    LANG_DEBUG_LFG_OFF                            = 30097
+    LANG_DEBUG_LFG_OFF                            = 30097,
+    LANG_DEBUG_LFG_CONF                           = 30098
 };
 #endif

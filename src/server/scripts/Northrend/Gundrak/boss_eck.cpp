@@ -33,115 +33,69 @@ enum Misc
 {
     POINT_START                         = 0,
     EVENT_ECK_BERSERK                   = 1,
-    EVENT_ECK_BITE                      = 2,
-    EVENT_ECK_SPIT                      = 3,
-    EVENT_ECK_SPRING                    = 4,
-    EVENT_ECK_CRAZED_EMOTE              = 5,
+    EVENT_ECK_CRAZED_EMOTE              = 2,
     EMOTE_CRAZED                        = 1
 };
 
-class boss_eck : public CreatureScript
-{
-public:
-    boss_eck() : CreatureScript("boss_eck") { }
+Position const EckHomePosition = { 1642.712f, 934.646f, 107.205f, 0.767f };
+Position const EckCombatStartPosition = { 1638.55f, 919.76f, 104.95f, 0.00f };
 
-    CreatureAI* GetAI(Creature* creature) const override
+struct boss_eck : public BossAI
+{
+    boss_eck(Creature* creature) : BossAI(creature, DATA_ECK_THE_FEROCIOUS)
     {
-        return GetGundrakAI<boss_eckAI>(creature);
+        scheduler.SetValidator([this]
+            {
+                return !me->HasUnitState(UNIT_STATE_CASTING);
+            });
     }
 
-    struct boss_eckAI : public BossAI
+    void InitializeAI() override
     {
-        boss_eckAI(Creature* creature) : BossAI(creature, DATA_ECK_THE_FEROCIOUS)
+        BossAI::InitializeAI();
+        me->GetMotionMaster()->MovePoint(POINT_START, EckCombatStartPosition, FORCED_MOVEMENT_NONE, 0.f, false);
+        me->SetHomePosition(EckHomePosition);
+        me->SetReactState(REACT_PASSIVE);
+    }
+
+    void MovementInform(uint32 type, uint32 id) override
+    {
+        if (type == POINT_MOTION_TYPE && id == POINT_START)
         {
+            me->CastSpell(me, SPELL_ECK_SPRING_INIT, true);
+            me->SetReactState(REACT_AGGRESSIVE);
         }
+    }
 
-        void InitializeAI() override
+    void SpellHitTarget(Unit* target, SpellInfo const* spell) override
+    {
+        if (spell->Id == SPELL_ECK_SPRING)
         {
-            BossAI::InitializeAI();
-            me->GetMotionMaster()->MovePoint(POINT_START, 1638.55f, 919.76f, 104.95f, FORCED_MOVEMENT_NONE, 0.f, 0.f, false);
-            me->SetHomePosition(1642.712f, 934.646f, 107.205f, 0.767f);
-            me->SetReactState(REACT_PASSIVE);
+            me->GetThreatMgr().ResetAllThreat();
+            me->AddThreat(target, 1.0f);
         }
+    }
 
-        void MovementInform(uint32 type, uint32 id) override
-        {
-            if (type == POINT_MOTION_TYPE && id == POINT_START)
-            {
-                me->CastSpell(me, SPELL_ECK_SPRING_INIT, true);
-                me->SetReactState(REACT_AGGRESSIVE);
-            }
-        }
-
-        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
-        {
-            if (spell->Id == SPELL_ECK_SPRING)
-            {
-                me->GetThreatMgr().ResetAllThreat();
-                me->AddThreat(target, 1.0f);
-            }
-        }
-
-        void Reset() override
-        {
-            BossAI::Reset();
-        }
-
-        void JustEngagedWith(Unit* who) override
-        {
-            BossAI::JustEngagedWith(who);
-            events.ScheduleEvent(EVENT_ECK_CRAZED_EMOTE, 76s, 78s);
-            events.ScheduleEvent(EVENT_ECK_BERSERK, 90s);
-            events.ScheduleEvent(EVENT_ECK_BITE, 5s);
-            events.ScheduleEvent(EVENT_ECK_SPIT, 10s, 37s);
-            events.ScheduleEvent(EVENT_ECK_SPRING, 10s, 24s);
-        }
-
-        void JustDied(Unit* killer) override
-        {
-            BossAI::JustDied(killer);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_ECK_CRAZED_EMOTE:
-                    Talk(EMOTE_CRAZED);
-                    break;
-                case EVENT_ECK_BERSERK:
-                    me->CastSpell(me, SPELL_ECK_BERSERK, false);
-                    break;
-                case EVENT_ECK_BITE:
-                    me->CastSpell(me->GetVictim(), SPELL_ECK_BITE, false);
-                    events.ScheduleEvent(EVENT_ECK_BITE, 8s, 12s);
-                    break;
-                case EVENT_ECK_SPIT:
-                    me->CastSpell(me->GetVictim(), SPELL_ECK_SPIT, false);
-                    events.ScheduleEvent(EVENT_ECK_SPIT, 11s, 24s);
-                    break;
-                case EVENT_ECK_SPRING:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f, true, false))
-                    {
-                        me->CastSpell(target, SPELL_ECK_SPRING, false);
-                    }
-                    events.ScheduleEvent(EVENT_ECK_SPRING, 10s, 24s);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
+    void JustEngagedWith(Unit* who) override
+    {
+        BossAI::JustEngagedWith(who);
+        ScheduleUniqueTimedEvent(77s, [&] {
+            Talk(EMOTE_CRAZED);
+        }, EVENT_ECK_CRAZED_EMOTE);
+        ScheduleTimedEvent(5s, [&] {
+            DoCastVictim(SPELL_ECK_BITE);
+        }, 8s, 12s);
+        ScheduleTimedEvent(10s, 37s, [&] {
+            DoCastVictim(SPELL_ECK_SPIT);
+        }, 8s, 12s);
+        ScheduleTimedEvent(10s, 24s, [&] {
+            DoCastRandomTarget(SPELL_ECK_SPRING, 0, 30.0f, true);
+        }, 10s, 24s);
+        ScheduleEnrageTimer(SPELL_ECK_BERSERK, 90s);
+    }
 };
 
 void AddSC_boss_eck()
 {
-    new boss_eck();
+    RegisterGundrakCreatureAI(boss_eck);
 }
