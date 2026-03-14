@@ -8102,6 +8102,8 @@ void Unit::RemoveAllControlled(bool onDeath /*= false*/)
                 target->ToTempSummon()->UnSummon();
                 it = m_Controlled.erase(it);
             }
+            else
+                ++it;
         }
         else
         {
