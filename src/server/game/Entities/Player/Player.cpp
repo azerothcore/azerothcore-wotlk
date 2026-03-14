@@ -3332,26 +3332,29 @@ uint8 Player::GetLearnSpellSpecMask(uint32 const spellId) const
     uint32 const firstRankSpellId = sSpellMgr->GetFirstSpellInChain(spellId);
 
     bool const isTalentBasedSpell = GetTalentSpellCost(firstRankSpellId) > 0 || sSpellMgr->IsAdditionalTalentSpell(firstRankSpellId);
+    
+    // If this spell doesn't require any talents, learn it in all talent specs
     if (!isTalentBasedSpell)
         return SPEC_MASK_ALL;
 
     uint8 specMask = GetActiveSpecMask();
 
+    // If the first rank of a talent-based spell has already been learned in another spec,
+    // the following ranks should also be learned in that spec.
     if (m_spells.find(firstRankSpellId) != m_spells.end())
     {
-        // If the first rank of a talent-based spell has already been learned in another spec,
-        // the following ranks should also be learned in that spec, even if it is not active.
         specMask |= m_spells.at(firstRankSpellId)->specMask;
     }
 
-    // When learning a spell that has other spells as a requirement, it should be learned in all specs that have the required spells.
+    // When learning a talent-based spell that has other spells as a requirement, it should be not only be learned in the current spec,
+    // but also in all other specs that have the required spells.
     // Example: Greater Blessing of Sanctuary has Blessing of Sanctuary as required spell.
-    SpellRequiredMapBounds const spellsRequiredForSpellBounds = sSpellMgr->GetSpellsRequiredForSpellBounds(spellId);
-    bool const spellHasRequiredSpells = (spellsRequiredForSpellBounds.first != spellsRequiredForSpellBounds.second);
+    auto const spellsRequiredForSpellBounds = sSpellMgr->GetSpellsRequiredForSpellBounds(spellId);
+    bool const spellHasRequiredSpells = (spellsRequiredForSpellBounds.begin() != spellsRequiredForSpellBounds.end());
     if (spellHasRequiredSpells)
     {
         uint8 requiredSpellsSpecMask = SPEC_MASK_ALL;
-        for (SpellRequiredMap::const_iterator itr = spellsRequiredForSpellBounds.first; itr != spellsRequiredForSpellBounds.second; ++itr)
+        for (SpellRequiredMap::const_iterator itr = spellsRequiredForSpellBounds.begin(); itr != spellsRequiredForSpellBounds.end(); ++itr)
         {
             uint32 const requiredSpellId = itr->second;
             bool const requiredSpellExistsAsPlayerSpell = (m_spells.find(requiredSpellId) != m_spells.end());
