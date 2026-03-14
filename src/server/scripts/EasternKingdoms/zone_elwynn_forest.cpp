@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -112,11 +112,11 @@ struct npc_cameron : public ScriptedAI
             if (Creature* children = ObjectAccessor::GetCreature(*me, _childrenGUIDs[i]))
             {
                 children->SetWalk(true);
-                children->GetMotionMaster()->MovePoint(0, MovePosPositions[i], true, MovePosPositions[i].GetOrientation());
+                children->GetMotionMaster()->MovePoint(0, MovePosPositions[i]);
             }
         }
         me->SetWalk(true);
-        me->GetMotionMaster()->MovePoint(0, MovePosPositions.back(), true, MovePosPositions.back().GetOrientation());
+        me->GetMotionMaster()->MovePoint(0, MovePosPositions.back());
     }
 
     void PathEndReached(uint32 pathId) override
@@ -182,13 +182,13 @@ struct npc_cameron : public ScriptedAI
             switch (eventId)
             {
             case EVENT_WP_START_GOLDSHIRE:
-                me->GetMotionMaster()->MovePath(GOLDSHIRE_PATH, false);
+                me->GetMotionMaster()->MoveWaypoint(GOLDSHIRE_PATH, false);
                 break;
             case EVENT_WP_START_WOODS:
-                me->GetMotionMaster()->MovePath(WOODS_PATH, false);
+                me->GetMotionMaster()->MoveWaypoint(WOODS_PATH, false);
                 break;
             case EVENT_WP_START_HOUSE:
-                me->GetMotionMaster()->MovePath(HOUSE_PATH, false);
+                me->GetMotionMaster()->MoveWaypoint(HOUSE_PATH, false);
                 break;
             case EVENT_WP_START_LISA:
                 for (uint32 i = 0; i < _childrenGUIDs.size(); ++i)
@@ -197,7 +197,7 @@ struct npc_cameron : public ScriptedAI
                     {
                         if (lisa->GetEntry() == NPC_LISA)
                         {
-                            lisa->GetMotionMaster()->MovePath(LISA_PATH, false);
+                            lisa->GetMotionMaster()->MoveWaypoint(LISA_PATH, false);
                             break;
                         }
                     }
@@ -233,7 +233,7 @@ struct npc_cameron : public ScriptedAI
                             child->SearchFormation();
 
                 // Start movement
-                me->GetMotionMaster()->MovePath(STORMWIND_PATH, false);
+                me->GetMotionMaster()->MoveWaypoint(STORMWIND_PATH, false);
 
                 break;
             }
@@ -386,7 +386,7 @@ struct npc_eastvale_peasent : public ScriptedAI
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
             me->CastSpell(me, SPELL_TRANSFORM_PEASENT_WITH_WOOD);
             me->SetSpeed(MOVE_WALK, 1.0f);
-            me->GetMotionMaster()->MovePath(_path, false);
+            me->GetMotionMaster()->MoveWaypoint(_path, false);
         }
     }
 
@@ -418,7 +418,7 @@ struct npc_eastvale_peasent : public ScriptedAI
             switch (eventId)
             {
             case EVENT_MOVETORAELEN:
-                me->GetMotionMaster()->MovePath(_path + 1, false);
+                me->GetMotionMaster()->MoveWaypoint(_path + 1, false);
                 break;
             case EVENT_TALKTORAELEN1:
                 if (Creature* realen = me->FindNearestCreature(NPC_SUPERVISOR_RAELEN, 2.0f, true))
@@ -429,17 +429,17 @@ struct npc_eastvale_peasent : public ScriptedAI
                     switch (_path)
                     {
                     case PATH_PEASENT_0:
-                        me->PlayDirectSound(SOUND_PEASENT_GREETING_1);
+                        me->PlayDistanceSound(SOUND_PEASENT_GREETING_1);
                         _events.ScheduleEvent(EVENT_TALKTORAELEN2, 2s);
                         break;
                     case PATH_PEASENT_1:
                     case PATH_PEASENT_3:
-                        me->PlayDirectSound(SOUND_PEASENT_GREETING_3);
+                        me->PlayDistanceSound(SOUND_PEASENT_GREETING_3);
                         _events.ScheduleEvent(EVENT_RAELENTALK, 2s);
                         break;
                     case PATH_PEASENT_2:
                     case PATH_PEASENT_4:
-                        me->PlayDirectSound(SOUND_PEASENT_GREETING_2);
+                        me->PlayDistanceSound(SOUND_PEASENT_GREETING_2);
                         _events.ScheduleEvent(EVENT_RAELENTALK, 2s);
                         break;
                     }
@@ -451,7 +451,7 @@ struct npc_eastvale_peasent : public ScriptedAI
                 }
                 break;
             case EVENT_TALKTORAELEN2:
-                me->PlayDirectSound(SOUND_PEASENT_GREETING_2);
+                me->PlayDistanceSound(SOUND_PEASENT_GREETING_2);
                 _events.ScheduleEvent(EVENT_RAELENTALK, 2s);
                 break;
             case EVENT_RAELENTALK:
@@ -466,33 +466,33 @@ struct npc_eastvale_peasent : public ScriptedAI
                     switch (_path)
                     {
                     case PATH_PEASENT_0:
-                        me->PlayDirectSound(SOUND_PEASENT_LEAVING_1);
+                        me->PlayDistanceSound(SOUND_PEASENT_LEAVING_1);
                         _events.ScheduleEvent(EVENT_PATHBACK, 2s);
                         break;
                     case PATH_PEASENT_1:
                     case PATH_PEASENT_3:
-                        me->PlayDirectSound(SOUND_PEASENT_LEAVING_4);
+                        me->PlayDistanceSound(SOUND_PEASENT_LEAVING_4);
                         _events.ScheduleEvent(EVENT_TALKTORAELEN4, 2s);
                         break;
                     case PATH_PEASENT_2:
-                        me->PlayDirectSound(SOUND_PEASENT_LEAVING_3);
+                        me->PlayDistanceSound(SOUND_PEASENT_LEAVING_3);
                         _events.ScheduleEvent(EVENT_PATHBACK, 2s);
                         break;
                     case PATH_PEASENT_4:
-                        me->PlayDirectSound(SOUND_PEASENT_LEAVING_2);
+                        me->PlayDistanceSound(SOUND_PEASENT_LEAVING_2);
                         _events.ScheduleEvent(EVENT_PATHBACK, 2s);
                         break;
                     }
                 }
                 break;
             case EVENT_TALKTORAELEN4:
-                me->PlayDirectSound(SOUND_PEASENT_LEAVING_5);
+                me->PlayDistanceSound(SOUND_PEASENT_LEAVING_5);
                 _events.ScheduleEvent(EVENT_PATHBACK, 2s);
                 break;
             case EVENT_PATHBACK:
                 if (Creature* realen = ObjectAccessor::GetCreature(*me, _realenGUID))
                     realen->AI()->SetData(1, 1);
-                me->GetMotionMaster()->MovePath(_path + 2, false);
+                me->GetMotionMaster()->MoveWaypoint(_path + 2, false);
                 break;
             }
         }

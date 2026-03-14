@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -428,7 +428,7 @@ public:
 
     struct npc_mageguard_dalaranAI : public ScriptedAI
     {
-        npc_mageguard_dalaranAI(Creature* creature) : ScriptedAI(creature)
+        explicit npc_mageguard_dalaranAI(Creature* creature) : ScriptedAI(creature)
         {
             creature->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             creature->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_NORMAL, true);
@@ -447,6 +447,9 @@ public:
                 return;
 
             if (!me->IsWithinDist(who, 5.0f, false))
+                return;
+
+            if (who->IsCreature() && who->GetCreatureType() == CREATURE_TYPE_NON_COMBAT_PET)
                 return;
 
             Player* player = who->GetCharmerOrOwnerPlayerOrPlayerItself();
@@ -484,7 +487,6 @@ public:
                     break;
             }
             me->SetOrientation(me->GetHomePosition().GetOrientation());
-            return;
         }
 
         void UpdateAI(uint32 /*diff*/) override {}
@@ -592,7 +594,7 @@ struct npc_minigob_manabonk : public ScriptedAI
                 case EVENT_MOVE:
                     {
                         Position pos = me->GetRandomNearPosition((urand(15, 40)));
-                        me->GetMotionMaster()->MovePoint(0, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), true);
+                        me->GetMotionMaster()->MovePoint(0, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ());
                     }
                     events.ScheduleEvent(EVENT_DESPAWN_VISUAL, 3s);
                     events.ScheduleEvent(EVENT_DESPAWN, 4s);

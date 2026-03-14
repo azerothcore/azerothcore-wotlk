@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -351,16 +351,16 @@ void Arena::EndBattleground(TeamId winnerTeamId)
 
                         // Last standing - Rated 5v5 arena & be solely alive player
                         if (GetArenaType() == ARENA_TYPE_5v5 && aliveWinners == 1 && player->IsAlive())
-                        {
                             player->CastSpell(player, SPELL_LAST_MAN_STANDING, true);
-                        }
 
-                        winnerArenaTeam->MemberWon(player, loserMatchmakerRating, winnerMatchmakerChange);
+                        if (sScriptMgr->OnBeforeArenaTeamMemberUpdate(winnerArenaTeam, player, true, loserMatchmakerRating, winnerMatchmakerChange))
+                            winnerArenaTeam->MemberWon(player, loserMatchmakerRating, winnerMatchmakerChange);
                     }
                 }
                 else
                 {
-                    loserArenaTeam->MemberLost(player, winnerMatchmakerRating, loserMatchmakerChange);
+                    if (sScriptMgr->OnBeforeArenaTeamMemberUpdate(loserArenaTeam, player, false, winnerMatchmakerRating, loserMatchmakerChange))
+                        loserArenaTeam->MemberLost(player, winnerMatchmakerRating, loserMatchmakerChange);
 
                     // Arena lost => reset the win_rated_arena having the "no_lose" condition
                     player->ResetAchievementCriteria(ACHIEVEMENT_CRITERIA_CONDITION_NO_LOSE, 0);

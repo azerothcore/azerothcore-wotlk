@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -67,7 +67,7 @@ public:
                 case EVENT_ARCANE_EXPLOSION:
                 {
                     DoCastVictim(SPELL_ARCANE_EXPLOSION);
-                    events.RepeatEvent(urand(4000, 5000));
+                    events.Repeat(4s, 5s);
                     break;
                 }
                 case EVENT_SHAZZRAH_CURSE:
@@ -76,26 +76,26 @@ public:
                     {
                         DoCast(target, SPELL_SHAZZRAH_CURSE);
                     }
-                    events.RepeatEvent(urand(23000, 26000));
+                    events.Repeat(23s, 26s);
                     break;
                 }
                 case EVENT_MAGIC_GROUNDING:
                 {
                     DoCastSelf(SPELL_MAGIC_GROUNDING);
-                    events.RepeatEvent(urand(7000, 9000));
+                    events.Repeat(7s, 9s);
                     break;
                 }
                 case EVENT_COUNTERSPELL:
                 {
                     DoCastAOE(SPELL_COUNTERSPELL);
-                    events.RepeatEvent(urand(15000, 18000));
+                    events.Repeat(15s, 18s);
                     break;
                 }
                 case EVENT_SHAZZRAH_GATE:
                 {
                     DoCastAOE(SPELL_SHAZZRAH_GATE_DUMMY);
                     events.RescheduleEvent(EVENT_ARCANE_EXPLOSION, 3s, 6s);
-                    events.RepeatEvent(45000);
+                    events.Repeat(45s);
                     break;
                 }
             }

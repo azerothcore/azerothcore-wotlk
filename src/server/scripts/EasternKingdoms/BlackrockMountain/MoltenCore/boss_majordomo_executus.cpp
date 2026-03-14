@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -348,7 +348,7 @@ public:
                                 {
                                     DoCastSelf(SPELL_DAMAGE_REFLECTION);
                                 }
-                                events.RepeatEvent(30000);
+                                events.Repeat(30s);
                                 break;
                             }
                             case EVENT_TELEPORT_RANDOM:
@@ -359,14 +359,14 @@ public:
                                     DoCast(target, SPELL_TELEPORT_RANDOM);
                                 }
 
-                                events.RepeatEvent(30000);
+                                events.Repeat(30s);
                                 break;
                             }
                             case EVENT_TELEPORT_TARGET:
                             {
                                 DoCastSelf(SPELL_HATE_TO_ZERO, true);
                                 DoCastAOE(SPELL_TELEPORT_TARGET);
-                                events.RepeatEvent(30000);
+                                events.Repeat(30s);
                                 break;
                             }
                         }
@@ -430,7 +430,7 @@ public:
                                 Talk(SAY_RAG_SUM_2);
                                 // Next event will get triggered in MovementInform
                                 me->SetWalk(true);
-                                me->GetMotionMaster()->MovePoint(POINT_RAGNAROS_SUMMON, MajordomoMoveRagPos, true, false);
+                                me->GetMotionMaster()->MovePoint(POINT_RAGNAROS_SUMMON, MajordomoMoveRagPos, FORCED_MOVEMENT_NONE, 0.f, true, false);
                                 break;
                             }
                             case EVENT_RAGNAROS_SUMMON_2:

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -207,7 +207,7 @@ public:
                 Mrfloppy->GetMotionMaster()->MoveFollow(creature, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
 
             if (npc_escortAI* pEscortAI = CAST_AI(npc_emily::npc_emilyAI, (creature->AI())))
-                pEscortAI->Start(true, false, player->GetGUID());
+                pEscortAI->Start(true, player->GetGUID());
         }
         return true;
     }
@@ -390,116 +390,6 @@ class spell_q12227_camera_shake : public SpellScript
         OnEffectHitTarget += SpellEffectFn(spell_q12227_camera_shake::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
-// Tallhorn Stage
-
-enum TallhornStage
-{
-    //Gameobject
-    OBJECT_HAUNCH                   = 188665
-};
-
-class npc_tallhorn_stag : public CreatureScript
-{
-public:
-    npc_tallhorn_stag() : CreatureScript("npc_tallhorn_stag") { }
-
-    struct npc_tallhorn_stagAI : public ScriptedAI
-    {
-        npc_tallhorn_stagAI(Creature* creature) : ScriptedAI(creature) { }
-
-        void Reset() override
-        {
-            _phase = 1;
-        }
-
-        void UpdateAI(uint32 /*diff*/) override
-        {
-            if (_phase == 1)
-            {
-                if (me->FindNearestGameObject(OBJECT_HAUNCH, 2.0f))
-                {
-                    me->SetStandState(UNIT_STAND_STATE_DEAD);
-                    me->SetImmuneToPC(true);
-                    me->ReplaceAllDynamicFlags(UNIT_DYNFLAG_DEAD);
-                }
-                _phase = 0;
-            }
-            DoMeleeAttackIfReady();
-        }
-    private:
-        uint8 _phase;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_tallhorn_stagAI(creature);
-    }
-};
-
-// Amberpine Woodsman
-
-enum AmberpineWoodsman
-{
-    // Creature
-    NPC_TALLHORN_STAG                      = 26363
-};
-
-enum AmberpineWoodsmanEvents
-{
-    EVENT_WOODSMAN_1                       = 1,
-    EVENT_WOODSMAN_2                       = 2
-};
-
-class npc_amberpine_woodsman : public CreatureScript
-{
-public:
-    npc_amberpine_woodsman() : CreatureScript("npc_amberpine_woodsman") { }
-
-    struct npc_amberpine_woodsmanAI : public ScriptedAI
-    {
-        npc_amberpine_woodsmanAI(Creature* creature) : ScriptedAI(creature) { }
-
-        void Reset() override
-        {
-            if (me->FindNearestCreature(NPC_TALLHORN_STAG, 0.2f))
-            {
-                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_USE_STANDING);
-            }
-            else
-                _events.ScheduleEvent(EVENT_WOODSMAN_1, 0ms);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            _events.Update(diff);
-
-            while (uint32 eventId = _events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                    case EVENT_WOODSMAN_1:
-                        me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_LOOT);
-                        _events.ScheduleEvent(EVENT_WOODSMAN_2, 3s);
-                        break;
-                    case EVENT_WOODSMAN_2:
-                        me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_ATTACK1H);
-                        _events.ScheduleEvent(EVENT_WOODSMAN_1, 4s);
-                        break;
-                    default:
-                        break;
-                }
-            }
-            UpdateVictim();
-        }
-    private:
-        EventMap _events;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_amberpine_woodsmanAI(creature);
-    }
-};
 
 /*######
 ## Quest 12288: Overwhelmed!
@@ -589,78 +479,78 @@ public:
             case EVENT_WOUNDED_MOVE:
                 if (me->GetPositionY() == -2835.11f)
                 {
-                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_1, false);
-                    me->DespawnOrUnsummon(20000);
+                    me->GetMotionMaster()->MoveWaypoint(WOUNDED_MOVE_1, false);
+                    me->DespawnOrUnsummon(20s);
                 }
                 if (me->GetPositionY() == -2981.89f)
                 {
-                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_3, false);
-                    me->DespawnOrUnsummon(18000);
+                    me->GetMotionMaster()->MoveWaypoint(WOUNDED_MOVE_3, false);
+                    me->DespawnOrUnsummon(18s);
                 }
                 if (me->GetPositionY() == -2934.44f)
                 {
-                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_3, false);
-                    me->DespawnOrUnsummon(9000);
+                    me->GetMotionMaster()->MoveWaypoint(WOUNDED_MOVE_3, false);
+                    me->DespawnOrUnsummon(9s);
                 }
                 if (me->GetPositionY() == -3020.99f)
                 {
-                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_1, false);
-                    me->DespawnOrUnsummon(22000);
+                    me->GetMotionMaster()->MoveWaypoint(WOUNDED_MOVE_1, false);
+                    me->DespawnOrUnsummon(22s);
                 }
                 if (me->GetPositionY() == -2964.73f)
                 {
-                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_2, false);
-                    me->DespawnOrUnsummon(15000);
+                    me->GetMotionMaster()->MoveWaypoint(WOUNDED_MOVE_2, false);
+                    me->DespawnOrUnsummon(15s);
                 }
                 if (me->GetPositionY() == -2940.50f)
                 {
-                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_1, false);
-                    me->DespawnOrUnsummon(20000);
+                    me->GetMotionMaster()->MoveWaypoint(WOUNDED_MOVE_1, false);
+                    me->DespawnOrUnsummon(20s);
                 }
                 if (me->GetPositionY() == -2847.93f)
                 {
-                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_1, false);
-                    me->DespawnOrUnsummon(30000);
+                    me->GetMotionMaster()->MoveWaypoint(WOUNDED_MOVE_1, false);
+                    me->DespawnOrUnsummon(30s);
                 }
                 if (me->GetPositionY() == -2835.31f)
                 {
-                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_1, false);
-                    me->DespawnOrUnsummon(27000);
+                    me->GetMotionMaster()->MoveWaypoint(WOUNDED_MOVE_1, false);
+                    me->DespawnOrUnsummon(27s);
                 }
                 if (me->GetPositionY() == -2822.20f)
                 {
-                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_1, false);
-                    me->DespawnOrUnsummon(25000);
+                    me->GetMotionMaster()->MoveWaypoint(WOUNDED_MOVE_1, false);
+                    me->DespawnOrUnsummon(25s);
                 }
                 if (me->GetPositionY() == -2846.31f)
                 {
-                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_1, false);
-                    me->DespawnOrUnsummon(21000);
+                    me->GetMotionMaster()->MoveWaypoint(WOUNDED_MOVE_1, false);
+                    me->DespawnOrUnsummon(21s);
                 }
                 if (me->GetPositionY() == -2897.23f)
                 {
-                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_3, false);
-                    me->DespawnOrUnsummon(15000);
+                    me->GetMotionMaster()->MoveWaypoint(WOUNDED_MOVE_3, false);
+                    me->DespawnOrUnsummon(15s);
                 }
                 if (me->GetPositionY() == -2886.01f)
                 {
-                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_3, false);
-                    me->DespawnOrUnsummon(25000);
+                    me->GetMotionMaster()->MoveWaypoint(WOUNDED_MOVE_3, false);
+                    me->DespawnOrUnsummon(25s);
                 }
                 if (me->GetPositionY() == -2906.89f)
                 {
-                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_3, false);
-                    me->DespawnOrUnsummon(25000);
+                    me->GetMotionMaster()->MoveWaypoint(WOUNDED_MOVE_3, false);
+                    me->DespawnOrUnsummon(25s);
                 }
                 if (me->GetPositionY() == -3048.94f)
                 {
-                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_2, false);
-                    me->DespawnOrUnsummon(30000);
+                    me->GetMotionMaster()->MoveWaypoint(WOUNDED_MOVE_2, false);
+                    me->DespawnOrUnsummon(30s);
                 }
                 if (me->GetPositionY() == -2961.08f)
                 {
-                    me->GetMotionMaster()->MovePath(WOUNDED_MOVE_2, false);
-                    me->DespawnOrUnsummon(25000);
+                    me->GetMotionMaster()->MoveWaypoint(WOUNDED_MOVE_2, false);
+                    me->DespawnOrUnsummon(25s);
                 }
                 break;
             case EVENT_CLEAVE:
@@ -871,7 +761,7 @@ public:
         {
             if (_following)
                 if (!me->HasAura(SPELL_FROG_LOVE))
-                    me->DespawnOrUnsummon(1000);
+                    me->DespawnOrUnsummon(1s);
 
             _events.Update(diff);
 
@@ -898,7 +788,7 @@ public:
                         break;
                     case EVENT_LAKEFROG_5:
                         Talk(SAY_MAIDEN_1);
-                        me->DespawnOrUnsummon(4000);
+                        me->DespawnOrUnsummon(4s);
                         break;
                     default:
                         break;
@@ -1178,8 +1068,6 @@ void AddSC_grizzly_hills()
     new npc_emily();
     new npc_mrfloppy();
     new npc_ravenous_worg();
-    new npc_tallhorn_stag();
-    new npc_amberpine_woodsman();
     RegisterCreatureAI(npc_wounded_skirmisher);
     RegisterSpellScript(spell_renew_skirmisher);
     new npc_venture_co_straggler();

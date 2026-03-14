@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -258,8 +258,8 @@ public:
             switch (param)
             {
                 case ENCOUNTER_PROGRESS_BARRELS:
-                    events.ScheduleEvent(EVENT_OPEN_DOORS, 0);
-                    events.ScheduleEvent(EVENT_START_WP, 3000);
+                    events.ScheduleEvent(EVENT_OPEN_DOORS, 0ms);
+                    events.ScheduleEvent(EVENT_START_WP, 3s);
                     break;
                 case ENCOUNTER_PROGRESS_THRALL_ARMORED:
                 case ENCOUNTER_PROGRESS_AMBUSHES_1:
@@ -268,27 +268,27 @@ public:
                     SetEscortPaused(false);
                     break;
                 case ENCOUNTER_PROGRESS_TARETHA_MEET:
-                    events.ScheduleEvent(EVENT_SUMMON_CHRONO, 0);
-                    events.ScheduleEvent(EVENT_THRALL_TALK_2, 6000);
-                    events.ScheduleEvent(EVENT_TARETHA_FALL, 11000);
-                    events.ScheduleEvent(EVENT_THRALL_TALK_3, 15000);
-                    events.ScheduleEvent(EVENT_THRALL_MOVE_DOWN, 17000);
+                    events.ScheduleEvent(EVENT_SUMMON_CHRONO, 0ms);
+                    events.ScheduleEvent(EVENT_THRALL_TALK_2, 6s);
+                    events.ScheduleEvent(EVENT_TARETHA_FALL, 11s);
+                    events.ScheduleEvent(EVENT_THRALL_TALK_3, 15s);
+                    events.ScheduleEvent(EVENT_THRALL_MOVE_DOWN, 17s);
                     break;
                 case NPC_TARETHA:
-                    events.ScheduleEvent(EVENT_THRALL_FACE_TARETHA, 0);
-                    events.ScheduleEvent(EVENT_THRALL_TALK_4, 4000);
-                    events.ScheduleEvent(EVENT_TARETHA_TALK_1, 13000);
-                    events.ScheduleEvent(EVENT_THRALL_TALK_5, 17000);
-                    events.ScheduleEvent(EVENT_SUMMON_EROZION, 17500);
-                    events.ScheduleEvent(EVENT_EROZION_TALK_1, 18000);
-                    events.ScheduleEvent(EVENT_EROZION_ACTION_1, 24000);
-                    events.ScheduleEvent(EVENT_EROZION_TALK_2, 29000);
-                    events.ScheduleEvent(EVENT_EROZION_TALK_3, 40000);
-                    events.ScheduleEvent(EVENT_EROZION_ACTION_2, 46000);
-                    events.ScheduleEvent(EVENT_THRALL_TALK_6, 48000);
-                    events.ScheduleEvent(EVENT_THRALL_RUN_AWAY, 51000);
-                    events.ScheduleEvent(EVENT_TARETHA_TALK_2, 53000);
-                    events.ScheduleEvent(EVENT_EROZION_FLAGS, 56000);
+                    events.ScheduleEvent(EVENT_THRALL_FACE_TARETHA, 0ms);
+                    events.ScheduleEvent(EVENT_THRALL_TALK_4, 4s);
+                    events.ScheduleEvent(EVENT_TARETHA_TALK_1, 13s);
+                    events.ScheduleEvent(EVENT_THRALL_TALK_5, 17s);
+                    events.ScheduleEvent(EVENT_SUMMON_EROZION, 17500ms);
+                    events.ScheduleEvent(EVENT_EROZION_TALK_1, 18s);
+                    events.ScheduleEvent(EVENT_EROZION_ACTION_1, 24s);
+                    events.ScheduleEvent(EVENT_EROZION_TALK_2, 29s);
+                    events.ScheduleEvent(EVENT_EROZION_TALK_3, 40s);
+                    events.ScheduleEvent(EVENT_EROZION_ACTION_2, 46s);
+                    events.ScheduleEvent(EVENT_THRALL_TALK_6, 48s);
+                    events.ScheduleEvent(EVENT_THRALL_RUN_AWAY, 51s);
+                    events.ScheduleEvent(EVENT_TARETHA_TALK_2, 53s);
+                    events.ScheduleEvent(EVENT_EROZION_FLAGS, 56s);
                     break;
             }
         }
@@ -311,23 +311,23 @@ public:
                     Talk(SAY_START_EVENT_PART1);
                     break;
                 case 8:
-                    events.ScheduleEvent(EVENT_SET_FACING, 500);
-                    events.ScheduleEvent(EVENT_ARMORER_SAY, 700);
-                    events.ScheduleEvent(EVENT_THRALL_EMOTE, 1300);
+                    events.ScheduleEvent(EVENT_SET_FACING, 500ms);
+                    events.ScheduleEvent(EVENT_ARMORER_SAY, 700ms);
+                    events.ScheduleEvent(EVENT_THRALL_EMOTE, 1300ms);
                     break;
                 case 9:
-                    SetRun(false);
-                    events.ScheduleEvent(EVENT_KILL_ARMORER, 500);
-                    events.ScheduleEvent(EVENT_TALK_KILL_ARMORER, 3000);
+                    me->SetWalk(true);
+                    events.ScheduleEvent(EVENT_KILL_ARMORER, 500ms);
+                    events.ScheduleEvent(EVENT_TALK_KILL_ARMORER, 3s);
                     break;
                 case 10:
-                    SetRun(true);
-                    events.ScheduleEvent(EVENT_DRESSING_KNEEL, 500);
-                    events.ScheduleEvent(EVENT_DRESSING_ARMOR, 3000);
-                    events.ScheduleEvent(EVENT_DRESSING_STAND, 4000);
-                    events.ScheduleEvent(EVENT_DRESSING_AXE, 7000);
-                    events.ScheduleEvent(EVENT_DRESSING_SHIELD, 9000);
-                    events.ScheduleEvent(EVENT_DRESSING_TALK, 12000);
+                    me->SetWalk(false);
+                    events.ScheduleEvent(EVENT_DRESSING_KNEEL, 500ms);
+                    events.ScheduleEvent(EVENT_DRESSING_ARMOR, 3s);
+                    events.ScheduleEvent(EVENT_DRESSING_STAND, 4s);
+                    events.ScheduleEvent(EVENT_DRESSING_AXE, 7s);
+                    events.ScheduleEvent(EVENT_DRESSING_SHIELD, 9s);
+                    events.ScheduleEvent(EVENT_DRESSING_TALK, 12s);
                     break;
                 case 18:
                     if (Creature* warden = me->SummonCreature(NPC_DURNHOLDE_WARDEN, 2149.4634f, 104.97559f, 73.632385f, 1.9065f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30 * IN_MILLISECONDS))
@@ -362,8 +362,8 @@ public:
                     Talk(SAY_SKARLOC_MEET);
                     break;
                 case 30:
-                    events.ScheduleEvent(EVENT_ENTER_MOUNT, 3000);
-                    events.ScheduleEvent(EVENT_TALK_START_RIDE, 7000);
+                    events.ScheduleEvent(EVENT_ENTER_MOUNT, 3s);
+                    events.ScheduleEvent(EVENT_TALK_START_RIDE, 7s);
                     break;
                 case 59:
                     instance->SetData(DATA_ESCORT_PROGRESS, ENCOUNTER_PROGRESS_TARREN_MILL);
@@ -374,7 +374,7 @@ public:
                     }
                     UnMountSelf();
                     _mounted = false;
-                    SetRun(false);
+                    me->SetWalk(true);
                     me->SetFacingTo(6.0388f);
                     break;
                 case 60:
@@ -382,32 +382,32 @@ public:
                     if (Creature* horse = me->FindNearestCreature(NPC_SKARLOC_MOUNT, 10.0f))
                     {
                         horse->GetMotionMaster()->MovePoint(0, 2501.15f, 572.14f, 54.13f);
-                        horse->DespawnOrUnsummon(30 * IN_MILLISECONDS);
+                        horse->DespawnOrUnsummon(30s);
                     }
                     Talk(SAY_EMOTE_HORSE);
                     SetEscortPaused(true);
-                    SetRun(true);
+                    me->SetWalk(false);
                     me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     me->SetFacingTo(4.1364f);
                     break;
                 case 64:
-                    SetRun(false);
+                    me->SetWalk(true);
                     break;
                 case 67:
-                    events.ScheduleEvent(EVENT_LOOK_1, 1200);
-                    events.ScheduleEvent(EVENT_MOVE_AROUND, 3500);
-                    events.ScheduleEvent(EVENT_LOOK_2, 5000);
-                    events.ScheduleEvent(EVENT_SUMMON_GUARDS, 5100);
-                    events.ScheduleEvent(EVENT_LOOK_3, 7000);
-                    events.ScheduleEvent(EVENT_SUMMON_TALK1, 12000);
-                    events.ScheduleEvent(EVENT_LOOK_4, 17000);
-                    events.ScheduleEvent(EVENT_SUMMON_TALK2, 19000);
-                    events.ScheduleEvent(EVENT_GUARDS_MOVING, 21000);
+                    events.ScheduleEvent(EVENT_LOOK_1, 1200ms);
+                    events.ScheduleEvent(EVENT_MOVE_AROUND, 3500ms);
+                    events.ScheduleEvent(EVENT_LOOK_2, 5s);
+                    events.ScheduleEvent(EVENT_SUMMON_GUARDS, 5100ms);
+                    events.ScheduleEvent(EVENT_LOOK_3, 7s);
+                    events.ScheduleEvent(EVENT_SUMMON_TALK1, 12s);
+                    events.ScheduleEvent(EVENT_LOOK_4, 17s);
+                    events.ScheduleEvent(EVENT_SUMMON_TALK2, 19s);
+                    events.ScheduleEvent(EVENT_GUARDS_MOVING, 21s);
                     break;
                 case 82:
-                    events.ScheduleEvent(EVENT_LOOK_5, 500);
-                    events.ScheduleEvent(EVENT_SUMMON_GUARDS_2, 1000);
-                    events.ScheduleEvent(EVENT_SUMMON_TALK3, 1500);
+                    events.ScheduleEvent(EVENT_LOOK_5, 500ms);
+                    events.ScheduleEvent(EVENT_SUMMON_GUARDS_2, 1s);
+                    events.ScheduleEvent(EVENT_SUMMON_TALK3, 1500ms);
                     break;
                 case 91:
                     me->SummonCreature(NPC_TM_PROTECTOR, 2652.71f, 660.31f, 61.93f, 1.67f, TEMPSUMMON_MANUAL_DESPAWN);
@@ -418,26 +418,26 @@ public:
                         summon->AI()->Talk(SAY_LOOKOUT_INN);
                     break;
                 case 92:
-                    SetRun(false);
+                    me->SetWalk(true);
                     break;
                 case 94:
                     summons.DespawnAll();
                     SetEscortPaused(true);
-                    SetRun(true);
+                    me->SetWalk(false);
                     instance->SetData(DATA_ESCORT_PROGRESS, ENCOUNTER_PROGRESS_TARETHA_MEET);
                     if (Creature* Taretha = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_TARETHA_GUID)))
                     {
                         Taretha->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
                         Taretha->AI()->Talk(SAY_TARETHA_ESCAPED);
                     }
-                    events.ScheduleEvent(EVENT_THRALL_TALK, 4000);
+                    events.ScheduleEvent(EVENT_THRALL_TALK, 4s);
                     break;
                 case 101:
                     SetEscortPaused(true);
-                    events.ScheduleEvent(EVENT_EPOCH_INTRO, 500);
-                    events.ScheduleEvent(EVENT_SUMMON_INFINITES, 1500);
-                    events.ScheduleEvent(EVENT_TRANSFORM, 8000);
-                    events.ScheduleEvent(EVENT_START_WAVE_1, 25000);
+                    events.ScheduleEvent(EVENT_EPOCH_INTRO, 500ms);
+                    events.ScheduleEvent(EVENT_SUMMON_INFINITES, 1500ms);
+                    events.ScheduleEvent(EVENT_TRANSFORM, 8s);
+                    events.ScheduleEvent(EVENT_START_WAVE_1, 25s);
                     break;
                 case 103:
                     instance->SetData(DATA_ESCORT_PROGRESS, ENCOUNTER_PROGRESS_FINISHED);
@@ -473,9 +473,9 @@ public:
         void JustEngagedWith(Unit*) override
         {
             combatEvents.Reset();
-            combatEvents.ScheduleEvent(EVENT_CHECK_HEALTH, 500);
-            combatEvents.ScheduleEvent(EVENT_SPELL_SHIELD_BLOCK, 8000);
-            combatEvents.ScheduleEvent(EVENT_SPELL_STRIKE, 2000);
+            combatEvents.ScheduleEvent(EVENT_CHECK_HEALTH, 500ms);
+            combatEvents.ScheduleEvent(EVENT_SPELL_SHIELD_BLOCK, 8s);
+            combatEvents.ScheduleEvent(EVENT_SPELL_STRIKE, 2s);
 
             if (roll_chance_i(50))
                 Talk(SAY_RANDOM_AGGRO);
@@ -566,7 +566,8 @@ public:
                     me->SummonCreature(NPC_DURNHOLDE_MAGE, 2108.4856f, 189.93457f, 66.30494f, 2.6878f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30 * IN_MILLISECONDS);
                     break;
                 case EVENT_START_WP:
-                    Start(true, true);
+                    me->SetWalk(false);
+                    Start(true);
                     SetDespawnAtEnd(false);
                     break;
                 case EVENT_SET_FACING:
@@ -663,7 +664,7 @@ public:
                     me->SetFacingTo(2.0071f);
                     break;
                 case EVENT_SUMMON_GUARDS:
-                    SetRun(true);
+                    me->SetWalk(false);
                     me->SummonCreature(NPC_TM_PROTECTOR, 2501.5708f, 699.38086f, 55.64138f, 3.8571f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30 * IN_MILLISECONDS);
                     me->SummonCreature(NPC_TM_LOOKOUT, 2500.7002f, 698.26746f, 55.618248f, 3.7350f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30 * IN_MILLISECONDS);
                     if (Creature* guardsman = me->SummonCreature(NPC_TM_GUARDSMAN, 2500.0908f, 699.9389f, 55.629555f, 4.2935f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30 * IN_MILLISECONDS))
@@ -766,7 +767,7 @@ public:
                     summons.DoAction(ACTION_SET_IMMUNE_FLAG);
                     break;
                 case EVENT_START_WAVE_1:
-                    events.ScheduleEvent(EVENT_CHECK_WAVE_1, 500);
+                    events.ScheduleEvent(EVENT_CHECK_WAVE_1, 500ms);
                     summons.DoAction(ACTION_REMOVE_IMMUNE_FLAG);
                     summons.DoAction(ACTION_START_COMBAT);
                     break;
@@ -777,10 +778,10 @@ public:
                         me->SummonCreature(NPC_INFINITE_SLAYER, 2599.57f, 677.0f, 55.975f, 0.05f, TEMPSUMMON_MANUAL_DESPAWN);
                         me->SummonCreature(NPC_INFINITE_DEFILER, 2592.57f, 680.0f, 55.975f, 0.05f, TEMPSUMMON_MANUAL_DESPAWN);
                         summons.DoAction(ACTION_START_COMBAT);
-                        events.ScheduleEvent(EVENT_CHECK_WAVE_2, 500);
+                        events.ScheduleEvent(EVENT_CHECK_WAVE_2, 500ms);
                         break;
                     }
-                    events.ScheduleEvent(EVENT_CHECK_WAVE_1, 500);
+                    events.ScheduleEvent(EVENT_CHECK_WAVE_1, 500ms);
                     break;
                 case EVENT_CHECK_WAVE_2:
                     if (summons.size() == 1)
@@ -790,26 +791,26 @@ public:
                         me->SummonCreature(NPC_INFINITE_SABOTEUR, 2638.62f, 705.43f, 55.965f, 4.46f, TEMPSUMMON_MANUAL_DESPAWN);
                         me->SummonCreature(NPC_INFINITE_DEFILER, 2642.62f, 705.43f, 55.965f, 4.46f, TEMPSUMMON_MANUAL_DESPAWN);
                         summons.DoAction(ACTION_START_COMBAT);
-                        events.ScheduleEvent(EVENT_CHECK_WAVE_3, 500);
+                        events.ScheduleEvent(EVENT_CHECK_WAVE_3, 500ms);
                         break;
                     }
-                    events.ScheduleEvent(EVENT_CHECK_WAVE_2, 500);
+                    events.ScheduleEvent(EVENT_CHECK_WAVE_2, 500ms);
                     break;
                 case EVENT_CHECK_WAVE_3:
                     if (summons.size() == 1)
                     {
                         me->SetHomePosition(2634.79f, 672.964f, 54.8577f, 1.33f);
                         me->GetMotionMaster()->MoveTargetedHome();
-                        events.ScheduleEvent(EVENT_CALL_EPOCH, 8000);
+                        events.ScheduleEvent(EVENT_CALL_EPOCH, 8s);
                         break;
                     }
-                    events.ScheduleEvent(EVENT_CHECK_WAVE_3, 500);
+                    events.ScheduleEvent(EVENT_CHECK_WAVE_3, 500ms);
                     break;
                 case EVENT_CALL_EPOCH:
                     if (Creature* epoch = summons.GetCreatureWithEntry(NPC_EPOCH_HUNTER))
                     {
                         epoch->SetImmuneToAll(false);
-                        epoch->GetMotionMaster()->MovePoint(0, *me, false, true);
+                        epoch->GetMotionMaster()->MovePoint(0, *me, FORCED_MOVEMENT_NONE, 0.f, false, true);
                     }
                     break;
                 case EVENT_THRALL_FACE_TARETHA:
@@ -905,15 +906,15 @@ public:
                         Talk(SAY_RANDOM_LOW_HP);
                         break;
                     }
-                    events.ScheduleEvent(EVENT_CHECK_HEALTH, 500);
+                    events.ScheduleEvent(EVENT_CHECK_HEALTH, 500ms);
                     break;
                 case EVENT_SPELL_STRIKE:
                     me->CastSpell(me->GetVictim(), SPELL_STRIKE, false);
-                    events.ScheduleEvent(EVENT_SPELL_STRIKE, 6000);
+                    events.ScheduleEvent(EVENT_SPELL_STRIKE, 6s);
                     break;
                 case EVENT_SPELL_SHIELD_BLOCK:
                     me->CastSpell(me, SPELL_SHIELD_BLOCK, false);
-                    events.ScheduleEvent(EVENT_SPELL_SHIELD_BLOCK, 6000);
+                    events.ScheduleEvent(EVENT_SPELL_SHIELD_BLOCK, 6s);
                     break;
             }
 
@@ -922,7 +923,8 @@ public:
 
         void ReorderInstance(uint32 data)
         {
-            Start(true, true);
+            me->SetWalk(false);
+            Start(true);
             SetEscortPaused(true);
             SetDespawnAtEnd(false);
 
@@ -1008,14 +1010,15 @@ public:
         {
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->RemoveAllAuras();
-            Start(false, true);
+            me->SetWalk(false);
+            Start(false);
         }
 
         void WaypointReached(uint32 waypointId) override
         {
             if (waypointId == 7)
             {
-                SetRun(false);
+                me->SetWalk(true);
                 Talk(SAY_TARETHA_FREE);
                 me->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
                 if (Creature* thrall = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_THRALL_GUID)))

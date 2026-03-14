@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -343,7 +343,7 @@ public:
                         nefarian->setActive(true);
                         nefarian->SetCanFly(true);
                         nefarian->SetDisableGravity(true);
-                        nefarian->GetMotionMaster()->MovePath(NEFARIAN_PATH, false);
+                        nefarian->GetMotionMaster()->MoveWaypoint(NEFARIAN_PATH, false);
                     }
 
                     events.Reset();
@@ -406,7 +406,7 @@ public:
                     switch (eventId)
                     {
                         case EVENT_PATH_2:
-                            me->GetMotionMaster()->MovePath(NEFARIUS_PATH_2, false);
+                            me->GetMotionMaster()->MoveWaypoint(NEFARIUS_PATH_2, false);
                             events.ScheduleEvent(EVENT_CHAOS_1, 7s);
                             break;
                         case EVENT_CHAOS_1:
@@ -435,10 +435,10 @@ public:
                             break;
                         case EVENT_SUCCESS_2:
                             DoCast(me, SPELL_VAELASTRASZZ_SPAWN);
-                            me->DespawnOrUnsummon(1000);
+                            me->DespawnOrUnsummon(1s);
                             break;
                         case EVENT_PATH_3:
-                            me->GetMotionMaster()->MovePath(NEFARIUS_PATH_3, false);
+                            me->GetMotionMaster()->MoveWaypoint(NEFARIUS_PATH_3, false);
                             break;
                         case EVENT_START_EVENT:
                             BeginEvent();
@@ -592,12 +592,12 @@ struct boss_nefarian : public BossAI
             return;
         }
 
-        if (id == 3)
+        if (id == 4)
         {
             Talk(SAY_INTRO);
         }
 
-        if (id == 5)
+        if (id == 6)
         {
             DoCastAOE(SPELL_SHADOWFLAME_INITIAL);
             Talk(SAY_SHADOWFLAME);

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -97,8 +97,8 @@ public:
             me->SetReactState(REACT_PASSIVE);
             me->SetImmuneToAll(true);
             events2.Reset();
-            events2.ScheduleEvent(EVENT_TELEPORT_VISUAL, 0);
-            events2.ScheduleEvent(EVENT_MILLHOUSE_INTRO1, 3000);
+            events2.ScheduleEvent(EVENT_TELEPORT_VISUAL, 0ms);
+            events2.ScheduleEvent(EVENT_MILLHOUSE_INTRO1, 3s);
         }
 
         void Reset() override
@@ -125,9 +125,9 @@ public:
 
         void JustEngagedWith(Unit*) override
         {
-            events.ScheduleEvent(EVENT_MILL_CHECK_HEALTH, 1000);
-            events.ScheduleEvent(EVENT_MILL_PYROBLAST, 30000);
-            events.ScheduleEvent(EVENT_MILL_BASE_SPELL, 2000);
+            events.ScheduleEvent(EVENT_MILL_CHECK_HEALTH, 1s);
+            events.ScheduleEvent(EVENT_MILL_PYROBLAST, 30s);
+            events.ScheduleEvent(EVENT_MILL_BASE_SPELL, 2s);
         }
 
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*type*/, SpellSchoolMask /*school*/) override
@@ -150,52 +150,52 @@ public:
                     break;
                 case EVENT_MILLHOUSE_INTRO1:
                     Talk(SAY_INTRO_1);
-                    events2.ScheduleEvent(EVENT_MILLHOUSE_INTRO2, 18000);
+                    events2.ScheduleEvent(EVENT_MILLHOUSE_INTRO2, 18s);
                     break;
                 case EVENT_MILLHOUSE_INTRO2:
                     Talk(SAY_INTRO_2);
-                    events2.ScheduleEvent(EVENT_MILLHOUSE_INTRO3, 8000);
+                    events2.ScheduleEvent(EVENT_MILLHOUSE_INTRO3, 8s);
                     break;
                 case EVENT_MILLHOUSE_INTRO3:
                     Talk(SAY_INTRO_3);
-                    events2.ScheduleEvent(EVENT_MILLHOUSE_INTRO4, 6000);
+                    events2.ScheduleEvent(EVENT_MILLHOUSE_INTRO4, 6s);
                     break;
                 case EVENT_MILLHOUSE_INTRO4:
                     Talk(SAY_INTRO_4);
-                    events2.ScheduleEvent(EVENT_MILLHOUSE_INTRO5, 8000);
+                    events2.ScheduleEvent(EVENT_MILLHOUSE_INTRO5, 8s);
                     break;
                 case EVENT_MILLHOUSE_INTRO5:
                     Talk(SAY_WATER);
                     me->CastSpell(me, SPELL_CONJURE_WATER, false);
-                    events2.ScheduleEvent(EVENT_MILLHOUSE_INTRO6, 7000);
+                    events2.ScheduleEvent(EVENT_MILLHOUSE_INTRO6, 7s);
                     break;
                 case EVENT_MILLHOUSE_INTRO6:
                     Talk(SAY_BUFFS);
                     me->CastSpell(me, SPELL_ICE_ARMOR, false);
-                    events2.ScheduleEvent(EVENT_MILLHOUSE_INTRO7, 7000);
+                    events2.ScheduleEvent(EVENT_MILLHOUSE_INTRO7, 7s);
                     break;
                 case EVENT_MILLHOUSE_INTRO7:
                     Talk(SAY_DRINK);
                     me->CastSpell(me, SPELL_ARCANE_INTELLECT, false);
-                    events2.ScheduleEvent(EVENT_MILLHOUSE_INTRO8, 7000);
+                    events2.ScheduleEvent(EVENT_MILLHOUSE_INTRO8, 7s);
                     break;
                 case EVENT_MILLHOUSE_INTRO8:
                     Talk(SAY_READY);
                     me->GetMotionMaster()->MovePoint(1, 445.82f, -158.38f, 43.067f);
-                    events2.ScheduleEvent(EVENT_MILLHOUSE_INTRO9, 5000);
+                    events2.ScheduleEvent(EVENT_MILLHOUSE_INTRO9, 5s);
                     break;
                 case EVENT_MILLHOUSE_INTRO9:
                     me->SetFacingTo(M_PI * 1.5f);
                     me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), M_PI * 1.5f);
                     me->SetImmuneToAll(false);
                     me->SetReactState(REACT_AGGRESSIVE);
-                    events2.ScheduleEvent(EVENT_SEARCH_FIGHT, 1000);
+                    events2.ScheduleEvent(EVENT_SEARCH_FIGHT, 1s);
                     break;
                 case EVENT_SEARCH_FIGHT:
                     if (!me->IsInCombat() && !me->IsInEvadeMode())
                         if (Unit* target = me->SelectNearbyTarget(nullptr, 30.0f))
                             AttackStart(target);
-                    events2.ScheduleEvent(EVENT_SEARCH_FIGHT, 1000);
+                    events2.ScheduleEvent(EVENT_SEARCH_FIGHT, 1s);
                     break;
             }
 
@@ -214,27 +214,27 @@ public:
                         Talk(SAY_LOWHP);
                         break;
                     }
-                    events.ScheduleEvent(EVENT_MILL_CHECK_HEALTH, 1000);
+                    events.ScheduleEvent(EVENT_MILL_CHECK_HEALTH, 1s);
                     break;
                 case EVENT_MILL_PYROBLAST:
                     Talk(SAY_PYRO);
                     me->CastSpell(me->GetVictim(), SPELL_PYROBLAST, false);
-                    events.ScheduleEvent(EVENT_MILL_PYROBLAST, 30000);
+                    events.ScheduleEvent(EVENT_MILL_PYROBLAST, 30s);
                     break;
                 case EVENT_MILL_BASE_SPELL:
                     switch (RAND(SPELL_FIREBALL, SPELL_ARCANE_MISSILES, SPELL_FROSTBOLT))
                     {
                         case SPELL_FIREBALL:
                             me->CastSpell(me->GetVictim(), SPELL_FIREBALL, false);
-                            events.ScheduleEvent(EVENT_MILL_BASE_SPELL, 4000);
+                            events.ScheduleEvent(EVENT_MILL_BASE_SPELL, 4s);
                             break;
                         case SPELL_ARCANE_MISSILES:
                             me->CastSpell(me->GetVictim(), SPELL_ARCANE_MISSILES, false);
-                            events.ScheduleEvent(EVENT_MILL_BASE_SPELL, 9000);
+                            events.ScheduleEvent(EVENT_MILL_BASE_SPELL, 9s);
                             break;
                         case SPELL_FROSTBOLT:
                             me->CastSpell(me->GetVictim(), SPELL_FROSTBOLT, false);
-                            events.ScheduleEvent(EVENT_MILL_BASE_SPELL, 4000);
+                            events.ScheduleEvent(EVENT_MILL_BASE_SPELL, 4s);
                             break;
                         default:
                             break;
@@ -390,8 +390,8 @@ public:
                 me->setActive(true);
                 me->InterruptNonMeleeSpells(false);
                 me->SetImmuneToAll(true);
-                events.ScheduleEvent(EVENT_WARDEN_INTRO1, 1500);
-                events.ScheduleEvent(EVENT_WARDEN_CHECK_PLAYERS, 1000);
+                events.ScheduleEvent(EVENT_WARDEN_INTRO1, 1500ms);
+                events.ScheduleEvent(EVENT_WARDEN_CHECK_PLAYERS, 1s);
                 instance->SetBossState(DATA_WARDEN_MELLICHAR, IN_PROGRESS);
             }
             damage = 0;
@@ -410,13 +410,13 @@ public:
             switch (type)
             {
                 case DATA_WARDEN_1:
-                    events.ScheduleEvent(EVENT_WARDEN_INTRO8, 2000);
+                    events.ScheduleEvent(EVENT_WARDEN_INTRO8, 2s);
                     break;
                 case DATA_WARDEN_3:
-                    events.ScheduleEvent(EVENT_WARDEN_INTRO19, 2000);
+                    events.ScheduleEvent(EVENT_WARDEN_INTRO19, 2s);
                     break;
                 case DATA_WARDEN_4:
-                    events.ScheduleEvent(EVENT_WARDEN_INTRO24, 2000);
+                    events.ScheduleEvent(EVENT_WARDEN_INTRO24, 2s);
                     break;
             }
         }
@@ -432,35 +432,35 @@ public:
                         CreatureAI::EnterEvadeMode();
                         return;
                     }
-                    events.ScheduleEvent(EVENT_WARDEN_CHECK_PLAYERS, 1000);
+                    events.ScheduleEvent(EVENT_WARDEN_CHECK_PLAYERS, 1s);
                     break;
                 case EVENT_WARDEN_INTRO1:
                     Talk(YELL_INTRO1);
                     me->SetFacingTo(M_PI / 2.0f);
                     me->CastSpell(me, SPELL_BUBBLE_VISUAL, false);
-                    events.ScheduleEvent(EVENT_WARDEN_INTRO2, 1400);
+                    events.ScheduleEvent(EVENT_WARDEN_INTRO2, 1400ms);
                     break;
                 case EVENT_WARDEN_INTRO2:
                     instance->HandleGameObject(instance->GetGuidData(DATA_WARDENS_SHIELD), false);
-                    events.ScheduleEvent(EVENT_WARDEN_INTRO3, 20000);
+                    events.ScheduleEvent(EVENT_WARDEN_INTRO3, 20s);
                     break;
                 case EVENT_WARDEN_INTRO3:
                     Talk(YELL_INTRO2);
-                    events.ScheduleEvent(EVENT_WARDEN_INTRO4, 5000);
+                    events.ScheduleEvent(EVENT_WARDEN_INTRO4, 5s);
                     break;
                 case EVENT_WARDEN_INTRO4:
                     me->SetFacingTo(0.5f);
                     me->CastSpell((Unit*)nullptr, SPELL_TARGET_ALPHA, false);
-                    events.ScheduleEvent(EVENT_WARDEN_INTRO5, 2000);
+                    events.ScheduleEvent(EVENT_WARDEN_INTRO5, 2s);
                     break;
                 case EVENT_WARDEN_INTRO5:
                     instance->SetData(DATA_WARDEN_1, IN_PROGRESS);
-                    events.ScheduleEvent(EVENT_WARDEN_INTRO6, 3000);
+                    events.ScheduleEvent(EVENT_WARDEN_INTRO6, 3s);
                     break;
                 case EVENT_WARDEN_INTRO6:
                     me->SetFacingTo(M_PI * 1.5f);
                     me->CastSpell((Unit*)nullptr, SPELL_TARGET_OMEGA, false);
-                    events.ScheduleEvent(EVENT_WARDEN_INTRO7, 5000);
+                    events.ScheduleEvent(EVENT_WARDEN_INTRO7, 5s);
                     break;
                 case EVENT_WARDEN_INTRO7:
                     me->SummonCreature(RAND(NPC_TRICKSTER, NPC_PH_HUNTER), 478.326f, -148.505f, 42.56f, 3.19f, TEMPSUMMON_MANUAL_DESPAWN);
@@ -470,44 +470,44 @@ public:
                     Talk(YELL_RELEASE1);
                     me->InterruptNonMeleeSpells(false);
                     me->SetFacingTo(2.6f);
-                    events.ScheduleEvent(EVENT_WARDEN_INTRO10, 4000);
+                    events.ScheduleEvent(EVENT_WARDEN_INTRO10, 4s);
                     break;
                 case EVENT_WARDEN_INTRO10:
                     me->CastSpell((Unit*)nullptr, SPELL_TARGET_BETA, false);
-                    events.ScheduleEvent(EVENT_WARDEN_INTRO11, 2000);
+                    events.ScheduleEvent(EVENT_WARDEN_INTRO11, 2s);
                     break;
                 case EVENT_WARDEN_INTRO11:
                     Talk(YELL_RELEASE2A);
                     instance->SetData(DATA_WARDEN_2, IN_PROGRESS);
-                    events.ScheduleEvent(EVENT_WARDEN_INTRO12, 2000);
+                    events.ScheduleEvent(EVENT_WARDEN_INTRO12, 2s);
                     break;
                 case EVENT_WARDEN_INTRO12:
                     me->SetFacingTo(M_PI * 1.5f);
                     me->CastSpell((Unit*)nullptr, SPELL_TARGET_OMEGA, false);
-                    events.ScheduleEvent(EVENT_WARDEN_INTRO13, 6000);
+                    events.ScheduleEvent(EVENT_WARDEN_INTRO13, 6s);
                     break;
                 case EVENT_WARDEN_INTRO13:
                     me->SummonCreature(NPC_MILLHOUSE, 413.292f, -148.378f, 42.56f, 6.27f, TEMPSUMMON_MANUAL_DESPAWN);
-                    events.ScheduleEvent(EVENT_WARDEN_INTRO14, 14000);
+                    events.ScheduleEvent(EVENT_WARDEN_INTRO14, 14s);
                     break;
                 case EVENT_WARDEN_INTRO14:
                     Talk(YELL_RELEASE2B);
                     me->InterruptNonMeleeSpells(false);
                     me->SetFacingTo(3.3f);
-                    events.ScheduleEvent(EVENT_WARDEN_INTRO15, 5000);
+                    events.ScheduleEvent(EVENT_WARDEN_INTRO15, 5s);
                     break;
                 case EVENT_WARDEN_INTRO15:
                     me->CastSpell((Unit*)nullptr, SPELL_TARGET_DELTA, false);
-                    events.ScheduleEvent(EVENT_WARDEN_INTRO16, 2000);
+                    events.ScheduleEvent(EVENT_WARDEN_INTRO16, 2s);
                     break;
                 case EVENT_WARDEN_INTRO16:
                     instance->SetData(DATA_WARDEN_3, IN_PROGRESS);
-                    events.ScheduleEvent(EVENT_WARDEN_INTRO17, 2000);
+                    events.ScheduleEvent(EVENT_WARDEN_INTRO17, 2s);
                     break;
                 case EVENT_WARDEN_INTRO17:
                     me->SetFacingTo(M_PI * 1.5f);
                     me->CastSpell((Unit*)nullptr, SPELL_TARGET_OMEGA, false);
-                    events.ScheduleEvent(EVENT_WARDEN_INTRO18, 6000);
+                    events.ScheduleEvent(EVENT_WARDEN_INTRO18, 6s);
                     break;
                 case EVENT_WARDEN_INTRO18:
                     me->SummonCreature(RAND(NPC_AKKIRIS, NPC_SULFURON), 420.179f, -174.396f, 42.58f, 0.02f, TEMPSUMMON_MANUAL_DESPAWN);
@@ -517,20 +517,20 @@ public:
                     Talk(YELL_RELEASE3);
                     me->InterruptNonMeleeSpells(false);
                     me->SetFacingTo(6.05f);
-                    events.ScheduleEvent(EVENT_WARDEN_INTRO20, 4000);
+                    events.ScheduleEvent(EVENT_WARDEN_INTRO20, 4s);
                     break;
                 case EVENT_WARDEN_INTRO20:
                     me->CastSpell((Unit*)nullptr, SPELL_TARGET_GAMMA, false);
-                    events.ScheduleEvent(EVENT_WARDEN_INTRO21, 2000);
+                    events.ScheduleEvent(EVENT_WARDEN_INTRO21, 2s);
                     break;
                 case EVENT_WARDEN_INTRO21:
                     instance->SetData(DATA_WARDEN_4, IN_PROGRESS);
-                    events.ScheduleEvent(EVENT_WARDEN_INTRO22, 2000);
+                    events.ScheduleEvent(EVENT_WARDEN_INTRO22, 2s);
                     break;
                 case EVENT_WARDEN_INTRO22:
                     me->SetFacingTo(M_PI * 1.5f);
                     me->CastSpell((Unit*)nullptr, SPELL_TARGET_OMEGA, false);
-                    events.ScheduleEvent(EVENT_WARDEN_INTRO23, 6000);
+                    events.ScheduleEvent(EVENT_WARDEN_INTRO23, 6s);
                     break;
                 case EVENT_WARDEN_INTRO23:
                     me->SummonCreature(RAND(NPC_TW_DRAK, NPC_BL_DRAK), 471.795f, -174.58f, 42.58f, 3.06f, TEMPSUMMON_MANUAL_DESPAWN);
@@ -540,7 +540,7 @@ public:
                     instance->SetData(DATA_WARDEN_5, IN_PROGRESS);
                     Talk(YELL_RELEASE4);
                     me->InterruptNonMeleeSpells(false);
-                    events.ScheduleEvent(EVENT_WARDEN_INTRO25, 8000);
+                    events.ScheduleEvent(EVENT_WARDEN_INTRO25, 8s);
                     break;
                 case EVENT_WARDEN_INTRO25:
                     if (Creature* cr = me->SummonCreature(NPC_HARBINGER_SKYRISS, 445.763f, -191.639f, 44.64f, 1.60f, TEMPSUMMON_MANUAL_DESPAWN))
@@ -548,22 +548,22 @@ public:
                         cr->SetImmuneToAll(true);
                         cr->CastSpell(cr, SPELL_TELEPORT_VISUAL, true);
                     }
-                    events.ScheduleEvent(EVENT_WARDEN_INTRO26, 1000);
+                    events.ScheduleEvent(EVENT_WARDEN_INTRO26, 1s);
                     break;
                 case EVENT_WARDEN_INTRO26:
                     if (Creature* creature = summons.GetCreatureWithEntry(NPC_HARBINGER_SKYRISS))
                         creature->AI()->Talk(SAY_HARBINGER_INTRO);
-                    events.ScheduleEvent(EVENT_WARDEN_INTRO27, 23000);
+                    events.ScheduleEvent(EVENT_WARDEN_INTRO27, 23s);
                     break;
                 case EVENT_WARDEN_INTRO27:
                     Talk(YELL_WELCOME);
-                    events.ScheduleEvent(EVENT_WARDEN_INTRO28, 5000);
+                    events.ScheduleEvent(EVENT_WARDEN_INTRO28, 5s);
                     break;
                 case EVENT_WARDEN_INTRO28:
                     instance->HandleGameObject(instance->GetGuidData(DATA_WARDENS_SHIELD), true);
                     if (Creature* creature = summons.GetCreatureWithEntry(NPC_HARBINGER_SKYRISS))
                         creature->CastSpell((Unit*)nullptr, SPELL_MIND_REND, false);
-                    events.ScheduleEvent(EVENT_WARDEN_INTRO29, 4000);
+                    events.ScheduleEvent(EVENT_WARDEN_INTRO29, 4s);
                     break;
 
                 case EVENT_WARDEN_INTRO29:

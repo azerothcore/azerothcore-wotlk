@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -105,9 +105,9 @@ struct emerald_dragonAI : public WorldBossAI
         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
         me->SetReactState(REACT_AGGRESSIVE);
         DoCast(me, SPELL_MARK_OF_NATURE_AURA, true);
-        events.ScheduleEvent(EVENT_TAIL_SWEEP, 4000);
-        events.ScheduleEvent(EVENT_NOXIOUS_BREATH, urand(7500, 15000));
-        events.ScheduleEvent(EVENT_SEEPING_FOG, urand(12500, 20000));
+        events.ScheduleEvent(EVENT_TAIL_SWEEP, 4s);
+        events.ScheduleEvent(EVENT_NOXIOUS_BREATH, 7500ms, 15s);
+        events.ScheduleEvent(EVENT_SEEPING_FOG, 12500ms, 20s);
         events.ScheduleEvent(EVENT_SUMMON_PLAYER, 1s);
     }
 
@@ -128,17 +128,17 @@ struct emerald_dragonAI : public WorldBossAI
                 // Despawntime is 2 minutes, so reschedule it for new cast after 2 minutes + a minor "random time" (30 seconds at max)
                 DoCast(me, SPELL_SEEPING_FOG_LEFT, true);
                 DoCast(me, SPELL_SEEPING_FOG_RIGHT, true);
-                events.ScheduleEvent(EVENT_SEEPING_FOG, urand(120000, 150000));
+                events.ScheduleEvent(EVENT_SEEPING_FOG, 120s, 150s);
                 break;
             case EVENT_NOXIOUS_BREATH:
                 // Noxious Breath is cast on random intervals, no less than 7.5 seconds between
                 DoCast(me, SPELL_NOXIOUS_BREATH);
-                events.ScheduleEvent(EVENT_NOXIOUS_BREATH, urand(7500, 15000));
+                events.ScheduleEvent(EVENT_NOXIOUS_BREATH, 7500ms, 15s);
                 break;
             case EVENT_TAIL_SWEEP:
                 // Tail Sweep is cast every two seconds, no matter what goes on in front of the dragon
                 DoCast(me, SPELL_TAIL_SWEEP);
-                events.ScheduleEvent(EVENT_TAIL_SWEEP, 2000);
+                events.ScheduleEvent(EVENT_TAIL_SWEEP, 2s);
                 break;
             case EVENT_SUMMON_PLAYER:
                 if (Unit* target = me->GetVictim())
@@ -219,7 +219,7 @@ public:
             });
         }
 
-        void SetGUID(ObjectGuid guid, int32 type) override
+        void SetGUID(ObjectGuid const& guid, int32 type) override
         {
             if (type == GUID_DRAGON)
             {
@@ -304,7 +304,7 @@ public:
         {
             _stage = 1;
             emerald_dragonAI::Reset();
-            events.ScheduleEvent(EVENT_LIGHTNING_WAVE, 12000);
+            events.ScheduleEvent(EVENT_LIGHTNING_WAVE, 12s);
         }
 
         void JustEngagedWith(Unit* who) override
@@ -344,7 +344,7 @@ public:
             {
                 case EVENT_LIGHTNING_WAVE:
                     DoCastVictim(SPELL_LIGHTNING_WAVE);
-                    events.ScheduleEvent(EVENT_LIGHTNING_WAVE, urand(10000, 20000));
+                    events.ScheduleEvent(EVENT_LIGHTNING_WAVE, 10s, 20s);
                     break;
                 default:
                     emerald_dragonAI::ExecuteEvent(eventId);
@@ -476,7 +476,7 @@ public:
             if (moveType == FOLLOW_MOTION_TYPE && data == _summonerGuid.GetCounter())
             {
                 me->CastSpell((Unit*)nullptr, SPELL_DARK_OFFERING, false);
-                me->DespawnOrUnsummon(1000);
+                me->DespawnOrUnsummon(1s);
             }
         }
 
@@ -524,7 +524,7 @@ public:
         {
             _stage = 1;
             emerald_dragonAI::Reset();
-            events.ScheduleEvent(EVENT_VOLATILE_INFECTION, 12000);
+            events.ScheduleEvent(EVENT_VOLATILE_INFECTION, 12s);
         }
 
         void KilledUnit(Unit* who) override
@@ -559,7 +559,7 @@ public:
             {
                 case EVENT_VOLATILE_INFECTION:
                     DoCastVictim(SPELL_VOLATILE_INFECTION);
-                    events.ScheduleEvent(EVENT_VOLATILE_INFECTION, 120000);
+                    events.ScheduleEvent(EVENT_VOLATILE_INFECTION, 120s);
                     break;
                 default:
                     emerald_dragonAI::ExecuteEvent(eventId);
@@ -624,8 +624,8 @@ public:
             _banishedTimer = 0;
 
             emerald_dragonAI::Reset();
-            events.ScheduleEvent(EVENT_ARCANE_BLAST, 12000);
-            events.ScheduleEvent(EVENT_BELLOWING_ROAR, 30000);
+            events.ScheduleEvent(EVENT_ARCANE_BLAST, 12s);
+            events.ScheduleEvent(EVENT_BELLOWING_ROAR, 30s);
         }
 
         void JustEngagedWith(Unit* who) override
@@ -671,11 +671,11 @@ public:
             {
                 case EVENT_ARCANE_BLAST:
                     DoCast(SPELL_ARCANE_BLAST);
-                    events.ScheduleEvent(EVENT_ARCANE_BLAST, urand(7000, 12000));
+                    events.ScheduleEvent(EVENT_ARCANE_BLAST, 7s, 12s);
                     break;
                 case EVENT_BELLOWING_ROAR:
                     DoCast(SPELL_BELLOWING_ROAR);
-                    events.ScheduleEvent(EVENT_BELLOWING_ROAR, urand(20000, 30000));
+                    events.ScheduleEvent(EVENT_BELLOWING_ROAR, 20s, 30s);
                     break;
                 default:
                     emerald_dragonAI::ExecuteEvent(eventId);

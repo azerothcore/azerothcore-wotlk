@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -473,7 +473,7 @@ public:
             if (battleStarted != ENCOUNTER_STATE_FIGHT)
                 return;
 
-            me->m_Events.AddEvent(new DelayedSummonEvent(me, creature->GetEntry(), *creature), me->m_Events.CalculateTime(3000));
+            me->m_Events.AddEventAtOffset(new DelayedSummonEvent(me, creature->GetEntry(), *creature), 3s);
             if (creature->GetEntry() >= NPC_RAMPAGING_ABOMINATION)
             {
                 --scourgeRemaining;
@@ -504,7 +504,7 @@ public:
                 tirion->AI()->Talk(SAY_LIGHT_OF_DAWN25, 4s);
 
                 tirion->m_Events.AddEventAtOffset([&, tirion] {
-                    tirion->GetMotionMaster()->MovePath(NPC_HIGHLORD_TIRION_FORDRING * 10, false);
+                    tirion->GetMotionMaster()->MoveWaypoint(NPC_HIGHLORD_TIRION_FORDRING * 10, false);
                 }, 14s);
 
                 events.Reset();
@@ -526,11 +526,11 @@ public:
             if (battleStarted != ENCOUNTER_STATE_FIGHT)
                 return;
 
-            events.RescheduleEvent(EVENT_SPELL_ANTI_MAGIC_ZONE, 15000);
-            events.RescheduleEvent(EVENT_SPELL_DEATH_STRIKE, 8000);
-            events.RescheduleEvent(EVENT_SPELL_DEATH_EMBRACE, 5000);
-            events.RescheduleEvent(EVENT_SPELL_UNHOLY_BLIGHT, 10000);
-            events.RescheduleEvent(EVENT_SPELL_DARION_MOD_DAMAGE, 500);
+            events.RescheduleEvent(EVENT_SPELL_ANTI_MAGIC_ZONE, 15s);
+            events.RescheduleEvent(EVENT_SPELL_DEATH_STRIKE, 8s);
+            events.RescheduleEvent(EVENT_SPELL_DEATH_EMBRACE, 5s);
+            events.RescheduleEvent(EVENT_SPELL_UNHOLY_BLIGHT, 10s);
+            events.RescheduleEvent(EVENT_SPELL_DARION_MOD_DAMAGE, 500ms);
         }
 
         void Reset() override
@@ -660,14 +660,14 @@ public:
                             {
                                 Position pos = LightOfDawnPos[first];
                                 summon->SetHomePosition(pos);
-                                summon->GetMotionMaster()->MovePoint(1, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), true, false);
+                                summon->GetMotionMaster()->MovePoint(1, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), FORCED_MOVEMENT_NONE, 0.f, 0.f, true, false);
                             }
                             first = first == 0 ? 1 : 0;
                         }
                         Position pos = LightOfDawnPos[first];
                         me->SetHomePosition(pos);
                         me->SetWalk(false);
-                        me->GetMotionMaster()->MovePoint(1, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), true, true);
+                        me->GetMotionMaster()->MovePoint(1, pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), FORCED_MOVEMENT_NONE, 0.f, 0.f, true, true);
                         DoCastSelf(SPELL_THE_MIGHT_OF_MOGRAINE, true);
                         break;
                     }
@@ -691,8 +691,8 @@ public:
                         {
                             orbaz->SetReactState(REACT_PASSIVE);
                             orbaz->AI()->Talk(EMOTE_LIGHT_OF_DAWN04);
-                            orbaz->GetMotionMaster()->MovePoint(2, LightOfDawnPos[2], true, true);
-                            orbaz->DespawnOrUnsummon(7000);
+                            orbaz->GetMotionMaster()->MovePoint(2, LightOfDawnPos[2], FORCED_MOVEMENT_NONE, 0.f, true, true);
+                            orbaz->DespawnOrUnsummon(7s);
                         }
 
                         for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
@@ -839,7 +839,7 @@ public:
                         alex->AI()->Talk(SAY_LIGHT_OF_DAWN41);
 
                     if (Creature* darion = GetEntryFromSummons(NPC_DARION_MOGRAINE))
-                        darion->DespawnOrUnsummon(3000);
+                        darion->DespawnOrUnsummon(3s);
                     break;
                 case EVENT_OUTRO_SCENE_19:
                     if (Creature* alex = GetEntryFromSummons(NPC_HIGHLORD_ALEXANDROS_MOGRAINE))
@@ -886,7 +886,7 @@ public:
                 case EVENT_OUTRO_SCENE_23:
                     if (Creature* alex = GetEntryFromSummons(NPC_HIGHLORD_ALEXANDROS_MOGRAINE))
                     {
-                        alex->DespawnOrUnsummon(5000);
+                        alex->DespawnOrUnsummon(5s);
                         alex->SetVisible(false);
                     }
                     break;
@@ -1055,13 +1055,13 @@ public:
                     if (Creature* lk = GetEntryFromSummons(NPC_THE_LICH_KING))
                     {
                         lk->CastSpell(lk, SPELL_EXIT_TELEPORT_VISUAL, true);
-                        lk->DespawnOrUnsummon(1500);
+                        lk->DespawnOrUnsummon(1500ms);
                     }
 
                     if (Creature* tirion = GetEntryFromSummons(NPC_HIGHLORD_TIRION_FORDRING))
                     {
                         float o = me->GetAngle(tirion);
-                        tirion->GetMotionMaster()->MovePoint(4, me->GetPositionX() + 2.0f * cos(o), me->GetPositionY() + 2.0f * std::sin(o), me->GetPositionZ(), false);
+                        tirion->GetMotionMaster()->MovePoint(4, me->GetPositionX() + 2.0f * cos(o), me->GetPositionY() + 2.0f * std::sin(o), me->GetPositionZ(), FORCED_MOVEMENT_NONE, 0.f, 0.f, false);
                         tirion->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
                         tirion->SetFaction(FACTION_FRIENDLY);
                     }
@@ -1145,7 +1145,7 @@ public:
                     }
                 case EVENT_OUTRO_SCENE_61:
                     summons.DespawnAll();
-                    me->DespawnOrUnsummon(1);
+                    me->DespawnOrUnsummon(1ms);
                     events.Reset();
                     return;
             }
@@ -1269,7 +1269,7 @@ class spell_chapter5_return_to_capital : public SpellScript
             if (creature)
             {
                 creature->PauseMovement(5000);
-                creature->SetTimedFacingToObject(player, 30000);
+                creature->SetFacingToObject(player, 30s);
 
                 if (roll_chance_i(30))
                 {

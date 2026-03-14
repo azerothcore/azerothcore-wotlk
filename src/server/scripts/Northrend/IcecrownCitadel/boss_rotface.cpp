@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -72,8 +72,6 @@ enum Spells
     SPELL_AWAKEN_PLAGUED_ZOMBIES            = 71159,
 };
 
-#define MUTATED_INFECTION RAID_MODE<int32>(69674, 71224, 73022, 73023)
-
 enum Events
 {
     EVENT_NONE,
@@ -131,13 +129,13 @@ public:
         {
         }
 
-        uint32 infectionCooldown;
+        Milliseconds infectionCooldown;
         ObjectGuid _oozeFloodDummyGUIDs[4][2];
         uint8 _oozeFloodStage;
 
         void Reset() override
         {
-            infectionCooldown = 14000;
+            infectionCooldown = 14s;
 
             for (uint8 i = 0; i < 4; ++i)
                 for (uint8 j = 0; j < 2; ++j)
@@ -193,7 +191,7 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            instance->DoRemoveAurasDueToSpellOnPlayers(MUTATED_INFECTION);
+            instance->DoRemoveAurasDueToSpellOnPlayers(sSpellMgr->GetSpellIdForDifficulty(SPELL_MUTATED_INFECTION, me));
             _JustDied();
             Talk(SAY_DEATH);
             if (Creature* professor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_PROFESSOR_PUTRICIDE)))
@@ -211,7 +209,7 @@ public:
             if (me->IsAlive() && me->IsInCombat() && !me->IsInEvadeMode())
                 summons.Summon(summon);
             else
-                summon->DespawnOrUnsummon(1);
+                summon->DespawnOrUnsummon(1ms);
         }
 
         void KilledUnit(Unit* victim) override
@@ -283,14 +281,14 @@ public:
                             DoCastSelf(SPELL_SLIME_SPRAY);
                         }
                     }
-                    events.DelayEvents(1);
+                    events.DelayEvents(1ms);
                     events.ScheduleEvent(EVENT_SLIME_SPRAY, 20s);
                     events.ScheduleEvent(EVENT_UNROOT, 0ms);
                     break;
                 case EVENT_HASTEN_INFECTIONS:
-                    if (infectionCooldown >= 8000)
+                    if (infectionCooldown >= 8s)
                     {
-                        infectionCooldown -= 2000;
+                        infectionCooldown -= 2s;
                         events.ScheduleEvent(EVENT_HASTEN_INFECTIONS, 90s);
                     }
                     break;
@@ -373,7 +371,7 @@ public:
         {
             if (Creature* rotface = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_ROTFACE)))
                 rotface->AI()->SummonedCreatureDespawn(me);
-            me->DespawnOrUnsummon(0);
+            me->DespawnOrUnsummon(0ms);
         }
 
         void UpdateAI(uint32 diff) override
@@ -798,7 +796,7 @@ class spell_rotface_unstable_ooze_explosion_suicide_aura : public AuraScript
         target->SetVisible(false);
         target->RemoveAllAuras();
         //target->ToCreature()->DespawnOrUnsummon();
-        target->ToCreature()->DespawnOrUnsummon(60000);
+        target->ToCreature()->DespawnOrUnsummon(60s);
     }
 
     void Register() override

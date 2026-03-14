@@ -1,0 +1,2 @@
+# Protect dashboard workflow – require explicit review
+.github/workflows/dashboard-ci.yml  @Yehonal

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -351,8 +351,7 @@ enum EventSpells
     SPELL_JORMUNGAR_ACHIEV                          = 68523,
     SPELL_FACTION_CHAMPIONS_KILL_CREDIT             = 68184,
     SPELL_RESILIENCE_WILL_FIX_IT_CREDIT             = 68620,
-    SPELL_TRAITOR_KING_10                           = 68186,
-    SPELL_TRAITOR_KING_25                           = 68515,
+    SPELL_TRAITOR_KING                              = 68186,
     SPELL_PORTAL_TO_DALARAN                         = 53142,
 };
 

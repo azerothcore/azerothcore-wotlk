@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -56,38 +56,30 @@ enum MountSpells
 enum ChampionSpells
 {
     // Mage (Ambrose Boltspark, Eressea Dawnsinger)
-    SPELL_FIREBALL_N                        = 66042,
-    SPELL_FIREBALL_H                        = 68310,
-    SPELL_BLAST_WAVE_N                      = 66044,
-    SPELL_BLAST_WAVE_H                      = 68312,
+    SPELL_FIREBALL                          = 66042,
+    SPELL_BLAST_WAVE                        = 66044,
     SPELL_HASTE                             = 66045,
-    SPELL_POLYMORPH_N                       = 66043,
-    SPELL_POLYMORPH_H                       = 68311,
+    SPELL_POLYMORPH                         = 66043,
 
     // Shaman (Colosos, Runok Wildmane)
-    SPELL_CHAIN_LIGHTNING_N                 = 67529,
-    SPELL_CHAIN_LIGHTNING_H                 = 68319,
+    SPELL_CHAIN_LIGHTNING                   = 67529,
     SPELL_EARTH_SHIELD                      = 67530,
-    SPELL_HEALING_WAVE_N                    = 67528,
-    SPELL_HEALING_WAVE_H                    = 68318,
+    SPELL_HEALING_WAVE                      = 67528,
     SPELL_HEX_OF_MENDING                    = 67534,
 
     // Hunter (Jaelyne Evensong, Zul'tore)
     SPELL_DISENGAGE                         = 68339,
     SPELL_LIGHTNING_ARROWS                  = 66083,
     SPELL_MULTI_SHOT                        = 66081,
-    SPELL_SHOOT_N                           = 65868,
-    SPELL_SHOOT_H                           = 67988,
+    SPELL_SHOOT                             = 65868,
 
     // Rogue (Lana Stouthammer Evensong, Deathstalker Visceri)
-    SPELL_EVISCERATE_N                      = 67709,
-    SPELL_EVISCERATE_H                      = 68317,
+    SPELL_EVISCERATE                        = 67709,
     SPELL_FAN_OF_KNIVES                     = 67706,
     SPELL_POISON_BOTTLE                     = 67701,
 
     // Warrior (Marshal Jacob Alerius, Mokra the Skullcrusher)
-    SPELL_MORTAL_STRIKE_N                   = 68783,
-    SPELL_MORTAL_STRIKE_H                   = 68784,
+    SPELL_MORTAL_STRIKE                     = 68783,
     SPELL_BLADESTORM                        = 63784,
     SPELL_INTERCEPT                         = 67540,
     SPELL_ROLLING_THROW                     = 67546, // not implemented yet!
@@ -97,15 +89,6 @@ enum Texts
 {
     SAY_TRAMPLED                            = 0,
 };
-
-#define SPELL_FIREBALL                      DUNGEON_MODE(SPELL_FIREBALL_N, SPELL_FIREBALL_H)
-#define SPELL_BLAST_WAVE                    DUNGEON_MODE(SPELL_BLAST_WAVE_N, SPELL_BLAST_WAVE_H)
-#define SPELL_POLYMORPH                     DUNGEON_MODE(SPELL_POLYMORPH_N, SPELL_POLYMORPH_H)
-#define SPELL_CHAIN_LIGHTNING               DUNGEON_MODE(SPELL_CHAIN_LIGHTNING_N, SPELL_CHAIN_LIGHTNING_H)
-#define SPELL_HEALING_WAVE                  DUNGEON_MODE(SPELL_HEALING_WAVE_N, SPELL_HEALING_WAVE_H)
-#define SPELL_SHOOT                         DUNGEON_MODE(SPELL_SHOOT_N, SPELL_SHOOT_H)
-#define SPELL_EVISCERATE                    DUNGEON_MODE(SPELL_EVISCERATE_N, SPELL_EVISCERATE_H)
-#define SPELL_MORTAL_STRIKE                 DUNGEON_MODE(SPELL_MORTAL_STRIKE_N, SPELL_MORTAL_STRIKE_H)
 
 enum MountEvents
 {
@@ -213,7 +196,7 @@ public:
             data << uint32(VEHICLE_SPELL_RIDE_HARDCODED);
             data << uint8(SPELL_FAILED_CUSTOM_ERROR);
             data << uint32(SPELL_CUSTOM_ERROR_MUST_HAVE_LANCE_EQUIPPED);
-            clicker->ToPlayer()->GetSession()->SendPacket(&data);
+            clicker->ToPlayer()->SendDirectMessage(&data);
             return false;
         }
     };
@@ -246,10 +229,16 @@ public:
             events.Reset();
         }
 
+        void MoveInLineOfSight(Unit* who) override
+        {
+            if (pInstance && pInstance->GetData(DATA_INSTANCE_PROGRESS) >= INSTANCE_PROGRESS_GRAND_CHAMPIONS_REACHED_DEST)
+                ScriptedAI::MoveInLineOfSight(who);
+        }
+
         void JustEngagedWith(Unit* /*who*/) override
         {
             events.Reset();
-            events.ScheduleEvent(EVENT_MOUNT_CHARGE, 2500ms, 4000ms);
+            events.ScheduleEvent(EVENT_MOUNT_CHARGE, 2500ms, 4s);
             events.ScheduleEvent(EVENT_SHIELD_BREAKER, 5s, 8s);
             events.ScheduleEvent(EVENT_THRUST, 3s, 5s);
             me->CastSpell(me, SPELL_TRAMPLE_AURA, true);
@@ -305,7 +294,7 @@ public:
                                 me->CastSpell(target, SPELL_MINIONS_CHARGE, false);
                             }
                         }
-                        events.Repeat(4500ms, 6000ms);
+                        events.Repeat(4500ms, 6s);
                     }
                     break;
                 case EVENT_SHIELD_BREAKER:
@@ -341,7 +330,7 @@ public:
         void JustDied(Unit* /*pKiller*/) override
         {
             me->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, 0);
-            me->DespawnOrUnsummon(10000);
+            me->DespawnOrUnsummon(10s);
             if (pInstance)
                 pInstance->SetData(DATA_MOUNT_DIED, 0);
         }
@@ -366,7 +355,7 @@ public:
             me->CastSpell(me, SPELL_BOSS_DEFEND_PERIODIC, true);
 
             events.Reset();
-            events.ScheduleEvent(EVENT_MOUNT_CHARGE, 2500ms, 4000ms);
+            events.ScheduleEvent(EVENT_MOUNT_CHARGE, 2500ms, 4s);
             events.ScheduleEvent(EVENT_SHIELD_BREAKER, 5s, 8s);
             events.ScheduleEvent(EVENT_THRUST, 3s, 5s);
 
@@ -408,6 +397,12 @@ public:
                 me->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, 0);
                 me->SetReactState(REACT_AGGRESSIVE);
             }
+        }
+
+        void MoveInLineOfSight(Unit* who) override
+        {
+            if (pInstance && pInstance->GetData(DATA_INSTANCE_PROGRESS) >= INSTANCE_PROGRESS_GRAND_CHAMPIONS_REACHED_DEST)
+                npc_escortAI::MoveInLineOfSight(who);
         }
 
         void JustEngagedWith(Unit* /*who*/) override
@@ -537,7 +532,7 @@ public:
                     return;
             }
 
-            Start(false, true);
+            Start(false);
         }
 
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -628,7 +623,7 @@ public:
                             me->CastSpell(me, SPELL_BOSS_DEFEND_PERIODIC, true);
                             me->SetRegeneratingHealth(true);
                             events.Reset();
-                            events.ScheduleEvent(EVENT_MOUNT_CHARGE, 2500ms, 4000ms);
+                            events.ScheduleEvent(EVENT_MOUNT_CHARGE, 2500ms, 4s);
                             events.ScheduleEvent(EVENT_SHIELD_BREAKER, 5s, 8s);
                             events.ScheduleEvent(EVENT_THRUST, 3s, 5s);
                             me->SetReactState(REACT_AGGRESSIVE);
@@ -754,7 +749,7 @@ public:
                                 me->CastSpell(target, SPELL_MINIONS_CHARGE, false);
                             }
                         }
-                        events.Repeat(4500ms, 6000ms);
+                        events.Repeat(4500ms, 6s);
                     }
                     break;
                 case EVENT_SHIELD_BREAKER:

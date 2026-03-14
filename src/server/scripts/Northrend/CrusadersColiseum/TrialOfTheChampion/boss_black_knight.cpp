@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -18,7 +18,11 @@
 #include "CreatureScript.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
+#include "SharedDefines.h"
+#include "Spell.h"
 #include "SpellInfo.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "trial_of_the_champion.h"
 
 enum Spells
@@ -30,49 +34,29 @@ enum Spells
     SPELL_BK_KILL_CREDIT            = 68663,
 
     // phase 1
-    SPELL_PLAGUE_STRIKE_N           = 67724,
-    SPELL_PLAGUE_STRIKE_H           = 67884,
-    SPELL_ICY_TOUCH_N               = 67718,
-    SPELL_ICY_TOUCH_H               = 67881,
-    SPELL_DEATH_RESPITE_N           = 67745,
-    SPELL_DEATH_RESPITE_H           = 68306,
+    SPELL_PLAGUE_STRIKE             = 67724,
+    SPELL_ICY_TOUCH                 = 67718,
+    SPELL_DEATH_RESPITE             = 67745,
     SPELL_DEATH_RESPITE_DUMMY       = 66798,
-    SPELL_OBLITERATE_N              = 67725,
-    SPELL_OBLITERATE_H              = 67883,
+    SPELL_OBLITERATE                = 67725,
 
     // phase 2 (+ abilities from phase 1 without death respite)
-    SPELL_ARMY_DEAD_N               = 67761,
-    SPELL_ARMY_DEAD_H               = 67874,
-    SPELL_DESECRATION_N             = 67778,
-    SPELL_DESECRATION_H             = 67877,
+    SPELL_ARMY_DEAD                 = 67761,
+    SPELL_DESECRATION               = 67778,
     SPELL_DESECRATION_SUMMON        = 67779,
     SPELL_BK_GHOUL_EXPLODE          = 67751,
 
     // phase 3
-    SPELL_DEATH_BITE_N              = 67808,
-    SPELL_DEATH_BITE_H              = 67875,
-    SPELL_MARKED_DEATH_N            = 67823,
-    SPELL_MARKED_DEATH_H            = 67882,
+    SPELL_DEATH_BITE                = 67808,
+    SPELL_MARKED_DEATH              = 67823,
 
     // ghouls
-    SPELL_CLAW_N                    = 67774,
+    SPELL_CLAW                      = 67774,
     SPELL_CLAW_H                    = 67879,
-    SPELL_EXPLODE_N                 = 67729,
-    SPELL_EXPLODE_H                 = 67886,
-    SPELL_LEAP_N                    = 67749,
-    SPELL_LEAP_H                    = 67880,
+    SPELL_EXPLODE                   = 67729,
+    SPELL_EXPLODE_H                   = 67886,
+    SPELL_LEAP                      = 67749,
 };
-#define SPELL_LEAP                  DUNGEON_MODE(SPELL_LEAP_N, SPELL_LEAP_H)
-#define SPELL_EXPLODE               DUNGEON_MODE(SPELL_EXPLODE_N, SPELL_EXPLODE_H)
-
-#define SPELL_PLAGUE_STRIKE         DUNGEON_MODE(SPELL_PLAGUE_STRIKE_N, SPELL_PLAGUE_STRIKE_H)
-#define SPELL_ICY_TOUCH             DUNGEON_MODE(SPELL_ICY_TOUCH_N, SPELL_ICY_TOUCH_H)
-#define SPELL_DEATH_RESPITE         DUNGEON_MODE(SPELL_DEATH_RESPITE_N, SPELL_DEATH_RESPITE_H)
-#define SPELL_OBLITERATE            DUNGEON_MODE(SPELL_OBLITERATE_N, SPELL_OBLITERATE_H)
-#define SPELL_ARMY_DEAD             DUNGEON_MODE(SPELL_ARMY_DEAD_N, SPELL_ARMY_DEAD_H)
-#define SPELL_DESECRATION           DUNGEON_MODE(SPELL_DESECRATION_N, SPELL_DESECRATION_H)
-#define SPELL_DEATH_BITE            DUNGEON_MODE(SPELL_DEATH_BITE_N, SPELL_DEATH_BITE_H)
-#define SPELL_MARKED_DEATH          DUNGEON_MODE(SPELL_MARKED_DEATH_N, SPELL_MARKED_DEATH_H)
 
 enum Events
 {
@@ -131,7 +115,7 @@ public:
 
         void EnterEvadeMode(EvadeReason why) override
         {
-            me->DespawnOrUnsummon(1);
+            me->DespawnOrUnsummon(1ms);
             ScriptedAI::EnterEvadeMode(why);
         }
 
@@ -182,7 +166,7 @@ public:
                 events.Reset();
                 events.ScheduleEvent(EVENT_ANNOUNCER_SAY_ZOMBIE, 2500ms);
                 events.ScheduleEvent(EVENT_SPELL_PLAGUE_STRIKE, 7s, 9s);
-                events.ScheduleEvent(EVENT_SPELL_ICY_TOUCH, 3500ms, 7000ms);
+                events.ScheduleEvent(EVENT_SPELL_ICY_TOUCH, 3500ms, 7s);
                 events.ScheduleEvent(EVENT_SPELL_DEATH_RESPITE, 13s, 15s);
                 events.ScheduleEvent(EVENT_SPELL_OBLITERATE, 11s, 19s);
             }
@@ -214,7 +198,7 @@ public:
 
                             events.Reset();
                             events.ScheduleEvent(EVENT_SPELL_PLAGUE_STRIKE, 7s, 9s);
-                            events.ScheduleEvent(EVENT_SPELL_ICY_TOUCH, 3500ms, 7000ms);
+                            events.ScheduleEvent(EVENT_SPELL_ICY_TOUCH, 3500ms, 7s);
                             events.ScheduleEvent(EVENT_SPELL_OBLITERATE, 11s, 19s);
                             events.ScheduleEvent(EVENT_SPELL_DESECRATION, 2s, 3s);
                             break;
@@ -339,7 +323,7 @@ public:
 
         void Reset() override
         {
-            Start(false, true, ObjectGuid::Empty, nullptr);
+            Start(false, ObjectGuid::Empty, nullptr);
             SetDespawnAtEnd(true);
             me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             me->SetImmuneToAll(true);
@@ -420,27 +404,6 @@ public:
             }
         }
 
-        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
-        {
-            switch (spell->Id)
-            {
-                case SPELL_CLAW_N:
-                case SPELL_CLAW_H:
-                    DoResetThreatList();
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 30.0f))
-                    {
-                        me->AddThreat(target, 100.0f);
-                        AttackStart(target);
-                    }
-                    break;
-                case SPELL_EXPLODE_H:
-                    if (target && target->IsPlayer())
-                        if (pInstance)
-                            pInstance->SetData(DATA_ACHIEV_IVE_HAD_WORSE, 0);
-                    break;
-            }
-        }
-
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
@@ -467,7 +430,7 @@ public:
                     break;
                 case 2: // claw
                     if (Unit* target = me->GetVictim())
-                        me->CastSpell(target, SPELL_CLAW_N, false);
+                        me->CastSpell(target, SPELL_CLAW, false);
                     events.Repeat(6s, 8s);
                     break;
             }
@@ -482,9 +445,51 @@ public:
     }
 };
 
+//67774,67879
+class spell_black_knight_ghoul_claw : public SpellScript
+{
+    PrepareSpellScript(spell_black_knight_ghoul_claw);
+
+    void HandleSpellHit(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            GetCaster()->GetThreatMgr().ResetAllThreat();
+            if (Unit* target = caster->GetAI()->SelectTarget(SelectTargetMethod::Random, 0, 30.0f))
+            {
+                caster->AddThreat(target, 100.0f);
+                caster->GetAI()->AttackStart(target);
+            }
+        }
+    }
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_black_knight_ghoul_claw::HandleSpellHit, EFFECT_0, SPELL_EFFECT_WEAPON_PERCENT_DAMAGE);
+    }
+};
+
+//67886
+class spell_black_knight_ghoul_explode : public SpellScript
+{
+    PrepareSpellScript(spell_black_knight_ghoul_explode);
+
+    void HandleSpellHit(SpellEffIndex /*effIndex*/)
+    {
+        if (GetHitUnit()->IsPlayer())
+            if (InstanceScript* instance = GetCaster()->GetInstanceScript())
+                instance->SetData(DATA_ACHIEV_IVE_HAD_WORSE, 0);
+    }
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_black_knight_ghoul_explode::HandleSpellHit, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+    }
+};
+
 void AddSC_boss_black_knight()
 {
     new boss_black_knight();
     new npc_black_knight_skeletal_gryphon();
     new npc_black_knight_ghoul();
+    RegisterSpellScript(spell_black_knight_ghoul_claw);
+    RegisterSpellScript(spell_black_knight_ghoul_explode);
 }

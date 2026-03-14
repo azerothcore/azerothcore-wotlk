@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -33,7 +33,6 @@ npc_escortAI::npc_escortAI(Creature* creature) : ScriptedAI(creature),
     MaxPlayerDistance(DEFAULT_MAX_PLAYER_DISTANCE),
     m_pQuestForEscort(nullptr),
     m_bIsActiveAttacker(true),
-    m_bIsRunning(false),
     m_bCanInstantRespawn(false),
     m_bCanReturnToStart(false),
     DespawnAtEnd(true),
@@ -186,9 +185,8 @@ void npc_escortAI::JustRespawned()
 void npc_escortAI::ReturnToLastPoint()
 {
     float x, y, z, o;
-    me->SetWalk(false);
     me->GetHomePosition(x, y, z, o);
-    me->GetMotionMaster()->MovePoint(POINT_LAST_POINT, x, y, z);
+    me->GetMotionMaster()->MovePoint(POINT_LAST_POINT, x, y, z, FORCED_MOVEMENT_RUN);
 }
 
 void npc_escortAI::EnterEvadeMode(EvadeReason /*why*/)
@@ -220,10 +218,10 @@ bool npc_escortAI::IsPlayerOrGroupInRange()
         {
             for (GroupReference* groupRef = group->GetFirstMember(); groupRef != nullptr; groupRef = groupRef->next())
                 if (Player* member = groupRef->GetSource())
-                    if (me->IsWithinDistInMap(member, GetMaxPlayerDistance(), true, false))
+                    if (me->IsWithinDistInMap(member, GetMaxPlayerDistance(), true, false, false))
                         return true;
         }
-        else if (me->IsWithinDistInMap(player, GetMaxPlayerDistance(), true, false))
+        else if (me->IsWithinDistInMap(player, GetMaxPlayerDistance(), true, false, false))
             return true;
     }
 
@@ -329,7 +327,6 @@ void npc_escortAI::MovementInform(uint32 moveType, uint32 pointId)
         {
             LOG_DEBUG("scripts.ai", "EscortAI has returned to original position before combat");
 
-            me->SetWalk(!m_bIsRunning);
             RemoveEscortState(STATE_ESCORT_RETURNING);
 
             if (!m_uiWPWaitTimer)
@@ -418,28 +415,8 @@ void npc_escortAI::FillPointMovementListForCreature()
     }
 }
 
-void npc_escortAI::SetRun(bool on)
-{
-    if (on)
-    {
-        if (!m_bIsRunning)
-            me->SetWalk(false);
-        else
-            LOG_DEBUG("scripts.ai", "EscortAI attempt to set run mode, but is already running.");
-    }
-    else
-    {
-        if (m_bIsRunning)
-            me->SetWalk(true);
-        else
-            LOG_DEBUG("scripts.ai", "EscortAI attempt to set walk mode, but is already walking.");
-    }
-
-    m_bIsRunning = on;
-}
-
 //TODO: get rid of this many variables passed in function.
-void npc_escortAI::Start(bool isActiveAttacker /* = true*/, bool run /* = false */, ObjectGuid playerGUID /* = ObjectGuid::Empty */, Quest const* quest /* = nullptr */, bool instantRespawn /* = false */, bool canLoopPath /* = false */, bool resetWaypoints /* = true */)
+void npc_escortAI::Start(bool isActiveAttacker /* = true*/, ObjectGuid playerGUID /* = ObjectGuid::Empty */, Quest const* quest /* = nullptr */, bool instantRespawn /* = false */, bool canLoopPath /* = false */, bool resetWaypoints /* = true */)
 {
     if (me->GetVictim())
     {
@@ -469,7 +446,6 @@ void npc_escortAI::Start(bool isActiveAttacker /* = true*/, bool run /* = false 
 
     //set variables
     m_bIsActiveAttacker = isActiveAttacker;
-    m_bIsRunning = run;
 
     m_uiPlayerGUID = playerGUID;
     m_pQuestForEscort = quest;
@@ -495,16 +471,10 @@ void npc_escortAI::Start(bool isActiveAttacker /* = true*/, bool run /* = false 
         me->SetImmuneToNPC(false);
     }
 
-    LOG_DEBUG("scripts.ai", "EscortAI started with {} waypoints. ActiveAttacker = {}, Run = {}, PlayerGUID = {}",
-        uint64(WaypointList.size()), m_bIsActiveAttacker, m_bIsRunning, m_uiPlayerGUID.ToString());
+    LOG_DEBUG("scripts.ai", "EscortAI started with {} waypoints. ActiveAttacker = {}, PlayerGUID = {}",
+        uint64(WaypointList.size()), m_bIsActiveAttacker, m_uiPlayerGUID.ToString());
 
     CurrentWP = WaypointList.begin();
-
-    //Set initial speed
-    if (m_bIsRunning)
-        me->SetWalk(false);
-    else
-        me->SetWalk(true);
 
     AddEscortState(STATE_ESCORT_ESCORTING);
     if (me->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_ACTIVE) == ESCORT_MOTION_TYPE)

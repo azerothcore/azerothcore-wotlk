@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -28,6 +28,7 @@
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "PoolMgr.h"
+#include "RaceMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellScript.h"
@@ -184,7 +185,7 @@ public:
             data << spellId;
             data << uint8(SPELL_FAILED_CUSTOM_ERROR);
             data << uint32(SPELL_CUSTOM_ERROR_CANT_BUILD_MORE_VEHICLES);
-            player->GetSession()->SendPacket(&data);
+            player->SendDirectMessage(&data);
         }
         return true;
     }
@@ -859,8 +860,8 @@ public:
 
         bool IsFriendly(Unit* passenger)
         {
-            return ((me->GetUInt32Value(GAMEOBJECT_FACTION) == WintergraspFaction[TEAM_HORDE] && passenger->getRaceMask() & RACEMASK_HORDE) ||
-                    (me->GetUInt32Value(GAMEOBJECT_FACTION) == WintergraspFaction[TEAM_ALLIANCE] && passenger->getRaceMask() & RACEMASK_ALLIANCE));
+            return ((me->GetUInt32Value(GAMEOBJECT_FACTION) == WintergraspFaction[TEAM_HORDE] && passenger->getRaceMask() & sRaceMgr->GetHordeRaceMask()) ||
+                    (me->GetUInt32Value(GAMEOBJECT_FACTION) == WintergraspFaction[TEAM_ALLIANCE] && passenger->getRaceMask() & sRaceMgr->GetAllianceRaceMask()));
         }
 
         Creature* IsValidVehicle(Creature* cVeh)

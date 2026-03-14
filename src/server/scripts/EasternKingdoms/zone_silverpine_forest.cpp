@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -111,7 +111,10 @@ public:
             creature->AI()->Talk(SAY_QUESTACCEPT, player);
 
             if (npc_escortAI* pEscortAI = CAST_AI(npc_deathstalker_erland::npc_deathstalker_erlandAI, creature->AI()))
-                pEscortAI->Start(true, false, player->GetGUID());
+            {
+                creature->SetWalk(true);
+                pEscortAI->Start(true, player->GetGUID());
+            }
         }
 
         return true;
@@ -328,7 +331,7 @@ public:
         {
             HasEnded = false;
             TalkRNG = urand(0,1);
-            events.ScheduleEvent(EVENT_APPA_INTRO, 2000);
+            events.ScheduleEvent(EVENT_APPA_INTRO, 2s);
             summons.DespawnAll();
         }
 
@@ -387,31 +390,31 @@ public:
                 case EVENT_APPA_INTRO:
                     Talk(SAY_APPA_INTRO);
                     SummonCrowd();
-                    events.ScheduleEvent(EVENT_APPA_SAY_1, 3000);
+                    events.ScheduleEvent(EVENT_APPA_SAY_1, 3s);
                     break;
                 case EVENT_APPA_SAY_1:
                     Talk(TalkRNG ? SAY_APPA_OPTION_1_1 : SAY_APPA_OPTION_2_1);
-                    events.ScheduleEvent(EVENT_APPA_SAY_2, 5000);
+                    events.ScheduleEvent(EVENT_APPA_SAY_2, 5s);
                     break;
                 case EVENT_APPA_SAY_2:
                     Talk(TalkRNG ? SAY_APPA_OPTION_1_2 : SAY_APPA_OPTION_2_2);
-                    events.ScheduleEvent(EVENT_APPA_SAY_3, 5000);
+                    events.ScheduleEvent(EVENT_APPA_SAY_3, 5s);
                     break;
                 case EVENT_APPA_SAY_3:
                     Talk(TalkRNG ? SAY_APPA_OPTION_1_3 : SAY_APPA_OPTION_2_3);
-                    events.ScheduleEvent(EVENT_APPA_SAY_4, 5000);
+                    events.ScheduleEvent(EVENT_APPA_SAY_4, 5s);
                     break;
                 case EVENT_APPA_SAY_4:
                     Talk(TalkRNG ? SAY_APPA_OPTION_1_4 : SAY_APPA_OPTION_2_4);
-                    events.ScheduleEvent(EVENT_APPA_OUTRO, 5000);
+                    events.ScheduleEvent(EVENT_APPA_OUTRO, 5s);
                     break;
                 case EVENT_APPA_OUTRO:
                     Talk(SAY_APPA_OUTRO);
-                    events.ScheduleEvent(EVENT_APPA_OUTRO_CROWD, 3000);
+                    events.ScheduleEvent(EVENT_APPA_OUTRO_CROWD, 3s);
                     break;
                 case EVENT_APPA_OUTRO_CROWD:
                     EmoteCrowd();
-                    events.ScheduleEvent(EVENT_APPA_OUTRO_END, 5000);
+                    events.ScheduleEvent(EVENT_APPA_OUTRO_END, 5s);
                     break;
                 case EVENT_APPA_OUTRO_END: // Despawn for Apparition is handled via Areatrigger SAI (5m)
                     summons.DespawnAll();

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -192,7 +192,7 @@ class spell_winter_veil_racer_slam_hit : public SpellScript
             return;
 
         target->CastSpell(target->GetPositionX() + irand(-10, 10), target->GetPositionY() + irand(-10, 10), target->GetPositionZ(), SPELL_RACER_DEATH_VISUAL, true);
-        target->DespawnOrUnsummon(3000);
+        target->DespawnOrUnsummon(3s);
         target->CastSpell(target, SPELL_RACER_FLAMES, true);
         caster->CastSpell(caster, SPELL_RACER_KILL_COUNTER, true);
 

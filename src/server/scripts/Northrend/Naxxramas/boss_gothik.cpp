@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -41,8 +41,7 @@ enum Spells
 {
     // Gothik
     SPELL_HARVEST_SOUL              = 28679,
-    SPELL_SHADOW_BOLT_10            = 29317,
-    SPELL_SHADOW_BOLT_25            = 56405,
+    SPELL_SHADOW_BOLT               = 29317,
     // Teleport spells
     SPELL_TELEPORT_DEAD             = 28025,
     SPELL_TELEPORT_LIVE             = 28026,
@@ -267,7 +266,7 @@ public:
                 std::vector<Player*> tList;
                 for(Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
                 {
-                    if (!me->IsWithinDistInMap(itr->GetSource(), 200.0f, true, false) || !itr->GetSource()->IsAlive() || itr->GetSource()->IsGameMaster())
+                    if (!me->IsWithinDistInMap(itr->GetSource(), 200.0f, true, false, false) || !itr->GetSource()->IsAlive() || itr->GetSource()->IsGameMaster())
                     {
                         continue;
                     }
@@ -283,7 +282,6 @@ public:
                     summon->AI()->AttackStart(target);
                     summon->SetInCombatWithZone();
                     summon->SetReactState(REACT_AGGRESSIVE);
-                    summon->CallForHelp(150.0f);
                 }
             }
         }
@@ -400,7 +398,7 @@ public:
                     Talk(SAY_INTRO_4);
                     break;
                 case EVENT_SHADOW_BOLT:
-                    me->CastSpell(me->GetVictim(), RAID_MODE(SPELL_SHADOW_BOLT_10, SPELL_SHADOW_BOLT_25), false);
+                    me->CastSpell(me->GetVictim(), SPELL_SHADOW_BOLT, false);
                     events.Repeat(1s);
                     break;
                 case EVENT_HARVEST_SOUL:
@@ -440,7 +438,7 @@ public:
                     if (gothikWaves[waveCount][0])
                     {
                         SummonHelpers(gothikWaves[waveCount][0]);
-                        events.RepeatEvent(gothikWaves[waveCount][1]);
+                        events.Repeat(Milliseconds(gothikWaves[waveCount][1]));
                     }
                     else
                     {
@@ -466,6 +464,19 @@ public:
                             go->SetGoState(GO_STATE_ACTIVE);
 
                         gateOpened = true;
+                        summons.DoForAllSummons([&](WorldObject* summon)
+                        {
+                            if (Creature* gothikMinion = summon->ToCreature())
+                                if (gothikMinion->IsAlive())
+                                {
+                                    if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, 200.0f))
+                                    {
+                                        gothikMinion->AI()->AttackStart(target);
+                                        gothikMinion->SetReactState(REACT_AGGRESSIVE);
+                                        gothikMinion->SetInCombatWithZone();
+                                    }
+                                }
+                        });
                         Talk(EMOTE_GATE_OPENED);
                     }
                     break;
@@ -502,7 +513,7 @@ public:
             events.Reset();
         }
 
-        void JustEngagedWith(Unit*  /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             switch (me->GetEntry())
             {
@@ -522,7 +533,7 @@ public:
                     events.ScheduleEvent(EVENT_SHADOW_BOLT_VOLLEY, 3s);
                     break;
                 case NPC_DEAD_RIDER:
-                    events.ScheduleEvent(EVENT_DRAIN_LIFE, 2000ms, 3500ms);
+                    events.ScheduleEvent(EVENT_DRAIN_LIFE, 2s, 3500ms);
                     events.ScheduleEvent(EVENT_UNHOLY_FRENZY, 5s, 9s);
                     break;
                 case NPC_DEAD_HORSE:

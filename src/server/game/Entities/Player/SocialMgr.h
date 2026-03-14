@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -104,19 +104,19 @@ class PlayerSocial
     public:
         PlayerSocial();
         // adding/removing
-        bool AddToSocialList(ObjectGuid friend_guid, SocialFlag flag);
-        void RemoveFromSocialList(ObjectGuid friend_guid, SocialFlag flag);
-        void SetFriendNote(ObjectGuid friendGuid, std::string note);
+        bool AddToSocialList(ObjectGuid const& friend_guid, SocialFlag flag);
+        void RemoveFromSocialList(ObjectGuid const& friend_guid, SocialFlag flag);
+        void SetFriendNote(ObjectGuid const& friendGuid, std::string note);
         // Packet send's
         void SendSocialList(Player* player, uint32 flags);
         // Misc
-        bool HasFriend(ObjectGuid friend_guid) const;
-        bool HasIgnore(ObjectGuid ignore_guid) const;
-        ObjectGuid GetPlayerGUID() const { return m_playerGUID; }
-        void SetPlayerGUID(ObjectGuid guid) { m_playerGUID = guid; }
+        bool HasFriend(ObjectGuid const& friend_guid) const;
+        bool HasIgnore(ObjectGuid const& ignore_guid) const;
+        ObjectGuid const& GetPlayerGUID() const { return m_playerGUID; }
+        void SetPlayerGUID(ObjectGuid const& guid) { m_playerGUID = guid; }
         uint32 GetNumberOfSocialsWithFlag(SocialFlag flag) const;
     private:
-        bool _checkContact(ObjectGuid guid, SocialFlag flags) const;
+        bool _checkContact(ObjectGuid const& guid, SocialFlag flags) const;
         typedef std::map<ObjectGuid, FriendInfo> PlayerSocialMap;
         PlayerSocialMap m_playerSocialMap;
         ObjectGuid m_playerGUID;
@@ -131,14 +131,14 @@ class SocialMgr
     public:
         static SocialMgr* instance();
         // Misc
-        void RemovePlayerSocial(ObjectGuid guid) { m_socialMap.erase(guid); }
-        static void GetFriendInfo(Player* player, ObjectGuid friendGUID, FriendInfo& friendInfo);
+        void RemovePlayerSocial(ObjectGuid const& guid) { m_socialMap.erase(guid); }
+        static void GetFriendInfo(Player* player, ObjectGuid const& friendGUID, FriendInfo& friendInfo);
         // Packet management
-        void MakeFriendStatusPacket(FriendsResult result, ObjectGuid friend_guid, WorldPacket* data);
-        void SendFriendStatus(Player* player, FriendsResult result, ObjectGuid friend_guid, bool broadcast);
+        void MakeFriendStatusPacket(FriendsResult result, ObjectGuid const& friend_guid, WorldPacket* data);
+        void SendFriendStatus(Player* player, FriendsResult result, ObjectGuid const& friend_guid, bool broadcast);
         void BroadcastToFriendListers(Player* player, WorldPacket* packet);
         // Loading
-        PlayerSocial* LoadFromDB(PreparedQueryResult result, ObjectGuid guid);
+        PlayerSocial* LoadFromDB(PreparedQueryResult result, ObjectGuid const& guid);
     private:
         typedef std::map<ObjectGuid, PlayerSocial> SocialMap;
         SocialMap m_socialMap;

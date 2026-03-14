@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -139,7 +139,7 @@ struct boss_fathomlord_karathress : public BossAI
         if (Creature* olum = instance->GetCreature(DATA_SEER_OLUM))
         {
             olum->SetWalk(true);
-            olum->GetMotionMaster()->MovePoint(0, olumWalk, false);
+            olum->GetMotionMaster()->MovePoint(0, olumWalk, FORCED_MOVEMENT_NONE, 0.f, false);
             olum->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             olum->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
         }
@@ -269,7 +269,7 @@ struct boss_fathomguard_sharkkis : public ScriptedAI
         {
             me->CastSpell(karathress, SPELL_POWER_OF_SHARKKIS, true);
             karathress->AI()->Talk(SAY_GAIN_ABILITY2);
-            me->DespawnOrUnsummon(1000);
+            me->DespawnOrUnsummon(1s);
         }
     }
 
@@ -452,7 +452,7 @@ struct boss_fathomguard_tidalvess : public ScriptedAI
         {
             me->CastSpell(karathress, SPELL_POWER_OF_TIDALVESS, true);
             karathress->AI()->Talk(SAY_GAIN_ABILITY1);
-            me->DespawnOrUnsummon(1000);
+            me->DespawnOrUnsummon(1s);
         }
     }
 
@@ -546,7 +546,7 @@ struct boss_fathomguard_caribdis : public ScriptedAI
         {
             me->CastSpell(karathress, SPELL_POWER_OF_CARIBDIS, true);
             karathress->AI()->Talk(SAY_GAIN_ABILITY3);
-            me->DespawnOrUnsummon(1000);
+            me->DespawnOrUnsummon(1s);
         }
     }
 

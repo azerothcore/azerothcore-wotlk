@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -27,11 +27,12 @@
 
 enum IronhandData
 {
-    IRONHAND_FLAMES_TIMER      = 16000,
-    IRONHAND_FLAMES_TIMER_RAND = 3000,
     IRONHAND_N_GROUPS          = 3,
     SPELL_GOUT_OF_FLAMES       = 15529
 };
+
+constexpr Milliseconds IRONHAND_FLAMES_TIMER = 16s;
+constexpr Milliseconds IRONHAND_FLAMES_TIMER_RAND = 3s;
 
 class go_shadowforge_brazier : public GameObjectScript
 {
@@ -110,7 +111,7 @@ public:
                     {
                         case SPELL_GOUT_OF_FLAMES:
                             DoCast(SPELL_GOUT_OF_FLAMES);
-                            events.RescheduleEvent(SPELL_GOUT_OF_FLAMES, urand(IRONHAND_FLAMES_TIMER - IRONHAND_FLAMES_TIMER_RAND, IRONHAND_FLAMES_TIMER + IRONHAND_FLAMES_TIMER_RAND));
+                            events.RescheduleEvent(SPELL_GOUT_OF_FLAMES, IRONHAND_FLAMES_TIMER - IRONHAND_FLAMES_TIMER_RAND, IRONHAND_FLAMES_TIMER + IRONHAND_FLAMES_TIMER_RAND);
                             break;
                         default:
                             break;
@@ -358,7 +359,8 @@ public:
                         case 0:
                             Talk(SAY_TEXT5);
                             HandleGameObject(DATA_ARENA4, false);
-                            Start(false, false);
+                            me->SetWalk(true);
+                            Start(false);
                             eventTimer = 0;
                             break;
                         case 1:
@@ -603,7 +605,10 @@ public:
                 creature->CastSpell(creature, SPELL_DRUNKEN_RAGE, false);
 
                 if (npc_escortAI* escortAI = CAST_AI(npc_rocknot::npc_rocknotAI, creature->AI()))
-                    escortAI->Start(false, false);
+                {
+                    creature->SetWalk(true);
+                    escortAI->Start(false);
+                }
             }
         }
 

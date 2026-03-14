@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -188,7 +188,7 @@ public:
             else
             {
                 creature->AI()->Talk(SAY_SUCCESS);
-                creature->GetMotionMaster()->MovePath(JAINA_RETREAT_PATH, false);
+                creature->GetMotionMaster()->MoveWaypoint(JAINA_RETREAT_PATH, false);
             }
         }
         return true;
@@ -493,15 +493,15 @@ struct npc_hyjal_ground_trash : public ScriptedAI
         case DATA_WINTERCHILL:
         case DATA_ANETHERON:
         case DATA_ALLIANCE_RETREAT:
-            me->GetMotionMaster()->MovePath(urand(ALLIANCE_BASE_CHARGE_1, ALLIANCE_BASE_CHARGE_3), false);
+            me->GetMotionMaster()->MoveWaypoint(urand(ALLIANCE_BASE_CHARGE_1, ALLIANCE_BASE_CHARGE_3), false);
             break;
         case DATA_KAZROGAL:
         case DATA_AZGALOR:
         case DATA_HORDE_RETREAT:
-            me->GetMotionMaster()->MovePath(urand(HORDE_BASE_CHARGE_1, HORDE_BASE_CHARGE_3), false);
+            me->GetMotionMaster()->MoveWaypoint(urand(HORDE_BASE_CHARGE_1, HORDE_BASE_CHARGE_3), false);
             break;
         case DATA_ARCHIMONDE:
-            me->GetMotionMaster()->MovePath(urand(NIGHT_ELF_BASE_CHARGE_1, NIGHT_ELF_BASE_CHARGE_3), false);
+            me->GetMotionMaster()->MoveWaypoint(urand(NIGHT_ELF_BASE_CHARGE_1, NIGHT_ELF_BASE_CHARGE_3), false);
             break;
         }
     }
@@ -517,7 +517,7 @@ struct npc_hyjal_ground_trash : public ScriptedAI
         case ALLIANCE_BASE_CHARGE_3:
             me->m_Events.AddEventAtOffset([this]()
                 {
-                    me->GetMotionMaster()->MovePath(urand(ALLIANCE_BASE_PATROL_1, ALLIANCE_BASE_PATROL_3), true);
+                    me->GetMotionMaster()->MoveWaypoint(urand(ALLIANCE_BASE_PATROL_1, ALLIANCE_BASE_PATROL_3), true);
                 }, 1s);
             break;
         case HORDE_BASE_CHARGE_1:
@@ -525,7 +525,7 @@ struct npc_hyjal_ground_trash : public ScriptedAI
         case HORDE_BASE_CHARGE_3:
             me->m_Events.AddEventAtOffset([this]()
                 {
-                    me->GetMotionMaster()->MovePath(urand(HORDE_BASE_PATROL_1, HORDE_BASE_PATROL_3), true);
+                    me->GetMotionMaster()->MoveWaypoint(urand(HORDE_BASE_PATROL_1, HORDE_BASE_PATROL_3), true);
                 }, 1s);
             break;
         case NIGHT_ELF_BASE_CHARGE_1:
@@ -616,9 +616,9 @@ struct npc_hyjal_gargoyle : public ScriptedAI
         case DATA_AZGALOR:
         case DATA_HORDE_RETREAT:
             if (me->GetPositionX() < 5500.f)
-                me->GetMotionMaster()->MovePath(urand(GARGOYLE_PATH_FORTRESS_1, GARGOYLE_PATH_FORTRESS_3), false);
+                me->GetMotionMaster()->MoveWaypoint(urand(GARGOYLE_PATH_FORTRESS_1, GARGOYLE_PATH_FORTRESS_3), false);
             else
-                me->GetMotionMaster()->MovePath(urand(GARGOYLE_PATH_TROLL_CAMP_1, GARGOYLE_PATH_TROLL_CAMP_3), false);
+                me->GetMotionMaster()->MoveWaypoint(urand(GARGOYLE_PATH_TROLL_CAMP_1, GARGOYLE_PATH_TROLL_CAMP_3), false);
             break;
         default:
             break;
@@ -687,9 +687,9 @@ struct npc_hyjal_frost_wyrm : public ScriptedAI
         case DATA_AZGALOR:
         case DATA_HORDE_RETREAT:
             if (me->GetPositionX() < 5500.f)
-                me->GetMotionMaster()->MovePath(FROST_WYRM_FORTRESS, false);
+                me->GetMotionMaster()->MoveWaypoint(FROST_WYRM_FORTRESS, false);
             else
-                me->GetMotionMaster()->MovePath(FROST_WYRM_TROLL_CAMP, false);
+                me->GetMotionMaster()->MoveWaypoint(FROST_WYRM_TROLL_CAMP, false);
             break;
         default:
             break;
@@ -702,7 +702,7 @@ struct npc_hyjal_frost_wyrm : public ScriptedAI
         {
             me->m_Events.AddEventAtOffset([this]()
                 {
-                    me->GetMotionMaster()->MovePath(FROST_WYRM_FORTRESS_PATROL, true);
+                    me->GetMotionMaster()->MoveWaypoint(FROST_WYRM_FORTRESS_PATROL, true);
                 }, 1s);
         }
     }

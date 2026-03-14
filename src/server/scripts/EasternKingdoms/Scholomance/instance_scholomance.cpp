@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -399,17 +399,17 @@ public:
             {
                 case 1:
                     me->CastSpell(me, BONE_ARMOR_SPELL, false);
-                    events.RepeatEvent(60000);
+                    events.Repeat(60s);
                     break;
                 case 2:
                     if (Unit* target = SelectUnitCasting())
                     {
                         me->CastSpell(target, COUNTER_SPELL, false);
-                        events.RepeatEvent(urand(10000, 20000));
+                        events.Repeat(10s, 20s);
                     }
                     else
                     {
-                        events.RepeatEvent(400);
+                        events.Repeat(400ms);
                     }
                     break;
                 case 3:
@@ -417,11 +417,11 @@ public:
                     {
                         me->CastSpell(target, DRAIN_MANA_SPELL, false);
                     }
-                    events.RepeatEvent(urand(13000, 20000));
+                    events.Repeat(13s, 20s);
                     break;
                 case 4:
                     me->CastSpell(me->GetVictim(), SHADOWBOLT_VOLLEY_SPELL, true);
-                    events.RepeatEvent(urand(11000, 17000));
+                    events.Repeat(11s, 17s);
                     break;
             }
 

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -852,7 +852,7 @@ void WorldState::HandleSunsReachSubPhaseTransition(int32 subPhaseMask, bool init
         if (!initial)
         {
             std::lock_guard<std::mutex> guard(m_sunsReachData.m_sunsReachReclamationMutex);
-            for (ObjectGuid& guid : m_sunsReachData.m_sunsReachReclamationPlayers)
+            for (ObjectGuid const& guid : m_sunsReachData.m_sunsReachReclamationPlayers)
                 if (Player* player = ObjectAccessor::FindPlayer(guid))
                 {
                     if (start)
@@ -1778,7 +1778,7 @@ bool WorldState::SummonPallid(Map* map, ScourgeInvasionData::CityAttack& zone, c
         else
             pathID = spawnLoc == 0 ? PATH_STORMWIND_KEEP : PATH_STORMWIND_TRADE_DISTRICT;
 
-        pallid->GetMotionMaster()->MovePath(pathID, false);
+        pallid->GetMotionMaster()->MoveWaypoint(pathID, false);
 
         sWorldState->SetPallidGuid(zone.zoneId, pallid->GetGUID());
     }

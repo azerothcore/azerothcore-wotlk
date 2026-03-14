@@ -9,7 +9,14 @@ on:
       - synchronize
 
 concurrency:
-  group: ${{ github.head_ref }} || concat(${{ github.ref }}, ${{ github.workflow }})
+  # One concurrency group per workflow + ref.
+  #
+  # - PRs use `refs/pull/<PR_NUMBER>/merge`, so new commits cancel older
+  #   in-progress runs for the same PR.
+  # - When a PR is merged, a push to the target branch starts a new group,
+  #   canceling any still-running PR CI.
+  # - Branch pushes are isolated by ref.
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 env:
@@ -36,16 +43,16 @@ jobs:
       - uses: actions/checkout@v4
 
       # The containers created in this workflow are used by
-      # acore-docker, which has a dependency on mod-eluna.
+      # acore-docker, which has a dependency on mod-ale.
       #
-      # If you're wanting containers without mod-eluna, the best solution is to
+      # If you're wanting containers without mod-ale, the best solution is to
       # build them locally (such as with `docker compose build`)
       - name: Download Eluna
         if: github.repository == 'azerothcore/azerothcore-wotlk' && github.ref_name == 'master'
         uses: actions/checkout@v4
         with:
-          repository: azerothcore/mod-eluna
-          path: modules/mod-eluna
+          repository: azerothcore/mod-ale
+          path: modules/mod-ale
 
       - name: Login to Docker Hub
         if: github.repository == 'azerothcore/azerothcore-wotlk' && github.ref_name == 'master'
@@ -115,6 +122,6 @@ jobs:
           event-type: azerothcore-new-images
           client-payload: >
             {
-              "ref": "${{ github.ref }}",
+              "ref": "${{ github.ref_name }}",
               "sha": "${{ github.sha }}"
             }

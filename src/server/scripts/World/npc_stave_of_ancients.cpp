@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -42,7 +42,7 @@ void NPCStaveQuestAI::RevealForm()
     {
         me->UpdateEntry(GetFormEntry("evil"));
         me->SetFullHealth();
-        me->DespawnOrUnsummon(900000);
+        me->DespawnOrUnsummon(900s);
     }
 }
 
@@ -306,11 +306,11 @@ public:
                 me->CastSpell(who, SPELL_FOOLS_PLIGHT, true);
             }
 
-            events.ScheduleEvent(EVENT_FOOLS_PLIGHT, urand(2000, 3000));
-            events.ScheduleEvent(EVENT_RANGE_CHECK, 1000);
-            events.ScheduleEvent(EVENT_UNFAIR_FIGHT, 1000);
-            events.ScheduleEvent(ARTORIUS_EVENT_DEMONIC_DOOM, urand(3000, 5000));
-            events.ScheduleEvent(ARTORIUS_EVENT_DEMONIC_ENRAGE, urand(6000, 8000));
+            events.ScheduleEvent(EVENT_FOOLS_PLIGHT, 2s, 3s);
+            events.ScheduleEvent(EVENT_RANGE_CHECK, 1s);
+            events.ScheduleEvent(EVENT_UNFAIR_FIGHT, 1s);
+            events.ScheduleEvent(ARTORIUS_EVENT_DEMONIC_DOOM, 3s, 5s);
+            events.ScheduleEvent(ARTORIUS_EVENT_DEMONIC_ENRAGE, 6s, 8s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -325,7 +325,7 @@ public:
                     me->Say(ARTORIUS_SAY);
                     me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                    events.ScheduleEvent(EVENT_REVEAL, 5000);
+                    events.ScheduleEvent(EVENT_REVEAL, 5s);
                     break;
                 case EVENT_REVEAL:
                     RevealForm();
@@ -355,7 +355,7 @@ public:
                     {
                         me->CastSpell(me->GetVictim(), SPELL_FOOLS_PLIGHT, true);
                     }
-                    events.RepeatEvent(urand(3000, 6000));
+                    events.Repeat(3s, 6s);
                     break;
                 case EVENT_RANGE_CHECK:
                     if (!me->GetVictim() || !me->GetVictim()->IsWithinDist2d(me, 60.0f))
@@ -364,7 +364,7 @@ public:
                     }
                     else
                     {
-                        events.RepeatEvent(2000);
+                        events.Repeat(2s);
                     }
                     break;
                 case EVENT_UNFAIR_FIGHT:
@@ -373,21 +373,21 @@ public:
                         SetHomePosition();
                         me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1);
                         me->SetImmuneToAll(true);
-                        me->DespawnOrUnsummon(5000);
+                        me->DespawnOrUnsummon(5s);
                         break;
                     }
-                    events.RepeatEvent(2000);
+                    events.Repeat(2s);
                     break;
                 case ARTORIUS_EVENT_DEMONIC_DOOM:
                     if (!me->GetVictim()->HasAura(ARTORIUS_SPELL_DEMONIC_DOOM))
                     {
                         me->CastSpell(me->GetVictim(), ARTORIUS_SPELL_DEMONIC_DOOM, false);
                     }
-                    events.RepeatEvent(urand(5000, 10000));
+                    events.Repeat(5s, 10s);
                     break;
                 case ARTORIUS_EVENT_DEMONIC_ENRAGE:
                     me->CastSpell(me, SPELL_DEMONIC_ENRAGE, false);
-                    events.RepeatEvent(urand(22000, 39000));
+                    events.Repeat(22s, 39s);
                     break;
             }
 
@@ -423,7 +423,7 @@ public:
             if (action == EVENT_ENCOUNTER_START)
             {
                 PrepareForEncounter();
-                events.ScheduleEvent(EVENT_ENCOUNTER_START, 5000);
+                events.ScheduleEvent(EVENT_ENCOUNTER_START, 5s);
             }
         }
     };
@@ -476,7 +476,7 @@ public:
         {
             if (flaggedForDespawn)
             {
-                me->DespawnOrUnsummon(0);
+                me->DespawnOrUnsummon(0ms);
                 flaggedForDespawn = false;
             }
         }
@@ -640,7 +640,7 @@ public:
             }
             else
             {
-                Precious()->DespawnOrUnsummon(0);
+                Precious()->DespawnOrUnsummon(0ms);
             }
         }
 
@@ -649,7 +649,7 @@ public:
             ResetState(SIMONE_SPELL_SILENCE);
             events.Reset();
 
-            events.ScheduleEvent(SIMONE_EVENT_CHECK_PET_STATE, 2000);
+            events.ScheduleEvent(SIMONE_EVENT_CHECK_PET_STATE, 2s);
         }
 
         void JustEngagedWith(Unit* who) override
@@ -664,13 +664,13 @@ public:
                     me->CastSpell(who, SPELL_FOOLS_PLIGHT, true);
                 }
 
-                events.ScheduleEvent(EVENT_RANGE_CHECK, 1000);
-                events.ScheduleEvent(EVENT_UNFAIR_FIGHT, 1000);
-                events.ScheduleEvent(SIMONE_EVENT_CHAIN_LIGHTNING, 3000);
-                events.ScheduleEvent(SIMONE_EVENT_TEMPTRESS_KISS, 1000);
+                events.ScheduleEvent(EVENT_RANGE_CHECK, 1s);
+                events.ScheduleEvent(EVENT_UNFAIR_FIGHT, 1s);
+                events.ScheduleEvent(SIMONE_EVENT_CHAIN_LIGHTNING, 3s);
+                events.ScheduleEvent(SIMONE_EVENT_TEMPTRESS_KISS, 1s);
             }
 
-            events.ScheduleEvent(EVENT_FOOLS_PLIGHT, urand(2000, 3000));
+            events.ScheduleEvent(EVENT_FOOLS_PLIGHT, 2s, 3s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -685,7 +685,7 @@ public:
                     me->TextEmote(SIMONE_EMOTE, GetGossipPlayer());
                     me->HandleEmoteCommand(EMOTE_ONESHOT_NONE);
                     me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
-                    events.ScheduleEvent(SIMONE_EVENT_TALK, 4000);
+                    events.ScheduleEvent(SIMONE_EVENT_TALK, 4s);
                     break;
                 case SIMONE_EVENT_TALK:
                     me->Say(SIMONE_SAY, GetGossipPlayer());
@@ -695,7 +695,7 @@ public:
                     {
                         Precious()->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     }
-                    events.ScheduleEvent(EVENT_REVEAL, 5000);
+                    events.ScheduleEvent(EVENT_REVEAL, 5s);
                     break;
                 case EVENT_REVEAL:
                     RevealForm();
@@ -713,7 +713,7 @@ public:
                             HandlePetRespawn();
                         }
 
-                        events.ScheduleEvent(SIMONE_EVENT_CHECK_PET_STATE, 1000);
+                        events.ScheduleEvent(SIMONE_EVENT_CHECK_PET_STATE, 1s);
                     }
                     break;
             }
@@ -730,7 +730,7 @@ public:
 
             if (me->HasUnitState(UNIT_STATE_CASTING) && eventId != EVENT_RANGE_CHECK && eventId != EVENT_UNFAIR_FIGHT)
             {
-                events.RepeatEvent(1000);
+                events.Repeat(1s);
                 return;
             }
 
@@ -742,7 +742,7 @@ public:
                     {
                         me->CastSpell(me->GetVictim(), SPELL_FOOLS_PLIGHT, true);
                     }
-                    events.RepeatEvent(urand(3000, 6000));
+                    events.Repeat(3s, 6s);
                     break;
                 case EVENT_RANGE_CHECK:
                     if (!me->GetVictim()->IsWithinDist2d(me, 60.0f))
@@ -751,7 +751,7 @@ public:
                     }
                     else
                     {
-                        events.RepeatEvent(2000);
+                        events.Repeat(2s);
                     }
                     break;
                 case EVENT_UNFAIR_FIGHT:
@@ -765,20 +765,20 @@ public:
                         me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1);
                         me->SetImmuneToAll(true);
 
-                        Precious()->DespawnOrUnsummon(5000);
+                        Precious()->DespawnOrUnsummon(5s);
 
-                        me->DespawnOrUnsummon(5000);
+                        me->DespawnOrUnsummon(5s);
                         break;
                     }
-                    events.RepeatEvent(2000);
+                    events.Repeat(2s);
                     break;
                 case SIMONE_EVENT_CHAIN_LIGHTNING:
                     me->CastSpell(me->GetVictim(), SIMONE_SPELL_CHAIN_LIGHTNING, false);
-                    events.RepeatEvent(7000);
+                    events.Repeat(7s);
                     break;
                 case SIMONE_EVENT_TEMPTRESS_KISS:
                     me->CastSpell(me->GetVictim(), SIMONE_SPELL_TEMPTRESS_KISS, false);
-                    events.RepeatEvent(45000);
+                    events.Repeat(45s);
                     break;
             }
 
@@ -805,7 +805,7 @@ public:
                 PreciousAI()->PrepareForEncounter();
             }
             gossipPlayerGUID = playerGUID;
-            events.ScheduleEvent(EVENT_ENCOUNTER_START, 1000);
+            events.ScheduleEvent(EVENT_ENCOUNTER_START, 1s);
         }
     };
 
@@ -906,11 +906,11 @@ public:
                 me->CastSpell(who, SPELL_FOOLS_PLIGHT, true);
             }
 
-            events.ScheduleEvent(EVENT_FOOLS_PLIGHT, urand(2000, 3000));
-            events.ScheduleEvent(EVENT_RANGE_CHECK, 1000);
-            events.ScheduleEvent(EVENT_UNFAIR_FIGHT, 1000);
-            events.ScheduleEvent(NELSON_EVENT_DREADFUL_FRIGHT, 10000);
-            events.ScheduleEvent(NELSON_EVENT_CREEPING_DOOM, 5000);
+            events.ScheduleEvent(EVENT_FOOLS_PLIGHT, 2s, 3s);
+            events.ScheduleEvent(EVENT_RANGE_CHECK, 1s);
+            events.ScheduleEvent(EVENT_UNFAIR_FIGHT, 1s);
+            events.ScheduleEvent(NELSON_EVENT_DREADFUL_FRIGHT, 10s);
+            events.ScheduleEvent(NELSON_EVENT_CREEPING_DOOM, 5s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -925,7 +925,7 @@ public:
                     me->Say(NELSON_SAY);
                     me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                    events.ScheduleEvent(EVENT_REVEAL, 5000);
+                    events.ScheduleEvent(EVENT_REVEAL, 5s);
                     break;
                 case EVENT_REVEAL:
                     RevealForm();
@@ -944,7 +944,7 @@ public:
 
             if (me->HasUnitState(UNIT_STATE_CASTING))
             {
-                events.RepeatEvent(1000);
+                events.Repeat(1s);
                 return;
             }
 
@@ -956,7 +956,7 @@ public:
                     {
                         me->CastSpell(me->GetVictim(), SPELL_FOOLS_PLIGHT, true);
                     }
-                    events.RepeatEvent(urand(3000, 6000));
+                    events.Repeat(3s, 6s);
                     break;
                 case EVENT_RANGE_CHECK:
                     if (!me->GetVictim()->IsWithinDist2d(me, 60.0f))
@@ -965,7 +965,7 @@ public:
                     }
                     else
                     {
-                        events.RepeatEvent(2000);
+                        events.Repeat(2s);
                     }
                     break;
                 case EVENT_UNFAIR_FIGHT:
@@ -978,18 +978,18 @@ public:
                         me->CombatStop(true);
                         me->Say(NELSON_DESPAWN_SAY);
                         me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                        me->DespawnOrUnsummon(5000);
+                        me->DespawnOrUnsummon(5s);
                         break;
                     }
-                    events.RepeatEvent(2000);
+                    events.Repeat(2s);
                     break;
                 case NELSON_EVENT_DREADFUL_FRIGHT:
                     me->CastSpell(me->GetVictim(), NELSON_SPELL_DREADFUL_FRIGHT, false);
-                    events.RepeatEvent(urand(12000, 19000));
+                    events.Repeat(12s, 19s);
                     break;
                 case NELSON_EVENT_CREEPING_DOOM:
                     me->CastSpell(me->GetVictim(), NELSON_SPELL_CREEPING_DOOM, false);
-                    events.RepeatEvent(urand(10000, 12000));
+                    events.Repeat(10s, 12s);
                     break;
             }
 
@@ -1016,7 +1016,7 @@ public:
             if (action == EVENT_ENCOUNTER_START)
             {
                 PrepareForEncounter();
-                events.ScheduleEvent(EVENT_ENCOUNTER_START, 5000);
+                events.ScheduleEvent(EVENT_ENCOUNTER_START, 5s);
             }
         }
     };
@@ -1077,12 +1077,12 @@ public:
                     me->CastSpell(who, SPELL_FOOLS_PLIGHT, true);
                 }
 
-                events.ScheduleEvent(FRANKLIN_EVENT_DEMONIC_ENRAGE, urand(9000, 13000));
-                events.ScheduleEvent(EVENT_RANGE_CHECK, 1000);
-                events.ScheduleEvent(EVENT_UNFAIR_FIGHT, 1000);
+                events.ScheduleEvent(FRANKLIN_EVENT_DEMONIC_ENRAGE, 9s, 13s);
+                events.ScheduleEvent(EVENT_RANGE_CHECK, 1s);
+                events.ScheduleEvent(EVENT_UNFAIR_FIGHT, 1s);
             }
 
-            events.ScheduleEvent(EVENT_FOOLS_PLIGHT, urand(2000, 3000));
+            events.ScheduleEvent(EVENT_FOOLS_PLIGHT, 2s, 3s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -1097,7 +1097,7 @@ public:
                     me->Say(FRANKLIN_SAY, GetGossipPlayer());
                     me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                    events.ScheduleEvent(EVENT_REVEAL, 5000);
+                    events.ScheduleEvent(EVENT_REVEAL, 5s);
                     break;
                 case EVENT_REVEAL:
                     RevealForm();
@@ -1116,7 +1116,7 @@ public:
 
             if (me->HasUnitState(UNIT_STATE_CASTING))
             {
-                events.RepeatEvent(1000);
+                events.Repeat(1s);
                 return;
             }
 
@@ -1128,7 +1128,7 @@ public:
                     {
                         me->CastSpell(me->GetVictim(), SPELL_FOOLS_PLIGHT, true);
                     }
-                    events.RepeatEvent(urand(3000, 6000));
+                    events.Repeat(3s, 6s);
                     break;
                 case EVENT_RANGE_CHECK:
                     if (!me->GetVictim()->IsWithinDist2d(me, 60.0f))
@@ -1137,7 +1137,7 @@ public:
                     }
                     else
                     {
-                        events.RepeatEvent(2000);
+                        events.Repeat(2s);
                     }
                     break;
                 case EVENT_UNFAIR_FIGHT:
@@ -1149,15 +1149,15 @@ public:
                         me->CombatStop(true);
                         me->Say(FRANKLIN_DESPAWN_SAY);
                         me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                        me->DespawnOrUnsummon(5000);
+                        me->DespawnOrUnsummon(5s);
                         break;
                     }
-                    events.RepeatEvent(2000);
+                    events.Repeat(2s);
                     break;
                 case FRANKLIN_EVENT_DEMONIC_ENRAGE:
                     me->CastSpell(me, SPELL_DEMONIC_ENRAGE, false);
                     me->TextEmote(FRANKLIN_ENRAGE_EMOTE);
-                    events.RepeatEvent(urand(9000, 22000));
+                    events.Repeat(9s, 22s);
                     break;
             }
 
@@ -1189,7 +1189,7 @@ public:
         {
             PrepareForEncounter();
             gossipPlayerGUID = playerGUID;
-            events.ScheduleEvent(EVENT_ENCOUNTER_START, 5000);
+            events.ScheduleEvent(EVENT_ENCOUNTER_START, 5s);
         }
     };
 

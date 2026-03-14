@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -102,7 +102,7 @@ struct boss_vazruden_the_herald : public BossAI
         if (summon->GetEntry() == NPC_HELLFIRE_SENTRY && summons.size() == 0)
         {
             Talk(SAY_INTRO);
-            me->GetMotionMaster()->MovePoint(POINT_MIDDLE, -1406.5f, 1746.5f, 85.0f, false);
+            me->GetMotionMaster()->MovePoint(POINT_MIDDLE, -1406.5f, 1746.5f, 85.0f, FORCED_MOVEMENT_NONE, 0.f, false);
             _JustEngagedWith();
         }
         else if (summons.size() == 0)
@@ -155,7 +155,7 @@ struct boss_nazan : public ScriptedAI
 
     void EnterEvadeMode(EvadeReason /*why*/) override
     {
-        me->DespawnOrUnsummon(1);
+        me->DespawnOrUnsummon(1ms);
     }
 
     void JustEngagedWith(Unit*) override
@@ -163,7 +163,7 @@ struct boss_nazan : public ScriptedAI
         _scheduler.CancelAll();
         _scheduler.Schedule(5ms, GROUP_PHASE_1, [this](TaskContext context)
         {
-            me->GetMotionMaster()->MovePoint(POINT_FLIGHT, NazanPos[urand(0, 2)], false);
+            me->GetMotionMaster()->MovePoint(POINT_FLIGHT, NazanPos[urand(0, 2)], FORCED_MOVEMENT_NONE, 0.f, false);
             _scheduler.DelayAll(7s);
             context.Repeat(30s);
         }).Schedule(5s, GROUP_PHASE_1, [this](TaskContext context)
@@ -193,7 +193,7 @@ struct boss_nazan : public ScriptedAI
             Talk(EMOTE_NAZAN);
             me->SetReactState(REACT_PASSIVE);
             me->InterruptNonMeleeSpells(true);
-            me->GetMotionMaster()->MovePoint(POINT_MIDDLE, -1406.5f, 1746.5f, 81.2f, false);
+            me->GetMotionMaster()->MovePoint(POINT_MIDDLE, -1406.5f, 1746.5f, 81.2f, FORCED_MOVEMENT_NONE, 0.f, false);
         }
     }
 
@@ -262,7 +262,7 @@ struct boss_vazruden : public ScriptedAI
     void EnterEvadeMode(EvadeReason /*why*/) override
     {
         Talk(SAY_WIPE);
-        me->DespawnOrUnsummon(1);
+        me->DespawnOrUnsummon(1ms);
     }
 
     void JustEngagedWith(Unit*) override

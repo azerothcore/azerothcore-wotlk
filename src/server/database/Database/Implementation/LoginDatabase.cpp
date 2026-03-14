@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -24,7 +24,7 @@ void LoginDatabaseConnection::DoPrepareStatements()
         m_stmts.resize(MAX_LOGINDATABASE_STATEMENTS);
 
     PrepareStatement(LOGIN_SEL_LOGONCHALLENGE,
-        "SELECT a.id, a.username, a.locked, a.lock_country, a.last_ip, a.failed_logins, "
+        "SELECT a.id, a.username, a.locked, a.lock_country, a.last_ip, a.Flags, a.failed_logins, "
         "ab.unbandate > UNIX_TIMESTAMP() OR ab.unbandate = ab.bandate, ab.unbandate = ab.bandate, "
         "ipb.unbandate > UNIX_TIMESTAMP() OR ipb.unbandate = ipb.bandate, ipb.unbandate = ipb.bandate, "
         "aa.gmlevel, a.totp_secret, a.salt, a.verifier "
@@ -34,7 +34,7 @@ void LoginDatabaseConnection::DoPrepareStatements()
         "LEFT JOIN ip_banned ipb ON ipb.ip = ? "
         "WHERE a.username = ?", CONNECTION_ASYNC);
     PrepareStatement(LOGIN_SEL_RECONNECTCHALLENGE,
-        "SELECT a.id, a.username, a.locked, a.lock_country, a.last_ip, a.failed_logins, "
+        "SELECT a.id, a.username, a.locked, a.lock_country, a.last_ip, a.Flags, a.failed_logins, "
         "ab.unbandate > UNIX_TIMESTAMP() OR ab.unbandate = ab.bandate, ab.unbandate = ab.bandate, "
         "ipb.unbandate > UNIX_TIMESTAMP() OR ipb.unbandate = ipb.bandate, ipb.unbandate = ipb.bandate, "
         "aa.gmlevel, a.session_key "

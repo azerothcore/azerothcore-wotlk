@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -113,7 +113,8 @@ struct npc_ranger_lilatha : public npc_escortAI
         if (quest->GetQuestId() == QUEST_ESCAPE_FROM_THE_CATACOMBS)
         {
             me->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_PASSIVE);
-            npc_escortAI::Start(true, false, player->GetGUID());
+            me->SetWalk(true);
+            Start(true, player->GetGUID());
         }
     }
 };
@@ -148,13 +149,13 @@ struct npc_sentinel_leader : public ScriptedAI
         {
             switch (id)
             {
-            case 1:
-            case 4:
-            case 7:
+            case 2:
+            case 5:
             case 8:
-            case 13:
+            case 9:
             case 14:
-            case 17:
+            case 15:
+            case 18:
                 Creature* SentinelSpy = me->FindNearestCreature(NPC_SENTINEL_SPY, 2.0f, true);
                 if (SentinelSpy)
                 {
@@ -281,10 +282,10 @@ struct npc_sentinel_infiltrator : public ScriptedAI
             case PATH_ONE:
                 switch (id)
                 {
-                    case 5:
-                    case 8:
-                    case 14:
-                    case 18:
+                    case 6:
+                    case 9:
+                    case 15:
+                    case 19:
                         Creature* SentinelInfiltrator = me->FindNearestCreature(NPC_SENTINEL_INFILTRATOR, 3.5f, true);
                         if (SentinelInfiltrator)
                         {
@@ -298,10 +299,10 @@ struct npc_sentinel_infiltrator : public ScriptedAI
             case PATH_TWO:
                 switch (id)
                 {
-                    case 5:
-                    case 7:
-                    case 14:
-                    case 17:
+                    case 6:
+                    case 8:
+                    case 15:
+                    case 18:
                         Creature* SentinelInfiltrator = me->FindNearestCreature(NPC_SENTINEL_INFILTRATOR, 3.5f, true);
                         if (SentinelInfiltrator)
                         {

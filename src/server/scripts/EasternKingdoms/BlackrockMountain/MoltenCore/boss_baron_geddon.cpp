@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -91,7 +91,7 @@ public:
                 case EVENT_INFERNO:
                 {
                     DoCastAOE(SPELL_INFERNO);
-                    events.RepeatEvent(urand(21000, 26000));
+                    events.Repeat(21s, 26s);
                     break;
                 }
                 case EVENT_IGNITE_MANA:
@@ -101,7 +101,7 @@ public:
                         DoCast(target, SPELL_IGNITE_MANA);
                     }
 
-                    events.RepeatEvent(urand(27000, 32000));
+                    events.Repeat(27s, 32s);
                     break;
                 }
                 case EVENT_LIVING_BOMB:
@@ -111,7 +111,7 @@ public:
                         DoCast(target, SPELL_LIVING_BOMB);
                     }
 
-                    events.RepeatEvent(urand(11000, 16000));
+                    events.Repeat(11s, 16s);
                     break;
                 }
             }

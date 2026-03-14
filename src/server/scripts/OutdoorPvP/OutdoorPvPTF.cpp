@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -142,7 +142,8 @@ void OutdoorPvPTF::ResetZoneToTeamControlled(TeamId team)
 
     for (auto& [guid, tower] : _capturePoints)
     {
-        dynamic_cast<OPvPCapturePointTF*>(tower)->ResetToTeamControlled(team);
+        if (auto* capturePoint = dynamic_cast<OPvPCapturePointTF*>(tower))
+            capturePoint->ResetToTeamControlled(team);
     }
 
     SendUpdateWorldState(WORLD_STATE_OPVP_TF_UI_TOWER_COUNT_H, m_HordeTowersControlled);
@@ -400,14 +401,14 @@ void OPvPCapturePointTF::ChangeState()
     {
         if (uint32 alliance_towers = ((OutdoorPvPTF*)_pvp)->GetAllianceTowersControlled())
             ((OutdoorPvPTF*)_pvp)->SetAllianceTowersControlled(--alliance_towers);
-        sWorldSessionMgr->SendZoneText(OutdoorPvPTFBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_TF_LOSE_A));
+        _pvp->GetMap()->SendZoneText(OutdoorPvPTFBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_TF_LOSE_A).c_str());
     }
     // if changing from controlling horde to alliance
     else if (_oldState == OBJECTIVESTATE_HORDE)
     {
         if (uint32 horde_towers = ((OutdoorPvPTF*)_pvp)->GetHordeTowersControlled())
             ((OutdoorPvPTF*)_pvp)->SetHordeTowersControlled(--horde_towers);
-        sWorldSessionMgr->SendZoneText(OutdoorPvPTFBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_TF_LOSE_H));
+        _pvp->GetMap()->SendZoneText(OutdoorPvPTFBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_TF_LOSE_H).c_str());
     }
 
     uint32 artkit = 21;
@@ -422,7 +423,7 @@ void OPvPCapturePointTF::ChangeState()
                 if (alliance_towers < TF_TOWER_NUM)
                     ((OutdoorPvPTF*)_pvp)->SetAllianceTowersControlled(++alliance_towers);
 
-                sWorldSessionMgr->SendZoneText(OutdoorPvPTFBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_TF_CAPTURE_A));
+                _pvp->GetMap()->SendZoneText(OutdoorPvPTFBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_TF_CAPTURE_A).c_str());
 
                 for (PlayerSet::iterator itr = _activePlayers[0].begin(); itr != _activePlayers[0].end(); ++itr)
                     if (Player* player = ObjectAccessor::FindPlayer(*itr))
@@ -437,7 +438,7 @@ void OPvPCapturePointTF::ChangeState()
                 if (horde_towers < TF_TOWER_NUM)
                     ((OutdoorPvPTF*)_pvp)->SetHordeTowersControlled(++horde_towers);
 
-                sWorldSessionMgr->SendZoneText(OutdoorPvPTFBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_TF_CAPTURE_H));
+                _pvp->GetMap()->SendZoneText(OutdoorPvPTFBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_TF_CAPTURE_H).c_str());
 
                 for (PlayerSet::iterator itr = _activePlayers[1].begin(); itr != _activePlayers[1].end(); ++itr)
                     if (Player* player = ObjectAccessor::FindPlayer(*itr))

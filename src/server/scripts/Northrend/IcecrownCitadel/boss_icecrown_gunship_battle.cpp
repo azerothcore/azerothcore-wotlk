@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -373,7 +373,7 @@ class BattleExperienceEvent : public BasicEvent
 {
 public:
     static uint32 const ExperiencedSpells[5];
-    static uint32 const ExperiencedTimes[5];
+    static Milliseconds const ExperiencedTimes[5];
 
     BattleExperienceEvent(Creature* creature) : _creature(creature), _level(0) { }
 
@@ -388,7 +388,8 @@ public:
         _creature->CastSpell(_creature, ExperiencedSpells[_level], true);
         if (_level < (_creature->GetMap()->IsHeroic() ? 4 : 3))
         {
-            _creature->m_Events.AddEvent(this, timer + ExperiencedTimes[_level]);
+            Milliseconds nextExperienceEventTime = Milliseconds(timer) + ExperiencedTimes[_level];
+            _creature->m_Events.AddEventAtOffset(this, nextExperienceEventTime);
             return false;
         }
 
@@ -401,7 +402,7 @@ private:
 };
 
 uint32 const BattleExperienceEvent::ExperiencedSpells[5] = { 0, SPELL_EXPERIENCED, SPELL_VETERAN, SPELL_ELITE, SPELL_ADDS_BERSERK };
-uint32 const BattleExperienceEvent::ExperiencedTimes[5] = { 100000, 70000, 60000, 90000, 0 };
+Milliseconds const BattleExperienceEvent::ExperiencedTimes[5] = { 100s, 70s, 60s, 90s, 0ms };
 
 class PassengerController
 {
@@ -503,7 +504,7 @@ public:
         float x, y, z, o;
         _dest.GetPosition(x, y, z, o);
         _owner->GetTransport()->CalculatePassengerPosition(x, y, z, &o);
-        _owner->GetMotionMaster()->MovePoint(EVENT_CHARGE_PREPATH, x, y, z, false);
+        _owner->GetMotionMaster()->MovePoint(EVENT_CHARGE_PREPATH, x, y, z, FORCED_MOVEMENT_NONE, 0.f, false);
         return true;
     }
 
@@ -668,14 +669,14 @@ public:
                                     continue;
                                 Creature* c = (*itr)->ToCreature();
                                 if (c->GetEntry() == NPC_SKYBREAKER_MARINE || c->GetEntry() == NPC_SKYBREAKER_SERGEANT || c->GetEntry() == NPC_KOR_KRON_REAVER || c->GetEntry() == NPC_KOR_KRON_SERGEANT)
-                                    c->DespawnOrUnsummon(1);
+                                    c->DespawnOrUnsummon(1ms);
                             }
                         }
             }
             else
             {
                 uint32 teleportSpellId = _teamIdInInstance == TEAM_HORDE ? SPELL_TELEPORT_PLAYERS_ON_RESET_H : SPELL_TELEPORT_PLAYERS_ON_RESET_A;
-                me->m_Events.AddEvent(new ResetEncounterEvent(me, teleportSpellId, _instance->GetGuidData(DATA_ENEMY_GUNSHIP)), me->m_Events.CalculateTime(8000));
+                me->m_Events.AddEventAtOffset(new ResetEncounterEvent(me, teleportSpellId, _instance->GetGuidData(DATA_ENEMY_GUNSHIP)), 8s);
             }
         }
 
@@ -703,7 +704,7 @@ public:
             }
         }
 
-        void SetGUID(ObjectGuid guid, int32 id/* = 0*/) override
+        void SetGUID(ObjectGuid const& guid, int32 id/* = 0*/) override
         {
             if (id != ACTION_SHIP_VISITS_ENEMY && id != ACTION_SHIP_VISITS_SELF)
                 return;
@@ -847,7 +848,7 @@ public:
             {
                 time_t now = GameTime::GetGameTime().count();
                 if (_firstMageCooldown > now)
-                    _events.ScheduleEvent(EVENT_SUMMON_MAGE, (_firstMageCooldown - now) * IN_MILLISECONDS);
+                    _events.ScheduleEvent(EVENT_SUMMON_MAGE, Seconds(_firstMageCooldown - now));
                 else
                     _events.ScheduleEvent(EVENT_SUMMON_MAGE, 1ms);
             }
@@ -880,7 +881,7 @@ public:
                 init.DisableTransportPathTransformations();
                 init.MovebyPath(path, 0);
                 init.Launch();
-                me->DespawnOrUnsummon(18000);
+                me->DespawnOrUnsummon(18s);
             }
         }
 
@@ -915,7 +916,7 @@ public:
                         {
                             float x, y, z, o;
                             me->GetHomePosition(x, y, z, o);
-                            me->GetMotionMaster()->MovePoint(0, x, y, z, false);
+                            me->GetMotionMaster()->MovePoint(0, x, y, z, FORCED_MOVEMENT_NONE, 0.f, false);
                         }
                     }
                     else
@@ -1072,7 +1073,7 @@ public:
                 {
                     float x, y, z, o;
                     me->GetHomePosition(x, y, z, o);
-                    me->GetMotionMaster()->MovePoint(0, x, y, z, false);
+                    me->GetMotionMaster()->MovePoint(0, x, y, z, FORCED_MOVEMENT_NONE, 0.f, false);
                 }
             }
         }
@@ -1183,7 +1184,7 @@ public:
             {
                 time_t now = GameTime::GetGameTime().count();
                 if (_firstMageCooldown > now)
-                    _events.ScheduleEvent(EVENT_SUMMON_MAGE, (_firstMageCooldown - now) * IN_MILLISECONDS);
+                    _events.ScheduleEvent(EVENT_SUMMON_MAGE, Seconds(_firstMageCooldown - now));
                 else
                     _events.ScheduleEvent(EVENT_SUMMON_MAGE, 1ms);
             }
@@ -1216,7 +1217,7 @@ public:
                 init.DisableTransportPathTransformations();
                 init.MovebyPath(path, 0);
                 init.Launch();
-                me->DespawnOrUnsummon(18000);
+                me->DespawnOrUnsummon(18s);
             }
         }
 
@@ -1251,7 +1252,7 @@ public:
                         {
                             float x, y, z, o;
                             me->GetHomePosition(x, y, z, o);
-                            me->GetMotionMaster()->MovePoint(0, x, y, z, false);
+                            me->GetMotionMaster()->MovePoint(0, x, y, z, FORCED_MOVEMENT_NONE, 0.f, false);
                         }
                     }
                     else
@@ -1411,7 +1412,7 @@ public:
                 {
                     float x, y, z, o;
                     me->GetHomePosition(x, y, z, o);
-                    me->GetMotionMaster()->MovePoint(0, x, y, z, false);
+                    me->GetMotionMaster()->MovePoint(0, x, y, z, FORCED_MOVEMENT_NONE, 0.f, false);
                 }
             }
         }
@@ -1518,7 +1519,7 @@ struct gunship_npc_AI : public ScriptedAI
             me->SetTransportHomePosition(Slot->TargetPosition);
             me->GetTransport()->CalculatePassengerPosition(x, y, z, &o);
             me->SetHomePosition(x, y, z, o);
-            me->GetMotionMaster()->MovePoint(EVENT_CHARGE_PREPATH, x, y, z, false);
+            me->GetMotionMaster()->MovePoint(EVENT_CHARGE_PREPATH, x, y, z, FORCED_MOVEMENT_NONE, 0.f, false);
         }
     }
 
@@ -1544,7 +1545,7 @@ struct gunship_npc_AI : public ScriptedAI
         if (type == POINT_MOTION_TYPE && pointId == EVENT_CHARGE_PREPATH && Slot)
         {
             me->SetFacingTo(Slot->TargetPosition.GetOrientation());
-            me->m_Events.AddEvent(new BattleExperienceEvent(me), me->m_Events.CalculateTime(BattleExperienceEvent::ExperiencedTimes[0]));
+            me->m_Events.AddEventAtOffset(new BattleExperienceEvent(me), BattleExperienceEvent::ExperiencedTimes[0]);
             me->CastSpell(me, SPELL_BATTLE_EXPERIENCE, true);
             me->SetReactState(REACT_AGGRESSIVE);
         }
@@ -1579,7 +1580,7 @@ struct npc_gunship_boarding_addAI : public ScriptedAI
         {
             SetSlotInfo(data);
             me->SetReactState(REACT_PASSIVE);
-            me->m_Events.AddEvent(new DelayedMovementEvent(me, Slot->TargetPosition), me->m_Events.CalculateTime(3000 * (Index - SLOT_MARINE_1)));
+            me->m_Events.AddEventAtOffset(new DelayedMovementEvent(me, Slot->TargetPosition), Milliseconds(3000 * (Index - SLOT_MARINE_1)));
         }
     }
 
@@ -1608,7 +1609,7 @@ struct npc_gunship_boarding_addAI : public ScriptedAI
         if (type == POINT_MOTION_TYPE && pointId == EVENT_CHARGE_PREPATH && Slot)
         {
             me->SetFacingTo(Slot->TargetPosition.GetOrientation());
-            me->m_Events.AddEvent(new BattleExperienceEvent(me), me->m_Events.CalculateTime(BattleExperienceEvent::ExperiencedTimes[0]));
+            me->m_Events.AddEventAtOffset(new BattleExperienceEvent(me), BattleExperienceEvent::ExperiencedTimes[0]);
             me->CastSpell(me, SPELL_BATTLE_EXPERIENCE, true);
             me->SetReactState(REACT_AGGRESSIVE);
 
@@ -2271,7 +2272,7 @@ class spell_igb_overheat_aura : public AuraScript
                     WorldPacket data(SMSG_CLIENT_CONTROL_UPDATE, GetUnitOwner()->GetPackGUID().size() + 1);
                     data << GetUnitOwner()->GetPackGUID();
                     data << uint8(value);
-                    player->GetSession()->SendPacket(&data);
+                    player->SendDirectMessage(&data);
                 }
             }
         }

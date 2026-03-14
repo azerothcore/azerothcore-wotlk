@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -23,6 +23,7 @@
 #include <array>
 #include <string>
 #include <vector>
+#include <numbers>
 
 enum ReactStates : uint8;
 
@@ -75,10 +76,10 @@ enum ActionFeedback
     FEEDBACK_CANT_ATT_TARGET    = 3
 };
 
-enum PetTalk
+enum PetAction : int32
 {
-    PET_TALK_SPECIAL_SPELL      = 0,
-    PET_TALK_ATTACK             = 1
+    PET_ACTION_SPECIAL_SPELL    = 0,
+    PET_ACTION_ATTACK           = 1
 };
 
 enum PetLoadState
@@ -202,8 +203,10 @@ enum PetScalingSpells
     SPELL_RISEN_GHOUL_SELF_STUN         = 47466,
 };
 
-#define PET_FOLLOW_DIST  1.0f
-#define PET_FOLLOW_ANGLE (M_PI/2)
+constexpr float PET_FOLLOW_DIST = 2.0f;
+constexpr float PET_FOLLOW_ANGLE = std::numbers::pi_v<float> / 2;
+constexpr float MINI_PET_SUMMON_ANGLE = std::numbers::pi_v<float> / 4;
+constexpr float MINI_PET_FOLLOW_ANGLE = std::numbers::pi_v<float>;
 
 class PetStable
 {

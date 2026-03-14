@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -24,6 +24,8 @@
 #include "VMapMgr2.h"
 #include <vector>
 #include <map>
+
+#include "StringFormat.h"
 
 // ******************************************
 // Map file format defines
@@ -80,10 +82,17 @@ struct map_liquidHeader
 
 namespace MMAP
 {
+    static char const* const MAP_FILE_NAME_FORMAT  = "{}/{:03}{:02}{:02}.map";
 
     uint32 const MAP_VERSION_MAGIC = 9;
 
-    TerrainBuilder::TerrainBuilder(bool skipLiquid) : m_skipLiquid (skipLiquid) { }
+    TerrainBuilder::TerrainBuilder(const std::string &dataDirPath, bool skipLiquid) :
+                m_skipLiquid (skipLiquid),
+                m_mapsPath((std::filesystem::path(dataDirPath) / "maps").string()),
+                m_vmapsPath((std::filesystem::path(dataDirPath) / "vmaps").string())
+    {
+    }
+
     TerrainBuilder::~TerrainBuilder() = default;
 
     /**************************************************************************/
@@ -134,10 +143,13 @@ namespace MMAP
     /**************************************************************************/
     bool TerrainBuilder::loadMap(uint32 mapID, uint32 tileX, uint32 tileY, MeshData& meshData, Spot portion)
     {
-        char mapFileName[255];
-        sprintf(mapFileName, "maps/%03u%02u%02u.map", mapID, tileY, tileX);
+        const std::string mapFileName = Acore::StringFormat(
+            MAP_FILE_NAME_FORMAT,
+            m_mapsPath,
+            mapID, tileY, tileX
+        );
 
-        FILE* mapFile = fopen(mapFileName, "rb");
+        FILE* mapFile = fopen(mapFileName.c_str(), "rb");
         if (!mapFile)
             return false;
 
@@ -146,7 +158,7 @@ namespace MMAP
                 fheader.versionMagic != MAP_VERSION_MAGIC)
         {
             fclose(mapFile);
-            printf("%s is the wrong version, please extract new .map files\n", mapFileName);
+            printf("%s is the wrong version, please extract new .map files\n", mapFileName.c_str());
             return false;
         }
 
@@ -665,7 +677,7 @@ namespace MMAP
     bool TerrainBuilder::loadVMap(uint32 mapID, uint32 tileX, uint32 tileY, MeshData& meshData)
     {
         IVMapMgr* vmapMgr = new VMapMgr2();
-        int result = vmapMgr->loadMap("vmaps", mapID, tileX, tileY);
+        int result = vmapMgr->loadMap(m_vmapsPath.c_str(), mapID, tileX, tileY);
         bool retval = false;
 
         do

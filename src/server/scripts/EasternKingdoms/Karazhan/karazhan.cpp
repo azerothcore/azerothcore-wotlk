@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -170,7 +170,8 @@ public:
             if (m_uiEventId == EVENT_OZ)
                 instance->SetData(DATA_OPERA_OZ_DEATHCOUNT, IN_PROGRESS);
 
-            Start(false, false);
+            me->SetWalk(true);
+            Start(false);
         }
 
         void JustEngagedWith(Unit* /*who*/) override { }
@@ -217,29 +218,22 @@ public:
             switch (m_uiEventId)
             {
                 case EVENT_OZ:
-                    if (OzDialogue[count].textid)
-                        text = OzDialogue[count].textid;
-                    if (OzDialogue[count].timer)
-                        TalkTimer = OzDialogue[count].timer;
+                    text = OzDialogue[count].textid;
+                    TalkTimer = OzDialogue[count].timer;
                     break;
-
                 case EVENT_HOOD:
-                    if (HoodDialogue[count].textid)
-                        text = HoodDialogue[count].textid;
-                    if (HoodDialogue[count].timer)
-                        TalkTimer = HoodDialogue[count].timer;
+                    text = HoodDialogue[count].textid;
+                    TalkTimer = HoodDialogue[count].timer;
                     break;
-
                 case EVENT_RAJ:
-                    if (RAJDialogue[count].textid)
-                        text = RAJDialogue[count].textid;
-                    if (RAJDialogue[count].timer)
-                        TalkTimer = RAJDialogue[count].timer;
+                    text = RAJDialogue[count].textid;
+                    TalkTimer = RAJDialogue[count].timer;
                     break;
+                default:
+                    return;
             }
 
-            if (text)
-                CreatureAI::Talk(text);
+            CreatureAI::Talk(text);
         }
 
         void PrepareEncounter()
@@ -523,9 +517,9 @@ public:
                         }
                     }
 
-                    me->DespawnOrUnsummon(100);
+                    me->DespawnOrUnsummon(100ms);
                     if (Creature* arca = ObjectAccessor::GetCreature((*me), ArcanagosGUID))
-                        arca->DespawnOrUnsummon(100);
+                        arca->DespawnOrUnsummon(100ms);
 
                     return 5000;
                 default:

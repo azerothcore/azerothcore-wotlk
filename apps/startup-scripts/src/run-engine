@@ -219,6 +219,13 @@ function parse_arguments() {
     export PARSED_CONFIG_FILE="$config_file"
     export PARSED_SERVERCONFIG="$serverconfig"
     export PARSED_SESSION_MANAGER="$session_manager"
+
+    echo "Parsed arguments:"
+    echo "  Mode: $PARSED_MODE"
+    echo "  Server Binary: $PARSED_SERVERBIN"
+    echo "  Config File: $PARSED_CONFIG_FILE"
+    echo "  Server Config: $PARSED_SERVERCONFIG"
+    echo "  Session Manager: $PARSED_SESSION_MANAGER"
 }
 
 # Start service (single run or with simple-restarter)
