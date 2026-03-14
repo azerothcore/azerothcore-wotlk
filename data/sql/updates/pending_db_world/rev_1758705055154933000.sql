@@ -26,4 +26,3 @@ INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `positi
 DELETE FROM `creature_addon` WHERE (`guid` = 96556);
 
 UPDATE `creature` SET `MovementType` = 2, `wander_distance` = 0 WHERE `id1` = 26115 and `guid` = 96556;
-
