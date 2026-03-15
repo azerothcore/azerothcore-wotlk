@@ -17,11 +17,11 @@
               boost
               cmake
               openssl
-              libmysqlclient
+              mysql84
               readline
               bzip2
+              zlib
             ];
-            MYSQL_INCLUDE_DIR = pkgs.libmysqlclient.dev + "/include/mysql";
           };
         };
       };
