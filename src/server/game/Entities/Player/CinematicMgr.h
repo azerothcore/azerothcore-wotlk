@@ -20,6 +20,7 @@
 
 #include "Define.h"
 #include "Position.h"
+#include "Timer.h"
 #include <vector>
 
 constexpr auto CINEMATIC_UPDATEDIFF = 500;
