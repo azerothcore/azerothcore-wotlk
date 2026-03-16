@@ -872,9 +872,9 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
         if (ChrClassesEntry const* cEntry = sChrClassesStore.LookupEntry(pCurrChar->getClass()))
         {
             if (cEntry->CinematicSequence)
-                pCurrChar->SendCinematicStart(cEntry->CinematicSequence);
+                pCurrChar->GetCinematicMgr().StartCinematic(cEntry->CinematicSequence);
             else if (ChrRacesEntry const* rEntry = sChrRacesStore.LookupEntry(pCurrChar->getRace()))
-                pCurrChar->SendCinematicStart(rEntry->CinematicSequence);
+                pCurrChar->GetCinematicMgr().StartCinematic(rEntry->CinematicSequence);
 
             // send new char string if not empty
             std::string_view newCharString = sWorld->getStringConfig(CONFIG_NEW_CHAR_STRING);

@@ -1703,7 +1703,7 @@ void GameObject::Use(Unit* user)
                 Player* player = user->ToPlayer();
 
                 if (info->camera.cinematicId)
-                    player->SendCinematicStart(info->camera.cinematicId);
+                    player->GetCinematicMgr().StartCinematic(info->camera.cinematicId);
 
                 if (info->camera.eventID)
                 {
