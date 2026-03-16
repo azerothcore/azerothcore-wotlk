@@ -331,6 +331,7 @@ INSERT INTO `pool_template` VALUES
 (295,1,''),
 (296,1,''),
 (297,1,''),
+(298,15,'Blood of Heroes'),
 (329,1,''),
 (330,1,''),
 (331,1,''),
@@ -9239,6 +9240,11 @@ INSERT INTO `pool_template` VALUES
 (31622,1,'IcecrownMisc - Node 6'),
 (31623,1,'IcecrownMisc - Node 7'),
 (31624,1,'IcecrownMisc - Node 8'),
+(32491,1,'Time-Lost Proto Drake / Vyragosa'),
+(32492,1,'Time-Lost Proto Drake / Vyragosa - Path 1'),
+(32493,1,'Time-Lost Proto Drake / Vyragosa - Path 2'),
+(32494,1,'Time-Lost Proto Drake / Vyragosa - Path 3'),
+(32495,1,'Time-Lost Proto Drake / Vyragosa - Path 4'),
 (42939,1,'Drogoth the Roamer'),
 (43157,1,'Ripscale'),
 (50000,5,'Raised Mud type 10 (190779)'),
@@ -9268,4 +9274,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-29 17:54:24
+-- Dump completed on 2026-03-15 20:39:04
