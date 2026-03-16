@@ -46,10 +46,7 @@ public:
     Position const& GetRemoteSightPosition() const { return _remoteSightPosition; }
 
 private:
-    // Remote location information
     Player&         _player;
-
-protected:
     uint32          _cinematicDiff;
     uint32          _activeCinematicCameraId;
     std::vector<FlyByCamera> const* _cinematicCamera;
