@@ -401,6 +401,7 @@ public:
     bool _isSpellValid;
     bool _isCritCapable;
     bool _requireCooldownInfo;
+    float JumpDistance;
 
     SpellInfo(SpellEntry const* spellEntry);
     ~SpellInfo();

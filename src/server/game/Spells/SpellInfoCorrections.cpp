@@ -1063,7 +1063,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 44461, 55361, 55362 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPPRESS_TARGET_PROCS;
-        spellInfo->AttributesEx4 |= SPELL_ATTR4_REACTIVE_DAMAGE_PROC;
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_DAMAGE_DOESNT_BREAK_AURAS;
     });
 
     // Evocation
@@ -1499,7 +1499,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_DOT_STACKING_RULE;
     });
 
-    // Activate Sunblade Protecto
+    // Activate Sunblade Protector
     ApplySpellFix({ 46475, 46476 }, [](SpellInfo* spellInfo)
     {
         spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(14); // 60yd
@@ -1546,14 +1546,21 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx6 |= SPELL_ATTR6_IGNORE_PHASE_SHIFT;
     });
 
-    // Parasitic Shadowfiend
+    // Illidan Stormrage - Parasitic Shadowfiend
     ApplySpellFix({ 41914 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Attributes |= SPELL_ATTR0_AURA_IS_DEBUFF;
         spellInfo->AttributesEx3 |= SPELL_ATTR3_DOT_STACKING_RULE;
     });
 
-    // Teleport Maiev
+    // Illidan Stormrage - Demon Fire
+    ApplySpellFix({ 40030 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
+        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_NO_CAST_LOG;
+    });
+
+    // Illidan Stormrage - Teleport Maiev
     ApplySpellFix({ 41221 }, [](SpellInfo* spellInfo)
     {
         spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(13); // 0-50000yd

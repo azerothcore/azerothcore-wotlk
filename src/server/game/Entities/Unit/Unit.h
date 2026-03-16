@@ -20,8 +20,6 @@
 
 #include "EnumFlag.h"
 #include "EventProcessor.h"
-#include "FollowerRefMgr.h"
-#include "FollowerReference.h"
 #include "HostileRefMgr.h"
 #include "ItemTemplate.h"
 #include "MotionMaster.h"
@@ -74,6 +72,7 @@ class MotionTransport;
 class Vehicle;
 class TransportBase;
 class SpellCastTargets;
+class AbstractFollower;
 
 typedef std::list<Unit*> UnitList;
 typedef std::list< std::pair<Aura*, uint8> > DispelChargesList;
@@ -1191,7 +1190,7 @@ public:
     int32 GetMechanicResistChance(SpellInfo const* spell);
     [[nodiscard]] uint32 GetResistance(SpellSchoolMask mask) const;
     [[nodiscard]] uint32 GetResistance(SpellSchools school) const { return GetUInt32Value(static_cast<uint16>(UNIT_FIELD_RESISTANCES) + school); }
-    static float GetEffectiveResistChance(Unit const* owner, SpellSchoolMask schoolMask, Unit const* victim);
+    static float GetEffectiveResistChance(Unit const* owner, SpellSchoolMask schoolMask, Unit const* victim, SpellInfo const* spellInfo = nullptr);
 
     void SetResistance(SpellSchools school, int32 val) { SetStatInt32Value(static_cast<uint16>(UNIT_FIELD_RESISTANCES) + school, val); }
     void UpdateResistanceBuffModsMod(SpellSchools school);
@@ -1881,9 +1880,9 @@ public:
     [[nodiscard]] bool IsInDisallowedMountForm() const;
 
     // Followers
-    void AddFollower(FollowerReference* ref) { m_FollowingRefMgr.insertFirst(ref); }
+    void FollowerAdded(AbstractFollower* f) { m_followingMe.insert(f); }
+    void FollowerRemoved(AbstractFollower* f) { m_followingMe.erase(f); }
     [[nodiscard]] virtual float GetFollowAngle() const { return static_cast<float>(M_PI / 2); }
-    void RemoveFollower(FollowerReference* /*ref*/ ) { /* nothing to do yet */ }
     void RemoveAllFollowers();
 
     // Pets, guardians, minions...
@@ -2229,7 +2228,7 @@ private:
     // Manage all Units that are threatened by us
     HostileRefMgr m_HostileRefMgr;
 
-    FollowerRefMgr m_FollowingRefMgr;
+    std::unordered_set<AbstractFollower*> m_followingMe;
 
     Unit* m_comboTarget;
     int8 m_comboPoints;

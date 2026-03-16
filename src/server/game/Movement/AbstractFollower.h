@@ -18,8 +18,6 @@
 #ifndef ACORE_ABSTRACTFOLLOWER_H
 #define ACORE_ABSTRACTFOLLOWER_H
 
-#include "FollowerReference.h"
-
 class Unit;
 
 class AbstractFollower
@@ -29,15 +27,10 @@ public:
     virtual ~AbstractFollower() { SetTarget(nullptr); }
 
     void SetTarget(Unit* unit);
-    Unit* GetTarget() const { return _target; }
-    bool IsTargetValid() const { return i_target.isValid(); }
+    [[nodiscard]] Unit* GetTarget() const { return _target; }
 
-    virtual void stopFollowing() { }
-
+private:
     Unit* _target = nullptr;
-
-protected:
-    FollowerReference i_target;
 };
 
 #endif

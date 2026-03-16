@@ -158,15 +158,6 @@ void PetAI::UpdateAI(uint32 diff)
     else
         m_updateAlliesTimer -= diff;
 
-    if (owner && owner->IsPlayer() && !me->GetVictim() && me->CanNotReachTarget())
-    {
-        if (me->GetDistance(owner) > 40.0f)
-        {
-            me->NearTeleportTo(owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ(), me->GetOrientation());
-            me->SetCannotReachTarget(); // Clear flag after teleport
-        }
-    }
-
     if (me->GetVictim() && me->GetVictim()->IsAlive())
     {
         // is only necessary to stop casting, the pet must not exit combat
@@ -733,7 +724,7 @@ bool PetAI::CanAttack(Unit* target, SpellInfo const* spellInfo)
         return me->GetCharmInfo()->IsCommandAttack();
 
     // CC - mobs under crowd control can be attacked if owner commanded
-    if (target->HasBreakableByDamageCrowdControlAura() && (!spellInfo || !spellInfo->HasAttribute(SPELL_ATTR4_REACTIVE_DAMAGE_PROC)))
+    if (target->HasBreakableByDamageCrowdControlAura() && (!spellInfo || !spellInfo->HasAttribute(SPELL_ATTR4_DAMAGE_DOESNT_BREAK_AURAS)))
         return me->GetCharmInfo()->IsCommandAttack();
 
     // Returning - pets ignore attacks only if owner clicked follow

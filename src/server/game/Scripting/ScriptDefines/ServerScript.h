@@ -53,23 +53,23 @@ public:
     virtual void OnSocketClose(std::shared_ptr<WorldSocket> const& /*socket*/) { }
 
     /**
-     * @brief This hook called when a packet is sent to a client. The packet object is a copy of the original packet, so reading and modifying it is safe.
+     * @brief This hook is called when a packet is sent to a client.
      *
      * @param session Contains information about the WorldSession
      * @param packet Contains information about the WorldPacket
      * @return True if you want to continue sending the packet, false if you want to disallow sending the packet
      */
-    [[nodiscard]] virtual bool CanPacketSend(WorldSession* /*session*/, WorldPacket& /*packet*/) { return true; }
+    [[nodiscard]] virtual bool CanPacketSend(WorldSession* /*session*/, WorldPacket const& /*packet*/) { return true; }
 
     /**
-     * @brief Called when a (valid) packet is received by a client. The packet object is a copy of the original packet, so
-     * reading and modifying it is safe. Make sure to check WorldSession pointer before usage, it might be null in case of auth packets
+     * @brief Called when a (valid) packet is received by a client.
+     * Make sure to check WorldSession pointer before usage, it might be null in case of auth packets
      *
      * @param session Contains information about the WorldSession
      * @param packet Contains information about the WorldPacket
-     * @return True if you want to continue receive the packet, false if you want to disallow receive the packet
+     * @return True if you want to continue receiving the packet, false if you want to disallow receiving the packet
      */
-    [[nodiscard]] virtual bool CanPacketReceive(WorldSession* /*session*/, WorldPacket& /*packet*/) { return true; }
+    [[nodiscard]] virtual bool CanPacketReceive(WorldSession* /*session*/, WorldPacket const& /*packet*/) { return true; }
 };
 
 #endif
