@@ -163,7 +163,6 @@ INSERT INTO `disenchant_loot_template` VALUES
 (65,20725,0,100,0,1,0,1,2,'Nexus Crystal'),
 (66,22450,0,100,0,1,0,1,2,'Void Crystal'),
 (67,22450,0,100,0,1,0,1,1,'Void Crystal'),
-(67,44012,44012,67,0,1,1,1,1,'(ReferenceTable)'),
 (68,34057,0,100,0,1,0,1,1,'Abyss Crystal'),
 (69,34057,0,100,0,1,0,1,2,'Abyss Crystal');
 /*!40000 ALTER TABLE `disenchant_loot_template` ENABLE KEYS */;
@@ -177,4 +176,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-29 17:53:50
+-- Dump completed on 2026-03-15 20:38:30

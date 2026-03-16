@@ -634,9 +634,11 @@ void PetAI::DoAttack(Unit* target, bool chase)
 
             if (_canMeleeAttack())
             {
-                float angle = combatRange == 0.f && !target->IsPlayer() && !target->IsPet() ? float(M_PI) : 0.f;
-                float tolerance = combatRange == 0.f ? float(M_PI_4) : float(M_PI * 2);
-                me->GetMotionMaster()->MoveChase(target, ChaseRange(0.f, combatRange), ChaseAngle(angle, tolerance));
+                std::optional<ChaseAngle> chaseAngle;
+                if (combatRange == 0.f && !target->IsPlayer() && !target->IsPet())
+                    chaseAngle.emplace(float(M_PI), float(M_PI_4));
+
+                me->GetMotionMaster()->MoveChase(target, ChaseRange(0.f, combatRange), chaseAngle);
             }
         }
         else // (Stay && ((Aggressive || Defensive) && In Melee Range)))
@@ -722,7 +724,7 @@ bool PetAI::CanAttack(Unit* target, SpellInfo const* spellInfo)
         return me->GetCharmInfo()->IsCommandAttack();
 
     // CC - mobs under crowd control can be attacked if owner commanded
-    if (target->HasBreakableByDamageCrowdControlAura() && (!spellInfo || !spellInfo->HasAttribute(SPELL_ATTR4_REACTIVE_DAMAGE_PROC)))
+    if (target->HasBreakableByDamageCrowdControlAura() && (!spellInfo || !spellInfo->HasAttribute(SPELL_ATTR4_DAMAGE_DOESNT_BREAK_AURAS)))
         return me->GetCharmInfo()->IsCommandAttack();
 
     // Returning - pets ignore attacks only if owner clicked follow
@@ -744,10 +746,15 @@ bool PetAI::CanAttack(Unit* target, SpellInfo const* spellInfo)
 
         // Check if our owner selected this target and clicked "attack"
         Unit* ownerTarget = nullptr;
-        if (Player* owner = me->GetCharmerOrOwner()->ToPlayer())
-            ownerTarget = owner->GetSelectedUnit();
-        else
-            ownerTarget = me->GetCharmerOrOwner()->GetVictim();
+        Unit* charmerOrOwner = me->GetCharmerOrOwner();
+
+        if (charmerOrOwner)
+        {
+            if (Player* owner = charmerOrOwner->ToPlayer())
+                ownerTarget = owner->GetSelectedUnit();
+            else
+                ownerTarget = charmerOrOwner->GetVictim();
+        }
 
         if (ownerTarget && me->GetCharmInfo()->IsCommandAttack())
             return (target->GetGUID() == ownerTarget->GetGUID());

@@ -1234,7 +1234,7 @@ public:
     bool OnGossipHello(Player* player, GameObject* gameobject) override
     {
         //ENGINEERING SPEC
-        if (player->HasSkill(SKILL_ENGINEERING) && player->GetBaseSkillValue(SKILL_ENGINEERING) >= 225 && player->GetLevel() >= 35)
+        if (player->HasSkill(SKILL_ENGINEERING) && player->GetBaseSkillValue(SKILL_ENGINEERING) >= 200 && player->GetLevel() >= 30)
         {
             if (player->GetQuestRewardStatus(3643) || player->GetQuestRewardStatus(3641) || player->GetQuestRewardStatus(3639))
             {

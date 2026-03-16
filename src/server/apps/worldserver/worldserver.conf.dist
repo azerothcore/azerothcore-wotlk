@@ -34,6 +34,7 @@
 #    CHARACTER DELETE
 #    CHARACTER CREATION
 #    CHARACTER
+#    ACHIEVEMENT
 #    SKILL
 #    STATS
 #    REPUTATION
@@ -2186,7 +2187,7 @@ Rate.MissChanceMultiplier.OnlyAffectsPlayer = 0
 
 #
 #     LevelReq.Trade
-#        Description: Level requirement for characters to be able to trade.
+#        Description: Level requirement for characters to be able to initiate a trade.
 #        Default:     1
 
 LevelReq.Trade = 1
@@ -2221,6 +2222,22 @@ SpellQueue.Enabled = 1
 #        Default:     400 - (400ms)
 
 SpellQueue.Window = 400
+
+#
+###################################################################################################
+
+###################################################################################################
+# ACHIEVEMENT
+#
+#    Achievement.RealmFirstKillWindow
+#        Description: Time window (in seconds) for realm first kill achievements after the first
+#                     completion. This setting controls whether multiple groups can earn the
+#                     realm first kill achievement within a short time window.
+#        Default:     60 - (Allow additional groups to complete within 60 seconds/1 minute)
+#                     0  - (Strict mode, only the first group/player gets the achievement)
+#                     1+ - (Extended window, allow N seconds for additional completions)
+
+Achievement.RealmFirstKillWindow = 60
 
 #
 ###################################################################################################
@@ -2422,6 +2439,13 @@ Rate.XP.BattlegroundKillSOTA = 1
 Rate.XP.BattlegroundKillIC   = 1
 
 #
+#    Rate.XP.BattlegroundBonus
+#        Description: Experience rate multiplier for battleground objectives (flag captures, base assaults, etc.).
+#        Default:     1
+
+Rate.XP.BattlegroundBonus = 1
+
+#
 #    Rate.Pet.LevelXP
 #        Description: Modifies the amount of experience required to level up a pet.
 #       The lower the rate the less experience is required.
@@ -2500,6 +2524,20 @@ Arena.LegacyArenaPoints = 0
 #        Default:     1
 
 Rate.ArenaPoints = 1
+
+#
+#    Rate.ArenaPoints2v2
+#        Description: Arena points gain rate for 2v2 bracket.
+#        Default:     0.76
+
+Rate.ArenaPoints2v2 = 0.76
+
+#
+#    Rate.ArenaPoints3v3
+#        Description: Arena points gain rate for 3v3 bracket.
+#        Default:     0.88
+
+Rate.ArenaPoints3v3 = 0.88
 
 #
 #    PvPToken.Enable
@@ -3382,6 +3420,16 @@ DungeonFinder.CastDeserter = 1
 #        Default:     1 - (Blizzlike: All dungeons are available for queue, even if already completed)
 
 DungeonFinder.AllowCompleted = 1
+
+#
+#    DungeonFinder.DungeonSelectionCooldown
+#
+#        Description: Duration in minutes for the dungeon selection cooldown. Players who complete a
+#                     random dungeon via LFG will not be assigned the same dungeon again for this
+#                     duration. This reduces the chance of getting the same dungeon in a row.
+#        Default:     0 - (Disabled)
+
+DungeonFinder.DungeonSelectionCooldown = 0
 
 #
 ###################################################################################################
@@ -4583,20 +4631,6 @@ Calculate.Creature.Zone.Area.Data = 0
 Calculate.Gameoject.Zone.Area.Data = 0
 
 #
-#    TeleportTimeoutNear
-#       Description:  No description
-#       Default:  25
-
-TeleportTimeoutNear = 25
-
-#
-#    TeleportTimeoutFar
-#       Description:  No description
-#       Default:  45
-
-TeleportTimeoutFar = 45
-
-#
 #    DailyRBGArenaPoints.MinLevel
 #        Description: Allows gaining arena points on the first RBG win at level 70.
 #        Default: 71 - (Blizzlike)
@@ -4644,6 +4678,14 @@ Debug.Battleground = 0
 #                 1 - (Enabled)
 
 Debug.Arena = 0
+
+#
+#    Debug.LFG
+#        Description: Enable or disable LFG 1 player queue mode. (If enabled, the in-game command is disabled.)
+#        Default: 0 - (Disabled)
+#                 1 - (Enabled)
+
+Debug.LFG = 0
 
 #
 ###################################################################################################

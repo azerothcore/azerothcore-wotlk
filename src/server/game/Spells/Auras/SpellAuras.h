@@ -64,9 +64,9 @@ public:
     uint8 GetSlot() const { return _slot; }
     uint8 GetFlags() const { return _flags; }
     uint8 GetEffectMask() const { return _flags & (AFLAG_EFF_INDEX_0 | AFLAG_EFF_INDEX_1 | AFLAG_EFF_INDEX_2); }
-    bool HasEffect(uint8 effect) const { ASSERT(effect < MAX_SPELL_EFFECTS);  return _flags & (1 << effect); }
-    bool IsPositive() const { return _flags & AFLAG_POSITIVE; }
-    bool IsSelfcasted() const { return _flags & AFLAG_CASTER; }
+    bool HasEffect(uint8 effect) const { ASSERT(effect < MAX_SPELL_EFFECTS); return (_flags & (1 << effect)) != 0; }
+    bool IsPositive() const { return (_flags & AFLAG_POSITIVE) != 0; }
+    bool IsSelfcasted() const { return (_flags & AFLAG_CASTER) != 0; }
     uint8 GetEffectsToApply() const { return _effectsToApply; }
 
     void SetRemoveMode(AuraRemoveMode mode) { _removeMode = mode; }
@@ -193,17 +193,17 @@ public:
     bool IsAuraStronger(Aura const* newAura) const;
 
     // Proc system
-    // this subsystem is not yet in use - the core of it is functional, but still some research has to be done
-    // and some dependant problems fixed before it can replace old proc system (for example cooldown handling)
-    // currently proc system functionality is implemented in Unit::ProcDamageAndSpell
-    bool IsProcOnCooldown() const;
-    void AddProcCooldown(Milliseconds msec);
+    bool IsProcOnCooldown(TimePoint now) const;
+    void AddProcCooldown(TimePoint cooldownEnd);
+    void AddProcCooldown(SpellProcEntry const* procEntry, TimePoint now);
+    void ResetProcCooldown();
     bool IsUsingCharges() const { return m_isUsingCharges; }
     void SetUsingCharges(bool val) { m_isUsingCharges = val; }
-    void PrepareProcToTrigger(AuraApplication* aurApp, ProcEventInfo& eventInfo);
-    bool IsProcTriggeredOnEvent(AuraApplication* aurApp, ProcEventInfo& eventInfo) const;
+    void PrepareProcToTrigger(AuraApplication* aurApp, ProcEventInfo& eventInfo, TimePoint now);
+    uint8 GetProcEffectMask(AuraApplication* aurApp, ProcEventInfo& eventInfo, TimePoint now) const;
     float CalcProcChance(SpellProcEntry const& procEntry, ProcEventInfo& eventInfo) const;
-    void TriggerProcOnEvent(AuraApplication* aurApp, ProcEventInfo& eventInfo);
+    void TriggerProcOnEvent(uint8 procEffectMask, AuraApplication* aurApp, ProcEventInfo& eventInfo);
+    void ConsumeProcCharges(SpellProcEntry const* procEntry);
 
     // AuraScript
     void LoadScripts();
@@ -227,6 +227,7 @@ public:
 
     // Spell Proc Hooks
     bool CallScriptCheckProcHandlers(AuraApplication const* aurApp, ProcEventInfo& eventInfo);
+    bool CallScriptCheckEffectProcHandlers(AuraEffect const* aurEff, AuraApplication const* aurApp, ProcEventInfo& eventInfo);
     bool CallScriptAfterCheckProcHandlers(AuraApplication const* aurApp, ProcEventInfo& eventInfo, bool isTriggeredAtSpellProcEvent);
     bool CallScriptPrepareProcHandlers(AuraApplication const* aurApp, ProcEventInfo& eventInfo);
     bool CallScriptProcHandlers(AuraApplication const* aurApp, ProcEventInfo& eventInfo);
@@ -269,6 +270,8 @@ protected:
     bool m_isRemoved: 1;
     bool m_isSingleTarget: 1;                       // true if it's a single target spell and registered at caster - can change at spell steal for example
     bool m_isUsingCharges: 1;
+
+    TimePoint m_procCooldown;
 
 private:
     Unit::AuraApplicationList m_removedApplications;

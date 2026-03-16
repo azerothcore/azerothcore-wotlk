@@ -238,7 +238,8 @@ struct npc_necropolis_health : public ScriptedAI
         if (spellInfo->Id == SPELL_DESPAWNER_OTHER && target->GetEntry() == NPC_NECROPOLIS)
         {
             DespawnNecropolis();
-            dynamic_cast<Creature*>(target)->DespawnOrUnsummon();
+            if (Creature* creature = target->ToCreature())
+                creature->DespawnOrUnsummon();
             me->DespawnOrUnsummon();
         }
     }

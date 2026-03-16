@@ -90,7 +90,7 @@ struct boss_pathaleon_the_calculator : public BossAI
             me->LoadEquipment(EQUIPMENT_FRENZY);
         });
 
-        scheduler.Schedule(20s, 25s, [this](TaskContext context)
+        scheduler.Schedule(10s, 16s, [this](TaskContext context)
         {
             if (!_isEnraged)
             {
@@ -113,7 +113,7 @@ struct boss_pathaleon_the_calculator : public BossAI
             me->ModifyPower(POWER_MANA, 5000);
             DoCastSelf(SPELL_ARCANE_TORRENT);
             context.Repeat(15s);
-        }).Schedule(10s, 15s, [this](TaskContext context)
+        }).Schedule(10s, 16s, [this](TaskContext context)
         {
             if (DoCastRandomTarget(SPELL_DOMINATION, 0, 50.0f, true, false, false) == SPELL_CAST_OK)
             {

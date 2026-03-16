@@ -56,17 +56,20 @@ struct boss_talon_king_ikiss : public BossAI
     void Reset() override
     {
         _Reset();
-        _spoken = false;
+        me->SetReactState(REACT_AGGRESSIVE);
         ScheduleHealthCheckEvent({ 80, 50, 25 }, [&] {
             me->InterruptNonMeleeSpells(false);
+            me->SetReactState(REACT_PASSIVE);
+            me->AttackStop();
             DoCastAOE(SPELL_BLINK);
             DoCastSelf(SPELL_ARCANE_BUBBLE, true);
             Talk(EMOTE_ARCANE_EXP);
             scheduler.Schedule(1s, [this](TaskContext /*context*/)
             {
                 DoCastAOE(SPELL_ARCANE_EXPLOSION);
-            }).Schedule(6500ms, [this](TaskContext /*context*/)
+            }).Schedule(7s, [this](TaskContext /*context*/)
             {
+                me->SetReactState(REACT_AGGRESSIVE);
                 me->GetThreatMgr().ResetAllThreat();
             });
         });
@@ -160,7 +163,7 @@ class spell_talon_king_ikiss_blink : public SpellScript
     void HandleDummyHitTarget(SpellEffIndex effIndex)
     {
         PreventHitDefaultEffect(effIndex);
-        GetHitUnit()->CastSpell(GetCaster(), SPELL_BLINK_TELEPORT, true);
+        GetCaster()->CastSpell(GetHitUnit(), SPELL_BLINK_TELEPORT, true);
     }
 
     void Register() override

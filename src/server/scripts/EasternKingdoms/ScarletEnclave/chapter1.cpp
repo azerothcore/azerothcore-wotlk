@@ -44,6 +44,11 @@ enum DeathComesFromOnHigh
     SPELL_CALL_OF_THE_DEAD = 51900
 };
 
+enum GothikActions
+{
+    ACTION_DK_INITIATE_ASSAULT_ROAR = 15
+};
+
 // 51904 - Summon Ghouls On Scarlet Crusade
 class spell_q12641_death_comes_from_on_high_summon_ghouls : public SpellScript
 {
@@ -94,210 +99,6 @@ class spell_q12641_death_comes_from_on_high_recall_eye : public SpellScript
     {
         OnEffectHitTarget += SpellEffectFn(spell_q12641_death_comes_from_on_high_recall_eye::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
-};
-
-enum deathsChallenge
-{
-    SPELL_DUEL                  = 52996,
-    //SPELL_DUEL_TRIGGERED        = 52990,
-    SPELL_DUEL_VICTORY          = 52994,
-    SPELL_DUEL_FLAG             = 52991,
-
-    SAY_DUEL                    = 0,
-
-    QUEST_DEATH_CHALLENGE       = 12733,
-
-    DATA_IN_PROGRESS            = 0,
-
-    EVENT_SPEAK                 = 1, // 1 - 6
-    EVENT_DUEL_LOST             = 7, // 7 - 8
-};
-
-class npc_death_knight_initiate : public CreatureScript
-{
-public:
-    npc_death_knight_initiate() : CreatureScript("npc_death_knight_initiate") { }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_INFO_DEF)
-        {
-            CloseGossipMenuFor(player);
-
-            if (player->IsInCombat() || creature->IsInCombat())
-                return true;
-
-            if (creature->AI()->GetData(DATA_IN_PROGRESS))
-                return true;
-
-            creature->RemoveUnitFlag(UNIT_FLAG_SWIMMING);
-
-            player->CastSpell(creature, SPELL_DUEL, false);
-            player->CastSpell(player, SPELL_DUEL_FLAG, true);
-        }
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (player->GetQuestStatus(QUEST_DEATH_CHALLENGE) == QUEST_STATUS_INCOMPLETE && creature->IsFullHealth())
-        {
-            if (player->HealthBelowPct(10))
-                return true;
-
-            if (player->IsInCombat() || creature->IsInCombat())
-                return true;
-
-            if (!creature->AI()->GetGUID(player->GetGUID().GetCounter()))
-                AddGossipItemFor(player, 9765, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-
-            SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-        }
-        return true;
-    }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_death_knight_initiateAI(creature);
-    }
-
-    struct npc_death_knight_initiateAI : public CombatAI
-    {
-        npc_death_knight_initiateAI(Creature* creature) : CombatAI(creature) { }
-
-        bool _duelInProgress;
-        ObjectGuid _duelGUID;
-        EventMap events;
-        std::set<uint32> playerGUIDs;
-        uint32 timer = 0;
-
-        uint32 GetData(uint32 data) const override
-        {
-            if (data == DATA_IN_PROGRESS)
-                return _duelInProgress;
-
-            return playerGUIDs.find(data) != playerGUIDs.end();
-        }
-
-        void Reset() override
-        {
-            _duelInProgress = false;
-            _duelGUID.Clear();
-            me->RestoreFaction();
-            CombatAI::Reset();
-
-            me->SetUnitFlag(UNIT_FLAG_SWIMMING);
-        }
-
-        void SpellHit(Unit* caster, SpellInfo const* pSpell) override
-        {
-            if (!_duelInProgress && pSpell->Id == SPELL_DUEL)
-            {
-                playerGUIDs.insert(caster->GetGUID().GetCounter());
-                _duelGUID = caster->GetGUID();
-                _duelInProgress = true;
-
-                timer = 600000; // clear playerGUIDs after 10 minutes if no one initiates a duel
-                me->SetFacingToObject(caster);
-
-                events.ScheduleEvent(EVENT_SPEAK, 3s);
-                events.ScheduleEvent(EVENT_SPEAK + 1, 7s);
-                events.ScheduleEvent(EVENT_SPEAK + 2, 8s);
-                events.ScheduleEvent(EVENT_SPEAK + 3, 9s);
-                events.ScheduleEvent(EVENT_SPEAK + 4, 10s);
-                events.ScheduleEvent(EVENT_SPEAK + 5, 11s);
-            }
-        }
-
-        void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
-        {
-            if (attacker && _duelInProgress && attacker->IsControlledByPlayer())
-            {
-                if (attacker->GetCharmerOrOwnerOrOwnGUID() != _duelGUID)
-                    damage = 0;
-                else if (damage >= me->GetHealth())
-                {
-                    damage = 0;
-                    events.ScheduleEvent(EVENT_DUEL_LOST, 2s);
-                    events.ScheduleEvent(EVENT_DUEL_LOST + 1, 6s);
-                    _duelGUID.Clear();
-                    _duelInProgress = 0;
-
-                    attacker->RemoveGameObject(SPELL_DUEL_FLAG, true);
-                    attacker->AttackStop();
-                    me->CombatStop(false);
-                    me->RemoveAllAuras();
-                    me->CastSpell(attacker, SPELL_DUEL_VICTORY, true);
-                    me->RestoreFaction();
-                    me->DespawnOrUnsummon(10s);
-                }
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (timer != 0)
-            {
-                if (timer <= diff)
-                {
-                    timer = 0;
-                    playerGUIDs.clear();
-                }
-                else
-                {
-                    timer -= diff;
-                }
-            }
-
-            events.Update(diff);
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_SPEAK:
-                    Talk(SAY_DUEL, ObjectAccessor::GetPlayer(*me, _duelGUID));
-                    break;
-                case EVENT_SPEAK+1:
-                    Talk(SAY_DUEL + 1, ObjectAccessor::GetPlayer(*me, _duelGUID));
-                    break;
-                case EVENT_SPEAK+2:
-                    Talk(SAY_DUEL + 2, ObjectAccessor::GetPlayer(*me, _duelGUID));
-                    break;
-                case EVENT_SPEAK+3:
-                    Talk(SAY_DUEL + 3, ObjectAccessor::GetPlayer(*me, _duelGUID));
-                    break;
-                case EVENT_SPEAK+4:
-                    Talk(SAY_DUEL + 4, ObjectAccessor::GetPlayer(*me, _duelGUID));
-                    break;
-                case EVENT_SPEAK+5:
-                    me->SetFaction(FACTION_UNDEAD_SCOURGE_2);
-                    if (Player* player = ObjectAccessor::GetPlayer(*me, _duelGUID))
-                        AttackStart(player);
-                    return;
-                case EVENT_DUEL_LOST:
-                    me->CastSpell(me, 7267, true);
-                    break;
-                case EVENT_DUEL_LOST+1:
-                    EnterEvadeMode();
-                    return;
-            }
-
-            if (!events.Empty() || !UpdateVictim())
-                return;
-
-            if (_duelInProgress)
-            {
-                if (me->GetVictim()->GetGUID() == _duelGUID && me->GetVictim()->HealthBelowPct(10))
-                {
-                    me->GetVictim()->CastSpell(me->GetVictim(), 7267, true); // beg
-                    me->GetVictim()->RemoveGameObject(SPELL_DUEL_FLAG, true);
-                    EnterEvadeMode();
-                    return;
-                }
-            }
-
-            CombatAI::UpdateAI(diff);
-        }
-    };
 };
 
 enum GiftOfTheHarvester
@@ -473,6 +274,9 @@ public:
                 spoken = 5000;
                 Talk(SAY_GOTHIK_PIT);
             }
+
+            if (action == ACTION_DK_INITIATE_ASSAULT_ROAR)
+                me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
         }
 
         void MoveInLineOfSight(Unit* who) override
@@ -924,7 +728,6 @@ void AddSC_the_scarlet_enclave_c1()
 {
     RegisterSpellScript(spell_q12641_death_comes_from_on_high_summon_ghouls);
     RegisterSpellScript(spell_q12641_death_comes_from_on_high_recall_eye);
-    new npc_death_knight_initiate();
     RegisterSpellScript(spell_item_gift_of_the_harvester);
     RegisterSpellScript(spell_q12698_the_gift_that_keeps_on_giving);
     new npc_scarlet_ghoul();

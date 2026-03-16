@@ -1177,9 +1177,6 @@ bool Player::UpdatePosition(float x, float y, float z, float orientation,
     if (GetGroup())
         SetGroupUpdateFlag(GROUP_UPDATE_FLAG_POSITION);
 
-    if (GetTrader() && !IsWithinDistInMap(GetTrader(), INTERACTION_DISTANCE))
-        GetSession()->SendCancelTrade(TRADE_STATUS_TRADE_CANCELED);
-
     CheckAreaExploreAndOutdoor();
 
     return true;
