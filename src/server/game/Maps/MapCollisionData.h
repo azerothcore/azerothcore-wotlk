@@ -59,7 +59,7 @@ class MMapData
     friend class MapCollisionData;
 
 public:
-    dtNavMesh const* GetNavMesh() { return _navMesh.get(); }
+    dtNavMesh const* GetNavMesh() const { return _navMesh.get(); }
     dtNavMeshQuery const* GetNavMeshQuery();
 
 protected:

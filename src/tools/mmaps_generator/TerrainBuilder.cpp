@@ -677,7 +677,6 @@ namespace MMAP
     bool TerrainBuilder::loadVMap(uint32 mapID, uint32 tileX, uint32 tileY, MeshData& meshData)
     {
         std::string const mapFileName = VMapMgr2::getMapFileName(mapID);
-        std::unique_ptr<VMapMgr2> vmapMgr = std::make_unique<VMapMgr2>();
         std::unique_ptr<StaticMapTree> staticTree = std::make_unique<StaticMapTree>(mapID, m_vmapsPath);
         if (!staticTree->InitMap(mapFileName))
             return false;

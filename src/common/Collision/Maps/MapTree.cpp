@@ -370,7 +370,7 @@ namespace VMAP
 
                     if (fread(&referencedVal, sizeof(uint32), 1, tf) == 1)
                     {
-                        if (referencedVal > iNTreeValues)
+                        if (referencedVal >= iNTreeValues)
                         {
                             LOG_DEBUG("maps", "StaticMapTree::LoadMapTile() : invalid tree element ({}/{})", referencedVal, iNTreeValues);
                             continue;
