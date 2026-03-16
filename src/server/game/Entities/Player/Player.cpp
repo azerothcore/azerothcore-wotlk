@@ -16344,17 +16344,3 @@ void Player::SendSystemMessage(std::string_view msg, bool escapeCharacters)
 {
     ChatHandler(GetSession()).SendSysMessage(msg, escapeCharacters);
 }
-
-// Schedules a timed event using task scheduler.
-void Player::SchedulePlayerEvent(Seconds timerMax, std::function<void()> exec)
-{
-    Player::SchedulePlayerEvent(0s, timerMax, exec);
-};
-
-void Player::SchedulePlayerEvent(Seconds timerMin, Seconds timerMax, std::function<void()> exec)
-{
-    _taskScheduler.Schedule(timerMin == 0s ? timerMax : timerMin, timerMax, [exec](TaskContext context)
-        {
-            exec();
-        });
-}

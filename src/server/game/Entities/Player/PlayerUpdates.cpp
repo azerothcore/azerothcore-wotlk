@@ -55,8 +55,6 @@ void Player::Update(uint32 p_time)
     if (!IsInWorld())
         return;
 
-    _taskScheduler.Update(p_time);
-
     sScriptMgr->OnPlayerBeforeUpdate(this, p_time);
 
     // undelivered mail

@@ -24,9 +24,7 @@
 #include "Language.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
-#include "TaskScheduler.h"
 #include "Player.h"
-#include "PlayerCommand.h"
 
 /// Ban function modes
 enum BanMode
@@ -73,7 +71,6 @@ public:
 
         static ChatCommandTable banCommandTable =
         {
-            { "delayed", HandleDelayedBanAccountCommand, SEC_GAMEMASTER, Console::Yes },
             { "account",      HandleBanAccountCommand,       SEC_GAMEMASTER, Console::Yes },
             { "character",    HandleBanCharacterCommand,     SEC_GAMEMASTER, Console::Yes },
             { "playeraccount",HandleBanAccountByCharCommand, SEC_GAMEMASTER, Console::Yes },
@@ -89,34 +86,6 @@ public:
         };
 
         return commandTable;
-    }
-
-    static bool HandleDelayedBanAccountCommand(ChatHandler* handler, AccountIdentifier acc, std::string time, Tail tail)
-    {
-        if (time.empty())
-            return false;
-
-        std::wstring wReason = std::wstring();
-        std::string strReason = std::string();
-        if (!tail.empty())
-        {
-            if (!Utf8toWStr(tail, wReason))
-                return false;
-
-            if (!WStrToUtf8(wReason, strReason))
-                return false;
-        }
-
-        std::chrono::seconds delay{ TimeStringToSecs(time) };
-
-        if (delay <= std::chrono::seconds{ 0 })
-            return false;
-
-        Player* player = handler->GetPlayer();
-        player->SchedulePlayerEvent(delay, [handler, acc, strReason] {
-            LOG_ERROR("sql.sql", "SchedulePlayerEvent Delayed Ban {} {}", acc.GetName(), strReason);
-            });
-        return true;
     }
 
     static bool HandleBanAccountCommand(ChatHandler* handler, char const* args)
