@@ -430,20 +430,27 @@ void ChaseMovementGenerator<T>::MovementInform(T* owner)
 
 //-----------------------------------------------//
 
+static float GetTargetSpeedInMotion(Unit* target)
+{
+    if (!target->movespline->Finalized())
+        return target->movespline->Velocity();
+
+    return target->GetSpeed(target->m_movementInfo.GetSpeedType());
+}
+
 static Optional<float> GetVelocity(Unit* owner, Unit* target, G3D::Vector3 const& dest, bool playerPet)
 {
     Optional<float> speed = {};
-    if (!owner->IsInCombat() && !owner->IsVehicle() && !owner->HasUnitFlag(UNIT_FLAG_POSSESSED) &&
-        (owner->IsPet() || owner->IsGuardian() || owner->GetGUID() == target->GetCritterGUID() || owner->GetCharmerOrOwnerGUID() == target->GetGUID()))
-    {
-        uint32 moveFlags = target->GetUnitMovementFlags();
-        if (target->IsWalking())
-        {
-            moveFlags |= MOVEMENTFLAG_WALKING;
-        }
+    if (owner->IsInCombat() || owner->IsVehicle() || owner->HasUnitFlag(UNIT_FLAG_POSSESSED))
+        return speed;
 
-        UnitMoveType moveType = Movement::SelectSpeedType(moveFlags);
-        speed = target->GetSpeed(moveType);
+    bool isPetLike = owner->IsPet() || owner->IsGuardian() || owner->GetGUID() == target->GetCritterGUID() || owner->GetCharmerOrOwnerGUID() == target->GetGUID();
+
+    // For pets/guardians/critters or creature-to-creature follow: sync with target's speed
+    if (isPetLike || (owner->IsCreature() && target->IsCreature()))
+    {
+        speed = GetTargetSpeedInMotion(target);
+
         if (playerPet)
         {
             float distance = owner->GetDistance2d(dest.x, dest.y) - target->GetObjectSize() - (*speed / 2.f);
@@ -462,7 +469,7 @@ static Position const PredictPosition(Unit* target)
 {
     Position pos = target->GetPosition();
     // 0.5 - it's time (0.5 sec) between starting movement opcode (e.g. MSG_MOVE_START_FORWARD) and MSG_MOVE_HEARTBEAT sent by client
-    float speed = target->GetSpeed(Movement::SelectSpeedType(target->GetUnitMovementFlags())) * 0.5f;
+    float speed = target->GetSpeed(target->m_movementInfo.GetSpeedType()) * 0.5f;
     float orientation = target->GetOrientation();
 
     if (target->m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FORWARD))

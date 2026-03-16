@@ -31,6 +31,7 @@
 #include "ObjectGuid.h"
 #include "Optional.h"
 #include "Position.h"
+#include "UnitDefines.h"
 #include "UpdateData.h"
 #include "UpdateMask.h"
 #include "ObjectVisibilityContainer.h"
@@ -343,6 +344,9 @@ struct MovementInfo
     void AddMovementFlag(uint32 flag) { flags |= flag; }
     void RemoveMovementFlag(uint32 flag) { flags &= ~flag; }
     [[nodiscard]] bool HasMovementFlag(uint32 flag) const { return flags & flag; }
+
+    [[nodiscard]] UnitMoveType GetSpeedType() const { return GetSpeedType(flags); }
+    [[nodiscard]] static UnitMoveType GetSpeedType(uint32 moveFlags);
 
     [[nodiscard]] uint16 GetExtraMovementFlags() const { return flags2; }
     void AddExtraMovementFlag(uint16 flag) { flags2 |= flag; }
