@@ -9709,7 +9709,15 @@ void ObjectMgr::LoadTrainers()
             auto [it, isNew] = _trainers.emplace(std::piecewise_construct, std::forward_as_tuple(trainerId), std::forward_as_tuple(trainerId, trainerType, requirement, std::move(greeting), std::move(spells)));
             ASSERT(isNew);
             if (trainerType == Trainer::Type::Class)
-                _classTrainers[requirement].push_back(&it->second);
+            {
+                if (!requirement || requirement >= MAX_CLASSES)
+                    LOG_ERROR("sql.sql", "Table `trainer` has invalid class requirement for trainer {}, ignoring");
+                else
+                {
+                    uint8 classId = static_cast<uint8>(requirement);
+                    _classTrainers[classId].push_back(&it->second);
+                }
+            }
         } while (trainersResult->NextRow());
     }
 
