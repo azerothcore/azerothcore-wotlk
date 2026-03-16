@@ -38,7 +38,6 @@
 #include "QuestDef.h"
 #include "SpellAuras.h"
 #include "SpellInfo.h"
-#include "TaskScheduler.h"
 #include "TradeData.h"
 #include "Unit.h"
 #include "WorldSession.h"
