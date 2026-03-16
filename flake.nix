@@ -14,15 +14,15 @@
         devShells = {
           default = pkgs.mkShell.override { stdenv = pkgs.clangStdenv; } {
             nativeBuildInputs = with pkgs; [
-                cmake
+              cmake
             ];
             buildInputs = with pkgs; [
-                boost
-                openssl
-                mysql84
-                readline
-                bzip2
-                zlib
+              boost
+              openssl
+              mysql84
+              readline
+              bzip2
+              zlib
             ];
           };
         };
