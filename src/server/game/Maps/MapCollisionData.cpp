@@ -124,7 +124,7 @@ float StaticVMapCollisionData::getHeight(float x, float y, float z, float maxSea
             G3D::Vector3 const pos = VMAP::VMapMgr2::convertPositionToInternalRep(x, y, z);
             float height = _staticTree->getHeight(pos, maxSearchDist);
             if (height >= G3D::finf())
-                return height = VMAP_INVALID_HEIGHT_VALUE; // No height
+                return VMAP_INVALID_HEIGHT_VALUE; // No height
 
             return height;
         }
