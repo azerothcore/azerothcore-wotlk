@@ -19,6 +19,7 @@
 #include "Cell.h"
 #include "CellImpl.h"
 #include "ChatTextBuilder.h"
+#include "CreatureGroups.h"
 #include "CreatureTextMgr.h"
 #include "GameEventMgr.h"
 #include "GossipDef.h"
@@ -3332,6 +3333,14 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             }
             break;
         }
+        case SMART_ACTION_SUMMON_GAMEOBJECT_GROUP:
+        {
+            if (!GetBaseObject())
+                break;
+
+            GetBaseObject()->SummonGameObjectGroup(e.action.gameobjectGroup.group);
+            break;
+        }
         default:
             LOG_ERROR("sql.sql", "SmartScript::ProcessAction: Entry {} SourceType {}, Event {}, Unhandled Action type {}", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
             break;
@@ -4052,6 +4061,49 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
                     targets.push_back(go);
             }
 
+            break;
+        }
+        case SMART_TARGET_FORMATION:
+        {
+            if (me)
+            {
+                if (CreatureGroup* group = me->GetFormation())
+                {
+                    uint32 formationType = e.target.formation.type;
+                    uint32 entry = e.target.formation.entry;
+                    bool excludeSelf = e.target.formation.excludeSelf;
+
+                    if (formationType == 1) // Leader only
+                    {
+                        if (Creature* leader = group->GetLeader())
+                        {
+                            if ((!excludeSelf || leader != me) && (!entry || leader->GetEntry() == entry))
+                                targets.push_back(leader);
+                        }
+                    }
+                    else // 0 = Members only, 2 = All
+                    {
+                        for (auto const& itr : group->GetMembers())
+                        {
+                            Creature* member = itr.first;
+
+                            if (!member)
+                                continue;
+
+                            if (excludeSelf && member == me)
+                                continue;
+
+                            if (entry && member->GetEntry() != entry)
+                                continue;
+
+                            if (formationType == 0 && member == group->GetLeader())
+                                continue;
+
+                            targets.push_back(member);
+                        }
+                    }
+                }
+            }
             break;
         }
         case SMART_TARGET_NONE:

@@ -6507,7 +6507,11 @@ INSERT INTO `pool_pool` VALUES
 (31621,17125,0,'IcecrownMisc - Rich Saronite Deposit / Saronite Deposit / Titanium Vein'),
 (31622,17125,0,'IcecrownMisc - Rich Saronite Deposit / Saronite Deposit / Titanium Vein'),
 (31623,17125,0,'IcecrownMisc - Rich Saronite Deposit / Saronite Deposit / Titanium Vein'),
-(31624,17125,0,'IcecrownMisc - Rich Saronite Deposit / Saronite Deposit / Titanium Vein');
+(31624,17125,0,'IcecrownMisc - Rich Saronite Deposit / Saronite Deposit / Titanium Vein'),
+(32492,32491,0,'Time-Lost Proto Drake / Vyragosa - Path 1'),
+(32493,32491,0,'Time-Lost Proto Drake / Vyragosa - Path 2'),
+(32494,32491,0,'Time-Lost Proto Drake / Vyragosa - Path 3'),
+(32495,32491,0,'Time-Lost Proto Drake / Vyragosa - Path 4');
 /*!40000 ALTER TABLE `pool_pool` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -6519,4 +6523,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-29 17:54:23
+-- Dump completed on 2026-03-15 20:39:04

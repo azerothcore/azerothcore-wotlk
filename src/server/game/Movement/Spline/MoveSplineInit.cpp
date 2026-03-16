@@ -29,31 +29,7 @@ namespace Movement
 {
     UnitMoveType SelectSpeedType(uint32 moveFlags)
     {
-        if (moveFlags & MOVEMENTFLAG_FLYING)
-        {
-            if (moveFlags & MOVEMENTFLAG_BACKWARD /*&& speed_obj.flight >= speed_obj.flight_back*/)
-                return MOVE_FLIGHT_BACK;
-            else
-                return MOVE_FLIGHT;
-        }
-        else if (moveFlags & MOVEMENTFLAG_SWIMMING)
-        {
-            if (moveFlags & MOVEMENTFLAG_BACKWARD /*&& speed_obj.swim >= speed_obj.swim_back*/)
-                return MOVE_SWIM_BACK;
-            else
-                return MOVE_SWIM;
-        }
-        else if (moveFlags & MOVEMENTFLAG_WALKING)
-        {
-            //if (speed_obj.run > speed_obj.walk)
-            return MOVE_WALK;
-        }
-        else if (moveFlags & MOVEMENTFLAG_BACKWARD /*&& speed_obj.run >= speed_obj.run_back*/)
-            return MOVE_RUN_BACK;
-
-        // Flying creatures use MOVEMENTFLAG_CAN_FLY or MOVEMENTFLAG_DISABLE_GRAVITY
-        // Run speed is their default flight speed.
-        return MOVE_RUN;
+        return MovementInfo::GetSpeedType(moveFlags);
     }
 
     int32 MoveSplineInit::Launch()

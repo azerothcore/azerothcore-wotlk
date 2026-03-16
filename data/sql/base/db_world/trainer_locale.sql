@@ -22,8 +22,8 @@ DROP TABLE IF EXISTS `trainer_locale`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `trainer_locale` (
   `Id` int unsigned NOT NULL DEFAULT '0',
-  `locale` varchar(4) COLLATE utf8mb4_general_ci NOT NULL,
-  `Greeting_lang` mediumtext COLLATE utf8mb4_general_ci,
+  `locale` varchar(4) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL,
+  `Greeting_lang` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
   `VerifiedBuild` int DEFAULT '0',
   PRIMARY KEY (`Id`,`locale`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -674,4 +674,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-29 17:54:45
+-- Dump completed on 2026-03-15 20:39:26

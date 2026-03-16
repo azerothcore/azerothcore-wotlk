@@ -43,6 +43,7 @@
 
 class AuctionHouseObject;
 class AuraScript;
+class Battlefield;
 class Battleground;
 class BattlegroundMap;
 class BattlegroundQueue;
@@ -462,6 +463,8 @@ public: /* PlayerScript */
     bool OnPlayerCanResurrect(Player* player);
     bool OnPlayerCanGiveLevel(Player* player, uint8 newLevel);
     void OnPlayerSendListInventory(Player* player, ObjectGuid vendorGuid, uint32& vendorEntry);
+    void OnPlayerGetReputationPriceDiscount(Player const* player, Creature const* creature, float& discount);
+    void OnPlayerGetReputationPriceDiscount(Player const* player, FactionTemplateEntry const* factionTemplate, float& discount);
 
     // Anti cheat
     void AnticheatSetCanFlybyServer(Player* player, bool apply);
@@ -575,6 +578,13 @@ public: /* AllMapScript */
     void OnBeforeCreateInstanceScript(InstanceMap* instanceMap, InstanceScript** instanceData, bool load, std::string data, uint32 completedEncounterMask);
     void OnDestroyInstance(MapInstanced* mapInstanced, Map* map);
 
+public: /* BattlefieldScript */
+    void OnBattlefieldPlayerEnterZone(Battlefield* bf, Player* player);
+    void OnBattlefieldPlayerLeaveZone(Battlefield* bf, Player* player);
+    void OnBattlefieldPlayerJoinWar(Battlefield* bf, Player* player);
+    void OnBattlefieldPlayerLeaveWar(Battlefield* bf, Player* player);
+    void OnBattlefieldBeforeInvitePlayerToWar(Battlefield* bf, Player* player);
+
 public: /* BGScript */
     void OnBattlegroundStart(Battleground* bg);
     void OnBattlegroundEndReward(Battleground* bg, Player* player, TeamId winnerTeamId);
@@ -594,6 +604,8 @@ public: /* BGScript */
     void OnBattlegroundEnd(Battleground* bg, TeamId winnerTeamId);
     void OnBattlegroundDestroy(Battleground* bg);
     void OnBattlegroundCreate(Battleground* bg);
+    bool CanAddGroupToMatchingPool(BattlegroundQueue* queue, GroupQueueInfo* group, uint32 poolPlayerCount, Battleground* bg, BattlegroundBracketId bracketId);
+    bool GetPlayerMatchmakingRating(ObjectGuid playerGuid, BattlegroundTypeId bgTypeId, float& outRating);
 
 public: /* Arena Team Script */
     void OnGetSlotByType(const uint32 type, uint8& slot);
@@ -649,6 +661,8 @@ public: /* ArenaScript */
     bool CanSaveToDB(ArenaTeam* team);
     bool OnBeforeArenaCheckWinConditions(Battleground* const bg);
     void OnArenaStart(Battleground* const bg);
+    bool OnBeforeArenaTeamMemberUpdate(ArenaTeam* team, Player* player, bool won, uint32 opponentMatchmakerRating, int32 matchmakerChange);
+    bool CanSaveArenaStatsForMember(ArenaTeam* team, ObjectGuid playerGuid);
 
 public: /* MiscScript */
 

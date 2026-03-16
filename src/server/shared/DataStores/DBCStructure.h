@@ -687,8 +687,8 @@ struct ChrRacesEntry
     uint32      TeamID;                                     // 7 (7-Alliance 1-Horde)
     // 8-11 unused
     uint32      CinematicSequence;                          // 12 id from CinematicSequences.dbc
-    //uint32    alliance;                                   // 13 faction (0 alliance, 1 horde, 2 not available?)
-    char const*       name[16];                             // 14-29 used for DBC language detection/selection
+    uint32      alliance;                                   // 13 faction (0 alliance, 1 horde, 2 not available?)
+    char const* name[16];                                   // 14-29 used for DBC language detection/selection
     // 30 string flags, unused
     //char const*       nameFemale[16];                     // 31-46, if different from base (male) case
     // 47 string flags, unused

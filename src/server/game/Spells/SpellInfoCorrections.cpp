@@ -652,11 +652,17 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
     });
 
-    // Cobra Strikes
-    ApplySpellFix({ 53257 }, [](SpellInfo* spellInfo)
+    // Explosive Trap Effect
+    ApplySpellFix({
+        13812, // Explosive Trap Effect (Rank 1)
+        14314, // Explosive Trap Effect (Rank 2)
+        14315, // Explosive Trap Effect (Rank 3)
+        27026, // Explosive Trap Effect (Rank 4)
+        49064, // Explosive Trap Effect (Rank 5)
+        49065  // Explosive Trap Effect (Rank 6)
+        }, [](SpellInfo* spellInfo)
     {
-        spellInfo->ProcCharges = 2;
-        spellInfo->StackAmount = 0;
+        spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
     });
 
     // Kill Command
@@ -711,12 +717,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_SCRIPT_EFFECT;
-    });
-
-    // Honor Among Thieves
-    ApplySpellFix({ 51698, 51700, 51701 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].TriggerSpell = 51699;
     });
 
     ApplySpellFix({
@@ -1063,7 +1063,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 44461, 55361, 55362 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPPRESS_TARGET_PROCS;
-        spellInfo->AttributesEx4 |= SPELL_ATTR4_REACTIVE_DAMAGE_PROC;
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_DAMAGE_DOESNT_BREAK_AURAS;
     });
 
     // Evocation
@@ -1234,15 +1234,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].SpellClassMask[1] |= 0x20; // prayer of mending
-    });
-
-    // Power Infusion
-    ApplySpellFix({ 10060 }, [](SpellInfo* spellInfo)
-    {
-        // hack to fix stacking with arcane power
-        spellInfo->Effects[EFFECT_2].Effect = SPELL_EFFECT_APPLY_AURA;
-        spellInfo->Effects[EFFECT_2].ApplyAuraName = SPELL_AURA_ADD_PCT_MODIFIER;
-        spellInfo->Effects[EFFECT_2].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ALLY);
     });
 
     // Lifebloom final bloom
@@ -1508,7 +1499,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_DOT_STACKING_RULE;
     });
 
-    // Activate Sunblade Protecto
+    // Activate Sunblade Protector
     ApplySpellFix({ 46475, 46476 }, [](SpellInfo* spellInfo)
     {
         spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(14); // 60yd
@@ -1555,14 +1546,21 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx6 |= SPELL_ATTR6_IGNORE_PHASE_SHIFT;
     });
 
-    // Parasitic Shadowfiend
+    // Illidan Stormrage - Parasitic Shadowfiend
     ApplySpellFix({ 41914 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Attributes |= SPELL_ATTR0_AURA_IS_DEBUFF;
         spellInfo->AttributesEx3 |= SPELL_ATTR3_DOT_STACKING_RULE;
     });
 
-    // Teleport Maiev
+    // Illidan Stormrage - Demon Fire
+    ApplySpellFix({ 40030 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
+        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_NO_CAST_LOG;
+    });
+
+    // Illidan Stormrage - Teleport Maiev
     ApplySpellFix({ 41221 }, [](SpellInfo* spellInfo)
     {
         spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(13); // 0-50000yd
@@ -1901,21 +1899,14 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_DEST);
     });
 
-    // Vortex (freeze anim)
-    ApplySpellFix({ 55883 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CHANGE_MAP;
-    });
-
     // Hurl Pyrite
     ApplySpellFix({ 62490 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_1].Effect = 0;
     });
 
-    // Ulduar, Mimiron, Magnetic Core (summon)
     // Meeting Stone Summon
-    ApplySpellFix({ 64444, 23598 }, [](SpellInfo* spellInfo)
+    ApplySpellFix({ 23598 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_CASTER);
     });
@@ -3695,13 +3686,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_MOD_CHARM;
     });
 
-    // Persistent Shield
-    ApplySpellFix({ 26467 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_PROC_TRIGGER_SPELL_WITH_VALUE;
-        spellInfo->Effects[EFFECT_0].TriggerSpell = 26470;
-    });
-
     // Deadly Swiftness
     ApplySpellFix({ 31255 }, [](SpellInfo* spellInfo)
     {
@@ -4408,6 +4392,12 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 18278 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx4 |= SPELL_ATTR4_NOT_IN_ARENA_OR_RATED_BATTLEGROUND;
+    });
+
+    // Honor Among Thieves - allow area aura from different casters to coexist
+    ApplySpellFix({ 51698, 51700, 51701 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_DOT_STACKING_RULE;
     });
 
     // Absorb Life

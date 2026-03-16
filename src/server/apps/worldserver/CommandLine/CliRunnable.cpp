@@ -25,7 +25,10 @@
 #include "World.h"
 #include <fmt/core.h>
 
-#if AC_PLATFORM != AC_PLATFORM_WINDOWS
+#if AC_PLATFORM == AC_PLATFORM_WINDOWS
+#include <windows.h>
+#include <iostream>
+#else
 #include "Chat.h"
 #include "ChatCommand.h"
 #include <cstring>
@@ -108,6 +111,10 @@ int kb_hit_return()
 void CliThread()
 {
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
+    // Set console code pages to UTF-8
+    SetConsoleCP(CP_UTF8);
+    SetConsoleOutputCP(CP_UTF8);
+
     // print this here the first time
     // later it will be printed after command queue updates
     PrintCliPrefix();
@@ -134,6 +141,14 @@ void CliThread()
         fInfo.dwTimeout = 0;
         FlashWindowEx(&fInfo);
     }
+
+    // Get console input handle once for reading commands
+    HANDLE hStdIn = GetStdHandle(STD_INPUT_HANDLE);
+    if (hStdIn == INVALID_HANDLE_VALUE)
+    {
+        LOG_ERROR("server.worldserver", "Failed to get console input handle");
+        return;
+    }
 #endif
 
     ///- As long as the World is running (no World::m_stopEvent), get the command line and handle it
@@ -144,15 +159,48 @@ void CliThread()
         std::string command;
 
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
-        wchar_t commandbuf[256];
-        if (fgetws(commandbuf, sizeof(commandbuf), stdin))
+
+        static bool checkedConsole = false;
+        static bool isRealConsole = false;
+
+        if (!checkedConsole)
         {
-            if (!WStrToUtf8(commandbuf, wcslen(commandbuf), command))
+            DWORD mode = 0;
+            isRealConsole = GetConsoleMode(hStdIn, &mode);
+            checkedConsole = true;
+        }
+
+        if (isRealConsole)
+        {
+            // ===== Real Windows Console =====
+            wchar_t commandbuf[256];
+            DWORD charsRead = 0;
+
+            if (ReadConsoleW(hStdIn, commandbuf,
+                sizeof(commandbuf) / sizeof(wchar_t) - 1,
+                &charsRead, nullptr))
             {
-                PrintCliPrefix();
-                continue;
+                if (charsRead > 0)
+                {
+                    commandbuf[charsRead] = L'\0';
+                    if (!WStrToUtf8(commandbuf, charsRead, command))
+                    {
+                        PrintCliPrefix();
+                        continue;
+                    }
+                }
             }
         }
+        else
+        {
+            // ===== Redirected input (pipe) =====
+            if (!std::getline(std::cin, command))
+            {
+                World::StopNow(SHUTDOWN_EXIT_CODE);
+                break;
+            }
+        }
+
 #else
         char* command_str = readline(CLI_PREFIX);
         ::rl_bind_key('\t', ::rl_complete);
