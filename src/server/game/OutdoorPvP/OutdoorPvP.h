@@ -242,7 +242,7 @@ public:
     void TeamApplyBuff(TeamId teamId, uint32 spellId, uint32 spellId2 = 0, Player* sameMapPlr = nullptr);
 
     Map* GetMap() const { return _map; }
-    OPvPCapturePointMap* GetCapturePoints() { return &_capturePoints; }
+    OPvPCapturePointMap const& GetCapturePoints() const { return _capturePoints; }
     OPvPCapturePoint* GetCapturePoint(ObjectGuid::LowType spawnId) const;
 
 protected:
