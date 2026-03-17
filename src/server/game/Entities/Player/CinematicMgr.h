@@ -33,7 +33,7 @@ class AC_GAME_API CinematicMgr
 {
 public:
     explicit CinematicMgr(Player& player);
-    ~CinematicMgr();
+    ~CinematicMgr() = default;
 
     // Cinematic camera data and remote sight functions
     void StartCinematic(uint32 const cinematicSequenceId);

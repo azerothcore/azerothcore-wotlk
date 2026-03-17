@@ -16276,7 +16276,7 @@ bool Player::IsWorldObjectOutOfSightRange(WorldObject const* target) const
     }
 
     // Check if out of range
-    if (!GetSightPosition().IsInDist2d(target, GetSightRange(target)))
+    if (!target->IsWithinSightRange(GetSightPosition(), GetSightRange(target)))
         return true;
 
     return false;

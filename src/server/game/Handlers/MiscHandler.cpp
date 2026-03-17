@@ -947,7 +947,7 @@ void WorldSession::HandleSetActionButtonOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleCompleteCinematic(WorldPacket& /*recv_data*/)
 {
-    // If player has sight bound to visual waypoint NPC we should remove it
+    // End the current cinematic and restore the normal player view
     GetPlayer()->GetCinematicMgr().EndCinematic();
 }
 

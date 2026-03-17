@@ -28,11 +28,6 @@ CinematicMgr::CinematicMgr(Player& player) : _player(player)
     _cinematicUpdateTimer.SetInterval(CINEMATIC_UPDATEDIFF);
 }
 
-CinematicMgr::~CinematicMgr()
-{
-    EndCinematic();
-}
-
 void CinematicMgr::StartCinematic(uint32 const cinematicSequenceId)
 {
     _player.SendCinematicStart(cinematicSequenceId);

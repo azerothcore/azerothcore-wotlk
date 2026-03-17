@@ -1338,6 +1338,12 @@ bool WorldObject::IsWithinDist2d(const Position* pos, float dist) const
     return IsInDist2d(pos, dist + GetObjectSize());
 }
 
+// Visibility always uses 2d checks, factors in self-object size already. Gameobjects will override this for custom calc
+bool WorldObject::IsWithinSightRange(Position const& pos, float dist) const
+{
+    return IsInDist2d(&pos, dist + GetObjectSize());
+}
+
 // use only if you will sure about placing both object at same map
 bool WorldObject::IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D, bool incOwnRadius, bool incTargetRadius) const
 {
@@ -1819,8 +1825,7 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
                 return false;
         }
 
-        // Xinef: check reversely obj vs viewpoint, object could be a gameObject which overrides _IsWithinDist function to include gameobject size
-        if (!corpseCheck && !sightPosition->IsInDist2d(obj, GetSightRange(obj)))
+        if (!corpseCheck && !obj->IsWithinSightRange(*sightPosition, GetSightRange(obj)))
             return false;
     }
 
