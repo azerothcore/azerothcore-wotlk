@@ -73,7 +73,7 @@ protected:
 class MapCollisionData
 {
 public:
-    MapCollisionData(Map const& map, Map const* parentMap, std::string const& basePath);
+    MapCollisionData(Map const& map, Map const* parentMap);
     ~MapCollisionData() = default;
 
     int LoadVMapTile(uint32 tileX, uint32 tileY);

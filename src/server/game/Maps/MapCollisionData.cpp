@@ -28,7 +28,7 @@
 
 #include <G3D/Vector3.h>
 
-MapCollisionData::MapCollisionData(Map const& map, Map const* parentMap, std::string const& basePath) :
+MapCollisionData::MapCollisionData(Map const& map, Map const* parentMap) :
     _map(map), _staticVMapData(map.GetId())
 {
     if (parentMap)
@@ -41,7 +41,7 @@ MapCollisionData::MapCollisionData(Map const& map, Map const* parentMap, std::st
     {
         // If we are a base map create a new static tree and mmap nav mesh
         std::string const mapFileName = VMAP::VMapMgr2::getMapFileName(map.GetId());
-        std::shared_ptr<VMAP::StaticMapTree> newTree = std::make_shared<VMAP::StaticMapTree>(map.GetId(), basePath);
+        std::shared_ptr<VMAP::StaticMapTree> newTree = std::make_shared<VMAP::StaticMapTree>(map.GetId(), (sWorld->GetDataPath() + "vmaps"));
         if (newTree->InitMap(mapFileName))
             _staticVMapData._staticTree = newTree;
 

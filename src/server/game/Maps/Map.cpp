@@ -64,8 +64,7 @@ Map::~Map()
 }
 
 Map::Map(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent) :
-    _mapGridManager(this), i_mapEntry(sMapStore.LookupEntry(id)),
-    _mapCollisionData(*this, _parent, (sWorld->GetDataPath() + "vmaps").c_str()),
+    _mapGridManager(this), i_mapEntry(sMapStore.LookupEntry(id)), _mapCollisionData(*this, _parent),
     i_spawnMode(SpawnMode), i_InstanceId(InstanceId), m_unloadTimer(0),
     m_VisibleDistance(DEFAULT_VISIBILITY_DISTANCE), _instanceResetPeriod(0),
     _transportsUpdateIter(_transports.end()), i_scriptLock(false), _defaultLight(GetDefaultMapLight(id))
