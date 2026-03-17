@@ -8097,8 +8097,6 @@ void Unit::RemoveAllControlled(bool onDeath /*= false*/)
 
             if (!(onDeath && !IsPlayer() && target->IsGuardian()))
                 target->ToTempSummon()->UnSummon();
-            else
-                m_Controlled.erase(target);
         }
         else
         {
