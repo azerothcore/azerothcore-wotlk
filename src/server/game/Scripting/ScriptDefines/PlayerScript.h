@@ -43,6 +43,7 @@ enum PlayerHook
     PLAYERHOOK_ON_LEVEL_CHANGED,
     PLAYERHOOK_ON_FREE_TALENT_POINTS_CHANGED,
     PLAYERHOOK_ON_TALENTS_RESET,
+    PLAYERHOOK_CAN_LEARN_TALENT,
     PLAYERHOOK_ON_AFTER_SPEC_SLOT_CHANGED,
     PLAYERHOOK_ON_BEFORE_UPDATE,
     PLAYERHOOK_ON_UPDATE,
@@ -259,6 +260,9 @@ public:
 
     // Called when a player's talent points are reset (right before the reset is done)
     virtual void OnPlayerTalentsReset(Player* /*player*/, bool /*noCost*/) { }
+
+    // Called when a player attempts to put a point in a talent.
+    virtual bool OnPlayerCanLearnTalent(Player* /*player*/, TalentEntry const* /*talent*/, uint32 /*rank*/) { return true; }
 
     // Called after a player switches specs using the dual spec system
     virtual void OnPlayerAfterSpecSlotChanged(Player* /*player*/, uint8 /*newSlot*/) { }

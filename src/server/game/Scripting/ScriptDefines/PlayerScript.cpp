@@ -109,6 +109,11 @@ void ScriptMgr::OnPlayerTalentsReset(Player* player, bool noCost)
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_TALENTS_RESET, script->OnPlayerTalentsReset(player, noCost));
 }
 
+bool ScriptMgr::OnPlayerCanLearnTalent(Player* player, TalentEntry const* talent, uint32 rank)
+{
+    CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_LEARN_TALENT, !script->OnPlayerCanLearnTalent(player, talent, rank));
+}
+
 void ScriptMgr::OnPlayerAfterSpecSlotChanged(Player* player, uint8 newSlot)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_AFTER_SPEC_SLOT_CHANGED, script->OnPlayerAfterSpecSlotChanged(player, newSlot));

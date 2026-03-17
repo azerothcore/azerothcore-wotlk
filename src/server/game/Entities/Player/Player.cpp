@@ -13958,6 +13958,9 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank, bool command /*= fa
     if (!talentInfo)
         return;
 
+    if (!sScriptMgr->OnPlayerCanLearnTalent(this, talentInfo, talentRank))
+        return;
+
     TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TalentTab);
     if (!talentTabInfo)
         return;
