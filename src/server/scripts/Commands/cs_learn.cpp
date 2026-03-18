@@ -302,6 +302,8 @@ public:
 
     static bool HandleLearnAllCraftsCommand(ChatHandler* handler)
     {
+        Player* target = handler->GetSession()->GetPlayer();
+
         for (uint32 i = 0; i < sSkillLineStore.GetNumRows(); ++i)
         {
             SkillLineEntry const* skillInfo = sSkillLineStore.LookupEntry(i);
@@ -309,9 +311,12 @@ public:
                 continue;
 
             if ((skillInfo->categoryId == SKILL_CATEGORY_PROFESSION || skillInfo->categoryId == SKILL_CATEGORY_SECONDARY) &&
-                    skillInfo->canLink)                             // only prof. with recipes have
+                    skillInfo->canLink)
             {
-                HandleLearnSkillRecipesHelper(handler->GetSession()->GetPlayer(), skillInfo->id);
+                HandleLearnSkillRecipesHelper(target, skillInfo->id);
+
+                const uint16 maxLevel = target->GetPureMaxSkillValue(skillInfo->id);
+                target->SetSkill(skillInfo->id, target->GetSkillStep(skillInfo->id), maxLevel, maxLevel);
             }
         }
 
@@ -381,6 +386,13 @@ public:
 
     static void HandleLearnSkillRecipesHelper(Player* player, uint32 skillId)
     {
+        // Rank spells (Apprentice → Grand Master) must be learned so that
+        // Player::removeSpell can walk the spell chain on profession unlearn
+        // and properly remove the skill.  Without them the profession
+        // reappears after relog (issue #2330).
+        for (uint32 rankSpell : sSpellMgr->GetSkillRankSpells(skillId))
+            player->learnSpell(rankSpell);
+
         uint32 classmask = player->getClassMask();
 
         for (SkillLineAbilityEntry const* skillLine : GetSkillLineAbilitiesBySkillLine(skillId))
