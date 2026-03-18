@@ -2247,7 +2247,7 @@ void Spell::prepareDataForTriggerSystem(AuraEffect const* /*triggeredByAura*/)
     // Hunter trap spells - activation proc for Lock and Load, Entrapment and Misdirection
     if (m_spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER &&
             (m_spellInfo->SpellFamilyFlags[0] & 0x18 ||              // Freezing and Frost Trap, Freezing Arrow
-             m_spellInfo->Id == 57879 || m_spellInfo->Id == 45145 ||  // Snake Trap - done this way to avoid double proc
+             m_spellInfo->Id == 57879 ||                               // Snake Trap - done this way to avoid double proc
              m_spellInfo->SpellFamilyFlags[2] & 0x00024000))          // Explosive and Immolation Trap
     {
         m_procAttacker |= PROC_FLAG_DONE_TRAP_ACTIVATION;
@@ -4307,7 +4307,13 @@ void Spell::_handle_finish_phase()
             break;
         }
 
-        Unit::ProcSkillsAndAuras(m_originalCaster, nullptr, procAttacker, PROC_FLAG_NONE, hitMask, 1, BASE_ATTACK, m_spellInfo, m_triggeredByAuraSpell.spellInfo,
+        // For trap activation, pass the original target (trap triggerer) so proc trigger spells
+        // like Entrapment can find a valid target to cast on
+        Unit* finishVictim = nullptr;
+        if (procAttacker & PROC_FLAG_DONE_TRAP_ACTIVATION)
+            finishVictim = GetOriginalTarget();
+
+        Unit::ProcSkillsAndAuras(m_originalCaster, finishVictim, procAttacker, PROC_FLAG_NONE, hitMask, 1, BASE_ATTACK, m_spellInfo, m_triggeredByAuraSpell.spellInfo,
             m_triggeredByAuraSpell.effectIndex, this, nullptr, nullptr, PROC_SPELL_PHASE_FINISH);
     }
 }
