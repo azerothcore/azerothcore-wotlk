@@ -35,10 +35,11 @@ TEST(SpellEffectsTest, DistractDoesNotStopMovement)
     ASSERT_EQ(target->GetMotionMaster()->size(), 1);
 
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(1725); // Distract
-    Spell* spell = new Spell(player, spellInfo, TriggerCastFlags(TRIGGERED_NONE));
-    spell->m_targets.SetUnitTarget(target);
+    SpellCastTargets targets;
+    targets.SetUnitTarget(target);
 
-    spell->EffectDistract(EFFECT_0);
+    Spell* spell = new Spell(player, spellInfo, TriggerCastFlags(TRIGGERED_NONE));
+    spell->prepare(&targets);
 
     // Verify that the movement stack size is now 2, meaning the original movement was not cleared
     EXPECT_EQ(target->GetMotionMaster()->size(), 2);
