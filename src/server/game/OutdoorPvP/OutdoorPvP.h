@@ -242,6 +242,8 @@ public:
     void TeamApplyBuff(TeamId teamId, uint32 spellId, uint32 spellId2 = 0, Player* sameMapPlr = nullptr);
 
     Map* GetMap() const { return _map; }
+    OPvPCapturePointMap const& GetCapturePoints() const { return _capturePoints; }
+    OPvPCapturePoint* GetCapturePoint(ObjectGuid::LowType spawnId) const;
 
 protected:
     void BroadcastPacket(WorldPacket& data) const;
@@ -256,7 +258,6 @@ protected:
         _capturePoints[cp->m_capturePointSpawnId] = cp;
     }
 
-    OPvPCapturePoint* GetCapturePoint(ObjectGuid::LowType spawnId) const;
     void RegisterZone(uint32 zoneid);
     bool HasPlayer(Player const* player) const;
     void TeamCastSpell(TeamId team, int32 spellId, Player* sameMapPlr = nullptr);

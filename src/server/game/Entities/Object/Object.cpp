@@ -995,6 +995,30 @@ std::string Object::GetDebugInfo() const
     return sstr.str();
 }
 
+UnitMoveType MovementInfo::GetSpeedType(uint32 moveFlags)
+{
+    if (moveFlags & MOVEMENTFLAG_FLYING)
+    {
+        if (moveFlags & MOVEMENTFLAG_BACKWARD)
+            return MOVE_FLIGHT_BACK;
+
+        return MOVE_FLIGHT;
+    }
+    else if (moveFlags & MOVEMENTFLAG_SWIMMING)
+    {
+        if (moveFlags & MOVEMENTFLAG_BACKWARD)
+            return MOVE_SWIM_BACK;
+
+        return MOVE_SWIM;
+    }
+    else if (moveFlags & MOVEMENTFLAG_WALKING)
+        return MOVE_WALK;
+    else if (moveFlags & MOVEMENTFLAG_BACKWARD)
+        return MOVE_RUN_BACK;
+
+    return MOVE_RUN;
+}
+
 void MovementInfo::OutDebug()
 {
     LOG_INFO("movement", "MOVEMENT INFO");

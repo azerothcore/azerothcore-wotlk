@@ -492,7 +492,7 @@ class spell_hun_chimera_shot : public SpellScript
 
                         // Amount of one aura tick
                         basePoint = int32(CalculatePct(unitTarget->GetMaxPower(POWER_MANA), aurEff->GetAmount()));
-                        int32 casterBasePoint = aurEff->GetAmount() * unitTarget->GetMaxPower(POWER_MANA) / 50; /// @todo: Caster uses unitTarget?
+                        int32 casterBasePoint = aurEff->GetAmount() * caster->GetMaxPower(POWER_MANA) / 50;
                         if (basePoint > casterBasePoint)
                             basePoint = casterBasePoint;
                         ApplyPct(basePoint, TickCount * 60);

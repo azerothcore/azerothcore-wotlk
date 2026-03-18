@@ -8077,24 +8077,31 @@ void Unit::RemoveAllControlled(bool onDeath /*= false*/)
     if (IsPlayer())
         ToPlayer()->StopCastingCharm();
 
-    while (!m_Controlled.empty())
+    for (auto it = m_Controlled.begin(); it != m_Controlled.end();)
     {
-        Unit* target = *m_Controlled.begin();
-        m_Controlled.erase(m_Controlled.begin());
+        Unit* target = *it;
+        ++it;
+
         if (target->GetCharmerGUID() == GetGUID())
         {
+            m_Controlled.erase(target);
             target->RemoveCharmAuras();
         }
         else if (target->GetOwnerGUID() == GetGUID() && target->IsSummon())
         {
+            // Keep Lightwell alive on owner death
+            if (onDeath)
+                if (TempSummon* ts = target->ToTempSummon())
+                    if (ts->m_Properties && ts->m_Properties->Type == SUMMON_TYPE_LIGHTWELL)
+                        continue;
+
             if (!(onDeath && !IsPlayer() && target->IsGuardian()))
-            {
                 target->ToTempSummon()->UnSummon();
-            }
         }
         else
         {
             LOG_ERROR("entities.unit", "Unit {} is trying to release unit {} which is neither charmed nor owned by it", GetEntry(), target->GetEntry());
+            m_Controlled.erase(target);
         }
     }
 }

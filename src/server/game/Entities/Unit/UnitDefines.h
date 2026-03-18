@@ -15,6 +15,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifndef ACORE_UNITDEFINES_H
+#define ACORE_UNITDEFINES_H
+
 #include "Define.h"
 #include "EnumFlag.h"
 
@@ -487,3 +490,5 @@ enum SplineType
     SPLINETYPE_FACING_TARGET    = 3,
     SPLINETYPE_FACING_ANGLE     = 4
 };
+
+#endif // ACORE_UNITDEFINES_H
