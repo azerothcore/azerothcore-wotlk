@@ -1,3 +1,4 @@
+-- DB update 2026_03_18_00 -> 2026_03_18_01
 -- Missing text: gameobject "Saga of the Sin'dorei"
 DELETE FROM `page_text` WHERE `ID` IN (2823,2824,2825,2826,2827);
 INSERT INTO `page_text` (`ID`, `Text`, `NextPageID`, `VerifiedBuild`) VALUES
