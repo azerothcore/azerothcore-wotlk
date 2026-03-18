@@ -312,123 +312,85 @@ public:
     }
 };
 
-enum eTrainingDummy
+struct npc_training_dummy : NullCreatureAI
 {
-    SPELL_STUN_PERMANENT        = 61204
-};
+    npc_training_dummy(Creature* creature) : NullCreatureAI(creature) { }
 
-class npc_training_dummy : public CreatureScript
-{
-public:
-    npc_training_dummy() : CreatureScript("npc_training_dummy") { }
-
-    struct npc_training_dummyAI : ScriptedAI
+    void JustEnteredCombat(Unit* who) override
     {
-        npc_training_dummyAI(Creature* creature) : ScriptedAI(creature)
+        _combatTimer[who->GetGUID()] = 5s;
+    }
+
+    void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damageType, SpellSchoolMask) override
+    {
+        damage = 0;
+
+        if (!attacker || damageType == DOT)
+            return;
+
+        _combatTimer[attacker->GetGUID()] = 5s;
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        for (auto itr = _combatTimer.begin(); itr != _combatTimer.end();)
         {
-            me->SetCombatMovement(false);
-            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true); //imune to knock aways like blast wave
-        }
-
-        uint32 resetTimer;
-
-        void Reset() override
-        {
-            me->CastSpell(me, SPELL_STUN_PERMANENT, true);
-            resetTimer = 5000;
-        }
-
-        void EnterEvadeMode(EvadeReason why) override
-        {
-            if (!_EnterEvadeMode(why))
-                return;
-
-            Reset();
-        }
-
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
-        {
-            resetTimer = 5000;
-            damage = 0;
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            if (resetTimer <= diff)
+            itr->second -= Milliseconds(diff);
+            if (itr->second <= 0s)
             {
-                EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
-                resetTimer = 5000;
+                // The attacker has not dealt any damage to the dummy for over 5 seconds. End combat.
+                auto const& pveRefs = me->GetCombatManager().GetPvECombatRefs();
+                auto it = pveRefs.find(itr->first);
+                if (it != pveRefs.end())
+                    it->second->EndCombat();
+
+                itr = _combatTimer.erase(itr);
             }
             else
-                resetTimer -= diff;
+                ++itr;
         }
-
-        void MoveInLineOfSight(Unit* /*who*/) override { }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_training_dummyAI(creature);
     }
+
+private:
+    std::unordered_map<ObjectGuid, Milliseconds> _combatTimer;
 };
 
-class npc_target_dummy : public CreatureScript
+struct npc_target_dummy : NullCreatureAI
 {
-public:
-    npc_target_dummy() : CreatureScript("npc_target_dummy") { }
-
-    struct npc_target_dummyAI : ScriptedAI
+    npc_target_dummy(Creature* creature) : NullCreatureAI(creature)
     {
-        npc_target_dummyAI(Creature* creature) : ScriptedAI(creature)
-        {
-            me->SetCombatMovement(false);
-            deathTimer = 15000;
-            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true); //imune to knock aways like blast wave
-        }
+        _deathTimer = 15s;
+    }
 
-        uint32 deathTimer;
+    void Reset() override
+    {
+        me->SetControlled(true, UNIT_STATE_STUNNED);
+        me->SetLootRecipient(me->GetOwner());
+        me->SelectLevel();
+    }
 
-        void Reset() override
+    void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
+    {
+        damage = 0;
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!me->HasUnitState(UNIT_STATE_STUNNED))
+            me->SetControlled(true, UNIT_STATE_STUNNED);
+
+        _deathTimer -= Milliseconds(diff);
+        if (_deathTimer <= 0s)
         {
-            me->SetControlled(true, UNIT_STATE_STUNNED); //disable rotate
             me->SetLootRecipient(me->GetOwner());
-            me->SelectLevel();
+            me->LowerPlayerDamageReq(me->GetMaxHealth());
+            me->KillSelf();
+            _deathTimer = 600s;
         }
-
-        void EnterEvadeMode(EvadeReason why) override
-        {
-            if (!_EnterEvadeMode(why))
-                return;
-
-            Reset();
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!me->HasUnitState(UNIT_STATE_STUNNED))
-                me->SetControlled(true, UNIT_STATE_STUNNED);//disable rotate
-
-            if (deathTimer <= diff)
-            {
-                me->SetLootRecipient(me->GetOwner());
-                me->LowerPlayerDamageReq(me->GetMaxHealth());
-                me->KillSelf();
-                deathTimer = 600000;
-            }
-            else
-                deathTimer -= diff;
-        }
-
-        void MoveInLineOfSight(Unit* /*who*/) override { }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_target_dummyAI(creature);
     }
+
+private:
+    Milliseconds _deathTimer;
 };
 
 /*########
@@ -2738,8 +2700,8 @@ void AddSC_npcs_special()
 {
     new npc_elder_clearwater();
     new npc_riggle_bassbait();
-    new npc_target_dummy();
-    new npc_training_dummy();
+    RegisterCreatureAI(npc_target_dummy);
+    RegisterCreatureAI(npc_training_dummy);
     new npc_venomhide_hatchling();
     new npc_air_force_bots();
     new npc_chicken_cluck();

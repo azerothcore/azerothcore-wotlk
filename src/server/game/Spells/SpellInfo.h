@@ -466,6 +466,7 @@ public:
     bool IsBreakingStealth() const;
     bool IsRangedWeaponSpell() const;
     bool IsAutoRepeatRangedSpell() const;
+    bool HasInitialAggro() const;
 
     [[nodiscard]] bool IsAffected(uint32 familyName, flag96 const& familyFlags) const;
 

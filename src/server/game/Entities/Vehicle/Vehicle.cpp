@@ -445,6 +445,10 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
         init.SetTransportEnter();
         init.Launch();
 
+        // Transfer threat from passenger to vehicle
+        for (auto const& [guid, threatRef] : unit->GetThreatMgr().GetThreatenedByMeList())
+            threatRef->GetOwner()->GetThreatMgr().AddThreat(_me, threatRef->GetThreat(), nullptr, true, true);
+
         if (_me->IsCreature())
         {
             if (_me->ToCreature()->IsAIEnabled)

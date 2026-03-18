@@ -27,6 +27,7 @@
 #include "Log.h"
 #include "M2Stores.h"
 #include "MapMgr.h"
+#include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "PoolMgr.h"
 #include "ScriptMgr.h"
@@ -70,6 +71,8 @@ public:
         {
             { "setbit",         HandleDebugSet32BitCommand,            SEC_ADMINISTRATOR, Console::No },
             { "threat",         HandleDebugThreatListCommand,          SEC_ADMINISTRATOR, Console::No },
+            { "threatinfo",     HandleDebugThreatInfoCommand,          SEC_ADMINISTRATOR, Console::No },
+            { "combat",         HandleDebugCombatListCommand,          SEC_ADMINISTRATOR, Console::No },
             { "hostile",        HandleDebugHostileRefListCommand,      SEC_ADMINISTRATOR, Console::No },
             { "anim",           HandleDebugAnimCommand,                SEC_ADMINISTRATOR, Console::No },
             { "arena",          HandleDebugArenaCommand,               SEC_ADMINISTRATOR, Console::No },
@@ -816,43 +819,182 @@ public:
 
     static bool HandleDebugThreatListCommand(ChatHandler* handler)
     {
-        Creature* target = handler->getSelectedCreature();
-        if (!target || target->IsTotem() || target->IsPet())
-            return false;
+        Unit* target = handler->getSelectedUnit();
+        if (!target)
+            target = handler->GetPlayer();
 
-        auto const& threatList = target->GetThreatMgr().GetThreatList();
-        ThreatContainer::StorageType::const_iterator itr;
+        ThreatManager& mgr = target->GetThreatMgr();
+        if (!target->IsAlive())
+        {
+            handler->PSendSysMessage("{} ({}) is not alive.{}", target->GetName(), target->GetGUID().ToString(), target->IsEngaged() ? " (It is, however, engaged. Huh?)" : "");
+            return true;
+        }
+
         uint32 count = 0;
-
-        handler->PSendSysMessage("Threat list of {} ({})", target->GetName(), target->GetGUID().ToString());
-
-        for (itr = threatList.begin(); itr != threatList.end(); ++itr)
+        auto const& threatenedByMe = target->GetThreatMgr().GetThreatenedByMeList();
+        if (threatenedByMe.empty())
+            handler->PSendSysMessage("{} ({}) does not threaten any units.", target->GetName(), target->GetGUID().ToString());
+        else
         {
-            Unit* unit = (*itr)->getTarget();
-            if (!unit)
+            handler->PSendSysMessage("List of units threatened by {} ({})", target->GetName(), target->GetGUID().ToString());
+            for (auto const& pair : threatenedByMe)
             {
-                handler->PSendSysMessage("   {}.   No Unit  - threat {}", ++count, (*itr)->GetThreat());
-                continue;
+                Unit* unit = pair.second->GetOwner();
+                handler->PSendSysMessage("   {}.   {}   ({}, SpawnID {})  - threat {}", ++count, unit->GetName(), unit->GetGUID().ToString(), unit->IsCreature() ? unit->ToCreature()->GetSpawnId() : 0, pair.second->GetThreat());
             }
-
-            handler->PSendSysMessage("   {}.   {}   ({})  - threat {}", ++count, unit->GetName(), unit->GetGUID().ToString(), (*itr)->GetThreat());
+            handler->SendSysMessage("End of threatened-by-me list.");
         }
 
-        auto const& threatList2 = target->GetThreatMgr().GetOfflineThreatList();
-        for (itr = threatList2.begin(); itr != threatList2.end(); ++itr)
+        if (mgr.CanHaveThreatList())
         {
-            Unit* unit = (*itr)->getTarget();
-            if (!unit)
+            if (!mgr.IsThreatListEmpty(true))
             {
-                handler->PSendSysMessage("   {}.   [offline] No Unit  - threat {}", ++count, (*itr)->GetThreat());
-                continue;
-            }
+                if (target->IsEngaged())
+                    handler->PSendSysMessage("Threat list of {} ({}, SpawnID {}):", target->GetName(), target->GetGUID().ToString(), target->IsCreature() ? target->ToCreature()->GetSpawnId() : 0);
+                else
+                    handler->PSendSysMessage("{} ({}, SpawnID {}) is not engaged, but still has a threat list? Well, here it is:", target->GetName(), target->GetGUID().ToString(), target->IsCreature() ? target->ToCreature()->GetSpawnId() : 0);
 
-            handler->PSendSysMessage("   {}.   [offline] {}   ({})  - threat {}", ++count, unit->GetName(), unit->GetGUID().ToString(), (*itr)->GetThreat());
+                count = 0;
+                Unit* fixateVictim = mgr.GetFixateTarget();
+                for (ThreatReference const* ref : mgr.GetSortedThreatList())
+                {
+                    Unit* unit = ref->GetVictim();
+                    char const* onlineStr;
+                    switch (ref->GetOnlineState())
+                    {
+                        case ThreatReference::ONLINE_STATE_SUPPRESSED:
+                            onlineStr = " [SUPPRESSED]";
+                            break;
+                        case ThreatReference::ONLINE_STATE_OFFLINE:
+                            onlineStr = " [OFFLINE]";
+                            break;
+                        default:
+                            onlineStr = "";
+                    }
+                    char const* tauntStr;
+                    if (unit == fixateVictim)
+                        tauntStr = " [FIXATE]";
+                    else
+                        switch (ref->GetTauntState())
+                        {
+                            case ThreatReference::TAUNT_STATE_TAUNT:
+                                tauntStr = " [TAUNT]";
+                                break;
+                            case ThreatReference::TAUNT_STATE_DETAUNT:
+                                tauntStr = " [DETAUNT]";
+                                break;
+                            default:
+                                tauntStr = "";
+                        }
+                    handler->PSendSysMessage("   {}.   {}   ({})  - threat {}{}{}", ++count, unit->GetName(), unit->GetGUID().ToString(), ref->GetThreat(), tauntStr, onlineStr);
+                }
+                handler->SendSysMessage("End of threat list.");
+            }
+            else if (!target->IsEngaged())
+                handler->PSendSysMessage("{} ({}, SpawnID {}) is not currently engaged.", target->GetName(), target->GetGUID().ToString(), target->IsCreature() ? target->ToCreature()->GetSpawnId() : 0);
+            else
+                handler->PSendSysMessage("{} ({}, SpawnID {}) seems to be engaged, but does not have a threat list??", target->GetName(), target->GetGUID().ToString(), target->IsCreature() ? target->ToCreature()->GetSpawnId() : 0);
+        }
+        else if (target->IsEngaged())
+            handler->PSendSysMessage("{} ({}) is currently engaged. (This unit cannot have a threat list.)", target->GetName(), target->GetGUID().ToString());
+        else
+            handler->PSendSysMessage("{} ({}) is not currently engaged. (This unit cannot have a threat list.)", target->GetName(), target->GetGUID().ToString());
+
+        return true;
+    }
+
+    static bool HandleDebugThreatInfoCommand(ChatHandler* handler)
+    {
+        Unit* target = handler->getSelectedUnit();
+        if (!target)
+        {
+            handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+            handler->SetSentErrorMessage(true);
+            return false;
         }
 
-        handler->SendSysMessage("End of threat list.");
+        handler->PSendSysMessage("Threat info for {} ({}):", target->GetName(), target->GetGUID().ToString());
 
+        ThreatManager const& mgr = target->GetThreatMgr();
+
+        // _singleSchoolModifiers
+        {
+            auto& mods = mgr._singleSchoolModifiers;
+            handler->SendSysMessage(" - Single-school threat modifiers:");
+            handler->PSendSysMessage(" |-- Physical: {:.2f}%", mods[SPELL_SCHOOL_NORMAL] * 100.0f);
+            handler->PSendSysMessage(" |-- Holy    : {:.2f}%", mods[SPELL_SCHOOL_HOLY] * 100.0f);
+            handler->PSendSysMessage(" |-- Fire    : {:.2f}%", mods[SPELL_SCHOOL_FIRE] * 100.0f);
+            handler->PSendSysMessage(" |-- Nature  : {:.2f}%", mods[SPELL_SCHOOL_NATURE] * 100.0f);
+            handler->PSendSysMessage(" |-- Frost   : {:.2f}%", mods[SPELL_SCHOOL_FROST] * 100.0f);
+            handler->PSendSysMessage(" |-- Shadow  : {:.2f}%", mods[SPELL_SCHOOL_SHADOW] * 100.0f);
+            handler->PSendSysMessage(" |-- Arcane  : {:.2f}%", mods[SPELL_SCHOOL_ARCANE] * 100.0f);
+        }
+
+        // _multiSchoolModifiers
+        {
+            auto& mods = mgr._multiSchoolModifiers;
+            handler->PSendSysMessage(" - Multi-school threat modifiers ({} entries):", mods.size());
+            for (auto const& pair : mods)
+                handler->PSendSysMessage(" |-- Mask 0x{:x}: {:.2f}%", uint32(pair.first), pair.second * 100.0f);
+        }
+
+        // _redirectInfo
+        {
+            auto const& redirectInfo = mgr._redirectInfo;
+            if (redirectInfo.empty())
+                handler->SendSysMessage(" - No redirects being applied");
+            else
+            {
+                handler->PSendSysMessage(" - {:02} redirects being applied:", redirectInfo.size());
+                for (auto const& pair : redirectInfo)
+                {
+                    Unit* unit = ObjectAccessor::GetUnit(*target, pair.first);
+                    handler->PSendSysMessage(" |-- {:02}% to {}", pair.second, unit ? unit->GetName() : pair.first.ToString());
+                }
+            }
+        }
+
+        // _redirectRegistry
+        {
+            auto const& redirectRegistry = mgr._redirectRegistry;
+            if (redirectRegistry.empty())
+                handler->SendSysMessage(" - No redirects are registered");
+            else
+            {
+                handler->PSendSysMessage(" - {:02} spells may have redirects registered", redirectRegistry.size());
+                for (auto const& outerPair : redirectRegistry)
+                {
+                    SpellInfo const* const spell = sSpellMgr->GetSpellInfo(outerPair.first);
+                    handler->PSendSysMessage(" |-- #{:06} {} ({} entries):", outerPair.first, spell ? spell->SpellName[0] : "<unknown>", outerPair.second.size());
+                    for (auto const& innerPair : outerPair.second)
+                    {
+                        Unit* unit = ObjectAccessor::GetUnit(*target, innerPair.first);
+                        handler->PSendSysMessage("   |-- {:02}% to {}", innerPair.second, unit ? unit->GetName() : innerPair.first.ToString());
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    static bool HandleDebugCombatListCommand(ChatHandler* handler)
+    {
+        Unit* target = handler->getSelectedUnit();
+        if (!target)
+            target = handler->GetPlayer();
+
+        handler->PSendSysMessage("Combat refs: (Combat state: {} | Manager state: {})", target->IsInCombat(), target->GetCombatManager().HasCombat());
+        for (auto const& ref : target->GetCombatManager().GetPvPCombatRefs())
+        {
+            Unit* unit = ref.second->GetOther(target);
+            handler->PSendSysMessage("[PvP] {} (SpawnID {})", unit->GetName(), unit->IsCreature() ? unit->ToCreature()->GetSpawnId() : 0);
+        }
+        for (auto const& ref : target->GetCombatManager().GetPvECombatRefs())
+        {
+            Unit* unit = ref.second->GetOther(target);
+            handler->PSendSysMessage("[PvE] {} (SpawnID {})", unit->GetName(), unit->IsCreature() ? unit->ToCreature()->GetSpawnId() : 0);
+        }
         return true;
     }
 
@@ -862,27 +1004,32 @@ public:
         if (!target)
             target = handler->GetSession()->GetPlayer();
 
-        HostileReference* ref = target->getHostileRefMgr().getFirst();
         uint32 count = 0;
 
-        handler->PSendSysMessage("Hostile reference list of {} ({})", target->GetName(), target->GetGUID().ToString());
+        handler->PSendSysMessage("Threatened by me list of {} ({})", target->GetName(), target->GetGUID().ToString());
 
-        while (ref)
+        for (auto const& pair : target->GetThreatMgr().GetThreatenedByMeList())
         {
-            if (Unit* unit = ref->GetSource()->GetOwner())
+            ThreatReference const* ref = pair.second;
+            Creature* owner = ref->GetOwner();
+            if (owner)
             {
-                handler->PSendSysMessage("   {}.   {} {}   ({})  - threat {}", ++count, (ref->IsOnline() ? "" : "[offline]"),
-                    unit->GetName(), unit->GetGUID().ToString(), ref->GetThreat());
+                std::string stateStr = "";
+                if (ref->IsOffline())
+                    stateStr = "[offline] ";
+                else if (ref->IsSuppressed())
+                    stateStr = "[suppressed] ";
+
+                handler->PSendSysMessage("   {}.   {}{}   ({})  - threat {}", ++count, stateStr,
+                    owner->GetName(), owner->GetGUID().ToString(), ref->GetThreat());
             }
             else
             {
                 handler->PSendSysMessage("   {}.   No Owner  - threat {}", ++count, ref->GetThreat());
             }
-
-            ref = ref->next();
         }
 
-        handler->SendSysMessage("End of hostile reference list.");
+        handler->SendSysMessage("End of threatened by me list.");
         return true;
     }
 

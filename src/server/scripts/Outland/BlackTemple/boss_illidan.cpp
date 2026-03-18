@@ -1104,7 +1104,7 @@ struct npc_maiev_illidan : public ScriptedAI
     void Reset() override
     {
         scheduler.CancelAll();
-        me->m_Events.KillAllEvents(true);
+        me->m_Events.KillAllEvents(false);
     }
 
     void DoAction(int32 param) override
