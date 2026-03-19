@@ -132,7 +132,7 @@ inline void CreatureUnitRelocationWorker(Creature* c, Unit* u)
     }
 
     // Prevents AI reaction when immunity flags are active
-    if (c->GetEntry() == 17862 && c->IsImmuneToNPC())
+    if (c->GetZoneId() == 2367 && c->IsImmuneToNPC())
     {
         return;
     }
