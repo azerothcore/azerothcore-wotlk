@@ -1,3 +1,4 @@
+-- DB update 2026_03_19_00 -> 2026_03_19_01
 -- Update gameobject 'Eye of Eternity' with sniffed values
 -- updated spawns
 DELETE FROM `gameobject` WHERE (`id` IN (193070, 193958, 193960, 193908)) AND (`guid` IN (268037, 268038, 268039, 268040));
