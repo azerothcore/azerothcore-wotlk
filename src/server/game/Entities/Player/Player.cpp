@@ -3332,7 +3332,7 @@ uint8 Player::GetLearnSpellSpecMask(uint32 const spellId) const
     uint32 const firstRankSpellId = sSpellMgr->GetFirstSpellInChain(spellId);
 
     bool const isTalentBasedSpell = GetTalentSpellCost(firstRankSpellId) > 0 || sSpellMgr->IsAdditionalTalentSpell(firstRankSpellId);
-    
+
     // If this spell doesn't require any talents, learn it in all talent specs
     if (!isTalentBasedSpell)
         return SPEC_MASK_ALL;
@@ -3361,7 +3361,6 @@ uint8 Player::GetLearnSpellSpecMask(uint32 const spellId) const
 
             // The required spell should usually exist at least in the current spec, but maybe we are learning a spell via GM command
             requiredSpellsSpecMask &= requiredSpellExistsAsPlayerSpell ? m_spells.at(requiredSpellId)->specMask : 0;
-
         }
         specMask |= requiredSpellsSpecMask;
     }
