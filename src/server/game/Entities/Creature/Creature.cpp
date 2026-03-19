@@ -2758,10 +2758,6 @@ void Creature::AtEngage(Unit* target)
 {
     Unit::AtEngage(target);
 
-    // If we somehow engage in combat with a player while immune, remove immunity so they can fight back
-    if (target && IsImmuneToPC() && target->GetCharmerOrOwnerPlayerOrPlayerItself())
-        SetImmuneToPC(false);
-
     if (!IsStandState())
         SetStandState(UNIT_STAND_STATE_STAND);
 
