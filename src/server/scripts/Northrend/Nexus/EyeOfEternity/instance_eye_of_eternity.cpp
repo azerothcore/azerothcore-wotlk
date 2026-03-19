@@ -56,6 +56,10 @@ struct instance_eye_of_eternity : public InstanceScript
 
         if (creature->GetEntry() == NPC_VORTEX)
             _vortexTriggers.push_back(creature->GetGUID());
+
+        if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
+            if (creature->GetEntry() == NPC_WYRMREST_SKYTALON)
+                creature->SetFaction(FACTION_FRIENDLY);
     }
 
     ObjectGuid GetGuidData(uint32 data) const override
