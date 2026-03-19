@@ -95,12 +95,19 @@ void WaypointMovementGenerator<Creature>::OnArrived(Creature* creature)
 
     auto currentNodeItr = i_path->find(i_currentNode);
 
-    if (currentNodeItr->second.event_id && urand(0, 99) < currentNodeItr->second.event_chance)
+    if (currentNodeItr->second.event_id != 0 && urand(0, 99) < currentNodeItr->second.event_chance)
     {
-        LOG_DEBUG("maps.script", "Creature movement start script {} at point {} for {}.",
-            currentNodeItr->second.event_id, i_currentNode, creature->GetGUID().ToString());
-        creature->ClearUnitState(UNIT_STATE_ROAMING_MOVE);
-        creature->GetMap()->ScriptsStart(sWaypointScripts, currentNodeItr->second.event_id, creature, nullptr);
+        if (currentNodeItr->second.event_id > 0)
+        {
+            LOG_DEBUG("maps.script", "Creature movement start script {} at point {} for {}.",
+                currentNodeItr->second.event_id, i_currentNode, creature->GetGUID().ToString());
+            creature->ClearUnitState(UNIT_STATE_ROAMING_MOVE);
+            creature->GetMap()->ScriptsStart(sWaypointScripts, currentNodeItr->second.event_id, creature, nullptr);
+        }
+        else if (creature->IsAIEnabled)
+        {
+            creature->AI()->DoAction(-currentNodeItr->second.event_id);
+        }
     }
 
     // Inform script

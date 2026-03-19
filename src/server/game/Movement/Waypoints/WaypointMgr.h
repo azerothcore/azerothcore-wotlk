@@ -40,7 +40,7 @@ struct WaypointData
     float x, y, z;
     std::optional<float> orientation;
     uint32 delay;
-    uint32 event_id = 0;
+    int32 event_id = 0;
     uint32 move_type = 0;
     uint8 event_chance = 0;
 };
