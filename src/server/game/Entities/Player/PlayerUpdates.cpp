@@ -1537,6 +1537,16 @@ void Player::UpdatePvP(bool state, bool _override)
     sScriptMgr->OnPlayerPVPFlagChange(this, state);
 }
 
+void Player::AtExitCombat()
+{
+    Unit::AtExitCombat();
+    UpdatePotionCooldown();
+
+    if (IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY))
+        for (uint8 i = 0; i < MAX_RUNES; ++i)
+            SetGracePeriod(i, 0);
+}
+
 void Player::UpdatePotionCooldown(Spell* spell)
 {
     // no potion used i combat or still in combat
