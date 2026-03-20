@@ -253,7 +253,7 @@ public:
     CreatureSpellCooldowns m_CreatureSpellCooldowns;
     uint32 m_ProhibitSchoolTime[7];
 
-    bool CanStartAttack(Unit const* u) const;
+    bool CanStartAttack(Unit const* u, bool force = false) const;
     float GetAggroRange(Unit const* target) const;
     float GetAttackDistance(Unit const* player) const;
     [[nodiscard]] float GetDetectionRange() const { return m_detectionDistance; }
