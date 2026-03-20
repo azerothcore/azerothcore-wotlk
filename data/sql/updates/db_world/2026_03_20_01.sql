@@ -1,3 +1,4 @@
+-- DB update 2026_03_20_00 -> 2026_03_20_01
 
 -- Upate SAI (add reset Invcibility Hp & enable evade on respawn).
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28406;
