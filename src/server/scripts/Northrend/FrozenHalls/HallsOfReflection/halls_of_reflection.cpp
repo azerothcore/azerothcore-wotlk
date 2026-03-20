@@ -1822,9 +1822,9 @@ public:
                     {
                         me->SetSpeed(MOVE_RUN, 9.0f / 7.0f);
                         Movement::PointsArray path;
-                        path.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
+                        path.emplace_back(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
                         for (uint8 i = 0; i <= 2; ++i)
-                            path.push_back(G3D::Vector3(PathWaypoints[i].GetPositionX(), PathWaypoints[i].GetPositionY(), PathWaypoints[i].GetPositionZ()));
+                            path.emplace_back(PathWaypoints[i].GetPositionX(), PathWaypoints[i].GetPositionY(), PathWaypoints[i].GetPositionZ());
                         me->GetMotionMaster()->MoveSplinePath(&path);
                     }
                     break;
@@ -1834,9 +1834,9 @@ public:
                         Talk(SAY_LK_WINTER);
                         me->CastSpell(me, SPELL_REMORSELESS_WINTER, true);
                         Movement::PointsArray path;
-                        path.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
+                        path.emplace_back(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
                         for (uint8 i = 3; i < PATH_WP_COUNT - 1; ++i)
-                            path.push_back(G3D::Vector3(PathWaypoints[i].GetPositionX(), PathWaypoints[i].GetPositionY(), PathWaypoints[i].GetPositionZ()));
+                            path.emplace_back(PathWaypoints[i].GetPositionX(), PathWaypoints[i].GetPositionY(), PathWaypoints[i].GetPositionZ());
                         me->GetMotionMaster()->MoveSplinePath(&path);
                         me->GetMotionMaster()->propagateSpeedChange();
                         events.ScheduleEvent(EVENT_LK_SUMMON, 1s);
@@ -1986,9 +1986,9 @@ public:
             ++currentStopPoint;
             me->SetWalk(false);
             Movement::PointsArray path;
-            path.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
+            path.emplace_back(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
             for (uint8 i = WP_STOP[currentStopPoint - 1] + (currentStopPoint == 1 ? 0 : 1); i <= WP_STOP[currentStopPoint]; ++i)
-                path.push_back(G3D::Vector3(PathWaypoints[i].GetPositionX(), PathWaypoints[i].GetPositionY(), PathWaypoints[i].GetPositionZ()));
+                path.emplace_back(PathWaypoints[i].GetPositionX(), PathWaypoints[i].GetPositionY(), PathWaypoints[i].GetPositionZ());
             me->GetMotionMaster()->MoveSplinePath(&path, FORCED_MOVEMENT_RUN);
         }
 
