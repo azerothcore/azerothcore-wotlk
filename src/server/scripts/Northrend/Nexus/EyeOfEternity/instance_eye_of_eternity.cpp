@@ -72,31 +72,22 @@ struct instance_eye_of_eternity : public InstanceScript
 
     void VortexHandling()
     {
-        Creature* malygos = GetCreature(DATA_MALYGOS);
-        if (!malygos)
+        if (_vortexTriggers.empty())
             return;
 
-        for (ObjectGuid const& guid : _vortexTriggers)
+        size_t triggerIndex = 0;
+        size_t triggerCount = _vortexTriggers.size();
+
+        instance->DoForAllPlayers([&](Player* player)
         {
-            uint8 counter = 0;
-            if (Creature* trigger = instance->GetCreature(guid))
-            {
-                for (auto* ref : malygos->GetThreatMgr().GetUnsortedThreatList())
-                {
-                    if (counter >= 5)
-                        break;
+            if (!player->IsAlive() || player->IsGameMaster())
+                return;
 
-                    if (Player* player = ref->GetVictim()->ToPlayer())
-                    {
-                        if (player->IsGameMaster() || player->HasAura(SPELL_VORTEX_4))
-                            continue;
+            if (Creature* trigger = instance->GetCreature(_vortexTriggers[triggerIndex]))
+                player->CastSpell(trigger, SPELL_VORTEX_4, true);
 
-                        player->CastSpell(trigger, SPELL_VORTEX_4, true);
-                        counter++;
-                    }
-                }
-            }
-        }
+            triggerIndex = (triggerIndex + 1) % triggerCount;
+        });
     }
 
     void OnPlayerEnter(Player* player) override
