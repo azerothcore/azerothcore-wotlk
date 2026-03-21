@@ -130,7 +130,7 @@ namespace Trainer
         return nullptr;
     }
 
-    bool Trainer::CanTeachSpell(Player const* player, Spell const* trainerSpell)
+    bool Trainer::CanTeachSpell(Player const* player, Spell const* trainerSpell) const
     {
         SpellState state = GetSpellState(player, trainerSpell);
         if (state != SpellState::Available)
