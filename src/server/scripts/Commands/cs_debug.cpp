@@ -15,13 +15,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ArenaTeamMgr.h"
+#include "AuctionHouseMgr.h"
 #include "Bag.h"
 #include "BattlegroundMgr.h"
 #include "CellImpl.h"
 #include "Channel.h"
+#include "CharacterCache.h"
+#include "DatabaseEnv.h"
 #include "Chat.h"
 #include "CommandScript.h"
 #include "GridNotifiersImpl.h"
+#include "GuildMgr.h"
 #include "ItemTemplate.h"
 #include "LFGMgr.h"
 #include "Language.h"
@@ -32,6 +37,7 @@
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "PoolMgr.h"
+#include "RaceMgr.h"
 #include "ScriptMgr.h"
 #include "Transport.h"
 #include "Warden.h"
@@ -109,6 +115,7 @@ public:
             { "mapdata",        HandleDebugMapDataCommand,             SEC_ADMINISTRATOR, Console::No },
             { "boundary",       HandleDebugBoundaryCommand,            SEC_ADMINISTRATOR, Console::No },
             { "visibilitydata", HandleDebugVisibilityDataCommand,      SEC_ADMINISTRATOR, Console::No },
+            { "factionchange",  HandleDebugFactionChangeCommand,       SEC_ADMINISTRATOR, Console::Yes},
             { "zonestats",      HandleDebugZoneStatsCommand,           SEC_MODERATOR,     Console::Yes}
         };
         static ChatCommandTable commandTable =
@@ -1838,6 +1845,123 @@ public:
             handler->PSendSysMessage(LANG_DEBUG_LOOT_GOLD_MULTI,
                 avgGold, gold, silver, copper, iterations);
         }
+
+        return true;
+    }
+
+    static bool HandleDebugFactionChangeCommand(ChatHandler* handler, Optional<PlayerIdentifier> playerTarget)
+    {
+        if (!playerTarget)
+            playerTarget = PlayerIdentifier::FromTarget(handler);
+
+        if (!playerTarget)
+        {
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+            return false;
+        }
+
+        ObjectGuid guid = playerTarget->GetGUID();
+        std::string name = playerTarget->GetName();
+
+        CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(guid);
+        if (!playerData)
+        {
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+            return false;
+        }
+
+        // Query at_login flags and money from the database (synchronous)
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_AT_LOGIN_TITLES_MONEY);
+        stmt->SetData(0, guid.GetCounter());
+        PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+        if (!result)
+        {
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+            return false;
+        }
+
+        Field* fields = result->Fetch();
+        uint32 atLoginFlags = fields[0].Get<uint16>();
+        uint32 money = fields[2].Get<uint32>();
+
+        // Header
+        handler->PSendSysMessage(LANG_DEBUG_FACTIONCHANGE_HEADER, name, guid.GetCounter());
+
+        // AT_LOGIN flags
+        bool hasFactionFlag = (atLoginFlags & AT_LOGIN_CHANGE_FACTION) != 0;
+        bool hasRaceFlag = (atLoginFlags & AT_LOGIN_CHANGE_RACE) != 0;
+
+        if (hasFactionFlag)
+            handler->PSendSysMessage(LANG_DEBUG_FACTIONCHANGE_FLAG_FACTION);
+        if (hasRaceFlag)
+            handler->PSendSysMessage(LANG_DEBUG_FACTIONCHANGE_FLAG_RACE);
+        if (!hasFactionFlag && !hasRaceFlag)
+            handler->PSendSysMessage(LANG_DEBUG_FACTIONCHANGE_FLAG_NONE);
+
+        // Faction-change-only checks (guild, arena captain, mail, auctions)
+        if (hasFactionFlag)
+        {
+            // Guild check
+            if (playerData->GuildId && !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD))
+            {
+                std::string guildName = sGuildMgr->GetGuildNameById(playerData->GuildId);
+                handler->PSendSysMessage(LANG_DEBUG_FACTIONCHANGE_GUILD_FAIL, guildName);
+            }
+            else
+                handler->PSendSysMessage(LANG_DEBUG_FACTIONCHANGE_GUILD_OK);
+
+            // Arena team captain check
+            if (sArenaTeamMgr->GetArenaTeamByCaptain(guid))
+                handler->PSendSysMessage(LANG_DEBUG_FACTIONCHANGE_ARENA_CAPTAIN_FAIL);
+            else
+                handler->PSendSysMessage(LANG_DEBUG_FACTIONCHANGE_ARENA_CAPTAIN_OK);
+
+            // Mail check
+            if (playerData->MailCount)
+                handler->PSendSysMessage(LANG_DEBUG_FACTIONCHANGE_MAIL_FAIL, playerData->MailCount);
+            else
+                handler->PSendSysMessage(LANG_DEBUG_FACTIONCHANGE_MAIL_OK);
+
+            // Auction check - mirrors CharacterHandler.cpp logic
+            // AH faction IDs: 0 = neutral, 12 = alliance, 29 = horde
+            bool hasAuctions = false;
+            for (uint8 i = 0; i < 2; ++i)
+            {
+                AuctionHouseObject* auctionHouse = sAuctionMgr->GetAuctionsMap(
+                    i == 0 ? 0 : (((1 << (playerData->Race - 1)) & sRaceMgr->GetAllianceRaceMask()) ? 12 : 29));
+
+                for (auto const& [auID, Aentry] : auctionHouse->GetAuctions())
+                {
+                    if (Aentry && (Aentry->owner == guid || Aentry->bidder == guid))
+                    {
+                        hasAuctions = true;
+                        break;
+                    }
+                }
+
+                if (hasAuctions)
+                    break;
+            }
+
+            if (hasAuctions)
+                handler->PSendSysMessage(LANG_DEBUG_FACTIONCHANGE_AUCTION_FAIL);
+            else
+                handler->PSendSysMessage(LANG_DEBUG_FACTIONCHANGE_AUCTION_OK);
+        }
+        else
+        {
+            handler->PSendSysMessage(LANG_DEBUG_FACTIONCHANGE_NA);
+        }
+
+        // Gold limit check
+        uint32 maxMoney = sWorld->getIntConfig(CONFIG_CHANGE_FACTION_MAX_MONEY);
+        if (maxMoney && money > maxMoney)
+            handler->PSendSysMessage(LANG_DEBUG_FACTIONCHANGE_GOLD_FAIL, money, maxMoney);
+        else if (maxMoney)
+            handler->PSendSysMessage(LANG_DEBUG_FACTIONCHANGE_GOLD_OK, money, maxMoney);
+        else
+            handler->PSendSysMessage(LANG_DEBUG_FACTIONCHANGE_GOLD_NOLIMIT, money);
 
         return true;
     }
