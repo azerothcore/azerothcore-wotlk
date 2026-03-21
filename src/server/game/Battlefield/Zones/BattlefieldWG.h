@@ -449,8 +449,6 @@ protected:
     GuidUnorderedSet UpdateTenacityList;
 
     int32 TenacityStack;
-    uint32 TenacityUpdateTimer;
-    uint32 SaveTimer;
 
     ObjectGuid TitansRelic;
 };

@@ -31,6 +31,7 @@
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Transport.h"
+#include "World.h"
 #include "WorldPacket.h"
 #include "WorldSessionMgr.h"
 
@@ -57,9 +58,6 @@ Battlefield::Battlefield() :
     NoWarBattleTime(0),
     RestartAfterCrash(0),
     TimeForAcceptInvite(20),
-    KickDontAcceptTimer(1000),
-    KickAfkPlayersTimer(1000),
-    LastResurrectTimer(RESURRECTION_INTERVAL),
     StartGroupingTimer(0),
     StartGrouping(false)
 {
@@ -147,7 +145,11 @@ bool Battlefield::Update(uint32 diff)
 {
     if (Timer <= diff)
     {
-        if (!IsEnabled() || (!IsWarTime() && sWorldSessionMgr->GetActiveSessionCount() > 3500)) // if WG is disabled or there is more than 3500 connections, switch automatically
+        uint32 sessionLimit = sWorld->getIntConfig(CONFIG_WINTERGRASP_SKIP_BATTLE_SESSION_COUNT);
+        bool tooManySessions = sessionLimit && !IsWarTime()
+            && sWorldSessionMgr->GetActiveSessionCount() > sessionLimit;
+
+        if (!IsEnabled() || tooManySessions)
         {
             Active = true;
             EndBattle(false);
@@ -174,51 +176,15 @@ bool Battlefield::Update(uint32 diff)
         SendUpdateWorldStates();
     }
 
+    _scheduler.Update(diff);
+
     bool objectiveChanged = false;
     if (IsWarTime())
     {
-        if (KickAfkPlayersTimer <= diff)
-        {
-            KickAfkPlayersTimer = 20000;
-            KickAfkPlayers();
-        }
-        else
-            KickAfkPlayersTimer -= diff;
-
-        // Kick players who chose not to accept invitation to the battle
-        if (KickDontAcceptTimer <= diff)
-        {
-            time_t now = GameTime::GetGameTime().count();
-            for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
-                for (PlayerTimerMap::value_type const& pair : InvitedPlayers[team])
-                    if (pair.second <= now)
-                        KickPlayerFromBattlefield(pair.first);
-
-            InvitePlayersInZoneToWar();
-            for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
-                for (PlayerTimerMap::value_type const& pair : PlayersWillBeKick[team])
-                    if (pair.second <= now)
-                        KickPlayerFromBattlefield(pair.first);
-
-            KickDontAcceptTimer = 5000;
-        }
-        else
-            KickDontAcceptTimer -= diff;
-
         for (BfCapturePoint* cp : CapturePoints)
             if (cp->Update(diff))
                 objectiveChanged = true;
     }
-
-    if (LastResurrectTimer <= diff)
-    {
-        for (BfGraveyard* gy : GraveyardList)
-            if (gy)
-                gy->Resurrect();
-        LastResurrectTimer = RESURRECTION_INTERVAL;
-    }
-    else
-        LastResurrectTimer -= diff;
 
     return objectiveChanged;
 }
@@ -342,6 +308,30 @@ void Battlefield::StartBattle()
     Timer = BattleTime;
     Active = true;
 
+    // Schedule war-only periodic timers
+    _scheduler.Schedule(1s, BATTLEFIELD_TIMER_GROUP_WAR, [this](TaskContext context)
+    {
+        KickAfkPlayers();
+        context.Repeat(20s);
+    });
+
+    _scheduler.Schedule(1s, BATTLEFIELD_TIMER_GROUP_WAR, [this](TaskContext context)
+    {
+        time_t now = GameTime::GetGameTime().count();
+        for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
+            for (PlayerTimerMap::value_type const& pair : InvitedPlayers[team])
+                if (pair.second <= now)
+                    KickPlayerFromBattlefield(pair.first);
+
+        InvitePlayersInZoneToWar();
+        for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
+            for (PlayerTimerMap::value_type const& pair : PlayersWillBeKick[team])
+                if (pair.second <= now)
+                    KickPlayerFromBattlefield(pair.first);
+
+        context.Repeat(5s);
+    });
+
     InvitePlayersInZoneToWar();
     InvitePlayersInQueueToWar();
 
@@ -358,6 +348,8 @@ void Battlefield::EndBattle(bool endByTimer)
         return;
 
     Active = false;
+
+    _scheduler.CancelGroup(BATTLEFIELD_TIMER_GROUP_WAR);
 
     StartGrouping = false;
 
@@ -626,7 +618,9 @@ void Battlefield::RemovePlayerFromResurrectQueue(ObjectGuid playerGuid)
 void Battlefield::SendAreaSpiritHealerQueryOpcode(Player* player, ObjectGuid const& guid)
 {
     WorldPacket data(SMSG_AREA_SPIRIT_HEALER_TIME, 12);
-    uint32 time = LastResurrectTimer;  // resurrect every 30 seconds
+    Milliseconds remaining = _scheduler.GetNextGroupOccurrence(BATTLEFIELD_TIMER_GROUP_RESURRECT);
+    uint32 time = static_cast<uint32>(std::clamp(remaining,
+        Milliseconds::zero(), Milliseconds(RESURRECTION_INTERVAL)).count());
 
     data << guid << time;
     ASSERT(player);

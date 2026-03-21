@@ -3628,6 +3628,15 @@ Wintergrasp.NoBattleTimer = 150
 Wintergrasp.CrashRestartTimer = 10
 
 #
+#     Wintergrasp.SkipBattleSessionCount
+#         Description: When the peace timer expires, if the number of active sessions
+#                      exceeds this value, a new war will not start.
+#                      Set to 0 to disable this check.
+#         Default:     3500
+
+Wintergrasp.SkipBattleSessionCount = 3500
+
+#
 ###################################################################################################
 
 ###################################################################################################

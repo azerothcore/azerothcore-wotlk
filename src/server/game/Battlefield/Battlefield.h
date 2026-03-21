@@ -22,6 +22,7 @@
 #include "GameObject.h"
 #include "ObjectAccessor.h"
 #include "SharedDefines.h"
+#include "TaskScheduler.h"
 #include "ZoneScript.h"
 
 enum BattlefieldTypes
@@ -54,6 +55,13 @@ enum BattlefieldSounds
 };
 
 constexpr auto BATTLEFIELD_OBJECTIVE_UPDATE_INTERVAL = 1000;
+
+enum BattlefieldTimerGroups
+{
+    BATTLEFIELD_TIMER_GROUP_RESURRECT   = 1,
+    BATTLEFIELD_TIMER_GROUP_WAR         = 2,
+    BATTLEFIELD_TIMER_GROUP_SAVE        = 3,
+};
 
 const uint32 BattlefieldFactions[PVP_TEAMS_COUNT] =
 {
@@ -401,17 +409,15 @@ protected:
     uint32 NoWarBattleTime;                                 // Time between two battles
     uint32 RestartAfterCrash;                               // Delay to restart Wintergrasp if the server crashed during a running battle
     uint32 TimeForAcceptInvite;
-    uint32 KickDontAcceptTimer;
     WorldLocation KickPosition;                             // Position where players are teleported if they switch to afk during the battle or if they don't accept invitation
-
-    uint32 KickAfkPlayersTimer;                             // Timer for check Afk in war
 
     // Graveyard variables
     GraveyardVect GraveyardList;                            // Vector which contains the different GY of the battle
-    uint32 LastResurrectTimer;                              // Timer for resurrect player every 30 sec
 
     uint32 StartGroupingTimer;                              // Timer for invite players in area 15 minutes before start battle
     bool StartGrouping;                                     // bool for knowing if all players in area have been invited
+
+    TaskScheduler _scheduler;
 
     GuidUnorderedSet Groups[PVP_TEAMS_COUNT];               // Contains different raid groups
 
