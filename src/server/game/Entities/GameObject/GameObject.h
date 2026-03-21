@@ -284,7 +284,8 @@ public:
 
     void CastSpell(Unit* target, uint32 spell);
     void SendCustomAnim(uint32 anim);
-    [[nodiscard]] bool IsInRange(float x, float y, float z, float radius) const;
+    bool IsInRange2d(float x, float y, float radius) const;
+    bool IsInRange3d(float x, float y, float z, float radius) const;
 
     void ModifyHealth(int32 change, Unit* attackerOrHealer = nullptr, uint32 spellId = 0);
     void SetDestructibleBuildingModifyState(bool allow) { m_allowModifyDestructibleBuilding = allow; }
@@ -418,8 +419,11 @@ private:
     {
         //! Following check does check 3d distance
         dist2compare += obj->GetObjectSize();
-        return IsInRange(obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ(), dist2compare);
+        return IsInRange3d(obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ(), dist2compare);
     }
+
+    bool IsWithinSightRange(Position const& pos, float dist) const override;
+
     GameObjectAI* m_AI;
 
     bool m_saveStateOnDb = false;

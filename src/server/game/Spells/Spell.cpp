@@ -9069,7 +9069,7 @@ namespace Acore
     {
         if (target->IsGameObject())
         {
-            if (!target->ToGameObject()->IsInRange(_position->GetPositionX(), _position->GetPositionY(), _position->GetPositionZ(), _range))
+            if (!target->ToGameObject()->IsInRange3d(_position->GetPositionX(), _position->GetPositionY(), _position->GetPositionZ(), _range))
                 return false;
         }
         else if (!target->IsWithinDist3d(_position, _range))

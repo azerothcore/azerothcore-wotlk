@@ -16325,8 +16325,8 @@ void Unit::ExecuteDelayedUnitRelocationEvent()
         GetMap()->LoadGridsInRange(*player, MAX_VISIBILITY_DISTANCE);
 
         Acore::PlayerRelocationNotifier notifier(*player);
-        Cell::VisitObjects(viewPoint, notifier, player->GetSightRange());
-        Cell::VisitFarVisibleObjects(viewPoint, notifier, VISIBILITY_DISTANCE_GIGANTIC);
+        Cell::VisitObjects(player->GetSightPosition().GetPositionX(), player->GetSightPosition().GetPositionY(), player->GetMap(), notifier, player->GetSightRange());
+        Cell::VisitFarVisibleObjects(player->GetSightPosition().GetPositionX(), player->GetSightPosition().GetPositionY(), player->GetMap(), notifier, VISIBILITY_DISTANCE_GIGANTIC);
         notifier.SendToSelf();
 
         this->AddToNotify(NOTIFY_AI_RELOCATION);

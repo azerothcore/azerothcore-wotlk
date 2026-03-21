@@ -154,7 +154,7 @@ static uint32 copseReclaimDelay[MAX_DEATH_COUNT] = { 30, 60, 120 };
 #ifdef _MSC_VER
 #pragma warning(disable:4355)
 #endif
-Player::Player(WorldSession* session): Unit(), m_mover(this)
+Player::Player(WorldSession* session): Unit(), m_mover(this), _cinematicMgr(*this)
 {
 #ifdef _MSC_VER
 #pragma warning(default:4355)
@@ -395,8 +395,6 @@ Player::Player(WorldSession* session): Unit(), m_mover(this)
 
     m_creationTime = 0s;
 
-    _cinematicMgr = new CinematicMgr(this);
-
     m_achievementMgr = new AchievementMgr(this);
     m_reputationMgr = new ReputationMgr(this);
 
@@ -462,7 +460,6 @@ Player::~Player()
     delete m_runes;
     delete m_achievementMgr;
     delete m_reputationMgr;
-    delete _cinematicMgr;
 
     sWorldSessionMgr->DecreasePlayerCount();
 
@@ -5688,10 +5685,6 @@ void Player::SendCinematicStart(uint32 CinematicSequenceId) const
     WorldPacket data(SMSG_TRIGGER_CINEMATIC, 4);
     data << uint32(CinematicSequenceId);
     SendDirectMessage(&data);
-    if (CinematicSequencesEntry const* sequence = sCinematicSequencesStore.LookupEntry(CinematicSequenceId))
-    {
-        _cinematicMgr->SetActiveCinematicCamera(sequence->cinematicCamera);
-    }
 }
 
 void Player::SendMovieStart(uint32 MovieId)
@@ -13201,6 +13194,14 @@ WorldObject* Player::GetViewpoint() const
     return nullptr;
 }
 
+Position const& Player::GetSightPosition() const
+{
+    if (_cinematicMgr.IsOnCinematic())
+        return _cinematicMgr.GetRemoteSightPosition();
+
+    return *m_seer;
+}
+
 bool Player::CanUseBattlegroundObject(GameObject* gameobject) const
 {
     // It is possible to call this method will a nullptr pointer, only skipping faction check.
@@ -16270,7 +16271,10 @@ bool Player::IsWorldObjectOutOfSightRange(WorldObject const* target) const
     }
 
     // Check if out of range
-    return !m_seer->IsWithinDist(target, GetSightRange(target), false);
+    if (!target->IsWithinSightRange(GetSightPosition(), GetSightRange(target)))
+        return true;
+
+    return false;
 }
 
 std::string Player::GetPlayerName()

@@ -137,7 +137,7 @@ public:
             handler->PSendSysMessage("{} waypoints dumped", flyByCameras->size());
         }
 
-        handler->GetPlayer()->SendCinematicStart(cinematicId);
+        handler->GetPlayer()->GetCinematicMgr().StartCinematic(cinematicId);
         return true;
     }
 
