@@ -811,6 +811,7 @@ public:
     void GetPlayerLevelInfo(uint32 race, uint32 class_, uint8 level, PlayerLevelInfo* info) const;
 
     uint32 GetNearestTaxiNode(float x, float y, float z, uint32 mapid, uint32 teamId);
+    uint32 GetNearestTaxiNode(WorldLocation const& loc, uint32 teamId);
     void GetTaxiPath(uint32 source, uint32 destination, uint32& path, uint32& cost);
     uint32 GetTaxiMountDisplayId(uint32 id, TeamId teamId, bool allowed_alt_team = false);
 

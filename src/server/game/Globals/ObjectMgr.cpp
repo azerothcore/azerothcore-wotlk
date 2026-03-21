@@ -7160,6 +7160,11 @@ void ObjectMgr::LoadAreaTriggerScripts()
     LOG_INFO("server.loading", " ");
 }
 
+uint32 ObjectMgr::GetNearestTaxiNode(WorldLocation const& loc, uint32 teamId)
+{
+    return GetNearestTaxiNode(loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ(), loc.GetMapId(), teamId);
+}
+
 uint32 ObjectMgr::GetNearestTaxiNode(float x, float y, float z, uint32 mapid, uint32 teamId)
 {
     bool found = false;

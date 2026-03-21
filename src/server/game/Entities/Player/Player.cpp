@@ -10441,7 +10441,7 @@ void Player::SendTaxiNodeStatusMultiple()
         if (!creature->HasNpcFlag(UNIT_NPC_FLAG_FLIGHTMASTER))
             return;
 
-        uint32 nearestNode = sObjectMgr->GetNearestTaxiNode(creature->GetPositionX(), creature->GetPositionY(), creature->GetPositionZ(), creature->GetMapId(), GetTeamId());
+        uint32 nearestNode = sObjectMgr->GetNearestTaxiNode(*creature, GetTeamId(true));
         if (!nearestNode)
             return;
 
