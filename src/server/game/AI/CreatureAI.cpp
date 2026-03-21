@@ -211,6 +211,9 @@ void CreatureAI::TriggerAlert(Unit const* who) const
     // If this unit isn't an NPC, is already distracted, is in combat, is confused, stunned or fleeing, do nothing
     if (!me->IsCreature() || me->IsEngaged() || me->HasUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_STUNNED | UNIT_STATE_FLEEING | UNIT_STATE_DISTRACTED))
         return;
+    // If the creature is immune to players, it should not be alerted by them
+    if (me->IsImmuneToPC())
+        return;
     // Only alert for hostiles!
     if (me->IsCivilian() || me->HasReactState(REACT_PASSIVE) || !me->IsHostileTo(who) || !me->_IsTargetAcceptable(who))
         return;
