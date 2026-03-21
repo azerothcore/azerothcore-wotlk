@@ -815,6 +815,7 @@ enum AcoreStrings
     LANG_NO_REASON                      = 35407,
     LANG_UNAUTHORIZED                   = 35408,
     LANG_PINFO_CHR_MAP_WITH_AREA        = 35409,
+    LANG_PINFO_CHR_ONLINETIME           = 35410,
 
     LANG_CHARACTER_GENDER_MALE          = 855,
     LANG_CHARACTER_GENDER_FEMALE        = 856,
