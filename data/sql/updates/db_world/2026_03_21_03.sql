@@ -1,3 +1,4 @@
+-- DB update 2026_03_21_02 -> 2026_03_21_03
 --
 DELETE FROM `command` WHERE `name`='learn all my quest';
 DELETE FROM `command` WHERE `name`='learn all my trainer';
