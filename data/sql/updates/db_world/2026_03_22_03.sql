@@ -1,3 +1,4 @@
+-- DB update 2026_03_22_02 -> 2026_03_22_03
 --
 CREATE TABLE `creature_immunities` (
   `ID` int NOT NULL,
