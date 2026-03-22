@@ -472,7 +472,7 @@ void ScriptedAI::DoResetThreat(Unit* unit)
 
 void ScriptedAI::DoResetThreatList()
 {
-    if (!me->CanHaveThreatList() || me->GetThreatMgr().IsThreatListEmpty())
+    if (!me->CanHaveThreatList() || me->GetThreatMgr().IsThreatListEmpty(true))
     {
         LOG_ERROR("entities.unit.ai", "DoResetThreatList called for creature that either cannot have threat list or has empty threat list (me entry = {})", me->GetEntry());
         return;

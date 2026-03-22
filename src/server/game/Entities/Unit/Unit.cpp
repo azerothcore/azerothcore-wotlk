@@ -11419,12 +11419,8 @@ Unit* Creature::SelectVictim()
 
     Unit* target = nullptr;
 
-    // Taunt handling is now done inside ThreatManager via TauntState
     if (CanHaveThreatList())
-    {
-        if (!m_threatManager.IsThreatListEmpty())
-            target = m_threatManager.GetCurrentVictim();
-    }
+        target = m_threatManager.GetCurrentVictim();
     else if (!HasReactState(REACT_PASSIVE))
     {
         // we have player pet probably
