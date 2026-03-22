@@ -199,7 +199,7 @@ void CreatureAI::OnOwnerCombatInteraction(Unit* target)
         return;
 
     if (!me->HasReactState(REACT_PASSIVE) && me->CanStartAttack(target, true))
-        me->EngageWithTarget(target);
+        AttackStart(target);
 }
 
 // Distract creature, if player gets too close while stealthed/prowling
