@@ -70,6 +70,25 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
         }
     }
 
+    void JustExitedCombat() override
+    {
+        EngagementOver();
+    }
+
+    void EnterEvadeMode(EvadeReason /*why*/) override
+    {
+        if (!_EnterEvadeMode())
+            return;
+
+        me->ClearUnitState(UNIT_STATE_EVADE);
+
+        if (Unit* owner = me->GetOwner())
+        {
+            me->GetMotionMaster()->Clear(false);
+            me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle(), MOTION_SLOT_ACTIVE);
+        }
+    }
+
     void InitializeAI() override
     {
         ScriptedAI::InitializeAI();
