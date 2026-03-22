@@ -481,6 +481,9 @@ void Player::CleanupsBeforeDelete(bool finalCleanup)
     TradeCancel(false);
     DuelComplete(DUEL_INTERRUPTED);
 
+    if (Group* group = GetGroupInvite())
+        group->RemoveInvite(this);
+
     Unit::CleanupsBeforeDelete(finalCleanup);
 }
 
