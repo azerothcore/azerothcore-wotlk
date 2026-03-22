@@ -1,15 +1,4 @@
 --
-UPDATE `acore_string` SET
-  `content_default`=REPLACE(`content_default`,'%u','%s'),
-  `locale_koKR`=REPLACE(`locale_koKR`,'%u','%s'),
-  `locale_frFR`=REPLACE(`locale_frFR`,'%u','%s'),
-  `locale_deDE`=REPLACE(`locale_deDE`,'%u','%s'),
-  `locale_zhCN`=REPLACE(`locale_zhCN`,'%u','%s'),
-  `locale_zhTW`=REPLACE(`locale_zhTW`,'%u','%s'),
-  `locale_esES`=REPLACE(`locale_esES`,'%u','%s'),
-  `locale_esMX`=REPLACE(`locale_esMX`,'%u','%s'),
-  `locale_ruRU`=REPLACE(`locale_ruRU`,'%u','%s')
-WHERE `entry`=5037;
 
 DELETE FROM `creature_immunities` WHERE `ID` IN (95,96,315,477,679,878,1537,1557,1614,1615,1630,1632,1664,1676,1682,1693,1694,1695,1733);
 INSERT INTO `creature_immunities` (`ID`, `SchoolMask`, `DispelTypeMask`, `MechanicsMask`, `Effects`, `Auras`, `ImmuneAoE`, `ImmuneChain`, `Comment`) VALUES
