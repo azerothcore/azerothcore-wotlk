@@ -217,6 +217,14 @@ struct boss_hodir : public BossAI
     const Position ENTRANCE_DOOR{ 1999.160034f, -297.792999f, 431.960999f, 0 };
     const Position EXIT_DOOR{ 1999.709961f, -166.259003f, 432.822998f, 0 };
 
+    void JustExitedCombat() override
+    {
+        EngagementOver();
+        if (me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
+            return;
+        EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
+    }
+
     void Reset() override
     {
         _Reset();

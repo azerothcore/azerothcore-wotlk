@@ -755,7 +755,7 @@ void SmartAI::MoveInLineOfSight(Unit* who)
 
 bool SmartAI::CanAIAttack(Unit const* /*who*/) const
 {
-    return !(me->GetReactState() == REACT_PASSIVE);
+    return true;
 }
 
 bool SmartAI::AssistPlayerInCombatAgainst(Unit* who)

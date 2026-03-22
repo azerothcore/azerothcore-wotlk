@@ -12512,7 +12512,7 @@ bool Player::HasItemFitToSpellRequirements(SpellInfo const* spellInfo, Item cons
                                 break;
                             }
 
-                    if (hasWeaponInSlot)
+                    if (!hasWeaponInSlot)
                         for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
                             if (spellInfo->Effects[i].IsAura())
                                 return true;

@@ -11392,6 +11392,8 @@ void Unit::AtTargetAttacked(Unit* target, bool canInitialAggro)
     target->EngageWithTarget(this);
     if (Unit* targetOwner = target->GetCharmerOrOwner())
         targetOwner->EngageWithTarget(this);
+    if (Unit* myOwner = GetCharmerOrOwner())
+        target->EngageWithTarget(myOwner);
 
     // Patch 3.0.8: All player spells which cause a creature to become aggressive
     // to you will now also immediately cause the creature to be tapped.
@@ -11419,12 +11421,8 @@ Unit* Creature::SelectVictim()
 
     Unit* target = nullptr;
 
-    // Taunt handling is now done inside ThreatManager via TauntState
     if (CanHaveThreatList())
-    {
-        if (!m_threatManager.IsThreatListEmpty())
-            target = m_threatManager.GetCurrentVictim();
-    }
+        target = m_threatManager.GetCurrentVictim();
     else if (!HasReactState(REACT_PASSIVE))
     {
         // we have player pet probably

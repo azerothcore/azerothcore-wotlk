@@ -399,6 +399,14 @@ struct boss_thorim : public BossAI
             go->SetGoState(GO_STATE_ACTIVE);
     }
 
+    void JustExitedCombat() override
+    {
+        EngagementOver();
+        if (_encounterFinished)
+            return;
+        EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
+    }
+
     void EnterEvadeMode(EvadeReason why) override
     {
         DisableThorim(false);
