@@ -17,7 +17,6 @@
 
 #include "AreaDefines.h"
 #include "Battleground.h"
-#include "CreatureScript.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
 #include "Player.h"

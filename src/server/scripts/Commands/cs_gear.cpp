@@ -19,7 +19,6 @@
 #include "CommandScript.h"
 #include "Language.h"
 #include "Player.h"
-#include "WorldSession.h"
 
 using namespace Acore::ChatCommands;
 

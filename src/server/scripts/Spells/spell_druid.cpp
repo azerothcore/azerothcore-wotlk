@@ -16,7 +16,6 @@
  */
 
 #include "Containers.h"
-#include "CreatureScript.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
 #include "Player.h"

@@ -17,7 +17,6 @@
 
 #include "AreaDefines.h"
 #include "CellImpl.h"
-#include "CreatureScript.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
 #include "SpellAuraEffects.h"

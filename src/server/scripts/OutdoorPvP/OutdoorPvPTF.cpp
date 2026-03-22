@@ -16,7 +16,6 @@
  */
 
 #include "OutdoorPvPTF.h"
-#include "CreatureScript.h"
 #include "GameTime.h"
 #include "Language.h"
 #include "MapMgr.h"

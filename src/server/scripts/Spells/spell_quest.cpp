@@ -16,7 +16,6 @@
  */
 
 #include "CellImpl.h"
-#include "CreatureScript.h"
 #include "CreatureTextMgr.h"
 #include "GridNotifiers.h"
 #include "MapMgr.h"

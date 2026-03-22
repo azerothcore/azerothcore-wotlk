@@ -23,7 +23,6 @@
 #include "Cell.h"
 #include "CellImpl.h"
 #include "Chat.h"
-#include "CreatureScript.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
 #include "Group.h"
