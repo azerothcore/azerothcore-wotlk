@@ -198,6 +198,10 @@ void CreatureAI::OnOwnerCombatInteraction(Unit* target)
     if (!target || !me->IsAlive())
         return;
 
+    // Prevent guardian from disengaging from current target
+    if (me->GetVictim() && me->GetVictim()->IsAlive())
+        return;
+
     if (!me->HasReactState(REACT_PASSIVE) && me->CanStartAttack(target, true))
         AttackStart(target);
 }
