@@ -30,6 +30,11 @@ enum Data
     DATA_BRONJAHM,
     DATA_DEVOURER,
     MAX_ENCOUNTER,
+
+    DATA_LEADER_FIRST,
+    DATA_LEADER_SECOND,
+    DATA_GUARD_FIRST,
+    DATA_GUARD_SECOND,
 };
 
 enum Creatures
@@ -98,5 +103,7 @@ inline AI* GetForgeOfSoulsAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, ForgeOfSoulsScriptName);
 }
+
+#define RegisterForgeOfSoulsCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetForgeOfSoulsAI)
 
 #endif
