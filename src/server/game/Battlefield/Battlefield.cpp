@@ -130,6 +130,7 @@ void Battlefield::HandlePlayerLeaveZone(Player* player, uint32 /*zone*/)
         cp->HandlePlayerLeave(player);
 
     InvitedPlayers[player->GetTeamId()].erase(player->GetGUID());
+    PlayersInQueue[player->GetTeamId()].erase(player->GetGUID());
     PlayersWillBeKick[player->GetTeamId()].erase(player->GetGUID());
     Players[player->GetTeamId()].erase(player->GetGUID());
     SendRemoveWorldStates(player);
@@ -290,7 +291,8 @@ void Battlefield::KickAfkPlayers()
 void Battlefield::KickPlayerFromBattlefield(ObjectGuid guid)
 {
     if (Player* player = ObjectAccessor::FindPlayer(guid))
-        if (player->GetZoneId() == GetZoneId() && !player->IsGameMaster())
+        if (player->GetZoneId() == GetZoneId() && !player->IsGameMaster()
+            && !PlayersInWar[player->GetTeamId()].count(guid))
             player->TeleportTo(KickPosition);
 }
 
@@ -416,7 +418,7 @@ void Battlefield::PlayerAcceptInviteToWar(Player* player)
     {
         player->GetSession()->SendBfEntered(BattleId);
         PlayersInWar[player->GetTeamId()].insert(player->GetGUID());
-        InvitedPlayers[player->GetTeamId(true)].erase(player->GetGUID());
+        InvitedPlayers[player->GetTeamId()].erase(player->GetGUID());
 
         if (player->isAFK())
             player->ToggleAFK();
