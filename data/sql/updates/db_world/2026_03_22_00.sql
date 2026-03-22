@@ -1,3 +1,4 @@
+-- DB update 2026_03_21_04 -> 2026_03_22_00
 --
 UPDATE `creature_template` SET `ScriptName` = 'npc_oathbound_warder' WHERE `entry` = 30270;
 
