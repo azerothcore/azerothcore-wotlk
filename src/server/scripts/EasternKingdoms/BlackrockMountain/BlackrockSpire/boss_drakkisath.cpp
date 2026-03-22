@@ -40,98 +40,85 @@ enum Events
     EVENT_CHECK_CONFLAGRATION_TARGET
 };
 
-class boss_drakkisath : public CreatureScript
+struct boss_drakkisath : public BossAI
 {
-public:
-    boss_drakkisath() : CreatureScript("boss_drakkisath") { }
-
-    struct boss_drakkisathAI : public BossAI
+    boss_drakkisath(Creature* creature) : BossAI(creature, DATA_GENERAL_DRAKKISATH)
     {
-        boss_drakkisathAI(Creature* creature) : BossAI(creature, DATA_GENERAL_DRAKKISATH)
-        {
-            _conflagrateThreat = 0.0f;
-        }
-
-        void JustEngagedWith(Unit* /*who*/) override
-        {
-            _JustEngagedWith();
-            events.ScheduleEvent(EVENT_FLAMESTRIKE, 6s);
-            events.ScheduleEvent(EVENT_CLEAVE, 8s);
-            events.ScheduleEvent(EVENT_CONFLAGRATION, 15s);
-            events.ScheduleEvent(EVENT_THUNDERCLAP, 17s);
-            events.ScheduleEvent(EVENT_PIERCE_ARMOR, 5s);
-            events.ScheduleEvent(EVENT_RAGE, 1s);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            while (uint32 eventId = events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                    case EVENT_FLAMESTRIKE:
-                        DoCastAOE(SPELL_FLAMESTRIKE);
-                        events.ScheduleEvent(EVENT_FLAMESTRIKE, 10s);
-                        break;
-                    case EVENT_CLEAVE:
-                        DoCastVictim(SPELL_CLEAVE);
-                        events.ScheduleEvent(EVENT_CLEAVE, 8s);
-                        break;
-                    case EVENT_CONFLAGRATION:
-                        DoCastVictim(SPELL_CONFLAGRATION);
-
-                        if (Unit* target = me->GetVictim())
-                        {
-                            _conflagrateTarget = me->GetVictim()->GetGUID();
-                            _conflagrateThreat = me->GetThreatMgr().GetThreat(me->GetVictim());
-                            me->GetThreatMgr().ModifyThreatByPercent(target, -100);
-                        }
-                        events.ScheduleEvent(EVENT_CONFLAGRATION, 18s, 25s);
-                        events.ScheduleEvent(EVENT_CHECK_CONFLAGRATION_TARGET, 10s);
-                        break;
-                    case EVENT_THUNDERCLAP:
-                        DoCastVictim(SPELL_THUNDERCLAP);
-                        events.ScheduleEvent(EVENT_THUNDERCLAP, 20s);
-                        break;
-                    case EVENT_PIERCE_ARMOR:
-                        DoCastVictim(SPELL_PIERCE_ARMOR);
-                        events.ScheduleEvent(EVENT_PIERCE_ARMOR, 40s);
-                        break;
-                    case EVENT_RAGE:
-                        DoCastSelf(SPELL_RAGE);
-                        events.ScheduleEvent(EVENT_RAGE, 35s);
-                        break;
-                    case EVENT_CHECK_CONFLAGRATION_TARGET:
-                        if (Unit* target = ObjectAccessor::GetUnit(*me, _conflagrateTarget))
-                        {
-                            me->GetThreatMgr().AddThreat(target, _conflagrateThreat);
-                        }
-                        break;
-                }
-            }
-            DoMeleeAttackIfReady();
-        }
-
-        private:
-            float _conflagrateThreat;
-            ObjectGuid _conflagrateTarget;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetBlackrockSpireAI<boss_drakkisathAI>(creature);
+        _conflagrateThreat = 0.0f;
     }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        _JustEngagedWith();
+        events.ScheduleEvent(EVENT_FLAMESTRIKE, 6s);
+        events.ScheduleEvent(EVENT_CLEAVE, 8s);
+        events.ScheduleEvent(EVENT_CONFLAGRATION, 15s);
+        events.ScheduleEvent(EVENT_THUNDERCLAP, 17s);
+        events.ScheduleEvent(EVENT_PIERCE_ARMOR, 5s);
+        events.ScheduleEvent(EVENT_RAGE, 1s);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        while (uint32 eventId = events.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+                case EVENT_FLAMESTRIKE:
+                    DoCastAOE(SPELL_FLAMESTRIKE);
+                    events.ScheduleEvent(EVENT_FLAMESTRIKE, 10s);
+                    break;
+                case EVENT_CLEAVE:
+                    DoCastVictim(SPELL_CLEAVE);
+                    events.ScheduleEvent(EVENT_CLEAVE, 8s);
+                    break;
+                case EVENT_CONFLAGRATION:
+                    DoCastVictim(SPELL_CONFLAGRATION);
+
+                    if (Unit* target = me->GetVictim())
+                    {
+                        _conflagrateTarget = me->GetVictim()->GetGUID();
+                        _conflagrateThreat = me->GetThreatMgr().GetThreat(me->GetVictim());
+                        me->GetThreatMgr().ModifyThreatByPercent(target, -100);
+                    }
+                    events.ScheduleEvent(EVENT_CONFLAGRATION, 18s, 25s);
+                    events.ScheduleEvent(EVENT_CHECK_CONFLAGRATION_TARGET, 10s);
+                    break;
+                case EVENT_THUNDERCLAP:
+                    DoCastVictim(SPELL_THUNDERCLAP);
+                    events.ScheduleEvent(EVENT_THUNDERCLAP, 20s);
+                    break;
+                case EVENT_PIERCE_ARMOR:
+                    DoCastVictim(SPELL_PIERCE_ARMOR);
+                    events.ScheduleEvent(EVENT_PIERCE_ARMOR, 40s);
+                    break;
+                case EVENT_RAGE:
+                    DoCastSelf(SPELL_RAGE);
+                    events.ScheduleEvent(EVENT_RAGE, 35s);
+                    break;
+                case EVENT_CHECK_CONFLAGRATION_TARGET:
+                    if (Unit* target = ObjectAccessor::GetUnit(*me, _conflagrateTarget))
+                        me->GetThreatMgr().AddThreat(target, _conflagrateThreat);
+                    break;
+            }
+        }
+        DoMeleeAttackIfReady();
+    }
+
+private:
+    float _conflagrateThreat;
+    ObjectGuid _conflagrateTarget;
 };
 
 void AddSC_boss_drakkisath()
 {
-    new boss_drakkisath();
+    RegisterBlackrockSpireCreatureAI(boss_drakkisath);
 }

@@ -51,123 +51,93 @@ enum Events
     EVENT_MAGMA_SHACKLES,
 };
 
-class boss_garr : public CreatureScript
+struct boss_garr : public BossAI
 {
-public:
-    boss_garr() : CreatureScript("boss_garr") {}
-
-    struct boss_garrAI : public BossAI
+    boss_garr(Creature* creature) : BossAI(creature, DATA_GARR),
+        massEruptionTimer(600000)   // 10 mins
     {
-        boss_garrAI(Creature* creature) : BossAI(creature, DATA_GARR),
-            massEruptionTimer(600000)   // 10 mins
+    }
+
+    void Reset() override
+    {
+        _Reset();
+        massEruptionTimer = 600000;
+    }
+
+    void JustEngagedWith(Unit* /*attacker*/) override
+    {
+        _JustEngagedWith();
+        DoCastSelf(SPELL_SEPARATION_ANXIETY, true);
+        events.ScheduleEvent(EVENT_ANTIMAGIC_PULSE, 15s);
+        events.ScheduleEvent(EVENT_MAGMA_SHACKLES, 10s);
+        massEruptionTimer = 600000; // 10 mins
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        // This should always process
+        if (massEruptionTimer <= diff)
         {
+            Talk(EMOTE_MASS_ERRUPTION, me);
+            DoCastAOE(SPELL_ERUPTION_TRIGGER, true);
+            massEruptionTimer = 20000;
+        }
+        else
+        {
+            massEruptionTimer -= diff;
         }
 
-        void Reset() override
+        events.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        while (uint32 const eventId = events.ExecuteEvent())
         {
-            _Reset();
-            massEruptionTimer = 600000;
-        }
-
-        void JustEngagedWith(Unit* /*attacker*/) override
-        {
-            _JustEngagedWith();
-            DoCastSelf(SPELL_SEPARATION_ANXIETY, true);
-            events.ScheduleEvent(EVENT_ANTIMAGIC_PULSE, 15s);
-            events.ScheduleEvent(EVENT_MAGMA_SHACKLES, 10s);
-            massEruptionTimer = 600000; // 10 mins
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
+            switch (eventId)
             {
-                return;
+                case EVENT_ANTIMAGIC_PULSE:
+                {
+                    DoCastSelf(SPELL_ANTIMAGIC_PULSE);
+                    events.Repeat(20s);
+                    break;
+                }
+                case EVENT_MAGMA_SHACKLES:
+                {
+                    DoCastSelf(SPELL_MAGMA_SHACKLES);
+                    events.Repeat(15s);
+                    break;
+                }
             }
-
-            // This should always process
-            if (massEruptionTimer <= diff)
-            {
-                Talk(EMOTE_MASS_ERRUPTION, me);
-                DoCastAOE(SPELL_ERUPTION_TRIGGER, true);
-                massEruptionTimer = 20000;
-            }
-            else
-            {
-                massEruptionTimer -= diff;
-            }
-
-            events.Update(diff);
 
             if (me->HasUnitState(UNIT_STATE_CASTING))
-            {
                 return;
-            }
-
-            while (uint32 const eventId = events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                    case EVENT_ANTIMAGIC_PULSE:
-                    {
-                        DoCastSelf(SPELL_ANTIMAGIC_PULSE);
-                        events.Repeat(20s);
-                        break;
-                    }
-                    case EVENT_MAGMA_SHACKLES:
-                    {
-                        DoCastSelf(SPELL_MAGMA_SHACKLES);
-                        events.Repeat(15s);
-                        break;
-                    }
-                }
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                {
-                    return;
-                }
-            }
-
-            DoMeleeAttackIfReady();
         }
 
-    private:
-        uint32 massEruptionTimer;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetMoltenCoreAI<boss_garrAI>(creature);
+        DoMeleeAttackIfReady();
     }
+
+private:
+    uint32 massEruptionTimer;
 };
 
-class npc_garr_firesworn : public CreatureScript
+struct npc_garr_firesworn : public ScriptedAI
 {
-public:
-    npc_garr_firesworn() : CreatureScript("npc_garr_firesworn") {}
+    npc_garr_firesworn(Creature* creature) : ScriptedAI(creature) {}
 
-    struct npc_garr_fireswornAI : public ScriptedAI
+    void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/ ) override
     {
-        npc_garr_fireswornAI(Creature* creature) : ScriptedAI(creature) {}
-
-        void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/ ) override
+        if (damage >= me->GetHealth())
         {
-            if (damage >= me->GetHealth())
-            {
-                // Prevent double damage because Firesworn can kill himself with Massive Erruption
-                if (me != attacker)
-                {
-                    DoCastSelf(SPELL_ERUPTION, true);
-                }
+            // Prevent double damage because Firesworn can kill himself with Massive Eruption
+            if (me != attacker)
+                DoCastSelf(SPELL_ERUPTION, true);
 
-                DoCastAOE(SPELL_ENRAGE_TRIGGER);
-            }
+            DoCastAOE(SPELL_ENRAGE_TRIGGER);
         }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetMoltenCoreAI<npc_garr_fireswornAI>(creature);
     }
 };
 
@@ -210,9 +180,7 @@ class spell_garr_frenzy : public SpellScript
     void HandleHit(SpellEffIndex /*effIndex*/)
     {
         if (Unit* target = GetHitUnit())
-        {
             target->CastSpell(target, SPELL_FRENZY);
-        }
     }
 
     void Register() override
@@ -223,8 +191,8 @@ class spell_garr_frenzy : public SpellScript
 
 void AddSC_boss_garr()
 {
-    new boss_garr();
-    new npc_garr_firesworn();
+    RegisterMoltenCoreCreatureAI(boss_garr);
+    RegisterMoltenCoreCreatureAI(npc_garr_firesworn);
 
     // Spells
     RegisterSpellScript(spell_garr_separation_anxiety_aura);

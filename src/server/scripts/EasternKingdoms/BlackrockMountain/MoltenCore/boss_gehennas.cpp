@@ -34,74 +34,57 @@ enum Events
     EVENT_SHADOW_BOLT,
 };
 
-class boss_gehennas : public CreatureScript
+struct boss_gehennas : public BossAI
 {
-public:
-    boss_gehennas() : CreatureScript("boss_gehennas") { }
+    boss_gehennas(Creature* creature) : BossAI(creature, DATA_GEHENNAS) {}
 
-    struct boss_gehennasAI : public BossAI
+    void JustEngagedWith(Unit* /*attacker*/) override
     {
-        boss_gehennasAI(Creature* creature) : BossAI(creature, DATA_GEHENNAS) {}
+        _JustEngagedWith();
+        events.ScheduleEvent(EVENT_GEHENNAS_CURSE, 6s, 9s);
+        events.ScheduleEvent(EVENT_RAIN_OF_FIRE, 10s);
+        events.ScheduleEvent(EVENT_SHADOW_BOLT, 3s, 5s);
+    }
 
-        void JustEngagedWith(Unit* /*attacker*/) override
+    void ExecuteEvent(uint32 eventId) override
+    {
+        switch (eventId)
         {
-            _JustEngagedWith();
-            events.ScheduleEvent(EVENT_GEHENNAS_CURSE, 6s, 9s);
-            events.ScheduleEvent(EVENT_RAIN_OF_FIRE, 10s);
-            events.ScheduleEvent(EVENT_SHADOW_BOLT, 3s, 5s);
-        }
-
-        void ExecuteEvent(uint32 eventId) override
-        {
-            switch (eventId)
+            case EVENT_GEHENNAS_CURSE:
             {
-                case EVENT_GEHENNAS_CURSE:
+                DoCastVictim(SPELL_GEHENNAS_CURSE);
+                events.Repeat(25s, 30s);
+                break;
+            }
+            case EVENT_RAIN_OF_FIRE:
+            {
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
+                    DoCast(target, SPELL_RAIN_OF_FIRE, true);
+                events.Repeat(6s);
+                break;
+            }
+            case EVENT_SHADOW_BOLT:
+            {
+                if (urand(0, 1))
                 {
-                    DoCastVictim(SPELL_GEHENNAS_CURSE);
-                    events.Repeat(25s, 30s);
-                    break;
-                }
-                case EVENT_RAIN_OF_FIRE:
-                {
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
-                    {
-                        DoCast(target, SPELL_RAIN_OF_FIRE, true);
-                    }
-                    events.Repeat(6s);
-                    break;
-                }
-                case EVENT_SHADOW_BOLT:
-                {
-                    if (urand(0, 1))
-                    {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, false))
-                        {
-                            DoCast(target, SPELL_SHADOW_BOLT_RANDOM);
-                        }
-                        else
-                        {
-                            DoCastVictim(SPELL_SHADOW_BOLT_VICTIM);
-                        }
-                    }
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, false))
+                        DoCast(target, SPELL_SHADOW_BOLT_RANDOM);
                     else
-                    {
                         DoCastVictim(SPELL_SHADOW_BOLT_VICTIM);
-                    }
-
-                    events.Repeat(5s);
-                    break;
                 }
+                else
+                {
+                    DoCastVictim(SPELL_SHADOW_BOLT_VICTIM);
+                }
+
+                events.Repeat(5s);
+                break;
             }
         }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetMoltenCoreAI<boss_gehennasAI>(creature);
     }
 };
 
 void AddSC_boss_gehennas()
 {
-    new boss_gehennas();
+    RegisterMoltenCoreCreatureAI(boss_gehennas);
 }

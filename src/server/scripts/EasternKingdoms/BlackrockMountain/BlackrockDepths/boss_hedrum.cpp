@@ -30,70 +30,55 @@ constexpr Milliseconds TIMER_PARALYZING = 20s;
 constexpr Milliseconds TIMER_BANEFUL = 24s;
 constexpr Milliseconds TIMER_WEB_EXPLOSION = 20s;
 
-class boss_hedrum : public CreatureScript
+struct boss_hedrum : public BossAI
 {
-public:
-    boss_hedrum() : CreatureScript("boss_hedrum") {}
+    boss_hedrum(Creature* creature) : BossAI(creature, DATA_HEDRUM) {}
 
-    CreatureAI* GetAI(Creature* creature) const override
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        return GetBlackrockDepthsAI<boss_hedrumAI>(creature);
+        _JustEngagedWith();
+        events.ScheduleEvent(SPELL_PARALYZING, TIMER_PARALYZING / 5);
+        events.ScheduleEvent(SPELL_BANEFUL, TIMER_BANEFUL / 5);
+        events.ScheduleEvent(SPELL_WEB_EXPLOSION, TIMER_WEB_EXPLOSION / 5);
     }
 
-    struct boss_hedrumAI : public BossAI
+    void UpdateAI(uint32 diff) override
     {
-        boss_hedrumAI(Creature* creature) : BossAI(creature, DATA_HEDRUM) {}
+        // Return since we have no target
+        if (!UpdateVictim())
+            return;
 
-        void JustEngagedWith(Unit* /*who*/) override
+        events.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        while (uint32 eventId = events.ExecuteEvent())
         {
-            _JustEngagedWith();
-            events.ScheduleEvent(SPELL_PARALYZING, TIMER_PARALYZING / 5);
-            events.ScheduleEvent(SPELL_BANEFUL, TIMER_BANEFUL / 5);
-            events.ScheduleEvent(SPELL_WEB_EXPLOSION, TIMER_WEB_EXPLOSION / 5);
+            switch (eventId)
+            {
+            case SPELL_PARALYZING:
+                DoCastVictim(SPELL_PARALYZING);
+                events.ScheduleEvent(SPELL_PARALYZING, TIMER_PARALYZING - 2s, TIMER_PARALYZING + 2s);
+                break;
+            case SPELL_BANEFUL:
+                DoCastVictim(SPELL_BANEFUL);
+                events.ScheduleEvent(SPELL_BANEFUL, TIMER_BANEFUL - 2s, TIMER_BANEFUL + 2s);
+                break;
+            case SPELL_WEB_EXPLOSION:
+                if (me->GetDistance2d(me->GetVictim()) < 100.0f)
+                    DoCast(SPELL_WEB_EXPLOSION);
+                events.ScheduleEvent(SPELL_WEB_EXPLOSION, TIMER_WEB_EXPLOSION - 2s, TIMER_WEB_EXPLOSION + 2s);
+                break;
+            default:
+                break;
+            }
         }
-
-        void UpdateAI(uint32 diff) override
-        {
-            // Return since we have no target
-            if (!UpdateVictim())
-            {
-                return;
-            }
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-            {
-                return;
-            }
-            while (uint32 eventId = events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                case SPELL_PARALYZING:
-                    DoCastVictim(SPELL_PARALYZING);
-                    events.ScheduleEvent(SPELL_PARALYZING, TIMER_PARALYZING - 2s, TIMER_PARALYZING + 2s);
-                    break;
-                case SPELL_BANEFUL:
-                    DoCastVictim(SPELL_BANEFUL);
-                    events.ScheduleEvent(SPELL_BANEFUL, TIMER_BANEFUL - 2s, TIMER_BANEFUL + 2s);
-                    break;
-                case SPELL_WEB_EXPLOSION:
-                    if (me->GetDistance2d(me->GetVictim()) < 100.0f)
-                    {
-                        DoCast(SPELL_WEB_EXPLOSION);
-                    }
-                    events.ScheduleEvent(SPELL_WEB_EXPLOSION, TIMER_WEB_EXPLOSION - 2s, TIMER_WEB_EXPLOSION + 2s);
-                    break;
-                default:
-                    break;
-                }
-            }
-            DoMeleeAttackIfReady();
-        }
-    };
+        DoMeleeAttackIfReady();
+    }
 };
 
 void AddSC_boss_hedrum()
 {
-    new boss_hedrum();
+    RegisterBlackrockDepthsCreatureAI(boss_hedrum);
 }

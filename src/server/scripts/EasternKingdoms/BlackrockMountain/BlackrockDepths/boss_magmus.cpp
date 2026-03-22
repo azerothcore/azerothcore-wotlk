@@ -25,66 +25,54 @@ enum Spells
     SPELL_WARSTOMP                                         = 24375
 };
 
-class boss_magmus : public CreatureScript
+struct boss_magmus : public BossAI
 {
-public:
-    boss_magmus() : CreatureScript("boss_magmus") { }
+    boss_magmus(Creature* creature) : BossAI(creature, TYPE_IRON_HALL) {}
 
-    CreatureAI* GetAI(Creature* creature) const override
+    void Reset() override
     {
-        return GetBlackrockDepthsAI<boss_magmusAI>(creature);
+        _Reset();
+        instance->SetData(TYPE_IRON_HALL, NOT_STARTED);
     }
 
-    struct boss_magmusAI : public BossAI
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        boss_magmusAI(Creature* creature) : BossAI(creature, TYPE_IRON_HALL) {}
+        instance->SetData(TYPE_IRON_HALL, IN_PROGRESS);
+        _JustEngagedWith();
+        events.ScheduleEvent(SPELL_WARSTOMP, 8s, 12s);
+        events.ScheduleEvent(SPELL_FIERYBURST, 4s, 8s);
+    }
 
-        void Reset() override
-        {
-            _Reset();
-            instance->SetData(TYPE_IRON_HALL, NOT_STARTED);
-        }
+    void UpdateAI(uint32 diff) override
+    {
+        //Return since we have no target
+        if (!UpdateVictim())
+            return;
 
-        void JustEngagedWith(Unit* /*who*/) override
-        {
-            instance->SetData(TYPE_IRON_HALL, IN_PROGRESS);
-            _JustEngagedWith();
-            events.ScheduleEvent(SPELL_WARSTOMP, 8s, 12s);
-            events.ScheduleEvent(SPELL_FIERYBURST, 4s, 8s);
-        }
+        events.Update(diff);
 
-        void UpdateAI(uint32 diff) override
+        while (uint32 eventId = events.ExecuteEvent())
         {
-            //Return since we have no target
-            if (!UpdateVictim())
+            switch (eventId)
             {
-                return;
+            case SPELL_WARSTOMP:
+                DoCastVictim(SPELL_WARSTOMP);
+                events.ScheduleEvent(SPELL_WARSTOMP, 8s, 12s);
+                break;
+            case SPELL_FIERYBURST:
+                DoCastVictim(SPELL_FIERYBURST);
+                events.ScheduleEvent(SPELL_FIERYBURST, 4s, 8s);
+                break;
+            default:
+                break;
             }
-            events.Update(diff);
-
-            while (uint32 eventId = events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                case SPELL_WARSTOMP:
-                    DoCastVictim(SPELL_WARSTOMP);
-                    events.ScheduleEvent(SPELL_WARSTOMP, 8s, 12s);
-                    break;
-                case SPELL_FIERYBURST:
-                    DoCastVictim(SPELL_FIERYBURST);
-                    events.ScheduleEvent(SPELL_FIERYBURST, 4s, 8s);
-                    break;
-                default:
-                    break;
-                }
-            }
-
-            DoMeleeAttackIfReady();
         }
-    };
+
+        DoMeleeAttackIfReady();
+    }
 };
 
 void AddSC_boss_magmus()
 {
-    new boss_magmus();
+    RegisterBlackrockDepthsCreatureAI(boss_magmus);
 }

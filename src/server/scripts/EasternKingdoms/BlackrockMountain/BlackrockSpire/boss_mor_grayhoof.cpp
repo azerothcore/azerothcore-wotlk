@@ -96,13 +96,9 @@ struct boss_mor_grayhoof : public BossAI
             case PHASE_HUMAN:
                 spell = Acore::Containers::SelectRandomContainerElement(humanSpells);
                 if (spell == SPELL_REJUVENATION || spell == SPELL_HEALING_TOUCH)
-                {
                     DoCastSelf(spell);
-                }
                 else
-                {
                     DoCastAOE(spell);
-                }
                 break;
             case PHASE_BEAR:
                 spell = Acore::Containers::SelectRandomContainerElement(bearSpells);
@@ -155,9 +151,7 @@ struct boss_mor_grayhoof : public BossAI
                 {
                     CastRandomSpell(PHASE_BEAR);
                     if (context.GetRepeatCounter() <= 3)
-                    {
                         context.Repeat();
-                    }
                 });
         }
         else if (_phase == PHASE_BEAR && me->HealthBelowPct(50.f))
@@ -170,9 +164,7 @@ struct boss_mor_grayhoof : public BossAI
                 {
                     CastRandomSpell(PHASE_CAT);
                     if (context.GetRepeatCounter() <= 3)
-                    {
                         context.Repeat();
-                    }
                 });
         }
         else if (_phase == PHASE_CAT && me->HealthBelowPct(25.f))
@@ -203,9 +195,7 @@ struct boss_mor_grayhoof : public BossAI
     void UpdateAI(uint32 diff) override
     {
         if (!UpdateVictim())
-        {
             return;
-        }
 
         _scheduler.Update(diff, [this]
             {

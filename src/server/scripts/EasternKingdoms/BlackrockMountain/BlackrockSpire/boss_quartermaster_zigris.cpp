@@ -87,16 +87,12 @@ struct boss_quartermaster_zigris : public BossAI
     void UpdateAI(uint32 diff) override
     {
         if (!UpdateVictim())
-        {
             return;
-        }
 
         events.Update(diff);
 
         if (me->HasUnitState(UNIT_STATE_CASTING))
-        {
             return;
-        }
 
         while (uint32 eventId = events.ExecuteEvent())
         {
@@ -135,9 +131,7 @@ struct boss_quartermaster_zigris : public BossAI
             }
 
             if (me->HasUnitState(UNIT_STATE_CASTING))
-            {
                 return;
-            }
         }
 
         DoMeleeAttackIfReady();

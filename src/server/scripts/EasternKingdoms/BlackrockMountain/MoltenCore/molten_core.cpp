@@ -46,75 +46,60 @@ enum Spells
 };
 
 // Serrated Bites timer may be wrong
-class npc_mc_core_hound : public CreatureScript
+struct npc_mc_core_hound : public CreatureAI
 {
-public:
-    npc_mc_core_hound() : CreatureScript("npc_mc_core_hound") {}
-
-    struct npc_mc_core_houndAI : public CreatureAI
+    npc_mc_core_hound(Creature* creature) :
+        CreatureAI(creature),
+        instance(creature->GetInstanceScript()),
+        serratedBiteTimer(3000)
     {
-        npc_mc_core_houndAI(Creature* creature) :
-            CreatureAI(creature),
-            instance(creature->GetInstanceScript()),
-            serratedBiteTimer(3000)
-        {
-        }
-
-        void Reset() override
-        {
-            serratedBiteTimer = 3000;
-        }
-
-        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
-        {
-            // Prevent receiving any extra damage if Hound is playing dead
-            if (me->HasAura(SPELL_PLAY_DEAD))
-            {
-                damage = 0;
-                return;
-            }
-            else if (me->GetHealth() <= damage)
-            {
-                damage = 0;
-                Talk(EMOTE_SMOLDERING);
-                DoCastSelf(SPELL_PLAY_DEAD);
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-            {
-                return;
-            }
-
-            if (me->HasUnitState(UNIT_STATE_CASTING) || me->HasAura(SPELL_PLAY_DEAD))
-            {
-                return;
-            }
-
-            if (serratedBiteTimer <= diff)
-            {
-                DoCastVictim(SPELL_SERRATED_BITE);
-                serratedBiteTimer = urand(5000, 6000);
-            }
-            else
-            {
-                serratedBiteTimer -= diff;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-
-    private:
-        InstanceScript* instance;
-        uint32 serratedBiteTimer;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetMoltenCoreAI<npc_mc_core_houndAI>(creature);
     }
+
+    void Reset() override
+    {
+        serratedBiteTimer = 3000;
+    }
+
+    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
+    {
+        // Prevent receiving any extra damage if Hound is playing dead
+        if (me->HasAura(SPELL_PLAY_DEAD))
+        {
+            damage = 0;
+            return;
+        }
+        else if (me->GetHealth() <= damage)
+        {
+            damage = 0;
+            Talk(EMOTE_SMOLDERING);
+            DoCastSelf(SPELL_PLAY_DEAD);
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        if (me->HasUnitState(UNIT_STATE_CASTING) || me->HasAura(SPELL_PLAY_DEAD))
+            return;
+
+        if (serratedBiteTimer <= diff)
+        {
+            DoCastVictim(SPELL_SERRATED_BITE);
+            serratedBiteTimer = urand(5000, 6000);
+        }
+        else
+        {
+            serratedBiteTimer -= diff;
+        }
+
+        DoMeleeAttackIfReady();
+    }
+
+private:
+    InstanceScript* instance;
+    uint32 serratedBiteTimer;
 };
 
 // 19822 Play Dead
@@ -136,9 +121,7 @@ class spell_mc_play_dead_aura : public AuraScript
     {
         Creature* creatureTarget = GetTarget()->ToCreature();
         if (!creatureTarget)
-        {
             return;
-        }
 
         creatureTarget->CastSpell(creatureTarget, SPELL_PLAY_DEAD_PACIFY, true);
         creatureTarget->SetDynamicFlag(UNIT_DYNFLAG_DEAD);
@@ -154,9 +137,7 @@ class spell_mc_play_dead_aura : public AuraScript
     {
         Creature* creatureTarget = GetTarget()->ToCreature();
         if (!creatureTarget)
-        {
             return;
-        }
 
         creatureTarget->RemoveAurasDueToSpell(SPELL_PLAY_DEAD_PACIFY);
         creatureTarget->RemoveDynamicFlag(UNIT_DYNFLAG_DEAD);
@@ -166,9 +147,7 @@ class spell_mc_play_dead_aura : public AuraScript
         creatureTarget->SetReactState(REACT_AGGRESSIVE);
 
         if (!creatureTarget->IsInCombat())
-        {
             return;
-        }
 
         bool shouldDie = true;
         std::list<Creature*> hounds;
@@ -246,9 +225,7 @@ struct npc_lava_spawn : public ScriptedAI
     void UpdateAI(uint32 diff) override
     {
         if (!UpdateVictim())
-        {
             return;
-        }
 
         _scheduler.Update(diff);
 
@@ -262,7 +239,7 @@ private:
 void AddSC_molten_core()
 {
     // Creatures
-    new npc_mc_core_hound();
+    RegisterMoltenCoreCreatureAI(npc_mc_core_hound);
     RegisterCreatureAI(npc_lava_spawn);
 
     // Spells
