@@ -233,12 +233,7 @@ static PlayerAbilityStruct PlayerAbility[13][3] =
 struct boss_hexlord_malacrass : public BossAI
 {
     boss_hexlord_malacrass(Creature* creature) : BossAI(creature, DATA_HEXLORD)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    {    }
 
     void Reset() override
     {

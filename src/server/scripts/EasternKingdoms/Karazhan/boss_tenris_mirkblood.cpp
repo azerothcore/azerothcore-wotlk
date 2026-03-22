@@ -74,12 +74,7 @@ enum Events
 struct boss_tenris_mirkblood : public BossAI
 {
     boss_tenris_mirkblood(Creature* creature) : BossAI(creature, DATA_MIRKBLOOD)
-    {
-        scheduler.SetValidator([this]
-            {
-                return !me->HasUnitState(UNIT_STATE_CASTING);
-            });
-    }
+    {    }
 
     void Reset() override
     {

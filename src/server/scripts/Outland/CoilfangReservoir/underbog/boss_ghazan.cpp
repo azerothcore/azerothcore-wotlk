@@ -35,12 +35,7 @@ enum eBlackStalker
 struct boss_ghazan : public BossAI
 {
     boss_ghazan(Creature* creature) : BossAI(creature, DATA_GHAZAN)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    {    }
 
     void InitializeAI() override
     {

@@ -42,11 +42,6 @@ struct boss_void_reaver : public BossAI
     boss_void_reaver(Creature* creature) : BossAI(creature, DATA_REAVER)
     {
         callForHelpRange = 105.0f;
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-
         me->ApplySpellImmune(0, IMMUNITY_DISPEL, DISPEL_POISON, true);
         me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_HEALTH_LEECH, true);
         me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_POWER_DRAIN, true);

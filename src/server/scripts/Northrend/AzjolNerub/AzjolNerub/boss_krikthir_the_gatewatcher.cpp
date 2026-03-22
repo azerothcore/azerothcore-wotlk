@@ -60,11 +60,6 @@ public:
             _initTalk = false;
             _canTalk = true;
             _minionInCombat = false;
-
-            scheduler.SetValidator([this]
-            {
-                return !me->HasUnitState(UNIT_STATE_CASTING);
-            });
         }
 
         void Reset() override

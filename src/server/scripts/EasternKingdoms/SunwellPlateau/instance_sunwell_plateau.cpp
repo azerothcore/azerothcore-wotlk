@@ -292,12 +292,7 @@ enum SunbladeArchMageSpells
 struct npc_sunblade_arch_mage : public ScriptedAI
 {
     npc_sunblade_arch_mage(Creature* creature) : ScriptedAI(creature)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    {    }
 
     void Reset() override
     {
