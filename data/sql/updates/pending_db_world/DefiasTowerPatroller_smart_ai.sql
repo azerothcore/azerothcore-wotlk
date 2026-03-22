@@ -27,8 +27,6 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (@ENTRY, 0, 20, 0, 8, 0, 100, 0, 48689, 0, 0, 0, 0, 0, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'On spell  Ambush (48689) hit - Self: Die'),
 (@ENTRY, 0, 21, 0, 8, 0, 100, 0, 48690, 0, 0, 0, 0, 0, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'On spell  Ambush (48690) hit - Self: Die'),
 (@ENTRY, 0, 22, 0, 8, 0, 100, 0, 48691, 0, 0, 0, 0, 0, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'On spell  Ambush (48691) hit - Self: Die');
-
-
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = 7052 AND `SourceId` = 0;
  -- Defias Tower Sentry smart ai
 SET @ENTRY := 7056;
@@ -58,6 +56,4 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (@ENTRY, 0, 20, 0, 8, 0, 100, 0, 48689, 0, 0, 0, 0, 0, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'On spell  Ambush (48689) hit - Self: Die'),
 (@ENTRY, 0, 21, 0, 8, 0, 100, 0, 48690, 0, 0, 0, 0, 0, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'On spell  Ambush (48690) hit - Self: Die'),
 (@ENTRY, 0, 22, 0, 8, 0, 100, 0, 48691, 0, 0, 0, 0, 0, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'On spell  Ambush (48691) hit - Self: Die');
-
-
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = 7056 AND `SourceId` = 0;
