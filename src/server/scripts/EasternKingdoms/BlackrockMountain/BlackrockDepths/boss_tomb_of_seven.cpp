@@ -53,19 +53,18 @@ enum Gossip
     SAY_QUEST_COMPLETED_END                       = 2606, // You have shown me your desire, and have payed with precious stone.  I will teach you...
 };
 
-class boss_gloomrel : public CreatureScript
+struct boss_gloomrel : public ScriptedAI
 {
-public:
-    boss_gloomrel() : CreatureScript("boss_gloomrel") { }
+    boss_gloomrel(Creature* creature) : ScriptedAI(creature) { }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
+    void sGossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
     {
         ClearGossipMenuFor(player);
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF+1:
                 AddGossipItemFor(player, GOSSIP_TEXT_CONTINUE, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
-                SendGossipMenuFor(player, SAY_QUEST_COMPLETED_END, creature->GetGUID());
+                SendGossipMenuFor(player, SAY_QUEST_COMPLETED_END, me->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+11:
                 CloseGossipMenuFor(player);
@@ -73,33 +72,29 @@ public:
                 break;
             case GOSSIP_ACTION_INFO_DEF+2:
                 AddGossipItemFor(player, GOSSIP_TEXT_CONTINUE, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 22);
-                SendGossipMenuFor(player, SAY_QUEST_ACCEPTED, creature->GetGUID());
+                SendGossipMenuFor(player, SAY_QUEST_ACCEPTED, me->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+22:
                 CloseGossipMenuFor(player);
-                if (InstanceScript* instance = creature->GetInstanceScript())
-                {
+                if (InstanceScript* instance = me->GetInstanceScript())
                     //are 5 minutes expected? go template may have data to despawn when used at quest
                     instance->DoRespawnGameObject(instance->GetGuidData(DATA_GO_CHALICE), MINUTE * 5);
-                }
                 break;
         }
-        return true;
     }
 
-    bool OnGossipHello(Player* player, Creature* creature) override
+    void sGossipHello(Player* player) override
     {
         if (player->GetQuestRewardStatus(QUEST_SPECTRAL_CHALICE) == 1 && player->GetSkillValue(SKILL_MINING) >= DATA_SKILLPOINT_MIN && !player->HasSpell(SPELL_SMELT_DARK_IRON))
         {
             AddGossipItemFor(player, GOSSIP_GROOMREL, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            SendGossipMenuFor(player, SAY_QUEST_COMPLETED, creature->GetGUID());
+            SendGossipMenuFor(player, SAY_QUEST_COMPLETED, me->GetGUID());
         }
 
         if (player->GetQuestRewardStatus(QUEST_SPECTRAL_CHALICE) == 0 && player->GetSkillValue(SKILL_MINING) >= DATA_SKILLPOINT_MIN)
             AddGossipItemFor(player, GOSSIP_GROOMREL, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
 
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-        return true;
+        SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
     }
 };
 
@@ -120,145 +115,124 @@ enum DoomrelEvents
     EVENT_SPELL_SUMMON_VOIDWALKERS  = 5,
 };
 
-class boss_doomrel : public CreatureScript
+struct boss_doomrel : public ScriptedAI
 {
-public:
-    boss_doomrel() : CreatureScript("boss_doomrel") { }
+    boss_doomrel(Creature* creature) : ScriptedAI(creature)
+    {
+        instance = creature->GetInstanceScript();
+    }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
+    InstanceScript* instance;
+    EventMap _events;
+    bool Voidwalkers;
+
+    void sGossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
     {
         ClearGossipMenuFor(player);
         switch (action)
         {
             case GOSSIP_ACTION_INFO_DEF+1:
                 AddGossipItemFor(player, GOSSIP_TEXT_CONTINUE, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                SendGossipMenuFor(player, SAY_QUEST_COMPLETED, creature->GetGUID());
+                SendGossipMenuFor(player, SAY_QUEST_COMPLETED, me->GetGUID());
                 break;
             case GOSSIP_ACTION_INFO_DEF+2:
                 CloseGossipMenuFor(player);
-                creature->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                 // Start encounter
-                InstanceScript* instance = creature->GetInstanceScript();
                 if (instance)
-                {
                     instance->SetData(TYPE_TOMB_OF_SEVEN, IN_PROGRESS);
-                }
-                creature->AI()->Talk(SAY_START_FIGHT);
+                Talk(SAY_START_FIGHT);
                 break;
         }
-        return true;
     }
 
-    bool OnGossipHello(Player* player, Creature* creature) override
+    void sGossipHello(Player* player) override
     {
         AddGossipItemFor(player, GOSSIP_DOOMREL_START_COMBAT, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        SendGossipMenuFor(player, SAY_DOOMREL_HELLO, creature->GetGUID());
-
-        return true;
+        SendGossipMenuFor(player, SAY_DOOMREL_HELLO, me->GetGUID());
     }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    void Reset() override
     {
-        return GetBlackrockDepthsAI<boss_doomrelAI>(creature);
+        Voidwalkers = false;
+        me->SetFaction(FACTION_FRIENDLY);
+
+        // was set before event start, so set again
+        me->SetImmuneToPC(true);
+
+        if (instance->GetData(TYPE_TOMB_OF_SEVEN) == DONE) // what is this trying to do? Probably some kind of crash recovery
+            me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
+        else
+            me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP);
     }
 
-    struct boss_doomrelAI : public ScriptedAI
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        boss_doomrelAI(Creature* creature) : ScriptedAI(creature)
+        _events.ScheduleEvent(EVENT_SPELL_SHADOWBOLTVOLLEY, 10s);
+        _events.ScheduleEvent(EVENT_SPELL_IMMOLATE, 18s);
+        _events.ScheduleEvent(EVENT_SPELL_CURSEOFWEAKNESS, 5s);
+        _events.ScheduleEvent(EVENT_SPELL_DEMONARMOR, 16s);
+        _events.ScheduleEvent(EVENT_SPELL_SUMMON_VOIDWALKERS, 1s);
+    }
+
+    void EnterEvadeMode(EvadeReason /*why*/) override
+    {
+        me->RemoveAllAuras();
+        me->GetThreatMgr().ClearAllThreat();
+        me->CombatStop(true);
+        me->LoadCreaturesAddon(true);
+        if (me->IsAlive())
+            me->GetMotionMaster()->MoveTargetedHome();
+        me->SetLootRecipient(nullptr);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        _events.Update(diff);
+
+        switch (_events.ExecuteEvent())
         {
-            instance = creature->GetInstanceScript();
+            case EVENT_SPELL_SHADOWBOLTVOLLEY:
+                DoCastVictim(SPELL_SHADOWBOLTVOLLEY);
+                _events.ScheduleEvent(EVENT_SPELL_SHADOWBOLTVOLLEY, 12s);
+                break;
+            case EVENT_SPELL_IMMOLATE:
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
+                {
+                    DoCast(target, SPELL_IMMOLATE);
+                    _events.ScheduleEvent(EVENT_SPELL_IMMOLATE, 25s);
+                }
+                // Didn't get a target, try again in 1s
+                _events.ScheduleEvent(EVENT_SPELL_IMMOLATE, 1s);
+                break;
+            case EVENT_SPELL_CURSEOFWEAKNESS:
+                DoCastVictim(SPELL_CURSEOFWEAKNESS);
+                _events.ScheduleEvent(EVENT_SPELL_CURSEOFWEAKNESS, 45s);
+                break;
+            case EVENT_SPELL_DEMONARMOR:
+                DoCast(me, SPELL_DEMONARMOR);
+                _events.ScheduleEvent(EVENT_SPELL_DEMONARMOR, 300s);
+                break;
+            case EVENT_SPELL_SUMMON_VOIDWALKERS:
+                if (!Voidwalkers && HealthBelowPct(51))
+                {
+                    DoCastVictim(SPELL_SUMMON_VOIDWALKERS, true);
+                    Voidwalkers = true;
+                }
+                // Not ready yet, try again in 1s
+                _events.ScheduleEvent(EVENT_SPELL_SUMMON_VOIDWALKERS, 1s);
+                break;
         }
 
-        InstanceScript* instance;
-        EventMap _events;
-        bool Voidwalkers;
-
-        void Reset() override
-        {
-            Voidwalkers = false;
-            me->SetFaction(FACTION_FRIENDLY);
-
-            // was set before event start, so set again
-            me->SetImmuneToPC(true);
-
-            if (instance->GetData(TYPE_TOMB_OF_SEVEN) == DONE) // what is this trying to do? Probably some kind of crash recovery
-            {
-                me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
-            }
-            else
-            {
-                me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP);
-            }
-        }
-
-        void JustEngagedWith(Unit* /*who*/) override
-        {
-            _events.ScheduleEvent(EVENT_SPELL_SHADOWBOLTVOLLEY, 10s);
-            _events.ScheduleEvent(EVENT_SPELL_IMMOLATE, 18s);
-            _events.ScheduleEvent(EVENT_SPELL_CURSEOFWEAKNESS, 5s);
-            _events.ScheduleEvent(EVENT_SPELL_DEMONARMOR, 16s);
-            _events.ScheduleEvent(EVENT_SPELL_SUMMON_VOIDWALKERS, 1s);
-        }
-
-        void EnterEvadeMode(EvadeReason /*why*/) override
-        {
-            me->RemoveAllAuras();
-            me->GetThreatMgr().ClearAllThreat();
-            me->CombatStop(true);
-            me->LoadCreaturesAddon(true);
-            if (me->IsAlive())
-                me->GetMotionMaster()->MoveTargetedHome();
-            me->SetLootRecipient(nullptr);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            _events.Update(diff);
-
-            switch (_events.ExecuteEvent())
-            {
-                case EVENT_SPELL_SHADOWBOLTVOLLEY:
-                    DoCastVictim(SPELL_SHADOWBOLTVOLLEY);
-                    _events.ScheduleEvent(EVENT_SPELL_SHADOWBOLTVOLLEY, 12s);
-                    break;
-                case EVENT_SPELL_IMMOLATE:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
-                    {
-                        DoCast(target, SPELL_IMMOLATE);
-                        _events.ScheduleEvent(EVENT_SPELL_IMMOLATE, 25s);
-                    }
-                    // Didn't get a target, try again in 1s
-                    _events.ScheduleEvent(EVENT_SPELL_IMMOLATE, 1s);
-                    break;
-                case EVENT_SPELL_CURSEOFWEAKNESS:
-                    DoCastVictim(SPELL_CURSEOFWEAKNESS);
-                    _events.ScheduleEvent(EVENT_SPELL_CURSEOFWEAKNESS, 45s);
-                    break;
-                case EVENT_SPELL_DEMONARMOR:
-                    DoCast(me, SPELL_DEMONARMOR);
-                    _events.ScheduleEvent(EVENT_SPELL_DEMONARMOR, 300s);
-                    break;
-                case EVENT_SPELL_SUMMON_VOIDWALKERS:
-                    if (!Voidwalkers && HealthBelowPct(51))
-                    {
-                        DoCastVictim(SPELL_SUMMON_VOIDWALKERS, true);
-                        Voidwalkers = true;
-                    }
-                    // Not ready yet, try again in 1s
-                    _events.ScheduleEvent(EVENT_SPELL_SUMMON_VOIDWALKERS, 1s);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
+        DoMeleeAttackIfReady();
+    }
 };
 
 void AddSC_boss_tomb_of_seven()
 {
-    new boss_gloomrel();
-    new boss_doomrel();
+    RegisterBlackrockDepthsCreatureAI(boss_gloomrel);
+    RegisterBlackrockDepthsCreatureAI(boss_doomrel);
 }
