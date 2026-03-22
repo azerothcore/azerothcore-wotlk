@@ -16,160 +16,136 @@
  */
 
 #include "CreatureScript.h"
-#include "SpellScriptLoader.h"
-#include "halls_of_reflection.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
+#include "SpellScriptLoader.h"
+#include "halls_of_reflection.h"
 
 enum Yells
 {
-    SAY_AGGRO                                     = 0,
-    SAY_SLAY                                      = 1,
-    SAY_DEATH                                     = 2,
-    SAY_CORRUPTED_FLESH                           = 3,
-    SAY_CORRUPTED_WELL                            = 4,
+    SAY_AGGRO          = 0,
+    SAY_SLAY           = 1,
+    SAY_DEATH          = 2,
+    SAY_CORRUPTED_FLESH = 3,
+    SAY_CORRUPTED_WELL = 4,
 };
 
 enum Spells
 {
-    SPELL_OBLITERATE                              = 72360,
-    SPELL_WELL_OF_CORRUPTION                      = 72362,
-    SPELL_CORRUPTED_FLESH                         = 72363,
-    SPELL_SHARED_SUFFERING                        = 72368,
+    SPELL_OBLITERATE         = 72360,
+    SPELL_WELL_OF_CORRUPTION = 72362,
+    SPELL_CORRUPTED_FLESH    = 72363,
+    SPELL_SHARED_SUFFERING   = 72368,
 };
 
 enum Events
 {
-    EVENT_NONE,
-    EVENT_OBLITERATE,
+    EVENT_OBLITERATE = 1,
     EVENT_WELL_OF_CORRUPTION,
     EVENT_CORRUPTED_FLESH,
     EVENT_SHARED_SUFFERING,
 };
 
-class boss_marwyn : public CreatureScript
+struct boss_marwyn : public BossAI
 {
-public:
-    boss_marwyn() : CreatureScript("boss_marwyn") { }
+    boss_marwyn(Creature* creature) : BossAI(creature, DATA_MARWYN) { }
 
-    struct boss_marwynAI : public ScriptedAI
+    void Reset() override
     {
-        boss_marwynAI(Creature* creature) : ScriptedAI(creature)
+        BossAI::Reset();
+        _startingFight = false;
+        me->SetImmuneToAll(true);
+    }
+
+    void JustEngagedWith(Unit* who) override
+    {
+        BossAI::JustEngagedWith(who);
+        me->SetImmuneToAll(false);
+
+        events.ScheduleEvent(EVENT_OBLITERATE, 15s);
+        events.ScheduleEvent(EVENT_WELL_OF_CORRUPTION, 13s);
+        events.ScheduleEvent(EVENT_CORRUPTED_FLESH, 20s);
+        events.ScheduleEvent(EVENT_SHARED_SUFFERING, 5s);
+    }
+
+    void DoAction(int32 action) override
+    {
+        if (action == 1)
         {
-            pInstance = creature->GetInstanceScript();
-        }
-
-        InstanceScript* pInstance;
-        EventMap events;
-        uint16 startFightTimer;
-
-        void Reset() override
-        {
-            startFightTimer = 0;
-            me->SetImmuneToAll(true);
-            events.Reset();
-            if (pInstance)
-                pInstance->SetData(DATA_MARWYN, NOT_STARTED);
-        }
-
-        void JustEngagedWith(Unit* /*who*/) override
-        {
-            me->SetImmuneToAll(false);
-
-            events.ScheduleEvent(EVENT_OBLITERATE, 15s);
-            events.ScheduleEvent(EVENT_WELL_OF_CORRUPTION, 13s);
-            events.ScheduleEvent(EVENT_CORRUPTED_FLESH, 20s);
-            events.ScheduleEvent(EVENT_SHARED_SUFFERING, 5s);
-        }
-
-        void DoAction(int32 a) override
-        {
-            if (a == 1)
+            Talk(SAY_AGGRO);
+            _startingFight = true;
+            me->m_Events.AddEventAtOffset([this]()
             {
-                Talk(SAY_AGGRO);
-                startFightTimer = 8000;
-            }
+                _startingFight = false;
+                me->SetInCombatWithZone();
+            }, 8s);
         }
+    }
 
-        void UpdateAI(uint32 diff) override
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        switch (events.ExecuteEvent())
         {
-            if (startFightTimer)
-            {
-                if (startFightTimer <= diff)
+            case EVENT_OBLITERATE:
+                if (me->IsWithinMeleeRange(me->GetVictim()))
                 {
-                    startFightTimer = 0;
-                    me->SetInCombatWithZone();
+                    DoCastVictim(SPELL_OBLITERATE);
+                    events.Repeat(15s);
                 }
                 else
-                    startFightTimer -= diff;
-            }
-
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_OBLITERATE:
-                    if (me->IsWithinMeleeRange(me->GetVictim()))
-                    {
-                        me->CastSpell(me->GetVictim(), SPELL_OBLITERATE, false);
-                        events.ScheduleEvent(EVENT_OBLITERATE, 15s);
-                    }
-                    else
-                        events.ScheduleEvent(EVENT_OBLITERATE, 3s);
-                    break;
-                case EVENT_WELL_OF_CORRUPTION:
-                    Talk(SAY_CORRUPTED_WELL);
-                    if (Unit* target = SelectTargetFromPlayerList(40.0f, 0, true))
-                        me->CastSpell(target, SPELL_WELL_OF_CORRUPTION, false);
-                    events.ScheduleEvent(EVENT_WELL_OF_CORRUPTION, 13s);
-                    break;
-                case EVENT_CORRUPTED_FLESH:
-                    Talk(SAY_CORRUPTED_FLESH);
-                    me->CastSpell((Unit*)nullptr, SPELL_CORRUPTED_FLESH, false);
-                    events.ScheduleEvent(EVENT_CORRUPTED_FLESH, 20s);
-                    break;
-                case EVENT_SHARED_SUFFERING:
-                    if (Unit* target = SelectTargetFromPlayerList(200.0f, 0, true))
-                        me->CastSpell(target, SPELL_SHARED_SUFFERING, true);
-                    events.ScheduleEvent(EVENT_SHARED_SUFFERING, 15s);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
+                    events.Repeat(3s);
+                break;
+            case EVENT_WELL_OF_CORRUPTION:
+                Talk(SAY_CORRUPTED_WELL);
+                if (Unit* target = SelectTargetFromPlayerList(40.0f, 0, true))
+                    DoCast(target, SPELL_WELL_OF_CORRUPTION);
+                events.Repeat(13s);
+                break;
+            case EVENT_CORRUPTED_FLESH:
+                Talk(SAY_CORRUPTED_FLESH);
+                DoCastAOE(SPELL_CORRUPTED_FLESH);
+                events.Repeat(20s);
+                break;
+            case EVENT_SHARED_SUFFERING:
+                if (Unit* target = SelectTargetFromPlayerList(200.0f, 0, true))
+                    DoCast(target, SPELL_SHARED_SUFFERING, true);
+                events.Repeat(15s);
+                break;
         }
 
-        void JustDied(Unit* /*killer*/) override
-        {
-            Talk(SAY_DEATH);
-            if (pInstance)
-                pInstance->SetData(DATA_MARWYN, DONE);
-        }
-
-        void KilledUnit(Unit* who) override
-        {
-            if (who->IsPlayer())
-                Talk(SAY_SLAY);
-        }
-
-        void EnterEvadeMode(EvadeReason why) override
-        {
-            ScriptedAI::EnterEvadeMode(why);
-            if (startFightTimer)
-                Reset();
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetHallsOfReflectionAI<boss_marwynAI>(creature);
+        DoMeleeAttackIfReady();
     }
+
+    void JustDied(Unit* killer) override
+    {
+        BossAI::JustDied(killer);
+        Talk(SAY_DEATH);
+    }
+
+    void KilledUnit(Unit* who) override
+    {
+        if (who->IsPlayer())
+            Talk(SAY_SLAY);
+    }
+
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        BossAI::EnterEvadeMode(why);
+        if (_startingFight)
+            Reset();
+    }
+
+private:
+    bool _startingFight{};
 };
 
 enum SharedSufferingAura
@@ -186,25 +162,37 @@ class spell_hor_shared_suffering_aura : public AuraScript
         return ValidateSpellInfo({ SPELL_SHARED_SUFFERING_DAMAGE });
     }
 
-    void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes  /*mode*/)
+    void OnRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
     {
-        if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_ENEMY_SPELL) // dispelled
-            if (Unit* caster = GetCaster())
-                if (Map* map = caster->FindMap())
-                    if (Aura* a = aurEff->GetBase())
-                    {
-                        uint32 count = 0;
-                        uint32 ticks = 0;
-                        uint32 dmgPerTick = a->GetSpellInfo()->Effects[0].BasePoints;
-                        Map::PlayerList const& pl = map->GetPlayers();
-                        for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
-                            if (Player* p = itr->GetSource())
-                                if (p->IsAlive())
-                                    ++count;
-                        ticks = (a->GetDuration() / int32(a->GetSpellInfo()->Effects[0].Amplitude)) + 1;
-                        int32 dmg = (ticks * dmgPerTick) / count;
-                        caster->CastCustomSpell(GetTarget(), SPELL_SHARED_SUFFERING_DAMAGE, nullptr, &dmg, nullptr, true);
-                    }
+        if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_ENEMY_SPELL)
+            return;
+
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+
+        Map* map = caster->FindMap();
+        if (!map)
+            return;
+
+        Aura* aura = aurEff->GetBase();
+        if (!aura)
+            return;
+
+        uint32 count = 0;
+        uint32 dmgPerTick = aura->GetSpellInfo()->Effects[0].BasePoints;
+        Map::PlayerList const& pl = map->GetPlayers();
+        for (auto itr = pl.begin(); itr != pl.end(); ++itr)
+            if (Player* p = itr->GetSource())
+                if (p->IsAlive())
+                    ++count;
+
+        if (!count)
+            return;
+
+        uint32 ticks = (aura->GetDuration() / int32(aura->GetSpellInfo()->Effects[0].Amplitude)) + 1;
+        int32 dmg = (ticks * dmgPerTick) / count;
+        caster->CastCustomSpell(GetTarget(), SPELL_SHARED_SUFFERING_DAMAGE, nullptr, &dmg, nullptr, true);
     }
 
     void Register() override
@@ -215,6 +203,6 @@ class spell_hor_shared_suffering_aura : public AuraScript
 
 void AddSC_boss_marwyn()
 {
-    new boss_marwyn();
+    RegisterHallsOfReflectionCreatureAI(boss_marwyn);
     RegisterSpellScript(spell_hor_shared_suffering_aura);
 }

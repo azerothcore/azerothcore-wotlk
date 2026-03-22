@@ -193,10 +193,20 @@ public:
     //Called when a player enters/leaves water bodies.
     virtual void OnPlayerInWaterStateUpdate(Player* /*player*/, bool /*inWater*/) {}
 
-    //Handle open / close objects
-    //use HandleGameObject(ObjectGuid::Empty, boolen, GO); in OnObjectCreate in instance scripts
-    //use HandleGameObject(GUID, boolen, nullptr); in any other script
+    /**
+     * @brief Open or close a GameObject by GUID.
+     * @param guid The GUID of the GameObject. Pass ObjectGuid::Empty when providing the go pointer directly.
+     * @param open true to open (GO_STATE_ACTIVE), false to close (GO_STATE_READY).
+     * @param go Optional pointer to the GameObject. If nullptr, the object is looked up by GUID.
+     */
     void HandleGameObject(ObjectGuid guid, bool open, GameObject* go = nullptr);
+
+    /**
+     * @brief Open or close a GameObject registered via LoadObjectData.
+     * @param type The ObjectData type constant (e.g. GO_FRONT_DOOR) used in the gameObjectData array.
+     * @param open true to open (GO_STATE_ACTIVE), false to close (GO_STATE_READY).
+     */
+    void HandleGameObject(uint32 type, bool open);
 
     //change active state of doors or buttons
     void DoUseDoorOrButton(ObjectGuid guid, uint32 withRestoreTime = 0, bool useAlternativeState = false);

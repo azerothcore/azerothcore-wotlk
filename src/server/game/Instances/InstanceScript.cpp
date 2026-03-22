@@ -134,6 +134,11 @@ void InstanceScript::HandleGameObject(ObjectGuid GUID, bool open, GameObject* go
     }
 }
 
+void InstanceScript::HandleGameObject(uint32 type, bool open)
+{
+    HandleGameObject(ObjectGuid::Empty, open, GetGameObject(type));
+}
+
 bool InstanceScript::IsEncounterInProgress() const
 {
     for (std::vector<BossInfo>::const_iterator itr = bosses.begin(); itr != bosses.end(); ++itr)
