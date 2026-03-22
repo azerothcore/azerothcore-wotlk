@@ -1,3 +1,4 @@
+-- DB update 2026_03_22_00 -> 2026_03_22_01
 --
 -- Fix Quest 9927 (Ruthless Cunning): banner spell 32307 conditions only checked for Kil'sorrow Deathsworn (17148)
 -- Each ElseGroup should check a different Kil'sorrow creature so banners work on all applicable mobs
