@@ -522,18 +522,18 @@ void ObjectMgr::LoadCreatureTemplates()
 
 //                                                        0      1                   2                   3                   4            5            6     7        8
     QueryResult result = WorldDatabase.Query("SELECT entry, difficulty_entry_1, difficulty_entry_2, difficulty_entry_3, KillCredit1, KillCredit2, name, subname, IconName, "
-//                        9               10        11        12   13       14       15          16         17          18            19               20     21      22
-                         "gossip_menu_id, minlevel, maxlevel, exp, faction, npcflag, speed_walk, speed_run, speed_swim, speed_flight, detection_range, scale, `rank`, dmgschool, "
-//                        23              24              25               26            27             28          29          30           31            32
+//                        9               10        11        12   13       14       15          16         17          18            19               20      21
+                         "gossip_menu_id, minlevel, maxlevel, exp, faction, npcflag, speed_walk, speed_run, speed_swim, speed_flight, detection_range, `rank`, dmgschool, "
+//                        22              23              24               25            26             27          28          29           30            31
                          "DamageModifier, BaseAttackTime, RangeAttackTime, BaseVariance, RangeVariance, unit_class, unit_flags, unit_flags2, dynamicflags, family, "
-//                        33    34          35      36              37
+//                        32    33          34      35              36
                          "type, type_flags, lootid, pickpocketloot, skinloot, "
-//                        38              39         40       41       42      43            44          45        46          47
+//                        37              38         39       40       41      42            43          44        45          46
                          "PetSpellDataId, VehicleId, mingold, maxgold, AIName, MovementType, ctm.Ground, ctm.Swim, ctm.Flight, ctm.Rooted, "
-//                        48         49          50                         51           52              53            54             55                  56            57          58           59
-                         "ctm.Chase, ctm.Random, ctm.InteractionPauseTimer, HoverHeight, HealthModifier, ManaModifier, ArmorModifier, ExperienceModifier, RacialLeader, movementId, RegenHealth, mechanic_immune_mask, "
-//                        60                        61           62
-                         "spell_school_immune_mask, flags_extra, ScriptName "
+//                        47         48          49                         50           51              52            53             54                  55            56          57
+                         "ctm.Chase, ctm.Random, ctm.InteractionPauseTimer, HoverHeight, HealthModifier, ManaModifier, ArmorModifier, ExperienceModifier, RacialLeader, movementId, RegenHealth, "
+//                       58                     59           60
+                         "CreatureImmunitiesId, flags_extra, ScriptName "
                          "FROM creature_template ct LEFT JOIN creature_template_movement ctm ON ct.entry = ctm.CreatureId ORDER BY entry DESC;");
 
     if (!result)
@@ -619,24 +619,23 @@ void ObjectMgr::LoadCreatureTemplate(Field* fields, bool triggerHook)
     creatureTemplate.speed_swim       = fields[17].Get<float>();
     creatureTemplate.speed_flight     = fields[18].Get<float>();
     creatureTemplate.detection_range  = fields[19].Get<float>();
-    creatureTemplate.scale            = fields[20].Get<float>();
-    creatureTemplate.rank             = uint32(fields[21].Get<uint8>());
-    creatureTemplate.dmgschool        = uint32(fields[22].Get<int8>());
-    creatureTemplate.DamageModifier   = fields[23].Get<float>();
-    creatureTemplate.BaseAttackTime   = fields[24].Get<uint32>();
-    creatureTemplate.RangeAttackTime  = fields[25].Get<uint32>();
-    creatureTemplate.BaseVariance     = fields[26].Get<float>();
-    creatureTemplate.RangeVariance    = fields[27].Get<float>();
-    creatureTemplate.unit_class       = uint32(fields[28].Get<uint8>());
-    creatureTemplate.unit_flags       = fields[29].Get<uint32>();
-    creatureTemplate.unit_flags2      = fields[30].Get<uint32>();
-    creatureTemplate.dynamicflags     = fields[31].Get<uint32>();
-    creatureTemplate.family           = uint32(fields[32].Get<uint8>());
-    creatureTemplate.type             = uint32(fields[33].Get<uint8>());
-    creatureTemplate.type_flags       = fields[34].Get<uint32>();
-    creatureTemplate.lootid           = fields[35].Get<uint32>();
-    creatureTemplate.pickpocketLootId = fields[36].Get<uint32>();
-    creatureTemplate.SkinLootId       = fields[37].Get<uint32>();
+    creatureTemplate.rank             = uint32(fields[20].Get<uint8>());
+    creatureTemplate.dmgschool        = uint32(fields[21].Get<int8>());
+    creatureTemplate.DamageModifier   = fields[22].Get<float>();
+    creatureTemplate.BaseAttackTime   = fields[23].Get<uint32>();
+    creatureTemplate.RangeAttackTime  = fields[24].Get<uint32>();
+    creatureTemplate.BaseVariance     = fields[25].Get<float>();
+    creatureTemplate.RangeVariance    = fields[26].Get<float>();
+    creatureTemplate.unit_class       = uint32(fields[27].Get<uint8>());
+    creatureTemplate.unit_flags       = fields[28].Get<uint32>();
+    creatureTemplate.unit_flags2      = fields[29].Get<uint32>();
+    creatureTemplate.dynamicflags     = fields[30].Get<uint32>();
+    creatureTemplate.family           = uint32(fields[31].Get<uint8>());
+    creatureTemplate.type             = uint32(fields[32].Get<uint8>());
+    creatureTemplate.type_flags       = fields[33].Get<uint32>();
+    creatureTemplate.lootid           = fields[34].Get<uint32>();
+    creatureTemplate.pickpocketLootId = fields[35].Get<uint32>();
+    creatureTemplate.SkinLootId       = fields[36].Get<uint32>();
 
     for (uint8 i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
     {
@@ -648,49 +647,56 @@ void ObjectMgr::LoadCreatureTemplate(Field* fields, bool triggerHook)
         creatureTemplate.spells[i] = 0;
     }
 
-    creatureTemplate.PetSpellDataId = fields[38].Get<uint32>();
-    creatureTemplate.VehicleId      = fields[39].Get<uint32>();
-    creatureTemplate.mingold        = fields[40].Get<uint32>();
-    creatureTemplate.maxgold        = fields[41].Get<uint32>();
-    creatureTemplate.AIName         = fields[42].Get<std::string>();
-    creatureTemplate.MovementType   = uint32(fields[43].Get<uint8>());
-    if (!fields[44].IsNull())
+    creatureTemplate.PetSpellDataId = fields[37].Get<uint32>();
+    creatureTemplate.VehicleId      = fields[38].Get<uint32>();
+    creatureTemplate.mingold        = fields[39].Get<uint32>();
+    creatureTemplate.maxgold        = fields[40].Get<uint32>();
+    creatureTemplate.AIName         = fields[41].Get<std::string>();
+    creatureTemplate.MovementType   = uint32(fields[42].Get<uint8>());
+    if (!fields[43].IsNull())
     {
-        creatureTemplate.Movement.Ground = static_cast<CreatureGroundMovementType>(fields[44].Get<uint8>());
+        creatureTemplate.Movement.Ground = static_cast<CreatureGroundMovementType>(fields[43].Get<uint8>());
     }
 
-    creatureTemplate.Movement.Swim = fields[45].Get<bool>();
-    if (!fields[46].IsNull())
+    creatureTemplate.Movement.Swim = fields[44].Get<bool>();
+    if (!fields[45].IsNull())
     {
-        creatureTemplate.Movement.Flight = static_cast<CreatureFlightMovementType>(fields[46].Get<uint8>());
+        creatureTemplate.Movement.Flight = static_cast<CreatureFlightMovementType>(fields[45].Get<uint8>());
     }
 
-    creatureTemplate.Movement.Rooted = fields[47].Get<bool>();
+    creatureTemplate.Movement.Rooted = fields[46].Get<bool>();
+    if (!fields[47].IsNull())
+    {
+        creatureTemplate.Movement.Chase = static_cast<CreatureChaseMovementType>(fields[47].Get<uint8>());
+    }
     if (!fields[48].IsNull())
     {
-        creatureTemplate.Movement.Chase = static_cast<CreatureChaseMovementType>(fields[48].Get<uint8>());
+        creatureTemplate.Movement.Random = static_cast<CreatureRandomMovementType>(fields[48].Get<uint8>());
     }
     if (!fields[49].IsNull())
     {
-        creatureTemplate.Movement.Random = static_cast<CreatureRandomMovementType>(fields[49].Get<uint8>());
-    }
-    if (!fields[50].IsNull())
-    {
-        creatureTemplate.Movement.InteractionPauseTimer = fields[50].Get<uint32>();
+        creatureTemplate.Movement.InteractionPauseTimer = fields[49].Get<uint32>();
     }
 
-    creatureTemplate.HoverHeight           = fields[51].Get<float>();
-    creatureTemplate.ModHealth             = fields[52].Get<float>();
-    creatureTemplate.ModMana               = fields[53].Get<float>();
-    creatureTemplate.ModArmor              = fields[54].Get<float>();
-    creatureTemplate.ModExperience         = fields[55].Get<float>();
-    creatureTemplate.RacialLeader          = fields[56].Get<bool>();
-    creatureTemplate.movementId            = fields[57].Get<uint32>();
-    creatureTemplate.RegenHealth           = fields[58].Get<bool>();
-    creatureTemplate.MechanicImmuneMask    = fields[59].Get<uint32>();
-    creatureTemplate.SpellSchoolImmuneMask = fields[60].Get<uint8>();
-    creatureTemplate.flags_extra           = fields[61].Get<uint32>();
-    creatureTemplate.ScriptID              = GetScriptId(fields[62].Get<std::string>());
+    creatureTemplate.HoverHeight           = fields[50].Get<float>();
+    creatureTemplate.ModHealth             = fields[51].Get<float>();
+    creatureTemplate.ModMana               = fields[52].Get<float>();
+    creatureTemplate.ModArmor              = fields[53].Get<float>();
+    creatureTemplate.ModExperience         = fields[54].Get<float>();
+    creatureTemplate.RacialLeader          = fields[55].Get<bool>();
+    creatureTemplate.movementId            = fields[56].Get<uint32>();
+    creatureTemplate.RegenHealth           = fields[57].Get<bool>();
+    creatureTemplate.CreatureImmunitiesId  = fields[58].Get<int32>();
+    creatureTemplate.flags_extra           = fields[59].Get<uint32>();
+    creatureTemplate.ScriptID              = GetScriptId(fields[60].Get<std::string>());
+
+    // Warn about deprecated immunity flags that should be moved to `creature_immunities` table
+    if (creatureTemplate.flags_extra & CREATURE_FLAG_EXTRA_NO_TAUNT)
+        LOG_WARN("server.loading", "Creature (Entry: {}) has deprecated flags_extra bit NO_TAUNT (0x100) set. This will be migrated to the `creature_immunities` table in a future update.", entry);
+    if (creatureTemplate.flags_extra & CREATURE_FLAG_EXTRA_AVOID_AOE)
+        LOG_WARN("server.loading", "Creature (Entry: {}) has deprecated flags_extra bit AVOID_AOE (0x400000) set. This will be migrated to the `creature_immunities` table in a future update.", entry);
+    if (creatureTemplate.flags_extra & CREATURE_FLAG_EXTRA_IMMUNITY_KNOCKBACK)
+        LOG_WARN("server.loading", "Creature (Entry: {}) has deprecated flags_extra bit IMMUNITY_KNOCKBACK (0x40000000) set. This will be migrated to the `creature_immunities` table in a future update.", entry);
 
     // useful if the creature template load is being triggered from outside this class
     if (triggerHook)
