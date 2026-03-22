@@ -25,6 +25,9 @@
 #include "SharedDefines.h"
 #include "Unit.h"
 
+#include <vector>
+#include <bitset>
+
 class SpellInfo;
 class Player;
 class Unit;
@@ -557,6 +560,18 @@ typedef std::multimap<uint32, uint32> SpellsRequiringSpellMap;
 typedef std::pair<SpellsRequiringSpellMap::const_iterator, SpellsRequiringSpellMap::const_iterator> SpellsRequiringSpellMapBounds;
 
 // Spell learning properties (accessed using SpellMgr functions)
+struct CreatureImmunities
+{
+    std::bitset<MAX_SPELL_SCHOOL> School;
+    std::bitset<DISPEL_MAX> DispelType;
+    std::bitset<MAX_MECHANIC> Mechanic;
+    std::vector<SpellEffects> Effect;
+    std::vector<AuraType> Aura;
+    bool ImmuneAoE = false;
+    bool ImmuneChain = false;
+};
+
+typedef std::unordered_map<int32, CreatureImmunities> CreatureImmunitiesMap;
 struct SpellLearnSkillNode
 {
     uint16 skill;
@@ -633,6 +648,9 @@ private:
     // Accessors (const or static functions)
 public:
     static SpellMgr* instance();
+
+    // creature immunity definitions loaded from DB
+    CreatureImmunities const* GetCreatureImmunities(int32 creatureImmunitiesId) const;
 
     // Spell correctness for client using
     static bool ComputeIsSpellValid(SpellInfo const* spellInfo, bool msg = true);
@@ -772,10 +790,12 @@ public:
     void LoadPetDefaultSpells();
     void LoadSpellAreas();
     void LoadSpellInfoStore();
+    void LoadCreatureImmunities();
     void LoadSpellCooldownOverrides();
     void UnloadSpellInfoStore();
     void UnloadSpellInfoImplicitTargetConditionLists();
     void LoadSpellInfoCustomAttributes();
+    void LoadSpellInfoImmunities();
     void LoadSpellInfoCorrections();
     void LoadSpellSpecificAndAuraState();
     void LoadSpellJumpDistances();
@@ -792,6 +812,7 @@ private:
     SpellGroupStackMap         mSpellGroupStack;
     SameEffectStackMap         mSpellSameEffectStack;
     SpellProcMap               mSpellProcMap;
+    CreatureImmunitiesMap      mCreatureImmunities;
     SpellBonusMap              mSpellBonusMap;
     SpellThreatMap             mSpellThreatMap;
     SpellMixologyMap           mSpellMixologyMap;
