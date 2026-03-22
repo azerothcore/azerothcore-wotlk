@@ -7407,6 +7407,7 @@ bool Unit::AttackStop()
 
 void Unit::CombatStop(bool includingCast, bool mutualPvP)
 {
+    sScriptMgr->OnUnitStopCombat(this);
     if (includingCast && IsNonMeleeSpellCast(false))
         InterruptNonMeleeSpells(false);
 
