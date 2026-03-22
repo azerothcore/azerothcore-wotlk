@@ -143,6 +143,12 @@ enum UlduarData
     DATA_BRANN_MEMOTESAY                    = 801,
     DATA_BRANN_EASY_MODE                    = 802,
     DATA_BRANN_BASE_CAMP                    = 803,
+
+    // Observation Ring Keepers
+    DATA_FREYA_GOSSIP                       = 810,
+    DATA_HODIR_GOSSIP                       = 811,
+    DATA_MIMIRON_GOSSIP                     = 812,
+    DATA_THORIM_GOSSIP                      = 813,
 };
 
 enum UlduarNPCs

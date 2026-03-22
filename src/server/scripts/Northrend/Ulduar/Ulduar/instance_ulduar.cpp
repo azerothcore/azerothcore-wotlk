@@ -39,6 +39,32 @@ DoorData const doorData[] =
     { 0,                    0,              DOOR_TYPE_ROOM    }
 };
 
+// Observation Ring keeper positions, indexed by KEEPER_* constants
+static Position const ObservationRingKeepersPos[4] =
+{
+    {1945.6823f,  33.342014f, 411.44083f, 5.270895f}, // Freya
+    {1945.7609f, -81.52171f,  411.4407f,  1.029744f}, // Hodir
+    {2028.7656f,  17.42014f,  411.44458f, 3.857178f}, // Mimiron
+    {2028.8219f, -65.73573f,  411.44257f, 2.460914f}  // Thorim
+};
+
+static uint32 const ObservationRingKeeperEntry[4] =
+{
+    NPC_FREYA_GOSSIP, NPC_HODIR_GOSSIP,
+    NPC_MIMIRON_GOSSIP, NPC_THORIM_GOSSIP
+};
+
+static uint32 const ObservationRingKeeperData[4] =
+{
+    DATA_FREYA_GOSSIP, DATA_HODIR_GOSSIP,
+    DATA_MIMIRON_GOSSIP, DATA_THORIM_GOSSIP
+};
+
+static uint32 const ObservationRingKeeperBoss[4] =
+{
+    BOSS_FREYA, BOSS_HODIR, BOSS_MIMIRON, BOSS_THORIM
+};
+
 ObjectData const creatureData[] =
 {
     { NPC_LEVIATHAN,    BOSS_LEVIATHAN  },
@@ -69,6 +95,11 @@ ObjectData const creatureData[] =
     // Yogg-Saron helpers
     { NPC_SARA,                     DATA_SARA                   },
     { NPC_BRAIN_OF_YOGG_SARON,      DATA_BRAIN_OF_YOGG_SARON    },
+    // Observation Ring Keepers
+    { NPC_FREYA_GOSSIP,             DATA_FREYA_GOSSIP           },
+    { NPC_HODIR_GOSSIP,             DATA_HODIR_GOSSIP           },
+    { NPC_MIMIRON_GOSSIP,           DATA_MIMIRON_GOSSIP         },
+    { NPC_THORIM_GOSSIP,            DATA_THORIM_GOSSIP          },
     // Algalon helpers
     { NPC_BRANN_BRONZBEARD_ALG,     DATA_BRANN_BRONZEBEARD_ALG  },
     { NPC_BRANN_BASE_CAMP,          DATA_BRANN_BASE_CAMP        },
@@ -173,7 +204,6 @@ public:
         // Shared
         EventMap _events;
         bool m_mimironTramUsed;
-        ObjectGuid m_keepersGossipGUID[4];
 
         void Initialize() override
         {
@@ -226,6 +256,15 @@ public:
                             t->AddPassenger(go, true);
                 }
             }
+
+            // Spawn Observation Ring keepers for defeated bosses
+            for (uint8 i = KEEPER_FREYA; i <= KEEPER_THORIM; ++i)
+                if (IsBossDone(ObservationRingKeeperBoss[i])
+                    && !(m_watchersMask & (1 << i))
+                    && !GetObjectGuid(ObservationRingKeeperData[i]))
+                    instance->SummonCreature(
+                        ObservationRingKeeperEntry[i],
+                        ObservationRingKeepersPos[i]);
 
             if (!GetObjectGuid(BOSS_ALGALON) && m_algalonTimer && (m_algalonTimer <= 60 || m_algalonTimer == TIMER_ALGALON_TO_SUMMON))
             {
@@ -303,7 +342,7 @@ public:
                 case BOSS_HODIR:
                 case BOSS_THORIM:
                 case BOSS_FREYA:
-                    if (GetBossState(BOSS_MIMIRON) == DONE && GetBossState(BOSS_FREYA) == DONE && GetBossState(BOSS_HODIR) == DONE && GetBossState(BOSS_THORIM) == DONE)
+                    if (AllBossesDone({BOSS_MIMIRON, BOSS_FREYA, BOSS_HODIR, BOSS_THORIM}))
                     {
                         scheduler.Schedule(45s, [this](TaskContext /*context*/)
                         {
@@ -317,6 +356,13 @@ public:
                     }
                     if (type == BOSS_HODIR && state == DONE)
                         setChestsLootable(BOSS_HODIR);
+                    if (state == DONE)
+                    {
+                        uint8 keeperIdx = type - BOSS_FREYA;
+                        instance->SummonCreature(
+                            ObservationRingKeeperEntry[keeperIdx],
+                            ObservationRingKeepersPos[keeperIdx]);
+                    }
                     break;
                 case BOSS_ALGALON:
                     if (GameObject* go = GetGameObject(DATA_SIGILDOOR_03))
@@ -563,7 +609,7 @@ public:
                     OpenIfDone(BOSS_ASSEMBLY, gameObject, GO_STATE_ACTIVE);
                     break;
                 case GO_KEEPERS_GATE:
-                    if (GetBossState(BOSS_MIMIRON) == DONE && GetBossState(BOSS_FREYA) == DONE && GetBossState(BOSS_HODIR) == DONE && GetBossState(BOSS_THORIM) == DONE)
+                    if (AllBossesDone({BOSS_MIMIRON, BOSS_FREYA, BOSS_HODIR, BOSS_THORIM}))
                         gameObject->RemoveGameObjectFlag(GO_FLAG_LOCKED);
                     break;
                 // Mimiron, Hodir, Vezax
