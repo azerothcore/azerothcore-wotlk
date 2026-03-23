@@ -15,32 +15,32 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _IMMAPMANAGER_H
-#define _IMMAPMANAGER_H
+#ifndef _WORLDMODELSTORE_H
+#define _WORLDMODELSTORE_H
 
-// Interface for IMMapManger
-namespace MMAP
+#include "WorldModel.h"
+#include <memory>
+#include <mutex>
+#include <unordered_map>
+
+class WorldModelStore
 {
-    enum MMAP_LOAD_RESULT
+public:
+    static WorldModelStore* instance()
     {
-        MMAP_LOAD_RESULT_ERROR,
-        MMAP_LOAD_RESULT_OK,
-        MMAP_LOAD_RESULT_IGNORED,
-    };
+        static WorldModelStore instance;
+        return &instance;
+    }
 
-    class IMMapMgr
-    {
-    private:
-        bool iEnablePathFinding;
+    std::shared_ptr<VMAP::WorldModel> AcquireModelInstance(std::string const& basepath, std::string const& filename, uint32 flags);
 
-    public:
-        IMMapMgr() : iEnablePathFinding(true) {}
-        virtual ~IMMapMgr(void) {}
+private:
+    typedef std::unordered_map<std::string, std::shared_ptr<VMAP::WorldModel>> ModelFileMap;
+    ModelFileMap _loadedModels;
 
-        //Enabled/Disabled Pathfinding
-        void setEnablePathFinding(bool value) { iEnablePathFinding = value; }
-        bool isEnablePathFinding() const { return (iEnablePathFinding); }
-    };
-}
+    std::mutex _lock;
+};
+
+#define sWorldModelStore WorldModelStore::instance()
 
 #endif

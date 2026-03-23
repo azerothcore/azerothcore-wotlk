@@ -60,8 +60,6 @@ namespace VMAP
         // some maps are not splitted into tiles and we have to make sure, not removing the map before all tiles are removed
         // empty tiles have no tile file, hence map with bool instead of just a set (consistency check)
         loadedTileMap iLoadedTiles;
-        // stores <tree_index, reference_count> to invalidate tree values, unload map, and to be able to report errors
-        loadedSpawnMap iLoadedSpawns;
         std::string iBasePath;
 
     private:
@@ -81,10 +79,10 @@ namespace VMAP
         [[nodiscard]] float getHeight(const G3D::Vector3& pPos, float maxSearchDist) const;
         bool GetLocationInfo(const G3D::Vector3& pos, LocationInfo& info) const;
 
-        bool InitMap(const std::string& fname, VMapMgr2* vm);
-        void UnloadMap(VMapMgr2* vm);
-        bool LoadMapTile(uint32 tileX, uint32 tileY, VMapMgr2* vm);
-        void UnloadMapTile(uint32 tileX, uint32 tileY, VMapMgr2* vm);
+        bool InitMap(const std::string& fname);
+        void UnloadMap();
+        bool LoadMapTile(uint32 tileX, uint32 tileY);
+        void UnloadMapTile(uint32 tileX, uint32 tileY);
         [[nodiscard]] bool isTiled() const { return iIsTiled; }
         [[nodiscard]] uint32 numLoadedTiles() const { return iLoadedTiles.size(); }
         void GetModelInstances(ModelInstance*& models, uint32& count);

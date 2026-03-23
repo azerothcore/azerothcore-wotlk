@@ -17,7 +17,6 @@
 
 #include "DisableMgr.h"
 #include "GameEventMgr.h"
-#include "MMapFactory.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvP.h"
 #include "Player.h"
@@ -448,5 +447,17 @@ bool DisableMgr::IsPathfindingEnabled(Map const* map)
     if (!map)
         return false;
 
-    return !MMAP::MMapFactory::forbiddenMaps[map->GetId()] && (sWorld->getBoolConfig(CONFIG_ENABLE_MMAPS) ? true : map->IsBattlegroundOrArena());
+    // Still not an ideal solution but removes the extra awful forbiddenMaps hack
+    // int32 f[] = {616 /*EoE*/, 649 /*ToC25*/, 650 /*ToC5*/, -1};
+    switch (map->GetId())
+    {
+    case 616: // EoE
+    case 649: // ToC25
+    case 650: // ToC5
+        return false;
+    default:
+        break;
+    }
+
+    return (sWorld->getBoolConfig(CONFIG_ENABLE_MMAPS) ? true : map->IsBattlegroundOrArena());
 }

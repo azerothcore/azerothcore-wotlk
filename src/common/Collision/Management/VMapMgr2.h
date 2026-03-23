@@ -19,9 +19,6 @@
 #define _VMAPMANAGER2_H
 
 #include "IVMapMgr.h"
-#include <mutex>
-#include <unordered_map>
-#include <vector>
 
 //===========================================================
 
@@ -46,24 +43,6 @@ namespace G3D
 
 namespace VMAP
 {
-    class StaticMapTree;
-    class WorldModel;
-
-    class ManagedModel
-    {
-    public:
-        ManagedModel()  { }
-        void setModel(WorldModel* model) { iModel = model; }
-        WorldModel* getModel() { return iModel; }
-        int decRefCount() { return --iRefCount; }
-    protected:
-        WorldModel* iModel{nullptr};
-        int iRefCount{0};
-    };
-
-    typedef std::unordered_map<uint32, StaticMapTree*> InstanceTreeMap;
-    typedef std::unordered_map<std::string, ManagedModel> ModelFileMap;
-
     enum DisableTypes
     {
         VMAP_DISABLE_AREAFLAG       = 0x1,
@@ -75,50 +54,18 @@ namespace VMAP
     class VMapMgr2 : public IVMapMgr
     {
     protected:
-        // Tree to check collision
-        ModelFileMap iLoadedModelFiles;
-        InstanceTreeMap iInstanceMapTrees;
-        bool thread_safe_environment;
-
-        // Mutex for iLoadedModelFiles
-        std::mutex LoadedModelFilesLock;
-
-        bool _loadMap(uint32 mapId, const std::string& basePath, uint32 tileX, uint32 tileY);
-        /* void _unloadMap(uint32 pMapId, uint32 x, uint32 y); */
-
         static uint32 GetLiquidFlagsDummy(uint32) { return 0; }
         static bool IsVMAPDisabledForDummy(uint32 /*entry*/, uint8 /*flags*/) { return false; }
 
-        InstanceTreeMap::const_iterator GetMapTree(uint32 mapId) const;
-
     public:
         // public for debug
-        [[nodiscard]] G3D::Vector3 convertPositionToInternalRep(float x, float y, float z) const;
+        static G3D::Vector3 convertPositionToInternalRep(float x, float y, float z);
         static std::string getMapFileName(unsigned int mapId);
 
         VMapMgr2();
         ~VMapMgr2() override;
 
-        void InitializeThreadUnsafe(const std::vector<uint32>& mapIds);
-
-        int loadMap(const char* pBasePath, unsigned int mapId, int x, int y) override;
-
-        void unloadMap(unsigned int mapId, int x, int y) override;
-        void unloadMap(unsigned int mapId) override;
-
-        bool isInLineOfSight(unsigned int mapId, float x1, float y1, float z1, float x2, float y2, float z2, ModelIgnoreFlags ignoreFlags) override ;
-        /**
-        fill the hit pos and return true, if an object was hit
-        */
-        bool GetObjectHitPos(unsigned int mapId, float x1, float y1, float z1, float x2, float y2, float z2, float& rx, float& ry, float& rz, float modifyDist) override;
-        float getHeight(unsigned int mapId, float x, float y, float z, float maxSearchDist) override;
-
         bool processCommand(char* /*command*/) override { return false; } // for debug and extensions
-
-        bool GetAreaAndLiquidData(uint32 mapId, float x, float y, float z, Optional<uint8> reqLiquidType, AreaAndLiquidData& data) const override;
-
-        WorldModel* acquireModelInstance(const std::string& basepath, const std::string& filename, uint32 flags);
-        void releaseModelInstance(const std::string& filename);
 
         // what's the use of this? o.O
         [[nodiscard]] std::string getDirFileName(unsigned int mapId, int /*x*/, int /*y*/) const override
@@ -126,7 +73,6 @@ namespace VMAP
             return getMapFileName(mapId);
         }
         LoadResult existsMap(const char* basePath, unsigned int mapId, int x, int y) override;
-        void GetInstanceMapTree(InstanceTreeMap& instanceMapTree);
 
         typedef uint32(*GetLiquidFlagsFn)(uint32 liquidType);
         GetLiquidFlagsFn GetLiquidFlagsPtr;
