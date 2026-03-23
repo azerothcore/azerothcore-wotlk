@@ -523,6 +523,8 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_RESPAWN_DYNAMICMINIMUM_GAMEOBJECT, "Respawn.DynamicMinimumGameObject", 10);
 
     SetConfigValue<bool>(CONFIG_VMAP_INDOOR_CHECK, "vmap.enableIndoorCheck", true);
+    SetConfigValue<bool>(CONFIG_VMAP_ENABLE_LOS, "vmap.enableLOS", true);
+    SetConfigValue<bool>(CONFIG_VMAP_ENABLE_HEIGHT, "vmap.enableHeight", true);
     SetConfigValue<bool>(CONFIG_PET_LOS, "vmap.petLOS", true);
 
     SetConfigValue<bool>(CONFIG_VMAP_BLIZZLIKE_PVP_LOS, "vmap.BlizzlikePvPLOS", true);

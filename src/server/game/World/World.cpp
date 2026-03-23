@@ -60,7 +60,6 @@
 #include "LootItemStorage.h"
 #include "LootMgr.h"
 #include "M2Stores.h"
-#include "MMapFactory.h"
 #include "MapMgr.h"
 #include "Metric.h"
 #include "MotdMgr.h"
@@ -139,7 +138,6 @@ World::~World()
         delete command;
 
     VMAP::VMapFactory::clear();
-    MMAP::MMapFactory::clear();
 }
 
 std::unique_ptr<IWorld>& getWorldInstance()
@@ -284,17 +282,15 @@ void World::LoadConfigSettings(bool reload)
     }
 
     bool const enableIndoor = getBoolConfig(CONFIG_VMAP_INDOOR_CHECK);
-    bool const enableLOS = sConfigMgr->GetOption<bool>("vmap.enableLOS", true);
+    bool const enableLOS = getBoolConfig(CONFIG_VMAP_ENABLE_LOS);
     bool const enablePetLOS = getBoolConfig(CONFIG_PET_LOS);
-    bool const enableHeight = sConfigMgr->GetOption<bool>("vmap.enableHeight", true);
+    bool const enableHeight = getBoolConfig(CONFIG_VMAP_ENABLE_HEIGHT);
     if (!enableHeight)
         LOG_ERROR("server.loading", "VMap height checking disabled! Creatures movements and other various things WILL be broken! Expect no support.");
 
     VMAP::VMapFactory::createOrGetVMapMgr()->setEnableLineOfSightCalc(enableLOS);
     VMAP::VMapFactory::createOrGetVMapMgr()->setEnableHeightCalc(enableHeight);
     LOG_INFO("server.loading", "WORLD: VMap support included. LineOfSight:{}, getHeight:{}, indoorCheck:{} PetLOS:{}", enableLOS, enableHeight, enableIndoor, enablePetLOS);
-
-    MMAP::MMapFactory::InitializeDisabledMaps();
 
     // call ScriptMgr if we're reloading the configuration
     sScriptMgr->OnAfterConfigLoad(reload);
@@ -391,17 +387,6 @@ void World::SetInitialWorldSettings()
 
     // Load IP Location Database
     sIPLocation->Load();
-
-    std::vector<uint32> mapIds;
-    for (auto const& map : sMapStore)
-    {
-        mapIds.emplace_back(map->MapID);
-    }
-
-    vmmgr2->InitializeThreadUnsafe(mapIds);
-
-    MMAP::MMapMgr* mmmgr = MMAP::MMapFactory::createOrGetMMapMgr();
-    mmmgr->InitializeThreadUnsafe(mapIds);
 
     LOG_INFO("server.loading", "Loading Game Graveyard...");
     sGraveyard->LoadGraveyardFromDB();
