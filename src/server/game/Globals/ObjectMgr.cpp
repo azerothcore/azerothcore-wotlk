@@ -310,6 +310,9 @@ ObjectMgr::ObjectMgr():
     {
         _playerClassInfo[i] = nullptr;
     }
+
+    // Initialize default spawn group
+    _spawnGroupDataStore[0] = {0, "Default Group", 0, SpawnGroupFlags(SPAWNGROUP_FLAG_SYSTEM)};
 }
 
 ObjectMgr::~ObjectMgr()
@@ -2400,6 +2403,7 @@ void ObjectMgr::LoadCreatures()
         data.unit_flags         = fields[21].Get<uint32>();
         data.dynamicflags       = fields[22].Get<uint32>();
         data.ScriptId           = GetScriptId(fields[23].Get<std::string>());
+        data.spawnGroupId       = 0;
 
         if (!data.ScriptId)
             data.ScriptId = cInfo->ScriptID;
@@ -2578,6 +2582,7 @@ CreatureData const* ObjectMgr::LoadCreatureDataFromDB(ObjectGuid::LowType spawnI
     creatureData.unit_flags       = fields[19].Get<uint32>();
     creatureData.dynamicflags     = fields[20].Get<uint32>();
     creatureData.ScriptId         = GetScriptId(fields[21].Get<std::string>());
+    creatureData.spawnGroupId     = 0;
 
     if (!creatureData.ScriptId)
         creatureData.ScriptId = cInfo->ScriptID;
@@ -2760,6 +2765,7 @@ ObjectGuid::LowType ObjectMgr::AddGOData(uint32 entry, uint32 mapId, float x, fl
     data.phaseMask      = PHASEMASK_NORMAL;
     data.artKit         = goinfo->type == GAMEOBJECT_TYPE_CAPTURE_POINT ? 21 : 0;
     data.dbData = false;
+    data.spawnGroupId   = 0;
 
     AddGameobjectToGrid(spawnId, &data);
 
@@ -2915,6 +2921,7 @@ void ObjectMgr::LoadGameobjects()
         data.rotation.w     = fields[10].Get<float>();
         data.spawntimesecs  = fields[11].Get<int32>();
         data.ScriptId       = GetScriptId(fields[18].Get<std::string>());
+        data.spawnGroupId   = 0;
         if (!data.ScriptId)
             data.ScriptId = gInfo->ScriptId;
 
@@ -8681,6 +8688,19 @@ void ObjectMgr::DeleteGOData(ObjectGuid::LowType guid)
         RemoveGameobjectFromGrid(guid, data);
 
     _gameObjectDataStore.erase(guid);
+}
+
+SpawnData const* ObjectMgr::GetSpawnData(SpawnObjectType type, ObjectGuid::LowType spawnId) const
+{
+    switch (type)
+    {
+        case SPAWN_TYPE_CREATURE:
+            return GetCreatureData(spawnId);
+        case SPAWN_TYPE_GAMEOBJECT:
+            return GetGameObjectData(spawnId);
+        default:
+            return nullptr;
+    }
 }
 
 void ObjectMgr::LoadQuestRelationsHelper(QuestRelations& map, std::string const& table, bool starter, bool go)
