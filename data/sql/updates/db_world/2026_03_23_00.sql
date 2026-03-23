@@ -1,3 +1,4 @@
+-- DB update 2026_03_22_05 -> 2026_03_23_00
 -- Add creature_text for Stephanie Sindree (31019)
 DELETE FROM `creature_text` WHERE `CreatureID` = 31019;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
