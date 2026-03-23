@@ -1,3 +1,4 @@
+-- DB update 2026_03_23_01 -> 2026_03_23_02
 -- Convert npc_slim (entry 19679) from C++ script to database gossip + conditions
 
 -- Remove ScriptName from creature_template
