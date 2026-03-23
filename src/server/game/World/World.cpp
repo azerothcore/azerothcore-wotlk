@@ -780,6 +780,9 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading Waypoints...");
     sWaypointMgr->Load();
 
+    LOG_INFO("server.loading", "Loading Waypoint Addons...");
+    sWaypointMgr->LoadWaypointAddons();
+
     LOG_INFO("server.loading", "Loading SmartAI Waypoints...");
     sSmartWaypointMgr->LoadFromDB();
 

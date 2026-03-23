@@ -527,6 +527,7 @@ public:
             }
         }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 uiPointId) override
         {
             switch (uiPointId)

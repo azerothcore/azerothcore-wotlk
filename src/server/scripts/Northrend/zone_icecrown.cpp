@@ -747,6 +747,7 @@ public:
             summons.Despawn(summon);
         }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 pointId) override
         {
             switch (pointId)

@@ -358,6 +358,14 @@ public:
     [[nodiscard]] uint32 GetCurrentWaypointID() const { return m_waypointID; }
     void UpdateWaypointID(uint32 wpID) { m_waypointID = wpID; }
 
+    // nodeId, pathId
+    std::pair<uint32, uint32> GetCurrentWaypointInfo() const { return _currentWaypointNodeInfo; }
+    void UpdateCurrentWaypointInfo(uint32 nodeId, uint32 pathId) { _currentWaypointNodeInfo = { nodeId, pathId }; }
+
+    bool IsFormationLeader() const;
+    void SignalFormationMovement();
+    bool IsFormationLeaderMoveAllowed() const;
+
     void SearchFormation();
     [[nodiscard]] CreatureGroup const* GetFormation() const { return m_formation; }
     [[nodiscard]] CreatureGroup* GetFormation() { return m_formation; }
@@ -519,6 +527,7 @@ private:
     // WaypointMovementGenerator variable
     uint32 m_waypointID;
     uint32 m_path_id;
+    std::pair<uint32, uint32> _currentWaypointNodeInfo{0, 0};
 
     // Formation variable
     CreatureGroup* m_formation;

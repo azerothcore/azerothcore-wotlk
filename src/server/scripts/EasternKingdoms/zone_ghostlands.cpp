@@ -45,6 +45,7 @@ struct npc_ranger_lilatha : public npc_escortAI
 {
     npc_ranger_lilatha(Creature* creature) : npc_escortAI(creature) { }
 
+    using CreatureAI::WaypointReached;
     void WaypointReached(uint32 waypointId) override
     {
         Player* player = GetPlayerForEscort();

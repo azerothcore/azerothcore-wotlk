@@ -227,6 +227,7 @@ struct npc_general_andorov : public npc_escortAI
         events.ScheduleEvent(EVENT_STRIKE, 2s, 5s);
     }
 
+    using CreatureAI::WaypointReached;
     void WaypointReached(uint32 waypointId) override
     {
         switch (waypointId)

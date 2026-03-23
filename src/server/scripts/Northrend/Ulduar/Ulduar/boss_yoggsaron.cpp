@@ -934,6 +934,7 @@ struct boss_yoggsaron_cloud : public npc_escortAI
 
     void MoveInLineOfSight(Unit*  /*who*/) override {}
     void AttackStart(Unit*  /*who*/) override {}
+    using CreatureAI::WaypointReached;
     void WaypointReached(uint32  /*point*/) override {}
 
     void Reset() override

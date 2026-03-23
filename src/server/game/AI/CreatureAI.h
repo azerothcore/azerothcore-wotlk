@@ -186,6 +186,13 @@ public:
     // Called at MovePath End
     virtual void PathEndReached(uint32 /*pathId*/) {}
 
+    /// == Waypoints system =============================
+
+    virtual void WaypointPathStarted(uint32 /*pathId*/) { }
+    virtual void WaypointStarted(uint32 /*nodeId*/, uint32 /*pathId*/) { }
+    virtual void WaypointReached(uint32 /*nodeId*/, uint32 /*pathId*/) { }
+    virtual void WaypointPathEnded(uint32 /*nodeId*/, uint32 /*pathId*/) { }
+
     void OnCharmed(bool apply) override;
 
     // Called at reaching home after evade

@@ -521,6 +521,7 @@ public:
 
         uint32 m_uiChatTimer;
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();

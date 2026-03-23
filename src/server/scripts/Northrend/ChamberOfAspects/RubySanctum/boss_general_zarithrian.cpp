@@ -233,6 +233,7 @@ public:
                 zarithrian->AI()->JustSummoned(me);
         }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 waypointId) override
         {
             if (waypointId == MAX_PATH_FLAMECALLER_WAYPOINTS)

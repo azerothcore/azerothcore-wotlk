@@ -213,6 +213,7 @@ struct npc_grimstone : public npc_escortAI
         }
     }
 
+    using CreatureAI::WaypointReached;
     void WaypointReached(uint32 waypointId) override
     {
         switch (waypointId)
@@ -568,6 +569,7 @@ struct npc_rocknot : public npc_escortAI
             go->SetGoState((GOState)state);
     }
 
+    using CreatureAI::WaypointReached;
     void WaypointReached(uint32 waypointId) override
     {
         switch (waypointId)

@@ -2533,14 +2533,12 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                                 break;
                             }
 
-                            if (!path || path->empty())
+                            if (!path || path->Nodes.empty())
                                 continue;
 
-                            auto itrWp = path->find(1);
-                            if (itrWp != path->end())
                             {
-                                WaypointData const& wpData = itrWp->second;
-                                float distToThisPath = creature->GetExactDistSq(wpData.x, wpData.y, wpData.z);
+                                WaypointNode const& wpData = path->Nodes[0];
+                                float distToThisPath = creature->GetExactDistSq(wpData.X, wpData.Y, wpData.Z);
 
                                 if (distToThisPath < distanceToClosest)
                                 {

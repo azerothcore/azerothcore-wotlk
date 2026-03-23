@@ -73,6 +73,7 @@ struct npc_frosthound : public npc_escortAI
             return;
     }
 
+    using CreatureAI::WaypointReached;
     void WaypointReached(uint32 waypointId) override
     {
         Player* player = GetPlayerForEscort();
@@ -568,6 +569,7 @@ public:
             }
         }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 /*waypointId*/) override { }
         void JustDied(Unit* /*killer*/) override { }
         void OnCharmed(bool /*apply*/) override { }

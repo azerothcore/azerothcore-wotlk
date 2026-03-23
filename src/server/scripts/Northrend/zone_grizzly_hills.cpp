@@ -75,6 +75,7 @@ public:
                 summoned->AI()->AttackStart(me->GetVictim());
         }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();

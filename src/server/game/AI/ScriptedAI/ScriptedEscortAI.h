@@ -87,6 +87,7 @@ public:
 
     void GenerateWaypointArray(Movement::PointsArray* points);
 
+    using CreatureAI::WaypointReached;
     virtual void WaypointReached(uint32 pointId) = 0;
     virtual void WaypointStart(uint32 /*pointId*/) {}
 

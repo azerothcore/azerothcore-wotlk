@@ -895,6 +895,7 @@ struct boss_thorim_lightning_orb : public npc_escortAI
             me->CastSpell(me, SPELL_LIGHTNING_DESTRUCTION, true);
         }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32  /*point*/) override
         {
         }
@@ -960,6 +961,7 @@ struct boss_thorim_sif_blizzard : public npc_escortAI
             me->CastSpell(me, SPELL_BLIZZARD, true);
         }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32  /*point*/) override
         {
         }

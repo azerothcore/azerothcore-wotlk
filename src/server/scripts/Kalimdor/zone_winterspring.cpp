@@ -383,6 +383,7 @@ public:
             StartNextDialogueText(SAY_PRIESTESS_ALTAR_3);
         }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 pointId) override
         {
             switch (pointId)

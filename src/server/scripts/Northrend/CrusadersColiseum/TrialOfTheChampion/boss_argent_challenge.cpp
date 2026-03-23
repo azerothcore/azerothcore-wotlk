@@ -519,6 +519,7 @@ public:
             bCheck = false;
         }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 uiPoint) override
         {
             if (uiPoint == 1)

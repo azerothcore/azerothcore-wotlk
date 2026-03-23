@@ -164,6 +164,7 @@ public:
                 }
         }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 i) override
         {
             Player* player = GetPlayerForEscort();
@@ -626,6 +627,7 @@ public:
                 player->FailQuest(Q_ALMABTRIEB);
         }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();
@@ -709,6 +711,7 @@ public:
             uiTakeTimer = 3000;
         }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();

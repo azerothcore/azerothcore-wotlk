@@ -538,9 +538,9 @@ void MotionMaster::MovePath(uint32 path_id, ForcedMovement forcedMovement, PathS
     }
 
     Movement::PointsArray points;
-    for (auto& point : *path)
+    for (auto const& node : path->Nodes)
     {
-        points.push_back(G3D::Vector3(point.second.x, point.second.y, point.second.z));
+        points.push_back(G3D::Vector3(node.X, node.Y, node.Z));
     }
 
     // pass the new PointsArray* to the appropriate MoveSplinePath function
@@ -918,7 +918,7 @@ void MotionMaster::MoveWaypoint(uint32 path_id, bool repeatable, PathSource path
     if (_owner->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
         return;
 
-    Mutate(new WaypointMovementGenerator<Creature>(path_id, pathSource, repeatable), MOTION_SLOT_IDLE);
+    Mutate(new WaypointMovementGenerator<Creature>(path_id, repeatable, pathSource), MOTION_SLOT_IDLE);
 
     LOG_DEBUG("movement.motionmaster", "{} ({}) start moving over path(Id:{}, repeatable: {})",
         _owner->IsPlayer() ? "Player" : "Creature", _owner->GetGUID().ToString(), path_id, repeatable ? "YES" : "NO");

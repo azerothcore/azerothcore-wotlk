@@ -312,6 +312,7 @@ public:
             TalkEvent = false;
         }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 id) override;
         void InitializeEvent();
 

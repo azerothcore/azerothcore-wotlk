@@ -374,6 +374,7 @@ public:
     {
         npc_isla_starmaneAI(Creature* creature) : npc_escortAI(creature) { }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();

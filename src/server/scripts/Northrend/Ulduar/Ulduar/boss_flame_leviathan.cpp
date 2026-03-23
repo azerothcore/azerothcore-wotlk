@@ -974,6 +974,7 @@ struct npc_mimirons_inferno : public npc_escortAI
 
     void AttackStart(Unit*) override { }
     void MoveInLineOfSight(Unit*) override { }
+    using CreatureAI::WaypointReached;
     void WaypointReached(uint32 /*waypointId*/) override { }
 
     void DoAction(int32 param) override
