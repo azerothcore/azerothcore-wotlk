@@ -1,3 +1,4 @@
+-- DB update 2026_03_23_00 -> 2026_03_23_01
 -- Add velocity and smoothTransition columns to waypoint_data
 ALTER TABLE `waypoint_data`
   ADD COLUMN `velocity` FLOAT NOT NULL DEFAULT 0 AFTER `orientation`,
