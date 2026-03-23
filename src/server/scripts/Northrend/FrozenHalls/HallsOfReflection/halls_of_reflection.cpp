@@ -1463,9 +1463,6 @@ public:
 
     bool OnTrigger(Player* player, const AreaTrigger* /*at*/) override
     {
-        if (player->IsGameMaster())
-            return false;
-
         InstanceScript* inst = player->GetInstanceScript();
         if (!inst)
             return false;
