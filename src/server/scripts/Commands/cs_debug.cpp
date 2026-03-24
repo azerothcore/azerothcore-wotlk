@@ -22,9 +22,11 @@
 #include "Chat.h"
 #include "CommandScript.h"
 #include "GridNotifiersImpl.h"
+#include "ItemTemplate.h"
 #include "LFGMgr.h"
 #include "Language.h"
 #include "Log.h"
+#include "LootMgr.h"
 #include "M2Stores.h"
 #include "MapMgr.h"
 #include "ObjectAccessor.h"
@@ -33,7 +35,9 @@
 #include "ScriptMgr.h"
 #include "Transport.h"
 #include "Warden.h"
+#include <algorithm>
 #include <fstream>
+#include <map>
 #include <set>
 
 using namespace Acore::ChatCommands;
@@ -96,6 +100,7 @@ public:
             { "itemexpire",     HandleDebugItemExpireCommand,          SEC_ADMINISTRATOR, Console::No },
             { "areatriggers",   HandleDebugAreaTriggersCommand,        SEC_ADMINISTRATOR, Console::No },
             { "lfg",            HandleDebugDungeonFinderCommand,       SEC_ADMINISTRATOR, Console::Yes},
+            { "loot",           HandleDebugLootCommand,                SEC_GAMEMASTER,    Console::Yes},
             { "los",            HandleDebugLoSCommand,                 SEC_ADMINISTRATOR, Console::No },
             { "moveflags",      HandleDebugMoveflagsCommand,           SEC_ADMINISTRATOR, Console::No },
             { "unitstate",      HandleDebugUnitStateCommand,           SEC_ADMINISTRATOR, Console::No },
@@ -1605,6 +1610,235 @@ public:
         uint32 zoneId = player->GetZoneId();
         AreaTableEntry const* zoneEntry = sAreaTableStore.LookupEntry(zoneId);
         handler->PSendSysMessage("Player count in zone {} ({}): {}.", zoneId, (zoneEntry ? zoneEntry->area_name[LOCALE_enUS] : "<unknown>"), player->GetMap()->GetPlayerCountInZone(zoneId));
+        return true;
+    }
+
+    static std::string GetLootSourceName(std::string const& type, uint32 lootId)
+    {
+        if (type == "creature" || type == "skinning" || type == "pickpocketing")
+        {
+            if (CreatureTemplate const* ct = sObjectMgr->GetCreatureTemplate(lootId))
+                return ct->Name;
+        }
+        else if (type == "gameobject")
+        {
+            if (GameObjectTemplate const* gt = sObjectMgr->GetGameObjectTemplate(lootId))
+                return gt->name;
+        }
+        else if (type == "item" || type == "disenchant" || type == "prospecting" || type == "milling")
+        {
+            if (ItemTemplate const* it = sObjectMgr->GetItemTemplate(lootId))
+                return it->Name1;
+        }
+        else if (type == "fishing")
+        {
+            if (AreaTableEntry const* area = sAreaTableStore.LookupEntry(lootId))
+                return area->area_name[LOCALE_enUS];
+        }
+
+        return "";
+    }
+
+    static char const* GetItemQualityName(uint32 quality)
+    {
+        static char const* const qualityNames[MAX_ITEM_QUALITY] =
+        {
+            "Poor", "Normal", "Uncommon", "Rare",
+            "Epic", "Legendary", "Artifact", "Heirloom"
+        };
+
+        if (quality < MAX_ITEM_QUALITY)
+            return qualityNames[quality];
+        return "Unknown";
+    }
+
+    static void GenerateLoot(Loot& loot, LootTemplate const* tab,
+        LootStore const& store, Player* player, std::string const& type, uint32 lootId)
+    {
+        loot.clear();
+        loot.items.reserve(MAX_NR_LOOT_ITEMS);
+        loot.quest_items.reserve(MAX_NR_QUEST_ITEMS);
+        tab->Process(loot, store, LOOT_MODE_DEFAULT, player);
+
+        if (type == "creature")
+        {
+            if (CreatureTemplate const* ct = sObjectMgr->GetCreatureTemplate(lootId))
+                loot.generateMoneyLoot(ct->mingold, ct->maxgold);
+        }
+        else if (type == "gameobject")
+        {
+            if (GameObjectTemplateAddon const* addon = sObjectMgr->GetGameObjectTemplateAddon(lootId))
+                loot.generateMoneyLoot(addon->mingold, addon->maxgold);
+        }
+        else if (type == "item")
+        {
+            if (ItemTemplate const* it = sObjectMgr->GetItemTemplate(lootId))
+                loot.generateMoneyLoot(it->MinMoneyLoot, it->MaxMoneyLoot);
+        }
+    }
+
+    static bool HandleDebugLootCommand(ChatHandler* handler, std::string type, uint32 lootId, Optional<uint32> count)
+    {
+        static std::unordered_map<std::string, LootStore*> const lootStoreMap =
+        {
+            { "creature",       &LootTemplates_Creature },
+            { "gameobject",     &LootTemplates_Gameobject },
+            { "fishing",        &LootTemplates_Fishing },
+            { "item",           &LootTemplates_Item },
+            { "pickpocketing",  &LootTemplates_Pickpocketing },
+            { "skinning",       &LootTemplates_Skinning },
+            { "disenchant",     &LootTemplates_Disenchant },
+            { "prospecting",    &LootTemplates_Prospecting },
+            { "milling",        &LootTemplates_Milling },
+            { "spell",          &LootTemplates_Spell },
+            { "reference",      &LootTemplates_Reference },
+            { "mail",           &LootTemplates_Mail },
+            { "player",         &LootTemplates_Player }
+        };
+
+        // Lowercase the type for case-insensitive matching
+        std::transform(type.begin(), type.end(), type.begin(), ::tolower);
+
+        auto itr = lootStoreMap.find(type);
+        if (itr == lootStoreMap.end())
+        {
+            handler->SendErrorMessage(LANG_DEBUG_LOOT_INVALID_TYPE, type);
+            return false;
+        }
+
+        LootStore const* store = itr->second;
+
+        LootTemplate const* tab = store->GetLootFor(lootId);
+        if (!tab)
+        {
+            handler->SendErrorMessage(LANG_DEBUG_LOOT_NO_TEMPLATE, type, lootId);
+            return false;
+        }
+
+        uint32 iterations = std::min(count.value_or(1), uint32(100));
+        if (iterations == 0)
+            iterations = 1;
+
+        Player* player = handler->GetPlayer();
+        std::string sourceName = GetLootSourceName(type, lootId);
+
+        // Single iteration - original behavior
+        if (iterations == 1)
+        {
+            Loot loot;
+            GenerateLoot(loot, tab, *store, player, type, lootId);
+
+            handler->PSendSysMessage(LANG_DEBUG_LOOT_HEADER, type, sourceName, lootId);
+
+            if (loot.items.empty() && loot.quest_items.empty() && loot.gold == 0)
+            {
+                handler->PSendSysMessage(LANG_DEBUG_LOOT_EMPTY);
+                return true;
+            }
+
+            for (LootItem const& li : loot.items)
+            {
+                ItemTemplate const* proto = sObjectMgr->GetItemTemplate(li.itemid);
+                std::string name = proto ? proto->Name1 : "Unknown";
+                char const* qualityName = GetItemQualityName(proto ? proto->Quality : 0);
+                handler->PSendSysMessage(LANG_DEBUG_LOOT_ITEM,
+                    li.itemid, uint32(li.count), name, qualityName,
+                    li.randomPropertyId, li.randomSuffix);
+            }
+
+            for (LootItem const& li : loot.quest_items)
+            {
+                ItemTemplate const* proto = sObjectMgr->GetItemTemplate(li.itemid);
+                std::string name = proto ? proto->Name1 : "Unknown";
+                char const* qualityName = GetItemQualityName(proto ? proto->Quality : 0);
+                handler->PSendSysMessage(LANG_DEBUG_LOOT_ITEM_QUEST,
+                    li.itemid, uint32(li.count), name, qualityName);
+            }
+
+            if (loot.gold > 0)
+            {
+                uint32 gold = loot.gold / 10000;
+                uint32 silver = (loot.gold % 10000) / 100;
+                uint32 copper = loot.gold % 100;
+                handler->PSendSysMessage(LANG_DEBUG_LOOT_GOLD,
+                    loot.gold, gold, silver, copper);
+            }
+
+            return true;
+        }
+
+        // Multi iteration - aggregate results
+        struct ItemStats
+        {
+            uint32 totalCount = 0;
+            uint32 timesDropped = 0;
+            bool questItem = false;
+        };
+
+        std::map<uint32, ItemStats> itemStats;
+        uint64 totalGold = 0;
+
+        for (uint32 i = 0; i < iterations; ++i)
+        {
+            Loot loot;
+            GenerateLoot(loot, tab, *store, player, type, lootId);
+
+            std::set<uint32> seenThisRun;
+
+            for (LootItem const& li : loot.items)
+            {
+                itemStats[li.itemid].totalCount += li.count;
+                if (seenThisRun.insert(li.itemid).second)
+                    itemStats[li.itemid].timesDropped++;
+            }
+
+            for (LootItem const& li : loot.quest_items)
+            {
+                itemStats[li.itemid].totalCount += li.count;
+                itemStats[li.itemid].questItem = true;
+                if (seenThisRun.insert(li.itemid).second)
+                    itemStats[li.itemid].timesDropped++;
+            }
+
+            totalGold += loot.gold;
+        }
+
+        handler->PSendSysMessage(LANG_DEBUG_LOOT_HEADER_MULTI,
+            type, sourceName, lootId, iterations);
+
+        if (itemStats.empty() && totalGold == 0)
+        {
+            handler->PSendSysMessage(LANG_DEBUG_LOOT_EMPTY);
+            return true;
+        }
+
+        for (auto const& [itemId, stats] : itemStats)
+        {
+            ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+            std::string name = proto ? proto->Name1 : "Unknown";
+            char const* qualityName = GetItemQualityName(proto ? proto->Quality : 0);
+            uint32 dropPct = (stats.timesDropped * 10000) / iterations;
+
+            if (stats.questItem)
+                handler->PSendSysMessage(LANG_DEBUG_LOOT_ITEM_QUEST_MULTI,
+                    itemId, stats.totalCount, name, qualityName,
+                    stats.timesDropped, iterations, dropPct / 100, dropPct % 100);
+            else
+                handler->PSendSysMessage(LANG_DEBUG_LOOT_ITEM_MULTI,
+                    itemId, stats.totalCount, name, qualityName,
+                    stats.timesDropped, iterations, dropPct / 100, dropPct % 100);
+        }
+
+        if (totalGold > 0)
+        {
+            uint32 avgGold = static_cast<uint32>(totalGold / iterations);
+            uint32 gold = avgGold / 10000;
+            uint32 silver = (avgGold % 10000) / 100;
+            uint32 copper = avgGold % 100;
+            handler->PSendSysMessage(LANG_DEBUG_LOOT_GOLD_MULTI,
+                avgGold, gold, silver, copper, iterations);
+        }
+
         return true;
     }
 };
