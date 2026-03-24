@@ -1,3 +1,4 @@
+-- DB update 2026_03_23_02 -> 2026_03_24_00
 -- Move npc_maredis_firestar (Mathredis Firestar, entry 9836) from C++ script to DB gossip
 
 -- Remove C++ ScriptName
