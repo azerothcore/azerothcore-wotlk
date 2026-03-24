@@ -25,8 +25,8 @@
 
 enum DataTypes
 {
-    DATA_NALORAKK                       = 0,
-    DATA_AKILZON                        = 1,
+    DATA_AKILZON                        = 0,
+    DATA_NALORAKK                       = 1,
     DATA_JANALAI                        = 2,
     DATA_HALAZZI                        = 3,
     DATA_HEXLORD                        = 4,

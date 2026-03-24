@@ -242,8 +242,8 @@ struct npc_forest_frog : public ScriptedAI
 
 #define GOSSIP_HOSTAGE1        "I am glad to help you."
 
-static uint32 HostageEntry[] = {23790, 23999, 24024, 24001};
-static uint32 ChestEntry[] = {186648, 187021, 186667, 186672};
+static uint32 HostageEntry[] = {23999, 23790, 24024, 24001};
+static uint32 ChestEntry[] = {187021, 186648, 186667, 186672};
 
 class npc_zulaman_hostage : public CreatureScript
 {
