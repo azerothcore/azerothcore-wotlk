@@ -1,3 +1,4 @@
+-- DB update 2026_03_24_01 -> 2026_03_24_02
 
 -- Ensure Grauf has RegenHealth disabled so harpoon damage persists
 UPDATE `creature_template` SET `RegenHealth` = 0 WHERE `entry` IN (26893, 30775);
