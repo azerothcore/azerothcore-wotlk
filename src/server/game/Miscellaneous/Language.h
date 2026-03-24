@@ -1391,6 +1391,19 @@ enum AcoreStrings
 
     LANG_DEBUG_LFG_ON                             = 30096,
     LANG_DEBUG_LFG_OFF                            = 30097,
-    LANG_DEBUG_LFG_CONF                           = 30098
+    LANG_DEBUG_LFG_CONF                           = 30098,
+
+    // debug loot command
+    LANG_DEBUG_LOOT_HEADER                        = 30099,
+    LANG_DEBUG_LOOT_ITEM                          = 30100,
+    LANG_DEBUG_LOOT_ITEM_QUEST                    = 30101,
+    LANG_DEBUG_LOOT_GOLD                          = 30102,
+    LANG_DEBUG_LOOT_EMPTY                         = 30103,
+    LANG_DEBUG_LOOT_INVALID_TYPE                  = 30104,
+    LANG_DEBUG_LOOT_NO_TEMPLATE                   = 30105,
+    LANG_DEBUG_LOOT_HEADER_MULTI                  = 30106,
+    LANG_DEBUG_LOOT_ITEM_MULTI                    = 30107,
+    LANG_DEBUG_LOOT_ITEM_QUEST_MULTI              = 30108,
+    LANG_DEBUG_LOOT_GOLD_MULTI                    = 30109
 };
 #endif
