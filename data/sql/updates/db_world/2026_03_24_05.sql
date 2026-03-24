@@ -1,3 +1,4 @@
+-- DB update 2026_03_24_04 -> 2026_03_24_05
 
 -- Set High Priest Talet-Kha SAI.
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 26073;
