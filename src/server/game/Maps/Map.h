@@ -27,6 +27,7 @@
 #include "GameObjectModel.h"
 #include "GridDefines.h"
 #include "GridRefMgr.h"
+#include "MapCollisionData.h"
 #include "MapGridManager.h"
 #include "MapRefMgr.h"
 #include "ObjectDefines.h"
@@ -230,8 +231,6 @@ public:
 
     [[nodiscard]] Map const* GetParent() const { return m_parentMap; }
 
-    // pussywizard: movemaps, mmaps
-    [[nodiscard]] std::shared_mutex& GetMMapLock() const { return *(const_cast<std::shared_mutex*>(&MMapLock)); }
     // pussywizard:
     std::unordered_set<Unit*> i_objectsForDelayedVisibility;
     void HandleDelayedVisibility();
@@ -389,15 +388,14 @@ public:
     bool CanReachPositionAndGetValidCoords(WorldObject const* source, float &destX, float &destY, float &destZ, bool failOnCollision = true, bool failOnSlopes = true) const;
     bool CanReachPositionAndGetValidCoords(WorldObject const* source, float startX, float startY, float startZ, float &destX, float &destY, float &destZ, bool failOnCollision = true, bool failOnSlopes = true) const;
     bool CheckCollisionAndGetValidCoords(WorldObject const* source, float startX, float startY, float startZ, float &destX, float &destY, float &destZ, bool failOnCollision = true) const;
-    void Balance() { _dynamicTree.balance(); }
-    void RemoveGameObjectModel(const GameObjectModel& model) { _dynamicTree.remove(model); }
-    void InsertGameObjectModel(const GameObjectModel& model) { _dynamicTree.insert(model); }
-    [[nodiscard]] bool ContainsGameObjectModel(const GameObjectModel& model) const { return _dynamicTree.contains(model);}
-    [[nodiscard]] DynamicMapTree const& GetDynamicMapTree() const { return _dynamicTree; }
-    bool GetObjectHitPos(uint32 phasemask, float x1, float y1, float z1, float x2, float y2, float z2, float& rx, float& ry, float& rz, float modifyDist);
+    void Balance() { _mapCollisionData.GetDynamicTree().balance(); }
+    void RemoveGameObjectModel(const GameObjectModel& model) { _mapCollisionData.GetDynamicTree().remove(model); }
+    void InsertGameObjectModel(const GameObjectModel& model) { _mapCollisionData.GetDynamicTree().insert(model); }
+    [[nodiscard]] bool ContainsGameObjectModel(const GameObjectModel& model) const { return _mapCollisionData.GetDynamicTree().contains(model);}
+    [[nodiscard]] DynamicMapTree const& GetDynamicMapTree() const { return _mapCollisionData.GetDynamicTree(); }
     [[nodiscard]] float GetGameObjectFloor(uint32 phasemask, float x, float y, float z, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const
     {
-        return _dynamicTree.getHeight(x, y, z, maxSearchDist, phasemask);
+        return _mapCollisionData.GetDynamicTree().getHeight(x, y, z, maxSearchDist, phasemask);
     }
     /*
         RESPAWN TIMES
@@ -524,6 +522,9 @@ public:
         return 0;
     };
 
+    MapCollisionData& GetMapCollisionData() { return _mapCollisionData; }
+    MapCollisionData const& GetMapCollisionData()  const { return _mapCollisionData; }
+
 private:
 
     template<class T> void InitializeObject(T* obj);
@@ -551,15 +552,14 @@ protected:
     void AddToGrid(T* object, Cell const& cell);
 
     std::mutex Lock;
-    std::shared_mutex MMapLock;
 
     MapGridManager _mapGridManager;
     MapEntry const* i_mapEntry;
+    MapCollisionData _mapCollisionData;
     uint8 i_spawnMode;
     uint32 i_InstanceId;
     uint32 m_unloadTimer;
     float m_VisibleDistance;
-    DynamicMapTree _dynamicTree;
     time_t _instanceResetPeriod; // pussywizard
 
     MapRefMgr m_mapRefMgr;

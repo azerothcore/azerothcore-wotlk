@@ -30,78 +30,65 @@ constexpr Milliseconds TIMER_WHIRLWIND = 12s;
 constexpr Milliseconds TIMER_MORTAL = 22s;
 constexpr Milliseconds TIMER_BLOODLUST = 30s;
 
-class boss_gorosh_the_dervish : public CreatureScript
+struct boss_gorosh_the_dervish : public BossAI
 {
-public:
-    boss_gorosh_the_dervish() : CreatureScript("boss_gorosh_the_dervish") { }
+    boss_gorosh_the_dervish(Creature* creature) : BossAI(creature, DATA_GOROSH) { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    Milliseconds nextWhirlwindTime;
+
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        return GetBlackrockDepthsAI<boss_gorosh_the_dervishAI>(creature);
+        _JustEngagedWith();
+        events.ScheduleEvent(SPELL_WHIRLWIND, TIMER_WHIRLWIND / 5);
+        events.ScheduleEvent(SPELL_MORTALSTRIKE, TIMER_MORTAL / 5);
+        events.ScheduleEvent(SPELL_BLOODLUST, TIMER_BLOODLUST / 5);
     }
 
-    struct boss_gorosh_the_dervishAI : public BossAI
+    void UpdateAI(uint32 diff) override
     {
-        boss_gorosh_the_dervishAI(Creature* creature) : BossAI(creature, DATA_GOROSH) { }
+        // Return since we have no target
+        if (!UpdateVictim())
+            return;
 
-        Milliseconds nextWhirlwindTime;
+        events.Update(diff);
 
-        void JustEngagedWith(Unit* /*who*/) override
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        while (uint32 eventId = events.ExecuteEvent())
         {
-            _JustEngagedWith();
-            events.ScheduleEvent(SPELL_WHIRLWIND, TIMER_WHIRLWIND / 5);
-            events.ScheduleEvent(SPELL_MORTALSTRIKE, TIMER_MORTAL / 5);
-            events.ScheduleEvent(SPELL_BLOODLUST, TIMER_BLOODLUST / 5);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            // Return since we have no target
-            if (!UpdateVictim())
+            switch (eventId)
             {
-                return;
-            }
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-            {
-                return;
-            }
-            while (uint32 eventId = events.ExecuteEvent())
-            {
-                switch (eventId)
+            case SPELL_WHIRLWIND:
+                if (me->GetDistance2d(me->GetVictim()) < 10.0f)
                 {
-                case SPELL_WHIRLWIND:
-                    if (me->GetDistance2d(me->GetVictim()) < 10.0f)
-                    {
-                        DoCastVictim(SPELL_WHIRLWIND);
-                        nextWhirlwindTime = randtime(TIMER_WHIRLWIND - 2s, TIMER_WHIRLWIND + 2s);
-                    }
-                    else
-                    {
-                        // reschedule sooner
-                        nextWhirlwindTime = randtime(TIMER_WHIRLWIND - 2s, TIMER_WHIRLWIND + 2s) / 3;
-                    }
-                    events.ScheduleEvent(SPELL_WHIRLWIND, nextWhirlwindTime);
-                    break;
-                case SPELL_MORTALSTRIKE:
-                    DoCastVictim(SPELL_MORTALSTRIKE);
-                    events.ScheduleEvent(SPELL_MORTALSTRIKE, TIMER_MORTAL - 2s, TIMER_MORTAL + 2s);
-                    break;
-                case SPELL_BLOODLUST:
-                    DoCastSelf(SPELL_BLOODLUST);
-                    events.ScheduleEvent(SPELL_BLOODLUST, TIMER_BLOODLUST - 2s, TIMER_BLOODLUST + 2s);
-                    break;
-                default:
-                    break;
+                    DoCastVictim(SPELL_WHIRLWIND);
+                    nextWhirlwindTime = randtime(TIMER_WHIRLWIND - 2s, TIMER_WHIRLWIND + 2s);
                 }
+                else
+                {
+                    // reschedule sooner
+                    nextWhirlwindTime = randtime(TIMER_WHIRLWIND - 2s, TIMER_WHIRLWIND + 2s) / 3;
+                }
+                events.ScheduleEvent(SPELL_WHIRLWIND, nextWhirlwindTime);
+                break;
+            case SPELL_MORTALSTRIKE:
+                DoCastVictim(SPELL_MORTALSTRIKE);
+                events.ScheduleEvent(SPELL_MORTALSTRIKE, TIMER_MORTAL - 2s, TIMER_MORTAL + 2s);
+                break;
+            case SPELL_BLOODLUST:
+                DoCastSelf(SPELL_BLOODLUST);
+                events.ScheduleEvent(SPELL_BLOODLUST, TIMER_BLOODLUST - 2s, TIMER_BLOODLUST + 2s);
+                break;
+            default:
+                break;
             }
-            DoMeleeAttackIfReady();
         }
-    };
+        DoMeleeAttackIfReady();
+    }
 };
 
 void AddSC_boss_gorosh_the_dervish()
 {
-    new boss_gorosh_the_dervish();
+    RegisterBlackrockDepthsCreatureAI(boss_gorosh_the_dervish);
 }

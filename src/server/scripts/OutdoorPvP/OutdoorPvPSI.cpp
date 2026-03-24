@@ -16,7 +16,6 @@
  */
 
 #include "OutdoorPvPSI.h"
-#include "CreatureScript.h"
 #include "GameObject.h"
 #include "Language.h"
 #include "MapMgr.h"

@@ -27,181 +27,283 @@
 #include "Player.h"
 #include "Spell.h"
 #include "Transport.h"
-#include "World.h"
 #include "SmartScriptMgr.h"
+#include "World.h"
 
-void WaypointMovementGenerator<Creature>::LoadPath(Creature* creature)
+inline G3D::Vector3 PositionToVector3(Position const& p) { return { p.GetPositionX(), p.GetPositionY(), p.GetPositionZ() }; }
+
+WaypointMovementGenerator<Creature>::WaypointMovementGenerator(uint32 pathId, bool repeating, PathSource pathSource) : PathMovementBase((WaypointPath const*)nullptr),
+    _lastSplineId(0), _pathId(pathId), _waypointDelay(0),
+    _waypointReached(true), _recalculateSpeed(false), _repeating(repeating), _loadedFromDB(true), _stalled(false), _hasBeenStalled(false), _done(false), _pathSource(pathSource),
+    _smoothSplineLaunched(false), _lastPassedSplineIdx(0)
 {
-    switch (i_pathSource)
-    {
-        case PathSource::WAYPOINT_MGR:
-        {
-            if (!path_id)
-                path_id = creature->GetWaypointPath();
+}
 
-            i_path = sWaypointMgr->GetPath(path_id);
-            break;
-        }
-        case PathSource::SMART_WAYPOINT_MGR:
+WaypointMovementGenerator<Creature>::WaypointMovementGenerator(WaypointPath& path, bool repeating) : PathMovementBase((WaypointPath const*)nullptr),
+    _lastSplineId(0), _pathId(0), _waypointDelay(0),
+    _waypointReached(true), _recalculateSpeed(false), _repeating(repeating), _loadedFromDB(false), _stalled(false), _hasBeenStalled(false), _done(false), _pathSource(PathSource::WAYPOINT_MGR),
+    _smoothSplineLaunched(false), _lastPassedSplineIdx(0)
+{
+    i_path = &path;
+}
+
+void WaypointMovementGenerator<Creature>::DoInitialize(Creature* creature)
+{
+    _done = false;
+
+    if (_loadedFromDB)
+    {
+        if (!_pathId)
+            _pathId = creature->GetWaypointPath();
+
+        switch (_pathSource)
         {
-            i_path = sSmartWaypointMgr->GetPath(path_id);
-            break;
+            default:
+            case PathSource::WAYPOINT_MGR:
+                i_path = sWaypointMgr->GetPath(_pathId);
+                break;
+            case PathSource::SMART_WAYPOINT_MGR:
+                i_path = sSmartWaypointMgr->GetPath(_pathId);
+                break;
         }
     }
 
     if (!i_path)
     {
-        // No movement found for entry
-        LOG_ERROR("sql.sql", "WaypointMovementGenerator::LoadPath: creature {} ({}) doesn't have waypoint path id: {}",
-            creature->GetName(), creature->GetGUID().ToString(), path_id);
+        LOG_ERROR("sql.sql", "WaypointMovementGenerator::DoInitialize: creature {} ({}) doesn't have waypoint path id: {}",
+            creature->GetName(), creature->GetGUID().ToString(), _pathId);
         return;
     }
 
-    i_currentNode = i_path->begin()->first;
+    // Determine our first waypoint from the creature's stored waypoint
+    if (CreatureData const* creatureData = creature->GetCreatureData())
+    {
+        if (i_path->Nodes.size() > creatureData->currentwaypoint)
+        {
+            creature->UpdateCurrentWaypointInfo(creatureData->currentwaypoint, i_path->Id);
+            i_currentNode = creatureData->currentwaypoint;
+        }
+    }
 
-    StartMoveNow(creature);
-}
-
-void WaypointMovementGenerator<Creature>::DoInitialize(Creature* creature)
-{
-    LoadPath(creature);
     creature->AddUnitState(UNIT_STATE_ROAMING | UNIT_STATE_ROAMING_MOVE);
+
+    // Inform AI
+    if (CreatureAI* AI = creature->AI())
+        AI->WaypointPathStarted(i_path->Id);
 }
 
 void WaypointMovementGenerator<Creature>::DoFinalize(Creature* creature)
 {
     creature->ClearUnitState(UNIT_STATE_ROAMING | UNIT_STATE_ROAMING_MOVE);
+    creature->SetWalk(false);
 }
 
 void WaypointMovementGenerator<Creature>::DoReset(Creature* creature)
 {
-    if (stalled)
+    // We did not reach our last waypoint before reset, treat this scenario as resuming movement.
+    if (!_done && !_waypointReached)
+        _hasBeenStalled = true;
+    else if (_done)
     {
-        return;
-    }
-    creature->AddUnitState(UNIT_STATE_ROAMING | UNIT_STATE_ROAMING_MOVE);
-    StartMoveNow(creature);
-}
-
-void WaypointMovementGenerator<Creature>::OnArrived(Creature* creature)
-{
-    if (!i_path || i_path->empty())
-        return;
-    if (m_isArrivalDone)
-        return;
-
-    creature->ClearUnitState(UNIT_STATE_ROAMING_MOVE);
-    m_isArrivalDone = true;
-
-    auto currentNodeItr = i_path->find(i_currentNode);
-
-    if (currentNodeItr->second.event_id && urand(0, 99) < currentNodeItr->second.event_chance)
-    {
-        LOG_DEBUG("maps.script", "Creature movement start script {} at point {} for {}.",
-            currentNodeItr->second.event_id, i_currentNode, creature->GetGUID().ToString());
-        creature->ClearUnitState(UNIT_STATE_ROAMING_MOVE);
-        creature->GetMap()->ScriptsStart(sWaypointScripts, currentNodeItr->second.event_id, creature, nullptr);
-    }
-
-    // Inform script
-    MovementInform(creature);
-    creature->UpdateWaypointID(i_currentNode);
-
-    if (currentNodeItr->second.delay)
-    {
-        creature->ClearUnitState(UNIT_STATE_ROAMING_MOVE);
-        Stop(currentNodeItr->second.delay);
+        // mimic IdleMovementGenerator
+        if (!creature->IsStopped())
+            creature->StopMoving();
     }
 }
 
-bool WaypointMovementGenerator<Creature>::StartMove(Creature* creature)
+inline void UpdateHomePosition(Creature* creature, WaypointNode const& waypointNode)
 {
-    if (!i_path || i_path->empty())
-        return false;
-
-    // Xinef: Dont allow dead creatures to move
-    if (!creature->IsAlive())
-        return false;
-
-    if (Stopped())
-        return true;
+    float x = waypointNode.X;
+    float y = waypointNode.Y;
+    float z = waypointNode.Z;
+    float o = creature->GetOrientation();
 
     bool transportPath = creature->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) && creature->GetTransGUID();
-
-    if (m_isArrivalDone)
+    if (!transportPath)
+        creature->SetHomePosition(x, y, z, o);
+    else
     {
+        if (Transport* trans = (creature->GetTransport() ? creature->GetTransport()->ToMotionTransport() : nullptr))
         {
-            auto currentNodeItr = i_path->find(i_currentNode);
-            float x = currentNodeItr->second.x;
-            float y = currentNodeItr->second.y;
-            float z = currentNodeItr->second.z;
-            float o = creature->GetOrientation();
+            o -= trans->GetOrientation();
+            creature->SetTransportHomePosition(x, y, z, o);
+            trans->CalculatePassengerPosition(x, y, z, &o);
+            creature->SetHomePosition(x, y, z, o);
+        }
+    }
+}
 
-            if (!transportPath)
-                creature->SetHomePosition(x, y, z, o);
-            else
+void WaypointMovementGenerator<Creature>::ProcessWaypointArrival(Creature* creature, WaypointNode const& waypoint)
+{
+    if (_waypointReached)
+        return;
+
+    if (waypoint.Delay > 0)
+    {
+        creature->ClearUnitState(UNIT_STATE_ROAMING_MOVE);
+        _waypointDelay = waypoint.Delay;
+    }
+
+    // Check if the waypoint path has reached its end and may not repeat. Inform AI.
+    if ((i_currentNode == i_path->Nodes.size() - 1) && !_repeating && !_done)
+    {
+        _done = true;
+        creature->UpdateCurrentWaypointInfo(0, 0);
+
+        if (CreatureAI* AI = creature->AI())
+        {
+            AI->PathEndReached(i_path->Id);
+            AI->WaypointPathEnded(waypoint.Id, i_path->Id);
+        }
+    }
+
+    UpdateHomePosition(creature, waypoint);
+
+    if (waypoint.EventId && urand(0, 99) < waypoint.EventChance)
+    {
+        LOG_DEBUG("maps.script", "Creature movement start script {} at point {} for {}.",
+            waypoint.EventId, i_currentNode, creature->GetGUID().ToString());
+        creature->ClearUnitState(UNIT_STATE_ROAMING_MOVE);
+        creature->GetMap()->ScriptsStart(sWaypointScripts, waypoint.EventId, creature, nullptr);
+    }
+
+    creature->UpdateWaypointID(waypoint.Id);
+    creature->UpdateCurrentWaypointInfo(waypoint.Id, i_path->Id);
+
+    // Inform AI
+    if (CreatureAI* AI = creature->AI())
+    {
+        AI->MovementInform(WAYPOINT_MOTION_TYPE, i_currentNode);
+        AI->WaypointReached(waypoint.Id, i_path->Id);
+    }
+
+    if (Unit* owner = creature->GetCharmerOrOwner())
+    {
+        if (UnitAI* AI = owner->GetAI())
+            AI->SummonMovementInform(creature, WAYPOINT_MOTION_TYPE, i_currentNode);
+    }
+    else
+    {
+        if (TempSummon* tempSummon = creature->ToTempSummon())
+            if (Unit* owner2 = tempSummon->GetSummonerUnit())
+                if (UnitAI* AI = owner2->GetAI())
+                    AI->SummonMovementInform(creature, WAYPOINT_MOTION_TYPE, i_currentNode);
+    }
+
+    // All hooks called and infos updated. Time to increment the waypoint node id
+    if (i_path && !i_path->Nodes.empty()) // ensure that the path has not been changed in one of the hooks.
+        i_currentNode = (i_currentNode + 1) % i_path->Nodes.size();
+
+    _waypointReached = true;
+}
+
+void WaypointMovementGenerator<Creature>::StartMove(Creature* creature, bool relaunch /*= false*/)
+{
+    // Formation checks. Do not launch a new spline when one of our formation members is currently in combat.
+    if (!relaunch)
+    {
+        if (!IsAllowedToMove(creature) || (creature->IsFormationLeader() && !creature->IsFormationLeaderMoveAllowed()))
+        {
+            _waypointDelay = 1000;
+            return;
+        }
+    }
+
+    // Dont allow dead creatures to move
+    if (!creature->IsAlive())
+        return;
+
+    // Step two: node selection is done, build spline data
+    creature->AddUnitState(UNIT_STATE_ROAMING_MOVE);
+    WaypointNode const& waypoint = i_path->Nodes.at(i_currentNode);
+    bool const useTransportPath = creature->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) && creature->GetTransGUID();
+
+    Movement::MoveSplineInit init(creature);
+    //! If the creature is on transport, we assume waypoints set in DB are already transport offsets
+    if (useTransportPath)
+        init.DisableTransportPathTransformations();
+
+    if (waypoint.SmoothTransition && i_path->Nodes.size() > 2)
+    {
+        // Build a catmullrom spline segment, stopping at delay waypoints
+        init.Path().push_back(PositionToVector3(creature->GetPosition()));
+
+        bool hasDelayInSegment = false;
+        uint32 segmentNodes = 0;
+        for (uint32 i = 0; i < i_path->Nodes.size(); ++i)
+        {
+            uint32 idx = (i_currentNode + i) % i_path->Nodes.size();
+            WaypointNode const& node = i_path->Nodes.at(idx);
+            init.Path().push_back(G3D::Vector3(node.X, node.Y, node.Z));
+            segmentNodes++;
+
+            // Stop the segment at a waypoint with a delay
+            if (node.Delay > 0)
             {
-                if (Transport* trans = (creature->GetTransport() ? creature->GetTransport()->ToMotionTransport() : nullptr))
-                {
-                    o -= trans->GetOrientation();
-                    creature->SetTransportHomePosition(x, y, z, o);
-                    trans->CalculatePassengerPosition(x, y, z, &o);
-                    creature->SetHomePosition(x, y, z, o);
-                }
-                else
-                    transportPath = false;
-                // else if (vehicle) - this should never happen, vehicle offsets are const
+                hasDelayInSegment = true;
+                break;
             }
         }
 
-        // Xinef: moved the upper IF here
-        uint32 lastPoint = i_path->rbegin()->first;
-        if ((i_currentNode == lastPoint) && !repeating) // If that's our last waypoint
+        // If no delays found and repeating, add wrap-around points for seamless loop
+        if (!hasDelayInSegment && _repeating)
         {
-            creature->AI()->PathEndReached(path_id);
-            creature->GetMotionMaster()->Initialize();
-            return false;
+            for (uint32 i = 0; i < std::min<uint32>(3, i_path->Nodes.size()); ++i)
+            {
+                uint32 idx = (i_currentNode + i) % i_path->Nodes.size();
+                WaypointNode const& node = i_path->Nodes.at(idx);
+                init.Path().push_back(G3D::Vector3(node.X, node.Y, node.Z));
+            }
         }
 
-        ++i_currentNode;
-        if (lastPoint < i_currentNode)
-            i_currentNode = i_path->begin()->first;
+        // Need at least 3 waypoints for a meaningful catmullrom spline
+        if (segmentNodes >= 3)
+        {
+            init.SetFirstPointId(i_currentNode);
+            init.SetSmooth();
+            _smoothSplineLaunched = true;
+            _lastPassedSplineIdx = i_currentNode;
+        }
+        else
+        {
+            // Too few points for catmullrom, fall back to linear point-to-point
+            init.Path().clear();
+            init.MoveTo(G3D::Vector3(waypoint.X, waypoint.Y, waypoint.Z));
+        }
     }
-
-    // xinef: do not initialize motion if we got stunned in movementinform
-    if (creature->HasUnitState(UNIT_STATE_NOT_MOVE) || creature->IsMovementPreventedByCasting())
+    else if (!waypoint.SplinePoints.empty())
     {
-        return true;
+        // We have spline points in waypoint_data_addon table
+        int32 splineIndex = 0;
+
+        auto itr = waypoint.SplinePoints.begin();
+        if (splineIndex)
+            std::advance(itr, splineIndex);
+
+        init.Path().reserve(waypoint.SplinePoints.size() - splineIndex);
+        std::copy(itr, waypoint.SplinePoints.end(), std::back_inserter(init.Path()));
+
+        // Add starting vertex and destination
+        init.Path().insert(init.Path().begin(), PositionToVector3(creature->GetPosition()));
+        init.Path().insert(init.Path().end(), G3D::Vector3(waypoint.X, waypoint.Y, waypoint.Z));
     }
-
-    auto currentNodeItr = i_path->find(i_currentNode);
-    WaypointData const& node = currentNodeItr->second;
-
-    m_isArrivalDone = false;
-
-    creature->AddUnitState(UNIT_STATE_ROAMING_MOVE);
-
-    Movement::Location formationDest(node.x, node.y, node.z, 0.0f);
-    Movement::MoveSplineInit init(creature);
-
-    //! If creature is on transport, we assume waypoints set in DB are already transport offsets
-    if (transportPath)
+    else
     {
-        init.DisableTransportPathTransformations();
-        if (TransportBase* trans = creature->GetDirectTransport())
-            trans->CalculatePassengerPosition(formationDest.x, formationDest.y, formationDest.z, &formationDest.orientation);
+        // Smooth transition for short paths (<=2 nodes): use previous spline endpoint as start
+        if (waypoint.SmoothTransition && !creature->movespline->Finalized() && _lastSplineId == creature->movespline->GetId())
+        {
+            init.MoveTo(creature->movespline->FinalDestination(), G3D::Vector3(waypoint.X, waypoint.Y, waypoint.Z));
+            if (!init.Path().empty())
+                init.Path().insert(init.Path().begin(), PositionToVector3(creature->GetPosition()));
+        }
+        else
+            init.MoveTo(PositionToVector3(creature->GetPosition()), G3D::Vector3(waypoint.X, waypoint.Y, waypoint.Z));
     }
 
-    float z = node.z;
-    creature->UpdateAllowedPositionZ(node.x, node.y, z);
-    //! Do not use formationDest here, MoveTo requires transport offsets due to DisableTransportPathTransformations() call
-    //! but formationDest contains global coordinates
-    init.MoveTo(node.x, node.y, z, true, true);
+    if (waypoint.Orientation.has_value() && waypoint.Delay > 0)
+        init.SetFacing(*waypoint.Orientation);
 
-    if (node.orientation.has_value() && node.delay > 0)
-        init.SetFacing(*node.orientation);
-
-    switch (node.move_type)
+    switch (waypoint.MoveType)
     {
         case WAYPOINT_MOVE_TYPE_LAND:
             init.SetAnimation(AnimTier::Ground);
@@ -219,89 +321,203 @@ bool WaypointMovementGenerator<Creature>::StartMove(Creature* creature)
             break;
     }
 
+    if (creature->CanFly())
+        init.SetFly();
+
+    if (waypoint.Velocity > 0.f)
+        init.SetVelocity(waypoint.Velocity);
+
     init.Launch();
 
-    //Call for creature group update
-    if (creature->GetFormation() && creature->GetFormation()->GetLeader() == creature && creature->GetFormation()->CanLeaderStartMoving())
-        creature->GetFormation()->LeaderStartedMoving();
+    if (!creature->movespline->Finalized())
+        _lastSplineId = creature->movespline->GetId();
 
-    return true;
+    // Inform formation
+    creature->SignalFormationMovement();
+
+    // Inform AI
+    if (!relaunch)
+        if (CreatureAI* AI = creature->AI())
+            AI->WaypointStarted(waypoint.Id, i_path->Id);
+
+    _waypointReached = false;
+    _recalculateSpeed = false;
+    _hasBeenStalled = false;
 }
 
 bool WaypointMovementGenerator<Creature>::DoUpdate(Creature* creature, uint32 diff)
 {
-    // Waypoint movement can be switched on/off
-    // This is quite handy for escort quests and other stuff
-    if (stalled)
-    {
-        Stop(1000);
+    if (!creature || !creature->IsAlive())
         return true;
-    }
-    if (creature->HasUnitState(UNIT_STATE_NOT_MOVE) || creature->IsMovementPreventedByCasting())
+
+    if (_done || !i_path || i_path->Nodes.empty())
+        return true;
+
+    // Stop movement if paused, rooted, or casting
+    if (!IsAllowedToMove(creature) && !creature->movespline->Finalized())
     {
         creature->StopMoving();
-        Stop(1000);
+        _lastSplineId = 0;
+        _smoothSplineLaunched = false;
+    }
+
+    // Set home position to current position.
+    if (!creature->movespline->Finalized())
+    {
+        bool transportPath = creature->HasUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT) && creature->GetTransGUID();
+        if (!transportPath)
+            creature->SetHomePosition(creature->GetPosition());
+    }
+
+    // Smooth spline: track waypoint passages without rebuilding
+    if (_smoothSplineLaunched && creature->movespline->GetId() == _lastSplineId)
+    {
+        int32 currentIdx = creature->movespline->currentPathIdx();
+
+        // Process passed waypoints
+        while (_lastPassedSplineIdx < currentIdx)
+        {
+            _lastPassedSplineIdx++;
+            WaypointNode const& passedWp = i_path->Nodes.at(i_currentNode);
+
+            UpdateHomePosition(creature, passedWp);
+            creature->UpdateWaypointID(passedWp.Id);
+            creature->UpdateCurrentWaypointInfo(passedWp.Id, i_path->Id);
+
+            if (passedWp.EventId && urand(0, 99) < passedWp.EventChance)
+            {
+                creature->ClearUnitState(UNIT_STATE_ROAMING_MOVE);
+                creature->GetMap()->ScriptsStart(sWaypointScripts, passedWp.EventId, creature, nullptr);
+            }
+
+            if (CreatureAI* AI = creature->AI())
+            {
+                AI->MovementInform(WAYPOINT_MOTION_TYPE, i_currentNode);
+                AI->WaypointReached(passedWp.Id, i_path->Id);
+            }
+
+            // Advance node
+            i_currentNode = (i_currentNode + 1) % i_path->Nodes.size();
+
+            // If this waypoint has a delay, stop the spline and pause
+            if (passedWp.Delay > 0)
+            {
+                creature->StopMoving();
+                creature->ClearUnitState(UNIT_STATE_ROAMING_MOVE);
+                _waypointDelay = passedWp.Delay;
+                _waypointReached = true;
+                _smoothSplineLaunched = false;
+                if (passedWp.Orientation.has_value())
+                    creature->SetFacingTo(*passedWp.Orientation);
+
+                return true;
+            }
+        }
+
+        if (creature->movespline->Finalized())
+        {
+            if (!_repeating)
+            {
+                // Path ended
+                _done = true;
+                _smoothSplineLaunched = false;
+                creature->UpdateCurrentWaypointInfo(0, 0);
+                if (CreatureAI* AI = creature->AI())
+                {
+                    AI->PathEndReached(i_path->Id);
+                    AI->WaypointPathEnded(i_path->Nodes.at(i_currentNode).Id, i_path->Id);
+                }
+            }
+            else
+            {
+                // Repeating: rebuild spline
+                _smoothSplineLaunched = false;
+                StartMove(creature);
+            }
+        }
+
         return true;
     }
 
-    // prevent a crash at empty waypoint path.
-    if (!i_path || i_path->empty())
-        return false;
+    // Non-smooth: per-waypoint logic
+    WaypointNode const& waypoint = i_path->Nodes.at(i_currentNode);
+    UpdateWaypointState(creature, waypoint);
 
-    // Xinef: Dont allow dead creatures to move
-    if (!creature->IsAlive())
-        return false;
+    // Process movement preventing timers
+    if (_waypointDelay > 0)
+    {
+        _waypointDelay -= diff;
+        if (_waypointDelay > 0)
+            return true;
+    }
 
-    if (Stopped())
+    if (_pauseTime.has_value())
     {
-        if (CanMove(diff))
-            return StartMove(creature);
+        *_pauseTime -= diff;
+        if (*_pauseTime > 0)
+            return true;
+        else
+            _pauseTime.reset();
     }
-    else
-    {
-        if (creature->movespline->Finalized())
-        {
-            OnArrived(creature);
-            return StartMove(creature);
-        }
-    }
+
+    // Timers are ready, let's try to move
+    if (IsAllowedToMove(creature) && (_waypointReached || _recalculateSpeed || _hasBeenStalled))
+        StartMove(creature, _recalculateSpeed || _hasBeenStalled);
+
     return true;
 }
 
-void WaypointMovementGenerator<Creature>::MovementInform(Creature* creature)
+void WaypointMovementGenerator<Creature>::Pause(uint32 timer /*= 0*/)
 {
-    if (creature->AI())
-        creature->AI()->MovementInform(WAYPOINT_MOTION_TYPE, i_currentNode);
-
-    if (Unit* owner = creature->GetCharmerOrOwner())
-    {
-        if (UnitAI* AI = owner->GetAI())
-            AI->SummonMovementInform(creature, WAYPOINT_MOTION_TYPE, i_currentNode);
-    }
-    else
-    {
-        if (TempSummon* tempSummon = creature->ToTempSummon())
-            if (Unit* owner = tempSummon->GetSummonerUnit())
-                if (UnitAI* AI = owner->GetAI())
-                    AI->SummonMovementInform(creature, WAYPOINT_MOTION_TYPE, i_currentNode);
-    }
+    _stalled = timer ? false : true;
+    _hasBeenStalled = !_waypointReached;
+    _pauseTime = timer;
 }
 
-void WaypointMovementGenerator<Creature>::Pause(uint32 timer)
+void WaypointMovementGenerator<Creature>::Resume(uint32 overrideTimer /*= 0*/)
 {
-    if (timer)
-        i_nextMoveTime.Reset(timer);
-    else
-    {
-        // No timer? Will be paused forever until ::Resume is called
-        stalled = true;
-        i_nextMoveTime.Reset(1);
-    }
+    _hasBeenStalled = !_waypointReached;
+    _stalled = false;
+    if (overrideTimer)
+        _pauseTime = overrideTimer;
 }
 
-void WaypointMovementGenerator<Creature>::Resume(uint32 /*overrideTimer/*/)
+bool WaypointMovementGenerator<Creature>::GetResetPosition(float& x, float& y, float& z)
 {
-    stalled = false;
+    // prevent a crash at empty waypoint path.
+    if (!i_path || i_path->Nodes.empty())
+        return false;
+
+    ASSERT(i_currentNode < i_path->Nodes.size(), "WaypointMovementGenerator::GetResetPos: tried to reference a node id ({}) which is not included in path ({})", i_currentNode, i_path->Id);
+    WaypointNode const& waypoint = i_path->Nodes.at(i_currentNode);
+
+    x = waypoint.X;
+    y = waypoint.Y;
+    z = waypoint.Z;
+    return true;
+}
+
+bool WaypointMovementGenerator<Creature>::IsAllowedToMove(Creature* creature) const
+{
+    if (_stalled || _done)
+        return false;
+
+    if (_pauseTime.has_value())
+        return false;
+
+    if (creature->HasUnitState(UNIT_STATE_NOT_MOVE) || creature->IsMovementPreventedByCasting())
+        return false;
+
+    return true;
+}
+
+void WaypointMovementGenerator<Creature>::UpdateWaypointState(Creature* creature, WaypointNode const& waypointNode)
+{
+    if (creature->movespline->GetId() != _lastSplineId)
+        return;
+
+    if (creature->movespline->Finalized())
+        ProcessWaypointArrival(creature, waypointNode);
 }
 
 //----------------------------------------------------//

@@ -126,6 +126,7 @@ public:
                 DoMeleeAttackIfReady();
         }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();
@@ -210,6 +211,7 @@ public:
             Start(false, summonerGUID);
         }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 waypointId) override
         {
             if (waypointId != 26)

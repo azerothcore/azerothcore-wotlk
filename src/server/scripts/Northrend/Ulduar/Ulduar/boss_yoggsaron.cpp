@@ -285,7 +285,6 @@ const Position KeepersPos[4] =
 
 const uint32 TABLE_KEEPER_ENTRY[4] = {NPC_FREYA_KEEPER, NPC_HODIR_KEEPER, NPC_MIMIRON_KEEPER, NPC_THORIM_KEEPER};
 const uint32 TABLE_GOSSIP_ENTRY[4] = {NPC_FREYA_GOSSIP, NPC_HODIR_GOSSIP, NPC_MIMIRON_GOSSIP, NPC_THORIM_GOSSIP};
-const uint32 TABLE_KEEPER_TYPE[4]  = {BOSS_FREYA,             BOSS_HODIR,       BOSS_MIMIRON,       BOSS_THORIM};
 
 static LocationsXY yoggPortalLoc[] =
 {
@@ -505,8 +504,17 @@ struct boss_yoggsaron_sara : public ScriptedAI
 
     void DespawnGossipKeepers()
     {
+        static uint32 const gossipData[] =
+        {
+            DATA_FREYA_GOSSIP, DATA_HODIR_GOSSIP,
+            DATA_MIMIRON_GOSSIP, DATA_THORIM_GOSSIP
+        };
         for (uint8 i = KEEPER_FREYA; i <= KEEPER_THORIM; i++)
+        {
             summons.DespawnEntry(TABLE_GOSSIP_ENTRY[i]);
+            if (Creature* keeper = m_pInstance->GetCreature(gossipData[i]))
+                keeper->DespawnOrUnsummon();
+        }
     }
 
     void UpdateKeeperSpawns()
@@ -517,11 +525,6 @@ struct boss_yoggsaron_sara : public ScriptedAI
             {
                 if (!summons.HasEntry(TABLE_KEEPER_ENTRY[i]))
                     me->SummonCreature(TABLE_KEEPER_ENTRY[i], KeepersPos[i]);
-            }
-            else if (m_pInstance->GetData(TABLE_KEEPER_TYPE[i]) == DONE)
-            {
-                if (!summons.HasEntry(TABLE_GOSSIP_ENTRY[i]))
-                    me->SummonCreature(TABLE_GOSSIP_ENTRY[i], GossipKeepersPos[i]);
             }
         }
     }
@@ -931,6 +934,7 @@ struct boss_yoggsaron_cloud : public npc_escortAI
 
     void MoveInLineOfSight(Unit*  /*who*/) override {}
     void AttackStart(Unit*  /*who*/) override {}
+    using CreatureAI::WaypointReached;
     void WaypointReached(uint32  /*point*/) override {}
 
     void Reset() override

@@ -312,6 +312,7 @@ struct violet_hold_trashAI : public npc_escortAI
         CreatureStartAttackDoor();
     }
 
+    using CreatureAI::WaypointReached;
     void WaypointReached(uint32 id) override
     {
         if (PLoc < 6)
@@ -1021,6 +1022,7 @@ public:
         uint32 timer;
         uint8 count;
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 uiWPointId) override
         {
             if (!pInstance)

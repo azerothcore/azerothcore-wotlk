@@ -44,6 +44,7 @@ enum Data
     ACTION_DELETE_ICE_WALL,
     DATA_WAVE_NUMBER,
     DATA_LK_BATTLE,// in progress
+    DATA_SHIP_CAPTAIN,
 };
 
 enum Creatures
@@ -108,6 +109,17 @@ enum BatteredHiltStatusFlags
     BHSF_FINISHED = 4,
 };
 
+enum HoRPersistentData
+{
+    PERSISTENT_DATA_INTRO,
+    PERSISTENT_DATA_FROSTSWORN_GENERAL,
+    PERSISTENT_DATA_LK_INTRO,
+    PERSISTENT_DATA_BATTERED_HILT,
+    PERSISTENT_DATA_COUNT
+};
+
+constexpr uint8 MAX_SPIRITUAL_REFLECTIONS = 5;
+constexpr uint8 MAX_ICE_WALL_TARGETS      = 4;
 #define NUM_OF_TRASH 34
 #define MAX_DIST_FROM_CENTER_IN_COMBAT 70.5f
 #define MAX_DIST_FROM_CENTER_TO_START 40.0f
@@ -291,6 +303,11 @@ enum hMisc
 
     // Battered Hilt - Summon Quel'Delar
     SPELL_SUMMON_EVIL_QUEL                        = 69966,
+    SPELL_QUEL_DELAR_HATRED                       = 70300,
+    SPELL_FROSTMOURNE_ALTAR_GLOW                  = 70720,
+    SPELL_UTHER_HOLY_LIGHT_VISUAL                 = 73036,
+    SPELL_QUELDELAR_COMPULSION                    = 70013,
+    SPELL_QUELDELAR_WILL                          = 70698,
 };
 
 const uint32 allowedCompositions[8][5] =
@@ -389,5 +406,8 @@ inline AI* GetHallsOfReflectionAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, HallsOfReflectionScriptName);
 }
+
+#define RegisterHallsOfReflectionCreatureAI(ai_name) \
+    RegisterCreatureAIWithFactory(ai_name, GetHallsOfReflectionAI)
 
 #endif
