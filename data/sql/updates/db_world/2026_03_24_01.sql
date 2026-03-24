@@ -1,3 +1,4 @@
+-- DB update 2026_03_24_00 -> 2026_03_24_01
 -- Defias Tower Patroller smart ai
 SET @ENTRY := 7052;
 UPDATE `creature_template` SET `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = @ENTRY;
