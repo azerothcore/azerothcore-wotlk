@@ -446,6 +446,7 @@ public:
                 else
                 {
                     me->SetHealth(me->GetMaxHealth());
+                    me->GetThreatMgr().ResetAllThreat();
                 }
             }
         }
