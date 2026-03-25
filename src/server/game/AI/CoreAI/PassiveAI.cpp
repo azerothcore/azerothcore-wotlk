@@ -20,7 +20,11 @@
 
 PassiveAI::PassiveAI(Creature* c) : CreatureAI(c) { me->SetReactState(REACT_PASSIVE); }
 PossessedAI::PossessedAI(Creature* c) : CreatureAI(c) { me->SetReactState(REACT_PASSIVE); }
-NullCreatureAI::NullCreatureAI(Creature* c) : CreatureAI(c) { me->SetReactState(REACT_PASSIVE); }
+NullCreatureAI::NullCreatureAI(Creature* c) : CreatureAI(c)
+{
+    me->SetReactState(REACT_PASSIVE);
+    me->SetIsCombatDisallowed(true);
+}
 
 int32 NullCreatureAI::Permissible(Creature const* creature)
 {
