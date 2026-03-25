@@ -105,6 +105,31 @@ namespace
         return false;
     }
 
+    bool IsEffectBlockedByStunImmunity(EffectDesc const& effect, bool immuneToStun)
+    {
+        if (!immuneToStun)
+            return false;
+
+        return effect.effect == EFFECT_APPLY_AURA && effect.aura == AURA_MOD_STUN;
+    }
+
+    bool IsFullyImmunedByStunImmunity(SpellDesc const& spell, bool immuneToStun)
+    {
+        bool hasAnyEffect = false;
+
+        for (EffectDesc const& effect : spell.effects)
+        {
+            if (effect.effect == EFFECT_NONE)
+                continue;
+
+            hasAnyEffect = true;
+            if (!IsEffectBlockedByStunImmunity(effect, immuneToStun))
+                return false;
+        }
+
+        return hasAnyEffect;
+    }
+
     // The last parameter defaults to false to avoid updating existing tests
     // that don't care about mechanic immunities.  Bladestorm grants a
     // specific mechanic immunity (including stun) that should block
@@ -114,12 +139,12 @@ namespace
     {
         // Mirrors current core ordering:
         // 1) full spell immunity check
-        // 2) mechanic immunity check (e.g. bladestorm vs stun)
+        // 2) full immunity from mechanic immunity (all effects blocked)
         // 3) damage immunity only for damage-only spells
         if (isImmunedToSpell)
             return SPELL_MISS_IMMUNE;
 
-        if (immuneToStun && IsStunSpell(spell))
+        if (IsFullyImmunedByStunImmunity(spell, immuneToStun))
             return SPELL_MISS_IMMUNE;
 
         if (HasOnlyDamageEffects(spell) && isImmunedToDamage)
@@ -327,4 +352,15 @@ TEST(SpellImmunityTest, Bladestorm_ImmuneToStun)
 
     // with a bladestorm‑style stun immunity it is blocked
     EXPECT_EQ(ComputeSpellHitResult(false, false, stunSpell, true), SPELL_MISS_IMMUNE);
+}
+
+TEST(SpellImmunityTest, StunImmunity_DoesNotFullyBlockMixedSpell)
+{
+    SpellDesc mixedSpell;
+    mixedSpell.effects[0] = { EFFECT_SCHOOL_DAMAGE, AURA_NONE };
+    mixedSpell.effects[1] = { EFFECT_APPLY_AURA, AURA_MOD_STUN };
+
+    // This models partial immunity: stun effect is blocked, damage still hits.
+    EXPECT_TRUE(IsStunSpell(mixedSpell));
+    EXPECT_EQ(ComputeSpellHitResult(false, false, mixedSpell, true), SPELL_MISS_NONE);
 }
