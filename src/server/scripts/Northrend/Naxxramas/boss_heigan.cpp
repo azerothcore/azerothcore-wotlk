@@ -159,13 +159,13 @@ struct boss_heigan : public BossAI
     void UpdateAI(uint32 diff) override
     {
         if (!UpdateVictim())
-        {
             return;
-        }
 
         _eruptionScheduler.Update(diff);
 
-        BossAI::UpdateAI(diff);
+        scheduler.Update(diff);
+
+        DoMeleeAttackIfReady();
     }
 
     void CheckSafetyDance()
