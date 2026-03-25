@@ -1,3 +1,4 @@
+-- DB update 2026_03_25_01 -> 2026_03_25_02
 --
 -- Fix: Repopulate CreatureImmunitiesId for all creatures that had mechanic/school immune masks
 -- The original migration (2026_03_22_03) ran the UPDATE before creature_immunities rows existed,
