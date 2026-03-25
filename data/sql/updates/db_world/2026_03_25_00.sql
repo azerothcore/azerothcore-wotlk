@@ -1,3 +1,4 @@
+-- DB update 2026_03_24_05 -> 2026_03_25_00
 -- Add acore_string entries (30110-30125) and command table entry for .debug factionchange
 
 DELETE FROM `acore_string` WHERE `entry` BETWEEN 30110 AND 30125;
