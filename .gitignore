@@ -54,6 +54,11 @@ CMakeLists.txt.user
 *.LOCAL.*
 
 #
+# AI tools
+#
+.claude
+
+#
 # IDE & other software
 #
 /.settings/
