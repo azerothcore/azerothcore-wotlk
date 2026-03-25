@@ -213,6 +213,7 @@ public:
             me->LoadCreaturesAddon(true);
             me->SetLootRecipient(nullptr);
             me->ResetPlayerDamageReq();
+            EngagementOver();
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -369,6 +370,10 @@ public:
 
         void EnterEvadeMode(EvadeReason why) override
         {
+            // Block evade during outer platform transitions
+            if (lock)
+                return;
+
             me->SetCanFly(false);
             me->SetDisableGravity(false);
             me->SetControlled(false, UNIT_STATE_ROOT);
