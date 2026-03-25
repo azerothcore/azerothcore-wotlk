@@ -628,9 +628,39 @@ private:
 /*######
 ## npc_cw_alexstrasza_trigger
 ######*/
+enum eAlexstrasza
+{
+    // Focusing Iris Keys
+    QUEST_KEY_TO_FOCUSING_IRIS            = 13372,
+    QUEST_HEROIC_KEY_TO_FOCUSING_IRIS     = 13375,
+    ITEM_KEY_TO_FOCUSING_IRIS             = 44569,
+    ITEM_HEROIC_KEY_TO_FOCUSING_IRIS      = 44577,
+    SPELL_KEY_TO_FOCUSING_IRIS            = 60989,
+    SPELL_HEROIC_KEY_TO_FOCUSING_IRIS     = 60992,
+    GOSSIP_MENU_ALEXSTRAZA                = 10192,
+};
+
 struct npc_alexstraza_the_lifebinder : public ScriptedAI
 {
-    npc_alexstraza_the_lifebinder(Creature* creature) : ScriptedAI(creature) {}
+    explicit npc_alexstraza_the_lifebinder(Creature* creature) : ScriptedAI(creature) {}
+
+    void sGossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
+    {
+        ClearGossipMenuFor(player);
+        switch (action)
+        {
+            case 0:
+                CloseGossipMenuFor(player);
+                player->CastSpell(player, SPELL_KEY_TO_FOCUSING_IRIS, false);
+                break;
+            case 1:
+                CloseGossipMenuFor(player);
+                player->CastSpell(player, SPELL_HEROIC_KEY_TO_FOCUSING_IRIS, false);
+                break;
+            default:
+                break;
+        }
+    }
 
     void Reset() override
     {
@@ -652,6 +682,8 @@ struct npc_alexstraza_the_lifebinder : public ScriptedAI
                     break;
                 case 2:
                     me->SetOrientation(me->GetHomePosition().GetOrientation());
+                    break;
+                default:
                     break;
             }
         }
@@ -767,8 +799,8 @@ struct npc_alexstraza_the_lifebinder : public ScriptedAI
     }
 
 private:
-    int8 phase;
-    uint32 timer;
+    int8 phase{};
+    uint32 timer{};
     ObjectGuid playerGUID;
     ObjectGuid orphanGUID;
 };
