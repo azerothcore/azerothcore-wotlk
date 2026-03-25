@@ -1,3 +1,4 @@
+-- DB update 2026_03_25_03 -> 2026_03_25_04
 -- Enable smooth waypoint transitions for flying creatures
 -- Paths with actions or delays are excluded
 
