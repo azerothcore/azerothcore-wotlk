@@ -1,3 +1,4 @@
+-- DB update 2026_03_25_00 -> 2026_03_25_01
 -- Add autobroadcast commands
 DELETE FROM `command` WHERE `name` IN ('autobroadcast', 'autobroadcast list', 'autobroadcast add', 'autobroadcast locale', 'autobroadcast remove');
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
