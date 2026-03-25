@@ -1203,7 +1203,19 @@ enum AcoreStrings
     LANG_BF_QUEUE_PLAYER_QUEUE          = 5123,
     LANG_BF_QUEUE_PLAYER_INVITED        = 5124,
     LANG_BF_QUEUE_PLAYER_WAR            = 5125,
-    // Room for more strings    5126-9999
+
+    // Autobroadcast commands
+    LANG_AUTOBROADCAST_LIST_HEADER      = 5126,
+    LANG_AUTOBROADCAST_LIST_ENTRY       = 5127,
+    LANG_AUTOBROADCAST_LIST_EMPTY       = 5128,
+    LANG_AUTOBROADCAST_ADD_SUCCESS      = 5129,
+    LANG_AUTOBROADCAST_REMOVE_SUCCESS   = 5130,
+    LANG_AUTOBROADCAST_NOT_FOUND        = 5131,
+    LANG_AUTOBROADCAST_LOCALE_SUCCESS   = 5132,
+    LANG_AUTOBROADCAST_LOCALE_ENTRY     = 5133,
+    LANG_AUTOBROADCAST_INVALID_LOCALE   = 5134,
+
+    // Room for more strings    5135-9999
 
     // Level requirement notifications
     LANG_SAY_REQ                        = 6604,
