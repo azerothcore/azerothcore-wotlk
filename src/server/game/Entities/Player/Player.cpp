@@ -769,7 +769,9 @@ bool Player::IsImmuneToEnvironmentalDamage()
 
 uint32 Player::EnvironmentalDamage(EnviromentalDamage type, uint32 damage)
 {
-    if (IsImmuneToEnvironmentalDamage())
+    // DAMAGE_FALL_TO_VOID bypasses all immunities (e.g. Divine Shield) to prevent
+    // players from being stuck infinitely falling below the map
+    if (type != DAMAGE_FALL_TO_VOID && IsImmuneToEnvironmentalDamage())
         return 0;
 
     // Absorb, resist some environmental damage type
