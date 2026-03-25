@@ -12,5 +12,5 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 (15, 10192, 1, 0, 0, 8, 0, 13375, 0, 0, 0, 0, 0, '', 'must have completed Quest \'The Heroic Key to the Focusing Iris\''),
 (15, 10192, 1, 0, 0, 2, 0, 44581, 1, 1, 1, 0, 0, '', 'must not have item \'Heroic Key to the Focusing Iris\'');
 
-UPDATE `spell_dbc` SET `Targets` = 1, `Effect_1` = 24, `EffectBasePoints_1` = 1, `EffectItemType_1` = 44582, `EffectMiscValue_1` = 0 WHERE (`ID` = 60989);
-UPDATE `spell_dbc` SET `Targets` = 1, `Effect_1` = 24, `EffectBasePoints_1` = 1, `EffectItemType_1` = 44581, `EffectMiscValue_1` = 0 WHERE (`ID` = 60992);
+UPDATE `spell_dbc` SET `Targets` = 1, `Effect_1` = 24, `EffectBasePoints_1` = 1, `EffectItemType_1` = 44582 WHERE (`ID` = 60989);
+UPDATE `spell_dbc` SET `Targets` = 1, `Effect_1` = 24, `EffectBasePoints_1` = 1, `EffectItemType_1` = 44581 WHERE (`ID` = 60992);
