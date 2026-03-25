@@ -2,7 +2,6 @@
 -- ============================================================
 -- creature_immunities seed
 -- ============================================================
-
 DELETE FROM `creature_immunities` WHERE `ID` < 0;
 DELETE FROM `creature_immunities` WHERE `ID` >= 1972;
 INSERT INTO `creature_immunities`
@@ -877,7 +876,4 @@ UPDATE `creature_template` SET `CreatureImmunitiesId` = -426 WHERE `entry` IN (3
 -- Clear no-longer-needed flags_extra bits (AOE / KNOCKBACK / TAUNT)
 -- ============================================================
 SET @MASK = 0x400000 | 0x40000000 | 0x100;
-UPDATE `creature_template`
-SET `flags_extra` = `flags_extra` & ~@MASK
-WHERE (`flags_extra` & @MASK) != 0;
-
+UPDATE `creature_template` SET `flags_extra` = `flags_extra` & ~@MASK WHERE (`flags_extra` & @MASK) != 0;
