@@ -910,14 +910,33 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, uint32 effectMask, Unit 
     if (!spellInfo)
         return false;
 
+    bool immuneToAllEffects = true;
+    bool hasCheckedEffect = false;
+
     for (uint8 i = EFFECT_0; i < MAX_SPELL_EFFECTS; ++i)
     {
         if (!(effectMask & (1u << i)))
             continue;
 
+        if (!spellInfo->Effects[i].IsEffect())
+            continue;
+
+        hasCheckedEffect = true;
+
         if (IsImmunedToSpellEffect(spellInfo, i, caster))
-            return true;
+        {
+            if (spellInfo->HasAttribute(SPELL_ATTR4_NO_PARTIAL_IMMUNITY))
+                return true;
+
+            continue;
+        }
+
+        immuneToAllEffects = false;
+        break;
     }
+
+    if (hasCheckedEffect && immuneToAllEffects)
+        return true;
 
     if (!spellInfo->HasAttribute(SPELL_ATTR2_NO_SCHOOL_IMMUNITIES))
     {
