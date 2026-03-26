@@ -259,12 +259,7 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
         owner->SetInFront(target);
 
         if (cOwner)
-        {
-            if (cOwner->IsWithinMeleeRange(target))
-                cOwner->SetCannotReachTarget();
-            else
-                cOwner->SetCannotReachTarget(target->GetGUID());
-        }
+            cOwner->SetCannotReachTarget();
 
         MovementInform(owner);
     }
