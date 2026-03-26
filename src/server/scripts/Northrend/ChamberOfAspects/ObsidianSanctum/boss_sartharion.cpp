@@ -635,7 +635,7 @@ private:
             {
                 Creature* tsunami = me->SummonCreature(NPC_FLAME_TSUNAMI, 3211.0f, FlameTsunamiLeftOffsets[i], 57.083332f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 13500);
 
-                if (((i - 2) % 3 == 0) && tsunami) // If center of wave
+                if (((i - 1) % 3 == 0) && tsunami) // If center of wave
                     tsunami->CastSpell(tsunami, SPELL_FLAME_TSUNAMI_VISUAL, true);
             }
 
@@ -648,7 +648,7 @@ private:
             {
                 Creature* tsunami = me->SummonCreature(NPC_FLAME_TSUNAMI, 3286.0f, FlameTsunamiRightOffsets[i], 57.083332f, 3.14f, TEMPSUMMON_TIMED_DESPAWN, 13500);
 
-                if (((i - 2) % 3 == 0) && tsunami) // If center of wave
+                if (((i - 1) % 3 == 0) && tsunami) // If center of wave
                     tsunami->CastSpell(tsunami, SPELL_FLAME_TSUNAMI_VISUAL, true);
             }
 
