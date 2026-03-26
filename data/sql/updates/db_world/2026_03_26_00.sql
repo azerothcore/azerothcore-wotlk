@@ -1,3 +1,4 @@
+-- DB update 2026_03_25_06 -> 2026_03_26_00
 -- Add mail commands
 DELETE FROM `command` WHERE `name` IN ('mail', 'mail list', 'mail return');
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
