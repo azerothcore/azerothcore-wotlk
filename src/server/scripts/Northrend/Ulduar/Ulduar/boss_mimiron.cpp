@@ -264,7 +264,7 @@ Position const ACUSummonPos = { 2742.6265f, 2568.0571f, 377.22076f, 0.0f }; /// 
 
 struct boss_mimiron : public BossAI
 {
-    boss_mimiron(Creature* pCreature) : BossAI(pCreature, BOSS_MIMIRON)
+    boss_mimiron(Creature* creature) : BossAI(creature, BOSS_MIMIRON)
     {
         if (!me->IsAlive())
             instance->SetBossState(BOSS_MIMIRON, DONE);
@@ -729,15 +729,6 @@ struct boss_mimiron : public BossAI
 
                     DoCastSelf(SPELL_SLEEP_VISUAL_1);
 
-                    if (instance)
-                        for( uint16 i = 0; i < 3; ++i )
-                            if (GameObject* door = instance->GetGameObject(DATA_GO_MIMIRON_DOOR_1 + i))
-                                    if (door->GetGoState() != GO_STATE_ACTIVE )
-                                    {
-                                        door->SetLootState(GO_READY);
-                                        door->UseDoorOrButton(0, false);
-                                    }
-
                     instance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, NPC_LEVIATHAN_MKII, 1, me);
 
                     if (_hardmode)
@@ -817,14 +808,6 @@ struct boss_mimiron : public BossAI
 
     void ResetGameObjects()
     {
-        for (uint16 i = 0; i < 3; ++i)
-            if (GameObject* door = instance->GetGameObject(DATA_GO_MIMIRON_DOOR_1 + i))
-                if (door->GetGoState() != GO_STATE_ACTIVE)
-                    {
-                        door->SetLootState(GO_READY);
-                        door->UseDoorOrButton(0, false);
-                    }
-
         if (GameObject* elevator = me->FindNearestGameObject(GO_MIMIRON_ELEVATOR, 200.0f))
         {
             if (elevator->GetGoState() != GO_STATE_ACTIVE )
@@ -846,14 +829,6 @@ struct boss_mimiron : public BossAI
 
     void CloseDoorAndButton()
     {
-        for (uint16 i = 0; i < 3; ++i)
-            if (GameObject* door = instance->GetGameObject(DATA_GO_MIMIRON_DOOR_1 + i))
-                if (door->GetGoState() != GO_STATE_READY)
-                    {
-                        door->SetLootState(GO_READY);
-                        door->UseDoorOrButton(0, false);
-                    }
-
         if (GameObject* button = me->FindNearestGameObject(GO_BUTTON, 200.0f))
             if (button->GetGoState() != GO_STATE_ACTIVE)
             {
@@ -945,7 +920,7 @@ private:
 
 struct npc_ulduar_leviathan_mkii : public ScriptedAI
 {
-    npc_ulduar_leviathan_mkii(Creature* pCreature) : ScriptedAI(pCreature)
+    npc_ulduar_leviathan_mkii(Creature* creature) : ScriptedAI(creature)
     {
         instance = me->GetInstanceScript();
         _isEvading = false;
@@ -1074,21 +1049,21 @@ struct npc_ulduar_leviathan_mkii : public ScriptedAI
                 break;
             case EVENT_SPELL_NAPALM_SHELL:
                 {
-                    Player* pTarget = nullptr;
-                    std::vector<Player*> pList;
+                    Player* target = nullptr;
+                    std::vector<Player*> playerList;
                     Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                     for( Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr )
                         if (Player* plr = itr->GetSource())
                             if (plr->IsAlive() && plr->GetDistance2d(me) > 15.0f )
-                                pList.push_back(plr);
+                                playerList.push_back(plr);
 
-                    if (!pList.empty())
-                        pTarget = pList[urand(0, pList.size() - 1)];
+                    if (!playerList.empty())
+                        target = playerList[urand(0, playerList.size() - 1)];
                     else
-                        pTarget = (Player*)SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true);
+                        target = (Player*)SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true);
 
-                    if (pTarget)
-                        cannon->CastSpell(pTarget, SPELL_NAPALM_SHELL, false);
+                    if (target)
+                        cannon->CastSpell(target, SPELL_NAPALM_SHELL, false);
 
                     _events.Repeat(14s);
                 }
@@ -1188,7 +1163,7 @@ private:
 
 struct npc_ulduar_vx001 : public ScriptedAI
 {
-    npc_ulduar_vx001(Creature* pCreature) : ScriptedAI(pCreature)
+    npc_ulduar_vx001(Creature* creature) : ScriptedAI(creature)
     {
         instance = me->GetInstanceScript();
         _isEvading = false;
@@ -1503,7 +1478,7 @@ private:
 
 struct npc_ulduar_aerial_command_unit : public ScriptedAI
 {
-    npc_ulduar_aerial_command_unit(Creature* pCreature) : ScriptedAI(pCreature), _summons(me)
+    npc_ulduar_aerial_command_unit(Creature* creature) : ScriptedAI(creature), _summons(me)
     {
         instance = me->GetInstanceScript();
         _isEvading = false;
@@ -1744,7 +1719,7 @@ private:
 
 struct npc_ulduar_proximity_mine : public ScriptedAI
 {
-    npc_ulduar_proximity_mine(Creature* pCreature) : ScriptedAI(pCreature)
+    npc_ulduar_proximity_mine(Creature* creature) : ScriptedAI(creature)
     {
         _exploded = false;
         _timer = 2500;
@@ -1809,7 +1784,7 @@ class spell_ulduar_mimiron_mine_explosion : public SpellScript
 
 struct npc_ulduar_mimiron_rocket : public NullCreatureAI
 {
-    npc_ulduar_mimiron_rocket(Creature* pCreature) : NullCreatureAI(pCreature) {}
+    npc_ulduar_mimiron_rocket(Creature* creature) : NullCreatureAI(creature) {}
 
     void InitializeAI() override
     {
@@ -1841,7 +1816,7 @@ struct npc_ulduar_mimiron_rocket : public NullCreatureAI
 
 struct npc_ulduar_bot_summon_trigger : public NullCreatureAI
 {
-    npc_ulduar_bot_summon_trigger(Creature* pCreature) : NullCreatureAI(pCreature) { }
+    npc_ulduar_bot_summon_trigger(Creature* creature) : NullCreatureAI(creature) { }
 
     void Reset() override
     {
@@ -2062,7 +2037,7 @@ public:
 
 struct npc_ulduar_flames_initial : public NullCreatureAI
 {
-    npc_ulduar_flames_initial(Creature* pCreature) : NullCreatureAI(pCreature)
+    npc_ulduar_flames_initial(Creature* creature) : NullCreatureAI(creature)
     {
         _createTime = GameTime::GetGameTime().count();
         _events.Reset();
@@ -2170,7 +2145,7 @@ private:
 
 struct npc_ulduar_flames_spread : public NullCreatureAI
 {
-    npc_ulduar_flames_spread(Creature* pCreature) : NullCreatureAI(pCreature) {}
+    npc_ulduar_flames_spread(Creature* creature) : NullCreatureAI(creature) {}
 
     void SpellHit(Unit*  /*caster*/, SpellInfo const* spell) override
     {
@@ -2201,7 +2176,7 @@ struct npc_ulduar_flames_spread : public NullCreatureAI
 
 struct npc_ulduar_emergency_fire_bot : public ScriptedAI
 {
-    npc_ulduar_emergency_fire_bot(Creature* pCreature) : ScriptedAI(pCreature)
+    npc_ulduar_emergency_fire_bot(Creature* creature) : ScriptedAI(creature)
     {
         _events.Reset();
         _events.ScheduleEvent(EVENT_EMERGENCY_BOT_CHECK, 1s);
@@ -2248,7 +2223,7 @@ private:
 
 struct npc_ulduar_rocket_strike_trigger : public NullCreatureAI
 {
-    npc_ulduar_rocket_strike_trigger(Creature* pCreature) : NullCreatureAI(pCreature) {}
+    npc_ulduar_rocket_strike_trigger(Creature* creature) : NullCreatureAI(creature) {}
 
     void SpellHitTarget(Unit* target, SpellInfo const* spell) override
     {

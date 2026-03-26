@@ -306,6 +306,17 @@ enum UlduarGameObjects
     GO_GIFT_OF_THE_OBSERVER_25              = 194822,
 };
 
+enum UlduarPersistentData
+{
+    PERSISTENT_DATA_WATCHERS_MASK           = 0,
+    PERSISTENT_DATA_CONSPEEDATORY,
+    PERSISTENT_DATA_UNBROKEN,
+    PERSISTENT_DATA_ALGALON_TIMER,
+    PERSISTENT_DATA_C_OF_ULDUAR_MASK,
+    PERSISTENT_DATA_MAGE_BARRIER,
+    MAX_PERSISTENT_DATA
+};
+
 enum UlduarMisc
 {
     // Flame Leviathan
