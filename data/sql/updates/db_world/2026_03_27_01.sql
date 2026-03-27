@@ -1,3 +1,4 @@
+-- DB update 2026_03_27_00 -> 2026_03_27_01
 -- Doomrel (9039): Create "Continue..." menu and chain from initial gossip
 DELETE FROM `gossip_menu` WHERE `MenuID` = 1950;
 INSERT INTO `gossip_menu` (`MenuID`, `TextID`) VALUES (1950, 2605);
