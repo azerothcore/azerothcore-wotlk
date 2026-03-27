@@ -363,7 +363,7 @@ public:
             ScriptedAI::MoveInLineOfSight(who);
         }
 
-        void AttackStart(Unit* who) override
+        void JustEngagedWith(Unit* who) override
         {
             if (me->ToTempSummon())
             {
@@ -372,6 +372,14 @@ public:
                         summoner->GetAI()->DoAction(ACTION_INFORM);
                 return;
             }
+
+            ScriptedAI::JustEngagedWith(who);
+        }
+
+        void AttackStart(Unit* who) override
+        {
+            if (me->ToTempSummon())
+                return;
 
             ScriptedAI::AttackStart(who);
         }

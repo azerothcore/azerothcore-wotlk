@@ -879,10 +879,10 @@ void MotionMaster::MoveDistract(uint32 timer)
 
 void MotionMaster::Mutate(MovementGenerator* m, MovementSlot slot)
 {
+    bool const delayed = (_cleanFlag & MMCF_UPDATE);
+
     while (MovementGenerator* curr = Impl[slot])
     {
-        bool delayed = (_top == slot && (_cleanFlag & MMCF_UPDATE));
-
         // clear slot AND decrease top immediately to avoid crashes when referencing null top in DirectDelete
         Impl[slot] = nullptr;
         while (!empty() && !top())

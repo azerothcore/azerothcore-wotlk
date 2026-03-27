@@ -1042,6 +1042,22 @@ public:
         }
 
         handler->SendSysMessage("End of threatened by me list.");
+
+        // Also show combat refs that may not appear in the threat list
+        // (e.g. creatures without threat lists like triggers/environmental hazards)
+        handler->PSendSysMessage("Combat refs (InCombat: {} | HasCombat: {})", target->IsInCombat(), target->GetCombatManager().HasCombat());
+        for (auto const& ref : target->GetCombatManager().GetPvECombatRefs())
+        {
+            Unit* unit = ref.second->GetOther(target);
+            handler->PSendSysMessage("   [PvE] {} ({}) Entry: {}", unit->GetName(), unit->GetGUID().ToString(),
+                unit->IsCreature() ? unit->ToCreature()->GetEntry() : 0);
+        }
+        for (auto const& ref : target->GetCombatManager().GetPvPCombatRefs())
+        {
+            Unit* unit = ref.second->GetOther(target);
+            handler->PSendSysMessage("   [PvP] {} ({})", unit->GetName(), unit->GetGUID().ToString());
+        }
+
         return true;
     }
 
