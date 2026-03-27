@@ -1978,7 +1978,8 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
     if (factionChangeInfo->FactionChange)
     {
         // Unable Change Faction For DeathKnight On Levelup Zone And Campagin
-        if (playerData->Class == CLASS_DEATH_KNIGHT && level <= 70) {
+        if (playerData->Class == CLASS_DEATH_KNIGHT && level <= 70)
+        {
             SendCharFactionChange(CHAR_CREATE_ERROR, factionChangeInfo.get());
             return;
         }
@@ -2216,17 +2217,17 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
             {
                 // Reset guild
                 if (uint32 guildId = playerData->GuildId)
-                    if (Guild* guild = sGuildMgr->GetGuildById(guildId))
+                    if (Guild *guild = sGuildMgr->GetGuildById(guildId))
                         guild->DeleteMember(factionChangeInfo->Guid, false, false);
 
                 Player::LeaveAllArenaTeams(factionChangeInfo->Guid);
             }
 
-            //if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
+            // if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
             //{
-            //    if (Group *group = sGroupMgr->GetGroupByDbStoreId(groupId))
-            //        group->RemoveMember(factionChangeInfo->Guid);
-            //}
+            //     if (Group *group = sGroupMgr->GetGroupByDbStoreId(groupId))
+            //         group->RemoveMember(factionChangeInfo->Guid);
+            // }
 
             if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_ADD_FRIEND))
             {
@@ -2289,7 +2290,7 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
             }
 
             // Item conversion
-            for (auto const& [item_alliance, item_horde] : sObjectMgr->FactionChangeItems)
+            for (auto const &[item_alliance, item_horde] : sObjectMgr->FactionChangeItems)
             {
                 uint32 new_entry = (newTeam == TEAM_ALLIANCE ? item_alliance : item_horde);
                 uint32 old_entry = (newTeam == TEAM_ALLIANCE ? item_horde : item_alliance);
@@ -2333,7 +2334,7 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
             trans->Append(stmt);
 
             // Disable all old-faction specific quests
-            for (auto const& [questID, quest] : sObjectMgr->GetQuestTemplates())
+            for (auto const &[questID, quest] : sObjectMgr->GetQuestTemplates())
             {
                 uint32 newRaceMask = (newTeam == TEAM_ALLIANCE) ? sRaceMgr->GetAllianceRaceMask() : sRaceMgr->GetHordeRaceMask();
 
@@ -2423,7 +2424,7 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
                     else
                     {
                         LOG_WARN("entities.player", "{} has invalid title data '{}' at index {} - skipped, this may result in titles being lost",
-                            GetPlayerInfo(), (index < tokens.size()) ? std::string(tokens[index]) : "<none>", index);
+                                 GetPlayerInfo(), (index < tokens.size()) ? std::string(tokens[index]) : "<none>", index);
 
                         knownTitles[index] = 0;
                     }

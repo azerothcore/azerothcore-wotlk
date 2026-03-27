@@ -130,9 +130,11 @@ enum PaladinProcSpells
     SPELL_PALADIN_SPIRITUAL_ATTUNEMENT_MANA      = 31786,
     SPELL_PALADIN_BEACON_OF_LIGHT_AURA           = 53563,
     SPELL_PALADIN_LIGHTS_BEACON                  = 53651,
-    SPELL_PALADIN_BEACON_OF_LIGHT_FLASH          = 53652,
-    SPELL_PALADIN_BEACON_OF_LIGHT_HOLY           = 53654,
+    SPELL_PALADIN_BEACON_OF_LIGHT_HL             = 53652,
+    SPELL_PALADIN_BEACON_OF_LIGHT_FOL            = 53653,
+    SPELL_PALADIN_BEACON_OF_LIGHT_HS             = 53654,
     SPELL_PALADIN_HOLY_LIGHT_R1                  = 635,
+    SPELL_PALADIN_FLASH_OF_LIGHT_R1              = 19750,
     SPELL_PALADIN_GLYPH_OF_HOLY_LIGHT_HEAL       = 54968,
     SPELL_PALADIN_SACRED_SHIELD                  = 53601,
     SPELL_PALADIN_T9_HOLY_4P_BONUS               = 67191,
@@ -2132,6 +2134,9 @@ private:
 };
 
 // 53651 - Light's Beacon - Beacon of Light
+// Each source heal has a dedicated beacon copy spell:
+//   53652 - Holy Light, 53653 - Flash of Light, 53654 - Holy Shock
+// Reference: https://kurn.info/blog/holy-how-to-5-to-beacon-or-not-to-beacon/
 class spell_pal_light_s_beacon : public AuraScript
 {
     PrepareAuraScript(spell_pal_light_s_beacon);
@@ -2141,9 +2146,11 @@ class spell_pal_light_s_beacon : public AuraScript
         return ValidateSpellInfo(
         {
             SPELL_PALADIN_BEACON_OF_LIGHT_AURA,
-            SPELL_PALADIN_BEACON_OF_LIGHT_FLASH,
-            SPELL_PALADIN_BEACON_OF_LIGHT_HOLY,
-            SPELL_PALADIN_HOLY_LIGHT_R1
+            SPELL_PALADIN_BEACON_OF_LIGHT_HL,
+            SPELL_PALADIN_BEACON_OF_LIGHT_FOL,
+            SPELL_PALADIN_BEACON_OF_LIGHT_HS,
+            SPELL_PALADIN_HOLY_LIGHT_R1,
+            SPELL_PALADIN_FLASH_OF_LIGHT_R1
         });
     }
 
@@ -2167,9 +2174,13 @@ class spell_pal_light_s_beacon : public AuraScript
         if (!healInfo || !healInfo->GetHeal())
             return;
 
-        // Holy Light heals for 100%, Flash of Light heals for 50%
-        uint32 healSpellId = procSpell->IsRankOf(sSpellMgr->AssertSpellInfo(SPELL_PALADIN_HOLY_LIGHT_R1)) ?
-            SPELL_PALADIN_BEACON_OF_LIGHT_FLASH : SPELL_PALADIN_BEACON_OF_LIGHT_HOLY;
+        uint32 healSpellId;
+        if (procSpell->IsRankOf(sSpellMgr->AssertSpellInfo(SPELL_PALADIN_HOLY_LIGHT_R1)))
+            healSpellId = SPELL_PALADIN_BEACON_OF_LIGHT_HL;
+        else if (procSpell->IsRankOf(sSpellMgr->AssertSpellInfo(SPELL_PALADIN_FLASH_OF_LIGHT_R1)))
+            healSpellId = SPELL_PALADIN_BEACON_OF_LIGHT_FOL;
+        else
+            healSpellId = SPELL_PALADIN_BEACON_OF_LIGHT_HS;
 
         // Use heal amount before target-specific modifiers to avoid copying them
         uint32 healAmount = healInfo->GetHealBeforeTakenMods();

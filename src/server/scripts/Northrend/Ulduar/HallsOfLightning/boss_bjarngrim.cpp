@@ -267,6 +267,7 @@ struct boss_bjarngrim : public npc_escortAI
         m_uiStance = stance;
     }
 
+    using CreatureAI::WaypointReached;
     void WaypointReached(uint32 Point) override
     {
         if (Point == 1)

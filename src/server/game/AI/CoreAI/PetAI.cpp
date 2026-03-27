@@ -77,7 +77,7 @@ void PetAI::_stopAttack()
         me->GetMotionMaster()->Clear();
         me->GetMotionMaster()->MoveIdle();
         me->CombatStop();
-        me->getHostileRefMgr().deleteReferences();
+        me->GetThreatMgr().RemoveMeFromThreatLists();
         return;
     }
 
@@ -157,15 +157,6 @@ void PetAI::UpdateAI(uint32 diff)
         UpdateAllies();
     else
         m_updateAlliesTimer -= diff;
-
-    if (owner && owner->IsPlayer() && !me->GetVictim() && me->CanNotReachTarget())
-    {
-        if (me->GetDistance(owner) > 40.0f)
-        {
-            me->NearTeleportTo(owner->GetPositionX(), owner->GetPositionY(), owner->GetPositionZ(), me->GetOrientation());
-            me->SetCannotReachTarget(); // Clear flag after teleport
-        }
-    }
 
     if (me->GetVictim() && me->GetVictim()->IsAlive())
     {
@@ -507,7 +498,7 @@ Unit* PetAI::SelectNextTarget(bool allowAutoSelect) const
         if (!tauntAuras.empty())
             for (Unit::AuraEffectList::const_reverse_iterator itr = tauntAuras.rbegin(); itr != tauntAuras.rend(); ++itr)
                 if (Unit* caster = (*itr)->GetCaster())
-                    if (me->CanCreatureAttack(caster) && !caster->HasAuraTypeWithCaster(SPELL_AURA_IGNORED, me->GetGUID()))
+                    if (me->CanCreatureAttack(caster) && !caster->HasAuraTypeWithCaster(SPELL_AURA_MOD_DETAUNT, me->GetGUID()))
                         return caster;
     }
 
@@ -733,7 +724,7 @@ bool PetAI::CanAttack(Unit* target, SpellInfo const* spellInfo)
         return me->GetCharmInfo()->IsCommandAttack();
 
     // CC - mobs under crowd control can be attacked if owner commanded
-    if (target->HasBreakableByDamageCrowdControlAura() && (!spellInfo || !spellInfo->HasAttribute(SPELL_ATTR4_REACTIVE_DAMAGE_PROC)))
+    if (target->HasBreakableByDamageCrowdControlAura() && (!spellInfo || !spellInfo->HasAttribute(SPELL_ATTR4_DAMAGE_DOESNT_BREAK_AURAS)))
         return me->GetCharmInfo()->IsCommandAttack();
 
     // Returning - pets ignore attacks only if owner clicked follow

@@ -24,7 +24,7 @@ CREATE TABLE `trainer` (
   `Id` int unsigned NOT NULL DEFAULT '0',
   `Type` tinyint unsigned NOT NULL DEFAULT '2',
   `Requirement` mediumint unsigned NOT NULL DEFAULT '0',
-  `Greeting` mediumtext COLLATE utf8mb4_general_ci,
+  `Greeting` mediumtext CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci,
   `VerifiedBuild` int DEFAULT '0',
   PRIMARY KEY (`Id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -174,4 +174,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-29 17:54:44
+-- Dump completed on 2026-03-15 20:39:26

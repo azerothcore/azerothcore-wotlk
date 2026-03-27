@@ -15,7 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
 #include "GridNotifiers.h"
 #include "Player.h"
 #include "SpellAuraEffects.h"
@@ -915,9 +914,8 @@ class spell_pri_mind_control : public AuraScript
         {
             if (Unit* target = GetTarget())
             {
-                uint32 duration = static_cast<uint32>(GetDuration());
-                caster->SetInCombatWith(target, duration);
-                target->SetInCombatWith(caster, duration);
+                caster->SetInCombatWith(target);
+                target->SetInCombatWith(caster);
             }
         }
     }

@@ -257,6 +257,7 @@ public:
             me->SetFaction(faction);
         }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 waypointId) override
         {
             RelocateSummons();
@@ -469,9 +470,9 @@ struct npc_aged_dying_ancient_kodo : public ScriptedAI
         }
     }
 
-    bool OnGossipHello(Player* player, Creature* creature)
+    void sGossipHello(Player* player) override
     {
-        if (creature->HasAura(SPELL_KODO_KOMBO_DESPAWN_BUFF))
+        if (me->HasAura(SPELL_KODO_KOMBO_DESPAWN_BUFF))
         {
             if (Group* group = player->GetGroup())
             {
@@ -479,18 +480,17 @@ struct npc_aged_dying_ancient_kodo : public ScriptedAI
                 {
                     Player* grpPlayer = itr->GetSource();
                     if (grpPlayer->HasAura(SPELL_KODO_KOMBO_PLAYER_BUFF))
-                        grpPlayer->TalkedToCreature(creature->GetEntry(), ObjectGuid::Empty);
+                        grpPlayer->TalkedToCreature(me->GetEntry(), ObjectGuid::Empty);
                 }
             }
             else
                 if (player->HasAura(SPELL_KODO_KOMBO_PLAYER_BUFF))
-                    player->TalkedToCreature(creature->GetEntry(), ObjectGuid::Empty);
+                    player->TalkedToCreature(me->GetEntry(), ObjectGuid::Empty);
 
             player->RemoveAurasDueToSpell(SPELL_KODO_KOMBO_PLAYER_BUFF);
         }
 
-        SendGossipMenuFor(player, NPC_TEXT_KODO, creature->GetGUID());
-        return true;
+        SendGossipMenuFor(player, NPC_TEXT_KODO, me->GetGUID());
     }
 };
 

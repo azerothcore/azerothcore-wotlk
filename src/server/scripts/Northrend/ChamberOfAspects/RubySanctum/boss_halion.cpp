@@ -1080,7 +1080,7 @@ class spell_halion_twilight_phasing_aura : public AuraScript
         GetTarget()->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         GetTarget()->ToCreature()->SetReactState(REACT_DEFENSIVE);
         GetTarget()->GetMotionMaster()->Clear();
-        GetTarget()->GetThreatMgr().clearReferences();
+        GetTarget()->GetThreatMgr().ClearAllThreat();
         GetTarget()->RemoveAllAttackers();
         GetTarget()->AttackStop();
     }
@@ -1090,7 +1090,7 @@ class spell_halion_twilight_phasing_aura : public AuraScript
         GetTarget()->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         GetTarget()->ToCreature()->SetReactState(REACT_DEFENSIVE);
         GetTarget()->GetMotionMaster()->Clear();
-        GetTarget()->GetThreatMgr().clearReferences();
+        GetTarget()->GetThreatMgr().ClearAllThreat();
         GetTarget()->RemoveAllAttackers();
         GetTarget()->AttackStop();
     }

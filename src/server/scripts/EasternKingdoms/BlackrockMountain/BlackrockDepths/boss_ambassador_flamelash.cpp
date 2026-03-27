@@ -50,219 +50,184 @@ const Position SummonPositions[7] =
 
 std::vector<int> gobjectDwarfRunesEntry { 170578, 170579, 170580, 170581, 170582, 170583, 170584 };
 
-class boss_ambassador_flamelash : public CreatureScript
+struct boss_ambassador_flamelash : public BossAI
 {
-public:
-    boss_ambassador_flamelash() : CreatureScript("boss_ambassador_flamelash") { }
+    boss_ambassador_flamelash(Creature* creature) : BossAI(creature, BOSS_AMBASSADOR_FLAMELASH) { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    void DoAction(int32 param) override
     {
-        return GetBlackrockDepthsAI<boss_ambassador_flamelashAI>(creature);
+        switch (param)
+        {
+            case EVENT_SUMMON_SPIRITS:
+                events.ScheduleEvent(EVENT_SUMMON_SPIRITS, 12s, 14s);
+                break;
+        }
     }
 
-    struct boss_ambassador_flamelashAI : public BossAI
+    void Reset() override
     {
-        boss_ambassador_flamelashAI(Creature* creature) : BossAI(creature, BOSS_AMBASSADOR_FLAMELASH), summons(me) { }
+        _Reset();
+        TurnRunes(false);
+        _foundValidPosition = false;
+        _validPosition.clear();
+    }
 
-        EventMap _events;
+    void TurnRunes(bool mode)
+    {
+        // Active makes the runes burn, ready turns them off
+        GOState state = mode ? GO_STATE_ACTIVE : GO_STATE_READY;
 
-        // This will help reseting the boss
-        SummonList summons;
+        for (int RuneEntry : gobjectDwarfRunesEntry)
+            if (GameObject* dwarfRune = me->FindNearestGameObject(RuneEntry, 200.0f))
+                dwarfRune->SetGoState(state);
+    }
 
-        // This will allow to find a valid position to spawn them
-        std::vector<int> validPosition;
-        bool foundValidPosition = false;
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        events.ScheduleEvent(EVENT_SPELL_FIREBLAST, 2s);
 
-        void JustSummoned(Creature* cr) override { summons.Summon(cr); }
+        // Spawn 7 Embers initially
+        for (int i = 0; i < 4; ++i)
+            events.ScheduleEvent(EVENT_SUMMON_SPIRITS, 4s);
 
-        void DoAction(int32 param) override
+        // Activate the runes (Start burning)
+        TurnRunes(true);
+
+        Talk(AGGRO_TEXT);
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        _JustDied();
+        TurnRunes(false);
+    }
+
+    int getValidRandomPosition()
+    {
+        /* Generate a random position which
+         * have not been used in 4 summonings.
+         * Since we are calling the event whenever the Spirit
+         * dies and not all at the time, we need to save at
+         * least 4 positions until reseting the vector
+        */
+
+        // Searching a new position so reset this bool check
+        _foundValidPosition = false;
+        int randomPosition;
+
+        while (!_foundValidPosition)
         {
-            switch (param)
+            /* When we have summoned 4 creatures, reset the vector
+             * so we can summon new spirits in other positions.*/
+            if (_validPosition.size() == 4)
+                _validPosition.clear();
+
+            // The random ranges from the position 0 to the position 6
+            randomPosition = urand(0, 6);
+
+            // When we have an empty vector we can use any random position generated.
+            if (_validPosition.empty())
+                _foundValidPosition = true;
+
+            /* This check is done to avoid running the vector
+             * when it is empty. Because if it is empty, then any
+             * position can be used to summon Spirits.
+             */
+            if (!_foundValidPosition)
             {
-                case EVENT_SUMMON_SPIRITS:
-                    _events.ScheduleEvent(EVENT_SUMMON_SPIRITS, 12s, 14s);
-                    break;
-            }
-        }
-
-        void Reset() override
-        {
-            _events.Reset();
-            summons.DespawnAll();
-            TurnRunes(false);
-            foundValidPosition = false;
-            validPosition.clear();
-        }
-
-        void TurnRunes(bool mode)
-        {
-            // Active makes the runes burn, ready turns them off
-            GOState state = mode ? GO_STATE_ACTIVE : GO_STATE_READY;
-
-            for (int RuneEntry : gobjectDwarfRunesEntry)
-                if (GameObject* dwarfRune = me->FindNearestGameObject(RuneEntry, 200.0f))
-                    dwarfRune->SetGoState(state);
-        }
-
-        void JustEngagedWith(Unit* /*who*/) override
-        {
-            _events.ScheduleEvent(EVENT_SPELL_FIREBLAST, 2s);
-
-            // Spawn 7 Embers initially
-            for (int i = 0; i < 4; ++i)
-                _events.ScheduleEvent(EVENT_SUMMON_SPIRITS, 4s);
-
-            // Activate the runes (Start burning)
-            TurnRunes(true);
-
-            Talk(AGGRO_TEXT);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            TurnRunes(false);
-            _events.Reset();
-            summons.DespawnAll();
-        }
-
-        int getValidRandomPosition()
-        {
-            /* Generate a random position which
-             * have not been used in 4 summonings.
-             * Since we are calling the event whenever the Spirit
-             * dies and not all at the time, we need to save at
-             * least 4 positions until reseting the vector
-            */
-
-            // Searching a new position so reset this bool check
-            foundValidPosition = false;
-            int randomPosition;
-
-            while (!foundValidPosition)
-            {
-                /* When we have summoned 4 creatures, reset the vector
-                 * so we can summon new spirits in other positions.*/
-                if (validPosition.size() == 4)
-                    validPosition.clear();
-
-                // The random ranges from the position 0 to the position 6
-                randomPosition = urand(0, 6);
-
-                // When we have an empty vector we can use any random position generated.
-                if (validPosition.empty())
-                    foundValidPosition = true;
-
-                /* This check is done to avoid running the vector
-                 * when it is empty. Because if it is empty, then any
-                 * position can be used to summon Spirits.
-                 */
-                if (!foundValidPosition)
+                // Check every position inside the vector
+                for (int pos : _validPosition)
                 {
-                    // Check every position inside the vector
-                    for (int pos : validPosition)
+                    // If the random is different, we found a temporary true,
+                    // until we find one that is equal, which means it has been used.
+                    if (pos != randomPosition)
+                        _foundValidPosition = true;
+                    else
                     {
-                        // If the random is different, we found a temporary true,
-                        // until we find one that is equal, which means it has been used.
-                        if (pos != randomPosition)
-                            foundValidPosition = true;
-                        else
-                        {
-                            foundValidPosition = false;
-                            break;
-                        }
+                        _foundValidPosition = false;
+                        break;
                     }
                 }
             }
-
-            // We found a valid position. Save it and return it to summon.
-            validPosition.emplace_back(randomPosition);
-            return randomPosition;
         }
 
-        void SummonSpirits()
+        // We found a valid position. Save it and return it to summon.
+        _validPosition.emplace_back(randomPosition);
+        return randomPosition;
+    }
+
+    void SummonSpirits()
+    {
+        // Make the Spirits chase Ambassador Flamelash
+        me->SummonCreature(NPC_FIRE_SPIRIT, SummonPositions[getValidRandomPosition()], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60 * IN_MILLISECONDS);
+        events.ScheduleEvent(EVENT_SUMMON_SPIRITS, 12s, 14s);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        //Return since we have no target
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+
+        switch (events.ExecuteEvent())
         {
-            // Make the Spirits chase Ambassador Flamelash
-            me->SummonCreature(NPC_FIRE_SPIRIT, SummonPositions[getValidRandomPosition()], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60 * IN_MILLISECONDS);
-            _events.ScheduleEvent(EVENT_SUMMON_SPIRITS, 12s, 14s);
+            case EVENT_SPELL_FIREBLAST:
+                DoCastVictim(SPELL_FIREBLAST);
+                events.ScheduleEvent(EVENT_SPELL_FIREBLAST, 7s);
+                break;
+            case EVENT_SUMMON_SPIRITS:
+                SummonSpirits();
+                break;
         }
 
-        void UpdateAI(uint32 diff) override
-        {
-            //Return since we have no target
-            if (!UpdateVictim())
-                return;
+        DoMeleeAttackIfReady();
+    }
 
-            _events.Update(diff);
-
-            switch (_events.ExecuteEvent())
-            {
-                case EVENT_SPELL_FIREBLAST:
-                    DoCastVictim(SPELL_FIREBLAST);
-                    _events.ScheduleEvent(EVENT_SPELL_FIREBLAST, 7s);
-                    break;
-                case EVENT_SUMMON_SPIRITS:
-                    SummonSpirits();
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-    };
+private:
+    // This will allow to find a valid position to spawn them
+    std::vector<int> _validPosition;
+    bool _foundValidPosition = false;
 };
 
-class npc_burning_spirit : public CreatureScript
+struct npc_burning_spirit : public ScriptedAI
 {
-public:
-    npc_burning_spirit() : CreatureScript("npc_burning_spirit") { }
+    npc_burning_spirit(Creature* creature) : ScriptedAI(creature) {}
 
-    struct npc_burning_spiritAI : public ScriptedAI
+    void IsSummonedBy(WorldObject* summoner) override
     {
-        npc_burning_spiritAI(Creature* creature) : ScriptedAI(creature) {}
+        if (!summoner->IsCreature())
+            return;
 
-        void IsSummonedBy(WorldObject* summoner) override
-        {
-            if (!summoner->IsCreature())
-            {
-                return;
-            }
-
-            _flamelasherGUID = summoner->GetGUID();
-            me->GetMotionMaster()->MoveFollow(summoner->ToCreature(), 0.f, 0.f);
-        }
-
-        void EnterEvadeMode(EvadeReason /*why*/) override
-        {
-            if (Creature* flamelasher = ObjectAccessor::GetCreature(*me, _flamelasherGUID))
-            {
-                me->GetMotionMaster()->MoveFollow(flamelasher, 5.f, 0.f);
-            }
-        }
-
-        void MovementInform(uint32 type, uint32 /*id*/) override
-        {
-            if (type != FOLLOW_MOTION_TYPE)
-                return;
-
-            if (Creature* flamelasher = ObjectAccessor::GetCreature(*me, _flamelasherGUID))
-            {
-                flamelasher->CastSpell(flamelasher, SPELL_BURNING_SPIRIT);
-                Unit::Kill(flamelasher, me);
-            }
-        }
-
-    private:
-        EventMap   _events;
-        ObjectGuid _flamelasherGUID;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetBlackrockDepthsAI<npc_burning_spiritAI>(creature);
+        _flamelasherGUID = summoner->GetGUID();
+        me->GetMotionMaster()->MoveFollow(summoner->ToCreature(), 0.f, 0.f);
     }
+
+    void EnterEvadeMode(EvadeReason /*why*/) override
+    {
+        if (Creature* flamelasher = ObjectAccessor::GetCreature(*me, _flamelasherGUID))
+            me->GetMotionMaster()->MoveFollow(flamelasher, 5.f, 0.f);
+    }
+
+    void MovementInform(uint32 type, uint32 /*id*/) override
+    {
+        if (type != FOLLOW_MOTION_TYPE)
+            return;
+
+        if (Creature* flamelasher = ObjectAccessor::GetCreature(*me, _flamelasherGUID))
+        {
+            flamelasher->CastSpell(flamelasher, SPELL_BURNING_SPIRIT);
+            Unit::Kill(flamelasher, me);
+        }
+    }
+
+private:
+    ObjectGuid _flamelasherGUID;
 };
 
 void AddSC_boss_ambassador_flamelash()
 {
-    new boss_ambassador_flamelash();
-    new npc_burning_spirit();
+    RegisterBlackrockDepthsCreatureAI(boss_ambassador_flamelash);
+    RegisterBlackrockDepthsCreatureAI(npc_burning_spirit);
 }

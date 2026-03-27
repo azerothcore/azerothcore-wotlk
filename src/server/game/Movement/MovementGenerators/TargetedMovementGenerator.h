@@ -25,8 +25,6 @@
 #include "Timer.h"
 #include "Unit.h"
 
-using TargetedMovementGeneratorBase = AbstractFollower;
-
 enum ChaseMovementMode
 {
     CHASE_MODE_NORMAL,      // chasing target

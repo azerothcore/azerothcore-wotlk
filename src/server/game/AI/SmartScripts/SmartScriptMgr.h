@@ -2064,21 +2064,22 @@ class SmartWaypointMgr
 {
     SmartWaypointMgr() {}
 public:
-    ~SmartWaypointMgr();
+    ~SmartWaypointMgr() = default;
 
     static SmartWaypointMgr* instance();
 
     void LoadFromDB();
 
-    WaypointPath* GetPath(uint32 id)
+    WaypointPath const* GetPath(uint32 id) const
     {
-        if (waypoint_map.find(id) != waypoint_map.end())
-            return waypoint_map[id];
-        else return 0;
+        auto itr = waypoint_map.find(id);
+        if (itr != waypoint_map.end())
+            return &itr->second;
+        return nullptr;
     }
 
 private:
-    std::unordered_map<uint32, WaypointPath*> waypoint_map;
+    std::unordered_map<uint32, WaypointPath> waypoint_map;
 };
 
 // all events for a single entry

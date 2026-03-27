@@ -192,7 +192,7 @@ void MessageDistDeliverer::Visit(VisiblePlayersMap const& m)
     for (auto const& kvPair : m)
     {
         Player const* target = kvPair.second;
-        if (i_distSq != 0.0f && target->m_seer->GetExactDist2dSq(i_source) > i_distSq)
+        if (i_distSq != 0.0f && target->GetSightPosition().GetExactDist2dSq(i_source) > i_distSq)
             continue;
 
         // @todo: Might not need this check anymore
