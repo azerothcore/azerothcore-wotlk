@@ -662,7 +662,11 @@ QuestItemList* Loot::FillQuestLoot(Player* player)
         {
             item.AddAllowedLooter(player);
 
-            if (!item.is_counted)
+            if (item.freeforall)
+            {
+                ++unlootedCount;
+            }
+            else if (!item.is_counted)
             {
                 ++unlootedCount;
                 item.is_counted = true;
