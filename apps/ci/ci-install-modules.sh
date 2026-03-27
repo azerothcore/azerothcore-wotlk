@@ -76,6 +76,7 @@ git clone --depth=1 --branch=master https://github.com/azerothcore/mod-pocket-po
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-premium modules/mod-premium
 git clone --depth=1 --branch=main   https://github.com/azerothcore/mod-progression-system.git modules/mod-progression-system
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-promotion-azerothcore modules/mod-promotion-azerothcore
+git clone --depth=1 --branch=master https://github.com/azerothcore/mod-ptr-template modules/mod-ptr-template
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-pvp-quests modules/mod-pvp-quests
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-pvp-titles modules/mod-pvp-titles
 git clone --depth=1 --branch=master https://github.com/azerothcore/mod-pvp-zones modules/mod-pvp-zones
