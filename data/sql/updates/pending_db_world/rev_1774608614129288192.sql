@@ -5,5 +5,4 @@ INSERT INTO `creature_equip_template` (`CreatureID`, `ID`, `ItemID1`, `ItemID2`,
 
 UPDATE `creature` SET `spawntimesecs` = 60 WHERE (`id1` = 28912) AND (`guid` IN (130354));
 
-DELETE FROM `creature_immunities` WHERE `ID` = -99; -- only used by 28912
 UPDATE `creature_template` SET `CreatureImmunitiesId` = -93 WHERE (`entry` = 28912);
