@@ -111,7 +111,9 @@ enum Events
     // Intro
     EVENT_INTRO_2                   = 15,
     EVENT_INTRO_3                   = 16,
-    EVENT_INTRO_4                   = 17
+    EVENT_INTRO_4                   = 17,
+    // Resume after teleport
+    EVENT_RESUME_ATTACK             = 18
 };
 
 const uint32 gothikWaves[24][2] =
@@ -172,21 +174,6 @@ const Position PosSummonDead[5] =
 #define POS_X_SOUTH  2633.84f
 #define IN_LIVE_SIDE(who) (who->GetPositionY() < POS_Y_GATE)
 
-// Predicate function to check that the r   efzr unit is NOT on the same side as the source.
-struct NotOnSameSide
-{
-public:
-    explicit NotOnSameSide(Unit* pSource) : m_inLiveSide(IN_LIVE_SIDE(pSource)) { }
-
-    bool operator() (Unit const* pTarget)
-    {
-        return (m_inLiveSide != IN_LIVE_SIDE(pTarget));
-    }
-
-private:
-    bool m_inLiveSide;
-};
-
 class boss_gothik : public CreatureScript
 {
 public:
@@ -206,6 +193,7 @@ public:
         SummonList summons;
         bool secondPhase{};
         bool gateOpened{};
+        bool lastTeleportDead{};
         uint8 waveCount{};
 
         bool IsInRoom()
@@ -228,6 +216,7 @@ public:
             me->SetReactState(REACT_PASSIVE);
             secondPhase = false;
             gateOpened = false;
+            lastTeleportDead = false;
             waveCount = 0;
             me->NearTeleportTo(2642.139f, -3386.959f, 285.492f, 6.265f);
         }
@@ -366,6 +355,18 @@ public:
             return false;
         }
 
+        void OpenGate()
+        {
+            if (gateOpened)
+                return;
+
+            if (GameObject* go = instance->GetGameObject(DATA_GOTHIK_INNER_GATE))
+                go->SetGoState(GO_STATE_ACTIVE);
+
+            gateOpened = true;
+            Talk(EMOTE_GATE_OPENED);
+        }
+
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (!secondPhase)
@@ -381,6 +382,35 @@ public:
 
             if (!UpdateVictim())
                 return;
+
+            // Safety net: if our victim is on the wrong side, find a
+            // same-side target or open the gate
+            if (secondPhase && me->HasReactState(REACT_AGGRESSIVE) && !gateOpened
+                && !IN_LIVE_SIDE(me) != !IN_LIVE_SIDE(me->GetVictim()))
+            {
+                Map::PlayerList const& pList = me->GetMap()->GetPlayers();
+                Player* newTarget = nullptr;
+                for (auto const& itr : pList)
+                {
+                    Player* player = itr.GetSource();
+                    if (player && player->IsAlive() && !player->IsGameMaster()
+                        && me->IsValidAttackTarget(player)
+                        && IN_LIVE_SIDE(me) == IN_LIVE_SIDE(player))
+                    {
+                        newTarget = player;
+                        break;
+                    }
+                }
+
+                if (newTarget)
+                {
+                    me->GetThreatMgr().ResetAllThreat();
+                    me->GetThreatMgr().AddThreat(newTarget, 1.0f);
+                    AttackStart(newTarget);
+                }
+                else
+                    OpenGate();
+            }
 
             events.Update(diff);
             if (me->HasUnitState(UNIT_STATE_CASTING))
@@ -407,32 +437,29 @@ public:
                     break;
                 case EVENT_TELEPORT:
                 {
+                    if (me->HealthBelowPct(30))
+                        break;
+
+                    me->CastStop();
                     me->AttackStop();
-                    if (IN_LIVE_SIDE(me))
-                        me->CastSpell(me, SPELL_TELEPORT_DEAD, false);
-                    else
-                        me->CastSpell(me, SPELL_TELEPORT_LIVE, false);
+                    me->SetReactState(REACT_PASSIVE);
+                    me->GetThreatMgr().ResetAllThreat();
+                    me->CastSpell(me, lastTeleportDead ? SPELL_TELEPORT_LIVE : SPELL_TELEPORT_DEAD, false);
+                    lastTeleportDead = !lastTeleportDead;
 
-                    // Clear threat from targets not on the same side as Gothik
-                    NotOnSameSide notOnSameSide(me);
-                    for (ThreatReference const* ref : me->GetThreatMgr().GetUnsortedThreatList())
-                        if (notOnSameSide(ref->GetVictim()))
-                            me->GetThreatMgr().ClearThreat(ref->GetVictim());
-
-                    if (Unit* pTarget = SelectTarget(SelectTargetMethod::MaxDistance, 0))
-                    {
-                        me->GetThreatMgr().AddThreat(pTarget, 100.0f);
-                        AttackStart(pTarget);
-                    }
+                    events.CancelEvent(EVENT_SHADOW_BOLT);
+                    events.ScheduleEvent(EVENT_RESUME_ATTACK, 2s);
                     events.Repeat(20s);
                     break;
                 }
+                case EVENT_RESUME_ATTACK:
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    events.ScheduleEvent(EVENT_SHADOW_BOLT, 0s);
+                    return UpdateAI(0);
                 case EVENT_CHECK_HEALTH:
                     if (me->HealthBelowPct(30))
                     {
-                        if (GameObject* go = instance->GetGameObject(DATA_GOTHIK_INNER_GATE))
-                            go->SetGoState(GO_STATE_ACTIVE);
-
+                        OpenGate();
                         events.CancelEvent(EVENT_TELEPORT);
                         break;
                     }
@@ -464,10 +491,7 @@ public:
                 case EVENT_CHECK_PLAYERS:
                     if (!CheckGroupSplitted())
                     {
-                        if (GameObject* go = instance->GetGameObject(DATA_GOTHIK_INNER_GATE))
-                            go->SetGoState(GO_STATE_ACTIVE);
-
-                        gateOpened = true;
+                        OpenGate();
                         summons.DoForAllSummons([&](WorldObject* summon)
                         {
                             if (Creature* gothikMinion = summon->ToCreature())
@@ -481,7 +505,6 @@ public:
                                     }
                                 }
                         });
-                        Talk(EMOTE_GATE_OPENED);
                     }
                     break;
             }
