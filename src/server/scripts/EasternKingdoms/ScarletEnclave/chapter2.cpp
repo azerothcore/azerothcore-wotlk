@@ -92,6 +92,7 @@ public:
             me->m_Events.KillAllEvents(false);
             me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
             me->setActive(false);
+            SetEquipmentSlots(true);
         }
 
         void StartEvent()
@@ -243,6 +244,8 @@ public:
                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
                     Talk(SAY_BREAKOUT2);
                     DoCastSelf(SPELL_ANTI_MAGIC_ZONE);
+                    break;
+                default:
                     break;
             }
         }
