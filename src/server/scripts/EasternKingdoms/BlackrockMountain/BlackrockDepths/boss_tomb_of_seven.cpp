@@ -23,18 +23,7 @@
 
 enum Spells
 {
-    SPELL_SMELT_DARK_IRON                         = 14891,
     SPELL_LEARN_SMELT                             = 14894,
-};
-
-enum Quests
-{
-    QUEST_SPECTRAL_CHALICE                        = 4083
-};
-
-enum Misc
-{
-    DATA_SKILLPOINT_MIN                           = 230
 };
 
 enum Says
@@ -44,57 +33,32 @@ enum Says
 
 enum Gossip
 {
-    GOSSIP_TEXT_CONTINUE                          = 1828, // Continue...
-    GOSSIP_GROOMREL                               = 1945, // Option 1 : Before quest(4083) accepted, option 0 after quest(4083) accepted
-    GOSSIP_DOOMREL_START_COMBAT                   = 1947, // Your bondage is at an end, Doom'rel.  I challenge you!
-    SAY_DOOMREL_HELLO                             = 2601, // Our fate is the doom of all who face the Great Fire.
-    SAY_QUEST_ACCEPTED                            = 2604, // You wish to learn the old craft?  You wish to smelt dark iron?$B$BAppease me, $r.  Show me a sacrifice and I will consider it!
-    SAY_QUEST_COMPLETED                           = 2605, // Your will is strong, and your intent is clear.$B$BPerhaps you are worthy...
-    SAY_QUEST_COMPLETED_END                       = 2606, // You have shown me your desire, and have payed with precious stone.  I will teach you...
+    GOSSIP_GLOOMREL_CONTINUE_SMELT                = 1952,
+    GOSSIP_GLOOMREL_CONTINUE_CHALICE              = 1953,
+    GOSSIP_DOOMREL_CONTINUE                       = 1950,
 };
 
 struct boss_gloomrel : public ScriptedAI
 {
     boss_gloomrel(Creature* creature) : ScriptedAI(creature) { }
 
-    void sGossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
+    void sGossipSelect(Player* player, uint32 menuId, uint32 gossipListId) override
     {
-        ClearGossipMenuFor(player);
-        switch (action)
+        if (gossipListId != 0)
+            return;
+
+        if (menuId == GOSSIP_GLOOMREL_CONTINUE_SMELT)
         {
-            case GOSSIP_ACTION_INFO_DEF+1:
-                AddGossipItemFor(player, GOSSIP_TEXT_CONTINUE, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
-                SendGossipMenuFor(player, SAY_QUEST_COMPLETED_END, me->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF+11:
-                CloseGossipMenuFor(player);
-                player->CastSpell(player, SPELL_LEARN_SMELT, false);
-                break;
-            case GOSSIP_ACTION_INFO_DEF+2:
-                AddGossipItemFor(player, GOSSIP_TEXT_CONTINUE, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 22);
-                SendGossipMenuFor(player, SAY_QUEST_ACCEPTED, me->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF+22:
-                CloseGossipMenuFor(player);
-                if (InstanceScript* instance = me->GetInstanceScript())
-                    //are 5 minutes expected? go template may have data to despawn when used at quest
-                    instance->DoRespawnGameObject(instance->GetGuidData(DATA_GO_CHALICE), MINUTE * 5);
-                break;
+            CloseGossipMenuFor(player);
+            player->CastSpell(player, SPELL_LEARN_SMELT, false);
         }
-    }
-
-    void sGossipHello(Player* player) override
-    {
-        if (player->GetQuestRewardStatus(QUEST_SPECTRAL_CHALICE) == 1 && player->GetSkillValue(SKILL_MINING) >= DATA_SKILLPOINT_MIN && !player->HasSpell(SPELL_SMELT_DARK_IRON))
+        else if (menuId == GOSSIP_GLOOMREL_CONTINUE_CHALICE)
         {
-            AddGossipItemFor(player, GOSSIP_GROOMREL, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            SendGossipMenuFor(player, SAY_QUEST_COMPLETED, me->GetGUID());
+            CloseGossipMenuFor(player);
+            if (InstanceScript* instance = me->GetInstanceScript())
+                //are 5 minutes expected? go template may have data to despawn when used at quest
+                instance->DoRespawnGameObject(instance->GetGuidData(DATA_GO_CHALICE), MINUTE * 5);
         }
-
-        if (player->GetQuestRewardStatus(QUEST_SPECTRAL_CHALICE) == 0 && player->GetSkillValue(SKILL_MINING) >= DATA_SKILLPOINT_MIN)
-            AddGossipItemFor(player, GOSSIP_GROOMREL, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-
-        SendGossipMenuFor(player, player->GetGossipTextId(me), me->GetGUID());
     }
 };
 
@@ -126,30 +90,17 @@ struct boss_doomrel : public ScriptedAI
     EventMap _events;
     bool Voidwalkers;
 
-    void sGossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
+    void sGossipSelect(Player* player, uint32 menuId, uint32 gossipListId) override
     {
-        ClearGossipMenuFor(player);
-        switch (action)
+        if (menuId == GOSSIP_DOOMREL_CONTINUE && gossipListId == 0)
         {
-            case GOSSIP_ACTION_INFO_DEF+1:
-                AddGossipItemFor(player, GOSSIP_TEXT_CONTINUE, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                SendGossipMenuFor(player, SAY_QUEST_COMPLETED, me->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF+2:
-                CloseGossipMenuFor(player);
-                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                // Start encounter
-                if (instance)
-                    instance->SetData(TYPE_TOMB_OF_SEVEN, IN_PROGRESS);
-                Talk(SAY_START_FIGHT);
-                break;
+            CloseGossipMenuFor(player);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+            // Start encounter
+            if (instance)
+                instance->SetData(TYPE_TOMB_OF_SEVEN, IN_PROGRESS);
+            Talk(SAY_START_FIGHT);
         }
-    }
-
-    void sGossipHello(Player* player) override
-    {
-        AddGossipItemFor(player, GOSSIP_DOOMREL_START_COMBAT, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        SendGossipMenuFor(player, SAY_DOOMREL_HELLO, me->GetGUID());
     }
 
     void Reset() override
