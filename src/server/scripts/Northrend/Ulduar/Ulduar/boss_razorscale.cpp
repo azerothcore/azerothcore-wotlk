@@ -181,6 +181,7 @@ struct boss_razorscale : public BossAI
 
     void JustEngagedWith(Unit* who) override
     {
+        me->SetImmuneToPC(false);
         BossAI::JustEngagedWith(who);
         events.ScheduleEvent(EVENT_COMMANDER_SAY_AGGRO, 5s);
         events.ScheduleEvent(EVENT_EE_SAY_MOVE_OUT, 10s);
