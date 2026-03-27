@@ -1,3 +1,4 @@
+-- DB update 2026_03_27_01 -> 2026_03_27_02
 
 -- Change row 3 event from ON_WAYPOINT_REACHED to ON_WAYPOINT_ENDED.
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -129210);
