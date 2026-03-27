@@ -172,21 +172,21 @@ void WaypointMovementGenerator<Creature>::ProcessWaypointArrival(Creature* creat
     // Inform AI
     if (CreatureAI* AI = creature->AI())
     {
-        AI->MovementInform(WAYPOINT_MOTION_TYPE, i_currentNode);
+        AI->MovementInform(WAYPOINT_MOTION_TYPE, waypoint.Id);
         AI->WaypointReached(waypoint.Id, i_path->Id);
     }
 
     if (Unit* owner = creature->GetCharmerOrOwner())
     {
         if (UnitAI* AI = owner->GetAI())
-            AI->SummonMovementInform(creature, WAYPOINT_MOTION_TYPE, i_currentNode);
+            AI->SummonMovementInform(creature, WAYPOINT_MOTION_TYPE, waypoint.Id);
     }
     else
     {
         if (TempSummon* tempSummon = creature->ToTempSummon())
             if (Unit* owner2 = tempSummon->GetSummonerUnit())
                 if (UnitAI* AI = owner2->GetAI())
-                    AI->SummonMovementInform(creature, WAYPOINT_MOTION_TYPE, i_currentNode);
+                    AI->SummonMovementInform(creature, WAYPOINT_MOTION_TYPE, waypoint.Id);
     }
 
     // All hooks called and infos updated. Time to increment the waypoint node id
@@ -391,7 +391,7 @@ bool WaypointMovementGenerator<Creature>::DoUpdate(Creature* creature, uint32 di
 
             if (CreatureAI* AI = creature->AI())
             {
-                AI->MovementInform(WAYPOINT_MOTION_TYPE, i_currentNode);
+                AI->MovementInform(WAYPOINT_MOTION_TYPE, passedWp.Id);
                 AI->WaypointReached(passedWp.Id, i_path->Id);
             }
 
