@@ -78,6 +78,7 @@ struct boss_falric : public BossAI
             me->m_Events.AddEventAtOffset([this]()
             {
                 _startingFight = false;
+                me->SetImmuneToPC(false);
                 me->SetInCombatWithZone();
             }, 8s);
         }
