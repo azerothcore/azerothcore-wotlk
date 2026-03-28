@@ -543,6 +543,7 @@ public:
     bool IsWithinDist3d(const Position* pos, float dist) const;
     [[nodiscard]] bool IsWithinDist2d(float x, float y, float dist) const;
     bool IsWithinDist2d(const Position* pos, float dist) const;
+    virtual bool IsWithinSightRange(Position const& pos, float dist) const;
     // use only if you will sure about placing both object at same map
     bool IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D = true, bool incOwnRadius = true, bool incTargetRadius = true) const;
     bool IsWithinDistInMap(WorldObject const* obj, float dist2compare, bool is3D = true, bool incOwnRadius = true, bool incTargetRadius = true) const;

@@ -161,7 +161,6 @@ struct boss_kalecgos : public BossAI
 
             me->m_Events.AddEventAtOffset([&] {
                 me->SetReactState(REACT_PASSIVE);
-                me->CombatStop();
                 me->RemoveAllAuras();
                 me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 Talk(SAY_EVIL_ENRAGE);

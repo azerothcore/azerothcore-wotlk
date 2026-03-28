@@ -154,7 +154,7 @@ static uint32 copseReclaimDelay[MAX_DEATH_COUNT] = { 30, 60, 120 };
 #ifdef _MSC_VER
 #pragma warning(disable:4355)
 #endif
-Player::Player(WorldSession* session): Unit(), m_mover(this)
+Player::Player(WorldSession* session): Unit(), m_mover(this), _cinematicMgr(*this)
 {
 #ifdef _MSC_VER
 #pragma warning(default:4355)
@@ -395,8 +395,6 @@ Player::Player(WorldSession* session): Unit(), m_mover(this)
 
     m_creationTime = 0s;
 
-    _cinematicMgr = new CinematicMgr(this);
-
     m_achievementMgr = new AchievementMgr(this);
     m_reputationMgr = new ReputationMgr(this);
 
@@ -462,7 +460,6 @@ Player::~Player()
     delete m_runes;
     delete m_achievementMgr;
     delete m_reputationMgr;
-    delete _cinematicMgr;
 
     sWorldSessionMgr->DecreasePlayerCount();
 
@@ -772,7 +769,9 @@ bool Player::IsImmuneToEnvironmentalDamage()
 
 uint32 Player::EnvironmentalDamage(EnviromentalDamage type, uint32 damage)
 {
-    if (IsImmuneToEnvironmentalDamage())
+    // DAMAGE_FALL_TO_VOID bypasses all immunities (e.g. Divine Shield) to prevent
+    // players from being stuck infinitely falling below the map
+    if (type != DAMAGE_FALL_TO_VOID && IsImmuneToEnvironmentalDamage())
         return 0;
 
     // Absorb, resist some environmental damage type
@@ -5688,10 +5687,6 @@ void Player::SendCinematicStart(uint32 CinematicSequenceId) const
     WorldPacket data(SMSG_TRIGGER_CINEMATIC, 4);
     data << uint32(CinematicSequenceId);
     SendDirectMessage(&data);
-    if (CinematicSequencesEntry const* sequence = sCinematicSequencesStore.LookupEntry(CinematicSequenceId))
-    {
-        _cinematicMgr->SetActiveCinematicCamera(sequence->cinematicCamera);
-    }
 }
 
 void Player::SendMovieStart(uint32 MovieId)
@@ -10448,7 +10443,7 @@ void Player::SendTaxiNodeStatusMultiple()
         if (!creature->HasNpcFlag(UNIT_NPC_FLAG_FLIGHTMASTER))
             return;
 
-        uint32 nearestNode = sObjectMgr->GetNearestTaxiNode(creature->GetPositionX(), creature->GetPositionY(), creature->GetPositionZ(), creature->GetMapId(), GetTeamId());
+        uint32 nearestNode = sObjectMgr->GetNearestTaxiNode(*creature, GetTeamId(true));
         if (!nearestNode)
             return;
 
@@ -12506,20 +12501,51 @@ bool Player::HasItemFitToSpellRequirements(SpellInfo const* spellInfo, Item cons
                     if (Item* item = GetUseableItemByPos(INVENTORY_SLOT_BAG_0, i))
                         if (item != ignoreItem && item->IsFitToSpellRequirements(spellInfo))
                             return true;
+
+                // Keep active non-passive auras (e.g. Bladestorm) when disarmed
+                if (!spellInfo->IsPassive())
+                {
+                    bool hasWeaponInSlot = false;
+                    for (uint8 i = EQUIPMENT_SLOT_MAINHAND; i < EQUIPMENT_SLOT_TABARD; ++i)
+                        if (Item* item = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+                            if (item != ignoreItem && item->IsFitToSpellRequirements(spellInfo))
+                            {
+                                hasWeaponInSlot = true;
+                                break;
+                            }
+
+                    if (!hasWeaponInSlot)
+                        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                            if (spellInfo->Effects[i].IsAura())
+                                return true;
+                }
+
                 break;
             }
         case ITEM_CLASS_ARMOR:
             {
+                // most used check: shield only
+                if (spellInfo->EquippedItemSubClassMask & (1 << ITEM_SUBCLASS_ARMOR_SHIELD))
+                {
+                    if (Item* item = GetUseableItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND))
+                        if (item != ignoreItem && item->IsFitToSpellRequirements(spellInfo))
+                            return true;
+
+                    // Keep active non-passive auras (e.g. Shield Wall) when disarmed
+                    Item* offhand = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
+                    if (!spellInfo->IsPassive() && offhand && offhand != ignoreItem)
+                    {
+                        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                            if (spellInfo->Effects[i].IsAura())
+                                return true;
+                    }
+                }
+
                 // tabard not have dependent spells
                 for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_MAINHAND; ++i)
                     if (Item* item = GetUseableItemByPos(INVENTORY_SLOT_BAG_0, i))
                         if (item != ignoreItem && item->IsFitToSpellRequirements(spellInfo))
                             return true;
-
-                // shields can be equipped to offhand slot
-                if (Item* item = GetUseableItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND))
-                    if (item != ignoreItem && item->IsFitToSpellRequirements(spellInfo))
-                        return true;
 
                 // ranged slot can have some armor subclasses
                 if (Item* item = GetUseableItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED))
@@ -13199,6 +13225,14 @@ WorldObject* Player::GetViewpoint() const
     if (ObjectGuid guid = GetGuidValue(PLAYER_FARSIGHT))
         return static_cast<WorldObject*>(ObjectAccessor::GetObjectByTypeMask(*this, guid, TYPEMASK_SEER));
     return nullptr;
+}
+
+Position const& Player::GetSightPosition() const
+{
+    if (_cinematicMgr.IsOnCinematic())
+        return _cinematicMgr.GetRemoteSightPosition();
+
+    return *m_seer;
 }
 
 bool Player::CanUseBattlegroundObject(GameObject* gameobject) const
@@ -16270,7 +16304,10 @@ bool Player::IsWorldObjectOutOfSightRange(WorldObject const* target) const
     }
 
     // Check if out of range
-    return !m_seer->IsWithinDist(target, GetSightRange(target), false);
+    if (!target->IsWithinSightRange(GetSightPosition(), GetSightRange(target)))
+        return true;
+
+    return false;
 }
 
 std::string Player::GetPlayerName()

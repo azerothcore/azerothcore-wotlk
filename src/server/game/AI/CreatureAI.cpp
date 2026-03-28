@@ -198,8 +198,12 @@ void CreatureAI::OnOwnerCombatInteraction(Unit* target)
     if (!target || !me->IsAlive())
         return;
 
+    // Prevent guardian from disengaging from current target
+    if (me->GetVictim() && me->GetVictim()->IsAlive())
+        return;
+
     if (!me->HasReactState(REACT_PASSIVE) && me->CanStartAttack(target, true))
-        me->EngageWithTarget(target);
+        AttackStart(target);
 }
 
 // Distract creature, if player gets too close while stealthed/prowling
@@ -210,6 +214,9 @@ void CreatureAI::TriggerAlert(Unit const* who) const
         return;
     // If this unit isn't an NPC, is already distracted, is in combat, is confused, stunned or fleeing, do nothing
     if (!me->IsCreature() || me->IsEngaged() || me->HasUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_STUNNED | UNIT_STATE_FLEEING | UNIT_STATE_DISTRACTED))
+        return;
+    // If the creature is immune to players, it should not be alerted by them
+    if (me->IsImmuneToPC())
         return;
     // Only alert for hostiles!
     if (me->IsCivilian() || me->HasReactState(REACT_PASSIVE) || !me->IsHostileTo(who) || !me->_IsTargetAcceptable(who))
@@ -236,14 +243,19 @@ void CreatureAI::EnterEvadeMode(EvadeReason why)
     {
         if (Unit* owner = me->GetCharmerOrOwner())
         {
-            me->GetMotionMaster()->Clear(false);
-            me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle(), MOTION_SLOT_ACTIVE);
+            // Owned creatures (pets/guardians) follow their owner — clear evade state
+            // so they can re-enter combat immediately via CanBeginCombat
+            me->ClearUnitState(UNIT_STATE_EVADE);
+            if (!me->IsVehicle()) // vehicles should not follow their owner (passenger)
+            {
+                me->GetMotionMaster()->Clear(false);
+                me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle(), MOTION_SLOT_ACTIVE);
+            }
         }
         else
         {
             // Required to prevent attacking creatures that are evading and cause them to reenter combat
-            // Does not apply to MoveFollow
-            me->AddUnitState(UNIT_STATE_EVADE);
+            // Does not apply to MoveFollow — UNIT_STATE_EVADE is already set from _EnterEvadeMode
             me->GetMotionMaster()->MoveTargetedHome();
         }
     }
@@ -378,8 +390,11 @@ bool CreatureAI::_EnterEvadeMode(EvadeReason /*why*/)
         return false;
     }
 
-    // Set evade state early to prevent recursion when CombatStop triggers JustExitedCombat
-    // This will be cleared in MoveTargetedHome for pets/guardians following their owner
+    // Set evade state early to prevent recursion: CombatStop below purges combat
+    // refs, which triggers JustExitedCombat -> EnterEvadeMode -> _EnterEvadeMode.
+    // The IsInEvadeMode() check above will catch it.
+    // EnterEvadeMode will clear this for owned creatures (pets/guardians) that
+    // use MoveFollow instead of MoveTargetedHome.
     me->AddUnitState(UNIT_STATE_EVADE);
 
     // don't remove vehicle auras, passengers aren't supposed to drop off the vehicle

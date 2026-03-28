@@ -1393,7 +1393,8 @@ public:
     [[nodiscard]] TradeData* GetTradeData() const { return m_trade; }
     void TradeCancel(bool sendback, TradeStatus status = TRADE_STATUS_TRADE_CANCELED);
 
-    CinematicMgr* GetCinematicMgr() const { return _cinematicMgr; }
+    CinematicMgr& GetCinematicMgr() { return _cinematicMgr; }
+    CinematicMgr const& GetCinematicMgr() const { return _cinematicMgr; }
 
     void UpdateEnchantTime(uint32 time);
     void UpdateSoulboundTradeItems();
@@ -2384,6 +2385,7 @@ public:
     WorldObject* GetSeer() const { return m_seer; }
     void SetViewpoint(WorldObject* target, bool apply);
     [[nodiscard]] WorldObject* GetViewpoint() const;
+    Position const& GetSightPosition() const;
     void StopCastingCharm(Aura* except = nullptr);
     void StopCastingBindSight(Aura* except = nullptr);
 
@@ -2978,7 +2980,7 @@ private:
     Item* _StoreItem(uint16 pos, Item* pItem, uint32 count, bool clone, bool update);
     Item* _LoadItem(CharacterDatabaseTransaction trans, uint32 zoneId, uint32 timeDiff, Field* fields);
 
-    CinematicMgr* _cinematicMgr;
+    CinematicMgr _cinematicMgr;
 
     typedef GuidSet RefundableItemsSet;
     RefundableItemsSet m_refundableItems;

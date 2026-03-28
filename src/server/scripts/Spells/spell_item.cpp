@@ -17,7 +17,6 @@
 
 #include "AreaDefines.h"
 #include "Battleground.h"
-#include "CreatureScript.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
 #include "Player.h"
@@ -3565,6 +3564,24 @@ class spell_item_rocket_boots : public SpellScript
     }
 };
 
+// 55001 - Flexweave Underlay (Parachute)
+class spell_item_flexweave_underlay : public SpellScript
+{
+    PrepareSpellScript(spell_item_flexweave_underlay);
+
+    SpellCastResult CheckCast()
+    {
+        if (GetCaster()->IsFlying() || GetCaster()->IsFalling())
+            return SPELL_CAST_OK;
+        return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_item_flexweave_underlay::CheckCast);
+    }
+};
+
 class spell_item_healing_injector : public SpellScript
 {
     PrepareSpellScript(spell_item_healing_injector);
@@ -6327,6 +6344,7 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_deathbringers_will_normal);
     RegisterSpellScript(spell_item_deathbringers_will_heroic);
     RegisterSpellScript(spell_item_discerning_eye_beast_dummy);
+    RegisterSpellScript(spell_item_flexweave_underlay);
     RegisterSpellScript(spell_item_frozen_shadoweave);
     RegisterSpellScript(spell_item_healing_touch_refund);
     RegisterSpellScript(spell_item_heartpierce);

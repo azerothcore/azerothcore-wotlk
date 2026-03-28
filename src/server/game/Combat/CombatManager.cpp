@@ -427,6 +427,9 @@ bool CombatManager::UpdateOwnerCombatState() const
         _owner->AtExitCombat();
         if (!_owner->IsCreature())
             _owner->AtDisengage();
+
+        if (Player* player = _owner->ToPlayer())
+            sScriptMgr->OnPlayerLeaveCombat(player);
     }
 
     if (Unit* master = _owner->GetCharmerOrOwner())

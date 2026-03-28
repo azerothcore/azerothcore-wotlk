@@ -552,7 +552,7 @@ void Aura::UpdateTargetMap(Unit* caster, bool apply)
             if (IsArea())
                 for (uint8 effIndex = 0; effIndex < MAX_SPELL_EFFECTS; ++effIndex)
                 {
-                    if ((existing->second & (1 << effIndex)) && existing->first->IsImmunedToSpellEffect(GetSpellInfo(), effIndex))
+                    if ((existing->second & (1 << effIndex)) && existing->first->IsImmunedToSpellEffect(GetSpellInfo(), effIndex, GetCaster()))
                         existing->second &= ~(1 << effIndex);
                 }
 
@@ -594,7 +594,7 @@ void Aura::UpdateTargetMap(Unit* caster, bool apply)
         // check target immunities
         for (uint8 effIndex = 0; effIndex < MAX_SPELL_EFFECTS; ++effIndex)
         {
-            if ((itr->second & (1 << effIndex)) && itr->first->IsImmunedToSpellEffect(GetSpellInfo(), effIndex))
+            if ((itr->second & (1 << effIndex)) && itr->first->IsImmunedToSpellEffect(GetSpellInfo(), effIndex, GetCaster()))
                 itr->second &= ~(1 << effIndex);
         }
         if (!itr->second || itr->first->IsImmunedToSpell(GetSpellInfo()) || !CanBeAppliedOn(itr->first))
@@ -2822,7 +2822,7 @@ void UnitAura::FillTargetMap(std::map<Unit*, uint8>& targets, Unit* caster)
         {
             float radius = GetSpellInfo()->Effects[effIndex].CalcRadius(caster);
 
-            if (!GetUnitOwner()->HasUnitState(UNIT_STATE_ISOLATED))
+            if (!GetUnitOwner()->HasAuraState(AURA_STATE_BANISHED, GetSpellInfo(), caster))
             {
                 switch (GetSpellInfo()->Effects[effIndex].Effect)
                 {

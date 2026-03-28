@@ -17,7 +17,6 @@
 
 #include "Cell.h"
 #include "CellImpl.h"
-#include "CreatureScript.h"
 #include "GridNotifiers.h"
 #include "Pet.h"
 #include "SpellAuraEffects.h"

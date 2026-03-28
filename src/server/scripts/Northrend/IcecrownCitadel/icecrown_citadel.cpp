@@ -791,6 +791,7 @@ public:
             }
         }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 waypointId) override
         {
             switch (waypointId)
@@ -3592,7 +3593,7 @@ public:
     bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
-            if (instance->GetBossState(DATA_SINDRAGOSA_GAUNTLET) == NOT_STARTED && !player->IsGameMaster())
+            if (instance->GetBossState(DATA_SINDRAGOSA_GAUNTLET) == NOT_STARTED)
                 if (Creature* gauntlet = ObjectAccessor::GetCreature(*player, instance->GetGuidData(NPC_SINDRAGOSA_GAUNTLET)))
                     gauntlet->AI()->DoAction(ACTION_START_GAUNTLET);
         return true;
@@ -3607,7 +3608,7 @@ public:
     bool OnTrigger(Player* player, AreaTrigger const* /*areaTrigger*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
-            if (instance->GetData(DATA_PUTRICIDE_TRAP_STATE) == NOT_STARTED && !player->IsGameMaster())
+            if (instance->GetData(DATA_PUTRICIDE_TRAP_STATE) == NOT_STARTED)
                 if (Creature* trap = ObjectAccessor::GetCreature(*player, instance->GetGuidData(NPC_PUTRICADES_TRAP)))
                     trap->AI()->DoAction(ACTION_START_GAUNTLET);
         return true;

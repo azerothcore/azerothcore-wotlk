@@ -187,7 +187,7 @@ const Position homePos = {322.39f, -14.5f, 409.8f, 3.14f};
 
 struct boss_flame_leviathan : public BossAI
 {
-    boss_flame_leviathan(Creature* pCreature) : BossAI(pCreature, BOSS_LEVIATHAN), vehicle(me->GetVehicleKit())
+    boss_flame_leviathan(Creature* creature) : BossAI(creature, BOSS_LEVIATHAN), vehicle(me->GetVehicleKit())
     {
         assert(vehicle);
     }
@@ -214,7 +214,7 @@ struct boss_flame_leviathan : public BossAI
     {
         _JustReachedHome();
         // For achievement
-        instance->SetData(DATA_UNBROKEN_ACHIEVEMENT, 0);
+        instance->StorePersistentData(PERSISTENT_DATA_UNBROKEN, 0);
         me->setActive(false);
     }
 
@@ -974,6 +974,7 @@ struct npc_mimirons_inferno : public npc_escortAI
 
     void AttackStart(Unit*) override { }
     void MoveInLineOfSight(Unit*) override { }
+    using CreatureAI::WaypointReached;
     void WaypointReached(uint32 /*waypointId*/) override { }
 
     void DoAction(int32 param) override
@@ -1238,7 +1239,7 @@ class spell_auto_repair : public SpellScript
 
         // Achievement
         if (InstanceScript* instance = vehicle->GetBase()->GetInstanceScript())
-            instance->SetData(DATA_UNBROKEN_ACHIEVEMENT, 0);
+            instance->StorePersistentData(PERSISTENT_DATA_UNBROKEN, 0);
     }
 
     void Register() override
@@ -1716,10 +1717,9 @@ public:
 
     bool OnCheck(Player* player, Unit*, uint32 /*criteria_id*/) override
     {
-        if (player->GetInstanceScript())
-            if (player->GetInstanceScript()->GetData(DATA_UNBROKEN_ACHIEVEMENT))
-                return true;
-        return false;
+        InstanceScript* instance = player->GetInstanceScript();
+        return instance
+            && instance->GetPersistentData(PERSISTENT_DATA_UNBROKEN);
     }
 };
 

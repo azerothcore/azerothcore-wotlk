@@ -53,12 +53,7 @@ enum Actions
 struct boss_kelidan_the_breaker : public BossAI
 {
     boss_kelidan_the_breaker(Creature* creature) : BossAI(creature, DATA_KELIDAN)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    {    }
 
     void Reset() override
     {

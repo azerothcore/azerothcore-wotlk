@@ -77,8 +77,6 @@ bool BattlefieldWG::SetupBattlefield()
 
     Data32.resize(BATTLEFIELD_WG_DATA_MAX);
 
-    SaveTimer = 60000;
-
     // Init Graveyards
     SetGraveyardNumber(BATTLEFIELD_WG_GRAVEYARD_MAX);
 
@@ -189,37 +187,31 @@ bool BattlefieldWG::SetupBattlefield()
     }
 
     UpdateCounterVehicle(true);
+
+    // Schedule always-running periodic timers
+    _scheduler.Schedule(Milliseconds(RESURRECTION_INTERVAL),
+        BATTLEFIELD_TIMER_GROUP_RESURRECT, [this](TaskContext context)
+    {
+        for (BfGraveyard* gy : GraveyardList)
+            if (gy)
+                gy->Resurrect();
+        context.Repeat();
+    });
+
+    _scheduler.Schedule(60s, BATTLEFIELD_TIMER_GROUP_SAVE, [this](TaskContext context)
+    {
+        sWorldState->setWorldState(WORLD_STATE_BATTLEFIELD_WG_ACTIVE, Active);
+        sWorldState->setWorldState(WORLD_STATE_BATTLEFIELD_WG_DEFENDER, DefenderTeam);
+        sWorldState->setWorldState(ClockWorldState[0], Timer);
+        context.Repeat();
+    });
+
     return true;
 }
 
 bool BattlefieldWG::Update(uint32 diff)
 {
-    bool result = Battlefield::Update(diff);
-    if (SaveTimer <= diff)
-    {
-        sWorldState->setWorldState(WORLD_STATE_BATTLEFIELD_WG_ACTIVE, Active);
-        sWorldState->setWorldState(WORLD_STATE_BATTLEFIELD_WG_DEFENDER, DefenderTeam);
-        sWorldState->setWorldState(ClockWorldState[0], Timer);
-        SaveTimer = 60 * IN_MILLISECONDS;
-    }
-    else
-        SaveTimer -= diff;
-
-    // Update Tenacity
-    if (IsWarTime())
-    {
-        if (TenacityUpdateTimer <= diff)
-        {
-            TenacityUpdateTimer = 10000;
-            if (!UpdateTenacityList.empty())
-                UpdateTenacity();
-            UpdateTenacityList.clear();
-        }
-        else
-            TenacityUpdateTimer -= diff;
-    }
-
-    return result;
+    return Battlefield::Update(diff);
 }
 
 void BattlefieldWG::OnBattleStart()
@@ -293,7 +285,14 @@ void BattlefieldWG::OnBattleStart()
 
     // Xinef: reset tenacity counter
     TenacityStack = 0;
-    TenacityUpdateTimer = 20000;
+
+    _scheduler.Schedule(20s, BATTLEFIELD_TIMER_GROUP_WAR, [this](TaskContext context)
+    {
+        if (!UpdateTenacityList.empty())
+            UpdateTenacity();
+        UpdateTenacityList.clear();
+        context.Repeat(10s);
+    });
 
     if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE))
         ChatHandler(nullptr).SendWorldText(BATTLEFIELD_WG_WORLD_START_MESSAGE);

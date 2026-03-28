@@ -1384,7 +1384,7 @@ namespace Acore
         AnyPlayerExactPositionInGameObjectRangeCheck(GameObject const* go, float range) : _go(go), _range(range) {}
         bool operator()(Player* u)
         {
-            if (!_go->IsInRange(u->GetPositionX(), u->GetPositionY(), u->GetPositionZ(), _range))
+            if (!_go->IsInRange3d(u->GetPositionX(), u->GetPositionY(), u->GetPositionZ(), _range))
                 return false;
 
             return true;
@@ -1604,7 +1604,7 @@ namespace Acore
         bool operator() (GameObject* go)
         {
             if (!entry || (go->GetGOInfo() && go->GetGOInfo()->entry == entry))
-                return go->IsInRange(x, y, z, range);
+                return go->IsInRange3d(x, y, z, range);
             else return false;
         }
     private:

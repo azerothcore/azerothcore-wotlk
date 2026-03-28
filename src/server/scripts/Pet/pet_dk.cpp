@@ -70,6 +70,25 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
         }
     }
 
+    void JustExitedCombat() override
+    {
+        EngagementOver();
+    }
+
+    void EnterEvadeMode(EvadeReason /*why*/) override
+    {
+        if (!_EnterEvadeMode())
+            return;
+
+        me->ClearUnitState(UNIT_STATE_EVADE);
+
+        if (Unit* owner = me->GetOwner())
+        {
+            me->GetMotionMaster()->Clear(false);
+            me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle(), MOTION_SLOT_ACTIVE);
+        }
+    }
+
     void InitializeAI() override
     {
         ScriptedAI::InitializeAI();
@@ -306,6 +325,8 @@ struct npc_pet_dk_army_of_the_dead : public AggressorAI
 {
     npc_pet_dk_army_of_the_dead(Creature* creature) : AggressorAI(creature) { }
 
+    // Restrict MoveInLineOfSight aggro to targets already fighting our owner,
+    // so ghouls don't pull extra packs on their own.
     bool CanAIAttack(Unit const* target) const override
     {
         if (!target)
@@ -314,6 +335,26 @@ struct npc_pet_dk_army_of_the_dead : public AggressorAI
         if (owner && !target->IsInCombatWith(owner))
             return false;
         return AggressorAI::CanAIAttack(target);
+    }
+
+    // Owner started attacking a target — engage immediately.
+    // We bypass OnOwnerCombatInteraction because CanStartAttack -> CanAIAttack
+    // may reject the target before combat refs are established.
+    void OwnerAttacked(Unit* target) override
+    {
+        if (!target || !me->IsAlive() || me->HasReactState(REACT_PASSIVE))
+            return;
+        if (me->IsValidAttackTarget(target))
+            AttackStart(target);
+    }
+
+    // Owner was attacked — help defend.
+    void OwnerAttackedBy(Unit* attacker) override
+    {
+        if (!attacker || !me->IsAlive() || me->HasReactState(REACT_PASSIVE))
+            return;
+        if (me->IsValidAttackTarget(attacker))
+            AttackStart(attacker);
     }
 };
 

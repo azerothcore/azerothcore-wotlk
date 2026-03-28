@@ -28,7 +28,6 @@
 #include "CommandScript.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "MMapFactory.h"
 #include "MMapMgr.h"
 #include "Map.h"
 #include "PathGenerator.h"
@@ -62,7 +61,8 @@ public:
 
     static bool HandleMmapPathCommand(ChatHandler* handler, Optional<std::string> param)
     {
-        if (!MMAP::MMapFactory::createOrGetMMapMgr()->GetNavMesh(handler->GetSession()->GetPlayer()->GetMapId()))
+        Map* map = handler->GetSession()->GetPlayer()->GetMap();
+        if (!map->GetMapCollisionData().GetMMapData().GetNavMesh())
         {
             handler->PSendSysMessage("NavMesh not loaded for current map.");
             return true;
@@ -173,9 +173,11 @@ public:
 
         handler->PSendSysMessage("gridloc [{}, {}]", gridCoord.x_coord, gridCoord.y_coord);
 
+        Map* map = handler->GetSession()->GetPlayer()->GetMap();
+
         // calculate navmesh tile location
-        dtNavMesh const* navmesh = MMAP::MMapFactory::createOrGetMMapMgr()->GetNavMesh(handler->GetSession()->GetPlayer()->GetMapId());
-        dtNavMeshQuery const* navmeshquery = MMAP::MMapFactory::createOrGetMMapMgr()->GetNavMeshQuery(handler->GetSession()->GetPlayer()->GetMapId(), player->GetInstanceId());
+        dtNavMesh const* navmesh = map->GetMapCollisionData().GetMMapData().GetNavMesh();
+        dtNavMeshQuery const* navmeshquery = map->GetMapCollisionData().GetMMapData().GetNavMeshQuery();
         if (!navmesh || !navmeshquery)
         {
             handler->PSendSysMessage("NavMesh not loaded for current map.");
@@ -225,9 +227,9 @@ public:
 
     static bool HandleMmapLoadedTilesCommand(ChatHandler* handler)
     {
-        uint32 mapid = handler->GetSession()->GetPlayer()->GetMapId();
-        dtNavMesh const* navmesh = MMAP::MMapFactory::createOrGetMMapMgr()->GetNavMesh(mapid);
-        dtNavMeshQuery const* navmeshquery = MMAP::MMapFactory::createOrGetMMapMgr()->GetNavMeshQuery(mapid, handler->GetSession()->GetPlayer()->GetInstanceId());
+        Map* map = handler->GetSession()->GetPlayer()->GetMap();
+        dtNavMesh const* navmesh = map->GetMapCollisionData().GetMMapData().GetNavMesh();
+        dtNavMeshQuery const* navmeshquery = map->GetMapCollisionData().GetMMapData().GetNavMeshQuery();
         if (!navmesh || !navmeshquery)
         {
             handler->PSendSysMessage("NavMesh not loaded for current map.");
@@ -250,12 +252,14 @@ public:
 
     static bool HandleMmapStatsCommand(ChatHandler* handler)
     {
-        handler->PSendSysMessage("mmap stats:");
-        //handler->PSendSysMessage("  global mmap pathfinding is {}abled", sDisableMgr->IsPathfindingEnabled(mapId) ? "en" : "dis");
-        MMAP::MMapMgr* manager = MMAP::MMapFactory::createOrGetMMapMgr();
-        handler->PSendSysMessage(" {} maps loaded with {} tiles overall", manager->getLoadedMapsCount(), manager->getLoadedTilesCount());
+        Map* map = handler->GetSession()->GetPlayer()->GetMap();
 
-        dtNavMesh const* navmesh = manager->GetNavMesh(handler->GetSession()->GetPlayer()->GetMapId());
+        //handler->PSendSysMessage("mmap stats:");
+        //handler->PSendSysMessage("  global mmap pathfinding is {}abled", sDisableMgr->IsPathfindingEnabled(mapId) ? "en" : "dis");
+        //MMAP::MMapMgr* manager = MMAP::MMapFactory::createOrGetMMapMgr();
+        //handler->PSendSysMessage(" {} maps loaded with {} tiles overall", manager->getLoadedMapsCount(), manager->getLoadedTilesCount());
+
+        dtNavMesh const* navmesh = map->GetMapCollisionData().GetMMapData().GetNavMesh();
         if (!navmesh)
         {
             handler->PSendSysMessage("NavMesh not loaded for current map.");

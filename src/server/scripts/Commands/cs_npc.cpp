@@ -655,8 +655,17 @@ public:
         CreatureTemplate const* cInfo = target->GetCreatureTemplate();
         uint32 faction = target->GetFaction();
         uint32 npcflags = target->GetNpcFlags();
-        uint32 mechanicImmuneMask = cInfo->MechanicImmuneMask;
-        uint32 spellSchoolImmuneMask = cInfo->SpellSchoolImmuneMask;
+        uint64 mechanicImmuneMask = 0;
+        uint32 spellSchoolImmuneMask = 0;
+
+        if (CreatureImmunities const* immunities = sSpellMgr->GetCreatureImmunities(cInfo->CreatureImmunitiesId))
+        {
+            mechanicImmuneMask = immunities->Mechanic.to_ullong();
+            for (std::size_t j = 0; j < immunities->School.size(); ++j)
+                if (immunities->School[j])
+                    spellSchoolImmuneMask |= (1u << j);
+        }
+
         uint32 displayid = target->GetDisplayId();
         uint32 nativeid = target->GetNativeDisplayId();
         uint32 entry = target->GetEntry();
@@ -673,6 +682,7 @@ public:
         int64 curRespawnDelay = target->GetRespawnTimeEx() - GameTime::GetGameTime().count();
         if (curRespawnDelay < 0)
             curRespawnDelay = 0;
+
         std::string curRespawnDelayStr = secsToTimeString(uint64(curRespawnDelay), true);
         std::string defRespawnDelayStr = secsToTimeString(target->GetRespawnDelay(), true);
 
@@ -689,31 +699,19 @@ public:
         handler->PSendSysMessage(LANG_NPCINFO_POSITION, float(target->GetPositionX()), float(target->GetPositionY()), float(target->GetPositionZ()));
         handler->PSendSysMessage(LANG_NPCINFO_AIINFO, target->GetAIName(), target->GetScriptName());
 
-        for (uint8 i = 0; i < NPCFLAG_COUNT; i++)
-        {
-            if (npcflags & npcFlagTexts[i].flag)
-            {
-                handler->PSendSysMessage(npcFlagTexts[i].text, npcFlagTexts[i].flag);
-            }
-        }
+        for (auto npcFlagText : npcFlagTexts)
+            if (npcflags & npcFlagText.flag)
+                handler->PSendSysMessage(npcFlagText.text, npcFlagText.flag);
 
-        handler->PSendSysMessage(LANG_NPCINFO_MECHANIC_IMMUNE, mechanicImmuneMask);
+        handler->PSendSysMessage(LANG_NPCINFO_MECHANIC_IMMUNE, Acore::StringFormat("0x{:X}", mechanicImmuneMask).c_str());
         for (uint8 i = 1; i < MAX_MECHANIC; ++i)
-        {
-            if (mechanicImmuneMask & (1 << (mechanicImmunes[i].flag - 1)))
-            {
+            if (mechanicImmuneMask & (UI64LIT(1) << i))
                 handler->PSendSysMessage(mechanicImmunes[i].text, mechanicImmunes[i].flag);
-            }
-        }
 
         handler->PSendSysMessage(LANG_NPCINFO_SPELL_SCHOOL_IMMUNE, spellSchoolImmuneMask);
-        for (uint8 i = 0; i < MAX_SPELL_SCHOOL; ++i)
-        {
-            if (spellSchoolImmuneMask & (1 << spellSchoolImmunes[i].flag))
-            {
-                handler->PSendSysMessage(spellSchoolImmunes[i].text, spellSchoolImmunes[i].flag);
-            }
-        }
+        for (auto spellSchoolImmune : spellSchoolImmunes)
+            if (spellSchoolImmuneMask & (1 << spellSchoolImmune.flag))
+                handler->PSendSysMessage(spellSchoolImmune.text, spellSchoolImmune.flag);
 
         return true;
     }
