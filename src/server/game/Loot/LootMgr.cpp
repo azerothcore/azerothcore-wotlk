@@ -561,7 +561,7 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
         if (hasQuestItems)
             for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
                 if (Player* player = itr->GetSource())
-                    if (PlayerQuestItems.contains(player->GetGUID()))
+                    if (!PlayerQuestItems.contains(player->GetGUID()))
                         FillQuestLoot(player);
 
         for (auto& item : items)
@@ -580,16 +580,13 @@ void Loot::FillNotNormalLootFor(Player* player)
 {
     ObjectGuid playerGuid = player->GetGUID();
 
-    QuestItemMap::const_iterator qmapitr = PlayerQuestItems.find(playerGuid);
-    if (qmapitr == PlayerQuestItems.end())
+    if (!PlayerQuestItems.contains(playerGuid))
         FillQuestLoot(player);
 
-    qmapitr = PlayerFFAItems.find(playerGuid);
-    if (qmapitr == PlayerFFAItems.end())
+    if (!PlayerNonQuestNonFFAConditionalItems.contains(playerGuid))
         FillFFALoot(player);
 
-    qmapitr = PlayerNonQuestNonFFAConditionalItems.find(playerGuid);
-    if (qmapitr == PlayerNonQuestNonFFAConditionalItems.end())
+    if (!PlayerNonQuestNonFFAConditionalItems.contains(playerGuid))
         FillNonQuestNonFFAConditionalLoot(player);
 
     // Process currency items
@@ -622,7 +619,7 @@ QuestItemList* Loot::FillFFALoot(Player* player)
         LootItem& item = items[i];
         if (!item.is_looted && item.freeforall && item.AllowedForPlayer(player, containerGUID))
         {
-            ql->push_back(QuestItem(i));
+            ql->emplace_back(i);
             ++unlootedCount;
         }
     }
@@ -656,7 +653,7 @@ QuestItemList* Loot::FillQuestLoot(Player* player)
         if (!allowed && !isMasterLooter)
             continue;
 
-        ql->push_back(QuestItem(i));
+        ql->emplace_back(i);
 
         // Only add "allowed looter" if you are actually allowed to loot.
         if (allowed)
@@ -702,7 +699,7 @@ QuestItemList* Loot::FillNonQuestNonFFAConditionalLoot(Player* player)
 
             if (!item.conditions.empty())
             {
-                ql->push_back(QuestItem(i));
+                ql->emplace_back(i);
                 if (!item.is_counted)
                 {
                     ++unlootedCount;
