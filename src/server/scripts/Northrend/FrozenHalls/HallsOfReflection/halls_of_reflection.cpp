@@ -1499,7 +1499,6 @@ enum eFightEvents
     EVENT_LK_SUMMON_LA,
     EVENT_LK_SUMMON_NEXT_ICE_WALL,
     EVENT_SAY_OPENING,
-    EVENT_DECREASE_REQ_COUNT_BY_100,
 };
 
 struct npc_hor_lich_king : public NullCreatureAI
@@ -1515,13 +1514,14 @@ struct npc_hor_lich_king : public NullCreatureAI
     EventMap events;
     SummonList summons;
     uint8 currentWall;
-    uint8 reqKillCount;
+    uint8 summonsCount;
     uint8 div2;
 
     void Reset() override
     {
         currentWall = 0;
-        reqKillCount = 0;
+        summonsCount = 0;
+        div2 = 0;
         events.Reset();
         events.RescheduleEvent(EVENT_LK_CHECK_COMBAT, 1s);
     }
@@ -1529,24 +1529,21 @@ struct npc_hor_lich_king : public NullCreatureAI
     {
         if (action == ACTION_START_LK_FIGHT_REAL)
             events.ScheduleEvent(EVENT_LK_START_FOLLOWING, 1500ms);
-        else if ((action == ACTION_INFORM_TRASH_DIED && reqKillCount) || action == ACTION_CHECK_TRASH_DIED)
+    }
+
+    void WallCompleted()
+    {
+        ++currentWall;
+        instance->SetData(ACTION_DELETE_ICE_WALL, 1);
+        if (currentWall <= 3)
         {
-            if ((action == ACTION_CHECK_TRASH_DIED && reqKillCount == 0) || (action == ACTION_INFORM_TRASH_DIED && (--reqKillCount) == 0))
-            {
-                events.CancelEvent(EVENT_DECREASE_REQ_COUNT_BY_100); // just in case, magic happens sometimes
-                ++currentWall;
-                instance->SetData(ACTION_DELETE_ICE_WALL, 1);
-                if (currentWall <= 3)
-                {
-                    events.ScheduleEvent(EVENT_LK_SUMMON_NEXT_ICE_WALL, 1s);
-                    events.ScheduleEvent(EVENT_LK_SUMMON, currentWall == 3 ? 11s : 7500ms);
-                }
-                else
-                    me->RemoveAura(SPELL_REMORSELESS_WINTER);
-                if (Creature* c = instance->GetCreature(NPC_SYLVANAS_PART2))
-                    c->AI()->DoAction(ACTION_INFORM_WALL_DESTROYED);
-            }
+            events.ScheduleEvent(EVENT_LK_SUMMON_NEXT_ICE_WALL, 1s);
+            events.ScheduleEvent(EVENT_LK_SUMMON, currentWall == 3 ? 11s : 7500ms);
         }
+        else
+            me->RemoveAura(SPELL_REMORSELESS_WINTER);
+        if (Creature* c = instance->GetCreature(NPC_SYLVANAS_PART2))
+            c->AI()->DoAction(ACTION_INFORM_WALL_DESTROYED);
     }
 
     void MovementInform(uint32 type, uint32  /*id*/) override
@@ -1569,17 +1566,14 @@ struct npc_hor_lich_king : public NullCreatureAI
             else if (currentWall == 4)
             {
                 Talk(SAY_LK_NOWHERE_TO_RUN);
-                instance->SetData(DATA_LICH_KING, DONE);
+                instance->SetBossState(DATA_LICH_KING, DONE);
             }
         }
     }
 
     void JustSummoned(Creature* s) override
     {
-
-        ++reqKillCount;
-        if (events.HasTimeUntilEvent(EVENT_DECREASE_REQ_COUNT_BY_100))
-            events.RescheduleEvent(EVENT_DECREASE_REQ_COUNT_BY_100, 10s);
+        ++summonsCount;
         summons.Summon(s);
         s->SetHomePosition(PathWaypoints[WP_STOP[currentWall + 1]]);
         s->GetMotionMaster()->MovePoint(0, PathWaypoints[WP_STOP[currentWall + 1]]);
@@ -1590,6 +1584,14 @@ struct npc_hor_lich_king : public NullCreatureAI
             s->AI()->AttackStart(target);
         }
         s->SetHomePosition(PathWaypoints[WP_STOP[currentWall + 1]]);
+    }
+
+    void SummonedCreatureDies(Creature* /*summon*/, Unit* /*killer*/) override
+    {
+        if (!summonsCount)
+            return;
+        if (--summonsCount == 0)
+            WallCompleted();
     }
 
     void SummonedCreatureDespawn(Creature* s) override
@@ -1623,7 +1625,7 @@ struct npc_hor_lich_king : public NullCreatureAI
                         {
                             me->GetMotionMaster()->MovementExpired();
                             me->StopMoving();
-                            reqKillCount = 255;
+                            summonsCount = 255;
                             leader->InterruptNonMeleeSpells(true);
                             me->CastSpell(leader, SPELL_HARVEST_SOUL);
                             events.ScheduleEvent(EVENT_LK_KILL_LEADER, 3s);
@@ -1720,15 +1722,6 @@ struct npc_hor_lich_king : public NullCreatureAI
                         events.ScheduleEvent(EVENT_LK_SUMMON_LA, 17s + 700ms);
                         break;
                 }
-                if (currentWall <= 3)
-                {
-                    reqKillCount = 100;
-                    events.RescheduleEvent(EVENT_DECREASE_REQ_COUNT_BY_100, 10s);
-                }
-                break;
-            case EVENT_DECREASE_REQ_COUNT_BY_100:
-                reqKillCount = (reqKillCount <= 100 ? 0 : reqKillCount - 100);
-                DoAction(ACTION_CHECK_TRASH_DIED);
                 break;
             case EVENT_LK_SUMMON_GHOULS:
                 DoCastAOE(SPELL_SUMMON_RAGING_GHOULS);
@@ -2003,9 +1996,6 @@ struct npc_hor_raging_ghoul : public ScriptedAI
     void JustDied(Unit* /*killer*/) override
     {
         me->SetCorpseDelay(10);
-        if (InstanceScript* instance = me->GetInstanceScript())
-            if (Creature* lichKing = instance->GetCreature(NPC_LICH_KING_BOSS))
-                lichKing->AI()->DoAction(ACTION_INFORM_TRASH_DIED);
     }
 };
 
@@ -2059,9 +2049,6 @@ struct npc_hor_risen_witch_doctor : public ScriptedAI
     void JustDied(Unit* /*killer*/) override
     {
         me->SetCorpseDelay(10);
-        if (InstanceScript* instance = me->GetInstanceScript())
-            if (Creature* lichKing = instance->GetCreature(NPC_LICH_KING_BOSS))
-                lichKing->AI()->DoAction(ACTION_INFORM_TRASH_DIED);
     }
 };
 
@@ -2110,9 +2097,6 @@ struct npc_hor_lumbering_abomination : public ScriptedAI
     void JustDied(Unit* /*killer*/) override
     {
         me->SetCorpseDelay(10);
-        if (InstanceScript* instance = me->GetInstanceScript())
-            if (Creature* lichKing = instance->GetCreature(NPC_LICH_KING_BOSS))
-                lichKing->AI()->DoAction(ACTION_INFORM_TRASH_DIED);
     }
 };
 

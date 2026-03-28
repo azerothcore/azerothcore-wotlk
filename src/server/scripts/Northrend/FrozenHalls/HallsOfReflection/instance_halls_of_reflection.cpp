@@ -468,6 +468,7 @@ public:
                     leader->AI()->DoAction(ACTION_START_INTRO);
                 break;
             case ACTION_START_LK_FIGHT:
+                SetBossState(DATA_LICH_KING, IN_PROGRESS);
                 _isLichKingFightActive = true;
                 DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_RETREATING_TIMED_EVENT);
                 DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_RETREATING_TIMED_EVENT);
@@ -516,14 +517,12 @@ public:
                     lichKing->SetSpeed(MOVE_RUN, lichKing->GetCreatureTemplate()->speed_run);
                 }
                 _isLichKingFightActive = false;
+                SetBossState(DATA_LICH_KING, FAIL);
                 _outroTimer = 0;
                 _outroStep = 0;
                 [[fallthrough]];
             case ACTION_DELETE_ICE_WALL:
                 HandleGameObject(GO_ICE_WALL, true);
-                break;
-            case DATA_LICH_KING:
-                SetBossState(DATA_LICH_KING, static_cast<EncounterState>(data));
                 break;
             case DATA_BATTERED_HILT:
             {
