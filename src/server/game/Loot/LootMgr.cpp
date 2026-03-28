@@ -546,27 +546,28 @@ bool Loot::FillLoot(uint32 lootId, LootStore const& store, Player* lootOwner, bo
 
     // Setting access rights for group loot case
     Group* group = lootOwner->GetGroup();
+    bool hasQuestItems = !quest_items.empty();
     if (!personal && group)
     {
         roundRobinPlayer = lootOwner->GetGUID();
 
         for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
-        {
             if (Player* player = itr->GetSource()) // should actually be looted object instead of lootOwner but looter has to be really close so doesnt really matter
-            {
                 if (player->IsAtLootRewardDistance(lootSource ? lootSource : lootOwner))
-                {
                     FillNotNormalLootFor(player);
-                }
-            }
-        }
 
-        for (uint8 i = 0; i < items.size(); ++i)
-        {
-            if (ItemTemplate const* proto = sObjectMgr->GetItemTemplate(items[i].itemid))
+        // Ensure quest items remain available for all raid members who were eligible at the time of loot generation,
+        // even if they are temporarily out of loot range. This prevents the object from becoming empty unexpectedly.
+        if (hasQuestItems)
+            for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+                if (Player* player = itr->GetSource())
+                    if (PlayerQuestItems.contains(player->GetGUID()))
+                        FillQuestLoot(player);
+
+        for (auto& item : items)
+            if (ItemTemplate const* proto = sObjectMgr->GetItemTemplate(item.itemid))
                 if (proto->Quality < uint32(group->GetLootThreshold()))
-                    items[i].is_underthreshold = true;
-        }
+                    item.is_underthreshold = true;
     }
     // ... for personal loot
     else
