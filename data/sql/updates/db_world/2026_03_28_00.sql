@@ -1,3 +1,4 @@
+-- DB update 2026_03_27_04 -> 2026_03_28_00
 -- Move Kalimdor gossip handlers from C++ to database
 -- NPCs: Rivern Frostwind, Stone Watcher of Norgannon, Great Bear Spirit,
 --        Braug Dimspirit, Steward of Time, Thrall Warchief
