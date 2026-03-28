@@ -20,7 +20,6 @@
 #include "Group.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 
@@ -655,98 +654,6 @@ public:
     private:
         float x, y, z;
     };
-};
-
-/*######
-## npc_drake_dealer_hurlunk
-######*/
-
-class npc_drake_dealer_hurlunk : public CreatureScript
-{
-public:
-    npc_drake_dealer_hurlunk() : CreatureScript("npc_drake_dealer_hurlunk") { }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_TRADE)
-            player->GetSession()->SendListInventory(creature->GetGUID());
-
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (creature->IsVendor() && player->GetReputationRank(1015) == REP_EXALTED)
-            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
-
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-
-        return true;
-    }
-};
-
-/*######
-## npc_flanis_swiftwing_and_kagrosh
-######*/
-
-enum Flanis : uint32
-{
-    QUEST_THE_FATE_OF_FLANIS    = 10583,
-    ITEM_FLAUNISS_PACK          = 30658,
-    GOSSIP_MENU_FLANIS          = 8356,
-};
-
-enum Kagrosh : uint32
-{
-    QUEST_THE_FATE_OF_KAGROSH   = 10601,
-    ITEM_KAGROSHS_PACK          = 30659,
-    GOSSIP_MENU_KAGROSH         = 8371,
-};
-
-class npcs_flanis_swiftwing_and_kagrosh : public CreatureScript
-{
-public:
-    npcs_flanis_swiftwing_and_kagrosh() : CreatureScript("npcs_flanis_swiftwing_and_kagrosh") { }
-
-    bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_INFO_DEF + 1)
-        {
-            ItemPosCountVec dest;
-            uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, ITEM_FLAUNISS_PACK, 1, nullptr);
-            if (msg == EQUIP_ERR_OK)
-            {
-                player->StoreNewItem(dest, ITEM_FLAUNISS_PACK, true);
-            }
-        }
-        if (action == GOSSIP_ACTION_INFO_DEF + 2)
-        {
-            ItemPosCountVec dest;
-            uint8 msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, ITEM_KAGROSHS_PACK, 1, nullptr);
-            if (msg == EQUIP_ERR_OK)
-            {
-                player->StoreNewItem(dest, ITEM_KAGROSHS_PACK, true);
-            }
-        }
-
-        CloseGossipMenuFor(player);
-
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (player->GetQuestStatus(QUEST_THE_FATE_OF_FLANIS) == QUEST_STATUS_INCOMPLETE && !player->HasItemCount(ITEM_FLAUNISS_PACK, 1, true))
-            AddGossipItemFor(player, GOSSIP_MENU_FLANIS, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        if (player->GetQuestStatus(QUEST_THE_FATE_OF_KAGROSH) == QUEST_STATUS_INCOMPLETE && !player->HasItemCount(ITEM_KAGROSHS_PACK, 1, true))
-            AddGossipItemFor(player, GOSSIP_MENU_KAGROSH, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-
-        return true;
-    }
 };
 
 /*####
@@ -2219,8 +2126,6 @@ void AddSC_shadowmoon_valley()
     new npc_mature_netherwing_drake();
     RegisterCreatureAI(npc_enslaved_netherwing_drake);
     new npc_dragonmaw_peon();
-    new npc_drake_dealer_hurlunk();
-    new npcs_flanis_swiftwing_and_kagrosh();
     new npc_karynaku();
     new npc_lord_illidan_stormrage();
     new go_crystal_prison();
