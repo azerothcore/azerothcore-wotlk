@@ -1,3 +1,4 @@
+-- DB update 2026_03_28_02 -> 2026_03_28_03
 -- Move Northrend gossip handlers from C++ to database
 -- NPCs: Iruk (26219), Razael & Lyana (23998, 23778), Roxi Ramrocket (31247), Avatar of Freya (27801)
 

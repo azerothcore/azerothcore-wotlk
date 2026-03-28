@@ -1,3 +1,4 @@
+-- DB update 2026_03_28_01 -> 2026_03_28_02
 -- Move Outland gossip handlers from C++ to database
 -- NPCs: Shattrath Flask Vendors (23484, 23483), Zephyr (25967), Drake Dealer Hurlunk (23489)
 
