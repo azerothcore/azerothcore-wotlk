@@ -20,40 +20,6 @@
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "ScriptedGossip.h"
-
-/*######
-## npc_rivern_frostwind
-######*/
-
-class npc_rivern_frostwind : public CreatureScript
-{
-public:
-    npc_rivern_frostwind() : CreatureScript("npc_rivern_frostwind") { }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_TRADE)
-            player->GetSession()->SendListInventory(creature->GetGUID());
-
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if (creature->IsVendor() && player->GetReputationRank(589) == REP_EXALTED)
-            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
-
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-
-        return true;
-    }
-};
-
 enum Says
 {
     // Escort texts
@@ -608,7 +574,6 @@ public:
 
 void AddSC_winterspring()
 {
-    new npc_rivern_frostwind();
     new npc_ranshalla();
     new go_elune_fire();
 }

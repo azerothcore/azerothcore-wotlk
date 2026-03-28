@@ -19,7 +19,6 @@
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
-#include "ScriptedGossip.h"
 #include "TaskScheduler.h"
 #include "LFGMgr.h"
 
@@ -142,8 +141,6 @@ enum ThrallWarchief : uint32
 
     // What the Wind Carries (ID: 6566)
     QUEST_WHAT_THE_WIND_CARRIES    = 6566,
-    GOSSIP_MENU_THRALL             = 3664,
-    GOSSIP_RESPONSE_THRALL_FIRST   = 5733,
 
     // Deathknight Starting Zone End
     QUEST_WARCHIEFS_BLESSING       = 13189,
@@ -156,45 +153,6 @@ class npc_thrall_warchief : public CreatureScript
 {
 public:
     npc_thrall_warchief() : CreatureScript("npc_thrall_warchief") { }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-
-        uint32 DiscussionOrder = action - GOSSIP_ACTION_INFO_DEF;
-
-        if (DiscussionOrder>= 1 && DiscussionOrder <= 6)
-        {
-            uint32 NextAction = GOSSIP_ACTION_INFO_DEF + DiscussionOrder + 1;
-            uint32 GossipResponse = GOSSIP_RESPONSE_THRALL_FIRST + DiscussionOrder - 1;
-
-            AddGossipItemFor(player, GOSSIP_MENU_THRALL + DiscussionOrder, 0, GOSSIP_SENDER_MAIN, NextAction);
-            SendGossipMenuFor(player, GossipResponse, creature->GetGUID());
-        }
-        else if (DiscussionOrder == 7)
-        {
-            CloseGossipMenuFor(player);
-            player->AreaExploredOrEventHappens(QUEST_WHAT_THE_WIND_CARRIES);
-        }
-
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (creature->IsQuestGiver())
-        {
-            player->PrepareQuestMenu(creature->GetGUID());
-        }
-
-        if (player->GetQuestStatus(QUEST_WHAT_THE_WIND_CARRIES) == QUEST_STATUS_INCOMPLETE)
-        {
-            AddGossipItemFor(player, GOSSIP_MENU_THRALL, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        }
-
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-        return true;
-    }
 
     bool OnQuestReward(Player* player, Creature* creature, Quest const* quest, uint32 /*item*/) override
     {
@@ -230,6 +188,12 @@ public:
         {
             ChainLightningTimer = 2000;
             ShockTimer = 8000;
+        }
+
+        void sGossipSelect(Player* player, uint32 menuId, uint32 /*gossipListId*/) override
+        {
+            if (menuId == 3670)
+                player->AreaExploredOrEventHappens(QUEST_WHAT_THE_WIND_CARRIES);
         }
 
         void JustEngagedWith(Unit* /*who*/) override { }
