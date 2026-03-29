@@ -509,12 +509,14 @@ struct boss_majordomo : public BossAI
 
     void sGossipHello(Player* player) override
     {
+        ClearGossipMenuFor(player);
         AddGossipItemFor(player, GOSSIP_ITEM_SUMMON_1, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
         SendGossipMenuFor(player, TEXT_ID_SUMMON_1, me->GetGUID());
     }
 
-    void sGossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
+    void sGossipSelect(Player* player, uint32 /*menuId*/, uint32 gossipListId) override
     {
+        uint32 const action = player->PlayerTalkClass->GetGossipOptionAction(gossipListId);
         ClearGossipMenuFor(player);
         switch (action)
         {
