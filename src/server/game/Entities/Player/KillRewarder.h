@@ -50,6 +50,7 @@ private:
     Group* _group;
     float _groupRate;
     Player* _maxNotGrayMember;
+    uint8 _maxNotGrayMemberLevel;
     uint32 _count;
     uint32 _aliveSumLevel;
     uint32 _sumLevel;

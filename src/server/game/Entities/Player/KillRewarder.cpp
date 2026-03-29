@@ -67,7 +67,7 @@
 KillRewarder::KillRewarder(Player* killer, Unit* victim, bool isBattleGround) :
 // 1. Initialize internal variables to default values.
         _killer(killer), _victim(victim), _group(killer->GetGroup()),
-        _groupRate(1.0f), _maxNotGrayMember(nullptr), _count(0), _aliveSumLevel(0), _sumLevel(0), _xp(0),
+        _groupRate(1.0f), _maxNotGrayMember(nullptr), _maxNotGrayMemberLevel(0), _count(0), _aliveSumLevel(0), _sumLevel(0), _xp(0),
         _isFullXP(false), _maxLevel(0), _isBattleGround(isBattleGround), _isPvP(false)
 {
     // mark the credit as pvp if victim is player
@@ -104,9 +104,10 @@ void KillRewarder::_InitGroupData()
                         // 2.4. _maxNotGrayMember - maximum level of alive group member within reward distance,
                         //      for whom victim is not gray;
                         uint32 grayLevel = Acore::XP::GetGrayLevel(lvl);
-                        if (_victim->GetLevel() > grayLevel && (!_maxNotGrayMember || _GetPlayerLevel(_maxNotGrayMember) < lvl))
+                        if (_victim->GetLevel() > grayLevel && (!_maxNotGrayMember || _maxNotGrayMemberLevel < lvl))
                         {
                             _maxNotGrayMember = member;
+                            _maxNotGrayMemberLevel = lvl;
                         }
                     }
                     // 2.5. _sumLevel - sum of levels of group members within reward distance;
@@ -114,7 +115,7 @@ void KillRewarder::_InitGroupData()
                 }
         // 2.6. _isFullXP - flag identifying that for all group members victim is not gray,
         //      so 100% XP will be rewarded (50% otherwise).
-        _isFullXP = _maxNotGrayMember && (_maxLevel == _GetPlayerLevel(_maxNotGrayMember));
+        _isFullXP = _maxNotGrayMember && (_maxLevel == _maxNotGrayMemberLevel);
     }
     else
         _count = 1;
@@ -153,7 +154,7 @@ void KillRewarder::_RewardXP(Player* player, float rate)
         //        * set to 0 if player's level is more than maximum level of not gray member;
         //        * cut XP in half if _isFullXP is false.
         if (_maxNotGrayMember && player->IsAlive() &&
-            _GetPlayerLevel(_maxNotGrayMember) >= _GetPlayerLevel(player))
+            _maxNotGrayMemberLevel >= _GetPlayerLevel(player))
             xp = _isFullXP ?
                  uint32(xp * rate) :             // Reward FULL XP if all group members are not gray.
                  uint32(xp * rate / 2) + 1;      // Reward only HALF of XP if some of group members are gray.
