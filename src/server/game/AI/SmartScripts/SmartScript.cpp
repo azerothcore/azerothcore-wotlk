@@ -696,7 +696,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     {
                         failedSpellCast = true; // Mark spellcast as failed so we can retry it later
 
-                        if (me->IsRooted()) // Rooted inhabit type, never move/reposition
+                        if (me->IsRooted() || !IsSmart()) // Rooted inhabit type, never move/reposition
                             continue;
 
                         float minDistance = std::max(meleeRange, spellMinRange) - distanceToTarget + NOMINAL_MELEE_RANGE;
@@ -708,7 +708,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     {
                         failedSpellCast = true;
 
-                        if (me->IsRooted()) // Rooted inhabit type, never move/reposition
+                        if (me->IsRooted() || !IsSmart()) // Rooted inhabit type, never move/reposition
                             continue;
 
                         if (e.action.cast.castFlags & SMARTCAST_COMBAT_MOVE)
@@ -720,7 +720,7 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     {
                         failedSpellCast = true;
 
-                        if (me->IsRooted()) // Rooted inhabit type, never move/reposition
+                        if (me->IsRooted() || !IsSmart()) // Rooted inhabit type, never move/reposition
                             continue;
 
                         CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(true, 0.f);
@@ -743,6 +743,9 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
                     if (e.action.cast.castFlags & SMARTCAST_COMBAT_MOVE)
                     {
+                        if (!IsSmart())
+                            continue;
+
                         if (result == SPELL_FAILED_OUT_OF_RANGE)
                             CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(true, std::max(spellMaxRange - NOMINAL_MELEE_RANGE, 0.0f));
                         else if (result != SPELL_CAST_OK)
@@ -1041,13 +1044,13 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
 
             // Suppress evade during script-initiated combat stop so
             // JustExitedCombat does not trigger EnterEvadeMode.
-            if (SmartAI* sai = CAST_AI(SmartAI, me->AI()))
-                sai->SetSuppressEvade(true);
+            if (IsSmart())
+                CAST_AI(SmartAI, me->AI())->SetSuppressEvade(true);
 
             me->CombatStop(true);
 
-            if (SmartAI* sai = CAST_AI(SmartAI, me->AI()))
-                sai->SetSuppressEvade(false);
+            if (IsSmart())
+                CAST_AI(SmartAI, me->AI())->SetSuppressEvade(false);
 
             break;
         }
@@ -2763,13 +2766,20 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                         float spellMaxRange = me->GetSpellMaxRangeForTarget(target->ToUnit(), spellInfo);
                         if (e.action.cast.castFlags & SMARTCAST_COMBAT_MOVE)
                         {
+                            if (!IsSmart())
+                                continue;
+
                             // If cast flag SMARTCAST_COMBAT_MOVE is set combat movement will not be allowed unless target is outside spell range, out of mana, or LOS.
                             if (result == SPELL_FAILED_OUT_OF_RANGE || result == SPELL_CAST_OK)
+                            {
                                 // if we are just out of range, we only chase until we are back in spell range.
                                 CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(true, std::max(spellMaxRange - NOMINAL_MELEE_RANGE, 0.0f));
+                            }
                             else // move into melee on any other fail
+                            {
                                 // if spell fail for any other reason, we chase to melee range, or stay where we are if spellcast was successful.
                                 CAST_AI(SmartAI, me->AI())->SetCurrentRangeMode(false, 0.f);
+                            }
                         }
                     }
                 }
