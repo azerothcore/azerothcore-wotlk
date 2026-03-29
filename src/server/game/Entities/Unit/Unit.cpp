@@ -7468,7 +7468,6 @@ bool Unit::AttackStop()
 
 void Unit::CombatStop(bool includingCast, bool mutualPvP)
 {
-    sScriptMgr->OnUnitStopCombat(this);
     if (includingCast && IsNonMeleeSpellCast(false))
         InterruptNonMeleeSpells(false);
 
@@ -7490,6 +7489,7 @@ void Unit::CombatStop(bool includingCast, bool mutualPvP)
     // xinef: just in case
     if (IsPetInCombat() && !IsPlayer())
         ClearInPetCombat();
+    sScriptMgr->OnUnitStopCombat(this);
 }
 
 void Unit::CombatStopWithPets(bool includingCast)
