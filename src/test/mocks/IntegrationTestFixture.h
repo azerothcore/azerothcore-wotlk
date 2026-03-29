@@ -131,10 +131,16 @@ protected:
         _ownedCreatureTemplates.push_back(tmpl);
 
         auto* creature = new TestCreature();
-        creature->ForceInit(guidLow, tmpl, _testMap);
+        creature->ForceInitValues(guidLow, entry);
+        creature->SetTestMap(_testMap);
+        creature->SetInWorld(true);
+        creature->SetAlive(true);
+        creature->SetPhase(1);
+        creature->SetFaction(factionId);
+        creature->SetLevel(80);
         creature->SetMaxHealth(10000);
         creature->SetHealth(10000);
-        creature->AddToWorld();
+        creature->InitializeThreatManager();
         _trackedCreatures.push_back(creature);
 
         return creature;
