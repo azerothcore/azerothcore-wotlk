@@ -367,6 +367,7 @@ bool WaypointMovementGenerator<Creature>::DoUpdate(Creature* creature, uint32 di
         creature->StopMoving();
         _lastSplineId = 0;
         _smoothSplineLaunched = false;
+        _hasBeenStalled = true;
     }
 
     // Set home position to current position.
