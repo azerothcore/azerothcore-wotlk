@@ -691,7 +691,7 @@ public:
             bool playerOnDeck = false;
             me->GetMap()->DoForAllPlayers([&](Player* player)
                 {
-                    if (!player->GetVehicle() && player->IsAlive())
+                    if (player->IsAlive())
                         playerOnDeck = true;
                 });
 

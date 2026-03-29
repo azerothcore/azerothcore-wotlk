@@ -586,20 +586,18 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
-            if (!me->IsInCombat())
+            if (instance->GetBossState(DATA_VALITHRIA_DREAMWALKER) != IN_PROGRESS)
                 return;
 
             if (checkTimer <= diff)
             {
                 checkTimer = 3000;
-                me->SetInCombatWithZone();
-                for (ThreatReference const* ref : me->GetThreatMgr().GetUnsortedThreatList())
-                {
-                    if (Unit* target = ref->GetVictim())
-                        if (target->IsAlive() && target->IsPlayer() && me->GetExactDist(target) < 200.0f && !target->IsImmunedToDamageOrSchool(SPELL_SCHOOL_MASK_ALL))
-                            return;
-                }
-                EnterEvadeMode();
+                Player* player = nullptr;
+                Acore::AnyPlayerInObjectRangeCheck check(me, 200.0f);
+                Acore::PlayerSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(me, player, check);
+                Cell::VisitObjects(me, searcher, 200.0f);
+                if (!player)
+                    EnterEvadeMode();
             }
             else
                 checkTimer -= diff;

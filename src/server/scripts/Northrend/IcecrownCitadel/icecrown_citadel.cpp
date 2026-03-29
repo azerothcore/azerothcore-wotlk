@@ -345,11 +345,17 @@ public:
                 return;
         }
 
+        uint32 corpseDelay = creature->GetCorpseDelay();
+        uint32 respawnDelay = creature->GetRespawnDelay();
+        creature->SetCorpseDelay(1);
+        creature->SetRespawnDelay(2);
+
         if (CreatureData const* data = creature->GetCreatureData())
             creature->SetPosition(data->posX, data->posY, data->posZ, data->orientation);
         creature->DespawnOrUnsummon();
 
-        creature->SetRespawnTime(5);
+        creature->SetCorpseDelay(corpseDelay);
+        creature->SetRespawnDelay(respawnDelay);
     }
 };
 
@@ -906,7 +912,6 @@ public:
                 // wipe
                 if (!player || me->GetExactDist(4357.0f, 2606.0f, 350.0f) > 125.0f)
                 {
-                    //Talk(SAY_CROK_DEATH);
                     FrostwingGauntletRespawner respawner;
                     Acore::CreatureWorker<FrostwingGauntletRespawner> worker(me, respawner);
                     Cell::VisitObjects(me, worker, 333.0f);
