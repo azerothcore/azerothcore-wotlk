@@ -43,6 +43,7 @@ private:
     void _RewardKillCredit(Player* player);
     void _RewardPlayer(Player* player, bool isDungeon);
     void _RewardGroup();
+    uint8 _GetPlayerLevel(Player const* player);
 
     Player* _killer;
     Unit* _victim;
