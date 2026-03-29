@@ -1,3 +1,4 @@
+-- DB update 2026_03_28_03 -> 2026_03_29_00
 -- Move gossip handling from C++ scripts to database for Augustus the Touched,
 -- Parqual Fintallas, and Lokhtos Darkbargainer.
 -- Augustus migration based on TC work by dr-j (commit cefed89c38bc)
