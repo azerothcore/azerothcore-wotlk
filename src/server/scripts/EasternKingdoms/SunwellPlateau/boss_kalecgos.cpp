@@ -187,7 +187,6 @@ struct boss_kalecgos : public BossAI
                 me->SetRegeneratingHealth(false);
                 me->RemoveAllAuras();
                 me->SetReactState(REACT_PASSIVE);
-                me->CombatStop();
                 me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetFaction(FACTION_FRIENDLY);
             }, 1s);
