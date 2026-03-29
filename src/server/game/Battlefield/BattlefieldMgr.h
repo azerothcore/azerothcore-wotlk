@@ -30,48 +30,47 @@ struct GossipMenuItems;
 class BattlefieldMgr
 {
 public:
-    // ctor
     BattlefieldMgr();
-    // dtor
     ~BattlefieldMgr();
 
     static BattlefieldMgr* instance();
 
     // create battlefield events
     void InitBattlefield();
-    // called when a player enters an battlefield area
+    // called when a player enters a battlefield area
     void HandlePlayerEnterZone(Player* player, uint32 areaflag);
-    // called when player leaves an battlefield area
+    // called when player leaves a battlefield area
     void HandlePlayerLeaveZone(Player* player, uint32 areaflag);
     // called when player resurrects
     void HandlePlayerResurrects(Player* player, uint32 areaflag);
     // return assigned battlefield
-    Battlefield* GetBattlefieldToZoneId(uint32 zoneid);
-    Battlefield* GetBattlefieldByBattleId(uint32 battleid);
+    Battlefield* GetBattlefieldToZoneId(uint32 zoneId);
+    Battlefield* GetBattlefieldByBattleId(uint32 battleId);
 
     ZoneScript* GetZoneScript(uint32 zoneId);
 
-    void AddZone(uint32 zoneid, Battlefield* handle);
+    void AddZone(uint32 zoneId, Battlefield* handle);
 
     void Update(uint32 diff);
 
-    void HandleGossipOption(Player* player, ObjectGuid guid, uint32 gossipid);
+    void HandleGossipOption(Player* player, ObjectGuid guid, uint32 gossipId);
 
     bool CanTalkTo(Player* player, Creature* creature, GossipMenuItems gso);
 
     void HandleDropFlag(Player* player, uint32 spellId);
 
-    typedef std::vector < Battlefield* >BattlefieldSet;
-    typedef std::map < uint32 /* zoneid */, Battlefield* >BattlefieldMap;
+    using BattlefieldSet = std::vector<Battlefield*>;
+    using BattlefieldMap = std::map<uint32 /* zoneid */, Battlefield*>;
+
 private:
     // contains all initiated battlefield events
     // used when initing / cleaning up
-    BattlefieldSet m_BattlefieldSet;
-    // maps the zone ids to an battlefield event
+    BattlefieldSet _battlefieldSet;
+    // maps the zone ids to a battlefield event
     // used in player event handling
-    BattlefieldMap m_BattlefieldMap;
+    BattlefieldMap _battlefieldMap;
     // update interval
-    uint32 m_UpdateTimer;
+    uint32 _updateTimer;
 };
 
 #define sBattlefieldMgr BattlefieldMgr::instance()

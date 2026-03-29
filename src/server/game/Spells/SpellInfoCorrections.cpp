@@ -652,6 +652,19 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
     });
 
+    // Explosive Trap Effect
+    ApplySpellFix({
+        13812, // Explosive Trap Effect (Rank 1)
+        14314, // Explosive Trap Effect (Rank 2)
+        14315, // Explosive Trap Effect (Rank 3)
+        27026, // Explosive Trap Effect (Rank 4)
+        49064, // Explosive Trap Effect (Rank 5)
+        49065  // Explosive Trap Effect (Rank 6)
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->DmgClass = SPELL_DAMAGE_CLASS_MAGIC;
+    });
+
     // Kill Command
     // Kill Command, Overpower
     ApplySpellFix({ 34027, 37529 }, [](SpellInfo* spellInfo)
@@ -1050,7 +1063,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 44461, 55361, 55362 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPPRESS_TARGET_PROCS;
-        spellInfo->AttributesEx4 |= SPELL_ATTR4_REACTIVE_DAMAGE_PROC;
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_DAMAGE_DOESNT_BREAK_AURAS;
     });
 
     // Evocation
@@ -1486,7 +1499,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_DOT_STACKING_RULE;
     });
 
-    // Activate Sunblade Protecto
+    // Activate Sunblade Protector
     ApplySpellFix({ 46475, 46476 }, [](SpellInfo* spellInfo)
     {
         spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(14); // 60yd
@@ -1533,14 +1546,21 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx6 |= SPELL_ATTR6_IGNORE_PHASE_SHIFT;
     });
 
-    // Parasitic Shadowfiend
+    // Illidan Stormrage - Parasitic Shadowfiend
     ApplySpellFix({ 41914 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Attributes |= SPELL_ATTR0_AURA_IS_DEBUFF;
         spellInfo->AttributesEx3 |= SPELL_ATTR3_DOT_STACKING_RULE;
     });
 
-    // Teleport Maiev
+    // Illidan Stormrage - Demon Fire
+    ApplySpellFix({ 40030 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
+        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_NO_CAST_LOG;
+    });
+
+    // Illidan Stormrage - Teleport Maiev
     ApplySpellFix({ 41221 }, [](SpellInfo* spellInfo)
     {
         spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(13); // 0-50000yd
@@ -1673,12 +1693,6 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->Effects[0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ANY);
         spellInfo->Effects[0].TargetB = SpellImplicitTargetInfo();
-    });
-
-    // Flame Breath
-    ApplySpellFix({ 47592 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].Amplitude = 200;
     });
 
     // Skarvald, Charge

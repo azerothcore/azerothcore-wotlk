@@ -32,7 +32,6 @@
 #include "MapInstanced.h"
 #include "Metric.h"
 #include "MiscPackets.h"
-#include "MMapFactory.h"
 #include "Object.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
@@ -62,13 +61,12 @@ Map::~Map()
 
     if (!m_scriptSchedule.empty())
         sScriptMgr->DecreaseScheduledScriptCount(m_scriptSchedule.size());
-
-    MMAP::MMapFactory::createOrGetMMapMgr()->unloadMapInstance(GetId(), i_InstanceId);
 }
 
 Map::Map(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent) :
-    _mapGridManager(this), i_mapEntry(sMapStore.LookupEntry(id)), i_spawnMode(SpawnMode), i_InstanceId(InstanceId),
-    m_unloadTimer(0), m_VisibleDistance(DEFAULT_VISIBILITY_DISTANCE), _instanceResetPeriod(0),
+    _mapGridManager(this), i_mapEntry(sMapStore.LookupEntry(id)), _mapCollisionData(*this, _parent),
+    i_spawnMode(SpawnMode), i_InstanceId(InstanceId), m_unloadTimer(0),
+    m_VisibleDistance(DEFAULT_VISIBILITY_DISTANCE), _instanceResetPeriod(0),
     _transportsUpdateIter(_transports.end()), i_scriptLock(false), _defaultLight(GetDefaultMapLight(id))
 {
     m_parentMap = (_parent ? _parent : this);
@@ -432,7 +430,7 @@ void Map::UpdatePlayerZoneStats(uint32 oldZone, uint32 newZone)
 void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
 {
     if (t_diff)
-        _dynamicTree.update(t_diff);
+        _mapCollisionData.GetDynamicTree().update(t_diff);
 
     // Update world sessions and players
     for (m_mapRefIter = m_mapRefMgr.begin(); m_mapRefIter != m_mapRefMgr.end(); ++m_mapRefIter)
@@ -702,7 +700,7 @@ void Map::RemovePlayerFromMap(Player* player, bool remove)
 {
     UpdatePlayerZoneStats(player->GetZoneId(), MAP_INVALID_ZONE);
 
-    player->getHostileRefMgr().deleteReferences(true); // pussywizard: multithreading crashfix
+    player->GetThreatMgr().RemoveMeFromThreatLists(); // pussywizard: multithreading crashfix
 
     player->RemoveFromWorld();
     SendRemoveTransports(player);
@@ -1037,9 +1035,10 @@ void Map::UnloadAll()
 
     for (GridRefMgr<MapGridType>::iterator i = GridRefMgr<MapGridType>::begin(); i != GridRefMgr<MapGridType>::end();)
     {
-        MapGridType& grid(*i->GetSource());
+        MapGridType* grid = i->GetSource();
         ++i;
-        UnloadGrid(grid); // deletes the grid and removes it from the GridRefMgr
+        if (grid)
+            UnloadGrid(*grid);
     }
 
     // pussywizard: crashfix, some npc can be left on transport (not a default passenger)
@@ -1073,9 +1072,9 @@ void Map::UnloadAll()
 
 std::shared_ptr<GridTerrainData> Map::GetGridTerrainDataSharedPtr(GridCoord const& gridCoord)
 {
-    // ensure GridMap is created
-    EnsureGridCreated(gridCoord);
-    return _mapGridManager.GetGrid(gridCoord.x_coord, gridCoord.y_coord)->GetTerrainDataSharedPtr();
+    MapGridType* grid = _mapGridManager.GetGrid(gridCoord.x_coord, gridCoord.y_coord);
+    ASSERT(grid); // Grid should always exist during this call
+    return grid->GetTerrainDataSharedPtr();
 }
 
 GridTerrainData* Map::GetGridTerrainData(GridCoord const& gridCoord)
@@ -1152,10 +1151,7 @@ float Map::GetHeight(float x, float y, float z, bool checkVMap /*= true*/, float
 
     float vmapHeight = VMAP_INVALID_HEIGHT_VALUE;
     if (checkVMap)
-    {
-        VMAP::IVMapMgr* vmgr = VMAP::VMapFactory::createOrGetVMapMgr();
-        vmapHeight = vmgr->getHeight(GetId(), x, y, z, maxSearchDist);   // look from a bit higher pos to find the floor
-    }
+        vmapHeight = _mapCollisionData.GetStaticTree().getHeight(x, y, z, maxSearchDist); // look from a bit higher pos to find the floor
 
     // mapHeight set for any above raw ground Z or <= INVALID_HEIGHT
     // vmapheight set for any under Z value or <= INVALID_HEIGHT
@@ -1203,12 +1199,11 @@ static inline bool IsInWMOInterior(uint32 mogpFlags)
 bool Map::GetAreaInfo(uint32 phaseMask, float x, float y, float z, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const
 {
     float check_z = z;
-    VMAP::IVMapMgr* vmgr = VMAP::VMapFactory::createOrGetVMapMgr();
     VMAP::AreaAndLiquidData vdata;
     VMAP::AreaAndLiquidData ddata;
 
-    bool hasVmapAreaInfo = vmgr->GetAreaAndLiquidData(GetId(), x, y, z, {}, vdata) && vdata.areaInfo.has_value();
-    bool hasDynamicAreaInfo = _dynamicTree.GetAreaAndLiquidData(x, y, z, phaseMask, {}, ddata) && ddata.areaInfo.has_value();
+    bool hasVmapAreaInfo = _mapCollisionData.GetStaticTree().GetAreaAndLiquidData(x, y, z, {}, vdata) && vdata.areaInfo.has_value();
+    bool hasDynamicAreaInfo = _mapCollisionData.GetDynamicTree().GetAreaAndLiquidData(x, y, z, phaseMask, {}, ddata) && ddata.areaInfo.has_value();
     auto useVmap = [&] { check_z = vdata.floorZ; groupId = vdata.areaInfo->groupId; adtId = vdata.areaInfo->adtId; rootId = vdata.areaInfo->rootId; flags = vdata.areaInfo->mogpFlags; };
     auto useDyn = [&] { check_z = ddata.floorZ; groupId = ddata.areaInfo->groupId; adtId = ddata.areaInfo->adtId; rootId = ddata.areaInfo->rootId; flags = ddata.areaInfo->mogpFlags; };
     if (hasVmapAreaInfo)
@@ -1299,10 +1294,9 @@ LiquidData const Map::GetLiquidData(uint32 phaseMask, float x, float y, float z,
    LiquidData liquidData;
    liquidData.Status = LIQUID_MAP_NO_WATER;
 
-    VMAP::IVMapMgr* vmgr = VMAP::VMapFactory::createOrGetVMapMgr();
     VMAP::AreaAndLiquidData vmapData;
     bool useGridLiquid = true;
-    if (vmgr->GetAreaAndLiquidData(GetId(), x, y, z, ReqLiquidType, vmapData) && vmapData.liquidInfo)
+    if (_mapCollisionData.GetStaticTree().GetAreaAndLiquidData(x, y, z, ReqLiquidType, vmapData) && vmapData.liquidInfo)
     {
         useGridLiquid = !vmapData.areaInfo || !IsInWMOInterior(vmapData.areaInfo->mogpFlags);
         LOG_DEBUG("maps", "GetLiquidStatus(): vmap liquid level: {} ground: {} type: {}", vmapData.liquidInfo->level, vmapData.floorZ, vmapData.liquidInfo->type);
@@ -1382,11 +1376,10 @@ void Map::GetFullTerrainStatusForPosition(uint32 /*phaseMask*/, float x, float y
 {
     GridTerrainData* gmap = GetGridTerrainData(x, y);
 
-    VMAP::IVMapMgr* vmgr = VMAP::VMapFactory::createOrGetVMapMgr();
     VMAP::AreaAndLiquidData vmapData;
     // VMAP::AreaAndLiquidData dynData;
     VMAP::AreaAndLiquidData* wmoData = nullptr;
-    vmgr->GetAreaAndLiquidData(GetId(), x, y, z, reqLiquidType, vmapData);
+    _mapCollisionData.GetStaticTree().GetAreaAndLiquidData(x, y, z, reqLiquidType, vmapData);
     // _dynamicTree.GetAreaAndLiquidData(x, y, z, phaseMask, reqLiquidType, dynData);
 
     uint32 gridAreaId = 0;
@@ -1547,7 +1540,7 @@ bool Map::isInLineOfSight(float x1, float y1, float z1, float x2, float y2, floa
         }
     }
 
-    if ((checks & LINEOFSIGHT_CHECK_VMAP) && !VMAP::VMapFactory::createOrGetVMapMgr()->isInLineOfSight(GetId(), x1, y1, z1, x2, y2, z2, ignoreFlags))
+    if ((checks & LINEOFSIGHT_CHECK_VMAP) && !_mapCollisionData.GetStaticTree().isInLineOfSight(x1, y1, z1, x2, y2, z2, ignoreFlags))
     {
         return false;
     }
@@ -1560,7 +1553,7 @@ bool Map::isInLineOfSight(float x1, float y1, float z1, float x2, float y2, floa
             ignoreFlags = VMAP::ModelIgnoreFlags::M2;
         }
 
-        if (!_dynamicTree.isInLineOfSight(x1, y1, z1, x2, y2, z2, phasemask, ignoreFlags))
+        if (!_mapCollisionData.GetDynamicTree().isInLineOfSight(x1, y1, z1, x2, y2, z2, phasemask, ignoreFlags))
         {
             return false;
         }
@@ -1569,25 +1562,11 @@ bool Map::isInLineOfSight(float x1, float y1, float z1, float x2, float y2, floa
     return true;
 }
 
-bool Map::GetObjectHitPos(uint32 phasemask, float x1, float y1, float z1, float x2, float y2, float z2, float& rx, float& ry, float& rz, float modifyDist)
-{
-    G3D::Vector3 startPos(x1, y1, z1);
-    G3D::Vector3 dstPos(x2, y2, z2);
-
-    G3D::Vector3 resultPos;
-    bool result = _dynamicTree.GetObjectHitPos(phasemask, startPos, dstPos, resultPos, modifyDist);
-
-    rx = resultPos.x;
-    ry = resultPos.y;
-    rz = resultPos.z;
-    return result;
-}
-
 float Map::GetHeight(uint32 phasemask, float x, float y, float z, bool vmap/*=true*/, float maxSearchDist /*= DEFAULT_HEIGHT_SEARCH*/) const
 {
     float h1, h2;
     h1 = GetHeight(x, y, z, vmap, maxSearchDist);
-    h2 = _dynamicTree.getHeight(x, y, z, maxSearchDist, phasemask);
+    h2 = _mapCollisionData.GetDynamicTree().getHeight(x, y, z, maxSearchDist, phasemask);
     return std::max<float>(h1, h2);
 }
 
@@ -3049,8 +3028,7 @@ bool Map::CheckCollisionAndGetValidCoords(WorldObject const* source, float start
     // Unit is not on the ground, check for potential collision via vmaps
     if (notOnGround)
     {
-        bool col = VMAP::VMapFactory::createOrGetVMapMgr()->GetObjectHitPos(source->GetMapId(),
-            startX, startY, startZ + halfHeight,
+        bool col = _mapCollisionData.GetStaticTree().GetObjectHitPos(startX, startY, startZ + halfHeight,
             destX, destY, destZ + halfHeight,
             destX, destY, destZ, -CONTACT_DISTANCE);
 
@@ -3064,7 +3042,7 @@ bool Map::CheckCollisionAndGetValidCoords(WorldObject const* source, float start
     }
 
     // check dynamic collision
-    bool col = source->GetMap()->GetObjectHitPos(source->GetPhaseMask(),
+    bool col = _mapCollisionData.GetDynamicTree().GetObjectHitPos(source->GetPhaseMask(),
         startX, startY, startZ + halfHeight,
         destX, destY, destZ + halfHeight,
         destX, destY, destZ, -CONTACT_DISTANCE);

@@ -49,6 +49,7 @@ enum Data
     DATA_SVALA_ACHIEVEMENT              = 50,
     DATA_SKADI_ACHIEVEMENT              = 51,
     DATA_YMIRON_ACHIEVEMENT             = 52,
+    DATA_LOVE_TO_SKADI                  = 53,
 };
 
 enum Objects
@@ -71,6 +72,9 @@ enum Objects
     NPC_MASSIVE_JORMUNGAR               = 26685,
     NPC_FEROCIOUS_RHINO                 = 26686,
     NPC_GARUF                           = 26893,
+    NPC_YMIRJAR_WARRIOR                 = 26690,
+    NPC_YMIRJAR_WITCH_DOCTOR            = 26691,
+    NPC_YMIRJAR_HARPOONER              = 26692,
 };
 
 template <class AI, class T>
@@ -78,5 +82,7 @@ inline AI* GetUtgardePinnacleAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, UtgardePinnacleScriptName);
 }
+
+#define RegisterUtgardePinnacleCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetUtgardePinnacleAI)
 
 #endif

@@ -85,6 +85,7 @@ public:
 
         void Reset() override { }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 waypointId) override
         {
             switch (waypointId)
@@ -170,6 +171,7 @@ public:
 
         void Reset() override { }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 waypointId) override
         {
             switch (waypointId)

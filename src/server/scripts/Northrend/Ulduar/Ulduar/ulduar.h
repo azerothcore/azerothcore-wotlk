@@ -143,6 +143,12 @@ enum UlduarData
     DATA_BRANN_MEMOTESAY                    = 801,
     DATA_BRANN_EASY_MODE                    = 802,
     DATA_BRANN_BASE_CAMP                    = 803,
+
+    // Observation Ring Keepers
+    DATA_FREYA_GOSSIP                       = 810,
+    DATA_HODIR_GOSSIP                       = 811,
+    DATA_MIMIRON_GOSSIP                     = 812,
+    DATA_THORIM_GOSSIP                      = 813,
 };
 
 enum UlduarNPCs
@@ -298,6 +304,17 @@ enum UlduarGameObjects
     GO_DOODAD_UL_ULDUAR_TRAPDOOR_03         = 194253,
     GO_GIFT_OF_THE_OBSERVER_10              = 194821,
     GO_GIFT_OF_THE_OBSERVER_25              = 194822,
+};
+
+enum UlduarPersistentData
+{
+    PERSISTENT_DATA_WATCHERS_MASK           = 0,
+    PERSISTENT_DATA_CONSPEEDATORY,
+    PERSISTENT_DATA_UNBROKEN,
+    PERSISTENT_DATA_ALGALON_TIMER,
+    PERSISTENT_DATA_C_OF_ULDUAR_MASK,
+    PERSISTENT_DATA_MAGE_BARRIER,
+    MAX_PERSISTENT_DATA
 };
 
 enum UlduarMisc

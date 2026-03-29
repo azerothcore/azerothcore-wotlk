@@ -109,6 +109,11 @@ void ScriptMgr::OnPlayerTalentsReset(Player* player, bool noCost)
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_TALENTS_RESET, script->OnPlayerTalentsReset(player, noCost));
 }
 
+bool ScriptMgr::OnPlayerCanLearnTalent(Player* player, TalentEntry const* talent, uint32 rank)
+{
+    CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_LEARN_TALENT, !script->OnPlayerCanLearnTalent(player, talent, rank));
+}
+
 void ScriptMgr::OnPlayerAfterSpecSlotChanged(Player* player, uint8 newSlot)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_AFTER_SPEC_SLOT_CHANGED, script->OnPlayerAfterSpecSlotChanged(player, newSlot));
@@ -918,6 +923,11 @@ void ScriptMgr::OnPlayerGetReputationPriceDiscount(Player const* player, Creatur
 void ScriptMgr::OnPlayerGetReputationPriceDiscount(Player const* player, FactionTemplateEntry const* factionTemplate, float& discount)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_GET_REPUTATION_PRICE_DISCOUNT, script->OnPlayerGetReputationPriceDiscount(player, factionTemplate, discount));
+}
+
+void ScriptMgr::OnPlayerLearnTaxiNode(Player const* player, uint32 nodeId)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_LEARN_TAXI_NODE, script->OnPlayerLearnTaxiNode(player, nodeId));
 }
 
 PlayerScript::PlayerScript(const char* name, std::vector<uint16> enabledHooks)

@@ -105,12 +105,11 @@ public:
     bool isCanInteractWithBattleMaster(Player* player, bool msg) const;
     bool CanResetTalents(Player* player) const;
     bool CanCreatureAttack(Unit const* victim, bool skipDistCheck = false) const;
-    void LoadSpellTemplateImmunity();
     bool IsImmunedToSpell(SpellInfo const* spellInfo, Spell const* spell = nullptr) override;
 
-    [[nodiscard]] bool HasMechanicTemplateImmunity(uint32 mask) const;
+    [[nodiscard]] bool HasMechanicTemplateImmunity(uint64 mask) const;
     // redefine Unit::IsImmunedToSpell
-    bool IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) const override;
+    bool IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index, Unit const* caster = nullptr) const override;
     // redefine Unit::IsImmunedToSpellEffect
     [[nodiscard]] bool isElite() const
     {
@@ -186,6 +185,8 @@ public:
     void UpdateAttackPowerAndDamage(bool ranged = false) override;
     void CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, bool addTotalPct, float& minDamage, float& maxDamage, uint8 damageIndex) override;
 
+    void LoadTemplateImmunities(int32 creatureImmunitiesId);
+
     void LoadSparringPct();
     [[nodiscard]] float GetSparringPct() const { return _sparringPct; }
 
@@ -253,7 +254,7 @@ public:
     CreatureSpellCooldowns m_CreatureSpellCooldowns;
     uint32 m_ProhibitSchoolTime[7];
 
-    bool CanStartAttack(Unit const* u) const;
+    bool CanStartAttack(Unit const* u, bool force = false) const;
     float GetAggroRange(Unit const* target) const;
     float GetAttackDistance(Unit const* player) const;
     [[nodiscard]] float GetDetectionRange() const { return m_detectionDistance; }
@@ -313,6 +314,11 @@ public:
 
     void SetInCombatWithZone();
 
+    // Engagement callbacks (called from CreatureAI::EngagementStart/EngagementOver)
+    void AtEngage(Unit* target) override;
+    void AtDisengage() override;
+    [[nodiscard]] bool IsEngaged() const override;
+
     [[nodiscard]] bool hasQuest(uint32 quest_id) const override;
     [[nodiscard]] bool hasInvolvedQuest(uint32 quest_id)  const override;
 
@@ -330,6 +336,7 @@ public:
 
     void SetCannotReachTarget(ObjectGuid const& target = ObjectGuid::Empty);
     [[nodiscard]] bool CanNotReachTarget() const;
+    [[nodiscard]] ObjectGuid const& GetCannotReachTarget() const { return m_cannotReachTarget; }
     [[nodiscard]] bool IsNotReachableAndNeedRegen() const;
 
     void SetPosition(float x, float y, float z, float o);
@@ -350,6 +357,14 @@ public:
 
     [[nodiscard]] uint32 GetCurrentWaypointID() const { return m_waypointID; }
     void UpdateWaypointID(uint32 wpID) { m_waypointID = wpID; }
+
+    // nodeId, pathId
+    std::pair<uint32, uint32> GetCurrentWaypointInfo() const { return _currentWaypointNodeInfo; }
+    void UpdateCurrentWaypointInfo(uint32 nodeId, uint32 pathId) { _currentWaypointNodeInfo = { nodeId, pathId }; }
+
+    bool IsFormationLeader() const;
+    void SignalFormationMovement();
+    bool IsFormationLeaderMoveAllowed() const;
 
     void SearchFormation();
     [[nodiscard]] CreatureGroup const* GetFormation() const { return m_formation; }
@@ -480,6 +495,7 @@ protected:
 
     SpellSchoolMask m_meleeDamageSchoolMask;
     uint32 m_originalEntry;
+    int32 _creatureImmunitiesId;
     uint32 _gossipMenuId;
 
     bool m_moveInLineOfSightDisabled;
@@ -511,6 +527,7 @@ private:
     // WaypointMovementGenerator variable
     uint32 m_waypointID;
     uint32 m_path_id;
+    std::pair<uint32, uint32> _currentWaypointNodeInfo{0, 0};
 
     // Formation variable
     CreatureGroup* m_formation;
@@ -521,9 +538,9 @@ private:
     mutable std::shared_ptr<time_t> m_lastLeashExtensionTime;
 
     ObjectGuid m_cannotReachTarget;
-    uint32 m_cannotReachTimer;
 
     Spell const* _focusSpell;   ///> Locks the target during spell cast for proper facing
+    ObjectGuid _spellFocusTarget; ///> Saved target during spell focus for restoration
 
     CreatureTextRepeatGroup m_textRepeat;
 

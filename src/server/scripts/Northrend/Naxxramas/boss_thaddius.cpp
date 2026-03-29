@@ -128,8 +128,8 @@ public:
 
         bool IsAnyPlayerInMeleeRange() const
         {
-            for (auto const& ref : me->GetThreatMgr().GetThreatList())
-                if (Unit* target = ref->getTarget())
+            for (auto const* ref : me->GetThreatMgr().GetUnsortedThreatList())
+                if (Unit* target = ref->GetVictim())
                     if (target->IsPlayer() && me->IsWithinMeleeRange(target))
                         return true;
             return false;
@@ -446,6 +446,7 @@ public:
                 else
                 {
                     me->SetHealth(me->GetMaxHealth());
+                    me->GetThreatMgr().ResetAllThreat();
                 }
             }
         }

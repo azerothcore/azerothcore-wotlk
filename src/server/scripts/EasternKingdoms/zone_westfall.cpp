@@ -81,6 +81,7 @@ public:
             textCounter = SAY_DS_DOWN_1;
         }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();

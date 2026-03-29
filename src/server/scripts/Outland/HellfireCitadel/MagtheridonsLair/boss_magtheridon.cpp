@@ -79,12 +79,7 @@ enum Actions
 struct boss_magtheridon : public BossAI
 {
     boss_magtheridon(Creature* creature) : BossAI(creature, DATA_MAGTHERIDON)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    {    }
 
     void Reset() override
     {

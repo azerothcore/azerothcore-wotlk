@@ -32,11 +32,11 @@ class WintergraspCapturePoint;
 struct BfWGGameObjectBuilding;
 struct WGWorkshop;
 
-typedef std::set<GameObject*> GameObjectSet;
-typedef std::set<BfWGGameObjectBuilding*> GameObjectBuilding;
-typedef std::set<WGWorkshop*> Workshop;
-typedef std::set<Group*> GroupSet;
-//typedef std::set<WintergraspCapturePoint *> CapturePointSet; unused ?
+using GameObjectSet = std::set<GameObject*>;
+using GameObjectBuilding = std::set<BfWGGameObjectBuilding*>;
+using Workshop = std::set<WGWorkshop*>;
+using GroupSet = std::set<Group*>;
+//using CapturePointSet = std::set<WintergraspCapturePoint*>; unused ?
 
 uint32 const VehNumWorldState[2] = { WORLD_STATE_BATTLEFIELD_WG_VEHICLE_A, WORLD_STATE_BATTLEFIELD_WG_VEHICLE_H };
 uint32 const MaxVehNumWorldState[2] = { WORLD_STATE_BATTLEFIELD_WG_MAX_VEHICLE_A, WORLD_STATE_BATTLEFIELD_WG_MAX_VEHICLE_H };
@@ -110,10 +110,10 @@ class BfGraveyardWG : public BfGraveyard
 public:
     BfGraveyardWG(BattlefieldWG* Bf);
 
-    void SetTextId(uint32 textid) { m_GossipTextId = textid; }
-    uint32 GetTextId() { return m_GossipTextId; }
+    void SetTextId(uint32 textid) { GossipTextId = textid; }
+    uint32 GetTextId() const { return GossipTextId; }
 protected:
-    uint32 m_GossipTextId;
+    uint32 GossipTextId;
 };
 
 enum WGGraveyardId
@@ -236,13 +236,13 @@ class WintergraspCapturePoint : public BfCapturePoint
 public:
     WintergraspCapturePoint(BattlefieldWG* battlefield, TeamId teamInControl);
 
-    void LinkToWorkshop(WGWorkshop* workshop) { m_Workshop = workshop; }
+    void LinkToWorkshop(WGWorkshop* workshop) { LinkedWorkshop = workshop; }
 
     void ChangeTeam(TeamId oldteam) override;
-    TeamId GetTeam() const { return m_team; }
+    TeamId GetTeam() const { return Team; }
 
 protected:
-    WGWorkshop* m_Workshop;
+    WGWorkshop* LinkedWorkshop;
 };
 
 /* ######################### *
@@ -363,16 +363,16 @@ public:
     bool SetupBattlefield() override;
 
     /// Return pointer to relic object
-    GameObject* GetRelic() { return GetGameObject(m_titansRelic); }
+    GameObject* GetRelic() { return GetGameObject(TitansRelic); }
 
     /// Define relic object
-    //void SetRelic(GameObject* relic) { m_titansRelic = relic; }
+    //void SetRelic(GameObject* relic) { TitansRelic = relic; }
 
     /// Check if players can interact with the relic (Only if the last door has been broken)
-    bool CanInteractWithRelic() { return m_isRelicInteractible; }
+    bool CanInteractWithRelic() { return IsRelicInteractible; }
 
     /// Define if player can interact with the relic
-    void SetRelicInteractible(bool allow) { m_isRelicInteractible = allow; }
+    void SetRelicInteractible(bool allow) { IsRelicInteractible = allow; }
 
     /// Vehicle world states update
     void UpdateCounterVehicle(bool init);
@@ -434,25 +434,23 @@ public:
         return false;
     }
 protected:
-    bool m_isRelicInteractible;
+    bool IsRelicInteractible;
 
     Workshop WorkshopsList;
 
     GameObjectSet DefenderPortalList;
-    GameObjectSet m_KeepGameObject[2];
+    GameObjectSet KeepGameObject[2];
     GameObjectBuilding BuildingsInZone;
 
-    GuidUnorderedSet m_vehicles[2];
+    GuidUnorderedSet Vehicles[2];
     GuidUnorderedSet CanonList;
     GuidUnorderedSet KeepCreature[2];
     GuidUnorderedSet OutsideCreature[2];
-    GuidUnorderedSet m_updateTenacityList;
+    GuidUnorderedSet UpdateTenacityList;
 
-    int32 m_tenacityStack;
-    uint32 m_tenacityUpdateTimer;
-    uint32 m_saveTimer;
+    int32 TenacityStack;
 
-    ObjectGuid m_titansRelic;
+    ObjectGuid TitansRelic;
 };
 
 uint8 const WG_MAX_OBJ = 32;
@@ -558,10 +556,7 @@ struct WintergraspObjectPositionData
     uint32 entryAlliance;
 };
 
-// *****************************************************
-// ************ Destructible (Wall,Tower..) ************
-// *****************************************************
-
+// Destructible buildings (walls, towers, etc.)
 struct WintergraspBuildingSpawnData
 {
     uint32 entry;
@@ -748,10 +743,7 @@ WintergraspTeleporterData const WGPortalDefenderData[WG_MAX_TELEPORTER] =
     { 192951, 5316.25f, 2977.04f, 408.539f, -0.820f },
 };
 
-// *********************************************************
-// **********Tower Element(GameObject,Creature)*************
-// *********************************************************
-
+// Tower elements (GameObjects and Creatures)
 struct WintergraspTowerData
 {
     uint32 towerEntry;                  // Gameobject id of tower
@@ -1022,10 +1014,7 @@ WintergraspTowerCannonData const TowerCannon[WG_MAX_TOWER_CANNON] =
     },
 };
 
-// *********************************************************
-// *****************WorkShop Data & Element*****************
-// *********************************************************
-
+// Workshop data and elements
 uint8 const WG_MAX_WORKSHOP = 6;
 
 struct WGWorkshopData
@@ -1052,10 +1041,9 @@ WGWorkshopData const WorkshopsData[WG_MAX_WORKSHOP] =
     {BATTLEFIELD_WG_WORKSHOP_KEEP_EAST, WORLD_STATE_BATTLEFIELD_WG_WORKSHOP_K_E, 0, BATTLEFIELD_WG_TEXT_WORKSHOP_NE_TAKEN}
 };
 
-// ********************************************************************
-// *         Structs using for Building,Graveyard,Workshop            *
-// ********************************************************************
-// Structure for different buildings that can be destroyed during battle
+// Structs for Building, Graveyard, and Workshop runtime objects
+
+// Buildings that can be destroyed during battle
 struct BfWGGameObjectBuilding
 {
     BfWGGameObjectBuilding(BattlefieldWG* WG)

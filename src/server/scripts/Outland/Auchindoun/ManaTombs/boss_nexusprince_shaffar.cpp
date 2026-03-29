@@ -54,10 +54,6 @@ struct boss_nexusprince_shaffar : public BossAI
     boss_nexusprince_shaffar(Creature* creature) : BossAI(creature, DATA_NEXUSPRINCE_SHAFFAR), summons(me)
     {
         HasTaunted = false;
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
     }
 
     SummonList summons;

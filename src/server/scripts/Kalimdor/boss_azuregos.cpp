@@ -53,12 +53,7 @@ public:
     struct boss_azuregosAI : public ScriptedAI
     {
         boss_azuregosAI(Creature* creature) : ScriptedAI(creature)
-        {
-            scheduler.SetValidator([this]
-            {
-                return !me->HasUnitState(UNIT_STATE_CASTING);
-            });
-        }
+        {        }
 
         void Reset() override
         {

@@ -147,12 +147,7 @@ private:
 struct boss_terestian_illhoof : public BossAI
 {
     boss_terestian_illhoof(Creature* creature) : BossAI(creature, DATA_TERESTIAN)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    {    }
 
     void Reset() override
     {

@@ -552,7 +552,7 @@ void Aura::UpdateTargetMap(Unit* caster, bool apply)
             if (IsArea())
                 for (uint8 effIndex = 0; effIndex < MAX_SPELL_EFFECTS; ++effIndex)
                 {
-                    if ((existing->second & (1 << effIndex)) && existing->first->IsImmunedToSpellEffect(GetSpellInfo(), effIndex))
+                    if ((existing->second & (1 << effIndex)) && existing->first->IsImmunedToSpellEffect(GetSpellInfo(), effIndex, GetCaster()))
                         existing->second &= ~(1 << effIndex);
                 }
 
@@ -594,7 +594,7 @@ void Aura::UpdateTargetMap(Unit* caster, bool apply)
         // check target immunities
         for (uint8 effIndex = 0; effIndex < MAX_SPELL_EFFECTS; ++effIndex)
         {
-            if ((itr->second & (1 << effIndex)) && itr->first->IsImmunedToSpellEffect(GetSpellInfo(), effIndex))
+            if ((itr->second & (1 << effIndex)) && itr->first->IsImmunedToSpellEffect(GetSpellInfo(), effIndex, GetCaster()))
                 itr->second &= ~(1 << effIndex);
         }
         if (!itr->second || itr->first->IsImmunedToSpell(GetSpellInfo()) || !CanBeAppliedOn(itr->first))
@@ -1348,28 +1348,6 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 }
                 switch (GetId())
                 {
-                    case 12536: // Clearcasting
-                    case 12043: // Presence of Mind
-                        // Arcane Potency
-                        if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_MAGE, 2120, 0))
-                        {
-                            uint32 spellId = 0;
-
-                            switch (aurEff->GetId())
-                            {
-                                case 31571:
-                                    spellId = 57529;
-                                    break;
-                                case 31572:
-                                    spellId = 57531;
-                                    break;
-                                default:
-                                    LOG_ERROR("spells.aura", "Aura::HandleAuraSpecificMods: Unknown rank of Arcane Potency ({}) found", aurEff->GetId());
-                            }
-                            if (spellId)
-                                caster->CastSpell(caster, spellId, true);
-                        }
-                        break;
                     case 44544: // Fingers of Frost
                         {
                             // See if we already have the indicator aura. If not, create one.
@@ -2844,7 +2822,7 @@ void UnitAura::FillTargetMap(std::map<Unit*, uint8>& targets, Unit* caster)
         {
             float radius = GetSpellInfo()->Effects[effIndex].CalcRadius(caster);
 
-            if (!GetUnitOwner()->HasUnitState(UNIT_STATE_ISOLATED))
+            if (!GetUnitOwner()->HasAuraState(AURA_STATE_BANISHED, GetSpellInfo(), caster))
             {
                 switch (GetSpellInfo()->Effects[effIndex].Effect)
                 {

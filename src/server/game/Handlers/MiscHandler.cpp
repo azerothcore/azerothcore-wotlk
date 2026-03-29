@@ -96,6 +96,12 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recv_data)
 
     recv_data >> guid >> menuId >> gossipListId;
 
+    if (!_player->PlayerTalkClass->GetGossipMenu().GetItem(gossipListId))
+    {
+        recv_data.rfinish();
+        return;
+    }
+
     if (_player->PlayerTalkClass->IsGossipOptionCoded(gossipListId))
         recv_data >> code;
 
@@ -726,7 +732,8 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
     if (player->isDebugAreaTriggers)
         ChatHandler(this).PSendSysMessage(LANG_DEBUG_AREATRIGGER_REACHED, triggerId);
 
-    if (sScriptMgr->OnAreaTrigger(player, atEntry))
+    // Skip areatrigger scripts for GMs unless debug areatriggers is enabled
+    if ((!player->IsGameMaster() || player->isDebugAreaTriggers) && sScriptMgr->OnAreaTrigger(player, atEntry))
         return;
 
     if (player->IsAlive())
@@ -941,14 +948,14 @@ void WorldSession::HandleSetActionButtonOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleCompleteCinematic(WorldPacket& /*recv_data*/)
 {
-    // If player has sight bound to visual waypoint NPC we should remove it
-    GetPlayer()->GetCinematicMgr()->EndCinematic();
+    // End the current cinematic and restore the normal player view
+    GetPlayer()->GetCinematicMgr().EndCinematic();
 }
 
 void WorldSession::HandleNextCinematicCamera(WorldPacket& /*recv_data*/)
 {
     // Sent by client when cinematic actually begun. So we begin the server side process
-    GetPlayer()->GetCinematicMgr()->BeginCinematic();
+    GetPlayer()->GetCinematicMgr().StartCinematicCamera();
 }
 
 void WorldSession::HandleSetActionBarToggles(WorldPacket& recv_data)
