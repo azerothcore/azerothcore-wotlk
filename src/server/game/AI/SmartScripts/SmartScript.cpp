@@ -1039,7 +1039,16 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             if (!me)
                 break;
 
+            // Suppress evade during script-initiated combat stop so
+            // JustExitedCombat does not trigger EnterEvadeMode.
+            if (SmartAI* sai = CAST_AI(SmartAI, me->AI()))
+                sai->SetSuppressEvade(true);
+
             me->CombatStop(true);
+
+            if (SmartAI* sai = CAST_AI(SmartAI, me->AI()))
+                sai->SetSuppressEvade(false);
+
             break;
         }
         case SMART_ACTION_CALL_GROUPEVENTHAPPENS:

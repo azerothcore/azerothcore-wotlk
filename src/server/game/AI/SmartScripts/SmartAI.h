@@ -181,6 +181,7 @@ public:
     void SetSwim(bool swim = true);
 
     void SetEvadeDisabled(bool disable = true);
+    void SetSuppressEvade(bool suppress) { mSuppressEvade = suppress; }
 
     void SetInvincibilityHpLevel(uint32 level) { mInvincibilityHpLevel = level; }
 
@@ -249,6 +250,7 @@ private:
     uint32 GetWPCount() { return mWayPoints ? mWayPoints->Nodes.size() : 0; }
     bool mCanRepeatPath;
     bool mEvadeDisabled;
+    bool mSuppressEvade;
     bool mCanAutoAttack;
     bool mForcedPaused;
     uint32 mInvincibilityHpLevel;
