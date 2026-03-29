@@ -142,6 +142,8 @@ bool WorldSession::SendLearnNewTaxiNode(Creature* unit)
         update << uint8(1);
         SendPacket(&update);
 
+        sScriptMgr->OnPlayerLearnTaxiNode(GetPlayer(), curloc);
+
         return true;
     }
     else
@@ -154,6 +156,8 @@ void WorldSession::SendDiscoverNewTaxiNode(uint32 nodeid)
     {
         WorldPacket msg(SMSG_NEW_TAXI_PATH, 0);
         SendPacket(&msg);
+
+        sScriptMgr->OnPlayerLearnTaxiNode(GetPlayer(), nodeid);
     }
 }
 
