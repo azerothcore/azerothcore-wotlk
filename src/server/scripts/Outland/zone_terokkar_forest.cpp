@@ -374,6 +374,7 @@ public:
     {
         npc_isla_starmaneAI(Creature* creature) : npc_escortAI(creature) { }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();
@@ -612,43 +613,6 @@ public:
     }
 };
 
-/*######
-## npc_slim
-######*/
-
-enum Slim
-{
-    FACTION_CONSORTIUM  = 933
-};
-
-class npc_slim : public CreatureScript
-{
-public:
-    npc_slim() : CreatureScript("npc_slim") { }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_TRADE)
-            player->GetSession()->SendListInventory(creature->GetGUID());
-
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (creature->IsVendor() && player->GetReputationRank(FACTION_CONSORTIUM) >= REP_FRIENDLY)
-        {
-            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
-            SendGossipMenuFor(player, 9896, creature->GetGUID());
-        }
-        else
-            SendGossipMenuFor(player, 9895, creature->GetGUID());
-
-        return true;
-    }
-};
-
 void AddSC_terokkar_forest()
 {
     RegisterSpellAndAuraScriptPair(spell_q10930_big_bone_worm, spell_q10930_big_bone_worm_aura);
@@ -662,5 +626,4 @@ void AddSC_terokkar_forest()
     new npc_isla_starmane();
     new go_skull_pile();
     new go_ancient_skull_pile();
-    new npc_slim();
 }

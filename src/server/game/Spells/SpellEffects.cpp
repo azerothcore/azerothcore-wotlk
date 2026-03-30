@@ -856,7 +856,7 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
                         SpellInfo const* spell = iter->second->GetBase()->GetSpellInfo();
 
                         // Pounce Bleed shouldn't be removed by Cloak of Shadows.
-                        if (spell->GetAllEffectsMechanicMask() & 1 << MECHANIC_BLEED)
+                        if (spell->GetAllEffectsMechanicMask() & (UI64LIT(1) << MECHANIC_BLEED))
                             return;
 
                         bool dmgClassNone = false;
@@ -1889,7 +1889,7 @@ void Spell::EffectEnergize(SpellEffIndex effIndex)
     if (!unitTarget->IsAlive())
         return;
 
-    if (unitTarget->HasUnitState(UNIT_STATE_ISOLATED))
+    if (unitTarget->IsImmunedToAuraPeriodicTick(m_caster, m_spellInfo))
     {
         m_caster->SendSpellDamageImmune(unitTarget, GetSpellInfo()->Id);
         return;
@@ -3681,7 +3681,7 @@ void Spell::EffectHealMaxHealth(SpellEffIndex /*effIndex*/)
     if (!unitTarget || !unitTarget->IsAlive())
         return;
 
-    if (unitTarget->HasUnitState(UNIT_STATE_ISOLATED))
+    if (unitTarget->IsImmunedToAuraPeriodicTick(m_caster, m_spellInfo))
     {
         m_caster->SendSpellDamageImmune(unitTarget, GetSpellInfo()->Id);
         return;
@@ -5152,7 +5152,7 @@ void Spell::EffectDispelMechanic(SpellEffIndex effIndex)
             continue;
         if (roll_chance_i(aura->CalcDispelChance(unitTarget, !unitTarget->IsFriendlyTo(m_caster))))
         {
-            if ((aura->GetSpellInfo()->GetAllEffectsMechanicMask() & (1 << mechanic)))
+            if ((aura->GetSpellInfo()->GetAllEffectsMechanicMask() & (UI64LIT(1) << mechanic)))
             {
                 dispel_list.push(std::make_pair(aura->GetId(), aura->GetCasterGUID()));
 
@@ -5943,6 +5943,9 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
 
     if (caster->IsTotem())
         caster = caster->ToTotem()->GetOwner();
+    else if (caster->IsPet())
+        if (Unit* owner = caster->GetOwner())
+            caster = owner;
 
     // in another case summon new
     uint8 summonLevel = caster->GetLevel();

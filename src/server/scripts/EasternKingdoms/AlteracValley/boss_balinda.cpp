@@ -43,12 +43,7 @@ enum Creatures
 struct boss_balinda : public ScriptedAI
 {
     boss_balinda(Creature* creature) : ScriptedAI(creature), summons(me), _hasCastIceBlock(false)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    {    }
 
     void Reset() override
     {

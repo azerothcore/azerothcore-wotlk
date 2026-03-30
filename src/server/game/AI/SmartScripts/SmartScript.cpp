@@ -1039,7 +1039,16 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             if (!me)
                 break;
 
+            // Suppress evade during script-initiated combat stop so
+            // JustExitedCombat does not trigger EnterEvadeMode.
+            if (SmartAI* sai = CAST_AI(SmartAI, me->AI()))
+                sai->SetSuppressEvade(true);
+
             me->CombatStop(true);
+
+            if (SmartAI* sai = CAST_AI(SmartAI, me->AI()))
+                sai->SetSuppressEvade(false);
+
             break;
         }
         case SMART_ACTION_CALL_GROUPEVENTHAPPENS:
@@ -2533,14 +2542,12 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                                 break;
                             }
 
-                            if (!path || path->empty())
+                            if (!path || path->Nodes.empty())
                                 continue;
 
-                            auto itrWp = path->find(1);
-                            if (itrWp != path->end())
                             {
-                                WaypointData const& wpData = itrWp->second;
-                                float distToThisPath = creature->GetExactDistSq(wpData.x, wpData.y, wpData.z);
+                                WaypointNode const& wpData = path->Nodes[0];
+                                float distToThisPath = creature->GetExactDistSq(wpData.X, wpData.Y, wpData.Z);
 
                                 if (distToThisPath < distanceToClosest)
                                 {

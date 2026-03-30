@@ -20,8 +20,8 @@
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
+#include "SpellMgr.h"
 #include "ScriptedEscortAI.h"
-#include "ScriptedGossip.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
@@ -72,6 +72,7 @@ struct npc_frosthound : public npc_escortAI
             return;
     }
 
+    using CreatureAI::WaypointReached;
     void WaypointReached(uint32 waypointId) override
     {
         Player* player = GetPlayerForEscort();
@@ -338,56 +339,6 @@ class spell_q13007_iron_colossus : public SpellScript
 };
 
 /*######
-## npc_roxi_ramrocket
-######*/
-
-enum RoxiRamrocket
-{
-    SPELL_MECHANO_HOG               = 60866,
-    SPELL_MEKGINEERS_CHOPPER        = 60867
-};
-
-class npc_roxi_ramrocket : public CreatureScript
-{
-public:
-    npc_roxi_ramrocket() : CreatureScript("npc_roxi_ramrocket") { }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        //Quest Menu
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        //Trainer Menu
-        if (creature->IsTrainer())
-            AddGossipItemFor(player, GOSSIP_ICON_TRAINER, GOSSIP_TEXT_TRAIN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
-
-        //Vendor Menu
-        if (creature->IsVendor())
-            if (player->HasSpell(SPELL_MECHANO_HOG) || player->HasSpell(SPELL_MEKGINEERS_CHOPPER))
-                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
-
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        switch (action)
-        {
-            case GOSSIP_ACTION_TRAIN:
-                player->GetSession()->SendTrainerList(creature);
-                break;
-            case GOSSIP_ACTION_TRADE:
-                player->GetSession()->SendListInventory(creature->GetGUID());
-                break;
-        }
-        return true;
-    }
-};
-
-/*######
 ## npc_brunnhildar_prisoner
 ######*/
 
@@ -567,6 +518,7 @@ public:
             }
         }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 /*waypointId*/) override { }
         void JustDied(Unit* /*killer*/) override { }
         void OnCharmed(bool /*apply*/) override { }
@@ -1340,13 +1292,49 @@ class spell_eject_passenger_wild_wyrm : public SpellScript
     }
 };
 
+struct npc_oathbound_warder : public ScriptedAI
+{
+    npc_oathbound_warder(Creature* creature) : ScriptedAI(creature) { }
+
+    void AttackStart(Unit* /*who*/) override { }
+    void JustEngagedWith(Unit* /*who*/) override { }
+    void UpdateAI(uint32 /*diff*/) override { } // Need so AI doesn't stop casting when hit in combat
+
+    void InitializeAI() override
+    {
+        ScriptedAI::InitializeAI();
+        me->SetReactState(REACT_PASSIVE);
+
+        CharmInfo* charmInfo = me->GetCharmInfo();
+        if (!charmInfo)
+            return;
+
+        charmInfo->InitEmptyActionBar(false);
+
+        uint32 slot = 0;
+        for (uint32 i = 0; i < MAX_CREATURE_SPELLS; ++i)
+        {
+            uint32 spellId = me->m_spells[i];
+            if (!spellId)
+                continue;
+
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+            if (spellInfo && spellInfo->IsPassive())
+                me->CastSpell(me, spellInfo, true);
+
+            charmInfo->SetActionBar(6 + slot, spellId, ACT_PASSIVE);
+            ++slot;
+        }
+    }
+};
+
 void AddSC_storm_peaks()
 {
     RegisterCreatureAI(npc_frosthound);
+    RegisterCreatureAI(npc_oathbound_warder);
     new npc_iron_watcher();
     new npc_time_lost_proto_drake();
     RegisterSpellScript(spell_q13007_iron_colossus);
-    new npc_roxi_ramrocket();
     new npc_brunnhildar_prisoner();
     new npc_freed_protodrake();
     new npc_icefang();

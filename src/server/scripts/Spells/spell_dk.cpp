@@ -16,7 +16,6 @@
  */
 
 #include "AreaDefines.h"
-#include "CreatureScript.h"
 #include "PetDefines.h"
 #include "Player.h"
 #include "SpellAuraEffects.h"

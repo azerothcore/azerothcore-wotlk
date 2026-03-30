@@ -540,6 +540,11 @@ void ThreatManager::TauntUpdate()
 
     // taunt aura update also re-evaluates all suppressed states (retail behavior)
     EvaluateSuppressed(true);
+
+    // immediately reselect victim so taunt takes effect without waiting
+    // for the next THREAT_UPDATE_INTERVAL (1 s) timer tick
+    UpdateVictim();
+    _updateTimer = THREAT_UPDATE_INTERVAL;
 }
 
 void ThreatManager::SetTauntStateForTesting(

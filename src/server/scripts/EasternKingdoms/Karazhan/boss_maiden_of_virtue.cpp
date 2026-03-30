@@ -39,12 +39,7 @@ enum Spells
 struct boss_maiden_of_virtue : public BossAI
 {
     boss_maiden_of_virtue(Creature* creature) : BossAI(creature, DATA_MAIDEN)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    {    }
 
     void JustEngagedWith(Unit* who) override
     {

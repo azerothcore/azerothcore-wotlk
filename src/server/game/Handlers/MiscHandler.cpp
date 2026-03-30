@@ -732,7 +732,8 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
     if (player->isDebugAreaTriggers)
         ChatHandler(this).PSendSysMessage(LANG_DEBUG_AREATRIGGER_REACHED, triggerId);
 
-    if (sScriptMgr->OnAreaTrigger(player, atEntry))
+    // Skip areatrigger scripts for GMs unless debug areatriggers is enabled
+    if ((!player->IsGameMaster() || player->isDebugAreaTriggers) && sScriptMgr->OnAreaTrigger(player, atEntry))
         return;
 
     if (player->IsAlive())

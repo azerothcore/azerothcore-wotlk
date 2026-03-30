@@ -38,12 +38,7 @@ enum Text
 struct boss_mennu_the_betrayer : public BossAI
 {
     boss_mennu_the_betrayer(Creature* creature) : BossAI(creature, DATA_MENNU_THE_BETRAYER)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    {    }
 
     void Reset() override
     {
