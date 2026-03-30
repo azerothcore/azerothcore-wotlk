@@ -1,0 +1,150 @@
+mmapsConfig:
+  skipLiquid: false
+  skipContinents: false
+  skipJunkMaps: true
+  skipBattlegrounds: false
+
+  # Path to the directory containing navigation data files.
+  # This directory should contain the "maps" and "vmaps" folders,
+  # and is also where the "mmaps" folder will be created or located.
+  dataDir: "./"
+
+  meshSettings:
+    # Here we have global config for recast navigation.
+    # It's possible to override these data on map or tile level (see mapsOverrides).
+
+    # Maximum slope angle (in degrees) NPCs can walk on.
+    # Surfaces steeper than this will be considered unwalkable.
+    walkableSlopeAngle: 60
+
+    # --- Cell Size Calculation ---
+    # Many parameters below are defined in "cell units".
+    # In RecastDemo, you often work with world units instead of cell units.
+    # By default, these cell units are converted to world units using the formula:
+    #
+    #     cellSize = MMAP::GRID_SIZE / (verticesPerMapEdge - 1)
+    #
+    # Where:
+    #     MMAP::GRID_SIZE = 533.3333f (the size of one map tile in world units)
+    #     verticesPerMapEdge = number of vertices along one edge of the full map grid
+    #
+    # Example:
+    #     If verticesPerMapEdge = 2000, then:
+    #         cellSize ≈ 533.3333 / (2000 - 1) ≈ 0.2667 world units per cell
+    #
+    # To convert a value from cell units to world units (e.g., walkableClimb),
+    # multiply by cellSize. For example, a walkableClimb of 6 corresponds to:
+    #     6 * 0.2667 ≈ 1.6 world units
+
+    # Minimum ceiling height (in cell units) NPCs need to pass under an obstacle.
+    # Controls how much vertical clearance is required.
+    # To convert to world units, multiply by cellSize (see "Cell Size Calculation").
+    walkableHeight: 6
+
+    # Maximum height difference (in cell units) NPCs can step up or down.
+    # Higher values allow walking over fences, ledges, or steps.
+    # To convert to world units, multiply by cellSize (see "Cell Size Calculation").
+    #
+    # Vanilla WotLK uses 6, which allows creatures to "jump" over fences.
+    # Classic WotLK uses 4, which forces creatures to walk around fences.
+    walkableClimb: 6
+
+    # Minimum distance (in cell units) around walkable surfaces.
+    # Helps prevent NPCs from clipping into walls and narrow gaps.
+    # To convert to world units, multiply by cellSize (see "Cell Size Calculation").
+    walkableRadius: 2
+
+    # Number of vertices along one edge of the entire map's navmesh grid.
+    # Higher values increase mesh resolution but also CPU/memory usage.
+    verticesPerMapEdge: 2000
+
+    # Number of vertices along one edge of each tile chunk.
+    # Must divide (vertexPerMapEdge - 1) evenly for seamless tiles.
+    # A higher vertex count per tile means fewer total tiles,
+    # reducing runtime work to load, unload, and manage tiles.
+    verticesPerTileEdge: 80
+
+    # Tolerance for how much a polygon can deviate from the original geometry when simplified.
+    # Higher values produce simpler (faster) meshes but can reduce accuracy.
+    maxSimplificationError: 1.8
+
+    # You can override any global parameter for a specific map by specifying its map ID.
+    # Inside each map override, you can also override parameters per individual tile,
+    # identified by a string "tileX,tileY" (coordinates).
+    #
+    # Overrides cascade: global settings → map overrides → tile overrides.
+    # For example:
+    #
+    # mapsOverrides:
+    #   "0":                              # Map ID 0 overrides
+    #     walkableRadius: 5               # Override global climb height for entire map 0
+    #
+    #     tilesOverrides:
+    #       "50,70":                      # Tile at coordinates (50,70) on map 0
+    #         walkableSlopeAngle: 70      # Override slope angle locally just here
+    #         walkableClimb: 4            # Also override climb height for this tile only
+    #
+    #       "51,71":
+    #         walkableClimb: 3            # Override climb height for tile (51,71)
+    #
+    #       "48,32":
+    #         walkableClimb: 1            # Even smaller climb for tile (48,32)
+    #
+    #   "1":                              # Map ID 1 overrides example
+    #     walkableHeight: 8               # Increase clearance for whole map 1
+    #
+    #     tilesOverrides:
+    #       "100,100":
+    #         maxSimplificationError: 2.5 # Looser mesh simplification for this tile only
+    #
+    #       "101,101":
+    #         walkableRadius: 1           # Smaller NPC radius here for tight corridors
+    #
+    # This approach allows very fine-grained control of navigation mesh parameters
+    # on a per-map and per-tile basis, optimizing pathfinding quality and performance.
+    #
+    # All parameters defined globally are eligible for override.
+    # Just specify the parameter name and new value in the override section.
+    mapsOverrides:
+      "562": # Blade's Edge Arena
+        walkableRadius: 0 # This allows walking on the ropes to the pillars
+
+      "48": # Blackfathom Deeps
+        cellSizeVertical: 0.5334 # ch*2 = 0.2667 * 2 ≈ 0.5334. Reduce the chance to have underground levels.
+
+      "529": # Arathi Basin
+        tilesOverrides:
+          "30,29": # Lumber Mill
+            # Make sure that Fear will not drop players rom cliff -
+            # https://github.com/azerothcore/azerothcore-wotlk/pull/22462#issuecomment-3067024680
+            walkableSlopeAngle: 45
+
+      "530": # Outland
+        tilesOverrides:
+          "32,30": # Dark portal
+            walkableSlopeAngle: 45 # https://github.com/chromiecraft/chromiecraft/issues/8404#issuecomment-3476012660
+
+  # debugOutput generates debug files in the `meshes` directory for use with RecastDemo.
+  # This is useful for inspecting and debugging mmap generation visually.
+  #
+  # My workflow:
+  # 1. Install RecastDemo. I'm building it from the source of this fork: https://github.com/jackpoz/recastnavigation
+  # 2. In-game, move your character to the area you want to debug.
+  # 3. Type `.mmap loc` in chat. This will output:
+  #    - The current tile file name (e.g., `04832.mmtile`)
+  #    - The Recast config values used to generate that tile
+  # 4. Enable `debugOutput` and regenerate mmaps (preferably just the tile from step 3).
+  #    - To regenerate only one tile, delete it from the `mmaps` folder.
+  # 5. After generation, you will find debug files in the `meshes` folder, including an OBJ file (e.g., `map0004832.obj`)
+  # 6. Copy these debug files to the `Meshes` folder used by RecastDemo.
+  #    - RecastDemo expects this folder to be in the same directory as its executable.
+  # 7. In RecastDemo:
+  #    - Click "Input Mesh" and select the `.obj` file
+  #    - Choose "Solo Mesh" in the Sample selector
+  # 8. (Optional) Reuse the Recast config values from step 3:
+  #    - `cellSizeHorizontal` → "Cell Size"
+  #    - `walkableSlopeAngle` → "Max Slope"
+  #    - `walkableClimb` → "Max Climb"
+  #    - and so on
+  # 9. Scroll to the bottom of RecastDemo UI and press "Build" to generate the navigation mesh
+  debugOutput: false

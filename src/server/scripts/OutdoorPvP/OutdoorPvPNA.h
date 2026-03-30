@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -34,57 +34,17 @@ const uint32 NA_CREDIT_MARKER = 24867;
 
 const uint32 NA_GUARDS_MAX = 15;
 
-const uint32 NA_BUFF_ZONE = 3518;
+const uint32 NA_BUFF_ZONE = AREA_NAGRAND;
 
 const uint32 NA_HALAA_GRAVEYARD = 993;
 
-const uint32 NA_HALAA_GRAVEYARD_ZONE = 3518; // need to add zone id, not area id
-
-uint32 const NA_HALAA_ZONE_ID = 3628; // halaa zone id
+const uint32 NA_HALAA_GRAVEYARD_ZONE = AREA_NAGRAND; // need to add zone id, not area id
 
 const uint32 NA_RESPAWN_TIME = 3600000; // one hour to capture after defeating all guards
 
 const uint32 NA_GUARD_CHECK_TIME = 500; // every half second
 
 const uint32 NA_HALAA_BOMB = 24538; // Item id Bomb throwed in Halaa
-
-enum OutdoorPvPNAWorldStates
-{
-    NA_UI_HORDE_GUARDS_SHOW = 2503,
-    NA_UI_ALLIANCE_GUARDS_SHOW = 2502,
-    NA_UI_GUARDS_MAX = 2493,
-    NA_UI_GUARDS_LEFT = 2491,
-
-    NA_UI_TOWER_SLIDER_DISPLAY = 2495,
-    NA_UI_TOWER_SLIDER_POS = 2494,
-    NA_UI_TOWER_SLIDER_N = 2497,
-
-    NA_MAP_WYVERN_NORTH_NEU_H = 2762,
-    NA_MAP_WYVERN_NORTH_NEU_A = 2662,
-    NA_MAP_WYVERN_NORTH_H = 2663,
-    NA_MAP_WYVERN_NORTH_A = 2664,
-
-    NA_MAP_WYVERN_SOUTH_NEU_H = 2760,
-    NA_MAP_WYVERN_SOUTH_NEU_A = 2670,
-    NA_MAP_WYVERN_SOUTH_H = 2668,
-    NA_MAP_WYVERN_SOUTH_A = 2669,
-
-    NA_MAP_WYVERN_WEST_NEU_H = 2761,
-    NA_MAP_WYVERN_WEST_NEU_A = 2667,
-    NA_MAP_WYVERN_WEST_H = 2665,
-    NA_MAP_WYVERN_WEST_A = 2666,
-
-    NA_MAP_WYVERN_EAST_NEU_H = 2763,
-    NA_MAP_WYVERN_EAST_NEU_A = 2659,
-    NA_MAP_WYVERN_EAST_H = 2660,
-    NA_MAP_WYVERN_EAST_A = 2661,
-
-    NA_MAP_HALAA_NEUTRAL = 2671,
-    NA_MAP_HALAA_NEU_A = 2676,
-    NA_MAP_HALAA_NEU_H = 2677,
-    NA_MAP_HALAA_HORDE = 2672,
-    NA_MAP_HALAA_ALLIANCE = 2673
-};
 
 const uint32 FLIGHT_NODES_NUM = 4;
 
@@ -137,39 +97,39 @@ enum HalaaCreaturesSpawn
 // spawned when the alliance is attacking, horde is in control
 const go_type HordeControlGOs[NA_CONTROL_GO_NUM] =
 {
-    {182267, 530, -1815.8f, 8036.51f, -26.2354f, -2.89725f, 0.0f, 0.0f, 0.992546f, -0.121869f}, //ALLY_ROOST_SOUTH
-    {182280, 530, -1507.95f, 8132.1f, -19.5585f, -1.3439f, 0.0f, 0.0f, 0.622515f, -0.782608f}, //ALLY_ROOST_WEST
-    {182281, 530, -1384.52f, 7779.33f, -11.1663f, -0.575959f, 0.0f, 0.0f, 0.284015f, -0.95882f}, //ALLY_ROOST_NORTH
-    {182282, 530, -1650.11f, 7732.56f, -15.4505f, -2.80998f, 0.0f, 0.0f, 0.986286f, -0.165048f}, //ALLY_ROOST_EAST
+    {182267, MAP_OUTLAND, -1815.8f, 8036.51f, -26.2354f, -2.89725f, 0.0f, 0.0f, 0.992546f, -0.121869f}, //ALLY_ROOST_SOUTH
+    {182280, MAP_OUTLAND, -1507.95f, 8132.1f, -19.5585f, -1.3439f, 0.0f, 0.0f, 0.622515f, -0.782608f}, //ALLY_ROOST_WEST
+    {182281, MAP_OUTLAND, -1384.52f, 7779.33f, -11.1663f, -0.575959f, 0.0f, 0.0f, 0.284015f, -0.95882f}, //ALLY_ROOST_NORTH
+    {182282, MAP_OUTLAND, -1650.11f, 7732.56f, -15.4505f, -2.80998f, 0.0f, 0.0f, 0.986286f, -0.165048f}, //ALLY_ROOST_EAST
 
-    {182222, 530, -1825.4022f, 8039.2602f, -26.08f, -2.89725f, 0.0f, 0.0f, 0.992546f, -0.121869f}, //HORDE_BOMB_WAGON_SOUTH
-    {182272, 530, -1517.44f, 8140.24f, -20.17f, -2.8099f, 0.0f, 0.0f, 0.622515f, -0.782608f}, //HORDE_BOMB_WAGON_WEST
-    {182273, 530, -1389.53f, 7782.50f, -11.62f, -1.5184f, 0.0f, 0.0f, 0.284015f, -0.95882f}, //HORDE_BOMB_WAGON_NORTH
-    {182274, 530, -1662.28f, 7735.00f, -15.96f, 1.8845f, 0.0f, 0.0f, 0.986286f, -0.165048f}, //HORDE_BOMB_WAGON_EAST
+    {182222, MAP_OUTLAND, -1825.4022f, 8039.2602f, -26.08f, -2.89725f, 0.0f, 0.0f, 0.992546f, -0.121869f}, //HORDE_BOMB_WAGON_SOUTH
+    {182272, MAP_OUTLAND, -1517.44f, 8140.24f, -20.17f, -2.8099f, 0.0f, 0.0f, 0.622515f, -0.782608f}, //HORDE_BOMB_WAGON_WEST
+    {182273, MAP_OUTLAND, -1389.53f, 7782.50f, -11.62f, -1.5184f, 0.0f, 0.0f, 0.284015f, -0.95882f}, //HORDE_BOMB_WAGON_NORTH
+    {182274, MAP_OUTLAND, -1662.28f, 7735.00f, -15.96f, 1.8845f, 0.0f, 0.0f, 0.986286f, -0.165048f}, //HORDE_BOMB_WAGON_EAST
 
-    {182266, 530, -1815.8f, 8036.51f, -26.2354f, -2.89725f, 0.0f, 0.0f, 0.992546f, -0.121869f}, //DESTROYED_ALLY_ROOST_SOUTH
-    {182275, 530, -1507.95f, 8132.1f, -19.5585f, -1.3439f, 0.0f, 0.0f, 0.622515f, -0.782608f}, //DESTROYED_ALLY_ROOST_WEST
-    {182276, 530, -1384.52f, 7779.33f, -11.1663f, -0.575959f, 0.0f, 0.0f, 0.284015f, -0.95882f}, //DESTROYED_ALLY_ROOST_NORTH
-    {182277, 530, -1650.11f, 7732.56f, -15.4505f, -2.80998f, 0.0f, 0.0f, 0.986286f, -0.165048f}  //DESTROYED_ALLY_ROOST_EAST
+    {182266, MAP_OUTLAND, -1815.8f, 8036.51f, -26.2354f, -2.89725f, 0.0f, 0.0f, 0.992546f, -0.121869f}, //DESTROYED_ALLY_ROOST_SOUTH
+    {182275, MAP_OUTLAND, -1507.95f, 8132.1f, -19.5585f, -1.3439f, 0.0f, 0.0f, 0.622515f, -0.782608f}, //DESTROYED_ALLY_ROOST_WEST
+    {182276, MAP_OUTLAND, -1384.52f, 7779.33f, -11.1663f, -0.575959f, 0.0f, 0.0f, 0.284015f, -0.95882f}, //DESTROYED_ALLY_ROOST_NORTH
+    {182277, MAP_OUTLAND, -1650.11f, 7732.56f, -15.4505f, -2.80998f, 0.0f, 0.0f, 0.986286f, -0.165048f}  //DESTROYED_ALLY_ROOST_EAST
 };
 
 // spawned when the horde is attacking, alliance is in control
 const go_type AllianceControlGOs[NA_CONTROL_GO_NUM] =
 {
-    {182301, 530, -1815.8f, 8036.51f, -26.2354f, -2.89725f, 0.0f, 0.0f, 0.992546f, -0.121869f}, //HORDE_ROOST_SOUTH
-    {182302, 530, -1507.95f, 8132.1f, -19.5585f, -1.3439f, 0.0f, 0.0f, 0.622515f, -0.782608f}, //HORDE_ROOST_WEST
-    {182303, 530, -1384.52f, 7779.33f, -11.1663f, -0.575959f, 0.0f, 0.0f, 0.284015f, -0.95882f}, //HORDE_ROOST_NORTH
-    {182304, 530, -1650.11f, 7732.56f, -15.4505f, -2.80998f, 0.0f, 0.0f, 0.986286f, -0.165048f}, //HORDE_ROOST_EAST
+    {182301, MAP_OUTLAND, -1815.8f, 8036.51f, -26.2354f, -2.89725f, 0.0f, 0.0f, 0.992546f, -0.121869f}, //HORDE_ROOST_SOUTH
+    {182302, MAP_OUTLAND, -1507.95f, 8132.1f, -19.5585f, -1.3439f, 0.0f, 0.0f, 0.622515f, -0.782608f}, //HORDE_ROOST_WEST
+    {182303, MAP_OUTLAND, -1384.52f, 7779.33f, -11.1663f, -0.575959f, 0.0f, 0.0f, 0.284015f, -0.95882f}, //HORDE_ROOST_NORTH
+    {182304, MAP_OUTLAND, -1650.11f, 7732.56f, -15.4505f, -2.80998f, 0.0f, 0.0f, 0.986286f, -0.165048f}, //HORDE_ROOST_EAST
 
-    {182305, 530, -1825.4022f, 8039.2602f, -26.08f, -2.89725f, 0.0f, 0.0f, 0.992546f, -0.121869f}, //ALLY_BOMB_WAGON_SOUTH
-    {182306, 530, -1517.44f, 8140.24f, -20.17f, -2.8099f, 0.0f, 0.0f, 0.622515f, -0.782608f}, //ALLY_BOMB_WAGON_WEST
-    {182307, 530, -1389.53f, 7782.50f, -11.62f, -1.5184f, 0.0f, 0.0f, 0.284015f, -0.95882f}, //ALLY_BOMB_WAGON_NORTH
-    {182308, 530, -1662.28f, 7735.00f, -15.96f, 1.8845f, 0.0f, 0.0f, 0.986286f, -0.165048f}, //ALLY_BOMB_WAGON_EAST
+    {182305, MAP_OUTLAND, -1825.4022f, 8039.2602f, -26.08f, -2.89725f, 0.0f, 0.0f, 0.992546f, -0.121869f}, //ALLY_BOMB_WAGON_SOUTH
+    {182306, MAP_OUTLAND, -1517.44f, 8140.24f, -20.17f, -2.8099f, 0.0f, 0.0f, 0.622515f, -0.782608f}, //ALLY_BOMB_WAGON_WEST
+    {182307, MAP_OUTLAND, -1389.53f, 7782.50f, -11.62f, -1.5184f, 0.0f, 0.0f, 0.284015f, -0.95882f}, //ALLY_BOMB_WAGON_NORTH
+    {182308, MAP_OUTLAND, -1662.28f, 7735.00f, -15.96f, 1.8845f, 0.0f, 0.0f, 0.986286f, -0.165048f}, //ALLY_BOMB_WAGON_EAST
 
-    {182297, 530, -1815.8f, 8036.51f, -26.2354f, -2.89725f, 0.0f, 0.0f, 0.992546f, -0.121869f}, //DESTROYED_HORDE_ROOST_SOUTH
-    {182298, 530, -1507.95f, 8132.1f, -19.5585f, -1.3439f, 0.0f, 0.0f, 0.622515f, -0.782608f}, //DESTROYED_HORDE_ROOST_WEST
-    {182299, 530, -1384.52f, 7779.33f, -11.1663f, -0.575959f, 0.0f, 0.0f, 0.284015f, -0.95882f}, //DESTROYED_HORDE_ROOST_NORTH
-    {182300, 530, -1650.11f, 7732.56f, -15.4505f, -2.80998f, 0.0f, 0.0f, 0.986286f, -0.165048f}  //DESTROYED_HORDE_ROOST_EAST
+    {182297, MAP_OUTLAND, -1815.8f, 8036.51f, -26.2354f, -2.89725f, 0.0f, 0.0f, 0.992546f, -0.121869f}, //DESTROYED_HORDE_ROOST_SOUTH
+    {182298, MAP_OUTLAND, -1507.95f, 8132.1f, -19.5585f, -1.3439f, 0.0f, 0.0f, 0.622515f, -0.782608f}, //DESTROYED_HORDE_ROOST_WEST
+    {182299, MAP_OUTLAND, -1384.52f, 7779.33f, -11.1663f, -0.575959f, 0.0f, 0.0f, 0.284015f, -0.95882f}, //DESTROYED_HORDE_ROOST_NORTH
+    {182300, MAP_OUTLAND, -1650.11f, 7732.56f, -15.4505f, -2.80998f, 0.0f, 0.0f, 0.986286f, -0.165048f}  //DESTROYED_HORDE_ROOST_EAST
 };
 
 struct HalaaIds

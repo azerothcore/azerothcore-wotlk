@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -51,14 +51,7 @@ enum Misc
     MAX_CONSTRICTOR                             = 3,
     MAX_SUMMONS                                 = 5,
 
-    EVENT_POISON_NOVA                           = 1,
-    EVENT_POWERFULL_BITE                        = 2,
-    EVENT_VENOM_BOLT                            = 3,
-    EVENT_CHECK_HEALTH1                         = 4,
-    EVENT_CHECK_HEALTH2                         = 5,
-    EVENT_SUMMON1                               = 6,
-    EVENT_SUMMON2                               = 7,
-    EVENT_KILL_TALK                             = 8
+    EVENT_KILL_TALK                             = 1
 };
 
 const Position SpawnLoc[] =
@@ -75,21 +68,32 @@ class boss_slad_ran : public CreatureScript
 public:
     boss_slad_ran() : CreatureScript("boss_slad_ran") { }
 
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetGundrakAI<boss_slad_ranAI>(creature);
-    }
-
     struct boss_slad_ranAI : public BossAI
     {
-        boss_slad_ranAI(Creature* creature) : BossAI(creature, DATA_SLAD_RAN)
-        {
-        }
+        boss_slad_ranAI(Creature* creature) : BossAI(creature, DATA_SLAD_RAN) { }
 
         void Reset() override
         {
             BossAI::Reset();
             _achievement = true;
+
+            ScheduleHealthCheckEvent(90, [&] {
+                Talk(SAY_SUMMON_SNAKES);
+
+                ScheduleTimedEvent(1s, [&] {
+                    for (uint8 i = MAX_CONSTRICTOR; i < MAX_SUMMONS; ++i)
+                        me->SummonCreature(NPC_SLADRAN_VIPER, SpawnLoc[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20 * IN_MILLISECONDS);
+                }, 8s);
+            });
+
+            ScheduleHealthCheckEvent(DUNGEON_MODE(50, 75), [&] {
+                Talk(SAY_SUMMON_CONSTRICTORS);
+
+                ScheduleTimedEvent(1s, [&] {
+                    for (uint8 i = 0; i < MAX_CONSTRICTOR; ++i)
+                        me->SummonCreature(NPC_SLADRAN_CONSTRICTORS, SpawnLoc[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20 * IN_MILLISECONDS);
+                }, 3s, 5s);
+            });
         }
 
         uint32 GetData(uint32 data) const override
@@ -110,11 +114,18 @@ public:
             Talk(SAY_AGGRO);
             BossAI::JustEngagedWith(who);
 
-            events.ScheduleEvent(EVENT_POISON_NOVA, 10s);
-            events.ScheduleEvent(EVENT_POWERFULL_BITE, 3s);
-            events.ScheduleEvent(EVENT_VENOM_BOLT, 15s);
-            events.ScheduleEvent(EVENT_CHECK_HEALTH1, 1s);
-            events.ScheduleEvent(EVENT_CHECK_HEALTH2, 1s);
+            ScheduleTimedEvent(16s, 53s, [&]{
+                Talk(EMOTE_NOVA);
+                DoCastAOE(SPELL_POISON_NOVA);
+            }, 16s, 53s);
+
+            ScheduleTimedEvent(3s, [&] {
+                DoCastVictim(SPELL_POWERFULL_BITE);
+            }, 10s);
+
+            ScheduleTimedEvent(15s, [&] {
+                DoCastRandomTarget(SPELL_VENOM_BOLT, 0, 45.0f, false);
+            }, 10s);
         }
 
         void JustDied(Unit* killer) override
@@ -126,79 +137,21 @@ public:
 
         void KilledUnit(Unit*) override
         {
-            if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+            if (!events.HasTimeUntilEvent(EVENT_KILL_TALK))
             {
                 Talk(SAY_SLAY);
                 events.ScheduleEvent(EVENT_KILL_TALK, 6s);
             }
         }
 
-        void JustSummoned(Creature* summon) override
-        {
-            summon->SetInCombatWithZone();
-            summons.Summon(summon);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case EVENT_CHECK_HEALTH1:
-                    if (me->HealthBelowPct(70))
-                    {
-                        Talk(SAY_SUMMON_SNAKES);
-                        events.ScheduleEvent(EVENT_SUMMON1, 1s);
-                        break;
-                    }
-                    events.ScheduleEvent(EVENT_CHECK_HEALTH1, 1s);
-                    break;
-                case EVENT_CHECK_HEALTH2:
-                    if (me->HealthBelowPct(50))
-                    {
-                        Talk(SAY_SUMMON_CONSTRICTORS);
-                        events.ScheduleEvent(EVENT_SUMMON2, 1s);
-                        break;
-                    }
-                    events.ScheduleEvent(EVENT_CHECK_HEALTH2, 1s);
-                    break;
-                case EVENT_POISON_NOVA:
-                    Talk(EMOTE_NOVA);
-                    me->CastSpell(me, SPELL_POISON_NOVA, false);
-                    events.ScheduleEvent(EVENT_POISON_NOVA, 15s);
-                    break;
-                case EVENT_POWERFULL_BITE:
-                    me->CastSpell(me->GetVictim(), SPELL_POWERFULL_BITE, false);
-                    events.ScheduleEvent(EVENT_POWERFULL_BITE, 10s);
-                    break;
-                case EVENT_VENOM_BOLT:
-                    me->CastSpell(me->GetVictim(), SPELL_VENOM_BOLT, false);
-                    events.ScheduleEvent(EVENT_VENOM_BOLT, 10s);
-                    break;
-                case EVENT_SUMMON1:
-                    for (uint8 i = MAX_CONSTRICTOR; i < MAX_SUMMONS; ++i)
-                        me->SummonCreature(NPC_SLADRAN_VIPER, SpawnLoc[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20 * IN_MILLISECONDS);
-                    events.ScheduleEvent(EVENT_SUMMON1, 8s);
-                    break;
-                case EVENT_SUMMON2:
-                    for (uint8 i = 0; i < MAX_CONSTRICTOR; ++i)
-                        me->SummonCreature(NPC_SLADRAN_CONSTRICTORS, SpawnLoc[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 20 * IN_MILLISECONDS);
-                    events.ScheduleEvent(EVENT_SUMMON2, 3s, 5s);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-
     private:
         bool _achievement;
     };
+
+    CreatureAI* GetAI(Creature* creature) const override
+    {
+        return GetGundrakAI<boss_slad_ranAI>(creature);
+    }
 };
 
 class spell_sladran_grip_of_sladran_aura : public AuraScript

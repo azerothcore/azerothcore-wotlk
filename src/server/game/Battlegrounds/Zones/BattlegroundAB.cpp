@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -24,6 +24,7 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "WorldStatePackets.h"
+#include "WorldStateDefines.h"
 
 void BattlegroundABScore::BuildObjectivesBlock(WorldPacket& data)
 {
@@ -100,7 +101,7 @@ void BattlegroundAB::PostUpdateImpl(uint32 diff)
                         uint8 controlledPoints = _controlledPoints[teamId];
                         if (controlledPoints == 0)
                         {
-                            _bgEvents.ScheduleEvent(eventId, 3000);
+                            _bgEvents.ScheduleEvent(eventId, 3s);
                             break;
                         }
 
@@ -114,7 +115,7 @@ void BattlegroundAB::PostUpdateImpl(uint32 diff)
                         if (honorRewards < uint8(m_TeamScores[teamId] / _honorTics))
                             RewardHonorToTeam(GetBonusHonorFromKill(1), teamId);
                         if (reputationRewards < uint8(m_TeamScores[teamId] / _reputationTics))
-                            RewardReputationToTeam(teamId == TEAM_ALLIANCE ? 509 : 510, 10, teamId);
+                            RewardReputationToTeam(teamId == TEAM_ALLIANCE ? 509 : 510, uint32(10 * _abReputationRate), teamId);
                         if (information < uint8(m_TeamScores[teamId] / BG_AB_WARNING_NEAR_VICTORY_SCORE))
                         {
                             if (teamId == TEAM_ALLIANCE)
@@ -129,7 +130,7 @@ void BattlegroundAB::PostUpdateImpl(uint32 diff)
                             }
                         }
 
-                        UpdateWorldState(teamId == TEAM_ALLIANCE ? BG_AB_OP_RESOURCES_ALLY : BG_AB_OP_RESOURCES_HORDE, m_TeamScores[teamId]);
+                        UpdateWorldState(teamId == TEAM_ALLIANCE ? WORLD_STATE_BATTLEGROUND_AB_RESOURCES_ALLIANCE : WORLD_STATE_BATTLEGROUND_AB_RESOURCES_HORDE, m_TeamScores[teamId]);
                         if (m_TeamScores[teamId] > m_TeamScores[GetOtherTeamId(teamId)] + 500)
                             _teamScores500Disadvantage[GetOtherTeamId(teamId)] = true;
                         if (m_TeamScores[teamId] >= static_cast<int32>(_configurableMaxTeamScore))
@@ -169,8 +170,8 @@ void BattlegroundAB::StartingEventOpenDoors()
     DoorOpen(BG_AB_OBJECT_GATE_A);
     DoorOpen(BG_AB_OBJECT_GATE_H);
     StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, BG_AB_EVENT_START_BATTLE);
-    _bgEvents.ScheduleEvent(BG_AB_EVENT_ALLIANCE_TICK, 3000);
-    _bgEvents.ScheduleEvent(BG_AB_EVENT_HORDE_TICK, 3000);
+    _bgEvents.ScheduleEvent(BG_AB_EVENT_ALLIANCE_TICK, 3s);
+    _bgEvents.ScheduleEvent(BG_AB_EVENT_HORDE_TICK, 3s);
 }
 
 void BattlegroundAB::AddPlayer(Player* player)
@@ -179,9 +180,8 @@ void BattlegroundAB::AddPlayer(Player* player)
     PlayerScores.emplace(player->GetGUID().GetCounter(), new BattlegroundABScore(player->GetGUID()));
 }
 
-void BattlegroundAB::RemovePlayer(Player* player)
+void BattlegroundAB::RemovePlayer(Player* /*player*/)
 {
-    player->SetPhaseMask(1, false);
 }
 
 void BattlegroundAB::HandleAreaTrigger(Player* player, uint32 trigger)
@@ -247,13 +247,13 @@ void BattlegroundAB::FillInitialWorldStates(WorldPackets::WorldState::InitWorldS
             packet.Worldstates.emplace_back(node._iconCapture + i - 1, node._state == i ? 1 : 0);
     }
 
-    packet.Worldstates.emplace_back(BG_AB_OP_OCCUPIED_BASES_ALLY, _controlledPoints[TEAM_ALLIANCE]);
-    packet.Worldstates.emplace_back(BG_AB_OP_OCCUPIED_BASES_HORDE, _controlledPoints[TEAM_HORDE]);
-    packet.Worldstates.emplace_back(BG_AB_OP_RESOURCES_MAX, _configurableMaxTeamScore);
-    packet.Worldstates.emplace_back(BG_AB_OP_RESOURCES_WARNING, BG_AB_WARNING_NEAR_VICTORY_SCORE);
-    packet.Worldstates.emplace_back(BG_AB_OP_RESOURCES_ALLY, m_TeamScores[TEAM_ALLIANCE]);
-    packet.Worldstates.emplace_back(BG_AB_OP_RESOURCES_HORDE, m_TeamScores[TEAM_HORDE]);
-    packet.Worldstates.emplace_back(0x745, 2);
+    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_OCCUPIED_BASES_ALLIANCE, _controlledPoints[TEAM_ALLIANCE]);
+    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_OCCUPIED_BASES_HORDE, _controlledPoints[TEAM_HORDE]);
+    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_RESOURCES_MAX, _configurableMaxTeamScore);
+    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_RESOURCES_WARNING, BG_AB_WARNING_NEAR_VICTORY_SCORE);
+    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_RESOURCES_ALLIANCE, m_TeamScores[TEAM_ALLIANCE]);
+    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_RESOURCES_HORDE, m_TeamScores[TEAM_HORDE]);
+    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_UNK, 2);
 }
 
 void BattlegroundAB::SendNodeUpdate(uint8 node)
@@ -262,13 +262,12 @@ void BattlegroundAB::SendNodeUpdate(uint8 node)
     for (uint8 i = BG_AB_NODE_STATE_ALLY_OCCUPIED; i <= BG_AB_NODE_STATE_HORDE_CONTESTED; ++i)
         UpdateWorldState(_capturePointInfo[node]._iconCapture + i - 1, _capturePointInfo[node]._state == i);
 
-    UpdateWorldState(BG_AB_OP_OCCUPIED_BASES_ALLY, _controlledPoints[TEAM_ALLIANCE]);
-    UpdateWorldState(BG_AB_OP_OCCUPIED_BASES_HORDE, _controlledPoints[TEAM_HORDE]);
+    UpdateWorldState(WORLD_STATE_BATTLEGROUND_AB_OCCUPIED_BASES_ALLIANCE, _controlledPoints[TEAM_ALLIANCE]);
+    UpdateWorldState(WORLD_STATE_BATTLEGROUND_AB_OCCUPIED_BASES_HORDE, _controlledPoints[TEAM_HORDE]);
 }
 
 void BattlegroundAB::NodeOccupied(uint8 node)
 {
-    ApplyPhaseMask();
     AddSpiritGuide(node, BG_AB_SpiritGuidePos[node][0], BG_AB_SpiritGuidePos[node][1], BG_AB_SpiritGuidePos[node][2], BG_AB_SpiritGuidePos[node][3], _capturePointInfo[node]._ownerTeamId);
 
     ++_controlledPoints[_capturePointInfo[node]._ownerTeamId];
@@ -391,7 +390,6 @@ void BattlegroundAB::EventPlayerClickedOnFlag(Player* player, GameObject* gameOb
 
         _capturePointInfo[node]._state = static_cast<uint8>(BG_AB_NODE_STATE_ALLY_CONTESTED) + player->GetTeamId();
 
-        ApplyPhaseMask();
         _bgEvents.RescheduleEvent(BG_AB_EVENT_CAPTURE_STABLE + node, BG_AB_FLAG_CAPTURING_TIME);
         sound = player->GetTeamId() == TEAM_ALLIANCE ? BG_AB_SOUND_NODE_ASSAULTED_ALLIANCE : BG_AB_SOUND_NODE_ASSAULTED_HORDE;
 
@@ -418,6 +416,10 @@ TeamId BattlegroundAB::GetPrematureWinner()
 
 bool BattlegroundAB::SetupBattleground()
 {
+    _honorTics = BattlegroundMgr::IsBGWeekend(GetBgTypeID(true)) ? BG_AB_HONOR_TICK_WEEKEND : BG_AB_HONOR_TICK_NORMAL;
+    _reputationTics = BattlegroundMgr::IsBGWeekend(GetBgTypeID(true)) ? BG_AB_REP_TICK_WEEKEND : BG_AB_REP_TICK_NORMAL;
+    _abReputationRate = sWorld->getRate(RATE_REPUTATION_GAIN_AB);
+
     for (uint32 i = 0; i < BG_AB_DYNAMIC_NODES_COUNT; ++i)
     {
         AddObject(BG_AB_OBJECT_BANNER_NEUTRAL + BG_AB_OBJECTS_PER_NODE * i, BG_AB_OBJECTID_NODE_BANNER_0 + i, BG_AB_NodePositions[i][0], BG_AB_NodePositions[i][1], BG_AB_NodePositions[i][2], BG_AB_NodePositions[i][3], 0, 0, std::sin(BG_AB_NodePositions[i][3] / 2), cos(BG_AB_NodePositions[i][3] / 2), RESPAWN_ONE_DAY);
@@ -467,19 +469,16 @@ void BattlegroundAB::Init()
 
     _bgEvents.Reset();
 
-    _honorTics = BattlegroundMgr::IsBGWeekend(GetBgTypeID(true)) ? BG_AB_HONOR_TICK_WEEKEND : BG_AB_HONOR_TICK_NORMAL;
-    _reputationTics = BattlegroundMgr::IsBGWeekend(GetBgTypeID(true)) ? BG_AB_REP_TICK_WEEKEND : BG_AB_REP_TICK_NORMAL;
-
-    _capturePointInfo[BG_AB_NODE_STABLES]._iconNone = BG_AB_OP_STABLE_ICON;
-    _capturePointInfo[BG_AB_NODE_FARM]._iconNone = BG_AB_OP_FARM_ICON;
-    _capturePointInfo[BG_AB_NODE_BLACKSMITH]._iconNone = BG_AB_OP_BLACKSMITH_ICON;
-    _capturePointInfo[BG_AB_NODE_LUMBER_MILL]._iconNone = BG_AB_OP_LUMBERMILL_ICON;
-    _capturePointInfo[BG_AB_NODE_GOLD_MINE]._iconNone = BG_AB_OP_GOLDMINE_ICON;
-    _capturePointInfo[BG_AB_NODE_STABLES]._iconCapture = BG_AB_OP_STABLE_STATE_ALIENCE;
-    _capturePointInfo[BG_AB_NODE_FARM]._iconCapture = BG_AB_OP_FARM_STATE_ALIENCE;
-    _capturePointInfo[BG_AB_NODE_BLACKSMITH]._iconCapture = BG_AB_OP_BLACKSMITH_STATE_ALIENCE;
-    _capturePointInfo[BG_AB_NODE_LUMBER_MILL]._iconCapture = BG_AB_OP_LUMBERMILL_STATE_ALIENCE;
-    _capturePointInfo[BG_AB_NODE_GOLD_MINE]._iconCapture = BG_AB_OP_GOLDMINE_STATE_ALIENCE;
+    _capturePointInfo[BG_AB_NODE_STABLES]._iconNone = WORLD_STATE_BATTLEGROUND_AB_STABLE_ICON;
+    _capturePointInfo[BG_AB_NODE_FARM]._iconNone = WORLD_STATE_BATTLEGROUND_AB_FARM_ICON;
+    _capturePointInfo[BG_AB_NODE_BLACKSMITH]._iconNone = WORLD_STATE_BATTLEGROUND_AB_BLACKSMITH_ICON;
+    _capturePointInfo[BG_AB_NODE_LUMBER_MILL]._iconNone = WORLD_STATE_BATTLEGROUND_AB_LUMBERMILL_ICON;
+    _capturePointInfo[BG_AB_NODE_GOLD_MINE]._iconNone = WORLD_STATE_BATTLEGROUND_AB_GOLDMINE_ICON;
+    _capturePointInfo[BG_AB_NODE_STABLES]._iconCapture = WORLD_STATE_BATTLEGROUND_AB_STABLE_STATE_ALLIANCE;
+    _capturePointInfo[BG_AB_NODE_FARM]._iconCapture = WORLD_STATE_BATTLEGROUND_AB_FARM_STATE_ALLIANCE;
+    _capturePointInfo[BG_AB_NODE_BLACKSMITH]._iconCapture = WORLD_STATE_BATTLEGROUND_AB_BLACKSMITH_STATE_ALLIANCE;
+    _capturePointInfo[BG_AB_NODE_LUMBER_MILL]._iconCapture = WORLD_STATE_BATTLEGROUND_AB_LUMBERMILL_STATE_ALLIANCE;
+    _capturePointInfo[BG_AB_NODE_GOLD_MINE]._iconCapture = WORLD_STATE_BATTLEGROUND_AB_GOLDMINE_STATE_ALLIANCE;
 
     uint32 bgArathiCapturePointsConfig = sWorld->getIntConfig(CONFIG_BATTLEGROUND_ARATHI_CAPTUREPOINTS);
     _configurableMaxTeamScore = bgArathiCapturePointsConfig > 0
@@ -544,20 +543,4 @@ bool BattlegroundAB::UpdatePlayerScore(Player* player, uint32 type, uint32 value
 bool BattlegroundAB::AllNodesConrolledByTeam(TeamId teamId) const
 {
     return _controlledPoints[teamId] == BG_AB_DYNAMIC_NODES_COUNT;
-}
-
-void BattlegroundAB::ApplyPhaseMask()
-{
-    uint32 phaseMask = 1;
-    for (uint32 i = BG_AB_NODE_STABLES; i < BG_AB_DYNAMIC_NODES_COUNT; ++i)
-        if (_capturePointInfo[i]._ownerTeamId != TEAM_NEUTRAL)
-            phaseMask |= 1 << (i * 2 + 1 + _capturePointInfo[i]._ownerTeamId);
-
-    const BattlegroundPlayerMap& bgPlayerMap = GetPlayers();
-
-    for (auto const& itr : bgPlayerMap)
-    {
-        itr.second->SetPhaseMask(phaseMask, false);
-        itr.second->UpdateObjectVisibility(true, false);
-    }
 }

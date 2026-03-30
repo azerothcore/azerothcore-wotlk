@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -20,101 +20,6 @@
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "ScriptedGossip.h"
-
-/*
-##################################################
-Shattrath City Flask Vendors provides flasks to people exalted with 3 fActions:
-Haldor the Compulsive
-Arcanist Xorith
-Both sell special flasks for use in Outlands 25man raids only,
-purchasable for one Mark of Illidari each
-Purchase requires exalted reputation with Scryers/Aldor, Cenarion Expedition and The Sha'tar
-##################################################
-*/
-
-class npc_shattrathflaskvendors : public CreatureScript
-{
-public:
-    npc_shattrathflaskvendors() : CreatureScript("npc_shattrathflaskvendors") { }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_TRADE)
-            player->GetSession()->SendListInventory(creature->GetGUID());
-
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (creature->GetEntry() == 23484)
-        {
-            // Aldor vendor
-            if (creature->IsVendor() && (player->GetReputationRank(932) == REP_EXALTED) && (player->GetReputationRank(935) == REP_EXALTED) && (player->GetReputationRank(942) == REP_EXALTED))
-            {
-                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
-                SendGossipMenuFor(player, 11085, creature->GetGUID());
-            }
-            else
-            {
-                SendGossipMenuFor(player, 11083, creature->GetGUID());
-            }
-        }
-
-        if (creature->GetEntry() == 23483)
-        {
-            // Scryers vendor
-            if (creature->IsVendor() && (player->GetReputationRank(934) == REP_EXALTED) && (player->GetReputationRank(935) == REP_EXALTED) && (player->GetReputationRank(942) == REP_EXALTED))
-            {
-                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
-                SendGossipMenuFor(player, 11085, creature->GetGUID());
-            }
-            else
-            {
-                SendGossipMenuFor(player, 11084, creature->GetGUID());
-            }
-        }
-
-        return true;
-    }
-};
-
-/*######
-# npc_zephyr
-######*/
-
-enum Zephyr : int32
-{
-    GOSSIP_MENU_ZEPHYR              = 9205,
-    SPELL_TELEPORT_CAVERNS_OF_TIME  = 37778,
-};
-
-class npc_zephyr : public CreatureScript
-{
-public:
-    npc_zephyr() : CreatureScript("npc_zephyr") { }
-
-    bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_INFO_DEF + 1)
-            player->CastSpell(player, SPELL_TELEPORT_CAVERNS_OF_TIME, false);
-
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (player->GetReputationRank(989) >= REP_REVERED)
-            AddGossipItemFor(player, GOSSIP_MENU_ZEPHYR, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-
-        return true;
-    }
-};
 
 /*######
 # npc_kservant
@@ -161,6 +66,7 @@ public:
     public:
         npc_kservantAI(Creature* creature) : npc_escortAI(creature) { }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();
@@ -246,7 +152,10 @@ public:
 
             Player* player = summoner->ToPlayer();
             if (player && player->GetQuestStatus(10211) == QUEST_STATUS_INCOMPLETE)
-                Start(false, false, summoner->GetGUID());
+            {
+                me->SetWalk(true);
+                Start(false, summoner->GetGUID());
+            }
         }
 
         void Reset() override { }
@@ -411,8 +320,6 @@ struct npc_shattrath_daily_quest : public NullCreatureAI
 
 void AddSC_shattrath_city()
 {
-    new npc_shattrathflaskvendors();
-    new npc_zephyr();
     new npc_kservant();
     RegisterCreatureAI(npc_shattrath_daily_quest);
 }

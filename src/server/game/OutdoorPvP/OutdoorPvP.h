@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -137,6 +137,8 @@ public:
     {
         return _value;
     }
+    [[nodiscard]] float GetMaxValue() const { return _maxValue; }
+    [[nodiscard]] float GetMinValue() const { return _minValue; }
 
 protected:
     bool AddObject(uint32 type, uint32 entry, uint32 map, float x, float y, float z, float o,
@@ -242,6 +244,8 @@ public:
     void TeamApplyBuff(TeamId teamId, uint32 spellId, uint32 spellId2 = 0, Player* sameMapPlr = nullptr);
 
     Map* GetMap() const { return _map; }
+    OPvPCapturePointMap const& GetCapturePoints() const { return _capturePoints; }
+    OPvPCapturePoint* GetCapturePoint(ObjectGuid::LowType spawnId) const;
 
 protected:
     void BroadcastPacket(WorldPacket& data) const;
@@ -256,7 +260,6 @@ protected:
         _capturePoints[cp->m_capturePointSpawnId] = cp;
     }
 
-    OPvPCapturePoint* GetCapturePoint(ObjectGuid::LowType spawnId) const;
     void RegisterZone(uint32 zoneid);
     bool HasPlayer(Player const* player) const;
     void TeamCastSpell(TeamId team, int32 spellId, Player* sameMapPlr = nullptr);

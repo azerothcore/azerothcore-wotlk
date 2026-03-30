@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -20,6 +20,7 @@
 
 #include "Battleground.h"
 #include "BattlegroundScore.h"
+#include "WorldStateDefines.h"
 
 #define BG_SA_FLAG_AMOUNT           3
 #define BG_SA_DEMOLISHER_AMOUNT     4
@@ -40,35 +41,6 @@ enum BG_SA_GateState
     BG_SA_GATE_OK           = 1,
     BG_SA_GATE_DAMAGED      = 2,
     BG_SA_GATE_DESTROYED    = 3
-};
-
-enum BG_SA_WorldStates
-{
-    BG_SA_TIMER_MINS                = 3559,
-    BG_SA_TIMER_SEC_TENS            = 3560,
-    BG_SA_TIMER_SEC_DECS            = 3561,
-    BG_SA_ALLY_ATTACKS              = 4352,
-    BG_SA_HORDE_ATTACKS             = 4353,
-    BG_SA_PURPLE_GATEWS             = 3614,
-    BG_SA_RED_GATEWS                = 3617,
-    BG_SA_BLUE_GATEWS               = 3620,
-    BG_SA_GREEN_GATEWS              = 3623,
-    BG_SA_YELLOW_GATEWS             = 3638,
-    BG_SA_ANCIENT_GATEWS            = 3849,
-    BG_SA_LEFT_GY_ALLIANCE          = 3635,
-    BG_SA_RIGHT_GY_ALLIANCE         = 3636,
-    BG_SA_CENTER_GY_ALLIANCE        = 3637,
-    BG_SA_RIGHT_ATT_TOKEN_ALL       = 3627,
-    BG_SA_LEFT_ATT_TOKEN_ALL        = 3626,
-    BG_SA_LEFT_ATT_TOKEN_HRD        = 3629,
-    BG_SA_RIGHT_ATT_TOKEN_HRD       = 3628,
-    BG_SA_HORDE_DEFENCE_TOKEN       = 3631,
-    BG_SA_ALLIANCE_DEFENCE_TOKEN    = 3630,
-    BG_SA_RIGHT_GY_HORDE            = 3632,
-    BG_SA_LEFT_GY_HORDE             = 3633,
-    BG_SA_CENTER_GY_HORDE           = 3634,
-    BG_SA_BONUS_TIMER               = 0xdf3,
-    BG_SA_ENABLE_TIMER              = 3564,
 };
 
 enum npc
@@ -223,7 +195,7 @@ float const BG_SA_ObjSpawnlocs[BG_SA_MAXOBJ][4] =
     { 1227.667f, -212.555f, 55.372f, 0.5023f },
     { 1214.681f, 81.21f, 53.413f, 5.745f },
     { 878.555f, -108.2f, 117.845f, 0.0f },
-    { 836.5f, -108.8f, 120.219f, 0.0f },
+    { 837.0653076171875f, -107.536727905273437f, 127.0248489379882812f, 4.468043327331542968f }, // VerifiedBuild 46158
     // Ships
     { 2679.696777f, -826.891235f, 3.712860f, 5.78367f}, //rot2 1 rot3 0.0002f
     { 2574.003662f, 981.261475f, 2.603424f, 0.807696f},
@@ -494,22 +466,22 @@ public:
         switch (id)
         {
             case BG_SA_GREEN_GATE:
-                uws = BG_SA_GREEN_GATEWS;
+                uws = WORLD_STATE_BATTLEGROUND_SA_GREEN_GATE;
                 break;
             case BG_SA_YELLOW_GATE:
-                uws = BG_SA_YELLOW_GATEWS;
+                uws = WORLD_STATE_BATTLEGROUND_SA_YELLOW_GATE;
                 break;
             case BG_SA_BLUE_GATE:
-                uws = BG_SA_BLUE_GATEWS;
+                uws = WORLD_STATE_BATTLEGROUND_SA_BLUE_GATE;
                 break;
             case BG_SA_RED_GATE:
-                uws = BG_SA_RED_GATEWS;
+                uws = WORLD_STATE_BATTLEGROUND_SA_RED_GATE;
                 break;
             case BG_SA_PURPLE_GATE:
-                uws = BG_SA_PURPLE_GATEWS;
+                uws = WORLD_STATE_BATTLEGROUND_SA_PURPLE_GATE;
                 break;
             case BG_SA_ANCIENT_GATE:
-                uws = BG_SA_ANCIENT_GATEWS;
+                uws = WORLD_STATE_BATTLEGROUND_SA_ANCIENT_GATE;
                 break;
         }
         return uws;
@@ -648,5 +620,7 @@ private:
 
     // Achievement: Not Even a Scratch
     bool _notEvenAScratch[PVP_TEAMS_COUNT];
+    /// Toggle for alternating player spawns between East and West ships (true = first/East ship, false = second/West ship)
+    bool _nextShipIsEast;
 };
 #endif

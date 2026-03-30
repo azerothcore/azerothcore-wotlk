@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -16,6 +16,7 @@
  */
 
 #include "AchievementCriteriaScript.h"
+#include "AreaDefines.h"
 #include "BattlegroundAB.h"
 #include "BattlegroundAV.h"
 #include "BattlegroundIC.h"
@@ -192,16 +193,6 @@ public:
     }
 };
 
-enum ArgentTournamentAreas
-{
-    AREA_ARGENT_TOURNAMENT_FIELDS  = 4658,
-    AREA_RING_OF_ASPIRANTS         = 4670,
-    AREA_RING_OF_ARGENT_VALIANTS   = 4671,
-    AREA_RING_OF_ALLIANCE_VALIANTS = 4672,
-    AREA_RING_OF_HORDE_VALIANTS    = 4673,
-    AREA_RING_OF_CHAMPIONS         = 4669,
-};
-
 class achievement_tilted : public AchievementCriteriaScript
 {
 public:
@@ -213,12 +204,12 @@ public:
             return false;
 
         uint32 areaid = player->GetAreaId();
-        bool checkArea =    areaid == AREA_ARGENT_TOURNAMENT_FIELDS ||
-                            areaid == AREA_RING_OF_ASPIRANTS ||
-                            areaid == AREA_RING_OF_ARGENT_VALIANTS ||
-                            areaid == AREA_RING_OF_ALLIANCE_VALIANTS ||
-                            areaid == AREA_RING_OF_HORDE_VALIANTS ||
-                            areaid == AREA_RING_OF_CHAMPIONS;
+        bool checkArea =    areaid == AREA_ARGENT_TOURNAMENT_GROUNDS ||
+                            areaid == AREA_THE_ASPIRANTS_RING ||
+                            areaid == AREA_THE_ARGENT_VALIANTS_RING ||
+                            areaid == AREA_THE_ALLIANCE_VALIANTS_RING ||
+                            areaid == AREA_THE_HORDE_VALIANTS_RING ||
+                            areaid == AREA_THE_RING_OF_CHAMPIONS;
 
         return checkArea && player->duel && player->duel->IsMounted;
     }
@@ -274,6 +265,23 @@ class achievement_flirt_with_disaster_perf_check : public AchievementCriteriaScr
         }
 };
 
+enum FaLaLaLaOgrila
+{
+    SPELL_FRESH_HOLLY     = 44824,
+    SPELL_PRESERVED_HOLLY = 62061,
+};
+
+class achievement_fa_la_la_la_ogrila : public AchievementCriteriaScript
+{
+public:
+    achievement_fa_la_la_la_ogrila() : AchievementCriteriaScript("achievement_fa_la_la_la_ogrila") {}
+
+    bool OnCheck(Player* player, Unit* /*target*/, uint32 /*criteria_id*/) override
+    {
+        return player->HasAura(SPELL_FRESH_HOLLY) || player->HasAura(SPELL_PRESERVED_HOLLY);
+    }
+};
+
 void AddSC_achievement_scripts()
 {
     new achievement_resilient_victory();
@@ -294,4 +302,5 @@ void AddSC_achievement_scripts()
     new achievement_not_even_a_scratch();
     new achievement_killed_exp_or_honor_target();
     new achievement_flirt_with_disaster_perf_check();
+    new achievement_fa_la_la_la_ogrila();
 }

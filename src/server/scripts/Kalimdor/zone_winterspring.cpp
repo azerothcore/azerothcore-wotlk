@@ -1,73 +1,25 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-SDName: Winterspring
-SD%Complete: Almost Completely Emptied
-SDComment: Vendor Rivern Frostwind. Quest Support 4901
-SDCategory: Winterspring
-EndScriptData */
-
-/* ContentData
-npc_rivern_frostwind
-npc_ranshalla
-go_elune_fire
-EndContentData */
-
 #include "CreatureScript.h"
 #include "GameObjectScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
-#include "ScriptedGossip.h"
-
-// Theirs
-/*######
-## npc_rivern_frostwind
-######*/
-
-class npc_rivern_frostwind : public CreatureScript
-{
-public:
-    npc_rivern_frostwind() : CreatureScript("npc_rivern_frostwind") { }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_TRADE)
-            player->GetSession()->SendListInventory(creature->GetGUID());
-
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if (creature->IsVendor() && player->GetReputationRank(589) == REP_EXALTED)
-            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
-
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-
-        return true;
-    }
-};
-
 enum Says
 {
     // Escort texts
@@ -300,7 +252,10 @@ public:
             creature->SetFaction(FACTION_ESCORT_A_NEUTRAL_PASSIVE);
 
             if (npc_ranshallaAI* escortAI = dynamic_cast<npc_ranshallaAI*>(creature->AI()))
-                escortAI->Start(false, false, player->GetGUID(), quest);
+            {
+                creature->SetWalk(true);
+                escortAI->Start(false, player->GetGUID(), quest);
+            }
 
             return true;
         }
@@ -394,6 +349,7 @@ public:
             StartNextDialogueText(SAY_PRIESTESS_ALTAR_3);
         }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 pointId) override
         {
             switch (pointId)
@@ -500,7 +456,7 @@ public:
                     if (Creature* guard = me->GetMap()->GetCreature(_guardEluneGUID))
                     {
                         guard->GetMotionMaster()->MovePoint(0, wingThicketLocations[2].m_positionX, wingThicketLocations[2].m_positionY, wingThicketLocations[2].m_positionZ);
-                        guard->DespawnOrUnsummon(4000);
+                        guard->DespawnOrUnsummon(4s);
                     }
                     break;
                 case SAY_PRIESTESS_ALTAR_20:
@@ -508,7 +464,7 @@ public:
                     if (Creature* priestess = me->GetMap()->GetCreature(_firstPriestessGUID))
                     {
                         priestess->GetMotionMaster()->MovePoint(0, wingThicketLocations[0].m_positionX, wingThicketLocations[0].m_positionY, wingThicketLocations[0].m_positionZ);
-                        priestess->DespawnOrUnsummon(4000);
+                        priestess->DespawnOrUnsummon(4s);
                     }
                     break;
                 case SAY_PRIESTESS_ALTAR_21:
@@ -516,7 +472,7 @@ public:
                     if (Creature* priestess = me->GetMap()->GetCreature(_secondPriestessGUID))
                     {
                         priestess->GetMotionMaster()->MovePoint(0, wingThicketLocations[1].m_positionX, wingThicketLocations[1].m_positionY, wingThicketLocations[1].m_positionZ);
-                        priestess->DespawnOrUnsummon(4000);
+                        priestess->DespawnOrUnsummon(4s);
                     }
                     break;
                 case DATA_EVENT_END:
@@ -540,7 +496,7 @@ public:
                         player->GroupEventHappens(QUEST_GUARDIANS_ALTAR, me);
                         Talk(SAY_RANSHALLA_END_2, player);
                     }
-                    me->DespawnOrUnsummon(4000);
+                    me->DespawnOrUnsummon(4s);
                     break;
             }
         }
@@ -618,8 +574,6 @@ public:
 
 void AddSC_winterspring()
 {
-    // Theirs
-    new npc_rivern_frostwind();
     new npc_ranshalla();
     new go_elune_fire();
 }

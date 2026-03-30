@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -26,7 +26,6 @@
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 
-// Ours
 enum fumping
 {
     SPELL_SUMMON_SAND_GNOME1            = 39240,
@@ -221,7 +220,6 @@ class spell_q10898_skywing : public SpellScript
     }
 };
 
-// Theirs
 /*######
 ## npc_unkor_the_ruthless
 ######*/
@@ -376,6 +374,7 @@ public:
     {
         npc_isla_starmaneAI(Creature* creature) : npc_escortAI(creature) { }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();
@@ -435,9 +434,9 @@ public:
         void JustEngagedWith(Unit*) override
         {
             events.Reset();
-            events.ScheduleEvent(EVENT_SPELL_WRATH, 0);
-            events.ScheduleEvent(EVENT_SPELL_MOONFIRE, 4000);
-            events.ScheduleEvent(EVENT_SPELL_ENTANGLING_ROOTS, 10000);
+            events.ScheduleEvent(EVENT_SPELL_WRATH, 0ms);
+            events.ScheduleEvent(EVENT_SPELL_MOONFIRE, 4s);
+            events.ScheduleEvent(EVENT_SPELL_ENTANGLING_ROOTS, 10s);
         }
 
         void UpdateEscortAI(uint32 diff) override
@@ -453,15 +452,15 @@ public:
             {
                 case EVENT_SPELL_WRATH:
                     me->CastSpell(me->GetVictim(), SPELL_WRATH, false);
-                    events.ScheduleEvent(EVENT_SPELL_WRATH, 3000);
+                    events.ScheduleEvent(EVENT_SPELL_WRATH, 3s);
                     break;
                 case EVENT_SPELL_MOONFIRE:
                     me->CastSpell(me->GetVictim(), SPELL_MOONFIRE, false);
-                    events.ScheduleEvent(EVENT_SPELL_MOONFIRE, 12000);
+                    events.ScheduleEvent(EVENT_SPELL_MOONFIRE, 12s);
                     break;
                 case EVENT_SPELL_ENTANGLING_ROOTS:
                     me->CastSpell(me->GetVictim(), SPELL_ENTANGLING_ROOTS, false);
-                    events.ScheduleEvent(EVENT_SPELL_ENTANGLING_ROOTS, 20000);
+                    events.ScheduleEvent(EVENT_SPELL_ENTANGLING_ROOTS, 20s);
                     break;
             }
 
@@ -475,7 +474,8 @@ public:
     {
         if (quest->GetQuestId() == QUEST_EFTW_H || quest->GetQuestId() == QUEST_EFTW_A)
         {
-            CAST_AI(npc_escortAI, (creature->AI()))->Start(true, false, player->GetGUID());
+            creature->SetWalk(true);
+            CAST_AI(npc_escortAI, (creature->AI()))->Start(true, player->GetGUID());
             creature->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_ACTIVE);
         }
         return true;
@@ -574,45 +574,47 @@ private:
 };
 
 /*######
-## npc_slim
+## go_ancient_skull_pile
 ######*/
 
-enum Slim
+enum AncientSkullPile
 {
-    FACTION_CONSORTIUM  = 933
+    ITEM_TIME_LOST_OFFERING = 32720,
+    SPELL_SUMMON_TEROKK     = 41004,
+
+    GOSSIP_MENU_ANCIENT_SKULL_PILE        = 8687,
+    GOSSIP_MENU_TEXT_ANCIENT_SKULL_PILE   = 11058
 };
 
-class npc_slim : public CreatureScript
+class go_ancient_skull_pile : public GameObjectScript
 {
 public:
-    npc_slim() : CreatureScript("npc_slim") { }
+    go_ancient_skull_pile() : GameObjectScript("go_ancient_skull_pile") {}
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
+    bool OnGossipSelect(Player* player, GameObject* go, uint32 sender, uint32 /*action*/) override
     {
         ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_TRADE)
-            player->GetSession()->SendListInventory(creature->GetGUID());
 
+        if (sender == GOSSIP_SENDER_MAIN)
+        {
+            CloseGossipMenuFor(player);
+            if (player->HasItemCount(ITEM_TIME_LOST_OFFERING, 1))
+                go->DespawnOrUnsummon();
+            player->CastSpell(player, SPELL_SUMMON_TEROKK);
+        }
         return true;
     }
 
-    bool OnGossipHello(Player* player, Creature* creature) override
+    bool OnGossipHello(Player* player, GameObject* go) override
     {
-        if (creature->IsVendor() && player->GetReputationRank(FACTION_CONSORTIUM) >= REP_FRIENDLY)
-        {
-            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
-            SendGossipMenuFor(player, 9896, creature->GetGUID());
-        }
-        else
-            SendGossipMenuFor(player, 9895, creature->GetGUID());
-
+        AddGossipItemFor(player, GOSSIP_MENU_ANCIENT_SKULL_PILE, 0, GOSSIP_SENDER_MAIN, 0);
+        SendGossipMenuFor(player, GOSSIP_MENU_TEXT_ANCIENT_SKULL_PILE, go->GetGUID());
         return true;
     }
 };
 
 void AddSC_terokkar_forest()
 {
-    // Ours
     RegisterSpellAndAuraScriptPair(spell_q10930_big_bone_worm, spell_q10930_big_bone_worm_aura);
     RegisterSpellAndAuraScriptPair(spell_q10929_fumping, spell_q10929_fumping_aura);
     RegisterSpellScript(spell_q10036_torgos);
@@ -620,10 +622,8 @@ void AddSC_terokkar_forest()
     RegisterSpellScript(spell_q10923_evil_draws_near_periodic_aura);
     RegisterSpellScript(spell_q10923_evil_draws_near_visual);
     RegisterSpellScript(spell_q10898_skywing);
-
-    // Theirs
     new npc_unkor_the_ruthless();
     new npc_isla_starmane();
     new go_skull_pile();
-    new npc_slim();
+    new go_ancient_skull_pile();
 }

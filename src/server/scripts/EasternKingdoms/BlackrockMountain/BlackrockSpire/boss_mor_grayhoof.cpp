@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -53,7 +53,7 @@ enum Spells
     SPELL_FAERIE_DRAGON_FORM = 27546,
     SPELL_ARCANE_EXPLOSION   = 22271,
     SPELL_REFLECTION         = 27564,
-    SPELL_CHAIN_LIGHTING     = 27567,
+    SPELL_CHAIN_LIGHTNING     = 27567,
     SPELL_SLEEP              = 20663 // Guessed
 };
 
@@ -68,7 +68,7 @@ enum Phases
 std::vector<uint32> catSpells = { SPELL_SHRED, SPELL_RAKE, SPELL_FEROCIOUS_BITE };
 std::vector<uint32> humanSpells = { SPELL_HURRICANE, SPELL_MOONFIRE, SPELL_SHOCK, SPELL_HEALING_TOUCH, SPELL_REJUVENATION };
 std::vector<uint32> bearSpells = { SPELL_DEMORALIZING_ROAR, SPELL_MAUL, SPELL_SWIPE };
-std::vector<uint32> faerieSpells = { SPELL_ARCANE_EXPLOSION, SPELL_REFLECTION, SPELL_CHAIN_LIGHTING, SPELL_SLEEP };
+std::vector<uint32> faerieSpells = { SPELL_ARCANE_EXPLOSION, SPELL_REFLECTION, SPELL_CHAIN_LIGHTNING, SPELL_SLEEP };
 
 struct boss_mor_grayhoof : public BossAI
 {
@@ -96,13 +96,9 @@ struct boss_mor_grayhoof : public BossAI
             case PHASE_HUMAN:
                 spell = Acore::Containers::SelectRandomContainerElement(humanSpells);
                 if (spell == SPELL_REJUVENATION || spell == SPELL_HEALING_TOUCH)
-                {
                     DoCastSelf(spell);
-                }
                 else
-                {
                     DoCastAOE(spell);
-                }
                 break;
             case PHASE_BEAR:
                 spell = Acore::Containers::SelectRandomContainerElement(bearSpells);
@@ -155,9 +151,7 @@ struct boss_mor_grayhoof : public BossAI
                 {
                     CastRandomSpell(PHASE_BEAR);
                     if (context.GetRepeatCounter() <= 3)
-                    {
                         context.Repeat();
-                    }
                 });
         }
         else if (_phase == PHASE_BEAR && me->HealthBelowPct(50.f))
@@ -170,9 +164,7 @@ struct boss_mor_grayhoof : public BossAI
                 {
                     CastRandomSpell(PHASE_CAT);
                     if (context.GetRepeatCounter() <= 3)
-                    {
                         context.Repeat();
-                    }
                 });
         }
         else if (_phase == PHASE_CAT && me->HealthBelowPct(25.f))
@@ -203,9 +195,7 @@ struct boss_mor_grayhoof : public BossAI
     void UpdateAI(uint32 diff) override
     {
         if (!UpdateVictim())
-        {
             return;
-        }
 
         _scheduler.Update(diff, [this]
             {

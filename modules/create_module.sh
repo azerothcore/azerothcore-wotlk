@@ -5,7 +5,7 @@
 ##------------------------------- VARIABLES ---------------------------------##
 
 MODULE_TEMPLATE_URL="https://github.com/azerothcore/skeleton-module/"
-GIT_COMMIT_MSG_SETUP="setup_git_commit_template.sh"
+GIT_COMMIT_MSG_SETUP="../../apps/git_tools/setup_git_commit_template.sh"
 
 ##------------------------------- CODE ---------------------------------##
 

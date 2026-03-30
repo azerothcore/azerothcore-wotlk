@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.34, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.4.3, for Win64 (x86_64)
 --
--- Host: 127.0.0.1    Database: acore_world
+-- Host: localhost    Database: acore_world
 -- ------------------------------------------------------
--- Server version	8.0.34
+-- Server version	8.4.3
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -42,8 +42,8 @@ CREATE TABLE `fishing_loot_template` (
 LOCK TABLES `fishing_loot_template` WRITE;
 /*!40000 ALTER TABLE `fishing_loot_template` DISABLE KEYS */;
 INSERT INTO `fishing_loot_template` VALUES
-(1,11000,11000,100,0,1,1,1,1,'(ReferenceTable)'),
-(1,11799,11799,100,0,32768,1,1,1,'(ReferenceTable)'),
+(1,11000,11000,100,0,1,0,1,1,'(ReferenceTable)'),
+(1,11799,11799,100,0,32768,0,1,1,'(ReferenceTable)'),
 (2,11003,11003,100,0,1,1,1,1,'(ReferenceTable)'),
 (8,11006,11006,100,0,1,1,1,1,'(ReferenceTable)'),
 (10,11004,11004,100,0,1,1,1,1,'(ReferenceTable)'),
@@ -54,8 +54,8 @@ INSERT INTO `fishing_loot_template` VALUES
 (16,11008,11008,100,0,1,1,1,1,'(ReferenceTable)'),
 (17,11003,11003,100,0,1,1,1,1,'(ReferenceTable)'),
 (28,11008,11008,100,0,1,1,1,1,'(ReferenceTable)'),
-(33,11006,11006,100,0,1,1,1,1,'(ReferenceTable)'),
-(33,11150,11150,33,0,1,1,1,1,'(ReferenceTable)'),
+(33,11006,11006,100,0,1,0,1,1,'(ReferenceTable)'),
+(33,11150,11150,33,0,1,0,1,1,'(ReferenceTable)'),
 (35,11007,11007,100,0,1,1,1,1,'(ReferenceTable)'),
 (36,11006,11006,100,0,1,1,1,1,'(ReferenceTable)'),
 (38,6317,0,25,0,1,0,1,1,'Raw Loch Frenzy'),
@@ -250,7 +250,6 @@ INSERT INTO `fishing_loot_template` VALUES
 (3805,11017,11017,100,0,1,1,1,1,'(ReferenceTable)'),
 (3859,11013,11013,100,0,1,1,1,1,'(ReferenceTable)'),
 (3979,11023,11023,100,0,1,1,1,1,'(ReferenceTable)'),
-(3979,45328,0,25,1,1,0,1,1,'Bloated Slippery Eel'),
 (3980,11019,11019,100,0,1,0,1,1,'(ReferenceTable)'),
 (3982,11019,11019,100,0,1,0,1,1,'(ReferenceTable)'),
 (3994,11019,11019,100,0,1,0,1,1,'(ReferenceTable)'),
@@ -284,9 +283,7 @@ INSERT INTO `fishing_loot_template` VALUES
 (4478,11018,11018,100,0,1,1,1,1,'(ReferenceTable)'),
 (4479,11019,11019,100,0,1,0,1,1,'(ReferenceTable)'),
 (4560,11026,11026,100,0,1,0,1,1,'(ReferenceTable)'),
-(4560,45903,0,20,1,1,0,1,1,'Corroded Jewelry'),
 (4567,11024,11024,100,0,1,1,1,1,'(ReferenceTable)'),
-(4567,45323,0,100,1,1,0,1,1,'Severed Arm'),
 (4568,11025,11025,100,0,1,1,1,1,'(ReferenceTable)'),
 (4813,3671,0,4.5,0,1,1,1,1,'Lifeless Skull'),
 (4813,4875,0,5,0,1,1,1,1,'Slimy Bone'),
@@ -307,5 +304,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-12-17 22:33:46
-
+-- Dump completed on 2026-03-15 20:38:33

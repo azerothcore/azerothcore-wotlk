@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -43,10 +43,8 @@ enum Yells
 enum Spells
 {
     // Kel'Thzuad
-    SPELL_FROST_BOLT_SINGLE_10              = 28478,
-    SPELL_FROST_BOLT_SINGLE_25              = 55802,
-    SPELL_FROST_BOLT_MULTI_10               = 28479,
-    SPELL_FROST_BOLT_MULTI_25               = 55807,
+    SPELL_FROST_BOLT_SINGLE                 = 28478,
+    SPELL_FROST_BOLT_MULTI                  = 28479,
     SPELL_SHADOW_FISURE                     = 27810,
     SPELL_VOID_BLAST                        = 27812,
     SPELL_DETONATE_MANA                     = 27819,
@@ -367,11 +365,11 @@ public:
                     me->CastSpell(me, SPELL_BERSERK, true);
                     break;
                 case EVENT_FROST_BOLT_SINGLE:
-                    me->CastSpell(me->GetVictim(), RAID_MODE(SPELL_FROST_BOLT_SINGLE_10, SPELL_FROST_BOLT_SINGLE_25), false);
+                    me->CastSpell(me->GetVictim(), SPELL_FROST_BOLT_SINGLE, false);
                     events.Repeat(2s, 10s);
                     break;
                 case EVENT_FROST_BOLT_MULTI:
-                    me->CastSpell(me, RAID_MODE(SPELL_FROST_BOLT_MULTI_10, SPELL_FROST_BOLT_MULTI_25), false);
+                    me->CastSpell(me, SPELL_FROST_BOLT_MULTI, false);
                     events.Repeat(15s, 30s);
                     break;
                 case EVENT_SHADOW_FISSURE:
@@ -382,7 +380,7 @@ public:
                     events.Repeat(25s);
                     break;
                 case EVENT_FROST_BLAST:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, RAID_MODE(1, 0), 0, true))
+                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0, true, RAID_MODE(false, true)))
                     {
                         me->CastSpell(target, SPELL_FROST_BLAST, false);
                     }
@@ -392,7 +390,7 @@ public:
                 case EVENT_CHAINS:
                     for (uint8 i = 0; i < 3; ++i)
                     {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 200, true, true, -SPELL_CHAINS_OF_KELTHUZAD))
+                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200, true, false, -SPELL_CHAINS_OF_KELTHUZAD))
                         {
                             me->CastSpell(target, SPELL_CHAINS_OF_KELTHUZAD, true);
                         }
@@ -403,15 +401,17 @@ public:
                 case EVENT_DETONATE_MANA:
                     {
                         std::vector<Unit*> unitList;
-                        ThreatContainer::StorageType const& threatList = me->GetThreatMgr().GetThreatList();
-                        for (auto itr : threatList)
+                        for (ThreatReference const* ref : me->GetThreatMgr().GetUnsortedThreatList())
                         {
-                            if (itr->getTarget()->IsPlayer()
-                                    && itr->getTarget()->getPowerType() == POWER_MANA
-                                    && itr->getTarget()->GetPower(POWER_MANA))
-                                    {
-                                        unitList.push_back(itr->getTarget());
-                                    }
+                            if (Unit* target = ref->GetVictim())
+                            {
+                                if (target->IsPlayer()
+                                        && target->getPowerType() == POWER_MANA
+                                        && target->GetPower(POWER_MANA))
+                                {
+                                    unitList.push_back(target);
+                                }
+                            }
                         }
                         if (!unitList.empty())
                         {
@@ -451,7 +451,7 @@ public:
                         cr->AI()->Talk(SAY_ANSWER_REQUEST);
 
                     for (uint8 i = 0 ; i < RAID_MODE(2, 4); ++i)
-                        events.ScheduleEvent(EVENT_SUMMON_GUARDIAN_OF_ICECROWN, 10000 + (i * 5000));
+                        events.ScheduleEvent(EVENT_SUMMON_GUARDIAN_OF_ICECROWN, Milliseconds(10000 + (i * 5000)));
 
                     break;
                 }
@@ -507,7 +507,7 @@ public:
             {
                 if (!me->IsInCombat())
                 {
-                    me->DespawnOrUnsummon(500);
+                    me->DespawnOrUnsummon(500ms);
                 }
             }
             if (param == ACTION_GUARDIANS_OFF)

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -239,5 +239,101 @@ namespace Acore
     //    SPECIFIC_TYPE* t = Remove(elements._elements, obj);
     //    return ( t != nullptr ? t : Remove(elements._TailElements, obj));
     //}
+
+    /* ContainerVector Helpers */
+    // count functions
+    template<class SPECIFIC_TYPE>
+    std::size_t Count(const ContainerVector<SPECIFIC_TYPE>& elements, SPECIFIC_TYPE* /*fake*/)
+    {
+        return elements._element.getSize();
+    }
+
+    template<class SPECIFIC_TYPE>
+    std::size_t Count(const ContainerVector<TypeNull>& /*elements*/, SPECIFIC_TYPE* /*fake*/)
+    {
+        return 0;
+    }
+
+    template<class SPECIFIC_TYPE, class T>
+    std::size_t Count(const ContainerVector<T>& /*elements*/, SPECIFIC_TYPE* /*fake*/)
+    {
+        return 0;
+    }
+
+    template<class SPECIFIC_TYPE, class T>
+    std::size_t Count(const ContainerVector<TypeList<SPECIFIC_TYPE, T>>& elements, SPECIFIC_TYPE* fake)
+    {
+        return Count(elements._elements, fake);
+    }
+
+    template<class SPECIFIC_TYPE, class H, class T>
+    std::size_t Count(const ContainerVector<TypeList<H, T>>& elements, SPECIFIC_TYPE* fake)
+    {
+        return Count(elements._TailElements, fake);
+    }
+
+    // non-const insert functions
+    template<class SPECIFIC_TYPE>
+    SPECIFIC_TYPE* Insert(ContainerVector<SPECIFIC_TYPE>& elements, SPECIFIC_TYPE* obj)
+    {
+        elements._element.push_back(obj);
+        return obj;
+    }
+
+    template<class SPECIFIC_TYPE>
+    SPECIFIC_TYPE* Insert(ContainerVector<TypeNull>& /*elements*/, SPECIFIC_TYPE* /*obj*/)
+    {
+        return nullptr;
+    }
+
+    // this is a missed
+    template<class SPECIFIC_TYPE, class T>
+    SPECIFIC_TYPE* Insert(ContainerVector<T>& /*elements*/, SPECIFIC_TYPE* /*obj*/)
+    {
+        return nullptr;                                        // a missed
+    }
+
+    // Recursion
+    template<class SPECIFIC_TYPE, class H, class T>
+    SPECIFIC_TYPE* Insert(ContainerVector<TypeList<H, T>>& elements, SPECIFIC_TYPE* obj)
+    {
+        SPECIFIC_TYPE* t = Insert(elements._elements, obj);
+        return (t != nullptr ? t : Insert(elements._TailElements, obj));
+    }
+
+    // non-const remove method
+    template<class SPECIFIC_TYPE> SPECIFIC_TYPE* Remove(ContainerVector<SPECIFIC_TYPE>& elements, SPECIFIC_TYPE *obj)
+    {
+        // Simple vector find/swap/pop, this container should be very lightly used
+        // so I don't suspect the linear search complexity to be an issue
+        auto itr = std::find(elements._element.begin(), elements._element.end(), obj);
+        if (itr != elements._element.end())
+        {
+            // Swap the element to be removed with the last element
+            std::swap(*itr, elements._element.back());
+
+            // Remove the last element (which is now the element we wanted to remove)
+            elements._element.pop_back();
+        }
+        return obj;
+    }
+
+    template<class SPECIFIC_TYPE> SPECIFIC_TYPE* Remove(ContainerVector<TypeNull> &/*elements*/, SPECIFIC_TYPE * /*obj*/)
+    {
+        return nullptr;
+    }
+
+    // this is a missed
+    template<class SPECIFIC_TYPE, class T> SPECIFIC_TYPE* Remove(ContainerVector<T> &/*elements*/, SPECIFIC_TYPE * /*obj*/)
+    {
+        return nullptr;                                        // a missed
+    }
+
+    template<class SPECIFIC_TYPE, class T, class H> SPECIFIC_TYPE* Remove(ContainerVector<TypeList<H, T> > &elements, SPECIFIC_TYPE *obj)
+    {
+        // The head element is bad
+        SPECIFIC_TYPE* t = Remove(elements._elements, obj);
+        return ( t != nullptr ? t : Remove(elements._TailElements, obj));
+    }
 }
 #endif

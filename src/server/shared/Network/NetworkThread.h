@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -91,13 +91,13 @@ public:
         SocketAdded(sock);
     }
 
-    tcp::socket* GetSocketForAccept() { return &_acceptSocket; }
+    IoContextTcpSocket* GetSocketForAccept() { return &_acceptSocket; }
 
     void EnableProxyProtocol() { _proxyHeaderReadingEnabled = true; }
 
 protected:
-    virtual void SocketAdded(std::shared_ptr<SocketType> /*sock*/) { }
-    virtual void SocketRemoved(std::shared_ptr<SocketType> /*sock*/) { }
+    virtual void SocketAdded(std::shared_ptr<SocketType> const& /*sock*/) { }
+    virtual void SocketRemoved(std::shared_ptr<SocketType> const& /*sock*/) { }
 
     void AddNewSockets()
     {
@@ -229,7 +229,7 @@ private:
     SocketContainer _newSockets;
 
     Acore::Asio::IoContext _ioContext;
-    tcp::socket _acceptSocket;
+    IoContextTcpSocket _acceptSocket;
     boost::asio::steady_timer _updateTimer;
 
     bool _proxyHeaderReadingEnabled;

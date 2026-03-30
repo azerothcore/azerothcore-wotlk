@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -24,6 +24,7 @@
 #include <thread>
 #include <vector>
 
+#include "Config.h"
 #include "Optional.h"
 #include "TerrainBuilder.h"
 
@@ -71,27 +72,6 @@ namespace MMAP
         rcPolyMeshDetail* dmesh{nullptr};
     };
 
-    struct TileConfig
-    {
-        TileConfig(bool bigBaseUnit)
-        {
-            // these are WORLD UNIT based metrics
-            // this are basic unit dimentions
-            // value have to divide GRID_SIZE(533.3333f) ( aka: 0.5333, 0.2666, 0.3333, 0.1333, etc )
-            BASE_UNIT_DIM = bigBaseUnit ? 0.5333333f : 0.2666666f;
-
-            // All are in UNIT metrics!
-            VERTEX_PER_MAP = int(GRID_SIZE / BASE_UNIT_DIM + 0.5f);
-            VERTEX_PER_TILE = bigBaseUnit ? 40 : 80; // must divide VERTEX_PER_MAP
-            TILES_PER_MAP = VERTEX_PER_MAP / VERTEX_PER_TILE;
-        }
-
-        float BASE_UNIT_DIM;
-        int VERTEX_PER_MAP;
-        int VERTEX_PER_TILE;
-        int TILES_PER_MAP;
-    };
-
     struct TileInfo
     {
         TileInfo() : m_mapId(uint32(-1)), m_tileX(), m_tileY(), m_navMeshParams() {}
@@ -109,7 +89,6 @@ namespace MMAP
     public:
         TileBuilder(MapBuilder* mapBuilder,
                     bool skipLiquid,
-                    bool bigBaseUnit,
                     bool debugOutput);
 
         TileBuilder(TileBuilder&&) = default;
@@ -131,7 +110,6 @@ namespace MMAP
         bool shouldSkipTile(uint32 mapID, uint32 tileX, uint32 tileY) const;
 
     private:
-        bool m_bigBaseUnit;
         bool m_debugOutput;
 
         MapBuilder* m_mapBuilder;
@@ -145,13 +123,7 @@ namespace MMAP
     {
         friend class TileBuilder;
     public:
-        MapBuilder(float maxWalkableAngle,
-                   bool skipLiquid,
-                   bool skipContinents,
-                   bool skipJunkMaps,
-                   bool skipBattlegrounds,
-                   bool debugOutput,
-                   bool bigBaseUnit,
+        MapBuilder(Config* config,
                    int mapid,
                    char const* offMeshFilePath,
                    unsigned int threads);
@@ -166,6 +138,7 @@ namespace MMAP
         // builds list of maps, then builds all of mmap tiles (based on the skip settings)
         void buildMaps(Optional<uint32> mapID);
 
+        const Config& getConfig() const { return *m_config; }
     private:
         // builds all mmap tiles for the specified map id (ignores skip settings)
         void buildMap(uint32 mapID);
@@ -184,7 +157,7 @@ namespace MMAP
         bool isTransportMap(uint32 mapID) const;
         bool isContinentMap(uint32 mapID) const;
 
-        rcConfig GetMapSpecificConfig(uint32 mapID, float bmin[3], float bmax[3], const TileConfig &tileConfig) const;
+        rcConfig getRecastConfig(const ResolvedMeshConfig &cfg, float bmin[3], float bmax[3]) const;
 
         uint32 percentageDone(uint32 totalTiles, uint32 totalTilesDone) const;
         uint32 currentPercentageDone() const;
@@ -201,9 +174,9 @@ namespace MMAP
         bool m_skipBattlegrounds;
         bool m_skipLiquid;
 
-        float m_maxWalkableAngle;
-        bool m_bigBaseUnit;
         int32 m_mapid;
+
+        Config* m_config;
 
         std::atomic<uint32> m_totalTiles;
         std::atomic<uint32> m_totalTilesProcessed;

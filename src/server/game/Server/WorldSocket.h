@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -65,29 +65,32 @@ struct ClientPktHeader
 };
 #pragma pack(pop)
 
-struct AuthSession;
+struct ClientAuthSession;
 
-class AC_GAME_API WorldSocket : public Socket<WorldSocket>
+class AC_GAME_API WorldSocket final : public Socket<WorldSocket>
 {
     typedef Socket<WorldSocket> BaseSocket;
 
 public:
-    WorldSocket(tcp::socket&& socket);
+    WorldSocket(IoContextTcpSocket&& socket);
     ~WorldSocket();
 
     WorldSocket(WorldSocket const& right) = delete;
     WorldSocket& operator=(WorldSocket const& right) = delete;
 
     void Start() override;
-    bool Update() override;
+    bool Update() final;
 
     void SendPacket(WorldPacket const& packet);
 
     void SetSendBufferSize(std::size_t sendBufferSize) { _sendBufferSize = sendBufferSize; }
 
+    bool IsLoggingPackets() const { return _loggingPackets; }
+    void SetPacketLogging(bool state) { _loggingPackets = state; }
+
 protected:
     void OnClose() override;
-    void ReadHandler() override;
+    SocketReadCallbackResult ReadHandler() final;
     bool ReadHeaderHandler();
 
     enum class ReadDataHandlerResult
@@ -110,7 +113,7 @@ private:
     void SendPacketAndLogOpcode(WorldPacket const& packet);
     void HandleSendAuthSession();
     void HandleAuthSession(WorldPacket& recvPacket);
-    void HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSession, PreparedQueryResult result);
+    void HandleAuthSessionCallback(std::shared_ptr<ClientAuthSession> authSession, PreparedQueryResult result);
     void LoadSessionPermissionsCallback(PreparedQueryResult result);
     void SendAuthResponseError(uint8 code);
 
@@ -133,6 +136,8 @@ private:
 
     QueryCallbackProcessor _queryProcessor;
     std::string _ipCountry;
+
+    bool _loggingPackets;
 };
 
 #endif

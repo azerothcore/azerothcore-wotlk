@@ -1,5 +1,12 @@
+#!/usr/bin/env bash
+
+CURRENT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# Set SUDO variable - one liner
+SUDO=$([ "$EUID" -ne 0 ] && echo "sudo" || echo "")
+
 if ! command -v lsb_release &>/dev/null ; then
-    sudo apt-get install -y lsb-release
+    $SUDO apt-get install -y lsb-release
 fi
 
 UBUNTU_VERSION=$(lsb_release -sr);
@@ -19,26 +26,31 @@ case $UBUNTU_VERSION in
     ;;
 esac
 
-sudo apt update
+$SUDO apt update
 
 # shared deps
-sudo DEBIAN_FRONTEND="noninteractive" \
-apt-get -y install ccache clang cmake curl google-perftools libmysqlclient-dev make unzip
+DEBIAN_FRONTEND="noninteractive" $SUDO \
+apt-get -y install ccache clang cmake curl google-perftools libmysqlclient-dev make unzip jq screen tmux \
+  libreadline-dev libncurses5-dev libncursesw5-dev libbz2-dev git gcc g++ libssl-dev \
+  libncurses-dev libboost-all-dev gdb gdbserver expect
 
-if [[ $CONTINUOUS_INTEGRATION || $DOCKER ]]; then
-  # TODO: update CI / Docker section for Ubuntu 22.04+
-  sudo add-apt-repository -y ppa:mhier/libboost-latest && sudo apt update && sudo apt-get -y install build-essential cmake-data  \
-  libboost1.74-dev libbz2-dev libncurses5-dev libmysql++-dev libgoogle-perftools-dev libreadline6-dev libssl-dev libtool \
-  openssl zlib1g-dev
-else
-  sudo DEBIAN_FRONTEND="noninteractive" \
-  apt-get install -y g++ gdb gdbserver gcc git \
-  libboost-all-dev libbz2-dev libncurses-dev libreadline-dev \
-  libssl-dev
+  VAR_PATH="$CURRENT_PATH/../../../../var"
 
+
+# Do not install MySQL if we are in docker (It will be used a docker container instead) or we are explicitly skipping it.
+if [[ $DOCKER != 1 && $SKIP_MYSQL_INSTALL != 1 ]]; then
   # run noninteractive install for MYSQL 8.4 LTS
-  wget https://dev.mysql.com/get/mysql-apt-config_0.8.32-1_all.deb
-  sudo DEBIAN_FRONTEND="noninteractive" dpkg -i ./mysql-apt-config_0.8.32-1_all.deb
-  sudo apt-get update
-  sudo DEBIAN_FRONTEND="noninteractive" apt-get install -y mysql-server
+  wget https://dev.mysql.com/get/mysql-apt-config_0.8.35-1_all.deb -P "$VAR_PATH"
+  # resolve expired key issue
+  sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A8D3785C
+  DEBIAN_FRONTEND="noninteractive" $SUDO dpkg -i "$VAR_PATH/mysql-apt-config_0.8.35-1_all.deb"
+  $SUDO apt-get update
+  DEBIAN_FRONTEND="noninteractive" $SUDO apt-get install -y mysql-server
 fi
+
+
+if [[ $CONTINUOUS_INTEGRATION ]]; then
+  $SUDO systemctl enable mysql.service
+  $SUDO systemctl start mysql.service
+fi
+

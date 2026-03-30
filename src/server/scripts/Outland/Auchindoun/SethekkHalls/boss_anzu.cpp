@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -68,10 +68,6 @@ struct boss_anzu : public BossAI
         talkTimer = 1;
         me->ReplaceAllUnitFlags(UNIT_FLAG_NON_ATTACKABLE);
         me->AddAura(SPELL_SHADOWFORM, me);
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
     }
 
     const Position AnzuSpiritPos[3] =
@@ -124,7 +120,7 @@ struct boss_anzu : public BossAI
             scheduler.DelayAll(3s);
         }).Schedule(8s, [this](TaskContext context)
         {
-            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 1, 45.0f, true))
+            if (Unit* target = SelectTarget(SelectTargetMethod::Random, 9, 45.0f, true, false))
             {
                 DoCast(target, SPELL_CYCLONE);
             }
@@ -139,7 +135,10 @@ struct boss_anzu : public BossAI
         me->CastSpell(me, SPELL_BANISH_SELF, true);
         for (uint8 i = 0; i < 5; ++i)
         {
-            me->SummonCreature(NPC_BROOD_OF_ANZU, me->GetPositionX() + 20 * cos((float)i), me->GetPositionY() + 20 * std::sin((float)i), me->GetPositionZ() + 25.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+            Position spawnPos = me->GetNearPosition(20.0f, (float)i);
+            spawnPos.m_positionZ += 25.0f;
+            spawnPos.m_orientation = 0.0f;
+            me->SummonCreature(NPC_BROOD_OF_ANZU, spawnPos, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
         }
     }
 

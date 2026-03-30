@@ -1,20 +1,21 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "CreatureScript.h"
 #include "GameEventMgr.h"
 #include "GameObjectScript.h"
@@ -59,91 +60,87 @@ static bool BonfireStampedOutState[COUNT_GO_BONFIRE_ALLIANCE + COUNT_GO_BONFIRE_
 
 // <mapId, zoneId, teamId>, <state>
 const std::map<std::tuple<uint32, uint32, TeamId>, bool*> BonfireStateStore = {
-// Map 0
-    { { 0, 1,    TEAM_ALLIANCE }, &BonfireStampedOutState[0] },
-    { { 0, 3,    TEAM_HORDE    }, &BonfireStampedOutState[1] },
-    { { 0, 4,    TEAM_ALLIANCE }, &BonfireStampedOutState[2] },
-    { { 0, 8,    TEAM_HORDE    }, &BonfireStampedOutState[3] },
-    { { 0, 10,   TEAM_ALLIANCE }, &BonfireStampedOutState[4] },
-    { { 0, 11,   TEAM_ALLIANCE }, &BonfireStampedOutState[5] },
-    { { 0, 12,   TEAM_ALLIANCE }, &BonfireStampedOutState[6] },
-    { { 0, 28,   TEAM_ALLIANCE }, &BonfireStampedOutState[7] },
-    { { 0, 33,   TEAM_ALLIANCE }, &BonfireStampedOutState[8] },
-    { { 0, 33,   TEAM_HORDE    }, &BonfireStampedOutState[9] },
-    { { 0, 38,   TEAM_ALLIANCE }, &BonfireStampedOutState[10] },
-    { { 0, 40,   TEAM_ALLIANCE }, &BonfireStampedOutState[11] },
-    { { 0, 44,   TEAM_ALLIANCE }, &BonfireStampedOutState[12] },
-    { { 0, 45,   TEAM_ALLIANCE }, &BonfireStampedOutState[13] },
-    { { 0, 45,   TEAM_HORDE    }, &BonfireStampedOutState[14] },
-    { { 0, 46,   TEAM_ALLIANCE }, &BonfireStampedOutState[15] },
-    { { 0, 46,   TEAM_HORDE    }, &BonfireStampedOutState[16] },
-    { { 0, 47,   TEAM_ALLIANCE }, &BonfireStampedOutState[17] },
-    { { 0, 47,   TEAM_HORDE    }, &BonfireStampedOutState[18] },
-    { { 0, 85,   TEAM_HORDE    }, &BonfireStampedOutState[19] },
-    { { 0, 130,  TEAM_HORDE    }, &BonfireStampedOutState[20] },
-    { { 0, 267,  TEAM_ALLIANCE }, &BonfireStampedOutState[21] },
-    { { 0, 267,  TEAM_HORDE    }, &BonfireStampedOutState[22] },
+    { { MAP_EASTERN_KINGDOMS, AREA_DUN_MOROGH,          TEAM_ALLIANCE }, &BonfireStampedOutState[0] },
+    { { MAP_EASTERN_KINGDOMS, AREA_BADLANDS,            TEAM_HORDE    }, &BonfireStampedOutState[1] },
+    { { MAP_EASTERN_KINGDOMS, AREA_BLASTED_LANDS,       TEAM_ALLIANCE }, &BonfireStampedOutState[2] },
+    { { MAP_EASTERN_KINGDOMS, AREA_SWAMP_OF_SORROWS,    TEAM_HORDE    }, &BonfireStampedOutState[3] },
+    { { MAP_EASTERN_KINGDOMS, AREA_DUSKWOOD,            TEAM_ALLIANCE }, &BonfireStampedOutState[4] },
+    { { MAP_EASTERN_KINGDOMS, AREA_WETLANDS,            TEAM_ALLIANCE }, &BonfireStampedOutState[5] },
+    { { MAP_EASTERN_KINGDOMS, AREA_ELWYNN_FOREST,       TEAM_ALLIANCE }, &BonfireStampedOutState[6] },
+    { { MAP_EASTERN_KINGDOMS, AREA_WESTERN_PLAGUELANDS, TEAM_ALLIANCE }, &BonfireStampedOutState[7] },
+    { { MAP_EASTERN_KINGDOMS, AREA_STRANGLETHORN_VALE,  TEAM_ALLIANCE }, &BonfireStampedOutState[8] },
+    { { MAP_EASTERN_KINGDOMS, AREA_STRANGLETHORN_VALE,  TEAM_HORDE    }, &BonfireStampedOutState[9] },
+    { { MAP_EASTERN_KINGDOMS, AREA_LOCH_MODAN,          TEAM_ALLIANCE }, &BonfireStampedOutState[10] },
+    { { MAP_EASTERN_KINGDOMS, AREA_WESTFALL,            TEAM_ALLIANCE }, &BonfireStampedOutState[11] },
+    { { MAP_EASTERN_KINGDOMS, AREA_REDRIDGE_MOUNTAINS,  TEAM_ALLIANCE }, &BonfireStampedOutState[12] },
+    { { MAP_EASTERN_KINGDOMS, AREA_ARATHI_HIGHLANDS,    TEAM_ALLIANCE }, &BonfireStampedOutState[13] },
+    { { MAP_EASTERN_KINGDOMS, AREA_ARATHI_HIGHLANDS,    TEAM_HORDE    }, &BonfireStampedOutState[14] },
+    { { MAP_EASTERN_KINGDOMS, AREA_BURNING_STEPPES,     TEAM_ALLIANCE }, &BonfireStampedOutState[15] },
+    { { MAP_EASTERN_KINGDOMS, AREA_BURNING_STEPPES,     TEAM_HORDE    }, &BonfireStampedOutState[16] },
+    { { MAP_EASTERN_KINGDOMS, AREA_THE_HINTERLANDS,     TEAM_ALLIANCE }, &BonfireStampedOutState[17] },
+    { { MAP_EASTERN_KINGDOMS, AREA_THE_HINTERLANDS,     TEAM_HORDE    }, &BonfireStampedOutState[18] },
+    { { MAP_EASTERN_KINGDOMS, AREA_TIRISFAL_GLADES,     TEAM_HORDE    }, &BonfireStampedOutState[19] },
+    { { MAP_EASTERN_KINGDOMS, AREA_SILVERPINE_FOREST,   TEAM_HORDE    }, &BonfireStampedOutState[20] },
+    { { MAP_EASTERN_KINGDOMS, AREA_HILLSBRAD_FOOTHILLS, TEAM_ALLIANCE }, &BonfireStampedOutState[21] },
+    { { MAP_EASTERN_KINGDOMS, AREA_HILLSBRAD_FOOTHILLS, TEAM_HORDE    }, &BonfireStampedOutState[22] },
 
-// Map 1
-    { { 1, 14,   TEAM_HORDE    }, &BonfireStampedOutState[23] },
-    { { 1, 15,   TEAM_ALLIANCE }, &BonfireStampedOutState[24] },
-    { { 1, 15,   TEAM_HORDE    }, &BonfireStampedOutState[25] },
-    { { 1, 17,   TEAM_HORDE    }, &BonfireStampedOutState[26] },
-    { { 1, 141,  TEAM_ALLIANCE }, &BonfireStampedOutState[27] },
-    { { 1, 148,  TEAM_ALLIANCE }, &BonfireStampedOutState[28] },
-    { { 1, 215,  TEAM_HORDE    }, &BonfireStampedOutState[29] },
-    { { 1, 331,  TEAM_ALLIANCE }, &BonfireStampedOutState[30] },
-    { { 1, 331,  TEAM_HORDE    }, &BonfireStampedOutState[31] },
-    { { 1, 357,  TEAM_ALLIANCE }, &BonfireStampedOutState[32] },
-    { { 1, 357,  TEAM_HORDE    }, &BonfireStampedOutState[33] },
-    { { 1, 400,  TEAM_HORDE    }, &BonfireStampedOutState[34] },
-    { { 1, 405,  TEAM_ALLIANCE }, &BonfireStampedOutState[35] },
-    { { 1, 405,  TEAM_HORDE    }, &BonfireStampedOutState[36] },
-    { { 1, 406,  TEAM_HORDE    }, &BonfireStampedOutState[37] },
-    { { 1, 440,  TEAM_ALLIANCE }, &BonfireStampedOutState[38] },
-    { { 1, 440,  TEAM_HORDE    }, &BonfireStampedOutState[39] },
-    { { 1, 618,  TEAM_ALLIANCE }, &BonfireStampedOutState[40] },
-    { { 1, 618,  TEAM_HORDE    }, &BonfireStampedOutState[41] },
-    { { 1, 1377, TEAM_ALLIANCE }, &BonfireStampedOutState[42] },
-    { { 1, 1377, TEAM_HORDE    }, &BonfireStampedOutState[43] },
+    { { MAP_KALIMDOR, AREA_DUROTAR,              TEAM_HORDE    }, &BonfireStampedOutState[23] },
+    { { MAP_KALIMDOR, AREA_DUSTWALLOW_MARSH,     TEAM_ALLIANCE }, &BonfireStampedOutState[24] },
+    { { MAP_KALIMDOR, AREA_DUSTWALLOW_MARSH,     TEAM_HORDE    }, &BonfireStampedOutState[25] },
+    { { MAP_KALIMDOR, AREA_THE_BARRENS,          TEAM_HORDE    }, &BonfireStampedOutState[26] },
+    { { MAP_KALIMDOR, AREA_TELDRASSIL,           TEAM_ALLIANCE }, &BonfireStampedOutState[27] },
+    { { MAP_KALIMDOR, AREA_DARKSHORE,            TEAM_ALLIANCE }, &BonfireStampedOutState[28] },
+    { { MAP_KALIMDOR, AREA_MULGORE,              TEAM_HORDE    }, &BonfireStampedOutState[29] },
+    { { MAP_KALIMDOR, AREA_ASHENVALE,            TEAM_ALLIANCE }, &BonfireStampedOutState[30] },
+    { { MAP_KALIMDOR, AREA_ASHENVALE,            TEAM_HORDE    }, &BonfireStampedOutState[31] },
+    { { MAP_KALIMDOR, AREA_FERALAS,              TEAM_ALLIANCE }, &BonfireStampedOutState[32] },
+    { { MAP_KALIMDOR, AREA_FERALAS,              TEAM_HORDE    }, &BonfireStampedOutState[33] },
+    { { MAP_KALIMDOR, AREA_THOUSAND_NEEDLES,     TEAM_HORDE    }, &BonfireStampedOutState[34] },
+    { { MAP_KALIMDOR, AREA_DESOLACE,             TEAM_ALLIANCE }, &BonfireStampedOutState[35] },
+    { { MAP_KALIMDOR, AREA_DESOLACE,             TEAM_HORDE    }, &BonfireStampedOutState[36] },
+    { { MAP_KALIMDOR, AREA_STONETALON_MOUNTAINS, TEAM_HORDE    }, &BonfireStampedOutState[37] },
+    { { MAP_KALIMDOR, AREA_TANARIS,              TEAM_ALLIANCE }, &BonfireStampedOutState[38] },
+    { { MAP_KALIMDOR, AREA_TANARIS,              TEAM_HORDE    }, &BonfireStampedOutState[39] },
+    { { MAP_KALIMDOR, AREA_WINTERSPRING,         TEAM_ALLIANCE }, &BonfireStampedOutState[40] },
+    { { MAP_KALIMDOR, AREA_WINTERSPRING,         TEAM_HORDE    }, &BonfireStampedOutState[41] },
+    { { MAP_KALIMDOR, AREA_SILITHUS,             TEAM_ALLIANCE }, &BonfireStampedOutState[42] },
+    { { MAP_KALIMDOR, AREA_SILITHUS,             TEAM_HORDE    }, &BonfireStampedOutState[43] },
 
-// Map 530
-    { { 530, 3430, TEAM_HORDE    }, &BonfireStampedOutState[44] },
-    { { 530, 3433, TEAM_HORDE    }, &BonfireStampedOutState[45] },
-    { { 530, 3483, TEAM_ALLIANCE }, &BonfireStampedOutState[46] },
-    { { 530, 3483, TEAM_HORDE    }, &BonfireStampedOutState[47] },
-    { { 530, 3518, TEAM_ALLIANCE }, &BonfireStampedOutState[48] },
-    { { 530, 3518, TEAM_HORDE    }, &BonfireStampedOutState[49] },
-    { { 530, 3519, TEAM_ALLIANCE }, &BonfireStampedOutState[50] },
-    { { 530, 3519, TEAM_HORDE    }, &BonfireStampedOutState[51] },
-    { { 530, 3520, TEAM_ALLIANCE }, &BonfireStampedOutState[52] },
-    { { 530, 3520, TEAM_HORDE    }, &BonfireStampedOutState[53] },
-    { { 530, 3521, TEAM_ALLIANCE }, &BonfireStampedOutState[54] },
-    { { 530, 3521, TEAM_HORDE    }, &BonfireStampedOutState[55] },
-    { { 530, 3522, TEAM_ALLIANCE }, &BonfireStampedOutState[56] },
-    { { 530, 3522, TEAM_HORDE    }, &BonfireStampedOutState[57] },
-    { { 530, 3523, TEAM_ALLIANCE }, &BonfireStampedOutState[58] },
-    { { 530, 3523, TEAM_HORDE    }, &BonfireStampedOutState[59] },
-    { { 530, 3524, TEAM_ALLIANCE }, &BonfireStampedOutState[60] },
-    { { 530, 3525, TEAM_ALLIANCE }, &BonfireStampedOutState[61] },
+    { { MAP_OUTLAND, AREA_EVERSONG_WOODS,        TEAM_HORDE    }, &BonfireStampedOutState[44] },
+    { { MAP_OUTLAND, AREA_GHOSTLANDS,            TEAM_HORDE    }, &BonfireStampedOutState[45] },
+    { { MAP_OUTLAND, AREA_HELLFIRE_PENINSULA,    TEAM_ALLIANCE }, &BonfireStampedOutState[46] },
+    { { MAP_OUTLAND, AREA_HELLFIRE_PENINSULA,    TEAM_HORDE    }, &BonfireStampedOutState[47] },
+    { { MAP_OUTLAND, AREA_NAGRAND,               TEAM_ALLIANCE }, &BonfireStampedOutState[48] },
+    { { MAP_OUTLAND, AREA_NAGRAND,               TEAM_HORDE    }, &BonfireStampedOutState[49] },
+    { { MAP_OUTLAND, AREA_TEROKKAR_FOREST,       TEAM_ALLIANCE }, &BonfireStampedOutState[50] },
+    { { MAP_OUTLAND, AREA_TEROKKAR_FOREST,       TEAM_HORDE    }, &BonfireStampedOutState[51] },
+    { { MAP_OUTLAND, AREA_SHADOWMOON_VALLEY,     TEAM_ALLIANCE }, &BonfireStampedOutState[52] },
+    { { MAP_OUTLAND, AREA_SHADOWMOON_VALLEY,     TEAM_HORDE    }, &BonfireStampedOutState[53] },
+    { { MAP_OUTLAND, AREA_ZANGARMARSH,           TEAM_ALLIANCE }, &BonfireStampedOutState[54] },
+    { { MAP_OUTLAND, AREA_ZANGARMARSH,           TEAM_HORDE    }, &BonfireStampedOutState[55] },
+    { { MAP_OUTLAND, AREA_BLADES_EDGE_MOUNTAINS, TEAM_ALLIANCE }, &BonfireStampedOutState[56] },
+    { { MAP_OUTLAND, AREA_BLADES_EDGE_MOUNTAINS, TEAM_HORDE    }, &BonfireStampedOutState[57] },
+    { { MAP_OUTLAND, AREA_NETHERSTORM,           TEAM_ALLIANCE }, &BonfireStampedOutState[58] },
+    { { MAP_OUTLAND, AREA_NETHERSTORM,           TEAM_HORDE    }, &BonfireStampedOutState[59] },
+    { { MAP_OUTLAND, AREA_AZUREMYST_ISLE,        TEAM_ALLIANCE }, &BonfireStampedOutState[60] },
+    { { MAP_OUTLAND, AREA_BLOODMYST_ISLE,        TEAM_ALLIANCE }, &BonfireStampedOutState[61] },
 
-// Map 571
-    { { 571, 65,   TEAM_ALLIANCE }, &BonfireStampedOutState[62] },
-    { { 571, 65,   TEAM_HORDE    }, &BonfireStampedOutState[63] },
-    { { 571, 66,   TEAM_ALLIANCE }, &BonfireStampedOutState[64] },
-    { { 571, 66,   TEAM_HORDE    }, &BonfireStampedOutState[65] },
-    { { 571, 67,   TEAM_ALLIANCE }, &BonfireStampedOutState[66] },
-    { { 571, 67,   TEAM_HORDE    }, &BonfireStampedOutState[67] },
-    { { 571, 394,  TEAM_ALLIANCE }, &BonfireStampedOutState[68] },
-    { { 571, 394,  TEAM_HORDE    }, &BonfireStampedOutState[69] },
-    { { 571, 495,  TEAM_ALLIANCE }, &BonfireStampedOutState[70] },
-    { { 571, 495,  TEAM_HORDE    }, &BonfireStampedOutState[71] },
-    { { 571, 2817, TEAM_ALLIANCE }, &BonfireStampedOutState[72] },
-    { { 571, 2817, TEAM_HORDE    }, &BonfireStampedOutState[73] },
-    { { 571, 3537, TEAM_ALLIANCE }, &BonfireStampedOutState[74] },
-    { { 571, 3537, TEAM_HORDE    }, &BonfireStampedOutState[75] },
-    { { 571, 3711, TEAM_ALLIANCE }, &BonfireStampedOutState[76] },
-    { { 571, 3711, TEAM_HORDE    }, &BonfireStampedOutState[77] },
+    { { MAP_NORTHREND, AREA_DRAGONBLIGHT,       TEAM_ALLIANCE }, &BonfireStampedOutState[62] },
+    { { MAP_NORTHREND, AREA_DRAGONBLIGHT,       TEAM_HORDE    }, &BonfireStampedOutState[63] },
+    { { MAP_NORTHREND, AREA_ZUL_DRAK,           TEAM_ALLIANCE }, &BonfireStampedOutState[64] },
+    { { MAP_NORTHREND, AREA_ZUL_DRAK,           TEAM_HORDE    }, &BonfireStampedOutState[65] },
+    { { MAP_NORTHREND, AREA_THE_STORM_PEAKS,    TEAM_ALLIANCE }, &BonfireStampedOutState[66] },
+    { { MAP_NORTHREND, AREA_THE_STORM_PEAKS,    TEAM_HORDE    }, &BonfireStampedOutState[67] },
+    { { MAP_NORTHREND, AREA_GRIZZLY_HILLS,      TEAM_ALLIANCE }, &BonfireStampedOutState[68] },
+    { { MAP_NORTHREND, AREA_GRIZZLY_HILLS,      TEAM_HORDE    }, &BonfireStampedOutState[69] },
+    { { MAP_NORTHREND, AREA_HOWLING_FJORD,      TEAM_ALLIANCE }, &BonfireStampedOutState[70] },
+    { { MAP_NORTHREND, AREA_HOWLING_FJORD,      TEAM_HORDE    }, &BonfireStampedOutState[71] },
+    { { MAP_NORTHREND, AREA_CRYSTALSONG_FOREST, TEAM_ALLIANCE }, &BonfireStampedOutState[72] },
+    { { MAP_NORTHREND, AREA_CRYSTALSONG_FOREST, TEAM_HORDE    }, &BonfireStampedOutState[73] },
+    { { MAP_NORTHREND, AREA_BOREAN_TUNDRA,      TEAM_ALLIANCE }, &BonfireStampedOutState[74] },
+    { { MAP_NORTHREND, AREA_BOREAN_TUNDRA,      TEAM_HORDE    }, &BonfireStampedOutState[75] },
+    { { MAP_NORTHREND, AREA_SHOLAZAR_BASIN,     TEAM_ALLIANCE }, &BonfireStampedOutState[76] },
+    { { MAP_NORTHREND, AREA_SHOLAZAR_BASIN,     TEAM_HORDE    }, &BonfireStampedOutState[77] },
 };
 
 uint32 const GoBonfireAlliance[COUNT_GO_BONFIRE_ALLIANCE] = { 187564, 187914, 187916, 187917, 187919, 187920, 187921, 187922, 187923, 187924, 187925, 187926, 187927, 187928, 187929, 187930, 187931, 187932, 187933, 187934, 187935, 187936, 187937, 187938, 187939, 187940, 187941, 187942, 187943, 187944, 187945, 187946, 194032, 194035, 194036, 194038, 194040, 194044, 194045, 194049 };
@@ -390,121 +387,11 @@ struct npc_midsummer_bonfire_despawner : public ScriptedAI
 
 enum torchToss
 {
-    GO_TORCH_TARGET_BRAZIER         = 187708,
-    NPC_TORCH_TOSS_TARGET_BUNNY     = 25535,
-
-    SPELL_TARGET_INDICATOR_RANK_1   = 43313,
-    SPELL_TORCH_TOSS_LAND           = 46054,
-    SPELL_BRAZIERS_HIT_VISUAL       = 45724,
-    SPELL_TORCH_TOSS_SUCCESS_A      = 45719,
-    SPELL_TORCH_TOSS_SUCCESS_H      = 46651,
-    SPELL_TORCH_TOSS_TRAINING       = 45716,
-};
-
-struct npc_midsummer_torch_target : public ScriptedAI
-{
-    npc_midsummer_torch_target(Creature* creature) : ScriptedAI(creature)
-    {
-        teleTimer = 0;
-        startTimer = 1;
-        posVec.clear();
-        playerGUID.Clear();
-        me->CastSpell(me, SPELL_TARGET_INDICATOR_RANK_1, true);
-        counter = 0;
-        maxCount = 0;
-    }
-
-    ObjectGuid playerGUID;
-    uint32 startTimer;
-    uint32 teleTimer;
-    std::vector<Position> posVec;
-    uint8 counter;
-    uint8 maxCount;
-
-    void SetPlayerGUID(ObjectGuid guid, uint8 cnt)
-    {
-        playerGUID = guid;
-        maxCount = cnt;
-    }
-
-    bool CanBeSeen(Player const* seer) override
-    {
-        return seer->GetGUID() == playerGUID;
-    }
-
-    void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
-    {
-        if (posVec.empty())
-            return;
-        // Triggered spell from torch
-        if (spellInfo->Id == SPELL_TORCH_TOSS_LAND && caster->IsPlayer())
-        {
-            me->CastSpell(me, SPELL_BRAZIERS_HIT_VISUAL, true); // hit visual anim
-            if (++counter >= maxCount)
-            {
-                caster->CastSpell(caster, (caster->ToPlayer()->GetTeamId() ? SPELL_TORCH_TOSS_SUCCESS_H : SPELL_TORCH_TOSS_SUCCESS_A), true); // quest complete spell
-                me->DespawnOrUnsummon(1);
-                return;
-            }
-
-            teleTimer = 1;
-        }
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (startTimer)
-        {
-            startTimer += diff;
-            if (startTimer >= 200)
-            {
-                startTimer = 0;
-                FillPositions();
-                SelectPosition();
-            }
-        }
-        if (teleTimer)
-        {
-            teleTimer += diff;
-            if (teleTimer >= 750 && teleTimer < 10000)
-            {
-                teleTimer = 10000;
-                SelectPosition();
-            }
-            else if (teleTimer >= 10500)
-            {
-                if (Player* plr = ObjectAccessor::GetPlayer(*me, playerGUID))
-                    plr->UpdateTriggerVisibility();
-
-                teleTimer = 0;
-            }
-        }
-    }
-
-    void FillPositions()
-    {
-        std::list<GameObject*> gobjList;
-        me->GetGameObjectListWithEntryInGrid(gobjList, GO_TORCH_TARGET_BRAZIER, 30.0f);
-        for (std::list<GameObject*>::const_iterator itr = gobjList.begin(); itr != gobjList.end(); ++itr)
-        {
-            Position pos;
-            pos.Relocate(*itr);
-            posVec.push_back(pos);
-        }
-    }
-
-    void SelectPosition()
-    {
-        if (posVec.empty())
-            return;
-        int8 num = urand(0, posVec.size() - 1);
-        Position pos;
-        pos.Relocate(posVec.at(num));
-        me->m_last_notify_position.Relocate(0.0f, 0.0f, 0.0f);
-        me->m_last_notify_mstime = GameTime::GetGameTimeMS().count() + 10000;
-
-        me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation());
-    }
+    SPELL_TORCH_TOSSING_TRAINING_SUCCESS_A  = 45719,
+    SPELL_TORCH_TOSSING_TRAINING_SUCCESS_H  = 46651,
+    SPELL_TORCH_TOSSING_TRAINING            = 45716,
+    SPELL_TORCH_TOSSING_PRACTICE            = 46630,
+    SPELL_REMOVE_TORCHES                    = 46074,
 };
 
 ///////////////////////////////
@@ -974,38 +861,81 @@ class spell_midsummer_ribbon_pole_visual : public SpellScript
     }
 };
 
-class spell_midsummer_torch_quest : public AuraScript
+class spell_braziers_hit : public AuraScript
 {
-    PrepareAuraScript(spell_midsummer_torch_quest)
+    PrepareAuraScript(spell_braziers_hit)
 
-    bool Load() override
+    bool Validate(SpellInfo const* /*spell*/) override
     {
-        torchGUID.Clear();
-        return true;
+        return ValidateSpellInfo(
+            {
+                SPELL_TORCH_TOSSING_TRAINING_SUCCESS_A,
+                SPELL_TORCH_TOSSING_TRAINING_SUCCESS_H,
+                SPELL_TORCH_TOSSING_TRAINING,
+                SPELL_TORCH_TOSSING_PRACTICE,
+             });
     }
 
-    ObjectGuid torchGUID;
-
-    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    void HandleAfterEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        Unit* ar = GetTarget();
-        if (Creature* cr = ar->SummonCreature(NPC_TORCH_TOSS_TARGET_BUNNY, ar->GetPositionX(), ar->GetPositionY(), ar->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 90000))
+        Player* const player = GetTarget()->ToPlayer();
+
+        if (!player)
+            return;
+
+        if ((player->HasAura(SPELL_TORCH_TOSSING_TRAINING) && (GetStackAmount() >= 8)) ||
+            (player->HasAura(SPELL_TORCH_TOSSING_PRACTICE) && (GetStackAmount() >= 20)))
         {
-            torchGUID = cr->GetGUID();
-            CAST_AI(npc_midsummer_torch_target, cr->AI())->SetPlayerGUID(ar->GetGUID(), (GetId() == SPELL_TORCH_TOSS_TRAINING ? 8 : 20));
+            player->CastSpell(player, SPELL_TORCH_TOSSING_TRAINING_SUCCESS_A, true);
+            player->CastSpell(player, SPELL_TORCH_TOSSING_TRAINING_SUCCESS_H, true);
         }
-    }
-
-    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        if (Creature* cr = ObjectAccessor::GetCreature(*GetTarget(), torchGUID))
-            cr->DespawnOrUnsummon(1);
     }
 
     void Register() override
     {
-        OnEffectApply += AuraEffectApplyFn(spell_midsummer_torch_quest::HandleEffectApply, EFFECT_0, SPELL_AURA_DETECT_AMORE, AURA_EFFECT_HANDLE_REAL);
-        OnEffectRemove += AuraEffectRemoveFn(spell_midsummer_torch_quest::HandleEffectRemove, EFFECT_0, SPELL_AURA_DETECT_AMORE, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectApply += AuraEffectApplyFn(spell_braziers_hit::HandleAfterEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+    }
+};
+
+class spell_torch_target_picker : public SpellScript
+{
+    PrepareSpellScript(spell_torch_target_picker)
+
+    void SelectTargets(std::list<WorldObject*>& targets)
+    {
+        if (targets.empty())
+            return;
+
+        // keep single random element only
+        WorldObject* const bunny = Acore::Containers::SelectRandomContainerElement(targets);
+        targets.clear();
+        targets.push_back(bunny);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_torch_target_picker::SelectTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+    }
+};
+
+class spell_torch_tossing_training : public AuraScript
+{
+    PrepareAuraScript(spell_torch_tossing_training)
+
+    bool Validate(SpellInfo const* /*spell*/) override
+    {
+        return ValidateSpellInfo({ SPELL_REMOVE_TORCHES });
+    }
+
+    void HandleAfterEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Unit* const target = GetTarget())
+            target->CastSpell(target, SPELL_REMOVE_TORCHES);
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectApplyFn(spell_torch_tossing_training::HandleAfterEffectRemove, EFFECT_0, SPELL_AURA_DETECT_AMORE, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
     }
 };
 
@@ -1254,22 +1184,22 @@ class spell_midsummer_summon_ahune_lieutenant : public SpellScript
 
         switch (zoneId)
         {
-        case 331: // Ashenvale
+        case AREA_ASHENVALE:
             npcEntry = 26116; // Frostwave Lieutenant
             break;
-        case 405: // Desolace
+        case AREA_DESOLACE:
             npcEntry = 26178; // Hailstone Lieutenant
             break;
-        case 33: // Stranglethorn Vale
+        case AREA_STRANGLETHORN_VALE:
             npcEntry = 26204; // Chillwind Lieutenant
             break;
-        case 51: // Searing Gorge
+        case AREA_SEARING_GORGE:
             npcEntry = 26214; // Frigid Lieutenant
             break;
-        case 1377: // Silithus
+        case AREA_SILITHUS:
             npcEntry = 26215; // Glacial Lieutenant
             break;
-        case 3483: // Hellfire Peninsula
+        case AREA_HELLFIRE_PENINSULA:
             npcEntry = 26216; // Glacial Templar
             break;
         }
@@ -1292,7 +1222,6 @@ void AddSC_event_midsummer_scripts()
     // NPCs
     RegisterCreatureAI(npc_midsummer_bonfire);
     RegisterCreatureAI(npc_midsummer_bonfire_despawner);
-    RegisterCreatureAI(npc_midsummer_torch_target);
     RegisterCreatureAI(npc_midsummer_ribbon_pole_target);
 
     // Spells
@@ -1302,9 +1231,11 @@ void AddSC_event_midsummer_scripts()
     RegisterSpellScript(spell_midsummer_ribbon_pole_firework);
     RegisterSpellScript(spell_midsummer_ribbon_pole);
     RegisterSpellScript(spell_midsummer_ribbon_pole_visual);
-    RegisterSpellScript(spell_midsummer_torch_quest);
     RegisterSpellScript(spell_midsummer_fling_torch);
     RegisterSpellScript(spell_midsummer_juggling_torch);
     RegisterSpellScript(spell_midsummer_torch_catch);
     RegisterSpellScript(spell_midsummer_summon_ahune_lieutenant);
+    RegisterSpellScript(spell_braziers_hit);
+    RegisterSpellScript(spell_torch_target_picker);
+    RegisterSpellScript(spell_torch_tossing_training);
 }

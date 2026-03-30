@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -51,6 +51,7 @@ public:
     void RemoveAllPassengers();
     void Dismiss();
     bool IsVehicleInUse();
+    [[nodiscard]] bool IsControllableVehicle() const;
     void TeleportVehicle(float x, float y, float z, float ang);
 
     SeatMap Seats;
@@ -100,12 +101,12 @@ private:
 class VehicleDespawnEvent : public BasicEvent
 {
 public:
-    VehicleDespawnEvent(Unit& self, uint32 duration) : _self(self), _duration(duration) { }
+    VehicleDespawnEvent(Unit& self, Milliseconds duration) : _self(self), _duration(duration) { }
     bool Execute(uint64 e_time, uint32 p_time) override;
 
 protected:
     Unit& _self;
-    uint32 _duration;
+    Milliseconds _duration;
 };
 
 #endif

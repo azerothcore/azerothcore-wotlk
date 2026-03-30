@@ -1,0 +1,95 @@
+#!/usr/bin/env bash
+
+# AzerothCore Simple Restarter
+# This script is a wrapper around the starter script that provides restart functionality
+# and maintains compatibility with the acore dashboard
+#
+# Usage: simple-restarter <binary> [gdb_file] [config] [syslog] [syserr] [gdb_enabled] [crashes_path]
+#
+# Parameters (same as starter):
+#   $1 - Binary to execute (required)
+#   $2 - GDB configuration file (optional)
+#   $3 - Configuration file path (optional)
+#   $4 - System log file (optional)
+#   $5 - System error file (optional)  
+#   $6 - GDB enabled flag (0/1, optional)
+#   $7 - Crashes directory path (optional)
+
+# Get script directory
+CURRENT_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# Parameters (same as starter)
+BINPATH="$1"
+BINFILE="$2"
+GDB_FILE="$3"
+CONFIG="$4"
+SYSLOG="$5"
+SYSERR="$6"
+GDB_ENABLED="${7:-0}"
+CRASHES_PATH="$8"
+
+BINARY="$BINPATH/$BINFILE"
+
+# Default values (same as starter)
+DEFAULT_GDB_FILE="$CURRENT_PATH/gdb.conf"
+
+# Set defaults if not provided
+GDB_FILE="${GDB_FILE:-$DEFAULT_GDB_FILE}"
+
+# Counters for crash detection
+_instant_crash_count=0
+_restart_count=0
+
+# Check if starter script exists
+STARTER_SCRIPT="$CURRENT_PATH/starter"
+if [ ! -f "$STARTER_SCRIPT" ]; then
+    echo "Error: starter script not found at $STARTER_SCRIPT"
+    exit 1
+fi
+
+# Main restart loop
+while true; do
+    STARTING_TIME=$(date +%s)
+
+    echo "AC_CONFIG_POLICY: $AC_CONFIG_POLICY"
+    
+    # Use starter script to launch the binary with all parameters
+    "$STARTER_SCRIPT" "$BINPATH" "$BINFILE" "$GDB_FILE" "$CONFIG" "$SYSLOG" "$SYSERR" "$GDB_ENABLED" "$CRASHES_PATH"
+
+    _exit_code=$?
+    
+    echo "$(basename "$BINARY") terminated with exit code: $_exit_code"
+    
+    # Calculate runtime
+    ENDING_TIME=$(date +%s)
+    DIFFERENCE=$((ENDING_TIME - STARTING_TIME))
+    
+    ((_restart_count++))
+    echo "$(basename "$BINARY") terminated after $DIFFERENCE seconds, restart count: $_restart_count"
+
+    # Crash loop detection
+    if [ "$DIFFERENCE" -lt 10 ]; then
+        # Increment instant crash count if runtime is lower than 10 seconds
+        ((_instant_crash_count++))
+        echo "Warning: Quick restart detected ($DIFFERENCE seconds) - instant crash count: $_instant_crash_count"
+    else
+        # Reset count on successful longer run
+        _instant_crash_count=0
+    fi
+
+    # Prevent infinite crash loops
+    if [ "$_instant_crash_count" -gt 5 ]; then
+        echo "Error: $(basename "$BINARY") restarter exited. Infinite crash loop prevented (6 crashes in under 10 seconds each)"
+        echo "Please check your system configuration and logs"
+        exit 1
+    fi
+
+    # Exit cleanly if shutdown was requested by command or SIGINT (exit code 0)
+    if [ "$_exit_code" -eq 0 ]; then
+        echo "$(basename "$BINARY") shutdown safely"
+        exit 0
+    fi
+    
+    echo "$(basename "$BINARY") will restart in 3 seconds..."
+    sleep 3
+done

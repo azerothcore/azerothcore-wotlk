@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -17,6 +17,7 @@
 
 #include "UnitAI.h"
 #include "Creature.h"
+#include "CreatureAI.h"
 #include "CreatureAIImpl.h"
 #include "Player.h"
 #include "Spell.h"
@@ -135,10 +136,12 @@ SpellCastResult UnitAI::DoAddAuraToAllHostilePlayers(uint32 spellid)
 {
     if (me->IsInCombat())
     {
-        ThreatContainer::StorageType threatlist = me->GetThreatMgr().GetThreatList();
-        for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
+        for (ThreatReference const* ref : me->GetThreatMgr().GetUnsortedThreatList())
         {
-            if (Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
+            if (ref->IsOffline())
+                continue;
+
+            if (Unit* unit = ref->GetVictim())
             {
                 if (unit->IsPlayer())
                 {
@@ -146,8 +149,6 @@ SpellCastResult UnitAI::DoAddAuraToAllHostilePlayers(uint32 spellid)
                     return SPELL_CAST_OK;
                 }
             }
-            else
-                return SPELL_FAILED_BAD_TARGETS;
         }
     }
 
@@ -158,16 +159,16 @@ SpellCastResult UnitAI::DoCastToAllHostilePlayers(uint32 spellid, bool triggered
 {
     if (me->IsInCombat())
     {
-        ThreatContainer::StorageType threatlist = me->GetThreatMgr().GetThreatList();
-        for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
+        for (ThreatReference const* ref : me->GetThreatMgr().GetUnsortedThreatList())
         {
-            if (Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid()))
+            if (ref->IsOffline())
+                continue;
+
+            if (Unit* unit = ref->GetVictim())
             {
                 if (unit->IsPlayer())
                     return me->CastSpell(unit, spellid, triggered);
             }
-            else
-                return SPELL_FAILED_BAD_TARGETS;
         }
     }
 
@@ -191,8 +192,26 @@ SpellCastResult UnitAI::DoCast(uint32 spellId)
             {
                 if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId))
                 {
-                    bool playerOnly = spellInfo->HasAttribute(SPELL_ATTR3_ONLY_ON_PLAYER);
-                    target = SelectTarget(SelectTargetMethod::Random, 0, spellInfo->GetMaxRange(false), playerOnly);
+                    DefaultTargetSelector targetSelector(me, spellInfo->GetMaxRange(false), false, true, 0);
+                    target = SelectTarget(SelectTargetMethod::Random, 0, [&](Unit* target) {
+                        if (!target)
+                            return false;
+
+                        if (target->IsPlayer())
+                        {
+                            if (spellInfo->HasAttribute(SPELL_ATTR5_NOT_ON_PLAYER))
+                                return false;
+                        }
+                        else
+                        {
+                            if (spellInfo->HasAttribute(SPELL_ATTR3_ONLY_ON_PLAYER))
+                                return false;
+
+                            if (spellInfo->HasAttribute(SPELL_ATTR5_NOT_ON_PLAYER_CONTROLLED_NPC) && target->IsControlledByPlayer())
+                                return false;
+                        }
+                        return targetSelector(target);
+                    });
                 }
                 break;
             }
@@ -206,12 +225,30 @@ SpellCastResult UnitAI::DoCast(uint32 spellId)
             {
                 if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId))
                 {
-                    bool playerOnly = spellInfo->HasAttribute(SPELL_ATTR3_ONLY_ON_PLAYER);
                     float range = spellInfo->GetMaxRange(false);
 
-                    DefaultTargetSelector targetSelector(me, range, playerOnly, true, -(int32)spellId);
-                    if (!(spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_VICTIM)
-                            && targetSelector(me->GetVictim()))
+                    DefaultTargetSelector defaultTargetSelector(me, range, false, true, -(int32)spellId);
+                    auto targetSelector = [&](Unit* target) {
+                        if (!target)
+                            return false;
+
+                        if (target->IsPlayer())
+                        {
+                            if (spellInfo->HasAttribute(SPELL_ATTR5_NOT_ON_PLAYER))
+                                return false;
+                        }
+                        else
+                        {
+                            if (spellInfo->HasAttribute(SPELL_ATTR3_ONLY_ON_PLAYER))
+                                return false;
+
+                            if (spellInfo->HasAttribute(SPELL_ATTR5_NOT_ON_PLAYER_CONTROLLED_NPC) && target->IsControlledByPlayer())
+                                return false;
+                        }
+                        return defaultTargetSelector(target);
+                    };
+
+                    if (!(spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_VICTIM) && targetSelector(me->GetVictim()))
                         target = me->GetVictim();
                     else
                         target = SelectTarget(SelectTargetMethod::Random, 0, targetSelector);
@@ -340,7 +377,7 @@ void UnitAI::FillAISpellInfo()
     }
 }
 
-ThreatMgr& UnitAI::GetThreatMgr()
+ThreatManager& UnitAI::GetThreatMgr()
 {
     return me->GetThreatMgr();
 }
@@ -348,6 +385,60 @@ ThreatMgr& UnitAI::GetThreatMgr()
 void UnitAI::SortByDistance(std::list<Unit*>& list, bool ascending)
 {
     list.sort(Acore::ObjectDistanceOrderPred(me, ascending));
+}
+
+void UnitAI::EvadeTimerExpired()
+{
+    Creature* creature = me->ToCreature();
+    if (!creature)
+        return;
+
+    CreatureAI* ai = creature->AI();
+    if (!ai)
+        return;
+
+    // Check if we can teleport an unreachable player first
+    if (ObjectGuid targetGuid = creature->GetCannotReachTarget())
+    {
+        if (Player* player = ObjectAccessor::GetPlayer(*creature, targetGuid))
+        {
+            if (creature->IsEngagedBy(player) && ai->OnTeleportUnreacheablePlayer(player))
+            {
+                creature->SetCannotReachTarget();
+                return;
+            }
+        }
+    }
+
+    if (creature->GetMap()->IsRaid())
+    {
+        creature->GetCombatManager().ContinueEvadeRegen();
+        return;
+    }
+
+    // If only one target, enter evade mode
+    if (creature->GetThreatMgr().GetThreatListSize() <= 1)
+    {
+        ai->EnterEvadeMode(CreatureAI::EVADE_REASON_NO_PATH);
+        return;
+    }
+
+    // Multiple targets - clear threat on unreachable target and try another
+    if (ObjectGuid targetGuid = creature->GetCannotReachTarget())
+    {
+        if (Unit* target = ObjectAccessor::GetUnit(*creature, targetGuid))
+        {
+            if (creature->GetThreatMgr().IsThreatenedBy(target))
+            {
+                creature->GetThreatMgr().ClearThreat(target);
+                creature->SetCannotReachTarget();
+                return;
+            }
+        }
+    }
+
+    // Fallback - enter evade
+    ai->EnterEvadeMode(CreatureAI::EVADE_REASON_NO_PATH);
 }
 
 //Enable PlayerAI when charmed

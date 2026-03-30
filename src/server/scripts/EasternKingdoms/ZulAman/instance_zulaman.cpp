@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -19,13 +19,12 @@
 #include "InstanceScript.h"
 #include "Player.h"
 #include "TemporarySummon.h"
+#include "WorldStateDefines.h"
 #include "zulaman.h"
 
 enum Misc
 {
-    RAND_VENDOR                    = 2,
-    WORLDSTATE_SHOW_TIMER          = 3104,
-    WORLDSTATE_TIME_TO_SACRIFICE   = 3106
+    RAND_VENDOR = 2,
 };
 
 // Chests spawn at bear/eagle/dragonhawk/lynx bosses
@@ -97,7 +96,7 @@ BossBoundaryData const boundaries =
 class instance_zulaman : public InstanceMapScript
 {
 public:
-    instance_zulaman() : InstanceMapScript("instance_zulaman", 568) { }
+    instance_zulaman() : InstanceMapScript("instance_zulaman", MAP_ZUL_AMAN) { }
 
     struct instance_zulaman_InstanceMapScript : public InstanceScript
     {
@@ -175,8 +174,8 @@ public:
             {
                 if (uint32 timer = GetPersistentData(DATA_TIMED_RUN))
                 {
-                    DoUpdateWorldState(WORLDSTATE_SHOW_TIMER, 1);
-                    DoUpdateWorldState(WORLDSTATE_TIME_TO_SACRIFICE, timer);
+                    DoUpdateWorldState(WORLD_STATE_ZUL_AMAN_SHOW_TIMER, 1);
+                    DoUpdateWorldState(WORLD_STATE_ZUL_AMAN_TIME_TO_SACRIFICE, timer);
                 }
 
                 scheduler.Schedule(1min, GROUP_TIMED_RUN, [this](TaskContext context)
@@ -184,13 +183,13 @@ public:
                     if (uint32 timer = GetPersistentData(DATA_TIMED_RUN))
                     {
                         --timer;
-                        DoUpdateWorldState(WORLDSTATE_SHOW_TIMER, 1);
-                        DoUpdateWorldState(WORLDSTATE_TIME_TO_SACRIFICE, timer);
+                        DoUpdateWorldState(WORLD_STATE_ZUL_AMAN_SHOW_TIMER, 1);
+                        DoUpdateWorldState(WORLD_STATE_ZUL_AMAN_TIME_TO_SACRIFICE, timer);
                         StorePersistentData(DATA_TIMED_RUN, timer);
                         context.Repeat();
                     }
                     else
-                        DoUpdateWorldState(WORLDSTATE_SHOW_TIMER, 0);
+                        DoUpdateWorldState(WORLD_STATE_ZUL_AMAN_SHOW_TIMER, 0);
                 });
             }
         }
@@ -303,7 +302,7 @@ public:
                         if (uint32 timer = GetPersistentData(DATA_TIMED_RUN))
                         {
                             StorePersistentData(DATA_TIMED_RUN, timer += 15);
-                            DoUpdateWorldState(WORLDSTATE_TIME_TO_SACRIFICE, timer);
+                            DoUpdateWorldState(WORLD_STATE_ZUL_AMAN_TIME_TO_SACRIFICE, timer);
                         }
                         SummonHostage(type);
                         break;
@@ -311,7 +310,7 @@ public:
                         if (uint32 timer = GetPersistentData(DATA_TIMED_RUN))
                         {
                             StorePersistentData(DATA_TIMED_RUN, timer += 10);
-                            DoUpdateWorldState(WORLDSTATE_TIME_TO_SACRIFICE, timer);
+                            DoUpdateWorldState(WORLD_STATE_ZUL_AMAN_TIME_TO_SACRIFICE, timer);
                         }
                         SummonHostage(type);
                         break;
@@ -328,7 +327,7 @@ public:
                 if (GetPersistentData(DATA_TIMED_RUN) && AllBossesDone({ DATA_NALORAKK, DATA_AKILZON, DATA_JANALAI, DATA_HALAZZI }))
                 {
                     StorePersistentData(DATA_TIMED_RUN, 0);
-                    DoUpdateWorldState(WORLDSTATE_SHOW_TIMER, 0);
+                    DoUpdateWorldState(WORLD_STATE_ZUL_AMAN_SHOW_TIMER, 0);
                 }
 
                 CheckInstanceStatus();

@@ -7,10 +7,19 @@ AC_PATH_APPS="$( cd "$( dirname "${BASH_SOURCE[0]}" )/../" && pwd )"
 
 AC_PATH_SHARED="$AC_PATH_APPS/bash_shared"
 
+# shellcheck source=./defines.sh
 source "$AC_PATH_SHARED/defines.sh"
 
+# shellcheck source=../../deps/acore/bash-lib/src/event/hooks.sh
 source "$AC_PATH_DEPS/acore/bash-lib/src/event/hooks.sh"
 
+# shellcheck source=./common.sh
 source "$AC_PATH_SHARED/common.sh"
 
-[[ "$OSTYPE" = "msys" ]] && AC_BINPATH_FULL="$BINPATH" || AC_BINPATH_FULL="$BINPATH/bin"
+acore_common_loadConfig
+
+if [[ "$OSTYPE" = "msys" ]]; then
+    AC_BINPATH_FULL="$BINPATH"
+else
+    export AC_BINPATH_FULL="$BINPATH/bin"
+fi

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -54,48 +54,43 @@ class WaypointMovementGenerator<Creature> : public MovementGeneratorMedium< Crea
     public PathMovementBase<Creature, WaypointPath const*>
 {
 public:
-    WaypointMovementGenerator(uint32 _path_id = 0, bool _repeating = true, bool _stalled = false)
-        : PathMovementBase((WaypointPath const*)nullptr), i_nextMoveTime(0), m_isArrivalDone(false), path_id(_path_id), repeating(_repeating), stalled(_stalled)  {}
+    explicit WaypointMovementGenerator(uint32 pathId = 0, bool repeating = true, PathSource pathSource = PathSource::WAYPOINT_MGR);
+    explicit WaypointMovementGenerator(WaypointPath& path, bool repeating = true);
     ~WaypointMovementGenerator() { i_path = nullptr; }
+
     void DoInitialize(Creature*);
     void DoFinalize(Creature*);
     void DoReset(Creature*);
     bool DoUpdate(Creature*, uint32 diff);
-    void Pause(uint32 timer = 0);
-    void Resume(uint32 overrideTimer/* = 0*/);
 
-    void MovementInform(Creature*);
+    void unitSpeedChanged() override { _recalculateSpeed = true; }
+    void Pause(uint32 timer = 0) override;
+    void Resume(uint32 overrideTimer = 0) override;
+    bool GetResetPosition(float& x, float& y, float& z) override;
 
-    MovementGeneratorType GetMovementGeneratorType() { return WAYPOINT_MOTION_TYPE; }
-
-    // now path movement implmementation
-    void LoadPath(Creature*);
+    MovementGeneratorType GetMovementGeneratorType() override { return WAYPOINT_MOTION_TYPE; }
 
 private:
-    void Stop(int32 time) { i_nextMoveTime.Reset(time);}
+    void ProcessWaypointArrival(Creature*, WaypointNode const&);
+    void StartMove(Creature*, bool relaunch = false);
+    bool IsAllowedToMove(Creature*) const;
+    void UpdateWaypointState(Creature*, WaypointNode const&);
 
-    bool Stopped() { return !i_nextMoveTime.Passed();}
+    uint32 _lastSplineId;
+    uint32 _pathId;
+    int32 _waypointDelay;
+    std::optional<int32> _pauseTime;
+    bool _waypointReached;
 
-    bool CanMove(int32 diff)
-    {
-        i_nextMoveTime.Update(diff);
-        return i_nextMoveTime.Passed();
-    }
-
-    void OnArrived(Creature*);
-    bool StartMove(Creature*);
-
-    void StartMoveNow(Creature* creature)
-    {
-        i_nextMoveTime.Reset(0);
-        StartMove(creature);
-    }
-
-    TimeTrackerSmall i_nextMoveTime;
-    bool m_isArrivalDone;
-    uint32 path_id;
-    bool repeating;
-    bool stalled;
+    bool _recalculateSpeed;
+    bool _repeating;
+    bool _loadedFromDB;
+    bool _stalled;
+    bool _hasBeenStalled;
+    bool _done;
+    PathSource _pathSource;
+    bool _smoothSplineLaunched;
+    int32 _lastPassedSplineIdx;
 };
 
 /** FlightPathMovementGenerator generates movement of the player for the paths

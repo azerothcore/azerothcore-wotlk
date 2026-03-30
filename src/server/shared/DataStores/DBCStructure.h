@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -18,6 +18,7 @@
 #ifndef ACORE_DBCSTRUCTURE_H
 #define ACORE_DBCSTRUCTURE_H
 
+#include "AreaDefines.h"
 #include "DBCEnums.h"
 #include "Define.h"
 #include "Util.h"
@@ -531,7 +532,7 @@ struct AreaTableEntry
     // helpers
     [[nodiscard]] bool IsSanctuary() const
     {
-        if (mapid == 609)
+        if (mapid == MAP_EBON_HOLD)
             return true;
         return (flags & AREA_FLAG_SANCTUARY);
     }
@@ -686,8 +687,8 @@ struct ChrRacesEntry
     uint32      TeamID;                                     // 7 (7-Alliance 1-Horde)
     // 8-11 unused
     uint32      CinematicSequence;                          // 12 id from CinematicSequences.dbc
-    //uint32    alliance;                                   // 13 faction (0 alliance, 1 horde, 2 not available?)
-    char const*       name[16];                             // 14-29 used for DBC language detection/selection
+    uint32      alliance;                                   // 13 faction (0 alliance, 1 horde, 2 not available?)
+    char const* name[16];                                   // 14-29 used for DBC language detection/selection
     // 30 string flags, unused
     //char const*       nameFemale[16];                     // 31-46, if different from base (male) case
     // 47 string flags, unused
@@ -978,6 +979,8 @@ struct FactionTemplateEntry
         return (hostileMask & entry.ourMask) != 0;
     }
     [[nodiscard]] bool IsHostileToPlayers() const { return (hostileMask & FACTION_MASK_PLAYER) != 0; }
+    [[nodiscard]] bool IsHostileToAlliancePlayers() const { return (hostileMask & FACTION_MASK_ALLIANCE) != 0; }
+    [[nodiscard]] bool IsHostileToHordePlayers() const { return (hostileMask & FACTION_MASK_HORDE) != 0; }
     [[nodiscard]] bool IsNeutralToAll() const
     {
         for (unsigned int i : enemyFaction)
@@ -986,6 +989,7 @@ struct FactionTemplateEntry
         return hostileMask == 0 && friendlyMask == 0;
     }
     [[nodiscard]] bool IsContestedGuardFaction() const { return (factionFlags & FACTION_TEMPLATE_FLAG_ATTACK_PVP_ACTIVE_PLAYERS) != 0; }
+    [[nodiscard]] bool FactionRespondsToCallForHelp() const { return (factionFlags & FACTION_TEMPLATE_FLAG_RESPOND_TO_CALL_FOR_HELP) != 0; }
 };
 
 struct GameObjectArtKitEntry
@@ -1206,8 +1210,7 @@ struct ItemRandomPropertiesEntry
 {
     uint32 ID;                                                          // 0
     //char const* InternalName;                                         // 1
-    std::array<uint32, MAX_ITEM_ENCHANTMENT_EFFECTS> Enchantment;       // 2-4
-    //std::array<uint32, 2> UnusedEnchantment;                          // 5-6
+    std::array<uint32, MAX_ITEM_ENCHANTMENT_EFFECTS> Enchantment;       // 2-6
     std::array<char const*, 16> Name;                                   // 7-22
     //uint32 Name_lang_mask;                                            // 23
 };
@@ -1218,10 +1221,8 @@ struct ItemRandomSuffixEntry
     std::array<char const*, 16> Name;                                   // 1-16
     //uint32 Name_lang_mask;                                            // 17
     //char const* InternalName;                                         // 18
-    std::array<uint32, MAX_ITEM_ENCHANTMENT_EFFECTS> Enchantment;       // 19-21
-    //std::array<uint32, 2> UnusedEnchantment;                          // 22-23
-    std::array<uint32, MAX_ITEM_ENCHANTMENT_EFFECTS> AllocationPct;     // 24-26
-    //std::array<uint32, 2> UnusedAllocationPct;                        // 27-28
+    std::array<uint32, MAX_ITEM_ENCHANTMENT_EFFECTS> Enchantment;       // 19-23
+    std::array<uint32, MAX_ITEM_ENCHANTMENT_EFFECTS> AllocationPct;     // 24-28
 };
 
 #define MAX_ITEM_SET_ITEMS 10
@@ -1368,7 +1369,7 @@ struct MapEntry
 
     [[nodiscard]] bool IsContinent() const
     {
-        return MapID == 0 || MapID == 1 || MapID == 530 || MapID == 571;
+        return MapID == MAP_EASTERN_KINGDOMS || MapID == MAP_KALIMDOR || MapID == MAP_OUTLAND || MapID == MAP_NORTHREND;
     }
 
     [[nodiscard]] bool IsDynamicDifficultyMap() const { return Flags & MAP_FLAG_DYNAMIC_DIFFICULTY; }

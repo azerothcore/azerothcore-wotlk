@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -26,6 +26,7 @@
 #include "WardenModuleMac.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include <openssl/crypto.h>
 
 WardenMac::WardenMac() : Warden()
 {
@@ -71,9 +72,12 @@ ClientWardenModule* WardenMac::GetModuleForClient()
 {
     auto mod = new ClientWardenModule;
 
+    uint32 length = Module_0DBBF209A27B1E279A9FEC5C168A15F7_Data.size();
+
     // data assign
-    mod->CompressedSize = Module_0DBBF209A27B1E279A9FEC5C168A15F7_Data.size();
-    mod->CompressedData = Module_0DBBF209A27B1E279A9FEC5C168A15F7_Data.data();
+    mod->CompressedSize = length;
+    mod->CompressedData = new uint8[length];
+    memcpy(mod->CompressedData, Module_0DBBF209A27B1E279A9FEC5C168A15F7_Data.data(), length);
 
     // md5 hash
     mod->Id = Acore::Crypto::MD5::GetDigestOf(mod->CompressedData, mod->CompressedSize);
@@ -152,8 +156,8 @@ void WardenMac::HandleHashResult(ByteBuffer& buff)
 
     //const uint8 validHash[20] = { 0x56, 0x8C, 0x05, 0x4C, 0x78, 0x1A, 0x97, 0x2A, 0x60, 0x37, 0xA2, 0x29, 0x0C, 0x22, 0xB5, 0x25, 0x71, 0xA0, 0x6F, 0x4E };
 
-    // Verify key
-    if (memcmp(buff.contents() + 1, sha1.GetDigest().data(), 20) != 0)
+    // Verify key using constant-time comparison
+    if (CRYPTO_memcmp(buff.contents() + 1, sha1.GetDigest().data(), 20) != 0)
     {
         LOG_DEBUG("warden", "Request hash reply: failed");
         ApplyPenalty(0, "Request hash reply: failed");

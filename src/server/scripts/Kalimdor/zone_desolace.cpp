@@ -1,30 +1,19 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-/* ScriptData
-SDName: Desolace
-SD%Complete: 100
-SDComment: Quest support: 5561
-SDCategory: Desolace
-EndScriptData */
-
-/* ContentData
-npc_aged_dying_ancient_kodo
-EndContentData */
 
 #include "CreatureScript.h"
 #include "Player.h"
@@ -33,7 +22,6 @@ EndContentData */
 #include "ScriptedGossip.h"
 #include "SpellInfo.h"
 
-// Ours
 enum Caravan
 {
     QUEST_BODYGUARD_FOR_HIRE            = 5821,
@@ -54,9 +42,6 @@ enum Caravan
 
     MAX_CARAVAN_SUMMONS                 = 3,
 
-    TIME_SHOP_STOP                      = 10 * MINUTE * IN_MILLISECONDS,
-    TIME_HIRE_STOP                      = 4 * MINUTE * IN_MILLISECONDS,
-
     // Ambush
     NPC_KOLKAR_WAYLAYER                 = 12976,
     NPC_KOLKAR_AMBUSHER                 = 12977,
@@ -64,6 +49,9 @@ enum Caravan
     NPC_DOOMWARDER                      = 4677,
     NPC_NETHER                          = 4684,
 };
+
+constexpr Milliseconds TIME_SHOP_STOP = 600s;
+constexpr Milliseconds TIME_HIRE_STOP = 240s;
 
 class npc_cork_gizelton : public CreatureScript
 {
@@ -141,7 +129,7 @@ public:
             ImmuneFlagSet(false, _faction);
         }
 
-        void SetGUID(ObjectGuid playerGUID, int32 faction) override
+        void SetGUID(ObjectGuid const& playerGUID, int32 faction) override
         {
             _playerGUID = playerGUID;
             _faction = faction;
@@ -269,6 +257,7 @@ public:
             me->SetFaction(faction);
         }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 waypointId) override
         {
             RelocateSummons();
@@ -276,14 +265,14 @@ public:
             {
                 // Finished north path
                 case 52:
-                    me->SummonCreature(NPC_VENDOR_TRON, -694.61f, 1460.7f, 90.794f, 2.4f, TEMPSUMMON_TIMED_DESPAWN, TIME_SHOP_STOP + 15 * IN_MILLISECONDS);
+                    me->SummonCreature(NPC_VENDOR_TRON, -694.61f, 1460.7f, 90.794f, 2.4f, TEMPSUMMON_TIMED_DESPAWN, 600000 + 15 * IN_MILLISECONDS);
                     SetEscortPaused(true);
                     events.ScheduleEvent(EVENT_RESUME_PATH, TIME_SHOP_STOP);
                     CheckCaravan();
                     break;
                 // Finished south path
                 case 193:
-                    me->SummonCreature(NPC_SUPER_SELLER, -1905.5f, 2463.3f, 61.52f, 5.87f, TEMPSUMMON_TIMED_DESPAWN, TIME_SHOP_STOP + 15 * IN_MILLISECONDS);
+                    me->SummonCreature(NPC_SUPER_SELLER, -1905.5f, 2463.3f, 61.52f, 5.87f, TEMPSUMMON_TIMED_DESPAWN, 600000 + 15 * IN_MILLISECONDS);
                     SetEscortPaused(true);
                     events.ScheduleEvent(EVENT_RESUME_PATH, TIME_SHOP_STOP);
                     CheckCaravan();
@@ -408,7 +397,7 @@ public:
                 case EVENT_RESTART_ESCORT:
                     CheckCaravan();
                     SetDespawnAtEnd(false);
-                    Start(true, true, ObjectGuid::Empty, 0, false, false, true);
+                    Start(true, ObjectGuid::Empty, 0, false, false, true);
                     break;
             }
 
@@ -420,7 +409,6 @@ public:
     };
 };
 
-// Theirs
 enum DyingKodo
 {
     SAY_SMEED_HOME                  = 0,
@@ -441,80 +429,73 @@ enum DyingKodo
     SPELL_KODO_KOMBO_GOSSIP         = 18362
 };
 
-class npc_aged_dying_ancient_kodo : public CreatureScript
+struct npc_aged_dying_ancient_kodo : public ScriptedAI
 {
-public:
-    npc_aged_dying_ancient_kodo() : CreatureScript("npc_aged_dying_ancient_kodo") { }
+    npc_aged_dying_ancient_kodo(Creature* creature) : ScriptedAI(creature) {}
 
-    struct npc_aged_dying_ancient_kodoAI : public ScriptedAI
+    void JustRespawned() override
     {
-        npc_aged_dying_ancient_kodoAI(Creature* creature) : ScriptedAI(creature) {}
+        me->UpdateEntry(RAND(NPC_AGED_KODO, NPC_DYING_KODO, NPC_ANCIENT_KODO));
+    }
 
-        void JustRespawned() override
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (who->GetEntry() == NPC_SMEED && me->IsWithinDistInMap(who, 10.0f) && !me->HasAura(SPELL_KODO_KOMBO_GOSSIP))
         {
-            me->UpdateEntry(RAND(NPC_AGED_KODO, NPC_DYING_KODO, NPC_ANCIENT_KODO), nullptr, false);
+            me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
+            me->GetMotionMaster()->Clear();
+            me->GetMotionMaster()->MoveIdle();
+
+            DoCast(me, SPELL_KODO_KOMBO_GOSSIP, true);
+            if (Creature* smeed = who->ToCreature())
+                smeed->AI()->Talk(SAY_SMEED_HOME);
         }
+    }
 
-        void MoveInLineOfSight(Unit* who) override
+    void SpellHit(Unit* caster, SpellInfo const* spell) override
+    {
+        if (spell->Id == SPELL_KODO_KOMBO_ITEM)
         {
-            if (who->GetEntry() == NPC_SMEED && me->IsWithinDistInMap(who, 10.0f) && !me->HasAura(SPELL_KODO_KOMBO_GOSSIP))
-            {
-                me->SetHomePosition(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation());
-                me->GetMotionMaster()->Clear();
-                me->GetMotionMaster()->MoveIdle();
+            me->UpdateEntry(NPC_TAMED_KODO, nullptr, false);
+            EnterEvadeMode();
+            me->GetMotionMaster()->MoveFollow(caster, PET_FOLLOW_DIST, me->GetFollowAngle());
 
-                DoCast(me, SPELL_KODO_KOMBO_GOSSIP, true);
-                if (Creature* smeed = who->ToCreature())
-                    smeed->AI()->Talk(SAY_SMEED_HOME);
-            }
+            caster->CastSpell(caster, SPELL_KODO_KOMBO_PLAYER_BUFF);
+            DoCastSelf(SPELL_KODO_KOMBO_DESPAWN_BUFF, true);
         }
-
-        void SpellHit(Unit* caster, SpellInfo const* spell) override
+        else if (spell->Id == SPELL_KODO_KOMBO_GOSSIP)
         {
-            if (spell->Id == SPELL_KODO_KOMBO_ITEM)
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+            me->DespawnOrUnsummon(60s);
+        }
+    }
+
+    void sGossipHello(Player* player) override
+    {
+        if (me->HasAura(SPELL_KODO_KOMBO_DESPAWN_BUFF))
+        {
+            if (Group* group = player->GetGroup())
             {
-                if (!caster->HasAnyAuras(SPELL_KODO_KOMBO_PLAYER_BUFF, SPELL_KODO_KOMBO_DESPAWN_BUFF)
-                        && (me->GetEntry() == NPC_AGED_KODO || me->GetEntry() == NPC_DYING_KODO || me->GetEntry() == NPC_ANCIENT_KODO))
+                for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
                 {
-                    me->UpdateEntry(NPC_TAMED_KODO, nullptr, false);
-                    EnterEvadeMode();
-                    me->GetMotionMaster()->MoveFollow(caster, PET_FOLLOW_DIST, me->GetFollowAngle());
-
-                    caster->CastSpell(caster, SPELL_KODO_KOMBO_PLAYER_BUFF, true);
-                    DoCast(me, SPELL_KODO_KOMBO_DESPAWN_BUFF, true);
+                    Player* grpPlayer = itr->GetSource();
+                    if (grpPlayer->HasAura(SPELL_KODO_KOMBO_PLAYER_BUFF))
+                        grpPlayer->TalkedToCreature(me->GetEntry(), ObjectGuid::Empty);
                 }
             }
-            else if (spell->Id == SPELL_KODO_KOMBO_GOSSIP)
-            {
-                me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                me->DespawnOrUnsummon(60000);
-            }
-        }
-    };
+            else
+                if (player->HasAura(SPELL_KODO_KOMBO_PLAYER_BUFF))
+                    player->TalkedToCreature(me->GetEntry(), ObjectGuid::Empty);
 
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (player->HasAllAuras(SPELL_KODO_KOMBO_PLAYER_BUFF, SPELL_KODO_KOMBO_DESPAWN_BUFF))
-        {
-            player->TalkedToCreature(creature->GetEntry(), ObjectGuid::Empty);
             player->RemoveAurasDueToSpell(SPELL_KODO_KOMBO_PLAYER_BUFF);
         }
 
-        SendGossipMenuFor(player, NPC_TEXT_KODO, creature->GetGUID());
-        return true;
-    }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_aged_dying_ancient_kodoAI(creature);
+        SendGossipMenuFor(player, NPC_TEXT_KODO, me->GetGUID());
     }
 };
 
 void AddSC_desolace()
 {
-    // Ours
     new npc_cork_gizelton();
-
-    // Theirs
-    new npc_aged_dying_ancient_kodo();
+    RegisterCreatureAI(npc_aged_dying_ancient_kodo);
 }

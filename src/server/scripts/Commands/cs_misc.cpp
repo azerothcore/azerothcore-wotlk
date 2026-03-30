@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -22,6 +22,7 @@
 #include "CharacterCache.h"
 #include "Chat.h"
 #include "CommandScript.h"
+#include "Common.h"
 #include "GameGraveyard.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
@@ -35,7 +36,6 @@
 #include "Language.h"
 #include "MapMgr.h"
 #include "MiscPackets.h"
-#include "MMapFactory.h"
 #include "MovementGenerator.h"
 #include "ObjectAccessor.h"
 #include "Pet.h"
@@ -45,6 +45,7 @@
 #include "SpellAuras.h"
 #include "TargetedMovementGenerator.h"
 #include "Tokenize.h"
+#include "Transport.h"
 #include "WeatherMgr.h"
 #include "WorldSessionMgr.h"
 
@@ -56,6 +57,49 @@
 
 constexpr auto SPELL_STUCK = 7355;
 constexpr auto SPELL_FREEZE = 9454;
+
+struct AccountFlagText
+{
+    AccountFlag flag;
+    std::string text;
+};
+
+AccountFlagText const accountFlagText[MAX_ACCOUNT_FLAG] =
+{
+    { ACCOUNT_FLAG_GM, "ACCOUNT_FLAG_GM" },
+    { ACCOUNT_FLAG_NOKICK, "ACCOUNT_FLAG_NOKICK" },
+    { ACCOUNT_FLAG_COLLECTOR, "ACCOUNT_FLAG_COLLECTOR" },
+    { ACCOUNT_FLAG_TRIAL, "ACCOUNT_FLAG_TRIAL" },
+    { ACCOUNT_FLAG_CANCELLED, "ACCOUNT_FLAG_CANCELLED" },
+    { ACCOUNT_FLAG_IGR, "ACCOUNT_FLAG_IGR" },
+    { ACCOUNT_FLAG_WHOLESALER, "ACCOUNT_FLAG_WHOLESALER" },
+    { ACCOUNT_FLAG_PRIVILEGED, "ACCOUNT_FLAG_PRIVILEGED" },
+    { ACCOUNT_FLAG_EU_FORBID_ELV, "ACCOUNT_FLAG_EU_FORBID_ELV" },
+    { ACCOUNT_FLAG_EU_FORBID_BILLING, "ACCOUNT_FLAG_EU_FORBID_BILLING" },
+    { ACCOUNT_FLAG_RESTRICTED, "ACCOUNT_FLAG_RESTRICTED" },
+    { ACCOUNT_FLAG_REFERRAL, "ACCOUNT_FLAG_REFERRAL" },
+    { ACCOUNT_FLAG_BLIZZARD, "ACCOUNT_FLAG_BLIZZARD" },
+    { ACCOUNT_FLAG_RECURRING_BILLING, "ACCOUNT_FLAG_RECURRING_BILLING" },
+    { ACCOUNT_FLAG_NOELECTUP, "ACCOUNT_FLAG_NOELECTUP" },
+    { ACCOUNT_FLAG_KR_CERTIFICATE, "ACCOUNT_FLAG_KR_CERTIFICATE" },
+    { ACCOUNT_FLAG_EXPANSION_COLLECTOR, "ACCOUNT_FLAG_EXPANSION_COLLECTOR" },
+    { ACCOUNT_FLAG_DISABLE_VOICE, "ACCOUNT_FLAG_DISABLE_VOICE" },
+    { ACCOUNT_FLAG_DISABLE_VOICE_SPEAK, "ACCOUNT_FLAG_DISABLE_VOICE_SPEAK" },
+    { ACCOUNT_FLAG_REFERRAL_RESURRECT, "ACCOUNT_FLAG_REFERRAL_RESURRECT" },
+    { ACCOUNT_FLAG_EU_FORBID_CC, "ACCOUNT_FLAG_EU_FORBID_CC" },
+    { ACCOUNT_FLAG_OPENBETA_DELL, "ACCOUNT_FLAG_OPENBETA_DELL" },
+    { ACCOUNT_FLAG_PROPASS, "ACCOUNT_FLAG_PROPASS" },
+    { ACCOUNT_FLAG_PROPASS_LOCK, "ACCOUNT_FLAG_PROPASS_LOCK" },
+    { ACCOUNT_FLAG_PENDING_UPGRADE, "ACCOUNT_FLAG_PENDING_UPGRADE" },
+    { ACCOUNT_FLAG_RETAIL_FROM_TRIAL, "ACCOUNT_FLAG_RETAIL_FROM_TRIAL" },
+    { ACCOUNT_FLAG_EXPANSION2_COLLECTOR, "ACCOUNT_FLAG_EXPANSION2_COLLECTOR" },
+    { ACCOUNT_FLAG_OVERMIND_LINKED, "ACCOUNT_FLAG_OVERMIND_LINKED" },
+    { ACCOUNT_FLAG_DEMOS, "ACCOUNT_FLAG_DEMOS" },
+    { ACCOUNT_FLAG_DEATH_KNIGHT_OK, "ACCOUNT_FLAG_DEATH_KNIGHT_OK" },
+    { ACCOUNT_FLAG_S2_REQUIRE_IGR, "ACCOUNT_FLAG_S2_REQUIRE_IGR" },
+    { ACCOUNT_FLAG_S2_TRIAL, "ACCOUNT_FLAG_S2_TRIAL" },
+    // { ACCOUNT_FLAG_S2_RESTRICTED, "ACCOUNT_FLAG_S2_RESTRICTED" }
+};
 
 std::string const GetLocalizeCreatureName(Creature* creature, LocaleConstant locale)
 {
@@ -149,7 +193,9 @@ public:
             { "skirmish",          HandleSkirmishCommand,          SEC_ADMINISTRATOR,      Console::No  },
             { "mailbox",           HandleMailBoxCommand,           SEC_MODERATOR,          Console::No  },
             { "string",            HandleStringCommand,            SEC_GAMEMASTER,         Console::No  },
-            { "opendoor",          HandleOpenDoorCommand,          SEC_GAMEMASTER,         Console::No  }
+            { "opendoor",          HandleOpenDoorCommand,          SEC_GAMEMASTER,         Console::No  },
+            { "bm",                HandleBMCommand,                SEC_GAMEMASTER,         Console::No  },
+            { "packetlog",         HandlePacketLog,                SEC_GAMEMASTER,         Console::Yes }
         };
 
         return commandTable;
@@ -441,7 +487,7 @@ public:
             uint32 queueSlot = 0;
             WorldPacket data;
             sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, queueSlot, STATUS_IN_PROGRESS, 0, bg->GetStartTime(), bg->GetArenaType(), teamId);
-            player->GetSession()->SendPacket(&data);
+            player->SendDirectMessage(&data);
 
             // Remove from LFG queues
             sLFGMgr->LeaveAllLfgQueues(player->GetGUID(), false);
@@ -460,6 +506,7 @@ public:
 
         if (!session)
         {
+            handler->SendErrorMessage(LANG_USE_BOL);
             return false;
         }
 
@@ -493,9 +540,6 @@ public:
             SetCommentatorMod(false);
             return true;
         }
-
-        handler->SendErrorMessage(LANG_USE_BOL);
-        return false;
     }
 
     static bool HandleDevCommand(ChatHandler* handler, Optional<bool> enableArg)
@@ -504,6 +548,7 @@ public:
 
         if (!session)
         {
+            handler->SendErrorMessage(LANG_USE_BOL);
             return false;
         }
 
@@ -538,9 +583,6 @@ public:
             SetDevMod(false);
             return true;
         }
-
-        handler->SendErrorMessage(LANG_USE_BOL);
-        return false;
     }
 
     static bool HandleGPSCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
@@ -587,7 +629,7 @@ public:
 
         uint32 haveMap = GridTerrainLoader::ExistMap(object->GetMapId(), cell.GridX(), cell.GridY()) ? 1 : 0;
         uint32 haveVMap = GridTerrainLoader::ExistVMap(object->GetMapId(), cell.GridX(), cell.GridY()) ? 1 : 0;
-        uint32 haveMMAP = MMAP::MMapFactory::createOrGetMMapMgr()->GetNavMesh(handler->GetSession()->GetPlayer()->GetMapId()) ? 1 : 0;
+        uint32 haveMMAP = handler->GetSession()->GetPlayer()->GetMap()->GetMapCollisionData().GetMMapData().GetNavMesh() ? 1 : 0;
 
         if (haveVMap)
         {
@@ -835,13 +877,39 @@ public:
                 _player->CleanupAfterTaxiFlight();
             }
             else // save only in non-flight case
-            {
                 _player->SaveRecallPosition();
-            }
 
-            if (_player->TeleportTo(targetPlayer->GetMapId(), targetPlayer->GetPositionX(), targetPlayer->GetPositionY(), targetPlayer->GetPositionZ() + 0.25f, _player->GetOrientation(), TELE_TO_GM_MODE, targetPlayer))
+            if (Transport* transport = targetPlayer->GetTransport())
             {
-                _player->SetPhaseMask(targetPlayer->GetPhaseMask() | 1, false);
+                if (Transport* oldTransport = _player->GetTransport())
+                    oldTransport->RemovePassenger(_player, true);
+
+                float x;
+                float y;
+                float z;
+                float o;
+                targetPlayer->m_movementInfo.transport.pos.GetPosition(x, y, z, o);
+
+                _player->SetTransport(transport);
+                _player->m_movementInfo.transport.guid = transport->GetGUID();
+                _player->m_movementInfo.transport.pos.Relocate(x, y, z, o);
+                _player->AddUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
+
+                float worldX = x;
+                float worldY = y;
+                float worldZ = z;
+                float worldO = o;
+                transport->CalculatePassengerPosition(worldX, worldY, worldZ, &worldO);
+
+                transport->AddPassenger(_player, false);
+
+                if (_player->TeleportTo(transport->GetMapId(), worldX, worldY, worldZ + 0.25f, worldO, TELE_TO_NOT_LEAVE_TRANSPORT | TELE_TO_GM_MODE, targetPlayer))
+                    _player->SetPhaseMask(targetPlayer->GetPhaseMask() | 1, false);
+            }
+            else
+            {
+                if (_player->TeleportTo(targetPlayer->GetMapId(), targetPlayer->GetPositionX(), targetPlayer->GetPositionY(), targetPlayer->GetPositionZ() + 0.25f, _player->GetOrientation(), TELE_TO_GM_MODE, targetPlayer))
+                    _player->SetPhaseMask(targetPlayer->GetPhaseMask() | 1, false);
             }
         }
         else
@@ -1456,14 +1524,10 @@ public:
         {
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(7355);
             if (!spellInfo)
-            {
                 return false;
-            }
 
-            if (Player* caster = handler->GetSession()->GetPlayer())
-            {
-                Spell::SendCastResult(caster, spellInfo, 0, SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW);
-            }
+            if (player)
+                Spell::SendCastResult(player, spellInfo, 0, SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW);
 
             return false;
         }
@@ -1855,13 +1919,7 @@ public:
         Player* player = handler->GetSession()->GetPlayer();
         uint32 zoneid = player->GetZoneId();
 
-        Weather* weather = WeatherMgr::FindWeather(zoneid);
-
-        if (!weather)
-        {
-            weather = WeatherMgr::AddWeather(zoneid);
-        }
-
+        Weather* weather = player->GetMap()->GetOrGenerateZoneDefaultWeather(zoneid);
         if (!weather)
         {
             handler->SendErrorMessage(LANG_NO_WEATHER);
@@ -2197,6 +2255,15 @@ public:
         // Output V. LANG_PINFO_ACC_ACCOUNT
         handler->PSendSysMessage(LANG_PINFO_ACC_ACCOUNT, userName, accId, security);
 
+        if (playerTarget)
+        {
+            uint32 accountFlags = playerTarget->GetSession()->GetAccountFlags();
+            handler->PSendSysMessage(LANG_ACCOUNT_FLAGS_PINFO);
+            for (uint8 i = 0; i < MAX_ACCOUNT_FLAG; i++)
+                if (accountFlags & static_cast<uint32>(accountFlagText[i].flag))
+                    handler->PSendSysMessage(LANG_SUBCMDS_LIST_ENTRY, accountFlagText[i].text);
+        }
+
         // Output VI. LANG_PINFO_ACC_LASTLOGIN
         handler->PSendSysMessage(LANG_PINFO_ACC_LASTLOGIN, lastLogin, failedLogins);
 
@@ -2350,6 +2417,13 @@ public:
         // Output XX. LANG_PINFO_CHR_PLAYEDTIME
         handler->PSendSysMessage(LANG_PINFO_CHR_PLAYEDTIME, (secsToTimeString(totalPlayerTime, true)));
 
+        // Output XXI. LANG_PINFO_CHR_ONLINETIME (only for online players)
+        if (playerTarget)
+        {
+            uint32 onlineTime = uint32(GameTime::GetGameTime().count() - playerTarget->m_logintime);
+            handler->PSendSysMessage(LANG_PINFO_CHR_ONLINETIME, secsToTimeString(onlineTime, true));
+        }
+
         // Mail Data - an own query, because it may or may not be useful.
         // SQL: "SELECT SUM(CASE WHEN (checked & 1) THEN 1 ELSE 0 END) AS 'readmail', COUNT(*) AS 'totalmail' FROM mail WHERE `receiver` = ?"
         CharacterDatabasePreparedStatement* mailQuery = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PINFO_MAILS);
@@ -2402,7 +2476,7 @@ public:
 
         Acore::RespawnDo u_do;
         Acore::WorldObjectWorker<Acore::RespawnDo> worker(player, u_do);
-        Cell::VisitGridObjects(player, worker, player->GetGridActivationRange());
+        Cell::VisitObjects(player, worker, player->GetGridActivationRange());
 
         return true;
     }
@@ -2836,7 +2910,7 @@ public:
         }
 
         playerTarget->CombatStop();
-        playerTarget->getHostileRefMgr().deleteReferences();
+        playerTarget->GetThreatMgr().RemoveMeFromThreatLists();
         return true;
     }
 
@@ -2953,7 +3027,7 @@ public:
             return false;
         }
 
-        handler->GetSession()->GetPlayer()->CastSpell(unit, 530, true);
+        handler->GetSession()->GetPlayer()->CastSpell(unit, MAP_OUTLAND, true);
         return true;
     }
 
@@ -3026,6 +3100,85 @@ public:
         handler->SendErrorMessage(LANG_CMD_NO_DOOR_FOUND, range ? *range : 5.0f);
         return false;
     }
+
+    static bool HandleBMCommand(ChatHandler* handler, Optional<bool> enableArg)
+    {
+        WorldSession* session = handler->GetSession();
+
+        if (!session)
+            return false;
+
+        auto SetBMMod = [&](bool enable)
+        {
+            char const* enabled = "ON";
+            char const* disabled = "OFF";
+            handler->SendNotification(LANG_COMMAND_BEASTMASTER_MODE, enable ? enabled : disabled);
+
+            session->GetPlayer()->SetBeastMaster(enable);
+        };
+
+        if (!enableArg)
+        {
+            if (!AccountMgr::IsPlayerAccount(session->GetSecurity()) && session->GetPlayer()->IsDeveloper())
+                SetBMMod(true);
+            else
+                SetBMMod(false);
+
+            return true;
+        }
+
+        if (*enableArg)
+        {
+            SetBMMod(true);
+            return true;
+        }
+        else
+        {
+            SetBMMod(false);
+            return true;
+        }
+
+        handler->SendErrorMessage(LANG_USE_BOL);
+        return false;
+    }
+
+    static bool HandlePacketLog(ChatHandler* handler, Optional<PlayerIdentifier> target, Optional<bool> enableArg)
+    {
+        if (!target)
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
+
+        if (!target || !target->IsConnected())
+        {
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+            return false;
+        }
+
+        Player* playerTarget = target->GetConnectedPlayer();
+        WorldSession* session = playerTarget->GetSession();
+
+        if (!session)
+            return false;
+
+        if (enableArg)
+        {
+            if (*enableArg)
+            {
+                session->SetPacketLogging(true);
+                handler->PSendSysMessage("Packet logging enabled for {}.", playerTarget->GetName());
+                return true;
+            }
+            else
+            {
+                session->SetPacketLogging(false);
+                handler->PSendSysMessage("Packet logging disabled for {}.", playerTarget->GetName());
+                return true;
+            }
+        }
+
+        handler->SendErrorMessage(LANG_USE_BOL);
+        return false;
+    }
+
 };
 
 void AddSC_misc_commandscript()

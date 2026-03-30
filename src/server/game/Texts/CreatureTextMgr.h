@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -77,11 +77,6 @@ typedef std::unordered_map<uint32, CreatureTextHolder> CreatureTextMap;     // a
 
 typedef std::map<CreatureTextId, CreatureTextLocale> LocaleCreatureTextMap;
 
-//used for handling non-repeatable random texts
-typedef std::vector<uint8> CreatureTextRepeatIds;
-typedef std::unordered_map<uint8, CreatureTextRepeatIds> CreatureTextRepeatGroup;
-typedef std::unordered_map<ObjectGuid, CreatureTextRepeatGroup> CreatureTextRepeatMap;//guid based
-
 class CreatureTextMgr
 {
     CreatureTextMgr() { }
@@ -105,14 +100,10 @@ public:
     template<class Builder> void SendChatPacket(WorldObject* source, Builder const& builder, ChatMsg msgType, WorldObject const* target = nullptr, CreatureTextRange range = TEXT_RANGE_NORMAL, TeamId teamId = TEAM_NEUTRAL, bool gmOnly = false) const;
 
 private:
-    CreatureTextRepeatIds GetRepeatGroup(Creature* source, uint8 textGroup);
-    void SetRepeatId(Creature* source, uint8 textGroup, uint8 id);
-
     void SendNonChatPacket(WorldObject* source, WorldPacket const* data, ChatMsg msgType, WorldObject const* target, CreatureTextRange range, TeamId teamId, bool gmOnly) const;
     float GetRangeForChatType(ChatMsg msgType) const;
 
     CreatureTextMap mTextMap;
-    CreatureTextRepeatMap mTextRepeatMap;
     LocaleCreatureTextMap mLocaleTextMap;
 };
 
@@ -251,7 +242,7 @@ void CreatureTextMgr::SendChatPacket(WorldObject* source, Builder const& builder
         dist = 250.0f;
 
     Acore::PlayerDistWorker<CreatureTextLocalizer<Builder> > worker(source, dist, localizer);
-    Cell::VisitWorldObjects(source, worker, dist);
+    Cell::VisitObjects(source, worker, dist);
 }
 
 #endif

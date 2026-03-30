@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -99,7 +99,7 @@ bool MotionTransport::CreateMoTrans(ObjectGuid::LowType guidlow, uint32 entry, u
     SetName(goinfo->name);
 
     // pussywizard: no WorldRotation for MotionTransports
-    SetLocalRotation(G3D::Quat());
+    SetWorldRotation(G3D::Quat());
     // pussywizard: no PathRotation for MotionTransports
     SetTransportPathRotation(0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -123,7 +123,7 @@ void MotionTransport::CleanupsBeforeDelete(bool finalCleanup /*= true*/)
     GameObject::CleanupsBeforeDelete(finalCleanup);
 }
 
-void MotionTransport::BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet&)
+void MotionTransport::BuildUpdate(UpdateDataMapType& data_map)
 {
     Map::PlayerList const& players = GetMap()->GetPlayers();
     if (players.IsEmpty())
@@ -607,12 +607,12 @@ void MotionTransport::DelayedTeleportTransport()
     }
 
     Map* newMap = sMapMgr->CreateBaseMap(newMapId);
-    GetMap()->RemoveFromMap<MotionTransport>(this, false);
+    GetMap()->RemoveFromMap<Transport>(this, false);
     newMap->LoadGrid(x, y); // xinef: load before adding passengers to new map
     SetMap(newMap);
 
     Relocate(x, y, z, o);
-    GetMap()->AddToMap<MotionTransport>(this);
+    GetMap()->AddToMap<Transport>(this);
 
     LoadStaticPassengers();
 }
@@ -690,6 +690,40 @@ StaticTransport::~StaticTransport()
     ASSERT(_passengers.empty());
 }
 
+bool StaticTransport::LoadGameObjectFromDB(ObjectGuid::LowType spawnId, Map* map, bool addToMap)
+{
+    GameObjectData const* data = sObjectMgr->GetGameObjectData(spawnId);
+
+    if (!data)
+    {
+        LOG_ERROR("sql.sql", "Gameobject (GUID: {}) not found in table `gameobject`, can't load. ", spawnId);
+        return false;
+    }
+
+    uint32 entry = data->id;
+    //uint32 map_id = data->mapid;                          // already used before call
+    uint32 phaseMask = data->phaseMask;
+    float x = data->posX;
+    float y = data->posY;
+    float z = data->posZ;
+    float ang = data->orientation;
+
+    uint32 animprogress = data->animprogress;
+    GOState go_state = data->go_state;
+    uint32 artKit = data->artKit;
+
+    m_goData = data;
+    m_spawnId = spawnId;
+
+    if (!Create(map->GenerateLowGuid<HighGuid::Transport>(), entry, map, phaseMask, x, y, z, ang, data->rotation, animprogress, go_state, artKit))
+        return false;
+
+    if (addToMap && !GetMap()->AddToMap<Transport>(this))
+        return false;
+
+    return true;
+}
+
 bool StaticTransport::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, uint32 phaseMask, float x, float y, float z, float ang, G3D::Quat const& rotation, uint32 animprogress, GOState go_state, uint32 artKit)
 {
     ASSERT(map);
@@ -732,11 +766,13 @@ bool StaticTransport::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* m
         return false;
     }
 
-    // pussywizard: temporarily calculate WorldRotation from orientation, do so until values in db are correct
-    //SetWorldRotation( /*for StaticTransport we need 2 rotation Quats in db for World- and Path- Rotation*/ );
-    SetLocalRotationAngles(NormalizeOrientation(GetOrientation()), 0.0f, 0.0f);
-    // pussywizard: PathRotation for StaticTransport (only StaticTransports have PathRotation)
-    SetTransportPathRotation(rotation.x, rotation.y, rotation.z, rotation.w);
+    SetWorldRotationAngles(NormalizeOrientation(GetOrientation()), 0.0f, 0.0f);
+
+    // Prefer gameobject_addon parent_rotation for path rotation, fall back to gameobject.rotation
+    if (GameObjectAddon const* addon = sObjectMgr->GetGameObjectAddon(GetSpawnId()))
+        SetTransportPathRotation(addon->ParentRotation.x, addon->ParentRotation.y, addon->ParentRotation.z, addon->ParentRotation.w);
+    else
+        SetTransportPathRotation(rotation.x, rotation.y, rotation.z, rotation.w);
 
     SetObjectScale(goinfo->size);
 
@@ -794,7 +830,6 @@ bool StaticTransport::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* m
     LastUsedScriptID = GetGOInfo()->ScriptId;
     AIM_Initialize();
 
-    this->setActive(true);
     return true;
 }
 
@@ -812,7 +847,7 @@ void StaticTransport::CleanupsBeforeDelete(bool finalCleanup /*= true*/)
     GameObject::CleanupsBeforeDelete(finalCleanup);
 }
 
-void StaticTransport::BuildUpdate(UpdateDataMapType& data_map, UpdatePlayerSet&)
+void StaticTransport::BuildUpdate(UpdateDataMapType& data_map)
 {
     Map::PlayerList const& players = GetMap()->GetPlayers();
     if (players.IsEmpty())
@@ -929,7 +964,9 @@ void StaticTransport::UpdatePosition(float x, float y, float z, float o)
     if (!GetMap()->IsGridLoaded(x, y)) // pussywizard: should not happen, but just in case
         GetMap()->LoadGrid(x, y);
 
-    GetMap()->GameObjectRelocation(this, x, y, z, o); // this also relocates the model
+    Relocate(x, y, z, o);
+    UpdateModelPosition();
+
     UpdatePassengerPositions();
 }
 

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -45,12 +45,7 @@ enum Npc
 struct boss_blackheart_the_inciter : public BossAI
 {
     boss_blackheart_the_inciter(Creature* creature) : BossAI(creature, DATA_BLACKHEARTTHEINCITEREVENT)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    {    }
 
     bool InciteChaos;
 
@@ -85,15 +80,16 @@ struct boss_blackheart_the_inciter : public BossAI
             DoCastAOE(SPELL_INCITE_CHAOS);
             DoCastSelf(SPELL_LAUGHTER, true);
             uint32 inciteTriggerID = NPC_INCITE_TRIGGER;
-            std::list<HostileReference*> t_list = me->GetThreatMgr().GetThreatList();
-            for (std::list<HostileReference*>::const_iterator itr = t_list.begin(); itr != t_list.end(); ++itr)
+            for (ThreatReference const* ref : me->GetThreatMgr().GetUnsortedThreatList())
             {
-                Unit* target = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
-                if (target && target->IsPlayer())
+                if (Unit* target = ref->GetVictim())
                 {
-                    if (Creature* inciteTrigger = me->SummonCreature(inciteTriggerID++, *target, TEMPSUMMON_TIMED_DESPAWN, 15 * IN_MILLISECONDS))
+                    if (target->IsPlayer())
                     {
-                        inciteTrigger->CastSpell(target, SPELL_INCITE_CHAOS_B, true);
+                        if (Creature* inciteTrigger = me->SummonCreature(inciteTriggerID++, *target, TEMPSUMMON_TIMED_DESPAWN, 15 * IN_MILLISECONDS))
+                        {
+                            inciteTrigger->CastSpell(target, SPELL_INCITE_CHAOS_B, true);
+                        }
                     }
                 }
             }

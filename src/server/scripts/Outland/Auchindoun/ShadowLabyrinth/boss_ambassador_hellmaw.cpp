@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -66,7 +66,7 @@ struct boss_ambassador_hellmaw : public BossAI
         }
         else
         {
-            me->GetMotionMaster()->MovePath(PATH_ID_START, false);
+            me->GetMotionMaster()->MoveWaypoint(PATH_ID_START, false);
         }
     }
 
@@ -88,7 +88,7 @@ struct boss_ambassador_hellmaw : public BossAI
         DoPlaySoundToSet(me, SOUND_INTRO);
         isBanished = false;
         me->SetImmuneToAll(false);
-        me->GetMotionMaster()->MovePath(PATH_ID_START, false);
+        me->GetMotionMaster()->MoveWaypoint(PATH_ID_START, false);
     }
 
     void JustEngagedWith(Unit*) override
@@ -142,7 +142,7 @@ struct boss_ambassador_hellmaw : public BossAI
         {
             me->m_Events.AddEventAtOffset([this]()
             {
-                me->GetMotionMaster()->MovePath(PATH_ID_PATHING, true);
+                me->GetMotionMaster()->MoveWaypoint(PATH_ID_PATHING, true);
             }, 20s);
         }
     }

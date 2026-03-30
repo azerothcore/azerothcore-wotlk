@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -412,10 +412,8 @@ MotionTransport* TransportMgr::CreateTransport(uint32 entry, ObjectGuid::LowType
     if (map && map->IsDungeon())
         trans->m_zoneScript = map->ToInstanceMap()->GetInstanceScript();
 
-    // xinef: transports are active so passengers can be relocated (grids must be loaded)
-    trans->setActive(true);
     HashMapHolder<MotionTransport>::Insert(trans);
-    trans->GetMap()->AddToMap<MotionTransport>(trans);
+    trans->GetMap()->AddToMap<Transport>(trans);
     return trans;
 }
 
@@ -450,31 +448,45 @@ void TransportMgr::SpawnContinentTransports()
         LOG_INFO("server.loading", ">> Spawned {} continent motion transports in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
     }
 
+    // Preloads Deeprun Tram to fix issues with Subway carts syncronization
+    /// @todo: This is a temporary workaround. Consider removing TransportMgr::PreloadGridsFromQuery() as part of fix.
+    /**
+     Takenbacon: "In the long run the most likely ideal fix would be to always spawn all transport types (and thus loading their grid) on map creation"
+     See https://github.com/azerothcore/azerothcore-wotlk/pull/23009 for more details.
+    */
+    PreloadGridsFromQuery("SELECT map, position_x, position_y FROM gameobject g JOIN gameobject_template t ON g.id = t.entry WHERE t.type = 11 AND g.map = 369", count);
+
     if (sWorld->getBoolConfig(CONFIG_ENABLE_CONTINENT_TRANSPORT_PRELOADING))
     {
         // pussywizard: preload grids for continent static transports
-        QueryResult result2 = WorldDatabase.Query("SELECT map, position_x, position_y FROM gameobject g JOIN gameobject_template t ON g.id = t.entry WHERE t.type = 11");
+        PreloadGridsFromQuery("SELECT map, position_x, position_y FROM gameobject g JOIN gameobject_template t ON g.id = t.entry WHERE t.type = 11 AND g.map != 369", count);
+        LOG_INFO("server.loading", ">> Preloaded grids for {} continent static transports in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    }
+}
 
-        if (result2)
+void TransportMgr::PreloadGridsFromQuery(std::string const& query, uint32& count)
+{
+    if (QueryResult result = WorldDatabase.Query(query))
+    {
+        do
         {
-            do
-            {
-                Field* fields = result2->Fetch();
-                uint16 mapId = fields[0].Get<uint16>();
-                float x = fields[1].Get<float>();
-                float y = fields[2].Get<float>();
+            Field* fields = result->Fetch();
+            uint16 mapId = fields[0].Get<uint16>();
+            float x = fields[1].Get<float>();
+            float y = fields[2].Get<float>();
 
-                MapEntry const* mapEntry = sMapStore.LookupEntry(mapId);
-                if (mapEntry && !mapEntry->Instanceable())
+            if (MapEntry const* mapEntry = sMapStore.LookupEntry(mapId))
+            {
+                if (!mapEntry->Instanceable())
+                {
                     if (Map* map = sMapMgr->CreateBaseMap(mapId))
                     {
                         map->LoadGrid(x, y);
                         ++count;
                     }
-            } while (result2->NextRow());
-        }
-
-        LOG_INFO("server.loading", ">> Preloaded grids for {} continent static transports in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+                }
+            }
+        } while (result->NextRow());
     }
 }
 

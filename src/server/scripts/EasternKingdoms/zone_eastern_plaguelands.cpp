@@ -1,33 +1,19 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-/* ScriptData
-SDName: Eastern_Plaguelands
-SD%Complete: 100
-SDComment: Quest support: 5211, 5742. Special vendor Augustus the Touched
-SDCategory: Eastern Plaguelands
-EndScriptData */
-
-/* ContentData
-npc_ghoul_flayer
-npc_augustus_the_touched
-npc_darrowshire_spirit
-npc_tirion_fordring
-EndContentData */
 
 #include "CreatureScript.h"
 #include "PassiveAI.h"
@@ -35,8 +21,6 @@ EndContentData */
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellInfo.h"
-
-// Ours
 
 enum eEris
 {
@@ -109,7 +93,7 @@ public:
             _faction = faction;
         }
 
-        void SetGUID(ObjectGuid guid, int32) override
+        void SetGUID(ObjectGuid const& guid, int32) override
         {
             _playerGUID = guid;
             me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_NONE);
@@ -223,7 +207,7 @@ public:
                             EnterEvadeMode();
                             return;
                         }
-                        events.RepeatEvent(2000);
+                        events.Repeat(2s);
                         break;
                     }
                 case EVENT_SUMMON_ARCHERS:
@@ -233,7 +217,7 @@ public:
                     _spoken = false;
                     SummonPeasants();
                     _spoken = false;
-                    events.RepeatEvent(60 * IN_MILLISECONDS);
+                    events.Repeat(60s);
                     break;
             }
         }
@@ -278,7 +262,7 @@ public:
                 if (Unit* creature = summon->GetSummonerUnit())
                     creature->GetAI()->DoAction(1);
 
-            me->DespawnOrUnsummon(1);
+            me->DespawnOrUnsummon(1ms);
         }
 
         void JustDied(Unit*) override
@@ -312,43 +296,8 @@ public:
     };
 };
 
-// Theirs
-/*######
-## npc_augustus_the_touched
-######*/
-
-class npc_augustus_the_touched : public CreatureScript
-{
-public:
-    npc_augustus_the_touched() : CreatureScript("npc_augustus_the_touched") { }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_TRADE)
-            player->GetSession()->SendListInventory(creature->GetGUID());
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if (creature->IsVendor() && player->GetQuestRewardStatus(6164))
-            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
-
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-        return true;
-    }
-};
-
 void AddSC_eastern_plaguelands()
 {
-    // Ours
     new npc_eris_hevenfire();
     new npc_balance_of_light_and_shadow();
-
-    // Theirs
-    new npc_augustus_the_touched();
 }
