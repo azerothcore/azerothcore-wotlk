@@ -341,18 +341,12 @@ public:
                 _done = true;
                 Talk(SAY_VALITHRIA_SUCCESS);
                 _instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
-                _instance->DoRemoveAurasDueToSpellOnPlayers(70766);
                 me->RemoveAurasDueToSpell(SPELL_CORRUPTION_VALITHRIA);
                 me->CastSpell(me, SPELL_ACHIEVEMENT_CHECK, true);
                 me->CastSpell((Unit*)nullptr, SPELL_DREAMWALKERS_RAGE, false);
-                _events.Reset();
                 _events.ScheduleEvent(EVENT_DREAM_SLIP, 3500ms);
-                _instance->SetBossState(DATA_VALITHRIA_DREAMWALKER, DONE);
-
-                if (Creature* trigger = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_VALITHRIA_TRIGGER)))
-                    trigger->AI()->EnterEvadeMode();
                 if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_VALITHRIA_LICH_KING)))
-                    lichKing->AI()->Reset();
+                    lichKing->AI()->EnterEvadeMode();
             }
             else if (!_over75PercentTalkDone && me->HealthAbovePctHealed(75, heal))
             {
@@ -361,11 +355,8 @@ public:
             }
             else if (_instance->GetBossState(DATA_VALITHRIA_DREAMWALKER) == NOT_STARTED)
             {
-                if (Creature* trigger = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_VALITHRIA_TRIGGER)))
-                {
-                    trigger->AI()->DoAction(ACTION_ENTER_COMBAT);
-                    _instance->SetBossState(DATA_VALITHRIA_DREAMWALKER, IN_PROGRESS);
-                }
+                if (Creature* archmage = me->FindNearestCreature(NPC_RISEN_ARCHMAGE, 30.0f))
+                    DoZoneInCombat(archmage); // archmage chain will put trigger in combat
             }
         }
 
@@ -388,7 +379,7 @@ public:
                         Talk(SAY_VALITHRIA_DEATH);
                         _instance->SendEncounterUnit(ENCOUNTER_FRAME_DISENGAGE, me);
                         if (Creature* trigger = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_VALITHRIA_TRIGGER)))
-                            trigger->AI()->EnterEvadeMode();
+                            trigger->AI()->DoAction(ACTION_DEATH);
                     }
                 }
             }
@@ -404,6 +395,8 @@ public:
                 me->SetDisplayId(11686);
                 me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->DespawnOrUnsummon(4s);
+                if (Creature* trigger = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_VALITHRIA_TRIGGER)))
+                    Unit::Kill(me, trigger);
                 if (Creature* lichKing = ObjectAccessor::GetCreature(*me, _instance->GetGuidData(DATA_VALITHRIA_LICH_KING)))
                     lichKing->CastSpell(lichKing, SPELL_SPAWN_CHEST, false);
                 _instance->SetData(DATA_WEEKLY_QUEST_ID, 0); // show hidden npc if necessary
@@ -434,13 +427,8 @@ public:
         void UpdateAI(uint32 diff) override
         {
             // does not enter combat
-            if (_instance->GetBossState(DATA_VALITHRIA_DREAMWALKER) == NOT_STARTED)
-            {
-                uint32 startingHealth = me->GetMaxHealth() * 0.5f;
-                if (me->GetHealth() != startingHealth) // healing when boss cannot be engaged (lower spire not finished, cheating) doesn't start the fight, prevent winning this way
-                    me->SetHealth(startingHealth);
+            if (_instance->GetBossState(DATA_VALITHRIA_DREAMWALKER) != IN_PROGRESS)
                 return;
-            }
 
             _events.Update(diff);
 
@@ -544,11 +532,6 @@ public:
 
         void MoveInLineOfSight(Unit* /*who*/) override {}
 
-        bool CanAIAttack(Unit const* target) const override
-        {
-            return target->IsPlayer();
-        }
-
         void JustExitedCombat() override
         {
             EngagementOver();
@@ -556,6 +539,8 @@ public:
             me->setActive(false);
 
             if (!me->IsAlive())
+                return;
+            if (instance->GetBossState(DATA_VALITHRIA_DREAMWALKER) == DONE)
                 return;
             DoAction(ACTION_DEATH);
         }
