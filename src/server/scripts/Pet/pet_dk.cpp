@@ -209,6 +209,16 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
             _decisionTimer -= diff;
             if (!UpdateVictimWithGaze())
             {
+                // Re-engage if we still have a valid victim but lost engagement
+                // (e.g., PvP combat reference expired during CC like Cyclone)
+                if (Unit* victim = me->GetVictim())
+                {
+                    if (me->IsValidAttackTarget(victim))
+                    {
+                        me->EngageWithTarget(victim);
+                        return;
+                    }
+                }
                 MySelectNextTarget();
                 return;
             }
