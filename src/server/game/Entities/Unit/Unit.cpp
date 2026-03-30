@@ -5697,6 +5697,9 @@ void Unit::RemoveAllAurasExceptType(AuraType type)
 // Xinef: We should not remove passive auras on evade, if npc has player owner (scripted one cast auras)
 void Unit::RemoveEvadeAuras()
 {
+    if (IsCharmedOwnedByPlayerOrPlayer())
+        return;
+
     for (AuraApplicationMap::iterator iter = m_appliedAuras.begin(); iter != m_appliedAuras.end();)
     {
         Aura const* aura = iter->second->GetBase();
