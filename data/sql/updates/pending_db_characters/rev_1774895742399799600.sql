@@ -1,0 +1,5 @@
+--
+ALTER TABLE `bugreport`
+  ADD COLUMN `state` TINYINT NOT NULL DEFAULT 1 COMMENT '0 = closed, 1 = open',
+  ADD COLUMN `assignee` VARCHAR(255) DEFAULT NULL;
+  ADD COLUMN `comment` LONGTEXT DEFAULT NULL;
