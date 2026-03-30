@@ -1,3 +1,4 @@
+-- DB update 2026_03_29_02 -> 2026_03_30_00
 -- Move Majordomo Executus Ragnaros summoning gossip chain to database
 -- Previously handled entirely in C++ script (sGossipHello/sGossipSelect)
 
