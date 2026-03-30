@@ -1,3 +1,4 @@
+-- DB update 2026_02_24_00 -> 2026_03_30_00
 --
 ALTER TABLE `bugreport`
   ADD COLUMN `State` TINYINT NOT NULL DEFAULT 1,
