@@ -1157,8 +1157,17 @@ void WorldSession::HandleComplainOpcode(WorldPackets::Misc::Complain& packet)
     // Complaint Received message
     SendPacket(WorldPackets::Misc::ComplainResult().Write());
 
-    LOG_DEBUG("network", "REPORT SPAM: type {}, {}, unk1 {}, unk2 {}, unk3 {}, unk4 {}, message {}",
-        packet.SpamType, packet.SpammerGuid.ToString(), packet.Unk1, packet.Unk2, packet.Unk3, packet.Unk4, packet.Description);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_SPAM_REPORT);
+
+    stmt->SetData(0, packet.SpamType);
+    stmt->SetData(1, packet.SpammerGuid.GetCounter());
+    stmt->SetData(2, packet.Unk1);
+    stmt->SetData(3, packet.mailIdOrMessageType);
+    stmt->SetData(4, packet.channelId);
+    stmt->SetData(5, packet.secondsSinceMessage);
+    stmt->SetData(6, packet.Description);
+
+    CharacterDatabase.Execute(stmt);
 }
 
 void WorldSession::HandleRealmSplitOpcode(WorldPacket& recv_data)

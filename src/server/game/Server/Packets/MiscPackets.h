@@ -214,17 +214,17 @@ namespace WorldPackets
         class Complain final : public ClientPacket
         {
         public:
-            Complain(WorldPacket&& packet) : ClientPacket(CMSG_COMPLAIN, std::move(packet)) {}
+            Complain(WorldPacket&& packet) : ClientPacket(a, std::move(packet)) {}
 
             void Read() override;
 
-            uint8 SpamType = 0; // 0 - mail, 1 - chat
+            uint8 SpamType              = 0; // 0 - mail, 1 - chat
             ObjectGuid SpammerGuid;
-            uint32 Unk1 = 0;
-            uint32 Unk2 = 0;
-            uint32 Unk3 = 0;
-            uint32 Unk4 = 0;
-            std::string Description = "";
+            uint32 Unk1                 = 0;
+            uint32 mailIdOrMessageType  = 0;
+            uint32 channelId            = 0;
+            uint32 secondsSinceMessage  = 0;
+            std::string Description     = "";
         };
 
         class ComplainResult final : public ServerPacket
