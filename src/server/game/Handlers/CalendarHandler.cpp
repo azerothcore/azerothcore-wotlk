@@ -754,18 +754,21 @@ void WorldSession::HandleCalendarEventModeratorStatus(WorldPacket& recvData)
 
 void WorldSession::HandleCalendarComplain(WorldPackets::Calendar::CalendarComplain& packet)
 {
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_SPAM_REPORT);
+    if (sWorld->getBoolConfig(CONFIG_LOGSPAMREPORTS))
+    {
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_SPAM_REPORT);
 
-    stmt->SetData(0, 3);
-    stmt->SetData(1, packet.ComplainGuid.GetCounter());
-    stmt->SetData(2, 0);
-    stmt->SetData(3, 0);
-    stmt->SetData(4, 0);
-    stmt->SetData(5, 0);
-    stmt->SetData(6, packet.EventId);
-    stmt->SetData(7, GameTime::GetGameTime().count());
+        stmt->SetData(0, 3);
+        stmt->SetData(1, packet.ComplainGuid.GetCounter());
+        stmt->SetData(2, 0);
+        stmt->SetData(3, 0);
+        stmt->SetData(4, 0);
+        stmt->SetData(5, 0);
+        stmt->SetData(6, "EventId: " + std::to_string(packet.EventId));
+        stmt->SetData(7, GameTime::GetGameTime().count());
 
-    CharacterDatabase.Execute(stmt);
+        CharacterDatabase.Execute(stmt);
+    }
 }
 
 void WorldSession::HandleCalendarGetNumPending(WorldPacket& /*recvData*/)

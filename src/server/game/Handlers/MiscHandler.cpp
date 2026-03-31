@@ -1157,18 +1157,21 @@ void WorldSession::HandleComplainOpcode(WorldPackets::Misc::Complain& packet)
     // Complaint Received message
     SendPacket(WorldPackets::Misc::ComplainResult().Write());
 
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_SPAM_REPORT);
+    if (sWorld->getBoolConfig(CONFIG_LOGSPAMREPORTS))
+    {
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_SPAM_REPORT);
 
-    stmt->SetData(0, packet.SpamType);
-    stmt->SetData(1, packet.SpammerGuid.GetCounter());
-    stmt->SetData(2, packet.Unk1);
-    stmt->SetData(3, packet.MailIdOrMessageType);
-    stmt->SetData(4, packet.ChannelId);
-    stmt->SetData(5, packet.SecondsSinceMessage);
-    stmt->SetData(6, packet.Description);
-    stmt->SetData(7, GameTime::GetGameTime().count());
+        stmt->SetData(0, packet.SpamType);
+        stmt->SetData(1, packet.SpammerGuid.GetCounter());
+        stmt->SetData(2, packet.Unk1);
+        stmt->SetData(3, packet.MailIdOrMessageType);
+        stmt->SetData(4, packet.ChannelId);
+        stmt->SetData(5, packet.SecondsSinceMessage);
+        stmt->SetData(6, packet.Description);
+        stmt->SetData(7, GameTime::GetGameTime().count());
 
-    CharacterDatabase.Execute(stmt);
+        CharacterDatabase.Execute(stmt);
+    }
 }
 
 void WorldSession::HandleRealmSplitOpcode(WorldPacket& recv_data)
