@@ -117,7 +117,6 @@ struct boss_ragnaros : public BossAI
     boss_ragnaros(Creature* creature) : BossAI(creature, DATA_RAGNAROS),
         _isIntroDone(false),
         _hasYelledMagmaBurst(false),
-        _processingMagmaBurst(false),
         _hasSubmergedOnce(false),
         _isKnockbackEmoteAllowed(true)
     {
@@ -140,7 +139,6 @@ struct boss_ragnaros : public BossAI
         }
 
         _hasYelledMagmaBurst = false;
-        _processingMagmaBurst = false;
         _hasSubmergedOnce = false;
         _isKnockbackEmoteAllowed = true;
         me->SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
@@ -218,29 +216,6 @@ struct boss_ragnaros : public BossAI
             DoStartNoMovement(target);
     }
 
-    void EnterEvadeMode(EvadeReason why) override
-    {
-        if (!me->GetThreatMgr().IsThreatListEmpty())
-        {
-            if (!_processingMagmaBurst)
-            {
-                // Boss try to evade, but still got some targets on threat list - it means that none of these targets are in melee range - cast magma blast
-                _processingMagmaBurst = true;
-                events.ScheduleEvent(EVENT_MAGMA_BLAST, 4s, PHASE_EMERGED, PHASE_EMERGED);
-            }
-        }
-        else
-        {
-            BossAI::EnterEvadeMode(why);
-        }
-    }
-
-    bool CanAIAttack(Unit const* victim) const override
-    {
-        // Used for Magma Blast handling to force EnterEvadeMode if there are no melee targets
-        return me->IsWithinMeleeRange(victim);
-    }
-
     void UpdateAI(uint32 diff) override
     {
         if (!extraEvents.Empty())
@@ -307,10 +282,7 @@ struct boss_ragnaros : public BossAI
         }
 
         if (!UpdateVictim())
-        {
-            if (!_processingMagmaBurst)
-                return;
-        }
+            return;
 
         events.Update(diff);
 
@@ -350,8 +322,6 @@ struct boss_ragnaros : public BossAI
                 }
                 case EVENT_MAGMA_BLAST:
                 {
-                    _processingMagmaBurst = false;
-
                     if (!IsVictimWithinMeleeRange())
                     {
                         DoCastRandomTarget(SPELL_MAGMA_BLAST);
@@ -362,7 +332,7 @@ struct boss_ragnaros : public BossAI
                             _hasYelledMagmaBurst = true;
                         }
                     }
-
+                    events.Repeat(4s);
                     break;
                 }
                 case EVENT_MIGHT_OF_RAGNAROS:
@@ -419,7 +389,6 @@ private:
     EventMap extraEvents;
     bool _isIntroDone;
     bool _hasYelledMagmaBurst;
-    bool _processingMagmaBurst;
     bool _hasSubmergedOnce;
     bool _isKnockbackEmoteAllowed;  // Prevents possible text overlap
 
@@ -452,6 +421,7 @@ private:
         events.RescheduleEvent(EVENT_WRATH_OF_RAGNAROS, 30s, PHASE_EMERGED, PHASE_EMERGED);
         events.RescheduleEvent(EVENT_HAND_OF_RAGNAROS, 25s, PHASE_EMERGED, PHASE_EMERGED);
         events.RescheduleEvent(EVENT_LAVA_BURST, 10s, PHASE_EMERGED, PHASE_EMERGED);
+        events.RescheduleEvent(EVENT_MAGMA_BLAST, 4s, PHASE_EMERGED, PHASE_EMERGED);
         events.RescheduleEvent(EVENT_SUBMERGE, 180s, PHASE_EMERGED, PHASE_EMERGED);
         events.RescheduleEvent(EVENT_MIGHT_OF_RAGNAROS, 11s, PHASE_EMERGED, PHASE_EMERGED);
     }
