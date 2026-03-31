@@ -2811,6 +2811,13 @@ void Creature::AtEngage(Unit* target)
         UpdateSpeed(MOVE_FLIGHT, true);
     }
 
+    // Notify controlled creatures (guardians/pets) so they assist when
+    // the owner enters combat via assist/aggro chain, not only via damage.
+    for (Unit* controlled : m_Controlled)
+        if (Creature* cControlled = controlled->ToCreature())
+            if (CreatureAI* controlledAI = cControlled->AI())
+                controlledAI->OwnerAttackedBy(target);
+
     MovementGeneratorType const movetype = GetMotionMaster()->GetCurrentMovementGeneratorType();
     if (movetype == WAYPOINT_MOTION_TYPE || movetype == ESCORT_MOTION_TYPE || (IsAIEnabled && AI()->IsEscorted()))
     {
