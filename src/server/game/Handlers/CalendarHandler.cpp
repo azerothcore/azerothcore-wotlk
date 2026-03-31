@@ -758,7 +758,7 @@ void WorldSession::HandleCalendarComplain(WorldPackets::Calendar::CalendarCompla
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_SPAM_REPORT);
 
-        stmt->SetData(0, 3);
+        stmt->SetData(0, 2);
         stmt->SetData(1, packet.ComplainGuid.GetCounter());
         stmt->SetData(2, 0);
         stmt->SetData(3, 0);

@@ -603,7 +603,7 @@ void WorldConfig::BuildConfigCache()
 
     SetConfigValue<bool>(CONFIG_IP_BASED_ACTION_LOGGING, "Allow.IP.Based.Action.Logging", false);
 
-    SetConfigValue<bool>(CONFIG_LOGSPAMREPORTS, "LogSpamReports", false);
+    SetConfigValue<bool>(CONFIG_LOGSPAMREPORTS, "LogSpamReports", true);
 
     // Whether to use LoS from game objects
     SetConfigValue<bool>(CONFIG_CHECK_GOBJECT_LOS, "CheckGameObjectLoS", true);
