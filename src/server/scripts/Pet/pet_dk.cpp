@@ -366,6 +366,26 @@ struct npc_pet_dk_army_of_the_dead : public AggressorAI
         if (me->IsValidAttackTarget(attacker))
             AttackStart(attacker);
     }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+        {
+            // Re-engage if we still have a valid victim but lost engagement
+            // (e.g., combat reference expired during CC like knockback)
+            if (Unit* victim = me->GetVictim())
+            {
+                if (me->IsValidAttackTarget(victim))
+                {
+                    me->EngageWithTarget(victim);
+                    return;
+                }
+            }
+            return;
+        }
+
+        DoMeleeAttackIfReady();
+    }
 };
 
 struct npc_pet_dk_dancing_rune_weapon : public NullCreatureAI
