@@ -754,11 +754,18 @@ void WorldSession::HandleCalendarEventModeratorStatus(WorldPacket& recvData)
 
 void WorldSession::HandleCalendarComplain(WorldPackets::Calendar::CalendarComplain& packet)
 {
-    ObjectGuid guid = _player->GetGUID();
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_SPAM_REPORT);
 
-    LOG_DEBUG("network", "CMSG_CALENDAR_COMPLAIN [{}] EventId [{}] guid [{}]", guid.ToString(), packet.EventId, packet.ComplainGuid.ToString());
+    stmt->SetData(0, 3);
+    stmt->SetData(1, packet.ComplainGuid.GetCounter());
+    stmt->SetData(2, 0);
+    stmt->SetData(3, 0);
+    stmt->SetData(4, 0);
+    stmt->SetData(5, 0);
+    stmt->SetData(6, packet.EventId);
+    stmt->SetData(7, GameTime::GetGameTime().count());
 
-    // what to do with complains?
+    CharacterDatabase.Execute(stmt);
 }
 
 void WorldSession::HandleCalendarGetNumPending(WorldPacket& /*recvData*/)
