@@ -309,8 +309,12 @@ void CreatureAI::EngagementOver()
 
 void CreatureAI::JustExitedCombat()
 {
-    // Creatures evade through UpdateVictim() detecting out-of-combat state.
-    // Scripts that need custom combat-exit behavior should override this.
+    EngagementOver();
+
+    // If creature is alive, in world, and not already evading, trigger evade to return home
+    // Check IsInWorld to avoid evade during server shutdown/cleanup
+    if (me->IsAlive() && me->IsInWorld() && !me->IsInEvadeMode())
+        EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
 }
 
 /*void CreatureAI::AttackedBy(Unit* attacker)
