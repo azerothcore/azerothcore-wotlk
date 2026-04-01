@@ -48,11 +48,6 @@ void SmartWaypointMgr::LoadFromDB()
 {
     uint32 oldMSTime = getMSTime();
 
-    for (auto itr : waypoint_map)
-    {
-        delete itr.second;
-    }
-
     waypoint_map.clear();
 
     WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_SMARTAI_WP);
@@ -78,14 +73,15 @@ void SmartWaypointMgr::LoadFromDB()
         float x = fields[2].Get<float>();
         float y = fields[3].Get<float>();
         float z = fields[4].Get<float>();
-        Optional<float> o;
+        std::optional<float> o;
         if (!fields[5].IsNull())
             o = fields[5].Get<float>();
         uint32 delay = fields[6].Get<uint32>();
 
         if (last_entry != entry)
         {
-            waypoint_map[entry] = new WaypointPath();
+            waypoint_map[entry] = WaypointPath();
+            waypoint_map[entry].Id = entry;
             last_id = 1;
             count++;
         }
@@ -94,15 +90,15 @@ void SmartWaypointMgr::LoadFromDB()
             LOG_ERROR("sql.sql", "SmartWaypointMgr::LoadFromDB: Path entry {}, unexpected point id {}, expected {}.", entry, id, last_id);
 
         last_id++;
-        WaypointData data;
-        data.id = id;
-        data.x = x;
-        data.y = y;
-        data.z = z;
-        data.orientation = o;
-        data.delay = delay;
-        data.move_type = WAYPOINT_MOVE_TYPE_MAX;
-        (*waypoint_map[entry]).emplace(id, data);
+        WaypointNode node;
+        node.Id = id;
+        node.X = x;
+        node.Y = y;
+        node.Z = z;
+        node.Orientation = o;
+        node.Delay = delay;
+        node.MoveType = WAYPOINT_MOVE_TYPE_MAX;
+        waypoint_map[entry].Nodes.push_back(std::move(node));
 
         last_entry = entry;
         total++;
@@ -110,14 +106,6 @@ void SmartWaypointMgr::LoadFromDB()
 
     LOG_INFO("server.loading", ">> Loaded {} SmartAI waypoint paths (total {} waypoints) in {} ms", count, total, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
-}
-
-SmartWaypointMgr::~SmartWaypointMgr()
-{
-    for (auto itr : waypoint_map)
-    {
-        delete itr.second;
-    }
 }
 
 SmartAIMgr* SmartAIMgr::instance()
@@ -531,6 +519,18 @@ bool SmartAIMgr::IsTargetValid(SmartScriptHolder const& e)
             }
             break;
         }
+        case SMART_TARGET_FORMATION:
+        {
+            if (e.target.formation.type > 2)
+            {
+                LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} has invalid formation target type ({}, must be 0-2).",
+                    e.entryOrGuid, e.GetScriptType(), e.GetEventType(), e.GetActionType(), e.target.formation.type);
+                return false;
+            }
+            if (e.target.formation.entry && !IsCreatureValid(e, e.target.formation.entry))
+                return false;
+            return IsSAIBoolValid(e, e.target.formation.excludeSelf);
+        }
         case SMART_TARGET_HOSTILE_SECOND_AGGRO:
         case SMART_TARGET_HOSTILE_LAST_AGGRO:
         case SMART_TARGET_HOSTILE_RANDOM:
@@ -885,6 +885,8 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_WORLD_SCRIPT: return sizeof(SmartAction::worldStateScript);
             case SMART_ACTION_DISABLE_REWARD: return sizeof(SmartAction::reward);
             case SMART_ACTION_SET_ANIM_TIER: return sizeof(SmartAction::animTier);
+            case SMART_ACTION_SET_GOSSIP_MENU: return sizeof(SmartAction::setGossipMenu);
+            case SMART_ACTION_SUMMON_GAMEOBJECT_GROUP: return sizeof(SmartAction::gameobjectGroup);
             case SMART_ACTION_DISMOUNT: return NO_PARAMS;
             default:
                 LOG_WARN("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} is using an action with no unused params specified in SmartAIMgr::CheckUnusedActionParams(), please report this.",
@@ -953,6 +955,7 @@ bool SmartAIMgr::CheckUnusedTargetParams(SmartScriptHolder const& e)
             case SMART_TARGET_RANDOM_POINT: return sizeof(SmartTarget::randomPoint);
             case SMART_TARGET_SUMMONED_CREATURES: return sizeof(SmartTarget::summonedCreatures);
             case SMART_TARGET_INSTANCE_STORAGE: return sizeof(SmartTarget::instanceStorage);
+            case SMART_TARGET_FORMATION: return sizeof(SmartTarget::formation);
             default:
                 LOG_WARN("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} is using a target {} with no unused params specified in SmartAIMgr::CheckUnusedTargetParams(), please report this.",
                             e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetTargetType());
@@ -2040,6 +2043,8 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_MOVEMENT_PAUSE:
         case SMART_ACTION_MOVEMENT_RESUME:
         case SMART_ACTION_WORLD_SCRIPT:
+        case SMART_ACTION_SET_GOSSIP_MENU:
+        case SMART_ACTION_SUMMON_GAMEOBJECT_GROUP:
             break;
         default:
             LOG_ERROR("sql.sql", "SmartAIMgr: Not handled action_type({}), event_type({}), Entry {} SourceType {} Event {}, skipped.", e.GetActionType(), e.GetEventType(), e.entryOrGuid, e.GetScriptType(), e.event_id);

@@ -96,12 +96,16 @@ void WorldSession::HandleQuestgiverHelloOpcode(WorldPacket& recvData)
     // Stop the npc if moving
     if (uint32 pause = creature->GetMovementTemplate().GetInteractionPauseTimer())
         creature->PauseMovement(pause);
-    creature->SetHomePosition(creature->GetPosition());
+
+    // Update home position for patrolling NPCs only (prevents drift for stationary NPCs)
+    if (creature->GetDefaultMovementType() == WAYPOINT_MOTION_TYPE ||
+        creature->GetMotionMaster()->GetCurrentMovementGeneratorType() == WAYPOINT_MOTION_TYPE)
+        creature->SetHomePosition(creature->GetPosition());
 
     if (sScriptMgr->OnGossipHello(_player, creature))
         return;
 
-    _player->PrepareGossipMenu(creature, creature->GetCreatureTemplate()->GossipMenuId, true);
+    _player->PrepareGossipMenu(creature, creature->GetGossipMenuId(), true);
     _player->SendPreparedGossip(creature);
 
     creature->AI()->sGossipHello(_player);

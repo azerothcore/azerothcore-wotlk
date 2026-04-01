@@ -15,24 +15,35 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "ArenaTeamMgr.h"
+#include "AuctionHouseMgr.h"
 #include "Bag.h"
 #include "BattlegroundMgr.h"
 #include "CellImpl.h"
 #include "Channel.h"
+#include "CharacterCache.h"
+#include "DatabaseEnv.h"
 #include "Chat.h"
 #include "CommandScript.h"
 #include "GridNotifiersImpl.h"
+#include "GuildMgr.h"
+#include "ItemTemplate.h"
 #include "LFGMgr.h"
 #include "Language.h"
 #include "Log.h"
+#include "LootMgr.h"
 #include "M2Stores.h"
 #include "MapMgr.h"
+#include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "PoolMgr.h"
+#include "RaceMgr.h"
 #include "ScriptMgr.h"
 #include "Transport.h"
 #include "Warden.h"
+#include <algorithm>
 #include <fstream>
+#include <map>
 #include <set>
 
 using namespace Acore::ChatCommands;
@@ -70,6 +81,8 @@ public:
         {
             { "setbit",         HandleDebugSet32BitCommand,            SEC_ADMINISTRATOR, Console::No },
             { "threat",         HandleDebugThreatListCommand,          SEC_ADMINISTRATOR, Console::No },
+            { "threatinfo",     HandleDebugThreatInfoCommand,          SEC_ADMINISTRATOR, Console::No },
+            { "combat",         HandleDebugCombatListCommand,          SEC_ADMINISTRATOR, Console::No },
             { "hostile",        HandleDebugHostileRefListCommand,      SEC_ADMINISTRATOR, Console::No },
             { "anim",           HandleDebugAnimCommand,                SEC_ADMINISTRATOR, Console::No },
             { "arena",          HandleDebugArenaCommand,               SEC_ADMINISTRATOR, Console::No },
@@ -93,6 +106,7 @@ public:
             { "itemexpire",     HandleDebugItemExpireCommand,          SEC_ADMINISTRATOR, Console::No },
             { "areatriggers",   HandleDebugAreaTriggersCommand,        SEC_ADMINISTRATOR, Console::No },
             { "lfg",            HandleDebugDungeonFinderCommand,       SEC_ADMINISTRATOR, Console::Yes},
+            { "loot",           HandleDebugLootCommand,                SEC_GAMEMASTER,    Console::Yes},
             { "los",            HandleDebugLoSCommand,                 SEC_ADMINISTRATOR, Console::No },
             { "moveflags",      HandleDebugMoveflagsCommand,           SEC_ADMINISTRATOR, Console::No },
             { "unitstate",      HandleDebugUnitStateCommand,           SEC_ADMINISTRATOR, Console::No },
@@ -101,6 +115,7 @@ public:
             { "mapdata",        HandleDebugMapDataCommand,             SEC_ADMINISTRATOR, Console::No },
             { "boundary",       HandleDebugBoundaryCommand,            SEC_ADMINISTRATOR, Console::No },
             { "visibilitydata", HandleDebugVisibilityDataCommand,      SEC_ADMINISTRATOR, Console::No },
+            { "factionchange",  HandleDebugFactionChangeCommand,       SEC_ADMINISTRATOR, Console::Yes},
             { "zonestats",      HandleDebugZoneStatsCommand,           SEC_MODERATOR,     Console::Yes}
         };
         static ChatCommandTable commandTable =
@@ -134,7 +149,7 @@ public:
             handler->PSendSysMessage("{} waypoints dumped", flyByCameras->size());
         }
 
-        handler->GetPlayer()->SendCinematicStart(cinematicId);
+        handler->GetPlayer()->GetCinematicMgr().StartCinematic(cinematicId);
         return true;
     }
 
@@ -816,43 +831,182 @@ public:
 
     static bool HandleDebugThreatListCommand(ChatHandler* handler)
     {
-        Creature* target = handler->getSelectedCreature();
-        if (!target || target->IsTotem() || target->IsPet())
-            return false;
+        Unit* target = handler->getSelectedUnit();
+        if (!target)
+            target = handler->GetPlayer();
 
-        auto const& threatList = target->GetThreatMgr().GetThreatList();
-        ThreatContainer::StorageType::const_iterator itr;
+        ThreatManager& mgr = target->GetThreatMgr();
+        if (!target->IsAlive())
+        {
+            handler->PSendSysMessage("{} ({}) is not alive.{}", target->GetName(), target->GetGUID().ToString(), target->IsEngaged() ? " (It is, however, engaged. Huh?)" : "");
+            return true;
+        }
+
         uint32 count = 0;
-
-        handler->PSendSysMessage("Threat list of {} ({})", target->GetName(), target->GetGUID().ToString());
-
-        for (itr = threatList.begin(); itr != threatList.end(); ++itr)
+        auto const& threatenedByMe = target->GetThreatMgr().GetThreatenedByMeList();
+        if (threatenedByMe.empty())
+            handler->PSendSysMessage("{} ({}) does not threaten any units.", target->GetName(), target->GetGUID().ToString());
+        else
         {
-            Unit* unit = (*itr)->getTarget();
-            if (!unit)
+            handler->PSendSysMessage("List of units threatened by {} ({})", target->GetName(), target->GetGUID().ToString());
+            for (auto const& pair : threatenedByMe)
             {
-                handler->PSendSysMessage("   {}.   No Unit  - threat {}", ++count, (*itr)->GetThreat());
-                continue;
+                Unit* unit = pair.second->GetOwner();
+                handler->PSendSysMessage("   {}.   {}   ({}, SpawnID {})  - threat {}", ++count, unit->GetName(), unit->GetGUID().ToString(), unit->IsCreature() ? unit->ToCreature()->GetSpawnId() : 0, pair.second->GetThreat());
             }
-
-            handler->PSendSysMessage("   {}.   {}   ({})  - threat {}", ++count, unit->GetName(), unit->GetGUID().ToString(), (*itr)->GetThreat());
+            handler->SendSysMessage("End of threatened-by-me list.");
         }
 
-        auto const& threatList2 = target->GetThreatMgr().GetOfflineThreatList();
-        for (itr = threatList2.begin(); itr != threatList2.end(); ++itr)
+        if (mgr.CanHaveThreatList())
         {
-            Unit* unit = (*itr)->getTarget();
-            if (!unit)
+            if (!mgr.IsThreatListEmpty(true))
             {
-                handler->PSendSysMessage("   {}.   [offline] No Unit  - threat {}", ++count, (*itr)->GetThreat());
-                continue;
-            }
+                if (target->IsEngaged())
+                    handler->PSendSysMessage("Threat list of {} ({}, SpawnID {}):", target->GetName(), target->GetGUID().ToString(), target->IsCreature() ? target->ToCreature()->GetSpawnId() : 0);
+                else
+                    handler->PSendSysMessage("{} ({}, SpawnID {}) is not engaged, but still has a threat list? Well, here it is:", target->GetName(), target->GetGUID().ToString(), target->IsCreature() ? target->ToCreature()->GetSpawnId() : 0);
 
-            handler->PSendSysMessage("   {}.   [offline] {}   ({})  - threat {}", ++count, unit->GetName(), unit->GetGUID().ToString(), (*itr)->GetThreat());
+                count = 0;
+                Unit* fixateVictim = mgr.GetFixateTarget();
+                for (ThreatReference const* ref : mgr.GetSortedThreatList())
+                {
+                    Unit* unit = ref->GetVictim();
+                    char const* onlineStr;
+                    switch (ref->GetOnlineState())
+                    {
+                        case ThreatReference::ONLINE_STATE_SUPPRESSED:
+                            onlineStr = " [SUPPRESSED]";
+                            break;
+                        case ThreatReference::ONLINE_STATE_OFFLINE:
+                            onlineStr = " [OFFLINE]";
+                            break;
+                        default:
+                            onlineStr = "";
+                    }
+                    char const* tauntStr;
+                    if (unit == fixateVictim)
+                        tauntStr = " [FIXATE]";
+                    else
+                        switch (ref->GetTauntState())
+                        {
+                            case ThreatReference::TAUNT_STATE_TAUNT:
+                                tauntStr = " [TAUNT]";
+                                break;
+                            case ThreatReference::TAUNT_STATE_DETAUNT:
+                                tauntStr = " [DETAUNT]";
+                                break;
+                            default:
+                                tauntStr = "";
+                        }
+                    handler->PSendSysMessage("   {}.   {}   ({})  - threat {}{}{}", ++count, unit->GetName(), unit->GetGUID().ToString(), ref->GetThreat(), tauntStr, onlineStr);
+                }
+                handler->SendSysMessage("End of threat list.");
+            }
+            else if (!target->IsEngaged())
+                handler->PSendSysMessage("{} ({}, SpawnID {}) is not currently engaged.", target->GetName(), target->GetGUID().ToString(), target->IsCreature() ? target->ToCreature()->GetSpawnId() : 0);
+            else
+                handler->PSendSysMessage("{} ({}, SpawnID {}) seems to be engaged, but does not have a threat list??", target->GetName(), target->GetGUID().ToString(), target->IsCreature() ? target->ToCreature()->GetSpawnId() : 0);
+        }
+        else if (target->IsEngaged())
+            handler->PSendSysMessage("{} ({}) is currently engaged. (This unit cannot have a threat list.)", target->GetName(), target->GetGUID().ToString());
+        else
+            handler->PSendSysMessage("{} ({}) is not currently engaged. (This unit cannot have a threat list.)", target->GetName(), target->GetGUID().ToString());
+
+        return true;
+    }
+
+    static bool HandleDebugThreatInfoCommand(ChatHandler* handler)
+    {
+        Unit* target = handler->getSelectedUnit();
+        if (!target)
+        {
+            handler->SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+            handler->SetSentErrorMessage(true);
+            return false;
         }
 
-        handler->SendSysMessage("End of threat list.");
+        handler->PSendSysMessage("Threat info for {} ({}):", target->GetName(), target->GetGUID().ToString());
 
+        ThreatManager const& mgr = target->GetThreatMgr();
+
+        // _singleSchoolModifiers
+        {
+            auto& mods = mgr._singleSchoolModifiers;
+            handler->SendSysMessage(" - Single-school threat modifiers:");
+            handler->PSendSysMessage(" |-- Physical: {:.2f}%", mods[SPELL_SCHOOL_NORMAL] * 100.0f);
+            handler->PSendSysMessage(" |-- Holy    : {:.2f}%", mods[SPELL_SCHOOL_HOLY] * 100.0f);
+            handler->PSendSysMessage(" |-- Fire    : {:.2f}%", mods[SPELL_SCHOOL_FIRE] * 100.0f);
+            handler->PSendSysMessage(" |-- Nature  : {:.2f}%", mods[SPELL_SCHOOL_NATURE] * 100.0f);
+            handler->PSendSysMessage(" |-- Frost   : {:.2f}%", mods[SPELL_SCHOOL_FROST] * 100.0f);
+            handler->PSendSysMessage(" |-- Shadow  : {:.2f}%", mods[SPELL_SCHOOL_SHADOW] * 100.0f);
+            handler->PSendSysMessage(" |-- Arcane  : {:.2f}%", mods[SPELL_SCHOOL_ARCANE] * 100.0f);
+        }
+
+        // _multiSchoolModifiers
+        {
+            auto& mods = mgr._multiSchoolModifiers;
+            handler->PSendSysMessage(" - Multi-school threat modifiers ({} entries):", mods.size());
+            for (auto const& pair : mods)
+                handler->PSendSysMessage(" |-- Mask 0x{:x}: {:.2f}%", uint32(pair.first), pair.second * 100.0f);
+        }
+
+        // _redirectInfo
+        {
+            auto const& redirectInfo = mgr._redirectInfo;
+            if (redirectInfo.empty())
+                handler->SendSysMessage(" - No redirects being applied");
+            else
+            {
+                handler->PSendSysMessage(" - {:02} redirects being applied:", redirectInfo.size());
+                for (auto const& pair : redirectInfo)
+                {
+                    Unit* unit = ObjectAccessor::GetUnit(*target, pair.first);
+                    handler->PSendSysMessage(" |-- {:02}% to {}", pair.second, unit ? unit->GetName() : pair.first.ToString());
+                }
+            }
+        }
+
+        // _redirectRegistry
+        {
+            auto const& redirectRegistry = mgr._redirectRegistry;
+            if (redirectRegistry.empty())
+                handler->SendSysMessage(" - No redirects are registered");
+            else
+            {
+                handler->PSendSysMessage(" - {:02} spells may have redirects registered", redirectRegistry.size());
+                for (auto const& outerPair : redirectRegistry)
+                {
+                    SpellInfo const* const spell = sSpellMgr->GetSpellInfo(outerPair.first);
+                    handler->PSendSysMessage(" |-- #{:06} {} ({} entries):", outerPair.first, spell ? spell->SpellName[0] : "<unknown>", outerPair.second.size());
+                    for (auto const& innerPair : outerPair.second)
+                    {
+                        Unit* unit = ObjectAccessor::GetUnit(*target, innerPair.first);
+                        handler->PSendSysMessage("   |-- {:02}% to {}", innerPair.second, unit ? unit->GetName() : innerPair.first.ToString());
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    static bool HandleDebugCombatListCommand(ChatHandler* handler)
+    {
+        Unit* target = handler->getSelectedUnit();
+        if (!target)
+            target = handler->GetPlayer();
+
+        handler->PSendSysMessage("Combat refs: (Combat state: {} | Manager state: {})", target->IsInCombat(), target->GetCombatManager().HasCombat());
+        for (auto const& ref : target->GetCombatManager().GetPvPCombatRefs())
+        {
+            Unit* unit = ref.second->GetOther(target);
+            handler->PSendSysMessage("[PvP] {} (SpawnID {})", unit->GetName(), unit->IsCreature() ? unit->ToCreature()->GetSpawnId() : 0);
+        }
+        for (auto const& ref : target->GetCombatManager().GetPvECombatRefs())
+        {
+            Unit* unit = ref.second->GetOther(target);
+            handler->PSendSysMessage("[PvE] {} (SpawnID {})", unit->GetName(), unit->IsCreature() ? unit->ToCreature()->GetSpawnId() : 0);
+        }
         return true;
     }
 
@@ -862,27 +1016,48 @@ public:
         if (!target)
             target = handler->GetSession()->GetPlayer();
 
-        HostileReference* ref = target->getHostileRefMgr().getFirst();
         uint32 count = 0;
 
-        handler->PSendSysMessage("Hostile reference list of {} ({})", target->GetName(), target->GetGUID().ToString());
+        handler->PSendSysMessage("Threatened by me list of {} ({})", target->GetName(), target->GetGUID().ToString());
 
-        while (ref)
+        for (auto const& pair : target->GetThreatMgr().GetThreatenedByMeList())
         {
-            if (Unit* unit = ref->GetSource()->GetOwner())
+            ThreatReference const* ref = pair.second;
+            Creature* owner = ref->GetOwner();
+            if (owner)
             {
-                handler->PSendSysMessage("   {}.   {} {}   ({})  - threat {}", ++count, (ref->IsOnline() ? "" : "[offline]"),
-                    unit->GetName(), unit->GetGUID().ToString(), ref->GetThreat());
+                std::string stateStr = "";
+                if (ref->IsOffline())
+                    stateStr = "[offline] ";
+                else if (ref->IsSuppressed())
+                    stateStr = "[suppressed] ";
+
+                handler->PSendSysMessage("   {}.   {}{}   ({})  - threat {}", ++count, stateStr,
+                    owner->GetName(), owner->GetGUID().ToString(), ref->GetThreat());
             }
             else
             {
                 handler->PSendSysMessage("   {}.   No Owner  - threat {}", ++count, ref->GetThreat());
             }
-
-            ref = ref->next();
         }
 
-        handler->SendSysMessage("End of hostile reference list.");
+        handler->SendSysMessage("End of threatened by me list.");
+
+        // Also show combat refs that may not appear in the threat list
+        // (e.g. creatures without threat lists like triggers/environmental hazards)
+        handler->PSendSysMessage("Combat refs (InCombat: {} | HasCombat: {})", target->IsInCombat(), target->GetCombatManager().HasCombat());
+        for (auto const& ref : target->GetCombatManager().GetPvECombatRefs())
+        {
+            Unit* unit = ref.second->GetOther(target);
+            handler->PSendSysMessage("   [PvE] {} ({}) Entry: {}", unit->GetName(), unit->GetGUID().ToString(),
+                unit->IsCreature() ? unit->ToCreature()->GetEntry() : 0);
+        }
+        for (auto const& ref : target->GetCombatManager().GetPvPCombatRefs())
+        {
+            Unit* unit = ref.second->GetOther(target);
+            handler->PSendSysMessage("   [PvP] {} ({})", unit->GetName(), unit->GetGUID().ToString());
+        }
+
         return true;
     }
 
@@ -1458,6 +1633,352 @@ public:
         uint32 zoneId = player->GetZoneId();
         AreaTableEntry const* zoneEntry = sAreaTableStore.LookupEntry(zoneId);
         handler->PSendSysMessage("Player count in zone {} ({}): {}.", zoneId, (zoneEntry ? zoneEntry->area_name[LOCALE_enUS] : "<unknown>"), player->GetMap()->GetPlayerCountInZone(zoneId));
+        return true;
+    }
+
+    static std::string GetLootSourceName(std::string const& type, uint32 lootId)
+    {
+        if (type == "creature" || type == "skinning" || type == "pickpocketing")
+        {
+            if (CreatureTemplate const* ct = sObjectMgr->GetCreatureTemplate(lootId))
+                return ct->Name;
+        }
+        else if (type == "gameobject")
+        {
+            if (GameObjectTemplate const* gt = sObjectMgr->GetGameObjectTemplate(lootId))
+                return gt->name;
+        }
+        else if (type == "item" || type == "disenchant" || type == "prospecting" || type == "milling")
+        {
+            if (ItemTemplate const* it = sObjectMgr->GetItemTemplate(lootId))
+                return it->Name1;
+        }
+        else if (type == "fishing")
+        {
+            if (AreaTableEntry const* area = sAreaTableStore.LookupEntry(lootId))
+                return area->area_name[LOCALE_enUS];
+        }
+
+        return "";
+    }
+
+    static char const* GetItemQualityName(uint32 quality)
+    {
+        static char const* const qualityNames[MAX_ITEM_QUALITY] =
+        {
+            "Poor", "Normal", "Uncommon", "Rare",
+            "Epic", "Legendary", "Artifact", "Heirloom"
+        };
+
+        if (quality < MAX_ITEM_QUALITY)
+            return qualityNames[quality];
+        return "Unknown";
+    }
+
+    static void GenerateLoot(Loot& loot, LootTemplate const* tab,
+        LootStore const& store, Player* player, std::string const& type, uint32 lootId)
+    {
+        loot.clear();
+        loot.items.reserve(MAX_NR_LOOT_ITEMS);
+        loot.quest_items.reserve(MAX_NR_QUEST_ITEMS);
+        tab->Process(loot, store, LOOT_MODE_DEFAULT, player);
+
+        if (type == "creature")
+        {
+            if (CreatureTemplate const* ct = sObjectMgr->GetCreatureTemplate(lootId))
+                loot.generateMoneyLoot(ct->mingold, ct->maxgold);
+        }
+        else if (type == "gameobject")
+        {
+            if (GameObjectTemplateAddon const* addon = sObjectMgr->GetGameObjectTemplateAddon(lootId))
+                loot.generateMoneyLoot(addon->mingold, addon->maxgold);
+        }
+        else if (type == "item")
+        {
+            if (ItemTemplate const* it = sObjectMgr->GetItemTemplate(lootId))
+                loot.generateMoneyLoot(it->MinMoneyLoot, it->MaxMoneyLoot);
+        }
+    }
+
+    static bool HandleDebugLootCommand(ChatHandler* handler, std::string type, uint32 lootId, Optional<uint32> count)
+    {
+        static std::unordered_map<std::string, LootStore*> const lootStoreMap =
+        {
+            { "creature",       &LootTemplates_Creature },
+            { "gameobject",     &LootTemplates_Gameobject },
+            { "fishing",        &LootTemplates_Fishing },
+            { "item",           &LootTemplates_Item },
+            { "pickpocketing",  &LootTemplates_Pickpocketing },
+            { "skinning",       &LootTemplates_Skinning },
+            { "disenchant",     &LootTemplates_Disenchant },
+            { "prospecting",    &LootTemplates_Prospecting },
+            { "milling",        &LootTemplates_Milling },
+            { "spell",          &LootTemplates_Spell },
+            { "reference",      &LootTemplates_Reference },
+            { "mail",           &LootTemplates_Mail },
+            { "player",         &LootTemplates_Player }
+        };
+
+        // Lowercase the type for case-insensitive matching
+        std::transform(type.begin(), type.end(), type.begin(), ::tolower);
+
+        auto itr = lootStoreMap.find(type);
+        if (itr == lootStoreMap.end())
+        {
+            handler->SendErrorMessage(LANG_DEBUG_LOOT_INVALID_TYPE, type);
+            return false;
+        }
+
+        LootStore const* store = itr->second;
+
+        LootTemplate const* tab = store->GetLootFor(lootId);
+        if (!tab)
+        {
+            handler->SendErrorMessage(LANG_DEBUG_LOOT_NO_TEMPLATE, type, lootId);
+            return false;
+        }
+
+        uint32 iterations = std::min(count.value_or(1), uint32(100));
+        if (iterations == 0)
+            iterations = 1;
+
+        Player* player = handler->GetPlayer();
+        std::string sourceName = GetLootSourceName(type, lootId);
+
+        // Single iteration - original behavior
+        if (iterations == 1)
+        {
+            Loot loot;
+            GenerateLoot(loot, tab, *store, player, type, lootId);
+
+            handler->PSendSysMessage(LANG_DEBUG_LOOT_HEADER, type, sourceName, lootId);
+
+            if (loot.items.empty() && loot.quest_items.empty() && loot.gold == 0)
+            {
+                handler->PSendSysMessage(LANG_DEBUG_LOOT_EMPTY);
+                return true;
+            }
+
+            for (LootItem const& li : loot.items)
+            {
+                ItemTemplate const* proto = sObjectMgr->GetItemTemplate(li.itemid);
+                std::string name = proto ? proto->Name1 : "Unknown";
+                char const* qualityName = GetItemQualityName(proto ? proto->Quality : 0);
+                handler->PSendSysMessage(LANG_DEBUG_LOOT_ITEM,
+                    li.itemid, uint32(li.count), name, qualityName,
+                    li.randomPropertyId, li.randomSuffix);
+            }
+
+            for (LootItem const& li : loot.quest_items)
+            {
+                ItemTemplate const* proto = sObjectMgr->GetItemTemplate(li.itemid);
+                std::string name = proto ? proto->Name1 : "Unknown";
+                char const* qualityName = GetItemQualityName(proto ? proto->Quality : 0);
+                handler->PSendSysMessage(LANG_DEBUG_LOOT_ITEM_QUEST,
+                    li.itemid, uint32(li.count), name, qualityName);
+            }
+
+            if (loot.gold > 0)
+            {
+                uint32 gold = loot.gold / 10000;
+                uint32 silver = (loot.gold % 10000) / 100;
+                uint32 copper = loot.gold % 100;
+                handler->PSendSysMessage(LANG_DEBUG_LOOT_GOLD,
+                    loot.gold, gold, silver, copper);
+            }
+
+            return true;
+        }
+
+        // Multi iteration - aggregate results
+        struct ItemStats
+        {
+            uint32 totalCount = 0;
+            uint32 timesDropped = 0;
+            bool questItem = false;
+        };
+
+        std::map<uint32, ItemStats> itemStats;
+        uint64 totalGold = 0;
+
+        for (uint32 i = 0; i < iterations; ++i)
+        {
+            Loot loot;
+            GenerateLoot(loot, tab, *store, player, type, lootId);
+
+            std::set<uint32> seenThisRun;
+
+            for (LootItem const& li : loot.items)
+            {
+                itemStats[li.itemid].totalCount += li.count;
+                if (seenThisRun.insert(li.itemid).second)
+                    itemStats[li.itemid].timesDropped++;
+            }
+
+            for (LootItem const& li : loot.quest_items)
+            {
+                itemStats[li.itemid].totalCount += li.count;
+                itemStats[li.itemid].questItem = true;
+                if (seenThisRun.insert(li.itemid).second)
+                    itemStats[li.itemid].timesDropped++;
+            }
+
+            totalGold += loot.gold;
+        }
+
+        handler->PSendSysMessage(LANG_DEBUG_LOOT_HEADER_MULTI,
+            type, sourceName, lootId, iterations);
+
+        if (itemStats.empty() && totalGold == 0)
+        {
+            handler->PSendSysMessage(LANG_DEBUG_LOOT_EMPTY);
+            return true;
+        }
+
+        for (auto const& [itemId, stats] : itemStats)
+        {
+            ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemId);
+            std::string name = proto ? proto->Name1 : "Unknown";
+            char const* qualityName = GetItemQualityName(proto ? proto->Quality : 0);
+            uint32 dropPct = (stats.timesDropped * 10000) / iterations;
+
+            if (stats.questItem)
+                handler->PSendSysMessage(LANG_DEBUG_LOOT_ITEM_QUEST_MULTI,
+                    itemId, stats.totalCount, name, qualityName,
+                    stats.timesDropped, iterations, dropPct / 100, dropPct % 100);
+            else
+                handler->PSendSysMessage(LANG_DEBUG_LOOT_ITEM_MULTI,
+                    itemId, stats.totalCount, name, qualityName,
+                    stats.timesDropped, iterations, dropPct / 100, dropPct % 100);
+        }
+
+        if (totalGold > 0)
+        {
+            uint32 avgGold = static_cast<uint32>(totalGold / iterations);
+            uint32 gold = avgGold / 10000;
+            uint32 silver = (avgGold % 10000) / 100;
+            uint32 copper = avgGold % 100;
+            handler->PSendSysMessage(LANG_DEBUG_LOOT_GOLD_MULTI,
+                avgGold, gold, silver, copper, iterations);
+        }
+
+        return true;
+    }
+
+    static bool HandleDebugFactionChangeCommand(ChatHandler* handler, Optional<PlayerIdentifier> playerTarget)
+    {
+        if (!playerTarget)
+            playerTarget = PlayerIdentifier::FromTarget(handler);
+
+        if (!playerTarget)
+        {
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+            return false;
+        }
+
+        ObjectGuid guid = playerTarget->GetGUID();
+        std::string name = playerTarget->GetName();
+
+        CharacterCacheEntry const* playerData = sCharacterCache->GetCharacterCacheByGuid(guid);
+        if (!playerData)
+        {
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+            return false;
+        }
+
+        // Query at_login flags and money from the database (synchronous)
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_AT_LOGIN_TITLES_MONEY);
+        stmt->SetData(0, guid.GetCounter());
+        PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+        if (!result)
+        {
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+            return false;
+        }
+
+        Field* fields = result->Fetch();
+        uint32 atLoginFlags = fields[0].Get<uint16>();
+        uint32 money = fields[2].Get<uint32>();
+
+        // Header
+        handler->PSendSysMessage(LANG_DEBUG_FACTIONCHANGE_HEADER, name, guid.GetCounter());
+
+        // AT_LOGIN flags
+        bool hasFactionFlag = (atLoginFlags & AT_LOGIN_CHANGE_FACTION) != 0;
+        bool hasRaceFlag = (atLoginFlags & AT_LOGIN_CHANGE_RACE) != 0;
+
+        if (hasFactionFlag)
+            handler->PSendSysMessage(LANG_DEBUG_FACTIONCHANGE_FLAG_FACTION);
+        if (hasRaceFlag)
+            handler->PSendSysMessage(LANG_DEBUG_FACTIONCHANGE_FLAG_RACE);
+        if (!hasFactionFlag && !hasRaceFlag)
+            handler->PSendSysMessage(LANG_DEBUG_FACTIONCHANGE_FLAG_NONE);
+
+        // Faction-change-only checks (guild, arena captain, mail, auctions)
+        if (hasFactionFlag)
+        {
+            // Guild check
+            if (playerData->GuildId && !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD))
+            {
+                std::string guildName = sGuildMgr->GetGuildNameById(playerData->GuildId);
+                handler->PSendSysMessage(LANG_DEBUG_FACTIONCHANGE_GUILD_FAIL, guildName);
+            }
+            else
+                handler->PSendSysMessage(LANG_DEBUG_FACTIONCHANGE_GUILD_OK);
+
+            // Arena team captain check
+            if (sArenaTeamMgr->GetArenaTeamByCaptain(guid))
+                handler->PSendSysMessage(LANG_DEBUG_FACTIONCHANGE_ARENA_CAPTAIN_FAIL);
+            else
+                handler->PSendSysMessage(LANG_DEBUG_FACTIONCHANGE_ARENA_CAPTAIN_OK);
+
+            // Mail check
+            if (playerData->MailCount)
+                handler->PSendSysMessage(LANG_DEBUG_FACTIONCHANGE_MAIL_FAIL, playerData->MailCount);
+            else
+                handler->PSendSysMessage(LANG_DEBUG_FACTIONCHANGE_MAIL_OK);
+
+            // Auction check - mirrors CharacterHandler.cpp logic
+            // AH faction IDs: 0 = neutral, 12 = alliance, 29 = horde
+            bool hasAuctions = false;
+            for (uint8 i = 0; i < 2; ++i)
+            {
+                AuctionHouseObject* auctionHouse = sAuctionMgr->GetAuctionsMap(
+                    i == 0 ? 0 : (((1 << (playerData->Race - 1)) & sRaceMgr->GetAllianceRaceMask()) ? 12 : 29));
+
+                for (auto const& [auID, Aentry] : auctionHouse->GetAuctions())
+                {
+                    if (Aentry && (Aentry->owner == guid || Aentry->bidder == guid))
+                    {
+                        hasAuctions = true;
+                        break;
+                    }
+                }
+
+                if (hasAuctions)
+                    break;
+            }
+
+            if (hasAuctions)
+                handler->PSendSysMessage(LANG_DEBUG_FACTIONCHANGE_AUCTION_FAIL);
+            else
+                handler->PSendSysMessage(LANG_DEBUG_FACTIONCHANGE_AUCTION_OK);
+        }
+        else
+        {
+            handler->PSendSysMessage(LANG_DEBUG_FACTIONCHANGE_NA);
+        }
+
+        // Gold limit check
+        uint32 maxMoney = sWorld->getIntConfig(CONFIG_CHANGE_FACTION_MAX_MONEY);
+        if (maxMoney && money > maxMoney)
+            handler->PSendSysMessage(LANG_DEBUG_FACTIONCHANGE_GOLD_FAIL, money, maxMoney);
+        else if (maxMoney)
+            handler->PSendSysMessage(LANG_DEBUG_FACTIONCHANGE_GOLD_OK, money, maxMoney);
+        else
+            handler->PSendSysMessage(LANG_DEBUG_FACTIONCHANGE_GOLD_NOLIMIT, money);
+
         return true;
     }
 };

@@ -688,14 +688,14 @@ public:
             if (_instance->GetBossState(DATA_ICECROWN_GUNSHIP_BATTLE) != IN_PROGRESS)
                 return;
 
+            // Blizzlike: ship wipes when all players are in cannons (vehicles) with nobody on deck
+            // See: azerothcore/azerothcore-wotlk#17856
             bool playerOnDeck = false;
             me->GetMap()->DoForAllPlayers([&](Player* player)
                 {
                     if (!player->GetVehicle() && player->IsAlive())
                         playerOnDeck = true;
                 });
-
-            // Wipe if no player is on the deck
             if (!playerOnDeck)
             {
                 // Script runs on enemy ship. We want to kill our ship.
@@ -980,7 +980,7 @@ public:
                         for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
                             if (Player* p = itr->GetSource())
                                 if (!p->IsGameMaster())
-                                    p->SetInCombatState(true);
+                                    p->SetInCombatWith(me);
                         _events.ScheduleEvent(EVENT_KEEP_PLAYER_IN_COMBAT, 4s);
                     }
                     break;
@@ -1319,7 +1319,7 @@ public:
                         for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
                             if (Player* p = itr->GetSource())
                                 if (!p->IsGameMaster())
-                                    p->SetInCombatState(true);
+                                    p->SetInCombatWith(me);
                         _events.ScheduleEvent(EVENT_KEEP_PLAYER_IN_COMBAT, 4s);
                     }
                     break;

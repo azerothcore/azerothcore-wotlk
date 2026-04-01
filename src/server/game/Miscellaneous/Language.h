@@ -671,6 +671,8 @@ enum AcoreStrings
 
     LANG_REWARDED                       = 602,
 
+    LANG_NPC_DO_ACTION                  = 603,
+
     // 603-704 - free
 
     LANG_WAIT_BEFORE_SPEAKING           = 705,
@@ -813,6 +815,7 @@ enum AcoreStrings
     LANG_NO_REASON                      = 35407,
     LANG_UNAUTHORIZED                   = 35408,
     LANG_PINFO_CHR_MAP_WITH_AREA        = 35409,
+    LANG_PINFO_CHR_ONLINETIME           = 35410,
 
     LANG_CHARACTER_GENDER_MALE          = 855,
     LANG_CHARACTER_GENDER_FEMALE        = 856,
@@ -1159,8 +1162,71 @@ enum AcoreStrings
 
     LANG_CMD_QUEST_STATUS               = 5088,
     LANG_CMD_QUEST_UNAVAILABLE          = 5089,
+    LANG_CMD_QUEST_STATUS_DISABLED      = 5090,
+    LANG_CMD_QUEST_STATUS_ALREADY_DONE  = 5091,
+    LANG_CMD_QUEST_STATUS_CLASS         = 5092,
+    LANG_CMD_QUEST_STATUS_RACE          = 5093,
+    LANG_CMD_QUEST_STATUS_LOW_LEVEL     = 5094,
+    LANG_CMD_QUEST_STATUS_HIGH_LEVEL    = 5095,
+    LANG_CMD_QUEST_STATUS_SKILL         = 5096,
+    LANG_CMD_QUEST_STATUS_REPUTATION    = 5097,
+    LANG_CMD_QUEST_STATUS_PREV_QUEST    = 5098,
+    LANG_CMD_QUEST_STATUS_TIMED         = 5099,
+    LANG_CMD_QUEST_STATUS_EXCLUSIVE     = 5100,
+    LANG_CMD_QUEST_STATUS_NEXT_CHAIN    = 5101,
+    LANG_CMD_QUEST_STATUS_PREV_CHAIN    = 5102,
+    LANG_CMD_QUEST_STATUS_BREADCRUMB    = 5103,
+    LANG_CMD_QUEST_STATUS_DAY           = 5104,
+    LANG_CMD_QUEST_STATUS_WEEK          = 5105,
+    LANG_CMD_QUEST_STATUS_MONTH         = 5106,
+    LANG_CMD_QUEST_STATUS_SEASONAL      = 5107,
+    LANG_CMD_QUEST_STATUS_CONDITION     = 5108,
+    LANG_CMD_QUEST_STATUS_LOG_FULL      = 5109,
+    LANG_CMD_QUEST_STATUS_COND_DETAIL   = 5110,
 
-    // Room for more strings    5090-9999
+    // Battlefield commands
+    LANG_BF_NOT_FOUND                   = 5111,
+    LANG_BF_STARTED                     = 5112,
+    LANG_BF_STOPPED                     = 5113,
+    LANG_BF_SWITCHED                    = 5114,
+    LANG_BF_TIMER_SET                   = 5115,
+    LANG_BF_ENABLED                     = 5116,
+    LANG_BF_DISABLED                    = 5117,
+
+    LANG_RESETALL_HONOR                 = 5118,
+    LANG_RESETALL_ARENA                 = 5119,
+
+    // Battlefield queue display (.bf queue)
+    LANG_BF_QUEUE_HDR_WAR               = 5120,
+    LANG_BF_QUEUE_HDR_WAIT              = 5121,
+    LANG_BF_QUEUE_TEAM_HDR              = 5122,
+    LANG_BF_QUEUE_PLAYER_QUEUE          = 5123,
+    LANG_BF_QUEUE_PLAYER_INVITED        = 5124,
+    LANG_BF_QUEUE_PLAYER_WAR            = 5125,
+
+    // Autobroadcast commands
+    LANG_AUTOBROADCAST_LIST_HEADER      = 5126,
+    LANG_AUTOBROADCAST_LIST_ENTRY       = 5127,
+    LANG_AUTOBROADCAST_LIST_EMPTY       = 5128,
+    LANG_AUTOBROADCAST_ADD_SUCCESS      = 5129,
+    LANG_AUTOBROADCAST_REMOVE_SUCCESS   = 5130,
+    LANG_AUTOBROADCAST_NOT_FOUND        = 5131,
+    LANG_AUTOBROADCAST_LOCALE_SUCCESS   = 5132,
+    LANG_AUTOBROADCAST_LOCALE_ENTRY     = 5133,
+    LANG_AUTOBROADCAST_INVALID_LOCALE   = 5134,
+
+    // Mail commands
+    LANG_MAIL_LIST_HEADER               = 5135,
+    LANG_MAIL_LIST_ENTRY                = 5136,
+    LANG_MAIL_LIST_EMPTY                = 5137,
+    LANG_MAIL_RETURN_SUCCESS            = 5138,
+    LANG_MAIL_RETURN_NOT_FOUND          = 5139,
+    LANG_MAIL_RETURN_NOT_NORMAL         = 5140,
+    LANG_MAIL_RETURN_NO_SENDER          = 5141,
+    LANG_MAIL_RETURN_ALREADY_RETURNED   = 5142,
+    LANG_MAIL_RETURN_HOOK_BLOCKED       = 5143,
+
+    // Room for more strings    5144-9999
 
     // Level requirement notifications
     LANG_SAY_REQ                        = 6604,
@@ -1324,6 +1390,8 @@ enum AcoreStrings
     LANG_BAN_IP_YOUBANNEDMESSAGE_WORLD            = 11017,
     LANG_BAN_IP_YOUPERMBANNEDMESSAGE_WORLD        = 11018,
 
+    LANG_LFG_COOLDOWN_CLEARED                     = 11019,
+
     LANG_MUTED_PLAYER                             = 30000, // Mute for player 2 hour
 
     // Instant Flight
@@ -1345,6 +1413,42 @@ enum AcoreStrings
     // 30087-30095 reserved for passive anticheat
 
     LANG_DEBUG_LFG_ON                             = 30096,
-    LANG_DEBUG_LFG_OFF                            = 30097
+    LANG_DEBUG_LFG_OFF                            = 30097,
+    LANG_DEBUG_LFG_CONF                           = 30098,
+
+    // debug loot command
+    LANG_DEBUG_LOOT_HEADER                        = 30099,
+    LANG_DEBUG_LOOT_ITEM                          = 30100,
+    LANG_DEBUG_LOOT_ITEM_QUEST                    = 30101,
+    LANG_DEBUG_LOOT_GOLD                          = 30102,
+    LANG_DEBUG_LOOT_EMPTY                         = 30103,
+    LANG_DEBUG_LOOT_INVALID_TYPE                  = 30104,
+    LANG_DEBUG_LOOT_NO_TEMPLATE                   = 30105,
+    LANG_DEBUG_LOOT_HEADER_MULTI                  = 30106,
+    LANG_DEBUG_LOOT_ITEM_MULTI                    = 30107,
+    LANG_DEBUG_LOOT_ITEM_QUEST_MULTI              = 30108,
+    LANG_DEBUG_LOOT_GOLD_MULTI                    = 30109,
+
+    // debug factionchange command (30110-30125)
+    LANG_DEBUG_FACTIONCHANGE_HEADER               = 30110,
+    LANG_DEBUG_FACTIONCHANGE_FLAG_FACTION          = 30111,
+    LANG_DEBUG_FACTIONCHANGE_FLAG_RACE             = 30112,
+    LANG_DEBUG_FACTIONCHANGE_FLAG_NONE             = 30113,
+    LANG_DEBUG_FACTIONCHANGE_GUILD_FAIL            = 30114,
+    LANG_DEBUG_FACTIONCHANGE_GUILD_OK              = 30115,
+    LANG_DEBUG_FACTIONCHANGE_ARENA_CAPTAIN_FAIL    = 30116,
+    LANG_DEBUG_FACTIONCHANGE_ARENA_CAPTAIN_OK      = 30117,
+    LANG_DEBUG_FACTIONCHANGE_MAIL_FAIL             = 30118,
+    LANG_DEBUG_FACTIONCHANGE_MAIL_OK               = 30119,
+    LANG_DEBUG_FACTIONCHANGE_AUCTION_FAIL          = 30120,
+    LANG_DEBUG_FACTIONCHANGE_AUCTION_OK            = 30121,
+    LANG_DEBUG_FACTIONCHANGE_GOLD_FAIL             = 30122,
+    LANG_DEBUG_FACTIONCHANGE_GOLD_OK               = 30123,
+    LANG_DEBUG_FACTIONCHANGE_GOLD_NOLIMIT          = 30124,
+    LANG_DEBUG_FACTIONCHANGE_NA                    = 30125,
+
+    // Achievement commands
+    LANG_ACHIEVEMENT_ADD_ONLINE                    = 30126,
+    LANG_ACHIEVEMENT_ADD_OFFLINE                   = 30127
 };
 #endif

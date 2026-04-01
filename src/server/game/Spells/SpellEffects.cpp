@@ -856,7 +856,7 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
                         SpellInfo const* spell = iter->second->GetBase()->GetSpellInfo();
 
                         // Pounce Bleed shouldn't be removed by Cloak of Shadows.
-                        if (spell->GetAllEffectsMechanicMask() & 1 << MECHANIC_BLEED)
+                        if (spell->GetAllEffectsMechanicMask() & (UI64LIT(1) << MECHANIC_BLEED))
                             return;
 
                         bool dmgClassNone = false;
@@ -1557,11 +1557,13 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
         else if (m_spellInfo->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT && m_spellInfo->SpellFamilyFlags[0] & 0x00080000)
         {
             addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, int32(caster->CountPctFromMaxHealth(damage)), HEAL, effIndex);
+            m_damageBeforeTakenMods -= addhealth;
             addhealth = unitTarget->SpellHealingBonusTaken(caster, m_spellInfo, addhealth, HEAL);
         }
         else if (m_spellInfo->Id != 33778) // not lifebloom
         {
             addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL, effIndex);
+            m_damageBeforeTakenMods -= addhealth;
             addhealth = unitTarget->SpellHealingBonusTaken(caster, m_spellInfo, addhealth, HEAL);
         }
 
@@ -1593,6 +1595,7 @@ void Spell::EffectHealPct(SpellEffIndex effIndex)
         return;
 
     uint32 heal = m_originalCaster->SpellHealingBonusDone(unitTarget, m_spellInfo, unitTarget->CountPctFromMaxHealth(damage), HEAL, effIndex);
+    m_damageBeforeTakenMods -= heal;
     heal = unitTarget->SpellHealingBonusTaken(m_originalCaster, m_spellInfo, heal, HEAL);
 
     m_damage -= heal;
@@ -1611,6 +1614,7 @@ void Spell::EffectHealMechanical(SpellEffIndex effIndex)
         return;
 
     uint32 heal = m_originalCaster->SpellHealingBonusDone(unitTarget, m_spellInfo, uint32(damage), HEAL, effIndex);
+    m_damageBeforeTakenMods -= heal;
 
     m_damage -= unitTarget->SpellHealingBonusTaken(m_originalCaster, m_spellInfo, heal, HEAL);
 }
@@ -1885,7 +1889,7 @@ void Spell::EffectEnergize(SpellEffIndex effIndex)
     if (!unitTarget->IsAlive())
         return;
 
-    if (unitTarget->HasUnitState(UNIT_STATE_ISOLATED))
+    if (unitTarget->IsImmunedToAuraPeriodicTick(m_caster, m_spellInfo))
     {
         m_caster->SendSpellDamageImmune(unitTarget, GetSpellInfo()->Id);
         return;
@@ -1992,6 +1996,12 @@ void Spell::EffectEnergizePct(SpellEffIndex effIndex)
         return;
     if (!unitTarget->IsAlive())
         return;
+
+    if (unitTarget->HasUnitState(UNIT_STATE_ISOLATED))
+    {
+        m_caster->SendSpellDamageImmune(unitTarget, GetSpellInfo()->Id);
+        return;
+    }
 
     if (m_spellInfo->Effects[effIndex].MiscValue < 0 || m_spellInfo->Effects[effIndex].MiscValue >= int8(MAX_POWERS))
         return;
@@ -2642,7 +2652,7 @@ void Spell::EffectDispel(SpellEffIndex effIndex)
 
     // put in combat
     if (unitTarget->IsFriendlyTo(m_caster))
-        unitTarget->getHostileRefMgr().threatAssist(m_caster, 0.0f, m_spellInfo);
+        unitTarget->GetThreatMgr().ForwardThreatForAssistingMe(m_caster, 0.0f, m_spellInfo);
 
     if (success_list.empty())
         return;
@@ -3289,33 +3299,25 @@ void Spell::EffectTaunt(SpellEffIndex /*effIndex*/)
     if (!unitTarget)
         return;
 
-    // xinef: Hand of Reckoning, cast before checing canhavethreatlist. fixes damage against pets
+    // xinef: Hand of Reckoning, cast before checking canhavethreatlist. fixes damage against pets
     if (m_spellInfo->Id == 62124 && unitTarget->GetVictim() != m_caster)
-    {
         m_caster->CastSpell(unitTarget, 67485, true);
-        unitTarget->CombatStart(m_caster);
-    }
 
-    // this effect use before aura Taunt apply for prevent taunt already attacking target
-    // for spell as marked "non effective at already attacking target"
-    if (!unitTarget->CanHaveThreatList() || (unitTarget->GetVictim() == m_caster && !m_spellInfo->HasAura(SPELL_AURA_MOD_TAUNT)))
+    if (!unitTarget->CanHaveThreatList())
     {
         SendCastResult(SPELL_FAILED_DONT_REPORT);
         return;
     }
 
-    if (!unitTarget->GetThreatMgr().GetOnlineContainer().empty())
+    ThreatManager& mgr = unitTarget->GetThreatMgr();
+    if (mgr.GetCurrentVictim() == m_caster)
     {
-        // Also use this effect to set the taunter's threat to the taunted creature's highest value
-        float myThreat = unitTarget->GetThreatMgr().GetThreat(m_caster);
-        float topThreat = unitTarget->GetThreatMgr().GetOnlineContainer().getMostHated()->GetThreat();
-        if (topThreat > myThreat)
-            unitTarget->GetThreatMgr().DoAddThreat(m_caster, topThreat - myThreat);
-
-        //Set aggro victim to caster
-        if (HostileReference* forcedVictim = unitTarget->GetThreatMgr().GetOnlineContainer().getReferenceByTarget(m_caster))
-            unitTarget->GetThreatMgr().setCurrentVictim(forcedVictim);
+        SendCastResult(SPELL_FAILED_DONT_REPORT);
+        return;
     }
+
+    if (!mgr.IsThreatListEmpty())
+        mgr.MatchUnitThreatToHighestThreat(m_caster);
 }
 
 void Spell::EffectWeaponDmg(SpellEffIndex effIndex)
@@ -3667,7 +3669,8 @@ void Spell::EffectThreat(SpellEffIndex /*effIndex*/)
     if (!unitTarget->CanHaveThreatList() || m_caster->IsFriendlyTo(unitTarget))
         return;
 
-    unitTarget->AddThreat(m_caster, float(damage));
+    // SPELL_EFFECT_THREAT adds flat threat that should not be modified by threat reduction
+    unitTarget->GetThreatMgr().AddThreat(m_caster, float(damage), m_spellInfo, true);
 }
 
 void Spell::EffectHealMaxHealth(SpellEffIndex /*effIndex*/)
@@ -3678,7 +3681,7 @@ void Spell::EffectHealMaxHealth(SpellEffIndex /*effIndex*/)
     if (!unitTarget || !unitTarget->IsAlive())
         return;
 
-    if (unitTarget->HasUnitState(UNIT_STATE_ISOLATED))
+    if (unitTarget->IsImmunedToAuraPeriodicTick(m_caster, m_spellInfo))
     {
         m_caster->SendSpellDamageImmune(unitTarget, GetSpellInfo()->Id);
         return;
@@ -3751,7 +3754,8 @@ void Spell::EffectSummonObjectWild(SpellEffIndex effIndex)
 
     Map* map = target->GetMap();
 
-    if (!pGameObj->Create(map->GenerateLowGuid<HighGuid::GameObject>(), gameobject_id, map, m_caster->GetPhaseMask(), x, y, z, target->GetOrientation(), G3D::Quat(), 100, GO_STATE_READY))
+    G3D::Quat rotation = G3D::Quat::fromAxisAngleRotation(G3D::Vector3::unitZ(), target->GetOrientation());
+    if (!pGameObj->Create(map->GenerateLowGuid<HighGuid::GameObject>(), gameobject_id, map, m_caster->GetPhaseMask(), x, y, z, target->GetOrientation(), rotation, 100, GO_STATE_READY))
     {
         delete pGameObj;
         return;
@@ -3927,39 +3931,6 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
 
                             return;
                         }
-                    // Stoneclaw Totem
-                    case 55328: // Rank 1
-                    case 55329: // Rank 2
-                    case 55330: // Rank 3
-                    case 55332: // Rank 4
-                    case 55333: // Rank 5
-                    case 55335: // Rank 6
-                    case 55278: // Rank 7
-                    case 58589: // Rank 8
-                    case 58590: // Rank 9
-                    case 58591: // Rank 10
-                        {
-                            int32 basepoints0 = damage;
-                            // Cast Absorb on totems
-                            for (uint8 slot = SUMMON_SLOT_TOTEM_FIRE; slot < MAX_TOTEM_SLOT; ++slot)
-                            {
-                                if (!unitTarget->m_SummonSlot[slot])
-                                    continue;
-
-                                Creature* totem = unitTarget->GetMap()->GetCreature(unitTarget->m_SummonSlot[slot]);
-                                if (totem && totem->IsTotem())
-                                {
-                                    m_caster->CastCustomSpell(totem, 55277, &basepoints0, nullptr, nullptr, true);
-                                }
-                            }
-                            // Glyph of Stoneclaw Totem
-                            if (AuraEffect* aur = unitTarget->GetAuraEffect(63298, 0))
-                            {
-                                basepoints0 *= aur->GetAmount();
-                                m_caster->CastCustomSpell(unitTarget, 55277, &basepoints0, nullptr, nullptr, true);
-                            }
-                            break;
-                        }
                     case 61263: // for item Intravenous Healing Potion (44698)
                         {
                             if (!m_caster || !unitTarget)
@@ -4024,24 +3995,18 @@ void Spell::EffectSanctuary(SpellEffIndex /*effIndex*/)
     if (!unitTarget)
         return;
 
-    if (unitTarget->GetInstanceScript() && unitTarget->GetInstanceScript()->IsEncounterInProgress())
+    unitTarget->GetThreatMgr().EvaluateSuppressed();
+
+    if (unitTarget->IsPlayer() && !unitTarget->GetMap()->IsDungeon())
     {
-        unitTarget->getHostileRefMgr().UpdateVisibility(true);
-        // Xinef: replaced with CombatStop(false)
-        unitTarget->AttackStop();
-        unitTarget->RemoveAllAttackers();
-
-        // Night Elf: Shadowmeld only resets threat temporarily
-        if (m_spellInfo->Id != 59646)
-            unitTarget->getHostileRefMgr().addThreatPercent(-100);
-
-        if (unitTarget->IsPlayer())
-            unitTarget->ToPlayer()->SendAttackSwingCancelAttack();     // melee and ranged forced attack cancel
+        // stop all pve combat for players outside dungeons, suppress pvp combat
+        unitTarget->CombatStop(false, false);
     }
     else
     {
-        unitTarget->getHostileRefMgr().UpdateVisibility(m_spellInfo->Id == 59646); // Night Elf: Shadowmeld
-        unitTarget->CombatStop(true);
+        // in dungeons (or for nonplayers), reset this unit on all enemies' threat lists
+        for (auto const& pair : unitTarget->GetThreatMgr().GetThreatenedByMeList())
+            pair.second->ScaleThreat(0.0f);
     }
 
     UnitList targets;
@@ -4132,12 +4097,13 @@ void Spell::EffectDuel(SpellEffIndex effIndex)
     GameObject* pGameObj = sObjectMgr->IsGameObjectStaticTransport(gameobject_id) ? new StaticTransport() : new GameObject();
 
     Map* map = m_caster->GetMap();
+    G3D::Quat rotation = G3D::Quat::fromAxisAngleRotation(G3D::Vector3::unitZ(), m_caster->GetOrientation());
     if (!pGameObj->Create(map->GenerateLowGuid<HighGuid::GameObject>(), gameobject_id,
                           map, m_caster->GetPhaseMask(),
                           m_caster->GetPositionX() + (unitTarget->GetPositionX() - m_caster->GetPositionX()) / 2,
                           m_caster->GetPositionY() + (unitTarget->GetPositionY() - m_caster->GetPositionY()) / 2,
                           m_caster->GetPositionZ(),
-                          m_caster->GetOrientation(), G3D::Quat(), 0, GO_STATE_READY))
+                          m_caster->GetOrientation(), rotation, 0, GO_STATE_READY))
     {
         delete pGameObj;
         return;
@@ -4613,7 +4579,8 @@ void Spell::EffectSummonObject(SpellEffIndex effIndex)
         m_caster->GetClosePoint(x, y, z, DEFAULT_WORLD_OBJECT_SIZE);
 
     Map* map = m_caster->GetMap();
-    if (!pGameObj->Create(map->GenerateLowGuid<HighGuid::GameObject>(), gameobjectId, map, m_caster->GetPhaseMask(), x, y, z, m_caster->GetOrientation(), G3D::Quat(), 0, GO_STATE_READY))
+    G3D::Quat rotation = G3D::Quat::fromAxisAngleRotation(G3D::Vector3::unitZ(), m_caster->GetOrientation());
+    if (!pGameObj->Create(map->GenerateLowGuid<HighGuid::GameObject>(), gameobjectId, map, m_caster->GetPhaseMask(), x, y, z, m_caster->GetOrientation(), rotation, 0, GO_STATE_READY))
     {
         delete pGameObj;
         return;
@@ -5185,7 +5152,7 @@ void Spell::EffectDispelMechanic(SpellEffIndex effIndex)
             continue;
         if (roll_chance_i(aura->CalcDispelChance(unitTarget, !unitTarget->IsFriendlyTo(m_caster))))
         {
-            if ((aura->GetSpellInfo()->GetAllEffectsMechanicMask() & (1 << mechanic)))
+            if ((aura->GetSpellInfo()->GetAllEffectsMechanicMask() & (UI64LIT(1) << mechanic)))
             {
                 dispel_list.push(std::make_pair(aura->GetId(), aura->GetCasterGUID()));
 
@@ -5205,7 +5172,7 @@ void Spell::EffectDispelMechanic(SpellEffIndex effIndex)
 
     // put in combat
     if (unitTarget->IsFriendlyTo(m_caster))
-        unitTarget->getHostileRefMgr().threatAssist(m_caster, 0.0f, m_spellInfo);
+        unitTarget->GetThreatMgr().ForwardThreatForAssistingMe(m_caster, 0.0f, m_spellInfo);
 }
 
 void Spell::EffectResurrectPet(SpellEffIndex /*effIndex*/)
@@ -5417,7 +5384,8 @@ void Spell::EffectTransmitted(SpellEffIndex effIndex)
 
     GameObject* pGameObj = sObjectMgr->IsGameObjectStaticTransport(name_id) ? new StaticTransport() : new GameObject();
 
-    if (!pGameObj->Create(cMap->GenerateLowGuid<HighGuid::GameObject>(), name_id, cMap, m_caster->GetPhaseMask(), fx, fy, fz, m_caster->GetOrientation(), G3D::Quat(), 100, GO_STATE_READY))
+    G3D::Quat rotation = G3D::Quat::fromAxisAngleRotation(G3D::Vector3::unitZ(), m_caster->GetOrientation());
+    if (!pGameObj->Create(cMap->GenerateLowGuid<HighGuid::GameObject>(), name_id, cMap, m_caster->GetPhaseMask(), fx, fy, fz, m_caster->GetOrientation(), rotation, 100, GO_STATE_READY))
     {
         delete pGameObj;
         return;
@@ -5922,7 +5890,7 @@ void Spell::EffectRedirectThreat(SpellEffIndex /*effIndex*/)
         return;
 
     if (unitTarget)
-        m_caster->SetRedirectThreat(unitTarget->GetGUID(), uint32(damage));
+        m_caster->GetThreatMgr().RegisterRedirectThreat(m_spellInfo->Id, unitTarget->GetGUID(), uint32(damage));
 }
 
 void Spell::EffectGameObjectDamage(SpellEffIndex /*effIndex*/)
@@ -5975,6 +5943,9 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
 
     if (caster->IsTotem())
         caster = caster->ToTotem()->GetOwner();
+    else if (caster->IsPet())
+        if (Unit* owner = caster->GetOwner())
+            caster = owner;
 
     // in another case summon new
     uint8 summonLevel = caster->GetLevel();

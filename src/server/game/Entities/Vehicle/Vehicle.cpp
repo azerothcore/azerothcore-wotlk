@@ -26,6 +26,7 @@
 #include "TemporarySummon.h"
 #include "Unit.h"
 #include "Util.h"
+#include <algorithm>
 
 Vehicle::Vehicle(Unit* unit, VehicleEntry const* vehInfo, uint32 creatureEntry) :
     _me(unit), _vehicleInfo(vehInfo), _usableSeatNum(0), _creatureEntry(creatureEntry), _status(STATUS_NONE)
@@ -444,6 +445,10 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
         init.SetTransportEnter();
         init.Launch();
 
+        // Transfer threat from passenger to vehicle
+        for (auto const& [guid, threatRef] : unit->GetThreatMgr().GetThreatenedByMeList())
+            threatRef->GetOwner()->GetThreatMgr().AddThreat(_me, threatRef->GetThreat(), nullptr, true, true);
+
         if (_me->IsCreature())
         {
             if (_me->ToCreature()->IsAIEnabled)
@@ -560,6 +565,11 @@ bool Vehicle::IsVehicleInUse()
         }
 
     return false;
+}
+
+bool Vehicle::IsControllableVehicle() const
+{
+    return std::ranges::any_of(Seats, [](auto const& seat) { return seat.second.SeatInfo->CanControl(); });
 }
 
 void Vehicle::TeleportVehicle(float x, float y, float z, float ang)

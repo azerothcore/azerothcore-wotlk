@@ -186,10 +186,6 @@ struct boss_archimonde : public BossAI
 {
     boss_archimonde(Creature* creature) : BossAI(creature, DATA_ARCHIMONDE)
     {
-        scheduler.SetValidator([&]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
     }
 
     void Reset() override
@@ -215,7 +211,7 @@ struct boss_archimonde : public BossAI
             scheduler.CancelAll();
             me->SetReactState(REACT_PASSIVE);
             DoCastAOE(SPELL_PROTECTION_OF_ELUNE, true);
-            Talk(SAY_ENRAGE);
+            Talk(SAY_DEATH);
             _enraged = true;
             me->GetMotionMaster()->Clear(false);
             me->GetMotionMaster()->MoveIdle();

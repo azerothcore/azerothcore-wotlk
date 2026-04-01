@@ -105,58 +105,6 @@ public:
 };
 
 /*######
-## npc_great_bear_spirit
-######*/
-
-class npc_great_bear_spirit : public CreatureScript
-{
-public:
-    npc_great_bear_spirit() : CreatureScript("npc_great_bear_spirit") { }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        switch (action)
-        {
-            case GOSSIP_ACTION_INFO_DEF:
-                AddGossipItemFor(player, 3881, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                SendGossipMenuFor(player, 4721, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 1:
-                AddGossipItemFor(player, 3883, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                SendGossipMenuFor(player, 4733, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 2:
-                AddGossipItemFor(player, 3884, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                SendGossipMenuFor(player, 4734, creature->GetGUID());
-                break;
-            case GOSSIP_ACTION_INFO_DEF + 3:
-                SendGossipMenuFor(player, 4735, creature->GetGUID());
-                if (player->GetQuestStatus(5929) == QUEST_STATUS_INCOMPLETE)
-                    player->AreaExploredOrEventHappens(5929);
-                if (player->GetQuestStatus(5930) == QUEST_STATUS_INCOMPLETE)
-                    player->AreaExploredOrEventHappens(5930);
-                break;
-        }
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        //ally or horde quest
-        if (player->GetQuestStatus(5929) == QUEST_STATUS_INCOMPLETE || player->GetQuestStatus(5930) == QUEST_STATUS_INCOMPLETE)
-        {
-            AddGossipItemFor(player, 3882, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-            SendGossipMenuFor(player, 4719, creature->GetGUID());
-        }
-        else
-            SendGossipMenuFor(player, 4718, creature->GetGUID());
-
-        return true;
-    }
-};
-
-/*######
 ## npc_silva_filnaveth
 ######*/
 
@@ -553,6 +501,7 @@ public:
             else if (EventOnWait) EventTimer -= diff;
         }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 waypointId) override
         {
             CurrWP = waypointId;
@@ -713,7 +662,6 @@ public:
 void AddSC_moonglade()
 {
     new npc_bunthen_plainswind();
-    new npc_great_bear_spirit();
     new npc_silva_filnaveth();
     new npc_clintar_spirit();
     new npc_omen();

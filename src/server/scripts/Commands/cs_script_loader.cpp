@@ -19,6 +19,7 @@
 void AddSC_account_commandscript();
 void AddSC_achievement_commandscript();
 void AddSC_arena_commandscript();
+void AddSC_autobroadcast_commandscript();
 void AddSC_bag_commandscript();
 void AddSC_ban_commandscript();
 void AddSC_bf_commandscript();
@@ -42,6 +43,7 @@ void AddSC_learn_commandscript();
 void AddSC_lfg_commandscript();
 void AddSC_list_commandscript();
 void AddSC_lookup_commandscript();
+void AddSC_mail_commandscript();
 void AddSC_message_commandscript();
 void AddSC_misc_commandscript();
 void AddSC_mmaps_commandscript();
@@ -56,6 +58,7 @@ void AddSC_reset_commandscript();
 void AddSC_send_commandscript();
 void AddSC_server_commandscript();
 void AddSC_spectator_commandscript();
+void AddSC_spellinfo_commandscript();
 void AddSC_tele_commandscript();
 void AddSC_ticket_commandscript();
 void AddSC_titles_commandscript();
@@ -72,6 +75,7 @@ void AddCommandsScripts()
     AddSC_account_commandscript();
     AddSC_achievement_commandscript();
     AddSC_arena_commandscript();
+    AddSC_autobroadcast_commandscript();
     AddSC_bag_commandscript();
     AddSC_ban_commandscript();
     AddSC_bf_commandscript();
@@ -95,6 +99,7 @@ void AddCommandsScripts()
     AddSC_lfg_commandscript();
     AddSC_list_commandscript();
     AddSC_lookup_commandscript();
+    AddSC_mail_commandscript();
     AddSC_message_commandscript();
     AddSC_misc_commandscript();
     AddSC_mmaps_commandscript();
@@ -109,6 +114,7 @@ void AddCommandsScripts()
     AddSC_send_commandscript();
     AddSC_server_commandscript();
     AddSC_spectator_commandscript();
+    AddSC_spellinfo_commandscript();
     AddSC_tele_commandscript();
     AddSC_ticket_commandscript();
     AddSC_titles_commandscript();

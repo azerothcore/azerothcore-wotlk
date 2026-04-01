@@ -376,9 +376,9 @@ bool LootStoreItem::IsValid(LootStore const& store, uint32 entry) const
     {
         if (needs_quest)
             LOG_ERROR("sql.sql", "Table '{}' Entry {} Item {}: quest required will be ignored", store.GetName(), entry, itemid);
-        else if (chance == 0)                              // no chance for the reference
+        else if (chance == 0 && groupid == 0)
         {
-            LOG_ERROR("sql.sql", "Table '{}' Entry {} Item {}: zero chance is specified for a reference, skipped", store.GetName(), entry, itemid);
+            LOG_ERROR("sql.sql", "Table '{}' Entry {} Item {}: zero chance is specified for an ungrouped reference, skipped", store.GetName(), entry, itemid);
             return false;
         }
     }
@@ -418,83 +418,34 @@ bool LootItem::AllowedForPlayer(Player const* player, ObjectGuid source) const
 {
     ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(itemid);
     if (!pProto)
-    {
         return false;
-    }
 
     if (sDisableMgr->IsDisabledFor(DISABLE_TYPE_LOOT, itemid, nullptr))
-    {
         return false;
-    }
 
-    bool isMasterLooter = player->GetGroup() && player->GetGroup()->GetMasterLooterGuid() == player->GetGUID();
-    bool itemVisibleForMasterLooter = !needs_quest && (!follow_loot_rules || !is_underthreshold);
-
-    // DB conditions check
     if (!sConditionMgr->IsObjectMeetToConditions(const_cast<Player*>(player), conditions))
-    {
-        // Master Looter can see conditioned recipes
-        if (isMasterLooter && itemVisibleForMasterLooter)
-        {
-            if (pProto->HasFlag(ITEM_FLAG_HIDE_UNUSABLE_RECIPE) || (pProto->Class == ITEM_CLASS_RECIPE && pProto->Bonding == BIND_WHEN_PICKED_UP && pProto->Spells[1].SpellId != 0))
-            {
-                return true;
-            }
-        }
-
         return false;
-    }
 
     // not show loot for not own team
     if (pProto->HasFlag2(ITEM_FLAG2_FACTION_HORDE) && player->GetTeamId(true) != TEAM_HORDE)
-    {
         return false;
-    }
 
     if (pProto->HasFlag2(ITEM_FLAG2_FACTION_ALLIANCE) && player->GetTeamId(true) != TEAM_ALLIANCE)
-    {
         return false;
-    }
 
-    // Master looter can see all items even if the character can't loot them
-    if (isMasterLooter && itemVisibleForMasterLooter)
-    {
-        return true;
-    }
-
-    // Don't allow loot for players without profession or those who already know the recipe
+    // profession / recipe checks
     if (pProto->HasFlag(ITEM_FLAG_HIDE_UNUSABLE_RECIPE) && (!player->HasSkill(pProto->RequiredSkill) || player->HasSpell(pProto->Spells[1].SpellId)))
-    {
         return false;
-    }
 
-    // Don't allow to loot soulbound recipes that the player has already learned
     if (pProto->Class == ITEM_CLASS_RECIPE && pProto->Bonding == BIND_WHEN_PICKED_UP && pProto->Spells[1].SpellId != 0 && player->HasSpell(pProto->Spells[1].SpellId))
-    {
         return false;
-    }
 
     // check quest requirements
-    if (!pProto->HasFlagCu(ITEM_FLAGS_CU_IGNORE_QUEST_STATUS))
-    {
-        //  Don't drop quest items if the player is missing the relevant quest
-        if (needs_quest && !player->HasQuestForItem(itemid))
-            return false;
-
-        // for items that start quests
-        if (pProto->StartQuest)
-        {
-            // Don't drop the item if the player has already finished the quest OR player already has the item in their inventory, and that item is unique OR the player has not finished a prerequisite quest
-            uint32 prevQuestId = sObjectMgr->GetQuestTemplate(pProto->StartQuest) ? sObjectMgr->GetQuestTemplate(pProto->StartQuest)->GetPrevQuestId() : 0;
-            if (player->GetQuestStatus(pProto->StartQuest) != QUEST_STATUS_NONE || (player->HasItemCount(itemid, pProto->MaxCount) && pProto->MaxCount) || (prevQuestId && !player->GetQuestRewardStatus(prevQuestId)))
-                return false;
-        }
-    }
+    if (needs_quest && !pProto->HasFlagCu(ITEM_FLAGS_CU_IGNORE_QUEST_STATUS) && !player->HasQuestForItem(itemid))
+        return false;
 
     if (!sScriptMgr->OnAllowedForPlayerLootCheck(player, source))
-    {
         return false;
-    }
 
     return true;
 }
@@ -691,7 +642,7 @@ QuestItemList* Loot::FillQuestLoot(Player* player)
 
     QuestItemList* ql = new QuestItemList();
 
-    Player* lootOwner = (roundRobinPlayer) ? ObjectAccessor::FindPlayer(roundRobinPlayer) : player;
+    bool isMasterLooter = player->GetGroup() && player->GetGroup()->GetLootMethod() == MASTER_LOOT && player->GetGroup()->GetMasterLooterGuid() == player->GetGUID();
 
     for (uint8 i = 0; i < quest_items.size(); ++i)
     {
@@ -699,32 +650,33 @@ QuestItemList* Loot::FillQuestLoot(Player* player)
 
         sScriptMgr->OnPlayerBeforeFillQuestLootItem(player, item);
 
-        // Quest item is not free for all and is already assigned to another player
-        // or player doesn't need it
-        if (item.is_blocked || !item.AllowedForPlayer(player, sourceWorldObjectGUID))
-        {
-            continue;
-        }
+        bool allowed = item.AllowedForPlayer(player, sourceWorldObjectGUID);
 
-        // Player is not the loot owner, and loot owner still needs this quest item
-        if (!item.freeforall &&
-            lootOwner && lootOwner != player &&
-            item.AllowedForPlayer(lootOwner, sourceWorldObjectGUID))
-        {
+        if (!allowed && !isMasterLooter)
             continue;
-        }
 
         ql->push_back(QuestItem(i));
-        ++unlootedCount;
 
-        if (!item.freeforall)
+        // Only add "allowed looter" if you are actually allowed to loot.
+        if (allowed)
         {
-            item.is_blocked = true;
+            item.AddAllowedLooter(player);
+
+            if (item.freeforall)
+            {
+                ++unlootedCount;
+            }
+            else if (!item.is_counted)
+            {
+                ++unlootedCount;
+                item.is_counted = true;
+            }
         }
 
         if (items.size() + ql->size() == MAX_NR_LOOT_ITEMS)
             break;
     }
+
     if (ql->empty())
     {
         delete ql;
@@ -1340,7 +1292,7 @@ bool LootTemplate::LootGroup::HasQuestDrop(LootTemplateMap const& store) const
                 continue; // Error message [should be] already printed at loading stage
             }
 
-            if (Referenced->second->HasQuestDrop(store, item->groupid))
+            if (Referenced->second->HasQuestDrop(store))
             {
                 return true;
             }
@@ -1362,7 +1314,7 @@ bool LootTemplate::LootGroup::HasQuestDrop(LootTemplateMap const& store) const
                 continue; // Error message [should be] already printed at loading stage
             }
 
-            if (Referenced->second->HasQuestDrop(store, item->groupid))
+            if (Referenced->second->HasQuestDrop(store))
             {
                 return true;
             }
@@ -1390,7 +1342,7 @@ bool LootTemplate::LootGroup::HasQuestDropForPlayer(Player const* player, LootTe
                 continue;                                   // Error message already printed at loading stage
             }
 
-            if (Referenced->second->HasQuestDropForPlayer(store, player, item->groupid))
+            if (Referenced->second->HasQuestDropForPlayer(store, player))
             {
                 return true;
             }
@@ -1412,7 +1364,7 @@ bool LootTemplate::LootGroup::HasQuestDropForPlayer(Player const* player, LootTe
                 continue;                                   // Error message already printed at loading stage
             }
 
-            if (Referenced->second->HasQuestDropForPlayer(store, player, item->groupid))
+            if (Referenced->second->HasQuestDropForPlayer(store, player))
             {
                 return true;
             }
@@ -1451,7 +1403,7 @@ void LootTemplate::LootGroup::Process(Loot& loot, Player const* player, LootStor
                 for (uint32 loop = 0; loop < maxcount; ++loop) // Ref multiplicator
                     // This reference needs to be processed further, but it is marked isTopLevel=false so that any groups inside
                     // the reference are not multiplied by Rate.Drop.Item.GroupAmount
-                    Referenced->Process(loot, store, lootMode, player, item->groupid, false);
+                    Referenced->Process(loot, store, lootMode, player, 0, false);
             }
         }
         else
@@ -1561,9 +1513,7 @@ LootTemplate::~LootTemplate()
 // Adds an entry to the group (at loading stage)
 void LootTemplate::AddEntry(LootStoreItem* item)
 {
-    // `item->reference` > 0 --> Reference is counted as a normal and non grouped entry
-    // `item->reference` < 0 --> Reference is counted as grouped entry within shared groupid
-    if (item->groupid > 0 && item->reference <= 0)  // Group and grouped reference
+    if (item->groupid > 0)  // Group and grouped reference
     {
         if (item->groupid >= Groups.size())
         {
@@ -1768,19 +1718,8 @@ void LootTemplate::Process(Loot& loot, LootStore const& store, uint16 lootMode, 
 }
 
 // True if template includes at least 1 quest drop entry
-bool LootTemplate::HasQuestDrop(LootTemplateMap const& store, uint8 groupId) const
+bool LootTemplate::HasQuestDrop(LootTemplateMap const& store) const
 {
-    if (groupId)                                            // Group reference
-    {
-        if (groupId > Groups.size())
-            return false;                                   // Error message [should be] already printed at loading stage
-
-        if (!Groups[groupId - 1])
-            return false;
-
-        return Groups[groupId - 1]->HasQuestDrop(store);
-    }
-
     for (LootStoreItemList::const_iterator i = Entries.begin(); i != Entries.end(); ++i)
     {
         LootStoreItem* item = *i;
@@ -1790,7 +1729,7 @@ bool LootTemplate::HasQuestDrop(LootTemplateMap const& store, uint8 groupId) con
             if (Referenced == store.end())
                 continue;                                   // Error message [should be] already printed at loading stage
 
-            if (Referenced->second->HasQuestDrop(store, item->groupid))
+            if (Referenced->second->HasQuestDrop(store))
                 return true;
         }
         else if (item->needs_quest)
@@ -1813,19 +1752,8 @@ bool LootTemplate::HasQuestDrop(LootTemplateMap const& store, uint8 groupId) con
 }
 
 // True if template includes at least 1 quest drop for an active quest of the player
-bool LootTemplate::HasQuestDropForPlayer(LootTemplateMap const& store, Player const* player, uint8 groupId) const
+bool LootTemplate::HasQuestDropForPlayer(LootTemplateMap const& store, Player const* player) const
 {
-    if (groupId)                                            // Group reference
-    {
-        if (groupId > Groups.size())
-            return false;                                   // Error message already printed at loading stage
-
-        if (!Groups[groupId - 1])
-            return false;
-
-        return Groups[groupId - 1]->HasQuestDropForPlayer(player, store);
-    }
-
     // Checking non-grouped entries
     for (LootStoreItemList::const_iterator i = Entries.begin(); i != Entries.end(); ++i)
     {
@@ -1835,7 +1763,7 @@ bool LootTemplate::HasQuestDropForPlayer(LootTemplateMap const& store, Player co
             LootTemplateMap::const_iterator Referenced = store.find(std::abs(item->reference));
             if (Referenced == store.end())
                 continue;                                   // Error message already printed at loading stage
-            if (Referenced->second->HasQuestDropForPlayer(store, player, item->groupid))
+            if (Referenced->second->HasQuestDropForPlayer(store, player))
                 return true;
         }
         else if (player->HasQuestForItem(item->itemid))

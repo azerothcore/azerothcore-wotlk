@@ -44,6 +44,7 @@ SmartAI::SmartAI(Creature* c) : CreatureAI(c)
     mCanRepeatPath = false;
 
     mEvadeDisabled = false;
+    mSuppressEvade = false;
 
     mCanAutoAttack = true;
 
@@ -109,27 +110,67 @@ void SmartAI::UpdateDespawn(const uint32 diff)
         mDespawnTime -= diff;
 }
 
-WaypointData const* SmartAI::GetNextWayPoint()
+void SmartAI::UpdateFollow(const uint32 diff)
 {
-    if (!mWayPoints || mWayPoints->empty())
+    if (!mFollowGuid)
+        return;
+
+    if (mFollowArrivedTimer < diff)
+    {
+        if (me->FindNearestCreature(mFollowArrivedEntry, INTERACTION_DISTANCE, mFollowArrivedAlive))
+            StopFollow(true);
+        else
+            mFollowArrivedTimer = 1000;
+    }
+    else
+        mFollowArrivedTimer -= diff;
+
+    if (mFollowGuid.IsPlayer())
+    {
+        if (_followCheckTimer < diff)
+        {
+            bool shouldDespawn = false;
+            if (Player* player = ObjectAccessor::FindPlayer(mFollowGuid))
+            {
+                float checkDist = me->GetInstanceScript() ? SMART_ESCORT_MAX_PLAYER_DIST * 2 : SMART_ESCORT_MAX_PLAYER_DIST;
+                if (!me->IsWithinDistInMap(player, checkDist))
+                    shouldDespawn = true;
+            }
+            else
+                shouldDespawn = true;
+
+            if (shouldDespawn)
+                me->DespawnOrUnsummon();
+
+            _followCheckTimer = 1000;
+        }
+        else
+            _followCheckTimer -= diff;
+    }
+}
+
+WaypointNode const* SmartAI::GetNextWayPoint()
+{
+    if (!mWayPoints || mWayPoints->Nodes.empty())
         return nullptr;
 
     mCurrentWPID++;
-    auto itr = mWayPoints->find(mCurrentWPID);
-    if (itr != mWayPoints->end())
-    {
-        mLastWP = &(*itr).second;
-        if (mLastWP->id != mCurrentWPID)
-            LOG_ERROR("scripts.ai.sai", "SmartAI::GetNextWayPoint: Got not expected waypoint id {}, expected {}", mLastWP->id, mCurrentWPID);
+    // mCurrentWPID is 1-based for SmartAI escort paths
+    if (mCurrentWPID > mWayPoints->Nodes.size())
+        return nullptr;
 
-        return &(*itr).second;
-    }
-    return nullptr;
+    // Nodes are 0-indexed, mCurrentWPID is 1-based
+    WaypointNode const& node = mWayPoints->Nodes[mCurrentWPID - 1];
+    mLastWP = &node;
+    if (mLastWP->Id != mCurrentWPID)
+        LOG_ERROR("scripts.ai.sai", "SmartAI::GetNextWayPoint: Got not expected waypoint id {}, expected {}", mLastWP->Id, mCurrentWPID);
+
+    return mLastWP;
 }
 
 void SmartAI::GenerateWayPointArray(Movement::PointsArray* points)
 {
-    if (!mWayPoints || mWayPoints->empty())
+    if (!mWayPoints || mWayPoints->Nodes.empty())
         return;
 
     // Flying unit, just fill array
@@ -138,16 +179,12 @@ void SmartAI::GenerateWayPointArray(Movement::PointsArray* points)
         // xinef: first point in vector is unit real position
         points->clear();
         points->push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-        uint32 wpCounter = mCurrentWPID;
-        auto itr = mWayPoints->find(wpCounter++);
-        do
+        // mCurrentWPID is 1-based
+        for (uint32 i = mCurrentWPID > 0 ? mCurrentWPID - 1 : 0; i < mWayPoints->Nodes.size(); ++i)
         {
-            WaypointData const& wp = (*itr).second;
-            points->push_back(G3D::Vector3(wp.x, wp.y, wp.z));
-
-            itr = mWayPoints->find(wpCounter++);
+            WaypointNode const& wp = mWayPoints->Nodes[i];
+            points->push_back(G3D::Vector3(wp.X, wp.Y, wp.Z));
         }
-        while (itr != mWayPoints->end());
     }
     else
     {
@@ -156,15 +193,15 @@ void SmartAI::GenerateWayPointArray(Movement::PointsArray* points)
             std::vector<G3D::Vector3> pVector;
             // xinef: first point in vector is unit real position
             pVector.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-            uint32 wpCounter = mCurrentWPID;
 
-            uint32 length = (mWayPoints->size() - mCurrentWPID) * size;
+            uint32 startIdx = mCurrentWPID > 0 ? mCurrentWPID - 1 : 0;
+            uint32 length = (uint32)((mWayPoints->Nodes.size() - startIdx) * size);
 
             uint32 cnt = 0;
-            for (auto itr = mWayPoints->find(wpCounter); itr != mWayPoints->end() && cnt++ <= length; ++itr)
+            for (uint32 i = startIdx; i < mWayPoints->Nodes.size() && cnt++ <= length; ++i)
             {
-                WaypointData const& wp = (*itr).second;
-                pVector.push_back(G3D::Vector3(wp.x, wp.y, wp.z));
+                WaypointNode const& wp = mWayPoints->Nodes[i];
+                pVector.push_back(G3D::Vector3(wp.X, wp.Y, wp.Z));
             }
 
             if (pVector.size() > 2) // more than source + dest
@@ -204,10 +241,10 @@ void SmartAI::StartPath(ForcedMovement forcedMovement, uint32 path, bool repeat,
             return;
     }
 
-    if (!mWayPoints || mWayPoints->empty())
+    if (!mWayPoints || mWayPoints->Nodes.empty())
         return;
 
-    if (WaypointData const* wp = GetNextWayPoint())
+    if (WaypointNode const* wp = GetNextWayPoint())
     {
         AddEscortState(SMART_ESCORT_ESCORTING);
         mCanRepeatPath = repeat;
@@ -223,7 +260,7 @@ void SmartAI::StartPath(ForcedMovement forcedMovement, uint32 path, bool repeat,
         GenerateWayPointArray(&pathPoints);
 
         me->GetMotionMaster()->MoveSplinePath(&pathPoints, mForcedMovement);
-        GetScript()->ProcessEventsFor(SMART_EVENT_ESCORT_START, nullptr, wp->id, GetScript()->GetPathId());
+        GetScript()->ProcessEventsFor(SMART_EVENT_ESCORT_START, nullptr, wp->Id, GetScript()->GetPathId());
     }
 }
 
@@ -282,10 +319,11 @@ void SmartAI::PausePath(uint32 delay, bool forced)
         me->StopMoving();
         me->GetMotionMaster()->MoveIdle();//force stop
 
-        auto waypoint = mWayPoints->find(mCurrentWPID);
-        if (waypoint->second.orientation.has_value())
+        if (mCurrentWPID > 0 && mCurrentWPID <= mWayPoints->Nodes.size())
         {
-            me->SetFacingTo(*waypoint->second.orientation);
+            WaypointNode const& waypoint = mWayPoints->Nodes[mCurrentWPID - 1];
+            if (waypoint.Orientation.has_value())
+                me->SetFacingTo(*waypoint.Orientation);
         }
     }
     GetScript()->ProcessEventsFor(SMART_EVENT_ESCORT_PAUSED, nullptr, mCurrentWPID, GetScript()->GetPathId());
@@ -523,28 +561,20 @@ void SmartAI::CheckConditions(const uint32 diff)
 
 void SmartAI::UpdateAI(uint32 diff)
 {
-    bool hasVictim = UpdateVictim();
+    if (!me->IsAlive())
+    {
+        if (IsEngaged())
+            EngagementOver();
+        return;
+    }
+
     CheckConditions(diff);
+
+    bool hasVictim = UpdateVictim();
     GetScript()->OnUpdate(diff);
     UpdatePath(diff);
     UpdateDespawn(diff);
-
-    //TODO move to void
-    if (mFollowGuid)
-    {
-        if (mFollowArrivedTimer < diff)
-        {
-            if (me->FindNearestCreature(mFollowArrivedEntry, INTERACTION_DISTANCE, mFollowArrivedAlive))
-            {
-                StopFollow(true);
-                return;
-            }
-
-            mFollowArrivedTimer = 1000;
-        }
-        else
-            mFollowArrivedTimer -= diff;
-    }
+    UpdateFollow(diff);
 
     if (!IsAIControlled())
     {
@@ -624,7 +654,7 @@ void SmartAI::MovepointReached(uint32 id)
 
     if (mLastWP)
     {
-        me->SetPosition(mLastWP->x, mLastWP->y, mLastWP->z, me->GetOrientation());
+        me->SetPosition(mLastWP->X, mLastWP->Y, mLastWP->Z, me->GetOrientation());
         me->SetHomePosition(me->GetPosition());
     }
 
@@ -669,6 +699,9 @@ void SmartAI::MovementInform(uint32 MovementType, uint32 Data)
 
 void SmartAI::EnterEvadeMode(EvadeReason /*why*/)
 {
+    if (mSuppressEvade)
+        return;
+
     if (mEvadeDisabled)
     {
         GetScript()->ProcessEventsFor(SMART_EVENT_EVADE);
@@ -689,7 +722,12 @@ void SmartAI::EnterEvadeMode(EvadeReason /*why*/)
 
     GetScript()->ProcessEventsFor(SMART_EVENT_EVADE); //must be after aura clear so we can cast spells from db
 
-    if (HasEscortState(SMART_ESCORT_ESCORTING))
+    if (Unit* owner = me->GetCharmerOrOwner())
+    {
+        me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle());
+        me->ClearUnitState(UNIT_STATE_EVADE);
+    }
+    else if (HasEscortState(SMART_ESCORT_ESCORTING))
     {
         AddEscortState(SMART_ESCORT_RETURNING);
         ReturnToLastOOCPos();
@@ -742,7 +780,7 @@ void SmartAI::MoveInLineOfSight(Unit* who)
 
 bool SmartAI::CanAIAttack(Unit const* /*who*/) const
 {
-    return !(me->GetReactState() == REACT_PASSIVE);
+    return true;
 }
 
 bool SmartAI::AssistPlayerInCombatAgainst(Unit* who)
@@ -859,7 +897,7 @@ void SmartAI::AttackStart(Unit* who)
         return;
     }
 
-    if (who && me->Attack(who, me->IsWithinMeleeRange(who) || _currentRangeMode))
+    if (who && me->Attack(who, me->IsWithinMeleeRange(who)))
     {
         if (!me->HasUnitState(UNIT_STATE_NO_COMBAT_MOVEMENT))
         {
@@ -951,6 +989,14 @@ void SmartAI::InitializeAI()
         if (!(event.action.cast.castFlags & SMARTCAST_MAIN_SPELL))
             continue;
 
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(event.action.cast.spell);
+        if (spellInfo && spellInfo->IsPositive())
+        {
+            LOG_WARN("scripts.ai", "SmartAI: Creature {} has SMARTCAST_MAIN_SPELL on positive spell {} - positive spells should not be used as main spell",
+                me->GetEntry(), event.action.cast.spell);
+            continue;
+        }
+
         SetMainSpell(event.action.cast.spell);
         break;
     }
@@ -964,6 +1010,11 @@ void SmartAI::InitializeAI()
                 continue;
 
             if (!(event.action.cast.castFlags & SMARTCAST_COMBAT_MOVE))
+                continue;
+
+            // Don't use positive (healing/buff) spells to determine attack distance
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(event.action.cast.spell);
+            if (spellInfo && spellInfo->IsPositive())
                 continue;
 
             SetMainSpell(event.action.cast.spell);
@@ -990,13 +1041,24 @@ void SmartAI::OnCharmed(bool /* apply */)
 
     mIsCharmed = charmed;
 
+    if (charmed && !me->isPossessed() && !me->IsVehicle())
+        me->GetMotionMaster()->MoveFollow(me->GetCharmer(), PET_FOLLOW_DIST, me->GetFollowAngle());
+
     if (!charmed && !me->IsInEvadeMode())
     {
         if (mCanRepeatPath)
             StartPath(mForcedMovement, GetScript()->GetPathId(), true);
 
-        if (Unit* charmer = me->GetCharmer())
-            AttackStart(charmer);
+        if (!me->LastCharmerGUID.IsEmpty())
+        {
+            if (!me->HasReactState(REACT_PASSIVE))
+                if (Unit* lastCharmer = ObjectAccessor::GetUnit(*me, me->LastCharmerGUID))
+                    me->EngageWithTarget(lastCharmer);
+            me->LastCharmerGUID.Clear();
+
+            if (!me->IsInCombat())
+                EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
+        }
     }
 
     GetScript()->ProcessEventsFor(SMART_EVENT_CHARMED, nullptr, 0, 0, charmed);
@@ -1218,6 +1280,32 @@ void SmartAI::PathEndReached(uint32 /*pathId*/)
     me->LoadPath(0);
 }
 
+void SmartAI::WaypointPathStarted(uint32 /*pathId*/)
+{
+}
+
+void SmartAI::WaypointStarted(uint32 /*nodeId*/, uint32 /*pathId*/)
+{
+}
+
+void SmartAI::WaypointReached(uint32 nodeId, uint32 pathId)
+{
+    if (!HasEscortState(SMART_ESCORT_ESCORTING))
+    {
+        GetScript()->ProcessEventsFor(SMART_EVENT_WAYPOINT_REACHED, nullptr, nodeId, pathId);
+        return;
+    }
+}
+
+void SmartAI::WaypointPathEnded(uint32 nodeId, uint32 pathId)
+{
+    if (!HasEscortState(SMART_ESCORT_ESCORTING))
+    {
+        GetScript()->ProcessEventsFor(SMART_EVENT_WAYPOINT_ENDED, nullptr, nodeId, pathId);
+        return;
+    }
+}
+
 void SmartAI::DistancingEnded()
 {
     SetCurrentRangeMode(true, _pendingDistancing);
@@ -1237,10 +1325,10 @@ bool SmartAI::IsMainSpellPrevented(SpellInfo const* spellInfo) const
     return false;
 }
 
-void SmartAI::OnSpellCastFinished(SpellInfo const* spell, SpellFinishReason reason)
+void SmartAI::OnSpellFailed(SpellInfo const* spell)
 {
-    CreatureAI::OnSpellCastFinished(spell, reason);
-    if (reason == SPELL_FINISHED_CANCELED && _mainSpellId == spell->Id)
+    CreatureAI::OnSpellFailed(spell);
+    if (_mainSpellId == spell->Id)
         if (_currentRangeMode && IsMainSpellPrevented(spell))
             SetCurrentRangeMode(false);
 }

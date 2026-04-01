@@ -20,6 +20,8 @@ This tool compares your existing configuration files (`.conf`) with the latest d
 
 ## How to Use
 
+There are two ways to use this. You can either copy this file directly to your `/configs` folder, or enable `TOOL_CONFIG_MERGER` in CMake. Upon compiling your core, the file will be generated in the same location as your `/configs` folder.
+
 ### Interactive Mode (Default)
 
 1. **Run the script** in your configs directory:

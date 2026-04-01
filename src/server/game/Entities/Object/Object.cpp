@@ -479,7 +479,7 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint16 flags) const
     // 0x200
     if (flags & UPDATEFLAG_ROTATION)
     {
-        *data << int64(ToGameObject()->GetPackedLocalRotation());
+        *data << int64(ToGameObject()->GetPackedWorldRotation());
     }
 }
 
@@ -995,6 +995,30 @@ std::string Object::GetDebugInfo() const
     return sstr.str();
 }
 
+UnitMoveType MovementInfo::GetSpeedType(uint32 moveFlags)
+{
+    if (moveFlags & MOVEMENTFLAG_FLYING)
+    {
+        if (moveFlags & MOVEMENTFLAG_BACKWARD)
+            return MOVE_FLIGHT_BACK;
+
+        return MOVE_FLIGHT;
+    }
+    else if (moveFlags & MOVEMENTFLAG_SWIMMING)
+    {
+        if (moveFlags & MOVEMENTFLAG_BACKWARD)
+            return MOVE_SWIM_BACK;
+
+        return MOVE_SWIM;
+    }
+    else if (moveFlags & MOVEMENTFLAG_WALKING)
+        return MOVE_WALK;
+    else if (moveFlags & MOVEMENTFLAG_BACKWARD)
+        return MOVE_RUN_BACK;
+
+    return MOVE_RUN;
+}
+
 void MovementInfo::OutDebug()
 {
     LOG_INFO("movement", "MOVEMENT INFO");
@@ -1338,6 +1362,12 @@ bool WorldObject::IsWithinDist2d(const Position* pos, float dist) const
     return IsInDist2d(pos, dist + GetObjectSize());
 }
 
+// Visibility always uses 2d checks, factors in self-object size already. Gameobjects will override this for custom calc
+bool WorldObject::IsWithinSightRange(Position const& pos, float dist) const
+{
+    return IsInDist2d(&pos, dist + GetObjectSize());
+}
+
 // use only if you will sure about placing both object at same map
 bool WorldObject::IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D, bool incOwnRadius, bool incTargetRadius) const
 {
@@ -1650,7 +1680,7 @@ float WorldObject::GetGridActivationRange() const
 {
     if (ToPlayer())
     {
-        if (ToPlayer()->GetCinematicMgr()->IsOnCinematic())
+        if (ToPlayer()->GetCinematicMgr().IsOnCinematic())
         {
             return DEFAULT_VISIBILITY_INSTANCE;
         }
@@ -1701,7 +1731,7 @@ float WorldObject::GetSightRange(WorldObject const* target) const
                         return VISIBILITY_DIST_WINTERGRASP;
                     else if (target->IsVisibilityOverridden())
                         return target->GetVisibilityOverrideDistance();
-                    else if (ToPlayer()->GetCinematicMgr()->IsOnCinematic())
+                    else if (ToPlayer()->GetCinematicMgr().IsOnCinematic())
                         return DEFAULT_VISIBILITY_INSTANCE;
                     else
                         return GetMap()->GetVisibilityRange();
@@ -1763,17 +1793,17 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
 
     // pussywizard: arena spectator
     if (obj->IsPlayer())
-        if (((Player const*)obj)->IsSpectator() && ((Player const*)obj)->FindMap()->IsBattleArena())
+        if (((Player const*)obj)->IsSpectator() && ((Player const*)obj)->FindMap() && ((Player const*)obj)->FindMap()->IsBattleArena())
             return false;
 
     bool corpseVisibility = false;
     if (distanceCheck)
     {
         bool corpseCheck = false;
-        WorldObject const* viewpoint = this;
+        Position const* sightPosition = this;
         if (Player const* thisPlayer = ToPlayer())
         {
-            viewpoint = thisPlayer->GetSeer();
+            sightPosition = &thisPlayer->GetSightPosition();
 
             if (Creature const* creature = obj->ToCreature())
             {
@@ -1807,19 +1837,19 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
                         return false;
 
                 // pussywizard: during arena preparation, don't allow to detect pets if can't see its owner (spoils enemy arena frames)
-                if (target->IsPet() && target->GetOwnerGUID() && target->FindMap()->IsBattleArena() && GetGUID() != target->GetOwnerGUID())
-                    if (BattlegroundMap* bgmap = target->FindMap()->ToBattlegroundMap())
-                        if (Battleground* bg = bgmap->GetBG())
-                            if (bg->GetStatus() < STATUS_IN_PROGRESS && !thisPlayer->HaveAtClient(target->GetOwnerGUID()))
-                                return false;
+                if (Map* targetMap = target->FindMap())
+                    if (target->IsPet() && target->GetOwnerGUID() && targetMap->IsBattleArena() && GetGUID() != target->GetOwnerGUID())
+                        if (BattlegroundMap* bgmap = targetMap->ToBattlegroundMap())
+                            if (Battleground* bg = bgmap->GetBG())
+                                if (bg->GetStatus() < STATUS_IN_PROGRESS && !thisPlayer->HaveAtClient(target->GetOwnerGUID()))
+                                    return false;
             }
 
             if (thisPlayer->GetFarSightDistance() && !thisPlayer->isInFront(obj))
                 return false;
         }
 
-        // Xinef: check reversely obj vs viewpoint, object could be a gameObject which overrides _IsWithinDist function to include gameobject size
-        if (!corpseCheck && !viewpoint->IsWithinDist(obj, GetSightRange(obj), false))
+        if (!corpseCheck && !obj->IsWithinSightRange(*sightPosition, GetSightRange(obj)))
             return false;
     }
 
@@ -1856,7 +1886,7 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
 
     // pussywizard: arena spectator
     if (this->IsPlayer())
-        if (((Player const*)this)->IsSpectator() && ((Player const*)this)->FindMap()->IsBattleArena() && (obj->m_invisibility.GetFlags() || obj->m_stealth.GetFlags()))
+        if (((Player const*)this)->IsSpectator() && ((Player const*)this)->FindMap() && ((Player const*)this)->FindMap()->IsBattleArena() && (obj->m_invisibility.GetFlags() || obj->m_stealth.GetFlags()))
             return false;
 
     if (!CanDetect(obj, ignoreStealth, !distanceCheck, checkAlert))
@@ -2284,6 +2314,18 @@ void Map::SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list /*= null
                 list->push_back(summon);
 }
 
+void Map::SummonGameObjectGroup(uint8 group, std::list<GameObject*>* list /*= nullptr*/)
+{
+    std::vector<GameObjectSummonData> const* data = sObjectMgr->GetGameObjectSummonGroup(GetId(), SUMMONER_TYPE_MAP, group);
+    if (!data)
+        return;
+
+    for (std::vector<GameObjectSummonData>::const_iterator itr = data->begin(); itr != data->end(); ++itr)
+        if (GameObject* go = SummonGameObject(itr->entry, itr->pos.GetPositionX(), itr->pos.GetPositionY(), itr->pos.GetPositionZ(), itr->pos.GetOrientation(), itr->rot.x, itr->rot.y, itr->rot.z, itr->rot.w, itr->respawnTime))
+            if (list)
+                list->push_back(go);
+}
+
 TempSummon* WorldObject::SummonCreature(uint32 id, float x, float y, float z, float ang, TempSummonType spwtype, uint32 despwtime, SummonPropertiesEntry const* properties, bool visibleBySummonerOnly)
 {
     if (!x && !y && !z)
@@ -2438,6 +2480,20 @@ void WorldObject::SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list 
         if (TempSummon* summon = SummonCreature(itr->entry, itr->pos, itr->type, itr->time))
             if (list)
                 list->push_back(summon);
+}
+
+void WorldObject::SummonGameObjectGroup(uint8 group, std::list<GameObject*>* list /*= nullptr*/)
+{
+    ASSERT((IsGameObject() || IsCreature()) && "Only GOs and creatures can summon gameobject groups!");
+
+    std::vector<GameObjectSummonData> const* data = sObjectMgr->GetGameObjectSummonGroup(GetEntry(), IsGameObject() ? SUMMONER_TYPE_GAMEOBJECT : SUMMONER_TYPE_CREATURE, group);
+    if (!data)
+        return;
+
+    for (std::vector<GameObjectSummonData>::const_iterator itr = data->begin(); itr != data->end(); ++itr)
+        if (GameObject* go = SummonGameObject(itr->entry, itr->pos.GetPositionX(), itr->pos.GetPositionY(), itr->pos.GetPositionZ(), itr->pos.GetOrientation(), itr->rot.x, itr->rot.y, itr->rot.z, itr->rot.w, itr->respawnTime))
+            if (list)
+                list->push_back(go);
 }
 
 Creature* WorldObject::FindNearestCreature(uint32 entry, float range, bool alive) const

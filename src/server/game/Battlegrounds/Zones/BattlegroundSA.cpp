@@ -52,6 +52,7 @@ BattlegroundSA::BattlegroundSA()
     EndRoundTimer = 0s;
     ShipsStarted = false;
     Status = BG_SA_NOTSTARTED;
+    _nextShipIsEast = true;
 
     for (uint8 i = 0; i < 6; i++)
         GateStatus[i] = BG_SA_GATE_OK;
@@ -85,6 +86,7 @@ void BattlegroundSA::Init()
     _notEvenAScratch[TEAM_HORDE] = true;
     Status = BG_SA_WARMUP;
     _relicClicked = false;
+    _nextShipIsEast = true;
 }
 
 bool BattlegroundSA::SetupBattleground()
@@ -181,6 +183,7 @@ bool BattlegroundSA::ResetObjs()
 
     TotalTime = 0s;
     ShipsStarted = false;
+    _nextShipIsEast = true;
 
     //Graveyards!
     for (uint8 i = 0; i < BG_SA_MAX_GY; i++)
@@ -574,10 +577,12 @@ void BattlegroundSA::TeleportToEntrancePosition(Player* player)
         if (!ShipsStarted)
         {
             player->CastSpell(player, 12438, true);//Without this player falls before boat loads...
-            if (urand(0, 1))
+            if (_nextShipIsEast)
                 player->TeleportTo(MAP_STRAND_OF_THE_ANCIENTS, 2682.936f, -830.368f, 15.0f, 2.895f, 0);
             else
                 player->TeleportTo(MAP_STRAND_OF_THE_ANCIENTS, 2577.003f, 980.261f, 15.0f, 0.807f, 0);
+
+            _nextShipIsEast = !_nextShipIsEast;
         }
         else
             player->TeleportTo(MAP_STRAND_OF_THE_ANCIENTS, 1600.381f, -106.263f, 8.8745f, 3.78f, 0);
@@ -713,6 +718,8 @@ void BattlegroundSA::DemolisherStartState(bool start)
     if (!BgCreatures[0])
         return;
 
+    // Only lock demolishers during warmup - they are attacker vehicles.
+    // Cannons/turrets are defender weapons and must remain usable from the start.
     for (uint8 i = BG_SA_DEMOLISHER_1; i <= BG_SA_DEMOLISHER_4; i++)
         if (Creature* dem = GetBGCreature(i))
         {
@@ -720,15 +727,6 @@ void BattlegroundSA::DemolisherStartState(bool start)
                 dem->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
             else
                 dem->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-        }
-
-    for (uint8 i = BG_SA_GUN_1; i <= BG_SA_GUN_10; i++)
-        if (Creature* gun = GetBGCreature(i))
-        {
-            if (start)
-                gun->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-            else
-                gun->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
         }
 
     // xinef: enable first gates damaging at start

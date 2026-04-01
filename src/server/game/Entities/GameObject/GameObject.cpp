@@ -38,6 +38,22 @@
 #include <G3D/CoordinateFrame.h>
 #include <G3D/Quat.h>
 
+bool QuaternionData::IsUnit() const
+{
+    return fabs(x * x + y * y + z * z + w * w - 1.0f) < 1e-5f;
+}
+
+void QuaternionData::ToEulerAnglesZYX(float& Z, float& Y, float& X) const
+{
+    G3D::Matrix3(G3D::Quat(x, y, z, w)).toEulerAnglesZYX(Z, Y, X);
+}
+
+QuaternionData QuaternionData::FromEulerAnglesZYX(float Z, float Y, float X)
+{
+    G3D::Quat quat(G3D::Matrix3::fromEulerAnglesZYX(Z, Y, X));
+    return QuaternionData(quat.x, quat.y, quat.z, quat.w);
+}
+
 GameObject::GameObject() : WorldObject(), MovableMapObject(),
     m_model(nullptr), m_goValue(), m_AI(nullptr)
 {
@@ -293,35 +309,14 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
         return false;
     }
 
-    GameObjectAddon const* addon = sObjectMgr->GetGameObjectAddon(GetSpawnId());
+    SetWorldRotation(rotation);
 
-    // hackfix for the hackfix down below
-    switch (goinfo->entry)
-    {
-        // excluded ids from the hackfix below
-        // used switch since there should be more
-        case 181233: // maexxna portal effect
-        case 181575: // maexxna portal
-        case 20992: // theramore black shield
-        case 21042: // theramore guard badge
-            SetLocalRotation(rotation);
-            break;
-        default:
-            // xinef: hackfix - but make it possible to use original WorldRotation (using special gameobject addon data)
-            // pussywizard: temporarily calculate WorldRotation from orientation, do so until values in db are correct
-            if (addon && addon->invisibilityType == INVISIBILITY_GENERAL && addon->InvisibilityValue == 0)
-            {
-                SetLocalRotation(rotation);
-            }
-            else
-            {
-                SetLocalRotationAngles(NormalizeOrientation(GetOrientation()), 0.0f, 0.0f);
-            }
-            break;
-    }
+    GameObjectAddon const* gameObjectAddon = sObjectMgr->GetGameObjectAddon(GetSpawnId());
+    QuaternionData parentRotation;
+    if (gameObjectAddon)
+        parentRotation = gameObjectAddon->ParentRotation;
 
-    // pussywizard: no PathRotation for normal gameobjects
-    SetTransportPathRotation(0.0f, 0.0f, 0.0f, 1.0f);
+    SetTransportPathRotation(parentRotation.x, parentRotation.y, parentRotation.z, parentRotation.w);
 
     SetObjectScale(goinfo->size);
 
@@ -403,12 +398,12 @@ bool GameObject::Create(ObjectGuid::LowType guidlow, uint32 name_id, Map* map, u
             break;
     }
 
-    if (addon)
+    if (gameObjectAddon)
     {
-        if (addon->InvisibilityValue)
+        if (gameObjectAddon->InvisibilityValue)
         {
-            m_invisibility.AddFlag(addon->invisibilityType);
-            m_invisibility.AddValue(addon->invisibilityType, addon->InvisibilityValue);
+            m_invisibility.AddFlag(gameObjectAddon->invisibilityType);
+            m_invisibility.AddValue(gameObjectAddon->invisibilityType, gameObjectAddon->InvisibilityValue);
         }
     }
 
@@ -1054,7 +1049,7 @@ void GameObject::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask, bool 
     data.posY = GetPositionY();
     data.posZ = GetPositionZ();
     data.orientation = GetOrientation();
-    data.rotation = m_localRotation;
+    data.rotation = WorldRotation;
     data.spawntimesecs = m_spawnedByDefault ? m_respawnDelayTime : -(int32)m_respawnDelayTime;
     data.animprogress = GetGoAnimProgress();
     data.go_state = GetGoState();
@@ -1080,10 +1075,10 @@ void GameObject::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask, bool 
     stmt->SetData(index++, GetPositionY());
     stmt->SetData(index++, GetPositionZ());
     stmt->SetData(index++, GetOrientation());
-    stmt->SetData(index++, m_localRotation.x);
-    stmt->SetData(index++, m_localRotation.y);
-    stmt->SetData(index++, m_localRotation.z);
-    stmt->SetData(index++, m_localRotation.w);
+    stmt->SetData(index++, WorldRotation.x);
+    stmt->SetData(index++, WorldRotation.y);
+    stmt->SetData(index++, WorldRotation.z);
+    stmt->SetData(index++, WorldRotation.w);
     stmt->SetData(index++, int32(m_respawnDelayTime));
     stmt->SetData(index++, GetGoAnimProgress());
     stmt->SetData(index++, uint8(GetGoState()));
@@ -1708,7 +1703,7 @@ void GameObject::Use(Unit* user)
                 Player* player = user->ToPlayer();
 
                 if (info->camera.cinematicId)
-                    player->SendCinematicStart(info->camera.cinematicId);
+                    player->GetCinematicMgr().StartCinematic(info->camera.cinematicId);
 
                 if (info->camera.eventID)
                 {
@@ -2147,7 +2142,32 @@ void GameObject::SendCustomAnim(uint32 anim)
     SendMessageToSet(&data, true);
 }
 
-bool GameObject::IsInRange(float x, float y, float z, float radius) const
+bool GameObject::IsInRange2d(float x, float y, float radius) const
+{
+    GameObjectDisplayInfoEntry const* info = sGameObjectDisplayInfoStore.LookupEntry(m_goInfo->displayId);
+    if (!info)
+        return IsWithinDist2d(x, y, radius);
+
+    float sinA = std::sin(GetOrientation());
+    float cosA = cos(GetOrientation());
+    float dx = x - GetPositionX();
+    float dy = y - GetPositionY();
+    float dist = std::sqrt(dx * dx + dy * dy);
+    //! Check if the distance between the 2 objects is 0, can happen if both objects are on the same position.
+    //! The code below this check wont crash if dist is 0 because 0/0 in float operations is valid, and returns infinite
+    if (G3D::fuzzyEq(dist, 0.0f))
+        return true;
+
+    float scale = GetObjectScale();
+    float sinB = dx / dist;
+    float cosB = dy / dist;
+    dx = dist * (cosA * cosB + sinA * sinB);
+    dy = dist * (cosA * sinB - sinA * cosB);
+    return dx < (info->maxX * scale) + radius && dx >(info->minX * scale) - radius
+        && dy < (info->maxY * scale) + radius && dy >(info->minY * scale) - radius;
+}
+
+bool GameObject::IsInRange3d(float x, float y, float z, float radius) const
 {
     GameObjectDisplayInfoEntry const* info = sGameObjectDisplayInfoStore.LookupEntry(m_goInfo->displayId);
     if (!info)
@@ -2215,24 +2235,27 @@ void GameObject::UpdatePackedRotation()
     static const int32 PACK_X = PACK_YZ << 1;
     static const int32 PACK_YZ_MASK = (PACK_YZ << 1) - 1;
     static const int32 PACK_X_MASK = (PACK_X << 1) - 1;
-    int8 w_sign = (m_localRotation.w >= 0.f ? 1 : -1);
-    int64 x = int32(m_localRotation.x * PACK_X)  * w_sign & PACK_X_MASK;
-    int64 y = int32(m_localRotation.y * PACK_YZ) * w_sign & PACK_YZ_MASK;
-    int64 z = int32(m_localRotation.z * PACK_YZ) * w_sign & PACK_YZ_MASK;
+    int8 w_sign = (WorldRotation.w >= 0.f ? 1 : -1);
+    int64 x = int32(WorldRotation.x * PACK_X)  * w_sign & PACK_X_MASK;
+    int64 y = int32(WorldRotation.y * PACK_YZ) * w_sign & PACK_YZ_MASK;
+    int64 z = int32(WorldRotation.z * PACK_YZ) * w_sign & PACK_YZ_MASK;
     m_packedRotation = z | (y << 21) | (x << 42);
 }
 
-void GameObject::SetLocalRotation(G3D::Quat const& rot)
+bool GameObject::IsWithinSightRange(Position const& pos, float dist) const
 {
-    G3D::Quat rotation;
-    // Temporary solution for gameobjects that have no rotation data in DB:
-    if (G3D::fuzzyEq(rot.z, 0.f) && G3D::fuzzyEq(rot.w, 0.f))
-        rotation = G3D::Quat::fromAxisAngleRotation(G3D::Vector3::unitZ(), GetOrientation());
-    else
-        rotation = rot;
+    return IsInRange2d(pos.GetPositionX(), pos.GetPositionY(), dist);
+}
 
+void GameObject::SetWorldRotation(G3D::Quat const& rot)
+{
+    G3D::Quat rotation = rot;
+    // If the quaternion is zero (e.g. dynamically spawned GOs with no rotation),
+    // fall back to computing rotation from orientation to avoid NaN from unitize()
+    if (G3D::fuzzyEq(rotation.magnitude(), 0.0f))
+        rotation = G3D::Quat::fromAxisAngleRotation(G3D::Vector3::unitZ(), GetOrientation());
     rotation.unitize();
-    m_localRotation = rotation;
+    WorldRotation = rotation;
     UpdatePackedRotation();
 }
 
@@ -2244,26 +2267,26 @@ void GameObject::SetTransportPathRotation(float qx, float qy, float qz, float qw
     SetFloatValue(GAMEOBJECT_PARENTROTATION + 3, qw);
 }
 
-void GameObject::SetLocalRotationAngles(float z_rot, float y_rot, float x_rot)
+void GameObject::SetWorldRotationAngles(float z_rot, float y_rot, float x_rot)
 {
-    SetLocalRotation(G3D::Quat(G3D::Matrix3::fromEulerAnglesZYX(z_rot, y_rot, x_rot)));
+    SetWorldRotation(G3D::Quat(G3D::Matrix3::fromEulerAnglesZYX(z_rot, y_rot, x_rot)));
 }
 
-G3D::Quat GameObject::GetWorldRotation() const
+G3D::Quat GameObject::GetFinalWorldRotation() const
 {
-    G3D::Quat localRotation = GetLocalRotation();
+    G3D::Quat worldRotation = GetWorldRotation();
     if (Transport* transport = GetTransport())
     {
-        G3D::Quat worldRotation = transport->GetWorldRotation();
+        G3D::Quat transportRotation = transport->GetWorldRotation();
 
+        G3D::Quat transportRotationQuat(transportRotation.x, transportRotation.y, transportRotation.z, transportRotation.w);
         G3D::Quat worldRotationQuat(worldRotation.x, worldRotation.y, worldRotation.z, worldRotation.w);
-        G3D::Quat localRotationQuat(localRotation.x, localRotation.y, localRotation.z, localRotation.w);
 
-        G3D::Quat resultRotation = localRotationQuat * worldRotationQuat;
+        G3D::Quat resultRotation = worldRotationQuat * transportRotationQuat;
 
         return G3D::Quat(resultRotation.x, resultRotation.y, resultRotation.z, resultRotation.w);
     }
-    return localRotation;
+    return worldRotation;
 }
 
 void GameObject::ModifyHealth(int32 change, Unit* attackerOrHealer /*= nullptr*/, uint32 spellId /*= 0*/)
@@ -2983,10 +3006,10 @@ bool GameObject::IsAtInteractDistance(Position const& pos, float radius) const
         float maxY = displayInfo->maxY * scale + radius;
         float maxZ = displayInfo->maxZ * scale + radius;
 
-        G3D::Quat worldRotation = GetWorldRotation();
-        G3D::Quat worldRotationQuat(worldRotation.x, worldRotation.y, worldRotation.z, worldRotation.w);
+        G3D::Quat finalRotation = GetFinalWorldRotation();
+        G3D::Quat finalRotationQuat(finalRotation.x, finalRotation.y, finalRotation.z, finalRotation.w);
 
-        return G3D::CoordinateFrame {{worldRotationQuat}, {GetPositionX(), GetPositionY(), GetPositionZ()}}.toWorldSpace(G3D::Box {{minX, minY, minZ}, {maxX, maxY, maxZ}}).contains({pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ()});
+        return G3D::CoordinateFrame {{finalRotationQuat}, {GetPositionX(), GetPositionY(), GetPositionZ()}}.toWorldSpace(G3D::Box {{minX, minY, minZ}, {maxX, maxY, maxZ}}).contains({pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ()});
     }
 
     return GetExactDist(&pos) <= radius;

@@ -110,7 +110,7 @@ enum Yells
 
 struct boss_bjarngrim : public npc_escortAI
 {
-    boss_bjarngrim(Creature* creature) : npc_escortAI(creature), summons(creature)
+    boss_bjarngrim(Creature* creature) : npc_escortAI(creature), summons(creature), m_uiStance(STANCE_BATTLE)
     {
         m_pInstance = creature->GetInstanceScript();
         InitializeWaypoints();
@@ -267,6 +267,7 @@ struct boss_bjarngrim : public npc_escortAI
         m_uiStance = stance;
     }
 
+    using CreatureAI::WaypointReached;
     void WaypointReached(uint32 Point) override
     {
         if (Point == 1)
@@ -301,18 +302,19 @@ struct boss_bjarngrim : public npc_escortAI
     {
         events.Update(diff);
 
-        if (uint32 eventId = events.ExecuteEvent())
-        {
-            if (eventId == EVENT_CHARGE_UP)
-            {
-                me->CastSpell(me, SPELL_CHARGE_UP, true);
-                me->CastSpell(me, SPELL_TEMPORARY_ELECTRICAL_CHARGE, true);
-                return;
-            }
-        }
-
         if (!me->IsInCombat())
+        {
+            // Handle charge-up only when out of combat
+            if (uint32 eventId = events.ExecuteEvent())
+            {
+                if (eventId == EVENT_CHARGE_UP)
+                {
+                    DoCastSelf(SPELL_CHARGE_UP, true);
+                    DoCastSelf(SPELL_TEMPORARY_ELECTRICAL_CHARGE, true);
+                }
+            }
             return;
+        }
 
         // Return since we have no target
         if (!UpdateVictim())

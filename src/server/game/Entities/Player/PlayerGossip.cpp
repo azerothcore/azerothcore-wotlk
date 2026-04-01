@@ -121,8 +121,8 @@ void Player::PrepareGossipMenu(WorldObject* source, uint32 menuId /*= 0*/, bool 
                     Trainer::Trainer const* trainer = sObjectMgr->GetTrainer(creature->GetEntry());
                     if (!trainer || !trainer->IsTrainerValidForPlayer(this))
                     {
-                        LOG_ERROR("sql.sql", "GOSSIP_OPTION_TRAINER:: Player %s (GUID: %u) requested wrong gossip menu: %u at Creature: %s (Entry: %u)",
-                                    GetName().c_str(), GetGUID().GetCounter(), menu->GetGossipMenu().GetMenuId(), creature->GetName().c_str(), creature->GetEntry());
+                        LOG_ERROR("sql.sql", "GOSSIP_OPTION_TRAINER:: Player {} (GUID: {}) requested wrong gossip menu: {} at Creature: {} (Entry: {})",
+                                    GetName(), GetGUID().GetCounter(), menu->GetGossipMenu().GetMenuId(), creature->GetName(), creature->GetEntry());
                         canTalk = false;
                     }
                 }
@@ -429,7 +429,7 @@ uint32 Player::GetDefaultGossipMenuForSource(WorldObject* source)
     switch (source->GetTypeId())
     {
         case TYPEID_UNIT:
-            return source->ToCreature()->GetCreatureTemplate()->GossipMenuId;
+            return source->ToCreature()->GetGossipMenuId();
         case TYPEID_GAMEOBJECT:
             return source->ToGameObject()->GetGOInfo()->GetGossipMenuId();
         default:

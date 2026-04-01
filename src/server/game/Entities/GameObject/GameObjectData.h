@@ -19,6 +19,7 @@
 #define GAMEOBJECTDATA_H
 
 #include "SharedDefines.h"
+#include "SpawnData.h"
 #include <array>
 #include <vector>
 #include <string>
@@ -678,9 +679,25 @@ struct GameObjectLocale
     std::vector<std::string> CastBarCaption;
 };
 
+struct AC_GAME_API QuaternionData
+{
+    float x;
+    float y;
+    float z;
+    float w;
+
+    QuaternionData() : x(0.0f), y(0.0f), z(0.0f), w(1.0f) { }
+    QuaternionData(float X, float Y, float Z, float W) : x(X), y(Y), z(Z), w(W) { }
+
+    [[nodiscard]] bool IsUnit() const;
+    void ToEulerAnglesZYX(float& Z, float& Y, float& X) const;
+    [[nodiscard]] static QuaternionData FromEulerAnglesZYX(float Z, float Y, float X);
+};
+
 // `gameobject_addon` table
 struct GameObjectAddon
 {
+    QuaternionData ParentRotation;
     InvisibilityType invisibilityType;
     uint32 InvisibilityValue;
 };
@@ -694,24 +711,15 @@ enum GOState
 };
 
 // from `gameobject`
-struct GameObjectData
+struct GameObjectData : public SpawnData
 {
-    explicit GameObjectData() = default;
-    uint32 id{ 0 };                                              // entry in gamobject_template
-    uint16 mapid{ 0 };
-    uint32 phaseMask{ 0 };
-    float posX{ 0.0f };
-    float posY{ 0.0f };
-    float posZ{ 0.0f };
-    float orientation{ 0.0f };
+    GameObjectData() : SpawnData(SPAWN_TYPE_GAMEOBJECT) {}
+    uint32 id{0};                                                // entry in gameobject_template
     G3D::Quat rotation;
-    int32  spawntimesecs{ 0 };
-    uint32 ScriptId;
-    uint32 animprogress{ 0 };
-    GOState go_state{ GO_STATE_ACTIVE };
-    uint8 spawnMask{ 0 };
-    uint8 artKit{ 0 };
-    bool dbData{ true };
+    int32 spawntimesecs{0};
+    uint32 animprogress{0};
+    GOState go_state{GO_STATE_ACTIVE};
+    uint8 artKit{0};
 };
 
 #endif // GameObjectData_h__

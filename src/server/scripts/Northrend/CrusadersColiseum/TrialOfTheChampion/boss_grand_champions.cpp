@@ -143,7 +143,6 @@ public:
         void Reset() override
         {
             me->SetReactState(REACT_PASSIVE);
-            me->getHostileRefMgr().setOnlineOfflineState(false);
         }
 
         void OnCharmed(bool apply) override
@@ -593,6 +592,7 @@ public:
 
         void EnterEvadeMode(EvadeReason /*why*/) override {}
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 i) override
         {
             if (!pInstance)

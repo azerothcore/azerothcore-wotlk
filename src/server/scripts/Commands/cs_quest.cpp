@@ -17,6 +17,8 @@
 
 #include "Chat.h"
 #include "CommandScript.h"
+#include "ConditionMgr.h"
+#include "DisableMgr.h"
 #include "GameTime.h"
 #include "ObjectMgr.h"
 #include "Player.h"
@@ -766,8 +768,85 @@ public:
 
             handler->PSendSysMessage(LANG_CMD_QUEST_STATUS, quest->GetTitle(), entry, status);
 
-            if (!player->CanTakeQuest(quest, true))
-                handler->PSendSysMessage(LANG_CMD_QUEST_UNAVAILABLE, entry, status);
+            if (!player->CanTakeQuest(quest, false))
+            {
+                handler->PSendSysMessage(LANG_CMD_QUEST_UNAVAILABLE, entry);
+
+                if (sDisableMgr->IsDisabledFor(DISABLE_TYPE_QUEST, entry, player))
+                    handler->SendSysMessage(LANG_CMD_QUEST_STATUS_DISABLED);
+
+                if (!player->SatisfyQuestStatus(quest, false))
+                    handler->SendSysMessage(LANG_CMD_QUEST_STATUS_ALREADY_DONE);
+
+                if (!player->SatisfyQuestClass(quest, false))
+                    handler->SendSysMessage(LANG_CMD_QUEST_STATUS_CLASS);
+
+                if (!player->SatisfyQuestRace(quest, false))
+                    handler->SendSysMessage(LANG_CMD_QUEST_STATUS_RACE);
+
+                if (player->GetLevel() < quest->GetMinLevel())
+                    handler->PSendSysMessage(LANG_CMD_QUEST_STATUS_LOW_LEVEL, quest->GetMinLevel());
+
+                if (quest->GetMaxLevel() > 0 && player->GetLevel() > quest->GetMaxLevel())
+                    handler->PSendSysMessage(LANG_CMD_QUEST_STATUS_HIGH_LEVEL, quest->GetMaxLevel());
+
+                if (!player->SatisfyQuestSkill(quest, false))
+                    handler->SendSysMessage(LANG_CMD_QUEST_STATUS_SKILL);
+
+                if (!player->SatisfyQuestReputation(quest, false))
+                    handler->SendSysMessage(LANG_CMD_QUEST_STATUS_REPUTATION);
+
+                if (!player->SatisfyQuestPreviousQuest(quest, false))
+                    handler->SendSysMessage(LANG_CMD_QUEST_STATUS_PREV_QUEST);
+
+                if (!player->SatisfyQuestTimed(quest, false))
+                    handler->SendSysMessage(LANG_CMD_QUEST_STATUS_TIMED);
+
+                if (!player->SatisfyQuestExclusiveGroup(quest, false))
+                    handler->SendSysMessage(LANG_CMD_QUEST_STATUS_EXCLUSIVE);
+
+                if (!player->SatisfyQuestNextChain(quest, false))
+                    handler->SendSysMessage(LANG_CMD_QUEST_STATUS_NEXT_CHAIN);
+
+                if (!player->SatisfyQuestPrevChain(quest, false))
+                    handler->SendSysMessage(LANG_CMD_QUEST_STATUS_PREV_CHAIN);
+
+                if (!player->SatisfyQuestBreadcrumb(quest, false))
+                    handler->SendSysMessage(LANG_CMD_QUEST_STATUS_BREADCRUMB);
+
+                if (!player->SatisfyQuestDay(quest, false))
+                    handler->SendSysMessage(LANG_CMD_QUEST_STATUS_DAY);
+
+                if (!player->SatisfyQuestWeek(quest, false))
+                    handler->SendSysMessage(LANG_CMD_QUEST_STATUS_WEEK);
+
+                if (!player->SatisfyQuestMonth(quest, false))
+                    handler->SendSysMessage(LANG_CMD_QUEST_STATUS_MONTH);
+
+                if (!player->SatisfyQuestSeasonal(quest, false))
+                    handler->SendSysMessage(LANG_CMD_QUEST_STATUS_SEASONAL);
+
+                if (!player->SatisfyQuestConditions(quest, false))
+                {
+                    handler->SendSysMessage(LANG_CMD_QUEST_STATUS_CONDITION);
+
+                    ConditionList conditions = sConditionMgr->GetConditionsForNotGroupedEntry(CONDITION_SOURCE_TYPE_QUEST_AVAILABLE, entry);
+                    ConditionSourceInfo srcInfo = ConditionSourceInfo(player);
+                    for (Condition* cond : conditions)
+                    {
+                        if (!cond->Meets(srcInfo))
+                            handler->PSendSysMessage(LANG_CMD_QUEST_STATUS_COND_DETAIL, uint32(cond->ConditionType), cond->ConditionValue1, cond->ConditionValue2, cond->ConditionValue3);
+                    }
+                }
+
+                if (!player->SatisfyQuestLog(false))
+                    handler->SendSysMessage(LANG_CMD_QUEST_STATUS_LOG_FULL);
+            }
+        }
+        else
+        {
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+            return false;
         }
 
         return true;
