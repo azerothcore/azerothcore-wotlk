@@ -572,10 +572,10 @@ struct boss_kologarn_eyebeam : public ScriptedAI
 {
     boss_kologarn_eyebeam(Creature* c) : ScriptedAI(c), _timer(1), _damaged(false)
     {
-        m_pInstance = (InstanceScript*)c->GetInstanceScript();
+        _instance = c->GetInstanceScript();
     }
 
-    InstanceScript* m_pInstance;
+    InstanceScript* _instance;
     uint32 _timer;
     bool _damaged;
 
@@ -602,7 +602,7 @@ struct boss_kologarn_eyebeam : public ScriptedAI
             me->Attack(player, false);
             me->GetMotionMaster()->MoveChase(player);
 
-            if (Creature* cr = m_pInstance->GetCreature(BOSS_KOLOGARN))
+            if (Creature* cr = _instance->GetCreature(BOSS_KOLOGARN))
             {
                 me->CastSpell(cr, me->GetEntry() == NPC_EYE_LEFT ? SPELL_FOCUSED_EYEBEAM_LEFT : SPELL_FOCUSED_EYEBEAM_RIGHT, true);
             }

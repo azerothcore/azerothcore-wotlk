@@ -50,9 +50,7 @@ bool ScriptMgr::CanPacketSend(WorldSession* session, WorldPacket const& packet)
     if (ScriptRegistry<ServerScript>::ScriptPointerList.empty())
         return true;
 
-    WorldPacket copy(packet);
-
-    CALL_ENABLED_BOOLEAN_HOOKS(ServerScript, SERVERHOOK_CAN_PACKET_SEND, !script->CanPacketSend(session, copy));
+    CALL_ENABLED_BOOLEAN_HOOKS(ServerScript, SERVERHOOK_CAN_PACKET_SEND, !script->CanPacketSend(session, packet));
 }
 
 bool ScriptMgr::CanPacketReceive(WorldSession* session, WorldPacket const& packet)
@@ -60,9 +58,7 @@ bool ScriptMgr::CanPacketReceive(WorldSession* session, WorldPacket const& packe
     if (ScriptRegistry<ServerScript>::ScriptPointerList.empty())
         return true;
 
-    WorldPacket copy(packet);
-
-    CALL_ENABLED_BOOLEAN_HOOKS(ServerScript, SERVERHOOK_CAN_PACKET_RECEIVE, !script->CanPacketReceive(session, copy));
+    CALL_ENABLED_BOOLEAN_HOOKS(ServerScript, SERVERHOOK_CAN_PACKET_RECEIVE, !script->CanPacketReceive(session, packet));
 }
 
 ServerScript::ServerScript(const char* name, std::vector<uint16> enabledHooks)

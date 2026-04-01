@@ -36,7 +36,6 @@
 #include "Language.h"
 #include "MapMgr.h"
 #include "MiscPackets.h"
-#include "MMapFactory.h"
 #include "MovementGenerator.h"
 #include "ObjectAccessor.h"
 #include "Pet.h"
@@ -630,7 +629,7 @@ public:
 
         uint32 haveMap = GridTerrainLoader::ExistMap(object->GetMapId(), cell.GridX(), cell.GridY()) ? 1 : 0;
         uint32 haveVMap = GridTerrainLoader::ExistVMap(object->GetMapId(), cell.GridX(), cell.GridY()) ? 1 : 0;
-        uint32 haveMMAP = MMAP::MMapFactory::createOrGetMMapMgr()->GetNavMesh(handler->GetSession()->GetPlayer()->GetMapId()) ? 1 : 0;
+        uint32 haveMMAP = handler->GetSession()->GetPlayer()->GetMap()->GetMapCollisionData().GetMMapData().GetNavMesh() ? 1 : 0;
 
         if (haveVMap)
         {
@@ -2418,6 +2417,13 @@ public:
         // Output XX. LANG_PINFO_CHR_PLAYEDTIME
         handler->PSendSysMessage(LANG_PINFO_CHR_PLAYEDTIME, (secsToTimeString(totalPlayerTime, true)));
 
+        // Output XXI. LANG_PINFO_CHR_ONLINETIME (only for online players)
+        if (playerTarget)
+        {
+            uint32 onlineTime = uint32(GameTime::GetGameTime().count() - playerTarget->m_logintime);
+            handler->PSendSysMessage(LANG_PINFO_CHR_ONLINETIME, secsToTimeString(onlineTime, true));
+        }
+
         // Mail Data - an own query, because it may or may not be useful.
         // SQL: "SELECT SUM(CASE WHEN (checked & 1) THEN 1 ELSE 0 END) AS 'readmail', COUNT(*) AS 'totalmail' FROM mail WHERE `receiver` = ?"
         CharacterDatabasePreparedStatement* mailQuery = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PINFO_MAILS);
@@ -2904,7 +2910,7 @@ public:
         }
 
         playerTarget->CombatStop();
-        playerTarget->getHostileRefMgr().deleteReferences();
+        playerTarget->GetThreatMgr().RemoveMeFromThreatLists();
         return true;
     }
 

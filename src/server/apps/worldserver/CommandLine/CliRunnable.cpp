@@ -27,6 +27,7 @@
 
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
 #include <windows.h>
+#include <iostream>
 #else
 #include "Chat.h"
 #include "ChatCommand.h"
@@ -158,21 +159,48 @@ void CliThread()
         std::string command;
 
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
-        wchar_t commandbuf[256];
-        DWORD charsRead = 0;
 
-        if (ReadConsoleW(hStdIn, commandbuf, sizeof(commandbuf) / sizeof(wchar_t) - 1, &charsRead, nullptr))
+        static bool checkedConsole = false;
+        static bool isRealConsole = false;
+
+        if (!checkedConsole)
         {
-            if (charsRead > 0)
+            DWORD mode = 0;
+            isRealConsole = GetConsoleMode(hStdIn, &mode);
+            checkedConsole = true;
+        }
+
+        if (isRealConsole)
+        {
+            // ===== Real Windows Console =====
+            wchar_t commandbuf[256];
+            DWORD charsRead = 0;
+
+            if (ReadConsoleW(hStdIn, commandbuf,
+                sizeof(commandbuf) / sizeof(wchar_t) - 1,
+                &charsRead, nullptr))
             {
-                commandbuf[charsRead] = L'\0';
-                if (!WStrToUtf8(commandbuf, charsRead, command))
+                if (charsRead > 0)
                 {
-                    PrintCliPrefix();
-                    continue;
+                    commandbuf[charsRead] = L'\0';
+                    if (!WStrToUtf8(commandbuf, charsRead, command))
+                    {
+                        PrintCliPrefix();
+                        continue;
+                    }
                 }
             }
         }
+        else
+        {
+            // ===== Redirected input (pipe) =====
+            if (!std::getline(std::cin, command))
+            {
+                World::StopNow(SHUTDOWN_EXIT_CODE);
+                break;
+            }
+        }
+
 #else
         char* command_str = readline(CLI_PREFIX);
         ::rl_bind_key('\t', ::rl_complete);

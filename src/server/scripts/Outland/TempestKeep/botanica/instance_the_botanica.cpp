@@ -59,8 +59,9 @@ class spell_botanica_call_of_the_falcon_aura : public AuraScript
         GetUnitOwner()->GetCreaturesWithEntryInRange(creatureList, 80.0f, NPC_BLOODFALCON);
         for (std::list<Creature*>::const_iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
         {
-            (*itr)->TauntApply(GetUnitOwner());
             (*itr)->AddThreat(GetUnitOwner(), 10000000.0f);
+            if ((*itr)->AI())
+                (*itr)->AI()->AttackStart(GetUnitOwner());
             _falconSet.insert((*itr)->GetGUID());
         }
     }
@@ -70,7 +71,6 @@ class spell_botanica_call_of_the_falcon_aura : public AuraScript
         for (ObjectGuid const& guid : _falconSet)
             if (Creature* falcon = ObjectAccessor::GetCreature(*GetUnitOwner(), guid))
             {
-                falcon->TauntFadeOut(GetUnitOwner());
                 falcon->AddThreat(GetUnitOwner(), -10000000.0f);
             }
     }

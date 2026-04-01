@@ -29,8 +29,6 @@ class Unit;
 class Creature;
 class Player;
 class SpellInfo;
-enum SpellFinishReason : uint8;
-
 typedef std::vector<AreaBoundary const*> CreatureBoundary;
 
 #define TIME_INTERVAL_LOOK   5000
@@ -99,9 +97,12 @@ public:
 
     WorldObject* GetSummoner() const;
 
-    explicit CreatureAI(Creature* creature) : UnitAI(creature), me(creature), _boundary(nullptr), _negateBoundary(false), m_MoveInLineOfSight_locked(false) { }
+    explicit CreatureAI(Creature* creature) : UnitAI(creature), me(creature), _boundary(nullptr), _negateBoundary(false), _isEngaged(false), m_MoveInLineOfSight_locked(false) { }
 
     ~CreatureAI() override {}
+
+    /// @brief Check if creature is currently engaged in combat
+    bool IsEngaged() const { return _isEngaged; }
 
     void MoveCircleChecks();
     void MoveBackwardsChecks();
@@ -120,10 +121,23 @@ public:
     // Called for reaction at stopping attack at no attackers or targets
     virtual void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER);
 
+    // Called for reaction whenever we start being in combat (overridden from UnitAI)
+    void JustEnteredCombat(Unit* who) override;
+
+    // Called for reaction when a new non-offline unit is added to the threat list
+    virtual void JustStartedThreateningMe(Unit* who) { if (!IsEngaged()) EngagementStart(who); }
+
     /**
-     * @brief Called for reaction when initially engaged
+     * @brief Called for reaction when initially engaged - this happens _after_ JustEnteredCombat
      */
     virtual void JustEngagedWith(Unit* /*who*/) {}
+
+    // Engagement handling
+    void EngagementStart(Unit* who);
+    void EngagementOver();
+
+    // Called when combat ends - clears engagement state and triggers evade if needed
+    void JustExitedCombat() override;
 
     // Called when the creature is killed
     virtual void JustDied(Unit* /*killer*/) {}
@@ -147,8 +161,17 @@ public:
     // Called when spell hits a target
     virtual void SpellHitTarget(Unit* /*target*/, SpellInfo const* /*spell*/) {}
 
-    // Called when a spell either finishes, interrupts or cancels a spell cast
-    virtual void OnSpellCastFinished(SpellInfo const* /*spell*/, SpellFinishReason /*reason*/) {}
+    // Called when the creature begins casting a spell (has cast time or is channeled)
+    virtual void OnSpellStart(SpellInfo const* /*spell*/) {}
+
+    // Called when the creature successfully executes a spell cast
+    virtual void OnSpellCast(SpellInfo const* /*spell*/) {}
+
+    // Called when a spell cast is interrupted or cancelled
+    virtual void OnSpellFailed(SpellInfo const* /*spell*/) {}
+
+    // Called when a channeled spell finishes its full duration
+    virtual void OnChannelFinished(SpellInfo const* /*spell*/) {}
 
     // Called when the creature is target of hostile action: swing, hostile spell landed, fear/etc)
     virtual void AttackedBy(Unit* /*attacker*/) {}
@@ -163,6 +186,13 @@ public:
     // Called at MovePath End
     virtual void PathEndReached(uint32 /*pathId*/) {}
 
+    /// == Waypoints system =============================
+
+    virtual void WaypointPathStarted(uint32 /*pathId*/) { }
+    virtual void WaypointStarted(uint32 /*nodeId*/, uint32 /*pathId*/) { }
+    virtual void WaypointReached(uint32 /*nodeId*/, uint32 /*pathId*/) { }
+    virtual void WaypointPathEnded(uint32 /*nodeId*/, uint32 /*pathId*/) { }
+
     void OnCharmed(bool apply) override;
 
     // Called at reaching home after evade
@@ -174,10 +204,13 @@ public:
     virtual void ReceiveEmote(Player* /*player*/, uint32 /*emoteId*/) {}
 
     // Called when owner takes damage
-    virtual void OwnerAttackedBy(Unit* /*attacker*/) {}
+    virtual void OwnerAttackedBy(Unit* attacker) { OnOwnerCombatInteraction(attacker); }
 
     // Called when owner attacks something
-    virtual void OwnerAttacked(Unit* /*target*/) {}
+    virtual void OwnerAttacked(Unit* target) { OnOwnerCombatInteraction(target); }
+
+    // Default handler for owner combat interactions — makes controlled creatures auto-engage
+    void OnOwnerCombatInteraction(Unit* target);
 
     /// == Triggered Actions Requested ==================
 
@@ -241,6 +274,7 @@ protected:
 
     CreatureBoundary const* _boundary;
     bool _negateBoundary;
+    bool _isEngaged;
 
 private:
     bool m_MoveInLineOfSight_locked;

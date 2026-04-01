@@ -43,6 +43,7 @@ enum PlayerHook
     PLAYERHOOK_ON_LEVEL_CHANGED,
     PLAYERHOOK_ON_FREE_TALENT_POINTS_CHANGED,
     PLAYERHOOK_ON_TALENTS_RESET,
+    PLAYERHOOK_CAN_LEARN_TALENT,
     PLAYERHOOK_ON_AFTER_SPEC_SLOT_CHANGED,
     PLAYERHOOK_ON_BEFORE_UPDATE,
     PLAYERHOOK_ON_UPDATE,
@@ -209,6 +210,7 @@ enum PlayerHook
     PLAYERHOOK_ON_SEND_LIST_INVENTORY,
     PLAYERHOOK_ON_GIVE_REPUTATION,
     PLAYERHOOK_ON_GET_REPUTATION_PRICE_DISCOUNT,
+    PLAYERHOOK_ON_LEARN_TAXI_NODE,
     PLAYERHOOK_END
 };
 
@@ -259,6 +261,9 @@ public:
 
     // Called when a player's talent points are reset (right before the reset is done)
     virtual void OnPlayerTalentsReset(Player* /*player*/, bool /*noCost*/) { }
+
+    // Called when a player attempts to put a point in a talent.
+    virtual bool OnPlayerCanLearnTalent(Player* /*player*/, TalentEntry const* /*talent*/, uint32 /*rank*/) { return true; }
 
     // Called after a player switches specs using the dual spec system
     virtual void OnPlayerAfterSpecSlotChanged(Player* /*player*/, uint8 /*newSlot*/) { }
@@ -816,6 +821,14 @@ public:
      * @param discount Float value of the discount, as a multiplier of the base price
      */
     virtual void OnPlayerGetReputationPriceDiscount(Player const* /*player*/, FactionTemplateEntry const* /*factionTemplate*/, float& /*discount*/) {}
+
+    /**
+     * @brief This hook is called when a player learns a new flight path node.
+     *
+     * @param player Contains information about the Player
+     * @param nodeId The id of the learned taxi node
+     */
+    virtual void OnPlayerLearnTaxiNode(Player const* /*player*/, uint32 /*nodeId*/) {}
 };
 
 #endif

@@ -48,11 +48,6 @@ void SmartWaypointMgr::LoadFromDB()
 {
     uint32 oldMSTime = getMSTime();
 
-    for (auto itr : waypoint_map)
-    {
-        delete itr.second;
-    }
-
     waypoint_map.clear();
 
     WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_SMARTAI_WP);
@@ -78,14 +73,15 @@ void SmartWaypointMgr::LoadFromDB()
         float x = fields[2].Get<float>();
         float y = fields[3].Get<float>();
         float z = fields[4].Get<float>();
-        Optional<float> o;
+        std::optional<float> o;
         if (!fields[5].IsNull())
             o = fields[5].Get<float>();
         uint32 delay = fields[6].Get<uint32>();
 
         if (last_entry != entry)
         {
-            waypoint_map[entry] = new WaypointPath();
+            waypoint_map[entry] = WaypointPath();
+            waypoint_map[entry].Id = entry;
             last_id = 1;
             count++;
         }
@@ -94,15 +90,15 @@ void SmartWaypointMgr::LoadFromDB()
             LOG_ERROR("sql.sql", "SmartWaypointMgr::LoadFromDB: Path entry {}, unexpected point id {}, expected {}.", entry, id, last_id);
 
         last_id++;
-        WaypointData data;
-        data.id = id;
-        data.x = x;
-        data.y = y;
-        data.z = z;
-        data.orientation = o;
-        data.delay = delay;
-        data.move_type = WAYPOINT_MOVE_TYPE_MAX;
-        (*waypoint_map[entry]).emplace(id, data);
+        WaypointNode node;
+        node.Id = id;
+        node.X = x;
+        node.Y = y;
+        node.Z = z;
+        node.Orientation = o;
+        node.Delay = delay;
+        node.MoveType = WAYPOINT_MOVE_TYPE_MAX;
+        waypoint_map[entry].Nodes.push_back(std::move(node));
 
         last_entry = entry;
         total++;
@@ -110,14 +106,6 @@ void SmartWaypointMgr::LoadFromDB()
 
     LOG_INFO("server.loading", ">> Loaded {} SmartAI waypoint paths (total {} waypoints) in {} ms", count, total, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
-}
-
-SmartWaypointMgr::~SmartWaypointMgr()
-{
-    for (auto itr : waypoint_map)
-    {
-        delete itr.second;
-    }
 }
 
 SmartAIMgr* SmartAIMgr::instance()

@@ -86,12 +86,7 @@ enum Actions
 struct boss_halazzi : public BossAI
 {
     boss_halazzi(Creature* creature) : BossAI(creature, DATA_HALAZZI)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    {    }
 
     void Reset() override
     {

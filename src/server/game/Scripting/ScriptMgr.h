@@ -308,6 +308,7 @@ public: /* PlayerScript */
     void OnPlayerLevelChanged(Player* player, uint8 oldLevel);
     void OnPlayerFreeTalentPointsChanged(Player* player, uint32 newPoints);
     void OnPlayerTalentsReset(Player* player, bool noCost);
+    bool OnPlayerCanLearnTalent(Player* player, TalentEntry const* talent, uint32 rank);
     void OnPlayerAfterSpecSlotChanged(Player* player, uint8 newSlot);
     void OnPlayerMoneyChanged(Player* player, int32& amount);
     void OnPlayerBeforeLootMoney(Player* player, Loot* loot);
@@ -465,6 +466,7 @@ public: /* PlayerScript */
     void OnPlayerSendListInventory(Player* player, ObjectGuid vendorGuid, uint32& vendorEntry);
     void OnPlayerGetReputationPriceDiscount(Player const* player, Creature const* creature, float& discount);
     void OnPlayerGetReputationPriceDiscount(Player const* player, FactionTemplateEntry const* factionTemplate, float& discount);
+    void OnPlayerLearnTaxiNode(Player const* player, uint32 nodeId);
 
     // Anti cheat
     void AnticheatSetCanFlybyServer(Player* player, bool apply);

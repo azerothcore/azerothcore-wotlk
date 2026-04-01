@@ -130,9 +130,11 @@ enum PaladinProcSpells
     SPELL_PALADIN_SPIRITUAL_ATTUNEMENT_MANA      = 31786,
     SPELL_PALADIN_BEACON_OF_LIGHT_AURA           = 53563,
     SPELL_PALADIN_LIGHTS_BEACON                  = 53651,
-    SPELL_PALADIN_BEACON_OF_LIGHT_FLASH          = 53652,
-    SPELL_PALADIN_BEACON_OF_LIGHT_HOLY           = 53654,
+    SPELL_PALADIN_BEACON_OF_LIGHT_HL             = 53652,
+    SPELL_PALADIN_BEACON_OF_LIGHT_FOL            = 53653,
+    SPELL_PALADIN_BEACON_OF_LIGHT_HS             = 53654,
     SPELL_PALADIN_HOLY_LIGHT_R1                  = 635,
+    SPELL_PALADIN_FLASH_OF_LIGHT_R1              = 19750,
     SPELL_PALADIN_GLYPH_OF_HOLY_LIGHT_HEAL       = 54968,
     SPELL_PALADIN_SACRED_SHIELD                  = 53601,
     SPELL_PALADIN_T9_HOLY_4P_BONUS               = 67191,
@@ -190,13 +192,15 @@ class spell_pal_seal_of_command_aura : public AuraScript
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
+        // All melee procs should cleave except Hammer of the Righteous.
+        // Judgement cleave is handled separately via JotJ code path.
         int32 targets = 3;
         if (SpellInfo const* procSpell = eventInfo.GetSpellInfo())
         {
-            if (procSpell->IsAffectingArea())
-            {
+            // HotR: flag1 0x40000, DS: flag1 0x20000
+            if (procSpell->SpellFamilyName == SPELLFAMILY_PALADIN &&
+                (procSpell->SpellFamilyFlags[1] & 0x60000))
                 targets = 1;
-            }
         }
 
         Unit* target = eventInfo.GetActionTarget();
@@ -1372,7 +1376,8 @@ class spell_pal_judgement_of_wisdom_mana : public AuraScript
         if (!attacker)
             return;
 
-        int32 bp = int32(CalculatePct(attacker->GetCreateMana(), aurEff->GetAmount()));
+        SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(SPELL_PALADIN_JUDGEMENT_OF_WISDOM_MANA);
+        int32 bp = int32(CalculatePct(attacker->GetCreateMana(), spellInfo->Effects[EFFECT_0].CalcValue()));
         attacker->CastCustomSpell(attacker, SPELL_PALADIN_JUDGEMENT_OF_WISDOM_MANA, &bp, nullptr, nullptr, true, nullptr, aurEff, GetCasterGUID());
     }
 
@@ -1975,8 +1980,10 @@ class spell_pal_seal_of_vengeance_aura : public AuraScript
     void Register() override
     {
         DoCheckProc += AuraCheckProcFn(spell_pal_seal_of_vengeance_aura::CheckProc);
-        OnEffectProc += AuraEffectProcFn(spell_pal_seal_of_vengeance_aura::HandleApplyDoT, EFFECT_0, SPELL_AURA_DUMMY);
+        // HandleSeal reads stacks BEFORE HandleApplyDoT increments them,
+        // so the attacking hit does not benefit from its own stack application.
         OnEffectProc += AuraEffectProcFn(spell_pal_seal_of_vengeance_aura::HandleSeal, EFFECT_0, SPELL_AURA_DUMMY);
+        OnEffectProc += AuraEffectProcFn(spell_pal_seal_of_vengeance_aura::HandleApplyDoT, EFFECT_0, SPELL_AURA_DUMMY);
     }
 
 private:
@@ -2127,6 +2134,9 @@ private:
 };
 
 // 53651 - Light's Beacon - Beacon of Light
+// Each source heal has a dedicated beacon copy spell:
+//   53652 - Holy Light, 53653 - Flash of Light, 53654 - Holy Shock
+// Reference: https://kurn.info/blog/holy-how-to-5-to-beacon-or-not-to-beacon/
 class spell_pal_light_s_beacon : public AuraScript
 {
     PrepareAuraScript(spell_pal_light_s_beacon);
@@ -2136,9 +2146,11 @@ class spell_pal_light_s_beacon : public AuraScript
         return ValidateSpellInfo(
         {
             SPELL_PALADIN_BEACON_OF_LIGHT_AURA,
-            SPELL_PALADIN_BEACON_OF_LIGHT_FLASH,
-            SPELL_PALADIN_BEACON_OF_LIGHT_HOLY,
-            SPELL_PALADIN_HOLY_LIGHT_R1
+            SPELL_PALADIN_BEACON_OF_LIGHT_HL,
+            SPELL_PALADIN_BEACON_OF_LIGHT_FOL,
+            SPELL_PALADIN_BEACON_OF_LIGHT_HS,
+            SPELL_PALADIN_HOLY_LIGHT_R1,
+            SPELL_PALADIN_FLASH_OF_LIGHT_R1
         });
     }
 
@@ -2162,9 +2174,13 @@ class spell_pal_light_s_beacon : public AuraScript
         if (!healInfo || !healInfo->GetHeal())
             return;
 
-        // Holy Light heals for 100%, Flash of Light heals for 50%
-        uint32 healSpellId = procSpell->IsRankOf(sSpellMgr->AssertSpellInfo(SPELL_PALADIN_HOLY_LIGHT_R1)) ?
-            SPELL_PALADIN_BEACON_OF_LIGHT_FLASH : SPELL_PALADIN_BEACON_OF_LIGHT_HOLY;
+        uint32 healSpellId;
+        if (procSpell->IsRankOf(sSpellMgr->AssertSpellInfo(SPELL_PALADIN_HOLY_LIGHT_R1)))
+            healSpellId = SPELL_PALADIN_BEACON_OF_LIGHT_HL;
+        else if (procSpell->IsRankOf(sSpellMgr->AssertSpellInfo(SPELL_PALADIN_FLASH_OF_LIGHT_R1)))
+            healSpellId = SPELL_PALADIN_BEACON_OF_LIGHT_FOL;
+        else
+            healSpellId = SPELL_PALADIN_BEACON_OF_LIGHT_HS;
 
         // Use heal amount before target-specific modifiers to avoid copying them
         uint32 healAmount = healInfo->GetHealBeforeTakenMods();

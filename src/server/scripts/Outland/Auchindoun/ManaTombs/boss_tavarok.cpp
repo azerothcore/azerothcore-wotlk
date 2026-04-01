@@ -29,12 +29,7 @@ enum Spells
 struct boss_tavarok : public BossAI
 {
     boss_tavarok(Creature* creature) : BossAI(creature, DATA_TAVAROK)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    {    }
 
     void Reset() override
     {

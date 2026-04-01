@@ -15,7 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
 #include "Pet.h"
 #include "Player.h"
 #include "SpellAuraEffects.h"
@@ -959,11 +958,23 @@ class spell_mage_fingers_of_frost : public AuraScript
 
     void PrepareProc(ProcEventInfo& eventInfo)
     {
-        // Block channeled spells (e.g. Blizzard channel start) from consuming charges.
-        // All other filtering is handled by SpellPhaseMask=1 (CAST only) in spell_proc.
         if (Spell const* spell = eventInfo.GetProcSpell())
-            if (spell->GetSpellInfo()->IsChanneled())
+        {
+            bool isTriggered = spell->IsTriggered();
+            bool isCastPhase = (eventInfo.GetSpellPhaseMask() & PROC_SPELL_PHASE_CAST) != 0;
+            bool isChanneled = spell->GetSpellInfo()->IsChanneled();
+            bool prevent = false;
+
+            if (isTriggered)
+                prevent = false;
+            else if (isChanneled)
+                prevent = true;
+            else if (!isCastPhase)
+                prevent = true;
+
+            if (prevent)
                 PreventDefaultAction();
+        }
     }
 
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -1207,7 +1218,7 @@ class spell_mage_glyph_of_polymorph : public AuraScript
             return;
 
         // Remove DoTs from target
-        target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE, ObjectGuid::Empty, nullptr, true);
+        target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE, ObjectGuid::Empty, target->GetAura(32409), true); // SW:D shall not be removed.
         target->RemoveAurasByType(SPELL_AURA_PERIODIC_DAMAGE_PERCENT, ObjectGuid::Empty, nullptr, true);
         target->RemoveAurasByType(SPELL_AURA_PERIODIC_LEECH, ObjectGuid::Empty, nullptr, true);
     }
@@ -1544,6 +1555,10 @@ class spell_mage_missile_barrage_proc : public AuraScript
     {
         Unit* caster = eventInfo.GetActor();
 
+        // Prevent double proc for Arcane Missiles
+        if (caster == eventInfo.GetActionTarget())
+            return false;
+
         // T8 4P bonus: chance to not consume the proc
         if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_MAGE_T8_4P_BONUS, EFFECT_0))
             if (roll_chance_i(aurEff->GetAmount()))
@@ -1598,6 +1613,7 @@ void AddSC_mage_spell_scripts()
     RegisterSpellScript(spell_mage_glyph_of_polymorph);
     RegisterSpellScript(spell_mage_hot_streak);
     RegisterSpellScript(spell_mage_ice_barrier);
+    RegisterSpellScript(spell_mage_ice_barrier_aura);
     RegisterSpellScript(spell_mage_ice_block);
     RegisterSpellScript(spell_mage_imp_blizzard);
     RegisterSpellScript(spell_mage_imp_mana_gems);

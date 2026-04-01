@@ -20,9 +20,7 @@
 
 #include "EnumFlag.h"
 #include "EventProcessor.h"
-#include "FollowerRefMgr.h"
-#include "FollowerReference.h"
-#include "HostileRefMgr.h"
+#include "CombatManager.h"
 #include "ItemTemplate.h"
 #include "MotionMaster.h"
 #include "Object.h"
@@ -30,7 +28,7 @@
 #include "SharedDefines.h"
 #include "SpellAuraDefines.h"
 #include "SpellDefines.h"
-#include "ThreatMgr.h"
+#include "ThreatManager.h"
 #include "UnitDefines.h"
 #include "UnitUtils.h"
 #include <functional>
@@ -74,6 +72,7 @@ class MotionTransport;
 class Vehicle;
 class TransportBase;
 class SpellCastTargets;
+class AbstractFollower;
 
 typedef std::list<Unit*> UnitList;
 typedef std::list< std::pair<Aura*, uint8> > DispelChargesList;
@@ -903,7 +902,7 @@ public:
     [[nodiscard]] bool isAttackingPlayer() const;
     [[nodiscard]] Unit* GetVictim() const { return m_attacking; }
 
-    void CombatStop(bool includingCast = false);
+    void CombatStop(bool includingCast = false, bool mutualPvP = true);
     void CombatStopWithPets(bool includingCast = false);
     void StopAttackFaction(uint32 faction_id);
     void StopAttackingInvalidTarget();
@@ -929,17 +928,15 @@ public:
     void SetImmuneToNPC(bool apply, bool keepCombat = false);
     bool IsImmuneToNPC() const { return HasUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC); }
 
-    bool IsEngaged() const { return IsInCombat(); }
-    bool IsEngagedBy(Unit const* who) const { return IsInCombatWith(who); }
+    virtual bool IsEngaged() const { return IsInCombat(); }
+    bool IsEngagedBy(Unit const* who) const { return CanHaveThreatList() ? IsThreatenedBy(who) : IsInCombatWith(who); }
+    void EngageWithTarget(Unit* who);
 
     [[nodiscard]] bool IsInCombat() const { return HasUnitFlag(UNIT_FLAG_IN_COMBAT); }
     bool IsInCombatWith(Unit const* who) const;
 
     [[nodiscard]] bool IsPetInCombat() const { return HasUnitFlag(UNIT_FLAG_PET_IN_COMBAT); }
-    void CombatStart(Unit* target, bool initialAggro = true);
-    void CombatStartOnCast(Unit* target, bool initialAggro = true, uint32 duration = 0);
-    void SetInCombatState(bool PvP, Unit* enemy = nullptr, uint32 duration = 0);
-    void SetInCombatWith(Unit* enemy, uint32 duration = 0);
+    void SetInCombatWith(Unit* enemy, bool addSecondUnitSuppressed = false) { if (enemy) m_combatManager.SetInCombatWith(enemy, addSecondUnitSuppressed); }
     void ClearInCombat();
     void ClearInPetCombat();
     [[nodiscard]] uint32 GetCombatTimer() const { return m_CombatTimer; }
@@ -948,21 +945,28 @@ public:
     // Threat related methods
     [[nodiscard]] bool CanHaveThreatList(bool skipAliveCheck = false) const;
     void AddThreat(Unit* victim, float fThreat, SpellSchoolMask schoolMask = SPELL_SCHOOL_MASK_NORMAL, SpellInfo const* threatSpell = nullptr);
-    float ApplyTotalThreatModifier(float fThreat, SpellSchoolMask schoolMask = SPELL_SCHOOL_MASK_NORMAL);
-    void TauntApply(Unit* victim);
-    void TauntFadeOut(Unit* taunter);
-    ThreatMgr& GetThreatMgr() { return m_ThreatMgr; }
-    ThreatMgr const& GetThreatMgr() const { return m_ThreatMgr; }
-    void addHatedBy(HostileReference* pHostileReference) { m_HostileRefMgr.insertFirst(pHostileReference); };
-    void removeHatedBy(HostileReference* /*pHostileReference*/) { /* nothing to do yet */ }
-    HostileRefMgr& getHostileRefMgr() { return m_HostileRefMgr; }
+    void AtTargetAttacked(Unit* target, bool canInitialAggro);
 
-    // Redirect Threat
-    void SetRedirectThreat(ObjectGuid guid, uint32 pct) { _redirectThreatInfo.Set(guid, pct); }
-    void ResetRedirectThreat() { SetRedirectThreat(ObjectGuid::Empty, 0); }
-    void ModifyRedirectThreat(int32 amount) { _redirectThreatInfo.ModifyThreatPct(amount); }
-    uint32 GetRedirectThreatPercent() { return _redirectThreatInfo.GetThreatPct(); }
-    [[nodiscard]] Unit* GetRedirectThreatTarget() const;
+    // ThreatManager/CombatManager accessors
+    ThreatManager& GetThreatMgr() { return m_threatManager; }
+    ThreatManager const& GetThreatMgr() const { return m_threatManager; }
+    CombatManager& GetCombatManager() { return m_combatManager; }
+    CombatManager const& GetCombatManager() const { return m_combatManager; }
+
+    // Combat state methods
+    [[nodiscard]] bool IsThreatened() const;
+    [[nodiscard]] bool IsThreatenedBy(Unit const* who) const { return who && m_threatManager.IsThreatenedBy(who, true); }
+    void UpdatePetCombatState();
+
+    virtual void AtEnterCombat() {}
+    virtual void AtExitCombat();
+
+    // Engagement callbacks - override in Creature for creature-specific behavior
+    virtual void AtEngage(Unit* target);
+    virtual void AtDisengage() {}
+
+    [[nodiscard]] bool IsCombatDisallowed() const { return _isCombatDisallowed; }
+    void SetIsCombatDisallowed(bool value) { _isCombatDisallowed = value; }
 
     void SetLastDamagedTargetGuid(ObjectGuid const& guid) { _lastDamagedTargetGuid = guid; }
     [[nodiscard]] ObjectGuid const& GetLastDamagedTargetGuid() const { return _lastDamagedTargetGuid; }
@@ -1191,7 +1195,7 @@ public:
     int32 GetMechanicResistChance(SpellInfo const* spell);
     [[nodiscard]] uint32 GetResistance(SpellSchoolMask mask) const;
     [[nodiscard]] uint32 GetResistance(SpellSchools school) const { return GetUInt32Value(static_cast<uint16>(UNIT_FIELD_RESISTANCES) + school); }
-    static float GetEffectiveResistChance(Unit const* owner, SpellSchoolMask schoolMask, Unit const* victim);
+    static float GetEffectiveResistChance(Unit const* owner, SpellSchoolMask schoolMask, Unit const* victim, SpellInfo const* spellInfo = nullptr);
 
     void SetResistance(SpellSchools school, int32 val) { SetStatInt32Value(static_cast<uint16>(UNIT_FIELD_RESISTANCES) + school, val); }
     void UpdateResistanceBuffModsMod(SpellSchools school);
@@ -1404,7 +1408,7 @@ public:
     void RemoveAurasWithInterruptFlags(uint32 flag, uint32 except = 0, bool isAutoshot = false);
     void RemoveAurasWithAttribute(uint32 flags);
     void RemoveAurasWithFamily(SpellFamilyNames family, uint32 familyFlag1, uint32 familyFlag2, uint32 familyFlag3, ObjectGuid casterGUID);
-    void RemoveAurasWithMechanic(uint32 mechanic_mask, AuraRemoveMode removemode = AURA_REMOVE_BY_DEFAULT, uint32 except = 0);
+    void RemoveAurasWithMechanic(uint64 mechanic_mask, AuraRemoveMode removemode = AURA_REMOVE_BY_DEFAULT, uint32 except = 0);
     void RemoveMovementImpairingAuras(bool withRoot);
     void RemoveAurasByShapeShift();
 
@@ -1496,7 +1500,7 @@ public:
     bool HasNegativeAuraWithInterruptFlag(uint32 flag, ObjectGuid guid = ObjectGuid::Empty);
     [[nodiscard]] bool HasVisibleAuraType(AuraType auraType) const;
     bool HasNegativeAuraWithAttribute(uint32 flag, ObjectGuid guid = ObjectGuid::Empty);
-    [[nodiscard]] bool HasAuraWithMechanic(uint32 mechanicMask) const;
+    [[nodiscard]] bool HasAuraWithMechanic(uint64 mechanicMask) const;
 
     [[nodiscard]] bool HasAuraTypeWithFamilyFlags(AuraType auraType, uint32 familyName, uint32 familyFlags) const;
 
@@ -1632,17 +1636,22 @@ public:
 
     // Spells immunities
     void ApplySpellImmune(uint32 spellId, uint32 op, uint32 type, bool apply, SpellImmuneBlockType blockType = SPELL_BLOCK_TYPE_ALL);
-    void ApplySpellDispelImmunity(SpellInfo const* spellProto, DispelType type, bool apply);
     virtual bool IsImmunedToSpell(SpellInfo const* spellInfo, Spell const* spell = nullptr);
-    [[nodiscard]] bool IsImmunedToDamage(SpellSchoolMask meleeSchoolMask) const;
-    [[nodiscard]] bool IsImmunedToDamage(SpellInfo const* spellInfo) const;
-    [[nodiscard]] bool IsImmunedToDamage(Spell const* spell) const;
-    [[nodiscard]] bool IsImmunedToSchool(SpellSchoolMask meleeSchoolMask) const;
+    bool IsImmunedToSpell(SpellInfo const* spellInfo, uint32 effectMask, Unit const* caster = nullptr);
+    [[nodiscard]] bool IsImmunedToDamage(SpellSchoolMask schoolMask) const;
+    [[nodiscard]] bool IsImmunedToDamage(Unit const* caster, SpellInfo const* spellInfo) const;
+    [[nodiscard]] bool IsImmunedToSchool(SpellSchoolMask schoolMask) const;
+
+    static bool IsImmuneMaskFully(SpellSchoolMask immuneMask, SpellSchoolMask schoolMask) { return (immuneMask & schoolMask) == schoolMask; }
+
+    [[nodiscard]] uint32 GetSchoolImmunityMask() const;
+    [[nodiscard]] uint32 GetDamageImmunityMask() const;
+
     [[nodiscard]] bool IsImmunedToSchool(SpellInfo const* spellInfo) const;
     [[nodiscard]] bool IsImmunedToSchool(Spell const* spell) const;
-    [[nodiscard]] bool IsImmunedToDamageOrSchool(SpellSchoolMask meleeSchoolMask) const;
-    bool IsImmunedToDamageOrSchool(SpellInfo const* spellInfo) const;
-    virtual bool IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) const;
+    [[nodiscard]] bool IsImmunedToDamageOrSchool(SpellSchoolMask schoolMask) const;
+    [[nodiscard]] bool IsImmunedToAuraPeriodicTick(Unit const* caster, SpellInfo const* spellInfo) const;
+    virtual bool IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index, Unit const* caster = nullptr) const;
 
     // Critic chances
     bool isBlockCritical();
@@ -1819,7 +1828,7 @@ public:
     [[nodiscard]] bool HasIgnoreTargetResistAura()  const { return HasAuraType(SPELL_AURA_MOD_IGNORE_TARGET_RESIST); }
     [[nodiscard]] bool HasIncreaseMountedSpeedAura() const { return HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_SPEED); }
     [[nodiscard]] bool HasIncreaseMountedFlightSpeedAura() const { return HasAuraType(SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED); }
-    [[nodiscard]] bool HasThreatAura()              const { return HasAuraType(SPELL_AURA_MOD_THREAT); }
+
     [[nodiscard]] bool HasAttackerSpellCritChanceAura() const { return HasAuraType(SPELL_AURA_MOD_ATTACKER_SPELL_CRIT_CHANCE); }
     [[nodiscard]] bool HasUnattackableAura()        const { return HasAuraType(SPELL_AURA_MOD_UNATTACKABLE); }
     [[nodiscard]] bool HasHealthRegenInCombatAura() const { return HasAuraType(SPELL_AURA_MOD_HEALTH_REGEN_IN_COMBAT); }
@@ -1881,9 +1890,10 @@ public:
     [[nodiscard]] bool IsInDisallowedMountForm() const;
 
     // Followers
-    void addFollower(FollowerReference* pRef) { m_FollowingRefMgr.insertFirst(pRef); }
-    void removeFollower(FollowerReference* /*pRef*/) { /* nothing to do yet */ }
+    void FollowerAdded(AbstractFollower* f) { m_followingMe.insert(f); }
+    void FollowerRemoved(AbstractFollower* f) { m_followingMe.erase(f); }
     [[nodiscard]] virtual float GetFollowAngle() const { return static_cast<float>(M_PI / 2); }
+    void RemoveAllFollowers();
 
     // Pets, guardians, minions...
     [[nodiscard]] Guardian* GetGuardianPet() const;
@@ -2044,10 +2054,6 @@ public:
     void SendMovementFeatherFall(Player* sendTo);
     void SendMovementHover(Player* sendTo);
 
-    void SendChangeCurrentVictimOpcode(HostileReference* pHostileReference);
-    void SendClearThreatListOpcode();
-    void SendRemoveFromThreatListOpcode(HostileReference* pHostileReference);
-    void SendThreatListUpdate();
     void SendClearTarget();
 
     // Misc functions
@@ -2077,16 +2083,17 @@ public:
     float m_modSpellHitChance;
     int32 m_baseSpellCritChance;
 
-    float m_threatModifier[MAX_SPELL_SCHOOL];
     float m_modAttackSpeedPct[3];
 
-    SpellImmuneList m_spellImmune[MAX_SPELL_IMMUNITY];
+    typedef std::unordered_multimap<uint32 /*type*/, uint32 /*spellId*/> SpellImmuneContainer;
+    SpellImmuneContainer m_spellImmune[MAX_SPELL_IMMUNITY];
     uint32 m_lastSanctuaryTime;
 
     // pet auras
     typedef std::set<PetAura const*> PetAuraSet;
     PetAuraSet m_petAuras;
 
+    ObjectGuid LastCharmerGUID;
     bool IsAIEnabled;
     bool NeedChangeAI;
 
@@ -2184,7 +2191,8 @@ protected:
     uint32 m_reactiveTimer[MAX_REACTIVE];
     int32 m_regenTimer;
 
-    ThreatMgr m_ThreatMgr;
+    ThreatManager m_threatManager;
+    CombatManager m_combatManager;
     typedef std::map<ObjectGuid, float> CharmThreatMap;
     CharmThreatMap _charmThreatInfo;
 
@@ -2225,22 +2233,19 @@ private:
     //TimeTrackerSmall m_movesplineTimer;
 
     Diminishing m_Diminishing;
-    // Manage all Units that are threatened by us
-    HostileRefMgr m_HostileRefMgr;
 
-    FollowerRefMgr m_FollowingRefMgr;
+    std::unordered_set<AbstractFollower*> m_followingMe;
 
     Unit* m_comboTarget;
     int8 m_comboPoints;
     std::unordered_set<Unit*> m_ComboPointHolders;
-
-    RedirectThreatInfo _redirectThreatInfo;
 
     bool m_cleanupDone; // lock made to not add stuff after cleanup before delete
     bool m_duringRemoveFromWorld; // lock made to not add stuff after begining removing from world
 
     uint32 _oldFactionId;           ///< faction before charm
     bool _isWalkingBeforeCharm;     ///< Are we walking before we were charmed?
+    bool _isCombatDisallowed;
 
     uint32 _lastExtraAttackSpell;
     std::unordered_map<ObjectGuid /*guid*/, uint32 /*count*/> extraAttacksTargets;

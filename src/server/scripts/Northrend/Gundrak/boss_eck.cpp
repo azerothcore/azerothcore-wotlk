@@ -43,12 +43,7 @@ Position const EckCombatStartPosition = { 1638.55f, 919.76f, 104.95f, 0.00f };
 struct boss_eck : public BossAI
 {
     boss_eck(Creature* creature) : BossAI(creature, DATA_ECK_THE_FEROCIOUS)
-    {
-        scheduler.SetValidator([this]
-            {
-                return !me->HasUnitState(UNIT_STATE_CASTING);
-            });
-    }
+    {    }
 
     void InitializeAI() override
     {
