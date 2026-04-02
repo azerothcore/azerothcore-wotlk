@@ -314,11 +314,7 @@ public:
 
 struct npc_training_dummy : NullCreatureAI
 {
-    npc_training_dummy(Creature* creature) : NullCreatureAI(creature)
-    {
-        // TODO: Remove once WorldObject casting is ported
-        me->SetIsCombatDisallowed(false);
-    }
+    npc_training_dummy(Creature* creature) : NullCreatureAI(creature) { }
 
     void JustEnteredCombat(Unit* who) override
     {
@@ -363,8 +359,6 @@ struct npc_target_dummy : NullCreatureAI
 {
     npc_target_dummy(Creature* creature) : NullCreatureAI(creature)
     {
-        // TODO: Remove once WorldObject casting is ported
-        me->SetIsCombatDisallowed(false);
         _deathTimer = 15s;
     }
 

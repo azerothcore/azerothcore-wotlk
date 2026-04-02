@@ -388,64 +388,6 @@ public:
 };
 
 /*######
-## avatar_of_freya
-######*/
-
-enum Freya
-{
-    QUEST_FREYA_PACT         = 12621,
-
-    SPELL_FREYA_CONVERSATION = 52045,
-
-    GOSSIP_AVATAR_MENU_1     = 9720,
-    GOSSIP_AVATAR_MENU_2     = 9721,
-    GOSSIP_AVATAR_MENU_3     = 9722,
-
-    GOSSIP_TEXTID_AVATAR_1   = 13303,
-    GOSSIP_TEXTID_AVATAR_2   = 13304,
-    GOSSIP_TEXTID_AVATAR_3   = 13305,
-};
-
-class npc_avatar_of_freya : public CreatureScript
-{
-public:
-    npc_avatar_of_freya() : CreatureScript("npc_avatar_of_freya") { }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if (player->GetQuestStatus(QUEST_FREYA_PACT) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_AVATAR_MENU_1, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-        SendGossipMenuFor(player, GOSSIP_TEXTID_AVATAR_1, creature);
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        switch (action)
-        {
-            case GOSSIP_ACTION_INFO_DEF+1:
-                AddGossipItemFor(player, GOSSIP_AVATAR_MENU_2, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                SendGossipMenuFor(player, GOSSIP_TEXTID_AVATAR_2, creature);
-                break;
-            case GOSSIP_ACTION_INFO_DEF+2:
-                AddGossipItemFor(player, GOSSIP_AVATAR_MENU_3, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                SendGossipMenuFor(player, GOSSIP_TEXTID_AVATAR_3, creature);
-                break;
-            case GOSSIP_ACTION_INFO_DEF+3:
-                player->CastSpell(player, SPELL_FREYA_CONVERSATION, true);
-                CloseGossipMenuFor(player);
-                break;
-        }
-        return true;
-    }
-};
-
-/*######
 ## npc_bushwhacker
 ######*/
 
@@ -1187,7 +1129,6 @@ void AddSC_sholazar_basin()
     new go_pressure_valve();
     new go_brazier();
     new npc_vekjik();
-    new npc_avatar_of_freya();
     new npc_bushwhacker();
     new npc_engineer_helice();
     new npc_adventurous_dwarf();

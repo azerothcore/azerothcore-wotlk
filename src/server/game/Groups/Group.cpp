@@ -600,35 +600,7 @@ bool Group::RemoveMember(ObjectGuid guid, const RemoveMethod& method /*= GROUP_R
         }
 
         // Remove player from loot rolls
-        for (Rolls::iterator it = RollId.begin(); it != RollId.end();)
-        {
-            Roll* roll = *it;
-            Roll::PlayerVote::iterator itr2 = roll->playerVote.find(guid);
-            if (itr2 == roll->playerVote.end())
-            {
-                ++it;
-                continue;
-            }
-
-            if (itr2->second == GREED || itr2->second == DISENCHANT)
-                --roll->totalGreed;
-            else if (itr2->second == NEED)
-                --roll->totalNeed;
-            else if (itr2->second == PASS)
-                --roll->totalPass;
-
-            if (itr2->second != NOT_VALID)
-                --roll->totalPlayersRolling;
-
-            roll->playerVote.erase(itr2);
-
-            // Xinef: itr can be erased inside
-            // Xinef: player is removed from all vote lists so it will not pass above playerVote == playerVote.end statement during second iteration
-            if (CountRollVote(guid, roll->itemGUID, MAX_ROLL_TYPE))
-                it = RollId.begin();
-            else
-                ++it;
-        }
+        RemovePlayerFromRolls(guid);
 
         // Update subgroups
         member_witerator slot = _getMemberWSlot(guid);
@@ -1419,6 +1391,37 @@ void Group::EndRoll(Loot* pLoot, Map* allowedMap)
         }
         else
             ++itr;
+    }
+}
+
+void Group::RemovePlayerFromRolls(ObjectGuid guid)
+{
+    for (Rolls::iterator it = RollId.begin(); it != RollId.end();)
+    {
+        Roll* roll = *it;
+        Roll::PlayerVote::iterator itr2 = roll->playerVote.find(guid);
+        if (itr2 == roll->playerVote.end())
+        {
+            ++it;
+            continue;
+        }
+
+        if (itr2->second == GREED || itr2->second == DISENCHANT)
+            --roll->totalGreed;
+        else if (itr2->second == NEED)
+            --roll->totalNeed;
+        else if (itr2->second == PASS)
+            --roll->totalPass;
+
+        if (itr2->second != NOT_VALID)
+            --roll->totalPlayersRolling;
+
+        roll->playerVote.erase(itr2);
+
+        if (CountRollVote(guid, roll->itemGUID, MAX_ROLL_TYPE))
+            it = RollId.begin();
+        else
+            ++it;
     }
 }
 

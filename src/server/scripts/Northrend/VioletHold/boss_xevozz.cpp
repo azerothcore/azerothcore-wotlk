@@ -157,8 +157,7 @@ public:
         {
             if (pSummoned)
             {
-                pSummoned->GetMotionMaster()->MoveFollow(me, 0.0f, 0.0f);
-                pSummoned->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+                pSummoned->GetMotionMaster()->MoveFollow(me, 0.0f, 0.0f, MOTION_SLOT_ACTIVE, true, false);
                 spheres.Summon(pSummoned);
                 if (pInstance)
                     pInstance->SetGuidData(DATA_ADD_TRASH_MOB, pSummoned->GetGUID());
