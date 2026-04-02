@@ -13040,7 +13040,7 @@ PartyResult Player::CanUninviteFromGroup(ObjectGuid targetPlayerGUID) const
         if (state == lfg::LFG_STATE_FINISHED_DUNGEON)
             return ERR_PARTY_LFG_BOOT_DUNGEON_COMPLETE;
 
-        if (grp->isRollLootActive())
+        if (grp->isRollLootActive() && ObjectAccessor::FindConnectedPlayer(targetPlayerGUID))
             return ERR_PARTY_LFG_BOOT_LOOT_ROLLS;
 
         /// @todo: Should also be sent when anyone has recently left combat, with an aprox ~5 seconds timer.

@@ -1445,6 +1445,10 @@ enum AcoreStrings
     LANG_DEBUG_FACTIONCHANGE_GOLD_FAIL             = 30122,
     LANG_DEBUG_FACTIONCHANGE_GOLD_OK               = 30123,
     LANG_DEBUG_FACTIONCHANGE_GOLD_NOLIMIT          = 30124,
-    LANG_DEBUG_FACTIONCHANGE_NA                    = 30125
+    LANG_DEBUG_FACTIONCHANGE_NA                    = 30125,
+
+    // Achievement commands
+    LANG_ACHIEVEMENT_ADD_ONLINE                    = 30126,
+    LANG_ACHIEVEMENT_ADD_OFFLINE                   = 30127
 };
 #endif
