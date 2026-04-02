@@ -6771,7 +6771,7 @@ void Unit::ProcSkillsAndAuras(Unit* actor, Unit* victim, uint32 procAttacker, ui
         }
         else if (healInfo && healInfo->GetHeal())
             spellTypeMask = PROC_SPELL_TYPE_HEAL;
-        else if (damageInfo && damageInfo->GetDamage())
+        else if (damageInfo && (damageInfo->GetDamage() || damageInfo->GetAbsorb()))
             spellTypeMask = PROC_SPELL_TYPE_DAMAGE;
         else if (procSpellInfo)
             spellTypeMask = PROC_SPELL_TYPE_NO_DMG_HEAL;
