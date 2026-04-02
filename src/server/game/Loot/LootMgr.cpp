@@ -455,7 +455,8 @@ bool LootItem::AllowedForPlayer(Player const* player, ObjectGuid source) const
                 prevQuestId = startQuest->GetPrevQuestId();
 
             if (player->GetQuestStatus(pProto->StartQuest) != QUEST_STATUS_NONE ||
-                (pProto->MaxCount && player->HasItemCount(itemid, pProto->MaxCount)) ||
+                player->GetQuestRewardStatus(pProto->StartQuest) ||
+                (pProto->MaxCount && player->HasItemCount(itemid, pProto->MaxCount, true)) ||
                 (prevQuestId && !player->GetQuestRewardStatus(prevQuestId)))
                 return false;
         }
