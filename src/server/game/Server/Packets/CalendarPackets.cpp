@@ -16,6 +16,7 @@
  */
 
 #include "CalendarPackets.h"
+#include "Packet.h"
 
 void WorldPackets::Calendar::GetEvent::Read()
 {
