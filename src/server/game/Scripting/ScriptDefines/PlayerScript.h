@@ -215,6 +215,7 @@ enum PlayerHook
     PLAYERHOOK_ON_BEFORE_PLAYER_SEND_SPELL_LIST_TO_TRAINER,
     PLAYERHOOK_ON_BEFORE_CAN_TAKE_QUEST,
     PLAYERHOOK_ON_BEFORE_CAN_REWARD_QUEST,
+    PLAYERHOOK_ON_LEARN_TAXI_NODE,
     PLAYERHOOK_END
 };
 
@@ -865,6 +866,12 @@ public:
      */  
      virtual bool OnBeforeCanRewardQuest(Player* /*player*/, Quest const* /*quest*/) { return true; }
 
+     * @brief This hook is called when a player learns a new flight path node.
+     *
+     * @param player Contains information about the Player
+     * @param nodeId The id of the learned taxi node
+     */
+    virtual void OnPlayerLearnTaxiNode(Player const* /*player*/, uint32 /*nodeId*/) {}
 };
 
 #endif

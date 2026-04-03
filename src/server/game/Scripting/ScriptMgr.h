@@ -470,6 +470,7 @@ public: /* PlayerScript */
     void OnBeforePlayerSendSpellListToTrainer(Player* player, Creature* creature, WorldPackets::NPC::TrainerList& trainerList);
     bool OnBeforeCanTakeQuest(Player* player, Quest const* quest);
     bool OnBeforeCanRewardQuest(Player* player, Quest const* quest);
+    void OnPlayerLearnTaxiNode(Player const* player, uint32 nodeId);
 
     // Anti cheat
     void AnticheatSetCanFlybyServer(Player* player, bool apply);

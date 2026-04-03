@@ -7079,18 +7079,18 @@ SpellCastResult Spell::CheckRange(bool strict)
             else if (!m_caster->IsWithinCombatRange(target, max_range))
                 return SPELL_FAILED_OUT_OF_RANGE; //0x5A;
 
-            if (m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED && range_type == SPELL_RANGE_RANGED)
-            {
-                if (m_caster->IsWithinMeleeRange(target))
-                    return SPELL_FAILED_TOO_CLOSE;
-            }
-
             if (m_caster->IsPlayer() && (m_spellInfo->FacingCasterFlags & SPELL_FACING_FLAG_INFRONT) && !m_caster->HasInArc(static_cast<float>(M_PI), target) && !m_caster->IsWithinBoundaryRadius(target))
                 return SPELL_FAILED_UNIT_NOT_INFRONT;
         }
 
-        // Xinef: check min range for self casts
-        if (min_range && range_type != SPELL_RANGE_RANGED && m_caster->IsWithinCombatRange(target, min_range)) // skip this check if min_range = 0
+        // Check min range - for ranged spells, min range is the spell's min range + melee range (no leeway)
+        if (range_type == SPELL_RANGE_RANGED)
+        {
+            float minRangeCombined = min_range + m_caster->GetMeleeRange(target);
+            if (m_caster->IsWithinRange(target, minRangeCombined))
+                return SPELL_FAILED_TOO_CLOSE;
+        }
+        else if (min_range > 0 && m_caster->IsWithinCombatRange(target, min_range))
             return SPELL_FAILED_TOO_CLOSE;
     }
 

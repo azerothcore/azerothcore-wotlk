@@ -944,6 +944,9 @@ bool ScriptMgr::OnBeforeCanTakeQuest(Player* player, Quest const* quest)
 bool ScriptMgr::OnBeforeCanRewardQuest(Player* player, Quest const* quest)
 {
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_CAN_REWARD_QUEST, !script->OnBeforeCanRewardQuest(player, quest));
+void ScriptMgr::OnPlayerLearnTaxiNode(Player const* player, uint32 nodeId)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_LEARN_TAXI_NODE, script->OnPlayerLearnTaxiNode(player, nodeId));
 }
 
 PlayerScript::PlayerScript(const char* name, std::vector<uint16> enabledHooks)

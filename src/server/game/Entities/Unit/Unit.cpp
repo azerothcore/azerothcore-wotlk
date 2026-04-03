@@ -910,14 +910,33 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, uint32 effectMask, Unit 
     if (!spellInfo)
         return false;
 
+    bool immuneToAllEffects = true;
+    bool hasCheckedEffect = false;
+
     for (uint8 i = EFFECT_0; i < MAX_SPELL_EFFECTS; ++i)
     {
         if (!(effectMask & (1u << i)))
             continue;
 
+        if (!spellInfo->Effects[i].IsEffect())
+            continue;
+
+        hasCheckedEffect = true;
+
         if (IsImmunedToSpellEffect(spellInfo, i, caster))
-            return true;
+        {
+            if (spellInfo->HasAttribute(SPELL_ATTR4_NO_PARTIAL_IMMUNITY))
+                return true;
+
+            continue;
+        }
+
+        immuneToAllEffects = false;
+        break;
     }
+
+    if (hasCheckedEffect && immuneToAllEffects)
+        return true;
 
     if (!spellInfo->HasAttribute(SPELL_ATTR2_NO_SCHOOL_IMMUNITIES))
     {
@@ -5678,6 +5697,9 @@ void Unit::RemoveAllAurasExceptType(AuraType type)
 // Xinef: We should not remove passive auras on evade, if npc has player owner (scripted one cast auras)
 void Unit::RemoveEvadeAuras()
 {
+    if (IsCharmedOwnedByPlayerOrPlayer())
+        return;
+
     for (AuraApplicationMap::iterator iter = m_appliedAuras.begin(); iter != m_appliedAuras.end();)
     {
         Aura const* aura = iter->second->GetBase();
@@ -6749,7 +6771,7 @@ void Unit::ProcSkillsAndAuras(Unit* actor, Unit* victim, uint32 procAttacker, ui
         }
         else if (healInfo && healInfo->GetHeal())
             spellTypeMask = PROC_SPELL_TYPE_HEAL;
-        else if (damageInfo && damageInfo->GetDamage())
+        else if (damageInfo && (damageInfo->GetDamage() || damageInfo->GetAbsorb()))
             spellTypeMask = PROC_SPELL_TYPE_DAMAGE;
         else if (procSpellInfo)
             spellTypeMask = PROC_SPELL_TYPE_NO_DMG_HEAL;

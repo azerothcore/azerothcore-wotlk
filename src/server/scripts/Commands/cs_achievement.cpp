@@ -15,8 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AchievementMgr.h"
 #include "Chat.h"
 #include "CommandScript.h"
+#include "Language.h"
 #include "Player.h"
 
 using namespace Acore::ChatCommands;
@@ -30,7 +32,7 @@ public:
     {
         static ChatCommandTable achievementCommandTable =
         {
-            { "add",      HandleAchievementAddCommand,      SEC_GAMEMASTER,    Console::No },
+            { "add",      HandleAchievementAddCommand,      SEC_GAMEMASTER,    Console::Yes },
             { "checkall", HandleAchievementCheckAllCommand, SEC_ADMINISTRATOR, Console::Yes }
         };
         static ChatCommandTable commandTable =
@@ -40,15 +42,27 @@ public:
         return commandTable;
     }
 
-    static bool HandleAchievementAddCommand(ChatHandler* handler, AchievementEntry const* achievementEntry)
+    static bool HandleAchievementAddCommand(ChatHandler* handler, AchievementEntry const* achievementEntry, Optional<PlayerIdentifier> player)
     {
-        Player* target = handler->getSelectedPlayer();
-        if (!target)
+        if (!player)
+            player = PlayerIdentifier::FromTargetOrSelf(handler);
+
+        if (!player)
         {
-            handler->SendErrorMessage(LANG_NO_CHAR_SELECTED);
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
             return false;
         }
-        target->CompletedAchievement(achievementEntry);
+
+        if (player->IsConnected())
+        {
+            player->GetConnectedPlayer()->CompletedAchievement(achievementEntry);
+            handler->PSendSysMessage(LANG_ACHIEVEMENT_ADD_ONLINE, achievementEntry->ID, achievementEntry->name[0], player->GetName());
+        }
+        else
+        {
+            sAchievementMgr->CompletedAchievementForOfflinePlayer(player->GetGUID().GetCounter(), achievementEntry);
+            handler->PSendSysMessage(LANG_ACHIEVEMENT_ADD_OFFLINE, achievementEntry->ID, achievementEntry->name[0], player->GetName());
+        }
 
         return true;
     }
