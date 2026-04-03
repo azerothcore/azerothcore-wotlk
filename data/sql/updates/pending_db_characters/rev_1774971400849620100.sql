@@ -6,7 +6,7 @@ CREATE TABLE `spam_reports` (
     `Unk1` INT UNSIGNED NULL DEFAULT '0',
     `MailIdOrMessageType` INT UNSIGNED NULL DEFAULT '0',
     `ChannelId` INT UNSIGNED NULL COMMENT 'Only used if SpamType = 1',
-    `secondsSinceMessage` INT UNSIGNED NULL COMMENT 'Only used if SpamType = 1',
+    `SecondsSinceMessage` INT UNSIGNED NULL COMMENT 'Only used if SpamType = 1',
     `Description` LONGTEXT NULL DEFAULT NULL COLLATE 'utf8mb4_unicode_ci',
     `Time` INT NULL DEFAULT NULL COMMENT 'Time of report',
     PRIMARY KEY (`ID`) USING BTREE
