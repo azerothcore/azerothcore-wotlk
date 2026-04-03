@@ -5,5 +5,4 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (22369, 0, 1, 0, 61, 0, 100, 1, 0, 0, 0, 0, 0, 0, 67, 1, 10000, 10000, 0, 0, 100, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dread Relic Thrall - On Just Summoned - Create Timed Event'),
 (22369, 0, 2, 3, 59, 0, 100, 1, 1, 0, 0, 0, 0, 0, 8, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Dread Relic Thrall - Timed Event - Set Aggressive'),
 (22369, 0, 3, 0, 61, 0, 100, 1, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 'Dread Relic Thrall - Timed Event - Attack Summoner'),
-(22369, 0, 4, 0, 4, 0, 100, 4, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 11, 22369, 10, 0, 0, 0, 0, 0, 0, 'Dread Relic Thrall - On Aggro - Set Data'); 
-
+(22369, 0, 4, 0, 4, 0, 100, 4, 0, 0, 0, 0, 0, 0, 45, 1, 1, 0, 0, 0, 0, 11, 22369, 10, 0, 0, 0, 0, 0, 0, 'Dread Relic Thrall - On Aggro - Set Data');
