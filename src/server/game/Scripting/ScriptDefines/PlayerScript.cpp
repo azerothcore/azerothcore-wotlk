@@ -18,6 +18,7 @@
 #include "PlayerScript.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
+#include "AllPackets.h"
 
 void ScriptMgr::OnPlayerBeforeDurabilityRepair(Player* player, ObjectGuid npcGUID, ObjectGuid itemGUID, float& discountMod, uint8 guildBank)
 {
@@ -923,6 +924,26 @@ void ScriptMgr::OnPlayerGetReputationPriceDiscount(Player const* player, Creatur
 void ScriptMgr::OnPlayerGetReputationPriceDiscount(Player const* player, FactionTemplateEntry const* factionTemplate, float& discount)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_GET_REPUTATION_PRICE_DISCOUNT, script->OnPlayerGetReputationPriceDiscount(player, factionTemplate, discount));
+}
+
+bool ScriptMgr::OnBeforePlayerLearnSpell(Player* player, uint32 spellId)
+{
+    CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_PLAYER_LEARN_SPELL, !script->OnBeforePlayerLearnSpell(player, spellId));
+}
+
+void ScriptMgr::OnBeforePlayerSendSpellListToTrainer(Player* player, Creature* npc, WorldPackets::NPC::TrainerList& trainerList)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_PLAYER_SEND_SPELL_LIST_TO_TRAINER, script->OnBeforePlayerSendSpellListToTrainer(player, npc, trainerList));
+}
+
+bool ScriptMgr::OnBeforeCanTakeQuest(Player* player, Quest const* quest)
+{
+    CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_CAN_TAKE_QUEST, !script->OnBeforeCanTakeQuest(player, quest));
+}
+
+bool ScriptMgr::OnBeforeCanRewardQuest(Player* player, Quest const* quest)
+{
+    CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_CAN_REWARD_QUEST, !script->OnBeforeCanRewardQuest(player, quest));
 }
 
 PlayerScript::PlayerScript(const char* name, std::vector<uint16> enabledHooks)

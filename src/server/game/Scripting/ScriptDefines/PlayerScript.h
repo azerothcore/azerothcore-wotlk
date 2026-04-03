@@ -21,6 +21,7 @@
 #include "ScriptObject.h"
 #include "SharedDefines.h"
 #include "DBCStructure.h"
+#include "AllPackets.h"
 #include <vector>
 
 // TODO to remove
@@ -210,6 +211,10 @@ enum PlayerHook
     PLAYERHOOK_ON_SEND_LIST_INVENTORY,
     PLAYERHOOK_ON_GIVE_REPUTATION,
     PLAYERHOOK_ON_GET_REPUTATION_PRICE_DISCOUNT,
+    PLAYERHOOK_ON_BEFORE_PLAYER_LEARN_SPELL,
+    PLAYERHOOK_ON_BEFORE_PLAYER_SEND_SPELL_LIST_TO_TRAINER,
+    PLAYERHOOK_ON_BEFORE_CAN_TAKE_QUEST,
+    PLAYERHOOK_ON_BEFORE_CAN_REWARD_QUEST,
     PLAYERHOOK_END
 };
 
@@ -820,6 +825,46 @@ public:
      * @param discount Float value of the discount, as a multiplier of the base price
      */
     virtual void OnPlayerGetReputationPriceDiscount(Player const* /*player*/, FactionTemplateEntry const* /*factionTemplate*/, float& /*discount*/) {}
+
+    /**
+     * @brief This hook is called before a player learns a spell, allowing cancel of learning a new spell.
+     *
+     * @param player Contains information about the Player
+     * @param spellId The id of the spell to be learned.
+     * 
+     * @return true if player is allowed to learn the new spell
+     */    
+    virtual bool OnBeforePlayerLearnSpell(Player* /*player*/, uint32 /*spellId*/) { return true; }
+
+    /**
+     * @brief This hook is called whenever a player speaks to a trainer that has spells for the player. This allows the spell list to be replaced.
+     *
+     * @param player Contains information about the Player
+     * @param creature Contains information about the Trainer.
+     * @param trainerList The TrainerList os spells that the Trainer will display to the player.
+     */
+    virtual void OnBeforePlayerSendSpellListToTrainer(Player* /*player*/, Creature* /*creature*/, WorldPackets::NPC::TrainerList& /*trainerList*/) { }
+
+    /**
+     * @brief This hook is called before a player can see a quest. This allows the quest to be hidden from the player.
+     *
+     * @param player Contains information about the Player
+     * @param quest Contains information about the quest.
+     * 
+     * @return true if player is allowed to see the quest
+     */  
+    virtual bool OnBeforeCanTakeQuest(Player* /*player*/, Quest const* /*quest*/) { return true; }
+
+    /**
+     * @brief This hook is called before a player can see a quest. This allows the server to prevent quest turn-ins.
+     *
+     * @param player Contains information about the Player
+     * @param quest Contains information about the quest.
+     * 
+     * @return true if player is allowed to turn in the quest
+     */  
+     virtual bool OnBeforeCanRewardQuest(Player* /*player*/, Quest const* /*quest*/) { return true; }
+
 };
 
 #endif

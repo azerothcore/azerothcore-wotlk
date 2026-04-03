@@ -250,6 +250,11 @@ bool Player::CanSeeStartQuest(Quest const* quest)
 
 bool Player::CanTakeQuest(Quest const* quest, bool msg)
 {
+    if (!sScriptMgr->OnBeforeCanTakeQuest(this, quest))
+    {
+        return false;
+    }
+
     return !sDisableMgr->IsDisabledFor(DISABLE_TYPE_QUEST, quest->GetQuestId(), this)
            && SatisfyQuestStatus(quest, msg) && SatisfyQuestExclusiveGroup(quest, msg)
            && SatisfyQuestClass(quest, msg) && SatisfyQuestRace(quest, msg) && SatisfyQuestLevel(quest, msg)
@@ -385,6 +390,11 @@ bool Player::CanCompleteRepeatableQuest(Quest const* quest)
 
 bool Player::CanRewardQuest(Quest const* quest, bool msg)
 {
+    if (!sScriptMgr->OnBeforeCanRewardQuest(this, quest))
+    {
+        return false;
+    }
+
     // not auto complete quest and not completed quest (only cheating case, then ignore without message)
     if (!quest->IsDFQuest() && !quest->IsAutoComplete() && quest->GetQuestMethod() && GetQuestStatus(quest->GetQuestId()) != QUEST_STATUS_COMPLETE)
         return false;

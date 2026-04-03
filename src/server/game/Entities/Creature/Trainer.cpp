@@ -21,6 +21,7 @@
 #include "Player.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
+#include "ScriptMgr.h"
 
 namespace Trainer
 {
@@ -73,6 +74,8 @@ namespace Trainer
             trainerListSpell.ReqSkillRank = trainerSpell.ReqSkillRank;
             std::copy(trainerSpell.ReqAbility.begin(), trainerSpell.ReqAbility.end(), trainerListSpell.ReqAbility.begin());
         }
+
+        sScriptMgr->OnBeforePlayerSendSpellListToTrainer(player, npc, trainerList);
 
         player->SendDirectMessage(trainerList.Write());
     }

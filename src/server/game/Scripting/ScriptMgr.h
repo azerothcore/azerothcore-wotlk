@@ -466,6 +466,10 @@ public: /* PlayerScript */
     void OnPlayerSendListInventory(Player* player, ObjectGuid vendorGuid, uint32& vendorEntry);
     void OnPlayerGetReputationPriceDiscount(Player const* player, Creature const* creature, float& discount);
     void OnPlayerGetReputationPriceDiscount(Player const* player, FactionTemplateEntry const* factionTemplate, float& discount);
+    bool OnBeforePlayerLearnSpell(Player* player, uint32 spellId);
+    void OnBeforePlayerSendSpellListToTrainer(Player* player, Creature* creature, WorldPackets::NPC::TrainerList& trainerList);
+    bool OnBeforeCanTakeQuest(Player* player, Quest const* quest);
+    bool OnBeforeCanRewardQuest(Player* player, Quest const* quest);
 
     // Anti cheat
     void AnticheatSetCanFlybyServer(Player* player, bool apply);
