@@ -1,3 +1,4 @@
+-- DB update 2026_03_30_00 -> 2026_04_03_00
 --
 CREATE TABLE `spam_reports` (
     `ID` INT UNSIGNED NOT NULL AUTO_INCREMENT,
