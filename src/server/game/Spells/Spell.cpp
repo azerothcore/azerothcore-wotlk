@@ -6881,7 +6881,7 @@ SpellCastResult Spell::CheckCasterAuras(bool preventionOnly) const
                 Unit::AuraEffectList const& stunAuras = m_caster->GetAuraEffectsByType(SPELL_AURA_MOD_STUN);
                 for (Unit::AuraEffectList::const_iterator i = stunAuras.begin(); i != stunAuras.end(); ++i)
                 {
-                    if ((*i)->GetSpellInfo()->GetAllEffectsMechanicMask() && !((*i)->GetSpellInfo()->GetAllEffectsMechanicMask() & mask))
+                    if ((*i)->GetSpellInfo()->GetAllEffectsMechanicMask() && !((*i)->GetSpellInfo()->GetAllEffectsMechanicMask() & uint64(mask)))
                     {
                         foundNotStun = true;
                         break;
@@ -6919,7 +6919,7 @@ SpellCastResult Spell::CheckCasterAuras(bool preventionOnly) const
             {
                 Aura const* aura = itr->second->GetBase();
                 SpellInfo const* auraInfo = aura->GetSpellInfo();
-                if (auraInfo->GetAllEffectsMechanicMask() & mechanic_immune)
+                if (auraInfo->GetAllEffectsMechanicMask() & uint64(mechanic_immune))
                     continue;
                 if (auraInfo->GetSchoolMask() & school_immune && !auraInfo->HasAttribute(SPELL_ATTR1_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS))
                     continue;
@@ -6944,7 +6944,7 @@ SpellCastResult Spell::CheckCasterAuras(bool preventionOnly) const
                                     if (m_spellInfo->Id == 1044)
                                         mask |= (1 << MECHANIC_SAPPED) | (1 << MECHANIC_FEAR);
 
-                                    if (!usableInStun || !(auraInfo->GetAllEffectsMechanicMask() & mask))
+                                    if (!usableInStun || !(auraInfo->GetAllEffectsMechanicMask() & uint64(mask)))
                                         return SPELL_FAILED_STUNNED;
                                     break;
                                 }
