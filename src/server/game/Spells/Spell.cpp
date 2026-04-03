@@ -6828,7 +6828,7 @@ SpellCastResult Spell::CheckCasterAuras(bool preventionOnly) const
         return SPELL_CAST_OK;
 
     uint8 school_immune = 0;
-    uint32 mechanic_immune = 0;
+    uint64 mechanic_immune = 0;
     uint32 dispel_immune = 0;
 
     // Check if the spell grants school or mechanic immunity.
@@ -6840,7 +6840,7 @@ SpellCastResult Spell::CheckCasterAuras(bool preventionOnly) const
             if (m_spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_SCHOOL_IMMUNITY)
                 school_immune |= uint32(m_spellInfo->Effects[i].MiscValue);
             else if (m_spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_MECHANIC_IMMUNITY)
-                mechanic_immune |= 1 << uint32(m_spellInfo->Effects[i].MiscValue);
+                mechanic_immune |= 1ULL << uint32(m_spellInfo->Effects[i].MiscValue);
             else if (m_spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_DISPEL_IMMUNITY)
                 dispel_immune |= SpellInfo::GetDispelMask(DispelType(m_spellInfo->Effects[i].MiscValue));
         }
@@ -6871,17 +6871,17 @@ SpellCastResult Spell::CheckCasterAuras(bool preventionOnly) const
             if (usableInStun)
             {
                 bool foundNotStun = false;
-                uint32 mask = (1 << MECHANIC_STUN) | (1 << MECHANIC_FREEZE) | (1 << MECHANIC_HORROR);
+                uint64 mask = (1ULL << MECHANIC_STUN) | (1ULL << MECHANIC_FREEZE) | (1ULL << MECHANIC_HORROR);
                 // Barkskin should skip sleep effects, sap and fears
                 if (m_spellInfo->Id == 22812)
-                    mask |= 1 << MECHANIC_SAPPED | 1 << MECHANIC_HORROR | 1 << MECHANIC_SLEEP;
+                    mask |= 1ULL << MECHANIC_SAPPED | 1ULL << MECHANIC_HORROR | 1ULL << MECHANIC_SLEEP;
                 // Hand of Freedom, can be used while sapped and while under fear-mechanic stuns (e.g. Intimidating Shout primary target)
                 if (m_spellInfo->Id == 1044)
-                    mask |= (1 << MECHANIC_SAPPED) | (1 << MECHANIC_FEAR);
+                    mask |= (1ULL << MECHANIC_SAPPED) | (1ULL << MECHANIC_FEAR);
                 Unit::AuraEffectList const& stunAuras = m_caster->GetAuraEffectsByType(SPELL_AURA_MOD_STUN);
                 for (Unit::AuraEffectList::const_iterator i = stunAuras.begin(); i != stunAuras.end(); ++i)
                 {
-                    if ((*i)->GetSpellInfo()->GetAllEffectsMechanicMask() && !((*i)->GetSpellInfo()->GetAllEffectsMechanicMask() & uint64(mask)))
+                    if ((*i)->GetSpellInfo()->GetAllEffectsMechanicMask() && !((*i)->GetSpellInfo()->GetAllEffectsMechanicMask() & mask))
                     {
                         foundNotStun = true;
                         break;
@@ -6919,7 +6919,7 @@ SpellCastResult Spell::CheckCasterAuras(bool preventionOnly) const
             {
                 Aura const* aura = itr->second->GetBase();
                 SpellInfo const* auraInfo = aura->GetSpellInfo();
-                if (auraInfo->GetAllEffectsMechanicMask() & uint64(mechanic_immune))
+                if (auraInfo->GetAllEffectsMechanicMask() & mechanic_immune)
                     continue;
                 if (auraInfo->GetSchoolMask() & school_immune && !auraInfo->HasAttribute(SPELL_ATTR1_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS))
                     continue;
@@ -6936,15 +6936,15 @@ SpellCastResult Spell::CheckCasterAuras(bool preventionOnly) const
                         {
                             case SPELL_AURA_MOD_STUN:
                                 {
-                                    uint32 mask = 1 << MECHANIC_STUN;
+                                    uint64 mask = 1ULL << MECHANIC_STUN;
                                     // Barkskin should skip sleep effects, sap and fears
                                     if (m_spellInfo->Id == 22812)
-                                        mask |= 1 << MECHANIC_SAPPED | 1 << MECHANIC_HORROR | 1 << MECHANIC_SLEEP;
+                                        mask |= 1ULL << MECHANIC_SAPPED | 1ULL << MECHANIC_HORROR | 1ULL << MECHANIC_SLEEP;
                                     // Hand of Freedom, can be used while sapped and while under fear-mechanic stuns (e.g. Intimidating Shout primary target)
                                     if (m_spellInfo->Id == 1044)
-                                        mask |= (1 << MECHANIC_SAPPED) | (1 << MECHANIC_FEAR);
+                                        mask |= (1ULL << MECHANIC_SAPPED) | (1ULL << MECHANIC_FEAR);
 
-                                    if (!usableInStun || !(auraInfo->GetAllEffectsMechanicMask() & uint64(mask)))
+                                    if (!usableInStun || !(auraInfo->GetAllEffectsMechanicMask() & mask))
                                         return SPELL_FAILED_STUNNED;
                                     break;
                                 }
