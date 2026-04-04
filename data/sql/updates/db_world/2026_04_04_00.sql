@@ -1,3 +1,4 @@
+-- DB update 2026_04_03_03 -> 2026_04_04_00
 -- Fix Scarlet Monastery Cathedral Mograine/Whitemane encounter resetting during scripted phase
 -- Disable evade during the scripted "fake death" / "Deep Sleep" / "resurrection" phase
 -- to prevent JustExitedCombat auto-evade from triggering SMART_EVENT_EVADE and setting FAIL
