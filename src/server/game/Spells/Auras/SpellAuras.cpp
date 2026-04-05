@@ -2137,6 +2137,35 @@ uint8 Aura::GetProcEffectMask(AuraApplication* aurApp, ProcEventInfo& eventInfo,
     // check spell triggering us
     if (Spell const* spell = eventInfo.GetProcSpell())
     {
+
+        SpellInfo const* eventSpellInfo = spell->GetSpellInfo();
+
+        uint32 typeMask = eventSpellInfo->GetProcSpellTypeMask();
+
+        if (eventSpellInfo->HasAttribute(SPELL_ATTR0_IS_TRADESKILL))
+            return 0;
+
+        if (spell->HasTriggeredCastFlag(TRIGGERED_DISALLOW_PROC_EVENTS))
+            return 0;
+
+        if (!eventInfo.GetDamageInfo() && !eventInfo.GetHealInfo())
+        {
+            if (!(typeMask & (PROC_SPELL_TYPE_DAMAGE | PROC_SPELL_TYPE_HEAL)))
+                return 0;
+        }
+        else
+        {
+            if (eventInfo.GetTypeMask() & (PROC_FLAG_DONE_PERIODIC | PROC_FLAG_TAKEN_PERIODIC))
+                return 0;
+
+            DamageInfo* dmgInfo = eventInfo.GetDamageInfo();
+            HealInfo* healInfo = eventInfo.GetHealInfo();
+            if (dmgInfo && !dmgInfo->GetDamage() && !dmgInfo->GetAbsorb())
+                return 0;
+            if (healInfo && !healInfo->GetHeal() && !healInfo->GetAbsorb())
+                return 0;
+        }
+
         // Do not allow auras to proc from effect triggered from itself
         if (spell->GetTriggeredByAuraSpellInfo() == m_spellInfo)
             return 0;

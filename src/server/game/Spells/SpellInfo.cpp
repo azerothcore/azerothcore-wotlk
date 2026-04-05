@@ -2795,6 +2795,72 @@ uint32 SpellInfo::GetMaxTicks() const
     return 6;
 }
 
+uint32 SpellInfo::GetProcSpellTypeMask() const
+{
+    if (HasAttribute(SPELL_ATTR0_IS_TRADESKILL))
+        return PROC_SPELL_TYPE_NO_DMG_HEAL;
+
+    uint32 mask = 0;
+
+    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+    {
+        if (!Effects[i].IsEffect())
+            continue;
+
+        switch (Effects[i].Effect)
+        {
+        case SPELL_EFFECT_SCHOOL_DAMAGE:
+        case SPELL_EFFECT_HEALTH_LEECH:
+        case SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL:
+        case SPELL_EFFECT_WEAPON_PERCENT_DAMAGE:
+        case SPELL_EFFECT_WEAPON_DAMAGE:
+        case SPELL_EFFECT_NORMALIZED_WEAPON_DMG:
+        case SPELL_EFFECT_POWER_BURN:
+        case SPELL_EFFECT_ENVIRONMENTAL_DAMAGE:
+            mask |= PROC_SPELL_TYPE_DAMAGE;
+            break;
+        case SPELL_EFFECT_HEAL:
+        case SPELL_EFFECT_HEAL_MECHANICAL:
+        case SPELL_EFFECT_HEAL_PCT:
+        case SPELL_EFFECT_HEAL_MAX_HEALTH:
+            mask |= PROC_SPELL_TYPE_HEAL;
+            break;
+        case SPELL_EFFECT_APPLY_AURA:
+        case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
+        case SPELL_EFFECT_APPLY_AREA_AURA_RAID:
+        case SPELL_EFFECT_APPLY_AREA_AURA_FRIEND:
+        case SPELL_EFFECT_APPLY_AREA_AURA_ENEMY:
+        case SPELL_EFFECT_APPLY_AREA_AURA_PET:
+        case SPELL_EFFECT_APPLY_AREA_AURA_OWNER:
+        case SPELL_EFFECT_PERSISTENT_AREA_AURA:
+        {
+            switch (Effects[i].ApplyAuraName)
+            {
+            case SPELL_AURA_PERIODIC_DAMAGE:
+            case SPELL_AURA_PERIODIC_DAMAGE_PERCENT:
+            case SPELL_AURA_PERIODIC_LEECH:          
+            case SPELL_AURA_PERIODIC_MANA_LEECH:     
+            case SPELL_AURA_PERIODIC_HEALTH_FUNNEL:  
+                mask |= PROC_SPELL_TYPE_DAMAGE;
+                break;
+            case SPELL_AURA_PERIODIC_HEAL:
+            case SPELL_AURA_OBS_MOD_HEALTH:
+                mask |= PROC_SPELL_TYPE_HEAL;
+                break;
+
+            default:
+                break;
+            }
+            break;
+        }
+
+        default:
+            break;
+        }
+    }
+    return mask ? mask : PROC_SPELL_TYPE_NO_DMG_HEAL;
+}
+
 uint32 SpellInfo::GetRecoveryTime() const
 {
     return RecoveryTime > CategoryRecoveryTime ? RecoveryTime : CategoryRecoveryTime;

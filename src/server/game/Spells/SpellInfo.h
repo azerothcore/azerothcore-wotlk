@@ -540,6 +540,8 @@ public:
 
     uint32 GetMaxTicks() const;
 
+    uint32 GetProcSpellTypeMask() const;
+
     uint32 CalcCastTime(Unit* caster = nullptr, Spell* spell = nullptr) const;
     uint32 GetRecoveryTime() const;
 
