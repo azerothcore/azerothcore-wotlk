@@ -215,14 +215,14 @@ bool OPvPCapturePoint::DelObject(uint32 type)
 
 bool OPvPCapturePoint::DelCapturePoint()
 {
-    sObjectMgr->DeleteGOData(m_capturePointSpawnId);
-    m_capturePointSpawnId = 0;
-
     if (_capturePoint)
     {
         _capturePoint->SetRespawnTime(0);                                 // not save respawn time
         _capturePoint->Delete();
     }
+
+    sObjectMgr->DeleteGOData(m_capturePointSpawnId);
+    m_capturePointSpawnId = 0;
 
     return true;
 }
