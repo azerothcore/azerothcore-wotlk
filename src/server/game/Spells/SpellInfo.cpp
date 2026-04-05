@@ -2838,9 +2838,9 @@ uint32 SpellInfo::GetProcSpellTypeMask() const
             {
             case SPELL_AURA_PERIODIC_DAMAGE:
             case SPELL_AURA_PERIODIC_DAMAGE_PERCENT:
-            case SPELL_AURA_PERIODIC_LEECH:          
-            case SPELL_AURA_PERIODIC_MANA_LEECH:     
-            case SPELL_AURA_PERIODIC_HEALTH_FUNNEL:  
+            case SPELL_AURA_PERIODIC_LEECH:
+            case SPELL_AURA_PERIODIC_MANA_LEECH:
+            case SPELL_AURA_PERIODIC_HEALTH_FUNNEL:
                 mask |= PROC_SPELL_TYPE_DAMAGE;
                 break;
             case SPELL_AURA_PERIODIC_HEAL:
