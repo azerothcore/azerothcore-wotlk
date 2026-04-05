@@ -2858,7 +2858,7 @@ uint32 SpellInfo::GetProcSpellTypeMask() const
             break;
         }
     }
-    return mask ? mask : PROC_SPELL_TYPE_NO_DMG_HEAL;
+    return mask ? mask : static_cast<uint32>(PROC_SPELL_TYPE_NO_DMG_HEAL);
 }
 
 uint32 SpellInfo::GetRecoveryTime() const
