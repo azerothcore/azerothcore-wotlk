@@ -533,7 +533,7 @@ class spell_skadi_launch_harpoon : public SpellScript
     }
 };
 
-// 50255 - Poisoned Spear
+// 50255, 59331 - Poisoned Spear
 class spell_skadi_poisoned_spear : public SpellScript
 {
     PrepareSpellScript(spell_skadi_poisoned_spear);

@@ -613,6 +613,15 @@ AllowLoggingIPAddressesInDatabase = 1
 Allow.IP.Based.Action.Logging = 0
 
 #
+#    LogSpamReports
+#        Description: Allow logging spam reports from players in the chat, mail or calendar into the database.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#
+
+LogSpamReports = 1
+
+#
 #  Appender config values: Given an appender "name"
 #    Appender.name
 #        Description: Defines 'where to log'.
