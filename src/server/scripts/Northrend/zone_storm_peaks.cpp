@@ -566,7 +566,7 @@ struct npc_hyldsmeet_protodrake : public CreatureAI
             vehicleKit->InstallAllAccessories(true);
             _accessoryRespawnTimer = 0;
         }
-        else
+        else if (_accessoryRespawnTimer)
             _accessoryRespawnTimer -= diff;
     }
 
