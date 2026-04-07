@@ -856,7 +856,7 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
                         SpellInfo const* spell = iter->second->GetBase()->GetSpellInfo();
 
                         // Pounce Bleed shouldn't be removed by Cloak of Shadows.
-                        if (spell->GetAllEffectsMechanicMask() & (UI64LIT(1) << MECHANIC_BLEED))
+                        if (spell->GetAllEffectsMechanicMask() & (1ULL << MECHANIC_BLEED))
                             return;
 
                         bool dmgClassNone = false;
@@ -5157,7 +5157,7 @@ void Spell::EffectDispelMechanic(SpellEffIndex effIndex)
             continue;
         if (roll_chance_i(aura->CalcDispelChance(unitTarget, !unitTarget->IsFriendlyTo(m_caster))))
         {
-            if ((aura->GetSpellInfo()->GetAllEffectsMechanicMask() & (UI64LIT(1) << mechanic)))
+            if (aura->GetSpellInfo()->GetAllEffectsMechanicMask() & (1ULL << mechanic))
             {
                 dispel_list.push(std::make_pair(aura->GetId(), aura->GetCasterGUID()));
 

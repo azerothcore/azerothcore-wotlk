@@ -441,8 +441,26 @@ bool LootItem::AllowedForPlayer(Player const* player, ObjectGuid source) const
         return false;
 
     // check quest requirements
-    if (needs_quest && !pProto->HasFlagCu(ITEM_FLAGS_CU_IGNORE_QUEST_STATUS) && !player->HasQuestForItem(itemid))
-        return false;
+    if (!pProto->HasFlagCu(ITEM_FLAGS_CU_IGNORE_QUEST_STATUS))
+    {
+        if (needs_quest && !player->HasQuestForItem(itemid))
+            return false;
+
+        // Hide quest starter items when quest is already started/rewarded,
+        // when unique count is already reached, or when prerequisite is missing.
+        if (pProto->StartQuest)
+        {
+            uint32 prevQuestId = 0;
+            if (Quest const* startQuest = sObjectMgr->GetQuestTemplate(pProto->StartQuest))
+                prevQuestId = startQuest->GetPrevQuestId();
+
+            if (player->GetQuestStatus(pProto->StartQuest) != QUEST_STATUS_NONE ||
+                player->GetQuestRewardStatus(pProto->StartQuest) ||
+                (pProto->MaxCount && player->HasItemCount(itemid, pProto->MaxCount, true)) ||
+                (prevQuestId && !player->GetQuestRewardStatus(prevQuestId)))
+                return false;
+        }
+    }
 
     if (!sScriptMgr->OnAllowedForPlayerLootCheck(player, source))
         return false;

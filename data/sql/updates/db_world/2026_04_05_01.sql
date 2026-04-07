@@ -1,3 +1,4 @@
+-- DB update 2026_04_05_00 -> 2026_04_05_01
 --
 -- Alexstrasza the Life-Binder (Dragonblight) - Add Focusing Iris key menu_option. (Previously empty)
 DELETE FROM `gossip_menu_option` WHERE `MenuID` = 10192;
