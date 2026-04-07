@@ -1328,6 +1328,75 @@ struct npc_oathbound_warder : public ScriptedAI
     }
 };
 
+class spell_q13010_jokkum_summon : public SpellScript
+{
+    PrepareSpellScript(spell_q13010_jokkum_summon);
+
+    void HandleSummon(SpellEffIndex effIndex)
+    {
+        PreventHitDefaultEffect(effIndex);
+
+        Unit* caster = GetCaster();
+        Player* target = caster->ToPlayer();
+        if (!target)
+            return;
+
+        if (target->IsInDisallowedMountForm())
+            target->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
+
+        uint32 entry = uint32(GetSpellInfo()->Effects[effIndex].MiscValue);
+        SummonPropertiesEntry const* properties = sSummonPropertiesStore.LookupEntry(uint32(GetSpellInfo()->Effects[effIndex].MiscValueB));
+        uint32 duration = uint32(GetSpellInfo()->GetDuration());
+
+        Position pos = caster->GetPosition();
+        if (Creature* summon = caster->GetMap()->SummonCreature(entry, pos, properties, duration, caster, GetSpellInfo()->Id))
+        {
+            uint32 spellId = GetSpellInfo()->Effects[EFFECT_0].CalcValue();
+            caster->CastSpell(summon, spellId, true);
+
+            if (summon->IsImmuneToNPC())
+                summon->SetDisableGravity(false);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectHit += SpellEffectFn(spell_q13010_jokkum_summon::HandleSummon, EFFECT_0, SPELL_EFFECT_SUMMON);
+    }
+};
+
+enum KingJokkum
+{
+    NPC_KING_JOKKUM = 30331
+};
+
+class spell_riding_jokkum : public AuraScript
+{
+    PrepareAuraScript(spell_riding_jokkum);
+
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* charm = GetUnitOwner()->GetCharm();
+        if (!charm || charm->GetEntry() != NPC_KING_JOKKUM)
+            return;
+
+        Creature* summoned = charm->ToCreature();
+        if (!summoned)
+            return;
+
+        AuraRemoveMode removeMode = GetTargetApplication()->GetRemoveMode();
+        if (removeMode == AURA_REMOVE_BY_CANCEL)
+        {
+            summoned->DespawnOrUnsummon();
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectRemove += AuraEffectRemoveFn(spell_riding_jokkum::HandleEffectRemove, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_storm_peaks()
 {
     RegisterCreatureAI(npc_frosthound);
@@ -1355,4 +1424,6 @@ void AddSC_storm_peaks()
     RegisterSpellScript(spell_fatal_strike);
     RegisterSpellScript(spell_player_mount_wyrm);
     RegisterSpellScript(spell_eject_passenger_wild_wyrm);
+    RegisterSpellScript(spell_q13010_jokkum_summon);
+    RegisterSpellScript(spell_riding_jokkum);
 }
