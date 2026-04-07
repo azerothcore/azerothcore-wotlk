@@ -483,6 +483,7 @@ void StopDB()
     CharacterDatabase.Close();
     WorldDatabase.Close();
     LoginDatabase.Close();
+    DBCDatabase.Close();
 
     MySQL::Library_End();
 }
