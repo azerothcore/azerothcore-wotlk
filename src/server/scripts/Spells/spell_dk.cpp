@@ -3001,7 +3001,7 @@ class spell_dk_pvp_4p_bonus : public AuraScript
         if (!spellInfo)
             return false;
 
-        return (spellInfo->GetAllEffectsMechanicMask() & ((1 << MECHANIC_ROOT) | (1 << MECHANIC_SNARE))) != 0;
+        return (spellInfo->GetAllEffectsMechanicMask() & ((1ULL << MECHANIC_ROOT) | (1ULL << MECHANIC_SNARE))) != 0;
     }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)

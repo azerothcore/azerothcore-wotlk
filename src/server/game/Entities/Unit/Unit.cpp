@@ -2194,7 +2194,7 @@ bool Unit::IsDamageReducedByArmor(SpellSchoolMask schoolMask, SpellInfo const* s
         {
             if (spellInfo->Effects[effIndex].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE ||
                     spellInfo->Effects[effIndex].Effect == SPELL_EFFECT_SCHOOL_DAMAGE)
-                if (spellInfo->GetEffectMechanicMask(effIndex) & (1 << MECHANIC_BLEED))
+                if (spellInfo->GetEffectMechanicMask(effIndex) & (1ULL << MECHANIC_BLEED))
                     return false;
         }
     }
@@ -5490,7 +5490,7 @@ void Unit::RemoveAurasWithFamily(SpellFamilyNames family, uint32 familyFlag1, ui
 void Unit::RemoveMovementImpairingAuras(bool withRoot)
 {
     if (withRoot)
-        RemoveAurasWithMechanic(1 << MECHANIC_ROOT);
+        RemoveAurasWithMechanic(1ULL << MECHANIC_ROOT);
 
     // Snares
     for (AuraApplicationMap::iterator iter = m_appliedAuras.begin(); iter != m_appliedAuras.end();)
@@ -5525,7 +5525,7 @@ void Unit::RemoveAurasWithMechanic(uint64 mechanic_mask, AuraRemoveMode removemo
 
 void Unit::RemoveAurasByShapeShift()
 {
-    uint64 mechanic_mask = (UI64LIT(1) << MECHANIC_SNARE) | (UI64LIT(1) << MECHANIC_ROOT);
+    uint64 mechanic_mask = (1ULL << MECHANIC_SNARE) | (1ULL << MECHANIC_ROOT);
     for (AuraApplicationMap::iterator iter = m_appliedAuras.begin(); iter != m_appliedAuras.end();)
     {
         Aura const* aura = iter->second->GetBase();
@@ -6082,12 +6082,12 @@ bool Unit::HasAuraWithMechanic(uint64 mechanicMask) const
     for (AuraApplicationMap::const_iterator iter = m_appliedAuras.begin(); iter != m_appliedAuras.end(); ++iter)
     {
         SpellInfo const* spellInfo  = iter->second->GetBase()->GetSpellInfo();
-        if (spellInfo->Mechanic && (mechanicMask & (UI64LIT(1) << spellInfo->Mechanic)))
+        if (spellInfo->Mechanic && (mechanicMask & (1ULL << spellInfo->Mechanic)))
             return true;
 
         for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
             if (iter->second->HasEffect(i) && spellInfo->Effects[i].Effect && spellInfo->Effects[i].Mechanic)
-                if (mechanicMask & (UI64LIT(1) << spellInfo->Effects[i].Mechanic))
+                if (mechanicMask & (1ULL << spellInfo->Effects[i].Mechanic))
                     return true;
     }
 
@@ -8591,7 +8591,7 @@ float Unit::SpellPctDamageModsDone(Unit* victim, SpellInfo const* spellProto, Da
 
             // Torment the weak
             if (spellProto->SpellFamilyFlags[0] & 0x20600021 || spellProto->SpellFamilyFlags[1] & 0x9000)
-                if (victim->HasAuraWithMechanic((1 << MECHANIC_SNARE) | (1 << MECHANIC_SLOW_ATTACK)))
+                if (victim->HasAuraWithMechanic((1ULL << MECHANIC_SNARE) | (1ULL << MECHANIC_SLOW_ATTACK)))
                     if (AuraEffect* aurEff = GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_GENERIC, 3263, EFFECT_0))
                         AddPct(DoneTotalMod, aurEff->GetAmount());
             break;
@@ -8910,7 +8910,7 @@ uint32 Unit::SpellDamageBonusTaken(Unit* caster, SpellInfo const* spellProto, ui
                 if (!caster || caster->GetGUID() != (*i)->GetCasterGUID())
                     continue;
 
-            if (mechanicMask & uint64(UI64LIT(1) << (*i)->GetMiscValue()))
+            if (mechanicMask & (1ULL << (*i)->GetMiscValue()))
             {
                 if ((*i)->GetAmount() > 0)
                 {
@@ -9218,7 +9218,7 @@ float Unit::SpellTakenCritChance(Unit const* caster, SpellInfo const* spellProto
                         case SPELLFAMILY_MAGE:
                             // Glyph of Fire Blast
                             if (spellProto->SpellFamilyFlags[0] == 0x2 && spellProto->SpellIconID == 12)
-                                if (HasAuraWithMechanic((1 << MECHANIC_STUN) | (1 << MECHANIC_KNOCKOUT)))
+                                if (HasAuraWithMechanic((1ULL << MECHANIC_STUN) | (1ULL << MECHANIC_KNOCKOUT)))
                                     if (AuraEffect const* aurEff = caster->GetAuraEffect(56369, EFFECT_0))
                                         crit_chance += aurEff->GetAmount();
                             break;
@@ -10364,13 +10364,13 @@ uint32 Unit::MeleeDamageBonusTaken(Unit* attacker, uint32 pdamage, WeaponAttackT
 
         // Shred, Maul - "Effects which increase Bleed damage also increase Shred damage"
         if (spellProto->SpellFamilyName == SPELLFAMILY_DRUID && spellProto->SpellFamilyFlags[0] & 0x00008800)
-            mechanicMask |= (UI64LIT(1) << MECHANIC_BLEED);
+            mechanicMask |= (1ULL << MECHANIC_BLEED);
 
         if (mechanicMask)
         {
             TakenTotalMod *= GetTotalAuraMultiplier(SPELL_AURA_MOD_MECHANIC_DAMAGE_TAKEN_PERCENT, [mechanicMask](AuraEffect const* aurEff) -> bool
             {
-                if (mechanicMask & uint64(UI64LIT(1) << (aurEff->GetMiscValue())))
+                if (mechanicMask & (1ULL << (aurEff->GetMiscValue())))
                     return true;
                 return false;
             });
@@ -11215,8 +11215,8 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
                 if (Creature* creature = ToCreature())
                 {
                     // use creature helper which now consults creature_immunities table
-                    if (creature->HasMechanicTemplateImmunity(UI64LIT(1) << MECHANIC_SNARE) ||
-                        creature->HasMechanicTemplateImmunity(UI64LIT(1) << MECHANIC_DAZE))
+                    if (creature->HasMechanicTemplateImmunity(1ULL << MECHANIC_SNARE) ||
+                        creature->HasMechanicTemplateImmunity(1ULL << MECHANIC_DAZE))
                         break;
                 }
 
@@ -11237,7 +11237,7 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
     if (creature
         && !IsPet()
         && !(IsControlledByPlayer() && IsVehicle())
-        && !(creature->HasMechanicTemplateImmunity(UI64LIT(1) << MECHANIC_SNARE))
+        && !(creature->HasMechanicTemplateImmunity(1ULL << MECHANIC_SNARE))
         && !(creature->IsDungeonBoss()))
     {
         // 1.6% for each % under 30.
@@ -11595,7 +11595,7 @@ int32 Unit::ModSpellDuration(SpellInfo const* spellProto, Unit const* target, in
     // xinef: also calculate self casts, spell can be reflected for example
     if (!positive)
     {
-        int32 mechanic = spellProto->GetSpellMechanicMaskByEffectMask(effectMask);
+        uint64 mechanic = spellProto->GetSpellMechanicMaskByEffectMask(effectMask);
 
         int32 durationMod;
         int32 durationMod_always = 0;
@@ -11603,11 +11603,11 @@ int32 Unit::ModSpellDuration(SpellInfo const* spellProto, Unit const* target, in
 
         for (uint8 i = 1; i <= MECHANIC_ENRAGED; ++i)
         {
-            if (!(mechanic & 1 << i))
+            if (!(mechanic & (1ULL << i)))
                 continue;
 
             // Xinef: spells affecting movement imparing effects should not reduce duration if disoriented mechanic is present
-            if (i == MECHANIC_SNARE && (mechanic & (1 << MECHANIC_DISORIENTED)))
+            if (i == MECHANIC_SNARE && (mechanic & (1ULL << MECHANIC_DISORIENTED)))
                 continue;
 
             // Find total mod value (negative bonus)

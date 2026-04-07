@@ -705,7 +705,7 @@ public:
 
         handler->PSendSysMessage(LANG_NPCINFO_MECHANIC_IMMUNE, Acore::StringFormat("0x{:X}", mechanicImmuneMask).c_str());
         for (uint8 i = 1; i < MAX_MECHANIC; ++i)
-            if (mechanicImmuneMask & (UI64LIT(1) << i))
+            if (mechanicImmuneMask & (1ULL << i))
                 handler->PSendSysMessage(mechanicImmunes[i].text, mechanicImmunes[i].flag);
 
         handler->PSendSysMessage(LANG_NPCINFO_SPELL_SCHOOL_IMMUNE, spellSchoolImmuneMask);
