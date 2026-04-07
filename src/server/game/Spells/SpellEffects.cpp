@@ -2493,8 +2493,8 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
 
                             if (properties->Category == SUMMON_CATEGORY_ALLY)
                             {
-                                summon->SetOwnerGUID(m_originalCaster->GetGUID());
-                                summon->SetFaction(m_originalCaster->GetFaction());
+                                summon->SetOwnerGUID(summoner->GetGUID());
+                                summon->SetFaction(summoner->GetFaction());
                             }
 
                             ExecuteLogEffectSummonObject(effIndex, summon);
