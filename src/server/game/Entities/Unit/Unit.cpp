@@ -8962,10 +8962,10 @@ uint32 Unit::SpellDamageBonusTaken(Unit* caster, SpellInfo const* spellProto, ui
         float ignoreModifier = 1.0f - TakenTotalMod;
         bool addModifier = false;
         AuraEffectList const& ResIgnoreAuras = caster->GetAuraEffectsByType(SPELL_AURA_MOD_IGNORE_TARGET_RESIST);
-        for (AuraEffectList::const_iterator j = ResIgnoreAuras.begin(); j != ResIgnoreAuras.end(); ++j)
-            if ((*j)->GetMiscValue() & spellProto->SchoolMask)
+        for (auto aurEff : ResIgnoreAuras)
+            if (aurEff->GetMiscValue() & spellProto->SchoolMask)
             {
-                ApplyPct(ignoreModifier, (*j)->GetAmount());
+                AddPct(ignoreModifier, -aurEff->GetAmount());
                 addModifier = true;
             }
 
@@ -10411,10 +10411,10 @@ uint32 Unit::MeleeDamageBonusTaken(Unit* attacker, uint32 pdamage, WeaponAttackT
         float ignoreModifier = 1.0f - TakenTotalMod;
         bool addModifier = false;
         AuraEffectList const& ResIgnoreAuras = attacker->GetAuraEffectsByType(SPELL_AURA_MOD_IGNORE_TARGET_RESIST);
-        for (AuraEffectList::const_iterator j = ResIgnoreAuras.begin(); j != ResIgnoreAuras.end(); ++j)
-            if ((*j)->GetMiscValue() & damageSchoolMask)
+        for (auto aurEff : ResIgnoreAuras)
+            if (aurEff->GetMiscValue() & damageSchoolMask)
             {
-                ApplyPct(ignoreModifier, (*j)->GetAmount());
+                AddPct(ignoreModifier, -aurEff->GetAmount());
                 addModifier = true;
             }
 
