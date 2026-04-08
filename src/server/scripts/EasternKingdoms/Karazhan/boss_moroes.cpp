@@ -149,7 +149,7 @@ struct boss_moroes : public BossAI
             _vanished = true;
             Talk(SAY_SPECIAL);
             DoCastSelf(SPELL_VANISH);
-            me->SetImmuneToAll(true);
+            me->SetImmuneToAll(true, true);
             scheduler.Schedule(5s, 7s, [this](TaskContext)
             {
                 me->SetImmuneToAll(false);

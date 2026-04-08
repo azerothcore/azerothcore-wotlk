@@ -4372,7 +4372,7 @@ class spell_item_luffa : public SpellScript
             for (Unit::AuraApplicationMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
             {
                 Aura const* aura = itr->second->GetBase();
-                if (!(aura->GetSpellInfo()->GetAllEffectsMechanicMask() & (1 << MECHANIC_BLEED)) || aura->GetCasterLevel() > 60 || aura->GetSpellInfo()->IsPositive())
+                if (!(aura->GetSpellInfo()->GetAllEffectsMechanicMask() & (1ULL << MECHANIC_BLEED)) || aura->GetCasterLevel() > 60 || aura->GetSpellInfo()->IsPositive())
                     continue;
 
                 return SPELL_CAST_OK;
@@ -4392,7 +4392,7 @@ class spell_item_luffa : public SpellScript
             for (Unit::AuraApplicationMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
             {
                 Aura const* aura = itr->second->GetBase();
-                if (!(aura->GetSpellInfo()->GetAllEffectsMechanicMask() & (1 << MECHANIC_BLEED)) || aura->GetCasterLevel() > 60 || aura->GetSpellInfo()->IsPositive())
+                if (!(aura->GetSpellInfo()->GetAllEffectsMechanicMask() & (1ULL << MECHANIC_BLEED)) || aura->GetCasterLevel() > 60 || aura->GetSpellInfo()->IsPositive())
                     continue;
 
                 player->RemoveAurasDueToSpell(aura->GetId(), aura->GetCasterGUID());

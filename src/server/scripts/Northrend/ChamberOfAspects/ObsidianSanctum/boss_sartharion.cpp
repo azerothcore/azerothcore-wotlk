@@ -136,7 +136,7 @@ enum Misc
     // Movement points
     POINT_LANDING                               = 1,
 
-    // Lava directions. Its used to identify to which side lava was moving by last time
+    // Lava directions
     LAVA_LEFT_SIDE                              = 0,
     LAVA_RIGHT_SIDE                             = 1,
 
@@ -307,7 +307,6 @@ struct boss_sartharion : public BossAI
 {
     explicit boss_sartharion(Creature* creature) : BossAI(creature, DATA_SARTHARION),
         dragonsCount(0),
-        lastLavaSide(LAVA_RIGHT_SIDE),
         usedBerserk(false),
         below11PctReached(false)
     {
@@ -628,8 +627,8 @@ private:
         extraEvents.ScheduleEvent(EVENT_SARTHARION_START_LAVA, 3600ms);
         extraEvents.ScheduleEvent(EVENT_SARTHARION_FINISH_LAVA, 11s);
 
-        // Send wave from left
-        if (lastLavaSide == LAVA_RIGHT_SIDE)
+        // Randomly choose which side the wave comes from
+        if (urand(LAVA_LEFT_SIDE, LAVA_RIGHT_SIDE) == LAVA_LEFT_SIDE)
         {
             for (uint8 i = 0; i < MAX_LEFT_LAVA_TSUNAMIS; ++i)
             {
@@ -638,10 +637,7 @@ private:
                 if (((i - 1) % 3 == 0) && tsunami) // If center of wave
                     tsunami->CastSpell(tsunami, SPELL_FLAME_TSUNAMI_VISUAL, true);
             }
-
-            lastLavaSide = LAVA_LEFT_SIDE;
         }
-        // from right
         else
         {
             for (uint8 i = 0; i < MAX_RIGHT_LAVA_TSUNAMIS; ++i)
@@ -651,8 +647,6 @@ private:
                 if (((i - 1) % 3 == 0) && tsunami) // If center of wave
                     tsunami->CastSpell(tsunami, SPELL_FLAME_TSUNAMI_VISUAL, true);
             }
-
-            lastLavaSide = LAVA_RIGHT_SIDE;
         }
     }
 
@@ -683,7 +677,6 @@ private:
     EventMap extraEvents;
     std::list<uint32> volcanoBlows;
     uint8 dragonsCount;
-    uint8 lastLavaSide; // 0 = left, 1 = right
     bool usedBerserk;
     bool below11PctReached;
 };
