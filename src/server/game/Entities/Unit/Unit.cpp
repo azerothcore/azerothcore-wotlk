@@ -2214,9 +2214,9 @@ uint32 Unit::CalcArmorReducedDamage(Unit const* attacker, Unit const* victim, co
             if (Player* modOwner = attacker->GetSpellModOwner())
                 modOwner->ApplySpellMod(spellInfo->Id, SPELLMOD_IGNORE_ARMOR, armor);
 
-        // Chaos Bolt Passive
+        // Apply ability-specific ignore target resist effects for physical damage (armor)
         AuraEffectList const& targetIgnoreRes = attacker->GetAuraEffectsByType(SPELL_AURA_MOD_ABILITY_IGNORE_TARGET_RESIST);
-        for (AuraEffect* const aurEff : targetIgnoreRes)
+        for (AuraEffect const* aurEff : targetIgnoreRes)
             if (aurEff->GetMiscValue() & SPELL_SCHOOL_MASK_NORMAL && aurEff->IsAffectedOnSpell(spellInfo))
                 armor = std::floor(AddPct(armor, -aurEff->GetAmount()));
 
