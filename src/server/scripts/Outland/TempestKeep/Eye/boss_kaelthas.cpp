@@ -725,12 +725,7 @@ private:
 struct advisor_baseAI : public ScriptedAI
 
 {
-    advisor_baseAI(Creature* creature) : ScriptedAI(creature) {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    advisor_baseAI(Creature* creature) : ScriptedAI(creature) {    }
 
     virtual void ScheduleEvents() {}
 

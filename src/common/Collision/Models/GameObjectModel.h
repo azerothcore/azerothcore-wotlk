@@ -23,6 +23,7 @@
 #include <G3D/Matrix3.h>
 #include <G3D/Ray.h>
 #include <G3D/Vector3.h>
+#include <memory>
 
 namespace VMAP
 {
@@ -58,7 +59,7 @@ public:
 
     [[nodiscard]] const G3D::AABox& GetBounds() const { return iBound; }
 
-    ~GameObjectModel();
+    ~GameObjectModel() = default;
 
     [[nodiscard]] const G3D::Vector3& GetPosition() const { return iPos; }
 
@@ -86,7 +87,7 @@ private:
     G3D::Vector3 iPos;
     float iInvScale{0};
     float iScale{0};
-    VMAP::WorldModel* iModel{nullptr};
+    std::shared_ptr<VMAP::WorldModel> iModel;
     std::unique_ptr<GameObjectModelOwnerBase> owner;
     bool isWmo{false};
 };

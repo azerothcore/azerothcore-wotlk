@@ -284,6 +284,7 @@ struct violet_hold_trashAI : public npc_escortAI
         CreatureStartAttackDoor();
     }
 
+    using CreatureAI::WaypointReached;
     void WaypointReached(uint32 id) override
     {
         if (PortalLoc < 6)

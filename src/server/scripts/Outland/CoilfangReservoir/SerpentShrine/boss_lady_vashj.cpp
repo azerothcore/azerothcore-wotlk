@@ -72,11 +72,6 @@ struct boss_lady_vashj : public BossAI
 {
     boss_lady_vashj(Creature* creature) : BossAI(creature, DATA_LADY_VASHJ)
     {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-
         _intro = false;
     }
 

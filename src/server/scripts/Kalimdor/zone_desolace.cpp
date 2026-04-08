@@ -257,6 +257,7 @@ public:
             me->SetFaction(faction);
         }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 waypointId) override
         {
             RelocateSummons();

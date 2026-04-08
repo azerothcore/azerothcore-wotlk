@@ -22,6 +22,7 @@
 #include "DatabaseEnv.h"
 #include "ItemTemplate.h"
 #include "LootMgr.h"
+#include "SpawnData.h"
 #include "Unit.h"
 #include <list>
 
@@ -55,7 +56,7 @@ enum CreatureFlagsExtra : uint32
     CREATURE_FLAG_EXTRA_GHOST_VISIBILITY                = 0x00000400,   // creature will only be visible to dead players
     CREATURE_FLAG_EXTRA_USE_OFFHAND_ATTACK              = 0x00000800,   // creature will use offhand attacks
     CREATURE_FLAG_EXTRA_NO_SELL_VENDOR                  = 0x00001000,   // players can't sell items to this vendor
-    CREATURE_FLAG_EXTRA_IGNORE_COMBAT                   = 0x00002000,
+    CREATURE_FLAG_EXTRA_CANNOT_ENTER_COMBAT             = 0x00002000,   // creature is not allowed to enter combat
     CREATURE_FLAG_EXTRA_WORLDEVENT                      = 0x00004000,   // custom flag for world event creatures (left room for merging)
     CREATURE_FLAG_EXTRA_GUARD                           = 0x00008000,   // Creature is guard
     CREATURE_FLAG_EXTRA_IGNORE_FEIGN_DEATH              = 0x00010000,   // creature ignores feign death
@@ -202,7 +203,6 @@ struct CreatureTemplate
     float   speed_swim;
     float   speed_flight;
     float   detection_range;                                // Detection Range for Line of Sight aggro
-    float   scale;
     uint32  rank;
     uint32  dmgschool;
     float   DamageModifier;
@@ -237,8 +237,7 @@ struct CreatureTemplate
     bool    RacialLeader;
     uint32  movementId;
     bool    RegenHealth;
-    uint32  MechanicImmuneMask;
-    uint8   SpellSchoolImmuneMask;
+    int32   CreatureImmunitiesId;
     uint32  flags_extra;
     uint32  ScriptID;
     WorldPacket queryData; // pussywizard
@@ -367,32 +366,23 @@ typedef std::unordered_map<uint8, EquipmentInfo> EquipmentInfoContainerInternal;
 typedef std::unordered_map<uint32, EquipmentInfoContainerInternal> EquipmentInfoContainer;
 
 // from `creature` table
-struct CreatureData
+struct CreatureData : public SpawnData
 {
-    CreatureData() = default;
+    CreatureData() : SpawnData(SPAWN_TYPE_CREATURE) {}
     uint32 id1{0};                                             // entry in creature_template
     uint32 id2{0};                                             // entry in creature_template
     uint32 id3{0};                                             // entry in creature_template
-    uint16 mapid{0};
-    uint32 phaseMask{0};
     uint32 displayid{0};
     int8 equipmentId{0};
-    float posX{0.0f};
-    float posY{0.0f};
-    float posZ{0.0f};
-    float orientation{0.0f};
     uint32 spawntimesecs{0};
     float wander_distance{0.0f};
     uint32 currentwaypoint{0};
     uint32 curhealth{0};
     uint32 curmana{0};
     uint8 movementType{0};
-    uint8 spawnMask{0};
     uint32 npcflag{0};
     uint32 unit_flags{0};                                      // enum UnitFlags mask values
     uint32 dynamicflags{0};
-    uint32 ScriptId;
-    bool dbData{true};
 };
 
 struct CreatureModelInfo

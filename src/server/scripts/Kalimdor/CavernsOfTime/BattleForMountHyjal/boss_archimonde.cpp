@@ -186,10 +186,6 @@ struct boss_archimonde : public BossAI
 {
     boss_archimonde(Creature* creature) : BossAI(creature, DATA_ARCHIMONDE)
     {
-        scheduler.SetValidator([&]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
     }
 
     void Reset() override

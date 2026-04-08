@@ -115,11 +115,6 @@ struct boss_thekal : public BossAI
             );
             context.Repeat(5s, 25s);
         });
-
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
     }
 
     void JustDied(Unit* /*killer*/) override

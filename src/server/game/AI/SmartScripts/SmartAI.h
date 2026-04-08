@@ -58,7 +58,7 @@ public:
     void StopPath(uint32 DespawnTime = 0, uint32 quest = 0, bool fail = false);
     void EndPath(bool fail = false);
     void ResumePath();
-    WaypointData const* GetNextWayPoint();
+    WaypointNode const* GetNextWayPoint();
     void GenerateWayPointArray(Movement::PointsArray* points);
     bool HasEscortState(uint32 uiEscortState) { return (mEscortState & uiEscortState); }
     void AddEscortState(uint32 uiEscortState) { mEscortState |= uiEscortState; }
@@ -84,6 +84,9 @@ public:
 
     // Called for reaction at enter to combat if not in combat yet (enemy can be nullptr)
     void JustEngagedWith(Unit* enemy) override;
+
+    // Called when creature exits combat (all combat refs gone)
+    void JustExitedCombat() override;
 
     // Called for reaction at stopping attack at no attackers or targets
     void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override;
@@ -181,6 +184,7 @@ public:
     void SetSwim(bool swim = true);
 
     void SetEvadeDisabled(bool disable = true);
+    void SetSuppressEvade(bool suppress) { mSuppressEvade = suppress; }
 
     void SetInvincibilityHpLevel(uint32 level) { mInvincibilityHpLevel = level; }
 
@@ -206,6 +210,11 @@ public:
 
     void PathEndReached(uint32 pathId) override;
 
+    void WaypointPathStarted(uint32 pathId) override;
+    void WaypointStarted(uint32 nodeId, uint32 pathId) override;
+    void WaypointReached(uint32 nodeId, uint32 pathId) override;
+    void WaypointPathEnded(uint32 nodeId, uint32 pathId) override;
+
     bool CanRespawn() override { return mcanSpawn; };
     void SetCanRespawn(bool canSpawn) { mcanSpawn = canSpawn; }
 
@@ -222,6 +231,7 @@ private:
     bool mIsCharmed;
     uint32 mFollowCreditType;
     uint32 mFollowArrivedTimer;
+    uint32 _followCheckTimer;
     uint32 mFollowCredit;
     uint32 mFollowArrivedEntry;
     bool   mFollowArrivedAlive;
@@ -238,11 +248,12 @@ private:
     bool mWPReached;
     bool mOOCReached;
     uint32 mWPPauseTimer;
-    WaypointData const* mLastWP;
+    WaypointNode const* mLastWP;
     uint32 mEscortNPCFlags;
-    uint32 GetWPCount() { return mWayPoints ? mWayPoints->size() : 0; }
+    uint32 GetWPCount() { return mWayPoints ? mWayPoints->Nodes.size() : 0; }
     bool mCanRepeatPath;
     bool mEvadeDisabled;
+    bool mSuppressEvade;
     bool mCanAutoAttack;
     bool mForcedPaused;
     uint32 mInvincibilityHpLevel;
@@ -253,6 +264,7 @@ private:
     uint32 mDespawnTime;
     uint32 mDespawnState;
     void UpdateDespawn(const uint32 diff);
+    void UpdateFollow(const uint32 diff);
     uint32 mEscortInvokerCheckTimer;
     bool mJustReset;
 

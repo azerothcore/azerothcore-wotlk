@@ -42,6 +42,8 @@ protected:
         ON_CALL(*_worldMock, getIntConfig(_)).WillByDefault(Return(0));
         ON_CALL(*_worldMock, getFloatConfig(_)).WillByDefault(Return(1.0f));
         ON_CALL(*_worldMock, getBoolConfig(_)).WillByDefault(Return(false));
+        static std::string emptyString;
+        ON_CALL(*_worldMock, GetDataPath()).WillByDefault(ReturnRef(emptyString));
 
         sWorld.reset(_worldMock);
 

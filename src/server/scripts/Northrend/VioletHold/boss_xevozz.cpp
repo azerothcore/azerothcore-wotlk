@@ -118,8 +118,7 @@ struct boss_xevozz : public BossAI
     {
         if (summoned)
         {
-            summoned->GetMotionMaster()->MoveFollow(me, 0.0f, 0.0f);
-            summoned->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
+            summoned->GetMotionMaster()->MoveFollow(me, 0.0f, 0.0f, MOTION_SLOT_ACTIVE, true, false);
             BossAI::JustSummoned(summoned);
             instance->SetGuidData(DATA_ADD_TRASH_MOB, summoned->GetGUID());
         }

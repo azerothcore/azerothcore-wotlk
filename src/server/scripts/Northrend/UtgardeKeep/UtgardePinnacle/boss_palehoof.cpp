@@ -191,6 +191,7 @@ public:
                     cr->SetDisableGravity(true);
                     cr->GetMotionMaster()->MovePoint(0, 275.4f, -453, 110); // ROOM CENTER
                     events.RescheduleEvent(EVENT_UNFREEZE_MONSTER, 10s);
+                    me->SetImmuneToPC(false);
                     me->SetInCombatWithZone();
                     me->SetControlled(true, UNIT_STATE_STUNNED);
                 }
@@ -373,6 +374,7 @@ public:
             {
                 me->RemoveAurasDueToSpell(SPELL_FREEZE);
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->SetImmuneToPC(false);
                 me->SetInCombatWithZone();
 
                 events.ScheduleEvent(EVENT_JORMUNGAR_ACID_SPIT, 3s);
@@ -499,6 +501,7 @@ public:
             {
                 me->RemoveAurasDueToSpell(SPELL_FREEZE);
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->SetImmuneToPC(false);
                 me->SetInCombatWithZone();
 
                 events.ScheduleEvent(EVENT_RHINO_STOMP, 3s);
@@ -609,6 +612,7 @@ public:
             {
                 me->RemoveAurasDueToSpell(SPELL_FREEZE);
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->SetImmuneToPC(false);
                 me->SetInCombatWithZone();
 
                 events.ScheduleEvent(EVENT_FURBOLG_CHAIN, 3s);
@@ -717,6 +721,7 @@ public:
             {
                 me->RemoveAurasDueToSpell(SPELL_FREEZE);
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->SetImmuneToPC(false);
                 me->SetInCombatWithZone();
 
                 events.ScheduleEvent(EVENT_WORGEN_MORTAL, 3s);

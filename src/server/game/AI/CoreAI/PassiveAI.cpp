@@ -20,7 +20,13 @@
 
 PassiveAI::PassiveAI(Creature* c) : CreatureAI(c) { me->SetReactState(REACT_PASSIVE); }
 PossessedAI::PossessedAI(Creature* c) : CreatureAI(c) { me->SetReactState(REACT_PASSIVE); }
-NullCreatureAI::NullCreatureAI(Creature* c) : CreatureAI(c) { me->SetReactState(REACT_PASSIVE); }
+NullCreatureAI::NullCreatureAI(Creature* c) : CreatureAI(c)
+{
+    me->SetReactState(REACT_PASSIVE);
+    // TODO: Remove once WorldObject spell casting is ported (triggers won't create combat refs from spell casts)
+    if (me->IsTrigger())
+        me->SetIsCombatDisallowed(true);
+}
 
 int32 NullCreatureAI::Permissible(Creature const* creature)
 {
