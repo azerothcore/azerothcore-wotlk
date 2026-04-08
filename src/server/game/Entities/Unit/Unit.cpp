@@ -8962,7 +8962,7 @@ uint32 Unit::SpellDamageBonusTaken(Unit* caster, SpellInfo const* spellProto, ui
         float ignoreModifier = 1.0f - TakenTotalMod;
         bool addModifier = false;
         AuraEffectList const& ResIgnoreAuras = caster->GetAuraEffectsByType(SPELL_AURA_MOD_IGNORE_TARGET_RESIST);
-        for (auto aurEff : ResIgnoreAuras)
+        for (AuraEffect const* aurEff : ResIgnoreAuras)
             if (aurEff->GetMiscValue() & spellProto->SchoolMask)
             {
                 AddPct(ignoreModifier, -aurEff->GetAmount());
