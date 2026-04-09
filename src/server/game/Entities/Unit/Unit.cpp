@@ -74,6 +74,7 @@
 #include "WorldPacket.h"
 #include <algorithm>
 #include <cmath>
+#include <limits>
 
 float baseMoveSpeed[MAX_MOVE_TYPE] =
 {
@@ -910,6 +911,9 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, uint32 effectMask, Unit 
     if (!spellInfo)
         return false;
 
+    if (spellInfo->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES) && !HasSpiritOfRedemptionAura())
+        return false;
+
     bool immuneToAllEffects = true;
     bool hasCheckedEffect = false;
 
@@ -940,6 +944,9 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, uint32 effectMask, Unit 
 
     if (!spellInfo->HasAttribute(SPELL_ATTR2_NO_SCHOOL_IMMUNITIES))
     {
+        if (spellInfo->Id == 42292 || spellInfo->Id == 59752 || spellInfo->Id == 19574 || spellInfo->Id == 34471)
+            return false;
+
         SpellSchoolMask schoolMask = spellInfo->GetSchoolMask();
         if (schoolMask != SPELL_SCHOOL_MASK_NONE)
         {
@@ -950,7 +957,7 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, uint32 effectMask, Unit 
                 if ((immunitySchoolMask & schoolMask) != schoolMask)
                     continue;
 
-                if (IgnoresSchoolImmunityFromFriendlyCaster(caster, immuneSpellInfo))
+                if (IgnoresSchoolImmunityFromFriendlyCaster(caster, immunityAuraId, immuneSpellInfo))
                     continue;
 
                 if (spellInfo->CanPierceImmuneAura(immuneSpellInfo))
@@ -9827,9 +9834,16 @@ uint32 Unit::GetDamageImmunityMask() const
     return mask;
 }
 
-bool Unit::IgnoresSchoolImmunityFromFriendlyCaster(Unit const* caster, SpellInfo const* immunitySpellInfo) const
+bool Unit::IgnoresSchoolImmunityFromFriendlyCaster(Unit const* caster, uint32 immunityAuraId, SpellInfo const* immunitySpellInfo) const
 {
-    return caster && caster->IsFriendlyTo(this) && (!immunitySpellInfo || !immunitySpellInfo->HasAttribute(SPELL_ATTR1_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS));
+    if (!caster || !caster->IsFriendlyTo(this))
+        return false;
+
+    if (immunitySpellInfo)
+        return !immunitySpellInfo->HasAttribute(SPELL_ATTR1_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS);
+
+    // Creature template immunities are loaded with a placeholder spell id.
+    return immunityAuraId == std::numeric_limits<uint32>::max();
 }
 
 bool Unit::IsImmunedToDamage(SpellSchoolMask schoolMask) const
@@ -9869,7 +9883,7 @@ bool Unit::IsImmunedToDamage(Unit const* caster, SpellInfo const* spellInfo) con
         for (auto const& [immunitySchoolMask, immunityAuraId] : container)
         {
             SpellInfo const* immuneAuraInfo = sSpellMgr->GetSpellInfo(immunityAuraId);
-            if (IgnoresSchoolImmunityFromFriendlyCaster(caster, immuneAuraInfo))
+            if (IgnoresSchoolImmunityFromFriendlyCaster(caster, immunityAuraId, immuneAuraInfo))
                 continue;
 
             if (immuneAuraInfo && spellInfo->CanPierceImmuneAura(immuneAuraInfo))
@@ -9952,7 +9966,7 @@ bool Unit::IsImmunedToSchool(Spell const* spell) const
         {
             SpellInfo const* immuneSpellInfo = sSpellMgr->GetSpellInfo(itr->second);
             if ((itr->first & schoolMask) == schoolMask
-                && !IgnoresSchoolImmunityFromFriendlyCaster(spell->GetCaster(), immuneSpellInfo)
+                && !IgnoresSchoolImmunityFromFriendlyCaster(spell->GetCaster(), itr->second, immuneSpellInfo)
                 && !spellInfo->CanPierceImmuneAura(immuneSpellInfo))
             {
                 return true;
@@ -9991,7 +10005,7 @@ bool Unit::IsImmunedToAuraPeriodicTick(Unit const* caster, SpellInfo const* spel
         for (auto const& [immunitySchoolMask, immunityAuraId] : container)
         {
             SpellInfo const* immuneAuraInfo = sSpellMgr->GetSpellInfo(immunityAuraId);
-            if (IgnoresSchoolImmunityFromFriendlyCaster(caster, immuneAuraInfo))
+            if (IgnoresSchoolImmunityFromFriendlyCaster(caster, immunityAuraId, immuneAuraInfo))
                 continue;
 
             schoolImmunityMask |= immunitySchoolMask;
@@ -10085,7 +10099,7 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, Spell const* spell)
                 if (!(itr->first & spellSchoolMask))
                     continue;
 
-                if (IgnoresSchoolImmunityFromFriendlyCaster(spellCaster, immuneSpellInfo))
+                if (IgnoresSchoolImmunityFromFriendlyCaster(spellCaster, itr->second, immuneSpellInfo))
                     continue;
 
                 if (spellInfo->CanPierceImmuneAura(immuneSpellInfo))
