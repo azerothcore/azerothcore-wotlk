@@ -242,10 +242,11 @@ struct boss_magtheridon : public BossAI
 
     void UpdateAI(uint32 diff) override
     {
+        scheduler.Update(diff);
+
         if (!UpdateVictim())
             return;
 
-        scheduler.Update(diff);
         _interruptScheduler.Update(diff);
 
         if (_currentPhase != 1 && !_castingQuake)

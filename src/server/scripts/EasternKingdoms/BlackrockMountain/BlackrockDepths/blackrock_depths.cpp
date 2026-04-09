@@ -452,59 +452,6 @@ private:
     uint32 _mightyBlowTimer;
 };
 
-// npc_lokhtos_darkbargainer
-enum LokhtosItems
-{
-    ITEM_THRORIUM_BROTHERHOOD_CONTRACT                     = 18628,
-    ITEM_SULFURON_INGOT                                    = 17203
-};
-
-enum LokhtosQuests
-{
-    QUEST_A_BINDING_CONTRACT                               = 7604
-};
-
-enum LokhtosSpells
-{
-    SPELL_CREATE_THORIUM_BROTHERHOOD_CONTRACT_DND          = 23059
-};
-
-struct npc_lokhtos_darkbargainer : public ScriptedAI
-{
-    npc_lokhtos_darkbargainer(Creature* creature) : ScriptedAI(creature) { }
-
-    void sGossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_INFO_DEF + 1)
-        {
-            CloseGossipMenuFor(player);
-            player->CastSpell(player, SPELL_CREATE_THORIUM_BROTHERHOOD_CONTRACT_DND, false);
-        }
-        if (action == GOSSIP_ACTION_TRADE)
-            player->GetSession()->SendListInventory(me->GetGUID());
-    }
-
-    void sGossipHello(Player* player) override
-    {
-        if (me->IsQuestGiver())
-            player->PrepareQuestMenu(me->GetGUID());
-
-        if (me->IsVendor() && player->GetReputationRank(59) >= REP_FRIENDLY)
-            AddGossipItemFor(player, 4781, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
-
-        if (player->GetQuestRewardStatus(QUEST_A_BINDING_CONTRACT) != 1 &&
-                !player->HasItemCount(ITEM_THRORIUM_BROTHERHOOD_CONTRACT, 1, true) &&
-                player->HasItemCount(ITEM_SULFURON_INGOT))
-            AddGossipItemFor(player, 4781, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-        if (player->GetReputationRank(59) < REP_FRIENDLY)
-            SendGossipMenuFor(player, 3673, me->GetGUID());
-        else
-            SendGossipMenuFor(player, 3677, me->GetGUID());
-    }
-};
-
 // npc_rocknot
 enum RocknotSays
 {
@@ -641,7 +588,6 @@ void AddSC_blackrock_depths()
     new at_ring_of_law();
     RegisterBlackrockDepthsCreatureAI(npc_grimstone);
     RegisterBlackrockDepthsCreatureAI(npc_phalanx);
-    RegisterBlackrockDepthsCreatureAI(npc_lokhtos_darkbargainer);
     RegisterBlackrockDepthsCreatureAI(npc_rocknot);
     RegisterBlackrockDepthsCreatureAI(brd_ironhand_guardian);
 }

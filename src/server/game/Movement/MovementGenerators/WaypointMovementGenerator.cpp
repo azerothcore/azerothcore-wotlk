@@ -143,18 +143,9 @@ void WaypointMovementGenerator<Creature>::ProcessWaypointArrival(Creature* creat
         _waypointDelay = waypoint.Delay;
     }
 
-    // Check if the waypoint path has reached its end and may not repeat. Inform AI.
-    if ((i_currentNode == i_path->Nodes.size() - 1) && !_repeating && !_done)
-    {
+    bool pathEnded = (i_currentNode == i_path->Nodes.size() - 1) && !_repeating && !_done;
+    if (pathEnded)
         _done = true;
-        creature->UpdateCurrentWaypointInfo(0, 0);
-
-        if (CreatureAI* AI = creature->AI())
-        {
-            AI->PathEndReached(i_path->Id);
-            AI->WaypointPathEnded(waypoint.Id, i_path->Id);
-        }
-    }
 
     UpdateHomePosition(creature, waypoint);
 
@@ -166,27 +157,45 @@ void WaypointMovementGenerator<Creature>::ProcessWaypointArrival(Creature* creat
         creature->GetMap()->ScriptsStart(sWaypointScripts, waypoint.EventId, creature, nullptr);
     }
 
-    creature->UpdateWaypointID(waypoint.Id);
-    creature->UpdateCurrentWaypointInfo(waypoint.Id, i_path->Id);
+    // scripts can invalidate current path, store what we need
+    uint32 const waypointId = waypoint.Id;
+    uint32 const pathId = i_path->Id;
+
+    creature->UpdateWaypointID(waypointId);
+    creature->UpdateCurrentWaypointInfo(waypointId, pathId);
 
     // Inform AI
     if (CreatureAI* AI = creature->AI())
     {
-        AI->MovementInform(WAYPOINT_MOTION_TYPE, i_currentNode);
-        AI->WaypointReached(waypoint.Id, i_path->Id);
+        AI->MovementInform(WAYPOINT_MOTION_TYPE, waypointId);
+        AI->WaypointReached(waypointId, pathId);
     }
 
     if (Unit* owner = creature->GetCharmerOrOwner())
     {
         if (UnitAI* AI = owner->GetAI())
-            AI->SummonMovementInform(creature, WAYPOINT_MOTION_TYPE, i_currentNode);
+            AI->SummonMovementInform(creature, WAYPOINT_MOTION_TYPE, waypointId);
     }
     else
     {
         if (TempSummon* tempSummon = creature->ToTempSummon())
             if (Unit* owner2 = tempSummon->GetSummonerUnit())
                 if (UnitAI* AI = owner2->GetAI())
-                    AI->SummonMovementInform(creature, WAYPOINT_MOTION_TYPE, i_currentNode);
+                    AI->SummonMovementInform(creature, WAYPOINT_MOTION_TYPE, waypointId);
+    }
+
+    // Path end notifications fire after WaypointReached so that m_path_id
+    // is still valid when SmartAI checks it for SMART_EVENT_WAYPOINT_REACHED.
+    if (pathEnded)
+    {
+        creature->UpdateCurrentWaypointInfo(0, 0);
+
+        if (CreatureAI* AI = creature->AI())
+            AI->PathEndReached(pathId);
+
+        // Re-fetch AI — PathEndReached may have despawned the creature or swapped its AI
+        if (CreatureAI* AI = creature->AI())
+            AI->WaypointPathEnded(waypointId, pathId);
     }
 
     // All hooks called and infos updated. Time to increment the waypoint node id
@@ -358,6 +367,7 @@ bool WaypointMovementGenerator<Creature>::DoUpdate(Creature* creature, uint32 di
         creature->StopMoving();
         _lastSplineId = 0;
         _smoothSplineLaunched = false;
+        _hasBeenStalled = true;
     }
 
     // Set home position to current position.
@@ -380,8 +390,15 @@ bool WaypointMovementGenerator<Creature>::DoUpdate(Creature* creature, uint32 di
             WaypointNode const& passedWp = i_path->Nodes.at(i_currentNode);
 
             UpdateHomePosition(creature, passedWp);
-            creature->UpdateWaypointID(passedWp.Id);
-            creature->UpdateCurrentWaypointInfo(passedWp.Id, i_path->Id);
+
+            // Save data before AI callbacks — they can invalidate the reference
+            uint32 const wpId = passedWp.Id;
+            uint32 const wpPathId = i_path->Id;
+            uint32 const wpDelay = passedWp.Delay;
+            std::optional<float> const wpOrientation = passedWp.Orientation;
+
+            creature->UpdateWaypointID(wpId);
+            creature->UpdateCurrentWaypointInfo(wpId, wpPathId);
 
             if (passedWp.EventId && urand(0, 99) < passedWp.EventChance)
             {
@@ -391,23 +408,24 @@ bool WaypointMovementGenerator<Creature>::DoUpdate(Creature* creature, uint32 di
 
             if (CreatureAI* AI = creature->AI())
             {
-                AI->MovementInform(WAYPOINT_MOTION_TYPE, i_currentNode);
-                AI->WaypointReached(passedWp.Id, i_path->Id);
+                AI->MovementInform(WAYPOINT_MOTION_TYPE, wpId);
+                AI->WaypointReached(wpId, wpPathId);
             }
 
             // Advance node
-            i_currentNode = (i_currentNode + 1) % i_path->Nodes.size();
+            if (i_path && !i_path->Nodes.empty())
+                i_currentNode = (i_currentNode + 1) % i_path->Nodes.size();
 
             // If this waypoint has a delay, stop the spline and pause
-            if (passedWp.Delay > 0)
+            if (wpDelay > 0)
             {
                 creature->StopMoving();
                 creature->ClearUnitState(UNIT_STATE_ROAMING_MOVE);
-                _waypointDelay = passedWp.Delay;
+                _waypointDelay = wpDelay;
                 _waypointReached = true;
                 _smoothSplineLaunched = false;
-                if (passedWp.Orientation.has_value())
-                    creature->SetFacingTo(*passedWp.Orientation);
+                if (wpOrientation.has_value())
+                    creature->SetFacingTo(*wpOrientation);
 
                 return true;
             }
@@ -418,14 +436,17 @@ bool WaypointMovementGenerator<Creature>::DoUpdate(Creature* creature, uint32 di
             if (!_repeating)
             {
                 // Path ended
+                uint32 const endWpId = i_path->Nodes.at(i_currentNode).Id;
+                uint32 const endPathId = i_path->Id;
                 _done = true;
                 _smoothSplineLaunched = false;
                 creature->UpdateCurrentWaypointInfo(0, 0);
                 if (CreatureAI* AI = creature->AI())
-                {
-                    AI->PathEndReached(i_path->Id);
-                    AI->WaypointPathEnded(i_path->Nodes.at(i_currentNode).Id, i_path->Id);
-                }
+                    AI->PathEndReached(endPathId);
+
+                // Re-fetch AI — PathEndReached may have despawned the creature or swapped its AI
+                if (CreatureAI* AI = creature->AI())
+                    AI->WaypointPathEnded(endWpId, endPathId);
             }
             else
             {

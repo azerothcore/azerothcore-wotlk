@@ -856,7 +856,7 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
                         SpellInfo const* spell = iter->second->GetBase()->GetSpellInfo();
 
                         // Pounce Bleed shouldn't be removed by Cloak of Shadows.
-                        if (spell->GetAllEffectsMechanicMask() & (UI64LIT(1) << MECHANIC_BLEED))
+                        if (spell->GetAllEffectsMechanicMask() & (1ULL << MECHANIC_BLEED))
                             return;
 
                         bool dmgClassNone = false;
@@ -2471,6 +2471,11 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
 
                         TempSummonType summonType = (duration <= 0) ? TEMPSUMMON_DEAD_DESPAWN : TEMPSUMMON_TIMED_DESPAWN;
 
+                        Unit* summoner = m_originalCaster;
+                        if (summoner->IsPet())
+                            if (Unit* owner = summoner->GetOwner())
+                                summoner = owner;
+
                         for (uint32 count = 0; count < numSummons; ++count)
                         {
                             Position pos;
@@ -2480,7 +2485,7 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
                                 // randomize position for multiple summons
                                 pos = m_caster->GetRandomPoint(*destTarget, radius);
 
-                            summon = m_originalCaster->SummonCreature(entry, pos, summonType, duration, 0, nullptr, personalSpawn);
+                            summon = summoner->SummonCreature(entry, pos, summonType, duration, 0, nullptr, personalSpawn);
                             if (!summon)
                                 continue;
 
@@ -2488,8 +2493,8 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
 
                             if (properties->Category == SUMMON_CATEGORY_ALLY)
                             {
-                                summon->SetOwnerGUID(m_originalCaster->GetGUID());
-                                summon->SetFaction(m_originalCaster->GetFaction());
+                                summon->SetOwnerGUID(summoner->GetGUID());
+                                summon->SetFaction(summoner->GetFaction());
                             }
 
                             ExecuteLogEffectSummonObject(effIndex, summon);
@@ -5152,7 +5157,7 @@ void Spell::EffectDispelMechanic(SpellEffIndex effIndex)
             continue;
         if (roll_chance_i(aura->CalcDispelChance(unitTarget, !unitTarget->IsFriendlyTo(m_caster))))
         {
-            if ((aura->GetSpellInfo()->GetAllEffectsMechanicMask() & (UI64LIT(1) << mechanic)))
+            if (aura->GetSpellInfo()->GetAllEffectsMechanicMask() & (1ULL << mechanic))
             {
                 dispel_list.push(std::make_pair(aura->GetId(), aura->GetCasterGUID()));
 
@@ -5943,6 +5948,9 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
 
     if (caster->IsTotem())
         caster = caster->ToTotem()->GetOwner();
+    else if (caster->IsPet())
+        if (Unit* owner = caster->GetOwner())
+            caster = owner;
 
     // in another case summon new
     uint8 summonLevel = caster->GetLevel();

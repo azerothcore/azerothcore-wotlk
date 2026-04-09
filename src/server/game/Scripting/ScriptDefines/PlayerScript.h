@@ -210,6 +210,7 @@ enum PlayerHook
     PLAYERHOOK_ON_SEND_LIST_INVENTORY,
     PLAYERHOOK_ON_GIVE_REPUTATION,
     PLAYERHOOK_ON_GET_REPUTATION_PRICE_DISCOUNT,
+    PLAYERHOOK_ON_LEARN_TAXI_NODE,
     PLAYERHOOK_END
 };
 
@@ -820,6 +821,14 @@ public:
      * @param discount Float value of the discount, as a multiplier of the base price
      */
     virtual void OnPlayerGetReputationPriceDiscount(Player const* /*player*/, FactionTemplateEntry const* /*factionTemplate*/, float& /*discount*/) {}
+
+    /**
+     * @brief This hook is called when a player learns a new flight path node.
+     *
+     * @param player Contains information about the Player
+     * @param nodeId The id of the learned taxi node
+     */
+    virtual void OnPlayerLearnTaxiNode(Player const* /*player*/, uint32 /*nodeId*/) {}
 };
 
 #endif

@@ -224,7 +224,7 @@ class spell_uk_second_wind : public AuraScript
         if (!spellInfo)
             return false;
 
-        return (spellInfo->GetAllEffectsMechanicMask() & ((1 << MECHANIC_ROOT) | (1 << MECHANIC_STUN))) != 0;
+        return (spellInfo->GetAllEffectsMechanicMask() & ((1ULL << MECHANIC_ROOT) | (1ULL << MECHANIC_STUN))) != 0;
     }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)

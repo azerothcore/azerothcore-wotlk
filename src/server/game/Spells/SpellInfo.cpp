@@ -1900,10 +1900,10 @@ uint64 SpellInfo::GetAllEffectsMechanicMask() const
 {
     uint64 mask = 0;
     if (Mechanic)
-        mask |= UI64LIT(1) << Mechanic;
+        mask |= 1ULL << Mechanic;
     for (int i = 0; i < MAX_SPELL_EFFECTS; ++i)
         if (Effects[i].IsEffect() && Effects[i].Mechanic)
-            mask |= UI64LIT(1) << Effects[i].Mechanic;
+            mask |= 1ULL << Effects[i].Mechanic;
     return mask;
 }
 
@@ -1911,9 +1911,9 @@ uint64 SpellInfo::GetEffectMechanicMask(uint8 effIndex) const
 {
     uint64 mask = 0;
     if (Mechanic)
-        mask |= UI64LIT(1) << Mechanic;
+        mask |= 1ULL << Mechanic;
     if (Effects[effIndex].IsEffect() && Effects[effIndex].Mechanic)
-        mask |= UI64LIT(1) << Effects[effIndex].Mechanic;
+        mask |= 1ULL << Effects[effIndex].Mechanic;
     return mask;
 }
 
@@ -1921,10 +1921,10 @@ uint64 SpellInfo::GetSpellMechanicMaskByEffectMask(uint32 effectMask) const
 {
     uint64 mask = 0;
     if (Mechanic)
-        mask |= UI64LIT(1) << Mechanic;
+        mask |= 1ULL << Mechanic;
     for (int i = 0; i < MAX_SPELL_EFFECTS; ++i)
         if ((effectMask & (1 << i)) && Effects[i].Mechanic)
-            mask |= UI64LIT(1) << Effects[i].Mechanic;
+            mask |= 1ULL << Effects[i].Mechanic;
     return mask;
 }
 
@@ -2008,7 +2008,7 @@ AuraStateType SpellInfo::LoadAuraState() const
         return AURA_STATE_ENRAGE;
 
     // Bleeding aura state
-    if (GetAllEffectsMechanicMask() & (UI64LIT(1) << MECHANIC_BLEED))
+    if (GetAllEffectsMechanicMask() & (1ULL << MECHANIC_BLEED))
         return AURA_STATE_BLEEDING;
 
     // Banished aura state
