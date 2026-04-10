@@ -128,7 +128,7 @@ struct boss_lady_vashj : public BossAI
                 summon->CastSpell(summon, SPELL_MAGIC_BARRIER);
                 break;
             case NPC_ENCHANTED_ELEMENTAL:
-                summon->GetMotionMaster()->MoveFollow(me, 0.0f, 0.0f, MOTION_SLOT_ACTIVE, false);
+                summon->GetMotionMaster()->MoveFollow(me, 0.0f, 0.0f, MOTION_SLOT_ACTIVE, false, false);
                 summon->SetWalk(true);
                 summon->SetReactState(REACT_PASSIVE);
                 break;
