@@ -2598,4 +2598,3 @@ void ConditionMgr::Clean()
 
     AllocatedMemoryStore.clear();
 }
-
