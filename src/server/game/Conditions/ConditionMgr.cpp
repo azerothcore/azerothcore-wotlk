@@ -1271,13 +1271,6 @@ void ConditionMgr::LoadConditions(bool isReload)
             case CONDITION_SOURCE_TYPE_GOSSIP_MENU_OPTION:
                 valid = addToGossipMenuItems(cond);
                 break;
-            case CONDITION_SOURCE_TYPE_GOSSIP_HELLO:
-            {
-                GossipHelloConditionStore[cond->SourceGroup][cond->SourceEntry].push_back(cond);
-                valid = true;
-                ++count;
-                continue;
-            }
             case CONDITION_SOURCE_TYPE_SPELL_CLICK_EVENT:
             {
                 SpellClickEventConditionStore[cond->SourceGroup][cond->SourceEntry].push_back(cond);
@@ -1817,9 +1810,9 @@ bool ConditionMgr::isSourceTypeValid(Condition* cond)
         break;
     case CONDITION_SOURCE_TYPE_GOSSIP_HELLO:
     {
-        if (!sObjectMgr->GetCreatureTemplate(cond->SourceGroup))
+        if (!sObjectMgr->GetCreatureTemplate(cond->SourceEntry))
         {
-            LOG_ERROR("sql.sql", "CONDITION_SOURCE_TYPE_GOSSIP_HELLO: creature entry {} in `condition` table does not exist in `creature_template`, ignoring.", cond->SourceGroup);
+            LOG_ERROR("sql.sql", "CONDITION_SOURCE_TYPE_GOSSIP_HELLO: creature entry {} in `condition` table does not exist in `creature_template`, ignoring.", cond->SourceEntry);
             return false;
         }
         break;
@@ -2600,23 +2593,9 @@ void ConditionMgr::Clean()
 
     NpcVendorConditionContainerStore.clear();
 
-    GossipHelloConditionStore.clear();
-
     // this is a BIG hack, feel free to fix it if you can figure out the ConditionMgr ;)
     for (std::list<Condition*>::const_iterator itr = AllocatedMemoryStore.begin(); itr != AllocatedMemoryStore.end(); ++itr) delete *itr;
 
     AllocatedMemoryStore.clear();
 }
 
-ConditionList ConditionMgr::GetConditionsForGossipHello(uint32 creatureEntry)
-{
-    ConditionList conditions;
-    auto itr = GossipHelloConditionStore.find(creatureEntry);
-    if (itr != GossipHelloConditionStore.end())
-    {
-        auto itr2 = itr->second.find(0);
-        if (itr2 != itr->second.end())
-            conditions = itr2->second;
-    }
-    return conditions;
-}
