@@ -22,6 +22,7 @@
 
 #include "gtest/gtest.h"
 
+#include <algorithm>
 #include <array>
 #include <cstdint>
 #include "Unit.h"  // needed for SpellSchoolMask and mask helper
@@ -79,30 +80,24 @@ namespace
 
     bool HasOnlyDamageEffects(SpellDesc const& spell)
     {
-        bool hasAny = false;
-
-        for (EffectDesc const& e : spell.effects)
+        bool hasAny = std::ranges::any_of(spell.effects, [](EffectDesc const& effect)
         {
-            if (e.effect == EFFECT_NONE)
-                continue;
+            return effect.effect != EFFECT_NONE;
+        });
 
-            hasAny = true;
-            if (!IsDamageEffect(e.effect))
-                return false;
-        }
-
-        return hasAny;
+        return hasAny && std::ranges::all_of(spell.effects, [](EffectDesc const& effect)
+        {
+            return effect.effect == EFFECT_NONE || IsDamageEffect(effect.effect);
+        });
     }
 
     // Helper to classify spells which apply a stun aura
     bool IsStunSpell(SpellDesc const& spell)
     {
-        for (EffectDesc const& e : spell.effects)
+        return std::ranges::any_of(spell.effects, [](EffectDesc const& effect)
         {
-            if (e.effect == EFFECT_APPLY_AURA && e.aura == AURA_MOD_STUN)
-                return true;
-        }
-        return false;
+            return effect.effect == EFFECT_APPLY_AURA && effect.aura == AURA_MOD_STUN;
+        });
     }
 
     bool IsEffectBlockedByStunImmunity(EffectDesc const& effect, bool immuneToStun)
@@ -128,6 +123,11 @@ namespace
         }
 
         return hasAnyEffect;
+    }
+
+    bool IsBlockedBySchoolImmunity(bool casterFriendly, bool immunityAppliesToFriendly)
+    {
+        return !casterFriendly || immunityAppliesToFriendly;
     }
 
     // The last parameter defaults to false to avoid updating existing tests
@@ -363,4 +363,19 @@ TEST(SpellImmunityTest, StunImmunity_DoesNotFullyBlockMixedSpell)
     // This models partial immunity: stun effect is blocked, damage still hits.
     EXPECT_TRUE(IsStunSpell(mixedSpell));
     EXPECT_EQ(ComputeSpellHitResult(false, false, mixedSpell, true), SPELL_MISS_NONE);
+}
+
+TEST(SpellImmunityTest, SchoolImmunity_TemplateStyle_AllowsFriendlySpell)
+{
+    EXPECT_FALSE(IsBlockedBySchoolImmunity(true, false));
+}
+
+TEST(SpellImmunityTest, SchoolImmunity_ExplicitFriendlyBlockStillApplies)
+{
+    EXPECT_TRUE(IsBlockedBySchoolImmunity(true, true));
+}
+
+TEST(SpellImmunityTest, SchoolImmunity_BlocksHostileSpell)
+{
+    EXPECT_TRUE(IsBlockedBySchoolImmunity(false, false));
 }
