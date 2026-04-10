@@ -1089,13 +1089,13 @@ ConditionList ConditionMgr::GetConditionsForObjectVisibility(const WorldObject* 
 
     uint32 guid = object->IsGameObject() ? object->ToGameObject()->GetSpawnId() : object->ToCreature()->GetSpawnId();
 
-    auto sourceIdConditions = itrBucket->second;
+    auto const& sourceIdConditions = itrBucket->second;
 
     auto itrGuid = sourceIdConditions.find(guid);
     if (itrGuid != sourceIdConditions.end())
     {
         cond.insert(cond.end(), itrGuid->second.begin(), itrGuid->second.end());
-        LOG_DEBUG("condition", "GetConditionsForObjectVisibility: found guid-level conditions for sourceGroup {} entry {} guid {}", sourceGroup, entry, object->GetGUID().GetCounter());
+        LOG_DEBUG("condition", "GetConditionsForObjectVisibility: found guid-level conditions for sourceGroup {} entry {} guid {}", sourceGroup, entry, guid);
     }
     else
     {
