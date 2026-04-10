@@ -1638,6 +1638,7 @@ public:
     void ApplySpellImmune(uint32 spellId, uint32 op, uint32 type, bool apply, SpellImmuneBlockType blockType = SPELL_BLOCK_TYPE_ALL);
     virtual bool IsImmunedToSpell(SpellInfo const* spellInfo, Spell const* spell = nullptr);
     bool IsImmunedToSpell(SpellInfo const* spellInfo, uint32 effectMask, Unit const* caster = nullptr);
+    bool IgnoresSchoolImmunityFromFriendlyCaster(Unit const* caster, uint32 immunityAuraId, SpellInfo const* immunitySpellInfo) const;
     [[nodiscard]] bool IsImmunedToDamage(SpellSchoolMask schoolMask) const;
     [[nodiscard]] bool IsImmunedToDamage(Unit const* caster, SpellInfo const* spellInfo) const;
     [[nodiscard]] bool IsImmunedToSchool(SpellSchoolMask schoolMask) const;
