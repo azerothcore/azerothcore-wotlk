@@ -269,7 +269,7 @@ public:
     ConditionList GetConditionsForSmartEvent(int32 entryOrGuid, uint32 eventId, uint32 sourceType);
     ConditionList GetConditionsForVehicleSpell(uint32 creatureId, uint32 spellId);
     ConditionList GetConditionsForNpcVendorEvent(uint32 creatureId, uint32 itemId);
-    ConditionList GetConditionsForGossipHello(uint32 creatureEntry);
+
 
 private:
     bool isSourceTypeValid(Condition* cond);
@@ -288,7 +288,7 @@ private:
     CreatureSpellConditionContainer   SpellClickEventConditionStore;
     NpcVendorConditionContainer       NpcVendorConditionContainerStore;
     SmartEventConditionContainer      SmartEventConditionStore;
-    CreatureSpellConditionContainer   GossipHelloConditionStore;
+
 };
 
 #define sConditionMgr ConditionMgr::instance()
