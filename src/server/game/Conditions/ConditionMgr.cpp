@@ -1091,19 +1091,19 @@ ConditionList ConditionMgr::GetConditionsForObjectVisibility(const WorldObject* 
 
     auto sourceIdConditions = itrBucket->second;
 
-    auto itrEntry = sourceIdConditions.find(0);
-    if (itrEntry != sourceIdConditions.end())
+    auto itrGuid = sourceIdConditions.find(guid);
+    if (itrGuid != sourceIdConditions.end())
     {
-        cond.insert(cond.end(), itrEntry->second.begin(), itrEntry->second.end());
-        LOG_DEBUG("condition", "GetConditionsForObjectVisibility: found entry-level conditions for sourceGroup {} entry {}", sourceGroup, entry);
+        cond.insert(cond.end(), itrGuid->second.begin(), itrGuid->second.end());
+        LOG_DEBUG("condition", "GetConditionsForObjectVisibility: found guid-level conditions for sourceGroup {} entry {} guid {}", sourceGroup, entry, object->GetGUID().GetCounter());
     }
     else
     {
-        auto itrGuid = sourceIdConditions.find(guid);
-        if (itrGuid != sourceIdConditions.end())
+        auto itrEntry = sourceIdConditions.find(0);
+        if (itrEntry != sourceIdConditions.end())
         {
-            cond.insert(cond.end(), itrGuid->second.begin(), itrGuid->second.end());
-            LOG_DEBUG("condition", "GetConditionsForObjectVisibility: found guid-level conditions for sourceGroup {} entry {} guid {}", sourceGroup, entry, object->GetGUID().GetCounter());
+            cond.insert(cond.end(), itrEntry->second.begin(), itrEntry->second.end());
+            LOG_DEBUG("condition", "GetConditionsForObjectVisibility: found entry-level conditions for sourceGroup {} entry {}", sourceGroup, entry);
         }
     }
 
