@@ -270,7 +270,6 @@ public:
     ConditionList GetConditionsForVehicleSpell(uint32 creatureId, uint32 spellId);
     ConditionList GetConditionsForNpcVendorEvent(uint32 creatureId, uint32 itemId);
 
-
 private:
     bool isSourceTypeValid(Condition* cond);
     bool addToLootTemplate(Condition* cond, LootTemplate* loot);
@@ -288,7 +287,6 @@ private:
     CreatureSpellConditionContainer   SpellClickEventConditionStore;
     NpcVendorConditionContainer       NpcVendorConditionContainerStore;
     SmartEventConditionContainer      SmartEventConditionStore;
-
 };
 
 #define sConditionMgr ConditionMgr::instance()
