@@ -153,7 +153,7 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket& recvData)
 
     // Check GossipHello conditions - block gossip opening if conditions not met
     ConditionList gossipConditions = sConditionMgr->GetConditionsForGossipHello(unit->GetEntry());
-    if (!gossipConditions.empty() && !sConditionMgr->IsObjectMeetToConditions(_player, unit, gossipConditions))
+    if (!sConditionMgr->IsObjectMeetToConditions(_player, unit, gossipConditions))
         return;
 
     // set faction visible if needed
