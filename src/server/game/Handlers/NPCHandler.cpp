@@ -16,6 +16,7 @@
  */
 
 #include "Battleground.h"
+#include "ConditionMgr.h"
 #include "BattlegroundMgr.h"
 #include "Creature.h"
 #include "DatabaseEnv.h"
@@ -148,6 +149,11 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket& recvData)
 
     // xinef: check if we have ANY npc flags
     if (unit->GetNpcFlags() == UNIT_NPC_FLAG_NONE)
+        return;
+
+    // Check GossipHello conditions - block gossip opening if conditions not met
+    ConditionList gossipConditions = sConditionMgr->GetConditionsForNotGroupedEntry(CONDITION_SOURCE_TYPE_GOSSIP_HELLO, unit->GetEntry());
+    if (!sConditionMgr->IsObjectMeetToConditions(_player, unit, gossipConditions))
         return;
 
     // set faction visible if needed
