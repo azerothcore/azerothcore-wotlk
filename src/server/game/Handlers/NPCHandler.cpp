@@ -152,7 +152,7 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket& recvData)
         return;
 
     // Check GossipHello conditions - block gossip opening if conditions not met
-    ConditionList gossipConditions = sConditionMgr->GetConditionsForGossipHello(unit->GetEntry());
+    ConditionList gossipConditions = sConditionMgr->GetConditionsForNotGroupedEntry(CONDITION_SOURCE_TYPE_GOSSIP_HELLO, unit->GetEntry());
     if (!sConditionMgr->IsObjectMeetToConditions(_player, unit, gossipConditions))
         return;
 
