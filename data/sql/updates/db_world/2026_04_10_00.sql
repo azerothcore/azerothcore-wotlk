@@ -1,3 +1,4 @@
+-- DB update 2026_04_05_03 -> 2026_04_10_00
 
 -- Edit Actionlists
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 2840600) AND (`source_type` = 9) AND (`id` IN (0, 1, 2, 4, 5, 8, 9));
