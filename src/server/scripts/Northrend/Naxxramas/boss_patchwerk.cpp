@@ -130,7 +130,7 @@ public:
 
                         std::list<Unit*> meleeTargetsExcludingTank;
                         constexpr float HATEFUL_STRIKE_RANGE = 5.0f;
-                        SelectTargetList(meleeTargetsExcludingTank, RAID_MODE(2, 3), SelectTargetMethod::MaxThreat, 0, [&](Unit const* target)
+                        SelectTargetList(meleeTargetsExcludingTank, RAID_MODE(1, 2), SelectTargetMethod::MaxThreat, 0, [&](Unit const* target)
                         {
                             return target && target->IsPlayer() && target != victim && me->IsWithinCombatRange(target, HATEFUL_STRIKE_RANGE);
                         });
