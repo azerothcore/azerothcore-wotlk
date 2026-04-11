@@ -153,6 +153,10 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction, CharacterDatabas
                 .AddItem(pItem)
                 .SendMailTo(trans, MailReceiver(bidder, auction->bidder.GetCounter()), auction, MAIL_CHECK_MASK_COPIED);
         }
+
+        LOG_INFO("entities.player.auctionhouse", "Auction #{} won: Bidder {} ({}), Item (Entry: {}) x{}, Bid: {}, Seller: {}",
+            auction->Id, bidder ? bidder->GetName() : "offline", auction->bidder.ToString(),
+            auction->item_template, auction->itemCount, auction->bid, auction->owner.ToString());
     }
     else
         RemoveAItem(auction->item_guid, true, &trans);
@@ -212,6 +216,11 @@ void AuctionHouseMgr::SendAuctionSuccessfulMail(AuctionEntry* auction, Character
             .AddMoney(profit)
             .SendMailTo(trans, MailReceiver(owner, auction->owner.GetCounter()), auction, MAIL_CHECK_MASK_COPIED, sWorld->getIntConfig(CONFIG_MAIL_DELIVERY_DELAY));
 
+        LOG_INFO("entities.player.auctionhouse", "Auction #{} sold: Seller {} ({}), Buyer: {}, Item (Entry: {}) x{}, Sale Price: {}, Profit: {} (cut: {})",
+            auction->Id, owner ? owner->GetName() : "offline", auction->owner.ToString(),
+            auction->bidder.ToString(), auction->item_template, auction->itemCount,
+            auction->bid, profit, auction->GetAuctionCut());
+
         if (auction->bid >= 500 * GOLD)
             if (CharacterCacheEntry const* gpd = sCharacterCache->GetCharacterCacheByGuid(auction->bidder))
             {
@@ -254,6 +263,10 @@ void AuctionHouseMgr::SendAuctionExpiredMail(AuctionEntry* auction, CharacterDat
                 .AddItem(pItem)
                 .SendMailTo(trans, MailReceiver(owner, auction->owner.GetCounter()), auction, MAIL_CHECK_MASK_COPIED, 0);
         }
+
+        LOG_INFO("entities.player.auctionhouse", "Auction #{} expired: Seller {} ({}), Item (Entry: {}) x{}, Buyout was: {}",
+            auction->Id, owner ? owner->GetName() : "offline", auction->owner.ToString(),
+            auction->item_template, auction->itemCount, auction->buyout);
     }
     else
         RemoveAItem(auction->item_guid, true, &trans);

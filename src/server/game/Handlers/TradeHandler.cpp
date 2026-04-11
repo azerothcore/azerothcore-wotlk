@@ -494,6 +494,23 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
         trader->ModifyMoney(-int32(his_trade->GetMoney()));
         trader->ModifyMoney(my_trade->GetMoney());
 
+        // log completed trade
+        {
+            uint8 myItemCount = 0;
+            uint8 hisItemCount = 0;
+            for (uint8 i = 0; i < TRADE_SLOT_TRADED_COUNT; ++i)
+            {
+                if (myItems[i])
+                    ++myItemCount;
+                if (hisItems[i])
+                    ++hisItemCount;
+            }
+            LOG_INFO("entities.player.trade", "Account: {} (IP: {}), Player [{}] ({}) traded with Player [{}] ({}): gave {} item(s) and {} copper, received {} item(s) and {} copper",
+                GetAccountId(), GetRemoteAddress(), _player->GetName(), _player->GetGUID().ToString(),
+                trader->GetName(), trader->GetGUID().ToString(),
+                myItemCount, my_trade->GetMoney(), hisItemCount, his_trade->GetMoney());
+        }
+
         if (my_spell)
             my_spell->prepare(&my_targets);
 

@@ -322,6 +322,11 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
             SendAuctionCommandResult(AH->Id, AUCTION_SELL_ITEM, ERR_AUCTION_OK);
 
             GetPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_CREATE_AUCTION, 1);
+
+            LOG_INFO("entities.player.auctionhouse", "Account: {} (IP: {}), Player [{}] ({}) created auction #{}: Item '{}' (Entry: {}) x{}, StartBid: {}, Buyout: {}, Deposit: {}",
+                GetAccountId(), GetRemoteAddress(), _player->GetName(), _player->GetGUID().ToString(),
+                AH->Id, item->GetTemplate()->Name1, item->GetEntry(), item->GetCount(), bid, buyout, deposit);
+
             return;
         }
         else // Required stack size of auction does not match to current item stack size, clone item and set correct stack size
@@ -384,6 +389,11 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
             SendAuctionCommandResult(AH->Id, AUCTION_SELL_ITEM, ERR_AUCTION_OK);
 
             GetPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_CREATE_AUCTION, 1);
+
+            LOG_INFO("entities.player.auctionhouse", "Account: {} (IP: {}), Player [{}] ({}) created auction #{}: Item '{}' (Entry: {}) x{}, StartBid: {}, Buyout: {}, Deposit: {}",
+                GetAccountId(), GetRemoteAddress(), _player->GetName(), _player->GetGUID().ToString(),
+                AH->Id, newItem->GetTemplate()->Name1, newItem->GetEntry(), newItem->GetCount(), bid, buyout, deposit);
+
             return;
         }
     }
@@ -490,6 +500,10 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket& recvData)
         trans->Append(stmt);
 
         SendAuctionCommandResult(auction->Id, AUCTION_PLACE_BID, ERR_AUCTION_OK, 0);
+
+        LOG_INFO("entities.player.auctionhouse", "Account: {} (IP: {}), Player [{}] ({}) placed bid on auction #{}: Item (Entry: {}) x{}, Bid: {}, Owner: {}",
+            GetAccountId(), GetRemoteAddress(), player->GetName(), player->GetGUID().ToString(),
+            auction->Id, auction->item_template, auction->itemCount, price, auction->owner.ToString());
     }
     else
     {
@@ -513,6 +527,10 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket& recvData)
         sScriptMgr->OnAuctionSuccessful(auctionHouse, auction);
 
         SendAuctionCommandResult(auction->Id, AUCTION_PLACE_BID, ERR_AUCTION_OK);
+
+        LOG_INFO("entities.player.auctionhouse", "Account: {} (IP: {}), Player [{}] ({}) bought out auction #{}: Item (Entry: {}) x{}, Buyout: {}, Owner: {}",
+            GetAccountId(), GetRemoteAddress(), player->GetName(), player->GetGUID().ToString(),
+            auction->Id, auction->item_template, auction->itemCount, auction->buyout, auction->owner.ToString());
 
         auction->DeleteFromDB(trans);
 
@@ -579,6 +597,10 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket& recvData)
 
     //inform player, that auction is removed
     SendAuctionCommandResult(auction->Id, AUCTION_CANCEL, ERR_AUCTION_OK);
+
+    LOG_INFO("entities.player.auctionhouse", "Account: {} (IP: {}), Player [{}] ({}) cancelled auction #{}: Item (Entry: {}) x{}, Buyout: {}",
+        GetAccountId(), GetRemoteAddress(), player->GetName(), player->GetGUID().ToString(),
+        auction->Id, auction->item_template, auction->itemCount, auction->buyout);
 
     // Now remove the auction
 

@@ -342,6 +342,10 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
 
     player->SaveInventoryAndGoldToDB(trans);
     CharacterDatabase.CommitTransaction(trans);
+
+    LOG_INFO("entities.player.mail", "Account: {} (IP: {}), Player [{}] ({}) sent mail to Player [{}] ({}): subject='{}', {} item(s), {} copper, {} COD copper",
+        GetAccountId(), GetRemoteAddress(), player->GetName(), player->GetGUID().ToString(),
+        receiver, receiverGuid.ToString(), subject, items_count, money, COD);
 }
 
 //called when mail is read
