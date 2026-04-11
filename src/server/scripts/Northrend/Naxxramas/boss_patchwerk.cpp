@@ -128,17 +128,17 @@ public:
 
                         Unit* hatefulTarget = victim; // default to current victim if no other target is available
 
-                        std::list<Unit*> meleeTargetsExcludingTank;
+                        std::list<Unit*> meleeTargets;
                         constexpr float HATEFUL_STRIKE_RANGE = 5.0f;
-                        SelectTargetList(meleeTargetsExcludingTank, RAID_MODE(1, 2), SelectTargetMethod::MaxThreat, 0, [&](Unit const* target)
+                        SelectTargetList(meleeTargets, RAID_MODE(1, 2), SelectTargetMethod::MaxThreat, 0, [&](Unit const* target)
                         {
                             return target && target->IsPlayer() && target != victim && me->IsWithinCombatRange(target, HATEFUL_STRIKE_RANGE);
                         });
 
-                        if (!meleeTargetsExcludingTank.empty())
+                        if (!meleeTargets.empty())
                         {
-                            meleeTargetsExcludingTank.sort(Acore::HealthOrderPred(false));
-                            hatefulTarget = meleeTargetsExcludingTank.front();
+                            meleeTargets.sort(Acore::HealthOrderPred(false));
+                            hatefulTarget = meleeTargets.front();
                         }
 
                         me->CastSpell(hatefulTarget, SPELL_HATEFUL_STRIKE, false);
