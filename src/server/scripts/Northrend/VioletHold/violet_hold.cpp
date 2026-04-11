@@ -926,6 +926,7 @@ struct npc_azure_saboteur : public npc_escortAI
         _isOpening = false;
     }
 
+    using CreatureAI::WaypointReached;
     void WaypointReached(uint32 waypointId) override
     {
         switch (_boss)
