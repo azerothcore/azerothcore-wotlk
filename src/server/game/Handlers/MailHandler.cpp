@@ -304,6 +304,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
             {
                 // log item
                 itemLogStr += items[i]->GetTemplate()->Name1 + " (Entry:" + std::to_string(items[i]->GetEntry()) + ") x" + std::to_string(items[i]->GetCount()) + ", ";
+
                 Item* item = items[i];
 
                 item->SetNotRefundable(GetPlayer()); // makes the item no longer refundable
