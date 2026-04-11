@@ -14878,6 +14878,9 @@ void Unit::RemoveCharmedBy(Unit* charmer)
 
     StopAttackingInvalidTarget();
 
+    // End stale combat refs between now-friendly units after faction restore
+    GetCombatManager().RevalidateCombat();
+
     Player* playerCharmer = charmer->ToPlayer();
     if (playerCharmer)
     {
