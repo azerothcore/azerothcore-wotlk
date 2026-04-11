@@ -115,7 +115,7 @@ public:
                     {
                         // Scan melee targets (melee range), choose target according to mechanics:
                         // - If only 1 melee target exists, hit the tank (current victim).
-                        // - Otherwise select the top RAID_MODE(2,3) threat targets (excluding current victim)
+                        // - Otherwise select the top RAID_MODE(1,2) threat targets (excluding current victim)
                         //   among melee targets and hit the one with the highest HP.
                         // - The target hit gains 500 flat threat.
 
