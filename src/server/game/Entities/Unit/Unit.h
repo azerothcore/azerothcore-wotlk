@@ -2321,15 +2321,15 @@ namespace Acore
         {
             Unit const* a = objA->ToUnit();
             Unit const* b = objB->ToUnit();
-            float rA = a ? float(a->GetHealth()) : 0.0f;
-            float rB = b ? float(b->GetHealth()) : 0.0f;
+            uint32 rA = a ? a->GetHealth() : 0;
+            uint32 rB = b ? b->GetHealth() : 0;
             return _ascending ? rA < rB : rA > rB;
         }
 
         bool operator() (Unit const* a, Unit const* b) const
         {
-            float rA = a ? float(a->GetHealth()) : 0.0f;
-            float rB = b ? float(b->GetHealth()) : 0.0f;
+            uint32 rA = a ? a->GetHealth() : 0;
+            uint32 rB = b ? b->GetHealth() : 0;
             return _ascending ? rA < rB : rA > rB;
         }
 
