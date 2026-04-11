@@ -154,9 +154,9 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction, CharacterDatabas
                 .SendMailTo(trans, MailReceiver(bidder, auction->bidder.GetCounter()), auction, MAIL_CHECK_MASK_COPIED);
         }
 
-        LOG_INFO("entities.player.auctionhouse", "Auction #{} won: Bidder {} ({}), Item (Entry: {}) x{}, Bid: {}, Seller: {}",
-            auction->Id, bidder ? bidder->GetName() : "offline", auction->bidder.ToString(),
-            auction->item_template, auction->itemCount, auction->bid, auction->owner.ToString());
+        LOG_INFO("entities.player.auctionhouse", "AuctionHouse: Auction #{} won: Bidder {} (GUID: {}), Item (Entry: {}) x{}, Bid: {} copper, Seller: {}",
+            auction->Id, bidder ? bidder->GetName() : "offline", auction->bidder.GetCounter(),
+            auction->item_template, auction->itemCount, auction->bid, auction->owner.GetCounter());
     }
     else
         RemoveAItem(auction->item_guid, true, &trans);
@@ -216,9 +216,9 @@ void AuctionHouseMgr::SendAuctionSuccessfulMail(AuctionEntry* auction, Character
             .AddMoney(profit)
             .SendMailTo(trans, MailReceiver(owner, auction->owner.GetCounter()), auction, MAIL_CHECK_MASK_COPIED, sWorld->getIntConfig(CONFIG_MAIL_DELIVERY_DELAY));
 
-        LOG_INFO("entities.player.auctionhouse", "Auction #{} sold: Seller {} ({}), Buyer: {}, Item (Entry: {}) x{}, Sale Price: {}, Profit: {} (cut: {})",
-            auction->Id, owner ? owner->GetName() : "offline", auction->owner.ToString(),
-            auction->bidder.ToString(), auction->item_template, auction->itemCount,
+        LOG_INFO("entities.player.auctionhouse", "AuctionHouse: Auction #{} sold: Seller {} (GUID: {}), Buyer: {} (GUID: {}), Item (Entry: {}) x{}, Sale Price: {} copper, Profit: {} copper (cut: {} copper)",
+            auction->Id, owner ? owner->GetName() : "offline", auction->owner.GetCounter(),
+            auction->bidder.GetCounter(), auction->item_template, auction->itemCount,
             auction->bid, profit, auction->GetAuctionCut());
 
         if (auction->bid >= 500 * GOLD)
@@ -264,8 +264,8 @@ void AuctionHouseMgr::SendAuctionExpiredMail(AuctionEntry* auction, CharacterDat
                 .SendMailTo(trans, MailReceiver(owner, auction->owner.GetCounter()), auction, MAIL_CHECK_MASK_COPIED, 0);
         }
 
-        LOG_INFO("entities.player.auctionhouse", "Auction #{} expired: Seller {} ({}), Item (Entry: {}) x{}, Buyout was: {}",
-            auction->Id, owner ? owner->GetName() : "offline", auction->owner.ToString(),
+        LOG_INFO("entities.player.auctionhouse", "AuctionHouse: Auction #{} expired: Seller {} (GUID: {}), Item (Entry: {}) x{}, Buyout was: {} copper",
+            auction->Id, owner ? owner->GetName() : "offline", auction->owner.GetCounter(),
             auction->item_template, auction->itemCount, auction->buyout);
     }
     else

@@ -295,12 +295,15 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
 
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
+    std::string itemLogStr = "";
     if (items_count > 0 || money > 0)
     {
         if (items_count > 0)
         {
             for (uint8 i = 0; i < items_count; ++i)
             {
+                // log item
+                itemLogStr += items[i]->GetTemplate()->Name1 + " (Entry:" + std::to_string(items[i]->GetEntry()) + ") x" + std::to_string(items[i]->GetCount()) + ", ";
                 Item* item = items[i];
 
                 item->SetNotRefundable(GetPlayer()); // makes the item no longer refundable
@@ -343,9 +346,9 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
     player->SaveInventoryAndGoldToDB(trans);
     CharacterDatabase.CommitTransaction(trans);
 
-    LOG_INFO("entities.player.mail", "Account: {} (IP: {}), Player [{}] ({}) sent mail to Player [{}] ({}): subject='{}', {} item(s), {} copper, {} COD copper",
-        GetAccountId(), GetRemoteAddress(), player->GetName(), player->GetGUID().ToString(),
-        receiver, receiverGuid.ToString(), subject, items_count, money, COD);
+    LOG_INFO("entities.player.mail", "Mail: Account: {} (IP: {}), Player [{}] ({}) sent mail to Player [{}] ({}): subject='{}', body='{}', {} copper, {} COD copper, sent item(s) [{}]",
+        GetAccountId(), GetRemoteAddress(), player->GetName(), player->GetGUID().GetCounter(),
+        receiver, receiverGuid.GetCounter(), subject, body, money, COD, itemLogStr);
 }
 
 //called when mail is read

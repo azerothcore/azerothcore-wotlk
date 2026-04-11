@@ -496,19 +496,21 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
 
         // log completed trade
         {
-            uint8 myItemCount = 0;
-            uint8 hisItemCount = 0;
+            std::string myItemsStr, hisItemsStr = "";
+
             for (uint8 i = 0; i < TRADE_SLOT_TRADED_COUNT; ++i)
             {
                 if (myItems[i])
-                    ++myItemCount;
+                    myItemsStr += myItems[i]->GetTemplate()->Name1 + " (Entry:" + std::to_string(myItems[i]->GetEntry()) + ") x" + std::to_string(myItems[i]->GetCount()) + ", ";
                 if (hisItems[i])
-                    ++hisItemCount;
+                    hisItemsStr += hisItems[i]->GetTemplate()->Name1 + " (Entry:" + std::to_string(hisItems[i]->GetEntry()) + ") x" + std::to_string(hisItems[i]->GetCount()) + ", ";
             }
-            LOG_INFO("entities.player.trade", "Account: {} (IP: {}), Player [{}] ({}) traded with Player [{}] ({}): gave {} item(s) and {} copper, received {} item(s) and {} copper",
-                GetAccountId(), GetRemoteAddress(), _player->GetName(), _player->GetGUID().ToString(),
-                trader->GetName(), trader->GetGUID().ToString(),
-                myItemCount, my_trade->GetMoney(), hisItemCount, his_trade->GetMoney());
+
+            LOG_INFO("entities.player.trade", "Trade: Account: {} (IP: {}), Player [{}] ({}) traded with Player [{}] ({}): gave {} copper, received {} copper, gave item(s) [{}], received item(s) [{}]",
+                GetAccountId(), GetRemoteAddress(), _player->GetName(), _player->GetGUID().GetCounter(),
+                trader->GetName(), trader->GetGUID().GetCounter(),
+                my_trade->GetMoney(), his_trade->GetMoney(),
+                myItemsStr, hisItemsStr);
         }
 
         if (my_spell)
