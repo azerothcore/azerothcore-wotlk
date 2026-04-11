@@ -35,97 +35,53 @@ enum eEvents
     EVENT_SPELL_CAUTERIZING_FLAMES,
 };
 
-class boss_lavanthor : public CreatureScript
+struct boss_lavanthor : public BossAI
 {
-public:
-    boss_lavanthor() : CreatureScript("boss_lavanthor") { }
+    boss_lavanthor(Creature* c) : BossAI(c, BOSS_LAVANTHOR) { }
 
-    CreatureAI* GetAI(Creature* pCreature) const override
+    void JustEngagedWith(Unit* who) override
     {
-        return GetVioletHoldAI<boss_lavanthorAI>(pCreature);
+        BossAI::JustEngagedWith(who);
+        events.RescheduleEvent(EVENT_SPELL_FIREBOLT, 1s);
+        events.RescheduleEvent(EVENT_SPELL_FLAME_BREATH, 5s);
+        events.RescheduleEvent(EVENT_SPELL_LAVA_BURN, 10s);
+        if (IsHeroic())
+            events.RescheduleEvent(EVENT_SPELL_CAUTERIZING_FLAMES, 3s);
     }
 
-    struct boss_lavanthorAI : public ScriptedAI
+    void ExecuteEvent(uint32 eventId) override
     {
-        boss_lavanthorAI(Creature* c) : ScriptedAI(c)
+        switch (eventId)
         {
-            pInstance = c->GetInstanceScript();
+            case EVENT_SPELL_FIREBOLT:
+                DoCastVictim(SPELL_FIREBOLT);
+                events.Repeat(5s, 13s);
+                break;
+            case EVENT_SPELL_FLAME_BREATH:
+                DoCastVictim(SPELL_FLAME_BREATH);
+                events.Repeat(10s, 15s);
+                break;
+            case EVENT_SPELL_LAVA_BURN:
+                DoCastVictim(SPELL_LAVA_BURN);
+                events.Repeat(14s, 20s);
+                break;
+            case EVENT_SPELL_CAUTERIZING_FLAMES:
+                DoCastAOE(SPELL_CAUTERIZING_FLAMES);
+                events.Repeat(10s, 16s);
+                break;
         }
+    }
 
-        InstanceScript* pInstance;
-        EventMap events;
+    void MoveInLineOfSight(Unit* /*who*/) override {}
 
-        void Reset() override
-        {
-            events.Reset();
-        }
-
-        void JustEngagedWith(Unit* /*who*/) override
-        {
-            DoZoneInCombat();
-            events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_FIREBOLT, 1s);
-            events.RescheduleEvent(EVENT_SPELL_FLAME_BREATH, 5s);
-            events.RescheduleEvent(EVENT_SPELL_LAVA_BURN, 10s);
-            if (IsHeroic())
-                events.RescheduleEvent(EVENT_SPELL_CAUTERIZING_FLAMES, 3s);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case 0:
-                    break;
-                case EVENT_SPELL_FIREBOLT:
-                    me->CastSpell(me->GetVictim(), SPELL_FIREBOLT, false);
-                    events.Repeat(5s, 13s);
-                    break;
-                case EVENT_SPELL_FLAME_BREATH:
-                    me->CastSpell(me->GetVictim(), SPELL_FLAME_BREATH, false);
-                    events.Repeat(10s, 15s);
-                    break;
-                case EVENT_SPELL_LAVA_BURN:
-                    me->CastSpell(me->GetVictim(), SPELL_LAVA_BURN, false);
-                    events.Repeat(14s, 20s);
-                    break;
-                case EVENT_SPELL_CAUTERIZING_FLAMES:
-                    me->CastSpell((Unit*)nullptr, SPELL_FLAME_BREATH, false);
-                    events.Repeat(10s, 16s);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            if (pInstance)
-                pInstance->SetData(DATA_BOSS_DIED, 0);
-        }
-
-        void MoveInLineOfSight(Unit* /*who*/) override {}
-
-        void EnterEvadeMode(EvadeReason why) override
-        {
-            ScriptedAI::EnterEvadeMode(why);
-            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-
-            if (pInstance)
-                pInstance->SetData(DATA_FAILED, 1);
-        }
-    };
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+        _EnterEvadeMode(why);
+    }
 };
 
 void AddSC_boss_lavanthor()
 {
-    new boss_lavanthor();
+    RegisterVioletHoldCreatureAI(boss_lavanthor);
 }

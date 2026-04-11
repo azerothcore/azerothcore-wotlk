@@ -1810,12 +1810,13 @@ void Map::RemoveAllObjectsInRemoveList()
     }
 }
 
-uint32 Map::GetPlayersCountExceptGMs() const
+uint32 Map::GetPlayersCountExceptGMs(bool aliveOnly /*= false*/) const
 {
     uint32 count = 0;
-    for (MapRefMgr::const_iterator itr = m_mapRefMgr.begin(); itr != m_mapRefMgr.end(); ++itr)
-        if (!itr->GetSource()->IsGameMaster())
-            ++count;
+    for (auto const& ref : m_mapRefMgr)
+        if (Player* player = ref.GetSource())
+            if (!player->IsGameMaster() && (!aliveOnly || (player->IsAlive() && !player->HasSpiritOfRedemptionAura())))
+                ++count;
     return count;
 }
 
