@@ -165,9 +165,20 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket& recvData)
     //if (GetPlayer()->HasUnitState(UNIT_STATE_DIED))
     //    GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
 
-    // Stop the npc if moving
+    // Stop the npc if moving.
+    // MOVE_TO_POS uses PointMovementGenerator in ACTIVE/CONTROLLED slots,
+    // while patrol waypoints are in IDLE slot.
     if (uint32 pause = unit->GetMovementTemplate().GetInteractionPauseTimer())
-        unit->PauseMovement(pause);
+    {
+        uint8 pauseSlot = MOTION_SLOT_IDLE;
+
+        if (unit->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_ACTIVE) == POINT_MOTION_TYPE)
+            pauseSlot = MOTION_SLOT_ACTIVE;
+        else if (unit->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) == POINT_MOTION_TYPE)
+            pauseSlot = MOTION_SLOT_CONTROLLED;
+
+        unit->PauseMovement(pause, pauseSlot);
+    }
 
     // Update home position for patrolling NPCs only (prevents drift for stationary NPCs)
     if (unit->GetDefaultMovementType() == WAYPOINT_MOTION_TYPE ||
