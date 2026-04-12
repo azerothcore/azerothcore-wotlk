@@ -1,3 +1,4 @@
+-- DB update 2026_04_12_01 -> 2026_04_12_02
 
 -- Armorer Orkuruk
 DELETE FROM `waypoints` WHERE `entry` = 25274;
