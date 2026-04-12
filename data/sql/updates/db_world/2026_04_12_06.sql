@@ -1,3 +1,4 @@
+-- DB update 2026_04_12_05 -> 2026_04_12_06
 
 -- Shadron
 UPDATE `creature_template` SET `lootid` = 30451 WHERE (`entry` = 30451);
