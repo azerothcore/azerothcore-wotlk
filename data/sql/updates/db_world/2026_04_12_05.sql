@@ -1,3 +1,4 @@
+-- DB update 2026_04_12_04 -> 2026_04_12_05
 --
 DROP TABLE IF EXISTS `spawn_group_template`;
 CREATE TABLE `spawn_group_template` (
