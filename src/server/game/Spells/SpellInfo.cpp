@@ -1440,7 +1440,7 @@ uint32 SpellInfo::_CalculateStaticProcSpellTypeMask(bool& reliable) const
 
 bool SpellInfo::HasInitialAggro() const
 {
-    return !(HasAttribute(SPELL_ATTR1_NO_THREAT) ||HasAttribute(SPELL_ATTR3_SUPPRESS_TARGET_PROCS));
+    return !(HasAttribute(SPELL_ATTR1_NO_THREAT) || HasAttribute(SPELL_ATTR3_SUPPRESS_TARGET_PROCS));
 }
 
 uint32 SpellInfo::GetStaticProcSpellTypeMask(bool& reliable) const
