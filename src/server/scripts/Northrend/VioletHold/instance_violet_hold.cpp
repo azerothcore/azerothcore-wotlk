@@ -556,7 +556,12 @@ public:
             DoUpdateWorldState(WORLD_STATE_VIOLET_HOLD_SHOW, 0);
             _encounterStatus = NOT_STARTED;
             _gateHealth = 100;
-            _waveCount = 0;
+            if (GetBossState(DATA_2ND_BOSS) == DONE)
+                _waveCount = 12;
+            else if (GetBossState(DATA_1ST_BOSS) == DONE)
+                _waveCount = 6;
+            else
+                _waveCount = 0;
             _defensesUsed = false;
             if (GetBossState(DATA_CYANIGOSA) == DONE)
                 _encounterStatus = DONE;
