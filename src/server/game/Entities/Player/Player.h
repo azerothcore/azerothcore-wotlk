@@ -2581,6 +2581,7 @@ public:
 
     //bool isActiveObject() const { return true; }
     bool CanSeeSpellClickOn(Creature const* creature) const;
+    [[nodiscard]] bool CanSeeObjectByVisibilityConditions(WorldObject const* object) const;
     [[nodiscard]] bool CanSeeVendor(Creature const* creature) const;
     [[nodiscard]] bool CanSeeTrainer(Creature const* creature) const;
 

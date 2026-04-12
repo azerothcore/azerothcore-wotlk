@@ -836,7 +836,7 @@ uint32 Condition::GetMaxAvailableConditionTargets()
         case CONDITION_SOURCE_TYPE_GOSSIP_MENU_OPTION:
         case CONDITION_SOURCE_TYPE_NPC_VENDOR:
         case CONDITION_SOURCE_TYPE_SPELL_PROC:
-        case CONDITION_SOURCE_TYPE_CREATURE_VISIBILITY:
+        case CONDITION_SOURCE_TYPE_OBJECT_VISIBILITY:
             return 2;
         default:
             break;
@@ -975,12 +975,12 @@ bool ConditionMgr::CanHaveSourceGroupSet(ConditionSourceType sourceType) const
 {
     return (sourceType == CONDITION_SOURCE_TYPE_CREATURE_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_DISENCHANT_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_FISHING_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_GAMEOBJECT_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_ITEM_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_MAIL_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_MILLING_LOOT_TEMPLATE ||
             sourceType == CONDITION_SOURCE_TYPE_PICKPOCKETING_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_PROSPECTING_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_REFERENCE_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_SKINNING_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_SPELL_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_GOSSIP_MENU || sourceType == CONDITION_SOURCE_TYPE_GOSSIP_MENU_OPTION || sourceType == CONDITION_SOURCE_TYPE_VEHICLE_SPELL || sourceType == CONDITION_SOURCE_TYPE_GOSSIP_HELLO ||
-            sourceType == CONDITION_SOURCE_TYPE_SPELL_IMPLICIT_TARGET || sourceType == CONDITION_SOURCE_TYPE_SPELL_CLICK_EVENT || sourceType == CONDITION_SOURCE_TYPE_SMART_EVENT || sourceType == CONDITION_SOURCE_TYPE_NPC_VENDOR || sourceType == CONDITION_SOURCE_TYPE_PLAYER_LOOT_TEMPLATE);
+            sourceType == CONDITION_SOURCE_TYPE_SPELL_IMPLICIT_TARGET || sourceType == CONDITION_SOURCE_TYPE_SPELL_CLICK_EVENT || sourceType == CONDITION_SOURCE_TYPE_SMART_EVENT || sourceType == CONDITION_SOURCE_TYPE_NPC_VENDOR || sourceType == CONDITION_SOURCE_TYPE_PLAYER_LOOT_TEMPLATE || sourceType == CONDITION_SOURCE_TYPE_OBJECT_VISIBILITY);
 }
 
 bool ConditionMgr::CanHaveSourceIdSet(ConditionSourceType sourceType) const
 {
-    return (sourceType == CONDITION_SOURCE_TYPE_SMART_EVENT);
+    return (sourceType == CONDITION_SOURCE_TYPE_SMART_EVENT || sourceType == CONDITION_SOURCE_TYPE_OBJECT_VISIBILITY);
 }
 
 ConditionList ConditionMgr::GetConditionsForNotGroupedEntry(ConditionSourceType sourceType, uint32 entry)
@@ -1070,6 +1070,43 @@ ConditionList ConditionMgr::GetConditionsForNpcVendorEvent(uint32 creatureId, ui
             }
         }
     }
+    return cond;
+}
+
+ConditionList ConditionMgr::GetConditionsForObjectVisibility(const WorldObject* object) const
+{
+    ConditionList cond;
+
+    if (!object->IsCreature() && !object->IsGameObject())
+        return cond;
+
+    uint32 entry = object->GetEntry();
+    uint32 sourceGroup = object->IsGameObject() ? 1 : 0;
+
+    auto itrBucket = ObjectVisibilityConditionStore.find(std::make_pair(entry, sourceGroup));
+    if (itrBucket == ObjectVisibilityConditionStore.end())
+        return cond;
+
+    uint32 guid = object->IsGameObject() ? object->ToGameObject()->GetSpawnId() : object->ToCreature()->GetSpawnId();
+
+    auto const& sourceIdConditions = itrBucket->second;
+
+    auto itrGuid = sourceIdConditions.find(guid);
+    if (itrGuid != sourceIdConditions.end())
+    {
+        cond.insert(cond.end(), itrGuid->second.begin(), itrGuid->second.end());
+        LOG_DEBUG("condition", "GetConditionsForObjectVisibility: found guid-level conditions for sourceGroup {} entry {} guid {}", sourceGroup, entry, guid);
+    }
+    else
+    {
+        auto itrEntry = sourceIdConditions.find(0);
+        if (itrEntry != sourceIdConditions.end())
+        {
+            cond.insert(cond.end(), itrEntry->second.begin(), itrEntry->second.end());
+            LOG_DEBUG("condition", "GetConditionsForObjectVisibility: found entry-level conditions for sourceGroup {} entry {}", sourceGroup, entry);
+        }
+    }
+
     return cond;
 }
 
@@ -1223,7 +1260,8 @@ void ConditionMgr::LoadConditions(bool isReload)
             cond->ErrorTextId = 0;
         }
 
-        if (cond->SourceGroup || cond->SourceType == CONDITION_SOURCE_TYPE_PLAYER_LOOT_TEMPLATE)
+        if (cond->SourceGroup || cond->SourceType == CONDITION_SOURCE_TYPE_PLAYER_LOOT_TEMPLATE
+            || cond->SourceType == CONDITION_SOURCE_TYPE_OBJECT_VISIBILITY)
         {
             bool valid = false;
             // handle grouped conditions
@@ -1303,6 +1341,13 @@ void ConditionMgr::LoadConditions(bool isReload)
                 valid = true;
                 ++count;
                 continue;
+            }
+            case CONDITION_SOURCE_TYPE_OBJECT_VISIBILITY:
+            {
+                ObjectVisibilityConditionStore[std::make_pair(uint32(cond->SourceEntry), cond->SourceGroup)][cond->SourceId].push_back(cond);
+                valid = true;
+                ++count;
+                continue; // do not add to AllocatedMemoryStore to avoid double-deleting
             }
             case CONDITION_SOURCE_TYPE_PLAYER_LOOT_TEMPLATE:
             {
@@ -1864,6 +1909,68 @@ bool ConditionMgr::isSourceTypeValid(Condition* cond)
             LOG_ERROR("sql.sql", "SourceType {}, SourceEntry {} in `condition` table, does not exist in `item_template`, ignoring.", cond->SourceType, cond->SourceEntry);
             return false;
         }
+        break;
+    }
+    case CONDITION_SOURCE_TYPE_OBJECT_VISIBILITY:
+    {
+        if (cond->SourceGroup > 1)
+        {
+            LOG_ERROR("sql.sql", "CONDITION_SOURCE_TYPE_OBJECT_VISIBILITY has invalid SourceGroup {} for SourceEntry {}, expected 0 (creature) or 1 (gameobject)", cond->SourceGroup, cond->SourceEntry);
+            return false;
+        }
+
+        if (cond->SourceEntry <= 0)
+        {
+            LOG_ERROR("sql.sql", "CONDITION_SOURCE_TYPE_OBJECT_VISIBILITY has invalid SourceEntry {}, expected a positive entry id.", cond->SourceEntry);
+            return false;
+        }
+
+        if (cond->SourceGroup == 0 && !sObjectMgr->GetCreatureTemplate(uint32(cond->SourceEntry)))
+        {
+            LOG_ERROR("sql.sql", "CONDITION_SOURCE_TYPE_OBJECT_VISIBILITY points to non-existing creature entry {}, skipped.", cond->SourceEntry);
+            return false;
+        }
+
+        if (cond->SourceGroup == 1 && !sObjectMgr->GetGameObjectTemplate(uint32(cond->SourceEntry)))
+        {
+            LOG_ERROR("sql.sql", "CONDITION_SOURCE_TYPE_OBJECT_VISIBILITY points to non-existing gameobject entry {}, skipped.", cond->SourceEntry);
+            return false;
+        }
+
+        if (cond->SourceId)
+        {
+            if (cond->SourceGroup == 0)
+            {
+                CreatureData const* data = sObjectMgr->GetCreatureData(cond->SourceId);
+                if (!data)
+                {
+                    LOG_ERROR("sql.sql", "CONDITION_SOURCE_TYPE_OBJECT_VISIBILITY points to non-existing creature guid {}, skipped.", cond->SourceId);
+                    return false;
+                }
+
+                if (data->id1 != uint32(cond->SourceEntry))
+                {
+                    LOG_ERROR("sql.sql", "CONDITION_SOURCE_TYPE_OBJECT_VISIBILITY has creature guid {} that does not match SourceEntry {}, skipped.", cond->SourceId, cond->SourceEntry);
+                    return false;
+                }
+            }
+            else
+            {
+                GameObjectData const* data = sObjectMgr->GetGameObjectData(cond->SourceId);
+                if (!data)
+                {
+                    LOG_ERROR("sql.sql", "CONDITION_SOURCE_TYPE_OBJECT_VISIBILITY points to non-existing gameobject guid {}, skipped.", cond->SourceId);
+                    return false;
+                }
+
+                if (data->id != uint32(cond->SourceEntry))
+                {
+                    LOG_ERROR("sql.sql", "CONDITION_SOURCE_TYPE_OBJECT_VISIBILITY has gameobject guid {} that does not match SourceEntry {}, skipped.", cond->SourceId, cond->SourceEntry);
+                    return false;
+                }
+            }
+        }
+
         break;
     }
     case CONDITION_SOURCE_TYPE_GOSSIP_MENU:
@@ -2592,6 +2699,21 @@ void ConditionMgr::Clean()
     }
 
     NpcVendorConditionContainerStore.clear();
+
+    for (auto& itr : ObjectVisibilityConditionStore)
+    {
+        for (auto& sourceIdConds : itr.second)
+        {
+            for (Condition* cond : sourceIdConds.second)
+                delete cond;
+
+            sourceIdConds.second.clear();
+        }
+
+        itr.second.clear();
+    }
+
+    ObjectVisibilityConditionStore.clear();
 
     // this is a BIG hack, feel free to fix it if you can figure out the ConditionMgr ;)
     for (std::list<Condition*>::const_iterator itr = AllocatedMemoryStore.begin(); itr != AllocatedMemoryStore.end(); ++itr) delete *itr;
