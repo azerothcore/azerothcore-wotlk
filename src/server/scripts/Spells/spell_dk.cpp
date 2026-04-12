@@ -3003,7 +3003,6 @@ void AddSC_deathknight_spell_scripts()
     RegisterSpellScript(spell_dk_improved_blood_presence_triggered);
     RegisterSpellScript(spell_dk_wandering_plague_aura);
     RegisterSpellScript(spell_dk_rune_of_the_fallen_crusader);
-
     RegisterSpellScript(spell_dk_hungering_cold);
     RegisterSpellScript(spell_dk_blood_caked_blade);
     RegisterSpellScript(spell_dk_dancing_rune_weapon);
