@@ -23,6 +23,7 @@
 #include "ObjectAccessor.h"
 #include "Player.h"
 #include "World.h"
+#include <limits>
 
 //----- Point Movement Generator
 template<class T>
@@ -140,23 +141,58 @@ bool PointMovementGenerator<T>::DoUpdate(T* unit, uint32 diff)
         i_recalculateSpeed = true;
     }
 
-    // Relaunch path when speed changed or when resuming from a stall
-    if (id != EVENT_CHARGE_PREPATH && (i_recalculateSpeed || _hasBeenStalled))
+    // Relaunch path when speed changed or when resuming from a stall.
+    // Keep an indefinitely paused movement stalled until Resume() clears _stalled.
+    if (id != EVENT_CHARGE_PREPATH && !_stalled && (i_recalculateSpeed || _hasBeenStalled))
     {
         i_recalculateSpeed = false;
         Movement::MoveSplineInit init(unit);
+        auto rebasePrecomputedPath = [this, unit](std::optional<uint32> offset = std::nullopt)
+        {
+            Movement::PointsArray rebasedPath;
+            G3D::Vector3 currentPos(unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ());
+
+            if (m_precomputedPath.empty())
+                return rebasedPath;
+
+            if (offset.has_value())
+            {
+                if (offset.value() >= m_precomputedPath.size())
+                {
+                    rebasedPath.push_back(currentPos);
+                    return rebasedPath;
+                }
+
+                rebasedPath.insert(rebasedPath.end(), m_precomputedPath.begin() + offset.value(), m_precomputedPath.end());
+            }
+            else
+            {
+                uint32 closestPointIndex = 0;
+                float closestPointDist = std::numeric_limits<float>::max();
+                for (uint32 pointIndex = 1; pointIndex < m_precomputedPath.size(); ++pointIndex)
+                {
+                    float const sqDist = (currentPos - m_precomputedPath[pointIndex]).squaredLength();
+                    if (sqDist < closestPointDist)
+                    {
+                        closestPointDist = sqDist;
+                        closestPointIndex = pointIndex;
+                    }
+                }
+
+                rebasedPath.insert(rebasedPath.end(), m_precomputedPath.begin() + closestPointIndex, m_precomputedPath.end());
+            }
+
+            // MovebyPath requires the first point to be the mover's current position.
+            rebasedPath.insert(rebasedPath.begin(), currentPos);
+            return rebasedPath;
+        };
 
         if (m_precomputedPath.size())
         {
             if (!unit->movespline->Finalized())
             {
                 uint32 offset = std::min(uint32(unit->movespline->_currentSplineIdx()), uint32(m_precomputedPath.size()));
-                Movement::PointsArray::iterator offsetItr = m_precomputedPath.begin();
-                std::advance(offsetItr, offset);
-                m_precomputedPath.erase(m_precomputedPath.begin(), offsetItr);
-
-                // restore 0 element (current position)
-                m_precomputedPath.insert(m_precomputedPath.begin(), G3D::Vector3(unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ()));
+                m_precomputedPath = rebasePrecomputedPath(offset);
 
                 if (m_precomputedPath.size() > 2)
                     init.MovebyPath(m_precomputedPath);
@@ -165,7 +201,9 @@ bool PointMovementGenerator<T>::DoUpdate(T* unit, uint32 diff)
             }
             else
             {
-                // unit was stopped (finalized) due to a Pause; relaunch towards destination
+                // Unit was stopped (finalized) due to Pause/StopMoving; trim path from current position.
+                m_precomputedPath = rebasePrecomputedPath();
+
                 if (m_precomputedPath.size() > 2)
                     init.MovebyPath(m_precomputedPath);
                 else if (m_precomputedPath.size() == 2)
