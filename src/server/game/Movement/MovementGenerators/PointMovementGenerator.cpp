@@ -160,6 +160,7 @@ bool PointMovementGenerator<T>::DoUpdate(T* unit, uint32 diff)
                 if (offset.value() >= m_precomputedPath.size())
                 {
                     rebasedPath.push_back(currentPos);
+                    rebasedPath.push_back(m_precomputedPath.back());
                     return rebasedPath;
                 }
 
