@@ -36,12 +36,12 @@ enum eSpells
     SPELL_VOID_SHIFT                                = 54361,
     SPELL_SUMMON_VOID_SENTRY                        = 54369,
     SPELL_SUMMON_VOID_SENTRY_BALL                   = 58650,
-
-    //SPELL_ZURAMAT_ADD_2_N                         = 54342,
-    //SPELL_ZURAMAT_ADD_2_H                         = 59747,
 };
 
-#define NPC_VOID_SENTRY_BALL                        29365
+enum eCreatures
+{
+    NPC_VOID_SENTRY_BALL                            = 29365,
+};
 
 enum eEvents
 {
@@ -50,208 +50,154 @@ enum eEvents
     EVENT_SPELL_SUMMON_VOID_SENTRY,
 };
 
-class boss_zuramat : public CreatureScript
+enum eVoidSentryEvents
 {
-public:
-    boss_zuramat() : CreatureScript("boss_zuramat") { }
-
-    CreatureAI* GetAI(Creature* pCreature) const override
-    {
-        return GetVioletHoldAI<boss_zuramatAI>(pCreature);
-    }
-
-    struct boss_zuramatAI : public ScriptedAI
-    {
-        boss_zuramatAI(Creature* c) : ScriptedAI(c), summons(me)
-        {
-            pInstance = c->GetInstanceScript();
-        }
-
-        InstanceScript* pInstance;
-        EventMap events;
-        SummonList summons;
-
-        void Reset() override
-        {
-            events.Reset();
-            summons.DespawnAll();
-        }
-
-        void JustEngagedWith(Unit* /*who*/) override
-        {
-            Talk(SAY_AGGRO);
-            DoZoneInCombat();
-            events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_SHROUD_OF_DARKNESS, 5s, 7s);
-            events.RescheduleEvent(EVENT_SPELL_VOID_SHIFT, 23s, 25s);
-            events.RescheduleEvent(EVENT_SPELL_SUMMON_VOID_SENTRY, 10s);
-            if (pInstance)
-                pInstance->SetData(DATA_ACHIEV, 1);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case 0:
-                    break;
-                case EVENT_SPELL_SHROUD_OF_DARKNESS:
-                    me->CastSpell(me, SPELL_SHROUD_OF_DARKNESS, false);
-                    Talk(SAY_SHIELD);
-                    events.Repeat(20s);
-                    break;
-                case EVENT_SPELL_VOID_SHIFT:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 60.0f, true))
-                    {
-                        me->CastSpell(target, SPELL_VOID_SHIFT, false);
-                        me->Whisper("Gaze... into the void.", LANG_UNIVERSAL, target->ToPlayer());
-                    }
-                    events.Repeat(18s, 22s);
-                    break;
-                case EVENT_SPELL_SUMMON_VOID_SENTRY:
-                    me->CastSpell((Unit*)nullptr, SPELL_SUMMON_VOID_SENTRY, false);
-                    events.Repeat(12s);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            summons.DespawnAll();
-            Talk(SAY_DEATH);
-            if (pInstance)
-                pInstance->SetData(DATA_BOSS_DIED, 0);
-        }
-
-        void KilledUnit(Unit* victim) override
-        {
-            if (victim && victim->GetGUID() == me->GetGUID())
-                return;
-
-            Talk(SAY_SLAY);
-        }
-
-        void JustSummoned(Creature* pSummoned) override
-        {
-            if (pSummoned)
-            {
-                summons.Summon(pSummoned);
-                pSummoned->SetPhaseMask(16, true);
-                if (pInstance)
-                    pInstance->SetGuidData(DATA_ADD_TRASH_MOB, pSummoned->GetGUID());
-            }
-        }
-
-        void SummonedCreatureDespawn(Creature* pSummoned) override
-        {
-            if (pSummoned)
-            {
-                summons.Despawn(pSummoned);
-                if (pSummoned->IsAIEnabled)
-                    pSummoned->AI()->DoAction(-1337);
-                if (pInstance)
-                    pInstance->SetGuidData(DATA_DELETE_TRASH_MOB, pSummoned->GetGUID());
-            }
-        }
-
-        void MoveInLineOfSight(Unit* /*who*/) override {}
-
-        void EnterEvadeMode(EvadeReason why) override
-        {
-            ScriptedAI::EnterEvadeMode(why);
-            events.Reset();
-            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-            if (pInstance)
-                pInstance->SetData(DATA_FAILED, 1);
-        }
-    };
+    EVENT_CHECK_SUMMONER = 1,
 };
 
-class npc_vh_void_sentry : public CreatureScript
+struct boss_zuramat : public BossAI
 {
-public:
-    npc_vh_void_sentry() : CreatureScript("npc_vh_void_sentry") { }
+    boss_zuramat(Creature* c) : BossAI(c, BOSS_ZURAMAT) { }
 
-    CreatureAI* GetAI(Creature* pCreature) const override
+    void JustEngagedWith(Unit* who) override
     {
-        return GetVioletHoldAI<npc_vh_void_sentryAI>(pCreature);
+        Talk(SAY_AGGRO);
+        BossAI::JustEngagedWith(who);
+        events.RescheduleEvent(EVENT_SPELL_SHROUD_OF_DARKNESS, 5s, 7s);
+        events.RescheduleEvent(EVENT_SPELL_VOID_SHIFT, 23s, 25s);
+        events.RescheduleEvent(EVENT_SPELL_SUMMON_VOID_SENTRY, 10s);
+        instance->SetData(DATA_ACHIEV, 1);
     }
 
-    struct npc_vh_void_sentryAI : public NullCreatureAI
+    void ExecuteEvent(uint32 eventId) override
     {
-        npc_vh_void_sentryAI(Creature* c) : NullCreatureAI(c)
+        switch (eventId)
         {
-            pInstance = c->GetInstanceScript();
-            SummonedGUID.Clear();
-            checkTimer = 5000;
-            //me->CastSpell(me, SPELL_SUMMON_VOID_SENTRY_BALL, true);
-            if (Creature* pSummoned = me->SummonCreature(NPC_VOID_SENTRY_BALL, *me, TEMPSUMMON_TIMED_DESPAWN, 300000))
-            {
-                pSummoned->SetPhaseMask(1, true);
-                SummonedGUID = pSummoned->GetGUID();
-                pInstance->SetGuidData(DATA_ADD_TRASH_MOB, pSummoned->GetGUID());
-            }
+            case EVENT_SPELL_SHROUD_OF_DARKNESS:
+                DoCastSelf(SPELL_SHROUD_OF_DARKNESS);
+                Talk(SAY_SHIELD);
+                events.Repeat(20s);
+                break;
+            case EVENT_SPELL_VOID_SHIFT:
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 60.0f, true))
+                {
+                    DoCast(target, SPELL_VOID_SHIFT);
+                    me->Whisper("Gaze... into the void.", LANG_UNIVERSAL, target->ToPlayer());
+                }
+                events.Repeat(18s, 22s);
+                break;
+            case EVENT_SPELL_SUMMON_VOID_SENTRY:
+                DoCastAOE(SPELL_SUMMON_VOID_SENTRY);
+                events.Repeat(12s);
+                break;
         }
+    }
 
-        InstanceScript* pInstance;
-        ObjectGuid SummonedGUID;
-        uint16 checkTimer;
+    void JustDied(Unit* killer) override
+    {
+        Talk(SAY_DEATH);
+        BossAI::JustDied(killer);
+    }
 
-        void DoAction(int32 a) override
+    void KilledUnit(Unit* victim) override
+    {
+        if (victim && victim->GetGUID() == me->GetGUID())
+            return;
+
+        Talk(SAY_SLAY);
+    }
+
+    void JustSummoned(Creature* summoned) override
+    {
+        if (summoned)
         {
-            if (a == -1337)
-                if (Creature* c = pInstance->instance->GetCreature(SummonedGUID))
-                    c->DespawnOrUnsummon();
+            BossAI::JustSummoned(summoned);
+            summoned->SetPhaseMask(16, true);
+            instance->SetGuidData(DATA_ADD_TRASH_MOB, summoned->GetGUID());
         }
+    }
 
-        void JustDied(Unit* /*killer*/) override
+    void SummonedCreatureDespawn(Creature* summoned) override
+    {
+        if (summoned)
         {
-            if (pInstance)
-            {
-                pInstance->SetData(DATA_ACHIEV, 0);
-                if (Creature* c = pInstance->instance->GetCreature(SummonedGUID))
-                    c->DespawnOrUnsummon();
-            }
-            me->DespawnOrUnsummon(5s);
+            BossAI::SummonedCreatureDespawn(summoned);
+            if (summoned->IsAIEnabled)
+                summoned->AI()->DoAction(-1337);
+            instance->SetGuidData(DATA_DELETE_TRASH_MOB, summoned->GetGUID());
         }
+    }
 
-        void SummonedCreatureDespawn(Creature* pSummoned) override
-        {
-            if (pSummoned)
-                pInstance->SetGuidData(DATA_DELETE_TRASH_MOB, pSummoned->GetGUID());
-        }
+    void MoveInLineOfSight(Unit* /*who*/) override {}
 
-        void UpdateAI(uint32 diff) override
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+        _EnterEvadeMode(why);
+    }
+};
+
+struct npc_vh_void_sentry : public NullCreatureAI
+{
+    npc_vh_void_sentry(Creature* c) : NullCreatureAI(c)
+    {
+        _instance = c->GetInstanceScript();
+        _summonedGuid.Clear();
+        _events.ScheduleEvent(EVENT_CHECK_SUMMONER, 5s);
+        if (Creature* summoned = me->SummonCreature(NPC_VOID_SENTRY_BALL, *me, TEMPSUMMON_TIMED_DESPAWN, 300000))
         {
-            if (checkTimer <= diff)
-            {
-                checkTimer = 5000;
-                bool good = false;
-                if (me->IsSummon())
-                    if (Unit* s = me->ToTempSummon()->GetSummonerUnit())
-                        if (s->IsAlive())
-                            good = true;
-                if (!good)
-                    me->KillSelf();
-            }
-            else
-                checkTimer -= diff;
+            summoned->SetPhaseMask(1, true);
+            _summonedGuid = summoned->GetGUID();
+            _instance->SetGuidData(DATA_ADD_TRASH_MOB, summoned->GetGUID());
         }
-    };
+    }
+
+    void DoAction(int32 action) override
+    {
+        if (action == -1337)
+            if (Creature* voidSentry = _instance->instance->GetCreature(_summonedGuid))
+                voidSentry->DespawnOrUnsummon();
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        _instance->SetData(DATA_ACHIEV, 0);
+        if (Creature* voidSentry = _instance->instance->GetCreature(_summonedGuid))
+            voidSentry->DespawnOrUnsummon();
+        me->DespawnOrUnsummon(5s);
+    }
+
+    void SummonedCreatureDespawn(Creature* summoned) override
+    {
+        if (summoned)
+            _instance->SetGuidData(DATA_DELETE_TRASH_MOB, summoned->GetGUID());
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        _events.Update(diff);
+
+        if (_events.ExecuteEvent() == EVENT_CHECK_SUMMONER)
+        {
+            bool good = false;
+            if (me->IsSummon())
+                if (Unit* s = me->ToTempSummon()->GetSummonerUnit())
+                    if (s->IsAlive())
+                        good = true;
+            if (!good)
+                me->KillSelf();
+            _events.Repeat(5s);
+        }
+    }
+
+private:
+    InstanceScript* _instance;
+    ObjectGuid _summonedGuid;
+    EventMap _events;
 };
 
 void AddSC_boss_zuramat()
 {
-    new boss_zuramat();
-    new npc_vh_void_sentry();
+    RegisterVioletHoldCreatureAI(boss_zuramat);
+    RegisterVioletHoldCreatureAI(npc_vh_void_sentry);
 }
