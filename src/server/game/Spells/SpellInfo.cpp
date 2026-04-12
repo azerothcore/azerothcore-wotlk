@@ -869,6 +869,7 @@ SpellInfo::SpellInfo(SpellEntry const* spellEntry)
     _isSpellValid = true;
     _isCritCapable = false;
     _requireCooldownInfo = false;
+    LoadStaticProcSpellTypeMask();
     JumpDistance = 0.0f;
 }
 
@@ -1317,9 +1318,140 @@ bool SpellInfo::IsAutoRepeatRangedSpell() const
     return AttributesEx2 & SPELL_ATTR2_AUTO_REPEAT;
 }
 
+uint32 SpellInfo::_CalculateStaticProcSpellTypeMask(bool& reliable) const
+{
+    if (HasAttribute(SPELL_ATTR0_IS_TRADESKILL))
+    {
+        reliable = true;
+        return PROC_SPELL_TYPE_NO_DMG_HEAL;
+    }
+
+    uint32 mask = 0;
+    bool sawKnownEffect = false;
+    bool sawAmbiguousEffect = false;
+
+    for (uint8 effectIndex = 0; effectIndex < MAX_SPELL_EFFECTS; ++effectIndex)
+    {
+        SpellEffectInfo const& effectInfo = Effects[effectIndex];
+        if (!effectInfo.IsEffect())
+            continue;
+
+        bool effectReliable = true;
+        uint32 effectMask = PROC_SPELL_TYPE_NO_DMG_HEAL;
+
+        switch (effectInfo.Effect)
+        {
+            case SPELL_EFFECT_SCHOOL_DAMAGE:
+            case SPELL_EFFECT_ENVIRONMENTAL_DAMAGE:
+            case SPELL_EFFECT_WEAPON_DAMAGE:
+            case SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL:
+            case SPELL_EFFECT_NORMALIZED_WEAPON_DMG:
+            case SPELL_EFFECT_WEAPON_PERCENT_DAMAGE:
+            case SPELL_EFFECT_POWER_BURN:
+                effectMask = PROC_SPELL_TYPE_DAMAGE;
+                break;
+            case SPELL_EFFECT_HEALTH_LEECH:
+                effectMask = PROC_SPELL_TYPE_DAMAGE | PROC_SPELL_TYPE_HEAL;
+                break;
+            case SPELL_EFFECT_HEAL:
+            case SPELL_EFFECT_HEAL_MAX_HEALTH:
+            case SPELL_EFFECT_HEAL_PCT:
+            case SPELL_EFFECT_HEAL_MECHANICAL:
+                effectMask = PROC_SPELL_TYPE_HEAL;
+                break;
+            case SPELL_EFFECT_APPLY_AURA:
+            case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
+            case SPELL_EFFECT_APPLY_AREA_AURA_RAID:
+            case SPELL_EFFECT_APPLY_AREA_AURA_FRIEND:
+            case SPELL_EFFECT_APPLY_AREA_AURA_ENEMY:
+            case SPELL_EFFECT_APPLY_AREA_AURA_PET:
+            case SPELL_EFFECT_APPLY_AREA_AURA_OWNER:
+            case SPELL_EFFECT_PERSISTENT_AREA_AURA:
+                switch (effectInfo.ApplyAuraName)
+                {
+                    case SPELL_AURA_PERIODIC_DAMAGE:
+                    case SPELL_AURA_PERIODIC_DAMAGE_PERCENT:
+                        effectMask = PROC_SPELL_TYPE_DAMAGE;
+                        break;
+                    case SPELL_AURA_PERIODIC_HEAL:
+                    case SPELL_AURA_OBS_MOD_HEALTH:
+                        effectMask = PROC_SPELL_TYPE_HEAL;
+                        break;
+                    case SPELL_AURA_PERIODIC_LEECH:
+                    case SPELL_AURA_PERIODIC_HEALTH_FUNNEL:
+                        effectMask = PROC_SPELL_TYPE_DAMAGE | PROC_SPELL_TYPE_HEAL;
+                        break;
+                    case SPELL_AURA_PERIODIC_MANA_LEECH:
+                        effectMask = PROC_SPELL_TYPE_DAMAGE;
+                        break;
+                    case SPELL_AURA_PROC_TRIGGER_SPELL:
+                    case SPELL_AURA_PROC_TRIGGER_DAMAGE:
+                    case SPELL_AURA_PERIODIC_TRIGGER_SPELL:
+                    case SPELL_AURA_PERIODIC_TRIGGER_SPELL_WITH_VALUE:
+                    case SPELL_AURA_PERIODIC_DUMMY:
+                    case SPELL_AURA_DUMMY:
+                        effectReliable = false;
+                        effectMask = PROC_SPELL_TYPE_NONE;
+                        break;
+                    default:
+                        break;
+                }
+                break;
+            case SPELL_EFFECT_DUMMY:
+            case SPELL_EFFECT_SCRIPT_EFFECT:
+            case SPELL_EFFECT_TRIGGER_SPELL:
+            case SPELL_EFFECT_TRIGGER_SPELL_WITH_VALUE:
+            case SPELL_EFFECT_TRIGGER_MISSILE:
+            case SPELL_EFFECT_TRIGGER_MISSILE_SPELL_WITH_VALUE:
+                effectReliable = false;
+                effectMask = PROC_SPELL_TYPE_NONE;
+                break;
+            default:
+                break;
+        }
+
+        if (!effectReliable)
+        {
+            sawAmbiguousEffect = true;
+            continue;
+        }
+
+        sawKnownEffect = true;
+
+        if (effectMask & (PROC_SPELL_TYPE_DAMAGE | PROC_SPELL_TYPE_HEAL))
+            mask |= effectMask &(PROC_SPELL_TYPE_DAMAGE | PROC_SPELL_TYPE_HEAL);
+    }
+
+    if (mask)
+    {
+        reliable = true;
+        return mask;
+    }
+
+    if (sawKnownEffect && !sawAmbiguousEffect)
+    {
+        reliable = true;
+        return PROC_SPELL_TYPE_NO_DMG_HEAL;
+    }
+
+    reliable = false;
+    return PROC_SPELL_TYPE_NONE;
+}
+
 bool SpellInfo::HasInitialAggro() const
 {
-    return !(HasAttribute(SPELL_ATTR1_NO_THREAT) || HasAttribute(SPELL_ATTR3_SUPPRESS_TARGET_PROCS));
+    return !(HasAttribute(SPELL_ATTR1_NO_THREAT) ||HasAttribute(SPELL_ATTR3_SUPPRESS_TARGET_PROCS));
+}
+
+uint32 SpellInfo::GetStaticProcSpellTypeMask(bool& reliable) const
+{
+    reliable = _isStaticProcSpellTypeMaskReliable;
+    return _staticProcSpellTypeMask;
+}
+
+void SpellInfo::LoadStaticProcSpellTypeMask()
+{
+    _staticProcSpellTypeMask = _CalculateStaticProcSpellTypeMask(_isStaticProcSpellTypeMaskReliable);
 }
 
 bool SpellInfo::IsAffected(uint32 familyName, flag96 const& familyFlags) const

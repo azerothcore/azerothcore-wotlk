@@ -3722,6 +3722,7 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
         }
 
         sScriptMgr->OnLoadSpellCustomAttr(spellInfo);
+        spellInfo->LoadStaticProcSpellTypeMask();
     }
 
     // Xinef: addition for binary spells, ommit spells triggering other spells

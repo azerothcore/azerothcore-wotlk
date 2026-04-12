@@ -425,7 +425,12 @@ public:
     bool _isSpellValid;
     bool _isCritCapable;
     bool _requireCooldownInfo;
+    uint32 _staticProcSpellTypeMask;
+    bool _isStaticProcSpellTypeMaskReliable;
     float JumpDistance;
+
+    void LoadStaticProcSpellTypeMask();
+    uint32 _CalculateStaticProcSpellTypeMask(bool& reliable) const;
 
     SpellInfo(SpellEntry const* spellEntry);
     ~SpellInfo();
@@ -492,6 +497,7 @@ public:
     bool IsRangedWeaponSpell() const;
     bool IsAutoRepeatRangedSpell() const;
     bool HasInitialAggro() const;
+    uint32 GetStaticProcSpellTypeMask(bool& reliable) const;
 
     [[nodiscard]] bool IsAffected(uint32 familyName, flag96 const& familyFlags) const;
 

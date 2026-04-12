@@ -6792,14 +6792,28 @@ void Unit::ProcSkillsAndAuras(Unit* actor, Unit* victim, uint32 procAttacker, ui
             // procs that check for damage/heal type based on spell info (like Backlash)
             // At FINISH phase, damageInfo may be null but spell did do damage - use MASK_ALL
             // to match TrinityCore behavior (see TC Spell.cpp PROC_SPELL_PHASE_FINISH call)
-            spellTypeMask = PROC_SPELL_TYPE_MASK_ALL;
+            bool reliable = false;
+
+            if (procSpellInfo)
+                spellTypeMask = procSpellInfo->GetStaticProcSpellTypeMask(reliable);
+
+            if (!reliable)
+                spellTypeMask = PROC_SPELL_TYPE_MASK_ALL;
         }
         else if (healInfo && healInfo->GetHeal())
             spellTypeMask = PROC_SPELL_TYPE_HEAL;
         else if (damageInfo && (damageInfo->GetDamage() || damageInfo->GetAbsorb()))
             spellTypeMask = PROC_SPELL_TYPE_DAMAGE;
         else if (procSpellInfo)
-            spellTypeMask = PROC_SPELL_TYPE_NO_DMG_HEAL;
+        {
+            bool reliable = false;
+            uint32 staticSpellTypeMask = procSpellInfo->GetStaticProcSpellTypeMask(reliable);
+
+            if (reliable && (staticSpellTypeMask & (PROC_SPELL_TYPE_DAMAGE | PROC_SPELL_TYPE_HEAL)))
+                spellTypeMask = staticSpellTypeMask & (PROC_SPELL_TYPE_DAMAGE | PROC_SPELL_TYPE_HEAL);
+            else
+                spellTypeMask = PROC_SPELL_TYPE_NO_DMG_HEAL;
+        }
 
         actor->TriggerAurasProcOnEvent(nullptr, nullptr, victim, procAttacker, procVictim, spellTypeMask, procPhase, procExtra, const_cast<Spell*>(procSpell), damageInfo, healInfo);
     }
