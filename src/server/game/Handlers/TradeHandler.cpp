@@ -494,6 +494,25 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
         trader->ModifyMoney(-int32(his_trade->GetMoney()));
         trader->ModifyMoney(my_trade->GetMoney());
 
+        // log completed trade
+        {
+            std::string myItemsStr, hisItemsStr = "";
+
+            for (uint8 i = 0; i < TRADE_SLOT_TRADED_COUNT; ++i)
+            {
+                if (myItems[i])
+                    myItemsStr += Acore::StringFormat("{} (Entry:{}) x{}, ", myItems[i]->GetTemplate()->Name1, myItems[i]->GetEntry(), myItems[i]->GetCount());
+                if (hisItems[i])
+                    hisItemsStr += Acore::StringFormat("{} (Entry:{}) x{}, ", hisItems[i]->GetTemplate()->Name1, hisItems[i]->GetEntry(), hisItems[i]->GetCount());
+            }
+
+            LOG_INFO("entities.player.trade", "Trade: Account: {} (IP: {}), Player [{}] ({}) traded with Player [{}] ({}): gave {} copper, received {} copper, gave item(s) [{}], received item(s) [{}]",
+                GetAccountId(), GetRemoteAddress(), _player->GetName(), _player->GetGUID().GetCounter(),
+                trader->GetName(), trader->GetGUID().GetCounter(),
+                my_trade->GetMoney(), his_trade->GetMoney(),
+                myItemsStr, hisItemsStr);
+        }
+
         if (my_spell)
             my_spell->prepare(&my_targets);
 
