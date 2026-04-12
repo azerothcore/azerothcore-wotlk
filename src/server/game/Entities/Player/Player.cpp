@@ -14338,6 +14338,13 @@ bool Player::CanSeeSpellClickOn(Creature const* c) const
     return false;
 }
 
+bool Player::CanSeeObjectByVisibilityConditions(WorldObject const* object) const
+{
+    ConditionList conds = sConditionMgr->GetConditionsForObjectVisibility(object);
+    ConditionSourceInfo info = ConditionSourceInfo(const_cast<Player*>(this), const_cast<WorldObject*>(object));
+    return sConditionMgr->IsObjectMeetToConditions(info, conds);
+}
+
 /**
  * @brief Checks if any vendor option is available in the gossip menu tree for a given creature.
  *
