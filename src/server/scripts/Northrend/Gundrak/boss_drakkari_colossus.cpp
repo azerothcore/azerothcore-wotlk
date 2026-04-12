@@ -56,9 +56,7 @@ enum Misc
 
     EVENT_COLOSSUS_MIGHTY_BLOW          = 1,
     EVENT_COLOSSUS_MORTAL_STRIKE        = 2,
-    EVENT_COLOSSUS_HEALTH_1             = 3,
-    EVENT_COLOSSUS_HEALTH_2             = 4,
-    EVENT_COLOSSUS_START_FIGHT          = 5,
+    EVENT_COLOSSUS_START_FIGHT          = 3,
 
     EVENT_ELEMENTAL_HEALTH              = 10,
     EVENT_ELEMENTAL_SURGE               = 11,
@@ -108,6 +106,8 @@ public:
         {
         }
 
+        bool _secondEmerge;
+
         void MoveInLineOfSight(Unit*  /*who*/) override
         {
         }
@@ -137,6 +137,9 @@ public:
                 me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             }
+
+            SetInvincibility(true);
+            _secondEmerge = false;
         }
 
         void JustReachedHome() override
@@ -150,8 +153,21 @@ public:
             events.ScheduleEvent(EVENT_COLOSSUS_START_FIGHT, 1s);
             events.ScheduleEvent(EVENT_COLOSSUS_MIGHTY_BLOW, 10s);
             events.ScheduleEvent(EVENT_COLOSSUS_MORTAL_STRIKE, 7s);
-            events.ScheduleEvent(EVENT_COLOSSUS_HEALTH_1, 1s);
-            events.ScheduleEvent(EVENT_COLOSSUS_HEALTH_2, 1s);
+
+            ScheduleHealthCheckEvent(51, [&] {
+                me->CastSpell(me, SPELL_EMERGE, false);
+                me->CastSpell(me, SPELL_EMERGE_SUMMON, true);
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->GetMotionMaster()->Clear();
+            });
+
+            ScheduleHealthCheckEvent(2, [&] {
+                _secondEmerge = true;
+                me->CastSpell(me, SPELL_EMERGE, false);
+                me->CastSpell(me, SPELL_EMERGE_SUMMON, true);
+                me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                me->GetMotionMaster()->Clear();
+            });
         }
 
         void JustSummoned(Creature* summon) override
@@ -161,7 +177,7 @@ public:
                 summon->SetRegeneratingHealth(false);
                 summon->SetReactState(REACT_PASSIVE);
                 summon->m_Events.AddEventAtOffset(new RestoreFight(summon), 3s);
-                if (!events.HasTimeUntilEvent(EVENT_COLOSSUS_HEALTH_2))
+                if (_secondEmerge)
                 {
                     summon->SetHealth(summon->GetMaxHealth() / 2);
                     summon->LowerPlayerDamageReq(summon->GetMaxHealth() / 2);
@@ -192,12 +208,6 @@ public:
             }
         }
 
-        void DamageTaken(Unit*  /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
-        {
-            if (damage >= me->GetHealth())
-                damage = 0;
-        }
-
         void UpdateAI(uint32 diff) override
         {
             if (!UpdateVictim())
@@ -220,28 +230,6 @@ public:
                 case EVENT_COLOSSUS_MORTAL_STRIKE:
                     DoCastVictim(SPELL_MORTAL_STRIKE);
                     events.ScheduleEvent(EVENT_COLOSSUS_MORTAL_STRIKE, 7s);
-                    break;
-                case EVENT_COLOSSUS_HEALTH_1:
-                    if (me->HealthBelowPct(51))
-                    {
-                        me->CastSpell(me, SPELL_EMERGE, false);
-                        me->CastSpell(me, SPELL_EMERGE_SUMMON, true);
-                        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                        me->GetMotionMaster()->Clear();
-                        break;
-                    }
-                    events.ScheduleEvent(EVENT_COLOSSUS_HEALTH_1, 1s);
-                    break;
-                case EVENT_COLOSSUS_HEALTH_2:
-                    if (me->HealthBelowPct(2))
-                    {
-                        me->CastSpell(me, SPELL_EMERGE, false);
-                        me->CastSpell(me, SPELL_EMERGE_SUMMON, true);
-                        me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                        me->GetMotionMaster()->Clear();
-                        break;
-                    }
-                    events.ScheduleEvent(EVENT_COLOSSUS_HEALTH_2, 1s);
                     break;
             }
 
