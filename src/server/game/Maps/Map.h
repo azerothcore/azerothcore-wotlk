@@ -318,7 +318,8 @@ public:
     void markCell(uint32 pCellId) { marked_cells.set(pCellId); }
 
     [[nodiscard]] bool HavePlayers() const { return !m_mapRefMgr.IsEmpty(); }
-    [[nodiscard]] uint32 GetPlayersCountExceptGMs() const;
+    // When aliveOnly is true, counts only players that are alive and not in Spirit of Redemption form.
+    [[nodiscard]] uint32 GetPlayersCountExceptGMs(bool aliveOnly = false) const;
 
     void SendToPlayers(WorldPacket const* data) const;
 
