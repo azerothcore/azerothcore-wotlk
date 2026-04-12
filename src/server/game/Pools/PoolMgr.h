@@ -25,7 +25,8 @@
 
 struct PoolTemplateData
 {
-    uint32  MaxLimit;
+    uint32      MaxLimit;
+    std::string Description;
 };
 
 struct PoolObject
@@ -89,6 +90,8 @@ public:
         return EqualChanced.front().guid;
     }
     uint32 GetPoolId() const { return poolId; }
+    std::vector<PoolObject> const& GetExplicitlyChanced() const { return ExplicitlyChanced; }
+    std::vector<PoolObject> const& GetEqualChanced() const { return EqualChanced; }
 private:
     uint32 poolId;
     PoolObjectList ExplicitlyChanced;
@@ -134,6 +137,15 @@ public:
 
     PooledQuestRelation mQuestCreatureRelation;
     PooledQuestRelation mQuestGORelation;
+
+    // Pool info accessors for debug commands
+    PoolTemplateData const* GetPoolTemplate(uint32 poolId) const;
+    PoolGroup<Creature> const* GetPoolCreatureGroup(uint32 poolId) const;
+    PoolGroup<GameObject> const* GetPoolGameObjectGroup(uint32 poolId) const;
+    PoolGroup<Pool> const* GetPoolPoolGroup(uint32 poolId) const;
+    ActivePoolData const& GetSpawnedData() const { return mSpawnedData; }
+    uint32 GetCreaturePoolId(uint32 guid) const;
+    uint32 GetGameObjectPoolId(uint32 guid) const;
 
     friend class PoolQuestReloadFixTest;
 private:

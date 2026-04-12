@@ -846,8 +846,8 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_PLAY_ANIMKIT: return sizeof(SmartAction::raw);
             case SMART_ACTION_SCENE_PLAY: return sizeof(SmartAction::raw);
             case SMART_ACTION_SCENE_CANCEL: return sizeof(SmartAction::raw);
-            // case SMART_ACTION_SPAWN_SPAWNGROUP: return sizeof(SmartAction::groupSpawn);
-            // case SMART_ACTION_DESPAWN_SPAWNGROUP: return sizeof(SmartAction::groupSpawn);
+            case SMART_ACTION_SPAWN_SPAWNGROUP: return sizeof(SmartAction::groupSpawn);
+            case SMART_ACTION_DESPAWN_SPAWNGROUP: return sizeof(SmartAction::groupSpawn);
             // case SMART_ACTION_RESPAWN_BY_SPAWNID: return sizeof(SmartAction::respawnData);
             case SMART_ACTION_PLAY_CINEMATIC: return sizeof(SmartAction::cinematic);
             case SMART_ACTION_SET_MOVEMENT_SPEED: return sizeof(SmartAction::movementSpeed);
@@ -1013,12 +1013,21 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_SET_CAN_FLY:
         case SMART_ACTION_REMOVE_AURAS_BY_TYPE:
         case SMART_ACTION_REMOVE_MOVEMENT:
-        case SMART_ACTION_SPAWN_SPAWNGROUP:
-        case SMART_ACTION_DESPAWN_SPAWNGROUP:
         case SMART_ACTION_RESPAWN_BY_SPAWNID:
             LOG_ERROR("sql.sql", "SmartAIMgr: EntryOrGuid {} using event({}) has an action type that is not yet supported on AzerothCore ({}), skipped.",
                              e.entryOrGuid, e.event_id, e.GetActionType());
             return false;
+        case SMART_ACTION_SPAWN_SPAWNGROUP:
+        case SMART_ACTION_DESPAWN_SPAWNGROUP:
+        {
+            if (!sObjectMgr->GetSpawnGroupData(e.action.groupSpawn.groupId))
+            {
+                LOG_ERROR("sql.sql", "SmartAIMgr: EntryOrGuid {} using event({}) has action type {} with invalid spawn group id {}.",
+                    e.entryOrGuid, e.event_id, e.GetActionType(), e.action.groupSpawn.groupId);
+                return false;
+            }
+            break;
+        }
         default:
             break;
     }

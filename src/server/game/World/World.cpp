@@ -554,6 +554,9 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading Creature Base Stats...");
     sObjectMgr->LoadCreatureClassLevelStats();
 
+    LOG_INFO("server.loading", "Loading Spawn Group Templates...");
+    sObjectMgr->LoadSpawnGroupTemplates();
+
     LOG_INFO("server.loading", "Loading Creature Data...");
     sObjectMgr->LoadCreatures();
 
@@ -580,6 +583,9 @@ void World::SetInitialWorldSettings()
 
     LOG_INFO("server.loading", "Loading Gameobject Data...");
     sObjectMgr->LoadGameobjects();
+
+    LOG_INFO("server.loading", "Loading Spawn Group Data...");
+    sObjectMgr->LoadSpawnGroups();                                 // must be after LoadCreatures() and LoadGameobjects()
 
     LOG_INFO("server.loading", "Loading GameObject Addon Data...");
     sObjectMgr->LoadGameObjectAddons();                          // must be after LoadGameObjectTemplate() and LoadGameobjects()

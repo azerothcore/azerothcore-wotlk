@@ -221,6 +221,7 @@ public:
 
     bool LoadFromDB(ObjectGuid::LowType guid, Map* map, bool allowDuplicate = false) { return LoadCreatureFromDB(guid, map, false, allowDuplicate); }
     bool LoadCreatureFromDB(ObjectGuid::LowType guid, Map* map, bool addToMap = true, bool allowDuplicate = false);
+    [[nodiscard]] bool IsRespawnCompatibilityMode() const { return _respawnCompatibilityMode; }
     void SaveToDB();
 
     virtual void SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask);   // overriden in Pet
@@ -464,6 +465,8 @@ protected:
 
     ObjectGuid m_lootRecipient;
     ObjectGuid::LowType m_lootRecipientGroup;
+
+    bool _respawnCompatibilityMode{true};
 
     /// Timers
     time_t m_corpseRemoveTime;                          // (secs) timer for death or corpse disappearance

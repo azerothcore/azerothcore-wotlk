@@ -150,6 +150,7 @@ public:
             { "skill_fishing_base_level",      HandleReloadSkillFishingBaseLevelCommand,      SEC_ADMINISTRATOR, Console::Yes },
             { "skinning_loot_template",        HandleReloadLootTemplatesSkinningCommand,      SEC_ADMINISTRATOR, Console::Yes },
             { "smart_scripts",                 HandleReloadSmartScripts,                      SEC_ADMINISTRATOR, Console::Yes },
+            { "spawn_group",                   HandleReloadSpawnGroupCommand,                 SEC_ADMINISTRATOR, Console::Yes },
             { "spell_required",                HandleReloadSpellRequiredCommand,              SEC_ADMINISTRATOR, Console::Yes },
             { "spell_area",                    HandleReloadSpellAreaCommand,                  SEC_ADMINISTRATOR, Console::Yes },
             { "spell_bonus_data",              HandleReloadSpellBonusesCommand,               SEC_ADMINISTRATOR, Console::Yes },
@@ -1256,6 +1257,15 @@ public:
         LOG_INFO("server.loading", "Reloading game_graveyard table...");
         sGraveyard->LoadGraveyardFromDB();
         handler->SendGlobalGMSysMessage("DB table `game_graveyard` reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadSpawnGroupCommand(ChatHandler* handler)
+    {
+        LOG_INFO("server.loading", "Reloading spawn_group_template and spawn_group tables...");
+        sObjectMgr->LoadSpawnGroupTemplates();
+        sObjectMgr->LoadSpawnGroups();
+        handler->SendGlobalGMSysMessage("DB tables `spawn_group_template` and `spawn_group` reloaded.");
         return true;
     }
 };

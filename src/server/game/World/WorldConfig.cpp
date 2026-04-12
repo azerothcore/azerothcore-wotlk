@@ -521,6 +521,8 @@ void WorldConfig::BuildConfigCache()
 
     SetConfigValue<float>(CONFIG_RESPAWN_DYNAMICRATE_GAMEOBJECT, "Respawn.DynamicRateGameObject", 1.0f);
     SetConfigValue<uint32>(CONFIG_RESPAWN_DYNAMICMINIMUM_GAMEOBJECT, "Respawn.DynamicMinimumGameObject", 10);
+    SetConfigValue<bool>(CONFIG_RESPAWN_DYNAMIC_ESCORTNPC, "Respawn.DynamicEscortNPC", false);
+    SetConfigValue<bool>(CONFIG_RESPAWN_FORCE_COMPATIBILITY_MODE, "Respawn.ForceCompatibilityMode", false);
 
     SetConfigValue<bool>(CONFIG_VMAP_INDOOR_CHECK, "vmap.enableIndoorCheck", true);
     SetConfigValue<bool>(CONFIG_VMAP_ENABLE_LOS, "vmap.enableLOS", true);

@@ -19,6 +19,7 @@
 #define AZEROTHCORE_SPAWNDATA_H
 
 #include "Define.h"
+#include "ObjectGuid.h"
 #include <string>
 
 enum SpawnObjectType : uint8
@@ -41,26 +42,30 @@ enum SpawnGroupFlags : uint32
 {
     SPAWNGROUP_FLAG_NONE                = 0x00,
     SPAWNGROUP_FLAG_SYSTEM              = 0x01,
+    SPAWNGROUP_FLAG_COMPATIBILITY_MODE  = 0x02,
     SPAWNGROUP_FLAG_MANUAL_SPAWN        = 0x04,
     SPAWNGROUP_FLAG_DYNAMIC_SPAWN_RATE  = 0x08,
     SPAWNGROUP_FLAG_ESCORTQUESTNPC      = 0x10,
 
-    SPAWNGROUP_FLAG_ALL = SPAWNGROUP_FLAG_SYSTEM |
+    SPAWNGROUP_FLAG_ALL = SPAWNGROUP_FLAG_SYSTEM | SPAWNGROUP_FLAG_COMPATIBILITY_MODE |
                           SPAWNGROUP_FLAG_MANUAL_SPAWN | SPAWNGROUP_FLAG_DYNAMIC_SPAWN_RATE |
                           SPAWNGROUP_FLAG_ESCORTQUESTNPC
 };
+
+constexpr uint32 SPAWNGROUP_MAP_UNSET = 0xFFFFFFFF;
 
 struct SpawnGroupTemplateData
 {
     uint32 groupId;
     std::string name;
-    uint16 mapid;
+    uint32 mapId;
     SpawnGroupFlags flags;
 };
 
 struct SpawnData
 {
     SpawnObjectType const type;
+    ObjectGuid::LowType spawnId{0};
     uint16 mapid{0};
     uint32 phaseMask{0};
     float posX{0.0f};

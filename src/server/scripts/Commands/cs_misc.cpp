@@ -40,6 +40,7 @@
 #include "ObjectAccessor.h"
 #include "Pet.h"
 #include "Player.h"
+#include "PoolMgr.h"
 #include "Realm.h"
 #include "ScriptMgr.h"
 #include "SpellAuras.h"
@@ -2474,9 +2475,51 @@ public:
     {
         Player* player = handler->GetSession()->GetPlayer();
 
+        // Phase 1: respawn creatures/GOs that still have corpses in the grid
         Acore::RespawnDo u_do;
         Acore::WorldObjectWorker<Acore::RespawnDo> worker(player, u_do);
         Cell::VisitObjects(player, worker, player->GetGridActivationRange());
+
+        // Phase 2: force-respawn creatures/GOs that were fully removed (non-compat mode)
+        // by setting their respawn times to now so ProcessRespawns() picks them up
+        Map* map = player->GetMap();
+        uint32 gridId = Acore::ComputeGridCoord(player->GetPositionX(), player->GetPositionY()).GetId();
+        time_t now = GameTime::GetGameTime().count();
+
+        std::vector<ObjectGuid::LowType> creaturesToRespawn;
+        for (auto const& pair : map->GetCreatureRespawnTimes())
+        {
+            CreatureData const* data = sObjectMgr->GetCreatureData(pair.first);
+            if (!data || Acore::ComputeGridCoord(data->posX, data->posY).GetId() != gridId)
+                continue;
+
+            // Skip pooled spawns — Phase 1 already triggered pool rotation via
+            // Creature::Respawn() -> PoolMgr::UpdatePool(). Forcing a respawn time
+            // here would cause ProcessRespawns() to call UpdatePool() again,
+            // spawning duplicates beyond the pool's max_limit.
+            if (sPoolMgr->IsPartOfAPool<Creature>(pair.first))
+                continue;
+
+            creaturesToRespawn.push_back(pair.first);
+        }
+        for (ObjectGuid::LowType spawnId : creaturesToRespawn)
+            map->SaveCreatureRespawnTime(spawnId, now);
+
+        std::vector<ObjectGuid::LowType> goesToRespawn;
+        for (auto const& pair : map->GetGORespawnTimes())
+        {
+            GameObjectData const* data = sObjectMgr->GetGameObjectData(pair.first);
+            if (!data || Acore::ComputeGridCoord(data->posX, data->posY).GetId() != gridId)
+                continue;
+
+            // Skip pooled spawns — same reason as creatures above.
+            if (sPoolMgr->IsPartOfAPool<GameObject>(pair.first))
+                continue;
+
+            goesToRespawn.push_back(pair.first);
+        }
+        for (ObjectGuid::LowType spawnId : goesToRespawn)
+            map->SaveGORespawnTime(spawnId, now);
 
         return true;
     }
