@@ -166,6 +166,7 @@ public:
                 case DATA_CYANIGOSA:
                     if (state == DONE)
                     {
+                        _events.Reset();
                         _encounterStatus = DONE;
                         HandleGameObject(DATA_MAIN_DOOR, true);
                         DoUpdateWorldState(WORLD_STATE_VIOLET_HOLD_SHOW, 0);
