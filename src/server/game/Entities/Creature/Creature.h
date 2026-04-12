@@ -80,6 +80,7 @@ public:
     [[nodiscard]] bool IsTrigger() const { return HasFlagsExtra(CREATURE_FLAG_EXTRA_TRIGGER); }
     [[nodiscard]] bool IsGuard() const { return HasFlagsExtra(CREATURE_FLAG_EXTRA_GUARD); }
     CreatureMovementData const& GetMovementTemplate() const;
+    void PauseMovementForInteraction();
     [[nodiscard]] bool CanWalk() const { return GetMovementTemplate().IsGroundAllowed(); }
     [[nodiscard]] bool CanSwim() const override;
     [[nodiscard]] bool CanEnterWater() const override;

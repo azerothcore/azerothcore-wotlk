@@ -3035,6 +3035,21 @@ CreatureMovementData const& Creature::GetMovementTemplate() const
     return GetCreatureTemplate()->Movement;
 }
 
+void Creature::PauseMovementForInteraction()
+{
+    if (uint32 pause = GetMovementTemplate().GetInteractionPauseTimer())
+    {
+        uint8 pauseSlot = MOTION_SLOT_IDLE;
+
+        if (GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_ACTIVE) == POINT_MOTION_TYPE)
+            pauseSlot = MOTION_SLOT_ACTIVE;
+        else if (GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) == POINT_MOTION_TYPE)
+            pauseSlot = MOTION_SLOT_CONTROLLED;
+
+        PauseMovement(pause, pauseSlot);
+    }
+}
+
 void Creature::AllLootRemovedFromCorpse()
 {
     if (loot.loot_type != LOOT_SKINNING && !IsPet() && GetCreatureTemplate()->SkinLootId && hasLootRecipient())
