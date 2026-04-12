@@ -303,7 +303,7 @@ void WorldSession::HandleSendMail(WorldPacket& recvData)
             for (uint8 i = 0; i < items_count; ++i)
             {
                 // log item
-                itemLogStr += items[i]->GetTemplate()->Name1 + " (Entry:" + std::to_string(items[i]->GetEntry()) + ") x" + std::to_string(items[i]->GetCount()) + ", ";
+                itemLogStr += Acore::StringFormat("{} (Entry: {}) x{}, ", items[i]->GetTemplate()->Name1, items[i]->GetEntry(), items[i]->GetCount());
 
                 Item* item = items[i];
 

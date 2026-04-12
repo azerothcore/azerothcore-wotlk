@@ -501,9 +501,9 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
             for (uint8 i = 0; i < TRADE_SLOT_TRADED_COUNT; ++i)
             {
                 if (myItems[i])
-                    myItemsStr += myItems[i]->GetTemplate()->Name1 + " (Entry:" + std::to_string(myItems[i]->GetEntry()) + ") x" + std::to_string(myItems[i]->GetCount()) + ", ";
+                    myItemsStr += Acore::StringFormat("{} (Entry:{}) x{}, ", myItems[i]->GetTemplate()->Name1, myItems[i]->GetEntry(), myItems[i]->GetCount());
                 if (hisItems[i])
-                    hisItemsStr += hisItems[i]->GetTemplate()->Name1 + " (Entry:" + std::to_string(hisItems[i]->GetEntry()) + ") x" + std::to_string(hisItems[i]->GetCount()) + ", ";
+                    hisItemsStr += Acore::StringFormat("{} (Entry:{}) x{}, ", hisItems[i]->GetTemplate()->Name1, hisItems[i]->GetEntry(), hisItems[i]->GetCount());
             }
 
             LOG_INFO("entities.player.trade", "Trade: Account: {} (IP: {}), Player [{}] ({}) traded with Player [{}] ({}): gave {} copper, received {} copper, gave item(s) [{}], received item(s) [{}]",
