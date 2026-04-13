@@ -62,11 +62,12 @@ deploy_to_wsl:
     # 2. 同步最新的 .dist 配置模板到 etc 目录
     - rsync -av --include="*/" --include="*.dist" --exclude="*" install/etc/ $SERVER_PATH/etc/
 
-    # 3. 解决 SQL 更新目录依赖问题：将编译源码的 data/sql 软链接到部署目录
+    # 3. 解决 SQL 更新目录依赖问题：将编译源码的 data/sql 同步到部署目录
+    # 这里我们不再使用软链接，而是直接用 rsync 复制一份过去。
+    # 这不仅能让本地 WSL 脱离对源码的依赖，也为未来同样逻辑推送生产服打下基础。
     - echo "Setting up SQL updates directory..."
-    - mkdir -p $SERVER_PATH/data
-    - rm -rf $SERVER_PATH/data/sql
-    - ln -sf $CI_PROJECT_DIR/data/sql $SERVER_PATH/data/sql
+    - mkdir -p $SERVER_PATH/data/sql
+    - rsync -av --delete $CI_PROJECT_DIR/data/sql/ $SERVER_PATH/data/sql/
 
     # 4. 执行官方的 Config Merger 工具
     - echo "Running Config Merger..."
