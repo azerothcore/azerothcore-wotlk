@@ -82,7 +82,8 @@ deploy_to_wsl:
     # 4. 执行官方的 Config Merger 工具
     - echo "Running Config Merger..."
     - cd apps/config-merger/python
-    - python3 config_merger.py --path $SERVER_PATH/etc --all --apply
+    - python3 config_merger.py $SERVER_PATH/etc both -y
+    - python3 config_merger.py $SERVER_PATH/etc modules -y
 
   environment:
     name: wsl-testing
@@ -132,7 +133,8 @@ deploy_to_prod:
     # 4. 合并配置文件
     - echo "Running Config Merger on Production..."
     - cd apps/config-merger/python
-    - python3 config_merger.py --path $SERVER_PATH/etc --all --apply
+    - python3 config_merger.py $SERVER_PATH/etc both -y
+    - python3 config_merger.py $SERVER_PATH/etc modules -y
 
   environment:
     name: production
