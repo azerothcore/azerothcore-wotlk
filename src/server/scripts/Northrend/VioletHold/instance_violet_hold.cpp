@@ -84,7 +84,6 @@ public:
             _cleaned = false;
             _encounterStatus = NOT_STARTED;
             _events.Reset();
-            _events.RescheduleEvent(EVENT_CHECK_PLAYERS, 0ms);
             _gateHealth = 100;
             _waveCount = 0;
             _portalLocation = 0;
@@ -212,6 +211,7 @@ public:
                             sinclari->AI()->Talk(SAY_SINCLARI_LEAVING);
                         }
                         _events.RescheduleEvent(EVENT_GUARDS_FALL_BACK, 4s);
+                        _events.RescheduleEvent(EVENT_CHECK_PLAYERS, 5s);
                     }
                     break;
                 case DATA_PORTAL_DEFEATED:
@@ -376,8 +376,8 @@ public:
                 case EVENT_START_ENCOUNTER:
                     if (Creature* sinclari = GetCreature(DATA_SINCLARI))
                     {
-                        sinclari->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         sinclari->AI()->Talk(SAY_SINCLARI_DOOR_LOCK);
+                        sinclari->DespawnOrUnsummon(5s);
                     }
                     if (Creature* doorSeal = GetCreature(DATA_DOOR_SEAL))
                         doorSeal->RemoveAllAuras();
@@ -448,19 +448,17 @@ public:
 
         void OnPlayerEnter(Player* plr) override
         {
-            if (DoNeedCleanup(plr->IsAlive()))
-                InstanceCleanup();
-
             if (_encounterStatus == IN_PROGRESS)
             {
+                if (DoNeedCleanup(plr->IsAlive()))
+                    InstanceCleanup();
+
                 plr->SendUpdateWorldState(WORLD_STATE_VIOLET_HOLD_SHOW, 1);
                 plr->SendUpdateWorldState(WORLD_STATE_VIOLET_HOLD_PRISON_STATE, (uint32)_gateHealth);
                 plr->SendUpdateWorldState(WORLD_STATE_VIOLET_HOLD_WAVE_COUNT, (uint32)_waveCount);
             }
             else
                 plr->SendUpdateWorldState(WORLD_STATE_VIOLET_HOLD_SHOW, 0);
-
-            _events.RescheduleEvent(EVENT_CHECK_PLAYERS, 5s);
         }
 
         bool DoNeedCleanup(bool enter)
@@ -488,18 +486,19 @@ public:
             if (Creature* sinclari = GetCreature(DATA_SINCLARI))
             {
                 sinclari->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                sinclari->DespawnOrUnsummon();
-                sinclari->SetRespawnTime(3);
+                sinclari->DespawnOrUnsummon(0ms, 3s);
             }
 
-            for (ObjectGuid const& guid : _guardGuid)
+            for (ObjectGuid& guid : _guardGuid)
+            {
                 if (Creature* guard = instance->GetCreature(guid))
                 {
-                    guard->DespawnOrUnsummon();
-                    guard->SetRespawnTime(3);
                     guard->SetVisible(GetBossState(DATA_CYANIGOSA) != DONE);
                     guard->SetReactState(REACT_AGGRESSIVE);
+                    guard->DespawnOrUnsummon(0ms, 3s);
                 }
+                guid.Clear();
+            }
 
             if (Creature* portal = GetCreature(DATA_TELEPORTATION_PORTAL))
                 portal->DespawnOrUnsummon();
@@ -530,26 +529,27 @@ public:
                 {
                     if (Creature* boss = GetCreature(id))
                     {
-                        boss->DespawnOrUnsummon();
-                        boss->SetRespawnTime(3);
                         boss->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                         boss->SetImmuneToNPC(true);
+                        boss->DespawnOrUnsummon(0ms, 3s);
                     }
                 }
+
                 if (Creature* guard1 = instance->GetCreature(_erekemGuardGuid[0]))
                 {
-                    guard1->DespawnOrUnsummon();
-                    guard1->SetRespawnTime(3);
                     guard1->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     guard1->SetImmuneToNPC(true);
+                    guard1->DespawnOrUnsummon(0ms, 3s);
                 }
+                _erekemGuardGuid[0].Clear();
                 if (Creature* guard2 = instance->GetCreature(_erekemGuardGuid[1]))
                 {
-                    guard2->DespawnOrUnsummon();
-                    guard2->SetRespawnTime(3);
                     guard2->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     guard2->SetImmuneToNPC(true);
+                    guard2->DespawnOrUnsummon(0ms, 3s);
                 }
+                _erekemGuardGuid[1].Clear();
+
                 if (Creature* cyanigosa = GetCreature(DATA_CYANIGOSA))
                     cyanigosa->DespawnOrUnsummon();
             }
