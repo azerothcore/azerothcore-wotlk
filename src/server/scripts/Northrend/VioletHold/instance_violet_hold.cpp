@@ -377,7 +377,7 @@ public:
                     if (Creature* sinclari = GetCreature(DATA_SINCLARI))
                     {
                         sinclari->AI()->Talk(SAY_SINCLARI_DOOR_LOCK);
-                        sinclari->DespawnOrUnsummon(5s);
+                        sinclari->SetVisible(false);
                     }
                     if (Creature* doorSeal = GetCreature(DATA_DOOR_SEAL))
                         doorSeal->RemoveAllAuras();
