@@ -56,11 +56,23 @@ deploy_to_wsl:
     - mkdir -p $SERVER_PATH/bin
     - mkdir -p $SERVER_PATH/etc
     
-    # 1. 从 Artifacts (install 目录) 同步二进制文件
-    - rsync -av --delete install/bin/ $SERVER_PATH/bin/
+    # 1. 如果有新的编译产物，就同步二进制文件
+    - |
+      if [ -d "install/bin" ]; then
+        echo "Found new build artifacts, syncing binaries..."
+        rsync -av --delete install/bin/ $SERVER_PATH/bin/
+      else
+        echo "No new build artifacts found. Skipping binary sync."
+      fi
     
-    # 2. 同步最新的 .dist 配置模板到 etc 目录
-    - rsync -av --include="*/" --include="*.dist" --exclude="*" install/etc/ $SERVER_PATH/etc/
+    # 2. 如果有新的编译产物，就同步 .dist 配置模板
+    - |
+      if [ -d "install/etc" ]; then
+        echo "Found new build artifacts, syncing configs..."
+        rsync -av --include="*/" --include="*.dist" --exclude="*" install/etc/ $SERVER_PATH/etc/
+      else
+        echo "No new build artifacts found. Skipping config sync."
+      fi
 
     # 3. 解决 SQL 更新目录依赖问题：将 Artifacts 里的 data/sql 同步到部署目录
     - echo "Setting up SQL updates directory..."
@@ -74,7 +86,10 @@ deploy_to_wsl:
 
   environment:
     name: wsl-testing
-  # 因为启用了 Artifacts，我们需要显式声明依赖 build 阶段，GitLab 就会自动下载产物到当前工作区
+  # 移除强制依赖，允许单独运行
+  # needs:
+  #   - build_wsl
+  # 尝试下载当前流水线的产物（如果有的话）
   dependencies:
     - build_wsl
 
@@ -91,11 +106,23 @@ deploy_to_prod:
     - mkdir -p $SERVER_PATH/bin
     - mkdir -p $SERVER_PATH/etc
     
-    # 1. 从 Artifacts (install 目录) 同步二进制文件
-    - rsync -av --delete install/bin/ $SERVER_PATH/bin/
+    # 1. 如果有新的编译产物，就同步二进制文件
+    - |
+      if [ -d "install/bin" ]; then
+        echo "Found new build artifacts, syncing binaries..."
+        rsync -av --delete install/bin/ $SERVER_PATH/bin/
+      else
+        echo "No new build artifacts found. Skipping binary sync."
+      fi
     
-    # 2. 同步 .dist 模板
-    - rsync -av --include="*/" --include="*.dist" --exclude="*" install/etc/ $SERVER_PATH/etc/
+    # 2. 如果有新的编译产物，就同步 .dist 配置模板
+    - |
+      if [ -d "install/etc" ]; then
+        echo "Found new build artifacts, syncing configs..."
+        rsync -av --include="*/" --include="*.dist" --exclude="*" install/etc/ $SERVER_PATH/etc/
+      else
+        echo "No new build artifacts found. Skipping config sync."
+      fi
 
     # 3. 将 Artifacts 里的 data/sql 同步到部署目录
     - echo "Setting up SQL updates directory..."
@@ -109,6 +136,9 @@ deploy_to_prod:
 
   environment:
     name: production
-  # 同样依赖 Artifacts，GitLab 自动跨机器分发
+  # 移除强制依赖，允许单独运行
+  # needs:
+  #   - build_wsl
+  # 尝试下载当前流水线的产物（如果有的话）
   dependencies:
     - build_wsl
