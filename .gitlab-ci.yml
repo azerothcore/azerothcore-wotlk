@@ -43,7 +43,10 @@ build_wsl:
     - mkdir -p $SERVER_PATH/bin $SERVER_PATH/etc $SERVER_PATH/lib $SERVER_PATH/include
     - cd $CI_PROJECT_DIR  # 返回项目根目录，因为上面我们在 build/ 目录里
     - rsync -av --delete install/bin/ $SERVER_PATH/bin/
-    - rsync -av --include="*/" --include="*.dist" --exclude="*" install/etc/ $SERVER_PATH/etc/
+    
+    # 配置文件现在直接安装到了 SERVER_PATH/etc，所以 install 下可能没有 etc 目录了
+    - if [ -d "install/etc" ]; then rsync -av --include="*/" --include="*.dist" --exclude="*" install/etc/ $SERVER_PATH/etc/; else echo "install/etc not found, skipping config sync as it was installed directly to target."; fi
+    
     - rsync -av --delete install/lib/ $SERVER_PATH/lib/ || true
     - rsync -av --delete install/include/ $SERVER_PATH/include/ || true
     
