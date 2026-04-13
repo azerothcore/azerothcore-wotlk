@@ -28,6 +28,7 @@ build_wsl:
     - >
       cmake ../ 
       -DCMAKE_INSTALL_PREFIX=$CI_PROJECT_DIR/install 
+      -DCONF_DIR=$SERVER_PATH/etc 
       -DCMAKE_C_COMPILER=/usr/bin/clang 
       -DCMAKE_CXX_COMPILER=/usr/bin/clang++ 
       -DWITH_WARNINGS=1 
@@ -36,11 +37,21 @@ build_wsl:
       -DMODULES=static
     - make -j$BUILD_CORES
     - make install
-    # 提取构建产物，GitLab 将会打包并保存这些文件
+    
+    # 编译完成后，直接在本地 WSL 环境中同步到运行目录，省去上传 Artifacts 和 deploy_wsl 的等待
+    - echo "Syncing compiled binaries locally to $SERVER_PATH..."
+    - mkdir -p $SERVER_PATH/bin $SERVER_PATH/etc $SERVER_PATH/lib $SERVER_PATH/include
+    - rsync -av --delete install/bin/ $SERVER_PATH/bin/
+    - rsync -av --include="*/" --include="*.dist" --exclude="*" install/etc/ $SERVER_PATH/etc/
+    - rsync -av --delete install/lib/ $SERVER_PATH/lib/ || true
+    - rsync -av --delete install/include/ $SERVER_PATH/include/ || true
+    
   artifacts:
     paths:
       - install/bin/
       - install/etc/
+      - install/lib/
+      - install/include/
     expire_in: 1 week
 
 # ==========================================
@@ -53,28 +64,13 @@ deploy_to_wsl:
   when: manual # 设为手动触发，不再自动覆盖
   script:
     - echo "Deploying binaries and configs to WSL Server ($SERVER_PATH)..."
-    - mkdir -p $SERVER_PATH/bin
-    - mkdir -p $SERVER_PATH/etc
+    - mkdir -p $SERVER_PATH/bin $SERVER_PATH/etc
     
-    # 1. 如果有新的编译产物，就同步二进制文件
-    - |
-      if [ -d "install/bin" ]; then
-        echo "Found new build artifacts, syncing binaries..."
-        rsync -av --delete install/bin/ $SERVER_PATH/bin/
-      else
-        echo "No new build artifacts found. Skipping binary sync."
-      fi
+    # 因为 build_wsl 阶段已经完成了本地文件的直接拷贝，
+    # 这里我们不再依赖 Artifacts 来同步二进制文件（防止被精简过符号的 strip 文件覆盖本地用于调试的完整文件）
+    - echo "Skipping binary sync in deploy_wsl, as it's handled locally during build_wsl."
     
-    # 2. 如果有新的编译产物，就同步 .dist 配置模板
-    - |
-      if [ -d "install/etc" ]; then
-        echo "Found new build artifacts, syncing configs..."
-        rsync -av --include="*/" --include="*.dist" --exclude="*" install/etc/ $SERVER_PATH/etc/
-      else
-        echo "No new build artifacts found. Skipping config sync."
-      fi
-
-    # 3. 解决 SQL 更新目录依赖问题：将 Artifacts 里的 data/sql 同步到部署目录
+    # 3. 解决 SQL 更新目录依赖问题：将源代码里的 data/sql 同步到部署目录
     - echo "Setting up SQL updates directory..."
     - mkdir -p $SERVER_PATH/data/sql
     - rsync -av --delete data/sql/ $SERVER_PATH/data/sql/
@@ -107,11 +103,19 @@ deploy_to_prod:
     - mkdir -p $SERVER_PATH/bin
     - mkdir -p $SERVER_PATH/etc
     
-    # 1. 如果有新的编译产物，就同步二进制文件
+    # 1. 如果有新的编译产物，就同步二进制文件和库文件
     - |
       if [ -d "install/bin" ]; then
         echo "Found new build artifacts, syncing binaries..."
         rsync -av --delete install/bin/ $SERVER_PATH/bin/
+        if [ -d "install/lib" ]; then
+          mkdir -p $SERVER_PATH/lib
+          rsync -av --delete install/lib/ $SERVER_PATH/lib/
+        fi
+        if [ -d "install/include" ]; then
+          mkdir -p $SERVER_PATH/include
+          rsync -av --delete install/include/ $SERVER_PATH/include/
+        fi
       else
         echo "No new build artifacts found. Skipping binary sync."
       fi
