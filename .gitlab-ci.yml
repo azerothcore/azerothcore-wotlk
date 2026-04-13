@@ -24,10 +24,10 @@ build_wsl:
     - export BUILD_CORES=$(awk 'BEGIN{print '"$(nproc --all)"'-1}')
     - if [ "$BUILD_CORES" -lt "1" ]; then export BUILD_CORES=1; fi
     - echo "Compiling with $BUILD_CORES cores..."
-    # 编译并安装到 WSL 系统的一个公共缓存文件夹，避免被 GitLab Runner 的自动清理给删掉
+    # 编译并安装到 CI 工作目录下的 install 文件夹
     - >
       cmake ../ 
-      -DCMAKE_INSTALL_PREFIX=/tmp/az-install 
+      -DCMAKE_INSTALL_PREFIX=$CI_PROJECT_DIR/install 
       -DCMAKE_C_COMPILER=/usr/bin/clang 
       -DCMAKE_CXX_COMPILER=/usr/bin/clang++ 
       -DWITH_WARNINGS=1 
@@ -36,12 +36,13 @@ build_wsl:
       -DMODULES=static
     - make -j$BUILD_CORES
     - make install
-    # 提取构建产物，由于二进制太大超过 GitLab 默认限制，我们不再走 Artifacts
-    # artifacts:
-    #   paths:
-    #     - /tmp/az-install/bin/
-    #     - /tmp/az-install/etc/
-    #   expire_in: 1 week
+    # 提取构建产物，GitLab 将会打包并保存这些文件
+  artifacts:
+    paths:
+      - install/bin/
+      - install/etc/
+      - data/sql/
+    expire_in: 1 week
 
 # ==========================================
 # 2. 部署到 WSL 测试环境
@@ -56,18 +57,16 @@ deploy_to_wsl:
     - mkdir -p $SERVER_PATH/bin
     - mkdir -p $SERVER_PATH/etc
     
-    # 1. 直接从上一步的公共编译目录同步二进制文件
-    - rsync -av --delete /tmp/az-install/bin/ $SERVER_PATH/bin/
+    # 1. 从 Artifacts (install 目录) 同步二进制文件
+    - rsync -av --delete install/bin/ $SERVER_PATH/bin/
     
     # 2. 同步最新的 .dist 配置模板到 etc 目录
-    - rsync -av --include="*/" --include="*.dist" --exclude="*" /tmp/az-install/etc/ $SERVER_PATH/etc/
+    - rsync -av --include="*/" --include="*.dist" --exclude="*" install/etc/ $SERVER_PATH/etc/
 
-    # 3. 解决 SQL 更新目录依赖问题：将编译源码的 data/sql 同步到部署目录
-    # 这里我们不再使用软链接，而是直接用 rsync 复制一份过去。
-    # 这不仅能让本地 WSL 脱离对源码的依赖，也为未来同样逻辑推送生产服打下基础。
+    # 3. 解决 SQL 更新目录依赖问题：将 Artifacts 里的 data/sql 同步到部署目录
     - echo "Setting up SQL updates directory..."
     - mkdir -p $SERVER_PATH/data/sql
-    - rsync -av --delete $CI_PROJECT_DIR/data/sql/ $SERVER_PATH/data/sql/
+    - rsync -av --delete data/sql/ $SERVER_PATH/data/sql/
 
     # 4. 执行官方的 Config Merger 工具
     - echo "Running Config Merger..."
@@ -76,9 +75,9 @@ deploy_to_wsl:
 
   environment:
     name: wsl-testing
-  # 移除 dependencies，因为我们不再依赖 GitLab artifacts，而是直接在同一机器上通过文件系统读取
-  # dependencies:
-  #   - build_wsl
+  # 因为启用了 Artifacts，我们需要显式声明依赖 build 阶段，GitLab 就会自动下载产物到当前工作区
+  dependencies:
+    - build_wsl
 
 # ==========================================
 # 3. 部署到生产环境
@@ -93,16 +92,24 @@ deploy_to_prod:
     - mkdir -p $SERVER_PATH/bin
     - mkdir -p $SERVER_PATH/etc
     
-    # 注意：因为没有了 Artifacts，要跨机器部署到 prod 服务器，
-    # 必须使用 SSH rsync，或者在 prod 服务器上也跑一遍 build 步骤。
-    # 这里我们演示通过 SCP/RSYNC 从 WSL 传到 Prod (需要配置 SSH 免密)
-    # 如果暂未配置，这一步可能会失败。
-    - echo "Please configure SSH keys if you want to push directly from CI runner to Prod"
-    # - rsync -avze ssh install/bin/ root@prod_ip:$SERVER_PATH/bin/
-    # - rsync -avze ssh --include="*/" --include="*.dist" --exclude="*" install/etc/ root@prod_ip:$SERVER_PATH/etc/
+    # 1. 从 Artifacts (install 目录) 同步二进制文件
+    - rsync -av --delete install/bin/ $SERVER_PATH/bin/
     
-    # 同样需要把 data/sql 拷贝过去
-    # - rsync -avze ssh data/sql/ root@prod_ip:$SERVER_PATH/data/sql/
+    # 2. 同步 .dist 模板
+    - rsync -av --include="*/" --include="*.dist" --exclude="*" install/etc/ $SERVER_PATH/etc/
+
+    # 3. 将 Artifacts 里的 data/sql 同步到部署目录
+    - echo "Setting up SQL updates directory..."
+    - mkdir -p $SERVER_PATH/data/sql
+    - rsync -av --delete data/sql/ $SERVER_PATH/data/sql/
+
+    # 4. 合并配置文件
+    - echo "Running Config Merger on Production..."
+    - cd apps/config-merger
+    - python3 config_merger.py --path $SERVER_PATH/etc --all --apply
 
   environment:
     name: production
+  # 同样依赖 Artifacts，GitLab 自动跨机器分发
+  dependencies:
+    - build_wsl
