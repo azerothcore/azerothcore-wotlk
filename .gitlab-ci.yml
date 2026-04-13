@@ -41,7 +41,6 @@ build_wsl:
     paths:
       - install/bin/
       - install/etc/
-      - data/sql/
     expire_in: 1 week
 
 # ==========================================
