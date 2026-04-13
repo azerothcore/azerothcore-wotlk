@@ -1,0 +1,108 @@
+stages:
+  - build
+  - deploy_wsl
+  - deploy_prod
+
+variables:
+  # 定义服务端实际运行的绝对路径（WSL和生产服保持一致）
+  SERVER_PATH: "/project/azeroth-server"
+  # 拉取代码时顺便拉取 modules 下的子模块
+  GIT_SUBMODULE_STRATEGY: recursive
+
+# ==========================================
+# 1. 编译阶段 (在 WSL 上执行)
+# ==========================================
+build_wsl:
+  stage: build
+  tags:
+    - test # 你的 WSL Runner 标签
+  when: manual # 设为手动触发，防止每次 push 自动跑编译
+  script:
+    - mkdir -p build
+    - cd build
+    # 获取 CPU 核心数减 1 作为编译并发数
+    - export BUILD_CORES=$(awk 'BEGIN{print '"$(nproc --all)"'-1}')
+    - if [ "$BUILD_CORES" -lt "1" ]; then export BUILD_CORES=1; fi
+    - echo "Compiling with $BUILD_CORES cores..."
+    # 编译并安装到 CI 工作目录下的 install 文件夹
+    - >
+      cmake ../ 
+      -DCMAKE_INSTALL_PREFIX=$CI_PROJECT_DIR/install 
+      -DCMAKE_C_COMPILER=/usr/bin/clang 
+      -DCMAKE_CXX_COMPILER=/usr/bin/clang++ 
+      -DWITH_WARNINGS=1 
+      -DTOOLS_BUILD=all 
+      -DSCRIPTS=static 
+      -DMODULES=static
+    - make -j$BUILD_CORES
+    - make install
+  artifacts:
+    # 提取构建产物，主要是二进制程序和最新的配置模板(.dist)
+    paths:
+      - install/bin/
+      - install/etc/
+    expire_in: 1 week
+
+# ==========================================
+# 2. 部署到 WSL 测试环境
+# ==========================================
+deploy_to_wsl:
+  stage: deploy_wsl
+  tags:
+    - test # 在同一个 WSL 机器上部署
+  script:
+    - echo "Deploying binaries and configs to WSL Server ($SERVER_PATH)..."
+    - mkdir -p $SERVER_PATH/bin
+    - mkdir -p $SERVER_PATH/etc
+    
+    # 1. 同步二进制文件（只覆盖 bin，不碰外部的 lua 文件夹）
+    - rsync -av --delete install/bin/ $SERVER_PATH/bin/
+    
+    # 2. 同步最新的 .dist 配置模板到 etc 目录
+    # 注意：这里我们只拷贝 .dist 模板，绝对不会覆盖你自己的 .conf
+    - rsync -av --include="*/" --include="*.dist" --exclude="*" install/etc/ $SERVER_PATH/etc/
+
+    # 3. 执行官方的 Config Merger 工具
+    # 这个工具会自动扫描 $SERVER_PATH/etc 下的 .dist 文件，并与你的 .conf 文件进行对比合并。
+    # 选项说明: --all 处理所有配置(包括模块), --apply 直接应用合并结果并备份旧配置
+    - echo "Running Config Merger..."
+    - cd apps/config-merger
+    - python3 config_merger.py --path $SERVER_PATH/etc --all --apply
+
+    # 4. 重启服务 (假设已配置 systemd，按需取消注释)
+    # - sudo systemctl restart worldserver authserver 
+  environment:
+    name: wsl-testing
+  dependencies:
+    - build_wsl
+
+# ==========================================
+# 3. 部署到生产环境
+# ==========================================
+deploy_to_prod:
+  stage: deploy_prod
+  tags:
+    - prod # 生产服务器的 Runner 标签
+  when: manual # 必须手动点击才能部署到生产环境
+  script:
+    - echo "Deploying binaries and configs to Production Server ($SERVER_PATH)..."
+    - mkdir -p $SERVER_PATH/bin
+    - mkdir -p $SERVER_PATH/etc
+    
+    # 1. 同步二进制
+    - rsync -av --delete install/bin/ $SERVER_PATH/bin/
+    
+    # 2. 同步 .dist 模板
+    - rsync -av --include="*/" --include="*.dist" --exclude="*" install/etc/ $SERVER_PATH/etc/
+
+    # 3. 合并配置文件
+    - echo "Running Config Merger on Production..."
+    - cd apps/config-merger
+    - python3 config_merger.py --path $SERVER_PATH/etc --all --apply
+
+    # 4. 重启服务
+    # - sudo systemctl restart worldserver authserver
+  environment:
+    name: production
+  dependencies:
+    - build_wsl
