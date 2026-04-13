@@ -41,6 +41,7 @@ build_wsl:
     # 编译完成后，直接在本地 WSL 环境中同步到运行目录，省去上传 Artifacts 和 deploy_wsl 的等待
     - echo "Syncing compiled binaries locally to $SERVER_PATH..."
     - mkdir -p $SERVER_PATH/bin $SERVER_PATH/etc $SERVER_PATH/lib $SERVER_PATH/include
+    - cd $CI_PROJECT_DIR  # 返回项目根目录，因为上面我们在 build/ 目录里
     - rsync -av --delete install/bin/ $SERVER_PATH/bin/
     - rsync -av --include="*/" --include="*.dist" --exclude="*" install/etc/ $SERVER_PATH/etc/
     - rsync -av --delete install/lib/ $SERVER_PATH/lib/ || true
