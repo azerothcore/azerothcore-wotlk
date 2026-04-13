@@ -24,10 +24,10 @@ build_wsl:
     - export BUILD_CORES=$(awk 'BEGIN{print '"$(nproc --all)"'-1}')
     - if [ "$BUILD_CORES" -lt "1" ]; then export BUILD_CORES=1; fi
     - echo "Compiling with $BUILD_CORES cores..."
-    # 编译并安装到 CI 工作目录下的 install 文件夹
+    # 编译并安装到 WSL 系统的一个公共缓存文件夹，避免被 GitLab Runner 的自动清理给删掉
     - >
       cmake ../ 
-      -DCMAKE_INSTALL_PREFIX=$CI_PROJECT_DIR/install 
+      -DCMAKE_INSTALL_PREFIX=/tmp/az-install 
       -DCMAKE_C_COMPILER=/usr/bin/clang 
       -DCMAKE_CXX_COMPILER=/usr/bin/clang++ 
       -DWITH_WARNINGS=1 
@@ -39,8 +39,8 @@ build_wsl:
     # 提取构建产物，由于二进制太大超过 GitLab 默认限制，我们不再走 Artifacts
     # artifacts:
     #   paths:
-    #     - install/bin/
-    #     - install/etc/
+    #     - /tmp/az-install/bin/
+    #     - /tmp/az-install/etc/
     #   expire_in: 1 week
 
 # ==========================================
@@ -56,11 +56,11 @@ deploy_to_wsl:
     - mkdir -p $SERVER_PATH/bin
     - mkdir -p $SERVER_PATH/etc
     
-    # 1. 直接从上一步的编译目录同步二进制文件（因为在同一台机器上，可以直接读取）
-    - rsync -av --delete install/bin/ $SERVER_PATH/bin/
+    # 1. 直接从上一步的公共编译目录同步二进制文件
+    - rsync -av --delete /tmp/az-install/bin/ $SERVER_PATH/bin/
     
     # 2. 同步最新的 .dist 配置模板到 etc 目录
-    - rsync -av --include="*/" --include="*.dist" --exclude="*" install/etc/ $SERVER_PATH/etc/
+    - rsync -av --include="*/" --include="*.dist" --exclude="*" /tmp/az-install/etc/ $SERVER_PATH/etc/
 
     # 3. 解决 SQL 更新目录依赖问题：将编译源码的 data/sql 同步到部署目录
     # 这里我们不再使用软链接，而是直接用 rsync 复制一份过去。
