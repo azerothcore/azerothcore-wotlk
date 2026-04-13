@@ -1,6 +1,7 @@
 stages:
   - build
   - deploy_wsl
+  - deploy_test
   - deploy_prod
 
 variables:
@@ -46,6 +47,9 @@ build_wsl:
     
     # 配置文件现在直接安装到了 SERVER_PATH/etc，所以 install 下可能没有 etc 目录了
     - if [ -d "install/etc" ]; then rsync -av --include="*/" --include="*.dist" --exclude="*" install/etc/ $SERVER_PATH/etc/; else echo "install/etc not found, skipping config sync as it was installed directly to target."; fi
+    
+    # 手动创建一个空的 install/etc，防止 GitLab artifacts 收集时报警告
+    - mkdir -p install/etc
     
     - rsync -av --delete install/lib/ $SERVER_PATH/lib/ || true
     - rsync -av --delete install/include/ $SERVER_PATH/include/ || true
@@ -95,7 +99,62 @@ deploy_to_wsl:
     - build_wsl
 
 # ==========================================
-# 3. 部署到生产环境
+# 3. 部署到 Test 测试服务器
+# ==========================================
+deploy_to_test:
+  stage: deploy_test
+  tags:
+    - kuaikuai03 # 测试服务器的 Runner 标签
+  when: manual # 必须手动点击才能部署到测试环境
+  script:
+    - echo "Deploying binaries and configs to Test Server ($SERVER_PATH)..."
+    - mkdir -p $SERVER_PATH/bin $SERVER_PATH/etc
+    
+    # 1. 如果有新的编译产物，就同步二进制文件和库文件
+    - |
+      if [ -d "install/bin" ]; then
+        echo "Found new build artifacts, syncing binaries..."
+        rsync -av --delete install/bin/ $SERVER_PATH/bin/
+        if [ -d "install/lib" ]; then
+          mkdir -p $SERVER_PATH/lib
+          rsync -av --delete install/lib/ $SERVER_PATH/lib/
+        fi
+        if [ -d "install/include" ]; then
+          mkdir -p $SERVER_PATH/include
+          rsync -av --delete install/include/ $SERVER_PATH/include/
+        fi
+      else
+        echo "No new build artifacts found. Skipping binary sync."
+      fi
+    
+    # 2. 如果有新的编译产物，就同步 .dist 配置模板
+    - |
+      if [ -d "install/etc" ]; then
+        echo "Found new build artifacts, syncing configs..."
+        rsync -av --include="*/" --include="*.dist" --exclude="*" install/etc/ $SERVER_PATH/etc/
+      else
+        echo "No new build artifacts found. Skipping config sync."
+      fi
+
+    # 3. 将 Artifacts 里的 data/sql 同步到部署目录
+    - echo "Setting up SQL updates directory..."
+    - mkdir -p $SERVER_PATH/data/sql
+    - rsync -av --delete data/sql/ $SERVER_PATH/data/sql/
+
+    # 4. 合并配置文件
+    - echo "Running Config Merger on Test Server..."
+    - cd apps/config-merger/python
+    - python3 config_merger.py $SERVER_PATH/etc both -y
+    - python3 config_merger.py $SERVER_PATH/etc modules -y
+
+  environment:
+    name: testing
+  # 尝试下载当前流水线的产物（如果有的话）
+  dependencies:
+    - build_wsl
+
+# ==========================================
+# 4. 部署到生产环境
 # ==========================================
 deploy_to_prod:
   stage: deploy_prod
