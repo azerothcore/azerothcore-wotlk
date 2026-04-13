@@ -1,0 +1,24 @@
+[submodule "modules/mod-account-mounts"]
+	path = modules/mod-account-mounts
+	url = https://github.com/azerothcore/mod-account-mounts.git
+[submodule "modules/mod-ale"]
+	path = modules/mod-ale
+	url = https://github.com/azerothcore/mod-ale.git
+[submodule "modules/mod-anticheat"]
+	path = modules/mod-anticheat
+	url = https://github.com/azerothcore/mod-anticheat.git
+[submodule "modules/mod-multi-client-check"]
+	path = modules/mod-multi-client-check
+	url = https://github.com/azerothcore/mod-multi-client-check.git
+[submodule "modules/mod-progression-system"]
+	path = modules/mod-progression-system
+	url = https://github.com/azerothcore/mod-progression-system.git
+[submodule "modules/mod-skip-dk-starting-area"]
+	path = modules/mod-skip-dk-starting-area
+	url = https://github.com/azerothcore/mod-skip-dk-starting-area.git
+[submodule "modules/mod-solocraft"]
+	path = modules/mod-solocraft
+	url = https://github.com/azerothcore/mod-solocraft.git
+[submodule "modules/mod-transmog"]
+	path = modules/mod-transmog
+	url = https://github.com/azerothcore/mod-transmog.git
