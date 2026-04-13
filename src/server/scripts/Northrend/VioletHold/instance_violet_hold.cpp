@@ -172,8 +172,7 @@ public:
                         if (Creature* sinclari = GetCreature(DATA_SINCLARI))
                         {
                             sinclari->AI()->Talk(SAY_SINCLARI_COMPLETE);
-                            sinclari->DespawnOrUnsummon();
-                            sinclari->SetRespawnTime(3);
+                            sinclari->DespawnOrUnsummon(0ms, 3s);
                         }
                     }
                     else if (state == FAIL || state == NOT_STARTED)

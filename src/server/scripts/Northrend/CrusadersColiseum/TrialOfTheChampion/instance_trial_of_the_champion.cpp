@@ -177,8 +177,7 @@ public:
                 case VEHICLE_ARGENT_BATTLEWORG:
                     if (InstanceProgress < INSTANCE_PROGRESS_CHAMPIONS_UNMOUNTED && m_auiEncounter[0] == NOT_STARTED)
                     {
-                        creature->DespawnOrUnsummon();
-                        creature->SetRespawnTime(3);
+                        creature->DespawnOrUnsummon(0ms, 3s);
                         VehicleList.push_back(creature->GetGUID());
                     }
                     else
@@ -310,8 +309,7 @@ public:
                         for (ObjectGuid const& guid : VehicleList)
                             if (Creature* veh = instance->GetCreature(guid))
                             {
-                                veh->DespawnOrUnsummon();
-                                veh->SetRespawnTime(3);
+                                veh->DespawnOrUnsummon(0ms, 3s);
                             }
                         for( uint8 i = 0; i < 3; ++i )
                         {
