@@ -36,12 +36,12 @@ build_wsl:
       -DMODULES=static
     - make -j$BUILD_CORES
     - make install
-  artifacts:
-    # 提取构建产物，主要是二进制程序和最新的配置模板(.dist)
-    paths:
-      - install/bin/
-      - install/etc/
-    expire_in: 1 week
+    # 提取构建产物，由于二进制太大超过 GitLab 默认限制，我们不再走 Artifacts
+    # artifacts:
+    #   paths:
+    #     - install/bin/
+    #     - install/etc/
+    #   expire_in: 1 week
 
 # ==========================================
 # 2. 部署到 WSL 测试环境
@@ -56,26 +56,28 @@ deploy_to_wsl:
     - mkdir -p $SERVER_PATH/bin
     - mkdir -p $SERVER_PATH/etc
     
-    # 1. 同步二进制文件（只覆盖 bin，不碰外部的 lua 文件夹）
+    # 1. 直接从上一步的编译目录同步二进制文件（因为在同一台机器上，可以直接读取）
     - rsync -av --delete install/bin/ $SERVER_PATH/bin/
     
     # 2. 同步最新的 .dist 配置模板到 etc 目录
-    # 注意：这里我们只拷贝 .dist 模板，绝对不会覆盖你自己的 .conf
     - rsync -av --include="*/" --include="*.dist" --exclude="*" install/etc/ $SERVER_PATH/etc/
 
-    # 3. 执行官方的 Config Merger 工具
-    # 这个工具会自动扫描 $SERVER_PATH/etc 下的 .dist 文件，并与你的 .conf 文件进行对比合并。
-    # 选项说明: --all 处理所有配置(包括模块), --apply 直接应用合并结果并备份旧配置
+    # 3. 解决 SQL 更新目录依赖问题：将编译源码的 data/sql 软链接到部署目录
+    - echo "Setting up SQL updates directory..."
+    - mkdir -p $SERVER_PATH/data
+    - rm -rf $SERVER_PATH/data/sql
+    - ln -sf $CI_PROJECT_DIR/data/sql $SERVER_PATH/data/sql
+
+    # 4. 执行官方的 Config Merger 工具
     - echo "Running Config Merger..."
     - cd apps/config-merger
     - python3 config_merger.py --path $SERVER_PATH/etc --all --apply
 
-    # 4. 重启服务 (假设已配置 systemd，按需取消注释)
-    # - sudo systemctl restart worldserver authserver 
   environment:
     name: wsl-testing
-  dependencies:
-    - build_wsl
+  # 移除 dependencies，因为我们不再依赖 GitLab artifacts，而是直接在同一机器上通过文件系统读取
+  # dependencies:
+  #   - build_wsl
 
 # ==========================================
 # 3. 部署到生产环境
@@ -90,20 +92,16 @@ deploy_to_prod:
     - mkdir -p $SERVER_PATH/bin
     - mkdir -p $SERVER_PATH/etc
     
-    # 1. 同步二进制
-    - rsync -av --delete install/bin/ $SERVER_PATH/bin/
+    # 注意：因为没有了 Artifacts，要跨机器部署到 prod 服务器，
+    # 必须使用 SSH rsync，或者在 prod 服务器上也跑一遍 build 步骤。
+    # 这里我们演示通过 SCP/RSYNC 从 WSL 传到 Prod (需要配置 SSH 免密)
+    # 如果暂未配置，这一步可能会失败。
+    - echo "Please configure SSH keys if you want to push directly from CI runner to Prod"
+    # - rsync -avze ssh install/bin/ root@prod_ip:$SERVER_PATH/bin/
+    # - rsync -avze ssh --include="*/" --include="*.dist" --exclude="*" install/etc/ root@prod_ip:$SERVER_PATH/etc/
     
-    # 2. 同步 .dist 模板
-    - rsync -av --include="*/" --include="*.dist" --exclude="*" install/etc/ $SERVER_PATH/etc/
+    # 同样需要把 data/sql 拷贝过去
+    # - rsync -avze ssh data/sql/ root@prod_ip:$SERVER_PATH/data/sql/
 
-    # 3. 合并配置文件
-    - echo "Running Config Merger on Production..."
-    - cd apps/config-merger
-    - python3 config_merger.py --path $SERVER_PATH/etc --all --apply
-
-    # 4. 重启服务
-    # - sudo systemctl restart worldserver authserver
   environment:
     name: production
-  dependencies:
-    - build_wsl
