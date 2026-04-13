@@ -50,6 +50,7 @@ deploy_to_wsl:
   stage: deploy_wsl
   tags:
     - test # 在同一个 WSL 机器上部署
+  when: manual # 设为手动触发，不再自动覆盖
   script:
     - echo "Deploying binaries and configs to WSL Server ($SERVER_PATH)..."
     - mkdir -p $SERVER_PATH/bin
