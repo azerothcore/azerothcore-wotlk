@@ -74,26 +74,28 @@ create_offline_package:
     GIT_STRATEGY: none # 这个阶段不需要再拉代码了，直接用本地的工作区
   script:
     # ------------------------------------------
-    # 从本地工作区收集文件并制作离线部署包
+    # 从本地部署目录收集文件并制作离线部署包
     # ------------------------------------------
-    - echo "Creating offline release package..."
-    - cd $CI_PROJECT_DIR
+    - echo "Creating offline release package from $SERVER_PATH..."
+    - cd /tmp
+    - rm -rf release_package  # 清理可能残留的旧包目录
     - mkdir -p release_package
     
-    # 从本地 CI 缓存的 install 目录中复制编译产物（如果不小心被清了，就从 SERVER_PATH 拿，这里优先从 install 拿最干净的）
-    - cp -r install/bin release_package/
-    - cp -r install/lib release_package/ || true
-    - cp -r install/include release_package/ || true
-    - mkdir -p release_package/etc
+    # 直接从你的 WSL 本地部署目录拷贝程序和库
+    - cp -r $SERVER_PATH/bin release_package/
+    - cp -r $SERVER_PATH/lib release_package/ || true
+    - cp -r $SERVER_PATH/include release_package/ || true
     
-    # 配置文件特殊处理：从源文件目录或本地部署目录中取一份最新的 .dist 模板
-    - cp -r src/server/worldserver/worldserver.conf.dist release_package/etc/ || true
-    - cp -r src/server/authserver/authserver.conf.dist release_package/etc/ || true
+    # 配置文件：从服务器 etc 下只拷贝 .dist 模板，不拷贝你的真实配置文件！
+    - mkdir -p release_package/etc
+    - find $SERVER_PATH/etc/ -name "*.dist" -exec cp {} release_package/etc/ \;
     
     # 复制 SQL 和配置合并脚本
     - mkdir -p release_package/data release_package/apps
-    - cp -r data/sql release_package/data/
-    - cp -r apps/config-merger release_package/apps/
+    - cp -r $SERVER_PATH/data/sql release_package/data/
+    
+    # 由于 config-merger 脚本你可能没有部署到 SERVER_PATH 下，我们从项目代码中拷贝它
+    - cp -r $CI_PROJECT_DIR/apps/config-merger release_package/apps/
     
     # 生成自动化覆盖部署脚本 deploy.sh
     - |
@@ -118,6 +120,7 @@ create_offline_package:
       rsync -av --delete data/sql/ $SERVER_PATH/data/sql/
       
       echo "4. Running Config Merger..."
+      # 这里我们在远程服务器也使用项目自带的 config-merger 脚本
       cd apps/config-merger/python
       python3 config_merger.py $SERVER_PATH/etc both -y
       python3 config_merger.py $SERVER_PATH/etc modules -y
@@ -130,5 +133,5 @@ create_offline_package:
     
     # 打包成压缩文件
     - echo "Compressing release package..."
-    - tar -czvf azerothcore-release.tar.gz -C release_package .
-    - echo "Release package created successfully"
+    - tar -czvf $CI_PROJECT_DIR/azerothcore-release.tar.gz -C /tmp/release_package .
+    - echo "Release package created successfully in your project root: azerothcore-release.tar.gz"
