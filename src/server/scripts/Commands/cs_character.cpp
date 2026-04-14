@@ -638,7 +638,7 @@ public:
 
     static bool HandleRestrictedNameAdd(ChatHandler* handler, RestrictedNameListType listType, std::string const& name, uint8 flags, Optional<int8> scopeArg, Optional<Tail> commentArg)
     {
-        int8 scopeValue = scopeArg.value_or(listType == RestrictedNameListType::Reserved ? SEC_PLAYER : PLAYER_NAME_RESTRICTION_ALL_LOCALES);
+        int8 scopeValue = scopeArg.value_or(listType == RestrictedNameListType::Reserved ? int8(SEC_PLAYER) : PLAYER_NAME_RESTRICTION_ALL_LOCALES);
         std::string comment = commentArg ? std::string(*commentArg) : "";
 
         if (listType == RestrictedNameListType::Reserved)
