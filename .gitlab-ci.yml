@@ -134,4 +134,4 @@ create_offline_package:
     # 打包成压缩文件
     - echo "Compressing release package..."
     - tar -czvf $CI_PROJECT_DIR/azerothcore-release.tar.gz -C /tmp/release_package .
-    - echo "Release package created successfully in your project root: azerothcore-release.tar.gz"
+    - echo "Release package created successfully in your project root"
