@@ -31,6 +31,11 @@ else()
   set(BOOST_REQUIRED_VERSION 1.74)
 endif()
 
+# Suppress deprecation of FindBoost module (CMake >= 3.30 uses Boost's own config).
+if(POLICY CMP0167)
+  cmake_policy(SET CMP0167 NEW)
+endif()
+
 # Boost.System is header-only since 1.69; do not require it explicitly.
 find_package(Boost ${BOOST_REQUIRED_VERSION} REQUIRED COMPONENTS filesystem program_options iostreams regex)
 
@@ -44,11 +49,14 @@ add_library(boost INTERFACE)
 
 target_link_libraries(boost
   INTERFACE
-    ${Boost_LIBRARIES})
+    Boost::filesystem
+    Boost::program_options
+    Boost::iostreams
+    Boost::regex)
 
 target_include_directories(boost
   INTERFACE
-    ${Boost_INCLUDE_DIRS})
+    $<TARGET_PROPERTY:Boost::headers,INTERFACE_INCLUDE_DIRECTORIES>)
 
 target_compile_definitions(boost
   INTERFACE
