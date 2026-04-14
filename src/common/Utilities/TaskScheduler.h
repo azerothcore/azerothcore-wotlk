@@ -21,6 +21,7 @@
 #include "Util.h"
 #include <chrono>
 #include <functional>
+#include <memory>
 #include <optional>
 #include <queue>
 #include <set>
