@@ -96,7 +96,7 @@ create_offline_package:
     # 复制 SQL 和 apps (包含 config-merger 工具)
     - mkdir -p release_package/data release_package/apps
     - rsync -av --delete $SERVER_PATH/data/sql/ release_package/data/sql/
-    - rsync -av --delete $SERVER_PATH/apps/ release_package/apps/
+    - rsync -av --delete $CI_PROJECT_DIR/apps/ release_package/apps/
     
     # 生成自动化覆盖部署脚本 deploy.sh
     - |
