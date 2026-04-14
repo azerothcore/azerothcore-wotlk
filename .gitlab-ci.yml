@@ -131,7 +131,9 @@ create_offline_package:
       EOF
     - chmod +x release_package/deploy.sh
     
-    # 打包成压缩文件
+    # 打包成压缩文件，加入精确到分钟的时间戳，并存放到 /project 目录下供你取用
     - echo "Compressing release package..."
-    - tar -czvf $CI_PROJECT_DIR/azerothcore-release.tar.gz -C /tmp/release_package .
-    - echo "Release package created successfully in your project root"
+    - export TIMESTAMP=$(date +"%Y%m%d_%H%M")
+    - export RELEASE_FILE="/project/azerothcore-release_${TIMESTAMP}.tar.gz"
+    - tar -czvf $RELEASE_FILE -C /tmp/release_package .
+    - echo "Release package created successfully at -> $RELEASE_FILE"
