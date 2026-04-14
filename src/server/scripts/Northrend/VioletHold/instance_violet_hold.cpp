@@ -189,19 +189,20 @@ public:
             return true;
         }
 
-        void SetData(uint32 type, uint32 data) override
+        void ProcessEvent(WorldObject* /*obj*/, uint32 eventId) override
         {
-            switch (type)
+            if (eventId == EVENT_ACTIVATE_CRYSTAL)
             {
-                case DATA_ACTIVATE_DEFENSE_SYSTEM:
-                    {
-                        if (data)
-                            _defensesUsed = true;
-                        Position const pos = {1919.09546f, 812.29724f, 86.2905f, M_PI};
-                        instance->SummonCreature(NPC_DEFENSE_SYSTEM, pos, 0, 6499);
-                    }
-                    break;
-                case DATA_START_INSTANCE:
+                _defensesUsed = true;
+                SummonDefenseSystem();
+            }
+        }
+
+        void DoAction(int32 action) override
+        {
+            switch (action)
+            {
+                case ACTION_START_INSTANCE:
                     if (_encounterStatus == NOT_STARTED)
                     {
                         _encounterStatus = IN_PROGRESS;
@@ -214,13 +215,10 @@ public:
                         _events.RescheduleEvent(EVENT_CHECK_PLAYERS, 5s);
                     }
                     break;
-                case DATA_PORTAL_DEFEATED:
+                case ACTION_PORTAL_DEFEATED:
                     _events.RescheduleEvent(EVENT_SUMMON_PORTAL, 3s);
                     break;
-                case DATA_PORTAL_LOCATION:
-                    _portalLocation = data;
-                    break;
-                case DATA_DECREASE_DOOR_HEALTH:
+                case ACTION_DECREASE_DOOR_HEALTH:
                     if (_gateHealth > 0)
                         --_gateHealth;
                     if (_gateHealth == 0)
@@ -230,11 +228,21 @@ public:
                     }
                     DoUpdateWorldState(WORLD_STATE_VIOLET_HOLD_PRISON_STATE, (uint32)_gateHealth);
                     break;
-                case DATA_RELEASE_BOSS:
+                case ACTION_RELEASE_BOSS:
                     if (_waveCount == 6)
                         StartBossEncounter(GetPersistentData(PERSISTENT_DATA_FIRST_BOSS));
                     else
                         StartBossEncounter(GetPersistentData(PERSISTENT_DATA_SECOND_BOSS));
+                    break;
+            }
+        }
+
+        void SetData(uint32 type, uint32 data) override
+        {
+            switch (type)
+            {
+                case DATA_PORTAL_LOCATION:
+                    _portalLocation = data;
                     break;
                 case DATA_ACHIEV:
                     _achievementCompleted = !!data;
@@ -370,14 +378,14 @@ public:
                         sinclari->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                         sinclari->GetMotionMaster()->MovePoint(0, sinclariOutsidePosition);
                     }
-                    SetData(DATA_ACTIVATE_DEFENSE_SYSTEM, 0);
+                    SummonDefenseSystem();
                     _events.RescheduleEvent(EVENT_START_ENCOUNTER, 4s);
                     break;
                 case EVENT_START_ENCOUNTER:
                     if (Creature* sinclari = GetCreature(DATA_SINCLARI))
                     {
                         sinclari->AI()->Talk(SAY_SINCLARI_DOOR_LOCK);
-                        sinclari->SetVisible(false);
+                        sinclari->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     }
                     if (Creature* doorSeal = GetCreature(DATA_DOOR_SEAL))
                         doorSeal->RemoveAllAuras();
@@ -581,6 +589,12 @@ public:
                     return _achievementCompleted;
             }
             return false;
+        }
+
+        void SummonDefenseSystem()
+        {
+            Position const pos = {1919.09546f, 812.29724f, 86.2905f, M_PI};
+            instance->SummonCreature(NPC_DEFENSE_SYSTEM, pos, 0, 6499);
         }
 
     private:

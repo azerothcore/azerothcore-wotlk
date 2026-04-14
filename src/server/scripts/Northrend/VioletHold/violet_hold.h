@@ -43,22 +43,25 @@ enum VHData
     DATA_XEVOZZ_CELL,
     DATA_ZURAMAT_CELL,
 
-    // Instance action/state IDs (used by SetData/GetData)
+    // Instance state IDs (used by SetData/GetData)
     DATA_ENCOUNTER_STATUS           = 30,
-    DATA_ACTIVATE_DEFENSE_SYSTEM,
-    DATA_START_INSTANCE,
     DATA_ADD_TRASH_MOB,
     DATA_DELETE_TRASH_MOB,
-    DATA_PORTAL_DEFEATED,
     DATA_WAVE_COUNT,
     DATA_PORTAL_LOCATION,
-    DATA_RELEASE_BOSS,
-    DATA_DECREASE_DOOR_HEALTH,
     DATA_ACHIEV,
 
     // Manual GUID tracking (multi-instance entries)
     DATA_EREKEM_GUARD_1_GUID,
     DATA_EREKEM_GUARD_2_GUID,
+};
+
+enum VHActions
+{
+    ACTION_START_INSTANCE = 1,
+    ACTION_PORTAL_DEFEATED,
+    ACTION_RELEASE_BOSS,
+    ACTION_DECREASE_DOOR_HEALTH,
 };
 
 enum VHPersistentData
@@ -165,7 +168,9 @@ enum VHInstanceEvents
 
     // Event defense system
     EVENT_ARCANE_LIGHTNING,
-    EVENT_ARCANE_LIGHTNING_INSTAKILL
+
+    // Spell event (SPELL_EFFECT_SEND_EVENT from spell 57804)
+    EVENT_ACTIVATE_CRYSTAL              = 20001,
 };
 
 enum VHAchievCriteria
