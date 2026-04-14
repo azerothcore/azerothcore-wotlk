@@ -132,8 +132,11 @@ create_offline_package:
     - chmod +x release_package/deploy.sh
     
     # 打包成压缩文件，加入精确到分钟的时间戳，并存放到 /project 目录下供你取用
+    # 注意这里我们不要进入 release_package 里面打包，而是把整个 release_package 文件夹作为顶层目录打进去
     - echo "Compressing release package..."
     - export TIMESTAMP=$(date +"%Y%m%d_%H%M")
     - export RELEASE_FILE="/project/azerothcore-release_${TIMESTAMP}.tar.gz"
-    - tar -czvf $RELEASE_FILE -C /tmp/release_package .
+    # 重命名文件夹，让解压出来的文件夹名字带上时间戳，更加清晰
+    - mv /tmp/release_package /tmp/azerothcore-update_${TIMESTAMP}
+    - tar -czvf $RELEASE_FILE -C /tmp azerothcore-update_${TIMESTAMP}
     - echo "Release package created successfully at -> $RELEASE_FILE"
