@@ -53,12 +53,15 @@ build_and_deploy_wsl:
     
     # 将 WSL 的 data/sql 同步过去
     - echo "Setting up SQL updates directory..."
-    - mkdir -p $SERVER_PATH/data/sql
+    - mkdir -p $SERVER_PATH/data/sql $SERVER_PATH/apps
     - rsync -av --delete data/sql/ $SERVER_PATH/data/sql/
+
+    # 将 config-merger 拷贝到部署目录
+    - rsync -av --delete apps/config-merger/ $SERVER_PATH/apps/config-merger/
 
     # 在 WSL 执行官方的 Config Merger 工具
     - echo "Running Config Merger for WSL..."
-    - cd apps/config-merger/python
+    - cd $SERVER_PATH/apps/config-merger/python
     - python3 config_merger.py $SERVER_PATH/etc both -y
     - python3 config_merger.py $SERVER_PATH/etc modules -y
 
@@ -90,12 +93,10 @@ create_offline_package:
     - mkdir -p release_package/etc
     - find $SERVER_PATH/etc/ -name "*.dist" -exec cp {} release_package/etc/ \;
     
-    # 复制 SQL 和配置合并脚本
+    # 复制 SQL 和 apps (包含 config-merger 工具)
     - mkdir -p release_package/data release_package/apps
-    - cp -r $SERVER_PATH/data/sql release_package/data/
-    
-    # 由于 config-merger 脚本你可能没有部署到 SERVER_PATH 下，我们从项目代码中拷贝它
-    - cp -r $CI_PROJECT_DIR/apps/config-merger release_package/apps/
+    - rsync -av --delete $SERVER_PATH/data/sql/ release_package/data/sql/
+    - rsync -av --delete $SERVER_PATH/apps/ release_package/apps/
     
     # 生成自动化覆盖部署脚本 deploy.sh
     - |
@@ -119,9 +120,13 @@ create_offline_package:
       echo "3. Updating SQL files..."
       rsync -av --delete data/sql/ $SERVER_PATH/data/sql/
       
-      echo "4. Running Config Merger..."
+      echo "4. Installing Config Merger..."
+      mkdir -p $SERVER_PATH/apps
+      rsync -av --delete apps/ $SERVER_PATH/apps/
+      
+      echo "5. Running Config Merger..."
       # 这里我们在远程服务器也使用项目自带的 config-merger 脚本
-      cd apps/config-merger/python
+      cd $SERVER_PATH/apps/config-merger/python
       python3 config_merger.py $SERVER_PATH/etc both -y
       python3 config_merger.py $SERVER_PATH/etc modules -y
       
