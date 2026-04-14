@@ -1,3 +1,4 @@
+-- DB update 2026_04_12_06 -> 2026_04_14_00
 -- Move npc_vh_sinclari (30658) and go_vh_activation_crystal (193611) from C++ to DB
 
 UPDATE `creature_template` SET `gossip_menu_id` = 9997, `AIName` = 'SmartAI', `ScriptName` = '' WHERE `entry` = 30658;
