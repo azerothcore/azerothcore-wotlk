@@ -176,10 +176,7 @@ public:
                 case VEHICLE_ARGENT_WARHORSE:
                 case VEHICLE_ARGENT_BATTLEWORG:
                     if (InstanceProgress < INSTANCE_PROGRESS_CHAMPIONS_UNMOUNTED && m_auiEncounter[0] == NOT_STARTED)
-                    {
-                        creature->DespawnOrUnsummon(0ms, 3s);
                         VehicleList.push_back(creature->GetGUID());
-                    }
                     else
                         creature->DespawnOrUnsummon();
                     break;
@@ -300,6 +297,7 @@ public:
             switch (InstanceProgress)
             {
                 case INSTANCE_PROGRESS_INITIAL:
+                    break;
                 case INSTANCE_PROGRESS_GRAND_CHAMPIONS_REACHED_DEST:
                 case INSTANCE_PROGRESS_CHAMPION_GROUP_DIED_1:
                 case INSTANCE_PROGRESS_CHAMPION_GROUP_DIED_2:
@@ -308,9 +306,8 @@ public:
                     {
                         for (ObjectGuid const& guid : VehicleList)
                             if (Creature* veh = instance->GetCreature(guid))
-                            {
                                 veh->DespawnOrUnsummon(0ms, 3s);
-                            }
+                        VehicleList.clear();
                         for( uint8 i = 0; i < 3; ++i )
                         {
                             for( uint8 j = 0; j < 3; ++j )
