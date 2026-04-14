@@ -1,8 +1,5 @@
 stages:
   - build
-  - deploy_wsl
-  - deploy_test
-  - deploy_prod
 
 variables:
   # 定义服务端实际运行的绝对路径（WSL和生产服保持一致）
@@ -39,181 +36,84 @@ build_wsl:
     - make -j$BUILD_CORES
     - make install
     
-    # 编译完成后，直接在本地 WSL 环境中同步到运行目录，省去上传 Artifacts 和 deploy_wsl 的等待
+    # ------------------------------------------
+    # 第一步：WSL 本地秒级部署
+    # ------------------------------------------
     - echo "Syncing compiled binaries locally to $SERVER_PATH..."
     - mkdir -p $SERVER_PATH/bin $SERVER_PATH/etc $SERVER_PATH/lib $SERVER_PATH/include
-    - cd $CI_PROJECT_DIR  # 返回项目根目录，因为上面我们在 build/ 目录里
+    - cd $CI_PROJECT_DIR  # 返回项目根目录
     - rsync -av --delete install/bin/ $SERVER_PATH/bin/
     
     # 配置文件现在直接安装到了 SERVER_PATH/etc，所以 install 下可能没有 etc 目录了
     - if [ -d "install/etc" ]; then rsync -av --include="*/" --include="*.dist" --exclude="*" install/etc/ $SERVER_PATH/etc/; else echo "install/etc not found, skipping config sync as it was installed directly to target."; fi
     
-    # 手动创建一个空的 install/etc，防止 GitLab artifacts 收集时报警告
-    - mkdir -p install/etc
-    
     - rsync -av --delete install/lib/ $SERVER_PATH/lib/ || true
     - rsync -av --delete install/include/ $SERVER_PATH/include/ || true
     
-  artifacts:
-    paths:
-      - install/bin/
-      - install/etc/
-      - install/lib/
-      - install/include/
-      - data/sql/
-      - apps/config-merger/
-    expire_in: 1 week
-
-# ==========================================
-# 2. 部署到 WSL 测试环境
-# ==========================================
-deploy_to_wsl:
-  stage: deploy_wsl
-  tags:
-    - test # 在同一个 WSL 机器上部署
-  when: manual # 设为手动触发，不再自动覆盖
-  script:
-    - echo "Deploying binaries and configs to WSL Server ($SERVER_PATH)..."
-    - mkdir -p $SERVER_PATH/bin $SERVER_PATH/etc
-    
-    # 因为 build_wsl 阶段已经完成了本地文件的直接拷贝，
-    # 这里我们不再依赖 Artifacts 来同步二进制文件（防止被精简过符号的 strip 文件覆盖本地用于调试的完整文件）
-    - echo "Skipping binary sync in deploy_wsl, as it's handled locally during build_wsl."
-    
-    # 3. 解决 SQL 更新目录依赖问题：将源代码里的 data/sql 同步到部署目录
+    # 将 WSL 的 data/sql 同步过去
     - echo "Setting up SQL updates directory..."
     - mkdir -p $SERVER_PATH/data/sql
     - rsync -av --delete data/sql/ $SERVER_PATH/data/sql/
 
-    # 4. 执行官方的 Config Merger 工具
-    - echo "Running Config Merger..."
+    # 在 WSL 执行官方的 Config Merger 工具
+    - echo "Running Config Merger for WSL..."
     - cd apps/config-merger/python
     - python3 config_merger.py $SERVER_PATH/etc both -y
     - python3 config_merger.py $SERVER_PATH/etc modules -y
-
-  environment:
-    name: wsl-testing
-  # 移除强制依赖，允许单独运行
-  # needs:
-  #   - build_wsl
-  # 尝试下载当前流水线的产物（如果有的话）
-  dependencies:
-    - build_wsl
-
-# ==========================================
-# 3. 部署到 Test 测试服务器
-# ==========================================
-deploy_to_test:
-  stage: deploy_test
-  tags:
-    - kuaikuai03 # 测试服务器的 Runner 标签
-  when: manual # 必须手动点击才能部署到测试环境
-  variables:
-    GIT_STRATEGY: none # 核心魔法：彻底跳过 Git 拉取代码！节省大量时间
-  script:
-    - echo "Deploying binaries and configs to Test Server ($SERVER_PATH)..."
-    - mkdir -p $SERVER_PATH/bin $SERVER_PATH/etc
+    - cd $CI_PROJECT_DIR
     
-    # 1. 如果有新的编译产物，就同步二进制文件和库文件
-    - |
-      if [ -d "install/bin" ]; then
-        echo "Found new build artifacts, syncing binaries..."
-        rsync -av --delete install/bin/ $SERVER_PATH/bin/
-        if [ -d "install/lib" ]; then
-          mkdir -p $SERVER_PATH/lib
-          rsync -av --delete install/lib/ $SERVER_PATH/lib/
-        fi
-        if [ -d "install/include" ]; then
-          mkdir -p $SERVER_PATH/include
-          rsync -av --delete install/include/ $SERVER_PATH/include/
-        fi
-      else
-        echo "No new build artifacts found. Skipping binary sync."
-      fi
+    # ------------------------------------------
+    # 第二步：制作离线部署包 (给测试服和生产服使用)
+    # ------------------------------------------
+    - echo "Creating offline release package..."
+    - mkdir -p release_package
+    - cp -r install/bin release_package/
+    - cp -r install/lib release_package/ || true
+    - cp -r install/include release_package/ || true
+    - mkdir -p release_package/etc
+    - if [ -d "install/etc" ]; then cp -r install/etc/* release_package/etc/; fi
     
-    # 2. 如果有新的编译产物，就同步 .dist 配置模板
-    - |
-      if [ -d "install/etc" ]; then
-        echo "Found new build artifacts, syncing configs..."
-        rsync -av --include="*/" --include="*.dist" --exclude="*" install/etc/ $SERVER_PATH/etc/
-      else
-        echo "No new build artifacts found. Skipping config sync."
-      fi
-
-    # 3. 将 Artifacts 里的 data/sql 同步到部署目录
-    - echo "Setting up SQL updates directory..."
-    - mkdir -p $SERVER_PATH/data/sql
-    - rsync -av --delete data/sql/ $SERVER_PATH/data/sql/
-
-    # 4. 合并配置文件
-    - echo "Running Config Merger on Test Server..."
-    - cd apps/config-merger/python
-    - python3 config_merger.py $SERVER_PATH/etc both -y
-    - python3 config_merger.py $SERVER_PATH/etc modules -y
-
-  environment:
-    name: testing
-  # 尝试下载当前流水线的产物（如果有的话）
-  dependencies:
-    - build_wsl
-
-# ==========================================
-# 4. 部署到生产环境
-# ==========================================
-deploy_to_prod:
-  stage: deploy_prod
-  tags:
-    - prod # 生产服务器的 Runner 标签
-  when: manual # 必须手动点击才能部署到生产环境
-  variables:
-    GIT_STRATEGY: none # 核心魔法：彻底跳过 Git 拉取代码！节省大量时间
-  script:
-    - echo "Deploying binaries and configs to Production Server ($SERVER_PATH)..."
-    - mkdir -p $SERVER_PATH/bin
-    - mkdir -p $SERVER_PATH/etc
+    # 复制 SQL 和配置合并脚本
+    - mkdir -p release_package/data release_package/apps
+    - cp -r data/sql release_package/data/
+    - cp -r apps/config-merger release_package/apps/
     
-    # 1. 如果有新的编译产物，就同步二进制文件和库文件
+    # 生成自动化覆盖部署脚本 deploy.sh
     - |
-      if [ -d "install/bin" ]; then
-        echo "Found new build artifacts, syncing binaries..."
-        rsync -av --delete install/bin/ $SERVER_PATH/bin/
-        if [ -d "install/lib" ]; then
-          mkdir -p $SERVER_PATH/lib
-          rsync -av --delete install/lib/ $SERVER_PATH/lib/
-        fi
-        if [ -d "install/include" ]; then
-          mkdir -p $SERVER_PATH/include
-          rsync -av --delete install/include/ $SERVER_PATH/include/
-        fi
-      else
-        echo "No new build artifacts found. Skipping binary sync."
-      fi
+      cat << 'EOF' > release_package/deploy.sh
+      #!/bin/bash
+      SERVER_PATH="/project/azeroth-server"
+      echo "================================================"
+      echo "  Starting AzerothCore deployment to $SERVER_PATH"
+      echo "================================================"
+      
+      mkdir -p $SERVER_PATH/bin $SERVER_PATH/etc $SERVER_PATH/lib $SERVER_PATH/include $SERVER_PATH/data/sql
+      
+      echo "1. Updating binaries and libraries..."
+      # 使用 cp -r 可以安全覆盖更新，不会像 rsync --delete 那样误删你原有的 lua_scripts 等附加文件
+      cp -r bin/* $SERVER_PATH/bin/
+      [ -d "lib" ] && cp -r lib/* $SERVER_PATH/lib/
+      [ -d "include" ] && cp -r include/* $SERVER_PATH/include/
+      
+      echo "2. Updating config templates..."
+      [ -d "etc" ] && cp -r etc/* $SERVER_PATH/etc/
+      
+      echo "3. Updating SQL files..."
+      rsync -av --delete data/sql/ $SERVER_PATH/data/sql/
+      
+      echo "4. Running Config Merger..."
+      cd apps/config-merger/python
+      python3 config_merger.py $SERVER_PATH/etc both -y
+      python3 config_merger.py $SERVER_PATH/etc modules -y
+      
+      echo "================================================"
+      echo "  Deployment completed successfully!"
+      echo "================================================"
+      EOF
+    - chmod +x release_package/deploy.sh
     
-    # 2. 如果有新的编译产物，就同步 .dist 配置模板
-    - |
-      if [ -d "install/etc" ]; then
-        echo "Found new build artifacts, syncing configs..."
-        rsync -av --include="*/" --include="*.dist" --exclude="*" install/etc/ $SERVER_PATH/etc/
-      else
-        echo "No new build artifacts found. Skipping config sync."
-      fi
-
-    # 3. 将 Artifacts 里的 data/sql 同步到部署目录
-    - echo "Setting up SQL updates directory..."
-    - mkdir -p $SERVER_PATH/data/sql
-    - rsync -av --delete data/sql/ $SERVER_PATH/data/sql/
-
-    # 4. 合并配置文件
-    - echo "Running Config Merger on Production..."
-    - cd apps/config-merger/python
-    - python3 config_merger.py $SERVER_PATH/etc both -y
-    - python3 config_merger.py $SERVER_PATH/etc modules -y
-
-  environment:
-    name: production
-  # 移除强制依赖，允许单独运行
-  # needs:
-  #   - build_wsl
-  # 尝试下载当前流水线的产物（如果有的话）
-  dependencies:
-    - build_wsl
+    # 打包成压缩文件
+    - echo "Compressing release package..."
+    - tar -czvf azerothcore-release.tar.gz -C release_package .
+    - echo "Release package created successfully: $CI_PROJECT_DIR/azerothcore-release.tar.gz"
+    - echo "You can now manually upload this tar.gz to your Test/Prod server and run ./deploy.sh inside it."
