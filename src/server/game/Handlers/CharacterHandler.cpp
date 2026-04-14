@@ -355,7 +355,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
     }
 
     // check name limitations
-    uint8 res = ObjectMgr::CheckPlayerName(createInfo->Name, true);
+    uint8 res = ObjectMgr::CheckPlayerName(createInfo->Name, true, GetSessionDbcLocale(), GetSecurity());
     if (res != CHAR_NAME_SUCCESS)
     {
         SendCharCreate(ResponseCodes(res));
@@ -1362,7 +1362,7 @@ void WorldSession::HandleCharRenameOpcode(WorldPacket& recvData)
         return;
     }
 
-    uint8 res = ObjectMgr::CheckPlayerName(renameInfo->Name, true);
+    uint8 res = ObjectMgr::CheckPlayerName(renameInfo->Name, true, GetSessionDbcLocale(), GetSecurity());
     if (res != CHAR_NAME_SUCCESS)
     {
         SendCharRename(ResponseCodes(res), renameInfo.get());
@@ -1702,7 +1702,7 @@ void WorldSession::HandleCharCustomizeCallback(std::shared_ptr<CharacterCustomiz
         return;
     }
 
-    ResponseCodes res = static_cast<ResponseCodes>(ObjectMgr::CheckPlayerName(customizeInfo->Name, true));
+    ResponseCodes res = static_cast<ResponseCodes>(ObjectMgr::CheckPlayerName(customizeInfo->Name, true, GetSessionDbcLocale(), GetSecurity()));
     if (res != CHAR_NAME_SUCCESS)
     {
         SendCharCustomize(res, customizeInfo.get());
@@ -2101,7 +2101,7 @@ void WorldSession::HandleCharFactionOrRaceChangeCallback(std::shared_ptr<Charact
         return;
     }
 
-    ResponseCodes res = static_cast<ResponseCodes>(ObjectMgr::CheckPlayerName(factionChangeInfo->Name, true));
+    ResponseCodes res = static_cast<ResponseCodes>(ObjectMgr::CheckPlayerName(factionChangeInfo->Name, true, GetSessionDbcLocale(), GetSecurity()));
     if (res != CHAR_NAME_SUCCESS)
     {
         SendCharFactionChange(res, factionChangeInfo.get());

@@ -1398,14 +1398,14 @@ struct NamesReservedEntry
 {
     //uint32         ID;                                    // 0
     char const*      Pattern;                               // 1
-    //uint32         Language;                              // 2
+    uint32           Language;                              // 2
 };
 
 struct NamesProfanityEntry
 {
     //uint32         ID;                                    // 0
     char const*      Pattern;                               // 1
-    //uint32         Language;                              // 2
+    uint32           Language;                              // 2
 };
 
 #define MAX_OVERRIDE_SPELL 10

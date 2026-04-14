@@ -19,6 +19,7 @@
 #define _OBJECTMGR_H
 
 #include "Bag.h"
+#include "Common.h"
 #include "ConditionMgr.h"
 #include "Creature.h"
 #include "DatabaseEnv.h"
@@ -39,6 +40,7 @@
 #include <limits>
 #include <map>
 #include <string>
+#include <vector>
 
 class Item;
 struct DungeonProgressionRequirements;
@@ -46,6 +48,40 @@ struct PlayerClassInfo;
 struct PlayerClassLevelInfo;
 struct PlayerInfo;
 struct PlayerLevelInfo;
+
+static constexpr int8 PLAYER_NAME_RESTRICTION_ALL_LOCALES = -1;
+static constexpr int8 PLAYER_NAME_RESERVED_FOR_ALL_ACCOUNTS = -1;
+
+enum PlayerNameRestrictionFlags
+{
+    PLAYER_NAME_RESTRICTION_FLAG_NONE               = 0x0,
+    PLAYER_NAME_RESTRICTION_FLAG_LEADING_WILDCARD   = 0x1,
+    PLAYER_NAME_RESTRICTION_FLAG_TRAILING_WILDCARD  = 0x2
+};
+
+struct ReservedPlayerName
+{
+    std::wstring Pattern;
+    uint8 Flags = 0;
+    int8 Security = SEC_PLAYER;
+    std::string Comment;
+};
+
+struct ReservedPlayerNameMatch
+{
+    bool Matched = false;
+    int8 RequiredSecurity = SEC_PLAYER;
+    bool IsAllowedForCurrentSecurity = false;
+    uint8 MatchedFlags = PLAYER_NAME_RESTRICTION_FLAG_NONE;
+};
+
+struct ProfanityPlayerName
+{
+    std::wstring Pattern;
+    uint8 Flags = 0;
+    int8 Locale = PLAYER_NAME_RESTRICTION_ALL_LOCALES;
+    std::string Comment;
+};
 
 // GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push, N), also any gcc version not support it at some platform
 #if defined(__GNUC__)
@@ -1399,17 +1435,22 @@ public:
     // reserved names
     void LoadReservedPlayerNamesDB();
     void LoadReservedPlayerNamesDBC();
-    [[nodiscard]] bool IsReservedName(std::string_view name) const;
-    void AddReservedPlayerName(std::string const& name);
+    [[nodiscard]] ReservedPlayerNameMatch GetReservedPlayerNameMatch(std::string_view name, int32 security = SEC_PLAYER) const;
+    void AddReservedPlayerName(std::string const& name, uint8 flags = 0, int8 security = SEC_PLAYER, std::string const& comment = "");
 
     // profanity names
     void LoadProfanityNamesFromDB();
     void LoadProfanityNamesFromDBC();
-    [[nodiscard]] bool IsProfanityName(std::string_view name) const;
-    void AddProfanityPlayerName(std::string const& name);
+    [[nodiscard]] bool IsProfanityName(std::string_view name, int32 locale = -1) const;
+    void AddProfanityPlayerName(std::string const& name, uint8 flags = 0, int8 locale = -1, std::string const& comment = "");
+
+    static bool IsValidPlayerNameRestrictionFlags(uint8 flags) { return flags <= (PLAYER_NAME_RESTRICTION_FLAG_LEADING_WILDCARD | PLAYER_NAME_RESTRICTION_FLAG_TRAILING_WILDCARD); }
+    static bool IsValidPlayerNameRestrictionLocale(int32 locale) { return locale >= PLAYER_NAME_RESTRICTION_ALL_LOCALES && locale < TOTAL_LOCALES; }
+    static bool IsValidReservedPlayerSecurity(int32 security) { return security >= PLAYER_NAME_RESERVED_FOR_ALL_ACCOUNTS && security <= SEC_CONSOLE; }
+    static bool MatchPlayerNameRestriction(std::wstring_view name, std::wstring_view pattern, uint8 flags);
 
     // name with valid structure and symbols
-    static uint8 CheckPlayerName(std::string_view name, bool create = false);
+    static uint8 CheckPlayerName(std::string_view name, bool create = false, int32 locale = -1, int32 security = SEC_PLAYER);
     static PetNameInvalidReason CheckPetName(std::string_view name);
     static bool IsValidCharterName(std::string_view name);
     static bool IsValidChannelName(std::string const& name);
@@ -1570,12 +1611,14 @@ private:
     QuestRelations _creatureQuestInvolvedRelations;
 
     //character reserved names
-    typedef std::set<std::wstring> ReservedNamesContainer;
+    typedef std::vector<ReservedPlayerName> ReservedNamesContainer;
     ReservedNamesContainer _reservedNamesStore;
 
     //character profanity names
-    typedef std::set<std::wstring> ProfanityNamesContainer;
+    typedef std::vector<ProfanityPlayerName> ProfanityNamesContainer;
     ProfanityNamesContainer _profanityNamesStore;
+
+    void FlagCharactersWithRestrictedNames() const;
 
     GameTeleContainer _gameTeleStore;
 

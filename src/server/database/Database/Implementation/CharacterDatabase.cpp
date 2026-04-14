@@ -605,8 +605,8 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_SEL_ARENAPOINTS, "SELECT arenaPoints FROM characters WHERE guid = ?", CONNECTION_SYNCH);
 
     // Character names
-    PrepareStatement(CHAR_INS_RESERVED_PLAYER_NAME, "INSERT IGNORE INTO reserved_name (name) VALUES (?)", CONNECTION_ASYNC);
-    PrepareStatement(CHAR_INS_PROFANITY_PLAYER_NAME, "INSERT IGNORE INTO profanity_name (name) VALUES (?)", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_INS_RESERVED_PLAYER_NAME, "INSERT INTO reserved_name (name, flags, security, comment) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE comment = VALUES(comment)", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_INS_PROFANITY_PLAYER_NAME, "INSERT INTO profanity_name (name, flags, locale, comment) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE comment = VALUES(comment)", CONNECTION_ASYNC);
 
     // Character settings
     PrepareStatement(CHAR_SEL_CHAR_SETTINGS, "SELECT source, data FROM character_settings WHERE guid = ?", CONNECTION_BOTH);

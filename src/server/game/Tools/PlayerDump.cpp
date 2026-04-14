@@ -788,7 +788,7 @@ DumpReturn PlayerDumpReader::LoadDump(std::istream& input, uint32 account, std::
     if (!normalizePlayerName(name))
         name.clear();
 
-    if (ObjectMgr::CheckPlayerName(name, true) == CHAR_NAME_SUCCESS)
+    if (ObjectMgr::CheckPlayerName(name, true, PLAYER_NAME_RESTRICTION_ALL_LOCALES, SEC_PLAYER) == CHAR_NAME_SUCCESS)
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHECK_NAME);
         stmt->SetData(0, name);
