@@ -56,7 +56,7 @@ target_link_libraries(boost
 
 target_include_directories(boost
   INTERFACE
-    $<TARGET_PROPERTY:Boost::boost,INTERFACE_INCLUDE_DIRECTORIES>)
+    ${Boost_INCLUDE_DIRS})
 
 target_compile_definitions(boost
   INTERFACE
