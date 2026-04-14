@@ -1,5 +1,6 @@
 stages:
   - build
+  - package
 
 variables:
   # 定义服务端实际运行的绝对路径（WSL和生产服保持一致）
@@ -8,9 +9,9 @@ variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
 # ==========================================
-# 1. 编译阶段 (在 WSL 上执行)
+# 1. 编译与本地部署阶段 (在 WSL 上执行)
 # ==========================================
-build_wsl:
+build_and_deploy_wsl:
   stage: build
   tags:
     - test # 你的 WSL Runner 标签
@@ -60,18 +61,34 @@ build_wsl:
     - cd apps/config-merger/python
     - python3 config_merger.py $SERVER_PATH/etc both -y
     - python3 config_merger.py $SERVER_PATH/etc modules -y
-    - cd $CI_PROJECT_DIR
-    
+
+# ==========================================
+# 2. 制作离线发布包阶段
+# ==========================================
+create_offline_package:
+  stage: package
+  tags:
+    - test # 依然在 WSL Runner 上执行，因为它拥有完整的源码和编译产物
+  when: manual # 只有在你确认本地 WSL 跑得没问题时，再手动点击打包
+  variables:
+    GIT_STRATEGY: none # 这个阶段不需要再拉代码了，直接用本地的工作区
+  script:
     # ------------------------------------------
-    # 第二步：制作离线部署包 (给测试服和生产服使用)
+    # 从本地工作区收集文件并制作离线部署包
     # ------------------------------------------
     - echo "Creating offline release package..."
+    - cd $CI_PROJECT_DIR
     - mkdir -p release_package
+    
+    # 从本地 CI 缓存的 install 目录中复制编译产物（如果不小心被清了，就从 SERVER_PATH 拿，这里优先从 install 拿最干净的）
     - cp -r install/bin release_package/
     - cp -r install/lib release_package/ || true
     - cp -r install/include release_package/ || true
     - mkdir -p release_package/etc
-    - if [ -d "install/etc" ]; then cp -r install/etc/* release_package/etc/; fi
+    
+    # 配置文件特殊处理：从源文件目录或本地部署目录中取一份最新的 .dist 模板
+    - cp -r src/server/worldserver/worldserver.conf.dist release_package/etc/ || true
+    - cp -r src/server/authserver/authserver.conf.dist release_package/etc/ || true
     
     # 复制 SQL 和配置合并脚本
     - mkdir -p release_package/data release_package/apps
@@ -90,7 +107,6 @@ build_wsl:
       mkdir -p $SERVER_PATH/bin $SERVER_PATH/etc $SERVER_PATH/lib $SERVER_PATH/include $SERVER_PATH/data/sql
       
       echo "1. Updating binaries and libraries..."
-      # 使用 cp -r 可以安全覆盖更新，不会像 rsync --delete 那样误删你原有的 lua_scripts 等附加文件
       cp -r bin/* $SERVER_PATH/bin/
       [ -d "lib" ] && cp -r lib/* $SERVER_PATH/lib/
       [ -d "include" ] && cp -r include/* $SERVER_PATH/include/
@@ -115,5 +131,4 @@ build_wsl:
     # 打包成压缩文件
     - echo "Compressing release package..."
     - tar -czvf azerothcore-release.tar.gz -C release_package .
-    - echo "Release package created successfully: $CI_PROJECT_DIR/azerothcore-release.tar.gz"
-    - echo "You can now manually upload this tar.gz to your Test/Prod server and run ./deploy.sh inside it."
+    - echo "Release package created successfully"
