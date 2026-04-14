@@ -60,6 +60,8 @@ build_wsl:
       - install/etc/
       - install/lib/
       - install/include/
+      - data/sql/
+      - apps/config-merger/
     expire_in: 1 week
 
 # ==========================================
@@ -106,6 +108,8 @@ deploy_to_test:
   tags:
     - kuaikuai03 # 测试服务器的 Runner 标签
   when: manual # 必须手动点击才能部署到测试环境
+  variables:
+    GIT_STRATEGY: none # 核心魔法：彻底跳过 Git 拉取代码！节省大量时间
   script:
     - echo "Deploying binaries and configs to Test Server ($SERVER_PATH)..."
     - mkdir -p $SERVER_PATH/bin $SERVER_PATH/etc
@@ -161,6 +165,8 @@ deploy_to_prod:
   tags:
     - prod # 生产服务器的 Runner 标签
   when: manual # 必须手动点击才能部署到生产环境
+  variables:
+    GIT_STRATEGY: none # 核心魔法：彻底跳过 Git 拉取代码！节省大量时间
   script:
     - echo "Deploying binaries and configs to Production Server ($SERVER_PATH)..."
     - mkdir -p $SERVER_PATH/bin
