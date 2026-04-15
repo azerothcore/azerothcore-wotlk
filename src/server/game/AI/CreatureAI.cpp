@@ -246,8 +246,11 @@ void CreatureAI::EnterEvadeMode(EvadeReason why)
             // Owned creatures (pets/guardians) follow their owner — clear evade state
             // so they can re-enter combat immediately via CanBeginCombat
             me->ClearUnitState(UNIT_STATE_EVADE);
-            me->GetMotionMaster()->Clear(false);
-            me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle(), MOTION_SLOT_ACTIVE);
+            if (!me->IsVehicle()) // vehicles should not follow their owner (passenger)
+            {
+                me->GetMotionMaster()->Clear(false);
+                me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle(), MOTION_SLOT_ACTIVE);
+            }
         }
         else
         {

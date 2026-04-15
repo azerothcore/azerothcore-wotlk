@@ -22,6 +22,7 @@
 
 #include "gtest/gtest.h"
 
+#include <algorithm>
 #include <array>
 #include <cstdint>
 #include "Unit.h"  // needed for SpellSchoolMask and mask helper
@@ -79,30 +80,54 @@ namespace
 
     bool HasOnlyDamageEffects(SpellDesc const& spell)
     {
-        bool hasAny = false;
-
-        for (EffectDesc const& e : spell.effects)
+        bool hasAny = std::ranges::any_of(spell.effects, [](EffectDesc const& effect)
         {
-            if (e.effect == EFFECT_NONE)
-                continue;
+            return effect.effect != EFFECT_NONE;
+        });
 
-            hasAny = true;
-            if (!IsDamageEffect(e.effect))
-                return false;
-        }
-
-        return hasAny;
+        return hasAny && std::ranges::all_of(spell.effects, [](EffectDesc const& effect)
+        {
+            return effect.effect == EFFECT_NONE || IsDamageEffect(effect.effect);
+        });
     }
 
     // Helper to classify spells which apply a stun aura
     bool IsStunSpell(SpellDesc const& spell)
     {
-        for (EffectDesc const& e : spell.effects)
+        return std::ranges::any_of(spell.effects, [](EffectDesc const& effect)
         {
-            if (e.effect == EFFECT_APPLY_AURA && e.aura == AURA_MOD_STUN)
-                return true;
+            return effect.effect == EFFECT_APPLY_AURA && effect.aura == AURA_MOD_STUN;
+        });
+    }
+
+    bool IsEffectBlockedByStunImmunity(EffectDesc const& effect, bool immuneToStun)
+    {
+        if (!immuneToStun)
+            return false;
+
+        return effect.effect == EFFECT_APPLY_AURA && effect.aura == AURA_MOD_STUN;
+    }
+
+    bool IsFullyImmunedByStunImmunity(SpellDesc const& spell, bool immuneToStun)
+    {
+        bool hasAnyEffect = false;
+
+        for (EffectDesc const& effect : spell.effects)
+        {
+            if (effect.effect == EFFECT_NONE)
+                continue;
+
+            hasAnyEffect = true;
+            if (!IsEffectBlockedByStunImmunity(effect, immuneToStun))
+                return false;
         }
-        return false;
+
+        return hasAnyEffect;
+    }
+
+    bool IsBlockedBySchoolImmunity(bool casterFriendly, bool immunityAppliesToFriendly)
+    {
+        return !casterFriendly || immunityAppliesToFriendly;
     }
 
     // The last parameter defaults to false to avoid updating existing tests
@@ -114,12 +139,12 @@ namespace
     {
         // Mirrors current core ordering:
         // 1) full spell immunity check
-        // 2) mechanic immunity check (e.g. bladestorm vs stun)
+        // 2) full immunity from mechanic immunity (all effects blocked)
         // 3) damage immunity only for damage-only spells
         if (isImmunedToSpell)
             return SPELL_MISS_IMMUNE;
 
-        if (immuneToStun && IsStunSpell(spell))
+        if (IsFullyImmunedByStunImmunity(spell, immuneToStun))
             return SPELL_MISS_IMMUNE;
 
         if (HasOnlyDamageEffects(spell) && isImmunedToDamage)
@@ -327,4 +352,30 @@ TEST(SpellImmunityTest, Bladestorm_ImmuneToStun)
 
     // with a bladestorm‑style stun immunity it is blocked
     EXPECT_EQ(ComputeSpellHitResult(false, false, stunSpell, true), SPELL_MISS_IMMUNE);
+}
+
+TEST(SpellImmunityTest, StunImmunity_DoesNotFullyBlockMixedSpell)
+{
+    SpellDesc mixedSpell;
+    mixedSpell.effects[0] = { EFFECT_SCHOOL_DAMAGE, AURA_NONE };
+    mixedSpell.effects[1] = { EFFECT_APPLY_AURA, AURA_MOD_STUN };
+
+    // This models partial immunity: stun effect is blocked, damage still hits.
+    EXPECT_TRUE(IsStunSpell(mixedSpell));
+    EXPECT_EQ(ComputeSpellHitResult(false, false, mixedSpell, true), SPELL_MISS_NONE);
+}
+
+TEST(SpellImmunityTest, SchoolImmunity_TemplateStyle_AllowsFriendlySpell)
+{
+    EXPECT_FALSE(IsBlockedBySchoolImmunity(true, false));
+}
+
+TEST(SpellImmunityTest, SchoolImmunity_ExplicitFriendlyBlockStillApplies)
+{
+    EXPECT_TRUE(IsBlockedBySchoolImmunity(true, true));
+}
+
+TEST(SpellImmunityTest, SchoolImmunity_BlocksHostileSpell)
+{
+    EXPECT_TRUE(IsBlockedBySchoolImmunity(false, false));
 }

@@ -22,6 +22,7 @@
 #include "DynamicObject.h"
 #include "GameObject.h"
 #include "GridNotifiers.h"
+#include "ObjectMgr.h"
 #include "Transport.h"
 
 template <class T>
@@ -38,6 +39,11 @@ void GridObjectLoader::LoadCreatures(CellGuidSet const& guid_set, Map* map)
 {
     for (ObjectGuid::LowType const& guid : guid_set)
     {
+        // Skip spawns whose spawn group is not active on this map
+        CreatureData const* cData = sObjectMgr->GetCreatureData(guid);
+        if (cData && !map->IsSpawnGroupActive(cData->spawnGroupId))
+            continue;
+
         Creature* obj = new Creature();
         if (!obj->LoadFromDB(guid, map))
         {
@@ -64,6 +70,10 @@ void GridObjectLoader::LoadGameObjects(CellGuidSet const& guid_set, Map* map)
     for (ObjectGuid::LowType const& guid : guid_set)
     {
         GameObjectData const* data = sObjectMgr->GetGameObjectData(guid);
+
+        // Skip spawns whose spawn group is not active on this map
+        if (data && !map->IsSpawnGroupActive(data->spawnGroupId))
+            continue;
 
         if (data && sObjectMgr->IsGameObjectStaticTransport(data->id))
         {

@@ -46,19 +46,21 @@ public:
     {
         static ChatCommandTable gobjectCommandTable =
         {
-            { "activate",  HandleGameObjectActivateCommand, rbac::RBAC_PERM_COMMAND_GOBJECT_ACTIVATE,  Console::No },
-            { "delete",    HandleGameObjectDeleteCommand,   rbac::RBAC_PERM_COMMAND_GOBJECT_DELETE,    Console::No },
-            { "info",      HandleGameObjectInfoCommand,     rbac::RBAC_PERM_COMMAND_GOBJECT_INFO,      Console::No },
-            { "move",      HandleGameObjectMoveCommand,     rbac::RBAC_PERM_COMMAND_GOBJECT_MOVE,      Console::No },
-            { "near",      HandleGameObjectNearCommand,     rbac::RBAC_PERM_COMMAND_GOBJECT_NEAR,      Console::No },
-            { "target",    HandleGameObjectTargetCommand,   rbac::RBAC_PERM_COMMAND_GOBJECT_TARGET,    Console::No },
-            { "turn",      HandleGameObjectTurnCommand,     rbac::RBAC_PERM_COMMAND_GOBJECT_TURN,      Console::No },
-            { "add temp",  HandleGameObjectAddTempCommand,  rbac::RBAC_PERM_COMMAND_GOBJECT_ADD_TEMP,  Console::No },
-            { "add",       HandleGameObjectAddCommand,      rbac::RBAC_PERM_COMMAND_GOBJECT_ADD,       Console::No },
-            { "load",      HandleGameObjectLoadCommand,     rbac::RBAC_PERM_COMMAND_GOBJECT_LOAD,      Console::Yes },
-            { "set phase", HandleGameObjectSetPhaseCommand, rbac::RBAC_PERM_COMMAND_GOBJECT_SET_PHASE, Console::No },
-            { "set state", HandleGameObjectSetStateCommand, rbac::RBAC_PERM_COMMAND_GOBJECT_SET_STATE, Console::No },
-            { "respawn",   HandleGameObjectRespawn,         rbac::RBAC_PERM_COMMAND_GOBJECT_ACTIVATE,  Console::No }
+            { "activate",     HandleGameObjectActivateCommand,     rbac::RBAC_PERM_COMMAND_GOBJECT_ACTIVATE,  Console::No },
+            { "delete",       HandleGameObjectDeleteCommand,       rbac::RBAC_PERM_COMMAND_GOBJECT_DELETE,    Console::No },
+            { "info",         HandleGameObjectInfoCommand,         rbac::RBAC_PERM_COMMAND_GOBJECT_INFO,      Console::No },
+            { "move",         HandleGameObjectMoveCommand,         rbac::RBAC_PERM_COMMAND_GOBJECT_MOVE,      Console::No },
+            { "near",         HandleGameObjectNearCommand,         rbac::RBAC_PERM_COMMAND_GOBJECT_NEAR,      Console::No },
+            { "target",       HandleGameObjectTargetCommand,       rbac::RBAC_PERM_COMMAND_GOBJECT_TARGET,    Console::No },
+            { "turn",         HandleGameObjectTurnCommand,         rbac::RBAC_PERM_COMMAND_GOBJECT_TURN,      Console::No },
+            { "add temp",     HandleGameObjectAddTempCommand,      rbac::RBAC_PERM_COMMAND_GOBJECT_ADD_TEMP,  Console::No },
+            { "add",          HandleGameObjectAddCommand,          rbac::RBAC_PERM_COMMAND_GOBJECT_ADD,       Console::No },
+            { "load",         HandleGameObjectLoadCommand,         rbac::RBAC_PERM_COMMAND_GOBJECT_LOAD,      Console::Yes },
+            { "set phase",    HandleGameObjectSetPhaseCommand,     rbac::RBAC_PERM_COMMAND_GOBJECT_SET_PHASE, Console::No },
+            { "set state",    HandleGameObjectSetStateCommand,     rbac::RBAC_PERM_COMMAND_GOBJECT_SET_STATE, Console::No },
+            { "respawn",      HandleGameObjectRespawn,             rbac::RBAC_PERM_COMMAND_GOBJECT_ACTIVATE,  Console::No },
+            { "spawngroup",   HandleGameObjectSpawnGroupCommand,   rbac::RBAC_PERM_COMMAND_GOBJECT_ADD,       Console::No },
+            { "despawngroup", HandleGameObjectDespawnGroupCommand, rbac::RBAC_PERM_COMMAND_GOBJECT_DELETE,    Console::No }
         };
         static ChatCommandTable commandTable =
         {
@@ -687,6 +689,60 @@ public:
 
         object->Respawn();
         handler->PSendSysMessage(LANG_CMD_GO_RESPAWN, object->GetNameForLocaleIdx(handler->GetSessionDbcLocale()), object->GetEntry(), object->GetSpawnId());
+        return true;
+    }
+
+    static bool HandleGameObjectSpawnGroupCommand(ChatHandler* handler, uint32 groupId)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+        if (!player)
+            return false;
+
+        SpawnGroupTemplateData const* groupData = sObjectMgr->GetSpawnGroupData(groupId);
+        if (!groupData)
+        {
+            handler->SendErrorMessage(LANG_SPAWNGROUP_NOT_FOUND, groupId);
+            return false;
+        }
+
+        if (groupData->flags & SPAWNGROUP_FLAG_SYSTEM)
+        {
+            handler->SendErrorMessage(LANG_SPAWNGROUP_SPAWN_SYSTEM_ERROR, groupId, groupData->name);
+            return false;
+        }
+
+        if (player->GetMap()->SpawnGroupSpawn(groupId, true, true))
+            handler->PSendSysMessage(LANG_SPAWNGROUP_SPAWN_SUCCESS, groupId, groupData->name);
+        else
+            handler->SendErrorMessage(LANG_SPAWNGROUP_SPAWN_FAILED, groupId, groupData->name);
+
+        return true;
+    }
+
+    static bool HandleGameObjectDespawnGroupCommand(ChatHandler* handler, uint32 groupId)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+        if (!player)
+            return false;
+
+        SpawnGroupTemplateData const* groupData = sObjectMgr->GetSpawnGroupData(groupId);
+        if (!groupData)
+        {
+            handler->SendErrorMessage(LANG_SPAWNGROUP_NOT_FOUND, groupId);
+            return false;
+        }
+
+        if (groupData->flags & SPAWNGROUP_FLAG_SYSTEM)
+        {
+            handler->SendErrorMessage(LANG_SPAWNGROUP_DESPAWN_SYSTEM_ERROR, groupId, groupData->name);
+            return false;
+        }
+
+        if (player->GetMap()->SpawnGroupDespawn(groupId, true))
+            handler->PSendSysMessage(LANG_SPAWNGROUP_DESPAWN_SUCCESS, groupId, groupData->name);
+        else
+            handler->SendErrorMessage(LANG_SPAWNGROUP_DESPAWN_FAILED, groupId, groupData->name);
+
         return true;
     }
 };

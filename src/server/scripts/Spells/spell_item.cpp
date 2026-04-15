@@ -3564,7 +3564,7 @@ class spell_item_rocket_boots : public SpellScript
     }
 };
 
-// 55002 - Flexweave Underlay
+// 55001 - Flexweave Underlay (Parachute)
 class spell_item_flexweave_underlay : public SpellScript
 {
     PrepareSpellScript(spell_item_flexweave_underlay);
@@ -3573,7 +3573,7 @@ class spell_item_flexweave_underlay : public SpellScript
     {
         if (GetCaster()->IsFlying() || GetCaster()->IsFalling())
             return SPELL_CAST_OK;
-        return SPELL_FAILED_NOT_FLYING;
+        return SPELL_FAILED_CANT_DO_THAT_RIGHT_NOW;
     }
 
     void Register() override
@@ -4372,7 +4372,7 @@ class spell_item_luffa : public SpellScript
             for (Unit::AuraApplicationMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
             {
                 Aura const* aura = itr->second->GetBase();
-                if (!(aura->GetSpellInfo()->GetAllEffectsMechanicMask() & (1 << MECHANIC_BLEED)) || aura->GetCasterLevel() > 60 || aura->GetSpellInfo()->IsPositive())
+                if (!(aura->GetSpellInfo()->GetAllEffectsMechanicMask() & (1ULL << MECHANIC_BLEED)) || aura->GetCasterLevel() > 60 || aura->GetSpellInfo()->IsPositive())
                     continue;
 
                 return SPELL_CAST_OK;
@@ -4392,7 +4392,7 @@ class spell_item_luffa : public SpellScript
             for (Unit::AuraApplicationMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
             {
                 Aura const* aura = itr->second->GetBase();
-                if (!(aura->GetSpellInfo()->GetAllEffectsMechanicMask() & (1 << MECHANIC_BLEED)) || aura->GetCasterLevel() > 60 || aura->GetSpellInfo()->IsPositive())
+                if (!(aura->GetSpellInfo()->GetAllEffectsMechanicMask() & (1ULL << MECHANIC_BLEED)) || aura->GetCasterLevel() > 60 || aura->GetSpellInfo()->IsPositive())
                     continue;
 
                 player->RemoveAurasDueToSpell(aura->GetId(), aura->GetCasterGUID());

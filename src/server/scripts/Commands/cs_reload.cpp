@@ -153,6 +153,7 @@ public:
             { "skill_fishing_base_level",      HandleReloadSkillFishingBaseLevelCommand,      rbac::RBAC_PERM_COMMAND_RELOAD_SKILL_FISHING_BASE_LEVEL, Console::Yes },
             { "skinning_loot_template",        HandleReloadLootTemplatesSkinningCommand,      rbac::RBAC_PERM_COMMAND_RELOAD_SKINNING_LOOT_TEMPLATE, Console::Yes },
             { "smart_scripts",                 HandleReloadSmartScripts,                      rbac::RBAC_PERM_COMMAND_RELOAD_SMART_SCRIPTS, Console::Yes },
+            { "spawn_group",                   HandleReloadSpawnGroupCommand,                 rbac::RBAC_PERM_COMMAND_RELOAD, Console::Yes },
             { "spell_required",                HandleReloadSpellRequiredCommand,              rbac::RBAC_PERM_COMMAND_RELOAD_SPELL_REQUIRED, Console::Yes },
             { "spell_area",                    HandleReloadSpellAreaCommand,                  rbac::RBAC_PERM_COMMAND_RELOAD_SPELL_AREA, Console::Yes },
             { "spell_bonus_data",              HandleReloadSpellBonusesCommand,               rbac::RBAC_PERM_COMMAND_RELOAD_SPELL_BONUS_DATA, Console::Yes },
@@ -1268,6 +1269,15 @@ public:
         LOG_INFO("server.loading", "Reloading game_graveyard table...");
         sGraveyard->LoadGraveyardFromDB();
         handler->SendGlobalGMSysMessage("DB table `game_graveyard` reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadSpawnGroupCommand(ChatHandler* handler)
+    {
+        LOG_INFO("server.loading", "Reloading spawn_group_template and spawn_group tables...");
+        sObjectMgr->LoadSpawnGroupTemplates();
+        sObjectMgr->LoadSpawnGroups();
+        handler->SendGlobalGMSysMessage("DB tables `spawn_group_template` and `spawn_group` reloaded.");
         return true;
     }
 };

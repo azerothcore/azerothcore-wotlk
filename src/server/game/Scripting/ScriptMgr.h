@@ -443,7 +443,7 @@ public: /* PlayerScript */
     bool OnPlayerCanSetTradeItem(Player* player, Item* tradedItem, uint8 tradeSlot);
     void OnPlayerSetServerSideVisibility(Player* player, ServerSideVisibilityType& type, AccountTypes& sec);
     void OnPlayerSetServerSideVisibilityDetect(Player* player, ServerSideVisibilityType& type, AccountTypes& sec);
-    void OnPlayerResurrect(Player* player, float restore_percent, bool applySickness);
+    void OnPlayerResurrect(Player* player, float restore_percent, bool& applySickness);
     void OnPlayerBeforeChooseGraveyard(Player* player, TeamId teamId, bool nearCorpse, uint32& graveyardOverride);
     bool OnPlayerCanUseChat(Player* player, uint32 type, uint32 language, std::string& msg);
     bool OnPlayerCanUseChat(Player* player, uint32 type, uint32 language, std::string& msg, Player* receiver);
@@ -466,6 +466,7 @@ public: /* PlayerScript */
     void OnPlayerSendListInventory(Player* player, ObjectGuid vendorGuid, uint32& vendorEntry);
     void OnPlayerGetReputationPriceDiscount(Player const* player, Creature const* creature, float& discount);
     void OnPlayerGetReputationPriceDiscount(Player const* player, FactionTemplateEntry const* factionTemplate, float& discount);
+    void OnPlayerLearnTaxiNode(Player const* player, uint32 nodeId);
 
     // Anti cheat
     void AnticheatSetCanFlybyServer(Player* player, bool apply);

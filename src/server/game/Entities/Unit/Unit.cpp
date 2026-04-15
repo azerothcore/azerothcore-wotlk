@@ -74,6 +74,7 @@
 #include "WorldPacket.h"
 #include <algorithm>
 #include <cmath>
+#include <limits>
 
 float baseMoveSpeed[MAX_MOVE_TYPE] =
 {
@@ -910,19 +911,61 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, uint32 effectMask, Unit 
     if (!spellInfo)
         return false;
 
+    if (spellInfo->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES) && !HasSpiritOfRedemptionAura())
+        return false;
+
+    bool immuneToAllEffects = true;
+    bool hasCheckedEffect = false;
+
     for (uint8 i = EFFECT_0; i < MAX_SPELL_EFFECTS; ++i)
     {
         if (!(effectMask & (1u << i)))
             continue;
 
+        if (!spellInfo->Effects[i].IsEffect())
+            continue;
+
+        hasCheckedEffect = true;
+
         if (IsImmunedToSpellEffect(spellInfo, i, caster))
-            return true;
+        {
+            if (spellInfo->HasAttribute(SPELL_ATTR4_NO_PARTIAL_IMMUNITY))
+                return true;
+
+            continue;
+        }
+
+        immuneToAllEffects = false;
+        break;
     }
+
+    if (hasCheckedEffect && immuneToAllEffects)
+        return true;
 
     if (!spellInfo->HasAttribute(SPELL_ATTR2_NO_SCHOOL_IMMUNITIES))
     {
-        if (IsImmunedToSchool(spellInfo))
-            return true;
+        if (spellInfo->Id == 42292 || spellInfo->Id == 59752 || spellInfo->Id == 19574 || spellInfo->Id == 34471)
+            return false;
+
+        SpellSchoolMask schoolMask = spellInfo->GetSchoolMask();
+        if (schoolMask != SPELL_SCHOOL_MASK_NONE)
+        {
+            SpellImmuneContainer const& schoolList = m_spellImmune[IMMUNITY_SCHOOL];
+            for (auto const& [immunitySchoolMask, immunityAuraId] : schoolList)
+            {
+                SpellInfo const* immuneSpellInfo = sSpellMgr->GetSpellInfo(immunityAuraId);
+                if ((immunitySchoolMask & schoolMask) != schoolMask)
+                    continue;
+
+                if (IgnoresSchoolImmunityFromFriendlyCaster(caster, immunityAuraId, immuneSpellInfo))
+                    continue;
+
+                if (spellInfo->CanPierceImmuneAura(immuneSpellInfo))
+                    continue;
+
+                return true;
+            }
+        }
     }
 
     return false;
@@ -1185,7 +1228,8 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
         if (!attacker || attacker->IsControlledByPlayer() || attacker->IsCreatedByPlayer())
         {
             uint32 unDamage = health < damage ? health : damage;
-            bool damagedByPlayer = unDamage && attacker && (attacker->IsPlayer() || attacker->m_movedByPlayer != nullptr);
+            bool damagedByPlayer = unDamage && attacker && (attacker->IsPlayer() || attacker->m_movedByPlayer != nullptr
+                || attacker->GetCharmerOrOwnerGUID().IsPlayer());
             victim->ToCreature()->LowerPlayerDamageReq(unDamage, damagedByPlayer);
         }
     }
@@ -2174,7 +2218,7 @@ bool Unit::IsDamageReducedByArmor(SpellSchoolMask schoolMask, SpellInfo const* s
         {
             if (spellInfo->Effects[effIndex].ApplyAuraName == SPELL_AURA_PERIODIC_DAMAGE ||
                     spellInfo->Effects[effIndex].Effect == SPELL_EFFECT_SCHOOL_DAMAGE)
-                if (spellInfo->GetEffectMechanicMask(effIndex) & (1 << MECHANIC_BLEED))
+                if (spellInfo->GetEffectMechanicMask(effIndex) & (1ULL << MECHANIC_BLEED))
                     return false;
         }
     }
@@ -2194,20 +2238,11 @@ uint32 Unit::CalcArmorReducedDamage(Unit const* attacker, Unit const* victim, co
             if (Player* modOwner = attacker->GetSpellModOwner())
                 modOwner->ApplySpellMod(spellInfo->Id, SPELLMOD_IGNORE_ARMOR, armor);
 
-        AuraEffectList const& ResIgnoreAurasAb = attacker->GetAuraEffectsByType(SPELL_AURA_MOD_ABILITY_IGNORE_TARGET_RESIST);
-        for (AuraEffectList::const_iterator j = ResIgnoreAurasAb.begin(); j != ResIgnoreAurasAb.end(); ++j)
-        {
-            if ((*j)->GetMiscValue() & SPELL_SCHOOL_MASK_NORMAL
-                    && (*j)->IsAffectedOnSpell(spellInfo))
-                armor = std::floor(AddPct(armor, -(*j)->GetAmount()));
-        }
-
-        AuraEffectList const& ResIgnoreAuras = attacker->GetAuraEffectsByType(SPELL_AURA_MOD_IGNORE_TARGET_RESIST);
-        for (AuraEffectList::const_iterator j = ResIgnoreAuras.begin(); j != ResIgnoreAuras.end(); ++j)
-        {
-            if ((*j)->GetMiscValue() & SPELL_SCHOOL_MASK_NORMAL)
-                armor = std::floor(AddPct(armor, -(*j)->GetAmount()));
-        }
+        // Apply ability-specific ignore target resist effects for physical damage (armor)
+        AuraEffectList const& targetIgnoreRes = attacker->GetAuraEffectsByType(SPELL_AURA_MOD_ABILITY_IGNORE_TARGET_RESIST);
+        for (AuraEffect const* aurEff : targetIgnoreRes)
+            if (aurEff->GetMiscValue() & SPELL_SCHOOL_MASK_NORMAL && aurEff->IsAffectedOnSpell(spellInfo))
+                armor = std::floor(AddPct(armor, -aurEff->GetAmount()));
 
         // Apply Player CR_ARMOR_PENETRATION rating and buffs from stances\specializations etc.
         if (attacker->IsPlayer())
@@ -2354,8 +2389,6 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
 
                     return true;
                 });
-                damageResisted -= damageResisted * (mult - 1.0f);
-                mult = attacker->GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_IGNORE_TARGET_RESIST, schoolMask);
                 damageResisted -= damageResisted * (mult - 1.0f);
             }
 
@@ -5470,7 +5503,7 @@ void Unit::RemoveAurasWithFamily(SpellFamilyNames family, uint32 familyFlag1, ui
 void Unit::RemoveMovementImpairingAuras(bool withRoot)
 {
     if (withRoot)
-        RemoveAurasWithMechanic(1 << MECHANIC_ROOT);
+        RemoveAurasWithMechanic(1ULL << MECHANIC_ROOT);
 
     // Snares
     for (AuraApplicationMap::iterator iter = m_appliedAuras.begin(); iter != m_appliedAuras.end();)
@@ -5505,7 +5538,7 @@ void Unit::RemoveAurasWithMechanic(uint64 mechanic_mask, AuraRemoveMode removemo
 
 void Unit::RemoveAurasByShapeShift()
 {
-    uint64 mechanic_mask = (UI64LIT(1) << MECHANIC_SNARE) | (UI64LIT(1) << MECHANIC_ROOT);
+    uint64 mechanic_mask = (1ULL << MECHANIC_SNARE) | (1ULL << MECHANIC_ROOT);
     for (AuraApplicationMap::iterator iter = m_appliedAuras.begin(); iter != m_appliedAuras.end();)
     {
         Aura const* aura = iter->second->GetBase();
@@ -5678,6 +5711,9 @@ void Unit::RemoveAllAurasExceptType(AuraType type)
 // Xinef: We should not remove passive auras on evade, if npc has player owner (scripted one cast auras)
 void Unit::RemoveEvadeAuras()
 {
+    if (IsCharmedOwnedByPlayerOrPlayer())
+        return;
+
     for (AuraApplicationMap::iterator iter = m_appliedAuras.begin(); iter != m_appliedAuras.end();)
     {
         Aura const* aura = iter->second->GetBase();
@@ -6059,12 +6095,12 @@ bool Unit::HasAuraWithMechanic(uint64 mechanicMask) const
     for (AuraApplicationMap::const_iterator iter = m_appliedAuras.begin(); iter != m_appliedAuras.end(); ++iter)
     {
         SpellInfo const* spellInfo  = iter->second->GetBase()->GetSpellInfo();
-        if (spellInfo->Mechanic && (mechanicMask & (UI64LIT(1) << spellInfo->Mechanic)))
+        if (spellInfo->Mechanic && (mechanicMask & (1ULL << spellInfo->Mechanic)))
             return true;
 
         for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
             if (iter->second->HasEffect(i) && spellInfo->Effects[i].Effect && spellInfo->Effects[i].Mechanic)
-                if (mechanicMask & (UI64LIT(1) << spellInfo->Effects[i].Mechanic))
+                if (mechanicMask & (1ULL << spellInfo->Effects[i].Mechanic))
                     return true;
     }
 
@@ -6749,7 +6785,7 @@ void Unit::ProcSkillsAndAuras(Unit* actor, Unit* victim, uint32 procAttacker, ui
         }
         else if (healInfo && healInfo->GetHeal())
             spellTypeMask = PROC_SPELL_TYPE_HEAL;
-        else if (damageInfo && damageInfo->GetDamage())
+        else if (damageInfo && (damageInfo->GetDamage() || damageInfo->GetAbsorb()))
             spellTypeMask = PROC_SPELL_TYPE_DAMAGE;
         else if (procSpellInfo)
             spellTypeMask = PROC_SPELL_TYPE_NO_DMG_HEAL;
@@ -8568,7 +8604,7 @@ float Unit::SpellPctDamageModsDone(Unit* victim, SpellInfo const* spellProto, Da
 
             // Torment the weak
             if (spellProto->SpellFamilyFlags[0] & 0x20600021 || spellProto->SpellFamilyFlags[1] & 0x9000)
-                if (victim->HasAuraWithMechanic((1 << MECHANIC_SNARE) | (1 << MECHANIC_SLOW_ATTACK)))
+                if (victim->HasAuraWithMechanic((1ULL << MECHANIC_SNARE) | (1ULL << MECHANIC_SLOW_ATTACK)))
                     if (AuraEffect* aurEff = GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_GENERIC, 3263, EFFECT_0))
                         AddPct(DoneTotalMod, aurEff->GetAmount());
             break;
@@ -8823,6 +8859,12 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
             }
         }
     }
+    else
+    {
+        // No bonus damage for SPELL_DAMAGE_CLASS_NONE class spells by default
+        if (spellProto->DmgClass == SPELL_DAMAGE_CLASS_NONE)
+            return uint32(std::max((float(pdamage) + DoneTotal) * DoneTotalMod, 0.0f));
+    }
 
     // Default calculation
     if (coeff && DoneAdvertisedBenefit)
@@ -8887,7 +8929,7 @@ uint32 Unit::SpellDamageBonusTaken(Unit* caster, SpellInfo const* spellProto, ui
                 if (!caster || caster->GetGUID() != (*i)->GetCasterGUID())
                     continue;
 
-            if (mechanicMask & uint64(UI64LIT(1) << (*i)->GetMiscValue()))
+            if (mechanicMask & (1ULL << (*i)->GetMiscValue()))
             {
                 if ((*i)->GetAmount() > 0)
                 {
@@ -8933,21 +8975,15 @@ uint32 Unit::SpellDamageBonusTaken(Unit* caster, SpellInfo const* spellProto, ui
         TakenTotalMod = 1.0f;
     }
 
-    // xinef: sanctified wrath talent
-    if (caster && TakenTotalMod < 1.0f && caster->HasIgnoreTargetResistAura())
+    // Sanctified Wrath (bypass damage reduction)
+    if (caster && TakenTotalMod < 1.0f && caster->HasIgnoreTargetResistModifiersAura())
     {
-        float ignoreModifier = 1.0f - TakenTotalMod;
-        bool addModifier = false;
-        AuraEffectList const& ResIgnoreAuras = caster->GetAuraEffectsByType(SPELL_AURA_MOD_IGNORE_TARGET_RESIST);
-        for (AuraEffectList::const_iterator j = ResIgnoreAuras.begin(); j != ResIgnoreAuras.end(); ++j)
-            if ((*j)->GetMiscValue() & spellProto->SchoolMask)
-            {
-                ApplyPct(ignoreModifier, (*j)->GetAmount());
-                addModifier = true;
-            }
+        float damageModifier = 1.0f - TakenTotalMod;
+        for (AuraEffect const* aurEff : caster->GetAuraEffectsByType(SPELL_AURA_MOD_IGNORE_TARGET_RESIST_MODIFIERS))
+            if (aurEff->GetMiscValue() & spellProto->SchoolMask)
+                AddPct(damageModifier, -aurEff->GetAmount());
 
-        if (addModifier)
-            TakenTotalMod += ignoreModifier;
+        TakenTotalMod = 1.0f - damageModifier;
     }
 
     float tmpDamage = (float(pdamage) + TakenTotal) * TakenTotalMod;
@@ -9195,7 +9231,7 @@ float Unit::SpellTakenCritChance(Unit const* caster, SpellInfo const* spellProto
                         case SPELLFAMILY_MAGE:
                             // Glyph of Fire Blast
                             if (spellProto->SpellFamilyFlags[0] == 0x2 && spellProto->SpellIconID == 12)
-                                if (HasAuraWithMechanic((1 << MECHANIC_STUN) | (1 << MECHANIC_KNOCKOUT)))
+                                if (HasAuraWithMechanic((1ULL << MECHANIC_STUN) | (1ULL << MECHANIC_KNOCKOUT)))
                                     if (AuraEffect const* aurEff = caster->GetAuraEffect(56369, EFFECT_0))
                                         crit_chance += aurEff->GetAmount();
                             break;
@@ -9412,12 +9448,12 @@ uint32 Unit::SpellCriticalHealingBonus(Unit const* caster, SpellInfo const* spel
     return damage;
 }
 
-float Unit::SpellPctHealingModsDone(Unit* victim, SpellInfo const* spellProto, DamageEffectType damagetype)
+float Unit::SpellPctHealingModsDone(Unit* victim, SpellInfo const* spellProto, DamageEffectType damagetype, bool includeHealingDonePct)
 {
     // For totems get healing bonus from owner (statue isn't totem in fact)
     if (IsCreature() && IsTotem())
         if (Unit* owner = GetOwner())
-            return owner->SpellPctHealingModsDone(victim, spellProto, damagetype);
+            return owner->SpellPctHealingModsDone(victim, spellProto, damagetype, includeHealingDonePct);
 
     // Some spells don't benefit from done mods
     if (spellProto->HasAttribute(SPELL_ATTR3_IGNORE_CASTER_MODIFIERS))
@@ -9434,7 +9470,8 @@ float Unit::SpellPctHealingModsDone(Unit* victim, SpellInfo const* spellProto, D
     float DoneTotalMod = 1.0f;
 
     // Healing done percent
-    DoneTotalMod *= GetTotalAuraMultiplier(SPELL_AURA_MOD_HEALING_DONE_PERCENT);
+    if (includeHealingDonePct)
+        DoneTotalMod *= GetTotalAuraMultiplier(SPELL_AURA_MOD_HEALING_DONE_PERCENT);
 
     // done scripted mod (take it from owner)
     Unit* owner = GetOwner() ? GetOwner() : this;
@@ -9787,6 +9824,18 @@ uint32 Unit::GetDamageImmunityMask() const
     return mask;
 }
 
+bool Unit::IgnoresSchoolImmunityFromFriendlyCaster(Unit const* caster, uint32 immunityAuraId, SpellInfo const* immunitySpellInfo) const
+{
+    if (!caster || !caster->IsFriendlyTo(this))
+        return false;
+
+    if (immunitySpellInfo)
+        return !immunitySpellInfo->HasAttribute(SPELL_ATTR1_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS);
+
+    // Creature template immunities are loaded with a placeholder spell id.
+    return immunityAuraId == std::numeric_limits<uint32>::max();
+}
+
 bool Unit::IsImmunedToDamage(SpellSchoolMask schoolMask) const
 {
     if (schoolMask == SPELL_SCHOOL_MASK_NONE)
@@ -9824,7 +9873,7 @@ bool Unit::IsImmunedToDamage(Unit const* caster, SpellInfo const* spellInfo) con
         for (auto const& [immunitySchoolMask, immunityAuraId] : container)
         {
             SpellInfo const* immuneAuraInfo = sSpellMgr->GetSpellInfo(immunityAuraId);
-            if (immuneAuraInfo && !immuneAuraInfo->HasAttribute(SPELL_ATTR1_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS) && caster && caster->IsFriendlyTo(this))
+            if (IgnoresSchoolImmunityFromFriendlyCaster(caster, immunityAuraId, immuneAuraInfo))
                 continue;
 
             if (immuneAuraInfo && spellInfo->CanPierceImmuneAura(immuneAuraInfo))
@@ -9905,7 +9954,10 @@ bool Unit::IsImmunedToSchool(Spell const* spell) const
         SpellImmuneContainer const& schoolList = m_spellImmune[IMMUNITY_SCHOOL];
         for (auto itr = schoolList.begin(); itr != schoolList.end(); ++itr)
         {
-            if ((itr->first & schoolMask) == schoolMask && !spellInfo->CanPierceImmuneAura(sSpellMgr->GetSpellInfo(itr->second)))
+            SpellInfo const* immuneSpellInfo = sSpellMgr->GetSpellInfo(itr->second);
+            if ((itr->first & schoolMask) == schoolMask
+                && !IgnoresSchoolImmunityFromFriendlyCaster(spell->GetCaster(), itr->second, immuneSpellInfo)
+                && !spellInfo->CanPierceImmuneAura(immuneSpellInfo))
             {
                 return true;
             }
@@ -9943,7 +9995,7 @@ bool Unit::IsImmunedToAuraPeriodicTick(Unit const* caster, SpellInfo const* spel
         for (auto const& [immunitySchoolMask, immunityAuraId] : container)
         {
             SpellInfo const* immuneAuraInfo = sSpellMgr->GetSpellInfo(immunityAuraId);
-            if (immuneAuraInfo && !immuneAuraInfo->HasAttribute(SPELL_ATTR1_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS) && caster && caster->IsFriendlyTo(this))
+            if (IgnoresSchoolImmunityFromFriendlyCaster(caster, immunityAuraId, immuneAuraInfo))
                 continue;
 
             schoolImmunityMask |= immunitySchoolMask;
@@ -10022,6 +10074,7 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, Spell const* spell)
     if (!spellInfo->HasAttribute(SPELL_ATTR2_NO_SCHOOL_IMMUNITIES))
     {
         SpellSchoolMask spellSchoolMask = spellInfo->GetSchoolMask();
+        Unit const* spellCaster = spell ? spell->GetCaster() : nullptr;
         if (spell)
         {
             spellSchoolMask = spell->GetSpellSchoolMask();
@@ -10036,12 +10089,8 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, Spell const* spell)
                 if (!(itr->first & spellSchoolMask))
                     continue;
 
-                if (immuneSpellInfo && !immuneSpellInfo->HasAttribute(SPELL_ATTR1_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS))
-                {
-                    Unit const* spellCaster = spell ? spell->GetCaster() : nullptr;
-                    if (spellCaster && spellCaster->IsFriendlyTo(this))
-                        continue;
-                }
+                if (IgnoresSchoolImmunityFromFriendlyCaster(spellCaster, itr->second, immuneSpellInfo))
+                    continue;
 
                 if (spellInfo->CanPierceImmuneAura(immuneSpellInfo))
                     continue;
@@ -10341,13 +10390,13 @@ uint32 Unit::MeleeDamageBonusTaken(Unit* attacker, uint32 pdamage, WeaponAttackT
 
         // Shred, Maul - "Effects which increase Bleed damage also increase Shred damage"
         if (spellProto->SpellFamilyName == SPELLFAMILY_DRUID && spellProto->SpellFamilyFlags[0] & 0x00008800)
-            mechanicMask |= (UI64LIT(1) << MECHANIC_BLEED);
+            mechanicMask |= (1ULL << MECHANIC_BLEED);
 
         if (mechanicMask)
         {
             TakenTotalMod *= GetTotalAuraMultiplier(SPELL_AURA_MOD_MECHANIC_DAMAGE_TAKEN_PERCENT, [mechanicMask](AuraEffect const* aurEff) -> bool
             {
-                if (mechanicMask & uint64(UI64LIT(1) << (aurEff->GetMiscValue())))
+                if (mechanicMask & (1ULL << (aurEff->GetMiscValue())))
                     return true;
                 return false;
             });
@@ -10382,21 +10431,15 @@ uint32 Unit::MeleeDamageBonusTaken(Unit* attacker, uint32 pdamage, WeaponAttackT
             TakenTotalMod = 1.0f;
         }
 
-    // xinef: sanctified wrath talent
-    if (TakenTotalMod < 1.0f && attacker->HasIgnoreTargetResistAura())
+    // Sanctified Wrath (bypass damage reduction)
+    if (TakenTotalMod < 1.0f && attacker->HasIgnoreTargetResistModifiersAura())
     {
-        float ignoreModifier = 1.0f - TakenTotalMod;
-        bool addModifier = false;
-        AuraEffectList const& ResIgnoreAuras = attacker->GetAuraEffectsByType(SPELL_AURA_MOD_IGNORE_TARGET_RESIST);
-        for (AuraEffectList::const_iterator j = ResIgnoreAuras.begin(); j != ResIgnoreAuras.end(); ++j)
-            if ((*j)->GetMiscValue() & damageSchoolMask)
-            {
-                ApplyPct(ignoreModifier, (*j)->GetAmount());
-                addModifier = true;
-            }
+        float damageModifier = 1.0f - TakenTotalMod;
+        for (AuraEffect const* aurEff : attacker->GetAuraEffectsByType(SPELL_AURA_MOD_IGNORE_TARGET_RESIST_MODIFIERS))
+            if (aurEff->GetMiscValue() & damageSchoolMask)
+                AddPct(damageModifier, -aurEff->GetAmount());
 
-        if (addModifier)
-            TakenTotalMod += ignoreModifier;
+        TakenTotalMod = 1.0f - damageModifier;
     }
 
     float tmpDamage = (float(pdamage) + TakenFlatBenefit) * TakenTotalMod;
@@ -11192,8 +11235,8 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
                 if (Creature* creature = ToCreature())
                 {
                     // use creature helper which now consults creature_immunities table
-                    if (creature->HasMechanicTemplateImmunity(UI64LIT(1) << MECHANIC_SNARE) ||
-                        creature->HasMechanicTemplateImmunity(UI64LIT(1) << MECHANIC_DAZE))
+                    if (creature->HasMechanicTemplateImmunity(1ULL << MECHANIC_SNARE) ||
+                        creature->HasMechanicTemplateImmunity(1ULL << MECHANIC_DAZE))
                         break;
                 }
 
@@ -11214,7 +11257,7 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced)
     if (creature
         && !IsPet()
         && !(IsControlledByPlayer() && IsVehicle())
-        && !(creature->HasMechanicTemplateImmunity(UI64LIT(1) << MECHANIC_SNARE))
+        && !(creature->HasMechanicTemplateImmunity(1ULL << MECHANIC_SNARE))
         && !(creature->IsDungeonBoss()))
     {
         // 1.6% for each % under 30.
@@ -11470,12 +11513,12 @@ Unit* Creature::SelectVictim()
         return target;
     }
 
-    // last case when creature must not go to evade mode:
-    // it in combat but attacker not make any damage and not enter to aggro radius to have record in threat list
-    // Note: creature does not have targeted movement generator but has attacker in this case
-    for (AttackerSet::const_iterator itr = m_attackers.begin(); itr != m_attackers.end(); ++itr)
-        if ((*itr) && CanCreatureAttack(*itr) && !(*itr)->IsPlayer() && !(*itr)->ToCreature()->HasUnitTypeMask(UNIT_MASK_CONTROLLABLE_GUARDIAN))
-            return nullptr;
+    // Don't evade if another unit has us on their threat list — evading would
+    // end the bidirectional combat reference and remove us from their threat list,
+    // causing them to lose their target (e.g. an NPC fighting a guardian whose
+    // CanAIAttack rejects the NPC).
+    if (!m_threatManager.GetThreatenedByMeList().empty())
+        return nullptr;
 
     if (GetVehicle())
         return nullptr;
@@ -11572,7 +11615,7 @@ int32 Unit::ModSpellDuration(SpellInfo const* spellProto, Unit const* target, in
     // xinef: also calculate self casts, spell can be reflected for example
     if (!positive)
     {
-        int32 mechanic = spellProto->GetSpellMechanicMaskByEffectMask(effectMask);
+        uint64 mechanic = spellProto->GetSpellMechanicMaskByEffectMask(effectMask);
 
         int32 durationMod;
         int32 durationMod_always = 0;
@@ -11580,11 +11623,11 @@ int32 Unit::ModSpellDuration(SpellInfo const* spellProto, Unit const* target, in
 
         for (uint8 i = 1; i <= MECHANIC_ENRAGED; ++i)
         {
-            if (!(mechanic & 1 << i))
+            if (!(mechanic & (1ULL << i)))
                 continue;
 
             // Xinef: spells affecting movement imparing effects should not reduce duration if disoriented mechanic is present
-            if (i == MECHANIC_SNARE && (mechanic & (1 << MECHANIC_DISORIENTED)))
+            if (i == MECHANIC_SNARE && (mechanic & (1ULL << MECHANIC_DISORIENTED)))
                 continue;
 
             // Find total mod value (negative bonus)
@@ -14819,6 +14862,9 @@ void Unit::RemoveCharmedBy(Unit* charmer)
 
     StopAttackingInvalidTarget();
 
+    // End stale combat refs between now-friendly units after faction restore
+    GetCombatManager().RevalidateCombat();
+
     Player* playerCharmer = charmer->ToPlayer();
     if (playerCharmer)
     {
@@ -15086,7 +15132,7 @@ Aura* Unit::AddAura(SpellInfo const* spellInfo, uint8 effMask, Unit* target)
     if (!spellInfo)
         return nullptr;
 
-    if (target->IsImmunedToSpell(spellInfo))
+    if (target->IsImmunedToSpell(spellInfo, effMask, this))
         return nullptr;
 
     for (uint32 i = 0; i < MAX_SPELL_EFFECTS; ++i)
