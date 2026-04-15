@@ -443,7 +443,7 @@ public: /* PlayerScript */
     bool OnPlayerCanSetTradeItem(Player* player, Item* tradedItem, uint8 tradeSlot);
     void OnPlayerSetServerSideVisibility(Player* player, ServerSideVisibilityType& type, AccountTypes& sec);
     void OnPlayerSetServerSideVisibilityDetect(Player* player, ServerSideVisibilityType& type, AccountTypes& sec);
-    void OnPlayerResurrect(Player* player, float restore_percent, bool applySickness);
+    void OnPlayerResurrect(Player* player, float restore_percent, bool& applySickness);
     void OnPlayerBeforeChooseGraveyard(Player* player, TeamId teamId, bool nearCorpse, uint32& graveyardOverride);
     bool OnPlayerCanUseChat(Player* player, uint32 type, uint32 language, std::string& msg);
     bool OnPlayerCanUseChat(Player* player, uint32 type, uint32 language, std::string& msg, Player* receiver);

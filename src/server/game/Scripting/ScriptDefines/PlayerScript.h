@@ -627,7 +627,7 @@ public:
 
     virtual void OnPlayerSetServerSideVisibilityDetect(Player* /*player*/, ServerSideVisibilityType& /*type*/, AccountTypes& /*sec*/) { }
 
-    virtual void OnPlayerResurrect(Player* /*player*/, float /*restore_percent*/, bool /*applySickness*/) { }
+    virtual void OnPlayerResurrect(Player* /*player*/, float /*restore_percent*/, bool& /*applySickness*/) { }
 
     // Called before selecting the graveyard when releasing spirit
     virtual void OnPlayerBeforeChooseGraveyard(Player* /*player*/, TeamId /*teamId*/, bool /*nearCorpse*/, uint32& /*graveyardOverride*/) { }
