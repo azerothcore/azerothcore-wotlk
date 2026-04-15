@@ -221,8 +221,10 @@ enum CommendationOfKaelthas
 
 enum CorpseTongueCoin
 {
-    SPELL_CORPSE_TONGUE_COIN        = 71633,
-    SPELL_CORPSE_TONGUE_COIN_HERO   = 71634
+    SPELL_CORPSE_TONGUE_COIN_PROC       = 71634,
+    SPELL_CORPSE_TONGUE_COIN_PROC_HERO  = 71640,
+    SPELL_THICK_SKIN                    = 71633,
+    SPELL_THICK_SKIN_HERO               = 71639
 };
 
 enum CrystalSpireOfKarabor
@@ -5726,46 +5728,58 @@ class spell_item_commendation_of_kaelthas : public AuraScript
     }
 };
 
-// 71632 - Corpse Tongue Coin
+// 71634 - Corpse Tongue Coin
 class spell_item_corpse_tongue_coin : public AuraScript
 {
     PrepareAuraScript(spell_item_corpse_tongue_coin);
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_CORPSE_TONGUE_COIN });
+        return ValidateSpellInfo({ SPELL_THICK_SKIN });
     }
 
-    void HandleProc(ProcEventInfo& eventInfo)
+    bool CheckProc(ProcEventInfo& /*eventInfo*/)
+    {
+        return GetTarget()->HealthBelowPct(35);
+    }
+
+    void HandleProc(ProcEventInfo& /*eventInfo*/)
     {
         PreventDefaultAction();
-        eventInfo.GetActor()->CastSpell((Unit*)nullptr, SPELL_CORPSE_TONGUE_COIN, true, nullptr, GetEffect(EFFECT_0));
+        GetTarget()->CastSpell(GetTarget(), SPELL_THICK_SKIN, true, nullptr, GetEffect(EFFECT_0));
     }
 
     void Register() override
     {
+        DoCheckProc += AuraCheckProcFn(spell_item_corpse_tongue_coin::CheckProc);
         OnProc += AuraProcFn(spell_item_corpse_tongue_coin::HandleProc);
     }
 };
 
-// 71639 - Corpse Tongue Coin (Heroic)
+// 71640 - Corpse Tongue Coin (Heroic)
 class spell_item_corpse_tongue_coin_heroic : public AuraScript
 {
     PrepareAuraScript(spell_item_corpse_tongue_coin_heroic);
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_CORPSE_TONGUE_COIN_HERO });
+        return ValidateSpellInfo({ SPELL_THICK_SKIN_HERO });
     }
 
-    void HandleProc(ProcEventInfo& eventInfo)
+    bool CheckProc(ProcEventInfo& /*eventInfo*/)
+    {
+        return GetTarget()->HealthBelowPct(35);
+    }
+
+    void HandleProc(ProcEventInfo& /*eventInfo*/)
     {
         PreventDefaultAction();
-        eventInfo.GetActor()->CastSpell((Unit*)nullptr, SPELL_CORPSE_TONGUE_COIN_HERO, true, nullptr, GetEffect(EFFECT_0));
+        GetTarget()->CastSpell(GetTarget(), SPELL_THICK_SKIN_HERO, true, nullptr, GetEffect(EFFECT_0));
     }
 
     void Register() override
     {
+        DoCheckProc += AuraCheckProcFn(spell_item_corpse_tongue_coin_heroic::CheckProc);
         OnProc += AuraProcFn(spell_item_corpse_tongue_coin_heroic::HandleProc);
     }
 };
