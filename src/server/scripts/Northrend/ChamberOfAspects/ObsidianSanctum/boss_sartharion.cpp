@@ -16,6 +16,7 @@
  */
 
 #include "CreatureScript.h"
+#include "GridNotifiers.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
 #include "SpellScript.h"
@@ -338,6 +339,8 @@ struct boss_sartharion : public BossAI
             if (Creature* boss = instance->GetCreature(i) )
                 boss->DespawnOnEvade();
         }
+
+        me->DespawnOnEvade(30s);
     }
 
     void DoAction(int32 param) override
@@ -405,7 +408,31 @@ struct boss_sartharion : public BossAI
             instance->DoAction(ACTION_START_PATROL);
         }
 
-        me->CallForHelp(500.0f);
+        // Pull arena trash into combat with the raid. SetInCombatWithZone
+        // bypasses CanAssistTo, so Feign Death / untargetable pulls can't skip trash.
+        std::list<Creature*> arenaTrash;
+        Acore::AllFriendlyCreaturesInGrid check(me);
+        Acore::CreatureListSearcher<Acore::AllFriendlyCreaturesInGrid> searcher(me, arenaTrash, check);
+        Cell::VisitObjects(me, searcher, 500.0f);
+        for (Creature* trash : arenaTrash)
+        {
+            if (trash == me || trash->IsInCombat() || !trash->IsAlive())
+                continue;
+            if (trash->GetEntry() == NPC_SARTHARION)
+                continue;
+            if (trash->IsCritter() || trash->IsTrigger())
+                continue;
+            // Drakes (Tenebron/Shadron/Vesperon) carry NOT_SELECTABLE until
+            // Sartharion's scripted call-in engages them — skip here so they
+            // follow the staggered script, not the trash pull.
+            if (trash->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE))
+                continue;
+            if (trash->IsImmuneToPC() || trash->IsImmuneToNPC())
+                continue;
+            if (!trash->HasReactState(REACT_AGGRESSIVE))
+                continue;
+            trash->SetInCombatWithZone();
+        }
     }
 
     void JustDied(Unit* /*killer*/) override
