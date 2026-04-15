@@ -95,6 +95,10 @@ local.properties
 .project
 .cproject
 
+# vcpkg integration
+/vcpkg/
+/vcpkg-ports/
+
 
 # ==================
 #
