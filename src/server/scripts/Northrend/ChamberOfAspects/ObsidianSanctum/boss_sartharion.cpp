@@ -310,6 +310,7 @@ struct boss_sartharion : public BossAI
         usedBerserk(false),
         below11PctReached(false)
     {
+        callForHelpRange = 500.0f;
     }
 
     void Reset() override
@@ -404,8 +405,6 @@ struct boss_sartharion : public BossAI
             DoCastSelf(SPELL_WILL_OF_SARTHARION, true);
             instance->DoAction(ACTION_START_PATROL);
         }
-
-        me->CallForHelp(500.0f);
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -568,6 +567,8 @@ struct boss_sartharion : public BossAI
 
         // Handle Sartharion combat abilities
         events.Update(diff);
+
+        scheduler.Update(diff);
 
         if (me->HasUnitState(UNIT_STATE_CASTING))
             return;
