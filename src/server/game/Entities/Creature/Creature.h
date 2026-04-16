@@ -536,6 +536,9 @@ private:
     // Formation variable
     CreatureGroup* m_formation;
     bool TriggerJustRespawned;
+    // Deferred vehicle init: set in AIM_Initialize, consumed on the next
+    // Creature::Update tick so accessories install after visibility sync.
+    bool _triggerVehicleKitInit = false;
 
     // Shared timer between mobs who assist another.
     // Damaging one extends leash range on all of them.
