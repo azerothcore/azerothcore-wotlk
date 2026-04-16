@@ -411,6 +411,11 @@ struct boss_sartharion : public BossAI
     {
         _JustDied();
         Talk(SAY_SARTHARION_DEATH);
+
+        // Despawn remaining drakes
+        for (uint32 i : dragons)
+            if (Creature* boss = instance->GetCreature(i))
+                boss->DespawnOrUnsummon();
     }
 
     void SetData(uint32 type, uint32 data) override
