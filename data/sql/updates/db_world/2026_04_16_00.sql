@@ -1,3 +1,4 @@
+-- DB update 2026_04_15_01 -> 2026_04_16_00
 --
 -- Ball of Flames Proc (ICC Prince Valanar):
 -- ensure the spell script is registered so the new AuraScript
