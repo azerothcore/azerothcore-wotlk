@@ -339,8 +339,6 @@ struct boss_sartharion : public BossAI
             if (Creature* boss = instance->GetCreature(i) )
                 boss->DespawnOnEvade();
         }
-
-        me->DespawnOnEvade(30s);
     }
 
     void DoAction(int32 param) override
