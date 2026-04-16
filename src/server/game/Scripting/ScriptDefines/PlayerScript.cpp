@@ -794,7 +794,7 @@ void ScriptMgr::OnPlayerSetServerSideVisibilityDetect(Player* player, ServerSide
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_SET_SERVER_SIDE_VISIBILITY_DETECT, script->OnPlayerSetServerSideVisibilityDetect(player, type, sec));
 }
 
-void ScriptMgr::OnPlayerResurrect(Player* player, float restore_percent, bool applySickness)
+void ScriptMgr::OnPlayerResurrect(Player* player, float restore_percent, bool& applySickness)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_PLAYER_RESURRECT, script->OnPlayerResurrect(player, restore_percent, applySickness));
 }
