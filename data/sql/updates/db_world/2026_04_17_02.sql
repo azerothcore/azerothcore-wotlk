@@ -1,3 +1,4 @@
+-- DB update 2026_04_17_01 -> 2026_04_17_02
 
 -- Clean useless Trigger GUID SAI and Comment
 UPDATE `creature` SET `Comment` = '' WHERE (`id1` = 23837) AND (`guid` IN (98562));
