@@ -29,7 +29,6 @@
 #define mkdir _mkdir
 #endif
 
-
 #undef min
 #undef max
 
