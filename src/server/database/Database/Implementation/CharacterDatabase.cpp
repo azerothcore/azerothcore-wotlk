@@ -605,6 +605,15 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_SEL_ARENAPOINTS, "SELECT arenaPoints FROM characters WHERE guid = ?", CONNECTION_SYNCH);
 
     // Character names
+    PrepareStatement(CHAR_SEL_CHARACTERS_FOR_NAME_RECHECK, "SELECT guid, account, name, at_login FROM characters WHERE deleteDate IS NULL", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_SEL_CHARACTERS_FOR_NAME_RECHECK_EXACT, "SELECT guid, account, name, at_login FROM characters WHERE deleteDate IS NULL AND name = ?", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_SEL_CHARACTERS_FOR_NAME_RECHECK_ENDS_WITH, "SELECT guid, account, name, at_login FROM characters WHERE deleteDate IS NULL AND name LIKE CONCAT('%%', ?)", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_SEL_CHARACTERS_FOR_NAME_RECHECK_STARTS_WITH, "SELECT guid, account, name, at_login FROM characters WHERE deleteDate IS NULL AND name LIKE CONCAT(?, '%%')", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_SEL_CHARACTERS_FOR_NAME_RECHECK_CONTAINS, "SELECT guid, account, name, at_login FROM characters WHERE deleteDate IS NULL AND name LIKE CONCAT('%%', ?, '%%')", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_SEL_RESERVED_PLAYER_NAMES, "SELECT id, name, flags, security, comment FROM reserved_name ORDER BY id ASC", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_SEL_PROFANITY_PLAYER_NAMES, "SELECT id, name, flags, locale, comment FROM profanity_name ORDER BY id ASC", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_DEL_RESERVED_PLAYER_NAME_BY_NAME, "DELETE FROM reserved_name WHERE name = ?", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_DEL_PROFANITY_PLAYER_NAME_BY_NAME, "DELETE FROM profanity_name WHERE name = ?", CONNECTION_ASYNC);
     PrepareStatement(CHAR_INS_RESERVED_PLAYER_NAME, "INSERT INTO reserved_name (name, flags, security, comment) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE comment = VALUES(comment)", CONNECTION_ASYNC);
     PrepareStatement(CHAR_INS_PROFANITY_PLAYER_NAME, "INSERT INTO profanity_name (name, flags, locale, comment) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE comment = VALUES(comment)", CONNECTION_ASYNC);
 

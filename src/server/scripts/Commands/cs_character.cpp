@@ -126,19 +126,9 @@ public:
 
     typedef std::list<DeletedInfo> DeletedInfoList;
 
-    static char const* GetRestrictedNameTable(RestrictedNameListType listType)
-    {
-        return listType == RestrictedNameListType::Reserved ? "reserved_name" : "profanity_name";
-    }
-
     static char const* GetRestrictedNameLabel(RestrictedNameListType listType)
     {
         return listType == RestrictedNameListType::Reserved ? "reserved" : "profanity";
-    }
-
-    static char const* GetRestrictedNameScopeColumn(RestrictedNameListType listType)
-    {
-        return listType == RestrictedNameListType::Reserved ? "security" : "locale";
     }
 
     static char const* GetRestrictedNameScopeLabel(RestrictedNameListType listType)
@@ -146,40 +136,14 @@ public:
         return listType == RestrictedNameListType::Reserved ? "security" : "locale";
     }
 
-    static bool ValidateReservedNameInput(ChatHandler* handler, std::string const& name, uint8 flags, int32 security)
+    static CharacterDatabaseStatements GetRestrictedNameSelectStatement(RestrictedNameListType listType)
     {
-        std::wstring wname;
-        if (!Utf8toWStr(name, wname) || wname.empty() || wname.size() > MAX_PLAYER_NAME)
-        {
-            handler->SendErrorMessage(LANG_BAD_VALUE);
-            return false;
-        }
-
-        if (!ObjectMgr::IsValidPlayerNameRestrictionFlags(flags) || !ObjectMgr::IsValidReservedPlayerSecurity(security))
-        {
-            handler->SendErrorMessage(LANG_BAD_VALUE);
-            return false;
-        }
-
-        return true;
+        return listType == RestrictedNameListType::Reserved ? CHAR_SEL_RESERVED_PLAYER_NAMES : CHAR_SEL_PROFANITY_PLAYER_NAMES;
     }
 
-    static bool ValidateProfanityNameInput(ChatHandler* handler, std::string const& name, uint8 flags, int32 locale)
+    static bool IsValidRestrictedNameScope(RestrictedNameListType listType, int32 scope)
     {
-        std::wstring wname;
-        if (!Utf8toWStr(name, wname) || wname.empty() || wname.size() > MAX_PLAYER_NAME)
-        {
-            handler->SendErrorMessage(LANG_BAD_VALUE);
-            return false;
-        }
-
-        if (!ObjectMgr::IsValidPlayerNameRestrictionFlags(flags) || !ObjectMgr::IsValidPlayerNameRestrictionLocale(locale))
-        {
-            handler->SendErrorMessage(LANG_BAD_VALUE);
-            return false;
-        }
-
-        return true;
+        return listType == RestrictedNameListType::Reserved ? ObjectMgr::IsValidReservedPlayerSecurity(scope) : ObjectMgr::IsValidPlayerNameRestrictionLocale(scope);
     }
 
     static bool LoadRestrictedNameAsLowercase(std::string const& name, std::wstring& wname)
@@ -191,18 +155,27 @@ public:
         return true;
     }
 
-    static void ReloadRestrictedNames(RestrictedNameListType listType)
+    static int8 GetRestrictedNameDefaultScope(RestrictedNameListType listType)
     {
-        if (listType == RestrictedNameListType::Reserved)
+        return listType == RestrictedNameListType::Reserved ? PLAYER_NAME_RESERVED_FOR_ALL_ACCOUNTS : PLAYER_NAME_RESTRICTION_ALL_LOCALES;
+    }
+
+    static bool ValidateRestrictedNameInput(ChatHandler* handler, RestrictedNameListType listType, std::string const& name, uint8 flags, int32 scope)
+    {
+        std::wstring wname;
+        if (!Utf8toWStr(name, wname) || wname.empty() || wname.size() > MAX_PLAYER_NAME)
         {
-            sObjectMgr->LoadReservedPlayerNamesDB();
-            sObjectMgr->LoadReservedPlayerNamesDBC();
+            handler->SendErrorMessage(LANG_BAD_VALUE);
+            return false;
         }
-        else
+
+        if (!ObjectMgr::IsValidPlayerNameRestrictionFlags(flags) || !IsValidRestrictedNameScope(listType, scope))
         {
-            sObjectMgr->LoadProfanityNamesFromDB();
-            sObjectMgr->LoadProfanityNamesFromDBC();
+            handler->SendErrorMessage(LANG_BAD_VALUE);
+            return false;
         }
+
+        return true;
     }
 
     template <RestrictedNameListType ListType>
@@ -213,9 +186,8 @@ public:
 
     static bool ListRestrictedNames(ChatHandler* handler, RestrictedNameListType listType)
     {
-        QueryResult result = CharacterDatabase.Query(Acore::StringFormat(
-            "SELECT id, name, flags, {}, comment FROM {} ORDER BY id ASC",
-            GetRestrictedNameScopeColumn(listType), GetRestrictedNameTable(listType)));
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(GetRestrictedNameSelectStatement(listType));
+        PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
         if (!result)
         {
@@ -564,7 +536,7 @@ public:
 
         if (reserveName)
         {
-            sObjectMgr->AddReservedPlayerName(player->GetName());
+            sObjectMgr->AddReservedPlayerName(player->GetName(), 0, PLAYER_NAME_RESERVED_FOR_ALL_ACCOUNTS);
         }
 
         return true;
@@ -575,17 +547,15 @@ public:
         if (flagsFilter && !ObjectMgr::IsValidPlayerNameRestrictionFlags(*flagsFilter))
             return false;
 
-        if (scopeFilter && ((listType == RestrictedNameListType::Reserved && !ObjectMgr::IsValidReservedPlayerSecurity(*scopeFilter)) ||
-            (listType == RestrictedNameListType::Profanity && !ObjectMgr::IsValidPlayerNameRestrictionLocale(*scopeFilter))))
+        if (scopeFilter && !IsValidRestrictedNameScope(listType, *scopeFilter))
             return false;
 
         std::wstring loweredName;
         if (!LoadRestrictedNameAsLowercase(name, loweredName))
             return false;
 
-        QueryResult result = CharacterDatabase.Query(Acore::StringFormat(
-            "SELECT id, name, flags, {}, comment FROM {} ORDER BY id ASC",
-            GetRestrictedNameScopeColumn(listType), GetRestrictedNameTable(listType)));
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(GetRestrictedNameSelectStatement(listType));
+        PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
         if (!result)
         {
@@ -638,21 +608,18 @@ public:
 
     static bool HandleRestrictedNameAdd(ChatHandler* handler, RestrictedNameListType listType, std::string const& name, uint8 flags, Optional<int8> scopeArg, Optional<Tail> commentArg)
     {
-        int8 scopeValue = scopeArg.value_or(listType == RestrictedNameListType::Reserved ? int8(SEC_PLAYER) : PLAYER_NAME_RESTRICTION_ALL_LOCALES);
+        int8 scopeValue = scopeArg.value_or(GetRestrictedNameDefaultScope(listType));
         std::string comment = commentArg ? std::string(*commentArg) : "";
+
+        if (!ValidateRestrictedNameInput(handler, listType, name, flags, scopeValue))
+            return false;
 
         if (listType == RestrictedNameListType::Reserved)
         {
-            if (!ValidateReservedNameInput(handler, name, flags, scopeValue))
-                return false;
-
             sObjectMgr->AddReservedPlayerName(name, flags, scopeValue, comment);
         }
         else
         {
-            if (!ValidateProfanityNameInput(handler, name, flags, scopeValue))
-                return false;
-
             sObjectMgr->AddProfanityPlayerName(name, flags, scopeValue, comment);
         }
 
@@ -668,41 +635,21 @@ public:
         return HandleRestrictedNameAdd(handler, ListType, name, flags, scopeArg, commentArg);
     }
 
-    static bool HandleRestrictedNameRemove(ChatHandler* handler, RestrictedNameListType listType, std::string name, int8 flags, Optional<int8> scopeArg)
+    static bool HandleRestrictedNameRemove(ChatHandler* handler, RestrictedNameListType listType, std::string const& name)
     {
-        if (flags != -1 && !ObjectMgr::IsValidPlayerNameRestrictionFlags(flags))
-            return false;
-
-        if (scopeArg && ((listType == RestrictedNameListType::Reserved && !ObjectMgr::IsValidReservedPlayerSecurity(*scopeArg)) ||
-            (listType == RestrictedNameListType::Profanity && !ObjectMgr::IsValidPlayerNameRestrictionLocale(*scopeArg))))
-            return false;
-
-        CharacterDatabase.EscapeString(name);
-
-        if (flags == -1)
-        {
-            if (scopeArg)
-                CharacterDatabase.DirectExecute("DELETE FROM {} WHERE name = '{}' AND {} = {}", GetRestrictedNameTable(listType), name, GetRestrictedNameScopeColumn(listType), int32(*scopeArg));
-            else
-                CharacterDatabase.DirectExecute("DELETE FROM {} WHERE name = '{}'", GetRestrictedNameTable(listType), name);
-        }
+        if (listType == RestrictedNameListType::Reserved)
+            sObjectMgr->RemoveReservedPlayerNames(name);
         else
-        {
-            if (scopeArg)
-                CharacterDatabase.DirectExecute("DELETE FROM {} WHERE name = '{}' AND flags = {} AND {} = {}", GetRestrictedNameTable(listType), name, int32(flags), GetRestrictedNameScopeColumn(listType), int32(*scopeArg));
-            else
-                CharacterDatabase.DirectExecute("DELETE FROM {} WHERE name = '{}' AND flags = {}", GetRestrictedNameTable(listType), name, int32(flags));
-        }
+            sObjectMgr->RemoveProfanityPlayerNames(name);
 
-        ReloadRestrictedNames(listType);
-        handler->SendSysMessage(Acore::StringFormat("Removed matching {} name restrictions for '{}'.",GetRestrictedNameLabel(listType), name));
+        handler->SendSysMessage(Acore::StringFormat("Removed {} name restrictions for '{}' and re-evaluated matching existing characters immediately.", GetRestrictedNameLabel(listType), name));
         return true;
     }
 
     template <RestrictedNameListType ListType>
-    static bool HandleCharacterNameRemoveCommand(ChatHandler* handler, std::string name, int8 flags, Optional<int8> scopeArg)
+    static bool HandleCharacterNameRemoveCommand(ChatHandler* handler, std::string name)
     {
-        return HandleRestrictedNameRemove(handler, ListType, std::move(name), flags, scopeArg);
+        return HandleRestrictedNameRemove(handler, ListType, name);
     }
 
     static bool HandleCharacterLevelCommand(ChatHandler* handler, Optional<PlayerIdentifier> player, int16 newlevel)

@@ -50,7 +50,8 @@ struct PlayerInfo;
 struct PlayerLevelInfo;
 
 static constexpr int8 PLAYER_NAME_RESTRICTION_ALL_LOCALES = -1;
-static constexpr int8 PLAYER_NAME_RESERVED_FOR_ALL_ACCOUNTS = -1;
+// `reserved_name.security = 0` means the name is reserved for everyone and no account can bypass it.
+static constexpr int8 PLAYER_NAME_RESERVED_FOR_ALL_ACCOUNTS = 0;
 
 enum PlayerNameRestrictionFlags
 {
@@ -63,15 +64,15 @@ struct ReservedPlayerName
 {
     std::wstring Pattern;
     uint8 Flags = 0;
-    int8 Security = SEC_PLAYER;
+    int8 BypassSecurity = PLAYER_NAME_RESERVED_FOR_ALL_ACCOUNTS;
     std::string Comment;
 };
 
 struct ReservedPlayerNameMatch
 {
     bool Matched = false;
-    int8 RequiredSecurity = SEC_PLAYER;
-    bool IsAllowedForCurrentSecurity = false;
+    int8 RequiredBypassSecurity = PLAYER_NAME_RESERVED_FOR_ALL_ACCOUNTS;
+    bool IsBypassedForCurrentSecurity = false;
     uint8 MatchedFlags = PLAYER_NAME_RESTRICTION_FLAG_NONE;
 };
 
@@ -1436,17 +1437,19 @@ public:
     void LoadReservedPlayerNamesDB();
     void LoadReservedPlayerNamesDBC();
     [[nodiscard]] ReservedPlayerNameMatch GetReservedPlayerNameMatch(std::string_view name, int32 security = SEC_PLAYER) const;
-    void AddReservedPlayerName(std::string const& name, uint8 flags = 0, int8 security = SEC_PLAYER, std::string const& comment = "");
+    void AddReservedPlayerName(std::string const& name, uint8 flags = 0, int8 security = PLAYER_NAME_RESERVED_FOR_ALL_ACCOUNTS, std::string const& comment = "");
+    void RemoveReservedPlayerNames(std::string const& name);
 
     // profanity names
     void LoadProfanityNamesFromDB();
     void LoadProfanityNamesFromDBC();
     [[nodiscard]] bool IsProfanityName(std::string_view name, int32 locale = -1) const;
     void AddProfanityPlayerName(std::string const& name, uint8 flags = 0, int8 locale = -1, std::string const& comment = "");
+    void RemoveProfanityPlayerNames(std::string const& name);
 
     static bool IsValidPlayerNameRestrictionFlags(uint8 flags) { return flags <= (PLAYER_NAME_RESTRICTION_FLAG_LEADING_WILDCARD | PLAYER_NAME_RESTRICTION_FLAG_TRAILING_WILDCARD); }
     static bool IsValidPlayerNameRestrictionLocale(int32 locale) { return locale >= PLAYER_NAME_RESTRICTION_ALL_LOCALES && locale < TOTAL_LOCALES; }
-    static bool IsValidReservedPlayerSecurity(int32 security) { return security >= PLAYER_NAME_RESERVED_FOR_ALL_ACCOUNTS && security <= SEC_CONSOLE; }
+    static bool IsValidReservedPlayerSecurity(int32 security) { return security >= SEC_PLAYER && security <= SEC_CONSOLE; }
     static bool MatchPlayerNameRestriction(std::wstring_view name, std::wstring_view pattern, uint8 flags);
 
     // name with valid structure and symbols

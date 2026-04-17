@@ -16,6 +16,7 @@
  */
 
 #include "ObjectMgr.h"
+#include "AccountMgr.h"
 #include "AchievementMgr.h"
 #include "ArenaTeamMgr.h"
 #include "CharacterCache.h"
@@ -68,9 +69,134 @@ static bool LocaleMatchesRestriction(int32 locale, int8 restrictionLocale)
     return restrictionLocale == PLAYER_NAME_RESTRICTION_ALL_LOCALES || locale == restrictionLocale;
 }
 
-static bool SecurityAllowsReservedName(int32 security, int8 requiredSecurity)
+struct AccountRestrictionContext
 {
-    return requiredSecurity == PLAYER_NAME_RESERVED_FOR_ALL_ACCOUNTS || security >= requiredSecurity;
+    int32 Locale = PLAYER_NAME_RESTRICTION_ALL_LOCALES;
+    int32 Security = SEC_PLAYER;
+};
+
+static bool SecurityBypassesReservedName(int32 security, int8 requiredBypassSecurity)
+{
+    return requiredBypassSecurity != PLAYER_NAME_RESERVED_FOR_ALL_ACCOUNTS && security >= requiredBypassSecurity;
+}
+
+static int32 NormalizeRestrictionSecurity(int32 security)
+{
+    return ObjectMgr::IsValidReservedPlayerSecurity(security) ? security : PLAYER_NAME_RESERVED_FOR_ALL_ACCOUNTS;
+}
+
+static int32 GetAccountRestrictionLocale(uint32 accountId)
+{
+    LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_LOCALE_BY_ID);
+    stmt->SetData(0, accountId);
+
+    if (PreparedQueryResult result = LoginDatabase.Query(stmt))
+    {
+        int32 locale = (*result)[0].Get<uint8>();
+        if (ObjectMgr::IsValidPlayerNameRestrictionLocale(locale))
+            return locale;
+    }
+
+    return PLAYER_NAME_RESTRICTION_ALL_LOCALES;
+}
+
+static CharacterDatabaseStatements GetCharacterNameRecheckStatement(uint8 flags)
+{
+    switch (flags)
+    {
+        case PLAYER_NAME_RESTRICTION_FLAG_NONE:
+            return CHAR_SEL_CHARACTERS_FOR_NAME_RECHECK_EXACT;
+        case PLAYER_NAME_RESTRICTION_FLAG_LEADING_WILDCARD:
+            return CHAR_SEL_CHARACTERS_FOR_NAME_RECHECK_ENDS_WITH;
+        case PLAYER_NAME_RESTRICTION_FLAG_TRAILING_WILDCARD:
+            return CHAR_SEL_CHARACTERS_FOR_NAME_RECHECK_STARTS_WITH;
+        case PLAYER_NAME_RESTRICTION_FLAG_LEADING_WILDCARD | PLAYER_NAME_RESTRICTION_FLAG_TRAILING_WILDCARD:
+            return CHAR_SEL_CHARACTERS_FOR_NAME_RECHECK_CONTAINS;
+        default:
+            return CHAR_SEL_CHARACTERS_FOR_NAME_RECHECK;
+    }
+}
+
+static void AddRenameFlag(ObjectGuid::LowType guid)
+{
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
+    stmt->SetData(0, uint16(AT_LOGIN_RENAME));
+    stmt->SetData(1, guid);
+    CharacterDatabase.Execute(stmt);
+}
+
+static void RemoveRenameFlag(ObjectGuid::LowType guid)
+{
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_REM_AT_LOGIN_FLAG);
+    stmt->SetData(0, uint16(AT_LOGIN_RENAME));
+    stmt->SetData(1, guid);
+    CharacterDatabase.Execute(stmt);
+}
+
+template <typename ContextProvider, typename Predicate>
+static uint32 FlagRestrictedCharacterCandidates(PreparedQueryResult result, ContextProvider&& getContext, Predicate&& shouldFlag)
+{
+    if (!result)
+        return 0;
+
+    uint32 count = 0;
+
+    do
+    {
+        Field* fields = result->Fetch();
+        ObjectGuid::LowType guid = fields[0].Get<uint32>();
+        uint32 accountId = fields[1].Get<uint32>();
+        std::string name = fields[2].Get<std::string>();
+        uint16 atLogin = fields[3].Get<uint16>();
+
+        if (atLogin & AT_LOGIN_RENAME)
+            continue;
+
+        AccountRestrictionContext context = getContext(accountId);
+        if (!shouldFlag(name, context))
+            continue;
+
+        AddRenameFlag(guid);
+        ++count;
+    } while (result->NextRow());
+
+    return count;
+}
+
+template <typename ContextProvider, typename Predicate>
+static std::pair<uint32, uint32> ReevaluateRestrictedCharacterCandidates(PreparedQueryResult result, ContextProvider&& getContext, Predicate&& shouldFlag)
+{
+    if (!result)
+        return {};
+
+    uint32 added = 0;
+    uint32 removed = 0;
+
+    do
+    {
+        Field* fields = result->Fetch();
+        ObjectGuid::LowType guid = fields[0].Get<uint32>();
+        uint32 accountId = fields[1].Get<uint32>();
+        std::string name = fields[2].Get<std::string>();
+        uint16 atLogin = fields[3].Get<uint16>();
+
+        AccountRestrictionContext context = getContext(accountId);
+        bool shouldHaveRename = shouldFlag(name, context);
+        bool hasRename = (atLogin & AT_LOGIN_RENAME) != 0;
+
+        if (shouldHaveRename && !hasRename)
+        {
+            AddRenameFlag(guid);
+            ++added;
+        }
+        else if (!shouldHaveRename && hasRename)
+        {
+            RemoveRenameFlag(guid);
+            ++removed;
+        }
+    } while (result->NextRow());
+
+    return { added, removed };
 }
 
 static bool EndsWith(std::wstring_view value, std::wstring_view suffix)
@@ -125,13 +251,13 @@ static bool HasReservedName(std::vector<ReservedPlayerName> const& store, std::w
 {
     return std::any_of(store.begin(), store.end(), [&](ReservedPlayerName const& restriction)
     {
-        return restriction.Pattern == pattern && restriction.Flags == flags && restriction.Security == security;
+        return restriction.Pattern == pattern && restriction.Flags == flags && restriction.BypassSecurity == security;
     });
 }
 
 static void AddReservedName(std::vector<ReservedPlayerName>& store, ReservedPlayerName&& restriction)
 {
-    if (!HasReservedName(store, restriction.Pattern, restriction.Flags, restriction.Security))
+    if (!HasReservedName(store, restriction.Pattern, restriction.Flags, restriction.BypassSecurity))
         store.push_back(std::move(restriction));
 }
 
@@ -8898,11 +9024,13 @@ void ObjectMgr::LoadReservedPlayerNamesDB()
 
     _reservedNamesStore.clear();                                // need for reload case
 
-    QueryResult result = CharacterDatabase.Query("SELECT name, flags, security, comment FROM reserved_name");
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_RESERVED_PLAYER_NAMES);
+    PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
     if (!result)
     {
         LOG_WARN("server.loading", ">> Loaded 0 reserved names. DB table `reserved_name` is empty!");
+        FlagCharactersWithRestrictedNames();
         return;
     }
 
@@ -8912,9 +9040,9 @@ void ObjectMgr::LoadReservedPlayerNamesDB()
     do
     {
         fields = result->Fetch();
-        std::string name = fields[0].Get<std::string>();
-        uint8 flags = fields[1].Get<uint8>();
-        int8 security = fields[2].Get<int8>();
+        std::string name = fields[1].Get<std::string>();
+        uint8 flags = fields[2].Get<uint8>();
+        int8 security = fields[3].Get<int8>();
 
         std::wstring wstr;
         if (!Utf8toWStr (name, wstr))
@@ -8937,7 +9065,7 @@ void ObjectMgr::LoadReservedPlayerNamesDB()
 
         wstrToLower(wstr);
 
-        AddReservedName(_reservedNamesStore, { std::move(wstr), flags, security, fields[3].Get<std::string>() });
+        AddReservedName(_reservedNamesStore, { std::move(wstr), flags, security, fields[4].Get<std::string>() });
         ++count;
     } while (result->NextRow());
 
@@ -8958,8 +9086,8 @@ ReservedPlayerNameMatch ObjectMgr::GetReservedPlayerNameMatch(std::string_view n
     if (name.size() >= 2 && (name[name.size() - 2] == 'G' || name[name.size() - 2] == 'g') && (name[name.size() - 1] == 'M' || name[name.size() - 1] == 'm'))
     {
         match.Matched = true;
-        match.RequiredSecurity = SEC_GAMEMASTER;
-        match.IsAllowedForCurrentSecurity = SecurityAllowsReservedName(security, match.RequiredSecurity);
+        match.RequiredBypassSecurity = SEC_GAMEMASTER;
+        match.IsBypassedForCurrentSecurity = SecurityBypassesReservedName(security, match.RequiredBypassSecurity);
         return match;
     }
 
@@ -8974,22 +9102,24 @@ ReservedPlayerNameMatch ObjectMgr::GetReservedPlayerNameMatch(std::string_view n
         if (!MatchPlayerNameRestriction(wstr, restriction.Pattern, restriction.Flags))
             continue;
 
-        if (!match.Matched || restriction.Security > match.RequiredSecurity)
+        if (!match.Matched || restriction.BypassSecurity == PLAYER_NAME_RESERVED_FOR_ALL_ACCOUNTS || (match.RequiredBypassSecurity != PLAYER_NAME_RESERVED_FOR_ALL_ACCOUNTS && restriction.BypassSecurity > match.RequiredBypassSecurity))
         {
             match.Matched = true;
-            match.RequiredSecurity = restriction.Security;
+            match.RequiredBypassSecurity = restriction.BypassSecurity;
             match.MatchedFlags = restriction.Flags;
         }
     }
 
     if (match.Matched)
-        match.IsAllowedForCurrentSecurity = SecurityAllowsReservedName(security, match.RequiredSecurity);
+        match.IsBypassedForCurrentSecurity = SecurityBypassesReservedName(security, match.RequiredBypassSecurity);
 
     return match;
 }
 
 void ObjectMgr::AddReservedPlayerName(std::string const& name, uint8 flags, int8 security, std::string const& comment)
 {
+    uint32 oldMSTime = getMSTime();
+
     if (!IsValidPlayerNameRestrictionFlags(flags) || !IsValidReservedPlayerSecurity(security))
     {
         LOG_ERROR("server", "Could not add reserved player name {} with invalid flags {} or security {}", name, flags, security);
@@ -9004,6 +9134,7 @@ void ObjectMgr::AddReservedPlayerName(std::string const& name, uint8 flags, int8
     }
 
     wstrToLower(wstr);
+    std::wstring pattern = wstr;
     AddReservedName(_reservedNamesStore, { std::move(wstr), flags, security, comment });
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_RESERVED_PLAYER_NAME);
@@ -9013,7 +9144,80 @@ void ObjectMgr::AddReservedPlayerName(std::string const& name, uint8 flags, int8
     stmt->SetData(3, comment);
     CharacterDatabase.Execute(stmt);
 
-    FlagCharactersWithRestrictedNames();
+    CharacterDatabasePreparedStatement* candidateStmt = CharacterDatabase.GetPreparedStatement(GetCharacterNameRecheckStatement(flags));
+    candidateStmt->SetData(0, name);
+    PreparedQueryResult candidates = CharacterDatabase.Query(candidateStmt);
+
+    std::unordered_map<uint32, AccountRestrictionContext> accountRestrictions;
+    uint32 count = FlagRestrictedCharacterCandidates(candidates,
+        [&](uint32 accountId)
+        {
+            auto [itr, inserted] = accountRestrictions.try_emplace(accountId);
+            if (inserted)
+                itr->second.Security = NormalizeRestrictionSecurity(AccountMgr::GetSecurity(accountId, realm.Id.Realm));
+
+            return itr->second;
+        },
+        [&](std::string const& candidateName, AccountRestrictionContext const& context)
+        {
+            std::wstring candidate;
+            if (!Utf8toWStr(candidateName, candidate))
+                return false;
+
+            wstrToLower(candidate);
+            return MatchPlayerNameRestriction(candidate, pattern, flags) && !SecurityBypassesReservedName(context.Security, security);
+        });
+
+    if (count)
+        LOG_INFO("server.loading", ">> Flagged {} characters for rename after adding reserved name '{}' in {} ms", count, name, GetMSTimeDiffToNow(oldMSTime));
+}
+
+void ObjectMgr::RemoveReservedPlayerNames(std::string const& name)
+{
+    uint32 oldMSTime = getMSTime();
+
+    std::wstring wname;
+    if (!Utf8toWStr(name, wname))
+        return;
+
+    wstrToLower(wname);
+
+    _reservedNamesStore.erase(std::remove_if(_reservedNamesStore.begin(), _reservedNamesStore.end(), [&](ReservedPlayerName const& restriction)
+    {
+        return restriction.Pattern == wname;
+    }), _reservedNamesStore.end());
+
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_RESERVED_PLAYER_NAME_BY_NAME);
+    stmt->SetData(0, name);
+    CharacterDatabase.Execute(stmt);
+
+    CharacterDatabasePreparedStatement* candidateStmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTERS_FOR_NAME_RECHECK_CONTAINS);
+    candidateStmt->SetData(0, name);
+    PreparedQueryResult candidates = CharacterDatabase.Query(candidateStmt);
+
+    std::unordered_map<uint32, AccountRestrictionContext> accountRestrictions;
+    auto [added, removed] = ReevaluateRestrictedCharacterCandidates(candidates,
+        [&](uint32 accountId)
+        {
+            auto [itr, inserted] = accountRestrictions.try_emplace(accountId);
+            if (inserted)
+            {
+                itr->second.Security = NormalizeRestrictionSecurity(AccountMgr::GetSecurity(accountId, realm.Id.Realm));
+                itr->second.Locale = GetAccountRestrictionLocale(accountId);
+            }
+
+            return itr->second;
+        },
+        [&](std::string const& candidateName, AccountRestrictionContext const& context)
+        {
+            return CheckPlayerName(candidateName, false, context.Locale, context.Security) != CHAR_NAME_SUCCESS;
+        });
+
+    if (added || removed)
+    {
+        LOG_INFO("server.loading", ">> Re-evaluated reserved-name removal '{}' and updated rename flags (+{}, -{}) in {} ms",
+            name, added, removed, GetMSTimeDiffToNow(oldMSTime));
+    }
 }
 
 void ObjectMgr::LoadProfanityNamesFromDB()
@@ -9022,7 +9226,8 @@ void ObjectMgr::LoadProfanityNamesFromDB()
 
     _profanityNamesStore.clear();                                // need for reload case
 
-    QueryResult result = CharacterDatabase.Query("SELECT name, flags, locale, comment FROM profanity_name");
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PROFANITY_PLAYER_NAMES);
+    PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
     if (!result)
     {
@@ -9036,9 +9241,9 @@ void ObjectMgr::LoadProfanityNamesFromDB()
     do
     {
         fields = result->Fetch();
-        std::string name = fields[0].Get<std::string>();
-        uint8 flags = fields[1].Get<uint8>();
-        int8 locale = fields[2].Get<int8>();
+        std::string name = fields[1].Get<std::string>();
+        uint8 flags = fields[2].Get<uint8>();
+        int8 locale = fields[3].Get<int8>();
 
         std::wstring wstr;
         if (!Utf8toWStr (name, wstr))
@@ -9061,12 +9266,11 @@ void ObjectMgr::LoadProfanityNamesFromDB()
 
         wstrToLower(wstr);
 
-        AddProfanityName(_profanityNamesStore, { std::move(wstr), flags, locale, fields[3].Get<std::string>() });
+        AddProfanityName(_profanityNamesStore, { std::move(wstr), flags, locale, fields[4].Get<std::string>() });
         ++count;
     } while (result->NextRow());
 
     LOG_INFO("server.loading", ">> Loaded {} profanity names from DB in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
-    FlagCharactersWithRestrictedNames();
 }
 
 void ObjectMgr::LoadProfanityNamesFromDBC()
@@ -9074,6 +9278,7 @@ void ObjectMgr::LoadProfanityNamesFromDBC()
     if (!sWorld->getBoolConfig(CONFIG_STRICT_NAMES_PROFANITY))
     {
         LOG_WARN("server.loading", ">> Loaded 0 profanity names from DBC. Config option disabled.");
+        FlagCharactersWithRestrictedNames();
         return;
     }
 
@@ -9126,6 +9331,8 @@ bool ObjectMgr::IsProfanityName(std::string_view name, int32 locale) const
 
 void ObjectMgr::AddProfanityPlayerName(std::string const& name, uint8 flags, int8 locale, std::string const& comment)
 {
+    uint32 oldMSTime = getMSTime();
+
     if (!IsValidPlayerNameRestrictionFlags(flags) || !IsValidPlayerNameRestrictionLocale(locale))
     {
         LOG_ERROR("server", "Could not add profanity player name {} with invalid flags {} or locale {}", name, flags, locale);
@@ -9140,6 +9347,7 @@ void ObjectMgr::AddProfanityPlayerName(std::string const& name, uint8 flags, int
     }
 
     wstrToLower(wstr);
+    std::wstring pattern = wstr;
     AddProfanityName(_profanityNamesStore, { std::move(wstr), flags, locale, comment });
 
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PROFANITY_PLAYER_NAME);
@@ -9149,7 +9357,80 @@ void ObjectMgr::AddProfanityPlayerName(std::string const& name, uint8 flags, int
     stmt->SetData(3, comment);
     CharacterDatabase.Execute(stmt);
 
-    FlagCharactersWithRestrictedNames();
+    CharacterDatabasePreparedStatement* candidateStmt = CharacterDatabase.GetPreparedStatement(GetCharacterNameRecheckStatement(flags));
+    candidateStmt->SetData(0, name);
+    PreparedQueryResult candidates = CharacterDatabase.Query(candidateStmt);
+
+    std::unordered_map<uint32, AccountRestrictionContext> accountRestrictions;
+    uint32 count = FlagRestrictedCharacterCandidates(candidates,
+        [&](uint32 accountId)
+        {
+            auto [itr, inserted] = accountRestrictions.try_emplace(accountId);
+            if (inserted)
+                itr->second.Locale = GetAccountRestrictionLocale(accountId);
+
+            return itr->second;
+        },
+        [&](std::string const& candidateName, AccountRestrictionContext const& context)
+        {
+            std::wstring candidate;
+            if (!Utf8toWStr(candidateName, candidate))
+                return false;
+
+            wstrToLower(candidate);
+            return LocaleMatchesRestriction(context.Locale, locale) && MatchPlayerNameRestriction(candidate, pattern, flags);
+        });
+
+    if (count)
+        LOG_INFO("server.loading", ">> Flagged {} characters for rename after adding profanity name '{}' in {} ms", count, name, GetMSTimeDiffToNow(oldMSTime));
+}
+
+void ObjectMgr::RemoveProfanityPlayerNames(std::string const& name)
+{
+    uint32 oldMSTime = getMSTime();
+
+    std::wstring wname;
+    if (!Utf8toWStr(name, wname))
+        return;
+
+    wstrToLower(wname);
+
+    _profanityNamesStore.erase(std::remove_if(_profanityNamesStore.begin(), _profanityNamesStore.end(), [&](ProfanityPlayerName const& restriction)
+    {
+        return restriction.Pattern == wname;
+    }), _profanityNamesStore.end());
+
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PROFANITY_PLAYER_NAME_BY_NAME);
+    stmt->SetData(0, name);
+    CharacterDatabase.Execute(stmt);
+
+    CharacterDatabasePreparedStatement* candidateStmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTERS_FOR_NAME_RECHECK_CONTAINS);
+    candidateStmt->SetData(0, name);
+    PreparedQueryResult candidates = CharacterDatabase.Query(candidateStmt);
+
+    std::unordered_map<uint32, AccountRestrictionContext> accountRestrictions;
+    auto [added, removed] = ReevaluateRestrictedCharacterCandidates(candidates,
+        [&](uint32 accountId)
+        {
+            auto [itr, inserted] = accountRestrictions.try_emplace(accountId);
+            if (inserted)
+            {
+                itr->second.Security = NormalizeRestrictionSecurity(AccountMgr::GetSecurity(accountId, realm.Id.Realm));
+                itr->second.Locale = GetAccountRestrictionLocale(accountId);
+            }
+
+            return itr->second;
+        },
+        [&](std::string const& candidateName, AccountRestrictionContext const& context)
+        {
+            return CheckPlayerName(candidateName, false, context.Locale, context.Security) != CHAR_NAME_SUCCESS;
+        });
+
+    if (added || removed)
+    {
+        LOG_INFO("server.loading", ">> Re-evaluated profanity-name removal '{}' and updated rename flags (+{}, -{}) in {} ms",
+            name, added, removed, GetMSTimeDiffToNow(oldMSTime));
+    }
 }
 
 enum LanguageType
@@ -9246,17 +9527,10 @@ void ObjectMgr::FlagCharactersWithRestrictedNames() const
 {
     uint32 oldMSTime = getMSTime();
 
-    struct AccountRestrictionContext
-    {
-        int32 Locale = PLAYER_NAME_RESTRICTION_ALL_LOCALES;
-        int32 Security = SEC_PLAYER;
-    };
-
     std::unordered_map<uint32, AccountRestrictionContext> accountRestrictions;
-    if (QueryResult accountResult = LoginDatabase.Query(Acore::StringFormat(
-        "SELECT a.id, a.locale, COALESCE(MAX(CASE WHEN aa.RealmID IN (-1, {}) THEN aa.gmlevel END), 0) "
-        "FROM account a LEFT JOIN account_access aa ON a.id = aa.id "
-        "GROUP BY a.id, a.locale", realm.Id.Realm)))
+    LoginDatabasePreparedStatement* accountStmt = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_RESTRICTION_CONTEXTS);
+    accountStmt->SetData(0, uint32(realm.Id.Realm));
+    if (PreparedQueryResult accountResult = LoginDatabase.Query(accountStmt))
     {
         do
         {
@@ -9267,54 +9541,29 @@ void ObjectMgr::FlagCharactersWithRestrictedNames() const
             accountRestrictions.emplace(accountFields[0].Get<uint32>(), AccountRestrictionContext
             {
                 IsValidPlayerNameRestrictionLocale(locale) ? locale : PLAYER_NAME_RESTRICTION_ALL_LOCALES,
-                IsValidReservedPlayerSecurity(security) ? security : SEC_PLAYER
+                NormalizeRestrictionSecurity(security)
             });
         } while (accountResult->NextRow());
     }
 
-    QueryResult result = CharacterDatabase.Query("SELECT guid, account, name, at_login FROM characters WHERE deleteDate IS NULL");
-
-    if (!result)
-        return;
-
-    uint32 count = 0;
-
-    do
-    {
-        Field* fields = result->Fetch();
-        ObjectGuid::LowType guid = fields[0].Get<uint32>();
-        uint32 accountId = fields[1].Get<uint32>();
-        std::string name = fields[2].Get<std::string>();
-        uint16 atLogin = fields[3].Get<uint16>();
-        int32 locale = PLAYER_NAME_RESTRICTION_ALL_LOCALES;
-        int32 security = SEC_PLAYER;
-
-        if (auto itr = accountRestrictions.find(accountId); itr != accountRestrictions.end())
+    CharacterDatabasePreparedStatement* candidateStmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHARACTERS_FOR_NAME_RECHECK);
+    PreparedQueryResult result = CharacterDatabase.Query(candidateStmt);
+    uint32 count = FlagRestrictedCharacterCandidates(result,
+        [&](uint32 accountId)
         {
-            locale = itr->second.Locale;
-            security = itr->second.Security;
-        }
+            if (auto itr = accountRestrictions.find(accountId); itr != accountRestrictions.end())
+                return itr->second;
 
-        if (atLogin & AT_LOGIN_RENAME)
-            continue;
+            return AccountRestrictionContext{};
+        },
+        [&](std::string const& name, AccountRestrictionContext const& context)
+        {
+            ReservedPlayerNameMatch reservedMatch = GetReservedPlayerNameMatch(name, context.Security);
+            if (reservedMatch.Matched && !reservedMatch.IsBypassedForCurrentSecurity)
+                return true;
 
-        ReservedPlayerNameMatch reservedMatch = GetReservedPlayerNameMatch(name, security);
-        bool shouldFlagRename = false;
-
-        if (reservedMatch.Matched)
-            shouldFlagRename = !reservedMatch.IsAllowedForCurrentSecurity;
-        else if (IsProfanityName(name, locale))
-            shouldFlagRename = true;
-
-        if (!shouldFlagRename)
-            continue;
-
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
-        stmt->SetData(0, uint16(AT_LOGIN_RENAME));
-        stmt->SetData(1, guid);
-        CharacterDatabase.Execute(stmt);
-        ++count;
-    } while (result->NextRow());
+            return IsProfanityName(name, context.Locale);
+        });
 
     if (count)
         LOG_INFO("server.loading", ">> Flagged {} characters for rename after refreshing restricted names in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
@@ -9350,10 +9599,10 @@ uint8 ObjectMgr::CheckPlayerName(std::string_view name, bool create, int32 local
 
     ReservedPlayerNameMatch reservedMatch = sObjectMgr->GetReservedPlayerNameMatch(name, security);
 
-    if (reservedMatch.Matched && !reservedMatch.IsAllowedForCurrentSecurity)
+    if (reservedMatch.Matched && !reservedMatch.IsBypassedForCurrentSecurity)
         return CHAR_NAME_RESERVED;
 
-    if (!reservedMatch.Matched && sObjectMgr->IsProfanityName(name, locale))
+    if (sObjectMgr->IsProfanityName(name, locale))
         return CHAR_NAME_PROFANE;
 
     return CHAR_NAME_SUCCESS;
@@ -9374,10 +9623,10 @@ bool ObjectMgr::IsValidCharterName(std::string_view name)
 
     // Check Reserved Name
     ReservedPlayerNameMatch reservedMatch = sObjectMgr->GetReservedPlayerNameMatch(name, SEC_PLAYER);
-    if (reservedMatch.Matched && !reservedMatch.IsAllowedForCurrentSecurity)
+    if (reservedMatch.Matched && !reservedMatch.IsBypassedForCurrentSecurity)
         return false;
 
-    if (!reservedMatch.Matched && sObjectMgr->IsProfanityName(name))
+    if (sObjectMgr->IsProfanityName(name))
         return false;
 
     uint32 strictMask = sWorld->getIntConfig(CONFIG_STRICT_CHARTER_NAMES);
@@ -9418,10 +9667,10 @@ PetNameInvalidReason ObjectMgr::CheckPetName(std::string_view name)
 
     // Check Reserved Name
     ReservedPlayerNameMatch reservedMatch = sObjectMgr->GetReservedPlayerNameMatch(name, SEC_PLAYER);
-    if (reservedMatch.Matched && !reservedMatch.IsAllowedForCurrentSecurity)
+    if (reservedMatch.Matched && !reservedMatch.IsBypassedForCurrentSecurity)
         return PET_NAME_RESERVED;
 
-    if (!reservedMatch.Matched && sObjectMgr->IsProfanityName(name))
+    if (sObjectMgr->IsProfanityName(name))
         return PET_NAME_PROFANE;
 
     return PET_NAME_SUCCESS;
