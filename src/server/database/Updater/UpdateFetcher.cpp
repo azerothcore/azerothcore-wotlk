@@ -160,18 +160,30 @@ UpdateFetcher::DirectoryStorage UpdateFetcher::ReceiveIncludedDirectories() cons
             moduleList.emplace_back(itr);
 
         // data/sql
-        for (auto const& itr : moduleList)
+        for (auto const& moduleName : moduleList)
         {
-            std::string path = _sourceDirectory->generic_string() + "/modules/" + itr + "/data/sql/" + _dbModuleName; // modules/mod-name/data/sql/db-world
-
-            Path const p(path);
+            std::string path = _sourceDirectory->generic_string() + "/modules/" + moduleName + "/data/sql/"; // modules/mod-name/data/sql/
+            Path const p{path};
             if (!is_directory(p))
                 continue;
 
-            DirectoryEntry const entry = { p, AppliedFileEntry::StateConvert("MODULE") };
-            directories.push_back(entry);
+            directory_iterator const end;
+            for (directory_iterator itr{p}; itr != end; ++itr)
+            {
+                if (!is_directory(itr->path()))
+                    continue;
 
-            LOG_TRACE("sql.updates", "Added applied modules file \"{}\" from remote.", p.filename().generic_string());
+                std::filesystem::path dirPath = itr->path(); // modules/mod-name/data/sql/db-world
+                std::string dirName = dirPath.filename().string(); // db-world
+
+                if (dirName.find(_dbModuleName) == std::string::npos)
+                    continue;
+
+                DirectoryEntry const entry = { dirPath, AppliedFileEntry::StateConvert("MODULE") };
+                directories.push_back(entry);
+
+                LOG_TRACE("sql.updates", "Added applied modules file \"{}\" from remote.", dirPath.filename().generic_string());
+            }
         }
     }
 

@@ -93,9 +93,7 @@ void WorldSession::HandleQuestgiverHelloOpcode(WorldPacket& recvData)
     if (GetPlayer()->HasUnitState(UNIT_STATE_DIED))
         GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
 
-    // Stop the npc if moving
-    if (uint32 pause = creature->GetMovementTemplate().GetInteractionPauseTimer())
-        creature->PauseMovement(pause);
+    creature->PauseMovementForInteraction();
 
     // Update home position for patrolling NPCs only (prevents drift for stationary NPCs)
     if (creature->GetDefaultMovementType() == WAYPOINT_MOTION_TYPE ||

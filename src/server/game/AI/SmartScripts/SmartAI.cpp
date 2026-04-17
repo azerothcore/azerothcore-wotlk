@@ -44,6 +44,7 @@ SmartAI::SmartAI(Creature* c) : CreatureAI(c)
     mCanRepeatPath = false;
 
     mEvadeDisabled = false;
+    mSuppressEvade = false;
 
     mCanAutoAttack = true;
 
@@ -696,8 +697,25 @@ void SmartAI::MovementInform(uint32 MovementType, uint32 Data)
         MovepointReached(Data);
 }
 
+void SmartAI::JustExitedCombat()
+{
+    // When evade is suppressed or disabled, don't auto-evade on combat exit.
+    // This prevents scripted encounters (e.g. Mograine/Whitemane) from resetting
+    // when bosses temporarily stop fighting during scripted phases.
+    if (mSuppressEvade || mEvadeDisabled)
+    {
+        EngagementOver();
+        return;
+    }
+
+    CreatureAI::JustExitedCombat();
+}
+
 void SmartAI::EnterEvadeMode(EvadeReason /*why*/)
 {
+    if (mSuppressEvade)
+        return;
+
     if (mEvadeDisabled)
     {
         GetScript()->ProcessEventsFor(SMART_EVENT_EVADE);

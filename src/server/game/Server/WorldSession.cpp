@@ -702,6 +702,10 @@ void WorldSession::LogoutPlayer(bool save)
         // a) in group; b) not in raid group; c) logging out normally (not being kicked or disconnected) d) LeaveGroupOnLogout is enabled
         if (_player->GetGroup() && !_player->GetGroup()->isRaidGroup() && !_player->GetGroup()->isLFGGroup() && m_Socket && sWorld->getBoolConfig(CONFIG_LEAVE_GROUP_ON_LOGOUT))
             _player->RemoveFromGroup();
+        // Remove player from active loot rolls in LFG groups (player stays in group but should not block rolls)
+        else if (Group* group = _player->GetGroup())
+            if (group->isLFGGroup())
+                group->RemovePlayerFromRolls(_player->GetGUID());
 
         // pussywizard: checked second time after being removed from a group
         if (!_player->IsBeingTeleportedFar() && !_player->m_InstanceValid && !_player->IsGameMaster())
