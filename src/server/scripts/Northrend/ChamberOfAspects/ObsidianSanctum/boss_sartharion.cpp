@@ -845,7 +845,10 @@ struct boss_sartharion_dragonAI : public BossAI
         }
 
         if (!isCalledBySartharion)
+        {
             ClearInstance();
+            me->GetMap()->ToInstanceMap()->PermBindAllPlayers();
+        }
         else
         {
             if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_SARTHARION)))
