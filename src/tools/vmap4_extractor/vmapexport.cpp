@@ -23,11 +23,12 @@
 #include <sys/stat.h>
 #include <vector>
 
-#ifdef WIN32
+#if defined(WIN32) || defined(_WIN32)
 #include <Windows.h>
 #include <direct.h>
 #define mkdir _mkdir
 #endif
+
 
 #undef min
 #undef max
