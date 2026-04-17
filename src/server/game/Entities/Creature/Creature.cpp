@@ -713,6 +713,13 @@ void Creature::Update(uint32 diff)
             m_vehicleKit->Reset();
     }
 
+    if (_triggerVehicleKitInit)
+    {
+        _triggerVehicleKitInit = false;
+        if (m_vehicleKit)
+            m_vehicleKit->Reset();
+    }
+
     switch (m_deathState)
     {
         case DeathState::JustRespawned:
@@ -1113,9 +1120,10 @@ bool Creature::AIM_Initialize(CreatureAI* ai)
     IsAIEnabled = true;
     i_AI->InitializeAI();
 
-    // Xinef: Initialize vehicle if it is not summoned!
-    if (GetVehicleKit() && m_spawnId)
-        GetVehicleKit()->Reset();
+    // Defer vehicle kit init to the next Creature::Update tick so accessories
+    // install after visibility sync.
+    if (GetVehicleKit())
+        _triggerVehicleKitInit = true;
     return true;
 }
 
