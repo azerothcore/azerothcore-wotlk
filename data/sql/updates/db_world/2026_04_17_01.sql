@@ -1,3 +1,4 @@
+-- DB update 2026_04_17_00 -> 2026_04_17_01
 -- Onslaught Knight (27206): Add On Evade -> Despawn
 -- Prevents ejected riders from piling up when warhorses respawn
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 27206) AND (`source_type` = 0) AND (`id` IN (2));
