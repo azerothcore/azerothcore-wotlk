@@ -15,9 +15,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ServerScript.h"
+#include "IoContext.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
+#include "ServerScript.h"
 
 void ScriptMgr::OnNetworkStart(Acore::Asio::IoContext& ioContext)
 {
