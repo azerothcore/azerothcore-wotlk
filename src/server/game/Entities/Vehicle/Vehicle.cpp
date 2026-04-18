@@ -88,11 +88,16 @@ void Vehicle::Install()
 
 void Vehicle::InstallAllAccessories(bool evading)
 {
-    // Clear stale control-vehicle auras only on first install; a re-Reset
-    // would otherwise eject the just-seated accessory and fire a spurious
-    // SMART_EVENT_PASSENGER_REMOVED on the vehicle's SAI.
+    // Clear stale control-vehicle auras only on the first non-evade reset;
+    // a re-Reset would otherwise eject a just-seated passenger and, for
+    // accessories, fire a spurious SMART_EVENT_PASSENGER_REMOVED.
     if (GetBase()->IsPlayer() || (!evading && !_accessoriesInstalled))
         RemoveAllPassengers();
+
+    // Mark the initial reset as done even if this vehicle has no accessory
+    // list, so subsequent Resets don't eject passengers on vehicles without
+    // accessories (e.g. WG demolisher/catapult).
+    _accessoriesInstalled = true;
 
     VehicleAccessoryList const* accessories = sObjectMgr->GetVehicleAccessoryList(this);
     if (!accessories)
@@ -101,8 +106,6 @@ void Vehicle::InstallAllAccessories(bool evading)
     for (VehicleAccessoryList::const_iterator itr = accessories->begin(); itr != accessories->end(); ++itr)
         if (!evading || itr->IsMinion)  // only install minions on evade mode
             InstallAccessory(itr->AccessoryEntry, itr->SeatId, itr->IsMinion, itr->SummonedType, itr->SummonTime);
-
-    _accessoriesInstalled = true;
 }
 
 void Vehicle::Uninstall()
