@@ -549,8 +549,6 @@ void npc_escortAI::GenerateWaypointArray(Movement::PointsArray* points)
     if (WaypointList.empty())
         return;
 
-    uint32 startingWaypointId = CurrentWP->id;
-
     // Flying unit, just fill array
     if (me->m_movementInfo.HasMovementFlag((MovementFlags)(MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_DISABLE_GRAVITY)))
     {
@@ -562,12 +560,13 @@ void npc_escortAI::GenerateWaypointArray(Movement::PointsArray* points)
     }
     else
     {
+        uint32 remainingWaypoints = std::distance(CurrentWP, WaypointList.end());
         for (float size = 1.0f; size; size *= 0.5f)
         {
             std::vector<G3D::Vector3> pVector;
             // xinef: first point in vector is unit real position
             pVector.push_back(G3D::Vector3(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-            uint32 length = (WaypointList.size() - startingWaypointId) * size;
+            uint32 length = remainingWaypoints * size;
 
             uint32 cnt = 0;
             for (std::list<Escort_Waypoint>::const_iterator itr = CurrentWP; itr != WaypointList.end() && cnt <= length; ++itr, ++cnt)
