@@ -29,7 +29,8 @@
 #include <algorithm>
 
 Vehicle::Vehicle(Unit* unit, VehicleEntry const* vehInfo, uint32 creatureEntry) :
-    _me(unit), _vehicleInfo(vehInfo), _usableSeatNum(0), _creatureEntry(creatureEntry), _status(STATUS_NONE)
+    _me(unit), _vehicleInfo(vehInfo), _usableSeatNum(0), _creatureEntry(creatureEntry), _status(STATUS_NONE),
+    _accessoriesInstalled(false)
 {
     for (uint32 i = 0; i < MAX_VEHICLE_SEATS; ++i)
     {
@@ -87,8 +88,11 @@ void Vehicle::Install()
 
 void Vehicle::InstallAllAccessories(bool evading)
 {
-    if (GetBase()->IsPlayer() || !evading)
-        RemoveAllPassengers();   // We might have aura's saved in the DB with now invalid casters - remove
+    // Clear stale control-vehicle auras only on first install; a re-Reset
+    // would otherwise eject the just-seated accessory and fire a spurious
+    // SMART_EVENT_PASSENGER_REMOVED on the vehicle's SAI.
+    if (GetBase()->IsPlayer() || (!evading && !_accessoriesInstalled))
+        RemoveAllPassengers();
 
     VehicleAccessoryList const* accessories = sObjectMgr->GetVehicleAccessoryList(this);
     if (!accessories)
@@ -97,6 +101,8 @@ void Vehicle::InstallAllAccessories(bool evading)
     for (VehicleAccessoryList::const_iterator itr = accessories->begin(); itr != accessories->end(); ++itr)
         if (!evading || itr->IsMinion)  // only install minions on evade mode
             InstallAccessory(itr->AccessoryEntry, itr->SeatId, itr->IsMinion, itr->SummonedType, itr->SummonTime);
+
+    _accessoriesInstalled = true;
 }
 
 void Vehicle::Uninstall()
@@ -111,6 +117,7 @@ void Vehicle::Uninstall()
     _status = STATUS_UNINSTALLING;
     LOG_DEBUG("vehicles", "Vehicle::Uninstall {}", _me->GetGUID().ToString());
     RemoveAllPassengers();
+    _accessoriesInstalled = false;
 
     if (_me && _me->IsCreature())
     {

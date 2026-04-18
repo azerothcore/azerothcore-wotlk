@@ -24,6 +24,7 @@
 #include "GridNotifiers.h"
 #include "ObjectMgr.h"
 #include "Transport.h"
+#include "Vehicle.h"
 
 template <class T>
 void GridObjectLoader::AddObjectHelper(Map* map, T* obj)
@@ -52,6 +53,10 @@ void GridObjectLoader::LoadCreatures(CellGuidSet const& guid_set, Map* map)
         }
 
         AddObjectHelper<Creature>(map, obj);
+
+        // Grid load bypasses Map::AddToMap, so seat accessories here.
+        if (Vehicle* vehicle = obj->GetVehicleKit())
+            vehicle->Reset();
 
         if (!obj->IsMoveInLineOfSightDisabled() && obj->GetDefaultMovementType() == IDLE_MOTION_TYPE && !obj->isNeedNotify(NOTIFY_VISIBILITY_CHANGED | NOTIFY_AI_RELOCATION))
         {
