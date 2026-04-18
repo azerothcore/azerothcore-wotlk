@@ -19,6 +19,7 @@
 #include "CellImpl.h"
 #include "Chat.h"
 #include "CommandScript.h"
+#include <fmt/ranges.h>
 #include "GameObject.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"

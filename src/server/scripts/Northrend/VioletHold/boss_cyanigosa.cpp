@@ -50,141 +50,95 @@ enum eEvents
     EVENT_UNROOT,
 };
 
-class boss_cyanigosa : public CreatureScript
+struct boss_cyanigosa : public BossAI
 {
-public:
-    boss_cyanigosa() : CreatureScript("boss_cyanigosa") { }
+    boss_cyanigosa(Creature* c) : BossAI(c, DATA_CYANIGOSA) { }
 
-    CreatureAI* GetAI(Creature* pCreature) const override
+    void JustEngagedWith(Unit* who) override
     {
-        return GetVioletHoldAI<boss_cyanigosaAI>(pCreature);
+        BossAI::JustEngagedWith(who);
+        Talk(SAY_AGGRO);
+        events.RescheduleEvent(EVENT_SPELL_ARCANE_VACUUM, 30s);
+        events.RescheduleEvent(EVENT_SPELL_BLIZZARD, 5s, 10s);
+        events.RescheduleEvent(EVENT_SPELL_TAIL_SWEEP, 15s, 20s);
+        events.RescheduleEvent(EVENT_SPELL_UNCONTROLLABLE_ENERGY, 5s, 8s);
+        if (IsHeroic())
+            events.RescheduleEvent(EVENT_SPELL_MANA_DESTRUCTION, 20s);
     }
 
-    struct boss_cyanigosaAI : public ScriptedAI
+    void SpellHitTarget(Unit* target, SpellInfo const* spell) override
     {
-        boss_cyanigosaAI(Creature* c) : ScriptedAI(c)
+        if (!target || !spell)
+            return;
+        if (spell->Id == SPELL_ARCANE_VACUUM)
+            target->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 10.0f, target->GetOrientation());
+    }
+
+    void ExecuteEvent(uint32 eventId) override
+    {
+        switch (eventId)
         {
-            pInstance = c->GetInstanceScript();
+            case EVENT_SPELL_ARCANE_VACUUM:
+                DoCastAOE(SPELL_ARCANE_VACUUM);
+                DoResetThreatList();
+                me->SetControlled(true, UNIT_STATE_ROOT);
+                me->setAttackTimer(BASE_ATTACK, 3000);
+                events.Repeat(30s);
+                events.ScheduleEvent(EVENT_UNROOT, 3s);
+                break;
+            case EVENT_UNROOT:
+                me->SetControlled(false, UNIT_STATE_ROOT);
+                break;
+            case EVENT_SPELL_BLIZZARD:
+                DoCastRandomTarget(SPELL_BLIZZARD, 0, 45.0f);
+                events.Repeat(15s);
+                break;
+            case EVENT_SPELL_MANA_DESTRUCTION:
+                DoCastRandomTarget(SPELL_MANA_DESTRUCTION, 0, 50.0f);
+                events.Repeat(20s);
+                break;
+            case EVENT_SPELL_TAIL_SWEEP:
+                DoCastVictim(SPELL_TAIL_SWEEP);
+                events.Repeat(15s, 20s);
+                break;
+            case EVENT_SPELL_UNCONTROLLABLE_ENERGY:
+                DoCastVictim(SPELL_UNCONTROLLABLE_ENERGY);
+                events.Repeat(20s, 25s);
+                break;
         }
+    }
 
-        InstanceScript* pInstance;
-        EventMap events;
-
-        void Reset() override
+    void JustDied(Unit* killer) override
+    {
+        Talk(SAY_DEATH);
+        BossAI::JustDied(killer);
+        float h = me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
+        if (h != INVALID_HEIGHT && me->GetPositionZ() - h > 3.0f)
         {
-            events.Reset();
+            me->UpdatePosition(me->GetPositionX(), me->GetPositionY(), h, me->GetOrientation(), true);
+            me->StopMovingOnCurrentPos();
+            me->DestroyForVisiblePlayers();
         }
+    }
 
-        void JustEngagedWith(Unit* /*who*/) override
-        {
-            DoZoneInCombat();
-            Talk(SAY_AGGRO);
-            events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_ARCANE_VACUUM, 30s);
-            events.RescheduleEvent(EVENT_SPELL_BLIZZARD, 5s, 10s);
-            events.RescheduleEvent(EVENT_SPELL_TAIL_SWEEP, 15s, 20s);
-            events.RescheduleEvent(EVENT_SPELL_UNCONTROLLABLE_ENERGY, 5s, 8s);
-            if (IsHeroic())
-                events.RescheduleEvent(EVENT_SPELL_MANA_DESTRUCTION, 20s);
-        }
+    void KilledUnit(Unit* victim) override
+    {
+        if (victim && victim->GetGUID() == me->GetGUID())
+            return;
+        Talk(SAY_SLAY);
+    }
 
-        void SpellHitTarget(Unit* target, SpellInfo const* spell) override
-        {
-            if (!target || !spell)
-                return;
-            switch (spell->Id)
-            {
-                case SPELL_ARCANE_VACUUM:
-                    target->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 10.0f, target->GetOrientation());
-                    break;
-            }
-        }
+    void MoveInLineOfSight(Unit* /*who*/) override {}
 
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case 0:
-                    break;
-                case EVENT_SPELL_ARCANE_VACUUM:
-                    me->CastSpell((Unit*)nullptr, SPELL_ARCANE_VACUUM, false);
-                    DoResetThreatList();
-                    me->SetControlled(true, UNIT_STATE_ROOT);
-                    me->setAttackTimer(BASE_ATTACK, 3000);
-                    events.Repeat(30s);
-                    events.ScheduleEvent(EVENT_UNROOT, 3s);
-                    break;
-                case EVENT_UNROOT:
-                    me->SetControlled(false, UNIT_STATE_ROOT);
-
-                    break;
-                case EVENT_SPELL_BLIZZARD:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 45.0f, true))
-                        me->CastSpell(target, SPELL_BLIZZARD, false);
-                    events.Repeat(15s);
-                    break;
-                case EVENT_SPELL_MANA_DESTRUCTION:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true))
-                        me->CastSpell(target, SPELL_MANA_DESTRUCTION, false);
-                    events.Repeat(20s);
-                    break;
-                case EVENT_SPELL_TAIL_SWEEP:
-                    me->CastSpell(me->GetVictim(), SPELL_TAIL_SWEEP, false);
-                    events.Repeat(15s, 20s);
-                    break;
-                case EVENT_SPELL_UNCONTROLLABLE_ENERGY:
-                    me->CastSpell(me->GetVictim(), SPELL_UNCONTROLLABLE_ENERGY, false);
-                    events.Repeat(20s, 25s);
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            Talk(SAY_DEATH);
-            if (pInstance)
-                pInstance->SetData(DATA_BOSS_DIED, 0);
-            float h = me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
-            if (h != INVALID_HEIGHT && me->GetPositionZ() - h > 3.0f)
-            {
-                me->UpdatePosition(me->GetPositionX(), me->GetPositionY(), h, me->GetOrientation(), true); // move to ground
-                me->StopMovingOnCurrentPos();
-                me->DestroyForVisiblePlayers();
-            }
-        }
-
-        void KilledUnit(Unit* victim) override
-        {
-            if (victim && victim->GetGUID() == me->GetGUID())
-                return;
-            Talk(SAY_SLAY);
-        }
-
-        void MoveInLineOfSight(Unit* /*who*/) override {}
-
-        void EnterEvadeMode(EvadeReason why) override
-        {
-            me->SetControlled(false, UNIT_STATE_ROOT);
-            ScriptedAI::EnterEvadeMode(why);
-            events.Reset();
-            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-            if (pInstance)
-                pInstance->SetData(DATA_FAILED, 1);
-        }
-    };
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        me->SetControlled(false, UNIT_STATE_ROOT);
+        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+        _EnterEvadeMode(why);
+    }
 };
 
 void AddSC_boss_cyanigosa()
 {
-    new boss_cyanigosa();
+    RegisterVioletHoldCreatureAI(boss_cyanigosa);
 }

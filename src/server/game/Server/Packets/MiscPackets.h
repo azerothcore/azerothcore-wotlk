@@ -218,13 +218,13 @@ namespace WorldPackets
 
             void Read() override;
 
-            uint8 SpamType = 0; // 0 - mail, 1 - chat
+            uint8 SpamType              = 0; // 0 - mail, 1 - chat
             ObjectGuid SpammerGuid;
-            uint32 Unk1 = 0;
-            uint32 Unk2 = 0;
-            uint32 Unk3 = 0;
-            uint32 Unk4 = 0;
-            std::string Description = "";
+            uint32 Unk1                 = 0;
+            uint32 MailIdOrMessageType  = 0;
+            uint32 ChannelId            = 0;
+            uint32 SecondsSinceMessage  = 0;
+            std::string Description     = "";
         };
 
         class ComplainResult final : public ServerPacket

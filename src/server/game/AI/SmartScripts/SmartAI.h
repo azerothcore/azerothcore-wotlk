@@ -85,6 +85,9 @@ public:
     // Called for reaction at enter to combat if not in combat yet (enemy can be nullptr)
     void JustEngagedWith(Unit* enemy) override;
 
+    // Called when creature exits combat (all combat refs gone)
+    void JustExitedCombat() override;
+
     // Called for reaction at stopping attack at no attackers or targets
     void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override;
 
