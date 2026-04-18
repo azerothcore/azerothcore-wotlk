@@ -19,9 +19,9 @@
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
 
-void ScriptMgr::OnNetworkStart()
+void ScriptMgr::OnNetworkStart(Acore::Asio::IoContext& ioContext)
 {
-    CALL_ENABLED_HOOKS(ServerScript, SERVERHOOK_ON_NETWORK_START, script->OnNetworkStart());
+    CALL_ENABLED_HOOKS(ServerScript, SERVERHOOK_ON_NETWORK_START, script->OnNetworkStart(ioContext));
 }
 
 void ScriptMgr::OnNetworkStop()

@@ -154,7 +154,7 @@ public: /* SpellScriptLoader */
     void CreateSpellScriptLoaders(uint32 spellId, std::vector<std::pair<SpellScriptLoader*, std::multimap<uint32, uint32>::iterator>>& scriptVector);
 
 public: /* ServerScript */
-    void OnNetworkStart();
+    void OnNetworkStart(Acore::Asio::IoContext& ioContext);
     void OnNetworkStop();
     void OnSocketOpen(std::shared_ptr<WorldSocket> const& socket);
     void OnSocketClose(std::shared_ptr<WorldSocket> const& socket);

@@ -40,7 +40,7 @@ protected:
 
 public:
     // Called when reactive socket I/O is started (WorldSocketMgr).
-    virtual void OnNetworkStart() { }
+    virtual void OnNetworkStart(Acore::Asio::IoContext& ioContext) { }
 
     // Called when reactive I/O is stopped.
     virtual void OnNetworkStop() { }
