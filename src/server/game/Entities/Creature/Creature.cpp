@@ -1113,9 +1113,6 @@ bool Creature::AIM_Initialize(CreatureAI* ai)
     IsAIEnabled = true;
     i_AI->InitializeAI();
 
-    // Xinef: Initialize vehicle if it is not summoned!
-    if (GetVehicleKit() && m_spawnId)
-        GetVehicleKit()->Reset();
     return true;
 }
 
@@ -2052,6 +2049,10 @@ void Creature::Respawn(bool force)
 
             if (getDeathState() == DeathState::Dead)
             {
+                // TempSummons (no m_spawnId) shouldn't be resurrected here; TempSummon::Update UnSummons them on the next tick once deathState is Dead.
+                if (!m_spawnId && !force)
+                    return;
+
                 if (m_spawnId)
                 {
                     GetMap()->RemoveCreatureRespawnTime(m_spawnId);
