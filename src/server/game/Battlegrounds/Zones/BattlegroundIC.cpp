@@ -770,6 +770,13 @@ void BattlegroundIC::HandleContestedNodes(ICNodePoint* nodePoint)
         uint8 catapultBase = (nodePoint->faction == TEAM_ALLIANCE ? BG_IC_NPC_CATAPULT_1_H : BG_IC_NPC_CATAPULT_1_A);
         removeUnusedVehicles(catapultBase, MAX_CATAPULTS_SPAWNS_PER_FACTION);
     }
+    else if (nodePoint->nodeType == NODE_TYPE_REFINERY || nodePoint->nodeType == NODE_TYPE_QUARRY)
+    {
+        // nodePoint->faction is the assaulting team (set before this call);
+        // remove the siege damage buff from the team that previously controlled the node.
+        uint32 auraSpellId = (nodePoint->nodeType == NODE_TYPE_REFINERY) ? SPELL_OIL_REFINERY : SPELL_QUARRY;
+        RemoveAuraOnTeam(auraSpellId, GetOtherTeamId(nodePoint->faction));
+    }
     else if (nodePoint->nodeType == NODE_TYPE_WORKSHOP)
     {
         DelObject(BG_IC_GO_SEAFORIUM_BOMBS_1);

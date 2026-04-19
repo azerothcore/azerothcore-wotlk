@@ -142,7 +142,7 @@ enum ConditionSourceType
     CONDITION_SOURCE_TYPE_SPELL                          = 17,
     CONDITION_SOURCE_TYPE_SPELL_CLICK_EVENT              = 18,
     CONDITION_SOURCE_TYPE_QUEST_AVAILABLE                = 19,
-    CONDITION_SOURCE_TYPE_UNUSED_20                      = 20, // placeholder
+    CONDITION_SOURCE_TYPE_GOSSIP_HELLO                   = 20,
     CONDITION_SOURCE_TYPE_VEHICLE_SPELL                  = 21,
     CONDITION_SOURCE_TYPE_SMART_EVENT                    = 22,
     CONDITION_SOURCE_TYPE_NPC_VENDOR                     = 23,
@@ -152,7 +152,7 @@ enum ConditionSourceType
     CONDITION_SOURCE_TYPE_GRAVEYARD                      = 27, // don't use on 3.3.5a
     CONDITION_SOURCE_TYPE_PLAYER_LOOT_TEMPLATE           = 28,
     CONDITION_SOURCE_TYPE_CREATURE_RESPAWN               = 29,
-    CONDITION_SOURCE_TYPE_CREATURE_VISIBILITY            = 30,
+    CONDITION_SOURCE_TYPE_OBJECT_VISIBILITY              = 30,
     CONDITION_SOURCE_TYPE_MAX                            = 31 // placeholder
 };
 
@@ -198,7 +198,7 @@ struct Condition
     ConditionSourceType     SourceType;        //SourceTypeOrReferenceId
     uint32                  SourceGroup;
     int32                   SourceEntry;
-    uint32                  SourceId;          // So far, only used in CONDITION_SOURCE_TYPE_SMART_EVENT
+    uint32                  SourceId;          // Used in CONDITION_SOURCE_TYPE_SMART_EVENT and CONDITION_SOURCE_TYPE_OBJECT_VISIBILITY
     uint32                  ElseGroup;
     ConditionTypes          ConditionType;     //ConditionTypeOrReference
     uint32                  ConditionValue1;
@@ -242,6 +242,7 @@ typedef std::map<ConditionSourceType, ConditionTypeContainer> ConditionContainer
 typedef std::map<uint32, ConditionTypeContainer> CreatureSpellConditionContainer;
 typedef std::map<uint32, ConditionTypeContainer> NpcVendorConditionContainer;
 typedef std::map<std::pair<int32, uint32 /*SAI source_type*/>, ConditionTypeContainer> SmartEventConditionContainer;
+typedef std::map<std::pair<uint32 /*SourceEntry*/, uint32 /*SourceGroup*/>, std::map<uint32 /*SourceId*/, ConditionList>> ObjectVisibilityConditionContainer;
 
 typedef std::map<uint32, ConditionList> ConditionReferenceContainer;//only used for references
 
@@ -269,6 +270,7 @@ public:
     ConditionList GetConditionsForSmartEvent(int32 entryOrGuid, uint32 eventId, uint32 sourceType);
     ConditionList GetConditionsForVehicleSpell(uint32 creatureId, uint32 spellId);
     ConditionList GetConditionsForNpcVendorEvent(uint32 creatureId, uint32 itemId);
+    ConditionList GetConditionsForObjectVisibility(const WorldObject* object) const;
 
 private:
     bool isSourceTypeValid(Condition* cond);
@@ -281,12 +283,13 @@ private:
     void Clean(); // free up resources
     std::list<Condition*> AllocatedMemoryStore; // some garbage collection :)
 
-    ConditionContainer                ConditionStore;
-    ConditionReferenceContainer       ConditionReferenceStore;
-    CreatureSpellConditionContainer   VehicleSpellConditionStore;
-    CreatureSpellConditionContainer   SpellClickEventConditionStore;
-    NpcVendorConditionContainer       NpcVendorConditionContainerStore;
-    SmartEventConditionContainer      SmartEventConditionStore;
+    ConditionContainer                 ConditionStore;
+    ConditionReferenceContainer        ConditionReferenceStore;
+    CreatureSpellConditionContainer    VehicleSpellConditionStore;
+    CreatureSpellConditionContainer    SpellClickEventConditionStore;
+    NpcVendorConditionContainer        NpcVendorConditionContainerStore;
+    SmartEventConditionContainer       SmartEventConditionStore;
+    ObjectVisibilityConditionContainer ObjectVisibilityConditionStore;
 };
 
 #define sConditionMgr ConditionMgr::instance()

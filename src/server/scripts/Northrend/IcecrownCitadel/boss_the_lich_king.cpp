@@ -653,6 +653,8 @@ public:
             _lastTalkTimeBuff = 0;
             _bFrostmournePhase = false;
             _bFordringMustFallYell = false;
+            me->SetRegeneratingHealth(true);
+            me->SetIsCombatDisallowed(false);
 
             _Reset();
             DoAction(ACTION_RESTORE_LIGHT);
@@ -792,12 +794,15 @@ public:
             if (_phase == PHASE_THREE && HealthBelowPct(10) && !me->HasUnitState(UNIT_STATE_CASTING))
             {
                 _phase = PHASE_OUTRO;
+                me->SetRegeneratingHealth(false);
+                me->SetIsCombatDisallowed(true);
                 EntryCheckPredicate pred(NPC_STRANGULATE_VEHICLE);
                 summons.DoAction(ACTION_TELEPORT_BACK, pred);
                 events.Reset();
                 summons.DespawnAll();
                 me->SetReactState(REACT_PASSIVE);
                 me->AttackStop();
+                me->CombatStop(true);
                 me->GetMap()->SetZoneMusic(AREA_THE_FROZEN_THRONE, MUSIC_FURY_OF_FROSTMOURNE);
                 me->InterruptNonMeleeSpells(true);
                 me->CastSpell((Unit*)nullptr, SPELL_FURY_OF_FROSTMOURNE, false);
@@ -1253,6 +1258,9 @@ public:
 
         void EnterEvadeMode(EvadeReason why) override
         {
+            if (_phase == PHASE_OUTRO || _phase == PHASE_FROSTMOURNE)
+                return;
+
             EntryCheckPredicate pred(NPC_STRANGULATE_VEHICLE);
             summons.DoAction(ACTION_TELEPORT_BACK, pred);
             instance->SetBossState(DATA_THE_LICH_KING, FAIL);
