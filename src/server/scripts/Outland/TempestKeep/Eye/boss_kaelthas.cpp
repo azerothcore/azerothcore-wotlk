@@ -229,9 +229,6 @@ struct boss_kaelthas : public BossAI
             {
                 advisor->Respawn(true);
                 advisor->StopMovingOnCurrentPos();
-                advisor->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                advisor->SetReactState(REACT_PASSIVE);
-                summons.Summon(advisor);
             }
         }
     }
@@ -550,7 +547,7 @@ struct boss_kaelthas : public BossAI
     void IntroduceNewAdvisor(KTYells talkIntroduction, KTActions kaelAction)
     {
         std::chrono::milliseconds attackStartTimer = 0ms;
-        EyeNPCs advisorNPCId = NPC_THALADRED;
+        uint32 dataIdx = DATA_THALADRED;
         scheduler.Schedule(2s, [this, talkIntroduction](TaskContext)
         {
             Talk(talkIntroduction);
@@ -560,26 +557,26 @@ struct boss_kaelthas : public BossAI
         {
             case ACTION_START_THALADRED:
                 attackStartTimer = 7s;
-                advisorNPCId = NPC_THALADRED;
+                dataIdx = DATA_THALADRED;
                 break;
             case ACTION_START_SANGUINAR:
                 attackStartTimer = 14500ms;
-                advisorNPCId = NPC_LORD_SANGUINAR;
+                dataIdx = DATA_LORD_SANGUINAR;
                 break;
             case ACTION_START_CAPERNIAN:
                 attackStartTimer = 9s;
-                advisorNPCId = NPC_CAPERNIAN;
+                dataIdx = DATA_CAPERNIAN;
                 break;
             case ACTION_START_TELONICUS:
                 attackStartTimer = 10400ms;
-                advisorNPCId = NPC_TELONICUS;
+                dataIdx = DATA_TELONICUS;
                 break;
             default:
                 break;
         }
-        scheduler.Schedule(attackStartTimer, [this, advisorNPCId](TaskContext)
+        scheduler.Schedule(attackStartTimer, [this, dataIdx](TaskContext)
         {
-            if (Creature* advisor = summons.GetCreatureWithEntry(advisorNPCId))
+            if (Creature* advisor = instance->GetCreature(dataIdx))
             {
                 advisor->SetReactState(REACT_AGGRESSIVE);
                 advisor->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
@@ -735,6 +732,13 @@ struct advisor_baseAI : public ScriptedAI
         _feigning = false;
         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         scheduler.CancelAll();
+    }
+
+    void JustRespawned() override
+    {
+        ScriptedAI::JustRespawned();
+        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+        me->SetReactState(REACT_PASSIVE);
     }
 
     void JustEngagedWith(Unit* /*who*/) override { ScheduleEvents(); }
