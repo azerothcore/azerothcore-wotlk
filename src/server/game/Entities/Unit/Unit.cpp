@@ -16105,13 +16105,19 @@ void Unit::StopAttackFaction(uint32 faction_id)
             ++itr;
     }
 
-    // End combat and threat references with creatures in this faction
-    std::vector<CombatReference*> refsToEnd;
+    // Collect GUIDs, not pointers: EndCombat can cascade through AI callbacks
+    // (formation MemberEvaded -> CombatStop) and free other refs in the list.
+    std::vector<ObjectGuid> guidsToEnd;
     for (auto const& pair : m_combatManager.GetPvECombatRefs())
         if (pair.second->GetOther(this)->GetFactionTemplateEntry()->faction == faction_id)
-            refsToEnd.push_back(pair.second);
-    for (CombatReference* ref : refsToEnd)
-        ref->EndCombat();
+            guidsToEnd.push_back(pair.first);
+    for (ObjectGuid const& guid : guidsToEnd)
+    {
+        auto const& refs = m_combatManager.GetPvECombatRefs();
+        auto it = refs.find(guid);
+        if (it != refs.end())
+            it->second->EndCombat();
+    }
 
     for (ControlSet::const_iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr)
         (*itr)->StopAttackFaction(faction_id);

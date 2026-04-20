@@ -189,6 +189,15 @@ void npc_escortAI::ReturnToLastPoint()
     me->GetMotionMaster()->MovePoint(POINT_LAST_POINT, x, y, z, FORCED_MOVEMENT_RUN);
 }
 
+void npc_escortAI::JustExitedCombat()
+{
+    // Evade synchronously so UpdateAI does not push a waypoint spline before
+    // SelectVictim's evade fallback fires; stacked motion intents twitch.
+    EngagementOver();
+    if (me->IsAlive() && me->IsInWorld() && !me->IsInEvadeMode())
+        EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
+}
+
 void npc_escortAI::EnterEvadeMode(EvadeReason /*why*/)
 {
     me->GetThreatMgr().ClearAllThreat();
