@@ -1,3 +1,4 @@
+-- DB update 2026_04_20_04 -> 2026_04_20_05
 
 -- Set equipment_id to 0
 UPDATE `creature` SET `equipment_id` = 0 WHERE (`id1` IN (29519, 29520, 29565, 29566, 29567));
