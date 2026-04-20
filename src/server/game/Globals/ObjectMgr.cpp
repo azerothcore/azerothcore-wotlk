@@ -2422,9 +2422,14 @@ void ObjectMgr::LoadCreatures()
             data.spawntimesecs = 14 * DAY;
 
         // Skip spawnMask check for transport maps
-        if (!_transportMaps.count(data.mapid) && data.spawnMask & ~spawnMasks[data.mapid])
-            LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: {}) that have wrong spawn mask {} including not supported difficulty modes for map (Id: {}).",
-                spawnId, data.spawnMask, data.mapid);
+        if (!_transportMaps.count(data.mapid))
+        {
+            if (data.spawnMask & ~spawnMasks[data.mapid])
+                LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: {}) that have wrong spawn mask {} including not supported difficulty modes for map (Id: {}).",
+                    spawnId, data.spawnMask, data.mapid);
+        }
+        else
+            data.spawnGroupId = 1; // force compatibility group for transport spawns
 
         bool ok = true;
         for (uint32 diff = 0; diff < MAX_DIFFICULTY - 1 && ok; ++diff)
@@ -2955,8 +2960,13 @@ void ObjectMgr::LoadGameobjects()
 
         data.spawnMask      = fields[14].Get<uint8>();
 
-        if (!_transportMaps.count(data.mapid) && data.spawnMask & ~spawnMasks[data.mapid])
-            LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) that has wrong spawn mask {} including not supported difficulty modes for map (Id: {}), skip", guid, data.id, data.spawnMask, data.mapid);
+        if (!_transportMaps.count(data.mapid))
+        {
+            if (data.spawnMask & ~spawnMasks[data.mapid])
+                LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) that has wrong spawn mask {} including not supported difficulty modes for map (Id: {}), skip", guid, data.id, data.spawnMask, data.mapid);
+        }
+        else
+            data.spawnGroupId = 1; // force compatibility group for transport spawns
 
         data.phaseMask      = fields[15].Get<uint32>();
         int16 gameEvent     = fields[16].Get<int16>();
@@ -8771,11 +8781,12 @@ void ObjectMgr::LoadSpawnGroups()
     uint32 oldMSTime = getMSTime();
 
     // Reset prior state for hot-reload support
+    // Preserve the forced legacy group for spawns on transport maps (set in LoadCreatures/LoadGameobjects).
     _spawnGroupMapStore.clear();
     for (auto& [id, data] : _creatureDataStore)
-        data.spawnGroupId = 0;
+        data.spawnGroupId = _transportMaps.count(data.mapid) ? 1 : 0;
     for (auto& [id, data] : _gameObjectDataStore)
-        data.spawnGroupId = 0;
+        data.spawnGroupId = _transportMaps.count(data.mapid) ? 1 : 0;
 
     //                                               0        1          2
     QueryResult result = WorldDatabase.Query("SELECT groupId, spawnType, spawnId FROM spawn_group");
