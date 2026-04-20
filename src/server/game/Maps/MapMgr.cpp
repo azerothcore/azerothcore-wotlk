@@ -26,6 +26,7 @@
 #include "Language.h"
 #include "Log.h"
 #include "MapInstanced.h"
+#include "MapPartitioned.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -33,6 +34,7 @@
 #include "ScriptMgr.h"
 #include "Transport.h"
 #include "World.h"
+#include "WorldConfig.h"
 #include "WorldPacket.h"
 
 MapMgr::MapMgr()
@@ -83,6 +85,8 @@ Map* MapMgr::CreateBaseMap(uint32 id)
 
             if (entry->Instanceable())
                 map = new MapInstanced(id);
+            else if (sWorld->getBoolConfig(CONFIG_MAP_PARTITIONING_ENABLED))
+                map = new MapPartitioned(id);
             else
                 map = new Map(id, 0, REGULAR_DIFFICULTY);
 

@@ -271,6 +271,8 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_INSTANCE_RESET_TIME_RELATIVE_TIMESTAMP, "Instance.ResetTimeRelativeTimestamp", 1135814400);
     SetConfigValue<uint32>(CONFIG_INSTANCE_UNLOAD_DELAY, "Instance.UnloadDelay", 1800000);
 
+    SetConfigValue<bool>(CONFIG_MAP_PARTITIONING_ENABLED, "MapPartitioning.Enabled", false);
+
     SetConfigValue<uint32>(CONFIG_MAX_PRIMARY_TRADE_SKILL, "MaxPrimaryTradeSkill", 2);
     SetConfigValue<uint32>(CONFIG_MIN_PETITION_SIGNS, "MinPetitionSigns", 9, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value <= 9; }, "<= 9");
 
