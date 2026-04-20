@@ -1,3 +1,4 @@
+-- DB update 2026_04_20_01 -> 2026_04_20_02
 UPDATE `quest_poi` SET `MapID` = 571, `WorldMapAreaId` = 491 WHERE `QuestID` = 11527;
 
 DELETE FROM `quest_poi_points` WHERE `QuestID` = 11527;
