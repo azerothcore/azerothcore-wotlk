@@ -745,6 +745,31 @@ void BattlegroundIC::HandleContestedNodes(ICNodePoint* nodePoint)
             (*itr)->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         }
     }
+    else if (nodePoint->nodeType == NODE_TYPE_DOCKS)
+    {
+        auto removeUnusedVehicles = [&](uint8 baseType, uint8 count)
+        {
+            for (uint8 i = 0; i < count; ++i)
+            {
+                uint8 type = baseType + i;
+                if (Creature* vehicle = GetBgMap()->GetCreature(BgCreatures[type]))
+                {
+                    if (Vehicle* veh = vehicle->GetVehicleKit())
+                        if (!veh->IsVehicleInUse())
+                        {
+                            respawnMap.erase(vehicle->GetGUID());
+                            DelCreature(type);
+                        }
+                }
+            }
+        };
+
+        uint8 glaiveBase = (nodePoint->faction == TEAM_ALLIANCE ? BG_IC_NPC_GLAIVE_THROWER_1_H : BG_IC_NPC_GLAIVE_THROWER_1_A);
+        removeUnusedVehicles(glaiveBase, MAX_GLAIVE_THROWERS_SPAWNS_PER_FACTION);
+
+        uint8 catapultBase = (nodePoint->faction == TEAM_ALLIANCE ? BG_IC_NPC_CATAPULT_1_H : BG_IC_NPC_CATAPULT_1_A);
+        removeUnusedVehicles(catapultBase, MAX_CATAPULTS_SPAWNS_PER_FACTION);
+    }
     else if (nodePoint->nodeType == NODE_TYPE_REFINERY || nodePoint->nodeType == NODE_TYPE_QUARRY)
     {
         // nodePoint->faction is the assaulting team (set before this call);
