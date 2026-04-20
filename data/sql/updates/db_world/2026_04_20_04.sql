@@ -1,3 +1,4 @@
+-- DB update 2026_04_20_03 -> 2026_04_20_04
 
 -- Remove useless rows & remove link from row 0.
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28406;
