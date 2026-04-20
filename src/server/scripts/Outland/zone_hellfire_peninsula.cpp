@@ -588,10 +588,8 @@ public:
                 {
                     for (Creature* whelp : creatureList)
                     {
-                        if (whelp->IsAlive() && !whelp->IsInCombat() && whelp->GetMotionMaster()->GetCurrentMovementGeneratorType() != HOME_MOTION_TYPE)
-                        {
+                        if (whelp && whelp->IsAlive() && !whelp->IsInCombat() && whelp->GetMotionMaster()->GetCurrentMovementGeneratorType() != HOME_MOTION_TYPE)
                             whelp->GetMotionMaster()->MovePoint(0, me->GetNearPosition(4.0f, whelp->GetOrientation()));
-                        }
                     }
                 }
             }
@@ -600,10 +598,8 @@ public:
                 {
                     for (Creature* whelp : creatureList)
                     {
-                        if (whelp->IsAlive() && !whelp->IsInCombat() && whelp->GetMotionMaster()->GetCurrentMovementGeneratorType() != HOME_MOTION_TYPE)
-                        {
+                        if (whelp && whelp->IsAlive() && !whelp->IsInCombat() && whelp->GetMotionMaster()->GetCurrentMovementGeneratorType() != HOME_MOTION_TYPE)
                             whelp->GetMotionMaster()->MoveTargetedHome();
-                        }
                     }
                 }
             }

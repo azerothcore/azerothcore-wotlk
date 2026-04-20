@@ -310,6 +310,7 @@ struct boss_sartharion : public BossAI
         usedBerserk(false),
         below11PctReached(false)
     {
+        callForHelpRange = 500.0f;
     }
 
     void Reset() override
@@ -404,14 +405,17 @@ struct boss_sartharion : public BossAI
             DoCastSelf(SPELL_WILL_OF_SARTHARION, true);
             instance->DoAction(ACTION_START_PATROL);
         }
-
-        me->CallForHelp(500.0f);
     }
 
     void JustDied(Unit* /*killer*/) override
     {
         _JustDied();
         Talk(SAY_SARTHARION_DEATH);
+
+        // Despawn remaining drakes
+        for (uint32 i : dragons)
+            if (Creature* boss = instance->GetCreature(i))
+                boss->DespawnOrUnsummon();
     }
 
     void SetData(uint32 type, uint32 data) override
@@ -568,6 +572,8 @@ struct boss_sartharion : public BossAI
 
         // Handle Sartharion combat abilities
         events.Update(diff);
+
+        scheduler.Update(diff);
 
         if (me->HasUnitState(UNIT_STATE_CASTING))
             return;
@@ -839,7 +845,10 @@ struct boss_sartharion_dragonAI : public BossAI
         }
 
         if (!isCalledBySartharion)
+        {
             ClearInstance();
+            me->GetMap()->ToInstanceMap()->PermBindAllPlayers();
+        }
         else
         {
             if (Creature* sartharion = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_SARTHARION)))
