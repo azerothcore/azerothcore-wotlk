@@ -39,8 +39,11 @@ struct go_shadowforge_brazier : public GameObjectAI
 {
     go_shadowforge_brazier(GameObject* go) : GameObjectAI(go) {}
 
-    bool GossipHello(Player* /*player*/, bool /*reportUse*/) override
+    bool GossipHello(Player* /*player*/, bool reportUse) override
     {
+        if (reportUse)
+            return false;
+
         if (InstanceScript* instance = me->GetInstanceScript())
         {
             GameObject* northBrazier = ObjectAccessor::GetGameObject(*me, instance->GetGuidData(DATA_SF_BRAZIER_N));
