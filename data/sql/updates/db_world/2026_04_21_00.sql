@@ -1,3 +1,4 @@
+-- DB update 2026_04_20_05 -> 2026_04_21_00
 
 -- Remove Kneel stand byte and aura from Unworthy Initiate
 UPDATE `creature_template_addon` SET `bytes1` = 0, `auras` = '' WHERE (`entry` IN (29519, 29520, 29565, 29566, 29567));
