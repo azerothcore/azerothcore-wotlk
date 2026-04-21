@@ -707,10 +707,15 @@ void Creature::Update(uint32 diff)
 {
     if (IsAIEnabled && TriggerJustRespawned && getDeathState() != DeathState::Dead)
     {
-        if (_respawnCompatibilityMode && m_vehicleKit)
-            m_vehicleKit->Reset();
         TriggerJustRespawned = false;
-        AI()->JustRespawned();
+
+        // Skip for temp summons: InitializeAI already reset them, and JustRespawned would clobber state set synchronously during SUMMON.
+        if (!IsSummon())
+        {
+            if (_respawnCompatibilityMode && m_vehicleKit)
+                m_vehicleKit->Reset();
+            AI()->JustRespawned();
+        }
     }
 
     switch (m_deathState)
