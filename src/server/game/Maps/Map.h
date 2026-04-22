@@ -60,6 +60,7 @@ struct ScriptAction;
 struct Position;
 class Battleground;
 class MapInstanced;
+class MapPartitioned;
 class InstanceMap;
 class BattlegroundMap;
 class Transport;
@@ -737,7 +738,20 @@ private:
     InstanceScript* instance_data;
     uint32 i_script_id;
 };
+class MapPartitioned : public Map
+{
+    public:
+        MapPartitioned(uint32 id, time_t expiry, uint32 instanceId, Map* parent = nullptr);
+        ~MapPartitioned() override;
 
+        bool AddToMap(WorldObject* obj) override;
+        void RemoveFromMap(WorldObject* obj) override;
+        void Update(uint32 diff) override;
+
+    private:
+        std::vector<Map*> _partitions;
+        Map* _parentMap;
+};
 class BattlegroundMap : public Map
 {
 public:
