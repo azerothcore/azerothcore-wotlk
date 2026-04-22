@@ -1,3 +1,4 @@
+-- DB update 2026_04_22_00 -> 2026_04_22_01
 DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` = 31242 AND `id` = 3;
 DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` = 31271 AND `id` = 2;
 DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` = 31277 AND `id` = 6;
