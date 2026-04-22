@@ -1,3 +1,4 @@
+-- DB update 2026_04_21_01 -> 2026_04_22_00
 
 -- Edit Row 1002 (from On Waypoint Ended to MovementInfo)
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = -101303) AND (`source_type` = 0) AND (`id` IN (1002));
