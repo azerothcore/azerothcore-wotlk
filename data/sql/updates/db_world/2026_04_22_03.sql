@@ -1,3 +1,4 @@
+-- DB update 2026_04_22_02 -> 2026_04_22_03
 --
 -- Removes 'Twilight Torment - Target players which has phase mask 1';
 -- This does not work as described in the comment, nor is it accurate.
