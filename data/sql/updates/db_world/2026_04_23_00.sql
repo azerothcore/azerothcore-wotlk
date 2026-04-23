@@ -1,3 +1,4 @@
+-- DB update 2026_04_22_03 -> 2026_04_23_00
 --
 -- Fix quest "The Deadliest Trap Ever Laid" (11097 Scryer / 11101 Aldor):
 -- the AC-specific SCRIPTED_SPAWN (state=0 on AI_INIT -> despawn self)
