@@ -358,6 +358,10 @@ bool CreatureAI::UpdateVictim()
         return false;
     }
 
+    // Charmed creatures: the charmer controls target selection, don't interfere
+    if (me->IsCharmed())
+        return me->GetVictim() != nullptr;
+
     if (!me->HasReactState(REACT_PASSIVE))
     {
         if (Unit* victim = me->SelectVictim())
