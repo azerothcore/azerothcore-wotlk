@@ -12,3 +12,6 @@ UPDATE `smart_scripts` SET `target_param1` = 65928, `target_param2` = 191587 WHE
 UPDATE `smart_scripts` SET `target_param1` = 65929, `target_param2` = 191588 WHERE (`entryorguid` IN (-128572)) AND (`source_type` = 0) AND (`id` IN (1, 2, 3));
 UPDATE `smart_scripts` SET `target_param1` = 65930, `target_param2` = 191589 WHERE (`entryorguid` IN (-128575)) AND (`source_type` = 0) AND (`id` IN (1, 2, 3));
 UPDATE `smart_scripts` SET `target_param1` = 65931, `target_param2` = 191590 WHERE (`entryorguid` IN (-128569)) AND (`source_type` = 0) AND (`id` IN (1, 2, 3));
+
+-- Delete creature_addon table from an Unworthy Initiate.
+DELETE FROM `creature_addon` WHERE (`guid` IN (128740));
