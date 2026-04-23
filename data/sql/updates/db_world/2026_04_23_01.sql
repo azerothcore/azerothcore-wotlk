@@ -1,3 +1,4 @@
+-- DB update 2026_04_23_00 -> 2026_04_23_01
 
 -- Update targets
 UPDATE `smart_scripts` SET `target_param1` = 65915, `target_param2` = 191577 WHERE (`entryorguid` IN (-128571)) AND (`source_type` = 0) AND (`id` IN (1, 2, 3));
