@@ -1895,7 +1895,10 @@ uint32 ObjectMgr::GetModelForShapeshift(ShapeshiftForm form, Player* player) con
     else
         customizationID = player->GetByteValue(PLAYER_BYTES, 0); // Use Skin Color
 
-    auto itr = _playerShapeshiftModel.find(std::make_tuple(form, player->getRace(), customizationID, player->getGender()));
+    // getGender() tracks the active display model; real gender lives in PLAYER_BYTES_3
+    uint8 gender = player->GetByteValue(PLAYER_BYTES_3, PLAYER_BYTES_3_OFFSET_GENDER);
+
+    auto itr = _playerShapeshiftModel.find(std::make_tuple(form, player->getRace(), customizationID, gender));
     if (itr != _playerShapeshiftModel.end())
         return itr->second; // Explicit combination
 
@@ -1903,7 +1906,7 @@ uint32 ObjectMgr::GetModelForShapeshift(ShapeshiftForm form, Player* player) con
     if (itr != _playerShapeshiftModel.end())
         return itr->second; // Combination applied to both genders
 
-    itr = _playerShapeshiftModel.find(std::make_tuple(form, player->getRace(), 255, player->getGender()));
+    itr = _playerShapeshiftModel.find(std::make_tuple(form, player->getRace(), 255, gender));
     if (itr != _playerShapeshiftModel.end())
         return itr->second; // Default gender-dependent model
 
