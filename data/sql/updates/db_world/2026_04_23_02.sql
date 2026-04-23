@@ -1,3 +1,4 @@
+-- DB update 2026_04_23_01 -> 2026_04_23_02
 
 -- Remove Mount from Creature Addon (it is setted using SAI).
 UPDATE `creature_addon` SET `mount` = 0 WHERE (`guid` IN (86873));
