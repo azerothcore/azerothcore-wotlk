@@ -26,6 +26,73 @@ constexpr double DEG_TO_RAD = PI / 180.0;
 // Helper: sin/cos in degrees
 inline double sind(double deg) { return std::sin(deg * DEG_TO_RAD); }
 
+// mktime() rejects pre-1970 dates on MSVC; these helpers normalize without it.
+static bool IsLeapYear(int year)
+{
+    return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
+}
+
+static int DaysInMonth(int year, int month)
+{
+    static int const table[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+    return (month == 2 && IsLeapYear(year)) ? 29 : table[month - 1];
+}
+
+static void NormalizeDate(std::tm& date)
+{
+    int year = date.tm_year + 1900;
+    int month = date.tm_mon + 1;
+    int day = date.tm_mday;
+
+    while (month > 12)
+    {
+        month -= 12;
+        ++year;
+    }
+    while (month < 1)
+    {
+        month += 12;
+        --year;
+    }
+    while (day > DaysInMonth(year, month))
+    {
+        day -= DaysInMonth(year, month);
+        ++month;
+        if (month > 12)
+        {
+            month = 1;
+            ++year;
+        }
+    }
+    while (day < 1)
+    {
+        --month;
+        if (month < 1)
+        {
+            month = 12;
+            --year;
+        }
+        day += DaysInMonth(year, month);
+    }
+
+    date.tm_year = year - 1900;
+    date.tm_mon = month - 1;
+    date.tm_mday = day;
+
+    // Zeller's congruence; remap 0=Sat to POSIX 0=Sun.
+    int zy = year;
+    int zm = month;
+    if (zm < 3)
+    {
+        zm += 12;
+        --zy;
+    }
+    int const K = zy % 100;
+    int const J = zy / 100;
+    int const h = (day + (13 * (zm + 1)) / 5 + K + K / 4 + J / 4 + 5 * J) % 7;
+    date.tm_wday = (h + 6) % 7;
+}
+
 // Static holiday rules configuration
 static const std::vector<HolidayRule> HolidayRules = {
     // Lunar Festival: Chinese New Year - 1 day (event starts day before CNY)
@@ -104,7 +171,7 @@ std::tm HolidayDateCalculator::CalculateEasterSunday(int year)
     result.tm_year = year - 1900;
     result.tm_mon = month - 1;
     result.tm_mday = day;
-    mktime(&result); // Normalize and fill in other fields
+    NormalizeDate(result);
 
     return result;
 }
@@ -116,7 +183,7 @@ std::tm HolidayDateCalculator::CalculateNthWeekday(int year, int month, Weekday 
     date.tm_year = year - 1900;
     date.tm_mon = month - 1;
     date.tm_mday = 1;
-    mktime(&date);
+    NormalizeDate(date);
 
     // Find first occurrence of the target weekday
     int const daysUntilWeekday = (static_cast<int>(weekday) - date.tm_wday + 7) % 7;
@@ -125,7 +192,7 @@ std::tm HolidayDateCalculator::CalculateNthWeekday(int year, int month, Weekday 
     // Move to nth occurrence
     date.tm_mday += (n - 1) * 7;
 
-    mktime(&date); // Normalize (handles month overflow)
+    NormalizeDate(date);
     return date;
 }
 
@@ -136,13 +203,13 @@ std::tm HolidayDateCalculator::CalculateWeekdayOnOrAfter(int year, int month, in
     date.tm_year = year - 1900;
     date.tm_mon = month - 1;
     date.tm_mday = day;
-    mktime(&date);
+    NormalizeDate(date);
 
     // Find days until the target weekday (0 if already on that day)
     int const daysUntilWeekday = (static_cast<int>(weekday) - date.tm_wday + 7) % 7;
     date.tm_mday += daysUntilWeekday;
 
-    mktime(&date); // Normalize
+    NormalizeDate(date);
     return date;
 }
 
@@ -288,7 +355,7 @@ std::tm HolidayDateCalculator::CalculateLunarNewYear(int year)
             result.tm_year = cnyYear - 1900;
             result.tm_mon = cnyMonth - 1;
             result.tm_mday = cnyDay;
-            mktime(&result);
+            NormalizeDate(result);
             return result;
         }
     }
@@ -298,7 +365,7 @@ std::tm HolidayDateCalculator::CalculateLunarNewYear(int year)
     fallback.tm_year = year - 1900;
     fallback.tm_mon = 0;  // January
     fallback.tm_mday = 25;
-    mktime(&fallback);
+    NormalizeDate(fallback);
     return fallback;
 }
 
@@ -354,7 +421,7 @@ std::tm HolidayDateCalculator::CalculateAutumnEquinox(int year)
     result.tm_year = eqYear - 1900;
     result.tm_mon = eqMonth - 1;
     result.tm_mday = eqDay;
-    mktime(&result);
+    NormalizeDate(result);
     return result;
 }
 
@@ -408,7 +475,7 @@ std::tm HolidayDateCalculator::CalculateWinterSolstice(int year)
     result.tm_year = solYear - 1900;
     result.tm_mon = solMonth - 1;
     result.tm_mday = solDay;
-    mktime(&result);
+    NormalizeDate(result);
     return result;
 }
 
@@ -423,7 +490,7 @@ std::tm HolidayDateCalculator::CalculateHolidayDate(const HolidayRule& rule, int
             result.tm_year = year - 1900;
             result.tm_mon = rule.month - 1;
             result.tm_mday = rule.day;
-            mktime(&result);
+            NormalizeDate(result);
             break;
         }
         case HolidayCalculationType::NTH_WEEKDAY:
@@ -432,7 +499,7 @@ std::tm HolidayDateCalculator::CalculateHolidayDate(const HolidayRule& rule, int
             if (rule.offset != 0)
             {
                 result.tm_mday += rule.offset;
-                mktime(&result); // Normalize
+                NormalizeDate(result);
             }
             break;
         }
@@ -440,7 +507,7 @@ std::tm HolidayDateCalculator::CalculateHolidayDate(const HolidayRule& rule, int
         {
             result = CalculateEasterSunday(year);
             result.tm_mday += rule.offset;
-            mktime(&result); // Normalize
+            NormalizeDate(result);
             break;
         }
         case HolidayCalculationType::LUNAR_NEW_YEAR:
@@ -449,7 +516,7 @@ std::tm HolidayDateCalculator::CalculateHolidayDate(const HolidayRule& rule, int
             if (rule.offset != 0)
             {
                 result.tm_mday += rule.offset;
-                mktime(&result); // Normalize
+                NormalizeDate(result);
             }
             break;
         }
@@ -459,7 +526,7 @@ std::tm HolidayDateCalculator::CalculateHolidayDate(const HolidayRule& rule, int
             if (rule.offset != 0)
             {
                 result.tm_mday += rule.offset;
-                mktime(&result); // Normalize
+                NormalizeDate(result);
             }
             break;
         }
@@ -469,7 +536,7 @@ std::tm HolidayDateCalculator::CalculateHolidayDate(const HolidayRule& rule, int
             if (rule.offset != 0)
             {
                 result.tm_mday += rule.offset;
-                mktime(&result); // Normalize
+                NormalizeDate(result);
             }
             break;
         }
@@ -479,7 +546,7 @@ std::tm HolidayDateCalculator::CalculateHolidayDate(const HolidayRule& rule, int
             if (rule.offset != 0)
             {
                 result.tm_mday += rule.offset;
-                mktime(&result); // Normalize
+                NormalizeDate(result);
             }
             break;
         }
@@ -571,7 +638,7 @@ std::vector<uint32_t> HolidayDateCalculator::GetDarkmoonFaireDates(int locationO
                 if (dayOffset != 0)
                 {
                     date.tm_mday += dayOffset;
-                    mktime(&date); // Normalize
+                    NormalizeDate(date);
                 }
                 dates.push_back(PackDate(date));
             }
