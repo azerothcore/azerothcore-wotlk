@@ -911,7 +911,7 @@ void SmartAI::AttackStart(Unit* who)
         return;
     }
 
-    if (who && me->Attack(who, me->IsWithinMeleeRange(who)))
+    if (who && me->Attack(who, mCanAutoAttack))
     {
         if (!me->HasUnitState(UNIT_STATE_NO_COMBAT_MOVEMENT))
         {
