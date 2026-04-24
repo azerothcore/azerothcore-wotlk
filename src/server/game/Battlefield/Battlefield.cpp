@@ -187,6 +187,17 @@ bool Battlefield::Update(uint32 diff)
                 objectiveChanged = true;
     }
 
+    // Creatures spawned via SpawnCreature have m_spawnId == 0 and are not
+    // TempSummons, so the unforced Respawn() call from Creature::Update is
+    // skipped by the no-spawnId guard added in #25499. Force the respawn
+    // here once the timer elapses.
+    time_t now = GameTime::GetGameTime().count();
+    for (ObjectGuid const& guid : SpawnedCreatures)
+        if (Creature* creature = GetCreature(guid))
+            if (creature->isDead() && creature->GetRespawnTime()
+                && creature->GetRespawnTime() <= now)
+                creature->Respawn(true);
+
     return objectiveChanged;
 }
 
@@ -777,6 +788,8 @@ Creature* Battlefield::SpawnCreature(uint32 entry, float x, float y, float z, fl
 
     map->AddToMap(creature);
     creature->setActive(true);
+
+    SpawnedCreatures.insert(creature->GetGUID());
 
     return creature;
 }

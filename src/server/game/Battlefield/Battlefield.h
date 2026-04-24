@@ -421,6 +421,8 @@ protected:
 
     GuidUnorderedSet Groups[PVP_TEAMS_COUNT];               // Contains different raid groups
 
+    GuidUnorderedSet SpawnedCreatures;                      // Creatures spawned via SpawnCreature (no spawnId, not TempSummon)
+
     std::vector<uint64> Data64;
     std::vector<uint32> Data32;
 
