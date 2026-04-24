@@ -1,6 +1,6 @@
 --
 -- Sartharion 25M drops 2x T7.5 Gloves
-SET @REF := 34370
+SET @REF := 34377
 DELETE FROM `creature_loot_template` WHERE (`Entry` = 31311) AND (`Item` IN (5, 40628, 40629, 40630));
 INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
 (31311, 5, -@REF, 100, 0, 1, 0, 2, 2, 'Sartharion (1) - (ReferenceTable)');
