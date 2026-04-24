@@ -1435,8 +1435,11 @@ bool Player::TakeQuestSourceItem(uint32 questId, bool msg)
 
 uint32 Player::CalculateQuestRewardXP(Quest const* quest)
 {
+    uint8 level = GetLevel();
+    sScriptMgr->OnPlayerBeforeGetLevelForXPGain(this, level);
+
     // apply world quest rate
-    uint32 xp = uint32(quest->XPValue(GetLevel()) * GetQuestRate(quest->IsDFQuest()));
+    uint32 xp = uint32(quest->XPValue(level) * GetQuestRate(quest->IsDFQuest()));
 
     // handle SPELL_AURA_MOD_XP_QUEST_PCT auras
     xp *= GetTotalAuraMultiplier(SPELL_AURA_MOD_XP_QUEST_PCT);
