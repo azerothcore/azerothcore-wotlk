@@ -129,6 +129,13 @@ struct boss_bjarngrim : public npc_escortAI
         AddWaypoint(7, 1262.0f, -26.9f, 33.5f, 0);
     }
 
+    void JustRespawned() override
+    {
+        npc_escortAI::JustRespawned();
+        me->SetWalk(true);
+        Start(true, ObjectGuid::Empty, nullptr, false, true);
+    }
+
     void Reset() override
     {
         events.Reset();
