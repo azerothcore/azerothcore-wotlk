@@ -1130,6 +1130,13 @@ void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
     ChatHandler chH = ChatHandler(this);
     m_playerLoading = true;
 
+    // Exit vehicle on reconnect - the client has fully reset so
+    // the player can no longer control the vehicle. Without this
+    // the player is stuck: server-side still seated, but the
+    // client has no vehicle UI or movement control.
+    if (pCurrChar->GetVehicle())
+        pCurrChar->ExitVehicle();
+
     pCurrChar->SendDungeonDifficulty(false);
 
     WorldPacket data(SMSG_LOGIN_VERIFY_WORLD, 20);

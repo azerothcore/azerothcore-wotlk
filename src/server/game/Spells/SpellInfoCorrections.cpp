@@ -5184,6 +5184,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->InterruptFlags &= ~SPELL_INTERRUPT_FLAG_INTERRUPT;
     });
 
+    // Twilight Torment
+    ApplySpellFix({ 57935, 58835 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->ProcCharges = 0;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
