@@ -7,6 +7,6 @@ INSERT INTO `creature_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `Q
 
 DELETE FROM `reference_loot_template` WHERE (`Entry` = 34349) AND (`Item` IN (40752, 40628, 40629, 40630));
 INSERT INTO `reference_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
-(@REF, 40628, 0, 100, 0, 1, 0, 1, 1, 'T7.5 Gloves Token'),
-(@REF, 40629, 0, 100, 0, 1, 0, 1, 1, 'T7.5 Gloves Token'),
-(@REF, 40630, 0, 100, 0, 1, 0, 1, 1, 'T7.5 Gloves Token');
+(@REF, 40628, 0, 0, 0, 1, 1, 1, 1, 'T7.5 Gloves Token'),
+(@REF, 40629, 0, 0, 0, 1, 1, 1, 1, 'T7.5 Gloves Token'),
+(@REF, 40630, 0, 0, 0, 1, 1, 1, 1, 'T7.5 Gloves Token');
