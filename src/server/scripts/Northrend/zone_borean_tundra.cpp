@@ -23,6 +23,7 @@
 #include "ScriptedEscortAI.h"
 #include "ScriptedFollowerAI.h"
 #include "ScriptedGossip.h"
+#include "SmartAI.h"
 #include "SpellAuras.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
@@ -55,6 +56,8 @@ class spell_q11919_q11940_drake_hunt_aura : public AuraScript
 
         Creature* owner = GetOwner()->ToCreature();
         owner->RemoveAllAurasExceptType(SPELL_AURA_DUMMY);
+        if (SmartAI* ai = CAST_AI(SmartAI, owner->AI()))
+            ai->SetEvadeDisabled(true);
         owner->CombatStop(true);
         owner->GetThreatMgr().ClearAllThreat();
         owner->GetMotionMaster()->Clear(false);
