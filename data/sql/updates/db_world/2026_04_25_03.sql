@@ -1,3 +1,4 @@
+-- DB update 2026_04_25_02 -> 2026_04_25_03
 --
 -- Remove AoE spell cast to entry, that may sometimes not be in range.
 DELETE FROM `waypoint_scripts` WHERE `id` IN (488, 489, 490) AND `guid` IN (891, 892, 893);
