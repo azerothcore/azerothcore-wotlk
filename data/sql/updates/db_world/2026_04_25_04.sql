@@ -1,3 +1,4 @@
+-- DB update 2026_04_25_03 -> 2026_04_25_04
 
 -- Update General SAI.
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28511;
