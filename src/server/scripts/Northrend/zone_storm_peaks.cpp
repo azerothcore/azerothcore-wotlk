@@ -561,7 +561,10 @@ struct npc_hyldsmeet_protodrake : public CreatureAI
         //! We need to manually reinstall accessories because the vehicle itself is friendly to players,
         //! so EnterEvadeMode is never triggered. The accessory on the other hand is hostile and killable.
         Vehicle* vehicleKit = me->GetVehicleKit();
-        if (_accessoryRespawnTimer && _accessoryRespawnTimer <= diff && vehicleKit)
+        if (!vehicleKit || !_accessoryRespawnTimer)
+            return;
+
+        if (_accessoryRespawnTimer <= diff)
         {
             vehicleKit->InstallAllAccessories(true);
             _accessoryRespawnTimer = 0;
