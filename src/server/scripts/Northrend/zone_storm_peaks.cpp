@@ -561,8 +561,8 @@ struct npc_hyldsmeet_protodrake : public CreatureAI
 
     void UpdateAI(uint32 diff) override
     {
-        // //! We need to manually reinstall accessories because the vehicle itself is friendly to players,
-        // //! so EnterEvadeMode is never triggered. The accessory on the other hand is hostile and killable.
+        // We need to manually reinstall accessories because the vehicle itself is friendly to players,
+        // so EnterEvadeMode is never triggered. The accessory on the other hand is hostile and killable.
         if (_accessoryInstalled)
             return;
 
