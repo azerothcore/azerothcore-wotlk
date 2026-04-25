@@ -1,3 +1,4 @@
+-- DB update 2026_04_25_01 -> 2026_04_25_02
 -- Update Apothecary Ravien SmartAI
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 23782;
 
