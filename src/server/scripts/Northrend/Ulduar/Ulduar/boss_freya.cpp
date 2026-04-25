@@ -48,6 +48,11 @@ enum FreyaSpells
     SPELL_UNSTABLE_SUN_FREYA_DAMAGE             = 62451,
     SPELL_UNSTABLE_SUN_VISUAL                   = 62216,
 
+    // CHANNEL STALKER VISUALS
+    SPELL_FREYA_DUMMY_GREEN                      = 63295,
+    SPELL_FREYA_DUMMY_YELLOW                     = 63292,
+    SPELL_FREYA_DUMMY_BLUE                       = 63294,
+
     // ELDERS
     SPELL_DRAINED_OF_POWER                      = 62467,
     SPELL_STONEBARK_ESSENCE                     = 62483,
@@ -164,6 +169,7 @@ enum Texts
 enum FreyaNPCs
 {
     NPC_NATURE_BOMB                             = 34129,
+    NPC_CHANNEL_STALKER_FREYA                   = 33575,
     NPC_IRON_ROOT_TRIGGER                       = 33088,
     NPC_FREYA_UNSTABLE_SUN_BEAM                 = 33170,
     NPC_UNSTABLE_SUN_BRIGHTLEAF                 = 33050, // 10 SECS?
@@ -196,6 +202,10 @@ enum Misc
     DATA_BACK_TO_NATURE                         = 2,
 
     CRITERIA_LUMBERJACKED                       = 21686,
+
+    WAYPOINT_GREEN                              = 4, // path: 1365540
+    WAYPOINT_YELLOW                             = 10,
+    WAYPOINT_BLUE                               = 18,
 };
 
 struct boss_freya : public BossAI
@@ -590,6 +600,31 @@ struct boss_freya : public BossAI
     bool CheckEvadeIfOutOfCombatArea() const override
     {
         return me->GetPositionX() < 2135.0f;
+    }
+
+    void MovementInform(uint32 type, uint32 pointId) override
+    {
+        if (type != WAYPOINT_MOTION_TYPE)
+            return;
+
+        Unit* target = GetClosestCreatureWithEntry(me, NPC_CHANNEL_STALKER_FREYA, 30.0f);
+        if (!target)
+            return;
+
+        switch (pointId)
+        {
+            case WAYPOINT_GREEN:
+                DoCast(target, SPELL_FREYA_DUMMY_GREEN);
+                break;
+            case WAYPOINT_YELLOW:
+                DoCast(target, SPELL_FREYA_DUMMY_YELLOW);
+                break;
+            case WAYPOINT_BLUE:
+                DoCast(target, SPELL_FREYA_DUMMY_BLUE);
+                break;
+            default:
+                break;
+        }
     }
 };
 
