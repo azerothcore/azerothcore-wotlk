@@ -82,11 +82,6 @@ struct boss_attumen : public BossAI
         Initialize();
     }
 
-    bool CanMeleeHit()
-    {
-        return me->GetVictim() && (me->GetVictim()->GetPositionZ() < 53.0f || me->GetVictim()->GetDistance(me->GetHomePosition()) < 50.0f);
-    }
-
     void EnterEvadeMode(EvadeReason why) override
     {
         if (Creature* midnight = instance->GetCreature(DATA_MIDNIGHT))
@@ -215,18 +210,10 @@ struct boss_attumen : public BossAI
 
     void UpdateAI(uint32 diff) override
     {
-        if (_phase != PHASE_NONE)
-        {
-            if (!UpdateVictim())
-            {
-                return;
-            }
-        }
-        if (!CanMeleeHit())
-        {
-            BossAI::EnterEvadeMode(EvadeReason::EVADE_REASON_BOUNDARY);
-        }
-        scheduler.Update(diff, std::bind(&BossAI::DoMeleeAttackIfReady, this));
+        if (_phase != PHASE_NONE && !UpdateVictim())
+            return;
+
+        scheduler.Update(diff, [this] { DoMeleeAttackIfReady(); });
     }
 
     void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
