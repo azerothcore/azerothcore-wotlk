@@ -1,11 +1,11 @@
 
--- Wipe creature_template_movement
+-- Wipe creature_template_movement.
 DELETE FROM `creature_template_movement` WHERE (`CreatureId` = 28511);
 
--- Delete old waypoint
+-- Delete old waypoint.
 DELETE FROM `waypoint_data` WHERE (id IN (2851100));
 
--- Add new waypoint
+-- Add new waypoint.
 DELETE FROM `waypoints` WHERE `entry` IN (2851100);
 INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `point_comment`) VALUES
 (2851100, 1, 2341.57, -5672.8, 538.394, NULL, 'Eye of Acherus Flight'),
