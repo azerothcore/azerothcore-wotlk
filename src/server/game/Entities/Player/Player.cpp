@@ -625,8 +625,29 @@ bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo
     for (PlayerCreateInfoActions::const_iterator action_itr = info->action.begin(); action_itr != info->action.end(); ++action_itr)
         addActionButton(action_itr->button, action_itr->action, action_itr->type);
 
-    // original items
-    if (CharStartOutfitEntry const* oEntry = GetCharStartOutfitEntry(createInfo->Race, createInfo->Class, createInfo->Gender))
+    // Death Knights prefer warrior CharStartOutfit + 2H swap. Some races cannot be warrior
+    // in 3.3.5 (e.g. Blood Elf), so no (race, WARRIOR) row exists in CharStartOutfit — fall
+    // back to another class for that race before default DK outfit.
+    uint8 outfitClass = createInfo->Class;
+    if (createInfo->Class == CLASS_DEATH_KNIGHT)
+    {
+        static uint8 const dk_outfit_class_fallback[] =
+        {
+            CLASS_WARRIOR, CLASS_PALADIN, CLASS_HUNTER, CLASS_ROGUE, CLASS_DEATH_KNIGHT
+        };
+        for (uint8 tryClass : dk_outfit_class_fallback)
+        {
+            if (GetCharStartOutfitEntry(createInfo->Race, tryClass, createInfo->Gender))
+            {
+                outfitClass = tryClass;
+                break;
+            }
+        }
+    }
+
+    constexpr uint32 item_dk_start_two_handed_sword = 2754; // Tarnished Bastard Sword (req 1)
+
+    if (CharStartOutfitEntry const* oEntry = GetCharStartOutfitEntry(createInfo->Race, outfitClass, createInfo->Gender))
     {
         for (int j = 0; j < MAX_OUTFIT_ITEMS; ++j)
         {
@@ -634,6 +655,14 @@ bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo
                 continue;
 
             uint32 itemId = oEntry->ItemId[j];
+            if (createInfo->Class == CLASS_DEATH_KNIGHT)
+            {
+                ItemTemplate const* const testProto = sObjectMgr->GetItemTemplate(itemId);
+                if (testProto && testProto->Class == ITEM_CLASS_WEAPON &&
+                    (testProto->InventoryType == INVTYPE_WEAPONMAINHAND ||
+                     testProto->InventoryType == INVTYPE_WEAPON))
+                    itemId = item_dk_start_two_handed_sword;
+            }
 
             // just skip, reported in ObjectMgr::LoadItemTemplates
             ItemTemplate const* iProto = sObjectMgr->GetItemTemplate(itemId);

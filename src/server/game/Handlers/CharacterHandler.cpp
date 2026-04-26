@@ -363,14 +363,6 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
     }
 
     // speedup check for heroic class disabled case
-    uint32 heroic_free_slots = sWorld->getIntConfig(CONFIG_HEROIC_CHARACTERS_PER_REALM);
-    if (heroic_free_slots == 0 && AccountMgr::IsPlayerAccount(GetSecurity()) && createInfo->Class == CLASS_DEATH_KNIGHT)
-    {
-        SendCharCreate(CHAR_CREATE_UNIQUE_CLASS_LIMIT);
-        return;
-    }
-
-    // speedup check for heroic class disabled case
     uint32 req_level_for_heroic = sWorld->getIntConfig(CONFIG_CHARACTER_CREATING_MIN_LEVEL_FOR_HEROIC_CHARACTER);
     if (AccountMgr::IsPlayerAccount(GetSecurity()) && createInfo->Class == CLASS_DEATH_KNIGHT && req_level_for_heroic > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
     {
@@ -448,11 +440,12 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
             {
                 TeamId teamId = Player::TeamIdForRace(createInfo->Race);
                 uint32 freeDeathKnightSlots = sWorld->getIntConfig(CONFIG_HEROIC_CHARACTERS_PER_REALM);
+                bool const unlimitedDeathKnights = (freeDeathKnightSlots == 0);
 
                 Field* field = result->Fetch();
                 uint8 accRace = field[1].Get<uint8>();
 
-                if (checkDeathKnightReqs)
+                if (checkDeathKnightReqs && !unlimitedDeathKnights)
                 {
                     uint8 accClass = field[2].Get<uint8>();
                     if (accClass == CLASS_DEATH_KNIGHT)
@@ -466,13 +459,13 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
                             return;
                         }
                     }
+                }
 
-                    if (!hasHeroicReqLevel)
-                    {
-                        uint8 accLevel = field[0].Get<uint8>();
-                        if (accLevel >= heroicReqLevel)
-                            hasHeroicReqLevel = true;
-                    }
+                if (checkDeathKnightReqs && !hasHeroicReqLevel)
+                {
+                    uint8 accLevel = field[0].Get<uint8>();
+                    if (accLevel >= heroicReqLevel)
+                        hasHeroicReqLevel = true;
                 }
 
                 // need to check team only for first character
@@ -503,7 +496,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
                     if (!haveSameRace)
                         haveSameRace = createInfo->Race == accRace;
 
-                    if (checkDeathKnightReqs)
+                    if (checkDeathKnightReqs && !unlimitedDeathKnights)
                     {
                         uint8 acc_class = field[2].Get<uint8>();
                         if (acc_class == CLASS_DEATH_KNIGHT)
@@ -517,13 +510,13 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
                                 return;
                             }
                         }
+                    }
 
-                        if (!hasHeroicReqLevel)
-                        {
-                            uint8 acc_level = field[0].Get<uint8>();
-                            if (acc_level >= heroicReqLevel)
-                                hasHeroicReqLevel = true;
-                        }
+                    if (checkDeathKnightReqs && !hasHeroicReqLevel)
+                    {
+                        uint8 acc_level = field[0].Get<uint8>();
+                        if (acc_level >= heroicReqLevel)
+                            hasHeroicReqLevel = true;
                     }
                 }
             }

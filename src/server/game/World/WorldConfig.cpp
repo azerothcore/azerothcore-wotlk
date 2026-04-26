@@ -230,7 +230,7 @@ void WorldConfig::BuildConfigCache()
 
     // must be after CONFIG_CHARACTERS_PER_REALM
     SetConfigValue<uint32>(CONFIG_CHARACTERS_PER_ACCOUNT, "CharactersPerAccount", 50, ConfigValueCache::Reloadable::Yes, [this](uint32 const& value) { return value >= GetConfigValue<uint32>(CONFIG_CHARACTERS_PER_REALM); }, ">= CONFIG_CHARACTERS_PER_REALM");
-    SetConfigValue<uint32>(CONFIG_HEROIC_CHARACTERS_PER_REALM, "HeroicCharactersPerRealm", 1, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value <= 10; }, "<= 10");
+    SetConfigValue<uint32>(CONFIG_HEROIC_CHARACTERS_PER_REALM, "HeroicCharactersPerRealm", 1, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value <= 10; }, "0 = unlimited, else <= 10");
 
     SetConfigValue<uint32>(CONFIG_CHARACTER_CREATING_MIN_LEVEL_FOR_HEROIC_CHARACTER, "CharacterCreating.MinLevelForHeroicCharacter", 55);
 
