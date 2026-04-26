@@ -1,3 +1,4 @@
+-- DB update 2026_04_26_00 -> 2026_04_26_01
 --
 DELETE FROM `npc_vendor` WHERE (`entry` = 35642) AND (`item` IN (3775, 43231, 43233, 43235, 43237));
 INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`, `VerifiedBuild`) VALUES
