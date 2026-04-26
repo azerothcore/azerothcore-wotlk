@@ -5075,7 +5075,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         // Eye of Acherus Flight (Boost)
     ApplySpellFix({ 51923 }, [](SpellInfo* spellInfo)
         {
-            spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED;
             spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
         });
 
