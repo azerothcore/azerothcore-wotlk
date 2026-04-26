@@ -1,3 +1,4 @@
+-- DB update 2026_04_26_04 -> 2026_04_26_05
 -- Adds missing items to vendors, corrects rating requirements and arena point+honour costs.
 DELETE FROM `npc_vendor` WHERE (`entry` IN (33915, 33918, 33921, 34087, 34088, 34089));
 INSERT INTO `npc_vendor` (`entry`, `slot`, `item`, `maxcount`, `incrtime`, `ExtendedCost`, `VerifiedBuild`) VALUES
