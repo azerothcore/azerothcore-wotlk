@@ -2370,6 +2370,7 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate, bool isLFGReward)
     }
 
     uint8 level = GetLevel();
+    sScriptMgr->OnPlayerBeforeGetLevelForXPGain(this, level);
 
     // Favored experience increase START
     uint32 zone = GetZoneId();
@@ -5775,17 +5776,20 @@ void Player::CheckAreaExploreAndOutdoor()
 
         if (areaEntry->area_level > 0)
         {
-            if (GetLevel() >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
+            uint8 playerLevel = GetLevel();
+            sScriptMgr->OnPlayerBeforeGetLevelForXPGain(this, playerLevel);
+
+            if (playerLevel >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
             {
                 SendExplorationExperience(areaId, 0);
             }
             else
             {
-                int32 diff = int32(GetLevel()) - areaEntry->area_level;
+                int32 diff = int32(playerLevel) - areaEntry->area_level;
                 uint32 XP = 0;
                 if (diff < -5)
                 {
-                    XP = uint32(sObjectMgr->GetBaseXP(GetLevel() + 5) * sWorld->getRate(RATE_XP_EXPLORE));
+                    XP = uint32(sObjectMgr->GetBaseXP(playerLevel + 5) * sWorld->getRate(RATE_XP_EXPLORE));
                 }
                 else if (diff > 5)
                 {
@@ -12750,7 +12754,9 @@ void Player::RewardPlayerAndGroupAtEvent(uint32 creature_id, WorldObject* pRewar
     if (!pRewardSource)
         return;
 
-    ObjectGuid creature_guid = (pRewardSource->IsCreature()) ? pRewardSource->GetGUID() : ObjectGuid::Empty;
+    ObjectGuid creature_guid;
+    if (pRewardSource->IsCreature() && pRewardSource->GetEntry() == creature_id)
+        creature_guid = pRewardSource->GetGUID();
 
     // prepare data for near group iteration
     if (Group* group = GetGroup())
