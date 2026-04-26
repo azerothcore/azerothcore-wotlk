@@ -1,3 +1,4 @@
+-- DB update 2026_04_26_01 -> 2026_04_26_02
 
 -- Update Mogor SAI
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 18069;
