@@ -3,7 +3,7 @@
 DELETE FROM `creature_template_movement` WHERE (`CreatureId` = 28511);
 
 -- Delete old waypoint.
-DELETE FROM `waypoint_data` WHERE (id IN (2851100));
+DELETE FROM `waypoint_data` WHERE (`id` IN (2851100));
 
 -- Add new waypoint.
 DELETE FROM `waypoints` WHERE `entry` IN (2851100);
