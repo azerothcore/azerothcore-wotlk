@@ -30,12 +30,6 @@ DoorData const doorData[] =
     { 0,                        0,                          DOOR_TYPE_ROOM } // END
 };
 
-MinionData const minionData[] =
-{
-    { NPC_HELLFIRE_CHANNELER,   DATA_MAGTHERIDON },
-    { 0, 0 } // END
-};
-
 class instance_magtheridons_lair : public InstanceMapScript
 {
 public:
@@ -48,12 +42,12 @@ public:
             SetHeaders(DataHeader);
             SetBossNumber(MAX_ENCOUNTER);
             LoadDoorData(doorData);
-            LoadMinionData(minionData);
             LoadBossBoundaries(boundaries);
         }
 
         void Initialize() override
         {
+            _channelersSet.clear();
             _wardersSet.clear();
             _cubesSet.clear();
             _columnSet.clear();
@@ -67,20 +61,10 @@ public:
                     _magtheridonGUID = creature->GetGUID();
                     break;
                 case NPC_HELLFIRE_CHANNELER:
-                    AddMinion(creature);
+                    _channelersSet.insert(creature->GetGUID());
                     break;
                 case NPC_HELLFIRE_WARDER:
                     _wardersSet.insert(creature->GetGUID());
-                    break;
-            }
-        }
-
-        void OnCreatureRemove(Creature* creature) override
-        {
-            switch (creature->GetEntry())
-            {
-                case NPC_HELLFIRE_CHANNELER:
-                    RemoveMinion(creature);
                     break;
             }
         }
@@ -154,6 +138,30 @@ public:
 
                     if (state == NOT_STARTED)
                         SetData(DATA_COLLAPSE, GO_READY);
+
+                    // The Channeler formation uses RESPAWN_ON_EVADE, which only
+                    // fires when a *living* member evades. If the raid wipes
+                    // after every Channeler is already dead (phase 2/3 wipe, or
+                    // a wipe during the 3s window before Magtheridon is freed),
+                    // no member is alive to trigger the formation respawn, and
+                    // the encounter would be left unrecoverable. Respawn the
+                    // pack manually in that case.
+                    if (state == NOT_STARTED || state == FAIL)
+                    {
+                        bool anyChannelerAlive = false;
+                        for (ObjectGuid const& guid : _channelersSet)
+                            if (Creature* channeler = instance->GetCreature(guid))
+                                if (channeler->IsAlive())
+                                {
+                                    anyChannelerAlive = true;
+                                    break;
+                                }
+
+                        if (!anyChannelerAlive)
+                            for (ObjectGuid const& guid : _channelersSet)
+                                if (Creature* channeler = instance->GetCreature(guid))
+                                    channeler->Respawn(true);
+                    }
                 }
             }
             return true;
@@ -164,9 +172,46 @@ public:
             switch (type)
             {
                 case DATA_CHANNELER_COMBAT:
-                    if (GetBossState(DATA_MAGTHERIDON) != IN_PROGRESS)
+                    // data == 1: a Channeler entered combat
+                    // data == 0: a Channeler evaded (sent from SmartAI on evade)
+                    if (data == 1)
+                    {
+                        if (GetBossState(DATA_MAGTHERIDON) != IN_PROGRESS)
+                            if (Creature* magtheridon = instance->GetCreature(_magtheridonGUID))
+                                magtheridon->SetInCombatWithZone();
+                    }
+                    else
+                    {
+                        // The formation handles respawning dead Channelers
+                        // when a living one evades, but Magtheridon himself
+                        // is held in combat by SetInCombatWithZone and his
+                        // own EnterEvadeMode does not always fire — leaving
+                        // his _channelersKilled counter stale, which would
+                        // release him prematurely on the next pull. Once
+                        // every Channeler has finished evading (and Mag is
+                        // still in his pre-release passive state), force a
+                        // full encounter reset.
                         if (Creature* magtheridon = instance->GetCreature(_magtheridonGUID))
-                            magtheridon->SetInCombatWithZone();
+                        {
+                            if (!magtheridon->IsEngaged() && magtheridon->IsImmuneToPC())
+                            {
+                                bool anyChannelerStillFighting = false;
+                                for (ObjectGuid const& guid : _channelersSet)
+                                    if (Creature* channeler = instance->GetCreature(guid))
+                                        if (channeler->IsAlive() && channeler->IsInCombat())
+                                        {
+                                            anyChannelerStillFighting = true;
+                                            break;
+                                        }
+
+                                if (!anyChannelerStillFighting)
+                                {
+                                    SetBossState(DATA_MAGTHERIDON, NOT_STARTED);
+                                    magtheridon->AI()->Reset();
+                                }
+                            }
+                        }
+                    }
                     break;
                 case DATA_ACTIVATE_CUBES:
                     for (ObjectGuid const& guid : _cubesSet)
@@ -183,6 +228,7 @@ public:
 
     private:
         ObjectGuid _magtheridonGUID;
+        GuidSet _channelersSet;
         GuidSet _wardersSet;
         GuidSet _cubesSet;
         GuidSet _columnSet;

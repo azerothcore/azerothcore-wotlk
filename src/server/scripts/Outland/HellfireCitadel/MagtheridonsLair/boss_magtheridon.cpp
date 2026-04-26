@@ -222,10 +222,6 @@ struct boss_magtheridon : public BossAI
         BossAI::JustEngagedWith(who);
         Talk(SAY_EMOTE_BEGIN);
 
-        instance->DoForAllMinions(DATA_MAGTHERIDON, [&](Creature* creature) {
-            creature->SetInCombatWithZone();
-        });
-
         scheduler.Schedule(60s, GROUP_EARLY_RELEASE_CHECK, [this](TaskContext /*context*/)
         {
             Talk(SAY_EMOTE_NEARLY);
