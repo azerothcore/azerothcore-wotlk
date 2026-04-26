@@ -1,3 +1,4 @@
+-- DB update 2026_04_26_02 -> 2026_04_26_03
 
 -- Wipe creature_template_movement.
 DELETE FROM `creature_template_movement` WHERE (`CreatureId` = 28511);
