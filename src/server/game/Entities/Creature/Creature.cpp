@@ -284,7 +284,7 @@ Creature::Creature(): Unit(), MovableMapObject(), m_groupLootTimer(0), lootingGr
     m_CombatDistance = 0.0f;
 
     ResetLootMode(); // restore default loot mode
-    TriggerJustRespawned = false;
+    TriggerJustRespawned = true;
     _focusSpell = nullptr;
 
     m_respawnedTime = time_t(0);
@@ -420,34 +420,55 @@ void Creature::RemoveCorpse(bool setSpawnTime, bool skipVisibility)
     if (getDeathState() != DeathState::Corpse)
         return;
 
-    m_corpseRemoveTime = GameTime::GetGameTime().count();
-    setDeathState(DeathState::Dead);
-    RemoveAllAuras();
-    if (!skipVisibility) // pussywizard
-        DestroyForVisiblePlayers(); // pussywizard: previous UpdateObjectVisibility()
-    loot.clear();
-    uint32 respawnDelay = m_respawnDelay;
-    if (IsAIEnabled)
-        AI()->CorpseRemoved(respawnDelay);
-
-    // Should get removed later, just keep "compatibility" with scripts
-    if (setSpawnTime)
+    if (_respawnCompatibilityMode)
     {
-        m_respawnTime = GameTime::GetGameTime().count() + respawnDelay;
-        //SaveRespawnTime();
+        m_corpseRemoveTime = GameTime::GetGameTime().count();
+        setDeathState(DeathState::Dead);
+        RemoveAllAuras();
+        if (!skipVisibility) // pussywizard
+            DestroyForVisiblePlayers(); // pussywizard: previous UpdateObjectVisibility()
+        loot.clear();
+        uint32 respawnDelay = m_respawnDelay;
+        if (IsAIEnabled)
+            AI()->CorpseRemoved(respawnDelay);
+
+        // Should get removed later, just keep "compatibility" with scripts
+        if (setSpawnTime)
+        {
+            m_respawnTime = GameTime::GetGameTime().count() + respawnDelay;
+            //SaveRespawnTime();
+        }
+
+        float x, y, z, o;
+        GetRespawnPosition(x, y, z, &o);
+        SetHomePosition(x, y, z, o);
+        SetPosition(x, y, z, o);
+
+        // xinef: relocate notifier
+        m_last_notify_position.Relocate(-5000.0f, -5000.0f, -5000.0f, 0.0f);
+
+        // pussywizard: if corpse was removed during falling then the falling will continue after respawn, so stop falling is such case
+        if (IsFalling())
+            StopMoving();
     }
+    else
+    {
+        // Dynamic spawn mode: save respawn time and remove the object entirely.
+        // A fresh creature will be spawned by ProcessRespawns() when the timer expires.
+        loot.clear();
+        uint32 respawnDelay = m_respawnDelay;
+        if (IsAIEnabled)
+            AI()->CorpseRemoved(respawnDelay);
 
-    float x, y, z, o;
-    GetRespawnPosition(x, y, z, &o);
-    SetHomePosition(x, y, z, o);
-    SetPosition(x, y, z, o);
+        // Always save respawn time in non-compat mode since the creature is being
+        // destroyed — ProcessRespawns() needs the entry to know when to recreate it.
+        // m_respawnTime was already set in setDeathState(JustDied).
+        if (setSpawnTime)
+            m_respawnTime = std::max<time_t>(GameTime::GetGameTime().count() + respawnDelay, m_respawnTime);
+        SaveRespawnTime();
 
-    // xinef: relocate notifier
-    m_last_notify_position.Relocate(-5000.0f, -5000.0f, -5000.0f, 0.0f);
-
-    // pussywizard: if corpse was removed during falling then the falling will continue after respawn, so stop falling is such case
-    if (IsFalling())
-        StopMoving();
+        AddObjectToRemoveList();
+    }
 }
 
 /**
@@ -684,12 +705,17 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
 
 void Creature::Update(uint32 diff)
 {
-    if (IsAIEnabled && TriggerJustRespawned)
+    if (IsAIEnabled && TriggerJustRespawned && getDeathState() != DeathState::Dead)
     {
         TriggerJustRespawned = false;
-        AI()->JustRespawned();
-        if (m_vehicleKit)
-            m_vehicleKit->Reset();
+
+        // Skip for temp summons: InitializeAI already reset them, and JustRespawned would clobber state set synchronously during SUMMON.
+        if (!IsSummon())
+        {
+            if (_respawnCompatibilityMode && m_vehicleKit)
+                m_vehicleKit->Reset();
+            AI()->JustRespawned();
+        }
     }
 
     switch (m_deathState)
@@ -1092,9 +1118,6 @@ bool Creature::AIM_Initialize(CreatureAI* ai)
     IsAIEnabled = true;
     i_AI->InitializeAI();
 
-    // Xinef: Initialize vehicle if it is not summoned!
-    if (GetVehicleKit() && m_spawnId)
-        GetVehicleKit()->Reset();
     return true;
 }
 
@@ -1696,6 +1719,11 @@ bool Creature::LoadCreatureFromDB(ObjectGuid::LowType spawnId, Map* map, bool ad
     m_creatureData = data;
     m_spawnId = spawnId;
 
+    // Set respawn compatibility mode based on spawn group flags
+    SpawnGroupTemplateData const* groupData = sObjectMgr->GetSpawnGroupData(data->spawnGroupId);
+    _respawnCompatibilityMode = sWorld->getBoolConfig(CONFIG_RESPAWN_FORCE_COMPATIBILITY_MODE)
+        || !groupData || (groupData->flags & SPAWNGROUP_FLAG_COMPATIBILITY_MODE);
+
     // Add to world
     uint32 entry = GetRandomId(data->id1, data->id2, data->id3);
 
@@ -2020,74 +2048,90 @@ void Creature::Respawn(bool force)
 
     if (!linkedRespawntime || (cInfo && cInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_HARD_RESET)) || force)          // Should respawn
     {
-        RemoveCorpse(false, false);
-
-        if (getDeathState() == DeathState::Dead)
+        if (_respawnCompatibilityMode)
         {
+            RemoveCorpse(false, false);
+
+            if (getDeathState() == DeathState::Dead)
+            {
+                if (m_spawnId)
+                {
+                    GetMap()->RemoveCreatureRespawnTime(m_spawnId);
+                    CreatureData const* data = sObjectMgr->GetCreatureData(m_spawnId);
+                    // Respawn check if spawn has 2 entries
+                    if (data->id2)
+                    {
+                        uint32 entry = GetRandomId(data->id1, data->id2, data->id3);
+                        UpdateEntry(entry, data, true);  // Select Random Entry
+                        m_defaultMovementType = MovementGeneratorType(data->movementType);                    // Reload Movement Type
+                        LoadEquipment(data->equipmentId);                                                     // Reload Equipment
+                        AIM_Initialize();                                                                     // Reload AI
+                    }
+                    else
+                    {
+                        if (m_originalEntry != GetEntry())
+                            UpdateEntry(m_originalEntry);
+                    }
+                }
+
+                LOG_DEBUG("entities.unit", "Respawning creature {} (SpawnId: {}, {})", GetName(), GetSpawnId(), GetGUID().ToString());
+                m_respawnTime = 0;
+                ResetPickPocketLootTime();
+                loot.clear();
+                SelectLevel();
+
+                m_respawnedTime = GameTime::GetGameTime().count();
+                setDeathState(DeathState::JustRespawned);
+
+                // MDic - Acidmanifesto: Do not override transform auras
+                if (GetAuraEffectsByType(SPELL_AURA_TRANSFORM).empty())
+                {
+                    CreatureModel display(GetNativeDisplayId(), GetNativeObjectScale(), 1.0f);
+                    CreatureModelInfo const* minfo = sObjectMgr->GetCreatureModelRandomGender(&display, GetCreatureTemplate());
+                    if (minfo)                                             // Cancel load if no model defined
+                    {
+                        SetDisplayId(display.CreatureDisplayID, display.DisplayScale);
+                        SetNativeDisplayId(display.CreatureDisplayID);
+                    }
+                }
+
+                GetMotionMaster()->InitDefault();
+
+                //Call AI respawn virtual function
+                if (IsAIEnabled)
+                {
+                    //reset the AI to be sure no dirty or uninitialized values will be used till next tick
+                    AI()->Reset();
+                    TriggerJustRespawned = true;  //delay event to next tick so all creatures are created on the map before processing
+                }
+
+                uint32 poolid = m_spawnId ? sPoolMgr->IsPartOfAPool<Creature>(m_spawnId) : 0;
+                if (poolid)
+                    sPoolMgr->UpdatePool<Creature>(poolid, m_spawnId);
+
+                //Re-initialize reactstate that could be altered by movementgenerators
+                InitializeReactState();
+
+            }
+            m_respawnedTime = GameTime::GetGameTime().count();
+            // xinef: relocate notifier, fixes npc appearing in corpse position after forced respawn (instead of spawn)
+            m_last_notify_position.Relocate(-5000.0f, -5000.0f, -5000.0f, 0.0f);
+            UpdateObjectVisibility(false);
+        }
+        else
+        {
+            // Non-compat mode: destroy and let ProcessRespawns() recreate
+            if (IsAlive())
+                return;
+
             if (m_spawnId)
             {
-                GetMap()->RemoveCreatureRespawnTime(m_spawnId);
-                CreatureData const* data = sObjectMgr->GetCreatureData(m_spawnId);
-                // Respawn check if spawn has 2 entries
-                if (data->id2)
-                {
-                    uint32 entry = GetRandomId(data->id1, data->id2, data->id3);
-                    UpdateEntry(entry, data, true);  // Select Random Entry
-                    m_defaultMovementType = MovementGeneratorType(data->movementType);                    // Reload Movement Type
-                    LoadEquipment(data->equipmentId);                                                     // Reload Equipment
-                    AIM_Initialize();                                                                     // Reload AI
-                }
-                else
-                {
-                    if (m_originalEntry != GetEntry())
-                        UpdateEntry(m_originalEntry);
-                }
+                // Set respawn time to now so ProcessRespawns() picks it up
+                time_t now = GameTime::GetGameTime().count();
+                GetMap()->SaveCreatureRespawnTime(m_spawnId, now);
             }
-
-            LOG_DEBUG("entities.unit", "Respawning creature {} (SpawnId: {}, {})", GetName(), GetSpawnId(), GetGUID().ToString());
-            m_respawnTime = 0;
-            ResetPickPocketLootTime();
-            loot.clear();
-            SelectLevel();
-
-            m_respawnedTime = GameTime::GetGameTime().count();
-            setDeathState(DeathState::JustRespawned);
-
-            // MDic - Acidmanifesto: Do not override transform auras
-            if (GetAuraEffectsByType(SPELL_AURA_TRANSFORM).empty())
-            {
-                CreatureModel display(GetNativeDisplayId(), GetNativeObjectScale(), 1.0f);
-                CreatureModelInfo const* minfo = sObjectMgr->GetCreatureModelRandomGender(&display, GetCreatureTemplate());
-                if (minfo)                                             // Cancel load if no model defined
-                {
-                    SetDisplayId(display.CreatureDisplayID, display.DisplayScale);
-                    SetNativeDisplayId(display.CreatureDisplayID);
-                }
-            }
-
-            GetMotionMaster()->InitDefault();
-
-            //Call AI respawn virtual function
-            if (IsAIEnabled)
-            {
-                //reset the AI to be sure no dirty or uninitialized values will be used till next tick
-                AI()->Reset();
-                TriggerJustRespawned = true;  //delay event to next tick so all creatures are created on the map before processing
-            }
-
-            uint32 poolid = m_spawnId ? sPoolMgr->IsPartOfAPool<Creature>(m_spawnId) : 0;
-            if (poolid)
-                sPoolMgr->UpdatePool<Creature>(poolid, m_spawnId);
-
-            //Re-initialize reactstate that could be altered by movementgenerators
-            InitializeReactState();
-
+            AddObjectToRemoveList();
         }
-        m_respawnedTime = GameTime::GetGameTime().count();
-        // xinef: relocate notifier, fixes npc appearing in corpse position after forced respawn (instead of spawn)
-        m_last_notify_position.Relocate(-5000.0f, -5000.0f, -5000.0f, 0.0f);
-        UpdateObjectVisibility(false);
-
     }
     else   // the master is dead
     {
@@ -2114,13 +2158,27 @@ void Creature::ForcedDespawn(Milliseconds timeMSToDespawn, Seconds forceRespawnT
         return;
     }
 
+    // Override respawn delay BEFORE setDeathState, because setDeathState(JustDied)
+    // computes m_respawnTime = now + m_respawnDelay + m_corpseDelay and immediately
+    // saves it to DB for bosses/elites. We must have the correct delay in place
+    // before that happens.
+    if (forceRespawnTimer > 0s)
+        m_respawnDelay = forceRespawnTimer.count();
+
     if (IsAlive())
         setDeathState(DeathState::JustDied, true);
 
     // Xinef: Set new respawn time, ignore corpse decay time...
+    // After setDeathState, m_respawnTime includes m_corpseDelay which we don't
+    // want for a forced respawn. Override it so RemoveCorpse's max() picks ours.
+    if (forceRespawnTimer > 0s)
+        m_respawnTime = GameTime::GetGameTime().count() + forceRespawnTimer.count();
+
     RemoveCorpse(true);
 
-    if (forceRespawnTimer > 0s)
+    // In compat mode the creature stays in the world as a dead body and needs
+    // an event-based kick to call Respawn() after the timer expires.
+    if (forceRespawnTimer > 0s && _respawnCompatibilityMode)
         if (GetMap())
             GetMap()->ScheduleCreatureRespawn(GetGUID(), forceRespawnTimer);
 }
@@ -3033,6 +3091,21 @@ CreatureMovementData const& Creature::GetMovementTemplate() const
         return *movementOverride;
 
     return GetCreatureTemplate()->Movement;
+}
+
+void Creature::PauseMovementForInteraction()
+{
+    if (uint32 pause = GetMovementTemplate().GetInteractionPauseTimer())
+    {
+        uint8 pauseSlot = MOTION_SLOT_IDLE;
+
+        if (GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_ACTIVE) == POINT_MOTION_TYPE)
+            pauseSlot = MOTION_SLOT_ACTIVE;
+        else if (GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) == POINT_MOTION_TYPE)
+            pauseSlot = MOTION_SLOT_CONTROLLED;
+
+        PauseMovement(pause, pauseSlot);
+    }
 }
 
 void Creature::AllLootRemovedFromCorpse()

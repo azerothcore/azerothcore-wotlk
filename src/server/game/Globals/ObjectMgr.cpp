@@ -311,8 +311,9 @@ ObjectMgr::ObjectMgr():
         _playerClassInfo[i] = nullptr;
     }
 
-    // Initialize default spawn group
-    _spawnGroupDataStore[0] = {0, "Default Group", 0, SpawnGroupFlags(SPAWNGROUP_FLAG_SYSTEM)};
+    // Initialize default spawn groups
+    _spawnGroupDataStore[0] = {0, "Default Group", SPAWNGROUP_MAP_UNSET, SpawnGroupFlags(SPAWNGROUP_FLAG_SYSTEM)};
+    _spawnGroupDataStore[1] = {1, "Legacy Group", SPAWNGROUP_MAP_UNSET, SpawnGroupFlags(SPAWNGROUP_FLAG_SYSTEM | SPAWNGROUP_FLAG_COMPATIBILITY_MODE)};
 }
 
 ObjectMgr::~ObjectMgr()
@@ -2380,6 +2381,7 @@ void ObjectMgr::LoadCreatures()
             continue;
         }
         CreatureData& data      = _creatureDataStore[spawnId];
+        data.spawnId            = spawnId;
         data.id1                = id1;
         data.id2                = id2;
         data.id3                = id3;
@@ -2420,9 +2422,14 @@ void ObjectMgr::LoadCreatures()
             data.spawntimesecs = 14 * DAY;
 
         // Skip spawnMask check for transport maps
-        if (!_transportMaps.count(data.mapid) && data.spawnMask & ~spawnMasks[data.mapid])
-            LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: {}) that have wrong spawn mask {} including not supported difficulty modes for map (Id: {}).",
-                spawnId, data.spawnMask, data.mapid);
+        if (!_transportMaps.count(data.mapid))
+        {
+            if (data.spawnMask & ~spawnMasks[data.mapid])
+                LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: {}) that have wrong spawn mask {} including not supported difficulty modes for map (Id: {}).",
+                    spawnId, data.spawnMask, data.mapid);
+        }
+        else
+            data.spawnGroupId = 1; // force compatibility group for transport spawns
 
         bool ok = true;
         for (uint32 diff = 0; diff < MAX_DIFFICULTY - 1 && ok; ++diff)
@@ -2748,6 +2755,7 @@ ObjectGuid::LowType ObjectMgr::AddGOData(uint32 entry, uint32 mapId, float x, fl
     ObjectGuid::LowType spawnId = GenerateGameObjectSpawnId();
 
     GameObjectData& data = NewGOData(spawnId);
+    data.spawnId        = spawnId;
     data.id             = entry;
     data.mapid          = mapId;
     data.posX           = x;
@@ -2801,6 +2809,7 @@ ObjectGuid::LowType ObjectMgr::AddCreData(uint32 entry, uint32 mapId, float x, f
 
     ObjectGuid::LowType spawnId = GenerateCreatureSpawnId();
     CreatureData& data = NewOrExistCreatureData(spawnId);
+    data.spawnId = spawnId;
     data.spawnMask = spawnId;
     data.id1 = entry;
     data.id2 = 0;
@@ -2909,6 +2918,7 @@ void ObjectMgr::LoadGameobjects()
 
         GameObjectData& data = _gameObjectDataStore[guid];
 
+        data.spawnId        = guid;
         data.id             = entry;
         data.mapid          = fields[2].Get<uint16>();
         data.posX           = fields[3].Get<float>();
@@ -2950,8 +2960,13 @@ void ObjectMgr::LoadGameobjects()
 
         data.spawnMask      = fields[14].Get<uint8>();
 
-        if (!_transportMaps.count(data.mapid) && data.spawnMask & ~spawnMasks[data.mapid])
-            LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) that has wrong spawn mask {} including not supported difficulty modes for map (Id: {}), skip", guid, data.id, data.spawnMask, data.mapid);
+        if (!_transportMaps.count(data.mapid))
+        {
+            if (data.spawnMask & ~spawnMasks[data.mapid])
+                LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) that has wrong spawn mask {} including not supported difficulty modes for map (Id: {}), skip", guid, data.id, data.spawnMask, data.mapid);
+        }
+        else
+            data.spawnGroupId = 1; // force compatibility group for transport spawns
 
         data.phaseMask      = fields[15].Get<uint32>();
         int16 gameEvent     = fields[16].Get<int16>();
@@ -8701,6 +8716,173 @@ SpawnData const* ObjectMgr::GetSpawnData(SpawnObjectType type, ObjectGuid::LowTy
         default:
             return nullptr;
     }
+}
+
+void ObjectMgr::LoadSpawnGroupTemplates()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _spawnGroupDataStore.clear();
+
+    //                                               0        1          2
+    QueryResult result = WorldDatabase.Query("SELECT groupId, groupName, groupFlags FROM spawn_group_template");
+
+    if (result)
+    {
+        do
+        {
+            Field* fields = result->Fetch();
+            uint32 groupId = fields[0].Get<uint32>();
+            SpawnGroupTemplateData& group = _spawnGroupDataStore[groupId];
+            group.groupId = groupId;
+            group.name = fields[1].Get<std::string>();
+            group.mapId = SPAWNGROUP_MAP_UNSET;
+            uint32 flags = fields[2].Get<uint32>();
+            if (flags & ~uint32(SPAWNGROUP_FLAG_ALL))
+            {
+                flags &= uint32(SPAWNGROUP_FLAG_ALL);
+                LOG_ERROR("sql.sql", "Invalid spawn group flag {} on group ID {} ({}), reduced to valid flags {}.",
+                    fields[2].Get<uint32>(), groupId, group.name, flags);
+            }
+            if ((flags & SPAWNGROUP_FLAG_SYSTEM) && (flags & SPAWNGROUP_FLAG_MANUAL_SPAWN))
+            {
+                flags &= ~SPAWNGROUP_FLAG_MANUAL_SPAWN;
+                LOG_ERROR("sql.sql", "System spawn group {} ({}) has invalid manual spawn flag. Ignored.", groupId, group.name);
+            }
+            group.flags = SpawnGroupFlags(flags);
+        } while (result->NextRow());
+    }
+
+    if (_spawnGroupDataStore.find(0) == _spawnGroupDataStore.end())
+    {
+        LOG_ERROR("sql.sql", "Default spawn group (index 0) is missing from DB! Manually inserted.");
+        SpawnGroupTemplateData& data = _spawnGroupDataStore[0];
+        data.groupId = 0;
+        data.name = "Default Group";
+        data.mapId = SPAWNGROUP_MAP_UNSET;
+        data.flags = SpawnGroupFlags(SPAWNGROUP_FLAG_SYSTEM);
+    }
+    if (_spawnGroupDataStore.find(1) == _spawnGroupDataStore.end())
+    {
+        LOG_ERROR("sql.sql", "Default legacy spawn group (index 1) is missing from DB! Manually inserted.");
+        SpawnGroupTemplateData& data = _spawnGroupDataStore[1];
+        data.groupId = 1;
+        data.name = "Legacy Group";
+        data.mapId = SPAWNGROUP_MAP_UNSET;
+        data.flags = SpawnGroupFlags(SPAWNGROUP_FLAG_SYSTEM | SPAWNGROUP_FLAG_COMPATIBILITY_MODE);
+    }
+
+    LOG_INFO("server.loading", ">> Loaded {} spawn group templates in {} ms", _spawnGroupDataStore.size(), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
+}
+
+void ObjectMgr::LoadSpawnGroups()
+{
+    uint32 oldMSTime = getMSTime();
+
+    // Reset prior state for hot-reload support
+    // Preserve the forced legacy group for spawns on transport maps (set in LoadCreatures/LoadGameobjects).
+    _spawnGroupMapStore.clear();
+    for (auto& [id, data] : _creatureDataStore)
+        data.spawnGroupId = _transportMaps.count(data.mapid) ? 1 : 0;
+    for (auto& [id, data] : _gameObjectDataStore)
+        data.spawnGroupId = _transportMaps.count(data.mapid) ? 1 : 0;
+
+    //                                               0        1          2
+    QueryResult result = WorldDatabase.Query("SELECT groupId, spawnType, spawnId FROM spawn_group");
+
+    if (!result)
+    {
+        LOG_INFO("server.loading", ">> Loaded 0 spawn group members. DB table `spawn_group` is empty.");
+        LOG_INFO("server.loading", " ");
+        return;
+    }
+
+    uint32 numMembers = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+        uint32 groupId = fields[0].Get<uint32>();
+        uint32 type = fields[1].Get<uint8>();
+        if (type >= SPAWN_TYPE_MAX)
+        {
+            LOG_ERROR("sql.sql", "Spawn data with invalid type {} listed for spawn group {}. Skipped.", type, groupId);
+            continue;
+        }
+        SpawnObjectType spawnType = SpawnObjectType(type);
+        ObjectGuid::LowType spawnId = fields[2].Get<uint32>();
+
+        SpawnData const* data = GetSpawnData(spawnType, spawnId);
+        if (!data)
+        {
+            LOG_ERROR("sql.sql", "Spawn data with ID ({},{}) not found, but is listed as a member of spawn group {}!",
+                uint32(spawnType), spawnId, groupId);
+            continue;
+        }
+        if (data->spawnGroupId)
+        {
+            LOG_ERROR("sql.sql", "Spawn with ID ({},{}) is listed as a member of spawn group {}, but is already a member of spawn group {}. Skipping.",
+                uint32(spawnType), spawnId, groupId, data->spawnGroupId);
+            continue;
+        }
+
+        auto it = _spawnGroupDataStore.find(groupId);
+        if (it == _spawnGroupDataStore.end())
+        {
+            LOG_ERROR("sql.sql", "Spawn group {} assigned to spawn ID ({},{}), but group is not found!", groupId, uint32(spawnType), spawnId);
+            continue;
+        }
+
+        SpawnGroupTemplateData& groupTemplate = it->second;
+        if (groupTemplate.mapId == SPAWNGROUP_MAP_UNSET)
+            groupTemplate.mapId = data->mapid;
+        else if (groupTemplate.mapId != data->mapid && !(groupTemplate.flags & SPAWNGROUP_FLAG_SYSTEM))
+        {
+            LOG_ERROR("sql.sql", "Spawn group {} has map ID {}, but spawn ({},{}) has map id {} - spawn NOT added to group!",
+                groupId, groupTemplate.mapId, uint32(spawnType), spawnId, data->mapid);
+            continue;
+        }
+
+        // Warn if spawn is also in a pool (non-system groups and pools are mutually exclusive)
+        if (!(groupTemplate.flags & SPAWNGROUP_FLAG_SYSTEM))
+        {
+            uint32 poolId = 0;
+            if (spawnType == SPAWN_TYPE_CREATURE)
+                poolId = sPoolMgr->IsPartOfAPool<Creature>(spawnId);
+            else if (spawnType == SPAWN_TYPE_GAMEOBJECT)
+                poolId = sPoolMgr->IsPartOfAPool<GameObject>(spawnId);
+
+            if (poolId)
+                LOG_WARN("sql.sql", "Spawn ({},{}) is a member of spawn group {} and also part of pool {}. This may cause issues!",
+                    uint32(spawnType), spawnId, groupId, poolId);
+        }
+
+        const_cast<SpawnData*>(data)->spawnGroupId = groupId;
+        if (!(groupTemplate.flags & SPAWNGROUP_FLAG_SYSTEM))
+            _spawnGroupMapStore.emplace(groupId, data);
+        ++numMembers;
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} spawn group members in {} ms", numMembers, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
+}
+
+void ObjectMgr::OnDeleteSpawnData(SpawnData const* data)
+{
+    auto templateIt = _spawnGroupDataStore.find(data->spawnGroupId);
+    ASSERT(templateIt != _spawnGroupDataStore.end(), "Spawn data is being deleted and has invalid spawn group index {}!", data->spawnGroupId);
+    if (templateIt->second.flags & SPAWNGROUP_FLAG_SYSTEM)
+        return;
+
+    auto pair = _spawnGroupMapStore.equal_range(data->spawnGroupId);
+    for (auto it = pair.first; it != pair.second; ++it)
+    {
+        if (it->second != data)
+            continue;
+        _spawnGroupMapStore.erase(it);
+        return;
+    }
+    ASSERT(false, "Spawn data being removed is member of spawn group {}, but not found in lookup table!", data->spawnGroupId);
 }
 
 void ObjectMgr::LoadQuestRelationsHelper(QuestRelations& map, std::string const& table, bool starter, bool go)
