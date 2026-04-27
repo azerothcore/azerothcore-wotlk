@@ -1,0 +1,10 @@
+## Interface: 30300
+## Title: BlackroseHideCorpseRes
+## Notes: Suppresses default corpse resurrection StaticPopups for hardcore realms
+##        (RetrieveCorpse / AcceptResurrect at corpse). Copy to Interface\AddOns.
+## Author: BlackroseWoW
+## Version: 1
+## LoadOnDemand: 0
+## DefaultState: enabled
+
+BlackroseHideCorpseRes.lua

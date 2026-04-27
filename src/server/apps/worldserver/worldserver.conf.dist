@@ -2677,6 +2677,16 @@ Death.Bones.World               = 1
 Death.Bones.BattlegroundOrArena = 1
 
 #
+#    Death.AllowCorpseReclaim
+#        Description: When 0, server rejects CMSG_RECLAIM_CORPSE (no revive at corpse).
+#                     The 3.3.5 client may still show corpse resurrection UI; that is not
+#                     driven only by opcodes we can omit. Use a client addon to hide it.
+#        Default:     1 - (Enabled, Blizzlike)
+#                     0 - (Disabled, server-side only)
+
+Death.AllowCorpseReclaim = 1
+
+#
 ###################################################################################################
 
 ###################################################################################################

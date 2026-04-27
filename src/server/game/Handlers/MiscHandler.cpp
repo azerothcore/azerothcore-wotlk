@@ -647,6 +647,9 @@ void WorldSession::HandleReclaimCorpseOpcode(WorldPacket& recv_data)
     if (_player->IsAlive())
         return;
 
+    if (!sWorld->getBoolConfig(CONFIG_DEATH_ALLOW_CORPSE_RECLAIM))
+        return;
+
     // do not allow corpse reclaim in arena
     if (_player->InArena())
         return;

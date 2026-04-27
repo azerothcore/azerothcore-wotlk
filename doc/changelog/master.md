@@ -1,3 +1,34 @@
+## Unreleased (BlackroseWoW custom)
+
+### Added
+
+- New worldserver config option `Death.AllowCorpseReclaim` to control whether
+  players can reclaim at their corpse.
+
+### Changed
+
+- `WorldSession::HandleReclaimCorpseOpcode` now checks
+  `CONFIG_DEATH_ALLOW_CORPSE_RECLAIM` and rejects reclaim requests when
+  disabled.
+- Added `Death.AllowCorpseReclaim` documentation and default value to
+  `worldserver.conf.dist`.
+- Marked startup/runtime helper scripts as executable for Linux/WSL workflow
+  consistency.
+
+### How to upgrade
+
+- Add this line to your `worldserver.conf` (or copy from the new dist file):
+  - `Death.AllowCorpseReclaim = 1`
+- Set `Death.AllowCorpseReclaim = 0` if your realm rules should prevent corpse
+  reclaim revival.
+- Ensure these scripts remain executable after deployment:
+  - `acore.sh`
+  - `apps/startup-scripts/src/run-engine`
+  - `apps/startup-scripts/src/service-manager.sh`
+  - `apps/startup-scripts/src/simple-restarter`
+  - `apps/startup-scripts/src/starter`
+  - `deps/jsonpath/JSONPath.sh`
+
 ## 7.0.0-dev.1 | Commit: [0c4feb674444210da295751a0c4e5eefb9c771f1
 ](https://github.com/azerothcore/azerothcore-wotlk/commit/0c4feb674444210da295751a0c4e5eefb9c771f1
 
