@@ -1454,7 +1454,7 @@ Height.Accurate.SquareBlend = 0.2
 # preventing extreme lifts on near-vertical faces. Safe upper bound: ~5.0 (~78.7 deg).
 #
 
-Height.Accurate.SlopeClamp = 0.0
+Height.Accurate.SlopeClamp = 4.0
 
 #
 # Gradient mode
