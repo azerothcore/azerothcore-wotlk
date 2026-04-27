@@ -17,6 +17,7 @@
 
 #include "ObjectMgr.h"
 #include "AchievementMgr.h"
+#include "SharedDefines.h"
 #include "ArenaTeamMgr.h"
 #include "CharacterCache.h"
 #include "Chat.h"
@@ -11033,6 +11034,18 @@ PlayerInfo const* ObjectMgr::GetPlayerInfo(uint32 race, uint32 class_) const
     if (!info)
         return nullptr;
     return info;
+}
+
+PlayerInfo const* ObjectMgr::GetPlayerClassStarterPositionTemplate(uint8 race) const
+{
+    static uint8 const TRY_CLASSES[] =
+    {
+        CLASS_WARRIOR, CLASS_PALADIN, CLASS_HUNTER, CLASS_ROGUE
+    };
+    for (uint8 cls : TRY_CLASSES)
+        if (PlayerInfo const* pinf = GetPlayerInfo(race, cls))
+            return pinf;
+    return nullptr;
 }
 
 void ObjectMgr::LoadGameObjectQuestItems()

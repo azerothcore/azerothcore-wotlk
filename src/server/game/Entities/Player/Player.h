@@ -1718,6 +1718,8 @@ public:
     void LearnCustomSpells();
     void LearnDefaultSkills();
     void LearnDefaultSkill(uint32 skillId, uint16 rank);
+    void ApplyLowLevelHeroicDeathKnightSpellbookLimits();
+    void GrantLowHeroicDeathKnightPlagueStrikeIfNeeded();
     void learnQuestRewardedSpells();
     void learnQuestRewardedSpells(Quest const* quest);
     void learnSpellHighRank(uint32 spellid);
