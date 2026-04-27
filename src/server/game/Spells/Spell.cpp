@@ -1422,8 +1422,23 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                 Position lastpos;
                 m_caster->GetPosition(startx, starty, startz, starto);
                 pos.Relocate(startx, starty, startz, starto);
-                float destx = pos.GetPositionX() + distance * cos(pos.GetOrientation());
-                float desty = pos.GetPositionY() + distance * sin(pos.GetOrientation());
+
+                float const orientation = pos.GetOrientation();
+                float const orientationCos = std::cos(orientation);
+                float const orientationSin = std::sin(orientation);
+                float const probeRadius = m_caster->GetGroundProbeRadius() * sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_RADIUS_SCALE);
+
+                auto getBlinkGroundHeight = [&](float x, float y, float z, bool checkVMap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) -> float
+                {
+                    float height = map->GetHeightAccurate(phasemask, x, y, z, probeRadius, orientation, checkVMap, maxSearchDist);
+                    if (!std::isfinite(height) || height <= INVALID_HEIGHT)
+                        height = map->GetHeight(phasemask, x, y, z, checkVMap, maxSearchDist);
+
+                    return height;
+                };
+
+                float destx = pos.GetPositionX() + distance * orientationCos;
+                float desty = pos.GetPositionY() + distance * orientationSin;
 
                 // Added GROUND_HEIGHT_TOLERANCE to account for cases where, during a jump,
                 // the Z position may be slightly below the vmap ground level.
@@ -1433,8 +1448,8 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                 // Example:
                 //    actual vmap ground: -56.342392
                 //    Z position:         -56.347195
-                float searchGroundZPos = pos.GetPositionZ()+GROUND_HEIGHT_TOLERANCE;
-                float ground = map->GetHeight(phasemask, pos.GetPositionX(), pos.GetPositionY(), searchGroundZPos);
+                float const searchGroundZPos = pos.GetPositionZ() + GROUND_HEIGHT_TOLERANCE;
+                float ground = getBlinkGroundHeight(pos.GetPositionX(), pos.GetPositionY(), searchGroundZPos);
 
                 bool isCasterInWater = m_caster->IsInWater();
                 if (!m_caster->HasUnitMovementFlag(MOVEMENTFLAG_FALLING) || (pos.GetPositionZ() - ground < distance))
@@ -1447,12 +1462,13 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                     float beforewaterz = 0.0f;
                     bool inwater = false;
                     bool wcol = false;
-                    const float  step = 2.0f;
-                    const uint8 numChecks = std::ceil(std::fabs(distance / step));
-                    const float DELTA_X = (destx - pos.GetPositionX()) / numChecks;
-                    const float DELTA_Y = (desty - pos.GetPositionY()) / numChecks;
-                    int j = 1;
-                    for (; j < (numChecks + 1); j++)
+                    float const step = 2.0f;
+                    uint32 const rawNumChecks = static_cast<uint32>(std::ceil(std::fabs(distance) / step));
+                    uint32 const numChecks = rawNumChecks ? rawNumChecks : 1;
+                    float const DELTA_X = (destx - pos.GetPositionX()) / numChecks;
+                    float const DELTA_Y = (desty - pos.GetPositionY()) / numChecks;
+
+                    for (uint32 j = 1; j < (numChecks + 1); ++j)
                     {
                         prevX = pos.GetPositionX() + (float(j - 1) * DELTA_X);
                         prevY = pos.GetPositionY() + (float(j - 1) * DELTA_Y);
@@ -1468,7 +1484,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                             prevZ = tstZ;
                         }
 
-                        tstZ = map->GetHeight(phasemask, tstX, tstY, prevZ + maxtravelDistZ, true);
+                        tstZ = getBlinkGroundHeight(tstX, tstY, prevZ + maxtravelDistZ, true);
                         ground = tstZ;
 
                         if (!isCasterInWater)
@@ -1480,7 +1496,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                                     beforewaterz = prevZ;
                                 }
                                 tstZ = beforewaterz;
-                                srange = sqrt((tstY - prevY) * (tstY - prevY) + (tstX - prevX) * (tstX - prevX));
+                                srange = std::sqrt((tstY - prevY) * (tstY - prevY) + (tstX - prevX) * (tstX - prevX));
                                 //LOG_ERROR("spells", "(start was from land) step in water , number of cycle = {} , distance of step = {}, total path = {}, Z = {}", j, srange, totalpath, tstZ);
                             }
                         }
@@ -1488,10 +1504,10 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                         {
                             prevZ = pos.GetPositionZ();
                             tstZ = pos.GetPositionZ();
-                            srange = sqrt((tstY - prevY) * (tstY - prevY) + (tstX - prevX) * (tstX - prevX));
+                            srange = std::sqrt((tstY - prevY) * (tstY - prevY) + (tstX - prevX) * (tstX - prevX));
 
                             inwater = true;
-                            if (inwater && (fabs(tstZ - ground) < 2.0f))
+                            if (inwater && (std::fabs(tstZ - ground) < 2.0f))
                             {
                                 wcol = true;
                                 //LOG_ERROR("spells", "step in water with collide and use standart check (for continue way after possible collide), number of cycle = {} ", j);
@@ -1510,18 +1526,18 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                                 inwater = false;
 
                             // highest available point
-                            tstZ1 = map->GetHeight(phasemask, tstX, tstY, prevZ + maxtravelDistZ, true, 25.0f);
+                            tstZ1 = getBlinkGroundHeight(tstX, tstY, prevZ + maxtravelDistZ, true, 25.0f);
                             // upper or floor
-                            tstZ2 = map->GetHeight(phasemask, tstX, tstY, prevZ, true, 25.0f);
+                            tstZ2 = getBlinkGroundHeight(tstX, tstY, prevZ, true, 25.0f);
                             //lower than floor
-                            tstZ3 = map->GetHeight(phasemask, tstX, tstY, prevZ - maxtravelDistZ / 2, true, 25.0f);
+                            tstZ3 = getBlinkGroundHeight(tstX, tstY, prevZ - maxtravelDistZ / 2, true, 25.0f);
 
                             //distance of rays, will select the shortest in 3D
-                            srange1 = sqrt((tstY - prevY) * (tstY - prevY) + (tstX - prevX) * (tstX - prevX) + (tstZ1 - prevZ) * (tstZ1 - prevZ));
+                            srange1 = std::sqrt((tstY - prevY) * (tstY - prevY) + (tstX - prevX) * (tstX - prevX) + (tstZ1 - prevZ) * (tstZ1 - prevZ));
                             //LOG_ERROR("spells", "step = {}, distance of ray1 = {}", j, srange1);
-                            srange2 = sqrt((tstY - prevY) * (tstY - prevY) + (tstX - prevX) * (tstX - prevX) + (tstZ2 - prevZ) * (tstZ2 - prevZ));
+                            srange2 = std::sqrt((tstY - prevY) * (tstY - prevY) + (tstX - prevX) * (tstX - prevX) + (tstZ2 - prevZ) * (tstZ2 - prevZ));
                             //LOG_ERROR("spells", "step = {}, distance of ray2 = {}", j, srange2);
-                            srange3 = sqrt((tstY - prevY) * (tstY - prevY) + (tstX - prevX) * (tstX - prevX) + (tstZ3 - prevZ) * (tstZ3 - prevZ));
+                            srange3 = std::sqrt((tstY - prevY) * (tstY - prevY) + (tstX - prevX) * (tstX - prevX) + (tstZ3 - prevZ) * (tstZ3 - prevZ));
                             //LOG_ERROR("spells", "step = {}, distance of ray3 = {}", j, srange3);
 
                             if (srange1 < srange2)
@@ -1560,33 +1576,33 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                         bool dcol = m_caster->GetMap()->GetMapCollisionData().GetDynamicTree().GetObjectHitPos(phasemask, prevX, prevY, prevZ + 0.5f, tstX, tstY, tstZ + 0.5f, tstX, tstY, tstZ, -0.5f);
 
                         // collision occured
-                        if (col || dcol || (overdistance > 0.0f && !map->IsInWater(phasemask, tstX, tstY, ground, collisionHeight)) || (fabs(prevZ - tstZ) > maxtravelDistZ && (tstZ > prevZ)))
+                        if (col || dcol || (overdistance > 0.0f && !map->IsInWater(phasemask, tstX, tstY, ground, collisionHeight)) || (std::fabs(prevZ - tstZ) > maxtravelDistZ && (tstZ > prevZ)))
                         {
                             if ((overdistance > 0.0f) && (overdistance < 1.f))
                             {
-                                destx = prevX + overdistance * cos(pos.GetOrientation());
-                                desty = prevY + overdistance * sin(pos.GetOrientation());
+                                destx = prevX + overdistance * orientationCos;
+                                desty = prevY + overdistance * orientationSin;
                                 //LOG_ERROR("spells", "(collision) collision occured 1");
                             }
                             else
                             {
                                 // move back a bit
-                                destx = tstX - (0.6 * cos(pos.GetOrientation()));
-                                desty = tstY - (0.6 * sin(pos.GetOrientation()));
+                                destx = tstX - (0.6f * orientationCos);
+                                desty = tstY - (0.6f * orientationSin);
                                 //LOG_ERROR("spells", "(collision) collision occured 2");
                             }
 
                             // highest available point
-                            destz1 = map->GetHeight(phasemask, destx, desty, prevZ + maxtravelDistZ, true, 25.0f);
+                            destz1 = getBlinkGroundHeight(destx, desty, prevZ + maxtravelDistZ, true, 25.0f);
                             // upper or floor
-                            destz2 = map->GetHeight(phasemask, destx, desty, prevZ, true, 25.0f);
+                            destz2 = getBlinkGroundHeight(destx, desty, prevZ, true, 25.0f);
                             //lower than floor
-                            destz3 = map->GetHeight(phasemask, destx, desty, prevZ - maxtravelDistZ / 2, true, 25.0f);
+                            destz3 = getBlinkGroundHeight(destx, desty, prevZ - maxtravelDistZ / 2, true, 25.0f);
 
                             //distance of rays, will select the shortest in 3D
-                            srange1 = sqrt((desty - prevY) * (desty - prevY) + (destx - prevX) * (destx - prevX) + (destz1 - prevZ) * (destz1 - prevZ));
-                            srange2 = sqrt((desty - prevY) * (desty - prevY) + (destx - prevX) * (destx - prevX) + (destz2 - prevZ) * (destz2 - prevZ));
-                            srange3 = sqrt((desty - prevY) * (desty - prevY) + (destx - prevX) * (destx - prevX) + (destz3 - prevZ) * (destz3 - prevZ));
+                            srange1 = std::sqrt((desty - prevY) * (desty - prevY) + (destx - prevX) * (destx - prevX) + (destz1 - prevZ) * (destz1 - prevZ));
+                            srange2 = std::sqrt((desty - prevY) * (desty - prevY) + (destx - prevX) * (destx - prevX) + (destz2 - prevZ) * (destz2 - prevZ));
+                            srange3 = std::sqrt((desty - prevY) * (desty - prevY) + (destx - prevX) * (destx - prevX) + (destz3 - prevZ) * (destz3 - prevZ));
 
                             if (srange1 < srange2)
                                 destz = destz1;
@@ -1613,7 +1629,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                         // we have correct destz now
                     }
 
-                    lastpos.Relocate(destx, desty, destz, pos.GetOrientation());
+                    lastpos.Relocate(destx, desty, destz, orientation);
                     dest = SpellDestination(lastpos);
                 }
                 else
@@ -1627,11 +1643,11 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                     if (col || dcol)
                     {
                         // move back a bit
-                        destx = destx - (0.6 * cos(pos.GetOrientation()));
-                        desty = desty - (0.6 * sin(pos.GetOrientation()));
+                        destx = destx - (0.6f * orientationCos);
+                        desty = desty - (0.6f * orientationSin);
                     }
 
-                    lastpos.Relocate(destx, desty, z, pos.GetOrientation());
+                    lastpos.Relocate(destx, desty, z, orientation);
                     dest = SpellDestination(lastpos);
                     //float range = sqrt((desty - pos.GetPositionY())*(desty - pos.GetPositionY()) + (destx - pos.GetPositionX())*(destx - pos.GetPositionX()));
                     //LOG_ERROR("spells", "Blink number 2, in falling but at a hight, distance of blink = {}", range);
