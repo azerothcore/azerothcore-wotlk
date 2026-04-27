@@ -1419,7 +1419,7 @@ public:
             {
                 me->CastSpell(me, SPELL_SAC_GHOUL_EXPLODE, true);
                 me->KillSelf();
-                me->m_Events.KillAllEvents(true);
+                me->m_Events.KillAllEvents(false);
                 Deactivate();
             }
         }

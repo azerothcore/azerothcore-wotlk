@@ -269,6 +269,16 @@ void ScriptedAI::DoStopAttack()
         me->AttackStop();
 }
 
+void ScriptedAI::DoRewardPlayersInArea()
+{
+    me->GetMap()->DoForAllPlayers([&](Player* player)
+    {
+        if (player->GetFaction() != me->GetCreatureTemplate()->faction && !player->IsGameMaster())
+            if (player->GetAreaId() == me->GetAreaId())
+                player->KilledMonsterCredit(me->GetEntry());
+    });
+}
+
 void ScriptedAI::DoCastSpell(Unit* target, SpellInfo const* spellInfo, bool triggered)
 {
     if (!target || me->IsNonMeleeSpellCast(false))
@@ -462,7 +472,7 @@ void ScriptedAI::DoResetThreat(Unit* unit)
 
 void ScriptedAI::DoResetThreatList()
 {
-    if (!me->CanHaveThreatList() || me->GetThreatMgr().isThreatListEmpty())
+    if (!me->CanHaveThreatList() || me->GetThreatMgr().IsThreatListEmpty(true))
     {
         LOG_ERROR("entities.unit.ai", "DoResetThreatList called for creature that either cannot have threat list or has empty threat list (me entry = {})", me->GetEntry());
         return;
@@ -704,11 +714,12 @@ void BossAI::TeleportCheaters()
     float x, y, z;
     me->GetPosition(x, y, z);
 
-    ThreatContainer::StorageType threatList = me->GetThreatMgr().GetThreatList();
-    for (ThreatContainer::StorageType::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
-        if (Unit* target = (*itr)->getTarget())
-            if (target->IsPlayer() && !IsInBoundary(target))
-                target->NearTeleportTo(x, y, z, 0);
+    for (auto const& pair : me->GetCombatManager().GetPvECombatRefs())
+    {
+        Unit* target = pair.second->GetOther(me);
+        if (target->IsControlledByPlayer() && !IsInBoundary(target))
+            target->NearTeleportTo(x, y, z, 0);
+    }
 }
 
 void BossAI::JustSummoned(Creature* summon)
@@ -756,9 +767,26 @@ void BossAI::UpdateAI(uint32 diff)
         DoMeleeAttackIfReady();
 }
 
-void BossAI::OnSpellCastFinished(SpellInfo const* spellInfo, SpellFinishReason reason)
+void BossAI::OnSpellCast(SpellInfo const* spellInfo)
 {
-    ScriptedAI::OnSpellCastFinished(spellInfo, reason);
+    ScriptedAI::OnSpellCast(spellInfo);
+    _CheckHealthAfterCast();
+}
+
+void BossAI::OnChannelFinished(SpellInfo const* spellInfo)
+{
+    ScriptedAI::OnChannelFinished(spellInfo);
+    _CheckHealthAfterCast();
+}
+
+void BossAI::OnSpellFailed(SpellInfo const* spellInfo)
+{
+    ScriptedAI::OnSpellFailed(spellInfo);
+    _CheckHealthAfterCast();
+}
+
+void BossAI::_CheckHealthAfterCast()
+{
     // Check if any health check events are pending (i.e. waiting for the boss to stop casting.
     if (_nextHealthCheck.IsPending() && me->IsInCombat())
     {

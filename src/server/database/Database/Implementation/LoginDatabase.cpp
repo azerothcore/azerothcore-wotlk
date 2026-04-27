@@ -24,7 +24,7 @@ void LoginDatabaseConnection::DoPrepareStatements()
         m_stmts.resize(MAX_LOGINDATABASE_STATEMENTS);
 
     PrepareStatement(LOGIN_SEL_LOGONCHALLENGE,
-        "SELECT a.id, a.username, a.locked, a.lock_country, a.last_ip, a.failed_logins, "
+        "SELECT a.id, a.username, a.locked, a.lock_country, a.last_ip, a.Flags, a.failed_logins, "
         "ab.unbandate > UNIX_TIMESTAMP() OR ab.unbandate = ab.bandate, ab.unbandate = ab.bandate, "
         "ipb.unbandate > UNIX_TIMESTAMP() OR ipb.unbandate = ipb.bandate, ipb.unbandate = ipb.bandate, "
         "aa.gmlevel, a.totp_secret, a.salt, a.verifier "
@@ -34,7 +34,7 @@ void LoginDatabaseConnection::DoPrepareStatements()
         "LEFT JOIN ip_banned ipb ON ipb.ip = ? "
         "WHERE a.username = ?", CONNECTION_ASYNC);
     PrepareStatement(LOGIN_SEL_RECONNECTCHALLENGE,
-        "SELECT a.id, a.username, a.locked, a.lock_country, a.last_ip, a.failed_logins, "
+        "SELECT a.id, a.username, a.locked, a.lock_country, a.last_ip, a.Flags, a.failed_logins, "
         "ab.unbandate > UNIX_TIMESTAMP() OR ab.unbandate = ab.bandate, ab.unbandate = ab.bandate, "
         "ipb.unbandate > UNIX_TIMESTAMP() OR ipb.unbandate = ipb.bandate, ipb.unbandate = ipb.bandate, "
         "aa.gmlevel, a.session_key "
@@ -118,6 +118,13 @@ void LoginDatabaseConnection::DoPrepareStatements()
     PrepareStatement(LOGIN_DEL_ACCOUNT, "DELETE FROM account WHERE id = ?", CONNECTION_ASYNC);
     PrepareStatement(LOGIN_SEL_AUTOBROADCAST, "SELECT id, weight, text FROM autobroadcast WHERE realmid = ? OR realmid = -1", CONNECTION_SYNCH);
     PrepareStatement(LOGIN_SEL_AUTOBROADCAST_LOCALIZED, "SELECT id, locale, text FROM autobroadcast_locale WHERE realmid = ? OR realmid = -1", CONNECTION_SYNCH);
+    PrepareStatement(LOGIN_INS_AUTOBROADCAST, "INSERT INTO autobroadcast (realmid, weight, text) VALUES (?, ?, ?)", CONNECTION_SYNCH);
+    PrepareStatement(LOGIN_DEL_AUTOBROADCAST, "DELETE FROM autobroadcast WHERE id = ? AND (realmid = ? OR realmid = -1)", CONNECTION_SYNCH);
+    PrepareStatement(LOGIN_INS_AUTOBROADCAST_LOCALE, "REPLACE INTO autobroadcast_locale (realmid, id, locale, text) VALUES (?, ?, ?, ?)", CONNECTION_SYNCH);
+    PrepareStatement(LOGIN_DEL_AUTOBROADCAST_LOCALE, "DELETE FROM autobroadcast_locale WHERE id = ? AND (realmid = ? OR realmid = -1)", CONNECTION_SYNCH);
+    PrepareStatement(LOGIN_SEL_AUTOBROADCAST_BY_ID, "SELECT 1 FROM autobroadcast WHERE id = ? AND (realmid = ? OR realmid = -1)", CONNECTION_SYNCH);
+    PrepareStatement(LOGIN_SEL_AUTOBROADCAST_LOCALE_BY_ID, "SELECT locale, text FROM autobroadcast_locale WHERE (realmid = ? OR realmid = -1) AND id = ?", CONNECTION_SYNCH);
+    PrepareStatement(LOGIN_SEL_AUTOBROADCAST_MAX_ID, "SELECT MAX(id) FROM autobroadcast WHERE realmid = ? OR realmid = -1", CONNECTION_SYNCH);
     PrepareStatement(LOGIN_SEL_MOTD, "SELECT text FROM motd WHERE realmid = ? OR realmid = -1 ORDER BY realmid DESC", CONNECTION_SYNCH);
     PrepareStatement(LOGIN_SEL_MOTD_LOCALE, "SELECT locale, text FROM motd_localized WHERE realmid = ? OR realmid = -1 ORDER BY realmid DESC", CONNECTION_SYNCH);
     PrepareStatement(LOGIN_REP_MOTD, "REPLACE INTO motd (realmid, text) VALUES (?, ?)", CONNECTION_ASYNC);

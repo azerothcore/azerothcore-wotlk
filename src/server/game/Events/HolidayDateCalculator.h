@@ -100,6 +100,13 @@ public:
     // Returns packed dates for all occurrences in the year range
     static std::vector<uint32_t> GetDarkmoonFaireDates(int locationOffset, int startYear, int numYears, int dayOffset = 0);
 
+    // Find the correct stage start time from a list of packed holiday dates.
+    // For multi-stage holidays, stageOffset is the cumulative duration (in seconds) of all prior stages.
+    // stageLengthMinutes is the duration of the current stage in minutes.
+    // Returns the computed stage start time (startTime + stageOffset), or 0 if no valid date found.
+    static time_t FindStartTimeForStage(const uint32_t* packedDates, uint8_t numDates,
+        time_t stageOffset, uint32_t stageLengthMinutes, time_t curTime);
+
 private:
     // Julian Date conversions for lunar calculations
     static double DateToJulianDay(int year, int month, double day);

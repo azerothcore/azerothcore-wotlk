@@ -36,16 +36,17 @@
 #include "Language.h"
 #include "MapMgr.h"
 #include "MiscPackets.h"
-#include "MMapFactory.h"
 #include "MovementGenerator.h"
 #include "ObjectAccessor.h"
 #include "Pet.h"
 #include "Player.h"
+#include "PoolMgr.h"
 #include "Realm.h"
 #include "ScriptMgr.h"
 #include "SpellAuras.h"
 #include "TargetedMovementGenerator.h"
 #include "Tokenize.h"
+#include "Transport.h"
 #include "WeatherMgr.h"
 #include "WorldSessionMgr.h"
 
@@ -195,7 +196,7 @@ public:
             { "string",            HandleStringCommand,            SEC_GAMEMASTER,         Console::No  },
             { "opendoor",          HandleOpenDoorCommand,          SEC_GAMEMASTER,         Console::No  },
             { "bm",                HandleBMCommand,                SEC_GAMEMASTER,         Console::No  },
-            { "packetlog",         HandlePacketLog,                SEC_GAMEMASTER,         Console::No  }
+            { "packetlog",         HandlePacketLog,                SEC_GAMEMASTER,         Console::Yes }
         };
 
         return commandTable;
@@ -646,7 +647,7 @@ public:
 
         uint32 haveMap = GridTerrainLoader::ExistMap(object->GetMapId(), cell.GridX(), cell.GridY()) ? 1 : 0;
         uint32 haveVMap = GridTerrainLoader::ExistVMap(object->GetMapId(), cell.GridX(), cell.GridY()) ? 1 : 0;
-        uint32 haveMMAP = MMAP::MMapFactory::createOrGetMMapMgr()->GetNavMesh(handler->GetSession()->GetPlayer()->GetMapId()) ? 1 : 0;
+        uint32 haveMMAP = handler->GetSession()->GetPlayer()->GetMap()->GetMapCollisionData().GetMMapData().GetNavMesh() ? 1 : 0;
 
         if (haveVMap)
         {
@@ -900,13 +901,39 @@ public:
                 _player->CleanupAfterTaxiFlight();
             }
             else // save only in non-flight case
-            {
                 _player->SaveRecallPosition();
-            }
 
-            if (_player->TeleportTo(targetPlayer->GetMapId(), targetPlayer->GetPositionX(), targetPlayer->GetPositionY(), targetPlayer->GetPositionZ() + 0.25f, _player->GetOrientation(), TELE_TO_GM_MODE, targetPlayer))
+            if (Transport* transport = targetPlayer->GetTransport())
             {
-                _player->SetPhaseMask(targetPlayer->GetPhaseMask() | 1, false);
+                if (Transport* oldTransport = _player->GetTransport())
+                    oldTransport->RemovePassenger(_player, true);
+
+                float x;
+                float y;
+                float z;
+                float o;
+                targetPlayer->m_movementInfo.transport.pos.GetPosition(x, y, z, o);
+
+                _player->SetTransport(transport);
+                _player->m_movementInfo.transport.guid = transport->GetGUID();
+                _player->m_movementInfo.transport.pos.Relocate(x, y, z, o);
+                _player->AddUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
+
+                float worldX = x;
+                float worldY = y;
+                float worldZ = z;
+                float worldO = o;
+                transport->CalculatePassengerPosition(worldX, worldY, worldZ, &worldO);
+
+                transport->AddPassenger(_player, false);
+
+                if (_player->TeleportTo(transport->GetMapId(), worldX, worldY, worldZ + 0.25f, worldO, TELE_TO_NOT_LEAVE_TRANSPORT | TELE_TO_GM_MODE, targetPlayer))
+                    _player->SetPhaseMask(targetPlayer->GetPhaseMask() | 1, false);
+            }
+            else
+            {
+                if (_player->TeleportTo(targetPlayer->GetMapId(), targetPlayer->GetPositionX(), targetPlayer->GetPositionY(), targetPlayer->GetPositionZ() + 0.25f, _player->GetOrientation(), TELE_TO_GM_MODE, targetPlayer))
+                    _player->SetPhaseMask(targetPlayer->GetPhaseMask() | 1, false);
             }
         }
         else
@@ -2414,6 +2441,13 @@ public:
         // Output XX. LANG_PINFO_CHR_PLAYEDTIME
         handler->PSendSysMessage(LANG_PINFO_CHR_PLAYEDTIME, (secsToTimeString(totalPlayerTime, true)));
 
+        // Output XXI. LANG_PINFO_CHR_ONLINETIME (only for online players)
+        if (playerTarget)
+        {
+            uint32 onlineTime = uint32(GameTime::GetGameTime().count() - playerTarget->m_logintime);
+            handler->PSendSysMessage(LANG_PINFO_CHR_ONLINETIME, secsToTimeString(onlineTime, true));
+        }
+
         // Mail Data - an own query, because it may or may not be useful.
         // SQL: "SELECT SUM(CASE WHEN (checked & 1) THEN 1 ELSE 0 END) AS 'readmail', COUNT(*) AS 'totalmail' FROM mail WHERE `receiver` = ?"
         CharacterDatabasePreparedStatement* mailQuery = CharacterDatabase.GetPreparedStatement(CHAR_SEL_PINFO_MAILS);
@@ -2464,9 +2498,51 @@ public:
     {
         Player* player = handler->GetSession()->GetPlayer();
 
+        // Phase 1: respawn creatures/GOs that still have corpses in the grid
         Acore::RespawnDo u_do;
         Acore::WorldObjectWorker<Acore::RespawnDo> worker(player, u_do);
         Cell::VisitObjects(player, worker, player->GetGridActivationRange());
+
+        // Phase 2: force-respawn creatures/GOs that were fully removed (non-compat mode)
+        // by setting their respawn times to now so ProcessRespawns() picks them up
+        Map* map = player->GetMap();
+        uint32 gridId = Acore::ComputeGridCoord(player->GetPositionX(), player->GetPositionY()).GetId();
+        time_t now = GameTime::GetGameTime().count();
+
+        std::vector<ObjectGuid::LowType> creaturesToRespawn;
+        for (auto const& pair : map->GetCreatureRespawnTimes())
+        {
+            CreatureData const* data = sObjectMgr->GetCreatureData(pair.first);
+            if (!data || Acore::ComputeGridCoord(data->posX, data->posY).GetId() != gridId)
+                continue;
+
+            // Skip pooled spawns — Phase 1 already triggered pool rotation via
+            // Creature::Respawn() -> PoolMgr::UpdatePool(). Forcing a respawn time
+            // here would cause ProcessRespawns() to call UpdatePool() again,
+            // spawning duplicates beyond the pool's max_limit.
+            if (sPoolMgr->IsPartOfAPool<Creature>(pair.first))
+                continue;
+
+            creaturesToRespawn.push_back(pair.first);
+        }
+        for (ObjectGuid::LowType spawnId : creaturesToRespawn)
+            map->SaveCreatureRespawnTime(spawnId, now);
+
+        std::vector<ObjectGuid::LowType> goesToRespawn;
+        for (auto const& pair : map->GetGORespawnTimes())
+        {
+            GameObjectData const* data = sObjectMgr->GetGameObjectData(pair.first);
+            if (!data || Acore::ComputeGridCoord(data->posX, data->posY).GetId() != gridId)
+                continue;
+
+            // Skip pooled spawns — same reason as creatures above.
+            if (sPoolMgr->IsPartOfAPool<GameObject>(pair.first))
+                continue;
+
+            goesToRespawn.push_back(pair.first);
+        }
+        for (ObjectGuid::LowType spawnId : goesToRespawn)
+            map->SaveGORespawnTime(spawnId, now);
 
         return true;
     }
@@ -2900,7 +2976,7 @@ public:
         }
 
         playerTarget->CombatStop();
-        playerTarget->getHostileRefMgr().deleteReferences();
+        playerTarget->GetThreatMgr().RemoveMeFromThreatLists();
         return true;
     }
 
@@ -3132,9 +3208,19 @@ public:
         return false;
     }
 
-    static bool HandlePacketLog(ChatHandler* handler, Optional<bool> enableArg)
+    static bool HandlePacketLog(ChatHandler* handler, Optional<PlayerIdentifier> target, Optional<bool> enableArg)
     {
-        WorldSession* session = handler->GetSession();
+        if (!target)
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
+
+        if (!target || !target->IsConnected())
+        {
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+            return false;
+        }
+
+        Player* playerTarget = target->GetConnectedPlayer();
+        WorldSession* session = playerTarget->GetSession();
 
         if (!session)
             return false;
@@ -3144,13 +3230,13 @@ public:
             if (*enableArg)
             {
                 session->SetPacketLogging(true);
-                handler->SendNotification(LANG_ON);
+                handler->PSendSysMessage("Packet logging enabled for {}.", playerTarget->GetName());
                 return true;
             }
             else
             {
                 session->SetPacketLogging(false);
-                handler->SendNotification(LANG_OFF);
+                handler->PSendSysMessage("Packet logging disabled for {}.", playerTarget->GetName());
                 return true;
             }
         }

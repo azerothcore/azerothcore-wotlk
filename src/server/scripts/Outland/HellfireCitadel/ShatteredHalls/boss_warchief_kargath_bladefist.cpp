@@ -69,12 +69,7 @@ Position const kargathRespawnPos = { 231.25f, -83.6449f, 5.02341f };
 struct boss_warchief_kargath_bladefist : public BossAI
 {
     boss_warchief_kargath_bladefist(Creature* creature) : BossAI(creature, DATA_KARGATH)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    {    }
 
     void InitializeAI() override
     {

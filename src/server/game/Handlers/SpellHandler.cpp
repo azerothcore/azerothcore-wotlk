@@ -530,14 +530,16 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     }
 
     // auto-selection buff level base at target level (in spellInfo)
-    if (targets.GetUnitTarget())
-    {
-        SpellInfo const* actualSpellInfo = spellInfo->GetAuraRankForLevel(targets.GetUnitTarget()->GetLevel());
+    if (spellInfo->IsPositive())
+        if (Unit* target = targets.GetUnitTarget())
+            if (mover->IsFriendlyTo(target))
+            {
+                SpellInfo const* actualSpellInfo = spellInfo->GetAuraRankForLevel(target->GetLevel());
 
-        // if rank not found then function return nullptr but in explicit cast case original spell can be casted and later failed with appropriate error message
-        if (actualSpellInfo)
-            spellInfo = actualSpellInfo;
-    }
+                // if rank not found then function return nullptr but in explicit cast case original spell can be casted and later failed with appropriate error message
+                if (actualSpellInfo)
+                    spellInfo = actualSpellInfo;
+            }
 
     Spell* spell = new Spell(mover, spellInfo, triggerFlag, ObjectGuid::Empty, false);
 

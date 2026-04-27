@@ -103,17 +103,14 @@ struct boss_faction_championsAI : public ScriptedAI
 
     void RecalculateThreat()
     {
-        ThreatContainer::StorageType const& tList = me->GetThreatMgr().GetThreatList();
-        for( ThreatContainer::StorageType::const_iterator itr = tList.begin(); itr != tList.end(); ++itr )
+        for (ThreatReference const* ref : me->GetThreatMgr().GetUnsortedThreatList())
         {
-            Unit* pUnit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
+            Unit* pUnit = ref->GetVictim();
             if (pUnit && pUnit->IsPlayer() && me->GetThreatMgr().GetThreat(pUnit))
             {
                 float threatMod = GetThreatMod(me->GetDistance2d(pUnit), (float)pUnit->GetArmor(), pUnit->GetHealth(), pUnit->GetMaxHealth(), pUnit);
-                me->GetThreatMgr().ModifyThreatByPercent(pUnit, -100);
-                //me->getThreatMgr().DoAddThreat(pUnit, 10000000.0f * threatMod);
-                if (HostileReference* ref = me->GetThreatMgr().GetOnlineContainer().getReferenceByTarget(pUnit))
-                    ref->AddThreat(10000000.0f * threatMod);
+                me->GetThreatMgr().ResetThreat(pUnit);
+                me->GetThreatMgr().AddThreat(pUnit, 10000000.0f * threatMod, nullptr, true, true);
             }
         }
     }
@@ -179,27 +176,23 @@ struct boss_faction_championsAI : public ScriptedAI
 
     uint32 EnemiesInRange(float distance)
     {
-        ThreatContainer::StorageType const& tList = me->GetThreatMgr().GetThreatList();
         uint32 count = 0;
-        Unit* target;
-        for( ThreatContainer::StorageType::const_iterator iter = tList.begin(); iter != tList.end(); ++iter )
+        for (ThreatReference const* ref : me->GetThreatMgr().GetUnsortedThreatList())
         {
-            target = ObjectAccessor::GetUnit((*me), (*iter)->getUnitGuid());
-            if (target && me->GetDistance2d(target) < distance )
-                ++count;
+            if (Unit* target = ref->GetVictim())
+                if (me->GetDistance2d(target) < distance)
+                    ++count;
         }
         return count;
     }
 
     Unit* SelectEnemyCaster(bool casting, float range)
     {
-        ThreatContainer::StorageType const& tList = me->GetThreatMgr().GetThreatList();
-        Unit* target;
-        for( ThreatContainer::StorageType::const_iterator iter = tList.begin(); iter != tList.end(); ++iter )
+        for (ThreatReference const* ref : me->GetThreatMgr().GetUnsortedThreatList())
         {
-            target = ObjectAccessor::GetUnit((*me), (*iter)->getUnitGuid());
-            if (target && target->getPowerType() == POWER_MANA && (!casting || target->HasUnitState(UNIT_STATE_CASTING)) && me->GetExactDist(target) <= range )
-                return target;
+            if (Unit* target = ref->GetVictim())
+                if (target->getPowerType() == POWER_MANA && (!casting || target->HasUnitState(UNIT_STATE_CASTING)) && me->GetExactDist(target) <= range)
+                    return target;
         }
         return nullptr;
     }

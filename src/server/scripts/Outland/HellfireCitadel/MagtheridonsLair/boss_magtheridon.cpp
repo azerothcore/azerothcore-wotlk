@@ -79,12 +79,7 @@ enum Actions
 struct boss_magtheridon : public BossAI
 {
     boss_magtheridon(Creature* creature) : BossAI(creature, DATA_MAGTHERIDON)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    {    }
 
     void Reset() override
     {
@@ -247,10 +242,11 @@ struct boss_magtheridon : public BossAI
 
     void UpdateAI(uint32 diff) override
     {
+        scheduler.Update(diff);
+
         if (!UpdateVictim())
             return;
 
-        scheduler.Update(diff);
         _interruptScheduler.Update(diff);
 
         if (_currentPhase != 1 && !_castingQuake)

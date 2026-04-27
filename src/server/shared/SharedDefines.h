@@ -91,21 +91,6 @@ enum Races
     //RACE_ICE_TROLL      = 21
 };
 
-// max+1 for player race
-#define MAX_RACES         12
-
-#define RACEMASK_ALL_PLAYABLE \
-    ((1<<(RACE_HUMAN-1))   |(1<<(RACE_ORC-1))          |(1<<(RACE_DWARF-1))   | \
-    (1<<(RACE_NIGHTELF-1))|(1<<(RACE_UNDEAD_PLAYER-1))|(1<<(RACE_TAUREN-1))  | \
-    (1<<(RACE_GNOME-1))   |(1<<(RACE_TROLL-1))        |(1<<(RACE_BLOODELF-1))| \
-    (1<<(RACE_DRAENEI-1)))
-
-#define RACEMASK_ALLIANCE \
-    ((1<<(RACE_HUMAN-1)) | (1<<(RACE_DWARF-1)) | (1<<(RACE_NIGHTELF-1)) | \
-    (1<<(RACE_GNOME-1)) | (1<<(RACE_DRAENEI-1)))
-
-#define RACEMASK_HORDE RACEMASK_ALL_PLAYABLE & ~RACEMASK_ALLIANCE
-
 // DisplayRace values from CreatureDisplayInfoExtra.dbc
 enum class DisplayRace : uint8
 {
@@ -161,15 +146,7 @@ enum Classes
     (1<<(CLASS_DEATH_KNIGHT-1)))
 
 // valid classes for creature_template.unit_class
-enum UnitClass
-{
-    UNIT_CLASS_WARRIOR                  = 1,
-    UNIT_CLASS_PALADIN                  = 2,
-    UNIT_CLASS_ROGUE                    = 4,
-    UNIT_CLASS_MAGE                     = 8,
-};
-
-#define CLASSMASK_ALL_CREATURES ((1<<(UNIT_CLASS_WARRIOR-1)) | (1<<(UNIT_CLASS_PALADIN-1)) | (1<<(UNIT_CLASS_ROGUE-1)) | (1<<(UNIT_CLASS_MAGE-1)))
+#define CLASSMASK_ALL_CREATURES ((1<<(CLASS_WARRIOR-1)) | (1<<(CLASS_PALADIN-1)) | (1<<(CLASS_ROGUE-1)) | (1<<(CLASS_MAGE-1)))
 
 #define CLASSMASK_WAND_USERS ((1<<(CLASS_PRIEST-1))|(1<<(CLASS_MAGE-1))|(1<<(CLASS_WARLOCK-1)))
 
@@ -390,7 +367,7 @@ uint32 constexpr QuestDifficultyColors[MAX_QUEST_DIFFICULTY] =
 // EnumUtils: DESCRIBE THIS
 enum SpellAttr0 : uint32
 {
-    SPELL_ATTR0_PROC_FAILURE_BURNS_CHARGE        = 0x00000001, // TITLE Unknown attribute 0@Attr0
+    SPELL_ATTR0_PROC_FAILURE_BURNS_CHARGE        = 0x00000001, // TITLE Proc Failure Burns Charge
     SPELL_ATTR0_USES_RANGED_SLOT                 = 0x00000002, // TITLE Treat as ranged attack DESCRIPTION Use ammo, ranged attack range modifiers, ranged haste, etc.
     SPELL_ATTR0_ON_NEXT_SWING_NO_DAMAGE          = 0x00000004, // TITLE On next melee (type 1) DESCRIPTION Both "on next swing" attributes have identical handling in server & client
     SPELL_ATTR0_DO_NOT_LOG_IMMUNE_MISSES         = 0x00000008, // TITLE Replenishment (client only)
@@ -443,7 +420,7 @@ enum SpellAttr1 : uint32
     SPELL_ATTR1_TOGGLE_FAR_SIGHT                         = 0x00002000, // TITLE Farsight aura (client only)
     SPELL_ATTR1_TRACK_TARGET_IN_CHANNEL                  = 0x00004000, // TITLE Track target while channeling DESCRIPTION While channeling, adjust facing to face target
     SPELL_ATTR1_IMMUNITY_PURGES_EFFECT                   = 0x00008000, // TITLE Immunity cancels preapplied auras DESCRIPTION For immunity spells, cancel all auras that this spell would make you immune to when the spell is applied
-    SPELL_ATTR1_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS = 0x00010000, // TITLE Unaffected by school immunities DESCRIPTION Will not pierce Divine Shield, Ice Block and other full invulnerabilities
+    SPELL_ATTR1_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS = 0x00010000, // TITLE Immunity to Hostile & Friendly Effects DESCRIPTION Immunity applied by this aura will also be checked for friendly spells (school immunity only) - used by Cyclone for example to cause friendly spells and healing over time to be immune
     SPELL_ATTR1_NO_AUTOCAST_AI                           = 0x00020000, // TITLE Cannot be autocast by pet DESCRIPTION (AI)
     SPELL_ATTR1_PREVENTS_ANIM                            = 0x00040000, // TITLE NYI, auras apply UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT
     SPELL_ATTR1_EXCLUDE_CASTER                           = 0x00080000, // TITLE Cannot be self-cast
@@ -487,7 +464,7 @@ enum SpellAttr2 : uint32
     SPELL_ATTR2_INITIATE_COMBAT_POST_CAST            = 0x00100000, // TITLE (Enables Auto-Attack)
     SPELL_ATTR2_FAIL_ON_ALL_TARGETS_IMMUNE           = 0x00200000, // TITLE Damage reduction ability DESCRIPTION Causes BG flags to be dropped if combined with ATTR1_DISPEL_AURAS_ON_IMMUNITY
     SPELL_ATTR2_NO_INITIAL_THREAD                    = 0x00400000, // TITLE Unknown attribute 22@Attr2 DESCRIPTION Ambush, Backstab, Cheap Shot, Death Grip, Garrote, Judgements, Mutilate, Pounce, Ravage, Shiv, Shred
-    SPELL_ATTR2_PROC_COOLDOWN_ON_FAILURE             = 0x00800000, // TITLE Arcane Concentration
+    SPELL_ATTR2_PROC_COOLDOWN_ON_FAILURE             = 0x00800000, // TITLE Proc Cooldown On Failure
     SPELL_ATTR2_ITEM_CAST_WITH_OWNER_SKILL           = 0x01000000, // TITLE Unknown attribute 24@Attr2
     SPELL_ATTR2_DONT_BLOCK_MANA_REGEN                = 0x02000000, // TITLE Unknown attribute 25@Attr2
     SPELL_ATTR2_NO_SCHOOL_IMMUNITIES                 = 0x04000000, // TITLE Pierce aura application immunities DESCRIPTION Allow aura to be applied despite target being immune to new aura applications
@@ -552,7 +529,7 @@ enum SpellAttr4 : uint32
     SPELL_ATTR4_NO_PARTIAL_IMMUNITY                = 0x00000800, // TITLE Unknown attribute 11@Attr4
     SPELL_ATTR4_AURA_IS_BUFF                       = 0x00001000, // TITLE Unknown attribute 12@Attr4
     SPELL_ATTR4_DO_NOT_LOG_CASTER                  = 0x00002000, // TITLE Unknown attribute 13@Attr4
-    SPELL_ATTR4_REACTIVE_DAMAGE_PROC               = 0x00004000, // TITLE Damage does not break auras
+    SPELL_ATTR4_DAMAGE_DOESNT_BREAK_AURAS          = 0x00004000, // TITLE Damage does not break auras
     SPELL_ATTR4_NOT_IN_SPELLBOOK                   = 0x00008000, // TITLE Unknown attribute 15@Attr4
     SPELL_ATTR4_NOT_IN_ARENA_OR_RATED_BATTLEGROUND = 0x00010000, // TITLE Not usable in arena DESCRIPTION Makes spell unusable despite CD <= 10min
     SPELL_ATTR4_IGNORE_DEFAULT_ARENA_RESTRICTIONS  = 0x00020000, // TITLE Usable in arena DESCRIPTION Makes spell usable despite CD > 10min
@@ -1308,7 +1285,7 @@ enum AuraStateType
     //AURA_STATE_UNKNOWN6                   = 6,            //     | not used
     AURA_STATE_HUNTER_PARRY                 = 7,            // C   |
     //AURA_STATE_UNKNOWN7                   = 7,            //  c  | creature cheap shot / focused bursts spells
-    //AURA_STATE_UNKNOWN8                   = 8,            //    t| test spells
+    AURA_STATE_BANISHED                     = 8,            //  c t| banished
     //AURA_STATE_UNKNOWN9                   = 9,            //     |
     AURA_STATE_WARRIOR_VICTORY_RUSH         = 10,           // C   | warrior victory rush
     //AURA_STATE_UNKNOWN11                  = 11,           // C  t| 60348 - Maelstrom Ready!, test spells
@@ -1365,17 +1342,32 @@ enum Mechanics : uint32
     MECHANIC_IMMUNE_SHIELD    = 29,                         // Divine (Blessing) Shield/Protection and Ice Block
     MECHANIC_SAPPED           = 30,
     MECHANIC_ENRAGED          = 31,
-    MAX_MECHANIC              = 32 // SKIP
+    MECHANIC_WOUNDED          = 32,
+    MECHANIC_INFECTED_2       = 33,
+    MECHANIC_INFECTED_3       = 34,
+    MECHANIC_INFECTED_4       = 35,
+    MECHANIC_TAUNTED          = 36,
+    MAX_MECHANIC              = 37 // SKIP
 };
 
 // Used for spell 42292 Immune Movement Impairment and Loss of Control (0x49967ca6)
-#define IMMUNE_TO_MOVEMENT_IMPAIRMENT_AND_LOSS_CONTROL_MASK (\
-    (1<<MECHANIC_CHARM)|(1<<MECHANIC_DISORIENTED)|(1<<MECHANIC_FEAR)| \
-    (1<<MECHANIC_ROOT)|(1<<MECHANIC_SLEEP)|(1<<MECHANIC_SNARE)| \
-    (1<<MECHANIC_STUN)|(1<<MECHANIC_FREEZE)|(1<<MECHANIC_KNOCKOUT)| \
-    (1<<MECHANIC_POLYMORPH)|(1<<MECHANIC_BANISH)|(1<<MECHANIC_SHACKLE)| \
-    (1<<MECHANIC_TURN)|(1<<MECHANIC_HORROR)|(1<<MECHANIC_DAZE)| \
-    (1<<MECHANIC_SAPPED))
+inline constexpr uint64 IMMUNE_TO_MOVEMENT_IMPAIRMENT_AND_LOSS_CONTROL_MASK =
+    (1ULL << MECHANIC_CHARM) |
+    (1ULL << MECHANIC_DISORIENTED) |
+    (1ULL << MECHANIC_FEAR) |
+    (1ULL << MECHANIC_ROOT) |
+    (1ULL << MECHANIC_SLEEP) |
+    (1ULL << MECHANIC_SNARE) |
+    (1ULL << MECHANIC_STUN) |
+    (1ULL << MECHANIC_FREEZE) |
+    (1ULL << MECHANIC_KNOCKOUT) |
+    (1ULL << MECHANIC_POLYMORPH) |
+    (1ULL << MECHANIC_BANISH) |
+    (1ULL << MECHANIC_SHACKLE) |
+    (1ULL << MECHANIC_TURN) |
+    (1ULL << MECHANIC_HORROR) |
+    (1ULL << MECHANIC_DAZE) |
+    (1ULL << MECHANIC_SAPPED);
 
 // Spell dispel type
 enum DispelType
@@ -1391,7 +1383,8 @@ enum DispelType
     DISPEL_SPE_NPC_ONLY = 8,
     DISPEL_ENRAGE       = 9,
     DISPEL_ZG_TICKET    = 10,
-    DESPEL_OLD_UNUSED   = 11
+    DESPEL_OLD_UNUSED   = 11,
+    DISPEL_MAX
 };
 
 #define DISPEL_ALL_MASK ((1<<DISPEL_MAGIC) | (1<<DISPEL_CURSE) | (1<<DISPEL_DISEASE) | (1<<DISPEL_POISON))
@@ -2657,7 +2650,7 @@ enum CreatureFamily
     CREATURE_FAMILY_CARRION_BIRD   = 7,
     CREATURE_FAMILY_CRAB           = 8,
     CREATURE_FAMILY_GORILLA        = 9,
-    CREATURE_FAMILY_HORSE_CUSTOM   = 10,                    // not exist in DBC but used for horse like beasts in DB
+    CREATURE_FAMILY_NOT_SPECIFIED  = 10, // Doesn't exist in DBC, but used by many creatures
     CREATURE_FAMILY_RAPTOR         = 11,
     CREATURE_FAMILY_TALLSTRIDER    = 12,
     CREATURE_FAMILY_FELHUNTER      = 15,
@@ -3698,6 +3691,13 @@ enum PvPTeamId
     PVP_TEAM_NEUTRAL     = 2  // Battleground: Neutral,  Arena: None
 };
 
+enum AllianceId
+{
+    ALLIANCE_ALLIANCE = 0,
+    ALLIANCE_HORDE    = 1,
+    ALLIANCE_NEUTRAL  = 2
+};
+
 uint8 constexpr PVP_TEAMS_COUNT = 2;
 
 inline PvPTeamId GetPvPTeamId(TeamId teamId)
@@ -3812,7 +3812,7 @@ enum TradeStatus
     TRADE_STATUS_NO_TARGET      = 6,
     TRADE_STATUS_BACK_TO_TRADE  = 7,
     TRADE_STATUS_TRADE_COMPLETE = 8,
-    // 9?
+    TRADE_STATUS_TRADE_REJECTED = 9,
     TRADE_STATUS_TARGET_TO_FAR  = 10,
     TRADE_STATUS_WRONG_FACTION  = 11,
     TRADE_STATUS_CLOSE_WINDOW   = 12,
@@ -3825,8 +3825,8 @@ enum TradeStatus
     TRADE_STATUS_YOU_LOGOUT     = 19,
     TRADE_STATUS_TARGET_LOGOUT  = 20,
     TRADE_STATUS_TRIAL_ACCOUNT  = 21,                       // Trial accounts can not perform that action
-    TRADE_STATUS_ONLY_CONJURED  = 22,                       // You can only trade conjured items... (cross realm BG related).
-    TRADE_STATUS_NOT_ELIGIBLE   = 23                        // Related to trading soulbound loot items
+    TRADE_STATUS_WRONG_REALM    = 22,                       // You can only trade conjured items... (cross realm BG related).
+    TRADE_STATUS_NOT_ON_TAPLIST = 23                        // Related to trading soulbound loot items
 };
 
 enum XPColorChar : uint8

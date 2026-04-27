@@ -29,17 +29,68 @@ namespace Acore
     template<typename... Args>
     using FormatString = fmt::format_string<Args...>;
 
+    using FormatStringView = fmt::string_view;
+
+    using FormatArgs = fmt::format_args;
+
+    template<typename... Args>
+    constexpr auto MakeFormatArgs(Args&&... args)
+    {
+        return fmt::make_format_args(args...);
+    }
+
     /// Default AC string format function.
     template<typename... Args>
-    inline std::string StringFormat(FormatString<Args...> fmt, Args&&... args)
+    inline std::string StringFormat(FormatStringView fmt, Args&&... args)
     {
         try
         {
-            return fmt::format(fmt, std::forward<Args>(args)...);
+            return fmt::vformat(fmt, fmt::make_format_args(args...));
         }
         catch (std::exception const& e)
         {
-            return fmt::format("Wrong format occurred ({}). Fmt string: '{}'", e.what(), fmt.get());
+            return fmt::format("Wrong format occurred ({}). Fmt string: '{}'", e.what(), fmt);
+        }
+    }
+
+    /// Format directly to an output iterator.
+    template<typename OutputIt, typename... Args>
+    inline OutputIt StringFormatTo(OutputIt out, FormatStringView fmt, Args&&... args)
+    {
+        try
+        {
+            return fmt::vformat_to(out, fmt, fmt::make_format_args(args...));
+        }
+        catch (std::exception const& e)
+        {
+            return fmt::format_to(out, "Wrong format occurred ({}). Fmt string: '{}'", e.what(), fmt);
+        }
+    }
+
+    /// Format with pre-built format args.
+    inline std::string StringVFormat(FormatStringView fmt, FormatArgs args)
+    {
+        try
+        {
+            return fmt::vformat(fmt, args);
+        }
+        catch (std::exception const& e)
+        {
+            return fmt::format("Wrong format occurred ({}). Fmt string: '{}'", e.what(), fmt);
+        }
+    }
+
+    /// Format with pre-built format args directly to an output iterator.
+    template<typename OutputIt>
+    inline OutputIt StringVFormatTo(OutputIt out, FormatStringView fmt, FormatArgs args)
+    {
+        try
+        {
+            return fmt::vformat_to(out, fmt, args);
+        }
+        catch (std::exception const& e)
+        {
+            return fmt::format_to(out, "Wrong format occurred ({}). Fmt string: '{}'", e.what(), fmt);
         }
     }
 
