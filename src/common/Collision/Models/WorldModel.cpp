@@ -84,6 +84,56 @@ namespace VMAP
         return false;
     }
 
+    bool IntersectTriangleDetailed(MeshTriangle const& tri, std::vector<Vector3>::const_iterator points,
+                                   G3D::Ray const& ray, float& distance, G3D::Vector3* hitNormal)
+    {
+        static float constexpr EPS = 1e-5f;
+
+        Vector3 const e1 = points[tri.idx1] - points[tri.idx0];
+        Vector3 const e2 = points[tri.idx2] - points[tri.idx0];
+        Vector3 const p(ray.direction().cross(e2));
+
+        float const a = e1.dot(p);
+        if (std::fabs(a) < EPS)
+            return false;
+
+        float const f = 1.0f / a;
+        Vector3 const s(ray.origin() - points[tri.idx0]);
+
+        float const u = f * s.dot(p);
+        if (u < 0.0f || u > 1.0f)
+            return false;
+
+        Vector3 const q(s.cross(e1));
+        float const v = f * ray.direction().dot(q);
+        if (v < 0.0f || u + v > 1.0f)
+            return false;
+
+        float const t = f * e2.dot(q);
+        if (t <= 0.0f || t >= distance)
+            return false;
+
+        distance = t;
+
+        if (hitNormal)
+        {
+            Vector3 normal = e1.cross(e2);
+            if (!normal.isZero())
+            {
+                normal = normal.unit();
+
+                // Make the normal oppose the ray direction. For downward height rays,
+                // this gives an upward-facing normal.
+                if (normal.dot(ray.direction()) > 0.0f)
+                    normal = -normal;
+
+                *hitNormal = normal;
+            }
+        }
+
+        return true;
+    }
+
     class TriBoundFunc
     {
     public:
@@ -426,27 +476,39 @@ namespace VMAP
 
     struct GModelRayCallback
     {
-        GModelRayCallback(const std::vector<MeshTriangle>& tris, const std::vector<Vector3>& vert):
-            vertices(vert.begin()), triangles(tris.begin()), hit(false) { }
-        bool operator()(const G3D::Ray& ray, uint32 entry, float& distance, bool /*StopAtFirstHit*/)
+        GModelRayCallback(std::vector<MeshTriangle> const& tris, std::vector<Vector3> const& vert, G3D::Vector3* normal = nullptr)
+            : vertices(vert.begin()), triangles(tris.begin()), hit(false), hitNormal(normal)
         {
-            bool result = IntersectTriangle(triangles[entry], vertices, ray, distance);
-            if (result) { hit = true; }
+        }
+
+        bool operator()(G3D::Ray const& ray, uint32 entry, float& distance, bool /*stopAtFirstHit*/)
+        {
+            G3D::Vector3 normal;
+            bool const result = IntersectTriangleDetailed(triangles[entry], vertices, ray, distance, hitNormal ? &normal : nullptr);
+
+            if (result)
+            {
+                hit = true;
+
+                if (hitNormal)
+                    *hitNormal = normal;
+            }
+
             return hit;
         }
+
         std::vector<Vector3>::const_iterator vertices;
         std::vector<MeshTriangle>::const_iterator triangles;
         bool hit;
+        G3D::Vector3* hitNormal;
     };
 
-    bool GroupModel::IntersectRay(const G3D::Ray& ray, float& distance, bool stopAtFirstHit) const
+    bool GroupModel::IntersectRay(G3D::Ray const& ray, float& distance, bool stopAtFirstHit, G3D::Vector3* hitNormal) const
     {
         if (triangles.empty())
-        {
             return false;
-        }
 
-        GModelRayCallback callback(triangles, vertices);
+        GModelRayCallback callback(triangles, vertices, hitNormal);
         meshTree.intersectRay(ray, callback, distance, stopAtFirstHit);
         return callback.hit;
     }
@@ -528,39 +590,45 @@ namespace VMAP
 
     struct WModelRayCallBack
     {
-        WModelRayCallBack(const std::vector<GroupModel>& mod): models(mod.begin()), hit(false) { }
-        bool operator()(const G3D::Ray& ray, uint32 entry, float& distance, bool StopAtFirstHit)
+        WModelRayCallBack(std::vector<GroupModel> const& mod, G3D::Vector3* normal = nullptr)
+            : models(mod.begin()), hit(false), hitNormal(normal)
         {
-            bool result = models[entry].IntersectRay(ray, distance, StopAtFirstHit);
-            if (result) { hit = true; }
+        }
+
+        bool operator()(G3D::Ray const& ray, uint32 entry, float& distance, bool stopAtFirstHit)
+        {
+            G3D::Vector3 normal;
+            bool const result = models[entry].IntersectRay(ray, distance, stopAtFirstHit, hitNormal ? &normal : nullptr);
+
+            if (result)
+            {
+                hit = true;
+
+                if (hitNormal)
+                    *hitNormal = normal;
+            }
+
             return hit;
         }
+
         std::vector<GroupModel>::const_iterator models;
         bool hit;
+        G3D::Vector3* hitNormal;
     };
 
-    bool WorldModel::IntersectRay(const G3D::Ray& ray, float& distance, bool stopAtFirstHit, ModelIgnoreFlags ignoreFlags) const
+    bool WorldModel::IntersectRay(G3D::Ray const& ray, float& distance, bool stopAtFirstHit,
+                                  ModelIgnoreFlags ignoreFlags, G3D::Vector3* hitNormal) const
     {
-        // If the caller asked us to ignore certain objects we should check flags
         if ((ignoreFlags & ModelIgnoreFlags::M2) != ModelIgnoreFlags::Nothing)
-        {
-            // M2 models are not taken into account for LoS calculation if caller requested their ignoring.
             if (Flags & MOD_M2)
-            {
                 return false;
-            }
-        }
 
-        // small M2 workaround, maybe better make separate class with virtual intersection funcs
-        // in any case, there's no need to use a bound tree if we only have one submodel
         if (groupModels.size() == 1)
-        {
-            return groupModels[0].IntersectRay(ray, distance, stopAtFirstHit);
-        }
+            return groupModels[0].IntersectRay(ray, distance, stopAtFirstHit, hitNormal);
 
-        WModelRayCallBack isc(groupModels);
-        groupTree.intersectRay(ray, isc, distance, stopAtFirstHit);
-        return isc.hit;
+        WModelRayCallBack callback(groupModels, hitNormal);
+        groupTree.intersectRay(ray, callback, distance, stopAtFirstHit);
+        return callback.hit;
     }
 
     class WModelAreaCallback

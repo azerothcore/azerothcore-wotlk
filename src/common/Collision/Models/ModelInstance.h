@@ -65,7 +65,7 @@ namespace VMAP
     public:
         ModelInstance() { }
         ModelInstance(const ModelSpawn& spawn, std::shared_ptr<WorldModel> model);
-        bool intersectRay(const G3D::Ray& pRay, float& pMaxDist, bool StopAtFirstHit, ModelIgnoreFlags ignoreFlags) const;
+        bool intersectRay(G3D::Ray const& pRay, float& pMaxDist, bool stopAtFirstHit, ModelIgnoreFlags ignoreFlags, G3D::Vector3* hitNormal = nullptr) const;
         bool GetLocationInfo(const G3D::Vector3& p, LocationInfo& info) const;
         bool GetLiquidLevel(const G3D::Vector3& p, LocationInfo& info, float& liqHeight) const;
         WorldModel* getWorldModel() { return iModel.get(); }

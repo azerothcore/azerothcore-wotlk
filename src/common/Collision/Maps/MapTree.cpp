@@ -35,21 +35,34 @@ namespace VMAP
     class MapRayCallback
     {
     public:
-        MapRayCallback(ModelInstance* val, ModelIgnoreFlags ignoreFlags): prims(val), flags(ignoreFlags), hit(false) { }
-        bool operator()(const G3D::Ray& ray, uint32 entry, float& distance, bool StopAtFirstHit)
+        MapRayCallback(ModelInstance* val, ModelIgnoreFlags ignoreFlags, G3D::Vector3* normal = nullptr)
+            : prims(val), flags(ignoreFlags), hit(false), hitNormal(normal)
         {
-            bool result = prims[entry].intersectRay(ray, distance, StopAtFirstHit, flags);
+        }
+
+        bool operator()(G3D::Ray const& ray, uint32 entry, float& distance, bool stopAtFirstHit)
+        {
+            G3D::Vector3 normal;
+            bool const result = prims[entry].intersectRay(ray, distance, stopAtFirstHit, flags, hitNormal ? &normal : nullptr);
+
             if (result)
             {
                 hit = true;
+
+                if (hitNormal)
+                    *hitNormal = normal;
             }
+
             return result;
         }
-        bool didHit() { return hit; }
+
+        bool didHit() const { return hit; }
+
     protected:
         ModelInstance* prims;
         ModelIgnoreFlags flags;
         bool hit;
+        G3D::Vector3* hitNormal;
     };
 
     class LocationInfoCallback
@@ -113,16 +126,17 @@ namespace VMAP
     Else, pMaxDist is not modified and returns false;
     */
 
-    bool StaticMapTree::GetIntersectionTime(const G3D::Ray& pRay, float& pMaxDist, bool StopAtFirstHit, ModelIgnoreFlags ignoreFlags) const
+    bool StaticMapTree::GetIntersectionTime(G3D::Ray const& pRay, float& pMaxDist, bool stopAtFirstHit,
+                                            ModelIgnoreFlags ignoreFlags, G3D::Vector3* hitNormal) const
     {
         float distance = pMaxDist;
-        MapRayCallback intersectionCallBack(iTreeValues, ignoreFlags);
-        iTree.intersectRay(pRay, intersectionCallBack, distance, StopAtFirstHit);
-        if (intersectionCallBack.didHit())
-        {
+        MapRayCallback callback(iTreeValues, ignoreFlags, hitNormal);
+        iTree.intersectRay(pRay, callback, distance, stopAtFirstHit);
+
+        if (callback.didHit())
             pMaxDist = distance;
-        }
-        return intersectionCallBack.didHit();
+
+        return callback.didHit();
     }
     //=========================================================
 
@@ -209,6 +223,27 @@ namespace VMAP
             height = pPos.z - maxDist;
         }
         return (height);
+    }
+
+    //=========================================================
+
+    bool StaticMapTree::getHeightAndNormal(G3D::Vector3 const& pPos, float maxSearchDist,
+                                           float& height, G3D::Vector3& normal) const
+    {
+        G3D::Ray ray(pPos, G3D::Vector3(0.0f, 0.0f, -1.0f));
+
+        float maxDist = maxSearchDist;
+        G3D::Vector3 hitNormal;
+
+        if (!GetIntersectionTime(ray, maxDist, false, ModelIgnoreFlags::Nothing, &hitNormal))
+        {
+            height = G3D::finf();
+            return false;
+        }
+
+        height = pPos.z - maxDist;
+        normal = hitNormal;
+        return true;
     }
 
     //=========================================================

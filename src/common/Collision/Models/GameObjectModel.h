@@ -70,7 +70,8 @@ public:
     [[nodiscard]] bool isEnabled() const { return phasemask != 0; }
     [[nodiscard]] bool IsMapObject() const { return isWmo; }
 
-    bool intersectRay(const G3D::Ray& Ray, float& MaxDist, bool StopAtFirstHit, uint32 ph_mask, VMAP::ModelIgnoreFlags ignoreFlags) const;
+    bool intersectRay(G3D::Ray const& ray, float& maxDist, bool stopAtFirstHit, uint32 phMask,
+                  VMAP::ModelIgnoreFlags ignoreFlags, G3D::Vector3* hitNormal = nullptr) const;
     bool GetLocationInfo(G3D::Vector3 const& point, VMAP::LocationInfo& info, uint32 ph_mask) const;
     bool GetLiquidLevel(G3D::Vector3 const& point, VMAP::LocationInfo& info, float& liqHeight) const;
 

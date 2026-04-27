@@ -1197,65 +1197,73 @@ namespace
     }
 }
 
-float Map::GetVMapHeightAccurate(float x, float y, float z, float radius, float yaw,
-    GridTerrainData::GroundFootprintShape shape, float blend, float clamp, float sampleDelta, float maxSearchDist) const
+float ComputeFootprintHeightFromNormal(float baseHeight, G3D::Vector3 normal, float radius,
+                                       float yaw, float blend, float clamp)
 {
-    auto sample = [&](float sx, float sy) -> float
-    {
-        float h = _mapCollisionData.GetStaticTree().getHeight(sx, sy, z, maxSearchDist);
-        return (h > INVALID_HEIGHT) ? h : std::numeric_limits<float>::quiet_NaN();
-    };
-
-    float h0 = sample(x, y);
-    if (!std::isfinite(h0))
-        return VMAP_INVALID_HEIGHT_VALUE;
-
     if (radius <= 0.0f)
-        return h0;
+        return baseHeight;
 
-    const float d = (sampleDelta > 0.0f) ? sampleDelta
-                    : std::max(0.05f, std::min(0.5f, radius * 0.5f));
+    if (!std::isfinite(normal.x) || !std::isfinite(normal.y) || !std::isfinite(normal.z))
+        return baseHeight;
 
-    float hx1 = sample(x + d, y), hx2 = sample(x - d, y);
-    float hy1 = sample(x, y + d), hy2 = sample(x, y - d);
+    if (normal.z < 0.0f)
+        normal = -normal;
 
-    auto diff = [&](float p, float m) -> float
-    {
-        if (std::isfinite(p) && std::isfinite(m)) return (p - m) / (2.0f * d);
-        if (std::isfinite(p))                     return (p - h0) / d;
-        if (std::isfinite(m))                     return (h0 - m) / d;
-        return 0.0f;
-    };
+    if (normal.z <= 1.0e-6f)
+        return baseHeight;
 
-    float gx = diff(hx1, hx2);  // dz/dx
-    float gy = diff(hy1, hy2);  // dz/dy
+    float gx = -normal.x / normal.z;
+    float gy = -normal.y / normal.z;
+
+    if (!std::isfinite(gx) || !std::isfinite(gy))
+        return baseHeight;
 
     if (clamp > 0.0f)
     {
         float const g2 = gx * gx + gy * gy;
         float const c2 = clamp * clamp;
+
         if (g2 > c2)
         {
-            float const s = clamp / std::sqrt(g2);
-            gx *= s;
-            gy *= s;
+            float const scale = clamp / std::sqrt(g2);
+            gx *= scale;
+            gy *= scale;
         }
     }
 
     float const slopeL2 = std::sqrt(std::max(0.0f, gx * gx + gy * gy));
     float totalSlope = slopeL2;
-    float const effectiveBlend = Clamp01(blend);
 
-    if (shape == GridTerrainData::GroundFootprintShape::Square && effectiveBlend < 1.0f)
+    float const effectiveBlend = Clamp01(blend);
+    if (effectiveBlend < 1.0f)
     {
-        float const c = std::cos(yaw);
-        float const s = std::sin(yaw);
-        float const rx = gx * c + gy * s;
-        float const ry = -gx * s + gy * c;
+        float const cosYaw = std::cos(yaw);
+        float const sinYaw = std::sin(yaw);
+
+        float const rx = gx * cosYaw + gy * sinYaw;
+        float const ry = -gx * sinYaw + gy * cosYaw;
+
         float const slopeL1 = std::abs(rx) + std::abs(ry);
         totalSlope = effectiveBlend * slopeL2 + (1.0f - effectiveBlend) * (INV_SQRT2 * slopeL1);
     }
-    return h0 + radius * totalSlope;
+
+    return baseHeight + radius * totalSlope;
+}
+
+float Map::GetVMapHeightAccurate(float x, float y, float z, float radius, float yaw,
+    GridTerrainData::GroundFootprintShape shape, float blend, float clamp, float /*sampleDelta*/, float maxSearchDist) const
+{
+    float height;
+    G3D::Vector3 normal;
+
+    if (!_mapCollisionData.GetStaticTree().getHeightAndNormal(G3D::Vector3(x, y, z), maxSearchDist, height, normal))
+        return VMAP_INVALID_HEIGHT_VALUE;
+
+    if (radius <= 0.0f)
+        return height;
+
+    float const effectiveBlend = (shape == GridTerrainData::GroundFootprintShape::Square) ? blend : 1.0f;
+    return ComputeFootprintHeightFromNormal(height, normal, radius, yaw, effectiveBlend, clamp);
 }
 
 float Map::GetHeightAccurate(float x, float y, float z, float radius, bool checkVMap /*= true*/, float maxSearchDist /*= DEFAULT_HEIGHT_SEARCH*/) const
