@@ -35,7 +35,6 @@ CREATE TABLE `playercreateinfo_cast_spell` (
 LOCK TABLES `playercreateinfo_cast_spell` WRITE;
 /*!40000 ALTER TABLE `playercreateinfo_cast_spell` DISABLE KEYS */;
 INSERT INTO `playercreateinfo_cast_spell` VALUES
-(0,32,48266,'Death Knight - Blood Presence'),
 (0,1,2457,'Warrior - Battle Stance');
 /*!40000 ALTER TABLE `playercreateinfo_cast_spell` ENABLE KEYS */;
 UNLOCK TABLES;

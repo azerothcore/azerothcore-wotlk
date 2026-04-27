@@ -25,6 +25,7 @@
 #include "SpellScriptLoader.h"
 #include "Totem.h"
 #include "UnitAI.h"
+#include "World.h"
 /*
  * Scripts for spells with SPELLFAMILY_DEATHKNIGHT and SPELLFAMILY_GENERIC spells used by deathknight players.
  * Ordered alphabetically using scriptname.
@@ -125,6 +126,32 @@ enum Misc
     NPC_DK_GHOUL                                = 26125,
     NPC_RISEN_ALLY                              = 30230
 };
+
+namespace
+{
+bool IsLowHeroicDeathKnight(Unit* caster)
+{
+    Player* player = caster ? caster->ToPlayer() : nullptr;
+    if (!player || player->getClass() != CLASS_DEATH_KNIGHT)
+        return false;
+
+    uint32 const heroicStart = uint32(sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL));
+    if (heroicStart == 0 || heroicStart >= 55)
+        return false;
+
+    // Keep the tuning for the early leveling window only.
+    return player->GetLevel() <= 20;
+}
+
+int32 GetLowHeroicDkDamageCap(Unit* caster)
+{
+    if (!caster)
+        return 0;
+
+    uint32 const normalizedWeaponDamage = caster->CalculateDamage(BASE_ATTACK, true, true);
+    return int32(float(normalizedWeaponDamage) * 1.2f);
+}
+}
 
 // 50526 - Wandering Plague
 class spell_dk_wandering_plague : public SpellScript
@@ -1393,6 +1420,14 @@ class spell_dk_death_coil : public SpellScript
             {
                 if (AuraEffect const* auraEffect = caster->GetAuraEffect(SPELL_DK_ITEM_SIGIL_VENGEFUL_HEART, EFFECT_1))
                     damage += auraEffect->GetBaseAmount();
+
+                if (IsLowHeroicDeathKnight(caster))
+                {
+                    int32 const cap = GetLowHeroicDkDamageCap(caster);
+                    if (cap > 0 && damage > cap)
+                        damage = cap;
+                }
+
                 caster->CastCustomSpell(target, SPELL_DK_DEATH_COIL_DAMAGE, &damage, nullptr, nullptr, true);
             }
         }
@@ -1419,6 +1454,31 @@ class spell_dk_death_coil : public SpellScript
     {
         OnCheckCast += SpellCheckCastFn(spell_dk_death_coil::CheckCast);
         OnEffectHitTarget += SpellEffectFn(spell_dk_death_coil::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
+// -45477, -45462 - Icy Touch / Plague Strike
+class spell_dk_low_heroic_damage_tuning : public SpellScript
+{
+    PrepareSpellScript(spell_dk_low_heroic_damage_tuning);
+
+    void CapDirectHitDamage()
+    {
+        if (!IsLowHeroicDeathKnight(GetCaster()))
+            return;
+
+        int32 damage = GetHitDamage();
+        if (damage <= 0)
+            return;
+
+        int32 const cap = GetLowHeroicDkDamageCap(GetCaster());
+        if (cap > 0 && damage > cap)
+            SetHitDamage(cap);
+    }
+
+    void Register() override
+    {
+        OnHit += SpellHitFn(spell_dk_low_heroic_damage_tuning::CapDirectHitDamage);
     }
 };
 
@@ -3018,6 +3078,7 @@ void AddSC_deathknight_spell_scripts()
     RegisterSpellScript(spell_dk_blood_gorged);
     RegisterSpellScript(spell_dk_corpse_explosion);
     RegisterSpellScript(spell_dk_death_coil);
+    RegisterSpellScript(spell_dk_low_heroic_damage_tuning);
     RegisterSpellScript(spell_dk_death_gate);
     RegisterSpellScript(spell_dk_death_grip);
     RegisterSpellScript(spell_dk_death_pact);

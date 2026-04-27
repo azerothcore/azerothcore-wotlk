@@ -54,6 +54,7 @@
 #include "GuildMgr.h"
 #include "InstanceSaveMgr.h"
 #include "InstanceScript.h"
+#include "ItemTemplate.h"
 #include "LFGMgr.h"
 #include "Log.h"
 #include "LootItemStorage.h"
@@ -500,10 +501,36 @@ bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo
         return false;
     }
 
+    uint32 createMapId = info->mapId;
+    uint32 createAreaId = info->areaId;
+    float createX = info->positionX;
+    float createY = info->positionY;
+    float createZ = info->positionZ;
+    float createO = info->orientation;
+
+    if (createInfo->Class == CLASS_DEATH_KNIGHT)
+    {
+        uint32 const heroicStartCfg =
+            uint32(sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL));
+        if (heroicStartCfg > 0u && heroicStartCfg < 55u)
+        {
+            if (PlayerInfo const* posTpl =
+                    sObjectMgr->GetPlayerClassStarterPositionTemplate(createInfo->Race))
+            {
+                createMapId = posTpl->mapId;
+                createAreaId = posTpl->areaId;
+                createX = posTpl->positionX;
+                createY = posTpl->positionY;
+                createZ = posTpl->positionZ;
+                createO = posTpl->orientation;
+            }
+        }
+    }
+
     for (uint8 i = 0; i < PLAYER_SLOTS_COUNT; i++)
         m_items[i] = nullptr;
 
-    Relocate(info->positionX, info->positionY, info->positionZ, info->orientation);
+    Relocate(createX, createY, createZ, createO);
 
     ChrClassesEntry const* cEntry = sChrClassesStore.LookupEntry(createInfo->Class);
     if (!cEntry)
@@ -513,7 +540,7 @@ bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo
         return false;
     }
 
-    SetMap(sMapMgr->CreateMap(info->mapId, this));
+    SetMap(sMapMgr->CreateMap(createMapId, this));
 
     uint8 powertype = cEntry->powerType;
 
@@ -620,6 +647,7 @@ bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo
     // original spells
     LearnDefaultSkills();
     LearnCustomSpells();
+    GrantLowHeroicDeathKnightPlagueStrikeIfNeeded();
 
     // original action bar
     for (PlayerCreateInfoActions::const_iterator action_itr = info->action.begin(); action_itr != info->action.end(); ++action_itr)
@@ -658,10 +686,22 @@ bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo
             if (createInfo->Class == CLASS_DEATH_KNIGHT)
             {
                 ItemTemplate const* const testProto = sObjectMgr->GetItemTemplate(itemId);
-                if (testProto && testProto->Class == ITEM_CLASS_WEAPON &&
-                    (testProto->InventoryType == INVTYPE_WEAPONMAINHAND ||
-                     testProto->InventoryType == INVTYPE_WEAPON))
-                    itemId = item_dk_start_two_handed_sword;
+                if (testProto && testProto->Class == ITEM_CLASS_WEAPON)
+                {
+                    uint8 const sub = testProto->SubClass;
+                    bool const axeOrSword =
+                        sub == ITEM_SUBCLASS_WEAPON_AXE || sub == ITEM_SUBCLASS_WEAPON_AXE2 ||
+                        sub == ITEM_SUBCLASS_WEAPON_SWORD || sub == ITEM_SUBCLASS_WEAPON_SWORD2;
+
+                    uint8 const inv = testProto->InventoryType;
+                    bool const primarySlot =
+                        inv == INVTYPE_WEAPON || inv == INVTYPE_WEAPONMAINHAND || inv == INVTYPE_2HWEAPON;
+
+                    // DK starter must be a two-handed axe or sword (CharStartOutfit can come from
+                    // paladin/warrior rows, e.g. Tauren paladin 2H mace — unusable for DK).
+                    if (primarySlot && (!axeOrSword || inv != INVTYPE_2HWEAPON))
+                        itemId = item_dk_start_two_handed_sword;
+                }
             }
 
             // just skip, reported in ObjectMgr::LoadItemTemplates
@@ -732,6 +772,8 @@ bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo
     // ensure player starts with full health
     UpdateAllStats();
     SetFullHealth();
+
+    ApplyLowLevelHeroicDeathKnightSpellbookLimits();
 
     CheckAllAchievementCriteria();
 
@@ -11835,7 +11877,9 @@ void Player::resetSpells()
 
     LearnDefaultSkills();
     LearnCustomSpells();
+    GrantLowHeroicDeathKnightPlagueStrikeIfNeeded();
     learnQuestRewardedSpells();
+    ApplyLowLevelHeroicDeathKnightSpellbookLimits();
 }
 
 void Player::LearnCustomSpells()
@@ -11864,13 +11908,123 @@ void Player::LearnCustomSpells()
     }
 }
 
+void Player::ApplyLowLevelHeroicDeathKnightSpellbookLimits()
+{
+    if (getClass() != CLASS_DEATH_KNIGHT)
+        return;
+
+    uint32 const heroicStart = uint32(sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL));
+    if (heroicStart == 0 || heroicStart >= 55)
+        return;
+
+    if (GetLevel() > heroicStart)
+        return;
+
+    constexpr uint32 SPELL_PLAGUE_STRIKE_RANK1 = 45462;
+
+    std::vector<uint32> removeIds;
+    removeIds.reserve(64);
+
+    for (auto const& pair : GetSpellMap())
+    {
+        uint32 const spellId = pair.first;
+        if (spellId == SPELL_PLAGUE_STRIKE_RANK1)
+            continue;
+
+        SpellInfo const* si = sSpellMgr->GetSpellInfo(spellId);
+        if (!si)
+            continue;
+
+        // Strip DK spellbook abilities: SpellFamily, core DK lines, or any class-category
+        // SkillLineAbility row that is Death-Knight-only (Death Grip / Death Coil use the
+        // latter in 3.3.5 DBC, not SPELLFAMILY_DEATHKNIGHT / blood-frost-unholy lines).
+        bool fromDkSkillLine = false;
+        SkillLineAbilityMapBounds const skillBounds = sSpellMgr->GetSkillLineAbilityMapBounds(spellId);
+        constexpr uint32 dkClassMask = (1u << (CLASS_DEATH_KNIGHT - 1));
+        for (auto slaItr = skillBounds.first; slaItr != skillBounds.second; ++slaItr)
+        {
+            SkillLineAbilityEntry const* sla = slaItr->second;
+            uint32 const lineId = sla->SkillLine;
+            if (lineId == SKILL_DK_BLOOD || lineId == SKILL_DK_FROST || lineId == SKILL_DK_UNHOLY || lineId == SKILL_RUNEFORGING)
+            {
+                fromDkSkillLine = true;
+                break;
+            }
+
+            SkillLineEntry const* sle = sSkillLineStore.LookupEntry(lineId);
+            if (!sle || sle->categoryId != SKILL_CATEGORY_CLASS)
+                continue;
+
+            uint32 const playableMask = sla->ClassMask & CLASSMASK_ALL_PLAYABLE;
+            if (playableMask == dkClassMask)
+            {
+                fromDkSkillLine = true;
+                break;
+            }
+        }
+
+        bool const dkFamily = (si->SpellFamilyName == SPELLFAMILY_DEATHKNIGHT);
+
+        // Extra roots: SkillLineAbility data can vary; these are the WotLK DK starters.
+        uint32 const firstInChain = sSpellMgr->GetFirstSpellInChain(spellId);
+        bool const explicitLowHeroicDkStrip =
+            firstInChain == 47541 || firstInChain == 49576 || firstInChain == 49560;
+
+        if (!dkFamily && !fromDkSkillLine && !explicitLowHeroicDkStrip)
+            continue;
+
+        if (si->IsPassive())
+            continue;
+
+        if (si->HasAttribute(SPELL_ATTR0_DO_NOT_DISPLAY))
+            continue;
+
+        removeIds.push_back(spellId);
+    }
+
+    for (uint32 spellId : removeIds)
+        removeSpell(spellId, SPEC_MASK_ALL, false);
+}
+
+void Player::GrantLowHeroicDeathKnightPlagueStrikeIfNeeded()
+{
+    if (getClass() != CLASS_DEATH_KNIGHT)
+        return;
+
+    uint32 const heroicStart = uint32(sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL));
+    if (heroicStart == 0 || heroicStart >= 55)
+        return;
+
+    if (GetLevel() > heroicStart)
+        return;
+
+    constexpr uint32 SPELL_PLAGUE_STRIKE_RANK1 = 45462;
+    if (HasSpell(SPELL_PLAGUE_STRIKE_RANK1))
+        return;
+
+    if (!IsInWorld())
+        addSpell(SPELL_PLAGUE_STRIKE_RANK1, SPEC_MASK_ALL, true);
+    else
+        learnSpell(SPELL_PLAGUE_STRIKE_RANK1);
+}
+
 void Player::LearnDefaultSkills()
 {
     // learn default race/class skills
     PlayerInfo const* info = sObjectMgr->GetPlayerInfo(getRace(), getClass());
+
+    uint32 const heroicStartCfg = uint32(sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL));
+    bool const skipDkTalentSkillLines =
+        getClass() == CLASS_DEATH_KNIGHT && heroicStartCfg > 0u && heroicStartCfg < 55u &&
+        GetLevel() <= heroicStartCfg;
+
     for (PlayerCreateInfoSkills::const_iterator itr = info->skills.begin(); itr != info->skills.end(); ++itr)
     {
         uint32 skillId = itr->SkillId;
+        if (skipDkTalentSkillLines &&
+            (skillId == SKILL_DK_BLOOD || skillId == SKILL_DK_FROST || skillId == SKILL_DK_UNHOLY))
+            continue;
+
         if (HasSkill(skillId))
             continue;
 

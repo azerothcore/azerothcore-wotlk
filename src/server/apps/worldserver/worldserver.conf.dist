@@ -2431,11 +2431,11 @@ MaxGroupXPDistance = 74
 #                     1 - (Rate.XP.Explore)
 #                     1 - (Rate.XP.Pet)
 
-Rate.XP.Kill      = 1
-Rate.XP.Quest     = 1
-Rate.XP.Quest.DF  = 1
-Rate.XP.Explore   = 1
-Rate.XP.Pet       = 1
+Rate.XP.Kill      = 3.5
+Rate.XP.Quest     = 3.5
+Rate.XP.Quest.DF  = 3.5
+Rate.XP.Explore   = 3.5
+Rate.XP.Pet       = 3.5
 
 #
 #    Rate.XP.BattlegroundKill...

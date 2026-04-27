@@ -987,8 +987,14 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
     if (firstLogin)
     {
         PlayerInfo const* info = sObjectMgr->GetPlayerInfo(pCurrChar->getRace(), pCurrChar->getClass());
+        uint32 const heroicStartCfg =
+            uint32(sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL));
         for (uint32 spellId : info->castSpells)
         {
+            if (pCurrChar->getClass() == CLASS_DEATH_KNIGHT && heroicStartCfg > 0u &&
+                heroicStartCfg < 55u && spellId == 48266u)
+                continue;
+
             pCurrChar->CastSpell(pCurrChar, spellId, true);
         }
 
