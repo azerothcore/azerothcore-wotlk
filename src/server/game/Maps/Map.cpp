@@ -1754,11 +1754,11 @@ float Map::GetHeightAccurate(uint32 phasemask, float x, float y, float z, float 
         const float clamp = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_SLOPE_CLAMP);
         const float dlt   = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_DYNAMIC_DELTA);
         const float effBlend = (shape == GridTerrainData::GroundFootprintShape::Square) ? blend : 1.0f;
-        hDyn = _dynamicTree.getHeightAccurate(x, y, z, maxSearchDist, phasemask, radius, yaw, effBlend, clamp, dlt);
+        hDyn = _mapCollisionData.GetDynamicTree().getHeightAccurate(x, y, z, maxSearchDist, phasemask, radius, yaw, effBlend, clamp, dlt);
     }
     else
     {
-        hDyn = _dynamicTree.getHeight(x, y, z, maxSearchDist, phasemask);
+        hDyn = _mapCollisionData.GetDynamicTree().getHeight(x, y, z, maxSearchDist, phasemask);
     }
     return std::max<float>(hMapMix, hDyn);
 }
