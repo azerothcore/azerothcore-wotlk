@@ -3099,7 +3099,7 @@ float WorldObject::GetGroundProbeRadius() const
 }
 
 float WorldObject::GetMapHeightAccurate(float x, float y, float z, bool vmap/* = true*/,
-                                        float distanceToSearch/* = DEFAULT_HEIGHT_SEARCH*/, float radius/* = 0.3f*/) const
+                                        float distanceToSearch/* = DEFAULT_HEIGHT_SEARCH*/, float radius/* = 0.0f*/) const
 {
     if (radius <= 0.0f)
         radius = GetGroundProbeRadius();

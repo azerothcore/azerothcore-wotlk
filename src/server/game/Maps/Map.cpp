@@ -1200,10 +1200,9 @@ namespace
 float Map::GetVMapHeightAccurate(float x, float y, float z, float radius, float yaw,
     GridTerrainData::GroundFootprintShape shape, float blend, float clamp, float sampleDelta, float maxSearchDist) const
 {
-    VMAP::IVMapMgr* vmgr = VMAP::VMapFactory::createOrGetVMapMgr();
     auto sample = [&](float sx, float sy) -> float
     {
-        float h = vmgr->getHeight(GetId(), sx, sy, z, maxSearchDist);
+        float h = _mapCollisionData.GetStaticTree().getHeight(sx, sy, z, maxSearchDist);
         return (h > INVALID_HEIGHT) ? h : std::numeric_limits<float>::quiet_NaN();
     };
 
@@ -1268,11 +1267,15 @@ float Map::GetHeightAccurate(float x, float y, float z, float radius, float yaw,
 {
     // find raw .map surface under Z coordinates
     float mapHeight = VMAP_INVALID_HEIGHT_VALUE;
-    float gridHeight = GetGridHeightAccurate(x, y, radius, yaw);
-    if (gridHeight > INVALID_HEIGHT)
+    float const gridBaseHeight = GetGridHeight(x, y);
+    float const gridHeight = GetGridHeightAccurate(x, y, radius, yaw);
+    if (gridBaseHeight > INVALID_HEIGHT && gridHeight > INVALID_HEIGHT)
     {
-        const float tol = std::max(0.1f, 0.5f * radius); // dynamic tolerance based on the size of the collider
-        if (G3D::fuzzyGe(z, gridHeight - tol))
+        // Use the point height for the Z visibility/search test. The accurate height
+        // intentionally lifts the result on slopes, so testing against it can reject
+        // valid terrain whenever the caller starts only slightly above the unit feet.
+        float const tol = std::max(GROUND_HEIGHT_TOLERANCE, radius + 0.2f);
+        if (G3D::fuzzyGe(z, gridBaseHeight - tol))
             mapHeight = gridHeight;
     }
 
@@ -1290,8 +1293,7 @@ float Map::GetHeightAccurate(float x, float y, float z, float radius, float yaw,
         }
         else
         {
-            VMAP::IVMapMgr* vmgr = VMAP::VMapFactory::createOrGetVMapMgr();
-            vmapHeight = vmgr->getHeight(GetId(), x, y, z, maxSearchDist);
+            vmapHeight = _mapCollisionData.GetStaticTree().getHeight(x, y, z, maxSearchDist);
         }
     }
 

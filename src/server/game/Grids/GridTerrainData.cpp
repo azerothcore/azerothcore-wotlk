@@ -626,8 +626,6 @@ namespace
     constexpr float GRID_CELL_SIZE = SIZE_OF_GRIDS / float(MAP_RESOLUTION);
 }
 
-static inline float CELL_SIZE() { return SIZE_OF_GRIDS / float(MAP_RESOLUTION); } // ≈ 4.1666667f
-
 bool GridTerrainData::SampleHeights(uint32 xInt, uint32 yInt, float& h1, float& h2, float& h3, float& h4, float& h5) const
 {
     if (!_loadedHeightData)

@@ -641,8 +641,8 @@ public:
         float const yaw = object->GetOrientation();
         float const probeRScaled = probeR * rScale;
 
-        float const GridZAccurate = map->GetGridHeightAccurate(object->GetPositionX(), object->GetPositionY(), probeRScaled, yaw);
-        float const MapZAccurate = object->GetMapHeightAccurate(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ(), true, DEFAULT_HEIGHT_SEARCH, probeR);
+        float const gridZAccurate = map->GetGridHeightAccurate(object->GetPositionX(), object->GetPositionY(), probeRScaled, yaw);
+        float const mapZAccurate = object->GetMapHeightAccurate(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ(), true, DEFAULT_HEIGHT_SEARCH, probeR);
         char const* shapeStr = GridTerrainData::ToString(static_cast<GridTerrainData::GroundFootprintShape>(sWorld->getIntConfig(CONFIG_HEIGHT_ACCURATE_SHAPE)));
 
         uint32 haveMap = GridTerrainLoader::ExistMap(object->GetMapId(), cell.GridX(), cell.GridY()) ? 1 : 0;

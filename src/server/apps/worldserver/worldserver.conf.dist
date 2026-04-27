@@ -1451,7 +1451,7 @@ Height.Accurate.SquareBlend = 0.2
 #
 # Optional slope clamp (rise/run). 0.0 disables clamping.
 # This limits the gradient magnitude used by both circle and square footprints,
-# preventing extreme lifts on near-vertical faces. Safe upper bound: ~5.0 (≈78.7°).
+# preventing extreme lifts on near-vertical faces. Safe upper bound: ~5.0 (~78.7 deg).
 #
 
 Height.Accurate.SlopeClamp = 0.0
@@ -1480,13 +1480,13 @@ Height.Accurate.VMap.Enable = 1
 
 #
 # Lateral sample delta (meters) to estimate VMAP gradient with 4 extra rays:
-# (x±delta,y) and (x,y±delta). Typical 0.15..0.35. Affects precision & cost.
+# (x +/- delta, y) and (x, y +/- delta). Typical 0.15..0.35. Affects precision & cost.
 #
 
 Height.Accurate.VMap.Delta  = 0.25
 
 #
-# -- Accurate DYNAMIC (MMAP) planar offset (gradient sampling) --
+# -- Accurate dynamic-object planar offset (gradient sampling) --
 # 1 = enable (recommended), 0 = legacy point ray
 #
 
