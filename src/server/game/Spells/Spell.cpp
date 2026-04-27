@@ -1449,7 +1449,6 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                     };
 
                     float const radius = std::max(0.0f, groundProbeRadius);
-                    float const diagonal = radius * 0.70710678118654752440f;
 
                     ProbeOffset const offsets[] =
                     {
@@ -1501,14 +1500,27 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                             G3D::Vector3 const to(toX + offset.x, toY + offset.y, toZ + zOffset);
 
                             // check static collision
-                            G3D::Vector3 staticHit;
-                            if (map->GetMapCollisionData().GetStaticTree().GetObjectHitPos(from, to, staticHit, -0.5f))
+                            G3D::Vector3 staticHit(to);
+                            if (map->GetMapCollisionData().GetStaticTree().GetObjectHitPos(
+                                from.x, from.y, from.z,
+                                to.x, to.y, to.z,
+                                staticHit.x, staticHit.y, staticHit.z,
+                                -0.5f))
+                            {
                                 considerHit(staticHit, offset, zOffset);
+                            }
 
                             // check dynamic collision
-                            G3D::Vector3 dynamicHit;
-                            if (map->GetMapCollisionData().GetDynamicTree().GetObjectHitPos(phasemask, from, to, dynamicHit, -0.5f))
+                            G3D::Vector3 dynamicHit(to);
+                            if (map->GetMapCollisionData().GetDynamicTree().GetObjectHitPos(
+                                phasemask,
+                                from.x, from.y, from.z,
+                                to.x, to.y, to.z,
+                                dynamicHit.x, dynamicHit.y, dynamicHit.z,
+                                -0.5f))
+                            {
                                 considerHit(dynamicHit, offset, zOffset);
+                            }
                         }
                     }
 

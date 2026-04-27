@@ -133,6 +133,51 @@ float StaticVMapCollisionData::getHeight(float x, float y, float z, float maxSea
     return VMAP_INVALID_HEIGHT_VALUE;
 }
 
+bool StaticVMapCollisionData::getHeightAndNormal(float x, float y, float z, float maxSearchDist, float& height, G3D::Vector3& normal) const
+{
+    normal = G3D::Vector3(0.0f, 0.0f, 1.0f);
+
+#if defined(ENABLE_VMAP_CHECKS)
+    if (!sWorld->getBoolConfig(CONFIG_VMAP_ENABLE_HEIGHT) || DisableMgr::IsVMAPDisabledFor(_mapId, VMAP::VMAP_DISABLE_HEIGHT))
+    {
+        height = VMAP_INVALID_HEIGHT_VALUE;
+        return false;
+    }
+#endif
+
+    if (!_staticTree)
+    {
+        height = VMAP_INVALID_HEIGHT_VALUE;
+        return false;
+    }
+
+    G3D::Vector3 const pos = VMAP::VMapMgr2::convertPositionToInternalRep(x, y, z);
+    G3D::Vector3 internalNormal(0.0f, 0.0f, 1.0f);
+    float internalHeight = G3D::finf();
+
+    if (!_staticTree->getHeightAndNormal(pos, maxSearchDist, internalHeight, internalNormal) || internalHeight >= G3D::finf())
+    {
+        height = VMAP_INVALID_HEIGHT_VALUE;
+        return false;
+    }
+
+    height = internalHeight;
+
+    // VMap internal coordinates are mirrored on X/Y:
+    // internal.x = mid - world.x, internal.y = mid - world.y, internal.z = world.z.
+    normal = G3D::Vector3(-internalNormal.x, -internalNormal.y, internalNormal.z);
+
+    if (!normal.isZero())
+        normal = normal.unit();
+    else
+        normal = G3D::Vector3(0.0f, 0.0f, 1.0f);
+
+    if (normal.z < 0.0f)
+        normal = -normal;
+
+    return true;
+}
+
 bool StaticVMapCollisionData::GetAreaAndLiquidData(float x, float y, float z, Optional<uint8> reqLiquidType, VMAP::AreaAndLiquidData& data) const
 {
     if (_staticTree)

@@ -1256,7 +1256,7 @@ float Map::GetVMapHeightAccurate(float x, float y, float z, float radius, float 
     float height;
     G3D::Vector3 normal(0.0f, 0.0f, 1.0f);
 
-    if (!_mapCollisionData.GetStaticTree().getHeightAndNormal(G3D::Vector3(x, y, z), maxSearchDist, height, normal))
+    if (!_mapCollisionData.GetStaticTree().getHeightAndNormal(x, y, z, maxSearchDist, height, normal))
         return VMAP_INVALID_HEIGHT_VALUE;
 
     if (radius <= 0.0f)
