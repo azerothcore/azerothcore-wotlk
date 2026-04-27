@@ -1187,15 +1187,23 @@ float Map::GetHeight(float x, float y, float z, bool checkVMap /*= true*/, float
     return mapHeight;                               // explicitly use map data
 }
 
-namespace { constexpr float INV_SQRT2 = 0.70710678118654752440f; }
+namespace
+{
+    constexpr float INV_SQRT2 = 0.70710678118654752440f;
+
+    float Clamp01(float value)
+    {
+        return std::max(0.0f, std::min(1.0f, value));
+    }
+}
 
 float Map::GetVMapHeightAccurate(float x, float y, float z, float radius, float yaw,
-    GridTerrainData::GroundFootprintShape shape, float blend, float clamp, float sampleDelta) const
+    GridTerrainData::GroundFootprintShape shape, float blend, float clamp, float sampleDelta, float maxSearchDist) const
 {
     VMAP::IVMapMgr* vmgr = VMAP::VMapFactory::createOrGetVMapMgr();
     auto sample = [&](float sx, float sy) -> float
     {
-        float h = vmgr->getHeight(GetId(), sx, sy, z, DEFAULT_HEIGHT_SEARCH);
+        float h = vmgr->getHeight(GetId(), sx, sy, z, maxSearchDist);
         return (h > INVALID_HEIGHT) ? h : std::numeric_limits<float>::quiet_NaN();
     };
 
@@ -1225,23 +1233,28 @@ float Map::GetVMapHeightAccurate(float x, float y, float z, float radius, float 
 
     if (clamp > 0.0f)
     {
-        float g2 = gx*gx + gy*gy, c2 = clamp*clamp;
+        float const g2 = gx * gx + gy * gy;
+        float const c2 = clamp * clamp;
         if (g2 > c2)
         {
-            float s = clamp / std::sqrt(g2);
-            gx *= s; gy *= s;
+            float const s = clamp / std::sqrt(g2);
+            gx *= s;
+            gy *= s;
         }
     }
 
-    float slopeL2 = std::sqrt(std::max(0.0f, gx*gx + gy*gy));
+    float const slopeL2 = std::sqrt(std::max(0.0f, gx * gx + gy * gy));
     float totalSlope = slopeL2;
+    float const effectiveBlend = Clamp01(blend);
 
-    if (shape == GridTerrainData::GroundFootprintShape::Square && blend < 1.0f)
+    if (shape == GridTerrainData::GroundFootprintShape::Square && effectiveBlend < 1.0f)
     {
-        float c = std::cos(yaw), s = std::sin(yaw);
-        float rx =  gx * c + gy * s, ry = -gx * s + gy * c;
-        float slopeL1 = std::abs(rx) + std::abs(ry);
-        totalSlope = blend * slopeL2 + (1.0f - blend) * (INV_SQRT2 * slopeL1);
+        float const c = std::cos(yaw);
+        float const s = std::sin(yaw);
+        float const rx = gx * c + gy * s;
+        float const ry = -gx * s + gy * c;
+        float const slopeL1 = std::abs(rx) + std::abs(ry);
+        totalSlope = effectiveBlend * slopeL2 + (1.0f - effectiveBlend) * (INV_SQRT2 * slopeL1);
     }
     return h0 + radius * totalSlope;
 }
@@ -1273,7 +1286,7 @@ float Map::GetHeightAccurate(float x, float y, float z, float radius, float yaw,
             float blend = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_SQUARE_BLEND);
             float clamp = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_SLOPE_CLAMP);
             float delta = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_VMAP_DELTA);
-            vmapHeight = GetVMapHeightAccurate(x, y, z, radius, yaw, shape, blend, clamp, delta);
+            vmapHeight = GetVMapHeightAccurate(x, y, z, radius, yaw, shape, blend, clamp, delta, maxSearchDist);
         }
         else
         {
@@ -1291,7 +1304,7 @@ float Map::GetHeightAccurate(float x, float y, float z, float radius, float yaw,
             // we have mapheight and vmapheight and must select more appropriate
 
             // we are already under the surface or vmap height above map heigt
-            // or if the distance of the vmap height is less the land height distance
+            // or if the distance of the vmap height is less than the land height distance
             if (vmapHeight > mapHeight || std::fabs(mapHeight - z) > std::fabs(vmapHeight - z))
                 return vmapHeight;
             else

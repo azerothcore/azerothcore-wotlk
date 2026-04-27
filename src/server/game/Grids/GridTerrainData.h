@@ -251,7 +251,7 @@ public:
         Square = 1    // upside-down pyramid
     };
 
-    static inline const char* ToString(GroundFootprintShape s)
+    static char const* ToString(GroundFootprintShape s)
     {
         switch (s)
         {
@@ -268,13 +268,19 @@ public:
     [[nodiscard]] float GetHeightAccurate(float x, float y, float radius) const;
     [[nodiscard]] float GetHeightAccurate(float x, float y, float radius, GroundFootprintShape shape) const;
     [[nodiscard]] float GetHeightAccurate(float x, float y, float radius, GroundFootprintShape shape, float yaw /*rads*/) const;
-    static inline std::string to_string(GridTerrainData::GroundFootprintShape s) { return GridTerrainData::ToString(s); }
     [[nodiscard]] uint16 getArea(float x, float y) const;
     [[nodiscard]] inline float getHeight(float x, float y) const { return (this->*_gridGetHeight)(x, y); }
     [[nodiscard]] float getMinHeight(float x, float y) const;
     [[nodiscard]] float getLiquidLevel(float x, float y) const;
     [[nodiscard]] LiquidData const GetLiquidData(float x, float y, float z, float collisionHeight, Optional<uint8> ReqLiquidType) const;
 private:
+    // Samples one terrain cell as real heights:
+    //   h1 ---- h2
+    //    | \  / |
+    //    |  h5  |
+    //    | /  \ |
+    //   h3 ---- h4
+    // h5 is the actual center height, not the legacy formula's temporary 2*h5 value.
     bool SampleHeights(uint32 xInt, uint32 yInt, float& h1, float& h2, float& h3, float& h4, float& h5) const;
 };
 

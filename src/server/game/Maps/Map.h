@@ -588,7 +588,7 @@ private:
     MapGridType* GetMapGrid(uint16 const x, uint16 const y);
 
     [[nodiscard]] float GetVMapHeightAccurate(float x, float y, float z, float radius, float yaw,
-    GridTerrainData::GroundFootprintShape shape, float blend, float clamp, float sampleDelta) const;
+    GridTerrainData::GroundFootprintShape shape, float blend, float clamp, float sampleDelta, float maxSearchDist) const;
 
     void ScriptsProcess();
 

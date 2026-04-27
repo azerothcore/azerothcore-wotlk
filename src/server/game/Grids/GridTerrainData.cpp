@@ -3,7 +3,8 @@
 #include "GridTerrainData.h"
 #include "Log.h"
 #include "MapDefines.h"
-#include "World.h"
+#include <algorithm>
+#include <cmath>
 #include <filesystem>
 #include <G3D/Ray.h>
 
@@ -622,6 +623,7 @@ LiquidData const GridTerrainData::GetLiquidData(float x, float y, float z, float
 namespace
 {
     constexpr float INV_SQRT2 = 0.70710678118654752440f; // 1/sqrt(2)
+    constexpr float GRID_CELL_SIZE = SIZE_OF_GRIDS / float(MAP_RESOLUTION);
 }
 
 static inline float CELL_SIZE() { return SIZE_OF_GRIDS / float(MAP_RESOLUTION); } // ≈ 4.1666667f
@@ -681,7 +683,9 @@ bool GridTerrainData::SampleHeights(uint32 xInt, uint32 yInt, float& h1, float& 
         return true;
     }
 
-    return false;
+    // Flat-height grids have only gridHeight and no v8/v9 arrays.
+    h1 = h2 = h3 = h4 = h5 = _loadedHeightData->gridHeight;
+    return true;
 }
 
 float GridTerrainData::GetHeightAccurate(float x, float y, float radius) const
@@ -733,7 +737,7 @@ float GridTerrainData::GetHeightAccurate(
     // h3 -> (0,S)
     // h4 -> (S,S)
     // h5 -> (S/2, S/2)
-    float const S = CELL_SIZE();
+    float const S = GRID_CELL_SIZE;
     float const S2 = S * 0.5f;
 
     G3D::Vector3 P(fx * S, fy * S, 0.0f);
@@ -743,29 +747,33 @@ float GridTerrainData::GetHeightAccurate(
     float const eps = 1e-6f;
     float const blend = std::max(0.0f, std::min(1.0f, squareBlend));
 
-    bool const right = (P.x >= A.x);
-    bool const top = (P.y >= A.y);
     G3D::Vector3 B, C;
-    if (right && !top)
+
+    // Match legacy getHeight* triangle selection exactly. The four triangles
+    // are split by the two diagonals through h5, not by the cell quadrants.
+    if (fx + fy < 1.0f)
     {
-        B = G3D::Vector3(S, 0.0f, h2);
-        C = G3D::Vector3(0.0f, 0.0f, h1);
-    } // BR
-    else if (right && top)
+        if (fx > fy)
+        {
+            B = G3D::Vector3(S, 0.0f, h2);
+            C = G3D::Vector3(0.0f, 0.0f, h1);
+        }
+        else
+        {
+            B = G3D::Vector3(0.0f, 0.0f, h1);
+            C = G3D::Vector3(0.0f, S, h3);
+        }
+    }
+    else if (fx > fy)
     {
         B = G3D::Vector3(S, S, h4);
         C = G3D::Vector3(S, 0.0f, h2);
-    } // TR
-    else if (!right && top)
+    }
+    else
     {
         B = G3D::Vector3(0.0f, S, h3);
         C = G3D::Vector3(S, S, h4);
-    } // TL
-    else /* !right && !top */
-    {
-        B = G3D::Vector3(0.0f, 0.0f, h1);
-        C = G3D::Vector3(0.0f, S, h3);
-    } // BL
+    }
 
     G3D::Vector3 const U = B - A;
     G3D::Vector3 const V = C - A;
@@ -780,7 +788,7 @@ float GridTerrainData::GetHeightAccurate(
 
     if (gradientMode == 0u)
     {
-        // Plane-exact gradient: z = (-n.x*x - n.y*y - d)/n.z  =>  ∇z = (-n.x/n.z, -n.y/n.z)
+        // Plane-exact gradient: z = (-n.x*x - n.y*y - d)/n.z => grad(z) = (-n.x/n.z, -n.y/n.z)
         gx = -n.x / n.z;
         gy = -n.y / n.z;
     }
@@ -805,7 +813,7 @@ float GridTerrainData::GetHeightAccurate(
 
     float const slopeL2 = std::sqrt(std::max(0.0f, gx * gx + gy * gy));
 
-    // Fast‑path radius 0
+    // Fast path for point-height callers.
     if (radius <= 0.0f)
         return zPlane;
 

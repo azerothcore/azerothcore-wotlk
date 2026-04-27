@@ -30,7 +30,9 @@
 #include <G3D/AABox.h>
 #include <G3D/Ray.h>
 #include <G3D/Vector3.h>
-#include <numbers>
+#include <algorithm>
+#include <cmath>
+#include <limits>
 
 using VMAP::ModelInstance;
 
@@ -292,8 +294,14 @@ float DynamicMapTree::getHeight(float x, float y, float z, float maxSearchDist, 
 
 namespace
 {
-    bool isFiniteF(float v) { return std::isfinite(v); }
-    constexpr float INV_SQRT2 = std::numbers::sqrt2 / 2.0f;
+    constexpr float INV_SQRT2 = 0.70710678118654752440f;
+
+    bool IsFinite(float value) { return std::isfinite(value); }
+
+    float Clamp01(float value)
+    {
+        return std::max(0.0f, std::min(1.0f, value));
+    }
 }
 
 float DynamicMapTree::getHeightAccurate(float x, float y, float z, float maxSearchDist, uint32 phasemask,
@@ -312,7 +320,7 @@ float DynamicMapTree::getHeightAccurate(float x, float y, float z, float maxSear
     };
 
     float const h0 = sample(x, y);
-    if (!isFiniteF(h0))
+    if (!IsFinite(h0))
         return -G3D::finf();
 
     if (radius <= 0.0f)
@@ -327,13 +335,13 @@ float DynamicMapTree::getHeightAccurate(float x, float y, float z, float maxSear
 
     auto diff = [&](float p, float m) -> float
     {
-        if (isFiniteF(p) && isFiniteF(m))
+        if (IsFinite(p) && IsFinite(m))
             return (p - m) / (2.0f * d);
 
-        if (isFiniteF(p))
+        if (IsFinite(p))
             return (p - h0) / d;
 
-        if (isFiniteF(m))
+        if (IsFinite(m))
             return (h0 - m) / d;
 
         return 0.0f;
@@ -355,14 +363,16 @@ float DynamicMapTree::getHeightAccurate(float x, float y, float z, float maxSear
 
     float const slopeL2 = std::sqrt(std::max(0.0f, gx * gx + gy * gy));
     float totalSlope = slopeL2;
+    float const effectiveBlend = Clamp01(blend);
 
-    if (blend < 1.0f)
+    if (effectiveBlend < 1.0f)
     {
-        float c = std::cos(yaw), s = std::sin(yaw);
-        float rx = gx * c + gy * s;
-        float ry = -gx * s + gy * c;
-        float slopeL1 = std::abs(rx) + std::abs(ry);
-        totalSlope = blend * slopeL2 + (1.0f - blend) * (INV_SQRT2 * slopeL1);
+        float const c = std::cos(yaw);
+        float const s = std::sin(yaw);
+        float const rx = gx * c + gy * s;
+        float const ry = -gx * s + gy * c;
+        float const slopeL1 = std::abs(rx) + std::abs(ry);
+        totalSlope = effectiveBlend * slopeL2 + (1.0f - effectiveBlend) * (INV_SQRT2 * slopeL1);
     }
 
     return h0 + radius * totalSlope;
