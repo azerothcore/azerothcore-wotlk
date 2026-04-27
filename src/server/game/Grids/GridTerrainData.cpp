@@ -716,10 +716,30 @@ float GridTerrainData::GetHeightAccurate(
     float fx = xf - static_cast<float>(xInt);
     float fy = yf - static_cast<float>(yInt);
 
-    if (fx < 0.0f) { fx += 1.0f; --xInt; }
-    if (fy < 0.0f) { fy += 1.0f; --yInt; }
-    if (fx >= 1.0f) { fx -= 1.0f; ++xInt; }
-    if (fy >= 1.0f) { fy -= 1.0f; ++yInt; }
+    if (fx < 0.0f)
+    {
+        fx += 1.0f;
+        --xInt;
+    }
+
+    if (fy < 0.0f)
+    {
+        fy += 1.0f;
+        --yInt;
+    }
+
+    if (fx >= 1.0f)
+    {
+        fx -= 1.0f;
+        ++xInt;
+    }
+
+    if (fy >= 1.0f)
+    {
+        fy -= 1.0f;
+        ++yInt;
+    }
+
     xInt &= (MAP_RESOLUTION - 1);
     yInt &= (MAP_RESOLUTION - 1);
 
@@ -730,103 +750,122 @@ float GridTerrainData::GetHeightAccurate(
     if (!SampleHeights(xInt, yInt, h1, h2, h3, h4, h5))
         return INVALID_HEIGHT;
 
-    // h1 -> (0,0)
-    // h2 -> (S,0)
-    // h3 -> (0,S)
-    // h4 -> (S,S)
-    // h5 -> (S/2, S/2)
-    float const S = GRID_CELL_SIZE;
-    float const S2 = S * 0.5f;
+    float const h5Twice = h5 + h5;
 
-    G3D::Vector3 P(fx * S, fy * S, 0.0f);
+    float a;
+    float b;
+    float c;
 
-    G3D::Vector3 A(S2, S2, h5);
-
-    float const eps = 1e-6f;
-    float const blend = std::max(0.0f, std::min(1.0f, squareBlend));
-
-    G3D::Vector3 B, C;
-
-    // Match legacy getHeight* triangle selection exactly. The four triangles
-    // are split by the two diagonals through h5, not by the cell quadrants.
+    // Match legacy getHeight* triangle selection and plane coefficients exactly.
     if (fx + fy < 1.0f)
     {
         if (fx > fy)
         {
-            B = G3D::Vector3(S, 0.0f, h2);
-            C = G3D::Vector3(0.0f, 0.0f, h1);
+            // Triangle 1: h1, h2, h5
+            a = h2 - h1;
+            b = h5Twice - h1 - h2;
+            c = h1;
         }
         else
         {
-            B = G3D::Vector3(0.0f, 0.0f, h1);
-            C = G3D::Vector3(0.0f, S, h3);
+            // Triangle 2: h1, h3, h5
+            a = h5Twice - h1 - h3;
+            b = h3 - h1;
+            c = h1;
         }
-    }
-    else if (fx > fy)
-    {
-        B = G3D::Vector3(S, S, h4);
-        C = G3D::Vector3(S, 0.0f, h2);
     }
     else
     {
-        B = G3D::Vector3(0.0f, S, h3);
-        C = G3D::Vector3(S, S, h4);
+        if (fx > fy)
+        {
+            // Triangle 3: h2, h4, h5
+            a = h2 + h4 - h5Twice;
+            b = h4 - h2;
+            c = h5Twice - h4;
+        }
+        else
+        {
+            // Triangle 4: h3, h4, h5
+            a = h4 - h3;
+            b = h3 + h4 - h5Twice;
+            c = h5Twice - h4;
+        }
     }
 
-    G3D::Vector3 const U = B - A;
-    G3D::Vector3 const V = C - A;
-    G3D::Vector3 const n = U.cross(V);
-    float const nzAbs = std::abs(n.z);
-    if (nzAbs < std::max(eps, normalEps))
+    float const zPlane = a * fx + b * fy + c;
+    if (!std::isfinite(zPlane))
         return getHeight(x, y);
 
-    float const zPlane = A.z - (n.x * (P.x - A.x) + n.y * (P.y - A.y)) / n.z;
-    float const inv2S = 1.0f / (2.0f * S);
-    float gx, gy;
+    float const invCellSize = 1.0f / GRID_CELL_SIZE;
+    float const planeGx = a * invCellSize;
+    float const planeGy = b * invCellSize;
+
+    if (!std::isfinite(planeGx) || !std::isfinite(planeGy))
+        return getHeight(x, y);
+
+    // Normalized normal.z for z = gx*x + gy*y + c is:
+    // nz = 1 / sqrt(1 + gx^2 + gy^2)
+    float const normalZ = 1.0f / std::sqrt(1.0f + planeGx * planeGx + planeGy * planeGy);
+    if (normalZ < std::max(1.0e-6f, normalEps))
+        return getHeight(x, y);
+
+    float gx;
+    float gy;
 
     if (gradientMode == 0u)
     {
-        // Plane-exact gradient: z = (-n.x*x - n.y*y - d)/n.z => grad(z) = (-n.x/n.z, -n.y/n.z)
-        gx = -n.x / n.z;
-        gy = -n.y / n.z;
+        // Exact selected-triangle gradient.
+        gx = planeGx;
+        gy = planeGy;
     }
     else
     {
-        // LS gradient (smoother)
+        // Least-squares full-cell gradient. Smoother, but intentionally less exact.
+        float const inv2S = 0.5f * invCellSize;
         gx = ((h2 + h4) - (h1 + h3)) * inv2S;
         gy = ((h3 + h4) - (h1 + h2)) * inv2S;
     }
 
-    // Optional clamp
+    if (!std::isfinite(gx) || !std::isfinite(gy))
+        return getHeight(x, y);
+
     if (slopeClamp > 0.0f)
     {
         float const g2 = gx * gx + gy * gy;
         float const c2 = slopeClamp * slopeClamp;
+
         if (g2 > c2)
         {
-            float const s = slopeClamp / std::sqrt(g2);
-            gx *= s; gy *= s;
+            float const scale = slopeClamp / std::sqrt(g2);
+            gx *= scale;
+            gy *= scale;
         }
     }
 
     float const slopeL2 = std::sqrt(std::max(0.0f, gx * gx + gy * gy));
 
-    // Fast path for point-height callers.
+    // Exact legacy height when used as a point-height query.
     if (radius <= 0.0f)
         return zPlane;
 
-    float totalSlope = slopeL2; // default: circle (or blend==1)
+    float totalSlope = slopeL2;
+    float const blend = std::max(0.0f, std::min(1.0f, squareBlend));
+
     if (shape == GroundFootprintShape::Square && blend < 1.0f)
     {
         float slopeL1 = 0.0f;
+
         if (!(gx == 0.0f && gy == 0.0f))
         {
-            float const c = std::cos(yaw);
-            float const s = std::sin(yaw);
-            float const rx = gx * c + gy * s;
-            float const ry = -gx * s + gy * c;
+            float const cosYaw = std::cos(yaw);
+            float const sinYaw = std::sin(yaw);
+
+            float const rx = gx * cosYaw + gy * sinYaw;
+            float const ry = -gx * sinYaw + gy * cosYaw;
+
             slopeL1 = std::abs(rx) + std::abs(ry);
         }
+
         totalSlope = blend * slopeL2 + (1.0f - blend) * (INV_SQRT2 * slopeL1);
     }
 
