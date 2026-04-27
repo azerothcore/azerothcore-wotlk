@@ -14346,6 +14346,9 @@ bool Player::CanSeeSpellClickOn(Creature const* c) const
 
 bool Player::CanSeeObjectByVisibilityConditions(WorldObject const* object) const
 {
+    if (IsGameMaster())
+        return true;
+
     ConditionList conds = sConditionMgr->GetConditionsForObjectVisibility(object);
     ConditionSourceInfo info = ConditionSourceInfo(const_cast<Player*>(this), const_cast<WorldObject*>(object));
     return sConditionMgr->IsObjectMeetToConditions(info, conds);
