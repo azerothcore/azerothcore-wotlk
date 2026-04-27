@@ -580,7 +580,7 @@ void PoolMgr::LoadFromDB()
     {
         uint32 oldMSTime = getMSTime();
 
-        QueryResult result = WorldDatabase.Query("SELECT entry, max_limit FROM pool_template");
+        QueryResult result = WorldDatabase.Query("SELECT entry, max_limit, description FROM pool_template");
         if (!result)
         {
             mPoolTemplate.clear();
@@ -597,7 +597,8 @@ void PoolMgr::LoadFromDB()
             uint32 pool_id = fields[0].Get<uint32>();
 
             PoolTemplateData& pPoolTemplate = mPoolTemplate[pool_id];
-            pPoolTemplate.MaxLimit  = fields[1].Get<uint32>();
+            pPoolTemplate.MaxLimit    = fields[1].Get<uint32>();
+            pPoolTemplate.Description = fields[2].Get<std::string>();
 
             ++count;
         } while (result->NextRow());
@@ -1166,3 +1167,39 @@ template void PoolMgr::UpdatePool<Pool>(uint32 pool_id, uint32 db_guid_or_pool_i
 template void PoolMgr::UpdatePool<GameObject>(uint32 pool_id, uint32 db_guid_or_pool_id);
 template void PoolMgr::UpdatePool<Creature>(uint32 pool_id, uint32 db_guid_or_pool_id);
 template void PoolMgr::UpdatePool<Quest>(uint32 pool_id, uint32 db_guid_or_pool_id);
+
+PoolTemplateData const* PoolMgr::GetPoolTemplate(uint32 poolId) const
+{
+    auto itr = mPoolTemplate.find(poolId);
+    return itr != mPoolTemplate.end() ? &itr->second : nullptr;
+}
+
+PoolGroup<Creature> const* PoolMgr::GetPoolCreatureGroup(uint32 poolId) const
+{
+    auto itr = mPoolCreatureGroups.find(poolId);
+    return itr != mPoolCreatureGroups.end() ? &itr->second : nullptr;
+}
+
+PoolGroup<GameObject> const* PoolMgr::GetPoolGameObjectGroup(uint32 poolId) const
+{
+    auto itr = mPoolGameobjectGroups.find(poolId);
+    return itr != mPoolGameobjectGroups.end() ? &itr->second : nullptr;
+}
+
+PoolGroup<Pool> const* PoolMgr::GetPoolPoolGroup(uint32 poolId) const
+{
+    auto itr = mPoolPoolGroups.find(poolId);
+    return itr != mPoolPoolGroups.end() ? &itr->second : nullptr;
+}
+
+uint32 PoolMgr::GetCreaturePoolId(uint32 guid) const
+{
+    SearchMap::const_iterator itr = mCreatureSearchMap.find(guid);
+    return itr != mCreatureSearchMap.end() ? itr->second : 0;
+}
+
+uint32 PoolMgr::GetGameObjectPoolId(uint32 guid) const
+{
+    SearchMap::const_iterator itr = mGameobjectSearchMap.find(guid);
+    return itr != mGameobjectSearchMap.end() ? itr->second : 0;
+}

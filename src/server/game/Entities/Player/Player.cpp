@@ -2370,6 +2370,7 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate, bool isLFGReward)
     }
 
     uint8 level = GetLevel();
+    sScriptMgr->OnPlayerBeforeGetLevelForXPGain(this, level);
 
     // Favored experience increase START
     uint32 zone = GetZoneId();
@@ -5775,17 +5776,20 @@ void Player::CheckAreaExploreAndOutdoor()
 
         if (areaEntry->area_level > 0)
         {
-            if (GetLevel() >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
+            uint8 playerLevel = GetLevel();
+            sScriptMgr->OnPlayerBeforeGetLevelForXPGain(this, playerLevel);
+
+            if (playerLevel >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
             {
                 SendExplorationExperience(areaId, 0);
             }
             else
             {
-                int32 diff = int32(GetLevel()) - areaEntry->area_level;
+                int32 diff = int32(playerLevel) - areaEntry->area_level;
                 uint32 XP = 0;
                 if (diff < -5)
                 {
-                    XP = uint32(sObjectMgr->GetBaseXP(GetLevel() + 5) * sWorld->getRate(RATE_XP_EXPLORE));
+                    XP = uint32(sObjectMgr->GetBaseXP(playerLevel + 5) * sWorld->getRate(RATE_XP_EXPLORE));
                 }
                 else if (diff > 5)
                 {
@@ -10389,24 +10393,39 @@ void Player::ContinueTaxiFlight()
 
     TaxiPathNodeList const& nodeList = sTaxiPathNodesByPath[path];
 
-    float bestDist = SIZE_OF_GRIDS * SIZE_OF_GRIDS; // xinef: large value
-    float currDist = 0.0f;
+    // Use triangle inequality to find the segment the player is on.
+    // When distPrev + distNext < distNodes, the player projects between
+    // the two nodes of the segment. Resume from the end node (i).
+    float distPrev;
+    float distNext =
+        (nodeList[0]->x - GetPositionX()) * (nodeList[0]->x - GetPositionX()) +
+        (nodeList[0]->y - GetPositionY()) * (nodeList[0]->y - GetPositionY()) +
+        (nodeList[0]->z - GetPositionZ()) * (nodeList[0]->z - GetPositionZ());
 
-    // xinef: changed to -1, we dont want to catch last node
-    for (uint32 i = 0; i < nodeList.size() - 1; ++i)
+    for (uint32 i = 1; i < nodeList.size(); ++i)
     {
         TaxiPathNodeEntry const* node = nodeList[i];
-        TaxiPathNodeEntry const* nextNode = nodeList[i + 1];
+        TaxiPathNodeEntry const* prevNode = nodeList[i - 1];
 
-        // xinef: skip nodes at another map, get last valid node on current map
-        if (nextNode->mapid != GetMapId() || node->mapid != GetMapId())
+        // skip nodes at another map
+        if (node->mapid != GetMapId())
             continue;
 
-        currDist = (node->x - GetPositionX()) * (node->x - GetPositionX()) + (node->y - GetPositionY()) * (node->y - GetPositionY()) + (node->z - GetPositionZ()) * (node->z - GetPositionZ());
-        if (currDist < bestDist)
+        distPrev = distNext;
+        distNext =
+            (node->x - GetPositionX()) * (node->x - GetPositionX()) +
+            (node->y - GetPositionY()) * (node->y - GetPositionY()) +
+            (node->z - GetPositionZ()) * (node->z - GetPositionZ());
+
+        float distNodes =
+            (node->x - prevNode->x) * (node->x - prevNode->x) +
+            (node->y - prevNode->y) * (node->y - prevNode->y) +
+            (node->z - prevNode->z) * (node->z - prevNode->z);
+
+        if (distPrev + distNext < distNodes)
         {
             startNode = i;
-            bestDist = currDist;
+            break;
         }
     }
 
@@ -12735,7 +12754,9 @@ void Player::RewardPlayerAndGroupAtEvent(uint32 creature_id, WorldObject* pRewar
     if (!pRewardSource)
         return;
 
-    ObjectGuid creature_guid = (pRewardSource->IsCreature()) ? pRewardSource->GetGUID() : ObjectGuid::Empty;
+    ObjectGuid creature_guid;
+    if (pRewardSource->IsCreature() && pRewardSource->GetEntry() == creature_id)
+        creature_guid = pRewardSource->GetGUID();
 
     // prepare data for near group iteration
     if (Group* group = GetGroup())
@@ -14321,6 +14342,13 @@ bool Player::CanSeeSpellClickOn(Creature const* c) const
     }
 
     return false;
+}
+
+bool Player::CanSeeObjectByVisibilityConditions(WorldObject const* object) const
+{
+    ConditionList conds = sConditionMgr->GetConditionsForObjectVisibility(object);
+    ConditionSourceInfo info = ConditionSourceInfo(const_cast<Player*>(this), const_cast<WorldObject*>(object));
+    return sConditionMgr->IsObjectMeetToConditions(info, conds);
 }
 
 /**

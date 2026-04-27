@@ -170,6 +170,7 @@ struct boss_razorscale : public BossAI
         CommanderGUID.Clear();
         bGroundPhase = false;
         flyTimes = 0;
+        me->SetImmuneToPC(true);
         me->SetAnimTier(AnimTier::Fly);
     }
 
@@ -610,6 +611,7 @@ public:
 
                 if (razorscale->AI())
                 {
+                    razorscale->SetImmuneToPC(false);
                     razorscale->AI()->AttackStart(player);
                     razorscale->GetMotionMaster()->MoveIdle();
                     razorscale->GetMotionMaster()->MovePoint(POINT_RAZORSCALE_INIT, CORDS_AIR.GetPositionX(), CORDS_AIR.GetPositionY(), CORDS_AIR.GetPositionZ(), FORCED_MOVEMENT_NONE, 0.f, 0.f, false, false, MOTION_SLOT_ACTIVE, AnimTier::Fly);

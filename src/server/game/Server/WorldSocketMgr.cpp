@@ -70,7 +70,7 @@ bool WorldSocketMgr::StartWorldNetwork(Acore::Asio::IoContext& ioContext, std::s
 
     _acceptor->AsyncAcceptWithCallback<&WorldSocketMgr::OnSocketAccept>();
 
-    sScriptMgr->OnNetworkStart();
+    sScriptMgr->OnNetworkStart(ioContext);
     return true;
 }
 

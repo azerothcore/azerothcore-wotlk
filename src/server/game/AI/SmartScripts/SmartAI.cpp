@@ -697,6 +697,20 @@ void SmartAI::MovementInform(uint32 MovementType, uint32 Data)
         MovepointReached(Data);
 }
 
+void SmartAI::JustExitedCombat()
+{
+    // When evade is suppressed or disabled, don't auto-evade on combat exit.
+    // This prevents scripted encounters (e.g. Mograine/Whitemane) from resetting
+    // when bosses temporarily stop fighting during scripted phases.
+    if (mSuppressEvade || mEvadeDisabled)
+    {
+        EngagementOver();
+        return;
+    }
+
+    CreatureAI::JustExitedCombat();
+}
+
 void SmartAI::EnterEvadeMode(EvadeReason /*why*/)
 {
     if (mSuppressEvade)
@@ -897,7 +911,7 @@ void SmartAI::AttackStart(Unit* who)
         return;
     }
 
-    if (who && me->Attack(who, me->IsWithinMeleeRange(who)))
+    if (who && me->Attack(who, mCanAutoAttack))
     {
         if (!me->HasUnitState(UNIT_STATE_NO_COMBAT_MOVEMENT))
         {

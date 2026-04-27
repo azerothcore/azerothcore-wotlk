@@ -1711,7 +1711,6 @@ bool Battleground::AddSpiritGuide(uint32 type, float x, float y, float z, float 
 
     if (Creature* creature = AddCreature(entry, type, x, y, z, o))
     {
-        creature->setDeathState(DeathState::Dead);
         creature->SetGuidValue(UNIT_FIELD_CHANNEL_OBJECT, creature->GetGUID());
         // aura
         /// @todo: Fix display here

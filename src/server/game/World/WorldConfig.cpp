@@ -521,6 +521,8 @@ void WorldConfig::BuildConfigCache()
 
     SetConfigValue<float>(CONFIG_RESPAWN_DYNAMICRATE_GAMEOBJECT, "Respawn.DynamicRateGameObject", 1.0f);
     SetConfigValue<uint32>(CONFIG_RESPAWN_DYNAMICMINIMUM_GAMEOBJECT, "Respawn.DynamicMinimumGameObject", 10);
+    SetConfigValue<bool>(CONFIG_RESPAWN_DYNAMIC_ESCORTNPC, "Respawn.DynamicEscortNPC", false);
+    SetConfigValue<bool>(CONFIG_RESPAWN_FORCE_COMPATIBILITY_MODE, "Respawn.ForceCompatibilityMode", false);
 
     SetConfigValue<bool>(CONFIG_VMAP_INDOOR_CHECK, "vmap.enableIndoorCheck", true);
     SetConfigValue<bool>(CONFIG_VMAP_ENABLE_LOS, "vmap.enableLOS", true);
@@ -602,6 +604,8 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<bool>(CONFIG_ENABLE_CONTINENT_TRANSPORT_PRELOADING, "IsPreloadedContinentTransport.Enabled", false);
 
     SetConfigValue<bool>(CONFIG_IP_BASED_ACTION_LOGGING, "Allow.IP.Based.Action.Logging", false);
+
+    SetConfigValue<bool>(CONFIG_LOGSPAMREPORTS, "LogSpamReports", true);
 
     // Whether to use LoS from game objects
     SetConfigValue<bool>(CONFIG_CHECK_GOBJECT_LOS, "CheckGameObjectLoS", true);

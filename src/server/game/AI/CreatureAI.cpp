@@ -309,8 +309,9 @@ void CreatureAI::EngagementOver()
 
 void CreatureAI::JustExitedCombat()
 {
-    // Creatures evade through UpdateVictim() detecting out-of-combat state.
-    // Scripts that need custom combat-exit behavior should override this.
+    // No-op: synchronous EnterEvadeMode cascades via MemberEvaded and frees
+    // refs held by upstream iterators (StopAttackFaction crash). EngagementOver
+    // here also resets scripted fights on brief combat gaps (Valithria).
 }
 
 /*void CreatureAI::AttackedBy(Unit* attacker)
@@ -356,6 +357,10 @@ bool CreatureAI::UpdateVictim()
         EngagementOver();
         return false;
     }
+
+    // Charmed creatures: the charmer controls target selection, don't interfere
+    if (me->IsCharmed())
+        return me->GetVictim() != nullptr;
 
     if (!me->HasReactState(REACT_PASSIVE))
     {
