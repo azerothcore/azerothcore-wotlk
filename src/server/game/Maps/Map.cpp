@@ -1267,7 +1267,7 @@ float Map::GetHeightAccurate(float x, float y, float z, float radius, float yaw,
 {
     // find raw .map surface under Z coordinates
     float mapHeight = VMAP_INVALID_HEIGHT_VALUE;
-    float const gridBaseHeight = GetGridHeight(x, y);
+    float const gridBaseHeight = GetGridHeightAccurate(x, y, 0.0f, yaw);
     float const gridHeight = GetGridHeightAccurate(x, y, radius, yaw);
     if (gridBaseHeight > INVALID_HEIGHT && gridHeight > INVALID_HEIGHT)
     {
