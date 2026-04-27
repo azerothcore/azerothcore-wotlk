@@ -1426,11 +1426,12 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                 float const orientation = pos.GetOrientation();
                 float const orientationCos = std::cos(orientation);
                 float const orientationSin = std::sin(orientation);
-                float const probeRadius = m_caster->GetGroundProbeRadius() * sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_RADIUS_SCALE);
+                float const groundProbeRadius = m_caster->GetGroundProbeRadius();
+                float const accurateProbeRadius = groundProbeRadius * sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_RADIUS_SCALE);
 
                 auto getBlinkGroundHeight = [&](float x, float y, float z, bool checkVMap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) -> float
                 {
-                    float height = map->GetHeightAccurate(phasemask, x, y, z, probeRadius, orientation, checkVMap, maxSearchDist);
+                    float height = map->GetHeightAccurate(phasemask, x, y, z, accurateProbeRadius, orientation, checkVMap, maxSearchDist);
                     if (!std::isfinite(height) || height <= INVALID_HEIGHT)
                         height = map->GetHeight(phasemask, x, y, z, checkVMap, maxSearchDist);
 
@@ -1447,7 +1448,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                         float y;
                     };
 
-                    float const radius = std::max(0.0f, probeRadius);
+                    float const radius = std::max(0.0f, groundProbeRadius);
                     float const diagonal = radius * 0.70710678118654752440f;
 
                     ProbeOffset const offsets[] =
@@ -1456,21 +1457,15 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                         { radius, 0.0f },
                         { -radius, 0.0f },
                         { 0.0f, radius },
-                        { 0.0f, -radius },
-                        { diagonal, diagonal },
-                        { diagonal, -diagonal },
-                        { -diagonal, diagonal },
-                        { -diagonal, -diagonal }
+                        { 0.0f, -radius }
                     };
 
                     float const lowerZ = 0.5f;
                     float const upperZ = std::max(lowerZ, collisionHeight - 0.1f);
-                    float const middleZ = 0.5f * (lowerZ + upperZ);
 
                     float const zOffsets[] =
                     {
                         lowerZ,
-                        middleZ,
                         upperZ
                     };
 
@@ -1502,9 +1497,6 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                     {
                         for (float const zOffset : zOffsets)
                         {
-                            if (zOffset > lowerZ && std::fabs(zOffset - lowerZ) < 0.05f)
-                                continue;
-
                             G3D::Vector3 const from(fromX + offset.x, fromY + offset.y, fromZ + zOffset);
                             G3D::Vector3 const to(toX + offset.x, toY + offset.y, toZ + zOffset);
 

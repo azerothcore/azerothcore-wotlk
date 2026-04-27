@@ -303,8 +303,6 @@ namespace
 {
     constexpr float INV_SQRT2 = 0.70710678118654752440f;
 
-    bool IsFinite(float value) { return std::isfinite(value); }
-
     float Clamp01(float value)
     {
         return std::max(0.0f, std::min(1.0f, value));
