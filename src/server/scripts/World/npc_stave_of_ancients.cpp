@@ -53,11 +53,14 @@ void NPCStaveQuestAI::StorePlayerGUID()
         return;
     }
 
-    for (ThreatContainer::StorageType::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
+    for (ThreatReference const* ref : me->GetThreatMgr().GetUnsortedThreatList())
     {
-        if ((*itr)->getTarget()->IsPlayer())
+        if (Unit* target = ref->GetVictim())
         {
-            playerGUID = (*itr)->getUnitGuid();
+            if (target->IsPlayer())
+            {
+                playerGUID = target->GetGUID();
+            }
         }
     }
 }
@@ -107,18 +110,16 @@ bool NPCStaveQuestAI::UnitIsUnfair(Unit* unit)
 
 bool NPCStaveQuestAI::IsFairFight()
 {
-    for (ThreatContainer::StorageType::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
+    for (ThreatReference const* ref : me->GetThreatMgr().GetUnsortedThreatList())
     {
-        Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
-
-        if (!(*itr)->GetThreat())
+        if (!ref->GetThreat())
         {
             // if target threat is 0 its fair, this prevents despawn in the case when
             // there is a bystander since UpdateVictim adds nearby enemies to the threatlist
             continue;
         }
 
-        if (UnitIsUnfair(unit))
+        if (UnitIsUnfair(ref->GetVictim()))
         {
             return false;
         }
@@ -129,7 +130,7 @@ bool NPCStaveQuestAI::IsFairFight()
 
 bool NPCStaveQuestAI::ValidThreatlist()
 {
-    if (threatList.size() == 1)
+    if (me->GetThreatMgr().GetThreatListSize() == 1)
     {
         return true;
     }
@@ -232,7 +233,7 @@ void NPCStaveQuestAI::ResetState(uint32 aura = 0)
 
     if (InNormalForm())
     {
-        me->m_Events.KillAllEvents(true);
+        me->m_Events.KillAllEvents(false);
         me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
     }
 
@@ -573,12 +574,16 @@ public:
 
         void RespawnPet()
         {
+            Creature* precious = Precious();
+            if (!precious)
+                return;
+
             Position current = me->GetNearPosition(-5.0f, 0.0f);
-            Precious()->RemoveCorpse(false, false);
-            Precious()->SetPosition(current);
-            Precious()->SetHomePosition(current);
-            Precious()->setDeathState(DeathState::JustRespawned);
-            Precious()->UpdateObjectVisibility(true);
+            precious->RemoveCorpse(false, false);
+            precious->SetPosition(current);
+            precious->SetHomePosition(current);
+            precious->setDeathState(DeathState::JustRespawned);
+            precious->UpdateObjectVisibility(true);
         }
 
         void HandlePetRespawn()

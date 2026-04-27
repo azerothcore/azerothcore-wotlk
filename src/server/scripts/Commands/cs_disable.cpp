@@ -21,7 +21,6 @@
 #include "Language.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvP.h"
-#include "Player.h"
 #include "SpellMgr.h"
 
 using namespace Acore::ChatCommands;

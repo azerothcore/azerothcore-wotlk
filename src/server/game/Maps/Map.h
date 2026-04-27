@@ -27,6 +27,7 @@
 #include "GameObjectModel.h"
 #include "GridDefines.h"
 #include "GridRefMgr.h"
+#include "MapCollisionData.h"
 #include "MapGridManager.h"
 #include "MapRefMgr.h"
 #include "ObjectDefines.h"
@@ -34,11 +35,13 @@
 #include "PathGenerator.h"
 #include "Position.h"
 #include "SharedDefines.h"
+#include "SpawnData.h"
 #include "Timer.h"
 #include "GridTerrainData.h"
 #include <bitset>
 #include <list>
 #include <memory>
+#include <set>
 #include <shared_mutex>
 
 class Unit;
@@ -230,8 +233,6 @@ public:
 
     [[nodiscard]] Map const* GetParent() const { return m_parentMap; }
 
-    // pussywizard: movemaps, mmaps
-    [[nodiscard]] std::shared_mutex& GetMMapLock() const { return *(const_cast<std::shared_mutex*>(&MMapLock)); }
     // pussywizard:
     std::unordered_set<Unit*> i_objectsForDelayedVisibility;
     void HandleDelayedVisibility();
@@ -241,6 +242,7 @@ public:
     [[nodiscard]] float GetHeightAccurate(float x, float y, float z, float radius, bool checkVMap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const; // wrapper yaw=0
     [[nodiscard]] float GetHeightAccurate(float x, float y, float z, float radius, float yaw, bool checkVMap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const;
     [[nodiscard]] float GetHeight(float x, float y, float z, bool checkVMap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const;
+    [[nodiscard]] float GetHeight(Position const& pos, bool checkVMap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const { return GetHeight(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), checkVMap, maxSearchDist); }
     [[nodiscard]] float GetGridHeight(float x, float y) const;
     [[nodiscard]] float GetGridHeightAccurate(float x, float y, float radius) const; // wrapper yaw=0
     [[nodiscard]] float GetGridHeightAccurate(float x, float y, float radius, float yaw) const;
@@ -322,7 +324,8 @@ public:
     void markCell(uint32 pCellId) { marked_cells.set(pCellId); }
 
     [[nodiscard]] bool HavePlayers() const { return !m_mapRefMgr.IsEmpty(); }
-    [[nodiscard]] uint32 GetPlayersCountExceptGMs() const;
+    // When aliveOnly is true, counts only players that are alive and not in Spirit of Redemption form.
+    [[nodiscard]] uint32 GetPlayersCountExceptGMs(bool aliveOnly = false) const;
 
     void SendToPlayers(WorldPacket const* data) const;
 
@@ -341,6 +344,7 @@ public:
     GameObject* SummonGameObject(uint32 entry, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime, bool checkTransport = true);
     GameObject* SummonGameObject(uint32 entry, Position const& pos, float rotation0 = 0.0f, float rotation1 = 0.0f, float rotation2 = 0.0f, float rotation3 = 0.0f, uint32 respawnTime = 100, bool checkTransport = true);
     void SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list = nullptr);
+    void SummonGameObjectGroup(uint8 group, std::list<GameObject*>* list = nullptr);
 
     Corpse* GetCorpse(ObjectGuid const& guid);
     Creature* GetCreature(ObjectGuid const& guid);
@@ -393,15 +397,14 @@ public:
     bool CanReachPositionAndGetValidCoords(WorldObject const* source, float &destX, float &destY, float &destZ, bool failOnCollision = true, bool failOnSlopes = true) const;
     bool CanReachPositionAndGetValidCoords(WorldObject const* source, float startX, float startY, float startZ, float &destX, float &destY, float &destZ, bool failOnCollision = true, bool failOnSlopes = true) const;
     bool CheckCollisionAndGetValidCoords(WorldObject const* source, float startX, float startY, float startZ, float &destX, float &destY, float &destZ, bool failOnCollision = true) const;
-    void Balance() { _dynamicTree.balance(); }
-    void RemoveGameObjectModel(const GameObjectModel& model) { _dynamicTree.remove(model); }
-    void InsertGameObjectModel(const GameObjectModel& model) { _dynamicTree.insert(model); }
-    [[nodiscard]] bool ContainsGameObjectModel(const GameObjectModel& model) const { return _dynamicTree.contains(model);}
-    [[nodiscard]] DynamicMapTree const& GetDynamicMapTree() const { return _dynamicTree; }
-    bool GetObjectHitPos(uint32 phasemask, float x1, float y1, float z1, float x2, float y2, float z2, float& rx, float& ry, float& rz, float modifyDist);
+    void Balance() { _mapCollisionData.GetDynamicTree().balance(); }
+    void RemoveGameObjectModel(const GameObjectModel& model) { _mapCollisionData.GetDynamicTree().remove(model); }
+    void InsertGameObjectModel(const GameObjectModel& model) { _mapCollisionData.GetDynamicTree().insert(model); }
+    [[nodiscard]] bool ContainsGameObjectModel(const GameObjectModel& model) const { return _mapCollisionData.GetDynamicTree().contains(model);}
+    [[nodiscard]] DynamicMapTree const& GetDynamicMapTree() const { return _mapCollisionData.GetDynamicTree(); }
     [[nodiscard]] float GetGameObjectFloor(uint32 phasemask, float x, float y, float z, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const
     {
-        return _dynamicTree.getHeight(x, y, z, maxSearchDist, phasemask);
+        return _mapCollisionData.GetDynamicTree().getHeight(x, y, z, maxSearchDist, phasemask);
     }
     /*
         RESPAWN TIMES
@@ -429,12 +432,48 @@ public:
     void RemoveCreatureRespawnTime(ObjectGuid::LowType dbGuid);
     void SaveGORespawnTime(ObjectGuid::LowType dbGuid, time_t& respawnTime);
     void RemoveGORespawnTime(ObjectGuid::LowType dbGuid);
+    [[nodiscard]] std::unordered_map<ObjectGuid::LowType, time_t> const& GetCreatureRespawnTimes() const { return _creatureRespawnTimes; }
+    [[nodiscard]] std::unordered_map<ObjectGuid::LowType, time_t> const& GetGORespawnTimes() const { return _goRespawnTimes; }
     void LoadRespawnTimes();
     void DeleteRespawnTimes();
     [[nodiscard]] time_t GetInstanceResetPeriod() const { return _instanceResetPeriod; }
 
     void UpdatePlayerZoneStats(uint32 oldZone, uint32 newZone);
     [[nodiscard]] uint32 ApplyDynamicModeRespawnScaling(WorldObject const* obj, uint32 respawnDelay) const;
+
+    bool SpawnGroupSpawn(uint32 groupId, bool ignoreRespawn = false, bool force = false);
+    bool SpawnGroupDespawn(uint32 groupId, bool deleteRespawnTimes = false);
+    [[nodiscard]] bool IsSpawnGroupActive(uint32 groupId) const;
+    void ProcessRespawns();
+    void ProcessCreatureRespawn(ObjectGuid::LowType spawnId);
+    void ProcessGameObjectRespawn(ObjectGuid::LowType spawnId);
+
+    [[nodiscard]] time_t GetRespawnTime(SpawnObjectType type, ObjectGuid::LowType spawnId) const
+    {
+        switch (type)
+        {
+            case SPAWN_TYPE_CREATURE:
+                return GetCreatureRespawnTime(spawnId);
+            case SPAWN_TYPE_GAMEOBJECT:
+                return GetGORespawnTime(spawnId);
+            default:
+                return time_t(0);
+        }
+    }
+    void RemoveRespawnTime(SpawnObjectType type, ObjectGuid::LowType spawnId)
+    {
+        switch (type)
+        {
+            case SPAWN_TYPE_CREATURE:
+                RemoveCreatureRespawnTime(spawnId);
+                break;
+            case SPAWN_TYPE_GAMEOBJECT:
+                RemoveGORespawnTime(spawnId);
+                break;
+            default:
+                break;
+        }
+    }
 
     EventProcessor Events;
 
@@ -528,6 +567,9 @@ public:
         return 0;
     };
 
+    MapCollisionData& GetMapCollisionData() { return _mapCollisionData; }
+    MapCollisionData const& GetMapCollisionData()  const { return _mapCollisionData; }
+
 private:
 
     template<class T> void InitializeObject(T* obj);
@@ -558,15 +600,14 @@ protected:
     void AddToGrid(T* object, Cell const& cell);
 
     std::mutex Lock;
-    std::shared_mutex MMapLock;
 
     MapGridManager _mapGridManager;
     MapEntry const* i_mapEntry;
+    MapCollisionData _mapCollisionData;
     uint8 i_spawnMode;
     uint32 i_InstanceId;
     uint32 m_unloadTimer;
     float m_VisibleDistance;
-    DynamicMapTree _dynamicTree;
     time_t _instanceResetPeriod; // pussywizard
 
     MapRefMgr m_mapRefMgr;
@@ -607,6 +648,27 @@ private:
 
     std::unordered_map<ObjectGuid::LowType /*dbGUID*/, time_t> _creatureRespawnTimes;
     std::unordered_map<ObjectGuid::LowType /*dbGUID*/, time_t> _goRespawnTimes;
+
+    // Time-ordered index for ProcessRespawns() — avoids O(n) full scan.
+    // Based on TrinityCore's priority queue approach (r00ty-tc, 59db2eee).
+    struct RespawnEntry
+    {
+        time_t respawnTime;
+        SpawnObjectType type;
+        ObjectGuid::LowType spawnId;
+        bool operator<(RespawnEntry const& other) const
+        {
+            if (respawnTime != other.respawnTime)
+                return respawnTime < other.respawnTime;
+            if (type != other.type)
+                return type < other.type;
+            return spawnId < other.spawnId;
+        }
+    };
+    std::set<RespawnEntry> _respawnQueue;
+
+    std::unordered_set<uint32> _toggledSpawnGroupIds;
+    uint32 _respawnCheckTimer{0};
 
     std::unordered_map<uint32, uint32> _zonePlayerCountMap;
 

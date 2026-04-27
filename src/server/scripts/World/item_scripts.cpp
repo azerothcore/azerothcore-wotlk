@@ -16,7 +16,6 @@
  */
 
 #include "AreaDefines.h"
-#include "CreatureScript.h"
 #include "ItemScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"

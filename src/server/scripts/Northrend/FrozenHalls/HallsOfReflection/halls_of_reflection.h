@@ -27,14 +27,22 @@
 
 enum Data
 {
-    DATA_INTRO,
+    // Boss encounters (indices for SetBossState)
     DATA_FALRIC,
     DATA_MARWYN,
+    DATA_LICH_KING,
+    MAX_ENCOUNTER,
+
+    // Non-boss data (SetData/GetData only)
+    DATA_INTRO,
     DATA_FROSTSWORN_GENERAL,
     DATA_LK_INTRO,
-    DATA_LICH_KING,
     DATA_BATTERED_HILT,
-    MAX_ENCOUNTER,
+    DATA_WAVE_NUMBER,
+    DATA_LK_BATTLE,
+    DATA_SHIP_CAPTAIN,
+
+    // Actions
     ACTION_SHOW_TRASH,
     ACTION_SPIRITUAL_REFLECTIONS_COPY,
     ACTION_SPIRITUAL_REFLECTIONS_ACTIVATE,
@@ -42,8 +50,6 @@ enum Data
     ACTION_START_LK_FIGHT,
     ACTION_STOP_LK_FIGHT,
     ACTION_DELETE_ICE_WALL,
-    DATA_WAVE_NUMBER,
-    DATA_LK_BATTLE,// in progress
 };
 
 enum Creatures
@@ -108,6 +114,17 @@ enum BatteredHiltStatusFlags
     BHSF_FINISHED = 4,
 };
 
+enum HoRPersistentData
+{
+    PERSISTENT_DATA_INTRO,
+    PERSISTENT_DATA_FROSTSWORN_GENERAL,
+    PERSISTENT_DATA_LK_INTRO,
+    PERSISTENT_DATA_BATTERED_HILT,
+    PERSISTENT_DATA_COUNT
+};
+
+constexpr uint8 MAX_SPIRITUAL_REFLECTIONS = 5;
+constexpr uint8 MAX_ICE_WALL_TARGETS      = 4;
 #define NUM_OF_TRASH 34
 #define MAX_DIST_FROM_CENTER_IN_COMBAT 70.5f
 #define MAX_DIST_FROM_CENTER_TO_START 40.0f
@@ -237,8 +254,6 @@ enum hMisc
     ACTION_START_INTRO,
     ACTION_SKIP_INTRO,
     ACTION_START_LK_FIGHT_REAL,
-    ACTION_INFORM_TRASH_DIED,
-    ACTION_CHECK_TRASH_DIED,
     ACTION_INFORM_WALL_DESTROYED,
 
     QUEST_DELIVRANCE_FROM_THE_PIT_A2              = 24710,
@@ -291,6 +306,11 @@ enum hMisc
 
     // Battered Hilt - Summon Quel'Delar
     SPELL_SUMMON_EVIL_QUEL                        = 69966,
+    SPELL_QUEL_DELAR_HATRED                       = 70300,
+    SPELL_FROSTMOURNE_ALTAR_GLOW                  = 70720,
+    SPELL_UTHER_HOLY_LIGHT_VISUAL                 = 73036,
+    SPELL_QUELDELAR_COMPULSION                    = 70013,
+    SPELL_QUELDELAR_WILL                          = 70698,
 };
 
 const uint32 allowedCompositions[8][5] =
@@ -389,5 +409,8 @@ inline AI* GetHallsOfReflectionAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, HallsOfReflectionScriptName);
 }
+
+#define RegisterHallsOfReflectionCreatureAI(ai_name) \
+    RegisterCreatureAIWithFactory(ai_name, GetHallsOfReflectionAI)
 
 #endif

@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaBoundary.h"
 #include "Creature.h"
 #include "GameObject.h"
 #include "InstanceMapScript.h"
@@ -65,6 +66,12 @@ DoorData const doorData[] =
     { 0,                        0,              DOOR_TYPE_ROOM  }
 };
 
+BossBoundaryData const boundaries =
+{
+    { DATA_ATTUMEN,     new CircleBoundary(Position(-11126.3f, -1929.11f), 50.0f) },
+    { DATA_ATTUMEN,     new ZRangeBoundary(49.0f, 55.0f) },
+};
+
 class instance_karazhan : public InstanceMapScript
 {
 public:
@@ -81,6 +88,7 @@ public:
         {
             SetHeaders(DataHeader);
             SetBossNumber(EncounterCount);
+            LoadBossBoundaries(boundaries);
             LoadObjectData(creatureData, gameObjectData);
             LoadDoorData(doorData);
 

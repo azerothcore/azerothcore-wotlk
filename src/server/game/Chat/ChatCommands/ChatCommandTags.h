@@ -143,6 +143,11 @@ namespace Acore::ChatCommands
         AC_GAME_API ChatCommandResult TryConsume(ChatHandler const* handler, std::string_view args);
     };
 
+    inline std::string_view format_as(QuotedString const& qs)
+    {
+        return std::string_view(qs);
+    }
+
     struct AC_GAME_API AccountIdentifier : Acore::Impl::ChatCommands::ContainerTag
     {
         using value_type = uint32;

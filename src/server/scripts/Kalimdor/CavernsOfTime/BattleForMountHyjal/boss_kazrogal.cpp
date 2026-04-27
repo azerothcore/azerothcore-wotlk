@@ -48,12 +48,7 @@ struct boss_kazrogal : public BossAI
 {
 public:
     boss_kazrogal(Creature* creature) : BossAI(creature, DATA_KAZROGAL)
-    {
-        scheduler.SetValidator([this]
-            {
-                return !me->HasUnitState(UNIT_STATE_CASTING);
-            });
-    }
+    {    }
 
     void Reset() override
     {
@@ -111,7 +106,7 @@ public:
 
     void KilledUnit(Unit * victim) override
     {
-        if (!_recentlySpoken && victim->IsPlayer())
+        if (!_recentlySpoken && victim->IsPlayer() && me->IsAlive())
         {
             Talk(SAY_ONSLAY);
             _recentlySpoken = true;

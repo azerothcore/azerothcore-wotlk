@@ -385,11 +385,11 @@ public:
 
         void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
-            if (attacker && attacker->GetCharmerOrOwnerOrOwnGUID().IsPlayer() && damage > 0 && !me->isActiveObject())
+            if (attacker && attacker->GetCharmerOrOwnerOrOwnGUID().IsPlayer() && damage > 0 && instance->GetBossState(DATA_WARDEN_MELLICHAR) != IN_PROGRESS)
             {
                 me->setActive(true);
                 me->InterruptNonMeleeSpells(false);
-                me->SetImmuneToAll(true);
+                me->SetImmuneToAll(true, true);
                 events.ScheduleEvent(EVENT_WARDEN_INTRO1, 1500ms);
                 events.ScheduleEvent(EVENT_WARDEN_CHECK_PLAYERS, 1s);
                 instance->SetBossState(DATA_WARDEN_MELLICHAR, IN_PROGRESS);

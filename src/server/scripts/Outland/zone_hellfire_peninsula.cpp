@@ -83,6 +83,9 @@ public:
 
         void Reset() override
         {
+            if (_defeated)
+                return;
+
             faction_Timer = 8000;
             envelopingWinds_Timer = 9000;
             shock_Timer = 5000;
@@ -91,6 +94,15 @@ public:
             me->SetFaction(FACTION_FRIENDLY);
 
             Talk(SAY_SUMMON);
+        }
+
+        void JustReachedHome() override
+        {
+            if (_defeated)
+            {
+                Talk(SAY_FREE);
+                me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
+            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -110,12 +122,11 @@ public:
 
             if (HealthBelowPct(30))
             {
-                me->SetFaction(FACTION_FRIENDLY);
-                me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
+                _defeated = true;
                 me->RemoveAllAuras();
-                me->GetThreatMgr().ClearAllThreat();
+                me->SetFaction(FACTION_FRIENDLY);
                 me->CombatStop(true);
-                Talk(SAY_FREE);
+                me->GetThreatMgr().ClearAllThreat();
                 return;
             }
 
@@ -140,6 +151,7 @@ public:
         uint32 faction_Timer;
         uint32 envelopingWinds_Timer;
         uint32 shock_Timer;
+        bool _defeated = false;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -195,6 +207,7 @@ public:
             npc_escortAI::MoveInLineOfSight(who);
         }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 waypointId) override
         {
             switch (waypointId)
@@ -320,6 +333,7 @@ public:
             }
         }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();
@@ -443,113 +457,6 @@ public:
     }
 };
 
-enum Aledis
-{
-    SAY_CHALLENGE = 0,
-    SAY_DEFEATED = 1,
-    EVENT_TALK = 1,
-    EVENT_ATTACK = 2,
-    EVENT_EVADE = 3,
-    EVENT_FIREBALL = 4,
-    EVENT_FROSTNOVA = 5,
-    SPELL_FIREBALL = 20823,
-    SPELL_FROSTNOVA = 11831,
-};
-
-struct npc_magister_aledis : public ScriptedAI
-{
-    npc_magister_aledis(Creature* creature) : ScriptedAI(creature) { }
-
-    void StartFight(Player* player)
-    {
-        me->Dismount();
-        me->SetFacingToObject(player);
-        me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-        _playerGUID = player->GetGUID();
-        _events.ScheduleEvent(EVENT_TALK, 2s);
-    }
-
-    void Reset() override
-    {
-        me->RestoreFaction();
-        me->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
-        me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-        me->SetImmuneToPC(true);
-    }
-
-    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damageType*/, SpellSchoolMask /*spellInfo = nullptr*/) override
-    {
-        if (damage > me->GetHealth() || me->HealthBelowPctDamaged(20, damage))
-        {
-            damage = 0;
-
-            _events.Reset();
-            me->RestoreFaction();
-            me->RemoveAllAuras();
-            me->GetThreatMgr().ClearAllThreat();
-            me->CombatStop(true);
-            me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
-            me->SetImmuneToPC(true);
-            Talk(SAY_DEFEATED);
-
-            _events.ScheduleEvent(EVENT_EVADE, 1min);
-        }
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        _events.Update(diff);
-
-        while (uint32 eventId = _events.ExecuteEvent())
-        {
-            switch (eventId)
-            {
-                case EVENT_TALK:
-                    Talk(SAY_CHALLENGE);
-                    _events.ScheduleEvent(EVENT_ATTACK, 2s);
-                    break;
-                case EVENT_ATTACK:
-                    me->SetImmuneToPC(false);
-                    me->SetFaction(FACTION_MONSTER);
-                    if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
-                    {
-                        AttackStart(player);
-                    }
-                    _events.ScheduleEvent(EVENT_FIREBALL, 1ms);
-                    _events.ScheduleEvent(EVENT_FROSTNOVA, 5s);
-                    break;
-                case EVENT_FIREBALL:
-                    DoCast(SPELL_FIREBALL);
-                    _events.ScheduleEvent(EVENT_FIREBALL, 10s);
-                    break;
-                case EVENT_FROSTNOVA:
-                    DoCastAOE(SPELL_FROSTNOVA);
-                    _events.ScheduleEvent(EVENT_FROSTNOVA, 20s);
-                    break;
-                case EVENT_EVADE:
-                    EnterEvadeMode();
-                    break;
-            }
-        }
-
-        if (UpdateVictim())
-        {
-            DoMeleeAttackIfReady();
-        }
-    }
-
-    void sGossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/) override
-    {
-        CloseGossipMenuFor(player);
-        me->StopMoving();
-        StartFight(player);
-    }
-
-private:
-    EventMap _events;
-    ObjectGuid _playerGUID;
-};
-
 enum Beacon
 {
     NPC_STONESCHYE_WHELP        = 16927,
@@ -574,10 +481,8 @@ public:
                 {
                     for (Creature* whelp : creatureList)
                     {
-                        if (whelp->IsAlive() && !whelp->IsInCombat() && whelp->GetMotionMaster()->GetCurrentMovementGeneratorType() != HOME_MOTION_TYPE)
-                        {
+                        if (whelp && whelp->IsAlive() && !whelp->IsInCombat() && whelp->GetMotionMaster()->GetCurrentMovementGeneratorType() != HOME_MOTION_TYPE)
                             whelp->GetMotionMaster()->MovePoint(0, me->GetNearPosition(4.0f, whelp->GetOrientation()));
-                        }
                     }
                 }
             }
@@ -586,10 +491,8 @@ public:
                 {
                     for (Creature* whelp : creatureList)
                     {
-                        if (whelp->IsAlive() && !whelp->IsInCombat() && whelp->GetMotionMaster()->GetCurrentMovementGeneratorType() != HOME_MOTION_TYPE)
-                        {
+                        if (whelp && whelp->IsAlive() && !whelp->IsInCombat() && whelp->GetMotionMaster()->GetCurrentMovementGeneratorType() != HOME_MOTION_TYPE)
                             whelp->GetMotionMaster()->MoveTargetedHome();
-                        }
                     }
                 }
             }
@@ -635,6 +538,5 @@ void AddSC_hellfire_peninsula()
     new npc_fel_guard_hound();
     new go_beacon();
 
-    RegisterCreatureAI(npc_magister_aledis);
     RegisterGameObjectAI(go_magtheridons_head);
 }

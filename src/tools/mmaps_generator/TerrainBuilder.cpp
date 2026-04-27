@@ -676,24 +676,20 @@ namespace MMAP
     /**************************************************************************/
     bool TerrainBuilder::loadVMap(uint32 mapID, uint32 tileX, uint32 tileY, MeshData& meshData)
     {
-        IVMapMgr* vmapMgr = new VMapMgr2();
-        int result = vmapMgr->loadMap(m_vmapsPath.c_str(), mapID, tileX, tileY);
+        std::string const mapFileName = VMapMgr2::getMapFileName(mapID);
+        std::unique_ptr<StaticMapTree> staticTree = std::make_unique<StaticMapTree>(mapID, m_vmapsPath);
+        if (!staticTree->InitMap(mapFileName))
+            return false;
+
+        staticTree->LoadMapTile(tileX, tileY);
+
         bool retval = false;
 
         do
         {
-            if (result == VMAP_LOAD_RESULT_ERROR)
-                break;
-
-            InstanceTreeMap instanceTrees;
-            ((VMapMgr2*)vmapMgr)->GetInstanceMapTree(instanceTrees);
-
-            if (!instanceTrees[mapID])
-                break;
-
             ModelInstance* models = nullptr;
             uint32 count = 0;
-            instanceTrees[mapID]->GetModelInstances(models, count);
+            staticTree->GetModelInstances(models, count);
 
             if (!models)
                 break;
@@ -828,9 +824,6 @@ namespace MMAP
                 }
             }
         } while (false);
-
-        vmapMgr->unloadMap(mapID, tileX, tileY);
-        delete vmapMgr;
 
         return retval;
     }

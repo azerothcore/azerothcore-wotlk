@@ -67,41 +67,9 @@ public:
             LoadBossBoundaries(boundaries);
         }
 
-        ObjectGuid ThaladredTheDarkenerGUID;
-        ObjectGuid LordSanguinarGUID;
-        ObjectGuid GrandAstromancerCapernianGUID;
-        ObjectGuid MasterEngineerTelonicusGUID;
-        ObjectGuid AlarGUID;
-        ObjectGuid KaelthasGUID;
         ObjectGuid BridgeWindowGUID;
         ObjectGuid KaelStateRightGUID;
         ObjectGuid KaelStateLeftGUID;
-
-        void OnCreatureCreate(Creature* creature) override
-        {
-            switch (creature->GetEntry())
-            {
-                case NPC_ALAR:
-                    AlarGUID = creature->GetGUID();
-                    break;
-                case NPC_KAELTHAS:
-                    KaelthasGUID = creature->GetGUID();
-                    break;
-                case NPC_THALADRED:
-                    ThaladredTheDarkenerGUID = creature->GetGUID();
-                    break;
-                case NPC_TELONICUS:
-                    MasterEngineerTelonicusGUID = creature->GetGUID();
-                    break;
-                case NPC_CAPERNIAN:
-                    GrandAstromancerCapernianGUID = creature->GetGUID();
-                    break;
-                case NPC_LORD_SANGUINAR:
-                    LordSanguinarGUID = creature->GetGUID();
-                    break;
-            }
-            InstanceScript::OnCreatureCreate(creature);
-        }
 
         void OnGameObjectCreate(GameObject* gobject) override
         {
@@ -130,10 +98,6 @@ public:
                     return KaelStateRightGUID;
                 case GO_KAEL_STATUE_LEFT:
                     return KaelStateLeftGUID;
-                case NPC_ALAR:
-                    return AlarGUID;
-                case NPC_KAELTHAS:
-                    return KaelthasGUID;
             }
 
             return ObjectGuid::Empty;
@@ -146,25 +110,7 @@ public:
     }
 };
 
-class spell_the_eye_countercharge_aura : public AuraScript
-{
-    PrepareAuraScript(spell_the_eye_countercharge_aura);
-
-    bool PrepareProc(ProcEventInfo&  /*eventInfo*/)
-    {
-        // xinef: prevent charge drop
-        PreventDefaultAction();
-        return true;
-    }
-
-    void Register() override
-    {
-        DoCheckProc += AuraCheckProcFn(spell_the_eye_countercharge_aura::PrepareProc);
-    }
-};
-
 void AddSC_instance_the_eye()
 {
     new instance_the_eye();
-    RegisterSpellScript(spell_the_eye_countercharge_aura);
 }

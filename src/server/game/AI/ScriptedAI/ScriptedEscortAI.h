@@ -64,9 +64,13 @@ public:
 
     void JustRespawned() override;
 
+    bool IsEscortNPC(bool /*onlyIfActive*/ = true) const override { return true; }
+
     void ReturnToLastPoint();
 
     void EnterEvadeMode(EvadeReason /*why*/ = EVADE_REASON_OTHER) override;
+
+    void JustExitedCombat() override;
 
     void UpdateAI(uint32 diff) override;                   //the "internal" update, calls UpdateEscortAI()
     virtual void UpdateEscortAI(uint32 diff);     //used when it's needed to add code in update (abilities, scripted events, etc)
@@ -87,6 +91,7 @@ public:
 
     void GenerateWaypointArray(Movement::PointsArray* points);
 
+    using CreatureAI::WaypointReached;
     virtual void WaypointReached(uint32 pointId) = 0;
     virtual void WaypointStart(uint32 /*pointId*/) {}
 

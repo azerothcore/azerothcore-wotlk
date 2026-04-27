@@ -270,7 +270,7 @@ struct boss_ouro : public BossAI
 
     void EnterEvadeMode(EvadeReason /*why*/) override
     {
-        if (me->GetThreatMgr().GetThreatList().empty())
+        if (me->GetThreatMgr().IsThreatListEmpty())
         {
             DoCastSelf(SPELL_OURO_SUBMERGE_VISUAL);
             me->DespawnOrUnsummon(1s);

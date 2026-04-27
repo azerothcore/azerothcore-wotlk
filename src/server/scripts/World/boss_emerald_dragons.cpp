@@ -320,13 +320,13 @@ public:
             {
                 Talk(SAY_YSONDRE_SUMMON_DRUIDS);
 
-                auto const& attackers = me->GetThreatMgr().GetThreatList();
                 uint8 attackersCount = 0;
 
-                for (const auto attacker : attackers)
+                for (ThreatReference const* ref : me->GetThreatMgr().GetUnsortedThreatList())
                 {
-                    if ((*attacker)->ToPlayer() && (*attacker)->IsAlive())
-                        ++attackersCount;
+                    if (Unit* victim = ref->GetVictim())
+                        if (victim->ToPlayer() && victim->IsAlive())
+                            ++attackersCount;
                 }
 
                 uint8 amount = attackersCount < 30 ? attackersCount * 0.5f : 15;

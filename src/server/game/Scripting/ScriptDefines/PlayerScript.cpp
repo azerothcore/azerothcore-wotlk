@@ -18,6 +18,9 @@
 #include "PlayerScript.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
+#include "World.h"
+
+#include <algorithm>
 
 void ScriptMgr::OnPlayerBeforeDurabilityRepair(Player* player, ObjectGuid npcGUID, ObjectGuid itemGUID, float& discountMod, uint8 guildBank)
 {
@@ -107,6 +110,11 @@ void ScriptMgr::OnPlayerFreeTalentPointsChanged(Player* player, uint32 points)
 void ScriptMgr::OnPlayerTalentsReset(Player* player, bool noCost)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_TALENTS_RESET, script->OnPlayerTalentsReset(player, noCost));
+}
+
+bool ScriptMgr::OnPlayerCanLearnTalent(Player* player, TalentEntry const* talent, uint32 rank)
+{
+    CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_LEARN_TALENT, !script->OnPlayerCanLearnTalent(player, talent, rank));
 }
 
 void ScriptMgr::OnPlayerAfterSpecSlotChanged(Player* player, uint8 newSlot)
@@ -789,7 +797,7 @@ void ScriptMgr::OnPlayerSetServerSideVisibilityDetect(Player* player, ServerSide
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_SET_SERVER_SIDE_VISIBILITY_DETECT, script->OnPlayerSetServerSideVisibilityDetect(player, type, sec));
 }
 
-void ScriptMgr::OnPlayerResurrect(Player* player, float restore_percent, bool applySickness)
+void ScriptMgr::OnPlayerResurrect(Player* player, float restore_percent, bool& applySickness)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_PLAYER_RESURRECT, script->OnPlayerResurrect(player, restore_percent, applySickness));
 }
@@ -908,6 +916,27 @@ bool ScriptMgr::OnPlayerCanGiveLevel(Player* player, uint8 newLevel)
 void ScriptMgr::OnPlayerSendListInventory(Player* player, ObjectGuid vendorGuid, uint32& vendorEntry)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_SEND_LIST_INVENTORY, script->OnPlayerSendListInventory(player, vendorGuid, vendorEntry));
+}
+
+void ScriptMgr::OnPlayerGetReputationPriceDiscount(Player const* player, Creature const* creature, float& discount)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_GET_REPUTATION_PRICE_DISCOUNT, script->OnPlayerGetReputationPriceDiscount(player, creature, discount));
+}
+
+void ScriptMgr::OnPlayerGetReputationPriceDiscount(Player const* player, FactionTemplateEntry const* factionTemplate, float& discount)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_GET_REPUTATION_PRICE_DISCOUNT, script->OnPlayerGetReputationPriceDiscount(player, factionTemplate, discount));
+}
+
+void ScriptMgr::OnPlayerLearnTaxiNode(Player const* player, uint32 nodeId)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_LEARN_TAXI_NODE, script->OnPlayerLearnTaxiNode(player, nodeId));
+}
+
+void ScriptMgr::OnPlayerBeforeGetLevelForXPGain(Player const* player, uint8& level)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_GET_LEVEL_FOR_XP_GAIN, script->OnPlayerBeforeGetLevelForXPGain(player, level));
+    level = std::clamp(level, uint8(1), uint8(sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL)));
 }
 
 PlayerScript::PlayerScript(const char* name, std::vector<uint16> enabledHooks)

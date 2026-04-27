@@ -25405,14 +25405,6 @@ INSERT INTO `gossip_menu_option_locale` VALUES
 (9586,0,'ruRU','Почему меня отправили именно в это время и место?',NULL),
 (9586,0,'zhCN','旧斯坦索姆……为什么送我回到这一时间流？',NULL),
 (9586,0,'zhTW','為什麼我會被送回這個特殊的地點和時間?',NULL),
-(9586,1,'deDE','Ja, bitte!',''),
-(9586,1,'esES','¡Sí, por favor!',NULL),
-(9586,1,'esMX','¡Sí, por favor!',NULL),
-(9586,1,'frFR','Oui, s\'il vous plaît !',NULL),
-(9586,1,'koKR','네, 그렇게 해주십시오!',NULL),
-(9586,1,'ruRU','Да, пожалуйста!',NULL),
-(9586,1,'zhCN','是的，请！',''),
-(9586,1,'zhTW','是，麻煩你了!',NULL),
 (9586,2,'deDE','Chromie, Ihr und ich wissen beide, was in dieser Zeitlinie passieren wird. Wir haben das alles schon mal gesehen. Könntet Ihr uns ein wenig vorspringen lassen, dahin, wo wirklich was los ist?',''),
 (9586,2,'esES','Cromi, tú y yo sabemos lo que va a ocurrir a continuación. Ya lo hemos visto antes. ¿No podemos saltárnoslo todo y pasar a la acción de verdad?',NULL),
 (9586,2,'esMX','Cromi, tú y yo sabemos lo que va a ocurrir a continuación. Ya lo hemos visto antes. ¿No podemos saltárnoslo todo y pasar a la acción de verdad?',NULL),
@@ -32972,13 +32964,13 @@ INSERT INTO `gossip_menu_option_locale` VALUES
 (21031,5,'esES','¿Dónde está el ancestro Obsidiano?',NULL),
 (21031,5,'esMX','¿Dónde está el ancestro Obsidiano?',NULL),
 (21031,5,'frFR','Où est l’Ancien Obsidien ?',NULL),
-(21031,5,'koKR','장로 옵시디안은 어디에 있습니까?',NULL);
-INSERT INTO `gossip_menu_option_locale` VALUES
+(21031,5,'koKR','장로 옵시디안은 어디에 있습니까?',NULL),
 (21031,5,'ruRU','Где я могу найти предка Обсидиана?',NULL),
 (21031,5,'zhCN','黑曜长者在哪里？',''),
 (21031,5,'zhTW','黑曜長者在哪裡?',NULL),
 (21031,6,'deDE','Wo ist Urahne Schneekrone?',NULL),
-(21031,6,'esES','¿Dónde está el ancestro Corona Nevada?',NULL),
+(21031,6,'esES','¿Dónde está el ancestro Corona Nevada?',NULL);
+INSERT INTO `gossip_menu_option_locale` VALUES
 (21031,6,'esMX','¿Dónde está el ancestro Corona Nevada?',NULL),
 (21031,6,'frFR','Où est l’Ancien Couronne-de-Neige ?',NULL),
 (21031,6,'koKR','장로 스노우크라운은 어디에 있습니까?',NULL),
@@ -35291,4 +35283,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-29 17:54:02
+-- Dump completed on 2026-03-15 20:38:42

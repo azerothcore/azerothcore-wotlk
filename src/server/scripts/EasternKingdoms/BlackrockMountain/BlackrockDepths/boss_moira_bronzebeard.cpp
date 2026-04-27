@@ -34,10 +34,10 @@ constexpr Milliseconds TIMER_RENEW = 12s;
 constexpr Milliseconds TIMER_SHADOWBOLT = 16s;
 constexpr Milliseconds TIMER_WORDPAIN = 12s;
 
-struct boss_moira_bronzebeardAI : public BossAI
+struct boss_moira_bronzebeard : public BossAI
 {
     // use a default value so we can inherit for priestess
-    boss_moira_bronzebeardAI(Creature* creature, uint32 data = DATA_MOIRA) : BossAI(creature, data) {}
+    boss_moira_bronzebeard(Creature* creature, uint32 data = DATA_MOIRA) : BossAI(creature, data) {}
     void JustEngagedWith(Unit* /*who*/) override
     {
         _JustEngagedWith();
@@ -49,15 +49,13 @@ struct boss_moira_bronzebeardAI : public BossAI
     void UpdateAI(uint32 diff) override
     {
         if (!UpdateVictim())
-        {
             return;
-        }
+
         events.Update(diff);
 
         if (me->HasUnitState(UNIT_STATE_CASTING))
-        {
             return;
-        }
+
         while (uint32 eventId = events.ExecuteEvent())
         {
             switch (eventId)
@@ -83,22 +81,18 @@ struct boss_moira_bronzebeardAI : public BossAI
     {
         Creature* emperor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_EMPEROR));
         if (emperor && emperor->HealthBelowPct(90))
-        {
             DoCast(emperor, spell);
-        }
         else if (HealthBelowPct(90))
-        {
             DoCastSelf(spell);
-        }
         events.ScheduleEvent(spell, timer - 2s, timer + 2s);
     }
 };
 
 // high priestess should be fairly identical to Moira.
 // Running away when emperor dies is handled through GUID from emperor, therefore not relevant here.
-struct boss_high_priestess_thaurissanAI : public boss_moira_bronzebeardAI
+struct boss_high_priestess_thaurissan : public boss_moira_bronzebeard
 {
-    boss_high_priestess_thaurissanAI(Creature* creature) : boss_moira_bronzebeardAI(creature, DATA_PRIESTESS) {}
+    boss_high_priestess_thaurissan(Creature* creature) : boss_moira_bronzebeard(creature, DATA_PRIESTESS) {}
 
     void JustEngagedWith(Unit* /*who*/) override
     {
@@ -110,18 +104,16 @@ struct boss_high_priestess_thaurissanAI : public boss_moira_bronzebeardAI
         events.ScheduleEvent(SPELL_SHADOWBOLT, TIMER_SHADOWBOLT / 2);
     }
 
-        void UpdateAI(uint32 diff) override
+    void UpdateAI(uint32 diff) override
     {
         if (!UpdateVictim())
-        {
             return;
-        }
+
         events.Update(diff);
 
         if (me->HasUnitState(UNIT_STATE_CASTING))
-        {
             return;
-        }
+
         while (uint32 eventId = events.ExecuteEvent())
         {
             switch (eventId)
@@ -148,34 +140,12 @@ struct boss_high_priestess_thaurissanAI : public boss_moira_bronzebeardAI
     }
 };
 
-class boss_moira_bronzebeard : public CreatureScript
-{
-public:
-    boss_moira_bronzebeard() : CreatureScript("boss_moira_bronzebeard") { }
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetBlackrockDepthsAI<boss_moira_bronzebeardAI>(creature);
-    }
-};
-
-class boss_high_priestess_thaurissan : public CreatureScript
-{
-public:
-    boss_high_priestess_thaurissan() : CreatureScript("boss_high_priestess_thaurissan") {}
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetBlackrockDepthsAI<boss_high_priestess_thaurissanAI>(creature);
-    }
-};
-
 void AddSC_boss_moira_bronzebeard()
 {
-    new boss_moira_bronzebeard();
+    RegisterBlackrockDepthsCreatureAI(boss_moira_bronzebeard);
 }
 
 void AddSC_boss_high_priestess_thaurissan()
 {
-    new boss_high_priestess_thaurissan();
+    RegisterBlackrockDepthsCreatureAI(boss_high_priestess_thaurissan);
 }

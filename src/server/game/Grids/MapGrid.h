@@ -20,6 +20,7 @@
 
 #include "GridCell.h"
 #include "GridReference.h"
+#include <memory>
 
 class GridTerrainData;
 

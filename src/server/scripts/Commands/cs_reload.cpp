@@ -30,6 +30,7 @@
 #include "MapMgr.h"
 #include "MotdMgr.h"
 #include "ObjectMgr.h"
+#include "PoolMgr.h"
 #include "ScriptMgr.h"
 #include "ServerMailMgr.h"
 #include "SkillDiscovery.h"
@@ -149,6 +150,7 @@ public:
             { "skill_fishing_base_level",      HandleReloadSkillFishingBaseLevelCommand,      SEC_ADMINISTRATOR, Console::Yes },
             { "skinning_loot_template",        HandleReloadLootTemplatesSkinningCommand,      SEC_ADMINISTRATOR, Console::Yes },
             { "smart_scripts",                 HandleReloadSmartScripts,                      SEC_ADMINISTRATOR, Console::Yes },
+            { "spawn_group",                   HandleReloadSpawnGroupCommand,                 SEC_ADMINISTRATOR, Console::Yes },
             { "spell_required",                HandleReloadSpellRequiredCommand,              SEC_ADMINISTRATOR, Console::Yes },
             { "spell_area",                    HandleReloadSpellAreaCommand,                  SEC_ADMINISTRATOR, Console::Yes },
             { "spell_bonus_data",              HandleReloadSpellBonusesCommand,               SEC_ADMINISTRATOR, Console::Yes },
@@ -156,7 +158,6 @@ public:
             { "spell_loot_template",           HandleReloadLootTemplatesSpellCommand,         SEC_ADMINISTRATOR, Console::Yes },
             { "spell_linked_spell",            HandleReloadSpellLinkedSpellCommand,           SEC_ADMINISTRATOR, Console::Yes },
             { "spell_pet_auras",               HandleReloadSpellPetAurasCommand,              SEC_ADMINISTRATOR, Console::Yes },
-            { "spell_proc_event",              HandleReloadSpellProcEventCommand,             SEC_ADMINISTRATOR, Console::Yes },
             { "spell_proc",                    HandleReloadSpellProcsCommand,                 SEC_ADMINISTRATOR, Console::Yes },
             { "spell_scripts",                 HandleReloadSpellScriptsCommand,               SEC_ADMINISTRATOR, Console::Yes },
             { "spell_target_position",         HandleReloadSpellTargetPositionCommand,        SEC_ADMINISTRATOR, Console::Yes },
@@ -270,6 +271,7 @@ public:
 
         LOG_INFO("server.loading", "Reloading Quests Relations...");
         sObjectMgr->LoadQuestStartersAndEnders();
+        sPoolMgr->ReSpawnPoolQuests();
         handler->SendGlobalGMSysMessage("DB tables `*_queststarter` and `*_questender` reloaded.");
         return true;
     }
@@ -299,7 +301,6 @@ public:
         HandleReloadSpellAreaCommand(handler);
         HandleReloadSpellGroupsCommand(handler);
         HandleReloadSpellLinkedSpellCommand(handler);
-        HandleReloadSpellProcEventCommand(handler);
         HandleReloadSpellProcsCommand(handler);
         HandleReloadSpellBonusesCommand(handler);
         HandleReloadSpellTargetPositionCommand(handler);
@@ -490,6 +491,7 @@ public:
     {
         LOG_INFO("server.loading", "Loading Quests Relations... (`creature_queststarter`)");
         sObjectMgr->LoadCreatureQuestStarters();
+        sPoolMgr->ReSpawnPoolQuests();
         handler->SendGlobalGMSysMessage("DB table `creature_queststarter` reloaded.");
         return true;
     }
@@ -532,6 +534,7 @@ public:
     {
         LOG_INFO("server.loading", "Loading Quests Relations... (`gameobject_queststarter`)");
         sObjectMgr->LoadGameobjectQuestStarters();
+        sPoolMgr->ReSpawnPoolQuests();
         handler->SendGlobalGMSysMessage("DB table `gameobject_queststarter` reloaded.");
         return true;
     }
@@ -897,14 +900,6 @@ public:
         return true;
     }
 
-    static bool HandleReloadSpellProcEventCommand(ChatHandler* handler)
-    {
-        LOG_INFO("server.loading", "Reloading Spell Proc Event conditions...");
-        sSpellMgr->LoadSpellProcEvents();
-        handler->SendGlobalGMSysMessage("DB table `spell_proc_event` (spell proc trigger requirements) reloaded.");
-        return true;
-    }
-
     static bool HandleReloadSpellProcsCommand(ChatHandler* handler)
     {
         LOG_INFO("server.loading", "Reloading Spell Proc conditions and data...");
@@ -1262,6 +1257,15 @@ public:
         LOG_INFO("server.loading", "Reloading game_graveyard table...");
         sGraveyard->LoadGraveyardFromDB();
         handler->SendGlobalGMSysMessage("DB table `game_graveyard` reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadSpawnGroupCommand(ChatHandler* handler)
+    {
+        LOG_INFO("server.loading", "Reloading spawn_group_template and spawn_group tables...");
+        sObjectMgr->LoadSpawnGroupTemplates();
+        sObjectMgr->LoadSpawnGroups();
+        handler->SendGlobalGMSysMessage("DB tables `spawn_group_template` and `spawn_group` reloaded.");
         return true;
     }
 };
