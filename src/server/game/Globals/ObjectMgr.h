@@ -809,6 +809,9 @@ public:
     void GetPlayerClassLevelInfo(uint32 class_, uint8 level, PlayerClassLevelInfo* info) const;
 
     [[nodiscard]] PlayerInfo const* GetPlayerInfo(uint32 race, uint32 class_) const;
+    /// First `playercreateinfo` row among warrior/paladin/hunter/rogue for
+    /// `race` (low-level Death Knight racial start positions).
+    [[nodiscard]] PlayerInfo const* GetPlayerClassStarterPositionTemplate(uint8 race) const;
 
     void GetPlayerLevelInfo(uint32 race, uint32 class_, uint8 level, PlayerLevelInfo* info) const;
 

@@ -5555,6 +5555,12 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     SetCanModifyStats(true);
     UpdateAllStats();
 
+    // Low-heroic DK: LearnDefaultSkills() runs before _LoadSpells and re-applies
+    // SkillLineAbility rewards (e.g. Death Grip, Death Coil) even when Blood/Frost/Unholy
+    // were skipped — strip again after the full load like Player::Create does.
+    GrantLowHeroicDeathKnightPlagueStrikeIfNeeded();
+    ApplyLowLevelHeroicDeathKnightSpellbookLimits();
+
     // restore remembered power/health values (but not more max values)
     uint32 savedHealth = fields[55].Get<uint32>();
     SetHealth(savedHealth > GetMaxHealth() ? GetMaxHealth() : savedHealth);
@@ -7091,11 +7097,17 @@ bool Player::_LoadHomeBind(PreparedQueryResult result)
 
     if (!ok)
     {
-        m_homebindMapId = info->mapId;
-        m_homebindAreaId = info->areaId;
-        m_homebindX = info->positionX;
-        m_homebindY = info->positionY;
-        m_homebindZ = info->positionZ;
+        PlayerInfo const* bindInfo = info;
+        uint32 const heroicStart = uint32(sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL));
+        if (getClass() == CLASS_DEATH_KNIGHT && heroicStart > 0u && heroicStart < 55u)
+            if (PlayerInfo const* tpl = sObjectMgr->GetPlayerClassStarterPositionTemplate(getRace(true)))
+                bindInfo = tpl;
+
+        m_homebindMapId = bindInfo->mapId;
+        m_homebindAreaId = bindInfo->areaId;
+        m_homebindX = bindInfo->positionX;
+        m_homebindY = bindInfo->positionY;
+        m_homebindZ = bindInfo->positionZ;
 
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PLAYER_HOMEBIND);
         stmt->SetData(0, GetGUID().GetCounter());

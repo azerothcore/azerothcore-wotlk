@@ -1981,10 +1981,10 @@ CharactersPerRealm = 10
 #
 #    HeroicCharactersPerRealm
 #        Description: Limit number of heroic class characters per account on this realm.
-#        Range:       1-10
+#        Range:       0-10 (0 = unlimited)
 #        Default:     1
 
-HeroicCharactersPerRealm = 1
+HeroicCharactersPerRealm = 0
 
 #
 #    CharacterCreating.MinLevelForHeroicCharacter
@@ -1994,7 +1994,7 @@ HeroicCharactersPerRealm = 1
 #                     0  - (Disabled)
 #                     1  - (Enabled, Requires at least another level 1 character)
 
-CharacterCreating.MinLevelForHeroicCharacter = 55
+CharacterCreating.MinLevelForHeroicCharacter = 0
 
 #
 #    StartPlayerLevel
@@ -2010,7 +2010,7 @@ StartPlayerLevel = 1
 #        Range:       1-MaxPlayerLevel
 #        Default:     55
 
-StartHeroicPlayerLevel = 55
+StartHeroicPlayerLevel = 1
 
 #
 #    SkipCinematics
@@ -2036,7 +2036,7 @@ StartPlayerMoney = 0
 #        Default:     2000
 #                     2000 - (20 Silver)
 
-StartHeroicPlayerMoney = 2000
+StartHeroicPlayerMoney = 0
 
 #
 #     PlayerStart.String
@@ -2431,11 +2431,11 @@ MaxGroupXPDistance = 74
 #                     1 - (Rate.XP.Explore)
 #                     1 - (Rate.XP.Pet)
 
-Rate.XP.Kill      = 1
-Rate.XP.Quest     = 1
-Rate.XP.Quest.DF  = 1
-Rate.XP.Explore   = 1
-Rate.XP.Pet       = 1
+Rate.XP.Kill      = 3.5
+Rate.XP.Quest     = 3.5
+Rate.XP.Quest.DF  = 3.5
+Rate.XP.Explore   = 3.5
+Rate.XP.Pet       = 3.5
 
 #
 #    Rate.XP.BattlegroundKill...
