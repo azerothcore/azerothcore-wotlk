@@ -147,59 +147,6 @@ void DynamicMapTree::update(uint32 t_diff)
     impl->update(t_diff);
 }
 
-float ComputeFootprintHeightFromNormal(float baseHeight, G3D::Vector3 normal, float radius,
-                                       float yaw, float blend, float clamp)
-{
-    if (radius <= 0.0f)
-        return baseHeight;
-
-    if (!std::isfinite(normal.x) || !std::isfinite(normal.y) || !std::isfinite(normal.z))
-        return baseHeight;
-
-    if (normal.z < 0.0f)
-        normal = -normal;
-
-    if (normal.z <= 1.0e-6f)
-        return baseHeight;
-
-    float gx = -normal.x / normal.z;
-    float gy = -normal.y / normal.z;
-
-    if (!std::isfinite(gx) || !std::isfinite(gy))
-        return baseHeight;
-
-    if (clamp > 0.0f)
-    {
-        float const g2 = gx * gx + gy * gy;
-        float const c2 = clamp * clamp;
-
-        if (g2 > c2)
-        {
-            float const scale = clamp / std::sqrt(g2);
-            gx *= scale;
-            gy *= scale;
-        }
-    }
-
-    float const slopeL2 = std::sqrt(std::max(0.0f, gx * gx + gy * gy));
-    float totalSlope = slopeL2;
-
-    float const effectiveBlend = Clamp01(blend);
-    if (effectiveBlend < 1.0f)
-    {
-        float const cosYaw = std::cos(yaw);
-        float const sinYaw = std::sin(yaw);
-
-        float const rx = gx * cosYaw + gy * sinYaw;
-        float const ry = -gx * sinYaw + gy * cosYaw;
-
-        float const slopeL1 = std::abs(rx) + std::abs(ry);
-        totalSlope = effectiveBlend * slopeL2 + (1.0f - effectiveBlend) * (INV_SQRT2 * slopeL1);
-    }
-
-    return baseHeight + radius * totalSlope;
-}
-
 struct DynamicTreeIntersectionCallback
 {
     DynamicTreeIntersectionCallback(uint32 phasemask, VMAP::ModelIgnoreFlags ignoreFlags, G3D::Vector3* normal = nullptr) :
@@ -207,7 +154,7 @@ struct DynamicTreeIntersectionCallback
 
     bool operator()(G3D::Ray const& r, GameObjectModel const& obj, float& distance, bool stopAtFirstHit)
     {
-        G3D::Vector3 normal;
+        G3D::Vector3 normal(0.0f, 0.0f, 1.0f);
         bool const result = obj.intersectRay(r, distance, stopAtFirstHit, _phaseMask, _ignoreFlags, _hitNormal ? &normal : nullptr);
 
         if (result)
@@ -362,6 +309,59 @@ namespace
     {
         return std::max(0.0f, std::min(1.0f, value));
     }
+
+    float ComputeFootprintHeightFromNormal(float baseHeight, G3D::Vector3 normal, float radius,
+                                           float yaw, float blend, float clamp)
+    {
+        if (radius <= 0.0f)
+            return baseHeight;
+
+        if (!std::isfinite(normal.x) || !std::isfinite(normal.y) || !std::isfinite(normal.z))
+            return baseHeight;
+
+        if (normal.z < 0.0f)
+            normal = -normal;
+
+        if (normal.z <= 1.0e-6f)
+            return baseHeight;
+
+        float gx = -normal.x / normal.z;
+        float gy = -normal.y / normal.z;
+
+        if (!std::isfinite(gx) || !std::isfinite(gy))
+            return baseHeight;
+
+        if (clamp > 0.0f)
+        {
+            float const g2 = gx * gx + gy * gy;
+            float const c2 = clamp * clamp;
+
+            if (g2 > c2)
+            {
+                float const scale = clamp / std::sqrt(g2);
+                gx *= scale;
+                gy *= scale;
+            }
+        }
+
+        float const slopeL2 = std::sqrt(std::max(0.0f, gx * gx + gy * gy));
+        float totalSlope = slopeL2;
+
+        float const effectiveBlend = Clamp01(blend);
+        if (effectiveBlend < 1.0f)
+        {
+            float const cosYaw = std::cos(yaw);
+            float const sinYaw = std::sin(yaw);
+
+            float const rx = gx * cosYaw + gy * sinYaw;
+            float const ry = -gx * sinYaw + gy * cosYaw;
+
+            float const slopeL1 = std::abs(rx) + std::abs(ry);
+            totalSlope = effectiveBlend * slopeL2 + (1.0f - effectiveBlend) * (INV_SQRT2 * slopeL1);
+        }
+
+        return baseHeight + radius * totalSlope;
+    }
 }
 
 float DynamicMapTree::getHeightAccurate(float x, float y, float z, float maxSearchDist, uint32 phasemask,
@@ -371,7 +371,7 @@ float DynamicMapTree::getHeightAccurate(float x, float y, float z, float maxSear
     G3D::Ray ray(origin, G3D::Vector3(0.0f, 0.0f, -1.0f));
 
     float dist = maxSearchDist;
-    G3D::Vector3 normal;
+    G3D::Vector3 normal(0.0f, 0.0f, 1.0f);
 
     DynamicTreeIntersectionCallback callback(phasemask, VMAP::ModelIgnoreFlags::Nothing, &normal);
     impl->intersectZAllignedRay(ray, callback, dist);

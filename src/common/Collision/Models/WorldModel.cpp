@@ -129,6 +129,8 @@ namespace VMAP
 
                 *hitNormal = normal;
             }
+            else
+                *hitNormal = G3D::Vector3(0.0f, 0.0f, 1.0f);
         }
 
         return true;
@@ -619,12 +621,22 @@ namespace VMAP
     bool WorldModel::IntersectRay(G3D::Ray const& ray, float& distance, bool stopAtFirstHit,
                                   ModelIgnoreFlags ignoreFlags, G3D::Vector3* hitNormal) const
     {
+        // If the caller asked us to ignore certain objects we should check flags
         if ((ignoreFlags & ModelIgnoreFlags::M2) != ModelIgnoreFlags::Nothing)
+        {
+            // M2 models are not taken into account for LoS calculation if caller requested their ignoring.
             if (Flags & MOD_M2)
+            {
                 return false;
+            }
+        }
 
+        // small M2 workaround, maybe better make separate class with virtual intersection funcs
+        // in any case, there's no need to use a bound tree if we only have one submodel
         if (groupModels.size() == 1)
+        {
             return groupModels[0].IntersectRay(ray, distance, stopAtFirstHit, hitNormal);
+        }
 
         WModelRayCallBack callback(groupModels, hitNormal);
         groupTree.intersectRay(ray, callback, distance, stopAtFirstHit);

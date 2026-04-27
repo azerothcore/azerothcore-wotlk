@@ -34,17 +34,31 @@ namespace VMAP
                                      ModelIgnoreFlags ignoreFlags, G3D::Vector3* hitNormal) const
     {
         if (!iModel)
+        {
+            //std::cout << "<object not loaded>\n";
             return false;
+        }
 
         float time = pRay.intersectionTime(iBound);
         if (time == G3D::inf())
+        {
+            //            std::cout << "Ray does not hit '" << name << "'\n";
             return false;
+        }
 
+        //        std::cout << "Ray crosses bound of '" << name << "'\n";
+        /*        std::cout << "ray from:" << pRay.origin().x << ", " << pRay.origin().y << ", " << pRay.origin().z
+                          << " dir:" << pRay.direction().x << ", " << pRay.direction().y << ", " << pRay.direction().z
+                          << " t/tmax:" << time << '/' << pMaxDist;
+                std::cout << "\nBound lo:" << iBound.low().x << ", " << iBound.low().y << ", " << iBound.low().z << " hi: "
+                          << iBound.high().x << ", " << iBound.high().y << ", " << iBound.high().z << std::endl; */
+
+        // child bounds are defined in object space:
         Vector3 p = iInvRot * (pRay.origin() - iPos) * iInvScale;
         Ray modRay(p, iInvRot * pRay.direction());
 
         float distance = pMaxDist * iInvScale;
-        G3D::Vector3 modelNormal;
+        G3D::Vector3 modelNormal(0.0f, 0.0f, 1.0f);
 
         bool const hit = iModel->IntersectRay(modRay, distance, stopAtFirstHit, ignoreFlags, hitNormal ? &modelNormal : nullptr);
         if (hit)
@@ -64,6 +78,8 @@ namespace VMAP
 
                     *hitNormal = worldNormal;
                 }
+                else
+                    *hitNormal = G3D::Vector3(0.0f, 0.0f, 1.0f);
             }
         }
 

@@ -42,7 +42,7 @@ namespace VMAP
 
         bool operator()(G3D::Ray const& ray, uint32 entry, float& distance, bool stopAtFirstHit)
         {
-            G3D::Vector3 normal;
+            G3D::Vector3 normal(0.0f, 0.0f, 1.0f);
             bool const result = prims[entry].intersectRay(ray, distance, stopAtFirstHit, flags, hitNormal ? &normal : nullptr);
 
             if (result)
@@ -233,7 +233,7 @@ namespace VMAP
         G3D::Ray ray(pPos, G3D::Vector3(0.0f, 0.0f, -1.0f));
 
         float maxDist = maxSearchDist;
-        G3D::Vector3 hitNormal;
+        G3D::Vector3 hitNormal(0.0f, 0.0f, 1.0f);
 
         if (!GetIntersectionTime(ray, maxDist, false, ModelIgnoreFlags::Nothing, &hitNormal))
         {

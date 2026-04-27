@@ -1195,66 +1195,66 @@ namespace
     {
         return std::max(0.0f, std::min(1.0f, value));
     }
-}
 
-float ComputeFootprintHeightFromNormal(float baseHeight, G3D::Vector3 normal, float radius,
-                                       float yaw, float blend, float clamp)
-{
-    if (radius <= 0.0f)
-        return baseHeight;
-
-    if (!std::isfinite(normal.x) || !std::isfinite(normal.y) || !std::isfinite(normal.z))
-        return baseHeight;
-
-    if (normal.z < 0.0f)
-        normal = -normal;
-
-    if (normal.z <= 1.0e-6f)
-        return baseHeight;
-
-    float gx = -normal.x / normal.z;
-    float gy = -normal.y / normal.z;
-
-    if (!std::isfinite(gx) || !std::isfinite(gy))
-        return baseHeight;
-
-    if (clamp > 0.0f)
+    float ComputeFootprintHeightFromNormal(float baseHeight, G3D::Vector3 normal, float radius,
+                                           float yaw, float blend, float clamp)
     {
-        float const g2 = gx * gx + gy * gy;
-        float const c2 = clamp * clamp;
+        if (radius <= 0.0f)
+            return baseHeight;
 
-        if (g2 > c2)
+        if (!std::isfinite(normal.x) || !std::isfinite(normal.y) || !std::isfinite(normal.z))
+            return baseHeight;
+
+        if (normal.z < 0.0f)
+            normal = -normal;
+
+        if (normal.z <= 1.0e-6f)
+            return baseHeight;
+
+        float gx = -normal.x / normal.z;
+        float gy = -normal.y / normal.z;
+
+        if (!std::isfinite(gx) || !std::isfinite(gy))
+            return baseHeight;
+
+        if (clamp > 0.0f)
         {
-            float const scale = clamp / std::sqrt(g2);
-            gx *= scale;
-            gy *= scale;
+            float const g2 = gx * gx + gy * gy;
+            float const c2 = clamp * clamp;
+
+            if (g2 > c2)
+            {
+                float const scale = clamp / std::sqrt(g2);
+                gx *= scale;
+                gy *= scale;
+            }
         }
+
+        float const slopeL2 = std::sqrt(std::max(0.0f, gx * gx + gy * gy));
+        float totalSlope = slopeL2;
+
+        float const effectiveBlend = Clamp01(blend);
+        if (effectiveBlend < 1.0f)
+        {
+            float const cosYaw = std::cos(yaw);
+            float const sinYaw = std::sin(yaw);
+
+            float const rx = gx * cosYaw + gy * sinYaw;
+            float const ry = -gx * sinYaw + gy * cosYaw;
+
+            float const slopeL1 = std::abs(rx) + std::abs(ry);
+            totalSlope = effectiveBlend * slopeL2 + (1.0f - effectiveBlend) * (INV_SQRT2 * slopeL1);
+        }
+
+        return baseHeight + radius * totalSlope;
     }
-
-    float const slopeL2 = std::sqrt(std::max(0.0f, gx * gx + gy * gy));
-    float totalSlope = slopeL2;
-
-    float const effectiveBlend = Clamp01(blend);
-    if (effectiveBlend < 1.0f)
-    {
-        float const cosYaw = std::cos(yaw);
-        float const sinYaw = std::sin(yaw);
-
-        float const rx = gx * cosYaw + gy * sinYaw;
-        float const ry = -gx * sinYaw + gy * cosYaw;
-
-        float const slopeL1 = std::abs(rx) + std::abs(ry);
-        totalSlope = effectiveBlend * slopeL2 + (1.0f - effectiveBlend) * (INV_SQRT2 * slopeL1);
-    }
-
-    return baseHeight + radius * totalSlope;
 }
 
 float Map::GetVMapHeightAccurate(float x, float y, float z, float radius, float yaw,
     GridTerrainData::GroundFootprintShape shape, float blend, float clamp, float /*sampleDelta*/, float maxSearchDist) const
 {
     float height;
-    G3D::Vector3 normal;
+    G3D::Vector3 normal(0.0f, 0.0f, 1.0f);
 
     if (!_mapCollisionData.GetStaticTree().getHeightAndNormal(G3D::Vector3(x, y, z), maxSearchDist, height, normal))
         return VMAP_INVALID_HEIGHT_VALUE;

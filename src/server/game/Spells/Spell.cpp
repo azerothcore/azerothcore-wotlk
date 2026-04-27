@@ -1437,6 +1437,92 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                     return height;
                 };
 
+                auto getBlinkSweptHitPos = [&](float fromX, float fromY, float fromZ,
+                                               float toX, float toY, float toZ,
+                                               float& hitX, float& hitY, float& hitZ) -> bool
+                {
+                    struct ProbeOffset
+                    {
+                        float x;
+                        float y;
+                    };
+
+                    float const radius = std::max(0.0f, probeRadius);
+                    float const diagonal = radius * 0.70710678118654752440f;
+
+                    ProbeOffset const offsets[] =
+                    {
+                        { 0.0f, 0.0f },
+                        { radius, 0.0f },
+                        { -radius, 0.0f },
+                        { 0.0f, radius },
+                        { 0.0f, -radius },
+                        { diagonal, diagonal },
+                        { diagonal, -diagonal },
+                        { -diagonal, diagonal },
+                        { -diagonal, -diagonal }
+                    };
+
+                    float const lowerZ = 0.5f;
+                    float const upperZ = std::max(lowerZ, collisionHeight - 0.1f);
+                    float const middleZ = 0.5f * (lowerZ + upperZ);
+
+                    float const zOffsets[] =
+                    {
+                        lowerZ,
+                        middleZ,
+                        upperZ
+                    };
+
+                    bool didHit = false;
+                    float bestDistSq = std::numeric_limits<float>::max();
+
+                    auto considerHit = [&](G3D::Vector3 const& rawHit, ProbeOffset const& offset, float zOffset)
+                    {
+                        float const centerX = rawHit.x - offset.x;
+                        float const centerY = rawHit.y - offset.y;
+                        float const centerZ = rawHit.z - zOffset;
+
+                        float const dx = centerX - fromX;
+                        float const dy = centerY - fromY;
+                        float const dz = centerZ - fromZ;
+                        float const distSq = dx * dx + dy * dy + dz * dz;
+
+                        if (distSq < bestDistSq)
+                        {
+                            bestDistSq = distSq;
+                            hitX = centerX;
+                            hitY = centerY;
+                            hitZ = centerZ;
+                            didHit = true;
+                        }
+                    };
+
+                    for (ProbeOffset const& offset : offsets)
+                    {
+                        for (float const zOffset : zOffsets)
+                        {
+                            if (zOffset > lowerZ && std::fabs(zOffset - lowerZ) < 0.05f)
+                                continue;
+
+                            G3D::Vector3 const from(fromX + offset.x, fromY + offset.y, fromZ + zOffset);
+                            G3D::Vector3 const to(toX + offset.x, toY + offset.y, toZ + zOffset);
+
+                            // check static collision
+                            G3D::Vector3 staticHit;
+                            if (map->GetMapCollisionData().GetStaticTree().GetObjectHitPos(from, to, staticHit, -0.5f))
+                                considerHit(staticHit, offset, zOffset);
+
+                            // check dynamic collision
+                            G3D::Vector3 dynamicHit;
+                            if (map->GetMapCollisionData().GetDynamicTree().GetObjectHitPos(phasemask, from, to, dynamicHit, -0.5f))
+                                considerHit(dynamicHit, offset, zOffset);
+                        }
+                    }
+
+                    return didHit;
+                };
+
                 float destx = pos.GetPositionX() + distance * orientationCos;
                 float desty = pos.GetPositionY() + distance * orientationSin;
 
@@ -1571,12 +1657,10 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                             //LOG_ERROR("spells", "total path > than distance in 3D , need to move back a bit for save distance, total path = {}, overdistance = {}", totalpath, overdistance);
                         }
 
-                        bool col = m_caster->GetMap()->GetMapCollisionData().GetStaticTree().GetObjectHitPos(prevX, prevY, prevZ + 0.5f, tstX, tstY, tstZ + 0.5f, tstX, tstY, tstZ, -0.5f);
-                        // check dynamic collision
-                        bool dcol = m_caster->GetMap()->GetMapCollisionData().GetDynamicTree().GetObjectHitPos(phasemask, prevX, prevY, prevZ + 0.5f, tstX, tstY, tstZ + 0.5f, tstX, tstY, tstZ, -0.5f);
+                        bool const col = getBlinkSweptHitPos(prevX, prevY, prevZ, tstX, tstY, tstZ, tstX, tstY, tstZ);
 
                         // collision occured
-                        if (col || dcol || (overdistance > 0.0f && !map->IsInWater(phasemask, tstX, tstY, ground, collisionHeight)) || (std::fabs(prevZ - tstZ) > maxtravelDistZ && (tstZ > prevZ)))
+                        if (col || (overdistance > 0.0f && !map->IsInWater(phasemask, tstX, tstY, ground, collisionHeight)) || (std::fabs(prevZ - tstZ) > maxtravelDistZ && (tstZ > prevZ)))
                         {
                             if ((overdistance > 0.0f) && (overdistance < 1.f))
                             {
@@ -1635,12 +1719,10 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                 else
                 {
                     float z = pos.GetPositionZ();
-                    bool col = m_caster->GetMap()->GetMapCollisionData().GetStaticTree().GetObjectHitPos(pos.GetPositionX(), pos.GetPositionY(), z, destx, desty, z, destx, desty, z, -0.5f);
-                    // check dynamic collision
-                    bool dcol = m_caster->GetMap()->GetMapCollisionData().GetDynamicTree().GetObjectHitPos(phasemask, pos.GetPositionX(), pos.GetPositionY(), z, destx, desty, z, destx, desty, z, -0.5f);
+                    bool const col = getBlinkSweptHitPos(pos.GetPositionX(), pos.GetPositionY(), z, destx, desty, z, destx, desty, z);
 
                     // collision occured
-                    if (col || dcol)
+                    if (col)
                     {
                         // move back a bit
                         destx = destx - (0.6f * orientationCos);

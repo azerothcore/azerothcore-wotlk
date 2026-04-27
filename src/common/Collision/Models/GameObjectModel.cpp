@@ -174,17 +174,22 @@ bool GameObjectModel::intersectRay(G3D::Ray const& ray, float& maxDist, bool sto
                                    uint32 phMask, VMAP::ModelIgnoreFlags ignoreFlags, G3D::Vector3* hitNormal) const
 {
     if (!(phasemask & phMask) || !owner->IsSpawned())
+    {
         return false;
+    }
 
     float time = ray.intersectionTime(iBound);
     if (time == G3D::inf())
+    {
         return false;
+    }
 
+    // child bounds are defined in object space:
     Vector3 p = iInvRot * (ray.origin() - iPos) * iInvScale;
     Ray modRay(p, iInvRot * ray.direction());
 
     float distance = maxDist * iInvScale;
-    G3D::Vector3 modelNormal;
+    G3D::Vector3 modelNormal(0.0f, 0.0f, 1.0f);
 
     bool const hit = iModel->IntersectRay(modRay, distance, stopAtFirstHit, ignoreFlags, hitNormal ? &modelNormal : nullptr);
     if (hit)
@@ -204,6 +209,8 @@ bool GameObjectModel::intersectRay(G3D::Ray const& ray, float& maxDist, bool sto
 
                 *hitNormal = worldNormal;
             }
+            else
+                *hitNormal = G3D::Vector3(0.0f, 0.0f, 1.0f);
         }
     }
 
