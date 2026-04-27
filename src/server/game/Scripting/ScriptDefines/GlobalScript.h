@@ -25,6 +25,10 @@
 #include <map>
 #include <vector>
 
+class Aura;
+class Spell;
+class WorldObject;
+
 enum GlobalHook
 {
     GLOBALHOOK_ON_ITEM_DEL_FROM_DB,
@@ -47,6 +51,10 @@ enum GlobalHook
     GLOBALHOOK_ON_INSTANCEID_REMOVED,
     GLOBALHOOK_ON_BEFORE_SET_BOSS_STATE,
     GLOBALHOOK_AFTER_INSTANCE_GAME_OBJECT_CREATE,
+    GLOBALHOOK_ON_SPELL_SEND_SPELL_GO,
+    GLOBALHOOK_ON_AURA_APPLICATION_CLIENT_UPDATE,
+    GLOBALHOOK_ON_SPELL_EXECUTE_LOG_SUMMON_OBJECT,
+    GLOBALHOOK_ON_SPELL_INTERRUPT,
     GLOBALHOOK_END
 };
 
@@ -102,6 +110,48 @@ public:
 
     // Called when a gameobject is created by an instance
     virtual void AfterInstanceGameObjectCreate(Map* /*instance*/, GameObject* /*go*/) { }
+
+    /**
+     * @brief Called when Spell::SendSpellGo fires
+     *        (the SPELL_GO moment of a spell cast).
+     *
+     * @param spell The spell being executed
+     */
+    virtual void OnSpellSendSpellGo(Spell* /*spell*/) { }
+
+    /**
+     * @brief Called when an aura application client update is
+     *        sent (SMSG_AURA_UPDATE), covering both apply
+     *        and remove.
+     *
+     * @param target The unit whose aura state changed
+     * @param aura   The aura being applied or removed
+     * @param remove True if the aura is being removed
+     */
+    virtual void OnAuraApplicationClientUpdate(Unit* /*target*/,
+        Aura* /*aura*/, bool /*remove*/) { }
+
+    /**
+     * @brief Called when a summon execute log is recorded
+     *        (e.g. pet, totem, trap creation).
+     *
+     * @param spell The spell that performed the summon
+     * @param obj   The summoned world object
+     */
+    virtual void OnSpellExecuteLogSummonObject(Spell* /*spell*/,
+        WorldObject* /*obj*/) { }
+
+    /**
+     * @brief Called when a spell interrupt effect succeeds
+     *        (e.g. Kick, Counterspell, Pummel).
+     *
+     * @param interrupter        The unit that cast the interrupt spell
+     * @param interrupted        The unit whose cast was interrupted
+     * @param interruptSpellId   The spell used to interrupt
+     * @param interruptedSpellId The spell that was interrupted
+     */
+    virtual void OnSpellInterrupt(Unit* /*interrupter*/, Unit* /*interrupted*/,
+        uint32 /*interruptSpellId*/, uint32 /*interruptedSpellId*/) { }
 };
 
 #endif

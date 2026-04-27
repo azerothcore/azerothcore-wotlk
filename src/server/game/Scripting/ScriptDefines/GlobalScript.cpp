@@ -144,6 +144,35 @@ void ScriptMgr::AfterInstanceGameObjectCreate(Map* instance, GameObject* go)
     CALL_ENABLED_HOOKS(GlobalScript, GLOBALHOOK_AFTER_INSTANCE_GAME_OBJECT_CREATE, script->AfterInstanceGameObjectCreate(instance, go));
 }
 
+/**
+ * @brief Called when Spell::SendSpellGo fires (the SPELL_GO moment).
+ */
+void ScriptMgr::OnSpellSendSpellGo(Spell* spell)
+{
+    CALL_ENABLED_HOOKS(GlobalScript, GLOBALHOOK_ON_SPELL_SEND_SPELL_GO, script->OnSpellSendSpellGo(spell));
+}
+
+/**
+ * @brief Called when an aura application update is sent to the client.
+ */
+void ScriptMgr::OnAuraApplicationClientUpdate(Unit* target, Aura* aura, bool remove)
+{
+    CALL_ENABLED_HOOKS(GlobalScript, GLOBALHOOK_ON_AURA_APPLICATION_CLIENT_UPDATE, script->OnAuraApplicationClientUpdate(target, aura, remove));
+}
+
+/**
+ * @brief Called when a summon execute log is recorded.
+ */
+void ScriptMgr::OnSpellExecuteLogSummonObject(Spell* spell, WorldObject* obj)
+{
+    CALL_ENABLED_HOOKS(GlobalScript, GLOBALHOOK_ON_SPELL_EXECUTE_LOG_SUMMON_OBJECT, script->OnSpellExecuteLogSummonObject(spell, obj));
+}
+
+void ScriptMgr::OnSpellInterrupt(Unit* interrupter, Unit* interrupted, uint32 interruptSpellId, uint32 interruptedSpellId)
+{
+    CALL_ENABLED_HOOKS(GlobalScript, GLOBALHOOK_ON_SPELL_INTERRUPT, script->OnSpellInterrupt(interrupter, interrupted, interruptSpellId, interruptedSpellId));
+}
+
 GlobalScript::GlobalScript(const char* name, std::vector<uint16> enabledHooks)
     : ScriptObject(name, GLOBALHOOK_END)
 {

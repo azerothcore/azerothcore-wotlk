@@ -4746,6 +4746,8 @@ void Spell::SendSpellStart()
 
 void Spell::SendSpellGo()
 {
+    sScriptMgr->OnSpellSendSpellGo(this);
+
     // not send invisible spell casting
     if (!IsNeedSendToClient(true))
         return;
@@ -5107,6 +5109,7 @@ void Spell::ExecuteLogEffectSummonObject(uint8 effIndex, WorldObject* obj)
 {
     InitEffectExecuteData(effIndex);
     *m_effectExecuteData[effIndex] << obj->GetPackGUID();
+    sScriptMgr->OnSpellExecuteLogSummonObject(this, obj);
 }
 
 void Spell::ExecuteLogEffectUnsummonObject(uint8 effIndex, WorldObject* obj)

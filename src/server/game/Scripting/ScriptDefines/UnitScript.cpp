@@ -134,6 +134,61 @@ void ScriptMgr::OnUnitSetShapeshiftForm(Unit* unit, uint8 form)
     CALL_ENABLED_HOOKS(UnitScript, UNITHOOK_ON_UNIT_SET_SHAPESHIFT_FORM, script->OnUnitSetShapeshiftForm(unit, form));
 }
 
+void ScriptMgr::OnDealDamageShieldDamage(DamageInfo* damageInfo, uint32 overkill)
+{
+    CALL_ENABLED_HOOKS(UnitScript, UNITHOOK_ON_DEAL_DAMAGE_SHIELD_DAMAGE, script->OnDealDamageShieldDamage(damageInfo, overkill));
+}
+
+void ScriptMgr::OnSendSpellNonMeleeDamageLog(SpellNonMeleeDamage* log, int32 overkill)
+{
+    CALL_ENABLED_HOOKS(UnitScript, UNITHOOK_ON_SEND_SPELL_NON_MELEE_DAMAGE_LOG, script->OnSendSpellNonMeleeDamageLog(log, overkill));
+}
+
+void ScriptMgr::OnSendAttackStateUpdate(CalcDamageInfo* damageInfo, int32 overkill)
+{
+    CALL_ENABLED_HOOKS(UnitScript, UNITHOOK_ON_SEND_ATTACK_STATE_UPDATE, script->OnSendAttackStateUpdate(damageInfo, overkill));
+}
+
+void ScriptMgr::OnSendSpellDamageImmune(Unit* attacker, Unit* victim, uint32 spellId)
+{
+    CALL_ENABLED_HOOKS(UnitScript, UNITHOOK_ON_SEND_SPELL_DAMAGE_IMMUNE, script->OnSendSpellDamageImmune(attacker, victim, spellId));
+}
+
+void ScriptMgr::OnSendSpellMiss(Unit* attacker, Unit* victim, uint32 spellID, SpellMissInfo missInfo)
+{
+    CALL_ENABLED_HOOKS(UnitScript, UNITHOOK_ON_SEND_SPELL_MISS, script->OnSendSpellMiss(attacker, victim, spellID, missInfo));
+}
+
+void ScriptMgr::OnSendSpellDamageResist(Unit* attacker, Unit* victim, uint32 spellId)
+{
+    CALL_ENABLED_HOOKS(UnitScript, UNITHOOK_ON_SEND_SPELL_DAMAGE_RESIST, script->OnSendSpellDamageResist(attacker, victim, spellId));
+}
+
+void ScriptMgr::OnSendSpellNonMeleeReflectLog(SpellNonMeleeDamage* log, Unit* attacker)
+{
+    CALL_ENABLED_HOOKS(UnitScript, UNITHOOK_ON_SEND_SPELL_NON_MELEE_REFLECT_LOG, script->OnSendSpellNonMeleeReflectLog(log, attacker));
+}
+
+void ScriptMgr::OnSendHealSpellLog(HealInfo const& healInfo, bool critical)
+{
+    CALL_ENABLED_HOOKS(UnitScript, UNITHOOK_ON_SEND_HEAL_SPELL_LOG, script->OnSendHealSpellLog(healInfo, critical));
+}
+
+void ScriptMgr::OnSendEnergizeSpellLog(Unit* attacker, Unit* victim, uint32 spellID, uint32 amount, Powers powerType)
+{
+    CALL_ENABLED_HOOKS(UnitScript, UNITHOOK_ON_SEND_ENERGIZE_SPELL_LOG, script->OnSendEnergizeSpellLog(attacker, victim, spellID, amount, powerType));
+}
+
+void ScriptMgr::OnSendPeriodicAuraLog(Unit* victim, SpellPeriodicAuraLogInfo* pInfo)
+{
+    CALL_ENABLED_HOOKS(UnitScript, UNITHOOK_ON_SEND_PERIODIC_AURA_LOG, script->OnSendPeriodicAuraLog(victim, pInfo));
+}
+
+void ScriptMgr::OnDamageAbsorbed(DamageInfo& dmgInfo, SpellInfo const* absorbSpellInfo, Unit* absorbCaster, uint32 absorbAmount)
+{
+    CALL_ENABLED_HOOKS(UnitScript, UNITHOOK_ON_DAMAGE_ABSORBED, script->OnDamageAbsorbed(dmgInfo, absorbSpellInfo, absorbCaster, absorbAmount));
+}
+
 UnitScript::UnitScript(const char* name, bool addToScripts, std::vector<uint16> enabledHooks)
     : ScriptObject(name, UNITHOOK_END)
 {

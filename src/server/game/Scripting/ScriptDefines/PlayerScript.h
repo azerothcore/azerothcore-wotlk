@@ -26,6 +26,7 @@
 // TODO to remove
 #include "AchievementMgr.h"
 #include "KillRewarder.h"
+#include "Player.h"
 
 enum PlayerHook
 {
@@ -211,6 +212,7 @@ enum PlayerHook
     PLAYERHOOK_ON_GIVE_REPUTATION,
     PLAYERHOOK_ON_GET_REPUTATION_PRICE_DISCOUNT,
     PLAYERHOOK_ON_LEARN_TAXI_NODE,
+    PLAYERHOOK_ON_ENVIRONMENTAL_DAMAGE,
     PLAYERHOOK_ON_BEFORE_GET_LEVEL_FOR_XP_GAIN,
     PLAYERHOOK_END
 };
@@ -830,6 +832,17 @@ public:
      * @param nodeId The id of the learned taxi node
      */
     virtual void OnPlayerLearnTaxiNode(Player const* /*player*/, uint32 /*nodeId*/) {}
+
+    /**
+     * @brief Called when a player takes environmental damage
+     *        (lava, drowning, falling, fatigue, etc.).
+     *
+     * @param player The player taking damage
+     * @param type   The environmental damage type
+     * @param damage The raw damage amount before mitigation
+     */
+    virtual void OnEnvironmentalDamage(Player* /*player*/,
+        EnviromentalDamage /*type*/, uint32 /*damage*/) { }
 
     /**
      * @brief This hook is called when XP is calculated for the player, and is used to modify the player level used in the XP formulas.

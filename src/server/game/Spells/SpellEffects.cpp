@@ -3732,6 +3732,7 @@ void Spell::EffectInterruptCast(SpellEffIndex effIndex)
                     unitTarget->ProhibitSpellSchool(curSpellInfo->GetSchoolMask(), duration/*spellInfo->GetDuration()*/);
                 }
                 ExecuteLogEffectInterruptCast(effIndex, unitTarget, curSpellInfo->Id);
+                sScriptMgr->OnSpellInterrupt(m_caster, unitTarget, m_spellInfo->Id, curSpellInfo->Id);
                 unitTarget->InterruptSpell(CurrentSpellTypes(i), false);
             }
         }
