@@ -818,6 +818,10 @@ bool SmartAI::AssistPlayerInCombatAgainst(Unit* who)
     if (!me->IsValidAssistTarget(who->GetVictim()))
         return false;
 
+    // Do not engage if we cannot actually attack the attacker (e.g. neutral faction)
+    if (!me->IsValidAttackTarget(who))
+        return false;
+
     //too far away and no free sight?
     if (me->IsWithinDistInMap(who, SMART_MAX_AID_DIST) && me->IsWithinLOSInMap(who))
     {
