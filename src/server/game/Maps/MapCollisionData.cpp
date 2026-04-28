@@ -155,7 +155,8 @@ bool StaticVMapCollisionData::getHeightAndNormal(float x, float y, float z, floa
     G3D::Vector3 internalNormal(0.0f, 0.0f, 1.0f);
     float internalHeight = G3D::finf();
 
-    if (!_staticTree->getHeightAndNormal(pos, maxSearchDist, internalHeight, internalNormal) || internalHeight >= G3D::finf())
+    if (!_staticTree->getHeightAndNormal(pos, maxSearchDist, internalHeight, internalNormal) ||
+        !std::isfinite(internalHeight) || internalHeight >= G3D::finf())
     {
         height = VMAP_INVALID_HEIGHT_VALUE;
         return false;
