@@ -1,3 +1,4 @@
+-- DB update 2026_04_27_00 -> 2026_04_28_00
 --
 DELETE FROM `gameobject_loot_template` WHERE (`Entry` = 26860);
 INSERT INTO `gameobject_loot_template` (`Entry`, `Item`, `Reference`, `Chance`, `QuestRequired`, `LootMode`, `GroupId`, `MinCount`, `MaxCount`, `Comment`) VALUES
