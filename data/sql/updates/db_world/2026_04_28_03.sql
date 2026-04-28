@@ -1,3 +1,4 @@
+-- DB update 2026_04_28_02 -> 2026_04_28_03
 -- Naxxramas loot pool structure fix
 -- Splits single GroupId pools into multiple pools matching retail WotLK behavior
 -- Source: Wowhead WotLK 25-man drop rates, WowDB cross-validation, ChromieCraft #9131 (Anub'Rekhan)
