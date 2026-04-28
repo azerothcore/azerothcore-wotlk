@@ -284,7 +284,7 @@ Creature::Creature(): Unit(), MovableMapObject(), m_groupLootTimer(0), lootingGr
     m_CombatDistance = 0.0f;
 
     ResetLootMode(); // restore default loot mode
-    TriggerJustRespawned = false;
+    TriggerJustRespawned = true;
     _focusSpell = nullptr;
 
     m_respawnedTime = time_t(0);
@@ -705,12 +705,17 @@ bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changele
 
 void Creature::Update(uint32 diff)
 {
-    if (IsAIEnabled && TriggerJustRespawned)
+    if (IsAIEnabled && TriggerJustRespawned && getDeathState() != DeathState::Dead)
     {
         TriggerJustRespawned = false;
-        AI()->JustRespawned();
-        if (m_vehicleKit)
-            m_vehicleKit->Reset();
+
+        // Skip for temp summons: InitializeAI already reset them, and JustRespawned would clobber state set synchronously during SUMMON.
+        if (!IsSummon())
+        {
+            if (_respawnCompatibilityMode && m_vehicleKit)
+                m_vehicleKit->Reset();
+            AI()->JustRespawned();
+        }
     }
 
     switch (m_deathState)
@@ -1113,9 +1118,6 @@ bool Creature::AIM_Initialize(CreatureAI* ai)
     IsAIEnabled = true;
     i_AI->InitializeAI();
 
-    // Xinef: Initialize vehicle if it is not summoned!
-    if (GetVehicleKit() && m_spawnId)
-        GetVehicleKit()->Reset();
     return true;
 }
 

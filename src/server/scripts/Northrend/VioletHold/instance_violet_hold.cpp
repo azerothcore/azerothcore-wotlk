@@ -172,8 +172,7 @@ public:
                         if (Creature* sinclari = GetCreature(DATA_SINCLARI))
                         {
                             sinclari->AI()->Talk(SAY_SINCLARI_COMPLETE);
-                            sinclari->DespawnOrUnsummon();
-                            sinclari->SetRespawnTime(3);
+                            sinclari->DespawnOrUnsummon(0ms, 3s);
                         }
                     }
                     else if (state == FAIL || state == NOT_STARTED)
@@ -297,14 +296,14 @@ public:
                     {
                         guard1->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                         guard1->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                        guard1->SetImmuneToNPC(false);
+                        guard1->SetImmuneToAll(false);
                         guard1->GetMotionMaster()->MovePoint(0, BossStartMove21);
                     }
                     if (Creature* guard2 = instance->GetCreature(_erekemGuardGuid[1]))
                     {
                         guard2->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                         guard2->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                        guard2->SetImmuneToNPC(false);
+                        guard2->SetImmuneToAll(false);
                         guard2->GetMotionMaster()->MovePoint(0, BossStartMove22);
                     }
                     break;
@@ -546,14 +545,14 @@ public:
                 if (Creature* guard1 = instance->GetCreature(_erekemGuardGuid[0]))
                 {
                     guard1->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                    guard1->SetImmuneToNPC(true);
+                    guard1->SetImmuneToAll(true);
                     guard1->DespawnOrUnsummon(0ms, 3s);
                 }
                 _erekemGuardGuid[0].Clear();
                 if (Creature* guard2 = instance->GetCreature(_erekemGuardGuid[1]))
                 {
                     guard2->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                    guard2->SetImmuneToNPC(true);
+                    guard2->SetImmuneToAll(true);
                     guard2->DespawnOrUnsummon(0ms, 3s);
                 }
                 _erekemGuardGuid[1].Clear();
