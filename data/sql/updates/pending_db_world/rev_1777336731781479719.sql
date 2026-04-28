@@ -1,17 +1,3 @@
---
--- Tighten chance-on-spell trinket procs (chromiecraft #9399) so they can no
--- longer be triggered on demand from utility self-casts (Conjure Refreshment
--- table click, Create Healthstone via Soulwell, drink/food, Lightwell, etc.).
--- Setting SpellTypeMask = 3 (PROC_SPELL_TYPE_DAMAGE | PROC_SPELL_TYPE_HEAL)
--- restricts the proc to actual damaging or healing spell hits and rejects
--- PROC_SPELL_TYPE_NO_DMG_HEAL (=4) events that the proc system fires for
--- self-cast utility spells.
---
--- Each of the auras below has tooltip wording that matches the chromiecraft
--- wowhead filter ("Your spells have a chance to..." / "Each time you cast a
--- spell..."). All currently let PROC_SPELL_TYPE_NO_DMG_HEAL events through
--- on AC (SpellTypeMask = 0 (any) or 7 (any)).
---
 --   60493  Dying Curse                    item 40255 (213) "Your spells have a chance..."
 --   60490  Embrace of the Spider          item 39229 (200) "Your spells have a chance..."
 --   64742  Pandora's Plea                 item 45490 (226) "Your spells have a chance..."
@@ -23,5 +9,4 @@
 --   60519  Spark of Life                  item 37657 (200) "Each time you cast a damaging or healing spell..." (was 7 -> 3, matches TC)
 --   67698  Solace of the Defeated/Fallen  items 47041, 47271 (245)
 --   67752  Solace of the Defeated/Fallen  items 47059, 47432 (258)
---
 UPDATE `spell_proc` SET `SpellTypeMask` = 3 WHERE `SpellId` IN (60493, 60490, 64742, 60524, 49622, 64738, 65002, 64999, 60519, 67698, 67752);
