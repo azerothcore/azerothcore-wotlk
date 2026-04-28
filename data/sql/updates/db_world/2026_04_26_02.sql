@@ -1,71 +1,15 @@
 -- DB update 2026_04_26_01 -> 2026_04_26_02
--- Disable player resurrection spells.
--- Uses `disables` with SPELL_DISABLE_PLAYER (flags = 1).
 
-DELETE FROM `disables`
-WHERE `sourceType` = 0
-  AND `entry` IN (
-    -- Priest: Resurrection
-    2006, 2010, 10880, 10881, 20770, 25435, 48171,
-    -- Paladin: Redemption
-    7328, 10322, 10324, 20772, 20773, 48949, 48950,
-    -- Shaman: Ancestral Spirit
-    2008, 20609, 20610, 20776, 20777, 25590, 49277, 49278,
-    -- Druid: Rebirth (combat resurrection)
-    20484, 20739, 20742, 20747, 20748, 26994, 48477,
-    -- Death Knight: Raise Ally (combat resurrection)
-    61999,
-    -- Self-resurrection: Shaman Reincarnation
-    20608,
-    -- Self-resurrection: Warlock Soulstone use effects
-    3026, 20707, 20762, 20763, 20764, 20765, 27239, 47883, 47882
-  );
+-- Update Mogor SAI
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 18069;
 
-INSERT INTO `disables` (`sourceType`, `entry`, `flags`, `params_0`, `params_1`, `comment`) VALUES
--- Priest: Resurrection
-(0, 2006, 1, '', '', 'Disable Resurrection rank 1 for players'),
-(0, 2010, 1, '', '', 'Disable Resurrection rank 2 for players'),
-(0, 10880, 1, '', '', 'Disable Resurrection rank 3 for players'),
-(0, 10881, 1, '', '', 'Disable Resurrection rank 4 for players'),
-(0, 20770, 1, '', '', 'Disable Resurrection rank 5 for players'),
-(0, 25435, 1, '', '', 'Disable Resurrection rank 6 for players'),
-(0, 48171, 1, '', '', 'Disable Resurrection rank 7 for players'),
--- Paladin: Redemption
-(0, 7328, 1, '', '', 'Disable Redemption rank 1 for players'),
-(0, 10322, 1, '', '', 'Disable Redemption rank 2 for players'),
-(0, 10324, 1, '', '', 'Disable Redemption rank 3 for players'),
-(0, 20772, 1, '', '', 'Disable Redemption rank 4 for players'),
-(0, 20773, 1, '', '', 'Disable Redemption rank 5 for players'),
-(0, 48949, 1, '', '', 'Disable Redemption rank 6 for players'),
-(0, 48950, 1, '', '', 'Disable Redemption rank 7 for players'),
--- Shaman: Ancestral Spirit
-(0, 2008, 1, '', '', 'Disable Ancestral Spirit rank 1 for players'),
-(0, 20609, 1, '', '', 'Disable Ancestral Spirit rank 2 for players'),
-(0, 20610, 1, '', '', 'Disable Ancestral Spirit rank 3 for players'),
-(0, 20776, 1, '', '', 'Disable Ancestral Spirit rank 4 for players'),
-(0, 20777, 1, '', '', 'Disable Ancestral Spirit rank 5 for players'),
-(0, 25590, 1, '', '', 'Disable Ancestral Spirit rank 6 for players'),
-(0, 49277, 1, '', '', 'Disable Ancestral Spirit rank 7 for players'),
-(0, 49278, 1, '', '', 'Disable Ancestral Spirit rank 8 for players'),
--- Druid: Rebirth (combat resurrection)
-(0, 20484, 1, '', '', 'Disable Rebirth rank 1 for players'),
-(0, 20739, 1, '', '', 'Disable Rebirth rank 2 for players'),
-(0, 20742, 1, '', '', 'Disable Rebirth rank 3 for players'),
-(0, 20747, 1, '', '', 'Disable Rebirth rank 4 for players'),
-(0, 20748, 1, '', '', 'Disable Rebirth rank 5 for players'),
-(0, 26994, 1, '', '', 'Disable Rebirth rank 6 for players'),
-(0, 48477, 1, '', '', 'Disable Rebirth rank 7 for players'),
--- Death Knight: Raise Ally (combat resurrection)
-(0, 61999, 1, '', '', 'Disable Raise Ally for players'),
--- Self-resurrection: Shaman Reincarnation
-(0, 20608, 1, '', '', 'Disable Reincarnation for players'),
--- Self-resurrection: Warlock Soulstone use effects
-(0, 3026, 1, '', '', 'Disable Use Soulstone for players'),
-(0, 20707, 1, '', '', 'Disable Soulstone effect rank 1 for players'),
-(0, 20762, 1, '', '', 'Disable Soulstone effect rank 2 for players'),
-(0, 20763, 1, '', '', 'Disable Soulstone effect rank 3 for players'),
-(0, 20764, 1, '', '', 'Disable Soulstone effect rank 4 for players'),
-(0, 20765, 1, '', '', 'Disable Soulstone effect rank 5 for players'),
-(0, 27239, 1, '', '', 'Disable Soulstone effect rank 6 for players'),
-(0, 47883, 1, '', '', 'Disable Soulstone effect rank 7 for players'),
-(0, 47882, 1, '', '', 'Disable Soulstone effect rank 8 for players');
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 18069) AND (`source_type` = 0) AND (`id` IN (7, 9, 11));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(18069, 0, 7, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - On Evade - Despawn Instant - Failure Event'),
+(18069, 0, 9, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 5000, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mogor - On Just Died - Despawn In 5000 ms'),
+(18069, 0, 11, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 82, 2, 0, 0, 0, 0, 0, 10, 66480, 18471, 0, 0, 0, 0, 0, 0, 'Mogor - On Respawn - Add Npc Flags Questgiver');
+
+-- Update Gurgthock Action List
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 1847117) AND (`source_type` = 9) AND (`id` IN (1, 2));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(1847117, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 6, 9977, 0, 0, 0, 0, 0, 12, 2, 0, 0, 0, 0, 0, 0, 0, 'Gurgthock - Mogor Failure Script - Fail Quest \'The Ring of Blood: The Final Challenge\'');
