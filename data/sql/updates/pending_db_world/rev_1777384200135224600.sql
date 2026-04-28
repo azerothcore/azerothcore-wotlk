@@ -1,8 +1,13 @@
 --
 DELETE FROM `gameobject` WHERE (`id` = 18901) AND (`guid` IN (34006));
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`, `Comment`) VALUES
-(34006, 18901, 33, 0, 0, 1, 1, -249.213, 2123.05, 82.5795, 4.71239, -0.131892, -0.694697, -0.131892, 0.694697, 0, 100, 1, '', 0, NULL);
+(34006, 18901, 33, 0, 0, 1, 1, -249.22014, 2123.1018, 82.80518, 6.0923543, -0.1318922, -0.6946964, -0.1318922, 0.69469833, 0, 100, 1, '', 43400, NULL);
 
 DELETE FROM `gameobject` WHERE (`id` = 18900) AND (`guid` IN (32442));
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `ScriptName`, `VerifiedBuild`, `Comment`) VALUES
-(32442, 18900, 33, 0, 0, 1, 1, -252.834, 2113.87, 82.5795, 4.71239, -0.131892, -0.694697, -0.131892, 0.694697, 0, 100, 1, '', 0, NULL);
+(32442, 18900, 33, 0, 0, 1, 1, -252.69586, 2114.2246, 82.80518, 6.0923543, -0.1318922, -0.6946964, -0.1318922, 0.69469833, 0, 100, 1, '', 43400, NULL);
+
+DELETE FROM `gameobject_addon` WHERE `guid` IN (32442, 34006);
+INSERT INTO `gameobject_addon` (`guid`, `parent_rotation0`, `parent_rotation1`, `parent_rotation2`, `parent_rotation3`, `invisibilityType`, `invisibilityValue`) VALUES
+(32442, 0, 0, -0.82658964, 0.56280506, 0, 0),
+(34006, 0, 0, -0.82658964, 0.56280506, 0, 0);
