@@ -386,6 +386,8 @@ class spell_q12943_shadow_vault_decree : public SpellScript
         Unit* caster = GetCaster();
         if (Creature* thane = caster->FindNearestCreature(NPC_THANE_UFRANG, 30.0f))
         {
+            if (thane->IsInCombat())
+                return;
             thane->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
             thane->AI()->AttackStart(caster);
         }
