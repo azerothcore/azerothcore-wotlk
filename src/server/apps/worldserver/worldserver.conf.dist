@@ -766,11 +766,14 @@ Logger.spells.scripts=2,Console Errors
 #Logger.entities.gameobject=4,Console Server
 #Logger.entities.object=4,Console Server
 #Logger.entities.pet=4,Console Server
+#Logger.entities.player.auctionhouse=4,Console Server
 #Logger.entities.player.character=4,Console Server
 #Logger.entities.player.dump=4,Console Server
 #Logger.entities.player.items=4,Console Server
 #Logger.entities.player.loading=4,Console Server
+#Logger.entities.player.mail=4,Console Server
 #Logger.entities.player.skills=4,Console Server
+#Logger.entities.player.trade=4,Console Server
 #Logger.entities.player=4,Console Server
 #Logger.entities.transport=4,Console Server
 #Logger.entities.unit.ai=4,Console Server
@@ -4750,6 +4753,27 @@ Respawn.DynamicRateGameObject = 1
 #        Default:     10 - (10 seconds)
 
 Respawn.DynamicMinimumGameObject = 10
+
+#
+#    Respawn.DynamicEscortNPC
+#        Description: Enable dynamic respawn behavior for escort quest NPCs.
+#                     When enabled, escort NPCs in spawn groups flagged as ESCORTQUESTNPC
+#                     will use special respawn handling.
+#        Default:     0 - (Disabled)
+#
+
+Respawn.DynamicEscortNPC = 0
+
+#
+#    Respawn.ForceCompatibilityMode
+#        Description: Force all spawns to use legacy (compatibility mode) respawn behavior,
+#                     regardless of their spawn group flags. When enabled, creatures and
+#                     gameobjects respawn in-place as they always have in AzerothCore.
+#                     Set to 1 to force legacy behavior for all spawns.
+#        Default:     0 - (Disabled, spawn groups control respawn mode)
+#
+
+Respawn.ForceCompatibilityMode = 0
 
 #
 ###################################################################################################

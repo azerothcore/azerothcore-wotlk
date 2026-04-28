@@ -2238,20 +2238,11 @@ uint32 Unit::CalcArmorReducedDamage(Unit const* attacker, Unit const* victim, co
             if (Player* modOwner = attacker->GetSpellModOwner())
                 modOwner->ApplySpellMod(spellInfo->Id, SPELLMOD_IGNORE_ARMOR, armor);
 
-        AuraEffectList const& ResIgnoreAurasAb = attacker->GetAuraEffectsByType(SPELL_AURA_MOD_ABILITY_IGNORE_TARGET_RESIST);
-        for (AuraEffectList::const_iterator j = ResIgnoreAurasAb.begin(); j != ResIgnoreAurasAb.end(); ++j)
-        {
-            if ((*j)->GetMiscValue() & SPELL_SCHOOL_MASK_NORMAL
-                    && (*j)->IsAffectedOnSpell(spellInfo))
-                armor = std::floor(AddPct(armor, -(*j)->GetAmount()));
-        }
-
-        AuraEffectList const& ResIgnoreAuras = attacker->GetAuraEffectsByType(SPELL_AURA_MOD_IGNORE_TARGET_RESIST);
-        for (AuraEffectList::const_iterator j = ResIgnoreAuras.begin(); j != ResIgnoreAuras.end(); ++j)
-        {
-            if ((*j)->GetMiscValue() & SPELL_SCHOOL_MASK_NORMAL)
-                armor = std::floor(AddPct(armor, -(*j)->GetAmount()));
-        }
+        // Apply ability-specific ignore target resist effects for physical damage (armor)
+        AuraEffectList const& targetIgnoreRes = attacker->GetAuraEffectsByType(SPELL_AURA_MOD_ABILITY_IGNORE_TARGET_RESIST);
+        for (AuraEffect const* aurEff : targetIgnoreRes)
+            if (aurEff->GetMiscValue() & SPELL_SCHOOL_MASK_NORMAL && aurEff->IsAffectedOnSpell(spellInfo))
+                armor = std::floor(AddPct(armor, -aurEff->GetAmount()));
 
         // Apply Player CR_ARMOR_PENETRATION rating and buffs from stances\specializations etc.
         if (attacker->IsPlayer())
@@ -2398,8 +2389,6 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
 
                     return true;
                 });
-                damageResisted -= damageResisted * (mult - 1.0f);
-                mult = attacker->GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_IGNORE_TARGET_RESIST, schoolMask);
                 damageResisted -= damageResisted * (mult - 1.0f);
             }
 
@@ -8870,6 +8859,12 @@ uint32 Unit::SpellDamageBonusDone(Unit* victim, SpellInfo const* spellProto, uin
             }
         }
     }
+    else
+    {
+        // No bonus damage for SPELL_DAMAGE_CLASS_NONE class spells by default
+        if (spellProto->DmgClass == SPELL_DAMAGE_CLASS_NONE)
+            return uint32(std::max((float(pdamage) + DoneTotal) * DoneTotalMod, 0.0f));
+    }
 
     // Default calculation
     if (coeff && DoneAdvertisedBenefit)
@@ -8980,21 +8975,15 @@ uint32 Unit::SpellDamageBonusTaken(Unit* caster, SpellInfo const* spellProto, ui
         TakenTotalMod = 1.0f;
     }
 
-    // xinef: sanctified wrath talent
-    if (caster && TakenTotalMod < 1.0f && caster->HasIgnoreTargetResistAura())
+    // Sanctified Wrath (bypass damage reduction)
+    if (caster && TakenTotalMod < 1.0f && caster->HasIgnoreTargetResistModifiersAura())
     {
-        float ignoreModifier = 1.0f - TakenTotalMod;
-        bool addModifier = false;
-        AuraEffectList const& ResIgnoreAuras = caster->GetAuraEffectsByType(SPELL_AURA_MOD_IGNORE_TARGET_RESIST);
-        for (AuraEffectList::const_iterator j = ResIgnoreAuras.begin(); j != ResIgnoreAuras.end(); ++j)
-            if ((*j)->GetMiscValue() & spellProto->SchoolMask)
-            {
-                ApplyPct(ignoreModifier, (*j)->GetAmount());
-                addModifier = true;
-            }
+        float damageModifier = 1.0f - TakenTotalMod;
+        for (AuraEffect const* aurEff : caster->GetAuraEffectsByType(SPELL_AURA_MOD_IGNORE_TARGET_RESIST_MODIFIERS))
+            if (aurEff->GetMiscValue() & spellProto->SchoolMask)
+                AddPct(damageModifier, -aurEff->GetAmount());
 
-        if (addModifier)
-            TakenTotalMod += ignoreModifier;
+        TakenTotalMod = 1.0f - damageModifier;
     }
 
     float tmpDamage = (float(pdamage) + TakenTotal) * TakenTotalMod;
@@ -9459,12 +9448,12 @@ uint32 Unit::SpellCriticalHealingBonus(Unit const* caster, SpellInfo const* spel
     return damage;
 }
 
-float Unit::SpellPctHealingModsDone(Unit* victim, SpellInfo const* spellProto, DamageEffectType damagetype)
+float Unit::SpellPctHealingModsDone(Unit* victim, SpellInfo const* spellProto, DamageEffectType damagetype, bool includeHealingDonePct)
 {
     // For totems get healing bonus from owner (statue isn't totem in fact)
     if (IsCreature() && IsTotem())
         if (Unit* owner = GetOwner())
-            return owner->SpellPctHealingModsDone(victim, spellProto, damagetype);
+            return owner->SpellPctHealingModsDone(victim, spellProto, damagetype, includeHealingDonePct);
 
     // Some spells don't benefit from done mods
     if (spellProto->HasAttribute(SPELL_ATTR3_IGNORE_CASTER_MODIFIERS))
@@ -9481,7 +9470,8 @@ float Unit::SpellPctHealingModsDone(Unit* victim, SpellInfo const* spellProto, D
     float DoneTotalMod = 1.0f;
 
     // Healing done percent
-    DoneTotalMod *= GetTotalAuraMultiplier(SPELL_AURA_MOD_HEALING_DONE_PERCENT);
+    if (includeHealingDonePct)
+        DoneTotalMod *= GetTotalAuraMultiplier(SPELL_AURA_MOD_HEALING_DONE_PERCENT);
 
     // done scripted mod (take it from owner)
     Unit* owner = GetOwner() ? GetOwner() : this;
@@ -10441,21 +10431,15 @@ uint32 Unit::MeleeDamageBonusTaken(Unit* attacker, uint32 pdamage, WeaponAttackT
             TakenTotalMod = 1.0f;
         }
 
-    // xinef: sanctified wrath talent
-    if (TakenTotalMod < 1.0f && attacker->HasIgnoreTargetResistAura())
+    // Sanctified Wrath (bypass damage reduction)
+    if (TakenTotalMod < 1.0f && attacker->HasIgnoreTargetResistModifiersAura())
     {
-        float ignoreModifier = 1.0f - TakenTotalMod;
-        bool addModifier = false;
-        AuraEffectList const& ResIgnoreAuras = attacker->GetAuraEffectsByType(SPELL_AURA_MOD_IGNORE_TARGET_RESIST);
-        for (AuraEffectList::const_iterator j = ResIgnoreAuras.begin(); j != ResIgnoreAuras.end(); ++j)
-            if ((*j)->GetMiscValue() & damageSchoolMask)
-            {
-                ApplyPct(ignoreModifier, (*j)->GetAmount());
-                addModifier = true;
-            }
+        float damageModifier = 1.0f - TakenTotalMod;
+        for (AuraEffect const* aurEff : attacker->GetAuraEffectsByType(SPELL_AURA_MOD_IGNORE_TARGET_RESIST_MODIFIERS))
+            if (aurEff->GetMiscValue() & damageSchoolMask)
+                AddPct(damageModifier, -aurEff->GetAmount());
 
-        if (addModifier)
-            TakenTotalMod += ignoreModifier;
+        TakenTotalMod = 1.0f - damageModifier;
     }
 
     float tmpDamage = (float(pdamage) + TakenFlatBenefit) * TakenTotalMod;
@@ -14878,6 +14862,9 @@ void Unit::RemoveCharmedBy(Unit* charmer)
 
     StopAttackingInvalidTarget();
 
+    // End stale combat refs between now-friendly units after faction restore
+    GetCombatManager().RevalidateCombat();
+
     Player* playerCharmer = charmer->ToPlayer();
     if (playerCharmer)
     {
@@ -16118,13 +16105,19 @@ void Unit::StopAttackFaction(uint32 faction_id)
             ++itr;
     }
 
-    // End combat and threat references with creatures in this faction
-    std::vector<CombatReference*> refsToEnd;
+    // Collect GUIDs, not pointers: EndCombat can cascade through AI callbacks
+    // (formation MemberEvaded -> CombatStop) and free other refs in the list.
+    std::vector<ObjectGuid> guidsToEnd;
     for (auto const& pair : m_combatManager.GetPvECombatRefs())
         if (pair.second->GetOther(this)->GetFactionTemplateEntry()->faction == faction_id)
-            refsToEnd.push_back(pair.second);
-    for (CombatReference* ref : refsToEnd)
-        ref->EndCombat();
+            guidsToEnd.push_back(pair.first);
+    for (ObjectGuid const& guid : guidsToEnd)
+    {
+        auto const& refs = m_combatManager.GetPvECombatRefs();
+        auto it = refs.find(guid);
+        if (it != refs.end())
+            it->second->EndCombat();
+    }
 
     for (ControlSet::const_iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr)
         (*itr)->StopAttackFaction(faction_id);

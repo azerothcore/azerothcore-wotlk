@@ -21,6 +21,7 @@
 #include "Creature.h"
 #include "Log.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "World.h"
 
 uint32 Acore::XP::BaseGain(uint8 pl_level, uint8 mob_level, ContentLevels content)
@@ -79,7 +80,9 @@ uint32 Acore::XP::Gain(Player* player, Unit* unit, bool isBattleGround /*= false
     {
         float xpMod = 1.0f;
 
-        gain = BaseGain(player->GetLevel(), unit->GetLevel(), GetContentLevelsForMapAndZone(unit->GetMapId(), unit->GetZoneId()));
+        uint8 playerLevel = player->GetLevel();
+        sScriptMgr->OnPlayerBeforeGetLevelForXPGain(player, playerLevel);
+        gain = BaseGain(playerLevel, unit->GetLevel(), GetContentLevelsForMapAndZone(unit->GetMapId(), unit->GetZoneId()));
 
         if (gain && creature)
         {

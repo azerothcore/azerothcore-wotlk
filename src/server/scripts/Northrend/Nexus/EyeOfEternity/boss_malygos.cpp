@@ -1011,25 +1011,28 @@ struct npc_hover_disk : public VehicleAI
                 who->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SURGE_OF_POWER_DMG, true);
                 me->SetSpeed(MOVE_RUN, 1.5f);
                 me->SetSpeed(MOVE_FLIGHT, 1.5f);
+                me->SetCanFly(true);
+                me->SetDisableGravity(true);
             }
             else if (who->GetEntry() == NPC_NEXUS_LORD)
             {
+                who->CastSpell(who, SPELL_TELEPORT_VISUAL);
                 me->SetSpeed(MOVE_RUN, 1.5f);
                 me->SetSpeed(MOVE_FLIGHT, 1.5f);
+                me->SetCanFly(true);
             }
             else
             {
+                who->CastSpell(who, SPELL_TELEPORT_VISUAL);
                 me->SetSpeed(MOVE_RUN, 0.6f);
                 me->SetSpeed(MOVE_FLIGHT, 0.6f);
+                me->SetCanFly(true);
             }
-
-            who->SetFacingTo(me->GetOrientation());
-            me->SetCanFly(true);
         }
         else
         {
-            me->GetMotionMaster()->MoveIdle();
-            me->DisableSpline();
+            me->StopMoving();
+            me->SetDisableGravity(false);
             me->SetCanFly(false);
             me->GetMotionMaster()->MoveLand(0, me->GetPositionX(), me->GetPositionY(), 267.24f, 10.0f);
 

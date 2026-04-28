@@ -84,7 +84,6 @@ public:
             _cleaned = false;
             _encounterStatus = NOT_STARTED;
             _events.Reset();
-            _events.RescheduleEvent(EVENT_CHECK_PLAYERS, 0ms);
             _gateHealth = 100;
             _waveCount = 0;
             _portalLocation = 0;
@@ -166,14 +165,14 @@ public:
                 case DATA_CYANIGOSA:
                     if (state == DONE)
                     {
+                        _events.Reset();
                         _encounterStatus = DONE;
                         HandleGameObject(DATA_MAIN_DOOR, true);
                         DoUpdateWorldState(WORLD_STATE_VIOLET_HOLD_SHOW, 0);
                         if (Creature* sinclari = GetCreature(DATA_SINCLARI))
                         {
                             sinclari->AI()->Talk(SAY_SINCLARI_COMPLETE);
-                            sinclari->DespawnOrUnsummon();
-                            sinclari->SetRespawnTime(3);
+                            sinclari->DespawnOrUnsummon(0ms, 3s);
                         }
                     }
                     else if (state == FAIL || state == NOT_STARTED)
@@ -189,19 +188,20 @@ public:
             return true;
         }
 
-        void SetData(uint32 type, uint32 data) override
+        void ProcessEvent(WorldObject* /*obj*/, uint32 eventId) override
         {
-            switch (type)
+            if (eventId == EVENT_ACTIVATE_CRYSTAL)
             {
-                case DATA_ACTIVATE_DEFENSE_SYSTEM:
-                    {
-                        if (data)
-                            _defensesUsed = true;
-                        Position const pos = {1919.09546f, 812.29724f, 86.2905f, M_PI};
-                        instance->SummonCreature(NPC_DEFENSE_SYSTEM, pos, 0, 6499);
-                    }
-                    break;
-                case DATA_START_INSTANCE:
+                _defensesUsed = true;
+                SummonDefenseSystem();
+            }
+        }
+
+        void DoAction(int32 action) override
+        {
+            switch (action)
+            {
+                case ACTION_START_INSTANCE:
                     if (_encounterStatus == NOT_STARTED)
                     {
                         _encounterStatus = IN_PROGRESS;
@@ -211,15 +211,13 @@ public:
                             sinclari->AI()->Talk(SAY_SINCLARI_LEAVING);
                         }
                         _events.RescheduleEvent(EVENT_GUARDS_FALL_BACK, 4s);
+                        _events.RescheduleEvent(EVENT_CHECK_PLAYERS, 5s);
                     }
                     break;
-                case DATA_PORTAL_DEFEATED:
+                case ACTION_PORTAL_DEFEATED:
                     _events.RescheduleEvent(EVENT_SUMMON_PORTAL, 3s);
                     break;
-                case DATA_PORTAL_LOCATION:
-                    _portalLocation = data;
-                    break;
-                case DATA_DECREASE_DOOR_HEALTH:
+                case ACTION_DECREASE_DOOR_HEALTH:
                     if (_gateHealth > 0)
                         --_gateHealth;
                     if (_gateHealth == 0)
@@ -229,11 +227,21 @@ public:
                     }
                     DoUpdateWorldState(WORLD_STATE_VIOLET_HOLD_PRISON_STATE, (uint32)_gateHealth);
                     break;
-                case DATA_RELEASE_BOSS:
+                case ACTION_RELEASE_BOSS:
                     if (_waveCount == 6)
                         StartBossEncounter(GetPersistentData(PERSISTENT_DATA_FIRST_BOSS));
                     else
                         StartBossEncounter(GetPersistentData(PERSISTENT_DATA_SECOND_BOSS));
+                    break;
+            }
+        }
+
+        void SetData(uint32 type, uint32 data) override
+        {
+            switch (type)
+            {
+                case DATA_PORTAL_LOCATION:
+                    _portalLocation = data;
                     break;
                 case DATA_ACHIEV:
                     _achievementCompleted = !!data;
@@ -288,14 +296,14 @@ public:
                     {
                         guard1->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                         guard1->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                        guard1->SetImmuneToNPC(false);
+                        guard1->SetImmuneToAll(false);
                         guard1->GetMotionMaster()->MovePoint(0, BossStartMove21);
                     }
                     if (Creature* guard2 = instance->GetCreature(_erekemGuardGuid[1]))
                     {
                         guard2->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                         guard2->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                        guard2->SetImmuneToNPC(false);
+                        guard2->SetImmuneToAll(false);
                         guard2->GetMotionMaster()->MovePoint(0, BossStartMove22);
                     }
                     break;
@@ -369,14 +377,14 @@ public:
                         sinclari->RemoveUnitMovementFlag(MOVEMENTFLAG_WALKING);
                         sinclari->GetMotionMaster()->MovePoint(0, sinclariOutsidePosition);
                     }
-                    SetData(DATA_ACTIVATE_DEFENSE_SYSTEM, 0);
+                    SummonDefenseSystem();
                     _events.RescheduleEvent(EVENT_START_ENCOUNTER, 4s);
                     break;
                 case EVENT_START_ENCOUNTER:
                     if (Creature* sinclari = GetCreature(DATA_SINCLARI))
                     {
-                        sinclari->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                         sinclari->AI()->Talk(SAY_SINCLARI_DOOR_LOCK);
+                        sinclari->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
                     }
                     if (Creature* doorSeal = GetCreature(DATA_DOOR_SEAL))
                         doorSeal->RemoveAllAuras();
@@ -447,19 +455,17 @@ public:
 
         void OnPlayerEnter(Player* plr) override
         {
-            if (DoNeedCleanup(plr->IsAlive()))
-                InstanceCleanup();
-
             if (_encounterStatus == IN_PROGRESS)
             {
+                if (DoNeedCleanup(plr->IsAlive()))
+                    InstanceCleanup();
+
                 plr->SendUpdateWorldState(WORLD_STATE_VIOLET_HOLD_SHOW, 1);
                 plr->SendUpdateWorldState(WORLD_STATE_VIOLET_HOLD_PRISON_STATE, (uint32)_gateHealth);
                 plr->SendUpdateWorldState(WORLD_STATE_VIOLET_HOLD_WAVE_COUNT, (uint32)_waveCount);
             }
             else
                 plr->SendUpdateWorldState(WORLD_STATE_VIOLET_HOLD_SHOW, 0);
-
-            _events.RescheduleEvent(EVENT_CHECK_PLAYERS, 5s);
         }
 
         bool DoNeedCleanup(bool enter)
@@ -487,18 +493,19 @@ public:
             if (Creature* sinclari = GetCreature(DATA_SINCLARI))
             {
                 sinclari->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                sinclari->DespawnOrUnsummon();
-                sinclari->SetRespawnTime(3);
+                sinclari->DespawnOrUnsummon(0ms, 3s);
             }
 
-            for (ObjectGuid const& guid : _guardGuid)
+            for (ObjectGuid& guid : _guardGuid)
+            {
                 if (Creature* guard = instance->GetCreature(guid))
                 {
-                    guard->DespawnOrUnsummon();
-                    guard->SetRespawnTime(3);
                     guard->SetVisible(GetBossState(DATA_CYANIGOSA) != DONE);
                     guard->SetReactState(REACT_AGGRESSIVE);
+                    guard->DespawnOrUnsummon(0ms, 3s);
                 }
+                guid.Clear();
+            }
 
             if (Creature* portal = GetCreature(DATA_TELEPORTATION_PORTAL))
                 portal->DespawnOrUnsummon();
@@ -529,26 +536,27 @@ public:
                 {
                     if (Creature* boss = GetCreature(id))
                     {
-                        boss->DespawnOrUnsummon();
-                        boss->SetRespawnTime(3);
                         boss->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                         boss->SetImmuneToNPC(true);
+                        boss->DespawnOrUnsummon(0ms, 3s);
                     }
                 }
+
                 if (Creature* guard1 = instance->GetCreature(_erekemGuardGuid[0]))
                 {
-                    guard1->DespawnOrUnsummon();
-                    guard1->SetRespawnTime(3);
                     guard1->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                    guard1->SetImmuneToNPC(true);
+                    guard1->SetImmuneToAll(true);
+                    guard1->DespawnOrUnsummon(0ms, 3s);
                 }
+                _erekemGuardGuid[0].Clear();
                 if (Creature* guard2 = instance->GetCreature(_erekemGuardGuid[1]))
                 {
-                    guard2->DespawnOrUnsummon();
-                    guard2->SetRespawnTime(3);
                     guard2->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                    guard2->SetImmuneToNPC(true);
+                    guard2->SetImmuneToAll(true);
+                    guard2->DespawnOrUnsummon(0ms, 3s);
                 }
+                _erekemGuardGuid[1].Clear();
+
                 if (Creature* cyanigosa = GetCreature(DATA_CYANIGOSA))
                     cyanigosa->DespawnOrUnsummon();
             }
@@ -556,7 +564,12 @@ public:
             DoUpdateWorldState(WORLD_STATE_VIOLET_HOLD_SHOW, 0);
             _encounterStatus = NOT_STARTED;
             _gateHealth = 100;
-            _waveCount = 0;
+            if (GetBossState(DATA_2ND_BOSS) == DONE)
+                _waveCount = 12;
+            else if (GetBossState(DATA_1ST_BOSS) == DONE)
+                _waveCount = 6;
+            else
+                _waveCount = 0;
             _defensesUsed = false;
             if (GetBossState(DATA_CYANIGOSA) == DONE)
                 _encounterStatus = DONE;
@@ -575,6 +588,12 @@ public:
                     return _achievementCompleted;
             }
             return false;
+        }
+
+        void SummonDefenseSystem()
+        {
+            Position const pos = {1919.09546f, 812.29724f, 86.2905f, M_PI};
+            instance->SummonCreature(NPC_DEFENSE_SYSTEM, pos, 0, 6499);
         }
 
     private:

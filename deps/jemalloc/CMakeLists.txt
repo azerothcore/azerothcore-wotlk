@@ -10,9 +10,11 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
 
+include(CheckSymbolExists)
+
 if(CMAKE_SYSTEM_NAME MATCHES "Linux" AND NOT NOJEM)
   # We need to generate the jemalloc_def.h header based on platform-specific settings
-  CHECK_SYMBOL_EXISTS(MADV_FREE "sys/mman.h" HAVE_MADV_FREE)
+  check_symbol_exists(MADV_FREE "sys/mman.h" HAVE_MADV_FREE)
 
   if (PLATFORM EQUAL 32)
     set(JEM_SIZEDEF 2)
