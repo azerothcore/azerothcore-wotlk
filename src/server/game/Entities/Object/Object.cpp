@@ -3133,39 +3133,29 @@ float WorldObject::GetMapWaterOrGroundLevel(float x, float y, float z, float* gr
     bool const swim = IsUnit() ? !static_cast<Unit const*>(this)->HasWaterWalkAura() : false;
     float const collisionHeight = std::max(GetCollisionHeight(), Z_OFFSET_FIND_HEIGHT);
 
-    if (!ToUnit() || !sWorld->getBoolConfig(CONFIG_HEIGHT_ACCURATE_ENABLE))
+    if (ToUnit() && sWorld->getBoolConfig(CONFIG_HEIGHT_ACCURATE_ENABLE))
     {
-        return GetMap()->GetWaterOrGroundLevel(GetPhaseMask(), x, y, z, ground, swim, collisionHeight);
+        float const accurateGround = GetMapHeightAccurate(x, y, z);
+        if (std::isfinite(accurateGround) && accurateGround > INVALID_HEIGHT)
+        {
+            if (ground)
+                *ground = accurateGround;
+
+            LiquidData const liquidData = GetMap()->GetLiquidData(GetPhaseMask(), x, y, accurateGround, collisionHeight, {});
+
+            switch (liquidData.Status)
+            {
+            case LIQUID_MAP_ABOVE_WATER:
+                return std::max<float>(liquidData.Level, accurateGround);
+            case LIQUID_MAP_NO_WATER:
+                return accurateGround;
+            default:
+                return liquidData.Level;
+            }
+        }
     }
 
-    float legacyGround = VMAP_INVALID_HEIGHT_VALUE;
-    float const legacyLevel = GetMap()->GetWaterOrGroundLevel(GetPhaseMask(), x, y, z, &legacyGround, swim, collisionHeight);
-
-    float const accurateGround = GetMapHeightAccurate(x, y, z);
-    if (!std::isfinite(accurateGround) || accurateGround <= INVALID_HEIGHT)
-    {
-        if (ground)
-            *ground = legacyGround;
-
-        return legacyLevel;
-    }
-
-    if (ground)
-        *ground = accurateGround;
-
-    LiquidData const liquidData = GetMap()->GetLiquidData(GetPhaseMask(), x, y, accurateGround, collisionHeight, {});
-
-    switch (liquidData.Status)
-    {
-    case LIQUID_MAP_ABOVE_WATER:
-        return std::max<float>(liquidData.Level, accurateGround);
-    case LIQUID_MAP_NO_WATER:
-        return accurateGround;
-    default:
-        return liquidData.Level;
-    }
-
-    return legacyLevel;
+    return GetMap()->GetWaterOrGroundLevel(GetPhaseMask(), x, y, z, ground, swim, collisionHeight);
 }
 
 float WorldObject::GetFloorZ() const
