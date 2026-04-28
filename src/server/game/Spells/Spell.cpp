@@ -1449,6 +1449,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                     };
 
                     float const radius = std::max(0.0f, groundProbeRadius);
+                    float const diagonal = radius * 0.70710678118654752440f;
 
                     ProbeOffset const offsets[] =
                     {
@@ -1456,15 +1457,21 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                         { radius, 0.0f },
                         { -radius, 0.0f },
                         { 0.0f, radius },
-                        { 0.0f, -radius }
+                        { 0.0f, -radius },
+                        { diagonal, diagonal },
+                        { diagonal, -diagonal },
+                        { -diagonal, diagonal },
+                        { -diagonal, -diagonal }
                     };
 
                     float const lowerZ = 0.5f;
                     float const upperZ = std::max(lowerZ, collisionHeight - 0.1f);
+                    float const middleZ = 0.5f * (lowerZ + upperZ);
 
                     float const zOffsets[] =
                     {
                         lowerZ,
+                        middleZ,
                         upperZ
                     };
 

@@ -486,7 +486,9 @@ namespace VMAP
         bool operator()(G3D::Ray const& ray, uint32 entry, float& distance, bool /*stopAtFirstHit*/)
         {
             G3D::Vector3 normal(0.0f, 0.0f, 1.0f);
-            bool const result = IntersectTriangleDetailed(triangles[entry], vertices, ray, distance, hitNormal ? &normal : nullptr);
+            bool const result = hitNormal
+                ? IntersectTriangleDetailed(triangles[entry], vertices, ray, distance, &normal)
+                : IntersectTriangle(triangles[entry], vertices, ray, distance);
 
             if (result)
             {

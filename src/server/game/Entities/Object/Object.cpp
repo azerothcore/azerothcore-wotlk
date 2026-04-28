@@ -3111,10 +3111,21 @@ float WorldObject::GetMapHeightAccurate(float x, float y, float z, bool vmap/* =
     radius *= rScale;
 
     float const yaw = GetOrientation();
-    if (z != MAX_HEIGHT)
-        z += std::max(radius + 0.2f, 0.5f);
+    float accurateSearchZ = z;
 
-    return GetMap()->GetHeightAccurate(GetPhaseMask(), x, y, z, radius, yaw, vmap, distanceToSearch);
+    if (accurateSearchZ != MAX_HEIGHT)
+        accurateSearchZ += std::max(radius + 0.2f, 0.5f);
+
+    float height = GetMap()->GetHeightAccurate(GetPhaseMask(), x, y, accurateSearchZ, radius, yaw, vmap, distanceToSearch);
+    if (std::isfinite(height) && height > INVALID_HEIGHT)
+        return height;
+
+    // Preserve legacy behavior if accurate height cannot resolve a valid surface.
+    float legacySearchZ = z;
+    if (legacySearchZ != MAX_HEIGHT)
+        legacySearchZ += std::max(GetCollisionHeight(), Z_OFFSET_FIND_HEIGHT);
+
+    return GetMap()->GetHeight(GetPhaseMask(), x, y, legacySearchZ, vmap, distanceToSearch);
 }
 
 float WorldObject::GetMapWaterOrGroundLevel(float x, float y, float z, float* ground/* = nullptr*/) const

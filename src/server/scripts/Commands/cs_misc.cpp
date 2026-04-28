@@ -626,8 +626,8 @@ public:
 
         Map2ZoneCoordinates(zoneX, zoneY, zoneId);
 
-        float groundZ = object->GetMapHeight(object->GetPositionX(), object->GetPositionY(), MAX_HEIGHT);
-        float floorZ = object->GetMapHeight(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ());
+        float groundZ = map->GetHeight(object->GetPhaseMask(), object->GetPositionX(), object->GetPositionY(), MAX_HEIGHT);
+        float floorZ = map->GetHeight(object->GetPhaseMask(), object->GetPositionX(), object->GetPositionY(), object->GetPositionZ());
         float const probeR = object->GetGroundProbeRadius(); // pre-scale
         float const rScale = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_RADIUS_SCALE);
         float const blend = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_SQUARE_BLEND);
