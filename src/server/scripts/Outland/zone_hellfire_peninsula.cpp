@@ -469,38 +469,51 @@ public:
 
     struct go_beaconAI : public GameObjectAI
     {
-        go_beaconAI(GameObject* gameObject) : GameObjectAI(gameObject) { }
+        explicit go_beaconAI(GameObject* gameObject) : GameObjectAI(gameObject) { }
 
-        std::list<Creature*> creatureList;
-
-        void OnStateChanged(uint32 state, Unit*  /*unit*/) override
+        void OnStateChanged(uint32 state, Unit* /*unit*/) override
         {
             if (state == GO_ACTIVATED)
             {
+                std::list<Creature*> creatureList;
+
+                _whelpGUIDs.clear();
                 me->GetCreaturesWithEntryInRange(creatureList, 40, NPC_STONESCHYE_WHELP);
+
+                for (Creature* whelp : creatureList)
                 {
-                    for (Creature* whelp : creatureList)
-                    {
-                        if (whelp && whelp->IsAlive() && !whelp->IsInCombat() && whelp->GetMotionMaster()->GetCurrentMovementGeneratorType() != HOME_MOTION_TYPE)
-                            whelp->GetMotionMaster()->MovePoint(0, me->GetNearPosition(4.0f, whelp->GetOrientation()));
-                    }
+                    if (!whelp)
+                        continue;
+
+                    _whelpGUIDs.push_back(whelp->GetGUID());
+
+                    MotionMaster* motionMaster = whelp->GetMotionMaster();
+                    if (whelp->IsAlive() && !whelp->IsInCombat() && motionMaster && motionMaster->GetCurrentMovementGeneratorType() != HOME_MOTION_TYPE)
+                        motionMaster->MovePoint(0, me->GetNearPosition(4.0f, whelp->GetOrientation()));
                 }
             }
             else if (state == GO_JUST_DEACTIVATED)
             {
+                for (ObjectGuid const& guid : _whelpGUIDs)
                 {
-                    for (Creature* whelp : creatureList)
+                    if (Creature* whelp = ObjectAccessor::GetCreature(*me, guid))
                     {
-                        if (whelp && whelp->IsAlive() && !whelp->IsInCombat() && whelp->GetMotionMaster()->GetCurrentMovementGeneratorType() != HOME_MOTION_TYPE)
-                            whelp->GetMotionMaster()->MoveTargetedHome();
+                        MotionMaster* motionMaster = whelp->GetMotionMaster();
+                        if (whelp->IsAlive() && !whelp->IsInCombat() && motionMaster && motionMaster->GetCurrentMovementGeneratorType() != HOME_MOTION_TYPE)
+                            motionMaster->MoveTargetedHome();
                     }
                 }
+
+                _whelpGUIDs.clear();
             }
             else
             {
-                creatureList.clear();
+                _whelpGUIDs.clear();
             }
         }
+
+        private:
+            GuidList _whelpGUIDs;
     };
 
     GameObjectAI* GetAI(GameObject* go) const override
