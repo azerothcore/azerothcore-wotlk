@@ -16645,14 +16645,14 @@ void Unit::SetHover(bool enable)
 
     if (enable)
     {
-        if (hoverHeight && GetPositionZ() - GetMap()->GetHeight(GetPhaseMask(), GetPositionX(), GetPositionY(), GetPositionZ()) < hoverHeight)
+        if (hoverHeight && GetPositionZ() - GetMapHeightAccurate(GetPositionX(), GetPositionY(), GetPositionZ()) < hoverHeight)
             Relocate(GetPositionX(), GetPositionY(), GetPositionZ() + hoverHeight);
     }
     else
     {
         if (IsAlive() || !IsUnit())
         {
-            float newZ = std::max<float>(GetMap()->GetHeight(GetPhaseMask(), GetPositionX(), GetPositionY(), GetPositionZ()), GetPositionZ() - hoverHeight);
+            float newZ = std::max<float>(GetMapHeightAccurate(GetPositionX(), GetPositionY(), GetPositionZ()), GetPositionZ() - hoverHeight);
             UpdateAllowedPositionZ(GetPositionX(), GetPositionY(), newZ);
             Relocate(GetPositionX(), GetPositionY(), newZ);
         }
