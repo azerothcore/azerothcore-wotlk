@@ -16643,16 +16643,25 @@ void Unit::SetHover(bool enable)
 
     float hoverHeight = GetHoverHeight();
 
+    auto getCurrentGroundHeight = [this]() -> float
+    {
+        if (sWorld->getBoolConfig(CONFIG_HEIGHT_ACCURATE_ENABLE))
+            return GetMapHeight(GetPositionX(), GetPositionY(), GetPositionZ());
+
+        return GetMap()->GetHeight(GetPhaseMask(), GetPositionX(), GetPositionY(), GetPositionZ());
+    };
+
     if (enable)
     {
-        if (hoverHeight && GetPositionZ() - GetMapHeight(GetPositionX(), GetPositionY(), GetPositionZ()) < hoverHeight)
+        float const groundHeight = getCurrentGroundHeight();
+        if (hoverHeight && GetPositionZ() - groundHeight < hoverHeight)
             Relocate(GetPositionX(), GetPositionY(), GetPositionZ() + hoverHeight);
     }
     else
     {
         if (IsAlive() || !IsUnit())
         {
-            float newZ = std::max<float>(GetMapHeight(GetPositionX(), GetPositionY(), GetPositionZ()), GetPositionZ() - hoverHeight);
+            float newZ = std::max<float>(getCurrentGroundHeight(), GetPositionZ() - hoverHeight);
             UpdateAllowedPositionZ(GetPositionX(), GetPositionY(), newZ);
             Relocate(GetPositionX(), GetPositionY(), newZ);
         }

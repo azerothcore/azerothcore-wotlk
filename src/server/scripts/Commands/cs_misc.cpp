@@ -628,6 +628,7 @@ public:
 
         float groundZ = map->GetHeight(object->GetPhaseMask(), object->GetPositionX(), object->GetPositionY(), MAX_HEIGHT);
         float floorZ = map->GetHeight(object->GetPhaseMask(), object->GetPositionX(), object->GetPositionY(), object->GetPositionZ());
+        uint32 const accEnable = sWorld->getBoolConfig(CONFIG_HEIGHT_ACCURATE_ENABLE) ? 1 : 0;
         float const probeR = object->GetGroundProbeRadius(); // pre-scale
         float const rScale = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_RADIUS_SCALE);
         float const blend = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_SQUARE_BLEND);
@@ -674,6 +675,7 @@ public:
                                  cell.GridX(), cell.GridY(), cell.CellX(), cell.CellY(), object->GetInstanceId(),
                                  zoneX, zoneY, groundZ, floorZ, haveMap, haveVMap, haveMMAP);
 
+        handler->PSendSysMessage("Accurate Height Enable: {}", accEnable);
         handler->PSendSysMessage("Accurate Height Shape: {} (SquareBlend: {:.2f}, RadiusScale: {:.2f}, SlopeClamp: {:.2f}, GradMode: {}, NormalEps: {:.6f}, VMapAccurate: {}, VMapDelta: {:.2f}, DynAccurate: {}, DynDelta: {:.2f})",
             shapeStr, blend, rScale, clamp, gmode, neps, vmapAcc, vdelta, dynAcc, dyndelta);
         handler->PSendSysMessage("Accurate Height Grid: {}", gridZAccurate);

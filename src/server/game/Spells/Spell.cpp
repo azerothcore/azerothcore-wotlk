@@ -1446,6 +1446,24 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                                                float toX, float toY, float toZ,
                                                float& hitX, float& hitY, float& hitZ) -> bool
                 {
+                    if (!sWorld->getBoolConfig(CONFIG_HEIGHT_ACCURATE_ENABLE))
+                    {
+                        bool const col = map->GetMapCollisionData().GetStaticTree().GetObjectHitPos(
+                            fromX, fromY, fromZ + 0.5f,
+                            toX, toY, toZ + 0.5f,
+                            hitX, hitY, hitZ,
+                            -0.5f);
+
+                        bool const dcol = map->GetMapCollisionData().GetDynamicTree().GetObjectHitPos(
+                            phasemask,
+                            fromX, fromY, fromZ + 0.5f,
+                            toX, toY, toZ + 0.5f,
+                            hitX, hitY, hitZ,
+                            -0.5f);
+
+                        return col || dcol;
+                    }
+
                     struct ProbeOffset
                     {
                         float x;
