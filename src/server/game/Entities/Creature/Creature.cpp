@@ -1744,7 +1744,6 @@ bool Creature::LoadCreatureFromDB(ObjectGuid::LowType spawnId, Map* map, bool ad
         m_deathState = DeathState::Dead;
         if (CanFly())
         {
-            float const radius = GetGroundProbeRadius() * sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_RADIUS_SCALE);
             float tz = VMAP_INVALID_HEIGHT_VALUE;
 
             if (sWorld->getBoolConfig(CONFIG_HEIGHT_ACCURATE_ENABLE))

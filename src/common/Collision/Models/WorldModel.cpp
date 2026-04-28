@@ -433,7 +433,6 @@ namespace VMAP
 
         bool operator()(G3D::Ray const& ray, uint32 entry, float& distance, bool /*stopAtFirstHit*/)
         {
-            G3D::Vector3 normal(0.0f, 0.0f, 1.0f);
             bool const result = IntersectTriangle(triangles[entry], vertices, ray, distance);
 
             if (result)
@@ -445,15 +444,15 @@ namespace VMAP
                     Vector3 const e1 = vertices[triangles[entry].idx1] - vertices[triangles[entry].idx0];
                     Vector3 const e2 = vertices[triangles[entry].idx2] - vertices[triangles[entry].idx0];
 
-                    Vector3 normal = e1.cross(e2);
-                    if (!normal.isZero())
+                    Vector3 triNormal = e1.cross(e2);
+                    if (!triNormal.isZero())
                     {
-                        normal = normal.unit();
+                        triNormal = triNormal.unit();
 
-                        if (normal.dot(ray.direction()) > 0.0f)
-                            normal = -normal;
+                        if (triNormal.dot(ray.direction()) > 0.0f)
+                            triNormal = -triNormal;
 
-                        *hitNormal = normal;
+                        *hitNormal = triNormal;
                     }
                     else
                         *hitNormal = G3D::Vector3(0.0f, 0.0f, 1.0f);
