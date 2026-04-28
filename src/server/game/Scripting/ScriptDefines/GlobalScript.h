@@ -55,6 +55,7 @@ enum GlobalHook
     GLOBALHOOK_ON_AURA_APPLICATION_CLIENT_UPDATE,
     GLOBALHOOK_ON_SPELL_EXECUTE_LOG_SUMMON_OBJECT,
     GLOBALHOOK_ON_SPELL_INTERRUPT,
+    GLOBALHOOK_ON_SPELL_DISPEL,
     GLOBALHOOK_END
 };
 
@@ -152,6 +153,18 @@ public:
      */
     virtual void OnSpellInterrupt(Unit* /*interrupter*/, Unit* /*interrupted*/,
         uint32 /*interruptSpellId*/, uint32 /*interruptedSpellId*/) { }
+
+    /**
+     * @brief Called when a dispel or spell steal succeeds.
+     *
+     * @param dispeller      The unit that cast the dispel/steal spell
+     * @param victim         The unit that lost the aura
+     * @param dispelSpellId  The dispel/steal spell id
+     * @param removedSpellId The aura spell id that was removed
+     * @param isSteal        True for spell-steal style removals, false for normal dispels
+     */
+    virtual void OnSpellDispel(Unit* /*dispeller*/, Unit* /*victim*/,
+        uint32 /*dispelSpellId*/, uint32 /*removedSpellId*/, bool /*isSteal*/) { }
 };
 
 #endif

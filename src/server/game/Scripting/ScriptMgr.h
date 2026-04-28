@@ -545,6 +545,7 @@ public: /* GlobalScript */
     void OnAuraApplicationClientUpdate(Unit* target, Aura* aura, bool remove);
     void OnSpellExecuteLogSummonObject(Spell* spell, WorldObject* obj);
     void OnSpellInterrupt(Unit* interrupter, Unit* interrupted, uint32 interruptSpellId, uint32 interruptedSpellId);
+    void OnSpellDispel(Unit* dispeller, Unit* victim, uint32 dispelSpellId, uint32 removedSpellId, bool isSteal);
 
 public: /* Scheduled scripts */
     uint32 IncreaseScheduledScriptsCount() { return ++_scheduledScripts; }
