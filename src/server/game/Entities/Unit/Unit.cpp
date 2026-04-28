@@ -6788,7 +6788,14 @@ void Unit::ProcSkillsAndAuras(Unit* actor, Unit* victim, uint32 procAttacker, ui
         else if (damageInfo && (damageInfo->GetDamage() || damageInfo->GetAbsorb()))
             spellTypeMask = PROC_SPELL_TYPE_DAMAGE;
         else if (procSpellInfo)
-            spellTypeMask = PROC_SPELL_TYPE_NO_DMG_HEAL;
+        {
+            // Patch 3.3.0: Slow Fall activates helpful-spell trinkets.
+            // https://www.bluetracker.gg/wow/topic/eu-en/11824414100-33-patch-notes/
+            if (procSpellInfo->Id == 130)
+                spellTypeMask = PROC_SPELL_TYPE_HEAL;
+            else
+                spellTypeMask = PROC_SPELL_TYPE_NO_DMG_HEAL;
+        }
 
         actor->TriggerAurasProcOnEvent(nullptr, nullptr, victim, procAttacker, procVictim, spellTypeMask, procPhase, procExtra, const_cast<Spell*>(procSpell), damageInfo, healInfo);
     }
