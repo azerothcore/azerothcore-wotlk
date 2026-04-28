@@ -298,6 +298,7 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<float>(CONFIG_HEIGHT_ACCURATE_VMAP_DELTA, "Height.Accurate.VMap.Delta", 0.25f, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0.01f && value <= 1.0f; }, ">= 0.01f and <= 1.0f");
     SetConfigValue<uint32>(CONFIG_HEIGHT_ACCURATE_DYNAMIC_ENABLE, "Height.Accurate.Dynamic.Enable", 1, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value <= 1; }, "<= 1");
     SetConfigValue<float>(CONFIG_HEIGHT_ACCURATE_DYNAMIC_DELTA, "Height.Accurate.Dynamic.Delta", 0.25f, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0.01f && value <= 1.0f; }, ">= 0.01f and <= 1.0f");
+    SetConfigValue<uint32>(CONFIG_HEIGHT_ACCURATE_ENABLE, "Height.Accurate.Enable", 1, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value <= 1; }, "<= 1");
 
     SetConfigValue<uint32>(CONFIG_GROUP_VISIBILITY, "Visibility.GroupMode", 1);
 

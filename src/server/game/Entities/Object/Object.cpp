@@ -3084,7 +3084,7 @@ ObjectGuid WorldObject::GetTransGUID() const
 
 float WorldObject::GetMapHeight(float x, float y, float z, bool vmap/* = true*/, float distanceToSearch/* = DEFAULT_HEIGHT_SEARCH*/) const
 {
-    if (ToUnit())
+    if (ToUnit() && sWorld->getBoolConfig(CONFIG_HEIGHT_ACCURATE_ENABLE))
         return GetMapHeightAccurate(x, y, z, vmap, distanceToSearch);
 
     if (z != MAX_HEIGHT)

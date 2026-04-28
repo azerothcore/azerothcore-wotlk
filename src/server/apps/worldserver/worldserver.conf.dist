@@ -1499,6 +1499,13 @@ Height.Accurate.Dynamic.Enable = 1
 Height.Accurate.Dynamic.Delta  = 0.25
 
 #
+# -- Enables or disables Height Accurate checks
+# 1 = enable, 0 = legacy
+#
+
+Height.Accurate.Enable = 1
+
+#
 #    DetectPosCollision
 #        Description: Check final move position, summon position, etc for visible collision with
 #                     other objects or walls (walls only if vmaps are enabled).

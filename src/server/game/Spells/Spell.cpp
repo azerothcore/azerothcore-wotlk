@@ -1448,7 +1448,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                         float y;
                     };
 
-                    float const radius = std::max(0.0f, groundProbeRadius);
+                    float const radius = std::max(0.0f, accurateProbeRadius);
                     float const diagonal = radius * 0.70710678118654752440f;
 
                     ProbeOffset const offsets[] =
@@ -1503,9 +1503,6 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                     {
                         for (float const zOffset : zOffsets)
                         {
-                            if (zOffset > lowerZ && std::fabs(zOffset - lowerZ) < 0.05f)
-                                continue;
-
                             G3D::Vector3 const from(fromX + offset.x, fromY + offset.y, fromZ + zOffset);
                             G3D::Vector3 const to(toX + offset.x, toY + offset.y, toZ + zOffset);
 

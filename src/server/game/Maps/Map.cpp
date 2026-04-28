@@ -3592,7 +3592,17 @@ bool Map::CheckCollisionAndGetValidCoords(WorldObject const* source, float start
     if (groundZ <= INVALID_HEIGHT && unit && !unit->CanFly())
     {
         // fall back to gridHeight if any
-        float gridHeight = GetGridHeight(destX, destY);
+        float gridHeight = INVALID_HEIGHT;
+
+        if (sWorld->getBoolConfig(CONFIG_HEIGHT_ACCURATE_ENABLE))
+        {
+            float const radius = source->GetGroundProbeRadius() * sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_RADIUS_SCALE);
+            gridHeight = GetGridHeightAccurate(destX, destY, radius, source->GetOrientation());
+        }
+
+        if (gridHeight <= INVALID_HEIGHT)
+            gridHeight = GetGridHeight(destX, destY);
+
         if (gridHeight > INVALID_HEIGHT)
         {
             destZ = gridHeight + unit->GetHoverHeight();
