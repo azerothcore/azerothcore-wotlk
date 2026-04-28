@@ -1,3 +1,4 @@
+-- DB update 2026_04_28_03 -> 2026_04_28_04
 -- Adds S6 off piece vendors to creature table, and then adds them to S6 event.
 DELETE FROM `creature` WHERE (`guid` IN (208509, 208510, 208511, 208512) AND `id1` IN (34036, 34058, 34073, 34076));
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`, `CreateObject`, `Comment`) VALUES
