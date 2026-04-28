@@ -1431,7 +1431,11 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
 
                 auto getBlinkGroundHeight = [&](float x, float y, float z, bool checkVMap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) -> float
                 {
-                    float height = map->GetHeightAccurate(phasemask, x, y, z, accurateProbeRadius, orientation, checkVMap, maxSearchDist);
+                    float height = VMAP_INVALID_HEIGHT_VALUE;
+
+                    if (sWorld->getBoolConfig(CONFIG_HEIGHT_ACCURATE_ENABLE))
+                        height = map->GetHeightAccurate(phasemask, x, y, z, accurateProbeRadius, orientation, checkVMap, maxSearchDist);
+
                     if (!std::isfinite(height) || height <= INVALID_HEIGHT)
                         height = map->GetHeight(phasemask, x, y, z, checkVMap, maxSearchDist);
 

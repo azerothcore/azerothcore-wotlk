@@ -84,58 +84,6 @@ namespace VMAP
         return false;
     }
 
-    bool IntersectTriangleDetailed(MeshTriangle const& tri, std::vector<Vector3>::const_iterator points,
-                                   G3D::Ray const& ray, float& distance, G3D::Vector3* hitNormal)
-    {
-        static float constexpr EPS = 1e-5f;
-
-        Vector3 const e1 = points[tri.idx1] - points[tri.idx0];
-        Vector3 const e2 = points[tri.idx2] - points[tri.idx0];
-        Vector3 const p(ray.direction().cross(e2));
-
-        float const a = e1.dot(p);
-        if (std::fabs(a) < EPS)
-            return false;
-
-        float const f = 1.0f / a;
-        Vector3 const s(ray.origin() - points[tri.idx0]);
-
-        float const u = f * s.dot(p);
-        if (u < 0.0f || u > 1.0f)
-            return false;
-
-        Vector3 const q(s.cross(e1));
-        float const v = f * ray.direction().dot(q);
-        if (v < 0.0f || u + v > 1.0f)
-            return false;
-
-        float const t = f * e2.dot(q);
-        if (t <= 0.0f || t >= distance)
-            return false;
-
-        distance = t;
-
-        if (hitNormal)
-        {
-            Vector3 normal = e1.cross(e2);
-            if (!normal.isZero())
-            {
-                normal = normal.unit();
-
-                // Make the normal oppose the ray direction. For downward height rays,
-                // this gives an upward-facing normal.
-                if (normal.dot(ray.direction()) > 0.0f)
-                    normal = -normal;
-
-                *hitNormal = normal;
-            }
-            else
-                *hitNormal = G3D::Vector3(0.0f, 0.0f, 1.0f);
-        }
-
-        return true;
-    }
-
     class TriBoundFunc
     {
     public:

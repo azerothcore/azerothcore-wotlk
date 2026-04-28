@@ -1745,7 +1745,13 @@ bool Creature::LoadCreatureFromDB(ObjectGuid::LowType spawnId, Map* map, bool ad
         if (CanFly())
         {
             float const radius = GetGroundProbeRadius() * sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_RADIUS_SCALE);
-            float tz = map->GetHeightAccurate(GetPhaseMask(), data->posX, data->posY, data->posZ, radius, data->orientation, true, MAX_FALL_DISTANCE);
+            float tz = VMAP_INVALID_HEIGHT_VALUE;
+
+            if (sWorld->getBoolConfig(CONFIG_HEIGHT_ACCURATE_ENABLE))
+            {
+                float const radius = GetGroundProbeRadius() * sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_RADIUS_SCALE);
+                tz = map->GetHeightAccurate(GetPhaseMask(), data->posX, data->posY, data->posZ, radius, data->orientation, true, MAX_FALL_DISTANCE);
+            }
 
             if (!std::isfinite(tz) || tz <= INVALID_HEIGHT)
                 tz = map->GetHeight(GetPhaseMask(), data->posX, data->posY, data->posZ, true, MAX_FALL_DISTANCE);

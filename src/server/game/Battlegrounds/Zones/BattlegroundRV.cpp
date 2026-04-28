@@ -52,7 +52,7 @@ void BattlegroundRV::CheckPositionForUnit(Unit* unit)
     // get height at current pos, if something is wrong (below or high above) - teleport
     if (!unit->IsFalling() && unit->IsAlive())
     {
-        float groundZ_vmap = unit->GetMapHeightAccurate(unit->GetPositionX(), unit->GetPositionY(), 37.0f, true, 50.0f);
+        float groundZ_vmap = unit->GetMapHeight(unit->GetPositionX(), unit->GetPositionY(), 37.0f, true, 50.0f);
         float groundZ_dyntree = unit->GetMap()->GetDynamicMapTree().getHeight(unit->GetPositionX(), unit->GetPositionY(), 37.0f, 50.0f, unit->GetPhaseMask());
 
         if ((groundZ_vmap > 28.0f && groundZ_vmap < 29.0f) || (groundZ_dyntree > 28.0f && groundZ_dyntree < 37.0f))
