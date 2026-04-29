@@ -1,3 +1,4 @@
+-- DB update 2026_04_29_00 -> 2026_04_29_01
 
 -- Add CastFlags 32 and update comments.
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 30202;
