@@ -1,3 +1,4 @@
+-- DB update 2026_04_29_06 -> 2026_04_29_07
 --
 -- workaround to apply gobject scaling of 23020 Crystal Imprisonment (SPELL_AURA_MOD_SCALE), value = -90
 UPDATE `gameobject_template` SET `AIName` = 'SmartGameObjectAI' WHERE `entry` = 179644;
