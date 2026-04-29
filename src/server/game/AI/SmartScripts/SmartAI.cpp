@@ -1241,10 +1241,10 @@ void SmartAI::SetFollow(Unit* target, float dist, float angle, uint32 credit, ui
 
 void SmartAI::StopFollow(bool complete)
 {
-    if (complete && mFollowCredit > 0)
+    if (complete)
     {
         Player* player = ObjectAccessor::GetPlayer(*me, mFollowGuid);
-        if (player)
+        if (player && mFollowCredit > 0)
         {
             if (!mFollowCreditType)
                 player->RewardPlayerAndGroupAtEvent(mFollowCredit, me);
