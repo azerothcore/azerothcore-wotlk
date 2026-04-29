@@ -227,6 +227,8 @@ namespace MMAP
                     override.walkableClimb = mapNode["walkableClimb"].get_value<int>();
                 if (mapNode.contains("vertexPerMapEdge"))
                     override.vertexPerMapEdge = mapNode["vertexPerMapEdge"].get_value<int>();
+                if (mapNode.contains("vertexPerTileEdge"))
+                    override.vertexPerTileEdge = mapNode["vertexPerTileEdge"].get_value<int>();
                 if (mapNode.contains("cellSizeHorizontal"))
                     override.cellSizeHorizontal = mapNode["cellSizeHorizontal"].get_value<float>();
                 if (mapNode.contains("cellSizeVertical"))
