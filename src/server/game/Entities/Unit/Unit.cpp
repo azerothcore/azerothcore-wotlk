@@ -16646,7 +16646,15 @@ void Unit::SetHover(bool enable)
     auto getCurrentGroundHeight = [this]() -> float
     {
         if (sWorld->getBoolConfig(CONFIG_HEIGHT_ACCURATE_ENABLE))
-            return GetMapHeight(GetPositionX(), GetPositionY(), GetPositionZ());
+        {
+            float const radius = GetGroundProbeRadius() * sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_RADIUS_SCALE);
+            float const height = GetMap()->GetHeightAccurate(
+                GetPhaseMask(), GetPositionX(), GetPositionY(), GetPositionZ(),
+                radius, GetOrientation());
+
+            if (std::isfinite(height) && height > INVALID_HEIGHT)
+                return height;
+        }
 
         return GetMap()->GetHeight(GetPhaseMask(), GetPositionX(), GetPositionY(), GetPositionZ());
     };
