@@ -1,3 +1,4 @@
+-- DB update 2026_04_29_03 -> 2026_04_29_04
 --
 -- Unit flags observed: 8, 2304 (256 | 2048)
 -- +256 IMMUNE_TO_PC - disables combat/assistance with PlayerCharacters (PC)

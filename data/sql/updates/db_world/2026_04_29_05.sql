@@ -1,3 +1,4 @@
+-- DB update 2026_04_29_04 -> 2026_04_29_05
 --
 -- Sartharion 25M drops 2x T7.5 Gloves
 SET @REF := 34377;
