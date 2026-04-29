@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -121,7 +121,7 @@ public:
                             while (entry1 == entry2);
                             me->CastSpell((Unit*)nullptr, entry2, true);
                         }
-                        events.RepeatEvent(45000);
+                        events.Repeat(45s);
                         events.RescheduleEvent(EVENT_SPELL_ARCANE_BUFFET, 5s);
                         events.RescheduleEvent(EVENT_CHECK_DISTANCE, 6s);
                     }
@@ -135,7 +135,7 @@ public:
                                     if (me->GetDistance(c) < 3.0f)
                                     {
                                         c->CastSpell(me, SPELL_ARCANE_POWER, false);
-                                        c->DespawnOrUnsummon(8000);
+                                        c->DespawnOrUnsummon(8s);
                                         found = true;
                                     }
                         if (found)

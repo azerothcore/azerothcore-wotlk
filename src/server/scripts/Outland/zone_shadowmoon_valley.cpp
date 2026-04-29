@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -23,28 +23,7 @@
 #include "ScriptedGossip.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
-/* ScriptData
-SDName: Shadowmoon_Valley
-SD%Complete: 100
-SDComment: Quest support: 10519, 10583, 10601, 10804, 10854, 10458, 10481, 10480, 10781. Vendor Drake Dealer Hurlunk.
-SDCategory: Shadowmoon Valley
-EndScriptData */
 
-/* ContentData
-npc_mature_netherwing_drake
-npc_enslaved_netherwing_drake
-npc_drake_dealer_hurlunk
-npcs_flanis_swiftwing_and_kagrosh
-npc_karynaku
-npc_oronok_tornheart
-npc_torloth_the_magnificent
-npc_illidari_spawn
-npc_lord_illidan_stormrage
-go_crystal_prison
-npc_enraged_spirit
-EndContentData */
-
-// Ours
 enum TheFelAndTheFurious
 {
     SPELL_ROCKET_LAUNCHER = 38083
@@ -123,7 +102,6 @@ class spell_q10563_q10596_to_legion_hold_aura : public AuraScript
     }
 };
 
-// Theirs
 /*#####
 # npc_invis_infernal_caster
 #####*/
@@ -155,7 +133,7 @@ public:
         {
             ground = me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
             SummonInfernal();
-            events.ScheduleEvent(EVENT_CAST_SUMMON_INFERNAL, urand(1000, 3000));
+            events.ScheduleEvent(EVENT_CAST_SUMMON_INFERNAL, 1s, 3s);
         }
 
         void SetData(uint32 id, uint32 data) override
@@ -166,7 +144,7 @@ public:
 
         void SummonInfernal()
         {
-            Creature* infernal = me->SummonCreature(NPC_INFERNAL_ATTACKER, me->GetPositionX(), me->GetPositionY(), ground + 0.05f, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 60000);
+            Creature* infernal = me->SummonCreature(NPC_INFERNAL_ATTACKER, me->GetPositionX(), me->GetPositionY(), ground + 0.05f, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 0);
             infernalGUID = infernal->GetGUID();
         }
 
@@ -183,7 +161,7 @@ public:
                             if (Unit* infernal = ObjectAccessor::GetUnit(*me, infernalGUID))
                                 if (infernal->GetDisplayId() == MODEL_INVISIBLE)
                                     me->CastSpell(infernal, SPELL_SUMMON_INFERNAL, true);
-                            events.ScheduleEvent(EVENT_CAST_SUMMON_INFERNAL, 12000);
+                            events.ScheduleEvent(EVENT_CAST_SUMMON_INFERNAL, 12s);
                             break;
                         }
                     default:
@@ -588,8 +566,8 @@ public:
 
         void JustEngagedWith(Unit* /*who*/) override
         {
-            events.ScheduleEvent(EVENT_KICK, urand(5000, 10000));
-            events.ScheduleEvent(EVENT_SUNDER, urand(5000, 10000));
+            events.ScheduleEvent(EVENT_KICK, 5s, 10s);
+            events.ScheduleEvent(EVENT_SUNDER, 5s, 10s);
         }
 
         void SpellHit(Unit* caster, SpellInfo const* spell) override
@@ -604,7 +582,7 @@ public:
                 Tapped = true;
                 caster->GetClosePoint(x, y, z, me->GetObjectSize());
                 Talk(SAY_1);
-                events.ScheduleEvent(EVENT_WALK_TO_MUTTON, 0);
+                events.ScheduleEvent(EVENT_WALK_TO_MUTTON, 0ms);
             }
         }
 
@@ -615,7 +593,7 @@ public:
                 if (GameObject* food = me->FindNearestGameObject(DELICIOUS_MUTTON, 5.0f))
                     me->SetFacingToObject(food);
                 me->HandleEmoteCommand(EMOTE_ONESHOT_EAT);
-                events.ScheduleEvent(EVENT_POISONED, 5000);
+                events.ScheduleEvent(EVENT_POISONED, 5s);
             }
         }
 
@@ -639,7 +617,7 @@ public:
                 {
                     case EVENT_WALK_TO_MUTTON:
                         me->SetWalk(true);
-                        me->GetMotionMaster()->MovePoint(1, x, y, z, true);
+                        me->GetMotionMaster()->MovePoint(1, x, y, z);
                         me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
                         me->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
                         break;
@@ -650,7 +628,7 @@ public:
                             Talk(SAY_POISONED_1);
                         CreditPlayer();
                         me->CastSpell(me, SPELL_VOMIT);
-                        events.ScheduleEvent(EVENT_KILL, 5000);
+                        events.ScheduleEvent(EVENT_KILL, 5s);
                         break;
                     case EVENT_KILL:
                         Unit::DealDamage(me, me, me->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
@@ -664,11 +642,11 @@ public:
                 case EVENT_KICK:
                     if (me->GetVictim()->HasUnitState(SPELL_STATE_CASTING))
                         DoCastVictim(SPELL_KICK);
-                    events.RepeatEvent(urand(5000, 10000));
+                    events.Repeat(5s, 10s);
                     break;
                 case EVENT_SUNDER:
                     DoCastVictim(SPELL_SUNDER);
-                    events.RepeatEvent(urand(5000, 10000));
+                    events.Repeat(5s, 10s);
                     break;
             }
 
@@ -805,14 +783,6 @@ public:
 /*#####
 # Quest: Battle of the crimson watch
 #####*/
-
-/* ContentData
-Battle of the crimson watch - creatures, gameobjects and defines
-npc_illidari_spawn : Adds that are summoned in the Crimson Watch battle.
-npc_torloth_the_magnificent : Final Creature that players have to face before quest is completed
-npc_lord_illidan_stormrage : Creature that controls the event.
-go_crystal_prison : GameObject that begins the event and hands out quest
-EndContentData */
 
 #define QUEST_BATTLE_OF_THE_CRIMSON_WATCH 10781
 #define EVENT_AREA_RADIUS 65 //65yds
@@ -1890,22 +1860,22 @@ struct dragonmaw_race_npc : public ScriptedAI
         switch (me->GetEntry())
         {
         case NPC_MUCKJAW:
-            me->GetMotionMaster()->MovePath(PATH_MUCKJAW, false);
+            me->GetMotionMaster()->MoveWaypoint(PATH_MUCKJAW, false);
             break;
         case NPC_TROPE:
-            me->GetMotionMaster()->MovePath(PATH_TROPE, false);
+            me->GetMotionMaster()->MoveWaypoint(PATH_TROPE, false);
             break;
         case NPC_CORLOK:
-            me->GetMotionMaster()->MovePath(PATH_CORLOK, false);
+            me->GetMotionMaster()->MoveWaypoint(PATH_CORLOK, false);
             break;
         case NPC_ICHMAN:
-            me->GetMotionMaster()->MovePath(PATH_ICHMAN, false);
+            me->GetMotionMaster()->MoveWaypoint(PATH_ICHMAN, false);
             break;
         case NPC_MULVERICK:
-            me->GetMotionMaster()->MovePath(PATH_MULVERICK, false);
+            me->GetMotionMaster()->MoveWaypoint(PATH_MULVERICK, false);
             break;
         case NPC_SKYSHATTER:
-            me->GetMotionMaster()->MovePath(PATH_SKYSHATTER, false);
+            me->GetMotionMaster()->MoveWaypoint(PATH_SKYSHATTER, false);
             break;
         default:
             break;
@@ -2241,11 +2211,8 @@ struct dragonmaw_race_npc : public ScriptedAI
 
 void AddSC_shadowmoon_valley()
 {
-    // Ours
     RegisterSpellScript(spell_q10612_10613_the_fel_and_the_furious);
     RegisterSpellScript(spell_q10563_q10596_to_legion_hold_aura);
-
-    // Theirs
     RegisterCreatureAI(dragonmaw_race_npc);
     new npc_invis_infernal_caster();
     new npc_infernal_attacker();

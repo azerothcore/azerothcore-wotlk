@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -18,6 +18,7 @@
 #include "ChannelMgr.h"
 #include "ObjectMgr.h"                                      // for normalizePlayerName
 #include "Player.h"
+#include "Language.h"
 #include <cctype>
 
 void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
@@ -38,6 +39,26 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
         AreaTableEntry const* zone = sAreaTableStore.LookupEntry(GetPlayer()->GetZoneId());
         if (!zone || !GetPlayer()->CanJoinConstantChannelInZone(channel, zone))
             return;
+
+        if (const ChatChannelsEntry* channel = sChatChannelsStore.LookupEntry(channelId))
+        {
+            const auto locale = GetSessionDbcLocale();
+            const std::string& zoneName = zone->area_name[locale];
+            const char* nameExt = nullptr;
+            if (channel->flags & CHANNEL_DBC_FLAG_CITY_ONLY)
+                nameExt = sObjectMgr->GetAcoreStringForDBCLocale(LANG_CHANNEL_CITY).c_str();
+            else
+                nameExt = zoneName.c_str();
+
+            std::array<char, 128> buffer{};
+
+            const char* pattern = channel->pattern[locale];
+
+            if (pattern)
+                std::snprintf(buffer.data(), buffer.size(), pattern, nameExt);
+
+            channelName= buffer.data();
+        }
     }
 
     if (channelName.empty())

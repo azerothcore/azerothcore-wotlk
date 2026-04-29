@@ -45,6 +45,7 @@ endif()
 if (BUILD_TOOLS_MAPS)
   add_subdirectory(bzip2)
   add_subdirectory(libmpq)
+  add_subdirectory(fkYAML)
 endif()
 
 add_subdirectory(libsidecar)

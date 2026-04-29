@@ -17,24 +17,28 @@
   "workspaceFolder": "/azerothcore",
 
   // Set *default* container specific settings.json values on container create.
-  "settings": {
-    "terminal.integrated.shell.linux": null
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "terminal.integrated.shell.linux": null
+      },
+      // Add the IDs of extensions you want installed when the container is created.
+      "extensions": [
+        "ms-vscode-remote.remote-containers",
+        "notskm.clang-tidy",
+        "xaver.clang-format",
+        "bbenoist.doxygen",
+        "ms-vscode.cpptools",
+        "ms-vscode.cmake-tools",
+        "mhutchie.git-graph",
+        "github.vscode-pull-request-github",
+        "eamodio.gitlens",
+        "cschlosser.doxdocgen",
+        "sanaajani.taskrunnercode",
+        "mads-hartmann.bash-ide-vscode"
+      ]
+    }
   },
-
-  // Add the IDs of extensions you want installed when the container is created.
-  "extensions": [
-    "notskm.clang-tidy",
-    "xaver.clang-format",
-    "bbenoist.doxygen",
-    "ms-vscode.cpptools",
-    "austin.code-gnu-global",
-    "twxs.cmake",
-    "mhutchie.git-graph",
-    "github.vscode-pull-request-github",
-    "eamodio.gitlens",
-    "cschlosser.doxdocgen",
-    "sanaajani.taskrunnercode"
-  ],
 
   // Use 'forwardPorts' to make a list of ports inside the container available locally.
   // "forwardPorts": [],

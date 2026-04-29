@@ -1,10 +1,5 @@
 # List of AUTHORS who contributed over time to the AzerothCore project
 
-## Warning
-The code of AzerothCore is shipped as it is without any form of warranty,
-and - except for third party libraries licensed under the AGPL 3,
-which you can read from the file "LICENSE".
-
 ## Point of current development
 The project is currently hosted at https://www.azerothcore.org/ and developed under https://github.com/azerothcore
 
@@ -34,3 +29,22 @@ The third-party libraries have their own way of addressing authorship, and the a
 a third-party library reflects who did the importing instead of who wrote the code within the commit.
 
 The Authors of third-party libraries are not explicitly mentioned, and usually is possible to obtain from the files belonging to the third-party libraries.
+
+## Cross-project collaboration
+
+At AzerothCore, we actively promote collaboration with other MaNGOS-based open-source projects that are actively maintained. This also includes cherry-picking commits from relevant projects such as:
+
+* TrinityCore: https://github.com/trinitycore
+* CMaNGOS: https://github.com/cmangos/
+* vMaNGOS: https://github.com/vmangos
+* and others
+
+It is strictly required for any contributor importing code to credit the original author by:
+- linking the original PR (or commit)
+- adding a [Co-authored-by](https://docs.github.com/en/pull-requests/committing-changes-to-your-project/creating-and-editing-commits/creating-a-commit-with-multiple-authors) line in the PR description
+
+This will automatically include the original author in our list of [Contributors](https://github.com/azerothcore/azerothcore-wotlk/graphs/contributors).
+
+If you notice a violation of the above, please report it to the Staff immediately.
+
+We encourage other projects to adopt similar practices to promote healthy cross-project collaboration and proper attribution.

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -22,6 +22,7 @@
 #include "DatabaseEnv.h"
 #include "ItemTemplate.h"
 #include "LootMgr.h"
+#include "SpawnData.h"
 #include "Unit.h"
 #include <list>
 
@@ -99,18 +100,18 @@ enum class CreatureFlightMovementType : uint8
 
 enum class CreatureChaseMovementType : uint8
 {
-    Run,
-    CanWalk,
-    AlwaysWalk,
+    Run         = 0,
+    CanWalk     = 1,
+    AlwaysWalk  = 2,
 
     Max
 };
 
 enum class CreatureRandomMovementType : uint8
 {
-    Walk,
-    CanRun,
-    AlwaysRun,
+    Walk        = 0,
+    CanRun      = 1,
+    AlwaysRun   = 2,
 
     Max
 };
@@ -202,7 +203,6 @@ struct CreatureTemplate
     float   speed_swim;
     float   speed_flight;
     float   detection_range;                                // Detection Range for Line of Sight aggro
-    float   scale;
     uint32  rank;
     uint32  dmgschool;
     float   DamageModifier;
@@ -215,10 +215,6 @@ struct CreatureTemplate
     uint32  unit_flags2;                                    // enum UnitFlags2 mask values
     uint32  dynamicflags;
     uint32  family;                                         // enum CreatureFamily values (optional)
-    uint32  trainer_type;
-    uint32  trainer_spell;
-    uint32  trainer_class;
-    uint32  trainer_race;
     uint32  type;                                           // enum CreatureType values
     uint32  type_flags;                                     // enum CreatureTypeFlags mask values
     uint32  lootid;
@@ -241,8 +237,7 @@ struct CreatureTemplate
     bool    RacialLeader;
     uint32  movementId;
     bool    RegenHealth;
-    uint32  MechanicImmuneMask;
-    uint8   SpellSchoolImmuneMask;
+    int32   CreatureImmunitiesId;
     uint32  flags_extra;
     uint32  ScriptID;
     WorldPacket queryData; // pussywizard
@@ -307,6 +302,11 @@ struct CreatureBaseStats
     uint32 AttackPower;
     uint32 RangedAttackPower;
     float BaseDamage[MAX_EXPANSIONS];
+    uint32 Strength;
+    uint32 Agility;
+    uint32 Stamina;
+    uint32 Intellect;
+    uint32 Spirit;
 
     // Helpers
 
@@ -366,32 +366,23 @@ typedef std::unordered_map<uint8, EquipmentInfo> EquipmentInfoContainerInternal;
 typedef std::unordered_map<uint32, EquipmentInfoContainerInternal> EquipmentInfoContainer;
 
 // from `creature` table
-struct CreatureData
+struct CreatureData : public SpawnData
 {
-    CreatureData() = default;
+    CreatureData() : SpawnData(SPAWN_TYPE_CREATURE) {}
     uint32 id1{0};                                             // entry in creature_template
     uint32 id2{0};                                             // entry in creature_template
     uint32 id3{0};                                             // entry in creature_template
-    uint16 mapid{0};
-    uint32 phaseMask{0};
     uint32 displayid{0};
     int8 equipmentId{0};
-    float posX{0.0f};
-    float posY{0.0f};
-    float posZ{0.0f};
-    float orientation{0.0f};
     uint32 spawntimesecs{0};
     float wander_distance{0.0f};
     uint32 currentwaypoint{0};
     uint32 curhealth{0};
     uint32 curmana{0};
     uint8 movementType{0};
-    uint8 spawnMask{0};
     uint32 npcflag{0};
     uint32 unit_flags{0};                                      // enum UnitFlags mask values
     uint32 dynamicflags{0};
-    uint32 ScriptId;
-    bool dbData{true};
 };
 
 struct CreatureModelInfo
@@ -502,39 +493,6 @@ struct VendorItemCount
 };
 
 typedef std::list<VendorItemCount> VendorItemCounts;
-
-struct TrainerSpell
-{
-    TrainerSpell()
-    {
-        for (unsigned int & i : learnedSpell)
-            i = 0;
-    }
-
-    uint32 spell{0};
-    uint32 spellCost{0};
-    uint32 reqSkill{0};
-    uint32 reqSkillValue{0};
-    uint32 reqLevel{0};
-    uint32 learnedSpell[3];
-    uint32 reqSpell{0};
-
-    // helpers
-    [[nodiscard]] bool IsCastable() const { return learnedSpell[0] != spell; }
-};
-
-typedef std::unordered_map<uint32 /*spellid*/, TrainerSpell> TrainerSpellMap;
-
-struct TrainerSpellData
-{
-    TrainerSpellData()  = default;
-    ~TrainerSpellData() { spellList.clear(); }
-
-    TrainerSpellMap spellList;
-    uint32 trainerType{0};                                     // trainer type based at trainer spells, can be different from creature_template value.
-    // req. for correct show non-prof. trainers like weaponmaster, allowed values 0 and 2.
-    [[nodiscard]] TrainerSpell const* Find(uint32 spell_id) const;
-};
 
 struct CreatureSpellCooldown
 {

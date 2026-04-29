@@ -1,31 +1,19 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-/* ScriptData
-SDName: Silithus
-SD%Complete: 100
-SDComment: Quest support: 8304, 8507.
-SDCategory: Silithus
-EndScriptData */
-
-/* ContentData
-npcs_rutgar_and_frankal
-quest_a_pawn_on_the_eternal_pawn
-EndContentData */
 
 #include "AccountMgr.h"
 #include "CreatureScript.h"
@@ -97,16 +85,6 @@ enum EternalBoard
 /*#####
 # Quest: A Pawn on the Eternal Board
 #####*/
-
-/* ContentData
-A Pawn on the Eternal Board - creatures, gameobjects and defines
-npc_qiraj_war_spawn : Adds that are summoned in the Qiraj gates battle.
-npc_anachronos_the_ancient : Creature that controls the event.
-npc_anachronos_quest_trigger: controls the spawning of the BG War mobs.
-go_crystalline_tear : GameObject that begins the event and hands out quest
-TO DO: get correct spell IDs and timings for spells cast upon dragon transformations
-TO DO: Dragons should use the HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF) after transformation, but for some unknown reason it doesnt work.
-EndContentData */
 
 #define EVENT_AREA_RADIUS 65 //65yds
 #define EVENT_COOLDOWN 500000 //in ms. appear after event completed or failed (should be = Adds despawn time)
@@ -1167,7 +1145,7 @@ public:
                 }
             }
 
-            me->DespawnOrUnsummon(5000ms, respawnTimer); // Despawn in 5 Seconds for respawnTimer value
+            me->DespawnOrUnsummon(5s, respawnTimer); // Despawn in 5 Seconds for respawnTimer value
             me->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
             CloseGossipMenuFor(player);
             return false;
@@ -1196,7 +1174,7 @@ public:
                 summons->SetLootRecipient(player);
                 summons->CastSpell(summons, SPELL_SPAWN_IN, false);
                 summons->AI()->Talk(SAY_ON_SPAWN_IN, player);
-                summons->m_Events.AddEvent(new DelayedWindstoneSummonEvent(summons, player->GetGUID()), summons->m_Events.CalculateTime(5200));
+                summons->m_Events.AddEventAtOffset(new DelayedWindstoneSummonEvent(summons, player->GetGUID()), 5200ms);
                 _creatureGuid = summons->GetGUID();
             }
         }

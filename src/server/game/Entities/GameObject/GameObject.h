@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -116,7 +116,7 @@ enum LootState
 // 5 sec for bobber catch
 #define FISHING_BOBBER_READY_TIME 5
 
-class GameObject : public WorldObject, public GridObject<GameObject>, public MovableMapObject
+class GameObject : public WorldObject, public GridObject<GameObject>, public MovableMapObject, public UpdatableMapObject
 {
 public:
     explicit GameObject();
@@ -144,20 +144,20 @@ public:
     [[nodiscard]] ObjectGuid::LowType GetSpawnId() const { return m_spawnId; }
 
     // z_rot, y_rot, x_rot - rotation angles around z, y and x axes
-    void SetLocalRotationAngles(float z_rot, float y_rot, float x_rot);
-    void SetLocalRotation(G3D::Quat const& rot);
+    void SetWorldRotationAngles(float z_rot, float y_rot, float x_rot);
+    void SetWorldRotation(G3D::Quat const& rot);
     void SetTransportPathRotation(float qx, float qy, float qz, float qw);
-    [[nodiscard]] G3D::Quat const& GetLocalRotation() const { return m_localRotation; }
-    [[nodiscard]] int64 GetPackedLocalRotation() const { return m_packedRotation; }
-    [[nodiscard]] G3D::Quat GetWorldRotation() const;
+    [[nodiscard]] G3D::Quat const& GetWorldRotation() const { return WorldRotation; }
+    [[nodiscard]] int64 GetPackedWorldRotation() const { return m_packedRotation; }
+    [[nodiscard]] G3D::Quat GetFinalWorldRotation() const;
 
     // overwrite WorldObject function for proper name localization
     [[nodiscard]] std::string const& GetNameForLocaleIdx(LocaleConstant locale_idx) const override;
 
     void SaveToDB(bool saveAddon = false);
     void SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask, bool saveAddon = false);
-    bool LoadFromDB(ObjectGuid::LowType guid, Map* map) { return LoadGameObjectFromDB(guid, map, false); }
-    bool LoadGameObjectFromDB(ObjectGuid::LowType guid, Map* map, bool addToMap = true);
+    virtual bool LoadFromDB(ObjectGuid::LowType guid, Map* map) { return LoadGameObjectFromDB(guid, map, false); }
+    virtual bool LoadGameObjectFromDB(ObjectGuid::LowType guid, Map* map, bool addToMap = true);
     void DeleteFromDB();
 
     void SetOwnerGUID(ObjectGuid owner)
@@ -231,8 +231,8 @@ public:
     void RemoveLootMode(uint16 lootMode) { m_LootMode &= ~lootMode; }
     void ResetLootMode() { m_LootMode = LOOT_MODE_DEFAULT; }
 
-    void AddToSkillupList(ObjectGuid playerGuid);
-    [[nodiscard]] bool IsInSkillupList(ObjectGuid playerGuid) const;
+    void AddToSkillupList(ObjectGuid const& playerGuid);
+    [[nodiscard]] bool IsInSkillupList(ObjectGuid const& playerGuid) const;
 
     void AddUniqueUse(Player* player);
     void AddUse() { ++m_usetimes; }
@@ -284,7 +284,8 @@ public:
 
     void CastSpell(Unit* target, uint32 spell);
     void SendCustomAnim(uint32 anim);
-    [[nodiscard]] bool IsInRange(float x, float y, float z, float radius) const;
+    bool IsInRange2d(float x, float y, float radius) const;
+    bool IsInRange3d(float x, float y, float z, float radius) const;
 
     void ModifyHealth(int32 change, Unit* attackerOrHealer = nullptr, uint32 spellId = 0);
     void SetDestructibleBuildingModifyState(bool allow) { m_allowModifyDestructibleBuilding = allow; }
@@ -362,6 +363,8 @@ public:
     void SaveStateToDB();
 
     std::string GetDebugInfo() const override;
+
+    bool IsUpdateNeeded() override;
 protected:
     bool AIM_Initialize();
     GameObjectModel* CreateModel();
@@ -392,7 +395,7 @@ protected:
     bool m_allowModifyDestructibleBuilding;
 
     int64 m_packedRotation;
-    G3D::Quat m_localRotation;
+    G3D::Quat WorldRotation;
     Position m_stationaryPosition;
 
     ObjectGuid m_lootRecipient;
@@ -412,12 +415,15 @@ private:
     void UpdatePackedRotation();
 
     //! Object distance/size - overridden from Object::_IsWithinDist. Needs to take in account proper GO size.
-    bool _IsWithinDist(WorldObject const* obj, float dist2compare, bool /*is3D*/, bool /*useBoundingRadius = true*/) const override
+    bool _IsWithinDist(WorldObject const* obj, float dist2compare, bool /*is3D*/, bool /*incOwnRadius = true*/, bool /*incTargetRadius = true*/) const override
     {
         //! Following check does check 3d distance
         dist2compare += obj->GetObjectSize();
-        return IsInRange(obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ(), dist2compare);
+        return IsInRange3d(obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ(), dist2compare);
     }
+
+    bool IsWithinSightRange(Position const& pos, float dist) const override;
+
     GameObjectAI* m_AI;
 
     bool m_saveStateOnDb = false;

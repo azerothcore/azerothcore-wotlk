@@ -1,34 +1,19 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
-/* ScriptData
-SDName: Stormwind_City
-SD%Complete: 100
-SDComment: Quest support: 1447, 4185, 11223, 434.
-SDCategory: Stormwind City
-EndScriptData */
-
-/* ContentData
-npc_archmage_malin
-npc_tyrion
-npc_tyrion_spybot
-npc_marzon_silent_blade
-npc_lord_gregor_lescovar
-EndContentData */
 
 #include "CreatureScript.h"
 #include "Player.h"
@@ -103,6 +88,7 @@ public:
             }
         }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 waypointId) override
         {
             switch (waypointId)
@@ -333,6 +319,7 @@ public:
             uiPhase = 0;
         }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 waypointId) override
         {
             switch (waypointId)
@@ -421,7 +408,8 @@ public:
                             {
                                 if (Player* player = GetPlayerForEscort())
                                 {
-                                    CAST_AI(npc_lord_gregor_lescovar::npc_lord_gregor_lescovarAI, pLescovar->AI())->Start(false, false, player->GetGUID());
+                                    pLescovar->SetWalk(true);
+                                    CAST_AI(npc_lord_gregor_lescovar::npc_lord_gregor_lescovarAI, pLescovar->AI())->Start(false, player->GetGUID());
                                     CAST_AI(npc_lord_gregor_lescovar::npc_lord_gregor_lescovarAI, pLescovar->AI())->SetMaxPlayerDistance(200.0f);
                                 }
                             }
@@ -463,12 +451,47 @@ public:
         {
             if (Creature* pSpybot = creature->FindNearestCreature(NPC_TYRION_SPYBOT, 5.0f, true))
             {
-                CAST_AI(npc_tyrion_spybot::npc_tyrion_spybotAI, pSpybot->AI())->Start(false, false, player->GetGUID());
+                pSpybot->SetWalk(true);
+                CAST_AI(npc_tyrion_spybot::npc_tyrion_spybotAI, pSpybot->AI())->Start(false, player->GetGUID());
                 CAST_AI(npc_tyrion_spybot::npc_tyrion_spybotAI, pSpybot->AI())->SetMaxPlayerDistance(200.0f);
             }
             return true;
         }
         return false;
+    }
+};
+
+enum KingVarianWrynn : uint32
+{
+    // Deathknight Starting Zone End
+    QUEST_WHERE_KINGS_WALK       = 13188,
+};
+// 29611 - King Varian Wryn
+/// @todo add abilities/timers
+struct npc_king_varian_wrynn : public ScriptedAI
+{
+    npc_king_varian_wrynn(Creature* creature) : ScriptedAI(creature) { }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        DoRewardPlayersInArea();
+    }
+
+    void UpdateAI(uint32 /*diff*/) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        DoMeleeAttackIfReady();
+    }
+
+    bool OnQuestReward(Player* player, Creature* /*creature*/, Quest const* quest, uint32 /*item*/)
+    {
+
+        if (quest->GetQuestId() == QUEST_WHERE_KINGS_WALK)
+            sLFGMgr->InitializeLockedDungeons(player);
+
+        return true;
     }
 };
 
@@ -478,4 +501,6 @@ void AddSC_stormwind_city()
     new npc_tyrion_spybot();
     new npc_lord_gregor_lescovar();
     new npc_marzon_silent_blade();
+    RegisterCreatureAI(npc_king_varian_wrynn);
+
 }

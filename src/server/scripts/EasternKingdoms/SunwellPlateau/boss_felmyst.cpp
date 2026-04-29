@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -108,8 +108,8 @@ const Position RightSideLanes[3] =
 
 const Position RightSide = { 1458.5555f, 502.1995f, 59.899513f, 1.605702f };
 const Position LeftSide = { 1469.0642f, 729.5854f, 59.823853f, 4.6774f };
-const Position LandingRightPos = { 1476.77f, 665.094f, 20.6423f };
-const Position LandingLeftPos = { 1469.93f, 557.009f, 22.631699f };
+const Position LandingLeftPos = { 1476.77f, 665.094f, 20.6423f };
+const Position LandingRightPos = { 1469.93f, 557.009f, 22.631699f };
 
 class CorruptTriggers : public BasicEvent
 {
@@ -157,7 +157,7 @@ struct boss_felmyst : public BossAI
             me->SetCanFly(true);
             me->SetDisableGravity(true);
             me->SendMovementFlagUpdate();
-            me->GetMotionMaster()->MovePath(me->GetEntry() * 10, true);
+            me->GetMotionMaster()->MoveWaypoint(me->GetEntry() * 10, true);
         }
     }
 
@@ -205,7 +205,7 @@ struct boss_felmyst : public BossAI
 
         // Summon Kalecgos (human form of kalecgos fight)
         if (Creature* kalec = me->SummonCreature(NPC_KALECGOS_FELMYST, 1573.1461f, 755.20245f, 99.524956f, 3.595378f))
-            kalec->GetMotionMaster()->MovePoint(POINT_KALECGOS, 1474.2347f, 624.0703f, 29.32589f, false, true);
+            kalec->GetMotionMaster()->MovePoint(POINT_KALECGOS, 1474.2347f, 624.0703f, 29.32589f, FORCED_MOVEMENT_NONE, 0.f, 0.f, false, true);
     }
 
     void ScheduleGroundAbilities()
@@ -312,25 +312,26 @@ struct boss_felmyst : public BossAI
                     ++_strafeCount;
                     _currentLane = urand(0, 2);
                     if (isRightSide)
-                        me->GetMotionMaster()->MovePoint(POINT_LANE, RightSideLanes[_currentLane], false);
+                        me->GetMotionMaster()->MovePoint(POINT_LANE, RightSideLanes[_currentLane], FORCED_MOVEMENT_NONE, 0.f, false);
                     else
-                        me->GetMotionMaster()->MovePoint(POINT_LANE, LeftSideLanes[_currentLane], false);
+                        me->GetMotionMaster()->MovePoint(POINT_LANE, LeftSideLanes[_currentLane], FORCED_MOVEMENT_NONE, 0.f, false);
                 }, 5s);
                 break;
             case POINT_LANE:
                 Talk(EMOTE_BREATH);
-                me->m_Events.AddEventAtOffset([&] {
+                me->m_Events.AddEventAtOffset([this]()
+                {
                     for (uint8 i = 0; i < 16; ++i)
-                        me->m_Events.AddEvent(new CorruptTriggers(me, _currentLane), me->m_Events.CalculateTime(i*250));
+                        me->m_Events.AddEventAtOffset(new CorruptTriggers(me, _currentLane), Milliseconds(i * 250));
                 }, 5s);
 
                 me->m_Events.AddEventAtOffset([&] {
                     DoCastSelf(SPELL_FELMYST_SPEED_BURST, true);
 
                     if (me->FindNearestCreature(NPC_WORLD_TRIGGER_RIGHT, 30.0f))
-                        me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_END, LeftSideLanes[_currentLane], false);
+                        me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_END, LeftSideLanes[_currentLane], FORCED_MOVEMENT_NONE, 0.f, false);
                     else
-                        me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_END, RightSideLanes[_currentLane], false);
+                        me->GetMotionMaster()->MovePoint(POINT_AIR_BREATH_END, RightSideLanes[_currentLane], FORCED_MOVEMENT_NONE, 0.f, false);
                 }, 5s);
                 break;
             case POINT_AIR_BREATH_END:
@@ -338,9 +339,9 @@ struct boss_felmyst : public BossAI
 
                 me->m_Events.AddEventAtOffset([&] {
                     if (me->FindNearestCreature(NPC_WORLD_TRIGGER_RIGHT, 30.0f))
-                        me->GetMotionMaster()->MovePoint(POINT_AIR_UP, RightSide, false);
+                        me->GetMotionMaster()->MovePoint(POINT_AIR_UP, RightSide, FORCED_MOVEMENT_NONE, 0.f, false);
                     else
-                        me->GetMotionMaster()->MovePoint(POINT_AIR_UP, LeftSide, false);
+                        me->GetMotionMaster()->MovePoint(POINT_AIR_UP, LeftSide, FORCED_MOVEMENT_NONE, 0.f, false);
                 }, 2s);
                 break;
         }
@@ -362,7 +363,7 @@ struct boss_felmyst : public BossAI
 
             me->m_Events.AddEventAtOffset([&] {
                 me->SetImmuneToPC(false);
-                me->GetMotionMaster()->MovePath(me->GetEntry() * 10, true);
+                me->GetMotionMaster()->MoveWaypoint(me->GetEntry() * 10, true);
             }, 8500ms);
         });
     }
@@ -425,7 +426,7 @@ struct npc_demonic_vapor_trail : public NullCreatureAI
     void Reset() override
     {
         me->CastSpell(me, SPELL_DEMONIC_VAPOR_TRAIL_PERIODIC, true);
-        me->DespawnOrUnsummon(20000);
+        me->DespawnOrUnsummon(20s);
     }
 
     void SpellHitTarget(Unit* /*unit*/, SpellInfo const* spellInfo) override

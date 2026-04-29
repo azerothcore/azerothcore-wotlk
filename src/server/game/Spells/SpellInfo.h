@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -22,6 +22,7 @@
 #include "Object.h"
 #include "SharedDefines.h"
 #include "SpellAuraDefines.h"
+#include <boost/container/flat_set.hpp>
 #include "Util.h"
 
 class Unit;
@@ -213,6 +214,26 @@ enum SpellCustomAttributes
 
 uint32 GetTargetFlagMask(SpellTargetObjectTypes objType);
 
+struct SpellDiminishInfo
+{
+    DiminishingGroup DiminishGroup = DIMINISHING_NONE;
+    DiminishingReturnsType DiminishReturnType = DRTYPE_NONE;
+    int32 DiminishMaxLevel = 3;     // DIMINISHING_LEVEL_IMMUNE
+    int32 DiminishDurationLimit = 0;
+};
+
+struct AC_GAME_API ImmunityInfo
+{
+    uint32 SchoolImmuneMask = 0;
+    uint32 ApplyHarmfulAuraImmuneMask = 0;
+    uint64 MechanicImmuneMask = 0;
+    uint32 DispelImmuneMask = 0;
+    uint32 DamageSchoolMask = 0;
+
+    boost::container::flat_set<AuraType> AuraTypeImmune;
+    boost::container::flat_set<SpellEffects> SpellEffectImmune;
+};
+
 class SpellImplicitTargetInfo
 {
 private:
@@ -248,10 +269,10 @@ private:
 class SpellEffectInfo
 {
     SpellInfo const* _spellInfo;
-    uint8 _effIndex;
 public:
+    uint8     EffectIndex;
     uint32    Effect;
-    uint32    ApplyAuraName;
+    AuraType  ApplyAuraName;
     uint32    Amplitude;
     int32     DieSides;
     float     RealPointsPerLevel;
@@ -272,7 +293,7 @@ public:
     flag96    SpellClassMask;
     std::list<Condition*>* ImplicitTargetConditions;
 
-    SpellEffectInfo() : _spellInfo(nullptr), _effIndex(0), Effect(0), ApplyAuraName(0), Amplitude(0), DieSides(0),
+    SpellEffectInfo() : _spellInfo(nullptr), EffectIndex(0), Effect(0), ApplyAuraName(SPELL_AURA_NONE), Amplitude(0), DieSides(0),
         RealPointsPerLevel(0), BasePoints(0), PointsPerComboPoint(0), ValueMultiplier(0), DamageMultiplier(0),
         BonusMultiplier(0), MiscValue(0), MiscValueB(0), Mechanic(MECHANIC_NONE), RadiusEntry(nullptr), ChainTarget(0),
         ItemType(0), TriggerSpell(0), ImplicitTargetConditions(nullptr) {}
@@ -302,6 +323,8 @@ public:
     SpellEffectImplicitTargetTypes GetImplicitTargetType() const;
     SpellTargetObjectTypes GetUsedTargetObjectType() const;
 
+    [[nodiscard]] ImmunityInfo const* GetImmunityInfo() const;
+
 private:
     struct StaticData
     {
@@ -310,6 +333,7 @@ private:
     };
 
     static std::array<StaticData, TOTAL_SPELL_EFFECTS> _data;
+
 };
 
 class AC_GAME_API SpellInfo
@@ -401,6 +425,7 @@ public:
     bool _isSpellValid;
     bool _isCritCapable;
     bool _requireCooldownInfo;
+    float JumpDistance;
 
     SpellInfo(SpellEntry const* spellEntry);
     ~SpellInfo();
@@ -411,6 +436,7 @@ public:
     bool HasAura(AuraType aura) const;
     bool HasAnyAura() const;
     bool HasAreaAuraEffect() const;
+    bool HasOnlyDamageEffects() const;
 
     inline bool HasAttribute(SpellAttr0 attribute) const { return (Attributes & attribute) != 0; }
     inline bool HasAttribute(SpellAttr1 attribute) const { return (AttributesEx & attribute) != 0; }
@@ -465,12 +491,19 @@ public:
     bool IsBreakingStealth() const;
     bool IsRangedWeaponSpell() const;
     bool IsAutoRepeatRangedSpell() const;
+    bool HasInitialAggro() const;
+
+    [[nodiscard]] bool IsAffected(uint32 familyName, flag96 const& familyFlags) const;
 
     bool IsAffectedBySpellMods() const;
     bool IsAffectedBySpellMod(SpellModifier const* mod) const;
 
-    bool CanPierceImmuneAura(SpellInfo const* aura) const;
-    bool CanDispelAura(SpellInfo const* aura) const;
+    bool CanPierceImmuneAura(SpellInfo const* auraSpellInfo) const;
+    bool CanDispelAura(SpellInfo const* auraSpellInfo) const;
+
+    void ApplyAllSpellImmunitiesTo(Unit* target, SpellEffectInfo const* effect, bool apply) const;
+    bool CanSpellProvideImmunityAgainstAura(SpellInfo const* auraSpellInfo) const;
+    bool CanSpellCastOverrideAuraEffect(AuraEffect const* aurEff) const;
 
     bool IsSingleTarget() const;
     bool IsAuraExclusiveBySpecificWith(SpellInfo const* spellInfo) const;
@@ -482,17 +515,16 @@ public:
     SpellCastResult CheckExplicitTarget(Unit const* caster, WorldObject const* target, Item const* itemTarget = nullptr) const;
     bool CheckTargetCreatureType(Unit const* target) const;
 
-    // xinef: aura stacking
-    bool IsStrongerAuraActive(Unit const* caster, Unit const* target) const;
     bool IsAuraEffectEqual(SpellInfo const* otherSpellInfo) const;
     bool ValidateAttribute6SpellDamageMods(Unit const* caster, const AuraEffect* auraEffect, bool isDot) const;
 
     SpellSchoolMask GetSchoolMask() const;
-    uint32 GetAllEffectsMechanicMask() const;
-    uint32 GetEffectMechanicMask(uint8 effIndex) const;
-    uint32 GetSpellMechanicMaskByEffectMask(uint32 effectMask) const;
+    uint64 GetAllEffectsMechanicMask() const;
+    uint64 GetEffectMechanicMask(uint8 effIndex) const;
+    uint64 GetSpellMechanicMaskByEffectMask(uint32 effectMask) const;
     Mechanics GetEffectMechanic(uint8 effIndex) const;
     bool HasAnyEffectMechanic() const;
+    [[nodiscard]] ImmunityInfo const* GetImmunityInfo(uint8 effIndex) const { return effIndex < MAX_SPELL_EFFECTS ? &_immunityInfo[effIndex] : nullptr; }
     uint32 GetDispelMask() const;
     static uint32 GetDispelMask(DispelType type);
     uint32 GetExplicitTargetMask() const;
@@ -539,9 +571,13 @@ public:
     // unloading helpers
     void _UnloadImplicitTargetConditionLists();
 
-    bool CheckElixirStacking(Unit const* caster) const;
+    // immunity helpers
+    void _LoadImmunityInfo();
 
-private:
+    SpellDiminishInfo _diminishInfoNonTriggered;
+    SpellDiminishInfo _diminishInfoTriggered;
+
+    ImmunityInfo _immunityInfo[MAX_SPELL_EFFECTS];
     std::array<SpellEffectInfo, MAX_SPELL_EFFECTS>& _GetEffects() { return Effects; }
     SpellEffectInfo& _GetEffect(SpellEffIndex index) { ASSERT(index < Effects.size()); return Effects[index]; }
 };

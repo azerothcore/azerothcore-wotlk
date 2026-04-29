@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -20,63 +20,25 @@
 */
 
 #include "WeatherMgr.h"
+#include "Containers.h"
+#include "DatabaseEnv.h"
 #include "Log.h"
-#include "MiscPackets.h"
 #include "ObjectMgr.h"
-#include "Player.h"
+#include "QueryResult.h"
+#include "Timer.h"
 #include "Weather.h"
-#include "WorldSession.h"
 
 namespace WeatherMgr
 {
 
     namespace
     {
-        typedef std::unordered_map<uint32, std::unique_ptr<Weather>> WeatherMap;
-        typedef std::unordered_map<uint32, WeatherData> WeatherZoneMap;
-
-        WeatherMap m_weathers;
-        WeatherZoneMap mWeatherZoneMap;
-
-        WeatherData const* GetWeatherData(uint32 zone_id)
-        {
-            WeatherZoneMap::const_iterator itr = mWeatherZoneMap.find(zone_id);
-            return (itr != mWeatherZoneMap.end()) ? &itr->second : nullptr;
-        }
+        std::unordered_map<uint32, WeatherData> _weatherData;
     }
 
-    /// Find a Weather object by the given zoneid
-    Weather* FindWeather(uint32 id)
+    WeatherData const* GetWeatherData(uint32 zone_id)
     {
-        WeatherMap::const_iterator itr = m_weathers.find(id);
-        return (itr != m_weathers.end()) ? itr->second.get() : 0;
-    }
-
-    /// Remove a Weather object for the given zoneid
-    void RemoveWeather(uint32 id)
-    {
-        // not called at the moment. Kept for completeness
-        WeatherMap::iterator itr = m_weathers.find(id);
-
-        if (itr != m_weathers.end())
-            m_weathers.erase(itr);
-    }
-
-    /// Add a Weather object to the list
-    Weather* AddWeather(uint32 zone_id)
-    {
-        WeatherData const* weatherChances = GetWeatherData(zone_id);
-
-        // zone does not have weather, ignore
-        if (!weatherChances)
-            return nullptr;
-
-        Weather* w = new Weather(zone_id, weatherChances);
-        m_weathers[w->GetZone()].reset(w);
-        w->ReGenerate();
-        w->UpdateWeather();
-
-        return w;
+        return Acore::Containers::MapGetValuePtr(_weatherData, zone_id);
     }
 
     void LoadWeatherData()
@@ -105,7 +67,7 @@ namespace WeatherMgr
 
             uint32 zone_id = fields[0].Get<uint32>();
 
-            WeatherData& wzc = mWeatherZoneMap[zone_id];
+            WeatherData& wzc = _weatherData[zone_id];
 
             for (uint8 season = 0; season < WEATHER_SEASONS; ++season)
             {
@@ -140,27 +102,4 @@ namespace WeatherMgr
         LOG_INFO("server.loading", ">> Loaded {} Weather Definitions in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
         LOG_INFO("server.loading", " ");
     }
-
-    void SendFineWeatherUpdateToPlayer(Player* player)
-    {
-        WorldPackets::Misc::Weather weather(WEATHER_STATE_FINE);
-        player->SendDirectMessage(weather.Write());
-    }
-
-    void Update(uint32 diff)
-    {
-        ///- Send an update signal to Weather objects
-        WeatherMap::iterator itr, next;
-        for (itr = m_weathers.begin(); itr != m_weathers.end(); itr = next)
-        {
-            next = itr;
-            ++next;
-
-            ///- and remove Weather objects for zones with no player
-            // As interval > WorldTick
-            if (!itr->second->Update(diff))
-                m_weathers.erase(itr);
-        }
-    }
-
 } // namespace

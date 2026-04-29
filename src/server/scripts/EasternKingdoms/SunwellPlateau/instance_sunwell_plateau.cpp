@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -78,7 +78,7 @@ ObjectData const summonData[] =
 class instance_sunwell_plateau : public InstanceMapScript
 {
 public:
-    instance_sunwell_plateau() : InstanceMapScript("instance_sunwell_plateau", 580) { }
+    instance_sunwell_plateau() : InstanceMapScript("instance_sunwell_plateau", MAP_THE_SUNWELL) { }
 
     struct instance_sunwell_plateau_InstanceMapScript : public InstanceScript
     {
@@ -292,12 +292,7 @@ enum SunbladeArchMageSpells
 struct npc_sunblade_arch_mage : public ScriptedAI
 {
     npc_sunblade_arch_mage(Creature* creature) : ScriptedAI(creature)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    {    }
 
     void Reset() override
     {
@@ -336,6 +331,22 @@ private:
     TaskScheduler scheduler;
 };
 
+class spell_spell_fury_aura : public AuraScript
+{
+    PrepareAuraScript(spell_spell_fury_aura);
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (GetUnitOwner()->ToPlayer())
+            ModStackAmount(5);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_spell_fury_aura::OnApply, EFFECT_0, SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_instance_sunwell_plateau()
 {
     new instance_sunwell_plateau();
@@ -345,4 +356,5 @@ void AddSC_instance_sunwell_plateau()
     RegisterSpellScriptWithArgs(spell_sunwell_teleport, "spell_teleport_to_apex_point", SPELL_TELEPORT_TO_APEX_POINT);
     RegisterSpellScriptWithArgs(spell_sunwell_teleport, "spell_teleport_to_witchs_sanctum", SPELL_TELEPORT_TO_WITCHS_SANCTUM);
     RegisterSpellScriptWithArgs(spell_sunwell_teleport, "spell_teleport_to_sunwell_plateau", SPELL_TELEPORT_TO_SUNWELL_PLATEAU);
+    RegisterSpellScript(spell_spell_fury_aura);
 }

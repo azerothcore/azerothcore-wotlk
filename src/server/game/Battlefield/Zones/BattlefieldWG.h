@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -21,6 +21,8 @@
 #include "Battlefield.h"
 #include "Log.h"
 #include "World.h"
+#include "WorldState.h"
+#include "WorldStateDefines.h"
 #include "WorldStatePackets.h"
 
 class Group;
@@ -30,15 +32,15 @@ class WintergraspCapturePoint;
 struct BfWGGameObjectBuilding;
 struct WGWorkshop;
 
-typedef std::set<GameObject*> GameObjectSet;
-typedef std::set<BfWGGameObjectBuilding*> GameObjectBuilding;
-typedef std::set<WGWorkshop*> Workshop;
-typedef std::set<Group*> GroupSet;
-//typedef std::set<WintergraspCapturePoint *> CapturePointSet; unused ?
+using GameObjectSet = std::set<GameObject*>;
+using GameObjectBuilding = std::set<BfWGGameObjectBuilding*>;
+using Workshop = std::set<WGWorkshop*>;
+using GroupSet = std::set<Group*>;
+//using CapturePointSet = std::set<WintergraspCapturePoint*>; unused ?
 
-uint32 const VehNumWorldState[2] = { 3680, 3490 };
-uint32 const MaxVehNumWorldState[2] = { 3681, 3491 };
-uint32 const ClockWorldState[2] = { 3781, 4354 };
+uint32 const VehNumWorldState[2] = { WORLD_STATE_BATTLEFIELD_WG_VEHICLE_A, WORLD_STATE_BATTLEFIELD_WG_VEHICLE_H };
+uint32 const MaxVehNumWorldState[2] = { WORLD_STATE_BATTLEFIELD_WG_MAX_VEHICLE_A, WORLD_STATE_BATTLEFIELD_WG_MAX_VEHICLE_H };
+uint32 const ClockWorldState[2] = { WORLD_STATE_BATTLEFIELD_WG_CLOCK, WORLD_STATE_BATTLEFIELD_WG_CLOCK_TEXTS };
 uint32 const WintergraspFaction[3] = { 1, 2, 35 };
 float const WintergraspStalkerPos[4]    = { 4948.985f, 2937.789f, 550.5172f, 1.815142f };
 
@@ -99,34 +101,6 @@ enum WintergraspData
     BATTLEFIELD_WG_DATA_MAX,
 };
 
-enum WintergraspWorldStates
-{
-    BATTLEFIELD_WG_WORLD_STATE_VEHICLE_H         = 3490,
-    BATTLEFIELD_WG_WORLD_STATE_MAX_VEHICLE_H     = 3491,
-    BATTLEFIELD_WG_WORLD_STATE_VEHICLE_A         = 3680,
-    BATTLEFIELD_WG_WORLD_STATE_MAX_VEHICLE_A     = 3681,
-    BATTLEFIELD_WG_WORLD_STATE_ACTIVE            = 3801,
-    BATTLEFIELD_WG_WORLD_STATE_DEFENDER          = 3802,
-    BATTLEFIELD_WG_WORLD_STATE_ATTACKER          = 3803,
-    BATTLEFIELD_WG_WORLD_STATE_SHOW_WORLDSTATE   = 3710,
-    BATTLEFIELD_WG_WORLD_STATE_CONTROL           = 3804, // Shows on the map who controls WG
-    BATTLEFIELD_WG_WORLD_STATE_ICON_ACTIVE       = 4375, // Activates "ice" icon
-};
-
-enum WintergraspAreaIds
-{
-    BATTLEFIELD_WG_ZONEID           = 4197,             // Wintergrasp
-    BATTLEFIELD_WG_MAPID            = 571,              // Northrend
-
-    AREA_WINTERGRASP_FORTRESS       = 4575,
-    AREA_THE_SUNKEN_RING            = 4538,
-    AREA_THE_BROKEN_TEMPLE          = 4539,
-    AREA_WESTPARK_WORKSHOP          = 4611,
-    AREA_EASTPARK_WORKSHOP          = 4612,
-    AREA_WINTERGRASP                = 4197,
-    AREA_THE_CHILLED_QUAGMIRE       = 4589,
-};
-
 /*#########################
  *####### Graveyards ######
  *#########################*/
@@ -136,10 +110,10 @@ class BfGraveyardWG : public BfGraveyard
 public:
     BfGraveyardWG(BattlefieldWG* Bf);
 
-    void SetTextId(uint32 textid) { m_GossipTextId = textid; }
-    uint32 GetTextId() { return m_GossipTextId; }
+    void SetTextId(uint32 textid) { GossipTextId = textid; }
+    uint32 GetTextId() const { return GossipTextId; }
 protected:
-    uint32 m_GossipTextId;
+    uint32 GossipTextId;
 };
 
 enum WGGraveyardId
@@ -262,13 +236,13 @@ class WintergraspCapturePoint : public BfCapturePoint
 public:
     WintergraspCapturePoint(BattlefieldWG* battlefield, TeamId teamInControl);
 
-    void LinkToWorkshop(WGWorkshop* workshop) { m_Workshop = workshop; }
+    void LinkToWorkshop(WGWorkshop* workshop) { LinkedWorkshop = workshop; }
 
     void ChangeTeam(TeamId oldteam) override;
-    TeamId GetTeam() const { return m_team; }
+    TeamId GetTeam() const { return Team; }
 
 protected:
-    WGWorkshop* m_Workshop;
+    WGWorkshop* LinkedWorkshop;
 };
 
 /* ######################### *
@@ -389,16 +363,16 @@ public:
     bool SetupBattlefield() override;
 
     /// Return pointer to relic object
-    GameObject* GetRelic() { return GetGameObject(m_titansRelic); }
+    GameObject* GetRelic() { return GetGameObject(TitansRelic); }
 
     /// Define relic object
-    //void SetRelic(GameObject* relic) { m_titansRelic = relic; }
+    //void SetRelic(GameObject* relic) { TitansRelic = relic; }
 
     /// Check if players can interact with the relic (Only if the last door has been broken)
-    bool CanInteractWithRelic() { return m_isRelicInteractible; }
+    bool CanInteractWithRelic() { return IsRelicInteractible; }
 
     /// Define if player can interact with the relic
-    void SetRelicInteractible(bool allow) { m_isRelicInteractible = allow; }
+    void SetRelicInteractible(bool allow) { IsRelicInteractible = allow; }
 
     /// Vehicle world states update
     void UpdateCounterVehicle(bool init);
@@ -460,25 +434,23 @@ public:
         return false;
     }
 protected:
-    bool m_isRelicInteractible;
+    bool IsRelicInteractible;
 
     Workshop WorkshopsList;
 
     GameObjectSet DefenderPortalList;
-    GameObjectSet m_KeepGameObject[2];
+    GameObjectSet KeepGameObject[2];
     GameObjectBuilding BuildingsInZone;
 
-    GuidUnorderedSet m_vehicles[2];
+    GuidUnorderedSet Vehicles[2];
     GuidUnorderedSet CanonList;
     GuidUnorderedSet KeepCreature[2];
     GuidUnorderedSet OutsideCreature[2];
-    GuidUnorderedSet m_updateTenacityList;
+    GuidUnorderedSet UpdateTenacityList;
 
-    int32 m_tenacityStack;
-    uint32 m_tenacityUpdateTimer;
-    uint32 m_saveTimer;
+    int32 TenacityStack;
 
-    ObjectGuid m_titansRelic;
+    ObjectGuid TitansRelic;
 };
 
 uint8 const WG_MAX_OBJ = 32;
@@ -520,20 +492,6 @@ enum WintergraspWorkshopIds
     BATTLEFIELD_WG_WORKSHOP_SW,
     BATTLEFIELD_WG_WORKSHOP_KEEP_WEST,
     BATTLEFIELD_WG_WORKSHOP_KEEP_EAST,
-};
-
-enum WintergraspWorldstates
-{
-    WORLDSTATE_WORKSHOP_NE = 3701,
-    WORLDSTATE_WORKSHOP_NW = 3700,
-    WORLDSTATE_WORKSHOP_SE = 3703,
-    WORLDSTATE_WORKSHOP_SW = 3702,
-    WORLDSTATE_WORKSHOP_K_W = 3698,
-    WORLDSTATE_WORKSHOP_K_E = 3699,
-    WORLDSTATE_HORDE_KEEP_CAPTURED = 4022,
-    WORLDSTATE_HORDE_KEEP_DEFENDED = 4024,
-    WORLDSTATE_ALLIANCE_KEEP_CAPTURED = 4023,
-    WORLDSTATE_ALLIANCE_KEEP_DEFENDED = 4025,
 };
 
 /// @todo: Handle this with creature_text ?
@@ -598,10 +556,7 @@ struct WintergraspObjectPositionData
     uint32 entryAlliance;
 };
 
-// *****************************************************
-// ************ Destructible (Wall,Tower..) ************
-// *****************************************************
-
+// Destructible buildings (walls, towers, etc.)
 struct WintergraspBuildingSpawnData
 {
     uint32 entry;
@@ -788,10 +743,7 @@ WintergraspTeleporterData const WGPortalDefenderData[WG_MAX_TELEPORTER] =
     { 192951, 5316.25f, 2977.04f, 408.539f, -0.820f },
 };
 
-// *********************************************************
-// **********Tower Element(GameObject,Creature)*************
-// *********************************************************
-
+// Tower elements (GameObjects and Creatures)
 struct WintergraspTowerData
 {
     uint32 towerEntry;                  // Gameobject id of tower
@@ -1062,10 +1014,7 @@ WintergraspTowerCannonData const TowerCannon[WG_MAX_TOWER_CANNON] =
     },
 };
 
-// *********************************************************
-// *****************WorkShop Data & Element*****************
-// *********************************************************
-
+// Workshop data and elements
 uint8 const WG_MAX_WORKSHOP = 6;
 
 struct WGWorkshopData
@@ -1079,23 +1028,22 @@ struct WGWorkshopData
 WGWorkshopData const WorkshopsData[WG_MAX_WORKSHOP] =
 {
     // NE
-    {BATTLEFIELD_WG_WORKSHOP_NE, WORLDSTATE_WORKSHOP_NE, BATTLEFIELD_WG_TEXT_WORKSHOP_NE_ATTACK, BATTLEFIELD_WG_TEXT_WORKSHOP_NE_TAKEN},
+    {BATTLEFIELD_WG_WORKSHOP_NE, WORLD_STATE_BATTLEFIELD_WG_WORKSHOP_NE, BATTLEFIELD_WG_TEXT_WORKSHOP_NE_ATTACK, BATTLEFIELD_WG_TEXT_WORKSHOP_NE_TAKEN},
     // NW
-    {BATTLEFIELD_WG_WORKSHOP_NW, WORLDSTATE_WORKSHOP_NW, BATTLEFIELD_WG_TEXT_WORKSHOP_NW_ATTACK, BATTLEFIELD_WG_TEXT_WORKSHOP_NW_TAKEN},
+    {BATTLEFIELD_WG_WORKSHOP_NW, WORLD_STATE_BATTLEFIELD_WG_WORKSHOP_NW, BATTLEFIELD_WG_TEXT_WORKSHOP_NW_ATTACK, BATTLEFIELD_WG_TEXT_WORKSHOP_NW_TAKEN},
     // SE
-    {BATTLEFIELD_WG_WORKSHOP_SE, WORLDSTATE_WORKSHOP_SE, BATTLEFIELD_WG_TEXT_WORKSHOP_SE_ATTACK, BATTLEFIELD_WG_TEXT_WORKSHOP_SE_TAKEN},
+    {BATTLEFIELD_WG_WORKSHOP_SE, WORLD_STATE_BATTLEFIELD_WG_WORKSHOP_SE, BATTLEFIELD_WG_TEXT_WORKSHOP_SE_ATTACK, BATTLEFIELD_WG_TEXT_WORKSHOP_SE_TAKEN},
     // SW
-    {BATTLEFIELD_WG_WORKSHOP_SW, WORLDSTATE_WORKSHOP_SW, BATTLEFIELD_WG_TEXT_WORKSHOP_SW_ATTACK, BATTLEFIELD_WG_TEXT_WORKSHOP_SW_TAKEN},
+    {BATTLEFIELD_WG_WORKSHOP_SW, WORLD_STATE_BATTLEFIELD_WG_WORKSHOP_SW, BATTLEFIELD_WG_TEXT_WORKSHOP_SW_ATTACK, BATTLEFIELD_WG_TEXT_WORKSHOP_SW_TAKEN},
     // KEEP WEST - It can't be taken
-    {BATTLEFIELD_WG_WORKSHOP_KEEP_WEST, WORLDSTATE_WORKSHOP_K_W, 0, BATTLEFIELD_WG_TEXT_WORKSHOP_NE_TAKEN},
+    {BATTLEFIELD_WG_WORKSHOP_KEEP_WEST, WORLD_STATE_BATTLEFIELD_WG_WORKSHOP_K_W, 0, BATTLEFIELD_WG_TEXT_WORKSHOP_NE_TAKEN},
     // KEEP EAST - It can't be taken
-    {BATTLEFIELD_WG_WORKSHOP_KEEP_EAST, WORLDSTATE_WORKSHOP_K_E, 0, BATTLEFIELD_WG_TEXT_WORKSHOP_NE_TAKEN}
+    {BATTLEFIELD_WG_WORKSHOP_KEEP_EAST, WORLD_STATE_BATTLEFIELD_WG_WORKSHOP_K_E, 0, BATTLEFIELD_WG_TEXT_WORKSHOP_NE_TAKEN}
 };
 
-// ********************************************************************
-// *         Structs using for Building,Graveyard,Workshop            *
-// ********************************************************************
-// Structure for different buildings that can be destroyed during battle
+// Structs for Building, Graveyard, and Workshop runtime objects
+
+// Buildings that can be destroyed during battle
 struct BfWGGameObjectBuilding
 {
     BfWGGameObjectBuilding(BattlefieldWG* WG)
@@ -1265,7 +1213,7 @@ struct BfWGGameObjectBuilding
                 break;
         }
 
-        m_State = sWorld->getWorldState(m_WorldState);
+        m_State = sWorldState->getWorldState(m_WorldState);
         if (gobj)
         {
             switch (m_State)
@@ -1445,7 +1393,7 @@ struct BfWGGameObjectBuilding
 
     void Save()
     {
-        sWorld->setWorldState(m_WorldState, m_State);
+        sWorldState->setWorldState(m_WorldState, m_State);
     }
 };
 
@@ -1530,7 +1478,7 @@ struct WGWorkshop
 
     void Save()
     {
-        sWorld->setWorldState(WorkshopsData[workshopId].worldstate, state);
+        sWorldState->setWorldState(WorkshopsData[workshopId].worldstate, state);
     }
 };
 

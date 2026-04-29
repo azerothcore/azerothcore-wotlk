@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -16,6 +16,7 @@
  */
 
 #include "Formulas.h"
+#include "AreaDefines.h"
 #include "Battleground.h"
 #include "Creature.h"
 #include "Log.h"
@@ -83,14 +84,9 @@ uint32 Acore::XP::Gain(Player* player, Unit* unit, bool isBattleGround /*= false
         if (gain && creature)
         {
             if (creature->isElite())
-            {
-                // Elites in instances have a 2.75x XP bonus instead of the regular 2x world bonus.
-                if (unit->GetMap() && unit->GetMap()->IsDungeon())
-                    xpMod *= 2.75f;
-                else
-                    xpMod *= 2.0f;
-            }
+                xpMod *= 2.0f;
 
+            // Instanced mobs (particularly bosses) oftentimes have higher bonuses, especially in later content levels
             xpMod *= creature->GetCreatureTemplate()->ModExperience;
         }
 
@@ -98,22 +94,22 @@ uint32 Acore::XP::Gain(Player* player, Unit* unit, bool isBattleGround /*= false
         {
             switch (player->GetMapId())
             {
-                case MAP_BG_ALTERAC_VALLEY:
+                case MAP_ALTERAC_VALLEY:
                     xpMod *= sWorld->getRate(RATE_XP_BG_KILL_AV);
                     break;
-                case MAP_BG_WARSONG_GULCH:
+                case MAP_WARSONG_GULCH:
                     xpMod *= sWorld->getRate(RATE_XP_BG_KILL_WSG);
                     break;
-                case MAP_BG_ARATHI_BASIN:
+                case MAP_ARATHI_BASIN:
                     xpMod *= sWorld->getRate(RATE_XP_BG_KILL_AB);
                     break;
-                case MAP_BG_EYE_OF_THE_STORM:
+                case MAP_EYE_OF_THE_STORM:
                     xpMod *= sWorld->getRate(RATE_XP_BG_KILL_EOTS);
                     break;
-                case MAP_BG_STRAND_OF_THE_ANCIENTS:
+                case MAP_STRAND_OF_THE_ANCIENTS:
                     xpMod *= sWorld->getRate(RATE_XP_BG_KILL_SOTA);
                     break;
-                case MAP_BG_ISLE_OF_CONQUEST:
+                case MAP_ISLE_OF_CONQUEST:
                     xpMod *= sWorld->getRate(RATE_XP_BG_KILL_IC);
                     break;
             }

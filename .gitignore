@@ -54,6 +54,11 @@ CMakeLists.txt.user
 *.LOCAL.*
 
 #
+# AI tools
+#
+.claude
+
+#
 # IDE & other software
 #
 /.settings/
@@ -67,6 +72,12 @@ nbproject/
 cmake-build-*/*
 coverage-report/
 .vs
+
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
 
 #
 # Eclipse

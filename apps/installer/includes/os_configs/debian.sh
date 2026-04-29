@@ -1,5 +1,12 @@
+#!/usr/bin/env bash
+
+CURRENT_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# Set SUDO variable - one liner
+SUDO=$([ "$EUID" -ne 0 ] && echo "sudo" || echo "")
+
 if ! command -v lsb_release &>/dev/null ; then
-       sudo apt-get install -y lsb-release
+       $SUDO apt-get install -y lsb-release
 fi
 
 DEBIAN_VERSION=$(lsb_release -sr)
@@ -14,16 +21,26 @@ if [[ $DEBIAN_VERSION -lt $DEBIAN_VERSION_MIN ]]; then
   echo "########## ########## ##########"
 fi
 
-sudo apt-get update -y
+$SUDO apt-get update -y
 
-sudo apt-get install -y gdbserver gdb unzip curl \
+$SUDO apt-get install -y gdbserver gdb unzip curl \
                      libncurses-dev libreadline-dev clang g++ \
                      gcc git cmake make ccache \
                      libssl-dev libbz2-dev \
-                     libboost-all-dev gnupg wget
+                     libboost-all-dev gnupg wget jq screen tmux expect
 
-# run noninteractive install for MYSQL 8.4 LTS
-wget https://dev.mysql.com/get/mysql-apt-config_0.8.32-1_all.deb
-sudo DEBIAN_FRONTEND="noninteractive" dpkg -i ./mysql-apt-config_0.8.32-1_all.deb
-sudo apt-get update
-sudo DEBIAN_FRONTEND="noninteractive" apt-get install -y mysql-server libmysqlclient-dev
+VAR_PATH="$CURRENT_PATH/../../../../var"
+
+# run noninteractive install for MYSQL
+# Version
+MYSQL_APT_CONFIG_VERSION=0.8.36-1
+# # # # #
+mkdir -p "$VAR_PATH/mysqlpackages" && cd "$VAR_PATH/mysqlpackages"
+# Download
+wget "https://dev.mysql.com/get/mysql-apt-config_${MYSQL_APT_CONFIG_VERSION}_all.deb"
+# Install
+sudo DEBIAN_FRONTEND="noninteractive" dpkg -i ./mysql-apt-config_${MYSQL_APT_CONFIG_VERSION}_all.deb
+sudo apt update
+sudo DEBIAN_FRONTEND="noninteractive" apt install -y mysql-server libmysqlclient-dev
+# Cleanup
+rm -v mysql-apt-config_${MYSQL_APT_CONFIG_VERSION}_all* && unset MYSQL_APT_CONFIG_VERSION

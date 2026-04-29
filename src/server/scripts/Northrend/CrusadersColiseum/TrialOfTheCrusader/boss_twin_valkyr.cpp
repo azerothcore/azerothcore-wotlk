@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -109,7 +109,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
     {
         pInstance = pCreature->GetInstanceScript();
         me->SetReactState(REACT_PASSIVE);
-        me->SetModifierValue(UNIT_MOD_DAMAGE_OFFHAND, TOTAL_PCT, 1.0f);
+        me->SetStatPctModifier(UNIT_MOD_DAMAGE_OFFHAND, TOTAL_PCT, 1.0f);
         me->UpdateDamagePhysical(OFF_ATTACK);
         LastSynchroHP = (int32)me->GetMaxHealth();
         SpecialMask = 0;
@@ -384,7 +384,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                     /*
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, essenceId))
                         me->CastSpell(target, me->GetEntry()==NPC_LIGHTBANE ? SPELL_LIGHT_TOUCH : SPELL_DARK_TOUCH, false);
-                    events.RepeatEvent(urand(45000,50000));
+                    events.Repeat(45s,50s);
                     */
 
                     GuidVector tList;
@@ -458,7 +458,7 @@ struct boss_twin_valkyrAI : public ScriptedAI
                     if ((SpecialMask & 0xF) == 0xF )
                         SpecialMask = 0;
                     events.Repeat(45s);
-                    events.DelayEventsToMax(15000, 1); // no touch of light/darkness during special abilities!
+                    events.DelayEventsToMax(15s, 1); // no touch of light/darkness during special abilities!
                 }
                 break;
             case EVENT_REMOVE_DUAL_WIELD:
@@ -710,7 +710,7 @@ public:
                 return;
 
             if (urand(0, 2))
-                me->DespawnOrUnsummon(0);
+                me->DespawnOrUnsummon(0ms);
         }
 
         void MoveToNextPoint()
@@ -884,7 +884,7 @@ class spell_valkyr_ball_periodic_dummy_aura : public AuraScript
                             creature->GetMotionMaster()->MoveIdle();
                             creature->CastSpell((Unit*)nullptr, creature->GetEntry() == NPC_CONCENTRATED_LIGHT ? SPELL_UNLEASHED_LIGHT : SPELL_UNLEASHED_DARK, false);
                             creature->SetDisplayId(11686);
-                            creature->DespawnOrUnsummon(1500);
+                            creature->DespawnOrUnsummon(1500ms);
                         }
     }
 

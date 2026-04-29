@@ -1,20 +1,21 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "CellImpl.h"
 #include "CreatureScript.h"
 #include "GameEventMgr.h"
@@ -154,8 +155,8 @@ struct npc_brewfest_bark_trigger : public ScriptedAI
             bool allow = false;
             uint32 quest = 0;
             Player* player = who->ToPlayer();
-            // Kalimdor
-            if (me->GetMapId() == 1)
+
+            if (me->GetMapId() == MAP_KALIMDOR)
             {
                 if (player->GetQuestStatus(QUEST_BARK_FOR_DROHN) == QUEST_STATUS_INCOMPLETE)
                 {
@@ -168,7 +169,7 @@ struct npc_brewfest_bark_trigger : public ScriptedAI
                     quest = QUEST_BARK_FOR_VOODOO;
                 }
             }
-            else if (me->GetMapId() == 0)
+            else if (me->GetMapId() == MAP_EASTERN_KINGDOMS)
             {
                 if (player->GetQuestStatus(QUEST_BARK_FOR_BARLEY) == QUEST_STATUS_INCOMPLETE)
                 {
@@ -366,15 +367,15 @@ struct npc_dark_iron_attack_generator : public ScriptedAI
                     if (AllowStart())
                     {
                         PrepareEvent();
-                        events.RepeatEvent(300000);
+                        events.Repeat(300s);
                         return;
                     }
-                    events.RepeatEvent(2000);
+                    events.Repeat(2s);
                     break;
                 }
             case EVENT_SPAWN_MOLE_MACHINE:
                 {
-                    if (me->GetMapId() == 1) // Kalimdor
+                    if (me->GetMapId() == MAP_KALIMDOR)
                     {
                         float rand = 8 + rand_norm() * 12;
                         float angle = rand_norm() * 2 * M_PI;
@@ -383,7 +384,7 @@ struct npc_dark_iron_attack_generator : public ScriptedAI
                         if (Creature* cr = me->SummonCreature(NPC_MOLE_MACHINE_TRIGGER, x, y, 21.3f, 0.0f))
                             cr->CastSpell(cr, SPELL_SPAWN_MOLE_MACHINE, true);
                     }
-                    else if (me->GetMapId() == 0) // EK
+                    else if (me->GetMapId() == MAP_EASTERN_KINGDOMS)
                     {
                         float rand = rand_norm() * 20;
                         float angle = rand_norm() * 2 * M_PI;
@@ -392,7 +393,7 @@ struct npc_dark_iron_attack_generator : public ScriptedAI
                         if (Creature* cr = me->SummonCreature(NPC_MOLE_MACHINE_TRIGGER, x, y, 398.11f, 0.0f))
                             cr->CastSpell(cr, SPELL_SPAWN_MOLE_MACHINE, true);
                     }
-                    events.RepeatEvent(3000);
+                    events.Repeat(3s);
                     break;
                 }
             case EVENT_PRE_FINISH_ATTACK:
@@ -409,7 +410,7 @@ struct npc_dark_iron_attack_generator : public ScriptedAI
                 }
             case EVENT_BARTENDER_SAY:
                 {
-                    events.RepeatEvent(12000);
+                    events.Repeat(12s);
                     Creature* sayer = GetRandomBartender();
                     if (!sayer)
                         return;
@@ -457,7 +458,7 @@ struct npc_dark_iron_attack_generator : public ScriptedAI
             herald->Yell(amount, LANG_UNIVERSAL);
         }
 
-        me->CastSpell(me, (me->GetMapId() == 1 ? SPELL_SUMMON_PLANS_H : SPELL_SUMMON_PLANS_A), true);
+        me->CastSpell(me, (me->GetMapId() == MAP_KALIMDOR ? SPELL_SUMMON_PLANS_H : SPELL_SUMMON_PLANS_A), true);
         Reset();
     }
 
@@ -473,7 +474,7 @@ struct npc_dark_iron_attack_generator : public ScriptedAI
         }
 
         Creature* cr;
-        if (me->GetMapId() == 1) // Kalimdor
+        if (me->GetMapId() == MAP_KALIMDOR)
         {
             if ((cr = me->SummonCreature(NPC_DROHN_KEG, 1183.69f, -4315.15f, 21.1875f, 0.750492f)))
             {
@@ -494,7 +495,7 @@ struct npc_dark_iron_attack_generator : public ScriptedAI
                 revelerGUIDs.push_back(cr->GetGUID());
             }
         }
-        else if (me->GetMapId() == 0) // Eastern Kingdom
+        else if (me->GetMapId() == MAP_EASTERN_KINGDOMS)
         {
             if ((cr = me->SummonCreature(NPC_BARLEYBREW_KEG, -5187.23f, -599.779f, 397.176f, 0.017453f)))
             {
@@ -544,10 +545,10 @@ struct npc_dark_iron_attack_generator : public ScriptedAI
         switch (urand(0, 2))
         {
             case 0:
-                entry = (me->GetMapId() == 1 ? NPC_NORMAL_DROHN : NPC_NORMAL_THUNDERBREW);
+                entry = (me->GetMapId() == MAP_KALIMDOR ? NPC_NORMAL_DROHN : NPC_NORMAL_THUNDERBREW);
                 break;
             case 1:
-                entry = (me->GetMapId() == 1 ? NPC_NORMAL_VOODOO : NPC_NORMAL_BARLEYBREW);
+                entry = (me->GetMapId() == MAP_KALIMDOR ? NPC_NORMAL_VOODOO : NPC_NORMAL_BARLEYBREW);
                 break;
             case 2:
                 entry = NPC_NORMAL_GORDOK;
@@ -602,7 +603,7 @@ struct npc_dark_iron_attack_mole_machine : public ScriptedAI
             {
                 me->SummonCreature(NPC_DARK_IRON_GUZZLER, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 6000);
                 summonTimer = 0;
-                me->DespawnOrUnsummon(3000);
+                me->DespawnOrUnsummon(3s);
             }
         }
     }
@@ -649,13 +650,13 @@ struct npc_dark_iron_guzzler : public ScriptedAI
         uint32 entry[3] = {0, 0, 0};
         uint32 shuffled[3] = {0, 0, 0};
 
-        if (me->GetMapId() == 1) // Kalimdor
+        if (me->GetMapId() == MAP_KALIMDOR)
         {
             entry[0] = NPC_DROHN_KEG;
             entry[1] = NPC_VOODOO_KEG;
             entry[2] = NPC_GORDOK_KEG;
         }
-        else// if (me->GetMapId() == 0) // EK
+        else// if (me->GetMapId() == MAP_EASTERN_KINGDOMS)
         {
             entry[0] = NPC_THUNDERBREW_KEG;
             entry[1] = NPC_BARLEYBREW_KEG;
@@ -792,7 +793,7 @@ struct npc_brewfest_super_brew_trigger : public ScriptedAI
             Player* player = nullptr;
             Acore::AnyPlayerInObjectRangeCheck checker(me, 2.0f);
             Acore::PlayerSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(me, player, checker);
-            Cell::VisitWorldObjects(me, searcher, 2.0f);
+            Cell::VisitObjects(me, searcher, 2.0f);
             if (player)
             {
                 player->CastSpell(player, SPELL_DRUNKEN_MASTER, true);
@@ -1231,7 +1232,7 @@ class spell_brewfest_toss_mug : public SpellScript
             return;
 
         std::vector<Creature*> bakers;
-        if (caster->GetMapId() == 1) // Kalimdor
+        if (caster->GetMapId() == MAP_KALIMDOR)
         {
             if (Creature* creature = caster->FindNearestCreature(NPC_NORMAL_VOODOO, 40.0f))
             {
@@ -1248,7 +1249,7 @@ class spell_brewfest_toss_mug : public SpellScript
                 bakers.push_back(creature);
             }
         }
-        else // EK
+        else // Eastern Kingdoms
         {
             if (Creature* creature = caster->FindNearestCreature(NPC_NORMAL_THUNDERBREW, 40.0f))
             {
@@ -1713,12 +1714,12 @@ struct npc_coren_direbrew : public ScriptedAI
                 case EVENT_SUMMON_MOLE_MACHINE:
                 {
                     me->CastCustomSpell(SPELL_MOLE_MACHINE_TARGET_PICKER, SPELLVALUE_MAX_TARGETS, 1, nullptr, true);
-                    _events.RepeatEvent(15 * IN_MILLISECONDS);
+                    _events.Repeat(15s);
                     break;
                 }
                 case EVENT_DIREBREW_DISARM:
                     DoCastSelf(SPELL_DIREBREW_DISARM_PRE_CAST, true);
-                    _events.RepeatEvent(20 * IN_MILLISECONDS);
+                    _events.Repeat(20s);
                     break;
                 default:
                     break;
@@ -1742,7 +1743,7 @@ struct npc_coren_direbrew_sisters : public ScriptedAI
 {
     npc_coren_direbrew_sisters(Creature* creature) : ScriptedAI(creature) { }
 
-    void SetGUID(ObjectGuid guid, int32 id) override
+    void SetGUID(ObjectGuid const& guid, int32 id) override
     {
         if (id == DATA_TARGET_GUID)
         {

@@ -1,30 +1,27 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/* ScriptData
-Name: bf_commandscript
-%Complete: 100
-Comment: All bf related commands
-Category: commandscripts
-EndScriptData */
-
 #include "BattlefieldMgr.h"
 #include "Chat.h"
 #include "CommandScript.h"
+#include "Language.h"
+#include "GameTime.h"
+#include "ObjectAccessor.h"
+#include "Player.h"
 
 using namespace Acore::ChatCommands;
 
@@ -37,11 +34,12 @@ public:
     {
         static ChatCommandTable battlefieldcommandTable =
         {
-            { "start",  HandleBattlefieldStart,  SEC_ADMINISTRATOR, Console::No },
-            { "stop",   HandleBattlefieldEnd,    SEC_ADMINISTRATOR, Console::No },
-            { "switch", HandleBattlefieldSwitch, SEC_ADMINISTRATOR, Console::No },
-            { "timer",  HandleBattlefieldTimer,  SEC_ADMINISTRATOR, Console::No },
-            { "enable", HandleBattlefieldEnable, SEC_ADMINISTRATOR, Console::No }
+            { "start",  HandleBattlefieldStart,  SEC_ADMINISTRATOR, Console::Yes },
+            { "stop",   HandleBattlefieldEnd,    SEC_ADMINISTRATOR, Console::Yes },
+            { "switch", HandleBattlefieldSwitch, SEC_ADMINISTRATOR, Console::Yes },
+            { "timer",  HandleBattlefieldTimer,  SEC_ADMINISTRATOR, Console::Yes },
+            { "enable", HandleBattlefieldEnable, SEC_ADMINISTRATOR, Console::Yes },
+            { "queue",  HandleBattlefieldQueue,  SEC_GAMEMASTER,    Console::Yes }
         };
         static ChatCommandTable commandTable =
         {
@@ -55,12 +53,15 @@ public:
         Battlefield* bf = sBattlefieldMgr->GetBattlefieldByBattleId(battleId);
 
         if (!bf)
+        {
+            handler->SendErrorMessage(LANG_BF_NOT_FOUND, battleId);
             return false;
+        }
 
         bf->StartBattle();
-
-        if (battleId == 1)
-            handler->SendGlobalGMSysMessage("Wintergrasp (Command start used)");
+        handler->SendWorldText(LANG_BF_STARTED, battleId);
+        if (handler->IsConsole())
+            handler->PSendSysMessage(LANG_BF_STARTED, battleId);
 
         return true;
     }
@@ -70,12 +71,15 @@ public:
         Battlefield* bf = sBattlefieldMgr->GetBattlefieldByBattleId(battleId);
 
         if (!bf)
+        {
+            handler->SendErrorMessage(LANG_BF_NOT_FOUND, battleId);
             return false;
+        }
 
         bf->EndBattle(true);
-
-        if (battleId == 1)
-            handler->SendGlobalGMSysMessage("Wintergrasp (Command stop used)");
+        handler->SendWorldText(LANG_BF_STOPPED, battleId);
+        if (handler->IsConsole())
+            handler->PSendSysMessage(LANG_BF_STOPPED, battleId);
 
         return true;
     }
@@ -85,19 +89,24 @@ public:
         Battlefield* bf = sBattlefieldMgr->GetBattlefieldByBattleId(battleId);
 
         if (!bf)
+        {
+            handler->SendErrorMessage(LANG_BF_NOT_FOUND, battleId);
             return false;
+        }
 
         if (bf->IsEnabled())
         {
             bf->ToggleBattlefield(false);
-            if (battleId == 1)
-                handler->SendGlobalGMSysMessage("Wintergrasp is disabled");
+            handler->SendWorldText(LANG_BF_DISABLED, battleId);
+            if (handler->IsConsole())
+                handler->PSendSysMessage(LANG_BF_DISABLED, battleId);
         }
         else
         {
             bf->ToggleBattlefield(true);
-            if (battleId == 1)
-                handler->SendGlobalGMSysMessage("Wintergrasp is enabled");
+            handler->SendWorldText(LANG_BF_ENABLED, battleId);
+            if (handler->IsConsole())
+                handler->PSendSysMessage(LANG_BF_ENABLED, battleId);
         }
 
         return true;
@@ -108,11 +117,15 @@ public:
         Battlefield* bf = sBattlefieldMgr->GetBattlefieldByBattleId(battleId);
 
         if (!bf)
+        {
+            handler->SendErrorMessage(LANG_BF_NOT_FOUND, battleId);
             return false;
+        }
 
         bf->EndBattle(false);
-        if (battleId == 1)
-            handler->SendGlobalGMSysMessage("Wintergrasp (Command switch used)");
+        handler->SendWorldText(LANG_BF_SWITCHED, battleId);
+        if (handler->IsConsole())
+            handler->PSendSysMessage(LANG_BF_SWITCHED, battleId);
 
         return true;
     }
@@ -145,12 +158,73 @@ public:
         Battlefield* bf = sBattlefieldMgr->GetBattlefieldByBattleId(battleId);
 
         if (!bf)
+        {
+            handler->SendErrorMessage(LANG_BF_NOT_FOUND, battleId);
             return false;
+        }
 
         bf->SetTimer(time * IN_MILLISECONDS);
         bf->SendInitWorldStatesToAll();
-        if (battleId == 1)
-            handler->SendGlobalGMSysMessage("Wintergrasp (Command timer used)");
+        handler->SendWorldText(LANG_BF_TIMER_SET, battleId, time);
+        if (handler->IsConsole())
+            handler->PSendSysMessage(LANG_BF_TIMER_SET, battleId, time);
+
+        return true;
+    }
+
+    static bool HandleBattlefieldQueue(ChatHandler* handler, uint32 battleId)
+    {
+        Battlefield* bf = sBattlefieldMgr->GetBattlefieldByBattleId(battleId);
+
+        if (!bf)
+        {
+            handler->SendErrorMessage(LANG_BF_NOT_FOUND, battleId);
+            return false;
+        }
+
+        handler->PSendSysMessage(bf->IsWarTime() ? LANG_BF_QUEUE_HDR_WAR : LANG_BF_QUEUE_HDR_WAIT,
+            battleId, bf->GetTimer() / IN_MILLISECONDS);
+
+        static char const* teamNames[PVP_TEAMS_COUNT] = { "Alliance", "Horde" };
+
+        std::string offlineSuffix = handler->GetAcoreString(LANG_OFFLINE);
+
+        auto nameOf = [offlineSuffix](ObjectGuid guid) -> std::string
+        {
+            if (Player* p = ObjectAccessor::FindPlayer(guid))
+                return p->GetName();
+            return std::to_string(guid.GetCounter()) + offlineSuffix;
+        };
+
+        for (uint8 i = 0; i < PVP_TEAMS_COUNT; ++i)
+        {
+            TeamId team = TeamId(i);
+
+            GuidUnorderedSet const& inQueue = bf->GetPlayersQueueSet(team);
+            PlayerTimerMap   const& invited = bf->GetInvitedPlayersMap(team);
+            GuidUnorderedSet const& inWar   = bf->GetPlayersInWarSet(team);
+
+            handler->PSendSysMessage(LANG_BF_QUEUE_TEAM_HDR,
+                teamNames[i],
+                static_cast<uint32>(inQueue.size()),
+                static_cast<uint32>(invited.size()),
+                static_cast<uint32>(inWar.size()));
+
+            for (ObjectGuid const& guid : inQueue)
+                handler->PSendSysMessage(LANG_BF_QUEUE_PLAYER_QUEUE, nameOf(guid));
+
+            SystemTimePoint now = GameTime::GetSystemTime();
+            for (auto const& [guid, expiry] : invited)
+            {
+                SystemTimePoint expiryPoint = std::chrono::system_clock::from_time_t(expiry);
+                int32 secsLeft = std::max(int32(0), static_cast<int32>(
+                    std::chrono::duration_cast<Seconds>(expiryPoint - now).count()));
+                handler->PSendSysMessage(LANG_BF_QUEUE_PLAYER_INVITED, nameOf(guid), secsLeft);
+            }
+
+            for (ObjectGuid const& guid : inWar)
+                handler->PSendSysMessage(LANG_BF_QUEUE_PLAYER_WAR, nameOf(guid));
+        }
 
         return true;
     }

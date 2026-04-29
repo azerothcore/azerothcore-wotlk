@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -44,6 +44,7 @@ enum Data
     ACTION_DELETE_ICE_WALL,
     DATA_WAVE_NUMBER,
     DATA_LK_BATTLE,// in progress
+    DATA_SHIP_CAPTAIN,
 };
 
 enum Creatures
@@ -100,12 +101,6 @@ enum GameObjects
     GO_PORTAL_TO_DALARAN                          = 195682,
 };
 
-enum HorWorldStates
-{
-    WORLD_STATE_HOR_COUNTER                         = 4884,
-    WORLD_STATE_HOR_WAVE_COUNT                      = 4882,
-};
-
 enum BatteredHiltStatusFlags
 {
     BHSF_NONE = 0,
@@ -114,6 +109,17 @@ enum BatteredHiltStatusFlags
     BHSF_FINISHED = 4,
 };
 
+enum HoRPersistentData
+{
+    PERSISTENT_DATA_INTRO,
+    PERSISTENT_DATA_FROSTSWORN_GENERAL,
+    PERSISTENT_DATA_LK_INTRO,
+    PERSISTENT_DATA_BATTERED_HILT,
+    PERSISTENT_DATA_COUNT
+};
+
+constexpr uint8 MAX_SPIRITUAL_REFLECTIONS = 5;
+constexpr uint8 MAX_ICE_WALL_TARGETS      = 4;
 #define NUM_OF_TRASH 34
 #define MAX_DIST_FROM_CENTER_IN_COMBAT 70.5f
 #define MAX_DIST_FROM_CENTER_TO_START 40.0f
@@ -297,6 +303,11 @@ enum hMisc
 
     // Battered Hilt - Summon Quel'Delar
     SPELL_SUMMON_EVIL_QUEL                        = 69966,
+    SPELL_QUEL_DELAR_HATRED                       = 70300,
+    SPELL_FROSTMOURNE_ALTAR_GLOW                  = 70720,
+    SPELL_UTHER_HOLY_LIGHT_VISUAL                 = 73036,
+    SPELL_QUELDELAR_COMPULSION                    = 70013,
+    SPELL_QUELDELAR_WILL                          = 70698,
 };
 
 const uint32 allowedCompositions[8][5] =
@@ -395,5 +406,8 @@ inline AI* GetHallsOfReflectionAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, HallsOfReflectionScriptName);
 }
+
+#define RegisterHallsOfReflectionCreatureAI(ai_name) \
+    RegisterCreatureAIWithFactory(ai_name, GetHallsOfReflectionAI)
 
 #endif

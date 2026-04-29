@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -25,7 +25,7 @@ const uint32 EP_AllianceBuffs[4] = {11413, 11414, 11415, 1386};
 
 const uint32 EP_HordeBuffs[4] = {30880, 30683, 30682, 29520};
 
-const uint32 EP_GraveyardZone = 139;
+const uint32 EP_GraveyardZone = AREA_EASTERN_PLAGUELANDS;
 
 const uint32 EP_GraveyardId = 927;
 
@@ -36,7 +36,12 @@ const uint32 EP_CGT_CM = 17689;
 const uint32 EP_NPT_CM = 17696;
 const uint32 EP_PWT_CM = 17698;
 
-const uint32 EPBuffZones[EPBuffZonesNum] = {139, 2017, 2057};
+const uint32 EPBuffZones[EPBuffZonesNum] =
+{
+    AREA_EASTERN_PLAGUELANDS,
+    AREA_STRATHOLME,
+    AREA_SCHOLOMANCE
+};
 
 //enum EP_TaxiNodes
 //{
@@ -45,52 +50,6 @@ const uint32 EPBuffZones[EPBuffZonesNum] = {139, 2017, 2057};
 //    EP_NPT_Taxi = 85,
 //    EP_PWT_Taxi = 84
 //};
-
-enum EP_EastwallTowerWorldStates
-{
-    EP_EWT_A = 2354,
-    EP_EWT_H = 2356,
-    EP_EWT_N_A = 2359, // ally conquested
-    EP_EWT_N_H = 2360,
-    EP_EWT_N = 2361
-};
-
-enum EP_NorthpassTowerWorldStates
-{
-    EP_NPT_N = 2352,
-    EP_NPT_N_A = 2362,
-    EP_NPT_N_H = 2363,
-    EP_NPT_A = 2372,
-    EP_NPT_H = 2373
-};
-
-enum EP_PlagewoodTowerWorldStates
-{
-    EP_PWT_N_A = 2366,
-    EP_PWT_N_H = 2353, //2367 not present! use neutral!
-    EP_PWT_A = 2370,
-    EP_PWT_H = 2371,
-    EP_PWT_N = 2353
-};
-
-enum EP_CrownGuardTowerWorldStates
-{
-    EP_CGT_N_A = 2374,
-    EP_CGT_N_H = 2375,
-    EP_CGT_A = 2378,
-    EP_CGT_H = 2379,
-    EP_CGT_N = 2355
-};
-
-enum EP_WorldStates
-{
-    EP_UI_TOWER_SLIDER_DISPLAY = 2426,
-    EP_UI_TOWER_SLIDER_POS = 2427,
-    EP_UI_TOWER_SLIDER_N = 2428,
-
-    EP_UI_TOWER_COUNT_A = 2327,
-    EP_UI_TOWER_COUNT_H = 2328
-};
 
 enum EP_Summons
 {
@@ -122,18 +81,18 @@ enum EP_Towers
 
 const go_type EPCapturePoints[EP_TOWER_NUM] =
 {
-    {182097, 0, 2574.51f, -4794.89f, 144.704f, -1.45003f, -0.097056f, 0.095578f, -0.656229f, 0.742165f},
-    {181899, 0, 3181.08f, -4379.36f, 174.123f, -2.03472f, -0.065392f, 0.119494f, -0.842275f, 0.521553f},
-    {182098, 0, 2962.71f, -3042.31f, 154.789f, 2.08426f, -0.074807f, -0.113837f, 0.855928f, 0.49883f},
-    {182096, 0, 1860.85f, -3731.23f, 196.716f, -2.53214f, 0.033967f, -0.131914f, 0.944741f, -0.298177f}
+    {182097, MAP_EASTERN_KINGDOMS, 2574.51f, -4794.89f, 144.704f, -1.45003f, -0.097056f, 0.095578f, -0.656229f, 0.742165f},
+    {181899, MAP_EASTERN_KINGDOMS, 3181.08f, -4379.36f, 174.123f, -2.03472f, -0.065392f, 0.119494f, -0.842275f, 0.521553f},
+    {182098, MAP_EASTERN_KINGDOMS, 2962.71f, -3042.31f, 154.789f, 2.08426f, -0.074807f, -0.113837f, 0.855928f, 0.49883f},
+    {182096, MAP_EASTERN_KINGDOMS, 1860.85f, -3731.23f, 196.716f, -2.53214f, 0.033967f, -0.131914f, 0.944741f, -0.298177f}
 };
 
 const go_type EPTowerFlags[EP_TOWER_NUM] =
 {
-    {182106, 0, 2569.60f, -4772.93f, 115.399f, 2.72271f, 0.0f, 0.0f, 0.978148f, 0.207912f},
-    {182106, 0, 3148.17f, -4365.51f, 145.029f, 1.53589f, 0.0f, 0.0f, 0.694658f, 0.71934f},
-    {182106, 0, 2992.63f, -3022.95f, 125.593f, 3.03687f, 0.0f, 0.0f, 0.99863f, 0.052336f},
-    {182106, 0, 1838.42f, -3703.56f, 167.713f, 0.890118f, 0.0f, 0.0f, 0.430511f, 0.902585f}
+    {182106, MAP_EASTERN_KINGDOMS, 2569.60f, -4772.93f, 115.399f, 2.72271f, 0.0f, 0.0f, 0.978148f, 0.207912f},
+    {182106, MAP_EASTERN_KINGDOMS, 3148.17f, -4365.51f, 145.029f, 1.53589f, 0.0f, 0.0f, 0.694658f, 0.71934f},
+    {182106, MAP_EASTERN_KINGDOMS, 2992.63f, -3022.95f, 125.593f, 3.03687f, 0.0f, 0.0f, 0.99863f, 0.052336f},
+    {182106, MAP_EASTERN_KINGDOMS, 1838.42f, -3703.56f, 167.713f, 0.890118f, 0.0f, 0.0f, 0.430511f, 0.902585f}
 };
 
 //const uint32 EPTowerPlayerEnterEvents[EP_TOWER_NUM] = {10691, 10699, 10701, 10705};
@@ -147,20 +106,20 @@ const uint8 EP_EWT_NUM_CREATURES = 5;
 // should be spawned at EWT and follow a path, but trans-grid pathing isn't safe, so summon them directly at NPT
 const creature_type EP_EWT_Summons_A[EP_EWT_NUM_CREATURES] =
 {
-    {17635, 0, 3167.61f, -4352.09f, 138.20f, 4.5811f},
-    {17647, 0, 3172.74f, -4352.99f, 139.14f, 4.9873f},
-    {17647, 0, 3165.89f, -4354.46f, 138.67f, 3.7244f},
-    {17647, 0, 3164.65f, -4350.26f, 138.22f, 2.4794f},
-    {17647, 0, 3169.91f, -4349.68f, 138.37f, 0.7444f}
+    {17635, MAP_EASTERN_KINGDOMS, 3167.61f, -4352.09f, 138.20f, 4.5811f},
+    {17647, MAP_EASTERN_KINGDOMS, 3172.74f, -4352.99f, 139.14f, 4.9873f},
+    {17647, MAP_EASTERN_KINGDOMS, 3165.89f, -4354.46f, 138.67f, 3.7244f},
+    {17647, MAP_EASTERN_KINGDOMS, 3164.65f, -4350.26f, 138.22f, 2.4794f},
+    {17647, MAP_EASTERN_KINGDOMS, 3169.91f, -4349.68f, 138.37f, 0.7444f}
 };
 
 const creature_type EP_EWT_Summons_H[EP_EWT_NUM_CREATURES] =
 {
-    {17995, 0, 3167.61f, -4352.09f, 138.20f, 4.5811f},
-    {17996, 0, 3172.74f, -4352.99f, 139.14f, 4.9873f},
-    {17996, 0, 3165.89f, -4354.46f, 138.67f, 3.7244f},
-    {17996, 0, 3164.65f, -4350.26f, 138.22f, 2.4794f},
-    {17996, 0, 3169.91f, -4349.68f, 138.37f, 0.7444f}
+    {17995, MAP_EASTERN_KINGDOMS, 3167.61f, -4352.09f, 138.20f, 4.5811f},
+    {17996, MAP_EASTERN_KINGDOMS, 3172.74f, -4352.99f, 139.14f, 4.9873f},
+    {17996, MAP_EASTERN_KINGDOMS, 3165.89f, -4354.46f, 138.67f, 3.7244f},
+    {17996, MAP_EASTERN_KINGDOMS, 3164.65f, -4350.26f, 138.22f, 2.4794f},
+    {17996, MAP_EASTERN_KINGDOMS, 3169.91f, -4349.68f, 138.37f, 0.7444f}
 };
 
 enum EP_TowerStates
@@ -175,10 +134,10 @@ enum EP_TowerStates
 };
 
 // when spawning, pay attention at setting the faction manually!
-const creature_type EP_PWT_FlightMaster = {17209, 0, 2987.5f, -3049.11f, 120.126f, 5.75959f};
+const creature_type EP_PWT_FlightMaster = {17209, MAP_EASTERN_KINGDOMS, 2987.5f, -3049.11f, 120.126f, 5.75959f};
 
 // after spawning, modify the faction so that only the controller will be able to use it with SetUInt32Value(GAMEOBJECT_FACTION, faction_id);
-const go_type EP_NPT_LordaeronShrine = {181682, 0, 3167.72f, -4355.91f, 138.785f, 1.69297f, 0.0f, 0.0f, 0.748956f, 0.66262f};
+const go_type EP_NPT_LordaeronShrine = {181682, MAP_EASTERN_KINGDOMS, 3167.72f, -4355.91f, 138.785f, 1.69297f, 0.0f, 0.0f, 0.748956f, 0.66262f};
 
 class OutdoorPvPEP;
 

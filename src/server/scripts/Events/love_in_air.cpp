@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -247,7 +247,7 @@ struct npc_love_in_air_snivel_real : public ScriptedAI
                     if (Unit* owner = me->ToTempSummon()->GetSummonerUnit())
                         me->CastSpell(owner, SPELL_SNIVEL_GUN, true);
 
-                me->DespawnOrUnsummon(1000);
+                me->DespawnOrUnsummon(1s);
             }
         }
     }
@@ -407,7 +407,7 @@ class spell_love_is_in_the_air_romantic_picnic : public AuraScript
         std::list<Player*> playerList;
         Acore::AnyPlayerInObjectRangeCheck checker(target, INTERACTION_DISTANCE * 2);
         Acore::PlayerListSearcher<Acore::AnyPlayerInObjectRangeCheck> searcher(target, playerList, checker);
-        Cell::VisitWorldObjects(target, searcher, INTERACTION_DISTANCE * 2);
+        Cell::VisitObjects(target, searcher, INTERACTION_DISTANCE * 2);
         for (std::list<Player*>::const_iterator itr = playerList.begin(); itr != playerList.end(); ++itr)
         {
             if ((*itr) != target && (*itr)->HasAura(GetId())) // && (*itr)->getStandState() == UNIT_STAND_STATE_SIT)

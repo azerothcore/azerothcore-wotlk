@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -41,8 +41,9 @@ void PetitionMgr::LoadPetitions()
 {
     uint32 oldMSTime = getMSTime();
     PetitionStore.clear();
+    PetitionIdToItemGuid.clear();
 
-    QueryResult result = CharacterDatabase.Query("SELECT ownerguid, petitionguid, name, type FROM petition");
+    QueryResult result = CharacterDatabase.Query("SELECT ownerguid, petitionguid, name, type, petition_id FROM petition");
     if (!result)
     {
         LOG_WARN("server.loading", ">> Loaded 0 Petitions!");
@@ -51,12 +52,23 @@ void PetitionMgr::LoadPetitions()
     }
 
     uint32 count = 0;
+    uint32 maxId = 0;
     do
     {
         Field* fields = result->Fetch();
-        AddPetition(ObjectGuid::Create<HighGuid::Item>(fields[1].Get<uint32>()), ObjectGuid::Create<HighGuid::Player>(fields[0].Get<uint32>()), fields[2].Get<std::string>(), fields[3].Get<uint8>());
+        uint32 itemLow = fields[1].Get<uint32>();
+        uint32 petitionId = fields[4].Get<uint32>();
+        ObjectGuid itemGuid = ObjectGuid::Create<HighGuid::Item>(itemLow);
+        ObjectGuid ownerGuid = ObjectGuid::Create<HighGuid::Player>(fields[0].Get<uint32>());
+        AddPetition(itemGuid, ownerGuid, fields[2].Get<std::string>(), fields[3].Get<uint8>(), petitionId);
+        PetitionIdToItemGuid[petitionId] = itemGuid;
+        if (petitionId > maxId)
+            maxId = petitionId;
         ++count;
     } while (result->NextRow());
+
+    // initialize next id (keep within 31-bit safe range)
+    _nextPetitionId = std::min<uint32>(std::max<uint32>(maxId + 1, 1), 0x7FFFFFFFu);
 
     LOG_INFO("server.loading", ">> Loaded {} Petitions in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
@@ -67,7 +79,7 @@ void PetitionMgr::LoadSignatures()
     uint32 oldMSTime = getMSTime();
     SignatureStore.clear();
 
-    QueryResult result = CharacterDatabase.Query("SELECT petitionguid, playerguid, player_account FROM petition_sign");
+    QueryResult result = CharacterDatabase.Query("SELECT petition_id, playerguid, player_account FROM petition_sign");
     if (!result)
     {
         LOG_WARN("server.loading", ">> Loaded 0 Petition signs!");
@@ -79,7 +91,11 @@ void PetitionMgr::LoadSignatures()
     do
     {
         Field* fields = result->Fetch();
-        AddSignature(ObjectGuid::Create<HighGuid::Item>(fields[0].Get<uint32>()), fields[2].Get<uint32>(), ObjectGuid::Create<HighGuid::Player>(fields[1].Get<uint32>()));
+        uint32 petitionId = fields[0].Get<uint32>();
+        auto it = PetitionIdToItemGuid.find(petitionId);
+        if (it == PetitionIdToItemGuid.end())
+            continue; // orphan signature, skip
+        AddSignature(it->second, fields[2].Get<uint32>(), ObjectGuid::Create<HighGuid::Player>(fields[1].Get<uint32>()));
         ++count;
     } while (result->NextRow());
 
@@ -87,10 +103,11 @@ void PetitionMgr::LoadSignatures()
     LOG_INFO("server.loading", " ");
 }
 
-void PetitionMgr::AddPetition(ObjectGuid petitionGUID, ObjectGuid ownerGuid, std::string const& name, uint8 type)
+void PetitionMgr::AddPetition(ObjectGuid petitionGUID, ObjectGuid ownerGuid, std::string const& name, uint8 type, uint32 petitionId)
 {
     Petition& p = PetitionStore[petitionGUID];
     p.petitionGuid = petitionGUID;
+    p.petitionId = petitionId;
     p.ownerGuid = ownerGuid;
     p.petitionName = name;
     p.petitionType = type;
@@ -102,7 +119,12 @@ void PetitionMgr::AddPetition(ObjectGuid petitionGUID, ObjectGuid ownerGuid, std
 
 void PetitionMgr::RemovePetition(ObjectGuid petitionGUID)
 {
-    PetitionStore.erase(petitionGUID);
+    auto it = PetitionStore.find(petitionGUID);
+    if (it != PetitionStore.end())
+    {
+        PetitionIdToItemGuid.erase(it->second.petitionId);
+        PetitionStore.erase(it);
+    }
 
     // remove signatures
     SignatureStore.erase(petitionGUID);
@@ -141,6 +163,15 @@ Petition const* PetitionMgr::GetPetition(ObjectGuid petitionGUID) const
     if (itr != PetitionStore.end())
         return &itr->second;
     return nullptr;
+}
+
+Petition const* PetitionMgr::GetPetitionById(uint32 petitionId) const
+{
+    auto it = PetitionIdToItemGuid.find(petitionId);
+    if (it == PetitionIdToItemGuid.end())
+        return nullptr;
+
+    return GetPetition(it->second);
 }
 
 Petition const* PetitionMgr::GetPetitionByOwnerWithType(ObjectGuid ownerGuid, uint8 type) const
@@ -188,4 +219,38 @@ void PetitionMgr::RemoveSignaturesByPlayerAndType(ObjectGuid playerGuid, uint8 t
         if (signItr != itr->second.signatureMap.end())
             itr->second.signatureMap.erase(signItr);
     }
+}
+
+uint32 PetitionMgr::GeneratePetitionId()
+{
+    // ensure 31-bit range and avoid collisions with already loaded petitions
+    if (_nextPetitionId == 0 || _nextPetitionId >= 0x7FFFFFFF)
+        _nextPetitionId = 1;
+
+    // find first free id
+    while (PetitionIdToItemGuid.count(_nextPetitionId))
+    {
+        ++_nextPetitionId;
+        if (_nextPetitionId >= 0x7FFFFFFF)
+            _nextPetitionId = 1;
+    }
+
+    uint32 id = _nextPetitionId++;
+    if (_nextPetitionId >= 0x7FFFFFFF)
+        _nextPetitionId = 1;
+    return id;
+}
+
+uint32 PetitionMgr::GetPetitionIdByItemGuid(ObjectGuid petitionItemGuid) const
+{
+    Petition const* p = GetPetition(petitionItemGuid);
+    return p ? p->petitionId : 0;
+}
+
+ObjectGuid PetitionMgr::GetItemGuidByPetitionId(uint32 petitionId) const
+{
+    auto it = PetitionIdToItemGuid.find(petitionId);
+    if (it == PetitionIdToItemGuid.end())
+        return ObjectGuid::Empty;
+    return it->second;
 }

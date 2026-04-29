@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -98,6 +98,7 @@ public:
     void PeriodicTick(AuraApplication* aurApp, Unit* caster) const;
 
     void HandleProc(AuraApplication* aurApp, ProcEventInfo& eventInfo);
+    bool CheckEffectProc(AuraApplication* aurApp, ProcEventInfo& eventInfo) const;
 
     void CleanupTriggeredSpells(Unit* target);
 
@@ -110,9 +111,8 @@ public:
     uint8 GetCasterLevel() const { return m_casterLevel; }
     bool CanApplyResilience() const { return m_applyResilience; }
     float GetPctMods() const { return m_pctMods; }
+    void SetPctMods(float pctMods) { m_pctMods = pctMods; }
 
-    // xinef: stacking
-    uint32 GetAuraGroup() const { return m_auraGroup; }
     int32 GetOldAmount() const { return m_oldAmount; }
     void SetOldAmount(int32 amount) { m_oldAmount = amount; }
     void SetEnabled(bool enabled) { m_isAuraEnabled = enabled; }
@@ -130,8 +130,6 @@ private:
     float m_critChance;
     float m_pctMods;
 
-    // xinef: stacking
-    uint32 m_auraGroup;
     int32 m_oldAmount;
     bool m_isAuraEnabled;
     // xinef: channel information for channel triggering
@@ -146,6 +144,7 @@ private:
     uint8 const m_effIndex;
     bool m_canBeRecalculated;
     bool m_isPeriodic;
+    bool m_isRecalculatingPassiveAuras = false;
 private:
     float CalcPeriodicCritChance(Unit const* caster, Unit const* target) const;
 
@@ -207,6 +206,7 @@ public:
     void HandleModThreat(AuraApplication const* aurApp, uint8 mode, bool apply) const;
     void HandleAuraModTotalThreat(AuraApplication const* aurApp, uint8 mode, bool apply) const;
     void HandleModTaunt(AuraApplication const* aurApp, uint8 mode, bool apply) const;
+    void HandleModDetaunt(AuraApplication const* aurApp, uint8 mode, bool apply) const;
     //  control
     void HandleModConfuse(AuraApplication const* aurApp, uint8 mode, bool apply) const;
     void HandleModFear(AuraApplication const* aurApp, uint8 mode, bool apply) const;
@@ -298,6 +298,7 @@ public:
     void HandleModDamagePercentDone(AuraApplication const* aurApp, uint8 mode, bool apply) const;
     void HandleModOffhandDamagePercent(AuraApplication const* aurApp, uint8 mode, bool apply) const;
     void HandleShieldBlockValue(AuraApplication const* aurApp, uint8 mode, bool apply) const;
+    void HandleShieldBlockValuePercent(AuraApplication const* aurApp, uint8 mode, bool apply) const;
     //  power cost
     void HandleModPowerCostPCT(AuraApplication const* aurApp, uint8 mode, bool apply) const;
     void HandleModPowerCost(AuraApplication const* aurApp, uint8 mode, bool apply) const;
@@ -335,6 +336,7 @@ public:
     void HandlePeriodicPowerBurnAuraTick(Unit* target, Unit* caster) const;
 
     // aura effect proc handlers
+    void HandleBreakableCCAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo);
     void HandleProcTriggerSpellAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo);
     void HandleProcTriggerSpellWithValueAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo);
     void HandleProcTriggerDamageAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo);

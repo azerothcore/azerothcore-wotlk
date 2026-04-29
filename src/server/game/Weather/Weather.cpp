@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -20,16 +20,16 @@
 */
 
 #include "Weather.h"
+#include "Map.h"
 #include "MiscPackets.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "Util.h"
 #include "World.h"
-#include "WorldSessionMgr.h"
 
 /// Create the Weather object
-Weather::Weather(uint32 zone, WeatherData const* weatherChances)
-    : m_zone(zone), m_weatherChances(weatherChances)
+Weather::Weather(Map* map, uint32 zone, WeatherData const* weatherChances)
+    : m_map(map), m_zone(zone), m_weatherChances(weatherChances)
 {
     m_timer.SetInterval(sWorld->getIntConfig(CONFIG_INTERVAL_CHANGEWEATHER));
     m_type = WEATHER_TYPE_FINE;
@@ -190,6 +190,12 @@ void Weather::SendWeatherUpdateToPlayer(Player* player)
     player->SendDirectMessage(weather.Write());
 }
 
+void Weather::SendFineWeatherUpdateToPlayer(Player* player)
+{
+    WorldPackets::Misc::Weather weather(WEATHER_STATE_FINE);
+    player->SendDirectMessage(weather.Write());
+}
+
 /// Send the new weather to all players in the zone
 bool Weather::UpdateWeather()
 {
@@ -204,7 +210,7 @@ bool Weather::UpdateWeather()
     WorldPackets::Misc::Weather weather(state, m_grade);
 
     //- Returns false if there were no players found to update
-    if (!sWorldSessionMgr->SendZoneMessage(m_zone, weather.Write()))
+    if (!m_map->SendZoneMessage(m_zone, weather.Write()))
         return false;
 
     ///- Log the event

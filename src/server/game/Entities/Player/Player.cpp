@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -18,6 +18,7 @@
 #include "Player.h"
 #include "AccountMgr.h"
 #include "AchievementMgr.h"
+#include "AreaDefines.h"
 #include "ArenaSpectator.h"
 #include "ArenaTeam.h"
 #include "ArenaTeamMgr.h"
@@ -68,15 +69,19 @@
 #include "Realm.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
+#include "SharedDefines.h"
 #include "SocialMgr.h"
 #include "Spell.h"
+#include "SpellAuraDefines.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
 #include "SpellMgr.h"
 #include "StringConvert.h"
 #include "TicketMgr.h"
 #include "Tokenize.h"
+#include "Trainer.h"
 #include "Transport.h"
+#include "Unit.h"
 #include "UpdateData.h"
 #include "Util.h"
 #include "Vehicle.h"
@@ -86,8 +91,10 @@
 #include "WorldSession.h"
 #include "WorldSessionMgr.h"
 #include "WorldState.h"
+#include "WorldStateDefines.h"
 #include "WorldStatePackets.h"
 #include <cmath>
+#include <queue>
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -99,7 +106,7 @@ enum CharacterFlags
 {
     CHARACTER_FLAG_NONE                 = 0x00000000,
     CHARACTER_FLAG_UNK1                 = 0x00000001,
-    CHARACTER_FLAG_UNK2                 = 0x00000002,
+    CHARACTER_FLAG_RESTING              = 0x00000002,
     CHARACTER_LOCKED_FOR_TRANSFER       = 0x00000004,
     CHARACTER_FLAG_UNK4                 = 0x00000008,
     CHARACTER_FLAG_UNK5                 = 0x00000010,
@@ -147,7 +154,7 @@ static uint32 copseReclaimDelay[MAX_DEATH_COUNT] = { 30, 60, 120 };
 #ifdef _MSC_VER
 #pragma warning(disable:4355)
 #endif
-Player::Player(WorldSession* session): Unit(true), m_mover(this)
+Player::Player(WorldSession* session): Unit(), m_mover(this), _cinematicMgr(*this)
 {
 #ifdef _MSC_VER
 #pragma warning(default:4355)
@@ -308,14 +315,16 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
 
     for (uint8 i = 0; i < BASEMOD_END; ++i)
     {
-        m_auraBaseMod[i][FLAT_MOD] = 0.0f;
-        m_auraBaseMod[i][PCT_MOD] = 1.0f;
+        m_auraBaseFlatMod[i] = 0.0f;
+        m_auraBasePctMod[i] = 1.0f;
     }
 
     for (uint8 i = 0; i < MAX_COMBAT_RATING; i++)
         m_baseRatingValue[i] = 0;
 
     m_baseSpellPower = 0;
+    m_baseSpellDamage = 0;
+    m_baseSpellHealing = 0;
     m_baseFeralAP = 0;
     m_baseManaRegen = 0;
     m_baseHealthRegen = 0;
@@ -386,12 +395,9 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
 
     m_creationTime = 0s;
 
-    _cinematicMgr = new CinematicMgr(this);
-
     m_achievementMgr = new AchievementMgr(this);
     m_reputationMgr = new ReputationMgr(this);
 
-    // Ours
     m_NeedToSaveGlyphs = false;
     m_MountBlockId = 0;
     m_realDodge = 0.0f;
@@ -409,7 +415,14 @@ Player::Player(WorldSession* session): Unit(true), m_mover(this)
     m_isInstantFlightOn = true;
 
     _wasOutdoor = true;
+
+    GetObjectVisibilityContainer().InitForPlayer();
+
     sScriptMgr->OnConstructPlayer(this);
+
+    _expectingChangeTransport = false;
+    _pendingFlightChangeCounter = 0;
+    _mapChangeOrderCounter = 0;
 }
 
 Player::~Player()
@@ -447,7 +460,6 @@ Player::~Player()
     delete m_runes;
     delete m_achievementMgr;
     delete m_reputationMgr;
-    delete _cinematicMgr;
 
     sWorldSessionMgr->DecreasePlayerCount();
 
@@ -757,7 +769,9 @@ bool Player::IsImmuneToEnvironmentalDamage()
 
 uint32 Player::EnvironmentalDamage(EnviromentalDamage type, uint32 damage)
 {
-    if (IsImmuneToEnvironmentalDamage())
+    // DAMAGE_FALL_TO_VOID bypasses all immunities (e.g. Divine Shield) to prevent
+    // players from being stuck infinitely falling below the map
+    if (type != DAMAGE_FALL_TO_VOID && IsImmuneToEnvironmentalDamage())
         return 0;
 
     // Absorb, resist some environmental damage type
@@ -796,8 +810,8 @@ uint32 Player::EnvironmentalDamage(EnviromentalDamage type, uint32 damage)
         if (type == DAMAGE_FALL)                               // DealDamage not apply item durability loss at self damage
         {
             LOG_DEBUG("entities.player", "Player::EnvironmentalDamage: Player '{}' ({}) fall to death, losing {} durability",
-                GetName(), GetGUID().ToString(), sWorld->getRate(RATE_DURABILITY_LOSS_ON_DEATH));
-            DurabilityLossAll(sWorld->getRate(RATE_DURABILITY_LOSS_ON_DEATH), false);
+                GetName(), GetGUID().ToString(), sWorld->getRate(RATE_DURABILITY_LOSS_ON_DEATH) / 100.0f);
+            DurabilityLossAll(sWorld->getRate(RATE_DURABILITY_LOSS_ON_DEATH) / 100.0f, false);
             // durability lost message
             SendDurabilityLoss();
         }
@@ -819,9 +833,7 @@ int32 Player::getMaxTimer(MirrorTimerType timer)
                 if (!IsAlive() || HasWaterBreathingAura() || GetSession()->GetSecurity() >= AccountTypes(sWorld->getIntConfig(CONFIG_DISABLE_BREATHING)))
                     return DISABLED_MIRROR_TIMER;
                 int32 UnderWaterTime = sWorld->getIntConfig(CONFIG_WATER_BREATH_TIMER);
-                AuraEffectList const& mModWaterBreathing = GetAuraEffectsByType(SPELL_AURA_MOD_WATER_BREATHING);
-                for (AuraEffectList::const_iterator i = mModWaterBreathing.begin(); i != mModWaterBreathing.end(); ++i)
-                    AddPct(UnderWaterTime, (*i)->GetAmount());
+                UnderWaterTime *= GetTotalAuraMultiplier(SPELL_AURA_MOD_WATER_BREATHING);
                 return UnderWaterTime;
             }
         case FIRE_TIMER:
@@ -1155,6 +1167,8 @@ bool Player::BuildEnumData(PreparedQueryResult result, WorldPacket* data)
 
     *data << uint32(fields[16].Get<uint32>());                 // guild id
 
+    if (playerFlags & PLAYER_FLAGS_RESTING)
+        playerFlags |= CHARACTER_FLAG_RESTING;
     if (atLoginFlags & AT_LOGIN_RESURRECT)
         playerFlags &= ~PLAYER_FLAGS_GHOST;
     if (playerFlags & PLAYER_FLAGS_HIDE_HELM)
@@ -1329,9 +1343,10 @@ void Player::SendTeleportAckPacket()
 {
     WorldPacket data(MSG_MOVE_TELEPORT_ACK, 41);
     data << GetPackGUID();
-    data << uint32(0);                                     // this value increments every time
+    data << GetSession()->GetOrderCounter(); // movement counter
     BuildMovementPacket(&data);
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
+    GetSession()->IncrementOrderCounter();
 }
 
 bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientation, uint32 options /*= 0*/, Unit* target /*= nullptr*/, bool newInstance /*= false*/)
@@ -1484,7 +1499,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
     }
     else
     {
-        if (IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_TELEPORT) && GetMapId() == 609 && !IsGameMaster() && !HasSpell(50977))
+        if (IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_TELEPORT) && GetMapId() == MAP_EBON_HOLD && !IsGameMaster() && !HasSpell(50977))
         {
             SendTransferAborted(mapid, TRANSFER_ABORT_UNIQUE_MESSAGE, 1);
             return false;
@@ -1521,17 +1536,6 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
 
             CombatStop();
 
-            // remove arena spell coldowns/buffs now to also remove pet's cooldowns before it's temporarily unsummoned
-            if (mEntry->IsBattleArena() && (HasPendingSpectatorForBG(0) || !HasPendingSpectatorForBG(GetBattlegroundId())))
-            {
-                // KEEP THIS ORDER!
-                RemoveArenaAuras();
-                if (pet)
-                    pet->RemoveArenaAuras();
-
-                RemoveArenaSpellCooldowns(true);
-            }
-
             // remove pet on map change
             if (pet)
                 UnsummonPetTemporaryIfAny();
@@ -1548,6 +1552,8 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             //remove auras before removing from map...
             RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CHANGE_MAP | AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING);
 
+            SetMapChangeOrderCounter();
+
             if (!GetSession()->PlayerLogout())
             {
                 // send transfer packets
@@ -1556,23 +1562,12 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
                 if (m_transport)
                     data << m_transport->GetEntry() << GetMapId();
 
-                GetSession()->SendPacket(&data);
+                SendDirectMessage(&data);
             }
 
             // remove from old map now
             if (oldmap)
                 oldmap->RemovePlayerFromMap(this, false);
-
-            // xinef: do this before setting fall information!
-            if (IsMounted() && (!GetMap()->GetEntry()->IsDungeon() && !GetMap()->GetEntry()->IsBattlegroundOrArena()) && !m_transport)
-            {
-                AuraEffectList const& auras = GetAuraEffectsByType(SPELL_AURA_MOUNTED);
-                if (!auras.empty())
-                {
-                    SetMountBlockId((*auras.begin())->GetId());
-                    RemoveAurasByType(SPELL_AURA_MOUNTED);
-                }
-            }
 
             teleportStore_dest = WorldLocation(mapid, x, y, z, orientation);
             SetFallInformation(GameTime::GetGameTime().count(), z);
@@ -1589,7 +1584,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
                 else
                     data << teleportStore_dest.PositionXYZOStream();
 
-                GetSession()->SendPacket(&data);
+                SendDirectMessage(&data);
                 SendSavedInstances();
             }
 
@@ -1646,12 +1641,9 @@ void Player::ProcessDelayedOperations()
     if (m_DelayedOperations & DELAYED_SAVE_PLAYER)
         SaveToDB(false, false);
 
-    if (m_DelayedOperations & DELAYED_SPELL_CAST_DESERTER)
-    {
-        Aura* aura = GetAura(26013);
-        if (!aura || aura->GetDuration() <= 900000)
+    if ((m_DelayedOperations & DELAYED_SPELL_CAST_DESERTER)
+        && !GetAura(26013))
             CastSpell(this, 26013, true);
-    }
 
     if (m_DelayedOperations & DELAYED_BG_MOUNT_RESTORE)
     {
@@ -1729,7 +1721,7 @@ void Player::RemoveFromWorld()
             m_session->DoLootRelease(lguid);
         sOutdoorPvPMgr->HandlePlayerLeaveZone(this, m_zoneUpdateId);
         sBattlefieldMgr->HandlePlayerLeaveZone(this, m_zoneUpdateId);
-        sWorldState->HandlePlayerLeaveZone(this, static_cast<WorldStateZoneId>(m_zoneUpdateId));
+        sWorldState->HandlePlayerLeaveZone(this, static_cast<AreaTableIDs>(m_zoneUpdateId));
     }
 
     // Remove items from world before self - player must be found in Item::RemoveFromObjectUpdate
@@ -1881,9 +1873,9 @@ void Player::Regenerate(Powers power)
                     ManaIncreaseRate = sWorld->getRate(RATE_POWER_MANA) * (2.066f - (GetLevel() * 0.066f));
 
                 if (recentCast) // Trinity Updates Mana in intervals of 2s, which is correct
-                    addvalue += GetFloatValue(UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER) *  ManaIncreaseRate * 0.001f * m_regenTimer;
+                    addvalue += GetFloatValue(UNIT_FIELD_POWER_REGEN_INTERRUPTED_FLAT_MODIFIER + AsUnderlyingType(POWER_MANA)) *  ManaIncreaseRate * 0.001f * m_regenTimer;
                 else
-                    addvalue += GetFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER) * ManaIncreaseRate * 0.001f * m_regenTimer;
+                    addvalue += GetFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER + AsUnderlyingType(POWER_MANA)) * ManaIncreaseRate * 0.001f * m_regenTimer;
             }
             break;
         case POWER_RAGE:                                    // Regenerate rage
@@ -1895,27 +1887,15 @@ void Player::Regenerate(Powers power)
                 }
             }
             break;
-        case POWER_ENERGY:
-            {
-                float baseRegenRate = 10.0f * sWorld->getRate(RATE_POWER_ENERGY);
-                float hasteModifier = 1.0f;
-
-                // Apply Vitality
-                if (HasAura(61329))
-                    hasteModifier += 0.25f;
-
-                // Apply Overkill
-                if (HasAura(58426))
-                    hasteModifier += 0.30f;
-
-                // Apply Adrenaline Rush
-                if (HasAura(13750))
-                    hasteModifier += 1.0f;
-
-                float adjustedRegenRate = baseRegenRate * hasteModifier;
-
-                addvalue += adjustedRegenRate * 0.001f * m_regenTimer;
-            }
+        case POWER_ENERGY:                                  // Regenerate energy (rogue)
+            // Regen per second
+            addvalue += (GetFloatValue(UNIT_FIELD_POWER_REGEN_FLAT_MODIFIER + AsUnderlyingType(POWER_ENERGY)) + 10.f);
+            // Regen per millisecond
+            addvalue *= 0.001f;
+            // Milliseconds passed
+            addvalue *= m_regenTimer;
+            // Rate
+            addvalue *= sWorld->getRate(RATE_POWER_ENERGY);
             break;
         case POWER_RUNIC_POWER:
             {
@@ -1936,13 +1916,10 @@ void Player::Regenerate(Powers power)
             break;
     }
 
-    // Mana regen calculated in Player::UpdateManaRegen()
-    if (power != POWER_MANA)
+    // Mana regen calculated in Player::UpdateManaRegen(), energy regen calculated in Player::UpdateEnergyRegen()
+    if (power != POWER_MANA && power != POWER_ENERGY)
     {
-        AuraEffectList const& ModPowerRegenPCTAuras = GetAuraEffectsByType(SPELL_AURA_MOD_POWER_REGEN_PERCENT);
-        for (AuraEffectList::const_iterator i = ModPowerRegenPCTAuras.begin(); i != ModPowerRegenPCTAuras.end(); ++i)
-            if (Powers((*i)->GetMiscValue()) == power)
-                AddPct(addvalue, (*i)->GetAmount());
+        addvalue *= GetTotalAuraMultiplierByMiscValue(SPELL_AURA_MOD_POWER_REGEN_PERCENT, power);
 
         // Butchery requires combat for this effect
         if (power != POWER_RUNIC_POWER || IsInCombat())
@@ -1965,7 +1942,6 @@ void Player::Regenerate(Powers power)
     addvalue += m_powerFraction[power];
     uint32 integerValue = uint32(std::fabs(addvalue));
 
-    bool forcedUpdate = false;
     if (addvalue < 0.0f)
     {
         if (curValue > integerValue)
@@ -1977,7 +1953,6 @@ void Player::Regenerate(Powers power)
         {
             curValue = 0;
             m_powerFraction[power] = 0;
-            forcedUpdate = true;
         }
     }
     else
@@ -1988,22 +1963,15 @@ void Player::Regenerate(Powers power)
         {
             curValue = maxValue;
             m_powerFraction[power] = 0;
-            forcedUpdate = true;
         }
         else
-        {
             m_powerFraction[power] = addvalue - integerValue;
-        }
     }
 
-    if (m_regenTimerCount >= 2000 || forcedUpdate)
-    {
+    if (m_regenTimerCount >= 2000 || curValue == 0 || curValue == maxValue)
         SetPower(power, curValue, true, true);
-    }
     else
-    {
-        UpdateUInt32Value(static_cast<uint16>(UNIT_FIELD_POWER1) + power, curValue);
-    }
+        UpdateUInt32Value(UNIT_FIELD_POWER1 + AsUnderlyingType(power), curValue);
 }
 
 void Player::RegenerateHealth()
@@ -2034,11 +2002,7 @@ void Player::RegenerateHealth()
             addvalue *= 1.33f;
         }
 
-        AuraEffectList const& mModHealthRegenPct = GetAuraEffectsByType(SPELL_AURA_MOD_HEALTH_REGEN_PERCENT);
-        for (AuraEffectList::const_iterator i = mModHealthRegenPct.begin(); i != mModHealthRegenPct.end(); ++i)
-        {
-            AddPct(addvalue, (*i)->GetAmount());
-        }
+        addvalue *= GetTotalAuraMultiplier(SPELL_AURA_MOD_HEALTH_REGEN_PERCENT);
 
         if (!IsInCombat())
         {
@@ -2099,7 +2063,7 @@ bool Player::CanInteractWithQuestGiver(Object* questGiver)
     return false;
 }
 
-Creature* Player::GetNPCIfCanInteractWith(ObjectGuid guid, uint32 npcflagmask)
+Creature* Player::GetNPCIfCanInteractWith(ObjectGuid const& guid, uint32 npcflagmask)
 {
     // unit checks
     if (!guid)
@@ -2148,15 +2112,10 @@ Creature* Player::GetNPCIfCanInteractWith(ObjectGuid guid, uint32 npcflagmask)
     if (!creature->IsWithinDistInMap(this, INTERACTION_DISTANCE))
         return nullptr;
 
-    // pussywizard: many npcs have missing conditions for class training and rogue trainer can for eg. train dual wield to a shaman :/ too many to change in sql and watch in the future
-    // pussywizard: this function is not used when talking, but when already taking action (buy spell, reset talents, show spell list)
-    if (npcflagmask & (UNIT_NPC_FLAG_TRAINER | UNIT_NPC_FLAG_TRAINER_CLASS) && creature->GetCreatureTemplate()->trainer_type == TRAINER_TYPE_CLASS && !IsClass((Classes)creature->GetCreatureTemplate()->trainer_class, CLASS_CONTEXT_CLASS_TRAINER))
-        return nullptr;
-
     return creature;
 }
 
-GameObject* Player::GetGameObjectIfCanInteractWith(ObjectGuid guid, GameobjectTypes type) const
+GameObject* Player::GetGameObjectIfCanInteractWith(ObjectGuid const& guid, GameobjectTypes type) const
 {
     if (GameObject* go = GetMap()->GetGameObject(guid))
     {
@@ -2201,7 +2160,7 @@ void Player::SetInWater(bool apply)
     // remove auras that need water/land
     RemoveAurasWithInterruptFlags(apply ? AURA_INTERRUPT_FLAG_NOT_ABOVEWATER : AURA_INTERRUPT_FLAG_NOT_UNDERWATER);
 
-    getHostileRefMgr().updateThreatTables();
+    GetThreatMgr().EvaluateSuppressed();
 
     if (InstanceScript* instance = GetInstanceScript())
         instance->OnPlayerInWaterStateUpdate(this, apply);
@@ -2243,7 +2202,6 @@ void Player::SetGameMaster(bool on)
         {
             if (GetSession()->IsGMAccount())
                 pet->SetFaction(FACTION_FRIENDLY);
-            pet->getHostileRefMgr().setOnlineOfflineState(false);
         }
         if (HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP))
         {
@@ -2252,11 +2210,10 @@ void Player::SetGameMaster(bool on)
         }
         ResetContestedPvP();
 
-        getHostileRefMgr().setOnlineOfflineState(false);
         CombatStopWithPets();
 
         SetPhaseMask(uint32(PHASEMASK_ANYWHERE), false);    // see and visible in all phases
-        m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GM, GetSession()->GetSecurity());
+        SetServerSideVisibilityDetect(SERVERSIDE_VISIBILITY_GM, GetSession()->GetSecurity());
     }
     else
     {
@@ -2274,10 +2231,7 @@ void Player::SetGameMaster(bool on)
         RemoveUnitFlag2(UNIT_FLAG2_ALLOW_CHEAT_SPELLS);
 
         if (Pet* pet = GetPet())
-        {
             pet->SetFaction(GetFaction());
-            pet->getHostileRefMgr().setOnlineOfflineState(true);
-        }
 
         // restore FFA PvP Server state
         if (sWorld->IsFFAPvPRealm())
@@ -2291,8 +2245,7 @@ void Player::SetGameMaster(bool on)
         // restore FFA PvP area state, remove not allowed for GM mounts
         UpdateArea(m_areaUpdateId);
 
-        getHostileRefMgr().setOnlineOfflineState(true);
-        m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GM, SEC_PLAYER);
+        SetServerSideVisibilityDetect(SERVERSIDE_VISIBILITY_GM, SEC_PLAYER);
     }
 
     UpdateObjectVisibility();
@@ -2306,16 +2259,15 @@ void Player::SetGMVisible(bool on)
     {
         RemoveAurasDueToSpell(VISUAL_AURA);
         m_ExtraFlags &= ~PLAYER_EXTRA_GM_INVISIBLE;
-        m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GM, SEC_PLAYER);
+        SetServerSideVisibility(SERVERSIDE_VISIBILITY_GM, SEC_PLAYER);
 
-        getHostileRefMgr().setOnlineOfflineState(false);
         CombatStopWithPets();
     }
     else
     {
         AddAura(VISUAL_AURA, this);
         m_ExtraFlags |= PLAYER_EXTRA_GM_INVISIBLE;
-        m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GM, GetSession()->GetSecurity());
+        SetServerSideVisibility(SERVERSIDE_VISIBILITY_GM, GetSession()->GetSecurity());
     }
 }
 
@@ -2392,7 +2344,7 @@ void Player::SendLogXPGain(uint32 GivenXP, Unit* victim, uint32 BonusXP, bool re
     }
 
     data << uint8(recruitAFriend ? 1 : 0);                  // does the GivenXP include a RaF bonus?
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 void Player::GiveXP(uint32 xp, Unit* victim, float group_rate, bool isLFGReward)
@@ -2422,7 +2374,7 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate, bool isLFGReward)
     // Favored experience increase START
     uint32 zone = GetZoneId();
     float favored_exp_mult = 0;
-    if ((zone == 3483 || zone == 3562 || zone == 3836 || zone == 3713 || zone == 3714) && HasAnyAuras(32096 /*Thrallmar's Favor*/, 32098 /*Honor Hold's Favor*/))
+    if ((zone == AREA_HELLFIRE_PENINSULA || zone == AREA_HELLFIRE_RAMPARTS || zone == AREA_MAGTHERIDONS_LAIR || zone == AREA_THE_BLOOD_FURNACE || zone == AREA_THE_SHATTERED_HALLS) && HasAnyAuras(32096 /*Thrallmar's Favor*/, 32098 /*Honor Hold's Favor*/))
         favored_exp_mult = 0.05f; // Thrallmar's Favor and Honor Hold's Favor
 
     xp = uint32(xp * (1 + favored_exp_mult));
@@ -2690,14 +2642,14 @@ void Player::InitStatsForLevel(bool reapplyMods)
 
     // set armor (resistance 0) to original value (create_agility*2)
     SetArmor(int32(m_createStats[STAT_AGILITY] * 2));
-    SetResistanceBuffMods(SpellSchools(0), true, 0.0f);
-    SetResistanceBuffMods(SpellSchools(0), false, 0.0f);
+    SetFloatValue(UNIT_FIELD_RESISTANCEBUFFMODSPOSITIVE + AsUnderlyingType(SPELL_SCHOOL_NORMAL), 0.0f);
+    SetFloatValue(UNIT_FIELD_RESISTANCEBUFFMODSNEGATIVE + AsUnderlyingType(SPELL_SCHOOL_NORMAL), 0.0f);
     // set other resistance to original value (0)
     for (uint8 i = 1; i < MAX_SPELL_SCHOOL; ++i)
     {
         SetResistance(SpellSchools(i), 0);
-        SetResistanceBuffMods(SpellSchools(i), true, 0.0f);
-        SetResistanceBuffMods(SpellSchools(i), false, 0.0f);
+        SetFloatValue(UNIT_FIELD_RESISTANCEBUFFMODSPOSITIVE + i, 0.0f);
+        SetFloatValue(UNIT_FIELD_RESISTANCEBUFFMODSNEGATIVE + i, 0.0f);
     }
 
     SetUInt32Value(PLAYER_FIELD_MOD_TARGET_RESISTANCE, 0);
@@ -2867,7 +2819,7 @@ void Player::SendInitialSpells()
         data << uint32(itr->second.category ? cooldown : 0);    // category cooldown
     }
 
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 void Player::RemoveMail(uint32 id)
@@ -2896,7 +2848,7 @@ void Player::SendMailResult(uint32 mailId, MailResponseType mailAction, MailResp
         data << (uint32) item_guid;                         // item guid low?
         data << (uint32) item_count;                        // item count?
     }
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 void Player::SendNewMail()
@@ -2904,7 +2856,7 @@ void Player::SendNewMail()
     // deliver undelivered mail
     WorldPacket data(SMSG_RECEIVED_MAIL, 4);
     data << (uint32) 0;
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 void Player::AddNewMailDeliverTime(time_t deliver_time)
@@ -3062,13 +3014,13 @@ void Player::SendLearnPacket(uint32 spellId, bool learn)
         WorldPacket data(SMSG_LEARNED_SPELL, 6);
         data << uint32(spellId);
         data << uint16(0);
-        GetSession()->SendPacket(&data);
+        SendDirectMessage(&data);
     }
     else
     {
         WorldPacket data(SMSG_REMOVED_SPELL, 4);
         data << uint32(spellId);
-        GetSession()->SendPacket(&data);
+        SendDirectMessage(&data);
     }
 }
 
@@ -3100,7 +3052,7 @@ bool Player::addSpell(uint32 spellId, uint8 addSpecMask, bool updateActive, bool
                         WorldPacket data(SMSG_SUPERCEDED_SPELL, 4 + 4);
                         data << uint32(nextSpellInfo->Id);
                         data << uint32(spellInfo->Id);
-                        GetSession()->SendPacket(&data);
+                        SendDirectMessage(&data);
                     }
                     return false;
                 }
@@ -3116,6 +3068,35 @@ bool Player::addSpell(uint32 spellId, uint8 addSpecMask, bool updateActive, bool
         }
     }
 
+    return true;
+}
+
+bool Player::CheckSkillLearnedBySpell(uint32 spellId)
+{
+    if (!sWorld->getBoolConfig(CONFIG_VALIDATE_SKILL_LEARNED_BY_SPELLS))
+        return true;
+
+    SkillLineAbilityMapBounds skill_bounds = sSpellMgr->GetSkillLineAbilityMapBounds(spellId);
+    uint32 errorSkill = 0;
+    for (SkillLineAbilityMap::const_iterator sla = skill_bounds.first; sla != skill_bounds.second; ++sla)
+    {
+        SkillLineEntry const* pSkill = sSkillLineStore.LookupEntry(sla->second->SkillLine);
+        if (!pSkill)
+            continue;
+
+        if (GetSkillRaceClassInfo(pSkill->id, getRace(), getClass()))
+            return true;
+        else
+            errorSkill = pSkill->id;
+    }
+
+    if (errorSkill)
+    {
+        LOG_ERROR("entities.player", "Player {} (GUID: {}), has spell ({}) that teach skill ({}) which is invalid for the race/class combination (Race: {}, Class: {}). Will be deleted.",
+            GetName(), GetGUID().GetCounter(), spellId, errorSkill, getRace(), getClass());
+
+        return false;
+    }
     return true;
 }
 
@@ -3260,27 +3241,17 @@ bool Player::_addSpell(uint32 spellId, uint8 addSpecMask, bool temporary, bool l
         {
             SkillLineEntry const* pSkill = sSkillLineStore.LookupEntry(_spell_idx->second->SkillLine);
             if (!pSkill)
-            {
                 continue;
-            }
 
-           /// @todo confirm if rogues start wth lockpicking skill at level 1 but only recieve the spell to use it at level 16
+            /// @todo confirm if rogues start wth lockpicking skill at level 1 but only recieve the spell to use it at level 16
             // Added for runeforging, it is confirmed via sniff that this happens when death knights learn the spell, not on character creation.
             if ((_spell_idx->second->AcquireMethod == SKILL_LINE_ABILITY_LEARNED_ON_SKILL_LEARN && !HasSkill(pSkill->id)) || ((pSkill->id == SKILL_LOCKPICKING || pSkill->id == SKILL_RUNEFORGING) && _spell_idx->second->TrivialSkillLineRankHigh == 0))
-            {
                 LearnDefaultSkill(pSkill->id, 0);
-            }
 
             if (pSkill->id == SKILL_MOUNTS && !Has310Flyer(false))
-            {
                 for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-                {
                     if (spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_MOD_INCREASE_MOUNTED_FLIGHT_SPEED && spellInfo->Effects[i].CalcValue() == 310)
-                    {
                         SetHas310Flyer(true);
-                    }
-                }
-            }
         }
     }
 
@@ -3794,7 +3765,7 @@ bool Player::resetTalents(bool noResetCost)
     if (m_canTitanGrip)
         SetCanTitanGrip(false);
     // xinef: remove dual wield if player does not have dual wield spell (shamans)
-    if (!HasSpell(674) && m_canDualWield)
+    if (!HasSpell(674) && CanDualWield())
         SetCanDualWield(false);
 
     AutoUnequipOffhandIfNeed();
@@ -3911,74 +3882,6 @@ bool Player::HasActiveSpell(uint32 spell) const
 {
     PlayerSpellMap::const_iterator itr = m_spells.find(spell);
     return (itr != m_spells.end() && itr->second->State != PLAYERSPELL_REMOVED && itr->second->Active && itr->second->IsInSpec(m_activeSpec));
-}
-
-TrainerSpellState Player::GetTrainerSpellState(TrainerSpell const* trainer_spell) const
-{
-    if (!trainer_spell)
-        return TRAINER_SPELL_RED;
-
-    bool hasSpell = true;
-    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-    {
-        if (!trainer_spell->learnedSpell[i])
-            continue;
-
-        if (!HasSpell(trainer_spell->learnedSpell[i]))
-        {
-            hasSpell = false;
-            break;
-        }
-    }
-    // known spell
-    if (hasSpell)
-        return TRAINER_SPELL_GRAY;
-
-    // check skill requirement
-    if (trainer_spell->reqSkill && GetBaseSkillValue(trainer_spell->reqSkill) < trainer_spell->reqSkillValue)
-        return TRAINER_SPELL_RED;
-
-    // check level requirement
-    if (GetLevel() < trainer_spell->reqLevel)
-        return TRAINER_SPELL_RED;
-
-    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-    {
-        if (!trainer_spell->learnedSpell[i])
-            continue;
-
-        // check race/class requirement
-        if (!IsSpellFitByClassAndRace(trainer_spell->learnedSpell[i]))
-            return TRAINER_SPELL_RED;
-
-        if (uint32 prevSpell = sSpellMgr->GetPrevSpellInChain(trainer_spell->learnedSpell[i]))
-        {
-            // check prev.rank requirement
-            if (prevSpell && !HasSpell(prevSpell))
-                return TRAINER_SPELL_RED;
-        }
-
-        SpellsRequiringSpellMapBounds spellsRequired = sSpellMgr->GetSpellsRequiredForSpellBounds(trainer_spell->learnedSpell[i]);
-        for (SpellsRequiringSpellMap::const_iterator itr = spellsRequired.first; itr != spellsRequired.second; ++itr)
-        {
-            // check additional spell requirement
-            if (!HasSpell(itr->second))
-                return TRAINER_SPELL_RED;
-        }
-    }
-
-    // check primary prof. limit
-    // first rank of primary profession spell when there are no proffesions avalible is disabled
-    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-    {
-        if (!trainer_spell->learnedSpell[i])
-            continue;
-        SpellInfo const* learnedSpellInfo = sSpellMgr->GetSpellInfo(trainer_spell->learnedSpell[i]);
-        if (learnedSpellInfo && learnedSpellInfo->IsPrimaryProfessionFirstRank() && (GetFreePrimaryProfessionPoints() == 0))
-            return TRAINER_SPELL_GREEN_DISABLED;
-    }
-
-    return TRAINER_SPELL_GREEN;
 }
 
 /**
@@ -4416,32 +4319,6 @@ void Player::DeleteOldRecoveryItems(uint32 keepDays)
     }
 }
 
-void Player::SetMovement(PlayerMovementType pType)
-{
-    WorldPacket data;
-    switch (pType)
-    {
-        case MOVE_ROOT:
-            data.Initialize(SMSG_FORCE_MOVE_ROOT,   GetPackGUID().size() + 4);
-            break;
-        case MOVE_UNROOT:
-            data.Initialize(SMSG_FORCE_MOVE_UNROOT, GetPackGUID().size() + 4);
-            break;
-        case MOVE_WATER_WALK:
-            data.Initialize(SMSG_MOVE_WATER_WALK,   GetPackGUID().size() + 4);
-            break;
-        case MOVE_LAND_WALK:
-            data.Initialize(SMSG_MOVE_LAND_WALK,    GetPackGUID().size() + 4);
-            break;
-        default:
-            LOG_ERROR("entities.player", "Player::SetMovement: Unsupported move type ({}), data not sent to client.", pType);
-            return;
-    }
-    data << GetPackGUID();
-    data << uint32(0);
-    GetSession()->SendPacket(&data);
-}
-
 /* Preconditions:
   - a resurrectable corpse must not be loaded for the player (only bones)
   - the player must be in world
@@ -4450,7 +4327,7 @@ void Player::BuildPlayerRepop()
 {
     WorldPacket data(SMSG_PRE_RESURRECT, GetPackGUID().size());
     data << GetPackGUID();
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
     if (getRace(true) == RACE_NIGHTELF)
     {
         CastSpell(this, 20584, true);
@@ -4477,12 +4354,11 @@ void Player::BuildPlayerRepop()
     }
     GetMap()->AddToMap(corpse);
     SetHealth(1); // convert player body to ghost
-    SetMovement(MOVE_WATER_WALK);
     SetWaterWalking(true);
-    if (!GetSession()->isLogingOut())
-    {
-        SetMovement(MOVE_UNROOT);
-    }
+
+    if (!IsImmobilizedState())
+        SendMoveRoot(false);
+
     RemoveUnitFlag(UNIT_FLAG_SKINNABLE); // BG - remove insignia related
     int32 corpseReclaimDelay = CalculateCorpseReclaimDelay();
     if (corpseReclaimDelay >= 0)
@@ -4505,7 +4381,7 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
     data << float(0);
     data << float(0);
     data << float(0);
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 
     // speed change, land walk
 
@@ -4518,8 +4394,7 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
         SetDynamicFlag(UNIT_DYNFLAG_REFER_A_FRIEND);
 
     setDeathState(DeathState::Alive);
-    SetMovement(MOVE_LAND_WALK);
-    SetMovement(MOVE_UNROOT);
+    SendMoveRoot(false);
     SetWaterWalking(false);
     m_deathTimer = 0;
 
@@ -4543,6 +4418,9 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
 
     // update visibility
     UpdateObjectVisibility();
+
+    // recast lost by death auras of any items held in the inventory
+    CastAllObtainSpells();
 
     sScriptMgr->OnPlayerResurrect(this, restore_percent, applySickness);
 
@@ -4580,7 +4458,7 @@ void Player::KillPlayer()
     if (IsFlying() && !GetTransport())
         GetMotionMaster()->MoveFall();
 
-    SetMovement(MOVE_ROOT);
+    SendMoveRoot(true);
 
     StopMirrorTimers();                                     //disable timers(bars)
 
@@ -4607,7 +4485,7 @@ void Player::KillPlayer()
     //UpdateObjectVisibility(); // pussywizard: not needed
 }
 
-void Player::OfflineResurrect(ObjectGuid const guid, CharacterDatabaseTransaction trans)
+void Player::OfflineResurrect(ObjectGuid const& guid, CharacterDatabaseTransaction trans)
 {
     Corpse::DeleteFromDB(guid, trans);
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
@@ -4989,7 +4867,7 @@ void Player::RepopAtGraveyard()
             data << ClosestGrave->x;
             data << ClosestGrave->y;
             data << ClosestGrave->z;
-            GetSession()->SendPacket(&data);
+            SendDirectMessage(&data);
         }
     }
     else if (GetPositionZ() < GetMap()->GetMinHeight(GetPositionX(), GetPositionY()))
@@ -5042,24 +4920,107 @@ void Player::ClearChannelWatch()
         (*itr)->RemoveWatching(this);
 }
 
-void Player::HandleBaseModValue(BaseModGroup modGroup, BaseModType modType, float amount, bool apply)
+void Player::HandleBaseModFlatValue(BaseModGroup modGroup, float amount, bool apply)
 {
     if (modGroup >= BASEMOD_END)
     {
-        LOG_ERROR("entities.player", "ERROR in HandleBaseModValue(): non existed BaseModGroup!");
+        LOG_ERROR("entities.player", "Player::HandleBaseModFlatValue: Invalid BaseModGroup/BaseModType ({}/{}) for player '{}' ({})",
+            modGroup, FLAT_MOD, GetName(), GetGUID().ToString());
         return;
     }
 
-    switch (modType)
+    m_auraBaseFlatMod[modGroup] += apply ? amount : -amount;
+    UpdateBaseModGroup(modGroup);
+}
+
+void Player::ApplyBaseModPctValue(BaseModGroup modGroup, float pct)
+{
+    if (modGroup >= BASEMOD_END)
     {
-        case FLAT_MOD:
-            m_auraBaseMod[modGroup][modType] += apply ? amount : -amount;
+        LOG_ERROR("entities.player", "Player::ApplyBaseModPctValue: Invalid BaseModGroup/BaseModType ({}/{}) for player '{}' ({})",
+            modGroup, PCT_MOD, GetName(), GetGUID().ToString());
+        return;
+    }
+
+    m_auraBasePctMod[modGroup] += CalculatePct(1.0f, pct);
+    UpdateBaseModGroup(modGroup);
+}
+
+void Player::SetBaseModFlatValue(BaseModGroup modGroup, float val)
+{
+    if (m_auraBaseFlatMod[modGroup] == val)
+        return;
+
+    m_auraBaseFlatMod[modGroup] = val;
+    UpdateBaseModGroup(modGroup);
+}
+
+void Player::SetBaseModPctValue(BaseModGroup modGroup, float val)
+{
+    if (m_auraBasePctMod[modGroup] == val)
+        return;
+
+    m_auraBasePctMod[modGroup] = val;
+    UpdateBaseModGroup(modGroup);
+}
+
+void Player::UpdateDamageDoneMods(WeaponAttackType attackType, int32 skipEnchantSlot /*= -1*/)
+{
+    Unit::UpdateDamageDoneMods(attackType, skipEnchantSlot);
+
+    UnitMods unitMod;
+    switch (attackType)
+    {
+        case BASE_ATTACK:
+            unitMod = UNIT_MOD_DAMAGE_MAINHAND;
             break;
-        case PCT_MOD:
-            ApplyPercentModFloatVar(m_auraBaseMod[modGroup][modType], amount, apply);
+        case OFF_ATTACK:
+            unitMod = UNIT_MOD_DAMAGE_OFFHAND;
+            break;
+        case RANGED_ATTACK:
+            unitMod = UNIT_MOD_DAMAGE_RANGED;
+            break;
+        default:
+            ABORT();
             break;
     }
 
+    float amount = 0.0f;
+    Item* item = GetWeaponForAttack(attackType, true);
+    if (!item)
+        return;
+
+    for (uint8 slot = 0; slot < MAX_ENCHANTMENT_SLOT; ++slot)
+    {
+        if (skipEnchantSlot == slot)
+            continue;
+
+        SpellItemEnchantmentEntry const* enchantmentEntry = sSpellItemEnchantmentStore.LookupEntry(item->GetEnchantmentId(EnchantmentSlot(slot)));
+        if (!enchantmentEntry)
+            continue;
+
+        for (uint8 i = 0; i < MAX_SPELL_ITEM_ENCHANTMENT_EFFECTS; ++i)
+        {
+            switch (enchantmentEntry->type[i])
+            {
+                case ITEM_ENCHANTMENT_TYPE_DAMAGE:
+                    amount += enchantmentEntry->amount[i];
+                    break;
+                case ITEM_ENCHANTMENT_TYPE_TOTEM:
+                    if (IsClass(CLASS_SHAMAN, CLASS_CONTEXT_ABILITY))
+                        amount += enchantmentEntry->amount[i] * item->GetTemplate()->Delay / 1000.0f;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    HandleStatFlatModifier(unitMod, TOTAL_VALUE, amount, true);
+}
+
+void Player::UpdateBaseModGroup(BaseModGroup modGroup)
+{
     if (!CanModifyStats())
         return;
 
@@ -5090,10 +5051,7 @@ float Player::GetBaseModValue(BaseModGroup modGroup, BaseModType modType) const
         return 0.0f;
     }
 
-    if (modType == PCT_MOD && m_auraBaseMod[modGroup][PCT_MOD] <= 0.0f)
-        return 0.0f;
-
-    return m_auraBaseMod[modGroup][modType];
+    return (modType == FLAT_MOD ? m_auraBaseFlatMod[modGroup] : m_auraBasePctMod[modGroup]);
 }
 
 float Player::GetTotalBaseModValue(BaseModGroup modGroup) const
@@ -5104,15 +5062,15 @@ float Player::GetTotalBaseModValue(BaseModGroup modGroup) const
         return 0.0f;
     }
 
-    if (m_auraBaseMod[modGroup][PCT_MOD] <= 0.0f)
+    if (m_auraBasePctMod[modGroup] <= 0.0f)
         return 0.0f;
 
-    return m_auraBaseMod[modGroup][FLAT_MOD] * m_auraBaseMod[modGroup][PCT_MOD];
+    return m_auraBaseFlatMod[modGroup] * m_auraBasePctMod[modGroup];
 }
 
 uint32 Player::GetShieldBlockValue() const
 {
-    float value = (m_auraBaseMod[SHIELD_BLOCK_VALUE][FLAT_MOD] + GetStat(STAT_STRENGTH) * 0.5f - 10) * m_auraBaseMod[SHIELD_BLOCK_VALUE][PCT_MOD];
+    float value = (m_auraBaseFlatMod[SHIELD_BLOCK_VALUE] + GetStat(STAT_STRENGTH) * 0.5f - 10) * m_auraBasePctMod[SHIELD_BLOCK_VALUE];
 
     value = (value < 0) ? 0 : value;
 
@@ -5181,7 +5139,7 @@ void Player::GetDodgeFromAgility(float& diminishing, float& nondiminishing)
         return;
 
     /// @todo: research if talents/effects that increase total agility by x% should increase non-diminishing part
-    float base_agility = GetCreateStat(STAT_AGILITY) * m_auraModifiersGroup[UNIT_MOD_STAT_START + static_cast<uint16>(STAT_AGILITY)][BASE_PCT];
+    float base_agility = GetCreateStat(STAT_AGILITY) * GetPctModifierValue(UnitMods(UNIT_MOD_STAT_START + AsUnderlyingType(STAT_AGILITY)), BASE_PCT);
     float bonus_agility = GetStat(STAT_AGILITY) - base_agility;
 
     // calculate diminishing (green in char screen) and non-diminishing (white) contribution
@@ -5232,9 +5190,9 @@ float Player::GetExpertiseDodgeOrParryReduction(WeaponAttackType attType) const
     switch (attType)
     {
         case BASE_ATTACK:
-            return GetUInt32Value(PLAYER_EXPERTISE) / 4.0f;
+            return m_Expertise / 4.0f;
         case OFF_ATTACK:
-            return GetUInt32Value(PLAYER_OFFHAND_EXPERTISE) / 4.0f;
+            return m_OffhandExpertise / 4.0f;
         default:
             break;
     }
@@ -5400,7 +5358,10 @@ void Player::SetSkill(uint16 id, uint16 step, uint16 newVal, uint16 maxVal)
 
             // remove all spells that related to this skill
             for (SkillLineAbilityEntry const* pAbility : GetSkillLineAbilitiesBySkillLine(id))
+            {
                 removeSpell(sSpellMgr->GetFirstSpellInChain(pAbility->Spell), SPEC_MASK_ALL, false);
+                RemoveAurasDueToSpell(pAbility->Spell);
+            }
         }
     }
     else if (newVal)                                        //add
@@ -5599,7 +5560,7 @@ void Player::SendActionButtons(uint32 state) const
         }
     }
 
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
     LOG_DEBUG("entities.player", "Action Buttons for {} spec {} Sent", GetGUID().ToString(), m_activeSpec);
 }
 
@@ -5704,20 +5665,7 @@ void Player::SendMessageToSetInRange(WorldPacket const* data, float dist, bool s
         SendDirectMessage(data);
 
     Acore::MessageDistDeliverer notifier(this, data, dist);
-    Cell::VisitWorldObjects(this, notifier, dist);
-}
-
-void Player::SendMessageToSetInRange(WorldPacket const* data, float dist, bool self, bool includeMargin, bool ownTeamOnly, bool required3dDist) const
-{
-    if (self)
-        SendDirectMessage(data);
-
-    dist += GetObjectSize();
-    if (includeMargin)
-        dist += VISIBILITY_COMPENSATION; // pussywizard: to ensure everyone receives all important packets
-
-    Acore::MessageDistDeliverer notifier(this, data, dist, ownTeamOnly, nullptr, required3dDist);
-    Cell::VisitWorldObjects(this, notifier, dist);
+    notifier.Visit(GetObjectVisibilityContainer().GetVisiblePlayersMap());
 }
 
 void Player::SendMessageToSet(WorldPacket const* data, Player const* skipped_rcvr) const
@@ -5725,8 +5673,8 @@ void Player::SendMessageToSet(WorldPacket const* data, Player const* skipped_rcv
     if (skipped_rcvr != this)
         SendDirectMessage(data);
 
-    Acore::MessageDistDeliverer notifier(this, data, GetVisibilityRange(), false, skipped_rcvr);
-    Cell::VisitWorldObjects(this, notifier, GetVisibilityRange());
+    Acore::MessageDistDeliverer notifier(this, data, 0.0f, false, skipped_rcvr);
+    notifier.Visit(GetObjectVisibilityContainer().GetVisiblePlayersMap());
 }
 
 void Player::SendDirectMessage(WorldPacket const* data) const
@@ -5739,10 +5687,6 @@ void Player::SendCinematicStart(uint32 CinematicSequenceId) const
     WorldPacket data(SMSG_TRIGGER_CINEMATIC, 4);
     data << uint32(CinematicSequenceId);
     SendDirectMessage(&data);
-    if (CinematicSequencesEntry const* sequence = sCinematicSequencesStore.LookupEntry(CinematicSequenceId))
-    {
-        _cinematicMgr->SetActiveCinematicCamera(sequence->cinematicCamera);
-    }
 }
 
 void Player::SendMovieStart(uint32 MovieId)
@@ -6015,6 +5959,7 @@ void Player::RewardReputation(Unit* victim)
     if (Rep->RepFaction1 && (!Rep->TeamDependent || teamId == TEAM_ALLIANCE))
     {
         float donerep1 = CalculateReputationGain(REPUTATION_SOURCE_KILL, victim->GetLevel(), static_cast<float>(Rep->RepValue1), ChampioningFaction ? ChampioningFaction : Rep->RepFaction1);
+        sScriptMgr->OnPlayerGiveReputation(this, Rep->RepFaction1, donerep1, REPUTATION_SOURCE_KILL);
 
         FactionEntry const* factionEntry1 = sFactionStore.LookupEntry(ChampioningFaction ? ChampioningFaction : Rep->RepFaction1);
         if (factionEntry1)
@@ -6026,6 +5971,7 @@ void Player::RewardReputation(Unit* victim)
     if (Rep->RepFaction2 && (!Rep->TeamDependent || teamId == TEAM_HORDE))
     {
         float donerep2 = CalculateReputationGain(REPUTATION_SOURCE_KILL, victim->GetLevel(), static_cast<float>(Rep->RepValue2), ChampioningFaction ? ChampioningFaction : Rep->RepFaction2);
+        sScriptMgr->OnPlayerGiveReputation(this, Rep->RepFaction2, donerep2, REPUTATION_SOURCE_KILL);
 
         FactionEntry const* factionEntry2 = sFactionStore.LookupEntry(ChampioningFaction ? ChampioningFaction : Rep->RepFaction2);
         if (factionEntry2)
@@ -6033,6 +5979,19 @@ void Player::RewardReputation(Unit* victim)
             GetReputationMgr().ModifyReputation(factionEntry2, donerep2, false, static_cast<ReputationRank>(Rep->ReputationMaxCap2));
         }
     }
+}
+
+FactionTemplateEntry const* GetAnyFactionTemplateForFaction(uint32 factionId)
+{
+    for (uint32 i = 0; i < sFactionTemplateStore.GetNumRows(); ++i)
+    {
+        if (FactionTemplateEntry const* factionTemplate = sFactionTemplateStore.LookupEntry(i))
+        {
+            if (factionTemplate->faction == factionId)
+                return factionTemplate;
+        }
+    }
+    return nullptr;
 }
 
 // Calculate how many reputation points player gain with the quest
@@ -6065,28 +6024,47 @@ void Player::RewardReputation(Quest const* quest)
         if (quest->IsDaily())
         {
             rep = CalculateReputationGain(REPUTATION_SOURCE_DAILY_QUEST, GetQuestLevel(quest), rep, quest->RewardFactionId[i], false);
+            sScriptMgr->OnPlayerGiveReputation(this, quest->RewardFactionId[i], rep, REPUTATION_SOURCE_DAILY_QUEST);
         }
         else if (quest->IsWeekly())
         {
             rep = CalculateReputationGain(REPUTATION_SOURCE_WEEKLY_QUEST, GetQuestLevel(quest), rep, quest->RewardFactionId[i], false);
+            sScriptMgr->OnPlayerGiveReputation(this, quest->RewardFactionId[i], rep, REPUTATION_SOURCE_WEEKLY_QUEST);
         }
         else if (quest->IsMonthly())
         {
             rep = CalculateReputationGain(REPUTATION_SOURCE_MONTHLY_QUEST, GetQuestLevel(quest), rep, quest->RewardFactionId[i], false);
+            sScriptMgr->OnPlayerGiveReputation(this, quest->RewardFactionId[i], rep, REPUTATION_SOURCE_MONTHLY_QUEST);
         }
         else if (quest->IsRepeatable())
         {
             rep = CalculateReputationGain(REPUTATION_SOURCE_REPEATABLE_QUEST, GetQuestLevel(quest), rep, quest->RewardFactionId[i], false);
+            sScriptMgr->OnPlayerGiveReputation(this, quest->RewardFactionId[i], rep, REPUTATION_SOURCE_REPEATABLE_QUEST);
         }
         else
         {
             rep = CalculateReputationGain(REPUTATION_SOURCE_QUEST, GetQuestLevel(quest), rep, quest->RewardFactionId[i], false);
+            sScriptMgr->OnPlayerGiveReputation(this, quest->RewardFactionId[i], rep, REPUTATION_SOURCE_QUEST);
         }
 
-        if (FactionEntry const* factionEntry = sFactionStore.LookupEntry(quest->RewardFactionId[i]))
+        FactionEntry const* factionEntry = sFactionStore.LookupEntry(quest->RewardFactionId[i]);
+        if (!factionEntry)
+            continue;
+
+        FactionTemplateEntry const* templateEntry = GetAnyFactionTemplateForFaction(factionEntry->ID);
+        if (templateEntry)
         {
-            GetReputationMgr().ModifyReputation(factionEntry, rep, quest->HasSpecialFlag(QUEST_SPECIAL_FLAGS_NO_REP_SPILLOVER));
+            bool hostile = (GetTeamId() == TEAM_ALLIANCE) ? templateEntry->IsHostileToAlliancePlayers()
+                                                          : templateEntry->IsHostileToHordePlayers();
+
+            if (hostile)
+            {
+                LOG_DEBUG("sql.sql", "RewardReputation: {} is hostile with player ({}), skipping!", templateEntry->ID, GetGUID().ToString());
+                continue;
+            }
         }
+
+        GetReputationMgr().ModifyReputation(factionEntry, rep, quest->HasSpecialFlag(QUEST_SPECIAL_FLAGS_NO_REP_SPILLOVER));
     }
 }
 
@@ -6128,7 +6106,7 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
     */
 
     ObjectGuid victim_guid;
-    uint32 victim_rank = 0;
+    int32 victim_rank = 0;
 
     // need call before fields update to have chance move yesterday data to appropriate fields before today data change.
     UpdateHonorFields();
@@ -6161,28 +6139,11 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
             if (v_level <= k_grey)
                 return false;
 
-            // PLAYER_CHOSEN_TITLE VALUES DESCRIPTION
-            //  [0]      Just name
-            //  [1..14]  Alliance honor titles and player name
-            //  [15..28] Horde honor titles and player name
-            //  [29..38] Other title and player name
-            //  [39+]    Nothing
-            uint32 victim_title = victim->GetUInt32Value(PLAYER_CHOSEN_TITLE);
-            uint32 killer_title = 0;
-            sScriptMgr->OnPlayerVictimRewardBefore(this, victim, killer_title, victim_title);
-            // Get Killer titles, CharTitlesEntry::bit_index
-            // Ranks:
-            //  title[1..14]  -> rank[5..18]
-            //  title[15..28] -> rank[5..18]
-            //  title[other]  -> 0
-            if (victim_title == 0)
-                victim_guid.Clear();                        // Don't show HK: <rank> message, only log.
-            else if (victim_title < 15)
-                victim_rank = victim_title + 4;
-            else if (victim_title < 29)
-                victim_rank = victim_title - 14 + 4;
-            else
-                victim_guid.Clear();                        // Don't show HK: <rank> message, only log.
+            victim_rank = victim->GetByteValue(PLAYER_FIELD_BYTES, PLAYER_FIELD_BYTES_OFFSET_LIFETIME_MAX_PVP_RANK);
+
+            uint32 killer_title = GetUInt32Value(PLAYER_CHOSEN_TITLE);
+
+            sScriptMgr->OnPlayerVictimRewardBefore(this, victim, killer_title, victim_rank);
 
             honor_f = std::ceil(Acore::Honor::hk_honor_at_level_f(k_level) * (v_level - k_grey) / (k_level - k_grey));
 
@@ -6232,7 +6193,7 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
 
     // Xinef: non quest case, quest honor obtain is send in quest reward packet
     if (uVictim || groupsize > 0)
-        GetSession()->SendPacket(&data);
+        SendDirectMessage(&data);
 
     // add honor points
     ModifyHonorPoints(honor);
@@ -6247,7 +6208,7 @@ bool Player::RewardHonor(Unit* uVictim, uint32 groupsize, int32 honor, bool awar
             // Xinef: Only for BG activities
             if (!uVictim)
             {
-                uint32 xp = uint32(honor * (3 + GetLevel() * 0.30f));
+                uint32 xp = static_cast<uint32>(honor * (3 + GetLevel() * 0.30f) * sWorld->getRate(RATE_XP_BATTLEGROUND_BONUS));
                 sScriptMgr->OnPlayerGiveXP(this, xp, nullptr, PlayerXPSource::XPSOURCE_BATTLEGROUND);
                 GiveXP(xp, nullptr);
             }
@@ -6425,7 +6386,7 @@ void Player::CheckDuelDistance(time_t currTime)
             duel->OutOfBoundsTime = currTime + 10;
 
             WorldPacket data(SMSG_DUEL_OUTOFBOUNDS, 0);
-            GetSession()->SendPacket(&data);
+            SendDirectMessage(&data);
         }
     }
     else
@@ -6435,7 +6396,7 @@ void Player::CheckDuelDistance(time_t currTime)
             duel->OutOfBoundsTime = 0;
 
             WorldPacket data(SMSG_DUEL_INBOUNDS, 0);
-            GetSession()->SendPacket(&data);
+            SendDirectMessage(&data);
         }
         else if (currTime >= duel->OutOfBoundsTime)
             DuelComplete(DUEL_FLED);
@@ -6610,13 +6571,8 @@ void Player::_ApplyItemMods(Item* item, uint8 slot, bool apply)
 
     LOG_DEBUG("entities.player", "applying mods for item {} ", item->GetGUID().ToString());
 
-    uint8 attacktype = Player::GetAttackBySlot(slot);
-
     if (item->HasSocket())                              //only (un)equipping of items with sockets can influence metagems, so no need to waste time with normal items
         CorrectMetaGemEnchants(slot, apply);
-
-    if (attacktype < MAX_ATTACK)
-        _ApplyWeaponDependentAuraMods(item, WeaponAttackType(attacktype), apply);
 
     _ApplyItemBonuses(proto, slot, apply);
 
@@ -6624,6 +6580,13 @@ void Player::_ApplyItemMods(Item* item, uint8 slot, bool apply)
         _ApplyAmmoBonuses();
 
     ApplyItemEquipSpell(item, apply);
+
+    ApplyItemDependentAuras(item, apply);
+
+    WeaponAttackType const attackType = Player::GetAttackBySlot(slot);
+    if (attackType != MAX_ATTACK)
+        UpdateWeaponDependentAuras(attackType);
+
     ApplyEnchantment(item, apply);
 
     LOG_DEBUG("entities.player.items", "_ApplyItemMods complete.");
@@ -6694,30 +6657,30 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
         switch (statType)
         {
             case ITEM_MOD_MANA:
-                HandleStatModifier(UNIT_MOD_MANA, BASE_VALUE, float(val), apply);
+                HandleStatFlatModifier(UNIT_MOD_MANA, BASE_VALUE, float(val), apply);
                 break;
             case ITEM_MOD_HEALTH:                           // modify HP
-                HandleStatModifier(UNIT_MOD_HEALTH, BASE_VALUE, float(val), apply);
+                HandleStatFlatModifier(UNIT_MOD_HEALTH, BASE_VALUE, float(val), apply);
                 break;
             case ITEM_MOD_AGILITY:                          // modify agility
-                HandleStatModifier(UNIT_MOD_STAT_AGILITY, BASE_VALUE, float(val), apply);
-                ApplyStatBuffMod(STAT_AGILITY, float(val), apply);
+                HandleStatFlatModifier(UNIT_MOD_STAT_AGILITY, BASE_VALUE, float(val), apply);
+                UpdateStatBuffMod(STAT_AGILITY);
                 break;
             case ITEM_MOD_STRENGTH:                         //modify strength
-                HandleStatModifier(UNIT_MOD_STAT_STRENGTH, BASE_VALUE, float(val), apply);
-                ApplyStatBuffMod(STAT_STRENGTH, float(val), apply);
+                HandleStatFlatModifier(UNIT_MOD_STAT_STRENGTH, BASE_VALUE, float(val), apply);
+                UpdateStatBuffMod(STAT_STRENGTH);
                 break;
             case ITEM_MOD_INTELLECT:                        //modify intellect
-                HandleStatModifier(UNIT_MOD_STAT_INTELLECT, BASE_VALUE, float(val), apply);
-                ApplyStatBuffMod(STAT_INTELLECT, float(val), apply);
+                HandleStatFlatModifier(UNIT_MOD_STAT_INTELLECT, BASE_VALUE, float(val), apply);
+                UpdateStatBuffMod(STAT_INTELLECT);
                 break;
             case ITEM_MOD_SPIRIT:                           //modify spirit
-                HandleStatModifier(UNIT_MOD_STAT_SPIRIT, BASE_VALUE, float(val), apply);
-                ApplyStatBuffMod(STAT_SPIRIT, float(val), apply);
+                HandleStatFlatModifier(UNIT_MOD_STAT_SPIRIT, BASE_VALUE, float(val), apply);
+                UpdateStatBuffMod(STAT_SPIRIT);
                 break;
             case ITEM_MOD_STAMINA:                          //modify stamina
-                HandleStatModifier(UNIT_MOD_STAT_STAMINA, BASE_VALUE, float(val), apply);
-                ApplyStatBuffMod(STAT_STAMINA, float(val), apply);
+                HandleStatFlatModifier(UNIT_MOD_STAT_STAMINA, BASE_VALUE, float(val), apply);
+                UpdateStatBuffMod(STAT_STAMINA);
                 break;
             case ITEM_MOD_DEFENSE_SKILL_RATING:
                 ApplyRatingMod(CR_DEFENSE_SKILL, int32(val), apply);
@@ -6806,11 +6769,11 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
                 ApplyRatingMod(CR_EXPERTISE, int32(val), apply);
                 break;
             case ITEM_MOD_ATTACK_POWER:
-                HandleStatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_VALUE, float(val), apply);
-                HandleStatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_VALUE, float(val), apply);
+                HandleStatFlatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_VALUE, float(val), apply);
+                HandleStatFlatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_VALUE, float(val), apply);
                 break;
             case ITEM_MOD_RANGED_ATTACK_POWER:
-                HandleStatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_VALUE, float(val), apply);
+                HandleStatFlatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_VALUE, float(val), apply);
                 break;
             //            case ITEM_MOD_FERAL_ATTACK_POWER:
             //                ApplyFeralAPBonus(int32(val), apply);
@@ -6831,11 +6794,14 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
                 ApplySpellPenetrationBonus(val, apply);
                 break;
             case ITEM_MOD_BLOCK_VALUE:
-                HandleBaseModValue(SHIELD_BLOCK_VALUE, FLAT_MOD, float(val), apply);
+                HandleBaseModFlatValue(SHIELD_BLOCK_VALUE, float(val), apply);
                 break;
             /// @deprecated item mods
             case ITEM_MOD_SPELL_HEALING_DONE:
+                ApplySpellHealingBonus(int32(val), apply);
+                break;
             case ITEM_MOD_SPELL_DAMAGE_DONE:
+                ApplySpellDamageBonus(int32(val), apply);
                 break;
         }
     }
@@ -6858,7 +6824,7 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
 
     if (armor)
     {
-        UnitModifierType modType = TOTAL_VALUE;
+        UnitModifierFlatType modType = TOTAL_VALUE;
         if (proto->Class == ITEM_CLASS_ARMOR)
         {
             switch (proto->SubClass)
@@ -6872,35 +6838,35 @@ void Player::_ApplyItemBonuses(ItemTemplate const* proto, uint8 slot, bool apply
                     break;
             }
         }
-        HandleStatModifier(UNIT_MOD_ARMOR, modType, float(armor), apply);
+        HandleStatFlatModifier(UNIT_MOD_ARMOR, modType, float(armor), apply);
     }
 
     // Add armor bonus from ArmorDamageModifier if > 0
     if (proto->ArmorDamageModifier > 0 && sScriptMgr->OnPlayerCanArmorDamageModifier(this))
-        HandleStatModifier(UNIT_MOD_ARMOR, TOTAL_VALUE, float(proto->ArmorDamageModifier), apply);
+        HandleStatFlatModifier(UNIT_MOD_ARMOR, TOTAL_VALUE, float(proto->ArmorDamageModifier), apply);
 
     if (proto->Block)
-        HandleBaseModValue(SHIELD_BLOCK_VALUE, FLAT_MOD, float(proto->Block), apply);
+        HandleBaseModFlatValue(SHIELD_BLOCK_VALUE, float(proto->Block), apply);
 
     if (proto->HolyRes)
-        HandleStatModifier(UNIT_MOD_RESISTANCE_HOLY, BASE_VALUE, float(proto->HolyRes), apply);
+        HandleStatFlatModifier(UNIT_MOD_RESISTANCE_HOLY, BASE_VALUE, float(proto->HolyRes), apply);
 
     if (proto->FireRes)
-        HandleStatModifier(UNIT_MOD_RESISTANCE_FIRE, BASE_VALUE, float(proto->FireRes), apply);
+        HandleStatFlatModifier(UNIT_MOD_RESISTANCE_FIRE, BASE_VALUE, float(proto->FireRes), apply);
 
     if (proto->NatureRes)
-        HandleStatModifier(UNIT_MOD_RESISTANCE_NATURE, BASE_VALUE, float(proto->NatureRes), apply);
+        HandleStatFlatModifier(UNIT_MOD_RESISTANCE_NATURE, BASE_VALUE, float(proto->NatureRes), apply);
 
     if (proto->FrostRes)
-        HandleStatModifier(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, float(proto->FrostRes), apply);
+        HandleStatFlatModifier(UNIT_MOD_RESISTANCE_FROST, BASE_VALUE, float(proto->FrostRes), apply);
 
     if (proto->ShadowRes)
-        HandleStatModifier(UNIT_MOD_RESISTANCE_SHADOW, BASE_VALUE, float(proto->ShadowRes), apply);
+        HandleStatFlatModifier(UNIT_MOD_RESISTANCE_SHADOW, BASE_VALUE, float(proto->ShadowRes), apply);
 
     if (proto->ArcaneRes)
-        HandleStatModifier(UNIT_MOD_RESISTANCE_ARCANE, BASE_VALUE, float(proto->ArcaneRes), apply);
+        HandleStatFlatModifier(UNIT_MOD_RESISTANCE_ARCANE, BASE_VALUE, float(proto->ArcaneRes), apply);
 
-    uint8 attType = Player::GetAttackBySlot(slot);
+    WeaponAttackType attType = Player::GetAttackBySlot(slot);
     if (attType != MAX_ATTACK)
     {
         _ApplyWeaponDamage(slot, proto, ssv, apply);
@@ -6947,7 +6913,7 @@ void Player::_ApplyWeaponDamage(uint8 slot, ItemTemplate const* proto, ScalingSt
         ssv = ScalingStatValue ? sScalingStatValuesStore.LookupEntry(ssd_level) : nullptr;
     }
 
-    uint8 attType = Player::GetAttackBySlot(slot);
+    WeaponAttackType attType = Player::GetAttackBySlot(slot);
     if (!IsInFeralForm() && apply && !CanUseAttackType(attType))
     {
         return;
@@ -6978,12 +6944,12 @@ void Player::_ApplyWeaponDamage(uint8 slot, ItemTemplate const* proto, ScalingSt
 
             if (minDamage > 0.f)
             {
-                SetBaseWeaponDamage(WeaponAttackType(attType), MINDAMAGE, minDamage, i);
+                SetBaseWeaponDamage(attType, MINDAMAGE, minDamage, i);
             }
 
             if (maxDamage > 0.f)
             {
-                SetBaseWeaponDamage(WeaponAttackType(attType), MAXDAMAGE, maxDamage, i);
+                SetBaseWeaponDamage(attType, MAXDAMAGE, maxDamage, i);
             }
         }
     }
@@ -6992,8 +6958,8 @@ void Player::_ApplyWeaponDamage(uint8 slot, ItemTemplate const* proto, ScalingSt
     {
         for (uint8 i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
         {
-            SetBaseWeaponDamage(WeaponAttackType(attType), MINDAMAGE, 0.f, i);
-            SetBaseWeaponDamage(WeaponAttackType(attType), MAXDAMAGE, 0.f, i);
+            SetBaseWeaponDamage(attType, MINDAMAGE, 0.f, i);
+            SetBaseWeaponDamage(attType, MAXDAMAGE, 0.f, i);
         }
 
         if (attType == BASE_ATTACK)
@@ -7017,8 +6983,150 @@ void Player::_ApplyWeaponDamage(uint8 slot, ItemTemplate const* proto, ScalingSt
     if (IsInFeralForm())
         return;
 
-    if (CanModifyStats() && (GetWeaponDamageRange(WeaponAttackType(attType), MAXDAMAGE) || proto->Delay))
-        UpdateDamagePhysical(WeaponAttackType(attType));
+    if (CanModifyStats() && (GetWeaponDamageRange(attType, MAXDAMAGE) || proto->Delay))
+        UpdateDamagePhysical(attType);
+}
+
+void Player::CastAllObtainSpells()
+{
+    for (uint8 slot = INVENTORY_SLOT_ITEM_START; slot < INVENTORY_SLOT_ITEM_END; ++slot)
+        if (Item* item = GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
+            ApplyItemObtainSpells(item, true);
+
+    for (uint8 i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
+    {
+        Bag* bag = GetBagByPos(i);
+        if (!bag)
+            continue;
+
+        for (uint32 slot = 0; slot < bag->GetBagSize(); ++slot)
+            if (Item* item = bag->GetItemByPos(slot))
+                ApplyItemObtainSpells(item, true);
+    }
+}
+
+void Player::ApplyItemObtainSpells(Item* item, bool apply)
+{
+    ItemTemplate const* itemTemplate = item->GetTemplate();
+    for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+    {
+        if (itemTemplate->Spells[i].SpellTrigger != ITEM_SPELLTRIGGER_ON_NO_DELAY_USE) // On obtain trigger
+            continue;
+
+        int32 const spellId = itemTemplate->Spells[i].SpellId;
+        if (spellId <= 0)
+            continue;
+
+        if (apply)
+        {
+            if (!HasAura(spellId))
+                CastSpell(this, spellId, true, item);
+        }
+        else
+            RemoveAurasDueToSpell(spellId);
+    }
+}
+
+void Player::UpdateItemObtainSpells(Item* item, uint8 bag, uint8 slot)
+{
+    if (IsBankPos(bag, slot))
+        ApplyItemObtainSpells(item, false);
+    else if (bag == INVENTORY_SLOT_BAG_0 || (bag >= INVENTORY_SLOT_BAG_START && bag < INVENTORY_SLOT_BAG_END))
+        ApplyItemObtainSpells(item, true);
+}
+
+// this one rechecks weapon auras and stores them in BaseModGroup container
+// needed for things like axe specialization applying only to axe weapons in case of dual-wield
+void Player::UpdateWeaponDependentCritAuras(WeaponAttackType attackType)
+{
+    BaseModGroup modGroup;
+    switch (attackType)
+    {
+        case BASE_ATTACK:
+            modGroup = CRIT_PERCENTAGE;
+            break;
+        case OFF_ATTACK:
+            modGroup = OFFHAND_CRIT_PERCENTAGE;
+            break;
+        case RANGED_ATTACK:
+            modGroup = RANGED_CRIT_PERCENTAGE;
+            break;
+        default:
+            ABORT();
+            break;
+    }
+
+    float amount = 0.0f;
+    amount += GetTotalAuraModifier(SPELL_AURA_MOD_WEAPON_CRIT_PERCENT, std::bind(&Unit::CheckAttackFitToAuraRequirement, this, attackType, std::placeholders::_1));
+
+    // these auras don't have item requirement (only Combat Expertise in 3.3.5a)
+    amount += GetTotalAuraModifier(SPELL_AURA_MOD_CRIT_PCT);
+
+    SetBaseModFlatValue(modGroup, amount);
+}
+
+void Player::UpdateAllWeaponDependentCritAuras()
+{
+    for (uint8 i = BASE_ATTACK; i < MAX_ATTACK; ++i)
+        UpdateWeaponDependentCritAuras(WeaponAttackType(i));
+}
+
+void Player::UpdateWeaponDependentAuras(WeaponAttackType attackType)
+{
+    UpdateWeaponDependentCritAuras(attackType);
+    UpdateDamageDoneMods(attackType);
+    UpdateDamagePctDoneMods(attackType);
+}
+
+void Player::ApplyItemDependentAuras(Item* item, bool apply)
+{
+    if (apply)
+    {
+        for (auto [spellId, playerSpell]: GetSpellMap())
+        {
+            if (playerSpell->State == PLAYERSPELL_REMOVED)
+                continue;
+
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+            if (!spellInfo || !spellInfo->IsPassive() || spellInfo->EquippedItemClass < 0)
+                continue;
+
+            if (!HasAura(spellId) && HasItemFitToSpellRequirements(spellInfo))
+                AddAura(spellId, this);  // no SMSG_SPELL_GO in sniff found
+        }
+
+        // Check talents (they are stored separately from regular spells)
+        for (auto [spellId, playerTalent] : GetTalentMap())
+        {
+            if (playerTalent->State == PLAYERSPELL_REMOVED)
+                continue;
+
+            if (!(playerTalent->IsInSpec(GetActiveSpec())))
+                continue;
+
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+            if (!spellInfo || !spellInfo->IsPassive() || spellInfo->EquippedItemClass < 0)
+                continue;
+
+            if (!HasAura(spellId) && HasItemFitToSpellRequirements(spellInfo))
+                AddAura(spellId, this);
+        }
+    }
+    else
+        RemoveItemDependentAurasAndCasts(item);
+}
+
+bool Player::CheckAttackFitToAuraRequirement(WeaponAttackType attackType, AuraEffect const* aurEff) const
+{
+    SpellInfo const* spellInfo = aurEff->GetSpellInfo();
+    if (spellInfo->EquippedItemClass == -1)
+        return true;
+
+    Item* item = GetWeaponForAttack(attackType, true);
+    if (!item || !item->IsFitToSpellRequirements(spellInfo))
+        return false;
+
+    return true;
 }
 
 SpellSchoolMask Player::GetMeleeDamageSchoolMask(WeaponAttackType attackType /*= BASE_ATTACK*/, uint8 damageIndex /*= 0*/) const
@@ -7031,110 +7139,6 @@ SpellSchoolMask Player::GetMeleeDamageSchoolMask(WeaponAttackType attackType /*=
     return SPELL_SCHOOL_MASK_NORMAL;
 }
 
-void Player::_ApplyWeaponDependentAuraMods(Item* item, WeaponAttackType attackType, bool apply)
-{
-    AuraEffectList const& auraCritList = GetAuraEffectsByType(SPELL_AURA_MOD_WEAPON_CRIT_PERCENT);
-    for (AuraEffectList::const_iterator itr = auraCritList.begin(); itr != auraCritList.end(); ++itr)
-        _ApplyWeaponDependentAuraCritMod(item, attackType, *itr, apply);
-
-    AuraEffectList const& auraDamageFlatList = GetAuraEffectsByType(SPELL_AURA_MOD_DAMAGE_DONE);
-    for (AuraEffectList::const_iterator itr = auraDamageFlatList.begin(); itr != auraDamageFlatList.end(); ++itr)
-        _ApplyWeaponDependentAuraDamageMod(item, attackType, *itr, apply);
-
-    AuraEffectList const& auraDamagePctList = GetAuraEffectsByType(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
-    for (AuraEffectList::const_iterator itr = auraDamagePctList.begin(); itr != auraDamagePctList.end(); ++itr)
-        _ApplyWeaponDependentAuraDamageMod(item, attackType, *itr, apply);
-}
-
-void Player::_ApplyWeaponDependentAuraCritMod(Item* item, WeaponAttackType attackType, AuraEffect const* aura, bool apply)
-{
-    // don't apply mod if item is broken or cannot be used
-    if (item->IsBroken() || !CanUseAttackType(attackType))
-        return;
-
-    // generic not weapon specific case processes in aura code
-    if (aura->GetSpellInfo()->EquippedItemClass == -1)
-        return;
-
-    if (!sScriptMgr->OnPlayerCanApplyWeaponDependentAuraDamageMod(this, item, attackType, aura, apply))
-        return;
-
-    BaseModGroup mod = BASEMOD_END;
-    switch (attackType)
-    {
-        case BASE_ATTACK:
-            mod = CRIT_PERCENTAGE;
-            break;
-        case OFF_ATTACK:
-            mod = OFFHAND_CRIT_PERCENTAGE;
-            break;
-        case RANGED_ATTACK:
-            mod = RANGED_CRIT_PERCENTAGE;
-            break;
-        default:
-            return;
-    }
-
-    if (item->IsFitToSpellRequirements(aura->GetSpellInfo()))
-        HandleBaseModValue(mod, FLAT_MOD, float (aura->GetAmount()), apply);
-}
-
-void Player::_ApplyWeaponDependentAuraDamageMod(Item* item, WeaponAttackType attackType, AuraEffect const* aura, bool apply)
-{
-    // don't apply mod if item is broken or cannot be used
-    if (item->IsBroken() || !CanUseAttackType(attackType))
-        return;
-
-    // ignore spell mods for not wands
-    if ((aura->GetMiscValue() & SPELL_SCHOOL_MASK_NORMAL) == 0 && (getClassMask() & CLASSMASK_WAND_USERS) == 0)
-        return;
-
-    // generic not weapon specific case processes in aura code
-    if (aura->GetSpellInfo()->EquippedItemClass == -1)
-        return;
-
-    UnitMods unitMod = UNIT_MOD_END;
-    switch (attackType)
-    {
-        case BASE_ATTACK:
-            unitMod = UNIT_MOD_DAMAGE_MAINHAND;
-            break;
-        case OFF_ATTACK:
-            unitMod = UNIT_MOD_DAMAGE_OFFHAND;
-            break;
-        case RANGED_ATTACK:
-            unitMod = UNIT_MOD_DAMAGE_RANGED;
-            break;
-        default:
-            return;
-    }
-
-    UnitModifierType unitModType = TOTAL_VALUE;
-    switch (aura->GetAuraType())
-    {
-        case SPELL_AURA_MOD_DAMAGE_DONE:
-            unitModType = TOTAL_VALUE;
-            break;
-        case SPELL_AURA_MOD_DAMAGE_PERCENT_DONE:
-            unitModType = TOTAL_PCT;
-            break;
-        default:
-            return;
-    }
-
-    if (item->IsFitToSpellRequirements(aura->GetSpellInfo()))
-    {
-        HandleStatModifier(unitMod, unitModType, float(aura->GetAmount()), apply);
-        if (unitModType == TOTAL_VALUE)
-        {
-            if (aura->GetAmount() > 0)
-                ApplyModUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS, aura->GetAmount(), apply);
-            else
-                ApplyModUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_NEG, aura->GetAmount(), apply);
-        }
-    }
-}
-
 void Player::ApplyItemEquipSpell(Item* item, bool apply, bool form_change)
 {
     if (!item)
@@ -7144,37 +7148,26 @@ void Player::ApplyItemEquipSpell(Item* item, bool apply, bool form_change)
     if (!proto)
         return;
 
-    for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+    for (auto const& spellData : proto->Spells)
     {
-        _Spell const& spellData = proto->Spells[i];
-
-        // no spell
+         // no spell
         if (!spellData.SpellId)
             continue;
-
-        // Spells that should stay on the caster after removing the item.
-        constexpr std::array<int32, 2> spellExceptions =
-        {
-            11826,  //Electromagnetic Gigaflux Reactivator
-            17490   //Book of the Dead - Summon Skeleton
-        };
-        const auto found = std::find(std::begin(spellExceptions), std::end(spellExceptions), spellData.SpellId);
 
         // wrong triggering type
         if (apply)
         {
+            // Only apply "On Equip" spells
             if (spellData.SpellTrigger != ITEM_SPELLTRIGGER_ON_EQUIP)
-            {
                 continue;
-            }
         }
         else
         {
-            // If the spell is an exception do not remove it.
-            if (found != std::end(spellExceptions))
-            {
+            // Do not remove "Use" spells in these special cases:
+            // 1. During form changes (e.g., druid shapeshifting)
+            // 2. When the spell comes from an item with negative charges, which means its effect should persist after the item is consumed or removed.
+            if (spellData.SpellTrigger == ITEM_SPELLTRIGGER_ON_USE && (form_change || spellData.SpellCharges < 0))
                 continue;
-            }
         }
 
         // check if it is valid spell
@@ -7207,8 +7200,7 @@ void Player::ApplyEquipSpell(SpellInfo const* spellInfo, Item* item, bool apply,
 
         LOG_DEBUG("entities.player", "WORLD: cast {} Equip spellId - {}", (item ? "item" : "itemset"), spellInfo->Id);
 
-        //Ignore spellInfo->DurationEntry, cast with -1 duration
-        CastCustomSpell(spellInfo->Id, SPELLVALUE_AURA_DURATION, -1, this, true, item);
+        CastSpell(this, spellInfo, true, item);
     }
     else
     {
@@ -7223,18 +7215,6 @@ void Player::ApplyEquipSpell(SpellInfo const* spellInfo, Item* item, bool apply,
             RemoveAurasDueToItemSpell(spellInfo->Id, item->GetGUID());  // un-apply all spells, not only at-equipped
         else
             RemoveAurasDueToSpell(spellInfo->Id);           // un-apply spell (item set case)
-
-        // Xinef: Remove Proc Spells and Summons
-        for (uint8 i = EFFECT_0; i < MAX_SPELL_EFFECTS; ++i)
-        {
-            // Xinef: Remove procs
-            if (spellInfo->Effects[i].TriggerSpell)
-                RemoveAurasDueToSpell(spellInfo->Effects[i].TriggerSpell);
-
-            // Xinef: remove minions summoned by item
-            if (spellInfo->Effects[i].Effect == SPELL_EFFECT_SUMMON)
-                RemoveAllMinionsByEntry(spellInfo->Effects[i].MiscValue);
-        }
     }
 }
 
@@ -7383,7 +7363,7 @@ void Player::CastItemCombatSpell(Unit* target, WeaponAttackType attType, uint32 
             if (entry)
             {
                 if (entry->PPMChance)
-                    chance = GetPPMProcChance(proto->Delay, entry->PPMChance, spellInfo);
+                    chance = GetPPMProcChance(GetAttackTime(attType), entry->PPMChance, spellInfo);
                 else if (entry->customChance)
                     chance = (float)entry->customChance;
             }
@@ -7470,12 +7450,10 @@ void Player::CastItemUseSpell(Item* item, SpellCastTargets const& targets, uint8
 
         if (HasSpellCooldown(spellInfo->Id))
         {
-            continue;
-        }
-
-        if (!spellInfo->CheckElixirStacking(this))
-        {
-            Spell::SendCastResult(this, spellInfo, cast_count, SPELL_FAILED_AURA_BOUNCED);
+            // Notify client so it can clean up the pending spell cast.
+            // Without this the client orphans the cast and blocks auto-attack.
+            Spell::SendCastResult(ToPlayer(), spellInfo, cast_count,
+                SPELL_FAILED_NOT_READY);
             continue;
         }
 
@@ -7522,7 +7500,11 @@ void Player::CastItemUseSpell(Item* item, SpellCastTargets const& targets, uint8
             }
 
             if (HasSpellCooldown(spellInfo->Id))
+            {
+                Spell::SendCastResult(ToPlayer(), spellInfo, cast_count,
+                    SPELL_FAILED_NOT_READY);
                 continue;
+            }
 
             Spell* spell = new Spell(this, spellInfo, (count > 0) ? TRIGGERED_FULL_MASK : TRIGGERED_NONE);
             spell->m_CastItem = item;
@@ -7587,10 +7569,7 @@ void Player::_RemoveAllItemMods()
             if (!proto)
                 continue;
 
-            uint32 attacktype = Player::GetAttackBySlot(i);
-            if (attacktype < MAX_ATTACK)
-                _ApplyWeaponDependentAuraMods(m_items[i], WeaponAttackType(attacktype), false);
-
+            ApplyItemDependentAuras(m_items[i], false);
             _ApplyItemBonuses(proto, i, false);
 
             if (i == EQUIPMENT_SLOT_RANGED)
@@ -7616,11 +7595,12 @@ void Player::_ApplyAllItemMods()
             if (!proto)
                 continue;
 
-            uint32 attacktype = Player::GetAttackBySlot(i);
-            if (attacktype < MAX_ATTACK)
-                _ApplyWeaponDependentAuraMods(m_items[i], WeaponAttackType(attacktype), true);
-
+            ApplyItemDependentAuras(m_items[i], true);
             _ApplyItemBonuses(proto, i, true);
+
+            WeaponAttackType const attackType = Player::GetAttackBySlot(i);
+            if (attackType != MAX_ATTACK)
+                UpdateWeaponDependentAuras(attackType);
 
             if (i == EQUIPMENT_SLOT_RANGED)
                 _ApplyAmmoBonuses();
@@ -7729,23 +7709,26 @@ bool Player::CheckAmmoCompatibility(ItemTemplate const* ammo_proto) const
 
 void Player::SendQuestGiverStatusMultiple()
 {
+    if (GetObjectVisibilityContainer().GetVisibleWorldObjectsMap()->empty())
+        return;
+
     uint32 count = 0;
 
     WorldPacket data(SMSG_QUESTGIVER_STATUS_MULTIPLE, 4);
     data << uint32(count); // placeholder
 
-    for (GuidUnorderedSet::const_iterator itr = m_clientGUIDs.begin(); itr != m_clientGUIDs.end(); ++itr)
+    DoForAllVisibleWorldObjects([this, &data, &count](WorldObject* worldObject)
     {
         uint32 questStatus = DIALOG_STATUS_NONE;
 
-        if ((*itr).IsAnyTypeCreature())
+        if (worldObject->IsCreature())
         {
             // need also pet quests case support
-            Creature* questgiver = ObjectAccessor::GetCreatureOrPetOrVehicle(*this, *itr);
+            Creature* questgiver = worldObject->ToCreature();
             if (!questgiver || questgiver->IsHostileTo(this))
-                continue;
+                return;
             if (!questgiver->HasNpcFlag(UNIT_NPC_FLAG_QUESTGIVER))
-                continue;
+                return;
 
             questStatus = GetQuestDialogStatus(questgiver);
 
@@ -7753,11 +7736,11 @@ void Player::SendQuestGiverStatusMultiple()
             data << uint8(questStatus);
             ++count;
         }
-        else if ((*itr).IsGameObject())
+        else if (worldObject->IsGameObject())
         {
-            GameObject* questgiver = GetMap()->GetGameObject(*itr);
+            GameObject* questgiver = worldObject->ToGameObject();
             if (!questgiver || questgiver->GetGoType() != GAMEOBJECT_TYPE_QUESTGIVER)
-                continue;
+                return;
 
             questStatus = GetQuestDialogStatus(questgiver);
 
@@ -7765,10 +7748,10 @@ void Player::SendQuestGiverStatusMultiple()
             data << uint8(questStatus);
             ++count;
         }
-    }
+    });
 
     data.put<uint32>(0, count); // write real count
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 /*  If in a battleground a player dies, and an enemy removes the insignia, the player's bones is lootable
@@ -7843,7 +7826,9 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
         // And permit out of range GO with no owner in case fishing hole
         if (!go || (loot_type != LOOT_FISHINGHOLE && ((loot_type != LOOT_FISHING && loot_type != LOOT_FISHING_JUNK) || go->GetOwnerGUID() != GetGUID()) && !go->IsWithinDistInMap(this)) || (loot_type == LOOT_CORPSE && go->GetRespawnTime() && go->isSpawnedByDefault()))
         {
-            go->ForceValuesUpdateAtIndex(GAMEOBJECT_BYTES_1);
+            if (go)
+                go->ForceValuesUpdateAtIndex(GAMEOBJECT_BYTES_1);
+
             SendLootRelease(guid);
             return;
         }
@@ -8215,14 +8200,14 @@ void Player::SendLootError(ObjectGuid guid, LootError error)
 void Player::SendNotifyLootMoneyRemoved()
 {
     WorldPacket data(SMSG_LOOT_CLEAR_MONEY, 0);
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 void Player::SendNotifyLootItemRemoved(uint8 lootSlot)
 {
     WorldPacket data(SMSG_LOOT_REMOVED, 1);
     data << uint8(lootSlot);
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 // TODO - InitWorldStates should NOT always send the same states
@@ -8244,24 +8229,24 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
     packet.AreaID = areaId;
 
     packet.Worldstates.reserve(8);
-    packet.Worldstates.emplace_back(0x8d8, 0); // SCOURGE_EVENT_WORLDSTATE_EASTERN_PLAGUELANDS
-    packet.Worldstates.emplace_back(0x8d7, 0); // SCOURGE_EVENT_WORLDSTATE_TANARIS
-    packet.Worldstates.emplace_back(0x8d6, 0); // SCOURGE_EVENT_WORLDSTATE_BURNING_STEPPES
-    packet.Worldstates.emplace_back(0x8d5, 0); // SCOURGE_EVENT_WORLDSTATE_BLASTED_LANDS
-    packet.Worldstates.emplace_back(0x8d4, 0); // SCOURGE_EVENT_WORLDSTATE_AZSHARA
-    packet.Worldstates.emplace_back(0x8d3, 0); // SCOURGE_EVENT_WORLDSTATE_WINTERSPRING
+    packet.Worldstates.emplace_back(WORLD_STATE_SCOURGE_INVASION_WINTERSPRING, 0);
+    packet.Worldstates.emplace_back(WORLD_STATE_SCOURGE_INVASION_AZSHARA, 0);
+    packet.Worldstates.emplace_back(WORLD_STATE_SCOURGE_INVASION_BLASTED_LANDS, 0);
+    packet.Worldstates.emplace_back(WORLD_STATE_SCOURGE_INVASION_BURNING_STEPPES, 0);
+    packet.Worldstates.emplace_back(WORLD_STATE_SCOURGE_INVASION_TANARIS, 0);
+    packet.Worldstates.emplace_back(WORLD_STATE_SCOURGE_INVASION_EASTERN_PLAGUELANDS, 0);
 
     // 7 1 - Arena season in progress, 0 - end of season
-    packet.Worldstates.emplace_back(0xc77, sArenaSeasonMgr->GetSeasonState() == ARENA_SEASON_STATE_IN_PROGRESS);
+    packet.Worldstates.emplace_back(WORLD_STATE_ARENA_SEASON_PROGRESS, sArenaSeasonMgr->GetSeasonState() == ARENA_SEASON_STATE_IN_PROGRESS);
     // 8 Arena season id
-    packet.Worldstates.emplace_back(0xf3d, sArenaSeasonMgr->GetCurrentSeason());
+    packet.Worldstates.emplace_back(WORLD_STATE_ARENA_SEASON_ID, sArenaSeasonMgr->GetCurrentSeason());
 
-    if (mapId == 530) // Outland
+    if (mapId == MAP_OUTLAND)
     {
         packet.Worldstates.reserve(3);
-        packet.Worldstates.emplace_back(0x9bf, 0);  // NA_UI_OUTLAND_01 "Progress: %2494w"
-        packet.Worldstates.emplace_back(0x9bd, 15); // NA_UI_GUARDS_MAX
-        packet.Worldstates.emplace_back(0x9bb, 15); // NA_UI_GUARDS_LEFT
+        packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_UI_TOWER_SLIDER_DISPLAY, 0);
+        packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_UI_GUARDS_MAX, 15);
+        packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_UI_GUARDS_LEFT, 15);
     }
 
     if (Player::bgZoneIdToFillWorldStates.find(zoneId) != Player::bgZoneIdToFillWorldStates.end())
@@ -8273,612 +8258,605 @@ void Player::SendInitWorldStates(uint32 zoneId, uint32 areaId)
         // insert <field> <value>
         switch (zoneId)
         {
-            case 1: // Dun Morogh
-            case 11: // Wetlands
-            case 12: // Elwynn Forest
-            case 38: // Loch Modan
-            case 40: // Westfall
-            case 51: // Searing Gorge
-            case 1519: // Stormwind City
-            case 1537: // Ironforge
-            case 2257: // Deeprun Tram
-            case 3703: // Shattrath City
+            case AREA_DUN_MOROGH:
+            case AREA_WETLANDS:
+            case AREA_ELWYNN_FOREST:
+            case AREA_LOCH_MODAN:
+            case AREA_WESTFALL:
+            case AREA_SEARING_GORGE:
+            case AREA_STORMWIND_CITY:
+            case AREA_IRONFORGE:
+            case AREA_DEEPRUN_TRAM:
+            case AREA_SHATTRATH_CITY:
                 break;
-            case 139: // Eastern Plaguelands
+            case AREA_EASTERN_PLAGUELANDS:
                 if (outdoorPvP && outdoorPvP->GetTypeId() == OUTDOOR_PVP_EP)
                     outdoorPvP->FillInitialWorldStates(packet);
                 else
                 {
                     packet.Worldstates.reserve(32);
-                    packet.Worldstates.emplace_back(0x97a, 0);  // GENERAL_WORLDSTATES_01 "Progress: %2427w"
-                    packet.Worldstates.emplace_back(0x917, 0);  // EP_UI_TOWER_COUNT_A
-                    packet.Worldstates.emplace_back(0x918, 0);  // EP_UI_TOWER_COUNT_H
-                    packet.Worldstates.emplace_back(0x97b, 50); // GENERAL_WORLDSTATES_02
-                    packet.Worldstates.emplace_back(0x97c, 50); // GENERAL_WORLDSTATES_03
-                    packet.Worldstates.emplace_back(0x933, 1);  // EP_CGT_N
-                    packet.Worldstates.emplace_back(0x946, 0);  // EP_CGT_N_A
-                    packet.Worldstates.emplace_back(0x947, 0);  // EP_CGT_N_H
-                    packet.Worldstates.emplace_back(0x948, 0);  // GENERAL_WORLDSTATES_04
-                    packet.Worldstates.emplace_back(0x949, 0);  // GENERAL_WORLDSTATES_05
-                    packet.Worldstates.emplace_back(0x94a, 0);  // EP_CGT_A
-                    packet.Worldstates.emplace_back(0x94b, 0);  // EP_CGT_H
-                    packet.Worldstates.emplace_back(0x932, 0);  // EP_EWT_A
-                    packet.Worldstates.emplace_back(0x934, 0);  // EP_EWT_H
-                    packet.Worldstates.emplace_back(0x935, 0);  // GENERAL_WORLDSTATES_06
-                    packet.Worldstates.emplace_back(0x936, 0);  // GENERAL_WORLDSTATES_07
-                    packet.Worldstates.emplace_back(0x937, 0);  // EP_EWT_N_A
-                    packet.Worldstates.emplace_back(0x938, 0);  // EP_EWT_N_H
-                    packet.Worldstates.emplace_back(0x939, 1);  // EP_EWT_N
-                    packet.Worldstates.emplace_back(0x930, 1);  // EP_NPT_N
-                    packet.Worldstates.emplace_back(0x93a, 0);  // EP_NPT_N_A
-                    packet.Worldstates.emplace_back(0x93b, 0);  // GENERAL_WORLDSTATES_08
-                    packet.Worldstates.emplace_back(0x93c, 0);  // GENERAL_WORLDSTATES_09
-                    packet.Worldstates.emplace_back(0x93d, 0);  // GENERAL_WORLDSTATES_10
-                    packet.Worldstates.emplace_back(0x944, 0);  // EP_NPT_A
-                    packet.Worldstates.emplace_back(0x945, 0);  // EP_NPT_H
-                    packet.Worldstates.emplace_back(0x931, 1);  // EP_PWT_N
-                    packet.Worldstates.emplace_back(0x93e, 0);  // EP_PWT_N_A
-                    //packet.Worldstates.emplace_back(0x93f, 1); // GENERAL_WORLDSTATES_13 grey horde not in dbc!
-                    packet.Worldstates.emplace_back(0x940, 0);  // GENERAL_WORLDSTATES_11
-                    packet.Worldstates.emplace_back(0x941, 0);  // GENERAL_WORLDSTATES_12
-                    packet.Worldstates.emplace_back(0x942, 0);  // EP_PWT_A
-                    packet.Worldstates.emplace_back(0x943, 0);  // EP_PWT_H
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_DISPLAY, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_UI_TOWER_COUNT_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_UI_TOWER_COUNT_H, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_POS, 50);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_UI_TOWER_SLIDER_N, 50);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_CROWNGUARDTOWER_N, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_CROWNGUARDTOWER_N_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_CROWNGUARDTOWER_N_H, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_UNK_7, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_UNK_8, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_CROWNGUARDTOWER_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_CROWNGUARDTOWER_H, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_EASTWALLTOWER_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_EASTWALLTOWER_H, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_UNK_0, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_UNK_1, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_EASTWALLTOWER_N_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_EASTWALLTOWER_N_H, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_EASTWALLTOWER_N, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_NORTHPASSTOWER_N, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_NORTHPASSTOWER_N_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_NORTHPASSTOWER_N_H, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_UNK_2, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_UNK_3, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_NORTHPASSTOWER_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_NORTHPASSTOWER_H, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_PLAGUEWOODTOWER_N, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_PLAGUEWOODTOWER_N_A, 0);
+                    //packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_UNK_4, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_UNK_5, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_UNK_6, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_PLAGUEWOODTOWER_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_EP_PLAGUEWOODTOWER_H, 0);
 
                 break;
-            case 1377: // Silithus
+            case AREA_SILITHUS:
                 if (outdoorPvP && outdoorPvP->GetTypeId() == OUTDOOR_PVP_SI)
                     outdoorPvP->FillInitialWorldStates(packet);
                 else
                 {
                     packet.Worldstates.reserve(3);
-                    packet.Worldstates.emplace_back(0x909, 0); // SI_GATHERED_A
-                    packet.Worldstates.emplace_back(0x90a, 0); // SI_GATHERED_H
-                    packet.Worldstates.emplace_back(0x90d, 0); // SI_SILITHYST_MAX
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_SI_GATHERED_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_SI_GATHERED_H, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_SI_SILITHYST_MAX, 0);
                 }
                 // unknown, aq opening?
                 packet.Worldstates.reserve(4);
-                packet.Worldstates.emplace_back(0x912, 0); // AQ_SANDWORM_N
-                packet.Worldstates.emplace_back(0x913, 0); // AQ_SANDWORM_S
-                packet.Worldstates.emplace_back(0x914, 0); // AQ_SANDWORM_SW
-                packet.Worldstates.emplace_back(0x915, 0); // AQ_SANDWORM_E
+                packet.Worldstates.emplace_back(WORLD_STATE_AHNQIRAJ_SANDWORM_N, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_AHNQIRAJ_SANDWORM_S, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_AHNQIRAJ_SANDWORM_SW, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_AHNQIRAJ_SANDWORM_E, 0);
                 break;
-            case 2597: // Alterac Valley
+            case AREA_ALTERAC_VALLEY:
                 if (battleground && battleground->GetBgTypeID(true) == BATTLEGROUND_AV)
                     battleground->FillInitialWorldStates(packet);
                 else
                 {
                     packet.Worldstates.reserve(75);
-                    packet.Worldstates.emplace_back(0x7ae, 1); // AV_SNOWFALL_N
-                    packet.Worldstates.emplace_back(0x532, 1); // AV_FROSTWOLFHUT_H_C
-                    packet.Worldstates.emplace_back(0x531, 0); // AV_FROSTWOLFHUT_A_C
-                    packet.Worldstates.emplace_back(0x52e, 0); // AV_AID_A_A
-                    packet.Worldstates.emplace_back(0x571, 0); // East Frostwolf Tower Horde Assaulted - UNUSED
-                    packet.Worldstates.emplace_back(0x570, 0); // West Frostwolf Tower Horde Assaulted - UNUSED
-                    packet.Worldstates.emplace_back(0x567, 1); // AV_FROSTWOLFE_CONTROLLED
-                    packet.Worldstates.emplace_back(0x566, 1); // AV_FROSTWOLFW_CONTROLLED
-                    packet.Worldstates.emplace_back(0x550, 1); // AV_N_MINE_N
-                    packet.Worldstates.emplace_back(0x544, 0); // AV_ICEBLOOD_A_A
-                    packet.Worldstates.emplace_back(0x536, 0); // AV_PIKEGRAVE_H_C
-                    packet.Worldstates.emplace_back(0x535, 1); // AV_PIKEGRAVE_A_C
-                    packet.Worldstates.emplace_back(0x518, 0); // AV_STONEHEART_A_A
-                    packet.Worldstates.emplace_back(0x517, 0); // AV_STONEHEART_H_A
-                    packet.Worldstates.emplace_back(0x574, 0); // unk
-                    packet.Worldstates.emplace_back(0x573, 0); // Iceblood Tower Horde Assaulted - UNUSED
-                    packet.Worldstates.emplace_back(0x572, 0); // Towerpoint Horde Assaulted - UNUSED
-                    packet.Worldstates.emplace_back(0x56f, 0); // unk
-                    packet.Worldstates.emplace_back(0x56e, 0); // AV_ICEBLOOD_ASSAULTED
-                    packet.Worldstates.emplace_back(0x56d, 0); // AV_TOWERPOINT_ASSAULTED
-                    packet.Worldstates.emplace_back(0x56c, 0); // AV_FROSTWOLFE_ASSAULTED
-                    packet.Worldstates.emplace_back(0x56b, 0); // AV_FROSTWOLFW_ASSAULTED
-                    packet.Worldstates.emplace_back(0x56a, 1); // unk
-                    packet.Worldstates.emplace_back(0x569, 1); // AV_ICEBLOOD_CONTROLLED
-                    packet.Worldstates.emplace_back(0x568, 1); // AV_TOWERPOINT_CONTROLLED
-                    packet.Worldstates.emplace_back(0x565, 0); // AV_STONEH_ASSAULTED
-                    packet.Worldstates.emplace_back(0x564, 0); // AV_ICEWING_ASSAULTED
-                    packet.Worldstates.emplace_back(0x563, 0); // AV_DUNN_ASSAULTED
-                    packet.Worldstates.emplace_back(0x562, 0); // AV_DUNS_ASSAULTED
-                    packet.Worldstates.emplace_back(0x561, 0); // Stoneheart Bunker Alliance Assaulted - UNUSED
-                    packet.Worldstates.emplace_back(0x560, 0); // Icewing Bunker Alliance Assaulted - UNUSED
-                    packet.Worldstates.emplace_back(0x55f, 0); // Dunbaldar South Alliance Assaulted - UNUSED
-                    packet.Worldstates.emplace_back(0x55e, 0); // Dunbaldar North Alliance Assaulted - UNUSED
-                    packet.Worldstates.emplace_back(0x55d, 0); // AV_STONEH_DESTROYED
-                    packet.Worldstates.emplace_back(0x3c6, 0);  // AV_UNK_02
-                    packet.Worldstates.emplace_back(0x3c4, 0);  // AV_UNK_01
-                    packet.Worldstates.emplace_back(0x3c2, 0);  // AV_STORMPIKE_COMMANDERS
-                    packet.Worldstates.emplace_back(0x516, 1); // AV_STONEHEART_A_C
-                    packet.Worldstates.emplace_back(0x515, 0); // AV_STONEHEART_H_C
-                    packet.Worldstates.emplace_back(0x3b6, 0);  // AV_STORMPIKE_LIEUTENANTS
-                    packet.Worldstates.emplace_back(0x55c, 0); // AV_ICEWING_DESTROYED
-                    packet.Worldstates.emplace_back(0x55b, 0); // AV_DUNN_DESTROYED
-                    packet.Worldstates.emplace_back(0x55a, 0); // AV_DUNS_DESTROYED
-                    packet.Worldstates.emplace_back(0x559, 0); // unk
-                    packet.Worldstates.emplace_back(0x558, 0); // AV_ICEBLOOD_DESTROYED
-                    packet.Worldstates.emplace_back(0x557, 0); // AV_TOWERPOINT_DESTROYED
-                    packet.Worldstates.emplace_back(0x556, 0); // AV_FROSTWOLFE_DESTROYED
-                    packet.Worldstates.emplace_back(0x555, 0); // AV_FROSTWOLFW_DESTROYED
-                    packet.Worldstates.emplace_back(0x554, 1); // AV_STONEH_CONTROLLED
-                    packet.Worldstates.emplace_back(0x553, 1); // AV_ICEWING_CONTROLLED
-                    packet.Worldstates.emplace_back(0x552, 1); // AV_DUNN_CONTROLLED
-                    packet.Worldstates.emplace_back(0x551, 1); // AV_DUNS_CONTROLLED
-                    packet.Worldstates.emplace_back(0x54f, 0); // AV_N_MINE_H
-                    packet.Worldstates.emplace_back(0x54e, 0); // AV_N_MINE_A
-                    packet.Worldstates.emplace_back(0x54d, 1); // AV_S_MINE_N
-                    packet.Worldstates.emplace_back(0x54c, 0); // AV_S_MINE_H
-                    packet.Worldstates.emplace_back(0x54b, 0); // AV_S_MINE_A
-                    packet.Worldstates.emplace_back(0x545, 0); // AV_ICEBLOOD_H_A
-                    packet.Worldstates.emplace_back(0x543, 1); // AV_ICEBLOOD_H_C
-                    packet.Worldstates.emplace_back(0x542, 0); // AV_ICEBLOOD_A_C
-                    packet.Worldstates.emplace_back(0x540, 0); // AV_SNOWFALL_H_A
-                    packet.Worldstates.emplace_back(0x53f, 0); // AV_SNOWFALL_A_A
-                    packet.Worldstates.emplace_back(0x53e, 0); // AV_SNOWFALL_H_C
-                    packet.Worldstates.emplace_back(0x53d, 0); // AV_SNOWFALL_A_C
-                    packet.Worldstates.emplace_back(0x53c, 0); // AV_FROSTWOLF_H_A
-                    packet.Worldstates.emplace_back(0x53b, 0); // AV_FROSTWOLF_A_A
-                    packet.Worldstates.emplace_back(0x53a, 1); // AV_FROSTWOLF_H_C
-                    packet.Worldstates.emplace_back(0x539, 0); // AV_FROSTWOLF_A_C
-                    packet.Worldstates.emplace_back(0x538, 0); // AV_PIKEGRAVE_H_A
-                    packet.Worldstates.emplace_back(0x537, 0); // AV_PIKEGRAVE_A_A
-                    packet.Worldstates.emplace_back(0x534, 0); // AV_FROSTWOLFHUT_H_A
-                    packet.Worldstates.emplace_back(0x533, 0); // AV_FROSTWOLFHUT_A_A
-                    packet.Worldstates.emplace_back(0x530, 0); // AV_AID_H_A
-                    packet.Worldstates.emplace_back(0x52f, 0); // AV_AID_H_C
-                    packet.Worldstates.emplace_back(0x52d, 1); // AV_AID_A_C
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_SNOWFALL_N, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_FROSTWOLFHUT_H_C, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_FROSTWOLFHUT_A_C, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_AID_A_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_FROSTWOLFE_UNUSED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_FROSTWOLFW_UNUSED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_FROSTWOLFE_CONTROLLED, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_FROSTWOLFW_CONTROLLED, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_N_MINE_N, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_ICEBLOOD_A_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_PIKEGRAVE_H_C, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_PIKEGRAVE_A_C, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_STONEHEART_A_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_STONEHEART_H_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_UNK_5, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_ICEBLOOD_UNUSED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_TOWERPOINT_UNUSED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_UNK_4, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_ICEBLOOD_ASSAULTED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_TOWERPOINT_ASSAULTED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_FROSTWOLFE_ASSAULTED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_FROSTWOLFW_ASSAULTED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_UNK_3, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_ICEBLOOD_CONTROLLED, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_TOWERPOINT_CONTROLLED, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_STONEH_ASSAULTED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_ICEWING_ASSAULTED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_DUNN_ASSAULTED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_DUNS_ASSAULTED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_STONEH_UNUSED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_ICEWING_UNUSED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_DUNS_UNUSED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_DUNN_UNUSED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_STONEH_DESTROYED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_UNK_1, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_UNK_0, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_STORMPIKE_COMMANDERS, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_STONEHEART_A_C, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_STONEHEART_H_C, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_STORMPIKE_LIEUTENANTS, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_ICEWING_DESTROYED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_DUNN_DESTROYED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_DUNS_DESTROYED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_UNK_2, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_ICEBLOOD_DESTROYED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_TOWERPOINT_DESTROYED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_FROSTWOLFE_DESTROYED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_FROSTWOLFW_DESTROYED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_STONEH_CONTROLLED, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_ICEWING_CONTROLLED, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_DUNN_CONTROLLED, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_DUNS_CONTROLLED, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_N_MINE_H, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_N_MINE_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_S_MINE_N, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_S_MINE_H, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_S_MINE_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_ICEBLOOD_H_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_ICEBLOOD_H_C, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_ICEBLOOD_A_C, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_SNOWFALL_H_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_SNOWFALL_A_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_SNOWFALL_H_C, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_SNOWFALL_A_C, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_FROSTWOLF_H_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_FROSTWOLF_A_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_FROSTWOLF_H_C, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_FROSTWOLF_A_C, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_PIKEGRAVE_H_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_PIKEGRAVE_A_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_FROSTWOLFHUT_H_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_FROSTWOLFHUT_A_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_AID_H_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_AID_H_C, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AV_AID_A_C, 1);
                 }
                 break;
-            case 3277: // Warsong Gulch
+            case AREA_WARSONG_GULCH:
                 if (battleground && battleground->GetBgTypeID(true) == BATTLEGROUND_WS)
                     battleground->FillInitialWorldStates(packet);
                 else
                 {
                     packet.Worldstates.reserve(8);
-                    packet.Worldstates.emplace_back(0x62d, 0); // alliance flag captures
-                    packet.Worldstates.emplace_back(0x62e, 0); // horde flag captures
-                    packet.Worldstates.emplace_back(0x609, 0); // unk, set to 1 on alliance flag pickup...
-                    packet.Worldstates.emplace_back(0x60a, 0); // unk, set to 1 on horde flag pickup, after drop it's -1
-                    packet.Worldstates.emplace_back(0x60b, 2); // unk
-                    packet.Worldstates.emplace_back(0x641, 3); // unk (max flag captures?)
-                    packet.Worldstates.emplace_back(0x922, 1); // horde (0 - hide, 1 - flag ok, 2 - flag picked up (flashing), 3 - flag picked up (not flashing)
-                    packet.Worldstates.emplace_back(0x923, 1); // alliance (0 - hide, 1 - flag ok, 2 - flag picked up (flashing), 3 - flag picked up (not flashing)
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_WS_FLAG_CAPTURES_ALLIANCE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_WS_FLAG_CAPTURES_HORDE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_WS_UNK_0, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_WS_UNK_1, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_WS_UNK_2, 2);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_WS_FLAG_CAPTURES_MAX, 3);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_WS_FLAG_STATE_HORDE, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_WS_FLAG_STATE_ALLIANCE, 1);
                 }
                 break;
-            case 3358: // Arathi Basin
+            case AREA_ARATHI_BASIN:
                 if (battleground && battleground->GetBgTypeID(true) == BATTLEGROUND_AB)
                     battleground->FillInitialWorldStates(packet);
                 else
                 {
                     packet.Worldstates.reserve(32);
-                    packet.Worldstates.emplace_back(0x6e7, 0);    // stables alliance
-                    packet.Worldstates.emplace_back(0x6e8, 0);    // stables horde
-                    packet.Worldstates.emplace_back(0x6e9, 0);    // stables alliance controlled
-                    packet.Worldstates.emplace_back(0x6ea, 0);    // stables horde controlled
-                    packet.Worldstates.emplace_back(0x6ec, 0);    // farm alliance
-                    packet.Worldstates.emplace_back(0x6ed, 0);    // farm horde
-                    packet.Worldstates.emplace_back(0x6ee, 0);    // farm alliance controlled
-                    packet.Worldstates.emplace_back(0x6ef, 0);    // farm horde controlled
-                    packet.Worldstates.emplace_back(0x6f0, 0);    // alliance resources
-                    packet.Worldstates.emplace_back(0x6f1, 0);    // horde resources
-                    packet.Worldstates.emplace_back(0x6f2, 0);    // horde bases
-                    packet.Worldstates.emplace_back(0x6f3, 0);    // alliance bases
-                    packet.Worldstates.emplace_back(0x6f4, 1600); // max resources (1600)
-                    packet.Worldstates.emplace_back(0x6f6, 0);    // blacksmith alliance
-                    packet.Worldstates.emplace_back(0x6f7, 0);    // blacksmith horde
-                    packet.Worldstates.emplace_back(0x6f8, 0);    // blacksmith alliance controlled
-                    packet.Worldstates.emplace_back(0x6f9, 0);    // blacksmith horde controlled
-                    packet.Worldstates.emplace_back(0x6fb, 0);    // gold mine alliance
-                    packet.Worldstates.emplace_back(0x6fc, 0);    // gold mine horde
-                    packet.Worldstates.emplace_back(0x6fd, 0);    // gold mine alliance controlled
-                    packet.Worldstates.emplace_back(0x6fe, 0);    // gold mine horde controlled
-                    packet.Worldstates.emplace_back(0x700, 0);    // lumber mill alliance
-                    packet.Worldstates.emplace_back(0x701, 0);    // lumber mill horde
-                    packet.Worldstates.emplace_back(0x702, 0);    // lumber mill alliance controlled
-                    packet.Worldstates.emplace_back(0x703, 0);    // lumber mill horde controlled
-                    packet.Worldstates.emplace_back(0x732, 1);    // stables (1 - uncontrolled)
-                    packet.Worldstates.emplace_back(0x733, 1);    // gold mine (1 - uncontrolled)
-                    packet.Worldstates.emplace_back(0x734, 1);    // lumber mill (1 - uncontrolled)
-                    packet.Worldstates.emplace_back(0x735, 1);    // farm (1 - uncontrolled)
-                    packet.Worldstates.emplace_back(0x736, 1);    // blacksmith (1 - uncontrolled)
-                    packet.Worldstates.emplace_back(0x745, 2);    // unk
-                    packet.Worldstates.emplace_back(0x7a3, 1400); // warning limit (1400)
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_STABLE_STATE_ALLIANCE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_STABLE_STATE_HORDE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_STABLE_STATE_CONTROLLED_ALLIANCE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_STABLE_STATE_CONTROLLED_HORDE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_FARM_STATE_ALLIANCE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_FARM_STATE_HORDE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_FARM_STATE_CONTROLLED_ALLIANCE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_FARM_STATE_CONTROLLED_HORDE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_RESOURCES_ALLIANCE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_RESOURCES_HORDE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_OCCUPIED_BASES_HORDE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_OCCUPIED_BASES_ALLIANCE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_RESOURCES_MAX, 1600);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_BLACKSMITH_STATE_ALLIANCE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_BLACKSMITH_STATE_HORDE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_BLACKSMITH_STATE_CONTROLLED_ALLIANCE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_BLACKSMITH_STATE_CONTROLLED_HORDE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_GOLDMINE_STATE_ALLIANCE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_GOLDMINE_STATE_HORDE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_GOLDMINE_STATE_CONTROLLED_ALLIANCE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_GOLDMINE_STATE_CONTROLLED_HORDE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_LUMBERMILL_STATE_ALLIANCE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_LUMBERMILL_STATE_HORDE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_LUMBERMILL_STATE_CONTROLLED_ALLIANCE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_LUMBERMILL_STATE_CONTROLLED_HORDE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_STABLE_ICON, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_GOLDMINE_ICON, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_LUMBERMILL_ICON, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_FARM_ICON, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_BLACKSMITH_ICON, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_UNK, 2);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_AB_RESOURCES_WARNING, 1400); // warning limit (1400)
                 }
                 break;
-            case 3820: // Eye of the Storm
+            case AREA_EYE_OF_THE_STORM:
                 if (battleground && battleground->GetBgTypeID(true) == BATTLEGROUND_EY)
                     battleground->FillInitialWorldStates(packet);
                 else
                 {
                     packet.Worldstates.reserve(32);
-                    packet.Worldstates.emplace_back(0xac1, 0);   // Horde Bases
-                    packet.Worldstates.emplace_back(0xac0, 0);   // Alliance Bases
-                    packet.Worldstates.emplace_back(0xab6, 0);   // Mage Tower - Horde conflict
-                    packet.Worldstates.emplace_back(0xab5, 0);   // Mage Tower - Alliance conflict
-                    packet.Worldstates.emplace_back(0xab4, 0);   // Fel Reaver - Horde conflict
-                    packet.Worldstates.emplace_back(0xab3, 0);   // Fel Reaver - Alliance conflict
-                    packet.Worldstates.emplace_back(0xab2, 0);   // Draenei - Alliance conflict
-                    packet.Worldstates.emplace_back(0xab1, 0);   // Draenei - Horde conflict
-                    packet.Worldstates.emplace_back(0xab0, 0);   // unk (0 at start)
-                    packet.Worldstates.emplace_back(0xaaf, 0);   // unk (0 at start)
-                    packet.Worldstates.emplace_back(0xaad, 0);   // Draenei - Horde control
-                    packet.Worldstates.emplace_back(0xaac, 0);   // Draenei - Alliance control
-                    packet.Worldstates.emplace_back(0xaab, 1);   // Draenei uncontrolled (1 - yes, 0 - no)
-                    packet.Worldstates.emplace_back(0xaaa, 0);   // Mage Tower - Alliance control
-                    packet.Worldstates.emplace_back(0xaa9, 0);   // Mage Tower - Horde control
-                    packet.Worldstates.emplace_back(0xaa8, 1);   // Mage Tower uncontrolled (1 - yes, 0 - no)
-                    packet.Worldstates.emplace_back(0xaa7, 0);   // Fel Reaver - Horde control
-                    packet.Worldstates.emplace_back(0xaa6, 0);   // Fel Reaver - Alliance control
-                    packet.Worldstates.emplace_back(0xaa5, 1);   // Fel Reaver uncontrolled (1 - yes, 0 - no)
-                    packet.Worldstates.emplace_back(0xaa4, 0);   // Boold Elf - Horde control
-                    packet.Worldstates.emplace_back(0xaa3, 0);   // Boold Elf - Alliance control
-                    packet.Worldstates.emplace_back(0xaa2, 1);   // Boold Elf uncontrolled (1 - yes, 0 - no)
-                    packet.Worldstates.emplace_back(0xac5, 1);   // Flag (1 - show, 0 - hide) - doesn't work exactly this way!
-                    packet.Worldstates.emplace_back(0xad2, 1);   // Horde top-stats (1 - show, 0 - hide) // 02 -> horde picked up the flag
-                    packet.Worldstates.emplace_back(0xad1, 1);   // Alliance top-stats (1 - show, 0 - hide) // 02 -> alliance picked up the flag
-                    packet.Worldstates.emplace_back(0xabe, 0);   // Horde resources
-                    packet.Worldstates.emplace_back(0xabd, 0);   // Alliance resources
-                    packet.Worldstates.emplace_back(0xa05, 142); // unk, constant?
-                    packet.Worldstates.emplace_back(0xaa0, 0);   // Capturing progress-bar (100 -> empty (only grey), 0 -> blue|red (no grey), default 0)
-                    packet.Worldstates.emplace_back(0xa9f, 0);   // Capturing progress-bar (0 - left, 100 - right)
-                    packet.Worldstates.emplace_back(0xa9e, 0);   // Capturing progress-bar (1 - show, 0 - hide)
-                    packet.Worldstates.emplace_back(0xc0d, 379); // unk, constant?
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_HORDE_BASE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_ALLIANCE_BASE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_MAGE_TOWER_HORDE_CONFLICT, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_MAGE_TOWER_ALLIANCE_CONFLICT, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_FEL_REAVER_HORDE_CONFLICT, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_FEL_REAVER_ALLIANCE_CONFLICT, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_DRAENEI_RUINS_ALLIANCE_CONFLICT, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_DRAENEI_RUINS_HORDE_CONFLICT, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_UNK_2, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_UNK_1, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_DRAENEI_RUINS_HORDE_CONTROL, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_DRAENEI_RUINS_ALLIANCE_CONTROL, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_DRAENEI_RUINS_UNCONTROL, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_MAGE_TOWER_ALLIANCE_CONTROL, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_MAGE_TOWER_HORDE_CONTROL, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_MAGE_TOWER_UNCONTROL, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_FEL_REAVER_HORDE_CONTROL, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_FEL_REAVER_ALLIANCE_CONTROL, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_FEL_REAVER_UNCONTROL, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_BLOOD_ELF_HORDE_CONTROL, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_BLOOD_ELF_ALLIANCE_CONTROL, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_BLOOD_ELF_UNCONTROL, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_FLAG, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_FLAG_STATE_HORDE, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_FLAG_STATE_ALLIANCE, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_HORDE_RESOURCES, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_ALLIANCE_RESOURCES, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_UNK_0, 142);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_PROGRESS_BAR_PERCENT_GREY, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_PROGRESS_BAR_STATUS, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_PROGRESS_BAR_SHOW, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_EY_UNK_3, 379);
                     // missing unknowns
                 }
                 break;
             // any of these needs change! the client remembers the prev setting!
             // ON EVERY ZONE LEAVE, RESET THE OLD ZONE'S WORLD STATE, BUT AT LEAST THE UI STUFF!
-            case 3483: // Hellfire Peninsula
+            case AREA_HELLFIRE_PENINSULA:
                 if (outdoorPvP && outdoorPvP->GetTypeId() == OUTDOOR_PVP_HP)
                     outdoorPvP->FillInitialWorldStates(packet);
                 else
                 {
                     packet.Worldstates.reserve(16);
-                    packet.Worldstates.emplace_back(0x9ba, 1);   // add ally tower main gui icon       // maybe should be sent only on login?
-                    packet.Worldstates.emplace_back(0x9b9, 1);   // add horde tower main gui icon      // maybe should be sent only on login?
-                    packet.Worldstates.emplace_back(0x9b5, 0);   // show neutral broken hill icon
-                    packet.Worldstates.emplace_back(0x9b4, 1);   // show icon above broken hill
-                    packet.Worldstates.emplace_back(0x9b3, 0);   // show ally broken hill icon
-                    packet.Worldstates.emplace_back(0x9b2, 0);   // show neutral overlook icon
-                    packet.Worldstates.emplace_back(0x9b1, 1);   // show the overlook arrow
-                    packet.Worldstates.emplace_back(0x9b0, 0);   // show ally overlook icon
-                    packet.Worldstates.emplace_back(0x9ae, 0);   // horde pvp objectives captured
-                    packet.Worldstates.emplace_back(0x9ac, 0);   // ally pvp objectives captured
-                    packet.Worldstates.emplace_back(0x9ab, 100); //: ally / horde slider grey area                              // show only in direct vicinity!
-                    packet.Worldstates.emplace_back(0x9aa, 50);  //: ally / horde slider percentage, 100 for ally, 0 for horde  // show only in direct vicinity!
-                    packet.Worldstates.emplace_back(0x9a9, 0);   //: ally / horde slider display                                // show only in direct vicinity!
-                    packet.Worldstates.emplace_back(0x9a8, 0);   // show the neutral stadium icon
-                    packet.Worldstates.emplace_back(0x9a7, 0);   // show the ally stadium icon
-                    packet.Worldstates.emplace_back(0x9a6, 1);   // show the horde stadium icon
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_HP_UI_TOWER_DISPLAY_A, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_HP_UI_TOWER_DISPLAY_H, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_HP_BROKENHILL_N, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_HP_BROKENHILL_H, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_HP_BROKENHILL_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_HP_OVERLOOK_N, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_HP_OVERLOOK_H, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_HP_OVERLOOK_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_HP_UI_TOWER_COUNT_H, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_HP_UI_TOWER_COUNT_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_HP_UI_TOWER_SLIDER_N, 100);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_HP_UI_TOWER_SLIDER_POS, 50);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_HP_UI_TOWER_SLIDER_DISPLAY, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_HP_STADIUM_N, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_HP_STADIUM_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_HP_STADIUM_H, 1);
                 }
                 break;
-        case 3518: // Nagrand
+        case AREA_NAGRAND:
             if (outdoorPvP && outdoorPvP->GetTypeId() == OUTDOOR_PVP_NA)
                 outdoorPvP->FillInitialWorldStates(packet);
             else
             {
                 packet.Worldstates.reserve(28);
-                packet.Worldstates.emplace_back(0x9c7, 0); // NA_UI_HORDE_GUARDS_SHOW
-                packet.Worldstates.emplace_back(0x9c6, 0); // NA_UI_ALLIANCE_GUARDS_SHOW
-                packet.Worldstates.emplace_back(0x9bd, 0); // NA_UI_GUARDS_MAX
-                packet.Worldstates.emplace_back(0x9bb, 0); // NA_UI_GUARDS_LEFT
-                packet.Worldstates.emplace_back(0x9bf, 0); // NA_UI_OUTLAND_01
-                packet.Worldstates.emplace_back(0x9be, 0); // NA_UI_UNK_1
-                packet.Worldstates.emplace_back(0x9c1, 0); // NA_UI_UNK_2
-                packet.Worldstates.emplace_back(0xaca, 0); // NA_MAP_WYVERN_NORTH_NEU_H
-                packet.Worldstates.emplace_back(0xa66, 0); // NA_MAP_WYVERN_NORTH_NEU_A
-                packet.Worldstates.emplace_back(0xa67, 0); // NA_MAP_WYVERN_NORTH_H
-                packet.Worldstates.emplace_back(0xa68, 0); // NA_MAP_WYVERN_NORTH_A
-                packet.Worldstates.emplace_back(0xac8, 0); // NA_MAP_WYVERN_SOUTH_NEU_H
-                packet.Worldstates.emplace_back(0xa6e, 0); // NA_MAP_WYVERN_SOUTH_NEU_A
-                packet.Worldstates.emplace_back(0xa6c, 0); // NA_MAP_WYVERN_SOUTH_H
-                packet.Worldstates.emplace_back(0xa6d, 0); // NA_MAP_WYVERN_SOUTH_A
-                packet.Worldstates.emplace_back(0xac9, 0); // NA_MAP_WYVERN_WEST_NEU_H
-                packet.Worldstates.emplace_back(0xa6b, 0); // NA_MAP_WYVERN_WEST_NEU_A
-                packet.Worldstates.emplace_back(0xa69, 0); // NA_MAP_WYVERN_WEST_H
-                packet.Worldstates.emplace_back(0xa6a, 0); // NA_MAP_WYVERN_WEST_A
-                packet.Worldstates.emplace_back(0xacb, 0); // NA_MAP_WYVERN_EAST_NEU_H
-                packet.Worldstates.emplace_back(0xa63, 0); // NA_MAP_WYVERN_EAST_NEU_A
-                packet.Worldstates.emplace_back(0xa64, 0); // NA_MAP_WYVERN_EAST_H
-                packet.Worldstates.emplace_back(0xa65, 0); // NA_MAP_WYVERN_EAST_A
-                packet.Worldstates.emplace_back(0xa6f, 0); // NA_MAP_HALAA_NEUTRAL
-                packet.Worldstates.emplace_back(0xa74, 0); // NA_MAP_HALAA_NEU_A
-                packet.Worldstates.emplace_back(0xa75, 0); // NA_MAP_HALAA_NEU_H
-                packet.Worldstates.emplace_back(0xa70, 0); // NA_MAP_HALAA_HORDE
-                packet.Worldstates.emplace_back(0xa71, 0); // NA_MAP_HALAA_ALLIANCE
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_UI_HORDE_GUARDS_SHOW, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_UI_ALLIANCE_GUARDS_SHOW, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_UI_GUARDS_MAX, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_UI_GUARDS_LEFT, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_UI_TOWER_SLIDER_DISPLAY, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_UI_TOWER_SLIDER_POS, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_UI_SLIDER_N, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_WYVERN_NORTH_NEU_H, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_WYVERN_NORTH_NEU_A, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_WYVERN_NORTH_H, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_WYVERN_NORTH_A, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_WYVERN_SOUTH_NEU_H, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_WYVERN_SOUTH_NEU_A, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_WYVERN_SOUTH_H, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_WYVERN_SOUTH_A, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_WYVERN_WEST_NEU_H, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_WYVERN_WEST_NEU_A, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_WYVERN_WEST_H, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_WYVERN_WEST_A, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_WYVERN_EAST_NEU_H, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_WYVERN_EAST_NEU_A, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_WYVERN_EAST_H, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_WYVERN_EAST_A, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_HALAA_NEUTRAL, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_HALAA_NEU_A, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_HALAA_NEU_H, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_HALAA_HORDE, 0);
+                packet.Worldstates.emplace_back(WORLD_STATE_OPVP_NA_MAP_HALAA_ALLIANCE, 0);
             }
                 break;
-            case 3519: // Terokkar Forest
+            case AREA_TEROKKAR_FOREST:
                 if (outdoorPvP && outdoorPvP->GetTypeId() == OUTDOOR_PVP_TF)
                     outdoorPvP->FillInitialWorldStates(packet);
                 else
                 {
                     packet.Worldstates.reserve(28);
-                    packet.Worldstates.emplace_back(0xa41, 0);  // TF_UI_CAPTURE_BAR_POS
-                    packet.Worldstates.emplace_back(0xa40, 20); // TF_UI_CAPTURE_BAR_NEUTRAL
-                    packet.Worldstates.emplace_back(0xa3f, 0);  // TF_UI_SHOW CAPTURE BAR
-                    packet.Worldstates.emplace_back(0xa3e, 0);  // TF_UI_TOWER_COUNT_H
-                    packet.Worldstates.emplace_back(0xa3d, 5);  // TF_UI_TOWER_COUNT_A
-                    packet.Worldstates.emplace_back(0xa3c, 0);  // TF_UI_TOWERS_CONTROLLED_DISPLAY
-                    packet.Worldstates.emplace_back(0xa88, 0);  // TF_TOWER_NUM_15 - SE Neutral
-                    packet.Worldstates.emplace_back(0xa87, 0);  // TF_TOWER_NUM_14 - SE Horde
-                    packet.Worldstates.emplace_back(0xa86, 0);  // TF_TOWER_NUM_13 - SE Alliance
-                    packet.Worldstates.emplace_back(0xa85, 0);  // TF_TOWER_NUM_12 - S Neutral
-                    packet.Worldstates.emplace_back(0xa84, 0);  // TF_TOWER_NUM_11 - S Horde
-                    packet.Worldstates.emplace_back(0xa83, 0);  // TF_TOWER_NUM_10 - S Alliance
-                    packet.Worldstates.emplace_back(0xa82, 0);  // TF_TOWER_NUM_09 - NE Neutral
-                    packet.Worldstates.emplace_back(0xa81, 0);  // TF_TOWER_NUM_08 - NE Horde
-                    packet.Worldstates.emplace_back(0xa80, 0);  // TF_TOWER_NUM_07 - NE Alliance
-                    packet.Worldstates.emplace_back(0xa7f, 0);  // TF_TOWER_NUM_16 - unk
-                    packet.Worldstates.emplace_back(0xa7e, 0);  // TF_TOWER_NUM_06 - N Neutral
-                    packet.Worldstates.emplace_back(0xa7d, 0);  // TF_TOWER_NUM_05 - N Horde
-                    packet.Worldstates.emplace_back(0xa7c, 0);  // TF_TOWER_NUM_04 - N Alliance
-                    packet.Worldstates.emplace_back(0xa7b, 0);  // TF_TOWER_NUM_03 - NW Alliance
-                    packet.Worldstates.emplace_back(0xa7a, 0);  // TF_TOWER_NUM_02 - NW Horde
-                    packet.Worldstates.emplace_back(0xa79, 0);  // TF_TOWER_NUM_01 - NW Neutral
-                    packet.Worldstates.emplace_back(0x9d0, 5);  // TF_UI_LOCKED_TIME_MINUTES_FIRST_DIGIT
-                    packet.Worldstates.emplace_back(0x9ce, 0);  // TF_UI_LOCKED_TIME_MINUTES_SECOND_DIGIT
-                    packet.Worldstates.emplace_back(0x9cd, 0);  // TF_UI_LOCKED_TIME_HOURS
-                    packet.Worldstates.emplace_back(0x9cc, 0);  // TF_UI_LOCKED_DISPLAY_NEUTRAL
-                    packet.Worldstates.emplace_back(0xad0, 0);  // TF_UI_LOCKED_DISPLAY_HORDE
-                    packet.Worldstates.emplace_back(0xacf, 1);  // TF_UI_LOCKED_DISPLAY_ALLIANCE
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_UI_TOWER_SLIDER_POS, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_UI_TOWER_SLIDER_N, 20);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_UI_TOWER_SLIDER_DISPLAY, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_UI_TOWER_COUNT_H, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_UI_TOWER_COUNT_A, 5);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_UI_TOWERS_CONTROLLED_DISPLAY, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_TOWER_NUM_14, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_TOWER_NUM_13, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_TOWER_NUM_12, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_TOWER_NUM_11, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_TOWER_NUM_10, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_TOWER_NUM_09, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_TOWER_NUM_08, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_TOWER_NUM_07, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_TOWER_NUM_06, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_TOWER_NUM_15, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_TOWER_NUM_05, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_TOWER_NUM_04, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_TOWER_NUM_03, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_TOWER_NUM_02, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_TOWER_NUM_01, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_TOWER_NUM_00, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_UI_LOCKED_TIME_MINUTES_FIRST_DIGIT, 5);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_UI_LOCKED_TIME_MINUTES_SECOND_DIGIT, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_UI_LOCKED_TIME_HOURS, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_UI_LOCKED_DISPLAY_NEUTRAL, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_UI_LOCKED_DISPLAY_HORDE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_TF_UI_LOCKED_DISPLAY_ALLIANCE, 1);
                 }
                 break;
-            case 3521: // Zangarmarsh
+            case AREA_ZANGARMARSH:
                 if (outdoorPvP && outdoorPvP->GetTypeId() == OUTDOOR_PVP_ZM)
                     outdoorPvP->FillInitialWorldStates(packet);
                 else
                 {
                     packet.Worldstates.reserve(26);
-                    packet.Worldstates.emplace_back(0x9e1, 0); // ZM_UNK_1
-                    packet.Worldstates.emplace_back(0x9e0, 0); // ZM_UNK_2
-                    packet.Worldstates.emplace_back(0x9df, 0); // ZM_UNK_3
-                    packet.Worldstates.emplace_back(0xa5d, 1); // ZM_WORLDSTATE_UNK_1
-                    packet.Worldstates.emplace_back(0xa5c, 0); // ZM_MAP_TOWER_EAST_N
-                    packet.Worldstates.emplace_back(0xa5b, 1); // ZM_MAP_TOWER_EAST_H
-                    packet.Worldstates.emplace_back(0xa5a, 0); // ZM_MAP_TOWER_EAST_A
-                    packet.Worldstates.emplace_back(0xa59, 1); // ZM_MAP_GRAVEYARD_H - Twin spire graveyard horde
-                    packet.Worldstates.emplace_back(0xa58, 0); // ZM_MAP_GRAVEYARD_A
-                    packet.Worldstates.emplace_back(0xa57, 0); // ZM_MAP_GRAVEYARD_N
-                    packet.Worldstates.emplace_back(0xa56, 0); // ZM_MAP_TOWER_WEST_N
-                    packet.Worldstates.emplace_back(0xa55, 1); // ZM_MAP_TOWER_WEST_H
-                    packet.Worldstates.emplace_back(0xa54, 0); // ZM_MAP_TOWER_WEST_A
-                    packet.Worldstates.emplace_back(0x9e7, 0); // ZM_UNK_4
-                    packet.Worldstates.emplace_back(0x9e6, 0); // ZM_UNK_5
-                    packet.Worldstates.emplace_back(0x9e5, 0); // ZM_UNK_6
-                    packet.Worldstates.emplace_back(0xa00, 0); // ZM_UI_TOWER_EAST_N
-                    packet.Worldstates.emplace_back(0x9ff, 1); // ZM_UI_TOWER_EAST_H
-                    packet.Worldstates.emplace_back(0x9fe, 0); // ZM_UI_TOWER_EAST_A
-                    packet.Worldstates.emplace_back(0x9fd, 0); // ZM_UI_TOWER_WEST_N
-                    packet.Worldstates.emplace_back(0x9fc, 1); // ZM_UI_TOWER_WEST_H
-                    packet.Worldstates.emplace_back(0x9fb, 0); // ZM_UI_TOWER_WEST_A
-                    packet.Worldstates.emplace_back(0xa62, 0); // ZM_MAP_HORDE_FLAG_READY
-                    packet.Worldstates.emplace_back(0xa61, 1); // ZM_MAP_HORDE_FLAG_NOT_READY
-                    packet.Worldstates.emplace_back(0xa60, 1); // ZM_MAP_ALLIANCE_FLAG_NOT_READY
-                    packet.Worldstates.emplace_back(0xa5f, 0); // ZM_MAP_ALLIANCE_FLAG_READY
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_UI_TOWER_SLIDER_N_W, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_UI_TOWER_SLIDER_POS_W, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_UI_TOWER_SLIDER_DISPLAY_W, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_UNK, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_MAP_TOWER_EAST_N, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_MAP_TOWER_EAST_H, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_MAP_TOWER_EAST_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_MAP_GRAVEYARD_H, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_MAP_GRAVEYARD_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_MAP_GRAVEYARD_N, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_MAP_TOWER_WEST_N, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_MAP_TOWER_WEST_H, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_MAP_TOWER_WEST_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_UI_TOWER_SLIDER_N_E, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_UI_TOWER_SLIDER_POS_E, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_UI_TOWER_SLIDER_DISPLAY_E, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_UI_TOWER_EAST_N, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_UI_TOWER_EAST_H, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_UI_TOWER_EAST_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_UI_TOWER_WEST_N, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_UI_TOWER_WEST_H, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_UI_TOWER_WEST_A, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_MAP_HORDE_FLAG_READY, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_MAP_HORDE_FLAG_NOT_READY, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_MAP_ALLIANCE_FLAG_NOT_READY, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_ZM_MAP_ALLIANCE_FLAG_READY, 0);
                 }
                 break;
-            case 3698: // Nagrand Arena
+            case AREA_NAGRAND_ARENA:
                 if (battleground && battleground->GetBgTypeID(true) == BATTLEGROUND_NA)
                     battleground->FillInitialWorldStates(packet);
                 else
                 {
                     packet.Worldstates.reserve(3);
-                    packet.Worldstates.emplace_back(0xa0f, 0); // BATTLEGROUND_NAGRAND_ARENA_GOLD
-                    packet.Worldstates.emplace_back(0xa10, 0); // BATTLEGROUND_NAGRAND_ARENA_GREEN
-                    packet.Worldstates.emplace_back(0xa11, 0); // BATTLEGROUND_NAGRAND_ARENA_SHOW
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_NA_ARENA_GOLD, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_NA_ARENA_GREEN, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_NA_ARENA_SHOW, 0);
                 }
                 break;
-            case 3702: // Blade's Edge Arena
+            case AREA_BLADES_EDGE_ARENA:
                 if (battleground && battleground->GetBgTypeID(true) == BATTLEGROUND_BE)
                     battleground->FillInitialWorldStates(packet);
                 else
                 {
                     packet.Worldstates.reserve(3);
-                    packet.Worldstates.emplace_back(0x9f0, 0); // BATTLEGROUND_BLADES_EDGE_ARENA_GOLD
-                    packet.Worldstates.emplace_back(0x9f1, 0); // BATTLEGROUND_BLADES_EDGE_ARENA_GREEN
-                    packet.Worldstates.emplace_back(0x9f3, 0); // BATTLEGROUND_BLADES_EDGE_ARENA_SHOW
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_BE_ARENA_GOLD, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_BE_ARENA_GREEN, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_BE_ARENA_SHOW, 0);
                 }
                 break;
-            case 3968: // Ruins of Lordaeron
+            case AREA_RUINS_OF_LORDAERON:
                 if (battleground && battleground->GetBgTypeID(true) == BATTLEGROUND_RL)
                     battleground->FillInitialWorldStates(packet);
                 else
                 {
                     packet.Worldstates.reserve(3);
-                    packet.Worldstates.emplace_back(0xbb8, 0); // BATTELGROUND_RUINS_OF_LORDAERNON_GOLD
-                    packet.Worldstates.emplace_back(0xbb9, 0); // BATTELGROUND_RUINS_OF_LORDAERNON_GREEN
-                    packet.Worldstates.emplace_back(0xbba, 0); // BATTELGROUND_RUINS_OF_LORDAERNON_SHOW
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_RL_ARENA_GOLD, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_RL_ARENA_GREEN, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_RL_ARENA_SHOW, 0);
                 }
                 break;
-            case 4378: // Dalaran Sewers
+            case AREA_DALARAN_ARENA:
                 if (battleground && battleground->GetBgTypeID(true) == BATTLEGROUND_DS)
                     battleground->FillInitialWorldStates(packet);
                 else
                 {
                     packet.Worldstates.reserve(3);
-                    packet.Worldstates.emplace_back(0xe11, 0); // ARENA_WORLD_STATE_ALIVE_PLAYERS_GOLD
-                    packet.Worldstates.emplace_back(0xe10, 0); // ARENA_WORLD_STATE_ALIVE_PLAYERS_GREEN
-                    packet.Worldstates.emplace_back(0xe1a, 0); // ARENA_WORLD_STATE_ALIVE_PLAYERS_SHOW
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_DS_ARENA_GOLD, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_DS_ARENA_GREEN, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_DS_ARENA_SHOW, 0);
                 }
                 break;
-            case 4384: // Strand of the Ancients
+            case AREA_STRAND_OF_THE_ANCIENTS:
                 if (battleground && battleground->GetBgTypeID(true) == BATTLEGROUND_SA)
                     battleground->FillInitialWorldStates(packet);
                 else
                 {
                     packet.Worldstates.reserve(24);
-                    // 1-3 A defend, 4-6 H defend, 7-9 unk defend, 1 - ok, 2 - half destroyed, 3 - destroyed
-                    packet.Worldstates.emplace_back(0xf09, 0); // Gate of Temple
-                    packet.Worldstates.emplace_back(0xe36, 0); // Gate of Yellow Moon
-                    packet.Worldstates.emplace_back(0xe27, 0); // Gate of Green Emerald
-                    packet.Worldstates.emplace_back(0xe24, 0); // Gate of Blue Sapphire
-                    packet.Worldstates.emplace_back(0xe21, 0); // Gate of Red Sun
-                    packet.Worldstates.emplace_back(0xe1e, 0); // Gate of Purple Ametyst
-                    packet.Worldstates.emplace_back(0xdf3, 0); // bonus timer (1 - on, 0 - off)
-                    packet.Worldstates.emplace_back(0xded, 0); // Horde Attacker
-                    packet.Worldstates.emplace_back(0xdec, 0); // Alliance Attacker
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_ANCIENT_GATE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_YELLOW_GATE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_GREEN_GATE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_BLUE_GATE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_RED_GATE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_PURPLE_GATE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_BONUS_TIMER, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_HORDE_ATTACKER, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_ENABLE_TIMER, 0);
 
                     // End Round timer, example: 19:59 -> A:BC
-                    packet.Worldstates.emplace_back(0xde9, 0); // C
-                    packet.Worldstates.emplace_back(0xde8, 0); // B
-                    packet.Worldstates.emplace_back(0xde7, 0); // A
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_TIMER_SECONDS_SECOND_DIGIT, 0); // C
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_TIMER_SECONDS_FIRST_DIGIT, 0); // B
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_TIMER_MINUTES, 0); // A
 
-                    packet.Worldstates.emplace_back(0xe35, 0); // BG_SA_CENTER_GY_ALLIANCE
-                    packet.Worldstates.emplace_back(0xe34, 0); // BG_SA_RIGHT_GY_ALLIANCE
-                    packet.Worldstates.emplace_back(0xe33, 0); // BG_SA_LEFT_GY_ALLIANCE
-                    packet.Worldstates.emplace_back(0xe32, 0); // BG_SA_CENTER_GY_HORDE
-                    packet.Worldstates.emplace_back(0xe31, 0); // BG_SA_LEFT_GY_HORDE
-                    packet.Worldstates.emplace_back(0xe30, 0); // BG_SA_RIGHT_GY_HORDE
-                    packet.Worldstates.emplace_back(0xe2f, 0); // BG_SA_HORDE_DEFENCE_TOKEN
-                    packet.Worldstates.emplace_back(0xe2e, 0); // BG_SA_ALLIANCE_DEFENCE_TOKEN
-                    packet.Worldstates.emplace_back(0xe2d, 0); // BG_SA_LEFT_ATT_TOKEN_HRD
-                    packet.Worldstates.emplace_back(0xe2c, 0); // BG_SA_RIGHT_ATT_TOKEN_HRD
-                    packet.Worldstates.emplace_back(0xe2b, 0); // BG_SA_RIGHT_ATT_TOKEN_ALL
-                    packet.Worldstates.emplace_back(0xe2a, 0); // BG_SA_LEFT_ATT_TOKEN_ALL
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_CENTER_GY_ALLIANCE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_RIGHT_GY_ALLIANCE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_LEFT_GY_ALLIANCE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_CENTER_GY_HORDE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_LEFT_GY_HORDE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_RIGHT_GY_HORDE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_HORDE_DEFENSE_TOKEN, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_ALLIANCE_DEFENSE_TOKEN, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_LEFT_ATTACK_TOKEN_HORDE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_RIGHT_ATTACK_TOKEN_HORDE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_RIGHT_ATTACK_TOKEN_ALLIANCE, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_SA_LEFT_ATTACK_TOKEN_ALLIANCE, 0);
                     // missing unknowns
                 }
                 break;
-            case 4406: // Ring of Valor
+            case ARENA_THE_RING_OF_VALOR:
                 if (battleground && battleground->GetBgTypeID(true) == BATTLEGROUND_RV)
                     battleground->FillInitialWorldStates(packet);
                 else
                 {
                     packet.Worldstates.reserve(3);
-                    packet.Worldstates.emplace_back(0xe10, 0); // ARENA_WORLD_STATE_ALIVE_PLAYERS_GREEN
-                    packet.Worldstates.emplace_back(0xe11, 0); // ARENA_WORLD_STATE_ALIVE_PLAYERS_GOLD
-                    packet.Worldstates.emplace_back(0xe1a, 0); // ARENA_WORLD_STATE_ALIVE_PLAYERS_SHOW
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_RV_ARENA_GREEN, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_RV_ARENA_GOLD, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_RV_ARENA_SHOW, 0);
                 }
                 break;
-            case 4710: // Isle of Conquest
+            case AREA_ISLE_OF_CONQUEST:
                 if (battleground && battleground->GetBgTypeID(true) == BATTLEGROUND_IC)
                     battleground->FillInitialWorldStates(packet);
                 else
                 {
                     packet.Worldstates.reserve(18);
-                    packet.Worldstates.emplace_back(0x107d, 1);   // BG_IC_ALLIANCE_RENFORT_SET
-                    packet.Worldstates.emplace_back(0x107e, 1);   // BG_IC_HORDE_RENFORT_SET
-                    packet.Worldstates.emplace_back(0x1082, 300); // BG_IC_ALLIANCE_RENFORT
-                    packet.Worldstates.emplace_back(0x1083, 300); // BG_IC_HORDE_RENFORT
-                    packet.Worldstates.emplace_back(0x10e2, 1);   // BG_IC_GATE_FRONT_H_WS_OPEN
-                    packet.Worldstates.emplace_back(0x10e1, 1);   // BG_IC_GATE_WEST_H_WS_OPEN
-                    packet.Worldstates.emplace_back(0x10e0, 1);   // BG_IC_GATE_EAST_H_WS_OPEN
-                    packet.Worldstates.emplace_back(0x10e3, 1);   // BG_IC_GATE_FRONT_A_WS_OPEN
-                    packet.Worldstates.emplace_back(0x10e4, 1);   // BG_IC_GATE_WEST_A_WS_OPEN
-                    packet.Worldstates.emplace_back(0x10e5, 1);   // BG_IC_GATE_EAST_A_WS_OPEN
-                    packet.Worldstates.emplace_back(0x10dd, 1);   // unk
-                    packet.Worldstates.emplace_back(0x10cd, 1);   // BG_IC_DOCKS_UNCONTROLLED
-                    packet.Worldstates.emplace_back(0x10c8, 1);   // BG_IC_HANGAR_UNCONTROLLED
-                    packet.Worldstates.emplace_back(0x10d2, 1);   // BG_IC_QUARRY_UNCONTROLLED
-                    packet.Worldstates.emplace_back(0x10d7, 1);   // BG_IC_REFINERY_UNCONTROLLED
-                    packet.Worldstates.emplace_back(0x10c6, 1);   // BG_IC_WORKSHOP_UNCONTROLLED
-                    packet.Worldstates.emplace_back(0x1093, 1);   // unk
-                    packet.Worldstates.emplace_back(0x10f9, 1);   // unk
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_ALLIANCE_REINFORCEMENT_SET, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_HORDE_REINFORCEMENT_SET, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_ALLIANCE_REINFORCEMENT, 300);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_HORDE_REINFORCEMENT, 300);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_GATE_FRONT_H_WS_OPEN, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_GATE_WEST_H_WS_OPEN, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_GATE_EAST_H_WS_OPEN, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_GATE_FRONT_A_WS_OPEN, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_GATE_WEST_A_WS_OPEN, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_GATE_EAST_A_WS_OPEN, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_GATE_FRONT_H_WS_CLOSED, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_DOCKS_UNCONTROLLED, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_HANGAR_UNCONTROLLED, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_QUARRY_UNCONTROLLED, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_REFINERY_UNCONTROLLED, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_WORKSHOP_UNCONTROLLED, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_UNK, 1);
+                    packet.Worldstates.emplace_back(WORLD_STATE_BATTLEGROUND_IC_HORDE_KEEP_CONTROLLED_H, 1);
                 }
                 break;
-            case 4987: // The Ruby Sanctum
+            case AREA_THE_RUBY_SANCTUM:
                 if (instance)
                     instance->FillInitialWorldStates(packet);
                 else
                 {
                     packet.Worldstates.reserve(3);
-                    packet.Worldstates.emplace_back(0x13b9, 50); // WORLDSTATE_CORPOREALITY_MATERIAL
-                    packet.Worldstates.emplace_back(0x13ba, 50); // WORLDSTATE_CORPOREALITY_TWILIGHT
-                    packet.Worldstates.emplace_back(0x13bb, 0);  // WORLDSTATE_CORPOREALITY_TOGGLE
+                    packet.Worldstates.emplace_back(WORLD_STATE_RUBY_SANCTUM_CORPOREALITY_MATERIAL, 50);
+                    packet.Worldstates.emplace_back(WORLD_STATE_RUBY_SANCTUM_CORPOREALITY_TWILIGHT, 50);
+                    packet.Worldstates.emplace_back(WORLD_STATE_RUBY_SANCTUM_CORPOREALITY_TOGGLE, 0);
                 }
                 break;
-            case 4812: // Icecrown Citadel
-                if (instance && mapId == 631)
+            case AREA_ICECROWN_CITADEL:
+                if (instance && mapId == MAP_ICECROWN_CITADEL)
                     instance->FillInitialWorldStates(packet);
                 else
                 {
                     packet.Worldstates.reserve(5);
-                    packet.Worldstates.emplace_back(0x1327, 0);  // WORLDSTATE_SHOW_TIMER (Blood Quickening weekly)
-                    packet.Worldstates.emplace_back(0x1328, 30); // WORLDSTATE_EXECUTION_TIME
-                    packet.Worldstates.emplace_back(0x134c, 0);  // WORLDSTATE_SHOW_ATTEMPTS
-                    packet.Worldstates.emplace_back(0x134d, 50); // WORLDSTATE_ATTEMPTS_REMAINING
-                    packet.Worldstates.emplace_back(0x134e, 50); // WORLDSTATE_ATTEMPTS_MAX
+                    packet.Worldstates.emplace_back(WORLD_STATE_ICECROWN_CITADEL_SHOW_TIMER, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_ICECROWN_CITADEL_EXECUTION_TIME, 30);
+                    packet.Worldstates.emplace_back(WORLD_STATE_ICECROWN_CITADEL_SHOW_ATTEMPTS, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_ICECROWN_CITADEL_ATTEMPTS_REMAINING, 50);
+                    packet.Worldstates.emplace_back(WORLD_STATE_ICECROWN_CITADEL_ATTEMPTS_MAX, 50);
                 }
                 break;
-            case 4100: // The Culling of Stratholme
-                if (instance && mapId == 595)
+            case AREA_THE_CULLING_OF_STRATHOLME:
+                if (instance && mapId == MAP_THE_CULLING_OF_STRATHOLME)
                     instance->FillInitialWorldStates(packet);
                 else
                 {
                     packet.Worldstates.reserve(5);
-                    packet.Worldstates.emplace_back(0xd97, 0);  // WORLDSTATE_SHOW_CRATES
-                    packet.Worldstates.emplace_back(0xd98, 0);  // WORLDSTATE_CRATES_REVEALED
-                    packet.Worldstates.emplace_back(0xdb0, 0);  // WORLDSTATE_WAVE_COUNT
-                    packet.Worldstates.emplace_back(0xf5b, 25); // WORLDSTATE_TIME_GUARDIAN
-                    packet.Worldstates.emplace_back(0xf5c, 0);  // WORLDSTATE_TIME_GUARDIAN_SHOW
+                    packet.Worldstates.emplace_back(WORLD_STATE_CULLING_OF_STRATHOLME_SHOW_CRATES, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_CULLING_OF_STRATHOLME_CRATES_REVEALED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_CULLING_OF_STRATHOLME_WAVE_COUNT, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_CULLING_OF_STRATHOLME_TIME_GUARDIAN, 25);
+                    packet.Worldstates.emplace_back(WORLD_STATE_CULLING_OF_STRATHOLME_TIME_GUARDIAN_SHOW, 0);
                 }
                 break;
-            case 4228: // The Oculus
-                if (instance && mapId == 578)
+            case AREA_THE_OCULUS:
+                if (instance && mapId == MAP_THE_OCULUS)
                     instance->FillInitialWorldStates(packet);
                 else
                 {
                     packet.Worldstates.reserve(2);
-                    packet.Worldstates.emplace_back(0xdc4, 0); // WORLD_STATE_CENTRIFUGE_CONSTRUCT_SHOW
-                    packet.Worldstates.emplace_back(0xd9e, 0); // WORLD_STATE_CENTRIFUGE_CONSTRUCT_AMOUNT
+                    packet.Worldstates.emplace_back(WORLD_STATE_OCULUS_CENTRIFUGE_CONSTRUCT_SHOW, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_OCULUS_CENTRIFUGE_CONSTRUCT_AMOUNT, 0);
                 }
                 break;
-            case 4273: // Ulduar
-                if (instance && mapId == 603)
+            case AREA_ULDUAR:
+                if (instance && mapId == MAP_ULDUAR)
                     instance->FillInitialWorldStates(packet);
                 else
                 {
                     packet.Worldstates.reserve(2);
-                    packet.Worldstates.emplace_back(0x1024, 0); // WORLDSTATE_ALGALON_TIMER_ENABLED
-                    packet.Worldstates.emplace_back(0x1023, 0); // WORLDSTATE_ALGALON_DESPAWN_TIMER
+                    packet.Worldstates.emplace_back(WORLD_STATE_ULDUAR_ALGALON_TIMER_ENABLED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_ULDUAR_ALGALON_DESPAWN_TIMER, 0);
                 }
                 break;
-            case 4415: // Violet Hold
+            case AREA_THE_VIOLET_HOLD:
                 if (instance)
                     instance->FillInitialWorldStates(packet);
                 else
                 {
                     packet.Worldstates.reserve(3);
-                    packet.Worldstates.emplace_back(0xee8, 0);   // WORLD_STATE_VH_SHOW
-                    packet.Worldstates.emplace_back(0xee7, 100); // WORLD_STATE_VH_PRISON_STATE
-                    packet.Worldstates.emplace_back(0xee2, 0);   // WORLD_STATE_VH_WAVE_COUNT
+                    packet.Worldstates.emplace_back(WORLD_STATE_VIOLET_HOLD_SHOW, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_VIOLET_HOLD_PRISON_STATE, 100);
+                    packet.Worldstates.emplace_back(WORLD_STATE_VIOLET_HOLD_WAVE_COUNT, 0);
                 }
                 break;
-            case 4820: // Halls of Refection
-                if (instance && mapId == 668)
+            case AREA_HALLS_OF_REFLECTION:
+                if (instance && mapId == MAP_HALLS_OF_REFLECTION)
                     instance->FillInitialWorldStates(packet);
                 else
                 {
                     packet.Worldstates.reserve(2);
-                    packet.Worldstates.emplace_back(0x1314, 0); // WORLD_STATE_HOR_WAVES_ENABLED
-                    packet.Worldstates.emplace_back(0x1312, 0); // WORLD_STATE_HOR_WAVE_COUNT
+                    packet.Worldstates.emplace_back(WORLD_STATE_HALLS_OF_REFLECTION_WAVES_ENABLED, 0);
+                    packet.Worldstates.emplace_back(WORLD_STATE_HALLS_OF_REFLECTION_WAVE_COUNT, 0);
                 }
                 break;
-            case 4298: // Scarlet Enclave (DK starting zone)
+            case AREA_PLAGUELANDS_THE_SCARLET_ENCLAVE: // (DK starting zone)
                 // Get Mograine, GUID and ENTRY should NEVER change
                 if (Creature* mograine = ObjectAccessor::GetCreature(*this, ObjectGuid::Create<HighGuid::Unit>(29173, 130956)))
                 {
                     if (CreatureAI* mograineAI = mograine->AI())
                     {
                         packet.Worldstates.reserve(6);
-                        packet.Worldstates.emplace_back(0xe06, mograineAI->GetData(3590));
-                        packet.Worldstates.emplace_back(0xe07, mograineAI->GetData(3591));
-                        packet.Worldstates.emplace_back(0xe08, mograineAI->GetData(3592));
-                        packet.Worldstates.emplace_back(0xe13, mograineAI->GetData(3603));
-                        packet.Worldstates.emplace_back(0xe14, mograineAI->GetData(3604));
-                        packet.Worldstates.emplace_back(0xe15, mograineAI->GetData(3605));
+                        packet.Worldstates.emplace_back(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_DEFENDERS_COUNT, mograineAI->GetData(3590));
+                        packet.Worldstates.emplace_back(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_SCOURGE_COUNT, mograineAI->GetData(3591));
+                        packet.Worldstates.emplace_back(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_SOLDIERS_ENABLE, mograineAI->GetData(3592));
+                        packet.Worldstates.emplace_back(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_COUNTDOWN_ENABLE, mograineAI->GetData(3603));
+                        packet.Worldstates.emplace_back(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_COUNTDOWN_TIME, mograineAI->GetData(3604));
+                        packet.Worldstates.emplace_back(WORLD_STATE_BATTLE_FOR_LIGHTS_HOPE_EVENT_BEGIN_ENABLE, mograineAI->GetData(3605));
                     }
                 }
                 break;
-            case 4197: // Wintergrasp
+            case AREA_WINTERGRASP:
                 if (battlefield && battlefield->GetTypeId() == BATTLEFIELD_WG)
                 {
                     battlefield->FillInitialWorldStates(packet);
                     break;
                 }
-                [[fallthrough]];
             default:
-                packet.Worldstates.reserve(4);
-                packet.Worldstates.emplace_back(0x914, 0);
-                packet.Worldstates.emplace_back(0x913, 0);
-                packet.Worldstates.emplace_back(0x912, 0);
-                packet.Worldstates.emplace_back(0x915, 0);
                 break;
             }
         }
@@ -8934,7 +8912,7 @@ void Player::SetBindPoint(ObjectGuid guid)
 {
     WorldPacket data(SMSG_BINDER_CONFIRM, 8);
     data << guid;
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 void Player::SendTalentWipeConfirm(ObjectGuid guid)
@@ -8943,7 +8921,7 @@ void Player::SendTalentWipeConfirm(ObjectGuid guid)
     data << guid;
     uint32 cost = sWorld->getBoolConfig(CONFIG_NO_RESET_TALENT_COST) ? 0 : resetTalentsCost();
     data << cost;
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 void Player::ResetPetTalents()
@@ -8988,7 +8966,7 @@ Pet* Player::GetPet() const
     return nullptr;
 }
 
-Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, Milliseconds duration /*= 0s*/, uint32 healthPct /*= 0*/)
+Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetType petType, Milliseconds duration /*= 0ms*/, uint32 healthPct /*= 0*/)
 {
     PetStable& petStable = GetOrInitPetStable();
 
@@ -9009,7 +8987,7 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
                 ++itr;
         }
 
-        if (duration > 0s)
+        if (duration > 0ms)
             pet->SetDuration(duration);
 
         // Generate a new name for the newly summoned ghoul
@@ -9103,7 +9081,7 @@ Pet* Player::SummonPet(uint32 entry, float x, float y, float z, float ang, PetTy
         }
     }
 
-    if (duration > 0s)
+    if (duration > 0ms)
         pet->SetDuration(duration);
 
     if (NeedSendSpectatorData() && pet->GetCreatureTemplate()->family)
@@ -9122,13 +9100,6 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
 
     if (pet)
     {
-        // xinef: dont save dead pet as current, save him not in slot
-        if (!pet->IsAlive() && mode == PET_SAVE_AS_CURRENT && pet->getPetType() == HUNTER_PET)
-        {
-            mode = PET_SAVE_NOT_IN_SLOT;
-            m_temporaryUnsummonedPetNumber = 0;
-        }
-
         LOG_DEBUG("entities.pet", "RemovePet {}, {}, {}", pet->GetEntry(), mode, returnreagent);
         if (pet->m_removed)
             return;
@@ -9206,7 +9177,7 @@ void Player::RemovePet(Pet* pet, PetSaveMode mode, bool returnreagent)
         {
             WorldPacket data(SMSG_PET_SPELLS, 8);
             data << uint64(0);
-            GetSession()->SendPacket(&data);
+            SendDirectMessage(&data);
 
             if (GetGroup())
                 SetGroupUpdateFlag(GROUP_UPDATE_PET);
@@ -9400,15 +9371,16 @@ void Player::Say(std::string_view text, Language language, WorldObject const* /*
 {
     std::string _text(text);
     if (!sScriptMgr->OnPlayerCanUseChat(this, CHAT_MSG_SAY, language, _text))
-    {
         return;
-    }
-
-    sScriptMgr->OnPlayerChat(this, CHAT_MSG_SAY, language, _text);
 
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_SAY, language, this, this, _text);
-    SendMessageToSetInRange(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), true, false, false, true);
+
+    SendDirectMessage(&data);
+
+    // Special handling for messages, do not use visibility map for stealthed units
+    Acore::MessageDistDeliverer notifier(this, &data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), false, nullptr, true);
+    Cell::VisitObjects(this, notifier, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY));
 }
 
 void Player::Say(uint32 textId, WorldObject const* target /*= nullptr*/)
@@ -9421,15 +9393,16 @@ void Player::Yell(std::string_view text, Language language, WorldObject const* /
     std::string _text(text);
 
     if (!sScriptMgr->OnPlayerCanUseChat(this, CHAT_MSG_YELL, language, _text))
-    {
         return;
-    }
-
-    sScriptMgr->OnPlayerChat(this, CHAT_MSG_YELL, language, _text);
 
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_YELL, language, this, this, _text);
-    SendMessageToSetInRange(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL), true, false, false, true);
+
+    SendDirectMessage(&data);
+
+    // Special handling for messages, do not use visibility map for stealthed units
+    Acore::MessageDistDeliverer notifier(this, &data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL), false, nullptr, true);
+    Cell::VisitObjects(this, notifier, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL));
 }
 
 void Player::Yell(uint32 textId, WorldObject const* target /*= nullptr*/)
@@ -9442,16 +9415,16 @@ void Player::TextEmote(std::string_view text, WorldObject const* /*= nullptr*/, 
     std::string _text(text);
 
     if (!sScriptMgr->OnPlayerCanUseChat(this, CHAT_MSG_EMOTE, LANG_UNIVERSAL, _text))
-    {
         return;
-    }
-
-    sScriptMgr->OnPlayerChat(this, CHAT_MSG_EMOTE, LANG_UNIVERSAL, _text);
 
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_EMOTE, LANG_UNIVERSAL, this, this, _text);
 
-    SendMessageToSetInRange(&data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), true, false, !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_EMOTE), true);
+    SendDirectMessage(&data);
+
+    // Special handling for messages, do not use visibility map for stealthed units
+    Acore::MessageDistDeliverer notifier(this, &data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_EMOTE), nullptr, true);
+    Cell::VisitObjects(this, notifier, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE));
 }
 
 void Player::TextEmote(uint32 textId, WorldObject const* target /*= nullptr*/, bool /*isBossEmote = false*/)
@@ -9471,22 +9444,18 @@ void Player::Whisper(std::string_view text, Language language, Player* target, b
     std::string _text(text);
 
     if (!sScriptMgr->OnPlayerCanUseChat(this, CHAT_MSG_WHISPER, language, _text, target))
-    {
         return;
-    }
-
-    sScriptMgr->OnPlayerChat(this, CHAT_MSG_WHISPER, language, _text, target);
 
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER, language, this, this, _text);
-    target->GetSession()->SendPacket(&data);
+    target->SendDirectMessage(&data);
 
     // rest stuff shouldn't happen in case of addon message
     if (isAddonMessage)
         return;
 
     ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER_INFORM, Language(language), target, target, _text);
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 
     if (!isAcceptWhispers() && !IsGameMaster() && !target->IsGameMaster())
     {
@@ -9595,7 +9564,7 @@ void Player::PetSpellInitialize()
         data << uint32(category ? cooldown : 0);            // category cooldown
     }
 
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 void Player::PossessSpellInitialize()
@@ -9623,7 +9592,7 @@ void Player::PossessSpellInitialize()
     data << uint8(0);                                       // spells count
     data << uint8(0);                                       // cooldowns count
 
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 void Player::VehicleSpellInitialize()
@@ -9698,7 +9667,7 @@ void Player::VehicleSpellInitialize()
         data << uint32(category ? cooldown : 0); // category cooldown
     }
 
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 void Player::CharmSpellInitialize()
@@ -9752,14 +9721,14 @@ void Player::CharmSpellInitialize()
 
     data << uint8(0);                                       // cooldowns count
 
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 void Player::SendRemoveControlBar()
 {
     WorldPacket data(SMSG_PET_SPELLS, 8);
     data << uint64(0);
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 bool Player::HasSpellMod(SpellModifier* mod, Spell* spell)
@@ -9775,8 +9744,8 @@ bool Player::IsAffectedBySpellmod(SpellInfo const* spellInfo, SpellModifier* mod
     if (!mod || !spellInfo)
         return false;
 
-    // Mod out of charges
-    if (spell && mod->charges == -1 && spell->m_appliedMods.find(mod->ownerAura) == spell->m_appliedMods.end())
+    // First time this aura applies a mod to us and is out of charges
+    if (spell && mod->ownerAura && mod->ownerAura->IsUsingCharges() && !mod->ownerAura->GetCharges() && !spell->m_appliedMods.count(mod->ownerAura))
         return false;
 
     // +duration to infinite duration spells making them limited
@@ -9791,9 +9760,7 @@ void Player::ApplySpellMod(uint32 spellId, SpellModOp op, T& basevalue, Spell* s
 {
     SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
     if (!spellInfo)
-    {
         return;
-    }
 
     float totalmul = 1.0f;
     int32 totalflat = 0;
@@ -9801,26 +9768,25 @@ void Player::ApplySpellMod(uint32 spellId, SpellModOp op, T& basevalue, Spell* s
     auto calculateSpellMod = [&](SpellModifier* mod)
     {
         // xinef: temporary pets cannot use charged mods of owner, needed for mirror image QQ they should use their own auras
-        if (temporaryPet && mod->charges != 0)
-        {
+        if (temporaryPet && mod->ownerAura && mod->ownerAura->IsUsingCharges())
             return;
-        }
+
+        // skip if already instant or cost is free
+        if (mod->op == SPELLMOD_CASTING_TIME || mod->op == SPELLMOD_COST)
+            if (((float)basevalue + (float)basevalue * (totalmul - 1.0f) + (float)totalflat) <= 0)
+                return;
 
         if (mod->type == SPELLMOD_FLAT)
         {
             // xinef: do not allow to consume more than one 100% crit increasing spell
             if (mod->op == SPELLMOD_CRITICAL_CHANCE && totalflat >= 100)
-            {
                 return;
-            }
 
             int32 flatValue = mod->value;
 
             // SPELL_MOD_THREAT - divide by 100 (in packets we send threat * 100)
             if (mod->op == SPELLMOD_THREAT)
-            {
                 flatValue /= 100;
-            }
 
             totalflat += flatValue;
         }
@@ -9828,122 +9794,49 @@ void Player::ApplySpellMod(uint32 spellId, SpellModOp op, T& basevalue, Spell* s
         {
             // skip percent mods for null basevalue (most important for spell mods with charges)
             if (basevalue == T(0) || totalmul == 0.0f)
-            {
                 return;
-            }
 
             // special case (skip > 10sec spell casts for instant cast setting)
             if (mod->op == SPELLMOD_CASTING_TIME && basevalue >= T(10000) && mod->value <= -100)
-            {
                 return;
-            }
             // xinef: special exception for surge of light, dont affect crit chance if previous mods were not applied
-            else if (mod->op == SPELLMOD_CRITICAL_CHANCE && spell && !HasSpellMod(mod, spell))
-            {
+            else if (mod->op == SPELLMOD_CRITICAL_CHANCE && !HasSpellModApplied(mod, spell))
                 return;
-            }
             // xinef: special case for backdraft gcd reduce with backlast time reduction, dont affect gcd if cast time was not applied
-            else if (mod->op == SPELLMOD_GLOBAL_COOLDOWN && spell && !HasSpellMod(mod, spell))
-            {
+            else if (mod->op == SPELLMOD_GLOBAL_COOLDOWN && !HasSpellModApplied(mod, spell))
                 return;
-            }
 
             // xinef: those two mods should be multiplicative (Glyph of Renew)
             if (mod->op == SPELLMOD_DAMAGE || mod->op == SPELLMOD_DOT)
-            {
                 totalmul *= CalculatePct(1.0f, 100.0f + mod->value);
-            }
             else
-            {
                 totalmul += CalculatePct(1.0f, mod->value);
-            }
         }
 
-        DropModCharge(mod, spell);
+        ApplyModToSpell(mod, spell);
     };
 
     // Drop charges for triggering spells instead of triggered ones
     if (m_spellModTakingSpell)
-    {
         spell = m_spellModTakingSpell;
-    }
 
-    SpellModifier* chargedMod = nullptr;
     for (auto mod : m_spellMods[op])
     {
-        // Charges can be set only for mods with auras
-        if (!mod->ownerAura)
-        {
-            ASSERT(!mod->charges);
-        }
-
         if (!IsAffectedBySpellmod(spellInfo, mod, spell))
-        {
             continue;
-        }
-
-        if (mod->ownerAura->IsUsingCharges())
-        {
-            if (!chargedMod || (chargedMod->ownerAura->GetSpellInfo()->SpellPriority < mod->ownerAura->GetSpellInfo()->SpellPriority))
-            {
-                chargedMod = mod;
-            }
-
-            continue;
-        }
 
         calculateSpellMod(mod);
     }
 
-    if (chargedMod)
-    {
-        calculateSpellMod(chargedMod);
-    }
-
-    float diff = 0.0f;
     if (op == SPELLMOD_CASTING_TIME || op == SPELLMOD_DURATION)
-    {
-        diff = ((float)basevalue + totalflat) * (totalmul - 1.0f) + (float)totalflat;
-    }
+        basevalue = (basevalue + totalflat) > 0 ? (basevalue + totalflat) * totalmul : 0;
     else
-    {
-        diff = (float)basevalue * (totalmul - 1.0f) + (float)totalflat;
-    }
-
-    basevalue = T((float)basevalue + diff);
+        basevalue = (basevalue * totalmul) + totalflat;
 }
 
 template AC_GAME_API void Player::ApplySpellMod(uint32 spellId, SpellModOp op, int32& basevalue, Spell* spell, bool temporaryPet);
 template AC_GAME_API void Player::ApplySpellMod(uint32 spellId, SpellModOp op, uint32& basevalue, Spell* spell, bool temporaryPet);
 template AC_GAME_API void Player::ApplySpellMod(uint32 spellId, SpellModOp op, float& basevalue, Spell* spell, bool temporaryPet);
-
-// Binary predicate for sorting SpellModifiers
-class SpellModPred
-{
-public:
-    SpellModPred() {}
-    bool operator() (SpellModifier const* a, SpellModifier const* b) const
-    {
-        if (a->type != b->type)
-            return a->type == SPELLMOD_FLAT;
-        return a->value < b->value;
-    }
-};
-class MageSpellModPred
-{
-public:
-    MageSpellModPred() {}
-    bool operator() (SpellModifier const* a, SpellModifier const* b) const
-    {
-        if (a->type != b->type)
-            return a->type == SPELLMOD_FLAT;
-        if (a->spellId == 44401)
-            return true;
-        if (b->spellId == 44401)
-            return false;
-        return a->value < b->value;
-    }
-};
 
 void Player::AddSpellMod(SpellModifier* mod, bool apply)
 {
@@ -9961,7 +9854,7 @@ void Player::AddSpellMod(SpellModifier* mod, bool apply)
         if (mod->mask & _mask)
         {
             int32 val = 0;
-            for (SpellModList::iterator itr = m_spellMods[mod->op].begin(); itr != m_spellMods[mod->op].end(); ++itr)
+            for (SpellModContainer::iterator itr = m_spellMods[mod->op].begin(); itr != m_spellMods[mod->op].end(); ++itr)
             {
                 if ((*itr)->type == mod->type && (*itr)->mask & _mask)
                     val += (*itr)->value;
@@ -9977,15 +9870,11 @@ void Player::AddSpellMod(SpellModifier* mod, bool apply)
 
     if (apply)
     {
-        m_spellMods[mod->op].push_back(mod);
-        if (IsClass(CLASS_MAGE, CLASS_CONTEXT_ABILITY))
-            m_spellMods[mod->op].sort(MageSpellModPred());
-        else
-            m_spellMods[mod->op].sort(SpellModPred());
+        m_spellMods[mod->op].insert(mod);
     }
     else
     {
-        m_spellMods[mod->op].remove(mod);
+        m_spellMods[mod->op].erase(mod);
         // mods bound to aura will be removed in AuraEffect::~AuraEffect
         if (!mod->ownerAura)
             delete mod;
@@ -10002,7 +9891,7 @@ void Player::RestoreSpellMods(Spell* spell, uint32 ownerAuraId, Aura* aura)
 
     for (uint8 i = 0; i < MAX_SPELLMOD; ++i)
     {
-        for (SpellModList::iterator itr = m_spellMods[i].begin(); itr != m_spellMods[i].end(); ++itr)
+        for (SpellModContainer::iterator itr = m_spellMods[i].begin(); itr != m_spellMods[i].end(); ++itr)
         {
             SpellModifier* mod = *itr;
 
@@ -10031,20 +9920,6 @@ void Player::RestoreSpellMods(Spell* spell, uint32 ownerAuraId, Aura* aura)
             // from applied mods (Else, an aura with two mods on the current spell would
             // only see the first of its modifier restored)
             aurasQueue.push_back(mod->ownerAura);
-
-            // add mod charges back to mod
-            if (mod->charges == -1)
-                mod->charges = 1;
-            else
-                mod->charges++;
-
-            // Do not set more spellmods than available
-            if (mod->ownerAura->GetCharges() < mod->charges)
-                mod->charges = mod->ownerAura->GetCharges();
-
-            // Skip this check for now - aura charges may change due to various reason
-            /// @todo track these changes correctly
-            //ASSERT (mod->ownerAura->GetCharges() <= mod->charges);
         }
     }
 
@@ -10079,14 +9954,14 @@ void Player::RemoveSpellMods(Spell* spell)
 
     for (uint8 i = 0; i < MAX_SPELLMOD; ++i)
     {
-        for (SpellModList::const_iterator itr = m_spellMods[i].begin(); itr != m_spellMods[i].end();)
+        for (SpellModContainer::const_iterator itr = m_spellMods[i].begin(); itr != m_spellMods[i].end();)
         {
             SpellModifier* mod = *itr;
             ++itr;
 
-            // don't handle spells with proc_event entry defined
+            // don't handle spells with spell_proc entry defined
             // this is a temporary workaround, because all spellmods should be handled like that
-            if (sSpellMgr->GetSpellProcEvent(mod->spellId))
+            if (sSpellMgr->GetSpellProcEntry(mod->spellId))
             {
                 continue;
             }
@@ -10112,48 +9987,42 @@ void Player::RemoveSpellMods(Spell* spell)
                 if (sp->SpellIconID == 3261 || sp->SpellIconID == 2999 || sp->SpellIconID == 2938)
                     if (AuraEffect* aurEff = GetAuraEffectDummy(64869))
                         if (roll_chance_i(aurEff->GetAmount()))
-                        {
-                            mod->charges = 1;
-                            continue;
-                        }
+                            continue; // don't consume charge
             }
-
             if (mod->ownerAura->DropCharge(AURA_REMOVE_BY_EXPIRE))
                 itr = m_spellMods[i].begin();
         }
     }
 }
 
-void Player::DropModCharge(SpellModifier* mod, Spell* spell)
+void Player::ApplyModToSpell(SpellModifier* mod, Spell* spell)
 {
-    if (spell && mod->ownerAura && mod->charges > 0)
-    {
-        if (--mod->charges == 0)
-            mod->charges = -1;
+    if (!spell)
+        return;
 
-        spell->m_appliedMods.insert(mod->ownerAura);
-    }
+    // don't do anything with no charges
+    if (mod->ownerAura->IsUsingCharges() && !mod->ownerAura->GetCharges())
+        return;
+
+    // register inside spell, proc system uses this to drop charges
+    spell->m_appliedMods.insert(mod->ownerAura);
+}
+
+bool Player::HasSpellModApplied(SpellModifier* mod, Spell* spell)
+{
+    if (!spell)
+        return false;
+
+    return spell->m_appliedMods.count(mod->ownerAura) != 0;
 }
 
 void Player::SetSpellModTakingSpell(Spell* spell, bool apply)
 {
-    if (apply && m_spellModTakingSpell)
-    {
-        LOG_INFO("misc", "Player::SetSpellModTakingSpell (A1) - {}, {}", spell->m_spellInfo->Id, m_spellModTakingSpell->m_spellInfo->Id);
+    if (apply && m_spellModTakingSpell != nullptr)
         return;
-        //ASSERT(m_spellModTakingSpell == nullptr);
-    }
-    else if (!apply)
-    {
-        if (!m_spellModTakingSpell)
-            LOG_INFO("misc", "Player::SetSpellModTakingSpell (B1) - {}", spell->m_spellInfo->Id);
-        else if (m_spellModTakingSpell != spell)
-        {
-            LOG_INFO("misc", "Player::SetSpellModTakingSpell (C1) - {}, {}", spell->m_spellInfo->Id, m_spellModTakingSpell->m_spellInfo->Id);
-            return;
-        }
-        //ASSERT(m_spellModTakingSpell && m_spellModTakingSpell == spell);
-    }
+
+    if (!apply && (!m_spellModTakingSpell || m_spellModTakingSpell != spell))
+        return;
 
     m_spellModTakingSpell = apply ? spell : nullptr;
 }
@@ -10163,7 +10032,7 @@ void Player::SendProficiency(ItemClass itemClass, uint32 itemSubclassMask)
 {
     WorldPacket data(SMSG_SET_PROFICIENCY, 1 + 4);
     data << uint8(itemClass) << uint32(itemSubclassMask);
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 void Player::RemovePetitionsAndSigns(ObjectGuid guid, uint32 type)
@@ -10499,7 +10368,6 @@ void Player::CleanupAfterTaxiFlight()
     m_taxi.ClearTaxiDestinations();        // not destinations, clear source node
     Dismount();
     RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_TAXI_FLIGHT);
-    getHostileRefMgr().setOnlineOfflineState(true);
 }
 
 void Player::ContinueTaxiFlight()
@@ -10566,35 +10434,24 @@ void Player::ContinueTaxiFlight()
 
 void Player::SendTaxiNodeStatusMultiple()
 {
-    for (auto itr = m_clientGUIDs.begin(); itr != m_clientGUIDs.end(); ++itr)
+    DoForAllVisibleWorldObjects([this](WorldObject* worldObject)
     {
-        if (!itr->IsCreature())
-        {
-            continue;
-        }
-
-        Creature* creature = ObjectAccessor::GetCreature(*this, *itr);
+        Creature* creature = worldObject->ToCreature();
         if (!creature || creature->IsHostileTo(this))
-        {
-            continue;
-        }
+            return;
 
         if (!creature->HasNpcFlag(UNIT_NPC_FLAG_FLIGHTMASTER))
-        {
-            continue;
-        }
+            return;
 
-        uint32 nearestNode = sObjectMgr->GetNearestTaxiNode(creature->GetPositionX(), creature->GetPositionY(), creature->GetPositionZ(), creature->GetMapId(), GetTeamId());
+        uint32 nearestNode = sObjectMgr->GetNearestTaxiNode(*creature, GetTeamId(true));
         if (!nearestNode)
-        {
-            continue;
-        }
+            return;
 
         WorldPacket data(SMSG_TAXINODE_STATUS, 9);
-        data << *itr;
+        data << creature->GetGUID();
         data << uint8(m_taxi.IsTaximaskNodeKnown(nearestNode) ? 1 : 0);
         SendDirectMessage(&data);
-    }
+    });
 }
 
 void Player::ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs)
@@ -10626,7 +10483,7 @@ void Player::ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs)
     if (!cooldowns.empty())
     {
         BuildCooldownPacket(data, SPELL_COOLDOWN_FLAG_NONE, cooldowns);
-        GetSession()->SendPacket(&data);
+        SendDirectMessage(&data);
     }
 }
 
@@ -10746,7 +10603,7 @@ inline bool Player::_StoreOrEquipNewItem(uint32 vendorslot, uint32 item, uint8 c
         data << uint32(vendorslot + 1);                   // numbered from 1 at client
         data << int32(crItem->maxcount > 0 ? new_count : 0xFFFFFFFF);
         data << uint32(count);
-        GetSession()->SendPacket(&data);
+        SendDirectMessage(&data);
         SendNewItem(it, pProto->BuyCount * count, true, false, false);
 
         if (!bStore)
@@ -11163,7 +11020,7 @@ void Player::ModifySpellCooldown(uint32 spellId, int32 cooldown)
     data << uint32(spellId);            // Spell ID
     data << GetGUID();                  // Player GUID
     data << int32(cooldown);            // Cooldown mod in milliseconds
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 void Player::SendCooldownEvent(SpellInfo const* spellInfo, uint32 itemId /*= 0*/, Spell* spell /*= nullptr*/, bool setCooldown /*= true*/)
@@ -11472,31 +11329,22 @@ WorldLocation Player::GetStartPosition() const
 
 bool Player::HaveAtClient(WorldObject const* u) const
 {
-    if (u == this)
-    {
-        return true;
-    }
-
     // Motion Transports are always present in player's client
     if (GameObject const* gameobject = u->ToGameObject())
     {
         if (gameobject->IsMotionTransport())
-        {
             return true;
-        }
     }
 
-    return m_clientGUIDs.find(u->GetGUID()) != m_clientGUIDs.end();
+    return HaveAtClient(u->GetGUID());
 }
 
 bool Player::HaveAtClient(ObjectGuid guid) const
 {
     if (guid == GetGUID())
-    {
         return true;
-    }
 
-    return m_clientGUIDs.find(guid) != m_clientGUIDs.end();
+    return GetObjectVisibilityContainer().GetVisibleWorldObjectsMap()->find(guid) != GetObjectVisibilityContainer().GetVisibleWorldObjectsMap()->end();
 }
 
 bool Player::IsNeverVisible() const
@@ -11648,7 +11496,7 @@ void Player::SendInitialPacketsBeforeAddToMap()
     data << m_homebindX << m_homebindY << m_homebindZ;
     data << (uint32) m_homebindMapId;
     data << (uint32) m_homebindAreaId;
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 
     // SMSG_SET_PROFICIENCY
     // SMSG_SET_PCT_SPELL_MODIFIER
@@ -11661,13 +11509,13 @@ void Player::SendInitialPacketsBeforeAddToMap()
     data.Initialize(SMSG_INSTANCE_DIFFICULTY, 4 + 4);
     data << uint32(GetMap()->GetDifficulty());
     data << uint32(GetMap()->GetEntry()->IsDynamicDifficultyMap() && GetMap()->IsHeroic()); // Raid dynamic difficulty
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 
     SendInitialSpells();
 
     data.Initialize(SMSG_SEND_UNLEARN_SPELLS, 4);
     data << uint32(0);                                      // count, for (count) uint32;
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 
     SendInitialActionButtons();
     m_reputationMgr->SendInitialReputations();
@@ -11679,7 +11527,7 @@ void Player::SendInitialPacketsBeforeAddToMap()
     data.AppendPackedTime(GameTime::GetGameTime().count());
     data << float(0.01666667f);                             // game speed
     data << uint32(0);                                      // added in 3.1.2
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 
     GetReputationMgr().SendForceReactions();                // SMSG_SET_FORCED_REACTIONS
 
@@ -11732,16 +11580,56 @@ void Player::SendInitialPacketsAfterAddToMap()
     GetZoneAndAreaId(newzone, newarea);
     UpdateZone(newzone, newarea);                            // also call SendInitWorldStates();
 
-    if (HasStunAura())
-        SetMovement(MOVE_ROOT);
+    WorldPacket setCompoundState(SMSG_MULTIPLE_MOVES, 100);
+    setCompoundState << uint32(0); // size placeholder
 
     // manual send package (have code in HandleEffect(this, AURA_EFFECT_HANDLE_SEND_FOR_CLIENT, true); that must not be re-applied.
-    if (HasRootAura())
+    if (IsImmobilizedState())
     {
-        WorldPacket data2(SMSG_FORCE_MOVE_ROOT, 10);
-        data2 << GetPackGUID();
-        data2 << (uint32)2;
-        SendMessageToSet(&data2, true);
+        uint32 const counter = GetSession()->GetOrderCounter();
+        setCompoundState << uint8(2 + GetPackGUID().size() + 4);
+        setCompoundState << uint16(SMSG_FORCE_MOVE_ROOT);
+        setCompoundState << GetPackGUID();
+        setCompoundState << uint32(counter);
+        GetSession()->IncrementOrderCounter();
+    }
+
+    if (HasAuraType(SPELL_AURA_FEATHER_FALL))
+    {
+        uint32 const counter = GetSession()->GetOrderCounter();
+        setCompoundState << uint8(2 + GetPackGUID().size() + 4);
+        setCompoundState << uint16(SMSG_MOVE_FEATHER_FALL);
+        setCompoundState << GetPackGUID();
+        setCompoundState << uint32(counter);
+        GetSession()->IncrementOrderCounter();
+    }
+
+    if (HasAuraType(SPELL_AURA_WATER_WALK) || HasAura(8326))
+    {
+        uint32 const counter = GetSession()->GetOrderCounter();
+        setCompoundState << uint8(2 + GetPackGUID().size() + 4);
+        setCompoundState << uint16(SMSG_MOVE_WATER_WALK);
+        setCompoundState << GetPackGUID();
+        setCompoundState << uint32(counter);
+        GetSession()->IncrementOrderCounter();
+    }
+
+    if (HasAuraType(SPELL_AURA_HOVER))
+    {
+        uint32 const counter = GetSession()->GetOrderCounter();
+        setCompoundState << uint8(2 + GetPackGUID().size() + 4);
+        setCompoundState << uint16(SMSG_MOVE_SET_HOVER);
+        setCompoundState << GetPackGUID();
+        setCompoundState << uint32(counter);
+        GetSession()->IncrementOrderCounter();
+    }
+
+    // TODO: Pending mount protocol
+
+    if (setCompoundState.size() > 4)
+    {
+        setCompoundState.put<uint32>(0, setCompoundState.size() - 4);
+        SendDirectMessage(&setCompoundState);
     }
 
     SendEnchantmentDurations();                             // must be after add to map
@@ -11791,7 +11679,7 @@ void Player::SendTransferAborted(uint32 mapid, TransferAbortReason reason, uint8
         default:
             break;
     }
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 void Player::SendInstanceResetWarning(uint32 mapid, Difficulty difficulty, uint32 time, bool onEnterMap)
@@ -11826,12 +11714,15 @@ void Player::SendInstanceResetWarning(uint32 mapid, Difficulty difficulty, uint3
         data << uint8(bind && bind->perm);                  // is locked
         data << uint8(bind && bind->extended);              // is extended, ignored if prev field is 0
     }
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 void Player::ApplyEquipCooldown(Item* pItem)
 {
     if (pItem->GetTemplate()->HasFlag(ITEM_FLAG_NO_EQUIP_COOLDOWN))
+        return;
+
+    if (GetCommandStatus(CHEAT_COOLDOWN))
         return;
 
     for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
@@ -11842,11 +11733,15 @@ void Player::ApplyEquipCooldown(Item* pItem)
         if (!spellData.SpellId)
             continue;
 
-        // xinef: apply hidden cooldown for procs
+        // apply proc cooldown to equip auras if we have any
         if (spellData.SpellTrigger == ITEM_SPELLTRIGGER_ON_EQUIP)
         {
-            // xinef: uint32(-1) special marker for proc cooldowns
-            AddSpellCooldown(spellData.SpellId, uint32(-1), 30 * IN_MILLISECONDS);
+            SpellProcEntry const* procEntry = sSpellMgr->GetSpellProcEntry(spellData.SpellId);
+            if (!procEntry)
+                continue;
+
+            if (Aura* itemAura = GetAura(spellData.SpellId, GetGUID(), pItem->GetGUID()))
+                itemAura->AddProcCooldown(std::chrono::steady_clock::now() + procEntry->Cooldown);
             continue;
         }
 
@@ -11873,7 +11768,7 @@ void Player::ApplyEquipCooldown(Item* pItem)
         WorldPacket data(SMSG_ITEM_COOLDOWN, 12);
         data << pItem->GetGUID();
         data << uint32(spellData.SpellId);
-        GetSession()->SendPacket(&data);
+        SendDirectMessage(&data);
     }
 }
 
@@ -12034,6 +11929,9 @@ void Player::learnQuestRewardedSpells(Quest const* quest)
     if (!found)
         return;
 
+    if (!SatisfyQuestSkill(quest, false))
+        return;
+
     CastSpell(this, spellId, true);
 }
 
@@ -12054,7 +11952,17 @@ void Player::learnSkillRewardedSpells(uint32 skill_id, uint32 skill_value)
 {
     uint32 raceMask  = getRaceMask();
     uint32 classMask = getClassMask();
-    for (SkillLineAbilityEntry const* pAbility : GetSkillLineAbilitiesBySkillLine(skill_id))
+
+    // Get all abilities for this skill and sort by MinSkillLineRank (lowest to highest)
+    auto abilities = GetSkillLineAbilitiesBySkillLine(skill_id);
+    std::vector<SkillLineAbilityEntry const*> sortedAbilities(abilities.begin(), abilities.end());
+    std::sort(sortedAbilities.begin(), sortedAbilities.end(),
+        [](SkillLineAbilityEntry const* a, SkillLineAbilityEntry const* b)
+        {
+            return a->MinSkillLineRank < b->MinSkillLineRank;
+        });
+
+    for (SkillLineAbilityEntry const* pAbility : sortedAbilities)
     {
         SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(pAbility->Spell);
         if (!spellInfo)
@@ -12123,18 +12031,6 @@ void Player::GetAurasForTarget(Unit* target, bool force /*= false*/)
     if (!target || (!force && target->GetVisibleAuras()->empty()))    // speedup things
         return;
 
-    /*! Blizz sends certain movement packets sometimes even before CreateObject
-        These movement packets are usually found in SMSG_COMPRESSED_MOVES
-    */
-    if (target->HasFeatherFallAura())
-        target->SendMovementFeatherFall(this);
-
-    if (target->HasWaterWalkAura())
-        target->SendMovementWaterWalking(this);
-
-    if (target->HasHoverAura())
-        target->SendMovementHover(this);
-
     WorldPacket data(SMSG_AURA_UPDATE_ALL);
     data<< target->GetPackGUID();
 
@@ -12145,7 +12041,7 @@ void Player::GetAurasForTarget(Unit* target, bool force /*= false*/)
         auraApp->BuildUpdatePacket(data, false);
     }
 
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 void Player::SetDailyQuestStatus(uint32 quest_id)
@@ -12396,23 +12292,33 @@ bool Player::GetBGAccessByLevel(BattlegroundTypeId bgTypeId) const
 
 float Player::GetReputationPriceDiscount(Creature const* creature) const
 {
-    return GetReputationPriceDiscount(creature->GetFactionTemplateEntry());
+    float discount = GetReputationPriceDiscount(creature->GetFactionTemplateEntry());
+    sScriptMgr->OnPlayerGetReputationPriceDiscount(this, creature, discount);
+    return discount;
 }
 
 float Player::GetReputationPriceDiscount(FactionTemplateEntry const* factionTemplate) const
 {
+    float discount = 1.0f;
+
     if (!factionTemplate || !factionTemplate->faction)
     {
-        return 1.0f;
+        sScriptMgr->OnPlayerGetReputationPriceDiscount(this, factionTemplate, discount);
+        return discount;
     }
 
     ReputationRank rank = GetReputationRank(factionTemplate->faction);
+
     if (rank <= REP_NEUTRAL)
     {
-        return 1.0f;
+        sScriptMgr->OnPlayerGetReputationPriceDiscount(this, factionTemplate, discount);
+        return discount;
     }
 
-    return 1.0f - 0.05f * (rank - REP_NEUTRAL);
+    discount = discount - 0.05f * (rank - REP_NEUTRAL);
+
+    sScriptMgr->OnPlayerGetReputationPriceDiscount(this, factionTemplate, discount);
+    return discount;
 }
 
 bool Player::IsSpellFitByClassAndRace(uint32 spell_id) const
@@ -12432,6 +12338,10 @@ bool Player::IsSpellFitByClassAndRace(uint32 spell_id) const
 
         // skip wrong class skills
         if (_spell_idx->second->ClassMask && (_spell_idx->second->ClassMask & classmask) == 0)
+            continue;
+
+        // skip wrong class and race skill saved in SkillRaceClassInfo.dbc
+        if (!GetSkillRaceClassInfo(_spell_idx->second->SkillLine, getRace(), getClass()))
             continue;
 
         return true;
@@ -12591,20 +12501,51 @@ bool Player::HasItemFitToSpellRequirements(SpellInfo const* spellInfo, Item cons
                     if (Item* item = GetUseableItemByPos(INVENTORY_SLOT_BAG_0, i))
                         if (item != ignoreItem && item->IsFitToSpellRequirements(spellInfo))
                             return true;
+
+                // Keep active non-passive auras (e.g. Bladestorm) when disarmed
+                if (!spellInfo->IsPassive())
+                {
+                    bool hasWeaponInSlot = false;
+                    for (uint8 i = EQUIPMENT_SLOT_MAINHAND; i < EQUIPMENT_SLOT_TABARD; ++i)
+                        if (Item* item = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+                            if (item != ignoreItem && item->IsFitToSpellRequirements(spellInfo))
+                            {
+                                hasWeaponInSlot = true;
+                                break;
+                            }
+
+                    if (!hasWeaponInSlot)
+                        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                            if (spellInfo->Effects[i].IsAura())
+                                return true;
+                }
+
                 break;
             }
         case ITEM_CLASS_ARMOR:
             {
+                // most used check: shield only
+                if (spellInfo->EquippedItemSubClassMask & (1 << ITEM_SUBCLASS_ARMOR_SHIELD))
+                {
+                    if (Item* item = GetUseableItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND))
+                        if (item != ignoreItem && item->IsFitToSpellRequirements(spellInfo))
+                            return true;
+
+                    // Keep active non-passive auras (e.g. Shield Wall) when disarmed
+                    Item* offhand = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
+                    if (!spellInfo->IsPassive() && offhand && offhand != ignoreItem)
+                    {
+                        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+                            if (spellInfo->Effects[i].IsAura())
+                                return true;
+                    }
+                }
+
                 // tabard not have dependent spells
                 for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_MAINHAND; ++i)
                     if (Item* item = GetUseableItemByPos(INVENTORY_SLOT_BAG_0, i))
                         if (item != ignoreItem && item->IsFitToSpellRequirements(spellInfo))
                             return true;
-
-                // shields can be equipped to offhand slot
-                if (Item* item = GetUseableItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND))
-                    if (item != ignoreItem && item->IsFitToSpellRequirements(spellInfo))
-                        return true;
 
                 // ranged slot can have some armor subclasses
                 if (Item* item = GetUseableItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED))
@@ -12644,9 +12585,9 @@ void Player::RemoveItemDependentAurasAndCasts(Item* pItem)
     {
         Aura* aura = itr->second;
 
-        // skip passive (passive item dependent spells work in another way) and not self applied auras
+        // skip not self applied auras
         SpellInfo const* spellInfo = aura->GetSpellInfo();
-        if (aura->IsPassive() ||  aura->GetCasterGUID() != GetGUID())
+        if (aura->GetCasterGUID() != GetGUID())
         {
             ++itr;
             continue;
@@ -12912,10 +12853,22 @@ void Player::ResurectUsingRequestData()
 
 void Player::SetClientControl(Unit* target, bool allowMove, bool packetOnly /*= false*/)
 {
+    ASSERT(target);
+    // refuse to grant control if target has UNIT_STATE_CHARMED
+    if (target->HasUnitState(UNIT_STATE_CHARMED) && (GetGUID() != target->GetCharmerGUID()))
+    {
+        LOG_ERROR("entities.player", "Player '{}' attempt to client control '{}', which is charmed by GUID {}", GetName(), target->GetName(), target->GetCharmerGUID().ToString());
+        return;
+    }
+
+    // still affected by some aura that shouldn't allow control, only allow on last such aura to be removed
+    if (target->HasUnitState(UNIT_STATE_FLEEING | UNIT_STATE_CONFUSED))
+        allowMove = false;
+
     WorldPacket data(SMSG_CLIENT_CONTROL_UPDATE, target->GetPackGUID().size() + 1);
     data << target->GetPackGUID();
-    data << uint8((allowMove && !target->HasUnitState(UNIT_STATE_FLEEING | UNIT_STATE_CONFUSED)) ? 1 : 0);
-    GetSession()->SendPacket(&data);
+    data << uint8(allowMove ? 1 : 0);
+    SendDirectMessage(&data);
 
     // We want to set the packet only
     if (packetOnly)
@@ -13036,7 +12989,7 @@ void Player::SendCorpseReclaimDelay(uint32 delay)
 {
     WorldPacket data(SMSG_CORPSE_RECLAIM_DELAY, 4);
     data << uint32(delay);
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 Player* Player::GetNextRandomRaidMember(float radius)
@@ -13263,7 +13216,7 @@ void Player::SetViewpoint(WorldObject* target, bool apply)
         SetSeer(this);
 
         //WorldPacket data(SMSG_CLEAR_FAR_SIGHT_IMMEDIATE, 0);
-        //GetSession()->SendPacket(&data);
+        //SendDirectMessage(&data);
     }
 }
 
@@ -13272,6 +13225,14 @@ WorldObject* Player::GetViewpoint() const
     if (ObjectGuid guid = GetGuidValue(PLAYER_FARSIGHT))
         return static_cast<WorldObject*>(ObjectAccessor::GetObjectByTypeMask(*this, guid, TYPEMASK_SEER));
     return nullptr;
+}
+
+Position const& Player::GetSightPosition() const
+{
+    if (_cinematicMgr.IsOnCinematic())
+        return _cinematicMgr.GetRemoteSightPosition();
+
+    return *m_seer;
 }
 
 bool Player::CanUseBattlegroundObject(GameObject* gameobject) const
@@ -13419,7 +13380,7 @@ void Player::SetTitle(CharTitlesEntry const* title, bool lost)
     WorldPacket data(SMSG_TITLE_EARNED, 4 + 4);
     data << uint32(title->bit_index);
     data << uint32(lost ? 0 : 1);                           // 1 - earned, 0 - lost
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_OWN_RANK);
 }
@@ -13479,7 +13440,7 @@ void Player::ConvertRune(uint8 index, RuneType newType)
     WorldPacket data(SMSG_CONVERT_RUNE, 2);
     data << uint8(index);
     data << uint8(newType);
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 void Player::ResyncRunes(uint8 count)
@@ -13491,14 +13452,14 @@ void Player::ResyncRunes(uint8 count)
         data << uint8(GetCurrentRune(i));                   // rune type
         data << uint8(255 - (GetRuneCooldown(i) * 51));     // passed cooldown time (0-255)
     }
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 void Player::AddRunePower(uint8 index)
 {
     WorldPacket data(SMSG_ADD_RUNE_POWER, 4);
     data << uint32(1 << index);                             // mask (0x00-0x3F probably)
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 static RuneType runeSlotTypes[MAX_RUNES] =
@@ -13679,7 +13640,7 @@ uint32 Player::CalculateTalentsPoints() const
     uint32 base_talent = GetLevel() < 10 ? 0 : GetLevel() - 9;
 
     uint32 talentPointsForLevel = 0;
-    if (!IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_TALENT_POINT_CALC) || GetMapId() != 609)
+    if (!IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_TALENT_POINT_CALC) || GetMapId() != MAP_EBON_HOLD)
     {
         talentPointsForLevel = base_talent;
     }
@@ -13708,7 +13669,7 @@ bool Player::canFlyInZone(uint32 mapid, uint32 zone, SpellInfo const* bySpell)
 
     // continent checked in SpellInfo::CheckLocation at cast and area update
     uint32 v_map = GetVirtualMapForMapAndZone(mapid, zone);
-    if (v_map == 571 && !bySpell->HasAttribute(SPELL_ATTR7_IGNORES_COLD_WEATHER_FLYING_REQUIREMENT))
+    if (v_map == MAP_NORTHREND && !bySpell->HasAttribute(SPELL_ATTR7_IGNORES_COLD_WEATHER_FLYING_REQUIREMENT))
     {
         if (!HasSpell(54197)) // 54197 = Cold Weather Flying
         {
@@ -13746,7 +13707,11 @@ void Player::_LoadSkills(PreparedQueryResult result)
             SkillRaceClassInfoEntry const* rcEntry = GetSkillRaceClassInfo(skill, getRace(), getClass());
             if (!rcEntry)
             {
-                LOG_ERROR("entities.player", "Character {} has skill {} that does not exist.", GetGUID().ToString(), skill);
+                LOG_ERROR("entities.player", "Player {} (GUID: {}), has skill ({}) that is invalid for the race/class combination (Race: {}, Class: {}). Will be deleted.",
+                    GetName(), GetGUID().GetCounter(), skill, getRace(), getClass());
+
+                // Mark skill for deletion in the database
+                mSkillStatus.insert(SkillStatusMap::value_type(skill, SkillStatusData(0, SKILL_DELETED)));
                 continue;
             }
 
@@ -13767,7 +13732,8 @@ void Player::_LoadSkills(PreparedQueryResult result)
 
             if (value == 0)
             {
-                LOG_ERROR("entities.player", "Character {} has skill {} with value 0. Will be deleted.", GetGUID().ToString(), skill);
+                LOG_ERROR("entities.player", "Player {} (GUID: {}), has skill ({}) with value 0. Will be deleted.",
+                    GetName(), GetGUID().GetCounter(), skill);
 
                 CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHARACTER_SKILL);
 
@@ -14016,6 +13982,9 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank, bool command /*= fa
 
     TalentEntry const* talentInfo = sTalentStore.LookupEntry(talentId);
     if (!talentInfo)
+        return;
+
+    if (!sScriptMgr->OnPlayerCanLearnTalent(this, talentInfo, talentRank))
         return;
 
     TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TalentTab);
@@ -14354,6 +14323,73 @@ bool Player::CanSeeSpellClickOn(Creature const* c) const
     return false;
 }
 
+/**
+ * @brief Checks if any vendor option is available in the gossip menu tree for a given creature.
+ *
+ * @param menuId The starting gossip menu ID to check.
+ * @param creature Pointer to the creature whose gossip menus are being checked.
+ * @return true if a vendor option is available in any accessible menu; false otherwise.
+ */
+bool Player::AnyVendorOptionAvailable(uint32 menuId, Creature const* creature) const
+{
+    {
+        GossipMenuItemsMapBounds menuItemBounds = sObjectMgr->GetGossipMenuItemsMapBounds(menuId);
+        if (menuItemBounds.first == menuItemBounds.second)
+            return true;
+    }
+
+    std::set<uint32> visitedMenus;
+    std::queue<uint32> menusToCheck;
+    menusToCheck.push(menuId);
+
+    while (!menusToCheck.empty())
+    {
+        uint32 const currentMenuId = menusToCheck.front();
+        menusToCheck.pop();
+
+        if (visitedMenus.find(currentMenuId) != visitedMenus.end())
+            continue;
+
+        visitedMenus.insert(currentMenuId);
+
+        GossipMenuItemsMapBounds menuItemBounds = sObjectMgr->GetGossipMenuItemsMapBounds(currentMenuId);
+
+        if (menuItemBounds.first == menuItemBounds.second && currentMenuId != 0)
+            continue;
+
+        for (auto itr = menuItemBounds.first; itr != menuItemBounds.second; ++itr)
+        {
+            if (!sConditionMgr->IsObjectMeetToConditions(const_cast<Player*>(this), const_cast<Creature*>(creature), itr->second.Conditions))
+                continue;
+
+            if (itr->second.OptionType == GOSSIP_OPTION_VENDOR)
+                return true;
+            else if (itr->second.ActionMenuID)
+            {
+                GossipMenusMapBounds menuBounds = sObjectMgr->GetGossipMenusMapBounds(itr->second.ActionMenuID);
+                bool menuAccessible = false;
+
+                if (menuBounds.first == menuBounds.second)
+                    menuAccessible = true;
+                else
+                {
+                    for (auto menuItr = menuBounds.first; menuItr != menuBounds.second; ++menuItr)
+                        if (sConditionMgr->IsObjectMeetToConditions(const_cast<Player*>(this), const_cast<Creature*>(creature), menuItr->second.Conditions))
+                        {
+                            menuAccessible = true;
+                            break;
+                        }
+                }
+
+                if (menuAccessible)
+                    menusToCheck.push(itr->second.ActionMenuID);
+            }
+        }
+    }
+
+    return false;
+}
+
 bool Player::CanSeeVendor(Creature const* creature) const
 {
     if (!creature->HasNpcFlag(UNIT_NPC_FLAG_VENDOR))
@@ -14361,9 +14397,23 @@ bool Player::CanSeeVendor(Creature const* creature) const
 
     ConditionList conditions = sConditionMgr->GetConditionsForNpcVendorEvent(creature->GetEntry(), 0);
     if (!sConditionMgr->IsObjectMeetToConditions(const_cast<Player*>(this), const_cast<Creature*>(creature), conditions))
-    {
         return false;
-    }
+
+    uint32 const menuId = creature->GetGossipMenuId();
+    if (!AnyVendorOptionAvailable(menuId, creature))
+        return false;
+
+    return true;
+}
+
+bool Player::CanSeeTrainer(Creature const* creature) const
+{
+    if (!creature->HasNpcFlag(UNIT_NPC_FLAG_TRAINER))
+        return true;
+
+    if (auto trainer = sObjectMgr->GetTrainer(creature->GetEntry()))
+        if (!trainer || !trainer->IsTrainerValidForPlayer(this))
+            return false;
 
     return true;
 }
@@ -14482,7 +14532,7 @@ void Player::SendTalentsInfoData(bool pet)
         BuildPetTalentsInfoData(&data);
     else
         BuildPlayerTalentsInfoData(&data);
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 void Player::BuildEnchantmentsInfoData(WorldPacket* data)
@@ -14555,7 +14605,7 @@ void Player::SendEquipmentSetList()
         ++count;                                            // client have limit but it checked at loading and set
     }
     data.put<uint32>(count_pos, count);
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 void Player::SetEquipmentSet(uint32 index, EquipmentSet eqset)
@@ -14593,7 +14643,7 @@ void Player::SetEquipmentSet(uint32 index, EquipmentSet eqset)
         WorldPacket data(SMSG_EQUIPMENT_SET_SAVED, 4 + 1);
         data << uint32(index);
         data.appendPackGUID(eqslot.Guid);
-        GetSession()->SendPacket(&data);
+        SendDirectMessage(&data);
     }
 
     eqslot.state = old_state == EQUIPMENT_SET_NEW ? EQUIPMENT_SET_NEW : EQUIPMENT_SET_CHANGED;
@@ -15299,7 +15349,7 @@ void Player::ActivateSpec(uint8 spec)
     if (!HasTalent(46917, GetActiveSpec()) && m_canTitanGrip)
         SetCanTitanGrip(false);
     // xinef: remove dual wield if player does not have dual wield spell (shamans)
-    if (!HasSpell(674) && m_canDualWield)
+    if (!HasSpell(674) && CanDualWield())
         SetCanDualWield(false);
 
     AutoUnequipOffhandIfNeed();
@@ -15404,7 +15454,7 @@ void Player::SendDuelCountdown(uint32 counter)
 {
     WorldPacket data(SMSG_DUEL_COUNTDOWN, 4);
     data << uint32(counter);                                // seconds
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 void Player::SetIsSpectator(bool on)
@@ -15608,7 +15658,7 @@ void Player::SendRefundInfo(Item* item)
     }
     data << uint32(0);
     data << uint32(GetTotalPlayedTime() - item->GetPlayedTime());
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 }
 
 bool Player::AddItem(uint32 itemId, uint32 count)
@@ -15656,7 +15706,7 @@ void Player::RefundItem(Item* item)
         WorldPacket data(SMSG_ITEM_REFUND_RESULT, 8 + 4);
         data << item->GetGUID();                     // Guid
         data << uint32(10);                          // Error!
-        GetSession()->SendPacket(&data);
+        SendDirectMessage(&data);
         return;
     }
 
@@ -15697,7 +15747,7 @@ void Player::RefundItem(Item* item)
         WorldPacket data(SMSG_ITEM_REFUND_RESULT, 8 + 4);
         data << item->GetGUID();                         // Guid
         data << uint32(10);                              // Error!
-        GetSession()->SendPacket(&data);
+        SendDirectMessage(&data);
         return;
     }
 
@@ -15712,7 +15762,7 @@ void Player::RefundItem(Item* item)
         data << uint32(iece->reqitem[i]);
         data << uint32(iece->reqitemcount[i]);
     }
-    GetSession()->SendPacket(&data);
+    SendDirectMessage(&data);
 
     uint32 moneyRefund = item->GetPaidMoney();  // item-> will be invalidated in DestroyItem
 
@@ -15735,7 +15785,7 @@ void Player::RefundItem(Item* item)
             ItemPosCountVec dest;
             InventoryResult msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemid, count);
             ASSERT(msg == EQUIP_ERR_OK); /// Already checked before
-            Item* it = StoreNewItem(dest, itemid, true);
+            Item* it = StoreNewItem(dest, itemid, true, true);
             SendNewItem(it, count, true, false, true);
         }
     }
@@ -15952,108 +16002,6 @@ bool Player::IsInWhisperWhiteList(ObjectGuid guid)
     }
 
     return false;
-}
-
-bool Player::SetDisableGravity(bool disable, bool packetOnly /*= false*/, bool /*updateAnimationTier = true*/)
-{
-    if (!packetOnly && !Unit::SetDisableGravity(disable))
-        return false;
-
-    WorldPacket data(disable ? SMSG_MOVE_GRAVITY_DISABLE : SMSG_MOVE_GRAVITY_ENABLE, 12);
-    data << GetPackGUID();
-    data << uint32(0);          //! movement counter
-    SendDirectMessage(&data);
-
-    data.Initialize(MSG_MOVE_GRAVITY_CHNG, 64);
-    data << GetPackGUID();
-    BuildMovementPacket(&data);
-    SendMessageToSet(&data, false);
-    return true;
-}
-
-bool Player::SetCanFly(bool apply, bool packetOnly /*= false*/)
-{
-    sScriptMgr->AnticheatSetCanFlybyServer(this, apply);
-
-    if (!packetOnly && !Unit::SetCanFly(apply))
-        return false;
-
-    if (!apply)
-        SetFallInformation(GameTime::GetGameTime().count(), GetPositionZ());
-
-    WorldPacket data(apply ? SMSG_MOVE_SET_CAN_FLY : SMSG_MOVE_UNSET_CAN_FLY, 12);
-    data << GetPackGUID();
-    data << uint32(0);          //! movement counter
-    SendDirectMessage(&data);
-
-    data.Initialize(MSG_MOVE_UPDATE_CAN_FLY, 64);
-    data << GetPackGUID();
-    BuildMovementPacket(&data);
-    SendMessageToSet(&data, false);
-    return true;
-}
-
-bool Player::SetHover(bool apply, bool packetOnly /*= false*/, bool /*updateAnimationTier = true*/)
-{
-    // moved inside, flag can be removed on landing and wont send appropriate packet to client when aura is removed
-    if (!packetOnly /* && !Unit::SetHover(apply)*/)
-    {
-        Unit::SetHover(apply);
-        // return false;
-    }
-
-    WorldPacket data(apply ? SMSG_MOVE_SET_HOVER : SMSG_MOVE_UNSET_HOVER, 12);
-    data << GetPackGUID();
-    data << uint32(0);          //! movement counter
-    SendDirectMessage(&data);
-
-    data.Initialize(MSG_MOVE_HOVER, 64);
-    data << GetPackGUID();
-    BuildMovementPacket(&data);
-    SendMessageToSet(&data, false);
-    return true;
-}
-
-bool Player::SetWaterWalking(bool apply, bool packetOnly /*= false*/)
-{
-    // moved inside, flag can be removed on landing and wont send appropriate packet to client when aura is removed
-    if (!packetOnly /* && !Unit::SetWaterWalking(apply)*/)
-    {
-        Unit::SetWaterWalking(apply);
-        // return false;
-    }
-
-    WorldPacket data(apply ? SMSG_MOVE_WATER_WALK : SMSG_MOVE_LAND_WALK, 12);
-    data << GetPackGUID();
-    data << uint32(0);          //! movement counter
-    SendDirectMessage(&data);
-
-    data.Initialize(MSG_MOVE_WATER_WALK, 64);
-    data << GetPackGUID();
-    BuildMovementPacket(&data);
-    SendMessageToSet(&data, false);
-    return true;
-}
-
-bool Player::SetFeatherFall(bool apply, bool packetOnly /*= false*/)
-{
-    // Xinef: moved inside, flag can be removed on landing and wont send appropriate packet to client when aura is removed
-    if (!packetOnly/* && !Unit::SetFeatherFall(apply)*/)
-    {
-        Unit::SetFeatherFall(apply);
-        //return false;
-    }
-
-    WorldPacket data(apply ? SMSG_MOVE_FEATHER_FALL : SMSG_MOVE_NORMAL_FALL, 12);
-    data << GetPackGUID();
-    data << uint32(0);          //! movement counter
-    SendDirectMessage(&data);
-
-    data.Initialize(MSG_MOVE_FEATHER_FALL, 64);
-    data << GetPackGUID();
-    BuildMovementPacket(&data);
-    SendMessageToSet(&data, false);
-    return true;
 }
 
 Guild* Player::GetGuild() const
@@ -16340,11 +16288,26 @@ float Player::GetSightRange(WorldObject const* target) const
 {
     float sightRange = WorldObject::GetSightRange(target);
     if (_farSightDistance)
-    {
         sightRange += *_farSightDistance;
-    }
 
     return sightRange;
+}
+
+bool Player::IsWorldObjectOutOfSightRange(WorldObject const* target) const
+{
+    // Special handling for Infinite visibility override objects -> they are zone wide visible
+    if (target->GetVisibilityOverrideType() == VisibilityDistanceType::Infinite)
+    {
+        // Same zone, always visible
+        if (target->GetZoneId() == GetZoneId())
+            return false;
+    }
+
+    // Check if out of range
+    if (!target->IsWithinSightRange(GetSightPosition(), GetSightRange(target)))
+        return true;
+
+    return false;
 }
 
 std::string Player::GetPlayerName()

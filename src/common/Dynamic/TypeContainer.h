@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -26,6 +26,7 @@
 #include "Dynamic/TypeList.h"
 #include "GridRefMgr.h"
 #include <unordered_map>
+#include <vector>
 
 /*
  * @class ContainerMapList is a mulit-type container for map elements
@@ -35,7 +36,6 @@
 template<class OBJECT>
 struct ContainerMapList
 {
-    //std::map<OBJECT_HANDLE, OBJECT *> _element;
     GridRefMgr<OBJECT> _element;
 };
 
@@ -49,6 +49,24 @@ struct ContainerMapList<TypeList<H, T>>
 {
     ContainerMapList<H> _elements;
     ContainerMapList<T> _TailElements;
+};
+
+template<class OBJECT>
+struct ContainerVector
+{
+    std::vector<OBJECT*> _element;
+};
+
+template<>
+struct ContainerVector<TypeNull>
+{
+};
+
+template<class H, class T>
+struct ContainerVector<TypeList<H, T>>
+{
+    ContainerVector<H> _elements;
+    ContainerVector<T> _TailElements;
 };
 
 template<class OBJECT, class KEY_TYPE>
@@ -122,6 +140,33 @@ public:
 
 private:
     ContainerMapList<OBJECT_TYPES> i_elements;
+};
+
+template<class OBJECT_TYPES>
+class TypeVectorContainer
+{
+public:
+    template<class SPECIFIC_TYPE> [[nodiscard]] std::size_t Count() const { return Acore::Count(i_elements, (SPECIFIC_TYPE*)nullptr); }
+
+    template<class SPECIFIC_TYPE>
+    bool Insert(SPECIFIC_TYPE* obj)
+    {
+        SPECIFIC_TYPE* t = Acore::Insert(i_elements, obj);
+        return (t != nullptr);
+    }
+
+    template<class SPECIFIC_TYPE>
+    bool Remove(SPECIFIC_TYPE* obj)
+    {
+        SPECIFIC_TYPE* t = Acore::Remove(i_elements, obj);
+        return (t != nullptr);
+    }
+
+    ContainerVector<OBJECT_TYPES>& GetElements() { return i_elements; }
+    [[nodiscard]] const ContainerVector<OBJECT_TYPES>& GetElements() const { return i_elements; }
+
+private:
+    ContainerVector<OBJECT_TYPES> i_elements;
 };
 
 template<class OBJECT_TYPES, class KEY_TYPE>

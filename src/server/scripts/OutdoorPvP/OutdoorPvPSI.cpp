@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -16,7 +16,6 @@
  */
 
 #include "OutdoorPvPSI.h"
-#include "CreatureScript.h"
 #include "GameObject.h"
 #include "Language.h"
 #include "MapMgr.h"
@@ -29,6 +28,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSessionMgr.h"
+#include "WorldStateDefines.h"
 #include "WorldStatePackets.h"
 
 OutdoorPvPSI::OutdoorPvPSI()
@@ -42,23 +42,23 @@ OutdoorPvPSI::OutdoorPvPSI()
 void OutdoorPvPSI::FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet)
 {
     packet.Worldstates.reserve(3);
-    packet.Worldstates.emplace_back(SI_GATHERED_A, m_Gathered_A);
-    packet.Worldstates.emplace_back(SI_GATHERED_H, m_Gathered_H);
-    packet.Worldstates.emplace_back(SI_SILITHYST_MAX, SI_MAX_RESOURCES);
+    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_SI_GATHERED_A, m_Gathered_A);
+    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_SI_GATHERED_H, m_Gathered_H);
+    packet.Worldstates.emplace_back(WORLD_STATE_OPVP_SI_SILITHYST_MAX, SI_MAX_RESOURCES);
 }
 
 void OutdoorPvPSI::SendRemoveWorldStates(Player* player)
 {
-    player->SendUpdateWorldState(SI_GATHERED_A, 0);
-    player->SendUpdateWorldState(SI_GATHERED_H, 0);
-    player->SendUpdateWorldState(SI_SILITHYST_MAX, 0);
+    player->SendUpdateWorldState(WORLD_STATE_OPVP_SI_GATHERED_A, 0);
+    player->SendUpdateWorldState(WORLD_STATE_OPVP_SI_GATHERED_H, 0);
+    player->SendUpdateWorldState(WORLD_STATE_OPVP_SI_SILITHYST_MAX, 0);
 }
 
 void OutdoorPvPSI::UpdateWorldState()
 {
-    SendUpdateWorldState(SI_GATHERED_A, m_Gathered_A);
-    SendUpdateWorldState(SI_GATHERED_H, m_Gathered_H);
-    SendUpdateWorldState(SI_SILITHYST_MAX, SI_MAX_RESOURCES);
+    SendUpdateWorldState(WORLD_STATE_OPVP_SI_GATHERED_A, m_Gathered_A);
+    SendUpdateWorldState(WORLD_STATE_OPVP_SI_GATHERED_H, m_Gathered_H);
+    SendUpdateWorldState(WORLD_STATE_OPVP_SI_SILITHYST_MAX, SI_MAX_RESOURCES);
 }
 
 bool OutdoorPvPSI::SetupOutdoorPvP()
@@ -105,7 +105,7 @@ bool OutdoorPvPSI::HandleAreaTrigger(Player* player, uint32 trigger)
                 if (m_Gathered_A >= SI_MAX_RESOURCES)
                 {
                     TeamApplyBuff(TEAM_ALLIANCE, SI_CENARION_FAVOR, 0, player);
-                    sWorldSessionMgr->SendZoneText(OutdoorPvPSIBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_SI_CAPTURE_A));
+                    GetMap()->SendZoneText(OutdoorPvPSIBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_SI_CAPTURE_A).c_str());
                     m_LastController = TEAM_ALLIANCE;
                     m_Gathered_A = 0;
                     m_Gathered_H = 0;
@@ -131,7 +131,7 @@ bool OutdoorPvPSI::HandleAreaTrigger(Player* player, uint32 trigger)
                 if (m_Gathered_H >= SI_MAX_RESOURCES)
                 {
                     TeamApplyBuff(TEAM_HORDE, SI_CENARION_FAVOR, 0, player);
-                    sWorldSessionMgr->SendZoneText(OutdoorPvPSIBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_SI_CAPTURE_H));
+                    GetMap()->SendZoneText(OutdoorPvPSIBuffZones[0], sObjectMgr->GetAcoreStringForDBCLocale(LANG_OPVP_SI_CAPTURE_H).c_str());
                     m_LastController = TEAM_HORDE;
                     m_Gathered_A = 0;
                     m_Gathered_H = 0;
@@ -176,7 +176,8 @@ bool OutdoorPvPSI::HandleDropFlag(Player* player, uint32 spellId)
                                 return true;
                             }
 
-                            if (!go->Create(map->GenerateLowGuid<HighGuid::GameObject>(), SI_SILITHYST_MOUND, map, player->GetPhaseMask(), player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetOrientation(), G3D::Quat(), 100, GO_STATE_READY))
+                            G3D::Quat rotation = G3D::Quat::fromAxisAngleRotation(G3D::Vector3::unitZ(), player->GetOrientation());
+                            if (!go->Create(map->GenerateLowGuid<HighGuid::GameObject>(), SI_SILITHYST_MOUND, map, player->GetPhaseMask(), player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetOrientation(), rotation, 100, GO_STATE_READY))
                             {
                                 delete go;
                                 return true;
@@ -210,7 +211,8 @@ bool OutdoorPvPSI::HandleDropFlag(Player* player, uint32 spellId)
                                 return true;
                             }
 
-                            if (!go->Create(map->GenerateLowGuid<HighGuid::GameObject>(), SI_SILITHYST_MOUND, map, player->GetPhaseMask(), player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetOrientation(), G3D::Quat(), 100, GO_STATE_READY))
+                            G3D::Quat rotation = G3D::Quat::fromAxisAngleRotation(G3D::Vector3::unitZ(), player->GetOrientation());
+                            if (!go->Create(map->GenerateLowGuid<HighGuid::GameObject>(), SI_SILITHYST_MOUND, map, player->GetPhaseMask(), player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), player->GetOrientation(), rotation, 100, GO_STATE_READY))
                             {
                                 delete go;
                                 return true;

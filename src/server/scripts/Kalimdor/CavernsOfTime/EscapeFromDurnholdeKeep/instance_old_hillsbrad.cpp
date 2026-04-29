@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -19,6 +19,7 @@
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Player.h"
+#include "WorldStateDefines.h"
 #include "old_hillsbrad.h"
 
 static Position const instancePositions[INSTANCE_POSITIONS_COUNT] =
@@ -40,7 +41,7 @@ const Position thrallPositions[THRALL_POSITIONS_COUNT] =
 class instance_old_hillsbrad : public InstanceMapScript
 {
 public:
-    instance_old_hillsbrad() : InstanceMapScript("instance_old_hillsbrad", 560) { }
+    instance_old_hillsbrad() : InstanceMapScript("instance_old_hillsbrad", MAP_THE_ESCAPE_FROM_DURNHOLDE) { }
 
     InstanceScript* GetInstanceScript(InstanceMap* map) const override
     {
@@ -70,7 +71,7 @@ public:
                 CleanupInstance();
 
             if (_encounterProgress < ENCOUNTER_PROGRESS_BARRELS)
-                player->SendUpdateWorldState(WORLD_STATE_BARRELS_PLANTED, _barrelCount);
+                player->SendUpdateWorldState(WORLD_STATE_OLD_HILLSBRAD_BARRELS_PLANTED, _barrelCount);
         }
 
         void CleanupInstance()
@@ -78,11 +79,11 @@ public:
             if (_encounterProgress == ENCOUNTER_PROGRESS_NONE)
                 return;
 
-            _events.ScheduleEvent(EVENT_INITIAL_BARRELS_FLAME, 0);
-            _events.ScheduleEvent(EVENT_FINAL_BARRELS_FLAME, 0);
+            _events.ScheduleEvent(EVENT_INITIAL_BARRELS_FLAME, 0ms);
+            _events.ScheduleEvent(EVENT_FINAL_BARRELS_FLAME, 0ms);
 
             if (_encounterProgress == ENCOUNTER_PROGRESS_BARRELS)
-                _events.ScheduleEvent(EVENT_SUMMON_LIEUTENANT, 0);
+                _events.ScheduleEvent(EVENT_SUMMON_LIEUTENANT, 0ms);
             else
                 SetData(DATA_THRALL_REPOSITION, 2);
         }
@@ -137,7 +138,7 @@ public:
             {
                 case DATA_THRALL_REPOSITION:
                     if (data > 1)
-                        _events.ScheduleEvent(EVENT_THRALL_REPOSITION, data == 2 ? 0 : 10000);
+                        _events.ScheduleEvent(EVENT_THRALL_REPOSITION, data == 2 ? 0ms : 10s);
                     else if (Creature* thrall = instance->GetCreature(_thrallGUID))
                         Reposition(thrall);
                     return;
@@ -153,12 +154,12 @@ public:
                         if (_barrelCount >= 5 || _encounterProgress > ENCOUNTER_PROGRESS_NONE)
                             return;
 
-                        DoUpdateWorldState(WORLD_STATE_BARRELS_PLANTED, ++_barrelCount);
+                        DoUpdateWorldState(WORLD_STATE_OLD_HILLSBRAD_BARRELS_PLANTED, ++_barrelCount);
                         if (_barrelCount == 5)
                         {
-                            _events.ScheduleEvent(EVENT_INITIAL_BARRELS_FLAME, 4000);
-                            _events.ScheduleEvent(EVENT_FINAL_BARRELS_FLAME, 12000);
-                            _events.ScheduleEvent(EVENT_SUMMON_LIEUTENANT, 18000);
+                            _events.ScheduleEvent(EVENT_INITIAL_BARRELS_FLAME, 4s);
+                            _events.ScheduleEvent(EVENT_FINAL_BARRELS_FLAME, 12s);
+                            _events.ScheduleEvent(EVENT_SUMMON_LIEUTENANT, 18s);
                         }
                         break;
                     }
@@ -237,7 +238,7 @@ public:
                                     orc->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
 
                         SetData(DATA_ESCORT_PROGRESS, ENCOUNTER_PROGRESS_BARRELS);
-                        DoUpdateWorldState(WORLD_STATE_BARRELS_PLANTED, 0);
+                        DoUpdateWorldState(WORLD_STATE_OLD_HILLSBRAD_BARRELS_PLANTED, 0);
                         break;
                     }
                 case EVENT_SUMMON_LIEUTENANT:

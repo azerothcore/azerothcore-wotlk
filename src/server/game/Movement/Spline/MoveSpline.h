@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -64,6 +64,7 @@ namespace Movement
         //float           duration_mod_next;
         float           vertical_acceleration;
         float           initialOrientation;
+        float           velocity;
         int32           effect_start_time;
         int32           point_Idx;
         int32           point_Idx_offset;
@@ -85,6 +86,7 @@ namespace Movement
         [[nodiscard]] int32 Duration() const { return spline.length(); }
         [[nodiscard]] MySpline const& _Spline() const { return spline; }
         [[nodiscard]] int32 _currentSplineIdx() const { return point_Idx; }
+        [[nodiscard]] float Velocity() const { return velocity; }
         void _Finalize();
         void _Interrupt() { splineflags.done = true; }
 
@@ -116,10 +118,11 @@ namespace Movement
         [[nodiscard]] bool Finalized() const { return splineflags.done; }
         [[nodiscard]] bool isCyclic() const { return splineflags.cyclic; }
         [[nodiscard]] bool isFalling() const { return splineflags.falling; }
-        [[nodiscard]] bool isWalking() const { return splineflags.walkmode; }
+        [[nodiscard]] bool isBoarding() const { return splineflags.transportEnter || splineflags.transportExit; }
         [[nodiscard]] Vector3 FinalDestination() const { return Initialized() ? spline.getPoint(spline.last()) : Vector3(); }
         [[nodiscard]] Vector3 CurrentDestination() const { return Initialized() ? spline.getPoint(point_Idx + 1) : Vector3(); }
         [[nodiscard]] int32 currentPathIdx() const;
+        [[nodiscard]] int32 MaxPathIdx() const { return spline.last() - 1; }
 
         [[nodiscard]] bool HasAnimation() const { return splineflags.animation; }
         [[nodiscard]] uint8 GetAnimationType() const { return splineflags.animId; }

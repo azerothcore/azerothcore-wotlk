@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -76,10 +76,6 @@ enum BattlegroundRVData
     BG_RV_STATE_OPEN_FENCES,
     BG_RV_STATE_SWITCH_PILLARS,
     BG_RV_STATE_CLOSE_FIRE,
-
-    BG_RV_WORLD_STATE_A                          = 0xe11,
-    BG_RV_WORLD_STATE_H                          = 0xe10,
-    BG_RV_WORLD_STATE                            = 0xe1a,
 };
 
 class AC_GAME_API BattlegroundRV : public Arena

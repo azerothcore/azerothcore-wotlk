@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -116,8 +116,8 @@ void EncryptableAndCompressiblePacket::CompressIfNeeded()
     SetOpcode(SMSG_COMPRESSED_UPDATE_OBJECT);
 }
 
-WorldSocket::WorldSocket(tcp::socket&& socket)
-    : Socket(std::move(socket)), _OverSpeedPings(0), _worldSession(nullptr), _authed(false), _sendBufferSize(4096)
+WorldSocket::WorldSocket(IoContextTcpSocket&& socket)
+    : Socket(std::move(socket)), _OverSpeedPings(0), _worldSession(nullptr), _authed(false), _sendBufferSize(4096), _loggingPackets(false)
 {
     Acore::Crypto::GetRandomBytes(_authSeed);
     _headerBuffer.Resize(sizeof(ClientPktHeader));
@@ -238,10 +238,10 @@ void WorldSocket::OnClose()
     }
 }
 
-void WorldSocket::ReadHandler()
+SocketReadCallbackResult WorldSocket::ReadHandler()
 {
     if (!IsOpen())
-        return;
+        return SocketReadCallbackResult::Stop;
 
     MessageBuffer& packet = GetReadBuffer();
     while (packet.GetActiveSize() > 0)
@@ -264,7 +264,7 @@ void WorldSocket::ReadHandler()
             if (!ReadHeaderHandler())
             {
                 CloseSocket();
-                return;
+                return SocketReadCallbackResult::Stop;
             }
         }
 
@@ -295,11 +295,11 @@ void WorldSocket::ReadHandler()
                 CloseSocket();
             }
 
-            return;
+            return SocketReadCallbackResult::Stop;
         }
     }
 
-    AsyncRead();
+    return SocketReadCallbackResult::KeepReading;
 }
 
 bool WorldSocket::ReadHeaderHandler()
@@ -329,7 +329,7 @@ bool WorldSocket::ReadHeaderHandler()
     return true;
 }
 
-struct AuthSession
+struct ClientAuthSession
 {
     uint32 BattlegroupID = 0;
     uint32 LoginServerType = 0;
@@ -352,6 +352,7 @@ struct AccountInfo
     bool IsLockedToIP;
     std::string LockCountry;
     uint8 Expansion;
+    uint32 Flags;
     int64 MuteTime;
     LocaleConstant Locale;
     uint32 Recruiter;
@@ -363,9 +364,9 @@ struct AccountInfo
 
     explicit AccountInfo(Field* fields)
     {
-        //           0             1          2         3               4            5           6         7            8     9           10          11
-        // SELECT a.id, a.sessionkey, a.last_ip, a.locked, a.lock_country, a.expansion, a.mutetime, a.locale, a.recruiter, a.os, a.totaltime, aa.gmLevel,
-        //                                                           12    13
+        //           0             1          2         3               4            5        6          7         8            9    10           11          12
+        // SELECT a.id, a.sessionkey, a.last_ip, a.locked, a.lock_country, a.expansion, a.Flags a.mutetime, a.locale, a.recruiter, a.os, a.totaltime, aa.gmLevel,
+        //                                                           13    14
         // ab.unbandate > UNIX_TIMESTAMP() OR ab.unbandate = ab.bandate, r.id
         // FROM account a
         // LEFT JOIN account_access aa ON a.id = aa.AccountID AND aa.RealmID IN (-1, ?)
@@ -378,14 +379,15 @@ struct AccountInfo
         IsLockedToIP = fields[3].Get<bool>();
         LockCountry = fields[4].Get<std::string>();
         Expansion = fields[5].Get<uint8>();
-        MuteTime = fields[6].Get<int64>();
-        Locale = LocaleConstant(fields[7].Get<uint8>());
-        Recruiter = fields[8].Get<uint32>();
-        OS = fields[9].Get<std::string>();
-        TotalTime = fields[10].Get<uint32>();
-        Security = AccountTypes(fields[11].Get<uint8>());
-        IsBanned = fields[12].Get<uint64>() != 0;
-        IsRectuiter = fields[13].Get<uint32>() != 0;
+        Flags = fields[6].Get<uint32>();
+        MuteTime = fields[7].Get<int64>();
+        Locale = LocaleConstant(fields[8].Get<uint8>());
+        Recruiter = fields[9].Get<uint32>();
+        OS = fields[10].Get<std::string>();
+        TotalTime = fields[11].Get<uint32>();
+        Security = AccountTypes(fields[12].Get<uint8>());
+        IsBanned = fields[13].Get<uint64>() != 0;
+        IsRectuiter = fields[14].Get<uint32>() != 0;
 
         uint32 world_expansion = sWorld->getIntConfig(CONFIG_EXPANSION);
         if (Expansion > world_expansion)
@@ -404,7 +406,7 @@ WorldSocket::ReadDataHandlerResult WorldSocket::ReadDataHandler()
     WorldPacket packet(opcode, std::move(_packetBuffer));
     WorldPacket* packetToQueue;
 
-    if (sPacketLog->CanLogPacket())
+    if (sPacketLog->CanLogPacket() && IsLoggingPackets())
         sPacketLog->LogPacket(packet, CLIENT_TO_SERVER, GetRemoteIpAddress(), GetRemotePort());
 
     std::unique_lock<std::mutex> sessionGuard(_worldSessionLock, std::defer_lock);
@@ -518,7 +520,7 @@ void WorldSocket::SendPacket(WorldPacket const& packet)
     if (!IsOpen())
         return;
 
-    if (sPacketLog->CanLogPacket())
+    if (sPacketLog->CanLogPacket() && IsLoggingPackets())
         sPacketLog->LogPacket(packet, SERVER_TO_CLIENT, GetRemoteIpAddress(), GetRemotePort());
 
     _bufferQueue.Enqueue(new EncryptableAndCompressiblePacket(packet, _authCrypt.IsInitialized()));
@@ -526,7 +528,7 @@ void WorldSocket::SendPacket(WorldPacket const& packet)
 
 void WorldSocket::HandleAuthSession(WorldPacket & recvPacket)
 {
-    std::shared_ptr<AuthSession> authSession = std::make_shared<AuthSession>();
+    std::shared_ptr<ClientAuthSession> authSession = std::make_shared<ClientAuthSession>();
 
     // Read the content of the packet
     recvPacket >> authSession->Build;
@@ -550,7 +552,7 @@ void WorldSocket::HandleAuthSession(WorldPacket & recvPacket)
     _queryProcessor.AddCallback(LoginDatabase.AsyncQuery(stmt).WithPreparedCallback(std::bind(&WorldSocket::HandleAuthSessionCallback, this, authSession, std::placeholders::_1)));
 }
 
-void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSession, PreparedQueryResult result)
+void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<ClientAuthSession> authSession, PreparedQueryResult result)
 {
     // Stop if the account is not found
     if (!result)
@@ -706,7 +708,7 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
 
     sScriptMgr->OnLastIpUpdate(account.Id, address);
 
-    _worldSession = new WorldSession(account.Id, std::move(authSession->Account), shared_from_this(), account.Security,
+    _worldSession = new WorldSession(account.Id, std::move(authSession->Account), account.Flags, shared_from_this(), account.Security,
         account.Expansion, account.MuteTime, account.Locale, account.Recruiter, account.IsRectuiter, account.Security ? true : false, account.TotalTime);
 
     _worldSession->ReadAddonsInfo(authSession->AddonInfo);
@@ -717,6 +719,8 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<AuthSession> authSes
         // TODO: move warden outside of a node?
         _worldSession->InitWarden(account.SessionKey, account.OS);
     }
+
+    _worldSession->ValidateAccountFlags();
 
     sWorldSessionMgr->AddSession(_worldSession);
 

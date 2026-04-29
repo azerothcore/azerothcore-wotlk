@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -80,7 +80,7 @@ void CombatAI::JustEngagedWith(Unit* who)
         if (AISpellInfo[*i].condition == AICOND_AGGRO)
             me->CastSpell(who, *i, false);
         else if (AISpellInfo[*i].condition == AICOND_COMBAT)
-            events.ScheduleEvent(*i, AISpellInfo[*i].cooldown + rand() % AISpellInfo[*i].cooldown);
+            events.ScheduleEvent(*i, Milliseconds(AISpellInfo[*i].cooldown + rand() % AISpellInfo[*i].cooldown));
     }
 }
 
@@ -97,7 +97,7 @@ void CombatAI::UpdateAI(uint32 diff)
     if (uint32 spellId = events.ExecuteEvent())
     {
         DoCast(spellId);
-        events.ScheduleEvent(spellId, AISpellInfo[spellId].cooldown + rand() % AISpellInfo[spellId].cooldown);
+        events.ScheduleEvent(spellId, Milliseconds(AISpellInfo[spellId].cooldown + rand() % AISpellInfo[spellId].cooldown));
     }
     else
         DoMeleeAttackIfReady();
@@ -143,7 +143,7 @@ void CasterAI::JustEngagedWith(Unit* who)
                 DoCast(spells[spell]);
                 cooldown += me->GetCurrentSpellCastTime(*itr);
             }
-            events.ScheduleEvent(*itr, cooldown);
+            events.ScheduleEvent(*itr, Milliseconds(cooldown));
         }
     }
 }
@@ -168,7 +168,7 @@ void CasterAI::UpdateAI(uint32 diff)
     {
         DoCast(spellId);
         uint32 casttime = me->GetCurrentSpellCastTime(spellId);
-        events.ScheduleEvent(spellId, (casttime ? casttime : 500) + GetAISpellInfo(spellId)->realCooldown);
+        events.ScheduleEvent(spellId, Milliseconds((casttime ? casttime : 500) + GetAISpellInfo(spellId)->realCooldown));
     }
 }
 

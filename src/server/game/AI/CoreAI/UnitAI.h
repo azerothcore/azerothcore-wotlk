@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -63,7 +63,7 @@ struct DefaultTargetSelector : public Acore::unary_function<Unit*, bool>
     // playerOnly: self explaining
     // withMainTank: allow current tank to be selected
     // aura: if 0: ignored, if > 0: the target shall have the aura, if < 0, the target shall NOT have the aura
-    DefaultTargetSelector(Unit const* unit, float dist, bool playerOnly, bool withMainTank, int32 aura) : me(unit), m_dist(dist), except(!withMainTank ? me->GetThreatMgr().GetCurrentVictim() : nullptr), m_playerOnly(playerOnly), m_aura(aura) {}
+    DefaultTargetSelector(Unit const* unit, float dist, bool playerOnly, bool withMainTank, int32 aura) : me(unit), m_dist(dist), except(!withMainTank ? me->GetThreatMgr().GetLastVictim() : nullptr), m_playerOnly(playerOnly), m_aura(aura) {}
 
     bool operator()(Unit const* target) const
     {
@@ -126,7 +126,7 @@ public:
     bool operator()(Unit const* target) const;
 
 private:
-    Creature const* _source;
+    Creature* _source;
     bool _playerOnly;
 };
 
@@ -137,12 +137,16 @@ struct PowerUsersSelector : public Acore::unary_function<Unit*, bool>
     Powers const _power;
     float const _dist;
     bool const _playerOnly;
+    bool const _withTank;
 
-    PowerUsersSelector(Unit const* unit, Powers power, float dist, bool playerOnly) : _me(unit), _power(power), _dist(dist), _playerOnly(playerOnly) { }
+    PowerUsersSelector(Unit const* unit, Powers power, float dist, bool playerOnly, bool withTank = true) : _me(unit), _power(power), _dist(dist), _playerOnly(playerOnly), _withTank(withTank) { }
 
     bool operator()(Unit const* target) const
     {
         if (!_me || !target)
+            return false;
+
+        if (!_withTank && target == _me->GetThreatMgr().GetLastVictim())
             return false;
 
         if (target->getPowerType() != _power)
@@ -161,9 +165,10 @@ struct PowerUsersSelector : public Acore::unary_function<Unit*, bool>
     }
 };
 
-struct FarthestTargetSelector : public Acore::unary_function<Unit*, bool>
+// Simple selector based on range and Los
+struct RangeSelector : public Acore::unary_function<Unit*, bool>
 {
-    FarthestTargetSelector(Unit const* unit, float maxDist, bool playerOnly, bool inLos, float minDist = 0.f) : _me(unit), _minDist(minDist), _maxDist(maxDist), _playerOnly(playerOnly), _inLos(inLos) {}
+    RangeSelector(Unit const* unit, float maxDist, bool playerOnly, bool inLos, float minDist = 0.f) : _me(unit), _minDist(minDist), _maxDist(maxDist), _playerOnly(playerOnly), _inLos(inLos) {}
 
     bool operator()(Unit const* target) const
     {
@@ -212,7 +217,7 @@ public:
     virtual void DoAction(int32 /*param*/) {}
     virtual uint32 GetData(uint32 /*id = 0*/) const { return 0; }
     virtual void SetData(uint32 /*id*/, uint32 /*value*/) {}
-    virtual void SetGUID(ObjectGuid /*guid*/, int32 /*id*/ = 0) {}
+    virtual void SetGUID(ObjectGuid const& /*guid*/, int32 /*id*/ = 0) {}
     virtual ObjectGuid GetGUID(int32 /*id*/ = 0) const { return ObjectGuid::Empty; }
 
     // Select the best target (in <targetType> order) from the threat list that fulfill the following:
@@ -232,7 +237,7 @@ public:
     template <class PREDICATE>
     Unit* SelectTarget(SelectTargetMethod targetType, uint32 position, PREDICATE const& predicate)
     {
-        ThreatMgr& mgr = GetThreatMgr();
+        ThreatManager& mgr = GetThreatMgr();
         // shortcut: if we ignore the first <offset> elements, and there are at most <offset> elements, then we ignore ALL elements
         if (mgr.GetThreatListSize() <= position)
             return nullptr;
@@ -277,7 +282,7 @@ public:
     void SelectTargetList(std::list<Unit*>& targetList, uint32 num, SelectTargetMethod targetType, uint32 position, PREDICATE const& predicate)
     {
         targetList.clear();
-        ThreatMgr& mgr = GetThreatMgr();
+        ThreatManager& mgr = GetThreatMgr();
         // shortcut: we're gonna ignore the first <offset> elements, and there's at most <offset> elements, so we ignore them all - nothing to do here
         if (mgr.GetThreatListSize() <= position)
             return;
@@ -294,18 +299,12 @@ public:
         }
         else
         {
-            Unit* currentVictim = mgr.GetCurrentVictim();
-            if (currentVictim)
-                targetList.push_back(currentVictim);
-
             for (ThreatReference const* ref : mgr.GetSortedThreatList())
             {
                 if (ref->IsOffline())
                     continue;
 
-                Unit* thisTarget = ref->GetVictim();
-                if (thisTarget != currentVictim)
-                    targetList.push_back(thisTarget);
+                targetList.push_back(ref->GetVictim());
             }
         }
 
@@ -353,10 +352,13 @@ public:
 
     /**
      * @brief Called when the unit leaves combat
-     *
-     * @todo Never invoked right now. Preparation for Combat Threat refactor
      */
     virtual void JustExitedCombat() { }
+
+    /**
+     * @brief Called when evade timer expires (target unreachable for too long)
+     */
+    virtual void EvadeTimerExpired();
 
     /// @brief Called at any Damage to any victim (before damage apply)
     virtual void DamageDealt(Unit* /*victim*/, uint32& /*damage*/, DamageEffectType /*damageType*/, SpellSchoolMask /*damageSchoolMask*/) {}
@@ -422,7 +424,7 @@ public:
     virtual std::string GetDebugInfo() const;
 
 private:
-    ThreatMgr& GetThreatMgr();
+    ThreatManager& GetThreatMgr();
     void SortByDistance(std::list<Unit*>& list, bool ascending = true);
 };
 

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -557,27 +557,12 @@ enum QuestsICC
     QUEST_A_FEAST_OF_SOULS                  = 24547
 };
 
-enum WorldStatesICC
-{
-    WORLDSTATE_SHOW_TIMER           = 4903,
-    WORLDSTATE_EXECUTION_TIME       = 4904,
-    WORLDSTATE_SHOW_ATTEMPTS        = 4940,
-    WORLDSTATE_ATTEMPTS_REMAINING   = 4941,
-    WORLDSTATE_ATTEMPTS_MAX         = 4942,
-};
-
 enum PutricideEventFlags
 {
     PUTRICIDE_EVENT_FLAG_FESTERGUT_VALVE    = 1,
     PUTRICIDE_EVENT_FLAG_ROTFACE_VALVE      = 2,
     PUTRICIDE_EVENT_FLAG_TRAP_INPROGRESS    = 4,
     PUTRICIDE_EVENT_FLAG_TRAP_FINISHED      = 8,
-};
-
-enum AreaIds
-{
-    AREA_ICECROWN_CITADEL   = 4812,
-    AREA_THE_FROZEN_THRONE  = 4859,
 };
 
 enum ItemIds

@@ -1,20 +1,21 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "CreatureScript.h"
 #include "PassiveAI.h"
 #include "Pet.h"
@@ -23,19 +24,6 @@
 #include "SpellInfo.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
-/* ScriptData
-SDName: Isle_of_Queldanas
-SD%Complete: 100
-SDComment: Quest support: 11524, 11525, 11532, 11533, 11542, 11543, 11541
-SDCategory: Isle Of Quel'Danas
-EndScriptData */
-
-/* ContentData
-npc_converted_sentry
-npc_greengill_slave
-EndContentData */
-
-/*###### OUR: ######*/
 
 enum ThalorienNpcs
 {
@@ -148,25 +136,25 @@ public:
             if (Creature* c = me->FindNearestCreature(NPC_THALORIEN_REMAINS, 100.0f, true))
                 c->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
             events.Reset();
-            events.ScheduleEvent(EVENT_CHECK_PLAYER, 5000);
-            events.ScheduleEvent(EVENT_SUMMON_SOLDIERS, 0);
-            events.ScheduleEvent(EVENT_TALK_INTRO_0, 3000);
-            events.ScheduleEvent(EVENT_TALK_INTRO_1, 8000);
-            events.ScheduleEvent(EVENT_TALK_INTRO_2, 15000);
-            events.ScheduleEvent(EVENT_TALK_INTRO_3, 22000);
-            events.ScheduleEvent(EVENT_SALUTE, 24000);
-            events.ScheduleEvent(EVENT_SOLDIERS_RUN_AWAY, 30000);
-            events.ScheduleEvent(EVENT_GO_FIGHTPOINT, 31000);
-            events.ScheduleEvent(EVENT_TALK_SPAWN_0, 38000);
-            events.ScheduleEvent(EVENT_SUMMON_MORLEN, 44000);
-            events.ScheduleEvent(EVENT_TALK_SPAWN_1, 47000);
-            events.ScheduleEvent(EVENT_TALK_MORLEN_0, 52000);
-            events.ScheduleEvent(EVENT_TALK_MORLEN_1, 58000);
-            events.ScheduleEvent(EVENT_SPAWN_WAVE_1, 61000);
+            events.ScheduleEvent(EVENT_CHECK_PLAYER, 5s);
+            events.ScheduleEvent(EVENT_SUMMON_SOLDIERS, 0ms);
+            events.ScheduleEvent(EVENT_TALK_INTRO_0, 3s);
+            events.ScheduleEvent(EVENT_TALK_INTRO_1, 8s);
+            events.ScheduleEvent(EVENT_TALK_INTRO_2, 15s);
+            events.ScheduleEvent(EVENT_TALK_INTRO_3, 22s);
+            events.ScheduleEvent(EVENT_SALUTE, 24s);
+            events.ScheduleEvent(EVENT_SOLDIERS_RUN_AWAY, 30s);
+            events.ScheduleEvent(EVENT_GO_FIGHTPOINT, 31s);
+            events.ScheduleEvent(EVENT_TALK_SPAWN_0, 38s);
+            events.ScheduleEvent(EVENT_SUMMON_MORLEN, 44s);
+            events.ScheduleEvent(EVENT_TALK_SPAWN_1, 47s);
+            events.ScheduleEvent(EVENT_TALK_MORLEN_0, 52s);
+            events.ScheduleEvent(EVENT_TALK_MORLEN_1, 58s);
+            events.ScheduleEvent(EVENT_SPAWN_WAVE_1, 61s);
 
-            events.ScheduleEvent(EVENT_SPELL_BLADESTORM, urand(6000, 15000));
-            events.ScheduleEvent(EVENT_SPELL_MORTAL_STRIKE, urand(3000, 7000));
-            events.ScheduleEvent(EVENT_SPELL_HEROIC_STRIKE, urand(4000, 10000));
+            events.ScheduleEvent(EVENT_SPELL_BLADESTORM, 6s, 15s);
+            events.ScheduleEvent(EVENT_SPELL_MORTAL_STRIKE, 3s, 7s);
+            events.ScheduleEvent(EVENT_SPELL_HEROIC_STRIKE, 4s, 10s);
         }
 
         void JustSummoned(Creature* summon) override
@@ -184,10 +172,10 @@ public:
                     me->RemoveAurasDueToSpell(67541);
                     me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
                     me->GetMotionMaster()->MoveCharge(11779.30f, -7065.43f, 24.92f, me->GetSpeed(MOVE_RUN), EVENT_CHARGE);
-                    events.ScheduleEvent(EVENT_OUTRO_0, 0);
-                    events.ScheduleEvent(EVENT_OUTRO_1, 5000);
-                    events.ScheduleEvent(EVENT_OUTRO_2, 12000);
-                    events.ScheduleEvent(EVENT_OUTRO_3, 19000);
+                    events.ScheduleEvent(EVENT_OUTRO_0, 0ms);
+                    events.ScheduleEvent(EVENT_OUTRO_1, 5s);
+                    events.ScheduleEvent(EVENT_OUTRO_2, 12s);
+                    events.ScheduleEvent(EVENT_OUTRO_3, 19s);
                 }
                 else if (summons.size() == 1)
                 {
@@ -196,13 +184,13 @@ public:
                     switch (summon->GetEntry())
                     {
                         case NPC_SCOURGE_ZOMBIE:
-                            events.ScheduleEvent(EVENT_SPAWN_WAVE_2, 3000);
+                            events.ScheduleEvent(EVENT_SPAWN_WAVE_2, 3s);
                             break;
                         case NPC_GHOUL_INVADER:
-                            events.ScheduleEvent(EVENT_SPAWN_WAVE_3, 3000);
+                            events.ScheduleEvent(EVENT_SPAWN_WAVE_3, 3s);
                             break;
                         case NPC_CRYPT_RAIDER:
-                            events.ScheduleEvent(EVENT_SUMMONS_ATTACK, 3000);
+                            events.ScheduleEvent(EVENT_SUMMONS_ATTACK, 3s);
                             break;
                     }
                 }
@@ -239,7 +227,7 @@ public:
                     if (Player* p = ObjectAccessor::GetPlayer(*me, playerGUID))
                         if (p->GetExactDist(me) <= 50.0f)
                         {
-                            events.RepeatEvent(5000);
+                            events.Repeat(5s);
                             break;
                         }
                     me->setActive(false);
@@ -278,7 +266,7 @@ public:
                             {
                                 if (!summons.empty())
                                 {
-                                    events.RepeatEvent(5000);
+                                    events.Repeat(5s);
                                     return;
                                 }
                                 else
@@ -362,7 +350,7 @@ public:
                                 break;
                         }
                     }
-                    events.ScheduleEvent(EVENT_SUMMONS_ATTACK, 3000);
+                    events.ScheduleEvent(EVENT_SUMMONS_ATTACK, 3s);
                     break;
                 case EVENT_SUMMONS_ATTACK:
                     for (SummonList::const_iterator itr = summons.begin(); itr != summons.end(); ++itr)
@@ -382,13 +370,13 @@ public:
                 case EVENT_OUTRO_3:
                     Talk(SAY_OUTRO_0 + (evId - EVENT_OUTRO_0));
                     if (evId == EVENT_OUTRO_3)
-                        events.ScheduleEvent(EVENT_OUTRO_KNEEL, 6000);
+                        events.ScheduleEvent(EVENT_OUTRO_KNEEL, 6s);
                     break;
                 case EVENT_OUTRO_KNEEL:
                     if (Player* p = ObjectAccessor::GetPlayer(*me, playerGUID))
                         p->KilledMonsterCredit(NPC_THALORIEN_KILL_CREDIT);
                     me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                    events.ScheduleEvent(EVENT_DISAPPEAR, 6000);
+                    events.ScheduleEvent(EVENT_DISAPPEAR, 6s);
                     break;
                 case EVENT_DISAPPEAR:
                     me->SetVisible(false);
@@ -402,17 +390,17 @@ public:
                 case EVENT_SPELL_BLADESTORM:
                     if (me->GetVictim() && me->IsWithinMeleeRange(me->GetVictim()))
                         me->CastSpell(me->GetVictim(), 67541, false);
-                    events.RepeatEvent(urand(25000, 35000));
+                    events.Repeat(25s, 35s);
                     break;
                 case EVENT_SPELL_MORTAL_STRIKE:
                     if (me->GetVictim() && me->IsWithinMeleeRange(me->GetVictim()))
                         me->CastSpell(me->GetVictim(), 67542, false);
-                    events.RepeatEvent(urand(7000, 12000));
+                    events.Repeat(7s, 12s);
                     break;
                 case EVENT_SPELL_HEROIC_STRIKE:
                     if (me->GetVictim() && me->IsWithinMeleeRange(me->GetVictim()))
                         me->CastSpell(me->GetVictim(), 57846, false);
-                    events.RepeatEvent(urand(5000, 10000));
+                    events.Repeat(5s, 10s);
                     break;
             }
 
@@ -422,7 +410,7 @@ public:
         void MovementInform(uint32 type, uint32 id) override
         {
             if (type == POINT_MOTION_TYPE && id == EVENT_CHARGE)
-                events.ScheduleEvent(EVENT_SET_FACING, 0);
+                events.ScheduleEvent(EVENT_SET_FACING, 0ms);
         }
 
         void EnterEvadeMode(EvadeReason why) override
@@ -516,19 +504,19 @@ public:
                 me->SummonCreature(NPC_SUNWELL_VISUAL_BUNNY, 1688.24f, 621.769f, 29.1745f, 0.523177f, TEMPSUMMON_MANUAL_DESPAWN);
                 me->setActive(true);
                 events.Reset();
-                events.ScheduleEvent(1, 1000); // guard talk
-                events.ScheduleEvent(2, 4000); // theron talk
-                events.ScheduleEvent(3, 10000); // npcs walk
-                events.ScheduleEvent(4, 17000); // rommath talk
-                events.ScheduleEvent(5, 20000); // theron talk
-                events.ScheduleEvent(6, 28000); // theron talk
-                events.ScheduleEvent(7, 37000); // rommath talk
-                events.ScheduleEvent(8, 44000); // rommath talk
-                events.ScheduleEvent(9, 52000); // rommath talk
-                events.ScheduleEvent(10, 60000); // auric talk
-                events.ScheduleEvent(11, 66000); // auric talk
-                events.ScheduleEvent(12, 76000); // rommath talk
-                events.ScheduleEvent(13, 80000); // move home
+                events.ScheduleEvent(1, 1s); // guard talk
+                events.ScheduleEvent(2, 4s); // theron talk
+                events.ScheduleEvent(3, 10s); // npcs walk
+                events.ScheduleEvent(4, 17s); // rommath talk
+                events.ScheduleEvent(5, 20s); // theron talk
+                events.ScheduleEvent(6, 28s); // theron talk
+                events.ScheduleEvent(7, 37s); // rommath talk
+                events.ScheduleEvent(8, 44s); // rommath talk
+                events.ScheduleEvent(9, 52s); // rommath talk
+                events.ScheduleEvent(10, 60s); // auric talk
+                events.ScheduleEvent(11, 66s); // auric talk
+                events.ScheduleEvent(12, 76s); // rommath talk
+                events.ScheduleEvent(13, 80s); // move home
             }
         }
 
@@ -551,16 +539,16 @@ public:
                     break;
                 case 3:
                     me->SetWalk(true);
-                    me->GetMotionMaster()->MovePath(me->GetEntry() * 100, false);
+                    me->GetMotionMaster()->MoveWaypoint(me->GetEntry() * 100, false);
                     if (Creature* c = me->FindNearestCreature(NPC_THERON, 60.0f, true))
                     {
                         c->SetWalk(true);
-                        c->GetMotionMaster()->MovePath(c->GetEntry() * 100, false);
+                        c->GetMotionMaster()->MoveWaypoint(c->GetEntry() * 100, false);
                     }
                     if (Creature* c = me->FindNearestCreature(NPC_AURIC, 60.0f, true))
                     {
                         c->SetWalk(true);
-                        c->GetMotionMaster()->MovePath(c->GetEntry() * 100, false);
+                        c->GetMotionMaster()->MoveWaypoint(c->GetEntry() * 100, false);
                     }
                     break;
                 case 4:
@@ -598,7 +586,7 @@ public:
                 case 13:
                     me->setActive(false);
                     if (Creature* c = me->FindNearestCreature(NPC_SUNWELL_VISUAL_BUNNY, 60.0f, true))
-                        c->DespawnOrUnsummon(1);
+                        c->DespawnOrUnsummon(1ms);
                     if (GameObject* go = me->FindNearestGameObject(GO_QUEL_DELAR, 60.0f))
                         go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                     me->SetWalk(true);
@@ -622,68 +610,30 @@ public:
     };
 };
 
-/*###### THEIR: ######*/
-
-/*######
-## npc_greengill_slave
-######*/
-
-#define ENRAGE  45111
-#define ORB     45109
-#define QUESTG  11541
-#define DM      25060
-
-class npc_greengill_slave : public CreatureScript
+// 45396, 45398 - Weapon Coating Enchant
+class spell_gen_weapon_coating_enchant : public AuraScript
 {
-public:
-    npc_greengill_slave() : CreatureScript("npc_greengill_slave") { }
+    PrepareAuraScript(spell_gen_weapon_coating_enchant);
 
-    CreatureAI* GetAI(Creature* creature) const override
+    bool CheckProc(ProcEventInfo& eventInfo)
     {
-        return new npc_greengill_slaveAI(creature);
+        Unit* caster = eventInfo.GetActor();
+        if (!caster)
+            return false;
+
+        return (caster->GetZoneId() == AREA_ISLE_OF_QUEL_DANAS || caster->GetZoneId() == AREA_SUNWELL_PLATEAU || caster->GetZoneId() == AREA_MAGISTERS_TERRACE);
     }
 
-    struct npc_greengill_slaveAI : public ScriptedAI
+    void Register() override
     {
-        npc_greengill_slaveAI(Creature* creature) : ScriptedAI(creature) { }
-
-        void JustEngagedWith(Unit* /*who*/) override { }
-
-        void SpellHit(Unit* caster, SpellInfo const* spellInfo) override
-        {
-            Player* player = caster->ToPlayer();
-            if (!player)
-                return;
-
-            if (spellInfo->Id == ORB && !me->HasAura(ENRAGE))
-            {
-                if (player->GetQuestStatus(QUESTG) == QUEST_STATUS_INCOMPLETE)
-                    DoCast(player, 45110, true);
-
-                DoCast(me, ENRAGE);
-
-                if (Creature* Myrmidon = me->FindNearestCreature(DM, 70))
-                {
-                    me->AddThreat(Myrmidon, 100000.0f);
-                    AttackStart(Myrmidon);
-                }
-            }
-        }
-
-        void UpdateAI(uint32 /*diff*/) override
-        {
-            DoMeleeAttackIfReady();
-        }
-    };
+        DoCheckProc += AuraCheckProcFn(spell_gen_weapon_coating_enchant::CheckProc);
+    }
 };
 
 void AddSC_isle_of_queldanas()
 {
-    // OUR:
     new npc_bh_thalorien_dawnseeker();
     RegisterSpellScript(spell_bh_cleanse_quel_delar);
     new npc_grand_magister_rommath();
-
-    // THEIR:
-    new npc_greengill_slave();
+    RegisterSpellScript(spell_gen_weapon_coating_enchant);
 }

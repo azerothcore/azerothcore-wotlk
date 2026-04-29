@@ -1,20 +1,21 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "CreatureAI.h"
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
@@ -36,7 +37,7 @@ enum Events
 class instance_uldaman : public InstanceMapScript
 {
 public:
-    instance_uldaman() : InstanceMapScript("instance_uldaman", 70) { }
+    instance_uldaman() : InstanceMapScript("instance_uldaman", MAP_ULDAMAN) { }
 
     struct instance_uldaman_InstanceMapScript : public InstanceScript
     {
@@ -154,11 +155,6 @@ class spell_uldaman_sub_boss_agro_keepers : public SpellScript
     {
         OnEffectLaunch += SpellEffectFn(spell_uldaman_sub_boss_agro_keepers::HandleSendEvent, EFFECT_0, SPELL_EFFECT_SEND_EVENT);
     }
-};
-
-enum UldamanStonedEnum
-{
-    MAP_ULDAMAN = 70
 };
 
 class spell_uldaman_stoned_aura : public AuraScript

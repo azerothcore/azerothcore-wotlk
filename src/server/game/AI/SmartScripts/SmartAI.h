@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -40,6 +40,8 @@ enum SmartEscortVars
     SMART_MAX_AID_DIST                  = SMART_ESCORT_MAX_PLAYER_DIST / 2,
 };
 
+#define DISTANCING_CONSTANT 1.f // buffer for better functionality of distancing
+
 class SmartAI : public CreatureAI
 {
 public:
@@ -50,24 +52,25 @@ public:
     bool IsAIControlled() const;
 
     // Start moving to the desired MovePoint
-    void StartPath(bool run = false, uint32 path = 0, bool repeat = false, Unit* invoker = nullptr);
-    bool LoadPath(uint32 entry);
+    void StartPath(ForcedMovement forcedMovement = FORCED_MOVEMENT_NONE, uint32 path = 0, bool repeat = false, Unit* invoker = nullptr, PathSource pathSource = PathSource::SMART_WAYPOINT_MGR);
+    bool LoadPath(uint32 entry, PathSource pathSource);
     void PausePath(uint32 delay, bool forced = false);
     void StopPath(uint32 DespawnTime = 0, uint32 quest = 0, bool fail = false);
     void EndPath(bool fail = false);
     void ResumePath();
-    WayPoint* GetNextWayPoint();
+    WaypointNode const* GetNextWayPoint();
     void GenerateWayPointArray(Movement::PointsArray* points);
     bool HasEscortState(uint32 uiEscortState) { return (mEscortState & uiEscortState); }
     void AddEscortState(uint32 uiEscortState) { mEscortState |= uiEscortState; }
     bool IsEscorted() override { return (mEscortState & SMART_ESCORT_ESCORTING); }
     void RemoveEscortState(uint32 uiEscortState) { mEscortState &= ~uiEscortState; }
     void SetAutoAttack(bool on) { mCanAutoAttack = on; }
-    void SetCombatMove(bool on, float chaseRange = 0.0f);
-    bool CanCombatMove() { return mCanCombatMove; }
+    void SetCombatMovement(bool on, bool stopOrStartMovement);
+    void SetCurrentRangeMode(bool on, float range = 0.f);
+    void SetMainSpell(uint32 spellId);
+    void DistanceYourself(float range);
     void SetFollow(Unit* target, float dist = 0.0f, float angle = 0.0f, uint32 credit = 0, uint32 end = 0, uint32 creditType = 0, bool aliveState = true);
     void StopFollow(bool complete);
-    void MoveAway(float distance);
 
     void SetScript9(SmartScriptHolder& e, uint32 entry, WorldObject* invoker);
     SmartScript* GetScript() { return &mScript; }
@@ -162,7 +165,7 @@ public:
     void SetData(uint32 id, uint32 value, WorldObject* invoker);
 
     // Used in scripts to share variables
-    void SetGUID(ObjectGuid guid, int32 id = 0) override;
+    void SetGUID(ObjectGuid const& guid, int32 id = 0) override;
 
     // Used in scripts to share variables
     ObjectGuid GetGUID(int32 id = 0) const override;
@@ -172,9 +175,6 @@ public:
 
     // Called at movepoint reached
     void MovepointReached(uint32 id);
-
-    // Makes the creature run/walk
-    void SetRun(bool run = true);
 
     void SetFly(bool fly = true);
 
@@ -206,16 +206,28 @@ public:
 
     void PathEndReached(uint32 pathId) override;
 
+    void WaypointPathStarted(uint32 pathId) override;
+    void WaypointStarted(uint32 nodeId, uint32 pathId) override;
+    void WaypointReached(uint32 nodeId, uint32 pathId) override;
+    void WaypointPathEnded(uint32 nodeId, uint32 pathId) override;
+
     bool CanRespawn() override { return mcanSpawn; };
     void SetCanRespawn(bool canSpawn) { mcanSpawn = canSpawn; }
 
     // Xinef
     void SetWPPauseTimer(uint32 time) { mWPPauseTimer = time; }
 
+    void DistancingEnded() override;
+
+    bool IsMainSpellPrevented(SpellInfo const* spellInfo) const;
+
+    void OnSpellFailed(SpellInfo const* spell) override;
+
 private:
     bool mIsCharmed;
     uint32 mFollowCreditType;
     uint32 mFollowArrivedTimer;
+    uint32 _followCheckTimer;
     uint32 mFollowCredit;
     uint32 mFollowArrivedEntry;
     bool   mFollowArrivedAlive;
@@ -226,28 +238,28 @@ private:
     void ReturnToLastOOCPos();
     void UpdatePath(const uint32 diff);
     SmartScript mScript;
-    WPPath* mWayPoints;
+    WaypointPath const* mWayPoints;
     uint32 mEscortState;
     uint32 mCurrentWPID;
     bool mWPReached;
     bool mOOCReached;
     uint32 mWPPauseTimer;
-    WayPoint* mLastWP;
+    WaypointNode const* mLastWP;
     uint32 mEscortNPCFlags;
-    uint32 GetWPCount() { return mWayPoints ? mWayPoints->size() : 0; }
+    uint32 GetWPCount() { return mWayPoints ? mWayPoints->Nodes.size() : 0; }
     bool mCanRepeatPath;
-    bool mRun;
     bool mEvadeDisabled;
     bool mCanAutoAttack;
-    bool mCanCombatMove;
     bool mForcedPaused;
     uint32 mInvincibilityHpLevel;
+    ForcedMovement mForcedMovement;
 
     bool AssistPlayerInCombatAgainst(Unit* who);
 
     uint32 mDespawnTime;
     uint32 mDespawnState;
     void UpdateDespawn(const uint32 diff);
+    void UpdateFollow(const uint32 diff);
     uint32 mEscortInvokerCheckTimer;
     bool mJustReset;
 
@@ -257,6 +269,14 @@ private:
     void CheckConditions(const uint32 diff);
     ConditionList conditions;
     uint32 m_ConditionsTimer;
+
+    bool _chaseOnInterrupt;
+    std::unordered_map<uint32, uint32> aiDataSet;
+
+    bool _currentRangeMode;
+    float _attackDistance;
+    float _pendingDistancing;
+    uint32 _mainSpellId;
 };
 
 class SmartGameObjectAI : public GameObjectAI

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -381,8 +381,8 @@ enum CharacterDatabaseStatements : uint32
     CHAR_DEL_INSTANCE_BY_INSTANCE,
     CHAR_DEL_MAIL_ITEM_BY_ID,
     CHAR_INS_PETITION,
-    CHAR_DEL_PETITION_BY_GUID,
-    CHAR_DEL_PETITION_SIGNATURE_BY_GUID,
+    CHAR_DEL_PETITION_BY_ID,
+    CHAR_DEL_PETITION_SIGNATURE_BY_ID,
     CHAR_DEL_CHAR_DECLINED_NAME,
     CHAR_INS_CHAR_DECLINED_NAME,
     CHAR_UPD_CHAR_RACE,
@@ -426,6 +426,8 @@ enum CharacterDatabaseStatements : uint32
     CHAR_UDP_CHAR_HONOR_POINTS_ACCUMULATIVE,
     CHAR_UDP_CHAR_ARENA_POINTS,
     CHAR_UDP_CHAR_ARENA_POINTS_ACCUMULATIVE,
+    CHAR_UPD_ALL_HONOR_POINTS,
+    CHAR_UPD_ALL_ARENA_POINTS,
     CHAR_UDP_CHAR_MONEY,
     CHAR_UDP_CHAR_MONEY_ACCUMULATIVE,
     CHAR_UPD_CHAR_REMOVE_GHOST, // pussywizard
@@ -527,6 +529,9 @@ enum CharacterDatabaseStatements : uint32
     CHAR_INSERT_INSTANCE_SAVED_DATA,
     CHAR_DELETE_INSTANCE_SAVED_DATA,
     CHAR_SANITIZE_INSTANCE_SAVED_DATA,
+
+    CHAR_SEL_WORLD_STATE,
+    CHAR_REP_WORLD_STATE,
 
     CHAR_NO_OP_PROVIDE_REALM_CONTEXT,
 
