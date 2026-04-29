@@ -374,18 +374,18 @@ float DynamicMapTree::getHeightAccurate(float x, float y, float z, float maxSear
     DynamicTreeIntersectionCallback callback(phasemask, VMAP::ModelIgnoreFlags::Nothing, &normal);
     impl->intersectZAllignedRay(ray, callback, dist);
 
-     if (!callback.didHit())
+    if (!callback.didHit())
     {
-        if (baseHeight)
-            *baseHeight = -G3D::finf();
+       if (baseHeight)
+           *baseHeight = -G3D::finf();
 
-         return -G3D::finf();
+        return -G3D::finf();
     }
 
     float const height = z - dist;
 
     if (baseHeight)
-        *baseHeight = height;
+       *baseHeight = height;
 
     return ComputeFootprintHeightFromNormal(height, normal, radius, yaw, blend, clamp);
 }
