@@ -1445,22 +1445,47 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
 
                 auto getBlinkSweptHitPos = [&](float fromX, float fromY, float fromZ,
                                                float toX, float toY, float toZ,
-                                               float& hitX, float& hitY, float& hitZ) -> bool
+                                               float& hitX, float& hitY, float& hitZ,
+                                               float legacyRayZOffset) -> bool
                 {
                     if (!accurateHeightEnabled)
                     {
+                        // Preserve legacy behavior exactly:
+                        // - Some legacy calls used +0.5f Z, some used raw Z.
+                        // - Dynamic collision was checked against the possibly shortened
+                        //   static-hit endpoint, not always against the original endpoint.
+                        G3D::Vector3 staticHit(toX, toY, toZ);
                         bool const col = map->GetMapCollisionData().GetStaticTree().GetObjectHitPos(
-                            fromX, fromY, fromZ + 0.5f,
-                            toX, toY, toZ + 0.5f,
-                            hitX, hitY, hitZ,
+                            fromX, fromY, fromZ + legacyRayZOffset,
+                            toX, toY, toZ + legacyRayZOffset,
+                            staticHit.x, staticHit.y, staticHit.z,
                             -0.5f);
+
+                        float const dynToX = col ? staticHit.x : toX;
+                        float const dynToY = col ? staticHit.y : toY;
+                        float const dynToZ = col ? staticHit.z : toZ;
+
+                        G3D::Vector3 dynamicHit(dynToX, dynToY, dynToZ);
 
                         bool const dcol = map->GetMapCollisionData().GetDynamicTree().GetObjectHitPos(
                             phasemask,
-                            fromX, fromY, fromZ + 0.5f,
-                            toX, toY, toZ + 0.5f,
-                            hitX, hitY, hitZ,
+                            fromX, fromY, fromZ + legacyRayZOffset,
+                            dynToX, dynToY, dynToZ + legacyRayZOffset,
+                            dynamicHit.x, dynamicHit.y, dynamicHit.z,
                             -0.5f);
+
+                        if (dcol)
+                        {
+                            hitX = dynamicHit.x;
+                            hitY = dynamicHit.y;
+                            hitZ = dynamicHit.z;
+                        }
+                        else if (col)
+                        {
+                            hitX = staticHit.x;
+                            hitY = staticHit.y;
+                            hitZ = staticHit.z;
+                        }
 
                         return col || dcol;
                     }
@@ -1691,7 +1716,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                             //LOG_ERROR("spells", "total path > than distance in 3D , need to move back a bit for save distance, total path = {}, overdistance = {}", totalpath, overdistance);
                         }
 
-                        bool const col = getBlinkSweptHitPos(prevX, prevY, prevZ, tstX, tstY, tstZ, tstX, tstY, tstZ);
+                        bool const col = getBlinkSweptHitPos(prevX, prevY, prevZ, tstX, tstY, tstZ, tstX, tstY, tstZ, 0.5f); // + 0.5f Magic Numbers Legacy
 
                         // collision occured
                         if (col || (overdistance > 0.0f && !map->IsInWater(phasemask, tstX, tstY, ground, collisionHeight)) || (std::fabs(prevZ - tstZ) > maxtravelDistZ && (tstZ > prevZ)))
@@ -1753,7 +1778,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                 else
                 {
                     float z = pos.GetPositionZ();
-                    bool const col = getBlinkSweptHitPos(pos.GetPositionX(), pos.GetPositionY(), z, destx, desty, z, destx, desty, z);
+                    bool const col = getBlinkSweptHitPos(pos.GetPositionX(), pos.GetPositionY(), z, destx, desty, z, destx, desty, z, 0.0f); // Magic Numbers Legacy.
 
                     // collision occured
                     if (col)

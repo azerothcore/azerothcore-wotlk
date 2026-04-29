@@ -1251,13 +1251,19 @@ namespace
 }
 
 float Map::GetVMapHeightAccurate(float x, float y, float z, float radius, float yaw,
-    GridTerrainData::GroundFootprintShape shape, float blend, float clamp, float /*sampleDelta*/, float maxSearchDist) const
+    GridTerrainData::GroundFootprintShape shape, float blend, float clamp, float maxSearchDist, float* baseHeight) const
 {
+    if (baseHeight)
+        *baseHeight = VMAP_INVALID_HEIGHT_VALUE;
+
     float height;
     G3D::Vector3 normal(0.0f, 0.0f, 1.0f);
 
     if (!_mapCollisionData.GetStaticTree().getHeightAndNormal(x, y, z, maxSearchDist, height, normal))
         return VMAP_INVALID_HEIGHT_VALUE;
+
+    if (baseHeight)
+        *baseHeight = height;
 
     if (radius <= 0.0f)
         return height;
@@ -1288,6 +1294,7 @@ float Map::GetHeightAccurate(float x, float y, float z, float radius, float yaw,
     }
 
     float vmapHeight = VMAP_INVALID_HEIGHT_VALUE;
+    float vmapBaseHeight = VMAP_INVALID_HEIGHT_VALUE;
     if (checkVMap)
     {
         const bool useAccurateVMap = (sWorld->getIntConfig(CONFIG_HEIGHT_ACCURATE_VMAP_ENABLE) != 0);
@@ -1296,12 +1303,12 @@ float Map::GetHeightAccurate(float x, float y, float z, float radius, float yaw,
             auto shape = static_cast<GridTerrainData::GroundFootprintShape>(sWorld->getIntConfig(CONFIG_HEIGHT_ACCURATE_SHAPE));
             float blend = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_SQUARE_BLEND);
             float clamp = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_SLOPE_CLAMP);
-            float delta = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_VMAP_DELTA);
-            vmapHeight = GetVMapHeightAccurate(x, y, z, radius, yaw, shape, blend, clamp, delta, maxSearchDist);
+            vmapHeight = GetVMapHeightAccurate(x, y, z, radius, yaw, shape, blend, clamp, maxSearchDist, &vmapBaseHeight);
         }
         else
         {
             vmapHeight = _mapCollisionData.GetStaticTree().getHeight(x, y, z, maxSearchDist);
+            vmapBaseHeight = vmapHeight;
         }
     }
 
@@ -1315,8 +1322,10 @@ float Map::GetHeightAccurate(float x, float y, float z, float radius, float yaw,
 
             // we are already under the surface or vmap height above map heigt
             // or if the distance of the vmap height is less than the land height distance
-            if (vmapHeight > mapHeight || std::fabs(mapHeight - z) > std::fabs(vmapHeight - z))
-                return vmapHeight;
+            // Selection must use point/base heights, not footprint-lifted heights.
+            // Otherwise a steep terrain triangle can incorrectly outrank a VMAP surface above it.
+            if (vmapBaseHeight > gridBaseHeight || std::fabs(gridBaseHeight - z) > std::fabs(vmapBaseHeight - z))
+                 return vmapHeight;
             else
                 return mapHeight;                           // better use .map surface height
         }
@@ -1755,23 +1764,38 @@ float Map::GetHeightAccurate(uint32 phasemask, float x, float y, float z, float 
                              bool vmap/*=true*/, float maxSearchDist /*= DEFAULT_HEIGHT_SEARCH*/) const
 {
     const float hMapMix = GetHeightAccurate(x, y, z, radius, yaw, vmap, maxSearchDist);
+    const float hMapMixBase = GetHeight(x, y, z, vmap, maxSearchDist);
 
     float hDyn;
+    float hDynBase;
     const bool dynAcc = (sWorld->getIntConfig(CONFIG_HEIGHT_ACCURATE_DYNAMIC_ENABLE) != 0);
+
     if (dynAcc)
     {
         const auto shape  = static_cast<GridTerrainData::GroundFootprintShape>(sWorld->getIntConfig(CONFIG_HEIGHT_ACCURATE_SHAPE));
         const float blend = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_SQUARE_BLEND);
         const float clamp = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_SLOPE_CLAMP);
-        const float dlt   = sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_DYNAMIC_DELTA);
         const float effBlend = (shape == GridTerrainData::GroundFootprintShape::Square) ? blend : 1.0f;
-        hDyn = _mapCollisionData.GetDynamicTree().getHeightAccurate(x, y, z, maxSearchDist, phasemask, radius, yaw, effBlend, clamp, dlt);
+        hDyn = _mapCollisionData.GetDynamicTree().getHeightAccurate(x, y, z, maxSearchDist, phasemask, radius, yaw, effBlend, clamp, &hDynBase);
     }
     else
     {
         hDyn = _mapCollisionData.GetDynamicTree().getHeight(x, y, z, maxSearchDist, phasemask);
+        hDynBase = hDyn;
     }
-    return std::max<float>(hMapMix, hDyn);
+
+    // Preserve the legacy source selection rule: dynamic wins only if its point/base
+    // surface is above the selected map/static surface. The accurate footprint lift
+    // must not make a lower dynamic object outrank real terrain or VMAP.
+    if (hDyn > INVALID_HEIGHT)
+    {
+        if (hMapMix > INVALID_HEIGHT)
+            return (hDynBase > hMapMixBase) ? hDyn : hMapMix;
+
+        return hDyn;
+    }
+
+    return hMapMix;
 }
 
 bool Map::IsInWater(uint32 phaseMask, float x, float y, float pZ, float collisionHeight) const

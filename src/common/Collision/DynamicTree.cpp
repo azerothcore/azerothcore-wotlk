@@ -363,7 +363,7 @@ namespace
 }
 
 float DynamicMapTree::getHeightAccurate(float x, float y, float z, float maxSearchDist, uint32 phasemask,
-                                        float radius, float yaw, float blend, float clamp, float /*sampleDelta*/) const
+                                        float radius, float yaw, float blend, float clamp, float* baseHeight) const
 {
     G3D::Vector3 origin(x, y, z);
     G3D::Ray ray(origin, G3D::Vector3(0.0f, 0.0f, -1.0f));
@@ -374,10 +374,19 @@ float DynamicMapTree::getHeightAccurate(float x, float y, float z, float maxSear
     DynamicTreeIntersectionCallback callback(phasemask, VMAP::ModelIgnoreFlags::Nothing, &normal);
     impl->intersectZAllignedRay(ray, callback, dist);
 
-    if (!callback.didHit())
-        return -G3D::finf();
+     if (!callback.didHit())
+    {
+        if (baseHeight)
+            *baseHeight = -G3D::finf();
+
+         return -G3D::finf();
+    }
 
     float const height = z - dist;
+
+    if (baseHeight)
+        *baseHeight = height;
+
     return ComputeFootprintHeightFromNormal(height, normal, radius, yaw, blend, clamp);
 }
 

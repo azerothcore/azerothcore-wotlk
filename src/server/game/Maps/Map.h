@@ -589,7 +589,7 @@ private:
 
     [[nodiscard]] float GetVMapHeightAccurate(float x, float y, float z, float radius, float yaw,
                                           GridTerrainData::GroundFootprintShape shape, float blend, float clamp,
-                                          float sampleDelta, float maxSearchDist) const;
+                                          float maxSearchDist, float* baseHeight = nullptr) const;
 
     void ScriptsProcess();
 
