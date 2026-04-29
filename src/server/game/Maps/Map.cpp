@@ -346,6 +346,10 @@ bool Map::AddToMap(T* obj, bool checkTransport)
     //also, trigger needs to cast spell, if not update, cannot see visual
     obj->UpdateObjectVisibility(true);
 
+    // Post-visibility so accessories seat after the vehicle's create packet reaches clients.
+    if (obj->IsCreature())
+        if (Vehicle* vehicle = obj->ToCreature()->GetVehicleKit())
+            vehicle->Reset();
     return true;
 }
 

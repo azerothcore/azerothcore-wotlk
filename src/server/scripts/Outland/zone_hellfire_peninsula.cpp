@@ -457,113 +457,6 @@ public:
     }
 };
 
-enum Aledis
-{
-    SAY_CHALLENGE = 0,
-    SAY_DEFEATED = 1,
-    EVENT_TALK = 1,
-    EVENT_ATTACK = 2,
-    EVENT_EVADE = 3,
-    EVENT_FIREBALL = 4,
-    EVENT_FROSTNOVA = 5,
-    SPELL_FIREBALL = 20823,
-    SPELL_FROSTNOVA = 11831,
-};
-
-struct npc_magister_aledis : public ScriptedAI
-{
-    npc_magister_aledis(Creature* creature) : ScriptedAI(creature) { }
-
-    void StartFight(Player* player)
-    {
-        me->Dismount();
-        me->SetFacingToObject(player);
-        me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-        _playerGUID = player->GetGUID();
-        _events.ScheduleEvent(EVENT_TALK, 2s);
-    }
-
-    void Reset() override
-    {
-        me->RestoreFaction();
-        me->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
-        me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-        me->SetImmuneToPC(true);
-    }
-
-    void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damageType*/, SpellSchoolMask /*spellInfo = nullptr*/) override
-    {
-        if (damage > me->GetHealth() || me->HealthBelowPctDamaged(20, damage))
-        {
-            damage = 0;
-
-            _events.Reset();
-            me->RestoreFaction();
-            me->RemoveAllAuras();
-            me->GetThreatMgr().ClearAllThreat();
-            me->CombatStop(true);
-            me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
-            me->SetImmuneToPC(true);
-            Talk(SAY_DEFEATED);
-
-            _events.ScheduleEvent(EVENT_EVADE, 1min);
-        }
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        _events.Update(diff);
-
-        while (uint32 eventId = _events.ExecuteEvent())
-        {
-            switch (eventId)
-            {
-                case EVENT_TALK:
-                    Talk(SAY_CHALLENGE);
-                    _events.ScheduleEvent(EVENT_ATTACK, 2s);
-                    break;
-                case EVENT_ATTACK:
-                    me->SetImmuneToPC(false);
-                    me->SetFaction(FACTION_MONSTER);
-                    if (Player* player = ObjectAccessor::GetPlayer(*me, _playerGUID))
-                    {
-                        AttackStart(player);
-                    }
-                    _events.ScheduleEvent(EVENT_FIREBALL, 1ms);
-                    _events.ScheduleEvent(EVENT_FROSTNOVA, 5s);
-                    break;
-                case EVENT_FIREBALL:
-                    DoCast(SPELL_FIREBALL);
-                    _events.ScheduleEvent(EVENT_FIREBALL, 10s);
-                    break;
-                case EVENT_FROSTNOVA:
-                    DoCastAOE(SPELL_FROSTNOVA);
-                    _events.ScheduleEvent(EVENT_FROSTNOVA, 20s);
-                    break;
-                case EVENT_EVADE:
-                    EnterEvadeMode();
-                    break;
-            }
-        }
-
-        if (UpdateVictim())
-        {
-            DoMeleeAttackIfReady();
-        }
-    }
-
-    void sGossipSelect(Player* player, uint32 /*sender*/, uint32 /*action*/) override
-    {
-        CloseGossipMenuFor(player);
-        me->StopMoving();
-        StartFight(player);
-    }
-
-private:
-    EventMap _events;
-    ObjectGuid _playerGUID;
-};
-
 enum Beacon
 {
     NPC_STONESCHYE_WHELP        = 16927,
@@ -576,42 +469,51 @@ public:
 
     struct go_beaconAI : public GameObjectAI
     {
-        go_beaconAI(GameObject* gameObject) : GameObjectAI(gameObject) { }
+        explicit go_beaconAI(GameObject* gameObject) : GameObjectAI(gameObject) { }
 
-        std::list<Creature*> creatureList;
-
-        void OnStateChanged(uint32 state, Unit*  /*unit*/) override
+        void OnStateChanged(uint32 state, Unit* /*unit*/) override
         {
             if (state == GO_ACTIVATED)
             {
+                std::list<Creature*> creatureList;
+
+                _whelpGUIDs.clear();
                 me->GetCreaturesWithEntryInRange(creatureList, 40, NPC_STONESCHYE_WHELP);
+
+                for (Creature* whelp : creatureList)
                 {
-                    for (Creature* whelp : creatureList)
-                    {
-                        if (whelp->IsAlive() && !whelp->IsInCombat() && whelp->GetMotionMaster()->GetCurrentMovementGeneratorType() != HOME_MOTION_TYPE)
-                        {
-                            whelp->GetMotionMaster()->MovePoint(0, me->GetNearPosition(4.0f, whelp->GetOrientation()));
-                        }
-                    }
+                    if (!whelp)
+                        continue;
+
+                    _whelpGUIDs.push_back(whelp->GetGUID());
+
+                    MotionMaster* motionMaster = whelp->GetMotionMaster();
+                    if (whelp->IsAlive() && !whelp->IsInCombat() && motionMaster && motionMaster->GetCurrentMovementGeneratorType() != HOME_MOTION_TYPE)
+                        motionMaster->MovePoint(0, me->GetNearPosition(4.0f, whelp->GetOrientation()));
                 }
             }
             else if (state == GO_JUST_DEACTIVATED)
             {
+                for (ObjectGuid const& guid : _whelpGUIDs)
                 {
-                    for (Creature* whelp : creatureList)
+                    if (Creature* whelp = ObjectAccessor::GetCreature(*me, guid))
                     {
-                        if (whelp->IsAlive() && !whelp->IsInCombat() && whelp->GetMotionMaster()->GetCurrentMovementGeneratorType() != HOME_MOTION_TYPE)
-                        {
-                            whelp->GetMotionMaster()->MoveTargetedHome();
-                        }
+                        MotionMaster* motionMaster = whelp->GetMotionMaster();
+                        if (whelp->IsAlive() && !whelp->IsInCombat() && motionMaster && motionMaster->GetCurrentMovementGeneratorType() != HOME_MOTION_TYPE)
+                            motionMaster->MoveTargetedHome();
                     }
                 }
+
+                _whelpGUIDs.clear();
             }
             else
             {
-                creatureList.clear();
+                _whelpGUIDs.clear();
             }
         }
+
+        private:
+            GuidList _whelpGUIDs;
     };
 
     GameObjectAI* GetAI(GameObject* go) const override
@@ -649,6 +551,5 @@ void AddSC_hellfire_peninsula()
     new npc_fel_guard_hound();
     new go_beacon();
 
-    RegisterCreatureAI(npc_magister_aledis);
     RegisterGameObjectAI(go_magtheridons_head);
 }
