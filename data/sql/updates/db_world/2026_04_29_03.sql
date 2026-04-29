@@ -1,3 +1,4 @@
+-- DB update 2026_04_29_02 -> 2026_04_29_03
 -- Allow Eye of Dominion (Rise of Suffering, GO 193424 / gossip menu 10111) to
 -- show its "Seize control of a Lithe Stalker" gossip option for quest 13160
 -- (Stunning View). Without this row players who have only Stunning View active

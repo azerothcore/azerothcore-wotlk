@@ -1,3 +1,4 @@
+-- DB update 2026_04_29_01 -> 2026_04_29_02
 --
 -- Quest 12943 "Shadow Vault Decree" - Thane Ufrang the Mighty (29919)
 --
