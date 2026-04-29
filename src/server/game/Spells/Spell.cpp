@@ -1428,12 +1428,13 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                 float const orientationSin = std::sin(orientation);
                 float const groundProbeRadius = m_caster->GetGroundProbeRadius();
                 float const accurateProbeRadius = groundProbeRadius * sWorld->getFloatConfig(CONFIG_HEIGHT_ACCURATE_RADIUS_SCALE);
+                bool const accurateHeightEnabled = sWorld->getBoolConfig(CONFIG_HEIGHT_ACCURATE_ENABLE);
 
                 auto getBlinkGroundHeight = [&](float x, float y, float z, bool checkVMap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) -> float
                 {
                     float height = VMAP_INVALID_HEIGHT_VALUE;
 
-                    if (sWorld->getBoolConfig(CONFIG_HEIGHT_ACCURATE_ENABLE))
+                    if (accurateHeightEnabled)
                         height = map->GetHeightAccurate(phasemask, x, y, z, accurateProbeRadius, orientation, checkVMap, maxSearchDist);
 
                     if (!std::isfinite(height) || height <= INVALID_HEIGHT)
@@ -1446,7 +1447,7 @@ void Spell::SelectImplicitCasterDestTargets(SpellEffIndex effIndex, SpellImplici
                                                float toX, float toY, float toZ,
                                                float& hitX, float& hitY, float& hitZ) -> bool
                 {
-                    if (!sWorld->getBoolConfig(CONFIG_HEIGHT_ACCURATE_ENABLE))
+                    if (!accurateHeightEnabled)
                     {
                         bool const col = map->GetMapCollisionData().GetStaticTree().GetObjectHitPos(
                             fromX, fromY, fromZ + 0.5f,

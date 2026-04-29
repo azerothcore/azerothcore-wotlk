@@ -3111,10 +3111,14 @@ float WorldObject::GetMapHeightAccurate(float x, float y, float z, bool vmap/* =
     radius *= rScale;
 
     float const yaw = GetOrientation();
+    // Preserve the legacy "start the height ray above the unit" behavior.
+    // The accurate footprint radius is only an additional lower bound, not a replacement
+    // for collision height / Z_OFFSET_FIND_HEIGHT.
+    float const accurateSearchOffset = std::max(std::max(GetCollisionHeight(), Z_OFFSET_FIND_HEIGHT), radius + 0.2f);
     float accurateSearchZ = z;
 
     if (accurateSearchZ != MAX_HEIGHT)
-        accurateSearchZ += std::max(radius + 0.2f, 0.5f);
+        accurateSearchZ += accurateSearchOffset;
 
     float height = GetMap()->GetHeightAccurate(GetPhaseMask(), x, y, accurateSearchZ, radius, yaw, vmap, distanceToSearch);
     if (std::isfinite(height) && height > INVALID_HEIGHT)

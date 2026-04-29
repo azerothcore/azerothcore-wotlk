@@ -1275,8 +1275,8 @@ float Map::GetHeightAccurate(float x, float y, float z, float radius, float yaw,
 {
     // find raw .map surface under Z coordinates
     float mapHeight = VMAP_INVALID_HEIGHT_VALUE;
-    float const gridBaseHeight = GetGridHeightAccurate(x, y, 0.0f, yaw);
-    float const gridHeight = GetGridHeightAccurate(x, y, radius, yaw);
+    float const gridBaseHeight = GetGridHeight(x, y);
+    float const gridHeight = (radius > 0.0f) ? GetGridHeightAccurate(x, y, radius, yaw) : gridBaseHeight;
     if (gridBaseHeight > INVALID_HEIGHT && gridHeight > INVALID_HEIGHT)
     {
         // Use the point height for the Z visibility/search test. The accurate height
@@ -1337,6 +1337,9 @@ float Map::GetGridHeight(float x, float y) const
 
 float Map::GetGridHeightAccurate(float x, float y, float radius, float yaw) const
 {
+    if (radius <= 0.0f)
+        return GetGridHeight(x, y);
+
     if (GridTerrainData* gmap = const_cast<Map*>(this)->GetGridTerrainData(x, y))
     {
         auto const shape = static_cast<GridTerrainData::GroundFootprintShape>(sWorld->getIntConfig(CONFIG_HEIGHT_ACCURATE_SHAPE));
