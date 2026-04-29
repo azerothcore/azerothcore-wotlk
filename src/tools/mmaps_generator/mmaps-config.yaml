@@ -22,14 +22,14 @@ mmapsConfig:
     # In RecastDemo, you often work with world units instead of cell units.
     # By default, these cell units are converted to world units using the formula:
     #
-    #     cellSize = MMAP::GRID_SIZE / (verticesPerMapEdge - 1)
+    #     cellSize = MMAP::GRID_SIZE / (vertexPerMapEdge - 1)
     #
     # Where:
     #     MMAP::GRID_SIZE = 533.3333f (the size of one map tile in world units)
-    #     verticesPerMapEdge = number of vertices along one edge of the full map grid
+    #     vertexPerMapEdge = number of vertices along one edge of the full map grid
     #
     # Example:
-    #     If verticesPerMapEdge = 2000, then:
+    #     If vertexPerMapEdge = 2000, then:
     #         cellSize ≈ 533.3333 / (2000 - 1) ≈ 0.2667 world units per cell
     #
     # To convert a value from cell units to world units (e.g., walkableClimb),
@@ -56,13 +56,13 @@ mmapsConfig:
 
     # Number of vertices along one edge of the entire map's navmesh grid.
     # Higher values increase mesh resolution but also CPU/memory usage.
-    verticesPerMapEdge: 2000
+    vertexPerMapEdge: 2000
 
     # Number of vertices along one edge of each tile chunk.
     # Must divide (vertexPerMapEdge - 1) evenly for seamless tiles.
     # A higher vertex count per tile means fewer total tiles,
     # reducing runtime work to load, unload, and manage tiles.
-    verticesPerTileEdge: 80
+    vertexPerTileEdge: 80
 
     # Tolerance for how much a polygon can deviate from the original geometry when simplified.
     # Higher values produce simpler (faster) meshes but can reduce accuracy.
