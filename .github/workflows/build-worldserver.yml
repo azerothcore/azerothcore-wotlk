@@ -1,0 +1,76 @@
+name: Build NostrumWoW Worldserver
+
+on:
+  push:
+    branches:
+      - master
+      - main
+  workflow_dispatch:
+
+jobs:
+  build-worldserver:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout AzerothCore fork
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            cmake \
+            clang \
+            libmysqlclient-dev \
+            libssl-dev \
+            libboost-all-dev \
+            libreadline-dev \
+            zlib1g-dev \
+            libbz2-dev \
+            libncurses-dev \
+            git
+
+      - name: Configure AzerothCore
+        run: |
+          mkdir -p build
+          cd build
+          cmake .. \
+            -DCMAKE_INSTALL_PREFIX=/opt/azerothcore/env/dist \
+            -DTOOLS=0 \
+            -DSCRIPTS=static
+
+      - name: Build worldserver
+        run: |
+          cd build
+          make -j$(nproc) worldserver
+
+      - name: Prepare Docker image context
+        run: |
+          mkdir -p docker-image
+          cp build/src/server/apps/worldserver/worldserver docker-image/worldserver
+
+          cat > docker-image/Dockerfile <<'EOF'
+          FROM acore/ac-wotlk-worldserver:master
+          USER root
+          COPY worldserver /azerothcore/env/dist/bin/worldserver
+          RUN chmod +x /azerothcore/env/dist/bin/worldserver && chown acore:acore /azerothcore/env/dist/bin/worldserver
+          USER acore
+          EOF
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: docker-image
+          push: true
+          tags: |
+            dockerdan247/nostrum-worldserver:latest
+            dockerdan247/nostrum-worldserver:${{ github.sha }}
