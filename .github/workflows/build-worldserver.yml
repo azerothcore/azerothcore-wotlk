@@ -48,7 +48,7 @@ jobs:
               cd build && \
               cmake .. \
                 -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-                -DCMAKE_INSTALL_PREFIX=/opt/azerothcore/env/dist \
+                -DCMAKE_INSTALL_PREFIX=/azerothcore/env/dist \
                 -DTOOLS=0 \
                 -DSCRIPTS=static && \
               cmake --build . --target worldserver -- -j$(nproc)
