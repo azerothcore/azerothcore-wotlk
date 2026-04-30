@@ -47,16 +47,34 @@ jobs:
           cd build
           make -j$(nproc) worldserver
 
-      - name: Prepare Docker image context
+      - name: Prepare Docker context
         run: |
           mkdir -p docker-image
-          cp build/src/server/apps/worldserver/worldserver docker-image/worldserver
+
+          echo "Searching for compiled worldserver binary..."
+          find build -type f -name "worldserver" -print
+
+          if [ -f build/bin/worldserver ]; then
+            cp build/bin/worldserver docker-image/worldserver
+          elif [ -f build/src/server/apps/worldserver/worldserver ]; then
+            cp build/src/server/apps/worldserver/worldserver docker-image/worldserver
+          else
+            echo "worldserver binary not found"
+            exit 1
+          fi
+
+          ls -lah docker-image/worldserver
 
           cat > docker-image/Dockerfile <<'EOF'
           FROM acore/ac-wotlk-worldserver:master
+
           USER root
+
           COPY worldserver /azerothcore/env/dist/bin/worldserver
-          RUN chmod +x /azerothcore/env/dist/bin/worldserver && chown acore:acore /azerothcore/env/dist/bin/worldserver
+
+          RUN chmod +x /azerothcore/env/dist/bin/worldserver && \
+              chown acore:acore /azerothcore/env/dist/bin/worldserver
+
           USER acore
           EOF
 
