@@ -5,7 +5,7 @@ INSERT INTO `acore_string` (`entry`, `content_default`) VALUES
 (64, 'Wrong parameter realmId: {}'),
 (65, 'Account {} ({}) granted permissions:'),
 (66, 'Account {} ({}) denied permissions:'),
-(67, 'Account {} ({}) inherited permissions by sec level {}:'),
+(67, 'Account {} ({}) inherited permissions by sec level {} ({}):'),
 (68, 'Permissions:'),
 (69, 'Linked permissions:'),
 (70, 'Empty List'),

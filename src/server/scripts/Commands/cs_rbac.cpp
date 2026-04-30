@@ -52,10 +52,10 @@ public:
     {
         static ChatCommandTable rbacAccountCommandTable =
         {
-            { "list",   HandleRBACPermListCommand,   rbac::RBAC_PERM_COMMAND_RBAC_ACC_PERM_LIST,   Console::Yes },
-            { "grant",  HandleRBACPermGrantCommand,  rbac::RBAC_PERM_COMMAND_RBAC_ACC_PERM_GRANT,  Console::Yes },
-            { "deny",   HandleRBACPermDenyCommand,   rbac::RBAC_PERM_COMMAND_RBAC_ACC_PERM_DENY,   Console::Yes },
-            { "revoke", HandleRBACPermRevokeCommand, rbac::RBAC_PERM_COMMAND_RBAC_ACC_PERM_REVOKE, Console::Yes },
+            { "list",   HandleRBACPermListCommand,   LANG_RBAC_HELP_ACC_LIST,   rbac::RBAC_PERM_COMMAND_RBAC_ACC_PERM_LIST,   Console::Yes },
+            { "grant",  HandleRBACPermGrantCommand,  LANG_RBAC_HELP_ACC_GRANT,  rbac::RBAC_PERM_COMMAND_RBAC_ACC_PERM_GRANT,  Console::Yes },
+            { "deny",   HandleRBACPermDenyCommand,   LANG_RBAC_HELP_ACC_DENY,   rbac::RBAC_PERM_COMMAND_RBAC_ACC_PERM_DENY,   Console::Yes },
+            { "revoke", HandleRBACPermRevokeCommand, LANG_RBAC_HELP_ACC_REVOKE, rbac::RBAC_PERM_COMMAND_RBAC_ACC_PERM_REVOKE, Console::Yes },
         };
 
         static ChatCommandTable rbacCommandTable =
@@ -190,6 +190,19 @@ public:
         return true;
     }
 
+    static char const* GetSecurityLevelName(uint8 secLevel)
+    {
+        switch (secLevel)
+        {
+            case SEC_PLAYER:        return "SEC_PLAYER";
+            case SEC_MODERATOR:     return "SEC_MODERATOR";
+            case SEC_GAMEMASTER:    return "SEC_GAMEMASTER";
+            case SEC_ADMINISTRATOR: return "SEC_ADMINISTRATOR";
+            case SEC_CONSOLE:       return "SEC_CONSOLE";
+            default:                return "Unknown";
+        }
+    }
+
     static bool HandleRBACPermListCommand(ChatHandler* handler, AccountIdentifier account)
     {
         RBACCommandData data = GetRBACData(account.GetID(), account.GetName());
@@ -220,7 +233,8 @@ public:
             }
         }
 
-        handler->PSendSysMessage(LANG_RBAC_LIST_HEADER_BY_SEC_LEVEL, data.rbac->GetId(), data.rbac->GetName().c_str(), data.rbac->GetSecurityLevel());
+        handler->PSendSysMessage(LANG_RBAC_LIST_HEADER_BY_SEC_LEVEL, data.rbac->GetId(), data.rbac->GetName().c_str(),
+                                 data.rbac->GetSecurityLevel(), GetSecurityLevelName(data.rbac->GetSecurityLevel()));
         rbac::RBACPermissionContainer const& defaultPermissions = sAccountMgr->GetRBACDefaultPermissions(data.rbac->GetSecurityLevel());
         if (defaultPermissions.empty())
             handler->SendSysMessage(handler->GetAcoreString(LANG_RBAC_LIST_EMPTY));
