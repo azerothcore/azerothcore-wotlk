@@ -17,65 +17,71 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install build dependencies
+      - name: Prepare Dockerfile
         run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            build-essential \
-            cmake \
-            file \
-            clang \
-            libmysqlclient-dev \
-            libssl-dev \
-            libboost-all-dev \
-            libreadline-dev \
-            zlib1g-dev \
-            libbz2-dev \
-            libncurses-dev \
-            git
+          cat > Dockerfile.worldserver <<'EOF'
+          FROM ubuntu:24.04 AS build
 
-      - name: Configure AzerothCore
-        run: |
-          mkdir -p build
-          cd build
-          cmake .. \
-            -DCMAKE_INSTALL_PREFIX=/opt/azerothcore/env/dist \
-            -DTOOLS=0 \
-            -DSCRIPTS=static
+          ENV DEBIAN_FRONTEND=noninteractive
 
-      - name: Build worldserver
-        run: |
-          cd build
-          make -j$(nproc) worldserver
+          RUN apt-get update && apt-get install -y \
+              build-essential \
+              cmake \
+              file \
+              clang \
+              libmysqlclient-dev \
+              libssl-dev \
+              libboost-all-dev \
+              libreadline-dev \
+              zlib1g-dev \
+              libbz2-dev \
+              libncurses-dev \
+              git \
+              && rm -rf /var/lib/apt/lists/*
 
-      - name: Prepare Docker context
-        run: |
-          mkdir -p docker-image
+          WORKDIR /azerothcore-src
 
-          echo "Searching for worldserver candidates..."
-          find build -name "worldserver" -print -exec ls -lah {} \; || true
+          COPY . .
 
-          WORLD_BIN="$(find build -type f -name worldserver -perm /111 | head -n 1)"
+          RUN mkdir -p build && \
+              cd build && \
+              cmake .. \
+                -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+                -DCMAKE_INSTALL_PREFIX=/opt/azerothcore/env/dist \
+                -DTOOLS=0 \
+                -DSCRIPTS=static && \
+              cmake --build . --target worldserver -- -j$(nproc)
 
-          if [ -z "$WORLD_BIN" ]; then
-            echo "Executable worldserver binary not found"
-            echo "All worldserver paths:"
-            find build -name "worldserver" -print -exec file {} \; || true
-            exit 1
-          fi
+          RUN mkdir -p /tmp/worldserver-build && \
+              echo "Searching for compiled worldserver binary..." && \
+              find build -name "worldserver" -print -exec ls -lah {} \; || true && \
+              WORLD_BIN="$(find build -type f -name worldserver -perm /111 | head -n 1)" && \
+              if [ -z "$WORLD_BIN" ]; then \
+                echo "Executable worldserver binary not found"; \
+                find build -name "worldserver" -print -exec file {} \; || true; \
+                exit 1; \
+              fi && \
+              echo "Using binary: $WORLD_BIN" && \
+              cp "$WORLD_BIN" /tmp/worldserver-build/worldserver && \
+              chmod +x /tmp/worldserver-build/worldserver && \
+              file /tmp/worldserver-build/worldserver
 
-          echo "Using binary: $WORLD_BIN"
-          cp "$WORLD_BIN" docker-image/worldserver
-          chmod +x docker-image/worldserver
-          ls -lah docker-image/worldserver
-          file docker-image/worldserver
-
-          cat > docker-image/Dockerfile <<'EOF'
           FROM acore/ac-wotlk-worldserver:master
 
           USER root
 
-          COPY worldserver /azerothcore/env/dist/bin/worldserver
+          RUN apt-get update && apt-get install -y \
+              libboost-filesystem1.83.0 \
+              libboost-system1.83.0 \
+              libboost-program-options1.83.0 \
+              libboost-iostreams1.83.0 \
+              libboost-regex1.83.0 \
+              libboost-thread1.83.0 \
+              libmysqlclient21 \
+              libssl3 \
+              && rm -rf /var/lib/apt/lists/*
+
+          COPY --from=build /tmp/worldserver-build/worldserver /azerothcore/env/dist/bin/worldserver
 
           RUN chmod +x /azerothcore/env/dist/bin/worldserver && \
               chown acore:acore /azerothcore/env/dist/bin/worldserver
@@ -92,7 +98,8 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
         with:
-          context: docker-image
+          context: .
+          file: Dockerfile.worldserver
           push: true
           tags: |
             dockerdan247/nostrum-worldserver:latest
