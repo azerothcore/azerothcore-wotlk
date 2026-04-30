@@ -20,7 +20,7 @@ jobs:
       - name: Prepare Dockerfile
         run: |
           cat > Dockerfile.worldserver <<'EOF'
-          FROM ubuntu:24.04 AS build
+          FROM ubuntu:22.04 AS build
 
           ENV DEBIAN_FRONTEND=noninteractive
 
@@ -69,17 +69,6 @@ jobs:
           FROM acore/ac-wotlk-worldserver:master
 
           USER root
-
-          RUN apt-get update && apt-get install -y \
-              libboost-filesystem1.83.0 \
-              libboost-system1.83.0 \
-              libboost-program-options1.83.0 \
-              libboost-iostreams1.83.0 \
-              libboost-regex1.83.0 \
-              libboost-thread1.83.0 \
-              libmysqlclient21 \
-              libssl3 \
-              && rm -rf /var/lib/apt/lists/*
 
           COPY --from=build /tmp/worldserver-build/worldserver /azerothcore/env/dist/bin/worldserver
 
