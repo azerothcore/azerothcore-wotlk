@@ -37,6 +37,7 @@ jobs:
               libbz2-dev \
               libncurses-dev \
               git \
+              pax-utils \
               && rm -rf /var/lib/apt/lists/*
 
           WORKDIR /azerothcore-src
@@ -52,9 +53,7 @@ jobs:
                 -DSCRIPTS=static && \
               cmake --build . --target worldserver -- -j$(nproc)
 
-          RUN mkdir -p /tmp/worldserver-build && \
-              echo "Searching for compiled worldserver binary..." && \
-              find build -name "worldserver" -print -exec ls -lah {} \; || true && \
+          RUN mkdir -p /tmp/worldserver-build /tmp/worldserver-libs && \
               WORLD_BIN="$(find build -type f -name worldserver -perm /111 | head -n 1)" && \
               if [ -z "$WORLD_BIN" ]; then \
                 echo "Executable worldserver binary not found"; \
@@ -64,16 +63,29 @@ jobs:
               echo "Using binary: $WORLD_BIN" && \
               cp "$WORLD_BIN" /tmp/worldserver-build/worldserver && \
               chmod +x /tmp/worldserver-build/worldserver && \
-              file /tmp/worldserver-build/worldserver
+              file /tmp/worldserver-build/worldserver && \
+              echo "Dependency list:" && \
+              ldd /tmp/worldserver-build/worldserver && \
+              lddtree -l /tmp/worldserver-build/worldserver \
+                | grep '^/' \
+                | sort -u \
+                | while read lib; do \
+                    if [ -f "$lib" ]; then \
+                      echo "Copying $lib"; \
+                      cp -v --parents "$lib" /tmp/worldserver-libs/; \
+                    fi; \
+                  done
 
           FROM acore/ac-wotlk-worldserver:master
 
           USER root
 
           COPY --from=build /tmp/worldserver-build/worldserver /azerothcore/env/dist/bin/worldserver
+          COPY --from=build /tmp/worldserver-libs/ /
 
           RUN chmod +x /azerothcore/env/dist/bin/worldserver && \
-              chown acore:acore /azerothcore/env/dist/bin/worldserver
+              chown acore:acore /azerothcore/env/dist/bin/worldserver && \
+              ldconfig
 
           USER acore
           EOF
