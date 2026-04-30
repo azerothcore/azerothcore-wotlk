@@ -53,7 +53,7 @@ jobs:
                 -DSCRIPTS=static && \
               cmake --build . --target worldserver -- -j$(nproc)
 
-          RUN mkdir -p /tmp/worldserver-build /tmp/worldserver-libs && \
+          RUN mkdir -p /tmp/worldserver-build /tmp/worldserver-runtime-libs && \
               WORLD_BIN="$(find build -type f -name worldserver -perm /111 | head -n 1)" && \
               if [ -z "$WORLD_BIN" ]; then \
                 echo "Executable worldserver binary not found"; \
@@ -70,22 +70,25 @@ jobs:
                 | grep '^/' \
                 | sort -u \
                 | while read lib; do \
-                    if [ -f "$lib" ]; then \
+                    if [ -f "$lib" ] && [ "$lib" != "/tmp/worldserver-build/worldserver" ]; then \
                       echo "Copying $lib"; \
-                      cp -v --parents "$lib" /tmp/worldserver-libs/; \
+                      cp -v "$lib" /tmp/worldserver-runtime-libs/; \
                     fi; \
-                  done
+                  done && \
+              echo "Copied runtime libraries:" && \
+              ls -lah /tmp/worldserver-runtime-libs
 
           FROM acore/ac-wotlk-worldserver:master
 
           USER root
 
           COPY --from=build /tmp/worldserver-build/worldserver /azerothcore/env/dist/bin/worldserver
-          COPY --from=build /tmp/worldserver-libs/ /
+          COPY --from=build /tmp/worldserver-runtime-libs/ /opt/nostrum-libs/
+
+          ENV LD_LIBRARY_PATH="/opt/nostrum-libs:${LD_LIBRARY_PATH}"
 
           RUN chmod +x /azerothcore/env/dist/bin/worldserver && \
-              chown acore:acore /azerothcore/env/dist/bin/worldserver && \
-              ldconfig
+              chown acore:acore /azerothcore/env/dist/bin/worldserver
 
           USER acore
           EOF
