@@ -1,0 +1,18 @@
+################################################################################
+# Dual Spec 19 Module Configuration
+################################################################################
+
+[worldserver]
+
+# Enable or disable this module.
+# Default: 1 (enabled)
+DualSpec19.Enable = 1
+
+# Minimum player level required to purchase dual specialization.
+# Default: 19
+DualSpec19.MinLevel = 19
+
+# Cost of dual specialization in copper.
+# 10000 copper = 1 gold
+# Default: 10000
+DualSpec19.Cost = 10000
