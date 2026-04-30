@@ -1,0 +1,26 @@
+################################################################################
+# NostrumWoW Progression Module Configuration
+################################################################################
+
+[worldserver]
+
+# Enable or disable the progression module.
+# Default: 1 (enabled)
+Nostrum.Progression.Enable = 1
+
+# The current phase level cap.
+# Players above this level will be reduced to it on login and on leveling.
+# Default: 19
+Nostrum.Progression.LevelCap = 19
+
+# Display name for the current phase shown in login/cap messages.
+# Default: "Phase 1"
+Nostrum.Progression.PhaseName = "Phase 1"
+
+# Allow GMs (security level >= 2) to bypass the level cap.
+# Default: 1 (GMs are exempt)
+Nostrum.Progression.GmBypass = 1
+
+# Send an announcement on login showing the current phase and level cap.
+# Default: 1 (enabled)
+Nostrum.Progression.LoginAnnouncement = 1
