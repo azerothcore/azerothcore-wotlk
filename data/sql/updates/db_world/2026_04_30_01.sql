@@ -1,3 +1,4 @@
+-- DB update 2026_04_30_00 -> 2026_04_30_01
 --
 -- BRD: Hurley Blackbreath (9537) and Blackbreath Cronies (per-spawn
 -- overrides -71997/-71998/-71999) start with UNIT_FLAG_UNK_6 |
