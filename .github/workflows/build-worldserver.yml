@@ -23,6 +23,7 @@ jobs:
           sudo apt-get install -y \
             build-essential \
             cmake \
+            file \
             clang \
             libmysqlclient-dev \
             libssl-dev \
@@ -51,19 +52,23 @@ jobs:
         run: |
           mkdir -p docker-image
 
-          echo "Searching for compiled worldserver binary..."
-          find build -type f -name "worldserver" -print
+          echo "Searching for worldserver candidates..."
+          find build -name "worldserver" -print -exec ls -lah {} \; || true
 
-          if [ -f build/bin/worldserver ]; then
-            cp build/bin/worldserver docker-image/worldserver
-          elif [ -f build/src/server/apps/worldserver/worldserver ]; then
-            cp build/src/server/apps/worldserver/worldserver docker-image/worldserver
-          else
-            echo "worldserver binary not found"
+          WORLD_BIN="$(find build -type f -name worldserver -perm /111 | head -n 1)"
+
+          if [ -z "$WORLD_BIN" ]; then
+            echo "Executable worldserver binary not found"
+            echo "All worldserver paths:"
+            find build -name "worldserver" -print -exec file {} \; || true
             exit 1
           fi
 
+          echo "Using binary: $WORLD_BIN"
+          cp "$WORLD_BIN" docker-image/worldserver
+          chmod +x docker-image/worldserver
           ls -lah docker-image/worldserver
+          file docker-image/worldserver
 
           cat > docker-image/Dockerfile <<'EOF'
           FROM acore/ac-wotlk-worldserver:master
