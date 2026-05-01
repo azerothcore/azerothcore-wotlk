@@ -824,6 +824,42 @@ class spell_blight_fog : public SpellScript
     }
 };
 
+// 51910 - Kickin' Nass: Quest Completion
+class spell_kickin_nass_quest_completion : public SpellScript {
+  PrepareSpellScript(spell_kickin_nass_quest_completion);
+
+  bool Load() override {
+    Unit *caster = GetCaster();
+    if (caster && caster->IsPlayer())
+      return true;
+
+    return false;
+  }
+
+  void DespawnNass(SpellEffIndex effIndex) {
+    uint32 effect = GetSpellInfo()->Effects[effIndex].Effect;
+    if (effect != SPELL_EFFECT_DUMMY && effect != SPELL_EFFECT_SCRIPT_EFFECT)
+      return;
+
+    Unit *caster = GetCaster();
+    Creature *creature = GetHitCreature();
+    if (!caster || !creature)
+      return;
+
+    if (creature->GetEntry() != 28521 ||
+        creature->GetCharmerOrOwnerGUID() != caster->GetGUID())
+      return;
+
+    creature->DespawnOrUnsummon(1ms);
+  }
+
+  void Register() override {
+    OnEffectHitTarget +=
+        SpellEffectFn(spell_kickin_nass_quest_completion::DespawnNass,
+                      EFFECT_ALL, SPELL_EFFECT_SCRIPT_EFFECT);
+  }
+};
+
 void AddSC_zuldrak()
 {
     new npc_finklestein();
@@ -835,4 +871,5 @@ void AddSC_zuldrak()
 
     RegisterSpellScript(spell_scourge_disguise_instability);
     RegisterSpellScript(spell_blight_fog);
+    RegisterSpellScript(spell_kickin_nass_quest_completion);
 }
