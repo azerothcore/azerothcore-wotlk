@@ -86,10 +86,10 @@ NostrumBGXP.DailyFirstWin.ResetHour   = 6
 # MinimumContributionScore: minimum score before XP is granted.
 #
 # Contribution is computed from:
-#   HonorableKills * HonorKill points
-#   Objectives (flags captured/returned, bases assaulted/defended) * Objective points
+#   KillingBlows * HonorKill points  (GetHonorableKills is protected; killing blows used instead)
 #   DamageDone >= Threshold -> DamageDonePoints
 #   HealingDone >= Threshold -> HealingDonePoints
+#   (Objectives/attrs are protected on BattlegroundScore and cannot be read from module code)
 #
 # NoParticipation*XP: flat XP given to non-participants (set to 0 to give nothing).
 ################################################################################

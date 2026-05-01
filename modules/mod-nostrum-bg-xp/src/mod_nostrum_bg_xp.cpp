@@ -305,12 +305,12 @@ float GetBGMultiplier(BattlegroundTypeId typeId)
 }
 
 // Calculates contribution score from BG end-of-match stats.
-// Note: BattlegroundScore::GetAttr1()/GetAttr2() are protected and inaccessible
-// from module code, so objective events cannot contribute to this score.
+// Only GetKillingBlows(), GetDamageDone(), and GetHealingDone() are public on
+// BattlegroundScore. GetHonorableKills(), GetAttr1/2(), etc. are protected.
 int32 CalcContribution(BattlegroundScore const* score)
 {
     int32 c = 0;
-    c += (int32)score->GetHonorableKills() * gCfg.contribHKPoints;
+    c += (int32)score->GetKillingBlows() * gCfg.contribHKPoints;
     if (score->GetDamageDone() >= gCfg.contribDamageThresh)
         c += gCfg.contribDamagePoints;
     if (score->GetHealingDone() >= gCfg.contribHealThresh)
