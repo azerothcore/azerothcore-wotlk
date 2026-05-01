@@ -47,8 +47,7 @@ class spell_kickin_nass_quest_completion : public SpellScript {
     Unit *caster = GetCaster();
     if (caster && caster->IsPlayer()) {
       LOG_INFO("time.update",
-               "spell_kickin_nass_quest_completion: caster {} is a player",
-               caster ? caster->GetGUID().ToString() : "none");
+               "spell_kickin_nass_quest_completion: caster is a player");
       return true;
     }
 
@@ -71,7 +70,7 @@ class spell_kickin_nass_quest_completion : public SpellScript {
 
     Unit *caster = GetCaster();
     Creature *creature = GetHitCreature();
-    if (creature->GetEntry() != 28521 ||
+    if (creature->GetEntry() == 28521 &&
         creature->GetCharmerOrOwnerGUID() != caster->GetGUID()) {
       LOG_INFO("time.update",
                "spell_kickin_nass_quest_completion: hit creature {} ({}) "
@@ -81,10 +80,8 @@ class spell_kickin_nass_quest_completion : public SpellScript {
     }
 
     LOG_INFO("time.update",
-             "spell_kickin_nass_quest_completion: despawning creature {} ({}) "
-             "from spell {} effect {} ",
-             creature->GetEntry(), creature->GetGUID().ToString(),
-             GetSpellInfo()->Id, uint32(effIndex));
+             "spell_kickin_nass_quest_completion: despawning creature {} ({}) ",
+             creature->GetEntry(), creature->GetGUID().ToString());
     creature->DespawnOrUnsummon(1ms);
   }
 
