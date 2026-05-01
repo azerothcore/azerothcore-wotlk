@@ -1,3 +1,4 @@
+-- DB update 2026_05_01_03 -> 2026_05_01_04
 
 -- Set Quest Pre-requisite From the Depths of Azjol-Nerub for Strength of Icemist.
 UPDATE `quest_template_addon` SET `PrevQuestID` = 12036 WHERE (`ID` = 12063);
