@@ -1,3 +1,4 @@
+-- DB update 2026_04_30_03 -> 2026_05_01_00
 -- RBAC Language strings (uses {} format placeholders for Acore::StringFormat)
 DELETE FROM `acore_string` WHERE `entry` BETWEEN 63 AND 79;
 INSERT INTO `acore_string` (`entry`, `content_default`) VALUES

@@ -1,3 +1,4 @@
+-- DB update 2025_07_24_00 -> 2026_05_01_00
 -- RBAC System for AzerothCore
 -- Ported from TrinityCore
 

@@ -1,3 +1,4 @@
+-- DB update 2026_05_01_00 -> 2026_05_01_01
 -- RBAC command help strings
 DELETE FROM `acore_string` WHERE `entry` BETWEEN 83 AND 86;
 INSERT INTO `acore_string` (`entry`, `content_default`) VALUES
