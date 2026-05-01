@@ -46,16 +46,12 @@ NostrumBGXP.LossMultiplier = 0.35
 ################################################################################
 # Objective XP
 #
-# Granted based on BG score objectives at match end.
-# Counted from BG-specific stats (flag captures+returns, base assaults+defenses).
-# Capped at MaxEventsPerBG to prevent excessive XP.
-#
-# NOTE: Objective source uses Attr1+Attr2 from BattlegroundScore, which covers
-# WSG (flag captures + returns), AB (assaults + defenses), and EOTS (captures).
-# AV and other BGs may report different values; test before adjusting multiplier.
+# NOTE: Objective XP is currently not implemented. BattlegroundScore::GetAttr1()
+# and GetAttr2() are protected virtual methods inaccessible from module code.
+# These settings are reserved for a future implementation.
 ################################################################################
 
-NostrumBGXP.ObjectiveXP.Enable         = 1
+NostrumBGXP.ObjectiveXP.Enable         = 0
 NostrumBGXP.ObjectiveXP.PercentOfLevel = 0.005
 NostrumBGXP.ObjectiveXP.Multiplier     = 1.0
 NostrumBGXP.ObjectiveXP.MaxEventsPerBG = 10

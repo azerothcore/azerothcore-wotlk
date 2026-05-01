@@ -305,11 +305,12 @@ float GetBGMultiplier(BattlegroundTypeId typeId)
 }
 
 // Calculates contribution score from BG end-of-match stats.
+// Note: BattlegroundScore::GetAttr1()/GetAttr2() are protected and inaccessible
+// from module code, so objective events cannot contribute to this score.
 int32 CalcContribution(BattlegroundScore const* score)
 {
     int32 c = 0;
     c += (int32)score->GetHonorableKills() * gCfg.contribHKPoints;
-    c += (int32)(score->GetAttr1() + score->GetAttr2()) * gCfg.contribObjPoints;
     if (score->GetDamageDone() >= gCfg.contribDamageThresh)
         c += gCfg.contribDamagePoints;
     if (score->GetHealingDone() >= gCfg.contribHealThresh)
@@ -491,14 +492,10 @@ public:
         uint32 totalXP = uint32(nextLevelXP * completionPct * gCfg.completionMult * bgMult * wlMult);
 
         // ---- Objective XP ----------------------------------------------
+        // Objective events come from BattlegroundScore::GetAttr1()/GetAttr2(),
+        // which are protected virtual methods inaccessible from module code.
+        // Objective XP is therefore not implemented here.
         uint32 objectiveXP = 0;
-        if (gCfg.objectiveEnabled && score)
-        {
-            uint32 objEvents = std::min(score->GetAttr1() + score->GetAttr2(),
-                                        gCfg.maxObjectiveEvents);
-            objectiveXP = uint32(nextLevelXP * gCfg.objectivePercent * gCfg.objectiveMult * objEvents);
-            totalXP += objectiveXP;
-        }
 
         // ---- Daily first win bonus -------------------------------------
         bool dailyApplied = false;
