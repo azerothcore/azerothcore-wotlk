@@ -328,7 +328,7 @@ class NostrumBGXPWorldScript : public WorldScript
 {
 public:
     NostrumBGXPWorldScript() : WorldScript("NostrumBGXPWorldScript",
-        { WORLDHOOK_ON_AFTER_CONFIG_LOAD })
+        { WORLDHOOK_ON_AFTER_CONFIG_LOAD, WORLDHOOK_ON_STARTUP })
     {
     }
 
@@ -337,6 +337,18 @@ public:
         LoadConfig();
         if (reload)
             LOG_INFO("module", ">> NostrumBGXP: config reloaded");
+    }
+
+    void OnStartup() override
+    {
+        CharacterDatabase.Execute(
+            "CREATE TABLE IF NOT EXISTS `character_bg_xp_daily` ("
+            "  `guid`          INT UNSIGNED NOT NULL,"
+            "  `last_win_date` INT UNSIGNED NOT NULL DEFAULT 0,"
+            "  PRIMARY KEY (`guid`)"
+            ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+        LOG_INFO("module", ">> NostrumBGXP: ensured character_bg_xp_daily table exists");
     }
 };
 
