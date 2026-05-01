@@ -1,0 +1,155 @@
+################################################################################
+# NostrumWoW Battleground XP Module
+#
+# XP formula:
+#   TotalXP = BaseXP * WinMult (or LossMult) + ObjectiveXP
+#   BaseXP  = XPForLevel(level) * CompletionPercent * BaseMultiplier * BGMultiplier
+#   First daily win: TotalXP * DailyFirstWinMultiplier
+#
+# Requires: character_bg_xp_daily DB table (see data/sql/db-characters/base/)
+################################################################################
+
+[worldserver]
+
+# Master switch. 0 disables all custom BG XP.
+NostrumBGXP.Enable = 1
+
+# Enable verbose debug output (shown in server log, not in-game).
+NostrumBGXP.Debug = 0
+
+################################################################################
+# Level limits
+#
+# Players outside this range receive no BG XP from this module.
+# MaxLevel default 79: level 80 players should focus on honor/gear.
+################################################################################
+
+NostrumBGXP.MinLevel = 10
+NostrumBGXP.MaxLevel = 79
+
+################################################################################
+# Completion XP
+#
+# PercentOfLevel: fraction of "XP for next level" granted per BG completion.
+#   Valid range: 0.0 - 0.25
+# BaseMultiplier: global multiplier on top of PercentOfLevel.
+################################################################################
+
+NostrumBGXP.CompletionXP.Enable           = 1
+NostrumBGXP.CompletionXP.PercentOfLevel   = 0.035
+NostrumBGXP.CompletionXP.BaseMultiplier   = 1.0
+
+# Win and loss modifiers (applied to BaseCompletionXP).
+NostrumBGXP.WinMultiplier  = 1.0
+NostrumBGXP.LossMultiplier = 0.35
+
+################################################################################
+# Objective XP
+#
+# Granted based on BG score objectives at match end.
+# Counted from BG-specific stats (flag captures+returns, base assaults+defenses).
+# Capped at MaxEventsPerBG to prevent excessive XP.
+#
+# NOTE: Objective source uses Attr1+Attr2 from BattlegroundScore, which covers
+# WSG (flag captures + returns), AB (assaults + defenses), and EOTS (captures).
+# AV and other BGs may report different values; test before adjusting multiplier.
+################################################################################
+
+NostrumBGXP.ObjectiveXP.Enable         = 1
+NostrumBGXP.ObjectiveXP.PercentOfLevel = 0.005
+NostrumBGXP.ObjectiveXP.Multiplier     = 1.0
+NostrumBGXP.ObjectiveXP.MaxEventsPerBG = 10
+
+################################################################################
+# Honorable Kill XP
+#
+# Disabled by default to prevent kill-trading and farming.
+# If enabled, grants XP per HK while in a BG, capped at MaxEventsPerBG.
+################################################################################
+
+NostrumBGXP.HonorableKillXP.Enable         = 0
+NostrumBGXP.HonorableKillXP.PercentOfLevel = 0.001
+NostrumBGXP.HonorableKillXP.MaxEventsPerBG = 25
+
+################################################################################
+# Daily First Win Bonus
+#
+# First BG win of the day grants TotalXP * Multiplier instead of base TotalXP.
+# ResetHour is UTC hour at which the daily window resets (0-23).
+# Requires: character_bg_xp_daily table in characters DB.
+################################################################################
+
+NostrumBGXP.DailyFirstWin.Enable      = 1
+NostrumBGXP.DailyFirstWin.Multiplier  = 2.0
+NostrumBGXP.DailyFirstWin.ResetHour   = 6
+
+################################################################################
+# Participation / Anti-AFK System
+#
+# RequireParticipation: if 1, players below MinimumContributionScore get no XP.
+# MinimumContributionScore: minimum score before XP is granted.
+#
+# Contribution is computed from:
+#   HonorableKills * HonorKill points
+#   Objectives (flags captured/returned, bases assaulted/defended) * Objective points
+#   DamageDone >= Threshold -> DamageDonePoints
+#   HealingDone >= Threshold -> HealingDonePoints
+#
+# NoParticipation*XP: flat XP given to non-participants (set to 0 to give nothing).
+################################################################################
+
+NostrumBGXP.RequireParticipation        = 1
+NostrumBGXP.MinimumContributionScore    = 1
+
+NostrumBGXP.Contribution.HonorKill             = 1
+NostrumBGXP.Contribution.Objective             = 3
+NostrumBGXP.Contribution.DamageDoneThreshold   = 1000
+NostrumBGXP.Contribution.HealingDoneThreshold  = 1000
+NostrumBGXP.Contribution.DamageDonePoints      = 1
+NostrumBGXP.Contribution.HealingDonePoints     = 1
+
+NostrumBGXP.NoParticipationWinXP   = 0
+NostrumBGXP.NoParticipationLossXP  = 0
+
+################################################################################
+# Level Range Scaling
+#
+# When enabled, per-bracket CompletionPercent overrides the global value.
+# Brackets is a comma-separated list of range strings that match keys below.
+# Missing ranges fall back to the global CompletionXP.PercentOfLevel.
+################################################################################
+
+NostrumBGXP.LevelRange.Enable    = 1
+NostrumBGXP.LevelRange.Brackets  = 10-19,20-29,30-39,40-49,50-59,60-69,70-79
+
+NostrumBGXP.LevelRange.10-19.CompletionPercent = 0.040
+NostrumBGXP.LevelRange.20-29.CompletionPercent = 0.040
+NostrumBGXP.LevelRange.30-39.CompletionPercent = 0.038
+NostrumBGXP.LevelRange.40-49.CompletionPercent = 0.038
+NostrumBGXP.LevelRange.50-59.CompletionPercent = 0.035
+NostrumBGXP.LevelRange.60-69.CompletionPercent = 0.032
+NostrumBGXP.LevelRange.70-79.CompletionPercent = 0.028
+
+################################################################################
+# Battleground-Specific Multipliers
+#
+# Multiplies the total XP (after win/loss modifier) for specific BG types.
+# 1.0 = no change. Set to 0 to effectively disable XP for a BG type.
+################################################################################
+
+NostrumBGXP.Battleground.WSG.Multiplier  = 1.0
+NostrumBGXP.Battleground.AB.Multiplier   = 1.0
+NostrumBGXP.Battleground.AV.Multiplier   = 1.0
+NostrumBGXP.Battleground.EOTS.Multiplier = 1.0
+NostrumBGXP.Battleground.SOTA.Multiplier = 1.0
+NostrumBGXP.Battleground.IOC.Multiplier  = 1.0
+
+################################################################################
+# Player Announcements
+#
+# AnnounceXP: send in-game message with XP earned at BG end.
+# AnnounceNoParticipation: send message when player fails participation check.
+################################################################################
+
+NostrumBGXP.AnnounceXP              = 1
+NostrumBGXP.AnnounceNoParticipation = 1
