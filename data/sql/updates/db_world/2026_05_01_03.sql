@@ -1,3 +1,4 @@
+-- DB update 2026_05_01_02 -> 2026_05_01_03
 --
 -- Add an explicit CallForHelp action with a 60-yard radius because CallForAssistance's default 10-yard range is too small.
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 16573) AND (`source_type` = 0) AND (`id` = 6);
