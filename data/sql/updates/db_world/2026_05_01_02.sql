@@ -1,3 +1,4 @@
+-- DB update 2026_05_01_01 -> 2026_05_01_02
 
 -- Set Aura for Scarlet Inquisitor (corpse)
 UPDATE `creature_template_addon` SET `auras` = '29266 52951' WHERE `entry` = 29029;
