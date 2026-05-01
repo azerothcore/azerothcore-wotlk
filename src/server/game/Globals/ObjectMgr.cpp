@@ -3332,10 +3332,12 @@ void ObjectMgr::LoadItemTemplates()
         itemTemplate.ContainerSlots            = uint32(fields[26].Get<uint8>());
 
         uint8 statsCount = 0;
-        while (statsCount < MAX_ITEM_PROTO_STATS)
+        uint8 statsIterator = 0;
+        while (statsIterator < MAX_ITEM_PROTO_STATS)
         {
-            uint32 statType = uint32(fields[27 + statsCount * 2].Get<uint8>());
-            int32 statValue = fields[28 + statsCount * 2].Get<int32>();
+            uint32 statType = uint32(fields[27 + statsIterator * 2].Get<uint8>());
+            int32 statValue = fields[28 + statsIterator * 2].Get<int32>();
+            statsIterator++;
             if (statValue == 0)
                 continue;
 
