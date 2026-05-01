@@ -1,0 +1,145 @@
+################################################################################
+# NostrumWoW Rates Module
+#
+# All rates stack on top of worldserver.conf rates.
+# Set Rate.XP.Kill, Rate.XP.Quest, Rate.Drop.Item.*, etc. to 1.0 in
+# worldserver.conf to give this module full control.
+#
+# Valid range for all multipliers: 0.0 - 100.0
+# Invalid values are rejected and the default is used (a warning is logged).
+################################################################################
+
+[worldserver]
+
+# Master switch. Set to 0 to disable all rate modifications.
+# Default: 1
+NostrumRates.Enable = 1
+
+################################################################################
+# XP Rates
+#
+# These multiply XP gained from each source on top of worldserver.conf rates.
+# NOTE: Rested XP cannot be modified via module hooks (worldserver.conf only).
+################################################################################
+
+# Kill XP for normal (non-elite, non-dungeon) creatures.
+NostrumRates.XP.Kill = 3.0
+
+# Quest XP (including Dungeon Finder quests).
+NostrumRates.XP.Quest = 3.0
+
+# Exploration XP.
+NostrumRates.XP.Explore = 3.0
+
+# Battleground XP (XPSOURCE_BATTLEGROUND).
+NostrumRates.XP.Battleground = 1.0
+
+# Kill XP when player is inside a dungeon or raid instance.
+# Takes priority over Elite rate when in an instance.
+NostrumRates.XP.Dungeon = 3.0
+
+# Kill XP for elite creatures outside instances.
+NostrumRates.XP.Elite = 3.0
+
+################################################################################
+# XP Level Range Overrides
+#
+# When enabled, the rates below override the global XP rates for players
+# within the specified level ranges. Any rate not defined in a range falls
+# back to the global value above.
+#
+# Brackets is a comma-separated list of range strings that match the keys below.
+# Invalid or out-of-bounds ranges are skipped with a warning.
+################################################################################
+
+NostrumRates.XP.LevelRange.Enable = 1
+
+# Comma-separated list of range strings to read. Must match the keys below.
+NostrumRates.XP.LevelRange.Brackets = 1-59,60-69,70-80
+
+NostrumRates.XP.LevelRange.1-59.Kill    = 3.0
+NostrumRates.XP.LevelRange.1-59.Quest   = 3.0
+NostrumRates.XP.LevelRange.1-59.Explore = 3.0
+
+NostrumRates.XP.LevelRange.60-69.Kill    = 3.0
+NostrumRates.XP.LevelRange.60-69.Quest   = 3.0
+NostrumRates.XP.LevelRange.60-69.Explore = 3.0
+
+NostrumRates.XP.LevelRange.70-80.Kill    = 2.0
+NostrumRates.XP.LevelRange.70-80.Quest   = 2.0
+NostrumRates.XP.LevelRange.70-80.Explore = 2.0
+
+################################################################################
+# Reputation Rates
+#
+# Kill reputation: from killing creatures with faction rep.
+# Quest reputation: from completing quests (daily, weekly, monthly, repeatable).
+#
+# Spillover reputation fires the same hook as its source (kill/quest), so
+# the same multiplier applies to it automatically.
+################################################################################
+
+NostrumRates.Reputation.Kill  = 2.0
+NostrumRates.Reputation.Quest = 2.0
+
+################################################################################
+# Profession Skill Gain
+#
+# Gathering: mining, herbalism, skinning (OnPlayerUpdateGatheringSkill).
+# Crafting:  all tradeskill crafting (OnPlayerUpdateCraftingSkill).
+#
+# NOTE: Fishing skill gain cannot be modified via the available hooks.
+#       Fishing catch loot rate is controlled under Loot.Fishing below.
+################################################################################
+
+NostrumRates.Profession.GatheringSkillGain = 2.0
+NostrumRates.Profession.CraftingSkillGain  = 2.0
+
+################################################################################
+# Loot Drop Chance Multipliers
+#
+# Applied to item drop chance rolls. Values > 1 increase drop frequency;
+# values < 1 decrease it. Does not affect guaranteed drops (100% chance).
+#
+# IMPORTANT: Mining and Herbalism cannot be distinguished — both go through
+# gameobject_loot_template. The Mining rate is applied to both.
+# Set Herbalism to the same value as Mining to avoid a warning on startup.
+#
+# Quest items: multiplied like any other item but be careful — some quest
+# items already have very high drop rates and doubling them may break
+# single-drop quest items. Keep at 1.0 unless you understand the risk.
+################################################################################
+
+NostrumRates.Loot.Creature      = 1.0
+NostrumRates.Loot.Skinning      = 1.0
+NostrumRates.Loot.Fishing       = 1.0
+NostrumRates.Loot.Mining        = 1.0
+NostrumRates.Loot.Herbalism     = 1.0  # must equal Mining (see note above)
+NostrumRates.Loot.Disenchanting = 1.0
+NostrumRates.Loot.Prospecting   = 1.0
+NostrumRates.Loot.Milling       = 1.0
+
+################################################################################
+# Money Rates
+#
+# Creature: multiplies gold dropped in creature loot (OnPlayerBeforeLootMoney).
+#
+# NOTE: Quest money rewards cannot be multiplied via module hooks.
+#       Vendor sell price cannot be multiplied via module hooks.
+#       Both require changes to worldserver.conf (Rate.Money.Quest,
+#       no built-in vendor sell rate exists in vanilla AzerothCore).
+################################################################################
+
+NostrumRates.Money.Creature = 1.0
+
+################################################################################
+# PvP Rates
+#
+# Honor: multiplies honor from PvP kills (OnHonorCalculation).
+# ArenaPoints: multiplies arena point reward per team (OnGetArenaPoints).
+#
+# NOTE: Battleground mark rewards cannot be modified via module hooks.
+################################################################################
+
+NostrumRates.PvP.Honor       = 1.0
+NostrumRates.PvP.ArenaPoints = 1.0
