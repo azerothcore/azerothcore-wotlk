@@ -3336,8 +3336,8 @@ void ObjectMgr::LoadItemTemplates()
         {
             uint32 statType = uint32(fields[27 + statsCount * 2].Get<uint8>());
             int32 statValue = fields[28 + statsCount * 2].Get<int32>();
-            if (statType == 0)
-                break;
+            if (statValue == 0)
+                continue;
 
             itemTemplate.ItemStat[statsCount].ItemStatType = statType;
             itemTemplate.ItemStat[statsCount].ItemStatValue = statValue;
