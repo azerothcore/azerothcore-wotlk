@@ -1,0 +1,30 @@
+################################################################################
+# Level Rewards Module Configuration
+################################################################################
+
+[worldserver]
+
+# Enable or disable this module.
+# Default: 1 (enabled)
+LevelRewards.Enable = 1
+
+# Subject line of the reward mail.
+# Supports {level} placeholder.
+# Default: "Level {level} Milestone Reward!"
+LevelRewards.Subject = "Level {level} Milestone Reward!"
+
+# Body of the reward mail.
+# Supports {level} placeholder.
+# Default: (community message)
+LevelRewards.Message = "Congratulations on reaching level {level}! The whole NostrumWoW community is thrilled to have you with us. Whether you are a seasoned veteran or just beginning your journey through Azeroth, every level you earn is a testament to your dedication. We hope you are enjoying the adventure — and we look forward to seeing everything you accomplish next. Keep exploring, keep making memories, and most importantly, have fun! A small gift awaits you in the attachment to help on your way. Safe travels, adventurer. — The NostrumWoW Team"
+
+# Gold reward per level milestone (in whole gold).
+# Set to 0 to disable a specific level.
+LevelRewards.Gold.10 = 1
+LevelRewards.Gold.20 = 3
+LevelRewards.Gold.30 = 8
+LevelRewards.Gold.40 = 15
+LevelRewards.Gold.50 = 30
+LevelRewards.Gold.60 = 50
+LevelRewards.Gold.70 = 80
+LevelRewards.Gold.80 = 100
