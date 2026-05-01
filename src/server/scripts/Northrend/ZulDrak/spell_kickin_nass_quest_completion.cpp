@@ -40,48 +40,30 @@
 
 // 51910 - Kickin' Nass: Quest Completion
 class spell_kickin_nass_quest_completion : public SpellScript {
-  // Macro for setting up Callbacks, etc.
   PrepareSpellScript(spell_kickin_nass_quest_completion);
 
   bool Load() override {
     Unit *caster = GetCaster();
-    if (caster && caster->IsPlayer()) {
-      LOG_INFO("time.update",
-               "spell_kickin_nass_quest_completion: caster is a player");
+    if (caster && caster->IsPlayer())
       return true;
-    }
 
-    LOG_INFO("time.update",
-             "spell_kickin_nass_quest_completion: skipped. caster {} is not a "
-             "player",
-             caster ? caster->GetGUID().ToString() : "none");
     return false;
   }
 
   void DespawnNass(SpellEffIndex effIndex) {
     uint32 effect = GetSpellInfo()->Effects[effIndex].Effect;
-    if (effect != SPELL_EFFECT_DUMMY && effect != SPELL_EFFECT_SCRIPT_EFFECT) {
-      LOG_INFO("time.update",
-               "spell_kickin_nass_quest_completion: ignored spell {} effect {} "
-               "type {}",
-               GetSpellInfo()->Id, uint32(effIndex), effect);
+    if (effect != SPELL_EFFECT_DUMMY && effect != SPELL_EFFECT_SCRIPT_EFFECT)
       return;
-    }
 
     Unit *caster = GetCaster();
     Creature *creature = GetHitCreature();
-    if (creature->GetEntry() == 28521 &&
-        creature->GetCharmerOrOwnerGUID() != caster->GetGUID()) {
-      LOG_INFO("time.update",
-               "spell_kickin_nass_quest_completion: hit creature {} ({}) "
-               "does not belong to player ",
-               creature->GetEntry(), creature->GetGUID().ToString());
+    if (!caster || !creature)
       return;
-    }
 
-    LOG_INFO("time.update",
-             "spell_kickin_nass_quest_completion: despawning creature {} ({}) ",
-             creature->GetEntry(), creature->GetGUID().ToString());
+    if (creature->GetEntry() != 28521 ||
+        creature->GetCharmerOrOwnerGUID() != caster->GetGUID())
+      return;
+
     creature->DespawnOrUnsummon(1ms);
   }
 
