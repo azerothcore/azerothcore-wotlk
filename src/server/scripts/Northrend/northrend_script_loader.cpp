@@ -174,6 +174,7 @@ void AddSC_icecrown();
 void AddSC_sholazar_basin();
 void AddSC_storm_peaks();
 void AddSC_zuldrak();
+void AddSC_spell_kickin_nass_quest_completion();
 void AddSC_crystalsong_forest();
 void AddSC_isle_of_conquest();
 void AddSC_wintergrasp();
@@ -340,6 +341,7 @@ void AddNorthrendScripts()
     AddSC_sholazar_basin();
     AddSC_storm_peaks();
     AddSC_zuldrak();
+    AddSC_spell_kickin_nass_quest_completion();
     AddSC_crystalsong_forest();
     AddSC_isle_of_conquest();
     AddSC_wintergrasp();
