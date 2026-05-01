@@ -924,6 +924,7 @@ struct boss_sartharion_dragonAI : public BossAI
             // Dragon speaks and starts flying to landing position
             Talk(SAY_DRAKE_RESPOND);
             me->GetMotionMaster()->Clear();
+            extraEvents.CancelEvent(EVENT_DRAGON_PATROL_WAYPOINT);
             me->SetDisableGravity(true);
             me->SetHover(true);
             me->SetAnimTier(AnimTier::Fly);
