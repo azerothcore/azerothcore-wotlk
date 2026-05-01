@@ -66,6 +66,19 @@ public:
 };
 
 /*######
+## Quest 11280: Draconis Gastritis
+######*/
+enum DraconisGastritis
+{
+    NPC_PROTO_DRAKE                  = 23689,
+    NPC_DRACONIS_GASTRITIS_BUNNY     = 24170,
+    QUEST_DRACONIS_GASTRITIS         = 11280,
+    SPELL_DRAKE_VOMIT_EMOTE          = 43168,
+    BUNNY_CHECK_TIMER                = 1000,
+    BUNNY_AGGRO_RADIUS               = 30.0f,
+};
+
+/*######
 ## npc_apothecary_hanes
 ######*/
 enum Entries
@@ -417,11 +430,62 @@ class spell_the_cleansing_on_death_cast_on_master : public SpellScript
     }
 };
 
+// NPC 24170 - Draconis Gastritis Bunny
+// Summoned by spell 43172 (Tillinghast's Plagued Meat).
+// Polls for a nearby Proto-Drake (NPC 23689); when found, grants quest credit.
+struct npc_draconis_gastritis_bunny : public NullCreatureAI
+{
+    npc_draconis_gastritis_bunny(Creature* creature) : NullCreatureAI(creature),
+        _checkTimer(BUNNY_CHECK_TIMER), _creditGiven(false) { }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (_creditGiven)
+            return;
+
+        if (_checkTimer <= diff)
+        {
+            _checkTimer = BUNNY_CHECK_TIMER;
+
+            Creature* drake = me->FindNearestCreature(NPC_PROTO_DRAKE, BUNNY_AGGRO_RADIUS, true);
+            if (!drake)
+                return;
+
+            Player* player = nullptr;
+            if (me->IsSummon())
+                if (Unit* summoner = me->ToTempSummon()->GetSummonerUnit())
+                    player = summoner->ToPlayer();
+
+            if (!player)
+                return;
+
+            if (player->GetQuestStatus(QUEST_DRACONIS_GASTRITIS) != QUEST_STATUS_INCOMPLETE)
+                return;
+
+            drake->SetFacingToObject(me);
+            drake->HandleEmoteCommand(EMOTE_ONESHOT_EAT_NO_SHEATHE);
+            drake->CastSpell(drake, SPELL_DRAKE_VOMIT_EMOTE, true);
+
+            player->KilledMonsterCredit(NPC_DRACONIS_GASTRITIS_BUNNY);
+
+            _creditGiven = true;
+            me->DespawnOrUnsummon(3s);
+        }
+        else
+            _checkTimer -= diff;
+    }
+
+private:
+    uint32 _checkTimer;
+    bool   _creditGiven;
+};
+
 void AddSC_howling_fjord()
 {
     new npc_attracted_reef_bull();
     new npc_apothecary_hanes();
     new npc_plaguehound_tracker();
+	RegisterCreatureAI(npc_draconis_gastritis_bunny);
     RegisterCreatureAI(npc_rodin_lightning_enabler);
     RegisterSpellScript(spell_hawk_hunting);
     RegisterSpellScript(spell_the_cleansing_shrine_cast);
