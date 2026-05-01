@@ -181,21 +181,6 @@ struct instance_blackwing_lair : public InstanceScript
         return 0;
     }
 
-    bool CheckRequiredBosses(uint32 bossId, Player const* /* player */) const override
-    {
-        switch (bossId)
-        {
-            case DATA_BROODLORD_LASHLAYER:
-                if (GetBossState(DATA_VAELASTRAZ_THE_CORRUPT) != DONE)
-                    return false;
-                break;
-            default:
-                break;
-        }
-
-        return true;
-    }
-
     bool SetBossState(uint32 type, EncounterState state) override
     {
         if (!InstanceScript::SetBossState(type, state))
@@ -302,6 +287,24 @@ struct instance_blackwing_lair : public InstanceScript
         }
 
         return ObjectGuid::Empty;
+    }
+
+    bool CheckRequiredBosses(uint32 bossId, Player const* player) const override
+    {
+        if (_SkipCheckRequiredBosses(player))
+            return true;
+
+        switch (bossId)
+        {
+            case DATA_BROODLORD_LASHLAYER:
+                if (GetBossState(DATA_VAELASTRAZ_THE_CORRUPT) != DONE)
+                    return false;
+                break;
+            default:
+                break;
+        }
+
+        return true;
     }
 
     void OnUnitDeath(Unit* unit) override

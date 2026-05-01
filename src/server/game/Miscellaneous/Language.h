@@ -112,7 +112,10 @@ enum AcoreStrings
     LANG_PVPSTATS                       = 80,
     LANG_PVPSTATS_DISABLED              = 81,
     LANG_GENERIC_TWO_CURLIES_WITH_COLON = 82,
-    // Free 83 - 86
+    LANG_RBAC_HELP_ACC_LIST             = 83,
+    LANG_RBAC_HELP_ACC_GRANT            = 84,
+    LANG_RBAC_HELP_ACC_DENY             = 85,
+    LANG_RBAC_HELP_ACC_REVOKE           = 86,
 
     LANG_UNKNOWN_ERROR                  = 87,
     LANG_2FA_COMMANDS_NOT_SETUP         = 88,

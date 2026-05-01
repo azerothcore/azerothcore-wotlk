@@ -20,6 +20,7 @@
 #include "CommandScript.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "Realm.h"
 #include "TicketMgr.h"
 
@@ -34,30 +35,30 @@ public:
     {
         static ChatCommandTable ticketResponseCommandTable =
         {
-            { "append",         HandleGMTicketResponseAppendCommand,    SEC_GAMEMASTER,     Console::Yes },
-            { "appendln",       HandleGMTicketResponseAppendLnCommand,  SEC_GAMEMASTER,     Console::Yes },
-            { "delete",         HandleGMTicketResponseDeleteCommand,    SEC_GAMEMASTER,     Console::Yes },
-            { "show",           HandleGMTicketResponseShowCommand,      SEC_GAMEMASTER,     Console::Yes }
+            { "append",         HandleGMTicketResponseAppendCommand,    rbac::RBAC_PERM_COMMAND_TICKET_RESPONSE_APPEND,     Console::Yes },
+            { "appendln",       HandleGMTicketResponseAppendLnCommand,  rbac::RBAC_PERM_COMMAND_TICKET_RESPONSE_APPENDLN,   Console::Yes },
+            { "delete",         HandleGMTicketResponseDeleteCommand,    rbac::RBAC_PERM_COMMAND_TICKET_RESPONSE,            Console::Yes },
+            { "show",           HandleGMTicketResponseShowCommand,      rbac::RBAC_PERM_COMMAND_TICKET_RESPONSE,            Console::Yes }
         };
         static ChatCommandTable ticketCommandTable =
         {
-            { "assign",         HandleGMTicketAssignToCommand,          SEC_GAMEMASTER,     Console::Yes },
-            { "close",          HandleGMTicketCloseByIdCommand,         SEC_GAMEMASTER,     Console::Yes },
-            { "closedlist",     HandleGMTicketListClosedCommand,        SEC_GAMEMASTER,     Console::Yes },
-            { "comment",        HandleGMTicketCommentCommand,           SEC_GAMEMASTER,     Console::Yes },
-            { "complete",       HandleGMTicketCompleteCommand,          SEC_GAMEMASTER,     Console::Yes },
-            { "delete",         HandleGMTicketDeleteByIdCommand,        SEC_ADMINISTRATOR,  Console::Yes },
-            { "escalate",       HandleGMTicketEscalateCommand,          SEC_GAMEMASTER,     Console::Yes },
-            { "escalatedlist",  HandleGMTicketListEscalatedCommand,     SEC_GAMEMASTER,     Console::Yes },
-            { "list",           HandleGMTicketListCommand,              SEC_GAMEMASTER,     Console::Yes },
-            { "onlinelist",     HandleGMTicketListOnlineCommand,        SEC_GAMEMASTER,     Console::Yes },
-            { "reset",          HandleGMTicketResetCommand,             SEC_CONSOLE,        Console::Yes },
+            { "assign",         HandleGMTicketAssignToCommand,          rbac::RBAC_PERM_COMMAND_TICKET_ASSIGN,          Console::Yes },
+            { "close",          HandleGMTicketCloseByIdCommand,         rbac::RBAC_PERM_COMMAND_TICKET_CLOSE,           Console::Yes },
+            { "closedlist",     HandleGMTicketListClosedCommand,        rbac::RBAC_PERM_COMMAND_TICKET_CLOSEDLIST,      Console::Yes },
+            { "comment",        HandleGMTicketCommentCommand,           rbac::RBAC_PERM_COMMAND_TICKET_COMMENT,         Console::Yes },
+            { "complete",       HandleGMTicketCompleteCommand,          rbac::RBAC_PERM_COMMAND_TICKET_COMPLETE,        Console::Yes },
+            { "delete",         HandleGMTicketDeleteByIdCommand,        rbac::RBAC_PERM_COMMAND_TICKET_DELETE,          Console::Yes },
+            { "escalate",       HandleGMTicketEscalateCommand,          rbac::RBAC_PERM_COMMAND_TICKET_ESCALATE,        Console::Yes },
+            { "escalatedlist",  HandleGMTicketListEscalatedCommand,     rbac::RBAC_PERM_COMMAND_TICKET_ESCALATEDLIST,   Console::Yes },
+            { "list",           HandleGMTicketListCommand,              rbac::RBAC_PERM_COMMAND_TICKET_LIST,            Console::Yes },
+            { "onlinelist",     HandleGMTicketListOnlineCommand,        rbac::RBAC_PERM_COMMAND_TICKET_ONLINELIST,      Console::Yes },
+            { "reset",          HandleGMTicketResetCommand,             rbac::RBAC_PERM_COMMAND_TICKET_RESET,           Console::Yes },
 
             { "response",       ticketResponseCommandTable },
-            { "togglesystem",   HandleToggleGMTicketSystem,             SEC_ADMINISTRATOR,  Console::Yes },
-            { "unassign",       HandleGMTicketUnAssignCommand,          SEC_GAMEMASTER,     Console::Yes },
-            { "viewid",         HandleGMTicketGetByIdCommand,           SEC_GAMEMASTER,     Console::Yes },
-            { "viewname",       HandleGMTicketGetByNameCommand,         SEC_GAMEMASTER,     Console::Yes }
+            { "togglesystem",   HandleToggleGMTicketSystem,             rbac::RBAC_PERM_COMMAND_TICKET_TOGGLESYSTEM,    Console::Yes },
+            { "unassign",       HandleGMTicketUnAssignCommand,          rbac::RBAC_PERM_COMMAND_TICKET_UNASSIGN,        Console::Yes },
+            { "viewid",         HandleGMTicketGetByIdCommand,           rbac::RBAC_PERM_COMMAND_TICKET_VIEWID,          Console::Yes },
+            { "viewname",       HandleGMTicketGetByNameCommand,         rbac::RBAC_PERM_COMMAND_TICKET_VIEWNAME,        Console::Yes }
         };
         static ChatCommandTable commandTable =
         {

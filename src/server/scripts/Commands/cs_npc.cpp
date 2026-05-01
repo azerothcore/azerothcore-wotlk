@@ -29,6 +29,7 @@
 #include "Pet.h"
 #include "Player.h"
 #include "PoolMgr.h"
+#include "RBAC.h"
 #include "TargetedMovementGenerator.h"                      // for HandleNpcUnFollowCommand
 #include "Transport.h"
 #include <string>
@@ -143,58 +144,58 @@ public:
     {
         static ChatCommandTable npcAddCommandTable =
         {
-            { "formation",      HandleNpcAddFormationCommand,      SEC_ADMINISTRATOR, Console::No },
-            { "item",           HandleNpcAddVendorItemCommand,     SEC_ADMINISTRATOR, Console::No },
-            { "move",           HandleNpcAddMoveCommand,           SEC_ADMINISTRATOR, Console::No },
-            { "temp",           HandleNpcAddTempSpawnCommand,      SEC_ADMINISTRATOR, Console::No },
-            { "",               HandleNpcAddCommand,               SEC_ADMINISTRATOR, Console::No }
+            { "formation",      HandleNpcAddFormationCommand,      rbac::RBAC_PERM_COMMAND_NPC_ADD_FORMATION, Console::No },
+            { "item",           HandleNpcAddVendorItemCommand,     rbac::RBAC_PERM_COMMAND_NPC_ADD_ITEM,      Console::No },
+            { "move",           HandleNpcAddMoveCommand,           rbac::RBAC_PERM_COMMAND_NPC_ADD_MOVE,      Console::No },
+            { "temp",           HandleNpcAddTempSpawnCommand,      rbac::RBAC_PERM_COMMAND_NPC_ADD_TEMP,      Console::No },
+            { "",               HandleNpcAddCommand,               rbac::RBAC_PERM_COMMAND_NPC_ADD,           Console::No }
         };
         static ChatCommandTable npcDeleteCommandTable =
         {
-            { "item",           HandleNpcDeleteVendorItemCommand,  SEC_ADMINISTRATOR, Console::No },
-            { "",               HandleNpcDeleteCommand,            SEC_ADMINISTRATOR, Console::No }
+            { "item",           HandleNpcDeleteVendorItemCommand,  rbac::RBAC_PERM_COMMAND_NPC_DELETE_ITEM,   Console::No },
+            { "",               HandleNpcDeleteCommand,            rbac::RBAC_PERM_COMMAND_NPC_DELETE,        Console::No }
         };
         static ChatCommandTable npcFollowCommandTable =
         {
-            { "stop",           HandleNpcUnFollowCommand,          SEC_GAMEMASTER, Console::No },
-            { "",               HandleNpcFollowCommand,            SEC_GAMEMASTER, Console::No }
+            { "stop",           HandleNpcUnFollowCommand,          rbac::RBAC_PERM_COMMAND_NPC_FOLLOW_STOP,   Console::No },
+            { "",               HandleNpcFollowCommand,            rbac::RBAC_PERM_COMMAND_NPC_FOLLOW,        Console::No }
         };
 
         static ChatCommandTable npcFactionCommandTable =
         {
-            { "permanent",      HandleNpcSetFactionIdCommand,      SEC_ADMINISTRATOR, Console::No },
-            { "temp",           HandleNpcSetFactionTempIdCommand,  SEC_ADMINISTRATOR, Console::No },
-            { "original",       HandleNpcSetOriginalFaction,       SEC_ADMINISTRATOR, Console::No }
+            { "permanent",      HandleNpcSetFactionIdCommand,      rbac::RBAC_PERM_COMMAND_NPC_SET_FACTIONID, Console::No },
+            { "temp",           HandleNpcSetFactionTempIdCommand,  rbac::RBAC_PERM_COMMAND_NPC_SET_FACTIONID, Console::No },
+            { "original",       HandleNpcSetOriginalFaction,       rbac::RBAC_PERM_COMMAND_NPC_SET_FACTIONID, Console::No }
         };
 
         static ChatCommandTable npcSetCommandTable =
         {
-            { "allowmove",      HandleNpcSetAllowMovementCommand,  SEC_ADMINISTRATOR, Console::No },
-            { "entry",          HandleNpcSetEntryCommand,          SEC_ADMINISTRATOR, Console::No },
+            { "allowmove",      HandleNpcSetAllowMovementCommand,  rbac::RBAC_PERM_COMMAND_NPC_SET_ALLOWMOVE, Console::No },
+            { "entry",          HandleNpcSetEntryCommand,          rbac::RBAC_PERM_COMMAND_NPC_SET_ENTRY,     Console::No },
             { "faction",        npcFactionCommandTable},
-            { "flag",           HandleNpcSetFlagCommand,           SEC_ADMINISTRATOR, Console::No },
-            { "level",          HandleNpcSetLevelCommand,          SEC_ADMINISTRATOR, Console::No },
-            { "link",           HandleNpcSetLinkCommand,           SEC_ADMINISTRATOR, Console::No },
-            { "model",          HandleNpcSetModelCommand,          SEC_ADMINISTRATOR, Console::No },
-            { "movetype",       HandleNpcSetMoveTypeCommand,       SEC_ADMINISTRATOR, Console::No },
-            { "phase",          HandleNpcSetPhaseCommand,          SEC_ADMINISTRATOR, Console::No },
-            { "wanderdistance", HandleNpcSetWanderDistanceCommand, SEC_ADMINISTRATOR, Console::No },
-            { "spawntime",      HandleNpcSetSpawnTimeCommand,      SEC_ADMINISTRATOR, Console::No },
-            { "data",           HandleNpcSetDataCommand,           SEC_ADMINISTRATOR, Console::No }
+            { "flag",           HandleNpcSetFlagCommand,           rbac::RBAC_PERM_COMMAND_NPC_SET_FLAG,      Console::No },
+            { "level",          HandleNpcSetLevelCommand,          rbac::RBAC_PERM_COMMAND_NPC_SET_LEVEL,     Console::No },
+            { "link",           HandleNpcSetLinkCommand,           rbac::RBAC_PERM_COMMAND_NPC_SET_LINK,      Console::No },
+            { "model",          HandleNpcSetModelCommand,          rbac::RBAC_PERM_COMMAND_NPC_SET_MODEL,     Console::No },
+            { "movetype",       HandleNpcSetMoveTypeCommand,       rbac::RBAC_PERM_COMMAND_NPC_SET_MOVETYPE,  Console::No },
+            { "phase",          HandleNpcSetPhaseCommand,          rbac::RBAC_PERM_COMMAND_NPC_SET_PHASE,     Console::No },
+            { "wanderdistance", HandleNpcSetWanderDistanceCommand, rbac::RBAC_PERM_COMMAND_NPC_SET_SPAWNDIST, Console::No },
+            { "spawntime",      HandleNpcSetSpawnTimeCommand,      rbac::RBAC_PERM_COMMAND_NPC_SET_SPAWNTIME, Console::No },
+            { "data",           HandleNpcSetDataCommand,           rbac::RBAC_PERM_COMMAND_NPC_SET_DATA,      Console::No }
         };
         static ChatCommandTable npcCommandTable =
         {
-            { "info",           HandleNpcInfoCommand,              SEC_GAMEMASTER, Console::No },
-            { "guid",           HandleNpcGuidCommand,              SEC_GAMEMASTER, Console::No },
-            { "near",           HandleNpcNearCommand,              SEC_GAMEMASTER, Console::No },
-            { "move",           HandleNpcMoveCommand,              SEC_GAMEMASTER, Console::No },
-            { "playemote",      HandleNpcPlayEmoteCommand,         SEC_GAMEMASTER, Console::No },
-            { "say",            HandleNpcSayCommand,               SEC_GAMEMASTER, Console::No },
-            { "textemote",      HandleNpcTextEmoteCommand,         SEC_GAMEMASTER, Console::No },
-            { "whisper",        HandleNpcWhisperCommand,           SEC_GAMEMASTER, Console::No },
-            { "yell",           HandleNpcYellCommand,              SEC_GAMEMASTER, Console::No },
-            { "tame",           HandleNpcTameCommand,              SEC_GAMEMASTER, Console::No },
-            { "do",             HandleNpcDoActionCommand,          SEC_GAMEMASTER, Console::No },
+            { "info",           HandleNpcInfoCommand,              rbac::RBAC_PERM_COMMAND_NPC_INFO,          Console::No },
+            { "guid",           HandleNpcGuidCommand,              rbac::RBAC_PERM_COMMAND_NPC_INFO,          Console::No },
+            { "near",           HandleNpcNearCommand,              rbac::RBAC_PERM_COMMAND_NPC_NEAR,          Console::No },
+            { "move",           HandleNpcMoveCommand,              rbac::RBAC_PERM_COMMAND_NPC_MOVE,          Console::No },
+            { "playemote",      HandleNpcPlayEmoteCommand,         rbac::RBAC_PERM_COMMAND_NPC_PLAYEMOTE,     Console::No },
+            { "say",            HandleNpcSayCommand,               rbac::RBAC_PERM_COMMAND_NPC_SAY,           Console::No },
+            { "textemote",      HandleNpcTextEmoteCommand,         rbac::RBAC_PERM_COMMAND_NPC_TEXTEMOTE,     Console::No },
+            { "whisper",        HandleNpcWhisperCommand,           rbac::RBAC_PERM_COMMAND_NPC_WHISPER,       Console::No },
+            { "yell",           HandleNpcYellCommand,              rbac::RBAC_PERM_COMMAND_NPC_YELL,          Console::No },
+            { "tame",           HandleNpcTameCommand,              rbac::RBAC_PERM_COMMAND_NPC_TAME,          Console::No },
+            { "do",             HandleNpcDoActionCommand,          rbac::RBAC_PERM_COMMAND_NPC_EVADE,         Console::No },
             { "add",            npcAddCommandTable },
             { "delete",         npcDeleteCommandTable },
             { "follow",         npcFollowCommandTable },

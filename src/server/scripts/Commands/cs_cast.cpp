@@ -20,6 +20,7 @@
 #include "Creature.h"
 #include "Language.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 
@@ -34,12 +35,12 @@ public:
     {
         static ChatCommandTable castCommandTable =
         {
-            { "back",   HandleCastBackCommand,  SEC_GAMEMASTER, Console::No },
-            { "dist",   HandleCastDistCommand,  SEC_GAMEMASTER, Console::No },
-            { "self",   HandleCastSelfCommand,  SEC_GAMEMASTER, Console::No },
-            { "target", HandleCastTargetCommad, SEC_GAMEMASTER, Console::No },
-            { "dest",   HandleCastDestCommand,  SEC_GAMEMASTER, Console::No },
-            { "",       HandleCastCommand,      SEC_GAMEMASTER, Console::No }
+            { "back",   HandleCastBackCommand,  rbac::RBAC_PERM_COMMAND_CAST_BACK,   Console::No },
+            { "dist",   HandleCastDistCommand,  rbac::RBAC_PERM_COMMAND_CAST_DIST,   Console::No },
+            { "self",   HandleCastSelfCommand,  rbac::RBAC_PERM_COMMAND_CAST_SELF,   Console::No },
+            { "target", HandleCastTargetCommad, rbac::RBAC_PERM_COMMAND_CAST_TARGET, Console::No },
+            { "dest",   HandleCastDestCommand,  rbac::RBAC_PERM_COMMAND_CAST_DEST,   Console::No },
+            { "",       HandleCastCommand,      rbac::RBAC_PERM_COMMAND_CAST,        Console::No }
         };
         static ChatCommandTable commandTable =
         {

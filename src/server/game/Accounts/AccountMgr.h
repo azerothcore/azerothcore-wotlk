@@ -1,10 +1,10 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation; either version 2 of the License, or (at your
+ * option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
@@ -18,9 +18,7 @@
 #ifndef _ACCMGR_H
 #define _ACCMGR_H
 
-#include "Define.h"
-#include "Common.h"
-#include <string>
+#include "RBAC.h"
 
 enum AccountOpResult
 {
@@ -37,25 +35,61 @@ enum AccountOpResult
 #define MAX_PASS_STR 16
 #define MAX_EMAIL_STR 255
 
-namespace AccountMgr
+namespace rbac
 {
+typedef std::map<uint32, rbac::RBACPermission*> RBACPermissionsContainer;
+typedef std::map<uint8, rbac::RBACPermissionContainer> RBACDefaultPermissionsContainer;
+}
+
+class AC_GAME_API AccountMgr
+{
+private:
+    AccountMgr();
+    ~AccountMgr();
+
+public:
+    static AccountMgr* instance();
+
     AccountOpResult CreateAccount(std::string username, std::string password, std::string email = "");
-    AccountOpResult DeleteAccount(uint32 accountId);
-    AccountOpResult ChangeUsername(uint32 accountId, std::string newUsername, std::string newPassword);
-    AccountOpResult ChangePassword(uint32 accountId, std::string newPassword);
-    AccountOpResult ChangeEmail(uint32 accountId, std::string email);
-    bool CheckPassword(uint32 accountId, std::string password);
+    static AccountOpResult DeleteAccount(uint32 accountId);
+    static AccountOpResult ChangeUsername(uint32 accountId, std::string newUsername, std::string newPassword);
+    static AccountOpResult ChangePassword(uint32 accountId, std::string newPassword);
+    static AccountOpResult ChangeEmail(uint32 accountId, std::string email);
+    static bool CheckPassword(uint32 accountId, std::string password);
 
-    uint32 GetId(std::string const& username);
-    uint32 GetSecurity(uint32 accountId);
-    uint32 GetSecurity(uint32 accountId, int32 realmId);
-    bool GetName(uint32 accountId, std::string& name);
-    uint32 GetCharactersCount(uint32 accountId);
+    static uint32 GetId(std::string const& username);
+    static uint32 GetSecurity(uint32 accountId);
+    static uint32 GetSecurity(uint32 accountId, int32 realmId);
+    static bool GetName(uint32 accountId, std::string& name);
+    static uint32 GetCharactersCount(uint32 accountId);
 
-    bool IsPlayerAccount(uint32 gmlevel);
-    bool IsGMAccount(uint32 gmlevel);
-    bool IsAdminAccount(uint32 gmlevel);
-    bool IsConsoleAccount(uint32 gmlevel);
+    static bool IsPlayerAccount(uint32 gmlevel);
+    static bool IsGMAccount(uint32 gmlevel);
+    static bool IsAdminAccount(uint32 gmlevel);
+    static bool IsConsoleAccount(uint32 gmlevel);
+
+    static bool HasPermission(uint32 accountId, uint32 permission, uint32 realmId);
+
+    void UpdateAccountAccess(rbac::RBACData* rbac, uint32 accountId, uint8 securityLevel, int32 realmId);
+
+    void LoadRBAC();
+    rbac::RBACPermission const* GetRBACPermission(uint32 permission) const;
+
+    rbac::RBACPermissionsContainer const& GetRBACPermissionList() const { return _permissions; }
+    rbac::RBACPermissionContainer const& GetRBACDefaultPermissions(uint8 secLevel);
+
+    // For unit testing - allows adding permissions without database
+    void AddPermissionForTest(uint32 permissionId, std::string const& name);
+    void AddLinkedPermissionForTest(uint32 permissionId, uint32 linkedPermissionId);
+    void AddDefaultPermissionForTest(uint8 secLevel, uint32 permissionId);
+    void ClearPermissionsForTest();
+
+private:
+    void ClearRBAC();
+    rbac::RBACPermissionsContainer _permissions;
+    rbac::RBACDefaultPermissionsContainer _defaultPermissions;
 };
+
+#define sAccountMgr AccountMgr::instance()
 
 #endif

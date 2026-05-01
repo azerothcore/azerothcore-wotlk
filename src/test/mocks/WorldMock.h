@@ -85,6 +85,7 @@ public:
     MOCK_METHOD(std::string const&, GetRealmName, (), (const));
     MOCK_METHOD(void, SetRealmName, (std::string name), ());
     MOCK_METHOD(void, RemoveOldCorpses, ());
+    MOCK_METHOD(void, ReloadRBAC, ());
 };
 #pragma GCC diagnostic pop
 

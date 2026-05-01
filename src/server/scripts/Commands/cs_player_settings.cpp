@@ -19,6 +19,7 @@
 #include "CommandScript.h"
 #include "Player.h"
 #include "PlayerSettings.h"
+#include "RBAC.h"
 
 using namespace Acore::ChatCommands;
 
@@ -31,7 +32,7 @@ public:
     {
         static ChatCommandTable playerSettingsCommandTable =
         {
-            { "announcer", HandleSettingsAnnouncerFlags, SEC_MODERATOR, Console::No },
+            { "announcer", HandleSettingsAnnouncerFlags, rbac::RBAC_PERM_COMMAND_SETTINGS_ANNOUNCER, Console::No },
         };
         static ChatCommandTable commandTable =
         {
