@@ -1,0 +1,34 @@
+################################################################################
+# NostrumWoW Starter Module
+#
+# Grants a one-time reward to fresh level-1 characters on their first login.
+# Currently awards one starter bag. Designed to be extended with additional
+# new-character QoL features over time.
+################################################################################
+
+[worldserver]
+
+# Master switch. Set to 0 to disable all starter rewards.
+# Default: 1
+NostrumStarter.Enable = 1
+
+################################################################################
+# Starter Bag
+################################################################################
+
+# Item ID for the starter bag.
+# Default: 1725 (Large Knapsack, 12 slots)
+NostrumStarter.Bag.ItemId = 1725
+
+# Number of starter bags to grant.
+# Default: 1
+NostrumStarter.Bag.Count = 1
+
+################################################################################
+# Player message
+#
+# System message sent to the player when the starter reward is granted.
+# Leave empty to send no message.
+################################################################################
+
+NostrumStarter.WelcomeMessage = Welcome to NostrumWoW! You have received a starter bag.

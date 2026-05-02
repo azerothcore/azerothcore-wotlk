@@ -111,11 +111,15 @@ Fallen characters are **not removed** from the Deathwalkers guild.
 
 When a character confirms Hardcore, they are automatically added to the **Deathwalkers** guild.
 
-- If the guild does not exist, it is created automatically with the first Hardcore joiner as guild leader.
-- Guild MOTD is set to: *"Welcome to Deathwalkers. One life. No excuses. Help each other survive."*
-- If the character is already in a guild, they receive a message and are not moved automatically.
+- If the guild does not exist, it is **created once** with the first confirming character as guild leader. The guild is immediately registered in `sGuildMgr` so all subsequent confirmations in the same server session find it instead of creating a new one.
+- The guild MOTD is set via the proper Guild API on creation: *"Welcome to Deathwalkers. One life. No excuses. Help each other survive."* (configurable).
+- If the module detects an existing guild whose MOTD does not match the config, the DB is corrected automatically. The in-memory MOTD reflects the update on the next server restart.
+- New HC characters are added as **Member rank** (no invite permissions).
+- **Officer rank has its invite right removed on guild creation.** Only the GuildMaster can invite via the guild tab.
+- The GuildMaster (the founding HC player) still technically holds all guild leader rights, including invite. This is a WoW guild system limitation — the GuildMaster should not manually invite non-HC characters.
+- If a character is already in another guild when they confirm Hardcore, they receive an informational message and are not moved automatically.
 - On login, guildless active Hardcore characters are re-added if possible.
-- Fallen characters remain in the guild and are not removed automatically.
+- Fallen characters remain in the guild and are **not** removed automatically.
 
 Guild behavior is configurable — see `Hardcore.AutoGuild.*` options.
 
@@ -154,9 +158,17 @@ See `conf/mod_nostrum_hardcore.conf.dist` for the full list. Key options:
 
 ### How to configure cosmetic title IDs
 
-1. Find a valid title ID in `CharTitles.dbc` or the `char_titles` table.
-2. Set `Hardcore.TitleId` and/or `Hardcore.SelfFoundTitleId` in the config.
-3. If the title ID is `0` or invalid, the title system is skipped and a warning is logged.
+The value must be the **DBC row ID** — the first column (`ID` field) of `CharTitles.dbc`.
+This is **not** the `bit_index` (the bitmask slot used internally for title tracking).
+
+For most standard WoTLK titles the DBC row ID and `bit_index` are the same number, so there is no visible difference. For custom server-added titles they may differ — always use the DBC row ID.
+
+1. Find the DBC row ID for your desired title in `CharTitles.dbc` (first column).
+2. Set `Hardcore.TitleId` and/or `Hardcore.SelfFoundTitleId` to that DBC row ID.
+3. If the ID is `0`, title application is disabled (no title is granted).
+4. If the configured ID does not exist in `CharTitles.dbc`, **no title is applied** and a warning is written to the log. There is no fallback to any other title (including Private).
+
+Enable `Hardcore.Debug = 1` to log the resolved DBC entry, `bit_index`, and title name at every apply attempt.
 
 ---
 
@@ -193,7 +205,33 @@ The module follows AzerothCore's standard module convention. No `CMakeLists.txt`
 
 ---
 
+## Cleanup SQL — duplicate Deathwalkers guilds
+
+If a previous version of the module created duplicate `Deathwalkers` guilds (the `AddGuild` bug), run this SQL to identify and clean them up. **Back up your database first.**
+
+```sql
+-- Step 1: identify all Deathwalkers guilds
+SELECT guildid, name, leaderguid FROM guild WHERE name = 'Deathwalkers' ORDER BY guildid ASC;
+
+-- Step 2: decide which guild to keep (usually the one with the lowest guildid / oldest).
+-- Replace KEEP_ID with that guildid and DELETE_ID with each duplicate to remove.
+
+-- Step 3: remove duplicate guilds (adjust DELETE_ID as needed)
+-- Removes the guild row and all associated member rows / rank rows.
+DELETE FROM guild        WHERE guildid = DELETE_ID;
+DELETE FROM guild_member WHERE guildid = DELETE_ID;
+DELETE FROM guild_rank   WHERE guildid = DELETE_ID;
+```
+
+After cleanup, restart the worldserver so `LoadGuilds` picks up the correct state.
+
+---
+
 ## Known limitations
+
+### GuildMaster can still invite via the guild tab
+
+AzerothCore's `GuildScript` does not provide a pre-invite hook, so manual invitations cannot be fully blocked at the module level. The module removes invite rights from the Officer rank on creation (so promoted members cannot invite), but the GuildMaster always retains all guild rights. Instruct the founding HC player not to manually invite non-HC characters into Deathwalkers.
 
 ### AH listing cannot be blocked from module hooks
 
