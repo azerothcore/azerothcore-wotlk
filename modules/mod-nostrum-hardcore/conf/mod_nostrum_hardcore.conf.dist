@@ -75,14 +75,28 @@ Hardcore.SelfFoundSoulOfIronSpellId = 0
 
 ################################################################################
 # Cosmetic title IDs
+#
 # Set to 0 to disable title application.
-# Look up title IDs in CharTitles.dbc or the spell_dbc override table.
+#
+# The value must be the DBC row ID — the first column (ID field) of CharTitles.dbc.
+# This is NOT the bit_index (the bitmask slot used in PLAYER__FIELD_KNOWN_TITLES).
+# For most standard WoTLK titles the DBC row ID and bit_index happen to be equal,
+# but they differ for custom server-added titles.
+#
+# Example: if your custom title has DBC row ID = 400 (and some other bit_index),
+# set Hardcore.TitleId = 400. The server resolves bit_index internally.
+#
+# If the configured ID is not found in CharTitles.dbc, no title is applied and a
+# warning is printed to the log. There is no fallback to any other title.
+#
+# When Hardcore.Debug = 1 the resolved DBC entry, bit_index, and title name are
+# logged at every apply attempt to aid configuration.
 ################################################################################
 
-# Title ID to grant to Regular Hardcore characters. 0 = disabled.
+# DBC row ID of the title to grant to Regular Hardcore characters. 0 = disabled.
 Hardcore.TitleId = 0
 
-# Title ID to grant to Self-Found Hardcore characters. 0 = disabled.
+# DBC row ID of the title to grant to Self-Found Hardcore characters. 0 = disabled.
 Hardcore.SelfFoundTitleId = 0
 
 ################################################################################
@@ -126,8 +140,23 @@ Hardcore.SelfFound.BlockPlayerMail = 1
 # Auto-guild (Deathwalkers)
 #
 # When a character confirms Hardcore, they are automatically added to a
-# dedicated guild. If the guild does not exist, it is created automatically.
-# Fallen characters are not removed from the guild.
+# dedicated guild. If the guild does not exist, it is created automatically
+# with the first confirming character as guild leader.
+#
+# Guild membership is managed entirely by the Hardcore module:
+#   - New HC characters are added as Member rank (no invite permissions).
+#   - Officer rank has its invite right removed on guild creation so only the
+#     GuildMaster can invite. Do NOT manually invite non-HC characters.
+#   - The GuildMaster (founding HC player) still technically has invite rights
+#     as guild leader — this is a WoW guild system limitation that cannot be
+#     fully restricted without core changes.
+#
+# Fallen characters are NOT removed from the guild.
+#
+# MOTD behaviour:
+#   - On guild creation the MOTD is set immediately via the proper Guild API.
+#   - If an existing guild's MOTD differs from the config value, the DB is
+#     corrected automatically. The in-memory value updates on next server restart.
 ################################################################################
 
 # Enable automatic guild assignment. Default: 1
@@ -136,7 +165,8 @@ Hardcore.AutoGuild.Enable = 1
 # Name of the Hardcore guild. Created automatically if missing.
 Hardcore.AutoGuild.Name = Deathwalkers
 
-# Message of the Day set when the guild is first created.
+# Message of the Day applied when the guild is first created, and enforced in DB
+# whenever the module detects a mismatch. Takes effect in-memory on next restart.
 Hardcore.AutoGuild.MOTD = Welcome to Deathwalkers. One life. No excuses. Help each other survive.
 
 ################################################################################

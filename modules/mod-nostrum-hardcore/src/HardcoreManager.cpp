@@ -15,6 +15,7 @@
 #include "ObjectAccessor.h"
 #include "Player.h"
 #include "SharedDefines.h"
+#include "SpellMgr.h"
 #include "StringFormat.h"
 #include "StringConvert.h"
 #include "Tokenize.h"
@@ -600,12 +601,47 @@ void HardcoreManager::ApplyBuff(Player* player)
     if (!data)
         return;
 
-    uint32 spellId = (data->mode == HardcoreMode::SelfFound)
+    bool isSelfFound = (data->mode == HardcoreMode::SelfFound);
+    uint32 spellId = isSelfFound
         ? _config.selfFoundSoulOfIronSpellId
         : _config.soulOfIronSpellId;
 
-    if (spellId != 0 && !player->HasAura(spellId))
-        player->CastSpell(player, spellId, true);
+    if (_config.debug)
+        LOG_INFO("module", "[Hardcore] ApplyBuff: player={} spellId={} isSelfFound={}",
+            player->GetName(), spellId, isSelfFound);
+
+    if (spellId != 0)
+    {
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+        if (!spellInfo)
+        {
+            LOG_WARN("module", "[Hardcore] Configured spell ID {} not found in SpellMgr — buff skipped for {}.",
+                spellId, player->GetName());
+        }
+        else if (player->HasAura(spellId))
+        {
+            if (_config.debug)
+                LOG_INFO("module", "[Hardcore] {} already has aura {} — skipping.", player->GetName(), spellId);
+        }
+        else
+        {
+            // AddAura applies the aura directly without going through the full cast system.
+            // This is more reliable than CastSpell for cosmetic/passive persistent auras.
+            Aura* aura = player->AddAura(spellId, player);
+            if (_config.debug)
+            {
+                if (aura)
+                    LOG_INFO("module", "[Hardcore] Applied aura {} to {}.", spellId, player->GetName());
+                else
+                    LOG_WARN("module", "[Hardcore] AddAura({}) returned null for {} — spell may lack SPELL_EFFECT_APPLY_AURA.",
+                        spellId, player->GetName());
+            }
+        }
+    }
+    else if (_config.debug)
+    {
+        LOG_INFO("module", "[Hardcore] Buff disabled (spell ID = 0) for {}.", player->GetName());
+    }
 
     ApplyTitle(player);
 }
@@ -627,24 +663,54 @@ void HardcoreManager::ApplyTitle(Player* player)
     if (!data)
         return;
 
-    uint32 titleId = (data->mode == HardcoreMode::SelfFound)
+    bool isSelfFound = (data->mode == HardcoreMode::SelfFound);
+    uint32 titleId = isSelfFound
         ? _config.selfFoundTitleId
         : _config.titleId;
 
-    if (titleId == 0)
-        return;
+    if (_config.debug)
+        LOG_INFO("module", "[Hardcore] ApplyTitle: player={} configuredTitleId={} isSelfFound={}",
+            player->GetName(), titleId, isSelfFound);
 
-    CharTitlesEntry const* entry = sCharTitlesStore.LookupEntry(titleId);
-    if (!entry)
+    if (titleId == 0)
     {
-        LOG_WARN("module", "[Hardcore] Title ID {} not found in CharTitles DBC.", titleId);
+        if (_config.debug)
+            LOG_INFO("module", "[Hardcore] Title disabled (configured ID = 0) for {}.", player->GetName());
         return;
     }
 
+    // sCharTitlesStore.LookupEntry uses the DBC row ID (first column of CharTitles.dbc),
+    // NOT the bit_index. Configure Hardcore.TitleId with the DBC row ID.
+    CharTitlesEntry const* entry = sCharTitlesStore.LookupEntry(titleId);
+    if (!entry)
+    {
+        LOG_WARN("module",
+            "[Hardcore] Title DBC row ID {} not found in CharTitles.dbc — no title applied for {}. "
+            "Check that Hardcore.TitleId is the DBC row ID (first column), not the bit_index.",
+            titleId, player->GetName());
+        return;
+    }
+
+    if (_config.debug)
+        LOG_INFO("module",
+            "[Hardcore] Resolved title: DBC ID={} bit_index={} name='{}' for {}.",
+            entry->ID, entry->bit_index,
+            entry->nameMale[0] ? entry->nameMale[0] : "<no name>",
+            player->GetName());
+
     if (!player->HasTitle(entry))
+    {
         player->SetTitle(entry);
+        if (_config.debug)
+            LOG_INFO("module", "[Hardcore] Added title bit_index={} to known titles for {}.",
+                entry->bit_index, player->GetName());
+    }
 
     player->SetCurrentTitle(entry);
+
+    if (_config.debug)
+        LOG_INFO("module", "[Hardcore] SetCurrentTitle bit_index={} applied to {}.",
+            entry->bit_index, player->GetName());
 }
 
 void HardcoreManager::RemoveTitle(Player* player)
@@ -676,16 +742,54 @@ void HardcoreManager::EnsureAndJoinGuild(Player* player)
 
     if (player->GetGuildId() != 0)
     {
+        if (_config.debug)
+            LOG_INFO("module", "[Hardcore] {} is already in guild ID {} — skipping auto-add.",
+                player->GetName(), player->GetGuildId());
         ChatHandler(player->GetSession()).PSendSysMessage(
             "You are already in a guild and could not be added to Deathwalkers automatically. "
             "Leave your current guild to join Deathwalkers.");
         return;
     }
 
+    // Look for the Hardcore guild in the in-memory manager first.
     Guild* guild = sGuildMgr->GetGuildByName(_config.autoGuildName);
+
+    if (_config.debug)
+        LOG_INFO("module", "[Hardcore] EnsureAndJoinGuild: guild '{}' found in sGuildMgr = {}.",
+            _config.autoGuildName, guild ? "YES" : "NO");
+
     if (!guild)
     {
-        // Create the guild with this player as founding leader
+        // Guard against orphaned guilds in DB left by previous runs where AddGuild was
+        // never called (before this bug was fixed). Warn loudly if found.
+        QueryResult dupResult = CharacterDatabase.Query(
+            "SELECT guildid FROM guild WHERE name = '{}' ORDER BY guildid ASC",
+            _config.autoGuildName);
+
+        if (dupResult)
+        {
+            uint32 count = dupResult->GetRowCount();
+            uint32 canonicalId = dupResult->Fetch()[0].Get<uint32>();
+
+            if (count > 1)
+            {
+                LOG_ERROR("module",
+                    "[Hardcore] Found {} guilds named '{}' in DB — duplicate guilds detected from a previous bug! "
+                    "Using oldest guild (ID {}). Run the cleanup SQL in README to remove duplicates.",
+                    count, _config.autoGuildName, canonicalId);
+            }
+            else
+            {
+                LOG_WARN("module",
+                    "[Hardcore] Guild '{}' (ID {}) is in DB but not in sGuildMgr — orphaned from a previous run. "
+                    "It will be picked up by LoadGuilds on the next restart. Creating a new one for this session.",
+                    _config.autoGuildName, canonicalId);
+            }
+            // Fall through to create a new guild for THIS session. On the next restart,
+            // LoadGuilds will load all DB guilds; the duplicate cleanup SQL should be run first.
+        }
+
+        // Create the Hardcore guild with this player as the founding leader.
         guild = new Guild();
         if (!guild->Create(player, _config.autoGuildName))
         {
@@ -695,24 +799,87 @@ void HardcoreManager::EnsureAndJoinGuild(Player* player)
                 "Could not create the Hardcore guild automatically. Please contact a GM.");
             return;
         }
-        // Set MOTD immediately after creation (config value, not user input)
+
+        // CRITICAL: register in sGuildMgr so GetGuildByName finds it for all subsequent
+        // Hardcore confirmations in this server session.
+        sGuildMgr->AddGuild(guild);
+
+        if (_config.debug)
+            LOG_INFO("module", "[Hardcore] Created guild '{}' (ID {}) and registered in sGuildMgr.",
+                _config.autoGuildName, guild->GetId());
+
+        // Set the MOTD via the proper Guild API. The player is the guild leader and has
+        // GR_RIGHT_SETMOTD. HandleSetMOTD updates both the in-memory object and the DB.
+        guild->HandleSetMOTD(player->GetSession(), _config.autoGuildMotd);
+
+        if (_config.debug)
+            LOG_INFO("module", "[Hardcore] MOTD set for guild '{}' (ID {}).",
+                _config.autoGuildName, guild->GetId());
+
+        // By default AzerothCore gives Officer rank GR_RIGHT_ALL (which includes invite).
+        // Strip the invite bit (0x10) from Officer so only the GuildMaster can invite.
+        // GR_RIGHT_INVITE = GR_RIGHT_EMPTY(0x40) | 0x10 = 0x50.
+        // The invite check is: (rights & GR_RIGHT_INVITE) != GR_RIGHT_EMPTY.
+        // Removing 0x10 makes that false, blocking invites for the Officer rank.
+        // Guild::GetRankInfo is private, so we update guild_rank directly. The in-memory
+        // rank state for this session still has full rights, but no member will be at
+        // Officer rank yet (all auto-added members use GR_MEMBER). Takes full effect after
+        // the next server restart when LoadGuilds reads the corrected DB row.
+        CharacterDatabase.Execute(
+            "UPDATE guild_rank SET rights = rights & ~0x10 WHERE guildid = {} AND rid = {}",
+            guild->GetId(), static_cast<uint8>(GR_OFFICER));
+
+        if (_config.debug)
+            LOG_INFO("module",
+                "[Hardcore] Removed invite bit from Officer rank (DB) for guild '{}' (ID {}). "
+                "Takes full in-memory effect on next restart.",
+                _config.autoGuildName, guild->GetId());
+
+        LOG_INFO("module", "[Hardcore] Guild '{}' (ID {}) created for Hardcore players.",
+            _config.autoGuildName, guild->GetId());
+
+        // The founding player is already the guild leader — no AddMember call needed.
+        ChatHandler(player->GetSession()).PSendSysMessage(
+            Acore::StringFormat(
+                "You have founded {}. One life. No excuses.", _config.autoGuildName).c_str());
+
+        if (_config.debug)
+            LOG_INFO("module", "[Hardcore] {} is guild leader of '{}' (ID {}). GetGuildId={}.",
+                player->GetName(), _config.autoGuildName, guild->GetId(), player->GetGuildId());
+        return;
+    }
+
+    // Guild already exists — verify the MOTD matches config and correct it in DB if not.
+    // The in-memory MOTD will only reflect the change after the next server restart
+    // (when LoadGuilds re-reads the DB), which is acceptable for a cosmetic field.
+    if (guild->GetMOTD() != _config.autoGuildMotd)
+    {
         CharacterDatabase.Execute(
             "UPDATE guild SET motd = '{}' WHERE guildid = {}",
             _config.autoGuildMotd, guild->GetId());
-        LOG_INFO("module", "[Hardcore] Created guild '{}' for Hardcore players.", _config.autoGuildName);
-        // Player is already a member as guild leader — no AddMember needed
+        if (_config.debug)
+            LOG_INFO("module",
+                "[Hardcore] Corrected MOTD for guild '{}' (ID {}) in DB. Takes effect on next restart.",
+                _config.autoGuildName, guild->GetId());
     }
-    else
+
+    if (_config.debug)
+        LOG_INFO("module", "[Hardcore] Adding {} to existing guild '{}' (ID {}). Player guildId before={}.",
+            player->GetName(), _config.autoGuildName, guild->GetId(), player->GetGuildId());
+
+    // Add the player as a regular Member rank so they have no invite rights by default.
+    if (!guild->AddMember(player->GetGUID(), GR_MEMBER))
     {
-        if (!guild->AddMember(player->GetGUID()))
-        {
-            LOG_ERROR("module", "[Hardcore] Failed to add {} to guild '{}'.",
-                player->GetName(), _config.autoGuildName);
-            ChatHandler(player->GetSession()).PSendSysMessage(
-                "Could not add you to the Hardcore guild. Please contact a GM.");
-            return;
-        }
+        LOG_ERROR("module", "[Hardcore] Failed to add {} to guild '{}'.",
+            player->GetName(), _config.autoGuildName);
+        ChatHandler(player->GetSession()).PSendSysMessage(
+            "Could not add you to the Hardcore guild. Please contact a GM.");
+        return;
     }
+
+    if (_config.debug)
+        LOG_INFO("module", "[Hardcore] Added {} to '{}' (ID {}). Player guildId after={}.",
+            player->GetName(), _config.autoGuildName, guild->GetId(), player->GetGuildId());
 
     ChatHandler(player->GetSession()).PSendSysMessage(
         Acore::StringFormat("You have joined {}. One life. No excuses.", _config.autoGuildName).c_str());
