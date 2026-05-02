@@ -538,42 +538,46 @@ public:
     }
 };
 
-enum HyldsmeetProtoDrake
-{
-    NPC_HYLDSMEET_DRAKERIDER = 29694
-};
-
 struct npc_hyldsmeet_protodrake : public CreatureAI
 {
-    explicit npc_hyldsmeet_protodrake(Creature* creature) : CreatureAI(creature), _accessoryRespawnTimer(0) { }
+    explicit npc_hyldsmeet_protodrake(Creature* creature) : CreatureAI(creature), _accessoryInstalled(false), _accessoryRespawnTimer(0)
+    {
+        me->SetUnitFlag2(UNIT_FLAG2_PREVENT_SPELL_CLICK);
+     }
 
     void PassengerBoarded(Unit* who, int8 /*seat*/, bool apply) override
     {
-        if (apply)
+        if (who->IsPlayer())
             return;
 
-        if (who->GetEntry() == NPC_HYLDSMEET_DRAKERIDER)
+        if (apply)
+            _accessoryInstalled = true;
+        else
+        {
+            _accessoryInstalled = false;
             _accessoryRespawnTimer = 5 * MINUTE * IN_MILLISECONDS;
+        }
     }
 
     void UpdateAI(uint32 diff) override
     {
-        //! We need to manually reinstall accessories because the vehicle itself is friendly to players,
-        //! so EnterEvadeMode is never triggered. The accessory on the other hand is hostile and killable.
+        // We need to manually reinstall accessories because the vehicle itself is friendly to players,
+        // so EnterEvadeMode is never triggered. The accessory on the other hand is hostile and killable.
+        if (_accessoryInstalled)
+            return;
+
         Vehicle* vehicleKit = me->GetVehicleKit();
-        if (!vehicleKit || !_accessoryRespawnTimer)
+        if (!vehicleKit)
             return;
 
         if (_accessoryRespawnTimer <= diff)
-        {
             vehicleKit->InstallAllAccessories(true);
-            _accessoryRespawnTimer = 0;
-        }
         else
             _accessoryRespawnTimer -= diff;
     }
 
 private:
+    bool _accessoryInstalled;
     uint32 _accessoryRespawnTimer;
 };
 

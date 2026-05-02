@@ -5189,6 +5189,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->ProcCharges = 0;
     });
 
+    // 54933 Hyldnir Harpoon
+    ApplySpellFix({ 54933 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].BasePoints = 1;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
