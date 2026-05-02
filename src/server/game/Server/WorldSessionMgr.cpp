@@ -25,8 +25,6 @@
 #include "WorldSession.h"
 #include "WorldSessionMgr.h"
 
-constexpr uint32 SESSION_RECONNECT_TIMEOUT = 60;    // seconds to keep a disconnected session alive for re-connection.
-
 WorldSessionMgr* WorldSessionMgr::Instance()
 {
     static WorldSessionMgr instance;
@@ -151,7 +149,7 @@ void WorldSessionMgr::UpdateSessions(uint32 const diff)
                 _disconnects[pSession->GetAccountId()] = now.count();
             _sessions.erase(itr);
             // If the player had already initiated logout, treat a disconnect such as one done by EXIT GAME->EXIT NOW as
-            // intentional, and skip the SESSION_RECONNECT_TIMEOUT grace period.
+            // intentional, and skip the CONFIG_INTERVAL_DISCONNECT_TOLERANCE grace period.
             if (pSession->isLogingOut())
             {
                 delete pSession;
@@ -200,7 +198,7 @@ void WorldSessionMgr::UpdateSessions(uint32 const diff)
         next = itr;
         ++next;
         WorldSession* pSession = itr->second;
-        if (!pSession->GetPlayer() || pSession->GetOfflineTime() + SESSION_RECONNECT_TIMEOUT < currTime || pSession->IsKicked())
+        if (!pSession->GetPlayer() || pSession->GetOfflineTime() + sWorld->getIntConfig(CONFIG_INTERVAL_DISCONNECT_TOLERANCE) < currTime || pSession->IsKicked())
         {
             _offlineSessions.erase(itr);
             delete pSession;
