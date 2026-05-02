@@ -9,6 +9,8 @@
 #include "Creature.h"
 #include "DBCStores.h"
 #include "DatabaseEnv.h"
+#include "Guild.h"
+#include "GuildMgr.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
@@ -49,14 +51,14 @@ void HardcoreManager::LoadConfig()
     _config.countArenaDeaths           = sConfigMgr->GetOption<bool>  ("Hardcore.CountArenaDeaths",           true);
     _config.countWorldPvPDeaths        = sConfigMgr->GetOption<bool>  ("Hardcore.CountWorldPvPDeaths",        true);
 
-    _config.allowOptionalPvP           = sConfigMgr->GetOption<bool>  ("Hardcore.AllowOptionalPvP",           true);
-
-    _config.kickOnDeath                = sConfigMgr->GetOption<bool>  ("Hardcore.KickOnDeath",                true);
-    _config.kickDelaySeconds           = sConfigMgr->GetOption<uint32>("Hardcore.KickDelaySeconds",           10);
-    _config.kickFallenOnLogin          = sConfigMgr->GetOption<bool>  ("Hardcore.KickFallenOnLogin",          true);
+    _config.fallenStayGhost            = sConfigMgr->GetOption<bool>  ("Hardcore.FallenStayGhost",            true);
+    _config.blockFallenResurrection    = sConfigMgr->GetOption<bool>  ("Hardcore.BlockFallenResurrection",    true);
 
     _config.soulOfIronSpellId          = sConfigMgr->GetOption<uint32>("Hardcore.SoulOfIronSpellId",          0);
     _config.selfFoundSoulOfIronSpellId = sConfigMgr->GetOption<uint32>("Hardcore.SelfFoundSoulOfIronSpellId", 0);
+
+    _config.titleId                    = sConfigMgr->GetOption<uint32>("Hardcore.TitleId",                    0);
+    _config.selfFoundTitleId           = sConfigMgr->GetOption<uint32>("Hardcore.SelfFoundTitleId",           0);
 
     _config.announceOptIn              = sConfigMgr->GetOption<bool>  ("Hardcore.AnnounceOptIn",              true);
     _config.announceDeaths             = sConfigMgr->GetOption<bool>  ("Hardcore.AnnounceDeaths",             true);
@@ -67,6 +69,11 @@ void HardcoreManager::LoadConfig()
     _config.selfFoundBlockTrade        = sConfigMgr->GetOption<bool>  ("Hardcore.SelfFound.BlockTrade",       true);
     _config.selfFoundBlockAuctionHouse = sConfigMgr->GetOption<bool>  ("Hardcore.SelfFound.BlockAuctionHouse",true);
     _config.selfFoundBlockPlayerMail   = sConfigMgr->GetOption<bool>  ("Hardcore.SelfFound.BlockPlayerMail",  true);
+
+    _config.autoGuildEnable            = sConfigMgr->GetOption<bool>        ("Hardcore.AutoGuild.Enable", true);
+    _config.autoGuildName              = sConfigMgr->GetOption<std::string> ("Hardcore.AutoGuild.Name",   "Deathwalkers");
+    _config.autoGuildMotd              = sConfigMgr->GetOption<std::string> ("Hardcore.AutoGuild.MOTD",
+        "Welcome to Deathwalkers. One life. No excuses. Help each other survive.");
 
     // Parse milestone levels from comma-separated string
     _config.milestoneLevels.clear();
@@ -97,18 +104,18 @@ void HardcoreManager::OnPlayerLogin(Player* player)
 
     if (IsFallen(guid))
     {
-        // Send message before the kick so the player sees it
         ChatHandler(player->GetSession()).PSendSysMessage(
-            "This Hardcore character has fallen and can no longer enter the world.");
-
-        if (_config.kickFallenOnLogin)
-            player->GetSession()->KickPlayer("Hardcore character is fallen.");
-
+            "This Hardcore character has fallen. You may remain as a ghost, but resurrection is permanently disabled.");
         return;
     }
 
     if (IsActive(guid))
+    {
         ApplyBuff(player);
+
+        if (player->GetGuildId() == 0)
+            EnsureAndJoinGuild(player);
+    }
 }
 
 void HardcoreManager::OnPlayerLogout(Player* player)
@@ -270,8 +277,11 @@ bool HardcoreManager::Confirm(Player* player, std::string& outError)
     _data[guid] = data;
     SaveDataToDB(data);
 
-    // Apply cosmetic buff
+    // Apply cosmetic buff and title
     ApplyBuff(player);
+
+    // Auto-join Hardcore guild
+    EnsureAndJoinGuild(player);
 
     // Announce globally
     if (_config.announceOptIn)
@@ -301,9 +311,9 @@ bool HardcoreManager::CheckEligibility(Player* player, HardcoreMode mode, std::s
         return false;
     }
 
-    if (_config.requireLevelOne && player->GetLevel() > 1)
+    if (_config.requireLevelOne && (player->GetLevel() != 1 || player->GetUInt32Value(PLAYER_XP) != 0))
     {
-        outReason = "Your character is above level 1.";
+        outReason = "You can only enable Hardcore on a fresh level 1 character with 0 XP.";
         return false;
     }
 
@@ -472,7 +482,7 @@ void HardcoreManager::ProcessHCDeath(Player* player, std::string const& killerNa
             "Zone: {}\n"
             "Killed by: {}\n"
             "Time played: {}\n"
-            "This character is now locked.",
+            "This character has fallen and cannot be revived. You may remain as a ghost.",
             data->levelReached, zoneName, killerName, timeStr).c_str());
 
     // Global announcement
@@ -492,8 +502,7 @@ void HardcoreManager::ProcessHCDeath(Player* player, std::string const& killerNa
         }
     }
 
-    if (_config.kickOnDeath)
-        player->GetSession()->KickPlayer("Hardcore character has fallen.");
+    // Fallen characters stay connected as permanent ghosts — no kick.
 }
 
 // ---------------------------------------------------------------------------
@@ -595,11 +604,10 @@ void HardcoreManager::ApplyBuff(Player* player)
         ? _config.selfFoundSoulOfIronSpellId
         : _config.soulOfIronSpellId;
 
-    if (spellId == 0)
-        return;
-
-    if (!player->HasAura(spellId))
+    if (spellId != 0 && !player->HasAura(spellId))
         player->CastSpell(player, spellId, true);
+
+    ApplyTitle(player);
 }
 
 void HardcoreManager::RemoveBuff(Player* player)
@@ -608,6 +616,106 @@ void HardcoreManager::RemoveBuff(Player* player)
         player->RemoveAurasDueToSpell(_config.soulOfIronSpellId);
     if (_config.selfFoundSoulOfIronSpellId != 0)
         player->RemoveAurasDueToSpell(_config.selfFoundSoulOfIronSpellId);
+
+    RemoveTitle(player);
+}
+
+void HardcoreManager::ApplyTitle(Player* player)
+{
+    uint32 guid = player->GetGUID().GetCounter();
+    HardcoreData* data = GetData(guid);
+    if (!data)
+        return;
+
+    uint32 titleId = (data->mode == HardcoreMode::SelfFound)
+        ? _config.selfFoundTitleId
+        : _config.titleId;
+
+    if (titleId == 0)
+        return;
+
+    CharTitlesEntry const* entry = sCharTitlesStore.LookupEntry(titleId);
+    if (!entry)
+    {
+        LOG_WARN("module", "[Hardcore] Title ID {} not found in CharTitles DBC.", titleId);
+        return;
+    }
+
+    if (!player->HasTitle(entry))
+        player->SetTitle(entry);
+
+    player->SetCurrentTitle(entry);
+}
+
+void HardcoreManager::RemoveTitle(Player* player)
+{
+    auto removeOne = [&](uint32 titleId)
+    {
+        if (titleId == 0)
+            return;
+        CharTitlesEntry const* entry = sCharTitlesStore.LookupEntry(titleId);
+        if (!entry)
+            return;
+        if (player->HasTitle(entry))
+            player->SetTitle(entry, true);
+        player->SetCurrentTitle(entry, true);
+    };
+
+    removeOne(_config.titleId);
+    removeOne(_config.selfFoundTitleId);
+}
+
+// ---------------------------------------------------------------------------
+// Auto-guild
+// ---------------------------------------------------------------------------
+
+void HardcoreManager::EnsureAndJoinGuild(Player* player)
+{
+    if (!_config.autoGuildEnable)
+        return;
+
+    if (player->GetGuildId() != 0)
+    {
+        ChatHandler(player->GetSession()).PSendSysMessage(
+            "You are already in a guild and could not be added to Deathwalkers automatically. "
+            "Leave your current guild to join Deathwalkers.");
+        return;
+    }
+
+    Guild* guild = sGuildMgr->GetGuildByName(_config.autoGuildName);
+    if (!guild)
+    {
+        // Create the guild with this player as founding leader
+        guild = new Guild();
+        if (!guild->Create(player, _config.autoGuildName))
+        {
+            delete guild;
+            LOG_ERROR("module", "[Hardcore] Failed to create guild '{}'.", _config.autoGuildName);
+            ChatHandler(player->GetSession()).PSendSysMessage(
+                "Could not create the Hardcore guild automatically. Please contact a GM.");
+            return;
+        }
+        // Set MOTD immediately after creation (config value, not user input)
+        CharacterDatabase.Execute(
+            "UPDATE guild SET motd = '{}' WHERE guildid = {}",
+            _config.autoGuildMotd, guild->GetId());
+        LOG_INFO("module", "[Hardcore] Created guild '{}' for Hardcore players.", _config.autoGuildName);
+        // Player is already a member as guild leader — no AddMember needed
+    }
+    else
+    {
+        if (!guild->AddMember(player->GetGUID()))
+        {
+            LOG_ERROR("module", "[Hardcore] Failed to add {} to guild '{}'.",
+                player->GetName(), _config.autoGuildName);
+            ChatHandler(player->GetSession()).PSendSysMessage(
+                "Could not add you to the Hardcore guild. Please contact a GM.");
+            return;
+        }
+    }
+
+    ChatHandler(player->GetSession()).PSendSysMessage(
+        Acore::StringFormat("You have joined {}. One life. No excuses.", _config.autoGuildName).c_str());
 }
 
 // ---------------------------------------------------------------------------

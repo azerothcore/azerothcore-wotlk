@@ -79,17 +79,17 @@ struct HardcoreConfig
     bool   countArenaDeaths          = true;
     bool   countWorldPvPDeaths       = true;
 
-    // PvP
-    bool   allowOptionalPvP          = true;
+    // Fallen ghost behavior
+    bool   fallenStayGhost           = true;
+    bool   blockFallenResurrection   = true;
 
-    // Locking
-    bool   kickOnDeath               = true;
-    uint32 kickDelaySeconds          = 10;
-    bool   kickFallenOnLogin         = true;
-
-    // Spell IDs (0 = disabled)
+    // Cosmetic spell IDs (0 = disabled)
     uint32 soulOfIronSpellId         = 0;
     uint32 selfFoundSoulOfIronSpellId= 0;
+
+    // Cosmetic title IDs (0 = disabled)
+    uint32 titleId                   = 0;
+    uint32 selfFoundTitleId          = 0;
 
     // Announcements
     bool          announceOptIn      = true;
@@ -104,6 +104,11 @@ struct HardcoreConfig
     bool   selfFoundBlockTrade       = true;
     bool   selfFoundBlockAuctionHouse= true;
     bool   selfFoundBlockPlayerMail  = true;
+
+    // Auto-guild
+    bool        autoGuildEnable      = true;
+    std::string autoGuildName        = "Deathwalkers";
+    std::string autoGuildMotd        = "Welcome to Deathwalkers. One life. No excuses. Help each other survive.";
 };
 
 class HardcoreManager
@@ -189,6 +194,9 @@ private:
     void IncrementDeathCount(uint32 guid);
 
     void ProcessHCDeath(Player* player, std::string const& killerName);
+    void EnsureAndJoinGuild(Player* player);
+    void ApplyTitle(Player* player);
+    void RemoveTitle(Player* player);
 
     bool IsMilestoneAnnounced(uint32 guid, uint8 level);
     void SaveMilestone(uint32 guid, uint8 level);

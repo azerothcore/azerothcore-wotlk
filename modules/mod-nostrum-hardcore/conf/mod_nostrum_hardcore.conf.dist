@@ -17,7 +17,7 @@ Hardcore.Enable = 1
 # Maximum total played time (seconds) allowed when opting in. Default: 600 (10 min)
 Hardcore.MaxPlayedSecondsToEnable = 600
 
-# Character must be level 1 to opt in.
+# Character must be level 1 with exactly 0 XP to opt in.
 Hardcore.RequireLevelOne = 1
 
 # Character must have 0 deaths to opt in.
@@ -46,26 +46,20 @@ Hardcore.CountArenaDeaths = 1
 Hardcore.CountWorldPvPDeaths = 1
 
 ################################################################################
-# PvP behavior
+# Fallen character behavior
+#
+# Fallen Hardcore characters remain connected as permanent ghosts.
+# They cannot be revived by normal game actions.
+# Only a GM using .hardcore revive can restore a fallen character.
 ################################################################################
 
-# Allow Hardcore characters to choose whether to PvP flag.
-# PvP deaths only count while the character is PvP-enabled/flagged.
-Hardcore.AllowOptionalPvP = 1
+# Keep fallen characters as permanent ghosts instead of disconnecting them.
+# Set to 0 only for legacy kick behavior (not recommended).
+Hardcore.FallenStayGhost = 1
 
-################################################################################
-# Character locking
-################################################################################
-
-# Kick the player from the server when their Hardcore character falls. Default: 1
-Hardcore.KickOnDeath = 1
-
-# Seconds to wait before kicking on death. Note: kick happens immediately after
-# the death message is sent; this delay value is currently informational only.
-Hardcore.KickDelaySeconds = 10
-
-# Block fallen Hardcore characters from re-entering the world on login. Default: 1
-Hardcore.KickFallenOnLogin = 1
+# Block all resurrection for fallen characters (spirit healer, spells, etc.).
+# .hardcore revive (GM) bypasses this restriction intentionally.
+Hardcore.BlockFallenResurrection = 1
 
 ################################################################################
 # Cosmetic spell IDs
@@ -73,11 +67,23 @@ Hardcore.KickFallenOnLogin = 1
 # Create custom spells with no stats/combat effects and set their IDs here.
 ################################################################################
 
-# Spell ID for "Soul of Iron" (Regular Hardcore buff). 0 = disabled.
+# Spell ID for the Regular Hardcore buff (e.g. "Soul of Iron"). 0 = disabled.
 Hardcore.SoulOfIronSpellId = 0
 
-# Spell ID for "Soul of Iron: Self-Found" (Self-Found Hardcore buff). 0 = disabled.
+# Spell ID for the Self-Found Hardcore buff (e.g. "Soul of Iron: Self-Found"). 0 = disabled.
 Hardcore.SelfFoundSoulOfIronSpellId = 0
+
+################################################################################
+# Cosmetic title IDs
+# Set to 0 to disable title application.
+# Look up title IDs in CharTitles.dbc or the spell_dbc override table.
+################################################################################
+
+# Title ID to grant to Regular Hardcore characters. 0 = disabled.
+Hardcore.TitleId = 0
+
+# Title ID to grant to Self-Found Hardcore characters. 0 = disabled.
+Hardcore.SelfFoundTitleId = 0
 
 ################################################################################
 # Announcements
@@ -115,6 +121,23 @@ Hardcore.SelfFound.BlockAuctionHouse = 1
 
 # Block player-to-player mail for Self-Found characters. Default: 1
 Hardcore.SelfFound.BlockPlayerMail = 1
+
+################################################################################
+# Auto-guild (Deathwalkers)
+#
+# When a character confirms Hardcore, they are automatically added to a
+# dedicated guild. If the guild does not exist, it is created automatically.
+# Fallen characters are not removed from the guild.
+################################################################################
+
+# Enable automatic guild assignment. Default: 1
+Hardcore.AutoGuild.Enable = 1
+
+# Name of the Hardcore guild. Created automatically if missing.
+Hardcore.AutoGuild.Name = Deathwalkers
+
+# Message of the Day set when the guild is first created.
+Hardcore.AutoGuild.MOTD = Welcome to Deathwalkers. One life. No excuses. Help each other survive.
 
 ################################################################################
 # Debug

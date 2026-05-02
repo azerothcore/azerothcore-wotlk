@@ -129,6 +129,8 @@ public:
             PLAYERHOOK_CAN_SET_TRADE_ITEM,
             PLAYERHOOK_CAN_SEND_MAIL,
             PLAYERHOOK_CAN_PLACE_AUCTION_BID,
+            PLAYERHOOK_CAN_RESURRECT,
+            PLAYERHOOK_CAN_REPOP_AT_GRAVEYARD,
         })
     {
     }
@@ -272,6 +274,36 @@ public:
         sHardcoreMgr->FlagUsedAuctionHouse(guid);
         return true;
     }
+
+    // ---- Resurrection blocking for fallen characters ----
+
+    bool OnPlayerCanRepopAtGraveyard(Player* player) override
+    {
+        if (!sHardcoreMgr->IsEnabled() || !sHardcoreMgr->Cfg().blockFallenResurrection)
+            return true;
+
+        uint32 guid = player->GetGUID().GetCounter();
+        if (!sHardcoreMgr->IsFallen(guid))
+            return true;
+
+        ChatHandler(player->GetSession()).PSendSysMessage(
+            "This Hardcore character has fallen. Resurrection is permanently disabled.");
+        return false;
+    }
+
+    bool OnPlayerCanResurrect(Player* player) override
+    {
+        if (!sHardcoreMgr->IsEnabled() || !sHardcoreMgr->Cfg().blockFallenResurrection)
+            return true;
+
+        uint32 guid = player->GetGUID().GetCounter();
+        if (!sHardcoreMgr->IsFallen(guid))
+            return true;
+
+        ChatHandler(player->GetSession()).PSendSysMessage(
+            "This Hardcore character has fallen. Resurrection is permanently disabled.");
+        return false;
+    }
 };
 
 // ---------------------------------------------------------------------------
@@ -383,12 +415,6 @@ public:
     {
         using namespace Acore::ChatCommands;
 
-        static std::vector<ChatCommandBuilder> pvpTable =
-        {
-            { "on",  HandleHardcorePvpOnCommand,  SEC_PLAYER, Console::No },
-            { "off", HandleHardcorePvpOffCommand, SEC_PLAYER, Console::No },
-        };
-
         static std::vector<ChatCommandBuilder> hardcoreTable =
         {
             { "enable",      HandleHardcoreEnableCommand,     SEC_PLAYER,       Console::No },
@@ -397,7 +423,6 @@ public:
             { "status",      HandleHardcoreStatusCommand,     SEC_PLAYER,       Console::No },
             { "rules",       HandleHardcoreRulesCommand,      SEC_PLAYER,       Console::No },
             { "leaderboard", HandleHardcoreLeaderboardCommand,SEC_PLAYER,       Console::No },
-            { "pvp",         pvpTable },
             { "info",        HandleHardcoreInfoGmCommand,     SEC_GAMEMASTER,   Console::No },
             { "revive",      HandleHardcoreReviveGmCommand,   SEC_GAMEMASTER,   Console::No },
             { "remove",      HandleHardcoreRemoveGmCommand,   SEC_ADMINISTRATOR,Console::No },
@@ -523,15 +548,11 @@ public:
 
         if (pendingMode == HardcoreMode::SelfFound)
         {
-            handler->PSendSysMessage("Hardcore Self-Found enabled.");
-            handler->PSendSysMessage("You have received: Soul of Iron: Self-Found.");
-            handler->PSendSysMessage("Walk alone. Survive.");
+            handler->PSendSysMessage("Hardcore Self-Found enabled. Walk alone. Survive.");
         }
         else
         {
-            handler->PSendSysMessage("Hardcore Mode enabled.");
-            handler->PSendSysMessage("You have received: Soul of Iron.");
-            handler->PSendSysMessage("Survive.");
+            handler->PSendSysMessage("Hardcore Mode enabled. Survive.");
         }
 
         return true;
@@ -559,12 +580,13 @@ public:
 
         if (data->status == HardcoreStatus::Fallen)
         {
-            handler->PSendSysMessage("Hardcore Status: Fallen");
+            handler->PSendSysMessage("Hardcore Status: Fallen — permanent ghost");
             handler->PSendSysMessage(Acore::StringFormat("Mode: {}",
                 data->mode == HardcoreMode::SelfFound ? "Self-Found Hardcore" : "Hardcore").c_str());
             handler->PSendSysMessage(Acore::StringFormat("Level Reached: {}", data->levelReached).c_str());
             handler->PSendSysMessage(Acore::StringFormat("Time Played: {}", HardcoreManager::FormatTime(data->playedTime)).c_str());
             handler->PSendSysMessage(Acore::StringFormat("Killed by: {}", data->deathKiller.empty() ? "Unknown" : data->deathKiller).c_str());
+            handler->PSendSysMessage("Resurrection is permanently disabled. Use .hardcore revive (GM only) to restore.");
             return true;
         }
 
@@ -575,12 +597,10 @@ public:
             handler->PSendSysMessage("Hardcore Status: Active");
             handler->PSendSysMessage(Acore::StringFormat("Mode: {}",
                 selfFound ? "Self-Found Hardcore" : "Hardcore").c_str());
-            handler->PSendSysMessage(Acore::StringFormat("Soul: {}",
-                selfFound ? "Soul of Iron: Self-Found" : "Soul of Iron").c_str());
             handler->PSendSysMessage(Acore::StringFormat("Level: {}", player->GetLevel()).c_str());
             handler->PSendSysMessage(Acore::StringFormat("Time Played: {}",
                 HardcoreManager::FormatTime(player->GetTotalPlayedTime())).c_str());
-            handler->PSendSysMessage("PvP: Optional, but PvP deaths count while PvP-enabled/flagged");
+            handler->PSendSysMessage("PvP: Optional — use the in-game PvP toggle. Deaths while PvP-flagged count.");
 
             if (selfFound)
             {
@@ -600,15 +620,16 @@ public:
     static bool HandleHardcoreRulesCommand(ChatHandler* handler)
     {
         handler->PSendSysMessage("Hardcore Rules:");
-        handler->PSendSysMessage("- If you die to PvE, the environment, or while PvP-enabled/flagged, your character is locked.");
+        handler->PSendSysMessage("- If you die, your character falls permanently.");
+        handler->PSendSysMessage("- Fallen characters remain as permanent ghosts. Resurrection is disabled.");
         handler->PSendSysMessage("- Creature deaths count.");
         handler->PSendSysMessage("- Dungeon and raid deaths count.");
         handler->PSendSysMessage("- Falling, drowning, lava, fatigue, and other environmental deaths count.");
-        handler->PSendSysMessage("- PvP is optional.");
         handler->PSendSysMessage("- Duel deaths do not count.");
         handler->PSendSysMessage("- Battleground deaths count.");
         handler->PSendSysMessage("- Arena deaths count.");
-        handler->PSendSysMessage("- World PvP deaths count if the player is PvP-enabled/flagged.");
+        handler->PSendSysMessage("- PvP is optional. Use the normal in-game PvP toggle. If you die while PvP flagged, the death counts.");
+        handler->PSendSysMessage("- World PvP deaths count if the character is PvP-flagged.");
         handler->PSendSysMessage(" ");
         handler->PSendSysMessage("Regular Hardcore:");
         handler->PSendSysMessage("- Trading is allowed.");
@@ -634,69 +655,6 @@ public:
 
         std::string board = sHardcoreMgr->BuildLeaderboard();
         handler->PSendSysMessage(board.c_str());
-        return true;
-    }
-
-    // ---- .hardcore pvp on ----
-
-    static bool HandleHardcorePvpOnCommand(ChatHandler* handler)
-    {
-        if (!sHardcoreMgr->IsEnabled())
-            return true;
-
-        Player* player = handler->GetSession()->GetPlayer();
-        uint32  guid   = player->GetGUID().GetCounter();
-
-        if (!sHardcoreMgr->IsActive(guid))
-        {
-            handler->PSendSysMessage("You must be an active Hardcore character to use this command.");
-            return true;
-        }
-
-        if (!sHardcoreMgr->Cfg().allowOptionalPvP)
-        {
-            handler->PSendSysMessage("PvP toggling is not available in this realm's Hardcore configuration.");
-            return true;
-        }
-
-        player->SetPvP(true);
-        handler->PSendSysMessage("PvP enabled. Warning: PvP deaths now count for your Hardcore run.");
-        return true;
-    }
-
-    // ---- .hardcore pvp off ----
-
-    static bool HandleHardcorePvpOffCommand(ChatHandler* handler)
-    {
-        if (!sHardcoreMgr->IsEnabled())
-            return true;
-
-        Player* player = handler->GetSession()->GetPlayer();
-        uint32  guid   = player->GetGUID().GetCounter();
-
-        if (!sHardcoreMgr->IsActive(guid))
-        {
-            handler->PSendSysMessage("You must be an active Hardcore character to use this command.");
-            return true;
-        }
-
-        if (!sHardcoreMgr->Cfg().allowOptionalPvP)
-        {
-            handler->PSendSysMessage("PvP toggling is not available in this realm's Hardcore configuration.");
-            return true;
-        }
-
-        // Respect the normal WoW PvP flag timer — don't remove PvP instantly if in combat
-        // or recently engaged in PvP. We simply call SetPvP(false) and let the core handle
-        // the PLAYER_FLAGS_PVP_TIMER which keeps the PvP flag for 5 minutes after combat.
-        if (player->IsInCombat())
-        {
-            handler->PSendSysMessage("You cannot disable PvP while in combat or shortly after PvP combat.");
-            return true;
-        }
-
-        player->SetPvP(false);
-        handler->PSendSysMessage("PvP disable requested. Your PvP flag will clear when it is safe according to normal game rules.");
         return true;
     }
 
