@@ -3157,6 +3157,7 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
                         // Exceptions
                         case 44801: // Spectral Invisibility (Kalecgos, SWP)
                         case 46021: // Spectral Realm (SWP)
+                        case 52951: // Chapel Invisibility (DK starting zone)
                             break;
                         default:
                             spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CAST;
