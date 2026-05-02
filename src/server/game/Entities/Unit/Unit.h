@@ -2310,6 +2310,32 @@ namespace Acore
     private:
         bool const _ascending;
     };
+
+    // Binary predicate for sorting Units based on current value of health
+    class HealthOrderPred
+    {
+    public:
+        HealthOrderPred(bool ascending = true) : _ascending(ascending) { }
+
+        bool operator()(WorldObject const* objA, WorldObject const* objB) const
+        {
+            Unit const* a = objA->ToUnit();
+            Unit const* b = objB->ToUnit();
+            uint32 rA = a ? a->GetHealth() : 0;
+            uint32 rB = b ? b->GetHealth() : 0;
+            return _ascending ? rA < rB : rA > rB;
+        }
+
+        bool operator() (Unit const* a, Unit const* b) const
+        {
+            uint32 rA = a ? a->GetHealth() : 0;
+            uint32 rB = b ? b->GetHealth() : 0;
+            return _ascending ? rA < rB : rA > rB;
+        }
+
+    private:
+        bool const _ascending;
+    };
 }
 
 class RedirectSpellEvent : public BasicEvent
