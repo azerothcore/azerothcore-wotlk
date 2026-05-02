@@ -94,7 +94,12 @@ jobs:
           COPY modules/mod-level-rewards/conf/mod-level-rewards.conf.dist /azerothcore/env/dist/etc/mod-level-rewards.conf
           COPY modules/mod-nostrum-rates/conf/nostrum_rates.conf.dist /azerothcore/env/dist/etc/nostrum_rates.conf
           COPY modules/mod-nostrum-bg-xp/conf/nostrum_bg_xp.conf.dist /azerothcore/env/dist/etc/nostrum_bg_xp.conf
+          COPY modules/mod-nostrum-crossfaction/conf/mod_nostrum_crossfaction.conf.dist /azerothcore/env/dist/etc/mod_nostrum_crossfaction.conf
+          COPY modules/mod-nostrum-guide/conf/mod_nostrum_guide.conf.dist /azerothcore/env/dist/etc/mod_nostrum_guide.conf
+          COPY modules/mod-nostrum-hardcore/conf/mod_nostrum_hardcore.conf.dist /azerothcore/env/dist/etc/mod_nostrum_hardcore.conf
+          COPY modules/mod_nostrum_instant_mail/conf/mod_nostrum_instant_mail.conf.dist /azerothcore/env/dist/etc/mod_nostrum_instant_mail.conf
           COPY modules/mod-nostrum-progression/conf/mod_nostrum_progression.conf.dist /azerothcore/env/dist/etc/mod_nostrum_progression.conf
+          COPY modules/mod-nostrum-starter/conf/mod_nostrum_starter.conf.dist /azerothcore/env/dist/etc/mod_nostrum_starter.conf
 
           USER acore
           EOF
