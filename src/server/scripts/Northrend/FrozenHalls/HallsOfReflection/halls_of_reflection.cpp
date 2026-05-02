@@ -215,12 +215,10 @@ public:
             instance = me->GetInstanceScript();
             if (!instance)
                 me->IsAIEnabled = false;
-            first = (instance && !instance->GetPersistentData(PERSISTENT_DATA_INTRO));
         }
 
         InstanceScript* instance;
         EventMap events;
-        bool first;
         bool shortver;
 
         void Reset() override
@@ -228,9 +226,8 @@ public:
             shortver = false;
             events.Reset();
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
-            if (first)
+            if (instance && !instance->GetPersistentData(PERSISTENT_DATA_INTRO))
             {
-                first = false;
                 events.ScheduleEvent(EVENT_PRE_INTRO_1, 10s);
                 events.ScheduleEvent(EVENT_PRE_INTRO_2, 11s);
                 events.ScheduleEvent(EVENT_EMOTE_LEADER_1, 16s);
