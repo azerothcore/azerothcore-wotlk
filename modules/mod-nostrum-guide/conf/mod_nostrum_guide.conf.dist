@@ -1,0 +1,103 @@
+################################################################################
+# Nostrum Guide Module
+#
+# Spawns first-time onboarding guide NPCs in every starting zone.
+# These NPCs are information-only. They have no vendors, quests, or rewards.
+################################################################################
+
+[worldserver]
+
+# Master switch. Set to 0 to disable custom gossip without removing spawns.
+# Default: 1
+NostrumGuide.Enable = 1
+
+################################################################################
+# NPC Settings
+################################################################################
+
+# Entry IDs for the guide NPC templates (must match SQL and creature_template).
+# Default: 900001 (Alliance), 900002 (Horde)
+NostrumGuide.AllianceNpcEntry = 900001
+NostrumGuide.HordeNpcEntry = 900002
+
+# NPC names (informational — actual names are set in creature_template SQL).
+NostrumGuide.AllianceNpcName = Loremaster Caedric
+NostrumGuide.HordeNpcName = Elder Gromak
+NostrumGuide.NpcSubName = New Player Guide
+
+# NPC scale (set in creature_template SQL — this key documents the intended value).
+# Default: 1.15
+NostrumGuide.NpcScale = 1.15
+
+# Reference creature entries used to copy display/model IDs in SQL.
+# Alliance: Rhonin-style (entry 16128, DisplayID 16024)
+# Horde: Tauren elder-style (entry 3057, DisplayID 4307)
+NostrumGuide.AllianceModelReferenceEntry = 16128
+NostrumGuide.HordeModelReferenceEntry = 3057
+
+################################################################################
+# Permanent Visual Cue
+#
+# A gameobject is spawned at each guide NPC location so new players notice the
+# NPC immediately without relying on temporary aura effects.
+# Disabling this key stops future scripted behavior; SQL spawns must be removed
+# manually if you want to remove existing visual cue gameobjects.
+################################################################################
+
+# Default: 1
+NostrumGuide.VisualCue.Enable = 1
+
+# Gameobject entry used as the visual cue (a permanent light effect).
+# Default: 149410
+NostrumGuide.VisualCue.GameObjectEntry = 149410
+
+# Reserved for future use: spawn at the same coordinates as the NPC.
+# Default: 1
+NostrumGuide.VisualCue.SpawnAtNpcLocation = 1
+
+################################################################################
+# Links
+################################################################################
+
+NostrumGuide.WebsiteUrl = https://nostrumwow.com
+NostrumGuide.DiscordUrl = https://discord.gg/YOURCODE
+
+################################################################################
+# Gossip Content
+#
+# These strings are shown in the gossip menu when players click each topic.
+# Update them to reflect the current state of the server.
+################################################################################
+
+# Current phase / level cap shown in the gossip menu.
+NostrumGuide.CurrentPhaseText = Pre-launch / Phase 0
+NostrumGuide.LevelCapText = Current level cap: To be announced
+
+# Server rates description.
+NostrumGuide.RatesText = Nostrum uses custom rates designed to respect the original WotLK progression while making the experience smoother.
+
+# World chat info.
+NostrumGuide.WorldChatText = Use /world for global community chat, questions, groups, trading, and discussion.
+
+# Hardcore mode description.
+NostrumGuide.HardcoreText = Hardcore mode is optional and can only be enabled on a fresh level 1 character with 0 XP. Hardcore characters have one life, join Deathwalkers, and receive cosmetic rewards.
+
+# Cross-faction description.
+NostrumGuide.CrossFactionText = Nostrum keeps faction identity in the open world, but enables selected cross-faction systems to improve queue times, grouping, and server health.
+
+# Dungeon Finder description.
+NostrumGuide.DungeonFinderText = Dungeon Finder may include both factions to improve queue times and make leveling dungeons easier to run.
+
+# Battleground description.
+NostrumGuide.BattlegroundText = Battlegrounds may use cross-faction matchmaking to improve queue times and balance.
+
+# Useful commands shown in the gossip menu.
+NostrumGuide.CommandsText = Useful commands: .hardcore for Hardcore mode. Join /world for global chat.
+
+################################################################################
+# Debug
+################################################################################
+
+# Verbose per-gossip-open debug logging. Leave disabled in production.
+# Default: 0
+NostrumGuide.Debug = 0
