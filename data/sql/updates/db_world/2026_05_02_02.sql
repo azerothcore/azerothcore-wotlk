@@ -1,3 +1,4 @@
+-- DB update 2026_05_02_01 -> 2026_05_02_02
 
 -- Set Probability to 0 for Mine Car and Iron Dwarf Relic second model.
 UPDATE `creature_template_model` SET `Probability` = 0 WHERE (`CreatureID` IN (28817, 24824)) AND (`Idx` IN (1));
