@@ -1,0 +1,28 @@
+################################################################################
+# NostrumWoW Instant Own-Account Mail
+#
+# Removes the mail delivery delay when a player sends mail (items, gold, text)
+# to another character on the same account.
+#
+# All other mail keeps its default AzerothCore behaviour:
+#   - Mail to characters on different accounts uses the normal delay.
+#   - Auction House mail, GM mail, system mail, and COD mail are unaffected.
+################################################################################
+
+[worldserver]
+
+# Enable instant delivery for same-account character mail.
+# Set to 0 to restore the default AzerothCore delivery delay for all mail.
+# Default: 1
+NostrumInstantOwnMail.Enable = 1
+
+# When enabled, mail sent between different accounts keeps the default delay.
+# Disabling this makes no practical difference since only same-account mail is
+# ever sped up, but the option is provided for documentation clarity.
+# Default: 1
+NostrumInstantOwnMail.PreserveDifferentAccountDelay = 1
+
+# Log each mail delivery decision at INFO level (same-account vs different-account).
+# Useful for testing and debugging. Leave disabled in production.
+# Default: 0
+NostrumInstantOwnMail.Debug = 0
