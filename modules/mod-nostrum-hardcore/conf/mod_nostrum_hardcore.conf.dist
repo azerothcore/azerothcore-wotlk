@@ -1,0 +1,123 @@
+################################################################################
+# NostrumWoW Hardcore Module
+#
+# Implements optional Hardcore and Self-Found Hardcore modes for players.
+# Use .hardcore enable or .hardcore selffound on a fresh character to opt in.
+################################################################################
+
+[worldserver]
+
+# Master switch. 0 disables the entire module.
+Hardcore.Enable = 1
+
+################################################################################
+# Eligibility
+################################################################################
+
+# Maximum total played time (seconds) allowed when opting in. Default: 600 (10 min)
+Hardcore.MaxPlayedSecondsToEnable = 600
+
+# Character must be level 1 to opt in.
+Hardcore.RequireLevelOne = 1
+
+# Character must have 0 deaths to opt in.
+Hardcore.RequireZeroDeaths = 1
+
+################################################################################
+# Death rules
+################################################################################
+
+# Count PvE deaths (creature kills). Default: 1
+Hardcore.CountPvEDeaths = 1
+
+# Count environmental deaths (fall, drown, lava, fatigue). Default: 1
+Hardcore.CountEnvironmentalDeaths = 1
+
+# Count duel deaths. Default: 0 (duels don't kill in standard WoW; this is a safeguard)
+Hardcore.CountDuelDeaths = 0
+
+# Count battleground deaths. Default: 1
+Hardcore.CountBattlegroundDeaths = 1
+
+# Count arena deaths. Default: 1
+Hardcore.CountArenaDeaths = 1
+
+# Count World PvP deaths when the character is PvP-enabled/flagged. Default: 1
+Hardcore.CountWorldPvPDeaths = 1
+
+################################################################################
+# PvP behavior
+################################################################################
+
+# Allow Hardcore characters to choose whether to PvP flag.
+# PvP deaths only count while the character is PvP-enabled/flagged.
+Hardcore.AllowOptionalPvP = 1
+
+################################################################################
+# Character locking
+################################################################################
+
+# Kick the player from the server when their Hardcore character falls. Default: 1
+Hardcore.KickOnDeath = 1
+
+# Seconds to wait before kicking on death. Note: kick happens immediately after
+# the death message is sent; this delay value is currently informational only.
+Hardcore.KickDelaySeconds = 10
+
+# Block fallen Hardcore characters from re-entering the world on login. Default: 1
+Hardcore.KickFallenOnLogin = 1
+
+################################################################################
+# Cosmetic spell IDs
+# Set to 0 to disable buff application (module works without spells).
+# Create custom spells with no stats/combat effects and set their IDs here.
+################################################################################
+
+# Spell ID for "Soul of Iron" (Regular Hardcore buff). 0 = disabled.
+Hardcore.SoulOfIronSpellId = 0
+
+# Spell ID for "Soul of Iron: Self-Found" (Self-Found Hardcore buff). 0 = disabled.
+Hardcore.SelfFoundSoulOfIronSpellId = 0
+
+################################################################################
+# Announcements
+################################################################################
+
+# Announce globally when a player opts into Hardcore. Default: 1
+Hardcore.AnnounceOptIn = 1
+
+# Announce globally when a Hardcore character falls. Default: 1
+Hardcore.AnnounceDeaths = 1
+
+# Announce globally at level milestones. Default: 1
+Hardcore.AnnounceMilestones = 1
+
+# Comma-separated list of levels that trigger a milestone announcement.
+Hardcore.MilestoneLevels = 10,20,40,60,70,80
+
+################################################################################
+# Leaderboard
+################################################################################
+
+# Maximum number of entries shown in the leaderboard. Default: 10
+Hardcore.LeaderboardLimit = 10
+
+################################################################################
+# Self-Found restrictions
+################################################################################
+
+# Block trading for Self-Found characters. Default: 1
+Hardcore.SelfFound.BlockTrade = 1
+
+# Block Auction House access entirely for Self-Found characters. Default: 1
+# Blocks the NPC interaction before the AH window opens (no buying or selling).
+Hardcore.SelfFound.BlockAuctionHouse = 1
+
+# Block player-to-player mail for Self-Found characters. Default: 1
+Hardcore.SelfFound.BlockPlayerMail = 1
+
+################################################################################
+# Debug
+################################################################################
+
+Hardcore.Debug = 0

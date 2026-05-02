@@ -90,6 +90,12 @@ jobs:
           RUN chmod +x /azerothcore/env/dist/bin/worldserver && \
               chown acore:acore /azerothcore/env/dist/bin/worldserver
 
+          COPY modules/mod-dual-spec-19/conf/mod-dual-spec-19.conf.dist /azerothcore/env/dist/etc/mod-dual-spec-19.conf
+          COPY modules/mod-level-rewards/conf/mod-level-rewards.conf.dist /azerothcore/env/dist/etc/mod-level-rewards.conf
+          COPY modules/mod-nostrum-rates/conf/nostrum_rates.conf.dist /azerothcore/env/dist/etc/nostrum_rates.conf
+          COPY modules/mod-nostrum-bg-xp/conf/nostrum_bg_xp.conf.dist /azerothcore/env/dist/etc/nostrum_bg_xp.conf
+          COPY modules/mod-nostrum-progression/conf/mod_nostrum_progression.conf.dist /azerothcore/env/dist/etc/mod_nostrum_progression.conf
+
           USER acore
           EOF
 
