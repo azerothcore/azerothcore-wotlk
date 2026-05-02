@@ -119,3 +119,5 @@ local.properties
 !modules/mod-nostrum-bg-xp
 !modules/mod-nostrum-hardcore
 !modules/mod-nostrum-starter
+!modules/mod_nostrum_instant_mail
+!modules/mod-nostrum-crossfaction
