@@ -39,15 +39,15 @@ DELETE FROM creature_template WHERE entry IN (900001, 900002);
 
 -- Alliance guide: Loremaster Caedric
 INSERT INTO creature_template
-    (entry, name, subname, minlevel, maxlevel, faction, npcflag, unit_flags, type, scale, flags_extra, ScriptName)
+    (entry, name, subname, minlevel, maxlevel, faction, npcflag, unit_flags, type, flags_extra, ScriptName)
 VALUES
-    (900001, 'Loremaster Caedric', 'New Player Guide', 1, 1, 35, 1, 2, 7, 1.15, 2, 'nostrum_guide');
+    (900001, 'Loremaster Caedric', 'New Player Guide', 1, 1, 35, 1, 2, 7, 2, 'nostrum_guide');
 
 -- Horde guide: Elder Gromak
 INSERT INTO creature_template
-    (entry, name, subname, minlevel, maxlevel, faction, npcflag, unit_flags, type, scale, flags_extra, ScriptName)
+    (entry, name, subname, minlevel, maxlevel, faction, npcflag, unit_flags, type, flags_extra, ScriptName)
 VALUES
-    (900002, 'Elder Gromak', 'New Player Guide', 1, 1, 35, 1, 2, 7, 1.15, 2, 'nostrum_guide');
+    (900002, 'Elder Gromak', 'New Player Guide', 1, 1, 35, 1, 2, 7, 2, 'nostrum_guide');
 
 -- ============================================================
 -- 3. Creature models (creature_template_model)
