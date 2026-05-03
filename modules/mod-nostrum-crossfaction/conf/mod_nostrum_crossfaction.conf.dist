@@ -20,10 +20,10 @@ NostrumCrossFaction.Enable = 1
 # Communication
 ################################################################################
 
-# Allow Alliance and Horde players to communicate through normal chat.
+# Allow Alliance and Horde players to communicate through normal chat (/say, /yell, /whisper).
 # Requires AllowTwoSide.Interaction.Chat = 1 in worldserver.conf.
-# Default: 1
-NostrumCrossFaction.Chat.Enable = 1
+# Default: 0 (faction identity preserved in open world)
+NostrumCrossFaction.Chat.Enable = 0
 
 # Allow Alliance and Horde players to share custom chat channels such as /world.
 # Requires AllowTwoSide.Interaction.Channel = 1 in worldserver.conf.
@@ -32,8 +32,8 @@ NostrumCrossFaction.Channels.Enable = 1
 
 # Allow Alliance and Horde players to see each other in /who.
 # Requires AllowTwoSide.WhoList = 1 in worldserver.conf.
-# Default: 1
-NostrumCrossFaction.WhoList.Enable = 1
+# Default: 0
+NostrumCrossFaction.WhoList.Enable = 0
 
 ################################################################################
 # World Channel Integration
@@ -72,8 +72,8 @@ NostrumCrossFaction.WorldChannel.MessageCooldownSeconds = 3
 
 # Allow cross-faction auction house interaction.
 # Requires AllowTwoSide.Interaction.Auction = 1 in worldserver.conf.
-# Default: 1
-NostrumCrossFaction.AuctionHouse.Enable = 1
+# Default: 0
+NostrumCrossFaction.AuctionHouse.Enable = 0
 
 # Allow cross-faction mail.
 # Requires AllowTwoSide.Interaction.Mail = 1 in worldserver.conf.
