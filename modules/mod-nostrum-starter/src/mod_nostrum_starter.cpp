@@ -27,7 +27,7 @@ namespace
 struct StarterConfig
 {
     bool        enabled         = true;
-    uint32      bagItemId       = 1725; // Large Knapsack
+    uint32      bagItemId       = 900100; // Nostrum Starter Bag
     uint32      bagCount        = 1;
     std::string welcomeMessage  = "Welcome to NostrumWoW! You have received a starter bag.";
 };
@@ -157,7 +157,7 @@ class NostrumStarterPlayerScript : public PlayerScript
 {
 public:
     NostrumStarterPlayerScript() : PlayerScript("NostrumStarterPlayerScript",
-        { PLAYERHOOK_ON_LOGIN })
+        { PLAYERHOOK_ON_LOGIN, PLAYERHOOK_CAN_SELL_ITEM })
     {
     }
 
@@ -167,6 +167,20 @@ public:
             return;
 
         TryGrantStarterBag(player);
+    }
+
+    bool OnPlayerCanSellItem(Player* player, Item* item, Creature* /*vendor*/) override
+    {
+        if (!gCfg.enabled)
+            return true;
+
+        if (item->GetEntry() == gCfg.bagItemId)
+        {
+            ChatHandler(player->GetSession()).PSendSysMessage("The starter bag cannot be sold.");
+            return false;
+        }
+
+        return true;
     }
 };
 

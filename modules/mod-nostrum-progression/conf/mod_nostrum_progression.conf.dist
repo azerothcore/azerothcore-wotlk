@@ -1,26 +1,46 @@
 ################################################################################
 # NostrumWoW Progression Module Configuration
+#
+# To advance the server to the next phase, change Nostrum.ActivePhase and
+# run `.reload config` on the worldserver console. Everything else (level cap,
+# phase name, XP rates, DK lock) updates automatically.
 ################################################################################
 
 [worldserver]
 
 # Enable or disable the progression module.
-# Default: 1 (enabled)
+# Default: 1
 Nostrum.Progression.Enable = 1
 
-# The current phase level cap.
-# Players above this level will be reduced to it on login and on leveling.
-# Default: 19
-Nostrum.Progression.LevelCap = 19
+################################################################################
+# Active Phase
+#
+# This is the single value that controls the current server phase.
+# It is shared with mod-nostrum-rates, which reads the same key to set XP
+# rates and unlock Death Knight creation.
+#
+# Phase 0 — Beta    : cap 80 (no restriction), 3× XP everywhere
+# Phase 1 — Phase 1 : cap 19
+# Phase 2 — Phase 2 : cap 29  (1-18: 2× catch-up,  19-29: 1×)
+# Phase 3 — Phase 3 : cap 39  (1-28: 2× catch-up,  29-39: 1×)
+# Phase 4 — Phase 4 : cap 49  (1-38: 2× catch-up,  39-49: 1×)
+# Phase 5 — Phase 5 : cap 60  (1-48: 2× catch-up,  49-60: 1×)
+# Phase 6 — Phase 6 : cap 70  (1-59: 2× catch-up,  60-70: 1×) — TBC
+# Phase 7 — Phase 7 : cap 80  (1-69: 2× catch-up,  70-80: 1×) — WotLK, DK unlocked
+#
+# Default: 1
+################################################################################
 
-# Display name for the current phase shown in login/cap messages.
-# Default: "Phase 1"
-Nostrum.Progression.PhaseName = "Phase 1"
+Nostrum.ActivePhase = 1
+
+################################################################################
+# Other options
+################################################################################
 
 # Allow GMs (security level >= 2) to bypass the level cap.
-# Default: 1 (GMs are exempt)
+# Default: 1
 Nostrum.Progression.GmBypass = 1
 
-# Send an announcement on login showing the current phase and level cap.
-# Default: 1 (enabled)
+# Send a login message showing the current phase and level cap.
+# Default: 1
 Nostrum.Progression.LoginAnnouncement = 1

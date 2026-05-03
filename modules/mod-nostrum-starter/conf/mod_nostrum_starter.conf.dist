@@ -17,8 +17,8 @@ NostrumStarter.Enable = 1
 ################################################################################
 
 # Item ID for the starter bag.
-# Default: 1725 (Large Knapsack, 12 slots)
-NostrumStarter.Bag.ItemId = 1725
+# Default: 900100 (Nostrum Starter Bag — unsellable custom item, 12 slots)
+NostrumStarter.Bag.ItemId = 900100
 
 # Number of starter bags to grant.
 # Default: 1

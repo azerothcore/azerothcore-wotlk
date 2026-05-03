@@ -131,6 +131,7 @@ public:
             PLAYERHOOK_CAN_PLACE_AUCTION_BID,
             PLAYERHOOK_CAN_RESURRECT,
             PLAYERHOOK_CAN_REPOP_AT_GRAVEYARD,
+            PLAYERHOOK_ON_BEFORE_SEND_CHAT_MESSAGE,
         })
     {
     }
@@ -183,19 +184,29 @@ public:
 
     // ---- Self-Found trade restrictions ----
 
-    bool OnPlayerCanInitTrade(Player* player, Player* /*target*/) override
+    bool OnPlayerCanInitTrade(Player* player, Player* target) override
     {
         if (!sHardcoreMgr->IsEnabled())
             return true;
 
         uint32 guid = player->GetGUID().GetCounter();
 
-        // Block if already Self-Found active
         if (sHardcoreMgr->IsSelfFound(guid) && sHardcoreMgr->Cfg().selfFoundBlockTrade)
         {
             ChatHandler(player->GetSession()).PSendSysMessage(
                 "Self-Found Hardcore characters cannot trade.");
             return false;
+        }
+
+        if (target)
+        {
+            uint32 targetGuid = target->GetGUID().GetCounter();
+            if (sHardcoreMgr->IsSelfFound(targetGuid) && sHardcoreMgr->Cfg().selfFoundBlockTrade)
+            {
+                ChatHandler(player->GetSession()).PSendSysMessage(
+                    "That player cannot trade.");
+                return false;
+            }
         }
 
         // Flag for eligibility tracking (initiating a trade window flags the character)
@@ -303,6 +314,24 @@ public:
         ChatHandler(player->GetSession()).PSendSysMessage(
             "This Hardcore character has fallen. Resurrection is permanently disabled.");
         return false;
+    }
+
+    // ---- Chat prefix ----
+
+    void OnPlayerBeforeSendChatMessage(Player* player, uint32& /*type*/, uint32& /*lang*/, std::string& msg) override
+    {
+        if (!sHardcoreMgr->IsEnabled())
+            return;
+
+        if (msg.rfind("[HC]", 0) == 0 || msg.rfind("[SF]", 0) == 0)
+            return;
+
+        uint32 guid = player->GetGUID().GetCounter();
+
+        if (sHardcoreMgr->IsSelfFound(guid))
+            msg = "[SF] " + msg;
+        else if (sHardcoreMgr->IsHardcore(guid))
+            msg = "[HC] " + msg;
     }
 };
 

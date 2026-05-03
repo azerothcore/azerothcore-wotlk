@@ -2,13 +2,27 @@
  * mod-nostrum-rates
  *
  * Centralizes configurable gameplay rate modifiers for NostrumWoW.
- * All values are read from nostrum_rates.conf at startup and on .reload config.
  *
- * NOTE: This module multiplies on top of any rates set in worldserver.conf.
- *       Set Rate.XP.Kill, Rate.XP.Quest, etc. to 1.0 in worldserver.conf
- *       to let this module be the sole authority on rates.
+ * Rates are phase-driven:
+ *   Phase 0 (beta)   — flat multiplier (default 3×) for all XP.
+ *   Phases 1-7       — each phase owns a level bracket.
+ *                       Active bracket: 1× (configurable, blizzlike).
+ *                       Previous brackets: 2× (configurable, catch-up).
+ *
+ * Phase brackets:
+ *   0: beta    (flat)
+ *   1:  1-19
+ *   2: 19-29
+ *   3: 29-39
+ *   4: 39-49
+ *   5: 49-60
+ *   6: 60-70   (TBC)
+ *   7: 70-80   (WotLK)
+ *
+ * Death Knight creation is blocked while ActivePhase < 7 (configurable).
  */
 
+#include "AccountScript.h"
 #include "ArenaTeamScript.h"
 #include "Config.h"
 #include "Creature.h"
@@ -18,57 +32,68 @@
 #include "Map.h"
 #include "Player.h"
 #include "PlayerScript.h"
+#include "SharedDefines.h"
 #include "WorldScript.h"
-#include <sstream>
 #include <string_view>
-#include <vector>
 
 namespace
 {
 
 // ---------------------------------------------------------------------------
-// Config structs
+// Phase table (hardcoded)
 // ---------------------------------------------------------------------------
 
-struct LevelRangeEntry
+struct PhaseInfo
 {
-    uint8 min;
-    uint8 max;
-    float kill;
-    float quest;
-    float explore;
+    uint8       number;
+    uint8       minLevel;
+    uint8       maxLevel;
+    char const* label;
 };
+
+static constexpr PhaseInfo kPhases[8] =
+{
+    { 0,  0,  0,  "Phase 0 — Beta (flat rate)"      },
+    { 1,  1, 19,  "Phase 1 — 1-19"                  },
+    { 2, 19, 29,  "Phase 2 — 19-29"                 },
+    { 3, 29, 39,  "Phase 3 — 29-39"                 },
+    { 4, 39, 49,  "Phase 4 — 39-49"                 },
+    { 5, 49, 60,  "Phase 5 — 49-60 (Vanilla endgame)"},
+    { 6, 60, 70,  "Phase 6 — 60-70 (TBC)"           },
+    { 7, 70, 80,  "Phase 7 — 70-80 (WotLK)"         },
+};
+
+static constexpr uint8 kMaxPhase = 7;
+
+// ---------------------------------------------------------------------------
+// Config
+// ---------------------------------------------------------------------------
 
 struct NostrumRatesConfig
 {
-    bool enabled = true;
+    bool    enabled     = true;
+    uint8   activePhase = 1;
 
-    // XP
-    float xpKill         = 3.0f;
-    float xpQuest        = 3.0f;
-    float xpExplore      = 3.0f;
-    float xpBattleground = 1.0f;
-    float xpDungeon      = 3.0f;
-    float xpElite        = 3.0f;
-
-    // XP level range overrides
-    bool levelRangeEnabled = true;
-    std::vector<LevelRangeEntry> levelRanges;
+    // XP — derived from phase at runtime
+    float xpBeta         = 3.0f; // Phase 0: flat multiplier
+    float xpCurrentPhase = 1.0f; // Active bracket (blizzlike)
+    float xpCatchUp      = 2.0f; // Previous brackets (catch-up)
+    float xpBattleground = 1.0f; // Not phase-scaled (handled by mod-nostrum-bg-xp)
 
     // Reputation
-    float repKill  = 2.0f;
-    float repQuest = 2.0f;
+    float repKill  = 1.0f;
+    float repQuest = 1.0f;
 
     // Profession skill gain
-    float profGathering = 2.0f;
-    float profCrafting  = 2.0f;
+    float profGathering = 1.0f;
+    float profCrafting  = 1.0f;
 
-    // Loot drop chance multipliers (applied via OnItemRoll)
-    // Mining and herbalism share gameobject_loot_template — see README.
+    // Loot drop chance multipliers
+    // Mining and herbalism share gameobject_loot_template — see conf notes.
     float lootCreature      = 1.0f;
     float lootSkinning      = 1.0f;
     float lootFishing       = 1.0f;
-    float lootMining        = 1.0f; // also applies to herbalism
+    float lootMining        = 1.0f;
     float lootDisenchanting = 1.0f;
     float lootProspecting   = 1.0f;
     float lootMilling       = 1.0f;
@@ -79,6 +104,9 @@ struct NostrumRatesConfig
     // PvP
     float pvpHonor       = 1.0f;
     float pvpArenaPoints = 1.0f;
+
+    // Death Knight restriction
+    bool blockDKBeforePhase7 = true;
 };
 
 NostrumRatesConfig gCfg;
@@ -102,62 +130,9 @@ float LoadRate(std::string const& key, float defaultVal)
     return ValidatedRate(key, sConfigMgr->GetOption<float>(key, defaultVal), defaultVal);
 }
 
-void ParseLevelRanges()
-{
-    gCfg.levelRanges.clear();
-
-    std::string brackets = sConfigMgr->GetOption<std::string>(
-        "NostrumRates.XP.LevelRange.Brackets", "1-59,60-69,70-80");
-
-    std::istringstream ss(brackets);
-    std::string token;
-    while (std::getline(ss, token, ','))
-    {
-        auto s = token.find_first_not_of(" \t");
-        auto e = token.find_last_not_of(" \t");
-        if (s == std::string::npos)
-            continue;
-        token = token.substr(s, e - s + 1);
-
-        size_t dash = token.find('-');
-        if (dash == std::string::npos || dash == 0)
-        {
-            LOG_WARN("module", ">> NostrumRates: malformed level range '{}', skipping", token);
-            continue;
-        }
-
-        int32 lo = 0, hi = 0;
-        try
-        {
-            lo = std::stoi(token.substr(0, dash));
-            hi = std::stoi(token.substr(dash + 1));
-        }
-        catch (...)
-        {
-            LOG_WARN("module", ">> NostrumRates: malformed level range '{}', skipping", token);
-            continue;
-        }
-
-        if (lo < 1 || hi > 80 || lo > hi)
-        {
-            LOG_WARN("module", ">> NostrumRates: level range {}-{} out of bounds [1-80], skipping", lo, hi);
-            continue;
-        }
-
-        std::string prefix = "NostrumRates.XP.LevelRange." + token + ".";
-        LevelRangeEntry entry;
-        entry.min     = static_cast<uint8>(lo);
-        entry.max     = static_cast<uint8>(hi);
-        entry.kill    = LoadRate(prefix + "Kill",    gCfg.xpKill);
-        entry.quest   = LoadRate(prefix + "Quest",   gCfg.xpQuest);
-        entry.explore = LoadRate(prefix + "Explore", gCfg.xpExplore);
-        gCfg.levelRanges.push_back(entry);
-    }
-}
-
 void LoadConfig()
 {
-    gCfg = {};  // reset to defaults
+    gCfg = {};
 
     gCfg.enabled = sConfigMgr->GetOption<bool>("NostrumRates.Enable", true);
     if (!gCfg.enabled)
@@ -166,25 +141,28 @@ void LoadConfig()
         return;
     }
 
-    // XP
-    gCfg.xpKill         = LoadRate("NostrumRates.XP.Kill",         3.0f);
-    gCfg.xpQuest        = LoadRate("NostrumRates.XP.Quest",        3.0f);
-    gCfg.xpExplore      = LoadRate("NostrumRates.XP.Explore",      3.0f);
-    gCfg.xpBattleground = LoadRate("NostrumRates.XP.Battleground", 1.0f);
-    gCfg.xpDungeon      = LoadRate("NostrumRates.XP.Dungeon",      3.0f);
-    gCfg.xpElite        = LoadRate("NostrumRates.XP.Elite",        3.0f);
+    uint32 phase = sConfigMgr->GetOption<uint32>("Nostrum.ActivePhase", 1);
+    if (phase > kMaxPhase)
+    {
+        LOG_WARN("module", ">> NostrumRates: ActivePhase {} out of range [0-{}], clamping to 1",
+            phase, kMaxPhase);
+        phase = 1;
+    }
+    gCfg.activePhase = static_cast<uint8>(phase);
 
-    gCfg.levelRangeEnabled = sConfigMgr->GetOption<bool>("NostrumRates.XP.LevelRange.Enable", true);
-    if (gCfg.levelRangeEnabled)
-        ParseLevelRanges();
+    // XP
+    gCfg.xpBeta         = LoadRate("NostrumRates.XP.BetaRate",         3.0f);
+    gCfg.xpCurrentPhase = LoadRate("NostrumRates.XP.CurrentPhaseRate", 1.0f);
+    gCfg.xpCatchUp      = LoadRate("NostrumRates.XP.CatchUpRate",      2.0f);
+    gCfg.xpBattleground = LoadRate("NostrumRates.XP.Battleground",     1.0f);
 
     // Reputation
-    gCfg.repKill  = LoadRate("NostrumRates.Reputation.Kill",  2.0f);
-    gCfg.repQuest = LoadRate("NostrumRates.Reputation.Quest", 2.0f);
+    gCfg.repKill  = LoadRate("NostrumRates.Reputation.Kill",  1.0f);
+    gCfg.repQuest = LoadRate("NostrumRates.Reputation.Quest", 1.0f);
 
     // Profession
-    gCfg.profGathering = LoadRate("NostrumRates.Profession.GatheringSkillGain", 2.0f);
-    gCfg.profCrafting  = LoadRate("NostrumRates.Profession.CraftingSkillGain",  2.0f);
+    gCfg.profGathering = LoadRate("NostrumRates.Profession.GatheringSkillGain", 1.0f);
+    gCfg.profCrafting  = LoadRate("NostrumRates.Profession.CraftingSkillGain",  1.0f);
 
     // Loot
     gCfg.lootCreature      = LoadRate("NostrumRates.Loot.Creature",      1.0f);
@@ -197,9 +175,10 @@ void LoadConfig()
 
     float herbRate = LoadRate("NostrumRates.Loot.Herbalism", 1.0f);
     if (herbRate != gCfg.lootMining)
-        LOG_WARN("module", ">> NostrumRates: Loot.Mining ({:.1f}) and Loot.Herbalism ({:.1f}) differ "
-                           "but both go through gameobject_loot_template — Mining rate will be used for both",
-                           gCfg.lootMining, herbRate);
+        LOG_WARN("module",
+            ">> NostrumRates: Loot.Mining ({:.1f}) and Loot.Herbalism ({:.1f}) differ "
+            "but both go through gameobject_loot_template — Mining rate will be used for both",
+            gCfg.lootMining, herbRate);
 
     // Money
     gCfg.moneyCreature = LoadRate("NostrumRates.Money.Creature", 1.0f);
@@ -208,44 +187,40 @@ void LoadConfig()
     gCfg.pvpHonor       = LoadRate("NostrumRates.PvP.Honor",       1.0f);
     gCfg.pvpArenaPoints = LoadRate("NostrumRates.PvP.ArenaPoints", 1.0f);
 
+    // DK
+    gCfg.blockDKBeforePhase7 = sConfigMgr->GetOption<bool>("NostrumRates.BlockDKBeforePhase7", true);
+
     // Startup log
-    LOG_INFO("module", ">> NostrumRates: module enabled");
-    LOG_INFO("module", ">> NostrumRates: XP Kill = {:.1f}", gCfg.xpKill);
-    LOG_INFO("module", ">> NostrumRates: XP Quest = {:.1f}", gCfg.xpQuest);
-    LOG_INFO("module", ">> NostrumRates: XP Explore = {:.1f}", gCfg.xpExplore);
-    LOG_INFO("module", ">> NostrumRates: XP Battleground = {:.1f}", gCfg.xpBattleground);
-    LOG_INFO("module", ">> NostrumRates: XP Dungeon = {:.1f}", gCfg.xpDungeon);
-    LOG_INFO("module", ">> NostrumRates: XP Elite = {:.1f}", gCfg.xpElite);
-    LOG_INFO("module", ">> NostrumRates: XP LevelRange = {}", gCfg.levelRangeEnabled ? "enabled" : "disabled");
-    LOG_INFO("module", ">> NostrumRates: Reputation Kill = {:.1f}", gCfg.repKill);
-    LOG_INFO("module", ">> NostrumRates: Reputation Quest = {:.1f}", gCfg.repQuest);
-    LOG_INFO("module", ">> NostrumRates: Profession Gathering = {:.1f}", gCfg.profGathering);
-    LOG_INFO("module", ">> NostrumRates: Profession Crafting = {:.1f}", gCfg.profCrafting);
-    LOG_INFO("module", ">> NostrumRates: Loot Creature = {:.1f}", gCfg.lootCreature);
-    LOG_INFO("module", ">> NostrumRates: Loot Skinning = {:.1f}", gCfg.lootSkinning);
-    LOG_INFO("module", ">> NostrumRates: Loot Fishing = {:.1f}", gCfg.lootFishing);
-    LOG_INFO("module", ">> NostrumRates: Loot Mining+Herbalism = {:.1f}", gCfg.lootMining);
-    LOG_INFO("module", ">> NostrumRates: Loot Disenchanting = {:.1f}", gCfg.lootDisenchanting);
-    LOG_INFO("module", ">> NostrumRates: Loot Prospecting = {:.1f}", gCfg.lootProspecting);
-    LOG_INFO("module", ">> NostrumRates: Loot Milling = {:.1f}", gCfg.lootMilling);
-    LOG_INFO("module", ">> NostrumRates: Money Creature = {:.1f}", gCfg.moneyCreature);
-    LOG_INFO("module", ">> NostrumRates: PvP Honor = {:.1f}", gCfg.pvpHonor);
-    LOG_INFO("module", ">> NostrumRates: PvP ArenaPoints = {:.1f}", gCfg.pvpArenaPoints);
+    LOG_INFO("module", ">> NostrumRates: active = {}", kPhases[gCfg.activePhase].label);
+    if (gCfg.activePhase == 0)
+        LOG_INFO("module", ">> NostrumRates: XP = {:.1f}x (beta flat rate)", gCfg.xpBeta);
+    else
+        LOG_INFO("module", ">> NostrumRates: XP current bracket = {:.1f}x  catch-up = {:.1f}x",
+            gCfg.xpCurrentPhase, gCfg.xpCatchUp);
+    LOG_INFO("module", ">> NostrumRates: XP Battleground = {:.1f}x", gCfg.xpBattleground);
+    LOG_INFO("module", ">> NostrumRates: DK creation block = {}",
+        (gCfg.blockDKBeforePhase7 && gCfg.activePhase < 7) ? "YES (phase < 7)" : "no");
 }
 
-// Returns the effective XP rate for a player's current level, falling back to globalRate
-// if level ranges are disabled or the player's level matches no configured range.
-float ResolveXPRate(Player const* player, float LevelRangeEntry::*field, float globalRate)
+// Returns the effective XP rate for a given player level.
+// Scans phase brackets from active phase downward; the first match wins,
+// so boundary levels (e.g. 19 appears in both Phase 1 and Phase 2) resolve
+// to the higher-numbered (more recent) phase.
+float ResolveXPRate(uint8 level)
 {
-    if (!gCfg.levelRangeEnabled || gCfg.levelRanges.empty())
-        return globalRate;
+    if (gCfg.activePhase == 0)
+        return gCfg.xpBeta;
 
-    uint8 level = player->GetLevel();
-    for (LevelRangeEntry const& r : gCfg.levelRanges)
-        if (level >= r.min && level <= r.max)
-            return r.*field;
+    for (int p = static_cast<int>(gCfg.activePhase); p >= 1; --p)
+    {
+        if (level >= kPhases[p].minLevel && level <= kPhases[p].maxLevel)
+            return (p == static_cast<int>(gCfg.activePhase))
+                ? gCfg.xpCurrentPhase
+                : gCfg.xpCatchUp;
+    }
 
-    return globalRate;
+    // Level not in any defined bracket — treat as current phase rate.
+    return gCfg.xpCurrentPhase;
 }
 
 float GetLootRate(char const* storeName)
@@ -255,7 +230,7 @@ float GetLootRate(char const* storeName)
     if (name == "creature_loot_template")    return gCfg.lootCreature;
     if (name == "skinning_loot_template")    return gCfg.lootSkinning;
     if (name == "fishing_loot_template")     return gCfg.lootFishing;
-    if (name == "gameobject_loot_template")  return gCfg.lootMining; // mining + herbalism
+    if (name == "gameobject_loot_template")  return gCfg.lootMining;
     if (name == "disenchant_loot_template")  return gCfg.lootDisenchanting;
     if (name == "prospecting_loot_template") return gCfg.lootProspecting;
     if (name == "milling_loot_template")     return gCfg.lootMilling;
@@ -265,7 +240,7 @@ float GetLootRate(char const* storeName)
 } // anonymous namespace
 
 // ---------------------------------------------------------------------------
-// WorldScript — config load + startup logging
+// WorldScript — config reload
 // ---------------------------------------------------------------------------
 
 class NostrumRatesWorldScript : public WorldScript
@@ -302,7 +277,7 @@ public:
     {
     }
 
-    void OnPlayerGiveXP(Player* player, uint32& amount, Unit* victim, uint8 xpSource) override
+    void OnPlayerGiveXP(Player* player, uint32& amount, Unit* /*victim*/, uint8 xpSource) override
     {
         if (!gCfg.enabled)
             return;
@@ -312,27 +287,10 @@ public:
         switch (xpSource)
         {
             case XPSOURCE_KILL:
-            {
-                if (victim && victim->GetTypeId() == TYPEID_UNIT)
-                {
-                    bool inInstance = player->GetMap()->IsDungeon() || player->GetMap()->IsRaid();
-                    if (inInstance)
-                        rate = ResolveXPRate(player, &LevelRangeEntry::kill, gCfg.xpDungeon);
-                    else if (victim->ToCreature()->isElite())
-                        rate = ResolveXPRate(player, &LevelRangeEntry::kill, gCfg.xpElite);
-                    else
-                        rate = ResolveXPRate(player, &LevelRangeEntry::kill, gCfg.xpKill);
-                }
-                else
-                    rate = ResolveXPRate(player, &LevelRangeEntry::kill, gCfg.xpKill);
-                break;
-            }
             case XPSOURCE_QUEST:
             case XPSOURCE_QUEST_DF:
-                rate = ResolveXPRate(player, &LevelRangeEntry::quest, gCfg.xpQuest);
-                break;
             case XPSOURCE_EXPLORE:
-                rate = ResolveXPRate(player, &LevelRangeEntry::explore, gCfg.xpExplore);
+                rate = ResolveXPRate(player->GetLevel());
                 break;
             case XPSOURCE_BATTLEGROUND:
                 rate = gCfg.xpBattleground;
@@ -445,8 +403,6 @@ public:
     {
     }
 
-    // Returning true lets the roll proceed (with the modified chance).
-    // Returning false cancels the drop entirely.
     bool OnItemRoll(Player const* /*player*/, LootStoreItem const* /*item*/, float& chance,
                     Loot& /*loot*/, LootStore const& store) override
     {
@@ -456,6 +412,30 @@ public:
         float rate = GetLootRate(store.GetName());
         if (rate != 1.0f)
             chance *= rate;
+
+        return true;
+    }
+};
+
+// ---------------------------------------------------------------------------
+// AccountScript — block Death Knight creation before Phase 7
+// ---------------------------------------------------------------------------
+
+class NostrumRatesAccountScript : public AccountScript
+{
+public:
+    NostrumRatesAccountScript() : AccountScript("NostrumRatesAccountScript",
+        { ACCOUNTHOOK_CAN_ACCOUNT_CREATE_CHARACTER })
+    {
+    }
+
+    bool CanAccountCreateCharacter(uint32 /*accountId*/, uint8 /*charRace*/, uint8 charClass) override
+    {
+        if (!gCfg.enabled || !gCfg.blockDKBeforePhase7)
+            return true;
+
+        if (gCfg.activePhase < 7 && charClass == CLASS_DEATH_KNIGHT)
+            return false;
 
         return true;
     }
@@ -472,4 +452,5 @@ void Addmod_nostrum_ratesScripts()
     new NostrumRatesFormulaScript();
     new NostrumRatesArenaTeamScript();
     new NostrumRatesGlobalScript();
+    new NostrumRatesAccountScript();
 }

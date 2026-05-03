@@ -4,7 +4,46 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
+This is **NostrumWoW** — a custom World of Warcraft 3.3.5a private server built on AzerothCore. It is a progression-phased, community-focused server with optional hardcore mode. See `NOSTRUM.md` for the full feature and design reference.
+
 AzerothCore is an open-source MMORPG server emulator for World of Warcraft patch 3.3.5a (Wrath of the Lich King). It's a C++ project built with CMake, using MySQL for data storage. Licensed under GNU GPL v2.
+
+## Custom Modules
+
+All NostrumWoW-specific logic lives in `modules/`. Do not modify core files unless a feature genuinely cannot be implemented via a module hook.
+
+| Module | Purpose |
+|--------|---------|
+| `mod-nostrum-progression` | Enforces level cap per progression phase |
+| `mod-nostrum-rates` | Centralized XP, reputation, loot, and money multipliers |
+| `mod-nostrum-bg-xp` | BG completion XP with anti-AFK and daily bonus |
+| `mod-nostrum-hardcore` | Opt-in hardcore and self-found hardcore mode |
+| `mod-nostrum-crossfaction` | Cross-faction policy: chat, groups, economy, world channel |
+| `mod-nostrum-guide` | New player guide NPCs in all starting zones |
+| `mod-nostrum-starter` | One-time starter bag for fresh level-1 characters |
+| `mod_nostrum_instant_mail` | Instant player-to-player mail delivery |
+| `mod-level-rewards` | Gold mailed to players at level milestones |
+| `mod-dual-spec-19` | Dual spec available from level 19 |
+| `mod-cfbg` | Mixed-faction battlegrounds (third-party) |
+
+### Custom DB entry ranges (do not reuse)
+
+- `item_template` entry `900100`: Nostrum Starter Bag
+- `creature_template` entries `900001`–`900002`: Guide NPCs
+- `creature` / `gameobject` GUIDs `9000001`–`9000008`: Guide NPC spawns
+
+### Module SQL
+
+Module SQL files live in `modules/<name>/data/sql/` or `modules/<name>/sql/`. When a module creates tables at startup via `OnStartup()`, the SQL file is kept for reference and manual installation. Always run pending module SQL against the correct database (`acore_world` or `acore_characters`) before deploying.
+
+### Key implementation notes
+
+- **Cross-faction RDF** works via `AllowTwoSide.Interaction.Group = 1` — `LFGMgr::SetTeam()` normalizes all players to the same queue. No core patch needed.
+- **Manual cross-faction invites** are blocked by `mod-nostrum-crossfaction`'s `OnPlayerCanGroupInvite` hook regardless of the core config.
+- **Cross-faction BGs** are handled entirely by `mod-cfbg`.
+- **World channel** (`/world`) uses AzerothCore's native `ChannelMgr`. Cross-faction visibility requires `AllowTwoSide.Interaction.Channel = 1`.
+- **Session iteration** in modules: use `sWorldSessionMgr->GetAllSessions()` from `WorldSessionMgr.h`. Do not use `sWorld->GetAllSessions()` — that method does not exist on `IWorld`.
+- **MariaDB compatibility**: `MySQLConnection.cpp` guards `mysql_stmt_bind_named_param` with `!defined(MARIADB_VERSION_ID) && MYSQL_VERSION_ID >= 80300`. The SSL block is also guarded for MariaDB. Do not remove these guards.
 
 ## Build Commands
 

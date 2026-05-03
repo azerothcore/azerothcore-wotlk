@@ -113,9 +113,9 @@ NostrumCrossFaction.DungeonGroups.CleanupOutsideInstance = 1
 ################################################################################
 # Dungeon Finder / RDF
 #
-# NOTE: RDF cross-faction queue matching cannot be implemented from a module
-# without a core patch. When enabled, the module logs a warning explaining
-# what is required. See LFGMgr::FindNewGroups / LFGMgr::MakeNewGroup.
+# NOTE: Cross-faction RDF queue matching requires AllowTwoSide.Interaction.Group = 1
+# in worldserver.conf. When enabled, LFGMgr::SetTeam normalizes all players to
+# the same team so they share a single queue and can be matched together.
 ################################################################################
 
 # Enable cross-faction Dungeon Finder / RDF matching.

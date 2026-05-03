@@ -279,11 +279,13 @@ void LogStartupState()
     // --- RDF ---
     LOG_INFO("module", "[NostrumCrossFaction] --- RDF / Dungeon Finder ---");
     if (gCfg.rdfEnable && gCfg.rdfMixedFactions)
-        // TODO: Implement RDF faction mixing via core patch in LFGMgr.cpp (LFGMgr::FindNewGroups /
-        // LFGMgr::MakeNewGroup). No clean module hook exists for cross-faction RDF queue matching.
-        LOG_WARN("module", "[NostrumCrossFaction] RDF cross-faction matching: configured but requires a core patch. "
-            "This module enforces config and policy only. "
-            "See LFGMgr::FindNewGroups / LFGMgr::MakeNewGroup for implementation entry points.");
+    {
+        if (!CoreBool("AllowTwoSide.Interaction.Group"))
+            LOG_WARN("module", "[NostrumCrossFaction] RDF cross-faction matching: requires "
+                "AllowTwoSide.Interaction.Group = 1 in worldserver.conf.");
+        else
+            LOG_INFO("module", "[NostrumCrossFaction] RDF cross-faction matching: enabled (core config OK).");
+    }
     else
         LOG_INFO("module", "[NostrumCrossFaction] RDF cross-faction: disabled.");
 
@@ -411,9 +413,9 @@ public:
         // Message cooldown
         if (gCfg.worldChannelCooldownSec > 0)
         {
-            time_t now       = time(nullptr);
-            uint64 guidLow   = player->GetGUID().GetCounter();
-            auto   it        = gLastSpeak.find(guidLow);
+            time_t now     = time(nullptr);
+            uint64 guidLow = player->GetGUID().GetCounter();
+            auto   it      = gLastSpeak.find(guidLow);
 
             if (it != gLastSpeak.end())
             {
