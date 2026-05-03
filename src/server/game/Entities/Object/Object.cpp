@@ -1681,19 +1681,19 @@ float WorldObject::GetGridActivationRange() const
     if (ToPlayer())
     {
         if (ToPlayer()->GetCinematicMgr().IsOnCinematic())
-        {
             return DEFAULT_VISIBILITY_INSTANCE;
-        }
-        return IsInWintergrasp() ? VISIBILITY_DIST_WINTERGRASP : GetMap()->GetVisibilityRange();
+
+        if (IsInDalaran())
+            return VISIBILITY_DIST_DALARAN;
+        else if (IsInWintergrasp())
+            return VISIBILITY_DIST_WINTERGRASP;
+        else
+            return GetMap()->GetVisibilityRange();
     }
     else if (ToCreature())
-    {
         return ToCreature()->m_SightDistance;
-    }
     else if (((IsGameObject() && ToGameObject()->IsTransport()) || IsDynamicObject()) && isActiveObject())
-    {
         return GetMap()->GetVisibilityRange();
-    }
 
     return 0.0f;
 }
@@ -1704,17 +1704,26 @@ float WorldObject::GetVisibilityRange() const
         return GetVisibilityOverrideDistance();
     else if (IsGameObject())
     {
-        if (IsInWintergrasp())
+        if (IsInDalaran())
+            return VISIBILITY_DIST_DALARAN;
+        else if (IsInWintergrasp())
             return VISIBILITY_DIST_WINTERGRASP;
         else if (IsVisibilityOverridden())
             return GetVisibilityOverrideDistance();
         else if (IsInDalaran())
-            return VISIBILITY_DISTANCE_SMALL;
+            return VISIBILITY_DIST_DALARAN;
         else
             return GetMap()->GetVisibilityRange();
     }
     else
-        return IsInWintergrasp() ? VISIBILITY_DIST_WINTERGRASP : GetMap()->GetVisibilityRange();
+    {
+        if (IsInDalaran())
+            return VISIBILITY_DIST_DALARAN;
+        else if (IsInWintergrasp())
+            return VISIBILITY_DIST_WINTERGRASP;
+        else
+            return GetMap()->GetVisibilityRange();
+    }
 }
 
 float WorldObject::GetSightRange(WorldObject const* target) const
@@ -1729,7 +1738,9 @@ float WorldObject::GetSightRange(WorldObject const* target) const
                     return target->GetVisibilityOverrideDistance();
                 else if (target->IsGameObject())
                 {
-                    if (IsInWintergrasp() && target->IsInWintergrasp())
+                    if (IsInDalaran() && target->IsInDalaran())
+                        return VISIBILITY_DIST_DALARAN;
+                    else if (IsInWintergrasp() && target->IsInWintergrasp())
                         return VISIBILITY_DIST_WINTERGRASP;
                     else if (target->IsVisibilityOverridden())
                         return target->GetVisibilityOverrideDistance();
@@ -1739,15 +1750,16 @@ float WorldObject::GetSightRange(WorldObject const* target) const
                         return GetMap()->GetVisibilityRange();
                 }
 
-                if (IsInDalaran())
-                    return VISIBILITY_DISTANCE_SMALL;
+                if (IsInDalaran() && target->IsInDalaran())
+                    return VISIBILITY_DIST_DALARAN;
                 else if (IsInWintergrasp() && target->IsInWintergrasp())
                    return VISIBILITY_DIST_WINTERGRASP;
                 else
                    return GetMap()->GetVisibilityRange();
             }
+
             if (IsInDalaran())
-                return VISIBILITY_DISTANCE_SMALL;
+                return VISIBILITY_DIST_DALARAN;
             else if (IsInWintergrasp())
                 return VISIBILITY_DIST_WINTERGRASP;
             else
