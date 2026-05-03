@@ -1710,8 +1710,6 @@ float WorldObject::GetVisibilityRange() const
             return VISIBILITY_DIST_WINTERGRASP;
         else if (IsVisibilityOverridden())
             return GetVisibilityOverrideDistance();
-        else if (IsInDalaran())
-            return VISIBILITY_DIST_DALARAN;
         else
             return GetMap()->GetVisibilityRange();
     }
