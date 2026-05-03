@@ -39,7 +39,7 @@
 #define DEFAULT_VISIBILITY_DISTANCE  100.0f                 // default visible distance, 100 yards on continents
 #define DEFAULT_VISIBILITY_INSTANCE  170.0f                 // default visible distance in instances, 170 yards
 #define VISIBILITY_DIST_WINTERGRASP  175.0f
-#define VISIBILITY_DIST_DALARAN      60.0f
+#define VISIBILITY_DIST_DALARAN      84.0f                  // visible distance in dalaran due to the city's dense/compact layout
 #define DEFAULT_VISIBILITY_BGARENAS  250.0f                 // default visible distance in BG/Arenas, roughly 250 yards
 
 #define DEFAULT_WORLD_OBJECT_SIZE   0.388999998569489f      // player size, also currently used (correctly?) for any non Unit world objects
