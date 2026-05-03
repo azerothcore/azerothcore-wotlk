@@ -1,3 +1,4 @@
+-- DB update 2026_05_03_00 -> 2026_05_03_01
 
 -- Edit SmartAIs
 DELETE FROM `smart_scripts` WHERE (`entryorguid` IN (-129500, -129501, -129502, -129503, -129520, -129529, -129530, -129531, -129532, -129546, -129547, -129556)) AND (`source_type` = 0) AND (`id` IN (41, 42, 43));
