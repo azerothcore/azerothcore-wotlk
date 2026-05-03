@@ -214,25 +214,9 @@ enum UnstablePower
     SPELL_UNSTABLE_POWER_AURA = 24659
 };
 
-enum CommendationOfKaelthas
-{
-    SPELL_COMMENDATION_OF_KAELTHAS = 45480
-};
-
-enum CorpseTongueCoin
-{
-    SPELL_CORPSE_TONGUE_COIN        = 71633,
-    SPELL_CORPSE_TONGUE_COIN_HERO   = 71634
-};
-
 enum CrystalSpireOfKarabor
 {
     SPELL_CRYSTAL_SPIRE_OF_KARABOR_MANA = 35476
-};
-
-enum SoulHarvestersCharm
-{
-    SPELL_SOUL_HARVESTERS_CHARM     = 60513
 };
 
 enum SunwellExaltedNeck
@@ -258,12 +242,6 @@ enum TinyAbominationInAJar
 enum TotemOfFlowingWater
 {
     SPELL_TOTEM_OF_FLOWING_WATER_MANA = 28857
-};
-
-enum PetrifiedTwilightScale
-{
-    SPELL_PETRIFIED_TWILIGHT_SCALE_HC = 75480,
-    SPELL_PETRIFIED_TWILIGHT_SCALE    = 75477
 };
 
 enum ShardOfTheScale
@@ -5706,67 +5684,30 @@ class spell_item_unstable_power : public AuraScript
     }
 };
 
-// 45478 - Commendation of Kael'thas
-class spell_item_commendation_of_kaelthas : public AuraScript
+// 45057 - Evasive Maneuvers (Commendation of Kael'thas)
+// 52420 - Deflection (Soul Harvester's Charm)
+// 71634 - Item - Icecrown 25 Normal Tank Trinket 1 (Corpse Tongue Coin)
+// 71640 - Item - Icecrown 25 Heroic Tank Trinket 1 (Corpse Tongue Coin (Heroic))
+// 75475 - Item - Chamber of Aspects 25 Tank Trinket (Petrified Twilight Scale)
+// 75481 - Item - Chamber of Aspects 25 Heroic Tank Trinket (Petrified Twilight Scale (Heroic))
+// Trinkets that proc only when a melee hit drops you below EFFECT_0 % HP.
+class spell_item_proc_below_pct_damaged : public AuraScript
 {
-    PrepareAuraScript(spell_item_commendation_of_kaelthas);
+    PrepareAuraScript(spell_item_proc_below_pct_damaged);
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        if (HealInfo* healInfo = eventInfo.GetHealInfo())
-            if (Unit* target = healInfo->GetTarget())
-                if (target->GetHealth() + healInfo->GetEffectiveHeal() >= target->GetMaxHealth())
-                    return true;
-        return false;
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        if (!damageInfo || !damageInfo->GetDamage())
+            return false;
+
+        int32 pct = GetSpellInfo()->Effects[EFFECT_0].CalcValue();
+        return eventInfo.GetActionTarget()->HealthBelowPctDamaged(pct, damageInfo->GetDamage());
     }
 
     void Register() override
     {
-        DoCheckProc += AuraCheckProcFn(spell_item_commendation_of_kaelthas::CheckProc);
-    }
-};
-
-// 71632 - Corpse Tongue Coin
-class spell_item_corpse_tongue_coin : public AuraScript
-{
-    PrepareAuraScript(spell_item_corpse_tongue_coin);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_CORPSE_TONGUE_COIN });
-    }
-
-    void HandleProc(ProcEventInfo& eventInfo)
-    {
-        PreventDefaultAction();
-        eventInfo.GetActor()->CastSpell((Unit*)nullptr, SPELL_CORPSE_TONGUE_COIN, true, nullptr, GetEffect(EFFECT_0));
-    }
-
-    void Register() override
-    {
-        OnProc += AuraProcFn(spell_item_corpse_tongue_coin::HandleProc);
-    }
-};
-
-// 71639 - Corpse Tongue Coin (Heroic)
-class spell_item_corpse_tongue_coin_heroic : public AuraScript
-{
-    PrepareAuraScript(spell_item_corpse_tongue_coin_heroic);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_CORPSE_TONGUE_COIN_HERO });
-    }
-
-    void HandleProc(ProcEventInfo& eventInfo)
-    {
-        PreventDefaultAction();
-        eventInfo.GetActor()->CastSpell((Unit*)nullptr, SPELL_CORPSE_TONGUE_COIN_HERO, true, nullptr, GetEffect(EFFECT_0));
-    }
-
-    void Register() override
-    {
-        OnProc += AuraProcFn(spell_item_corpse_tongue_coin_heroic::HandleProc);
+        DoCheckProc += AuraCheckProcFn(spell_item_proc_below_pct_damaged::CheckProc);
     }
 };
 
@@ -5785,28 +5726,6 @@ class spell_item_crystal_spire_of_karabor : public AuraScript
     void Register() override
     {
         DoCheckProc += AuraCheckProcFn(spell_item_crystal_spire_of_karabor::CheckProc);
-    }
-};
-
-// 60512 - Soul Harvester's Charm
-class spell_item_soul_harvesters_charm : public AuraScript
-{
-    PrepareAuraScript(spell_item_soul_harvesters_charm);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_SOUL_HARVESTERS_CHARM });
-    }
-
-    void HandleProc(ProcEventInfo& eventInfo)
-    {
-        PreventDefaultAction();
-        eventInfo.GetActor()->CastSpell((Unit*)nullptr, SPELL_SOUL_HARVESTERS_CHARM, true, nullptr, GetEffect(EFFECT_0));
-    }
-
-    void Register() override
-    {
-        OnProc += AuraProcFn(spell_item_soul_harvesters_charm::HandleProc);
     }
 };
 
@@ -6022,50 +5941,6 @@ class spell_item_totem_of_flowing_water : public AuraScript
     void Register() override
     {
         OnEffectProc += AuraEffectProcFn(spell_item_totem_of_flowing_water::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
-    }
-};
-
-// 75466 - Petrified Twilight Scale
-class spell_item_petrified_twilight_scale : public AuraScript
-{
-    PrepareAuraScript(spell_item_petrified_twilight_scale);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_PETRIFIED_TWILIGHT_SCALE });
-    }
-
-    void HandleProc(ProcEventInfo& eventInfo)
-    {
-        PreventDefaultAction();
-        eventInfo.GetActionTarget()->CastSpell((Unit*)nullptr, SPELL_PETRIFIED_TWILIGHT_SCALE, true, nullptr, GetEffect(EFFECT_0));
-    }
-
-    void Register() override
-    {
-        OnProc += AuraProcFn(spell_item_petrified_twilight_scale::HandleProc);
-    }
-};
-
-// 75473 - Petrified Twilight Scale (Heroic)
-class spell_item_petrified_twilight_scale_heroic : public AuraScript
-{
-    PrepareAuraScript(spell_item_petrified_twilight_scale_heroic);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_PETRIFIED_TWILIGHT_SCALE_HC });
-    }
-
-    void HandleProc(ProcEventInfo& eventInfo)
-    {
-        PreventDefaultAction();
-        eventInfo.GetActionTarget()->CastSpell((Unit*)nullptr, SPELL_PETRIFIED_TWILIGHT_SCALE_HC, true, nullptr, GetEffect(EFFECT_0));
-    }
-
-    void Register() override
-    {
-        OnProc += AuraProcFn(spell_item_petrified_twilight_scale_heroic::HandleProc);
     }
 };
 
@@ -6355,11 +6230,8 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_pet_healing);
     RegisterSpellScript(spell_item_restless_strength);
     RegisterSpellScript(spell_item_unstable_power);
-    RegisterSpellScript(spell_item_commendation_of_kaelthas);
-    RegisterSpellScript(spell_item_corpse_tongue_coin);
-    RegisterSpellScript(spell_item_corpse_tongue_coin_heroic);
+    RegisterSpellScript(spell_item_proc_below_pct_damaged);
     RegisterSpellScript(spell_item_crystal_spire_of_karabor);
-    RegisterSpellScript(spell_item_soul_harvesters_charm);
     RegisterSpellScript(spell_item_sunwell_exalted_caster_neck);
     RegisterSpellScript(spell_item_sunwell_exalted_healer_neck);
     RegisterSpellScript(spell_item_sunwell_exalted_melee_neck);
@@ -6368,8 +6240,6 @@ void AddSC_item_spell_scripts()
     RegisterSpellScript(spell_item_tiny_abomination_in_a_jar);
     RegisterSpellScript(spell_item_tiny_abomination_in_a_jar_hero);
     RegisterSpellScript(spell_item_totem_of_flowing_water);
-    RegisterSpellScript(spell_item_petrified_twilight_scale);
-    RegisterSpellScript(spell_item_petrified_twilight_scale_heroic);
     RegisterSpellScript(spell_item_purified_shard_of_the_scale);
     RegisterSpellScript(spell_item_shiny_shard_of_the_scale);
     RegisterSpellScript(spell_item_living_root_of_the_wildheart);

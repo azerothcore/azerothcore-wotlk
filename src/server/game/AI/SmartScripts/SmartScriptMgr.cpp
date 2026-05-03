@@ -2054,6 +2054,8 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_WORLD_SCRIPT:
         case SMART_ACTION_SET_GOSSIP_MENU:
         case SMART_ACTION_SUMMON_GAMEOBJECT_GROUP:
+        case SMART_ACTION_SPAWN_SPAWNGROUP:
+        case SMART_ACTION_DESPAWN_SPAWNGROUP:
             break;
         default:
             LOG_ERROR("sql.sql", "SmartAIMgr: Not handled action_type({}), event_type({}), Entry {} SourceType {} Event {}, skipped.", e.GetActionType(), e.GetEventType(), e.entryOrGuid, e.GetScriptType(), e.event_id);

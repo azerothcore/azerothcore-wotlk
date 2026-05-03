@@ -1011,6 +1011,7 @@ struct npc_hover_disk : public VehicleAI
                 who->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SURGE_OF_POWER_DMG, true);
                 me->SetSpeed(MOVE_RUN, 1.5f);
                 me->SetSpeed(MOVE_FLIGHT, 1.5f);
+                me->SetCanFly(true);
                 me->SetDisableGravity(true);
             }
             else if (who->GetEntry() == NPC_NEXUS_LORD)

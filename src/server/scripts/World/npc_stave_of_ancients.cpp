@@ -574,12 +574,16 @@ public:
 
         void RespawnPet()
         {
+            Creature* precious = Precious();
+            if (!precious)
+                return;
+
             Position current = me->GetNearPosition(-5.0f, 0.0f);
-            Precious()->RemoveCorpse(false, false);
-            Precious()->SetPosition(current);
-            Precious()->SetHomePosition(current);
-            Precious()->setDeathState(DeathState::JustRespawned);
-            Precious()->UpdateObjectVisibility(true);
+            precious->RemoveCorpse(false, false);
+            precious->SetPosition(current);
+            precious->SetHomePosition(current);
+            precious->setDeathState(DeathState::JustRespawned);
+            precious->UpdateObjectVisibility(true);
         }
 
         void HandlePetRespawn()
