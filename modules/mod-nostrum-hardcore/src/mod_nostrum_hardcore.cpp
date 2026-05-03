@@ -184,19 +184,29 @@ public:
 
     // ---- Self-Found trade restrictions ----
 
-    bool OnPlayerCanInitTrade(Player* player, Player* /*target*/) override
+    bool OnPlayerCanInitTrade(Player* player, Player* target) override
     {
         if (!sHardcoreMgr->IsEnabled())
             return true;
 
         uint32 guid = player->GetGUID().GetCounter();
 
-        // Block if already Self-Found active
         if (sHardcoreMgr->IsSelfFound(guid) && sHardcoreMgr->Cfg().selfFoundBlockTrade)
         {
             ChatHandler(player->GetSession()).PSendSysMessage(
                 "Self-Found Hardcore characters cannot trade.");
             return false;
+        }
+
+        if (target)
+        {
+            uint32 targetGuid = target->GetGUID().GetCounter();
+            if (sHardcoreMgr->IsSelfFound(targetGuid) && sHardcoreMgr->Cfg().selfFoundBlockTrade)
+            {
+                ChatHandler(player->GetSession()).PSendSysMessage(
+                    "That player cannot trade.");
+                return false;
+            }
         }
 
         // Flag for eligibility tracking (initiating a trade window flags the character)
