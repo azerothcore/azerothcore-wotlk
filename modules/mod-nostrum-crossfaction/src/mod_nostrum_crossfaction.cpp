@@ -15,6 +15,7 @@
 #include "Channel.h"
 #include "ChannelMgr.h"
 #include "Chat.h"
+#include "CommandScript.h"
 #include "Config.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
@@ -481,6 +482,83 @@ public:
 };
 
 // ---------------------------------------------------------------------------
+// CommandScript — .world <message>
+// Accessible to all players via rbac_default_permissions (secId=0, permId=9000010).
+// ---------------------------------------------------------------------------
+
+using namespace Acore::ChatCommands;
+
+class NostrumCrossFactionCommandScript : public CommandScript
+{
+public:
+    NostrumCrossFactionCommandScript() : CommandScript("NostrumCrossFactionCommandScript") { }
+
+    ChatCommandTable GetCommands() const override
+    {
+        static ChatCommandTable table =
+        {
+            { "world", HandleWorldChatCommand, static_cast<rbac::RBACPermissions>(9000010), Console::No },
+        };
+        return table;
+    }
+
+    static bool HandleWorldChatCommand(ChatHandler* handler, Tail message)
+    {
+        if (!gCfg.enabled || !gCfg.worldChannelEnable)
+            return false;
+
+        Player* player = handler->GetSession() ? handler->GetSession()->GetPlayer() : nullptr;
+        if (!player)
+            return false;
+
+        if (message.empty())
+        {
+            handler->PSendSysMessage("Usage: .world <message>");
+            return true;
+        }
+
+        if (player->GetLevel() < gCfg.worldChannelMinSpeakLevel)
+        {
+            handler->PSendSysMessage("You must be at least level {} to speak in /world.",
+                gCfg.worldChannelMinSpeakLevel);
+            return true;
+        }
+
+        uint64 guidLow = player->GetGUID().GetCounter();
+        time_t now = time(nullptr);
+        if (gCfg.worldChannelCooldownSec > 0)
+        {
+            auto it = gLastSpeak.find(guidLow);
+            if (it != gLastSpeak.end())
+            {
+                time_t diff = now - it->second;
+                if (diff < static_cast<time_t>(gCfg.worldChannelCooldownSec))
+                {
+                    handler->PSendSysMessage("Please wait {} more second(s) before speaking in /world.",
+                        gCfg.worldChannelCooldownSec - diff);
+                    return true;
+                }
+            }
+        }
+
+        ChannelMgr* mgr = ChannelMgr::forTeam(player->GetTeamId());
+        if (!mgr)
+            return false;
+
+        Channel* channel = mgr->GetChannel(gCfg.worldChannelName, player);
+        if (!channel)
+        {
+            handler->SendSysMessage("World channel not found. Try re-logging.");
+            return false;
+        }
+
+        channel->Say(player->GetGUID(), std::string(message), LANG_UNIVERSAL);
+        gLastSpeak[guidLow] = now;
+        return true;
+    }
+};
+
+// ---------------------------------------------------------------------------
 // Registration
 // ---------------------------------------------------------------------------
 
@@ -488,4 +566,5 @@ void Addmod_nostrum_crossfactionScripts()
 {
     new NostrumCrossFactionWorldScript();
     new NostrumCrossFactionPlayerScript();
+    new NostrumCrossFactionCommandScript();
 }
