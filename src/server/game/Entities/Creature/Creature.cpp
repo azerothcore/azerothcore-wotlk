@@ -2718,7 +2718,8 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
 
     float x, y, z;
     x = y = z = 0.0f;
-    if (GetMotionMaster()->GetMotionSlot(MOTION_SLOT_IDLE)->GetResetPosition(x, y, z))
+    MovementGenerator* idleSlot = GetMotionMaster()->GetMotionSlot(MOTION_SLOT_IDLE);
+    if (idleSlot && idleSlot->GetResetPosition(x, y, z))
         return IsInDist2d(x, y, dist);
     else
         return IsInDist2d(&m_homePosition, dist);
