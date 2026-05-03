@@ -131,6 +131,7 @@ public:
             PLAYERHOOK_CAN_PLACE_AUCTION_BID,
             PLAYERHOOK_CAN_RESURRECT,
             PLAYERHOOK_CAN_REPOP_AT_GRAVEYARD,
+            PLAYERHOOK_ON_BEFORE_SEND_CHAT_MESSAGE,
         })
     {
     }
@@ -303,6 +304,24 @@ public:
         ChatHandler(player->GetSession()).PSendSysMessage(
             "This Hardcore character has fallen. Resurrection is permanently disabled.");
         return false;
+    }
+
+    // ---- Chat prefix ----
+
+    void OnPlayerBeforeSendChatMessage(Player* player, uint32& /*type*/, uint32& /*lang*/, std::string& msg) override
+    {
+        if (!sHardcoreMgr->IsEnabled())
+            return;
+
+        if (msg.rfind("[HC]", 0) == 0 || msg.rfind("[SF]", 0) == 0)
+            return;
+
+        uint32 guid = player->GetGUID().GetCounter();
+
+        if (sHardcoreMgr->IsSelfFound(guid))
+            msg = "[SF] " + msg;
+        else if (sHardcoreMgr->IsHardcore(guid))
+            msg = "[HC] " + msg;
     }
 };
 
