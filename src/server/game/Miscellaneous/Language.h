@@ -1478,6 +1478,15 @@ enum AcoreStrings
     LANG_POOL_LOOKUP_IN_POOL            = 35431,
     LANG_POOL_LOOKUP_NOT_IN_POOL        = 35432,
     LANG_POOL_LOOKUP_USE_INFO           = 35433,
-    LANG_POOL_LOOKUP_NOTARGET           = 35434
+    LANG_POOL_LOOKUP_NOTARGET           = 35434,
+
+    // Pet list command
+    LANG_PET_LIST_HEADER                = 35435,
+    LANG_PET_LIST_ENTRY                 = 35436,
+    LANG_PET_LIST_EMPTY                 = 35437,
+
+    // Pet delete command
+    LANG_PET_DELETE_NOT_FOUND           = 35438,
+    LANG_PET_DELETE_SUCCESS             = 35439
 };
 #endif
