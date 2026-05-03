@@ -16,101 +16,84 @@
 NostrumRates.Enable = 1
 
 ################################################################################
+# Active Phase
+#
+# Controlled via Nostrum.ActivePhase in mod_nostrum_progression.conf.
+# That single value drives both the level cap (progression module) and the
+# XP rate brackets + Death Knight lock (this module). Do not duplicate it here.
+#
+# See mod_nostrum_progression.conf for the full phase table.
+################################################################################
+
+################################################################################
 # XP Rates
 #
-# These multiply XP gained from each source on top of worldserver.conf rates.
-# NOTE: Rested XP cannot be modified via module hooks (worldserver.conf only).
+# XP scaling is phase-driven. No manual bracket configuration is needed.
+#
+#   Phase 0 (Beta)           : BetaRate applied to all XP sources (default 3x)
+#   Active phase bracket     : CurrentPhaseRate (default 1x, blizzlike)
+#   Previous phase brackets  : CatchUpRate (default 2x, catch-up for new/returning players)
+#
+# Boundary levels (19, 29, etc.) resolve to the higher-numbered bracket,
+# so a level-19 player in Phase 2 receives the current-phase rate.
+#
+# NOTE: BG XP bypasses phase scaling (handled by mod-nostrum-bg-xp).
+#       Rested XP cannot be modified via module hooks (worldserver.conf only).
 ################################################################################
 
-# Kill XP for normal (non-elite, non-dungeon) creatures.
-# Current phase: 1.0 (blizzlike). Previous phases use 2.0 via LevelRange overrides.
-NostrumRates.XP.Kill = 1.0
+# Phase 0 flat rate applied to all XP sources.
+# Default: 3.0
+NostrumRates.XP.BetaRate = 3.0
 
-# Quest XP (including Dungeon Finder quests).
-NostrumRates.XP.Quest = 1.0
+# XP rate for players within the active phase's level bracket (blizzlike).
+# Default: 1.0
+NostrumRates.XP.CurrentPhaseRate = 1.0
 
-# Exploration XP.
-NostrumRates.XP.Explore = 1.0
+# XP rate for players in previous phase brackets (catch-up).
+# Default: 2.0
+NostrumRates.XP.CatchUpRate = 2.0
 
-# Battleground XP (XPSOURCE_BATTLEGROUND).
+# Battleground completion XP — not phase-scaled.
+# Default: 1.0
 NostrumRates.XP.Battleground = 1.0
 
-# Kill XP when player is inside a dungeon or raid instance.
-# Takes priority over Elite rate when in an instance.
-NostrumRates.XP.Dungeon = 1.0
-
-# Kill XP for elite creatures outside instances.
-NostrumRates.XP.Elite = 1.0
-
 ################################################################################
-# XP Level Range Overrides
+# Death Knight Creation Lock
 #
-# When enabled, the rates below override the global XP rates for players
-# within the specified level ranges. Any rate not defined in a range falls
-# back to the global value above.
+# When enabled, Death Knight character creation is blocked while ActivePhase < 7.
+# Death Knights start at level 55 and belong to WotLK content (Phase 7).
 #
-# Brackets is a comma-separated list of range strings that match the keys below.
-# Invalid or out-of-bounds ranges are skipped with a warning.
-#
-# Phase progression rule:
-#   - Current phase bracket:  1× (blizzlike, matches global values above)
-#   - Previous phase brackets: 2× (catch-up rate for returning/new players)
-#
-# Update these brackets and their rates when the server advances to a new phase.
-# Example at Phase 2 (cap 40): Brackets = 1-19,20-40
-#   NostrumRates.XP.LevelRange.1-19.*  = 2.0  (previous phase, catch-up)
-#   NostrumRates.XP.LevelRange.20-29.* = 1.0  (current phase, blizzlike)
+# Default: 1
 ################################################################################
 
-NostrumRates.XP.LevelRange.Enable = 1
-
-# Phase 1 (current): cap 19 — 1× blizzlike rate
-# Comma-separated list of range strings to read. Must match the keys below.
-NostrumRates.XP.LevelRange.Brackets = 1-19
-
-NostrumRates.XP.LevelRange.1-19.Kill    = 1.0
-NostrumRates.XP.LevelRange.1-19.Quest   = 1.0
-NostrumRates.XP.LevelRange.1-19.Explore = 1.0
+NostrumRates.BlockDKBeforePhase7 = 1
 
 ################################################################################
 # Reputation Rates
-#
-# Kill reputation: from killing creatures with faction rep.
-# Quest reputation: from completing quests (daily, weekly, monthly, repeatable).
-#
-# Spillover reputation fires the same hook as its source (kill/quest), so
-# the same multiplier applies to it automatically.
 ################################################################################
 
-NostrumRates.Reputation.Kill  = 2.0
-NostrumRates.Reputation.Quest = 2.0
+NostrumRates.Reputation.Kill  = 1.0
+NostrumRates.Reputation.Quest = 1.0
 
 ################################################################################
 # Profession Skill Gain
 #
-# Gathering: mining, herbalism, skinning (OnPlayerUpdateGatheringSkill).
-# Crafting:  all tradeskill crafting (OnPlayerUpdateCraftingSkill).
+# Gathering: mining, herbalism, skinning.
+# Crafting:  all tradeskill crafting.
 #
 # NOTE: Fishing skill gain cannot be modified via the available hooks.
-#       Fishing catch loot rate is controlled under Loot.Fishing below.
 ################################################################################
 
-NostrumRates.Profession.GatheringSkillGain = 2.0
-NostrumRates.Profession.CraftingSkillGain  = 2.0
+NostrumRates.Profession.GatheringSkillGain = 1.0
+NostrumRates.Profession.CraftingSkillGain  = 1.0
 
 ################################################################################
 # Loot Drop Chance Multipliers
 #
-# Applied to item drop chance rolls. Values > 1 increase drop frequency;
-# values < 1 decrease it. Does not affect guaranteed drops (100% chance).
+# Applied to item drop chance rolls. Does not affect guaranteed (100%) drops.
 #
-# IMPORTANT: Mining and Herbalism cannot be distinguished — both go through
-# gameobject_loot_template. The Mining rate is applied to both.
-# Set Herbalism to the same value as Mining to avoid a warning on startup.
-#
-# Quest items: multiplied like any other item but be careful — some quest
-# items already have very high drop rates and doubling them may break
-# single-drop quest items. Keep at 1.0 unless you understand the risk.
+# IMPORTANT: Mining and Herbalism share gameobject_loot_template — the Mining
+# rate applies to both. Set Herbalism to the same value to avoid a warning.
 ################################################################################
 
 NostrumRates.Loot.Creature      = 1.0
@@ -124,24 +107,12 @@ NostrumRates.Loot.Milling       = 1.0
 
 ################################################################################
 # Money Rates
-#
-# Creature: multiplies gold dropped in creature loot (OnPlayerBeforeLootMoney).
-#
-# NOTE: Quest money rewards cannot be multiplied via module hooks.
-#       Vendor sell price cannot be multiplied via module hooks.
-#       Both require changes to worldserver.conf (Rate.Money.Quest,
-#       no built-in vendor sell rate exists in vanilla AzerothCore).
 ################################################################################
 
 NostrumRates.Money.Creature = 1.0
 
 ################################################################################
 # PvP Rates
-#
-# Honor: multiplies honor from PvP kills (OnHonorCalculation).
-# ArenaPoints: multiplies arena point reward per team (OnGetArenaPoints).
-#
-# NOTE: Battleground mark rewards cannot be modified via module hooks.
 ################################################################################
 
 NostrumRates.PvP.Honor       = 1.0

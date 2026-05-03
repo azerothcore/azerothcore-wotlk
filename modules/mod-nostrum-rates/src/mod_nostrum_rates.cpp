@@ -141,7 +141,7 @@ void LoadConfig()
         return;
     }
 
-    uint32 phase = sConfigMgr->GetOption<uint32>("NostrumRates.ActivePhase", 1);
+    uint32 phase = sConfigMgr->GetOption<uint32>("Nostrum.ActivePhase", 1);
     if (phase > kMaxPhase)
     {
         LOG_WARN("module", ">> NostrumRates: ActivePhase {} out of range [0-{}], clamping to 1",
