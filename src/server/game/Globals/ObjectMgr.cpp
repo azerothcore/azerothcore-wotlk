@@ -1895,7 +1895,10 @@ uint32 ObjectMgr::GetModelForShapeshift(ShapeshiftForm form, Player* player) con
     else
         customizationID = player->GetByteValue(PLAYER_BYTES, 0); // Use Skin Color
 
-    auto itr = _playerShapeshiftModel.find(std::make_tuple(form, player->getRace(), customizationID, player->getGender()));
+    // getGender() tracks the active display model; real gender lives in PLAYER_BYTES_3
+    uint8 gender = player->GetByteValue(PLAYER_BYTES_3, PLAYER_BYTES_3_OFFSET_GENDER);
+
+    auto itr = _playerShapeshiftModel.find(std::make_tuple(form, player->getRace(), customizationID, gender));
     if (itr != _playerShapeshiftModel.end())
         return itr->second; // Explicit combination
 
@@ -1903,7 +1906,7 @@ uint32 ObjectMgr::GetModelForShapeshift(ShapeshiftForm form, Player* player) con
     if (itr != _playerShapeshiftModel.end())
         return itr->second; // Combination applied to both genders
 
-    itr = _playerShapeshiftModel.find(std::make_tuple(form, player->getRace(), 255, player->getGender()));
+    itr = _playerShapeshiftModel.find(std::make_tuple(form, player->getRace(), 255, gender));
     if (itr != _playerShapeshiftModel.end())
         return itr->second; // Default gender-dependent model
 
@@ -3332,12 +3335,14 @@ void ObjectMgr::LoadItemTemplates()
         itemTemplate.ContainerSlots            = uint32(fields[26].Get<uint8>());
 
         uint8 statsCount = 0;
-        while (statsCount < MAX_ITEM_PROTO_STATS)
+        uint8 statsIterator = 0;
+        while (statsIterator < MAX_ITEM_PROTO_STATS)
         {
-            uint32 statType = uint32(fields[27 + statsCount * 2].Get<uint8>());
-            int32 statValue = fields[28 + statsCount * 2].Get<int32>();
-            if (statType == 0)
-                break;
+            uint32 statType = uint32(fields[27 + statsIterator * 2].Get<uint8>());
+            int32 statValue = fields[28 + statsIterator * 2].Get<int32>();
+            statsIterator++;
+            if (statValue == 0)
+                continue;
 
             itemTemplate.ItemStat[statsCount].ItemStatType = statType;
             itemTemplate.ItemStat[statsCount].ItemStatValue = statValue;
