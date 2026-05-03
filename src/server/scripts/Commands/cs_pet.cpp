@@ -18,6 +18,7 @@
 #include "Chat.h"
 #include "CommandScript.h"
 #include "DatabaseEnv.h"
+#include <algorithm>
 #include "Language.h"
 #include "Log.h"
 #include "ObjectMgr.h"
@@ -154,6 +155,23 @@ public:
                     online->RemovePet(activePet, PET_SAVE_AS_DELETED);
                 }
             }
+
+            // Drop the pet from the in-memory PetStable so the stable UI / call-pet
+            // logic does not reference a row that no longer exists in the database.
+            if (PetStable* stable = online->GetPetStable())
+            {
+                if (stable->CurrentPet && stable->CurrentPet->PetNumber == petNumber)
+                    stable->CurrentPet.reset();
+
+                for (Optional<PetStable::PetInfo>& stabled : stable->StabledPets)
+                    if (stabled && stabled->PetNumber == petNumber)
+                        stabled.reset();
+
+                stable->UnslottedPets.erase(
+                    std::remove_if(stable->UnslottedPets.begin(), stable->UnslottedPets.end(),
+                        [petNumber](PetStable::PetInfo const& p) { return p.PetNumber == petNumber; }),
+                    stable->UnslottedPets.end());
+            }
         }
 
         Field* fields    = result->Fetch();
@@ -176,7 +194,8 @@ public:
         ObjectGuid ownerGuid = owner.GetGUID();
 
         QueryResult result = CharacterDatabase.Query(
-            "SELECT id, entry, level, slot, name, PetType FROM character_pet WHERE owner = {}",
+            "SELECT id, entry, level, slot, name, PetType FROM character_pet "
+            "WHERE owner = {} ORDER BY slot, id",
             ownerGuid.GetCounter());
 
         if (!result)
@@ -193,7 +212,7 @@ public:
             uint32 petNumber = fields[0].Get<uint32>();
             uint32 entry     = fields[1].Get<uint32>();
             uint8  level     = fields[2].Get<uint8>();
-            int8   slot      = fields[3].Get<int8>();
+            uint8  slot      = fields[3].Get<uint8>();
             std::string name = fields[4].Get<std::string>();
             uint8  petType   = fields[5].Get<uint8>();
 
@@ -201,7 +220,7 @@ public:
             if (CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(entry))
                 creatureName = cInfo->Name;
 
-            handler->PSendSysMessage(LANG_PET_LIST_ENTRY, petNumber, int32(slot), entry,
+            handler->PSendSysMessage(LANG_PET_LIST_ENTRY, petNumber, uint32(slot), entry,
                                      creatureName, name, uint32(level), uint32(petType));
         } while (result->NextRow());
 
