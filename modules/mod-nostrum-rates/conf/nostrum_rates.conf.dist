@@ -23,23 +23,24 @@ NostrumRates.Enable = 1
 ################################################################################
 
 # Kill XP for normal (non-elite, non-dungeon) creatures.
-NostrumRates.XP.Kill = 3.0
+# Current phase: 1.0 (blizzlike). Previous phases use 2.0 via LevelRange overrides.
+NostrumRates.XP.Kill = 1.0
 
 # Quest XP (including Dungeon Finder quests).
-NostrumRates.XP.Quest = 3.0
+NostrumRates.XP.Quest = 1.0
 
 # Exploration XP.
-NostrumRates.XP.Explore = 3.0
+NostrumRates.XP.Explore = 1.0
 
 # Battleground XP (XPSOURCE_BATTLEGROUND).
 NostrumRates.XP.Battleground = 1.0
 
 # Kill XP when player is inside a dungeon or raid instance.
 # Takes priority over Elite rate when in an instance.
-NostrumRates.XP.Dungeon = 3.0
+NostrumRates.XP.Dungeon = 1.0
 
 # Kill XP for elite creatures outside instances.
-NostrumRates.XP.Elite = 3.0
+NostrumRates.XP.Elite = 1.0
 
 ################################################################################
 # XP Level Range Overrides
@@ -50,24 +51,26 @@ NostrumRates.XP.Elite = 3.0
 #
 # Brackets is a comma-separated list of range strings that match the keys below.
 # Invalid or out-of-bounds ranges are skipped with a warning.
+#
+# Phase progression rule:
+#   - Current phase bracket:  1× (blizzlike, matches global values above)
+#   - Previous phase brackets: 2× (catch-up rate for returning/new players)
+#
+# Update these brackets and their rates when the server advances to a new phase.
+# Example at Phase 2 (cap 40): Brackets = 1-19,20-40
+#   NostrumRates.XP.LevelRange.1-19.*  = 2.0  (previous phase, catch-up)
+#   NostrumRates.XP.LevelRange.20-29.* = 1.0  (current phase, blizzlike)
 ################################################################################
 
 NostrumRates.XP.LevelRange.Enable = 1
 
+# Phase 1 (current): cap 19 — 1× blizzlike rate
 # Comma-separated list of range strings to read. Must match the keys below.
-NostrumRates.XP.LevelRange.Brackets = 1-59,60-69,70-80
+NostrumRates.XP.LevelRange.Brackets = 1-19
 
-NostrumRates.XP.LevelRange.1-59.Kill    = 3.0
-NostrumRates.XP.LevelRange.1-59.Quest   = 3.0
-NostrumRates.XP.LevelRange.1-59.Explore = 3.0
-
-NostrumRates.XP.LevelRange.60-69.Kill    = 3.0
-NostrumRates.XP.LevelRange.60-69.Quest   = 3.0
-NostrumRates.XP.LevelRange.60-69.Explore = 3.0
-
-NostrumRates.XP.LevelRange.70-80.Kill    = 2.0
-NostrumRates.XP.LevelRange.70-80.Quest   = 2.0
-NostrumRates.XP.LevelRange.70-80.Explore = 2.0
+NostrumRates.XP.LevelRange.1-19.Kill    = 1.0
+NostrumRates.XP.LevelRange.1-19.Quest   = 1.0
+NostrumRates.XP.LevelRange.1-19.Explore = 1.0
 
 ################################################################################
 # Reputation Rates
