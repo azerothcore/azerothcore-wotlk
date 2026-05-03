@@ -416,6 +416,9 @@ struct boss_sartharion : public BossAI
         for (uint32 i : dragons)
             if (Creature* boss = instance->GetCreature(i))
                 boss->DespawnOrUnsummon();
+
+        instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_TWILIGHT_TORMENT_VESPERON);
+        instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_TWILIGHT_TORMENT_SARTHARION);
     }
 
     void SetData(uint32 type, uint32 data) override
@@ -838,6 +841,8 @@ struct boss_sartharion_dragonAI : public BossAI
             {
                 Talk(SAY_VESPERON_DEATH);
                 instance->DoAction(ACTION_CLEAR_PORTAL);
+                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_TWILIGHT_TORMENT_VESPERON);
+                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_TWILIGHT_TORMENT_SARTHARION);
                 if (!isCalledBySartharion || instance->GetBossState(DATA_SARTHARION) != IN_PROGRESS)
                     instance->SetBossState(DATA_VESPERON, DONE);
                 break;
