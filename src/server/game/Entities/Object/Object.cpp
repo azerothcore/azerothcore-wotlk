@@ -1708,6 +1708,8 @@ float WorldObject::GetVisibilityRange() const
             return VISIBILITY_DIST_WINTERGRASP;
         else if (IsVisibilityOverridden())
             return GetVisibilityOverrideDistance();
+        else if (IsInDalaran())
+            return VISIBILITY_DISTANCE_SMALL;
         else
             return GetMap()->GetVisibilityRange();
     }
@@ -1737,9 +1739,19 @@ float WorldObject::GetSightRange(WorldObject const* target) const
                         return GetMap()->GetVisibilityRange();
                 }
 
-                return IsInWintergrasp() && target->IsInWintergrasp() ? VISIBILITY_DIST_WINTERGRASP : GetMap()->GetVisibilityRange();
+                if (IsInDalaran())
+                    return VISIBILITY_DISTANCE_SMALL;
+                else if (IsInWintergrasp() && target->IsInWintergrasp())
+                   return VISIBILITY_DIST_WINTERGRASP;
+                else
+                   return GetMap()->GetVisibilityRange();
             }
-            return IsInWintergrasp() ? VISIBILITY_DIST_WINTERGRASP : GetMap()->GetVisibilityRange();
+            if (IsInDalaran())
+                return VISIBILITY_DISTANCE_SMALL;
+            else if (IsInWintergrasp())
+                return VISIBILITY_DIST_WINTERGRASP;
+            else
+                return GetMap()->GetVisibilityRange();
         }
         else if (ToCreature())
             return ToCreature()->m_SightDistance;

@@ -682,6 +682,12 @@ public:
         return GetMapId() == MAP_NORTHREND && GetPositionX() > 3733.33331f && GetPositionX() < 5866.66663f && GetPositionY() > 1599.99999f && GetPositionY() < 4799.99997f;
     }
 
+    [[nodiscard]] bool IsInDalaran() const
+    {
+        return GetMapId() == MAP_NORTHREND && GetZoneId() == AREA_DALARAN;
+    }
+
+
     uint32  LastUsedScriptID;
 
     // Transports
