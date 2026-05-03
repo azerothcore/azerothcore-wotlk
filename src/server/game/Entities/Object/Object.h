@@ -687,7 +687,6 @@ public:
         return GetMapId() == MAP_NORTHREND && GetZoneId() == AREA_DALARAN;
     }
 
-
     uint32  LastUsedScriptID;
 
     // Transports
