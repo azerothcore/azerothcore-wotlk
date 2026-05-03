@@ -367,7 +367,7 @@ struct npc_pet_dk_army_of_the_dead : public AggressorAI
             AttackStart(attacker);
     }
 
-    void UpdateAI(uint32 diff) override
+    void UpdateAI(uint32 /*diff*/) override
     {
         if (!UpdateVictim())
         {
