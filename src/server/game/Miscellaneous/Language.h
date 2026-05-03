@@ -1487,6 +1487,6 @@ enum AcoreStrings
 
     // Pet delete command
     LANG_PET_DELETE_NOT_FOUND           = 35438,
-    LANG_PET_DELETE_SUCCESS             = 35440
+    LANG_PET_DELETE_SUCCESS             = 35439
 };
 #endif
