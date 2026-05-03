@@ -17,6 +17,7 @@
 
 #include "Chat.h"
 #include "CommandScript.h"
+#include "DatabaseEnv.h"
 #include "Language.h"
 #include "Log.h"
 #include "ObjectMgr.h"
@@ -37,9 +38,11 @@ public:
     {
         static ChatCommandTable petCommandTable =
         {
-            { "create",  HandlePetCreateCommand,  rbac::RBAC_PERM_COMMAND_PET_CREATE,  Console::No },
-            { "learn",   HandlePetLearnCommand,   rbac::RBAC_PERM_COMMAND_PET_LEARN,   Console::No },
-            { "unlearn", HandlePetUnlearnCommand, rbac::RBAC_PERM_COMMAND_PET_UNLEARN, Console::No }
+            { "create",  HandlePetCreateCommand,  rbac::RBAC_PERM_COMMAND_PET_CREATE,  Console::No  },
+            { "delete",  HandlePetDeleteCommand,  rbac::RBAC_PERM_COMMAND_PET_DELETE,  Console::Yes },
+            { "learn",   HandlePetLearnCommand,   rbac::RBAC_PERM_COMMAND_PET_LEARN,   Console::No  },
+            { "list",    HandlePetListCommand,    rbac::RBAC_PERM_COMMAND_PET_LIST,    Console::Yes },
+            { "unlearn", HandlePetUnlearnCommand, rbac::RBAC_PERM_COMMAND_PET_UNLEARN, Console::No  }
         };
 
         static ChatCommandTable commandTable =
@@ -122,6 +125,85 @@ public:
 
         pet->learnSpell(spell->Id);
         handler->PSendSysMessage("Pet has learned spell {}", spell->Id);
+
+        return true;
+    }
+
+    static bool HandlePetDeleteCommand(ChatHandler* handler, PlayerIdentifier owner, uint32 petNumber)
+    {
+        ObjectGuid ownerGuid = owner.GetGUID();
+
+        QueryResult result = CharacterDatabase.Query(
+            "SELECT entry, name FROM character_pet WHERE id = {} AND owner = {}",
+            petNumber, ownerGuid.GetCounter());
+
+        if (!result)
+        {
+            handler->SendErrorMessage(LANG_PET_DELETE_NOT_FOUND, petNumber, owner.GetName(),
+                                      ownerGuid.GetCounter());
+            return false;
+        }
+
+        if (Player* online = owner.GetConnectedPlayer())
+        {
+            if (Pet* activePet = online->GetPet())
+            {
+                if (activePet->GetCharmInfo() &&
+                    activePet->GetCharmInfo()->GetPetNumber() == petNumber)
+                {
+                    online->RemovePet(activePet, PET_SAVE_AS_DELETED);
+                }
+            }
+        }
+
+        Field* fields    = result->Fetch();
+        uint32 entry     = fields[0].Get<uint32>();
+        std::string name = fields[1].Get<std::string>();
+
+        std::string creatureName = "<unknown>";
+        if (CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(entry))
+            creatureName = cInfo->Name;
+
+        Pet::DeleteFromDB(petNumber);
+
+        handler->PSendSysMessage(LANG_PET_DELETE_SUCCESS, petNumber, name, entry, creatureName,
+                                 owner.GetName(), ownerGuid.GetCounter());
+        return true;
+    }
+
+    static bool HandlePetListCommand(ChatHandler* handler, PlayerIdentifier owner)
+    {
+        ObjectGuid ownerGuid = owner.GetGUID();
+
+        QueryResult result = CharacterDatabase.Query(
+            "SELECT id, entry, level, slot, name, PetType FROM character_pet WHERE owner = {}",
+            ownerGuid.GetCounter());
+
+        if (!result)
+        {
+            handler->PSendSysMessage(LANG_PET_LIST_EMPTY, owner.GetName(), ownerGuid.GetCounter());
+            return true;
+        }
+
+        handler->PSendSysMessage(LANG_PET_LIST_HEADER, owner.GetName(), ownerGuid.GetCounter());
+
+        do
+        {
+            Field* fields    = result->Fetch();
+            uint32 petNumber = fields[0].Get<uint32>();
+            uint32 entry     = fields[1].Get<uint32>();
+            uint8  level     = fields[2].Get<uint8>();
+            int8   slot      = fields[3].Get<int8>();
+            std::string name = fields[4].Get<std::string>();
+            uint8  petType   = fields[5].Get<uint8>();
+
+            std::string creatureName = "<unknown>";
+            if (CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(entry))
+                creatureName = cInfo->Name;
+
+            handler->PSendSysMessage(LANG_PET_LIST_ENTRY, petNumber, int32(slot), entry,
+                                     creatureName, name, uint32(level), uint32(petType));
+        } while (result->NextRow());
 
         return true;
     }
