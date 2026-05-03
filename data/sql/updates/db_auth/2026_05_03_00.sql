@@ -1,3 +1,4 @@
+-- DB update 2026_05_01_00 -> 2026_05_03_00
 -- RBAC permissions for .pet list (sec 1+, Mod role 198) and .pet delete (sec 3+, Admin role 196).
 DELETE FROM `rbac_permissions` WHERE `id` IN (914, 915);
 INSERT INTO `rbac_permissions` (`id`, `name`) VALUES
