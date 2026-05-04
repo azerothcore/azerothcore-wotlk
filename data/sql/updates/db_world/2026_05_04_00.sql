@@ -1,3 +1,4 @@
+-- DB update 2026_05_03_01 -> 2026_05_04_00
 
 -- Delete old waypoint & add two new ones.
 DELETE FROM `script_waypoint` WHERE `entry` = 29602;
