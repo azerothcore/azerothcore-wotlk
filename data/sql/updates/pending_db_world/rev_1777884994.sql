@@ -74,3 +74,11 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (29602, 0, 2, 0, 61, 0, 100, 512, 0, 0, 0, 0, 0, 0, 233, 2960200, 2960201, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Icefang - On Passenger Boarded - Start Random Path 2960200-2960201'),
 (29602, 0, 3, 0, 28, 0, 100, 512, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Icefang - On Passenger Removed - Despawn Instant'),
 (29602, 0, 4, 0, 109, 0, 100, 512, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Icefang - On Any Path Finished - Despawn Instant');
+
+-- Delete Old Condition (Icefang spellclick requires the Going Bearback quest to not be rewarded)
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 18) AND (`SourceGroup` = 29598) AND (`SourceEntry` = 54768) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 8) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 12856) AND (`ConditionValue2` = 0) AND (`ConditionValue3` = 0);
+
+-- Add new Condition.
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 18) AND (`SourceGroup` = 29598) AND (`SourceEntry` = 54768) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 9) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 12851) AND (`ConditionValue2` = 0) AND (`ConditionValue3` = 0);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(18, 29598, 54768, 0, 0, 9, 0, 12851, 0, 0, 0, 0, 0, '', 'Icefang spellclick require Going Bearback quest taken');
