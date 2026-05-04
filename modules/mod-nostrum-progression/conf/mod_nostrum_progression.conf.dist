@@ -3,7 +3,7 @@
 #
 # To advance the server to the next phase, change Nostrum.ActivePhase and
 # run `.reload config` on the worldserver console. Everything else (level cap,
-# phase name, XP rates, DK lock) updates automatically.
+# phase name, XP rates, DK lock, content locks) updates automatically.
 ################################################################################
 
 [worldserver]
@@ -37,10 +37,37 @@ Nostrum.ActivePhase = 1
 # Other options
 ################################################################################
 
-# Allow GMs (security level >= 2) to bypass the level cap.
+# Allow GMs (security level >= 2) to bypass the level cap and all content locks.
 # Default: 1
 Nostrum.Progression.GmBypass = 1
 
 # Send a login message showing the current phase and level cap.
 # Default: 1
 Nostrum.Progression.LoginAnnouncement = 1
+
+################################################################################
+# Progression Content Locks
+################################################################################
+
+# Lock dungeon and raid maps by progression phase.
+# Players cannot enter instance portals or be teleported into maps that require
+# a later phase. Phase 0 bypasses all locks.
+# Default: 1
+Nostrum.Progression.LockInstances = 1
+
+# If a player logs in inside a locked instance, teleport them to their homebind.
+# Default: 1
+Nostrum.Progression.TeleportOutOfLockedMapsOnLogin = 1
+
+# Lock battleground queues by progression phase.
+# Default: 1
+Nostrum.Progression.LockBattlegrounds = 1
+
+# Lock Dungeon Finder (LFG) queues by progression phase.
+# Any selected dungeon that requires a later phase blocks the queue.
+# Default: 1
+Nostrum.Progression.LockLFG = 1
+
+# Debug logging for progression lock checks (map entry, BG queue, LFG).
+# Default: 0
+Nostrum.Progression.Debug = 0
