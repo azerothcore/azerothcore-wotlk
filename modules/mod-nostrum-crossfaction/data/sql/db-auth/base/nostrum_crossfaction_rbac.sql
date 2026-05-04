@@ -4,6 +4,8 @@
 -- Permission ID 9000010 is in the NostrumWoW custom range (9000001+).
 -- Apply to: acore_auth
 
+USE acore_auth;
+
 INSERT IGNORE INTO `rbac_permissions` (`id`, `name`)
     VALUES (9000010, 'Nostrum: Command world chat');
 

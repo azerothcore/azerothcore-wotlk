@@ -1,22 +1,18 @@
 /*
  * mod_nostrum_instant_mail
  *
- * Removes the mail delivery delay when a player mails items or gold to another
- * character on the same account.  All other mail (different account, Auction
- * House, system/GM, COD) keeps its default AzerothCore behaviour.
+ * Removes the mail delivery delay for all player-to-player mail.
+ * Auction House, system/GM, and COD mail keep their default AzerothCore behaviour.
  *
  * Implementation note:
  *   AzerothCore exposes OnBeforeMailDraftSendMailTo (MailScript) which fires
  *   for every outgoing mail and receives deliver_delay by reference.  This lets
- *   the module zero-out the delay for eligible same-account mail without any
- *   core patch.
+ *   the module zero-out the delay without any core patch.
  */
 
-#include "CharacterCache.h"
 #include "Config.h"
 #include "Mail.h"
 #include "MailScript.h"
-#include "ObjectGuid.h"
 #include "Log.h"
 #include "WorldScript.h"
 
@@ -29,18 +25,16 @@ namespace
 
 struct InstantMailConfig
 {
-    bool enabled                    = true;
-    bool preserveDifferentDelay     = true;
-    bool debug                      = false;
+    bool enabled = true;
+    bool debug   = false;
 };
 
 InstantMailConfig gCfg;
 
 void LoadConfig()
 {
-    gCfg.enabled                = sConfigMgr->GetOption<bool>("NostrumInstantOwnMail.Enable",                        true);
-    gCfg.preserveDifferentDelay = sConfigMgr->GetOption<bool>("NostrumInstantOwnMail.PreserveDifferentAccountDelay", true);
-    gCfg.debug                  = sConfigMgr->GetOption<bool>("NostrumInstantOwnMail.Debug",                         false);
+    gCfg.enabled = sConfigMgr->GetOption<bool>("NostrumInstantOwnMail.Enable", true);
+    gCfg.debug   = sConfigMgr->GetOption<bool>("NostrumInstantOwnMail.Debug", false);
 
     LOG_INFO("module", ">> NostrumInstantOwnMail: loaded. enabled={} debug={}",
         gCfg.enabled, gCfg.debug);
@@ -110,38 +104,8 @@ public:
             return;
         }
 
-        uint32 senderGuidLow   = sender.GetSenderId();
-        uint32 receiverGuidLow = receiver.GetPlayerGUIDLow();
-
-        ObjectGuid senderGuid   = ObjectGuid::Create<HighGuid::Player>(senderGuidLow);
-        ObjectGuid receiverGuid = ObjectGuid::Create<HighGuid::Player>(receiverGuidLow);
-
-        uint32 senderAccount   = sCharacterCache->GetCharacterAccountIdByGuid(senderGuid);
-        uint32 receiverAccount = sCharacterCache->GetCharacterAccountIdByGuid(receiverGuid);
-
-        if (senderAccount == 0 || receiverAccount == 0)
-        {
-            LOG_WARN("module",
-                "[NostrumInstantOwnMail] Could not resolve account for sender guid={} (acct={}) or "
-                "receiver guid={} (acct={}) — keeping default delay.",
-                senderGuidLow, senderAccount, receiverGuidLow, receiverAccount);
-            return;
-        }
-
-        if (senderAccount != receiverAccount)
-        {
-            if (gCfg.debug)
-                LOG_INFO("module",
-                    "[NostrumInstantOwnMail] Different accounts (sender={} receiver={}) — keeping delay={}s.",
-                    senderAccount, receiverAccount, deliver_delay);
-            return;
-        }
-
-        // Same account: make the mail instant.
         if (gCfg.debug)
-            LOG_INFO("module",
-                "[NostrumInstantOwnMail] Same account {} — setting deliver_delay 0 (was {}s).",
-                senderAccount, deliver_delay);
+            LOG_INFO("module", "[NostrumInstantOwnMail] Player-to-player mail — setting deliver_delay 0 (was {}s).", deliver_delay);
 
         deliver_delay = 0;
     }

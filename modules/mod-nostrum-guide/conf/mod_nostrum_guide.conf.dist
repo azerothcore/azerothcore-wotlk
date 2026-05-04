@@ -60,7 +60,7 @@ NostrumGuide.VisualCue.SpawnAtNpcLocation = 1
 ################################################################################
 
 NostrumGuide.WebsiteUrl = https://nostrumwow.com
-NostrumGuide.DiscordUrl = https://discord.gg/YOURCODE
+NostrumGuide.DiscordUrl = https://discord.gg/ebvrN5kqTJ
 
 ################################################################################
 # Gossip Content
@@ -70,29 +70,29 @@ NostrumGuide.DiscordUrl = https://discord.gg/YOURCODE
 ################################################################################
 
 # Current phase / level cap shown in the gossip menu.
-NostrumGuide.CurrentPhaseText = Pre-launch / Phase 0
-NostrumGuide.LevelCapText = Current level cap: To be announced
+NostrumGuide.CurrentPhaseText = Phase 3
+NostrumGuide.LevelCapText = Current level cap: 39
 
 # Server rates description.
-NostrumGuide.RatesText = Nostrum uses custom rates designed to respect the original WotLK progression while making the experience smoother.
+NostrumGuide.RatesText = XP rates are phase-driven. You earn blizzlike (1x) XP in the current phase bracket. Previous phase brackets give 2x catch-up XP. Gold is mailed to you at every 10 levels as a milestone reward.
 
 # World chat info.
-NostrumGuide.WorldChatText = Use /world for global community chat, questions, groups, trading, and discussion.
+NostrumGuide.WorldChatText = Use .world <message> to talk in the global community channel. You are auto-joined on login. Both Horde and Alliance share the same channel.
 
 # Hardcore mode description.
-NostrumGuide.HardcoreText = Hardcore mode is optional and can only be enabled on a fresh level 1 character with 0 XP. Hardcore characters have one life, join Deathwalkers, and receive cosmetic rewards.
+NostrumGuide.HardcoreText = Hardcore mode is optional. Enable it on a fresh level 1 character with 0 XP using .hardcore enable. One life — if you die, your character becomes a permanent ghost. Hardcore characters automatically join the Deathwalkers guild. Self-Found Hardcore (.hardcore selffound) adds trade, AH, and mail restrictions on top of permadeath.
 
 # Cross-faction description.
-NostrumGuide.CrossFactionText = Nostrum keeps faction identity in the open world, but enables selected cross-faction systems to improve queue times, grouping, and server health.
+NostrumGuide.CrossFactionText = Faction identity is preserved in the open world. Cross-faction is only enabled where it helps: Dungeon Finder, Battlegrounds, and the world chat channel.
 
 # Dungeon Finder description.
-NostrumGuide.DungeonFinderText = Dungeon Finder may include both factions to improve queue times and make leveling dungeons easier to run.
+NostrumGuide.DungeonFinderText = The Dungeon Finder is cross-faction. Horde and Alliance are matched together to keep queues healthy. Available from level 15.
 
 # Battleground description.
-NostrumGuide.BattlegroundText = Battlegrounds may use cross-faction matchmaking to improve queue times and balance.
+NostrumGuide.BattlegroundText = Battlegrounds use cross-faction team matching. You may fight alongside the opposing faction. A visual race change is applied for the duration of the BG.
 
 # Useful commands shown in the gossip menu.
-NostrumGuide.CommandsText = Useful commands: .hardcore for Hardcore mode. Join /world for global chat.
+NostrumGuide.CommandsText = Useful commands: .world <message> for global chat. .hardcore enable or .hardcore selffound to opt into Hardcore on a fresh character. Dual spec available from level 19 for 1 gold.
 
 ################################################################################
 # Debug
