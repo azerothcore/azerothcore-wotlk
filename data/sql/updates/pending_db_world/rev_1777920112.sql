@@ -1,5 +1,5 @@
 
--- Edit SAI
+-- Edit SAI (Talbot)
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 25301;
 
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 25301) AND (`source_type` = 0) AND (`id` IN (3, 4, 5, 6, 7, 8, 9));
@@ -11,3 +11,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (25301, 0, 7, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 223, 1, 0, 0, 0, 0, 0, 19, 25251, 100, 0, 0, 0, 0, 0, 0, 'Counselor Talbot - On Just Died - Send Event to Leryssa'),
 (25301, 0, 8, 0, 109, 0, 100, 0, 0, 253011, 0, 0, 0, 0, 90, 8, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Counselor Talbot - On Path Finished - Set Flag Standstate Kneel'),
 (25301, 0, 9, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 124, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Counselor Talbot - On Respawn - Deload Equipment');
+
+-- Edit Action Lists (Thassarian)
+UPDATE `smart_scripts` SET `action_param3` = 1 WHERE (`entryorguid` = 2617004) AND (`source_type` = 9) AND (`id` IN (2));
+UPDATE `smart_scripts` SET `action_param3` = 1 WHERE (`entryorguid` = 2617001) AND (`source_type` = 9) AND (`id` IN (5));
