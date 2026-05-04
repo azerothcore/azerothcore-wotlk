@@ -493,51 +493,6 @@ public:
     }
 };
 
-class npc_icefang : public CreatureScript
-{
-public:
-    npc_icefang() : CreatureScript("npc_icefang") { }
-
-    struct npc_icefangAI : public npc_escortAI
-    {
-        npc_icefangAI(Creature* creature) : npc_escortAI(creature) { }
-
-        void AttackStart(Unit* /*who*/) override { }
-        void JustEngagedWith(Unit* /*who*/) override { }
-        void EnterEvadeMode(EvadeReason /*why*/) override { }
-
-        void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply) override
-        {
-            if (who->IsPlayer())
-            {
-                if (apply)
-                {
-                    me->SetWalk(false);
-                    Start(false, who->GetGUID());
-                }
-            }
-        }
-
-        using CreatureAI::WaypointReached;
-        void WaypointReached(uint32 /*waypointId*/) override { }
-        void JustDied(Unit* /*killer*/) override { }
-        void OnCharmed(bool /*apply*/) override { }
-
-        void UpdateAI(uint32 diff) override
-        {
-            npc_escortAI::UpdateAI(diff);
-
-            if (!UpdateVictim())
-                return;
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_icefangAI(creature);
-    }
-};
-
 struct npc_hyldsmeet_protodrake : public CreatureAI
 {
     explicit npc_hyldsmeet_protodrake(Creature* creature) : CreatureAI(creature), _accessoryInstalled(false), _accessoryRespawnTimer(0)
@@ -1344,7 +1299,6 @@ void AddSC_storm_peaks()
     RegisterSpellScript(spell_q13007_iron_colossus);
     new npc_brunnhildar_prisoner();
     new npc_freed_protodrake();
-    new npc_icefang();
     RegisterCreatureAI(npc_hyldsmeet_protodrake);
     RegisterSpellScript(spell_close_rift_aura);
     new npc_vehicle_d16_propelled_delivery();
