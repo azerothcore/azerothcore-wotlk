@@ -8381,8 +8381,10 @@ void Unit::EnergizeBySpell(Unit* victim, uint32 spellID, uint32 damage, Powers p
 {
     victim->ModifyPower(powerType, damage, false);
 
-    if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellID))
-        victim->GetThreatMgr().ForwardThreatForAssistingMe(this, float(damage) / 2.0f, spellInfo, true);
+    // Happiness is internal hunter pet state, not combat assistance — energizing it must not generate threat
+    if (powerType != POWER_HAPPINESS)
+        if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellID))
+            victim->GetThreatMgr().ForwardThreatForAssistingMe(this, float(damage) / 2.0f, spellInfo, true);
 
     SendEnergizeSpellLog(victim, spellID, damage, powerType);
 }
