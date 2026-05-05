@@ -9,6 +9,19 @@ mmapsConfig:
   # and is also where the "mmaps" folder will be created or located.
   dataDir: "./"
 
+  # Off-mesh connections define manual navigation links that are not part of the generated navmesh.
+  # They are used to connect two arbitrary points in the world where normal pathfinding cannot reach,
+  # such as jumps, ropes, ladders, teleports, elevators, or special scripted movement paths.
+  #
+  # Format:
+  #   mapID tileX,tileY (start_x start_y start_z) (end_x end_y end_z) size
+  #
+  # Fields:
+  #   mapID      - Map identifier where this connection exists.
+  #   tileX,tileY- Navmesh tile coordinates the connection belongs to.
+  #   start      - World position where the connection begins.
+  #   end        - World position where the connection ends.
+  #   size       - Effective radius of the connection (agent clearance / usability width).
   offmeshConnections:
     # Make Blades Edge Arena Ropes wider
     - "562 31,20 (6234.474121 256.563721 11.063726) (6230.162598 251.681976 11.199670) 2.1"
@@ -111,9 +124,6 @@ mmapsConfig:
     # All parameters defined globally are eligible for override.
     # Just specify the parameter name and new value in the override section.
     mapsOverrides:
-      "562": # Blade's Edge Arena
-        walkableRadius: 0 # This allows walking on the ropes to the pillars
-
       "48": # Blackfathom Deeps
         cellSizeVertical: 0.5334 # ch*2 = 0.2667 * 2 ≈ 0.5334. Reduce the chance to have underground levels.
 

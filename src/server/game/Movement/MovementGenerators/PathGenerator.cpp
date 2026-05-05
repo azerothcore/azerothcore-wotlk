@@ -123,7 +123,6 @@ namespace
     }
 }
 
-
  ////////////////// PathGenerator //////////////////
 PathGenerator::PathGenerator(WorldObject const* owner) :
     _polyLength(0), _type(PATHFIND_BLANK), _useStraightPath(false), _forceDestination(false),
