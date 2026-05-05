@@ -1,3 +1,4 @@
+-- DB update 2026_05_05_02 -> 2026_05_05_03
 
 -- Edit Action Lists 1985100, 1985101 & update comments.
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9) AND (`entryorguid` IN (1985100, 1985101));
