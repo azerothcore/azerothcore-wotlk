@@ -1532,7 +1532,11 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
 
             int32 tickheal = targetAura->GetAmount();
             if (Unit* auraCaster = targetAura->GetCaster())
+            {
+                // MOD_HEALING_DONE_PERCENT is applied per-tick, not baked into GetAmount.
+                tickheal = int32(float(tickheal) * auraCaster->GetTotalAuraMultiplier(SPELL_AURA_MOD_HEALING_DONE_PERCENT));
                 tickheal = unitTarget->SpellHealingBonusTaken(auraCaster, targetAura->GetSpellInfo(), tickheal, DOT);
+            }
 
             //int32 tickheal = targetAura->GetSpellInfo()->EffectBasePoints[idx] + 1;
             //It is said that talent bonus should not be included
