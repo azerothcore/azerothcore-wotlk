@@ -189,17 +189,31 @@ public:
         return true;
     }
 
-    static bool HandleSendMoneyCommand(ChatHandler* handler, Optional<PlayerIdentifier> target, QuotedString subject, QuotedString text, uint32 money)
+    static bool HandleSendMoneyCommand(ChatHandler* handler, Optional<PlayerIdentifier> target, QuotedString subject, QuotedString text, Tail money)
     {
         if (!target)
-        {
             target = PlayerIdentifier::FromTargetOrSelf(handler);
-        }
 
         if (!target)
-        {
             return false;
-        }
+
+        auto IsExistWord = [](std::string_view line, std::initializer_list<std::string_view> words)
+        {
+            for (auto const& word : words)
+            {
+                if (line.find(word) != std::string_view::npos)
+                    return true;
+            }
+
+            return false;
+        };
+
+        Optional<int32> moneyToAddO = IsExistWord(money, { "g", "s", "c" }) ? MoneyStringToMoney(money) : Acore::StringTo<int32>(money);
+
+        if (!moneyToAddO)
+            return false;
+
+        int32 moneyToAdd = *moneyToAddO;
 
         // from console show not existed sender
         MailSender sender(MAIL_NORMAL, handler->GetSession() ? handler->GetSession()->GetPlayer()->GetGUID().GetCounter() : 0, MAIL_STATIONERY_GM);
@@ -207,7 +221,7 @@ public:
         CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
         MailDraft(subject, text)
-        .AddMoney(money)
+        .AddMoney(moneyToAdd)
         .SendMailTo(trans, MailReceiver(target->GetConnectedPlayer(), target->GetGUID().GetCounter()), sender);
 
         CharacterDatabase.CommitTransaction(trans);
