@@ -474,7 +474,6 @@ public: /* PlayerScript */
     void OnPlayerLearnTaxiNode(Player const* player, uint32 nodeId);
     void OnPlayerBeforeGetLevelForXPGain(Player const* player, uint8& level);
     void OnEnvironmentalDamage(Player* player, EnviromentalDamage type, uint32 damage);
-    void OnPlayerBeforeGetLevelForXPGain(Player const* player, uint8& level);
 
     // Anti cheat
     void AnticheatSetCanFlybyServer(Player* player, bool apply);

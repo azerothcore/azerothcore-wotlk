@@ -2190,6 +2190,9 @@ void Unit::DealDamageShieldDamage(Unit* victim)
         data << uint32(i_spellProto->GetSchoolMask());
         victim->SendMessageToSet(&data, true);
 
+        if (absorb > dmgInfo.GetAbsorb())
+            dmgInfo.AbsorbDamage(absorb - dmgInfo.GetAbsorb());
+
         sScriptMgr->OnDealDamageShieldDamage(&dmgInfo, overkill > 0 ? overkill : 0);
 
         Unit::DealDamage(victim, this, damage, 0, SPELL_DIRECT_DAMAGE, i_spellProto->GetSchoolMask(), i_spellProto, true);

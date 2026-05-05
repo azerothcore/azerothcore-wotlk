@@ -113,9 +113,9 @@ public:
     virtual void AfterInstanceGameObjectCreate(Map* /*instance*/, GameObject* /*go*/) { }
 
     /**
-     * @brief Called when Spell::SendSpellGo fires
-     *        (the SPELL_GO moment of a spell cast).
-     *
+        * @brief Called when Spell::SendSpellGo is about to send
+        *        a client-visible SMSG_SPELL_GO packet.
+        *
      * @param spell The spell being executed
      */
     virtual void OnSpellSendSpellGo(Spell* /*spell*/) { }

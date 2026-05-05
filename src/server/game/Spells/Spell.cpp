@@ -4746,11 +4746,11 @@ void Spell::SendSpellStart()
 
 void Spell::SendSpellGo()
 {
-    sScriptMgr->OnSpellSendSpellGo(this);
-
     // not send invisible spell casting
     if (!IsNeedSendToClient(true))
         return;
+
+    sScriptMgr->OnSpellSendSpellGo(this);
 
     //LOG_DEBUG("spells.aura", "Sending SMSG_SPELL_GO id={}", m_spellInfo->Id);
 

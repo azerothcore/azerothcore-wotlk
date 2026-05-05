@@ -775,6 +775,8 @@ uint32 Player::EnvironmentalDamage(EnviromentalDamage type, uint32 damage)
     if (type != DAMAGE_FALL_TO_VOID && IsImmuneToEnvironmentalDamage())
         return 0;
 
+    uint32 originalDamage = damage;
+
     // Absorb, resist some environmental damage type
     uint32 absorb = 0;
     uint32 resist = 0;
@@ -804,7 +806,7 @@ uint32 Player::EnvironmentalDamage(EnviromentalDamage type, uint32 damage)
     packet.Resisted = resist;
     SendMessageToSet(packet.Write(), true);
 
-    sScriptMgr->OnEnvironmentalDamage(this, type, damage);
+    sScriptMgr->OnEnvironmentalDamage(this, type, originalDamage);
 
     uint32 final_damage = Unit::DealDamage(this, this, damage, nullptr, SELF_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
 
