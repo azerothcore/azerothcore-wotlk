@@ -2607,6 +2607,14 @@ DurabilityLoss.InPvP = 0
 DurabilityLoss.OnDeath = 10
 
 #
+#    DurabilityLoss.OnSpiritResurrect
+#        Description: Durability loss percentage on spirit healer resurrection. Does not effect PvP
+#                     spirit healers.
+#        Default:     25
+
+DurabilityLoss.OnSpiritResurrect = 25
+
+#
 #    DurabilityLossChance.Damage
 #        Description: Chance to lose durability on one equipped item from damage.
 #        Default:     0.5 - (100/0.5 = 200, Each 200 damage one equipped item will use durability)
