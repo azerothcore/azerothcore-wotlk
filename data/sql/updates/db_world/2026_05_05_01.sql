@@ -1,3 +1,4 @@
+-- DB update 2026_05_05_00 -> 2026_05_05_01
 
 -- Edit SAI (Talbot)
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 25301;
