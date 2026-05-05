@@ -1241,6 +1241,23 @@ void SmartAI::SetFollow(Unit* target, float dist, float angle, uint32 credit, ui
 
 void SmartAI::StopFollow(bool complete)
 {
+    if (complete)
+    {
+        Player* player = ObjectAccessor::GetPlayer(*me, mFollowGuid);
+        if (player && mFollowCredit > 0)
+        {
+            if (!mFollowCreditType)
+                player->RewardPlayerAndGroupAtEvent(mFollowCredit, me);
+            else
+                player->GroupEventHappens(mFollowCredit, me);
+        }
+
+        SetDespawnTime(5000);
+        StartDespawn();
+
+        GetScript()->ProcessEventsFor(SMART_EVENT_FOLLOW_COMPLETED, player);
+    }
+
     mFollowGuid.Clear();
     mFollowDist = 0;
     mFollowAngle = 0;
@@ -1252,23 +1269,6 @@ void SmartAI::StopFollow(bool complete)
     me->GetMotionMaster()->Clear(false);
     me->StopMoving();
     me->GetMotionMaster()->MoveIdle();
-
-    if (!complete)
-        return;
-
-    Player* player = ObjectAccessor::GetPlayer(*me, mFollowGuid);
-    if (player)
-    {
-        if (!mFollowCreditType)
-            player->RewardPlayerAndGroupAtEvent(mFollowCredit, me);
-        else
-            player->GroupEventHappens(mFollowCredit, me);
-    }
-
-    SetDespawnTime(5000);
-    StartDespawn();
-
-    GetScript()->ProcessEventsFor(SMART_EVENT_FOLLOW_COMPLETED, player);
 }
 
 void SmartAI::SetScript9(SmartScriptHolder& e, uint32 entry, WorldObject* invoker)
