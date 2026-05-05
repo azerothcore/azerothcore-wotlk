@@ -9,6 +9,11 @@ mmapsConfig:
   # and is also where the "mmaps" folder will be created or located.
   dataDir: "./"
 
+  offmeshConnections:
+    # Make Blades Edge Arena Ropes wider
+    - "562 31,20 (6234.474121 256.563721 11.063726) (6230.162598 251.681976 11.199670) 2.1"
+    - "562 31,20 (6242.273926 266.697540 11.090456) (6246.688965 272.064819 11.235604) 2.1"
+
   meshSettings:
     # Here we have global config for recast navigation.
     # It's possible to override these data on map or tile level (see mapsOverrides).
