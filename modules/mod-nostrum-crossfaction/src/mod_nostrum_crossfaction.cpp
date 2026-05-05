@@ -495,9 +495,10 @@ public:
 
     ChatCommandTable GetCommands() const override
     {
+        LOG_INFO("module", "[NostrumCrossFaction] Registering .world command.");
         static ChatCommandTable table =
         {
-            { "world", HandleWorldChatCommand, static_cast<rbac::RBACPermissions>(9000010), Console::No },
+            { "world", HandleWorldChatCommand, static_cast<uint32>(9000010), Console::No },
         };
         return table;
     }
@@ -505,22 +506,49 @@ public:
     static bool HandleWorldChatCommand(ChatHandler* handler, Tail message)
     {
         if (!gCfg.enabled || !gCfg.worldChannelEnable)
-            return false;
+        {
+            handler->SendSysMessage("World chat is currently disabled.");
+            return true;
+        }
 
         Player* player = handler->GetSession() ? handler->GetSession()->GetPlayer() : nullptr;
         if (!player)
             return false;
 
-        if (message.empty())
+        LOG_DEBUG("module", "[NostrumCrossFaction] .world command executed by {}", player->GetName());
+
+        // Get-or-create the channel, then ensure the player is joined.
+        // GetJoinChannel creates the channel if it doesn't exist yet.
+        // JoinChannel is a no-op if the player is already a member.
+        ChannelMgr* mgr = ChannelMgr::forTeam(player->GetTeamId());
+        if (!mgr)
         {
-            handler->PSendSysMessage("Usage: .world <message>");
+            handler->SendSysMessage("World channel could not be created or found.");
             return true;
         }
 
-        if (player->GetLevel() < gCfg.worldChannelMinSpeakLevel)
+        Channel* channel = mgr->GetJoinChannel(gCfg.worldChannelName, 0);
+        if (!channel)
         {
-            handler->PSendSysMessage("You must be at least level {} to speak in /world.",
-                gCfg.worldChannelMinSpeakLevel);
+            handler->SendSysMessage("World channel could not be created or found.");
+            return true;
+        }
+
+        channel->JoinChannel(player, "");
+
+        if (message.empty())
+        {
+            handler->PSendSysMessage(
+                "You have joined the {} channel. Use your channel number, usually /1 or /2, to speak.",
+                gCfg.worldChannelName);
+            return true;
+        }
+
+        if (gCfg.worldChannelMinSpeakLevel > 0 &&
+            player->GetLevel() < gCfg.worldChannelMinSpeakLevel)
+        {
+            handler->PSendSysMessage("You must be at least level {} to speak in /{}.",
+                gCfg.worldChannelMinSpeakLevel, gCfg.worldChannelName);
             return true;
         }
 
@@ -534,22 +562,12 @@ public:
                 time_t diff = now - it->second;
                 if (diff < static_cast<time_t>(gCfg.worldChannelCooldownSec))
                 {
-                    handler->PSendSysMessage("Please wait {} more second(s) before speaking in /world.",
-                        gCfg.worldChannelCooldownSec - diff);
+                    handler->PSendSysMessage("Please wait {} more second(s) before speaking in /{}.",
+                        static_cast<uint32>(gCfg.worldChannelCooldownSec - diff),
+                        gCfg.worldChannelName);
                     return true;
                 }
             }
-        }
-
-        ChannelMgr* mgr = ChannelMgr::forTeam(player->GetTeamId());
-        if (!mgr)
-            return false;
-
-        Channel* channel = mgr->GetChannel(gCfg.worldChannelName, player);
-        if (!channel)
-        {
-            handler->SendSysMessage("World channel not found. Try re-logging.");
-            return false;
         }
 
         channel->Say(player->GetGUID(), std::string(message), LANG_UNIVERSAL);

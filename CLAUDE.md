@@ -14,7 +14,7 @@ All NostrumWoW-specific logic lives in `modules/`. Do not modify core files unle
 
 | Module | Purpose |
 |--------|---------|
-| `mod-nostrum-progression` | Enforces level cap per progression phase |
+| `mod-nostrum-progression` | Enforces level cap and instance/BG/LFG content locks per progression phase |
 | `mod-nostrum-rates` | Centralized XP, reputation, loot, and money multipliers |
 | `mod-nostrum-bg-xp` | BG completion XP with anti-AFK and daily bonus |
 | `mod-nostrum-hardcore` | Opt-in hardcore and self-found hardcore mode |

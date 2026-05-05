@@ -134,18 +134,30 @@ The guild name and MOTD are configurable.
 
 ### mod-nostrum-progression
 
-Enforces a server-wide level cap per progression phase without modifying `MaxPlayerLevel` in the core.
+Enforces a server-wide level cap and content locks per progression phase. All gates are driven by a single `Nostrum.ActivePhase` value (0–7); no other config changes are needed when advancing phases.
 
+**Level cap enforcement:**
 - On login and on level-up, characters above the cap are reduced to the cap level.
 - XP is zeroed out when the player is at or above the cap.
-- GMs with security level ≥ 2 bypass the cap by default.
+- GMs with security level ≥ 2 bypass all restrictions by default.
 - A login announcement informs players of the current phase name and level cap.
+
+**Content locks (all default on):**
+- **Instances** — players cannot enter dungeon or raid portals that require a later phase. Portal entry and teleport-in are both blocked.
+- **Login teleport** — if a player logs in inside a locked instance, they are moved to their homebind.
+- **Battlegrounds** — queue registration and port-in are blocked for BGs that require a later phase.
+- **LFG / Dungeon Finder** — queuing is blocked if any selected dungeon resolves to a locked map.
+
+Phase 0 (Beta) bypasses all content locks entirely.
 
 Key config:
 ```
-Nostrum.Progression.LevelCap    = 19
-Nostrum.Progression.PhaseName   = Phase 1
-Nostrum.Progression.GmBypass    = 1
+Nostrum.ActivePhase                              = 1
+Nostrum.Progression.GmBypass                    = 1
+Nostrum.Progression.LockInstances               = 1
+Nostrum.Progression.TeleportOutOfLockedMapsOnLogin = 1
+Nostrum.Progression.LockBattlegrounds           = 1
+Nostrum.Progression.LockLFG                     = 1
 ```
 
 ---
@@ -290,7 +302,7 @@ Grants a one-time starter reward to fresh level-1 characters on first login.
 
 ### mod-nostrum-instant-mail
 
-Removes the mail delivery delay for player-to-player mail. Mail is delivered immediately instead of the default 1-hour delay.
+Removes the mail delivery delay for all player-to-player mail (any sender to any recipient). Mail is delivered immediately instead of the default 1-hour delay. COD mail, Auction House mail, GM mail, and system mail keep their default delivery behaviour.
 
 ---
 
@@ -382,9 +394,8 @@ The server advances through 8 phases. Each phase raises the level cap and introd
 | 6 | 60–70 | TBC | 1–59: 2×  •  60–70: 1× |
 | 7 | 70–80 | WotLK | 1–69: 2×  •  70–80: 1× |
 
-**Advancing a phase** requires two conf changes + `.reload config`:
-1. `NostrumRates.ActivePhase` in `nostrum_rates.conf` → new phase number
-2. `Nostrum.Progression.LevelCap` + `Nostrum.Progression.PhaseName` in `mod_nostrum_progression.conf`
+**Advancing a phase** requires one conf change + `.reload config`:
+1. `Nostrum.ActivePhase` → new phase number (read by both `mod-nostrum-progression` and `mod-nostrum-rates`)
 
 ### Leveling
 
@@ -396,7 +407,7 @@ The server advances through 8 phases. Each phase raises the level cap and introd
 
 ### Dungeon and Raid Access
 
-No custom restrictions beyond the phase level cap. Access follows standard AzerothCore rules.
+Dungeon and raid entry is locked by `mod-nostrum-progression` based on the active phase. Portal entry, teleport-in, Dungeon Finder queues, and battleground queues are all blocked for content that requires a later phase. The lock table is hardcoded in C++ (see `kInstanceUnlockPhase` and `kBattlegroundUnlockPhase`). Phase 0 (Beta) disables all locks.
 
 ### Class and Race Restrictions
 
@@ -496,15 +507,20 @@ Module conf files are volume-mounted from `./conf/modules/` on the host into `/a
 | Key | Default | Description |
 |-----|---------|-------------|
 | `Nostrum.Progression.Enable` | 1 | Master switch |
-| `Nostrum.Progression.LevelCap` | 19 | Enforced level cap |
-| `Nostrum.Progression.PhaseName` | `Phase 1` | Display name shown on login |
-| `Nostrum.Progression.GmBypass` | 1 | GMs bypass the cap |
+| `Nostrum.ActivePhase` | 1 | Active phase 0–7; controls level cap, content locks, and XP rates |
+| `Nostrum.Progression.GmBypass` | 1 | GMs bypass the level cap and all content locks |
+| `Nostrum.Progression.LoginAnnouncement` | 1 | Show phase name and cap on login |
+| `Nostrum.Progression.LockInstances` | 1 | Block dungeon/raid entry for locked phases |
+| `Nostrum.Progression.TeleportOutOfLockedMapsOnLogin` | 1 | Move players to homebind if logged inside a locked instance |
+| `Nostrum.Progression.LockBattlegrounds` | 1 | Block BG queue and port-in for locked phases |
+| `Nostrum.Progression.LockLFG` | 1 | Block Dungeon Finder queues for locked phases |
+| `Nostrum.Progression.Debug` | 0 | Verbose logging for all lock checks |
 
 ### Rates (`nostrum_rates.conf`)
 
 | Key | Default | Description |
 |-----|---------|-------------|
-| `NostrumRates.ActivePhase` | 1 | Active phase (0–7). Controls all XP brackets and DK lock |
+| `Nostrum.ActivePhase` | 1 | Active phase (0–7). Shared with mod-nostrum-progression; controls XP brackets and DK lock |
 | `NostrumRates.XP.BetaRate` | 3.0 | Phase 0 flat XP multiplier |
 | `NostrumRates.XP.CurrentPhaseRate` | 1.0 | XP for the active phase's level bracket |
 | `NostrumRates.XP.CatchUpRate` | 2.0 | XP for previous phase brackets (catch-up) |
