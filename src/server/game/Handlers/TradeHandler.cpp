@@ -459,14 +459,35 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
             return;
         }
 
-        // log traded items before moving (pointers become invalid after moveItems)
+        // cache traded item info before moving (pointers become invalid after moveItems if items merge into existing stacks)
+        struct TradedItemInfo
+        {
+            bool present = false;
+            std::string name;
+            uint32 entry = 0;
+            uint32 count = 0;
+        };
+        TradedItemInfo myItemsInfo[TRADE_SLOT_TRADED_COUNT];
+        TradedItemInfo hisItemsInfo[TRADE_SLOT_TRADED_COUNT];
         std::string myItemsStr, hisItemsStr;
         for (uint8 i = 0; i < TRADE_SLOT_TRADED_COUNT; ++i)
         {
             if (myItems[i])
-                myItemsStr += Acore::StringFormat("{} (Entry:{}) x{}, ", myItems[i]->GetTemplate()->Name1, myItems[i]->GetEntry(), myItems[i]->GetCount());
+            {
+                myItemsInfo[i].present = true;
+                myItemsInfo[i].name = myItems[i]->GetTemplate()->Name1;
+                myItemsInfo[i].entry = myItems[i]->GetEntry();
+                myItemsInfo[i].count = myItems[i]->GetCount();
+                myItemsStr += Acore::StringFormat("{} (Entry:{}) x{}, ", myItemsInfo[i].name, myItemsInfo[i].entry, myItemsInfo[i].count);
+            }
             if (hisItems[i])
-                hisItemsStr += Acore::StringFormat("{} (Entry:{}) x{}, ", hisItems[i]->GetTemplate()->Name1, hisItems[i]->GetEntry(), hisItems[i]->GetCount());
+            {
+                hisItemsInfo[i].present = true;
+                hisItemsInfo[i].name = hisItems[i]->GetTemplate()->Name1;
+                hisItemsInfo[i].entry = hisItems[i]->GetEntry();
+                hisItemsInfo[i].count = hisItems[i]->GetCount();
+                hisItemsStr += Acore::StringFormat("{} (Entry:{}) x{}, ", hisItemsInfo[i].name, hisItemsInfo[i].entry, hisItemsInfo[i].count);
+            }
         }
 
         // execute trade: 1. remove
@@ -509,10 +530,10 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
         {
             for (uint8 i = 0; i < TRADE_SLOT_TRADED_COUNT; ++i)
             {
-                if (myItems[i])
+                if (myItemsInfo[i].present)
                     LOG_GM(GetAccountId(), "GM {} (Account: {}) traded item: {} (Entry: {} Count: {}) to {}",
                         _player->GetName(), GetAccountId(),
-                        myItems[i]->GetTemplate()->Name1, myItems[i]->GetEntry(), myItems[i]->GetCount(),
+                        myItemsInfo[i].name, myItemsInfo[i].entry, myItemsInfo[i].count,
                         trader->GetName());
             }
             if (my_trade->GetMoney() > 0)
@@ -523,10 +544,10 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
         {
             for (uint8 i = 0; i < TRADE_SLOT_TRADED_COUNT; ++i)
             {
-                if (hisItems[i])
+                if (hisItemsInfo[i].present)
                     LOG_GM(trader->GetSession()->GetAccountId(), "GM {} (Account: {}) traded item: {} (Entry: {} Count: {}) to {}",
                         trader->GetName(), trader->GetSession()->GetAccountId(),
-                        hisItems[i]->GetTemplate()->Name1, hisItems[i]->GetEntry(), hisItems[i]->GetCount(),
+                        hisItemsInfo[i].name, hisItemsInfo[i].entry, hisItemsInfo[i].count,
                         _player->GetName());
             }
             if (his_trade->GetMoney() > 0)
