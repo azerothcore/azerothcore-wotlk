@@ -5390,10 +5390,10 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                             {
                                 if (target->isDead() && GetBase() && target->IsCreature() && target->GetEntry() == 24601)
                                 {
-                                    auto caster2 = GetBase()->GetCaster();
-                                    if (caster2 && caster2->IsPlayer())
+                                    if (Unit* caster2 = GetBase()->GetCaster())
                                     {
-                                        caster2->ToPlayer()->KilledMonsterCredit(25987);
+                                        if (Player* player = caster2->GetCharmerOrOwnerPlayerOrPlayerItself())
+                                            player->KilledMonsterCredit(25987);
                                     }
                                 }
                                 return;
