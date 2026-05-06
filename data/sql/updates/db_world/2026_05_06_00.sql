@@ -1,3 +1,4 @@
+-- DB update 2026_05_05_04 -> 2026_05_06_00
 
 -- Set SAI
 UPDATE `gameobject_template` SET `AIName` = 'SmartGameObjectAI' WHERE `entry` = 186565;
