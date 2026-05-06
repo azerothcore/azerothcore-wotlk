@@ -74,8 +74,10 @@ public:
 
     static RBACCommandData GetRBACData(uint32 accountId, std::string const& accountName)
     {
+        // session->GetRBACData() can be null after World::ReloadRBAC()
         if (WorldSession* session = sWorldSessionMgr->FindSession(accountId))
-            return { session->GetRBACData(), false };
+            if (rbac::RBACData* sessionRbac = session->GetRBACData())
+                return { sessionRbac, false };
 
         rbac::RBACData* rbac = new rbac::RBACData(accountId, accountName, realm.Id.Realm, AccountMgr::GetSecurity(accountId, realm.Id.Realm));
         rbac->LoadFromDB();
