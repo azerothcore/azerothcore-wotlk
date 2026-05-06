@@ -293,10 +293,10 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
 
     for (auto const& target : sWhoListCacheMgr->GetWhoList())
     {
-        // RBAC_PERM_TWO_SIDE_WHO_LIST or AllowTwoSide.WhoList is globally enabled
-        if (target.GetTeamId() != team
-            && !HasPermission(rbac::RBAC_PERM_TWO_SIDE_WHO_LIST)
-            && !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_WHO_LIST))
+        // player can see member of other team only if they have
+        // RBAC_PERM_TWO_SIDE_WHO_LIST (granted to role 194+ by default;
+        // grant to role 195 or per-account to allow cross-faction /who)
+        if (target.GetTeamId() != team && !HasPermission(rbac::RBAC_PERM_TWO_SIDE_WHO_LIST))
             continue;
 
         // player can see MODERATOR, GAME MASTER, ADMINISTRATOR only if CONFIG_GM_IN_WHO_LIST
