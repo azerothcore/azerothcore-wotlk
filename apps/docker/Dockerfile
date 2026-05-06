@@ -224,6 +224,15 @@ RUN apt-get update && \
     apt-get install -y curl unzip && \
     rm -rf /var/lib/apt/lists/*
 
+ARG USER_ID=1000
+ARG GROUP_ID=1000
+ARG DOCKER_USER=acore
+
+RUN groupadd --gid "$GROUP_ID"  "$DOCKER_USER" && \
+    useradd -d /azerothcore --uid "$USER_ID"  --gid "$GROUP_ID"  "$DOCKER_USER" && \
+    passwd -d "$DOCKER_USER" && \
+    chown -R "$DOCKER_USER:$DOCKER_USER" /azerothcore
+
 COPY --chown=$DOCKER_USER:$DOCKER_USER apps apps
 
 VOLUME /azerothcore/env/dist/data
