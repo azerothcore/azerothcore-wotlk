@@ -2,7 +2,6 @@
  * mod-nostrum-crossfaction
  *
  * Centralizes NostrumWoW cross-faction policy:
- *  - World channel auto-join with configurable speak level and cooldown.
  *  - Blocks manual cross-faction group invites (configurable).
  *  - Blocks cross-faction direct trades (configurable).
  *  - Startup validation logs for features that require core config changes or
@@ -12,19 +11,13 @@
  * BG team mixing) are validated and logged at startup without fake stubs.
  */
 
-#include "Channel.h"
-#include "ChannelMgr.h"
 #include "Chat.h"
-#include "CommandScript.h"
 #include "Config.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
 #include "PlayerScript.h"
 #include "WorldScript.h"
-
-#include <algorithm>
-#include <unordered_map>
 
 // ---------------------------------------------------------------------------
 // Config
@@ -41,14 +34,6 @@ struct CrossFactionConfig
     bool        chatEnable                      = true;
     bool        channelsEnable                  = true;
     bool        whoListEnable                   = true;
-
-    // World Channel
-    bool        worldChannelEnable              = true;
-    std::string worldChannelName                = "world";
-    bool        worldChannelLoginMsgEnable      = true;
-    std::string worldChannelLoginMsg            = "You have joined /world. Use it for global chat, questions, groups, and trading.";
-    uint32      worldChannelMinSpeakLevel       = 5;
-    uint32      worldChannelCooldownSec         = 3;
 
     // Economy
     bool        ahEnable                        = true;
@@ -88,18 +73,9 @@ struct CrossFactionConfig
 
 CrossFactionConfig gCfg;
 
-// guid.GetCounter() -> unix timestamp of last world-channel message
-std::unordered_map<uint64, time_t> gLastSpeak;
-
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-
-static std::string strToLower(std::string s)
-{
-    std::transform(s.begin(), s.end(), s.begin(), ::tolower);
-    return s;
-}
 
 static bool CoreBool(char const* key)
 {
@@ -117,14 +93,6 @@ void LoadConfig()
     gCfg.chatEnable     = sConfigMgr->GetOption<bool>("NostrumCrossFaction.Chat.Enable",     true);
     gCfg.channelsEnable = sConfigMgr->GetOption<bool>("NostrumCrossFaction.Channels.Enable", true);
     gCfg.whoListEnable  = sConfigMgr->GetOption<bool>("NostrumCrossFaction.WhoList.Enable",  true);
-
-    gCfg.worldChannelEnable         = sConfigMgr->GetOption<bool>  ("NostrumCrossFaction.WorldChannel.Enable",              true);
-    gCfg.worldChannelName           = sConfigMgr->GetOption<std::string>("NostrumCrossFaction.WorldChannel.Name",           "world");
-    gCfg.worldChannelLoginMsgEnable = sConfigMgr->GetOption<bool>  ("NostrumCrossFaction.WorldChannel.LoginMessage.Enable", true);
-    gCfg.worldChannelLoginMsg       = sConfigMgr->GetOption<std::string>("NostrumCrossFaction.WorldChannel.LoginMessage",
-        "You have joined /world. Use it for global chat, questions, groups, and trading.");
-    gCfg.worldChannelMinSpeakLevel  = sConfigMgr->GetOption<uint32>("NostrumCrossFaction.WorldChannel.MinSpeakLevel",           5);
-    gCfg.worldChannelCooldownSec    = sConfigMgr->GetOption<uint32>("NostrumCrossFaction.WorldChannel.MessageCooldownSeconds",   3);
 
     gCfg.ahEnable      = sConfigMgr->GetOption<bool>("NostrumCrossFaction.AuctionHouse.Enable", true);
     gCfg.mailEnable    = sConfigMgr->GetOption<bool>("NostrumCrossFaction.Mail.Enable",          false);
@@ -212,20 +180,6 @@ void LogStartupState()
     }
     else
         LOG_INFO("module", "[NostrumCrossFaction] Cross-faction /who: disabled.");
-
-    // --- World Channel ---
-    LOG_INFO("module", "[NostrumCrossFaction] --- World Channel ---");
-    if (gCfg.worldChannelEnable)
-    {
-        LOG_INFO("module", "[NostrumCrossFaction] World channel: \"{}\" (auto-join on login)", gCfg.worldChannelName);
-        LOG_INFO("module", "[NostrumCrossFaction] World channel min speak level: {}", gCfg.worldChannelMinSpeakLevel);
-        LOG_INFO("module", "[NostrumCrossFaction] World channel message cooldown: {}s", gCfg.worldChannelCooldownSec);
-        if (!CoreBool("AllowTwoSide.Interaction.Channel"))
-            LOG_WARN("module", "[NostrumCrossFaction] AllowTwoSide.Interaction.Channel = 0 — "
-                "world channel will be faction-split. Set = 1 for a shared cross-faction world channel.");
-    }
-    else
-        LOG_INFO("module", "[NostrumCrossFaction] World channel auto-join: disabled.");
 
     // --- Economy ---
     LOG_INFO("module", "[NostrumCrossFaction] --- Economy ---");
@@ -353,87 +307,10 @@ class NostrumCrossFactionPlayerScript : public PlayerScript
 public:
     NostrumCrossFactionPlayerScript() : PlayerScript("NostrumCrossFactionPlayerScript",
         {
-            PLAYERHOOK_ON_LOGIN,
-            PLAYERHOOK_CAN_PLAYER_USE_CHANNEL_CHAT,
             PLAYERHOOK_CAN_GROUP_INVITE,
             PLAYERHOOK_CAN_INIT_TRADE,
         })
     {
-    }
-
-    // -----------------------------------------------------------------------
-    // World channel auto-join
-    // -----------------------------------------------------------------------
-
-    void OnPlayerLogin(Player* player) override
-    {
-        if (!gCfg.enabled || !gCfg.worldChannelEnable)
-            return;
-
-        ChannelMgr* mgr = ChannelMgr::forTeam(player->GetTeamId());
-        if (!mgr)
-            return;
-
-        Channel* channel = mgr->GetJoinChannel(gCfg.worldChannelName, 0);
-        if (!channel)
-            return;
-
-        channel->JoinChannel(player, "");
-
-        if (gCfg.worldChannelLoginMsgEnable && !gCfg.worldChannelLoginMsg.empty())
-            ChatHandler(player->GetSession()).SendSysMessage(gCfg.worldChannelLoginMsg);
-
-        if (gCfg.debug)
-            LOG_INFO("module", "[NostrumCrossFaction] {} joined world channel \"{}\".",
-                player->GetName(), gCfg.worldChannelName);
-    }
-
-    // -----------------------------------------------------------------------
-    // World channel speak enforcement (min level + cooldown)
-    // -----------------------------------------------------------------------
-
-    bool OnPlayerCanUseChat(Player* player, uint32 /*type*/, uint32 /*language*/,
-        std::string& /*msg*/, Channel* channel) override
-    {
-        if (!gCfg.enabled || !gCfg.worldChannelEnable || !channel)
-            return true;
-
-        if (strToLower(channel->GetName()) != strToLower(gCfg.worldChannelName))
-            return true;
-
-        // Minimum speak level
-        if (gCfg.worldChannelMinSpeakLevel > 0 &&
-            player->GetLevel() < gCfg.worldChannelMinSpeakLevel)
-        {
-            ChatHandler(player->GetSession()).PSendSysMessage(
-                "You must be at least level {} to speak in /{}.",
-                gCfg.worldChannelMinSpeakLevel, gCfg.worldChannelName);
-            return false;
-        }
-
-        // Message cooldown
-        if (gCfg.worldChannelCooldownSec > 0)
-        {
-            time_t now     = time(nullptr);
-            uint64 guidLow = player->GetGUID().GetCounter();
-            auto   it      = gLastSpeak.find(guidLow);
-
-            if (it != gLastSpeak.end())
-            {
-                time_t elapsed = now - it->second;
-                if (elapsed < static_cast<time_t>(gCfg.worldChannelCooldownSec))
-                {
-                    ChatHandler(player->GetSession()).PSendSysMessage(
-                        "Please wait {} more second(s) before speaking in /{}.",
-                        static_cast<uint32>(gCfg.worldChannelCooldownSec - elapsed),
-                        gCfg.worldChannelName);
-                    return false;
-                }
-            }
-            gLastSpeak[guidLow] = now;
-        }
-
-        return true;
     }
 
     // -----------------------------------------------------------------------
@@ -482,101 +359,6 @@ public:
 };
 
 // ---------------------------------------------------------------------------
-// CommandScript — .world <message>
-// Accessible to all players via rbac_default_permissions (secId=0, permId=9000010).
-// ---------------------------------------------------------------------------
-
-using namespace Acore::ChatCommands;
-
-class NostrumCrossFactionCommandScript : public CommandScript
-{
-public:
-    NostrumCrossFactionCommandScript() : CommandScript("NostrumCrossFactionCommandScript") { }
-
-    ChatCommandTable GetCommands() const override
-    {
-        LOG_INFO("module", "[NostrumCrossFaction] Registering .world command.");
-        static ChatCommandTable table =
-        {
-            { "world", HandleWorldChatCommand, static_cast<uint32>(9000010), Console::No },
-        };
-        return table;
-    }
-
-    static bool HandleWorldChatCommand(ChatHandler* handler, Tail message)
-    {
-        if (!gCfg.enabled || !gCfg.worldChannelEnable)
-        {
-            handler->SendSysMessage("World chat is currently disabled.");
-            return true;
-        }
-
-        Player* player = handler->GetSession() ? handler->GetSession()->GetPlayer() : nullptr;
-        if (!player)
-            return false;
-
-        LOG_DEBUG("module", "[NostrumCrossFaction] .world command executed by {}", player->GetName());
-
-        // Get-or-create the channel, then ensure the player is joined.
-        // GetJoinChannel creates the channel if it doesn't exist yet.
-        // JoinChannel is a no-op if the player is already a member.
-        ChannelMgr* mgr = ChannelMgr::forTeam(player->GetTeamId());
-        if (!mgr)
-        {
-            handler->SendSysMessage("World channel could not be created or found.");
-            return true;
-        }
-
-        Channel* channel = mgr->GetJoinChannel(gCfg.worldChannelName, 0);
-        if (!channel)
-        {
-            handler->SendSysMessage("World channel could not be created or found.");
-            return true;
-        }
-
-        channel->JoinChannel(player, "");
-
-        if (message.empty())
-        {
-            handler->PSendSysMessage(
-                "You have joined the {} channel. Use your channel number, usually /1 or /2, to speak.",
-                gCfg.worldChannelName);
-            return true;
-        }
-
-        if (gCfg.worldChannelMinSpeakLevel > 0 &&
-            player->GetLevel() < gCfg.worldChannelMinSpeakLevel)
-        {
-            handler->PSendSysMessage("You must be at least level {} to speak in /{}.",
-                gCfg.worldChannelMinSpeakLevel, gCfg.worldChannelName);
-            return true;
-        }
-
-        uint64 guidLow = player->GetGUID().GetCounter();
-        time_t now = time(nullptr);
-        if (gCfg.worldChannelCooldownSec > 0)
-        {
-            auto it = gLastSpeak.find(guidLow);
-            if (it != gLastSpeak.end())
-            {
-                time_t diff = now - it->second;
-                if (diff < static_cast<time_t>(gCfg.worldChannelCooldownSec))
-                {
-                    handler->PSendSysMessage("Please wait {} more second(s) before speaking in /{}.",
-                        static_cast<uint32>(gCfg.worldChannelCooldownSec - diff),
-                        gCfg.worldChannelName);
-                    return true;
-                }
-            }
-        }
-
-        channel->Say(player->GetGUID(), std::string(message), LANG_UNIVERSAL);
-        gLastSpeak[guidLow] = now;
-        return true;
-    }
-};
-
-// ---------------------------------------------------------------------------
 // Registration
 // ---------------------------------------------------------------------------
 
@@ -584,5 +366,4 @@ void Addmod_nostrum_crossfactionScripts()
 {
     new NostrumCrossFactionWorldScript();
     new NostrumCrossFactionPlayerScript();
-    new NostrumCrossFactionCommandScript();
 }

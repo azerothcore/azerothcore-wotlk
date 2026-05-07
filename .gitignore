@@ -122,3 +122,7 @@ local.properties
 !modules/mod_nostrum_instant_mail
 !modules/mod-nostrum-crossfaction
 !modules/mod-nostrum-guide
+!modules/mod-cfbg
+!modules/mod-transmog
+!modules/mod-ah-bot-plus
+!modules/mod-world-chat

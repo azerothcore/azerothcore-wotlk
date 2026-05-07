@@ -105,6 +105,9 @@ struct HardcoreConfig
     bool   selfFoundBlockAuctionHouse= true;
     bool   selfFoundBlockPlayerMail  = true;
 
+    // Hardcore restrictions
+    bool   hardcoreBlockAuctionHouse = true;
+
     // Auto-guild
     bool        autoGuildEnable      = true;
     std::string autoGuildName        = "Deathwalkers";
@@ -131,9 +134,18 @@ public:
 
     bool IsActive(uint32 guid);
     bool IsFallen(uint32 guid);
-    bool IsHardcore(uint32 guid);       // mode == Hardcore (not SelfFound), online only
-    bool IsSelfFound(uint32 guid);      // mode == SelfFound, online only
-    bool IsSelfFoundAny(uint32 guid);   // mode == SelfFound, checks DB for offline characters
+    bool IsHardcore(uint32 guid);         // mode == Hardcore (not SelfFound), online only
+    bool IsSelfFound(uint32 guid);        // mode == SelfFound, online only
+    bool IsSelfFoundAny(uint32 guid);     // mode == SelfFound, checks DB for offline characters
+
+    // Returns active HC mode for guid; HardcoreMode::None if not enrolled or fallen.
+    // Checks in-memory for online players and falls back to DB for offline.
+    HardcoreMode GetActiveModeAny(uint32 guid);
+
+    // True if guidA and guidB are allowed to trade/mail/group with each other.
+    // Softcore<->Softcore and Hardcore<->Hardcore are allowed; all other pairings are not.
+    // Self-Found is always isolated (blocked with everyone).
+    bool CanInteract(uint32 guidA, uint32 guidB);
 
     // --- Confirmation flow ---
     void  SetPendingMode(Player* player, HardcoreMode mode);
@@ -172,6 +184,9 @@ public:
 
     // --- Leaderboard ---
     std::string BuildLeaderboard();
+
+    // --- Player self-service ---
+    bool PlayerDisable(Player* player, std::string& outMsg);
 
     // --- GM helpers ---
     bool GMGetInfo(std::string const& playerName, std::string& outMsg);

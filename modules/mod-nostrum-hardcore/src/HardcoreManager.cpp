@@ -71,6 +71,8 @@ void HardcoreManager::LoadConfig()
     _config.selfFoundBlockAuctionHouse = sConfigMgr->GetOption<bool>  ("Hardcore.SelfFound.BlockAuctionHouse",true);
     _config.selfFoundBlockPlayerMail   = sConfigMgr->GetOption<bool>  ("Hardcore.SelfFound.BlockPlayerMail",  true);
 
+    _config.hardcoreBlockAuctionHouse  = sConfigMgr->GetOption<bool>  ("Hardcore.BlockAuctionHouse",          true);
+
     _config.autoGuildEnable            = sConfigMgr->GetOption<bool>        ("Hardcore.AutoGuild.Enable", true);
     _config.autoGuildName              = sConfigMgr->GetOption<std::string> ("Hardcore.AutoGuild.Name",   "Deathwalkers");
     _config.autoGuildMotd              = sConfigMgr->GetOption<std::string> ("Hardcore.AutoGuild.MOTD",
@@ -196,6 +198,27 @@ bool HardcoreManager::IsSelfFoundAny(uint32 guid)
         "SELECT 1 FROM mod_nostrum_hardcore WHERE guid = {} AND mode = 2 AND status = 1",
         guid);
     return result != nullptr;
+}
+
+HardcoreMode HardcoreManager::GetActiveModeAny(uint32 guid)
+{
+    if (HardcoreData* d = GetData(guid))
+        return (d->status == HardcoreStatus::Active) ? d->mode : HardcoreMode::None;
+
+    QueryResult result = CharacterDatabase.Query(
+        "SELECT mode FROM mod_nostrum_hardcore WHERE guid = {} AND status = 1", guid);
+    if (!result)
+        return HardcoreMode::None;
+    return static_cast<HardcoreMode>(result->Fetch()[0].Get<uint8>());
+}
+
+bool HardcoreManager::CanInteract(uint32 guidA, uint32 guidB)
+{
+    HardcoreMode modeA = GetActiveModeAny(guidA);
+    HardcoreMode modeB = GetActiveModeAny(guidB);
+    if (modeA == HardcoreMode::SelfFound || modeB == HardcoreMode::SelfFound)
+        return false;
+    return modeA == modeB;
 }
 
 // ---------------------------------------------------------------------------
@@ -577,6 +600,11 @@ void HardcoreManager::OnLevelChanged(Player* player, uint8 /*oldLevel*/)
         Broadcast(Acore::StringFormat(
             "[Hardcore] {} has reached level 80 without dying. A true champion of Nostrum.",
             player->GetName()));
+
+        ChatHandler(player->GetSession()).PSendSysMessage(
+            "Congratulations on reaching level 80 as a Hardcore character! "
+            "You have proven your strength and survived the journey. "
+            "If you wish to leave Hardcore mode and play normally, type .hardcore disable.");
     }
     else if (selfFound)
     {
@@ -944,6 +972,40 @@ std::string HardcoreManager::BuildLeaderboard()
     } while (result->NextRow());
 
     return out;
+}
+
+// ---------------------------------------------------------------------------
+// Player self-service
+// ---------------------------------------------------------------------------
+
+bool HardcoreManager::PlayerDisable(Player* player, std::string& outMsg)
+{
+    uint32 guid = player->GetGUID().GetCounter();
+
+    if (!IsActive(guid))
+    {
+        outMsg = "You are not an active Hardcore character.";
+        return false;
+    }
+
+    if (player->GetLevel() < 80)
+    {
+        outMsg = "You can not disable Hardcore mode. Survive.";
+        return false;
+    }
+
+    CharacterDatabase.Execute(
+        "UPDATE mod_nostrum_hardcore SET status = 3 WHERE guid = {} AND status = 1",
+        guid);
+
+    auto it = _data.find(guid);
+    if (it != _data.end())
+        it->second.status = HardcoreStatus::Removed;
+
+    RemoveBuff(player);
+
+    outMsg = "Hardcore mode has been disabled. You are now a normal character.";
+    return true;
 }
 
 // ---------------------------------------------------------------------------
