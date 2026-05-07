@@ -829,28 +829,13 @@ class spell_kickin_nass_quest_completion : public SpellScript
 {
     PrepareSpellScript(spell_kickin_nass_quest_completion);
 
-    bool Load() override
-    {
-        Unit *caster = GetCaster();
-        if (caster && caster->IsPlayer())
-          return true;
-
-        return false;
-    }
-
     void DespawnNass(SpellEffIndex effIndex)
     {
-        uint32 effect = GetSpellInfo()->Effects[effIndex].Effect;
-        if (effect != SPELL_EFFECT_DUMMY && effect != SPELL_EFFECT_SCRIPT_EFFECT)
-          return;
-
-        Unit *caster = GetCaster();
         Creature *creature = GetHitCreature();
-        if (!caster || !creature)
+        if (!creature)
           return;
 
-        if (creature->GetEntry() != 28521 ||
-            creature->GetCharmerOrOwnerGUID() != caster->GetGUID())
+        if (creature->GetEntry() != 28521)
           return;
 
         creature->DespawnOrUnsummon(1ms);
