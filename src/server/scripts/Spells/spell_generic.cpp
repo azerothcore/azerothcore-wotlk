@@ -3774,7 +3774,6 @@ private:
    29435 - Capture Female Kaliri Hatchling
    42268 - Quest - Mindless Abomination Explosion FX Master
    51592 - Pickup Primordial Hatchling
-   51910 - Kickin' Nass: Quest Completion
    52267 - Despawn Horse
    54420 - Deliver Gryphon */
 class spell_gen_despawn_self : public SpellScript
