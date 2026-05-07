@@ -64,7 +64,7 @@ void WorldSession::HandleAddFriendOpcode(WorldPacket& recv_data)
         {
             if (friendGuid == GetPlayer()->GetGUID())
                 friendResult = FRIEND_SELF;
-            else if (GetPlayer()->GetTeamId() != teamId && !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_ADD_FRIEND) && !HasPermission(rbac::RBAC_PERM_TWO_SIDE_ADD_FRIEND))
+            else if (GetPlayer()->GetTeamId() != teamId && !HasPermission(rbac::RBAC_PERM_TWO_SIDE_ADD_FRIEND))
                 friendResult = FRIEND_ENEMY;
             else if (GetPlayer()->GetSocial()->HasFriend(friendGuid))
                 friendResult = FRIEND_ALREADY;
