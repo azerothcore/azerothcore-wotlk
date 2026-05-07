@@ -4416,14 +4416,6 @@ AllowTwoSide.Interaction.Auction = 0
 AllowTwoSide.Interaction.Mail = 0
 
 #
-#    AllowTwoSide.WhoList
-#        Description: Show characters from both factions in the /who list.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-AllowTwoSide.WhoList = 0
-
-#
 #    AllowTwoSide.AddFriend
 #        Description: Allow adding friends from other faction the friends list.
 #        Default:     0 - (Disabled)
