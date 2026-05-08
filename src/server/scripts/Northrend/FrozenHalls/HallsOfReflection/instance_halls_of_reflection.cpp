@@ -60,6 +60,7 @@ public:
             case 5:
                 _owner.SetFacingTo(2.82f);
                 _owner.SetStandState(UNIT_STAND_STATE_KNEEL);
+                _owner.m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(_owner, 6), 3s);
                 break;
             case 6:
                 if (InstanceScript* inst = _owner.GetInstanceScript())
