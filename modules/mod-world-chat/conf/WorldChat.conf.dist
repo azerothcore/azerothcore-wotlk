@@ -1,0 +1,52 @@
+[worldserver]
+
+###################################################################################################
+# Ouizzy's World Chat System
+#
+# These settings control Ouizzy's World Chat System
+#
+#    WorldChat.Enable
+#        Description: Enables Ouizzy's World Chat System
+#        Default:     True  - (Enabled)
+#                     False - (Disabled)
+
+WorldChat.Enable = true
+
+#
+#    WorldChat.CrossFaction
+#        Description: Enables world chatting cross-faction
+#        Default:     False - (Disabled)
+#                     True  - (Enabled)
+#
+
+WorldChat.CrossFaction = false
+
+#
+#    WorldChat.Announce
+#        Description: Enables announcing players that the server uses this module
+#        Default:     True  - (Enabled)
+#                     False - (Disabled)
+#
+
+WorldChat.Announce = true
+
+#
+#    WorldChat.OnLogin.State
+#        Description: Enables world by default on character login
+#        Default:     True  - (Enabled)
+#                     False - (Disabled)
+#
+
+WorldChat.OnLogin.State = true
+
+#
+#    WorldChat.ChannelName
+#        Description: Enables world on a specific channel which you can /join in-game
+#        Default:     "world"   - (Enabled)
+#                     ""        - (Disabled)
+#
+
+WorldChat.ChannelName = "world"
+
+#
+###################################################################################################
