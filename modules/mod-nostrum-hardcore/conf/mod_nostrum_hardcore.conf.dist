@@ -123,6 +123,14 @@ Hardcore.MilestoneLevels = 10,20,40,60,70,80
 Hardcore.LeaderboardLimit = 10
 
 ################################################################################
+# Hardcore restrictions
+################################################################################
+
+# Block Auction House access for Hardcore characters. Default: 1
+# Blocks the NPC interaction before the AH window opens (no buying or selling).
+Hardcore.BlockAuctionHouse = 1
+
+################################################################################
 # Self-Found restrictions
 ################################################################################
 

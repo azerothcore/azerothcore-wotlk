@@ -23,6 +23,8 @@
 #include "HardcoreManager.h"
 
 #include "AuctionHouseScript.h"
+#include "CharacterCache.h"
+#include "WorldSession.h"
 #include "AuctionHouseMgr.h"
 #include "Chat.h"
 #include "ChatCommand.h"
@@ -37,6 +39,8 @@
 #include "Player.h"
 #include "PlayerScript.h"
 #include "SharedDefines.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "StringFormat.h"
 #include "WorldScript.h"
 
@@ -125,6 +129,7 @@ public:
             PLAYERHOOK_ON_PLAYER_KILLED_BY_CREATURE,
             PLAYERHOOK_ON_DUEL_END,
             PLAYERHOOK_ON_LEVEL_CHANGED,
+            PLAYERHOOK_CAN_GROUP_INVITE,
             PLAYERHOOK_CAN_INIT_TRADE,
             PLAYERHOOK_CAN_SET_TRADE_ITEM,
             PLAYERHOOK_CAN_SEND_MAIL,
@@ -163,8 +168,10 @@ public:
 
     void OnPlayerJustDied(Player* player) override
     {
-        // Handles environmental/fallthrough deaths not caught by the hooks above
         sHardcoreMgr->NotifyGeneralDeath(player);
+        // Fallback for deaths that slip through NotifyGeneralDeath
+        // (drowning, falling, and other edge cases in AzerothCore)
+        sHardcoreMgr->EnsureFallenIfDead(player);
     }
 
     // ---- Duel ----
@@ -182,31 +189,94 @@ public:
         sHardcoreMgr->OnLevelChanged(player, oldLevel);
     }
 
-    // ---- Self-Found trade restrictions ----
+    // ---- Group invite restriction ----
+
+    bool OnPlayerCanGroupInvite(Player* player, std::string& membername) override
+    {
+        if (!sHardcoreMgr->IsEnabled())
+            return true;
+
+        uint32 inviterGuid = player->GetGUID().GetCounter();
+
+        ObjectGuid targetObjGuid = sCharacterCache->GetCharacterGuidByName(membername);
+        if (!targetObjGuid)
+            return true; // unknown player — let the normal "not found" error handle it
+
+        uint32 inviteeGuid = targetObjGuid.GetCounter();
+
+        HardcoreMode myMode     = sHardcoreMgr->GetActiveModeAny(inviterGuid);
+        HardcoreMode targetMode = sHardcoreMgr->GetActiveModeAny(inviteeGuid);
+
+        if (myMode == HardcoreMode::SelfFound)
+        {
+            ChatHandler(player->GetSession()).PSendSysMessage(
+                "Self-Found characters cannot join groups.");
+            return false;
+        }
+
+        if (targetMode == HardcoreMode::SelfFound)
+        {
+            ChatHandler(player->GetSession()).PSendSysMessage(
+                "That player cannot join groups.");
+            return false;
+        }
+
+        if (myMode != targetMode)
+        {
+            if (myMode == HardcoreMode::Hardcore)
+                ChatHandler(player->GetSession()).PSendSysMessage(
+                    "Hardcore characters can only group with other Hardcore characters.");
+            else
+                ChatHandler(player->GetSession()).PSendSysMessage(
+                    "You cannot group with Hardcore characters.");
+            return false;
+        }
+
+        return true;
+    }
+
+    // ---- Trade restrictions ----
 
     bool OnPlayerCanInitTrade(Player* player, Player* target) override
     {
         if (!sHardcoreMgr->IsEnabled())
             return true;
 
-        uint32 guid = player->GetGUID().GetCounter();
+        if (!target)
+            return true;
 
-        if (sHardcoreMgr->IsSelfFound(guid) && sHardcoreMgr->Cfg().selfFoundBlockTrade)
+        uint32 guid       = player->GetGUID().GetCounter();
+        uint32 targetGuid = target->GetGUID().GetCounter();
+
+        HardcoreMode myMode     = sHardcoreMgr->GetActiveModeAny(guid);
+        HardcoreMode targetMode = sHardcoreMgr->GetActiveModeAny(targetGuid);
+
+        if (myMode == HardcoreMode::SelfFound)
         {
             ChatHandler(player->GetSession()).PSendSysMessage(
-                "Self-Found Hardcore characters cannot trade.");
+                "Self-Found characters cannot trade with anyone.");
+            player->GetSession()->SendCancelTrade(TRADE_STATUS_TRADE_CANCELED);
             return false;
         }
 
-        if (target)
+        if (targetMode == HardcoreMode::SelfFound)
         {
-            uint32 targetGuid = target->GetGUID().GetCounter();
-            if (sHardcoreMgr->IsSelfFound(targetGuid) && sHardcoreMgr->Cfg().selfFoundBlockTrade)
-            {
+            ChatHandler(player->GetSession()).PSendSysMessage(
+                "That player cannot trade with anyone.");
+            player->GetSession()->SendCancelTrade(TRADE_STATUS_TRADE_CANCELED);
+            return false;
+        }
+
+        if (myMode != targetMode)
+        {
+            if (myMode == HardcoreMode::Hardcore)
                 ChatHandler(player->GetSession()).PSendSysMessage(
-                    "That player cannot trade.");
-                return false;
-            }
+                    "Hardcore characters can only trade with other Hardcore characters.");
+            else
+                ChatHandler(player->GetSession()).PSendSysMessage(
+                    "You cannot trade with Hardcore characters.");
+            player->GetSession()->SendCancelTrade(TRADE_STATUS_TRADE_CANCELED);
+            return false;
         }
 
         // Flag for eligibility tracking (initiating a trade window flags the character)
@@ -231,7 +301,7 @@ public:
         return true;
     }
 
-    // ---- Self-Found mail restrictions ----
+    // ---- Mail restrictions ----
 
     bool OnPlayerCanSendMail(Player* player, ObjectGuid receiverGuid, ObjectGuid /*mailbox*/,
         std::string& /*subject*/, std::string& /*body*/, uint32 /*money*/, uint32 /*COD*/, Item* /*item*/) override
@@ -242,21 +312,35 @@ public:
         uint32 senderLow   = player->GetGUID().GetCounter();
         uint32 receiverLow = receiverGuid.GetCounter();
 
-        // Block if sender is Self-Found — fires before MAIL_OK, safe to reject
-        if (sHardcoreMgr->IsSelfFound(senderLow) && sHardcoreMgr->Cfg().selfFoundBlockPlayerMail)
+        // Self-mail (e.g. AH returns) is always allowed
+        if (senderLow == receiverLow)
+            return true;
+
+        HardcoreMode senderMode   = sHardcoreMgr->GetActiveModeAny(senderLow);
+        HardcoreMode receiverMode = sHardcoreMgr->GetActiveModeAny(receiverLow);
+
+        if (senderMode == HardcoreMode::SelfFound && sHardcoreMgr->Cfg().selfFoundBlockPlayerMail)
         {
             ChatHandler(player->GetSession()).PSendSysMessage(
-                "Self-Found Hardcore characters cannot use player mail.");
+                "Self-Found characters cannot use player mail.");
             return false;
         }
 
-        // Block if receiver is Self-Found (online or offline) — also fires before MAIL_OK
-        if (sHardcoreMgr->Cfg().selfFoundBlockPlayerMail &&
-            senderLow != receiverLow &&
-            sHardcoreMgr->IsSelfFoundAny(receiverLow))
+        if (receiverMode == HardcoreMode::SelfFound && sHardcoreMgr->Cfg().selfFoundBlockPlayerMail)
         {
             ChatHandler(player->GetSession()).PSendSysMessage(
                 "You cannot send mail to that player.");
+            return false;
+        }
+
+        if (senderMode != receiverMode)
+        {
+            if (senderMode == HardcoreMode::Hardcore)
+                ChatHandler(player->GetSession()).PSendSysMessage(
+                    "Hardcore characters can only send mail to other Hardcore characters.");
+            else
+                ChatHandler(player->GetSession()).PSendSysMessage(
+                    "You cannot send mail to Hardcore characters.");
             return false;
         }
 
@@ -265,7 +349,7 @@ public:
         return true;
     }
 
-    // ---- Self-Found Auction House restrictions (bidding/buying) ----
+    // ---- Auction House restrictions (bidding/buying) ----
 
     bool OnPlayerCanPlaceAuctionBid(Player* player, AuctionEntry* /*auction*/) override
     {
@@ -277,7 +361,14 @@ public:
         if (sHardcoreMgr->IsSelfFound(guid) && sHardcoreMgr->Cfg().selfFoundBlockAuctionHouse)
         {
             ChatHandler(player->GetSession()).PSendSysMessage(
-                "Self-Found Hardcore characters cannot use the Auction House.");
+                "Self-Found characters cannot use the Auction House.");
+            return false;
+        }
+
+        if (sHardcoreMgr->IsHardcore(guid) && sHardcoreMgr->Cfg().hardcoreBlockAuctionHouse)
+        {
+            ChatHandler(player->GetSession()).PSendSysMessage(
+                "Hardcore characters cannot use the Auction House.");
             return false;
         }
 
@@ -293,6 +384,9 @@ public:
         if (!sHardcoreMgr->IsEnabled() || !sHardcoreMgr->Cfg().blockFallenResurrection)
             return true;
 
+        // Safety net: catches deaths (drowning, falling) that slipped past OnPlayerJustDied
+        sHardcoreMgr->EnsureFallenIfDead(player);
+
         uint32 guid = player->GetGUID().GetCounter();
         if (!sHardcoreMgr->IsFallen(guid))
             return true;
@@ -306,6 +400,9 @@ public:
     {
         if (!sHardcoreMgr->IsEnabled() || !sHardcoreMgr->Cfg().blockFallenResurrection)
             return true;
+
+        // Safety net: catches deaths (drowning, falling) that slipped past OnPlayerJustDied
+        sHardcoreMgr->EnsureFallenIfDead(player);
 
         uint32 guid = player->GetGUID().GetCounter();
         if (!sHardcoreMgr->IsFallen(guid))
@@ -423,7 +520,14 @@ public:
         if (sHardcoreMgr->IsSelfFound(guid) && sHardcoreMgr->Cfg().selfFoundBlockAuctionHouse)
         {
             ChatHandler(player->GetSession()).PSendSysMessage(
-                "Self-Found Hardcore characters cannot use the Auction House.");
+                "Self-Found characters cannot use the Auction House.");
+            return false;
+        }
+
+        if (sHardcoreMgr->IsHardcore(guid) && sHardcoreMgr->Cfg().hardcoreBlockAuctionHouse)
+        {
+            ChatHandler(player->GetSession()).PSendSysMessage(
+                "Hardcore characters cannot use the Auction House.");
             return false;
         }
 
@@ -449,6 +553,7 @@ public:
             { "enable",      HandleHardcoreEnableCommand,     SEC_PLAYER,       Console::No },
             { "selffound",   HandleHardcoreSelfFoundCommand,  SEC_PLAYER,       Console::No },
             { "confirm",     HandleHardcoreConfirmCommand,    SEC_PLAYER,       Console::No },
+            { "disable",     HandleHardcoreDisableCommand,    SEC_PLAYER,       Console::No },
             { "status",      HandleHardcoreStatusCommand,     SEC_PLAYER,       Console::No },
             { "rules",       HandleHardcoreRulesCommand,      SEC_PLAYER,       Console::No },
             { "leaderboard", HandleHardcoreLeaderboardCommand,SEC_PLAYER,       Console::No },
@@ -584,6 +689,23 @@ public:
             handler->PSendSysMessage("Hardcore Mode enabled. Survive.");
         }
 
+        return true;
+    }
+
+    // ---- .hardcore disable ----
+
+    static bool HandleHardcoreDisableCommand(ChatHandler* handler)
+    {
+        if (!sHardcoreMgr->IsEnabled())
+        {
+            handler->PSendSysMessage("The Hardcore system is currently disabled.");
+            return true;
+        }
+
+        Player* player = handler->GetSession()->GetPlayer();
+        std::string msg;
+        sHardcoreMgr->PlayerDisable(player, msg);
+        handler->PSendSysMessage(msg.c_str());
         return true;
     }
 
@@ -745,6 +867,51 @@ public:
 };
 
 // ---------------------------------------------------------------------------
+// SpellScript — block resurrection casts on fallen HC players before cast starts
+// Registered for all rez spell IDs via spell_script_names in OnStartup.
+// ---------------------------------------------------------------------------
+
+class HardcoreResurrectBlockScript : public SpellScript
+{
+    PrepareSpellScript(HardcoreResurrectBlockScript);
+
+    SpellCastResult CheckTarget()
+    {
+        if (!sHardcoreMgr->IsEnabled() || !sHardcoreMgr->Cfg().blockFallenResurrection)
+            return SPELL_CAST_OK;
+
+        Unit* target = GetExplTargetUnit();
+        if (!target || !target->IsPlayer())
+            return SPELL_CAST_OK;
+
+        if (!sHardcoreMgr->IsFallen(target->GetGUID().GetCounter()))
+            return SPELL_CAST_OK;
+
+        if (Player* caster = GetCaster()->ToPlayer())
+            ChatHandler(caster->GetSession()).PSendSysMessage(
+                "That player is a fallen Hardcore character and cannot be resurrected.");
+
+        return SPELL_FAILED_DONT_REPORT;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(HardcoreResurrectBlockScript::CheckTarget);
+    }
+};
+
+class HardcoreResurrectBlockLoader : public SpellScriptLoader
+{
+public:
+    HardcoreResurrectBlockLoader() : SpellScriptLoader("spell_hc_block_resurrect") {}
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new HardcoreResurrectBlockScript();
+    }
+};
+
+// ---------------------------------------------------------------------------
 // Module registration
 // ---------------------------------------------------------------------------
 
@@ -756,4 +923,5 @@ void Addmod_nostrum_hardcoreScripts()
     new HardcoreMailScript();
     new HardcoreMiscScript();
     new HardcoreCommandScript();
+    new HardcoreResurrectBlockLoader();
 }

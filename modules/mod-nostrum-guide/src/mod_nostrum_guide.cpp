@@ -65,12 +65,12 @@ struct GuideConfig
     std::string currentPhaseText        = "Pre-launch / Phase 0";
     std::string levelCapText            = "Current level cap: To be announced";
     std::string ratesText               = "Nostrum uses custom rates designed to respect the original WotLK progression while making the experience smoother.";
-    std::string worldChatText           = "Use /world for global community chat, questions, groups, trading, and discussion.";
+    std::string worldChatText           = "Use .chat <message> to talk on the World Chat. Use .chat on / .chat off to enable or disable it.";
     std::string hardcoreText            = "Hardcore mode is optional and can only be enabled on a fresh level 1 character with 0 XP. Hardcore characters have one life, join Deathwalkers, and receive cosmetic rewards.";
     std::string crossFactionText        = "Nostrum keeps faction identity in the open world, but enables selected cross-faction systems to improve queue times, grouping, and server health.";
     std::string dungeonFinderText       = "Dungeon Finder may include both factions to improve queue times and make leveling dungeons easier to run.";
     std::string battlegroundText        = "Battlegrounds may use cross-faction matchmaking to improve queue times and balance.";
-    std::string commandsText            = "Useful commands: .hardcore for Hardcore mode. Join /world for global chat.";
+    std::string commandsText            = "Useful commands: .hardcore — enable Hardcore mode. .chat <message> — talk on World Chat. .chat on / .chat off — toggle World Chat.";
 
     bool        debug                   = false;
 };
@@ -104,7 +104,7 @@ void LoadConfig()
     gCfg.ratesText          = sConfigMgr->GetOption<std::string>("NostrumGuide.RatesText",
         "Nostrum uses custom rates designed to respect the original WotLK progression while making the experience smoother.");
     gCfg.worldChatText      = sConfigMgr->GetOption<std::string>("NostrumGuide.WorldChatText",
-        "Use /world for global community chat, questions, groups, trading, and discussion.");
+        "Use .chat <message> to talk on the World Chat. Use .chat on / .chat off to enable or disable it.");
     gCfg.hardcoreText       = sConfigMgr->GetOption<std::string>("NostrumGuide.HardcoreText",
         "Hardcore mode is optional and can only be enabled on a fresh level 1 character with 0 XP. Hardcore characters have one life, join Deathwalkers, and receive cosmetic rewards.");
     gCfg.crossFactionText   = sConfigMgr->GetOption<std::string>("NostrumGuide.CrossFactionText",
@@ -114,7 +114,7 @@ void LoadConfig()
     gCfg.battlegroundText   = sConfigMgr->GetOption<std::string>("NostrumGuide.BattlegroundText",
         "Battlegrounds may use cross-faction matchmaking to improve queue times and balance.");
     gCfg.commandsText       = sConfigMgr->GetOption<std::string>("NostrumGuide.CommandsText",
-        "Useful commands: .hardcore for Hardcore mode. Join /world for global chat.");
+        "Useful commands: .hardcore — enable Hardcore mode. .chat <message> — talk on World Chat. .chat on / .chat off — toggle World Chat.");
 
     gCfg.debug              = sConfigMgr->GetOption<bool>("NostrumGuide.Debug", false);
 }
@@ -203,7 +203,11 @@ public:
                 break;
 
             case GUIDE_ACTION_WORLDCHAT:
-                ShowPage(player, creature, gCfg.worldChatText);
+                ShowPage(player, creature,
+                    gCfg.worldChatText +
+                    " | .chat <message> — talk on World Chat"
+                    " | .chat on — enable World Chat"
+                    " | .chat off — disable World Chat");
                 break;
 
             case GUIDE_ACTION_CROSSFACTION:
