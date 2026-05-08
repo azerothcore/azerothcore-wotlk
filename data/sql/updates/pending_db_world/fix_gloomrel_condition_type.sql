@@ -1,0 +1,2 @@
+UPDATE `conditions` SET `ConditionTypeOrReference` = 25 WHERE `SourceTypeOrReferenceId` = 14 AND `SourceGroup` = 1945 AND `SourceEntry` = 2605 AND `ConditionTypeOrReference` = 16 AND `ConditionValue1` = 14891 AND `NegativeCondition` = 1;
+UPDATE `conditions` SET `ConditionTypeOrReference` = 25 WHERE `SourceTypeOrReferenceId` = 15 AND `SourceGroup` = 1945 AND `SourceEntry` = 0 AND `ConditionTypeOrReference` = 16 AND `ConditionValue1` = 14891 AND `NegativeCondition` = 1;
