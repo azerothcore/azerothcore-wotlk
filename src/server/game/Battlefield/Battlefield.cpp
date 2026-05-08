@@ -364,6 +364,7 @@ void Battlefield::EndBattle(bool endByTimer)
         DoPlaySoundToAll(BF_HORDE_WINS);
 
     OnBattleEnd(endByTimer);
+    sScriptMgr->OnBattlefieldWarEnd(this, endByTimer);
 
     // Reset battlefield timer
     Timer = NoWarBattleTime;
