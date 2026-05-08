@@ -15417,6 +15417,15 @@ void Player::ActivateSpec(uint8 spec)
             ++iter;
     }
 
+    // Recheck shapeshift bonus auras: drop and re-apply form-tied passives
+    // so buffs from talents missing in the new spec (e.g. Master Shapeshifter) go away
+    Unit::AuraEffectList const& shapeshiftAuras = GetAuraEffectsByType(SPELL_AURA_MOD_SHAPESHIFT);
+    for (AuraEffect* aurEff : shapeshiftAuras)
+    {
+        aurEff->HandleShapeshiftBoosts(this, false);
+        aurEff->HandleShapeshiftBoosts(this, true);
+    }
+
     sScriptMgr->OnPlayerAfterSpecSlotChanged(this, GetActiveSpec());
 }
 
