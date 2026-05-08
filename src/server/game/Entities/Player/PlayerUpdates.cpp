@@ -1435,7 +1435,7 @@ void Player::UpdatePvPState()
 
     if (pvpInfo.IsHostile) // in hostile area
     {
-        if (IsInFlight()) // on taxi
+        if (IsInFlight() || !m_taxi.empty()) // on taxi or taxi pending resume after login
             return;
 
         if (!IsPvP() || pvpInfo.EndTimer != 0)

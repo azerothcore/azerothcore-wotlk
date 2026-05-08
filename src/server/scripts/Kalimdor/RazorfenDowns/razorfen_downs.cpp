@@ -100,6 +100,16 @@ public:
             }
         }
 
+        void JustExitedCombat() override
+        {
+            if (channeling)
+            {
+                EngagementOver();
+                return;
+            }
+            CreatureAI::JustExitedCombat();
+        }
+
         void JustEngagedWith(Unit* who) override
         {
             if (channeling)
