@@ -313,7 +313,10 @@ void Vehicle::InstallAccessory(uint32 entry, int8 seatId, bool minion, uint8 typ
     if (TempSummon* accessory = _me->SummonCreature(entry, *_me, TempSummonType(type), summonTime))
     {
         if (minion)
+        {
             accessory->AddUnitTypeMask(UNIT_MASK_ACCESSORY);
+            accessory->GetThreatMgr().Initialize(); // reinitialize CanHaveThreatList cached value
+        }
 
         if (!_me->HandleSpellClick(accessory, seatId))
         {
@@ -455,9 +458,9 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
         init.SetTransportEnter();
         init.Launch();
 
-        // Transfer threat from passenger to vehicle
+        // Put the vehicle in combat with anything that was threatening the passenger; the threat itself stays on the passenger
         for (auto const& [guid, threatRef] : unit->GetThreatMgr().GetThreatenedByMeList())
-            threatRef->GetOwner()->GetThreatMgr().AddThreat(_me, threatRef->GetThreat(), nullptr, true, true);
+            threatRef->GetOwner()->GetThreatMgr().AddThreat(_me, 0.0f, nullptr, true, true);
 
         if (_me->IsCreature())
         {
