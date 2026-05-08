@@ -39,6 +39,8 @@
 #include "Player.h"
 #include "PlayerScript.h"
 #include "SharedDefines.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "StringFormat.h"
 #include "WorldScript.h"
 
@@ -166,8 +168,10 @@ public:
 
     void OnPlayerJustDied(Player* player) override
     {
-        // Handles environmental/fallthrough deaths not caught by the hooks above
         sHardcoreMgr->NotifyGeneralDeath(player);
+        // Fallback for deaths that slip through NotifyGeneralDeath
+        // (drowning, falling, and other edge cases in AzerothCore)
+        sHardcoreMgr->EnsureFallenIfDead(player);
     }
 
     // ---- Duel ----
@@ -380,6 +384,9 @@ public:
         if (!sHardcoreMgr->IsEnabled() || !sHardcoreMgr->Cfg().blockFallenResurrection)
             return true;
 
+        // Safety net: catches deaths (drowning, falling) that slipped past OnPlayerJustDied
+        sHardcoreMgr->EnsureFallenIfDead(player);
+
         uint32 guid = player->GetGUID().GetCounter();
         if (!sHardcoreMgr->IsFallen(guid))
             return true;
@@ -393,6 +400,9 @@ public:
     {
         if (!sHardcoreMgr->IsEnabled() || !sHardcoreMgr->Cfg().blockFallenResurrection)
             return true;
+
+        // Safety net: catches deaths (drowning, falling) that slipped past OnPlayerJustDied
+        sHardcoreMgr->EnsureFallenIfDead(player);
 
         uint32 guid = player->GetGUID().GetCounter();
         if (!sHardcoreMgr->IsFallen(guid))
@@ -857,6 +867,51 @@ public:
 };
 
 // ---------------------------------------------------------------------------
+// SpellScript — block resurrection casts on fallen HC players before cast starts
+// Registered for all rez spell IDs via spell_script_names in OnStartup.
+// ---------------------------------------------------------------------------
+
+class HardcoreResurrectBlockScript : public SpellScript
+{
+    PrepareSpellScript(HardcoreResurrectBlockScript);
+
+    SpellCastResult CheckTarget()
+    {
+        if (!sHardcoreMgr->IsEnabled() || !sHardcoreMgr->Cfg().blockFallenResurrection)
+            return SPELL_CAST_OK;
+
+        Unit* target = GetExplTargetUnit();
+        if (!target || !target->IsPlayer())
+            return SPELL_CAST_OK;
+
+        if (!sHardcoreMgr->IsFallen(target->GetGUID().GetCounter()))
+            return SPELL_CAST_OK;
+
+        if (Player* caster = GetCaster()->ToPlayer())
+            ChatHandler(caster->GetSession()).PSendSysMessage(
+                "That player is a fallen Hardcore character and cannot be resurrected.");
+
+        return SPELL_FAILED_DONT_REPORT;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(HardcoreResurrectBlockScript::CheckTarget);
+    }
+};
+
+class HardcoreResurrectBlockLoader : public SpellScriptLoader
+{
+public:
+    HardcoreResurrectBlockLoader() : SpellScriptLoader("spell_hc_block_resurrect") {}
+
+    SpellScript* GetSpellScript() const override
+    {
+        return new HardcoreResurrectBlockScript();
+    }
+};
+
+// ---------------------------------------------------------------------------
 // Module registration
 // ---------------------------------------------------------------------------
 
@@ -868,4 +923,5 @@ void Addmod_nostrum_hardcoreScripts()
     new HardcoreMailScript();
     new HardcoreMiscScript();
     new HardcoreCommandScript();
+    new HardcoreResurrectBlockLoader();
 }

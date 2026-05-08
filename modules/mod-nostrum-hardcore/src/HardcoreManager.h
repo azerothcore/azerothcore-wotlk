@@ -159,6 +159,13 @@ public:
     // --- Eligibility ---
     bool  CheckEligibility(Player* player, HardcoreMode mode, std::string& outReason);
 
+    // --- Resurrection safety net ---
+    // Called from OnPlayerCanRepopAtGraveyard / OnPlayerCanResurrect.
+    // If the player is active HC and dead but ProcessHCDeath was never called
+    // (edge case: some environmental deaths slip past OnPlayerJustDied),
+    // force-processes the death now so the fallen block fires correctly.
+    void EnsureFallenIfDead(Player* player);
+
     // --- Death notification (called from script hooks) ---
     // Creature kill: mark death as handled, process if HC active
     void NotifyCreatureDeath(Creature* killer, Player* killed);

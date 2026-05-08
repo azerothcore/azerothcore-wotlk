@@ -477,6 +477,16 @@ void HardcoreManager::NotifyDuelLoss(Player* loser)
     _duelExempts.insert(loser->GetGUID().GetCounter());
 }
 
+void HardcoreManager::EnsureFallenIfDead(Player* player)
+{
+    uint32 guid = player->GetGUID().GetCounter();
+    if (!IsActive(guid) || player->IsAlive())
+        return;
+
+    _handledDeaths.erase(guid); // clear any stale marker
+    ProcessHCDeath(player, "Environmental");
+}
+
 void HardcoreManager::ProcessHCDeath(Player* player, std::string const& killerName)
 {
     uint32 guid = player->GetGUID().GetCounter();
