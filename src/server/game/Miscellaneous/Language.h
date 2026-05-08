@@ -112,7 +112,10 @@ enum AcoreStrings
     LANG_PVPSTATS                       = 80,
     LANG_PVPSTATS_DISABLED              = 81,
     LANG_GENERIC_TWO_CURLIES_WITH_COLON = 82,
-    // Free 83 - 86
+    LANG_RBAC_HELP_ACC_LIST             = 83,
+    LANG_RBAC_HELP_ACC_GRANT            = 84,
+    LANG_RBAC_HELP_ACC_DENY             = 85,
+    LANG_RBAC_HELP_ACC_REVOKE           = 86,
 
     LANG_UNKNOWN_ERROR                  = 87,
     LANG_2FA_COMMANDS_NOT_SETUP         = 88,
@@ -1475,6 +1478,15 @@ enum AcoreStrings
     LANG_POOL_LOOKUP_IN_POOL            = 35431,
     LANG_POOL_LOOKUP_NOT_IN_POOL        = 35432,
     LANG_POOL_LOOKUP_USE_INFO           = 35433,
-    LANG_POOL_LOOKUP_NOTARGET           = 35434
+    LANG_POOL_LOOKUP_NOTARGET           = 35434,
+
+    // Pet list command
+    LANG_PET_LIST_HEADER                = 35435,
+    LANG_PET_LIST_ENTRY                 = 35436,
+    LANG_PET_LIST_EMPTY                 = 35437,
+
+    // Pet delete command
+    LANG_PET_DELETE_NOT_FOUND           = 35438,
+    LANG_PET_DELETE_SUCCESS             = 35439
 };
 #endif

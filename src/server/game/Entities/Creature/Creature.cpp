@@ -2054,10 +2054,6 @@ void Creature::Respawn(bool force)
 
             if (getDeathState() == DeathState::Dead)
             {
-                // TempSummons (no m_spawnId) shouldn't be resurrected here; TempSummon::Update UnSummons them on the next tick once deathState is Dead.
-                if (!m_spawnId && !force)
-                    return;
-
                 if (m_spawnId)
                 {
                     GetMap()->RemoveCreatureRespawnTime(m_spawnId);
@@ -2722,7 +2718,8 @@ bool Creature::CanCreatureAttack(Unit const* victim, bool skipDistCheck) const
 
     float x, y, z;
     x = y = z = 0.0f;
-    if (GetMotionMaster()->GetMotionSlot(MOTION_SLOT_IDLE)->GetResetPosition(x, y, z))
+    MovementGenerator* idleSlot = GetMotionMaster()->GetMotionSlot(MOTION_SLOT_IDLE);
+    if (idleSlot && idleSlot->GetResetPosition(x, y, z))
         return IsInDist2d(x, y, dist);
     else
         return IsInDist2d(&m_homePosition, dist);

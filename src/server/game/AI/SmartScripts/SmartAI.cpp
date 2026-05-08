@@ -818,6 +818,10 @@ bool SmartAI::AssistPlayerInCombatAgainst(Unit* who)
     if (!me->IsValidAssistTarget(who->GetVictim()))
         return false;
 
+    // Do not engage if we cannot actually attack the attacker (e.g. neutral faction)
+    if (!me->IsValidAttackTarget(who))
+        return false;
+
     //too far away and no free sight?
     if (me->IsWithinDistInMap(who, SMART_MAX_AID_DIST) && me->IsWithinLOSInMap(who))
     {
@@ -1237,6 +1241,23 @@ void SmartAI::SetFollow(Unit* target, float dist, float angle, uint32 credit, ui
 
 void SmartAI::StopFollow(bool complete)
 {
+    if (complete)
+    {
+        Player* player = ObjectAccessor::GetPlayer(*me, mFollowGuid);
+        if (player && mFollowCredit > 0)
+        {
+            if (!mFollowCreditType)
+                player->RewardPlayerAndGroupAtEvent(mFollowCredit, me);
+            else
+                player->GroupEventHappens(mFollowCredit, me);
+        }
+
+        SetDespawnTime(5000);
+        StartDespawn();
+
+        GetScript()->ProcessEventsFor(SMART_EVENT_FOLLOW_COMPLETED, player);
+    }
+
     mFollowGuid.Clear();
     mFollowDist = 0;
     mFollowAngle = 0;
@@ -1248,23 +1269,6 @@ void SmartAI::StopFollow(bool complete)
     me->GetMotionMaster()->Clear(false);
     me->StopMoving();
     me->GetMotionMaster()->MoveIdle();
-
-    if (!complete)
-        return;
-
-    Player* player = ObjectAccessor::GetPlayer(*me, mFollowGuid);
-    if (player)
-    {
-        if (!mFollowCreditType)
-            player->RewardPlayerAndGroupAtEvent(mFollowCredit, me);
-        else
-            player->GroupEventHappens(mFollowCredit, me);
-    }
-
-    SetDespawnTime(5000);
-    StartDespawn();
-
-    GetScript()->ProcessEventsFor(SMART_EVENT_FOLLOW_COMPLETED, player);
 }
 
 void SmartAI::SetScript9(SmartScriptHolder& e, uint32 entry, WorldObject* invoker)

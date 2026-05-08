@@ -66,6 +66,7 @@
 #include "Pet.h"
 #include "PetitionMgr.h"
 #include "QuestDef.h"
+#include "RBAC.h"
 #include "Realm.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
@@ -175,7 +176,7 @@ Player::Player(WorldSession* session): Unit(), m_mover(this), _cinematicMgr(*thi
     //m_pad = 0;
 
     // players always accept
-    if (AccountMgr::IsPlayerAccount(GetSession()->GetSecurity()))
+    if (!GetSession()->HasPermission(rbac::RBAC_PERM_CAN_FILTER_WHISPERS))
         SetAcceptWhispers(true);
 
     m_usedTalentCount = 0;
@@ -573,7 +574,7 @@ bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo
                          ? sWorld->getIntConfig(CONFIG_START_PLAYER_LEVEL)
                          : sWorld->getIntConfig(CONFIG_START_HEROIC_PLAYER_LEVEL);
 
-    if (!AccountMgr::IsPlayerAccount(GetSession()->GetSecurity()))
+    if (GetSession()->HasPermission(rbac::RBAC_PERM_USE_START_GM_LEVEL))
     {
         uint32 gm_level = sWorld->getIntConfig(CONFIG_START_GM_LEVEL);
         if (gm_level > start_level)
@@ -1312,7 +1313,7 @@ void Player::ToggleAFK()
     ToggleFlag(PLAYER_FLAGS, PLAYER_FLAGS_AFK);
 
     // afk player not allowed in battleground
-    if (!IsGameMaster() && isAFK() && InBattleground())
+    if (!GetSession()->HasPermission(rbac::RBAC_PERM_CAN_AFK_ON_BATTLEGROUND) && isAFK() && InBattleground() && !InArena())
         LeaveBattleground();
 }
 
@@ -1358,7 +1359,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
         return false;
     }
 
-    if (AccountMgr::IsPlayerAccount(GetSession()->GetSecurity()) && sDisableMgr->IsDisabledFor(DISABLE_TYPE_MAP, mapid, this))
+    if (!GetSession()->HasPermission(rbac::RBAC_PERM_SKIP_CHECK_DISABLE_MAP) && sDisableMgr->IsDisabledFor(DISABLE_TYPE_MAP, mapid, this))
     {
         LOG_ERROR("entities.player", "Player ({}, name: {}) tried to enter a forbidden map {}", GetGUID().ToString(), GetName(), mapid);
         SendTransferAborted(mapid, TRANSFER_ABORT_MAP_NOT_ALLOWED);
@@ -2188,6 +2189,11 @@ bool Player::IsInAreaTriggerRadius(AreaTrigger const* trigger, float delta) cons
     return true;
 }
 
+bool Player::CanBeGameMaster() const
+{
+    return GetSession()->HasPermission(rbac::RBAC_PERM_COMMAND_GM);
+}
+
 void Player::SetGameMaster(bool on)
 {
     if (on)
@@ -2540,10 +2546,15 @@ void Player::InitTalentForLevel()
 {
     uint32 talentPointsForLevel = CalculateTalentsPoints();
 
-    // xinef: more talent points that we have are used, reset
+    // if used more than have then reset
     if (m_usedTalentCount > talentPointsForLevel)
-        resetTalents(true);
-    // xinef: else, recalculate free talent points count
+    {
+        if (!GetSession()->HasPermission(rbac::RBAC_PERM_SKIP_CHECK_MORE_TALENTS_THAN_ALLOWED))
+            resetTalents(true);
+        else
+            SetFreeTalentPoints(0);
+    }
+    // else update amount of free points
     else
         SetFreeTalentPoints(talentPointsForLevel - m_usedTalentCount);
 
@@ -9436,7 +9447,7 @@ void Player::TextEmote(std::string_view text, WorldObject const* /*= nullptr*/, 
     SendDirectMessage(&data);
 
     // Special handling for messages, do not use visibility map for stealthed units
-    Acore::MessageDistDeliverer notifier(this, &data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_EMOTE), nullptr, true);
+    Acore::MessageDistDeliverer notifier(this, &data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), !GetSession()->HasPermission(rbac::RBAC_PERM_TWO_SIDE_INTERACTION_CHAT), nullptr, true);
     Cell::VisitObjects(this, notifier, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE));
 }
 
@@ -11302,13 +11313,17 @@ void Player::LeaveBattleground(Battleground* bg)
     TeleportToEntryPoint();
 }
 
-bool Player::CanJoinToBattleground() const
+bool Player::CanJoinToBattleground(Battleground const* bg) const
 {
     // check Deserter debuff
     if (HasAura(26013))
         return false;
 
-    return true;
+    if (bg->isArena())
+        return GetSession()->HasPermission(rbac::RBAC_PERM_JOIN_ARENAS);
+    if (bg->GetBgTypeID() == BATTLEGROUND_RB)
+        return GetSession()->HasPermission(rbac::RBAC_PERM_JOIN_RANDOM_BG);
+    return GetSession()->HasPermission(rbac::RBAC_PERM_JOIN_NORMAL_BG);
 }
 
 bool Player::CanReportAfkDueToLimit()
@@ -12560,8 +12575,7 @@ bool Player::HasItemFitToSpellRequirements(SpellInfo const* spellInfo, Item cons
                             return true;
 
                     // Keep active non-passive auras (e.g. Shield Wall) when disarmed
-                    Item* offhand = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
-                    if (!spellInfo->IsPassive() && offhand && offhand != ignoreItem)
+                    if (!spellInfo->IsPassive() && HasAuraType(SPELL_AURA_MOD_DISARM_OFFHAND) && GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND))
                     {
                         for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
                             if (spellInfo->Effects[i].IsAura())
@@ -12763,7 +12777,9 @@ void Player::RewardPlayerAndGroupAtEvent(uint32 creature_id, WorldObject* pRewar
     if (!pRewardSource)
         return;
 
-    ObjectGuid creature_guid = (pRewardSource->IsCreature()) ? pRewardSource->GetGUID() : ObjectGuid::Empty;
+    ObjectGuid creature_guid;
+    if (pRewardSource->IsCreature() && pRewardSource->GetEntry() == creature_id)
+        creature_guid = pRewardSource->GetGUID();
 
     // prepare data for near group iteration
     if (Group* group = GetGroup())
@@ -14335,7 +14351,7 @@ bool Player::CanSeeSpellClickOn(Creature const* c) const
 
     SpellClickInfoMapBounds clickPair = sObjectMgr->GetSpellClickInfoMapBounds(c->GetEntry());
     if (clickPair.first == clickPair.second)
-        return true;
+        return false;
 
     for (SpellClickInfoContainer::const_iterator itr = clickPair.first; itr != clickPair.second; ++itr)
     {
@@ -14353,6 +14369,9 @@ bool Player::CanSeeSpellClickOn(Creature const* c) const
 
 bool Player::CanSeeObjectByVisibilityConditions(WorldObject const* object) const
 {
+    if (IsGameMaster())
+        return true;
+
     ConditionList conds = sConditionMgr->GetConditionsForObjectVisibility(object);
     ConditionSourceInfo info = ConditionSourceInfo(const_cast<Player*>(this), const_cast<WorldObject*>(object));
     return sConditionMgr->IsObjectMeetToConditions(info, conds);

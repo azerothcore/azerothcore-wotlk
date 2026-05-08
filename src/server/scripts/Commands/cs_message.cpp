@@ -23,6 +23,7 @@
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "World.h"
 #include "WorldSession.h"
 #include "WorldSessionMgr.h"
@@ -38,13 +39,13 @@ public:
     {
         static ChatCommandTable commandTable =
         {
-            { "nameannounce",   HandleNameAnnounceCommand,   SEC_GAMEMASTER, Console::Yes },
-            { "gmnameannounce", HandleGMNameAnnounceCommand, SEC_GAMEMASTER, Console::Yes },
-            { "announce",       HandleAnnounceCommand,       SEC_GAMEMASTER, Console::Yes },
-            { "gmannounce",     HandleGMAnnounceCommand,     SEC_GAMEMASTER, Console::Yes },
-            { "notify",         HandleNotifyCommand,         SEC_GAMEMASTER, Console::Yes },
-            { "gmnotify",       HandleGMNotifyCommand,       SEC_GAMEMASTER, Console::Yes },
-            { "whispers",       HandleWhispersCommand,       SEC_MODERATOR,  Console::No },
+            { "nameannounce",   HandleNameAnnounceCommand,   rbac::RBAC_PERM_COMMAND_NAMEANNOUNCE,   Console::Yes },
+            { "gmnameannounce", HandleGMNameAnnounceCommand, rbac::RBAC_PERM_COMMAND_GMNAMEANNOUNCE, Console::Yes },
+            { "announce",       HandleAnnounceCommand,       rbac::RBAC_PERM_COMMAND_ANNOUNCE,       Console::Yes },
+            { "gmannounce",     HandleGMAnnounceCommand,     rbac::RBAC_PERM_COMMAND_GMANNOUNCE,     Console::Yes },
+            { "notify",         HandleNotifyCommand,         rbac::RBAC_PERM_COMMAND_NOTIFY,         Console::Yes },
+            { "gmnotify",       HandleGMNotifyCommand,       rbac::RBAC_PERM_COMMAND_GMNOTIFY,       Console::Yes },
+            { "whispers",       HandleWhispersCommand,       rbac::RBAC_PERM_COMMAND_WHISPERS,       Console::No },
         };
         return commandTable;
     }
