@@ -1,0 +1,72 @@
+name: Bug report
+description: Create a bug report to help us improve.
+title: "Bug: "
+body:
+  - type: textarea
+    id: current
+    attributes:
+      label: Current Behaviour
+      description: |
+        Description of the problem or issue here.
+        Include entries of affected creatures / items / quests / spells etc.
+        If this is a crash, post the crashlog (upload to https://gist.github.com/) and include the link here.
+        Never upload files! Use GIST for text and YouTube for videos!
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behaviour
+      description: |
+        Tell us what should happen instead.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce the problem
+      description: |
+        What does someone else need to do to encounter the same bug?
+      placeholder: |
+        1. Step 1
+        2. Step 2
+        3. Step 3
+    validations:
+      required: true
+  - type: textarea
+    id: extra
+    attributes:
+      label: Extra Notes
+      description: |
+        Do you have any extra notes that can help solve the issue that does not fit any other field?
+      placeholder: |
+        None
+    validations:
+      required: false
+  - type: textarea
+    id: commit
+    attributes:
+      label: AC rev. hash/commit
+      description: |
+        Copy the result of the `.server debug` command (if you need to run it from the client get a prat addon)
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating system
+      description: |
+        The Operating System the Server is running on.
+        i.e. Windows 11 x64, Debian 10 x64, macOS 12, Ubuntu 20.04
+    validations:
+      required: true
+  - type: textarea
+    id: custom
+    attributes:
+      label: Custom changes or Modules
+      description: |
+        List which custom changes or modules you have applied, i.e. Eluna module, etc.
+      placeholder: |
+        None
+    validations:
+      required: false

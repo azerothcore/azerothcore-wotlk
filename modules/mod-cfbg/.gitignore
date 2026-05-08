@@ -1,0 +1,57 @@
+!.gitignore
+
+#
+# Generic
+#
+
+.directory
+.mailmap
+*.orig
+*.rej
+*.*~
+.hg/
+*.kdev*
+.DS_Store
+CMakeLists.txt.user
+*.bak
+*.patch
+*.diff
+*.REMOTE.*
+*.BACKUP.*
+*.BASE.*
+*.LOCAL.*
+
+#
+# IDE & other softwares
+#
+
+/.settings/
+/.externalToolBuilders/*
+
+#
+# Exclude in all levels
+#
+
+nbproject/
+.sync.ffs_db
+*.kate-swp
+
+#
+# Eclipse
+#
+
+*.pydevproject
+.metadata
+.gradle
+tmp/
+*.tmp
+*.swp
+*~.nib
+local.properties
+.settings/
+.loadpath
+.project
+.cproject
+
+# Private modules
+/src/mod-cfbg/*
