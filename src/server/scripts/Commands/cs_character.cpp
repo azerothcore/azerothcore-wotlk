@@ -105,7 +105,7 @@ public:
     * Collects all GUIDs (and related info) from deleted characters which are still in the database.
     *
     * @param foundList    a reference to an std::list which will be filled with info data
-    * @param searchString the search string which either contains a player GUID or a part fo the character-name
+    * @param searchString the search string which either contains a player GUID or a part of the character-name
     * @param limitResults if true, caps results at MAX_DELETED_CHAR_RESULTS + 1 using a DB-level LIMIT
     * @return             returns false if there was a problem while selecting the characters (e.g. player name not normalizeable)
     */
