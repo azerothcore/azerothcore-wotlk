@@ -1118,7 +1118,7 @@ void BattlegroundSA::UpdateDemolisherSpawns()
                                                  BG_SA_NpcSpawnlocs[i][2], BG_SA_NpcSpawnlocs[i][3]);
 
                             Demolisher->SetVisible(true);
-                            Demolisher->Respawn();
+                            Demolisher->Respawn(true);
                             DemoliserRespawnList.erase(i);
                         }
                     }

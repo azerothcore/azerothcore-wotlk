@@ -18,6 +18,7 @@
 #include "Chat.h"
 #include "CommandScript.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "WaypointMgr.h"
 
 #if AC_COMPILER == AC_COMPILER_GNU
@@ -35,13 +36,13 @@ public:
     {
         static ChatCommandTable wpCommandTable =
         {
-            { "add",        HandleWpAddCommand,      SEC_ADMINISTRATOR, Console::No },
-            { "event",      HandleWpEventCommand,    SEC_ADMINISTRATOR, Console::No },
-            { "load",       HandleWpLoadCommand,     SEC_ADMINISTRATOR, Console::No },
-            { "modify",     HandleWpModifyCommand,   SEC_ADMINISTRATOR, Console::No },
-            { "unload",     HandleWpUnLoadCommand,   SEC_ADMINISTRATOR, Console::No },
-            { "reload",     HandleWpReloadCommand,   SEC_ADMINISTRATOR, Console::No },
-            { "show",       HandleWpShowCommand,     SEC_ADMINISTRATOR, Console::No }
+            { "add",        HandleWpAddCommand,      rbac::RBAC_PERM_COMMAND_WP_ADD,    Console::No },
+            { "event",      HandleWpEventCommand,    rbac::RBAC_PERM_COMMAND_WP_EVENT,  Console::No },
+            { "load",       HandleWpLoadCommand,     rbac::RBAC_PERM_COMMAND_WP_LOAD,   Console::No },
+            { "modify",     HandleWpModifyCommand,   rbac::RBAC_PERM_COMMAND_WP_MODIFY, Console::No },
+            { "unload",     HandleWpUnLoadCommand,   rbac::RBAC_PERM_COMMAND_WP_UNLOAD, Console::No },
+            { "reload",     HandleWpReloadCommand,   rbac::RBAC_PERM_COMMAND_WP_RELOAD, Console::No },
+            { "show",       HandleWpShowCommand,     rbac::RBAC_PERM_COMMAND_WP_SHOW,   Console::No }
         };
         static ChatCommandTable commandTable =
         {

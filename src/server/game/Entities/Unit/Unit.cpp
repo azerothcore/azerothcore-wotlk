@@ -1229,7 +1229,7 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
         {
             uint32 unDamage = health < damage ? health : damage;
             bool damagedByPlayer = unDamage && attacker && (attacker->IsPlayer() || attacker->m_movedByPlayer != nullptr
-                || attacker->GetCharmerOrOwnerGUID().IsPlayer());
+                || attacker->GetCharmerGUID().IsPlayer());
             victim->ToCreature()->LowerPlayerDamageReq(unDamage, damagedByPlayer);
         }
     }
@@ -8381,8 +8381,10 @@ void Unit::EnergizeBySpell(Unit* victim, uint32 spellID, uint32 damage, Powers p
 {
     victim->ModifyPower(powerType, damage, false);
 
-    if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellID))
-        victim->GetThreatMgr().ForwardThreatForAssistingMe(this, float(damage) / 2.0f, spellInfo, true);
+    // Happiness is internal hunter pet state, not combat assistance — energizing it must not generate threat
+    if (powerType != POWER_HAPPINESS)
+        if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellID))
+            victim->GetThreatMgr().ForwardThreatForAssistingMe(this, float(damage) / 2.0f, spellInfo, true);
 
     SendEnergizeSpellLog(victim, spellID, damage, powerType);
 }
@@ -16105,13 +16107,19 @@ void Unit::StopAttackFaction(uint32 faction_id)
             ++itr;
     }
 
-    // End combat and threat references with creatures in this faction
-    std::vector<CombatReference*> refsToEnd;
+    // Collect GUIDs, not pointers: EndCombat can cascade through AI callbacks
+    // (formation MemberEvaded -> CombatStop) and free other refs in the list.
+    std::vector<ObjectGuid> guidsToEnd;
     for (auto const& pair : m_combatManager.GetPvECombatRefs())
         if (pair.second->GetOther(this)->GetFactionTemplateEntry()->faction == faction_id)
-            refsToEnd.push_back(pair.second);
-    for (CombatReference* ref : refsToEnd)
-        ref->EndCombat();
+            guidsToEnd.push_back(pair.first);
+    for (ObjectGuid const& guid : guidsToEnd)
+    {
+        auto const& refs = m_combatManager.GetPvECombatRefs();
+        auto it = refs.find(guid);
+        if (it != refs.end())
+            it->second->EndCombat();
+    }
 
     for (ControlSet::const_iterator itr = m_Controlled.begin(); itr != m_Controlled.end(); ++itr)
         (*itr)->StopAttackFaction(faction_id);

@@ -1895,7 +1895,10 @@ uint32 ObjectMgr::GetModelForShapeshift(ShapeshiftForm form, Player* player) con
     else
         customizationID = player->GetByteValue(PLAYER_BYTES, 0); // Use Skin Color
 
-    auto itr = _playerShapeshiftModel.find(std::make_tuple(form, player->getRace(), customizationID, player->getGender()));
+    // getGender() tracks the active display model; real gender lives in PLAYER_BYTES_3
+    uint8 gender = player->GetByteValue(PLAYER_BYTES_3, PLAYER_BYTES_3_OFFSET_GENDER);
+
+    auto itr = _playerShapeshiftModel.find(std::make_tuple(form, player->getRace(), customizationID, gender));
     if (itr != _playerShapeshiftModel.end())
         return itr->second; // Explicit combination
 
@@ -1903,7 +1906,7 @@ uint32 ObjectMgr::GetModelForShapeshift(ShapeshiftForm form, Player* player) con
     if (itr != _playerShapeshiftModel.end())
         return itr->second; // Combination applied to both genders
 
-    itr = _playerShapeshiftModel.find(std::make_tuple(form, player->getRace(), 255, player->getGender()));
+    itr = _playerShapeshiftModel.find(std::make_tuple(form, player->getRace(), 255, gender));
     if (itr != _playerShapeshiftModel.end())
         return itr->second; // Default gender-dependent model
 
@@ -2422,9 +2425,14 @@ void ObjectMgr::LoadCreatures()
             data.spawntimesecs = 14 * DAY;
 
         // Skip spawnMask check for transport maps
-        if (!_transportMaps.count(data.mapid) && data.spawnMask & ~spawnMasks[data.mapid])
-            LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: {}) that have wrong spawn mask {} including not supported difficulty modes for map (Id: {}).",
-                spawnId, data.spawnMask, data.mapid);
+        if (!_transportMaps.count(data.mapid))
+        {
+            if (data.spawnMask & ~spawnMasks[data.mapid])
+                LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: {}) that have wrong spawn mask {} including not supported difficulty modes for map (Id: {}).",
+                    spawnId, data.spawnMask, data.mapid);
+        }
+        else
+            data.spawnGroupId = 1; // force compatibility group for transport spawns
 
         bool ok = true;
         for (uint32 diff = 0; diff < MAX_DIFFICULTY - 1 && ok; ++diff)
@@ -2955,8 +2963,13 @@ void ObjectMgr::LoadGameobjects()
 
         data.spawnMask      = fields[14].Get<uint8>();
 
-        if (!_transportMaps.count(data.mapid) && data.spawnMask & ~spawnMasks[data.mapid])
-            LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) that has wrong spawn mask {} including not supported difficulty modes for map (Id: {}), skip", guid, data.id, data.spawnMask, data.mapid);
+        if (!_transportMaps.count(data.mapid))
+        {
+            if (data.spawnMask & ~spawnMasks[data.mapid])
+                LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) that has wrong spawn mask {} including not supported difficulty modes for map (Id: {}), skip", guid, data.id, data.spawnMask, data.mapid);
+        }
+        else
+            data.spawnGroupId = 1; // force compatibility group for transport spawns
 
         data.phaseMask      = fields[15].Get<uint32>();
         int16 gameEvent     = fields[16].Get<int16>();
@@ -3322,12 +3335,14 @@ void ObjectMgr::LoadItemTemplates()
         itemTemplate.ContainerSlots            = uint32(fields[26].Get<uint8>());
 
         uint8 statsCount = 0;
-        while (statsCount < MAX_ITEM_PROTO_STATS)
+        uint8 statsIterator = 0;
+        while (statsIterator < MAX_ITEM_PROTO_STATS)
         {
-            uint32 statType = uint32(fields[27 + statsCount * 2].Get<uint8>());
-            int32 statValue = fields[28 + statsCount * 2].Get<int32>();
-            if (statType == 0)
-                break;
+            uint32 statType = uint32(fields[27 + statsIterator * 2].Get<uint8>());
+            int32 statValue = fields[28 + statsIterator * 2].Get<int32>();
+            statsIterator++;
+            if (statValue == 0)
+                continue;
 
             itemTemplate.ItemStat[statsCount].ItemStatType = statType;
             itemTemplate.ItemStat[statsCount].ItemStatValue = statValue;
@@ -8771,11 +8786,12 @@ void ObjectMgr::LoadSpawnGroups()
     uint32 oldMSTime = getMSTime();
 
     // Reset prior state for hot-reload support
+    // Preserve the forced legacy group for spawns on transport maps (set in LoadCreatures/LoadGameobjects).
     _spawnGroupMapStore.clear();
     for (auto& [id, data] : _creatureDataStore)
-        data.spawnGroupId = 0;
+        data.spawnGroupId = _transportMaps.count(data.mapid) ? 1 : 0;
     for (auto& [id, data] : _gameObjectDataStore)
-        data.spawnGroupId = 0;
+        data.spawnGroupId = _transportMaps.count(data.mapid) ? 1 : 0;
 
     //                                               0        1          2
     QueryResult result = WorldDatabase.Query("SELECT groupId, spawnType, spawnId FROM spawn_group");
