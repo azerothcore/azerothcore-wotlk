@@ -356,26 +356,17 @@ bool HardcoreManager::CheckEligibility(Player* player, HardcoreMode mode, std::s
         return false;
     }
 
-    if (mode == HardcoreMode::SelfFound && flags)
+    if (flags)
     {
-        if (flags->hasTraded)
+        bool hasInteracted = flags->hasTraded
+                          || flags->hasSentMail
+                          || flags->hasReceivedMail
+                          || flags->hasUsedAuctionHouse
+                          || flags->hasGrouped
+                          || flags->hasJoinedGuild;
+        if (hasInteracted)
         {
-            outReason = "This character has traded with another player.";
-            return false;
-        }
-        if (flags->hasSentMail)
-        {
-            outReason = "This character has sent mail to another player.";
-            return false;
-        }
-        if (flags->hasReceivedMail)
-        {
-            outReason = "This character has received player mail.";
-            return false;
-        }
-        if (flags->hasUsedAuctionHouse)
-        {
-            outReason = "This character has used the Auction House.";
+            outReason = "You cannot enable Hardcore or Self-Found after interacting with another player.";
             return false;
         }
     }
@@ -577,6 +568,24 @@ void HardcoreManager::FlagUsedAuctionHouse(uint32 guid)
         return;
     it->second.hasUsedAuctionHouse = true;
     SaveFlagField(guid, "has_used_auction_house", 1);
+}
+
+void HardcoreManager::FlagGrouped(uint32 guid)
+{
+    auto it = _flags.find(guid);
+    if (it == _flags.end() || it->second.hasGrouped)
+        return;
+    it->second.hasGrouped = true;
+    SaveFlagField(guid, "has_grouped", 1);
+}
+
+void HardcoreManager::FlagJoinedGuild(uint32 guid)
+{
+    auto it = _flags.find(guid);
+    if (it == _flags.end() || it->second.hasJoinedGuild)
+        return;
+    it->second.hasJoinedGuild = true;
+    SaveFlagField(guid, "has_joined_guild", 1);
 }
 
 // ---------------------------------------------------------------------------
@@ -1223,7 +1232,7 @@ void HardcoreManager::LoadDataFromDB(uint32 guid)
 void HardcoreManager::LoadFlagsFromDB(uint32 guid)
 {
     QueryResult result = CharacterDatabase.Query(
-        "SELECT death_count, has_traded, has_sent_mail, has_received_mail, has_used_auction_house "
+        "SELECT death_count, has_traded, has_sent_mail, has_received_mail, has_used_auction_house, has_grouped, has_joined_guild "
         "FROM mod_nostrum_hardcore_flags WHERE guid = {}",
         guid);
 
@@ -1238,6 +1247,8 @@ void HardcoreManager::LoadFlagsFromDB(uint32 guid)
         flags.hasSentMail         = f[2].Get<bool>();
         flags.hasReceivedMail     = f[3].Get<bool>();
         flags.hasUsedAuctionHouse = f[4].Get<bool>();
+        flags.hasGrouped          = f[5].Get<bool>();
+        flags.hasJoinedGuild      = f[6].Get<bool>();
     }
     else
     {

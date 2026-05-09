@@ -59,6 +59,8 @@ struct HardcoreFlags
     bool   hasSentMail         = false;
     bool   hasReceivedMail     = false;
     bool   hasUsedAuctionHouse = false;
+    bool   hasGrouped          = false;
+    bool   hasJoinedGuild      = false;
 };
 
 struct HardcoreConfig
@@ -176,11 +178,13 @@ public:
     // Duel loss: exempt this player's next death from HC processing
     void NotifyDuelLoss(Player* loser);
 
-    // --- Self-found eligibility flag setters ---
+    // --- Player interaction flag setters ---
     void FlagTraded(uint32 guid);
     void FlagSentMail(uint32 guid);
     void FlagReceivedMail(uint32 guid);
     void FlagUsedAuctionHouse(uint32 guid);
+    void FlagGrouped(uint32 guid);
+    void FlagJoinedGuild(uint32 guid);
 
     // --- Level milestone ---
     void OnLevelChanged(Player* player, uint8 oldLevel);

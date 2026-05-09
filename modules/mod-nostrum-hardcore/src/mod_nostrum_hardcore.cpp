@@ -31,6 +31,8 @@
 #include "CommandScript.h"
 #include "Creature.h"
 #include "DatabaseEnv.h"
+#include "GuildScript.h"
+#include "LFG.h"
 #include "Log.h"
 #include "Mail.h"
 #include "MailScript.h"
@@ -97,6 +99,8 @@ public:
             "  `has_sent_mail`          TINYINT UNSIGNED NOT NULL DEFAULT 0,"
             "  `has_received_mail`      TINYINT UNSIGNED NOT NULL DEFAULT 0,"
             "  `has_used_auction_house` TINYINT UNSIGNED NOT NULL DEFAULT 0,"
+            "  `has_grouped`            TINYINT UNSIGNED NOT NULL DEFAULT 0,"
+            "  `has_joined_guild`       TINYINT UNSIGNED NOT NULL DEFAULT 0,"
             "  `updated_at`             TIMESTAMP        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,"
             "  PRIMARY KEY (`guid`)"
             ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
@@ -139,6 +143,8 @@ public:
             PLAYERHOOK_ON_BEFORE_SEND_CHAT_MESSAGE,
             PLAYERHOOK_CAN_JOIN_IN_BATTLEGROUND_QUEUE,
             PLAYERHOOK_CAN_JOIN_IN_ARENA_QUEUE,
+            PLAYERHOOK_CAN_JOIN_LFG,
+            PLAYERHOOK_CAN_GROUP_ACCEPT,
         })
     {
     }
@@ -234,6 +240,18 @@ public:
             return false;
         }
 
+        return true;
+    }
+
+    // ---- Group accept flagging ----
+
+    bool OnPlayerCanGroupAccept(Player* player, Group* /*group*/) override
+    {
+        if (!sHardcoreMgr->IsEnabled())
+            return true;
+
+        uint32 guid = player->GetGUID().GetCounter();
+        sHardcoreMgr->FlagGrouped(guid);
         return true;
     }
 
@@ -471,6 +489,25 @@ public:
 
         return true;
     }
+
+    // ---- LFG/RDF queue blocking ----
+
+    bool OnPlayerCanJoinLfg(Player* player, uint8 /*roles*/,
+        lfg::LfgDungeonSet& /*dungeons*/,
+        const std::string& /*comment*/) override
+    {
+        if (!sHardcoreMgr->IsEnabled())
+            return true;
+
+        uint32 guid = player->GetGUID().GetCounter();
+        if (sHardcoreMgr->IsActive(guid))
+        {
+            ChatHandler(player->GetSession()).SendSysMessage("Hardcore and Self-Found characters cannot use the Dungeon Finder.");
+            return false;
+        }
+
+        return true;
+    }
 };
 
 // ---------------------------------------------------------------------------
@@ -579,6 +616,30 @@ public:
 // ---------------------------------------------------------------------------
 // CommandScript — .hardcore commands
 // ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// GuildScript — flag guild join for player interaction tracking
+// ---------------------------------------------------------------------------
+
+class HardcoreGuildScript : public GuildScript
+{
+public:
+    HardcoreGuildScript() : GuildScript("HardcoreGuildScript",
+        {
+            GUILDHOOK_ON_ADD_MEMBER,
+        })
+    {
+    }
+
+    void OnAddMember(Guild* /*guild*/, Player* player, uint8& /*plRank*/) override
+    {
+        if (!sHardcoreMgr->IsEnabled())
+            return;
+
+        uint32 guid = player->GetGUID().GetCounter();
+        sHardcoreMgr->FlagJoinedGuild(guid);
+    }
+};
 
 class HardcoreCommandScript : public CommandScript
 {
@@ -963,6 +1024,7 @@ void Addmod_nostrum_hardcoreScripts()
     new HardcoreAHScript();
     new HardcoreMailScript();
     new HardcoreMiscScript();
+    new HardcoreGuildScript();
     new HardcoreCommandScript();
     new HardcoreResurrectBlockLoader();
 }
