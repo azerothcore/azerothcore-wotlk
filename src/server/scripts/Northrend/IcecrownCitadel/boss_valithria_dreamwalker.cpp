@@ -259,23 +259,15 @@ public:
                 return;
         }
 
-        uint32 corpseDelay = creature->GetCorpseDelay();
-        uint32 respawnDelay = creature->GetRespawnDelay();
-        creature->SetCorpseDelay(1);
-        creature->SetRespawnDelay(10);
-
         if (CreatureData const* data = creature->GetCreatureData())
             creature->SetPosition(data->posX, data->posY, data->posZ, data->orientation);
-        if (!creature->IsAlive())
-        {
-            creature->RemoveCorpse(false);
-            creature->SetRespawnTime(11);
-        }
-        else
-            creature->DespawnOrUnsummon();
 
-        creature->SetCorpseDelay(corpseDelay);
-        creature->SetRespawnDelay(respawnDelay);
+        // Use ForcedDespawn with a 11s respawn timer instead of the old
+        // RemoveCorpse + SetRespawnTime approach. The old code set the respawn
+        // time in memory after RemoveCorpse had already saved the original
+        // (7-day) respawn time to DB, so ProcessRespawns() never saw the
+        // 11-second override and Archmages would not respawn after a wipe.
+        creature->DespawnOrUnsummon(0ms, 11s);
     }
 
 private:
