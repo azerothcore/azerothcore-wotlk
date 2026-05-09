@@ -90,6 +90,30 @@ private:
     uint32 m_diff;
 };
 
+class PartitionUpdateRequest : public UpdateRequest
+{
+public:
+    PartitionUpdateRequest(Map& m, MapUpdater& u, uint32 partId, uint32 d)
+        : m_map(m), m_updater(u), m_partitionId(partId), m_diff(d)
+    {
+    }
+
+    void call() override
+    {
+        METRIC_TIMER("partition_update_time_diff",
+            METRIC_TAG("map_id", std::to_string(m_map.GetId())),
+            METRIC_TAG("partition_id", std::to_string(m_partitionId)));
+        m_map.UpdatePartitionEntities(m_partitionId, m_diff);
+        m_updater.update_finished();
+    }
+
+private:
+    Map& m_map;
+    MapUpdater& m_updater;
+    uint32 m_partitionId;
+    uint32 m_diff;
+};
+
 MapUpdater::MapUpdater() : pending_requests(0), _cancelationToken(false)
 {
 }
@@ -141,6 +165,11 @@ void MapUpdater::schedule_task(UpdateRequest* request)
 void MapUpdater::schedule_update(Map& map, uint32 diff, uint32 s_diff)
 {
     schedule_task(new MapUpdateRequest(map, *this, diff, s_diff));
+}
+
+void MapUpdater::schedule_partition_update(Map& map, uint32 partitionId, uint32 diff)
+{
+    schedule_task(new PartitionUpdateRequest(map, *this, partitionId, diff));
 }
 
 void MapUpdater::schedule_map_preload(uint32 mapid)

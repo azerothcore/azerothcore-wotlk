@@ -30,6 +30,7 @@
 #include "LFGMgr.h"
 #include "MapGrid.h"
 #include "MapInstanced.h"
+#include "MapPartition.h"
 #include "Metric.h"
 #include "MiscPackets.h"
 #include "Object.h"
@@ -44,6 +45,7 @@
 #include "VMapMgr2.h"
 #include "Weather.h"
 #include "WeatherMgr.h"
+#include "World.h"
 
 #define MAP_INVALID_ZONE        0xFFFFFFFF
 
@@ -106,6 +108,180 @@ void Map::InitVisibilityDistance()
             m_VisibleDistance = 200.0f;
             break;
     }
+}
+
+void Map::InitializePartitions()
+{
+    // Only partition non-instanced continent maps (world maps)
+    if (Instanceable() || IsBattlegroundOrArena())
+        return;
+
+    uint32 gridsPerPartition = sWorld->getIntConfig(CONFIG_MAP_PARTITION_GRIDS);
+    if (!sWorld->getBoolConfig(CONFIG_MAP_PARTITION_ENABLED) || gridsPerPartition == 0)
+        return;
+
+    _partitionMgr.Initialize(gridsPerPartition);
+
+    if (_partitionMgr.IsEnabled())
+    {
+        LOG_INFO("maps", "Map {}: Partitioning enabled with {} partitions",
+                 GetId(), _partitionMgr.GetPartitionCount());
+    }
+}
+
+void Map::UpdatePrePartition(uint32 t_diff, uint32 s_diff)
+{
+    // === Serial pre-phase: shared state and player updates ===
+
+    if (t_diff)
+        _mapCollisionData.GetDynamicTree().update(t_diff);
+
+    // Update world sessions and players (session processing)
+    for (m_mapRefIter = m_mapRefMgr.begin(); m_mapRefIter != m_mapRefMgr.end(); ++m_mapRefIter)
+    {
+        Player* player = m_mapRefIter->GetSource();
+        if (player && player->IsInWorld())
+        {
+            WorldSession* session = player->GetSession();
+            MapSessionFilter updater(session);
+            session->Update(s_diff, updater);
+
+            if (!t_diff)
+                player->Update(s_diff);
+        }
+    }
+
+    Events.Update(t_diff);
+
+    if (!t_diff)
+    {
+        HandleDelayedVisibility();
+        return;
+    }
+
+    // Process respawns
+    if (!sWorld->getBoolConfig(CONFIG_RESPAWN_FORCE_COMPATIBILITY_MODE))
+    {
+        if (_respawnCheckTimer <= t_diff)
+        {
+            ProcessRespawns();
+            _respawnCheckTimer = 5000;
+        }
+        else
+            _respawnCheckTimer -= t_diff;
+    }
+
+    _updatableObjectListRecheckTimer.Update(t_diff);
+    resetMarkedCells();
+
+    // Player updates (kept serial for thread safety)
+    for (m_mapRefIter = m_mapRefMgr.begin(); m_mapRefIter != m_mapRefMgr.end(); ++m_mapRefIter)
+    {
+        Player* player = m_mapRefIter->GetSource();
+
+        if (!player || !player->IsInWorld())
+            continue;
+
+        player->Update(s_diff);
+
+        if (_updatableObjectListRecheckTimer.Passed())
+        {
+            MarkNearbyCellsOf(player);
+
+            if (WorldObject* viewPoint = player->GetViewpoint())
+            {
+                if (Creature* viewCreature = viewPoint->ToCreature())
+                    MarkNearbyCellsOf(viewCreature);
+                else if (DynamicObject* viewObject = viewPoint->ToDynObject())
+                    MarkNearbyCellsOf(viewObject);
+            }
+        }
+    }
+
+    // Add pending objects to update list before parallel phase
+    for (WorldObject* obj : _pendingAddUpdatableObjectList)
+        _AddObjectToUpdateList(obj);
+    _pendingAddUpdatableObjectList.clear();
+
+    // Build per-partition entity assignment lists so each partition thread
+    // processes a fixed set of entities. This prevents double-updates when
+    // entities move across partition boundaries during their Update().
+    uint32 partCount = _partitionMgr.GetPartitionCount();
+    _partitionAssignment.clear();
+    _partitionAssignment.resize(partCount);
+    for (uint32 i = 0; i < _updatableObjectList.size(); ++i)
+    {
+        WorldObject* obj = _updatableObjectList[i];
+        if (!obj->IsInWorld())
+            continue;
+
+        uint32 partId = _partitionMgr.GetPartitionForPosition(
+            obj->GetPositionX(), obj->GetPositionY());
+        _partitionAssignment[partId].push_back(i);
+    }
+}
+
+void Map::UpdatePartitionEntities(uint32 partitionId, uint32 diff)
+{
+    // Called from worker threads during the parallel phase.
+    // Uses pre-computed assignment to avoid double-updates when entities
+    // move across partition boundaries.
+    for (uint32 idx : _partitionAssignment[partitionId])
+    {
+        WorldObject* obj = _updatableObjectList[idx];
+        if (!obj->IsInWorld())
+            continue;
+
+        obj->Update(diff);
+    }
+}
+
+void Map::UpdatePostPartition(uint32 t_diff, uint32 s_diff)
+{
+    // === Serial post-phase: finalize after parallel entity updates ===
+    _inParallelPhase.store(false, std::memory_order_release);
+
+    // Handle recheck timer - remove objects no longer needing updates
+    if (_updatableObjectListRecheckTimer.Passed())
+    {
+        for (uint32 i = 0; i < _updatableObjectList.size();)
+        {
+            WorldObject* obj = _updatableObjectList[i];
+            if (!obj->IsUpdateNeeded())
+                _RemoveObjectFromUpdateList(obj);
+            else
+                ++i;
+        }
+        _updatableObjectListRecheckTimer.Reset();
+    }
+
+    SendObjectUpdates();
+
+    if (!m_scriptSchedule.empty())
+    {
+        i_scriptLock = true;
+        ScriptsProcess();
+        i_scriptLock = false;
+    }
+
+    MoveAllCreaturesInMoveList();
+    MoveAllGameObjectsInMoveList();
+    MoveAllDynamicObjectsInMoveList();
+
+    HandleDelayedVisibility();
+
+    UpdateWeather(t_diff);
+    UpdateExpiredCorpses(t_diff);
+
+    sScriptMgr->OnMapUpdate(this, t_diff);
+
+    METRIC_VALUE("map_creatures", uint64(GetObjectsStore().Size<Creature>()),
+        METRIC_TAG("map_id", std::to_string(GetId())),
+        METRIC_TAG("map_instanceid", std::to_string(GetInstanceId())));
+
+    METRIC_VALUE("map_gameobjects", uint64(GetObjectsStore().Size<GameObject>()),
+        METRIC_TAG("map_id", std::to_string(GetId())),
+        METRIC_TAG("map_instanceid", std::to_string(GetInstanceId())));
 }
 
 // Template specialization of utility methods
@@ -581,8 +757,17 @@ void Map::AddObjectToPendingUpdateList(WorldObject* obj)
     if (!mapUpdatableObject || mapUpdatableObject->GetUpdateState() != UpdatableMapObject::UpdateState::NotUpdating)
         return;
 
-    _pendingAddUpdatableObjectList.insert(obj);
-    mapUpdatableObject->SetUpdateState(UpdatableMapObject::UpdateState::PendingAdd);
+    if (_inParallelPhase.load(std::memory_order_acquire))
+    {
+        std::lock_guard<std::mutex> lock(_parallelDataMutex);
+        _pendingAddUpdatableObjectList.insert(obj);
+        mapUpdatableObject->SetUpdateState(UpdatableMapObject::UpdateState::PendingAdd);
+    }
+    else
+    {
+        _pendingAddUpdatableObjectList.insert(obj);
+        mapUpdatableObject->SetUpdateState(UpdatableMapObject::UpdateState::PendingAdd);
+    }
 }
 
 // Internal use only
@@ -878,9 +1063,19 @@ void Map::DynamicObjectRelocation(DynamicObject* dynObj, float x, float y, float
 
 void Map::AddCreatureToMoveList(Creature* c)
 {
-    if (c->_moveState == MAP_OBJECT_CELL_MOVE_NONE)
-        _creaturesToMove.push_back(c);
-    c->_moveState = MAP_OBJECT_CELL_MOVE_ACTIVE;
+    if (_inParallelPhase.load(std::memory_order_acquire))
+    {
+        std::lock_guard<std::mutex> lock(_parallelDataMutex);
+        if (c->_moveState == MAP_OBJECT_CELL_MOVE_NONE)
+            _creaturesToMove.push_back(c);
+        c->_moveState = MAP_OBJECT_CELL_MOVE_ACTIVE;
+    }
+    else
+    {
+        if (c->_moveState == MAP_OBJECT_CELL_MOVE_NONE)
+            _creaturesToMove.push_back(c);
+        c->_moveState = MAP_OBJECT_CELL_MOVE_ACTIVE;
+    }
 }
 
 void Map::RemoveCreatureFromMoveList(Creature* c)
@@ -891,9 +1086,19 @@ void Map::RemoveCreatureFromMoveList(Creature* c)
 
 void Map::AddGameObjectToMoveList(GameObject* go)
 {
-    if (go->_moveState == MAP_OBJECT_CELL_MOVE_NONE)
-        _gameObjectsToMove.push_back(go);
-    go->_moveState = MAP_OBJECT_CELL_MOVE_ACTIVE;
+    if (_inParallelPhase.load(std::memory_order_acquire))
+    {
+        std::lock_guard<std::mutex> lock(_parallelDataMutex);
+        if (go->_moveState == MAP_OBJECT_CELL_MOVE_NONE)
+            _gameObjectsToMove.push_back(go);
+        go->_moveState = MAP_OBJECT_CELL_MOVE_ACTIVE;
+    }
+    else
+    {
+        if (go->_moveState == MAP_OBJECT_CELL_MOVE_NONE)
+            _gameObjectsToMove.push_back(go);
+        go->_moveState = MAP_OBJECT_CELL_MOVE_ACTIVE;
+    }
 }
 
 void Map::RemoveGameObjectFromMoveList(GameObject* go)
@@ -904,9 +1109,19 @@ void Map::RemoveGameObjectFromMoveList(GameObject* go)
 
 void Map::AddDynamicObjectToMoveList(DynamicObject* dynObj)
 {
-    if (dynObj->_moveState == MAP_OBJECT_CELL_MOVE_NONE)
-        _dynamicObjectsToMove.push_back(dynObj);
-    dynObj->_moveState = MAP_OBJECT_CELL_MOVE_ACTIVE;
+    if (_inParallelPhase.load(std::memory_order_acquire))
+    {
+        std::lock_guard<std::mutex> lock(_parallelDataMutex);
+        if (dynObj->_moveState == MAP_OBJECT_CELL_MOVE_NONE)
+            _dynamicObjectsToMove.push_back(dynObj);
+        dynObj->_moveState = MAP_OBJECT_CELL_MOVE_ACTIVE;
+    }
+    else
+    {
+        if (dynObj->_moveState == MAP_OBJECT_CELL_MOVE_NONE)
+            _dynamicObjectsToMove.push_back(dynObj);
+        dynObj->_moveState = MAP_OBJECT_CELL_MOVE_ACTIVE;
+    }
 }
 
 void Map::RemoveDynamicObjectFromMoveList(DynamicObject* dynObj)
@@ -1777,8 +1992,13 @@ void Map::AddObjectToRemoveList(WorldObject* obj)
 
     obj->CleanupsBeforeDelete(false);                            // remove or simplify at least cross referenced links
 
-    i_objectsToRemove.insert(obj);
-    //LOG_DEBUG("maps", "Object ({}) added to removing list.", obj->GetGUID().ToString());
+    if (_inParallelPhase.load(std::memory_order_acquire))
+    {
+        std::lock_guard<std::mutex> lock(_parallelDataMutex);
+        i_objectsToRemove.insert(obj);
+    }
+    else
+        i_objectsToRemove.insert(obj);
 }
 
 void Map::RemoveAllObjectsInRemoveList()

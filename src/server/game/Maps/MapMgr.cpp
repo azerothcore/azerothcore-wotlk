@@ -92,6 +92,7 @@ Map* MapMgr::CreateBaseMap(uint32 id)
             {
                 map->LoadRespawnTimes();
                 map->LoadCorpseData();
+                map->InitializePartitions();
             }
 
             map->OnCreateMap();
@@ -265,18 +266,47 @@ void MapMgr::Update(uint32 diff)
         }
     }
 
+    // Collect partitioned maps that need pre/post phase handling
+    std::vector<std::pair<Map*, uint32>> partitionedMaps;  // map, diff
+
     MapMapType::iterator iter = i_maps.begin();
     for (; iter != i_maps.end(); ++iter)
     {
         bool full = mapUpdateStep < 3 && ((mapUpdateStep == 0 && !iter->second->IsBattlegroundOrArena() && !iter->second->IsDungeon()) || (mapUpdateStep == 1 && iter->second->IsBattlegroundOrArena()) || (mapUpdateStep == 2 && iter->second->IsDungeon()));
-        if (m_updater.activated())
-            m_updater.schedule_update(*iter->second, uint32(full ? i_timer[mapUpdateStep].GetCurrent() : 0), diff);
+        uint32 mapDiff = uint32(full ? i_timer[mapUpdateStep].GetCurrent() : 0);
+
+        if (full && iter->second->IsPartitioned() && m_updater.activated())
+        {
+            // Partitioned continent: run pre-phase inline, then schedule
+            // partition updates to the thread pool
+            iter->second->UpdatePrePartition(mapDiff, diff);
+
+            // Only schedule partition updates if we have a meaningful diff
+            if (mapDiff > 0)
+            {
+                iter->second->SetInParallelPhase(true);
+                uint32 partCount = iter->second->GetPartitionManager().GetPartitionCount();
+                for (uint32 p = 0; p < partCount; ++p)
+                    m_updater.schedule_partition_update(*iter->second, p, mapDiff);
+                partitionedMaps.push_back({iter->second, mapDiff});
+            }
+        }
         else
-            iter->second->Update(uint32(full ? i_timer[mapUpdateStep].GetCurrent() : 0), diff);
+        {
+            // Non-partitioned map: schedule as usual
+            if (m_updater.activated())
+                m_updater.schedule_update(*iter->second, mapDiff, diff);
+            else
+                iter->second->Update(mapDiff, diff);
+        }
     }
 
     if (m_updater.activated())
         m_updater.wait();
+
+    // Run post-phase for partitioned maps
+    for (auto& [map, mapDiff] : partitionedMaps)
+        map->UpdatePostPartition(mapDiff, diff);
 
     if (mapUpdateStep < 3)
     {

@@ -35,6 +35,7 @@ public:
 
     void schedule_task(UpdateRequest* request);
     void schedule_update(Map& map, uint32 diff, uint32 s_diff);
+    void schedule_partition_update(Map& map, uint32 partitionId, uint32 diff);
     void schedule_map_preload(uint32 mapid);
     void schedule_lfg_update(uint32 diff);
     void wait();

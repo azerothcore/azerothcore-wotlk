@@ -29,6 +29,7 @@
 #include "GridRefMgr.h"
 #include "MapCollisionData.h"
 #include "MapGridManager.h"
+#include "MapPartition.h"
 #include "MapRefMgr.h"
 #include "ObjectDefines.h"
 #include "ObjectGuid.h"
@@ -38,6 +39,7 @@
 #include "SpawnData.h"
 #include "Timer.h"
 #include "GridTerrainData.h"
+#include <atomic>
 #include <bitset>
 #include <list>
 #include <memory>
@@ -235,6 +237,16 @@ public:
 
     // pussywizard:
     std::unordered_set<Unit*> i_objectsForDelayedVisibility;
+    void AddToDelayedVisibility(Unit* unit)
+    {
+        if (_inParallelPhase)
+        {
+            std::lock_guard<std::mutex> lock(_parallelDataMutex);
+            i_objectsForDelayedVisibility.insert(unit);
+        }
+        else
+            i_objectsForDelayedVisibility.insert(unit);
+    }
     void HandleDelayedVisibility();
 
     // some calls like isInWater should not use vmaps due to processor power
@@ -314,6 +326,15 @@ public:
 
     void AddObjectToRemoveList(WorldObject* obj);
     virtual void DelayedUpdate(const uint32 diff);
+
+    // Map partitioning support
+    void InitializePartitions();
+    [[nodiscard]] bool IsPartitioned() const { return _partitionMgr.IsEnabled(); }
+    [[nodiscard]] MapPartitionManager const& GetPartitionManager() const { return _partitionMgr; }
+    void UpdatePrePartition(uint32 t_diff, uint32 s_diff);
+    void UpdatePartitionEntities(uint32 partitionId, uint32 diff);
+    void UpdatePostPartition(uint32 t_diff, uint32 s_diff);
+    void SetInParallelPhase(bool v) { _inParallelPhase.store(v, std::memory_order_release); }
 
     void resetMarkedCells() { marked_cells.reset(); }
     bool isCellMarked(uint32 pCellId) { return marked_cells.test(pCellId); }
@@ -524,12 +545,24 @@ public:
 
     void AddUpdateObject(Object* obj)
     {
-        _updateObjects.insert(obj);
+        if (_inParallelPhase)
+        {
+            std::lock_guard<std::mutex> lock(_parallelDataMutex);
+            _updateObjects.insert(obj);
+        }
+        else
+            _updateObjects.insert(obj);
     }
 
     void RemoveUpdateObject(Object* obj)
     {
-        _updateObjects.erase(obj);
+        if (_inParallelPhase)
+        {
+            std::lock_guard<std::mutex> lock(_parallelDataMutex);
+            _updateObjects.erase(obj);
+        }
+        else
+            _updateObjects.erase(obj);
     }
 
     size_t GetUpdatableObjectsCount() const { return _updatableObjectList.size(); }
@@ -693,6 +726,14 @@ private:
     PendingAddUpdatableObjectList _pendingAddUpdatableObjectList;
     IntervalTimer _updatableObjectListRecheckTimer;
     ZoneWideVisibleWorldObjectsMap _zoneWideVisibleWorldObjectsMap;
+
+    // Map partitioning
+    MapPartitionManager _partitionMgr;
+    std::atomic<bool> _inParallelPhase{false};
+    std::mutex _parallelDataMutex;  // protects shared collections during parallel phase
+    // Per-partition entity indices, built before parallel phase to prevent
+    // double-updates when entities move across partition boundaries
+    std::vector<std::vector<uint32>> _partitionAssignment;
 };
 
 enum InstanceResetMethod
