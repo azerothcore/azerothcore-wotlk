@@ -137,6 +137,8 @@ public:
             PLAYERHOOK_CAN_RESURRECT,
             PLAYERHOOK_CAN_REPOP_AT_GRAVEYARD,
             PLAYERHOOK_ON_BEFORE_SEND_CHAT_MESSAGE,
+            PLAYERHOOK_CAN_JOIN_IN_BATTLEGROUND_QUEUE,
+            PLAYERHOOK_CAN_JOIN_IN_ARENA_QUEUE,
         })
     {
     }
@@ -429,6 +431,45 @@ public:
             msg = "[SF] " + msg;
         else if (sHardcoreMgr->IsHardcore(guid))
             msg = "[HC] " + msg;
+    }
+
+    // ---- BG/Arena queue blocking ----
+
+    bool OnPlayerCanJoinInBattlegroundQueue(Player* player, ObjectGuid /*BattlemasterGuid*/,
+        BattlegroundTypeId /*BGTypeID*/, uint8 /*joinAsGroup*/,
+        GroupJoinBattlegroundResult& err) override
+    {
+        if (!sHardcoreMgr->IsEnabled())
+            return true;
+
+        uint32 guid = player->GetGUID().GetCounter();
+        if (sHardcoreMgr->IsActive(guid))
+        {
+            err = ERR_BATTLEGROUND_JOIN_FAILED;
+            ChatHandler(player->GetSession()).SendSysMessage("Hardcore and Self-Found characters cannot join battlegrounds or arenas.");
+            return false;
+        }
+
+        return true;
+    }
+
+    bool OnPlayerCanJoinInArenaQueue(Player* player, ObjectGuid /*BattlemasterGuid*/,
+        uint8 /*arenaslot*/, BattlegroundTypeId /*BGTypeID*/,
+        uint8 /*joinAsGroup*/, uint8 /*IsRated*/,
+        GroupJoinBattlegroundResult& err) override
+    {
+        if (!sHardcoreMgr->IsEnabled())
+            return true;
+
+        uint32 guid = player->GetGUID().GetCounter();
+        if (sHardcoreMgr->IsActive(guid))
+        {
+            err = ERR_BATTLEGROUND_JOIN_FAILED;
+            ChatHandler(player->GetSession()).SendSysMessage("Hardcore and Self-Found characters cannot join battlegrounds or arenas.");
+            return false;
+        }
+
+        return true;
     }
 };
 
