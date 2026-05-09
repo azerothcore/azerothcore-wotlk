@@ -19,10 +19,8 @@
 #define ACORE_MAP_PARTITION_H
 
 #include "Define.h"
+#include "GridDefines.h"
 #include <vector>
-
-// Forward declaration
-struct GridCoord;
 
 // Represents a rectangular partition of a map's grid space.
 // Each partition covers a contiguous block of grids that can be

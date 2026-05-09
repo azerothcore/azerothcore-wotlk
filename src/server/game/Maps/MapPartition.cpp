@@ -16,7 +16,6 @@
  */
 
 #include "MapPartition.h"
-#include "GridDefines.h"
 #include "Log.h"
 #include <algorithm>
 
