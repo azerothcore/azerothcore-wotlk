@@ -3,8 +3,8 @@
 -- ============================================================
 --
 -- Custom GUID ranges used by this module:
---   creature  guids : 9000001 – 9000008
---   gameobject guids: 9000001 – 9000008
+--   creature  guids : 9000001 – 9000009
+--   gameobject guids: 9000001 – 9000009
 --
 -- Both ranges are intentionally placed well above the AC default
 -- auto-increment (~5.3M creature, ~5.7M gameobject) to avoid
@@ -16,8 +16,8 @@
 --   Horde guide    (entry 900002) → CreatureDisplayID 4307  (from creature 3057,  Tauren elder)
 --
 -- To remove all spawns and templates:
---   DELETE FROM gameobject          WHERE guid BETWEEN 9000001 AND 9000008;
---   DELETE FROM creature            WHERE guid BETWEEN 9000001 AND 9000008;
+--   DELETE FROM gameobject          WHERE guid BETWEEN 9000001 AND 9000009;
+--   DELETE FROM creature            WHERE guid BETWEEN 9000001 AND 9000009;
 --   DELETE FROM creature_template_model WHERE CreatureID IN (900001, 900002);
 --   DELETE FROM creature_template   WHERE entry IN (900001, 900002);
 --   DELETE FROM npc_text            WHERE ID = 900001;
@@ -73,7 +73,7 @@ INSERT INTO creature_template_model (CreatureID, Idx, CreatureDisplayID, Display
 --   ScriptName, VerifiedBuild, CreateObject, Comment
 -- ============================================================
 
-DELETE FROM creature WHERE guid BETWEEN 9000001 AND 9000008;
+DELETE FROM creature WHERE guid BETWEEN 9000001 AND 9000009;
 INSERT INTO creature
     (guid, id1, map, position_x, position_y, position_z, orientation,
      spawnMask, phaseMask, equipment_id, spawntimesecs, wander_distance,
@@ -84,7 +84,7 @@ VALUES
 -- Alliance: Dwarf/Gnome — Coldridge Valley (map 0)
 (9000002, 900001, 0, -6230.0347, 334.72903, 383.20734, 2.887422,  1, 1, 0, 120, 0, 100, 0),
 -- Alliance: Night Elf — Shadowglen (map 1)
-(9000003, 900001, 1,  10314.0,   829.83,   1326.48,   2.54818,   1, 1, 0, 120, 0, 100, 0),
+(9000003, 900001, 1,  10329.68,  831.41565, 1326.3103, 3.151634,  1, 1, 0, 120, 0, 100, 0),
 -- Alliance: Draenei — Ammen Vale (map 530)
 (9000004, 900001, 530, -3968.444, -13928.292, 100.41841, 5.5865216, 1, 1, 0, 120, 0, 100, 0),
 -- Horde: Orc/Troll — Valley of Trials (map 1)
@@ -94,7 +94,9 @@ VALUES
 -- Horde: Tauren — Camp Narache (map 1)
 (9000007, 900002, 1, -2911.7666, -252.0669, 52.940895, 3.755963,  1, 1, 0, 120, 0, 100, 0),
 -- Horde: Blood Elf — Sunstrider Isle (map 530)
-(9000008, 900002, 530, 10351.972, -6357.193, 33.478085, 3.8034222, 1, 1, 0, 120, 0, 100, 0);
+(9000008, 900002, 530, 10351.972, -6357.193, 33.478085, 3.8034222, 1, 1, 0, 120, 0, 100, 0),
+-- Alliance: Death Knight — Ebon Hold (map 609)
+(9000009, 900001, 609, 2341.0974, -5667.3594, 426.0278, 0.2159737, 1, 1, 0, 120, 0, 100, 0);
 
 -- ============================================================
 -- 5. Gameobject spawns — permanent visual cue (entry 149410)
@@ -111,7 +113,7 @@ VALUES
 --   spawntimesecs, animprogress, state
 -- ============================================================
 
-DELETE FROM gameobject WHERE guid BETWEEN 9000001 AND 9000008;
+DELETE FROM gameobject WHERE guid BETWEEN 9000001 AND 9000009;
 INSERT INTO gameobject
     (guid, id, map, spawnMask, phaseMask,
      position_x, position_y, position_z, orientation,
@@ -123,7 +125,7 @@ VALUES
 -- Alliance: Dwarf/Gnome — Coldridge Valley
 (9000002, 149410, 0, 1, 1, -6230.0347, 334.72903, 383.20734, 2.887422, 0, 0, 0, 1, -1, 100, 1),
 -- Alliance: Night Elf — Shadowglen
-(9000003, 149410, 1, 1, 1,  10314.0,   829.83,   1326.48,   2.54818,  0, 0, 0, 1, -1, 100, 1),
+(9000003, 149410, 1, 1, 1,  10329.68,  831.41565, 1326.3103, 3.151634,  0, 0, 0, 1, -1, 100, 1),
 -- Alliance: Draenei — Ammen Vale
 (9000004, 149410, 530, 1, 1, -3968.444, -13928.292, 100.41841, 5.5865216, 0, 0, 0, 1, -1, 100, 1),
 -- Horde: Orc/Troll — Valley of Trials
@@ -133,4 +135,6 @@ VALUES
 -- Horde: Tauren — Camp Narache
 (9000007, 149410, 1, 1, 1, -2911.7666, -252.0669, 52.940895, 3.755963, 0, 0, 0, 1, -1, 100, 1),
 -- Horde: Blood Elf — Sunstrider Isle
-(9000008, 149410, 530, 1, 1, 10351.972, -6357.193, 33.478085, 3.8034222, 0, 0, 0, 1, -1, 100, 1);
+(9000008, 149410, 530, 1, 1, 10351.972, -6357.193, 33.478085, 3.8034222, 0, 0, 0, 1, -1, 100, 1),
+-- Alliance: Death Knight — Ebon Hold
+(9000009, 149410, 609, 1, 1, 2341.0974, -5667.3594, 426.0278, 0.2159737, 0, 0, 0, 1, -1, 100, 1);
