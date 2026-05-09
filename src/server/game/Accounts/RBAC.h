@@ -300,7 +300,6 @@ enum RBACPermissions
     RBAC_PERM_COMMAND_GMNOTIFY                               = 468,
     RBAC_PERM_COMMAND_NAMEANNOUNCE                           = 469,
     RBAC_PERM_COMMAND_NOTIFY                                 = 470,
-    RBAC_PERM_COMMAND_WHISPERS                               = 471,
     RBAC_PERM_COMMAND_GROUP                                  = 472,
     RBAC_PERM_COMMAND_GROUP_LEADER                           = 473,
     RBAC_PERM_COMMAND_GROUP_DISBAND                          = 474,
