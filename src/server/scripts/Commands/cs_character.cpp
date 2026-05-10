@@ -95,7 +95,7 @@ public:
         uint32      accountId;                          ///< the account id
         std::string accountName;                        ///< the account name
         time_t      deleteDate;                         ///< the date at which the character has been deleted
-        uint32      level;                              ///< the character level at the time of deletion
+        uint8       level;                              ///< the character level at the time of deletion
     };
 
     typedef std::list<DeletedInfo> DeletedInfoList;
@@ -189,12 +189,12 @@ public:
 
             if (!handler->GetSession())
                 handler->PSendSysMessage(LANG_CHARACTER_DELETED_LIST_LINE_CONSOLE,
-                                         itr->lowGuid, itr->name, itr->level,
+                                         itr->lowGuid, itr->name, uint32(itr->level),
                                          itr->accountName.empty() ? "<Not existing>" : itr->accountName,
                                          itr->accountId, dateStr);
             else
                 handler->PSendSysMessage(LANG_CHARACTER_DELETED_LIST_LINE_CHAT,
-                                         itr->lowGuid, itr->name, itr->level,
+                                         itr->lowGuid, itr->name, uint32(itr->level),
                                          itr->accountName.empty() ? "<Not existing>" : itr->accountName,
                                          itr->accountId, dateStr);
         }
