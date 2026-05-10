@@ -622,6 +622,15 @@ Allow.IP.Based.Action.Logging = 0
 LogSpamReports = 1
 
 #
+#    ChatLog.Enable
+#        Description: Enable or disable chat logging (chat_log.cpp).
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+#
+
+ChatLog.Enable = 0
+
+#
 #  Appender config values: Given an appender "name"
 #    Appender.name
 #        Description: Defines 'where to log'.
