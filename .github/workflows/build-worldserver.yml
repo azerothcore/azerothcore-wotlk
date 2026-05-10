@@ -100,6 +100,10 @@ jobs:
           COPY modules/mod_nostrum_instant_mail/conf/mod_nostrum_instant_mail.conf.dist /azerothcore/env/dist/etc/mod_nostrum_instant_mail.conf
           COPY modules/mod-nostrum-progression/conf/mod_nostrum_progression.conf.dist /azerothcore/env/dist/etc/mod_nostrum_progression.conf
           COPY modules/mod-nostrum-starter/conf/mod_nostrum_starter.conf.dist /azerothcore/env/dist/etc/mod_nostrum_starter.conf
+          COPY modules/mod-cfbg/conf/CFBG.conf.dist /azerothcore/env/dist/etc/CFBG.conf
+          COPY modules/mod-transmog/conf/transmog.conf.dist /azerothcore/env/dist/etc/transmog.conf
+          COPY modules/mod-world-chat/conf/WorldChat.conf.dist /azerothcore/env/dist/etc/WorldChat.conf
+          COPY modules/mod-ah-bot-plus/conf/mod_ahbot.conf.dist /azerothcore/env/dist/etc/mod_ahbot.conf
 
           USER acore
           EOF

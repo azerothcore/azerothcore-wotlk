@@ -555,10 +555,17 @@ void HardcoreManager::FlagSentMail(uint32 guid)
 void HardcoreManager::FlagReceivedMail(uint32 guid)
 {
     auto it = _flags.find(guid);
-    if (it == _flags.end() || it->second.hasReceivedMail)
-        return;
-    it->second.hasReceivedMail = true;
-    SaveFlagField(guid, "has_received_mail", 1);
+    if (it != _flags.end())
+    {
+        if (it->second.hasReceivedMail)
+            return;
+        it->second.hasReceivedMail = true;
+    }
+    // Receiver may be offline (not in _flags) — upsert directly so the flag is never lost
+    CharacterDatabase.Execute(
+        "INSERT INTO mod_nostrum_hardcore_flags (guid, has_received_mail) VALUES ({}, 1) "
+        "ON DUPLICATE KEY UPDATE has_received_mail = 1",
+        guid);
 }
 
 void HardcoreManager::FlagUsedAuctionHouse(uint32 guid)
