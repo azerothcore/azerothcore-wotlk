@@ -76,6 +76,11 @@ void WC::SendWorldMessage(Player const &sender, const std::string &msg, const in
 
     const AccountTypes senderSecurity = sender.GetSession()->GetSecurity();
 
+    // Build the channel packet once — cheaper than one PSendSysMessage per player
+    WorldPacket data;
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_CHANNEL, LANG_UNIVERSAL,
+        &sender, nullptr, msg, 0, g_wcConfig.channelName);
+
     WorldSessionMgr::SessionMap sessions = sWorldSessionMgr->GetAllSessions();
     for (auto const& [accountId, session] : sessions) {
         if (!session) {
@@ -97,7 +102,7 @@ void WC::SendWorldMessage(Player const &sender, const std::string &msg, const in
         }
 
         if (target->GetTeamId() != team && team != -1) {
-            return;
+            continue;
         }
 
         if (sender.GetTeamId() != target->GetTeamId()
@@ -107,29 +112,7 @@ void WC::SendWorldMessage(Player const &sender, const std::string &msg, const in
             continue;
         }
 
-        const std::string &senderName = sender.GetName();
-
-        std::string outMessage;
-        if (sender.isGMChat() || sender.IsDeveloper()) {
-            outMessage = Acore::StringFormat(
-                MessageTemplate,
-                GMIcon,
-                ClassColor[sender.getClass()],
-                senderName,
-                senderName,
-                ChatColor::WHITE,
-                msg);
-        } else {
-            outMessage = Acore::StringFormat(
-                MessageTemplate,
-                TeamColored[sender.GetTeamId()],
-                ClassColor[sender.getClass()],
-                senderName,
-                senderName,
-                ChatColor::WHITE,
-                msg);
-        }
-        ChatHandler(target->GetSession()).PSendSysMessage(outMessage);
+        target->GetSession()->SendPacket(&data);
     }
 }
 

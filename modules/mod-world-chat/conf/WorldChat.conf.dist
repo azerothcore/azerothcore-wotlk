@@ -19,7 +19,7 @@ WorldChat.Enable = true
 #                     True  - (Enabled)
 #
 
-WorldChat.CrossFaction = false
+WorldChat.CrossFaction = true
 
 #
 #    WorldChat.Announce
