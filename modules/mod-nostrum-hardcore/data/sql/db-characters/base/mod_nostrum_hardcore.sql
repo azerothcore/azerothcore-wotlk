@@ -31,6 +31,8 @@ CREATE TABLE IF NOT EXISTS `mod_nostrum_hardcore_flags` (
     `has_sent_mail`         TINYINT UNSIGNED NOT NULL DEFAULT 0,
     `has_received_mail`     TINYINT UNSIGNED NOT NULL DEFAULT 0,
     `has_used_auction_house`TINYINT UNSIGNED NOT NULL DEFAULT 0,
+    `has_grouped`            TINYINT UNSIGNED NOT NULL DEFAULT 0,
+    `has_joined_guild`       TINYINT UNSIGNED NOT NULL DEFAULT 0,
     `updated_at`            TIMESTAMP        NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`guid`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

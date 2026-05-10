@@ -137,6 +137,20 @@ External modules are loaded from the `modules/` directory. Each module is a subd
 
 Bundled in `deps/`: boost, MySQL client, OpenSSL, zlib, recastnavigation (pathfinding), g3dlite (geometry), fmt, argon2, jemalloc, and others.
 
+## VPS Access (Production Server)
+
+SSH into the NostrumWoW production VPS using the readonly key:
+
+```bash
+ssh -i ~/.ssh/nostrum_readonly readonly@62.238.22.143 "<command>"
+```
+
+- **Key**: `~/.ssh/nostrum_readonly` (no passphrase)
+- **User**: `readonly` (limited permissions)
+- **Project root on VPS**: `/opt/nostrum`
+- **Constraints**: no interactive sessions — only one-off commands via `terminal` tool. No PTY, no password prompts. Pipe output back for analysis.
+- **Useful paths**: `conf/` (configs), `docker-compose.yml`, `.env`, `scripts/`, `sql/`
+
 ## Commit Message Format
 
 Uses Conventional Commits:

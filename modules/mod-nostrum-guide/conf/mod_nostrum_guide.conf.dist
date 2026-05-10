@@ -1,13 +1,24 @@
 ################################################################################
 # Nostrum Guide Module
 #
-# Spawns first-time onboarding guide NPCs in every starting zone.
-# These NPCs are information-only. They have no vendors, quests, or rewards.
+# Server onboarding hub NPCs in every starting zone.
+# Phase and rate info is read from shared config keys:
+#
+#   Nostrum.ActivePhase              (shared: mod-nostrum-progression, mod-nostrum-rates)
+#   NostrumRates.XP.*                (owned by mod-nostrum-rates)
+#   NostrumRates.Profession.*        (owned by mod-nostrum-rates)
+#   NostrumRates.Loot.Creature       (owned by mod-nostrum-rates)
+#   NostrumRates.Money.Creature      (owned by mod-nostrum-rates)
+#   NostrumRates.Reputation.*        (owned by mod-nostrum-rates)
+#
+# The guide derives phase name and level cap from the bracket table
+# (matching mod-nostrum-rates) driven by Nostrum.ActivePhase.
+# Do NOT duplicate those keys here.
 ################################################################################
 
 [worldserver]
 
-# Master switch. Set to 0 to disable custom gossip without removing spawns.
+# Master switch. Set to 0 to disable gossip without removing spawns.
 # Default: 1
 NostrumGuide.Enable = 1
 
@@ -15,45 +26,22 @@ NostrumGuide.Enable = 1
 # NPC Settings
 ################################################################################
 
-# Entry IDs for the guide NPC templates (must match SQL and creature_template).
+# Entry IDs for the guide NPC templates (must match SQL creature_template).
 # Default: 900001 (Alliance), 900002 (Horde)
 NostrumGuide.AllianceNpcEntry = 900001
 NostrumGuide.HordeNpcEntry = 900002
 
-# NPC names (informational — actual names are set in creature_template SQL).
-NostrumGuide.AllianceNpcName = Loremaster Caedric
-NostrumGuide.HordeNpcName = Elder Gromak
-NostrumGuide.NpcSubName = New Player Guide
-
-# NPC scale (set in creature_template SQL — this key documents the intended value).
-# Default: 1.15
-NostrumGuide.NpcScale = 1.15
-
-# Reference creature entries used to copy display/model IDs in SQL.
-# Alliance: Rhonin-style (entry 16128, DisplayID 16024)
-# Horde: Tauren elder-style (entry 3057, DisplayID 4307)
-NostrumGuide.AllianceModelReferenceEntry = 16128
-NostrumGuide.HordeModelReferenceEntry = 3057
-
 ################################################################################
 # Permanent Visual Cue
-#
-# A gameobject is spawned at each guide NPC location so new players notice the
-# NPC immediately without relying on temporary aura effects.
-# Disabling this key stops future scripted behavior; SQL spawns must be removed
-# manually if you want to remove existing visual cue gameobjects.
 ################################################################################
 
+# Spawn a gameobject at each guide NPC location so new players notice it.
 # Default: 1
 NostrumGuide.VisualCue.Enable = 1
 
-# Gameobject entry used as the visual cue (a permanent light effect).
+# Gameobject entry used as the visual cue.
 # Default: 149410
 NostrumGuide.VisualCue.GameObjectEntry = 149410
-
-# Reserved for future use: spawn at the same coordinates as the NPC.
-# Default: 1
-NostrumGuide.VisualCue.SpawnAtNpcLocation = 1
 
 ################################################################################
 # Links
@@ -63,36 +51,23 @@ NostrumGuide.WebsiteUrl = https://nostrumwow.com
 NostrumGuide.DiscordUrl = https://discord.gg/ebvrN5kqTJ
 
 ################################################################################
-# Gossip Content
+# Rates Description
 #
-# These strings are shown in the gossip menu when players click each topic.
-# Update them to reflect the current state of the server.
+# Phase, level cap, and numeric rates are auto-read from Nostrum.ActivePhase
+# and NostrumRates.* keys. This text is appended after the rate summary
+# in the NPC "Features, phase & rates" menu for additional context.
 ################################################################################
 
-# Current phase / level cap shown in the gossip menu.
-NostrumGuide.CurrentPhaseText = Phase 3
-NostrumGuide.LevelCapText = Current level cap: 39
+NostrumGuide.RatesText = "XP is phase-driven. Current bracket: blizzlike. Previous brackets: catch-up. Gold is mailed at every 10 levels."
 
-# Server rates description.
-NostrumGuide.RatesText = XP rates are phase-driven. You earn blizzlike (1x) XP in the current phase bracket. Previous phase brackets give 2x catch-up XP. Gold is mailed to you at every 10 levels as a milestone reward.
+################################################################################
+# World Chat
+#
+# The guide reads WorldChat.ChannelName (owned by mod-world-chat) to join
+# players server-side. Only override here if you want a different channel.
+################################################################################
 
-# World chat info.
-NostrumGuide.WorldChatText = Use .world <message> to talk in the global community channel. You are auto-joined on login. Both Horde and Alliance share the same channel.
-
-# Hardcore mode description.
-NostrumGuide.HardcoreText = Hardcore mode is optional. Enable it on a fresh level 1 character with 0 XP using .hardcore enable. One life — if you die, your character becomes a permanent ghost. Hardcore characters automatically join the Deathwalkers guild. Self-Found Hardcore (.hardcore selffound) adds trade, AH, and mail restrictions on top of permadeath.
-
-# Cross-faction description.
-NostrumGuide.CrossFactionText = Faction identity is preserved in the open world. Cross-faction is only enabled where it helps: Dungeon Finder, Battlegrounds, and the world chat channel.
-
-# Dungeon Finder description.
-NostrumGuide.DungeonFinderText = The Dungeon Finder is cross-faction. Horde and Alliance are matched together to keep queues healthy. Available from level 15.
-
-# Battleground description.
-NostrumGuide.BattlegroundText = Battlegrounds use cross-faction team matching. You may fight alongside the opposing faction. A visual race change is applied for the duration of the BG.
-
-# Useful commands shown in the gossip menu.
-NostrumGuide.CommandsText = Useful commands: .world <message> for global chat. .hardcore enable or .hardcore selffound to opt into Hardcore on a fresh character. Dual spec available from level 19 for 1 gold.
+# WorldChat.ChannelName = world
 
 ################################################################################
 # Debug
