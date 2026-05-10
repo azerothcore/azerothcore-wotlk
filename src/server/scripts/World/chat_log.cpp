@@ -20,6 +20,7 @@
 #include "Guild.h"
 #include "Log.h"
 #include "PlayerScript.h"
+#include "World.h"
 
 class ChatLogScript : public PlayerScript
 {
@@ -38,6 +39,9 @@ public:
 
     bool OnPlayerCanUseChat(Player* player, uint32 type, uint32 lang, std::string& msg) override
     {
+        if (!sWorld->getBoolConfig(CONFIG_CHATLOG_ENABLED))
+            return true;
+
         std::string logType = "";
         std::string chatType = "";
 
@@ -67,6 +71,9 @@ public:
 
     bool OnPlayerCanUseChat(Player* player, uint32 /*type*/, uint32 lang, std::string& msg, Player* receiver) override
     {
+        if (!sWorld->getBoolConfig(CONFIG_CHATLOG_ENABLED))
+            return true;
+
         //! NOTE:
         //! LANG_ADDON can only be sent by client in "PARTY", "RAID", "GUILD", "BATTLEGROUND", "WHISPER"
         std::string logType = (lang != LANG_ADDON) ? "chat." : "chat.addon.";
@@ -80,6 +87,9 @@ public:
 
     bool OnPlayerCanUseChat(Player* player, uint32 type, uint32 lang, std::string& msg, Group* group) override
     {
+        if (!sWorld->getBoolConfig(CONFIG_CHATLOG_ENABLED))
+            return true;
+
         //! NOTE:
         //! LANG_ADDON can only be sent by client in "PARTY", "RAID", "GUILD", "BATTLEGROUND", "WHISPER"
         std::string logType = (lang != LANG_ADDON) ? "chat." : "chat.addon.";
@@ -116,6 +126,9 @@ public:
 
     bool OnPlayerCanUseChat(Player* player, uint32 type, uint32 lang, std::string& msg, Guild* guild) override
     {
+        if (!sWorld->getBoolConfig(CONFIG_CHATLOG_ENABLED))
+            return true;
+
         //! NOTE:
         //! LANG_ADDON can only be sent by client in "PARTY", "RAID", "GUILD", "BATTLEGROUND", "WHISPER"
         std::string logType = (lang != LANG_ADDON) ? "chat." : "chat.addon.";
@@ -141,6 +154,9 @@ public:
 
     bool OnPlayerCanUseChat(Player* player, uint32 /*type*/, uint32 /*lang*/, std::string& msg, Channel* channel) override
     {
+        if (!sWorld->getBoolConfig(CONFIG_CHATLOG_ENABLED))
+            return true;
+
         bool isSystem = channel &&
                         (channel->HasFlag(CHANNEL_FLAG_TRADE) ||
                          channel->HasFlag(CHANNEL_FLAG_GENERAL) ||

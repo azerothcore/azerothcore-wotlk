@@ -604,6 +604,8 @@ void WorldConfig::BuildConfigCache()
 
     SetConfigValue<bool>(CONFIG_LOGSPAMREPORTS, "LogSpamReports", true);
 
+    SetConfigValue<bool>(CONFIG_CHATLOG_ENABLED, "ChatLog.Enable", false);
+
     // Whether to use LoS from game objects
     SetConfigValue<bool>(CONFIG_CHECK_GOBJECT_LOS, "CheckGameObjectLoS", true);
 
