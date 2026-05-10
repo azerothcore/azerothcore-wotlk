@@ -1,3 +1,4 @@
+-- DB update 2026_05_10_00 -> 2026_05_10_01
 --
 -- Show character level in `.character deleted list` output
 --
