@@ -27,9 +27,21 @@
 -- 1. NPC text (main gossip greeting box)
 -- ============================================================
 
-DELETE FROM npc_text WHERE ID = 900001;
-INSERT INTO npc_text (ID, text0_0) VALUES
-(900001, 'Welcome to NostrumWoW.$B$BI can help you understand the server rules, progression, and quality-of-life features.$B$BWhat would you like to know?');
+-- npc_text entries for guide pages.
+-- The module writes these dynamically at startup via EnsureNpcText() so they
+-- always reflect the current config (phase, rates, channel name, URLs).
+-- Entry 900001 is also kept here as a fallback if the module hasn't loaded yet.
+-- Entries 900010-900015 are purely module-managed; do not edit manually.
+
+DELETE FROM npc_text WHERE ID BETWEEN 900001 AND 900015;
+INSERT INTO npc_text (ID, Probability0, text0_0) VALUES
+(900001, 1, 'Welcome to NostrumWoW!$B$BI can help you get started. What would you like to know?'),
+(900010, 1, 'NostrumWoW is a progressive WotLK 3.3.5a server with blizzlike gameplay, quality-of-life improvements, optional Hardcore mode, and phased content releases.$B$BWebsite: nostrumwow.com$BDiscord: join from the website'),
+(900011, 1, 'Phase and rates info is written at startup from the current config.$B$BThis entry is updated automatically by the module.'),
+(900012, 1, 'Hardcore is optional permadeath. One life -- die and your character becomes a permanent ghost.$B$BAvailable on fresh level 1 characters with 0 XP and no prior player interaction.$B$BSelf-Found adds trade, mail, and Auction House restrictions on top of permadeath.$B$BChoose your path below.'),
+(900013, 1, 'Hardcore Mode -- IMPORTANT:$B$B- Death is permanent$B- PvE and environmental deaths count$B- Duel deaths do NOT count$B- Trading, mail, and AH are allowed$B- You will join the Deathwalkers guild$B- This cannot be undone$B$BClick Confirm ONLY if you understand.'),
+(900014, 1, 'Self-Found Hardcore -- IMPORTANT:$B$B- Death is permanent$B- Trading is disabled$B- Auction House is disabled$B- Player mail is disabled$B- You will join the Deathwalkers guild$B- This cannot be undone$B$BClick Confirm ONLY if you understand.'),
+(900015, 1, 'Talk to the entire server! Both factions share one channel.$B$BCommands:$B.chat <msg> -- send a message$B.chat on / .chat off -- toggle$B$BOr join manually: /join world');
 
 -- ============================================================
 -- 2. Creature templates
