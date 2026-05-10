@@ -240,6 +240,8 @@ public:
             return false;
         }
 
+        // Flag the inviter — the acceptor is flagged separately in OnPlayerCanGroupAccept
+        sHardcoreMgr->FlagGrouped(inviterGuid);
         return true;
     }
 
@@ -299,8 +301,9 @@ public:
             return false;
         }
 
-        // Flag for eligibility tracking (initiating a trade window flags the character)
+        // Flag both parties — the target never calls this hook themselves
         sHardcoreMgr->FlagTraded(guid);
+        sHardcoreMgr->FlagTraded(targetGuid);
         return true;
     }
 

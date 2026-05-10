@@ -111,7 +111,7 @@ void TryGrantStarterBag(Player* player)
     MarkRewarded(guid);
 
     if (!gCfg.welcomeMessage.empty())
-        ChatHandler(player->GetSession()).PSendSysMessage("%s", gCfg.welcomeMessage.c_str());
+        ChatHandler(player->GetSession()).PSendSysMessage(gCfg.welcomeMessage.c_str());
 
     LOG_INFO("module", "[NostrumStarter] Granted starter bag (itemId={}) to {} (guid={}).",
         gCfg.bagItemId, player->GetName(), guid);
