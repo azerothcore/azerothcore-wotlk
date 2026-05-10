@@ -5075,7 +5075,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         // Eye of Acherus Flight (Boost)
     ApplySpellFix({ 51923 }, [](SpellInfo* spellInfo)
         {
-            spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED;
             spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
         });
 
@@ -5182,6 +5181,18 @@ void SpellMgr::LoadSpellInfoCorrections()
         }, [](SpellInfo* spellInfo)
     {
         spellInfo->InterruptFlags &= ~SPELL_INTERRUPT_FLAG_INTERRUPT;
+    });
+
+    // Twilight Torment
+    ApplySpellFix({ 57935, 58835 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->ProcCharges = 0;
+    });
+
+    // 54933 Hyldnir Harpoon
+    ApplySpellFix({ 54933 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].BasePoints = 1;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)

@@ -670,8 +670,8 @@ enum SMART_ACTION
     SMART_ACTION_PLAY_ANIMKIT                       = 128,    // don't use on 3.3.5a
     SMART_ACTION_SCENE_PLAY                         = 129,    // don't use on 3.3.5a
     SMART_ACTION_SCENE_CANCEL                       = 130,    // don't use on 3.3.5a
-    SMART_ACTION_SPAWN_SPAWNGROUP                   = 131,    /// @todo: NOT SUPPORTED YET
-    SMART_ACTION_DESPAWN_SPAWNGROUP                 = 132,    /// @todo: NOT SUPPORTED YET
+    SMART_ACTION_SPAWN_SPAWNGROUP                   = 131,    // groupId, ignoreRespawn, force
+    SMART_ACTION_DESPAWN_SPAWNGROUP                 = 132,    // groupId, deleteRespawnTimes
     SMART_ACTION_RESPAWN_BY_SPAWNID                 = 133,    /// @todo: NOT SUPPORTED YET
     SMART_ACTION_INVOKER_CAST                       = 134,    // spellID, castFlags, triggerFlags, targetsLimit
     SMART_ACTION_PLAY_CINEMATIC                     = 135,    // entry
@@ -1523,6 +1523,13 @@ struct SmartAction
         {
             uint32 group;
         } gameobjectGroup;
+
+        struct
+        {
+            uint32 groupId;
+            uint32 ignoreRespawn;
+            uint32 force;
+        } groupSpawn;
     };
 };
 
