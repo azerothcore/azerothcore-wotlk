@@ -48,12 +48,7 @@ struct boss_kazrogal : public BossAI
 {
 public:
     boss_kazrogal(Creature* creature) : BossAI(creature, DATA_KAZROGAL)
-    {
-        scheduler.SetValidator([this]
-            {
-                return !me->HasUnitState(UNIT_STATE_CASTING);
-            });
-    }
+    {    }
 
     void Reset() override
     {

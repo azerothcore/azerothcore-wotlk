@@ -75,10 +75,6 @@ struct boss_moroes : public BossAI
     boss_moroes(Creature* creature) : BossAI(creature, DATA_MOROES)
     {
         _activeGuests = 0;
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
     }
 
     void InitializeAI() override
@@ -153,7 +149,7 @@ struct boss_moroes : public BossAI
             _vanished = true;
             Talk(SAY_SPECIAL);
             DoCastSelf(SPELL_VANISH);
-            me->SetImmuneToAll(true);
+            me->SetImmuneToAll(true, true);
             scheduler.Schedule(5s, 7s, [this](TaskContext)
             {
                 me->SetImmuneToAll(false);

@@ -21,10 +21,27 @@
 #include "forge_of_souls.h"
 #include "Group.h"
 
+enum Misc
+{
+    NPC_CORRUPTED_SOUL_FRAGMENT         = 36535,
+
+    ACHIEV_CRITERIA_SOUL_POWER          = 12752,
+    ACHIEV_CRITERIA_THREE_FACED         = 12976,
+
+    SOUL_POWER_FRAGMENT_COUNT           = 4,
+};
+
 BossBoundaryData const boundaries =
 {
     { DATA_BRONJAHM,    new CircleBoundary(Position(5297.3f, 2506.45f), 100.96)                                                                                   },
     { DATA_DEVOURER,    new ParallelogramBoundary(Position(5663.56f, 2570.53f), Position(5724.39f, 2520.45f), Position(5570.36f, 2461.42f)) }
+};
+
+static ObjectData const creatureData[] =
+{
+    { NPC_BRONJAHM, DATA_BRONJAHM },
+    { NPC_DEVOURER, DATA_DEVOURER },
+    { 0,            0             }
 };
 
 class instance_forge_of_souls : public InstanceMapScript
@@ -42,38 +59,22 @@ public:
         instance_forge_of_souls_InstanceScript(Map* map) : InstanceScript(map)
         {
             SetHeaders(DataHeader);
+            SetBossNumber(MAX_ENCOUNTER);
+            LoadObjectData(creatureData, nullptr);
             LoadBossBoundaries(boundaries);
         }
 
-        uint32 m_auiEncounter[MAX_ENCOUNTER];
-        std::string str_data;
-        ObjectGuid NPC_BronjahmGUID;
-        ObjectGuid NPC_DevourerGUID;
-
-        ObjectGuid NPC_LeaderFirstGUID;
-        ObjectGuid NPC_LeaderSecondGUID;
-        ObjectGuid NPC_GuardFirstGUID;
-        ObjectGuid NPC_GuardSecondGUID;
-
-        void Initialize() override
-        {
-            memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
-        }
-
-        bool IsEncounterInProgress() const override
-        {
-            for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
-                if (m_auiEncounter[i] == IN_PROGRESS) return true;
-
-            return false;
-        }
+        ObjectGuid LeaderFirstGUID;
+        ObjectGuid LeaderSecondGUID;
+        ObjectGuid GuardFirstGUID;
+        ObjectGuid GuardSecondGUID;
 
         void OnPlayerEnter(Player* player) override
         {
             InstanceScript::OnPlayerEnter(player);
 
             // this will happen only after crash and loading the instance from db
-            if (m_auiEncounter[0] == DONE && m_auiEncounter[1] == DONE && (!NPC_LeaderSecondGUID || !instance->GetCreature(NPC_LeaderSecondGUID)))
+            if (AllBossesDone() && (!LeaderSecondGUID || !instance->GetCreature(LeaderSecondGUID)))
             {
                 Position pos = {5658.15f, 2502.564f, 708.83f, 0.885207f};
                 instance->SummonCreature(NPC_SYLVANAS_PART2, pos);
@@ -82,44 +83,40 @@ public:
 
         void OnCreatureCreate(Creature* creature) override
         {
+            InstanceScript::OnCreatureCreate(creature);
+
             switch (creature->GetEntry())
             {
-                case NPC_BRONJAHM:
-                    NPC_BronjahmGUID = creature->GetGUID();
-                    break;
-                case NPC_DEVOURER:
-                    NPC_DevourerGUID = creature->GetGUID();
-                    break;
                 case NPC_SYLVANAS_PART1:
                     if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_JAINA_PART1);
-                    NPC_LeaderFirstGUID = creature->GetGUID();
+                    LeaderFirstGUID = creature->GetGUID();
 
-                    if (m_auiEncounter[0] == DONE && m_auiEncounter[1] == DONE)
+                    if (AllBossesDone())
                         creature->SetVisible(false);
                     break;
                 case NPC_SYLVANAS_PART2:
                     if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_JAINA_PART2);
-                    NPC_LeaderSecondGUID = creature->GetGUID();
+                    LeaderSecondGUID = creature->GetGUID();
                     break;
                 case NPC_LORALEN:
                     if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_ELANDRA);
-                    if (!NPC_GuardFirstGUID)
+                    if (!GuardFirstGUID)
                     {
-                        NPC_GuardFirstGUID = creature->GetGUID();
-                        if (m_auiEncounter[0] == DONE && m_auiEncounter[1] == DONE)
+                        GuardFirstGUID = creature->GetGUID();
+                        if (AllBossesDone())
                             creature->SetVisible(false);
                     }
                     break;
                 case NPC_KALIRA:
                     if (GetTeamIdInInstance() == TEAM_ALLIANCE)
                         creature->UpdateEntry(NPC_KORELN);
-                    if (!NPC_GuardSecondGUID)
+                    if (!GuardSecondGUID)
                     {
-                        NPC_GuardSecondGUID = creature->GetGUID();
-                        if (m_auiEncounter[0] == DONE && m_auiEncounter[1] == DONE)
+                        GuardSecondGUID = creature->GetGUID();
+                        if (AllBossesDone())
                             creature->SetVisible(false);
                     }
                     break;
@@ -128,9 +125,9 @@ public:
 
         void HandleOutro()
         {
-            if (!NPC_LeaderSecondGUID || !instance->GetCreature(NPC_LeaderSecondGUID))
+            if (!LeaderSecondGUID || !instance->GetCreature(LeaderSecondGUID))
                 if (Creature* leader = instance->SummonCreature(NPC_SYLVANAS_PART2, outroSpawnPoint))
-                    if (Creature* boss = instance->GetCreature(NPC_DevourerGUID))
+                    if (Creature* boss = GetCreature(DATA_DEVOURER))
                     {
                         float angle = boss->GetAngle(leader);
                         leader->GetMotionMaster()->MovePoint(1, boss->GetPositionX() + 10.0f * cos(angle), boss->GetPositionY() + 10.0f * std::sin(angle), boss->GetPositionZ());
@@ -144,68 +141,36 @@ public:
             }
         }
 
-        void SetData(uint32 type, uint32 data) override
+        bool SetBossState(uint32 type, EncounterState state) override
         {
-            switch (type)
-            {
-                case DATA_BRONJAHM:
-                    m_auiEncounter[type] = data;
-                    break;
-                case DATA_DEVOURER:
-                    m_auiEncounter[type] = data;
-                    if (m_auiEncounter[0] == DONE && m_auiEncounter[1] == DONE)
-                        HandleOutro();
-                    break;
-            }
+            if (!InstanceScript::SetBossState(type, state))
+                return false;
 
-            if (data == DONE)
-                SaveToDB();
-        }
+            if (state == DONE && AllBossesDone())
+                HandleOutro();
 
-        ObjectGuid GetGuidData(uint32 type) const override
-        {
-            switch (type)
-            {
-                case DATA_BRONJAHM:
-                    return NPC_BronjahmGUID;
-            }
-
-            return ObjectGuid::Empty;
+            return true;
         }
 
         bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const*  /*source*/, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
         {
             switch (criteria_id)
             {
-                case 12752: // Soul Power
-                    if (Creature* c = instance->GetCreature(NPC_BronjahmGUID))
+                case ACHIEV_CRITERIA_SOUL_POWER:
+                    if (Creature* bronjahm = GetCreature(DATA_BRONJAHM))
                     {
-                        std::list<Creature*> L;
-                        uint8 count = 0;
-                        c->GetCreaturesWithEntryInRange(L, 200.0f, 36535); // find all Corrupted Soul Fragment (36535)
-                        for( std::list<Creature*>::const_iterator itr = L.begin(); itr != L.end(); ++itr )
-                            if ((*itr)->IsAlive())
-                                ++count;
-                        return (count >= 4);
+                        std::list<Creature*> fragments;
+                        bronjahm->GetCreaturesWithEntryInRange(fragments, 200.0f, NPC_CORRUPTED_SOUL_FRAGMENT);
+                        return std::count_if(fragments.begin(), fragments.end(),
+                            [](Creature const* fragment) { return fragment->IsAlive(); }) >= SOUL_POWER_FRAGMENT_COUNT;
                     }
                     break;
-                case 12976:
-                    if (Creature* c = instance->GetCreature(NPC_DevourerGUID))
-                        return (bool)c->AI()->GetData(1);
+                case ACHIEV_CRITERIA_THREE_FACED:
+                    if (Creature* devourer = GetCreature(DATA_DEVOURER))
+                        return devourer->AI()->GetData(1) != 0;
                     break;
             }
             return false;
-        }
-
-        void ReadSaveDataMore(std::istringstream& data) override
-        {
-            data >> m_auiEncounter[0];
-            data >> m_auiEncounter[1];
-        }
-
-        void WriteSaveDataMore(std::ostringstream& data) override
-        {
-            data << m_auiEncounter[0] << ' ' << m_auiEncounter[1];
         }
     };
 };

@@ -190,6 +190,9 @@ INSERT INTO `skinning_loot_template` VALUES
 (1895,783,0,5.51,0,1,0,1,1,'Pyrewood Elder - Light Hide'),
 (1895,2318,0,63.78,0,1,0,1,1,'Pyrewood Elder - Light Leather'),
 (1895,2934,0,30.71,0,1,0,1,1,'Pyrewood Elder - Ruined Leather Scraps'),
+(1933,2318,0,10,0,1,1,1,1,'Light Leather'),
+(1933,2592,0,35,0,1,1,1,1,'Wool Cloth'),
+(1933,2934,0,55,0,1,1,1,1,'Ruined Leather Scraps'),
 (2173,17057,0,100,0,1,1,1,1,'Reef Frenzy - Shiny Fish Scales'),
 (2174,17057,0,100,0,1,1,1,1,'Coastal Frenzy - Shiny Fish Scales'),
 (2347,4234,0,79.4118,0,1,1,1,1,'Wild Gryphon - Heavy Leather'),
@@ -1990,4 +1993,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-29 17:54:34
+-- Dump completed on 2026-03-15 20:39:15

@@ -249,12 +249,7 @@ private:
 struct npc_inner_demon : public ScriptedAI
 {
     npc_inner_demon(Creature* creature) : ScriptedAI(creature)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    {    }
 
     void IsSummonedBy(WorldObject* summoner) override
     {
