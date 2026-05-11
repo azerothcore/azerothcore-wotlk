@@ -52,6 +52,8 @@ private:
         size_t pos;
         while ((pos = str.find("{level}")) != std::string::npos)
             str.replace(pos, 7, levelStr);
+        while ((pos = str.find("$B")) != std::string::npos)
+            str.replace(pos, 2, "\n");
     }
 };
 

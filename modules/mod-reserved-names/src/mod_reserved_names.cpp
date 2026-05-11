@@ -24,6 +24,7 @@
 #include "AccountScript.h"
 #include "Config.h"
 #include "DatabaseEnv.h"
+#include "QueryResult.h"
 #include "Log.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
