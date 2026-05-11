@@ -10036,6 +10036,8 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, Spell const* spell)
     if (spellInfo->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES) && !HasSpiritOfRedemptionAura())
         return false;
 
+    Unit const* spellCaster = spell ? spell->GetCaster() : nullptr;
+
     if (uint32 dispel = spellInfo->Dispel)
     {
         SpellImmuneContainer const& dispelList = m_spellImmune[IMMUNITY_DISPEL];
@@ -10047,8 +10049,17 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, Spell const* spell)
     if (uint32 mechanic = spellInfo->Mechanic)
     {
         SpellImmuneContainer const& mechanicList = m_spellImmune[IMMUNITY_MECHANIC];
-        if (mechanicList.count(mechanic) > 0)
+        for (auto const& [immunityMechanic, immunitySpellId] : mechanicList)
+        {
+            if (immunityMechanic != mechanic)
+                continue;
+            SpellInfo const* immuneSpellInfo = sSpellMgr->GetSpellInfo(immunitySpellId);
+            if (spellCaster && spellCaster->IsFriendlyTo(this) && immuneSpellInfo
+                    && !immuneSpellInfo->HasAttribute(SPELL_ATTR1_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS)
+                    && !(spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION))
+                continue;
             return true;
+        }
     }
 
     bool immuneToAllEffects = true;
@@ -10060,7 +10071,7 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, Spell const* spell)
             continue;
 
         // Xinef: if target is immune to one effect, and the spell has transform aura - it is immune to whole spell
-        if (IsImmunedToSpellEffect(spellInfo, i))
+        if (IsImmunedToSpellEffect(spellInfo, i, spellCaster))
         {
             if (spellInfo->HasAura(SPELL_AURA_TRANSFORM))
                 return true;
@@ -10076,7 +10087,6 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, Spell const* spell)
     if (!spellInfo->HasAttribute(SPELL_ATTR2_NO_SCHOOL_IMMUNITIES))
     {
         SpellSchoolMask spellSchoolMask = spellInfo->GetSchoolMask();
-        Unit const* spellCaster = spell ? spell->GetCaster() : nullptr;
         if (spell)
         {
             spellSchoolMask = spell->GetSpellSchoolMask();
@@ -10128,6 +10138,11 @@ bool Unit::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index, Unit
     {
         if (itr->first == effect && (itr->second != SPELL_AURA_OF_DESPAIR_1 || (spellInfo->Effects[index].MiscValue == POWER_MANA && !CanRestoreMana(spellInfo))))
         {
+            SpellInfo const* immuneSpellInfo = sSpellMgr->GetSpellInfo(itr->second);
+            if (caster && caster->IsFriendlyTo(this) && immuneSpellInfo
+                    && !immuneSpellInfo->HasAttribute(SPELL_ATTR1_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS)
+                    && !(spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION))
+                continue;
             return true;
         }
     }
