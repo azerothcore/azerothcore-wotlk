@@ -10135,8 +10135,17 @@ bool Unit::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index, Unit
     if (uint32 mechanic = spellInfo->Effects[index].Mechanic)
     {
         auto const& mechanicList = m_spellImmune[IMMUNITY_MECHANIC];
-        if (mechanicList.count(mechanic) > 0)
+        for (auto const& [immunityMechanic, immunitySpellId] : mechanicList)
+        {
+            if (immunityMechanic != mechanic)
+                continue;
+            SpellInfo const* immuneSpellInfo = sSpellMgr->GetSpellInfo(immunitySpellId);
+            if (caster && caster->IsFriendlyTo(this) && immuneSpellInfo
+                    && !immuneSpellInfo->HasAttribute(SPELL_ATTR1_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS)
+                    && !(spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION))
+                continue;
             return true;
+        }
     }
 
     if (!spellInfo->HasAttribute(SPELL_ATTR3_ALWAYS_HIT))
@@ -10147,7 +10156,14 @@ bool Unit::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index, Unit
             for (SpellImmuneContainer::const_iterator itr = list.begin(); itr != list.end(); ++itr)
             {
                 if (itr->first == aura && (itr->second != SPELL_AURA_OF_DESPAIR_2 || (spellInfo->Effects[index].MiscValue == POWER_MANA && !CanRestoreMana(spellInfo))))
+                {
+                    SpellInfo const* immuneSpellInfo = sSpellMgr->GetSpellInfo(itr->second);
+                    if (caster && caster->IsFriendlyTo(this) && immuneSpellInfo
+                            && !immuneSpellInfo->HasAttribute(SPELL_ATTR1_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS)
+                            && !(spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION))
+                        continue;
                     return true;
+                }
             }
 
             if (!spellInfo->HasAttribute(SPELL_ATTR2_NO_SCHOOL_IMMUNITIES))
