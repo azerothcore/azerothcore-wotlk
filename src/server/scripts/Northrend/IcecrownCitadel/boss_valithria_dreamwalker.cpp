@@ -224,19 +224,23 @@ public:
         Acore::CreatureWorker<ValithriaDespawner> worker(_creature, *this);
         Cell::VisitObjects(_creature, worker, 333.0f);
 
-        // Also fix respawn time for Archmages that were killed and corpse-decayed
+        // Fix respawn time for creatures that were killed and corpse-decayed
         // during combat (Cell::VisitObjects can't find them once removed from world)
         if (Map* map = _creature->GetMap())
         {
-            time_t now = GameTime::GetGameTime().count();
-            for (auto const& [spawnId, respawnTime] : map->GetCreatureRespawnTimes())
+            time_t respawnTime = GameTime::GetGameTime().count() + 11;
+            for (auto const& [spawnId, rt] : map->GetCreatureRespawnTimes())
             {
                 if (CreatureData const* data = sObjectMgr->GetCreatureData(spawnId))
                 {
-                    if (data->id1 == NPC_RISEN_ARCHMAGE && data->mapid == map->GetId())
+                    if (data->mapid != map->GetId())
+                        continue;
+
+                    // Both Archmage and Valithria respawn in 11s
+                    // Valithria DB default is 604800s (7 days)
+                    if (data->id1 == NPC_RISEN_ARCHMAGE || data->id1 == NPC_VALITHRIA_DREAMWALKER)
                     {
-                        time_t rt = now + 11;
-                        map->SaveCreatureRespawnTime(spawnId, rt);
+                        map->SaveCreatureRespawnTime(spawnId, respawnTime);
                     }
                 }
             }
@@ -282,10 +286,9 @@ public:
         if (CreatureData const* data = creature->GetCreatureData())
             creature->SetPosition(data->posX, data->posY, data->posZ, data->orientation);
 
-        if (creature->GetEntry() == NPC_RISEN_ARCHMAGE)
-            creature->DespawnOrUnsummon(0ms, 11s); // 11s respawn for Archmages
-        else
-            creature->DespawnOrUnsummon(); // Valithria: use DB default respawn time
+        // Both Archmage and Valithria respawn in 11s
+        // Valithria DB default is 604800s (7 days) - override
+        creature->DespawnOrUnsummon(0ms, 11s);
     }
 
 private:
