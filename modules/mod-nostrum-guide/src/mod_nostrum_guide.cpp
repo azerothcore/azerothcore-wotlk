@@ -5,7 +5,7 @@
  * Alliance: Loremaster Caedric, Horde: Elder Gromak.
  *
  * Reads phase/rates from actual shared config keys:
- *   Nostrum.ActivePhase  (shared with mod-nostrum-rates, mod-nostrum-progression)
+ *   Nostrum.Progression.Era / Nostrum.Progression.Phase  (shared with mod-nostrum-rates, mod-nostrum-progression)
  *   NostrumRates.*       (owned by mod-nostrum-rates)
  *
  * Provides Hardcore enrollment flow and World Chat join.
@@ -16,6 +16,7 @@
  */
 
 #include "Channel.h"
+#include <algorithm>
 #include "ChannelMgr.h"
 #include "Chat.h"
 #include "Config.h"
@@ -83,7 +84,7 @@ struct GuideConfig
     bool   visualCueEnable   = true;
     uint32 visualCueGoEntry  = 149410;
 
-    // Phase -- derived from Nostrum.ActivePhase + bracket table
+    // Phase -- derived from Nostrum.Progression.Era/Phase + bracket table
     uint8      activePhase   = 1;
     std::string phaseLabel;
     uint8      levelCap      = 19;
@@ -118,17 +119,20 @@ void LoadConfig()
     gCfg.visualCueEnable   = sConfigMgr->GetOption<bool>  ("NostrumGuide.VisualCue.Enable", true);
     gCfg.visualCueGoEntry  = sConfigMgr->GetOption<uint32>("NostrumGuide.VisualCue.GameObjectEntry", 149410);
 
-    // Phase -- shared key with mod-nostrum-rates and mod-nostrum-progression
-    uint32 phase = sConfigMgr->GetOption<uint32>("Nostrum.ActivePhase", 1);
-    if (phase > kMaxPhase)
-        phase = 1;
-    gCfg.activePhase = static_cast<uint8>(phase);
-    gCfg.phaseLabel  = kPhases[gCfg.activePhase].label;
+    // Phase -- derived from Era/Phase, shared with mod-nostrum-rates and mod-nostrum-progression
+    uint32 era      = sConfigMgr->GetOption<uint32>("Nostrum.Progression.Era",   1);
+    uint32 rawPhase = sConfigMgr->GetOption<uint32>("Nostrum.Progression.Phase", 1);
+    if (era < 1 || era > 3) era = 1;
+    if (rawPhase < 1) rawPhase = 1;
 
-    if (gCfg.activePhase == 0)
-        gCfg.levelCap = 80;
-    else
-        gCfg.levelCap = kPhases[gCfg.activePhase].maxLevel;
+    uint8 flatPhase;
+    if (era >= 3)       flatPhase = 7;
+    else if (era == 2)  flatPhase = 6;
+    else                flatPhase = static_cast<uint8>(std::min<uint32>(rawPhase, 5));
+
+    gCfg.activePhase = flatPhase;
+    gCfg.phaseLabel  = kPhases[gCfg.activePhase].label;
+    gCfg.levelCap    = kPhases[gCfg.activePhase].maxLevel;
 
     // Rates -- read from NostrumRates.* (owned by mod-nostrum-rates)
     gCfg.xpBetaRate        = sConfigMgr->GetOption<float>("NostrumRates.XP.BetaRate", 3.0f);

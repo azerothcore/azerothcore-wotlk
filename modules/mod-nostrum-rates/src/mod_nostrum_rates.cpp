@@ -3,23 +3,21 @@
  *
  * Centralizes configurable gameplay rate modifiers for NostrumWoW.
  *
- * Rates are phase-driven:
- *   Phase 0 (beta)   — flat multiplier (default 3×) for all XP.
- *   Phases 1-7       — each phase owns a level bracket.
- *                       Active bracket: 1× (configurable, blizzlike).
- *                       Previous brackets: 2× (configurable, catch-up).
+ * Rates are phase-driven via Nostrum.Progression.Era + Nostrum.Progression.Phase.
+ * These are converted to a flat XP bracket (0-7) for rate computation:
  *
- * Phase brackets:
- *   0: beta    (flat)
- *   1:  1-19
- *   2: 19-29
- *   3: 29-39
- *   4: 39-49
- *   5: 49-60
- *   6: 60-70   (TBC)
- *   7: 70-80   (WotLK)
+ *   Azeroth Era Phase 1 → bracket 1 (1-19)
+ *   Azeroth Era Phase 2 → bracket 2 (19-29)
+ *   Azeroth Era Phase 3 → bracket 3 (29-39)
+ *   Azeroth Era Phase 4 → bracket 4 (39-49)
+ *   Azeroth Era Phase 5+ → bracket 5 (49-60)
+ *   Outland Era  → bracket 6 (60-70)
+ *   Northrend Era → bracket 7 (70-80)
  *
- * Death Knight creation is blocked while ActivePhase < 7 (configurable).
+ * Active bracket: 1× (configurable, blizzlike).
+ * Previous brackets: 2× (configurable, catch-up).
+ *
+ * Death Knight creation is blocked before Northrend Era (configurable).
  */
 
 #include "AccountScript.h"
@@ -34,6 +32,7 @@
 #include "PlayerScript.h"
 #include "SharedDefines.h"
 #include "WorldScript.h"
+#include <algorithm>
 #include <string_view>
 
 namespace
@@ -72,7 +71,7 @@ static constexpr uint8 kMaxPhase = 7;
 struct NostrumRatesConfig
 {
     bool    enabled     = true;
-    uint8   activePhase = 1;
+    uint8   activePhase = 1; // derived flat bracket (1-7) for XP rate logic
 
     // XP — derived from phase at runtime
     float xpBeta         = 3.0f; // Phase 0: flat multiplier
@@ -105,8 +104,8 @@ struct NostrumRatesConfig
     float pvpHonor       = 1.0f;
     float pvpArenaPoints = 1.0f;
 
-    // Death Knight restriction
-    bool blockDKBeforePhase7 = true;
+    // Death Knight restriction (blocked before Northrend Era)
+    bool blockDKBeforeNorthrendEra = true;
 };
 
 NostrumRatesConfig gCfg;
@@ -141,14 +140,21 @@ void LoadConfig()
         return;
     }
 
-    uint32 phase = sConfigMgr->GetOption<uint32>("Nostrum.ActivePhase", 1);
-    if (phase > kMaxPhase)
-    {
-        LOG_WARN("module", ">> NostrumRates: ActivePhase {} out of range [0-{}], clamping to 1",
-            phase, kMaxPhase);
-        phase = 1;
-    }
-    gCfg.activePhase = static_cast<uint8>(phase);
+    // Derive flat XP bracket from Era/Phase
+    uint32 era   = sConfigMgr->GetOption<uint32>("Nostrum.Progression.Era",   1);
+    uint32 phase = sConfigMgr->GetOption<uint32>("Nostrum.Progression.Phase", 1);
+    if (era < 1 || era > 3) era = 1;
+    if (phase < 1) phase = 1;
+
+    uint8 flatPhase;
+    if (era >= 3)
+        flatPhase = 7;
+    else if (era == 2)
+        flatPhase = 6;
+    else
+        flatPhase = static_cast<uint8>(std::min<uint32>(phase, 5)); // Azeroth phases 1-5
+
+    gCfg.activePhase = flatPhase;
 
     // XP
     gCfg.xpBeta         = LoadRate("NostrumRates.XP.BetaRate",         3.0f);
@@ -188,18 +194,16 @@ void LoadConfig()
     gCfg.pvpArenaPoints = LoadRate("NostrumRates.PvP.ArenaPoints", 1.0f);
 
     // DK
-    gCfg.blockDKBeforePhase7 = sConfigMgr->GetOption<bool>("NostrumRates.BlockDKBeforePhase7", true);
+    gCfg.blockDKBeforeNorthrendEra = sConfigMgr->GetOption<bool>("NostrumRates.BlockDKBeforeNorthrendEra", true);
 
     // Startup log
-    LOG_INFO("module", ">> NostrumRates: active = {}", kPhases[gCfg.activePhase].label);
-    if (gCfg.activePhase == 0)
-        LOG_INFO("module", ">> NostrumRates: XP = {:.1f}x (beta flat rate)", gCfg.xpBeta);
-    else
-        LOG_INFO("module", ">> NostrumRates: XP current bracket = {:.1f}x  catch-up = {:.1f}x",
-            gCfg.xpCurrentPhase, gCfg.xpCatchUp);
+    LOG_INFO("module", ">> NostrumRates: active = {} (era={} phase={})",
+        kPhases[gCfg.activePhase].label, era, phase);
+    LOG_INFO("module", ">> NostrumRates: XP current bracket = {:.1f}x  catch-up = {:.1f}x",
+        gCfg.xpCurrentPhase, gCfg.xpCatchUp);
     LOG_INFO("module", ">> NostrumRates: XP Battleground = {:.1f}x", gCfg.xpBattleground);
     LOG_INFO("module", ">> NostrumRates: DK creation block = {}",
-        (gCfg.blockDKBeforePhase7 && gCfg.activePhase < 7) ? "YES (phase < 7)" : "no");
+        (gCfg.blockDKBeforeNorthrendEra && era < 3) ? "YES (pre-Northrend Era)" : "no");
 }
 
 // Returns the effective XP rate for a given player level.
@@ -431,9 +435,10 @@ public:
 
     bool CanAccountCreateCharacter(uint32 /*accountId*/, uint8 /*charRace*/, uint8 charClass) override
     {
-        if (!gCfg.enabled || !gCfg.blockDKBeforePhase7)
+        if (!gCfg.enabled || !gCfg.blockDKBeforeNorthrendEra)
             return true;
 
+        // DKs unlock with Northrend Era (flat bracket 7)
         if (gCfg.activePhase < 7 && charClass == CLASS_DEATH_KNIGHT)
             return false;
 

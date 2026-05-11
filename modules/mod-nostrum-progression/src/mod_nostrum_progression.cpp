@@ -1,32 +1,36 @@
 /*
  * NostrumWoW Progression Module
  *
- * Enforces the phase level cap driven by a single config value:
+ * Controls server content availability via a two-axis Era + Phase system:
  *
- *   Nostrum.ActivePhase = <0-7>
+ *   Nostrum.Progression.Era   = 1  (1=Azeroth  2=Outland  3=Northrend)
+ *   Nostrum.Progression.Phase = 1  (within-era phase number)
  *
- * The level cap and phase name are derived automatically from the phase table.
- * Changing ActivePhase and running `.reload config` is all that is needed to
- * advance the server to the next phase.
+ * Unlock rule:
+ *   required era  < current era  → unlocked
+ *   required era  > current era  → locked
+ *   required era == current era  → unlocked if current phase >= required phase
  *
- * Phase table:
- *   0 — Beta    (cap 80, no restriction)
- *   1 — Phase 1 (cap 19)
- *   2 — Phase 2 (cap 29)
- *   3 — Phase 3 (cap 39)
- *   4 — Phase 4 (cap 49)
- *   5 — Phase 5 (cap 60)
- *   6 — Phase 6 (cap 70)
- *   7 — Phase 7 (cap 80, WotLK — Death Knights unlocked)
+ * Level caps:
+ *   Azeroth Phase 1: 19 | Phase 2: 29 | Phase 3: 39 | Phase 4: 49 | Phase 5+: 60
+ *   Outland  (any phase): 70
+ *   Northrend (any phase): 80
  *
- * Content locks:
- *   Dungeon/raid map entry, login-inside-locked-map teleport, battleground
- *   queues, and LFG dungeon queues are all gated by the same phase table.
+ * Locks enforced:
+ *   - Level cap (XP gate + level rollback)
+ *   - Continent maps (530 Outland, 571 Northrend, 609 DK zone)
+ *   - Instance/raid entry (per era+phase)
+ *   - Battleground queues
+ *   - LFG/Dungeon Finder queues
+ *   - World boss spawns (despawned until their phase)
+ *   - Badge/emblem currency purchases
  */
 
+#include "AllCreatureScript.h"
 #include "Chat.h"
 #include "Common.h"
 #include "Config.h"
+#include "Creature.h"
 #include "DBCStores.h"
 #include "LFGMgr.h"
 #include "Player.h"
@@ -41,134 +45,182 @@ namespace
 {
 
 // ---------------------------------------------------------------------------
-// Phase table
+// Era/Phase key
 // ---------------------------------------------------------------------------
 
-struct PhaseEntry
+struct EraPhaseKey
 {
-    uint8       cap;
-    char const* name;
+    uint8 era;
+    uint8 phase;
 };
-
-static constexpr PhaseEntry kPhases[8] =
-{
-    { 80, "Beta"    }, // 0 — no cap, 3× rates via mod-nostrum-rates
-    { 19, "Phase 1" }, // 1
-    { 29, "Phase 2" }, // 2
-    { 39, "Phase 3" }, // 3
-    { 49, "Phase 4" }, // 4
-    { 60, "Phase 5" }, // 5 — vanilla endgame
-    { 70, "Phase 6" }, // 6 — TBC
-    { 80, "Phase 7" }, // 7 — WotLK
-};
-
-static constexpr uint8 kMaxPhase = 7;
 
 // ---------------------------------------------------------------------------
-// Content lock tables
+// Instance lock table  (map ID → minimum era/phase required)
 // ---------------------------------------------------------------------------
 
-// Maps instance map ID -> minimum progression phase required.
-static const std::unordered_map<uint32, uint8> kInstanceUnlockPhase =
+static const std::unordered_map<uint32, EraPhaseKey> kInstanceLock =
 {
-    // Phase 1 — level 19
-    { 389, 1 }, // Ragefire Chasm
-    { 36,  1 }, // Deadmines
-    { 43,  1 }, // Wailing Caverns
-    { 33,  1 }, // Shadowfang Keep
+    // ---- Era 1, Phase 1 (cap 19) ----
+    { 389, {1,1} }, // Ragefire Chasm
+    {  36, {1,1} }, // Deadmines
+    {  43, {1,1} }, // Wailing Caverns
+    {  33, {1,1} }, // Shadowfang Keep
 
-    // Phase 2 — level 29
-    { 48,  2 }, // Blackfathom Deeps
-    { 34,  2 }, // Stormwind Stockade
-    { 90,  2 }, // Gnomeregan
-    { 47,  2 }, // Razorfen Kraul
+    // ---- Era 1, Phase 2 (cap 29) ----
+    {  48, {1,2} }, // Blackfathom Deeps
+    {  34, {1,2} }, // Stormwind Stockade
+    {  90, {1,2} }, // Gnomeregan
+    {  47, {1,2} }, // Razorfen Kraul
 
-    // Phase 3 — level 39
-    { 189, 3 }, // Scarlet Monastery
-    { 129, 3 }, // Razorfen Downs
+    // ---- Era 1, Phase 3 (cap 39) ----
+    { 189, {1,3} }, // Scarlet Monastery
+    { 129, {1,3} }, // Razorfen Downs
 
-    // Phase 4 — level 49
-    { 70,  4 }, // Uldaman
-    { 209, 4 }, // Zul'Farrak
-    { 349, 4 }, // Maraudon
-    { 109, 4 }, // Sunken Temple / Temple of Atal'Hakkar
+    // ---- Era 1, Phase 4 (cap 49) ----
+    {  70, {1,4} }, // Uldaman
+    { 209, {1,4} }, // Zul'Farrak
+    { 349, {1,4} }, // Maraudon
+    { 109, {1,4} }, // Sunken Temple
 
-    // Phase 5 — Vanilla endgame
-    { 230, 5 }, // Blackrock Depths
-    { 229, 5 }, // Blackrock Spire (LBRS/UBRS)
-    { 429, 5 }, // Dire Maul
-    { 329, 5 }, // Stratholme
-    { 289, 5 }, // Scholomance
-    { 409, 5 }, // Molten Core
-    { 469, 5 }, // Blackwing Lair
-    { 309, 5 }, // Zul'Gurub
-    { 249, 5 }, // Onyxia's Lair
-    { 509, 5 }, // Ruins of Ahn'Qiraj
-    { 531, 5 }, // Ahn'Qiraj Temple
+    // ---- Era 1, Phase 5 — Vanilla endgame ----
+    { 230, {1,5} }, // Blackrock Depths
+    { 229, {1,5} }, // Blackrock Spire (LBRS/UBRS)
+    { 429, {1,5} }, // Dire Maul
+    { 329, {1,5} }, // Stratholme
+    { 289, {1,5} }, // Scholomance
+    { 409, {1,5} }, // Molten Core
+    { 249, {3,3} }, // Onyxia's Lair (level 60 + level 80 — both gated at Northrend Phase 3)
 
-    // Phase 6 — TBC
-    { 543, 6 }, // Hellfire Citadel: Ramparts
-    { 542, 6 }, // Hellfire Citadel: The Blood Furnace
-    { 540, 6 }, // Hellfire Citadel: The Shattered Halls
-    { 546, 6 }, // Coilfang: The Underbog
-    { 547, 6 }, // Coilfang: The Slave Pens
-    { 545, 6 }, // Coilfang: The Steamvault
-    { 557, 6 }, // Auchindoun: Mana-Tombs
-    { 558, 6 }, // Auchindoun: Auchenai Crypts
-    { 556, 6 }, // Auchindoun: Sethekk Halls
-    { 555, 6 }, // Auchindoun: Shadow Labyrinth
-    { 553, 6 }, // Tempest Keep: The Botanica
-    { 554, 6 }, // Tempest Keep: The Mechanar
-    { 552, 6 }, // Tempest Keep: The Arcatraz
-    { 269, 6 }, // Opening of the Dark Portal / Black Morass
-    { 560, 6 }, // The Escape From Durnholde / Old Hillsbrad
-    { 585, 6 }, // Magister's Terrace
-    { 532, 6 }, // Karazhan
-    { 544, 6 }, // Magtheridon's Lair
-    { 565, 6 }, // Gruul's Lair
-    { 548, 6 }, // Coilfang: Serpentshrine Cavern
-    { 550, 6 }, // Tempest Keep / The Eye
-    { 564, 6 }, // Black Temple
-    { 534, 6 }, // The Battle for Mount Hyjal
-    { 568, 6 }, // Zul'Aman
-    { 580, 6 }, // Sunwell Plateau
+    // ---- Era 1, Phase 6 — Blackwing Lair ----
+    { 469, {1,6} }, // Blackwing Lair
 
-    // Phase 7 — WotLK
-    { 574, 7 }, // Utgarde Keep
-    { 575, 7 }, // Utgarde Pinnacle
-    { 576, 7 }, // The Nexus
-    { 578, 7 }, // The Oculus
-    { 599, 7 }, // Halls of Stone
-    { 602, 7 }, // Halls of Lightning
-    { 600, 7 }, // Drak'Tharon Keep
-    { 604, 7 }, // Gundrak
-    { 601, 7 }, // Azjol-Nerub
-    { 619, 7 }, // Ahn'kahet: The Old Kingdom
-    { 608, 7 }, // Violet Hold
-    { 595, 7 }, // The Culling of Stratholme
-    { 650, 7 }, // Trial of the Champion
-    { 632, 7 }, // The Forge of Souls
-    { 658, 7 }, // Pit of Saron
-    { 668, 7 }, // Halls of Reflection
-    { 533, 7 }, // Naxxramas (WotLK 3.3.5a map entry)
-    { 615, 7 }, // The Obsidian Sanctum
-    { 616, 7 }, // The Eye of Eternity
-    { 624, 7 }, // Vault of Archavon
-    { 603, 7 }, // Ulduar
-    { 649, 7 }, // Trial of the Crusader
-    { 631, 7 }, // Icecrown Citadel
-    { 724, 7 }, // The Ruby Sanctum
+    // ---- Era 1, Phase 7 — Zul'Gurub ----
+    { 309, {1,7} }, // Zul'Gurub
+
+    // ---- Era 1, Phase 8 — Ahn'Qiraj ----
+    { 509, {1,8} }, // Ruins of Ahn'Qiraj (AQ20)
+    { 531, {1,8} }, // Temple of Ahn'Qiraj (AQ40)
+
+    // ---- Era 2, Phase 1 — TBC dungeons + opening raids ----
+    { 543, {2,1} }, // Hellfire Citadel: Ramparts
+    { 542, {2,1} }, // Hellfire Citadel: Blood Furnace
+    { 540, {2,1} }, // Hellfire Citadel: Shattered Halls
+    { 546, {2,1} }, // Coilfang: The Underbog
+    { 547, {2,1} }, // Coilfang: The Slave Pens
+    { 545, {2,1} }, // Coilfang: The Steamvault
+    { 557, {2,1} }, // Auchindoun: Mana-Tombs
+    { 558, {2,1} }, // Auchindoun: Auchenai Crypts
+    { 556, {2,1} }, // Auchindoun: Sethekk Halls
+    { 555, {2,1} }, // Auchindoun: Shadow Labyrinth
+    { 553, {2,1} }, // Tempest Keep: The Botanica
+    { 554, {2,1} }, // Tempest Keep: The Mechanar
+    { 552, {2,1} }, // Tempest Keep: The Arcatraz
+    { 269, {2,1} }, // Opening of the Dark Portal / Black Morass
+    { 560, {2,1} }, // The Escape From Durnholde / Old Hillsbrad
+    { 585, {2,1} }, // Magister's Terrace
+    { 532, {2,1} }, // Karazhan
+    { 544, {2,1} }, // Magtheridon's Lair
+    { 565, {2,1} }, // Gruul's Lair
+
+    // ---- Era 2, Phase 2 — Serpentshrine & Tempest Keep ----
+    { 548, {2,2} }, // Coilfang: Serpentshrine Cavern
+    { 550, {2,2} }, // Tempest Keep / The Eye
+
+    // ---- Era 2, Phase 3 — Mount Hyjal & Black Temple ----
+    { 534, {2,3} }, // The Battle for Mount Hyjal
+    { 564, {2,3} }, // Black Temple
+    { 568, {2,3} }, // Zul'Aman
+
+    // ---- Era 2, Phase 4 — Sunwell ----
+    { 580, {2,4} }, // Sunwell Plateau
+
+    // ---- Era 3, Phase 1 — WotLK dungeons + opening raids ----
+    { 574, {3,1} }, // Utgarde Keep
+    { 575, {3,1} }, // Utgarde Pinnacle
+    { 576, {3,1} }, // The Nexus
+    { 578, {3,1} }, // The Oculus
+    { 599, {3,1} }, // Halls of Stone
+    { 602, {3,1} }, // Halls of Lightning
+    { 600, {3,1} }, // Drak'Tharon Keep
+    { 604, {3,1} }, // Gundrak
+    { 601, {3,1} }, // Azjol-Nerub
+    { 619, {3,1} }, // Ahn'kahet: The Old Kingdom
+    { 608, {3,1} }, // Violet Hold
+    { 595, {3,1} }, // The Culling of Stratholme
+    { 650, {3,1} }, // Trial of the Champion
+    { 632, {3,1} }, // The Forge of Souls
+    { 658, {3,1} }, // Pit of Saron
+    { 668, {3,1} }, // Halls of Reflection
+    { 533, {3,1} }, // Naxxramas
+    { 615, {3,1} }, // The Obsidian Sanctum
+    { 616, {3,1} }, // The Eye of Eternity
+    { 624, {3,1} }, // Vault of Archavon
+
+    // ---- Era 3, Phase 2 — Ulduar ----
+    { 603, {3,2} }, // Ulduar
+
+    // ---- Era 3, Phase 3 — Trial of the Crusader & Onyxia 80 ----
+    { 649, {3,3} }, // Trial of the Crusader
+    // map 249 (Onyxia) is already in the table above at {3,3}
+
+    // ---- Era 3, Phase 4 — Icecrown & Ruby Sanctum ----
+    { 631, {3,4} }, // Icecrown Citadel
+    { 724, {3,4} }, // The Ruby Sanctum
 };
 
-// Maps BattlegroundTypeId -> minimum progression phase required.
-static const std::unordered_map<uint32, uint8> kBattlegroundUnlockPhase =
+// ---------------------------------------------------------------------------
+// Continent/map lock table  (map ID → minimum era/phase required)
+// ---------------------------------------------------------------------------
+
+static const std::unordered_map<uint32, EraPhaseKey> kMapLock =
 {
-    { BATTLEGROUND_WS, 1 }, // Warsong Gulch
-    { BATTLEGROUND_AB, 2 }, // Arathi Basin
-    { BATTLEGROUND_AV, 5 }, // Alterac Valley
-    { BATTLEGROUND_EY, 6 }, // Eye of the Storm
-    { BATTLEGROUND_SA, 7 }, // Strand of the Ancients
-    { BATTLEGROUND_IC, 7 }, // Isle of Conquest
+    { 530, {2,1} }, // Outland
+    { 571, {3,1} }, // Northrend
+    { 609, {3,1} }, // Death Knight starting zone
+};
+
+// ---------------------------------------------------------------------------
+// Battleground lock table
+// ---------------------------------------------------------------------------
+
+static const std::unordered_map<uint32, EraPhaseKey> kBattlegroundLock =
+{
+    { BATTLEGROUND_WS, {1,1} }, // Warsong Gulch
+    { BATTLEGROUND_AB, {1,2} }, // Arathi Basin
+    { BATTLEGROUND_AV, {1,5} }, // Alterac Valley
+    { BATTLEGROUND_EY, {2,1} }, // Eye of the Storm
+    { BATTLEGROUND_SA, {3,1} }, // Strand of the Ancients
+    { BATTLEGROUND_IC, {3,1} }, // Isle of Conquest
+};
+
+// ---------------------------------------------------------------------------
+// World boss lock table  (creature entry → minimum era/phase required)
+// ---------------------------------------------------------------------------
+
+static const std::unordered_map<uint32, EraPhaseKey> kWorldBossLock =
+{
+    {  6109, {1,5} }, // Azuregos
+    { 12397, {1,5} }, // Lord Kazzak
+    { 14887, {1,5} }, // Ysondre (Dragon of Nightmare)
+    { 14888, {1,5} }, // Lethon  (Dragon of Nightmare)
+    { 14889, {1,5} }, // Emeriss (Dragon of Nightmare)
+    { 14890, {1,5} }, // Taerar  (Dragon of Nightmare)
+    { 18728, {2,1} }, // Doom Lord Kazzak
+    { 17711, {2,1} }, // Doomwalker
+};
+
+// ---------------------------------------------------------------------------
+// Currency item lock table  (item entry → minimum era/phase required)
+// ---------------------------------------------------------------------------
+
+static const std::unordered_map<uint32, EraPhaseKey> kCurrencyItemLock =
+{
+    { 29434, {2,1} }, // Badge of Justice
+    { 40752, {3,1} }, // Emblem of Heroism
+    { 40753, {3,1} }, // Emblem of Valor
+    { 45624, {3,2} }, // Emblem of Conquest
+    { 47241, {3,3} }, // Emblem of Triumph
+    { 49426, {3,4} }, // Emblem of Frost
 };
 
 // ---------------------------------------------------------------------------
@@ -178,76 +230,65 @@ static const std::unordered_map<uint32, uint8> kBattlegroundUnlockPhase =
 struct ProgConfig
 {
     bool    enabled             = true;
-    uint8   activePhase         = 1;
+    uint8   era                 = 1;
+    uint8   phase               = 1;
     bool    gmBypass            = true;
     bool    loginAnnouncement   = true;
     bool    lockInstances       = true;
-    bool    teleportOutLocked   = true;
+    bool    lockMaps            = true;
     bool    lockBattlegrounds   = true;
     bool    lockLFG             = true;
+    bool    lockWorldBosses     = true;
+    bool    lockVendors         = true;
+    bool    teleportOutLocked   = true;
     bool    debug               = false;
 };
 
 ProgConfig gCfg;
 
-void LoadConfig()
-{
-    gCfg = {};
-
-    gCfg.enabled = sConfigMgr->GetOption<bool>("Nostrum.Progression.Enable", true);
-
-    uint32 phase = sConfigMgr->GetOption<uint32>("Nostrum.ActivePhase", 1);
-    if (phase > kMaxPhase)
-    {
-        LOG_WARN("module", ">> NostrumProgression: ActivePhase {} out of range [0-{}], using 1",
-            phase, kMaxPhase);
-        phase = 1;
-    }
-    gCfg.activePhase = static_cast<uint8>(phase);
-
-    gCfg.gmBypass            = sConfigMgr->GetOption<bool>("Nostrum.Progression.GmBypass",                    true);
-    gCfg.loginAnnouncement   = sConfigMgr->GetOption<bool>("Nostrum.Progression.LoginAnnouncement",           true);
-    gCfg.lockInstances       = sConfigMgr->GetOption<bool>("Nostrum.Progression.LockInstances",               true);
-    gCfg.teleportOutLocked   = sConfigMgr->GetOption<bool>("Nostrum.Progression.TeleportOutOfLockedMapsOnLogin", true);
-    gCfg.lockBattlegrounds   = sConfigMgr->GetOption<bool>("Nostrum.Progression.LockBattlegrounds",           true);
-    gCfg.lockLFG             = sConfigMgr->GetOption<bool>("Nostrum.Progression.LockLFG",                     true);
-    gCfg.debug               = sConfigMgr->GetOption<bool>("Nostrum.Progression.Debug",                       false);
-
-    LOG_INFO("module", ">> NostrumProgression: {} — cap {} — enabled={} lockInstances={} lockBG={} lockLFG={}",
-        kPhases[gCfg.activePhase].name,
-        uint32(kPhases[gCfg.activePhase].cap),
-        gCfg.enabled,
-        gCfg.lockInstances,
-        gCfg.lockBattlegrounds,
-        gCfg.lockLFG);
-}
-
 // ---------------------------------------------------------------------------
-// Lock helpers
+// Core helpers
 // ---------------------------------------------------------------------------
 
-bool IsInstanceMapUnlocked(uint32 mapId)
+bool IsUnlocked(uint8 reqEra, uint8 reqPhase)
 {
-    if (!gCfg.enabled || gCfg.activePhase == 0)
-        return true;
-
-    auto itr = kInstanceUnlockPhase.find(mapId);
-    if (itr == kInstanceUnlockPhase.end())
-        return true;
-
-    return gCfg.activePhase >= itr->second;
+    if (gCfg.era != reqEra)
+        return gCfg.era > reqEra;
+    return gCfg.phase >= reqPhase;
 }
 
-bool IsBattlegroundUnlocked(uint32 bgTypeId)
+uint8 GetLevelCap()
 {
-    if (!gCfg.enabled || gCfg.activePhase == 0)
-        return true;
+    if (gCfg.era >= 3)
+        return 80;
+    if (gCfg.era == 2)
+        return 70;
+    // Era 1: phase 1-4 have individual caps, phase 5+ all 60
+    static constexpr uint8 caps[] = { 0, 19, 29, 39, 49, 60, 60, 60, 60 };
+    return caps[std::min<uint8>(gCfg.phase, 8)];
+}
 
-    auto itr = kBattlegroundUnlockPhase.find(bgTypeId);
-    if (itr == kBattlegroundUnlockPhase.end())
-        return true;
+std::string GetPhaseName()
+{
+    static const char* eraNames[] = { "", "Azeroth", "Outland", "Northrend" };
+    uint8 era = std::min<uint8>(gCfg.era, 3);
+    return Acore::StringFormat("{} Era — Phase {}", eraNames[era], uint32(gCfg.phase));
+}
 
-    return gCfg.activePhase >= itr->second;
+bool IsInstanceLocked(uint32 mapId)
+{
+    auto it = kInstanceLock.find(mapId);
+    if (it == kInstanceLock.end())
+        return false;
+    return !IsUnlocked(it->second.era, it->second.phase);
+}
+
+bool IsMapLocked(uint32 mapId)
+{
+    auto it = kMapLock.find(mapId);
+    if (it == kMapLock.end())
+        return false;
+    return !IsUnlocked(it->second.era, it->second.phase);
 }
 
 void TeleportToHomebind(Player* player)
@@ -257,6 +298,40 @@ void TeleportToHomebind(Player* player)
                        player->m_homebindY,
                        player->m_homebindZ,
                        0.0f);
+}
+
+void LoadConfig()
+{
+    gCfg = {};
+
+    gCfg.enabled = sConfigMgr->GetOption<bool>("Nostrum.Progression.Enable", true);
+
+    uint32 era = sConfigMgr->GetOption<uint32>("Nostrum.Progression.Era", 1);
+    if (era < 1 || era > 3)
+    {
+        LOG_WARN("module", ">> NostrumProgression: Era {} out of range [1-3], using 1", era);
+        era = 1;
+    }
+    gCfg.era = static_cast<uint8>(era);
+
+    uint32 phase = sConfigMgr->GetOption<uint32>("Nostrum.Progression.Phase", 1);
+    if (phase < 1)
+        phase = 1;
+    gCfg.phase = static_cast<uint8>(phase);
+
+    gCfg.gmBypass          = sConfigMgr->GetOption<bool>("Nostrum.Progression.GmBypass",                       true);
+    gCfg.loginAnnouncement = sConfigMgr->GetOption<bool>("Nostrum.Progression.LoginAnnouncement",               true);
+    gCfg.lockInstances     = sConfigMgr->GetOption<bool>("Nostrum.Progression.LockInstances",                   true);
+    gCfg.lockMaps          = sConfigMgr->GetOption<bool>("Nostrum.Progression.LockMaps",                        true);
+    gCfg.lockBattlegrounds = sConfigMgr->GetOption<bool>("Nostrum.Progression.LockBattlegrounds",               true);
+    gCfg.lockLFG           = sConfigMgr->GetOption<bool>("Nostrum.Progression.LockLFG",                         true);
+    gCfg.lockWorldBosses   = sConfigMgr->GetOption<bool>("Nostrum.Progression.LockWorldBosses",                 true);
+    gCfg.lockVendors       = sConfigMgr->GetOption<bool>("Nostrum.Progression.LockVendors",                     true);
+    gCfg.teleportOutLocked = sConfigMgr->GetOption<bool>("Nostrum.Progression.TeleportOutOfLockedMapsOnLogin",  true);
+    gCfg.debug             = sConfigMgr->GetOption<bool>("Nostrum.Progression.Debug",                           false);
+
+    LOG_INFO("module", ">> NostrumProgression: {} — cap {} — enabled={} era={} phase={}",
+        GetPhaseName(), uint32(GetLevelCap()), gCfg.enabled, uint32(gCfg.era), uint32(gCfg.phase));
 }
 
 } // anonymous namespace
@@ -293,16 +368,18 @@ public:
             PLAYERHOOK_ON_LOGIN,
             PLAYERHOOK_ON_LEVEL_CHANGED,
             PLAYERHOOK_ON_GIVE_EXP,
+            PLAYERHOOK_ON_BEFORE_TELEPORT,
             PLAYERHOOK_CAN_ENTER_MAP,
             PLAYERHOOK_CAN_JOIN_IN_BATTLEGROUND_QUEUE,
             PLAYERHOOK_CAN_BATTLEFIELD_PORT,
             PLAYERHOOK_CAN_JOIN_LFG,
+            PLAYERHOOK_ON_BEFORE_BUY_ITEM_FROM_VENDOR,
         })
     {
     }
 
     // -----------------------------------------------------------------------
-    // Login — level cap + teleport out of locked maps
+    // Login — level cap + teleport out of locked continents/instances
     // -----------------------------------------------------------------------
 
     void OnPlayerLogin(Player* player) override
@@ -310,25 +387,34 @@ public:
         if (!gCfg.enabled)
             return;
 
-        uint8       cap  = kPhases[gCfg.activePhase].cap;
-        char const* name = kPhases[gCfg.activePhase].name;
+        uint8 cap = GetLevelCap();
 
         if (IsExempt(player))
         {
             if (gCfg.loginAnnouncement)
                 ChatHandler(player->GetSession()).PSendSysMessage(
-                    "[NostrumWoW] {} — Level cap: {} (GM bypass active)", name, uint32(cap));
+                    "[NostrumWoW] {} — Level cap: {} (GM bypass active)", GetPhaseName(), uint32(cap));
             return;
         }
 
         if (player->GetLevel() > cap)
-            EnforceCap(player, cap, name);
+            EnforceCap(player, cap);
 
         if (gCfg.loginAnnouncement)
             ChatHandler(player->GetSession()).PSendSysMessage(
-                "[NostrumWoW] {} — Current level cap: {}", name, uint32(cap));
+                "[NostrumWoW] {} — Current level cap: {}", GetPhaseName(), uint32(cap));
 
-        if (gCfg.lockInstances && gCfg.teleportOutLocked && !IsInstanceMapUnlocked(player->GetMapId()))
+        uint32 mapId = player->GetMapId();
+
+        if (gCfg.lockMaps && IsMapLocked(mapId))
+        {
+            ChatHandler(player->GetSession()).SendSysMessage(
+                "[NostrumWoW] You have been moved — this area is locked until a later Nostrum Era.");
+            TeleportToHomebind(player);
+            return;
+        }
+
+        if (gCfg.lockInstances && gCfg.teleportOutLocked && IsInstanceLocked(mapId))
         {
             ChatHandler(player->GetSession()).SendSysMessage(
                 "[NostrumWoW] You have been moved because this instance is locked in the current progression phase.");
@@ -345,9 +431,9 @@ public:
         if (!gCfg.enabled || IsExempt(player))
             return;
 
-        uint8 cap = kPhases[gCfg.activePhase].cap;
+        uint8 cap = GetLevelCap();
         if (player->GetLevel() > cap)
-            EnforceCap(player, cap, kPhases[gCfg.activePhase].name);
+            EnforceCap(player, cap);
     }
 
     // -----------------------------------------------------------------------
@@ -359,12 +445,37 @@ public:
         if (!gCfg.enabled || IsExempt(player))
             return;
 
-        if (player->GetLevel() >= kPhases[gCfg.activePhase].cap)
+        if (player->GetLevel() >= GetLevelCap())
             amount = 0;
     }
 
     // -----------------------------------------------------------------------
-    // Map entry gate
+    // Continent / map teleport gate
+    // Covers: Dark Portal, boats, zeppelins, portals, hearthstone, summons.
+    // -----------------------------------------------------------------------
+
+    bool OnPlayerBeforeTeleport(Player* player, uint32 mapId, float /*x*/, float /*y*/,
+                                float /*z*/, float /*orientation*/, uint32 /*options*/,
+                                Unit* /*target*/) override
+    {
+        if (!gCfg.lockMaps || IsExempt(player))
+            return true;
+
+        if (!IsMapLocked(mapId))
+            return true;
+
+        if (gCfg.debug)
+            LOG_INFO("module.nostrum.progression",
+                "Map teleport blocked: player={} mapId={} era={} phase={}",
+                player->GetName(), mapId, uint32(gCfg.era), uint32(gCfg.phase));
+
+        ChatHandler(player->GetSession()).SendSysMessage(
+            "[NostrumWoW] This area is locked until a later Nostrum Era.");
+        return false;
+    }
+
+    // -----------------------------------------------------------------------
+    // Instance map entry gate
     // -----------------------------------------------------------------------
 
     bool OnPlayerCanEnterMap(Player* player, MapEntry const* entry,
@@ -375,47 +486,49 @@ public:
         if (!gCfg.lockInstances || IsExempt(player))
             return true;
 
-        uint32 mapId         = entry->MapID;
-        bool   allowed       = IsInstanceMapUnlocked(mapId);
+        uint32 mapId   = entry->MapID;
+        bool   locked  = IsInstanceLocked(mapId);
 
         if (gCfg.debug)
         {
-            auto itr          = kInstanceUnlockPhase.find(mapId);
-            uint8 required    = (itr != kInstanceUnlockPhase.end()) ? itr->second : 0;
+            auto it        = kInstanceLock.find(mapId);
+            uint8 reqEra   = it != kInstanceLock.end() ? it->second.era   : 0;
+            uint8 reqPhase = it != kInstanceLock.end() ? it->second.phase : 0;
             LOG_INFO("module.nostrum.progression",
-                "Map entry check: player={} phase={} mapId={} required={} allowed={}",
-                player->GetName(), uint32(gCfg.activePhase), mapId, uint32(required), allowed);
+                "Instance entry check: player={} mapId={} required=({},{}) current=({},{}) locked={}",
+                player->GetName(), mapId, uint32(reqEra), uint32(reqPhase),
+                uint32(gCfg.era), uint32(gCfg.phase), locked);
         }
 
-        if (!allowed)
+        if (locked)
             ChatHandler(player->GetSession()).SendSysMessage(
                 "[NostrumWoW] This instance is locked until a later progression phase.");
 
-        return allowed;
+        return !locked;
     }
 
     // -----------------------------------------------------------------------
     // Battleground queue gate
     // -----------------------------------------------------------------------
 
-    bool OnPlayerCanJoinInBattlegroundQueue(Player* player, ObjectGuid /*BattlemasterGuid*/,
-                                            BattlegroundTypeId BGTypeID, uint8 /*joinAsGroup*/,
+    bool OnPlayerCanJoinInBattlegroundQueue(Player* player, ObjectGuid /*bmGuid*/,
+                                            BattlegroundTypeId bgTypeId, uint8 /*joinAsGroup*/,
                                             GroupJoinBattlegroundResult& /*err*/) override
     {
         if (!gCfg.lockBattlegrounds || IsExempt(player))
             return true;
 
-        uint32 bgType  = static_cast<uint32>(BGTypeID);
-        bool   allowed = IsBattlegroundUnlocked(bgType);
+        auto it = kBattlegroundLock.find(static_cast<uint32>(bgTypeId));
+        if (it == kBattlegroundLock.end())
+            return true;
+
+        bool allowed = IsUnlocked(it->second.era, it->second.phase);
 
         if (gCfg.debug)
-        {
-            auto itr       = kBattlegroundUnlockPhase.find(bgType);
-            uint8 required = (itr != kBattlegroundUnlockPhase.end()) ? itr->second : 0;
             LOG_INFO("module.nostrum.progression",
-                "BG queue check: player={} phase={} bgType={} required={} allowed={}",
-                player->GetName(), uint32(gCfg.activePhase), bgType, uint32(required), allowed);
-        }
+                "BG queue check: player={} bgType={} required=({},{}) allowed={}",
+                player->GetName(), uint32(bgTypeId),
+                uint32(it->second.era), uint32(it->second.phase), allowed);
 
         if (!allowed)
             ChatHandler(player->GetSession()).SendSysMessage(
@@ -426,13 +539,16 @@ public:
 
     // Second-layer defence: catches port-in after a phase change.
     bool OnPlayerCanBattleFieldPort(Player* player, uint8 /*arenaType*/,
-                                    BattlegroundTypeId BGTypeID, uint8 /*action*/) override
+                                    BattlegroundTypeId bgTypeId, uint8 /*action*/) override
     {
         if (!gCfg.lockBattlegrounds || IsExempt(player))
             return true;
 
-        uint32 bgType  = static_cast<uint32>(BGTypeID);
-        bool   allowed = IsBattlegroundUnlocked(bgType);
+        auto it = kBattlegroundLock.find(static_cast<uint32>(bgTypeId));
+        if (it == kBattlegroundLock.end())
+            return true;
+
+        bool allowed = IsUnlocked(it->second.era, it->second.phase);
 
         if (!allowed)
             ChatHandler(player->GetSession()).SendSysMessage(
@@ -443,11 +559,6 @@ public:
 
     // -----------------------------------------------------------------------
     // LFG / Dungeon Finder gate
-    //
-    // dungeons is a set<uint32> of LFGDungeonEntry IDs (not map IDs).
-    // We resolve each to its map ID via sLFGDungeonStore and check the lock
-    // table.  If any selected dungeon resolves to a locked map, the queue is
-    // blocked.
     // -----------------------------------------------------------------------
 
     bool OnPlayerCanJoinLfg(Player* player, uint8 /*roles*/,
@@ -463,19 +574,21 @@ public:
             if (!dungeon)
                 continue;
 
-            uint32 mapId   = dungeon->MapID;
-            bool   allowed = IsInstanceMapUnlocked(mapId);
+            uint32 mapId  = dungeon->MapID;
+            bool   locked = IsInstanceLocked(mapId);
 
             if (gCfg.debug)
             {
-                auto itr       = kInstanceUnlockPhase.find(mapId);
-                uint8 required = (itr != kInstanceUnlockPhase.end()) ? itr->second : 0;
+                auto it        = kInstanceLock.find(mapId);
+                uint8 reqEra   = it != kInstanceLock.end() ? it->second.era   : 0;
+                uint8 reqPhase = it != kInstanceLock.end() ? it->second.phase : 0;
                 LOG_INFO("module.nostrum.progression",
-                    "LFG check: player={} phase={} dungeonId={} mapId={} required={} allowed={}",
-                    player->GetName(), uint32(gCfg.activePhase), dungeonId, mapId, uint32(required), allowed);
+                    "LFG check: player={} dungeonId={} mapId={} required=({},{}) locked={}",
+                    player->GetName(), dungeonId, mapId,
+                    uint32(reqEra), uint32(reqPhase), locked);
             }
 
-            if (!allowed)
+            if (locked)
             {
                 ChatHandler(player->GetSession()).SendSysMessage(
                     "[NostrumWoW] One or more selected dungeons are locked until a later progression phase.");
@@ -486,18 +599,72 @@ public:
         return true;
     }
 
+    // -----------------------------------------------------------------------
+    // Vendor currency item gate (badge/emblem purchases)
+    // -----------------------------------------------------------------------
+
+    void OnPlayerBeforeBuyItemFromVendor(Player* player, ObjectGuid /*vendorGuid*/,
+                                         uint32 /*vendorSlot*/, uint32& itemEntry,
+                                         uint8 /*count*/, uint8 /*bag*/, uint8 /*slot*/) override
+    {
+        if (!gCfg.lockVendors || IsExempt(player))
+            return;
+
+        auto it = kCurrencyItemLock.find(itemEntry);
+        if (it == kCurrencyItemLock.end())
+            return;
+
+        if (IsUnlocked(it->second.era, it->second.phase))
+            return;
+
+        ChatHandler(player->GetSession()).SendSysMessage(
+            "[NostrumWoW] This currency is locked until a later Nostrum phase.");
+        itemEntry = 0; // cancel the purchase
+    }
+
 private:
     bool IsExempt(Player* player) const
     {
         return gCfg.gmBypass && player->GetSession()->GetSecurity() >= SEC_GAMEMASTER;
     }
 
-    void EnforceCap(Player* player, uint8 cap, char const* phaseName) const
+    void EnforceCap(Player* player, uint8 cap) const
     {
         player->GiveLevel(cap);
         player->SetUInt32Value(PLAYER_XP, 0);
         ChatHandler(player->GetSession()).PSendSysMessage(
-            "[NostrumWoW] Your level has been set to {} — {} cap enforced.", uint32(cap), phaseName);
+            "[NostrumWoW] The current Nostrum phase is capped at level {}.", uint32(cap));
+    }
+};
+
+// ---------------------------------------------------------------------------
+// AllCreatureScript — world boss spawn prevention
+// ---------------------------------------------------------------------------
+
+class NostrumProgressionCreatureScript : public AllCreatureScript
+{
+public:
+    NostrumProgressionCreatureScript() : AllCreatureScript("NostrumProgressionCreatureScript") {}
+
+    void OnCreatureAddWorld(Creature* creature) override
+    {
+        if (!gCfg.enabled || !gCfg.lockWorldBosses)
+            return;
+
+        auto it = kWorldBossLock.find(creature->GetEntry());
+        if (it == kWorldBossLock.end())
+            return;
+
+        if (IsUnlocked(it->second.era, it->second.phase))
+            return;
+
+        LOG_INFO("module.nostrum.progression",
+            "NostrumProgression: despawning locked world boss entry={} current=({},{})",
+            creature->GetEntry(), uint32(gCfg.era), uint32(gCfg.phase));
+
+        // Use a long forced respawn so it doesn't spam-respawn every few seconds.
+        // When the phase advances, an admin can respawn manually via `.npc respawn`.
+        creature->DespawnOrUnsummon(0ms, Seconds(7 * 24 * 3600));
     }
 };
 
@@ -509,4 +676,5 @@ void Addmod_nostrum_progressionScripts()
 {
     new NostrumProgressionWorldScript();
     new NostrumProgressionPlayerScript();
+    new NostrumProgressionCreatureScript();
 }

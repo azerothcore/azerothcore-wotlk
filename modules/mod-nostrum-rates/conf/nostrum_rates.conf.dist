@@ -16,13 +16,13 @@
 NostrumRates.Enable = 1
 
 ################################################################################
-# Active Phase
+# Active Era / Phase
 #
-# Controlled via Nostrum.ActivePhase in mod_nostrum_progression.conf.
-# That single value drives both the level cap (progression module) and the
-# XP rate brackets + Death Knight lock (this module). Do not duplicate it here.
+# Controlled via Nostrum.Progression.Era and Nostrum.Progression.Phase in
+# mod_nostrum_progression.conf. Those values drive both the level cap and
+# the XP rate brackets + Death Knight lock. Do not duplicate them here.
 #
-# See mod_nostrum_progression.conf for the full phase table.
+# See mod_nostrum_progression.conf for the full era/phase table.
 ################################################################################
 
 ################################################################################
@@ -60,13 +60,13 @@ NostrumRates.XP.Battleground = 1.0
 ################################################################################
 # Death Knight Creation Lock
 #
-# When enabled, Death Knight character creation is blocked while ActivePhase < 7.
-# Death Knights start at level 55 and belong to WotLK content (Phase 7).
+# When enabled, Death Knight character creation is blocked before Northrend Era.
+# Death Knights start at level 55 and belong to WotLK content (Northrend Era).
 #
 # Default: 1
 ################################################################################
 
-NostrumRates.BlockDKBeforePhase7 = 1
+NostrumRates.BlockDKBeforeNorthrendEra = 1
 
 ################################################################################
 # Reputation Rates

@@ -4,7 +4,7 @@
 # Server onboarding hub NPCs in every starting zone.
 # Phase and rate info is read from shared config keys:
 #
-#   Nostrum.ActivePhase              (shared: mod-nostrum-progression, mod-nostrum-rates)
+#   Nostrum.Progression.Era + Nostrum.Progression.Phase              (shared: mod-nostrum-progression, mod-nostrum-rates)
 #   NostrumRates.XP.*                (owned by mod-nostrum-rates)
 #   NostrumRates.Profession.*        (owned by mod-nostrum-rates)
 #   NostrumRates.Loot.Creature       (owned by mod-nostrum-rates)
@@ -12,7 +12,7 @@
 #   NostrumRates.Reputation.*        (owned by mod-nostrum-rates)
 #
 # The guide derives phase name and level cap from the bracket table
-# (matching mod-nostrum-rates) driven by Nostrum.ActivePhase.
+# (matching mod-nostrum-rates) driven by Nostrum.Progression.Era + Nostrum.Progression.Phase.
 # Do NOT duplicate those keys here.
 ################################################################################
 
@@ -53,7 +53,7 @@ NostrumGuide.DiscordUrl = https://discord.gg/ebvrN5kqTJ
 ################################################################################
 # Rates Description
 #
-# Phase, level cap, and numeric rates are auto-read from Nostrum.ActivePhase
+# Phase, level cap, and numeric rates are auto-read from Nostrum.Progression.Era + Nostrum.Progression.Phase
 # and NostrumRates.* keys. This text is appended after the rate summary
 # in the NPC "Features, phase & rates" menu for additional context.
 ################################################################################

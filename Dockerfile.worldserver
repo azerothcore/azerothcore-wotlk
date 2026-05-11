@@ -1,0 +1,86 @@
+FROM ubuntu:22.04 AS build
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    cmake \
+    file \
+    clang \
+    libmysqlclient-dev \
+    libssl-dev \
+    libboost-all-dev \
+    libreadline-dev \
+    zlib1g-dev \
+    libbz2-dev \
+    libncurses-dev \
+    git \
+    pax-utils \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /azerothcore-src
+
+COPY . .
+
+RUN mkdir -p build && \
+    cd build && \
+    cmake .. \
+      -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+      -DCMAKE_INSTALL_PREFIX=/azerothcore/env/dist \
+      -DTOOLS=0 \
+      -DSCRIPTS=static && \
+    cmake --build . --target worldserver -- -j$(nproc)
+
+RUN mkdir -p /tmp/worldserver-build /tmp/worldserver-runtime-libs && \
+    WORLD_BIN="$(find build -type f -name worldserver -perm /111 | head -n 1)" && \
+    if [ -z "$WORLD_BIN" ]; then \
+      echo "Executable worldserver binary not found"; \
+      find build -name "worldserver" -print -exec file {} \; || true; \
+      exit 1; \
+    fi && \
+    echo "Using binary: $WORLD_BIN" && \
+    cp "$WORLD_BIN" /tmp/worldserver-build/worldserver && \
+    chmod +x /tmp/worldserver-build/worldserver && \
+    file /tmp/worldserver-build/worldserver && \
+    echo "Dependency list:" && \
+    ldd /tmp/worldserver-build/worldserver && \
+    lddtree -l /tmp/worldserver-build/worldserver \
+      | grep '^/' \
+      | sort -u \
+      | while read lib; do \
+          if [ -f "$lib" ] && [ "$lib" != "/tmp/worldserver-build/worldserver" ]; then \
+            echo "Copying $lib"; \
+            cp -v "$lib" /tmp/worldserver-runtime-libs/; \
+          fi; \
+        done && \
+    echo "Copied runtime libraries:" && \
+    ls -lah /tmp/worldserver-runtime-libs
+
+FROM acore/ac-wotlk-worldserver:master
+
+USER root
+
+COPY --from=build /tmp/worldserver-build/worldserver /azerothcore/env/dist/bin/worldserver
+COPY --from=build /tmp/worldserver-runtime-libs/ /opt/nostrum-libs/
+
+ENV LD_LIBRARY_PATH="/opt/nostrum-libs:${LD_LIBRARY_PATH}"
+
+RUN chmod +x /azerothcore/env/dist/bin/worldserver && \
+    chown acore:acore /azerothcore/env/dist/bin/worldserver
+
+COPY modules/mod-dual-spec-19/conf/mod-dual-spec-19.conf.dist /azerothcore/env/dist/etc/mod-dual-spec-19.conf
+COPY modules/mod-level-rewards/conf/mod-level-rewards.conf.dist /azerothcore/env/dist/etc/mod-level-rewards.conf
+COPY modules/mod-nostrum-rates/conf/nostrum_rates.conf.dist /azerothcore/env/dist/etc/nostrum_rates.conf
+COPY modules/mod-nostrum-bg-xp/conf/nostrum_bg_xp.conf.dist /azerothcore/env/dist/etc/nostrum_bg_xp.conf
+COPY modules/mod-nostrum-crossfaction/conf/mod_nostrum_crossfaction.conf.dist /azerothcore/env/dist/etc/mod_nostrum_crossfaction.conf
+COPY modules/mod-nostrum-guide/conf/mod_nostrum_guide.conf.dist /azerothcore/env/dist/etc/mod_nostrum_guide.conf
+COPY modules/mod-nostrum-hardcore/conf/mod_nostrum_hardcore.conf.dist /azerothcore/env/dist/etc/mod_nostrum_hardcore.conf
+COPY modules/mod_nostrum_instant_mail/conf/mod_nostrum_instant_mail.conf.dist /azerothcore/env/dist/etc/mod_nostrum_instant_mail.conf
+COPY modules/mod-nostrum-progression/conf/mod_nostrum_progression.conf.dist /azerothcore/env/dist/etc/mod_nostrum_progression.conf
+COPY modules/mod-nostrum-starter/conf/mod_nostrum_starter.conf.dist /azerothcore/env/dist/etc/mod_nostrum_starter.conf
+COPY modules/mod-cfbg/conf/CFBG.conf.dist /azerothcore/env/dist/etc/CFBG.conf
+COPY modules/mod-transmog/conf/transmog.conf.dist /azerothcore/env/dist/etc/transmog.conf
+COPY modules/mod-world-chat/conf/WorldChat.conf.dist /azerothcore/env/dist/etc/WorldChat.conf
+COPY modules/mod-ah-bot-plus/conf/mod_ahbot.conf.dist /azerothcore/env/dist/etc/mod_ahbot.conf
+
+USER acore

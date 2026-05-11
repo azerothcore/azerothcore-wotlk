@@ -1,9 +1,40 @@
 ################################################################################
 # NostrumWoW Progression Module Configuration
 #
-# To advance the server to the next phase, change Nostrum.ActivePhase and
-# run `.reload config` on the worldserver console. Everything else (level cap,
-# phase name, XP rates, DK lock, content locks) updates automatically.
+# Controls server content availability via a two-axis Era + Phase system.
+# Change Era/Phase and run `.reload config` to advance the server — no restart.
+#
+# Unlock rule:
+#   required era  < current era  → unlocked
+#   required era  > current era  → locked
+#   required era == current era  → unlocked if current phase >= required phase
+#
+# Era values:
+#   1 = Azeroth Era   (phases 1-8,  caps: P1=19 P2=29 P3=39 P4=49 P5+=60)
+#   2 = Outland Era   (phases 1-4,  cap 70)
+#   3 = Northrend Era (phases 1-4,  cap 80)
+#
+# Azeroth Era phases:
+#   Phase 1: The Road to 19
+#   Phase 2: The Road to 29
+#   Phase 3: The Road to 39
+#   Phase 4: The Road to 49
+#   Phase 5: The Road to 60 — Molten Core & Onyxia
+#   Phase 6: Blackwing Lair
+#   Phase 7: Zul'Gurub
+#   Phase 8: Ahn'Qiraj
+#
+# Outland Era phases:
+#   Phase 1: Karazhan, Gruul & Magtheridon
+#   Phase 2: Serpentshrine Cavern & Tempest Keep
+#   Phase 3: Mount Hyjal & Black Temple
+#   Phase 4: Sunwell Plateau
+#
+# Northrend Era phases:
+#   Phase 1: Naxxramas, Obsidian Sanctum & Eye of Eternity
+#   Phase 2: Ulduar
+#   Phase 3: Trial of the Crusader & Onyxia
+#   Phase 4: Icecrown Citadel & Ruby Sanctum
 ################################################################################
 
 [worldserver]
@@ -13,25 +44,16 @@
 Nostrum.Progression.Enable = 1
 
 ################################################################################
-# Active Phase
-#
-# This is the single value that controls the current server phase.
-# It is shared with mod-nostrum-rates, which reads the same key to set XP
-# rates and unlock Death Knight creation.
-#
-# Phase 0 — Beta    : cap 80 (no restriction), 3× XP everywhere
-# Phase 1 — Phase 1 : cap 19
-# Phase 2 — Phase 2 : cap 29  (1-18: 2× catch-up,  19-29: 1×)
-# Phase 3 — Phase 3 : cap 39  (1-28: 2× catch-up,  29-39: 1×)
-# Phase 4 — Phase 4 : cap 49  (1-38: 2× catch-up,  39-49: 1×)
-# Phase 5 — Phase 5 : cap 60  (1-48: 2× catch-up,  49-60: 1×)
-# Phase 6 — Phase 6 : cap 70  (1-59: 2× catch-up,  60-70: 1×) — TBC
-# Phase 7 — Phase 7 : cap 80  (1-69: 2× catch-up,  70-80: 1×) — WotLK, DK unlocked
-#
-# Default: 1
+# Active Era and Phase
 ################################################################################
 
-Nostrum.ActivePhase = 1
+# Current server era. 1=Azeroth  2=Outland  3=Northrend
+# Default: 1
+Nostrum.Progression.Era = 1
+
+# Current phase within the active era.
+# Default: 1
+Nostrum.Progression.Phase = 1
 
 ################################################################################
 # Other options
@@ -41,7 +63,7 @@ Nostrum.ActivePhase = 1
 # Default: 1
 Nostrum.Progression.GmBypass = 1
 
-# Send a login message showing the current phase and level cap.
+# Send a login message showing the current era, phase, and level cap.
 # Default: 1
 Nostrum.Progression.LoginAnnouncement = 1
 
@@ -49,25 +71,37 @@ Nostrum.Progression.LoginAnnouncement = 1
 # Progression Content Locks
 ################################################################################
 
-# Lock dungeon and raid maps by progression phase.
-# Players cannot enter instance portals or be teleported into maps that require
-# a later phase. Phase 0 bypasses all locks.
+# Lock dungeon and raid maps by progression era/phase.
 # Default: 1
 Nostrum.Progression.LockInstances = 1
 
-# If a player logs in inside a locked instance, teleport them to their homebind.
+# Lock continent maps (Outland, Northrend, DK zone) by progression era.
+# This is the safety net for portals, boats, zeppelins, summons, and hearthstone.
 # Default: 1
-Nostrum.Progression.TeleportOutOfLockedMapsOnLogin = 1
+Nostrum.Progression.LockMaps = 1
 
-# Lock battleground queues by progression phase.
+# Lock battleground queues by progression era/phase.
 # Default: 1
 Nostrum.Progression.LockBattlegrounds = 1
 
-# Lock Dungeon Finder (LFG) queues by progression phase.
-# Any selected dungeon that requires a later phase blocks the queue.
+# Lock Dungeon Finder (LFG) queues by progression era/phase.
 # Default: 1
 Nostrum.Progression.LockLFG = 1
 
-# Debug logging for progression lock checks (map entry, BG queue, LFG).
+# Despawn world bosses (Azuregos, Lord Kazzak, Dragons of Nightmare, etc.)
+# when they spawn before their required progression era/phase.
+# Default: 1
+Nostrum.Progression.LockWorldBosses = 1
+
+# Block purchase of locked badge/emblem currency items from vendors.
+# Default: 1
+Nostrum.Progression.LockVendors = 1
+
+# If a player logs in inside a locked instance or continent map, teleport them
+# to their homebind.
+# Default: 1
+Nostrum.Progression.TeleportOutOfLockedMapsOnLogin = 1
+
+# Debug logging for progression lock checks.
 # Default: 0
 Nostrum.Progression.Debug = 0
