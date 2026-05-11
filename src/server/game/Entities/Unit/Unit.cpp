@@ -10115,6 +10115,100 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, Spell const* spell)
     return false;
 }
 
+bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, Unit const* caster)
+{
+    if (!spellInfo)
+        return false;
+
+    // Single spell immunity.
+    SpellImmuneContainer const& idList = m_spellImmune[IMMUNITY_ID];
+    if (idList.count(spellInfo->Id) > 0)
+        return true;
+
+    // xinef: my special immunity, if spellid is not on this list it means npc is immune
+    SpellImmuneContainer const& allowIdList = m_spellImmune[IMMUNITY_ALLOW_ID];
+    if (!allowIdList.empty())
+    {
+        if (allowIdList.count(spellInfo->Id) == 0)
+            return true;
+        return false;
+    }
+
+    if (spellInfo->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES) && !HasSpiritOfRedemptionAura())
+        return false;
+
+    Unit const* spellCaster = caster;
+
+    if (uint32 dispel = spellInfo->Dispel)
+    {
+        SpellImmuneContainer const& dispelList = m_spellImmune[IMMUNITY_DISPEL];
+        if (dispelList.count(dispel) > 0)
+            return true;
+    }
+
+    // Spells that don't have effectMechanics.
+    if (uint32 mechanic = spellInfo->Mechanic)
+    {
+        SpellImmuneContainer const& mechanicList = m_spellImmune[IMMUNITY_MECHANIC];
+        for (auto const& [immunityMechanic, immunitySpellId] : mechanicList)
+        {
+            if (immunityMechanic != mechanic)
+                continue;
+            SpellInfo const* immuneSpellInfo = sSpellMgr->GetSpellInfo(immunitySpellId);
+            if (spellCaster && spellCaster->IsFriendlyTo(this) && immuneSpellInfo
+                    && !immuneSpellInfo->HasAttribute(SPELL_ATTR1_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS)
+                    && !(spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION))
+                continue;
+            return true;
+        }
+    }
+
+    bool immuneToAllEffects = true;
+    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+    {
+        if (!spellInfo->Effects[i].IsEffect())
+            continue;
+
+        if (IsImmunedToSpellEffect(spellInfo, i, spellCaster))
+        {
+            if (spellInfo->HasAura(SPELL_AURA_TRANSFORM))
+                return true;
+            continue;
+        }
+
+        immuneToAllEffects = false;
+        break;
+    }
+    if (immuneToAllEffects)
+        return true;
+
+    if (!spellInfo->HasAttribute(SPELL_ATTR2_NO_SCHOOL_IMMUNITIES))
+    {
+        SpellSchoolMask spellSchoolMask = spellInfo->GetSchoolMask();
+
+        if (spellSchoolMask != SPELL_SCHOOL_MASK_NONE)
+        {
+            SpellImmuneContainer const& schoolList = m_spellImmune[IMMUNITY_SCHOOL];
+            for (auto itr = schoolList.begin(); itr != schoolList.end(); ++itr)
+            {
+                SpellInfo const* immuneSpellInfo = sSpellMgr->GetSpellInfo(itr->second);
+                if (!(itr->first & spellSchoolMask))
+                    continue;
+
+                if (IgnoresSchoolImmunityFromFriendlyCaster(spellCaster, itr->second, immuneSpellInfo))
+                    continue;
+
+                if (spellInfo->CanPierceImmuneAura(immuneSpellInfo))
+                    continue;
+
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
 bool Unit::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index, Unit const* caster /*= nullptr*/) const
 {
     if (!spellInfo || !spellInfo->Effects[index].IsEffect())
