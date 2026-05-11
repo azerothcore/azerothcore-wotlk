@@ -604,7 +604,7 @@ struct boss_kologarn_eyebeam : public ScriptedAI
             if (Creature* cr = _instance->GetCreature(BOSS_KOLOGARN))
             {
                 me->CastSpell(cr, me->GetEntry() == NPC_EYE_LEFT ? SPELL_FOCUSED_EYEBEAM_LEFT : SPELL_FOCUSED_EYEBEAM_RIGHT, true);
-                cr->AI()->Talk(EMOTE_EYES, player); 
+                cr->AI()->Talk(EMOTE_EYES, player);
             }
         }
     }
