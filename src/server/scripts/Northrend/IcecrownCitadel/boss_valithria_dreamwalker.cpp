@@ -21,6 +21,7 @@
 #include "CreatureScript.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
+#include "GameTime.h"
 #include "ObjectMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
@@ -222,6 +223,25 @@ public:
     {
         Acore::CreatureWorker<ValithriaDespawner> worker(_creature, *this);
         Cell::VisitObjects(_creature, worker, 333.0f);
+
+        // Also fix respawn time for Archmages that were killed and corpse-decayed
+        // during combat (Cell::VisitObjects can't find them once removed from world)
+        if (Map* map = _creature->GetMap())
+        {
+            time_t now = GameTime::GetGameTime().count();
+            for (auto const& [spawnId, respawnTime] : map->GetCreatureRespawnTimes())
+            {
+                if (CreatureData const* data = sObjectMgr->GetCreatureData(spawnId))
+                {
+                    if (data->id1 == NPC_RISEN_ARCHMAGE && data->mapid == map->GetId())
+                    {
+                        time_t rt = now + 11;
+                        map->SaveCreatureRespawnTime(spawnId, rt);
+                    }
+                }
+            }
+        }
+
         _creature->AI()->Reset();
         _creature->setActive(false);
         return true;
@@ -259,23 +279,13 @@ public:
                 return;
         }
 
-        uint32 corpseDelay = creature->GetCorpseDelay();
-        uint32 respawnDelay = creature->GetRespawnDelay();
-        creature->SetCorpseDelay(1);
-        creature->SetRespawnDelay(10);
-
         if (CreatureData const* data = creature->GetCreatureData())
             creature->SetPosition(data->posX, data->posY, data->posZ, data->orientation);
-        if (!creature->IsAlive())
-        {
-            creature->RemoveCorpse(false);
-            creature->SetRespawnTime(11);
-        }
-        else
-            creature->DespawnOrUnsummon();
 
-        creature->SetCorpseDelay(corpseDelay);
-        creature->SetRespawnDelay(respawnDelay);
+        if (creature->GetEntry() == NPC_RISEN_ARCHMAGE)
+            creature->DespawnOrUnsummon(0ms, 11s); // 11s respawn for Archmages
+        else
+            creature->DespawnOrUnsummon(); // Valithria: use DB default respawn time
     }
 
 private:
