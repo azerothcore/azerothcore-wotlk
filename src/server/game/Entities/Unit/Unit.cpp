@@ -10137,8 +10137,6 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, Unit const* caster)
     if (spellInfo->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES) && !HasSpiritOfRedemptionAura())
         return false;
 
-    Unit const* spellCaster = caster;
-
     if (uint32 dispel = spellInfo->Dispel)
     {
         SpellImmuneContainer const& dispelList = m_spellImmune[IMMUNITY_DISPEL];
@@ -10155,7 +10153,7 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, Unit const* caster)
             if (immunityMechanic != mechanic)
                 continue;
             SpellInfo const* immuneSpellInfo = sSpellMgr->GetSpellInfo(immunitySpellId);
-            if (spellCaster && spellCaster->IsFriendlyTo(this) && immuneSpellInfo
+            if (caster && caster->IsFriendlyTo(this) && immuneSpellInfo
                     && !immuneSpellInfo->HasAttribute(SPELL_ATTR1_IMMUNITY_TO_HOSTILE_AND_FRIENDLY_EFFECTS)
                     && !(spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION))
                 continue;
@@ -10169,7 +10167,7 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, Unit const* caster)
         if (!spellInfo->Effects[i].IsEffect())
             continue;
 
-        if (IsImmunedToSpellEffect(spellInfo, i, spellCaster))
+        if (IsImmunedToSpellEffect(spellInfo, i, caster))
         {
             if (spellInfo->HasAura(SPELL_AURA_TRANSFORM))
                 return true;
@@ -10195,7 +10193,7 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, Unit const* caster)
                 if (!(itr->first & spellSchoolMask))
                     continue;
 
-                if (IgnoresSchoolImmunityFromFriendlyCaster(spellCaster, itr->second, immuneSpellInfo))
+                if (IgnoresSchoolImmunityFromFriendlyCaster(caster, itr->second, immuneSpellInfo))
                     continue;
 
                 if (spellInfo->CanPierceImmuneAura(immuneSpellInfo))
@@ -10243,7 +10241,7 @@ bool Unit::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index, Unit
 
     if (uint32 mechanic = spellInfo->Effects[index].Mechanic)
     {
-        auto const& mechanicList = m_spellImmune[IMMUNITY_MECHANIC];
+        SpellImmuneContainer const& mechanicList = m_spellImmune[IMMUNITY_MECHANIC];
         for (auto const& [immunityMechanic, immunitySpellId] : mechanicList)
         {
             if (immunityMechanic != mechanic)
