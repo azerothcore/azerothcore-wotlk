@@ -57,7 +57,7 @@ public:
         // allow use in flight only
         if (player->IsInFlight() && !disabled)
             return false;
-			
+
         // error
         if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_ARCANE_CHARGES))
             Spell::SendCastResult(player, spellInfo, 1, SPELL_FAILED_NOT_ON_GROUND);		
