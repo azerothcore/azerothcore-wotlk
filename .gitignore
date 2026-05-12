@@ -130,3 +130,5 @@ local.properties
 !modules/mod-ah-bot-plus
 !modules/mod-world-chat
 !modules/mod-reserved-names
+
+/launch/
