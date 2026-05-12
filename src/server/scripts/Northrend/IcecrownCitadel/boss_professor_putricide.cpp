@@ -133,6 +133,7 @@ enum Events
     EVENT_UNBOUND_PLAGUE,
     EVENT_MALLEABLE_GOO,
     EVENT_CHOKING_GAS_BOMB,
+    EVENT_MUTATED_PLAGUE,
 };
 
 #define EVENT_GROUP_ABILITIES 1
@@ -653,6 +654,11 @@ public:
                     me->CastSpell(me, SPELL_CHOKING_GAS_BOMB, false);
                     events.ScheduleEvent(EVENT_CHOKING_GAS_BOMB, 35s, 40s, EVENT_GROUP_ABILITIES);
                     break;
+                case EVENT_MUTATED_PLAGUE:
+                    if (Unit* target = me->GetVictim())
+                        me->CastSpell(target, SPELL_MUTATED_PLAGUE, false);
+                    events.ScheduleEvent(EVENT_MUTATED_PLAGUE, 10s, EVENT_GROUP_ABILITIES);
+                    break;
                 default:
                     break;
             }
@@ -721,6 +727,7 @@ public:
                 case 2:
                     _phase = 3;
                     events.CancelEvent(EVENT_UNSTABLE_EXPERIMENT);
+                    events.ScheduleEvent(EVENT_MUTATED_PLAGUE, 10s, EVENT_GROUP_ABILITIES);
                     break;
                 default:
                     break;
