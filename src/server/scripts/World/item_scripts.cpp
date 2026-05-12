@@ -55,15 +55,22 @@ public:
         }
 
         // allow use in flight only
-        if (player->IsInFlight() && !disabled)
-            return false;
+        if (player->IsInFlight())
+        {
+            if (!disabled)
+                return false;	
+        }
+        else // error
+        {
+            if (itemId == 34475)
+            {
+                if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_ARCANE_CHARGES))
+                    Spell::SendCastResult(player, spellInfo, 1, SPELL_FAILED_NOT_ON_GROUND);
+            }
 
-        // error
-        if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_ARCANE_CHARGES))
-            Spell::SendCastResult(player, spellInfo, 1, SPELL_FAILED_NOT_ON_GROUND);		
-        else
             player->SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW, item, nullptr);
-			
+        }
+
         return true;
     }
 };
