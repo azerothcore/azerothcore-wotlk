@@ -653,6 +653,11 @@ public:
     {
         using namespace Acore::ChatCommands;
 
+        static std::vector<ChatCommandBuilder> joinTable =
+        {
+            { "join", HandleHardcoreJoinGuildCommand, SEC_PLAYER, Console::No },
+        };
+
         static std::vector<ChatCommandBuilder> hardcoreTable =
         {
             { "enable",      HandleHardcoreEnableCommand,     SEC_PLAYER,       Console::No },
@@ -662,6 +667,7 @@ public:
             { "status",      HandleHardcoreStatusCommand,     SEC_PLAYER,       Console::No },
             { "rules",       HandleHardcoreRulesCommand,      SEC_PLAYER,       Console::No },
             { "leaderboard", HandleHardcoreLeaderboardCommand,SEC_PLAYER,       Console::No },
+            { "guild",        joinTable },
             { "info",        HandleHardcoreInfoGmCommand,     SEC_GAMEMASTER,   Console::No },
             { "revive",      HandleHardcoreReviveGmCommand,   SEC_GAMEMASTER,   Console::No },
             { "remove",      HandleHardcoreRemoveGmCommand,   SEC_ADMINISTRATOR,Console::No },
@@ -793,6 +799,24 @@ public:
         {
             handler->PSendSysMessage("Hardcore Mode enabled. Survive.");
         }
+
+        return true;
+    }
+
+    // ---- .hardcore join guild ----
+
+    static bool HandleHardcoreJoinGuildCommand(ChatHandler* handler)
+    {
+        if (!sHardcoreMgr->IsEnabled())
+        {
+            handler->PSendSysMessage("The Hardcore system is currently disabled.");
+            return true;
+        }
+
+        Player* player = handler->GetSession()->GetPlayer();
+        std::string msg;
+        sHardcoreMgr->JoinGuild(player, msg);
+        handler->PSendSysMessage("{}", msg);
 
         return true;
     }

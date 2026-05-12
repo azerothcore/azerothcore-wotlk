@@ -115,9 +115,6 @@ void HardcoreManager::OnPlayerLogin(Player* player)
     if (IsActive(guid))
     {
         ApplyBuff(player);
-
-        if (player->GetGuildId() == 0)
-            EnsureAndJoinGuild(player);
     }
 }
 
@@ -303,9 +300,6 @@ bool HardcoreManager::Confirm(Player* player, std::string& outError)
 
     // Apply cosmetic buff and title
     ApplyBuff(player);
-
-    // Auto-join Hardcore guild
-    EnsureAndJoinGuild(player);
 
     // Announce globally
     if (_config.announceOptIn)
@@ -794,6 +788,17 @@ void HardcoreManager::EnsureAndJoinGuild(Player* player)
     if (!_config.autoGuildEnable)
         return;
 
+    uint32 guid = player->GetGUID().GetCounter();
+
+    // Only Hardcore mode may join — Self-Found and regular players cannot.
+    HardcoreData* data = GetData(guid);
+    if (!data || data->mode != HardcoreMode::Hardcore || data->status != HardcoreStatus::Active)
+    {
+        ChatHandler(player->GetSession()).PSendSysMessage(
+            "Only Hardcore players can join {}.", _config.autoGuildName);
+        return;
+    }
+
     if (player->GetGuildId() != 0)
     {
         if (_config.debug)
@@ -1032,6 +1037,50 @@ bool HardcoreManager::PlayerDisable(Player* player, std::string& outMsg)
 
     outMsg = "Hardcore mode has been disabled. You are now a normal character.";
     return true;
+}
+
+// ---------------------------------------------------------------------------
+// Guild — optional .hardcore join guild command
+// ---------------------------------------------------------------------------
+
+bool HardcoreManager::JoinGuild(Player* player, std::string& outMsg)
+{
+    if (!_config.autoGuildEnable)
+    {
+        outMsg = "The Hardcore guild is not available.";
+        return false;
+    }
+
+    uint32 guid = player->GetGUID().GetCounter();
+
+    HardcoreData* data = GetData(guid);
+    if (!data || data->status != HardcoreStatus::Active)
+    {
+        outMsg = "Only active Hardcore characters can join the guild.";
+        return false;
+    }
+
+    if (data->mode != HardcoreMode::Hardcore)
+    {
+        outMsg = Acore::StringFormat(
+            "Self-Found characters cannot join {}.", _config.autoGuildName);
+        return false;
+    }
+
+    if (player->GetGuildId() != 0)
+    {
+        outMsg = "You are already in a guild. Leave it first to join Deathwalkers.";
+        return false;
+    }
+
+    EnsureAndJoinGuild(player);
+
+    if (player->GetGuildId() != 0)
+        outMsg = Acore::StringFormat("You have joined {}.", _config.autoGuildName);
+    else
+        outMsg = "Could not join the guild. Please contact a GM.";
+
+    return player->GetGuildId() != 0;
 }
 
 // ---------------------------------------------------------------------------

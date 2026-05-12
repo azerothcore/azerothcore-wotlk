@@ -1,0 +1,19 @@
+################################################################################
+# NostrumWoW Reserved Names Module
+#
+# Prevents a character from being created with a name that is reserved for a
+# different account in acore_auth.reserved_character_names.
+# The account that owns the reservation may always claim their name.
+################################################################################
+
+[worldserver]
+
+# Master switch. Set to 0 to disable all reservation checks.
+# Default: 1
+ReservedNames.Enable = 1
+
+# When set to 1, the reservation row is deleted from reserved_character_names
+# after the rightful account successfully creates a character with that name.
+# When set to 0, the row is kept for audit purposes.
+# Default: 0
+ReservedNames.DeleteReservationOnSuccessfulClaim = 0

@@ -20,7 +20,6 @@
 /.env*
 /apps/joiner
 /deps/deno
-/data/sql/custom/*
 /src/server/scripts/Custom/*
 !/src/server/scripts/Custom/README.md
 
@@ -129,3 +128,6 @@ local.properties
 !modules/mod-transmog
 !modules/mod-ah-bot-plus
 !modules/mod-world-chat
+!modules/mod-reserved-names
+
+/launch/

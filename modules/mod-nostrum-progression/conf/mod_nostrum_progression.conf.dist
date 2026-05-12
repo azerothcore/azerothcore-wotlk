@@ -10,31 +10,33 @@
 #   required era == current era  → unlocked if current phase >= required phase
 #
 # Era values:
-#   1 = Azeroth Era   (phases 1-8,  caps: P1=19 P2=29 P3=39 P4=49 P5+=60)
-#   2 = Outland Era   (phases 1-4,  cap 70)
-#   3 = Northrend Era (phases 1-4,  cap 80)
+#   1 = Azeroth Era   (phases 1-8,  caps: P1=19 P2=29 P3=39 P4=49 P5=59 P6+=60)
+#   2 = Outland Era   (phases 1-5,  cap 70)
+#   3 = Northrend Era (phases 1-5,  cap 80)
 #
 # Azeroth Era phases:
 #   Phase 1: The Road to 19
-#   Phase 2: The Road to 29
-#   Phase 3: The Road to 39
+#   Phase 2: The Road to 29  (SM Graveyard opens)
+#   Phase 3: The Road to 39  (SM Library, Armory & Cathedral open)
 #   Phase 4: The Road to 49
-#   Phase 5: The Road to 60 — Molten Core & Onyxia
-#   Phase 6: Blackwing Lair
-#   Phase 7: Zul'Gurub
+#   Phase 5: The Road to 59  (BRD, UBRS, Dire Maul, Stratholme, Scholomance)
+#   Phase 6: Molten Core
+#   Phase 7: Blackwing Lair & Zul'Gurub
 #   Phase 8: Ahn'Qiraj
 #
 # Outland Era phases:
-#   Phase 1: Karazhan, Gruul & Magtheridon
-#   Phase 2: Serpentshrine Cavern & Tempest Keep
-#   Phase 3: Mount Hyjal & Black Temple
-#   Phase 4: Sunwell Plateau
+#   Phase 1: The Road to 69
+#   Phase 2: Karazhan, Gruul & Magtheridon
+#   Phase 3: Serpentshrine Cavern & Tempest Keep
+#   Phase 4: Mount Hyjal & Black Temple
+#   Phase 5: Sunwell Plateau
 #
 # Northrend Era phases:
-#   Phase 1: Naxxramas, Obsidian Sanctum & Eye of Eternity
-#   Phase 2: Ulduar
-#   Phase 3: Trial of the Crusader & Onyxia
-#   Phase 4: Icecrown Citadel & Ruby Sanctum
+#   Phase 1: The Road to 79
+#   Phase 2: Naxxramas, Obsidian Sanctum & Eye of Eternity
+#   Phase 3: Ulduar
+#   Phase 4: Trial of the Crusader & Onyxia
+#   Phase 5: Icecrown Citadel & Ruby Sanctum
 ################################################################################
 
 [worldserver]
@@ -72,6 +74,9 @@ Nostrum.Progression.LoginAnnouncement = 1
 ################################################################################
 
 # Lock dungeon and raid maps by progression era/phase.
+# Also gates individual instance wing portals where multiple wings share a map ID
+# (e.g. Scarlet Monastery: Graveyard unlocks at Phase 2, Library/Armory/Cathedral at Phase 3).
+# Requires the corresponding areatrigger_scripts SQL to be applied (nostrum_progression_areatrigger_scripts.sql).
 # Default: 1
 Nostrum.Progression.LockInstances = 1
 
