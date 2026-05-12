@@ -1,0 +1,23 @@
+-- NostrumWoW Progression — GameObject door/gate locks
+--
+-- BRD Shadowforge Gates that block entry to Upper City until
+-- Azeroth Era 1, Phase 5 (level cap 59).
+--
+-- IMPLEMENTATION
+--   The module uses AllGameObjectScript::OnGameObjectAddWorld to set
+--   GO_FLAG_NOT_SELECTABLE on locked doors at spawn time.  This prevents
+--   the client from offering any interaction (no progress bar, no click).
+--   OnGameObjectRemoveWorld cleans up the tracking set.  On config reload,
+--   RefreshLockedGOs() toggles flags so doors unlock when the phase advances.
+--
+--   CanGameObjectGossipHello is kept as a safety net — if the flag is somehow
+--   bypassed, it still sends the lock message and blocks GameObject::Use().
+--
+--   No ScriptName binding on gameobject_template is required.  This file is
+--   kept for reference only.
+--
+-- LOCKED GAMEOBJECT ENTRIES (also defined in kGameObjectLock in C++)
+--   170559  Shadowforge Gate — BRD Prison -> deeper BRD / Upper City
+--   170560  Shadowforge Gate — paired gate object
+--
+-- No SQL mutations needed — all logic is in the C++ module.

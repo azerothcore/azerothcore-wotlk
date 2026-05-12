@@ -12,7 +12,7 @@
  *   required era == current era  → unlocked if current phase >= required phase
  *
  * Level caps:
- *   Azeroth Phase 1: 19 | Phase 2: 29 | Phase 3: 39 | Phase 4: 49 | Phase 5+: 60
+ *   Azeroth Phase 1: 19 | Phase 2: 29 | Phase 3: 39 | Phase 4: 49 | Phase 5: 59 | Phase 6+: 60
  *   Outland  (any phase): 70
  *   Northrend (any phase): 80
  *
@@ -27,7 +27,10 @@
  */
 
 #include "AllCreatureScript.h"
+#include "AreaTriggerScript.h"
 #include "Chat.h"
+#include "GameObject.h"
+#include "AllGameObjectScript.h"
 #include "Common.h"
 #include "Config.h"
 #include "Creature.h"
@@ -40,6 +43,7 @@
 #include "WorldScript.h"
 
 #include <unordered_map>
+#include <unordered_set>
 
 namespace
 {
@@ -65,43 +69,44 @@ static const std::unordered_map<uint32, EraPhaseKey> kInstanceLock =
     {  36, {1,1} }, // Deadmines
     {  43, {1,1} }, // Wailing Caverns
     {  33, {1,1} }, // Shadowfang Keep
+    {  48, {1,1} }, // Blackfathom Deeps
 
     // ---- Era 1, Phase 2 (cap 29) ----
-    {  48, {1,2} }, // Blackfathom Deeps
     {  34, {1,2} }, // Stormwind Stockade
     {  90, {1,2} }, // Gnomeregan
     {  47, {1,2} }, // Razorfen Kraul
+    // Scarlet Monastery (base; wings gated individually via kAreaTriggerLock)
+    { 189, {1,2} }, // - Graveyard, Library, Armory, Cathedral
 
     // ---- Era 1, Phase 3 (cap 39) ----
-    { 189, {1,3} }, // Scarlet Monastery
     { 129, {1,3} }, // Razorfen Downs
+    {  70, {1,3} }, // Uldaman
 
     // ---- Era 1, Phase 4 (cap 49) ----
-    {  70, {1,4} }, // Uldaman
     { 209, {1,4} }, // Zul'Farrak
     { 349, {1,4} }, // Maraudon
     { 109, {1,4} }, // Sunken Temple
 
-    // ---- Era 1, Phase 5 — Vanilla endgame ----
-    { 230, {1,5} }, // Blackrock Depths
+    // ---- Era 1, Phase 5 — Road to 59  ----
+    { 230, {1,4} }, // Blackrock Depths (base; Upper City gated via kGameObjectLock)
     { 229, {1,5} }, // Blackrock Spire (LBRS/UBRS)
     { 429, {1,5} }, // Dire Maul
     { 329, {1,5} }, // Stratholme
     { 289, {1,5} }, // Scholomance
-    { 409, {1,5} }, // Molten Core
-    { 249, {3,3} }, // Onyxia's Lair (level 60 + level 80 — both gated at Northrend Phase 3)
 
-    // ---- Era 1, Phase 6 — Blackwing Lair ----
-    { 469, {1,6} }, // Blackwing Lair
+    // ---- Era 1, Phase 6 — Vanilla endgame ----
+    { 409, {1,6} }, // Molten Core
 
-    // ---- Era 1, Phase 7 — Zul'Gurub ----
+    // ---- Era 1, Phase 7 — Blackwing Lair & Zul'Gurub ----
+    { 469, {1,7} }, // Blackwing Lair
     { 309, {1,7} }, // Zul'Gurub
 
     // ---- Era 1, Phase 8 — Ahn'Qiraj ----
     { 509, {1,8} }, // Ruins of Ahn'Qiraj (AQ20)
     { 531, {1,8} }, // Temple of Ahn'Qiraj (AQ40)
 
-    // ---- Era 2, Phase 1 — TBC dungeons + opening raids ----
+    // ---- Era 2, Phase 1 — Road to 69 ----
+
     { 543, {2,1} }, // Hellfire Citadel: Ramparts
     { 542, {2,1} }, // Hellfire Citadel: Blood Furnace
     { 540, {2,1} }, // Hellfire Citadel: Shattered Halls
@@ -117,24 +122,26 @@ static const std::unordered_map<uint32, EraPhaseKey> kInstanceLock =
     { 552, {2,1} }, // Tempest Keep: The Arcatraz
     { 269, {2,1} }, // Opening of the Dark Portal / Black Morass
     { 560, {2,1} }, // The Escape From Durnholde / Old Hillsbrad
-    { 585, {2,1} }, // Magister's Terrace
-    { 532, {2,1} }, // Karazhan
-    { 544, {2,1} }, // Magtheridon's Lair
-    { 565, {2,1} }, // Gruul's Lair
 
-    // ---- Era 2, Phase 2 — Serpentshrine & Tempest Keep ----
-    { 548, {2,2} }, // Coilfang: Serpentshrine Cavern
-    { 550, {2,2} }, // Tempest Keep / The Eye
+    // ---- Era 2, Phase 2 — Karazhan, Gruul & Magtheridon ----
+    { 532, {2,2} }, // Karazhan
+    { 544, {2,2} }, // Magtheridon's Lair
+    { 565, {2,2} }, // Gruul's Lair
 
-    // ---- Era 2, Phase 3 — Mount Hyjal & Black Temple ----
-    { 534, {2,3} }, // The Battle for Mount Hyjal
-    { 564, {2,3} }, // Black Temple
-    { 568, {2,3} }, // Zul'Aman
+    // ---- Era 2, Phase 3 — Serpentshrine & Tempest Keep ----
+    { 548, {2,3} }, // Coilfang: Serpentshrine Cavern
+    { 550, {2,3} }, // Tempest Keep / The Eye
 
-    // ---- Era 2, Phase 4 — Sunwell ----
-    { 580, {2,4} }, // Sunwell Plateau
+    // ---- Era 2, Phase 4 — Mount Hyjal & Black Temple ----
+    { 585, {2,4} }, // Magister's Terrace
+    { 534, {2,4} }, // The Battle for Mount Hyjal
+    { 564, {2,4} }, // Black Temple
+    { 568, {2,4} }, // Zul'Aman
 
-    // ---- Era 3, Phase 1 — WotLK dungeons + opening raids ----
+    // ---- Era 2, Phase 5 — Sunwell ----
+    { 580, {2,5} }, // Sunwell Plateau
+
+    // ---- Era 3, Phase 1 — WotLK dungeons ----
     { 574, {3,1} }, // Utgarde Keep
     { 575, {3,1} }, // Utgarde Pinnacle
     { 576, {3,1} }, // The Nexus
@@ -147,25 +154,27 @@ static const std::unordered_map<uint32, EraPhaseKey> kInstanceLock =
     { 619, {3,1} }, // Ahn'kahet: The Old Kingdom
     { 608, {3,1} }, // Violet Hold
     { 595, {3,1} }, // The Culling of Stratholme
-    { 650, {3,1} }, // Trial of the Champion
-    { 632, {3,1} }, // The Forge of Souls
-    { 658, {3,1} }, // Pit of Saron
-    { 668, {3,1} }, // Halls of Reflection
-    { 533, {3,1} }, // Naxxramas
-    { 615, {3,1} }, // The Obsidian Sanctum
-    { 616, {3,1} }, // The Eye of Eternity
-    { 624, {3,1} }, // Vault of Archavon
 
-    // ---- Era 3, Phase 2 — Ulduar ----
-    { 603, {3,2} }, // Ulduar
+    // ---- Era 3, Phase 2 — Naxxramas, Obsidian Sanctum & Eye of Eternity ----
+    { 533, {3,2} }, // Naxxramas
+    { 615, {3,2} }, // The Obsidian Sanctum
+    { 616, {3,2} }, // The Eye of Eternity
+    { 624, {3,2} }, // Vault of Archavon
 
-    // ---- Era 3, Phase 3 — Trial of the Crusader & Onyxia 80 ----
-    { 649, {3,3} }, // Trial of the Crusader
-    // map 249 (Onyxia) is already in the table above at {3,3}
+    // ---- Era 3, Phase 3 — Ulduar ----
+    { 603, {3,3} }, // Ulduar
 
-    // ---- Era 3, Phase 4 — Icecrown & Ruby Sanctum ----
-    { 631, {3,4} }, // Icecrown Citadel
-    { 724, {3,4} }, // The Ruby Sanctum
+    // ---- Era 3, Phase 4 — Trial of the Crusader & Onyxia 80 ----
+    { 650, {3,4} }, // Trial of the Champion
+    { 649, {3,4} }, // Trial of the Crusader
+    { 249, {3,4} }, // Onyxia's Lair (level 60 + level 80 — both gated at Northrend Phase 4)
+
+    // ---- Era 3, Phase 5 — Icecrown & Ruby Sanctum ----
+    { 632, {3,5} }, // The Forge of Souls
+    { 658, {3,5} }, // Pit of Saron
+    { 668, {3,5} }, // Halls of Reflection
+    { 631, {3,5} }, // Icecrown Citadel
+    { 724, {3,5} }, // The Ruby Sanctum
 };
 
 // ---------------------------------------------------------------------------
@@ -199,14 +208,14 @@ static const std::unordered_map<uint32, EraPhaseKey> kBattlegroundLock =
 
 static const std::unordered_map<uint32, EraPhaseKey> kWorldBossLock =
 {
-    {  6109, {1,5} }, // Azuregos
-    { 12397, {1,5} }, // Lord Kazzak
-    { 14887, {1,5} }, // Ysondre (Dragon of Nightmare)
-    { 14888, {1,5} }, // Lethon  (Dragon of Nightmare)
-    { 14889, {1,5} }, // Emeriss (Dragon of Nightmare)
-    { 14890, {1,5} }, // Taerar  (Dragon of Nightmare)
-    { 18728, {2,1} }, // Doom Lord Kazzak
-    { 17711, {2,1} }, // Doomwalker
+    {  6109, {1,6} }, // Azuregos
+    { 12397, {1,6} }, // Lord Kazzak
+    { 14887, {1,6} }, // Ysondre (Dragon of Nightmare)
+    { 14888, {1,6} }, // Lethon  (Dragon of Nightmare)
+    { 14889, {1,6} }, // Emeriss (Dragon of Nightmare)
+    { 14890, {1,6} }, // Taerar  (Dragon of Nightmare)
+    { 18728, {2,2} }, // Doom Lord Kazzak
+    { 17711, {2,2} }, // Doomwalker
 };
 
 // ---------------------------------------------------------------------------
@@ -215,12 +224,72 @@ static const std::unordered_map<uint32, EraPhaseKey> kWorldBossLock =
 
 static const std::unordered_map<uint32, EraPhaseKey> kCurrencyItemLock =
 {
-    { 29434, {2,1} }, // Badge of Justice
-    { 40752, {3,1} }, // Emblem of Heroism
-    { 40753, {3,1} }, // Emblem of Valor
-    { 45624, {3,2} }, // Emblem of Conquest
-    { 47241, {3,3} }, // Emblem of Triumph
-    { 49426, {3,4} }, // Emblem of Frost
+    { 29434, {2,2} }, // Badge of Justice
+
+    { 40752, {3,2} }, // Emblem of Heroism
+    { 40753, {3,2} }, // Emblem of Valor
+    { 45624, {3,3} }, // Emblem of Conquest
+    { 47241, {3,4} }, // Emblem of Triumph
+    { 49426, {3,5} }, // Emblem of Frost
+};
+
+// ---------------------------------------------------------------------------
+// Area trigger lock table  (AreaTrigger entry → minimum era/phase required)
+//
+// Used for instances that share a map ID but have wing-specific entry portals.
+// Each entry is the AreaTrigger from areatrigger_teleport.sql.
+// ---------------------------------------------------------------------------
+
+static const std::unordered_map<uint32, EraPhaseKey> kAreaTriggerLock =
+{
+    //  45 = Scarlet Monastery — Graveyard entrance
+    { 45,  {1,2} },
+    // 614 = Scarlet Monastery — Library entrance
+    { 614, {1,3} },
+    // 612 = Scarlet Monastery — Armory entrance
+    { 612, {1,3} },
+    // 610 = Scarlet Monastery — Cathedral entrance
+    { 610, {1,3} },
+};
+
+// ---------------------------------------------------------------------------
+// GameObject lock table  (GO entry → minimum era/phase required)
+//
+// Used for doors/gates inside instances where multiple progression sections
+// share the same map ID. Blocking is done via OnGossipHello, which fires
+// before any type-specific handling in GameObject::Use().
+//
+// Bound to GOs via gameobject_template.ScriptName = 'nostrum_progression_go'.
+// See: data/sql/custom/db_world/nostrum_progression_go_scripts.sql
+//
+// HOW TO FIND BRD DOOR ENTRIES
+// Log in as GM inside Blackrock Depths and use:
+//   .go object near 20
+// to list nearby game objects with their GUIDs and entries.
+// Cross-reference with `SELECT entry, name FROM gameobject_template WHERE entry = <X>;`
+//
+// BRD layout for reference:
+//   Prison section  → accessible from Phase 4 (covered by kInstanceLock {1,4})
+//   Upper City      → deeper routes past the Shadowforge Lock and beyond
+//                     (gates, doors, portcullises leading toward Lord Incendius,
+//                      Golem Lord Argelmach, Emperor Dagran Thaurissan)
+// ---------------------------------------------------------------------------
+
+static const std::unordered_map<uint32, EraPhaseKey> kGameObjectLock =
+{
+    // TODO: Add BRD Upper City gate/door GO entries here after testing in-game.
+    //
+    // Candidates to inspect with `.go object near 20` near the Prison→Upper City
+    // boundary (the Shadowforge Lock corridor area):
+    //
+    //   { <entry>, {1,5} }, // Shadowforge Lock / gate to Upper BRD
+    //   { <entry>, {1,5} }, // Portcullis / door deeper into Upper City
+    //
+    // Leave this empty until entries are confirmed — an empty map means no GOs
+    // are blocked and the SQL file is a no-op until entries are populated.
+    //
+    { 170559, {1,5} }, // Shadowforge Gate - BRD Prison -> deeper BRD / Upper City
+    { 170560, {1,5} }, // Shadowforge Gate - paired gate object
 };
 
 // ---------------------------------------------------------------------------
@@ -246,6 +315,10 @@ struct ProgConfig
 
 ProgConfig gCfg;
 
+// Tracked GOs whose GO_FLAG_NOT_SELECTABLE we toggled based on phase.
+// Used by config-reload to refresh flags when era/phase changes.
+std::unordered_set<GameObject*> gTrackedLockedGOs;
+
 // ---------------------------------------------------------------------------
 // Core helpers
 // ---------------------------------------------------------------------------
@@ -257,14 +330,48 @@ bool IsUnlocked(uint8 reqEra, uint8 reqPhase)
     return gCfg.phase >= reqPhase;
 }
 
+// Apply or remove GO_FLAG_NOT_SELECTABLE based on current phase.
+// Returns true if the GO is locked (flag was applied).
+bool ApplyGOLock(GameObject* go)
+{
+    auto it = kGameObjectLock.find(go->GetEntry());
+    if (it == kGameObjectLock.end())
+        return false;
+
+    if (IsUnlocked(it->second.era, it->second.phase))
+    {
+        go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+        return false;
+    }
+
+    go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+    return true;
+}
+
+// Refresh all tracked GOs after a config reload.
+void RefreshLockedGOs()
+{
+    // Erase destroyed/invalid GOs, then reapply flags.
+    for (auto it = gTrackedLockedGOs.begin(); it != gTrackedLockedGOs.end(); )
+    {
+        if (!*it || !(*it)->IsInWorld())
+        {
+            it = gTrackedLockedGOs.erase(it);
+            continue;
+        }
+        ApplyGOLock(*it);
+        ++it;
+    }
+}
+
 uint8 GetLevelCap()
 {
     if (gCfg.era >= 3)
         return 80;
     if (gCfg.era == 2)
         return 70;
-    // Era 1: phase 1-4 have individual caps, phase 5+ all 60
-    static constexpr uint8 caps[] = { 0, 19, 29, 39, 49, 60, 60, 60, 60 };
+    // Era 1: phase 1-4 have individual caps, phase 5=59, phase 6+ all 60
+    static constexpr uint8 caps[] = { 0, 19, 29, 39, 49, 59, 60, 60, 60 };
     return caps[std::min<uint8>(gCfg.phase, 8)];
 }
 
@@ -352,7 +459,10 @@ public:
     {
         LoadConfig();
         if (reload)
+        {
+            RefreshLockedGOs();
             LOG_INFO("module", ">> NostrumProgression: config reloaded");
+        }
     }
 };
 
@@ -669,6 +779,98 @@ public:
 };
 
 // ---------------------------------------------------------------------------
+// AllGameObjectScript — in-instance door/gate locks
+//
+// OnGameObjectAddWorld sets GO_FLAG_NOT_SELECTABLE on locked doors so the
+// client never offers an interaction (no progress bar, no click).  This is
+// the only reliable way to block GAMEOBJECT_TYPE_DOOR — OnGossipHello fires
+// too late (after the client-side progress bar completes).
+//
+// CanGameObjectGossipHello is kept as a safety net: if the flag is somehow
+// bypassed, it still sends the lock message and blocks Use().
+// ---------------------------------------------------------------------------
+
+class NostrumProgressionGameObjectScript : public AllGameObjectScript
+{
+public:
+    NostrumProgressionGameObjectScript() : AllGameObjectScript("NostrumProgressionGameObjectScript") {}
+
+    void OnGameObjectAddWorld(GameObject* go) override
+    {
+        if (!gCfg.enabled || !gCfg.lockInstances)
+            return;
+
+        if (kGameObjectLock.find(go->GetEntry()) == kGameObjectLock.end())
+            return;
+
+        // Always track so RefreshLockedGOs can toggle on config reload.
+        gTrackedLockedGOs.insert(go);
+
+        if (ApplyGOLock(go))
+        {
+            LOG_INFO("module.nostrum.progression",
+                "NostrumProgression: locked GO entry={} current=({},{})",
+                go->GetEntry(), uint32(gCfg.era), uint32(gCfg.phase));
+        }
+    }
+
+    void OnGameObjectRemoveWorld(GameObject* go) override
+    {
+        gTrackedLockedGOs.erase(go);
+    }
+
+    bool CanGameObjectGossipHello(Player* player, GameObject* go) override
+    {
+        if (!gCfg.enabled || !gCfg.lockInstances)
+            return false;
+
+        if (gCfg.gmBypass && player->GetSession()->GetSecurity() >= SEC_GAMEMASTER)
+            return false;
+
+        auto it = kGameObjectLock.find(go->GetEntry());
+        if (it == kGameObjectLock.end())
+            return false;
+
+        if (IsUnlocked(it->second.era, it->second.phase))
+            return false;
+
+        ChatHandler(player->GetSession()).SendSysMessage(
+            "[NostrumWoW] This path unlocks in a later progression phase.");
+        return true; // block — safety net if GO_FLAG_NOT_SELECTABLE was bypassed
+    }
+};
+
+// ---------------------------------------------------------------------------
+// AreaTriggerScript — wing-specific instance entrance gates
+// ---------------------------------------------------------------------------
+
+class NostrumProgressionAreaTriggerScript : public AreaTriggerScript
+{
+public:
+    NostrumProgressionAreaTriggerScript() : AreaTriggerScript("nostrum_progression_at") {}
+
+    bool OnTrigger(Player* player, AreaTrigger const* trigger) override
+    {
+        if (!gCfg.enabled || !gCfg.lockInstances)
+            return false;
+
+        if (gCfg.gmBypass && player->GetSession()->GetSecurity() >= SEC_GAMEMASTER)
+            return false;
+
+        auto it = kAreaTriggerLock.find(trigger->entry);
+        if (it == kAreaTriggerLock.end())
+            return false;
+
+        if (IsUnlocked(it->second.era, it->second.phase))
+            return false;
+
+        ChatHandler(player->GetSession()).SendSysMessage(
+            "[NostrumWoW] This wing is locked until a later progression phase.");
+        return true; // block default portal teleport
+    }
+};
+
+// ---------------------------------------------------------------------------
 // Registration
 // ---------------------------------------------------------------------------
 
@@ -677,4 +879,6 @@ void Addmod_nostrum_progressionScripts()
     new NostrumProgressionWorldScript();
     new NostrumProgressionPlayerScript();
     new NostrumProgressionCreatureScript();
+    new NostrumProgressionGameObjectScript();
+    new NostrumProgressionAreaTriggerScript();
 }
