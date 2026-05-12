@@ -853,23 +853,34 @@ public:
 
             if (result)
             {
-                switch (QuestStatus(result->Fetch()[0].Get<uint8>()))
+                uint8 rawStatus = result->Fetch()[0].Get<uint8>();
+                if (rawStatus < MAX_QUEST_STATUS)
                 {
-                    case QUEST_STATUS_COMPLETE:
-                        status = "Complete";
-                        break;
-                    case QUEST_STATUS_INCOMPLETE:
-                        status = "Incomplete";
-                        break;
-                    case QUEST_STATUS_FAILED:
-                        status = "Failed";
-                        break;
-                    case QUEST_STATUS_REWARDED:
-                        status = "Rewarded";
-                        break;
-                    default:
-                        status = "Not Taken";
-                        break;
+                    switch (QuestStatus(rawStatus))
+                    {
+                        case QUEST_STATUS_NONE:
+                            status = "Not Taken";
+                            break;
+                        case QUEST_STATUS_COMPLETE:
+                            status = "Complete";
+                            break;
+                        case QUEST_STATUS_INCOMPLETE:
+                            status = "Incomplete";
+                            break;
+                        case QUEST_STATUS_FAILED:
+                            status = "Failed";
+                            break;
+                        case QUEST_STATUS_REWARDED:
+                            status = "Rewarded";
+                            break;
+                        default:
+                            status = "Unknown";
+                            break;
+                    }
+                }
+                else
+                {
+                    status = "Unknown";
                 }
             }
             else if (quest->IsSeasonal())
