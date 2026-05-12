@@ -86,9 +86,9 @@ static const std::unordered_map<uint32, EraPhaseKey> kInstanceLock =
     { 209, {1,4} }, // Zul'Farrak
     { 349, {1,4} }, // Maraudon
     { 109, {1,4} }, // Sunken Temple
+    { 230, {1,4} }, // Blackrock Depths (base; Upper City gated via kGameObjectLock)
 
     // ---- Era 1, Phase 5 — Road to 59  ----
-    { 230, {1,4} }, // Blackrock Depths (base; Upper City gated via kGameObjectLock)
     { 229, {1,5} }, // Blackrock Spire (LBRS/UBRS)
     { 429, {1,5} }, // Dire Maul
     { 329, {1,5} }, // Stratholme
