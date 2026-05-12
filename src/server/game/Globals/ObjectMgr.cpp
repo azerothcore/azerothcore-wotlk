@@ -11069,8 +11069,7 @@ void ObjectMgr::LoadGameObjectQuestItems()
             continue;
         };
 
-        ItemEntry const* dbcData = sItemStore.LookupEntry(item);
-        if (!dbcData)
+        if (!GetItemTemplate(item))
         {
             LOG_ERROR("sql.sql", "Table `gameobject_questitem` has nonexistent item (ID: {}) in gameobject (entry: {}, idx: {}), skipped", item, entry, idx);
             continue;
@@ -11092,41 +11091,70 @@ void ObjectMgr::LoadCreatureQuestItems()
     //                                               0              1        2
     QueryResult result = WorldDatabase.Query("SELECT CreatureEntry, ItemId, Idx FROM creature_questitem ORDER BY Idx ASC");
 
-    if (!result)
+    uint32 count = 0;
+    if (result)
     {
-        LOG_WARN("server.loading", ">> Loaded 0 creature quest items. DB table `creature_questitem` is empty.");
-        return;
+        do
+        {
+            Field* fields = result->Fetch();
+
+            uint32 entry = fields[0].Get<uint32>();
+            uint32 item = fields[1].Get<uint32>();
+            uint32 idx = fields[2].Get<uint32>();
+
+            CreatureTemplate const* creatureInfo = GetCreatureTemplate(entry);
+            if (!creatureInfo)
+            {
+                LOG_ERROR("sql.sql", "Table `creature_questitem` has data for nonexistent creature (entry: {}, idx: {}), skipped", entry, idx);
+                continue;
+            }
+
+            if (!GetItemTemplate(item))
+            {
+                LOG_ERROR("sql.sql", "Table `creature_questitem` has nonexistent item (ID: {}) in creature (entry: {}, idx: {}), skipped", item, entry, idx);
+                continue;
+            }
+
+            _creatureQuestItemStore[entry].push_back(item);
+
+            ++count;
+        } while (result->NextRow());
     }
 
-    uint32 count = 0;
-    do
+    // Derive additional quest item hints from loot tables so creature_questitem gaps don't silently break tooltips.
+    QueryResult lootResult = WorldDatabase.Query(
+        "SELECT ct.entry, clt.Item "
+        "FROM creature_loot_template clt "
+        "INNER JOIN creature_template ct ON ct.lootid = clt.Entry "
+        "WHERE clt.QuestRequired = 1 AND clt.Reference = 0 "
+        "ORDER BY ct.entry ASC, clt.Item ASC");
+
+    uint32 autoCount = 0;
+    if (lootResult)
     {
-        Field* fields = result->Fetch();
-
-        uint32 entry = fields[0].Get<uint32>();
-        uint32 item = fields[1].Get<uint32>();
-        uint32 idx = fields[2].Get<uint32>();
-
-        CreatureTemplate const* creatureInfo = GetCreatureTemplate(entry);
-        if (!creatureInfo)
+        do
         {
-            LOG_ERROR("sql.sql", "Table `creature_questitem` has data for nonexistent creature (entry: {}, idx: {}), skipped", entry, idx);
-            continue;
-        };
+            Field* fields = lootResult->Fetch();
+            uint32 entry = fields[0].Get<uint32>();
+            uint32 item  = fields[1].Get<uint32>();
 
-        ItemEntry const* dbcData = sItemStore.LookupEntry(item);
-        if (!dbcData)
-        {
-            LOG_ERROR("sql.sql", "Table `creature_questitem` has nonexistent item (ID: {}) in creature (entry: {}, idx: {}), skipped", item, entry, idx);
-            continue;
-        };
+            if (!GetItemTemplate(item))
+                continue;
 
-        _creatureQuestItemStore[entry].push_back(item);
+            CreatureQuestItemList& questItems = _creatureQuestItemStore[entry];
 
-        ++count;
-    } while (result->NextRow());
+            if (std::find(questItems.begin(), questItems.end(), item) != questItems.end())
+                continue;
 
-    LOG_INFO("server.loading", ">> Loaded {} Creature Quest Items in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+            if (questItems.size() >= MAX_CREATURE_QUEST_ITEMS)
+                continue;
+
+            questItems.push_back(item);
+            ++autoCount;
+        } while (lootResult->NextRow());
+    }
+
+    LOG_INFO("server.loading", ">> Loaded {} Creature Quest Items ({} derived from loot templates) in {} ms", count + autoCount, autoCount, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 
