@@ -198,6 +198,7 @@ public:
 
     // --- Player self-service ---
     bool PlayerDisable(Player* player, std::string& outMsg);
+    bool JoinGuild(Player* player, std::string& outMsg);
 
     // --- GM helpers ---
     bool GMGetInfo(std::string const& playerName, std::string& outMsg);

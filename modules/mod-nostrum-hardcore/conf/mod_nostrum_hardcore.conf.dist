@@ -145,14 +145,17 @@ Hardcore.SelfFound.BlockAuctionHouse = 1
 Hardcore.SelfFound.BlockPlayerMail = 1
 
 ################################################################################
-# Auto-guild (Deathwalkers)
+# Hardcore guild (Deathwalkers)
 #
-# When a character confirms Hardcore, they are automatically added to a
-# dedicated guild. If the guild does not exist, it is created automatically
-# with the first confirming character as guild leader.
+# Hardcore players can optionally join a dedicated guild via the
+# ".hardcore join guild" command. Only active Hardcore characters may join —
+# Self-Found and regular players are blocked.
+#
+# If the guild does not exist, it is created automatically with the first
+# joining character as guild leader.
 #
 # Guild membership is managed entirely by the Hardcore module:
-#   - New HC characters are added as Member rank (no invite permissions).
+#   - Joining HC characters are added as Member rank (no invite permissions).
 #   - Officer rank has its invite right removed on guild creation so only the
 #     GuildMaster can invite. Do NOT manually invite non-HC characters.
 #   - The GuildMaster (founding HC player) still technically has invite rights
@@ -167,8 +170,8 @@ Hardcore.SelfFound.BlockPlayerMail = 1
 #     corrected automatically. The in-memory value updates on next server restart.
 ################################################################################
 
-# Enable automatic guild assignment. Default: 1
-Hardcore.AutoGuild.Enable = 1
+# Enable the Hardcore guild system. Default: 1
+Hardcore.AutoGuild.Enable = 0
 
 # Name of the Hardcore guild. Created automatically if missing.
 Hardcore.AutoGuild.Name = Deathwalkers
