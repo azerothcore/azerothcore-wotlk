@@ -27,6 +27,8 @@
  */
 
 #include "AllCreatureScript.h"
+#include "AccountMgr.h"
+#include "AccountScript.h"
 #include "AreaTriggerScript.h"
 #include "Chat.h"
 #include "GameObject.h"
@@ -841,6 +843,40 @@ public:
 };
 
 // ---------------------------------------------------------------------------
+// AccountScript — block Death Knight creation before Era 3 Phase 1
+// ---------------------------------------------------------------------------
+
+class NostrumProgressionAccountScript : public AccountScript
+{
+public:
+    NostrumProgressionAccountScript() : AccountScript("NostrumProgressionAccountScript",
+        { ACCOUNTHOOK_CAN_ACCOUNT_CREATE_CHARACTER })
+    {
+    }
+
+    bool CanAccountCreateCharacter(uint32 accountId, uint8 /*charRace*/, uint8 charClass) override
+    {
+        if (!gCfg.enabled)
+            return true;
+
+        if (charClass != CLASS_DEATH_KNIGHT)
+            return true;
+
+        if (gCfg.gmBypass && AccountMgr::GetSecurity(accountId) >= SEC_GAMEMASTER)
+            return true;
+
+        if (IsUnlocked(3, 1))
+            return true;
+
+        LOG_INFO("module.nostrum.progression",
+            "NostrumProgression: DK creation blocked for account={} current=({},{})",
+            accountId, uint32(gCfg.era), uint32(gCfg.phase));
+
+        return false; // CHAR_CREATE_DISABLED sent to client
+    }
+};
+
+// ---------------------------------------------------------------------------
 // AreaTriggerScript — wing-specific instance entrance gates
 // ---------------------------------------------------------------------------
 
@@ -880,5 +916,6 @@ void Addmod_nostrum_progressionScripts()
     new NostrumProgressionPlayerScript();
     new NostrumProgressionCreatureScript();
     new NostrumProgressionGameObjectScript();
+    new NostrumProgressionAccountScript();
     new NostrumProgressionAreaTriggerScript();
 }
