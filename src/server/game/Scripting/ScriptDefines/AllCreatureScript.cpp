@@ -84,4 +84,14 @@ AllCreatureScript::AllCreatureScript(const char* name) :
     ScriptRegistry<AllCreatureScript>::AddScript(this);
 }
 
+void ScriptMgr::OnBeforeCreatureDespawn(Creature* creature)
+{
+    ASSERT(creature);
+
+    ExecuteScript<AllCreatureScript>([&](AllCreatureScript* script)
+    {
+        script->OnBeforeCreatureDespawn(creature);
+    });
+}
+
 template class AC_GAME_API ScriptRegistry<AllCreatureScript>;

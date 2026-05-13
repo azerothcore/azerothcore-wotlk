@@ -134,17 +134,17 @@ void ScriptMgr::OnUnitSetShapeshiftForm(Unit* unit, uint8 form)
     CALL_ENABLED_HOOKS(UnitScript, UNITHOOK_ON_UNIT_SET_SHAPESHIFT_FORM, script->OnUnitSetShapeshiftForm(unit, form));
 }
 
-void ScriptMgr::OnDealDamageShieldDamage(DamageInfo* damageInfo, uint32 overkill)
+void ScriptMgr::OnDealDamageShieldDamage(Unit* shieldOwner, Unit* attacker, SpellInfo const* spellInfo, uint32 damage, uint32 absorb, uint32 overkill)
 {
-    CALL_ENABLED_HOOKS(UnitScript, UNITHOOK_ON_DEAL_DAMAGE_SHIELD_DAMAGE, script->OnDealDamageShieldDamage(damageInfo, overkill));
+    CALL_ENABLED_HOOKS(UnitScript, UNITHOOK_ON_DEAL_DAMAGE_SHIELD_DAMAGE, script->OnDealDamageShieldDamage(shieldOwner, attacker, spellInfo, damage, absorb, overkill));
 }
 
-void ScriptMgr::OnSendSpellNonMeleeDamageLog(SpellNonMeleeDamage* log, int32 overkill)
+void ScriptMgr::OnSendSpellNonMeleeDamageLog(SpellNonMeleeDamage const* log, int32 overkill)
 {
     CALL_ENABLED_HOOKS(UnitScript, UNITHOOK_ON_SEND_SPELL_NON_MELEE_DAMAGE_LOG, script->OnSendSpellNonMeleeDamageLog(log, overkill));
 }
 
-void ScriptMgr::OnSendAttackStateUpdate(CalcDamageInfo* damageInfo, int32 overkill)
+void ScriptMgr::OnSendAttackStateUpdate(CalcDamageInfo const* damageInfo, int32 overkill)
 {
     CALL_ENABLED_HOOKS(UnitScript, UNITHOOK_ON_SEND_ATTACK_STATE_UPDATE, script->OnSendAttackStateUpdate(damageInfo, overkill));
 }
@@ -184,9 +184,9 @@ void ScriptMgr::OnSendPeriodicAuraLog(Unit* victim, SpellPeriodicAuraLogInfo* pI
     CALL_ENABLED_HOOKS(UnitScript, UNITHOOK_ON_SEND_PERIODIC_AURA_LOG, script->OnSendPeriodicAuraLog(victim, pInfo));
 }
 
-void ScriptMgr::OnDamageAbsorbed(DamageInfo& dmgInfo, SpellInfo const* absorbSpellInfo, Unit* absorbCaster, uint32 absorbAmount)
+void ScriptMgr::OnSchoolAbsorbApplied(DamageInfo& dmgInfo, SpellInfo const* absorbSpellInfo, Unit* absorbCaster, uint32 absorbAmount)
 {
-    CALL_ENABLED_HOOKS(UnitScript, UNITHOOK_ON_DAMAGE_ABSORBED, script->OnDamageAbsorbed(dmgInfo, absorbSpellInfo, absorbCaster, absorbAmount));
+    CALL_ENABLED_HOOKS(UnitScript, UNITHOOK_ON_SCHOOL_ABSORB_APPLIED, script->OnSchoolAbsorbApplied(dmgInfo, absorbSpellInfo, absorbCaster, absorbAmount));
 }
 
 UnitScript::UnitScript(const char* name, bool addToScripts, std::vector<uint16> enabledHooks)

@@ -574,9 +574,9 @@ public: /* UnitScript */
     void OnUnitEnterCombat(Unit* unit, Unit* victim);
     void OnUnitDeath(Unit* unit, Unit* killer);
     void OnUnitSetShapeshiftForm(Unit* unit, uint8 form);
-    void OnDealDamageShieldDamage(DamageInfo* damageInfo, uint32 overkill);
-    void OnSendSpellNonMeleeDamageLog(SpellNonMeleeDamage* log, int32 overkill);
-    void OnSendAttackStateUpdate(CalcDamageInfo* damageInfo, int32 overkill);
+    void OnDealDamageShieldDamage(Unit* shieldOwner, Unit* attacker, SpellInfo const* spellInfo, uint32 damage, uint32 absorb, uint32 overkill);
+    void OnSendSpellNonMeleeDamageLog(SpellNonMeleeDamage const* log, int32 overkill);
+    void OnSendAttackStateUpdate(CalcDamageInfo const* damageInfo, int32 overkill);
     void OnSendSpellDamageImmune(Unit* attacker, Unit* victim, uint32 spellId);
     void OnSendSpellMiss(Unit* attacker, Unit* victim, uint32 spellID, SpellMissInfo missInfo);
     void OnSendSpellDamageResist(Unit* attacker, Unit* victim, uint32 spellId);
@@ -584,7 +584,7 @@ public: /* UnitScript */
     void OnSendHealSpellLog(HealInfo const& healInfo, bool critical);
     void OnSendEnergizeSpellLog(Unit* attacker, Unit* victim, uint32 spellID, uint32 amount, Powers powerType);
     void OnSendPeriodicAuraLog(Unit* victim, SpellPeriodicAuraLogInfo* pInfo);
-    void OnDamageAbsorbed(DamageInfo& dmgInfo, SpellInfo const* absorbSpellInfo, Unit* absorbCaster, uint32 absorbAmount);
+    void OnSchoolAbsorbApplied(DamageInfo& dmgInfo, SpellInfo const* absorbSpellInfo, Unit* absorbCaster, uint32 absorbAmount);
 
 public: /* MovementHandlerScript */
     void OnPlayerMove(Player* player, MovementInfo movementInfo, uint32 opcode);
@@ -595,6 +595,7 @@ public: /* AllCreatureScript */
     void OnBeforeCreatureSelectLevel(const CreatureTemplate* cinfo, Creature* creature, uint8& level);
     void OnCreatureSelectLevel(const CreatureTemplate* cinfo, Creature* creature);
     void OnCreatureSaveToDB(Creature* creature);
+    void OnBeforeCreatureDespawn(Creature* creature);
 
 public: /* AllGameobjectScript */
     void OnGameObjectSaveToDB(GameObject* go);

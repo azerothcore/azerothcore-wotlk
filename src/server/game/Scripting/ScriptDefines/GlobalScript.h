@@ -144,9 +144,12 @@ public:
 
     /**
      * @brief Called when a spell interrupt effect succeeds
-     *        (e.g. Kick, Counterspell, Pummel).
+     *        (e.g. Kick, Counterspell, Pummel) or when a silence
+     *        aura interrupts a cast on application.
      *
-     * @param interrupter        The unit that cast the interrupt spell
+     * @param interrupter        The unit that cast the interrupt spell,
+     *                           or nullptr when triggered by a silence
+     *                           aura whose caster is no longer in world
      * @param interrupted        The unit whose cast was interrupted
      * @param interruptSpellId   The spell used to interrupt
      * @param interruptedSpellId The spell that was interrupted

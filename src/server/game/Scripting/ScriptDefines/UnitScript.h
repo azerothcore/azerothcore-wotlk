@@ -54,7 +54,7 @@ enum UnitHook
     UNITHOOK_ON_SEND_HEAL_SPELL_LOG,
     UNITHOOK_ON_SEND_ENERGIZE_SPELL_LOG,
     UNITHOOK_ON_SEND_PERIODIC_AURA_LOG,
-    UNITHOOK_ON_DAMAGE_ABSORBED,
+    UNITHOOK_ON_SCHOOL_ABSORB_APPLIED,
     UNITHOOK_END
 };
 
@@ -131,36 +131,44 @@ public:
      * @brief Called when damage shield (e.g. Thorns) damage
      *        is dealt inside DealDamageShieldDamage.
      *
-     * @param damageInfo Damage details (attacker, victim, amount,
-     *                   absorb, resist, school)
-     * @param overkill   Damage exceeding the target's remaining
-     *                   health (0 if target survives)
+     * @param shieldOwner The unit that owns the damage shield aura
+     * @param attacker    The unit whose melee hit triggered the shield
+     * @param spellInfo   The damage shield spell
+     * @param damage      Post-mitigation damage amount actually dealt
+     * @param absorb      Total absorbed amount after DealDamageMods
+     * @param overkill    Damage exceeding the attacker's remaining
+     *                    health (0 if attacker survives)
      */
-    virtual void OnDealDamageShieldDamage(DamageInfo* /*damageInfo*/,
-        uint32 /*overkill*/) { }
+    virtual void OnDealDamageShieldDamage(Unit* /*shieldOwner*/,
+        Unit* /*attacker*/, SpellInfo const* /*spellInfo*/,
+        uint32 /*damage*/, uint32 /*absorb*/, uint32 /*overkill*/) { }
 
     /**
      * @brief Called when a spell non-melee damage log is sent
      *        to the client (SMSG_SPELLNONMELEEDAMAGELOG).
      *
       * @param log      Spell damage details including damage, absorb,
-      *                 resist, blocked, school, and hit-info flags
+      *                 resist, blocked, school, and hit-info flags.
+      *                 The packet is already serialized; this hook is
+      *                 observation-only.
       * @param overkill Damage exceeding the target's remaining
       *                 health (0 if target survives)
      */
     virtual void OnSendSpellNonMeleeDamageLog(
-          SpellNonMeleeDamage* /*log*/, int32 /*overkill*/) { }
+          SpellNonMeleeDamage const* /*log*/, int32 /*overkill*/) { }
 
     /**
      * @brief Called when a melee attack state update is sent
      *        to the client (SMSG_ATTACKERSTATEUPDATE).
      *
-     * @param damageInfo Full melee damage calculation result
+     * @param damageInfo Full melee damage calculation result.
+     *                   The packet is already partially serialized;
+     *                   this hook is observation-only.
      * @param overkill   Damage exceeding the target's remaining
      *                   health (0 if target survives)
      */
     virtual void OnSendAttackStateUpdate(
-        CalcDamageInfo* /*damageInfo*/, int32 /*overkill*/) { }
+        CalcDamageInfo const* /*damageInfo*/, int32 /*overkill*/) { }
 
     /**
      * @brief Called when a spell damage immunity message is
@@ -248,18 +256,20 @@ public:
         SpellPeriodicAuraLogInfo* /*pInfo*/) { }
 
     /**
-     * @brief Called after an absorb aura absorbs part or all of
-     *        incoming damage.
+     * @brief Called after a school absorb or mana shield aura absorbs
+     *        part or all of incoming damage.
      *
      * Fires once per absorb aura per damage event inside
-     * CalcAbsorbResist. Covers both school absorbs and mana shields.
+     * CalcAbsorbResist, covering SPELL_AURA_SCHOOL_ABSORB and
+     * SPELL_AURA_MANA_SHIELD. Split-damage redirections are not
+     * covered by this hook.
      *
      * @param dmgInfo         Incoming damage context
      * @param absorbSpellInfo The absorb aura's spell
      * @param absorbCaster    Unit that applied the absorb aura
      * @param absorbAmount    Amount absorbed by this specific aura
      */
-    virtual void OnDamageAbsorbed(DamageInfo& /*dmgInfo*/,
+    virtual void OnSchoolAbsorbApplied(DamageInfo& /*dmgInfo*/,
         SpellInfo const* /*absorbSpellInfo*/, Unit* /*absorbCaster*/,
         uint32 /*absorbAmount*/) { }
 };

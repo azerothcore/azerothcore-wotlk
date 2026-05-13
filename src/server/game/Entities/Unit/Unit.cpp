@@ -2190,10 +2190,7 @@ void Unit::DealDamageShieldDamage(Unit* victim)
         data << uint32(i_spellProto->GetSchoolMask());
         victim->SendMessageToSet(&data, true);
 
-        if (absorb > dmgInfo.GetAbsorb())
-            dmgInfo.AbsorbDamage(absorb - dmgInfo.GetAbsorb());
-
-        sScriptMgr->OnDealDamageShieldDamage(&dmgInfo, overkill > 0 ? overkill : 0);
+        sScriptMgr->OnDealDamageShieldDamage(victim, this, i_spellProto, damage, absorb, overkill > 0 ? overkill : 0);
 
         Unit::DealDamage(victim, this, damage, 0, SPELL_DIRECT_DAMAGE, i_spellProto->GetSchoolMask(), i_spellProto, true);
     }
@@ -2472,7 +2469,7 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
         absorbAurEff->GetBase()->CallScriptEffectAfterAbsorbHandlers(absorbAurEff, aurApp, dmgInfo, tempAbsorb);
 
         if (currentAbsorb > 0)
-            sScriptMgr->OnDamageAbsorbed(dmgInfo, absorbAurEff->GetSpellInfo(), absorbAurEff->GetCaster(), currentAbsorb);
+            sScriptMgr->OnSchoolAbsorbApplied(dmgInfo, absorbAurEff->GetSpellInfo(), absorbAurEff->GetCaster(), currentAbsorb);
 
         // Check if our aura is using amount to count damage
         if (absorbAurEff->GetAmount() >= 0)
@@ -2537,7 +2534,7 @@ void Unit::CalcAbsorbResist(DamageInfo& dmgInfo, bool Splited)
         absorbAurEff->GetBase()->CallScriptEffectAfterManaShieldHandlers(absorbAurEff, aurApp, dmgInfo, tempAbsorb);
 
         if (currentAbsorb > 0)
-            sScriptMgr->OnDamageAbsorbed(dmgInfo, absorbAurEff->GetSpellInfo(), absorbAurEff->GetCaster(), currentAbsorb);
+            sScriptMgr->OnSchoolAbsorbApplied(dmgInfo, absorbAurEff->GetSpellInfo(), absorbAurEff->GetCaster(), currentAbsorb);
 
         // Check if our aura is using amount to count damage
         if (absorbAurEff->GetAmount() >= 0)
