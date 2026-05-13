@@ -115,6 +115,10 @@ void HardcoreManager::OnPlayerLogin(Player* player)
     if (IsActive(guid))
     {
         ApplyBuff(player);
+
+        HardcoreData* data = GetData(guid);
+        if (data && data->mode == HardcoreMode::Hardcore && player->GetGuildId() == 0)
+            EnsureAndJoinGuild(player);
     }
 }
 
@@ -300,6 +304,10 @@ bool HardcoreManager::Confirm(Player* player, std::string& outError)
 
     // Apply cosmetic buff and title
     ApplyBuff(player);
+
+    // Auto-join Hardcore guild (Hardcore mode only, not Self-Found)
+    if (mode == HardcoreMode::Hardcore)
+        EnsureAndJoinGuild(player);
 
     // Announce globally
     if (_config.announceOptIn)
