@@ -11121,7 +11121,7 @@ void ObjectMgr::LoadCreatureQuestItems()
         } while (result->NextRow());
     }
 
-    // Derive additional quest item hints from loot tables so creature_questitem gaps don't silently break tooltips.
+    // Pass 1: items that only drop when a quest is active (QuestRequired=1)
     QueryResult lootResult = WorldDatabase.Query(
         "SELECT ct.entry, clt.Item "
         "FROM creature_loot_template clt "
@@ -11154,7 +11154,49 @@ void ObjectMgr::LoadCreatureQuestItems()
         } while (lootResult->NextRow());
     }
 
-    LOG_INFO("server.loading", ">> Loaded {} Creature Quest Items ({} derived from loot templates) in {} ms", count + autoCount, autoCount, GetMSTimeDiffToNow(oldMSTime));
+    // Pass 2: regular loot items that are required by a quest (ReqItemId in quest_template)
+    QueryResult questItemResult = WorldDatabase.Query(
+        "SELECT ct.entry, clt.Item "
+        "FROM creature_loot_template clt "
+        "INNER JOIN creature_template ct ON ct.lootid = clt.Entry "
+        "INNER JOIN ( "
+        "    SELECT RequiredItemId1 AS ItemId FROM quest_template WHERE RequiredItemId1 > 0 "
+        "    UNION SELECT RequiredItemId2 FROM quest_template WHERE RequiredItemId2 > 0 "
+        "    UNION SELECT RequiredItemId3 FROM quest_template WHERE RequiredItemId3 > 0 "
+        "    UNION SELECT RequiredItemId4 FROM quest_template WHERE RequiredItemId4 > 0 "
+        "    UNION SELECT RequiredItemId5 FROM quest_template WHERE RequiredItemId5 > 0 "
+        "    UNION SELECT RequiredItemId6 FROM quest_template WHERE RequiredItemId6 > 0 "
+        ") AS qi ON clt.Item = qi.ItemId "
+        "WHERE clt.Reference = 0 "
+        "ORDER BY ct.entry ASC, clt.Item ASC");
+
+    uint32 autoQuestCount = 0;
+    if (questItemResult)
+    {
+        do
+        {
+            Field* fields = questItemResult->Fetch();
+            uint32 entry = fields[0].Get<uint32>();
+            uint32 item  = fields[1].Get<uint32>();
+
+            if (!GetItemTemplate(item))
+                continue;
+
+            CreatureQuestItemList& questItems = _creatureQuestItemStore[entry];
+
+            if (std::find(questItems.begin(), questItems.end(), item) != questItems.end())
+                continue;
+
+            if (questItems.size() >= MAX_CREATURE_QUEST_ITEMS)
+                continue;
+
+            questItems.push_back(item);
+            ++autoQuestCount;
+        } while (questItemResult->NextRow());
+    }
+
+    LOG_INFO("server.loading", ">> Loaded {} Creature Quest Items ({} from loot templates, {} from quest requirements) in {} ms",
+        count + autoCount + autoQuestCount, autoCount, autoQuestCount, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 
