@@ -136,6 +136,7 @@ public:
             PLAYERHOOK_CAN_GROUP_INVITE,
             PLAYERHOOK_CAN_INIT_TRADE,
             PLAYERHOOK_CAN_SET_TRADE_ITEM,
+            PLAYERHOOK_ON_TRADE_COMPLETED,
             PLAYERHOOK_CAN_SEND_MAIL,
             PLAYERHOOK_CAN_PLACE_AUCTION_BID,
             PLAYERHOOK_CAN_RESURRECT,
@@ -301,9 +302,6 @@ public:
             return false;
         }
 
-        // Flag both parties — the target never calls this hook themselves
-        sHardcoreMgr->FlagTraded(guid);
-        sHardcoreMgr->FlagTraded(targetGuid);
         return true;
     }
 
@@ -322,6 +320,15 @@ public:
         }
 
         return true;
+    }
+
+    void OnPlayerTradeCompleted(Player* player, Player* trader) override
+    {
+        if (!sHardcoreMgr->IsEnabled())
+            return;
+
+        sHardcoreMgr->FlagTraded(player->GetGUID().GetCounter());
+        sHardcoreMgr->FlagTraded(trader->GetGUID().GetCounter());
     }
 
     // ---- Mail restrictions ----

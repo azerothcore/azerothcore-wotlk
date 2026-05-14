@@ -787,6 +787,11 @@ bool ScriptMgr::OnPlayerCanSetTradeItem(Player* player, Item* tradedItem, uint8 
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_SET_TRADE_ITEM, !script->OnPlayerCanSetTradeItem(player, tradedItem, tradeSlot));
 }
 
+void ScriptMgr::OnPlayerTradeCompleted(Player* player, Player* trader)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_TRADE_COMPLETED, script->OnPlayerTradeCompleted(player, trader));
+}
+
 void ScriptMgr::OnPlayerSetServerSideVisibility(Player* player, ServerSideVisibilityType& type, AccountTypes& sec)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_SET_SERVER_SIDE_VISIBILITY, script->OnPlayerSetServerSideVisibility(player, type, sec));
