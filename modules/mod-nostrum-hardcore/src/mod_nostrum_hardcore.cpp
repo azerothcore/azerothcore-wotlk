@@ -711,13 +711,8 @@ public:
 
         handler->PSendSysMessage("You are about to begin Hardcore Mode.");
         handler->PSendSysMessage(" ");
-        handler->PSendSysMessage("Rules:");
         handler->PSendSysMessage("- Death is permanent.");
-        handler->PSendSysMessage("- PvE and environmental deaths count.");
-        handler->PSendSysMessage("- Duel deaths do not count. Battleground, arena, and World PvP deaths count if the player is PvP-enabled/flagged or voluntarily joined the PvP activity.");
-        handler->PSendSysMessage("- Trading, mail, and Auction House are allowed.");
-        handler->PSendSysMessage("- PvP is optional.");
-        handler->PSendSysMessage("- This cannot be undone.");
+        handler->PSendSysMessage("- Interaction with non HC players is disabled.");
         handler->PSendSysMessage(" ");
         handler->PSendSysMessage("Type .hardcore confirm to begin.");
         return true;
@@ -746,14 +741,8 @@ public:
 
         handler->PSendSysMessage("You are about to begin Hardcore Self-Found Mode.");
         handler->PSendSysMessage(" ");
-        handler->PSendSysMessage("Rules:");
         handler->PSendSysMessage("- Death is permanent.");
-        handler->PSendSysMessage("- Trading is disabled.");
-        handler->PSendSysMessage("- Auction House is disabled.");
-        handler->PSendSysMessage("- Player mail is disabled.");
-        handler->PSendSysMessage("- PvP is optional.");
-        handler->PSendSysMessage("- Duel deaths do not count. Battleground, arena, and World PvP deaths count if the player is PvP-enabled/flagged or voluntarily joined the PvP activity.");
-        handler->PSendSysMessage("- This cannot be undone.");
+        handler->PSendSysMessage("- Interaction with players is disabled.");
         handler->PSendSysMessage(" ");
         handler->PSendSysMessage("Type .hardcore confirm to begin.");
         return true;
