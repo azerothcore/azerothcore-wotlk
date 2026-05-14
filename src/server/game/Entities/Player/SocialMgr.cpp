@@ -17,6 +17,7 @@
 
 #include "SocialMgr.h"
 #include "AccountMgr.h"
+#include "World.h"
 #include "DatabaseEnv.h"
 #include "ObjectMgr.h"
 #include "Player.h"
@@ -237,7 +238,7 @@ void SocialMgr::GetFriendInfo(Player* player, ObjectGuid const& friendGUID, Frie
         pFriend->GetSession()->GetSecurity() > gmLevelInWhoList)
         return;
 
-    if (pFriend->GetTeamId() != teamId && !player->GetSession()->HasPermission(rbac::RBAC_PERM_TWO_SIDE_WHO_LIST))
+    if (pFriend->GetTeamId() != teamId && !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_WHO_LIST) && !player->GetSession()->HasPermission(rbac::RBAC_PERM_TWO_SIDE_WHO_LIST))
         return;
 
     if (pFriend->IsVisibleGloballyFor(player))
@@ -320,7 +321,7 @@ void SocialMgr::BroadcastToFriendListers(Player* player, WorldPacket* packet)
             if (!session->HasPermission(rbac::RBAC_PERM_WHO_SEE_ALL_SEC_LEVELS) && player->GetSession()->GetSecurity() > gmLevelInWhoList)
                 continue;
 
-            if (pFriend->GetTeamId() != teamId && !session->HasPermission(rbac::RBAC_PERM_TWO_SIDE_WHO_LIST))
+            if (pFriend->GetTeamId() != teamId && !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_WHO_LIST) && !session->HasPermission(rbac::RBAC_PERM_TWO_SIDE_WHO_LIST))
                 continue;
 
             if (player->IsVisibleGloballyFor(pFriend))
