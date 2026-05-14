@@ -104,6 +104,7 @@ jobs:
           COPY modules/mod-transmog/conf/transmog.conf.dist /azerothcore/env/dist/etc/transmog.conf
           COPY modules/mod-world-chat/conf/WorldChat.conf.dist /azerothcore/env/dist/etc/WorldChat.conf
           COPY modules/mod-ah-bot-plus/conf/mod_ahbot.conf.dist /azerothcore/env/dist/etc/mod_ahbot.conf
+          COPY modules/mod-reserved-names/conf/mod_reserved_names.conf.dist /azerothcore/env/dist/etc/mod_reserved_names.conf
 
           USER acore
           EOF
