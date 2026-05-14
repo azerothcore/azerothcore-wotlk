@@ -18,7 +18,6 @@ All NostrumWoW-specific logic lives in `modules/`. Do not modify core files unle
 | `mod-nostrum-rates` | Centralized XP, reputation, loot, and money multipliers |
 | `mod-nostrum-bg-xp` | BG completion XP with anti-AFK and daily bonus |
 | `mod-nostrum-hardcore` | Opt-in hardcore and self-found hardcore mode |
-| `mod-nostrum-crossfaction` | Cross-faction policy: chat, groups, economy, world channel |
 | `mod-nostrum-guide` | New player guide NPCs in all starting zones |
 | `mod-nostrum-starter` | One-time starter bag for fresh level-1 characters |
 | `mod_nostrum_instant_mail` | Instant player-to-player mail delivery |
@@ -38,10 +37,9 @@ Module SQL files live in `modules/<name>/data/sql/` or `modules/<name>/sql/`. Wh
 
 ### Key implementation notes
 
+- **Cross-faction** is handled entirely via `AllowTwoSide.*` settings in `worldserver.conf`. All options are set to `1`.
 - **Cross-faction RDF** works via `AllowTwoSide.Interaction.Group = 1` — `LFGMgr::SetTeam()` normalizes all players to the same queue. No core patch needed.
-- **Manual cross-faction invites** are blocked by `mod-nostrum-crossfaction`'s `OnPlayerCanGroupInvite` hook regardless of the core config.
 - **Cross-faction BGs** are handled entirely by `mod-cfbg`.
-- **World channel** (`/world`) uses AzerothCore's native `ChannelMgr`. Cross-faction visibility requires `AllowTwoSide.Interaction.Channel = 1`.
 - **Session iteration** in modules: use `sWorldSessionMgr->GetAllSessions()` from `WorldSessionMgr.h`. Do not use `sWorld->GetAllSessions()` — that method does not exist on `IWorld`.
 - **MariaDB compatibility**: `MySQLConnection.cpp` guards `mysql_stmt_bind_named_param` with `!defined(MARIADB_VERSION_ID) && MYSQL_VERSION_ID >= 80300`. The SSL block is also guarded for MariaDB. Do not remove these guards.
 
