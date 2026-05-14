@@ -1,3 +1,4 @@
+-- DB update 2026_05_09_00 -> 2026_05_14_00
 --
 -- RBAC permissions for `respawn creature guid`, `respawn gameobject guid`,
 -- `respawn creature entry`, and `respawn gameobject entry` commands (Console::Yes/No, security level 3 - GM)

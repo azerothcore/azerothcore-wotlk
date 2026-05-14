@@ -1,3 +1,4 @@
+-- DB update 2026_05_10_01 -> 2026_05_14_00
 --
 -- Strings for `respawn creature guid` / `respawn gameobject guid` /
 -- `respawn creature entry` / `respawn gameobject entry` commands and updated `list respawns` command
