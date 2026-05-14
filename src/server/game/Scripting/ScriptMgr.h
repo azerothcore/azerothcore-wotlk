@@ -441,6 +441,7 @@ public: /* PlayerScript */
     bool OnPlayerCanEnterMap(Player* player, MapEntry const* entry, InstanceTemplate const* instance, MapDifficulty const* mapDiff, bool loginCheck);
     bool OnPlayerCanInitTrade(Player* player, Player* target);
     bool OnPlayerCanSetTradeItem(Player* player, Item* tradedItem, uint8 tradeSlot);
+    void OnPlayerTradeCompleted(Player* player, Player* trader);
     void OnPlayerSetServerSideVisibility(Player* player, ServerSideVisibilityType& type, AccountTypes& sec);
     void OnPlayerSetServerSideVisibilityDetect(Player* player, ServerSideVisibilityType& type, AccountTypes& sec);
     void OnPlayerResurrect(Player* player, float restore_percent, bool& applySickness);

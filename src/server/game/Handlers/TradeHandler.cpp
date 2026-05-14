@@ -581,6 +581,8 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
         trader->SaveInventoryAndGoldToDB(trans);
         CharacterDatabase.CommitTransaction(trans);
 
+        sScriptMgr->OnPlayerTradeCompleted(_player, trader);
+
         info.Status = TRADE_STATUS_TRADE_COMPLETE;
         trader->GetSession()->SendTradeStatus(info);
         SendTradeStatus(info);
