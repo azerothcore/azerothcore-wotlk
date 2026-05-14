@@ -185,9 +185,21 @@ static const std::unordered_map<uint32, EraPhaseKey> kInstanceLock =
 
 static const std::unordered_map<uint32, EraPhaseKey> kMapLock =
 {
-    { 530, {2,1} }, // Outland
+    { 530, {2,1} }, // Outland (also contains Blood Elf/Draenei starting zones — see kMap530StartingZones)
     { 571, {3,1} }, // Northrend
     { 609, {3,1} }, // Death Knight starting zone
+};
+
+// Map 530 contains both Outland and the TBC starting zones. These zones are
+// part of the base game and must remain accessible during Azeroth Era.
+static const std::unordered_set<uint32> kMap530StartingZones =
+{
+    3430, // Eversong Woods
+    3433, // Ghostlands
+    3487, // Silvermoon City
+    3524, // Azuremyst Isle
+    3525, // Bloodmyst Isle
+    3557, // The Exodar
 };
 
 // ---------------------------------------------------------------------------
@@ -400,6 +412,14 @@ bool IsMapLocked(uint32 mapId)
     return !IsUnlocked(it->second.era, it->second.phase);
 }
 
+// Returns true if the player is on map 530 in a Blood Elf/Draenei starting
+// zone that must stay accessible regardless of the Outland era lock.
+bool IsInMap530StartingZone(Player* player)
+{
+    return player->GetMapId() == 530 &&
+           kMap530StartingZones.count(player->GetZoneId()) > 0;
+}
+
 void TeleportToHomebind(Player* player)
 {
     player->TeleportTo(player->m_homebindMapId,
@@ -518,7 +538,7 @@ public:
 
         uint32 mapId = player->GetMapId();
 
-        if (gCfg.lockMaps && IsMapLocked(mapId))
+        if (gCfg.lockMaps && IsMapLocked(mapId) && !IsInMap530StartingZone(player))
         {
             ChatHandler(player->GetSession()).SendSysMessage(
                 "[NostrumWoW] You have been moved — this area is locked until a later Nostrum Era.");
@@ -574,6 +594,12 @@ public:
             return true;
 
         if (!IsMapLocked(mapId))
+            return true;
+
+        // Map 530 contains Blood Elf/Draenei starting zones. Allow teleports
+        // there (e.g. graveyard respawn) only when the player is already in
+        // one of those zones — not as a bypass to reach actual Outland.
+        if (mapId == 530 && IsInMap530StartingZone(player))
             return true;
 
         if (gCfg.debug)
