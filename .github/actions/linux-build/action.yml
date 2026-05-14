@@ -69,20 +69,6 @@ runs:
           libboost-all-dev libbz2-dev libncurses5-dev libmysql++-dev \
           libreadline6-dev libssl-dev libtool openssl zlib1g-dev
 
-        # Account for https://github.com/actions/runner-images/issues/8659
-        # based off of https://github.com/actions/runner-images/issues/8659#issuecomment-1852353116
-        UBUNTU_VERSION="$(grep VERSION_ID /etc/os-release | cut -f2 -d\")"
-        source /etc/os-release
-        if [[ "$VERSION_CODENAME" == "jammy" ]]; then
-          if [[ "${{ inputs.CC }}" =~ "clang-" ]]; then
-            CLANG_VERSION="$(echo '${{ inputs.CC }}' | cut -f2 -d\-)"
-            wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-            sudo add-apt-repository "deb http://apt.llvm.org/$VERSION_CODENAME/ llvm-toolchain-$VERSION_CODENAME-$CLANG_VERSION main"
-            sudo apt-get -qq update
-            sudo apt-get -qq install '${{ inputs.CC }}'
-          fi
-        fi
-
     - name: setup ccache
       shell: bash
       env:
