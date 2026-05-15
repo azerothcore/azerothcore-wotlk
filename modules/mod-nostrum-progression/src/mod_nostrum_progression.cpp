@@ -600,10 +600,16 @@ public:
         // Map 530 contains Blood Elf/Draenei starting zones alongside Outland.
         // Allow teleports whose destination zone is a starting zone (covers boat
         // travel from Darkshore, graveyard respawns, hearthstones, etc.).
+        // If the zone lookup returns 0 (map not yet loaded), allow rather than block
+        // to avoid false-positives on boat/transport travel.
         if (mapId == 530)
         {
             uint32 destZone = sMapMgr->GetZoneId(player->GetPhaseMaskForSpawn(), mapId, x, y, z);
-            if (kMap530StartingZones.count(destZone))
+            if (gCfg.debug)
+                LOG_INFO("module.nostrum.progression",
+                    "Map 530 teleport: player={} destZone={} x={:.1f} y={:.1f} z={:.1f}",
+                    player->GetName(), destZone, x, y, z);
+            if (destZone == 0 || kMap530StartingZones.count(destZone))
                 return true;
         }
 
