@@ -24,6 +24,7 @@ All NostrumWoW-specific logic lives in `modules/`. Do not modify core files unle
 | `mod-level-rewards` | Gold mailed to players at level milestones |
 | `mod-dual-spec-19` | Dual spec available from level 19 |
 | `mod-cfbg` | Mixed-faction battlegrounds (third-party) |
+| `mod-nostrum-peak` | Persistent peak concurrent player tracker with world announcement |
 
 ### Custom DB entry ranges (do not reuse)
 
