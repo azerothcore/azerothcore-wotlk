@@ -14137,6 +14137,24 @@ void Unit::Kill(Unit* killer, Unit* victim, bool durabilityLoss, WeaponAttackTyp
         }
     }
 
+    if (victim->IsVehicle() && victim->GetCharmer() && victim->GetCharmer()->IsPlayer())
+    {
+        Player* rider = victim->GetCharmer()->ToPlayer();
+        if (rider && rider->IsAlive() && !victim->GetCombatManager().IsInEvadeMode())
+        {
+            rider->GetCombatManager().InheritCombatStatesFrom(victim);
+
+            for (auto const& [guid, threatRef] : victim->GetThreatMgr().GetThreatenedByMeList())
+            {
+                Unit* hostile = threatRef->GetOwner();
+                if (!hostile || !hostile->IsAlive())
+                    continue;
+
+                hostile->GetThreatMgr().AddThreat(rider, hostile->GetThreatMgr().GetThreat(victim, true), nullptr, true, true);
+            }
+        }
+    }
+
     if (!spiritOfRedemption)
     {
         LOG_DEBUG("entities.unit", "SET DeathState::JustDied");
