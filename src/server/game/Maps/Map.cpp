@@ -47,6 +47,12 @@
 
 #define MAP_INVALID_ZONE        0xFFFFFFFF
 
+#define MAP_UPDATE_PHASE_TIMER(phaseName) \
+    METRIC_TIMER("map_update_phase_time", \
+        METRIC_TAG("map_id", std::to_string(GetId())), \
+        METRIC_TAG("map_instanceid", std::to_string(GetInstanceId())), \
+        METRIC_TAG("phase", phaseName))
+
 ZoneDynamicInfo::ZoneDynamicInfo() : MusicId(0), DefaultWeather(nullptr), WeatherId(WEATHER_STATE_FINE),
                                      WeatherGrade(0.0f), OverrideLightId(0), LightFadeInTime(0) { }
 
@@ -430,29 +436,39 @@ void Map::UpdatePlayerZoneStats(uint32 oldZone, uint32 newZone)
 void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
 {
     if (t_diff)
+    {
+        MAP_UPDATE_PHASE_TIMER("dynamic_tree");
         _mapCollisionData.GetDynamicTree().update(t_diff);
+    }
 
     // Update world sessions and players
-    for (m_mapRefIter = m_mapRefMgr.begin(); m_mapRefIter != m_mapRefMgr.end(); ++m_mapRefIter)
     {
-        Player* player = m_mapRefIter->GetSource();
-        if (player && player->IsInWorld())
+        MAP_UPDATE_PHASE_TIMER("sessions");
+        for (m_mapRefIter = m_mapRefMgr.begin(); m_mapRefIter != m_mapRefMgr.end(); ++m_mapRefIter)
         {
-            // Update session
-            WorldSession* session = player->GetSession();
-            MapSessionFilter updater(session);
-            session->Update(s_diff, updater);
+            Player* player = m_mapRefIter->GetSource();
+            if (player && player->IsInWorld())
+            {
+                // Update session
+                WorldSession* session = player->GetSession();
+                MapSessionFilter updater(session);
+                session->Update(s_diff, updater);
 
-            // update players at tick
-            if (!t_diff)
-                player->Update(s_diff);
+                // update players at tick
+                if (!t_diff)
+                    player->Update(s_diff);
+            }
         }
     }
 
-    Events.Update(t_diff);
+    {
+        MAP_UPDATE_PHASE_TIMER("events");
+        Events.Update(t_diff);
+    }
 
     if (!t_diff)
     {
+        MAP_UPDATE_PHASE_TIMER("delayed_visibility");
         HandleDelayedVisibility();
         return;
     }
@@ -462,6 +478,7 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
     {
         if (_respawnCheckTimer <= t_diff)
         {
+            MAP_UPDATE_PHASE_TIMER("respawns");
             ProcessRespawns();
             _respawnCheckTimer = 5000; // Check every 5 seconds
         }
@@ -473,50 +490,69 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
     resetMarkedCells();
 
     // Update players
-    for (m_mapRefIter = m_mapRefMgr.begin(); m_mapRefIter != m_mapRefMgr.end(); ++m_mapRefIter)
     {
-        Player* player = m_mapRefIter->GetSource();
-
-        if (!player || !player->IsInWorld())
-            continue;
-
-        player->Update(s_diff);
-
-        if (_updatableObjectListRecheckTimer.Passed())
+        MAP_UPDATE_PHASE_TIMER("players");
+        for (m_mapRefIter = m_mapRefMgr.begin(); m_mapRefIter != m_mapRefMgr.end(); ++m_mapRefIter)
         {
-            MarkNearbyCellsOf(player);
+            Player* player = m_mapRefIter->GetSource();
 
-            // If player is using far sight, update viewpoint
-            if (WorldObject* viewPoint = player->GetViewpoint())
+            if (!player || !player->IsInWorld())
+                continue;
+
+            player->Update(s_diff);
+
+            if (_updatableObjectListRecheckTimer.Passed())
             {
-                if (Creature* viewCreature = viewPoint->ToCreature())
-                    MarkNearbyCellsOf(viewCreature);
-                else if (DynamicObject* viewObject = viewPoint->ToDynObject())
-                    MarkNearbyCellsOf(viewObject);
+                MarkNearbyCellsOf(player);
+
+                // If player is using far sight, update viewpoint
+                if (WorldObject* viewPoint = player->GetViewpoint())
+                {
+                    if (Creature* viewCreature = viewPoint->ToCreature())
+                        MarkNearbyCellsOf(viewCreature);
+                    else if (DynamicObject* viewObject = viewPoint->ToDynObject())
+                        MarkNearbyCellsOf(viewObject);
+                }
             }
         }
     }
 
-    UpdateNonPlayerObjects(t_diff);
+    {
+        MAP_UPDATE_PHASE_TIMER("non_player_objects");
+        UpdateNonPlayerObjects(t_diff);
+    }
 
-    SendObjectUpdates();
+    {
+        MAP_UPDATE_PHASE_TIMER("object_updates");
+        SendObjectUpdates();
+    }
 
     ///- Process necessary scripts
     if (!m_scriptSchedule.empty())
     {
+        MAP_UPDATE_PHASE_TIMER("scripts");
         i_scriptLock = true;
         ScriptsProcess();
         i_scriptLock = false;
     }
 
-    MoveAllCreaturesInMoveList();
-    MoveAllGameObjectsInMoveList();
-    MoveAllDynamicObjectsInMoveList();
+    {
+        MAP_UPDATE_PHASE_TIMER("moves");
+        MoveAllCreaturesInMoveList();
+        MoveAllGameObjectsInMoveList();
+        MoveAllDynamicObjectsInMoveList();
+    }
 
-    HandleDelayedVisibility();
+    {
+        MAP_UPDATE_PHASE_TIMER("delayed_visibility");
+        HandleDelayedVisibility();
+    }
 
-    UpdateWeather(t_diff);
-    UpdateExpiredCorpses(t_diff);
+    {
+        MAP_UPDATE_PHASE_TIMER("weather_corpses");
+        UpdateWeather(t_diff);
+        UpdateExpiredCorpses(t_diff);
+    }
 
     sScriptMgr->OnMapUpdate(this, t_diff);
 
@@ -528,6 +564,8 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
         METRIC_TAG("map_id", std::to_string(GetId())),
         METRIC_TAG("map_instanceid", std::to_string(GetInstanceId())));
 }
+
+#undef MAP_UPDATE_PHASE_TIMER
 
 void Map::UpdateNonPlayerObjects(uint32 const diff)
 {
