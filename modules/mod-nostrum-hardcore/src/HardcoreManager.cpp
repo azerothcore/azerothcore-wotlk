@@ -1290,6 +1290,21 @@ void HardcoreManager::LoadDataFromDB(uint32 guid)
     data.revivedByGm   = f[13].Get<bool>();
     data.removedByGm   = f[14].Get<bool>();
 
+    // Guard against GUID reuse: if the stored character name doesn't match the
+    // player loading this record, a deleted character's HC data survived and now
+    // belongs to a different character with the same GUID. Purge it.
+    Player* player = ObjectAccessor::FindConnectedPlayer(ObjectGuid::Create<HighGuid::Player>(guid));
+    if (player && data.characterName != player->GetName())
+    {
+        LOG_WARN("module",
+            "[Hardcore] Stale HC record for guid {} (stored name '{}', actual name '{}') — purging.",
+            guid, data.characterName, player->GetName());
+        CharacterDatabase.Execute("DELETE FROM mod_nostrum_hardcore WHERE guid = {}", guid);
+        CharacterDatabase.Execute("DELETE FROM mod_nostrum_hardcore_flags WHERE guid = {}", guid);
+        CharacterDatabase.Execute("DELETE FROM mod_nostrum_hardcore_milestones WHERE guid = {}", guid);
+        return;
+    }
+
     _data[guid] = data;
 }
 
