@@ -38,6 +38,7 @@
 #include "Creature.h"
 #include "DBCStores.h"
 #include "LFGMgr.h"
+#include "MapMgr.h"
 #include "Player.h"
 #include "PlayerScript.h"
 #include "ScriptMgr.h"
@@ -586,8 +587,8 @@ public:
     // Covers: Dark Portal, boats, zeppelins, portals, hearthstone, summons.
     // -----------------------------------------------------------------------
 
-    bool OnPlayerBeforeTeleport(Player* player, uint32 mapId, float /*x*/, float /*y*/,
-                                float /*z*/, float /*orientation*/, uint32 /*options*/,
+    bool OnPlayerBeforeTeleport(Player* player, uint32 mapId, float x, float y,
+                                float z, float /*orientation*/, uint32 /*options*/,
                                 Unit* /*target*/) override
     {
         if (!gCfg.lockMaps || IsExempt(player))
@@ -596,11 +597,21 @@ public:
         if (!IsMapLocked(mapId))
             return true;
 
-        // Map 530 contains Blood Elf/Draenei starting zones. Allow teleports
-        // there (e.g. graveyard respawn) only when the player is already in
-        // one of those zones — not as a bypass to reach actual Outland.
-        if (mapId == 530 && IsInMap530StartingZone(player))
-            return true;
+        // Map 530 contains Blood Elf/Draenei starting zones alongside Outland.
+        // Allow teleports whose destination zone is a starting zone (covers boat
+        // travel from Darkshore, graveyard respawns, hearthstones, etc.).
+        // If the zone lookup returns 0 (map not yet loaded), allow rather than block
+        // to avoid false-positives on boat/transport travel.
+        if (mapId == 530)
+        {
+            uint32 destZone = sMapMgr->GetZoneId(player->GetPhaseMaskForSpawn(), mapId, x, y, z);
+            if (gCfg.debug)
+                LOG_INFO("module.nostrum.progression",
+                    "Map 530 teleport: player={} destZone={} x={:.1f} y={:.1f} z={:.1f}",
+                    player->GetName(), destZone, x, y, z);
+            if (destZone == 0 || kMap530StartingZones.count(destZone))
+                return true;
+        }
 
         if (gCfg.debug)
             LOG_INFO("module.nostrum.progression",
