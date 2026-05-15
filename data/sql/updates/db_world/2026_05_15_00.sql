@@ -1,3 +1,4 @@
+-- DB update 2026_05_14_00 -> 2026_05_15_00
 -- Remove trigger bunny SAI scripts that interfere with the chain mechanic
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` IN (-113478, -113479, -113550, -113551));
 
