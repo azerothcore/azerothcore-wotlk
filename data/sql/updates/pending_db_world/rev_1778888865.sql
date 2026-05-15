@@ -125,9 +125,6 @@ INSERT INTO `waypoint_data` (`id`,  `point`, `position_x`, `position_y`, `positi
 (1487405, 6, 239.77821, -2901.221, 98.15523, NULL, 0, 0, 0, 100, 0),
 (1487405, 7, 240.79094, -2901.4275, 98.10327, NULL, 0, 0, 0, 100, 0);
 
--- Set Karu Broadcast text
-UPDATE `broadcast_text` SET `FemaleText` = 'Here is some food for you Trok! Trok? Why are you running around like fearful human?' WHERE (`ID` = 10252);
-
 -- Set Karu SAI
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 14874;
 
