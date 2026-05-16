@@ -1,5 +1,5 @@
 -- Update Night Elf shapeshift forms
-DELETE FROM `player_shapeshift_model` WHERE (`RaceID` = 4 AND `CustomizationID` IN (3, 5) and `ShapeShiftID` IN (5, 8)) OR (`RaceID` = 4 AND `CustomizationID` = 5 and `ShapeShiftID` = 1) OR (`RaceID` = 4 AND `CustomizationID` = 7 AND `ShapeShiftID` IN (5, 8)) OR (`RaceID` = 4 AND `CustomizationID` = 6 AND `ShapeShiftID` = 1);
+DELETE FROM `player_shapeshift_model` WHERE (`RaceID` = 4 AND `CustomizationID` IN (3, 5) AND `ShapeshiftID` IN (5, 8)) OR (`RaceID` = 4 AND `CustomizationID` = 5 AND `ShapeshiftID` = 1) OR (`RaceID` = 4 AND `CustomizationID` = 7 AND `ShapeshiftID` IN (5, 8)) OR (`RaceID` = 4 AND `CustomizationID` = 6 AND `ShapeshiftID` = 1);
 INSERT INTO `player_shapeshift_model` (`ShapeshiftID`, `RaceID`, `CustomizationID`, `GenderID`, `ModelID`) VALUES
 -- light blue hair, bear
 (5, 4, 3, 2, 29415),
