@@ -127,6 +127,7 @@ enum Spells
     SPELL_UNDEATH                   = 70089,
     SPELL_IMPALING_SPEAR            = 71443,
     SPELL_AETHER_SHIELD             = 71463,
+    SPELL_AETHER_SPEAR_TARGET       = 70203, // required on Svalna for Infernal Spear (Hurl Spear) targeting
     SPELL_HURL_SPEAR                = 71466,
 
     // Captain Arnath
@@ -1197,7 +1198,7 @@ public:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, false, -SPELL_IMPALING_SPEAR))
                         {
                             DoCast(me, SPELL_AETHER_SHIELD);
-                            me->AddAura(70203, me);
+                            me->AddAura(SPELL_AETHER_SPEAR_TARGET, me);
                             DoCast(target, SPELL_IMPALING_SPEAR);
                         }
                         events.ScheduleEvent(EVENT_IMPALING_SPEAR, 20s, 25s);
