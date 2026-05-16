@@ -181,7 +181,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (1487406, 9, 0, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 0, 1, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - Actionlist - Say Line 7'),
 (1487406, 9, 1, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 0, 232, 1487404, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - Actionlist - Start Path 1487404');
 
--- Set Conditions 
+-- Set Conditions
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` IN (6, 7)) AND (`SourceEntry` = 14874) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 29) AND (`ConditionTarget` = 1) AND (`ConditionValue1` = 10685) AND (`ConditionValue2` = 100) AND (`ConditionValue3` = 0);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (22, 6, 14874, 0, 0, 29, 1, 10685, 100, 0, 0, 0, 0, '', 'Karu will start this event only if there is at least one Swine alive.'),
