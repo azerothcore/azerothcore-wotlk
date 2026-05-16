@@ -5400,6 +5400,11 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
 
     uint32 extraflags = fields[36].Get<uint16>();
 
+    // Mirror before the gate below so saved bits survive when the gate
+    // skips effect application; otherwise the next SaveToDB writes 0
+    // over them.
+    m_ExtraFlags = extraflags;
+
     _LoadPetStable(fields[37].Get<uint8>(), holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_PET_SLOTS));
 
     m_atLoginFlags = fields[38].Get<uint16>();
