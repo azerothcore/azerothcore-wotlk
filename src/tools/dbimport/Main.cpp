@@ -105,12 +105,14 @@ bool StartDB()
 
     // Load modules conditionally based on what modules are allowed to auto-update or none
     std::string modules = sConfigMgr->GetOption<std::string>("Updates.AllowedModules", "all");
+    if (modules == "all")
+        modules = AC_MODULES_LIST;
+    if (modules == "none")
+        modules.clear();
+
     LOG_INFO("dbimport", "Loading modules: {}", modules.empty() ? "none" : modules);
 
-    DatabaseLoader loader =
-        modules.empty() ? DatabaseLoader("dbimport") :
-        (modules == "all") ? DatabaseLoader("dbimport", DatabaseLoader::DATABASE_MASK_ALL, AC_MODULES_LIST) :
-        DatabaseLoader("dbimport", DatabaseLoader::DATABASE_MASK_ALL, modules);
+    DatabaseLoader loader("dbimport", DatabaseLoader::DATABASE_MASK_ALL, modules);
 
     loader
         .AddDatabase(LoginDatabase, "Login")
