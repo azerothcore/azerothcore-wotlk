@@ -117,11 +117,12 @@ ARG DOCKER_USER=acore
 ENV ACORE_COMPONENT=undefined
 
 # Install base dependencies for azerothcore
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
       libmysqlclient21 libreadline8 libicu74 libncurses5-dev \
-      gettext-base default-mysql-client && \
-    rm -rf /var/lib/apt/lists/*
+      gettext-base default-mysql-client \
+      adduser \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY --from=build /azerothcore/env/dist/etc/ /azerothcore/env/ref/etc
 
@@ -131,11 +132,11 @@ ENV PATH="/azerothcore/env/dist/bin:$PATH"
 
 # To use GID/UID 1000 in ubuntu > 23.04 the existing user must be deleted
 # See https://bugs.launchpad.net/cloud-images/+bug/2005129
-RUN touch /var/mail/ubuntu && chown ubuntu /var/mail/ubuntu && userdel -r ubuntu && \
-    groupadd --gid "$GROUP_ID"  "$DOCKER_USER" && \
-    useradd -d /azerothcore --uid "$USER_ID"  --gid "$GROUP_ID"  "$DOCKER_USER" && \
-    passwd -d "$DOCKER_USER" && \
-    chown -R "$DOCKER_USER:$DOCKER_USER" /azerothcore
+RUN userdel --remove ubuntu \
+  && addgroup --gid "$GROUP_ID" "$DOCKER_USER" \
+  && adduser --disabled-password --gecos '' --uid "$USER_ID" --gid "$GROUP_ID" "$DOCKER_USER" \
+  && passwd -d "$DOCKER_USER" \
+  && chown -R "$DOCKER_USER:$DOCKER_USER" /azerothcore
 
 COPY --chown=$USER_ID:$GROUP_ID \
      --chmod=755 \
