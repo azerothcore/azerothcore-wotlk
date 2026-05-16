@@ -198,6 +198,7 @@ static const std::unordered_set<uint32> kMap530StartingZones =
     3430, // Eversong Woods
     3433, // Ghostlands
     3487, // Silvermoon City
+    3479, // Ammen Vale (Azuremyst dock/coastal area)
     3524, // Azuremyst Isle
     3525, // Bloodmyst Isle
     3557, // The Exodar
