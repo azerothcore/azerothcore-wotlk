@@ -136,10 +136,6 @@ void Battlefield::HandlePlayerLeaveZone(Player* player, uint32 /*zone*/)
     SendRemoveWorldStates(player);
     RemovePlayerFromResurrectQueue(player->GetGUID());
     OnPlayerLeaveZone(player);
-    // Scripts must restore player->GetTeamId() here (e.g. ClearFakePlayer).
-    // All Battlefield data-structure cleanup above has already completed using
-    // the assigned team, so it is safe to restore the real team now.
-    sScriptMgr->OnBattlefieldPlayerLeaveZone(this, player);
 }
 
 bool Battlefield::Update(uint32 diff)

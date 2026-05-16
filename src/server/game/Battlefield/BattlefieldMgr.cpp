@@ -17,6 +17,7 @@
 
 #include "BattlefieldMgr.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "Zones/BattlefieldWG.h"
 
 BattlefieldMgr::BattlefieldMgr() : _updateTimer(0)
@@ -82,6 +83,8 @@ void BattlefieldMgr::HandlePlayerLeaveZone(Player* player, uint32 zoneId)
     auto itr = _battlefieldMap.find(zoneId);
     if (itr == _battlefieldMap.end())
         return;
+
+    sScriptMgr->OnBattlefieldPlayerLeaveZone(itr->second, player);
 
     // teleport: remove once in removefromworld, once in updatezone
     if (!itr->second->HasPlayer(player))
