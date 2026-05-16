@@ -643,7 +643,7 @@ public:
 
     void OnAddMember(Guild* /*guild*/, Player* player, uint8& /*plRank*/) override
     {
-        if (!sHardcoreMgr->IsEnabled())
+        if (!sHardcoreMgr->IsEnabled() || !player)
             return;
 
         uint32 guid = player->GetGUID().GetCounter();
