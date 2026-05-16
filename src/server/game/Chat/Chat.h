@@ -241,6 +241,7 @@ public:
     Player* GetPlayer() const;
     WorldSession* GetSession() { return m_session; }
     bool IsAvailable(uint32 securityLevel) const;
+    bool HasPermission(uint32 permissionId) const;
 protected:
     explicit ChatHandler() : m_session(nullptr), sentErrorMessage(false) {}      // for CLI subclass
 

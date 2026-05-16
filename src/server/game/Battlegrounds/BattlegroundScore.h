@@ -59,7 +59,12 @@ struct AC_GAME_API BattlegroundScore
     friend class Arena;
     friend class Battleground;
 
-protected:
+    public:
+    [[nodiscard]] uint32 GetKillingBlows() const    { return KillingBlows; }
+    [[nodiscard]] uint32 GetDamageDone() const      { return DamageDone; }
+    [[nodiscard]] uint32 GetHealingDone() const     { return HealingDone; }
+
+    protected:
     BattlegroundScore(ObjectGuid playerGuid) : PlayerGuid(playerGuid) { }
     virtual ~BattlegroundScore() = default;
 
@@ -97,12 +102,9 @@ protected:
     // For Logging purpose
     virtual std::string ToString() const { return ""; }
 
-    [[nodiscard]] uint32 GetKillingBlows() const    { return KillingBlows; }
     [[nodiscard]] uint32 GetDeaths() const          { return Deaths; }
     [[nodiscard]] uint32 GetHonorableKills() const  { return HonorableKills; }
     [[nodiscard]] uint32 GetBonusHonor() const      { return BonusHonor; }
-    [[nodiscard]] uint32 GetDamageDone() const      { return DamageDone; }
-    [[nodiscard]] uint32 GetHealingDone() const     { return HealingDone; }
 
     [[nodiscard]] virtual uint32 GetAttr1() const { return 0; }
     [[nodiscard]] virtual uint32 GetAttr2() const { return 0; }

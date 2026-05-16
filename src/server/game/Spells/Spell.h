@@ -38,6 +38,15 @@ class SpellEvent;
 class ByteBuffer;
 class BasicEvent;
 
+namespace Acore
+{
+    enum class WorldObjectSpellAreaTargetSearchReason
+    {
+        Area,
+        Chain
+    };
+}
+
 #define SPELL_CHANNEL_UPDATE_INTERVAL (1 * IN_MILLISECONDS)
 #define TRAJECTORY_MISSILE_SIZE 3.0f
 
@@ -91,13 +100,6 @@ enum SpellRangeFlag
     SPELL_RANGE_DEFAULT             = 0,
     SPELL_RANGE_MELEE               = 1,     //melee
     SPELL_RANGE_RANGED              = 2,     //hunter range and ranged weapon
-};
-
-enum SpellFinishReason : uint8
-{
-    SPELL_FINISHED_SUCCESSFUL_CAST     = 0, // spell has sucessfully launched
-    SPELL_FINISHED_CANCELED            = 1, // spell has been canceled (interrupts)
-    SPELL_FINISHED_CHANNELING_COMPLETE = 2  // spell channeling has been finished
 };
 
 struct SpellDestination
@@ -273,6 +275,7 @@ struct TargetInfo
     bool   crit:1;
     bool   scaleAura:1;
     int32  damage;
+    int32  damageBeforeTakenMods;
 };
 
 static const uint32 SPELL_INTERRUPT_NONPLAYER = 32747;
@@ -450,7 +453,7 @@ public:
     template<class SEARCHER> void SearchTargets(SEARCHER& searcher, uint32 containerMask, Unit* referer, Position const* pos, float radius);
 
     WorldObject* SearchNearbyTarget(float range, SpellTargetObjectTypes objectType, SpellTargetCheckTypes selectionType, ConditionList* condList = nullptr);
-    void SearchAreaTargets(std::list<WorldObject*>& targets, float range, Position const* position, Unit* referer, SpellTargetObjectTypes objectType, SpellTargetCheckTypes selectionType, ConditionList* condList);
+    void SearchAreaTargets(std::list<WorldObject*>& targets, float range, Position const* position, Unit* referer, SpellTargetObjectTypes objectType, SpellTargetCheckTypes selectionType, ConditionList* condList, Acore::WorldObjectSpellAreaTargetSearchReason searchReason = Acore::WorldObjectSpellAreaTargetSearchReason::Area);
     void SearchChainTargets(std::list<WorldObject*>& targets, uint32 chainTargets, WorldObject* target, SpellTargetObjectTypes objectType, SpellTargetCheckTypes selectType, SpellTargetSelectionCategories selectCategory, ConditionList* condList, bool isChainHeal);
 
     SpellCastResult prepare(SpellCastTargets const* targets, AuraEffect const* triggeredByAura = nullptr);
@@ -466,7 +469,7 @@ public:
     void TakeReagents();
     void TakeCastItem();
 
-    SpellCastResult CheckCast(bool strict);
+    SpellCastResult CheckCast(bool strict, uint32* param1 = nullptr, uint32* param2 = nullptr);
     SpellCastResult CheckPetCast(Unit* target);
 
     // handlers
@@ -478,7 +481,7 @@ public:
 
     void OnSpellLaunch();
 
-    SpellCastResult CheckItems();
+    SpellCastResult CheckItems(uint32* param1 = nullptr, uint32* param2 = nullptr);
     SpellCastResult CheckSpellFocus();
     SpellCastResult CheckRange(bool strict);
     SpellCastResult CheckPower();
@@ -508,6 +511,7 @@ public:
     void SendPetCastResult(SpellCastResult result);
     void SendSpellStart();
     void SendSpellGo();
+
     void SendSpellCooldown();
     void SendLogExecute();
     void ExecuteLogEffectTakeTargetPower(uint8 effIndex, Unit* target, uint32 PowerType, uint32 powerTaken, float gainMultiplier);
@@ -563,6 +567,7 @@ public:
     bool IsNextMeleeSwingSpell() const;
     bool IsTriggered() const { return HasTriggeredCastFlag(TRIGGERED_FULL_MASK); };
     bool HasTriggeredCastFlag(TriggerCastFlags flag) const { return _triggeredCastFlags & flag; };
+    [[nodiscard]] bool IsProcDisabled() const { return HasTriggeredCastFlag(TRIGGERED_DISALLOW_PROC_EVENTS); }
     bool IsChannelActive() const { return m_caster->GetUInt32Value(UNIT_CHANNEL_SPELL) != 0; }
     bool IsAutoActionResetSpell() const;
     bool IsIgnoringCooldowns() const;
@@ -584,6 +589,7 @@ public:
 
     Unit* GetCaster() const { return m_caster; }
     Unit* GetOriginalCaster() const { return m_originalCaster; }
+    Unit* GetOriginalTarget() const;
     SpellInfo const* GetSpellInfo() const { return m_spellInfo; }
     int32 GetPowerCost() const { return m_powerCost; }
 
@@ -599,6 +605,7 @@ public:
     std::list<TargetInfo>* GetUniqueTargetInfo() { return &m_UniqueTargetInfo; }
 
     [[nodiscard]] uint32 GetTriggeredByAuraTickNumber() const { return m_triggeredByAuraSpell.tickNumber; }
+    [[nodiscard]] SpellInfo const* GetTriggeredByAuraSpellInfo() const { return m_triggeredByAuraSpell.spellInfo; }
 
     [[nodiscard]] TriggerCastFlags GetTriggeredCastFlags() const { return _triggeredCastFlags; }
 
@@ -618,6 +625,8 @@ public:
     ObjectGuid m_originalCasterGUID;                    // real source of cast (aura caster/etc), used for spell targets selection
     // e.g. damage around area spell trigered by victim aura and damage enemies of aura caster
     Unit* m_originalCaster;                             // cached pointer for m_originalCaster, updated at Spell::UpdatePointers()
+
+    ObjectGuid m_originalTargetGUID;                    // unit target saved before InitExplicitTargets strips it
 
     Spell** m_selfContainer;                            // pointer to our spell container (if applicable)
 
@@ -682,6 +691,7 @@ public:
     // Damage and healing in effects need just calculate
     int32 m_damage;           // Damge   in effects count here
     int32 m_healing;          // Healing in effects count here
+    int32 m_damageBeforeTakenMods;
 
     // ******************************************
     // Spell trigger system
@@ -826,8 +836,9 @@ namespace Acore
     {
         float _range;
         Position const* _position;
+        Acore::WorldObjectSpellAreaTargetSearchReason _searchReason;
         WorldObjectSpellAreaTargetCheck(float range, Position const* position, Unit* caster,
-                                        Unit* referer, SpellInfo const* spellInfo, SpellTargetCheckTypes selectionType, ConditionList* condList);
+                                        Unit* referer, SpellInfo const* spellInfo, SpellTargetCheckTypes selectionType, ConditionList* condList, Acore::WorldObjectSpellAreaTargetSearchReason searchReason = Acore::WorldObjectSpellAreaTargetSearchReason::Area);
         bool operator()(WorldObject* target);
     };
 

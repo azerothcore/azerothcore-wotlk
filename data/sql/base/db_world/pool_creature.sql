@@ -155,6 +155,14 @@ INSERT INTO `pool_creature` VALUES
 (38089,1041,0,'Spiteflayer (8299) - Spawn 1'),
 (38303,1040,0,'Ravage (8300) - Spawn 1'),
 (38936,1032,0,'Lost One Cook (1106) - Spawn 1'),
+(39203,32492,10,'Time-Lost Proto Drake - Path 1'),
+(39204,32493,10,'Time-Lost Proto Drake - Path 2'),
+(39205,32494,10,'Time-Lost Proto Drake - Path 3'),
+(39206,32495,10,'Time-Lost Proto Drake - Path 4'),
+(39207,32492,0,'Vyragosa - Path 1'),
+(39208,32493,0,'Vyragosa - Path 2'),
+(39209,32494,0,'Vyragosa - Path 3'),
+(39210,32495,0,'Vyragosa - Path 4'),
 (40656,367,0,'Death Howl Spawn 1'),
 (41881,1035,0,'Clack the Reaver (8301) - Spawn 1'),
 (42112,1031,0,'Lost One Chieftain (763) - Spawn 1'),
@@ -1709,4 +1717,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-29 17:54:22
+-- Dump completed on 2026-03-15 20:39:03

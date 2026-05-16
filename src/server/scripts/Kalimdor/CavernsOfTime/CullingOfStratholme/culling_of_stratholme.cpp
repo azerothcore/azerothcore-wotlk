@@ -175,6 +175,18 @@ enum Misc
     ACTION_FORCE_CHANGE_LOCK                = 2,
 
     POINT_CHRONOS                           = 1,
+
+    // Stephanie Sindree crowd
+    NPC_STEPHANIE_SINDREE                   = 31019,
+    SAY_STEPHANIE_CROWD_1                   = 4,
+    SAY_STEPHANIE_CROWD_2                   = 5,
+    SAY_STEPHANIE_CROWD_3                   = 6,
+    SAY_STEPHANIE_RESPONSE_1                = 0,
+    SAY_STEPHANIE_RESPONSE_2                = 1,
+
+    // Brandon Eiredeck crowd
+    NPC_BRANDON_EIREDECK                    = 31023,
+    SAY_BRANDON_CROWD_AMBIENT               = 3,
 };
 
 enum Events
@@ -515,6 +527,7 @@ public:
             }
         }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 uiPointId) override
         {
             switch (uiPointId)
@@ -1402,7 +1415,10 @@ enum chromie
     ITEM_ARCANE_DISRUPTOR               = 37888,
     QUEST_DISPELLING_ILLUSIONS          = 13149,
     QUEST_A_ROYAL_ESCORT                = 13151,
-    SPELL_SUMMON_ARCANE_DISRUPTOR       = 49591
+    SPELL_SUMMON_ARCANE_DISRUPTOR       = 49591,
+    GOSSIP_MENU_START                   = 9586,
+    GOSSIP_MENU_ACTION_MENU_SKIP        = 11277,
+    GOSSIP_MENU_ACTION_INTERFERE        = 9595
 };
 
 class npc_cos_chromie_start : public CreatureScript
@@ -1410,55 +1426,55 @@ class npc_cos_chromie_start : public CreatureScript
 public:
     npc_cos_chromie_start() : CreatureScript("npc_cos_chromie_start") { }
 
-    bool OnQuestAccept(Player*, Creature* creature, const Quest* pQuest)
+    bool OnQuestAccept(Player* /*player*/, Creature* creature, const Quest* quest) override
     {
-        if (pQuest->GetQuestId() == QUEST_DISPELLING_ILLUSIONS)
-        {
-            if (InstanceScript* pInstance = creature->GetInstanceScript())
-            {
-                pInstance->SetData(DATA_SHOW_CRATES, 1);
-            }
-        }
+        if (quest->GetQuestId() == QUEST_DISPELLING_ILLUSIONS)
+            if (InstanceScript* instance = creature->GetInstanceScript())
+                instance->SetData(DATA_SHOW_CRATES, 1);
 
         return true;
     }
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 /*action*/)
+    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 /*action*/) override
     {
-        // final menu id, show crates if hidden and add item if missing
-        if (player->PlayerTalkClass->GetGossipMenu().GetMenuId() == 9595)
+        switch (player->PlayerTalkClass->GetGossipMenu().GetMenuId())
         {
-            if (InstanceScript* pInstance = creature->GetInstanceScript())
+            case GOSSIP_MENU_START:
             {
-                if (pInstance->GetData(DATA_ARTHAS_EVENT) == COS_PROGRESS_NOT_STARTED)
-                {
-                    pInstance->SetData(DATA_SHOW_CRATES, 1);
-                }
-            }
+                if (InstanceScript* instance = creature->GetInstanceScript())
+                    if (instance->GetData(DATA_ARTHAS_EVENT) == COS_PROGRESS_NOT_STARTED)
+                        instance->SetData(DATA_SHOW_CRATES, 1);
 
-            if (!player->HasItemCount(ITEM_ARCANE_DISRUPTOR))
-            {
-                creature->CastSpell(player, SPELL_SUMMON_ARCANE_DISRUPTOR);
+                break;
             }
-        }
-        // Skip Event
-        else if (player->PlayerTalkClass->GetGossipMenu().GetMenuId() == 11277)
-        {
-            if (InstanceScript* pInstance = creature->GetInstanceScript())
+            case GOSSIP_MENU_ACTION_INTERFERE:
             {
-                if (pInstance->GetData(DATA_ARTHAS_EVENT) == COS_PROGRESS_NOT_STARTED)
+                if (!player->HasItemCount(ITEM_ARCANE_DISRUPTOR))
+                    creature->CastSpell(player, SPELL_SUMMON_ARCANE_DISRUPTOR);
+
+                break;
+            }
+            // Since 3.3.3: "Players may now skip the initial introduction dialog to this dungeon once they have completed it at least once."
+            case GOSSIP_MENU_ACTION_MENU_SKIP:
+            {
+                if (InstanceScript* instance = creature->GetInstanceScript())
                 {
-                    pInstance->SetData(DATA_ARTHAS_EVENT, COS_PROGRESS_FINISHED_INTRO);
-                    if (Creature* arthas = ObjectAccessor::GetCreature(*creature, pInstance->GetGuidData(DATA_ARTHAS)))
+                    if (instance->GetData(DATA_ARTHAS_EVENT) == COS_PROGRESS_NOT_STARTED)
                     {
-                        arthas->AI()->Reset();
+                        instance->SetData(DATA_ARTHAS_EVENT, COS_PROGRESS_FINISHED_INTRO);
+
+                        if (Creature* arthas = ObjectAccessor::GetCreature(*creature, instance->GetGuidData(DATA_ARTHAS)))
+                            arthas->AI()->Reset();
                     }
+
+                    player->NearTeleportTo(LeaderIntroPos2.GetPositionX(), LeaderIntroPos2.GetPositionY(), LeaderIntroPos2.GetPositionZ(), LeaderIntroPos2.GetOrientation());
                 }
-                player->NearTeleportTo(LeaderIntroPos2.GetPositionX(), LeaderIntroPos2.GetPositionY(), LeaderIntroPos2.GetPositionZ(), LeaderIntroPos2.GetOrientation());
+                break;
             }
+            default:
+                break;
         }
 
-        // return false to display last windows
         return false;
     }
 };
@@ -1483,7 +1499,7 @@ public:
         if (!creature->GetInstanceScript() || creature->GetInstanceScript()->GetData(DATA_ARTHAS_EVENT) != COS_PROGRESS_CRATES_FOUND)
             return true;
 
-        // We can start event:)
+        // "Well, you're not going to sign recruitment papers or anything, but you are going to fight alongside him. ..."
         if (player->PlayerTalkClass->GetGossipMenu().GetMenuId() == 9612)
             creature->GetInstanceScript()->SetData(DATA_ARTHAS_EVENT, COS_PROGRESS_START_INTRO);
 
@@ -1518,12 +1534,24 @@ public:
             pInstance = me->GetInstanceScript();
             if (!pInstance || pInstance->GetData(DATA_ARTHAS_EVENT) < COS_PROGRESS_FINISHED_CITY_INTRO)
                 allowTimer++;
+
+            isStephanieCrowd = me->GetEntry() == NPC_CITY_MAN3 && me->GetDistance(2149.56f, 1339.46f, 132.531f) < 10.0f;
+            stephanieDialogueTimer = isStephanieCrowd ? urand(5000, 15000) : 0;
+            stephanieDialoguePhase = 0;
+
+            isBrandonCrowd = me->GetDistance(2267.86f, 1144.93f, 138.403f) < 10.0f;
+            ambientTalkTimer = isBrandonCrowd ? urand(5000, 15000) : 0;
         }
 
         bool locked;
         uint32 changeTimer;
         InstanceScript* pInstance;
         uint32 allowTimer;
+        bool isStephanieCrowd;
+        uint32 stephanieDialogueTimer;
+        uint8 stephanieDialoguePhase;
+        bool isBrandonCrowd;
+        uint32 ambientTalkTimer;
 
         void Reset() override
         {
@@ -1583,6 +1611,61 @@ public:
         void UpdateAI(uint32 diff) override
         {
             ScriptedAI::UpdateAI(diff);
+
+            if (isStephanieCrowd && stephanieDialogueTimer)
+            {
+                if (stephanieDialogueTimer <= diff)
+                {
+                    Creature* stephanie = me->FindNearestCreature(NPC_STEPHANIE_SINDREE, 10.0f);
+                    switch (stephanieDialoguePhase)
+                    {
+                        case 0:
+                            Talk(SAY_STEPHANIE_CROWD_1);
+                            stephanieDialogueTimer = 5000;
+                            stephanieDialoguePhase = 1;
+                            break;
+                        case 1:
+                            if (stephanie)
+                                stephanie->AI()->Talk(SAY_STEPHANIE_RESPONSE_1);
+                            stephanieDialogueTimer = 5000;
+                            stephanieDialoguePhase = 2;
+                            break;
+                        case 2:
+                            Talk(SAY_STEPHANIE_CROWD_2);
+                            stephanieDialogueTimer = 5000;
+                            stephanieDialoguePhase = 3;
+                            break;
+                        case 3:
+                            if (stephanie)
+                                stephanie->AI()->Talk(SAY_STEPHANIE_RESPONSE_2);
+                            stephanieDialogueTimer = 8000;
+                            stephanieDialoguePhase = 4;
+                            break;
+                        case 4:
+                            Talk(SAY_STEPHANIE_CROWD_3);
+                            stephanieDialogueTimer = urand(45000, 60000);
+                            stephanieDialoguePhase = 0;
+                            break;
+                    }
+                }
+                else
+                    stephanieDialogueTimer -= diff;
+
+                return;
+            }
+
+            if (isBrandonCrowd && ambientTalkTimer)
+            {
+                if (ambientTalkTimer <= diff)
+                {
+                    Talk(SAY_BRANDON_CROWD_AMBIENT);
+                    ambientTalkTimer = urand(15000, 25000);
+                }
+                else
+                    ambientTalkTimer -= diff;
+
+                return;
+            }
 
             if (allowTimer)
             {

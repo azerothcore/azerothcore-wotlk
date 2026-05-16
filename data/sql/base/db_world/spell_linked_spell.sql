@@ -78,7 +78,6 @@ INSERT INTO `spell_linked_spell` VALUES
 (-59743,54343,0,''),
 (-57620,-57874,0,'Twilight Phase Shift trigger remove'),
 (-57620,61885,0,'Twilight Phase Shift immunity add'),
-(-57350,60242,0,'Darkmoon Card: Illusion'),
 (-55053,55601,0,'Deathbloom (H)'),
 (-54361,54343,0,''),
 (-53601,-58597,0,'Sacred Shield remove'),
@@ -656,4 +655,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-29 17:54:36
+-- Dump completed on 2026-03-15 20:39:18

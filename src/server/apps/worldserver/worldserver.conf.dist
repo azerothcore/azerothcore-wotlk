@@ -34,6 +34,7 @@
 #    CHARACTER DELETE
 #    CHARACTER CREATION
 #    CHARACTER
+#    ACHIEVEMENT
 #    SKILL
 #    STATS
 #    REPUTATION
@@ -612,6 +613,24 @@ AllowLoggingIPAddressesInDatabase = 1
 Allow.IP.Based.Action.Logging = 0
 
 #
+#    LogSpamReports
+#        Description: Allow logging spam reports from players in the chat, mail or calendar into the database.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#
+
+LogSpamReports = 1
+
+#
+#    ChatLog.Enable
+#        Description: Enable or disable chat logging (chat_log.cpp).
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+#
+
+ChatLog.Enable = 0
+
+#
 #  Appender config values: Given an appender "name"
 #    Appender.name
 #        Description: Defines 'where to log'.
@@ -756,11 +775,14 @@ Logger.spells.scripts=2,Console Errors
 #Logger.entities.gameobject=4,Console Server
 #Logger.entities.object=4,Console Server
 #Logger.entities.pet=4,Console Server
+#Logger.entities.player.auctionhouse=4,Console Server
 #Logger.entities.player.character=4,Console Server
 #Logger.entities.player.dump=4,Console Server
 #Logger.entities.player.items=4,Console Server
 #Logger.entities.player.loading=4,Console Server
+#Logger.entities.player.mail=4,Console Server
 #Logger.entities.player.skills=4,Console Server
+#Logger.entities.player.trade=4,Console Server
 #Logger.entities.player=4,Console Server
 #Logger.entities.transport=4,Console Server
 #Logger.entities.unit.ai=4,Console Server
@@ -2186,7 +2208,7 @@ Rate.MissChanceMultiplier.OnlyAffectsPlayer = 0
 
 #
 #     LevelReq.Trade
-#        Description: Level requirement for characters to be able to trade.
+#        Description: Level requirement for characters to be able to initiate a trade.
 #        Default:     1
 
 LevelReq.Trade = 1
@@ -2221,6 +2243,22 @@ SpellQueue.Enabled = 1
 #        Default:     400 - (400ms)
 
 SpellQueue.Window = 400
+
+#
+###################################################################################################
+
+###################################################################################################
+# ACHIEVEMENT
+#
+#    Achievement.RealmFirstKillWindow
+#        Description: Time window (in seconds) for realm first kill achievements after the first
+#                     completion. This setting controls whether multiple groups can earn the
+#                     realm first kill achievement within a short time window.
+#        Default:     60 - (Allow additional groups to complete within 60 seconds/1 minute)
+#                     0  - (Strict mode, only the first group/player gets the achievement)
+#                     1+ - (Extended window, allow N seconds for additional completions)
+
+Achievement.RealmFirstKillWindow = 60
 
 #
 ###################################################################################################
@@ -2422,6 +2460,13 @@ Rate.XP.BattlegroundKillSOTA = 1
 Rate.XP.BattlegroundKillIC   = 1
 
 #
+#    Rate.XP.BattlegroundBonus
+#        Description: Experience rate multiplier for battleground objectives (flag captures, base assaults, etc.).
+#        Default:     1
+
+Rate.XP.BattlegroundBonus = 1
+
+#
 #    Rate.Pet.LevelXP
 #        Description: Modifies the amount of experience required to level up a pet.
 #       The lower the rate the less experience is required.
@@ -2502,6 +2547,20 @@ Arena.LegacyArenaPoints = 0
 Rate.ArenaPoints = 1
 
 #
+#    Rate.ArenaPoints2v2
+#        Description: Arena points gain rate for 2v2 bracket.
+#        Default:     0.76
+
+Rate.ArenaPoints2v2 = 0.76
+
+#
+#    Rate.ArenaPoints3v3
+#        Description: Arena points gain rate for 3v3 bracket.
+#        Default:     0.88
+
+Rate.ArenaPoints3v3 = 0.88
+
+#
 #    PvPToken.Enable
 #        Description: Character will receive a token after defeating another character that yields
 #                     honor.
@@ -2555,6 +2614,14 @@ DurabilityLoss.InPvP = 0
 #        Default:     10
 
 DurabilityLoss.OnDeath = 10
+
+#
+#    DurabilityLoss.OnSpiritResurrect
+#        Description: Durability loss percentage on spirit healer resurrection. Does not effect PvP
+#                     spirit healers.
+#        Default:     25
+
+DurabilityLoss.OnSpiritResurrect = 25
 
 #
 #    DurabilityLossChance.Damage
@@ -3384,6 +3451,16 @@ DungeonFinder.CastDeserter = 1
 DungeonFinder.AllowCompleted = 1
 
 #
+#    DungeonFinder.DungeonSelectionCooldown
+#
+#        Description: Duration in minutes for the dungeon selection cooldown. Players who complete a
+#                     random dungeon via LFG will not be assigned the same dungeon again for this
+#                     duration. This reduces the chance of getting the same dungeon in a row.
+#        Default:     0 - (Disabled)
+
+DungeonFinder.DungeonSelectionCooldown = 0
+
+#
 ###################################################################################################
 
 ###################################################################################################
@@ -3578,6 +3655,15 @@ Wintergrasp.NoBattleTimer = 150
 #         Default:     10
 
 Wintergrasp.CrashRestartTimer = 10
+
+#
+#     Wintergrasp.SkipBattleSessionCount
+#         Description: When the peace timer expires, if the number of active sessions
+#                      exceeds this value, a new war will not start.
+#                      Set to 0 to disable this check.
+#         Default:     3500
+
+Wintergrasp.SkipBattleSessionCount = 3500
 
 #
 ###################################################################################################
@@ -4290,14 +4376,6 @@ AllowTwoSide.Interaction.Calendar = 0
 AllowTwoSide.Interaction.Chat = 0
 
 #
-#    AllowTwoSide.Interaction.Emote
-#        Description: Allow emote messages between factions (e.g. "/e looks into the sky")
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-AllowTwoSide.Interaction.Emote = 0
-
-#
 #    AllowTwoSide.Interaction.Channel
 #        Description: Allow channel chat between factions.
 #        Default:     0 - (Disabled)
@@ -4337,38 +4415,6 @@ AllowTwoSide.Interaction.Arena = 0
 #                     1 - (Enabled)
 
 AllowTwoSide.Interaction.Auction = 0
-
-#
-#    AllowTwoSide.Interaction.Mail
-#        Description: Allow sending mails between factions.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-AllowTwoSide.Interaction.Mail = 0
-
-#
-#    AllowTwoSide.WhoList
-#        Description: Show characters from both factions in the /who list.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-AllowTwoSide.WhoList = 0
-
-#
-#    AllowTwoSide.AddFriend
-#        Description: Allow adding friends from other faction the friends list.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-AllowTwoSide.AddFriend = 0
-
-#
-#    AllowTwoSide.Trade
-#        Description: Allow trading between factions.
-#        Default:     0 - (Disabled)
-#                     1 - (Enabled)
-
-AllowTwoSide.Trade = 0
 
 #
 #    TalentsInspecting
@@ -4583,20 +4629,6 @@ Calculate.Creature.Zone.Area.Data = 0
 Calculate.Gameoject.Zone.Area.Data = 0
 
 #
-#    TeleportTimeoutNear
-#       Description:  No description
-#       Default:  25
-
-TeleportTimeoutNear = 25
-
-#
-#    TeleportTimeoutFar
-#       Description:  No description
-#       Default:  45
-
-TeleportTimeoutFar = 45
-
-#
 #    DailyRBGArenaPoints.MinLevel
 #        Description: Allows gaining arena points on the first RBG win at level 70.
 #        Default: 71 - (Blizzlike)
@@ -4646,6 +4678,14 @@ Debug.Battleground = 0
 Debug.Arena = 0
 
 #
+#    Debug.LFG
+#        Description: Enable or disable LFG 1 player queue mode. (If enabled, the in-game command is disabled.)
+#        Default: 0 - (Disabled)
+#                 1 - (Enabled)
+
+Debug.LFG = 0
+
+#
 ###################################################################################################
 
 ###################################################################################################
@@ -4690,6 +4730,27 @@ Respawn.DynamicRateGameObject = 1
 #        Default:     10 - (10 seconds)
 
 Respawn.DynamicMinimumGameObject = 10
+
+#
+#    Respawn.DynamicEscortNPC
+#        Description: Enable dynamic respawn behavior for escort quest NPCs.
+#                     When enabled, escort NPCs in spawn groups flagged as ESCORTQUESTNPC
+#                     will use special respawn handling.
+#        Default:     0 - (Disabled)
+#
+
+Respawn.DynamicEscortNPC = 0
+
+#
+#    Respawn.ForceCompatibilityMode
+#        Description: Force all spawns to use legacy (compatibility mode) respawn behavior,
+#                     regardless of their spawn group flags. When enabled, creatures and
+#                     gameobjects respawn in-place as they always have in AzerothCore.
+#                     Set to 1 to force legacy behavior for all spawns.
+#        Default:     0 - (Disabled, spawn groups control respawn mode)
+#
+
+Respawn.ForceCompatibilityMode = 0
 
 #
 ###################################################################################################
