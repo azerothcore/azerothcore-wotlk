@@ -14342,7 +14342,7 @@ bool Player::CanSeeSpellClickOn(Creature const* c) const
 
     SpellClickInfoMapBounds clickPair = sObjectMgr->GetSpellClickInfoMapBounds(c->GetEntry());
     if (clickPair.first == clickPair.second)
-        return true;
+        return false;
 
     for (SpellClickInfoContainer::const_iterator itr = clickPair.first; itr != clickPair.second; ++itr)
     {
@@ -15415,6 +15415,15 @@ void Player::ActivateSpec(uint8 spec)
         }
         else
             ++iter;
+    }
+
+    // Recheck shapeshift bonus auras: drop and re-apply form-tied passives
+    // so buffs from talents missing in the new spec (e.g. Master Shapeshifter) go away
+    Unit::AuraEffectList const& shapeshiftAuras = GetAuraEffectsByType(SPELL_AURA_MOD_SHAPESHIFT);
+    for (AuraEffect* aurEff : shapeshiftAuras)
+    {
+        aurEff->HandleShapeshiftBoosts(this, false);
+        aurEff->HandleShapeshiftBoosts(this, true);
     }
 
     sScriptMgr->OnPlayerAfterSpecSlotChanged(this, GetActiveSpec());

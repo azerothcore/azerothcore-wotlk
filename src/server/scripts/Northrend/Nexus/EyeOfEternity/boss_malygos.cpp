@@ -709,11 +709,10 @@ struct boss_malygos : public BossAI
         DoMeleeAttackIfReady();
     }
 
-    void JustDied(Unit*  /*killer*/) override
+    void JustDied(Unit* /*killer*/) override
     {
         _JustDied();
         Talk(SAY_DEATH);
-        instance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, NPC_MALYGOS, 1);
     }
 
     void KilledUnit(Unit* victim) override
