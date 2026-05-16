@@ -165,8 +165,9 @@ Updates.EnableDatabases = 7
 #                    If the list is empty, no modules are allowed to automatically update. (current behavior)
 #       Default:     "" - (No modules are allowed)
 #
-#       Example:     "mod_name,mod_name2,mod_name3" (selected modules)
-#                     "all" - (All modules are allowed)
+#       Example:     "mod-name,mod-name2,mod-name3" (selected modules)
+#                     "all" - (Modules enabled by the current CMake list are allowed)
+#                     "all_nocmake" - (All module folders in modules/ are allowed)
 #
 Updates.AllowedModules = "all"
 

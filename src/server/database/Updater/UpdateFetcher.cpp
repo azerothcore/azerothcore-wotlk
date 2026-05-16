@@ -156,8 +156,26 @@ UpdateFetcher::DirectoryStorage UpdateFetcher::ReceiveIncludedDirectories() cons
 
         std::vector<std::string> moduleList;
 
-        for (auto const& itr : Acore::Tokenize(_modulesList, ',', true))
-            moduleList.emplace_back(itr);
+        if (_modulesList == "all_nocmake")
+        {
+            path const modulesPath = *_sourceDirectory / "modules";
+            if (is_directory(modulesPath))
+            {
+                directory_iterator const end;
+                for (directory_iterator itr{modulesPath}; itr != end; ++itr)
+                {
+                    if (!is_directory(itr->path()))
+                        continue;
+
+                    moduleList.emplace_back(itr->path().filename().string());
+                }
+            }
+        }
+        else
+        {
+            for (auto const& itr : Acore::Tokenize(_modulesList, ',', true))
+                moduleList.emplace_back(itr);
+        }
 
         // data/sql
         for (auto const& moduleName : moduleList)
