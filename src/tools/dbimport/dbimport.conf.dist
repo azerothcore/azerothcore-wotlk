@@ -169,7 +169,7 @@ Updates.EnableDatabases = 7
 #                     "all" - (Modules enabled by the current CMake list are allowed)
 #                     "all_nocmake" - (All module folders in modules/ are allowed)
 #
-Updates.AllowedModules = "all"
+Updates.AllowedModules = ""
 
 #
 #    Updates.AutoSetup
