@@ -1,3 +1,4 @@
+-- DB update 2026_05_15_00 -> 2026_05_16_00
 -- Remove Trok Creature Addon & set movement type to 0
 UPDATE `creature` SET `MovementType` = 0 WHERE (`id1` = 14872) AND (`guid` = 13178);
 DELETE FROM `creature_addon` WHERE (`guid` IN (13178));
