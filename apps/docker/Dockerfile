@@ -1,4 +1,4 @@
-ARG UBUNTU_VERSION=22.04 # lts
+ARG UBUNTU_VERSION=24.04 # lts
 
 # This target lays out the general directory skeleton for AzerothCore,
 # This target isn't intended to be directly used
@@ -67,7 +67,7 @@ RUN apt-get update                                                     \
         build-essential ccache libtool cmake-data make cmake clang    \
         git lsb-base curl unzip default-mysql-client openssl                  \
         default-libmysqlclient-dev libboost-all-dev libssl-dev libmysql++-dev \
-        libreadline-dev zlib1g-dev libbz2-dev libncurses5-dev         \
+        libreadline-dev zlib1g-dev libbz2-dev libncurses5-dev liblzma-dev  \
     && rm -rf /var/lib/apt/lists/*
 
 COPY CMakeLists.txt /azerothcore/CMakeLists.txt
@@ -117,11 +117,12 @@ ARG DOCKER_USER=acore
 ENV ACORE_COMPONENT=undefined
 
 # Install base dependencies for azerothcore
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-      libmysqlclient21 libreadline8 \
-      gettext-base default-mysql-client && \
-    rm -rf /var/lib/apt/lists/*
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+      libmysqlclient21 libreadline8 libicu74 libncurses5-dev \
+      gettext-base default-mysql-client \
+      adduser \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY --from=build /azerothcore/env/dist/etc/ /azerothcore/env/ref/etc
 
@@ -129,10 +130,13 @@ VOLUME /azerothcore/env/dist/etc
 
 ENV PATH="/azerothcore/env/dist/bin:$PATH"
 
-RUN groupadd --gid "$GROUP_ID"  "$DOCKER_USER" && \
-    useradd -d /azerothcore --uid "$USER_ID"  --gid "$GROUP_ID"  "$DOCKER_USER" && \
-    passwd -d "$DOCKER_USER" && \
-    chown -R "$DOCKER_USER:$DOCKER_USER" /azerothcore
+# To use GID/UID 1000 in ubuntu > 23.04 the existing user must be deleted
+# See https://bugs.launchpad.net/cloud-images/+bug/2005129
+RUN userdel --remove ubuntu \
+  && addgroup --gid "$GROUP_ID" "$DOCKER_USER" \
+  && adduser --disabled-password --gecos '' --uid "$USER_ID" --gid "$GROUP_ID" "$DOCKER_USER" \
+  && passwd -d "$DOCKER_USER" \
+  && chown -R "$DOCKER_USER:$DOCKER_USER" /azerothcore
 
 COPY --chown=$USER_ID:$GROUP_ID \
      --chmod=755 \
