@@ -122,9 +122,23 @@ foreach(TOOL_NAME ${TOOLS_BUILD_LIST})
       PUBLIC
         database
       PRIVATE
-        modules
-        scripts
         acore-core-interface)
+
+    if (TARGET scripts)
+      target_link_libraries(${TOOL_PROJECT_NAME}
+        PRIVATE
+          scripts)
+    endif()
+
+    if (TARGET modules)
+      target_link_libraries(${TOOL_PROJECT_NAME}
+        PRIVATE
+          modules)
+    else()
+      target_compile_definitions(${TOOL_PROJECT_NAME}
+        PRIVATE
+          AC_MODULES_LIST="")
+    endif()
 
     # Install config
     CopyToolConfig(${TOOL_PROJECT_NAME} ${TOOL_NAME})
