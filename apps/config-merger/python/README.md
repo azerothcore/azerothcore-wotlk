@@ -12,7 +12,7 @@ This tool compares your existing configuration files (`.conf`) with the latest d
 ## Features
 
 - **Interactive Menu System** - Easy-to-use numbered menu options
-- **Server Config Support** - Update authserver.conf and worldserver.conf
+- **Server Config Support** - Update authserver.conf, worldserver.conf, and dbimport.conf
 - **Module Config Support** - Update all or selected module configurations
 - **Automatic Backups** - If you choose a valid option and there are changes, a timestamped backup is created before any changes are made (e.g. `filename(d11_m12_y2025_14h_30m_45s).bak`)
 - **Selective Updates** - Choose which new config options to add (y/n prompts)
@@ -44,6 +44,7 @@ There are two ways to use this. You can either copy this file directly to your `
    3 - Update Auth and World Configs
    4 - Update All Modules Configs
    5 - Update Modules (Selection) Configs
+  6 - Update DBImport Config
    0 - Quit
    ```
 
@@ -61,6 +62,7 @@ python config_merger.py [config_dir] [target] [options]
   - `auth` - Update authserver.conf only
   - `world` - Update worldserver.conf only  
   - `both` - Update both server configs
+  - `dbimport` - Update dbimport.conf only
   - `modules` - Update all module configs
   - `modules-select` - Interactive module selection
 
@@ -90,6 +92,7 @@ python config_merger.py . modules
 - **Option 3**: Updates both server config files
 - **Option 4**: Automatically processes all module config files in the `modules/` folder
 - **Option 5**: Shows you a list of available modules and lets you select specific ones to update
+- **Option 6**: Updates only `dbimport.conf` from `dbimport.conf.dist`
 - **Option 0**: Exit the program
 
 ## Interactive Process
@@ -130,6 +133,8 @@ configs/
 ├── config_merger.py        (this script)
 ├── authserver.conf.dist
 ├── authserver.conf
+├── dbimport.conf.dist
+├── dbimport.conf
 ├── worldserver.conf.dist
 ├── worldserver.conf
 └── modules/

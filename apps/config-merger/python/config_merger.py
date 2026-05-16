@@ -19,7 +19,7 @@
 # Original code portions licensed under MIT License by Brian Aldridge (https://github.com/BoiseComputer)
 # Original project: https://github.com/Brian-Aldridge/update_module_confs
 
-VERSION = "1"
+VERSION = "2"
 
 import os
 import shutil
@@ -195,6 +195,7 @@ def show_main_menu():
     print("3 - Update Auth and World Configs")
     print("4 - Update All Modules Configs")
     print("5 - Update Modules (Selection) Configs")
+    print("6 - Update DBImport Config")
     print("0 - Quit")
     return input("Select an option: ").strip()
 
@@ -203,8 +204,8 @@ def parse_args():
     parser.add_argument('config_dir', nargs='?', default='.', 
                       help='Path to configs directory (default: current directory)')
     parser.add_argument('target', nargs='?',
-                      choices=['auth', 'world', 'both', 'modules', 'modules-select'],
-                      help='What to update: auth, world, both, modules, modules-select')
+                      choices=['auth', 'world', 'both', 'dbimport', 'modules', 'modules-select'],
+                      help='What to update: auth, world, both, dbimport, modules, modules-select')
     parser.add_argument('-y', '--yes', action='store_true',
                       help='Automatically answer yes to all prompts')
     parser.add_argument('--version', action='version', version=f'%(prog)s {VERSION}')
@@ -239,6 +240,8 @@ def main():
                 update_modules(config_dir, selected_only=False)
             elif choice == "5":
                 update_modules(config_dir, selected_only=True)
+            elif choice == "6":
+                update_server_config("dbimport", config_dir)
             elif choice == "0":
                 print("Goodbye!")
                 break
@@ -265,6 +268,8 @@ def main():
         elif args.target == 'both':
             update_server_config("authserver", config_dir, args.yes)
             update_server_config("worldserver", config_dir, args.yes)
+        elif args.target == 'dbimport':
+            update_server_config("dbimport", config_dir, args.yes)
         elif args.target == 'modules':
             update_modules(config_dir, selected_only=False, skip_prompts=args.yes)
         elif args.target == 'modules-select':
