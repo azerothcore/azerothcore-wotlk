@@ -1,4 +1,3 @@
-
 -- Remove Trok Creature Addon & set movement type to 0
 UPDATE `creature` SET `MovementType` = 0 WHERE (`id1` = 14872) AND (`guid` = 13178);
 DELETE FROM `creature_addon` WHERE (`guid` IN (13178));
@@ -102,7 +101,7 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 (13178, 13589, 3, 210, 512, 0, 0);
 
 -- Set Karu Waypoints (sniffed)
-DELETE FROM `waypoint_data` WHERE (`id` IN (1487400, 1487401, 1487402, 1487403, 1487405));
+DELETE FROM `waypoint_data` WHERE (`id` IN (1487400, 1487401, 1487402, 1487403, 1487404, 1487405));
 INSERT INTO `waypoint_data` (`id`,  `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
 (1487400, 1, 236.83551, -2901.6663, 98.27072, NULL, 0, 0, 0, 100, 0),
 (1487400, 2, 231.1377, -2900.656, 98.36378, NULL, 0, 0, 0, 100, 0),
@@ -117,6 +116,12 @@ INSERT INTO `waypoint_data` (`id`,  `point`, `position_x`, `position_y`, `positi
 (1487403, 2, 214.50314, -2872.4348, 92.15973, NULL, 0, 0, 0, 100, 0),
 (1487403, 3, 217.36098, -2865.298, 91.65433, NULL, 0, 0, 0, 100, 0),
 (1487403, 4, 217.41162, -2850.4937, 90.641594, NULL, 0, 0, 0, 100, 0),
+(1487404, 1, 213.4119, -2880.7893, 92.02311, NULL, 0, 0, 0, 100, 0),
+(1487404, 2, 219.35861, -2891.507, 95.20309, NULL, 0, 0, 0, 100, 0),
+(1487404, 3, 226.4482, -2900.4465, 97.3964, NULL, 0, 0, 0, 100, 0),
+(1487404, 4, 232.52274, -2901.0789, 98.35955, NULL, 0, 0, 0, 100, 0),
+(1487404, 5, 239.77821, -2901.221, 98.15523, NULL, 0, 0, 0, 100, 0),
+(1487404, 6, 240.79094, -2901.4275, 98.10327, NULL, 0, 0, 0, 100, 0),
 (1487405, 1, 216.49214, -2861.2983, 91.58173, NULL, 0, 0, 0, 100, 0),
 (1487405, 2, 213.4119, -2880.7893, 92.02311, NULL, 0, 0, 0, 100, 0),
 (1487405, 3, 219.35861, -2891.507, 95.20309, NULL, 0, 0, 0, 100, 0),
@@ -130,23 +135,25 @@ UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 14874;
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 14874);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(14874, 0, 0, 1, 1, 1, 100, 0, 12000, 180000, 120000, 180000, 0, 0, 89, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - Out of Combat - Stop Random Movement (Phase 1)'),
+(14874, 0, 0, 1, 1, 1, 100, 0, 120000, 180000, 120000, 180000, 0, 0, 89, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - Out of Combat - Stop Random Movement (Phase 1)'),
 (14874, 0, 1, 2, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - Out of Combat - Set Event Phase 2 (Phase 1)'),
 (14874, 0, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 69, 14, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 241.109, -2908.19, 98.1005, 0, 'Karu - Out of Combat - Move To Position (Phase 1)'),
 (14874, 0, 3, 0, 34, 2, 100, 0, 8, 14, 0, 0, 0, 0, 80, 1487400, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - On Reached Point 14 - Run Script (Phase 2)'),
 (14874, 0, 4, 0, 109, 2, 100, 0, 0, 1487400, 0, 0, 0, 0, 80, 1487401, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - On Path 1487400 Finished - Run Script (Phase 2)'),
 (14874, 0, 5, 0, 109, 2, 100, 0, 0, 1487401, 0, 0, 0, 0, 80, 1487402, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - On Path 1487401 Finished - Run Script (Phase 2)'),
-(14874, 0, 6, 0, 109, 2, 100, 0, 0, 1487402, 0, 0, 0, 0, 80, 1487403, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - On Path 1487402 Finished - Run Script (Phase 2)'),
-(14874, 0, 7, 0, 109, 2, 100, 0, 0, 1487403, 0, 0, 0, 0, 80, 1487404, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - On Path 1487403 Finished - Run Script (Phase 2)'),
-(14874, 0, 8, 0, 34, 2, 100, 0, 8, 15, 0, 0, 0, 0, 80, 1487405, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - On Reached Point 15 - Run Script (Phase 2)'),
-(14874, 0, 9, 10, 109, 2, 100, 0, 0, 1487405, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - On Path 1487405 Finished - Set Event Phase 1 (Phase 2)'),
-(14874, 0, 10, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 89, 5, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - On Path 1487405 Finished - Start Random Movement (Phase 2)'),
-(14874, 0, 11, 12, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - On Respawn - Set Event Phase 1'),
-(14874, 0, 12, 13, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - On Respawn - Set Run Off'),
-(14874, 0, 13, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 89, 5, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - On Respawn - Start Random Movement');
+(14874, 0, 6, 0, 109, 2, 100, 0, 0, 1487401, 0, 0, 0, 0, 80, 1487406, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - On Path 1487401 Finished - Run Script (Phase 2)'),
+(14874, 0, 7, 0, 109, 2, 100, 0, 0, 1487402, 0, 0, 0, 0, 80, 1487403, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - On Path 1487402 Finished - Run Script (Phase 2)'),
+(14874, 0, 8, 0, 109, 2, 100, 0, 0, 1487403, 0, 0, 0, 0, 80, 1487404, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - On Path 1487403 Finished - Run Script (Phase 2)'),
+(14874, 0, 9, 0, 34, 2, 100, 0, 8, 15, 0, 0, 0, 0, 80, 1487405, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - On Reached Point 15 - Run Script (Phase 2)'),
+(14874, 0, 10, 12, 109, 2, 100, 0, 0, 1487404, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - On Path 1487404 Finished - Set Event Phase 1 (Phase 2)'),
+(14874, 0, 11, 12, 109, 2, 100, 0, 0, 1487405, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - On Path 1487405 Finished - Set Event Phase 1 (Phase 2)'),
+(14874, 0, 12, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 89, 5, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - On Path 1487405 Finished - Start Random Movement (Phase 2)'),
+(14874, 0, 13, 14, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - On Respawn - Set Event Phase 1'),
+(14874, 0, 14, 15, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - On Respawn - Set Run Off'),
+(14874, 0, 15, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 89, 5, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - On Respawn - Start Random Movement');
 
 -- Set Action Lists (Karu)
-DELETE FROM `smart_scripts` WHERE (`source_type` = 9) AND (`entryorguid` IN (1487400, 1487401, 1487402, 1487403, 1487404, 1487405));
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9) AND (`entryorguid` IN (1487400, 1487401, 1487402, 1487403, 1487404, 1487405, 1487406));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (1487400, 9, 0, 0, 0, 0, 100, 0, 500, 500, 0, 0, 0, 0, 66, 1, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 5.89921, 'Karu - Actionlist - Set Orientation 5.89921'),
 (1487400, 9, 1, 0, 0, 0, 100, 0, 10000, 10000, 0, 0, 0, 0, 71, 0, 0, 2196, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - Actionlist - Change Equipment'),
@@ -170,7 +177,15 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (1487404, 9, 5, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 0, 0, 69, 15, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 214.149, -2854.87, 91.2582, 0, 'Karu - Actionlist - Move To Position'),
 (1487405, 9, 0, 0, 0, 0, 100, 0, 500, 500, 0, 0, 0, 0, 71, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - Actionlist - Remove Equipment'),
 (1487405, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 6, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - Actionlist - Say Line 6'),
-(1487405, 9, 2, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 0, 232, 1487405, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - Actionlist - Start Path 1487405');
+(1487405, 9, 2, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 0, 232, 1487405, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - Actionlist - Start Path 1487405'),
+(1487406, 9, 0, 0, 0, 0, 100, 0, 1000, 1000, 0, 0, 0, 0, 1, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - Actionlist - Say Line 7'),
+(1487406, 9, 1, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 0, 232, 1487404, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Karu - Actionlist - Start Path 1487404');
+
+-- Set Conditions 
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` IN (6, 7)) AND (`SourceEntry` = 14874) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 29) AND (`ConditionTarget` = 1) AND (`ConditionValue1` = 10685) AND (`ConditionValue2` = 100) AND (`ConditionValue3` = 0);
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(22, 6, 14874, 0, 0, 29, 1, 10685, 100, 0, 0, 0, 0, '', 'Karu will start this event only if there is at least one Swine alive.'),
+(22, 7, 14874, 0, 0, 29, 1, 10685, 100, 0, 1, 0, 0, '', 'Karu will start this event only if Swine are not present.');
 
 -- Edit two Swine spawn points & add 3 new ones
 DELETE FROM `creature` WHERE (`id1` = 10685) AND (`guid` IN (20181, 20186, 24323, 25789, 25790));
