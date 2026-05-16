@@ -1,3 +1,4 @@
+-- DB update 2026_05_16_01 -> 2026_05_16_02
 -- Update Night Elf shapeshift forms
 DELETE FROM `player_shapeshift_model` WHERE (`RaceID` = 4 AND `CustomizationID` IN (3, 5) AND `ShapeshiftID` IN (5, 8)) OR (`RaceID` = 4 AND `CustomizationID` = 5 AND `ShapeshiftID` = 1) OR (`RaceID` = 4 AND `CustomizationID` = 7 AND `ShapeshiftID` IN (5, 8)) OR (`RaceID` = 4 AND `CustomizationID` = 6 AND `ShapeshiftID` = 1);
 INSERT INTO `player_shapeshift_model` (`ShapeshiftID`, `RaceID`, `CustomizationID`, `GenderID`, `ModelID`) VALUES
