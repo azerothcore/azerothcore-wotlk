@@ -1489,6 +1489,25 @@ enum AcoreStrings
     LANG_PET_DELETE_NOT_FOUND           = 35438,
     LANG_PET_DELETE_SUCCESS             = 35439,
 
-    LANG_CHARACTER_DELETED_LIST_LIMIT   = 35440
+    LANG_CHARACTER_DELETED_LIST_LIMIT   = 35440,
+
+    // Respawn creature/gameobject by spawn GUID commands
+    LANG_RESPAWN_GUID_CREATURE_NOT_FOUND    = 35441,
+    LANG_RESPAWN_GUID_MAP_NOT_LOADED        = 35442,
+    LANG_RESPAWN_GUID_CREATURE_ALIVE        = 35443,
+    LANG_RESPAWN_GUID_CREATURE_QUEUED       = 35444,
+    LANG_RESPAWN_GUID_GAMEOBJECT_ACTIVE     = 35445,
+    LANG_RESPAWN_GUID_GAMEOBJECT_QUEUED     = 35446,
+    // 35447 is reserved for LANG_LIST_RESPAWNS_NO_MAP (list respawns command, defined at the end of this enum)
+    LANG_RESPAWN_GUID_GAMEOBJECT_NOT_FOUND  = 35448,
+
+    // Respawn creature/gameobject by entry commands
+    LANG_RESPAWN_ENTRY_CREATURE_NOT_FOUND    = 35449,
+    LANG_RESPAWN_ENTRY_GAMEOBJECT_NOT_FOUND  = 35450,
+    LANG_RESPAWN_ENTRY_CREATURE_QUEUED       = 35451,
+    LANG_RESPAWN_ENTRY_GAMEOBJECT_QUEUED     = 35452,
+
+    // List respawns console support
+    LANG_LIST_RESPAWNS_NO_MAP           = 35447
 };
 #endif

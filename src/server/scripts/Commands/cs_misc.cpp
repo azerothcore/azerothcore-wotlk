@@ -24,6 +24,7 @@
 #include "CommandScript.h"
 #include "Common.h"
 #include "GameGraveyard.h"
+#include "GameObject.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
 #include "GridTerrainLoader.h"
@@ -177,6 +178,10 @@ public:
             { "pinfo",             HandlePInfoCommand,             rbac::RBAC_PERM_COMMAND_PINFO,             Console::Yes },
             { "respawn",           HandleRespawnCommand,           rbac::RBAC_PERM_COMMAND_RESPAWN,           Console::No  },
             { "respawn all",       HandleRespawnAllCommand,        rbac::RBAC_PERM_COMMAND_RESPAWN_ALL,       Console::No  },
+            { "respawn creature guid",    HandleRespawnCreatureByGuidCommand,    rbac::RBAC_PERM_COMMAND_RESPAWN_CREATURE_GUID,    Console::Yes },
+            { "respawn gameobject guid",  HandleRespawnGameObjectByGuidCommand,  rbac::RBAC_PERM_COMMAND_RESPAWN_GAMEOBJECT_GUID,  Console::Yes },
+            { "respawn creature entry",   HandleRespawnCreatureByEntryCommand,   rbac::RBAC_PERM_COMMAND_RESPAWN_CREATURE_ENTRY,   Console::Yes },
+            { "respawn gameobject entry", HandleRespawnGameObjectByEntryCommand, rbac::RBAC_PERM_COMMAND_RESPAWN_GAMEOBJECT_ENTRY, Console::Yes },
             { "mute",              HandleMuteCommand,              rbac::RBAC_PERM_COMMAND_MUTE,              Console::Yes },
             { "mutehistory",       HandleMuteInfoCommand,          rbac::RBAC_PERM_COMMAND_MUTEHISTORY,       Console::Yes },
             { "unmute",            HandleUnmuteCommand,            rbac::RBAC_PERM_COMMAND_UNMUTE,            Console::Yes },
@@ -2445,6 +2450,265 @@ public:
             }
         }
 
+        return true;
+    }
+
+    static bool HandleRespawnCreatureByGuidCommand(ChatHandler* handler, ObjectGuid::LowType spawnId)
+    {
+        CreatureData const* creData = sObjectMgr->GetCreatureData(spawnId);
+        if (!creData)
+        {
+            handler->SendErrorMessage(LANG_RESPAWN_GUID_CREATURE_NOT_FOUND, spawnId);
+            return false;
+        }
+
+        Map* map = nullptr;
+        if (handler->GetSession())
+        {
+            Player* player = handler->GetSession()->GetPlayer();
+            if (player->GetMapId() == creData->mapid)
+                map = player->GetMap();
+        }
+        if (!map)
+            map = sMapMgr->FindMap(creData->mapid, 0);
+
+        if (!map)
+        {
+            handler->PSendSysMessage(LANG_RESPAWN_GUID_MAP_NOT_LOADED, creData->mapid);
+            return true;
+        }
+
+        // First pass: check if any instance is alive
+        bool isAlive = false;
+        auto const creBounds = map->GetCreatureBySpawnIdStore().equal_range(spawnId);
+        for (auto itr = creBounds.first; itr != creBounds.second; ++itr)
+        {
+            if (itr->second->IsAlive())
+            {
+                isAlive = true;
+                break;
+            }
+        }
+
+        if (isAlive)
+        {
+            handler->PSendSysMessage(LANG_RESPAWN_GUID_CREATURE_ALIVE, spawnId, creData->id1);
+            return true;
+        }
+
+        // Second pass: respawn any dead corpses in the world
+        for (auto itr = creBounds.first; itr != creBounds.second; ++itr)
+        {
+            if (itr->second->isDead())
+                itr->second->Respawn(true);
+        }
+        // Also trigger via respawn time queue for fully-removed spawns
+        if (map->GetCreatureRespawnTime(spawnId) > 0)
+        {
+            time_t now = GameTime::GetGameTime().count();
+            map->SaveCreatureRespawnTime(spawnId, now);
+        }
+        handler->PSendSysMessage(LANG_RESPAWN_GUID_CREATURE_QUEUED, spawnId, creData->id1);
+        return true;
+    }
+
+    static bool HandleRespawnGameObjectByGuidCommand(ChatHandler* handler, ObjectGuid::LowType spawnId)
+    {
+        GameObjectData const* goData = sObjectMgr->GetGameObjectData(spawnId);
+        if (!goData)
+        {
+            handler->SendErrorMessage(LANG_RESPAWN_GUID_GAMEOBJECT_NOT_FOUND, spawnId);
+            return false;
+        }
+
+        Map* map = nullptr;
+        if (handler->GetSession())
+        {
+            Player* player = handler->GetSession()->GetPlayer();
+            if (player->GetMapId() == goData->mapid)
+                map = player->GetMap();
+        }
+        if (!map)
+            map = sMapMgr->FindMap(goData->mapid, 0);
+
+        if (!map)
+        {
+            handler->PSendSysMessage(LANG_RESPAWN_GUID_MAP_NOT_LOADED, goData->mapid);
+            return true;
+        }
+
+        // First pass: check if any instance is already active
+        bool isActive = false;
+        auto const goBounds = map->GetGameObjectBySpawnIdStore().equal_range(spawnId);
+        for (auto itr = goBounds.first; itr != goBounds.second; ++itr)
+        {
+            if (itr->second->isSpawned())
+            {
+                isActive = true;
+                break;
+            }
+        }
+
+        if (isActive)
+        {
+            handler->PSendSysMessage(LANG_RESPAWN_GUID_GAMEOBJECT_ACTIVE, spawnId, goData->id);
+            return true;
+        }
+
+        // Second pass: respawn inactive objects in the world
+        for (auto itr = goBounds.first; itr != goBounds.second; ++itr)
+            itr->second->Respawn();
+        // Also trigger via respawn time queue for fully-removed spawns
+        if (map->GetGORespawnTime(spawnId) > 0)
+        {
+            time_t now = GameTime::GetGameTime().count();
+            map->SaveGORespawnTime(spawnId, now);
+        }
+        handler->PSendSysMessage(LANG_RESPAWN_GUID_GAMEOBJECT_QUEUED, spawnId, goData->id);
+        return true;
+    }
+
+    static bool HandleRespawnCreatureByEntryCommand(ChatHandler* handler, uint32 entry, Optional<uint32> mapIdArg, Optional<uint32> instanceIdArg)
+    {
+        if (!sObjectMgr->GetCreatureTemplate(entry))
+        {
+            handler->SendErrorMessage(LANG_RESPAWN_ENTRY_CREATURE_NOT_FOUND, entry);
+            return false;
+        }
+
+        Map* map = nullptr;
+        if (handler->GetSession())
+        {
+            // In-game: always use the player's current map
+            map = handler->GetSession()->GetPlayer()->GetMap();
+        }
+        else
+        {
+            // Console: mapId required, instanceId optional
+            if (!mapIdArg)
+            {
+                handler->SendSysMessage(LANG_LIST_RESPAWNS_NO_MAP);
+                return false;
+            }
+            map = sMapMgr->FindMap(*mapIdArg, instanceIdArg.value_or(0));
+        }
+
+        if (!map)
+        {
+            handler->PSendSysMessage(LANG_RESPAWN_GUID_MAP_NOT_LOADED, mapIdArg.value_or(0));
+            return false;
+        }
+
+        time_t now = GameTime::GetGameTime().count();
+        uint32 count = 0;
+
+        // Phase 1: respawn dead corpses that are still tracked in the spawn-id store.
+        // Collect first to avoid iterator invalidation caused by Respawn().
+        std::vector<Creature*> deadCreatures;
+        for (auto const& [spawnId, creature] : map->GetCreatureBySpawnIdStore())
+        {
+            CreatureData const* data = sObjectMgr->GetCreatureData(spawnId);
+            if (!data || data->id1 != entry)
+                continue;
+            if (creature->isDead())
+                deadCreatures.push_back(creature);
+        }
+        for (Creature* creature : deadCreatures)
+        {
+            creature->Respawn(true);
+            ++count;
+        }
+
+        // Phase 2: set respawn time to now for fully-removed spawns, skipping pools
+        std::vector<ObjectGuid::LowType> toRespawn;
+        for (auto const& [spawnId, respawnTime] : map->GetCreatureRespawnTimes())
+        {
+            CreatureData const* data = sObjectMgr->GetCreatureData(spawnId);
+            if (!data || data->id1 != entry)
+                continue;
+            if (sPoolMgr->IsPartOfAPool<Creature>(spawnId))
+                continue;
+            toRespawn.push_back(spawnId);
+        }
+        for (ObjectGuid::LowType spawnId : toRespawn)
+        {
+            map->SaveCreatureRespawnTime(spawnId, now);
+            ++count;
+        }
+
+        handler->PSendSysMessage(LANG_RESPAWN_ENTRY_CREATURE_QUEUED, count, entry);
+        return true;
+    }
+
+    static bool HandleRespawnGameObjectByEntryCommand(ChatHandler* handler, uint32 entry, Optional<uint32> mapIdArg, Optional<uint32> instanceIdArg)
+    {
+        if (!sObjectMgr->GetGameObjectTemplate(entry))
+        {
+            handler->SendErrorMessage(LANG_RESPAWN_ENTRY_GAMEOBJECT_NOT_FOUND, entry);
+            return false;
+        }
+
+        Map* map = nullptr;
+        if (handler->GetSession())
+        {
+            // In-game: always use the player's current map
+            map = handler->GetSession()->GetPlayer()->GetMap();
+        }
+        else
+        {
+            // Console: mapId required, instanceId optional
+            if (!mapIdArg)
+            {
+                handler->SendSysMessage(LANG_LIST_RESPAWNS_NO_MAP);
+                return false;
+            }
+            map = sMapMgr->FindMap(*mapIdArg, instanceIdArg.value_or(0));
+        }
+
+        if (!map)
+        {
+            handler->PSendSysMessage(LANG_RESPAWN_GUID_MAP_NOT_LOADED, mapIdArg.value_or(0));
+            return false;
+        }
+
+        time_t now = GameTime::GetGameTime().count();
+        uint32 count = 0;
+
+        // Phase 1: respawn inactive objects that are still tracked in the spawn-id store.
+        // Collect first to avoid iterator invalidation caused by Respawn().
+        std::vector<GameObject*> inactiveGOs;
+        for (auto const& [spawnId, go] : map->GetGameObjectBySpawnIdStore())
+        {
+            GameObjectData const* data = sObjectMgr->GetGameObjectData(spawnId);
+            if (!data || data->id != entry)
+                continue;
+            if (!go->isSpawned())
+                inactiveGOs.push_back(go);
+        }
+        for (GameObject* go : inactiveGOs)
+        {
+            go->Respawn();
+            ++count;
+        }
+
+        // Phase 2: set respawn time to now for fully-removed spawns, skipping pools
+        std::vector<ObjectGuid::LowType> toRespawn;
+        for (auto const& [spawnId, respawnTime] : map->GetGORespawnTimes())
+        {
+            GameObjectData const* data = sObjectMgr->GetGameObjectData(spawnId);
+            if (!data || data->id != entry)
+                continue;
+            if (sPoolMgr->IsPartOfAPool<GameObject>(spawnId))
+                continue;
+            toRespawn.push_back(spawnId);
+        }
+        for (ObjectGuid::LowType spawnId : toRespawn)
+        {
+            map->SaveGORespawnTime(spawnId, now);
+            ++count;
+        }
+
+        handler->PSendSysMessage(LANG_RESPAWN_ENTRY_GAMEOBJECT_QUEUED, count, entry);
         return true;
     }
 
