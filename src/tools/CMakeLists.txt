@@ -135,9 +135,33 @@ foreach(TOOL_NAME ${TOOLS_BUILD_LIST})
         PRIVATE
           modules)
     else()
+      GetModuleSourceList(DBIMPORT_MODULES_SOURCE_LIST)
+
+      if(MODULES MATCHES "dynamic")
+        set(DBIMPORT_MODULES_DEFAULT_LINKAGE "dynamic")
+      elseif(MODULES MATCHES "static")
+        set(DBIMPORT_MODULES_DEFAULT_LINKAGE "static")
+      else()
+        set(DBIMPORT_MODULES_DEFAULT_LINKAGE "disabled")
+      endif()
+
+      set(DBIMPORT_MODULES_LIST "")
+      foreach(DBIMPORT_MODULE ${DBIMPORT_MODULES_SOURCE_LIST})
+        ModuleNameToVariable(${DBIMPORT_MODULE} DBIMPORT_MODULE_VARIABLE)
+        set(DBIMPORT_MODULE_LINKAGE "${${DBIMPORT_MODULE_VARIABLE}}")
+
+        if(DBIMPORT_MODULE_LINKAGE STREQUAL "default" OR DBIMPORT_MODULE_LINKAGE STREQUAL "")
+          set(DBIMPORT_MODULE_LINKAGE ${DBIMPORT_MODULES_DEFAULT_LINKAGE})
+        endif()
+
+        if(NOT DBIMPORT_MODULE_LINKAGE STREQUAL "disabled")
+          string(APPEND DBIMPORT_MODULES_LIST "${DBIMPORT_MODULE},")
+        endif()
+      endforeach()
+
       target_compile_definitions(${TOOL_PROJECT_NAME}
         PRIVATE
-          AC_MODULES_LIST="")
+          AC_MODULES_LIST="${DBIMPORT_MODULES_LIST}")
     endif()
 
     # Install config
