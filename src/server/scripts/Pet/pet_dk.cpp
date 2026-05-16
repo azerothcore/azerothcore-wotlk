@@ -333,6 +333,17 @@ struct npc_pet_dk_risen_ally : public PossessedAI
 
 struct npc_pet_dk_army_of_the_dead : public AggressorAI
 {
+    enum Spells
+    {
+        SPELL_GHOUL_CLAW = 47468,
+        SPELL_GHOUL_LEAP = 47482,
+    };
+
+    enum Event
+    {
+        EVENT_START_LEAP
+    };
+
     npc_pet_dk_army_of_the_dead(Creature* creature) : AggressorAI(creature) { }
 
     // Restrict MoveInLineOfSight aggro to targets already fighting our owner,
@@ -367,7 +378,13 @@ struct npc_pet_dk_army_of_the_dead : public AggressorAI
             AttackStart(attacker);
     }
 
-    void UpdateAI(uint32 /*diff*/) override
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        events.Reset();
+        events.RescheduleEvent(EVENT_START_LEAP, 1s, 5s);
+    }
+
+    void UpdateAI(uint32 diff) override
     {
         if (!UpdateVictim())
         {
@@ -382,6 +399,16 @@ struct npc_pet_dk_army_of_the_dead : public AggressorAI
                 }
             }
             return;
+        }
+
+        events.Update(diff);
+
+        switch (events.ExecuteEvent())
+        {
+            case EVENT_START_LEAP:
+                me->CastSpell(me->GetVictim(), SPELL_GHOUL_LEAP, false);
+                events.Repeat(20s, 25s);
+                break;
         }
 
         DoMeleeAttackIfReady();
