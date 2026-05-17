@@ -1379,6 +1379,8 @@ MapUpdateInterval = 10
 #
 #    MapUpdate.Threads
 #        Description: Number of threads to update maps.
+#                     This schedules separate map update jobs in parallel; it does
+#                     not partition a single non-instanced continent map update.
 #        Default:     1
 
 MapUpdate.Threads = 1
