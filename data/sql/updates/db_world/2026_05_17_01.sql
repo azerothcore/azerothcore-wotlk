@@ -1,3 +1,4 @@
+-- DB update 2026_05_17_00 -> 2026_05_17_01
 DELETE FROM `command` WHERE `name` IN ('debug combat','debug threatinfo','pdump copy','pet delete','pet list','rbac list','reload rbac');
 INSERT INTO `command` (`name`,`security`,`help`) VALUES
 ('debug combat',3,'Syntax: .debug combat\nLists PvP and PvE combat references of the selected unit (or self).'),
