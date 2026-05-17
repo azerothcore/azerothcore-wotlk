@@ -25,15 +25,10 @@ INSERT INTO `rbac_permissions` (`id`, `name`) VALUES
 (920, 'Command: debug info'),
 (921, 'Command: debug cosmetic');
 
--- Existing holders of perm 300 automatically receive both new sub-perms
+-- Existing holders of perm 300 automatically receive both new sub-perms.
+-- Role 197 (GM Commands) already includes perm 300, so it reaches 920 and 921
+-- transitively — no direct links to role 197 are needed or added.
 DELETE FROM `rbac_linked_permissions` WHERE `id` = 300 AND `linkedId` IN (920, 921);
 INSERT INTO `rbac_linked_permissions` (`id`, `linkedId`) VALUES
 (300, 920),
 (300, 921);
-
--- Role 197 (GM Commands) gets the sub-perms directly as well, so they appear
--- in explicit role listings and survive any future removal of perm 300
-DELETE FROM `rbac_linked_permissions` WHERE `id` = 197 AND `linkedId` IN (920, 921);
-INSERT INTO `rbac_linked_permissions` (`id`, `linkedId`) VALUES
-(197, 920),
-(197, 921);
