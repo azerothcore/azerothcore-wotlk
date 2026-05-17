@@ -1,3 +1,4 @@
+-- DB update 2026_05_14_00 -> 2026_05_17_00
 -- Split RBAC_PERM_COMMAND_DEBUG (300) into three permission tiers:
 --
 --   300 (Command: debug)           -- state-modifying commands (unchanged)
