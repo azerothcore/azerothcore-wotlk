@@ -735,9 +735,7 @@ void BattlefieldWG::HandleKill(Player* killer, Unit* victim)
                     if (Player* player = ObjectAccessor::FindPlayer(playerGuid))
                     {
                         if (player->GetDistance2d(killer) < 40)
-                        {
                             player->KilledMonsterCredit(killerTeam == TEAM_HORDE ? NPC_QUEST_PVP_KILL_ALLIANCE : NPC_QUEST_PVP_KILL_HORDE);
-                        }
                     }
                 }
             }

@@ -35,7 +35,6 @@ enum BattlefieldHook
 
 class Battlefield;
 class Player;
-class Unit;
 
 class BattlefieldScript : public ScriptObject
 {
