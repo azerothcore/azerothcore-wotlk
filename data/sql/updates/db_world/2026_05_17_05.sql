@@ -1,3 +1,4 @@
+-- DB update 2026_05_17_04 -> 2026_05_17_05
 --
 -- Scourgebane Infusion (item 22778 -> spell 28488) and Scourgebane Draught
 -- (item 22779 -> spell 28486) are not battle elixirs. Remove them from the
