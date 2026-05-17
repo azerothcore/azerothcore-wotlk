@@ -155,6 +155,7 @@ struct boss_gal_darah : public BossAI
     {
         Talk(SAY_DEATH);
         BossAI::JustDied(killer);
+        instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_PUNCTURE);
     }
 
     void KilledUnit(Unit*) override
