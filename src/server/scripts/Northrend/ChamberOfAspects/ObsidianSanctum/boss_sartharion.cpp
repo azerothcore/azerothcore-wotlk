@@ -416,6 +416,9 @@ struct boss_sartharion : public BossAI
         for (uint32 i : dragons)
             if (Creature* boss = instance->GetCreature(i))
                 boss->DespawnOrUnsummon();
+
+        instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_TWILIGHT_TORMENT_VESPERON);
+        instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_TWILIGHT_TORMENT_SARTHARION);
     }
 
     void SetData(uint32 type, uint32 data) override
@@ -838,6 +841,8 @@ struct boss_sartharion_dragonAI : public BossAI
             {
                 Talk(SAY_VESPERON_DEATH);
                 instance->DoAction(ACTION_CLEAR_PORTAL);
+                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_TWILIGHT_TORMENT_VESPERON);
+                instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_TWILIGHT_TORMENT_SARTHARION);
                 if (!isCalledBySartharion || instance->GetBossState(DATA_SARTHARION) != IN_PROGRESS)
                     instance->SetBossState(DATA_VESPERON, DONE);
                 break;
@@ -924,6 +929,7 @@ struct boss_sartharion_dragonAI : public BossAI
             // Dragon speaks and starts flying to landing position
             Talk(SAY_DRAKE_RESPOND);
             me->GetMotionMaster()->Clear();
+            extraEvents.CancelEvent(EVENT_DRAGON_PATROL_WAYPOINT);
             me->SetDisableGravity(true);
             me->SetHover(true);
             me->SetAnimTier(AnimTier::Fly);

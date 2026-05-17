@@ -190,6 +190,7 @@ enum PlayerHook
     PLAYERHOOK_ON_PLAYER_ENTER_COMBAT,
     PLAYERHOOK_ON_PLAYER_LEAVE_COMBAT,
     PLAYERHOOK_ON_QUEST_ABANDON,
+    PLAYERHOOK_ON_PLAYER_QUEST_ACCEPT,
     PLAYERHOOK_ON_GET_QUEST_RATE,
     PLAYERHOOK_ON_CAN_PLAYER_FLY_IN_ZONE,
     PLAYERHOOK_ANTICHEAT_SET_CAN_FLY_BY_SERVER,
@@ -729,6 +730,14 @@ public:
      * @param questId Contains information about the quest id
      */
     virtual void OnPlayerQuestAbandon(Player* /*player*/, uint32 /*questId*/) { }
+
+    /**
+     * @brief This hook called after a player accepts a quest, regardless of quest giver type
+     *
+     * @param player Contains information about the Player
+     * @param quest Contains information about the Quest
+     */
+    virtual void OnPlayerQuestAccept(Player* /*player*/, Quest const* /*quest*/) { }
 
     /**
      * @brief This hook called before other CanFlyChecks are applied
