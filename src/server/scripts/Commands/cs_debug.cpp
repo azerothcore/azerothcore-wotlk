@@ -105,7 +105,7 @@ public:
             { "uws",            HandleDebugUpdateWorldStateCommand,    rbac::RBAC_PERM_COMMAND_DEBUG,          Console::No },
             { "update",         HandleDebugUpdateCommand,              rbac::RBAC_PERM_COMMAND_DEBUG,          Console::No },
             { "itemexpire",     HandleDebugItemExpireCommand,          rbac::RBAC_PERM_COMMAND_DEBUG,          Console::No },
-            { "areatriggers",   HandleDebugAreaTriggersCommand,        rbac::RBAC_PERM_COMMAND_DEBUG_COSMETIC, Console::No },
+            { "areatriggers",   HandleDebugAreaTriggersCommand,        rbac::RBAC_PERM_COMMAND_DEBUG_INFO,     Console::No },
             { "lfg",            HandleDebugDungeonFinderCommand,       rbac::RBAC_PERM_COMMAND_DEBUG,          Console::Yes},
             { "loot",           HandleDebugLootCommand,                rbac::RBAC_PERM_COMMAND_DEBUG_INFO,     Console::Yes},
             { "los",            HandleDebugLoSCommand,                 rbac::RBAC_PERM_COMMAND_DEBUG_INFO,     Console::No },
