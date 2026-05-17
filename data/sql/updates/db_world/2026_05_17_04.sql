@@ -1,3 +1,4 @@
+-- DB update 2026_05_17_03 -> 2026_05_17_04
 --
 -- Griselda Hunderland → Talker: 26043
 DELETE FROM `creature_text` WHERE (`CreatureID` = 26043);
