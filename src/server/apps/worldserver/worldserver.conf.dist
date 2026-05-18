@@ -417,6 +417,41 @@ Network.UseSocketActivation = 0
 ###################################################################################################
 
 ###################################################################################################
+# OBSERVABILITY
+#
+#    Observability.Enable
+#        Description: Global runtime switch for observability features.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+Observability.Enable = 1
+
+#
+#    Observability.Prometheus.Enable
+#        Description: Enable the Prometheus metrics exporter. Requires Observability.Enable.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+Observability.Prometheus.Enable = 1
+
+#
+#    Observability.Prometheus.IP
+#        Description: Bind Prometheus metrics exporter to IP/hostname.
+#        Default:     "127.0.0.1" - (Bind to localhost)
+
+Observability.Prometheus.IP = "127.0.0.1"
+
+#
+#    Observability.Prometheus.Port
+#        Description: TCP port for the Prometheus /metrics endpoint.
+#        Default:     9200
+
+Observability.Prometheus.Port = 9200
+
+#
+###################################################################################################
+
+###################################################################################################
 # REMOTE ACCESS
 #
 #    Ra.Enable

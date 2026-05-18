@@ -36,6 +36,7 @@
 #include "Metric.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
+#include "Observability.h"
 #include "Opcodes.h"
 #include "OutdoorPvPMgr.h"
 #include "PacketUtilities.h"
@@ -54,11 +55,37 @@
 #include "WorldPacket.h"
 #include "WorldSocket.h"
 #include "WorldState.h"
+#include <atomic>
 #include <zlib.h>
 
 namespace
 {
     std::string const DefaultPlayerName = "<none>";
+
+    struct WorldSessionMetrics
+    {
+        Acore::Observability::HistogramFamily OpcodeDuration
+        {
+            "ac_world_opcode_duration_seconds",
+            "Duration of processed world opcodes by opcode name.",
+            Acore::Observability::DefaultDurationBuckets(),
+            NUM_OPCODE_HANDLERS
+        };
+
+        Acore::Observability::Counter ProcessedPackets
+        {
+            "ac_world_packets_processed_total",
+            "Total number of world packets processed."
+        };
+
+        Acore::Observability::Counter AddonMessages
+        {
+            "ac_world_addon_messages_total",
+            "Total number of addon messages received."
+        };
+    };
+
+    WorldSessionMetrics Metrics;
 }
 
 bool MapSessionFilter::Process(WorldPacket* packet)
@@ -432,7 +459,10 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                         if (!sScriptMgr->CanPacketReceive(this, *packet))
                             break;
 
-                        opHandle->Call(this, *packet);
+                        {
+                            Acore::Observability::ScopedHistogramTimer observabilityOpcodeTimer = Metrics.OpcodeDuration.MeasureIndexed(uint32(opcode), "opcode", opHandle->Name);
+                            opHandle->Call(this, *packet);
+                        }
                         LogUnprocessedTail(packet);
                     }
 
@@ -450,7 +480,10 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                         if (!sScriptMgr->CanPacketReceive(this, *packet))
                             break;
 
-                        opHandle->Call(this, *packet);
+                        {
+                            Acore::Observability::ScopedHistogramTimer observabilityOpcodeTimer = Metrics.OpcodeDuration.MeasureIndexed(uint32(opcode), "opcode", opHandle->Name);
+                            opHandle->Call(this, *packet);
+                        }
                         LogUnprocessedTail(packet);
                     }
                     break;
@@ -460,7 +493,10 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                         if (!sScriptMgr->CanPacketReceive(this, *packet))
                             break;
 
-                        opHandle->Call(this, *packet);
+                        {
+                            Acore::Observability::ScopedHistogramTimer observabilityOpcodeTimer = Metrics.OpcodeDuration.MeasureIndexed(uint32(opcode), "opcode", opHandle->Name);
+                            opHandle->Call(this, *packet);
+                        }
                         LogUnprocessedTail(packet);
                     }
                     break;
@@ -476,7 +512,10 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                     if (!sScriptMgr->CanPacketReceive(this, *packet))
                         break;
 
-                    opHandle->Call(this, *packet);
+                    {
+                        Acore::Observability::ScopedHistogramTimer observabilityOpcodeTimer = Metrics.OpcodeDuration.MeasureIndexed(uint32(opcode), "opcode", opHandle->Name);
+                        opHandle->Call(this, *packet);
+                    }
                     LogUnprocessedTail(packet);
                     break;
                 case STATUS_NEVER:
@@ -540,9 +579,12 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
 
     _recvQueue.readd(requeuePackets.begin(), requeuePackets.end());
 
+    uint32 const addonMessages = _addonMessageReceiveCount.exchange(0, std::memory_order_relaxed);
+    Metrics.ProcessedPackets.Increment(processedPackets);
+    Metrics.AddonMessages.Increment(addonMessages);
+
     METRIC_VALUE("processed_packets", processedPackets);
-    METRIC_VALUE("addon_messages", _addonMessageReceiveCount.load());
-    _addonMessageReceiveCount = 0;
+    METRIC_VALUE("addon_messages", addonMessages);
 
     if (!updater.ProcessUnsafe()) // <=> updater is of type MapSessionFilter
     {
