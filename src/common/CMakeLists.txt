@@ -10,25 +10,41 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
 
-CollectSourceFiles(
-  ${CMAKE_CURRENT_SOURCE_DIR}
-  PRIVATE_SOURCES
-  # Exclude
+set(COMMON_SOURCE_EXCLUDES
   ${CMAKE_CURRENT_SOURCE_DIR}/Debugging
   ${CMAKE_CURRENT_SOURCE_DIR}/Platform
   ${CMAKE_CURRENT_SOURCE_DIR}/Collision
   ${CMAKE_CURRENT_SOURCE_DIR}/Navigation
   ${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders)
 
+if (WITHOUT_OBSERVABILITY)
+  list(APPEND COMMON_SOURCE_EXCLUDES
+    ${CMAKE_CURRENT_SOURCE_DIR}/Observability)
+endif()
+
+CollectSourceFiles(
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  PRIVATE_SOURCES
+  # Exclude
+  ${COMMON_SOURCE_EXCLUDES})
+
 if (BUILD_APPLICATION_WORLDSERVER OR BUILD_TOOLS_MAPS)
+  set(COMMON_WORLDSERVER_SOURCE_EXCLUDES
+    ${CMAKE_CURRENT_SOURCE_DIR}/Debugging
+    ${CMAKE_CURRENT_SOURCE_DIR}/Platform
+    ${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders)
+
+  if (WITHOUT_OBSERVABILITY)
+    list(APPEND COMMON_WORLDSERVER_SOURCE_EXCLUDES
+      ${CMAKE_CURRENT_SOURCE_DIR}/Observability)
+  endif()
+
   unset(PRIVATE_SOURCES)
   CollectSourceFiles(
     ${CMAKE_CURRENT_SOURCE_DIR}
     PRIVATE_SOURCES
     # Exclude
-    ${CMAKE_CURRENT_SOURCE_DIR}/Debugging
-    ${CMAKE_CURRENT_SOURCE_DIR}/Platform
-    ${CMAKE_CURRENT_SOURCE_DIR}/PrecompiledHeaders)
+    ${COMMON_WORLDSERVER_SOURCE_EXCLUDES})
 endif()
 
 # Manually set sources for Debugging directory as we don't want to include WheatyExceptionReport in common project

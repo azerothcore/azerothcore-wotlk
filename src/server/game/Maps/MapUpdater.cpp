@@ -19,9 +19,29 @@
 #include "DatabaseEnv.h"
 #include "LFGMgr.h"
 #include "Log.h"
+#include "AreaDefines.h"
 #include "Map.h"
 #include "MapMgr.h"
 #include "Metric.h"
+#include "Observability.h"
+
+namespace
+{
+    static constexpr uint32 MapMetricCount = MAP_THE_RUBY_SANCTUM + 1;
+
+    struct MapUpdaterMetrics
+    {
+        Acore::Observability::HistogramFamily UpdateDuration
+        {
+            "ac_map_update_duration_seconds",
+            "Duration of map updates by map id.",
+            Acore::Observability::DefaultDurationBuckets(),
+            MapMetricCount
+        };
+    };
+
+    MapUpdaterMetrics Metrics;
+}
 
 class UpdateRequest
 {
@@ -43,7 +63,10 @@ public:
     void call() override
     {
         METRIC_TIMER("map_update_time_diff", METRIC_TAG("map_id", std::to_string(m_map.GetId())));
-        m_map.Update(m_diff, s_diff);
+        {
+            Acore::Observability::ScopedHistogramTimer observabilityTimer = Metrics.UpdateDuration.MeasureIndexed(m_map.GetId(), "map_id", m_map.GetId());
+            m_map.Update(m_diff, s_diff);
+        }
         m_updater.update_finished();
     }
 
