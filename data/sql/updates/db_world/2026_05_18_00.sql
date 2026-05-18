@@ -1,3 +1,4 @@
+-- DB update 2026_05_17_07 -> 2026_05_18_00
 
 -- Set idle for Burning Blade Fanatics and Apprentices.
 UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 0 WHERE (`id1` = 3198) AND (`guid` IN (6430, 6431));
