@@ -1,3 +1,4 @@
+-- DB update 2026_05_18_00 -> 2026_05_18_01
 
 -- Update 15066 spawntime (it must be instant), add two new spawn points and set random in radius.
 DELETE FROM `creature` WHERE (`id1` = 3467);
