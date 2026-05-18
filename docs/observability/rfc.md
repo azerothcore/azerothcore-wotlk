@@ -125,26 +125,38 @@ Label values should be emitted safely for Prometheus text exposition and should 
 
 ## Producer API Direction
 
-The v1 producer API should allow call-site metric declaration. For example:
+The v1 producer API should use long-lived metric objects. A file-local metrics aggregate keeps ownership explicit and avoids accidental counter or histogram resets when normal gameplay objects are recreated. For example:
 
 ```cpp
+namespace
+{
+    struct WorldMetrics
+    {
+        Acore::Observability::Histogram UpdateDuration
+        {
+            "ac_world_update_duration_seconds",
+            "Duration of one world update tick.",
+            Acore::Observability::DefaultDurationBuckets()
+        };
+    };
+
+    WorldMetrics Metrics;
+}
+
 void World::Update(uint32 diff)
 {
-    AC_SCOPED_METRIC(
-        "ac_world_update_duration_seconds",
-        AC_OBSERVABILITY_BUCKETS(0.001, 0.0025, 0.005, 0.01, 0.025, 0.05,
-            0.1, 0.25, 0.5, 1.0, 2.5, 5.0));
+    Acore::Observability::ScopedHistogramTimer updateTimer = Metrics.UpdateDuration.Measure();
 
     // ...
 }
 ```
 
-Final macro names are implementation details, but the important behavior is:
+Final class and helper names are implementation details, but the important behavior is:
 
-- A scoped timer should register a static local metric handle once per call site.
+- Metric state should be owned by long-lived objects, not by recreated gameplay objects.
 - Observations should be cheap after first registration.
-- Bucket lists may be declared at the call site for clarity.
-- A metric name has a single owner call site.
+- Duration histograms should use the shared default duration buckets unless a metric has a clearly different scale.
+- A metric name has a single owner.
 - The same metric name must not be used from multiple code locations.
 - Duplicate metric name registration from another file/line/function should fail loudly in debug builds. In release builds, it should log an error, ignore the duplicate registration, and keep the first registered owner.
 - If related work is measured in multiple places, use distinct metric names or one intentional owner block with bounded labels.
@@ -155,7 +167,10 @@ V1 uses classic histograms with explicit bucket boundaries.
 
 Buckets provide in-process aggregation for many observations. AzerothCore should not store every duration in memory for percentile calculation. It should update histogram bucket counters, and Prometheus/Grafana should calculate averages and p95/p99-style views from scraped bucket data.
 
-Bucket lists may differ per metric. They should be chosen near the instrumentation point when that makes the measurement easier to understand. A lower bound around `250us` is reasonable for fast server paths. Durations should use seconds as the base unit in metric names and values.
+Duration histograms should use a shared default bucket list covering fast paths and visible stalls:
+`100us`, `250us`, `500us`, `1ms`, `2.5ms`, `5ms`, `10ms`, `25ms`, `50ms`, `100ms`, `250ms`, `500ms`, `1s`, and `2.5s`.
+
+Bucket lists may still differ per metric when a measurement has a clearly different scale. Durations should use seconds as the base unit in metric names and values.
 
 Custom runtime bucket configuration is deferred.
 
@@ -199,9 +214,9 @@ The exact names are examples, but the required v1 metric set should cover these 
 - Instrumentation point: top of `World::Update(uint32 diff)` in [`src/server/game/World/World.cpp`](../../src/server/game/World/World.cpp#L1099)
 - Current related metric: `world_update_time_total`
 
-### World Update Diff
+### World Update Interval
 
-- Metric: `ac_world_update_diff_seconds`
+- Metric: `ac_world_update_interval_seconds`
 - Type: classic histogram
 - Labels: none beyond constant `realm`
 - Instrumentation point: near `sWorldUpdateTime.UpdateWithDiff(diff)` in [`src/server/game/World/World.cpp`](../../src/server/game/World/World.cpp#L1107)
@@ -302,8 +317,6 @@ Metrics should be useful for operations without exposing player identity, accoun
 
 ## Open Questions
 
-- Exact macro and namespace names.
 - Exact default port.
-- Exact bucket lists for each required histogram.
+- Exact custom bucket lists for metrics that do not use the default duration buckets.
 - Whether Boost.Beast is available across all supported Boost configurations, and if not, whether to add a constrained raw-Asio HTTP implementation.
-- Whether status gauges should be updated every world tick, on a lightweight interval, or via an explicit observability timer on the world thread.
