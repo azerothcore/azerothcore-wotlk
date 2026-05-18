@@ -1,3 +1,4 @@
+-- DB update 2026_05_18_01 -> 2026_05_18_02
 
 -- Add Waypoints.
 DELETE FROM `waypoint_data` WHERE (`id` IN (4507400, 4507401, 4507402, 4507600, 4507601, 4507602));
