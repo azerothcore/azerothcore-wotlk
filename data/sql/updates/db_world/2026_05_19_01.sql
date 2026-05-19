@@ -1,3 +1,4 @@
+-- DB update 2026_05_19_00 -> 2026_05_19_01
 
 -- Remove Wrong Spawn Points and Old Waypoints.
 DELETE FROM `creature` WHERE (`id1` = 2974) AND (`guid` IN (26214, 26231, 26232, 26233));
