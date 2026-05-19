@@ -217,7 +217,7 @@ public:
                         break;
                     }
                     events.Repeat(5s);
-                    Unit* unit = SelectTarget(SelectTargetMethod::Random, 0, BoneStormMoveTargetSelector(me));
+                    Unit* unit = SelectTarget(SelectTargetMethod::MaxDistance, 0, BoneStormMoveTargetSelector(me));
                     if (!unit)
                     {
                         if ((unit = SelectTarget(SelectTargetMethod::MaxThreat, 0, 175.0f, true)))
