@@ -155,7 +155,7 @@ namespace Acore::Observability
         Entry* RegisterHistogramFamily(StaticStringLiteral name, StaticStringLiteral help, Buckets buckets, std::source_location owner, std::size_t indexedSeriesCount);
         Detail::HistogramSeries* FindIndexedHistogramSeries(Entry const& entry, std::size_t index) const;
         Detail::HistogramSeries& RegisterIndexedHistogramSeries(Entry& entry, std::size_t index, std::vector<Label> labels);
-        Detail::HistogramSeries& RegisterHistogramSeriesLocked(Entry& entry, std::vector<Label> labels);
+        Detail::HistogramSeries& EmplaceHistogramSeries(Entry& entry, std::vector<Label> labels);
         void LogIncompatibleRegistration(StaticStringLiteral name, std::source_location existingOwner, std::source_location duplicateOwner, std::string_view reason) const;
         static Detail::CounterSeries& IgnoredCounter();
         static Detail::GaugeSeries& IgnoredGauge();
