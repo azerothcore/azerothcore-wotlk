@@ -1647,8 +1647,9 @@ public:
     {
         if (!result)
         {
-            // Error handling should be done prior running LookupPlayerSearchCommand if not this will display an error here
-            handler->SendErrorMessage(LANG_LOOKUP_NOT_VALID, __func__ ,__LINE__);
+            // Safety net: callers (HandleLookupPlayer*Command) must validate `result` before invoking this.
+            // If we get here it's a bug in a sibling handler -- log it server-side and bail.
+            LOG_ERROR("misc", "LookupPlayerSearchCommand called with null result; a HandleLookupPlayer* handler is missing pre-validation.");
             return false;
         }
 
@@ -1669,8 +1670,10 @@ public:
             Field* fields           = result->Fetch();
             uint32 accountId        = fields[0].Get<uint32>();
             std::string accountName = fields[1].Get<std::string>();
+            bool locked             = fields[2].Get<uint8>() != 0; // pulled from the initial query
 
-            bool banned = false; // BANNED > LOCKED > MUTED (order of priority).
+            // BANNED > LOCKED > MUTED (order of priority).
+            bool banned = false;
             {
                 LoginDatabasePreparedStatement* stmtBan = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BANNED);
                 stmtBan->SetData(0, accountId);
@@ -1679,31 +1682,19 @@ public:
                     banned = true;
             }
 
-            bool locked = false;
-            if (!banned) // If not banned, check lock status
-            {
-                LoginDatabasePreparedStatement* stmtLock = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_LOCK);
-                stmtLock->SetData(0, accountId);
-                PreparedQueryResult lockResult = LoginDatabase.Query(stmtLock);
-                if (lockResult && lockResult->GetRowCount() > 0)
-                {
-                    Field* lockFields = lockResult->Fetch();
-                    if (lockFields)
-                        locked = lockFields[0].Get<uint8>() != 0;
-                }
-            }
             bool muted = false;
-            if (!banned && !locked) // If not banned and not locked, check mute status
+            if (!banned && !locked) // If not banned or locked, check mute status
             {
                 LoginDatabasePreparedStatement* stmtMute = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_MUTE_INFO);
                 stmtMute->SetData(0, accountId);
                 PreparedQueryResult muteResult = LoginDatabase.Query(stmtMute);
                 if (muteResult)
                 {
+                    uint32 now = uint32(time(nullptr));
                     do
                     {
                         Field* muteFields = muteResult->Fetch();
-                        if (muteFields[0].Get<uint32>() + muteFields[1].Get<uint32>() > uint32(time(nullptr)))
+                        if (muteFields[0].Get<uint32>() + muteFields[1].Get<uint32>() > now)
                         {
                             muted = true;
                             break;
@@ -1721,6 +1712,8 @@ public:
                 status = " - [MUTED]";
 
             handler->PSendSysMessage(LANG_LOOKUP_PLAYER_ACCOUNT, accountName, accountId);
+            if (!status.empty())
+                handler->PSendSysMessage("  {}", status);
 
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_GUID_NAME_BY_ACC);
             stmt->SetData(0, accountId);
@@ -1755,9 +1748,9 @@ public:
                     ++counter;
                 } while (result2->NextRow() && (limit == -1 || counter < limit));
             }
-            else // If no characters, only show the account names + no characters found message
+            else // Account exists but has no characters; not an error condition.
             {
-                handler->SendErrorMessage(LANG_NO_PLAYERS_FOUND);
+                handler->SendSysMessage(LANG_NO_PLAYERS_FOUND);
             }
 
             handler->SendSysMessage("");
