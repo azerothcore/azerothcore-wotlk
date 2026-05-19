@@ -21,9 +21,9 @@
 #include "ObservabilityMgr.h"
 #include <algorithm>
 #include <atomic>
+#include <format>
 #include <optional>
 #include <ranges>
-#include <sstream>
 #include <utility>
 
 namespace Acore::Observability
@@ -53,7 +53,7 @@ namespace Acore::Observability
             boundaries.reserve(buckets.size());
 
             for (double bucket : buckets)
-                boundaries.push_back({ bucket, std::to_string(bucket) });
+                boundaries.push_back({ bucket, std::format("{}", bucket) });
 
             return boundaries;
         }
@@ -127,14 +127,16 @@ namespace Acore::Observability
         void ObserveHistogramSeries(Detail::HistogramSeries& series, double value)
         {
             auto bucket = std::ranges::lower_bound(series.Buckets, value, {}, &BucketBoundary::Value);
+
+            // Count before BucketCounts: ensures a concurrent scrape never observes cumulative finite buckets > _count.
+            series.Count.fetch_add(1, std::memory_order_relaxed);
+            series.Sum.fetch_add(value, std::memory_order_relaxed);
+
             if (bucket != series.Buckets.end())
             {
                 std::size_t index = static_cast<std::size_t>(bucket - series.Buckets.begin());
                 series.BucketCounts[index].fetch_add(1, std::memory_order_relaxed);
             }
-
-            series.Count.fetch_add(1, std::memory_order_relaxed);
-            series.Sum.fetch_add(value, std::memory_order_relaxed);
         }
 
         void InitializeIndexedHistograms(std::vector<std::atomic<Detail::HistogramSeries*>>& indexedHistograms, std::size_t size)
@@ -504,7 +506,7 @@ namespace Acore::Observability
         if (Detail::HistogramSeries* series = registry.FindIndexedHistogramSeries(*_entry, index))
             return ScopedHistogramTimer(*series);
 
-        Detail::HistogramSeries& series = registry.RegisterIndexedHistogramSeries(*_entry, index, { { labelName, std::to_string(labelValue) } });
+        Detail::HistogramSeries& series = registry.RegisterIndexedHistogramSeries(*_entry, index, { { labelName, std::format("{}", labelValue) } });
         return ScopedHistogramTimer(series);
     }
 
