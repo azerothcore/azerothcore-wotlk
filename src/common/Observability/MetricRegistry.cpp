@@ -138,22 +138,19 @@ namespace Acore::Observability
                 series.BucketCounts[index].fetch_add(1, std::memory_order_relaxed);
             }
         }
-
-        void InitializeIndexedHistograms(std::vector<std::atomic<Detail::HistogramSeries*>>& indexedHistograms, std::size_t size)
-        {
-            indexedHistograms = std::vector<std::atomic<Detail::HistogramSeries*>>(size);
-
-            for (std::atomic<Detail::HistogramSeries*>& series : indexedHistograms)
-                series.store(nullptr, std::memory_order_relaxed);
-        }
     }
 
     struct MetricRegistry::Entry
     {
         Entry(EntryKind kind, StaticStringLiteral name, StaticStringLiteral help, std::source_location owner, std::size_t indexedSeriesCount = 0)
-            : Kind(kind), Name(name), Help(help), Owner(owner)
+            : Kind(kind), Name(name), Help(help), Owner(owner), IndexedHistograms(indexedSeriesCount)
         {
-            InitializeIndexedHistograms(IndexedHistograms, indexedSeriesCount);
+        }
+
+        ~Entry()
+        {
+            for (auto& slot : IndexedHistograms)
+                delete slot.load(std::memory_order_relaxed);
         }
 
         EntryKind Kind;
@@ -164,6 +161,8 @@ namespace Acore::Observability
         std::map<std::string, Detail::CounterSeries, std::less<>> Counters;
         std::map<std::string, Detail::GaugeSeries, std::less<>> Gauges;
         std::map<std::string, Detail::HistogramSeries, std::less<>> Histograms;
+
+        // Despite the raw pointer those are owned by the `Entry`
         std::vector<std::atomic<Detail::HistogramSeries*>> IndexedHistograms;
     };
 
@@ -339,7 +338,7 @@ namespace Acore::Observability
             return IgnoredHistogram();
         }
 
-        return RegisterHistogramSeriesLocked(entry, std::move(labels));
+        return EmplaceHistogramSeries(entry, std::move(labels));
     }
 
     MetricRegistry::Entry* MetricRegistry::RegisterHistogramFamily(StaticStringLiteral name, StaticStringLiteral help, Buckets buckets, std::source_location owner, std::size_t indexedSeriesCount)
@@ -374,30 +373,24 @@ namespace Acore::Observability
 
     Detail::HistogramSeries* MetricRegistry::FindIndexedHistogramSeries(Entry const& entry, std::size_t index) const
     {
-        if (index >= entry.IndexedHistograms.size())
-            return nullptr;
-
         return entry.IndexedHistograms[index].load(std::memory_order_acquire);
     }
 
     Detail::HistogramSeries& MetricRegistry::RegisterIndexedHistogramSeries(Entry& entry, std::size_t index, std::vector<Label> labels)
     {
-        std::lock_guard<std::mutex> lock(_registryMutex);
-
-        if (index >= entry.IndexedHistograms.size())
-            return RegisterHistogramSeriesLocked(entry, std::move(labels));
-
         auto& slot = entry.IndexedHistograms[index];
-        if (auto* series = slot.load(std::memory_order_acquire))
-            return *series;
+        auto fresh = std::make_unique<Detail::HistogramSeries>(*entry.Buckets, std::move(labels));
 
-        auto& series = RegisterHistogramSeriesLocked(entry, std::move(labels));
-        slot.store(&series, std::memory_order_release);
+        Detail::HistogramSeries* expected = nullptr;
+        if (slot.compare_exchange_strong(expected, fresh.get(),
+                std::memory_order_release, std::memory_order_acquire))
+            return *fresh.release();
 
-        return series;
+        // Lost the race
+        return *expected;
     }
 
-    Detail::HistogramSeries& MetricRegistry::RegisterHistogramSeriesLocked(Entry& entry, std::vector<Label> labels)
+    Detail::HistogramSeries& MetricRegistry::EmplaceHistogramSeries(Entry& entry, std::vector<Label> labels)
     {
         auto it = entry.Histograms.try_emplace(LabelKey(labels), *entry.Buckets, std::move(labels)).first;
         return it->second;
@@ -450,6 +443,12 @@ namespace Acore::Observability
 
             for (auto const& histogram : entry.Histograms | std::views::values)
                 histogram.VisitSamples(family, _constantLabels, visitor);
+
+            for (auto const& slot : entry.IndexedHistograms)
+            {
+                if (auto* series = slot.load(std::memory_order_acquire))
+                    series->VisitSamples(family, _constantLabels, visitor);
+            }
         }
     }
 
