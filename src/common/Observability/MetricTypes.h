@@ -26,7 +26,7 @@
 
 namespace Acore::Observability
 {
-    using StaticStringLiteral = char const*; // TODO: consteval enforce; TODO_CPP26: std::define_static_string
+    using StaticStringLiteral = std::string_view; // TODO: consteval enforce; TODO_CPP26: std::define_static_string
 
     enum class MetricKind
     {
