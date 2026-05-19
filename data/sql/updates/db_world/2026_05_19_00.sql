@@ -1,3 +1,4 @@
+-- DB update 2026_05_18_02 -> 2026_05_19_00
 -- Update creature 'Ludin Farrow' with sniffed values
 -- new spawns
 DELETE FROM `creature` WHERE (`id1` IN (26546)) AND (`guid` IN (1550));
