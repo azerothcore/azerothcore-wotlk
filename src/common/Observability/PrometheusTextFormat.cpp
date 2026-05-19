@@ -17,7 +17,9 @@
 
 #include "PrometheusTextFormat.h"
 #include "MetricRegistry.h"
-#include <sstream>
+#include <format>
+#include <iterator>
+#include <string>
 
 namespace Acore::Observability
 {
@@ -39,79 +41,75 @@ namespace Acore::Observability
             return "untyped";
         }
 
-        void WriteEscapedLabelValue(std::ostringstream& out, std::string_view value)
+        void WriteEscapedLabelValue(std::string& out, std::string_view value)
         {
             for (char c : value)
             {
                 switch (c)
                 {
                     case '\\':
-                        out << "\\\\";
+                        out.append("\\\\");
                         break;
                     case '"':
-                        out << "\\\"";
+                        out.append("\\\"");
                         break;
                     case '\n':
-                        out << "\\n";
+                        out.append("\\n");
                         break;
                     default:
-                        out << c;
+                        out.push_back(c);
                         break;
                 }
             }
         }
 
-        void WriteLabels(std::ostringstream& out, LabelSetView labels)
+        void WriteLabels(std::string& out, LabelSetView labels)
         {
             bool first = true;
 
             labels.Visit([&](LabelView label)
             {
-                if (first)
-                    out << '{';
-                else
-                    out << ',';
-
+                out.push_back(first ? '{' : ',');
                 first = false;
-                out << label.Name << "=\"";
+                std::format_to(std::back_inserter(out), "{}=\"", label.Name);
                 WriteEscapedLabelValue(out, label.Value);
-                out << '"';
+                out.push_back('"');
             });
 
             if (!first)
-                out << '}';
+                out.push_back('}');
         }
 
         class PrometheusWriter : public MetricVisitor
         {
         public:
-            explicit PrometheusWriter(std::ostringstream& out) : _out(out) { }
+            explicit PrometheusWriter(std::string& out) : _out(out) { }
 
             void VisitFamily(MetricFamilyView family) override
             {
                 if (!family.Help.empty())
-                    _out << "# HELP " << family.Name << ' ' << family.Help << '\n';
+                    std::format_to(std::back_inserter(_out), "# HELP {} {}\n", family.Name, family.Help);
 
-                _out << "# TYPE " << family.Name << ' ' << TypeName(family.Kind) << '\n';
+                std::format_to(std::back_inserter(_out), "# TYPE {} {}\n", family.Name, TypeName(family.Kind));
             }
 
             void VisitSample(MetricFamilyView family, MetricSampleView sample) override
             {
-                _out << family.Name << sample.Suffix;
+                std::format_to(std::back_inserter(_out), "{}{}", family.Name, sample.Suffix);
                 WriteLabels(_out, sample.Labels);
-                _out << ' ' << sample.Value << '\n';
+                std::format_to(std::back_inserter(_out), " {}\n", sample.Value);
             }
 
         private:
-            std::ostringstream& _out;
+            std::string& _out;
         };
     }
 
     std::string PrometheusTextFormat::Serialize(MetricRegistry const& registry)
     {
-        std::ostringstream out;
+        std::string out;
         PrometheusWriter writer(out);
         registry.VisitMetrics(writer);
-        return out.str();
+        return out;
     }
 }
