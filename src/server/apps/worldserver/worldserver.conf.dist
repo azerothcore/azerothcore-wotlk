@@ -431,7 +431,7 @@ Observability.Prometheus.Enable = 1
 
 #
 #    Observability.Prometheus.IP
-#        Description: Bind Prometheus metrics exporter to IP/hostname.
+#        Description: Bind Prometheus metrics exporter to an IP address.
 #        Default:     "127.0.0.1" - (Bind to localhost)
 
 Observability.Prometheus.IP = "127.0.0.1"
