@@ -342,7 +342,7 @@ struct boss_blindeye_the_seer : public ScriptedAI
                 DoCast(target, SPELL_HEAL);
             }
             context.Repeat(7200ms);
-        }).Schedule(37500s, [this](TaskContext context)
+        }).Schedule(37500ms, [this](TaskContext context)
         {
             DoCastSelf(SPELL_GREATER_PW_SHIELD);
             _scheduler.Schedule(1200ms, [this](TaskContext)
