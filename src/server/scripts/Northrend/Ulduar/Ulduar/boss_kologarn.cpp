@@ -441,7 +441,6 @@ struct boss_kologarn : public BossAI
                 {
                     events.ScheduleEvent(EVENT_FOCUSED_EYEBEAM, 20s);
                     me->CastSpell(me, SPELL_FOCUSED_EYEBEAM_SUMMON, false);
-                    Talk(EMOTE_EYES);
                     return;
                 }
                 case EVENT_RESTORE_ARM_LEFT:
@@ -605,6 +604,7 @@ struct boss_kologarn_eyebeam : public ScriptedAI
             if (Creature* cr = _instance->GetCreature(BOSS_KOLOGARN))
             {
                 me->CastSpell(cr, me->GetEntry() == NPC_EYE_LEFT ? SPELL_FOCUSED_EYEBEAM_LEFT : SPELL_FOCUSED_EYEBEAM_RIGHT, true);
+                cr->AI()->Talk(EMOTE_EYES, player);
             }
         }
     }
