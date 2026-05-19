@@ -53,6 +53,26 @@ public:
             _columnSet.clear();
         }
 
+        bool IsAnyChannelerAlive()
+        {
+            return std::ranges::any_of(_channelersSet, [&](ObjectGuid const& guid)
+            {
+                if (Creature* channeler = instance->GetCreature(guid))
+                    return channeler->IsAlive();
+                return false;
+            });
+        }
+
+        bool IsAnyChannelerAliveAndInCombat()
+        {
+            return std::ranges::any_of(_channelersSet, [&](ObjectGuid const& guid)
+            {
+                if (Creature* channeler = instance->GetCreature(guid))
+                    return channeler->IsAlive() && channeler->IsInCombat();
+                return false;
+            });
+        }
+
         void OnCreatureCreate(Creature* creature) override
         {
             switch (creature->GetEntry())
@@ -139,29 +159,12 @@ public:
                     if (state == NOT_STARTED)
                         SetData(DATA_COLLAPSE, GO_READY);
 
-                    // The Channeler formation uses RESPAWN_ON_EVADE, which only
-                    // fires when a *living* member evades. If the raid wipes
-                    // after every Channeler is already dead (phase 2/3 wipe, or
-                    // a wipe during the 3s window before Magtheridon is freed),
-                    // no member is alive to trigger the formation respawn, and
-                    // the encounter would be left unrecoverable. Respawn the
-                    // pack manually in that case.
-                    if (state == NOT_STARTED || state == FAIL)
-                    {
-                        bool anyChannelerAlive = false;
+                    // Channeler formation respawns only when a living member evades.
+                    // If all Channelers are dead on wipe, respawn them manually.
+                    if ((state == NOT_STARTED || state == FAIL) && !IsAnyChannelerAlive())
                         for (ObjectGuid const& guid : _channelersSet)
                             if (Creature* channeler = instance->GetCreature(guid))
-                                if (channeler->IsAlive())
-                                {
-                                    anyChannelerAlive = true;
-                                    break;
-                                }
-
-                        if (!anyChannelerAlive)
-                            for (ObjectGuid const& guid : _channelersSet)
-                                if (Creature* channeler = instance->GetCreature(guid))
-                                    channeler->Respawn(true);
-                    }
+                                channeler->Respawn(true);
                 }
             }
             return true;
@@ -172,8 +175,6 @@ public:
             switch (type)
             {
                 case DATA_CHANNELER_COMBAT:
-                    // data == 1: a Channeler entered combat
-                    // data == 0: a Channeler evaded (sent from SmartAI on evade)
                     if (data == 1)
                     {
                         if (GetBossState(DATA_MAGTHERIDON) != IN_PROGRESS)
@@ -182,35 +183,15 @@ public:
                     }
                     else
                     {
-                        // The formation handles respawning dead Channelers
-                        // when a living one evades, but Magtheridon himself
-                        // is held in combat by SetInCombatWithZone and his
-                        // own EnterEvadeMode does not always fire — leaving
-                        // his _channelersKilled counter stale, which would
-                        // release him prematurely on the next pull. Once
-                        // every Channeler has finished evading (and Mag is
-                        // still in his pre-release passive state), force a
-                        // full encounter reset.
+                        // If Mag's evade doesn't update the Channeler counter
+                        // and no Channelers are alive or in combat, reset the
+                        // encounter to avoid a stale state.
                         if (Creature* magtheridon = instance->GetCreature(_magtheridonGUID))
-                        {
-                            if (!magtheridon->IsEngaged() && magtheridon->IsImmuneToPC())
+                            if (!magtheridon->IsEngaged() && magtheridon->IsImmuneToPC() && !IsAnyChannelerAliveAndInCombat())
                             {
-                                bool anyChannelerStillFighting = false;
-                                for (ObjectGuid const& guid : _channelersSet)
-                                    if (Creature* channeler = instance->GetCreature(guid))
-                                        if (channeler->IsAlive() && channeler->IsInCombat())
-                                        {
-                                            anyChannelerStillFighting = true;
-                                            break;
-                                        }
-
-                                if (!anyChannelerStillFighting)
-                                {
-                                    SetBossState(DATA_MAGTHERIDON, NOT_STARTED);
-                                    magtheridon->AI()->Reset();
-                                }
+                                SetBossState(DATA_MAGTHERIDON, NOT_STARTED);
+                                magtheridon->AI()->Reset();
                             }
-                        }
                     }
                     break;
                 case DATA_ACTIVATE_CUBES:
@@ -222,6 +203,8 @@ public:
                     for (ObjectGuid const& guid : _columnSet)
                         if (GameObject* column = instance->GetGameObject(guid))
                             column->SetGoState(GOState(data));
+                    break;
+                default:
                     break;
             }
         }
