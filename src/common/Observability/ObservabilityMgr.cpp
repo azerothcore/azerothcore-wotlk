@@ -65,11 +65,11 @@ namespace Acore::Observability
         return &instance;
     }
 
-    void ObservabilityMgr::Initialize(std::string const& realmName, Acore::Asio::IoContext& ioContext)
+    void ObservabilityMgr::Initialize(std::string const& realmName)
     {
         _realmName = realmName;
         _registry.SetConstantLabel("realm", _realmName);
-        _prometheusExporter = std::make_unique<PrometheusExporter>(ioContext, _registry);
+        _prometheusExporter = std::make_unique<PrometheusExporter>(_registry);
         LoadFromConfigs();
     }
 

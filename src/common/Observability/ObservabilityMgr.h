@@ -23,11 +23,6 @@
 #include <memory>
 #include <string>
 
-namespace Acore::Asio
-{
-    class IoContext;
-}
-
 namespace Acore::Observability
 {
     class PrometheusExporter;
@@ -41,7 +36,7 @@ namespace Acore::Observability
 
         static ObservabilityMgr* instance();
 
-        void Initialize(std::string const& realmName, Acore::Asio::IoContext& ioContext);
+        void Initialize(std::string const& realmName);
         void LoadFromConfigs();
         void Unload();
 
