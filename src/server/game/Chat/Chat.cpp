@@ -895,6 +895,11 @@ std::string CliHandler::GetAcoreString(uint32 entry) const
     return sObjectMgr->GetAcoreStringForDBCLocale(entry);
 }
 
+std::string const* CliHandler::GetModuleString(std::string module, uint32 id) const
+{
+    return sObjectMgr->GetModuleString(module, id, LocaleConstant(sObjectMgr->GetDBCLocaleIndex()));
+}
+
 void CliHandler::SendSysMessage(std::string_view str, bool /*escapeCharacters*/)
 {
     m_print(m_callbackArg, str);
