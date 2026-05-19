@@ -69,13 +69,13 @@ public:
     bool SetLogLevel(std::string const& name, int32 level, bool isLogger = true);
 
     template<typename... Args>
-    inline void outMessage(std::string const& filter, LogLevel const level, Acore::FormatString<Args...> fmt, Args&&... args)
+    inline void outMessage(std::string const& filter, LogLevel const level, Acore::FormatStringView fmt, Args&&... args)
     {
         _outMessage(filter, level, Acore::StringFormat(fmt, std::forward<Args>(args)...));
     }
 
     template<typename... Args>
-    void outCommand(uint32 account, Acore::FormatString<Args...> fmt, Args&&... args)
+    void outCommand(uint32 account, Acore::FormatStringView fmt, Args&&... args)
     {
         if (!ShouldLog("commands.gm", LOG_LEVEL_INFO))
         {
@@ -126,19 +126,6 @@ private:
 
 #define sLog Log::instance()
 
-#define LOG_EXCEPTION_FREE(filterType__, level__, ...) \
-    { \
-        try \
-        { \
-            sLog->outMessage(filterType__, level__, fmt::format(__VA_ARGS__)); \
-        } \
-        catch (std::exception const& e) \
-        { \
-            sLog->outMessage("server", LogLevel::LOG_LEVEL_ERROR, "Wrong format occurred ({}) at '{}:{}'", \
-                e.what(), __FILE__, __LINE__); \
-        } \
-    }
-
 #ifdef PERFORMANCE_PROFILING
 #define LOG_MESSAGE_BODY(filterType__, level__, ...) ((void)0)
 #else
@@ -146,7 +133,7 @@ private:
         do                                                              \
         {                                                               \
             if (sLog->ShouldLog(filterType__, level__))                 \
-                LOG_EXCEPTION_FREE(filterType__, level__, __VA_ARGS__); \
+                sLog->outMessage(filterType__, level__, __VA_ARGS__); \
         } while (0)
 #endif
 

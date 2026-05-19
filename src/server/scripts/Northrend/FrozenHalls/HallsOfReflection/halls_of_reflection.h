@@ -36,8 +36,8 @@ enum Data
     // Non-boss data (SetData/GetData only)
     DATA_INTRO,
     DATA_FROSTSWORN_GENERAL,
+    DATA_BATTERED_HILT = 6, //For SAI DB
     DATA_LK_INTRO,
-    DATA_BATTERED_HILT,
     DATA_WAVE_NUMBER,
     DATA_LK_BATTLE,
     DATA_SHIP_CAPTAIN,
