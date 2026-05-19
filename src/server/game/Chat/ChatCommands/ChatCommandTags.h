@@ -245,7 +245,7 @@ namespace fmt {
 template<>
 struct formatter<Acore::ChatCommands::Tail> : formatter<std::string_view> {
     template <typename FormatContext>
-    auto format(Acore::ChatCommands::Tail const& t, FormatContext& ctx) {
+    auto format(Acore::ChatCommands::Tail const& t, FormatContext& ctx) const {
         return formatter<std::string_view>::format(std::string_view(t), ctx);
     }
 };
