@@ -1497,7 +1497,8 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
                             roll->getLoot()->NotifyItemRemoved(roll->itemSlot);
                             roll->getLoot()->unlootedCount--;
                             player->SendEquipError(msg, nullptr, nullptr, roll->itemid);
-                            player->SendItemRetrievalMail(roll->itemid, item->count);
+                            if (Item* mailItem = Item::CreateItem(roll->itemid, item->count, player, false, item->randomPropertyId))
+                                player->SendItemRetrievalMail(mailItem);
                         }
                         else
                         {
@@ -1579,7 +1580,8 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
                                 roll->getLoot()->NotifyItemRemoved(roll->itemSlot);
                                 roll->getLoot()->unlootedCount--;
                                 player->SendEquipError(msg, nullptr, nullptr, roll->itemid);
-                                player->SendItemRetrievalMail(roll->itemid, item->count);
+                                if (Item* mailItem = Item::CreateItem(roll->itemid, item->count, player, false, item->randomPropertyId))
+                                    player->SendItemRetrievalMail(mailItem);
                             }
                             else
                             {
