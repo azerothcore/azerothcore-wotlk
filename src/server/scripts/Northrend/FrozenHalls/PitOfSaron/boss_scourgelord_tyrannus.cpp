@@ -117,7 +117,7 @@ public:
                 me->RemoveAllAuras();
                 me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetImmuneToPC(false);
-                DoZoneInCombat();
+                me->SetInCombatWithZone();
                 me->CastSpell(me, 43979, true);
                 Talk(SAY_AGGRO);
                 events.Reset();
