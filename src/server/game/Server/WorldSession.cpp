@@ -436,6 +436,12 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
         if (evaluationPolicy == WorldSession::DosProtection::Policy::Process
             || evaluationPolicy == WorldSession::DosProtection::Policy::Log)
         {
+            auto callOpcodeHandler = [&]
+            {
+                Acore::Observability::ScopedHistogramTimer observabilityOpcodeTimer = Metrics.OpcodeDuration.MeasureIndexed(uint32(opcode), "opcode", opHandle->Name);
+                opHandle->Call(this, *packet);
+            };
+
             try
             {
                 switch (opHandle->Status)
@@ -459,10 +465,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                         if (!sScriptMgr->CanPacketReceive(this, *packet))
                             break;
 
-                        {
-                            Acore::Observability::ScopedHistogramTimer observabilityOpcodeTimer = Metrics.OpcodeDuration.MeasureIndexed(uint32(opcode), "opcode", opHandle->Name);
-                            opHandle->Call(this, *packet);
-                        }
+                        callOpcodeHandler();
                         LogUnprocessedTail(packet);
                     }
 
@@ -480,10 +483,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                         if (!sScriptMgr->CanPacketReceive(this, *packet))
                             break;
 
-                        {
-                            Acore::Observability::ScopedHistogramTimer observabilityOpcodeTimer = Metrics.OpcodeDuration.MeasureIndexed(uint32(opcode), "opcode", opHandle->Name);
-                            opHandle->Call(this, *packet);
-                        }
+                        callOpcodeHandler();
                         LogUnprocessedTail(packet);
                     }
                     break;
@@ -493,10 +493,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                         if (!sScriptMgr->CanPacketReceive(this, *packet))
                             break;
 
-                        {
-                            Acore::Observability::ScopedHistogramTimer observabilityOpcodeTimer = Metrics.OpcodeDuration.MeasureIndexed(uint32(opcode), "opcode", opHandle->Name);
-                            opHandle->Call(this, *packet);
-                        }
+                        callOpcodeHandler();
                         LogUnprocessedTail(packet);
                     }
                     break;
@@ -512,10 +509,7 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
                     if (!sScriptMgr->CanPacketReceive(this, *packet))
                         break;
 
-                    {
-                        Acore::Observability::ScopedHistogramTimer observabilityOpcodeTimer = Metrics.OpcodeDuration.MeasureIndexed(uint32(opcode), "opcode", opHandle->Name);
-                        opHandle->Call(this, *packet);
-                    }
+                    callOpcodeHandler();
                     LogUnprocessedTail(packet);
                     break;
                 case STATUS_NEVER:
