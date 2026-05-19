@@ -292,7 +292,7 @@ int main(int argc, char** argv)
         sObservability->Unload();
     });
 
-    static Acore::Observability::Info BuildInfo
+    Acore::Observability::Info BuildInfo
     {
         "ac_build_info",
         "Build information for the running worldserver.",

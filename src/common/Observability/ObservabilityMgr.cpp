@@ -68,13 +68,15 @@ namespace Acore::Observability
     void ObservabilityMgr::Initialize(std::string const& realmName)
     {
         _realmName = realmName;
-        _registry.SetConstantLabel("realm", _realmName);
         _prometheusExporter = std::make_unique<PrometheusExporter>(_registry);
         LoadFromConfigs();
     }
 
     void ObservabilityMgr::LoadFromConfigs()
     {
+        if (!_realmName.empty())
+            _registry.SetConstantLabel("realm", _realmName);
+
         _enabled = sConfigMgr->GetOption<bool>("Observability.Enable", true);
         RuntimeEnabled.store(_enabled, std::memory_order_relaxed);
 
