@@ -101,6 +101,7 @@
 #include "WorldStateDefines.h"
 #include <boost/asio/ip/address.hpp>
 #include <cmath>
+#include <cstddef>
 
 std::atomic_long World::_stopEvent = false;
 uint8 World::_exitCode = SHUTDOWN_EXIT_CODE;
@@ -114,6 +115,38 @@ Realm realm;
 
 namespace
 {
+    // Enumerator names are stringized into the exported "phase" metric label.
+    // Rename them only when intentionally changing the metric series.
+    enum class WorldUpdatePhase : std::size_t
+    {
+        update_who_list,
+        check_quest_reset_times,
+        reset_random_bg,
+        delete_old_calendar_events,
+        reset_guild_cap,
+        update_expired_auctions,
+        update_sessions,
+        clean_logs_table,
+        update_lfg_0,
+        update_maps,
+        send_autobroadcast,
+        update_battlegrounds,
+        update_outdoor_pvp,
+        update_worldstate,
+        update_battlefields,
+        update_lfg_2,
+        process_query_callbacks,
+        update_uptime,
+        update_game_events,
+        ping_mysql,
+        update_instance_reset_times,
+        process_cli_commands,
+        update_world_scripts,
+        update_metrics,
+
+        Count
+    };
+
     struct WorldMetrics
     {
         Acore::Observability::Histogram UpdateDuration
@@ -130,196 +163,12 @@ namespace
             Acore::Observability::DefaultDurationBuckets()
         };
 
-        Acore::Observability::Histogram UpdateWhoListDuration
+        Acore::Observability::HistogramFamily UpdatePhase
         {
             "ac_world_update_phase_duration_seconds",
             "Duration of a named world update phase.",
             Acore::Observability::DefaultDurationBuckets(),
-            { { "phase", "update_who_list" } }
-        };
-
-        Acore::Observability::Histogram CheckQuestResetTimesDuration
-        {
-            "ac_world_update_phase_duration_seconds",
-            "Duration of a named world update phase.",
-            Acore::Observability::DefaultDurationBuckets(),
-            { { "phase", "check_quest_reset_times" } }
-        };
-
-        Acore::Observability::Histogram ResetRandomBgDuration
-        {
-            "ac_world_update_phase_duration_seconds",
-            "Duration of a named world update phase.",
-            Acore::Observability::DefaultDurationBuckets(),
-            { { "phase", "reset_random_bg" } }
-        };
-
-        Acore::Observability::Histogram DeleteOldCalendarEventsDuration
-        {
-            "ac_world_update_phase_duration_seconds",
-            "Duration of a named world update phase.",
-            Acore::Observability::DefaultDurationBuckets(),
-            { { "phase", "delete_old_calendar_events" } }
-        };
-
-        Acore::Observability::Histogram ResetGuildCapDuration
-        {
-            "ac_world_update_phase_duration_seconds",
-            "Duration of a named world update phase.",
-            Acore::Observability::DefaultDurationBuckets(),
-            { { "phase", "reset_guild_cap" } }
-        };
-
-        Acore::Observability::Histogram UpdateExpiredAuctionsDuration
-        {
-            "ac_world_update_phase_duration_seconds",
-            "Duration of a named world update phase.",
-            Acore::Observability::DefaultDurationBuckets(),
-            { { "phase", "update_expired_auctions" } }
-        };
-
-        Acore::Observability::Histogram UpdateSessionsDuration
-        {
-            "ac_world_update_phase_duration_seconds",
-            "Duration of a named world update phase.",
-            Acore::Observability::DefaultDurationBuckets(),
-            { { "phase", "update_sessions" } }
-        };
-
-        Acore::Observability::Histogram CleanLogsTableDuration
-        {
-            "ac_world_update_phase_duration_seconds",
-            "Duration of a named world update phase.",
-            Acore::Observability::DefaultDurationBuckets(),
-            { { "phase", "clean_logs_table" } }
-        };
-
-        Acore::Observability::Histogram UpdateLfg0Duration
-        {
-            "ac_world_update_phase_duration_seconds",
-            "Duration of a named world update phase.",
-            Acore::Observability::DefaultDurationBuckets(),
-            { { "phase", "update_lfg_0" } }
-        };
-
-        Acore::Observability::Histogram UpdateMapsDuration
-        {
-            "ac_world_update_phase_duration_seconds",
-            "Duration of a named world update phase.",
-            Acore::Observability::DefaultDurationBuckets(),
-            { { "phase", "update_maps" } }
-        };
-
-        Acore::Observability::Histogram SendAutobroadcastDuration
-        {
-            "ac_world_update_phase_duration_seconds",
-            "Duration of a named world update phase.",
-            Acore::Observability::DefaultDurationBuckets(),
-            { { "phase", "send_autobroadcast" } }
-        };
-
-        Acore::Observability::Histogram UpdateBattlegroundsDuration
-        {
-            "ac_world_update_phase_duration_seconds",
-            "Duration of a named world update phase.",
-            Acore::Observability::DefaultDurationBuckets(),
-            { { "phase", "update_battlegrounds" } }
-        };
-
-        Acore::Observability::Histogram UpdateOutdoorPvpDuration
-        {
-            "ac_world_update_phase_duration_seconds",
-            "Duration of a named world update phase.",
-            Acore::Observability::DefaultDurationBuckets(),
-            { { "phase", "update_outdoor_pvp" } }
-        };
-
-        Acore::Observability::Histogram UpdateWorldstateDuration
-        {
-            "ac_world_update_phase_duration_seconds",
-            "Duration of a named world update phase.",
-            Acore::Observability::DefaultDurationBuckets(),
-            { { "phase", "update_worldstate" } }
-        };
-
-        Acore::Observability::Histogram UpdateBattlefieldsDuration
-        {
-            "ac_world_update_phase_duration_seconds",
-            "Duration of a named world update phase.",
-            Acore::Observability::DefaultDurationBuckets(),
-            { { "phase", "update_battlefields" } }
-        };
-
-        Acore::Observability::Histogram UpdateLfg2Duration
-        {
-            "ac_world_update_phase_duration_seconds",
-            "Duration of a named world update phase.",
-            Acore::Observability::DefaultDurationBuckets(),
-            { { "phase", "update_lfg_2" } }
-        };
-
-        Acore::Observability::Histogram ProcessQueryCallbacksDuration
-        {
-            "ac_world_update_phase_duration_seconds",
-            "Duration of a named world update phase.",
-            Acore::Observability::DefaultDurationBuckets(),
-            { { "phase", "process_query_callbacks" } }
-        };
-
-        Acore::Observability::Histogram UpdateUptimeDuration
-        {
-            "ac_world_update_phase_duration_seconds",
-            "Duration of a named world update phase.",
-            Acore::Observability::DefaultDurationBuckets(),
-            { { "phase", "update_uptime" } }
-        };
-
-        Acore::Observability::Histogram UpdateGameEventsDuration
-        {
-            "ac_world_update_phase_duration_seconds",
-            "Duration of a named world update phase.",
-            Acore::Observability::DefaultDurationBuckets(),
-            { { "phase", "update_game_events" } }
-        };
-
-        Acore::Observability::Histogram PingMysqlDuration
-        {
-            "ac_world_update_phase_duration_seconds",
-            "Duration of a named world update phase.",
-            Acore::Observability::DefaultDurationBuckets(),
-            { { "phase", "ping_mysql" } }
-        };
-
-        Acore::Observability::Histogram UpdateInstanceResetTimesDuration
-        {
-            "ac_world_update_phase_duration_seconds",
-            "Duration of a named world update phase.",
-            Acore::Observability::DefaultDurationBuckets(),
-            { { "phase", "update_instance_reset_times" } }
-        };
-
-        Acore::Observability::Histogram ProcessCliCommandsDuration
-        {
-            "ac_world_update_phase_duration_seconds",
-            "Duration of a named world update phase.",
-            Acore::Observability::DefaultDurationBuckets(),
-            { { "phase", "process_cli_commands" } }
-        };
-
-        Acore::Observability::Histogram UpdateWorldScriptsDuration
-        {
-            "ac_world_update_phase_duration_seconds",
-            "Duration of a named world update phase.",
-            Acore::Observability::DefaultDurationBuckets(),
-            { { "phase", "update_world_scripts" } }
-        };
-
-        Acore::Observability::Histogram UpdateMetricsDuration
-        {
-            "ac_world_update_phase_duration_seconds",
-            "Duration of a named world update phase.",
-            Acore::Observability::DefaultDurationBuckets(),
-            { { "phase", "update_metrics" } }
+            static_cast<std::size_t>(WorldUpdatePhase::Count)
         };
 
         Acore::Observability::Gauge OnlinePlayers
@@ -372,6 +221,9 @@ namespace
     };
 
     WorldMetrics Metrics;
+
+#define MEASURE_WORLD_UPDATE_PHASE(phase) \
+    Metrics.UpdatePhase.MeasureIndexed(static_cast<std::size_t>(WorldUpdatePhase::phase), "phase", #phase)
 
     void CollectWorldStatusMetrics()
     {
@@ -1418,14 +1270,14 @@ void World::Update(uint32 diff)
     ///- Update Who List Cache
     if (_timers[WUPDATE_WHO_LIST].Passed())
     {
-        Acore::Observability::ScopedHistogramTimer observabilityPhaseTimer = Metrics.UpdateWhoListDuration.Measure();
+        auto observabilityPhaseTimer = MEASURE_WORLD_UPDATE_PHASE(update_who_list);
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update who list"));
         _timers[WUPDATE_WHO_LIST].Reset();
         sWhoListCacheMgr->Update();
     }
 
     {
-        Acore::Observability::ScopedHistogramTimer observabilityPhaseTimer = Metrics.CheckQuestResetTimesDuration.Measure();
+        auto observabilityPhaseTimer = MEASURE_WORLD_UPDATE_PHASE(check_quest_reset_times);
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Check quest reset times"));
 
         /// Handle daily quests reset time
@@ -1449,28 +1301,28 @@ void World::Update(uint32 diff)
 
     if (currentGameTime > _nextRandomBGReset)
     {
-        Acore::Observability::ScopedHistogramTimer observabilityPhaseTimer = Metrics.ResetRandomBgDuration.Measure();
+        auto observabilityPhaseTimer = MEASURE_WORLD_UPDATE_PHASE(reset_random_bg);
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Reset random BG"));
         ResetRandomBG();
     }
 
     if (currentGameTime > _nextCalendarOldEventsDeletionTime)
     {
-        Acore::Observability::ScopedHistogramTimer observabilityPhaseTimer = Metrics.DeleteOldCalendarEventsDuration.Measure();
+        auto observabilityPhaseTimer = MEASURE_WORLD_UPDATE_PHASE(delete_old_calendar_events);
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Delete old calendar events"));
         CalendarDeleteOldEvents();
     }
 
     if (currentGameTime > _nextGuildReset)
     {
-        Acore::Observability::ScopedHistogramTimer observabilityPhaseTimer = Metrics.ResetGuildCapDuration.Measure();
+        auto observabilityPhaseTimer = MEASURE_WORLD_UPDATE_PHASE(reset_guild_cap);
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Reset guild cap"));
         ResetGuildCap();
     }
 
     {
         // pussywizard: handle expired auctions, auctions expired when realm was offline are also handled here (not during loading when many required things aren't loaded yet)
-        Acore::Observability::ScopedHistogramTimer observabilityPhaseTimer = Metrics.UpdateExpiredAuctionsDuration.Measure();
+        auto observabilityPhaseTimer = MEASURE_WORLD_UPDATE_PHASE(update_expired_auctions);
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update expired auctions"));
         sAuctionMgr->Update(diff);
     }
@@ -1482,7 +1334,7 @@ void World::Update(uint32 diff)
     }
 
     {
-        Acore::Observability::ScopedHistogramTimer observabilityPhaseTimer = Metrics.UpdateSessionsDuration.Measure();
+        auto observabilityPhaseTimer = MEASURE_WORLD_UPDATE_PHASE(update_sessions);
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update sessions"));
         sWorldSessionMgr->UpdateSessions(diff);
     }
@@ -1492,7 +1344,7 @@ void World::Update(uint32 diff)
     {
         if (_timers[WUPDATE_CLEANDB].Passed())
         {
-            Acore::Observability::ScopedHistogramTimer observabilityPhaseTimer = Metrics.CleanLogsTableDuration.Measure();
+            auto observabilityPhaseTimer = MEASURE_WORLD_UPDATE_PHASE(clean_logs_table);
             METRIC_TIMER("world_update_time", METRIC_TAG("type", "Clean logs table"));
 
             _timers[WUPDATE_CLEANDB].Reset();
@@ -1505,14 +1357,14 @@ void World::Update(uint32 diff)
     }
 
     {
-        Acore::Observability::ScopedHistogramTimer observabilityPhaseTimer = Metrics.UpdateLfg0Duration.Measure();
+        auto observabilityPhaseTimer = MEASURE_WORLD_UPDATE_PHASE(update_lfg_0);
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update LFG 0"));
         sLFGMgr->Update(diff, 0); // pussywizard: remove obsolete stuff before finding compatibility during map update
     }
 
     {
         ///- Update objects when the timer has passed (maps, transport, creatures, ...)
-        Acore::Observability::ScopedHistogramTimer observabilityPhaseTimer = Metrics.UpdateMapsDuration.Measure();
+        auto observabilityPhaseTimer = MEASURE_WORLD_UPDATE_PHASE(update_maps);
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update maps"));
         sMapMgr->Update(diff);
     }
@@ -1521,7 +1373,7 @@ void World::Update(uint32 diff)
     {
         if (_timers[WUPDATE_AUTOBROADCAST].Passed())
         {
-            Acore::Observability::ScopedHistogramTimer observabilityPhaseTimer = Metrics.SendAutobroadcastDuration.Measure();
+            auto observabilityPhaseTimer = MEASURE_WORLD_UPDATE_PHASE(send_autobroadcast);
             METRIC_TIMER("world_update_time", METRIC_TAG("type", "Send autobroadcast"));
             _timers[WUPDATE_AUTOBROADCAST].Reset();
             sAutobroadcastMgr->SendAutobroadcasts();
@@ -1529,37 +1381,37 @@ void World::Update(uint32 diff)
     }
 
     {
-        Acore::Observability::ScopedHistogramTimer observabilityPhaseTimer = Metrics.UpdateBattlegroundsDuration.Measure();
+        auto observabilityPhaseTimer = MEASURE_WORLD_UPDATE_PHASE(update_battlegrounds);
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update battlegrounds"));
         sBattlegroundMgr->Update(diff);
     }
 
     {
-        Acore::Observability::ScopedHistogramTimer observabilityPhaseTimer = Metrics.UpdateOutdoorPvpDuration.Measure();
+        auto observabilityPhaseTimer = MEASURE_WORLD_UPDATE_PHASE(update_outdoor_pvp);
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update outdoor pvp"));
         sOutdoorPvPMgr->Update(diff);
     }
 
     {
-        Acore::Observability::ScopedHistogramTimer observabilityPhaseTimer = Metrics.UpdateWorldstateDuration.Measure();
+        auto observabilityPhaseTimer = MEASURE_WORLD_UPDATE_PHASE(update_worldstate);
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update worldstate"));
         sWorldState->Update(diff);
     }
 
     {
-        Acore::Observability::ScopedHistogramTimer observabilityPhaseTimer = Metrics.UpdateBattlefieldsDuration.Measure();
+        auto observabilityPhaseTimer = MEASURE_WORLD_UPDATE_PHASE(update_battlefields);
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update battlefields"));
         sBattlefieldMgr->Update(diff);
     }
 
     {
-        Acore::Observability::ScopedHistogramTimer observabilityPhaseTimer = Metrics.UpdateLfg2Duration.Measure();
+        auto observabilityPhaseTimer = MEASURE_WORLD_UPDATE_PHASE(update_lfg_2);
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update LFG 2"));
         sLFGMgr->Update(diff, 2); // pussywizard: handle created proposals
     }
 
     {
-        Acore::Observability::ScopedHistogramTimer observabilityPhaseTimer = Metrics.ProcessQueryCallbacksDuration.Measure();
+        auto observabilityPhaseTimer = MEASURE_WORLD_UPDATE_PHASE(process_query_callbacks);
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Process query callbacks"));
         // execute callbacks from sql queries that were queued recently
         ProcessQueryCallbacks();
@@ -1568,7 +1420,7 @@ void World::Update(uint32 diff)
     /// <li> Update uptime table
     if (_timers[WUPDATE_UPTIME].Passed())
     {
-        Acore::Observability::ScopedHistogramTimer observabilityPhaseTimer = Metrics.UpdateUptimeDuration.Measure();
+        auto observabilityPhaseTimer = MEASURE_WORLD_UPDATE_PHASE(update_uptime);
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update uptime"));
 
         _timers[WUPDATE_UPTIME].Reset();
@@ -1584,7 +1436,7 @@ void World::Update(uint32 diff)
     ///- Process Game events when necessary
     if (_timers[WUPDATE_EVENTS].Passed())
     {
-        Acore::Observability::ScopedHistogramTimer observabilityPhaseTimer = Metrics.UpdateGameEventsDuration.Measure();
+        auto observabilityPhaseTimer = MEASURE_WORLD_UPDATE_PHASE(update_game_events);
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update game events"));
         _timers[WUPDATE_EVENTS].Reset();                   // to give time for Update() to be processed
         uint32 nextGameEvent = sGameEventMgr->Update();
@@ -1595,7 +1447,7 @@ void World::Update(uint32 diff)
     ///- Ping to keep MySQL connections alive
     if (_timers[WUPDATE_PINGDB].Passed())
     {
-        Acore::Observability::ScopedHistogramTimer observabilityPhaseTimer = Metrics.PingMysqlDuration.Measure();
+        auto observabilityPhaseTimer = MEASURE_WORLD_UPDATE_PHASE(ping_mysql);
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Ping MySQL"));
         _timers[WUPDATE_PINGDB].Reset();
         LOG_DEBUG("sql.driver", "Ping MySQL to keep connection alive");
@@ -1605,27 +1457,27 @@ void World::Update(uint32 diff)
     }
 
     {
-        Acore::Observability::ScopedHistogramTimer observabilityPhaseTimer = Metrics.UpdateInstanceResetTimesDuration.Measure();
+        auto observabilityPhaseTimer = MEASURE_WORLD_UPDATE_PHASE(update_instance_reset_times);
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update instance reset times"));
         // update the instance reset times
         sInstanceSaveMgr->Update();
     }
 
     {
-        Acore::Observability::ScopedHistogramTimer observabilityPhaseTimer = Metrics.ProcessCliCommandsDuration.Measure();
+        auto observabilityPhaseTimer = MEASURE_WORLD_UPDATE_PHASE(process_cli_commands);
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Process cli commands"));
         // And last, but not least handle the issued cli commands
         ProcessCliCommands();
     }
 
     {
-        Acore::Observability::ScopedHistogramTimer observabilityPhaseTimer = Metrics.UpdateWorldScriptsDuration.Measure();
+        auto observabilityPhaseTimer = MEASURE_WORLD_UPDATE_PHASE(update_world_scripts);
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update world scripts"));
         sScriptMgr->OnWorldUpdate(diff);
     }
 
     {
-        Acore::Observability::ScopedHistogramTimer observabilityPhaseTimer = Metrics.UpdateMetricsDuration.Measure();
+        auto observabilityPhaseTimer = MEASURE_WORLD_UPDATE_PHASE(update_metrics);
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update metrics"));
         // Stats logger update
         sMetric->Update();
@@ -1633,6 +1485,8 @@ void World::Update(uint32 diff)
         CollectWorldStatusMetrics();
     }
 }
+
+#undef MEASURE_WORLD_UPDATE_PHASE
 
 // Internally uses setFloatConfig. Retained for backwards compatibility
 void World::setRate(ServerConfigs index, float value)
