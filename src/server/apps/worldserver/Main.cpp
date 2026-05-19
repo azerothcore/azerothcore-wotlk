@@ -293,7 +293,7 @@ int main(int argc, char** argv)
 
     LoadRealmInfo(*ioContext);
 
-    sObservability->Initialize(realm.Name, *ioContext);
+    sObservability->Initialize(realm.Name);
     std::shared_ptr<void> sObservabilityHandle(nullptr, [](void*)
     {
         sObservability->Unload();

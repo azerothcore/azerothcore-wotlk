@@ -22,11 +22,6 @@
 #include <memory>
 #include <string>
 
-namespace Acore::Asio
-{
-    class IoContext;
-}
-
 namespace Acore::Observability
 {
     class MetricRegistry;
@@ -43,7 +38,7 @@ namespace Acore::Observability
     class PrometheusExporter
     {
     public:
-        PrometheusExporter(Acore::Asio::IoContext& ioContext, MetricRegistry& registry);
+        explicit PrometheusExporter(MetricRegistry& registry);
         ~PrometheusExporter();
 
         void ApplyConfig(PrometheusEndpointConfig config);

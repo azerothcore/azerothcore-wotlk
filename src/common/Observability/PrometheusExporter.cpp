@@ -16,21 +16,25 @@
  */
 
 #include "PrometheusExporter.h"
-#include "IoContext.h"
 #include "Log.h"
 #include "MetricRegistry.h"
 #include "PrometheusTextFormat.h"
 #include <atomic>
-#include <boost/asio/dispatch.hpp>
+#include <boost/asio/executor_work_guard.hpp>
+#include <boost/asio/io_context.hpp>
 #include <boost/asio/ip/address.hpp>
 #include <boost/asio/ip/tcp.hpp>
+#include <boost/asio/post.hpp>
 #include <boost/asio/strand.hpp>
 #include <boost/beast/core/bind_handler.hpp>
 #include <boost/beast/core/flat_buffer.hpp>
 #include <boost/beast/core/tcp_stream.hpp>
 #include <boost/beast/http.hpp>
+#include <exception>
 #include <memory>
 #include <optional>
+#include <stop_token>
+#include <thread>
 #include <utility>
 
 namespace Acore::Observability
@@ -60,17 +64,45 @@ namespace Acore::Observability
     class PrometheusExporter::Impl : public std::enable_shared_from_this<PrometheusExporter::Impl>
     {
     public:
-        Impl(Acore::Asio::IoContext& ioContext, MetricRegistry& registry)
-            : _ioContext(static_cast<net::io_context&>(ioContext)),
+        explicit Impl(MetricRegistry& registry)
+            : _ioContext(1),
+              _workGuard(net::make_work_guard(_ioContext)),
               _strand(net::make_strand(_ioContext)),
               _acceptor(_strand),
               _registry(registry)
         {
+            _thread = std::jthread([this](std::stop_token stopToken)
+            {
+                std::stop_callback onStop(stopToken, [this]
+                {
+                    net::post(_strand, [this] { StopOnStrand(); });
+                    _workGuard.reset();
+                });
+
+                try
+                {
+                    _ioContext.run();
+                }
+                catch (std::exception const& e)
+                {
+                    LOG_ERROR("observability", "Prometheus metrics exporter thread terminated: {}", e.what());
+                }
+            });
+        }
+
+        void Shutdown()
+        {
+            // Explicit join (rather than relying on ~jthread) ensures the io thread is
+            // drained before the last shared_ptr<Impl> ref can be released by a handler
+            // running on it — otherwise ~Impl could run on the io thread and ~jthread
+            // would self-join.
+            _thread.request_stop();
+            _thread.join();
         }
 
         void ApplyConfig(PrometheusEndpointConfig config)
         {
-            net::dispatch(_strand, [self = shared_from_this(), config = std::move(config)]() mutable
+            net::post(_strand, [self = shared_from_this(), config = std::move(config)]() mutable
             {
                 self->ApplyConfigOnStrand(std::move(config));
             });
@@ -78,7 +110,7 @@ namespace Acore::Observability
 
         void Stop()
         {
-            net::dispatch(_strand, [self = shared_from_this()]
+            net::post(_strand, [self = shared_from_this()]
             {
                 self->StopOnStrand();
             });
@@ -282,22 +314,25 @@ namespace Acore::Observability
             _acceptor.close(ignored);
         }
 
-        net::io_context& _ioContext;
+        net::io_context _ioContext;
+        net::executor_work_guard<net::io_context::executor_type> _workGuard;
         net::strand<net::io_context::executor_type> _strand;
         tcp::acceptor _acceptor;
         MetricRegistry& _registry;
         PrometheusEndpointConfig _config;
         std::atomic<bool> _running{ false };
+        std::jthread _thread;
     };
 
-    PrometheusExporter::PrometheusExporter(Acore::Asio::IoContext& ioContext, MetricRegistry& registry)
-        : _impl(std::make_shared<Impl>(ioContext, registry))
+    PrometheusExporter::PrometheusExporter(MetricRegistry& registry)
+        : _impl(std::make_shared<Impl>(registry))
     {
     }
 
     PrometheusExporter::~PrometheusExporter()
     {
-        Stop();
+        if (_impl)
+            _impl->Shutdown();
     }
 
     void PrometheusExporter::ApplyConfig(PrometheusEndpointConfig config)

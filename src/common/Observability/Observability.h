@@ -23,11 +23,6 @@
 #include <source_location>
 #include <string>
 
-namespace Acore::Asio
-{
-    class IoContext;
-}
-
 #if defined(WITHOUT_OBSERVABILITY)
 
 namespace Acore::Observability
@@ -99,7 +94,7 @@ namespace Acore::Observability
             return &instance;
         }
 
-        void Initialize(std::string const&, Acore::Asio::IoContext&) { }
+        void Initialize(std::string const&) { }
         void LoadFromConfigs() { }
         void Unload() { }
         bool IsEnabled() const { return false; }
