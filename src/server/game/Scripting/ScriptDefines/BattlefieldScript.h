@@ -29,6 +29,7 @@ enum BattlefieldHook
     BATTLEFIELDHOOK_ON_PLAYER_LEAVE_WAR,           // 3 - fires after player is removed from the active war
     BATTLEFIELDHOOK_BEFORE_INVITE_PLAYER_TO_WAR,   // 4 - fires in InvitePlayerToWar before InvitedPlayers insert
     BATTLEFIELDHOOK_ON_WAR_END,                    // 5 - fires in EndBattle after OnBattleEnd(), before timer reset
+    BATTLEFIELDHOOK_ON_PLAYER_KILL,                // 6 - fires in HandleKill for every player-kills-player event
     BATTLEFIELDHOOK_END
 };
 
@@ -99,6 +100,17 @@ public:
      * @param endByTimer True if the war ended by the countdown timer expiring
      */
     virtual void OnBattlefieldWarEnd(Battlefield* /*bf*/, bool /*endByTimer*/) { }
+
+    /**
+     * @brief Called inside BattlefieldWG::HandleKill for every player-kills-player event,
+     * regardless of the victim's WG rank. Fired before the core's own lieutenant-gated
+     * quest-credit loop so modules may grant credit for non-lieutenant kills.
+     *
+     * @param bf     The Battlefield instance
+     * @param killer The player who landed the killing blow
+     * @param victim The player who was killed
+     */
+    virtual void OnBattlefieldPlayerKill(Battlefield* /*bf*/, Player* /*killer*/, Player* /*victim*/) { }
 };
 
 #endif // SCRIPT_OBJECT_BATTLEFIELD_SCRIPT_H_
