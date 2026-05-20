@@ -494,6 +494,8 @@ void WorldConfig::BuildConfigCache()
 
     SetConfigValue<bool>(CONFIG_ALLOW_JOIN_BG_AND_LFG, "JoinBGAndLFG.Enable", false);
 
+    SetConfigValue<uint32>(CONFIG_LFG_MAIL_ITEM_ON_FULL_INVENTORY, "LFG.MailItemOnFullInventory", 0);
+
     SetConfigValue<bool>(CONFIG_LEAVE_GROUP_ON_LOGOUT, "LeaveGroupOnLogout.Enabled", false);
 
     SetConfigValue<uint32>(CONFIG_RANDOM_ROLL_MAXIMUM, "Group.RandomRollMaximum", 1000000);
