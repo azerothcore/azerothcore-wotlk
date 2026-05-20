@@ -18,13 +18,16 @@
 #include "Util.h"
 #include "Common.h"
 #include "Containers.h"
+#include "Duration.h"
 #include "IpAddress.h"
+#include "Log.h"
 #include "StringConvert.h"
 #include "Tokenize.h"
 #include <algorithm>
 #include <boost/core/demangle.hpp>
 #include <cctype>
 #include <cstdarg>
+#include <thread>
 #include <sstream>
 #include <string>
 #include <utf8.h>
@@ -608,4 +611,12 @@ bool StringCompareLessI(std::string_view a, std::string_view b)
 std::string GetTypeName(std::type_info const& info)
 {
     return boost::core::demangle(info.name());
+}
+
+void FatalServerError(const std::string& logFilter, std::string_view message)
+{
+    LOG_ERROR(logFilter, "{}", message);
+    LOG_INFO(logFilter, "The server will close in {} seconds...", ERROR_EXIT_SECONDS);
+    std::this_thread::sleep_for(Seconds(ERROR_EXIT_SECONDS));
+    exit(1);
 }

@@ -113,8 +113,7 @@ int main(int argc, char** argv)
             LOG_INFO("server.authserver", "Daemon PID: {}\n", pid); // outError for red color in console
         else
         {
-            LOG_ERROR("server.authserver", "Cannot create PID file {} (possible error: permission)\n", pidFile);
-            return 1;
+            FatalServerError("server.authserver", Acore::StringFormat("Cannot create PID file '{}' (possible error: permission).", pidFile));
         }
     }
 
@@ -138,8 +137,7 @@ int main(int argc, char** argv)
 
     if (sRealmList->GetRealms().empty())
     {
-        LOG_ERROR("server.authserver", "No valid realms specified.");
-        return 1;
+        FatalServerError("server.authserver", "No valid realms specified. Please check your authserver.conf realm configuration.");
     }
 
     // Stop auth server if dry run
@@ -153,16 +151,14 @@ int main(int argc, char** argv)
     int32 port = sConfigMgr->GetOption<int32>("RealmServerPort", 3724);
     if (port < 0 || port > 0xFFFF)
     {
-        LOG_ERROR("server.authserver", "Specified port out of allowed range (1-65535)");
-        return 1;
+        FatalServerError("server.authserver", Acore::StringFormat("Specified RealmServerPort '{}' is out of the allowed range (1-65535). Please check your authserver.conf.", port));
     }
 
     std::string bindIp = sConfigMgr->GetOption<std::string>("BindIP", "0.0.0.0");
 
     if (!sAuthSocketMgr.StartNetwork(*ioContext, bindIp, port))
     {
-        LOG_ERROR("server.authserver", "Failed to initialize network");
-        return 1;
+        FatalServerError("server.authserver", Acore::StringFormat("Failed to initialize network on {}:{}. Please check your authserver.conf BindIP and RealmServerPort settings.", bindIp, port));
     }
 
     std::shared_ptr<void> sAuthSocketMgrHandle(nullptr, [](void*) { sAuthSocketMgr.StopNetwork(); });

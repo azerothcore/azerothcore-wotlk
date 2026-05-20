@@ -52,6 +52,10 @@ constexpr auto MONTH = DAY * 30;
 constexpr auto YEAR = DAY * 365;
 constexpr auto IN_MILLISECONDS = 1000;
 
+// Number of seconds to wait before closing the server on a fatal startup error,
+// giving the operator time to read the error message.
+constexpr uint32 ERROR_EXIT_SECONDS = 15;
+
 enum AccountTypes
 {
     SEC_PLAYER         = 0,
