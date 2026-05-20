@@ -42,6 +42,7 @@
 #include "OutdoorPvPMgr.h"
 #include "Pet.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
 #include "SharedDefines.h"
@@ -1531,7 +1532,11 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
 
             int32 tickheal = targetAura->GetAmount();
             if (Unit* auraCaster = targetAura->GetCaster())
+            {
+                // MOD_HEALING_DONE_PERCENT is applied per-tick, not baked into GetAmount.
+                tickheal = int32(float(tickheal) * auraCaster->GetTotalAuraMultiplier(SPELL_AURA_MOD_HEALING_DONE_PERCENT));
                 tickheal = unitTarget->SpellHealingBonusTaken(auraCaster, targetAura->GetSpellInfo(), tickheal, DOT);
+            }
 
             //int32 tickheal = targetAura->GetSpellInfo()->EffectBasePoints[idx] + 1;
             //It is said that talent bonus should not be included
@@ -2900,6 +2905,14 @@ void Spell::EffectEnchantItemPerm(SpellEffIndex effIndex)
         // add new enchanting if equipped
         item_owner->ApplyEnchantment(itemTarget, PERM_ENCHANTMENT_SLOT, true);
 
+        if (item_owner != p_caster && p_caster->GetSession()->HasPermission(rbac::RBAC_PERM_LOG_GM_TRADE))
+        {
+            LOG_GM(p_caster->GetSession()->GetAccountId(), "GM {} (Account: {}) enchanting(perm): {} (SpellID: {} EncID: {}) on {}'s item: {} (Entry: {})",
+                p_caster->GetName(), p_caster->GetSession()->GetAccountId(),
+                m_spellInfo->SpellName[0], m_spellInfo->Id, enchant_id,
+                item_owner->GetName(), itemTarget->GetTemplate()->Name1, itemTarget->GetEntry());
+        }
+
         item_owner->RemoveTradeableItem(itemTarget);
         itemTarget->ClearSoulboundTradeable(item_owner);
     }
@@ -2946,6 +2959,15 @@ void Spell::EffectEnchantItemPrismatic(SpellEffIndex effIndex)
     Player* item_owner = itemTarget->GetOwner();
     if (!item_owner)
         return;
+
+    Player* p_caster = m_caster->ToPlayer();
+    if (item_owner != p_caster && p_caster->GetSession()->HasPermission(rbac::RBAC_PERM_LOG_GM_TRADE))
+    {
+        LOG_GM(p_caster->GetSession()->GetAccountId(), "GM {} (Account: {}) enchanting(prismatic): {} (SpellID: {} EncID: {}) on {}'s item: {} (Entry: {})",
+            p_caster->GetName(), p_caster->GetSession()->GetAccountId(),
+            m_spellInfo->SpellName[0], m_spellInfo->Id, enchant_id,
+            item_owner->GetName(), itemTarget->GetTemplate()->Name1, itemTarget->GetEntry());
+    }
 
     // remove old enchanting before applying new if equipped
     item_owner->ApplyEnchantment(itemTarget, PRISMATIC_ENCHANTMENT_SLOT, false);
@@ -3095,6 +3117,14 @@ void Spell::EffectEnchantItemTmp(SpellEffIndex effIndex)
 
     // add new enchanting if equipped
     item_owner->ApplyEnchantment(itemTarget, TEMP_ENCHANTMENT_SLOT, true);
+
+    if (item_owner != p_caster && p_caster->GetSession()->HasPermission(rbac::RBAC_PERM_LOG_GM_TRADE))
+    {
+        LOG_GM(p_caster->GetSession()->GetAccountId(), "GM {} (Account: {}) enchanting(temp): {} (SpellID: {} EncID: {}) on {}'s item: {} (Entry: {})",
+            p_caster->GetName(), p_caster->GetSession()->GetAccountId(),
+            m_spellInfo->SpellName[0], m_spellInfo->Id, enchant_id,
+            item_owner->GetName(), itemTarget->GetTemplate()->Name1, itemTarget->GetEntry());
+    }
 
     item_owner->RemoveTradeableItem(itemTarget);
     itemTarget->ClearSoulboundTradeable(item_owner);

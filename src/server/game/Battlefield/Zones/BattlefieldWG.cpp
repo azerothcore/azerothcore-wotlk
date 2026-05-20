@@ -21,6 +21,7 @@
 
 #include "AreaDefines.h"
 #include "BattlefieldWG.h"
+#include "ScriptMgr.h"
 #include "Chat.h"
 #include "GameTime.h"
 #include "MapMgr.h"
@@ -722,16 +723,19 @@ void BattlefieldWG::HandleKill(Player* killer, Unit* victim)
     // xinef: tower cannons also grant rank
     if (victim->IsPlayer() || IsKeepNpc(victim->GetEntry()) || victim->GetEntry() == NPC_WINTERGRASP_TOWER_CANNON)
     {
-        if (victim->IsPlayer() && victim->HasAura(SPELL_LIEUTENANT))
+        if (Player* victimPlayer = victim->ToPlayer())
         {
-            // Quest - Wintergrasp - PvP Kill - Horde/Alliance
-            for (ObjectGuid const& playerGuid : PlayersInWar[killerTeam])
+            sScriptMgr->OnBattlefieldPlayerKill(this, killer, victimPlayer);
+
+            if (victimPlayer->HasAura(SPELL_LIEUTENANT))
             {
-                if (Player* player = ObjectAccessor::FindPlayer(playerGuid))
+                // Quest - Wintergrasp - PvP Kill - Horde/Alliance
+                for (ObjectGuid const& playerGuid : PlayersInWar[killerTeam])
                 {
-                    if (player->GetDistance2d(killer) < 40)
+                    if (Player* player = ObjectAccessor::FindPlayer(playerGuid))
                     {
-                        player->KilledMonsterCredit(killerTeam == TEAM_HORDE ? NPC_QUEST_PVP_KILL_ALLIANCE : NPC_QUEST_PVP_KILL_HORDE);
+                        if (player->GetDistance2d(killer) < 40)
+                            player->KilledMonsterCredit(killerTeam == TEAM_HORDE ? NPC_QUEST_PVP_KILL_ALLIANCE : NPC_QUEST_PVP_KILL_HORDE);
                     }
                 }
             }

@@ -1770,24 +1770,23 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
         if (Player const* player = ToPlayer())
         {
             if (cObj->IsAIEnabled && !cObj->AI()->CanBeSeen(player))
-            {
                 return false;
-            }
 
-            ConditionList conditions = sConditionMgr->GetConditionsForNotGroupedEntry(CONDITION_SOURCE_TYPE_CREATURE_VISIBILITY, cObj->GetEntry());
-            if (!sConditionMgr->IsObjectMeetToConditions((WorldObject*)this, (WorldObject*)obj, conditions))
-            {
+            if (!player->CanSeeObjectByVisibilityConditions(obj))
                 return false;
-            }
         }
     }
 
     // Gameobject scripts
     if (GameObject const* goObj = obj->ToGameObject())
     {
-        if (ToPlayer() && !goObj->AI()->CanBeSeen(ToPlayer()))
+        if (Player const* player = ToPlayer())
         {
-            return false;
+            if (!goObj->AI()->CanBeSeen(player))
+                return false;
+
+            if (!player->CanSeeObjectByVisibilityConditions(obj))
+                return false;
         }
     }
 

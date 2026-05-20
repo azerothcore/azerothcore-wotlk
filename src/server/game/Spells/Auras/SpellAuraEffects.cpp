@@ -384,7 +384,7 @@ pAuraEffectHandler AuraEffectHandler[TOTAL_AURAS] =
 AuraEffect::AuraEffect(Aura* base, uint8 effIndex, int32* baseAmount, Unit* caster):
     m_base(base), m_spellInfo(base->GetSpellInfo()),
     m_baseAmount(baseAmount ? * baseAmount : m_spellInfo->Effects[effIndex].BasePoints), m_dieSides(m_spellInfo->Effects[effIndex].DieSides),
-    m_critChance(0), m_oldAmount(0), m_isAuraEnabled(true), m_channelData(nullptr), m_spellmod(nullptr), m_periodicTimer(0), m_tickNumber(0), m_effIndex(effIndex),
+    m_critChance(0), m_pctMods(1.0f), m_oldAmount(0), m_isAuraEnabled(true), m_channelData(nullptr), m_spellmod(nullptr), m_periodicTimer(0), m_amplitude(0), m_tickNumber(0), m_effIndex(effIndex),
     m_canBeRecalculated(true), m_isPeriodic(false)
 {
     CalculatePeriodic(caster, true, false);
@@ -587,7 +587,7 @@ void AuraEffect::CalculatePeriodicData()
     if (GetBase()->GetType() == UNIT_AURA_TYPE && GetCaster())
     {
         if (m_spellInfo->HasAura(SPELL_AURA_PERIODIC_HEAL))
-            m_pctMods = GetCaster()->SpellPctHealingModsDone(GetBase()->GetUnitOwner(), GetSpellInfo(), DOT);
+            m_pctMods = GetCaster()->SpellPctHealingModsDone(GetBase()->GetUnitOwner(), GetSpellInfo(), DOT, false);
         else if (m_spellInfo->HasAura(SPELL_AURA_PERIODIC_DAMAGE) || m_spellInfo->HasAura(SPELL_AURA_PERIODIC_LEECH))
             m_pctMods = GetCaster()->SpellPctDamageModsDone(GetBase()->GetUnitOwner(), GetSpellInfo(), DOT);
     }
@@ -5390,10 +5390,10 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                             {
                                 if (target->isDead() && GetBase() && target->IsCreature() && target->GetEntry() == 24601)
                                 {
-                                    auto caster2 = GetBase()->GetCaster();
-                                    if (caster2 && caster2->IsPlayer())
+                                    if (Unit* caster2 = GetBase()->GetCaster())
                                     {
-                                        caster2->ToPlayer()->KilledMonsterCredit(25987);
+                                        if (Player* player = caster2->GetCharmerOrOwnerPlayerOrPlayerItself())
+                                            player->KilledMonsterCredit(25987);
                                     }
                                 }
                                 return;
@@ -6632,6 +6632,10 @@ void AuraEffect::HandlePeriodicHealAurasTick(Unit* target, Unit* caster) const
     {
         if (GetBase()->GetType() == DYNOBJ_AURA_TYPE)
             damage = caster->SpellHealingBonusDone(target, GetSpellInfo(), damage, DOT, GetEffIndex(), 0.0f, GetBase()->GetStackAmount());
+
+        if (caster && GetBase()->GetType() == UNIT_AURA_TYPE)
+            damage = int32(float(damage) * caster->GetTotalAuraMultiplier(SPELL_AURA_MOD_HEALING_DONE_PERCENT));
+
         damage = target->SpellHealingBonusTaken(caster, GetSpellInfo(), damage, DOT, GetBase()->GetStackAmount());
     }
 
