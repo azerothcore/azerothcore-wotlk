@@ -634,4 +634,11 @@ std::enable_if_t<!std::is_same_v<std::decay_t<T>, std::type_info>, std::string> 
 // giving the operator time to read the message before the window closes.
 [[noreturn]] AC_COMMON_API void FatalServerError(const std::string& logFilter, std::string_view message);
 
+// Pre-log variant for fatal errors that occur before the logging system is initialized
+// (e.g. config load failures). Prints directly to stdout.
+[[noreturn]] AC_COMMON_API void FatalServerError(std::string_view message);
+
+// Countdown-only variant for when the error has already been printed (e.g. by Config::LoadFile).
+[[noreturn]] AC_COMMON_API void FatalServerError();
+
 #endif

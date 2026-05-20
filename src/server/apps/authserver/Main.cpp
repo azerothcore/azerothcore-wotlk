@@ -83,7 +83,7 @@ int main(int argc, char** argv)
     sConfigMgr->Configure(configFile.generic_string(), std::vector<std::string>(argv, argv + argc));
 
     if (!sConfigMgr->LoadAppConfigs())
-        return 1;
+        FatalServerError();
 
     // Init logging
     sLog->RegisterAppender<AppenderDB>();
@@ -119,7 +119,7 @@ int main(int argc, char** argv)
 
     // Initialize the database connection
     if (!StartDB())
-        return 1;
+        FatalServerError();
 
     sSecretMgr->Initialize();
 

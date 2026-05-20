@@ -49,6 +49,7 @@
 #include "SharedDefines.h"
 #include "SteadyTimer.h"
 #include "Systemd.h"
+#include "Util.h"
 #include "World.h"
 #include "WorldSessionMgr.h"
 #include "WorldSocket.h"
@@ -182,7 +183,7 @@ int main(int argc, char** argv)
     sConfigMgr->Configure(configFile.generic_string(), {argv, argv + argc}, CONFIG_FILE_LIST);
 
     if (!sConfigMgr->LoadAppConfigs())
-        return 1;
+        FatalServerError();
 
     std::shared_ptr<Acore::Asio::IoContext> ioContext = std::make_shared<Acore::Asio::IoContext>();
 
@@ -220,8 +221,7 @@ int main(int argc, char** argv)
             LOG_ERROR("server", "Daemon PID: {}\n", pid); // outError for red color in console
         else
         {
-            LOG_ERROR("server", "Cannot create PID file {} (possible error: permission)\n", pidFile);
-            return 1;
+            FatalServerError("server", Acore::StringFormat("Cannot create PID file '{}' (possible error: permission).", pidFile));
         }
     }
 
@@ -276,7 +276,7 @@ int main(int argc, char** argv)
 
     // Start the databases
     if (!StartDB())
-        return 1;
+        FatalServerError();
 
     std::shared_ptr<void> dbHandle(nullptr, [](void*) { StopDB(); });
 
@@ -345,16 +345,12 @@ int main(int argc, char** argv)
 
     if (networkThreads <= 0)
     {
-        LOG_ERROR("server.worldserver", "Network.Threads must be greater than 0");
-        World::StopNow(ERROR_EXIT_CODE);
-        return 1;
+        FatalServerError("server.worldserver", "Network.Threads must be greater than 0. Please check your worldserver.conf.");
     }
 
     if (!sWorldSocketMgr.StartWorldNetwork(*ioContext, worldListener, worldPort, networkThreads))
     {
-        LOG_ERROR("server.worldserver", "Failed to initialize network");
-        World::StopNow(ERROR_EXIT_CODE);
-        return 1;
+        FatalServerError("server.worldserver", Acore::StringFormat("Failed to initialize network on {}:{}. Please check your worldserver.conf.", worldListener, worldPort));
     }
 
     std::shared_ptr<void> sWorldSocketMgrHandle(nullptr, [](void*)

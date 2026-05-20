@@ -620,3 +620,18 @@ void FatalServerError(const std::string& logFilter, std::string_view message)
     std::this_thread::sleep_for(Seconds(ERROR_EXIT_SECONDS));
     exit(1);
 }
+
+void FatalServerError(std::string_view message)
+{
+    fmt::print("{}\n", message);
+    fmt::print("The server will close in {} seconds...\n", ERROR_EXIT_SECONDS);
+    std::this_thread::sleep_for(Seconds(ERROR_EXIT_SECONDS));
+    exit(1);
+}
+
+void FatalServerError()
+{
+    fmt::print("The server will close in {} seconds...\n", ERROR_EXIT_SECONDS);
+    std::this_thread::sleep_for(Seconds(ERROR_EXIT_SECONDS));
+    exit(1);
+}

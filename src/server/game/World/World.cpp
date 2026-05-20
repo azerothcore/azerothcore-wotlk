@@ -367,8 +367,7 @@ void World::SetInitialWorldSettings()
                         !MapMgr::ExistMapAndVMap(MAP_OUTLAND, 10349.6f, -6357.29f) ||
                         !MapMgr::ExistMapAndVMap(MAP_OUTLAND, -3961.64f, -13931.2f))))
         {
-            LOG_ERROR("server.loading", "Failed to find map files for starting areas, check your map files!");
-            exit(1);
+            FatalServerError("server.loading", "Failed to find map files for starting areas. Please check that your maps/, vmaps/ and mmaps/ folders are correctly placed in your DataDir.");
         }
     }
 
@@ -1117,8 +1116,7 @@ void World::DetectDBCLang()
 
     if (default_locale >= TOTAL_LOCALES)
     {
-        LOG_ERROR("server.loading", "Unable to determine your DBC Locale! (corrupt DBC?)");
-        exit(1);
+        FatalServerError("server.loading", "Unable to determine your DBC Locale. Your DBC files may be corrupt or missing. Please re-extract them.");
     }
 
     _defaultDbcLocale = LocaleConstant(default_locale);
