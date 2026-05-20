@@ -140,6 +140,11 @@ enum CharacterFlags
     CHARACTER_FLAG_UNK32                = 0x80000000
 };
 
+enum WarriorSpellMods
+{
+    SPELL_WARRIOR_JUGGERNAUT_CRIT_BONUS_BUFF = 65156
+};
+
 enum CharacterCustomizeFlags
 {
     CHAR_CUSTOMIZE_FLAG_NONE            = 0x00000000,
@@ -9793,8 +9798,10 @@ void Player::ApplySpellMod(uint32 spellId, SpellModOp op, T& basevalue, Spell* s
 
         if (mod->type == SPELLMOD_FLAT)
         {
-            // xinef: do not allow to consume more than one 100% crit increasing spell
-            if (mod->op == SPELLMOD_CRITICAL_CHANCE && totalflat >= 100)
+            // xinef: do not allow to consume more than one 100% crit increasing spell.
+            // Juggernaut's Mortal Strike/Slam bonus is additive with Recklessness and
+            // must still apply above 100% so resilience cannot push the hit below crit.
+            if (mod->op == SPELLMOD_CRITICAL_CHANCE && totalflat >= 100 && mod->spellId != SPELL_WARRIOR_JUGGERNAUT_CRIT_BONUS_BUFF)
                 return;
 
             int32 flatValue = mod->value;
