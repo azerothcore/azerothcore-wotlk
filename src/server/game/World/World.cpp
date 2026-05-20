@@ -290,7 +290,7 @@ void World::LoadConfigSettings(bool reload)
         LOG_INFO("server.loading", "Core Map Version: {}", MapVersionMagic);
         LOG_INFO("server.loading", "Core MMAP Version: {}", MMAP_VERSION);
         LOG_INFO("server.loading", "Core VMAP Version: {}", VMAP::VMAP_MAGIC);
-        LOG_INFO("server.loading", "{}", GitRevision::GetFullVersion());
+        LOG_INFO("server.loading", "Core Version: {}", GitRevision::GetFullVersion());
     }
     bool const enableIndoor = getBoolConfig(CONFIG_VMAP_INDOOR_CHECK);
     bool const enableLOS = getBoolConfig(CONFIG_VMAP_ENABLE_LOS);
@@ -338,23 +338,24 @@ void World::SetInitialWorldSettings()
         // Validate DataDir before checking map files
         std::string dataDir = _dataPath;
         std::error_code ec;
-        if (!std::filesystem::exists(dataDir, ec))
-        {
-            LOG_ERROR("server.loading", "DataDir '{}' does not exist{}{}", dataDir, ec ? ": " : "", ec ? ec.message() : "");
-            exit(1);
-        }
+
+        bool dataDirExists = std::filesystem::exists(dataDir, ec);
+        if (ec)
+            FatalServerError("server.loading", Acore::StringFormat("Could not access DataDir '{}': {}. Please check your worldserver.conf 'DataDir' setting.", dataDir, ec.message()));
+        if (!dataDirExists)
+            FatalServerError("server.loading", Acore::StringFormat("DataDir '{}' does not exist. Please check your worldserver.conf 'DataDir' setting.", dataDir));
         ec.clear();
-        if (!std::filesystem::is_directory(dataDir, ec))
-        {
-            LOG_ERROR("server.loading", "DataDir '{}' is not a directory{}{}", dataDir, ec ? ": " : "", ec ? ec.message() : "");
-            exit(1);
-        }
+        bool dataDirIsDirectory = std::filesystem::is_directory(dataDir, ec);
+        if (ec)
+            FatalServerError("server.loading", Acore::StringFormat("Could not check DataDir '{}': {}. Please check your worldserver.conf 'DataDir' setting.", dataDir, ec.message()));
+        if (!dataDirIsDirectory)
+            FatalServerError("server.loading", Acore::StringFormat("DataDir '{}' is not a directory. Please check your worldserver.conf 'DataDir' setting.", dataDir));
         ec.clear();
-        if (std::filesystem::is_empty(dataDir, ec))
-        {
-            LOG_ERROR("server.loading", "DataDir '{}' exists but is empty{}{}", dataDir, ec ? ": " : "", ec ? ec.message() : "");
-            exit(1);
-        }
+        bool dataDirIsEmpty = std::filesystem::is_empty(dataDir, ec);
+        if (ec)
+            FatalServerError("server.loading", Acore::StringFormat("Could not read the contents of DataDir '{}': {}. Please check your worldserver.conf 'DataDir' setting.", dataDir, ec.message()));
+        if (dataDirIsEmpty)
+            FatalServerError("server.loading", Acore::StringFormat("DataDir '{}' is empty. Please make sure your map files (maps/, vmaps/, mmaps/) are placed inside it.", dataDir));
         ///- Check the existence of the map files for all starting areas.
         if (!MapMgr::ExistMapAndVMap(MAP_EASTERN_KINGDOMS, -6240.32f, 331.033f)
                 || !MapMgr::ExistMapAndVMap(MAP_EASTERN_KINGDOMS, -8949.95f, -132.493f)
