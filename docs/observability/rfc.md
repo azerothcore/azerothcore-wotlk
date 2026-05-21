@@ -1,12 +1,14 @@
 # Observability v1 RFC
 
-Status: Draft
+Status: Implemented
 
 ## Summary
 
-Observability v1 adds a Prometheus metrics exporter to `worldserver` for operational metrics. It is intentionally separate from the existing Influx/Grafana `Metric` system. The first version focuses on safe, low-cardinality Prometheus export for runtime health and performance. Event, alarm, and QuestDB-style observability are out of scope for v1 and should be designed as a separate backend later.
+Observability v1 adds a Prometheus metrics exporter to `worldserver` for operational metrics. It is intentionally separate from the existing Influx/Grafana `Metric` system. The first version focuses on safe, low-cardinality Prometheus export for runtime health and performance. Event, alarm, and QuestDB-style observability are out of scope for v1 and remain future backend work.
 
-The v1 implementation should be enabled by default at runtime, bind safely by default, and have a compile-time option to remove it from builds that do not want observability code.
+The v1 implementation is enabled by default at runtime, binds safely to loopback by default, and has a compile-time option to remove observability code from builds that do not want it.
+
+All v1 goals listed below are fulfilled by the implementation. The only deliberate adjustment from the original draft is duplicate registration semantics: compatible same-name registrations now coalesce into one metric family, while incompatible registrations fail loudly in debug builds and log errors in release builds.
 
 ## Goals
 
@@ -35,7 +37,7 @@ The v1 implementation should be enabled by default at runtime, bind safely by de
 
 The current metric system is Influx-oriented and mixes producer API, queueing, line protocol formatting, transport, and event-style records. That shape does not map cleanly to Prometheus. Prometheus is best used for low-cardinality operational time series, while richer events and alarms fit a later append-oriented backend such as QuestDB.
 
-The existing design also has producer-side and data-model problems that Observability v1 should avoid:
+The existing design also has producer-side and data-model problems that Observability v1 avoids:
 
 - It encourages high-cardinality tags and event fields. Existing call sites include values such as `account_id`, player names, and map instance IDs, which are bad dimensions for time-series databases in general. In Prometheus specifically, they would create large, expensive, hard-to-query series sets.
 - It can produce a large amount of low-value throughput. Fine-grained timers and event-style records are pushed continuously even when the result is not a useful operational time series.
@@ -46,26 +48,26 @@ The existing design also has producer-side and data-model problems that Observab
 - Transport, formatting, backend config, batching, retry behavior, and the producer API live in one `Metric` class, making it difficult to reason about cost and difficult to evolve safely.
 - The old event model stores arbitrary text. That text is useful for logs or a future event backend, but it is not useful as Prometheus metric data.
 
-Observability v1 should therefore be a Prometheus-shaped module, not a new backend bolted onto the existing `Metric` pipeline.
+Observability v1 is therefore implemented as a Prometheus-shaped path, not a new backend bolted onto the existing `Metric` pipeline.
 
-The existing `Metric` system should remain untouched while Observability v1 proves the new Prometheus path. Once the new approach works well, useful instrumentation can be ported and the old metrics system should be fully removed to avoid maintaining two competing systems.
+The existing `Metric` system remains untouched in v1 while the new Prometheus path is proven. Once the new approach works well, useful instrumentation can be ported and the old metrics system can be removed in a later change to avoid maintaining two competing systems.
 
 ## Export Model
 
 `worldserver` exposes metrics directly through a built-in HTTP `/metrics` endpoint.
 
-The endpoint should:
+The endpoint:
 
-- Be enabled at runtime by default.
-- Bind to loopback by default, for example `127.0.0.1`.
-- Require explicit config to bind publicly.
-- Have no built-in auth in v1.
-- Document that public binding can expose operational data.
-- Be disabled at compile time through a dedicated CMake option.
+- Is enabled at runtime by default.
+- Binds to loopback by default, `127.0.0.1`.
+- Requires explicit config to bind publicly.
+- Has no built-in auth in v1.
+- Documents that public binding can expose operational data.
+- Can be disabled at compile time through the `WITHOUT_OBSERVABILITY` CMake option.
 
-If the exporter cannot start or bind its configured endpoint, `worldserver` should log a clear error and continue normal operation without the exporter.
+If the exporter cannot start or bind its configured endpoint, `worldserver` logs a clear error and continues normal operation without the exporter.
 
-The implementation should use the existing Boost asynchronous runtime. Boost.Beast is preferred for HTTP framing if available in supported Boost builds. Raw Asio HTTP parsing should only be used if Beast is unavailable and the implementation remains deliberately tiny and well-tested.
+The implementation uses Boost.Asio and Boost.Beast for HTTP framing on a dedicated exporter thread. The exporter owns its own `io_context`, accepts `GET` and `HEAD` requests to `/metrics`, and renders the registry on demand.
 
 ## Metric Model
 
@@ -75,7 +77,7 @@ V1 supports:
 - Gauge: current values such as online players or DB queue size.
 - Classic histogram: duration observations exported as `_bucket`, `_sum`, and `_count` series.
 
-V1 may use the Prometheus info-as-gauge convention for metadata:
+V1 uses the Prometheus info-as-gauge convention for metadata:
 
 ```text
 ac_build_info{realm="...",version="...",revision="..."} 1
@@ -83,9 +85,9 @@ ac_build_info{realm="...",version="...",revision="..."} 1
 
 Summaries, native histograms, and stateset/enum metrics are deferred.
 
-Metric updates and scrapes must be thread-safe. The exact synchronization and snapshot model is an implementation detail.
+Metric updates and scrapes are thread-safe. Registry structure is protected by a mutex, metric values use atomics, and indexed histogram series are registered lazily through atomic slots.
 
-Prometheus documentation currently recommends native histograms when available, but v1 uses classic histograms because the planned exporter is simple text exposition without a Prometheus client library. Native histograms can be revisited later.
+Prometheus documentation currently recommends native histograms when available, but v1 uses classic histograms because the exporter is simple text exposition without a Prometheus client library. Native histograms can be revisited later.
 
 References:
 
@@ -121,11 +123,11 @@ Disallowed label examples:
 
 If a value would create unbounded or user-specific series, it belongs in a future event/alarm backend, not Prometheus v1.
 
-Label values should be emitted safely for Prometheus text exposition and should keep canonical bounded values stable instead of cosmetically rewriting them.
+Label values are escaped for Prometheus text exposition and keep canonical bounded values stable instead of cosmetically rewriting them.
 
-## Producer API Direction
+## Producer API
 
-The v1 producer API should use long-lived metric objects. A file-local metrics aggregate keeps ownership explicit and avoids accidental counter or histogram resets when normal gameplay objects are recreated. For example:
+The v1 producer API uses long-lived metric objects. A file-local metrics aggregate keeps ownership explicit and avoids accidental counter or histogram resets when normal gameplay objects are recreated. For example:
 
 ```cpp
 namespace
@@ -151,32 +153,32 @@ void World::Update(uint32 diff)
 }
 ```
 
-Final class and helper names are implementation details, but the important behavior is:
+The important implemented behavior is:
 
-- Metric state should be owned by long-lived objects, not by recreated gameplay objects.
-- Observations should be cheap after first registration.
-- Duration histograms should use the shared default duration buckets unless a metric has a clearly different scale.
-- A metric name has a single owner.
-- The same metric name must not be used from multiple code locations.
-- Duplicate metric name registration from another file/line/function should fail loudly in debug builds. In release builds, it should log an error, ignore the duplicate registration, and keep the first registered owner.
-- If related work is measured in multiple places, use distinct metric names or one intentional owner block with bounded labels.
+- Metric state is owned by long-lived objects, not by recreated gameplay objects.
+- Observations are cheap after first registration.
+- Duration histograms use the shared default duration buckets unless a metric has a clearly different scale.
+- A metric name represents one semantic metric family.
+- Compatible same-name registrations coalesce into the same metric family and can add distinct label series.
+- Incompatible duplicate registrations fail loudly in debug builds and log an error in release builds. Incompatible means the same metric name is registered with a different kind, help text, histogram bucket list, or indexed-series cache shape.
+- If related work is measured in multiple places, use distinct metric names or one intentional metric family with bounded labels.
 
 ## Histograms
 
 V1 uses classic histograms with explicit bucket boundaries.
 
-Buckets provide in-process aggregation for many observations. AzerothCore should not store every duration in memory for percentile calculation. It should update histogram bucket counters, and Prometheus/Grafana should calculate averages and p95/p99-style views from scraped bucket data.
+Buckets provide in-process aggregation for many observations. AzerothCore does not store every duration in memory for percentile calculation. It updates histogram bucket counters, and Prometheus/Grafana calculate averages and p95/p99-style views from scraped bucket data.
 
-Duration histograms should use a shared default bucket list covering fast paths and visible stalls:
+Duration histograms use a shared default bucket list covering fast paths and visible stalls:
 `100us`, `250us`, `500us`, `1ms`, `2.5ms`, `5ms`, `10ms`, `25ms`, `50ms`, `100ms`, `250ms`, `500ms`, `1s`, and `2.5s`.
 
-Bucket lists may still differ per metric when a measurement has a clearly different scale. Durations should use seconds as the base unit in metric names and values.
+Bucket lists may still differ per metric when a measurement has a clearly different scale. Durations use seconds as the base unit in metric names and values.
 
 Custom runtime bucket configuration is deferred.
 
 ## Required V1 Metrics
 
-The exact names are examples, but the required v1 metric set should cover these measurements.
+The required v1 metric set has been implemented with the names below.
 
 ### Build Info
 
@@ -196,7 +198,7 @@ The exact names are examples, but the required v1 metric set should cover these 
 - Labels:
   - `ac_world_sessions`: `state`
   - `ac_database_queue_size`: `database`
-- Instrumentation point: a new runtime status collection function called from [`src/server/game/World/World.cpp`](../../src/server/game/World/World.cpp#L1320), near the existing metrics update block
+- Instrumentation point: runtime status collection from the `update_metrics` world update phase in [`src/server/game/World/World.cpp`](../../src/server/game/World/World.cpp)
 - Data sources:
   - `sWorldSessionMgr->GetPlayerCount()`
   - `sWorldSessionMgr->GetActiveSessionCount()`
@@ -227,10 +229,10 @@ The exact names are examples, but the required v1 metric set should cover these 
 - Metric: `ac_world_update_phase_duration_seconds`
 - Type: classic histogram
 - Labels: `phase`
-- Instrumentation points: existing named world update phase timers in [`src/server/game/World/World.cpp`](../../src/server/game/World/World.cpp#L1136) through [`src/server/game/World/World.cpp`](../../src/server/game/World/World.cpp#L1320)
+- Instrumentation point: named world update phase timers in [`src/server/game/World/World.cpp`](../../src/server/game/World/World.cpp)
 - Current related metric: `world_update_time` with `type` tag
 
-The `phase` label must come from a fixed set of string literals.
+The `phase` label comes from a fixed set of string literals.
 
 ### Map Update Duration
 
@@ -259,7 +261,7 @@ Do not add per-account or per-session labels. The existing `world_update_session
 - Instrumentation point: around opcode handler execution in [`src/server/game/Server/WorldSession.cpp`](../../src/server/game/Server/WorldSession.cpp#L390)
 - Current related metric: `worldsession_update_opcode_time`
 
-The `opcode` label should use the opcode name from `opHandle->Name`. Opcode names are bounded by the opcode table and are acceptable for v1.
+The `opcode` label uses the opcode name from `opHandle->Name`. Opcode names are bounded by the opcode table and are acceptable for v1.
 
 ### Packet Counters
 
@@ -271,11 +273,11 @@ The `opcode` label should use the opcode name from `opHandle->Name`. Opcode name
 - Instrumentation point: where processed packet and addon message counts are known in [`src/server/game/Server/WorldSession.cpp`](../../src/server/game/Server/WorldSession.cpp#L543)
 - Current related metrics: `processed_packets`, `addon_messages`
 
-Counters should increment by the observed count. They should not be gauges reset to zero.
+Counters increment by the observed count. They are not gauges reset to zero.
 
 ## Deferred Existing Metric Sites
 
-These existing metric sites should not be part of the required v1 pass:
+These existing metric sites are not part of the required v1 pass:
 
 - Player login/logout event records with player names.
 - Map tile load/unload event text.
@@ -286,7 +288,7 @@ Some of these may become counters or histograms later, but event-shaped data wit
 
 ## Configuration
 
-Suggested runtime configuration keys:
+Implemented runtime configuration keys:
 
 ```ini
 Observability.Enable = 1
@@ -295,13 +297,11 @@ Observability.Prometheus.IP = "127.0.0.1"
 Observability.Prometheus.Port = 9200
 ```
 
-Suggested compile-time option:
+Implemented compile-time option:
 
 ```cmake
 WITHOUT_OBSERVABILITY=0
 ```
-
-Final names may change to match project conventions.
 
 The compile-time option has the strongest precedence: `WITHOUT_OBSERVABILITY=1` removes all observability features from the build. At runtime, `Observability.Enable` is the global switch for all observability features. `Observability.Prometheus.Enable` controls only the Prometheus exporter. In v1, Prometheus is the only concrete observability backend, but future backends should still remain behind `Observability.Enable`.
 
@@ -311,14 +311,15 @@ Prometheus export is enabled only when both `Observability.Enable` and `Observab
 
 The exporter must not expose secrets or player-private information.
 
-The endpoint should bind to loopback by default. Operators who bind it to `0.0.0.0` are responsible for network policy, reverse proxy auth, firewalling, or other protections.
+The endpoint binds to loopback by default. Operators who bind it to `0.0.0.0` are responsible for network policy, reverse proxy auth, firewalling, or other protections.
 
-Metrics should be useful for operations without exposing player identity, account identity, network identity, database connection strings, auth tokens, or arbitrary text payloads.
+Metrics are useful for operations without exposing player identity, account identity, network identity, database connection strings, auth tokens, or arbitrary text payloads.
 
-## Open Questions
+## Resolved Implementation Choices
 
-- Exact producer helper and namespace names.
-- Exact default port.
-- Exact custom bucket lists for metrics that do not use the default duration buckets.
-- Whether Boost.Beast is available across all supported Boost configurations, and if not, whether to add a constrained raw-Asio HTTP implementation.
-- Whether status gauges should be updated every world tick, on a lightweight interval, or via an explicit observability timer on the world thread.
+- Producer API lives under `Acore::Observability` with `Counter`, `Gauge`, `Info`, `Histogram`, `HistogramFamily`, and `ScopedHistogramTimer`.
+- The default Prometheus exporter endpoint is `127.0.0.1:9200`.
+- V1 duration metrics use `DefaultDurationBuckets()`.
+- HTTP export uses Boost.Asio and Boost.Beast.
+- Status gauges are refreshed from the world update loop during the `update_metrics` phase.
+- Docker-based Prometheus smoke/E2E coverage lives under [`apps/prometheus-test`](../../apps/prometheus-test).
