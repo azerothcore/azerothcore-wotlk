@@ -570,6 +570,8 @@ void BattlefieldWG::OnCreatureCreate(Creature* creature)
 
                 if (GraveyardList[graveyardId])
                     GraveyardList[graveyardId]->SetSpirit(creature, teamId);
+
+                creature->RemoveAurasDueToSpell(SPELL_SPIRITUAL_IMMUNITY);
                 break;
             }
     }
