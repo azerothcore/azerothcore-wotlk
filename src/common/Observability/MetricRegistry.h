@@ -141,17 +141,10 @@ namespace Acore::Observability
     private:
         friend class HistogramFamily;
 
-        enum class EntryKind
-        {
-            Counter,
-            Gauge,
-            Info,
-            Histogram
-        };
-
-        Entry& CreateEntry(StaticStringLiteral name, StaticStringLiteral help, EntryKind kind, std::source_location owner, std::size_t indexedSeriesCount = 0);
+        Entry& CreateEntry(StaticStringLiteral name, StaticStringLiteral help, MetricKind kind, std::source_location owner);
+        Entry& CreateHistogramEntry(StaticStringLiteral name, StaticStringLiteral help, std::vector<BucketBoundary> buckets, std::source_location owner, std::size_t indexedSeriesCount = 0);
         Entry* FindExisting(StaticStringLiteral name);
-        bool IsCompatibleEntry(Entry const& entry, StaticStringLiteral name, StaticStringLiteral help, EntryKind kind, std::source_location owner) const;
+        bool IsCompatibleEntry(Entry const& entry, StaticStringLiteral name, StaticStringLiteral help, MetricKind kind, std::source_location owner) const;
         Entry* RegisterHistogramFamily(StaticStringLiteral name, StaticStringLiteral help, Buckets buckets, std::source_location owner, std::size_t indexedSeriesCount);
         Detail::HistogramSeries* FindIndexedHistogramSeries(Entry const& entry, std::size_t index) const;
         Detail::HistogramSeries& RegisterIndexedHistogramSeries(Entry& entry, std::size_t index, std::vector<Label> labels);
