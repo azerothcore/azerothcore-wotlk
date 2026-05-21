@@ -1,0 +1,30 @@
+services:
+  ac-worldserver:
+    environment:
+      AC_OBSERVABILITY_ENABLE: "1"
+      AC_OBSERVABILITY_PROMETHEUS_ENABLE: "1"
+      AC_OBSERVABILITY_PROMETHEUS_IP: "0.0.0.0"
+      AC_OBSERVABILITY_PROMETHEUS_PORT: "9200"
+    ports:
+      - ${DOCKER_PROMETHEUS_EXPORTER_EXTERNAL_PORT:-9200}:9200
+
+  ac-prometheus:
+    container_name: ac-prometheus
+    image: ${AC_PROMETHEUS_IMAGE:-prom/prometheus:v2.54.1}
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --web.console.libraries=/usr/share/prometheus/console_libraries
+      - --web.console.templates=/usr/share/prometheus/consoles
+    networks:
+      - ac-network
+    ports:
+      - ${DOCKER_PROMETHEUS_EXTERNAL_PORT:-9090}:9090
+    volumes:
+      - ${AC_PROMETHEUS_TEST_DIR:-./apps/prometheus-test}/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ac-prometheus-data:/prometheus
+    depends_on:
+      - ac-worldserver
+
+volumes:
+  ac-prometheus-data:
