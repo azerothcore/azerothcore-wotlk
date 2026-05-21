@@ -217,7 +217,9 @@ public:
                         break;
                     }
                     events.Repeat(5s);
-                    Unit* unit = SelectTarget(SelectTargetMethod::MaxDistance, 0, BoneStormMoveTargetSelector(me));
+                    std::list<Unit*> furthest;
+                    SelectTargetList(furthest, 2, SelectTargetMethod::MaxDistance, 0, BoneStormMoveTargetSelector(me));
+                    Unit* unit = furthest.empty() ? nullptr : Acore::Containers::SelectRandomContainerElement(furthest);
                     if (!unit)
                     {
                         if ((unit = SelectTarget(SelectTargetMethod::MaxThreat, 0, 175.0f, true)))
