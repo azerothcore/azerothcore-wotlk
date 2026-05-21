@@ -151,7 +151,16 @@ namespace Acore::Observability
 
     struct GaugeEntry
     {
+        explicit GaugeEntry(std::size_t indexedCount = 0) : IndexedSeries(indexedCount) { }
+
+        ~GaugeEntry()
+        {
+            for (auto& slot : IndexedSeries)
+                delete slot.load(std::memory_order_relaxed);
+        }
+
         GaugeSeriesMap Series;
+        std::vector<std::atomic<Detail::GaugeSeries*>> IndexedSeries; // Owned by GaugeEntry
     };
 
     struct HistogramEntry
@@ -160,6 +169,12 @@ namespace Acore::Observability
             : Buckets(std::move(buckets)), IndexedSeries(indexedCount)
         {
             ASSERT(!Buckets.empty(), "Observability histogram entries must define at least one bucket");
+        }
+
+        ~HistogramEntry()
+        {
+            for (auto& slot : IndexedSeries)
+                delete slot.load(std::memory_order_relaxed);
         }
 
         std::vector<BucketBoundary> Buckets;
@@ -177,7 +192,7 @@ namespace Acore::Observability
 
     struct MetricRegistry::Entry
     {
-        Entry(StaticStringLiteral name, StaticStringLiteral help, std::source_location owner, MetricKind kind)
+        Entry(StaticStringLiteral name, StaticStringLiteral help, std::source_location owner, MetricKind kind, std::size_t indexedSeriesCount = 0)
             : Name(name), Help(help), Owner(owner)
         {
             switch (kind)
@@ -185,7 +200,7 @@ namespace Acore::Observability
                 case MetricKind::Counter:
                     break;
                 case MetricKind::Gauge:
-                    Data.emplace<GaugeEntry>();
+                    Data.emplace<GaugeEntry>(indexedSeriesCount);
                     break;
                 case MetricKind::Histogram:
                     ASSERT(false, "Histogram entries must be constructed with bucket boundaries");
@@ -199,13 +214,6 @@ namespace Acore::Observability
         Entry(StaticStringLiteral name, StaticStringLiteral help, std::source_location owner, std::vector<BucketBoundary> buckets, std::size_t indexedSeriesCount)
             : Name(name), Help(help), Owner(owner), Data(std::in_place_type<HistogramEntry>, std::move(buckets), indexedSeriesCount)
         {
-        }
-
-        ~Entry()
-        {
-            if (auto* histogram = std::get_if<HistogramEntry>(&Data))
-                for (auto& slot : histogram->IndexedSeries)
-                    delete slot.load(std::memory_order_relaxed);
         }
 
         StaticStringLiteral Name;
@@ -449,6 +457,46 @@ namespace Acore::Observability
         return it->second;
     }
 
+    MetricRegistry::Entry* MetricRegistry::RegisterGaugeFamily(StaticStringLiteral name, StaticStringLiteral help, std::source_location owner, std::size_t indexedSeriesCount)
+    {
+        std::lock_guard<std::mutex> lock(_registryMutex);
+        Entry* existing = FindExisting(name);
+        Entry& entry = existing ? *existing : CreateEntry(name, help, MetricKind::Gauge, owner, indexedSeriesCount);
+
+        if (!IsCompatibleEntry(entry, name, help, MetricKind::Gauge, owner))
+            return nullptr;
+
+        auto& gauge = std::get<GaugeEntry>(entry.Data);
+        if (gauge.IndexedSeries.size() != indexedSeriesCount)
+        {
+            LogIncompatibleRegistration(name, entry.Owner, owner, "indexed series cache size differs");
+            ASSERT(false, "Incompatible observability metric registration for '{}': indexed series cache size differs", name);
+            return nullptr;
+        }
+
+        return &entry;
+    }
+
+    Detail::GaugeSeries* MetricRegistry::FindIndexedGaugeSeries(Entry const& entry, std::size_t index) const
+    {
+        return std::get<GaugeEntry>(entry.Data).IndexedSeries[index].load(std::memory_order_acquire);
+    }
+
+    Detail::GaugeSeries& MetricRegistry::RegisterIndexedGaugeSeries(Entry& entry, std::size_t index, std::vector<Label> labels)
+    {
+        auto& gauge = std::get<GaugeEntry>(entry.Data);
+        auto& slot = gauge.IndexedSeries[index];
+        auto fresh = std::make_unique<Detail::GaugeSeries>(std::move(labels));
+
+        Detail::GaugeSeries* expected = nullptr;
+        if (slot.compare_exchange_strong(expected, fresh.get(),
+                std::memory_order_release, std::memory_order_acquire))
+            return *fresh.release();
+
+        // Lost the race
+        return *expected;
+    }
+
     void MetricRegistry::SetConstantLabel(StaticStringLiteral name, std::string_view value)
     {
         std::lock_guard<std::mutex> lock(_registryMutex);
@@ -481,6 +529,10 @@ namespace Acore::Observability
                 {
                     for (auto const& gauge : gauges.Series | std::views::values)
                         gauge.VisitSample(family, _constantLabels, visitor);
+
+                    for (auto const& slot : gauges.IndexedSeries)
+                        if (auto* series = slot.load(std::memory_order_acquire))
+                            series->VisitSample(family, _constantLabels, visitor);
                 },
                 [&](HistogramEntry const& histograms)
                 {
@@ -500,9 +552,9 @@ namespace Acore::Observability
         }
     }
 
-    MetricRegistry::Entry& MetricRegistry::CreateEntry(StaticStringLiteral name, StaticStringLiteral help, MetricKind kind, std::source_location owner)
+    MetricRegistry::Entry& MetricRegistry::CreateEntry(StaticStringLiteral name, StaticStringLiteral help, MetricKind kind, std::source_location owner, std::size_t indexedSeriesCount)
     {
-        auto it = _entries.emplace(name, std::make_unique<Entry>(name, help, owner, kind)).first;
+        auto it = _entries.emplace(name, std::make_unique<Entry>(name, help, owner, kind, indexedSeriesCount)).first;
         return *it->second;
     }
 
@@ -574,6 +626,37 @@ namespace Acore::Observability
 
         Detail::HistogramSeries& series = registry.RegisterIndexedHistogramSeries(*_entry, index, { { labelName, std::string(labelValue) } });
         return ScopedHistogramTimer(series);
+    }
+
+    GaugeFamily::GaugeFamily(StaticStringLiteral name, StaticStringLiteral help, std::size_t indexedSeriesCount, std::source_location owner)
+        : _entry(sObservability->Registry().RegisterGaugeFamily(name, help, owner, indexedSeriesCount))
+    {
+    }
+
+    void GaugeFamily::SetIndexed(std::size_t index, StaticStringLiteral labelName, uint32 labelValue, double value) const
+    {
+        if (!_entry || !IsEnabled())
+            return;
+
+        MetricRegistry& registry = sObservability->Registry();
+        Detail::GaugeSeries* series = registry.FindIndexedGaugeSeries(*_entry, index);
+        if (!series)
+            series = &registry.RegisterIndexedGaugeSeries(*_entry, index, { { labelName, std::format("{}", labelValue) } });
+
+        series->Value.store(value, std::memory_order_relaxed);
+    }
+
+    void GaugeFamily::SetIndexed(std::size_t index, StaticStringLiteral labelName, StaticStringLiteral labelValue, double value) const
+    {
+        if (!_entry || !IsEnabled())
+            return;
+
+        MetricRegistry& registry = sObservability->Registry();
+        Detail::GaugeSeries* series = registry.FindIndexedGaugeSeries(*_entry, index);
+        if (!series)
+            series = &registry.RegisterIndexedGaugeSeries(*_entry, index, { { labelName, std::string(labelValue) } });
+
+        series->Value.store(value, std::memory_order_relaxed);
     }
 
     Detail::CounterSeries& MetricRegistry::IgnoredCounter()

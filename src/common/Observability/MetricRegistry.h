@@ -49,6 +49,7 @@ namespace Acore::Observability
 
     class ScopedHistogramTimer;
     class HistogramFamily;
+    class GaugeFamily;
 
     class AC_COMMON_API Counter
     {
@@ -140,8 +141,9 @@ namespace Acore::Observability
 
     private:
         friend class HistogramFamily;
+        friend class GaugeFamily;
 
-        Entry& CreateEntry(StaticStringLiteral name, StaticStringLiteral help, MetricKind kind, std::source_location owner);
+        Entry& CreateEntry(StaticStringLiteral name, StaticStringLiteral help, MetricKind kind, std::source_location owner, std::size_t indexedSeriesCount = 0);
         Entry& CreateHistogramEntry(StaticStringLiteral name, StaticStringLiteral help, std::vector<BucketBoundary> buckets, std::source_location owner, std::size_t indexedSeriesCount = 0);
         Entry* FindExisting(StaticStringLiteral name);
         bool IsCompatibleEntry(Entry const& entry, StaticStringLiteral name, StaticStringLiteral help, MetricKind kind, std::source_location owner) const;
@@ -149,6 +151,9 @@ namespace Acore::Observability
         Detail::HistogramSeries* FindIndexedHistogramSeries(Entry const& entry, std::size_t index) const;
         Detail::HistogramSeries& RegisterIndexedHistogramSeries(Entry& entry, std::size_t index, std::vector<Label> labels);
         Detail::HistogramSeries& EmplaceHistogramSeries(Entry& entry, std::vector<Label> labels);
+        Entry* RegisterGaugeFamily(StaticStringLiteral name, StaticStringLiteral help, std::source_location owner, std::size_t indexedSeriesCount);
+        Detail::GaugeSeries* FindIndexedGaugeSeries(Entry const& entry, std::size_t index) const;
+        Detail::GaugeSeries& RegisterIndexedGaugeSeries(Entry& entry, std::size_t index, std::vector<Label> labels);
         void LogIncompatibleRegistration(StaticStringLiteral name, std::source_location existingOwner, std::source_location duplicateOwner, std::string_view reason) const;
         static Detail::CounterSeries& IgnoredCounter();
         static Detail::GaugeSeries& IgnoredGauge();
@@ -169,6 +174,20 @@ namespace Acore::Observability
 
         [[nodiscard]] ScopedHistogramTimer MeasureIndexed(std::size_t index, StaticStringLiteral labelName, uint32 labelValue) const;
         [[nodiscard]] ScopedHistogramTimer MeasureIndexed(std::size_t index, StaticStringLiteral labelName, StaticStringLiteral labelValue) const;
+
+    private:
+        MetricRegistry::Entry* _entry;
+    };
+
+    class AC_COMMON_API GaugeFamily
+    {
+    public:
+        GaugeFamily(StaticStringLiteral name, StaticStringLiteral help,
+            std::size_t indexedSeriesCount = 0,
+            std::source_location owner = std::source_location::current());
+
+        void SetIndexed(std::size_t index, StaticStringLiteral labelName, uint32 labelValue, double value) const;
+        void SetIndexed(std::size_t index, StaticStringLiteral labelName, StaticStringLiteral labelValue, double value) const;
 
     private:
         MetricRegistry::Entry* _entry;

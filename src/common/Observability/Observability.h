@@ -85,6 +85,16 @@ namespace Acore::Observability
         [[nodiscard]] ScopedHistogramTimer MeasureIndexed(std::size_t, StaticStringLiteral, StaticStringLiteral) const { return {}; }
     };
 
+    class GaugeFamily
+    {
+    public:
+        GaugeFamily(StaticStringLiteral, StaticStringLiteral, std::size_t = 0,
+            std::source_location = std::source_location::current()) { }
+
+        void SetIndexed(std::size_t, StaticStringLiteral, uint32, double) const { }
+        void SetIndexed(std::size_t, StaticStringLiteral, StaticStringLiteral, double) const { }
+    };
+
     class ObservabilityMgr
     {
     public:
