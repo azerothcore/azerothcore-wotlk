@@ -288,7 +288,13 @@ Some of these may become counters or histograms later, but event-shaped data wit
 
 ## Configuration
 
-Implemented runtime configuration keys:
+Implemented runtime configuration keys. Observability ships off at runtime:
+
+```ini
+Observability.Enable = 0
+```
+
+Operators opt in to Prometheus export with:
 
 ```ini
 Observability.Enable = 1
