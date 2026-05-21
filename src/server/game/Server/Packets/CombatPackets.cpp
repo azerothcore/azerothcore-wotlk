@@ -21,3 +21,14 @@ void WorldPackets::Combat::SetSheathed::Read()
 {
     _worldPacket >> CurrentSheathState;
 }
+
+WorldPacket const* WorldPackets::Combat::SAttackStop::Write()
+{
+    _worldPacket << Attacker;
+    _worldPacket << Victim;
+    _worldPacket << Attacker.WriteAsPacked();
+    _worldPacket << Victim.WriteAsPacked();
+    _worldPacket << uint32(NowDead);
+
+    return &_worldPacket;
+}

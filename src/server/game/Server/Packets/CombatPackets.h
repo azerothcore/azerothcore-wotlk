@@ -34,6 +34,18 @@ namespace WorldPackets
 
             uint32 CurrentSheathState = 0;
         };
+
+        class SAttackStop final : public ServerPacket
+        {
+        public:
+            explicit SAttackStop() : ServerPacket(SMSG_ATTACKSTOP, 8 + 8 + 4) {}
+
+            WorldPacket const* Write() override;
+
+            ObjectGuid Attacker;
+            ObjectGuid Victim;
+            bool NowDead = false;
+        };
     }
 }
 
