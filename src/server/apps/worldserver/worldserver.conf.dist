@@ -416,10 +416,10 @@ Network.UseSocketActivation = 0
 #
 #    Observability.Enable
 #        Description: Global runtime switch for observability features.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
 
-Observability.Enable = 1
+Observability.Enable = 0
 
 #
 #    Observability.Prometheus.Enable

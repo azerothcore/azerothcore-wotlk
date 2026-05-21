@@ -77,7 +77,7 @@ namespace Acore::Observability
         if (!_realmName.empty())
             _registry.SetConstantLabel("realm", _realmName);
 
-        _enabled = sConfigMgr->GetOption<bool>("Observability.Enable", true);
+        _enabled = sConfigMgr->GetOption<bool>("Observability.Enable", false);
         RuntimeEnabled.store(_enabled, std::memory_order_relaxed);
 
         if (!_enabled)

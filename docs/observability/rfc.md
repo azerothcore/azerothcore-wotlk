@@ -6,7 +6,7 @@ Status: Implemented
 
 Observability v1 adds a Prometheus metrics exporter to `worldserver` for operational metrics. It is intentionally separate from the existing Influx/Grafana `Metric` system. The first version focuses on safe, low-cardinality Prometheus export for runtime health and performance. Event, alarm, and QuestDB-style observability are out of scope for v1 and remain future backend work.
 
-The v1 implementation is enabled by default at runtime, binds safely to loopback by default, and has a compile-time option to remove observability code from builds that do not want it.
+The v1 implementation is compiled by default but disabled by default at runtime. When explicitly enabled, it binds safely to loopback by default. Builds that do not want observability code can remove it with a compile-time option.
 
 All v1 goals listed below are fulfilled by the implementation. The only deliberate adjustment from the original draft is duplicate registration semantics: compatible same-name registrations now coalesce into one metric family, while incompatible registrations fail loudly in debug builds and log errors in release builds.
 
@@ -58,7 +58,7 @@ The existing `Metric` system remains untouched in v1 while the new Prometheus pa
 
 The endpoint:
 
-- Is enabled at runtime by default.
+- Is disabled at runtime by default.
 - Binds to loopback by default, `127.0.0.1`.
 - Requires explicit config to bind publicly.
 - Has no built-in auth in v1.
@@ -303,7 +303,7 @@ Implemented compile-time option:
 WITHOUT_OBSERVABILITY=0
 ```
 
-The compile-time option has the strongest precedence: `WITHOUT_OBSERVABILITY=1` removes all observability features from the build. At runtime, `Observability.Enable` is the global switch for all observability features. `Observability.Prometheus.Enable` controls only the Prometheus exporter. In v1, Prometheus is the only concrete observability backend, but future backends should still remain behind `Observability.Enable`.
+The compile-time option has the strongest precedence: `WITHOUT_OBSERVABILITY=1` removes all observability features from the build. At runtime, `Observability.Enable` is the global switch for all observability features and defaults to disabled. `Observability.Prometheus.Enable` controls only the Prometheus exporter. In v1, Prometheus is the only concrete observability backend, but future backends should still remain behind `Observability.Enable`.
 
 Prometheus export is enabled only when both `Observability.Enable` and `Observability.Prometheus.Enable` are enabled.
 
