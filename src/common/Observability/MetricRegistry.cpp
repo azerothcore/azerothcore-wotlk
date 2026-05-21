@@ -22,14 +22,20 @@
 #include <algorithm>
 #include <atomic>
 #include <format>
-#include <optional>
 #include <ranges>
 #include <utility>
+#include <variant>
 
 namespace Acore::Observability
 {
     namespace
     {
+        template<class... Ts>
+        struct overloaded : Ts...
+        {
+            using Ts::operator()...;
+        };
+
         std::string LabelKey(std::vector<Label> const& labels)
         {
             std::string key;
@@ -140,30 +146,72 @@ namespace Acore::Observability
         }
     }
 
+    using CounterEntry = std::map<std::string, Detail::CounterSeries, std::less<>>;
+    using GaugeSeriesMap = std::map<std::string, Detail::GaugeSeries, std::less<>>;
+
+    struct GaugeEntry
+    {
+        GaugeSeriesMap Series;
+    };
+
+    struct HistogramEntry
+    {
+        HistogramEntry(std::vector<BucketBoundary> buckets, std::size_t indexedCount = 0)
+            : Buckets(std::move(buckets)), IndexedSeries(indexedCount)
+        {
+            ASSERT(!Buckets.empty(), "Observability histogram entries must define at least one bucket");
+        }
+
+        std::vector<BucketBoundary> Buckets;
+        std::map<std::string, Detail::HistogramSeries, std::less<>> Series;
+        std::vector<std::atomic<Detail::HistogramSeries*>> IndexedSeries; // Owned by HistogramEntry
+    };
+
+    struct InfoEntry
+    {
+        GaugeSeriesMap Series;
+    };
+
+    // Keep this order aligned with MetricKind.
+    using EntryData = std::variant<CounterEntry, GaugeEntry, HistogramEntry, InfoEntry>;
+
     struct MetricRegistry::Entry
     {
-        Entry(EntryKind kind, StaticStringLiteral name, StaticStringLiteral help, std::source_location owner, std::size_t indexedSeriesCount = 0)
-            : Kind(kind), Name(name), Help(help), Owner(owner), IndexedHistograms(indexedSeriesCount)
+        Entry(StaticStringLiteral name, StaticStringLiteral help, std::source_location owner, MetricKind kind)
+            : Name(name), Help(help), Owner(owner)
+        {
+            switch (kind)
+            {
+                case MetricKind::Counter:
+                    break;
+                case MetricKind::Gauge:
+                    Data.emplace<GaugeEntry>();
+                    break;
+                case MetricKind::Histogram:
+                    ASSERT(false, "Histogram entries must be constructed with bucket boundaries");
+                    break;
+                case MetricKind::Info:
+                    Data.emplace<InfoEntry>();
+                    break;
+            }
+        }
+
+        Entry(StaticStringLiteral name, StaticStringLiteral help, std::source_location owner, std::vector<BucketBoundary> buckets, std::size_t indexedSeriesCount)
+            : Name(name), Help(help), Owner(owner), Data(std::in_place_type<HistogramEntry>, std::move(buckets), indexedSeriesCount)
         {
         }
 
         ~Entry()
         {
-            for (auto& slot : IndexedHistograms)
-                delete slot.load(std::memory_order_relaxed);
+            if (auto* histogram = std::get_if<HistogramEntry>(&Data))
+                for (auto& slot : histogram->IndexedSeries)
+                    delete slot.load(std::memory_order_relaxed);
         }
 
-        EntryKind Kind;
         StaticStringLiteral Name;
         StaticStringLiteral Help;
         std::source_location Owner;
-        std::optional<std::vector<BucketBoundary>> Buckets;
-        std::map<std::string, Detail::CounterSeries, std::less<>> Counters;
-        std::map<std::string, Detail::GaugeSeries, std::less<>> Gauges;
-        std::map<std::string, Detail::HistogramSeries, std::less<>> Histograms;
-
-        // Despite the raw pointer those are owned by the `Entry`
-        std::vector<std::atomic<Detail::HistogramSeries*>> IndexedHistograms;
+        EntryData Data;
     };
 
     Counter::Counter(StaticStringLiteral name, StaticStringLiteral help, std::vector<Label> labels, std::source_location owner)
@@ -283,12 +331,13 @@ namespace Acore::Observability
     {
         std::lock_guard<std::mutex> lock(_registryMutex);
         Entry* existing = FindExisting(name);
-        Entry& entry = existing ? *existing : CreateEntry(name, help, EntryKind::Counter, owner);
+        Entry& entry = existing ? *existing : CreateEntry(name, help, MetricKind::Counter, owner);
 
-        if (!IsCompatibleEntry(entry, name, help, EntryKind::Counter, owner))
+        if (!IsCompatibleEntry(entry, name, help, MetricKind::Counter, owner))
             return IgnoredCounter();
 
-        auto it = entry.Counters.try_emplace(LabelKey(labels), std::move(labels)).first;
+        auto& counter = std::get<CounterEntry>(entry.Data);
+        auto it = counter.try_emplace(LabelKey(labels), std::move(labels)).first;
         return it->second;
     }
 
@@ -296,12 +345,13 @@ namespace Acore::Observability
     {
         std::lock_guard<std::mutex> lock(_registryMutex);
         Entry* existing = FindExisting(name);
-        Entry& entry = existing ? *existing : CreateEntry(name, help, EntryKind::Gauge, owner);
+        Entry& entry = existing ? *existing : CreateEntry(name, help, MetricKind::Gauge, owner);
 
-        if (!IsCompatibleEntry(entry, name, help, EntryKind::Gauge, owner))
+        if (!IsCompatibleEntry(entry, name, help, MetricKind::Gauge, owner))
             return IgnoredGauge();
 
-        auto it = entry.Gauges.try_emplace(LabelKey(labels), std::move(labels)).first;
+        auto& gauge = std::get<GaugeEntry>(entry.Data);
+        auto it = gauge.Series.try_emplace(LabelKey(labels), std::move(labels)).first;
         return it->second;
     }
 
@@ -309,29 +359,30 @@ namespace Acore::Observability
     {
         std::lock_guard<std::mutex> lock(_registryMutex);
         Entry* existing = FindExisting(name);
-        Entry& entry = existing ? *existing : CreateEntry(name, help, EntryKind::Info, owner);
+        Entry& entry = existing ? *existing : CreateEntry(name, help, MetricKind::Info, owner);
 
-        if (!IsCompatibleEntry(entry, name, help, EntryKind::Info, owner))
+        if (!IsCompatibleEntry(entry, name, help, MetricKind::Info, owner))
             return IgnoredGauge();
 
-        auto it = entry.Gauges.try_emplace(LabelKey(labels), std::move(labels)).first;
+        auto& info = std::get<InfoEntry>(entry.Data);
+        auto it = info.Series.try_emplace(LabelKey(labels), std::move(labels)).first;
         return it->second;
     }
 
     Detail::HistogramSeries& MetricRegistry::RegisterHistogram(StaticStringLiteral name, StaticStringLiteral help, Buckets buckets, std::vector<Label> labels, std::source_location owner)
     {
         std::vector<BucketBoundary> boundaries = MakeBucketBoundaries(std::move(buckets));
+        ASSERT(!boundaries.empty(), "Observability histogram '{}' must define at least one bucket", name);
 
         std::lock_guard<std::mutex> lock(_registryMutex);
         Entry* existing = FindExisting(name);
-        Entry& entry = existing ? *existing : CreateEntry(name, help, EntryKind::Histogram, owner);
+        Entry& entry = existing ? *existing : CreateHistogramEntry(name, help, std::move(boundaries), owner);
 
-        if (!IsCompatibleEntry(entry, name, help, EntryKind::Histogram, owner))
+        if (!IsCompatibleEntry(entry, name, help, MetricKind::Histogram, owner))
             return IgnoredHistogram();
 
-        if (!entry.Buckets)
-            entry.Buckets = std::move(boundaries);
-        else if (*entry.Buckets != boundaries)
+        auto& histogram = std::get<HistogramEntry>(entry.Data);
+        if (existing && histogram.Buckets != boundaries)
         {
             LogIncompatibleRegistration(name, entry.Owner, owner, "histogram buckets differ");
             ASSERT(false, "Incompatible observability metric registration for '{}': histogram buckets differ", name);
@@ -344,24 +395,24 @@ namespace Acore::Observability
     MetricRegistry::Entry* MetricRegistry::RegisterHistogramFamily(StaticStringLiteral name, StaticStringLiteral help, Buckets buckets, std::source_location owner, std::size_t indexedSeriesCount)
     {
         std::vector<BucketBoundary> boundaries = MakeBucketBoundaries(std::move(buckets));
+        ASSERT(!boundaries.empty(), "Observability histogram family '{}' must define at least one bucket", name);
 
         std::lock_guard<std::mutex> lock(_registryMutex);
         Entry* existing = FindExisting(name);
-        Entry& entry = existing ? *existing : CreateEntry(name, help, EntryKind::Histogram, owner, indexedSeriesCount);
+        Entry& entry = existing ? *existing : CreateHistogramEntry(name, help, std::move(boundaries), owner, indexedSeriesCount);
 
-        if (!IsCompatibleEntry(entry, name, help, EntryKind::Histogram, owner))
+        if (!IsCompatibleEntry(entry, name, help, MetricKind::Histogram, owner))
             return nullptr;
 
-        if (!entry.Buckets)
-            entry.Buckets = std::move(boundaries);
-        else if (*entry.Buckets != boundaries)
+        auto& histogram = std::get<HistogramEntry>(entry.Data);
+        if (existing && histogram.Buckets != boundaries)
         {
             LogIncompatibleRegistration(name, entry.Owner, owner, "histogram buckets differ");
             ASSERT(false, "Incompatible observability metric registration for '{}': histogram buckets differ", name);
             return nullptr;
         }
 
-        if (entry.IndexedHistograms.size() != indexedSeriesCount)
+        if (histogram.IndexedSeries.size() != indexedSeriesCount)
         {
             LogIncompatibleRegistration(name, entry.Owner, owner, "indexed series cache size differs");
             ASSERT(false, "Incompatible observability metric registration for '{}': indexed series cache size differs", name);
@@ -373,13 +424,14 @@ namespace Acore::Observability
 
     Detail::HistogramSeries* MetricRegistry::FindIndexedHistogramSeries(Entry const& entry, std::size_t index) const
     {
-        return entry.IndexedHistograms[index].load(std::memory_order_acquire);
+        return std::get<HistogramEntry>(entry.Data).IndexedSeries[index].load(std::memory_order_acquire);
     }
 
     Detail::HistogramSeries& MetricRegistry::RegisterIndexedHistogramSeries(Entry& entry, std::size_t index, std::vector<Label> labels)
     {
-        auto& slot = entry.IndexedHistograms[index];
-        auto fresh = std::make_unique<Detail::HistogramSeries>(*entry.Buckets, std::move(labels));
+        auto& histogram = std::get<HistogramEntry>(entry.Data);
+        auto& slot = histogram.IndexedSeries[index];
+        auto fresh = std::make_unique<Detail::HistogramSeries>(histogram.Buckets, std::move(labels));
 
         Detail::HistogramSeries* expected = nullptr;
         if (slot.compare_exchange_strong(expected, fresh.get(),
@@ -392,7 +444,8 @@ namespace Acore::Observability
 
     Detail::HistogramSeries& MetricRegistry::EmplaceHistogramSeries(Entry& entry, std::vector<Label> labels)
     {
-        auto it = entry.Histograms.try_emplace(LabelKey(labels), *entry.Buckets, std::move(labels)).first;
+        auto& histogram = std::get<HistogramEntry>(entry.Data);
+        auto it = histogram.Series.try_emplace(LabelKey(labels), histogram.Buckets, std::move(labels)).first;
         return it->second;
     }
 
@@ -415,46 +468,47 @@ namespace Acore::Observability
         {
             Entry const& entry = *entryPtr;
 
-            MetricKind kind = MetricKind::Gauge;
-            switch (entry.Kind)
-            {
-                case EntryKind::Counter:
-                    kind = MetricKind::Counter;
-                    break;
-                case EntryKind::Gauge:
-                    kind = MetricKind::Gauge;
-                    break;
-                case EntryKind::Info:
-                    kind = MetricKind::Info;
-                    break;
-                case EntryKind::Histogram:
-                    kind = MetricKind::Histogram;
-                    break;
-            }
-
-            MetricFamilyView family{ entry.Name, entry.Help, kind };
+            MetricFamilyView family{ entry.Name, entry.Help, static_cast<MetricKind>(entry.Data.index()) };
             visitor.VisitFamily(family);
 
-            for (auto const& counter : entry.Counters | std::views::values)
-                counter.VisitSample(family, _constantLabels, visitor);
+            std::visit(overloaded{
+                [&](CounterEntry const& counters)
+                {
+                    for (auto const& counter : counters | std::views::values)
+                        counter.VisitSample(family, _constantLabels, visitor);
+                },
+                [&](GaugeEntry const& gauges)
+                {
+                    for (auto const& gauge : gauges.Series | std::views::values)
+                        gauge.VisitSample(family, _constantLabels, visitor);
+                },
+                [&](HistogramEntry const& histograms)
+                {
+                    for (auto const& histogram : histograms.Series | std::views::values)
+                        histogram.VisitSamples(family, _constantLabels, visitor);
 
-            for (auto const& gauge : entry.Gauges | std::views::values)
-                gauge.VisitSample(family, _constantLabels, visitor);
-
-            for (auto const& histogram : entry.Histograms | std::views::values)
-                histogram.VisitSamples(family, _constantLabels, visitor);
-
-            for (auto const& slot : entry.IndexedHistograms)
-            {
-                if (auto* series = slot.load(std::memory_order_acquire))
-                    series->VisitSamples(family, _constantLabels, visitor);
-            }
+                    for (auto const& slot : histograms.IndexedSeries)
+                        if (auto* series = slot.load(std::memory_order_acquire))
+                            series->VisitSamples(family, _constantLabels, visitor);
+                },
+                [&](InfoEntry const& info)
+                {
+                    for (auto const& gauge : info.Series | std::views::values)
+                        gauge.VisitSample(family, _constantLabels, visitor);
+                }
+            }, entry.Data);
         }
     }
 
-    MetricRegistry::Entry& MetricRegistry::CreateEntry(StaticStringLiteral name, StaticStringLiteral help, EntryKind kind, std::source_location owner, std::size_t indexedSeriesCount)
+    MetricRegistry::Entry& MetricRegistry::CreateEntry(StaticStringLiteral name, StaticStringLiteral help, MetricKind kind, std::source_location owner)
     {
-        auto it = _entries.emplace(name, std::make_unique<Entry>(kind, name, help, owner, indexedSeriesCount)).first;
+        auto it = _entries.emplace(name, std::make_unique<Entry>(name, help, owner, kind)).first;
+        return *it->second;
+    }
+
+    MetricRegistry::Entry& MetricRegistry::CreateHistogramEntry(StaticStringLiteral name, StaticStringLiteral help, std::vector<BucketBoundary> buckets, std::source_location owner, std::size_t indexedSeriesCount)
+    {
+        auto it = _entries.emplace(name, std::make_unique<Entry>(name, help, owner, std::move(buckets), indexedSeriesCount)).first;
         return *it->second;
     }
 
@@ -466,9 +520,9 @@ namespace Acore::Observability
         return nullptr;
     }
 
-    bool MetricRegistry::IsCompatibleEntry(Entry const& entry, StaticStringLiteral name, StaticStringLiteral help, EntryKind kind, std::source_location owner) const
+    bool MetricRegistry::IsCompatibleEntry(Entry const& entry, StaticStringLiteral name, StaticStringLiteral help, MetricKind kind, std::source_location owner) const
     {
-        if (entry.Kind != kind)
+        if (static_cast<MetricKind>(entry.Data.index()) != kind)
         {
             LogIncompatibleRegistration(name, entry.Owner, owner, "metric kind differs");
             ASSERT(false, "Incompatible observability metric registration for '{}': metric kind differs", name);
