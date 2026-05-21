@@ -42,104 +42,100 @@ void	operator delete[](void *ptr, std::size_t size) noexcept;
 JEMALLOC_NOINLINE
 static void *
 handleOOM(std::size_t size, bool nothrow) {
-    void *ptr = nullptr;
+	void *ptr = nullptr;
 
-    while (ptr == nullptr) {
-        std::new_handler handler;
-        // GCC-4.8 and clang 4.0 do not have std::get_new_handler.
-        {
-            static std::mutex mtx;
-            std::lock_guard<std::mutex> lock(mtx);
+	while (ptr == nullptr) {
+		std::new_handler handler;
+		// GCC-4.8 and clang 4.0 do not have std::get_new_handler.
+		{
+			static std::mutex mtx;
+			std::lock_guard<std::mutex> lock(mtx);
 
-            handler = std::set_new_handler(nullptr);
-            std::set_new_handler(handler);
-        }
-        if (handler == nullptr)
-            break;
+			handler = std::set_new_handler(nullptr);
+			std::set_new_handler(handler);
+		}
+		if (handler == nullptr)
+			break;
 
-        try {
-            handler();
-        } catch (const std::bad_alloc &) {
-            break;
-        }
+		try {
+			handler();
+		} catch (const std::bad_alloc &) {
+			break;
+		}
 
-        ptr = je_malloc(size);
-    }
+		ptr = je_malloc(size);
+	}
 
-    if (ptr == nullptr && !nothrow)
-#if (defined(_GLIBCXX_RELEASE) && _GLIBCXX_RELEASE >= 14) || (defined(__GNUC__) && __GNUC__ >= 14 && !defined(__clang__)) || defined(__clang__)
-        throw std::bad_alloc();
-#else
-        std::__throw_bad_alloc();
-#endif
-    return ptr;
+	if (ptr == nullptr && !nothrow)
+		std::__throw_bad_alloc();
+	return ptr;
 }
 
 template <bool IsNoExcept>
 JEMALLOC_ALWAYS_INLINE
 void *
 newImpl(std::size_t size) noexcept(IsNoExcept) {
-    void *ptr = je_malloc(size);
-    if (likely(ptr != nullptr))
-        return ptr;
+	void *ptr = je_malloc(size);
+	if (likely(ptr != nullptr))
+		return ptr;
 
-    return handleOOM(size, IsNoExcept);
+	return handleOOM(size, IsNoExcept);
 }
 
 void *
 operator new(std::size_t size) {
-    return newImpl<false>(size);
+	return newImpl<false>(size);
 }
 
 void *
 operator new[](std::size_t size) {
-    return newImpl<false>(size);
+	return newImpl<false>(size);
 }
 
 void *
 operator new(std::size_t size, const std::nothrow_t &) noexcept {
-    return newImpl<true>(size);
+	return newImpl<true>(size);
 }
 
 void *
 operator new[](std::size_t size, const std::nothrow_t &) noexcept {
-    return newImpl<true>(size);
+	return newImpl<true>(size);
 }
 
 void
 operator delete(void *ptr) noexcept {
-    je_free(ptr);
+	je_free(ptr);
 }
 
 void
 operator delete[](void *ptr) noexcept {
-    je_free(ptr);
+	je_free(ptr);
 }
 
 void
 operator delete(void *ptr, const std::nothrow_t &) noexcept {
-    je_free(ptr);
+	je_free(ptr);
 }
 
 void operator delete[](void *ptr, const std::nothrow_t &) noexcept {
-    je_free(ptr);
+	je_free(ptr);
 }
 
 #if __cpp_sized_deallocation >= 201309
 
 void
 operator delete(void *ptr, std::size_t size) noexcept {
-    if (unlikely(ptr == nullptr)) {
-        return;
-    }
-    je_sdallocx_noflags(ptr, size);
+	if (unlikely(ptr == nullptr)) {
+		return;
+	}
+	je_sdallocx_noflags(ptr, size);
 }
 
 void operator delete[](void *ptr, std::size_t size) noexcept {
-    if (unlikely(ptr == nullptr)) {
-        return;
-    }
-    je_sdallocx_noflags(ptr, size);
+	if (unlikely(ptr == nullptr)) {
+		return;
+	}
+	je_sdallocx_noflags(ptr, size);
 }
 
 #endif  // __cpp_sized_deallocation
