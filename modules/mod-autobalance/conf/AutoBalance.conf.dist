@@ -888,7 +888,7 @@ AutoBalance.RewardScaling.XP.Modifier = 1.0
 #        Scale Money drops based on the `AutoBalance.RewardScaling.Method` selection. If set to 0, the full
 #        amount will be rewarded.
 #
-#        Default: 1 (1 = ON, 0 = OFF)
+#        Default: 0 (1 = ON, 0 = OFF)
 #
 #     AutoBalance.RewardScaling.Money.Modifier
 #        Apply a flat modifier to the amount of money that is rewarded to players.
@@ -899,7 +899,7 @@ AutoBalance.RewardScaling.XP.Modifier = 1.0
 #        rewarded to each player, 1 gold 50 silver will be rewarded.
 #
 #        Default: 1.0 (no change)
-AutoBalance.RewardScaling.Money = 1
+AutoBalance.RewardScaling.Money = 0
 AutoBalance.RewardScaling.Money.Modifier = 1.0
 
 ##########################

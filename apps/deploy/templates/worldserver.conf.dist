@@ -2852,7 +2852,7 @@ Rate.Drop.Item.Epic             = 1
 Rate.Drop.Item.Legendary        = 1
 Rate.Drop.Item.Artifact         = 1
 Rate.Drop.Item.Referenced       = 1
-Rate.Drop.Money                 = 1
+Rate.Drop.Money                 = 3
 
 #    Rate.Drop.Item.ReferencedAmount
 #        Description: Multiplier for referenced loot amount. Makes many raid bosses (and others) drop additional loot.
@@ -3229,7 +3229,7 @@ Creatures.CustomIDs = "190010,55005,999991,25462,98888,601014,34567,34568"
 #                     1 - (Rate.SellValue.Item.Artifact)
 #                     1 - (Rate.SellValue.Item.Heirloom)
 
-Rate.SellValue.Item.Poor             = 1
+Rate.SellValue.Item.Poor             = 3
 Rate.SellValue.Item.Normal           = 1
 Rate.SellValue.Item.Uncommon         = 1
 Rate.SellValue.Item.Rare             = 1
