@@ -381,27 +381,20 @@ class spell_q12943_shadow_vault_decree : public SpellScript
 {
     PrepareSpellScript(spell_q12943_shadow_vault_decree);
 
-    SpellCastResult CheckRequirement()
-    {
-        // if thane is present and not in combat - allow cast
-        Unit* caster = GetCaster();
-        if (Creature* thane = caster->FindNearestCreature(NPC_THANE_UFRANG, 30.0f))
-            if (!thane->IsInCombat())
-                return SPELL_CAST_OK;
-
-        return SPELL_FAILED_CASTER_AURASTATE;
-    }
-
     void HandleScriptEffect(SpellEffIndex /*effIndex*/)
     {
         Unit* caster = GetCaster();
         if (Creature* thane = caster->FindNearestCreature(NPC_THANE_UFRANG, 30.0f))
+        {
+            if (thane->IsInCombat())
+                return;
+            thane->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
             thane->AI()->AttackStart(caster);
+        }
     }
 
     void Register() override
     {
-        OnCheckCast += SpellCheckCastFn(spell_q12943_shadow_vault_decree::CheckRequirement);
         OnEffectHitTarget += SpellEffectFn(spell_q12943_shadow_vault_decree::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };

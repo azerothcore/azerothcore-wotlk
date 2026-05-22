@@ -680,10 +680,34 @@ class spell_kelthuzad_detonate_mana_aura : public AuraScript
     }
 };
 
+class spell_kelthuzad_void_blast : public SpellScript
+{
+    PrepareSpellScript(spell_kelthuzad_void_blast);
+
+    void HandleAfterHit()
+    {
+        Player* player = GetHitPlayer();
+        if (!player)
+            return;
+
+        if (player->IsAlive())
+            return;
+
+        if (InstanceScript* instance = player->GetInstanceScript())
+            instance->StorePersistentData(PERSISTENT_DATA_IMMORTAL_FAIL, 1);
+    }
+
+    void Register() override
+    {
+        AfterHit += SpellHitFn(spell_kelthuzad_void_blast::HandleAfterHit);
+    }
+};
+
 void AddSC_boss_kelthuzad()
 {
     new boss_kelthuzad();
     new boss_kelthuzad_minion();
     RegisterSpellScript(spell_kelthuzad_frost_blast);
     RegisterSpellScript(spell_kelthuzad_detonate_mana_aura);
+    RegisterSpellScript(spell_kelthuzad_void_blast);
 }

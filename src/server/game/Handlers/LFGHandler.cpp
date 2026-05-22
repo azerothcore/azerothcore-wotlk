@@ -23,6 +23,7 @@
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
@@ -188,10 +189,13 @@ void WorldSession::HandleLfgPlayerLockInfoRequestOpcode(WorldPacket& /*recvData*
         if (quest)
         {
             uint8 playerLevel = GetPlayer() ? GetPlayer()->GetLevel() : 0;
+            uint8 playerLevelForXP = playerLevel;
+            sScriptMgr->OnPlayerBeforeGetLevelForXPGain(GetPlayer(), playerLevelForXP);
+
             data << uint8(done);
             data << uint32(quest->GetRewOrReqMoney(playerLevel));
-            if (!GetPlayer()->IsMaxLevel())
-                data << uint32(quest->XPValue(playerLevel));
+            if (playerLevelForXP < GetPlayer()->GetUInt32Value(PLAYER_FIELD_MAX_LEVEL))
+                data << uint32(quest->XPValue(playerLevelForXP));
             else
                 data << uint32(0);
             data << uint32(0);
@@ -479,6 +483,8 @@ void WorldSession::SendLfgPlayerReward(lfg::LfgPlayerRewardData const& rewardDat
     uint8 itemNum = rewardData.quest->GetRewItemsCount();
 
     uint8 playerLevel = GetPlayer() ? GetPlayer()->GetLevel() : 0;
+    uint8 playerLevelForXP = playerLevel;
+    sScriptMgr->OnPlayerBeforeGetLevelForXPGain(GetPlayer(), playerLevelForXP);
 
     WorldPacket data(SMSG_LFG_PLAYER_REWARD, 4 + 4 + 1 + 4 + 4 + 4 + 4 + 4 + 1 + itemNum * (4 + 4 + 4));
     data << uint32(rewardData.rdungeonEntry);              // Random Dungeon Finished
@@ -486,7 +492,7 @@ void WorldSession::SendLfgPlayerReward(lfg::LfgPlayerRewardData const& rewardDat
     data << uint8(rewardData.done);
     data << uint32(1);
     data << uint32(rewardData.quest->GetRewOrReqMoney(playerLevel));
-    data << uint32(rewardData.quest->XPValue(playerLevel));
+    data << uint32(rewardData.quest->XPValue(playerLevelForXP));
     data << uint32(0);
     data << uint32(0);
     data << uint8(itemNum);
