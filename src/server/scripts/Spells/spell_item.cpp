@@ -191,7 +191,7 @@ enum Heartpierce
 
 enum MarkOfConquest
 {
-    SPELL_MARK_OF_CONQUEST_ENERGIZE = 33671
+    SPELL_MARK_OF_CONQUEST_ENERGIZE = 39599
 };
 
 enum PersistentShieldMisc
