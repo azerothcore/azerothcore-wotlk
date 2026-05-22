@@ -110,7 +110,8 @@ TEST_F(GameObjectSummonGroupTest, DifferentGroupsAreIndependent)
 TEST_F(GameObjectSummonGroupTest, SmartActionEnumValue)
 {
     EXPECT_EQ(SMART_ACTION_SUMMON_GAMEOBJECT_GROUP, 241);
-    EXPECT_EQ(SMART_ACTION_AC_END, 242);
+    EXPECT_EQ(SMART_ACTION_INC_DATA, 242);
+    EXPECT_EQ(SMART_ACTION_AC_END, 243);
 }
 
 TEST_F(GameObjectSummonGroupTest, SmartActionUnionSize)
