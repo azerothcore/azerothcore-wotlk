@@ -608,7 +608,7 @@ namespace Acore::Observability
             return {};
 
         MetricRegistry& registry = sObservability->Registry();
-        if (Detail::HistogramSeries* series = registry.FindIndexedHistogramSeries(*_entry, index))
+        if (Detail::HistogramSeries* series = registry.FindIndexedHistogramSeries(*_entry, index)) [[likely]]
             return ScopedHistogramTimer(*series);
 
         Detail::HistogramSeries& series = registry.RegisterIndexedHistogramSeries(*_entry, index, { { labelName, std::format("{}", labelValue) } });
@@ -621,7 +621,7 @@ namespace Acore::Observability
             return {};
 
         MetricRegistry& registry = sObservability->Registry();
-        if (Detail::HistogramSeries* series = registry.FindIndexedHistogramSeries(*_entry, index))
+        if (Detail::HistogramSeries* series = registry.FindIndexedHistogramSeries(*_entry, index)) [[likely]]
             return ScopedHistogramTimer(*series);
 
         Detail::HistogramSeries& series = registry.RegisterIndexedHistogramSeries(*_entry, index, { { labelName, std::string(labelValue) } });
@@ -640,7 +640,7 @@ namespace Acore::Observability
 
         MetricRegistry& registry = sObservability->Registry();
         Detail::GaugeSeries* series = registry.FindIndexedGaugeSeries(*_entry, index);
-        if (!series)
+        if (!series) [[unlikely]]
             series = &registry.RegisterIndexedGaugeSeries(*_entry, index, { { labelName, std::format("{}", labelValue) } });
 
         series->Value.store(value, std::memory_order_relaxed);
@@ -653,7 +653,7 @@ namespace Acore::Observability
 
         MetricRegistry& registry = sObservability->Registry();
         Detail::GaugeSeries* series = registry.FindIndexedGaugeSeries(*_entry, index);
-        if (!series)
+        if (!series) [[unlikely]]
             series = &registry.RegisterIndexedGaugeSeries(*_entry, index, { { labelName, std::string(labelValue) } });
 
         series->Value.store(value, std::memory_order_relaxed);

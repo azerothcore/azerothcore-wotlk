@@ -27,8 +27,6 @@
 
 namespace
 {
-    static constexpr uint32 MapMetricCount = MAP_THE_RUBY_SANCTUM + 1;
-
     struct MapUpdaterMetrics
     {
         Acore::Observability::HistogramFamily UpdateDuration
@@ -36,7 +34,7 @@ namespace
             "ac_map_update_duration_seconds",
             "Duration of map updates by map id.",
             Acore::Observability::DefaultDurationBuckets(),
-            MapMetricCount
+            MAP_ID_METRIC_COUNT
         };
     };
 
