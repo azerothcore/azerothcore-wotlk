@@ -67,8 +67,8 @@ public:
                 if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_ARCANE_CHARGES))
                     Spell::SendCastResult(player, spellInfo, 1, SPELL_FAILED_NOT_ON_GROUND);
             }
-
-            player->SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW, item, nullptr);
+            else
+                player->SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW, item, nullptr);
         }
 
         return true;
