@@ -217,18 +217,23 @@ public:
                         break;
                     }
                     events.Repeat(5s);
-                    std::list<Unit*> furthest;
-                    SelectTargetList(furthest, 2, SelectTargetMethod::MaxDistance, 0, BoneStormMoveTargetSelector(me));
-                    Unit* unit = furthest.empty() ? nullptr : Acore::Containers::SelectRandomContainerElement(furthest);
-                    if (!unit)
-                    {
-                        if ((unit = SelectTarget(SelectTargetMethod::MaxThreat, 0, 175.0f, true)))
-                            if (unit->GetPositionX() > -337.0f)
-                            {
-                                EnterEvadeMode();
-                                return;
-                            }
+                    Unit* unit = SelectTarget(SelectTargetMethod::Random, 0, BoneStormMoveTargetSelector(me));
+
+                     std::list<Unit*> targets;
+                     SelectTargetList(targets, Is25ManRaid() ? 2 : 1, SelectTargetMethod::MaxDistance, 0, BoneStormMoveTargetSelector(me));
+
+                     Unit* unit = nullptr;
+                     if (!targets.empty())
+                         unit = targets.size() == 1 ? targets.front() : Acore::Containers::SelectRandomContainerElement(targets);
+                     else if ((unit = SelectTarget(SelectTargetMethod::MaxThreat, 0, 175.0f, true)))
+                     {
+                         if (unit->GetPositionX() > -337.0f)
+                         {
+                             EnterEvadeMode();
+                             return;
+                         }
                     }
+
                     if (unit)
                         me->GetMotionMaster()->MoveCharge(unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ(), 25.0f, 1337);
                     break;
