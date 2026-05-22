@@ -130,7 +130,8 @@ foreach(APPLICATION_NAME ${APPLICATIONS_BUILD_LIST})
   if (${APP_PROJECT_NAME} MATCHES "authserver")
     target_link_libraries(${APP_PROJECT_NAME}
       PUBLIC
-        shared)
+        shared
+        mimalloc-static)
   elseif(${APP_PROJECT_NAME} MATCHES "worldserver")
     target_link_libraries(${APP_PROJECT_NAME}
       PUBLIC
@@ -139,9 +140,10 @@ foreach(APPLICATION_NAME ${APPLICATIONS_BUILD_LIST})
         game
         gsoap
         readline
-        gperftools)
+        gperftools
+        mimalloc-static)
 
-    if (UNIX AND NOT NOJEM)
+    if (UNIX)
       set(${APP_PROJECT_NAME}_LINK_FLAGS "-pthread -lncurses ${${APP_PROJECT_NAME}_LINK_FLAGS}")
     endif()
 
@@ -168,7 +170,8 @@ foreach(APPLICATION_NAME ${APPLICATIONS_BUILD_LIST})
     PUBLIC
       ${APP_PUBLIC_INCLUDES}
     PRIVATE
-      ${CMAKE_CURRENT_BINARY_DIR}/${APPLICATION_NAME})
+      ${CMAKE_CURRENT_BINARY_DIR}/${APPLICATION_NAME}
+      ${CMAKE_SOURCE_DIR}/deps/mimalloc/include)
 
   set_target_properties(${APP_PROJECT_NAME}
     PROPERTIES
