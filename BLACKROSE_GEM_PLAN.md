@@ -26,6 +26,9 @@ eligible next-rank upgrades.
 - Added separate faction quest IDs:
   - Alliance: `900100`
   - Horde: `900101`
+- Quest objective:
+  - Kill `Gruff Swiftbite` NPC `100`.
+  - NPC `100` is a placeholder until the custom Black Rose boss is added.
 - Added Norah Rose as the quest giver in each major city:
   - Horde NPC: `900103`, display ID `16695`
   - Alliance NPC: `900104`, display ID `14615`
@@ -35,8 +38,16 @@ eligible next-rank upgrades.
   - `5` gold
   - closest DB-supported level 20 XP reward setting
   - `Bag of the Black Rose` item `900102`
-  - faction Black War Bear mount item
+  - `Reins of the Black Rose Mauler` item `900106`
   - `The Black Rose` trinket item `900105`
+
+### Reins of the Black Rose Mauler
+
+- Added faction-neutral mount reward item `900106`.
+- The item requires level `20` and apprentice riding.
+- On use, it teaches mount spell `900903`, `Black Rose Mauler`.
+- The mount spell uses normal mount aura data and requires the client patch to
+  provide the final Black Rose Mauler mount display ID.
 
 Primary SQL:
 
@@ -182,6 +193,8 @@ Related DB tables:
 
 Red gems are named as Ribbons, use Black Miasma, and have 7 ranks.
 Ribbon items are unique and bind when picked up.
+Every rank in a family uses the exact same item name, such as `Stark Ribbon`
+or `Klug Ribbon`; the item ID and tooltip distinguish the rank.
 
 ID formula:
 
@@ -238,6 +251,8 @@ Costs in Black Miasma:
 
 Yellow gems are named as Mists, use Black Petals, and have 7 ranks.
 Mist items are unique and bind when picked up.
+Every rank in a family uses the exact same item name, such as `Pouvoir Mist`
+or `Restaurer Mist`; the item ID and tooltip distinguish the rank.
 
 ID formula:
 
@@ -364,6 +379,19 @@ Additional module update `2026_05_22_02_blackrose_item_flags_and_trinket.sql`
 makes all Ribbon/Mist socketable items unique and soulbound, and moves
 `The Black Rose` trinket fully onto normal item on-use spell handling.
 
+Additional module update `2026_05_22_03_blackrose_gruff_objective.sql` adds
+the temporary `Gruff Swiftbite` NPC `100` kill objective to both faction
+variants of `The Black Rose` quest.
+
+Additional module update `2026_05_22_04_blackrose_mauler_mount.sql` adds
+`Reins of the Black Rose Mauler`, mount spell `900903`, and replaces both
+faction-specific Black War Bear quest rewards with the new faction-neutral
+mount reward.
+
+Additional module update `2026_05_22_05_blackrose_explicit_gems.sql` enforces
+exact literal Ribbon/Mist item names and tooltip descriptions for existing
+databases.
+
 ### Client DBC Patch Requirements
 
 The server module includes the matching data rows, but the 3.3.5 client also
@@ -374,6 +402,8 @@ needs these custom rows in its patched DBC files for tooltip display:
 - SpellItemEnchantment rows for all Ribbon/Mist enchant IDs so socketed gem
   lines display next to socket icons.
 - GemProperties rows for all Ribbon/Mist item/enchant IDs.
+- Spell `900903`, SkillLineAbility row `900903`, and the custom Black Rose
+  Mauler mount display used by the learned mount spell.
 
 ## Known Client and Cache Caveats
 
@@ -401,15 +431,21 @@ needs these custom rows in its patched DBC files for tooltip display:
 
 1. Visit Norah Rose in a major city at level 20 or above.
 2. Confirm `The Black Rose` quest is available.
-3. Complete the quest.
-4. Confirm rewards:
+3. Accept the quest and confirm the objective shows `Gruff Swiftbite slain`.
+4. Kill `Gruff Swiftbite` NPC `100`.
+5. Confirm objective progress becomes `1/1`.
+6. Return to Norah Rose and complete the quest.
+7. Confirm rewards:
    - 5 gold
    - `Bag of the Black Rose`
-   - faction Black War Bear item
+   - `Reins of the Black Rose Mauler`
    - `The Black Rose` trinket
    - 1 Black Miasma
    - 1 Black Petals
    - 1 Black Thorns
+8. Use `Reins of the Black Rose Mauler`.
+9. Confirm `Black Rose Mauler` spell `900903` is learned and appears in the
+   mount UI.
 
 ### Bag Upgrade Test
 
