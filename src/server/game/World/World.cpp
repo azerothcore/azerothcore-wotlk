@@ -233,6 +233,7 @@ namespace
         Metrics.LoginDatabaseQueue.Set(double(LoginDatabase.QueueSize()));
         Metrics.CharacterDatabaseQueue.Set(double(CharacterDatabase.QueueSize()));
         Metrics.WorldDatabaseQueue.Set(double(WorldDatabase.QueueSize()));
+        sMapMgr->UpdateAggregateMetrics();
     }
 }
 
