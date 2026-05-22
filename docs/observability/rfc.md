@@ -85,7 +85,7 @@ ac_build_info{realm="...",version="...",revision="..."} 1
 
 Summaries, native histograms, and stateset/enum metrics are deferred.
 
-Metric updates and scrapes are thread-safe. Registry structure is protected by a mutex, metric values use atomics, and indexed histogram series are registered lazily through atomic slots.
+Metric updates and scrapes are thread-safe. Registry structure is protected by a mutex, metric values use atomics, and indexed histogram/gauge series are registered lazily through atomic slots.
 
 Prometheus documentation currently recommends native histograms when available, but v1 uses classic histograms because the exporter is simple text exposition without a Prometheus client library. Native histograms can be revisited later.
 
@@ -244,6 +244,22 @@ The `phase` label comes from a fixed set of string literals.
 
 Do not include `map_instanceid` in v1.
 
+### Map Object Counts
+
+- Metrics:
+  - `ac_map_creatures`
+  - `ac_map_gameobjects`
+- Type: gauge
+- Labels: `map_id`
+- Instrumentation point: aggregate map status collection from `MapMgr::UpdateAggregateMetrics()` during the `update_metrics` world update phase.
+- Data sources:
+  - `Map::GetObjectsStore().Size<Creature>()`
+  - `Map::GetObjectsStore().Size<GameObject>()`
+
+The gauges aggregate all currently live `Map` objects by map ID. This keeps the Prometheus label bounded to `map_id` and deliberately avoids `map_instanceid`. Multiple instances of the same map ID are summed into one exported series.
+
+Indexed gauge slots are bounded by `MAP_ID_METRIC_COUNT`, derived from `MAX_MAP_ID + 1`, and map IDs are asserted before indexing. A map ID creates a series only after it has been observed. If a previously observed map later has no live maps, the collector exports one zero value and then stops actively refreshing that map ID until it appears again.
+
 ### Session Update Duration
 
 - Metric: `ac_world_session_update_duration_seconds`
@@ -282,7 +298,7 @@ These existing metric sites are not part of the required v1 pass:
 - Player login/logout event records with player names.
 - Map tile load/unload event text.
 - MMap/path calculation event-style records.
-- Per-map-instance object counts from [`src/server/game/Maps/Map.cpp`](../../src/server/game/Maps/Map.cpp#L523).
+- Per-map-instance object-count labels from [`src/server/game/Maps/Map.cpp`](../../src/server/game/Maps/Map.cpp#L523). V1 exports aggregated `map_id` gauges instead.
 
 Some of these may become counters or histograms later, but event-shaped data with names or text belongs to the future event backend.
 
@@ -328,4 +344,5 @@ Metrics are useful for operations without exposing player identity, account iden
 - V1 duration metrics use `DefaultDurationBuckets()`.
 - HTTP export uses Boost.Asio and Boost.Beast.
 - Status gauges are refreshed from the world update loop during the `update_metrics` phase.
+- Map object-count gauges are aggregated by `map_id` from `MapMgr` and use indexed gauge series to avoid per-update label-map lookups after first registration.
 - Docker-based Prometheus smoke/E2E coverage lives under [`apps/prometheus-test`](../../apps/prometheus-test).
