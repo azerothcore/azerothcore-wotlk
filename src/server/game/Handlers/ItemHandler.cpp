@@ -16,6 +16,7 @@
  */
 
 #include "Common.h"
+#include "BlackRoseGemSystem.h"
 #include "Item.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
@@ -933,6 +934,10 @@ void WorldSession::SendListInventory(ObjectGuid vendorGuid, uint32 vendorEntry)
                     continue;
                 }
 
+                if (vendor->GetEntry() == BlackRose::NpcRosy &&
+                    !BlackRose::ShouldShowRosyVendorItem(_player, item->item))
+                    continue;
+
                 // reputation discount
                 int32 price = item->IsGoldRequired(itemTemplate) ? uint32(std::floor(itemTemplate->BuyPrice * discountMod)) : 0;
 
@@ -1240,6 +1245,19 @@ void WorldSession::HandleSocketOpcode(WorldPackets::Item::SocketGems& packet)
     GemPropertiesEntry const* GemProps[MAX_GEM_SOCKETS];
     for (int i = 0; i < MAX_GEM_SOCKETS; ++i)                //get geminfo from dbc storage
         GemProps[i] = (Gems[i]) ? sGemPropertiesStore.LookupEntry(Gems[i]->GetTemplate()->GemProperties) : nullptr;
+
+    for (int i = 0; i < MAX_GEM_SOCKETS; ++i)
+    {
+        if (!Gems[i] || !BlackRose::IsBlackRoseGemItem(Gems[i]->GetEntry()))
+            continue;
+
+        if (itemTarget->GetEntry() == BlackRose::ItemTheBlackRose)
+            continue;
+
+        _player->SendEquipError(EQUIP_ERR_ITEM_DOESNT_GO_TO_SLOT,
+            itemTarget, Gems[i]);
+        return;
+    }
 
     // Find first prismatic socket
     int32 firstPrismatic = 0;

@@ -17,6 +17,7 @@
 
 #include "AreaDefines.h"
 #include "Battleground.h"
+#include "BlackRoseGemSystem.h"
 #include "ObjectMgr.h"
 #include "Pet.h"
 #include "Player.h"
@@ -6062,8 +6063,34 @@ class spell_item_living_root_of_the_wildheart : public AuraScript
     }
 };
 
+class spell_item_black_rose : public AuraScript
+{
+    PrepareAuraScript(spell_item_black_rose);
+
+    void AfterApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Player* player = GetTarget()->ToPlayer())
+            BlackRose::ReapplySocketEnchants(player, false, true);
+    }
+
+    void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (Player* player = GetTarget()->ToPlayer())
+            BlackRose::ReapplySocketEnchants(player, true, false);
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_item_black_rose::AfterApply,
+            EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_item_black_rose::AfterRemove,
+            EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_item_spell_scripts()
 {
+    RegisterSpellScript(spell_item_black_rose);
     RegisterSpellScript(spell_item_massive_seaforium_charge);
     RegisterSpellScript(spell_item_titanium_seal_of_dalaran);
     RegisterSpellScript(spell_item_mind_amplify_dish);
