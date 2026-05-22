@@ -1,3 +1,4 @@
+-- DB update 2026_05_20_00 -> 2026_05_22_00
 --
 -- Quest 'The Deadliest Trap Ever Laid' (11097/11101): kill counter survives evade
 --
