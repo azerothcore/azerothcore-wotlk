@@ -6,6 +6,18 @@ This document summarizes the Black Rose work completed so far and preserves the
 implementation plan for the Black Rose gem system. It is intended as a handoff
 and testing reference for server, DB, and client-side follow-up.
 
+## Module Migration
+
+Black Rose is now owned by `modules/mod-blackrose`. The module contains the
+quest/content SQL under `modules/mod-blackrose/data/sql/db-world`, the item and
+player scripts under `modules/mod-blackrose/src`, and the Rosy upgrade flow.
+
+The module is intentionally strict module-only: Black Rose-specific source edits
+were removed from core files. Because the core vendor list hook cannot remove
+individual rows from the vendor packet, Rosy sells base gems through the normal
+vendor list and sells gem upgrade tokens through a gossip menu that only displays
+eligible next-rank upgrades.
+
 ## Change Summary
 
 ### Norah Rose Quest
@@ -28,7 +40,7 @@ and testing reference for server, DB, and client-side follow-up.
 
 Primary SQL:
 
-- `data/sql/updates/pending_db_world/rev_1779316939445293603.sql`
+- `modules/mod-blackrose/data/sql/db-world/2026_05_22_00_blackrose.sql`
 
 ### Bag of the Black Rose
 
@@ -63,8 +75,8 @@ Primary SQL:
 
 Primary SQL/source:
 
-- `data/sql/updates/pending_db_world/rev_1779360000000000000.sql`
-- `src/server/scripts/World/item_scripts.cpp`
+- `modules/mod-blackrose/data/sql/db-world/2026_05_22_00_blackrose.sql`
+- `modules/mod-blackrose/src/BlackRose.cpp`
 
 ### Gold and Gray Item Economy
 
@@ -106,17 +118,14 @@ Primary config areas:
   - Spell/aura ID: `900900`
   - Duration: `20` seconds
   - Cooldown: `3` minutes
-  - ScriptName: `item_black_rose_trinket`
+  - Uses normal `item_template` on-use spell handling
 - On use, it channels the power of the Black Rose and makes socketed Black Rose
   gem stats count as `250%` total effectiveness for the duration.
 
 Primary SQL/source:
 
-- `data/sql/updates/pending_db_world/rev_1779316939445293603.sql`
-- `data/sql/updates/pending_db_world/rev_1779400000000000000.sql`
-- `data/sql/updates/pending_db_world/rev_1779410000000000000.sql`
-- `src/server/scripts/World/item_scripts.cpp`
-- `src/server/scripts/Spells/spell_item.cpp`
+- `modules/mod-blackrose/data/sql/db-world/2026_05_22_00_blackrose.sql`
+- `modules/mod-blackrose/src/BlackRose.cpp`
 
 ## Black Rose Gem Plan
 
@@ -169,9 +178,10 @@ Related DB tables:
 - `npc_vendor`
 - `conditions`
 
-### Red Gems
+### Red Ribbon Gems
 
-Red gems use Black Miasma and have 7 ranks.
+Red gems are named as Ribbons, use Black Miasma, and have 7 ranks.
+Ribbon items are unique and bind when picked up.
 
 ID formula:
 
@@ -184,15 +194,15 @@ ID formula:
 
 Families:
 
-- `0`: Stark, strength
-- `1`: Klug, intellect
-- `2`: Geist, spirit
-- `3`: Schnell, agility
-- `4`: Fett, stamina
-- `5`: Gross, strength and stamina
-- `6`: Spinnst, intellect and spirit
-- `7`: Scharf, strength and agility
-- `8`: Weise, intellect and stamina
+- `0`: Stark Ribbon, strength
+- `1`: Klug Ribbon, intellect
+- `2`: Geist Ribbon, spirit
+- `3`: Schnell Ribbon, agility
+- `4`: Fett Ribbon, stamina
+- `5`: Gross Ribbon, strength and stamina
+- `6`: Spinnst Ribbon, intellect and spirit
+- `7`: Scharf Ribbon, strength and agility
+- `8`: Weise Ribbon, intellect and stamina
 
 Single-stat rank values:
 
@@ -224,9 +234,10 @@ Costs in Black Miasma:
 - Upgrade to rank 6: `5000`
 - Upgrade to rank 7: `10000`
 
-### Yellow Gems
+### Yellow Mist Gems
 
-Yellow gems use Black Petals and have 7 ranks.
+Yellow gems are named as Mists, use Black Petals, and have 7 ranks.
+Mist items are unique and bind when picked up.
 
 ID formula:
 
@@ -237,10 +248,13 @@ ID formula:
 
 Families:
 
-- `0`: pouvoir, spell power
-- `1`: douleur, attack power
+- `0`: Pouvoir Mist, spell power
+- `1`: Douleur Mist, attack power
+- `2`: Pointe Mist, crit rating
+- `3`: Vitesse Mist, haste rating
+- `4`: Restaurer Mist, mana per 5 seconds
 
-Rank values:
+Normal rank values for Pouvoir, Douleur, Pointe, and Vitesse:
 
 - Rank 1: `+6`
 - Rank 2: `+26`
@@ -249,6 +263,16 @@ Rank values:
 - Rank 5: `+166`
 - Rank 6: `+206`
 - Rank 7: `+246`
+
+Restaurer MP5 rank values:
+
+- Rank 1: `+10`
+- Rank 2: `+25`
+- Rank 3: `+50`
+- Rank 4: `+75`
+- Rank 5: `+200`
+- Rank 6: `+325`
+- Rank 7: `+525`
 
 Costs in Black Petals:
 
@@ -268,71 +292,88 @@ The intended player flow is:
 2. Equip `The Black Rose` trinket.
 3. Buy a rank 1 gem from Rosy.
 4. Socket the rank 1 gem into `The Black Rose`.
-5. Rosy displays only the next eligible upgrade for that socketed gem.
-6. Buy the upgrade token.
-7. Right-click the upgrade token.
-8. The token verifies the lower-rank gem is socketed.
-9. The lower-rank socket enchant is removed.
-10. The next-rank gem item is granted.
-11. The token is consumed.
-12. The player sockets the new higher-rank gem.
+5. Choose Rosy's `Empower a Black Rose gem` gossip option.
+6. Rosy displays only the next eligible upgrade for that socketed gem.
+7. Buy the upgrade token from the gossip menu.
+8. Right-click the upgrade token.
+9. The token verifies the lower-rank gem is socketed.
+10. The lower-rank socket enchant is removed.
+11. The next-rank gem item is granted.
+12. The token is consumed.
+13. The player sockets the new higher-rank gem.
 
 ### Server-Side Enforcement
 
-Implemented in `src/server/game/BlackRoseGemSystem.h`:
+Implemented in `modules/mod-blackrose/src/BlackRose.h`:
 
 - Central constants for items, spells, NPCs, quests, gem bases, and upgrade
   bases.
 - Helpers to identify Black Rose gems and upgrade tokens.
 - Helpers to map an upgrade token to its lower-rank gem and next-rank gem.
 - Helper to find equipped `The Black Rose`.
-- Helper to determine if Rosy should show an upgrade item.
+- Helpers to determine eligible Rosy gossip upgrade options.
 - Scoped multiplier mode used to safely remove and reapply socket enchant stats
   during the trinket aura transition.
 
-Implemented in `src/server/game/Handlers/ItemHandler.cpp`:
+Implemented in `modules/mod-blackrose/src/BlackRose.cpp`:
 
-- Prevents Black Rose gems from being socketed into any item except
-  `The Black Rose`.
-- Filters Rosy's vendor list so upgrade tokens only appear when the player has
-  the prerequisite lower-rank gem socketed.
-
-Implemented in `src/server/scripts/World/item_scripts.cpp`:
-
-- `item_black_rose_trinket`
-  - Casts aura `900900`.
-  - Applies a 3-minute cooldown.
+- `npc_black_rose_rosy`
+  - Offers normal vendor browsing for bag upgrades and base gems.
+  - Offers an `Empower a Black Rose gem` gossip menu for eligible upgrades.
 - `item_black_rose_gem_upgrade`
   - Verifies the correct lower-rank gem is socketed.
   - Removes the lower-rank socket enchant.
   - Grants the next-rank gem.
   - Consumes the token.
 - `player_black_rose_gem_system`
-  - Blocks invalid Rosy purchases server-side.
+  - Blocks stale invalid Rosy purchases server-side if old vendor rows exist.
+  - Performs module-only cleanup/refund if a Black Rose gem is socketed into a
+    non-Black-Rose item.
   - Multiplies Black Rose gem enchant stat amounts by `5 / 2` while boosted.
   - Grants one Black Miasma, one Black Petals, and one Black Thorns when the
     quest is completed.
-
-Implemented in `src/server/scripts/Spells/spell_item.cpp`:
-
-- `spell_item_black_rose`
+- `spell_black_rose_power`
   - On aura apply, reapplies socket enchant stats as boosted.
   - On aura removal, reapplies socket enchant stats as base values.
 
+`The Black Rose` trinket itself uses normal item spell handling through its
+`item_template` fields: `spellid_1 = 900900`, `spelltrigger_1 = 0`, and
+`spellcooldown_1 = 180000`.
+
 ### Follow-Up Correction SQL
 
-Added `data/sql/updates/pending_db_world/rev_1779410000000000000.sql` after
-testing revealed stale item data. This follow-up update corrects live DB rows
-that may not be updated if an earlier pending revision had already been applied.
+The module SQL includes the previous follow-up corrections after testing
+revealed stale item data. This lets module installation correct live DB rows
+that may already have received earlier Black Rose pending updates.
 
 It fixes:
 
-- Gem item names, for example `Klug Gem` instead of `Black Rose Klug 1`.
-- Gem descriptions, for example `Grants the Black Rose +2 intellect.`
+- Gem item names, for example `Klug Ribbon` instead of `Black Rose Klug 1`.
+- Gem descriptions, for example
+  `Grants The Black Rose +2 intellect when socketed.`
 - Upgrade names and descriptions.
 - Upgrade `spellid_1`, replacing the captured-frog spell reference.
 - Trinket use spell fields, cooldown, base stats, and `ScriptName`.
 - Enchantment display names for socketed gem effects.
+
+Additional module update `2026_05_22_01_blackrose_yellow_gems.sql` adds the
+expanded yellow Mist families and applies the Ribbon/Mist naming corrections to
+databases that already ran the first module SQL update.
+
+Additional module update `2026_05_22_02_blackrose_item_flags_and_trinket.sql`
+makes all Ribbon/Mist socketable items unique and soulbound, and moves
+`The Black Rose` trinket fully onto normal item on-use spell handling.
+
+### Client DBC Patch Requirements
+
+The server module includes the matching data rows, but the 3.3.5 client also
+needs these custom rows in its patched DBC files for tooltip display:
+
+- Spell `900900`, with the green `Use:` description for the Black Rose trinket.
+- Spell duration `900900`, matching the 20-second aura duration.
+- SpellItemEnchantment rows for all Ribbon/Mist enchant IDs so socketed gem
+  lines display next to socket icons.
+- GemProperties rows for all Ribbon/Mist item/enchant IDs.
 
 ## Known Client and Cache Caveats
 
@@ -341,16 +382,17 @@ It fixes:
 - `spell_dbc`, `spellduration_dbc`, `gemproperties_dbc`, and
   `spellitemenchantment_dbc` changes require a server restart.
 - Some tooltip behavior may require client-side DBC patches.
-- The trinket tooltip may not dynamically display socketed gem stat totals even
-  when the server applies the stats correctly.
-- If the upgrade token still references the captured frog, verify that
-  `rev_1779410000000000000.sql` was applied and the client cache was cleared.
+- The trinket green `Use:` text and custom socket stat lines require matching
+  client DBC rows for the custom spell, spell duration, gem properties, and
+  enchantments.
+- If the upgrade token still references the captured frog, verify that the
+  `mod-blackrose` module SQL was applied and the client cache was cleared.
 
 ## Test Checklist
 
 ### DB and Server Setup
 
-1. Apply all pending DB-world SQL updates.
+1. Apply the `mod-blackrose` module DB-world SQL update.
 2. Rebuild worldserver if C++ changes were not already built.
 3. Restart worldserver.
 4. Clear the WoW client `Cache` folder.
@@ -384,7 +426,7 @@ It fixes:
 2. Open Rosy's vendor list.
 3. Confirm base red/yellow gems are visible.
 4. Confirm upgrade tokens are hidden before the prerequisite gem is socketed.
-5. Buy `Klug Gem`.
+5. Buy `Klug Ribbon`.
 6. Confirm its name and description are correct.
 7. Socket it into `The Black Rose`.
 8. Confirm only the next Klug upgrade appears.

@@ -15,8 +15,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef BLACK_ROSE_GEM_SYSTEM_H
-#define BLACK_ROSE_GEM_SYSTEM_H
+#ifndef MOD_BLACKROSE_BLACK_ROSE_H
+#define MOD_BLACKROSE_BLACK_ROSE_H
 
 #include "Common.h"
 #include "Item.h"
@@ -24,22 +24,38 @@
 
 namespace BlackRose
 {
+    constexpr uint32 QuestTheBlackRoseAlliance = 900100;
+    constexpr uint32 QuestTheBlackRoseHorde = 900101;
+
+    constexpr uint32 ItemBag26 = 900102;
     constexpr uint32 ItemTheBlackRose = 900105;
+    constexpr uint32 ItemBag28 = 900120;
+    constexpr uint32 ItemBag30 = 900121;
+    constexpr uint32 ItemBag32 = 900122;
+    constexpr uint32 ItemBag34 = 900123;
+    constexpr uint32 ItemBag36 = 900124;
+
+    constexpr uint32 ItemBagUpgrade28 = 900130;
+    constexpr uint32 ItemBagUpgrade30 = 900131;
+    constexpr uint32 ItemBagUpgrade32 = 900132;
+    constexpr uint32 ItemBagUpgrade34 = 900133;
+    constexpr uint32 ItemBagUpgrade36 = 900134;
+
+    constexpr uint32 NpcRosy = 900140;
+
     constexpr uint32 ItemBlackMiasma = 900200;
     constexpr uint32 ItemBlackPetals = 900201;
     constexpr uint32 ItemBlackThorns = 900202;
-    constexpr uint32 NpcRosy = 900140;
-    constexpr uint32 QuestTheBlackRoseAlliance = 900100;
-    constexpr uint32 QuestTheBlackRoseHorde = 900101;
-    constexpr uint32 SpellBlackRoseAura = 900900;
 
     constexpr uint32 RedGemBase = 900300;
     constexpr uint32 YellowGemBase = 900400;
     constexpr uint32 RedUpgradeBase = 900500;
     constexpr uint32 YellowUpgradeBase = 900600;
 
+    constexpr uint32 SpellBlackRoseAura = 900900;
+
     constexpr uint8 RedGemFamilies = 9;
-    constexpr uint8 YellowGemFamilies = 2;
+    constexpr uint8 YellowGemFamilies = 5;
     constexpr uint8 GemRanks = 7;
 
     enum class MultiplierMode
@@ -68,6 +84,14 @@ namespace BlackRose
 
     private:
         MultiplierMode _previous;
+    };
+
+    struct BagUpgradeTier
+    {
+        uint32 Token;
+        uint32 CurrentBag;
+        uint32 UpgradedBag;
+        uint8 Slots;
     };
 
     struct GemUpgrade
@@ -111,6 +135,24 @@ namespace BlackRose
             IsUpgradeToken(entry, YellowUpgradeBase, YellowGemFamilies);
     }
 
+    inline BagUpgradeTier const* GetBagUpgradeTier(uint32 token)
+    {
+        static BagUpgradeTier const upgrades[] =
+        {
+            { ItemBagUpgrade28, ItemBag26, ItemBag28, 28 },
+            { ItemBagUpgrade30, ItemBag28, ItemBag30, 30 },
+            { ItemBagUpgrade32, ItemBag30, ItemBag32, 32 },
+            { ItemBagUpgrade34, ItemBag32, ItemBag34, 34 },
+            { ItemBagUpgrade36, ItemBag34, ItemBag36, 36 }
+        };
+
+        for (BagUpgradeTier const& upgrade : upgrades)
+            if (upgrade.Token == token)
+                return &upgrade;
+
+        return nullptr;
+    }
+
     inline bool GetGemUpgrade(uint32 token, GemUpgrade& upgrade)
     {
         uint32 gemBase = 0;
@@ -144,6 +186,33 @@ namespace BlackRose
         upgrade.NextGem = gemBase + family * 10 + targetRank - 1;
         upgrade.LowerEnchant = upgrade.LowerGem;
         return true;
+    }
+
+    inline uint32 GetGemUpgradeCurrency(uint32 token)
+    {
+        if (IsUpgradeToken(token, RedUpgradeBase, RedGemFamilies))
+            return ItemBlackMiasma;
+
+        if (IsUpgradeToken(token, YellowUpgradeBase, YellowGemFamilies))
+            return ItemBlackPetals;
+
+        return 0;
+    }
+
+    inline uint32 GetGemUpgradeCost(uint32 token)
+    {
+        uint32 offset = 0;
+        if (IsUpgradeToken(token, RedUpgradeBase, RedGemFamilies))
+            offset = token - RedUpgradeBase;
+        else if (IsUpgradeToken(token, YellowUpgradeBase, YellowGemFamilies))
+            offset = token - YellowUpgradeBase;
+        else
+            return 0;
+
+        static uint32 constexpr costs[] = { 10, 50, 500, 1000, 5000, 10000 };
+        uint32 rankOffset = offset % 10;
+        return rankOffset < (sizeof(costs) / sizeof(uint32))
+            ? costs[rankOffset] : 0;
     }
 
     inline Item* GetEquippedBlackRose(Player* player)
@@ -180,15 +249,6 @@ namespace BlackRose
     inline bool HasSocketedEnchant(Player* player, uint32 enchantId)
     {
         return HasSocketedEnchant(GetEquippedBlackRose(player), enchantId);
-    }
-
-    inline bool ShouldShowRosyVendorItem(Player* player, uint32 itemId)
-    {
-        GemUpgrade upgrade;
-        if (!GetGemUpgrade(itemId, upgrade))
-            return true;
-
-        return HasSocketedEnchant(player, upgrade.LowerEnchant);
     }
 
     inline void ReapplySocketEnchants(Player* player, bool oldBoosted,

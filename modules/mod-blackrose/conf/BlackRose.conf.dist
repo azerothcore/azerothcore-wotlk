@@ -1,0 +1,15 @@
+[worldserver]
+
+#
+# BlackRose.Enable
+#   Enables the Black Rose module scripts.
+#   Default: 1
+#
+BlackRose.Enable = 1
+
+#
+# Logger.module.BlackRose
+#   Optional module logger.
+#   Default: 4,Console Server
+#
+# Logger.module.BlackRose=4,Console Server

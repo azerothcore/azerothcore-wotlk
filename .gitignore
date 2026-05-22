@@ -121,3 +121,7 @@ local.properties
 # Track mod-autobalance (default AzerothCore rule `/modules/*` hides it from git).
 !/modules/mod-autobalance/
 !/modules/mod-autobalance/**
+
+# Track mod-blackrose as the custom Black Rose feature module.
+!/modules/mod-blackrose/
+!/modules/mod-blackrose/**
