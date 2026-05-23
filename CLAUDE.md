@@ -21,6 +21,8 @@ make -j$(nproc) && make install
 
 Compiler: **C++20** required (`CMAKE_CXX_STANDARD 20`). Useful CMake flags: `BUILD_TESTING=ON` (Google Test), `NOPCH=1` (disable precompiled headers). Full flag set in `conf/dist/config.cmake`. `compile_commands.json` is exported automatically.
 
+macOS (Apple Silicon): GNU readline is keg-only under Homebrew, so CMake's `find_library` grabs the SDK's libedit stub and `worldserver` fails to link (`undefined symbols _rl_done`, `_rl_event_hook`). After `brew install readline`, point CMake at it: `-DREADLINE_INCLUDE_DIR=/opt/homebrew/opt/readline/include -DREADLINE_LIBRARY=/opt/homebrew/opt/readline/lib/libreadline.dylib`.
+
 Tests (Google Test, in `src/test/`): configure with `-DBUILD_TESTING=ON`, then `ctest` or `./src/test/unit_tests` from the build dir.
 
 ## Repository layout
