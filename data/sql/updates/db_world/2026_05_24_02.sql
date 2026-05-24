@@ -1,3 +1,4 @@
+-- DB update 2026_05_24_01 -> 2026_05_24_02
 -- acore_string entries for .pet rename command.
 DELETE FROM `acore_string` WHERE `entry` IN (35453, 35454);
 INSERT INTO `acore_string` (`entry`, `content_default`, `locale_koKR`, `locale_frFR`, `locale_deDE`, `locale_zhCN`, `locale_zhTW`, `locale_esES`, `locale_esMX`, `locale_ruRU`) VALUES
