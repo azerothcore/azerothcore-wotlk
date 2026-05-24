@@ -3678,7 +3678,9 @@ Wintergrasp.SkipBattleSessionCount = 3500
 #
 #     Wintergrasp.KickVoAPlayers
 #         Description: Kick players from Vault of Archavon and freeze its bosses
-#                      in the minutes leading up to a Wintergrasp battle.
+#                      in the minutes leading up to a Wintergrasp battle, and
+#                      block new entries during wartime / the 10-minute warmup.
+#                      Requires a server restart to take effect (not reloadable).
 #         Default:     1 - (Enabled, players are warned then teleported to their
 #                           homebind before the battle starts)
 #                      0 - (Disabled, players stay inside and bosses behave
