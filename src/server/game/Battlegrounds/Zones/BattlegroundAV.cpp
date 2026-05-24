@@ -1586,7 +1586,7 @@ uint8 BattlegroundAV::GetAttackString(BG_AV_Nodes node, TeamId teamId)
         if (teamId == TEAM_ALLIANCE)
             strId = AV_TEXT_A_HERALD_ICEBLOOD_TOWER_ATTACK;
         else
-            strId = AV_TEXT_H_HERALD_ICEBLOOD_TOWER_ATTACK;                
+            strId = AV_TEXT_H_HERALD_ICEBLOOD_TOWER_ATTACK;
         break;
     case BG_AV_NODES_ICEBLOOD_GRAVE:
         if (teamId == TEAM_ALLIANCE)
