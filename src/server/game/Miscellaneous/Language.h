@@ -1508,6 +1508,10 @@ enum AcoreStrings
     LANG_RESPAWN_ENTRY_GAMEOBJECT_QUEUED     = 35452,
 
     // List respawns console support
-    LANG_LIST_RESPAWNS_NO_MAP           = 35447
+    LANG_LIST_RESPAWNS_NO_MAP           = 35447,
+
+    // Pet rename command
+    LANG_PET_RENAME_INVALID             = 35453,
+    LANG_PET_RENAME_SUCCESS             = 35454
 };
 #endif
