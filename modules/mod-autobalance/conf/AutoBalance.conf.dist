@@ -961,7 +961,9 @@ AutoBalance.reward.MinPlayerReward = 1
 #     AutoBalanceAnnounce.enable
 #        Announce the module on login if it is enabled
 #        Default:     1 (1 = ON, 0 = OFF)
-AutoBalanceAnnounce.enable=1
+#        Blackrose:   off - we don't surface module branding to players,
+#        the MOTD does the welcome work.
+AutoBalanceAnnounce.enable=0
 
 ##########################
 #

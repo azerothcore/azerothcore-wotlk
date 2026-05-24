@@ -1,0 +1,18 @@
+[
+  {
+    "ID": 900903,
+    "SkillLine": 777,
+    "Spell": 900903,
+    "RaceMask": 0,
+    "ClassMask": 0,
+    "ExcludeRace": 0,
+    "ExcludeClass": 0,
+    "MinSkillLineRank": 0,
+    "SupercededBySpell": 0,
+    "AcquireMethod": 0,
+    "TrivialSkillLineRankHigh": 0,
+    "TrivialSkillLineRankLow": 0,
+    "CharacterPoints_1": 0,
+    "CharacterPoints_2": 0
+  }
+]
