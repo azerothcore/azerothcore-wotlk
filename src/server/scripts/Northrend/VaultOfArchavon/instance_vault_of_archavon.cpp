@@ -22,6 +22,7 @@
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
+#include "World.h"
 #include "vault_of_archavon.h"
 
 /* Vault of Archavon encounters:
@@ -73,6 +74,8 @@ public:
             if (checkTimer >= 60000)
             {
                 checkTimer -= 60000; // one minute
+                if (!sWorld->getBoolConfig(CONFIG_WINTERGRASP_KICK_VOA_PLAYERS))
+                    return;
                 if (Battlefield* bf = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG))
                 {
                     if (!bf->IsWarTime())
