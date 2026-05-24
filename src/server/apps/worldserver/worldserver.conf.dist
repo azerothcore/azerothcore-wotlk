@@ -3387,6 +3387,16 @@ DungeonAccessRequirements.OptionalStringID = 0
 JoinBGAndLFG.Enable = 0
 
 #
+#     LFG.MailItemOnFullInventory
+#        Description: When a player wins a group roll but their inventory is full, mail
+#                     the item to them instead of leaving it on the corpse.
+#        Default:     0 - Disabled
+#                     1 - Only in LFG/RDF groups
+#                     2 - In all group types
+
+LFG.MailItemOnFullInventory = 0
+
+#
 #     DungeonFinder.OptionsMask
 #        Description: Dungeon and raid finder system.
 #        Value is a bitmask consisting of:
@@ -3664,6 +3674,19 @@ Wintergrasp.CrashRestartTimer = 10
 #         Default:     3500
 
 Wintergrasp.SkipBattleSessionCount = 3500
+
+#
+#     Wintergrasp.KickVoAPlayers
+#         Description: Kick players from Vault of Archavon and freeze its bosses
+#                      in the minutes leading up to a Wintergrasp battle, and
+#                      block new entries during wartime / the 10-minute warmup.
+#                      Requires a server restart to take effect (not reloadable).
+#         Default:     1 - (Enabled, players are warned then teleported to their
+#                           homebind before the battle starts)
+#                      0 - (Disabled, players stay inside and bosses behave
+#                           normally during Wintergrasp)
+
+Wintergrasp.KickVoAPlayers = 1
 
 #
 ###################################################################################################
