@@ -136,6 +136,9 @@ public:
                 if (m_auiEncounter[i] == IN_PROGRESS)
                     return true;
 
+            if (!sWorld->getBoolConfig(CONFIG_WINTERGRASP_KICK_VOA_PLAYERS))
+                return false;
+
             Battlefield* bf = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
             if (!bf || bf->IsWarTime() || bf->GetTimer() <= 10 * MINUTE * IN_MILLISECONDS)
                 return true;
