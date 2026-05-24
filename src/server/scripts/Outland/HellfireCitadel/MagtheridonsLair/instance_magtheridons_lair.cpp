@@ -178,8 +178,15 @@ public:
                     if (data == 1)
                     {
                         if (GetBossState(DATA_MAGTHERIDON) != IN_PROGRESS)
+                        {
+                            // Magtheridon is ImmuneToPC during phase 1, so
+                            // SetInCombatWithZone() alone does not always reach
+                            // JustEngagedWith. Force the encounter start so the
+                            // door closes the moment a Channeler is engaged.
+                            SetBossState(DATA_MAGTHERIDON, IN_PROGRESS);
                             if (Creature* magtheridon = instance->GetCreature(_magtheridonGUID))
                                 magtheridon->SetInCombatWithZone();
+                        }
                     }
                     else
                     {

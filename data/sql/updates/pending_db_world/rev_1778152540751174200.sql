@@ -1,26 +1,34 @@
 --
--- Magtheridon's Lair: group the 5 Hellfire Channelers in a formation with
--- RESPAWN_ON_EVADE (groupAI flag 0x008). When any surviving Channeler
--- evades (e.g. raid wipes during phase 1), the dead members of the group
--- respawn automatically. This replaces the previous reliance on the
--- minion system, which caused dead Channelers to be resurrected when
+-- Magtheridon's Lair: group the 5 Hellfire Channelers in a single formation.
+-- groupAI = 11 (0x00B) combines:
+--   0x001 MEMBER_ASSIST_LEADER - members aggro when the leader is engaged
+--   0x002 LEADER_ASSIST_MEMBER - leader aggros when any member is engaged
+--                                (fans out to the other members via 0x001)
+--   0x008 RESPAWN_ON_EVADE     - dead members respawn when a surviving member evades
+-- EVADE_TOGETHER (0x004) is intentionally NOT set: in CreatureGroup::MemberEvaded
+-- the EVADE_TOGETHER branch short-circuits on dead members and skips the
+-- respawn path, so a partial wipe (e.g. 3/5 killed) would leave the corpses
+-- on the ground. Without that flag, each surviving Channeler evades on its
+-- own when its target list empties, and each evade triggers RESPAWN_ON_EVADE
+-- to bring the dead members back. This replaces the previous reliance on
+-- the minion system, which caused dead Channelers to be resurrected when
 -- Magtheridon's combat state oscillated between IN_COMBAT and NONE.
 --
 DELETE FROM `creature_formations` WHERE `leaderGUID`=90978;
 INSERT INTO `creature_formations`
 (`leaderGUID`,`memberGUID`,`dist`,`angle`,`groupAI`,`point_1`,`point_2`)
 VALUES
-(90978, 90978, 0, 0, 8, 0, 0),
-(90978, 90979, 0, 0, 8, 0, 0),
-(90978, 90980, 0, 0, 8, 0, 0),
-(90978, 90981, 0, 0, 8, 0, 0),
-(90978, 90982, 0, 0, 8, 0, 0);
+(90978, 90978, 0, 0, 11, 0, 0),
+(90978, 90979, 0, 0, 11, 0, 0),
+(90978, 90980, 0, 0, 11, 0, 0),
+(90978, 90981, 0, 0, 11, 0, 0),
+(90978, 90982, 0, 0, 11, 0, 0);
 
 --
 -- On evade:
 --  * id=9 notifies the instance script so it can force-reset Magtheridon
 --    (otherwise his _channelersKilled counter would stay stale across
---    pulls — Magtheridon is held in combat by SetInCombatWithZone() and
+--    pulls; Magtheridon is held in combat by SetInCombatWithZone() and
 --    his own EnterEvadeMode does not always fire).
 --  * id=10 strips the Soul Transfer (30531) auras stacked on the surviving
 --    Channelers from each ally that died during the previous pull.
