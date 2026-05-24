@@ -911,8 +911,8 @@ void BattlefieldWG::OnPlayerEnterZone(Player* player)
     // Send worldstate to player
     SendInitWorldStatesTo(player);
 
-    // xinef: Attacker, if hidden in relic room kick him out
-    if (player->GetTeamId() == GetAttackerTeam())
+    // xinef: Attacker, if hidden in relic room kick him out (only during wartime)
+    if (IsWarTime() && player->GetTeamId() == GetAttackerTeam())
         if (player->GetPositionX() > 5400.0f && player->GetPositionX() < 5490.0f && player->GetPositionY() > 2803.0f && player->GetPositionY() < 2878.0f)
             KickPlayerFromBattlefield(player->GetGUID());
 }
