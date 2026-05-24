@@ -1,0 +1,1982 @@
+[
+  {
+    "ID": 900102,
+    "ClassID": 1,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": 8,
+    "DisplayInfoID": 30271,
+    "InventoryType": 18,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900105,
+    "ClassID": 4,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 6483,
+    "InventoryType": 12,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900106,
+    "ClassID": 15,
+    "SubclassID": 5,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 45364,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900120,
+    "ClassID": 1,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": 8,
+    "DisplayInfoID": 30271,
+    "InventoryType": 18,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900121,
+    "ClassID": 1,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": 8,
+    "DisplayInfoID": 30271,
+    "InventoryType": 18,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900122,
+    "ClassID": 1,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": 8,
+    "DisplayInfoID": 30271,
+    "InventoryType": 18,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900123,
+    "ClassID": 1,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": 8,
+    "DisplayInfoID": 30271,
+    "InventoryType": 18,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900124,
+    "ClassID": 1,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": 8,
+    "DisplayInfoID": 30271,
+    "InventoryType": 18,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900130,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 8861,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900131,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 8861,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900132,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 8861,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900133,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 8861,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900134,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 8861,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900200,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 44851,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900201,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 24688,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900202,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 30601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900300,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900301,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900302,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900303,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900304,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900305,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900306,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900310,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900311,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900312,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900313,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900314,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900315,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900316,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900320,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900321,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900322,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900323,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900324,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900325,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900326,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900330,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900331,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900332,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900333,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900334,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900335,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900336,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900340,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900341,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900342,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900343,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900344,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900345,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900346,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900350,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900351,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900352,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900353,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900354,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900355,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900356,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900360,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900361,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900362,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900363,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900364,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900365,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900366,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900370,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900371,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900372,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900373,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900374,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900375,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900376,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900380,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900381,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900382,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900383,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900384,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900385,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900386,
+    "ClassID": 3,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900400,
+    "ClassID": 3,
+    "SubclassID": 2,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900401,
+    "ClassID": 3,
+    "SubclassID": 2,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900402,
+    "ClassID": 3,
+    "SubclassID": 2,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900403,
+    "ClassID": 3,
+    "SubclassID": 2,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900404,
+    "ClassID": 3,
+    "SubclassID": 2,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900405,
+    "ClassID": 3,
+    "SubclassID": 2,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900406,
+    "ClassID": 3,
+    "SubclassID": 2,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900410,
+    "ClassID": 3,
+    "SubclassID": 2,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900411,
+    "ClassID": 3,
+    "SubclassID": 2,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900412,
+    "ClassID": 3,
+    "SubclassID": 2,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900413,
+    "ClassID": 3,
+    "SubclassID": 2,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900414,
+    "ClassID": 3,
+    "SubclassID": 2,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900415,
+    "ClassID": 3,
+    "SubclassID": 2,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900416,
+    "ClassID": 3,
+    "SubclassID": 2,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900420,
+    "ClassID": 3,
+    "SubclassID": 2,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900421,
+    "ClassID": 3,
+    "SubclassID": 2,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900422,
+    "ClassID": 3,
+    "SubclassID": 2,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900423,
+    "ClassID": 3,
+    "SubclassID": 2,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900424,
+    "ClassID": 3,
+    "SubclassID": 2,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900425,
+    "ClassID": 3,
+    "SubclassID": 2,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900426,
+    "ClassID": 3,
+    "SubclassID": 2,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900430,
+    "ClassID": 3,
+    "SubclassID": 2,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900431,
+    "ClassID": 3,
+    "SubclassID": 2,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900432,
+    "ClassID": 3,
+    "SubclassID": 2,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900433,
+    "ClassID": 3,
+    "SubclassID": 2,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900434,
+    "ClassID": 3,
+    "SubclassID": 2,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900435,
+    "ClassID": 3,
+    "SubclassID": 2,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900436,
+    "ClassID": 3,
+    "SubclassID": 2,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900440,
+    "ClassID": 3,
+    "SubclassID": 2,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900441,
+    "ClassID": 3,
+    "SubclassID": 2,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900442,
+    "ClassID": 3,
+    "SubclassID": 2,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900443,
+    "ClassID": 3,
+    "SubclassID": 2,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900444,
+    "ClassID": 3,
+    "SubclassID": 2,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900445,
+    "ClassID": 3,
+    "SubclassID": 2,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900446,
+    "ClassID": 3,
+    "SubclassID": 2,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900500,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900501,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900502,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900503,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900504,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900505,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900510,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900511,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900512,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900513,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900514,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900515,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900520,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900521,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900522,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900523,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900524,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900525,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900530,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900531,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900532,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900533,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900534,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900535,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900540,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900541,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900542,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900543,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900544,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900545,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900550,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900551,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900552,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900553,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900554,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900555,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900560,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900561,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900562,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900563,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900564,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900565,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900570,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900571,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900572,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900573,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900574,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900575,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900580,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900581,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900582,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900583,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900584,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900585,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 58601,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900600,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900601,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900602,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900603,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900604,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900605,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900610,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900611,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900612,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900613,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900614,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900615,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900620,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900621,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900622,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900623,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900624,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900625,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900630,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900631,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900632,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900633,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900634,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900635,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900640,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900641,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900642,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900643,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900644,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  },
+  {
+    "ID": 900645,
+    "ClassID": 12,
+    "SubclassID": 0,
+    "SoundOverrideSubclassID": -1,
+    "Material": -1,
+    "DisplayInfoID": 54318,
+    "InventoryType": 0,
+    "SheatheType": 0
+  }
+]

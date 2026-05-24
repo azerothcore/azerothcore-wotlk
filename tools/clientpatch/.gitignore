@@ -1,0 +1,5 @@
+input/
+extras_src/
+staging/
+__pycache__/
+*.pyc

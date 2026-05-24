@@ -16,8 +16,10 @@
  */
 
 #include "AreaDefines.h"
+#include "Chat.h"
 #include "ItemScript.h"
 #include "Player.h"
+#include "PlayerScript.h"
 #include "ScriptedCreature.h"
 #include "Spell.h"
 #include "SpellMgr.h"

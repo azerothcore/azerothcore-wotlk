@@ -1,0 +1,50 @@
+### TITLE
+## Type(Scope/Subscope): Commit ultra short explanation
+## |---- Write below the examples with a maximum of 50 characters ----|
+## Example 1: feat(Core/Modules): Add Black Rose module
+## Example 2: fix(DB/BlackRose): Correct Rosy vendor costs
+## Example 3: docs(Module/BlackRose): Update test plan
+
+
+### DESCRIPTION
+## Explain why this change is being made, what it fixes, etc.
+## |---- Write below the examples with a maximum of 72 characters per line ----|
+## Example: Rosy's upgrade menu now only offers the next eligible gem rank.
+
+
+## Provide links to any issue, commit, pull request, source, or test notes.
+## Example 1: Closes issue #23
+## Example 2: References taken from Wowhead / wowwiki / in-game testing
+
+
+
+## =======================================================
+##                     EXTRA INFO
+## =======================================================
+## "Type" can be:
+##    feat     (new feature)
+##    fix      (bug fix)
+##    refactor (refactoring production code)
+##    style    (formatting, missing semi colons, etc; no code change)
+##    docs     (changes to documentation)
+##    test     (adding or refactoring tests; no production code change)
+##    chore    (updating bash scripts, git files etc; no production code change)
+## --------------------
+## Remember to
+##    Capitalize the subject line
+##    Use the imperative mood in the subject line
+##    Do not end the subject line with a period
+##    Separate subject from body with a blank line
+##    Use the body to explain what and why rather than how
+##    Mention AI assistance in the body when relevant for PR disclosure
+## --------------------
+## More info here https://www.conventionalcommits.org/
+## =======================================================
+## "Scope" can be:
+##    Core     (C++ or module script changes)
+##    DB       (SQL content changes)
+##    Docs     (documentation only)
+##    Module   (module metadata/config/tooling)
+## =======================================================
+## "Subscope" is optional and depends on the nature of the commit.
+## =======================================================
