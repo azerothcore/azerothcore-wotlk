@@ -1753,6 +1753,50 @@ float WorldObject::GetSightRange(WorldObject const* target) const
     return 0.0f;
 }
 
+float WorldObject::GetLeewayBonusRangeForTargets(Player const* player, Unit const* target, bool ability) const
+{
+    if (!player || !target)
+        return 0.0f;
+
+    if (ability)
+    {
+        if (player->GetXZFlagBasedSpeed() > LEEWAY_MIN_MOVE_SPEED && target->GetXZFlagBasedSpeed() > LEEWAY_MIN_MOVE_SPEED)
+            return LEEWAY_BONUS_RANGE;
+    }
+    else
+    {
+        uint32 leewayMoveFlags = MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_STRAFE_LEFT | MOVEMENTFLAG_STRAFE_RIGHT | MOVEMENTFLAG_FALLING;
+        if (player->HasUnitMovementFlag(leewayMoveFlags) && !player->IsWalking() && target->HasUnitMovementFlag(leewayMoveFlags) && !target->IsWalking())
+            return LEEWAY_BONUS_RANGE;
+    }
+
+    return 0.0f;
+}
+
+float WorldObject::GetLeewayBonusRange(Unit const* target, bool ability) const
+{
+    if (!target)
+        return 0.0f;
+
+    if (const Player* player = ToPlayer())
+        return GetLeewayBonusRangeForTargets(player, target, ability);
+
+    if (const Player* playerTarget = target->ToPlayer())
+        return GetLeewayBonusRangeForTargets(playerTarget, ToUnit(), ability);
+
+    return 0.0f;
+}
+
+float WorldObject::GetLeewayBonusRadius() const
+{
+    if (const Player* player = ToPlayer())
+    {
+        if (player->GetXZFlagBasedSpeed() > LEEWAY_MIN_MOVE_SPEED || player->HasUnitState(UNIT_STATE_JUMPING) || player->HasUnitMovementFlag(MOVEMENTFLAG_FALLING))
+            return LEEWAY_BONUS_RANGE;
+    }
+    return 0.0f;
+}
+
 bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, bool distanceCheck, bool checkAlert) const
 {
     if (this == obj)

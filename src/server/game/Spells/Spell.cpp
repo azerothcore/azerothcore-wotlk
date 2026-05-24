@@ -1228,6 +1228,9 @@ void Spell::SelectImplicitConeTargets(SpellEffIndex effIndex, SpellImplicitTarge
     float coneAngle = M_PI / 2;
     float radius = m_spellInfo->Effects[effIndex].CalcRadius(m_caster) * m_spellValue->RadiusMod;
 
+    if (targetType.GetTarget() == TARGET_UNIT_CONE_ENEMY_24)
+        radius += m_caster->GetLeewayBonusRadius();
+
     if (uint32 containerTypeMask = GetSearcherTypeMask(objectType, condList))
     {
         Acore::WorldObjectSpellConeTargetCheck check(coneAngle, radius, m_caster, m_spellInfo, selectionType, condList);
@@ -1315,6 +1318,10 @@ void Spell::SelectImplicitAreaTargets(SpellEffIndex effIndex, SpellImplicitTarge
     // Xinef: the distance should be increased by caster size, it is neglected in latter calculations
     std::list<WorldObject*> targets;
     float radius = m_spellInfo->Effects[effIndex].CalcRadius(m_caster) * m_spellValue->RadiusMod;
+
+    if (targetType.GetTarget() == TARGET_UNIT_SRC_AREA_ENEMY || targetType.GetTarget() == TARGET_UNIT_CASTER_AREA_PARTY)
+        radius += m_caster->GetLeewayBonusRadius();
+
     SearchAreaTargets(targets, radius, center, referer, targetType.GetObjectType(), targetType.GetCheckType(), m_spellInfo->Effects[effIndex].ImplicitTargetConditions, Acore::WorldObjectSpellAreaTargetSearchReason::Area);
 
     CallScriptObjectAreaTargetSelectHandlers(targets, effIndex, targetType);
@@ -7068,8 +7075,9 @@ SpellCastResult Spell::CheckRange(bool strict)
             if (range_type == SPELL_RANGE_MELEE)
             {
                 float real_max_range = max_range;
-                if (!m_caster->IsCreature() && m_caster->HasLeewayMovement() && target->HasLeewayMovement())
-                    real_max_range -= MIN_MELEE_REACH; // Because of lag, we can not check too strictly here (is only used if both caster and target are moving)
+
+                if (m_caster->GetLeewayBonusRange(target, false) > 0.0f)
+                    real_max_range -= MIN_MELEE_REACH; // less strict when leeway applies
                 else
                     real_max_range -= 2 * MIN_MELEE_REACH;
 
@@ -7104,7 +7112,7 @@ SpellCastResult Spell::CheckRange(bool strict)
 
     if (m_targets.HasDst() && !m_targets.HasTraj())
     {
-        if (!m_caster->IsWithinDist3d(m_targets.GetDstPos(), max_range))
+        if (!m_caster->IsWithinDist3d(m_targets.GetDstPos(), max_range + m_caster->GetLeewayBonusRadius()))
             return SPELL_FAILED_OUT_OF_RANGE;
         if (min_range && m_caster->IsWithinDist3d(m_targets.GetDstPos(), min_range))
             return SPELL_FAILED_TOO_CLOSE;

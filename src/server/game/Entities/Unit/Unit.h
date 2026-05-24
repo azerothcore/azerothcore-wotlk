@@ -1727,18 +1727,13 @@ public:
                              UNIT_STATE_ROOT | UNIT_STATE_STUNNED | UNIT_STATE_DISTRACTED) && !GetOwnerGUID();
     }
 
-    [[nodiscard]] bool HasLeewayMovement() const
-    {
-         return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_STRAFE_LEFT | MOVEMENTFLAG_STRAFE_RIGHT | MOVEMENTFLAG_FALLING)
-                && !IsWalking();
-    }
-
     void KnockbackFrom(float x, float y, float speedXY, float speedZ);
     void JumpTo(float speedXY, float speedZ, bool forward = true);
     void JumpTo(WorldObject* obj, float speedZ);
 
     void  UpdateSpeed(UnitMoveType mtype, bool forced);
     [[nodiscard]] float GetSpeed(UnitMoveType mtype) const;
+    [[nodiscard]] float GetXZFlagBasedSpeed() const;
     [[nodiscard]] float GetSpeedRate(UnitMoveType mtype) const { return m_speed_rate[mtype]; }
     void SetSpeed(UnitMoveType mtype, float rate, bool forced = false);
     void SetSpeedRate(UnitMoveType mtype, float rate) { m_speed_rate[mtype] = rate; }
