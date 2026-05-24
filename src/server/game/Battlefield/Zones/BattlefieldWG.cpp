@@ -348,6 +348,9 @@ void BattlefieldWG::CapturePointTaken(uint32 areaId)
 
 void BattlefieldWG::OnBattleEnd(bool endByTimer)
 {
+    // Must be set before SPELL_VICTORY_REWARD so the 1755 criterion can gate on it.
+    LastBattleAttackerVictory = !endByTimer;
+
     // Remove relic
     if (GameObject* go = GetRelic())
         go->RemoveFromWorld();

@@ -47,6 +47,9 @@ public:
     Battlefield* GetBattlefieldToZoneId(uint32 zoneId);
     Battlefield* GetBattlefieldByBattleId(uint32 battleId);
 
+    // True iff the most recent Wintergrasp battle ended with the keep captured.
+    [[nodiscard]] bool IsWintergraspAttackerVictory();
+
     ZoneScript* GetZoneScript(uint32 zoneId);
 
     void AddZone(uint32 zoneId, Battlefield* handle);
