@@ -7970,7 +7970,7 @@ INSERT INTO `item_template_locale` (`ID`, `locale`, `Name`, `Description`, `Veri
 (1061,'frFR','Tablette d''Annuler poison II',NULL,0),
 (1063,'frFR','Tablette d''Annuler maladie II',NULL,0),
 (1072,'frFR','Bouteille de tord-boyaux pleine',NULL,0),
-(1078,'frFR','Deprecated Writ of Lakeshire','Porte la signature de l''honorable magistrat Salomon.',0),
+(1078,'frFR',NULL,'Porte la signature de l''honorable magistrat Salomon.',0),
 (1084,'frFR','Codex de Rénovation',NULL,0);
 
 DELETE FROM `item_template_locale` WHERE `ID` IN(1085,1086,1087,1088,1089,1090,1091,1092,1093,1095,1096,1100,1101,1102,1105,1108,1109,1111,1112,1119) AND `locale` = 'frFR';
@@ -7998,10 +7998,10 @@ INSERT INTO `item_template_locale` (`ID`, `locale`, `Name`, `Description`, `Veri
 
 DELETE FROM `item_template_locale` WHERE `ID` IN(1122,1123,1124,1125,1133,1134,1136,1138,1139,1141,1144,1146,1149,1150,1151,1164,1176,1199,1216,1224) AND `locale` = 'frFR';
 INSERT INTO `item_template_locale` (`ID`, `locale`, `Name`, `Description`, `VerifiedBuild`) VALUES
-(1122,'frFR','Deprecated Amulet of the White Stallion','Invoque un Étalon blanc pour vous servir de monture.',0),
-(1123,'frFR','Deprecated Amulet of the Pinto','Invoque un pinto pour vous servir de monture.',0),
-(1124,'frFR','Deprecated Amulet of the Palomino','Invoque un palomino pour vous servir de monture.',0),
-(1125,'frFR','Deprecated Amulet of the Nightmare','Invoque une Cavale de cauchemar pour vous servir de monture.',0),
+(1122,'frFR',NULL,'Invoque un Étalon blanc pour vous servir de monture.',0),
+(1123,'frFR',NULL,'Invoque un pinto pour vous servir de monture.',0),
+(1124,'frFR',NULL,'Invoque un palomino pour vous servir de monture.',0),
+(1125,'frFR',NULL,'Invoque une Cavale de cauchemar pour vous servir de monture.',0),
 (1133,'frFR','Cor du loup blanc',NULL,0),
 (1134,'frFR','Cor du loup gris',NULL,0),
 (1136,'frFR','Libram : Faveur divine II',NULL,0),
@@ -8033,19 +8033,19 @@ INSERT INTO `item_template_locale` (`ID`, `locale`, `Name`, `Description`, `Veri
 (1246,'frFR','Grimoire de Respiration démoniaque',NULL,0),
 (1250,'frFR','Grimoire de Détection de l''invisibilité inférieure',NULL,0),
 (1255,'frFR','Deprecated Conjured Mana Gem',NULL,0),
-(1323,'frFR','Deprecated [PH] Recipe: Broiled Sunfish','Ce sera une recette de cuisine.',0),
+(1323,'frFR',NULL,'Ce sera une recette de cuisine.',0),
 (1328,'frFR','Livre de Lucioles',NULL,0),
 (1332,'frFR','Livre de Guérison du poison',NULL,0),
 (1334,'frFR','Livre de Récupération II',NULL,0),
 (1339,'frFR','Livre de Sarments',NULL,0),
 (1341,'frFR','Livre d''Eclat lunaire',NULL,0),
-(1350,'frFR','Deprecated Hex Doll','De nombreux sorts sont cousus sur cette poupée de chiffon.',0),
+(1350,'frFR',NULL,'De nombreux sorts sont cousus sur cette poupée de chiffon.',0),
 (1400,'frFR','Insigne plumevive',NULL,0);
 
 DELETE FROM `item_template_locale` WHERE `ID` IN(1402,1492,1500,1534,1536,1554,1559,1567,1568,1571,1574,1588,1589,1591,1597,1599,1603,1619,1623,1641) AND `locale` = 'frFR';
 INSERT INTO `item_template_locale` (`ID`, `locale`, `Name`, `Description`, `VerifiedBuild`) VALUES
 (1402,'frFR','Soufre',NULL,0),
-(1492,'frFR','Deprecated Recipe: Murloc Fin Soup','Ce sera une recette de cuisine.',0),
+(1492,'frFR',NULL,'Ce sera une recette de cuisine.',0),
 (1500,'frFR','Totem maître','Ce totem représente l''air, la terre, le feu et l''eau.',0),
 (1534,'frFR','Libram : Lumière sacrée IV',NULL,0),
 (1536,'frFR','Libram : Sceau de courroux',NULL,0),
@@ -8059,7 +8059,7 @@ INSERT INTO `item_template_locale` (`ID`, `locale`, `Name`, `Description`, `Veri
 (1589,'frFR','Tablette d''Armure spirituelle III',NULL,0),
 (1591,'frFR','Tablette de Bouclier de foudre III',NULL,0),
 (1597,'frFR','Tablette de Tempête de foudre',NULL,0),
-(1599,'frFR','Deprecated [PH] Recipe: Zombie Juice','Ce sera une recette de cuisine.',0),
+(1599,'frFR',NULL,'Ce sera une recette de cuisine.',0),
 (1603,'frFR','Tablette d''Appel des esprits II',NULL,0),
 (1619,'frFR','Tablette de Tempête de foudre II',NULL,0),
 (1623,'frFR','Sacoche en peau de raptor',NULL,0),
@@ -8079,7 +8079,7 @@ INSERT INTO `item_template_locale` (`ID`, `locale`, `Name`, `Description`, `Veri
 (1882,'frFR','Livre d''Eclat lunaire III',NULL,0),
 (1886,'frFR','Livre d''Eclat lunaire II',NULL,0),
 (1977,'frFR','Sac à 20 emplacements',NULL,0),
-(2003,'frFR','Deprecated Big Quiver','Un grand carquois',0),
+(2003,'frFR',NULL,'Un grand carquois',0),
 (2021,'frFR','Bouclier Carapace vert',NULL,0),
 (2056,'frFR','Le Marteau de velours',NULL,0),
 (2410,'frFR','Torche fumante',NULL,0),
@@ -8093,10 +8093,10 @@ INSERT INTO `item_template_locale` (`ID`, `locale`, `Name`, `Description`, `Veri
 (2693,'frFR','OLD Stormwind Seasoning Salts',NULL,0),
 (2695,'frFR','Monster - Mace, Board with Nail Club',NULL,0),
 (2719,'frFR','Petite clé en cuivre',NULL,0),
-(2789,'frFR','Deprecated Bent Copper Lockpick','Ouvre les serrures de difficulté 25.',0),
-(2790,'frFR','Deprecated Straight Copper Lockpick','Ouvre les serrures de difficulté 50.',0),
-(2791,'frFR','Deprecated Fine Copper Lockpick','Ouvre les serrures de difficulté 75.',0),
-(2792,'frFR','Deprecated Worn Bronze Lockpick','Ouvre les serrures de difficulté 100.',0),
+(2789,'frFR',NULL,'Ouvre les serrures de difficulté 25.',0),
+(2790,'frFR',NULL,'Ouvre les serrures de difficulté 50.',0),
+(2791,'frFR',NULL,'Ouvre les serrures de difficulté 75.',0),
+(2792,'frFR',NULL,'Ouvre les serrures de difficulté 100.',0),
 (2887,'frFR','Peau de loup déchirée',NULL,0),
 (2890,'frFR','Peau de sanglier déchirée',NULL,0),
 (2895,'frFR','Douleur progressive',NULL,0),
@@ -8167,7 +8167,7 @@ INSERT INTO `item_template_locale` (`ID`, `locale`, `Name`, `Description`, `Veri
 (3146,'frFR','Grimoire d''Esprit ardent III',NULL,0),
 (3148,'frFR','Deprecated Work Shirt',NULL,0),
 (3227,'frFR','Bâton plaie-de-nuit',NULL,0),
-(3249,'frFR','Conjured test Item','Un objet pour tester les objets invoqués',0),
+(3249,'frFR',NULL,'Un objet pour tester les objets invoqués',0),
 (3259,'frFR','Peau de chauve-souris déchirée',NULL,0),
 (3278,'frFR','Epée qui produit un effet dégâts de zone',NULL,0),
 (3438,'frFR','Ankh de Résurrection',NULL,0),
@@ -8316,7 +8316,7 @@ INSERT INTO `item_template_locale` (`ID`, `locale`, `Name`, `Description`, `Veri
 (4286,'frFR','Codex de Prière de soins II',NULL,0),
 (4287,'frFR','Codex d''Annuler maladie II',NULL,0),
 (4288,'frFR','Codex de Délivrance de la malédiction II',NULL,0),
-(4620,'frFR','Deprecated Scribbled Note','Cette note en mauvais état porte des inscriptions à la craie…',0);
+(4620,'frFR',NULL,'Cette note en mauvais état porte des inscriptions à la craie…',0);
 
 DELETE FROM `item_template_locale` WHERE `ID` IN(4728,4747,4748,4756,4882,4930,4959,4966,4981,4988,5004,5005,5008,5013,5045,5049,5105,5106,5126,5127) AND `locale` = 'frFR';
 INSERT INTO `item_template_locale` (`ID`, `locale`, `Name`, `Description`, `VerifiedBuild`) VALUES
@@ -8376,7 +8376,7 @@ INSERT INTO `item_template_locale` (`ID`, `locale`, `Name`, `Description`, `Veri
 (5265,'frFR','Bière coupée',NULL,0),
 (5330,'frFR','Relique de coupe elfique',NULL,0),
 (5333,'frFR','Deprecated Mathystra Relic',NULL,0),
-(5372,'frFR','Deprecated Glowing Shrunken Skull','Les orbites de ce crâne luisent étrangement.',0),
+(5372,'frFR',NULL,'Les orbites de ce crâne luisent étrangement.',0),
 (5380,'frFR','Lettre scellée pour Elissa','Une lettre scellée pour Elissa Brise-stellaire à Auberdine.',0),
 (5381,'frFR','Lettre scellée à Balthule','Une lettre scellée pour Balthule Frappelombre.',0),
 (5396,'frFR','Clé de la gorge des Vents brûlants',NULL,0),
@@ -8470,7 +8470,7 @@ INSERT INTO `item_template_locale` (`ID`, `locale`, `Name`, `Description`, `Veri
 (5858,'frFR','Boîte à surprises gobeline','Ouvrez pour obtenir une surprise !',0),
 (5874,'frFR','Harnais : bélier noir',NULL,0),
 (5875,'frFR','Harnais : bélier bleu',NULL,0),
-(5896,'frFR','Theramore Guard Medallion UNUSED','L''estampille porte le nom de Muren Macfeere.',0),
+(5896,'frFR',NULL,'L''estampille porte le nom de Muren Macfeere.',0),
 (5916,'frFR','Clé d''appareil gnome',NULL,0),
 (5937,'frFR','Clé d''appareil gobelin',NULL,0),
 (5949,'frFR','Morceau de papier',NULL,0),
@@ -8565,7 +8565,7 @@ INSERT INTO `item_template_locale` (`ID`, `locale`, `Name`, `Description`, `Veri
 (7547,'frFR','Anneau en onyx',NULL,0),
 (7548,'frFR','Sautoir en onyx',NULL,0),
 (7550,'frFR','Honneur du guerrier',NULL,0),
-(7868,'frFR','Trousse de voleur','Invalid loot table, crashes when you modify Miscellaneous',0),
+(7868,'frFR','Trousse de voleur',NULL,0),
 (7869,'frFR','Coffret de Lucius',NULL,0),
 (7872,'frFR','Outils de voleur rouillés',NULL,0),
 (7923,'frFR','Clé de la tour défias',NULL,0),
@@ -9234,7 +9234,7 @@ INSERT INTO `item_template_locale` (`ID`, `locale`, `Name`, `Description`, `Veri
 (18316,'frFR','Colifichet en obsidienne',NULL,0),
 (18355,'frFR','Collier de Ferra',NULL,0),
 (18438,'frFR','Marque de sergent',NULL,0),
-(18593,'frFR','Thorium Brotherhood Contract (OLD)','Lié par des fils de sombrefer',0),
+(18593,'frFR',NULL,'Lié par des fils de sombrefer',0),
 (18595,'frFR','Opale de sang',NULL,0),
 (18627,'frFR','Gong de Dethmoora',NULL,0);
 
@@ -9248,7 +9248,7 @@ INSERT INTO `item_template_locale` (`ID`, `locale`, `Name`, `Description`, `Veri
 (18965,'frFR','Oeuf de tortue imbriquée',NULL,0),
 (18966,'frFR','Oeuf de tortue lyre',NULL,0),
 (18967,'frFR','Oeuf de tortue olivâtre',NULL,0),
-(19322,'frFR','zzDEPRECATED Warsong Mark of Honor','Preuve de victoire dans le goulet des Chanteguerres',0),
+(19322,'frFR',NULL,'Preuve de victoire dans le goulet des Chanteguerres',0),
 (19482,'frFR','Peau de lapin de LeCraft',NULL,0),
 (19804,'frFR','Rascasse pâle',NULL,0),
 (19989,'frFR','Tome des ombres dévorantes','Certains secrets devraient rester enfouis.',0),
@@ -9413,7 +9413,7 @@ INSERT INTO `item_template_locale` (`ID`, `locale`, `Name`, `Description`, `Veri
 (21240,'frFR','Bonbon du Voile d''hiver',NULL,0),
 (21246,'frFR','Briefing de combat I',NULL,0),
 (21247,'frFR','Briefing de combat II',NULL,0),
-(21276,'frFR','Blessed Qiraji Naturalist Staff UNUSED','L''arme est imprégnée et renforcée d''élémentium.',0),
+(21276,'frFR',NULL,'L''arme est imprégnée et renforcée d''élémentium.',0),
 (21313,'frFR','Petit sac de D''Sak',NULL,0),
 (21369,'frFR','Patron : Sac en gangrétoffe',NULL,0),
 (21575,'frFR','Chapelet de fusées violettes',NULL,0),
@@ -11437,7 +11437,7 @@ INSERT INTO `item_template_locale` (`ID`, `locale`, `Name`, `Description`, `Veri
 (30325,'frFR','Oeuf de ravageur vorace','On dirait que ce truc est prêt à éclore !',0),
 (30347,'frFR','Alexander''s Test Healthstone',NULL,0),
 (30385,'frFR','QR XXXX Plate Spell Bracer',NULL,0),
-(30427,'frFR','Naga Treasure Map - Questgiver (PH)','Un Xsss marque l''emplaccccement.',0),
+(30427,'frFR',NULL,'Un Xsss marque l''emplaccccement.',0),
 (30438,'frFR','Clé de la cache de la Légion',NULL,0),
 (30469,'frFR','Patron : Robe de flamme-du-Néant',NULL,0),
 (30470,'frFR','Patron : Ceinture de flamme-du-Néant',NULL,0),
@@ -11788,7 +11788,7 @@ INSERT INTO `item_template_locale` (`ID`, `locale`, `Name`, `Description`, `Veri
 (37711,'frFR','Test Jeton de système de monnaie 1','Un premier jeton de test pour le système de monnaie',0),
 (37738,'frFR','Une poignée de piquants','Aïe, ça pique.',0),
 (37742,'frFR','Test Jeton de système de monnaie 2','Un second jeton de test pour le système de monnaie',0),
-(37837,'frFR','Luth','TEMP Test Vendor Item',0),
+(37837,'frFR','Luth',NULL,0),
 (37838,'frFR','Flûte','TEMP Test Vendor Item',0);
 
 DELETE FROM `item_template_locale` WHERE `ID` IN(37878,37919,37946,37951,37952,37972,37973,37974,37975,37977,37978,37979,37994,37997,38009,38015,38016,38017,38018,38019) AND `locale` = 'frFR';
@@ -13105,8 +13105,8 @@ INSERT INTO `item_template_locale` (`ID`, `locale`, `Name`, `Description`, `Veri
 (3244,'frFR','OLD [Monster]- Feet, Plate Silver',NULL,0),
 (3246,'frFR','OLD [Monster] - Shoulder, Plate Silver',NULL,0),
 (3247,'frFR','OLD [Monster] - Waist, Plate Silver',NULL,0),
-(4156,'frFR','Deprecated Tome of Conjure Mana Jewel','Vous apprend Purification.',0),
-(4163,'frFR','Deprecated Libram: Seal of Fury','Vous apprend Sceau de fureur (Rang 1).',0),
+(4156,'frFR',NULL,'Vous apprend Purification.',0),
+(4163,'frFR',NULL,'Vous apprend Sceau de fureur (Rang 1).',0),
 (4750,'frFR','OLD Totem de purification de Sabot-d’hiver',NULL,0),
 (4760,'frFR','OLD Totem de purification de Corne-tonnerre',NULL,0),
 (4762,'frFR','OLD Totem de purification de Crin-sauvage',NULL,0),
@@ -13115,7 +13115,7 @@ INSERT INTO `item_template_locale` (`ID`, `locale`, `Name`, `Description`, `Veri
 (6090,'frFR','OLD Casse-tête de Noboru',NULL,0),
 (6683,'frFR','Pendentif de Tyranis (old)',NULL,0),
 (10594,'frFR',NULL,'Tableau de butin invalide, plante lorsque vous modifiez Divers',0),
-(17412,'frFR','zzOLDCodex of Prayer of Fortitude','Vous apprend Prière de robustesse (Rang 1).',0),
+(17412,'frFR',NULL,'Vous apprend Prière de robustesse (Rang 1).',0),
 (18685,'frFR','Potion des ténèbres OLD',NULL,0),
 (23418,'frFR','Test Charge de sapeur',NULL,0);
 
