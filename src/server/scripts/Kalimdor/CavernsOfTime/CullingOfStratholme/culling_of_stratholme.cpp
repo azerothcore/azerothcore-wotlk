@@ -1190,7 +1190,7 @@ public:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_ARTHAS_EXORCISM, false);
 
-                    combatEvents.Repeat(7300ms);
+                    combatEvents.Repeat(7s, 14s);
                     break;
                 case EVENT_COMBAT_HEALTH_CHECK:
                     if (HealthBelowPct(40))
@@ -1247,8 +1247,8 @@ void npc_arthas::npc_arthasAI::JustEngagedWith(Unit* /*who*/)
     DoCast(me, SPELL_ARTHAS_AURA);
 
     // Fight
-    combatEvents.ScheduleEvent(EVENT_COMBAT_EXORCISM, 2s);
-    combatEvents.ScheduleEvent(EVENT_COMBAT_HEALTH_CHECK, 2s);
+    combatEvents.RescheduleEvent(EVENT_COMBAT_EXORCISM, 7s, 14s);
+    combatEvents.RescheduleEvent(EVENT_COMBAT_HEALTH_CHECK, 2s);
 }
 
 void npc_arthas::npc_arthasAI::ReorderInstance(uint32 data)

@@ -129,17 +129,16 @@ void Battlefield::HandlePlayerLeaveZone(Player* player, uint32 /*zone*/)
     for (BfCapturePoint* cp : CapturePoints)
         cp->HandlePlayerLeave(player);
 
-    InvitedPlayers[player->GetTeamId()].erase(player->GetGUID());
-    PlayersInQueue[player->GetTeamId()].erase(player->GetGUID());
-    PlayersWillBeKick[player->GetTeamId()].erase(player->GetGUID());
-    Players[player->GetTeamId()].erase(player->GetGUID());
+    for (uint8 i = 0; i < PVP_TEAMS_COUNT; ++i)
+    {
+        InvitedPlayers[i].erase(player->GetGUID());
+        PlayersInQueue[i].erase(player->GetGUID());
+        PlayersWillBeKick[i].erase(player->GetGUID());
+        Players[i].erase(player->GetGUID());
+    }
     SendRemoveWorldStates(player);
     RemovePlayerFromResurrectQueue(player->GetGUID());
     OnPlayerLeaveZone(player);
-    // Scripts must restore player->GetTeamId() here (e.g. ClearFakePlayer).
-    // All Battlefield data-structure cleanup above has already completed using
-    // the assigned team, so it is safe to restore the real team now.
-    sScriptMgr->OnBattlefieldPlayerLeaveZone(this, player);
 }
 
 bool Battlefield::Update(uint32 diff)
@@ -379,7 +378,10 @@ void Battlefield::DoPlaySoundToAll(uint32 soundId)
 
 bool Battlefield::HasPlayer(Player* player) const
 {
-    return Players[player->GetTeamId()].find(player->GetGUID()) != Players[player->GetTeamId()].end();
+    for (uint8 i = 0; i < PVP_TEAMS_COUNT; ++i)
+        if (Players[i].count(player->GetGUID()))
+            return true;
+    return false;
 }
 
 // Called in WorldSession::HandleBfQueueInviteResponse
