@@ -133,6 +133,7 @@ enum Events
     EVENT_UNBOUND_PLAGUE,
     EVENT_MALLEABLE_GOO,
     EVENT_CHOKING_GAS_BOMB,
+    EVENT_MUTATED_PLAGUE,
 };
 
 #define EVENT_GROUP_ABILITIES 1
@@ -209,7 +210,7 @@ public:
 
     bool operator()(Unit const* target) const
     {
-        if (!me || !target || !target->IsPlayer() || target == me->GetThreatMgr().GetCurrentVictim())
+        if (!me || !target || !target->IsPlayer() || target == me->GetThreatMgr().GetLastVictim())
             return false;
 
         if (me->IsWithinCombatRange(target, 7.0f))
@@ -653,6 +654,11 @@ public:
                     me->CastSpell(me, SPELL_CHOKING_GAS_BOMB, false);
                     events.ScheduleEvent(EVENT_CHOKING_GAS_BOMB, 35s, 40s, EVENT_GROUP_ABILITIES);
                     break;
+                case EVENT_MUTATED_PLAGUE:
+                    if (Unit* target = me->GetVictim())
+                        me->CastSpell(target, SPELL_MUTATED_PLAGUE, false);
+                    events.ScheduleEvent(EVENT_MUTATED_PLAGUE, 10s, EVENT_GROUP_ABILITIES);
+                    break;
                 default:
                     break;
             }
@@ -721,6 +727,7 @@ public:
                 case 2:
                     _phase = 3;
                     events.CancelEvent(EVENT_UNSTABLE_EXPERIMENT);
+                    events.ScheduleEvent(EVENT_MUTATED_PLAGUE, 10s, EVENT_GROUP_ABILITIES);
                     break;
                 default:
                     break;
@@ -1522,11 +1529,37 @@ class spell_putricide_regurgitated_ooze : public SpellScript
     }
 };
 
+// 71770 - Ooze Tank Protection
+class spell_putricide_ooze_tank_protection : public AuraScript
+{
+    PrepareAuraScript(spell_putricide_ooze_tank_protection);
+
+    bool Validate(SpellInfo const* spellInfo) override
+    {
+        return ValidateSpellInfo({ spellInfo->Effects[EFFECT_0].TriggerSpell, spellInfo->Effects[EFFECT_1].TriggerSpell });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        Unit* actionTarget = eventInfo.GetActionTarget();
+        actionTarget->CastSpell(nullptr, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true, nullptr, aurEff);
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_putricide_ooze_tank_protection::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+        OnEffectProc += AuraEffectProcFn(spell_putricide_ooze_tank_protection::HandleProc, EFFECT_1, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_boss_professor_putricide()
 {
     new boss_professor_putricide();
     new npc_volatile_ooze();
     new npc_gas_cloud();
+    RegisterSpellScript(spell_putricide_ooze_tank_protection);
     RegisterSpellScript(spell_putricide_slime_puddle);
     RegisterSpellScript(spell_putricide_slime_puddle_spawn);
     RegisterSpellScript(spell_putricide_grow_stacker_aura);

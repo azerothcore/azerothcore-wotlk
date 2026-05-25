@@ -130,6 +130,12 @@ public:
             if (!UpdateVictim())
                 return;
 
+            if (!CheckInRoom())
+            {
+                EnterEvadeMode(EVADE_REASON_BOUNDARY);
+                return;
+            }
+
             events.Update(diff);
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
@@ -159,9 +165,9 @@ public:
             DoMeleeAttackIfReady();
         }
 
-        bool CheckEvadeIfOutOfCombatArea() const override
+        bool CheckInRoom() override
         {
-            return me->GetHomePosition().GetExactDist2d(me) > 60.0f;
+            return (me->GetPositionY() >= -700.0f && me->GetPositionY() <= -628.0f);
         }
 
     private:

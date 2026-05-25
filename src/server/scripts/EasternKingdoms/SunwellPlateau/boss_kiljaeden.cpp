@@ -126,10 +126,6 @@ struct npc_kiljaeden_controller : public NullCreatureAI
     npc_kiljaeden_controller(Creature* creature) : NullCreatureAI(creature), summons(me)
     {
         instance = creature->GetInstanceScript();
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
     }
 
     void ResetOrbs()
@@ -233,11 +229,6 @@ struct boss_kiljaeden : public BossAI
     boss_kiljaeden(Creature* creature) : BossAI(creature, DATA_KILJAEDEN)
     {
         me->SetReactState(REACT_PASSIVE);
-
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
     }
 
     void InitializeAI() override

@@ -49,7 +49,7 @@ constexpr auto HOUR = MINUTE * 60;
 constexpr auto DAY = HOUR * 24;
 constexpr auto WEEK = DAY * 7;
 constexpr auto MONTH = DAY * 30;
-constexpr auto YEAR = MONTH * 12;
+constexpr auto YEAR = DAY * 365;
 constexpr auto IN_MILLISECONDS = 1000;
 
 enum AccountTypes

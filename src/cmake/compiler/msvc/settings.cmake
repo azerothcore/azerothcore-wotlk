@@ -36,6 +36,11 @@ target_compile_options(acore-compile-option-interface
     INTERFACE
       /utf-8)
 
+target_compile_options(acore-compile-option-interface
+    INTERFACE
+      /Zc:preprocessor)
+message(STATUS "MSVC: Enabled standard conforming preprocessor")
+
 if(PLATFORM EQUAL 64)
   # This definition is necessary to work around a bug with Intellisense described
   # here: http://tinyurl.com/2cb428.  Syntax highlighting is important for proper
@@ -57,19 +62,6 @@ else()
     INTERFACE
       /arch:SSE2)
   message(STATUS "MSVC: Enabled SSE2 support")
-endif()
-
-# Set build-directive (used in core to tell which buildtype we used)
-# msbuild/devenv don't set CMAKE_MAKE_PROGRAM, you can choose build type from a dropdown after generating projects
-if("${CMAKE_MAKE_PROGRAM}" MATCHES "MSBuild")
-  target_compile_definitions(acore-compile-option-interface
-    INTERFACE
-      -D_BUILD_DIRECTIVE="$(ConfigurationName)")
-else()
-  # while all make-like generators do (nmake, ninja)
-  target_compile_definitions(acore-compile-option-interface
-    INTERFACE
-      -D_BUILD_DIRECTIVE="${CMAKE_BUILD_TYPE}")
 endif()
 
 # multithreaded compiling on VS

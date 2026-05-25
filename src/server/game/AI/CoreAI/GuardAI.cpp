@@ -33,7 +33,6 @@ GuardAI::GuardAI(Creature* creature) : ScriptedAI(creature)
 void GuardAI::Reset()
 {
     ScriptedAI::Reset();
-    me->CastSpell(me, 18950 /*SPELL_INVISIBILITY_AND_STEALTH_DETECTION*/, true);
 }
 
 void GuardAI::EnterEvadeMode(EvadeReason /*why*/)

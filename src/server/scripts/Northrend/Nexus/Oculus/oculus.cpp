@@ -817,7 +817,8 @@ class spell_oculus_rider_aura : public AuraScript
                 _drakeGUID = drake->GetGUID();
                 caster->AddAura(SPELL_DRAKE_FLAG_VISUAL, caster);
                 caster->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                caster->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
+                if (caster->IsInDisallowedMountForm())
+                    caster->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
                 drake->CastSpell(drake, SPELL_SOAR_TRIGGER);
                 if (drake->GetEntry() == NPC_RUBY_DRAKE)
                     drake->CastSpell(drake, SPELL_RUBY_EVASIVE_AURA);

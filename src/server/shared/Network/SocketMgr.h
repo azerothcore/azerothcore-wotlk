@@ -19,6 +19,7 @@
 #define SocketMgr_h__
 
 #include "AsyncAcceptor.h"
+#include "Config.h"
 #include "Errors.h"
 #include "NetworkThread.h"
 #include <boost/asio/ip/tcp.hpp>
@@ -42,7 +43,8 @@ public:
         std::unique_ptr<AsyncAcceptor> acceptor;
         try
         {
-            acceptor = std::make_unique<AsyncAcceptor>(ioContext, bindIp, port);
+            bool supportSocketActivation = sConfigMgr->GetOption<bool>("Network.UseSocketActivation", false);
+            acceptor = std::make_unique<AsyncAcceptor>(ioContext, bindIp, port, supportSocketActivation);
         }
         catch (boost::system::system_error const& err)
         {
@@ -89,7 +91,7 @@ public:
             _threads[i].Wait();
     }
 
-    virtual void OnSocketOpen(tcp::socket&& sock, uint32 threadIndex)
+    virtual void OnSocketOpen(IoContextTcpSocket&& sock, uint32 threadIndex)
     {
         try
         {
@@ -115,7 +117,7 @@ public:
         return min;
     }
 
-    std::pair<tcp::socket*, uint32> GetSocketForAccept()
+    std::pair<IoContextTcpSocket*, uint32> GetSocketForAccept()
     {
         uint32 threadIndex = SelectThreadWithMinConnections();
         return { _threads[threadIndex].GetSocketForAccept(), threadIndex };

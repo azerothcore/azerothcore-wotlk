@@ -1,6 +1,7 @@
 name: PR Labeler
 on:
-  - pull_request_target
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review] # Ready for Review = Draft to Live PR
 
 jobs:
   triage:
@@ -15,4 +16,4 @@ jobs:
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           configuration-path: .github/labeler.yml
-          sync-labels: true
+          sync-labels: false # true = Removes ALL current labels before adding the labels | false = Only adds the Labels

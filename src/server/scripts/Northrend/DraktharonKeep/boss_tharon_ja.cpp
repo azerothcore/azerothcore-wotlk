@@ -59,7 +59,6 @@ enum Misc
     EVENT_SPELL_EYE_BEAM                = 4,
     EVENT_SPELL_LIGHTNING_BREATH        = 5,
     EVENT_SPELL_POISON_CLOUD            = 6,
-    EVENT_SPELL_TURN_FLESH              = 7,
     EVENT_TURN_FLESH_REAL               = 9,
     EVENT_TURN_BONES_REAL               = 10,
     EVENT_KILL_TALK                     = 11
@@ -77,9 +76,7 @@ public:
 
     struct boss_tharon_jaAI : public BossAI
     {
-        boss_tharon_jaAI(Creature* creature) : BossAI(creature, DATA_THARON_JA)
-        {
-        }
+        boss_tharon_jaAI(Creature* creature) : BossAI(creature, DATA_THARON_JA) { }
 
         void Reset() override
         {
@@ -88,15 +85,23 @@ public:
             me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK_DEST, true);
             me->SetDisplayId(me->GetNativeDisplayId());
             me->CastSpell(me, SPELL_CLEAR_GIFT, true);
+
+            ScheduleHealthCheckEvent(55, [&] {
+                Talk(SAY_FLESH);
+                me->GetThreatMgr().ResetAllThreat();
+                me->CastSpell((Unit*)nullptr, SPELL_TURN_FLESH, false);
+
+                events.Reset();
+                events.ScheduleEvent(EVENT_TURN_FLESH_REAL, 3s);
+            }, false);
         }
 
         void JustEngagedWith(Unit* who) override
         {
             Talk(SAY_AGGRO);
             BossAI::JustEngagedWith(who);
-            events.ScheduleEvent(EVENT_SPELL_CURSE_OF_LIFE, 5s);
-            events.ScheduleEvent(EVENT_SPELL_SHADOW_VOLLEY, 8s, 10s);
-            events.ScheduleEvent(EVENT_SPELL_TURN_FLESH, 1s);
+            events.ScheduleEvent(EVENT_SPELL_CURSE_OF_LIFE, 13s, 24s);
+            events.ScheduleEvent(EVENT_SPELL_SHADOW_VOLLEY, 6s, 29s);
         }
 
         void KilledUnit(Unit* /*victim*/) override
@@ -144,24 +149,11 @@ public:
             {
                 case EVENT_SPELL_CURSE_OF_LIFE:
                     DoCastRandomTarget(SPELL_CURSE_OF_LIFE, 0, 30.0f, false);
-                    events.ScheduleEvent(EVENT_SPELL_CURSE_OF_LIFE, 13s);
+                    events.ScheduleEvent(EVENT_SPELL_CURSE_OF_LIFE, 11s, 28s);
                     break;
                 case EVENT_SPELL_SHADOW_VOLLEY:
                     DoCastAOE(SPELL_SHADOW_VOLLEY);
-                    events.ScheduleEvent(EVENT_SPELL_SHADOW_VOLLEY, 9s);
-                    break;
-                case EVENT_SPELL_TURN_FLESH:
-                    if (me->HealthBelowPct(50))
-                    {
-                        Talk(SAY_FLESH);
-                        me->GetThreatMgr().ResetAllThreat();
-                        me->CastSpell((Unit*)nullptr, SPELL_TURN_FLESH, false);
-
-                        events.Reset();
-                        events.ScheduleEvent(EVENT_TURN_FLESH_REAL, 3s);
-                        return;
-                    }
-                    events.ScheduleEvent(EVENT_SPELL_TURN_FLESH, 1s);
+                    events.ScheduleEvent(EVENT_SPELL_SHADOW_VOLLEY, 6s, 29s);
                     break;
                 case EVENT_TURN_FLESH_REAL:
                     DoCastSelf(SPELL_DUMMY, true);
