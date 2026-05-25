@@ -17,7 +17,6 @@
 
 #include "DisableMgr.h"
 #include "GameEventMgr.h"
-#include "MMapFactory.h"
 #include "ObjectMgr.h"
 #include "OutdoorPvP.h"
 #include "Player.h"
@@ -388,30 +387,39 @@ bool DisableMgr::IsDisabledFor(DisableType type, uint32 entry, Unit const* unit,
             }
         case DISABLE_TYPE_MAP:
         case DISABLE_TYPE_LFG_MAP:
-            if (Player const* player = unit->ToPlayer())
+        {
+            MapEntry const* mapEntry = sMapStore.LookupEntry(entry);
+            if (!mapEntry)
+                return false;
+
+            if (!mapEntry->IsDungeon())
+                return mapEntry->map_type == MAP_COMMON;
+
+            uint8 disabledModes = itr->second.flags;
+
+            Difficulty targetDifficulty;
+            if (unit && unit->IsPlayer())
+                targetDifficulty = unit->ToPlayer()->GetDifficulty(mapEntry->IsRaid());
+            else
+                targetDifficulty = Difficulty(flags);
+
+            GetDownscaledMapDifficultyData(entry, targetDifficulty);
+
+            switch (targetDifficulty)
             {
-                MapEntry const* mapEntry = sMapStore.LookupEntry(entry);
-                if (mapEntry->IsDungeon())
-                {
-                    uint8 disabledModes = itr->second.flags;
-                    Difficulty targetDifficulty = player->GetDifficulty(mapEntry->IsRaid());
-                    GetDownscaledMapDifficultyData(entry, targetDifficulty);
-                    switch (targetDifficulty)
-                    {
-                        case DUNGEON_DIFFICULTY_NORMAL:
-                            return disabledModes & DUNGEON_STATUSFLAG_NORMAL;
-                        case DUNGEON_DIFFICULTY_HEROIC:
-                            return disabledModes & DUNGEON_STATUSFLAG_HEROIC;
-                        case RAID_DIFFICULTY_10MAN_HEROIC:
-                            return disabledModes & RAID_STATUSFLAG_10MAN_HEROIC;
-                        case RAID_DIFFICULTY_25MAN_HEROIC:
-                            return disabledModes & RAID_STATUSFLAG_25MAN_HEROIC;
-                    }
-                }
-                else if (mapEntry->map_type == MAP_COMMON)
-                    return true;
+                case DUNGEON_DIFFICULTY_NORMAL:
+                    return disabledModes & DUNGEON_STATUSFLAG_NORMAL;
+                case DUNGEON_DIFFICULTY_HEROIC:
+                    return disabledModes & DUNGEON_STATUSFLAG_HEROIC;
+                case RAID_DIFFICULTY_10MAN_HEROIC:
+                    return disabledModes & RAID_STATUSFLAG_10MAN_HEROIC;
+                case RAID_DIFFICULTY_25MAN_HEROIC:
+                    return disabledModes & RAID_STATUSFLAG_25MAN_HEROIC;
+                default:
+                    return false;
             }
             return false;
+        }
         case DISABLE_TYPE_VMAP:
             return flags & itr->second.flags;
         case DISABLE_TYPE_QUEST:
@@ -439,5 +447,17 @@ bool DisableMgr::IsPathfindingEnabled(Map const* map)
     if (!map)
         return false;
 
-    return !MMAP::MMapFactory::forbiddenMaps[map->GetId()] && (sWorld->getBoolConfig(CONFIG_ENABLE_MMAPS) ? true : map->IsBattlegroundOrArena());
+    // Still not an ideal solution but removes the extra awful forbiddenMaps hack
+    // int32 f[] = {616 /*EoE*/, 649 /*ToC25*/, 650 /*ToC5*/, -1};
+    switch (map->GetId())
+    {
+    case 616: // EoE
+    case 649: // ToC25
+    case 650: // ToC5
+        return false;
+    default:
+        break;
+    }
+
+    return (sWorld->getBoolConfig(CONFIG_ENABLE_MMAPS) ? true : map->IsBattlegroundOrArena());
 }

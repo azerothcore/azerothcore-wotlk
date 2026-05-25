@@ -1000,7 +1000,8 @@ struct npc_akama_illidan : public ScriptedAI
     void JustReachedHome() override
     {
         // Minions Event
-        if (instance->GetBossState(DATA_ILLIDAN_STORMRAGE) == IN_PROGRESS && !instance->GetCreature(DATA_ILLIDAN_STORMRAGE)->HasAura(SPELL_DEATH))
+        Creature* illidan = instance->GetCreature(DATA_ILLIDAN_STORMRAGE);
+        if (illidan && instance->GetBossState(DATA_ILLIDAN_STORMRAGE) == IN_PROGRESS && !illidan->HasAura(SPELL_DEATH))
         {
             me->SetReactState(REACT_PASSIVE);
             me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
@@ -1100,16 +1101,29 @@ struct npc_maiev_illidan : public ScriptedAI
         instance = creature->GetInstanceScript();
     }
 
+    bool _outroActive{ false };
+
     void Reset() override
     {
+        if (_outroActive)
+            return;
         scheduler.CancelAll();
-        me->m_Events.KillAllEvents(true);
+        me->m_Events.KillAllEvents(false);
+    }
+
+    void JustExitedCombat() override
+    {
+        EngagementOver();
+        if (_outroActive)
+            return;
+        EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
     }
 
     void DoAction(int32 param) override
     {
         if (param == ACTION_MAIEV_ENDING)
         {
+            _outroActive = true;
             scheduler.CancelAll();
             me->SetReactState(REACT_PASSIVE);
             DoStopAttack();

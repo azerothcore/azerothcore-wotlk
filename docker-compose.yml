@@ -16,9 +16,7 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=${DOCKER_DB_ROOT_PASSWORD:-password}
     volumes:
-      - type: volume
-        source: ac-database
-        target: /var/lib/mysql
+      - ${DOCKER_VOL_DB:-ac-database}:/var/lib/mysql
     restart: unless-stopped
     healthcheck:
       test: "/usr/bin/mysql --user=root --password=$$MYSQL_ROOT_PASSWORD --execute \"SHOW DATABASES;\""

@@ -20,7 +20,7 @@
 
 #include "Define.h"
 #include "Position.h"
-#include "TemporarySummon.h"
+#include "Timer.h"
 #include <vector>
 
 constexpr auto CINEMATIC_UPDATEDIFF = 500;
@@ -31,31 +31,27 @@ struct FlyByCamera;
 
 class AC_GAME_API CinematicMgr
 {
-    friend class Player;
 public:
-    explicit CinematicMgr(Player* playerref);
-    ~CinematicMgr();
+    explicit CinematicMgr(Player& player);
+    ~CinematicMgr() = default;
 
     // Cinematic camera data and remote sight functions
-    uint32 GetActiveCinematicCamera() const { return m_activeCinematicCameraId; }
-    void SetActiveCinematicCamera(uint32 cinematicCameraId = 0) { m_activeCinematicCameraId = cinematicCameraId; }
-    bool IsOnCinematic() const { return (m_cinematicCamera != nullptr); }
-    void BeginCinematic();
+    void StartCinematic(uint32 const cinematicSequenceId);
+    uint32 GetActiveCinematicCamera() const { return _activeCinematicCameraId; }
+    void SetActiveCinematicCamera(uint32 cinematicCameraId = 0) { _activeCinematicCameraId = cinematicCameraId; }
+    bool IsOnCinematic() const { return (_cinematicCamera != nullptr); }
+    void StartCinematicCamera();
     void EndCinematic();
-    void UpdateCinematicLocation(uint32 diff);
+    void UpdateCinematic(uint32 const diff);
+    Position const& GetRemoteSightPosition() const { return _remoteSightPosition; }
 
 private:
-    // Remote location information
-    Player*     player;
-
-protected:
-    uint32      m_cinematicDiff;
-    uint32      m_lastCinematicCheck;
-    uint32      m_activeCinematicCameraId;
-    uint32      m_cinematicLength;
-    std::vector<FlyByCamera> const* m_cinematicCamera;
-    Position    m_remoteSightPosition;
-    TempSummon*   m_CinematicObject;
+    Player&         _player;
+    uint32          _cinematicDiff;
+    uint32          _activeCinematicCameraId;
+    std::vector<FlyByCamera> const* _cinematicCamera;
+    Position        _remoteSightPosition;
+    IntervalTimer   _cinematicUpdateTimer;
 };
 
 #endif
