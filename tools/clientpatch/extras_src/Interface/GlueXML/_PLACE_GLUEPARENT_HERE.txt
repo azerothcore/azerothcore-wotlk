@@ -1,0 +1,26 @@
+Drop your client-extracted stock GlueParent.lua in this directory.
+
+Where to get it:
+  Open Ladik's MPQ Editor.
+  Open WoW/Data/interface.MPQ (or WoW/Data/enUS/locale-enUS.MPQ on a
+  localized client) and browse to:
+    Interface\GlueXML\GlueParent.lua
+  Extract it next to this file as:
+    extras_src/Interface/GlueXML/GlueParent.lua
+
+Why a .lua and not the .xml:
+  Earlier attempts patched GlueParent.xml to add a second <Script>
+  directive that loaded a brand-new BlackRoseLogin.lua. That tripped
+  "Your login interface files are corrupt please reinstall the game"
+  - either the glue XML parser only accepts one <Script> per <Ui>,
+  or the client rejects new Lua files that appear at glue-system
+  paths. So the safest move is to NOT modify any glue XML and to NOT
+  introduce any new file at a glue-system path. Instead, the patcher
+  appends our overlay code onto your stock GlueParent.lua (which is
+  loaded by the unmodified GlueParent.xml's existing <Script> tag).
+
+  GlueParent.xml is no longer touched at all; the file you previously
+  extracted as GlueParent.xml is no longer used and can be deleted.
+
+  This entire directory is gitignored so we never check in
+  copyrighted Blizzard content.

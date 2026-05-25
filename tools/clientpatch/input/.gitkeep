@@ -1,0 +1,4 @@
+Drop the base client DBCs here under DBFilesClient/ before running:
+    python3 ../build_patch.py merge
+
+See ../README.md for extraction instructions.
