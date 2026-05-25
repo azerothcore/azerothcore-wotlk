@@ -428,7 +428,7 @@ public:
 
     struct npc_mageguard_dalaranAI : public ScriptedAI
     {
-        npc_mageguard_dalaranAI(Creature* creature) : ScriptedAI(creature)
+        explicit npc_mageguard_dalaranAI(Creature* creature) : ScriptedAI(creature)
         {
             creature->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
             creature->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_NORMAL, true);
@@ -447,6 +447,9 @@ public:
                 return;
 
             if (!me->IsWithinDist(who, 5.0f, false))
+                return;
+
+            if (who->IsCreature() && who->GetCreatureType() == CREATURE_TYPE_NON_COMBAT_PET)
                 return;
 
             Player* player = who->GetCharmerOrOwnerPlayerOrPlayerItself();
@@ -484,7 +487,6 @@ public:
                     break;
             }
             me->SetOrientation(me->GetHomePosition().GetOrientation());
-            return;
         }
 
         void UpdateAI(uint32 /*diff*/) override {}
@@ -524,6 +526,7 @@ struct npc_minigob_manabonk : public ScriptedAI
     void Reset() override
     {
         me->SetVisible(false);
+        playerGUID.Clear();
         events.ScheduleEvent(EVENT_SELECT_TARGET, 1s);
     }
 
@@ -577,6 +580,11 @@ struct npc_minigob_manabonk : public ScriptedAI
                 case EVENT_POLYMORPH:
                     if (Player* player = ObjectAccessor::GetPlayer(*me, playerGUID))
                     {
+                        if (player->IsGameMaster())
+                        {
+                            me->DespawnOrUnsummon();
+                            return;
+                        }
                         DoCast(player, SPELL_MANABONKED);
                         SendMailToPlayer(player);
                     }

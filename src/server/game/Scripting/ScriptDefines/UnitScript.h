@@ -33,9 +33,6 @@ enum UnitHook
     UNITHOOK_ON_AURA_APPLY,
     UNITHOOK_ON_AURA_REMOVE,
     UNITHOOK_IF_NORMAL_REACTION,
-    UNITHOOK_IS_NEEDMOD_SPELL_DAMAGE_PERCENT,
-    UNITHOOK_IS_NEEDMOD_MELEE_DAMAGE_PERCENT,
-    UNITHOOK_IS_NEEDMOD_HEAL_PERCENT,
     UNITHOOK_CAN_SET_PHASE_MASK,
     UNITHOOK_IS_CUSTOM_BUILD_VALUES_UPDATE,
     UNITHOOK_SHOULD_TRACK_VALUES_UPDATE_POS_BY_INDEX,
@@ -88,12 +85,6 @@ public:
     virtual void OnAuraRemove(Unit* /*unit*/, AuraApplication* /*aurApp*/, AuraRemoveMode /*mode*/) { }
 
     [[nodiscard]] virtual bool IfNormalReaction(Unit const* /*unit*/, Unit const* /*target*/, ReputationRank& /*repRank*/) { return true; }
-
-    [[nodiscard]] virtual bool IsNeedModSpellDamagePercent(Unit const* /*unit*/, AuraEffect* /*auraEff*/, float& /*doneTotalMod*/, SpellInfo const* /*spellProto*/) { return true; }
-
-    [[nodiscard]] virtual bool IsNeedModMeleeDamagePercent(Unit const* /*unit*/, AuraEffect* /*auraEff*/, float& /*doneTotalMod*/, SpellInfo const* /*spellProto*/) { return true; }
-
-    [[nodiscard]] virtual bool IsNeedModHealPercent(Unit const* /*unit*/, AuraEffect* /*auraEff*/, float& /*doneTotalMod*/, SpellInfo const* /*spellProto*/) { return true; }
 
     [[nodiscard]] virtual bool CanSetPhaseMask(Unit const* /*unit*/, uint32 /*newPhaseMask*/, bool /*update*/) { return true; }
 

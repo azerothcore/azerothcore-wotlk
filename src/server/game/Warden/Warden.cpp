@@ -38,9 +38,12 @@ Warden::Warden() : _session(nullptr), _checkTimer(10000/*10 sec*/), _clientRespo
 
 Warden::~Warden()
 {
-    delete[] _module->CompressedData;
-    delete _module;
-    _module = nullptr;
+    if (_module)
+    {
+        delete[] _module->CompressedData;
+        delete _module;
+        _module = nullptr;
+    }
     _initialized = false;
 }
 

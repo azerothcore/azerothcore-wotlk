@@ -172,12 +172,7 @@ private:
 struct boss_taldaram : public BossAI
 {
     boss_taldaram(Creature* pCreature) : BossAI(pCreature, DATA_PRINCE_TALDARAM), vanishDamage(0)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    {    }
 
     void InitializeAI() override
     {

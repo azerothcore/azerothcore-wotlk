@@ -415,7 +415,10 @@ namespace lfg
         proposal.cancelTime = GameTime::GetGameTime().count() + LFG_TIME_PROPOSAL;
         proposal.state = LFG_PROPOSAL_INITIATING;
         proposal.leader.Clear();
-        proposal.dungeonId = Acore::Containers::SelectRandomContainerElement(proposalDungeons);
+
+        // Filter out recently completed dungeons to prevent same dungeon in a row
+        LfgDungeonSet filteredDungeons = sLFGMgr->FilterCooldownDungeons(proposalDungeons, proposalRoles);
+        proposal.dungeonId = Acore::Containers::SelectRandomContainerElement(filteredDungeons);
 
         uint32 completedEncounters = 0;
         bool leader = false;

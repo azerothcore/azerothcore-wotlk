@@ -427,6 +427,8 @@ struct SmartEvent
         struct
         {
             uint32 eventId;
+            uint32 cooldownMin;
+            uint32 cooldownMax;
         } doAction;
 
         struct
@@ -668,8 +670,8 @@ enum SMART_ACTION
     SMART_ACTION_PLAY_ANIMKIT                       = 128,    // don't use on 3.3.5a
     SMART_ACTION_SCENE_PLAY                         = 129,    // don't use on 3.3.5a
     SMART_ACTION_SCENE_CANCEL                       = 130,    // don't use on 3.3.5a
-    SMART_ACTION_SPAWN_SPAWNGROUP                   = 131,    /// @todo: NOT SUPPORTED YET
-    SMART_ACTION_DESPAWN_SPAWNGROUP                 = 132,    /// @todo: NOT SUPPORTED YET
+    SMART_ACTION_SPAWN_SPAWNGROUP                   = 131,    // groupId, ignoreRespawn, force
+    SMART_ACTION_DESPAWN_SPAWNGROUP                 = 132,    // groupId, deleteRespawnTimes
     SMART_ACTION_RESPAWN_BY_SPAWNID                 = 133,    /// @todo: NOT SUPPORTED YET
     SMART_ACTION_INVOKER_CAST                       = 134,    // spellID, castFlags, triggerFlags, targetsLimit
     SMART_ACTION_PLAY_CINEMATIC                     = 135,    // entry
@@ -721,8 +723,12 @@ enum SMART_ACTION
     SMART_ACTION_MOVEMENT_RESUME                    = 236,    // timerOverride
     SMART_ACTION_WORLD_SCRIPT                       = 237,    // eventId, param
     SMART_ACTION_DISABLE_REWARD                     = 238,    // reputation 0/1, loot 0/1
+    SMART_ACTION_SET_ANIM_TIER                      = 239,    // animtier
+    SMART_ACTION_SET_GOSSIP_MENU                    = 240,    // gossipMenuId
+    SMART_ACTION_SUMMON_GAMEOBJECT_GROUP            = 241,    // group
+    SMART_ACTION_INC_DATA                           = 242,    // field, increment (uses aiDataSet, wipe-safe across evade)
 
-    SMART_ACTION_AC_END                             = 239,    // placeholder
+    SMART_ACTION_AC_END                             = 243,    // placeholder
 };
 
 enum class SmartActionSummonCreatureFlags
@@ -1278,6 +1284,7 @@ struct SmartAction
             uint32 pathId2;
             uint32 repeat;
             uint32 forcedMovement;
+            PathSource pathSource;
         } startClosestWaypoint;
 
         struct
@@ -1502,6 +1509,28 @@ struct SmartAction
             SAIBool reputation;
             SAIBool loot;
         } reward;
+
+        struct
+        {
+            uint32 animTier;
+        } animTier;
+
+        struct
+        {
+            uint32 gossipMenuId;
+        } setGossipMenu;
+
+        struct
+        {
+            uint32 group;
+        } gameobjectGroup;
+
+        struct
+        {
+            uint32 groupId;
+            uint32 ignoreRespawn;
+            uint32 force;
+        } groupSpawn;
     };
 };
 
@@ -1560,8 +1589,9 @@ enum SMARTAI_TARGETS
     SMART_TARGET_ROLE_SELECTION                 = 203,  // Range Max, TargetMask (Tanks (1), Healer (2) Damage (4)), resize list
     SMART_TARGET_SUMMONED_CREATURES             = 204,  // Entry
     SMART_TARGET_INSTANCE_STORAGE               = 205,  // Instance data index, Type (creature (1), gameobject (2))
+    SMART_TARGET_FORMATION                      = 206,  // Type (0: members only, 1: leader only, 2: all), CreatureEntry (0: any), ExcludeSelf (0/1)
 
-    SMART_TARGET_AC_END                         = 206   // placeholder
+    SMART_TARGET_AC_END                         = 207   // placeholder
 };
 
 struct SmartTarget
@@ -1737,6 +1767,13 @@ struct SmartTarget
             uint32 index;
             uint32 type;
         } instanceStorage;
+
+        struct
+        {
+            uint32 type;        // 0: members only, 1: leader only, 2: all
+            uint32 entry;       // creature entry filter, 0 = any
+            SAIBool excludeSelf;
+        } formation;
 
         struct
         {
@@ -1932,16 +1969,17 @@ enum SmartEventFlags
 
 enum SmartCastFlags
 {
-    SMARTCAST_INTERRUPT_PREVIOUS     = 0x001,                     // Interrupt any spell casting
-    SMARTCAST_TRIGGERED              = 0x002,                     // Triggered (this makes spell cost zero mana and have no cast time)
-    //CAST_FORCE_CAST                  = 0x004,                     // Forces cast even if creature is out of mana or out of range
-    //CAST_NO_MELEE_IF_OOM             = 0x008,                     // Prevents creature from entering melee if out of mana or out of range
-    //CAST_FORCE_TARGET_SELF           = 0x010,                     // Forces the target to cast this spell on itself
-    SMARTCAST_AURA_NOT_PRESENT       = 0x020,                     // Only casts the spell if the target does not have an aura from the spell
-    SMARTCAST_COMBAT_MOVE            = 0x040,                     // Prevents combat movement if cast successful. Allows movement on range, OOM, LOS
-    SMARTCAST_THREATLIST_NOT_SINGLE  = 0x080,                     // Only cast if the source's threatlist is higher than one. This includes pets (see Skeram's True Fulfillment)
-    SMARTCAST_TARGET_POWER_MANA      = 0x100,                     // Only cast if the target has power type mana (e.g. Mana Drain)
-    SMARTCAST_ENABLE_COMBAT_MOVE_ON_LOS = 0x200,
+    SMARTCAST_INTERRUPT_PREVIOUS        = 0x001,                  // Interrupt any spell casting
+    SMARTCAST_TRIGGERED                 = 0x002,                  // Triggered (this makes spell cost zero mana and have no cast time)
+    //CAST_FORCE_CAST                   = 0x004,                  // Forces cast even if creature is out of mana or out of range
+    //CAST_NO_MELEE_IF_OOM              = 0x008,                  // Prevents creature from entering melee if out of mana or out of range
+    //CAST_FORCE_TARGET_SELF            = 0x010,                  // Forces the target to cast this spell on itself
+    SMARTCAST_AURA_NOT_PRESENT          = 0x020,                  // Only casts the spell if the target does not have an aura from the spell
+    SMARTCAST_COMBAT_MOVE               = 0x040,                  // Prevents combat movement if cast successful. Allows movement on range, OOM, LOS
+    SMARTCAST_THREATLIST_NOT_SINGLE     = 0x080,                  // Only cast if the source's threatlist is higher than one. This includes pets (see Skeram's True Fulfillment)
+    SMARTCAST_TARGET_POWER_MANA         = 0x100,                  // Only cast if the target has power type mana (e.g. Mana Drain)
+    SMARTCAST_ENABLE_COMBAT_MOVE_ON_LOS = 0x200,                  // Allows combat movement when not in line of sight
+    SMARTCAST_MAIN_SPELL                = 0x400,                  // Sets this spell's max range as the creature's chase distance on spawn
 };
 
 enum SmartFollowType
@@ -2034,21 +2072,22 @@ class SmartWaypointMgr
 {
     SmartWaypointMgr() {}
 public:
-    ~SmartWaypointMgr();
+    ~SmartWaypointMgr() = default;
 
     static SmartWaypointMgr* instance();
 
     void LoadFromDB();
 
-    WaypointPath* GetPath(uint32 id)
+    WaypointPath const* GetPath(uint32 id) const
     {
-        if (waypoint_map.find(id) != waypoint_map.end())
-            return waypoint_map[id];
-        else return 0;
+        auto itr = waypoint_map.find(id);
+        if (itr != waypoint_map.end())
+            return &itr->second;
+        return nullptr;
     }
 
 private:
-    std::unordered_map<uint32, WaypointPath*> waypoint_map;
+    std::unordered_map<uint32, WaypointPath> waypoint_map;
 };
 
 // all events for a single entry

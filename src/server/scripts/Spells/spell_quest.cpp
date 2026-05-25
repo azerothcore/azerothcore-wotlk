@@ -16,7 +16,6 @@
  */
 
 #include "CellImpl.h"
-#include "CreatureScript.h"
 #include "CreatureTextMgr.h"
 #include "GridNotifiers.h"
 #include "MapMgr.h"
@@ -31,6 +30,55 @@
  * Ordered alphabetically using questId and scriptname.
  * Scriptnames of files in this file should be prefixed with "spell_q#questID_".
  */
+
+//                             Aged  Dying Ancient Kodo
+std::vector<uint32> kodoEntry{ 4700, 4701, 4702 };
+class spell_q5561_kodo_roundup_kodo_kombobulator : public SpellScript
+{
+    PrepareSpellScript(spell_q5561_kodo_roundup_kodo_kombobulator);
+
+    SpellCastResult CheckCast()
+    {
+        if (Unit* caster = GetCaster())
+            if (Player* player = caster->ToPlayer())
+                if (player->HasAura(18172)) // Kodo Kombobulator
+                    return SPELL_FAILED_NOT_READY;
+
+        bool ok = false;
+        if (Unit* target = GetExplTargetUnit())
+            if (Creature* creature = target->ToCreature())
+                for (uint32 cid : kodoEntry)
+                    if (creature->GetEntry() == cid)
+                        ok = true;
+
+        if (!ok)
+            return SPELL_FAILED_BAD_TARGETS;
+
+        return SPELL_CAST_OK;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_q5561_kodo_roundup_kodo_kombobulator::CheckCast);
+    }
+};
+
+class spell_q5561_kodo_roundup_kodo_kombobulator_despawn : public SpellScript
+{
+    PrepareSpellScript(spell_q5561_kodo_roundup_kodo_kombobulator_despawn);
+
+    void HandleDummyEffect(SpellEffIndex /*effIndex*/)
+    {
+        if (Unit* caster = GetCaster())
+            if (Creature* creature = caster->ToCreature())
+                creature->DespawnOrUnsummon();
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_q5561_kodo_roundup_kodo_kombobulator_despawn::HandleDummyEffect, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
 
 class spell_q11065_wrangle_some_aether_rays : public SpellScript
 {
@@ -247,28 +295,6 @@ class spell_q10525_vision_guide : public AuraScript
     }
 };
 
-class spell_q11322_q11317_the_cleansing : public AuraScript
-{
-    PrepareAuraScript(spell_q11322_q11317_the_cleansing)
-
-    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        Unit* ar = GetCaster();
-        if (ar && ar->ToPlayer())
-        {
-            if (ar->ToPlayer()->GetQuestStatus(11317) == QUEST_STATUS_INCOMPLETE || ar->ToPlayer()->GetQuestStatus(11322) == QUEST_STATUS_INCOMPLETE)
-                ar->SummonCreature(27959, 3032.0f, -5095.0f, 723.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000);
-
-            ar->SetStandState(UNIT_STAND_STATE_SIT);
-        }
-    }
-
-    void Register() override
-    {
-        OnEffectApply += AuraEffectApplyFn(spell_q11322_q11317_the_cleansing::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-    }
-};
-
 class spell_q10714_on_spirits_wings : public SpellScript
 {
     PrepareSpellScript(spell_q10714_on_spirits_wings);
@@ -355,27 +381,20 @@ class spell_q12943_shadow_vault_decree : public SpellScript
 {
     PrepareSpellScript(spell_q12943_shadow_vault_decree);
 
-    SpellCastResult CheckRequirement()
-    {
-        // if thane is present and not in combat - allow cast
-        Unit* caster = GetCaster();
-        if (Creature* thane = caster->FindNearestCreature(NPC_THANE_UFRANG, 30.0f))
-            if (!thane->IsInCombat())
-                return SPELL_CAST_OK;
-
-        return SPELL_FAILED_CASTER_AURASTATE;
-    }
-
     void HandleScriptEffect(SpellEffIndex /*effIndex*/)
     {
         Unit* caster = GetCaster();
         if (Creature* thane = caster->FindNearestCreature(NPC_THANE_UFRANG, 30.0f))
+        {
+            if (thane->IsInCombat())
+                return;
+            thane->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
             thane->AI()->AttackStart(caster);
+        }
     }
 
     void Register() override
     {
-        OnCheckCast += SpellCheckCastFn(spell_q12943_shadow_vault_decree::CheckRequirement);
         OnEffectHitTarget += SpellEffectFn(spell_q12943_shadow_vault_decree::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
@@ -1281,6 +1300,7 @@ class spell_q12683_take_sputum_sample : public SpellScript
         {
             uint32 spellId = GetSpellInfo()->Effects[EFFECT_0].CalcValue();
             caster->CastSpell(caster, spellId, true, nullptr);
+            caster->RemoveAurasDueToSpell(reqAuraId); // consuming the sample clears Hydra Sputum
         }
     }
 
@@ -2494,12 +2514,13 @@ class spell_q9847_a_spirit_ally : public SpellScript
 
 void AddSC_quest_spell_scripts()
 {
+    RegisterSpellScript(spell_q5561_kodo_roundup_kodo_kombobulator);
+    RegisterSpellScript(spell_q5561_kodo_roundup_kodo_kombobulator_despawn);
     RegisterSpellAndAuraScriptPair(spell_q11065_wrangle_some_aether_rays, spell_q11065_wrangle_some_aether_rays_aura);
     RegisterSpellScript(spell_image_of_drakuru_reagent_check);
     RegisterSpellScript(spell_q12014_steady_as_a_rock);
     RegisterSpellAndAuraScriptPair(spell_q11026_a11051_banish_the_demons, spell_q11026_a11051_banish_the_demons_aura);
     RegisterSpellScript(spell_q10525_vision_guide);
-    RegisterSpellScript(spell_q11322_q11317_the_cleansing);
     RegisterSpellScript(spell_q10714_on_spirits_wings);
     RegisterSpellScript(spell_q10720_the_smallest_creature);
     RegisterSpellScript(spell_q13086_last_line_of_defence);
