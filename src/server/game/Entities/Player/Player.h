@@ -1770,6 +1770,8 @@ public:
     uint32 GetSpec(int8 spec = -1);
 
     void InitGlyphsForLevel();
+    static uint8 GetDefaultGlyphSlotRequiredLevel(uint8 glyphSlot);
+    static uint8 GetGlyphSlotRequiredLevel(uint8 glyphSlot);
     void SetGlyphSlot(uint8 slot, uint32 slottype) { SetUInt32Value(PLAYER_FIELD_GLYPH_SLOTS_1 + slot, slottype); }
     [[nodiscard]] uint32 GetGlyphSlot(uint8 slot) const { return GetUInt32Value(PLAYER_FIELD_GLYPH_SLOTS_1 + slot); }
     void SetGlyph(uint8 slot, uint32 glyph, bool save)

@@ -13339,27 +13339,72 @@ uint32 Player::GetBarberShopCost(uint8 newhairstyle, uint8 newhaircolor, uint8 n
     return uint32(cost);
 }
 
+uint8 Player::GetDefaultGlyphSlotRequiredLevel(uint8 glyphSlot)
+{
+    switch (glyphSlot)
+    {
+        case 0:
+        case 1:
+            return 15;
+        case 2:
+            return 50;
+        case 3:
+            return 30;
+        case 4:
+            return 70;
+        case 5:
+            return 80;
+        default:
+            return 0;
+    }
+}
+
+uint8 Player::GetGlyphSlotRequiredLevel(uint8 glyphSlot)
+{
+    if (glyphSlot >= MAX_GLYPH_SLOT_INDEX)
+        return 0;
+
+    if (!sConfigMgr->GetOption<bool>("GlyphLevelReq.Enable", false))
+        return GetDefaultGlyphSlotRequiredLevel(glyphSlot);
+
+    std::string option = "GlyphLevelReq.Slot" + std::to_string(glyphSlot) + ".Level";
+
+    uint32 level = sConfigMgr->GetOption<uint32>(option, GetDefaultGlyphSlotRequiredLevel(glyphSlot));
+
+    // WotLK 3.3.5a max level.
+    if (level > 80)
+        level = 80;
+
+    return static_cast<uint8>(level);
+}
+
 void Player::InitGlyphsForLevel()
 {
+    // Initialize glyph slot IDs from GlyphSlot.dbc.
+    // This controls slot order and Major/Minor socket type.
     for (uint32 i = 0; i < sGlyphSlotStore.GetNumRows(); ++i)
         if (GlyphSlotEntry const* gs = sGlyphSlotStore.LookupEntry(i))
             if (gs->Order)
                 SetGlyphSlot(gs->Order - 1, gs->Id);
 
-    uint8 level = GetLevel();
     uint32 value = 0;
 
-    // 0x3F = 0x01 | 0x02 | 0x04 | 0x08 | 0x10 | 0x20 for 80 level
-    if (level >= 15)
-        value |= (0x01 | 0x02);
-    if (level >= 30)
-        value |= 0x08;
-    if (level >= 50)
-        value |= 0x04;
-    if (level >= 70)
-        value |= 0x10;
-    if (level >= 80)
-        value |= 0x20;
+    /*  Glyph Slot bitmask values
+        slot 0 -> 0x01
+        slot 1 -> 0x02
+        slot 2 -> 0x04
+        slot 3 -> 0x08
+        slot 4 -> 0x10
+        slot 5 -> 0x20
+    */
+
+    for (uint8 slot = 0; slot < MAX_GLYPH_SLOT_INDEX; ++slot)
+    {
+        uint8 minLevel = GetGlyphSlotRequiredLevel(slot);
+
+        if (!minLevel || GetLevel() >= minLevel)
+            value |= 1 << slot;
+    }
 
     SetUInt32Value(PLAYER_GLYPHS_ENABLED, value);
 }
