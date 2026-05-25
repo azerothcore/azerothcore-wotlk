@@ -292,7 +292,14 @@ void Battlefield::KickPlayerFromBattlefield(ObjectGuid guid)
     if (Player* player = ObjectAccessor::FindPlayer(guid))
         if (player->GetZoneId() == GetZoneId() && !player->IsGameMaster()
             && !PlayersInWar[player->GetTeamId()].count(guid))
+        {
             player->TeleportTo(KickPosition);
+            // Eagerly drop zone tracking: the teleport's zone change does not
+            // propagate until the next Player::Update, so callers iterating
+            // Players[team] in the same tick would otherwise still see them.
+            for (uint8 i = 0; i < PVP_TEAMS_COUNT; ++i)
+                Players[i].erase(guid);
+        }
 }
 
 void Battlefield::StartBattle()
@@ -318,11 +325,25 @@ void Battlefield::StartBattle()
 
     _scheduler.Schedule(1s, BATTLEFIELD_TIMER_GROUP_WAR, [this](TaskContext context)
     {
-        time_t now = GameTime::GetGameTime().count();
+        time_t const now = GameTime::GetGameTime().count();
+
+        // Send eject so the 3.3.5 client closes its popup (it does not on its
+        // own when the timer hits zero), then drop the entry and teleport.
         for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
-            for (PlayerTimerMap::value_type const& pair : InvitedPlayers[team])
-                if (pair.second <= now)
-                    KickPlayerFromBattlefield(pair.first);
+        {
+            std::vector<ObjectGuid> expired;
+            for (auto const& [guid, expireAt] : InvitedPlayers[team])
+                if (expireAt <= now)
+                    expired.push_back(guid);
+
+            for (ObjectGuid const& guid : expired)
+            {
+                if (Player* player = ObjectAccessor::FindPlayer(guid))
+                    player->GetSession()->SendBfLeaveMessage(BattleId, BF_LEAVE_REASON_EXITED);
+                InvitedPlayers[team].erase(guid);
+                KickPlayerFromBattlefield(guid);
+            }
+        }
 
         InvitePlayersInZoneToWar();
         for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
@@ -415,13 +436,21 @@ void Battlefield::PlayerAcceptInviteToWar(Player* player)
     if (!IsWarTime())
         return;
 
+    // Reject unknown / expired invites; the kick task only sweeps every 5s.
+    TeamId const invitedTeam = player->GetTeamId();
+    auto itr = InvitedPlayers[invitedTeam].find(player->GetGUID());
+    if (itr == InvitedPlayers[invitedTeam].end()
+        || itr->second <= GameTime::GetGameTime().count())
+        return;
+
     sScriptMgr->OnBattlefieldPlayerJoinWar(this, player);
 
     if (AddOrSetPlayerToCorrectBfGroup(player))
     {
         player->GetSession()->SendBfEntered(BattleId);
         PlayersInWar[player->GetTeamId()].insert(player->GetGUID());
-        InvitedPlayers[player->GetTeamId()].erase(player->GetGUID());
+        // Use pre-hook team: JoinWar may have just reassigned GetTeamId().
+        InvitedPlayers[invitedTeam].erase(player->GetGUID());
 
         if (player->isAFK())
             player->ToggleAFK();
