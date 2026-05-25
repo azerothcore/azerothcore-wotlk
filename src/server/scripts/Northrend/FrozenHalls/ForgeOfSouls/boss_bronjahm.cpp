@@ -32,7 +32,7 @@ enum Yells
     SAY_CORRUPT_SOUL    = 4,
 };
 
-enum eSpells
+enum Spells
 {
     SPELL_SOULSTORM_CHANNEL_OOC     = 69008,
 
@@ -51,7 +51,7 @@ enum eSpells
     SPELL_SOULSTORM                 = 68872,
 };
 
-enum eEvents
+enum Events
 {
     EVENT_SPELL_SHADOW_BOLT = 1,
     EVENT_SPELL_FEAR,
@@ -60,207 +60,171 @@ enum eEvents
     EVENT_START_SOULSTORM,
 };
 
-class boss_bronjahm : public CreatureScript
+struct boss_bronjahm : public BossAI
 {
-public:
-    boss_bronjahm() : CreatureScript("boss_bronjahm") { }
+    boss_bronjahm(Creature* creature) : BossAI(creature, DATA_BRONJAHM) { }
 
-    struct boss_bronjahmAI : public ScriptedAI
+    void JustReachedHome() override
     {
-        boss_bronjahmAI(Creature* creature) : ScriptedAI(creature), summons(me)
-        {
-            pInstance = creature->GetInstanceScript();
-        }
+        BossAI::JustReachedHome();
+        DoCastSelf(SPELL_SOULSTORM_CHANNEL_OOC, true);
+    }
 
-        InstanceScript* pInstance;
-        EventMap events;
-        SummonList summons;
-
-        void JustReachedHome() override
-        {
-            me->CastSpell(me, SPELL_SOULSTORM_CHANNEL_OOC, true);
-        }
-
-        void Reset() override
-        {
-            me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
-            me->CastSpell(me, SPELL_SOULSTORM_CHANNEL_OOC, true);
-            events.Reset();
-            summons.DespawnAll();
-            if (pInstance)
-                pInstance->SetData(DATA_BRONJAHM, NOT_STARTED);
-        }
-
-        void JustEngagedWith(Unit* /*who*/) override
-        {
-            Talk(SAY_AGGRO);
-            me->RemoveAurasDueToSpell(SPELL_SOULSTORM_CHANNEL_OOC);
-
-            DoZoneInCombat();
-            events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_SHADOW_BOLT, 2s);
-            events.RescheduleEvent(EVENT_SPELL_MAGICS_BANE, 5s, 10s);
-            events.RescheduleEvent(EVENT_SPELL_CORRUPT_SOUL, 14s, 20s);
-
-            if (pInstance)
-                pInstance->SetData(DATA_BRONJAHM, IN_PROGRESS);
-        }
-
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
-        {
-            if (!me->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE) && me->HealthBelowPctDamaged(35, damage))
-            {
-                me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE);
-                me->GetMotionMaster()->Clear();
-                me->GetMotionMaster()->MoveIdle();
-                me->CastSpell(me, SPELL_TELEPORT, false);
-                events.CancelEvent(EVENT_SPELL_CORRUPT_SOUL);
-                events.DelayEvents(6s);
-                events.RescheduleEvent(EVENT_SPELL_FEAR, 8s, 14s);
-            }
-        }
-
-        void SpellHitTarget(Unit*  /*target*/, SpellInfo const* spell) override
-        {
-            if (spell->Id == SPELL_TELEPORT)
-            {
-                me->CastSpell(me, SPELL_TELEPORT_VISUAL, true);
-                events.RescheduleEvent(EVENT_START_SOULSTORM, 1ms);
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            if (me->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
-                if (me->isAttackReady())
-                    me->SetFacingToObject(me->GetVictim());
-
-            switch (events.ExecuteEvent())
-            {
-                case 0:
-                    break;
-                case EVENT_SPELL_SHADOW_BOLT:
-                    if (!me->IsWithinMeleeRange(me->GetVictim()))
-                        me->CastSpell(me->GetVictim(), SPELL_SHADOW_BOLT, false);
-                    events.Repeat(2s);
-                    break;
-                case EVENT_SPELL_FEAR:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 10.0f, true))
-                        me->CastCustomSpell(SPELL_FEAR, SPELLVALUE_MAX_TARGETS, 1, target, false);
-                    events.Repeat(8s, 12s);
-                    break;
-                case EVENT_SPELL_MAGICS_BANE:
-                    me->CastSpell(me->GetVictim(), SPELL_MAGICS_BANE, false);
-                    events.Repeat(10s, 15s);
-                    break;
-                case EVENT_SPELL_CORRUPT_SOUL:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
-                    {
-                        Talk(SAY_CORRUPT_SOUL);
-                        me->CastSpell(target, SPELL_CORRUPT_SOUL, false);
-                    }
-                    events.Repeat(20s, 25s);
-                    break;
-                case EVENT_START_SOULSTORM:
-                    Talk(SAY_SOUL_STORM);
-                    me->CastSpell(me, SPELL_SOULSTORM, false);
-                    me->CastSpell(me, SPELL_TELEPORT_VISUAL, true);
-                    me->CastSpell(me, SPELL_SOULSTORM_VISUAL, true);
-
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            Talk(SAY_DEATH);
-            if (pInstance)
-                pInstance->SetData(DATA_BRONJAHM, DONE);
-        }
-
-        void KilledUnit(Unit* who) override
-        {
-            if (who->IsPlayer())
-                Talk(SAY_SLAY);
-        }
-
-        void JustSummoned(Creature* summon) override
-        {
-            summons.Summon(summon);
-            summon->SetReactState(REACT_PASSIVE);
-        }
-
-        void EnterEvadeMode(EvadeReason why) override
-        {
-            me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
-            ScriptedAI::EnterEvadeMode(why);
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
+    void Reset() override
     {
-        return GetForgeOfSoulsAI<boss_bronjahmAI>(creature);
+        BossAI::Reset();
+        me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
+        DoCastSelf(SPELL_SOULSTORM_CHANNEL_OOC, true);
+    }
+
+    void JustEngagedWith(Unit* who) override
+    {
+        BossAI::JustEngagedWith(who);
+        Talk(SAY_AGGRO);
+        me->RemoveAurasDueToSpell(SPELL_SOULSTORM_CHANNEL_OOC);
+
+        events.RescheduleEvent(EVENT_SPELL_SHADOW_BOLT, 2s);
+        events.RescheduleEvent(EVENT_SPELL_MAGICS_BANE, 5s, 10s);
+        events.RescheduleEvent(EVENT_SPELL_CORRUPT_SOUL, 14s, 20s);
+    }
+
+    void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
+    {
+        if (!me->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE) && me->HealthBelowPctDamaged(35, damage))
+        {
+            me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE);
+            me->GetMotionMaster()->Clear();
+            me->GetMotionMaster()->MoveIdle();
+            DoCastSelf(SPELL_TELEPORT);
+            events.CancelEvent(EVENT_SPELL_CORRUPT_SOUL);
+            events.DelayEvents(6s);
+            events.RescheduleEvent(EVENT_SPELL_FEAR, 8s, 14s);
+        }
+    }
+
+    void SpellHitTarget(Unit* /*target*/, SpellInfo const* spell) override
+    {
+        if (spell->Id == SPELL_TELEPORT)
+        {
+            DoCastSelf(SPELL_TELEPORT_VISUAL, true);
+            events.RescheduleEvent(EVENT_START_SOULSTORM, 1ms);
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        if (me->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
+            if (me->isAttackReady())
+                me->SetFacingToObject(me->GetVictim());
+
+        switch (events.ExecuteEvent())
+        {
+            case EVENT_SPELL_SHADOW_BOLT:
+                if (!me->IsWithinMeleeRange(me->GetVictim()))
+                    DoCastVictim(SPELL_SHADOW_BOLT);
+                events.Repeat(2s);
+                break;
+            case EVENT_SPELL_FEAR:
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 10.0f, true))
+                    me->CastCustomSpell(SPELL_FEAR, SPELLVALUE_MAX_TARGETS, 1, target);
+                events.Repeat(8s, 12s);
+                break;
+            case EVENT_SPELL_MAGICS_BANE:
+                DoCastVictim(SPELL_MAGICS_BANE);
+                events.Repeat(10s, 15s);
+                break;
+            case EVENT_SPELL_CORRUPT_SOUL:
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
+                {
+                    Talk(SAY_CORRUPT_SOUL);
+                    DoCast(target, SPELL_CORRUPT_SOUL);
+                }
+                events.Repeat(20s, 25s);
+                break;
+            case EVENT_START_SOULSTORM:
+                Talk(SAY_SOUL_STORM);
+                DoCastSelf(SPELL_SOULSTORM);
+                DoCastSelf(SPELL_TELEPORT_VISUAL, true);
+                DoCastSelf(SPELL_SOULSTORM_VISUAL, true);
+                break;
+        }
+
+        DoMeleeAttackIfReady();
+    }
+
+    void JustDied(Unit* killer) override
+    {
+        BossAI::JustDied(killer);
+        Talk(SAY_DEATH);
+    }
+
+    void KilledUnit(Unit* who) override
+    {
+        if (who->IsPlayer())
+            Talk(SAY_SLAY);
+    }
+
+    void JustSummoned(Creature* summon) override
+    {
+        BossAI::JustSummoned(summon);
+        summon->SetReactState(REACT_PASSIVE);
+    }
+
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
+        BossAI::EnterEvadeMode(why);
     }
 };
 
-class npc_fos_corrupted_soul_fragment : public CreatureScript
+struct npc_fos_corrupted_soul_fragment : public NullCreatureAI
 {
-public:
-    npc_fos_corrupted_soul_fragment() : CreatureScript("npc_fos_corrupted_soul_fragment") { }
-
-    struct npc_fos_corrupted_soul_fragmentAI : public NullCreatureAI
+    npc_fos_corrupted_soul_fragment(Creature* creature) : NullCreatureAI(creature)
     {
-        npc_fos_corrupted_soul_fragmentAI(Creature* creature) : NullCreatureAI(creature)
-        {
-            pInstance = me->GetInstanceScript();
-        }
+        Instance = me->GetInstanceScript();
+    }
 
-        uint32 timer;
-        InstanceScript* pInstance;
+    uint32 Timer = 0;
+    InstanceScript* Instance = nullptr;
 
-        void Reset() override
-        {
-            timer = 0;
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (pInstance)
-                if (Creature* b = pInstance->instance->GetCreature(pInstance->GetGuidData(DATA_BRONJAHM)))
-                {
-                    if (me->GetExactDist2d(b) <= 2.0f)
-                    {
-                        me->GetMotionMaster()->MoveIdle();
-                        me->CastSpell(b, SPELL_CONSUME_SOUL, true);
-                        me->DespawnOrUnsummon(1ms);
-                        return;
-                    }
-
-                    if (timer <= diff)
-                    {
-                        if (!me->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED))
-                            me->GetMotionMaster()->MovePoint(0, *b);
-                        timer = 1000;
-                    }
-                    else
-                        timer -= diff;
-                }
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
+    void Reset() override
     {
-        return GetForgeOfSoulsAI<npc_fos_corrupted_soul_fragmentAI>(creature);
+        Timer = 0;
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!Instance)
+            return;
+
+        Creature* bronjahm = Instance->GetCreature(DATA_BRONJAHM);
+        if (!bronjahm)
+            return;
+
+        if (me->GetExactDist2d(bronjahm) <= 2.0f)
+        {
+            me->GetMotionMaster()->MoveIdle();
+            me->CastSpell(bronjahm, SPELL_CONSUME_SOUL, true);
+            me->DespawnOrUnsummon(1ms);
+            return;
+        }
+
+        if (Timer <= diff)
+        {
+            if (!me->HasUnitState(UNIT_STATE_ROOT | UNIT_STATE_STUNNED))
+                me->GetMotionMaster()->MovePoint(0, *bronjahm);
+            Timer = 1000;
+        }
+        else
+            Timer -= diff;
     }
 };
 
@@ -275,7 +239,7 @@ class spell_bronjahm_magic_bane : public SpellScript
 
         if (Unit* caster = GetCaster())
         {
-            const int32 maxDamage = caster->GetMap()->GetSpawnMode() == 1 ? 15000 : 10000;
+            int32 const maxDamage = caster->GetMap()->GetSpawnMode() == 1 ? 15000 : 10000;
             int32 newDamage = GetHitDamage();
             newDamage += GetHitUnit()->GetMaxPower(POWER_MANA) / 2;
             newDamage = std::min<int32>(maxDamage, newDamage);
@@ -365,9 +329,8 @@ class spell_bronjahm_soulstorm_targeting : public SpellScript
 
 void AddSC_boss_bronjahm()
 {
-    new boss_bronjahm();
-    new npc_fos_corrupted_soul_fragment();
-
+    RegisterForgeOfSoulsCreatureAI(boss_bronjahm);
+    RegisterForgeOfSoulsCreatureAI(npc_fos_corrupted_soul_fragment);
     RegisterSpellScript(spell_bronjahm_magic_bane);
     RegisterSpellScript(spell_bronjahm_soulstorm_channel_ooc_aura);
     RegisterSpellScript(spell_bronjahm_soulstorm_visual_aura);

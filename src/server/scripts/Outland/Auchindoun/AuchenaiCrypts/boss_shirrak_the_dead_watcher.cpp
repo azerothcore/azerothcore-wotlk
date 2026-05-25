@@ -46,12 +46,7 @@ enum Misc
 struct boss_shirrak_the_dead_watcher : public BossAI
 {
     boss_shirrak_the_dead_watcher(Creature* creature) : BossAI(creature, DATA_SHIRRAK_THE_DEAD_WATCHER)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    {    }
 
     ObjectGuid focusGUID;
 

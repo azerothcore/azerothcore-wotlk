@@ -51,125 +51,114 @@ enum Events
     EVENT_SUMMONED_2                = 6
 };
 
-class boss_gyth : public CreatureScript
+struct boss_gyth : public BossAI
 {
-public:
-    boss_gyth() : CreatureScript("boss_gyth") { }
+    boss_gyth(Creature* creature) : BossAI(creature, DATA_GYTH) { }
 
-    struct boss_gythAI : public BossAI
+    void Reset() override
     {
-        boss_gythAI(Creature* creature) : BossAI(creature, DATA_GYTH) { }
-
-        void Reset() override
+        if (instance->GetBossState(DATA_GYTH) == IN_PROGRESS)
         {
-            if (instance->GetBossState(DATA_GYTH) == IN_PROGRESS)
-            {
-                instance->SetBossState(DATA_GYTH, NOT_STARTED);
-                summons.DespawnAll();
-                me->DespawnOrUnsummon();
-            }
-
-            SetInvincibility(true); // Don't let boss die before summoning Rend.
-
-            ScheduleHealthCheckEvent(25, [&] {
-                DoCastAOE(SPELL_SUMMON_REND, true);
-                me->RemoveAura(SPELL_REND_MOUNTS);
-                SetInvincibility(false);
-            });
+            instance->SetBossState(DATA_GYTH, NOT_STARTED);
+            summons.DespawnAll();
+            me->DespawnOrUnsummon();
         }
 
-        void JustEngagedWith(Unit* /*who*/) override
+        SetInvincibility(true); // Don't let boss die before summoning Rend.
+
+        ScheduleHealthCheckEvent(25, [&] {
+            DoCastAOE(SPELL_SUMMON_REND, true);
+            me->RemoveAura(SPELL_REND_MOUNTS);
+            SetInvincibility(false);
+        });
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        _JustEngagedWith();
+
+        events.ScheduleEvent(EVENT_CORROSIVE_ACID, 8s, 16s);
+        events.ScheduleEvent(EVENT_FREEZE, 8s, 16s);
+        events.ScheduleEvent(EVENT_FLAME_BREATH, 8s, 16s);
+        events.ScheduleEvent(EVENT_KNOCK_AWAY, 12s, 18s);
+    }
+
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        instance->SetBossState(DATA_WARCHIEF_REND_BLACKHAND, FAIL);
+        BossAI::EnterEvadeMode(why);
+    }
+
+    void IsSummonedBy(WorldObject* /*summoner*/) override
+    {
+        events.ScheduleEvent(EVENT_SUMMONED_1, 1s);
+    }
+
+    void JustSummoned(Creature* summon) override
+    {
+        summons.Summon(summon);
+        summon->AI()->AttackStart(me->SelectVictim());
+    }
+
+    // Prevent clearing summon list, otherwise Rend despawns if the drake is killed first.
+    void JustDied(Unit* /*killer*/) override
+    {
+        instance->SetBossState(DATA_GYTH, DONE);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
         {
-            _JustEngagedWith();
-
-            events.ScheduleEvent(EVENT_CORROSIVE_ACID, 8s, 16s);
-            events.ScheduleEvent(EVENT_FREEZE, 8s, 16s);
-            events.ScheduleEvent(EVENT_FLAME_BREATH, 8s, 16s);
-            events.ScheduleEvent(EVENT_KNOCK_AWAY, 12s, 18s);
-        }
-
-        void EnterEvadeMode(EvadeReason why) override
-        {
-            instance->SetBossState(DATA_WARCHIEF_REND_BLACKHAND, FAIL);
-            BossAI::EnterEvadeMode(why);
-        }
-
-        void IsSummonedBy(WorldObject* /*summoner*/) override
-        {
-            events.ScheduleEvent(EVENT_SUMMONED_1, 1s);
-        }
-
-        void JustSummoned(Creature* summon) override
-        {
-            summons.Summon(summon);
-            summon->AI()->AttackStart(me->SelectVictim());
-        }
-
-        // Prevent clearing summon list, otherwise Rend despawns if the drake is killed first.
-        void JustDied(Unit* /*killer*/) override
-        {
-            instance->SetBossState(DATA_GYTH, DONE);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-            {
-                events.Update(diff);
-
-                while (uint32 eventId = events.ExecuteEvent())
-                {
-                    switch (eventId)
-                    {
-                        case EVENT_SUMMONED_1:
-                            me->AddAura(SPELL_REND_MOUNTS, me);
-                            if (GameObject* portcullis = me->FindNearestGameObject(GO_DR_PORTCULLIS, 40.0f))
-                                portcullis->UseDoorOrButton();
-                            events.ScheduleEvent(EVENT_SUMMONED_2, 2s);
-                            break;
-                        case EVENT_SUMMONED_2:
-                            me->GetMotionMaster()->MoveWaypoint(GYTH_PATH_1, false);
-                            break;
-                        default:
-                            break;
-                    }
-                }
-                return;
-            }
-
             events.Update(diff);
 
             while (uint32 eventId = events.ExecuteEvent())
             {
                 switch (eventId)
                 {
-                    case EVENT_CORROSIVE_ACID:
-                        DoCast(me, SPELL_CORROSIVE_ACID);
-                        events.ScheduleEvent(EVENT_CORROSIVE_ACID, 10s, 16s);
+                    case EVENT_SUMMONED_1:
+                        me->AddAura(SPELL_REND_MOUNTS, me);
+                        if (GameObject* portcullis = me->FindNearestGameObject(GO_DR_PORTCULLIS, 40.0f))
+                            portcullis->UseDoorOrButton();
+                        events.ScheduleEvent(EVENT_SUMMONED_2, 2s);
                         break;
-                    case EVENT_FREEZE:
-                        DoCast(me, SPELL_FREEZE);
-                        events.ScheduleEvent(EVENT_FREEZE, 10s, 16s);
-                        break;
-                    case EVENT_FLAME_BREATH:
-                        DoCast(me, SPELL_FLAMEBREATH);
-                        events.ScheduleEvent(EVENT_FLAME_BREATH, 10s, 16s);
-                        break;
-                    case EVENT_KNOCK_AWAY:
-                        DoCastVictim(SPELL_KNOCK_AWAY);
-                        events.ScheduleEvent(EVENT_KNOCK_AWAY, 14s, 20s);
+                    case EVENT_SUMMONED_2:
+                        me->GetMotionMaster()->MoveWaypoint(GYTH_PATH_1, false);
                         break;
                     default:
                         break;
                 }
             }
-            DoMeleeAttackIfReady();
+            return;
         }
-    };
 
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetBlackrockSpireAI<boss_gythAI>(creature);
+        events.Update(diff);
+
+        while (uint32 eventId = events.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+                case EVENT_CORROSIVE_ACID:
+                    DoCast(me, SPELL_CORROSIVE_ACID);
+                    events.ScheduleEvent(EVENT_CORROSIVE_ACID, 10s, 16s);
+                    break;
+                case EVENT_FREEZE:
+                    DoCast(me, SPELL_FREEZE);
+                    events.ScheduleEvent(EVENT_FREEZE, 10s, 16s);
+                    break;
+                case EVENT_FLAME_BREATH:
+                    DoCast(me, SPELL_FLAMEBREATH);
+                    events.ScheduleEvent(EVENT_FLAME_BREATH, 10s, 16s);
+                    break;
+                case EVENT_KNOCK_AWAY:
+                    DoCastVictim(SPELL_KNOCK_AWAY);
+                    events.ScheduleEvent(EVENT_KNOCK_AWAY, 14s, 20s);
+                    break;
+                default:
+                    break;
+            }
+        }
+        DoMeleeAttackIfReady();
     }
 };
 
@@ -231,6 +220,6 @@ class spell_gyth_chromatic_protection : public AuraScript
 
 void AddSC_boss_gyth()
 {
-    new boss_gyth();
+    RegisterBlackrockSpireCreatureAI(boss_gyth);
     RegisterSpellScript(spell_gyth_chromatic_protection);
 }

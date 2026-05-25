@@ -41,6 +41,7 @@ enum Spells
     SPELL_ARCANE_MAGUS_SUMMON       = 47708,
 
     SPELL_FIRE_MAGUS_DEATH          = 47711,
+    SPELL_FROST_MAGUS_DEATH         = 47712,
     SPELL_ARCANE_MAGUS_DEATH        = 47713,
 
     SPELL_WEAR_CHRISTMAS_HAT        = 61400
@@ -83,13 +84,11 @@ struct boss_magus_telestra : public BossAI
 {
     boss_magus_telestra(Creature* creature) : BossAI(creature, DATA_MAGUS_TELESTRA_EVENT) { }
 
-    uint8 copiesDied;
     bool achievement;
 
     void Reset() override
     {
         BossAI::Reset();
-        copiesDied = 0;
         achievement = true;
 
         if (IsHeroic() && sGameEventMgr->IsActiveEvent(GAME_EVENT_WINTER_VEIL) && !me->HasAura(SPELL_WEAR_CHRISTMAS_HAT))
@@ -152,9 +151,8 @@ struct boss_magus_telestra : public BossAI
             events.ScheduleEvent(EVENT_MAGUS_FAIL_ACHIEVEMENT, 5s);
             caster->ToCreature()->DespawnOrUnsummon(1s);
 
-            if (++copiesDied >= 3)
+            if (me->HasAura(SPELL_FIRE_MAGUS_DEATH) && me->HasAura(SPELL_FROST_MAGUS_DEATH) && me->HasAura(SPELL_ARCANE_MAGUS_DEATH))
             {
-                copiesDied = 0;
                 events.CancelEvent(EVENT_MAGUS_FAIL_ACHIEVEMENT);
                 events.ScheduleEvent(EVENT_MAGUS_MERGED, 5s);
                 me->CastSpell(me, SPELL_BURNING_WINDS, true);
@@ -168,13 +166,14 @@ struct boss_magus_telestra : public BossAI
             return;
 
         events.Update(diff);
-        if (me->HasUnitState(UNIT_STATE_CASTING))
+        if (me->HasUnitState(UNIT_STATE_CASTING) ||
+           (me->HasUnitState(UNIT_STATE_STUNNED) && !me->HasAura(SPELL_START_SUMMON_CLONES))) // Reflected Ice Nova can stun her as its mechanic bypasses immunities
             return;
 
         switch (events.ExecuteEvent())
         {
         case EVENT_MAGUS_HEALTH1:
-            if (me->HealthBelowPct(51))
+            if (me->HealthBelowPct(51) && me->HealthAbovePct(11))
             {
                 me->CastSpell(me, SPELL_START_SUMMON_CLONES, false);
                 events.ScheduleEvent(EVENT_MAGUS_RELOCATE, 3500ms);

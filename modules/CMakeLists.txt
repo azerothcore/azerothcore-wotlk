@@ -279,6 +279,11 @@ add_library(modules STATIC
 
 if (MOD_ALE_FOUND)
     target_link_libraries(modules PUBLIC lualib)
+    # Also ensure include directories are propagated for modules that include sol.hpp
+    get_target_property(LUALIB_INCLUDE_DIRS lualib INTERFACE_INCLUDE_DIRECTORIES)
+    if(LUALIB_INCLUDE_DIRS)
+        list(APPEND PUBLIC_INCLUDES ${LUALIB_INCLUDE_DIRS})
+    endif()
 endif()
 
 target_link_libraries(modules
