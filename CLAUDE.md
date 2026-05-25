@@ -1,126 +1,104 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+AzerothCore is a C++ MMORPG server emulator for World of Warcraft 3.3.5a (WotLK), built with CMake, backed by MySQL.
 
-## Project Overview
+## Agent rules
 
-AzerothCore is an open-source MMORPG server emulator for World of Warcraft patch 3.3.5a (Wrath of the Lich King). It's a C++ project built with CMake, using MySQL for data storage. Licensed under GNU GPL v2.
+- **Do not configure or build unless explicitly asked.** Builds are slow (CMake + compile of a large C++ codebase) and rarely needed to make code changes.
+- **Never edit SQL files outside `data/sql/updates/pending_db_*/`.** `data/sql/base/`, `data/sql/archive/`, and `data/sql/updates/db_*/` are immutable (do not modify).
+- **Do not run git commands that modify repo state** (commit, branch, merge, rebase, reset, push, …) unless explicitly requested, and do not include them in plans. Read-only git (status, diff, log) is fine.
 
-## Build Commands
+## Build
 
-### Configure and build (out-of-source build required)
-
-- Skip building unless explicitly requested.
+Out-of-source build is required (in-source is blocked by CMake).
 
 ```bash
-# Create build directory and configure
 mkdir -p build && cd build
 cmake .. -DCMAKE_INSTALL_PREFIX=$HOME/azeroth-server -DCMAKE_BUILD_TYPE=RelWithDebInfo \
   -DSCRIPTS=static -DMODULES=static
-
-# Build (use appropriate core count)
-make -j$(nproc)
-make install
+make -j$(nproc) && make install
 ```
 
-### Key CMake options
+Compiler: **C++20** required (`CMAKE_CXX_STANDARD 20`). Useful CMake flags: `BUILD_TESTING=ON` (Google Test), `NOPCH=1` (disable precompiled headers). Full flag set in `conf/dist/config.cmake`. `compile_commands.json` is exported automatically.
 
-- `SCRIPTS`: none, static, dynamic, minimal-static, minimal-dynamic (default: static)
-- `MODULES`: none, static, dynamic (default: static)
-- `APPS_BUILD`: none, all, auth-only, world-only (default: all)
-- `TOOLS_BUILD`: none, all, db-only, maps-only (default: none)
-- `BUILD_TESTING`: Enable unit tests (default: OFF)
-- `USE_COREPCH` / `USE_SCRIPTPCH`: Precompiled headers (default: ON)
+Tests (Google Test, in `src/test/`): configure with `-DBUILD_TESTING=ON`, then `ctest` or `./src/test/unit_tests` from the build dir.
 
-### Unit tests
+## Repository layout
+
+- `src/common/` — networking (Asio), crypto, config, logging, shared utilities.
+- `src/server/game/` — core gameplay; compiled into worldserver.
+- `src/server/scripts/` — content scripts grouped by region (`EasternKingdoms/`, `Northrend/`, …), class (`Spells/spell_mage.cpp`, …), and domain (`Commands/`, `Pet/`, `OutdoorPvP/`, `World/`).
+- `src/server/database/` — DB abstraction and schema updater.
+- `src/server/shared/` — code shared by auth and world servers.
+- `src/server/apps/{authserver,worldserver}/` — entry points (ports 3724 and 8085).
+- `src/test/` — Google Test unit tests + mocks.
+- `data/sql/` — `base/` (historical schema), `updates/db_*/` (merged), `updates/pending_db_*/` (in-flight, **edit here**), `custom/` (gitignored).
+- `modules/` — external modules (each a subdir with its own `CMakeLists.txt`). Disable with `-DDISABLED_AC_MODULES="mod1;mod2"`. See `modules/how_to_make_a_module.md`.
+- `apps/` — helper scripts; `apps/codestyle/` holds the lint scripts (see below).
+- `conf/dist/` — distributed config templates; `conf/*.conf` is gitignored.
+- `deps/` — vendored third-party dependencies.
+
+## Adding SQL updates
+
+1. `cd data/sql/updates/pending_db_world/` (or `pending_db_auth` / `pending_db_characters`).
+2. `./create_sql.sh` generates an empty `rev_<timestamp>.sql` you write into.
+3. Required SQL conventions (enforced by `apps/codestyle/codestyle-sql.py`):
+   - Every `INSERT` must be preceded by a matching `DELETE` (idempotency).
+   - 4-space indent (no tabs), trailing newline, no double semicolons, no multiple blank lines.
+   - Tables must use the InnoDB engine.
+
+The three databases:
+
+- `acore_auth` — accounts, realm list, IP/account bans, session keys. Shared across all realms.
+- `acore_characters` — per-character state: characters, inventory, in-progress quests, mail, guilds, arena teams, achievements. One per realm.
+- `acore_world` — static game content: creature/gameobject/item/quest templates, spawn lists, loot tables, SmartAI scripts, gossip, conditions. Read-mostly; rebuilt from SQL.
+
+## Code style
+
+Run the linters before claiming a change is done:
 
 ```bash
-# Configure with testing enabled
-cmake .. -DBUILD_TESTING=ON
-make -j$(nproc)
-
-# Run tests
-./src/test/unit_tests
-# or
-ctest
+python apps/codestyle/codestyle-cpp.py     # C++
+python apps/codestyle/codestyle-sql.py     # SQL (compares to origin/master)
 ```
 
-Tests use Google Test and live in `src/test/`. The test binary links against the `game` library.
+Hard rules (also enforced by CI with `-Werror`):
 
-## Architecture
+- 4-space indent for C++ (tabs forbidden); 2-space for JSON/YAML/sh/ts/js. UTF-8, LF, max 80 cols, trailing newline.
+- Allman braces. No braces around single-line statements. `if (x)` — never `if(x)` or `if ( x )`.
+- `auto const&` (not `const auto&`); `Type const*` (not `const Type*`).
+- Use `{}` format specifiers (`fmt`-style), not `%u`/`%s`.
+- Use the typed helpers, not raw flag access:
+  - `IsPlayer()`, `IsCreature()`, `IsItem()`, … instead of `GetTypeId() == TYPEID_*`.
+  - `GetNpcFlags()`, `HasNpcFlag()`, `SetNpcFlag()`, `RemoveNpcFlag()`, `ReplaceAllNpcFlags()` instead of `*Flag(UNIT_NPC_FLAGS, …)`.
+  - `IsRefundable()`, `IsBOPTradable()`, `IsWrapped()` instead of `HasFlag(ITEM_FIELD_FLAGS, …)`.
+  - `HasFlag(ItemFlag)` / `HasFlag2(ItemFlag2)` / `HasFlagCu(ItemFlagsCustom)` instead of bitwise `Flags & ITEM_FLAG…`.
+  - `ObjectGuid::ToString().c_str()` instead of `ObjectGuid::GetCounter()`.
 
-### Two server executables
-- **authserver** (`src/server/apps/authserver/`): Handles authentication and realm selection (port 3724)
-- **worldserver** (`src/server/apps/worldserver/`): Main game server handling all gameplay (port 8085)
+CI also runs `cppcheck`.
 
-### Source layout (`src/`)
+## Project conventions
 
-- **`src/common/`** - Shared libraries: networking (Asio), cryptography, configuration, logging, threading, collision detection, utilities
-- **`src/server/game/`** - Core game logic (~52 subsystems), the heart of the worldserver
-- **`src/server/scripts/`** - Content scripts (bosses, spells, commands, instances)
-- **`src/server/database/`** - Database abstraction layer and schema updater
-- **`src/server/shared/`** - Code shared between auth and world servers (packets, network, realm definitions)
-- **`src/test/`** - Unit tests (Google Test)
+- **Logging**: `LOG_INFO("category.sub", "msg with {}", arg)` (also `LOG_WARN`, `LOG_ERROR`, `LOG_DEBUG`, `LOG_TRACE`). Categories are hierarchical, dot-separated (e.g. `server.loading`, `entities.player`, `sql.dev`). No `printf`-style; no `sLog->`; no `TC_LOG_*`. Macro in `src/common/Logging/Log.h`.
+- **Random**: use project helpers from `src/common/Utilities/Random.h` — `urand`, `irand`, `frand`, `rand32`, `rand_chance`, `roll_chance_f`, `roll_chance_i`. Do not use `std::rand` or `<random>` directly.
+- **Strings**: `Acore::StringFormat(fmt, args...)` (wraps `fmt::format`, `{}` placeholders) — `src/common/Utilities/StringFormat.h`.
+- **Config**: read options with `sConfigMgr->GetOption<T>("Name", default)`.
+- **Namespace**: project-wide is `Acore::` (no `Trinity::` remnants — agents porting from upstream forks must rename).
+- **Long-lived references**: do not store a raw `Player*` / `Creature*` / `Unit*` past the current call/tick — the object can be removed (logout, despawn, instance unload) and the pointer dangles. Store the `ObjectGuid` and resolve at use time via `ObjectAccessor::FindPlayer(guid)`, `ObjectAccessor::GetCreature(*from, guid)`, `Map::GetCreature(guid)`, etc.
+- **DB queries**: use `PreparedStatement` (via `WorldDatabase` / `CharacterDatabase` / `LoginDatabase` and the prepared-statement enums) rather than raw query strings. Reads that don't need to block the world tick go through the async path: `_queryProcessor.AddCallback(db.AsyncQuery(stmt).WithPreparedCallback(...))` (or `WithCallback` for non-prepared). Multi-statement writes wrap in `SQLTransaction` + `Execute` / `AppendPreparedStatement`.
+- **Timed actions in AI**: use `EventMap` (event id → delay; simple) or `TaskScheduler` (lambdas, repeats, cancellation). Both are members of `CreatureAI`; see any boss script under `src/server/scripts/` for examples — don't roll your own tick counters.
 
-### Key game subsystems (`src/server/game/`)
+## Scripting registration
 
-- **Entities/** - Core game objects: `Player`, `Creature`, `Unit`, `Item`, `GameObject`
-- **Spells/** - Spell mechanics, aura system, spell effects
-- **Maps/** - Map management, grid system, instancing
-- **Handlers/** - Client packet handlers (one file per system: `MovementHandler.cpp`, `SpellHandler.cpp`, etc.). These are methods on `WorldSession`
-- **AI/** - Creature AI framework
-- **Scripting/** - Script system with typed base classes (`ScriptObject` subclasses: `CreatureScript`, `SpellScript`, `InstanceMapScript`, `GameObjectScript`, `CommandScript`, etc.)
-- **Server/** - `WorldSession` (per-player connection), `World` (global state), opcode definitions
+Scripts inherit from a `ScriptObject` subclass (`SpellScript`, `AuraScript`, `CreatureScript`, `InstanceMapScript`, `GameObjectScript`, `CommandScript`, …). Two registration styles coexist:
 
-### Scripting system
+- **Spell / aura scripts**: use the `RegisterSpellScript(ClassName)` (or `RegisterSpellAndAuraScriptPair(...)`) macro inside `AddSC_<name>()`.
+- **Creature scripts**: prefer `RegisterCreatureAI(ClassName)` for new code; legacy zones still use `new ClassName();`. Match the surrounding pattern.
 
-Scripts follow a registration pattern:
-1. Define a class inheriting from `SpellScript`, `CreatureScript`, etc.
-2. Implement an `AddSC_*()` function that calls `RegisterSpellScript(ClassName)` (or similar)
-3. The `AddSC_*()` is declared and called from the regional `*_script_loader.cpp`
-4. Script loaders per region: `spells_script_loader.cpp`, `eastern_kingdoms_script_loader.cpp`, `northrend_script_loader.cpp`, etc.
-5. Spell script files are organized by class: `spell_dk.cpp`, `spell_mage.cpp`, `spell_generic.cpp`, etc.
+Then declare and call `AddSC_<name>()` from the regional loader: `Spells/spells_script_loader.cpp`, `EasternKingdoms/eastern_kingdoms_script_loader.cpp`, etc.
 
-### Three databases
-- **acore_auth** - Accounts, realm list, bans (`data/sql/base/db_auth/`)
-- **acore_characters** - Character data, inventories, progress (`data/sql/base/db_characters/`)
-- **acore_world** - Game content: creatures, items, quests, spells, loot (`data/sql/base/db_world/`)
+**SmartAI** (data-driven creature behaviour) lives in the world DB's `smart_scripts` table — not in C++. Engine: `src/server/game/AI/SmartScripts/`. For new creature behaviour prefer SmartAI (added via the SQL update workflow); reach for `CreatureScript` only when SmartAI's event/action vocabulary isn't enough.
 
-- SQL updates go in `data/sql/updates/pending_*` with separate subdirectories per database until pull request is merged. Pending SQL files are assigned random names.
-- SQL updates go in `data/sql/updates/` with separate subdirectories per database after their pull request is merged.
-- SQL files outside the `data/sql/updates/pending_*` folders should never be updated.
+**Module hooks** (e.g. `OnPlayerLogin`, `OnWorldUpdate`, `OnSpellCast`) are declared in `src/server/game/Scripting/ScriptDefines/*.h`. Implement by inheriting the matching base (`PlayerScript`, `WorldScript`, …) and registering with `new MyClass();` (or its `RegisterXxxScript` macro where one exists) inside `AddSC_<name>()`. Full hook list: https://www.azerothcore.org/wiki/hooks-script.
 
-### Module system
-
-External modules are loaded from the `modules/` directory. Each module is a subdirectory with its own `CMakeLists.txt`. Disable specific modules with `-DDISABLED_AC_MODULES="mod1;mod2"`. Module skeleton: https://github.com/azerothcore/skeleton-module/
-
-### Dependencies
-
-Bundled in `deps/`: boost, MySQL client, OpenSSL, zlib, recastnavigation (pathfinding), g3dlite (geometry), fmt, argon2, jemalloc, and others.
-
-## Commit Message Format
-
-Uses Conventional Commits:
-```
-Type(Scope/Subscope): Short description (max 50 chars)
-```
-
-- **Types**: feat, fix, refactor, style, docs, test, chore
-- **Scopes**: Core (C++ changes), DB (SQL changes)
-- **Examples**: `fix(Core/Spells): Fix damage calculation for Fireball`, `fix(DB/SAI): Missing spell to NPC Hogger`
-
-## Code Style
-
-- 4-space indentation for C++ (no tabs)
-- 2-space indentation for JSON, YAML, shell scripts
-- UTF-8 encoding, LF line endings
-- Max 80 character line length
-- No braces around single-line statements
-- Use {} to parse variables into output instead of %u etc.
-- CI enforces code style checks and compiles with `-Werror`
-
-## PR Requirements
-
-- AI tool usage must be disclosed in PRs
-- In-game testing expected
-- Changes to generic code require regression testing of related systems
+Custom (non-upstream) scripts go in `src/server/scripts/Custom/` (gitignored).

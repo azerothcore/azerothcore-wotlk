@@ -17,6 +17,10 @@ if( UNIX )
   # READLINE_LIBRARY     - full path to the READLINE library
   find_path(READLINE_INCLUDE_DIR readline/readline.h)
   find_library(READLINE_LIBRARY NAMES readline)
+  # macOS: Homebrew readline is keg-only, so this finds the SDK's libedit stub
+  # and worldserver fails to link. After `brew install readline`, configure with
+  # -DREADLINE_LIBRARY=/opt/homebrew/opt/readline/lib/libreadline.dylib and
+  # -DREADLINE_INCLUDE_DIR=/opt/homebrew/opt/readline/include
 
   message(STATUS "Found Readline library: ${READLINE_LIBRARY}")
   message(STATUS "Include dir is: ${READLINE_INCLUDE_DIR}")
