@@ -207,6 +207,8 @@ public:
     void AddCreatureSummon(ObjectGuid const& guid);
     void RemoveCreatureSummon(ObjectGuid const& guid);
 
+    SmartAIEventList const& GetEvents() const { return mEvents; }
+
 private:
     void IncPhase(uint32 p);
     void DecPhase(uint32 p);

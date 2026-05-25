@@ -16,7 +16,6 @@
  */
 
 #include "AchievementCriteriaScript.h"
-#include "Containers.h"
 #include "CreatureScript.h"
 #include "ObjectAccessor.h"
 #include "ScriptedCreature.h"
@@ -90,6 +89,7 @@ enum SummonGroups
 {
     SUMMON_GROUP_OOC                        = 0,
     SUMMON_GROUP_OOC_TRIGGERS               = 1,
+    SUMMON_GROUP_IC_WORSHIPPERS             = 2
 };
 
 enum Points
@@ -208,7 +208,7 @@ struct boss_jedoga_shadowseeker : public BossAI
             }
         }
 
-        sacraficeTarget_GUID.Clear();
+        sacrificeTargetGUID.Clear();
         sayPreachTimer = 120000;
         ritualTriggered = false;
         volunteerWork = true;
@@ -217,7 +217,7 @@ struct boss_jedoga_shadowseeker : public BossAI
 
     void JustSummoned(Creature* summon) override
     {
-        if (summon->GetEntry() == NPC_JEDOGA_CONTROLLER)
+        if (summon->EntryEquals(NPC_JEDOGA_CONTROLLER, NPC_TWILIGHT_WORSHIPPER))
         {
             summons.Summon(summon);
         }
@@ -267,12 +267,12 @@ struct boss_jedoga_shadowseeker : public BossAI
             }
             case NPC_TWILIGHT_VOLUNTEER:
             {
-                if (sacraficeTarget_GUID && summon->GetGUID() != sacraficeTarget_GUID)
+                if (sacrificeTargetGUID && summon->GetGUID() != sacrificeTargetGUID)
                 {
                     break;
                 }
 
-                if (killer != me && killer->GetGUID() != sacraficeTarget_GUID)
+                if (killer != me && killer->GetGUID() != sacrificeTargetGUID)
                 {
                     volunteerWork = false;
                 }
@@ -314,7 +314,7 @@ struct boss_jedoga_shadowseeker : public BossAI
     {
         if (action == ACTION_SACRAFICE)
         {
-            if (Creature* target = ObjectAccessor::GetCreature(*me, sacraficeTarget_GUID))
+            if (Creature* target = ObjectAccessor::GetCreature(*me, sacrificeTargetGUID))
             {
                 Unit::Kill(me, target);
             }
@@ -326,6 +326,17 @@ struct boss_jedoga_shadowseeker : public BossAI
         _JustEngagedWith();
         Talk(SAY_AGGRO);
         ReschedulleCombatEvents();
+
+        std::list<TempSummon*> tempSummons;
+        me->SummonCreatureGroup(SUMMON_GROUP_IC_WORSHIPPERS, &tempSummons);
+        if (!tempSummons.empty())
+        {
+            for (TempSummon* summon : tempSummons)
+            {
+                if (summon)
+                    summon->SetStandState(UNIT_STAND_STATE_KNEEL);
+            }
+        }
     }
 
     void KilledUnit(Unit* who) override
@@ -383,9 +394,9 @@ struct boss_jedoga_shadowseeker : public BossAI
                 me->SetFacingTo(5.66f);
                 if (!summons.empty())
                 {
-                    sacraficeTarget_GUID = Acore::Containers::SelectRandomContainerElement(summons);
-                    if (ObjectAccessor::GetCreature(*me, sacraficeTarget_GUID))
+                    if (Creature* creature = summons.GetRandomCreatureWithEntry(NPC_TWILIGHT_VOLUNTEER))
                     {
+                        sacrificeTargetGUID = creature->GetGUID();
                         events.ScheduleEvent(EVENT_JEDGA_START_RITUAL, 3s, 0, PHASE_RITUAL);
                     }
                     // Something failed, let players continue but do not grant achievement
@@ -506,15 +517,16 @@ struct boss_jedoga_shadowseeker : public BossAI
                 }
                 case EVENT_JEDGA_START_RITUAL:
                 {
-                    sacraficeTarget_GUID = Acore::Containers::SelectRandomContainerElement(summons);
-                    if (Creature* volunteer = ObjectAccessor::GetCreature(*me, sacraficeTarget_GUID))
+                    if (Creature* creature = summons.GetRandomCreatureWithEntry(NPC_TWILIGHT_VOLUNTEER))
                     {
+                        sacrificeTargetGUID = creature->GetGUID();
                         Talk(SAY_SACRIFICE_1);
-                        sacraficeTarget_GUID = volunteer->GetGUID();
-                        volunteer->AI()->DoAction(ACTION_RITUAL_BEGIN);
+                        creature->AI()->DoAction(ACTION_RITUAL_BEGIN);
                     }
                     break;
                 }
+                default:
+                    break;
             }
         }
 
@@ -534,7 +546,7 @@ struct boss_jedoga_shadowseeker : public BossAI
 private:
     GuidList oocSummons;
     GuidList oocTriggers;
-    ObjectGuid sacraficeTarget_GUID;
+    ObjectGuid sacrificeTargetGUID;
     uint32 sayPreachTimer;
     bool combatSummonsSummoned;
     bool ritualTriggered;

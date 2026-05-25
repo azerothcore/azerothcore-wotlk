@@ -1005,6 +1005,9 @@ namespace Acore
         AnyGroupedUnitInObjectRangeCheck(WorldObject const* obj, Unit const* funit, float range, bool raid) : _source(obj), _refUnit(funit), _range(range), _raid(raid) {}
         bool operator()(Unit* u)
         {
+            if (u->IsVehicle())
+                return false;
+
             if (_raid)
             {
                 if (!_refUnit->IsInRaidWith(u))
@@ -1155,12 +1158,9 @@ namespace Acore
             if (!u->IsWithinLOSInMap(i_enemy))
                 return;
 
-            if (u->AI())
-            {
-                u->SetNoCallForHelp(true); // avoid recursive call for help causing stack overflow
-                u->AI()->AttackStart(i_enemy);
-                u->SetNoCallForHelp(false);
-            }
+            u->SetNoCallForHelp(true); // avoid recursive call for help causing stack overflow
+            u->EngageWithTarget(i_enemy);
+            u->SetNoCallForHelp(false);
         }
     private:
         Unit* const i_funit;
@@ -1384,7 +1384,7 @@ namespace Acore
         AnyPlayerExactPositionInGameObjectRangeCheck(GameObject const* go, float range) : _go(go), _range(range) {}
         bool operator()(Player* u)
         {
-            if (!_go->IsInRange(u->GetPositionX(), u->GetPositionY(), u->GetPositionZ(), _range))
+            if (!_go->IsInRange3d(u->GetPositionX(), u->GetPositionY(), u->GetPositionZ(), _range))
                 return false;
 
             return true;
@@ -1539,7 +1539,7 @@ namespace Acore
                 return false;
             }
 
-            if (u->IsAlive() && !i_obj->IsHostileTo(u) && i_obj->IsWithinDistInMap(u, i_range) && u->GetMaxHealth() - u->GetHealth() > i_hp)
+            if (u->IsAlive() && !i_obj->IsHostileTo(u) && i_obj->IsWithinDistInMap(u, i_range) && u->GetMaxHealth() - u->GetHealth() >= i_hp)
             {
                 i_hp = u->GetMaxHealth() - u->GetHealth();
                 return true;
@@ -1604,7 +1604,7 @@ namespace Acore
         bool operator() (GameObject* go)
         {
             if (!entry || (go->GetGOInfo() && go->GetGOInfo()->entry == entry))
-                return go->IsInRange(x, y, z, range);
+                return go->IsInRange3d(x, y, z, range);
             else return false;
         }
     private:

@@ -10,6 +10,15 @@ This PR proposes changes to:
 -  [ ] Scripts (bosses, spell scripts, creature scripts).
 -  [ ] Database (SAI, creatures, etc).
 
+### AI-assisted Pull Requests
+
+> [!IMPORTANT]
+> While the use of AI tools when preparing pull requests is not prohibited, contributors must clearly disclose when such tools have been used and specify the model involved.
+> 
+> Contributors are also expected to fully understand the changes they are submitting and must be able to explain and justify those changes when requested by maintainers.
+
+- [ ] AI tools (e.g. ChatGPT, Claude, or similar) were used entirely or partially in preparing this pull request. Please specify which tools were used, if any.
+
 ## Issues Addressed:
 <!-- If your fix has a relating issue, link it below -->
 - Closes 
