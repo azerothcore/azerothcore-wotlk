@@ -42,9 +42,6 @@ jobs:
           sudo rm -rf "$AGENT_TOOLSDIRECTORY"
 
       - uses: actions/checkout@v4
-        with:
-          # Need the previous commit so dorny/paths-filter can diff data/sql/**.
-          fetch-depth: 2
 
       # The containers created in this workflow are used by
       # acore-docker, which has a dependency on mod-ale.
@@ -135,34 +132,56 @@ jobs:
       #
       # Kept LAST so a failure here cannot block the six images already pushed
       # above (build and push are fused per step). It only marks the run failed.
-      # Runs on master of the canonical repo when data/sql/** changed or the
-      # workflow was dispatched manually; core-only pushes leave the existing
-      # :master DB image valid.
+      #
+      # When it BUILDS (like the sibling images):
+      #   - labeled PR (run-build): build only, validate, no push
+      #   - master push: only when data/sql/** changed (core-only pushes leave the
+      #     existing :master DB image valid)
+      #   - workflow_dispatch: always (manual rebuild)
+      # When it PUSHES: only on master of the canonical repo.
       # ----------------------------------------------------------------------
-      - name: Detect data/sql changes
-        id: db_changes
-        if: github.repository == 'azerothcore/azerothcore-wotlk' && github.ref_name == 'master' && github.event_name != 'workflow_dispatch'
-        uses: dorny/paths-filter@v3
-        with:
-          filters: |
-            sql:
-              - 'data/sql/**'
-
       - name: Decide whether to build the DB image
         id: db_gate
         run: |
+          set -euo pipefail
           build=false
-          if [ "${{ github.repository }}" = "azerothcore/azerothcore-wotlk" ] && [ "${{ github.ref_name }}" = "master" ]; then
-            if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "${{ steps.db_changes.outputs.sql }}" = "true" ]; then
-              build=true
-            fi
-          fi
+          case "${{ github.event_name }}" in
+            workflow_dispatch)
+              build=true ;;                       # manual rebuild
+            pull_request)
+              build=true ;;                       # labeled PR: validate, no push
+            *)
+              # push: on master, rebuild only when DB content changed. Compare
+              # against github.event.before with a targeted fetch (two-dot diff
+              # needs only the two commit objects, not the history between them).
+              # Fail safe toward rebuilding whenever the base can't be resolved.
+              if [ "${{ github.ref_name }}" = "master" ]; then
+                before="${{ github.event.before }}"
+                if [ -z "$before" ] || [ "$before" = "0000000000000000000000000000000000000000" ]; then
+                  build=true                      # no base → rebuild
+                elif ! git fetch --depth=1 origin "$before"; then
+                  build=true                      # base unfetchable → rebuild
+                else
+                  # Capture to a var (no pipe) to avoid set -o pipefail + SIGPIPE
+                  # false negatives from `grep -q`.
+                  changed="$(git diff --name-only "$before" "${{ github.sha }}" -- 'data/sql/**')"
+                  if [ -n "$changed" ]; then build=true; fi
+                fi
+              fi ;;
+          esac
           echo "build=$build" >> "$GITHUB_OUTPUT"
 
       - name: Import database and capture datadir
         if: steps.db_gate.outputs.build == 'true'
         run: |
           set -euo pipefail
+
+          # Tear down the helper container/network on success or failure.
+          cleanup() {
+            docker rm -f acdb >/dev/null 2>&1 || true
+            docker network rm acnet >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
 
           docker network create acnet
 
@@ -190,8 +209,11 @@ jobs:
             sleep 2
           done
 
-          # Import with the db-import image pushed earlier in this job (includes
-          # Eluna, no test modules). AutoSetup creates the acore_* databases.
+          # Import with the published db-import image (includes Eluna, no test
+          # modules). AutoSetup creates the acore_* databases. On master this is
+          # the image pushed earlier in this same job; on a labeled PR it is the
+          # current published :master, validating the pipeline mechanics (per-PR
+          # SQL content is already covered by dashboard-ci's dry-run).
           docker pull "acore/ac-wotlk-db-import:master"
           docker run --rm --network acnet \
             -e AC_LOGIN_DATABASE_INFO="acdb;3306;root;password;acore_auth" \
@@ -218,13 +240,42 @@ jobs:
           mkdir -p db-ctx
           mv mysql-seed db-ctx/
 
-      - name: Build and push pre-imported DB image
+      - name: Build (and push on master) pre-imported DB image
         if: steps.db_gate.outputs.build == 'true'
         run: |
           set -euo pipefail
           VERSION="$(jq -r '.version' acore.json)"
-          docker buildx build --platform linux/amd64,linux/arm64 \
-            -f apps/docker/Dockerfile.db \
-            -t "acore/ac-wotlk-db:master" \
-            -t "acore/ac-wotlk-db:${VERSION}" \
-            --push db-ctx
+
+          # Push only on master of the canonical repo (same condition as
+          # RUNNING_ON_PRIMARY_BRANCH, computed here to avoid its trailing newline).
+          if [ "${{ github.repository }}" = "azerothcore/azerothcore-wotlk" ] && [ "${{ github.ref_name }}" = "master" ]; then
+            # master: multi-arch (same arch-neutral datadir on each base) + push.
+            docker buildx build --platform linux/amd64,linux/arm64 \
+              -f apps/docker/Dockerfile.db \
+              -t "acore/ac-wotlk-db:master" \
+              -t "acore/ac-wotlk-db:${VERSION}" \
+              --push db-ctx
+          else
+            # PR validation: single-arch, load locally, smoke-test that it boots
+            # with the data baked in. No push (no Docker Hub login on PRs).
+            docker buildx build --platform linux/amd64 --load \
+              -f apps/docker/Dockerfile.db \
+              -t "acore/ac-wotlk-db:pr-test" db-ctx
+
+            trap 'docker rm -f acdb-test >/dev/null 2>&1 || true' EXIT
+            docker run -d --name acdb-test acore/ac-wotlk-db:pr-test
+            # Pre-initialized datadir: the entrypoint skips init and starts the
+            # real server directly, so a socket ping has no temp-server race here.
+            for i in $(seq 1 60); do
+              docker exec acdb-test mysqladmin ping -uroot -ppassword --silent && break
+              if [ "$i" -eq 60 ]; then
+                echo "DB image failed to boot" >&2; docker logs acdb-test >&2; exit 1
+              fi
+              sleep 2
+            done
+            for db in acore_auth acore_world acore_characters; do
+              docker exec acdb-test mysql -uroot -ppassword \
+                -e "USE $db; SELECT 1;" >/dev/null
+            done
+            echo "DB image booted and all three databases are present."
+          fi
