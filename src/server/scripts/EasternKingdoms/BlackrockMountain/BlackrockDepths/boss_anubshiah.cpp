@@ -34,84 +34,67 @@ constexpr Milliseconds TIMER_CURSE_WEAKNESS = 12s;
 constexpr Milliseconds TIMER_DEMON_ARMOR = 3s; //virtually only cast once
 constexpr Milliseconds TIMER_ENVELOPING_WEB = 16s;
 
-class boss_anubshiah : public CreatureScript
+struct boss_anubshiah : public BossAI
 {
-public:
-    boss_anubshiah() : CreatureScript("boss_anubshiah") { }
+    boss_anubshiah(Creature* creature) :  BossAI(creature, DATA_ANUBSHIAH) { }
 
-    CreatureAI* GetAI(Creature* creature) const override
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        return GetBlackrockDepthsAI<boss_anubshiahAI>(creature);
+        _JustEngagedWith();
+        events.ScheduleEvent(SPELL_SHADOWBOLT, TIMER_SHADOWBOLT / 5);
+        events.ScheduleEvent(SPELL_CURSE_TONGUES, TIMER_CURSE_TONGUES / 5);
+        events.ScheduleEvent(SPELL_CURSE_WEAKNESS, TIMER_CURSE_WEAKNESS / 5);
+        events.ScheduleEvent(SPELL_DEMON_ARMOR, TIMER_DEMON_ARMOR / 5);
+        events.ScheduleEvent(SPELL_ENVELOPING_WEB, TIMER_ENVELOPING_WEB / 5);
     }
 
-    struct boss_anubshiahAI : public BossAI
+    void UpdateAI(uint32 diff) override
     {
-        boss_anubshiahAI(Creature* creature) :  BossAI(creature, DATA_ANUBSHIAH) { }
+        //Return since we have no target
+        if (!UpdateVictim())
+            return;
 
-        void JustEngagedWith(Unit* /*who*/) override
+        events.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        while (uint32 eventId = events.ExecuteEvent())
         {
-            _JustEngagedWith();
-            events.ScheduleEvent(SPELL_SHADOWBOLT, TIMER_SHADOWBOLT / 5);
-            events.ScheduleEvent(SPELL_CURSE_TONGUES, TIMER_CURSE_TONGUES / 5);
-            events.ScheduleEvent(SPELL_CURSE_WEAKNESS, TIMER_CURSE_WEAKNESS / 5);
-            events.ScheduleEvent(SPELL_DEMON_ARMOR, TIMER_DEMON_ARMOR / 5);
-            events.ScheduleEvent(SPELL_ENVELOPING_WEB, TIMER_ENVELOPING_WEB / 5);
+            switch (eventId)
+            {
+            case SPELL_SHADOWBOLT:
+                DoCastVictim(SPELL_SHADOWBOLT);
+                events.ScheduleEvent(SPELL_SHADOWBOLT, TIMER_SHADOWBOLT - 2s, TIMER_SHADOWBOLT + 2s);
+                break;
+            case SPELL_CURSE_TONGUES:
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
+                    DoCast(target, SPELL_CURSE_TONGUES);
+                events.ScheduleEvent(SPELL_CURSE_TONGUES, TIMER_CURSE_TONGUES - 2s, TIMER_CURSE_TONGUES + 2s);
+                break;
+            case SPELL_CURSE_WEAKNESS:
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
+                    DoCast(target, SPELL_CURSE_WEAKNESS);
+                events.ScheduleEvent(SPELL_CURSE_WEAKNESS, TIMER_CURSE_WEAKNESS - 2s, TIMER_CURSE_WEAKNESS + 2s);
+                break;
+            case SPELL_DEMON_ARMOR:
+                DoCast(me, SPELL_DEMON_ARMOR);
+                events.ScheduleEvent(SPELL_DEMON_ARMOR, TIMER_DEMON_ARMOR);
+                break;
+            case SPELL_ENVELOPING_WEB:
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
+                    DoCast(target, SPELL_ENVELOPING_WEB);
+                events.ScheduleEvent(SPELL_ENVELOPING_WEB, TIMER_ENVELOPING_WEB - 2s, TIMER_ENVELOPING_WEB + 2s);
+                break;
+            default:
+                break;
+            }
         }
-
-        void UpdateAI(uint32 diff) override
-        {
-            //Return since we have no target
-            if (!UpdateVictim())
-            {
-                return;
-            }
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-            {
-                return;
-            }
-            while (uint32 eventId = events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                case SPELL_SHADOWBOLT:
-                    DoCastVictim(SPELL_SHADOWBOLT);
-                    events.ScheduleEvent(SPELL_SHADOWBOLT, TIMER_SHADOWBOLT - 2s, TIMER_SHADOWBOLT + 2s);
-                    break;
-                case SPELL_CURSE_TONGUES:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
-                    {
-                        DoCast(target, SPELL_CURSE_TONGUES);
-                    }
-                    events.ScheduleEvent(SPELL_CURSE_TONGUES, TIMER_CURSE_TONGUES - 2s, TIMER_CURSE_TONGUES + 2s);
-                    break;
-                case SPELL_CURSE_WEAKNESS:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
-                    {
-                        DoCast(target, SPELL_CURSE_WEAKNESS);
-                    }
-                    events.ScheduleEvent(SPELL_CURSE_WEAKNESS, TIMER_CURSE_WEAKNESS - 2s, TIMER_CURSE_WEAKNESS + 2s);
-                    break;
-                case SPELL_DEMON_ARMOR:
-                    DoCast(me, SPELL_DEMON_ARMOR);
-                    events.ScheduleEvent(SPELL_DEMON_ARMOR, TIMER_DEMON_ARMOR);
-                    break;
-                case SPELL_ENVELOPING_WEB:
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 100, true))
-                        DoCast(target, SPELL_ENVELOPING_WEB);
-                    events.ScheduleEvent(SPELL_ENVELOPING_WEB, TIMER_ENVELOPING_WEB - 2s, TIMER_ENVELOPING_WEB + 2s);
-                    break;
-                default:
-                    break;
-                }
-            }
-            DoMeleeAttackIfReady();
-        }
-    };
+        DoMeleeAttackIfReady();
+    }
 };
 
 void AddSC_boss_anubshiah()
 {
-    new boss_anubshiah();
+    RegisterBlackrockDepthsCreatureAI(boss_anubshiah);
 }

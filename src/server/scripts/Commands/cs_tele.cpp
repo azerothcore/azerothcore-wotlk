@@ -23,6 +23,7 @@
 #include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "RBAC.h"
 
 using namespace Acore::ChatCommands;
 
@@ -35,22 +36,22 @@ public:
     {
         static ChatCommandTable teleNameNpcCommandTable =
         {
-            { "id",     HandleTeleNameNpcIdCommand,      SEC_GAMEMASTER,    Console::Yes },
-            { "guid",   HandleTeleNameNpcSpawnIdCommand, SEC_GAMEMASTER,    Console::Yes },
-            { "name",   HandleTeleNameNpcNameCommand,    SEC_GAMEMASTER,    Console::Yes },
+            { "id",     HandleTeleNameNpcIdCommand,      rbac::RBAC_PERM_COMMAND_TELE_NAME,    Console::Yes },
+            { "guid",   HandleTeleNameNpcSpawnIdCommand, rbac::RBAC_PERM_COMMAND_TELE_NAME,    Console::Yes },
+            { "name",   HandleTeleNameNpcNameCommand,    rbac::RBAC_PERM_COMMAND_TELE_NAME,    Console::Yes },
         };
         static ChatCommandTable teleNameCommandTable =
         {
             { "npc",    teleNameNpcCommandTable },
-            { "",       HandleTeleNameCommand,           SEC_GAMEMASTER,    Console::Yes },
+            { "",       HandleTeleNameCommand,           rbac::RBAC_PERM_COMMAND_TELE_NAME,    Console::Yes },
         };
         static ChatCommandTable teleCommandTable =
         {
-            { "add",    HandleTeleAddCommand,            SEC_ADMINISTRATOR, Console::No },
-            { "del",    HandleTeleDelCommand,            SEC_ADMINISTRATOR, Console::Yes },
+            { "add",    HandleTeleAddCommand,            rbac::RBAC_PERM_COMMAND_TELE_ADD,     Console::No },
+            { "del",    HandleTeleDelCommand,            rbac::RBAC_PERM_COMMAND_TELE_DEL,     Console::Yes },
             { "name",   teleNameCommandTable },
-            { "group",  HandleTeleGroupCommand,          SEC_GAMEMASTER,    Console::No },
-            { "",       HandleTeleCommand,               SEC_GAMEMASTER,    Console::No }
+            { "group",  HandleTeleGroupCommand,          rbac::RBAC_PERM_COMMAND_TELE_GROUP,   Console::No },
+            { "",       HandleTeleCommand,               rbac::RBAC_PERM_COMMAND_TELE,         Console::No }
         };
         static ChatCommandTable commandTable =
         {

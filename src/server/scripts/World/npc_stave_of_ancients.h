@@ -88,6 +88,15 @@ enum NPCPrecious
     PRECIOUS_EVIL_ENTRY                       = 14538
 };
 
+enum SimoneAIData
+{
+    DATA_SIMONE_REVEAL = 1,
+    DATA_SIMONE_PREPARE_ENCOUNTER = 2,
+    DATA_SIMONE_VALID_THREATLIST = 3,
+    DATA_SIMONE_SET_HOME = 4,
+    DATA_SIMONE_CORPSE_REMOVED = 5
+};
+
 enum NPCNelson
 {
     NELSON_EVENT_DREADFUL_FRIGHT              = 6,
@@ -137,7 +146,6 @@ struct NPCStaveQuestAI : public ScriptedAI
     ObjectGuid gossipPlayerGUID;
     ObjectGuid playerGUID;
     bool encounterStarted;
-    ThreatContainer::StorageType const& threatList = me->GetThreatMgr().GetThreatList();
 
     std::map<int, int> entryKeys = {
         { ARTORIUS_NORMAL_ENTRY, 1 },
@@ -190,10 +198,10 @@ struct NPCStaveQuestAI : public ScriptedAI
     void RevealForm();
     void StorePlayerGUID();
     Player* GetGossipPlayer();
-    bool IsAllowedEntry(uint32 /*entry*/);
-    bool UnitIsUnfair(Unit* unit);
-    bool IsFairFight();
-    bool ValidThreatlist();
+    bool IsAllowedEntry(uint32 /*entry*/) const;
+    bool UnitIsUnfair(Unit* unit) const;
+    bool IsFairFight() const;
+    bool ValidThreatlist() const;
     void SetHomePosition();
     void PrepareForEncounter();
     void ClearLootIfUnfair(Unit* killer);

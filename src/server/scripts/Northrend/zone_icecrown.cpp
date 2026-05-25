@@ -81,6 +81,7 @@ enum valhalas
     EVENT_VALHALAS_SECOND                       = 2,
     EVENT_VALHALAS_THIRD                        = 3,
     EVENT_VALHALAS_CHECK_PLAYER                 = 4,
+    EVENT_VALHALAS_THIRD_2                      = 5,
 
     // Fallen Heroes
     NPC_ELDRETH                                 = 31195,
@@ -111,12 +112,16 @@ public:
         EventMap events;
         SummonList summons;
         ObjectGuid playerGUID;
-        ObjectGuid playerGUID2;
         uint32 currentQuest;
 
         void Reset() override
         {
             ResetData();
+        }
+
+        void JustReachedHome() override
+        {
+            me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
         }
 
         void ResetData()
@@ -125,7 +130,7 @@ public:
             summons.DespawnAll();
             playerGUID.Clear();
             currentQuest = 0;
-            me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
+            me->SetNpcFlag(UNIT_NPC_FLAG_QUESTGIVER | UNIT_NPC_FLAG_GOSSIP);
         }
 
         void JustSummoned(Creature* creature) override
@@ -170,63 +175,16 @@ public:
         {
             events.ScheduleEvent(EVENT_VALHALAS_FIRST, 6s);
             events.ScheduleEvent(EVENT_VALHALAS_CHECK_PLAYER, 30s);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
             currentQuest = questId;
             playerGUID = guid;
         }
 
-        void CheckSummons()
+        void EndBattle()
         {
-            bool allow = true;
-            for (ObjectGuid const& guid : summons)
-                if (Creature* cr = ObjectAccessor::GetCreature(*me, guid))
-                    if (cr->IsAlive())
-                        allow = false;
-
-            if (allow)
-            {
-                uint32 quest = currentQuest;
-                if (Player* player = ObjectAccessor::GetPlayer(*me, playerGUID))
-                {
-                    switch (quest)
-                    {
-                        case QUEST_BFV_FALLEN_HEROES:
-                            me->Yell("$N has defeated the fallen heroes of Valhalas battles past. This is only a beginning, but it will suffice.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
-                            break;
-                        case QUEST_BFV_DARK_MASTER:
-                            me->Yell("Khit'rix the Dark Master has been defeated by $N and his band of companions. Let the next challenge be issued!", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
-                            break;
-                        case QUEST_BFV_SIGRID:
-                            me->Yell("$N has defeated Sigrid Iceborn for a second time. Well, this time he did it with the help of his friends, but a win is a win!", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
-                            break;
-                        case QUEST_BFV_CARNAGE:
-                            me->Yell("The horror known as Carnage is no more. Could it be that $N is truly worthy of battle in Valhalas? We shall see.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
-                            break;
-                        case QUEST_BFV_THANE:
-                            me->Yell("Thane Banahogg the Deathblow has fallen to $N and his fighting companions. He has but one challenge ahead of him. Who will it be?", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
-                            break;
-                        case QUEST_BFV_FINAL:
-                            me->Yell("The unthinkable has happened... $N has slain Prince Sandoval!", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
-                            break;
-                    }
-                    player->GroupEventHappens(quest, player);
-                }
-                playerGUID2 = playerGUID;
-                EnterEvadeMode();
-                if (quest == QUEST_BFV_FINAL)
-                    events.ScheduleEvent(EVENT_VALHALAS_THIRD, 7s);
-            }
-            else
-            {
-                uint32 quest = currentQuest;
-                if (Player* player = ObjectAccessor::GetPlayer(*me, playerGUID))
-                {
-                    if (!player->HasQuest(quest))
-                    {
-                        ResetData();
-                        return;
-                    }
-                }
-            }
+            ResetData();
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+            me->GetMotionMaster()->MoveTargetedHome();
         }
 
         void UpdateAI(uint32 diff) override
@@ -296,29 +254,65 @@ public:
                     }
                 case EVENT_VALHALAS_THIRD:
                     {
-                        me->Yell("In defeating him, he and his fighting companions have proven themselves worthy of battle in this most sacred place of vrykul honor.", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
-                        events.ScheduleEvent(EVENT_VALHALAS_THIRD + 2, 7s);
+                        if (Player* player = ObjectAccessor::GetPlayer(*me, playerGUID))
+                            me->Yell("In defeating him, he and his fighting companions have proven themselves worthy of battle in this most sacred place of vrykul honor.", LANG_UNIVERSAL, player);
+                        events.ScheduleEvent(EVENT_VALHALAS_THIRD_2, 7s);
                         break;
                     }
-                case EVENT_VALHALAS_THIRD+2:
+                case EVENT_VALHALAS_THIRD_2:
                     {
-                        me->Yell("ALL HAIL $N, CHAMPION OF VALHALAS! ", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID2));
+                        if (Player* player = ObjectAccessor::GetPlayer(*me, playerGUID))
+                            me->Yell("ALL HAIL $N, CHAMPION OF VALHALAS! ", LANG_UNIVERSAL, player);
+                        EndBattle();
                         break;
                     }
                 case EVENT_VALHALAS_CHECK_PLAYER:
                     {
-                        bool fail = true;
-                        if (Player* player = ObjectAccessor::GetPlayer(*me, playerGUID))
-                            if (me->GetDistance(player) < 100.0f)
+                        Player* player = ObjectAccessor::GetPlayer(*me, playerGUID);
+                        if (!player || me->GetDistance(player) >= 100.0f)
+                        {
+                            EndBattle();
+                            break;
+                        }
+
+                        if (summons.IsAnyCreatureAlive())
+                        {
+                            if (!player->HasQuest(currentQuest))
+                                EndBattle();
+                            else
+                                events.Repeat(5s);
+                        }
+                        else
+                        {
+                            switch (currentQuest)
                             {
-                                fail = false;
-                                CheckSummons();
+                                case QUEST_BFV_FALLEN_HEROES:
+                                    me->Yell("$N has defeated the fallen heroes of Valhalas battles past. This is only a beginning, but it will suffice.", LANG_UNIVERSAL, player);
+                                    break;
+                                case QUEST_BFV_DARK_MASTER:
+                                    me->Yell("Khit'rix the Dark Master has been defeated by $N and his band of companions. Let the next challenge be issued!", LANG_UNIVERSAL, player);
+                                    break;
+                                case QUEST_BFV_SIGRID:
+                                    me->Yell("$N has defeated Sigrid Iceborn for a second time. Well, this time he did it with the help of his friends, but a win is a win!", LANG_UNIVERSAL, player);
+                                    break;
+                                case QUEST_BFV_CARNAGE:
+                                    me->Yell("The horror known as Carnage is no more. Could it be that $N is truly worthy of battle in Valhalas? We shall see.", LANG_UNIVERSAL, player);
+                                    break;
+                                case QUEST_BFV_THANE:
+                                    me->Yell("Thane Banahogg the Deathblow has fallen to $N and his fighting companions. He has but one challenge ahead of him. Who will it be?", LANG_UNIVERSAL, player);
+                                    break;
+                                case QUEST_BFV_FINAL:
+                                    me->Yell("The unthinkable has happened... $N has slain Prince Sandoval!", LANG_UNIVERSAL, player);
+                                    break;
                             }
 
-                        if (fail)
-                            EnterEvadeMode();
+                            player->GroupEventHappens(currentQuest, player);
 
-                        events.Repeat(5s);
+                            if (currentQuest == QUEST_BFV_FINAL)
+                                events.ScheduleEvent(EVENT_VALHALAS_THIRD, 7s);
+                            else
+                                EndBattle();
+                        }
                         break;
                     }
             }
@@ -687,23 +681,28 @@ public:
 
     struct npc_tirions_gambit_tirionAI : npc_escortAI
     {
-        npc_tirions_gambit_tirionAI(Creature* creature) : npc_escortAI(creature), summons(me)
+        npc_tirions_gambit_tirionAI(Creature* creature) : npc_escortAI(creature), summons(me), _eventOver(false)
         {
         }
 
         EventMap events;
         SummonList summons;
+        bool _eventOver;
 
         void Reset() override
         {
             me->setActive(false);
             me->SetStandState(UNIT_STAND_STATE_STAND);
+            _eventOver = false;
         }
 
         void SetData(uint32 type, uint32 data) override
         {
-            if (type == 1 && data == 1)
+            if (type == 1 && data == 1 && !_eventOver)
+            {
                 events.ScheduleEvent(EVENT_SCENE_0 + 30, 10s);
+                _eventOver = true;
+            }
         }
 
         void DoAction(int32 param) override
@@ -748,12 +747,13 @@ public:
             summons.Despawn(summon);
         }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 pointId) override
         {
             switch (pointId)
             {
                 case 6:
-                    me->SummonCreature(NPC_INVOKER_BASALEPH, 6130.26f, 2764.83f, 573.92f, 5.19f, TEMPSUMMON_TIMED_DESPAWN, 10 * MINUTE * IN_MILLISECONDS);
+                    me->SummonCreature(NPC_INVOKER_BASALEPH, 6130.26f, 2764.83f, 573.92f, 5.19f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
                     Talk(1);
                     break;
                 case 15:
@@ -818,9 +818,9 @@ public:
                     Talk(2);
                     DoSummonAction(NPC_DISGUISED_CRUSADER, ACTION_SUMMON_ORIENTATION, 200);
 
-                    me->SummonCreature(NPC_CHOSEN_ZEALOT, 6160.74f, 2695.90f, 573.92f, 2.04f, TEMPSUMMON_TIMED_DESPAWN, 5 * MINUTE * IN_MILLISECONDS);
-                    me->SummonCreature(NPC_CHOSEN_ZEALOT, 6164.98f, 2697.90f, 573.92f, 2.04f, TEMPSUMMON_TIMED_DESPAWN, 5 * MINUTE * IN_MILLISECONDS);
-                    me->SummonCreature(NPC_CHOSEN_ZEALOT, 6161.26f, 2700.05f, 573.92f, 2.04f, TEMPSUMMON_TIMED_DESPAWN, 5 * MINUTE * IN_MILLISECONDS);
+                    me->SummonCreature(NPC_CHOSEN_ZEALOT, 6160.74f, 2695.90f, 573.92f, 2.04f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
+                    me->SummonCreature(NPC_CHOSEN_ZEALOT, 6164.98f, 2697.90f, 573.92f, 2.04f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
+                    me->SummonCreature(NPC_CHOSEN_ZEALOT, 6161.26f, 2700.05f, 573.92f, 2.04f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
 
                     DoSummonAction(NPC_CHOSEN_ZEALOT, ACTION_SUMMON_MOVE_STRAIGHT, 27);
                     events.ScheduleEvent(EVENT_SCENE_0, 30s);
@@ -841,7 +841,7 @@ public:
                     break;
                 case EVENT_SCENE_0+3:
                     Talk(3);
-                    if (Creature* cr = me->SummonCreature(NPC_TIRION_LICH_KING, 6161.26f, 2700.05f, 573.92f, 2.04f, TEMPSUMMON_TIMED_DESPAWN, 5 * MINUTE * IN_MILLISECONDS))
+                    if (Creature* cr = me->SummonCreature(NPC_TIRION_LICH_KING, 6161.26f, 2700.05f, 573.92f, 2.04f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000))
                         cr->GetMotionMaster()->MovePoint(2, 6131.93f, 2756.84f, 573.92f);
                     events.ScheduleEvent(EVENT_SCENE_0 + 4, 4s);
                     break;
@@ -982,7 +982,6 @@ public:
                             if (target)
                                 (*itr)->AI()->AttackStart(target);
                         }
-
                         break;
                     }
                 case EVENT_SCENE_0+30:
@@ -1660,7 +1659,7 @@ enum BlessedBanner
     NPC_ARGENT_MASON                    = 30900,
     NPC_REANIMATED_CAPTAIN              = 30986,
     NPC_SCOURGE_DRUDGE                  = 30984,
-    NPC_HIDEOUS_PLAGEBRINGER            = 30987,
+    NPC_HIDEOUS_PLAGUEBRINGER           = 30987,
     NPC_HALOF_THE_DEATHBRINGER          = 30989,
     NPC_LK                              = 31013,
 
@@ -1772,9 +1771,20 @@ public:
 
         void MoveInLineOfSight(Unit* /*who*/) override { }
 
-        void JustSummoned(Creature* Summoned) override
+        void JustSummoned(Creature* summon) override
         {
-            Summons.Summon(Summoned);
+            Summons.Summon(summon);
+            if (summon->GetEntry() == NPC_SCOURGE_DRUDGE || summon->GetEntry() == NPC_REANIMATED_CAPTAIN ||
+                summon->GetEntry() == NPC_HIDEOUS_PLAGUEBRINGER || summon->GetEntry() == NPC_HALOF_THE_DEATHBRINGER)
+            {
+                summon->SetHomePosition(DalforsPos[2]);
+                summon->SetReactState(REACT_PASSIVE);
+                summon->EngageWithTarget(me);
+                summon->m_Events.AddEventAtOffset([summon]()
+                {
+                    summon->SetReactState(REACT_AGGRESSIVE);
+                }, 2s);
+            }
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -1927,36 +1937,16 @@ public:
                             if (Creature* LK = GetClosestCreatureWithEntry(me, NPC_LK, 100))
                                 LK->AI()->Talk(LK_TALK_3);
                         }
-                        if (Creature* tempsum = DoSummon(NPC_SCOURGE_DRUDGE, Mason3Pos[0]))
-                        {
-                            tempsum->SetHomePosition(DalforsPos[2]);
-                            tempsum->AI()->AttackStart(GetClosestCreatureWithEntry(me, NPC_BLESSED_BANNER, 100));
-                        }
+                        DoSummon(NPC_SCOURGE_DRUDGE, Mason3Pos[0]);
                         if (urand(0, 1) == 0)
                         {
-                            if (Creature* tempsum = DoSummon(NPC_HIDEOUS_PLAGEBRINGER, Mason1Pos[0]))
-                            {
-                                tempsum->SetHomePosition(DalforsPos[2]);
-                                tempsum->AI()->AttackStart(GetClosestCreatureWithEntry(me, NPC_BLESSED_BANNER, 100));
-                            }
-                            if (Creature* tempsum = DoSummon(NPC_HIDEOUS_PLAGEBRINGER, Mason2Pos[0]))
-                            {
-                                tempsum->SetHomePosition(DalforsPos[2]);
-                                tempsum->AI()->AttackStart(GetClosestCreatureWithEntry(me, NPC_BLESSED_BANNER, 100));
-                            }
+                            DoSummon(NPC_HIDEOUS_PLAGUEBRINGER, Mason1Pos[0]);
+                            DoSummon(NPC_HIDEOUS_PLAGUEBRINGER, Mason2Pos[0]);
                         }
                         else
                         {
-                            if (Creature* tempsum = DoSummon(NPC_REANIMATED_CAPTAIN, Mason1Pos[0]))
-                            {
-                                tempsum->SetHomePosition(DalforsPos[2]);
-                                tempsum->AI()->AttackStart(GetClosestCreatureWithEntry(me, NPC_BLESSED_BANNER, 100));
-                            }
-                            if (Creature* tempsum = DoSummon(NPC_REANIMATED_CAPTAIN, Mason2Pos[0]))
-                            {
-                                tempsum->SetHomePosition(DalforsPos[2]);
-                                tempsum->AI()->AttackStart(GetClosestCreatureWithEntry(me, NPC_BLESSED_BANNER, 100));
-                            }
+                            DoSummon(NPC_REANIMATED_CAPTAIN, Mason1Pos[0]);
+                            DoSummon(NPC_REANIMATED_CAPTAIN, Mason2Pos[0]);
                         }
 
                         PhaseCount++;
@@ -1971,22 +1961,12 @@ public:
                     {
                         if (Creature* LK = GetClosestCreatureWithEntry(me, NPC_LK, 100))
                             LK->AI()->Talk(LK_TALK_4);
-                        if (Creature* tempsum = DoSummon(NPC_SCOURGE_DRUDGE, Mason1Pos[0]))
-                        {
-                            tempsum->SetHomePosition(DalforsPos[2]);
-                            tempsum->AI()->AttackStart(GetClosestCreatureWithEntry(me, NPC_BLESSED_BANNER, 100));
-                        }
-                        if (Creature* tempsum = DoSummon(NPC_SCOURGE_DRUDGE, Mason2Pos[0]))
-                        {
-                            tempsum->SetHomePosition(DalforsPos[2]);
-                            tempsum->AI()->AttackStart(GetClosestCreatureWithEntry(me, NPC_BLESSED_BANNER, 100));
-                        }
+                        DoSummon(NPC_SCOURGE_DRUDGE, Mason1Pos[0]);
+                        DoSummon(NPC_SCOURGE_DRUDGE, Mason2Pos[0]);
                         if (Creature* tempsum = DoSummon(NPC_HALOF_THE_DEATHBRINGER, DalforsPos[0]))
                         {
                             HalofSpawned = true;
                             guidHalof = tempsum->GetGUID();
-                            tempsum->SetHomePosition(DalforsPos[2]);
-                            tempsum->AI()->AttackStart(GetClosestCreatureWithEntry(me, NPC_BLESSED_BANNER, 100));
                         }
                     }
                     break;
@@ -2003,7 +1983,7 @@ public:
                     if (Halof->isDead())
                     {
                         DoCast(me, SPELL_CRUSADERS_SPIRE_VICTORY, true);
-                        Summons.DespawnEntry(NPC_HIDEOUS_PLAGEBRINGER);
+                        Summons.DespawnEntry(NPC_HIDEOUS_PLAGUEBRINGER);
                         Summons.DespawnEntry(NPC_REANIMATED_CAPTAIN);
                         Summons.DespawnEntry(NPC_SCOURGE_DRUDGE);
                         Summons.DespawnEntry(NPC_HALOF_THE_DEATHBRINGER);

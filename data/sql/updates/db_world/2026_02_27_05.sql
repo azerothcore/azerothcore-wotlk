@@ -1,0 +1,11 @@
+-- DB update 2026_02_27_04 -> 2026_02_27_05
+-- Beacon of Light (53651): restrict proc to Holy Light, Flash of Light, Holy Shock, Lay on Hands
+-- Previously had no SpellFamily filter, allowing unintended heals to transfer:
+-- Glyph of Holy Light (54968), Seal of Light (20167), JoL (20267)
+-- SpellFamilyName=10 (PALADIN) blocks Glyph of Holy Light (GENERIC family)
+-- SpellFamilyMask 0xC0008000/0x00010000 allows only:
+--   Holy Light (635)        Flags[0]=0x80000000
+--   Flash of Light (19750)  Flags[0]=0x40000000
+--   Lay on Hands (633)      Flags[0]=0x00008000
+--   Holy Shock heal (25914) Flags[1]=0x00010000
+UPDATE `spell_proc` SET `SpellFamilyName` = 10, `SpellFamilyMask0` = 0xC0008000, `SpellFamilyMask1` = 0x00010000 WHERE `SpellId` = 53651;

@@ -158,7 +158,7 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr0>::ToString(SpellAttr0 value)
 {
     switch (value)
     {
-        case SPELL_ATTR0_PROC_FAILURE_BURNS_CHARGE: return { "SPELL_ATTR0_PROC_FAILURE_BURNS_CHARGE", "Unknown attribute 0@Attr0", "" };
+        case SPELL_ATTR0_PROC_FAILURE_BURNS_CHARGE: return { "SPELL_ATTR0_PROC_FAILURE_BURNS_CHARGE", "Proc Failure Burns Charge", "" };
         case SPELL_ATTR0_USES_RANGED_SLOT: return { "SPELL_ATTR0_USES_RANGED_SLOT", "Treat as ranged attack", "Use ammo, ranged attack range modifiers, ranged haste, etc." };
         case SPELL_ATTR0_ON_NEXT_SWING_NO_DAMAGE: return { "SPELL_ATTR0_ON_NEXT_SWING_NO_DAMAGE", "On next melee (type 1)", "Both \042on next swing\042 attributes have identical handling in server & client" };
         case SPELL_ATTR0_DO_NOT_LOG_IMMUNE_MISSES: return { "SPELL_ATTR0_DO_NOT_LOG_IMMUNE_MISSES", "Replenishment (client only)", "" };
@@ -439,7 +439,7 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr2>::ToString(SpellAttr2 value)
         case SPELL_ATTR2_INITIATE_COMBAT_POST_CAST: return { "SPELL_ATTR2_INITIATE_COMBAT_POST_CAST", "(Enables Auto-Attack)", "" };
         case SPELL_ATTR2_FAIL_ON_ALL_TARGETS_IMMUNE: return { "SPELL_ATTR2_FAIL_ON_ALL_TARGETS_IMMUNE", "Damage reduction ability", "Causes BG flags to be dropped if combined with ATTR1_DISPEL_AURAS_ON_IMMUNITY" };
         case SPELL_ATTR2_NO_INITIAL_THREAD: return { "SPELL_ATTR2_NO_INITIAL_THREAD", "Unknown attribute 22@Attr2", "Ambush, Backstab, Cheap Shot, Death Grip, Garrote, Judgements, Mutilate, Pounce, Ravage, Shiv, Shred" };
-        case SPELL_ATTR2_PROC_COOLDOWN_ON_FAILURE: return { "SPELL_ATTR2_PROC_COOLDOWN_ON_FAILURE", "Arcane Concentration", "" };
+        case SPELL_ATTR2_PROC_COOLDOWN_ON_FAILURE: return { "SPELL_ATTR2_PROC_COOLDOWN_ON_FAILURE", "Proc Cooldown On Failure", "" };
         case SPELL_ATTR2_ITEM_CAST_WITH_OWNER_SKILL: return { "SPELL_ATTR2_ITEM_CAST_WITH_OWNER_SKILL", "Unknown attribute 24@Attr2", "" };
         case SPELL_ATTR2_DONT_BLOCK_MANA_REGEN: return { "SPELL_ATTR2_DONT_BLOCK_MANA_REGEN", "Unknown attribute 25@Attr2", "" };
         case SPELL_ATTR2_NO_SCHOOL_IMMUNITIES: return { "SPELL_ATTR2_NO_SCHOOL_IMMUNITIES", "Pierce aura application immunities", "Allow aura to be applied despite target being immune to new aura applications" };
@@ -688,7 +688,7 @@ AC_API_EXPORT EnumText EnumUtils<SpellAttr4>::ToString(SpellAttr4 value)
         case SPELL_ATTR4_NO_PARTIAL_IMMUNITY: return { "SPELL_ATTR4_NO_PARTIAL_IMMUNITY", "Unknown attribute 11@Attr4", "" };
         case SPELL_ATTR4_AURA_IS_BUFF: return { "SPELL_ATTR4_AURA_IS_BUFF", "Unknown attribute 12@Attr4", "" };
         case SPELL_ATTR4_DO_NOT_LOG_CASTER: return { "SPELL_ATTR4_DO_NOT_LOG_CASTER", "Unknown attribute 13@Attr4", "" };
-        case SPELL_ATTR4_REACTIVE_DAMAGE_PROC: return { "SPELL_ATTR4_REACTIVE_DAMAGE_PROC", "Damage does not break auras", "" };
+        case SPELL_ATTR4_DAMAGE_DOESNT_BREAK_AURAS: return { "SPELL_ATTR4_DAMAGE_DOESNT_BREAK_AURAS", "Damage does not break auras", "" };
         case SPELL_ATTR4_NOT_IN_SPELLBOOK: return { "SPELL_ATTR4_NOT_IN_SPELLBOOK", "Unknown attribute 15@Attr4", "" };
         case SPELL_ATTR4_NOT_IN_ARENA_OR_RATED_BATTLEGROUND: return { "SPELL_ATTR4_NOT_IN_ARENA_OR_RATED_BATTLEGROUND", "Not usable in arena", "Makes spell unusable despite CD <= 10min" };
         case SPELL_ATTR4_IGNORE_DEFAULT_ARENA_RESTRICTIONS: return { "SPELL_ATTR4_IGNORE_DEFAULT_ARENA_RESTRICTIONS", "Usable in arena", "Makes spell usable despite CD > 10min" };
@@ -732,7 +732,7 @@ AC_API_EXPORT SpellAttr4 EnumUtils<SpellAttr4>::FromIndex(std::size_t index)
         case 11: return SPELL_ATTR4_NO_PARTIAL_IMMUNITY;
         case 12: return SPELL_ATTR4_AURA_IS_BUFF;
         case 13: return SPELL_ATTR4_DO_NOT_LOG_CASTER;
-        case 14: return SPELL_ATTR4_REACTIVE_DAMAGE_PROC;
+        case 14: return SPELL_ATTR4_DAMAGE_DOESNT_BREAK_AURAS;
         case 15: return SPELL_ATTR4_NOT_IN_SPELLBOOK;
         case 16: return SPELL_ATTR4_NOT_IN_ARENA_OR_RATED_BATTLEGROUND;
         case 17: return SPELL_ATTR4_IGNORE_DEFAULT_ARENA_RESTRICTIONS;
@@ -773,7 +773,7 @@ AC_API_EXPORT std::size_t EnumUtils<SpellAttr4>::ToIndex(SpellAttr4 value)
         case SPELL_ATTR4_NO_PARTIAL_IMMUNITY: return 11;
         case SPELL_ATTR4_AURA_IS_BUFF: return 12;
         case SPELL_ATTR4_DO_NOT_LOG_CASTER: return 13;
-        case SPELL_ATTR4_REACTIVE_DAMAGE_PROC: return 14;
+        case SPELL_ATTR4_DAMAGE_DOESNT_BREAK_AURAS: return 14;
         case SPELL_ATTR4_NOT_IN_SPELLBOOK: return 15;
         case SPELL_ATTR4_NOT_IN_ARENA_OR_RATED_BATTLEGROUND: return 16;
         case SPELL_ATTR4_IGNORE_DEFAULT_ARENA_RESTRICTIONS: return 17;
