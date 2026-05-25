@@ -2,7 +2,6 @@
 -- Modèle: Gemma4 via LiteLLM
 -- Quêtes traitées: 4461
 -- Textes détectés: 6037
-SET NAMES utf8mb4;
 
 -- Quest 5 [RequestItems]
 DELETE FROM `quest_request_items_locale` WHERE `ID`=5 AND `locale`='frFR';
