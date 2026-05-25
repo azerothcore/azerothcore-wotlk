@@ -38,6 +38,11 @@
 # default build directory if not specified by CMAKE configuration
 /out/*
 
+# Python bytecode cache (regenerated on every script run)
+__pycache__/
+*.pyc
+*.pyo
+
 #
 #Generic
 #
