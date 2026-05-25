@@ -1,3 +1,4 @@
+-- DB update 2026_05_24_02 -> 2026_05_25_00
 -- Hide Whispering Wind (30848) during Wintergrasp battle.
 -- Aura 52107 phases the creature out while war is active; the other five
 -- small WG elementals (30842, 30845, 30846, 30847, 30849) already have it
