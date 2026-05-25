@@ -340,6 +340,7 @@ public:
             }
         }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 i) override
         {
             if (i == 12)

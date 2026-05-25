@@ -281,7 +281,7 @@ enum AuraType
     SPELL_AURA_HASTE_RANGED                                 = 218,
     SPELL_AURA_MOD_MANA_REGEN_FROM_STAT                     = 219,
     SPELL_AURA_MOD_RATING_FROM_STAT                         = 220,
-    SPELL_AURA_IGNORED                                      = 221,
+    SPELL_AURA_MOD_DETAUNT                                  = 221,
     SPELL_AURA_222                                          = 222,
     SPELL_AURA_RAID_PROC_FROM_CHARGE                        = 223,
     SPELL_AURA_224                                          = 224,
@@ -329,7 +329,7 @@ enum AuraType
     SPELL_AURA_266                                          = 266,
     SPELL_AURA_MOD_IMMUNE_AURA_APPLY_SCHOOL                 = 267,
     SPELL_AURA_MOD_ATTACK_POWER_OF_STAT_PERCENT             = 268,
-    SPELL_AURA_MOD_IGNORE_TARGET_RESIST                     = 269,
+    SPELL_AURA_MOD_IGNORE_TARGET_RESIST_MODIFIERS           = 269,  // Sanctified Wrath, reduces effectiveness of a target's damage reduction effects like Shield Wall
     SPELL_AURA_MOD_ABILITY_IGNORE_TARGET_RESIST             = 270,  // Possibly need swap vs 195 aura used only in 1 spell Chaos Bolt Passive
     SPELL_AURA_MOD_DAMAGE_FROM_CASTER                       = 271,
     SPELL_AURA_IGNORE_MELEE_RESET                           = 272,

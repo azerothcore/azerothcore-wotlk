@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Set SUDO variable - one liner
-if [[ "$OSTYPE" == "msys"* ]]; then
+if [[ "$OSTYPE" == "msys"* || "$OSTYPE" == "cygwin"* ]]; then
     SUDO=""
 else
     SUDO=$([ "$EUID" -ne 0 ] && echo "sudo" || echo "")
@@ -49,7 +49,7 @@ function inst_configureOS() {
             source "$AC_PATH_INSTALLER/includes/os_configs/$DISTRO.sh"
         ;;
         *bsd*)     echo "BSD is not supported yet" ;;
-        msys*)    source "$AC_PATH_INSTALLER/includes/os_configs/windows.sh" ;;
+        msys*|cygwin*)    source "$AC_PATH_INSTALLER/includes/os_configs/windows.sh" ;;
         *)        echo "This platform is not supported" ;;
     esac
 }
@@ -155,7 +155,7 @@ function inst_simple_restarter {
 
 function inst_download_client_data {
     # change the following version when needed
-    local VERSION=v18.0
+    local VERSION=v19
 
     echo "#######################"
     echo "Client data downloader"

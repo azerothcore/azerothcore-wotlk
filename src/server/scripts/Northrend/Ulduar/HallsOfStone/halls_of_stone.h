@@ -78,6 +78,7 @@ enum npcs
     NPC_ABEDNEUM                = 30899,
     NPC_SJONNIR                 = 27978,
     NPC_BRANN                   = 28070,
+    NPC_IRON_SLUDGE             = 28165,
 
     ACTION_START_ESCORT_EVENT       = 0,
     ACTION_START_TRIBUNAL           = 1,

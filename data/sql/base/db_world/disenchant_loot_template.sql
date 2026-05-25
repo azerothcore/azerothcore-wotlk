@@ -84,10 +84,10 @@ INSERT INTO `disenchant_loot_template` VALUES
 (14,22446,0,22,0,1,1,1,2,'Greater Planar Essence'),
 (14,22449,0,0,0,1,1,1,1,'Large Prismatic Shard'),
 (15,34053,0,0,0,1,1,1,1,'Small Dream Shard'),
-(15,34054,0,75,0,1,1,1,2,'Infinite Dust'),
+(15,34054,0,75,0,1,1,1,3,'Infinite Dust'),
 (15,34056,0,22,0,1,1,1,2,'Lesser Cosmic Essence'),
 (16,34052,0,0,0,1,1,1,1,'Dream Shard'),
-(16,34054,0,75,0,1,1,2,5,'Infinite Dust'),
+(16,34054,0,75,0,1,1,4,7,'Infinite Dust'),
 (16,34055,0,22,0,1,1,1,2,'Greater Cosmic Essence'),
 (17,11139,0,100,0,1,0,2,4,'Large Glowing Shard'),
 (18,14344,0,75,0,1,0,1,1,'Large Brilliant Shard'),
@@ -130,10 +130,10 @@ INSERT INTO `disenchant_loot_template` VALUES
 (33,22446,0,75,0,1,1,1,2,'Greater Planar Essence'),
 (33,22449,0,0,0,1,1,1,1,'Large Prismatic Shard'),
 (34,34053,0,0,0,1,1,1,1,'Small Dream Shard'),
-(34,34054,0,22,0,1,1,1,2,'Infinite Dust'),
+(34,34054,0,22,0,1,1,1,3,'Infinite Dust'),
 (34,34056,0,75,0,1,1,1,2,'Lesser Cosmic Essence'),
 (35,34052,0,0,0,1,1,1,1,'Dream Shard'),
-(35,34054,0,22,0,1,1,2,5,'Infinite Dust'),
+(35,34054,0,22,0,1,1,4,7,'Infinite Dust'),
 (35,34055,0,75,0,1,1,1,2,'Greater Cosmic Essence'),
 (41,10978,0,100,0,1,0,1,1,'Small Glimmering Shard'),
 (42,11084,0,100,0,1,0,1,1,'Large Glimmering Shard'),
@@ -163,7 +163,6 @@ INSERT INTO `disenchant_loot_template` VALUES
 (65,20725,0,100,0,1,0,1,2,'Nexus Crystal'),
 (66,22450,0,100,0,1,0,1,2,'Void Crystal'),
 (67,22450,0,100,0,1,0,1,1,'Void Crystal'),
-(67,44012,44012,67,0,1,1,1,1,'(ReferenceTable)'),
 (68,34057,0,100,0,1,0,1,1,'Abyss Crystal'),
 (69,34057,0,100,0,1,0,1,2,'Abyss Crystal');
 /*!40000 ALTER TABLE `disenchant_loot_template` ENABLE KEYS */;
@@ -177,4 +176,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-07-19 12:08:53
+-- Dump completed on 2026-03-15 20:38:30

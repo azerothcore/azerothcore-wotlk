@@ -29,14 +29,6 @@ namespace Movement
     // xinef: moved declaration here so it can be accessed out of MoveSplineInit.cpp
     UnitMoveType SelectSpeedType(uint32 moveFlags);
 
-    enum AnimType
-    {
-        ToGround    = 0, // 460 = ToGround, index of AnimationData.dbc
-        FlyToFly    = 1, // 461 = FlyToFly?
-        ToFly       = 2, // 458 = ToFly
-        FlyToGround = 3  // 463 = FlyToGround
-    };
-
     // Transforms coordinates from global to transport offsets
     class TransportPathTransform
     {
@@ -89,7 +81,7 @@ namespace Movement
         /* Plays animation after movement done
          * can't be combined with parabolic movement
          */
-        void SetAnimation(AnimType anim);
+        void SetAnimation(AnimTier anim);
 
         /* Adds final facing animation
          * sets unit's facing to specified point/angle after all path done
@@ -107,6 +99,7 @@ namespace Movement
 
         /* Initializes simple A to B motion, A is current unit's position, B is destination
          */
+        void MoveTo(Vector3 const& start, Vector3 const& destination, bool generatePath = true, bool forceDestination = false);
         void MoveTo(const Vector3& destination, bool generatePath = false, bool forceDestination = false);
         void MoveTo(float x, float y, float z, bool generatePath = false, bool forceDestination = false);
 
@@ -162,7 +155,7 @@ namespace Movement
     };
 
     inline void MoveSplineInit::SetFly() { args.flags.EnableFlying(); }
-    inline void MoveSplineInit::SetWalk(bool enable) { args.flags.walkmode = enable; }
+    inline void MoveSplineInit::SetWalk(bool enable) { args.walk = enable; }
     inline void MoveSplineInit::SetSmooth() { args.flags.EnableCatmullRom(); }
     inline void MoveSplineInit::SetCyclic() { args.flags.cyclic = true; }
     inline void MoveSplineInit::SetFall() { args.flags.EnableFalling(); }
@@ -191,7 +184,7 @@ namespace Movement
         args.flags.EnableParabolic();
     }
 
-    inline void MoveSplineInit::SetAnimation(AnimType anim)
+    inline void MoveSplineInit::SetAnimation(AnimTier anim)
     {
         args.time_perc = 0.f;
         args.flags.EnableAnimation((uint8)anim);
