@@ -21,6 +21,7 @@
 
 #include "AreaDefines.h"
 #include "BattlefieldWG.h"
+#include "ScriptMgr.h"
 #include "Chat.h"
 #include "GameTime.h"
 #include "MapMgr.h"
@@ -347,6 +348,9 @@ void BattlefieldWG::CapturePointTaken(uint32 areaId)
 
 void BattlefieldWG::OnBattleEnd(bool endByTimer)
 {
+    // Must be set before SPELL_VICTORY_REWARD so the 1755 criterion can gate on it.
+    LastBattleAttackerVictory = !endByTimer;
+
     // Remove relic
     if (GameObject* go = GetRelic())
         go->RemoveFromWorld();
@@ -722,16 +726,19 @@ void BattlefieldWG::HandleKill(Player* killer, Unit* victim)
     // xinef: tower cannons also grant rank
     if (victim->IsPlayer() || IsKeepNpc(victim->GetEntry()) || victim->GetEntry() == NPC_WINTERGRASP_TOWER_CANNON)
     {
-        if (victim->IsPlayer() && victim->HasAura(SPELL_LIEUTENANT))
+        if (Player* victimPlayer = victim->ToPlayer())
         {
-            // Quest - Wintergrasp - PvP Kill - Horde/Alliance
-            for (ObjectGuid const& playerGuid : PlayersInWar[killerTeam])
+            sScriptMgr->OnBattlefieldPlayerKill(this, killer, victimPlayer);
+
+            if (victimPlayer->HasAura(SPELL_LIEUTENANT))
             {
-                if (Player* player = ObjectAccessor::FindPlayer(playerGuid))
+                // Quest - Wintergrasp - PvP Kill - Horde/Alliance
+                for (ObjectGuid const& playerGuid : PlayersInWar[killerTeam])
                 {
-                    if (player->GetDistance2d(killer) < 40)
+                    if (Player* player = ObjectAccessor::FindPlayer(playerGuid))
                     {
-                        player->KilledMonsterCredit(killerTeam == TEAM_HORDE ? NPC_QUEST_PVP_KILL_ALLIANCE : NPC_QUEST_PVP_KILL_HORDE);
+                        if (player->GetDistance2d(killer) < 40)
+                            player->KilledMonsterCredit(killerTeam == TEAM_HORDE ? NPC_QUEST_PVP_KILL_ALLIANCE : NPC_QUEST_PVP_KILL_HORDE);
                     }
                 }
             }
@@ -904,8 +911,8 @@ void BattlefieldWG::OnPlayerEnterZone(Player* player)
     // Send worldstate to player
     SendInitWorldStatesTo(player);
 
-    // xinef: Attacker, if hidden in relic room kick him out
-    if (player->GetTeamId() == GetAttackerTeam())
+    // xinef: Attacker, if hidden in relic room kick him out (only during wartime)
+    if (IsWarTime() && player->GetTeamId() == GetAttackerTeam())
         if (player->GetPositionX() > 5400.0f && player->GetPositionX() < 5490.0f && player->GetPositionY() > 2803.0f && player->GetPositionY() < 2878.0f)
             KickPlayerFromBattlefield(player->GetGUID());
 }

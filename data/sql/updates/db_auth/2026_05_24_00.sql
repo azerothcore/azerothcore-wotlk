@@ -1,6 +1,9 @@
--- DB update 2026_04_29_00 -> 2026_05_24_00
--- Set the login MOTD that every realm shows. realmid = -1 means
--- "applies to all realms" (the default Theta entry). Plain, practical,
--- gives players a clear path to support instead of leaning on lore.
-REPLACE INTO `motd` (`realmid`, `text`) VALUES
-(-1, 'Welcome to Blackrose, a hardcore WoW Pserver. If you run into any issues please don''t hesitate to reach out on the discord.');
+-- DB update 2026_05_17_00 -> 2026_05_24_00
+-- RBAC permission for .pet rename (sec 3+, Admin role 196).
+DELETE FROM `rbac_permissions` WHERE `id` = 922;
+INSERT INTO `rbac_permissions` (`id`, `name`) VALUES
+(922, 'Command: pet rename');
+
+DELETE FROM `rbac_linked_permissions` WHERE `linkedId` = 922;
+INSERT INTO `rbac_linked_permissions` (`id`, `linkedId`) VALUES
+(196, 922);

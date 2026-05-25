@@ -1241,6 +1241,23 @@ void SmartAI::SetFollow(Unit* target, float dist, float angle, uint32 credit, ui
 
 void SmartAI::StopFollow(bool complete)
 {
+    if (complete)
+    {
+        Player* player = ObjectAccessor::GetPlayer(*me, mFollowGuid);
+        if (player && mFollowCredit > 0)
+        {
+            if (!mFollowCreditType)
+                player->RewardPlayerAndGroupAtEvent(mFollowCredit, me);
+            else
+                player->GroupEventHappens(mFollowCredit, me);
+        }
+
+        SetDespawnTime(5000);
+        StartDespawn();
+
+        GetScript()->ProcessEventsFor(SMART_EVENT_FOLLOW_COMPLETED, player);
+    }
+
     mFollowGuid.Clear();
     mFollowDist = 0;
     mFollowAngle = 0;
@@ -1252,23 +1269,6 @@ void SmartAI::StopFollow(bool complete)
     me->GetMotionMaster()->Clear(false);
     me->StopMoving();
     me->GetMotionMaster()->MoveIdle();
-
-    if (!complete)
-        return;
-
-    Player* player = ObjectAccessor::GetPlayer(*me, mFollowGuid);
-    if (player)
-    {
-        if (!mFollowCreditType)
-            player->RewardPlayerAndGroupAtEvent(mFollowCredit, me);
-        else
-            player->GroupEventHappens(mFollowCredit, me);
-    }
-
-    SetDespawnTime(5000);
-    StartDespawn();
-
-    GetScript()->ProcessEventsFor(SMART_EVENT_FOLLOW_COMPLETED, player);
 }
 
 void SmartAI::SetScript9(SmartScriptHolder& e, uint32 entry, WorldObject* invoker)
@@ -1369,6 +1369,7 @@ void SmartGameObjectAI::UpdateAI(uint32 diff)
 void SmartGameObjectAI::InitializeAI()
 {
     GetScript()->OnInitialize(me);
+    aiDataSet.clear();
 
     // Xinef: do not call respawn event if go is not spawned
     if (me->isSpawned())
@@ -1437,7 +1438,17 @@ void SmartGameObjectAI::SetData(uint32 id, uint32 value, WorldObject* invoker)
             gob = invoker->ToGameObject();
     }
 
+    aiDataSet[id] = value;
     GetScript()->ProcessEventsFor(SMART_EVENT_DATA_SET, unit, id, value, false, nullptr, gob);
+}
+
+uint32 SmartGameObjectAI::GetData(uint32 id) const
+{
+    std::unordered_map<uint32, uint32>::const_iterator itr = aiDataSet.find(id);
+    if (itr != aiDataSet.end())
+        return itr->second;
+
+    return 0;
 }
 
 void SmartGameObjectAI::SetScript9(SmartScriptHolder& e, uint32 entry, WorldObject* invoker)

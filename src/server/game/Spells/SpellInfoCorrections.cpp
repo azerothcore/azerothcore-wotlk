@@ -562,11 +562,15 @@ void SpellMgr::LoadSpellInfoCorrections()
         20184,  // Judgement of Justice
         20185,  // Judgement of Light
         20186,  // Judgement of Wisdom
+        20267,  // Judgement of Light (triggered heal on attacker)
+        20268,  // Judgement of Wisdom (triggered mana on attacker)
         68055   // Judgements of the Just
         }, [](SpellInfo* spellInfo)
     {
         // hack for seal of light and few spells, judgement consists of few single casts and each of them can proc
         // some spell, base one has disabled proc flag but those dont have this flag
+        // 20267/20268 are passive proc effects from the judgement debuff; they must not cause the paladin's
+        // on-heal/on-cast procs (e.g. Soul Preserver, which has CAN_PROC_FROM_PROCS) to fire
         spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPPRESS_CASTER_PROCS;
     });
 
@@ -5187,6 +5191,12 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 57935, 58835 }, [](SpellInfo* spellInfo)
     {
         spellInfo->ProcCharges = 0;
+    });
+
+    // 54933 Hyldnir Harpoon
+    ApplySpellFix({ 54933 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].BasePoints = 1;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)

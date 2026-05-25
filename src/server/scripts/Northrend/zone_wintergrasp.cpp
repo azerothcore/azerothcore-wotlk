@@ -1160,6 +1160,10 @@ public:
         if (!wintergrasp)
             return false;
 
+        // Attacker-only achievement -- defenders winning fast must not qualify.
+        if (!sBattlefieldMgr->IsWintergraspAttackerVictory())
+            return false;
+
         return wintergrasp->GetTimer() >= (20 * MINUTE * IN_MILLISECONDS);
     }
 };

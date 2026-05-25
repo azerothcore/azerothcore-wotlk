@@ -190,6 +190,7 @@ enum PlayerHook
     PLAYERHOOK_ON_PLAYER_ENTER_COMBAT,
     PLAYERHOOK_ON_PLAYER_LEAVE_COMBAT,
     PLAYERHOOK_ON_QUEST_ABANDON,
+    PLAYERHOOK_ON_PLAYER_QUEST_ACCEPT,
     PLAYERHOOK_ON_GET_QUEST_RATE,
     PLAYERHOOK_ON_CAN_PLAYER_FLY_IN_ZONE,
     PLAYERHOOK_ANTICHEAT_SET_CAN_FLY_BY_SERVER,
@@ -205,6 +206,7 @@ enum PlayerHook
     PLAYERHOOK_ON_CAN_UPDATE_SKILL,
     PLAYERHOOK_ON_BEFORE_UPDATE_SKILL,
     PLAYERHOOK_ON_UPDATE_SKILL,
+    PLAYERHOOK_ON_SET_SKILL,
     PLAYERHOOK_CAN_RESURRECT,
     PLAYERHOOK_ON_CAN_GIVE_LEVEL,
     PLAYERHOOK_ON_SEND_LIST_INVENTORY,
@@ -731,6 +733,14 @@ public:
     virtual void OnPlayerQuestAbandon(Player* /*player*/, uint32 /*questId*/) { }
 
     /**
+     * @brief This hook called after a player accepts a quest, regardless of quest giver type
+     *
+     * @param player Contains information about the Player
+     * @param quest Contains information about the Quest
+     */
+    virtual void OnPlayerQuestAccept(Player* /*player*/, Quest const* /*quest*/) { }
+
+    /**
      * @brief This hook called before other CanFlyChecks are applied
      *
      * @param player Contains information about the Player
@@ -776,6 +786,7 @@ public:
     virtual bool OnPlayerCanUpdateSkill(Player* /*player*/, uint32 /*skillId*/) { return true; }
     virtual void OnPlayerBeforeUpdateSkill(Player* /*player*/, uint32 /*skillId*/, uint32& /*value*/, uint32 /*max*/, uint32 /*step*/) { }
     virtual void OnPlayerUpdateSkill(Player* /*player*/, uint32 /*skillId*/, uint32 /*value*/, uint32 /*max*/, uint32 /*step*/, uint32 /*newValue*/) { }
+    virtual void OnPlayerSetSkill(Player* /*player*/, uint32 /*skillId*/, uint32 /*value*/, uint32 /*max*/, uint32 /*step*/, uint32 /*newValue*/) { }
 
     /**
      * @brief This hook is called, to avoid player resurrect

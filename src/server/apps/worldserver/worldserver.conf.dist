@@ -627,6 +627,15 @@ Allow.IP.Based.Action.Logging = 0
 LogSpamReports = 1
 
 #
+#    ChatLog.Enable
+#        Description: Enable or disable chat logging (chat_log.cpp).
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+#
+
+ChatLog.Enable = 0
+
+#
 #  Appender config values: Given an appender "name"
 #    Appender.name
 #        Description: Defines 'where to log'.
@@ -2231,10 +2240,10 @@ Rate.Loyalty           = 1
 #                     1 - (Rate.Rest.Offline.InWilderness)
 #                     1.5 - (Rate.Rest.MaxBonus)
 
-Rate.Rest.InGame                 = 1
-Rate.Rest.Offline.InTavernOrCity = 1
+Rate.Rest.InGame                 = 1000
+Rate.Rest.Offline.InTavernOrCity = 1000
 Rate.Rest.Offline.InWilderness   = 1
-Rate.Rest.MaxBonus               = 1.5
+Rate.Rest.MaxBonus               = 10
 
 #
 #    Rate.MissChanceMultiplier.Creature
@@ -2669,6 +2678,14 @@ DurabilityLoss.InPvP = 0
 #        Default:     10
 
 DurabilityLoss.OnDeath = 10
+
+#
+#    DurabilityLoss.OnSpiritResurrect
+#        Description: Durability loss percentage on spirit healer resurrection. Does not effect PvP
+#                     spirit healers.
+#        Default:     25
+
+DurabilityLoss.OnSpiritResurrect = 25
 
 #
 #    DurabilityLossChance.Damage
@@ -3434,6 +3451,16 @@ DungeonAccessRequirements.OptionalStringID = 0
 JoinBGAndLFG.Enable = 0
 
 #
+#     LFG.MailItemOnFullInventory
+#        Description: When a player wins a group roll but their inventory is full, mail
+#                     the item to them instead of leaving it on the corpse.
+#        Default:     0 - Disabled
+#                     1 - Only in LFG/RDF groups
+#                     2 - In all group types
+
+LFG.MailItemOnFullInventory = 0
+
+#
 #     DungeonFinder.OptionsMask
 #        Description: Dungeon and raid finder system.
 #        Value is a bitmask consisting of:
@@ -3711,6 +3738,19 @@ Wintergrasp.CrashRestartTimer = 10
 #         Default:     3500
 
 Wintergrasp.SkipBattleSessionCount = 3500
+
+#
+#     Wintergrasp.KickVoAPlayers
+#         Description: Kick players from Vault of Archavon and freeze its bosses
+#                      in the minutes leading up to a Wintergrasp battle, and
+#                      block new entries during wartime / the 10-minute warmup.
+#                      Requires a server restart to take effect (not reloadable).
+#         Default:     1 - (Enabled, players are warned then teleported to their
+#                           homebind before the battle starts)
+#                      0 - (Disabled, players stay inside and bosses behave
+#                           normally during Wintergrasp)
+
+Wintergrasp.KickVoAPlayers = 1
 
 #
 ###################################################################################################
@@ -4425,10 +4465,13 @@ AllowTwoSide.Interaction.Chat = 1
 #
 #    AllowTwoSide.Interaction.Emote
 #        Description: Allow emote messages between factions (e.g. "/e looks into the sky")
+#        NOTE (Blackrose): upstream removed CONFIG_ALLOW_TWO_SIDE_INTERACTION_EMOTE,
+#                          so this key is no longer read. Kept commented as a marker
+#                          in case we restore the feature locally.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-AllowTwoSide.Interaction.Emote = 1
+# AllowTwoSide.Interaction.Emote = 1
 
 #
 #    AllowTwoSide.Interaction.Channel
@@ -4474,34 +4517,46 @@ AllowTwoSide.Interaction.Auction = 1
 #
 #    AllowTwoSide.Interaction.Mail
 #        Description: Allow sending mails between factions.
+#        NOTE (Blackrose): upstream removed CONFIG_ALLOW_TWO_SIDE_INTERACTION_MAIL,
+#                          so this key is no longer read. Kept commented as a marker
+#                          in case we restore the feature locally.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-AllowTwoSide.Interaction.Mail = 1
+# AllowTwoSide.Interaction.Mail = 1
 
 #
 #    AllowTwoSide.WhoList
 #        Description: Show characters from both factions in the /who list.
+#        NOTE (Blackrose): upstream removed CONFIG_ALLOW_TWO_SIDE_WHO_LIST,
+#                          so this key is no longer read. Kept commented as a marker
+#                          in case we restore the feature locally.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-AllowTwoSide.WhoList = 1
+# AllowTwoSide.WhoList = 1
 
 #
 #    AllowTwoSide.AddFriend
 #        Description: Allow adding friends from other faction the friends list.
+#        NOTE (Blackrose): upstream removed CONFIG_ALLOW_TWO_SIDE_ADD_FRIEND,
+#                          so this key is no longer read. Kept commented as a marker
+#                          in case we restore the feature locally.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-AllowTwoSide.AddFriend = 1
+# AllowTwoSide.AddFriend = 1
 
 #
 #    AllowTwoSide.Trade
 #        Description: Allow trading between factions.
+#        NOTE (Blackrose): upstream removed CONFIG_ALLOW_TWO_SIDE_TRADE,
+#                          so this key is no longer read. Kept commented as a marker
+#                          in case we restore the feature locally.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-AllowTwoSide.Trade = 1
+# AllowTwoSide.Trade = 1
 
 #
 #    TalentsInspecting

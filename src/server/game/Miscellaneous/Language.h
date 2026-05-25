@@ -112,7 +112,10 @@ enum AcoreStrings
     LANG_PVPSTATS                       = 80,
     LANG_PVPSTATS_DISABLED              = 81,
     LANG_GENERIC_TWO_CURLIES_WITH_COLON = 82,
-    // Free 83 - 86
+    LANG_RBAC_HELP_ACC_LIST             = 83,
+    LANG_RBAC_HELP_ACC_GRANT            = 84,
+    LANG_RBAC_HELP_ACC_DENY             = 85,
+    LANG_RBAC_HELP_ACC_REVOKE           = 86,
 
     LANG_UNKNOWN_ERROR                  = 87,
     LANG_2FA_COMMANDS_NOT_SETUP         = 88,
@@ -1475,6 +1478,40 @@ enum AcoreStrings
     LANG_POOL_LOOKUP_IN_POOL            = 35431,
     LANG_POOL_LOOKUP_NOT_IN_POOL        = 35432,
     LANG_POOL_LOOKUP_USE_INFO           = 35433,
-    LANG_POOL_LOOKUP_NOTARGET           = 35434
+    LANG_POOL_LOOKUP_NOTARGET           = 35434,
+
+    // Pet list command
+    LANG_PET_LIST_HEADER                = 35435,
+    LANG_PET_LIST_ENTRY                 = 35436,
+    LANG_PET_LIST_EMPTY                 = 35437,
+
+    // Pet delete command
+    LANG_PET_DELETE_NOT_FOUND           = 35438,
+    LANG_PET_DELETE_SUCCESS             = 35439,
+
+    LANG_CHARACTER_DELETED_LIST_LIMIT   = 35440,
+
+    // Respawn creature/gameobject by spawn GUID commands
+    LANG_RESPAWN_GUID_CREATURE_NOT_FOUND    = 35441,
+    LANG_RESPAWN_GUID_MAP_NOT_LOADED        = 35442,
+    LANG_RESPAWN_GUID_CREATURE_ALIVE        = 35443,
+    LANG_RESPAWN_GUID_CREATURE_QUEUED       = 35444,
+    LANG_RESPAWN_GUID_GAMEOBJECT_ACTIVE     = 35445,
+    LANG_RESPAWN_GUID_GAMEOBJECT_QUEUED     = 35446,
+    // 35447 is reserved for LANG_LIST_RESPAWNS_NO_MAP (list respawns command, defined at the end of this enum)
+    LANG_RESPAWN_GUID_GAMEOBJECT_NOT_FOUND  = 35448,
+
+    // Respawn creature/gameobject by entry commands
+    LANG_RESPAWN_ENTRY_CREATURE_NOT_FOUND    = 35449,
+    LANG_RESPAWN_ENTRY_GAMEOBJECT_NOT_FOUND  = 35450,
+    LANG_RESPAWN_ENTRY_CREATURE_QUEUED       = 35451,
+    LANG_RESPAWN_ENTRY_GAMEOBJECT_QUEUED     = 35452,
+
+    // List respawns console support
+    LANG_LIST_RESPAWNS_NO_MAP           = 35447,
+
+    // Pet rename command
+    LANG_PET_RENAME_INVALID             = 35453,
+    LANG_PET_RENAME_SUCCESS             = 35454
 };
 #endif
