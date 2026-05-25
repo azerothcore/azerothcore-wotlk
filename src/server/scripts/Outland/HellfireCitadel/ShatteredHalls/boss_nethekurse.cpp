@@ -100,12 +100,7 @@ PeonRoleplay PeonRoleplayData[3] =
 struct boss_grand_warlock_nethekurse : public BossAI
 {
     boss_grand_warlock_nethekurse(Creature* creature) : BossAI(creature, DATA_NETHEKURSE)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    {    }
 
     void Reset() override
     {

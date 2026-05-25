@@ -38,70 +38,59 @@ enum Events
 
 const Position SummonLocation = { -167.9561f, -411.7844f, 76.23057f, 1.53589f };
 
-class boss_halycon : public CreatureScript
+struct boss_halycon : public BossAI
 {
-public:
-    boss_halycon() : CreatureScript("boss_halycon") { }
+    boss_halycon(Creature* creature) : BossAI(creature, DATA_HALYCON) { }
 
-    struct boss_halyconAI : public BossAI
+    void Reset() override
     {
-        boss_halyconAI(Creature* creature) : BossAI(creature, DATA_HALYCON) { }
+        _Reset();
+    }
 
-        void Reset() override
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        _JustEngagedWith();
+        events.ScheduleEvent(EVENT_REND, 17s, 20s);
+        events.ScheduleEvent(EVENT_THRASH, 10s, 12s);
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        _JustDied();
+        me->SummonCreature(NPC_GIZRUL_THE_SLAVENER, SummonLocation, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 300000);
+        Talk(EMOTE_DEATH);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        while (uint32 eventId = events.ExecuteEvent())
         {
-            _Reset();
-        }
-
-        void JustEngagedWith(Unit* /*who*/) override
-        {
-            _JustEngagedWith();
-            events.ScheduleEvent(EVENT_REND, 17s, 20s);
-            events.ScheduleEvent(EVENT_THRASH, 10s, 12s);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            _JustDied();
-            me->SummonCreature(NPC_GIZRUL_THE_SLAVENER, SummonLocation, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 300000);
-            Talk(EMOTE_DEATH);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            while (uint32 eventId = events.ExecuteEvent())
+            switch (eventId)
             {
-                switch (eventId)
-                {
-                    case EVENT_REND:
-                        DoCastVictim(SPELL_REND);
-                        events.ScheduleEvent(EVENT_REND, 8s, 10s);
-                        break;
-                    case EVENT_THRASH:
-                        DoCast(me, SPELL_THRASH);
-                        break;
-                    default:
-                        break;
-                }
+                case EVENT_REND:
+                    DoCastVictim(SPELL_REND);
+                    events.ScheduleEvent(EVENT_REND, 8s, 10s);
+                    break;
+                case EVENT_THRASH:
+                    DoCast(me, SPELL_THRASH);
+                    break;
+                default:
+                    break;
             }
-            DoMeleeAttackIfReady();
         }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetBlackrockSpireAI<boss_halyconAI>(creature);
+        DoMeleeAttackIfReady();
     }
 };
 
 void AddSC_boss_halycon()
 {
-    new boss_halycon();
+    RegisterBlackrockSpireCreatureAI(boss_halycon);
 }

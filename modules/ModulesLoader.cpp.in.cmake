@@ -56,7 +56,7 @@ AC_MODULES_API void AddModulesScripts()
 /// Exposed in script modules to get the build directive of the module.
 AC_MODULES_API char const* GetModulesBuildDirective()
 {
-    return _BUILD_DIRECTIVE;
+    return AC_BUILD_TYPE;
 }
 
 #ifdef ACORE_IS_DYNAMIC_SCRIPTLOADER

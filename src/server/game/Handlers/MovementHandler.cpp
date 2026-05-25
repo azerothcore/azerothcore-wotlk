@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaDefines.h"
 #include "ArenaSpectator.h"
 #include "Battleground.h"
 #include "BattlegroundMgr.h"
@@ -134,8 +135,8 @@ void WorldSession::HandleMoveWorldportAck()
             _player->m_movementInfo.RemoveMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
         }
 
-    if (!_player->getHostileRefMgr().IsEmpty())
-        _player->getHostileRefMgr().deleteReferences(true); // pussywizard: multithreading crashfix
+    if (_player->GetThreatMgr().IsThreateningAnyone())
+        _player->GetThreatMgr().RemoveMeFromThreatLists(); // pussywizard: multithreading crashfix
 
     CellCoord pair(Acore::ComputeCellCoord(GetPlayer()->GetPositionX(), GetPlayer()->GetPositionY()));
     Cell cell(pair);
@@ -490,6 +491,10 @@ void WorldSession::HandleMoverRelocation(MovementInfo& movementInfo, Unit* mover
             {
                 if (plrMover->IsAlive())
                 {
+                    // The Oculus under map case is handled by areatrigger (5001) and should not kill the player
+                    if (plrMover->GetMapId() == MAP_THE_OCULUS)
+                        return;
+
                     plrMover->SetPlayerFlag(PLAYER_FLAGS_IS_OUT_OF_BOUNDS);
                     plrMover->EnvironmentalDamage(DAMAGE_FALL_TO_VOID, GetPlayer()->GetMaxHealth());
                     // player can be alive if GM

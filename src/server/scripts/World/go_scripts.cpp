@@ -18,7 +18,6 @@
 #include "AreaDefines.h"
 #include "CellImpl.h"
 #include "Chat.h"
-#include "CreatureScript.h"
 #include "GameEventMgr.h"
 #include "GameObjectAI.h"
 #include "GameObjectScript.h"
@@ -38,25 +37,6 @@ public:
         if (player->GetQuestStatus(12007) == QUEST_STATUS_INCOMPLETE)
             player->CastSpell(player, 47293, true);
         return true;
-    }
-};
-
-class go_mistwhisper_treasure : public GameObjectScript
-{
-public:
-    go_mistwhisper_treasure() : GameObjectScript("go_mistwhisper_treasure") { }
-
-    bool OnGossipHello(Player* pPlayer, GameObject* go) override
-    {
-        if (!go->FindNearestCreature(28105, 30.0f)) // Tartek
-        {
-            if (Creature* cr = go->SummonCreature(28105, 6708.7f, 5115.45f, -18.3f, 0.7f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
-            {
-                cr->Yell("My treasure! You no steal from Tartek, dumb big-tongue traitor thing. Tartek and nasty dragon going to kill you! You so dumb.", LANG_UNIVERSAL);
-                cr->AI()->AttackStart(pPlayer);
-            }
-        }
-        return false;
     }
 };
 
@@ -1579,7 +1559,8 @@ public:
 enum AmberpineOuthouse
 {
     QUEST_DOING_YOUR_DUTY           = 12227,
-    SPELL_INDISPOSED                = 53017,
+    SPELL_INDISPOSED_MALE           = 48323,
+    SPELL_INDISPOSED_FEMALE         = 53017,
     SPELL_INDISPOSED_II             = 48324,
     SPELL_INDISPOSED_III            = 48341,
     GOSSIP_OUTHOUSE_INUSE           = 12775,
@@ -1612,7 +1593,17 @@ public:
         if (action == GOSSIP_ACTION_INFO_DEF + 1)
         {
             CloseGossipMenuFor(player);
-            player->CastSpell(player, SPELL_INDISPOSED);
+            switch (player->getGender())
+            {
+            case GENDER_FEMALE:
+                player->CastSpell(player, SPELL_INDISPOSED_FEMALE);
+                break;
+            case GENDER_MALE:
+                player->CastSpell(player, SPELL_INDISPOSED_MALE);
+                break;
+            default:
+                break;
+            }
             player->CastSpell(player, SPELL_INDISPOSED_II);
             player->CastSpell(player, SPELL_INDISPOSED_III);
             return true;
@@ -1896,7 +1887,6 @@ public:
 void AddSC_go_scripts()
 {
     new go_seer_of_zebhalak();
-    new go_mistwhisper_treasure();
     new go_witherbark_totem_bundle();
     new go_arena_ready_marker();
     new go_ethereum_prison();

@@ -18,15 +18,60 @@
 #ifndef DEF_VIOLET_HOLD_H
 #define DEF_VIOLET_HOLD_H
 
-#define MAX_ENCOUNTER 3
-
 #include "CreatureAIImpl.h"
 
 #define DataHeader "VIO"
 
 #define VioletHoldScriptName "instance_violet_hold"
 
-enum Creatures
+enum VHData
+{
+    // Creature ObjectData IDs
+    // Boss creatures use VHBosses values directly (BOSS_MORAGG .. BOSS_ZURAMAT, DATA_CYANIGOSA)
+    DATA_SINCLARI                   = 10,
+    DATA_DOOR_SEAL,
+    DATA_TELEPORTATION_PORTAL,
+
+    // GO ObjectData IDs
+    DATA_MAIN_DOOR                  = 20,
+    DATA_MORAGG_CELL,
+    DATA_EREKEM_CELL,
+    DATA_EREKEM_GUARD_1_CELL,
+    DATA_EREKEM_GUARD_2_CELL,
+    DATA_ICHORON_CELL,
+    DATA_LAVANTHOR_CELL,
+    DATA_XEVOZZ_CELL,
+    DATA_ZURAMAT_CELL,
+
+    // Instance state IDs (used by SetData/GetData)
+    DATA_ENCOUNTER_STATUS           = 30,
+    DATA_ADD_TRASH_MOB,
+    DATA_DELETE_TRASH_MOB,
+    DATA_WAVE_COUNT,
+    DATA_PORTAL_LOCATION,
+    DATA_ACHIEV,
+
+    // Manual GUID tracking (multi-instance entries)
+    DATA_EREKEM_GUARD_1_GUID,
+    DATA_EREKEM_GUARD_2_GUID,
+};
+
+enum VHActions
+{
+    ACTION_START_INSTANCE = 1,
+    ACTION_PORTAL_DEFEATED,
+    ACTION_RELEASE_BOSS,
+    ACTION_DECREASE_DOOR_HEALTH,
+};
+
+enum VHPersistentData
+{
+    PERSISTENT_DATA_FIRST_BOSS,
+    PERSISTENT_DATA_SECOND_BOSS,
+    PERSISTENT_DATA_COUNT
+};
+
+enum VHCreatures
 {
     NPC_TELEPORTATION_PORTAL        = 31011,
     NPC_DEFENSE_SYSTEM              = 30837,
@@ -63,7 +108,7 @@ enum Creatures
     NPC_AZURE_STALKER               = 32191,
 };
 
-enum GameObjects
+enum VHGameObjects
 {
     GO_MAIN_DOOR                    = 191723,
     GO_XEVOZZ_DOOR                  = 191556,
@@ -78,19 +123,25 @@ enum GameObjects
     GO_ACTIVATION_CRYSTAL           = 193611,
 };
 
-enum Bosses
+enum VHBosses
 {
-    BOSS_NONE,
-    BOSS_MORAGG,
+    // Encounter slot IDs (used by SetBossState/GetBossState)
+    DATA_1ST_BOSS,
+    DATA_2ND_BOSS,
+    DATA_CYANIGOSA,
+    MAX_ENCOUNTER,
+
+    // Individual boss IDs (used by ObjectData and BossAI)
+    BOSS_MORAGG             = MAX_ENCOUNTER,
     BOSS_EREKEM,
     BOSS_ICHORON,
     BOSS_LAVANTHOR,
     BOSS_XEVOZZ,
     BOSS_ZURAMAT,
-    BOSS_CYANIGOSA
+    MAX_BOSS
 };
 
-enum Spells
+enum VHSpells
 {
     SPELL_CONTROL_CRYSTAL_ACTIVATION   = 57804,
     SPELL_DEFENSE_SYSTEM_SPAWN_EFFECT  = 57886,
@@ -104,7 +155,7 @@ enum Spells
     SPELL_CYANIGOSA_BLUE_AURA          = 45870
 };
 
-enum Events
+enum VHInstanceEvents
 {
     EVENT_CHECK_PLAYERS = 1,
     EVENT_GUARDS_FALL_BACK,
@@ -112,40 +163,17 @@ enum Events
     EVENT_SINCLARI_FALL_BACK,
     EVENT_START_ENCOUNTER,
     EVENT_SUMMON_PORTAL,
-    EVENT_CYANIGOSSA_TRANSFORM,
+    EVENT_CYANIGOSA_TRANSFORM,
     EVENT_CYANIGOSA_ATTACK,
 
     // Event defense system
     EVENT_ARCANE_LIGHTNING,
-    EVENT_ARCANE_LIGHTNING_INSTAKILL
+
+    // Spell event (SPELL_EFFECT_SEND_EVENT from spell 57804)
+    EVENT_ACTIVATE_CRYSTAL              = 20001,
 };
 
-enum Data
-{
-    DATA_ACTIVATE_DEFENSE_SYSTEM = 1,
-    DATA_ENCOUNTER_STATUS,
-    DATA_START_INSTANCE,
-    DATA_ADD_TRASH_MOB,
-    DATA_DELETE_TRASH_MOB,
-    DATA_PORTAL_DEFEATED,
-    DATA_WAVE_COUNT,
-    DATA_PORTAL_LOCATION,
-    DATA_TELEPORTATION_PORTAL_GUID,
-    DATA_DOOR_SEAL_GUID,
-    DATA_FIRST_BOSS_NUMBER,
-    DATA_SECOND_BOSS_NUMBER,
-    DATA_RELEASE_BOSS,
-    DATA_DECRASE_DOOR_HEALTH,
-    DATA_BOSS_DIED,
-    DATA_FAILED,
-    DATA_EREKEM_GUID,
-    DATA_EREKEM_GUARD_1_GUID,
-    DATA_EREKEM_GUARD_2_GUID,
-    DATA_ICHORON_GUID,
-    DATA_ACHIEV,
-};
-
-enum AchievCriteria
+enum VHAchievCriteria
 {
     CRITERIA_DEFENSELESS            = 6803,
     CRITERIA_A_VOID_DANCE           = 7587,
@@ -307,5 +335,7 @@ inline AI* GetVioletHoldAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, VioletHoldScriptName);
 }
+
+#define RegisterVioletHoldCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetVioletHoldAI)
 
 #endif

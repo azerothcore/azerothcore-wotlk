@@ -67,8 +67,8 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
 
         init.SetWalk(walk);
         init.Launch();
-        if (creature->GetFormation() && creature->GetFormation()->GetLeader() == creature)
-            creature->GetFormation()->LeaderMoveTo(_currDestPosition.GetPositionX(), _currDestPosition.GetPositionY(), _currDestPosition.GetPositionZ(), 0);
+        if (creature->GetFormation() && creature->GetFormation()->GetLeader() == creature && creature->GetFormation()->CanLeaderStartMoving())
+            creature->GetFormation()->LeaderStartedMoving();
         return;
     }
 
@@ -211,7 +211,8 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
     }
 
     _currentPoint = newPoint;
-    G3D::Vector3& finalPoint = finalPath[finalPath.size() - 1];
+    ASSERT(!finalPath.empty());
+    G3D::Vector3 finalPoint = finalPath.back();
     _currDestPosition.Relocate(finalPoint.x, finalPoint.y, finalPoint.z);
 
     creature->AddUnitState(UNIT_STATE_ROAMING_MOVE);
@@ -239,12 +240,13 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature* creature)
         _moveCount = 0;
         _nextMoveTime.Reset(urand(4000, 8000));
     }
-    if (sWorld->getBoolConfig(CONFIG_DONT_CACHE_RANDOM_MOVEMENT_PATHS))
-        _preComputedPaths.erase(pathIdx);
 
     //Call for creature group update
-    if (creature->GetFormation() && creature->GetFormation()->GetLeader() == creature)
-        creature->GetFormation()->LeaderMoveTo(finalPoint.x, finalPoint.y, finalPoint.z, 0);
+    if (creature->GetFormation() && creature->GetFormation()->GetLeader() == creature && creature->GetFormation()->CanLeaderStartMoving())
+        creature->GetFormation()->LeaderStartedMoving();
+
+    if (sWorld->getBoolConfig(CONFIG_DONT_CACHE_RANDOM_MOVEMENT_PATHS))
+        _preComputedPaths.erase(pathIdx);
 }
 
 template<>

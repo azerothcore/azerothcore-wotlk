@@ -25,6 +25,7 @@
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "PlayerDump.h"
+#include "RBAC.h"
 #include "ReputationMgr.h"
 #include "Timer.h"
 #include "World.h"
@@ -41,44 +42,45 @@ public:
     {
         static ChatCommandTable pdumpCommandTable =
         {
-            { "load",           HandlePDumpLoadCommand,  SEC_ADMINISTRATOR, Console::Yes },
-            { "write",          HandlePDumpWriteCommand, SEC_ADMINISTRATOR, Console::Yes }
+            { "copy",           HandlePDumpCopyCommand,  rbac::RBAC_PERM_COMMAND_PDUMP_COPY,  Console::Yes },
+            { "load",           HandlePDumpLoadCommand,  rbac::RBAC_PERM_COMMAND_PDUMP_LOAD,  Console::Yes },
+            { "write",          HandlePDumpWriteCommand, rbac::RBAC_PERM_COMMAND_PDUMP_WRITE, Console::Yes }
         };
 
         static ChatCommandTable characterDeletedCommandTable =
         {
-            { "delete",         HandleCharacterDeletedDeleteCommand,   SEC_CONSOLE,       Console::Yes },
-            { "list",           HandleCharacterDeletedListCommand,     SEC_ADMINISTRATOR, Console::Yes },
-            { "restore",        HandleCharacterDeletedRestoreCommand,  SEC_ADMINISTRATOR, Console::Yes },
-            { "purge",          HandleCharacterDeletedPurgeCommand,    SEC_CONSOLE,       Console::Yes }
+            { "delete",         HandleCharacterDeletedDeleteCommand,   rbac::RBAC_PERM_COMMAND_CHARACTER_DELETED_DELETE,  Console::Yes },
+            { "list",           HandleCharacterDeletedListCommand,     rbac::RBAC_PERM_COMMAND_CHARACTER_DELETED_LIST,    Console::Yes },
+            { "restore",        HandleCharacterDeletedRestoreCommand,  rbac::RBAC_PERM_COMMAND_CHARACTER_DELETED_RESTORE, Console::Yes },
+            { "purge",          HandleCharacterDeletedPurgeCommand,    rbac::RBAC_PERM_COMMAND_CHARACTER_DELETED_OLD,     Console::Yes }
         };
 
         static ChatCommandTable characterCheckCommandTable =
         {
-            { "bank",          HandleCharacterCheckBankCommand,          SEC_GAMEMASTER, Console::Yes },
-            { "bag",           HandleCharacterCheckBagCommand,           SEC_GAMEMASTER, Console::Yes },
-            { "profession",    HandleCharacterCheckProfessionCommand,    SEC_GAMEMASTER, Console::Yes }
+            { "bank",          HandleCharacterCheckBankCommand,          rbac::RBAC_PERM_COMMAND_CHARACTER_CHECK_BANK,       Console::Yes },
+            { "bag",           HandleCharacterCheckBagCommand,           rbac::RBAC_PERM_COMMAND_CHARACTER_CHECK_BAG,        Console::Yes },
+            { "profession",    HandleCharacterCheckProfessionCommand,    rbac::RBAC_PERM_COMMAND_CHARACTER_CHECK_PROFESSION, Console::Yes }
         };
 
         static ChatCommandTable characterCommandTable =
         {
-            { "customize",      HandleCharacterCustomizeCommand,        SEC_GAMEMASTER, Console::Yes },
-            { "changefaction",  HandleCharacterChangeFactionCommand,    SEC_GAMEMASTER, Console::Yes },
-            { "changerace",     HandleCharacterChangeRaceCommand,       SEC_GAMEMASTER, Console::Yes },
-            { "changeaccount",  HandleCharacterChangeAccountCommand,    SEC_ADMINISTRATOR, Console::Yes },
+            { "customize",      HandleCharacterCustomizeCommand,        rbac::RBAC_PERM_COMMAND_CHARACTER_CUSTOMIZE,      Console::Yes },
+            { "changefaction",  HandleCharacterChangeFactionCommand,    rbac::RBAC_PERM_COMMAND_CHARACTER_CHANGEFACTION,  Console::Yes },
+            { "changerace",     HandleCharacterChangeRaceCommand,       rbac::RBAC_PERM_COMMAND_CHARACTER_CHANGERACE,     Console::Yes },
+            { "changeaccount",  HandleCharacterChangeAccountCommand,    rbac::RBAC_PERM_COMMAND_CHARACTER_CHANGEACCOUNT,  Console::Yes },
             { "check",          characterCheckCommandTable },
-            { "erase",          HandleCharacterEraseCommand,            SEC_CONSOLE,    Console::Yes },
+            { "erase",          HandleCharacterEraseCommand,            rbac::RBAC_PERM_COMMAND_CHARACTER_ERASE,          Console::Yes },
             { "deleted",        characterDeletedCommandTable },
-            { "level",          HandleCharacterLevelCommand,            SEC_GAMEMASTER, Console::Yes },
-            { "rename",         HandleCharacterRenameCommand,           SEC_GAMEMASTER, Console::Yes },
-            { "reputation",     HandleCharacterReputationCommand,       SEC_GAMEMASTER, Console::Yes },
-            { "titles",         HandleCharacterTitlesCommand,           SEC_GAMEMASTER, Console::Yes }
+            { "level",          HandleCharacterLevelCommand,            rbac::RBAC_PERM_COMMAND_CHARACTER_LEVEL,          Console::Yes },
+            { "rename",         HandleCharacterRenameCommand,           rbac::RBAC_PERM_COMMAND_CHARACTER_RENAME,         Console::Yes },
+            { "reputation",     HandleCharacterReputationCommand,       rbac::RBAC_PERM_COMMAND_CHARACTER_REPUTATION,     Console::Yes },
+            { "titles",         HandleCharacterTitlesCommand,           rbac::RBAC_PERM_COMMAND_CHARACTER_TITLES,         Console::Yes }
         };
 
         static ChatCommandTable commandTable =
         {
             { "character",      characterCommandTable },
-            { "levelup",        HandleLevelUpCommand, SEC_GAMEMASTER, Console::No },
+            { "levelup",        HandleLevelUpCommand, rbac::RBAC_PERM_COMMAND_LEVELUP, Console::No },
             { "pdump",          pdumpCommandTable }
         };
 
@@ -93,18 +95,22 @@ public:
         uint32      accountId;                          ///< the account id
         std::string accountName;                        ///< the account name
         time_t      deleteDate;                         ///< the date at which the character has been deleted
+        uint8       level;                              ///< the character level at the time of deletion
     };
 
     typedef std::list<DeletedInfo> DeletedInfoList;
+
+    static constexpr std::size_t MAX_DELETED_CHAR_RESULTS = 50;
 
     /**
     * Collects all GUIDs (and related info) from deleted characters which are still in the database.
     *
     * @param foundList    a reference to an std::list which will be filled with info data
-    * @param searchString the search string which either contains a player GUID or a part fo the character-name
+    * @param searchString the search string which either contains a player GUID or a part of the character-name
+    * @param limitResults if true, caps results at MAX_DELETED_CHAR_RESULTS + 1 using a DB-level LIMIT
     * @return             returns false if there was a problem while selecting the characters (e.g. player name not normalizeable)
     */
-    static bool GetDeletedCharacterInfoList(DeletedInfoList& foundList, std::string searchString)
+    static bool GetDeletedCharacterInfoList(DeletedInfoList& foundList, std::string searchString, bool limitResults = false)
     {
         PreparedQueryResult result;
         CharacterDatabasePreparedStatement* stmt = nullptr;
@@ -123,7 +129,8 @@ public:
                 if (!normalizePlayerName(searchString))
                     return false;
 
-                stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_DEL_INFO_BY_NAME);
+                CharacterDatabaseStatements nameStmt = limitResults ? CHAR_SEL_CHAR_DEL_INFO_BY_NAME_LIMIT : CHAR_SEL_CHAR_DEL_INFO_BY_NAME;
+                stmt = CharacterDatabase.GetPreparedStatement(nameStmt);
                 stmt->SetData(0, searchString);
                 result = CharacterDatabase.Query(stmt);
             }
@@ -149,6 +156,7 @@ public:
                 // account name will be empty for nonexisting account
                 AccountMgr::GetName(info.accountId, info.accountName);
                 info.deleteDate = time_t(fields[3].Get<uint32>());
+                info.level      = fields[4].Get<uint8>();
                 foundList.push_back(info);
             } while (result->NextRow());
         }
@@ -181,11 +189,13 @@ public:
 
             if (!handler->GetSession())
                 handler->PSendSysMessage(LANG_CHARACTER_DELETED_LIST_LINE_CONSOLE,
-                                         itr->lowGuid, itr->name, itr->accountName.empty() ? "<Not existing>" : itr->accountName,
+                                         itr->lowGuid, itr->name, uint32(itr->level),
+                                         itr->accountName.empty() ? "<Not existing>" : itr->accountName,
                                          itr->accountId, dateStr);
             else
                 handler->PSendSysMessage(LANG_CHARACTER_DELETED_LIST_LINE_CHAT,
-                                         itr->lowGuid, itr->name, itr->accountName.empty() ? "<Not existing>" : itr->accountName,
+                                         itr->lowGuid, itr->name, uint32(itr->level),
+                                         itr->accountName.empty() ? "<Not existing>" : itr->accountName,
                                          itr->accountId, dateStr);
         }
 
@@ -588,7 +598,7 @@ public:
         if (needleStr)
             needle.assign(*needleStr);
         DeletedInfoList foundList;
-        if (!GetDeletedCharacterInfoList(foundList, needle))
+        if (!GetDeletedCharacterInfoList(foundList, needle, true))
             return false;
 
         // if no characters have been found, output a warning
@@ -598,7 +608,14 @@ public:
             return false;
         }
 
+        bool truncated = foundList.size() > MAX_DELETED_CHAR_RESULTS;
+        if (truncated)
+            foundList.resize(MAX_DELETED_CHAR_RESULTS);
+
         HandleCharacterDeletedListHelper(foundList, handler);
+
+        if (truncated)
+            handler->SendSysMessage(LANG_CHARACTER_DELETED_LIST_LIMIT);
 
         return true;
     }
