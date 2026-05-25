@@ -7,6 +7,7 @@ on:
     types:
       - labeled
       - synchronize
+  workflow_dispatch:
 
 concurrency:
   # One concurrency group per workflow + ref.
@@ -41,6 +42,9 @@ jobs:
           sudo rm -rf "$AGENT_TOOLSDIRECTORY"
 
       - uses: actions/checkout@v4
+        with:
+          # Need the previous commit so dorny/paths-filter can diff data/sql/**.
+          fetch-depth: 2
 
       # The containers created in this workflow are used by
       # acore-docker, which has a dependency on mod-ale.
@@ -125,3 +129,102 @@ jobs:
               "ref": "${{ github.ref_name }}",
               "sha": "${{ github.sha }}"
             }
+
+      # ----------------------------------------------------------------------
+      # Pre-imported DB image (acore/ac-wotlk-db)
+      #
+      # Kept LAST so a failure here cannot block the six images already pushed
+      # above (build and push are fused per step). It only marks the run failed.
+      # Runs on master of the canonical repo when data/sql/** changed or the
+      # workflow was dispatched manually; core-only pushes leave the existing
+      # :master DB image valid.
+      # ----------------------------------------------------------------------
+      - name: Detect data/sql changes
+        id: db_changes
+        if: github.repository == 'azerothcore/azerothcore-wotlk' && github.ref_name == 'master' && github.event_name != 'workflow_dispatch'
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            sql:
+              - 'data/sql/**'
+
+      - name: Decide whether to build the DB image
+        id: db_gate
+        run: |
+          build=false
+          if [ "${{ github.repository }}" = "azerothcore/azerothcore-wotlk" ] && [ "${{ github.ref_name }}" = "master" ]; then
+            if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "${{ steps.db_changes.outputs.sql }}" = "true" ]; then
+              build=true
+            fi
+          fi
+          echo "build=$build" >> "$GITHUB_OUTPUT"
+
+      - name: Import database and capture datadir
+        if: steps.db_gate.outputs.build == 'true'
+        run: |
+          set -euo pipefail
+
+          docker network create acnet
+
+          mkdir -p mysql-seed
+          docker run -d --name acdb --network acnet \
+            -e MYSQL_ROOT_PASSWORD=password \
+            -v "$PWD/mysql-seed:/var/lib/mysql" \
+            mysql:8.4 --skip-log-bin
+
+          # The plain mysql image has no built-in healthcheck; poll explicitly.
+          # Poll over TCP from another container (same as dbimport connects): the
+          # image's first-boot temporary init server runs with --skip-networking,
+          # so a socket ping would falsely report "alive" before TCP 3306 is up,
+          # and dbimport does not retry its initial connection.
+          for i in $(seq 1 60); do
+            if docker run --rm --network acnet mysql:8.4 \
+                 mysqladmin ping -h acdb -uroot -ppassword --silent; then
+              break
+            fi
+            if [ "$i" -eq 60 ]; then
+              echo "MySQL did not become ready in time" >&2
+              docker logs acdb >&2 || true
+              exit 1
+            fi
+            sleep 2
+          done
+
+          # Import with the db-import image pushed earlier in this job (includes
+          # Eluna, no test modules). AutoSetup creates the acore_* databases.
+          docker pull "acore/ac-wotlk-db-import:master"
+          docker run --rm --network acnet \
+            -e AC_LOGIN_DATABASE_INFO="acdb;3306;root;password;acore_auth" \
+            -e AC_WORLD_DATABASE_INFO="acdb;3306;root;password;acore_world" \
+            -e AC_CHARACTER_DATABASE_INFO="acdb;3306;root;password;acore_characters" \
+            "acore/ac-wotlk-db-import:master"
+
+          # Native-install parity account for standalone/non-root clients.
+          docker exec acdb mysql -uroot -ppassword -e \
+            "CREATE USER 'acore'@'%' IDENTIFIED BY 'acore';
+             GRANT ALL PRIVILEGES ON acore_world.*      TO 'acore'@'%' WITH GRANT OPTION;
+             GRANT ALL PRIVILEGES ON acore_characters.* TO 'acore'@'%' WITH GRANT OPTION;
+             GRANT ALL PRIVILEGES ON acore_auth.*       TO 'acore'@'%' WITH GRANT OPTION;
+             FLUSH PRIVILEGES;"
+
+          # Clean shutdown so the InnoDB datadir is consistent before capture.
+          docker stop -t 120 acdb
+
+          # Bind-mounted files are owned by uid 999 (container mysql user); make
+          # them readable as the build context for the runner user.
+          sudo chown -R "$(id -u):$(id -g)" mysql-seed
+
+          # Minimal build context: only the datadir, not the ~GB repo.
+          mkdir -p db-ctx
+          mv mysql-seed db-ctx/
+
+      - name: Build and push pre-imported DB image
+        if: steps.db_gate.outputs.build == 'true'
+        run: |
+          set -euo pipefail
+          VERSION="$(jq -r '.version' acore.json)"
+          docker buildx build --platform linux/amd64,linux/arm64 \
+            -f apps/docker/Dockerfile.db \
+            -t "acore/ac-wotlk-db:master" \
+            -t "acore/ac-wotlk-db:${VERSION}" \
+            --push db-ctx
