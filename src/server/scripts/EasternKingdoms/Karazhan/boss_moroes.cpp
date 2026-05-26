@@ -119,6 +119,7 @@ struct boss_moroes : public BossAI
         DoCastSelf(SPELL_DUAL_WIELD, true);
         _recentlySpoken = false;
         _vanished = false;
+        me->SetImmuneToAll(false);
 
         InitializeGuests();
 
