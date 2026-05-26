@@ -2,7 +2,8 @@
 
 Generates the binary DBC files for a 3.3.5a (build 12340) client patch that
 matches the Black Rose server module. Covers the **bag**, **gem**,
-**trinket**, and **Rurik's Death Mobile** mount in one build pipeline.
+**trinket**, **currency**, **custom item icons**, and **Rurik's Death
+Mobile** mount in one build pipeline.
 
 The mount intentionally reuses the stock 3.3.5a Mechano-Hog client model -
 no custom M2/.skin/.blp assets are shipped, so the patch is small and the
@@ -16,29 +17,61 @@ stock "Mechano-hog" creature (entry `29929`); AC's
 
 Three buckets of files under `staging/`:
 
-* **Eight DBC files** under `staging/DBFilesClient/` (item, spell, and
+* **Nine DBC files** under `staging/DBFilesClient/` (item, spell, and
   enchant data the client needs for tooltips and right-click behavior).
-* **Three UI assets** under `staging/Interface/` (the login backdrop
-  and the GlueXML overlay that wires it in).
+* **UI and icon assets** under `staging/Interface/` (the login backdrop,
+  Black Rose item icons, and the GlueXML overlay that wires it in).
 * **One audio file** under `staging/Sound/` (replacement title music).
 
 The DBCs:
 
 | DBC                            | Black Rose rows added                                                                            |
 |--------------------------------|--------------------------------------------------------------------------------------------------|
-| `Spell.dbc`                    | `900900` Power of the Black Rose, `900901` Empower Black Rose Gem, `900902` Upgrade Black Rose Bag, `900903` Rurik's Death Mobile |
+| `Spell.dbc`                    | Black Rose aura/use spells, gem and bag upgrade spells, Rurik's Death Mobile, and Rosy's Magic Stick use spell |
 | `SpellDuration.dbc`            | `900900` 20 second duration                                                                      |
 | `SpellItemEnchantment.dbc`     | 98 rows: red `900300..900386` and yellow `900400..900446` socket enchant tooltips                |
 | `GemProperties.dbc`            | Same 98 IDs, red Type=2 / yellow Type=4                                                          |
-| `ItemExtendedCost.dbc`         | `900700..900706` Black Miasma costs and `900710..900716` Black Petals costs                      |
+| `ItemExtendedCost.dbc`         | `900700..900706` Black Miasma costs, `900710..900716` Black Petals costs, and `900720..900726` Black Thorns costs |
 | `SkillLineAbility.dbc`         | `900903` registers Rurik's Death Mobile under the Riding skill line so it shows in the mount UI  |
 | `QuestSort.dbc`                | `9009` "The Black Rose" header, referenced by `quest_template.QuestSortID = -9009`               |
-| `Item.dbc`                     | One row per `item_template` entry in `[900100,900999]` (bags, trinket, mount item, gem upgrades, currencies, gems). Without these the client misclassifies custom items and breaks right-click. |
+| `Item.dbc`                     | One row per `item_template` entry in `[900100,901399]` (bags, trinket, mount item, gem upgrades, currencies, gems, and Rosy's sticks). Without these the client misclassifies custom items and breaks right-click. |
+| `ItemDisplayInfo.dbc`          | Custom display IDs for The Black Rose, currencies, Ribbons, Mists, Jewels, and Rosy's sticks, pointing at BLP basenames in `extras/Interface/Icons/` |
 
 These mirror the server `*_dbc` rows and the live `item_template` table
 in `modules/mod-blackrose/data/sql/db-world/`, so client tooltips,
 socket lines, the mount UI entry, and right-click behavior match what
 the server enforces.
+
+## How Item Icons Resolve
+
+Custom item icons require both DBC mappings and the BLP assets. The client
+does not have a separate icon manifest DBC; for 3.3.5a the item icon chain is:
+
+```
+Item.dbc item ID -> DisplayInfoID
+ItemDisplayInfo.dbc DisplayInfoID -> InventoryIcon_1 basename
+Interface\Icons\<InventoryIcon_1>.blp -> rendered icon
+```
+
+The server-side mirror is `item_template.displayid` plus
+`itemdisplayinfo_dbc`, but the game client still needs its own patched
+`DBFilesClient\Item.dbc` and `DBFilesClient\ItemDisplayInfo.dbc` inside the
+MPQ. Shipping only `Interface\Icons\*.blp` is not enough; the client will have
+the image files but no mapping from custom item/display IDs to those basenames.
+
+Inside the packed MPQ the paths must be rooted exactly like this:
+
+```
+DBFilesClient\Item.dbc
+DBFilesClient\ItemDisplayInfo.dbc
+Interface\Icons\INV_BR_Misc_BlackMiasma.blp
+Interface\Icons\INV_BR_Misc_StarkRibbon.blp
+Interface\Icons\INV_BR_Misc_RosysMagicStick.blp
+```
+
+Do not pack the `staging/` folder itself as a top-level folder. If the archive
+contains `staging\DBFilesClient\Item.dbc` or `staging\Interface\Icons\...`, the
+client will not load those files.
 
 If you ever want to swap the stock Mechano-Hog model for a custom mount,
 re-add `creaturedisplayinfo` and `creaturemodeldata` to `_generate.py` and
@@ -66,7 +99,9 @@ tools/clientpatch/
     skilllineability.json
     questsort.json
     item.json               - regenerated by dump_items.py from live MySQL
+    itemdisplayinfo.json    - custom item icon display rows
   extras/                   - non-DBC assets we ship as-is (committed)
+    Interface/Icons/*.blp
     Interface/Glues/LoadingScreens/Login-Blackrose.blp
     Sound/Music/GlueScreenMusic/WotlkTitleScreen.mp3
     Interface/GlueXML/BlackRoseLogin.lua    <- append fodder, NOT shipped standalone
@@ -100,14 +135,26 @@ WDBXEditor / MyDBCEditor.
 
 ### 2. Extract base DBCs from your reference client
 
-You need the current authoritative DBCs. In 3.3.5a, `patch-3.MPQ` is
-cumulative and contains the final version of every DBC any patch has
-ever touched, which covers all seven of ours. Most of the time you do
-not need to look anywhere else.
+You need the current authoritative DBCs. For most 3.3.5a clients the DBCs
+live in the locale archives under `WoW/Data/enUS/`, not just the root
+`WoW/Data/patch-3.MPQ`.
 
-Open Ladik's MPQ Editor, open `WoW/Data/patch-3.MPQ`, drill into
-`DBFilesClient\`, and extract the seven files this tool touches into
-`input/DBFilesClient/`:
+Open the archives below in priority order and extract the newest available
+copy of each required DBC into `input/DBFilesClient/`:
+
+```
+WoW/Data/enUS/patch-enUS-3.MPQ
+WoW/Data/enUS/patch-enUS-2.MPQ
+WoW/Data/enUS/patch-enUS.MPQ
+WoW/Data/patch-3.MPQ
+WoW/Data/patch-2.MPQ
+WoW/Data/patch.MPQ
+WoW/Data/common-2.MPQ
+WoW/Data/common.MPQ
+WoW/Data/enUS/locale-enUS.MPQ
+```
+
+Required files:
 
 ```
 input/DBFilesClient/Spell.dbc
@@ -118,24 +165,11 @@ input/DBFilesClient/ItemExtendedCost.dbc
 input/DBFilesClient/SkillLineAbility.dbc
 input/DBFilesClient/QuestSort.dbc
 input/DBFilesClient/Item.dbc
+input/DBFilesClient/ItemDisplayInfo.dbc
 ```
 
-If `build_patch.py merge` errors with `missing base file <Foo>.dbc`, that
-particular DBC was not redistributed by `patch-3.MPQ`. Open these in
-order and grab the missing one from whichever has it:
-
-```
-WoW/Data/enUS/patch-enUS-3.MPQ
-WoW/Data/enUS/patch-enUS-2.MPQ
-WoW/Data/enUS/patch-enUS.MPQ
-WoW/Data/patch-2.MPQ
-WoW/Data/patch.MPQ
-WoW/Data/common-2.MPQ
-WoW/Data/common.MPQ
-```
-
-Later archives in that list (higher up) override earlier ones; the
-editor will overwrite when prompted, which is what you want.
+Later archives in the load chain override earlier ones. If you extract by
+hand, keep the newest/highest-priority copy of each DBC.
 
 ### 3. Build the merged patch
 
@@ -145,17 +179,41 @@ python3 build_patch.py merge
 
 The tool reads each base DBC from `input/DBFilesClient/`, upserts the Black
 Rose rows by `ID` (replacing any existing row with the same ID), sorts by ID,
-and writes the merged result to `staging/DBFilesClient/`. Output looks like:
+and writes the merged result to `staging/DBFilesClient/`. It also copies
+assets from `extras/` into `staging/` and validates that every custom
+`ItemDisplayInfo.dbc` icon basename has a matching staged BLP file.
+
+Output looks like:
 
 ```
-  Spell.dbc                      base= 51224 custom=   3 added=   3 total= 51227
-  SpellDuration.dbc              base=   571 custom=   1 added=   1 total=   572
-  SpellItemEnchantment.dbc       base=  4815 custom=  98 added=  98 total=  4913
-  GemProperties.dbc              base=    81 custom=  98 added=  98 total=   179
-  ItemExtendedCost.dbc           base=  2625 custom=  14 added=  14 total=  2639
+  Spell.dbc                      base= 49839 custom=   7 added=   5 merged=  2 total= 49844
+  SpellDuration.dbc              base=   130 custom=   1 added=   1 merged=  0 total=   131
+  SpellItemEnchantment.dbc       base=  2656 custom=  98 added=  98 merged=  0 total=  2754
+  GemProperties.dbc              base=   626 custom=  98 added=  98 merged=  0 total=   724
+  ItemExtendedCost.dbc           base=   972 custom=  21 added=  21 merged=  0 total=   993
+  Item.dbc                       base= 46096 custom= 331 added= 331 merged=  0 total= 46427
+  ItemDisplayInfo.dbc            base= 57986 custom=  29 added=  29 merged=  0 total= 58015
 ```
 
 (Counts vary depending on what patches are already on top of the client.)
+
+### Build flow summary
+
+`build_patch.py` has two modes:
+
+* `customonly` writes DBCs containing only the rows in `definitions/*.json`.
+  Use this for inspecting generated rows. Do not ship it as a client patch,
+  because it would replace full client DBCs with Black Rose-only files.
+* `merge` reads full base DBCs from `input/DBFilesClient/`, overlays the
+  Black Rose rows from `definitions/*.json`, and writes full patched DBCs to
+  `staging/DBFilesClient/`. This is the distributable build.
+
+During `merge`, normal rows are upserted by `ID`. Rows with `_merge: true`
+only override the fields present in JSON, which is useful for tweaking stock
+rows without zeroing fields we do not manage. After DBC writing, the script
+copies `extras/` to `staging/`, validates icon pathing, and optionally appends
+the login-screen Lua overlay if `extras_src/Interface/GlueXML/GlueParent.lua`
+is available.
 
 ### 4. Pack into an MPQ
 
@@ -164,10 +222,13 @@ Open Ladik's MPQ Editor and create a new MPQ:
 * New MPQ: `patch-Z.MPQ`
 * Format: **MPQ format v1** (3.3.5a-compatible)
 * Hash table size: 4096 (default is fine for a few hundred files)
-* Add the entire `staging/` folder, preserving directory structure,
-  so the files end up at:
+* Add the **contents** of the `staging/` folder, preserving directory
+  structure, so the files end up at:
   ```
-  DBFilesClient\Spell.dbc                      (and the other 7 DBCs)
+  DBFilesClient\Spell.dbc                      (and the other 8 DBCs)
+  DBFilesClient\Item.dbc
+  DBFilesClient\ItemDisplayInfo.dbc
+  Interface\Icons\INV_BR_Misc_BlackMiasma.blp  (and the other icons)
   Interface\GlueXML\GlueParent.lua             (stock + appended overlay)
   Interface\Glues\LoadingScreens\Login-Blackrose.blp
   Sound\Music\GlueScreenMusic\WotlkTitleScreen.mp3
@@ -185,6 +246,12 @@ virtual paths.
 Drop the resulting `patch-Z.MPQ` into the client's `WoW/Data/` folder. The
 client loads `patch-*.MPQ` archives alphabetically; `Z` sorts last so it
 overrides everything else.
+
+If an existing custom patch is locked by the client or an MPQ editor, close
+that process before replacing it. For a quick local test, you can temporarily
+deploy the new archive under a later-sorting name such as `patch-zz.mpq`;
+remove the older duplicate once the lock is gone so you do not keep stale
+patches around.
 
 For a locale-scoped variant put it at `WoW/Data/enUS/patch-enUS-Z.MPQ`
 instead. Both work for 3.3.5a.
@@ -207,6 +274,10 @@ In-game:
   `Rurik's Death Mobile`. Same check, different spell.
 * Hover **The Black Rose** trinket: the green `Use:` line should match the
   description we wrote.
+* Add or hover **Black Miasma**: it should use
+  `Interface\Icons\INV_BR_Misc_BlackMiasma.blp`. If it is a question mark,
+  check that the packed MPQ contains both `DBFilesClient\Item.dbc` and
+  `DBFilesClient\ItemDisplayInfo.dbc`, not just the BLP icon files.
 * Hover any **Klug Ribbon** before socketing: tooltip should show
   `+N intellect` from the gem properties + enchantment join.
 * Socket a Klug Ribbon into The Black Rose: the item tooltip should grow a
@@ -247,7 +318,7 @@ There are two sources of truth, depending on which DBC:
   `MYSQL_PASSWORD` / `MYSQL_DB` env vars (defaults: `127.0.0.1` /
   `acore` / `acore` / `acore_world`) and writes
   `definitions/item.json` covering every item with `entry` in
-  `[900100, 900999]`.
+  `[900100, 901199]`.
 
 Then rebuild the patch with `python3 build_patch.py merge` from the
 `tools/clientpatch/` directory.
@@ -320,13 +391,17 @@ client code.
 
 1. Copies everything under `extras/` into `staging/` preserving paths
    (note: anything under `extras/Interface/GlueXML/` is **not** copied
-   standalone - it's append fodder, see step 2).
-2. Reads `extras_src/Interface/GlueXML/GlueParent.lua`, strips any
+   standalone - it's append fodder, see step 2). This includes
+   `extras/Interface/Icons/*.blp`, which `ItemDisplayInfo.dbc` references
+   by basename without the `.blp` suffix.
+2. Validates every custom `ItemDisplayInfo.dbc` icon row against the
+   staged `Interface/Icons/*.blp` files so missing icon assets fail fast.
+3. Reads `extras_src/Interface/GlueXML/GlueParent.lua`, strips any
    prior `-- BEGIN/END BlackRoseLogin overlay --` block (so re-runs
    are idempotent), appends the contents of
    `extras/Interface/GlueXML/BlackRoseLogin.lua`, and writes the
    merged file to `staging/Interface/GlueXML/GlueParent.lua`.
-3. Skips the GlueParent patch (with a warning) if you haven't extracted
+4. Skips the GlueParent patch (with a warning) if you haven't extracted
    the stock file yet - DBC patching still works fine, you just won't
    get the new login screen.
 
@@ -390,10 +465,14 @@ that can affect "is the image too dark / too pulsing".
   testing.
 * **Cache must be cleared.** Custom item/spell IDs that the client has
   already cached as `Unknown` will stay broken until `WoW/Cache/` is wiped.
-* **`Item.dbc` matters for right-click.** Without the custom item rows,
-  the client cannot classify the item locally and falls back to
-  `InventoryType = 0`. That makes it send `CMSG_USE_ITEM` instead of
-  `CMSG_AUTOEQUIP_ITEM` for trinkets, which the server rejects with
-  `EQUIP_ERR_ITEM_NOT_FOUND` (in-game: "Item not found"). Bag right-click
-  silently fails the same way. Re-run `dump_items.py` and repack the MPQ
-  any time you add/edit items in the SQL migration.
+* **`Item.dbc` matters for both icons and right-click.** Without the custom
+  item rows, the client can keep using stale stock display IDs and cannot
+  classify custom equippables locally. That can render question-mark icons
+  even when the BLP files are present, and can make trinkets send
+  `CMSG_USE_ITEM` instead of `CMSG_AUTOEQUIP_ITEM`. Re-run `dump_items.py`,
+  `build_patch.py merge`, and repack the MPQ any time you add/edit items in
+  the SQL migration.
+* **`ItemDisplayInfo.dbc` matters for icon basenames.** This DBC maps the
+  `DisplayInfoID` from `Item.dbc` / `item_template.displayid` to
+  `InventoryIcon_1`. The value must be a basename like
+  `INV_BR_Misc_BlackMiasma`, not a path and not a `.blp` filename.

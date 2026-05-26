@@ -24,11 +24,13 @@ HERE = Path(__file__).parent
 
 BLACK_MIASMA = 900200
 BLACK_PETALS = 900201
+BLACK_THORNS = 900202
 
 BLACK_ROSE_AURA = 900900
 BLACK_ROSE_UPGRADE_USE = 900901
 BLACK_ROSE_BAG_UPGRADE_USE = 900902
 RURIK_DEATH_MOBILE_SPELL = 900903
+BLACK_ROSE_MAGIC_STICK_USE = 900904
 
 BLACK_ROSE_QUEST_SORT_ID = 9009
 BLACK_ROSE_QUEST_SORT_NAME = "The Black Rose"
@@ -55,6 +57,7 @@ RED_GEM_BASE = 900300
 YELLOW_GEM_BASE = 900400
 MIA_EXT_BASE = 900700
 PETAL_EXT_BASE = 900710
+THORN_EXT_BASE = 900720
 
 ITEM_MOD_AGILITY = 3
 ITEM_MOD_STRENGTH = 4
@@ -216,7 +219,32 @@ def gen_spell() -> list[dict]:
         **no_item_class_constraint,
     }
 
-    return [aura, upgrade_gem, upgrade_bag, mount]
+    magic_stick = {
+        "ID": BLACK_ROSE_MAGIC_STICK_USE,
+        "Attributes": ATTRIBUTES,
+        "CastingTimeIndex": 1,
+        "DurationIndex": 0,
+        "RangeIndex": 1,
+        "Effect_1": 3,
+        "EffectDieSides_1": 1,
+        "EffectBasePoints_1": 0,
+        "ImplicitTargetA_1": 1,
+        "EffectAura_1": 0,
+        "EffectMiscValue_1": 0,
+        "SpellIconID": 0,
+        "ActiveIconID": 0,
+        "Name_Lang_enUS": "Recover Black Rose Gem",
+        "Name_Lang_Mask": 1,
+        "Description_Lang_enUS":
+            "Use to recover a socketed Black Rose gem.",
+        "Description_Lang_Mask": 1,
+        "AuraDescription_Lang_enUS": "",
+        "AuraDescription_Lang_Mask": 0,
+        "SchoolMask": 1,
+        **no_item_class_constraint,
+    }
+
+    return [aura, upgrade_gem, upgrade_bag, mount, magic_stick]
 
 
 def gen_spell_duration() -> list[dict]:
@@ -336,36 +364,28 @@ def gen_gem_properties() -> list[dict]:
 
 def gen_item_extended_cost() -> list[dict]:
     rows: list[dict] = []
-    miasma_counts = [1, 10, 50, 500, 1000, 5000, 10000]
-    for i, count in enumerate(miasma_counts):
-        rows.append({
-            "ID": MIA_EXT_BASE + i,
-            "HonorPoints": 0,
-            "ArenaPoints": 0,
-            "ArenaBracket": 0,
-            "ItemID_1": BLACK_MIASMA,
-            "ItemID_2": 0, "ItemID_3": 0, "ItemID_4": 0, "ItemID_5": 0,
-            "ItemCount_1": count,
-            "ItemCount_2": 0, "ItemCount_3": 0,
-            "ItemCount_4": 0, "ItemCount_5": 0,
-            "RequiredArenaRating": 0,
-            "ItemPurchaseGroup": 0,
-        })
-    petal_counts = [1, 10, 50, 500, 1000, 5000, 10000]
-    for i, count in enumerate(petal_counts):
-        rows.append({
-            "ID": PETAL_EXT_BASE + i,
-            "HonorPoints": 0,
-            "ArenaPoints": 0,
-            "ArenaBracket": 0,
-            "ItemID_1": BLACK_PETALS,
-            "ItemID_2": 0, "ItemID_3": 0, "ItemID_4": 0, "ItemID_5": 0,
-            "ItemCount_1": count,
-            "ItemCount_2": 0, "ItemCount_3": 0,
-            "ItemCount_4": 0, "ItemCount_5": 0,
-            "RequiredArenaRating": 0,
-            "ItemPurchaseGroup": 0,
-        })
+    costs = [1, 3, 8, 15, 30, 60, 100]
+    currency_rows = [
+        (MIA_EXT_BASE, BLACK_MIASMA),
+        (PETAL_EXT_BASE, BLACK_PETALS),
+        (THORN_EXT_BASE, BLACK_THORNS),
+    ]
+    for base, currency in currency_rows:
+        for i, count in enumerate(costs):
+            rows.append({
+                "ID": base + i,
+                "HonorPoints": 0,
+                "ArenaPoints": 0,
+                "ArenaBracket": 0,
+                "ItemID_1": currency,
+                "ItemID_2": 0, "ItemID_3": 0,
+                "ItemID_4": 0, "ItemID_5": 0,
+                "ItemCount_1": count,
+                "ItemCount_2": 0, "ItemCount_3": 0,
+                "ItemCount_4": 0, "ItemCount_5": 0,
+                "RequiredArenaRating": 0,
+                "ItemPurchaseGroup": 0,
+            })
     return rows
 
 

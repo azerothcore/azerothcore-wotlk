@@ -47,15 +47,26 @@ namespace BlackRose
     constexpr uint32 ItemBlackPetals = 900201;
     constexpr uint32 ItemBlackThorns = 900202;
 
+    constexpr uint32 ItemRosyRibbonStick = 901300;
+    constexpr uint32 ItemRosyMistStick = 901301;
+    constexpr uint32 ItemRosyJewelStick = 901302;
+
     constexpr uint32 RedGemBase = 900300;
     constexpr uint32 YellowGemBase = 900400;
     constexpr uint32 RedUpgradeBase = 900500;
     constexpr uint32 YellowUpgradeBase = 900600;
+    constexpr uint32 JewelGemBase = 901000;
+    constexpr uint32 JewelUpgradeBase = 901100;
+
+    constexpr uint32 QuestUnlockTier5 = 901200;
+    constexpr uint32 QuestUnlockTier6 = 901201;
+    constexpr uint32 QuestUnlockTier7 = 901202;
 
     constexpr uint32 SpellBlackRoseAura = 900900;
 
     constexpr uint8 RedGemFamilies = 9;
     constexpr uint8 YellowGemFamilies = 5;
+    constexpr uint8 JewelGemFamilies = 10;
     constexpr uint8 GemRanks = 7;
 
     enum class MultiplierMode
@@ -63,6 +74,14 @@ namespace BlackRose
         FromAura,
         ForceBase,
         ForceBoosted
+    };
+
+    enum class GemSocketFamily
+    {
+        None,
+        Ribbon,
+        Mist,
+        Jewel
     };
 
     inline thread_local MultiplierMode GemMultiplierMode =
@@ -121,7 +140,8 @@ namespace BlackRose
     inline bool IsBlackRoseGemItem(uint32 entry)
     {
         return IsRankedEntry(entry, RedGemBase, RedGemFamilies) ||
-            IsRankedEntry(entry, YellowGemBase, YellowGemFamilies);
+            IsRankedEntry(entry, YellowGemBase, YellowGemFamilies) ||
+            IsRankedEntry(entry, JewelGemBase, JewelGemFamilies);
     }
 
     inline bool IsBlackRoseGemEnchantment(uint32 enchantId)
@@ -129,10 +149,57 @@ namespace BlackRose
         return IsBlackRoseGemItem(enchantId);
     }
 
+    inline GemSocketFamily GetBlackRoseGemFamily(uint32 entry)
+    {
+        if (IsRankedEntry(entry, RedGemBase, RedGemFamilies))
+            return GemSocketFamily::Ribbon;
+
+        if (IsRankedEntry(entry, YellowGemBase, YellowGemFamilies))
+            return GemSocketFamily::Mist;
+
+        if (IsRankedEntry(entry, JewelGemBase, JewelGemFamilies))
+            return GemSocketFamily::Jewel;
+
+        return GemSocketFamily::None;
+    }
+
+    inline GemSocketFamily GetMagicStickFamily(uint32 entry)
+    {
+        switch (entry)
+        {
+            case ItemRosyRibbonStick:
+                return GemSocketFamily::Ribbon;
+            case ItemRosyMistStick:
+                return GemSocketFamily::Mist;
+            case ItemRosyJewelStick:
+                return GemSocketFamily::Jewel;
+            default:
+                return GemSocketFamily::None;
+        }
+    }
+
+    inline char const* GetGemFamilyName(GemSocketFamily family)
+    {
+        switch (family)
+        {
+            case GemSocketFamily::Ribbon:
+                return "Ribbon";
+            case GemSocketFamily::Mist:
+                return "Mist";
+            case GemSocketFamily::Jewel:
+                return "Jewel";
+            case GemSocketFamily::None:
+                break;
+        }
+
+        return "Black Rose gem";
+    }
+
     inline bool IsBlackRoseUpgradeToken(uint32 entry)
     {
         return IsUpgradeToken(entry, RedUpgradeBase, RedGemFamilies) ||
-            IsUpgradeToken(entry, YellowUpgradeBase, YellowGemFamilies);
+            IsUpgradeToken(entry, YellowUpgradeBase, YellowGemFamilies) ||
+            IsUpgradeToken(entry, JewelUpgradeBase, JewelGemFamilies);
     }
 
     inline BagUpgradeTier const* GetBagUpgradeTier(uint32 token)
@@ -171,6 +238,12 @@ namespace BlackRose
             tokenBase = YellowUpgradeBase;
             families = YellowGemFamilies;
         }
+        else if (IsUpgradeToken(token, JewelUpgradeBase, JewelGemFamilies))
+        {
+            gemBase = JewelGemBase;
+            tokenBase = JewelUpgradeBase;
+            families = JewelGemFamilies;
+        }
         else
             return false;
 
@@ -196,23 +269,58 @@ namespace BlackRose
         if (IsUpgradeToken(token, YellowUpgradeBase, YellowGemFamilies))
             return ItemBlackPetals;
 
+        if (IsUpgradeToken(token, JewelUpgradeBase, JewelGemFamilies))
+            return ItemBlackThorns;
+
         return 0;
     }
 
-    inline uint32 GetGemUpgradeCost(uint32 token)
+    inline uint32 GetGemUpgradeTargetRank(uint32 token)
     {
         uint32 offset = 0;
         if (IsUpgradeToken(token, RedUpgradeBase, RedGemFamilies))
             offset = token - RedUpgradeBase;
         else if (IsUpgradeToken(token, YellowUpgradeBase, YellowGemFamilies))
             offset = token - YellowUpgradeBase;
+        else if (IsUpgradeToken(token, JewelUpgradeBase, JewelGemFamilies))
+            offset = token - JewelUpgradeBase;
         else
             return 0;
 
-        static uint32 constexpr costs[] = { 10, 50, 500, 1000, 5000, 10000 };
-        uint32 rankOffset = offset % 10;
+        return (offset % 10) + 2;
+    }
+
+    inline uint32 GetGemUpgradeCost(uint32 token)
+    {
+        uint32 targetRank = GetGemUpgradeTargetRank(token);
+        if (targetRank < 2 || targetRank > GemRanks)
+            return 0;
+
+        static uint32 constexpr costs[] = { 3, 8, 15, 30, 60, 100 };
+        uint32 rankOffset = targetRank - 2;
         return rankOffset < (sizeof(costs) / sizeof(uint32))
             ? costs[rankOffset] : 0;
+    }
+
+    inline uint32 GetGemUpgradeRequiredQuest(uint32 token)
+    {
+        switch (GetGemUpgradeTargetRank(token))
+        {
+            case 5:
+                return QuestUnlockTier5;
+            case 6:
+                return QuestUnlockTier6;
+            case 7:
+                return QuestUnlockTier7;
+            default:
+                return 0;
+        }
+    }
+
+    inline bool IsGemUpgradeUnlocked(Player const* player, uint32 token)
+    {
+        uint32 questId = GetGemUpgradeRequiredQuest(token);
+        return !questId || (player && player->GetQuestRewardStatus(questId));
     }
 
     inline Item* GetEquippedBlackRose(Player* player)

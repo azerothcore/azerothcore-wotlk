@@ -57,6 +57,7 @@ DEFINITION_TO_SCHEMA = {
     "skilllineability": "skilllineability",
     "questsort": "questsort",
     "item": "item",
+    "itemdisplayinfo": "itemdisplayinfo",
 }
 
 
@@ -98,6 +99,40 @@ def copy_extras() -> int:
         copied += 1
         print(f"  extras  {rel}")
     return copied
+
+
+def validate_itemdisplay_icons() -> None:
+    """Verify custom ItemDisplayInfo rows point at staged BLP icons."""
+    schema = dbc.SCHEMAS["itemdisplayinfo"]
+    dbc_path = STAGING_DBC_DIR / schema.filename
+    if not dbc_path.exists():
+        sys.exit(f"ERROR: missing staged DBC {dbc_path.relative_to(HERE)}")
+
+    staged_dbc = dbc.read_dbc(dbc_path, schema)
+    staged_rows = {int(row["ID"]): row for row in staged_dbc.rows}
+    missing_rows: list[int] = []
+    missing_icons: list[str] = []
+
+    for expected in load_definition("itemdisplayinfo"):
+        display_id = int(expected["ID"])
+        icon_name = str(expected["InventoryIcon_1"])
+        row = staged_rows.get(display_id)
+        if not row or row.get("InventoryIcon_1") != icon_name:
+            missing_rows.append(display_id)
+            continue
+
+        icon_path = STAGING_ROOT / "Interface" / "Icons" / f"{icon_name}.blp"
+        if not icon_path.exists():
+            missing_icons.append(str(icon_path.relative_to(HERE)))
+
+    if missing_rows:
+        joined = ", ".join(str(display_id) for display_id in missing_rows)
+        sys.exit(f"ERROR: missing ItemDisplayInfo rows in staged DBC: {joined}")
+    if missing_icons:
+        joined = "\n  ".join(missing_icons)
+        sys.exit(f"ERROR: missing staged icon BLP(s):\n  {joined}")
+
+    print("  validated ItemDisplayInfo icons in staging/")
 
 
 def append_to_glueparent_lua() -> bool:
@@ -230,6 +265,7 @@ def build_merge() -> None:
     extras_count = copy_extras()
     if extras_count:
         print(f"\n  copied {extras_count} extras file(s) into staging/")
+    validate_itemdisplay_icons()
     if _SKIP_GLUE:
         print("\n  --no-glue: skipping GlueParent.lua append.")
     elif not append_to_glueparent_lua():
