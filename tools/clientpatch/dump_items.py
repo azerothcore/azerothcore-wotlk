@@ -35,7 +35,7 @@ HERE = Path(__file__).parent
 DEFAULT_OUT = HERE / "definitions" / "item.json"
 
 CUSTOM_RANGE_LOW = 900100
-CUSTOM_RANGE_HIGH = 900999
+CUSTOM_RANGE_HIGH = 901399
 
 # Item.dbc field order. Maps to item_template columns one-to-one.
 DBC_COLUMNS = [

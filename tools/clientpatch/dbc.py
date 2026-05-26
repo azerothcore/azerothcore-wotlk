@@ -258,6 +258,30 @@ def _item_schema() -> Schema:
     )
 
 
+def _item_display_info_schema() -> Schema:
+    """3.3.5a ItemDisplayInfo.dbc - 25 fields.
+
+    AzerothCore only reads InventoryIcon_1 from this DBC at runtime, but
+    the client needs every model and texture string preserved when we
+    merge onto a full stock DBC. Using AC's server-side `x` skips here
+    zeroes Blizzard texture references and causes checkerboard models.
+    """
+    return Schema(
+        "ItemDisplayInfo.dbc",
+        "nssssssxxxxxxxxssssssssii",
+        [
+            "ID", "ModelName_1", "ModelName_2", "ModelTexture_1",
+            "ModelTexture_2", "InventoryIcon_1", "InventoryIcon_2",
+            "GeosetGroup_1", "GeosetGroup_2", "GeosetGroup_3",
+            "Flags", "SpellVisualID", "GroupSoundIndex",
+            "HelmetGeosetVis_1", "HelmetGeosetVis_2",
+            "Texture_1", "Texture_2", "Texture_3", "Texture_4",
+            "Texture_5", "Texture_6", "Texture_7", "Texture_8",
+            "ItemVisual", "ParticleColorID",
+        ],
+    )
+
+
 def _creature_display_info_schema() -> Schema:
     """3.3.5a CreatureDisplayInfo.dbc - 16 fields.
 
@@ -319,6 +343,7 @@ SCHEMAS: dict[str, Schema] = {
     "skilllineability": _skill_line_ability_schema(),
     "questsort": _quest_sort_schema(),
     "item": _item_schema(),
+    "itemdisplayinfo": _item_display_info_schema(),
     "creaturedisplayinfo": _creature_display_info_schema(),
     "creaturemodeldata": _creature_model_data_schema(),
 }

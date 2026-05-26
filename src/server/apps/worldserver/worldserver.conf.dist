@@ -2283,7 +2283,7 @@ LevelReq.Trade = 1
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 
-NoResetTalentsCost = 0
+NoResetTalentsCost = 1
 
 #
 #    ToggleXP.Cost

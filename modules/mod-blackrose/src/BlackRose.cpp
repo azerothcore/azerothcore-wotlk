@@ -20,7 +20,13 @@
 #include "Chat.h"
 #include "Creature.h"
 #include "CreatureScript.h"
+#include "Formulas.h"
+#include "GlobalScript.h"
+#include "Group.h"
 #include "ItemScript.h"
+#include "LootMgr.h"
+#include "Map.h"
+#include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "PlayerScript.h"
 #include "QuestDef.h"
@@ -50,6 +56,13 @@ namespace
                 BlackRose::RedGemFamilies * 10 +
                 token - BlackRose::YellowUpgradeBase;
 
+        if (BlackRose::IsUpgradeToken(token, BlackRose::JewelUpgradeBase,
+                BlackRose::JewelGemFamilies))
+            return GOSSIP_ACTION_GEM_UPGRADE_BASE +
+                BlackRose::RedGemFamilies * 10 +
+                BlackRose::YellowGemFamilies * 10 +
+                token - BlackRose::JewelUpgradeBase;
+
         return 0;
     }
 
@@ -65,6 +78,10 @@ namespace
         offset -= BlackRose::RedGemFamilies * 10;
         if (offset < BlackRose::YellowGemFamilies * 10)
             return BlackRose::YellowUpgradeBase + offset;
+
+        offset -= BlackRose::YellowGemFamilies * 10;
+        if (offset < BlackRose::JewelGemFamilies * 10)
+            return BlackRose::JewelUpgradeBase + offset;
 
         return 0;
     }
@@ -86,46 +103,127 @@ namespace
             " " + GetItemName(currency) + ")";
     }
 
+    std::string GetUnlockQuestName(uint32 questId)
+    {
+        if (Quest const* quest = sObjectMgr->GetQuestTemplate(questId))
+            return quest->GetTitle();
+
+        return "the required Black Rose unlock quest";
+    }
+
+    bool CheckUpgradeUnlocked(Player* player, uint32 token, bool notify)
+    {
+        uint32 questId = BlackRose::GetGemUpgradeRequiredQuest(token);
+        if (!questId || BlackRose::IsGemUpgradeUnlocked(player, token))
+            return true;
+
+        if (notify)
+            ChatHandler(player->GetSession()).SendNotification(
+                "Complete {} before buying that upgrade.",
+                GetUnlockQuestName(questId));
+
+        return false;
+    }
+
+    template <typename Callback>
+    void ForEachGemUpgradeToken(Callback&& callback)
+    {
+        for (uint8 family = 0; family < BlackRose::RedGemFamilies; ++family)
+            for (uint8 rank = 2; rank <= BlackRose::GemRanks; ++rank)
+                callback(BlackRose::RedUpgradeBase + family * 10 + rank - 2);
+
+        for (uint8 family = 0; family < BlackRose::YellowGemFamilies; ++family)
+            for (uint8 rank = 2; rank <= BlackRose::GemRanks; ++rank)
+                callback(BlackRose::YellowUpgradeBase + family * 10 + rank - 2);
+
+        for (uint8 family = 0; family < BlackRose::JewelGemFamilies; ++family)
+            for (uint8 rank = 2; rank <= BlackRose::GemRanks; ++rank)
+                callback(BlackRose::JewelUpgradeBase + family * 10 + rank - 2);
+    }
+
     bool AddEligibleUpgradeOptions(Player* player)
     {
         bool added = false;
 
-        for (uint8 family = 0; family < BlackRose::RedGemFamilies; ++family)
+        ForEachGemUpgradeToken([&](uint32 token)
         {
-            for (uint8 rank = 2; rank <= BlackRose::GemRanks; ++rank)
-            {
-                uint32 token = BlackRose::RedUpgradeBase + family * 10 + rank - 2;
-                BlackRose::GemUpgrade upgrade;
-                if (!BlackRose::GetGemUpgrade(token, upgrade) ||
-                    !BlackRose::HasSocketedEnchant(player, upgrade.LowerEnchant))
-                    continue;
+            BlackRose::GemUpgrade upgrade;
+            if (!BlackRose::GetGemUpgrade(token, upgrade) ||
+                !BlackRose::HasSocketedEnchant(player, upgrade.LowerEnchant) ||
+                !CheckUpgradeUnlocked(player, token, false))
+                return;
 
-                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG,
-                    GetUpgradeGossipText(token), GOSSIP_SENDER_MAIN,
-                    GetGossipActionForGemUpgrade(token));
-                added = true;
-            }
-        }
-
-        for (uint8 family = 0; family < BlackRose::YellowGemFamilies; ++family)
-        {
-            for (uint8 rank = 2; rank <= BlackRose::GemRanks; ++rank)
-            {
-                uint32 token = BlackRose::YellowUpgradeBase + family * 10 +
-                    rank - 2;
-                BlackRose::GemUpgrade upgrade;
-                if (!BlackRose::GetGemUpgrade(token, upgrade) ||
-                    !BlackRose::HasSocketedEnchant(player, upgrade.LowerEnchant))
-                    continue;
-
-                AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG,
-                    GetUpgradeGossipText(token), GOSSIP_SENDER_MAIN,
-                    GetGossipActionForGemUpgrade(token));
-                added = true;
-            }
-        }
+            AddGossipItemFor(player, GOSSIP_ICON_MONEY_BAG,
+                GetUpgradeGossipText(token), GOSSIP_SENDER_MAIN,
+                GetGossipActionForGemUpgrade(token));
+            added = true;
+        });
 
         return added;
+    }
+
+    bool IsBlackRoseCurrency(uint32 itemId)
+    {
+        return itemId == BlackRose::ItemBlackMiasma ||
+            itemId == BlackRose::ItemBlackPetals ||
+            itemId == BlackRose::ItemBlackThorns;
+    }
+
+    bool IsBlackRoseCurrencyGroup(LootStoreItemList const& items)
+    {
+        bool hasCurrency = false;
+        for (LootStoreItem const* item : items)
+        {
+            if (!item)
+                continue;
+
+            if (!IsBlackRoseCurrency(item->itemid) || item->reference)
+                return false;
+
+            hasCurrency = true;
+        }
+
+        return hasCurrency;
+    }
+
+    bool PlayerCountsForTrivialCheck(Player const* player, Creature const* boss)
+    {
+        return player && player->IsAlive() &&
+            player->IsAtGroupRewardDistance(boss);
+    }
+
+    bool IsNonTrivialForPlayer(Player const* player, Creature const* boss)
+    {
+        if (!PlayerCountsForTrivialCheck(player, boss))
+            return true;
+
+        return boss->GetLevel() > Acore::XP::GetGrayLevel(player->GetLevel());
+    }
+
+    bool IsNonTrivialForLootOwnerGroup(Player const* owner, Creature const* boss)
+    {
+        if (!owner || !boss)
+            return true;
+
+        if (Group const* group = owner->GetGroup())
+        {
+            bool checkedAnyMember = false;
+            for (GroupReference const* itr = group->GetFirstMember();
+                 itr != nullptr; itr = itr->next())
+            {
+                Player const* member = itr->GetSource();
+                if (!PlayerCountsForTrivialCheck(member, boss))
+                    continue;
+
+                checkedAnyMember = true;
+                if (!IsNonTrivialForPlayer(member, boss))
+                    return false;
+            }
+
+            return checkedAnyMember;
+        }
+
+        return IsNonTrivialForPlayer(owner, boss);
     }
 
     bool GrantItem(Player* player, uint32 itemId, uint32 count = 1)
@@ -155,6 +253,9 @@ namespace
                 "Socket the previous rank into The Black Rose first.");
             return false;
         }
+
+        if (!CheckUpgradeUnlocked(player, token, true))
+            return false;
 
         uint32 currency = BlackRose::GetGemUpgradeCurrency(token);
         uint32 cost = BlackRose::GetGemUpgradeCost(token);
@@ -267,6 +368,9 @@ public:
         if (!BlackRose::GetGemUpgrade(item->GetEntry(), upgrade))
             return true;
 
+        if (!CheckUpgradeUnlocked(player, item->GetEntry(), true))
+            return true;
+
         Item* blackRose = BlackRose::GetEquippedBlackRose(player);
         if (!blackRose)
         {
@@ -315,6 +419,78 @@ public:
 
         ChatHandler(player->GetSession()).SendNotification(
             "The Black Rose releases the socketed gem's next rank.");
+
+        return true;
+    }
+};
+
+class item_black_rose_magic_stick : public ItemScript
+{
+public:
+    item_black_rose_magic_stick() : ItemScript(
+        "item_black_rose_magic_stick") { }
+
+    bool OnUse(Player* player, Item* item,
+        SpellCastTargets const& /*targets*/) override
+    {
+        BlackRose::GemSocketFamily family =
+            BlackRose::GetMagicStickFamily(item->GetEntry());
+        if (family == BlackRose::GemSocketFamily::None)
+            return true;
+
+        Item* blackRose = BlackRose::GetEquippedBlackRose(player);
+        if (!blackRose)
+        {
+            ChatHandler(player->GetSession()).SendNotification(
+                "Equip The Black Rose before using this stick.");
+            return true;
+        }
+
+        EnchantmentSlot socketSlot = EnchantmentSlot(MAX_ENCHANTMENT_SLOT);
+        uint32 gemItem = 0;
+        for (uint32 slot = SOCK_ENCHANTMENT_SLOT;
+             slot < SOCK_ENCHANTMENT_SLOT + MAX_GEM_SOCKETS; ++slot)
+        {
+            EnchantmentSlot enchantSlot = EnchantmentSlot(slot);
+            uint32 enchantId = blackRose->GetEnchantmentId(enchantSlot);
+            if (BlackRose::GetBlackRoseGemFamily(enchantId) != family)
+                continue;
+
+            socketSlot = enchantSlot;
+            gemItem = enchantId;
+            break;
+        }
+
+        if (socketSlot == EnchantmentSlot(MAX_ENCHANTMENT_SLOT) || !gemItem)
+        {
+            ChatHandler(player->GetSession()).SendNotification(
+                "The Black Rose has no socketed {} to recover.",
+                BlackRose::GetGemFamilyName(family));
+            return true;
+        }
+
+        ItemPosCountVec dest;
+        InventoryResult result = player->CanStoreNewItem(
+            NULL_BAG, NULL_SLOT, dest, gemItem, 1);
+        if (result != EQUIP_ERR_OK)
+        {
+            player->SendEquipError(result, item, nullptr);
+            return true;
+        }
+
+        uint8 stickBag = item->GetBagSlot();
+        uint8 stickSlot = item->GetSlot();
+
+        player->ApplyEnchantment(blackRose, socketSlot, false);
+        blackRose->ClearEnchantment(socketSlot);
+        blackRose->SendUpdateSockets();
+
+        player->StoreNewItem(dest, gemItem, true);
+        player->DestroyItem(stickBag, stickSlot, true);
+
+        ChatHandler(player->GetSession()).SendNotification(
+            "Rosy's Magic Stick recovers your {}.",
+            BlackRose::GetGemFamilyName(family));
 
         return true;
     }
@@ -411,13 +587,17 @@ public:
         if (!BlackRose::GetGemUpgrade(item, upgrade))
             return;
 
-        if (BlackRose::HasSocketedEnchant(player, upgrade.LowerEnchant))
+        if (!BlackRose::HasSocketedEnchant(player, upgrade.LowerEnchant))
+        {
+            ChatHandler(player->GetSession()).SendNotification(
+                "Rosy will only sell that upgrade after the previous rank "
+                "is socketed.");
+            item = 0;
             return;
+        }
 
-        ChatHandler(player->GetSession()).SendNotification(
-            "Rosy will only sell that upgrade after the previous rank "
-            "is socketed.");
-        item = 0;
+        if (!CheckUpgradeUnlocked(player, item, true))
+            item = 0;
     }
 
     bool OnPlayerCanApplyEnchantment(Player* player, Item* item,
@@ -479,6 +659,32 @@ private:
     }
 };
 
+class global_black_rose_loot_system : public GlobalScript
+{
+public:
+    global_black_rose_loot_system() : GlobalScript(
+        "global_black_rose_loot_system",
+        { GLOBALHOOK_ON_BEFORE_LOOT_EQUAL_CHANCED }) { }
+
+    bool OnBeforeLootEqualChanced(Player const* player,
+        LootStoreItemList equalChanced, Loot& loot,
+        LootStore const& /*store*/) override
+    {
+        if (!IsBlackRoseCurrencyGroup(equalChanced))
+            return true;
+
+        if (!player || !loot.sourceWorldObjectGUID)
+            return true;
+
+        Creature const* boss = ObjectAccessor::GetCreature(
+            *player, loot.sourceWorldObjectGUID);
+        if (!boss || !boss->GetMap() || !boss->GetMap()->IsNonRaidDungeon())
+            return true;
+
+        return IsNonTrivialForLootOwnerGroup(player, boss);
+    }
+};
+
 class spell_black_rose_power : public AuraScript
 {
     PrepareAuraScript(spell_black_rose_power);
@@ -510,6 +716,8 @@ void AddBlackRoseScripts()
     new npc_black_rose_rosy();
     new item_black_rose_bag_upgrade();
     new item_black_rose_gem_upgrade();
+    new item_black_rose_magic_stick();
     new player_black_rose_gem_system();
+    new global_black_rose_loot_system();
     RegisterSpellScript(spell_black_rose_power);
 }

@@ -1,0 +1,118 @@
+[
+  {
+    "ID": 900105,
+    "InventoryIcon_1": "INV_BR_Trinket_BlackRose"
+  },
+  {
+    "ID": 900200,
+    "InventoryIcon_1": "INV_BR_Misc_BlackMiasma"
+  },
+  {
+    "ID": 900201,
+    "InventoryIcon_1": "INV_BR_Misc_BlackPetals"
+  },
+  {
+    "ID": 900202,
+    "InventoryIcon_1": "INV_BR_Misc_BlackThorns"
+  },
+  {
+    "ID": 900300,
+    "InventoryIcon_1": "INV_BR_Misc_StarkRibbon"
+  },
+  {
+    "ID": 900310,
+    "InventoryIcon_1": "INV_BR_Misc_KlugRibbon"
+  },
+  {
+    "ID": 900320,
+    "InventoryIcon_1": "INV_BR_Misc_GeistRibbon"
+  },
+  {
+    "ID": 900330,
+    "InventoryIcon_1": "INV_BR_Misc_SchnellRibbon"
+  },
+  {
+    "ID": 900340,
+    "InventoryIcon_1": "INV_BR_Misc_FettRibbon"
+  },
+  {
+    "ID": 900350,
+    "InventoryIcon_1": "INV_BR_Misc_GrossRibbon"
+  },
+  {
+    "ID": 900360,
+    "InventoryIcon_1": "INV_BR_Misc_SpinnstRibbon"
+  },
+  {
+    "ID": 900370,
+    "InventoryIcon_1": "INV_BR_Misc_ScharfRibbon"
+  },
+  {
+    "ID": 900380,
+    "InventoryIcon_1": "INV_BR_Misc_WeiseRibbon"
+  },
+  {
+    "ID": 900400,
+    "InventoryIcon_1": "INV_BR_Misc_PouvoirMist"
+  },
+  {
+    "ID": 900410,
+    "InventoryIcon_1": "INV_BR_Misc_DouleurMist"
+  },
+  {
+    "ID": 900420,
+    "InventoryIcon_1": "INV_BR_Misc_PointeMist"
+  },
+  {
+    "ID": 900430,
+    "InventoryIcon_1": "INV_BR_Misc_VitesseMist"
+  },
+  {
+    "ID": 900440,
+    "InventoryIcon_1": "INV_BR_Misc_RestaurerMist"
+  },
+  {
+    "ID": 901000,
+    "InventoryIcon_1": "INV_BR_Misc_Jewel_Commander"
+  },
+  {
+    "ID": 901010,
+    "InventoryIcon_1": "INV_BR_Misc_Jewel_Highlord"
+  },
+  {
+    "ID": 901020,
+    "InventoryIcon_1": "INV_BR_Misc_Jewel_Huntmaster"
+  },
+  {
+    "ID": 901030,
+    "InventoryIcon_1": "INV_BR_Misc_Jewel_Mastermind"
+  },
+  {
+    "ID": 901040,
+    "InventoryIcon_1": "INV_BR_Misc_Jewel_HighPriestess"
+  },
+  {
+    "ID": 901050,
+    "InventoryIcon_1": "INV_BR_Misc_Jewel_Herald"
+  },
+  {
+    "ID": 901060,
+    "InventoryIcon_1": "INV_BR_Misc_Jewel_Speaker"
+  },
+  {
+    "ID": 901070,
+    "InventoryIcon_1": "INV_BR_Misc_Jewel_Archmage"
+  },
+  {
+    "ID": 901080,
+    "InventoryIcon_1": "INV_BR_Misc_Jewel_Corrupter"
+  },
+  {
+    "ID": 901090,
+    "InventoryIcon_1": "INV_BR_Misc_Jewel_Archdruid"
+  },
+  {
+    "ID": 901300,
+    "InventoryIcon_1": "INV_BR_Misc_RosysMagicStick"
+  }
+]
