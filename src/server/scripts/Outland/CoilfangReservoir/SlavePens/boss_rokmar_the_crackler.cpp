@@ -19,11 +19,15 @@
 #include "ScriptedCreature.h"
 #include "the_slave_pens.h"
 
+// Grievous Wound (31956 / 38801) is intentionally omitted from Rokmar's
+// rotation. The original aura ticks until the target is fully healed, which
+// turns into a guaranteed kill on auto-balance / no-healer compositions.
+// Cutting the cast is simpler than scripting an expiry override and matches
+// the design intent of "encounter is beatable without a dedicated healer".
 enum Spells
 {
     SPELL_ENSNARING_MOSS    = 31948,
     SPELL_FRENZY            = 34970,
-    SPELL_GRIEVOUS_WOUND  = 31956,
     SPELL_WATER_SPIT        = 35008
 };
 
@@ -45,11 +49,7 @@ struct boss_rokmar_the_crackler : public BossAI
     {
         _JustEngagedWith();
 
-        scheduler.Schedule(8s, [this] (TaskContext context)
-        {
-            DoCastVictim(SPELL_GRIEVOUS_WOUND);
-            context.Repeat(20700ms);
-        }).Schedule(15300ms, [this](TaskContext context)
+        scheduler.Schedule(15300ms, [this](TaskContext context)
         {
             DoCastRandomTarget(SPELL_ENSNARING_MOSS);
             context.Repeat(26s);
