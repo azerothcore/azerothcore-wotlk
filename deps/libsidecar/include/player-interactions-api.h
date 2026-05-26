@@ -5,6 +5,10 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum PlayerInteractionErrorCode {
     PlayerInteractionErrorCodeNoError            = 0,
     PlayerInteractionErrorCodeNoHandler          = 1,
@@ -30,5 +34,9 @@ typedef struct {
 typedef CanPlayerInteractWithGOAndTypeResponse (*CanPlayerInteractWithGOAndTypeHandler) (uint64_t /*playerGUID*/, uint64_t /*goGUID*/, uint8_t /*goType*/);
 void SetCanPlayerInteractWithGOAndTypeHandler(CanPlayerInteractWithGOAndTypeHandler h);
 CanPlayerInteractWithGOAndTypeResponse CallCanPlayerInteractWithGOAndTypeHandler(uint64_t player_guid, uint64_t go_guid, uint8_t go_type);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

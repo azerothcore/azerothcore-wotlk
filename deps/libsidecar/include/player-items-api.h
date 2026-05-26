@@ -5,6 +5,10 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum PlayerItemErrorCode {
     PlayerItemErrorCodeNoError        = 0,
     PlayerItemErrorCodeNoHandler      = 1,
@@ -64,5 +68,9 @@ typedef struct {
 typedef PlayerItemErrorCode (*AddExistingItemToPlayerHandler) (AddExistingItemToPlayerRequest*);
 void SetAddExistingItemToPlayerHandler(AddExistingItemToPlayerHandler h);
 PlayerItemErrorCode CallAddExistingItemToPlayerHandler(AddExistingItemToPlayerRequest*);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
