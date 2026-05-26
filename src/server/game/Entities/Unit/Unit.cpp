@@ -954,6 +954,9 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, uint32 effectMask, Unit 
             for (auto const& [immunitySchoolMask, immunityAuraId] : schoolList)
             {
                 SpellInfo const* immuneSpellInfo = sSpellMgr->GetSpellInfo(immunityAuraId);
+                if (immunityAuraId == spellInfo->Id)
+                    continue;
+
                 if ((immunitySchoolMask & schoolMask) != schoolMask)
                     continue;
 
@@ -10088,6 +10091,9 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, Spell const* spell)
             for (auto itr = schoolList.begin(); itr != schoolList.end(); ++itr)
             {
                 SpellInfo const* immuneSpellInfo = sSpellMgr->GetSpellInfo(itr->second);
+                if (itr->second == spellInfo->Id || (spell && itr->second == spell->GetSpellInfo()->Id))
+                    continue;
+
                 if (!(itr->first & spellSchoolMask))
                     continue;
 
