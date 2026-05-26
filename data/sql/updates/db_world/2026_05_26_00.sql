@@ -1,3 +1,4 @@
+-- DB update 2026_05_25_00 -> 2026_05_26_00
 --
 -- Change Target CREATURE_DISTANCE to CLOSEST_FRIENDLY
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 23960) AND (`source_type` = 0) AND (`id` IN (1, 2));
