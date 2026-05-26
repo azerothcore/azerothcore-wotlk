@@ -113,49 +113,37 @@ public:
             {
                 case EVENT_HATEFUL_STRIKE:
                     {
-                        // Cast Hateful strike on the player with the highest amount of HP within melee distance, and second threat amount
-                        std::list<Unit*> meleeRangeTargets;
-                        Unit* finalTarget = nullptr;
-                        uint8 counter = 0;
-                        auto threatList = me->GetThreatMgr().GetSortedThreatList();
-                        for (auto i = threatList.begin(); i != threatList.end(); ++i, ++counter)
+                        // Scan melee targets (melee range), choose target according to mechanics:
+                        // - If only 1 melee target exists, hit the tank (current victim).
+                        // - Otherwise select the top RAID_MODE(1,2) threat targets (excluding current victim)
+                        //   among melee targets and hit the one with the highest HP.
+                        // - The target hit gains 500 flat threat.
+
+                        Unit* victim = me->GetVictim();
+                        if (!victim)
                         {
-                            // Gather all units with melee range
-                            Unit* target = (*i)->GetVictim();
-                            if (me->IsWithinMeleeRange(target))
-                            {
-                                meleeRangeTargets.push_back(target);
-                            }
-                            // and add threat to most hated
-                            if (counter < RAID_MODE(2, 3))
-                            {
-                                me->AddThreat(target, 500.0f);
-                            }
+                            events.RescheduleEvent(EVENT_HATEFUL_STRIKE, 1s);
+                            break;
                         }
-                        counter = 0;
-                        std::list<Unit*, std::allocator<Unit*>>::iterator itr;
-                        for (itr = meleeRangeTargets.begin(); itr != meleeRangeTargets.end(); ++itr, ++counter)
+
+                        Unit* hatefulTarget = victim; // default to current victim if no other target is available
+
+                        std::list<Unit*> meleeTargets;
+                        constexpr float HATEFUL_STRIKE_RANGE = 5.0f;
+                        SelectTargetList(meleeTargets, RAID_MODE(1, 2), SelectTargetMethod::MaxThreat, 0, [&](Unit const* target)
                         {
-                            // if there is only one target available
-                            if (meleeRangeTargets.size() == 1)
-                            {
-                                finalTarget = (*itr);
-                            }
-                            else if (counter > 0) // skip first target
-                            {
-                                if (!finalTarget || (*itr)->GetHealth() > finalTarget->GetHealth())
-                                {
-                                    finalTarget = (*itr);
-                                }
-                                // third loop
-                                if (counter >= 2)
-                                    break;
-                            }
-                        }
-                        if (finalTarget)
+                            return target && target->IsPlayer() && target != victim && me->IsWithinCombatRange(target, HATEFUL_STRIKE_RANGE);
+                        });
+
+                        if (!meleeTargets.empty())
                         {
-                            me->CastSpell(finalTarget, SPELL_HATEFUL_STRIKE, false);
+                            meleeTargets.sort(Acore::HealthOrderPred(false));
+                            hatefulTarget = meleeTargets.front();
                         }
+
+                        me->CastSpell(hatefulTarget, SPELL_HATEFUL_STRIKE, false);
+                        me->AddThreat(hatefulTarget, 500.0f);
+
                         events.Repeat(1s);
                         break;
                     }

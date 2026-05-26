@@ -294,63 +294,6 @@ public:
 };
 
 /*######
-## npc_parqual_fintallas
-######*/
-
-enum ParqualFintallas
-{
-    SPELL_MARK_OF_SHAME             = 6767,
-    QUEST_ID_TEST_OF_LORE           = 6628,
-    GOSSIP_MENU_ID_TEST_OF_LORE     = 4764,
-    GOSSIP_TEXTID_PARQUAL_FINTALLAS = 5821,
-    GOSSIP_TEXTID_TEST_OF_LORE      = 5822,
-};
-
-class npc_parqual_fintallas : public CreatureScript
-{
-public:
-    npc_parqual_fintallas() : CreatureScript("npc_parqual_fintallas") { }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_INFO_DEF + 1)
-        {
-            CloseGossipMenuFor(player);
-            creature->CastSpell(player, SPELL_MARK_OF_SHAME, false);
-        }
-        if (action == GOSSIP_ACTION_INFO_DEF + 2)
-        {
-            CloseGossipMenuFor(player);
-            player->AreaExploredOrEventHappens(6628);
-        }
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (creature->IsQuestGiver())
-        {
-            player->PrepareQuestMenu(creature->GetGUID());
-        }
-
-        if (player->GetQuestStatus(QUEST_ID_TEST_OF_LORE) == QUEST_STATUS_INCOMPLETE && !player->HasAura(SPELL_MARK_OF_SHAME))
-        {
-            AddGossipItemFor(player, GOSSIP_MENU_ID_TEST_OF_LORE, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            AddGossipItemFor(player, GOSSIP_MENU_ID_TEST_OF_LORE, 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            AddGossipItemFor(player, GOSSIP_MENU_ID_TEST_OF_LORE, 3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-            SendGossipMenuFor(player, GOSSIP_TEXTID_TEST_OF_LORE, creature->GetGUID());
-        }
-        else
-        {
-            SendGossipMenuFor(player, GOSSIP_TEXTID_PARQUAL_FINTALLAS, creature->GetGUID());
-        }
-
-        return true;
-    }
-};
-
-/*######
 ## ALLIANCE
 #######*/
 
@@ -4037,7 +3980,6 @@ void AddSC_undercity()
 {
     new npc_lady_sylvanas_windrunner();
     new npc_highborne_lamenter();
-    new npc_parqual_fintallas();
 
     new npc_varian_wrynn();
     new npc_thrall_bfu();

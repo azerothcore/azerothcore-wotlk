@@ -42,6 +42,7 @@
 #include "OutdoorPvPMgr.h"
 #include "Pet.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
 #include "SharedDefines.h"
@@ -856,7 +857,7 @@ void Spell::EffectTriggerSpell(SpellEffIndex effIndex)
                         SpellInfo const* spell = iter->second->GetBase()->GetSpellInfo();
 
                         // Pounce Bleed shouldn't be removed by Cloak of Shadows.
-                        if (spell->GetAllEffectsMechanicMask() & (UI64LIT(1) << MECHANIC_BLEED))
+                        if (spell->GetAllEffectsMechanicMask() & (1ULL << MECHANIC_BLEED))
                             return;
 
                         bool dmgClassNone = false;
@@ -1531,7 +1532,11 @@ void Spell::EffectHeal(SpellEffIndex effIndex)
 
             int32 tickheal = targetAura->GetAmount();
             if (Unit* auraCaster = targetAura->GetCaster())
+            {
+                // MOD_HEALING_DONE_PERCENT is applied per-tick, not baked into GetAmount.
+                tickheal = int32(float(tickheal) * auraCaster->GetTotalAuraMultiplier(SPELL_AURA_MOD_HEALING_DONE_PERCENT));
                 tickheal = unitTarget->SpellHealingBonusTaken(auraCaster, targetAura->GetSpellInfo(), tickheal, DOT);
+            }
 
             //int32 tickheal = targetAura->GetSpellInfo()->EffectBasePoints[idx] + 1;
             //It is said that talent bonus should not be included
@@ -2471,6 +2476,11 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
 
                         TempSummonType summonType = (duration <= 0) ? TEMPSUMMON_DEAD_DESPAWN : TEMPSUMMON_TIMED_DESPAWN;
 
+                        Unit* summoner = m_originalCaster;
+                        if (summoner->IsPet())
+                            if (Unit* owner = summoner->GetOwner())
+                                summoner = owner;
+
                         for (uint32 count = 0; count < numSummons; ++count)
                         {
                             Position pos;
@@ -2480,7 +2490,7 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
                                 // randomize position for multiple summons
                                 pos = m_caster->GetRandomPoint(*destTarget, radius);
 
-                            summon = m_originalCaster->SummonCreature(entry, pos, summonType, duration, 0, nullptr, personalSpawn);
+                            summon = summoner->SummonCreature(entry, pos, summonType, duration, 0, nullptr, personalSpawn);
                             if (!summon)
                                 continue;
 
@@ -2488,8 +2498,8 @@ void Spell::EffectSummonType(SpellEffIndex effIndex)
 
                             if (properties->Category == SUMMON_CATEGORY_ALLY)
                             {
-                                summon->SetOwnerGUID(m_originalCaster->GetGUID());
-                                summon->SetFaction(m_originalCaster->GetFaction());
+                                summon->SetOwnerGUID(summoner->GetGUID());
+                                summon->SetFaction(summoner->GetFaction());
                             }
 
                             ExecuteLogEffectSummonObject(effIndex, summon);
@@ -2895,6 +2905,14 @@ void Spell::EffectEnchantItemPerm(SpellEffIndex effIndex)
         // add new enchanting if equipped
         item_owner->ApplyEnchantment(itemTarget, PERM_ENCHANTMENT_SLOT, true);
 
+        if (item_owner != p_caster && p_caster->GetSession()->HasPermission(rbac::RBAC_PERM_LOG_GM_TRADE))
+        {
+            LOG_GM(p_caster->GetSession()->GetAccountId(), "GM {} (Account: {}) enchanting(perm): {} (SpellID: {} EncID: {}) on {}'s item: {} (Entry: {})",
+                p_caster->GetName(), p_caster->GetSession()->GetAccountId(),
+                m_spellInfo->SpellName[0], m_spellInfo->Id, enchant_id,
+                item_owner->GetName(), itemTarget->GetTemplate()->Name1, itemTarget->GetEntry());
+        }
+
         item_owner->RemoveTradeableItem(itemTarget);
         itemTarget->ClearSoulboundTradeable(item_owner);
     }
@@ -2941,6 +2959,15 @@ void Spell::EffectEnchantItemPrismatic(SpellEffIndex effIndex)
     Player* item_owner = itemTarget->GetOwner();
     if (!item_owner)
         return;
+
+    Player* p_caster = m_caster->ToPlayer();
+    if (item_owner != p_caster && p_caster->GetSession()->HasPermission(rbac::RBAC_PERM_LOG_GM_TRADE))
+    {
+        LOG_GM(p_caster->GetSession()->GetAccountId(), "GM {} (Account: {}) enchanting(prismatic): {} (SpellID: {} EncID: {}) on {}'s item: {} (Entry: {})",
+            p_caster->GetName(), p_caster->GetSession()->GetAccountId(),
+            m_spellInfo->SpellName[0], m_spellInfo->Id, enchant_id,
+            item_owner->GetName(), itemTarget->GetTemplate()->Name1, itemTarget->GetEntry());
+    }
 
     // remove old enchanting before applying new if equipped
     item_owner->ApplyEnchantment(itemTarget, PRISMATIC_ENCHANTMENT_SLOT, false);
@@ -3090,6 +3117,14 @@ void Spell::EffectEnchantItemTmp(SpellEffIndex effIndex)
 
     // add new enchanting if equipped
     item_owner->ApplyEnchantment(itemTarget, TEMP_ENCHANTMENT_SLOT, true);
+
+    if (item_owner != p_caster && p_caster->GetSession()->HasPermission(rbac::RBAC_PERM_LOG_GM_TRADE))
+    {
+        LOG_GM(p_caster->GetSession()->GetAccountId(), "GM {} (Account: {}) enchanting(temp): {} (SpellID: {} EncID: {}) on {}'s item: {} (Entry: {})",
+            p_caster->GetName(), p_caster->GetSession()->GetAccountId(),
+            m_spellInfo->SpellName[0], m_spellInfo->Id, enchant_id,
+            item_owner->GetName(), itemTarget->GetTemplate()->Name1, itemTarget->GetEntry());
+    }
 
     item_owner->RemoveTradeableItem(itemTarget);
     itemTarget->ClearSoulboundTradeable(item_owner);
@@ -5152,7 +5187,7 @@ void Spell::EffectDispelMechanic(SpellEffIndex effIndex)
             continue;
         if (roll_chance_i(aura->CalcDispelChance(unitTarget, !unitTarget->IsFriendlyTo(m_caster))))
         {
-            if ((aura->GetSpellInfo()->GetAllEffectsMechanicMask() & (UI64LIT(1) << mechanic)))
+            if (aura->GetSpellInfo()->GetAllEffectsMechanicMask() & (1ULL << mechanic))
             {
                 dispel_list.push(std::make_pair(aura->GetId(), aura->GetCasterGUID()));
 
@@ -5943,6 +5978,9 @@ void Spell::SummonGuardian(uint32 i, uint32 entry, SummonPropertiesEntry const* 
 
     if (caster->IsTotem())
         caster = caster->ToTotem()->GetOwner();
+    else if (caster->IsPet())
+        if (Unit* owner = caster->GetOwner())
+            caster = owner;
 
     // in another case summon new
     uint8 summonLevel = caster->GetLevel();

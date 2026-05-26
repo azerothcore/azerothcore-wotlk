@@ -44,6 +44,7 @@ SmartAI::SmartAI(Creature* c) : CreatureAI(c)
     mCanRepeatPath = false;
 
     mEvadeDisabled = false;
+    mSuppressEvade = false;
 
     mCanAutoAttack = true;
 
@@ -696,8 +697,25 @@ void SmartAI::MovementInform(uint32 MovementType, uint32 Data)
         MovepointReached(Data);
 }
 
+void SmartAI::JustExitedCombat()
+{
+    // When evade is suppressed or disabled, don't auto-evade on combat exit.
+    // This prevents scripted encounters (e.g. Mograine/Whitemane) from resetting
+    // when bosses temporarily stop fighting during scripted phases.
+    if (mSuppressEvade || mEvadeDisabled)
+    {
+        EngagementOver();
+        return;
+    }
+
+    CreatureAI::JustExitedCombat();
+}
+
 void SmartAI::EnterEvadeMode(EvadeReason /*why*/)
 {
+    if (mSuppressEvade)
+        return;
+
     if (mEvadeDisabled)
     {
         GetScript()->ProcessEventsFor(SMART_EVENT_EVADE);
@@ -800,6 +818,10 @@ bool SmartAI::AssistPlayerInCombatAgainst(Unit* who)
     if (!me->IsValidAssistTarget(who->GetVictim()))
         return false;
 
+    // Do not engage if we cannot actually attack the attacker (e.g. neutral faction)
+    if (!me->IsValidAttackTarget(who))
+        return false;
+
     //too far away and no free sight?
     if (me->IsWithinDistInMap(who, SMART_MAX_AID_DIST) && me->IsWithinLOSInMap(who))
     {
@@ -893,7 +915,7 @@ void SmartAI::AttackStart(Unit* who)
         return;
     }
 
-    if (who && me->Attack(who, me->IsWithinMeleeRange(who)))
+    if (who && me->Attack(who, mCanAutoAttack))
     {
         if (!me->HasUnitState(UNIT_STATE_NO_COMBAT_MOVEMENT))
         {
@@ -1219,6 +1241,23 @@ void SmartAI::SetFollow(Unit* target, float dist, float angle, uint32 credit, ui
 
 void SmartAI::StopFollow(bool complete)
 {
+    if (complete)
+    {
+        Player* player = ObjectAccessor::GetPlayer(*me, mFollowGuid);
+        if (player && mFollowCredit > 0)
+        {
+            if (!mFollowCreditType)
+                player->RewardPlayerAndGroupAtEvent(mFollowCredit, me);
+            else
+                player->GroupEventHappens(mFollowCredit, me);
+        }
+
+        SetDespawnTime(5000);
+        StartDespawn();
+
+        GetScript()->ProcessEventsFor(SMART_EVENT_FOLLOW_COMPLETED, player);
+    }
+
     mFollowGuid.Clear();
     mFollowDist = 0;
     mFollowAngle = 0;
@@ -1230,23 +1269,6 @@ void SmartAI::StopFollow(bool complete)
     me->GetMotionMaster()->Clear(false);
     me->StopMoving();
     me->GetMotionMaster()->MoveIdle();
-
-    if (!complete)
-        return;
-
-    Player* player = ObjectAccessor::GetPlayer(*me, mFollowGuid);
-    if (player)
-    {
-        if (!mFollowCreditType)
-            player->RewardPlayerAndGroupAtEvent(mFollowCredit, me);
-        else
-            player->GroupEventHappens(mFollowCredit, me);
-    }
-
-    SetDespawnTime(5000);
-    StartDespawn();
-
-    GetScript()->ProcessEventsFor(SMART_EVENT_FOLLOW_COMPLETED, player);
 }
 
 void SmartAI::SetScript9(SmartScriptHolder& e, uint32 entry, WorldObject* invoker)
@@ -1347,6 +1369,7 @@ void SmartGameObjectAI::UpdateAI(uint32 diff)
 void SmartGameObjectAI::InitializeAI()
 {
     GetScript()->OnInitialize(me);
+    aiDataSet.clear();
 
     // Xinef: do not call respawn event if go is not spawned
     if (me->isSpawned())
@@ -1415,7 +1438,17 @@ void SmartGameObjectAI::SetData(uint32 id, uint32 value, WorldObject* invoker)
             gob = invoker->ToGameObject();
     }
 
+    aiDataSet[id] = value;
     GetScript()->ProcessEventsFor(SMART_EVENT_DATA_SET, unit, id, value, false, nullptr, gob);
+}
+
+uint32 SmartGameObjectAI::GetData(uint32 id) const
+{
+    std::unordered_map<uint32, uint32>::const_iterator itr = aiDataSet.find(id);
+    if (itr != aiDataSet.end())
+        return itr->second;
+
+    return 0;
 }
 
 void SmartGameObjectAI::SetScript9(SmartScriptHolder& e, uint32 entry, WorldObject* invoker)

@@ -85,6 +85,9 @@ public:
     // Called for reaction at enter to combat if not in combat yet (enemy can be nullptr)
     void JustEngagedWith(Unit* enemy) override;
 
+    // Called when creature exits combat (all combat refs gone)
+    void JustExitedCombat() override;
+
     // Called for reaction at stopping attack at no attackers or targets
     void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER) override;
 
@@ -181,6 +184,7 @@ public:
     void SetSwim(bool swim = true);
 
     void SetEvadeDisabled(bool disable = true);
+    void SetSuppressEvade(bool suppress) { mSuppressEvade = suppress; }
 
     void SetInvincibilityHpLevel(uint32 level) { mInvincibilityHpLevel = level; }
 
@@ -249,6 +253,7 @@ private:
     uint32 GetWPCount() { return mWayPoints ? mWayPoints->Nodes.size() : 0; }
     bool mCanRepeatPath;
     bool mEvadeDisabled;
+    bool mSuppressEvade;
     bool mCanAutoAttack;
     bool mForcedPaused;
     uint32 mInvincibilityHpLevel;
@@ -299,6 +304,7 @@ public:
     void Destroyed(Player* player, uint32 eventId) override;
     void SetData(uint32 id, uint32 value) override { SetData(id, value, nullptr); }
     void SetData(uint32 id, uint32 value, WorldObject* invoker);
+    uint32 GetData(uint32 id) const override;
     void SetScript9(SmartScriptHolder& e, uint32 entry, WorldObject* invoker);
     void OnGameEvent(bool start, uint16 eventId) override;
     void OnStateChanged(uint32 state, Unit* unit) override;
@@ -319,6 +325,7 @@ public:
 
 protected:
     SmartScript mScript;
+    std::unordered_map<uint32, uint32> aiDataSet;
 };
 
 /// Registers scripts required by the SAI scripting system

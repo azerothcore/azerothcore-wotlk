@@ -71,7 +71,6 @@ enum Actions
     ACTION_START_ENCOUNTER              = 1,
     ACTION_DRAKE_BREATH                 = 2,
     ACTION_PHASE2                       = 3,
-    ACTION_HARPOON_HIT                  = 4,
 };
 
 enum CombatPhase
@@ -113,8 +112,6 @@ Position const FirstWaveLocations[FIRST_WAVE_SIZE] =
     { 481.388f, -507.109f, 104.724f, 3.26377f },
 };
 
-Position const SecondaryWavesInitialPoint = { 478.743f, -505.576f, 104.724f };
-
 enum GraufPoints
 {
     POINT_BREACH                        = 0,
@@ -122,11 +119,19 @@ enum GraufPoints
     POINT_RIGHT                         = 2,
 };
 
-uint32 const PATH_INITIAL   = 2689300;
-uint32 const PATH_RIGHT     = 2689301;
-uint32 const PATH_LEFT      = 2689302;
+enum GraufPaths
+{
+    PATH_INITIAL                        = 2689300,
+    PATH_RIGHT                          = 2689301,
+    PATH_LEFT                           = 2689302,
+    PATH_BREACH_RIGHT                   = 2689303,
+    PATH_BREACH_LEFT                    = 2689304,
+    PATH_GAUNTLET_ADDS                  = 2669000,
+};
 
 float const BreachFacing      = 2.670354f;
+float const BreathFacingRight = 3.124139f;
+float const BreathFacingLeft  = 3.228859f;
 
 enum Events
 {
@@ -139,6 +144,7 @@ enum Events
     // Grauf
     EVENT_GRAUF_START                   = 10,
     EVENT_GRAUF_LEAVE_BREACH            = 11,
+    EVENT_GRAUF_BREATH_START            = 12,
     EVENT_GRAUF_REMOVE_AURA             = 13,
 };
 
@@ -164,8 +170,6 @@ public:
             _events.Reset();
             _summons.DespawnAll();
             _phase = PHASE_GROUND;
-            _harpoonHit = 0;
-            _loveSkadi = 0;
             _firstWaveSummoned = false;
             _encounterStarted = false;
 
@@ -193,7 +197,10 @@ public:
                 case NPC_YMIRJAR_WITCH_DOCTOR:
                 case NPC_YMIRJAR_HARPOONER:
                     if (_firstWaveSummoned)
-                        summon->GetMotionMaster()->MovePoint(1, SecondaryWavesInitialPoint);
+                    {
+                        summon->LoadPath(PATH_GAUNTLET_ADDS);
+                        summon->GetMotionMaster()->MoveWaypoint(PATH_GAUNTLET_ADDS, false);
+                    }
                     break;
                 default:
                     break;
@@ -256,8 +263,6 @@ public:
                     _events.ScheduleEvent(EVENT_SKADI_RESET_CHECK, 6s);
                     break;
                 case ACTION_DRAKE_BREATH:
-                    if (_loveSkadi == 1)
-                        ++_loveSkadi;
                     Talk(SAY_DRAKE_BREATH);
                     break;
                 case ACTION_PHASE2:
@@ -273,19 +278,7 @@ public:
                     _events.ScheduleEvent(EVENT_SKADI_SPEAR, 11s);
                     _events.ScheduleEvent(EVENT_SKADI_WHIRLWIND, 23s);
                     break;
-                case ACTION_HARPOON_HIT:
-                    ++_harpoonHit;
-                    if (_harpoonHit == 1)
-                        _loveSkadi = 1;
-                    break;
             }
-        }
-
-        uint32 GetData(uint32 id) const override
-        {
-            if (id == DATA_LOVE_TO_SKADI)
-                return _loveSkadi;
-            return 0;
         }
 
         void UpdateAI(uint32 diff) override
@@ -374,8 +367,6 @@ public:
         EventMap _events;
         SummonList _summons;
         CombatPhase _phase;
-        uint8 _harpoonHit;
-        uint8 _loveSkadi;
         bool _firstWaveSummoned;
         bool _encounterStarted;
     };
@@ -404,6 +395,8 @@ public:
             _summons.DespawnAll();
             me->SetReactState(REACT_PASSIVE);
             me->SetSpeedRate(MOVE_RUN, 2.5f);
+            _flyingToSide = false;
+            _passFreshStart = false;
         }
 
         void DoAction(int32 param) override
@@ -419,20 +412,23 @@ public:
             }
         }
 
-        void SpellHit(Unit* /*caster*/, SpellInfo const* spellInfo) override
-        {
-            if (spellInfo->Id == SPELL_LAUNCH_HARPOON)
-                if (Creature* skadi = _instance->GetCreature(DATA_SKADI_THE_RUTHLESS))
-                    skadi->AI()->DoAction(ACTION_HARPOON_HIT);
-        }
-
         void MovementInform(uint32 type, uint32 /*id*/) override
         {
             if (type == ESCORT_MOTION_TYPE && me->movespline->Finalized())
             {
-                me->SetFacingTo(BreachFacing);
-                Talk(EMOTE_ON_RANGE);
-                _events.ScheduleEvent(EVENT_GRAUF_LEAVE_BREACH, 10s);
+                if (_flyingToSide)
+                {
+                    _flyingToSide = false;
+                    me->SetFacingTo(_lastSide == POINT_LEFT ? BreathFacingLeft : BreathFacingRight);
+                    Talk(EMOTE_DEEP_BREATH);
+                    _events.ScheduleEvent(EVENT_GRAUF_BREATH_START, 2s);
+                }
+                else
+                {
+                    me->SetFacingTo(BreachFacing);
+                    Talk(EMOTE_ON_RANGE);
+                    _events.ScheduleEvent(EVENT_GRAUF_LEAVE_BREACH, 10s);
+                }
             }
         }
 
@@ -443,16 +439,21 @@ public:
             {
                 case EVENT_GRAUF_LEAVE_BREACH:
                     _lastSide = RAND(POINT_LEFT, POINT_RIGHT);
-                    me->GetMotionMaster()->MovePath(_lastSide == POINT_LEFT ? PATH_LEFT : PATH_RIGHT, FORCED_MOVEMENT_RUN);
-
-                    if (_lastSide == POINT_LEFT)
-                        DoCast(me, SPELL_FREEZING_CLOUD_LEFT_PERIODIC);
-                    else
-                        DoCast(me, SPELL_FREEZING_CLOUD_RIGHT_PERIODIC);
-
+                    _flyingToSide = true;
+                    me->GetMotionMaster()->MovePath(
+                        _lastSide == POINT_LEFT ? PATH_BREACH_LEFT : PATH_BREACH_RIGHT,
+                        FORCED_MOVEMENT_RUN);
+                    break;
+                case EVENT_GRAUF_BREATH_START:
+                    _passFreshStart = me->IsFullHealth();
+                    me->GetMotionMaster()->MovePath(
+                        _lastSide == POINT_LEFT ? PATH_LEFT : PATH_RIGHT,
+                        FORCED_MOVEMENT_RUN);
+                    DoCast(me, _lastSide == POINT_LEFT
+                        ? SPELL_FREEZING_CLOUD_LEFT_PERIODIC
+                        : SPELL_FREEZING_CLOUD_RIGHT_PERIODIC);
                     if (Creature* skadi = _instance->GetCreature(DATA_SKADI_THE_RUTHLESS))
                         skadi->AI()->DoAction(ACTION_DRAKE_BREATH);
-
                     _events.ScheduleEvent(EVENT_GRAUF_REMOVE_AURA, 10s);
                     break;
                 case EVENT_GRAUF_REMOVE_AURA:
@@ -468,10 +469,11 @@ public:
             {
                 skadi->ExitVehicle();
                 skadi->AI()->DoAction(ACTION_PHASE2);
-
-                if (skadi->AI()->GetData(DATA_LOVE_TO_SKADI) == 1)
-                    _instance->SetData(DATA_SKADI_ACHIEVEMENT, true);
             }
+
+            if (_passFreshStart)
+                _instance->SetData(DATA_SKADI_ACHIEVEMENT, true);
+
             me->DespawnOrUnsummon(6s);
         }
 
@@ -480,6 +482,8 @@ public:
         EventMap _events;
         SummonList _summons;
         uint8 _lastSide = POINT_LEFT;
+        bool _flyingToSide = false;
+        bool _passFreshStart = false;
     };
 };
 
@@ -507,7 +511,7 @@ class spell_skadi_launch_harpoon : public SpellScript
     }
 };
 
-// 50255 - Poisoned Spear
+// 50255, 59331 - Poisoned Spear
 class spell_skadi_poisoned_spear : public SpellScript
 {
     PrepareSpellScript(spell_skadi_poisoned_spear);
