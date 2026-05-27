@@ -121,17 +121,6 @@ INSERT INTO `acore_string` (`entry`, `content_default`, `locale_koKR`, `locale_f
     'Ограничения фракций для игровых объектов заклинаний не определены.'),
 
 (35463,
-    '{} ({}) - {}',
-    '{} ({}) - {}',
-    '{} ({}) - {}',
-    '{} ({}) - {}',
-    '{} ({}) - {}',
-    '{} ({}) - {}',
-    '{} ({}) - {}',
-    '{} ({}) - {}',
-    '{} ({}) - {}'),
-
-(35464,
     '{} restriction(s) found.',
     '{} 개의 제한이 발견되었습니다.',
     '{} restriction(s) trouvée(s).',
@@ -140,4 +129,15 @@ INSERT INTO `acore_string` (`entry`, `content_default`, `locale_koKR`, `locale_f
     '找到 {} 個限制。',
     '{} restricción(es) encontrada(s).',
     '{} restricción(es) encontrada(s).',
-    'Найдено {} ограничение(й).');
+    'Найдено {} ограничение(й).'),
+
+(35464,
+    'Spell {} ({}) already has a gameobject faction restriction. Use .spell gobject faction update to change it.',
+    '주문 {} ({})은(는) 이미 게임 오브젝트 세력 제한이 있습니다. 변경하려면 .spell gobject faction update를 사용하세요.',
+    'Le sort {} ({}) a déjà une restriction de faction sur les objets de jeu. Utilisez .spell gobject faction update pour la modifier.',
+    'Zauber {} ({}) hat bereits eine Spielobjekt-Fraktionsbeschränkung. Verwende .spell gobject faction update, um sie zu ändern.',
+    '法术 {} ({}) 已有游戏对象阵营限制。使用 .spell gobject faction update 来更改。',
+    '法術 {} ({}) 已有遊戲物件陣營限制。使用 .spell gobject faction update 來更改。',
+    'El hechizo {} ({}) ya tiene una restricción de facción en objetos de juego. Usa .spell gobject faction update para cambiarla.',
+    'El hechizo {} ({}) ya tiene una restricción de facción en objetos de juego. Usa .spell gobject faction update para cambiarla.',
+    'Заклинание {} ({}) уже имеет ограничение фракции для игрового объекта. Используйте .spell gobject faction update для изменения.');

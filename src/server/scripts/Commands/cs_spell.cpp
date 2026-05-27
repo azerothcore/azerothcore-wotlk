@@ -22,7 +22,6 @@
 #include "RBAC.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
-#include "StringFormat.h"
 #include <algorithm>
 
 using namespace Acore::ChatCommands;
@@ -72,34 +71,26 @@ public:
         }
 
         uint32 spellId = spellInfo->Id;
+
+        if (sSpellMgr->GetSpellGameObjectFaction(spellId))
+        {
+            handler->PSendSysMessage(LANG_SPELL_GO_FACTION_ADD_ALREADY_EXISTS, spellId, spellInfo->SpellName[0]);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
         char const* teamName = (teamId == TEAM_ALLIANCE) ? "Alliance" : "Horde";
-        std::string commentStr = comment ? std::string(*comment) : Acore::StringFormat("{} ({}) - {}", spellId, spellInfo->SpellName[0], teamName);
+        std::string commentStr = comment ? std::string(*comment) : "";
 
-        bool const isUpdate = sSpellMgr->GetSpellGameObjectFaction(spellId) != nullptr;
-
-        WorldDatabasePreparedStatement* stmt = nullptr;
-        if (isUpdate)
-        {
-            stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_SPELL_GO_FACTION);
-            stmt->SetData(0, teamId);
-            stmt->SetData(1, commentStr);
-            stmt->SetData(2, spellId);
-        }
-        else
-        {
-            stmt = WorldDatabase.GetPreparedStatement(WORLD_INS_SPELL_GO_FACTION);
-            stmt->SetData(0, spellId);
-            stmt->SetData(1, teamId);
-            stmt->SetData(2, commentStr);
-        }
+        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_INS_SPELL_GO_FACTION);
+        stmt->SetData(0, spellId);
+        stmt->SetData(1, teamId);
+        stmt->SetData(2, commentStr);
         WorldDatabase.DirectExecute(stmt);
 
         sSpellMgr->LoadSpellGameObjectFactions();
 
-        if (isUpdate)
-            handler->PSendSysMessage(LANG_SPELL_GO_FACTION_UPDATED, spellId, spellInfo->SpellName[0], teamName);
-        else
-            handler->PSendSysMessage(LANG_SPELL_GO_FACTION_ADDED, spellId, spellInfo->SpellName[0], teamName);
+        handler->PSendSysMessage(LANG_SPELL_GO_FACTION_ADDED, spellId, spellInfo->SpellName[0], teamName);
         return true;
     }
 
@@ -157,7 +148,7 @@ public:
             return false;
         }
 
-        std::string commentStr = comment ? std::string(*comment) : Acore::StringFormat("{} ({}) - {}", spellId, spellInfo->SpellName[0], teamName);
+        std::string commentStr = comment ? std::string(*comment) : "";
 
         WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_SPELL_GO_FACTION);
         stmt->SetData(0, teamId);
@@ -211,7 +202,7 @@ public:
             }
 
             char const* teamName = (teamId == TEAM_ALLIANCE) ? "Alliance" : "Horde";
-            handler->PSendSysMessage(LANG_SPELL_GO_FACTION_ENTRY, spellId, spellName, teamName);
+            handler->PSendSysMessage("{} ({}) - {}", spellId, spellName, teamName);
             ++count;
         } while (result->NextRow());
 
