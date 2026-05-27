@@ -211,7 +211,7 @@ public:
             }
 
             char const* teamName = (teamId == TEAM_ALLIANCE) ? "Alliance" : "Horde";
-            handler->PSendSysMessage(LANG_SPELL_GO_FACTION_ENTRY, spellId, spellName, teamName);
+            handler->PSendSysMessage("{} ({}) - {}", spellId, spellName, teamName);
             ++count;
         } while (result->NextRow());
 
