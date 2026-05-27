@@ -112,6 +112,10 @@ void WorldDatabaseConnection::DoPrepareStatements()
     PrepareStatement(WORLD_SEL_REQ_XP, "SELECT Experience FROM player_xp_for_level WHERE Level = ?", CONNECTION_SYNCH);
     PrepareStatement(WORLD_UPD_VERSION, "UPDATE version SET core_version = ?, core_revision = ?", CONNECTION_ASYNC);
     PrepareStatement(WORLD_DEL_SPAWNGROUP_MEMBER, "DELETE FROM spawn_group WHERE spawnType = ? AND spawnId = ?", CONNECTION_ASYNC);
+    PrepareStatement(WORLD_INS_SPELL_GO_FACTION,     "INSERT INTO spell_gameobject_faction (spell_id, team_id, comment) VALUES (?, ?, ?)", CONNECTION_ASYNC);
+    PrepareStatement(WORLD_UPD_SPELL_GO_FACTION,     "UPDATE spell_gameobject_faction SET team_id = ?, comment = ? WHERE spell_id = ?", CONNECTION_ASYNC);
+    PrepareStatement(WORLD_DEL_SPELL_GO_FACTION,     "DELETE FROM spell_gameobject_faction WHERE spell_id = ?", CONNECTION_ASYNC);
+    PrepareStatement(WORLD_SEL_SPELL_GO_FACTION_ALL, "SELECT spell_id, team_id, comment FROM spell_gameobject_faction ORDER BY team_id, spell_id", CONNECTION_SYNCH);
 }
 
 WorldDatabaseConnection::WorldDatabaseConnection(MySQLConnectionInfo& connInfo) : MySQLConnection(connInfo)
