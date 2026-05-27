@@ -1897,7 +1897,11 @@ void GameObject::Use(Unit* user)
                         if (TeamId const* requiredTeam = sSpellMgr->GetSpellGameObjectFaction(creationSpell))
                         {
                             if (playerUser->GetTeamId() != *requiredTeam)
-                                return;
+                            {
+                                bool isCaster = playerUser->GetGUID() == GetOwnerGUID();
+                                if (!isCaster || !sConfigMgr->GetOption<bool>("SpellGobjectFaction.AllowCasterUse", true))
+                                    return;
+                            }
                         }
                     }
                 }

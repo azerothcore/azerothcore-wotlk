@@ -4439,6 +4439,17 @@ AllowTwoSide.Interaction.Arena = 0
 
 AllowTwoSide.Interaction.Auction = 0
 
+#    SpellGobjectFaction.AllowCasterUse
+#        Description: When a spell-created gameobject has a faction restriction set via
+#                     spell_gameobject_faction, allow the player who cast the spell to
+#                     always use their own gameobject regardless of their faction.
+#                     Example: a Horde mage who has a portal spell can still use the
+#                     portal they personally summoned even if it is Alliance-restricted.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+SpellGobjectFaction.AllowCasterUse = 1
+
 #
 #    TalentsInspecting
 #        Description: Allow inspecting characters from the opposing faction.
