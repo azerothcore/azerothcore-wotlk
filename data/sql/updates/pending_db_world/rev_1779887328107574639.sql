@@ -30,7 +30,7 @@ INSERT INTO `command` (`name`, `security`, `help`) VALUES
 ('reload spell_gameobject_faction', 3, 'Syntax: .reload spell_gameobject_faction\r\nReloads the spell_gameobject_faction table from the database.');
 
 -- Translated with Claude by Anthropic
-DELETE FROM `acore_string` WHERE `entry` IN (35455, 35456, 35457, 35458, 35459, 35460, 35461, 35462, 35463, 35464);
+DELETE FROM `acore_string` WHERE `entry` IN (35455, 35456, 35457, 35458, 35459, 35460, 35461, 35462, 35463);
 INSERT INTO `acore_string` (`entry`, `content_default`, `locale_koKR`, `locale_frFR`, `locale_deDE`, `locale_zhCN`, `locale_zhTW`, `locale_esES`, `locale_esMX`, `locale_ruRU`) VALUES
 (35455,
     'Invalid team_id {}. Use 0 (Alliance) or 1 (Horde).',
