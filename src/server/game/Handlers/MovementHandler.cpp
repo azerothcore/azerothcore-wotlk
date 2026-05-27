@@ -309,6 +309,25 @@ void WorldSession::HandleMoveTeleportAck(WorldPacket& recvData)
             pet->NearTeleportTo(plMover->GetPositionX(), plMover->GetPositionY(), plMover->GetPositionZ(), pet->GetOrientation());
     }
 
+    // Resync controlled guardians/minions that cannot path through portals (e.g. Water Elemental)
+    for (Unit* controlled : plMover->m_Controlled)
+    {
+        if (!controlled || !controlled->IsInWorld() || !controlled->IsAlive())
+            continue;
+
+        // Only handle guardians/minions, not full pets (already handled above) or charmed players
+        if (controlled->IsPet() || !controlled->IsCreature())
+            continue;
+
+        if (!controlled->IsWithinDist3d(plMover, plMover->GetMap()->GetVisibilityRange() - 5.0f))
+            controlled->NearTeleportTo(
+                plMover->GetPositionX(),
+                plMover->GetPositionY(),
+                plMover->GetPositionZ(),
+                controlled->GetOrientation()
+            );
+    }
+
     if (oldPos.GetExactDist2d(plMover) > 100.0f)
     {
         uint32 newzone, newarea;
