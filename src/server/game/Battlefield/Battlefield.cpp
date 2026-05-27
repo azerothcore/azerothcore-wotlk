@@ -235,6 +235,9 @@ void Battlefield::InvitePlayerToWar(Player* player)
     if (!player)
         return;
 
+    if (player->IsGameMaster())
+        return;
+
     /// @todo : needed ?
     if (player->IsInFlight())
         return;
