@@ -1318,9 +1318,16 @@ void Spell::SelectImplicitAreaTargets(SpellEffIndex effIndex, SpellImplicitTarge
     // Xinef: the distance should be increased by caster size, it is neglected in latter calculations
     std::list<WorldObject*> targets;
     float radius = m_spellInfo->Effects[effIndex].CalcRadius(m_caster) * m_spellValue->RadiusMod;
-
-    if (targetType.GetTarget() == TARGET_UNIT_SRC_AREA_ENEMY || targetType.GetTarget() == TARGET_UNIT_CASTER_AREA_PARTY || targetType.GetTarget() == TARGET_UNIT_CASTER_AREA_RAID)
-        radius += m_caster->GetLeewayBonusRadius();
+    switch (targetType.GetTarget())
+    {
+        case TARGET_UNIT_SRC_AREA_ENEMY:
+        case TARGET_UNIT_CASTER_AREA_PARTY:
+        case TARGET_UNIT_CASTER_AREA_RAID:
+            radius += m_caster->GetLeewayBonusRadius();
+            break;
+        default:
+            break;
+    }
 
     SearchAreaTargets(targets, radius, center, referer, targetType.GetObjectType(), targetType.GetCheckType(), m_spellInfo->Effects[effIndex].ImplicitTargetConditions, Acore::WorldObjectSpellAreaTargetSearchReason::Area);
 
