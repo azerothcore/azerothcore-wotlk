@@ -1782,8 +1782,23 @@ float WorldObject::GetLeewayBonusRange(Unit const* target) const
 float WorldObject::GetLeewayBonusRadius() const
 {
     if (Player const* player = ToPlayer())
-        if (player->GetXZFlagBasedSpeed() > LEEWAY_MIN_MOVE_SPEED || player->HasUnitState(UNIT_STATE_JUMPING) || player->HasUnitMovementFlag(MOVEMENTFLAG_FALLING))
+    {
+        bool hasLeewayMovement = false;
+
+        if (player->HasUnitState(UNIT_STATE_JUMPING) || player->HasUnitMovementFlag(MOVEMENTFLAG_FALLING))
+            hasLeewayMovement = true;
+        else
+        {
+            float speedXY = (player->m_movementInfo.jump.xyspeed > 0.0f)
+                ? player->m_movementInfo.jump.xyspeed
+                : player->GetSpeed(player->IsWalking() ? MOVE_WALK : MOVE_RUN);
+
+            hasLeewayMovement = speedXY > LEEWAY_MIN_MOVE_SPEED;
+        }
+
+        if (hasLeewayMovement)
             return LEEWAY_BONUS_RANGE;
+    }
 
     return 0.0f;
 }

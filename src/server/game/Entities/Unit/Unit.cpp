@@ -11294,21 +11294,6 @@ float Unit::GetSpeed(UnitMoveType mtype) const
     return m_speed_rate[mtype] * (IsControlledByPlayer() ? playerBaseMoveSpeed[mtype] : baseMoveSpeed[mtype]);
 }
 
-float Unit::GetXZFlagBasedSpeed() const
-{
-    if (!isMoving())
-        return 0.0f;
-
-    // Prefer jump XZ speed when available
-    if (m_movementInfo.jump.xyspeed > 0.0f)
-        return m_movementInfo.jump.xyspeed;
-
-    if (IsWalking())
-        return GetSpeed(MOVE_WALK);
-
-    return GetSpeed(MOVE_RUN);
-}
-
 void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
 {
     if (rate < 0)

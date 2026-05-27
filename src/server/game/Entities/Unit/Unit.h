@@ -1733,7 +1733,6 @@ public:
 
     void  UpdateSpeed(UnitMoveType mtype, bool forced);
     [[nodiscard]] float GetSpeed(UnitMoveType mtype) const;
-    [[nodiscard]] float GetXZFlagBasedSpeed() const;
     [[nodiscard]] float GetSpeedRate(UnitMoveType mtype) const { return m_speed_rate[mtype]; }
     void SetSpeed(UnitMoveType mtype, float rate, bool forced = false);
     void SetSpeedRate(UnitMoveType mtype, float rate) { m_speed_rate[mtype] = rate; }
