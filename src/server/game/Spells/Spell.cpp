@@ -1319,7 +1319,7 @@ void Spell::SelectImplicitAreaTargets(SpellEffIndex effIndex, SpellImplicitTarge
     std::list<WorldObject*> targets;
     float radius = m_spellInfo->Effects[effIndex].CalcRadius(m_caster) * m_spellValue->RadiusMod;
 
-    if (targetType.GetTarget() == TARGET_UNIT_SRC_AREA_ENEMY || targetType.GetTarget() == TARGET_UNIT_CASTER_AREA_PARTY)
+    if (targetType.GetTarget() == TARGET_UNIT_SRC_AREA_ENEMY || targetType.GetTarget() == TARGET_UNIT_CASTER_AREA_PARTY || targetType.GetTarget() == TARGET_UNIT_CASTER_AREA_RAID)
         radius += m_caster->GetLeewayBonusRadius();
 
     SearchAreaTargets(targets, radius, center, referer, targetType.GetObjectType(), targetType.GetCheckType(), m_spellInfo->Effects[effIndex].ImplicitTargetConditions, Acore::WorldObjectSpellAreaTargetSearchReason::Area);
@@ -7076,7 +7076,7 @@ SpellCastResult Spell::CheckRange(bool strict)
             {
                 float real_max_range = max_range;
 
-                if (m_caster->GetLeewayBonusRange(target, false) > 0.0f)
+                if (m_caster->GetLeewayBonusRange(target) > 0.0f)
                     real_max_range -= MIN_MELEE_REACH; // less strict when leeway applies
                 else
                     real_max_range -= 2 * MIN_MELEE_REACH;

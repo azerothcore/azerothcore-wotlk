@@ -792,7 +792,7 @@ bool Unit::IsWithinMeleeRange(Unit const* obj, float dist) const
 
     float maxdist = dist + GetMeleeRange(obj);
 
-    maxdist += GetLeewayBonusRange(obj, false);
+    maxdist += GetLeewayBonusRange(obj);
 
     return distsq < maxdist * maxdist;
 }

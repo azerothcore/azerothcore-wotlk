@@ -606,8 +606,8 @@ public:
     [[nodiscard]] float GetVisibilityRange() const;
     virtual float GetSightRange(WorldObject const* target = nullptr) const;
 
-    [[nodiscard]] float GetLeewayBonusRangeForTargets(Player const* player, Unit const* target, bool ability) const;
-    [[nodiscard]] float GetLeewayBonusRange(Unit const* target, bool ability) const;
+    [[nodiscard]] static float GetLeewayBonusRangeForTargets(Player const* player, Unit const* target);
+    [[nodiscard]] float GetLeewayBonusRange(Unit const* target) const;
     [[nodiscard]] float GetLeewayBonusRadius() const;
 
     //bool CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth = false, bool distanceCheck = false) const;
