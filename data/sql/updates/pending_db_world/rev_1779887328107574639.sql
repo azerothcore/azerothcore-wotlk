@@ -20,3 +20,10 @@ INSERT INTO `spell_gameobject_faction` (`spell_id`, `team_id`, `comment`) VALUES
 (32267, 1, 'Portal: Silvermoon City - Horde'),
 (49361, 1, 'Portal: Stonard - Horde'),
 (35717, 1, 'Portal: Shattrath - Horde');
+
+DELETE FROM `command` WHERE `name` IN ('spell gobject faction add', 'spell gobject faction remove', 'spell gobject faction list', 'reload spell_gameobject_faction');
+INSERT INTO `command` (`name`, `security`, `help`) VALUES
+('spell gobject faction add',    3, 'Syntax: .spell gobject faction add <spell_id|spelllink> <team_id> [comment]\r\nAdds or updates a gameobject faction restriction for the given spell. team_id: 0 = Alliance, 1 = Horde.'),
+('spell gobject faction remove', 3, 'Syntax: .spell gobject faction remove <spell_id|spelllink>\r\nRemoves the gameobject faction restriction for the given spell.'),
+('spell gobject faction list',   2, 'Syntax: .spell gobject faction list [nameFilter]\r\nLists all spell gameobject faction restrictions. Optional name filter is case-insensitive.'),
+('reload spell_gameobject_faction', 3, 'Syntax: .reload spell_gameobject_faction\r\nReloads the spell_gameobject_faction table from the database.');

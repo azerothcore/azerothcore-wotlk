@@ -57,18 +57,10 @@ public:
         return commandTable;
     }
 
-    // .spell gobject faction add <spell_id> <team_id> [comment]
+    // .spell gobject faction add <spell_id|spelllink> <team_id> [comment]
     // team_id: 0 = Alliance, 1 = Horde
-    static bool HandleSpellGobjectFactionAddCommand(ChatHandler* handler, uint32 spellId, uint8 teamId, Optional<Tail> comment)
+    static bool HandleSpellGobjectFactionAddCommand(ChatHandler* handler, SpellInfo const* spellInfo, uint8 teamId, Optional<Tail> comment)
     {
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-        if (!spellInfo)
-        {
-            handler->PSendSysMessage("Spell {} does not exist.", spellId);
-            handler->SetSentErrorMessage(true);
-            return false;
-        }
-
         if (teamId >= TEAM_NEUTRAL)
         {
             handler->PSendSysMessage("Invalid team_id {}. Use 0 (Alliance) or 1 (Horde).", teamId);
@@ -76,6 +68,7 @@ public:
             return false;
         }
 
+        uint32 spellId = spellInfo->Id;
         std::string commentStr = comment ? std::string(*comment) : "";
 
         WorldDatabasePreparedStatement* stmt = nullptr;
@@ -103,20 +96,19 @@ public:
         return true;
     }
 
-    // .spell gobject faction remove <spell_id>
-    static bool HandleSpellGobjectFactionRemoveCommand(ChatHandler* handler, uint32 spellId)
+    // .spell gobject faction remove <spell_id|spelllink>
+    static bool HandleSpellGobjectFactionRemoveCommand(ChatHandler* handler, SpellInfo const* spellInfo)
     {
+        uint32 spellId = spellInfo->Id;
         TeamId const* existingTeam = sSpellMgr->GetSpellGameObjectFaction(spellId);
         if (!existingTeam)
         {
-            handler->PSendSysMessage("Spell {} has no gameobject faction restriction.", spellId);
+            handler->PSendSysMessage("Spell {} ({}) has no gameobject faction restriction.", spellId, spellInfo->SpellName[0]);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
-        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-        char const* spellName = spellInfo ? spellInfo->SpellName[0] : "Unknown";
-        char const* teamName  = (*existingTeam == TEAM_ALLIANCE) ? "Alliance" : "Horde";
+        char const* teamName = (*existingTeam == TEAM_ALLIANCE) ? "Alliance" : "Horde";
 
         WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_SPELL_GO_FACTION);
         stmt->SetData(0, spellId);
@@ -124,7 +116,7 @@ public:
 
         sSpellMgr->LoadSpellGameObjectFactions();
 
-        handler->PSendSysMessage("{} ({}) - {} removed.", spellId, spellName, teamName);
+        handler->PSendSysMessage("{} ({}) - {} removed.", spellId, spellInfo->SpellName[0], teamName);
         return true;
     }
 
@@ -166,9 +158,7 @@ public:
             }
 
             char const* teamName = (teamId == TEAM_ALLIANCE) ? "Alliance" : "Horde";
-
             handler->PSendSysMessage("{} ({}) - {}", spellId, spellName, teamName);
-
             ++count;
         } while (result->NextRow());
 
