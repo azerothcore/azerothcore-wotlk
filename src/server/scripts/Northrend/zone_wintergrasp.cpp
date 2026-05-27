@@ -28,7 +28,6 @@
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "PoolMgr.h"
-#include "RaceMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellScript.h"
@@ -860,8 +859,12 @@ public:
 
         bool IsFriendly(Unit* passenger)
         {
-            return ((me->GetUInt32Value(GAMEOBJECT_FACTION) == WintergraspFaction[TEAM_HORDE] && passenger->getRaceMask() & sRaceMgr->GetHordeRaceMask()) ||
-                    (me->GetUInt32Value(GAMEOBJECT_FACTION) == WintergraspFaction[TEAM_ALLIANCE] && passenger->getRaceMask() & sRaceMgr->GetAllianceRaceMask()));
+            Player* player = passenger->ToPlayer();
+            if (!player)
+                return false;
+
+            TeamId goTeam = me->GetUInt32Value(GAMEOBJECT_FACTION) == WintergraspFaction[TEAM_HORDE] ? TEAM_HORDE : TEAM_ALLIANCE;
+            return player->GetTeamId() == goTeam;
         }
 
         Creature* IsValidVehicle(Creature* cVeh)
