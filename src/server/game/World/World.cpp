@@ -688,6 +688,9 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading linked Spells...");
     sSpellMgr->LoadSpellLinked();
 
+    LOG_INFO("server.loading", "Loading Spell Gameobject Faction Restrictions...");
+    sSpellMgr->LoadSpellGameObjectFactions();
+
     LOG_INFO("server.loading", "Loading Player Create Data...");
     sObjectMgr->LoadPlayerInfo();
 

@@ -684,6 +684,7 @@ enum RBACPermissions
     RBAC_PERM_COMMAND_DEBUG_INFO                             = 920,
     RBAC_PERM_COMMAND_DEBUG_COSMETIC                         = 921,
     RBAC_PERM_COMMAND_PET_RENAME                             = 922,
+    RBAC_PERM_COMMAND_RELOAD_SPELL_GAMEOBJECT_FACTION        = 923,
     // custom permissions 1000+
     RBAC_PERM_MAX
 };

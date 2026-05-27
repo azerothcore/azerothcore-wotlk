@@ -1890,6 +1890,18 @@ void GameObject::Use(Unit* user)
                     }
                 }
 
+                if (uint32 creationSpell = GetSpellId())
+                {
+                    if (Player* playerUser = user->ToPlayer())
+                    {
+                        if (TeamId const* requiredTeam = sSpellMgr->GetSpellGameObjectFaction(creationSpell))
+                        {
+                            if (playerUser->GetTeamId() != *requiredTeam)
+                                return;
+                        }
+                    }
+                }
+
                 spellId = info->spellcaster.spellId;
                 break;
             }

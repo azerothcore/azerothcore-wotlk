@@ -605,6 +605,8 @@ typedef std::vector<SpellInfo*> SpellInfoMap;
 
 typedef std::map<int32, std::vector<int32> > SpellLinkedMap;
 
+typedef std::unordered_map<uint32, TeamId> SpellGameObjectFactionMap;
+
 struct SpellCooldownOverride
 {
     uint32 RecoveryTime;
@@ -719,6 +721,8 @@ public:
 
     [[nodiscard]] const std::vector<int32>* GetSpellLinked(int32 spell_id) const;
 
+    [[nodiscard]] TeamId const* GetSpellGameObjectFaction(uint32 spellId) const;
+
     [[nodiscard]] PetLevelupSpellSet const* GetPetLevelupSpellList(uint32 petFamily) const;
     [[nodiscard]] PetDefaultSpellsEntry const* GetPetDefaultSpellsEntry(int32 id) const;
 
@@ -786,6 +790,7 @@ public:
     void LoadEnchantCustomAttr();
     void LoadSpellEnchantProcData();
     void LoadSpellLinked();
+    void LoadSpellGameObjectFactions();
     void LoadPetLevelupSpellMap();
     void LoadPetDefaultSpells();
     void LoadSpellAreas();
@@ -818,6 +823,7 @@ private:
     SpellMixologyMap           mSpellMixologyMap;
     SpellPetAuraMap            mSpellPetAuraMap;
     SpellLinkedMap             mSpellLinkedMap;
+    SpellGameObjectFactionMap  mSpellGameObjectFactionMap;
     SpellEnchantProcEventMap   mSpellEnchantProcEventMap;
     EnchantCustomAttribute     mEnchantCustomAttr;
     SpellAreaMap               mSpellAreaMap;

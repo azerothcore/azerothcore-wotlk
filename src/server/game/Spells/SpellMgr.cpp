@@ -2515,6 +2515,58 @@ void SpellMgr::LoadSpellLinked()
     LOG_INFO("server.loading", " ");
 }
 
+TeamId const* SpellMgr::GetSpellGameObjectFaction(uint32 spellId) const
+{
+    auto itr = mSpellGameObjectFactionMap.find(spellId);
+    if (itr != mSpellGameObjectFactionMap.end())
+        return &itr->second;
+    return nullptr;
+}
+
+void SpellMgr::LoadSpellGameObjectFactions()
+{
+    uint32 oldMSTime = getMSTime();
+
+    mSpellGameObjectFactionMap.clear();    // needed for reload
+
+    //                                                0          1
+    QueryResult result = WorldDatabase.Query("SELECT spell_id, team_id FROM spell_gameobject_faction");
+    if (!result)
+    {
+        LOG_WARN("server.loading", ">> Loaded 0 spell gameobject faction restrictions. DB table `spell_gameobject_faction` is empty.");
+        LOG_INFO("server.loading", " ");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 spellId = fields[0].Get<uint32>();
+        uint8 teamId   = fields[1].Get<uint8>();
+
+        SpellInfo const* spellInfo = GetSpellInfo(spellId);
+        if (!spellInfo)
+        {
+            LOG_ERROR("sql.sql", "Spell {} listed in `spell_gameobject_faction` does not exist", spellId);
+            continue;
+        }
+
+        if (teamId >= TEAM_NEUTRAL)
+        {
+            LOG_ERROR("sql.sql", "Spell {} in `spell_gameobject_faction` has invalid team_id {}. Use 0 (Alliance) or 1 (Horde)", spellId, teamId);
+            continue;
+        }
+
+        mSpellGameObjectFactionMap[spellId] = static_cast<TeamId>(teamId);
+        ++count;
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} spell gameobject faction restriction(s) in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
+}
+
 void SpellMgr::LoadPetLevelupSpellMap()
 {
     uint32 oldMSTime = getMSTime();

@@ -166,6 +166,7 @@ public:
             { "spell_target_position",         HandleReloadSpellTargetPositionCommand,        rbac::RBAC_PERM_COMMAND_RELOAD_SPELL_TARGET_POSITION, Console::Yes },
             { "spell_threats",                 HandleReloadSpellThreatsCommand,               rbac::RBAC_PERM_COMMAND_RELOAD_SPELL_THREATS, Console::Yes },
             { "spell_group_stack_rules",       HandleReloadSpellGroupStackRulesCommand,       rbac::RBAC_PERM_COMMAND_RELOAD_SPELL_GROUP_STACK_RULES, Console::Yes },
+            { "spell_gameobject_faction",      HandleReloadSpellGameObjectFactionCommand,     rbac::RBAC_PERM_COMMAND_RELOAD_SPELL_GAMEOBJECT_FACTION, Console::Yes },
             { "player_loot_template",          HandleReloadLootTemplatesPlayerCommand,        rbac::RBAC_PERM_COMMAND_RELOAD, Console::Yes },
             { "module_string",                 HandleReloadModuleStringCommand,               rbac::RBAC_PERM_COMMAND_RELOAD, Console::Yes },
             { "acore_string",                  HandleReloadAcoreStringCommand,                rbac::RBAC_PERM_COMMAND_RELOAD_ACORE_STRING, Console::Yes },
@@ -949,6 +950,14 @@ public:
         LOG_INFO("server.loading", "Reloading Spell Group Stack Rules...");
         sSpellMgr->LoadSpellGroupStackRules();
         handler->SendGlobalGMSysMessage("DB table `spell_group_stack_rules` (spell stacking definitions) reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadSpellGameObjectFactionCommand(ChatHandler* handler)
+    {
+        LOG_INFO("server.loading", "Reloading Spell Gameobject Faction Restrictions...");
+        sSpellMgr->LoadSpellGameObjectFactions();
+        handler->SendGlobalGMSysMessage("DB table `spell_gameobject_faction` reloaded.");
         return true;
     }
 
