@@ -10626,6 +10626,8 @@ void Unit::Dismount()
             if (charm->IsCreature() && !charm->HasUnitState(UNIT_STATE_STUNNED))
                 charm->RemoveUnitFlag(UNIT_FLAG_STUNNED);
     }
+
+    UpdateSpeed(MOVE_RUN, true);
 }
 
 void Unit::SetImmuneToPC(bool apply, bool keepCombat)
