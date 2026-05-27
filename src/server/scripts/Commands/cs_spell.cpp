@@ -94,32 +94,37 @@ public:
             stmt->SetData(1, teamId);
             stmt->SetData(2, commentStr);
         }
-        WorldDatabase.Execute(stmt);
+        WorldDatabase.DirectExecute(stmt);
 
         sSpellMgr->LoadSpellGameObjectFactions();
 
         char const* teamName = (teamId == TEAM_ALLIANCE) ? "Alliance" : "Horde";
-        handler->PSendSysMessage("Spell {} ({}) restricted to {}.", spellId, spellInfo->SpellName[0], teamName);
+        handler->PSendSysMessage("{} ({}) - {}", spellId, spellInfo->SpellName[0], teamName);
         return true;
     }
 
     // .spell gobject faction remove <spell_id>
     static bool HandleSpellGobjectFactionRemoveCommand(ChatHandler* handler, uint32 spellId)
     {
-        if (!sSpellMgr->GetSpellGameObjectFaction(spellId))
+        TeamId const* existingTeam = sSpellMgr->GetSpellGameObjectFaction(spellId);
+        if (!existingTeam)
         {
             handler->PSendSysMessage("Spell {} has no gameobject faction restriction.", spellId);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+        char const* spellName = spellInfo ? spellInfo->SpellName[0] : "Unknown";
+        char const* teamName  = (*existingTeam == TEAM_ALLIANCE) ? "Alliance" : "Horde";
+
         WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_SPELL_GO_FACTION);
         stmt->SetData(0, spellId);
-        WorldDatabase.Execute(stmt);
+        WorldDatabase.DirectExecute(stmt);
 
         sSpellMgr->LoadSpellGameObjectFactions();
 
-        handler->PSendSysMessage("Faction restriction for spell {} removed.", spellId);
+        handler->PSendSysMessage("{} ({}) - {} removed.", spellId, spellName, teamName);
         return true;
     }
 
@@ -146,9 +151,8 @@ public:
         do
         {
             Field* fields = result->Fetch();
-            uint32 spellId  = fields[0].Get<uint32>();
-            uint8 teamId    = fields[1].Get<uint8>();
-            std::string com = fields[2].Get<std::string>();
+            uint32 spellId = fields[0].Get<uint32>();
+            uint8 teamId   = fields[1].Get<uint8>();
 
             SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
             char const* spellName = spellInfo ? spellInfo->SpellName[0] : "Unknown";
@@ -163,10 +167,7 @@ public:
 
             char const* teamName = (teamId == TEAM_ALLIANCE) ? "Alliance" : "Horde";
 
-            if (com.empty())
-                handler->PSendSysMessage("{} ({}) - {}", spellId, spellName, teamName);
-            else
-                handler->PSendSysMessage("{} ({}) - {} - {}", spellId, spellName, teamName, com);
+            handler->PSendSysMessage("{} ({}) - {}", spellId, spellName, teamName);
 
             ++count;
         } while (result->NextRow());
