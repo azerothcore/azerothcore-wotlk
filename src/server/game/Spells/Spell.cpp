@@ -52,6 +52,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include <cmath>
+#include <numbers>
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -1225,9 +1226,28 @@ void Spell::SelectImplicitConeTargets(SpellEffIndex effIndex, SpellImplicitTarge
     SpellTargetObjectTypes objectType = targetType.GetObjectType();
     SpellTargetCheckTypes selectionType = targetType.GetCheckType();
     ConditionList* condList = m_spellInfo->Effects[effIndex].ImplicitTargetConditions;
-    float coneAngle = M_PI / 2;
-    float radius = m_spellInfo->Effects[effIndex].CalcRadius(m_caster) * m_spellValue->RadiusMod;
+    float coneAngle = 60.0f * std::numbers::pi_v<float> / 180.0f;
+    if (SpellCone const* sc = sSpellMgr->GetSpellCone(m_spellInfo->Id))
+        coneAngle = static_cast<float>(sc->cone_degrees) * std::numbers::pi_v<float> / 180.0f;
+    else
+    {
+        switch (targetType.GetTarget())
+        {
+            case TARGET_UNIT_CONE_ENEMY_24:
+                coneAngle = 24.0f * std::numbers::pi_v<float> / 180.0f;
+                break;
+            case TARGET_UNIT_CONE_ENEMY_54:
+                coneAngle = 54.0f * std::numbers::pi_v<float> / 180.0f;
+                break;
+            case TARGET_UNIT_CONE_ENEMY_104:
+                coneAngle = 104.0f * std::numbers::pi_v<float> / 180.0f;
+                break;
+            default:
+                break;
+        }
+    }
 
+    float radius = m_spellInfo->Effects[effIndex].CalcRadius(m_caster) * m_spellValue->RadiusMod;
     if (uint32 containerTypeMask = GetSearcherTypeMask(objectType, condList))
     {
         Acore::WorldObjectSpellConeTargetCheck check(coneAngle, radius, m_caster, m_spellInfo, selectionType, condList);
