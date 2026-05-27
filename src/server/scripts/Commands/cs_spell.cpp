@@ -18,9 +18,11 @@
 #include "Chat.h"
 #include "CommandScript.h"
 #include "DatabaseEnv.h"
+#include "Language.h"
 #include "RBAC.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
+#include "StringFormat.h"
 #include <algorithm>
 
 using namespace Acore::ChatCommands;
@@ -37,6 +39,7 @@ public:
             { "add",    HandleSpellGobjectFactionAddCommand,    rbac::RBAC_PERM_COMMAND_SPELL_GOBJECT_FACTION_ADD,    Console::Yes },
             { "remove", HandleSpellGobjectFactionRemoveCommand, rbac::RBAC_PERM_COMMAND_SPELL_GOBJECT_FACTION_REMOVE, Console::Yes },
             { "list",   HandleSpellGobjectFactionListCommand,   rbac::RBAC_PERM_COMMAND_SPELL_GOBJECT_FACTION_LIST,   Console::Yes },
+            { "update", HandleSpellGobjectFactionUpdateCommand, rbac::RBAC_PERM_COMMAND_SPELL_GOBJECT_FACTION_UPDATE, Console::Yes },
         };
 
         static ChatCommandTable spellGobjectCommandTable =
@@ -63,18 +66,20 @@ public:
     {
         if (teamId >= TEAM_NEUTRAL)
         {
-            handler->PSendSysMessage("Invalid team_id {}. Use 0 (Alliance) or 1 (Horde).", teamId);
+            handler->PSendSysMessage(LANG_SPELL_GO_FACTION_INVALID_TEAM, teamId);
             handler->SetSentErrorMessage(true);
             return false;
         }
 
         uint32 spellId = spellInfo->Id;
-        std::string commentStr = comment ? std::string(*comment) : "";
+        char const* teamName = (teamId == TEAM_ALLIANCE) ? "Alliance" : "Horde";
+        std::string commentStr = comment ? std::string(*comment) : Acore::StringFormat("{} ({}) - {}", spellId, spellInfo->SpellName[0], teamName);
+
+        bool const isUpdate = sSpellMgr->GetSpellGameObjectFaction(spellId) != nullptr;
 
         WorldDatabasePreparedStatement* stmt = nullptr;
-        if (sSpellMgr->GetSpellGameObjectFaction(spellId))
+        if (isUpdate)
         {
-            // entry already exists — update it
             stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_SPELL_GO_FACTION);
             stmt->SetData(0, teamId);
             stmt->SetData(1, commentStr);
@@ -91,8 +96,10 @@ public:
 
         sSpellMgr->LoadSpellGameObjectFactions();
 
-        char const* teamName = (teamId == TEAM_ALLIANCE) ? "Alliance" : "Horde";
-        handler->PSendSysMessage("{} ({}) - {}", spellId, spellInfo->SpellName[0], teamName);
+        if (isUpdate)
+            handler->PSendSysMessage(LANG_SPELL_GO_FACTION_UPDATED, spellId, spellInfo->SpellName[0], teamName);
+        else
+            handler->PSendSysMessage(LANG_SPELL_GO_FACTION_ADDED, spellId, spellInfo->SpellName[0], teamName);
         return true;
     }
 
@@ -103,7 +110,7 @@ public:
         TeamId const* existingTeam = sSpellMgr->GetSpellGameObjectFaction(spellId);
         if (!existingTeam)
         {
-            handler->PSendSysMessage("Spell {} ({}) has no gameobject faction restriction.", spellId, spellInfo->SpellName[0]);
+            handler->PSendSysMessage(LANG_SPELL_GO_FACTION_NO_RESTRICTION, spellId, spellInfo->SpellName[0]);
             handler->SetSentErrorMessage(true);
             return false;
         }
@@ -116,7 +123,51 @@ public:
 
         sSpellMgr->LoadSpellGameObjectFactions();
 
-        handler->PSendSysMessage("{} ({}) - {} removed.", spellId, spellInfo->SpellName[0], teamName);
+        handler->PSendSysMessage(LANG_SPELL_GO_FACTION_REMOVED, spellId, spellInfo->SpellName[0], teamName);
+        return true;
+    }
+
+    // .spell gobject faction update <spell_id|spelllink> <team_id> [comment]
+    // team_id: 0 = Alliance, 1 = Horde
+    static bool HandleSpellGobjectFactionUpdateCommand(ChatHandler* handler, SpellInfo const* spellInfo, uint8 teamId, Optional<Tail> comment)
+    {
+        uint32 spellId = spellInfo->Id;
+
+        TeamId const* existingTeam = sSpellMgr->GetSpellGameObjectFaction(spellId);
+        if (!existingTeam)
+        {
+            handler->PSendSysMessage(LANG_SPELL_GO_FACTION_NOT_IN_TABLE, spellId, spellInfo->SpellName[0]);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (teamId >= TEAM_NEUTRAL)
+        {
+            handler->PSendSysMessage(LANG_SPELL_GO_FACTION_INVALID_TEAM, teamId);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        char const* teamName = (teamId == TEAM_ALLIANCE) ? "Alliance" : "Horde";
+
+        if (*existingTeam == static_cast<TeamId>(teamId))
+        {
+            handler->PSendSysMessage(LANG_SPELL_GO_FACTION_ALREADY_SET, spellId, spellInfo->SpellName[0], teamName);
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
+        std::string commentStr = comment ? std::string(*comment) : Acore::StringFormat("{} ({}) - {}", spellId, spellInfo->SpellName[0], teamName);
+
+        WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_SPELL_GO_FACTION);
+        stmt->SetData(0, teamId);
+        stmt->SetData(1, commentStr);
+        stmt->SetData(2, spellId);
+        WorldDatabase.DirectExecute(stmt);
+
+        sSpellMgr->LoadSpellGameObjectFactions();
+
+        handler->PSendSysMessage(LANG_SPELL_GO_FACTION_UPDATED, spellId, spellInfo->SpellName[0], teamName);
         return true;
     }
 
@@ -128,7 +179,7 @@ public:
 
         if (!result)
         {
-            handler->SendSysMessage("No spell gameobject faction restrictions defined.");
+            handler->SendSysMessage(LANG_SPELL_GO_FACTION_NO_ENTRIES);
             return true;
         }
 
@@ -138,6 +189,8 @@ public:
             filter = std::string(*nameFilter);
             std::transform(filter.begin(), filter.end(), filter.begin(), ::tolower);
         }
+
+        handler->SendSysMessage("================================");
 
         uint32 count = 0;
         do
@@ -158,11 +211,12 @@ public:
             }
 
             char const* teamName = (teamId == TEAM_ALLIANCE) ? "Alliance" : "Horde";
-            handler->PSendSysMessage("{} ({}) - {}", spellId, spellName, teamName);
+            handler->PSendSysMessage(LANG_SPELL_GO_FACTION_ENTRY, spellId, spellName, teamName);
             ++count;
         } while (result->NextRow());
 
-        handler->PSendSysMessage("{} restriction(s) found.", count);
+        handler->SendSysMessage("================================");
+        handler->PSendSysMessage(LANG_SPELL_GO_FACTION_COUNT, count);
         return true;
     }
 };
