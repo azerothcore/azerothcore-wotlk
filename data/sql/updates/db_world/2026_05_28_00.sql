@@ -1,3 +1,4 @@
+-- DB update 2026_05_26_00 -> 2026_05_28_00
 --
 DELETE FROM `spawn_group` WHERE `spawnId` IN (153154, 153155, 153156, 153157);
 INSERT INTO `spawn_group` (`groupId`, `spawnType`, `spawnId`) VALUES
