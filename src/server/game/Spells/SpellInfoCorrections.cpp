@@ -1573,7 +1573,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx5 |= SPELL_ATTR5_ALLOW_WHILE_STUNNED;
     });
 
-    // Prince Malcezaar - Amplify Damage
+    // Prince Malchezaar - Amplify Damage
     ApplySpellFix({ 39095 }, [](SpellInfo* spellInfo)
     {
         spellInfo->MaxAffectedTargets = 1;
