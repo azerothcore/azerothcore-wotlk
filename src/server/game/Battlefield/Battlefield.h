@@ -444,6 +444,8 @@ protected:
     /// Returns true if the player is already tracked as actively in the war or invited to join it.
     bool IsPlayerInWarOrInvited(Player* player) const;
 
+    void RemovePlayerFromTracking(ObjectGuid playerGuid);
+
     // Player-iteration helpers: resolve each GUID to a live Player* and call fn(player).
     // Using templates avoids std::function overhead and works naturally with lambdas.
     template<typename Func>
