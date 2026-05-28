@@ -118,6 +118,9 @@ public:
     // Called in Creature::Update when deathstate = DEAD. Inherited classes may maniuplate the ability to respawn based on scripted events.
     virtual bool CanRespawn() { return true; }
 
+    // Whether this creature is an escort NPC (override in escort AI)
+    virtual bool IsEscortNPC(bool /*onlyIfActive*/ = true) const { return false; }
+
     // Called for reaction at stopping attack at no attackers or targets
     virtual void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER);
 
@@ -185,6 +188,13 @@ public:
 
     // Called at MovePath End
     virtual void PathEndReached(uint32 /*pathId*/) {}
+
+    /// == Waypoints system =============================
+
+    virtual void WaypointPathStarted(uint32 /*pathId*/) { }
+    virtual void WaypointStarted(uint32 /*nodeId*/, uint32 /*pathId*/) { }
+    virtual void WaypointReached(uint32 /*nodeId*/, uint32 /*pathId*/) { }
+    virtual void WaypointPathEnded(uint32 /*nodeId*/, uint32 /*pathId*/) { }
 
     void OnCharmed(bool apply) override;
 

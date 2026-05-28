@@ -592,6 +592,7 @@ public:
 
         void EnterEvadeMode(EvadeReason /*why*/) override {}
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 i) override
         {
             if (!pInstance)

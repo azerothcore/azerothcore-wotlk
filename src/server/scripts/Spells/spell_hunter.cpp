@@ -17,7 +17,6 @@
 
 #include "Cell.h"
 #include "CellImpl.h"
-#include "CreatureScript.h"
 #include "GridNotifiers.h"
 #include "Pet.h"
 #include "SpellAuraEffects.h"
@@ -314,6 +313,7 @@ class spell_hun_taming_the_beast : public AuraScript
             if (Creature* creature = target->ToCreature())
             {
                 creature->GetThreatMgr().ClearAllThreat();
+                creature->GetCombatManager().EndAllCombat();
             }
         }
     }

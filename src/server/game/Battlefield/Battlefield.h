@@ -169,18 +169,6 @@ public:
     // Set spirit service for the graveyard
     void SetSpirit(Creature* spirit, TeamId team);
 
-    // Add a player to the graveyard
-    void AddPlayer(ObjectGuid playerGuid);
-
-    // Remove a player from the graveyard
-    void RemovePlayer(ObjectGuid playerGuid);
-
-    // Resurrect players
-    void Resurrect();
-
-    // Move players waiting to that graveyard on the nearest one
-    void RelocateDeadPlayers();
-
     // Check if this graveyard has a spirit guide
     bool HasNpc(ObjectGuid guid)
     {
@@ -190,8 +178,7 @@ public:
         return (SpiritGuide[0] == guid || SpiritGuide[1] == guid);
     }
 
-    // Check if a player is in this graveyard's resurrect queue
-    bool HasPlayer(ObjectGuid guid) const { return ResurrectQueue.find(guid) != ResurrectQueue.end(); }
+    ObjectGuid GetSpiritGuide(TeamId team) const { return SpiritGuide[team]; }
 
     // Get the graveyard's ID.
     uint32 GetGraveyardId() const { return GraveyardId; }
@@ -200,7 +187,6 @@ protected:
     TeamId ControlTeam;
     uint32 GraveyardId;
     ObjectGuid SpiritGuide[2];
-    GuidUnorderedSet ResurrectQueue;
     Battlefield* Bf;
 };
 
@@ -443,6 +429,8 @@ protected:
 
     /// Returns true if the player is already tracked as actively in the war or invited to join it.
     bool IsPlayerInWarOrInvited(Player* player) const;
+
+    void RemovePlayerFromTracking(ObjectGuid playerGuid);
 
     // Player-iteration helpers: resolve each GUID to a live Player* and call fn(player).
     // Using templates avoids std::function overhead and works naturally with lambdas.

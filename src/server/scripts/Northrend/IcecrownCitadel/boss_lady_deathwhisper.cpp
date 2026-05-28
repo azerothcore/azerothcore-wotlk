@@ -1176,8 +1176,7 @@ public:
     {
         if (InstanceScript* instance = player->GetInstanceScript())
             if (instance->GetBossState(DATA_LADY_DEATHWHISPER) != DONE)
-                if (!player->IsGameMaster())
-                    if (Creature* ladyDeathwhisper = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_LADY_DEATHWHISPER)))
+                if (Creature* ladyDeathwhisper = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_LADY_DEATHWHISPER)))
                         ladyDeathwhisper->AI()->DoAction(ACTION_START_INTRO);
         return true;
     }

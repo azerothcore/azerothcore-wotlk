@@ -399,6 +399,14 @@ struct boss_thorim : public BossAI
             go->SetGoState(GO_STATE_ACTIVE);
     }
 
+    void JustExitedCombat() override
+    {
+        EngagementOver();
+        if (_encounterFinished)
+            return;
+        EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
+    }
+
     void EnterEvadeMode(EvadeReason why) override
     {
         DisableThorim(false);
@@ -887,6 +895,7 @@ struct boss_thorim_lightning_orb : public npc_escortAI
             me->CastSpell(me, SPELL_LIGHTNING_DESTRUCTION, true);
         }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32  /*point*/) override
         {
         }
@@ -952,6 +961,7 @@ struct boss_thorim_sif_blizzard : public npc_escortAI
             me->CastSpell(me, SPELL_BLIZZARD, true);
         }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32  /*point*/) override
         {
         }

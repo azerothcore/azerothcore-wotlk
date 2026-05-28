@@ -42,6 +42,8 @@ protected:
         ON_CALL(*_worldMock, getIntConfig(_)).WillByDefault(Return(0));
         ON_CALL(*_worldMock, getFloatConfig(_)).WillByDefault(Return(1.0f));
         ON_CALL(*_worldMock, getBoolConfig(_)).WillByDefault(Return(false));
+        static std::string emptyString;
+        ON_CALL(*_worldMock, GetDataPath()).WillByDefault(ReturnRef(emptyString));
 
         sWorld.reset(_worldMock);
 
@@ -2306,6 +2308,249 @@ TEST_F(ThreatManagerIntegrationTest,
     // Now fixate on C (not on threat list) — should clear the existing fixate
     _creatureA->TestGetThreatMgr().FixateTarget(creatureC);
     EXPECT_EQ(_creatureA->TestGetThreatMgr().GetFixateTarget(), nullptr);
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+// ============================================================================
+// TauntUpdate immediate victim reselection tests
+// Verify that TauntUpdate() calls UpdateVictim() immediately (no 1-second
+// delay), and that rapid/repeated calls do not cause recursion or crashes.
+//
+// Note: TauntUpdate() reads real auras via GetAuraEffectsByType(), which are
+// not present in unit tests.  Tests that need taunt state to persist use
+// SetTauntStateForTesting() + UpdateVictim() to exercise the same code path
+// (ReselectVictim → ProcessAIUpdates) that TauntUpdate now invokes.
+// TauntUpdate()-specific tests verify no-crash / no-recursion behaviour.
+// ============================================================================
+
+TEST_F(ThreatManagerIntegrationTest,
+       UpdateVictim_ImmediateReselectAfterTauntState)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    // B has low threat, C has high threat
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 500.0f);
+    _creatureA->TestGetThreatMgr().Update(
+        ThreatManager::THREAT_UPDATE_INTERVAL);
+    EXPECT_EQ(
+        _creatureA->TestGetThreatMgr().GetCurrentVictim(),
+        creatureC);
+
+    // Set taunt on B, then call UpdateVictim directly (the call that
+    // TauntUpdate now makes internally) — WITHOUT waiting for the
+    // 1-second Update() timer
+    _creatureA->TestGetThreatMgr().SetTauntStateForTesting(
+        _creatureB, ThreatReference::TAUNT_STATE_TAUNT);
+    _creatureA->TestGetThreatMgr().UpdateVictimForTesting();
+
+    // Victim should switch immediately to B (taunted)
+    EXPECT_EQ(
+        _creatureA->TestGetThreatMgr().GetCurrentVictim(),
+        _creatureB);
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       UpdateVictim_Idempotent_MultipleCalls)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 500.0f);
+    _creatureA->TestGetThreatMgr().Update(
+        ThreatManager::THREAT_UPDATE_INTERVAL);
+
+    _creatureA->TestGetThreatMgr().SetTauntStateForTesting(
+        _creatureB, ThreatReference::TAUNT_STATE_TAUNT);
+
+    // Call UpdateVictim many times in a row — must be idempotent
+    for (int i = 0; i < 50; ++i)
+        _creatureA->TestGetThreatMgr().UpdateVictimForTesting();
+
+    EXPECT_EQ(
+        _creatureA->TestGetThreatMgr().GetCurrentVictim(),
+        _creatureB);
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       UpdateVictim_RapidTauntToggle_NoCrash)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 500.0f);
+    _creatureA->TestGetThreatMgr().Update(
+        ThreatManager::THREAT_UPDATE_INTERVAL);
+
+    // Rapidly toggle taunt state with immediate UpdateVictim each time
+    for (int i = 0; i < 50; ++i)
+    {
+        _creatureA->TestGetThreatMgr().SetTauntStateForTesting(
+            _creatureB, ThreatReference::TAUNT_STATE_TAUNT);
+        _creatureA->TestGetThreatMgr().UpdateVictimForTesting();
+        EXPECT_EQ(
+            _creatureA->TestGetThreatMgr().GetCurrentVictim(),
+            _creatureB);
+
+        _creatureA->TestGetThreatMgr().SetTauntStateForTesting(
+            _creatureB, ThreatReference::TAUNT_STATE_NONE);
+        _creatureA->TestGetThreatMgr().UpdateVictimForTesting();
+        EXPECT_EQ(
+            _creatureA->TestGetThreatMgr().GetCurrentVictim(),
+            creatureC);
+    }
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       UpdateVictim_WithConcurrentThreatChanges_NoCrash)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 500.0f);
+    _creatureA->TestGetThreatMgr().Update(
+        ThreatManager::THREAT_UPDATE_INTERVAL);
+
+    // Simulate taunt landing while threat is also being modified
+    // (e.g. damage events arriving in the same server tick)
+    _creatureA->TestGetThreatMgr().SetTauntStateForTesting(
+        _creatureB, ThreatReference::TAUNT_STATE_TAUNT);
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 200.0f);
+    _creatureA->TestGetThreatMgr().UpdateVictimForTesting();
+
+    // B should be victim because taunt overrides threat
+    EXPECT_EQ(
+        _creatureA->TestGetThreatMgr().GetCurrentVictim(),
+        _creatureB);
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       UpdateVictim_MultipleTaunters_HighestStateWins)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    TestCreature* creatureD = new TestCreature();
+    creatureD->SetupForCombatTest(_map, 4, 12348);
+    creatureD->SetFaction(90002);
+
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 200.0f);
+    _creatureA->TestGetThreatMgr().AddThreat(creatureD, 300.0f);
+    _creatureA->TestGetThreatMgr().Update(
+        ThreatManager::THREAT_UPDATE_INTERVAL);
+    EXPECT_EQ(
+        _creatureA->TestGetThreatMgr().GetCurrentVictim(),
+        creatureD);
+
+    // Two taunters: B (state=TAUNT) and C (state=TAUNT+1, i.e. "last taunt")
+    _creatureA->TestGetThreatMgr().SetTauntStateForTesting(
+        _creatureB, ThreatReference::TAUNT_STATE_TAUNT);
+    _creatureA->TestGetThreatMgr().SetTauntStateForTesting(
+        creatureC, static_cast<ThreatReference::TauntState>(
+            ThreatReference::TAUNT_STATE_TAUNT + 1));
+    _creatureA->TestGetThreatMgr().UpdateVictimForTesting();
+
+    // C has the higher taunt state — should be victim immediately
+    EXPECT_EQ(
+        _creatureA->TestGetThreatMgr().GetCurrentVictim(),
+        creatureC);
+
+    creatureC->CleanupCombatState();
+    creatureD->CleanupCombatState();
+    delete creatureC;
+    delete creatureD;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       UpdateVictim_FixateStillTakesPrecedence)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 200.0f);
+
+    // Fixate on C
+    _creatureA->TestGetThreatMgr().FixateTarget(creatureC);
+    _creatureA->TestGetThreatMgr().Update(
+        ThreatManager::THREAT_UPDATE_INTERVAL);
+    EXPECT_EQ(
+        _creatureA->TestGetThreatMgr().GetCurrentVictim(),
+        creatureC);
+
+    // Taunt from B + immediate UpdateVictim — fixate should still win
+    _creatureA->TestGetThreatMgr().SetTauntStateForTesting(
+        _creatureB, ThreatReference::TAUNT_STATE_TAUNT);
+    _creatureA->TestGetThreatMgr().UpdateVictimForTesting();
+
+    EXPECT_EQ(
+        _creatureA->TestGetThreatMgr().GetCurrentVictim(),
+        creatureC);
+    EXPECT_EQ(
+        _creatureA->TestGetThreatMgr().GetFixateTarget(),
+        creatureC);
+
+    creatureC->CleanupCombatState();
+    delete creatureC;
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       TauntUpdate_EmptyThreatList_NoCrash)
+{
+    // TauntUpdate on a creature with no threats should not crash
+    // even though UpdateVictim is now called internally
+    _creatureA->TestGetThreatMgr().TauntUpdate();
+    EXPECT_EQ(
+        _creatureA->TestGetThreatMgr().GetCurrentVictim(),
+        nullptr);
+}
+
+TEST_F(ThreatManagerIntegrationTest,
+       TauntUpdate_RapidCalls_NoCrash)
+{
+    TestCreature* creatureC = new TestCreature();
+    creatureC->SetupForCombatTest(_map, 3, 12347);
+    creatureC->SetFaction(90002);
+
+    _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 100.0f);
+    _creatureA->TestGetThreatMgr().AddThreat(creatureC, 500.0f);
+    _creatureA->TestGetThreatMgr().Update(
+        ThreatManager::THREAT_UPDATE_INTERVAL);
+
+    // Rapidly call TauntUpdate (no real auras — clears taunt state each
+    // time and calls UpdateVictim). Must not crash or recurse.
+    for (int i = 0; i < 50; ++i)
+        _creatureA->TestGetThreatMgr().TauntUpdate();
+
+    // C remains victim (highest threat, no taunt active)
+    EXPECT_EQ(
+        _creatureA->TestGetThreatMgr().GetCurrentVictim(),
+        creatureC);
 
     creatureC->CleanupCombatState();
     delete creatureC;

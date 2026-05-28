@@ -246,6 +246,7 @@ public:
             }
         }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 waypointId) override
         {
             if (Player* player = GetPlayerForEscort())

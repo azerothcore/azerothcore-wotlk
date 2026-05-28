@@ -1172,6 +1172,7 @@ public:
     [[nodiscard]] bool isAcceptWhispers() const { return m_ExtraFlags & PLAYER_EXTRA_ACCEPT_WHISPERS; }
     void SetAcceptWhispers(bool on) { if (on) m_ExtraFlags |= PLAYER_EXTRA_ACCEPT_WHISPERS; else m_ExtraFlags &= ~PLAYER_EXTRA_ACCEPT_WHISPERS; }
     [[nodiscard]] bool IsGameMaster() const { return m_ExtraFlags & PLAYER_EXTRA_GM_ON; }
+    [[nodiscard]] bool CanBeGameMaster() const;
     void SetGameMaster(bool on);
     [[nodiscard]] bool isGMChat() const { return m_ExtraFlags & PLAYER_EXTRA_GM_CHAT; }
     void SetGMChat(bool on) { if (on) m_ExtraFlags |= PLAYER_EXTRA_GM_CHAT; else m_ExtraFlags &= ~PLAYER_EXTRA_GM_CHAT; }
@@ -1667,6 +1668,7 @@ public:
     [[nodiscard]] PlayerMails const& GetMails() const { return m_mail; }
     void SendItemRetrievalMail(uint32 itemEntry, uint32 count); // Item retrieval mails sent by The Postmaster (34337)
     void SendItemRetrievalMail(std::vector<std::pair<uint32, uint32>> mailItems); // Item retrieval mails sent by The Postmaster (34337)
+    void SendItemRetrievalMail(Item* item); // As above, but for a pre-created item (preserves randomPropertyId)
 
     /*********************************************************/
     /*** MAILED ITEMS SYSTEM ***/
@@ -2313,7 +2315,7 @@ public:
     [[nodiscard]] TeamId GetBgTeamId() const { return m_bgData.bgTeamId != TEAM_NEUTRAL ? m_bgData.bgTeamId : GetTeamId(); }
 
     void LeaveBattleground(Battleground* bg = nullptr);
-    [[nodiscard]] bool CanJoinToBattleground() const;
+    [[nodiscard]] bool CanJoinToBattleground(Battleground const* bg) const;
     bool CanReportAfkDueToLimit();
     void ReportedAfkBy(Player* reporter);
     void ClearAfkReports() { m_bgData.bgAfkReporter.clear(); }
@@ -2581,6 +2583,7 @@ public:
 
     //bool isActiveObject() const { return true; }
     bool CanSeeSpellClickOn(Creature const* creature) const;
+    [[nodiscard]] bool CanSeeObjectByVisibilityConditions(WorldObject const* object) const;
     [[nodiscard]] bool CanSeeVendor(Creature const* creature) const;
     [[nodiscard]] bool CanSeeTrainer(Creature const* creature) const;
 
