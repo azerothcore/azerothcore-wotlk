@@ -76,6 +76,18 @@ Battlefield::~Battlefield()
 
 void Battlefield::HandlePlayerEnterZone(Player* player, uint32 /*zone*/)
 {
+    // Clear any stale entries from a prior visit that did not unwind cleanly.
+    // Runs before the script hook so scripts see a clean state if they read any
+    // of these containers.
+    for (uint8 i = 0; i < PVP_TEAMS_COUNT; ++i)
+    {
+        PlayersInWar[i].erase(player->GetGUID());
+        InvitedPlayers[i].erase(player->GetGUID());
+        PlayersInQueue[i].erase(player->GetGUID());
+        PlayersWillBeKick[i].erase(player->GetGUID());
+        Players[i].erase(player->GetGUID());
+    }
+
     // Allow scripts to adjust the player's effective team or appearance before
     // any team-based battlefield containers (such as player lists or queues) are updated.
     sScriptMgr->OnBattlefieldPlayerEnterZone(this, player);
@@ -233,6 +245,9 @@ void Battlefield::InvitePlayersInZoneToWar()
 void Battlefield::InvitePlayerToWar(Player* player)
 {
     if (!player)
+        return;
+
+    if (player->IsGameMaster())
         return;
 
     /// @todo : needed ?
