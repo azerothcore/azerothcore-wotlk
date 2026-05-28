@@ -309,44 +309,6 @@ void WorldSession::HandleMoveTeleportAck(WorldPacket& recvData)
             pet->NearTeleportTo(plMover->GetPositionX(), plMover->GetPositionY(), plMover->GetPositionZ(), pet->GetOrientation());
     }
 
-    // Resync controlled guardians/minions that cannot path through portals (e.g. Water Elemental)
-    for (Unit* controlled : plMover->m_Controlled)
-    {
-        if (!controlled || !controlled->IsInWorld() || !controlled->IsAlive())
-            continue;
-
-        // Only handle guardians/minions, not full pets (already handled above) or charmed players
-        if (controlled->IsPet() || !controlled->IsCreature())
-            continue;
-
-        CharmInfo* ci = controlled->GetCharmInfo();
-        if (!ci)
-            continue;
-
-        controlled->AttackStop();
-        controlled->InterruptNonMeleeSpells(false);
-        controlled->ClearInPetCombat();
-        controlled->GetMotionMaster()->MoveFollow(plMover, PET_FOLLOW_DIST, controlled->GetFollowAngle());
-
-        ci->SetCommandState(COMMAND_FOLLOW);
-        ci->SetIsCommandAttack(false);
-        ci->SetIsAtStay(false);
-        ci->SetIsReturning(true);
-        ci->SetIsCommandFollow(true);
-        ci->SetIsFollowing(false);
-        ci->RemoveStayPosition();
-        ci->SetForcedSpell(0);
-        ci->SetForcedTargetGUID();
-
-        if (!controlled->IsWithinDist3d(plMover, plMover->GetMap()->GetVisibilityRange() - 5.0f))
-            controlled->NearTeleportTo(
-                plMover->GetPositionX(),
-                plMover->GetPositionY(),
-                plMover->GetPositionZ(),
-                controlled->GetOrientation()
-            );
-    }
-
     if (oldPos.GetExactDist2d(plMover) > 100.0f)
     {
         uint32 newzone, newarea;
@@ -368,6 +330,7 @@ void WorldSession::HandleMoveTeleportAck(WorldPacket& recvData)
 
     // resummon pet
     GetPlayer()->ResummonPetTemporaryUnSummonedIfAny();
+    GetPlayer()->ResyncControlledUnitsAfterTeleport();
 
     //lets process all delayed operations on successful teleport
     GetPlayer()->ProcessDelayedOperations();
