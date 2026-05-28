@@ -215,12 +215,18 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
         Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
         if (!wintergrasp)
             return true;
+
+        if (!player->IsAlive())
+        {
+            wintergrasp->SendAreaSpiritHealerQueryOpcode(player, creature->GetGUID());
+            player->CastSpell(player, SPELL_WAITING_FOR_RESURRECT, true);
+        }
+
+        if (creature->IsQuestGiver())
+            player->PrepareQuestMenu(creature->GetGUID());
 
         GraveyardVect graveyard = wintergrasp->GetGraveyardVector();
         for (uint8 i = 0; i < graveyard.size(); i++)
