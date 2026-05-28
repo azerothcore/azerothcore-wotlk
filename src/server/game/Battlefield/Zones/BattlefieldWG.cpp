@@ -296,19 +296,7 @@ void BattlefieldWG::OnBattleStart()
         capturePoint->SetCapturePointData(capturePoint->GetCapturePointGo(),
             capturePoint->GetCapturePointGo()->GetEntry() == GO_WINTERGRASP_FACTORY_BANNER_SE || capturePoint->GetCapturePointGo()->GetEntry() == GO_WINTERGRASP_FACTORY_BANNER_SW ? GetAttackerTeam() : GetDefenderTeam());
 
-    for (uint8 team = 0; team < 2; ++team)
-        for (ObjectGuid const& guid : Players[team])
-        {
-            // Kick player in orb room, TODO: offline player ?
-            if (Player* player = ObjectAccessor::FindPlayer(guid))
-            {
-                float x, y, z;
-                player->GetPosition(x, y, z);
-                if (5500 > x && x > 5392 && y < 2880 && y > 2800 && z < 480)
-                    player->TeleportTo(MAP_NORTHREND, 5349.8686f, 2838.481f, 409.240f, 0.046328f);
-                SendInitWorldStatesTo(player);
-            }
-        }
+    SendInitWorldStatesToAll();
     // Initialize vehicle counter
     UpdateCounterVehicle(true);
     // Send start warning to all players
