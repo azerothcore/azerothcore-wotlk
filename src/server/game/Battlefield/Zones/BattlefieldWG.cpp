@@ -193,9 +193,39 @@ bool BattlefieldWG::SetupBattlefield()
     _scheduler.Schedule(Milliseconds(RESURRECTION_INTERVAL),
         BATTLEFIELD_TIMER_GROUP_RESURRECT, [this](TaskContext context)
     {
-        for (BfGraveyard* gy : GraveyardList)
-            if (gy)
-                gy->Resurrect();
+        ForEachPlayerInZone([this](Player* player)
+        {
+            if (!player->HasAura(SPELL_WAITING_FOR_RESURRECT))
+                return;
+
+            TeamId team = player->GetTeamId();
+            Unit* closestSpirit = nullptr;
+            float closestDist = -1.0f;
+            for (BfGraveyard* gy : GraveyardList)
+            {
+                if (!gy)
+                    continue;
+                Unit* spirit = ObjectAccessor::GetCreature(*player, gy->GetSpiritGuide(team));
+                if (!spirit)
+                    continue;
+                float dist = player->GetDistance(spirit);
+                if (closestDist < 0.0f || dist < closestDist)
+                {
+                    closestDist = dist;
+                    closestSpirit = spirit;
+                }
+            }
+
+            if (closestSpirit)
+                closestSpirit->CastSpell(closestSpirit, SPELL_SPIRIT_HEAL, true);
+
+            player->CastSpell(player, SPELL_RESURRECTION_VISUAL, true);
+            player->ResurrectPlayer(1.0f);
+            player->CastSpell(player, 6962, true);
+            player->CastSpell(player, SPELL_SPIRIT_HEAL_MANA, true);
+            player->SpawnCorpseBones(false);
+            player->RemoveAurasDueToSpell(SPELL_WAITING_FOR_RESURRECT);
+        });
         context.Repeat();
     });
 
