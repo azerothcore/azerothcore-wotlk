@@ -74,19 +74,20 @@ Battlefield::~Battlefield()
     CapturePoints.clear();
 }
 
-void Battlefield::HandlePlayerEnterZone(Player* player, uint32 /*zone*/)
+void Battlefield::RemovePlayerFromTracking(ObjectGuid playerGuid)
 {
-    // Clear any stale entries from a prior visit that did not unwind cleanly.
-    // Runs before the script hook so scripts see a clean state if they read any
-    // of these containers.
     for (uint8 i = 0; i < PVP_TEAMS_COUNT; ++i)
     {
-        PlayersInWar[i].erase(player->GetGUID());
-        InvitedPlayers[i].erase(player->GetGUID());
-        PlayersInQueue[i].erase(player->GetGUID());
-        PlayersWillBeKick[i].erase(player->GetGUID());
-        Players[i].erase(player->GetGUID());
+        InvitedPlayers[i].erase(playerGuid);
+        PlayersInQueue[i].erase(playerGuid);
+        PlayersWillBeKick[i].erase(playerGuid);
+        Players[i].erase(playerGuid);
     }
+}
+
+void Battlefield::HandlePlayerEnterZone(Player* player, uint32 /*zone*/)
+{
+    RemovePlayerFromTracking(player->GetGUID());
 
     // Allow scripts to adjust the player's effective team or appearance before
     // any team-based battlefield containers (such as player lists or queues) are updated.
@@ -141,13 +142,7 @@ void Battlefield::HandlePlayerLeaveZone(Player* player, uint32 /*zone*/)
     for (BfCapturePoint* cp : CapturePoints)
         cp->HandlePlayerLeave(player);
 
-    for (uint8 i = 0; i < PVP_TEAMS_COUNT; ++i)
-    {
-        InvitedPlayers[i].erase(player->GetGUID());
-        PlayersInQueue[i].erase(player->GetGUID());
-        PlayersWillBeKick[i].erase(player->GetGUID());
-        Players[i].erase(player->GetGUID());
-    }
+    RemovePlayerFromTracking(player->GetGUID());
     SendRemoveWorldStates(player);
     RemovePlayerFromResurrectQueue(player->GetGUID());
     OnPlayerLeaveZone(player);
