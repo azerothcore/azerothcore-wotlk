@@ -120,6 +120,7 @@ struct boss_moroes : public BossAI
         _recentlySpoken = false;
         _vanished = false;
         me->SetImmuneToAll(false);
+        me->SetReactState(REACT_AGGRESSIVE);
 
         InitializeGuests();
 
@@ -143,9 +144,11 @@ struct boss_moroes : public BossAI
             Talk(SAY_SPECIAL);
             DoCastSelf(SPELL_VANISH);
             me->SetImmuneToAll(true, true);
+            me->SetReactState(REACT_PASSIVE);
             scheduler.Schedule(5s, 7s, [this](TaskContext)
             {
                 me->SetImmuneToAll(false);
+                me->SetReactState(REACT_AGGRESSIVE);
                 DoCastSelf(SPELL_VANISH_TELEPORT);
                 _vanished = false;
             });
