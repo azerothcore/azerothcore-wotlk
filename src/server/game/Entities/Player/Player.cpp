@@ -9795,11 +9795,12 @@ void Player::ApplySpellMod(uint32 spellId, SpellModOp op, T& basevalue, Spell* s
 
         if (mod->type == SPELLMOD_FLAT)
         {
-            // xinef: do not allow to consume more than one 100% crit increasing spell
-            if (mod->op == SPELLMOD_CRITICAL_CHANCE && totalflat >= 100)
-                return;
-
             int32 flatValue = mod->value;
+
+            // xinef: do not allow to consume more than one 100% crit increasing spell,
+            // but still allow smaller crit bonuses to stack with a 100% crit modifier.
+            if (mod->op == SPELLMOD_CRITICAL_CHANCE && flatValue >= 100 && totalflat >= 100)
+                return;
 
             // SPELL_MOD_THREAT - divide by 100 (in packets we send threat * 100)
             if (mod->op == SPELLMOD_THREAT)
