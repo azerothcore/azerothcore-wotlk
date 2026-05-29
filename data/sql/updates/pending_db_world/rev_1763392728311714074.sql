@@ -5976,7 +5976,7 @@ UPDATE `item_template_locale` SET `Name` = 'Fils démêlés d''équilibre mental
 -- AC datas : OLD Description : "Vous apprend à invoquer cette mascotte.", Description AC enUS : "Teaches you how to summon this companion." ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Vous apprend à invoquer ce compagnon.', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 40653;
 -- AC datas : OLD Name : "Puits de gravité gnome", Name AC enUS : "Gnomish Gravity Well" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Siège éjectable personnel', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 40727;
+-- UPDATE `item_template_locale` SET `Name` = 'Siège éjectable personnel', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 40727;
 -- AC datas : OLD Description : "Vous apprend à invoquer cette monture volante.", Description AC enUS : "Speed scales to riding skill." ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Sa vitesse dépend de la compétence d''équitation.', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 40775;
 -- AC datas : OLD Name : "[Obsolète]Sigil of Pestilential Touch", Name AC enUS : "ObsoleteSigil of Pestilential Touch" ; Wowhead enUS : ""
