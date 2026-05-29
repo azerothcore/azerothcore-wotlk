@@ -866,7 +866,7 @@ UPDATE `item_template_locale` SET `Name` = '최하급 영혼석', `VerifiedBuild
 -- AC datas : OLD Name : "튼튼한 어깨덮개", Name AC enUS : "Rugged Spaulders" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = '튼튼한 어깨갑옷', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 5254;
 -- AC datas : OLD Name : "화염 화살", Name AC enUS : "Flaming Arrows" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Monster - Bow, Red', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 5259;
+-- UPDATE `item_template_locale` SET `Name` = 'Monster - Bow, Red', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 5259;
 -- AC datas : OLD Name : "장미 어깨덧옷", Name AC enUS : "Rose Mantle" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = '장미 어깨보호대', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 5274;
 -- AC datas : OLD Name : "결속의 요대", Name AC enUS : "Binding Girdle" ; Wowhead enUS : ""
@@ -1464,7 +1464,7 @@ UPDATE `item_template_locale` SET `Name` = '반짝이는 돌', `VerifiedBuild` =
 -- AC datas : OLD Name : "마른나무껍질 해골", Name AC enUS : "Witherbark Skull" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = '마른나무껍질부족 해골', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 9320;
 -- AC datas : OLD Name : "워트의 의족", Name AC enUS : "Wirt's Third Leg" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = '남쪽바다 등불', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 9359;
+-- UPDATE `item_template_locale` SET `Name` = '남쪽바다 등불', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 9359;
 -- AC datas : OLD Name : "발굴단장의 보호모", Name AC enUS : "Expert Goldminer's Helmet" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = '발굴단장의 안전모', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 9375;
 -- AC datas : OLD Name : "바위동굴 비수", Name AC enUS : "Stonevault Shiv" ; Wowhead enUS : ""
@@ -1784,7 +1784,7 @@ UPDATE `item_template_locale` SET `Name` = '사초줄기 반바지', `VerifiedBu
 -- AC datas : OLD Name : "탈바르 어깨덧옷", Name AC enUS : "Talbar Mantle" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = '탈바르 어깨보호대', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 10657;
 -- AC datas : OLD Name : "아프라사 결정", Name AC enUS : "Shard of Afrasa" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = '갈래발굽 결정', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 10659;
+-- UPDATE `item_template_locale` SET `Name` = '갈래발굽 결정', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 10659;
 -- AC datas : OLD Name : "기괴한 비수", Name AC enUS : "Fiendish Skiv" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = '극악의 비수', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 10703;
 -- AC datas : OLD Name : "밤비늘 요대", Name AC enUS : "Nightscale Girdle" ; Wowhead enUS : ""
@@ -2180,7 +2180,7 @@ UPDATE `item_template_locale` SET `Description` = '남작 리븐데어의 군마
 -- AC datas : OLD Name : "해골제련 약탈검", Name AC enUS : "Skullforge Reaver" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = '영혼의 약탈자', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 13361;
 -- AC datas : OLD Name : "프라스 샤비의 전단지", Name AC enUS : "Fras Siabi's Advertisement" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = '에즈라 그림의 전단지', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 13364;
+-- UPDATE `item_template_locale` SET `Name` = '에즈라 그림의 전단지', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 13364;
 -- AC datas : OLD Name : "불길의 성큼장화", Name AC enUS : "Fire Striders" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = '불길의 장화', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 13369;
 -- AC datas : OLD Name : "영혼강탈자 어깨덧옷", Name AC enUS : "Soulstealer Mantle" ; Wowhead enUS : ""
@@ -7642,7 +7642,7 @@ UPDATE `item_template_locale` SET `Name` = '도안: 회복의 북소리', `Descr
 -- AC datas : OLD Name : "명가의 브로치", Name AC enUS : "Brooch of the Highborne" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = '귀족의 브로치', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 34184;
 -- AC datas : OLD Name : "용 두개골", Name AC enUS : "Dragon Skull" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = '용 두개골 시험용', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 34187;
+-- UPDATE `item_template_locale` SET `Name` = '용 두개골 시험용', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 34187;
 -- AC datas : OLD Name : "끈기의 견갑", Name AC enUS : "Pauldrons of Perseverance" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = '끈기의 어깨갑옷', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 34192;
 -- AC datas : OLD Name : "탈라시안 구원자의 어깨덮개", Name AC enUS : "Spaulders of the Thalassian Savior" ; Wowhead enUS : ""
@@ -8548,7 +8548,7 @@ UPDATE `item_template_locale` SET `Name` = '치유사의 모자', `VerifiedBuild
 -- AC datas : OLD Name : "응결된 노여움의 어깨덧옷", Name AC enUS : "Mantle of Congealed Anger" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = '응결된 노여움의 어깨보호대', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 37275;
 -- AC datas : OLD Name : "고지의 일상복", Name AC enUS : "Gorge's Loungewear" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = '그렉로르의 일상복', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 37276;
+-- UPDATE `item_template_locale` SET `Name` = '그렉로르의 일상복', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 37276;
 -- AC datas : OLD Name : "불꽃 경화 허리보호띠", Name AC enUS : "Flame Hardened Waistband" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = '불꽃 경화 허리띠', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 37280;
 -- AC datas : OLD Name : "BT55 Leather Physical Gloves4", Name AC enUS : "BT55 Leather Physical Gloves4" ; Wowhead enUS : ""
@@ -8630,7 +8630,7 @@ UPDATE `item_template_locale` SET `Name` = '마비의 사슬 다리보호구', `
 -- AC datas : OLD Name : "공간을 가르는 요대", Name AC enUS : "Girdle of Ripped Space" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = '공간을 가르는 벨트', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 37471;
 -- AC datas : OLD Name : "고지의 피의분노 가슴보호갑", Name AC enUS : "Gorge's Breastplate of Bloodrage" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = '그렉로르의 피의분노 가슴보호갑', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 37476;
+-- UPDATE `item_template_locale` SET `Name` = '그렉로르의 피의분노 가슴보호갑', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 37476;
 -- AC datas : OLD Name : "방황하는 성전사의 가슴갑옷", Name AC enUS : "Lost Crusader Chestplate" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = '방황하는 성전사의 흉갑', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 37477;
 -- AC datas : OLD Name : "호박석 판금 다리보호대", Name AC enUS : "Amberplate Legguards" ; Wowhead enUS : ""
@@ -9010,7 +9010,7 @@ UPDATE `item_template_locale` SET `Name` = '문자가 새겨진 화려한 토파
 -- AC datas : OLD Name : "찬란한 화려한 루비", Name AC enUS : "Runed Ornate Ruby" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = '룬이 새겨진 화려한 루비', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 38549;
 -- AC datas : OLD Name : "마라우돈 죄수 목록", Name AC enUS : "Maraudine Prisoner Manifest" ; Wowhead enUS : "",  OLD Description : "", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = '고대 드라카리 서판', `Description` = '상형 문자가 새겨진 금속판으로 표지가 꾸며져 있습니다.', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 38567;
+-- UPDATE `item_template_locale` SET `Name` = '고대 드라카리 서판', `Description` = '상형 문자가 새겨진 금속판으로 표지가 꾸며져 있습니다.', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 38567;
 -- AC datas : OLD Description : "탈것 소환하는 법을 배웁니다.", Description AC enUS : "Teaches you how to summon this mount.  This is a very fast mount." ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = '탈것 소환하는 법을 배웁니다. 속도가 매우 빠릅니다.', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 38576;
 -- AC datas : OLD Name : "빈 가을 축제 잔", Name AC enUS : "Empty Brewfest Stein" ; Wowhead enUS : ""
@@ -13796,7 +13796,7 @@ UPDATE `item_template_locale` SET `Name` = '뾰족한 이미르하임 목걸이'
 -- AC datas : OLD Name : "어둠의 집회 어깨덧대", Name AC enUS : "Dark Coven Shoulderpads" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = '어둠의 집회 어깨보호구', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 50244;
 -- AC datas : OLD Name : "커다란 사랑의 로켓", Name AC enUS : "Big Love Rocket" ; Wowhead enUS : "",  OLD Description : "탈것 소환하는 법을 배웁니다. 타기 숙련도와 위치에 따라 달라지는 탈것입니다.", Description AC enUS : "Teaches you how to summon this mount" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'X-45 심장폭격기', `Description` = '탈것 소환하는 법을 배웁니다.', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 50250;
+-- UPDATE `item_template_locale` SET `Name` = 'X-45 심장폭격기', `Description` = '탈것 소환하는 법을 배웁니다.', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 50250;
 -- AC datas : OLD Name : "혈법사 어깨덧대", Name AC enUS : "Bloodmage Shoulderpads" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = '혈법사 어깨보호구', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 50279;
 -- AC datas : OLD Name : "검은 복수의 어깨덮개", Name AC enUS : "Spaulders of Black Betrayal" ; Wowhead enUS : ""
@@ -14408,7 +14408,7 @@ UPDATE `item_template_locale` SET `Name` = '90 영웅급 전사 Waistband', `Ver
 -- AC datas : OLD Name : "시험용 90 Epic Frost Leggings", Name AC enUS : "90 Epic Frost Leggings" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = '90 영웅급 냉기 Leggings', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 20329;
 -- AC datas : OLD Name : "단단한 하늘 사파이어", Name AC enUS : "Solid Sky Sapphire (Unused)" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Solid Sky Sapphire', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 37430;
+-- UPDATE `item_template_locale` SET `Name` = 'Solid Sky Sapphire', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 37430;
 
 -- Update existing entries, from MOP
 -- AC datas : OLD Name : "존유 시험용 아이템", Name AC enUS : "JYoo test item" ; Wowhead enUS : ""
