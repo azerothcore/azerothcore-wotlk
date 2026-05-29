@@ -11826,7 +11826,7 @@ UPDATE `item_template_locale` SET `Name` = 'Team B Wappenrock', `VerifiedBuild` 
 -- AC datas : OLD Name : "NPC Equip 34161", Name AC enUS : "NPC Equip 34161" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Kaels Standarte', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 34161;
 -- AC datas : OLD Name : "Drachenschädel", Name AC enUS : "Dragon Skull" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Drachenschädeltest', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 34187;
+-- UPDATE `item_template_locale` SET `Name` = 'Drachenschädeltest', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 34187;
 -- AC datas : OLD Name : "NPC Equip 34217", Name AC enUS : "NPC Equip 34217" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Monster - Shield, Skeletal - Vrykul Ancestor', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 34217;
 -- AC datas : OLD Name : "NPC Equip 34250", Name AC enUS : "NPC Equip 34250" ; Wowhead enUS : ""
@@ -12914,7 +12914,7 @@ UPDATE `item_template_locale` SET `Name` = 'Monster - Shield, Crest B03', `Verif
 -- AC datas : OLD Name : "NPC Equip 38565", Name AC enUS : "NPC Equip 38565" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Uraltes Relikt der Drakkari', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 38565;
 -- AC datas : OLD Name : "Gefangenenmanifest der Maraudine", Name AC enUS : "Maraudine Prisoner Manifest" ; Wowhead enUS : "",  OLD Description : "", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Uralte Tafeln der Drakkari', `Description` = 'Gebundene Metallplatten mit eingeätzten Hieroglyphen.', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 38567;
+-- UPDATE `item_template_locale` SET `Name` = 'Uralte Tafeln der Drakkari', `Description` = 'Gebundene Metallplatten mit eingeätzten Hieroglyphen.', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 38567;
 -- AC datas : OLD Name : "NPC Equip 38568", Name AC enUS : "NPC Equip 38568" ; Wowhead enUS : "",  OLD Description : "", Description AC enUS : "" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Glücksbringerarmreif der Drakkari', `Description` = 'Bringt nicht unbedingt Glück...', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 38568;
 -- AC datas : OLD Name : "NPC Equip 38569", Name AC enUS : "NPC Equip 38569" ; Wowhead enUS : "",  OLD Description : "", Description AC enUS : "" ; Wowhead enUS : ""
