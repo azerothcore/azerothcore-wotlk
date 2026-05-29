@@ -93,6 +93,8 @@ void Battlefield::HandlePlayerEnterZone(Player* player, uint32 /*zone*/)
     // any team-based battlefield containers (such as player lists or queues) are updated.
     sScriptMgr->OnBattlefieldPlayerEnterZone(this, player);
 
+    TryRejoinAfterLogout(player); // relog: auto-rejoin, skip invite below
+
     // Xinef: do not invite players on taxi
     if (!player->IsInFlight())
     {
@@ -124,12 +126,20 @@ void Battlefield::HandlePlayerEnterZone(Player* player, uint32 /*zone*/)
 
 void Battlefield::HandlePlayerLeaveZone(Player* player, uint32 /*zone*/)
 {
+    // Logout still runs full leave-war cleanup, but marks the player for grace-window auto-rejoin.
+    bool const isLogout = player->GetSession() && player->GetSession()->PlayerLogout();
+
     if (IsWarTime())
     {
         // If the player is participating to the battle
         if (PlayersInWar[player->GetTeamId()].erase(player->GetGUID()))
         {
-            player->GetSession()->SendBfLeaveMessage(BattleId);
+            if (isLogout)
+                LogoutGracePlayers[player->GetTeamId()][player->GetGUID()] =
+                    GameTime::GetGameTime().count() + LOGOUT_GRACE_SECONDS;
+            else
+                player->GetSession()->SendBfLeaveMessage(BattleId);
+
             if (Group* group = player->GetGroup()) // Remove the player from the raid group
                 if (group->isBFGroup())
                     group->RemoveMember(player->GetGUID());
@@ -321,6 +331,7 @@ void Battlefield::StartBattle()
     {
         PlayersInWar[team].clear();
         Groups[team].clear();
+        LogoutGracePlayers[team].clear();
     }
 
     Timer = BattleTime;
@@ -586,6 +597,41 @@ bool Battlefield::AddOrSetPlayerToCorrectBfGroup(Player* player)
         group->AddMember(player);
 
     return true;
+}
+
+void Battlefield::TryRejoinAfterLogout(Player* player)
+{
+    ObjectGuid const guid = player->GetGUID();
+    time_t const now = GameTime::GetGameTime().count();
+
+    // Consume the marker and honor its grace window (check both teams; team may have changed).
+    bool pending = false;
+    for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
+        if (auto itr = LogoutGracePlayers[team].find(guid); itr != LogoutGracePlayers[team].end())
+        {
+            pending = itr->second > now;
+            LogoutGracePlayers[team].erase(itr);
+        }
+
+    // Vacancy gate mirrors HandlePlayerEnterZone (full team -> queue path). Pre-hook:
+    // we can't abort after JoinWar, which may already have mutated module state.
+    if (!pending || !IsWarTime() || !HasWarVacancy(player->GetTeamId()))
+        return;
+
+    if (Group* current = player->GetGroup())
+        if (current->isBGGroup() || current->isBFGroup())
+            return;
+
+    // Rejoin via the normal join path: firing JoinWar lets modules rebuild
+    // per-session (Player*-keyed) state and pick the team before the raid bind.
+    sScriptMgr->OnBattlefieldPlayerJoinWar(this, player);
+
+    if (AddOrSetPlayerToCorrectBfGroup(player))
+    {
+        player->GetSession()->SendBfEntered(BattleId);
+        PlayersInWar[player->GetTeamId()].insert(guid);
+        OnPlayerJoinWar(player);
+    }
 }
 
 BfGraveyard* Battlefield::GetGraveyardById(uint32 id) const
