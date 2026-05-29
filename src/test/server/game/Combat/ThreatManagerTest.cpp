@@ -734,7 +734,7 @@ TEST_F(ThreatManagerIntegrationTest,
 }
 
 // ============================================================================
-// Phase Change + Threat Offline State Tests (SetPhaseMask order fix)
+// Phase Change + Threat Offline State Tests
 // ============================================================================
 
 TEST_F(ThreatManagerIntegrationTest,
@@ -747,6 +747,10 @@ TEST_F(ThreatManagerIntegrationTest,
 
     // Move B to a different phase
     _creatureB->SetPhase(2);
+
+    // Online state is refreshed lazily on the next threat update tick (matches
+    // TrinityCore - SetPhaseMask itself does not touch threat)
+    _creatureA->TestGetThreatMgr().Update(ThreatManager::THREAT_UPDATE_INTERVAL);
 
     // B should now be offline on A's threat list (different phases)
     // The list is not empty if we include offline, but empty if we don't
