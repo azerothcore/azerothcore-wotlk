@@ -590,7 +590,7 @@ UPDATE `item_template_locale` SET `Name` = 'Martillo de Rhahk''Zor', `VerifiedBu
 -- AC datas : OLD Name : "Piedra de alma", Name AC enUS : "Minor Soulstone" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Piedra de alma menor', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 5232;
 -- AC datas : OLD Name : "Flechas flamígeras", Name AC enUS : "Flaming Arrows" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Monster - Bow, Red', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 5259;
+-- UPDATE `item_template_locale` SET `Name` = 'Monster - Bow, Red', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 5259;
 -- AC datas : OLD Name : "Pólvora Defias", Name AC enUS : "Defias Gunpowder" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Pólvora de los Defias', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 5397;
 -- AC datas : OLD Name : "Piedra de salud", Name AC enUS : "Minor Healthstone" ; Wowhead enUS : ""
@@ -650,7 +650,7 @@ UPDATE `item_template_locale` SET `Name` = 'Corazón marchito', `VerifiedBuild` 
 -- AC datas : OLD Name : "Ruta de navegación deteriorada por el agua", Name AC enUS : "Ship Schedule" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Ruta de navegación', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 9250;
 -- AC datas : OLD Name : "La tercera pierna de Wirt", Name AC enUS : "Wirt's Third Leg" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Farol de los Mares del Sur', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 9359;
+-- UPDATE `item_template_locale` SET `Name` = 'Farol de los Mares del Sur', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 9359;
 -- AC datas : OLD Name : "Espada de jin-su", Name AC enUS : "Ginn-su Sword" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Espada de Ginn-Su', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 9424;
 -- AC datas : OLD Name : "Guerrera abisal", Name AC enUS : "Nether-lace Tunic" ; Wowhead enUS : ""
@@ -668,7 +668,7 @@ UPDATE `item_template_locale` SET `Description` = 'Lleva la marca de Velarok el 
 -- AC datas : OLD Description : "Un parche gris pálido de piel de dragón negro.", Description AC enUS : "A dull and gray patch of black dragon skin" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Un parche gris pálido de piel de dragón Negro.', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 10575;
 -- AC datas : OLD Name : "Fragmento de Afrasa", Name AC enUS : "Shard of Afrasa" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Fragmento de los Pezuña Quebrada', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 10659;
+-- UPDATE `item_template_locale` SET `Name` = 'Fragmento de los Pezuña Quebrada', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 10659;
 -- AC datas : OLD Name : "Dirk fuerza de vida", Name AC enUS : "Lifeforce Dirk" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Puntilla de fuerza de vida', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 10750;
 -- AC datas : OLD Name : "Veneno hiriente", Name AC enUS : "Wound Poison II" ; Wowhead enUS : ""
@@ -730,7 +730,7 @@ UPDATE `item_template_locale` SET `Description` = 'Te enseña a invocar esta mon
 -- AC datas : OLD Description : "Te enseña a invocar el corcel del Barón Osahendido.", Description AC enUS : "Teaches you how to summon Baron Rivendare's steed.  This is a very fast mount." ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Te enseña a invocar el corcel del Barón Osahendido. Es muy veloz.', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 13335;
 -- AC datas : OLD Name : "Anuncio de Fras Siabi", Name AC enUS : "Fras Siabi's Advertisement" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Anuncio de Ezra Grimm', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 13364;
+-- UPDATE `item_template_locale` SET `Name` = 'Anuncio de Ezra Grimm', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 13364;
 -- AC datas : OLD Name : "Musgopena", Name AC enUS : "Plaguebloom" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Flor de plaga', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 13466;
 -- AC datas : OLD Name : "Receta: piedra de alquimista", Name AC enUS : "Recipe: Alchemist's Stone" ; Wowhead enUS : ""
@@ -1644,7 +1644,7 @@ UPDATE `item_template_locale` SET `Description` = 'Te enseña a invocar esta mon
 -- AC datas : OLD Description : "Te enseña a invocar esta montura.", Description AC enUS : "Teaches you how to summon this mount.  This is a very fast mount." ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Te enseña a invocar esta montura. Es muy veloz.', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 34129;
 -- AC datas : OLD Name : "Calavera de dragón", Name AC enUS : "Dragon Skull" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Dragon Skull Test', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 34187;
+-- UPDATE `item_template_locale` SET `Name` = 'Dragon Skull Test', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 34187;
 -- AC datas : OLD Name : "Patrón estropeado", Name AC enUS : "Pattern: Quiver of a Thousand Feathers" ; Wowhead enUS : "",  OLD Description : "Este detallado patrón ha sido estropeado por los elementos.", Description AC enUS : "Teaches you how to craft a Quiver of a Thousand Feathers." ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Patrón: carcaj de mil plumas', `Description` = 'Te enseña a hacer un carcaj de mil plumas.', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 34200;
 -- AC datas : OLD Name : "Patrón estropeado", Name AC enUS : "Pattern: Netherscale Ammo Pouch" ; Wowhead enUS : "",  OLD Description : "Este patrón desprende un hedor a lluvia y ceniza.", Description AC enUS : "Teaches you how to craft a Netherscale Ammo Pouch." ; Wowhead enUS : ""
@@ -1748,13 +1748,13 @@ UPDATE `item_template_locale` SET `Name` = 'Clayton''s Test Item Three TEST', `V
 -- AC datas : OLD Name : "Esfera de sangre de dragón rojo", Name AC enUS : "Sphere of Red Dragon's Blood" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Esfera de sangre de dragón Rojo', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 37166;
 -- AC datas : OLD Name : "Falda hogareña de Gorge", Name AC enUS : "Gorge's Loungewear" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Grek''lor''s Loungewear', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 37276;
+-- UPDATE `item_template_locale` SET `Name` = 'Grek''lor''s Loungewear', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 37276;
 -- AC datas : OLD Name : "Fórmula: encantar pechera: esquivar superior", Name AC enUS : "Formula: Enchant Chest - Greater Dodge" ; Wowhead enUS : "",  OLD Description : "Te enseña a encantar de forma permanente una pechera para aumentar el índice de esquivar 22 p. Requiere un objeto de nivel 60 o superior.", Description AC enUS : "Teaches you how to permanently enchant chest armor to increase dodge rating by 22.   Requires a level 60 or higher item." ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Fórmula: encantar pechera: defensa superior', `Description` = 'Te enseña a encantar de forma permanente una pieza de armadura para el torso para aumentar el índice de defensa 22 p. Requiere un objeto de nivel 60 o superior.', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 37336;
 -- AC datas : OLD Description : "Te enseña a encantar de forma permanente una capa para que aumente el sigilo ligeramente y la agilidad 10 p. Requiere un objeto de nivel 60 o superior.", Description AC enUS : "Teaches you how to permanently enchant a cloak to increase stealth slightly and Agility by 10.  Requires a level 60 or higher item." ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Te enseña a encantar de forma permanente una capa para aumentar el sigilo ligeramente y aumentar la agilidad 10 p. Requiere un objeto de nivel 60 o superior.', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 37349;
 -- AC datas : OLD Name : "Coraza de sanguinario de Gorge", Name AC enUS : "Gorge's Breastplate of Bloodrage" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Grek''lor''s Breastplate of Bloodrage', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 37476;
+-- UPDATE `item_template_locale` SET `Name` = 'Grek''lor''s Breastplate of Bloodrage', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 37476;
 -- AC datas : OLD Description : "Cuenta como un tótem de aire, tierra, fuego y agua.", Description AC enUS : "Counts as an Air, Earth, Fire, and Water totem." ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Cuenta como un tótem de Aire, Tierra, Fuego y Agua.', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 37575;
 -- AC datas : OLD Name : "Puñado de golosinas", Name AC enUS : "Handful of Candy" ; Wowhead enUS : ""
@@ -1788,7 +1788,7 @@ UPDATE `item_template_locale` SET `Name` = 'Topacio ornamentado con inscripcione
 -- AC datas : OLD Name : "Rubí ornamentado luminoso", Name AC enUS : "Runed Ornate Ruby" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Rubí rúnico ornamentado', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 38549;
 -- AC datas : OLD Name : "Manifiesto de prisionero Maraudine", Name AC enUS : "Maraudine Prisoner Manifest" ; Wowhead enUS : "",  OLD Description : "", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Tablillas Drakkari antiguas', `Description` = 'Placas de metal con rebordes con jeroglíficos grabados.', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 38567;
+-- UPDATE `item_template_locale` SET `Name` = 'Tablillas Drakkari antiguas', `Description` = 'Placas de metal con rebordes con jeroglíficos grabados.', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 38567;
 -- AC datas : OLD Description : "Te enseña a invocar esta montura.", Description AC enUS : "Teaches you how to summon this mount.  This is a very fast mount." ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Te enseña a invocar esta montura. Es muy veloz.', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 38576;
 -- AC datas : OLD Name : "Encantar brazales: salud menor", Name AC enUS : "Scroll of Enchant Bracer - Minor Health" ; Wowhead enUS : ""
@@ -2796,7 +2796,7 @@ UPDATE `item_template_locale` SET `Name` = 'Puntilla desgastada', `VerifiedBuild
 -- AC datas : OLD Name : "Dirk afilado", Name AC enUS : "Sharp Dirk" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Puntilla afilada', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 50057;
 -- AC datas : OLD Name : "Gran cohete de amor", Name AC enUS : "Big Love Rocket" ; Wowhead enUS : "",  OLD Description : "Te enseña a invocar esta montura. Cambia según tu habilidad en equitación y la zona en la que estés.", Description AC enUS : "Teaches you how to summon this mount" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Rompecorazones X-45', `Description` = 'Te enseña a invocar esta montura.', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 50250;
+-- UPDATE `item_template_locale` SET `Name` = 'Rompecorazones X-45', `Description` = 'Te enseña a invocar esta montura.', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 50250;
 -- AC datas : OLD Description : "Te enseña a invocar esta montura. Es una montura voladora.", Description AC enUS : "Teaches you how to summon this mount.  Can only be summoned in Outland or Northrend.  This is an extremely fast mount." ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Te enseña a invocar esta montura. Es extremadamente veloz.', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 50435;
 -- AC datas : OLD Description : "Cuenta como un tótem de aire, tierra, fuego y agua.", Description AC enUS : "Counts as an Air, Earth, Fire, and Water totem." ; Wowhead enUS : ""
@@ -2990,7 +2990,7 @@ UPDATE `item_template_locale` SET `Description` = 'Testing the LOC trigger', `Ve
 -- AC datas : OLD Name : "Monedero grande (OLD)", Name AC enUS : "Large Moneybag (old)" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Monedero grande (old)', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 1014;
 -- AC datas : OLD Name : "Zafiro celestial sólido", Name AC enUS : "Solid Sky Sapphire (Unused)" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Solid Sky Sapphire', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 37430;
+-- UPDATE `item_template_locale` SET `Name` = 'Solid Sky Sapphire', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 37430;
 
 -- Update existing entries, from MOP
 -- AC datas : OLD Name : "Objeto de prueba JYoo", Name AC enUS : "JYoo test item" ; Wowhead enUS : ""
