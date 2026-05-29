@@ -3146,7 +3146,7 @@ UPDATE `item_template_locale` SET `Description` = 'Cuenta como un tótem de Aire
 -- AC datas : OLD Description : "Cuenta como un tótem de aire, tierra, fuego y agua.", Description AC enUS : "Counts as an Air, Earth, Fire, and Water totem." ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Cuenta como un tótem de Aire, Tierra, Fuego y Agua.', `VerifiedBuild` = 0 WHERE `locale` = 'esES' AND `ID` = 40710;
 -- AC datas : OLD Name : "Contenedor de gravedad gnómico", Name AC enUS : "Gnomish Gravity Well" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Asiento eyectable personal', `VerifiedBuild` = 0 WHERE `locale` = 'esES' AND `ID` = 40727;
+-- UPDATE `item_template_locale` SET `Name` = 'Asiento eyectable personal', `VerifiedBuild` = 0 WHERE `locale` = 'esES' AND `ID` = 40727;
 -- AC datas : OLD Name : "Zancos de conjunto de hielo", Name AC enUS : "Pack-Ice Striders" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Botas de conjunto de hielo', `VerifiedBuild` = 0 WHERE `locale` = 'esES' AND `ID` = 40746;
 -- AC datas : OLD Description : "Te enseña a invocar esta montura. Es una montura voladora.", Description AC enUS : "Speed scales to riding skill." ; Wowhead enUS : ""
