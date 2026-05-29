@@ -17,6 +17,7 @@
 
 #include "BattlefieldMgr.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "Zones/BattlefieldWG.h"
 
 BattlefieldMgr::BattlefieldMgr() : _updateTimer(0)
@@ -86,6 +87,7 @@ void BattlefieldMgr::HandlePlayerLeaveZone(Player* player, uint32 zoneId)
     // teleport: remove once in removefromworld, once in updatezone
     if (!itr->second->HasPlayer(player))
         return;
+    sScriptMgr->OnBattlefieldPlayerLeaveZone(itr->second, player);
     itr->second->HandlePlayerLeaveZone(player, zoneId);
     LOG_DEBUG("bg.battlefield", "Player {} left outdoorpvp id {}", player->GetGUID().ToString(), itr->second->GetTypeId());
 }

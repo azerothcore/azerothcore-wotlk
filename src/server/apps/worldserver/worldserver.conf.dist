@@ -3389,6 +3389,16 @@ DungeonAccessRequirements.OptionalStringID = 0
 JoinBGAndLFG.Enable = 0
 
 #
+#     LFG.MailItemOnFullInventory
+#        Description: When a player wins a group roll but their inventory is full, mail
+#                     the item to them instead of leaving it on the corpse.
+#        Default:     0 - Disabled
+#                     1 - Only in LFG/RDF groups
+#                     2 - In all group types
+
+LFG.MailItemOnFullInventory = 0
+
+#
 #     DungeonFinder.OptionsMask
 #        Description: Dungeon and raid finder system.
 #        Value is a bitmask consisting of:
