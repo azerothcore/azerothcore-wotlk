@@ -126,6 +126,16 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket& recvData)
         return;
     }
 
+    // Battlefield raids (e.g. Wintergrasp) are owned by the BF system. Unlike BG raids,
+    // BF raids do not preserve the player's original group as a fallback, so an outsider
+    // joining via invite would bypass the queue/team-balance path and end up in a broken
+    // state where Battlefield::AddOrSetPlayerToCorrectBfGroup refuses to add them.
+    if (Group* invitingGroup = invitingPlayer->GetGroup(); invitingGroup && invitingGroup->isBFGroup())
+    {
+        SendPartyResult(PARTY_OP_INVITE, membername, ERR_NOT_LEADER);
+        return;
+    }
+
     Group* group = invitingPlayer->GetGroup();
     if (group && group->isBGGroup())
         group = invitingPlayer->GetOriginalGroup();
