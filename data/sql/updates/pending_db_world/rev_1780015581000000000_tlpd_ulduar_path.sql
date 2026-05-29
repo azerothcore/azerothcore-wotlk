@@ -51,8 +51,8 @@ UPDATE `waypoint_data` SET `smoothTransition` = 1 WHERE `id` = 392110;
 -- ---------------------------------------------------------------------------
 DELETE FROM `creature` WHERE `guid` IN (39211, 39212);
 INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`, `CreateObject`, `Comment`) VALUES
-    (39211, 32491, 0, 0, 571, 67, 0, 1, 511, 0, 8545.776, -1879.3956, 1131.0109, 6.2809854, 2700, 0, 0, 1, 0, 2, 0, 0, 0, '', 58558, 1, NULL),
-    (39212, 32630, 0, 0, 571, 67, 0, 1, 511, 0, 8545.776, -1879.3956, 1131.0109, 6.2809854, 2700, 0, 0, 1, 0, 2, 0, 0, 0, '', 58558, 1, NULL);
+    (39211, 32491, 0, 0, 571, 67, 0, 1, 511, 0, 8545.776, -1879.3956, 1131.0109, 6.2809854, 2700, 0, 0, 1, 0, 2, 0, 0, 0, '', 58558, 1, 'Time-Lost Proto Drake - Path 5 (Ulduar)'),
+    (39212, 32630, 0, 0, 571, 67, 0, 1, 511, 0, 8545.776, -1879.3956, 1131.0109, 6.2809854, 2700, 0, 0, 1, 0, 2, 0, 0, 0, '', 58558, 1, 'Vyragosa - Path 5 (Ulduar)');
 
 -- ---------------------------------------------------------------------------
 -- creature_addon – assign waypoint path for path 5 creatures
@@ -69,11 +69,11 @@ DELETE FROM `pool_template` WHERE `entry` = 32496;
 INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
     (32496, 1, 'Time-Lost Proto Drake / Vyragosa - Path 5 (Ulduar)');
 
-DELETE FROM `pool_creature` WHERE `guid` IN (39211, 39212);
+DELETE FROM `pool_creature` WHERE `pool_entry` = 32496;
 INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES
     (39211, 32496, 10, 'Time-Lost Proto Drake - Path 5 (Ulduar)'),
     (39212, 32496,  0, 'Vyragosa - Path 5 (Ulduar)');
 
-DELETE FROM `pool_pool` WHERE `pool_id` = 32496;
+DELETE FROM `pool_pool` WHERE `pool_id` = 32496 OR `mother_pool` = 32496;
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES
     (32496, 32491, 0, 'Time-Lost Proto Drake / Vyragosa - Path 5 (Ulduar)');
