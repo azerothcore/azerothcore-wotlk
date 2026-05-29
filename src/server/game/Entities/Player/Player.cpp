@@ -13109,8 +13109,8 @@ PartyResult Player::CanUninviteFromGroup(ObjectGuid targetPlayerGUID) const
         if (InBattleground())
             return ERR_INVITE_RESTRICTED;
 
-        // BF raids are owned by the Battlefield system; members must not be kicked
-        // by the synthetic raid leader (would drop their team assignment mid-battle).
+        // BF raids are owned by the Battlefield system; leaders/assistants must not
+        // be able to kick members (would drop their team assignment mid-battle).
         if (grp->isBFGroup())
             return ERR_NOT_LEADER;
     }
