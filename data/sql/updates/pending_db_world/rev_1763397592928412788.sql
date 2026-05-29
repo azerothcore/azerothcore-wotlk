@@ -3392,7 +3392,7 @@ UPDATE `item_template_locale` SET `Name` = 'Zauberfoliant des Dämonenatems', `V
 -- AC datas : OLD Name : "NPC Equip 1250", Name AC enUS : "Grimoire of Detect Lesser Invisibility" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Zauberfoliant der Entdeckung geringer Unsichtbarkeit', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 1250;
 -- AC datas : OLD Name : "Brackwasserarmschienen", Name AC enUS : "Brackwater Bracers" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Deprecated Conjured Mana Gem', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 1255;
+-- UPDATE `item_template_locale` SET `Name` = 'Deprecated Conjured Mana Gem', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 1255;
 -- AC datas : OLD Name : "Fässchen Donnerbräu Lagerbier", Name AC enUS : "Keg of Thunderbrew Lager" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Fässchen Donnerbräu', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 1262;
 -- AC datas : OLD Description : "", Description AC enUS : "This will be a Cooking Tradeskill recipe" ; Wowhead enUS : ""
@@ -3470,7 +3470,7 @@ UPDATE `item_template_locale` SET `Name` = 'Kodex des Schlafs II', `VerifiedBuil
 -- AC datas : OLD Name : "NPC Equip 1681", Name AC enUS : "Grimoire of Cripple" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Zauberfoliant des Verkrüppelns', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 1681;
 -- AC datas : OLD Name : "Das Claymore des Admin Warlord", Name AC enUS : "Admin Warlord's Claymore" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Deprecated Blood Totem', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 1700;
+-- UPDATE `item_template_locale` SET `Name` = 'Deprecated Blood Totem', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 1700;
 -- AC datas : OLD Name : "NPC Equip 1851", Name AC enUS : "Cleansing Water" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Säuberndes Wasser', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 1851;
 -- AC datas : OLD Name : "NPC Equip 1877", Name AC enUS : "Book of Rejuvenation III" ; Wowhead enUS : ""
@@ -3524,7 +3524,7 @@ UPDATE `item_template_locale` SET `Name` = 'Donnerbier', `VerifiedBuild` = 0 WHE
 -- AC datas : OLD Name : "NPC Equip 2688", Name AC enUS : "Squirrel Nut" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Eichhörnchennuss', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 2688;
 -- AC datas : OLD Name : "Sturmwind Würzsalze", Name AC enUS : "Stormwind Seasoning Salts" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'OLD Stormwind Seasoning Salts', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 2693;
+-- UPDATE `item_template_locale` SET `Name` = 'OLD Stormwind Seasoning Salts', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 2693;
 -- AC datas : OLD Name : "NPC Equip 2695", Name AC enUS : "Monster - Mace, Spiked Club" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Monster - Mace, Board with Nail Club', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 2695;
 -- AC datas : OLD Name : "Flasche Pinot Noir", Name AC enUS : "Bottle of Pinot Noir" ; Wowhead enUS : ""
@@ -3566,7 +3566,7 @@ UPDATE `item_template_locale` SET `Name` = 'Langbogen', `VerifiedBuild` = 0 WHER
 -- AC datas : OLD Name : "NPC Equip 3029", Name AC enUS : "Depricated Whipwood Arrow" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Ausgedienter Peitschenholzpfeil', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 3029;
 -- AC datas : OLD Name : "Glyphenverzierte Brustplatte", Name AC enUS : "Glyphed Breastplate" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Deprecated BKP "Impact" Shot', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 3034;
+-- UPDATE `item_template_locale` SET `Name` = 'Deprecated BKP "Impact" Shot', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 3034;
 -- AC datas : OLD Name : "Schwelende Robe", Name AC enUS : "Smoldering Robe" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Glimmende Robe', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 3072;
 -- AC datas : OLD Name : "Schwelende Hose", Name AC enUS : "Smoldering Pants" ; Wowhead enUS : ""
@@ -3656,7 +3656,7 @@ UPDATE `item_template_locale` SET `Name` = 'Zauberfoliant des brennenden Geistes
 -- AC datas : OLD Name : "NPC Equip 3146", Name AC enUS : "Grimoire of Burning Spirit III" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Zauberfoliant des brennenden Geistes III', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 3146;
 -- AC datas : OLD Name : "Arbeitshemd", Name AC enUS : "Work Shirt" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Deprecated Work Shirt', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 3148;
+-- UPDATE `item_template_locale` SET `Name` = 'Deprecated Work Shirt', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 3148;
 -- AC datas : OLD Name : "Spaltbeil", Name AC enUS : "Wood Chopper" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Holzfällerbeil', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 3189;
 -- AC datas : OLD Description : "", Description AC enUS : "An item for testing conjured items" ; Wowhead enUS : ""
@@ -3976,7 +3976,7 @@ UPDATE `item_template_locale` SET `Name` = 'Selbstverschließendes Eisenpapier',
 -- AC datas : OLD Name : "Veränderter Schnappkieferpanzer", Name AC enUS : "Altered Snapjaw Shell" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Veränderte Schnappkieferschale', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 5098;
 -- AC datas : OLD Name : "Rote Maske der Defias", Name AC enUS : "Red Defias Mask" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Deprecated Red Mask', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 5106;
+-- UPDATE `item_template_locale` SET `Name` = 'Deprecated Red Mask', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 5106;
 -- AC datas : OLD Name : "NPC Equip 5126", Name AC enUS : "Knowledge: Defias Disguise" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Wissen: Defiasverkleidung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 5126;
 -- AC datas : OLD Name : "NPC Equip 5127", Name AC enUS : "Knowledge: South Seas Pirate Disguise" ; Wowhead enUS : ""
@@ -4022,7 +4022,7 @@ UPDATE `item_template_locale` SET `Name` = 'Buch der heilenden Berührung V', `V
 -- AC datas : OLD Name : "NPC Equip 5163", Name AC enUS : "Book of Mark of the Wild III" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Buch des Mals der Wildnis III', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 5163;
 -- AC datas : OLD Name : "Sonnenschuppenfeder", Name AC enUS : "Sunscale Feather" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Bluthornfeder', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 5165;
+-- UPDATE `item_template_locale` SET `Name` = 'Bluthornfeder', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 5165;
 -- AC datas : OLD Name : "NPC Equip 5172", Name AC enUS : "Death Capsule" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Todeskapsel', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 5172;
 -- AC datas : OLD Name : "NPC Equip 5174", Name AC enUS : "Note from Neeru" ; Wowhead enUS : ""
@@ -4036,11 +4036,11 @@ UPDATE `item_template_locale` SET `Name` = 'Leerer Manaedelstein', `VerifiedBuil
 -- AC datas : OLD Name : "NPC Equip 5227", Name AC enUS : "Empty Mana Jewel" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Leeres Manajuwel', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 5227;
 -- AC datas : OLD Name : "Handgenähte Lederarmschienen", Name AC enUS : "Handstitched Leather Bracers" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Leerer großer Blutstein', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 5229;
+-- UPDATE `item_template_locale` SET `Name` = 'Leerer großer Blutstein', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 5229;
 -- AC datas : OLD Name : "Seelenstein", Name AC enUS : "Minor Soulstone" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Schwacher Seelenstein', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 5232;
 -- AC datas : OLD Name : "Flammende Pfeile", Name AC enUS : "Flaming Arrows" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Monster - Bow, Red', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 5259;
+-- UPDATE `item_template_locale` SET `Name` = 'Monster - Bow, Red', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 5259;
 -- AC datas : OLD Name : "NPC Equip 5264", Name AC enUS : "Complimentary Beer Token" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Freibiermarke', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 5264;
 -- AC datas : OLD Name : "NPC Equip 5265", Name AC enUS : "Watered-down Beer" ; Wowhead enUS : ""
@@ -4048,7 +4048,7 @@ UPDATE `item_template_locale` SET `Name` = 'Verwässertes Bier', `VerifiedBuild`
 -- AC datas : OLD Name : "Elfen-Kelchrelikt", Name AC enUS : "Elven Cup Relic" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Elfenkelchrelikt', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 5330;
 -- AC datas : OLD Name : "Mathystra-Relikte", Name AC enUS : "Mathystra Relic" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Deprecated Mathystra Relic', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 5333;
+-- UPDATE `item_template_locale` SET `Name` = 'Deprecated Mathystra Relic', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 5333;
 -- AC datas : OLD Name : "Gurt der Tierherrschaft", Name AC enUS : "Beastmaster's Girdle" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Bestienmeistergurt', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 5355;
 -- AC datas : OLD Description : "", Description AC enUS : "The eyes grow brightly on this skull." ; Wowhead enUS : ""
@@ -4070,15 +4070,15 @@ UPDATE `item_template_locale` SET `Name` = 'Bestimmte Rolle', `VerifiedBuild` = 
 -- AC datas : OLD Name : "Orendils Heilung", Name AC enUS : "Orendil's Cure" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Orendils Heilmittel', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 5460;
 -- AC datas : OLD Name : "Schwarzer Überzieher", Name AC enUS : "Black Supe" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Monster - Mace2H, Large Metal (1H, Special)', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 5495;
+-- UPDATE `item_template_locale` SET `Name` = 'Monster - Mace2H, Large Metal (1H, Special)', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 5495;
 -- AC datas : OLD Description : "", Description AC enUS : "A reagent for mage spells." ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Ein Reagenz für Magierzauber.', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 5517;
 -- AC datas : OLD Name : "NPC Equip 5559", Name AC enUS : "Fast Test Thrown" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Zerbrochene Schnelltestwurfwaffe', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 5559;
 -- AC datas : OLD Name : "Die Lage von Ameth'Aran", Name AC enUS : "The Lay of Ameth'Aran" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Voidstone (Deprecated)', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 5562;
+-- UPDATE `item_template_locale` SET `Name` = 'Voidstone (Deprecated)', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 5562;
 -- AC datas : OLD Name : "Der Fall von Ameth'Aran", Name AC enUS : "The Fall of Ameth'Aran" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Succubi Stone (Deprecated)', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 5563;
+-- UPDATE `item_template_locale` SET `Name` = 'Succubi Stone (Deprecated)', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 5563;
 -- AC datas : OLD Name : "NPC Equip 5577", Name AC enUS : "Plans: Rough Bronze Bracers" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Pläne: Raue bronzene Armschienen', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 5577;
 -- AC datas : OLD Name : "Wizbangs Rupfensack", Name AC enUS : "Wizbang's Gunnysack" ; Wowhead enUS : ""
@@ -4576,7 +4576,7 @@ UPDATE `item_template_locale` SET `Name` = 'Foliant des Feuerballs VII', `Verifi
 -- AC datas : OLD Name : "NPC Equip 8837", Name AC enUS : "Tome of Arcane Explosion V" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Foliant der arkanen Explosion V', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 8837;
 -- AC datas : OLD Name : "Abtrünnige Stiefel", Name AC enUS : "Renegade Boots" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Foliant des Manaedelsteinherbeizauberns II', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 8840;
+-- UPDATE `item_template_locale` SET `Name` = 'Foliant des Manaedelsteinherbeizauberns II', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 8840;
 -- AC datas : OLD Name : "NPC Equip 8841", Name AC enUS : "Tome of Fire Blast V" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Foliant des Feuerschlages V', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 8841;
 -- AC datas : OLD Name : "NPC Equip 8842", Name AC enUS : "Tome of Frostbolt VII" ; Wowhead enUS : ""
@@ -5216,7 +5216,7 @@ UPDATE `item_template_locale` SET `Name` = 'Eingetrocknetes Herz', `VerifiedBuil
 -- AC datas : OLD Name : "Robomechanische Gedärme", Name AC enUS : "Robo-mechanical Guts" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Robomechanische Innereien', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 9309;
 -- AC datas : OLD Name : "Wirts drittes Bein", Name AC enUS : "Wirt's Third Leg" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Lampe der Südmeerfreibeuter', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 9359;
+-- UPDATE `item_template_locale` SET `Name` = 'Lampe der Südmeerfreibeuter', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 9359;
 -- AC datas : OLD Name : "NPC Equip 9529", Name AC enUS : "Internal Warrior Equipment Kit L25" ; Wowhead enUS : "",  OLD Description : "", Description AC enUS : "Soft Like Pudding" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Internes Kriegerausstattungsset L25', `Description` = 'Weich wie Pudding', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 9529;
 -- AC datas : OLD Name : "NPC Equip 9532", Name AC enUS : "Internal Warrior Equipment Kit L30" ; Wowhead enUS : "",  OLD Description : "", Description AC enUS : "Made With Love" ; Wowhead enUS : ""
@@ -5246,7 +5246,7 @@ UPDATE `item_template_locale` SET `Name` = 'Bogenschützenbeinkleider', `Verifie
 -- AC datas : OLD Name : "Schulterpolster des Bogenschützen", Name AC enUS : "Archer's Shoulderpads" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Bogenschützenschulterpolster', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 9863;
 -- AC datas : OLD Name : "Elfenbeschützer", Name AC enUS : "Elven Protector" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Deprecated Elven Protector', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 9888;
+-- UPDATE `item_template_locale` SET `Name` = 'Deprecated Elven Protector', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 9888;
 -- AC datas : OLD Name : "Besitznachweis", Name AC enUS : "Proof of Deed" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Beweisurkunde', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 10022;
 -- AC datas : OLD Name : "NPC Equip 10303", Name AC enUS : "Pattern: Stormcloth Pants" ; Wowhead enUS : ""
@@ -5280,7 +5280,7 @@ UPDATE `item_template_locale` SET `Name` = 'Seuchenbefallene Stachelebermähne',
 -- AC datas : OLD Name : "NPC Equip 10651", Name AC enUS : "Cracked Arcane Focusing Crystal" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Gesprungener arkaner Fokussierkristall', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 10651;
 -- AC datas : OLD Name : "Splitter von Afrasa", Name AC enUS : "Shard of Afrasa" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Splitter der Spalthufe', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 10659;
+-- UPDATE `item_template_locale` SET `Name` = 'Splitter der Spalthufe', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 10659;
 -- AC datas : OLD Name : "Explorer''s Knapsack", Name AC enUS : "Explorer's Knapsack" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Forscherknappsack', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 10683;
 -- AC datas : OLD Name : "Blutgerötete Stiefel", Name AC enUS : "Encarmine Boots" ; Wowhead enUS : ""
@@ -5450,7 +5450,7 @@ UPDATE `item_template_locale` SET `Name` = 'Pläne: Blutkralle', `VerifiedBuild`
 -- AC datas : OLD Name : "NPC Equip 12832", Name AC enUS : "Plans: Darkspear" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Pläne: Dunkelspeer', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 12832;
 -- AC datas : OLD Name : "Jadearmschienen", Name AC enUS : "Jade Bracers" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Monster - Item, Book - B02 Black Glowing', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 12866;
+-- UPDATE `item_template_locale` SET `Name` = 'Monster - Item, Book - B02 Black Glowing', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 12866;
 -- AC datas : OLD Description : "", Description AC enUS : "" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Sieht großartig aus. Nicht so füllend.', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 12947;
 -- AC datas : OLD Name : "Wappen der Familie Garrett", Name AC enUS : "Garrett Family Crest" ; Wowhead enUS : ""
@@ -5458,7 +5458,7 @@ UPDATE `item_template_locale` SET `Name` = 'Familienwappen der Garretts', `Verif
 -- AC datas : OLD Description : "Lehrt Euch, wie man dieses Reittier beschwört.", Description AC enUS : "Teaches you how to summon this mount.  This is a very fast mount." ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Lehrt Euch, wie man dieses Reittier beschwört. Das ist ein sehr schnelles Reittier.', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 13086;
 -- AC datas : OLD Name : "Drachenjägertunika", Name AC enUS : "Dragonstalker Tunic" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Deprecated Dragonstalker Tunic', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 13092;
+-- UPDATE `item_template_locale` SET `Name` = 'Deprecated Dragonstalker Tunic', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 13092;
 -- AC datas : OLD Name : "NPC Equip 13149", Name AC enUS : "Eldarathian Tome of Summoning Vol. 1" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Eldarathischer Foliant des Beschwörens Bd. 1', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 13149;
 -- AC datas : OLD Name : "NPC Equip 13151", Name AC enUS : "The Mystic Studies of Hor'ank" ; Wowhead enUS : ""
@@ -5498,7 +5498,7 @@ UPDATE `item_template_locale` SET `Name` = 'Streichelfisch, Tier', `VerifiedBuil
 -- AC datas : OLD Name : "NPC Equip 13343", Name AC enUS : "Pet Stone" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Streichelstein, Tier', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 13343;
 -- AC datas : OLD Name : "Fras Siabis Werbung", Name AC enUS : "Fras Siabi's Advertisement" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Ezra Grimms Werbung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 13364;
+-- UPDATE `item_template_locale` SET `Name` = 'Ezra Grimms Werbung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 13364;
 -- AC datas : OLD Name : "NPC Equip 13500", Name AC enUS : "Recipe: Greater Holy Protection Potion" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Rezept: Großer Heiligschutztrank', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 13500;
 -- AC datas : OLD Name : "NPC Equip 13811", Name AC enUS : "Necklace of the Dawn" ; Wowhead enUS : ""
@@ -5522,7 +5522,7 @@ UPDATE `item_template_locale` SET `Name` = 'Frühling/Sommer-Nacht', `VerifiedBu
 -- AC datas : OLD Name : "Befehl des Obersten Kreuzfahrers", Name AC enUS : "The Grand Crusader's Command" ; Wowhead enUS : "",  OLD Description : "Trägt das Mal des Obersten Kreuzfahrers.", Description AC enUS : "Bears the mark of the Grand Crusader." ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Befehl des obersten Kreuzzüglers', `Description` = 'Trägt das Mal des obersten Kreuzzüglers.', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 13852;
 -- AC datas : OLD Name : "Schleier der Dreadmaster", Name AC enUS : "Dreadmaster's Shroud" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Deprecated Dreadmaster''s Shroud', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 13936;
+-- UPDATE `item_template_locale` SET `Name` = 'Deprecated Dreadmaster''s Shroud', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 13936;
 -- AC datas : OLD Name : "NPC Equip 14382", Name AC enUS : "Durability Chestpiece" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Haltbarkeitsbrustharnisch', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 14382;
 -- AC datas : OLD Name : "NPC Equip 14383", Name AC enUS : "Durability Bracers" ; Wowhead enUS : ""
@@ -5794,7 +5794,7 @@ UPDATE `item_template_locale` SET `Name` = 'Rolle von Celebras', `VerifiedBuild`
 -- AC datas : OLD Name : "NPC Equip 17783", Name AC enUS : "Talisman of Binding Fragment" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Fragment des Talismans des Bindens', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 17783;
 -- AC datas : OLD Name : "Waldpilzkappe", Name AC enUS : "Forest Mushroom Cap" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Monster - Axe, 2H Horde Massive Spiked Blue', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 18002;
+-- UPDATE `item_template_locale` SET `Name` = 'Monster - Axe, 2H Horde Massive Spiked Blue', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 18002;
 -- AC datas : OLD Name : "NPC Equip 18023", Name AC enUS : "Blood Ruby Pendant" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Blutrubin Anhänger', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 18023;
 -- AC datas : OLD Name : "NPC Equip 18155", Name AC enUS : "Blue Moro'gai Gem" ; Wowhead enUS : ""
@@ -5972,7 +5972,7 @@ UPDATE `item_template_locale` SET `Description` = 'Lehrt Euch, wie man den Rapto
 -- AC datas : OLD Description : "Lehrt Euch, wie man Hohepriester Thekals Tiger beschwört.", Description AC enUS : "Teaches you how to summon High Preist Thekal's tiger.  This is a very fast mount." ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Lehrt Euch, wie man Hohepriester Thekals Tiger beschwört. Das ist ein sehr schneller Tiger.', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 19902;
 -- AC datas : OLD Name : "Forors Augenklappe", Name AC enUS : "Foror's Eyepatch" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Echsenschuppenaugenklappe', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 19945;
+-- UPDATE `item_template_locale` SET `Name` = 'Echsenschuppenaugenklappe', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 19945;
 -- AC datas : OLD Name : "NPC Equip 19989", Name AC enUS : "Tome of Devouring Shadows" ; Wowhead enUS : "",  OLD Description : "", Description AC enUS : "Some secrets are best left unknown." ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Foliant der verschlingenden Schatten', `Description` = 'Es gibt Geheimnisse, die sollte man nicht erkunden.', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 19989;
 -- AC datas : OLD Name : "NPC Equip 20024", Name AC enUS : "Putrid Bile Duct" ; Wowhead enUS : ""
@@ -6360,7 +6360,7 @@ UPDATE `item_template_locale` SET `Name` = 'Mondfesteinladung', `VerifiedBuild` 
 -- AC datas : OLD Name : "Geschnittener Opal", Name AC enUS : "Cut Opal" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Geschliffener Opal', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 21773;
 -- AC datas : OLD Name : "Zauberfaden", Name AC enUS : "ZZOLD Spellthread" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'zzDEPRECATED Spellthread', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 21878;
+-- UPDATE `item_template_locale` SET `Name` = 'zzDEPRECATED Spellthread', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 21878;
 -- AC datas : OLD Name : "NPC Equip 21879", Name AC enUS : "NPC Equip 21879" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Aufgeladener Draenethystkristall', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 21879;
 -- AC datas : OLD Name : "NPC Equip 21880", Name AC enUS : "NPC Equip 21880" ; Wowhead enUS : ""
@@ -6398,7 +6398,7 @@ UPDATE `item_template_locale` SET `Description` = 'Lehrt Euch, Zweihandwaffen da
 -- AC datas : OLD Description : "Dieses Schriftstück wurde von den Elementen beschädigt und ist nicht mehr lesbar.", Description AC enUS : "Teaches Prayer of Shadow Protection (Rank 1)." ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Lehrt ''Gebet des Schattenschutzes'' (Rang 1).', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 22393;
 -- AC datas : OLD Name : "Dianas Perlenkette", Name AC enUS : "Diana's Pearl Necklace" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Perlmuttmuschelhalskette', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 22403;
+-- UPDATE `item_template_locale` SET `Name` = 'Perlmuttmuschelhalskette', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 22403;
 -- AC datas : OLD Name : "NPC Equip 22415", Name AC enUS : "NPC Equip 22415" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Drachenfalkenfeder', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 22415;
 -- AC datas : OLD Name : "NPC Equip 22474", Name AC enUS : "NPC Equip 22474" ; Wowhead enUS : ""
@@ -6520,7 +6520,7 @@ UPDATE `item_template_locale` SET `Name` = 'Schienenbeinschützer des Opferberei
 -- AC datas : OLD Name : "NPC Equip 23026", Name AC enUS : "NPC Equip 23026" ; Wowhead enUS : "",  OLD Description : "", Description AC enUS : "" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Versorgungsanfragekristall', `Description` = 'Der Kristall leuchtet und zeigt eine in ihm enthaltene Liste von Notfallvorräten an.', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 23026;
 -- AC datas : OLD Name : "Gleve des Verteidigers", Name AC enUS : "Glaive of the Defender" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Monster - Bogen, Schlachtzug Schlange ZG', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 23051;
+-- UPDATE `item_template_locale` SET `Name` = 'Monster - Bogen, Schlachtzug Schlange ZG', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 23051;
 -- AC datas : OLD Name : "NPC Equip 23052", Name AC enUS : "NPC Equip 23052" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Monster - Armbrust, Verziert', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 23052;
 -- AC datas : OLD Name : "Hammer des Wirbelnden Nethers", Name AC enUS : "Hammer of the Twisting Nether" ; Wowhead enUS : ""
@@ -6536,7 +6536,7 @@ UPDATE `item_template_locale` SET `Name` = 'Gediegener Aquamarin', `VerifiedBuil
 -- AC datas : OLD Name : "NPC Equip 23159", Name AC enUS : "NPC Equip 23159" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Funkelnder Aquamarin', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 23159;
 -- AC datas : OLD Name : "Forors Kiste der endlosen Widerstandsausstattung", Name AC enUS : "Foror's Crate of Endless Resist Gear Storage" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Ein sehr großer Beutel', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 23162;
+-- UPDATE `item_template_locale` SET `Name` = 'Ein sehr großer Beutel', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 23162;
 -- AC datas : OLD Name : "NPC Equip 23163", Name AC enUS : "Performer's Wand" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Zauberstab des Darstellers', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 23163;
 -- AC datas : OLD Name : "NPC Equip 23164", Name AC enUS : "Bubbly Beverage" ; Wowhead enUS : ""
@@ -6898,7 +6898,7 @@ UPDATE `item_template_locale` SET `Name` = 'Monster - Gun, Draenei A01 Orange', 
 -- AC datas : OLD Description : "Es scheint vor psychischer Kraft zu summen.", Description AC enUS : "Ok, this is disgusting!" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Ok, das ist ekelhaft!', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 24248;
 -- AC datas : OLD Name : "Runenfaden", Name AC enUS : "Rune Thread" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'zzDEPRECATED Greater Spellthread', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 24288;
+-- UPDATE `item_template_locale` SET `Name` = 'zzDEPRECATED Greater Spellthread', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 24288;
 -- AC datas : OLD Name : "NPC Equip 24319", Name AC enUS : "NPC Equip 24319" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Monster - Bow, Blood Elf B01 Blue', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 24319;
 -- AC datas : OLD Name : "NPC Equip 24320", Name AC enUS : "NPC Equip 24320" ; Wowhead enUS : ""
@@ -8972,7 +8972,7 @@ UPDATE `item_template_locale` SET `Name` = '68 TEST Green Shaman Head', `Verifie
 -- AC datas : OLD Name : "NPC Equip 27001", Name AC enUS : "NPC Equip 27001" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = '68 TEST Green Shaman Legs', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 27001;
 -- AC datas : OLD Name : "Spojka's schwarzes Hemd", Name AC enUS : "Spojka Black Shirt" ; Wowhead enUS : "",  OLD Description : "Spojka 4ever", Description AC enUS : "Spojka 4ever" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = '68 TEST Green Shaman Shoulder', `Description` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 27002;
+-- UPDATE `item_template_locale` SET `Name` = '68 TEST Green Shaman Shoulder', `Description` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 27002;
 -- AC datas : OLD Name : "NPC Equip 27003", Name AC enUS : "NPC Equip 27003" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = '68 TEST Green Shaman Wrist', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 27003;
 -- AC datas : OLD Name : "NPC Equip 27004", Name AC enUS : "NPC Equip 27004" ; Wowhead enUS : ""
@@ -8982,7 +8982,7 @@ UPDATE `item_template_locale` SET `Name` = '69 TEST Green Shaman Boot', `Verifie
 -- AC datas : OLD Name : "NPC Equip 27006", Name AC enUS : "NPC Equip 27006" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = '69 TEST Green Shaman Chest', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 27006;
 -- AC datas : OLD Name : "Spojka's reiches lila Hemd", Name AC enUS : "Spojka Rich Purple Shirt" ; Wowhead enUS : "",  OLD Description : "Spojka 4ever", Description AC enUS : "Spojka 4ever" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = '69 TEST Green Shaman Hand', `Description` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 27007;
+-- UPDATE `item_template_locale` SET `Name` = '69 TEST Green Shaman Hand', `Description` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 27007;
 -- AC datas : OLD Name : "NPC Equip 27008", Name AC enUS : "NPC Equip 27008" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = '69 TEST Green Shaman Head', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 27008;
 -- AC datas : OLD Name : "NPC Equip 27009", Name AC enUS : "NPC Equip 27009" ; Wowhead enUS : ""
@@ -11146,7 +11146,7 @@ UPDATE `item_template_locale` SET `Name` = 'Waldläuferumhang des ewigen Hains',
 -- AC datas : OLD Name : "NPC Equip 31801", Name AC enUS : "NPC Equip 31801" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Monster - Staff, Zul''Gurub 03', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 31801;
 -- AC datas : OLD Name : "Fleischlingssimulationsstab", Name AC enUS : "Fleshling Simulation Staff" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Monster - Claw, ZulGurub 02', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 31802;
+-- UPDATE `item_template_locale` SET `Name` = 'Monster - Claw, ZulGurub 02', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 31802;
 -- AC datas : OLD Name : "NPC Equip 31803", Name AC enUS : "NPC Equip 31803" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Monster - Claw, ZulGurub 02 Offhand', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 31803;
 -- AC datas : OLD Name : "NPC Equip 31805", Name AC enUS : "NPC Equip 31805" ; Wowhead enUS : ""
@@ -11480,7 +11480,7 @@ UPDATE `item_template_locale` SET `Name` = 'Versteckte Testaugen', `VerifiedBuil
 -- AC datas : OLD Name : "NPC Equip 33075", Name AC enUS : "NPC Equip 33075" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Versteckte Testnase und Testohren', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 33075;
 -- AC datas : OLD Name : "Elixier der Wasserelementare", Name AC enUS : "Elixir of Water Elementals" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Monster - Gun - Outland Raid D04', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 33080;
+-- UPDATE `item_template_locale` SET `Name` = 'Monster - Gun - Outland Raid D04', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 33080;
 -- AC datas : OLD Name : "Essenz eines schwarzen Drachkin", Name AC enUS : "Black Dragonkin Essence" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Essenz eines schwarzen Drachkins', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 33087;
 -- AC datas : OLD Name : "NPC Equip 33094", Name AC enUS : "NPC Equip 33094" ; Wowhead enUS : ""
@@ -12508,7 +12508,7 @@ UPDATE `item_template_locale` SET `Name` = 'Monster - Bow, 7th Legion Sentinel',
 -- AC datas : OLD Name : "NPC Equip 37266", Name AC enUS : "NPC Equip 37266" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Monster - Wand, Stratholme D02', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 37266;
 -- AC datas : OLD Name : "Kehls Hausanzug", Name AC enUS : "Gorge's Loungewear" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Grek''lor''s Loungewear', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 37276;
+-- UPDATE `item_template_locale` SET `Name` = 'Grek''lor''s Loungewear', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 37276;
 -- AC datas : OLD Name : "NPC Equip 37308", Name AC enUS : "NPC Equip 37308" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Monster - Sword2H, Northrend D03', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 37308;
 -- AC datas : OLD Name : "NPC Equip 37309", Name AC enUS : "NPC Equip 37309" ; Wowhead enUS : ""
@@ -12568,7 +12568,7 @@ UPDATE `item_template_locale` SET `Name` = 'Ringbesetzter Handgelenksschutz', `V
 -- AC datas : OLD Description : "Funktioniert nur in der Boreanischen Tundra, im Heulenden Fjord und in der Drachenöde.", Description AC enUS : "Only works in Borean Tundra, Howling Fjord, and Dragonblight." ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Funktioniert nur in der boreanischen Tundra, im heulenden Fjord und in der Drachenöde.', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 37464;
 -- AC datas : OLD Name : "Kehls Brustplatte des Blutfurors", Name AC enUS : "Gorge's Breastplate of Bloodrage" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Grek''lor''s Breastplate of Bloodrage', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 37476;
+-- UPDATE `item_template_locale` SET `Name` = 'Grek''lor''s Breastplate of Bloodrage', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 37476;
 -- AC datas : OLD Name : "NPC Equip 37531", Name AC enUS : "NPC Equip 37531" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Reif des eisigen Windstoßes', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 37531;
 -- AC datas : OLD Name : "NPC Equip 37532", Name AC enUS : "NPC Equip 37532" ; Wowhead enUS : ""
@@ -15724,7 +15724,7 @@ UPDATE `item_template_locale` SET `Name` = 'zzOLD Empty Brewfest Sampler', `Veri
 -- AC datas : OLD Name : "Wirklich hartes Braufestbrot", Name AC enUS : "Really Tough Brewfest Bread" ; Wowhead enUS : "",  OLD Description : "Nicht genießbar, aber ein praktisches Hilfsmittel zur Verteidigung Eures Getränks.", Description AC enUS : "Not edilble,but a handy tool for defending your drink." ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Wirklich zähes Braufestbrot', `Description` = 'Nicht essbar, aber eine gute Waffe, um Euer Getränk zu verteidigen.', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 33063;
 -- AC datas : OLD Name : "Omars Juwel von POWAH", Name AC enUS : "Omar's Gem of POWAH" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Omar''s Test Item', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 34835;
+-- UPDATE `item_template_locale` SET `Name` = 'Omar''s Test Item', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 34835;
 
 -- Update existing entries, from CLASSIC
 -- AC datas : OLD Name : "NPC Equip 1002", Name AC enUS : "Tome of Lesser Invisibility" ; Wowhead enUS : ""
@@ -16302,9 +16302,9 @@ UPDATE `item_template_locale` SET `Name` = 'Test-Verteidigungsring +120', `Verif
 -- AC datas : OLD Name : "NPC Equip 23418", Name AC enUS : "Test Sapper Charge" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Testpioniersprengladung', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 23418;
 -- AC datas : OLD Name : "Gediegener Himmelssaphir", Name AC enUS : "Solid Sky Sapphire (Unused)" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Solid Sky Sapphire', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 37430;
+-- UPDATE `item_template_locale` SET `Name` = 'Solid Sky Sapphire', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 37430;
 -- AC datas : OLD Name : "Marcus' Spezialmünze", Name AC enUS : "Marcus's Special Coin [PH]" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Marcus'' Special Coin [PH]', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 43003;
+-- UPDATE `item_template_locale` SET `Name` = 'Marcus'' Special Coin [PH]', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 43003;
 
 -- Update existing entries, from MOP
 -- AC datas : OLD Description : "Euer offizielles "Ich war in der Jaspismine, und alles, was ich dafür bekommen habe, war dieses lausige T-Shirt"-T-Shirt", Description AC enUS : "Your official "I went to the Jasperlode Mine and all I got was this lousy shirt" T-shirt" ; Wowhead enUS : ""
