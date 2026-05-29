@@ -407,6 +407,14 @@ void Battlefield::EndBattle(bool endByTimer)
     OnBattleEnd(endByTimer);
     sScriptMgr->OnBattlefieldWarEnd(this, endByTimer);
 
+    for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
+    {
+        for (ObjectGuid const& guid : Groups[team])
+            if (Group* group = sGroupMgr->GetGroupByGUID(guid.GetCounter()))
+                group->Disband();
+        Groups[team].clear();
+    }
+
     // Reset battlefield timer
     Timer = NoWarBattleTime;
     SendInitWorldStatesToAll();
