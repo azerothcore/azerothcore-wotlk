@@ -10462,7 +10462,7 @@ UPDATE `item_template_locale` SET `Name` = 'Raptorblutfeder', `VerifiedBuild` = 
 -- AC datas : OLD Name : "Ein Gnomenbildnis", Name AC enUS : "A Gnome Effigy" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Gnomenbildnis', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 29570;
 -- AC datas : OLD Name : "Ein schlüpfriger Romantikschmöker", Name AC enUS : "A Steamy Romance Novel" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Kitschiger Dreikupferroman', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 29571;
+-- UPDATE `item_template_locale` SET `Name` = 'Kitschiger Dreikupferroman', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 29571;
 -- AC datas : OLD Name : "NPC Equip 29585", Name AC enUS : "NPC Equip 29585" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Legionspeitsche', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 29585;
 -- AC datas : OLD Name : "Lamellenkopfschutz des Feldherrn", Name AC enUS : "Champion's Lamellar Headguard" ; Wowhead enUS : ""
@@ -14638,7 +14638,7 @@ UPDATE `item_template_locale` SET `Name` = 'Monster - Staff, Icecrown Citadel (W
 -- AC datas : OLD Name : "NPC Equip 50249", Name AC enUS : "NPC Equip 50249" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Monster - Sword, 1H IcecrownRaid D04 Black', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 50249;
 -- AC datas : OLD Name : "Große Liebesrakete", Name AC enUS : "Big Love Rocket" ; Wowhead enUS : "",  OLD Description : "Lehrt Euch, wie man dieses Reittier beschwört. Dieses Reittier passt sich Eurer Reitfertigkeit und Eurem Aufenthaltsort an.", Description AC enUS : "Teaches you how to summon this mount" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Herzbrecher X-45', `Description` = 'Lehrt Euch, wie man dieses Reittier beschwört.', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 50250;
+-- UPDATE `item_template_locale` SET `Name` = 'Herzbrecher X-45', `Description` = 'Lehrt Euch, wie man dieses Reittier beschwört.', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 50250;
 -- AC datas : OLD Name : "NPC Equip 50251", Name AC enUS : "NPC Equip 50251" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Shadow''s Edge One-Hander', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 50251;
 -- AC datas : OLD Name : "NPC Equip 50252", Name AC enUS : "NPC Equip 50252" ; Wowhead enUS : ""
