@@ -479,11 +479,16 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
         }
     }
 
+    bool const grantEssenceToAttackers = sWorld->getBoolConfig(CONFIG_WINTERGRASP_ESSENCE_BOTH_FACTIONS);
+
     for (ObjectGuid const& guid : PlayersInWar[GetAttackerTeam()])
         if (Player* player = ObjectAccessor::FindPlayer(guid))
         {
             player->CastSpell(player, SPELL_DEFEAT_REWARD, true);
             RemoveAurasFromPlayer(player);
+
+            if (grantEssenceToAttackers)
+                player->CastSpell(player, SPELL_ESSENCE_OF_WINTERGRASP, true);
 
             for (uint8 i = 0; i < damagedTowersAtt; ++i)
                 player->CastSpell(player, spellDamagedAtt, true);

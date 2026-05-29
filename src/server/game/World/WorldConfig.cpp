@@ -596,6 +596,7 @@ void WorldConfig::BuildConfigCache()
 
     SetConfigValue<uint32>(CONFIG_WINTERGRASP_SKIP_BATTLE_SESSION_COUNT, "Wintergrasp.SkipBattleSessionCount", 3500);
     SetConfigValue<bool>(CONFIG_WINTERGRASP_KICK_VOA_PLAYERS, "Wintergrasp.KickVoAPlayers", true, ConfigValueCache::Reloadable::No);
+    SetConfigValue<bool>(CONFIG_WINTERGRASP_ESSENCE_BOTH_FACTIONS, "Wintergrasp.EssenceBothFactions", false);
 
     SetConfigValue<uint32>(CONFIG_BIRTHDAY_TIME, "BirthdayTime", 1222964635);
     SetConfigValue<bool>(CONFIG_MINIGOB_MANABONK, "Minigob.Manabonk.Enable", true);
