@@ -6142,7 +6142,7 @@ UPDATE `item_template_locale` SET `Name` = '魔化瓶', `VerifiedBuild` = 0 WHER
 -- AC datas : OLD Description : "教你学会召唤这种小伙伴。", Description AC enUS : "Teaches you how to summon this companion." ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = '​教你学会召唤这种小伙伴。', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `ID` = 40653;
 -- AC datas : OLD Name : "侏儒重力井", Name AC enUS : "Gnomish Gravity Well" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = '单兵弹射座椅', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `ID` = 40727;
+-- UPDATE `item_template_locale` SET `Name` = '单兵弹射座椅', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `ID` = 40727;
 -- AC datas : OLD Description : "包括微调器、扳手、燧石与火绒、铁匠锤、矿工锄和剥皮刀等组件。", Description AC enUS : "Includes Gyromatic Micro-Adjuster, Arclight Spanner, Flint and Tinder, Blacksmithing Hammer, Mining Pick, and a Skinning Knife." ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = '包括微调器、扳手、燧石与火绒、锻造锤、矿工锄和剥皮刀等组件。', `VerifiedBuild` = 0 WHERE `locale` = 'zhCN' AND `ID` = 40772;
 -- AC datas : OLD Description : "教你学会召唤这种坐骑。这是一种飞行坐骑。", Description AC enUS : "Speed scales to riding skill." ; Wowhead enUS : ""
