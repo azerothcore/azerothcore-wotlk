@@ -13354,7 +13354,7 @@ UPDATE `item_template_locale` SET `Name` = 'LK ARENA TEST PRIEST BRACERS 252', `
 -- AC datas : OLD Name : "NPC Equip 40677", Name AC enUS : "NPC Equip 40677" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Listiger Trank', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 40677;
 -- AC datas : OLD Name : "Gnomischer Gravitationsbrunnen", Name AC enUS : "Gnomish Gravity Well" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Persönlicher Schleudersitz', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 40727;
+-- UPDATE `item_template_locale` SET `Name` = 'Persönlicher Schleudersitz', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 40727;
 -- AC datas : OLD Name : "NPC Equip 40729", Name AC enUS : "NPC Equip 40729" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Monster - Spear, Badass Blue (Poisoned)', `VerifiedBuild` = 0 WHERE `locale` = 'deDE' AND `ID` = 40729;
 -- AC datas : OLD Name : "NPC Equip 40759", Name AC enUS : "NPC Equip 40759" ; Wowhead enUS : ""
