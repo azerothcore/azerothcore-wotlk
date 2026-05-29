@@ -1101,7 +1101,9 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
                     return false;
 
                 Battlefield* Bf = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
-                if (!Bf || player->GetTeamId() != Bf->GetDefenderTeam() || Bf->IsWarTime())
+                if (!Bf || Bf->IsWarTime())
+                    return false;
+                if (!sWorld->getBoolConfig(CONFIG_WINTERGRASP_ESSENCE_BOTH_FACTIONS) && player->GetTeamId() != Bf->GetDefenderTeam())
                     return false;
                 break;
             }
