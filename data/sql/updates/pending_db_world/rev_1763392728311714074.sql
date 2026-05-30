@@ -714,7 +714,7 @@ UPDATE `item_template_locale` SET `Name` = 'Noeud en tissu râpé', `VerifiedBui
 -- AC datas : OLD Name : "Recette : Elixir de force d'ogre", Name AC enUS : "Recipe: Elixir of Ogre's Strength" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Recette : Elixir de force d''ogre', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 6211;
 -- AC datas : OLD Name : "[Monster] - Item, Flowers  - Bouquet Roses", Name AC enUS : "Monster - Item, Flowers  - Bouquet Roses" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Monster - Item, Flowers - Boquet Roses', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 6232;
+-- UPDATE `item_template_locale` SET `Name` = 'Monster - Item, Flowers - Boquet Roses', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 6232;
 -- AC datas : OLD Name : "Eclat d'âme", Name AC enUS : "Soul Shard" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Fragment d''âme', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 6265;
 -- AC datas : OLD Name : "Patron : Gilet bleu en lin", Name AC enUS : "Pattern: Blue Linen Vest" ; Wowhead enUS : ""
@@ -2252,7 +2252,7 @@ UPDATE `item_template_locale` SET `Name` = 'Patron : Mantelet Coeur-de-braise', 
 -- AC datas : OLD Name : "Patron : Gants Cœur-de-braise", Name AC enUS : "Pattern: Flarecore Gloves" ; Wowhead enUS : "",  OLD Description : "Vous apprend à coudre des Gants Cœur-de-braise.", Description AC enUS : "Teaches you how to sew Flarecore Gloves." ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Patron : Gants Coeur-de-braise', `Description` = 'Vous apprend à coudre des Gants Coeur-de-braise.', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 17018;
 -- AC datas : OLD Name : "[VIEUX] Poussière arcanique", Name AC enUS : "Arcane Dust" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Poussière des arcanes', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 17019;
+-- UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Poussière des arcanes', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 17019;
 -- AC datas : OLD Name : "Poudre des Arcanes", Name AC enUS : "Arcane Powder" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Poudre des arcanes', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 17020;
 -- AC datas : OLD Name : "Patron : Bottes du Magma", Name AC enUS : "Pattern: Corehound Boots" ; Wowhead enUS : ""
@@ -4246,37 +4246,37 @@ UPDATE `item_template_locale` SET `Name` = 'Haubert festonné de champignons de 
 -- AC datas : OLD Name : "Brassards festonnés de champignons de Jessera", Name AC enUS : "Jessera's Fungus Lined Bracers" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Brassards festonnés de champignons de Maatparm', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 26040;
 -- AC datas : OLD Name : "[Test] 59 Vert Voleur Jambes", Name AC enUS : "59 TEST Green Rogue Legs" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = '59 Test Vert Voleur Jambes', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 26173;
+-- UPDATE `item_template_locale` SET `Name` = '59 Test Vert Voleur Jambes', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 26173;
 -- AC datas : OLD Name : "[Test] 59 Vert Voleur Epaules", Name AC enUS : "59 TEST Green Rogue Shoulder" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = '59 Test Vert Voleur Epaules', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 26174;
+-- UPDATE `item_template_locale` SET `Name` = '59 Test Vert Voleur Epaules', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 26174;
 -- AC datas : OLD Name : "[Test] 59 Vert Voleur Poignets", Name AC enUS : "59 TEST Green Rogue Wrist" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = '59 Test Vert Voleur Poignets', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 26175;
+-- UPDATE `item_template_locale` SET `Name` = '59 Test Vert Voleur Poignets', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 26175;
 -- AC datas : OLD Name : "[Test] 60 Vert Voleur Tête", Name AC enUS : "60 TEST Green Rogue Head" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = '60 Test Vert Voleur Tête', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 26180;
+-- UPDATE `item_template_locale` SET `Name` = '60 Test Vert Voleur Tête', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 26180;
 -- AC datas : OLD Name : "[Test] 67 Vert Voleur Main", Name AC enUS : "67 TEST Green Rogue Hand" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = '67 Test Vert Voleur Main', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 26235;
+-- UPDATE `item_template_locale` SET `Name` = '67 Test Vert Voleur Main', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 26235;
 -- AC datas : OLD Name : "[Test] 64 Vert Chasseur Tête", Name AC enUS : "64 TEST Green Hunter Head" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = '64 Test Vert Chasseur Tête', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 26324;
+-- UPDATE `item_template_locale` SET `Name` = '64 Test Vert Chasseur Tête', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 26324;
 -- AC datas : OLD Name : "[Test] 70 Vert Chasseur Ceinture", Name AC enUS : "70 TEST Green Hunter Belt" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = '70 Test Vert Chasseur Ceinture', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 26368;
+-- UPDATE `item_template_locale` SET `Name` = '70 Test Vert Chasseur Ceinture', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 26368;
 -- AC datas : OLD Name : "[Test] 70 Vert Chasseur Tête", Name AC enUS : "70 TEST Green Hunter Head" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = '70 Test Vert Chasseur Tête', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 26372;
+-- UPDATE `item_template_locale` SET `Name` = '70 Test Vert Chasseur Tête', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 26372;
 -- AC datas : OLD Name : "[Test] 68 Vert Guerrier Ceinture", Name AC enUS : "68 TEST Green Warrior Belt" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = '68 Test Vert Guerrier Ceinture', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 26464;
+-- UPDATE `item_template_locale` SET `Name` = '68 Test Vert Guerrier Ceinture', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 26464;
 -- AC datas : OLD Name : "[Test] 68 Vert Guerrier Bottes", Name AC enUS : "68 TEST Green Warrior Boot" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = '68 Test Vert Guerrier Bottes', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 26465;
+-- UPDATE `item_template_locale` SET `Name` = '68 Test Vert Guerrier Bottes', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 26465;
 -- AC datas : OLD Name : "[Test] 61 Vert Bouclier", Name AC enUS : "61 TEST Green Shield" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = '61 Test Vert Bouclier', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 26548;
+-- UPDATE `item_template_locale` SET `Name` = '61 Test Vert Bouclier', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 26548;
 -- AC datas : OLD Name : "[Test] 70 Vert Bâton", Name AC enUS : "70 TEST Green Staff" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = '70 Test Vert Bâton', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 26655;
+-- UPDATE `item_template_locale` SET `Name` = '70 Test Vert Bâton', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 26655;
 -- AC datas : OLD Name : "[Test] 69 Vert Arbalète", Name AC enUS : "69 TEST Green Crossbow" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = '69 Test Vert Arbalète', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 26738;
+-- UPDATE `item_template_locale` SET `Name` = '69 Test Vert Arbalète', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 26738;
 -- AC datas : OLD Name : "[Test] 67 Vert Soigneur Masse", Name AC enUS : "67 TEST Green Healer Mace" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = '67 Test Vert Soigneur Masse', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 26792;
+-- UPDATE `item_template_locale` SET `Name` = '67 Test Vert Soigneur Masse', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 26792;
 -- AC datas : OLD Name : "[Test] 65 Vert Druide/Guerrier Cape", Name AC enUS : "65 TEST Green Druid/Warrior Cloak" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = '65 Test Vert Druide/Guerrier Cape', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 27196;
+-- UPDATE `item_template_locale` SET `Name` = '65 Test Vert Druide/Guerrier Cape', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 27196;
 -- AC datas : OLD Name : "[Test] 59 Vert Druide/Guerrier Collier", Name AC enUS : "59 TEST Green Druid/Warrior Necklace" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = '59 Test Vert Druide/Guerrier Collier', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 27218;
+-- UPDATE `item_template_locale` SET `Name` = '59 Test Vert Druide/Guerrier Collier', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 27218;
 -- AC datas : OLD Name : "Coiffure cœur-de-corbeau", Name AC enUS : "Raven-Heart Headdress" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Coiffure coeur-de-corbeau', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 27409;
 -- AC datas : OLD Name : "Kilt d'ombre foudreguerre", Name AC enUS : "Stormreaver Shadow-Kilt" ; Wowhead enUS : ""
@@ -4338,13 +4338,13 @@ UPDATE `item_template_locale` SET `Name` = 'Recette : Ecrevisse épicée', `Veri
 -- AC datas : OLD Name : "Casque lamellaire de gladiateur", Name AC enUS : "Gladiator's Lamellar Helm" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Heaume lamellaire de gladiateur', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 27704;
 -- AC datas : OLD Name : "Grenat sanguin puissant", Name AC enUS : "zzOLDMighty Blood Garnet" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Grenat sanguin puissant', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 27774;
+-- UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Grenat sanguin puissant', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 27774;
 -- AC datas : OLD Name : "Gants brassecœur", Name AC enUS : "Fathomheart Gauntlets" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Gants brassecoeur', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 27806;
 -- AC datas : OLD Description : "Congelé !", Description AC enUS : "Frozen solid!" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Congelé !', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 27807;
 -- AC datas : OLD Name : "Grenat sanguin puissant", Name AC enUS : "zzOLDMighty Blood Garnet" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Grenat sanguin puissant', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 27811;
+-- UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Grenat sanguin puissant', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 27811;
 -- AC datas : OLD Description : "Aucun de ces objets ne vous semble familier. Mais que prépare donc Lathrai ?", Description AC enUS : "None of this stuff looks familiar to you.  Just what is Lathrai up to?" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Aucun de ces objets ne vous semble familier. Mais que prépare donc Lathrai ?', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 27861;
 -- AC datas : OLD Name : "Bryanite onéreuse", Name AC enUS : "Extended Cost Bryanite" ; Wowhead enUS : ""
@@ -4376,9 +4376,9 @@ UPDATE `item_template_locale` SET `Description` = 'Fabriquée par : Garvin le Go
 -- AC datas : OLD Name : "Ordres du maître de manœuvre Zurok", Name AC enUS : "Drillmaster Zurok's Orders" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Ordres du maître de manoeuvre Zurok', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 28099;
 -- AC datas : OLD Name : "Rubis orné soutenu", Name AC enUS : "zzOLDBold Ornate Ruby" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Rubis orné soutenu', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 28117;
+-- UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Rubis orné soutenu', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 28117;
 -- AC datas : OLD Name : "Topaze ornée gravée", Name AC enUS : "zzOLDEnscribed Ornate Topaz" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Topaze ornée gravée', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 28122;
+-- UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Topaze ornée gravée', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 28122;
 -- AC datas : OLD Name : "Garde-poignets de maître-espionne", Name AC enUS : "Spymistress's Wristguards" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Garde-poignets de maître espionne', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 28171;
 -- AC datas : OLD Name : "Bottes de maître-espionne", Name AC enUS : "Spymistress's Boots" ; Wowhead enUS : ""
@@ -4420,9 +4420,9 @@ UPDATE `item_template_locale` SET `Name` = 'Epine de Brise-dimension', `Verified
 -- AC datas : OLD Description : "Vous vous demandez si ce n'est pas dangereux de le manipuler pendant qu'il brille encore ?", Description AC enUS : "You wonder if it's safe to handle these while they're still glowing?" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Vous vous demandez si ce n''est pas dangereux de le manipuler pendant qu''il brille encore ?', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 28364;
 -- AC datas : OLD Name : "[Test] TCHILTON RUBIS", Name AC enUS : "TCHILTON TEST RUBY" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'TCHILTON TEST RUBIS', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 28388;
+-- UPDATE `item_template_locale` SET `Name` = 'TCHILTON TEST RUBIS', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 28388;
 -- AC datas : OLD Name : "[Test] TCHILTON PIERRE D'AUBE", Name AC enUS : "TCHILTON TEST DAWNSTONE" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'TCHILTON TEST PIERRE D''AUBE', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 28389;
+-- UPDATE `item_template_locale` SET `Name` = 'TCHILTON TEST PIERRE D''AUBE', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 28389;
 -- AC datas : OLD Description : "La substance qui goutte à l'extrémité de l'aiguillon fait un trou... dans le sol !", Description AC enUS : "The stuff dripping out of the tip burns a hole... in the ground!" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'La substance qui goutte à l''extrémité de l''aiguillon fait un trou... dans le sol !', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 28417;
 -- AC datas : OLD Name : "Lame Cœur-de-lion", Name AC enUS : "Lionheart Blade" ; Wowhead enUS : ""
@@ -4520,7 +4520,7 @@ UPDATE `item_template_locale` SET `Description` = 'Vous apprend à invoquer cett
 -- AC datas : OLD Description : "Vous apprend à invoquer cette monture.", Description AC enUS : "Teaches you how to summon this mount.  This is a very fast mount." ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Vous apprend à invoquer cette monture. C''est une monture très rapide.', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 29224;
 -- AC datas : OLD Name : "[VIEUX]Faucon de guerre rapide", Name AC enUS : "zzoldSwift Warstrider" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Faucon de guerre rapide', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 29225;
+-- UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Faucon de guerre rapide', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 29225;
 -- AC datas : OLD Description : "Vous apprend à invoquer cette monture.", Description AC enUS : "Teaches you how to summon this mount.  This is a very fast mount." ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Vous apprend à invoquer cette monture. C''est une monture très rapide.', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 29227;
 -- AC datas : OLD Description : "Vous apprend à invoquer cette monture.", Description AC enUS : "Teaches you how to summon this mount.  This is a very fast mount." ; Wowhead enUS : ""
@@ -4680,7 +4680,7 @@ UPDATE `item_template_locale` SET `Name` = 'Mauvais oeil', `VerifiedBuild` = 0 W
 -- AC datas : OLD Description : "Fais de beaux rêves, bubuk !", Description AC enUS : "Sweet dreams, bucky!" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Fais de beaux rêves, bubuk !', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 29817;
 -- AC datas : OLD Name : "[Test] Voleur 150 Epique  Dague 1800", Name AC enUS : "Rogue 150 Epic Test Dagger 1800" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Voleur 150 Epique Test Dague 1800', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 29828;
+-- UPDATE `item_template_locale` SET `Name` = 'Voleur 150 Epique Test Dague 1800', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 29828;
 -- AC datas : OLD Description : "Vous apprend à invoquer cette mascotte.", Description AC enUS : "Teaches you how to summon this companion." ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Vous apprend à invoquer ce compagnon.', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 29901;
 -- AC datas : OLD Description : "Vous apprend à invoquer cette mascotte.", Description AC enUS : "Teaches you how to summon this companion." ; Wowhead enUS : ""
@@ -5144,7 +5144,7 @@ UPDATE `item_template_locale` SET `Description` = 'Un avertissement est écrit s
 -- AC datas : OLD Description : "Lunettes Cul-de-bouteille garanties par Belbi Coupecircuit : Elles rendent TOUT LE MONDE séduisant !", Description AC enUS : "Guaranteed by Belbi Quikswitch to make EVERYONE look attractive!" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Lunettes Cul-de-bouteille garanties par Belbi Coupecircuit : Elles rendent TOUT LE MONDE séduisant !', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 33047;
 -- AC datas : OLD Name : "[Test] Gemme liée", Name AC enUS : "Soulbound Test Gem" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Gemme de test liée', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 33060;
+-- UPDATE `item_template_locale` SET `Name` = 'Gemme de test liée', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 33060;
 -- AC datas : OLD Name : "Armes de Sabot-Noir", Name AC enUS : "Blackhoof Armaments" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Armes de Sabot-noir', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 33071;
 -- AC datas : OLD Description : "De l'ammoniac, de l'acide urique, phosphorique, oxalique et carbonique. Rien que du bon !", Description AC enUS : "Ammonia, uric, phosphoric, oxalic, and carbonic acids.  Mmm, all the good stuff!" ; Wowhead enUS : ""
@@ -5354,7 +5354,7 @@ UPDATE `item_template_locale` SET `Name` = 'Patron : Tambours de restauration', 
 -- AC datas : OLD Name : "Crâne de dragon", Name AC enUS : "Dragon Skull" ; Wowhead enUS : ""
 -- UPDATE `item_template_locale` SET `Name` = 'Test Crâne de dragon', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 34187;
 -- AC datas : OLD Name : "[Test] Objet armure", Name AC enUS : "Armor Test Item" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Objet de test armure', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 34219;
+-- UPDATE `item_template_locale` SET `Name` = 'Objet de test armure', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 34219;
 -- AC datas : OLD Name : "Dessin : Diamant brûleciel chaotique", Name AC enUS : "Design: Chaotic Skyfire Diamond" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Dessin : Diamant brûleciel chaotique', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 34221;
 -- AC datas : OLD Description : "Une inscription sur le côté de la tabatière vide indique : Propriété de Harry « Lune-d'argent ».", Description AC enUS : "An inscription on the side of the empty snuff tin reads: Property of "Silvermoon" Harry." ; Wowhead enUS : ""
@@ -5466,7 +5466,7 @@ UPDATE `item_template_locale` SET `Description` = 'Vous apprend à invoquer ce c
 -- AC datas : OLD Name : "Cœur élémentaire", Name AC enUS : "Elemental Heart" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Coeur élémentaire', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 34956;
 -- AC datas : OLD Name : "[Test] Gemme de Junon", Name AC enUS : "Juno's Test Gem" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Test Gemme de Junon', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 34967;
+-- UPDATE `item_template_locale` SET `Name` = 'Test Gemme de Junon', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 34967;
 -- AC datas : OLD Description : "Ces trucs ressemblent à un tas de ferraille !", Description AC enUS : "This stuff looks like a bunch of junk!" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Ces trucs ressemblent à un tas de ferraille !', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 34972;
 -- AC datas : OLD Description : "Il y a de l'ingénierie gnome fantasque dans l'air !", Description AC enUS : "This is some fancy gnomish engineering right here!" ; Wowhead enUS : ""
@@ -5708,7 +5708,7 @@ UPDATE `item_template_locale` SET `Description` = 'AVERTISSEMENT : NE PAS OUVRIR
 -- AC datas : OLD Name : "Pique-œil de poisson", Name AC enUS : "Fish-Eye Poker" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Pique-oeil de poisson', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 37036;
 -- AC datas : OLD Name : "[Test] Clayton Item Three", Name AC enUS : "Clayton's Test Item Three" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Clayton''s Test Item Three TEST', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 37126;
+-- UPDATE `item_template_locale` SET `Name` = 'Clayton''s Test Item Three TEST', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 37126;
 -- AC datas : OLD Description : "Une seule page reste après avoir brisé le sceau de « La Fureur des titans ».", Description AC enUS : "One page remains after breaking the seal on the 'Wrath of the Titans.'" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Une seule page reste après avoir brisé le sceau de « La Fureur des titans ».', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 37148;
 -- AC datas : OLD Name : "Robe du cocon d'œufs", Name AC enUS : "Egg Sac Robes" ; Wowhead enUS : ""
@@ -5842,7 +5842,7 @@ UPDATE `item_template_locale` SET `Description` = 'Levez-vous, mes recrues ! Au 
 -- AC datas : OLD Name : "Patron : Sac de botanique de Mycah", Name AC enUS : "Pattern: Mycah's Botanical Bag" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Patron : Sac de botanique de Mycah', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 38229;
 -- AC datas : OLD Name : "[Test] Rubis vivant", Name AC enUS : "Test Living Ruby" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Test Rubis vivant', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 38292;
+-- UPDATE `item_template_locale` SET `Name` = 'Test Rubis vivant', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 38292;
 -- AC datas : OLD Name : "Tabard des Arcanes", Name AC enUS : "Tabard of the Arcane" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Tabard des arcanes', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 38310;
 -- AC datas : OLD Description : "Ça sent mauvais. Ça se mange vraiment, ce truc ?", Description AC enUS : "Smells nasty. People actually eat these?" ; Wowhead enUS : ""
@@ -5998,7 +5998,7 @@ UPDATE `item_template_locale` SET `Name` = 'Glyphe de Frappe du croisé', `Verif
 -- AC datas : OLD Description : "Sans danger !", Description AC enUS : "It's safe!" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Sans danger !', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41121;
 -- AC datas : OLD Name : "[VIEUX]", Name AC enUS : "zzOLD" ; Wowhead enUS : "",  OLD Description : "zzOLD", Description AC enUS : "zzOLD" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX]', `Description` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41125;
+-- UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX]', `Description` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41125;
 -- AC datas : OLD Name : "Oeuf de M. Glagla", Name AC enUS : "Unhatched Mr. Chilly" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Œuf de M. Glagla', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41133;
 -- AC datas : OLD Name : "« Ouvre-serrure » de Drakuru", Name AC enUS : "Drakuru "Lock Opener"" ; Wowhead enUS : ""
@@ -6008,47 +6008,47 @@ UPDATE `item_template_locale` SET `Description` = 'Des images d''un mal indicibl
 -- AC datas : OLD Name : "Lentille de focalisation en jade sombre", Name AC enUS : "Dark Jade Focusing Lens" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Lentilles de focalisation en jade sombre', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41367;
 -- AC datas : OLD Name : "[VIEUX]Dessin : Diamant siègeterre de perspicacité", Name AC enUS : "ZZOLD Design: Insightful Earthsiege Diamond" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Dessin : Diamant siègeterre de perspicacité', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41403;
+-- UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Dessin : Diamant siègeterre de perspicacité', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41403;
 -- AC datas : OLD Name : "[VIEUX]Dessin : Diamant siègeterre tonifiant", Name AC enUS : "ZZOLD Design: Bracing Earthsiege Diamond" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Dessin : Diamant siègeterre tonifiant', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41404;
+-- UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Dessin : Diamant siègeterre tonifiant', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41404;
 -- AC datas : OLD Name : "[VIEUX]Dessin : Diamant siègeterre éternel", Name AC enUS : "ZZOLD Design: Eternal Earthsiege Diamond" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Dessin : Diamant siègeterre éternel', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41405;
+-- UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Dessin : Diamant siègeterre éternel', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41405;
 -- AC datas : OLD Name : "[VIEUX]Dessin : Diamant siègeterre de puissance", Name AC enUS : "ZZOLD Design: Powerful Earthsiege Diamond" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Dessin : Diamant siègeterre de puissance', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41406;
+-- UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Dessin : Diamant siègeterre de puissance', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41406;
 -- AC datas : OLD Name : "[VIEUX]Dessin : Diamant siègeterre implacable", Name AC enUS : "ZZOLD Design: Relentless Earthsiege Diamond" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Dessin : Diamant siègeterre implacable', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41407;
+-- UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Dessin : Diamant siègeterre implacable', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41407;
 -- AC datas : OLD Name : "[VIEUX]Dessin : Diamant siègeterre austère", Name AC enUS : "ZZOLD Design: Austere Earthsiege Diamond" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Dessin : Diamant siègeterre austère', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41408;
+-- UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Dessin : Diamant siègeterre austère', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41408;
 -- AC datas : OLD Name : "[VIEUX]Dessin : Diamant siègeterre persistant", Name AC enUS : "ZZOLD Design: Persistent Earthsiege Diamond" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Dessin : Diamant siègeterre persistant', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41409;
+-- UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Dessin : Diamant siègeterre persistant', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41409;
 -- AC datas : OLD Name : "[VIEUX]Dessin : Diamant siègeterre incisif", Name AC enUS : "ZZOLD Design: Trenchant Earthsiege Diamond" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX]Dessin : Diamant siègeterre incisif', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41410;
+-- UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX]Dessin : Diamant siègeterre incisif', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41410;
 -- AC datas : OLD Name : "[VIEUX]Dessin : Diamant siègeterre vivifiant", Name AC enUS : "ZZOLD Design: Invigorating Earthsiege Diamond" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Dessin : Diamant siègeterre vivifiant', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41411;
+-- UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Dessin : Diamant siègeterre vivifiant', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41411;
 -- AC datas : OLD Name : "[VIEUX]Dessin : Diamant siègeterre flambant", Name AC enUS : "ZZOLD Design: Beaming Earthsiege Diamond" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Dessin : Diamant siègeterre flambant', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41412;
+-- UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Dessin : Diamant siègeterre flambant', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41412;
 -- AC datas : OLD Name : "[VIEUX]Dessin : Diamant flambeciel revitalisant", Name AC enUS : "ZZOLD Design: Revitalizing Skyflare Diamond" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Dessin : Diamant flambeciel revitalisant', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41413;
+-- UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Dessin : Diamant flambeciel revitalisant', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41413;
 -- AC datas : OLD Name : "[VIEUX]Dessin : Diamant flambeciel nitescent", Name AC enUS : "ZZOLD Design: Effulgent Skyflare Diamond" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Dessin : Diamant flambeciel nitescent', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41414;
+-- UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Dessin : Diamant flambeciel nitescent', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41414;
 -- AC datas : OLD Name : "[VIEUX]Dessin : Diamant flambeciel infatigable", Name AC enUS : "ZZOLD Design: Tireless Skyflare Diamond" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX]Dessin : Diamant flambeciel infatigable', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41415;
+-- UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX]Dessin : Diamant flambeciel infatigable', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41415;
 -- AC datas : OLD Name : "[VIEUX]Dessin : Diamant flambeciel lugubre", Name AC enUS : "ZZOLD Design: Forlorn Skyflare Diamond" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Dessin : Diamant flambeciel lugubre', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41416;
+-- UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Dessin : Diamant flambeciel lugubre', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41416;
 -- AC datas : OLD Name : "[VIEUX]Dessin : Diamant flambeciel impassible", Name AC enUS : "ZZOLD Design: Impassive Skyflare Diamond" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Dessin : Diamant flambeciel impassible', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41417;
+-- UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Dessin : Diamant flambeciel impassible', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41417;
 -- AC datas : OLD Name : "[VIEUX]Dessin : Diamant flambeciel chaotique", Name AC enUS : "ZZOLD Design: Chaotic Skyflare Diamond" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Dessin : Diamant flambeciel chaotique', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41418;
+-- UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Dessin : Diamant flambeciel chaotique', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41418;
 -- AC datas : OLD Name : "[VIEUX]Dessin : Diamant flambeciel de destruction", Name AC enUS : "ZZOLD Design: Destructive Skyflare Diamond" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Dessin : Diamant flambeciel de destruction', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41419;
+-- UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Dessin : Diamant flambeciel de destruction', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41419;
 -- AC datas : OLD Name : "[VIEUX]Dessin : Diamant flambeciel brasillé", Name AC enUS : "ZZOLD Design: Ember Skyflare Diamond" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Dessin : Diamant flambeciel brasillé', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41420;
+-- UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Dessin : Diamant flambeciel brasillé', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41420;
 -- AC datas : OLD Name : "[VIEUX]Dessin : Diamant flambeciel de mystère", Name AC enUS : "ZZOLD Design: Enigmatic Skyflare Diamond" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Dessin : Diamant flambeciel de mystère', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41421;
+-- UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Dessin : Diamant flambeciel de mystère', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41421;
 -- AC datas : OLD Name : "[VIEUX]Dessin : Diamant flambleciel de rapidité", Name AC enUS : "ZZOLD Design: Swift Skyflare Diamond" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Dessin : Diamant flambleciel de rapidité', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41422;
+-- UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Dessin : Diamant flambleciel de rapidité', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41422;
 -- AC datas : OLD Name : "[VIEUX]Dessin : Diamant flambeciel foudroyant", Name AC enUS : "ZZOLDDesign: Thundering Skyflare Diamond" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Dessin : Diamant flambeciel foudroyant', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41423;
+-- UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Dessin : Diamant flambeciel foudroyant', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41423;
 -- AC datas : OLD Description : "C'est extensible !", Description AC enUS : "Stretchy!" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'C''est extensible !', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41504;
 -- AC datas : OLD Name : "Dessin : Cristal soleil mystique", Name AC enUS : "Design: Mystic Sun Crystal" ; Wowhead enUS : ""
@@ -6082,9 +6082,9 @@ UPDATE `item_template_locale` SET `Name` = 'Dessin : Rubis écarlate miroitant',
 -- AC datas : OLD Name : "Dessin : Halo de l'automne rapide", Name AC enUS : "Design: Quick Autumn's Glow" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Dessin : Halo de l''automne rapide', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41579;
 -- AC datas : OLD Name : "[PÉRIMÉ]Fil ensorcelé sanctifié", Name AC enUS : "zzDEPRECATED Sanctified Spellthread" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Fil ensorcelé sanctifié', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41605;
+-- UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Fil ensorcelé sanctifié', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41605;
 -- AC datas : OLD Name : "[PÉRIMÉ]Fil ensorcelé de maître", Name AC enUS : "zzDEPRECATED Master's Spellthread" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Fil ensorcelé de maître', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41606;
+-- UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Fil ensorcelé de maître', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41606;
 -- AC datas : OLD Name : "Dessin : Topaze monarchique toute-puissante", Name AC enUS : "Design: Potent Monarch Topaz" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Dessin : Topaze monarchique toute-puissante', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 41686;
 -- AC datas : OLD Name : "Dessin : Topaze monarchique téméraire", Name AC enUS : "Design: Reckless Monarch Topaz" ; Wowhead enUS : ""
@@ -6228,7 +6228,7 @@ UPDATE `item_template_locale` SET `Name` = 'Glyphe de mot de pouvoir : bouclier'
 -- AC datas : OLD Name : "Glyphe de mot de l'ombre : Mort", Name AC enUS : "Glyph of Shadow Word: Death" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Glyphe de mot de l''ombre : mort', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 42414;
 -- AC datas : OLD Name : "[Test] GÂTEAU AUX FRUITS", Name AC enUS : "TEST FRUITCAKE" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'TEST GÂTEAU AUX FRUITS', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 42590;
+-- UPDATE `item_template_locale` SET `Name` = 'TEST GÂTEAU AUX FRUITS', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 42590;
 -- AC datas : OLD Name : "Dessin : Bague d'impact en titane", Name AC enUS : "Design: Titanium Impact Band" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Dessin : Bague d''impact en titane', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 42648;
 -- AC datas : OLD Name : "Dessin : Anneau garde-terre en titane", Name AC enUS : "Design: Titanium Earthguard Ring" ; Wowhead enUS : ""
@@ -6334,7 +6334,7 @@ UPDATE `item_template_locale` SET `Name` = 'Bouton « J''ai perdu » cassé', `V
 -- AC datas : OLD Description : "Impossible de s'envoler !", Description AC enUS : "No flying away for you!" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Impossible de s''envoler !', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 43333;
 -- AC datas : OLD Name : "[VIEUX]Glyphe de l'ourson", Name AC enUS : "Glyph of the Bear Cub" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Glyphe de l''ourson', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 43362;
+-- UPDATE `item_template_locale` SET `Name` = 'zz[VIEUX] Glyphe de l''ourson', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 43362;
 -- AC datas : OLD Name : "Glyphe d'asservir démon", Name AC enUS : "Glyph of Enslave Demon" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Glyphe de Subjugation de démon', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 43393;
 -- AC datas : OLD Name : "Dessin : Anneau sauvage en titane", Name AC enUS : "Design: Savage Titanium Ring" ; Wowhead enUS : ""
@@ -6370,7 +6370,7 @@ UPDATE `item_template_locale` SET `Description` = 'Je suis si distrait ! Je souh
 -- AC datas : OLD Description : "On dirait que quelqu'un a essayé de pêcher dans cette fontaine. Pourquoi donc ?", Description AC enUS : "Looks like someone tried to fish in this fountain. Who would do such a thing?" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'On dirait que quelqu''un a essayé de pêcher dans cette fontaine. Pourquoi donc ?', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 43645;
 -- AC datas : OLD Name : "[Test] RESILIENCE RING DO NOT LOCALIZE", Name AC enUS : "RESILIENCE TEST RING DO NOT LOCALIZE  " ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'RESILIENCE TEST RING DO NOT LOCALIZE', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 43648;
+-- UPDATE `item_template_locale` SET `Name` = 'RESILIENCE TEST RING DO NOT LOCALIZE', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 43648;
 -- AC datas : OLD Name : "Cœur brisé de Keristrasza", Name AC enUS : "Keristrasza's Broken Heart" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Coeur brisé de Keristrasza', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 43665;
 -- AC datas : OLD Description : "Vous ne savez pas trop quoi penser de cet objet. Il semble imprégné de magie arcanique, mais quelque chose d'aussi petit pourrait-il être aussi important ?", Description AC enUS : "You're not quite sure what to make of it. It definitely seethes with arcane magic, but how can something so small be so important?" ; Wowhead enUS : ""
@@ -7548,7 +7548,7 @@ UPDATE `item_template_locale` SET `Name` = 'Que signifie pour moi "La Fin de Tou
 -- AC datas : OLD Name : "Motiva-tron", Name AC enUS : "Motivate-a-Tron" ; Wowhead enUS : "",  OLD Description : "Visez, tirez, motivez !", Description AC enUS : "Point, Shoot, Motivate!" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Motiv-a-tron', `Description` = 'Visez, tirez, motivez !', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 52566;
 -- AC datas : OLD Name : "[Test] du coût de remboursement en or de l'anneau", Name AC enUS : "Test Buyback Gold Cost Ring" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Test du coût de remboursement en or de l''anneau', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 52567;
+-- UPDATE `item_template_locale` SET `Name` = 'Test du coût de remboursement en or de l''anneau', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 52567;
 -- AC datas : OLD Name : "Robe de recrue", Name AC enUS : "Recruit's Robe" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Robe de recrue de l''apocalypse', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 52729;
 -- AC datas : OLD Description : "Petits appareils portatifs, abritant de puissants élémentaires.", Description AC enUS : "Small, portable devices housing powerful elementals." ; Wowhead enUS : ""
@@ -7836,15 +7836,15 @@ UPDATE `item_template_locale` SET `Description` = 'Transformation en guerrier so
 -- AC datas : OLD Name : "[Monster] - Shield, Stormwind Guard", Name AC enUS : "Monster - Shield, Stormwind Guard" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Monstre - Bouclier, Garde de Hurlevent', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 143;
 -- AC datas : OLD Name : "[PÉRIMÉ] Couvre-œil du capitaine Sanders", Name AC enUS : "Deprecated Captain Sanders' Eyepatch" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Deprecated Captain Sander''s Eyepatch', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 1363;
+-- UPDATE `item_template_locale` SET `Name` = 'Deprecated Captain Sander''s Eyepatch', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 1363;
 -- AC datas : OLD Name : "[PÉRIMÉ] Potion de fuite lâche", Name AC enUS : "Cowardly Flight Potion" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Potion de fuite irrépressible', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 5632;
 -- AC datas : OLD Name : "[Test] 130 Epic Warrior Bracelets", Name AC enUS : "130 Epic Warrior Bracelets" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = '130 Epique Guerrier Bracelets', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 24526;
 -- AC datas : OLD Name : "[Test] 130 Caster Belt", Name AC enUS : "130 Test Caster Belt" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = '130 Test Lanceur Ceinture', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 24561;
+-- UPDATE `item_template_locale` SET `Name` = '130 Test Lanceur Ceinture', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 24561;
 -- AC datas : OLD Name : "[Test] 130 Caster Cloak", Name AC enUS : "130 Test Caster Cloak" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = '130 Test Lanceur Cape', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 24567;
+-- UPDATE `item_template_locale` SET `Name` = '130 Test Lanceur Cape', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 24567;
 -- AC datas : OLD Name : "[Monster] - Throwing Axe (Poison)", Name AC enUS : "Monster - Throwing Axe (Poison)" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Monstre - Hache de jet (poison)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 28023;
 -- AC datas : OLD Name : "[Monster] - Work Wrench, Ethereal (Red Glow)", Name AC enUS : "Monster - Work Wrench, Ethereal (Red Glow)" ; Wowhead enUS : ""
@@ -7900,13 +7900,13 @@ UPDATE `item_template_locale` SET `Description` = 'Testing the LOC trigger', `Ve
 
 -- Update existing entries, from CATA
 -- AC datas : OLD Name : "[VIEUX] Pantalon d'initié nain", Name AC enUS : "OLDDwarven Initiate's Pants" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'OLD Pantalon d’initié nain', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 91;
+-- UPDATE `item_template_locale` SET `Name` = 'OLD Pantalon d’initié nain', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 91;
 -- AC datas : OLD Name : "[VIEUX]Monstre -Mains, Plaques Argent", Name AC enUS : "OLDMonster - Hands, Plate Silver" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'OLD [Monster]- Hands, Plate Silver', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 3245;
+-- UPDATE `item_template_locale` SET `Name` = 'OLD [Monster]- Hands, Plate Silver', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 3245;
 -- AC datas : OLD Name : "[VIEUX] Massue de cérémonie", Name AC enUS : "OLDCeremonial Club" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'OLD Massue de cérémonie', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 4704;
+-- UPDATE `item_template_locale` SET `Name` = 'OLD Massue de cérémonie', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 4704;
 -- AC datas : OLD Name : "[VIEUX] Massue de cérémonie", Name AC enUS : "OLDCeremonial Club" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'OLD Massue de cérémonie', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 5410;
+-- UPDATE `item_template_locale` SET `Name` = 'OLD Massue de cérémonie', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 5410;
 -- AC datas : OLD Name : "Peau de démon écorché (vieille2)", Name AC enUS : "Flayed Demon Skin (old2)" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Peau de démon écorché (old2)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 6766;
 -- AC datas : OLD Name : "Saphir céleste solide", Name AC enUS : "Solid Sky Sapphire (Unused)" ; Wowhead enUS : ""
