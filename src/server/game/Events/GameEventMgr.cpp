@@ -1961,21 +1961,23 @@ void GameEventMgr::SetHolidayEventTime(GameEventData& event)
     bool singleDate = ((holiday->Date[0] >> 24) & 0x1F) == 31; // Events with fixed date within year have - 1
 
     time_t curTime = GameTime::GetGameTime().count();
-    for (uint8 i = 0; i < MAX_HOLIDAY_DATES && holiday->Date[i]; ++i)
 
+    if (!singleDate)
+    {
+        time_t start = HolidayDateCalculator::FindStartTimeForStage(
+            holiday->Date, MAX_HOLIDAY_DATES, stageOffset, event.Length, curTime);
+        if (start)
+            event.Start = start;
+
+        return;
+    }
+
+    for (uint8 i = 0; i < MAX_HOLIDAY_DATES && holiday->Date[i]; ++i)
     {
         uint32 date = holiday->Date[i];
 
-        tm timeInfo;
-        if (singleDate)
-        {
-            timeInfo = Acore::Time::TimeBreakdown(curTime);
-            timeInfo.tm_year -= 1; // First try last year (event active through New Year)
-        }
-        else
-        {
-            timeInfo.tm_year = ((date >> 24) & 0x1F) + 100;
-        }
+        tm timeInfo = Acore::Time::TimeBreakdown(curTime);
+        timeInfo.tm_year -= 1; // First try last year (event active through New Year)
 
         timeInfo.tm_mon = (date >> 20) & 0xF;
         timeInfo.tm_mday = ((date >> 14) & 0x3F) + 1;
@@ -1986,12 +1988,12 @@ void GameEventMgr::SetHolidayEventTime(GameEventData& event)
 
         // try to get next start time (skip past dates)
         time_t startTime = mktime(&timeInfo);
-        if (curTime < startTime + event.Length * MINUTE)
+        if (curTime < startTime + stageOffset + event.Length * MINUTE)
         {
             event.Start = startTime + stageOffset;
             break;
         }
-        else if (singleDate)
+        else
         {
             tm tmCopy = Acore::Time::TimeBreakdown(curTime);
             int year = tmCopy.tm_year; // This year
@@ -1999,11 +2001,6 @@ void GameEventMgr::SetHolidayEventTime(GameEventData& event)
             tmCopy.tm_year = year;
             event.Start = mktime(&tmCopy) + stageOffset;
             break;
-        }
-        else
-        {
-            // date is due and not a singleDate event, try with next DBC date (dynamically calculated or overridden by game_event.start_time)
-            // if none is found we don't modify start date and use the one in game_event
         }
     }
 }

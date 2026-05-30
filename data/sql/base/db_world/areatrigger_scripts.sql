@@ -174,7 +174,13 @@ INSERT INTO `areatrigger_scripts` VALUES
 (5339,'at_last_rites'),
 (5340,'at_last_rites'),
 (5401,'at_celestial_planetarium_enterance'),
+(5414,'SmartTrigger'),
+(5415,'SmartTrigger'),
+(5416,'SmartTrigger'),
+(5417,'SmartTrigger'),
 (5440,'SmartTrigger'),
+(5442,'SmartTrigger'),
+(5443,'SmartTrigger'),
 (5578,'SmartTrigger'),
 (5579,'SmartTrigger'),
 (5580,'SmartTrigger'),
@@ -215,4 +221,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-29 17:53:35
+-- Dump completed on 2026-03-15 20:38:13

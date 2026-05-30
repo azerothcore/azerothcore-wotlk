@@ -97,6 +97,7 @@ INSERT INTO `spell_group_stack_rules` VALUES
 (1111,1,'Champion\'s Pennants'),
 (1112,1,'Flip Out'),
 (1113,4,'Thorns'),
+(1114,1,'Love is in the Air Flasks'),
 (1121,1,'Elemental Slave Buffs'),
 (1122,3,'Temporary Haste Buffs'),
 (1123,4,'Power Infusion and Arcane Power'),
@@ -114,4 +115,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-29 17:54:36
+-- Dump completed on 2026-03-15 20:39:17
