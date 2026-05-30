@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CreatureAI.h"
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "magtheridons_lair.h"
@@ -49,6 +50,7 @@ public:
         {
             _channelersSet.clear();
             _wardersSet.clear();
+            _burningAbyssalsSet.clear();
             _cubesSet.clear();
             _columnSet.clear();
         }
@@ -59,16 +61,6 @@ public:
             {
                 if (Creature* channeler = instance->GetCreature(guid))
                     return channeler->IsAlive();
-                return false;
-            });
-        }
-
-        bool IsAnyChannelerAliveAndInCombat()
-        {
-            return std::ranges::any_of(_channelersSet, [&](ObjectGuid const& guid)
-            {
-                if (Creature* channeler = instance->GetCreature(guid))
-                    return channeler->IsAlive() && channeler->IsInCombat();
                 return false;
             });
         }
@@ -86,7 +78,37 @@ public:
                 case NPC_HELLFIRE_WARDER:
                     _wardersSet.insert(creature->GetGUID());
                     break;
+                case NPC_BURNING_ABYSSAL:
+                    _burningAbyssalsSet.insert(creature->GetGUID());
+                    break;
             }
+        }
+
+        void OnCreatureRemove(Creature* creature) override
+        {
+            if (creature->GetEntry() == NPC_BURNING_ABYSSAL)
+                _burningAbyssalsSet.erase(creature->GetGUID());
+        }
+
+        void OnUnitDeath(Unit* unit) override
+        {
+            Creature* creature = unit ? unit->ToCreature() : nullptr;
+            if (!creature || creature->GetEntry() != NPC_HELLFIRE_CHANNELER)
+                return;
+
+            // IN_PROGRESS guard: stays inert during the hard-reset Respawn(true) cycle.
+            if (GetBossState(DATA_MAGTHERIDON) != IN_PROGRESS || IsAnyChannelerAlive())
+                return;
+
+            if (Creature* magtheridon = instance->GetCreature(_magtheridonGUID))
+                magtheridon->AI()->DoAction(ACTION_RELEASE_MAGTHERIDON);
+        }
+
+        void OnCreatureEvade(Creature* creature) override
+        {
+            // Phase-1 wipe signal: Mag is ImmuneToPC so BossAI evade does not fire; a Channeler evade is the trigger.
+            if (creature->GetEntry() == NPC_HELLFIRE_CHANNELER && GetBossState(DATA_MAGTHERIDON) == IN_PROGRESS)
+                SetBossState(DATA_MAGTHERIDON, NOT_STARTED);
         }
 
         void OnGameObjectCreate(GameObject* go) override
@@ -159,12 +181,17 @@ public:
                     if (state == NOT_STARTED)
                         SetData(DATA_COLLAPSE, GO_READY);
 
-                    // Channeler formation respawns only when a living member evades.
-                    // If all Channelers are dead on wipe, respawn them manually.
-                    if ((state == NOT_STARTED || state == FAIL) && !IsAnyChannelerAlive())
+                    // Hard reset: vanish Channelers and their lingering Burning Abyssal summons.
+                    if (state == NOT_STARTED || state == FAIL)
+                    {
                         for (ObjectGuid const& guid : _channelersSet)
                             if (Creature* channeler = instance->GetCreature(guid))
                                 channeler->Respawn(true);
+
+                        for (ObjectGuid const& guid : _burningAbyssalsSet)
+                            if (Creature* abyssal = instance->GetCreature(guid))
+                                abyssal->DespawnOrUnsummon();
+                    }
                 }
             }
             return true;
@@ -175,30 +202,12 @@ public:
             switch (type)
             {
                 case DATA_CHANNELER_COMBAT:
-                    if (data == 1)
+                    // Force the encounter start: Mag is ImmuneToPC so SetInCombatWithZone alone may miss JustEngagedWith.
+                    if (GetBossState(DATA_MAGTHERIDON) != IN_PROGRESS)
                     {
-                        if (GetBossState(DATA_MAGTHERIDON) != IN_PROGRESS)
-                        {
-                            // Magtheridon is ImmuneToPC during phase 1, so
-                            // SetInCombatWithZone() alone does not always reach
-                            // JustEngagedWith. Force the encounter start so the
-                            // door closes the moment a Channeler is engaged.
-                            SetBossState(DATA_MAGTHERIDON, IN_PROGRESS);
-                            if (Creature* magtheridon = instance->GetCreature(_magtheridonGUID))
-                                magtheridon->SetInCombatWithZone();
-                        }
-                    }
-                    else
-                    {
-                        // If Mag's evade doesn't update the Channeler counter
-                        // and no Channelers are alive or in combat, reset the
-                        // encounter to avoid a stale state.
+                        SetBossState(DATA_MAGTHERIDON, IN_PROGRESS);
                         if (Creature* magtheridon = instance->GetCreature(_magtheridonGUID))
-                            if (!magtheridon->IsEngaged() && magtheridon->IsImmuneToPC() && !IsAnyChannelerAliveAndInCombat())
-                            {
-                                SetBossState(DATA_MAGTHERIDON, NOT_STARTED);
-                                magtheridon->AI()->Reset();
-                            }
+                            magtheridon->SetInCombatWithZone();
                     }
                     break;
                 case DATA_ACTIVATE_CUBES:
@@ -220,6 +229,7 @@ public:
         ObjectGuid _magtheridonGUID;
         GuidSet _channelersSet;
         GuidSet _wardersSet;
+        GuidSet _burningAbyssalsSet;
         GuidSet _cubesSet;
         GuidSet _columnSet;
     };
