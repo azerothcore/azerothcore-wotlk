@@ -63,6 +63,40 @@ Loot* Roll::getLoot()
     return getTarget();
 }
 
+static void SendRollWonItemViaMail(Player* player, LootItem const* lootItem, uint32 itemId)
+{
+    Item* mailItem = Item::CreateItem(itemId, lootItem->count, player, false, lootItem->randomPropertyId);
+    if (!mailItem)
+        return;
+
+    AllowedLooterSet looters = lootItem->GetAllowedLooters();
+    ItemTemplate const* proto = mailItem->GetTemplate();
+    // Preserve the 2-hour group trade window the item would have had if stored directly.
+    if (looters.size() > 1 && proto->GetMaxStackSize() == 1 &&
+        (proto->Bonding == BIND_WHEN_PICKED_UP || proto->Bonding == BIND_QUEST_ITEM) &&
+        sWorld->getBoolConfig(CONFIG_SET_BOP_ITEM_TRADEABLE))
+    {
+        mailItem->SetBinding(true);
+        mailItem->SetSoulboundTradeable(looters);
+        mailItem->SetUInt32Value(ITEM_FIELD_CREATE_PLAYED_TIME, player->GetTotalPlayedTime());
+
+        std::string lootersStr;
+        for (ObjectGuid const& guid : looters)
+        {
+            if (!lootersStr.empty())
+                lootersStr += ' ';
+            lootersStr += std::to_string(guid.GetCounter());
+        }
+
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ITEM_BOP_TRADE);
+        stmt->SetData(0, mailItem->GetGUID().GetCounter());
+        stmt->SetData(1, lootersStr);
+        CharacterDatabase.Execute(stmt);
+    }
+
+    player->SendItemRetrievalMail(mailItem);
+}
+
 Group::Group() : m_leaderName(""), m_groupType(GROUPTYPE_NORMAL),
     m_dungeonDifficulty(DUNGEON_DIFFICULTY_NORMAL), m_raidDifficulty(RAID_DIFFICULTY_10MAN_NORMAL),
     m_bfGroup(nullptr), m_bgGroup(nullptr), m_lootMethod(FREE_FOR_ALL), m_lootThreshold(ITEM_QUALITY_UNCOMMON),
@@ -1497,8 +1531,7 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
                             roll->getLoot()->NotifyItemRemoved(roll->itemSlot);
                             roll->getLoot()->unlootedCount--;
                             player->SendEquipError(msg, nullptr, nullptr, roll->itemid);
-                            if (Item* mailItem = Item::CreateItem(roll->itemid, item->count, player, false, item->randomPropertyId))
-                                player->SendItemRetrievalMail(mailItem);
+                            SendRollWonItemViaMail(player, item, roll->itemid);
                         }
                         else
                         {
@@ -1580,8 +1613,7 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
                                 roll->getLoot()->NotifyItemRemoved(roll->itemSlot);
                                 roll->getLoot()->unlootedCount--;
                                 player->SendEquipError(msg, nullptr, nullptr, roll->itemid);
-                                if (Item* mailItem = Item::CreateItem(roll->itemid, item->count, player, false, item->randomPropertyId))
-                                    player->SendItemRetrievalMail(mailItem);
+                                SendRollWonItemViaMail(player, item, roll->itemid);
                             }
                             else
                             {
