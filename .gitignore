@@ -54,6 +54,13 @@ CMakeLists.txt.user
 *.LOCAL.*
 
 #
+# Claude
+#
+.claude/worktrees
+.claude/settings.local.json
+.claude/plans/**
+
+#
 # IDE & other software
 #
 /.settings/
@@ -89,6 +96,10 @@ local.properties
 .loadpath
 .project
 .cproject
+
+# vcpkg integration
+/vcpkg/
+/vcpkg-ports/
 
 
 # ==================

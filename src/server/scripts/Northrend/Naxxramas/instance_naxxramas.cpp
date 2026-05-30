@@ -426,20 +426,49 @@ public:
             case ACHIEV_CRITERIA_THE_HUNDRED_CLUB_25_PLAYER:
                 return _sapphironAchievement;
             case ACHIEV_CRITERIA_THE_UNDYING_KELTHUZAD:
-            case ACHIEV_CRITERIA_THE_UNDYING_THE_FOUR_HORSEMEN:
-            case ACHIEV_CRITERIA_THE_UNDYING_MAEXXNA:
-            case ACHIEV_CRITERIA_THE_UNDYING_LOATHEB:
-            case ACHIEV_CRITERIA_THE_UNDYING_THADDIUS:
             case ACHIEV_CRITERIA_THE_IMMORTAL_KELTHUZAD:
+            case ACHIEV_CRITERIA_THE_UNDYING_THE_FOUR_HORSEMEN:
             case ACHIEV_CRITERIA_THE_IMMORTAL_THE_FOUR_HORSEMEN:
+            case ACHIEV_CRITERIA_THE_UNDYING_MAEXXNA:
             case ACHIEV_CRITERIA_THE_IMMORTAL_MAEXXNA:
+            case ACHIEV_CRITERIA_THE_UNDYING_LOATHEB:
             case ACHIEV_CRITERIA_THE_IMMORTAL_LOATHEB:
+            case ACHIEV_CRITERIA_THE_UNDYING_THADDIUS:
             case ACHIEV_CRITERIA_THE_IMMORTAL_THADDIUS:
-                for (int i = 0; i < MAX_ENCOUNTERS; ++i)
-                    if (GetBossState(i) != DONE)
+            {
+                uint32 currentBoss;
+                switch (criteria_id)
+                {
+                    case ACHIEV_CRITERIA_THE_UNDYING_KELTHUZAD:
+                    case ACHIEV_CRITERIA_THE_IMMORTAL_KELTHUZAD:
+                        currentBoss = BOSS_KELTHUZAD;
+                        break;
+                    case ACHIEV_CRITERIA_THE_UNDYING_THE_FOUR_HORSEMEN:
+                    case ACHIEV_CRITERIA_THE_IMMORTAL_THE_FOUR_HORSEMEN:
+                        currentBoss = BOSS_HORSEMAN;
+                        break;
+                    case ACHIEV_CRITERIA_THE_UNDYING_MAEXXNA:
+                    case ACHIEV_CRITERIA_THE_IMMORTAL_MAEXXNA:
+                        currentBoss = BOSS_MAEXXNA;
+                        break;
+                    case ACHIEV_CRITERIA_THE_UNDYING_LOATHEB:
+                    case ACHIEV_CRITERIA_THE_IMMORTAL_LOATHEB:
+                        currentBoss = BOSS_LOATHEB;
+                        break;
+                    case ACHIEV_CRITERIA_THE_UNDYING_THADDIUS:
+                    case ACHIEV_CRITERIA_THE_IMMORTAL_THADDIUS:
+                        currentBoss = BOSS_THADDIUS;
+                        break;
+                    default:
+                        return false;
+                }
+
+                for (uint32 i = 0; i < MAX_ENCOUNTERS; ++i)
+                    if (i != currentBoss && GetBossState(i) != DONE)
                         return false;
 
                 return !GetPersistentData(PERSISTENT_DATA_IMMORTAL_FAIL);
+            }
             default:
                 return false;
         }
@@ -487,11 +516,14 @@ public:
                 // pull all the trash if not killed
                 if (Creature* patchwerk = GetCreature(DATA_PATCHWERK_BOSS))
                 {
-                    for (auto& itr : _patchwerkRoomTrash)
+                    if (Unit* target = patchwerk->GetThreatMgr().GetCurrentVictim())
                     {
-                        Creature* trash = ObjectAccessor::GetCreature(*patchwerk, itr);
-                        if (trash && trash->IsAlive() && !trash->IsInCombat())
-                            trash->AI()->AttackStart(patchwerk->GetVictim());
+                        for (auto& itr : _patchwerkRoomTrash)
+                        {
+                            Creature* trash = ObjectAccessor::GetCreature(*patchwerk, itr);
+                            if (trash && trash->IsAlive() && !trash->IsInCombat())
+                                trash->AI()->AttackStart(target);
+                        }
                     }
                 }
 
@@ -741,10 +773,10 @@ private:
     bool _horsemanAchievement;
 };
 
-class npc_mr_bigglesworth : public NullCreatureAI
+class npc_mr_bigglesworth : public CritterAI
 {
 public:
-    npc_mr_bigglesworth(Creature* c) : NullCreatureAI(c) { }
+    npc_mr_bigglesworth(Creature* c) : CritterAI(c) { }
 
     void JustDied(Unit* /*killer*/) override
     {

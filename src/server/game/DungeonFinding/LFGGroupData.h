@@ -37,6 +37,8 @@ namespace lfg
         void SetState(LfgState state);
         void RestoreState();
         void AddPlayer(ObjectGuid guid);
+        void AddRandomQueuedPlayer(ObjectGuid guid);
+        [[nodiscard]] bool IsRandomQueuedPlayer(ObjectGuid guid) const;
         uint8 RemovePlayer(ObjectGuid guid);
         void RemoveAllPlayers();
         void SetLeader(ObjectGuid guid);
@@ -66,6 +68,7 @@ namespace lfg
         LfgState m_OldState;                ///< Old State
         ObjectGuid m_Leader;                ///< Leader GUID
         LfgGuidSet m_Players;               ///< Players in group
+        LfgGuidSet m_RandomQueuedPlayers;   ///< Players that queued for random dungeon
         // Dungeon
         uint32 m_Dungeon;                   ///< Dungeon entry
         bool _isLFGGroup;

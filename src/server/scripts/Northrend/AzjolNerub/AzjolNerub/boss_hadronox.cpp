@@ -172,7 +172,7 @@ struct boss_hadronox : public BossAI
             SummonCrusherPack(SUMMON_GROUP_CRUSHER_3);
             events.ScheduleEvent(EVENT_HADRONOX_MOVE1, 0s);
             events.ScheduleEvent(EVENT_HADRONOX_MOVE2, 45s);
-            events.ScheduleEvent(EVENT_HADRONOX_MOVE3, 90s);
+            events.ScheduleEvent(EVENT_HADRONOX_MOVE3, 70s);
         }
     }
 
@@ -235,9 +235,10 @@ struct boss_hadronox : public BossAI
 
     bool IsInCombatWithPlayer() const
     {
-        return std::ranges::any_of(me->GetThreatMgr().GetThreatList(), [](auto const& ref) {
-            return ref->getTarget()->IsControlledByPlayer();
-        });
+        for (ThreatReference const* ref : me->GetThreatMgr().GetUnsortedThreatList())
+            if (ref->GetVictim()->IsControlledByPlayer())
+                return true;
+        return false;
     }
 
     void DamageTaken(Unit* who, uint32& damage, DamageEffectType /*damageType*/, SpellSchoolMask /*damageSchoolMask*/) override

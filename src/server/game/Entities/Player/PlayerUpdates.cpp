@@ -68,14 +68,8 @@ void Player::Update(uint32 p_time)
         m_nextMailDelivereTime = time_t(0);
     }
 
-    // Update cinematic location, if 500ms have passed and we're doing a
-    // cinematic now.
-    _cinematicMgr->m_cinematicDiff += p_time;
-    if (_cinematicMgr->m_cinematicCamera && _cinematicMgr->m_activeCinematicCameraId && GetMSTimeDiffToNow(_cinematicMgr->m_lastCinematicCheck) > CINEMATIC_UPDATEDIFF)
-    {
-        _cinematicMgr->m_lastCinematicCheck = getMSTime();
-        _cinematicMgr->UpdateCinematicLocation(p_time);
-    }
+    // Update cinematic camera (if needed)
+    _cinematicMgr.UpdateCinematic(p_time);
 
     // used to implement delayed far teleports
     SetMustDelayTeleport(true);
@@ -319,23 +313,6 @@ void Player::Update(uint32 p_time)
     {
         m_regenTimer += p_time;
         RegenerateAll();
-
-        // Apply buffs from items with Apply on Equip trigger if they are not present.
-        for (uint8 i = 0; i < INVENTORY_SLOT_BAG_END; ++i)
-        {
-            if (!m_items[i])
-                continue;
-
-            std::vector<uint32> spellIDs;
-            m_items[i]->GetOnEquipSpellIDs(spellIDs);
-            bool apply = false;
-            for (uint32 spellID : spellIDs)
-                if (!apply && !HasAura(spellID))
-                    apply = true;
-
-            if (apply)
-                ApplyItemEquipSpell(m_items[i], true, false);
-        }
     }
 
     if (m_deathState == DeathState::JustDied)
@@ -419,13 +396,11 @@ void Player::Update(uint32 p_time)
         // != GetCharmGUID())))
         RemovePet(pet, PET_SAVE_NOT_IN_SLOT, true);
 
-    // pussywizard:
     if (m_hostileReferenceCheckTimer <= p_time)
     {
         m_hostileReferenceCheckTimer = 15000;
         if (!GetMap()->IsDungeon())
-            getHostileRefMgr().deleteReferencesOutOfRange(
-                GetVisibilityRange());
+            GetCombatManager().EndCombatBeyondRange(GetVisibilityRange(), true);
     }
     else
         m_hostileReferenceCheckTimer -= p_time;
@@ -1194,9 +1169,6 @@ bool Player::UpdatePosition(float x, float y, float z, float orientation,
     if (GetGroup())
         SetGroupUpdateFlag(GROUP_UPDATE_FLAG_POSITION);
 
-    if (GetTrader() && !IsWithinDistInMap(GetTrader(), INTERACTION_DISTANCE))
-        GetSession()->SendCancelTrade(TRADE_STATUS_TRADE_CANCELED);
-
     CheckAreaExploreAndOutdoor();
 
     return true;
@@ -1258,7 +1230,8 @@ void Player::UpdateArea(uint32 newArea)
     {
         SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_SANCTUARY);
         pvpInfo.IsInNoPvPArea = true;
-        CombatStopWithPets();
+        if (!duel && GetCombatManager().HasPvPCombat())
+            CombatStopWithPets();
     }
     else
         RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_SANCTUARY);
@@ -1462,7 +1435,7 @@ void Player::UpdatePvPState()
 
     if (pvpInfo.IsHostile) // in hostile area
     {
-        if (IsInFlight()) // on taxi
+        if (IsInFlight() || !m_taxi.empty()) // on taxi or taxi pending resume after login
             return;
 
         if (!IsPvP() || pvpInfo.EndTimer != 0)
@@ -1566,6 +1539,16 @@ void Player::UpdatePvP(bool state, bool _override)
     sScriptMgr->OnPlayerPVPFlagChange(this, state);
 }
 
+void Player::AtExitCombat()
+{
+    Unit::AtExitCombat();
+    UpdatePotionCooldown();
+
+    if (IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY))
+        for (uint8 i = 0; i < MAX_RUNES; ++i)
+            SetGracePeriod(i, 0);
+}
+
 void Player::UpdatePotionCooldown(Spell* spell)
 {
     // no potion used i combat or still in combat
@@ -1619,8 +1602,8 @@ void Player::UpdateVisibilityForPlayer(bool mapChange)
         m_seer = this;
 
     Acore::VisibleNotifier notifier(*this, mapChange);
-    Cell::VisitObjects(m_seer, notifier, GetSightRange());
-    Cell::VisitFarVisibleObjects(m_seer, notifier, VISIBILITY_DISTANCE_GIGANTIC);
+    Cell::VisitObjects(GetSightPosition().GetPositionX(), GetSightPosition().GetPositionY(), GetMap(), notifier, GetSightRange());
+    Cell::VisitFarVisibleObjects(GetSightPosition().GetPositionX(), GetSightPosition().GetPositionY(), GetMap(), notifier, VISIBILITY_DISTANCE_GIGANTIC);
     notifier.SendToSelf();
 
     if (mapChange)

@@ -41,6 +41,19 @@ namespace GameTime
     /// Uptime
     AC_GAME_API Seconds GetUptime();
 
+    /// Uptime since a given time point
+    inline Microseconds Elapsed(TimePoint start)
+    {
+        return std::chrono::duration_cast<Microseconds>(Now() - start);
+    }
+
+    /// Check if a duration has elapsed since a given time point
+    template<class T>
+    inline bool HasElapsed(TimePoint start, T duration)
+    {
+        return (Now() - start) >= duration;
+    }
+
     /// Update all timers
     void UpdateGameTimers();
 }

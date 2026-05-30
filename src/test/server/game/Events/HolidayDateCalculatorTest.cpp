@@ -397,60 +397,45 @@ TEST_F(HolidayDateCalculatorTest, FixedDateHolidays_ConsistentAcrossYears_1900_2
 }
 
 // ============================================================
-// Brewfest Tests (Oktoberfest rule)
-// First Saturday on or after Sept 15, minus 7 days for holidayStage offset
+// Brewfest Tests (Fixed Sept 20 main event)
 // ============================================================
 
-TEST_F(HolidayDateCalculatorTest, Brewfest_OktoberfestRule)
+TEST_F(HolidayDateCalculatorTest, Brewfest_FixedSept13)
 {
-    // Brewfest follows the Oktoberfest rule:
-    // Oktoberfest starts the Saturday after Sept 15 (or on Sept 15 if it's Saturday)
-    // Brewfest holidayStage 1 starts 7 days before that
-    HolidayRule brewfest = { 372, HolidayCalculationType::WEEKDAY_ON_OR_AFTER, 9, 15, static_cast<int>(Weekday::SATURDAY), -7 };
+    // Brewfest is now fixed: prep starts Sept 13, main event Sept 20
+    // This avoids any potential overlap with Pirates' Day (Sept 19)
+    HolidayRule brewfest = { 372, HolidayCalculationType::FIXED_DATE, 9, 13, 0, 0 };
 
-    struct BrewfestTestCase { int year; int expectedMonth; int expectedDay; };
-    std::vector<BrewfestTestCase> testCases = {
-        // Sept 15, 2024 is Sunday, first Sat after is Sept 21, minus 7 = Sept 14
-        { 2024, 9, 14 },
-        // Sept 15, 2025 is Monday, first Sat after is Sept 20, minus 7 = Sept 13
-        { 2025, 9, 13 },
-        // Sept 15, 2026 is Tuesday, first Sat after is Sept 19, minus 7 = Sept 12
-        { 2026, 9, 12 },
-        // Sept 15, 2027 is Wednesday, first Sat after is Sept 18, minus 7 = Sept 11
-        { 2027, 9, 11 },
-        // Sept 15, 2028 is Friday, first Sat after is Sept 16, minus 7 = Sept 9
-        { 2028, 9, 9 },
-        // Sept 15, 2029 is Saturday, so Sept 15, minus 7 = Sept 8
-        { 2029, 9, 8 },
-    };
-
-    for (auto const& tc : testCases)
-    {
-        std::tm date = HolidayDateCalculator::CalculateHolidayDate(brewfest, tc.year);
-
-        SCOPED_TRACE("Year: " + std::to_string(tc.year));
-
-        EXPECT_EQ(date.tm_year + 1900, tc.year);
-        EXPECT_EQ(date.tm_mon + 1, tc.expectedMonth);
-        EXPECT_EQ(date.tm_mday, tc.expectedDay);
-    }
-}
-
-TEST_F(HolidayDateCalculatorTest, Brewfest_AlwaysInSeptember_1900_2200)
-{
-    HolidayRule brewfest = { 372, HolidayCalculationType::WEEKDAY_ON_OR_AFTER, 9, 15, static_cast<int>(Weekday::SATURDAY), -7 };
-
-    for (int year = 1900; year <= 2200; ++year)
+    for (int year = 2000; year <= 2030; ++year)
     {
         std::tm date = HolidayDateCalculator::CalculateHolidayDate(brewfest, year);
 
         SCOPED_TRACE("Year: " + std::to_string(year));
 
-        // Brewfest should always be in September (after -7 offset from Sept 15-21)
-        EXPECT_EQ(date.tm_mon + 1, 9) << "Brewfest should be in September";
-        // Should be between Sept 8 and Sept 14 (7 days before Sept 15-21)
-        EXPECT_GE(date.tm_mday, 8) << "Brewfest should be >= Sept 8";
-        EXPECT_LE(date.tm_mday, 14) << "Brewfest should be <= Sept 14";
+        EXPECT_EQ(date.tm_year + 1900, year);
+        EXPECT_EQ(date.tm_mon + 1, 9);   // September
+        EXPECT_EQ(date.tm_mday, 13);     // Always Sept 13
+    }
+}
+
+TEST_F(HolidayDateCalculatorTest, Brewfest_NoPiratesDayConflict)
+{
+    // Brewfest main event (Sept 20) is always after Pirates' Day (Sept 19)
+    HolidayRule brewfest = { 372, HolidayCalculationType::FIXED_DATE, 9, 13, 0, 0 };
+    HolidayRule piratesDay = { 398, HolidayCalculationType::FIXED_DATE, 9, 19, 0, 0 };
+
+    for (int year = 2000; year <= 2030; ++year)
+    {
+        std::tm brewfestDate = HolidayDateCalculator::CalculateHolidayDate(brewfest, year);
+        std::tm piratesDate = HolidayDateCalculator::CalculateHolidayDate(piratesDay, year);
+
+        SCOPED_TRACE("Year: " + std::to_string(year));
+
+        // Brewfest prep is Sept 13, main event is Sept 20
+        // Pirates' Day is Sept 19, which falls between prep and main event
+        EXPECT_EQ(brewfestDate.tm_mday, 13);  // Brewfest prep
+        EXPECT_EQ(piratesDate.tm_mday, 19);   // Pirates' Day
+        // Main event (Sept 20) > Pirates' Day (Sept 19)
     }
 }
 
@@ -1250,4 +1235,157 @@ TEST_F(HolidayDateCalculatorTest, DarkmoonFaire_InHolidayRules)
     EXPECT_TRUE(foundElwynn) << "Darkmoon Faire Elwynn (374) should be in HolidayRules";
     EXPECT_TRUE(foundMulgore) << "Darkmoon Faire Mulgore (375) should be in HolidayRules";
     EXPECT_TRUE(foundTerokkar) << "Darkmoon Faire Terokkar (376) should be in HolidayRules";
+}
+
+// ============================================================================
+// FindStartTimeForStage tests
+// ============================================================================
+
+class FindStartTimeForStageTest : public ::testing::Test
+{
+protected:
+    // Helper to create a time_t from year/month/day/hour
+    static time_t MakeTime(int year, int month, int day, int hour = 0)
+    {
+        std::tm t = {};
+        t.tm_year = year - 1900;
+        t.tm_mon = month - 1;
+        t.tm_mday = day;
+        t.tm_hour = hour;
+        t.tm_isdst = -1;
+        return mktime(&t);
+    }
+
+    // Pack two dates into an array (rest zeroed)
+    void PackTwoDates(uint32_t* dates, int y1, int m1, int d1, int y2, int m2, int d2)
+    {
+        std::tm t1 = {};
+        t1.tm_year = y1 - 1900;
+        t1.tm_mon = m1 - 1;
+        t1.tm_mday = d1;
+        t1.tm_isdst = -1;
+        mktime(&t1);
+        dates[0] = HolidayDateCalculator::PackDate(t1);
+
+        std::tm t2 = {};
+        t2.tm_year = y2 - 1900;
+        t2.tm_mon = m2 - 1;
+        t2.tm_mday = d2;
+        t2.tm_isdst = -1;
+        mktime(&t2);
+        dates[1] = HolidayDateCalculator::PackDate(t2);
+
+        for (int i = 2; i < 26; ++i)
+            dates[i] = 0;
+    }
+};
+
+// Stage 1 (no offset): curTime before event starts -> selects first date
+TEST_F(FindStartTimeForStageTest, Stage1_BeforeStart_SelectsFirstDate)
+{
+    uint32_t dates[26] = {};
+    PackTwoDates(dates, 2026, 3, 6, 2026, 4, 3);
+
+    time_t curTime = MakeTime(2026, 3, 1);
+    time_t stageOffset = 0;
+    uint32_t stageLengthMin = 72 * 60; // 72 hours = 3 days
+
+    time_t result = HolidayDateCalculator::FindStartTimeForStage(dates, 26, stageOffset, stageLengthMin, curTime);
+    EXPECT_EQ(result, MakeTime(2026, 3, 6));
+}
+
+// Stage 1 (no offset): curTime during event -> selects current date
+TEST_F(FindStartTimeForStageTest, Stage1_DuringEvent_SelectsCurrentDate)
+{
+    uint32_t dates[26] = {};
+    PackTwoDates(dates, 2026, 3, 6, 2026, 4, 3);
+
+    time_t curTime = MakeTime(2026, 3, 7, 12); // mid-event
+    time_t stageOffset = 0;
+    uint32_t stageLengthMin = 72 * 60; // 3 days
+
+    time_t result = HolidayDateCalculator::FindStartTimeForStage(dates, 26, stageOffset, stageLengthMin, curTime);
+    EXPECT_EQ(result, MakeTime(2026, 3, 6));
+}
+
+// Stage 1 (no offset): curTime after event ends -> selects next date
+TEST_F(FindStartTimeForStageTest, Stage1_AfterEnd_SelectsNextDate)
+{
+    uint32_t dates[26] = {};
+    PackTwoDates(dates, 2026, 3, 6, 2026, 4, 3);
+
+    time_t curTime = MakeTime(2026, 3, 20); // well past first event
+    time_t stageOffset = 0;
+    uint32_t stageLengthMin = 72 * 60; // 3 days
+
+    time_t result = HolidayDateCalculator::FindStartTimeForStage(dates, 26, stageOffset, stageLengthMin, curTime);
+    EXPECT_EQ(result, MakeTime(2026, 4, 3));
+}
+
+// THE BUG: Stage 2 with stageOffset > 0, curTime in the window that the old
+// code would incorrectly skip (between startTime + stageLength and
+// startTime + stageOffset + stageLength). Without the fix, this would
+// return the NEXT occurrence's start instead of the current one.
+TEST_F(FindStartTimeForStageTest, Stage2_DuringLateWindow_SelectsCurrentDate)
+{
+    // Simulate Darkmoon Faire:
+    // Holiday starts Mar 6 (Friday, building phase)
+    // Stage 1 (building): 72 hours = 3 days (Mar 6-9)
+    // Stage 2 (active):  168 hours = 7 days (Mar 9-16)
+    // Total holiday: Mar 6 - Mar 16 (10 days)
+    // Next occurrence: Apr 3
+    uint32_t dates[26] = {};
+    PackTwoDates(dates, 2026, 3, 6, 2026, 4, 3);
+
+    time_t stageOffset = 72 * 3600; // Stage 1 = 72 hours in seconds
+    uint32_t stageLengthMin = 168 * 60; // Stage 2 = 168 hours in minutes
+
+    // curTime = Mar 14 (day 8 of holiday, day 5 of stage 2)
+    // Old bug: startTime(Mar 6) + 168h = Mar 13, so curTime > that -> SKIP to Apr 3!
+    // Fixed:   startTime(Mar 6) + 72h + 168h = Mar 16, so curTime < that -> correct
+    time_t curTime = MakeTime(2026, 3, 14, 12);
+
+    time_t result = HolidayDateCalculator::FindStartTimeForStage(dates, 26, stageOffset, stageLengthMin, curTime);
+    // Should return Mar 6 + stageOffset = Mar 9 (stage 2 start)
+    EXPECT_EQ(result, MakeTime(2026, 3, 6) + stageOffset);
+}
+
+// Stage 2: curTime after entire holiday ends -> selects next occurrence
+TEST_F(FindStartTimeForStageTest, Stage2_AfterHolidayEnds_SelectsNextDate)
+{
+    uint32_t dates[26] = {};
+    PackTwoDates(dates, 2026, 3, 6, 2026, 4, 3);
+
+    time_t stageOffset = 72 * 3600;
+    uint32_t stageLengthMin = 168 * 60;
+
+    // curTime = Mar 20 (well past the entire holiday)
+    time_t curTime = MakeTime(2026, 3, 20);
+
+    time_t result = HolidayDateCalculator::FindStartTimeForStage(dates, 26, stageOffset, stageLengthMin, curTime);
+    EXPECT_EQ(result, MakeTime(2026, 4, 3) + stageOffset);
+}
+
+// No valid dates -> returns 0
+TEST_F(FindStartTimeForStageTest, NoDates_ReturnsZero)
+{
+    uint32_t dates[26] = {};
+    time_t curTime = MakeTime(2026, 6, 1);
+
+    time_t result = HolidayDateCalculator::FindStartTimeForStage(dates, 26, 0, 168 * 60, curTime);
+    EXPECT_EQ(result, 0);
+}
+
+// All dates in the past -> returns 0
+TEST_F(FindStartTimeForStageTest, AllDatesPast_ReturnsZero)
+{
+    uint32_t dates[26] = {};
+    PackTwoDates(dates, 2026, 1, 5, 2026, 2, 6);
+
+    time_t stageOffset = 0;
+    uint32_t stageLengthMin = 72 * 60;
+
+    time_t curTime = MakeTime(2026, 6, 1); // way after both dates
+    time_t result = HolidayDateCalculator::FindStartTimeForStage(dates, 26, stageOffset, stageLengthMin, curTime);
+    EXPECT_EQ(result, 0);
 }

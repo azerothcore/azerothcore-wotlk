@@ -118,22 +118,41 @@ public:
 
         void OnUnitDeath(Unit* unit) override
         {
-            if (unit->EntryEquals(NPC_WATCHER_GASHRA, NPC_WATCHER_NARJIL, NPC_WATCHER_SILTHIK, NPC_ANUBAR_SHADOWCASTER, NPC_ANUBAR_SKIRMISHER, NPC_ANUBAR_WARRIOR))
+            if (!unit->EntryEquals(NPC_WATCHER_GASHRA, NPC_WATCHER_NARJIL, NPC_WATCHER_SILTHIK, NPC_ANUBAR_SHADOWCASTER, NPC_ANUBAR_SKIRMISHER, NPC_ANUBAR_WARRIOR))
+                return;
+
+            Creature* creature = unit->ToCreature();
+            if (!creature)
+                return;
+
+            // For trash mobs, ensure their leader is a Watcher
+            if (unit->EntryEquals(NPC_ANUBAR_SHADOWCASTER, NPC_ANUBAR_SKIRMISHER, NPC_ANUBAR_WARRIOR))
             {
-                if (Creature* creature = unit->ToCreature())
-                {
-                    ObjectGuid creatureGuid = creature->GetGUID();
-                    scheduler.CancelAll();
-                    scheduler.Schedule(1s, [this, creatureGuid](TaskContext /*context*/)
-                    {
-                        if (Creature* creature = instance->GetCreature(creatureGuid))
-                            if (CreatureGroup* formation = creature->GetFormation())
-                                if (!formation->IsAnyMemberAlive())
-                                    if (Creature* krikthir = GetCreature(DATA_KRIKTHIR))
-                                        krikthir->AI()->DoAction(ACTION_MINION_DIED);
-                    });
-                }
+                CreatureGroup* formation = creature->GetFormation();
+                if (!formation)
+                    return;
+
+                Creature* leader = formation->GetLeader();
+                if (!leader || !leader->EntryEquals(NPC_WATCHER_GASHRA, NPC_WATCHER_NARJIL, NPC_WATCHER_SILTHIK))
+                    return;
             }
+
+            ObjectGuid creatureGuid = creature->GetGUID();
+
+            scheduler.CancelAll();
+            scheduler.Schedule(1s, [this, creatureGuid](TaskContext /*context*/)
+            {
+                Creature* creature = instance->GetCreature(creatureGuid);
+                if (!creature)
+                    return;
+
+                CreatureGroup* formation = creature->GetFormation();
+                if (!formation || formation->IsAnyMemberAlive())
+                    return;
+
+                if (Creature* krikthir = GetCreature(DATA_KRIKTHIR))
+                    krikthir->AI()->DoAction(ACTION_MINION_DIED);
+            });
         }
     };
 

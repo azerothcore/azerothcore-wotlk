@@ -235,17 +235,6 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                         if (pet->GetVictim() == TargetUnit && pet->GetCharmInfo()->IsCommandAttack())
                             return;
 
-                        // Check line of sight either from pet or owner depending if pet is charmed
-                        Unit* seer = pet;
-                        if (Unit* owner = pet->GetOwner())
-                            if (owner->IsPlayer() && owner->ToPlayer()->GetCharm() != pet && owner->ToPlayer()->GetVehicleBase() != pet)
-                                if (sDisableMgr->IsPathfindingEnabled(pet->GetMap()))
-                                    seer = owner;
-
-                        // Fail on LoS
-                        if (seer && !seer->IsWithinLOSInMap(TargetUnit, VMAP::ModelIgnoreFlags::M2))
-                            return;
-
                         pet->ClearUnitState(UNIT_STATE_FOLLOW);
                         // This is true if pet has no target or has target but targets differs.
                         if (pet->GetVictim() != TargetUnit || (pet->GetVictim() == TargetUnit && !pet->GetCharmInfo()->IsCommandAttack()))
@@ -429,8 +418,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                         // This is true if pet has no target or has target but targets differs.
                         if (pet->GetVictim() != unit_target)
                         {
-                            if (pet->ToCreature()->IsAIEnabled && pet->IsWithinLOSInMap(unit_target, VMAP::ModelIgnoreFlags::M2))
-                                pet->ToCreature()->AI()->AttackStart(unit_target);
+                            pet->ToCreature()->AI()->AttackStart(unit_target);
                         }
                     }
 
@@ -511,8 +499,7 @@ void WorldSession::HandlePetActionHelper(Unit* pet, ObjectGuid guid1, uint32 spe
                                 charmInfo->SetIsCommandFollow(false);
                                 charmInfo->SetIsReturning(false);
 
-                                if (pet->IsWithinLOSInMap(TargetUnit, VMAP::ModelIgnoreFlags::M2))
-                                    pet->ToCreature()->AI()->AttackStart(TargetUnit);
+                                pet->ToCreature()->AI()->AttackStart(TargetUnit);
 
                                 if (pet->IsPet() && pet->ToPet()->getPetType() == SUMMON_PET && pet != TargetUnit && roll_chance_i(10))
                                     pet->SendPetActionSound(PET_ACTION_SPECIAL_SPELL);

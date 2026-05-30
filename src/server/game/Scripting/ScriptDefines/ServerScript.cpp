@@ -15,13 +15,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "ServerScript.h"
+#include "IoContext.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
+#include "ServerScript.h"
 
-void ScriptMgr::OnNetworkStart()
+void ScriptMgr::OnNetworkStart(Acore::Asio::IoContext& ioContext)
 {
-    CALL_ENABLED_HOOKS(ServerScript, SERVERHOOK_ON_NETWORK_START, script->OnNetworkStart());
+    CALL_ENABLED_HOOKS(ServerScript, SERVERHOOK_ON_NETWORK_START, script->OnNetworkStart(ioContext));
 }
 
 void ScriptMgr::OnNetworkStop()
@@ -29,14 +30,14 @@ void ScriptMgr::OnNetworkStop()
     CALL_ENABLED_HOOKS(ServerScript, SERVERHOOK_ON_NETWORK_STOP, script->OnNetworkStop());
 }
 
-void ScriptMgr::OnSocketOpen(std::shared_ptr<WorldSocket> socket)
+void ScriptMgr::OnSocketOpen(std::shared_ptr<WorldSocket> const& socket)
 {
     ASSERT(socket);
 
     CALL_ENABLED_HOOKS(ServerScript, SERVERHOOK_ON_SOCKET_OPEN, script->OnSocketOpen(socket));
 }
 
-void ScriptMgr::OnSocketClose(std::shared_ptr<WorldSocket> socket)
+void ScriptMgr::OnSocketClose(std::shared_ptr<WorldSocket> const& socket)
 {
     ASSERT(socket);
 
@@ -50,9 +51,7 @@ bool ScriptMgr::CanPacketSend(WorldSession* session, WorldPacket const& packet)
     if (ScriptRegistry<ServerScript>::ScriptPointerList.empty())
         return true;
 
-    WorldPacket copy(packet);
-
-    CALL_ENABLED_BOOLEAN_HOOKS(ServerScript, SERVERHOOK_CAN_PACKET_SEND, !script->CanPacketSend(session, copy));
+    CALL_ENABLED_BOOLEAN_HOOKS(ServerScript, SERVERHOOK_CAN_PACKET_SEND, !script->CanPacketSend(session, packet));
 }
 
 bool ScriptMgr::CanPacketReceive(WorldSession* session, WorldPacket const& packet)
@@ -60,9 +59,7 @@ bool ScriptMgr::CanPacketReceive(WorldSession* session, WorldPacket const& packe
     if (ScriptRegistry<ServerScript>::ScriptPointerList.empty())
         return true;
 
-    WorldPacket copy(packet);
-
-    CALL_ENABLED_BOOLEAN_HOOKS(ServerScript, SERVERHOOK_CAN_PACKET_RECEIVE, !script->CanPacketReceive(session, copy));
+    CALL_ENABLED_BOOLEAN_HOOKS(ServerScript, SERVERHOOK_CAN_PACKET_RECEIVE, !script->CanPacketReceive(session, packet));
 }
 
 ServerScript::ServerScript(const char* name, std::vector<uint16> enabledHooks)

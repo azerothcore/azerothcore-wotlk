@@ -44,7 +44,9 @@ INSERT INTO `uptime` VALUES
 (1,1752912822,0,0,'AzerothCore rev. 9415d1bef80d 2025-07-05 11:29:15 +0200 (whisper-something-something branch) (Win64, RelWithDebInfo, Static)'),
 (1,1752913079,0,0,'AzerothCore rev. 9415d1bef80d 2025-07-05 11:29:15 +0200 (whisper-something-something branch) (Win64, RelWithDebInfo, Static)'),
 (1,1752919589,0,0,'AzerothCore rev. 9415d1bef80d 2025-07-05 11:29:15 +0200 (whisper-something-something branch) (Win64, RelWithDebInfo, Static)'),
-(1,1767027047,0,0,'AzerothCore rev. 10d105243f47 2025-12-29 17:44:37 +0100 (Last-DB-SQUASH-OF-2025-WOO-HOO-WOOP-WOOP branch) (Win64, RelWithDebInfo, Static)');
+(1,1767027047,0,0,'AzerothCore rev. 10d105243f47 2025-12-29 17:44:37 +0100 (Last-DB-SQUASH-OF-2025-WOO-HOO-WOOP-WOOP branch) (Win64, RelWithDebInfo, Static)'),
+(1,1773603132,0,0,'AzerothCore rev. b87240941155 2026-03-15 08:58:27 +0000 (squash-in-mars branch) (Win64, RelWithDebInfo, Static)'),
+(1,1773603445,0,0,'AzerothCore rev. b87240941155 2026-03-15 08:58:27 +0000 (squash-in-mars branch) (Win64, RelWithDebInfo, Static)');
 /*!40000 ALTER TABLE `uptime` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -56,4 +58,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-29 17:55:20
+-- Dump completed on 2026-03-15 20:40:04

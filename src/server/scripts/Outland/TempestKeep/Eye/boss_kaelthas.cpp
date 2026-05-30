@@ -229,9 +229,6 @@ struct boss_kaelthas : public BossAI
             {
                 advisor->Respawn(true);
                 advisor->StopMovingOnCurrentPos();
-                advisor->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                advisor->SetReactState(REACT_PASSIVE);
-                summons.Summon(advisor);
             }
         }
     }
@@ -550,7 +547,7 @@ struct boss_kaelthas : public BossAI
     void IntroduceNewAdvisor(KTYells talkIntroduction, KTActions kaelAction)
     {
         std::chrono::milliseconds attackStartTimer = 0ms;
-        EyeNPCs advisorNPCId = NPC_THALADRED;
+        uint32 dataIdx = DATA_THALADRED;
         scheduler.Schedule(2s, [this, talkIntroduction](TaskContext)
         {
             Talk(talkIntroduction);
@@ -560,26 +557,26 @@ struct boss_kaelthas : public BossAI
         {
             case ACTION_START_THALADRED:
                 attackStartTimer = 7s;
-                advisorNPCId = NPC_THALADRED;
+                dataIdx = DATA_THALADRED;
                 break;
             case ACTION_START_SANGUINAR:
                 attackStartTimer = 14500ms;
-                advisorNPCId = NPC_LORD_SANGUINAR;
+                dataIdx = DATA_LORD_SANGUINAR;
                 break;
             case ACTION_START_CAPERNIAN:
                 attackStartTimer = 9s;
-                advisorNPCId = NPC_CAPERNIAN;
+                dataIdx = DATA_CAPERNIAN;
                 break;
             case ACTION_START_TELONICUS:
                 attackStartTimer = 10400ms;
-                advisorNPCId = NPC_TELONICUS;
+                dataIdx = DATA_TELONICUS;
                 break;
             default:
                 break;
         }
-        scheduler.Schedule(attackStartTimer, [this, advisorNPCId](TaskContext)
+        scheduler.Schedule(attackStartTimer, [this, dataIdx](TaskContext)
         {
-            if (Creature* advisor = summons.GetCreatureWithEntry(advisorNPCId))
+            if (Creature* advisor = instance->GetCreature(dataIdx))
             {
                 advisor->SetReactState(REACT_AGGRESSIVE);
                 advisor->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
@@ -725,12 +722,7 @@ private:
 struct advisor_baseAI : public ScriptedAI
 
 {
-    advisor_baseAI(Creature* creature) : ScriptedAI(creature) {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    advisor_baseAI(Creature* creature) : ScriptedAI(creature) {    }
 
     virtual void ScheduleEvents() {}
 
@@ -740,6 +732,13 @@ struct advisor_baseAI : public ScriptedAI
         _feigning = false;
         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         scheduler.CancelAll();
+    }
+
+    void JustRespawned() override
+    {
+        ScriptedAI::JustRespawned();
+        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+        me->SetReactState(REACT_PASSIVE);
     }
 
     void JustEngagedWith(Unit* /*who*/) override { ScheduleEvents(); }
@@ -1083,13 +1082,14 @@ class spell_kaelthas_nether_beam : public SpellScript
     {
         PreventHitEffect(effIndex);
 
-        ThreatContainer::StorageType const& ThreatList = GetCaster()-> GetThreatMgr().GetThreatList();
         std::list<Unit*> targetList;
-        for (ThreatContainer::StorageType::const_iterator itr = ThreatList.begin(); itr != ThreatList.end(); ++itr)
+        for (ThreatReference const* ref : GetCaster()->GetThreatMgr().GetUnsortedThreatList())
         {
-            Unit* target = ObjectAccessor::GetUnit(*GetCaster(), (*itr)->getUnitGuid());
-            if (target && target->IsPlayer())
-                targetList.push_back(target);
+            if (Unit* target = ref->GetVictim())
+            {
+                if (target->IsPlayer())
+                    targetList.push_back(target);
+            }
         }
 
         Acore::Containers::RandomResize(targetList, 5);
