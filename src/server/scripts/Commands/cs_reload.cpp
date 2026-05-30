@@ -164,6 +164,7 @@ public:
             { "spell_proc",                    HandleReloadSpellProcsCommand,                 rbac::RBAC_PERM_COMMAND_RELOAD_SPELL_PROC, Console::Yes },
             { "spell_scripts",                 HandleReloadSpellScriptsCommand,               rbac::RBAC_PERM_COMMAND_RELOAD, Console::Yes },
             { "spell_target_position",         HandleReloadSpellTargetPositionCommand,        rbac::RBAC_PERM_COMMAND_RELOAD_SPELL_TARGET_POSITION, Console::Yes },
+            { "spell_cone",                    HandleReloadSpellConeCommand,                  rbac::RBAC_PERM_COMMAND_RELOAD_SPELL_TARGET_POSITION, Console::Yes },
             { "spell_threats",                 HandleReloadSpellThreatsCommand,               rbac::RBAC_PERM_COMMAND_RELOAD_SPELL_THREATS, Console::Yes },
             { "spell_group_stack_rules",       HandleReloadSpellGroupStackRulesCommand,       rbac::RBAC_PERM_COMMAND_RELOAD_SPELL_GROUP_STACK_RULES, Console::Yes },
             { "player_loot_template",          HandleReloadLootTemplatesPlayerCommand,        rbac::RBAC_PERM_COMMAND_RELOAD, Console::Yes },
@@ -933,6 +934,14 @@ public:
         LOG_INFO("server.loading", "Reloading Spell target coordinates...");
         sSpellMgr->LoadSpellTargetPositions();
         handler->SendGlobalGMSysMessage("DB table `spell_target_position` (destination coordinates for spell targets) reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadSpellConeCommand(ChatHandler* handler)
+    {
+        LOG_INFO("server.loading", "Reloading Spell cone definitions...");
+        sSpellMgr->LoadSpellCones();
+        handler->SendGlobalGMSysMessage("DB table `spell_cone` reloaded.");
         return true;
     }
 
