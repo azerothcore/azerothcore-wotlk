@@ -28,7 +28,6 @@
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "PoolMgr.h"
-#include "RaceMgr.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
 #include "SpellScript.h"
@@ -216,12 +215,18 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
         Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
         if (!wintergrasp)
             return true;
+
+        if (!player->IsAlive())
+        {
+            wintergrasp->SendAreaSpiritHealerQueryOpcode(player, creature->GetGUID());
+            player->CastSpell(player, SPELL_WAITING_FOR_RESURRECT, true);
+        }
+
+        if (creature->IsQuestGiver())
+            player->PrepareQuestMenu(creature->GetGUID());
 
         GraveyardVect graveyard = wintergrasp->GetGraveyardVector();
         for (uint8 i = 0; i < graveyard.size(); i++)
@@ -860,8 +865,12 @@ public:
 
         bool IsFriendly(Unit* passenger)
         {
-            return ((me->GetUInt32Value(GAMEOBJECT_FACTION) == WintergraspFaction[TEAM_HORDE] && passenger->getRaceMask() & sRaceMgr->GetHordeRaceMask()) ||
-                    (me->GetUInt32Value(GAMEOBJECT_FACTION) == WintergraspFaction[TEAM_ALLIANCE] && passenger->getRaceMask() & sRaceMgr->GetAllianceRaceMask()));
+            Player* player = passenger->ToPlayer();
+            if (!player)
+                return false;
+
+            TeamId goTeam = me->GetUInt32Value(GAMEOBJECT_FACTION) == WintergraspFaction[TEAM_HORDE] ? TEAM_HORDE : TEAM_ALLIANCE;
+            return player->GetTeamId() == goTeam;
         }
 
         Creature* IsValidVehicle(Creature* cVeh)

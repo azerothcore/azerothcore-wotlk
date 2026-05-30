@@ -682,6 +682,9 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading Spell Target Coordinates...");
     sSpellMgr->LoadSpellTargetPositions();
 
+    LOG_INFO("server.loading", "Loading Spell Cone definitions...");
+    sSpellMgr->LoadSpellCones();
+
     LOG_INFO("server.loading", "Loading Enchant Custom Attributes...");
     sSpellMgr->LoadEnchantCustomAttr();
 
