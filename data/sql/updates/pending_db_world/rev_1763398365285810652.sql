@@ -699,6 +699,7 @@ UPDATE `item_template_locale` SET `Name` = 'Camisa de matón', `VerifiedBuild` =
 UPDATE `item_template_locale` SET `Name` = 'Botas de matón', `VerifiedBuild` = 0 WHERE `locale` = 'esES' AND `ID` = 6138;
 -- AC datas : OLD Name : "Monster - Item, Flowers  - Bouquet Roses", Name AC enUS : "Monster - Item, Flowers  - Bouquet Roses" ; Wowhead enUS : ""
 -- UPDATE `item_template_locale` SET `Name` = 'Monster - Item, Flowers - Boquet Roses', `VerifiedBuild` = 0 WHERE `locale` = 'esES' AND `ID` = 6232;
+DELETE FROM `item_template_locale` WHERE `locale` = 'esES' AND `ID` = 6232;
 -- AC datas : OLD Name : "Sangre de guardiavil", Name AC enUS : "Doomwarder Blood" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Sangre de Guardiavil', `VerifiedBuild` = 0 WHERE `locale` = 'esES' AND `ID` = 6252;
 -- AC datas : OLD Name : "Corazón de Comar", Name AC enUS : "Comar's Heart" ; Wowhead enUS : ""
@@ -2977,6 +2978,7 @@ UPDATE `item_template_locale` SET `Description` = 'Te enseña a invocar esta mon
 UPDATE `item_template_locale` SET `Name` = 'Botas de arponero', `VerifiedBuild` = 0 WHERE `locale` = 'esES' AND `ID` = 37056;
 -- AC datas : OLD Name : "Clayton's Test Item Three", Name AC enUS : "Clayton's Test Item Three" ; Wowhead enUS : ""
 -- UPDATE `item_template_locale` SET `Name` = 'Clayton''s Test Item Three TEST', `VerifiedBuild` = 0 WHERE `locale` = 'esES' AND `ID` = 37126;
+DELETE FROM `item_template_locale` WHERE `locale` = 'esES' AND `ID` = 37126;
 -- AC datas : OLD Name : "Zancos de fallas", Name AC enUS : "Rift Striders" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Zancudos de fallas', `VerifiedBuild` = 0 WHERE `locale` = 'esES' AND `ID` = 37150;
 -- AC datas : OLD Name : "Borceguíes ajados por la piedra", Name AC enUS : "Stone-Worn Footwraps" ; Wowhead enUS : ""
@@ -4051,14 +4053,19 @@ UPDATE `item_template_locale` SET `Name` = 'Daga dirk', `VerifiedBuild` = 0 WHER
 UPDATE `item_template_locale` SET `Name` = 'Puñal kris', `VerifiedBuild` = 0 WHERE `locale` = 'esES' AND `ID` = 2209;
 -- AC datas : OLD Name : "59 TEST Green Rogue Legs", Name AC enUS : "59 TEST Green Rogue Legs" ; Wowhead enUS : ""
 -- UPDATE `item_template_locale` SET `Name` = '60 TEST Green Rogue Legs', `VerifiedBuild` = 0 WHERE `locale` = 'esES' AND `ID` = 26173;
+DELETE FROM `item_template_locale` WHERE `locale` = 'esES' AND `ID` = 26173;
 -- AC datas : OLD Name : "59 TEST Green Rogue Shoulder", Name AC enUS : "59 TEST Green Rogue Shoulder" ; Wowhead enUS : ""
 -- UPDATE `item_template_locale` SET `Name` = '60 TEST Green Rogue Shoulder', `VerifiedBuild` = 0 WHERE `locale` = 'esES' AND `ID` = 26174;
+DELETE FROM `item_template_locale` WHERE `locale` = 'esES' AND `ID` = 26174;
 -- AC datas : OLD Name : "59 TEST Green Rogue Wrist", Name AC enUS : "59 TEST Green Rogue Wrist" ; Wowhead enUS : ""
 -- UPDATE `item_template_locale` SET `Name` = '60 TEST Green Rogue Wrist', `VerifiedBuild` = 0 WHERE `locale` = 'esES' AND `ID` = 26175;
+DELETE FROM `item_template_locale` WHERE `locale` = 'esES' AND `ID` = 26175;
 -- AC datas : OLD Name : "67 TEST Green Rogue Hand", Name AC enUS : "67 TEST Green Rogue Hand" ; Wowhead enUS : ""
 -- UPDATE `item_template_locale` SET `Name` = '68 TEST Green Rogue Hand', `VerifiedBuild` = 0 WHERE `locale` = 'esES' AND `ID` = 26235;
+DELETE FROM `item_template_locale` WHERE `locale` = 'esES' AND `ID` = 26235;
 -- AC datas : OLD Name : "Monster - Axe, 2H Gorehowl (GROM HELLSCREAM ONLY)", Name AC enUS : "Monster - Axe, 2H Gorehowl (GROM HELLSCREAM ONLY)" ; Wowhead enUS : ""
 -- UPDATE `item_template_locale` SET `Name` = 'Monster - Axe, 2H Gorehowl', `VerifiedBuild` = 0 WHERE `locale` = 'esES' AND `ID` = 30414;
+DELETE FROM `item_template_locale` WHERE `locale` = 'esES' AND `ID` = 30414;
 
 -- Update existing entries, from CLASSIC
 -- AC datas : OLD Name : "Tabar", Name AC enUS : "Tabar" ; Wowhead enUS : ""
