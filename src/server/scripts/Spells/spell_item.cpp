@@ -787,27 +787,25 @@ class spell_item_feast : public SpellScript
         Unit* caster = GetCaster();
         if (Player* player = caster->ToPlayer())
         {
-            LocaleConstant loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
-
+            uint32 textId = 0;
             switch (GetSpellInfo()->Id)
             {
                 case SPELL_GREAT_FEAST:
-                    if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(GREAT_FEAST_BROADCAST_TEXT_ID_PREPARE))
-                        player->TextEmote(bct->GetText(loc_idx, player->getGender()), player);
+                    textId = GREAT_FEAST_BROADCAST_TEXT_ID_PREPARE;
                     break;
                 case SPELL_FISH_FEAST:
-                    if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(FISH_FEAST_BROADCAST_TEXT_ID_PREPARE))
-                        player->TextEmote(bct->GetText(loc_idx, player->getGender()), player);
+                    textId = FISH_FEAST_BROADCAST_TEXT_ID_PREPARE;
                     break;
                 case SPELL_SMALL_FEAST:
-                    if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(SMALL_FEAST_BROADCAST_TEXT_ID_PREPARE))
-                        player->TextEmote(bct->GetText(loc_idx, player->getGender()), player);
+                    textId = SMALL_FEAST_BROADCAST_TEXT_ID_PREPARE;
                     break;
                 case SPELL_GIGANTIC_FEAST:
-                    if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(GIGANTIC_FEAST_BROADCAST_TEXT_ID_PREPARE))
-                        player->TextEmote(bct->GetText(loc_idx, player->getGender()), player);
+                    textId = GIGANTIC_FEAST_BROADCAST_TEXT_ID_PREPARE;
+                    break;
+                default:
                     break;
             }
+            player->Unit::TextEmote(textId, player);
         }
     }
 
