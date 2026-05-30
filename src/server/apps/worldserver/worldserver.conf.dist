@@ -3678,6 +3678,31 @@ Wintergrasp.CrashRestartTimer = 10
 Wintergrasp.SkipBattleSessionCount = 3500
 
 #
+#     Wintergrasp.KickVoAPlayers
+#         Description: Kick players from Vault of Archavon and freeze its bosses
+#                      in the minutes leading up to a Wintergrasp battle, and
+#                      block new entries during wartime / the 10-minute warmup.
+#                      Requires a server restart to take effect (not reloadable).
+#         Default:     1 - (Enabled, players are warned then teleported to their
+#                           homebind before the battle starts)
+#                      0 - (Disabled, players stay inside and bosses behave
+#                           normally during Wintergrasp)
+
+Wintergrasp.KickVoAPlayers = 1
+
+#
+#     Wintergrasp.EssenceBothFactions
+#         Description: Grant the "Essence of Wintergrasp" buff to both factions
+#                      during peacetime, regardless of who controls the keep.
+#                      The wartime suppression still applies; this only affects
+#                      who receives the buff once the battle is over.
+#         Default:     0 - (Disabled, only the defending faction gets the buff)
+#                      1 - (Enabled, attackers and defenders both get the buff,
+#                           so both factions can access Vault of Archavon)
+
+Wintergrasp.EssenceBothFactions = 0
+
+#
 ###################################################################################################
 
 ###################################################################################################
