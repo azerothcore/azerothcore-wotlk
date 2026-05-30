@@ -404,8 +404,11 @@ void Battlefield::EndBattle(bool endByTimer)
     else
         DoPlaySoundToAll(BF_HORDE_WINS);
 
-    OnBattleEnd(endByTimer);
+    // Hook runs BEFORE OnBattleEnd so subscribers can read PlayersInWar
+    // while it is still populated (OnBattleEnd hands out rewards and then
+    // clears the set).
     sScriptMgr->OnBattlefieldWarEnd(this, endByTimer);
+    OnBattleEnd(endByTimer);
 
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
     {

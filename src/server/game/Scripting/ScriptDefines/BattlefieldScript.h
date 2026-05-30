@@ -28,7 +28,7 @@ enum BattlefieldHook
     BATTLEFIELDHOOK_ON_PLAYER_JOIN_WAR,            // 2 - fires after player is added to the active war
     BATTLEFIELDHOOK_ON_PLAYER_LEAVE_WAR,           // 3 - fires after player is removed from the active war
     BATTLEFIELDHOOK_BEFORE_INVITE_PLAYER_TO_WAR,   // 4 - fires in InvitePlayerToWar before InvitedPlayers insert
-    BATTLEFIELDHOOK_ON_WAR_END,                    // 5 - fires in EndBattle after OnBattleEnd(), before timer reset
+    BATTLEFIELDHOOK_ON_WAR_END,                    // 5 - fires in EndBattle before OnBattleEnd(), while PlayersInWar is still populated
     BATTLEFIELDHOOK_ON_PLAYER_KILL,                // 6 - fires in HandleKill for every player-kills-player event
     BATTLEFIELDHOOK_END
 };
