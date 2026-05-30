@@ -1,3 +1,4 @@
+-- DB update 2026_05_30_08 -> 2026_05_30_09
 -- Update item (esES) ; from WowHead Wotlk > TBC > Classic > Cata > Mop > Retail
 -- If locale datas strictly equals AC enUS, or if locale datas strictly equals to Wowhead enUS, then we use AC fallback to enUS
 -- Disclaimer : Datas of technical NPCs (Theoretically not visible to players) could be wrong, here we strictly align with WoWHead datas
