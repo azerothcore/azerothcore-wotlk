@@ -608,7 +608,7 @@ UPDATE `item_template_locale` SET `Name` = 'Camisa de matón', `VerifiedBuild` =
 -- AC datas : OLD Name : "Botas de trampero", Name AC enUS : "Thug Boots" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Botas de matón', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 6138;
 -- AC datas : OLD Name : "Monster - Item, Flowers  - Bouquet Roses", Name AC enUS : "Monster - Item, Flowers  - Bouquet Roses" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Monster - Item, Flowers - Boquet Roses', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 6232;
+-- UPDATE `item_template_locale` SET `Name` = 'Monster - Item, Flowers - Boquet Roses', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 6232;
 -- AC datas : OLD Name : "Corazón de Comar", Name AC enUS : "Comar's Heart" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Corazón de Corma', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 6313;
 -- AC datas : OLD Name : "Hombreras con babosas taraceadas", Name AC enUS : "Slime-encrusted Pads" ; Wowhead enUS : ""
@@ -1744,7 +1744,7 @@ UPDATE `item_template_locale` SET `Name` = 'Ópalo de maná', `VerifiedBuild` = 
 -- AC datas : OLD Description : "Te enseña a invocar esta montura. Cambia según tu habilidad en equitación y la zona en la que estés.", Description AC enUS : "Teaches you how to summon this mount." ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Te enseña a invocar esta montura.', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 37012;
 -- AC datas : OLD Name : "Clayton's Test Item Three", Name AC enUS : "Clayton's Test Item Three" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Clayton''s Test Item Three TEST', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 37126;
+-- UPDATE `item_template_locale` SET `Name` = 'Clayton''s Test Item Three TEST', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 37126;
 -- AC datas : OLD Name : "Esfera de sangre de dragón rojo", Name AC enUS : "Sphere of Red Dragon's Blood" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Esfera de sangre de dragón Rojo', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 37166;
 -- AC datas : OLD Name : "Falda hogareña de Gorge", Name AC enUS : "Gorge's Loungewear" ; Wowhead enUS : ""
@@ -2980,7 +2980,7 @@ UPDATE `item_template_locale` SET `Description` = 'Te transforma en un guerrero 
 
 -- Update existing entries, from TBC
 -- AC datas : OLD Name : "Monster - Axe, 2H Gorehowl (GROM HELLSCREAM ONLY)", Name AC enUS : "Monster - Axe, 2H Gorehowl (GROM HELLSCREAM ONLY)" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Monster - Axe, 2H Gorehowl', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 30414;
+-- UPDATE `item_template_locale` SET `Name` = 'Monster - Axe, 2H Gorehowl', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 30414;
 
 -- Update existing entries, from CLASSIC
 -- AC datas : OLD Description : "", Description AC enUS : "" ; Wowhead enUS : ""
@@ -2994,7 +2994,7 @@ UPDATE `item_template_locale` SET `Name` = 'Monedero grande (old)', `VerifiedBui
 
 -- Update existing entries, from MOP
 -- AC datas : OLD Name : "Objeto de prueba JYoo", Name AC enUS : "JYoo test item" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'JLeCraft Test Item', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 1259;
+-- UPDATE `item_template_locale` SET `Name` = 'JLeCraft Test Item', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 1259;
 -- AC datas : OLD Name : "Monstruo: daga, básica con pinchos ornamentada", Name AC enUS : "Monster - Dagger, Ornate Spikey Base" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = '"Monster - Dagger, Ornate Spikey Base"', `VerifiedBuild` = 0 WHERE `locale` = 'esMX' AND `ID` = 5283;
 -- AC datas : OLD Name : "Monstruo: daga, garfio colmillo curva oscura", Name AC enUS : "Monster - Dagger, Fang Hook Curve Dark" ; Wowhead enUS : ""
