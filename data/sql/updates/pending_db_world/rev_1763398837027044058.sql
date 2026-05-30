@@ -884,7 +884,7 @@ UPDATE `item_template_locale` SET `Name` = 'Сапоги головореза', 
 -- AC datas : OLD Name : "Ножка чудовищного краба", Name AC enUS : "Monstrous Crawler Leg" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Нога чудовищного краба', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 6184;
 -- AC datas : OLD Name : "Monster - Item, Flowers  - Bouquet Roses", Name AC enUS : "Monster - Item, Flowers  - Bouquet Roses" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Monster - Item, Flowers - Boquet Roses', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 6232;
+-- UPDATE `item_template_locale` SET `Name` = 'Monster - Item, Flowers - Boquet Roses', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 6232;
 -- AC datas : OLD Name : "Большее одеяние адепта", Name AC enUS : "Greater Adept's Robe" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Большое одеяние адепта', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 6264;
 -- AC datas : OLD Name : "Жилет посвященного", Name AC enUS : "Disciple's Vest" ; Wowhead enUS : ""
@@ -4756,13 +4756,13 @@ UPDATE `item_template_locale` SET `Description` = 'Документ написа
 -- AC datas : OLD Description : "Запечатано. Может потрясти?", Description AC enUS : "It's sealed.  Maybe you should shake it?" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Запечатано. Может, потрясти?', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 25727;
 -- AC datas : OLD Name : "(Испорчено) Чертеж мана-бомбы, стр. 1", Name AC enUS : "(Deprecated)Mana Bomb Schematics - Page 1" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = '(DEPRECATED) Чертеж мана-бомбы, стр. 1', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 25747;
+-- UPDATE `item_template_locale` SET `Name` = '(DEPRECATED) Чертеж мана-бомбы, стр. 1', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 25747;
 -- AC datas : OLD Name : "(Испорчено) Чертеж мана-бомбы, стр. 2", Name AC enUS : "(Deprecated)Mana Bomb Schematics - Page 2" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = '(DEPRECATED) Чертеж мана-бомбы, стр. 2', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 25748;
+-- UPDATE `item_template_locale` SET `Name` = '(DEPRECATED) Чертеж мана-бомбы, стр. 2', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 25748;
 -- AC datas : OLD Name : "(Испорчено) Чертеж мана-бомбы, стр. 3", Name AC enUS : "(Deprecated)Mana Bomb Schematics - Page 3" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = '(DEPRECATED) Чертеж мана-бомбы, стр. 3', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 25749;
+-- UPDATE `item_template_locale` SET `Name` = '(DEPRECATED) Чертеж мана-бомбы, стр. 3', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 25749;
 -- AC datas : OLD Name : "(Испорчено) Чертеж мана-бомбы, стр. 4", Name AC enUS : "(Deprecated)Mana Bomb Schematics - Page 4" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = '(DEPRECATED) Чертеж мана-бомбы, стр. 4', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 25750;
+-- UPDATE `item_template_locale` SET `Name` = '(DEPRECATED) Чертеж мана-бомбы, стр. 4', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 25750;
 -- AC datas : OLD Description : "На этой карте отмечены Бастион Аллерии и Форт Камнеломов в окружении чернильных пятен и разнообразных приказов.", Description AC enUS : "The locations of the Allerian Stronghold and Stonebreaker Hold are clearly marked on this map along with a series of bold ink strokes and assorted orders." ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'На этой карте отмечены бастион Аллерии и форт Камнеломов в окружении чернильных пятен и разнообразных приказов.', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 25765;
 -- AC datas : OLD Name : ""Должники Сальсалабима"", Name AC enUS : ""Creatures That Owe Sal'salabim Golds"" ; Wowhead enUS : "",  OLD Description : "Список существ, задолжавших Сальсалабиму.", Description AC enUS : "The list of creatures that owe Sal'salabim money." ; Wowhead enUS : ""
@@ -4878,11 +4878,11 @@ UPDATE `item_template_locale` SET `Name` = 'Великий посох левиа
 -- AC datas : OLD Name : "Пояс безвременной тайны оракула", Name AC enUS : "Oracle Belt of Timeless Mystery" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Пояс вневременной тайны оракула', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 27768;
 -- AC datas : OLD Name : "СТАРЫЙ Могущественный кровавый гранат", Name AC enUS : "zzOLDMighty Blood Garnet" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'zzOLD Могущественный кровавый гранат', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 27774;
+-- UPDATE `item_template_locale` SET `Name` = 'zzOLD Могущественный кровавый гранат', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 27774;
 -- AC datas : OLD Name : "Ключ от прыготрона 4000", Name AC enUS : "Jump-a-tron 4000 Key" ; Wowhead enUS : "",  OLD Description : "Сбоку выгравировано: Вазат не несёт ответственности за несчастные случаи при использовании прыготрона 4000.", Description AC enUS : "Etched on the side: Wazat will not be held accountable for any accidents that occur as a result of using the Jump-a-tron 4000." ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Ключ от Прыготрона-4000', `Description` = 'Сбоку выгравировано: Вазат не несет ответственности за несчастные случаи при использовании Прыготрона-4000.', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 27808;
 -- AC datas : OLD Name : "СТАРЫЙ Могущественный кровавый гранат", Name AC enUS : "zzOLDMighty Blood Garnet" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'zzOLD Могущественный кровавый гранат', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 27811;
+-- UPDATE `item_template_locale` SET `Name` = 'zzOLD Могущественный кровавый гранат', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 27811;
 -- AC datas : OLD Name : "Наплечье Ярости разума", Name AC enUS : "Mindrage Pauldrons" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Наплечье ярости разума', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 27816;
 -- AC datas : OLD Name : "Длинный лук Звездострела", Name AC enUS : "Starbolt Longbow" ; Wowhead enUS : ""
@@ -4946,9 +4946,9 @@ UPDATE `item_template_locale` SET `Name` = 'Гримуар страданий (2
 -- AC datas : OLD Name : "Гримуар Муки (Ранг 3)", Name AC enUS : "Grimoire of Anguish (Rank 3)" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Гримуар страданий (3-й уровень)', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 28073;
 -- AC datas : OLD Name : "СТАРЫЙ Рельефный изысканный рубин", Name AC enUS : "zzOLDBold Ornate Ruby" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'zzOLD Рельефный изысканный рубин', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 28117;
+-- UPDATE `item_template_locale` SET `Name` = 'zzOLD Рельефный изысканный рубин', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 28117;
 -- AC datas : OLD Name : "СТАРЫЙ Покрытый письменами изысканный топаз", Name AC enUS : "zzOLDEnscribed Ornate Topaz" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'zzOLD Покрытый письменами изысканный топаз', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 28122;
+-- UPDATE `item_template_locale` SET `Name` = 'zzOLD Покрытый письменами изысканный топаз', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 28122;
 -- AC datas : OLD Name : "Наручи разведчика Транквиллиона", Name AC enUS : "Tranquillien Scout's Bracers" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Наручи разведчика из Транквиллиона', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 28147;
 -- AC datas : OLD Name : "Ремень поборника Транквиллиона", Name AC enUS : "Tranquillien Defender's Girdle" ; Wowhead enUS : ""
@@ -6384,7 +6384,7 @@ UPDATE `item_template_locale` SET `Name` = 'Особое зелье маны', `
 -- AC datas : OLD Description : "Обучает управлению этим средством передвижения. Свойства этого транспортного средства могут меняться в зависимости от вашего навыка верховой езды и местонахождения.", Description AC enUS : "Teaches you how to summon this mount." ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Обучает управлению этим верховым животным.', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 37012;
 -- AC datas : OLD Name : "Clayton's Test Item Three", Name AC enUS : "Clayton's Test Item Three" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Clayton''s Test Item Three TEST', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 37126;
+-- UPDATE `item_template_locale` SET `Name` = 'Clayton''s Test Item Three TEST', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 37126;
 -- AC datas : OLD Name : "Амулет светлого пива", Name AC enUS : "Brightbrew Charm" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Амулет светлого напитка', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 37127;
 -- AC datas : OLD Name : "Амулет темного пива", Name AC enUS : "Balebrew Charm" ; Wowhead enUS : ""
@@ -7696,17 +7696,17 @@ UPDATE `item_template_locale` SET `Description` = 'Testing the LOC trigger', `Ve
 
 -- Update existing entries, from CATA
 -- AC datas : OLD Name : "СТАРЫЕ штаны дворфийского новичка", Name AC enUS : "OLDDwarven Initiate's Pants" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'OLD Дворфийские штаны посвященного', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 91;
+-- UPDATE `item_template_locale` SET `Name` = 'OLD Дворфийские штаны посвященного', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 91;
 -- AC datas : OLD Name : "Большой кошель (старый)", Name AC enUS : "Large Moneybag (old)" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Большой кошель (old)', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 1014;
 -- AC datas : OLD Name : "OLDMonster - Hands, Plate Silver", Name AC enUS : "OLDMonster - Hands, Plate Silver" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'OLD Монстр – руки, серебряные латы', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 3245;
+-- UPDATE `item_template_locale` SET `Name` = 'OLD Монстр – руки, серебряные латы', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 3245;
 -- AC datas : OLD Name : "СТАРАЯ церемониальная дубина", Name AC enUS : "OLDCeremonial Club" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'OLD Парадная дубина', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 4704;
+-- UPDATE `item_template_locale` SET `Name` = 'OLD Парадная дубина', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 4704;
 -- AC datas : OLD Name : "Monster - Dagger, Ornate Spikey Base", Name AC enUS : "Monster - Dagger, Ornate Spikey Base" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Монстр – кинжал, украшенное основание с шипами', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 5283;
 -- AC datas : OLD Name : "СТАРАЯ церемониальная дубина", Name AC enUS : "OLDCeremonial Club" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'OLD Парадная дубина', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 5410;
+-- UPDATE `item_template_locale` SET `Name` = 'OLD Парадная дубина', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 5410;
 -- AC datas : OLD Name : "Рваная демонская кожа (old2)", Name AC enUS : "Flayed Demon Skin (old2)" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Рваная шкура демона (old2)', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 6766;
 -- AC datas : OLD Name : "PvP - латы - шлем - Альянс", Name AC enUS : "PVP Plate Helm Alliance" ; Wowhead enUS : ""
