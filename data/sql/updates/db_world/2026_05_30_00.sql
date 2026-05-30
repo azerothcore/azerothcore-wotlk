@@ -1,3 +1,4 @@
+-- DB update 2026_05_28_00 -> 2026_05_30_00
 -- Hellfire Channelers formation: groupAI = 3 (MEMBER_ASSIST_LEADER | LEADER_ASSIST_MEMBER), pack-aggro only. Wipe handling lives in the instance script's hard reset.
 DELETE FROM `creature_formations` WHERE `leaderGUID`=90978;
 INSERT INTO `creature_formations`

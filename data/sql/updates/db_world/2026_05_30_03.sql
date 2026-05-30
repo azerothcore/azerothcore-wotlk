@@ -1,3 +1,4 @@
+-- DB update 2026_05_30_02 -> 2026_05_30_03
 --
 -- 25029 Flamethrower TARGET_UNIT_CONE_ENTRY
 -- 25030 Shoot Rocket TARGET_UNIT_CONE_ENTRY

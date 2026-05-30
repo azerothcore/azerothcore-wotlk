@@ -1,3 +1,4 @@
+-- DB update 2026_05_30_00 -> 2026_05_30_01
 --
 DROP TABLE IF EXISTS `spell_cone`;
 CREATE TABLE `spell_cone` (
