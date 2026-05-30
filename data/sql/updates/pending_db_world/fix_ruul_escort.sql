@@ -1,11 +1,11 @@
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 12818;
 DELETE FROM `smart_scripts` WHERE `source_type` = 0 AND `entryorguid` IN (12818);
 DELETE FROM `smart_scripts` WHERE `source_type` = 9 AND `entryorguid` IN (1281801, 1281802);
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, 
-`event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, 
-`action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, 
-`target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES 
--- 
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`,
+`event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`,
+`action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`,
+`target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+--
 (12818, 0, 0, 1, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,                 'Ruul Snowhoof - On Respawn - Set Reactstate Passive'),
 (12818, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 3, 12819, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,             'Ruul Snowhoof - On Respawn - Morph To Creature Ruul Snowhoof Bear Form'),
 (12818, 0, 2, 3, 19, 0, 100, 0, 6482, 0, 0, 0, 0, 0, 64, 1, 0, 0, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0,            'Ruul Snowhoof - On Quest Taken - Store Targetlist'),
@@ -34,7 +34,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (1281802, 9, 2, 0, 0, 0, 100, 0, 8000, 8000, 0, 0, 0, 0, 12, 3926, 7, 60000, 1, 1, 0, 8, 0, 0, 0, 0, 3495.9, -526.57, 188.322, 4.62782,   'Ruul Snowhoof - Actionlist - Summon Creature Thistlefur Pathfinder');
 
 DELETE FROM `waypoints` WHERE `entry` = 12818;
-INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `point_comment`) VALUES 
+INSERT INTO `waypoints` (`entry`, `pointid`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `point_comment`) VALUES
 (12818, 1, 3339.1, -693.613, 162.218, NULL, 0, 'Ruul Snowhoof'),
 (12818, 2, 3343.94, -682.272, 163.039, NULL, 0, 'Ruul Snowhoof'),
 (12818, 3, 3381.5, -659.834, 162.487, NULL, 0, 'Ruul Snowhoof'),
