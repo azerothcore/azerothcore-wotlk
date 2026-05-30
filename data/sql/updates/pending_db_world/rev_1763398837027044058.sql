@@ -885,6 +885,7 @@ UPDATE `item_template_locale` SET `Name` = 'Сапоги головореза', 
 UPDATE `item_template_locale` SET `Name` = 'Нога чудовищного краба', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 6184;
 -- AC datas : OLD Name : "Monster - Item, Flowers  - Bouquet Roses", Name AC enUS : "Monster - Item, Flowers  - Bouquet Roses" ; Wowhead enUS : ""
 -- UPDATE `item_template_locale` SET `Name` = 'Monster - Item, Flowers - Boquet Roses', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 6232;
+DELETE FROM `item_template_locale` WHERE `locale` = 'ruRU' AND `ID` = 6232;
 -- AC datas : OLD Name : "Большее одеяние адепта", Name AC enUS : "Greater Adept's Robe" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Большое одеяние адепта', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 6264;
 -- AC datas : OLD Name : "Жилет посвященного", Name AC enUS : "Disciple's Vest" ; Wowhead enUS : ""
@@ -6385,6 +6386,7 @@ UPDATE `item_template_locale` SET `Name` = 'Особое зелье маны', `
 UPDATE `item_template_locale` SET `Description` = 'Обучает управлению этим верховым животным.', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 37012;
 -- AC datas : OLD Name : "Clayton's Test Item Three", Name AC enUS : "Clayton's Test Item Three" ; Wowhead enUS : ""
 -- UPDATE `item_template_locale` SET `Name` = 'Clayton''s Test Item Three TEST', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 37126;
+DELETE FROM `item_template_locale` WHERE `locale` = 'ruRU' AND `ID` = 37126;
 -- AC datas : OLD Name : "Амулет светлого пива", Name AC enUS : "Brightbrew Charm" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Амулет светлого напитка', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 37127;
 -- AC datas : OLD Name : "Амулет темного пива", Name AC enUS : "Balebrew Charm" ; Wowhead enUS : ""
@@ -7701,6 +7703,7 @@ UPDATE `item_template_locale` SET `Description` = 'Testing the LOC trigger', `Ve
 UPDATE `item_template_locale` SET `Name` = 'Большой кошель (old)', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 1014;
 -- AC datas : OLD Name : "OLDMonster - Hands, Plate Silver", Name AC enUS : "OLDMonster - Hands, Plate Silver" ; Wowhead enUS : ""
 -- UPDATE `item_template_locale` SET `Name` = 'OLD Монстр – руки, серебряные латы', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 3245;
+DELETE FROM `item_template_locale` WHERE `locale` = 'ruRU' AND `ID` = 3245;
 -- AC datas : OLD Name : "СТАРАЯ церемониальная дубина", Name AC enUS : "OLDCeremonial Club" ; Wowhead enUS : ""
 -- UPDATE `item_template_locale` SET `Name` = 'OLD Парадная дубина', `VerifiedBuild` = 0 WHERE `locale` = 'ruRU' AND `ID` = 4704;
 -- AC datas : OLD Name : "Monster - Dagger, Ornate Spikey Base", Name AC enUS : "Monster - Dagger, Ornate Spikey Base" ; Wowhead enUS : ""
