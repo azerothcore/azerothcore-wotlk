@@ -1020,7 +1020,7 @@ UPDATE `item_template_locale` SET `Name` = '룬문자 구리마법막대', `Veri
 -- AC datas : OLD Name : "어둠골 문장 방패", Name AC enUS : "Crest of Darkshire" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = '다크샤이어 문장 방패', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 6223;
 -- AC datas : OLD Name : "몬스터 - Item, Flowers - Bouquet Roses", Name AC enUS : "Monster - Item, Flowers  - Bouquet Roses" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Monster - Item, Flowers - Boquet Roses', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 6232;
+-- UPDATE `item_template_locale` SET `Name` = 'Monster - Item, Flowers - Boquet Roses', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 6232;
 -- AC datas : OLD Name : "호수광포어 별미", Name AC enUS : "Loch Frenzy Delight" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = '호수프렌지 별미', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 6316;
 -- AC datas : OLD Name : "호수광포어", Name AC enUS : "Raw Loch Frenzy" ; Wowhead enUS : ""
@@ -8498,7 +8498,7 @@ UPDATE `item_template_locale` SET `Name` = '버려진 은빛 성기사단 어깨
 -- AC datas : OLD Name : "성전사의 각진 견갑", Name AC enUS : "Crusader's Square Pauldrons" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = '성전사의 각진 어깨갑옷', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 37115;
 -- AC datas : OLD Name : "클레이튼 시험용 아이템", Name AC enUS : "Clayton's Test Item Three" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Clayton''s Test Item Three TEST', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 37126;
+-- UPDATE `item_template_locale` SET `Name` = 'Clayton''s Test Item Three TEST', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 37126;
 -- AC datas : OLD Name : "부주의한 도둑의 어깨덮개", Name AC enUS : "Spaulders of the Careless Thief" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = '부주의한 도둑의 어깨갑옷', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 37139;
 -- AC datas : OLD Name : "균열의 성큼장화", Name AC enUS : "Rift Striders" ; Wowhead enUS : ""
@@ -11578,7 +11578,7 @@ UPDATE `item_template_locale` SET `Name` = '냉기계 수호의 문양', `Verifi
 -- AC datas : OLD Name : "문양: 펭귄", Name AC enUS : "Glyph of the Penguin" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = '펭귄의 문양', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 43361;
 -- AC datas : OLD Name : "zzOLD문양: 아기곰", Name AC enUS : "Glyph of the Bear Cub" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'zzOLD아기곰의 문양', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 43362;
+-- UPDATE `item_template_locale` SET `Name` = 'zzOLD아기곰의 문양', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 43362;
 -- AC datas : OLD Name : "비명 외투", Name AC enUS : "Screeching Cape" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = '비명소리 외투', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 43363;
 -- AC datas : OLD Name : "문양: 저속 낙하", Name AC enUS : "Glyph of Slow Fall" ; Wowhead enUS : ""
@@ -14386,7 +14386,7 @@ UPDATE `item_template_locale` SET `Name` = '검은창부족의 자부심', `Desc
 
 -- Update existing entries, from TBC
 -- AC datas : OLD Name : "미사용 샌더스 선장의 안대", Name AC enUS : "Deprecated Captain Sanders' Eyepatch" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Deprecated Captain Sander''s Eyepatch', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 1363;
+-- UPDATE `item_template_locale` SET `Name` = 'Deprecated Captain Sander''s Eyepatch', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 1363;
 -- AC datas : OLD Description : "애완동물 친구를 소환하는 법을 배웁니다.", Description AC enUS : "Teaches you how to summon this companion." ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = '애완용 새끼용을 소환하거나 소환 해제합니다.', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 19054;
 -- AC datas : OLD Description : "애완동물 친구를 소환하는 법을 배웁니다.", Description AC enUS : "Teaches you how to summon this companion." ; Wowhead enUS : ""
@@ -14398,7 +14398,7 @@ UPDATE `item_template_locale` SET `Description` = 'Right Click to summon and dis
 -- AC datas : OLD Description : "", Description AC enUS : "" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Testing the LOC trigger', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 5550;
 -- AC datas : OLD Name : "QA Test Ring +285 Spell Damage", Name AC enUS : "QA Test Ring +285 Spell Damage" ; Wowhead enUS : "",  OLD Description : "What the combat specialist wants, the combat specialist gets... PEWPEWLAWLZ", Description AC enUS : "What the combat specialist wants, the combat specialist gets... PEWPEWLAWLZ" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'zzOLD - QAEnchant Weapon Winter''s Might', `Description` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 17886;
+-- UPDATE `item_template_locale` SET `Name` = 'zzOLD - QAEnchant Weapon Winter''s Might', `Description` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 17886;
 
 -- Update existing entries, from CATA
 -- AC datas : OLD Name : "악마의 가죽 (old2)", Name AC enUS : "Flayed Demon Skin (old2)" ; Wowhead enUS : ""
