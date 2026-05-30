@@ -14399,6 +14399,7 @@ UPDATE `item_template_locale` SET `Description` = 'Right Click to summon and dis
 UPDATE `item_template_locale` SET `Description` = 'Testing the LOC trigger', `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 5550;
 -- AC datas : OLD Name : "QA Test Ring +285 Spell Damage", Name AC enUS : "QA Test Ring +285 Spell Damage" ; Wowhead enUS : "",  OLD Description : "What the combat specialist wants, the combat specialist gets... PEWPEWLAWLZ", Description AC enUS : "What the combat specialist wants, the combat specialist gets... PEWPEWLAWLZ" ; Wowhead enUS : ""
 -- UPDATE `item_template_locale` SET `Name` = 'zzOLD - QAEnchant Weapon Winter''s Might', `Description` = NULL, `VerifiedBuild` = 0 WHERE `locale` = 'koKR' AND `ID` = 17886;
+DELETE FROM `item_template_locale` WHERE `locale` = 'koKR' AND `ID` = 17886;
 
 -- Update existing entries, from CATA
 -- AC datas : OLD Name : "악마의 가죽 (old2)", Name AC enUS : "Flayed Demon Skin (old2)" ; Wowhead enUS : ""
