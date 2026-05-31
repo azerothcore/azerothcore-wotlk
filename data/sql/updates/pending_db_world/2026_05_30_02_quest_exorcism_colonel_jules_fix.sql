@@ -1,7 +1,7 @@
 -- DB update 2026_05_23_00 -> 2026_05_30_02
 --
 -- Fixes: https://github.com/azerothcore/azerothcore-wotlk/issues/638
--- Quest "The Exorcism of Colonel Jules" (10935) — 7 SAI/movement bugs
+-- Quest "The Exorcism of Colonel Jules" (10935) — 9 SAI/movement bugs
 
 -- -------------------------------------------------------------------------
 -- Bug 1: Barada's "start exorcism" gossip menu can be triggered while the
@@ -81,24 +81,35 @@ UPDATE `smart_scripts` SET `event_param3` = 35000, -- was 3000 (repeat min)
 --        ghosts indefinitely. There is no JUST_DIED handler to stop the event.
 --
 -- IMPORTANT: SMART_ACTION_SET_EVENT_PHASE (22) always acts on the script
--- owner (GetBaseObject()) — it ignores any target list. Barada cannot set
--- Jules' phase directly. The fix uses a two-step signal:
+-- owner (GetBaseObject()) — it ignores any target list. The fix uses a
+-- two-step signal via SET_DATA → Jules handles it himself with EVADE.
 --   • Barada JUST_DIED → SMART_ACTION_SET_DATA (45) {field=2, data=0} on
 --     Jules (CREATURE_DISTANCE entry 22432 ≤ 100 yd). SET_DATA uses targets.
---   • Jules ON_DATA_SET(2, 0) → SET_PHASE 0 on self.
+--   • Jules ON_DATA_SET(2, 0) → SMART_ACTION_EVADE (24) on self.
+-- EVADE causes Jules to: abort his waypoint loop, return to spawn, call
+-- OnReset() which clears runOnce flags (restoring all NOT_REPEATABLE events),
+-- and re-run his initialization chain (id=0-3). Ghost spawning stops because
+-- EVADE resets his phase to 0. The waypoint loop is also stopped, preventing
+-- id=5 (WP_REACHED) from re-activating phase 1 in future loops.
 -- Additionally Barada despawns all summons from the event within 100 yards.
 -- -------------------------------------------------------------------------
 -- Anchorite Barada (22431), ids 5–8: new JUST_DIED chain
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 22431 AND `source_type` = 0 AND `id` IN (5, 6, 7, 8);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(22431, 0, 5, 6, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 45, 2, 0, 0, 0, 0, 0, 11, 22432, 100, 0, 0, 0, 0, 0, 0, 'Anchorite Barada - On Death - Signal Jules to Set Phase 0'),
+(22431, 0, 5, 6, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 45, 2, 0, 0, 0, 0, 0, 11, 22432, 100, 0, 0, 0, 0, 0, 0, 'Anchorite Barada - On Death - Signal Jules to Evade'),
 (22431, 0, 6, 7, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 11, 22507, 100, 0, 0, 0, 0, 0, 0, 'Anchorite Barada - On Death - Despawn Darkness Released (22507)'),
 (22431, 0, 7, 8, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 11, 22506, 100, 0, 0, 0, 0, 0, 0, 'Anchorite Barada - On Death - Despawn Foul Purge (22506)'),
 (22431, 0, 8, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 11, 22505, 100, 0, 0, 0, 0, 0, 0, 'Anchorite Barada - On Death - Despawn Slimer Bunny DND (22505)');
--- Colonel Jules (22432), id=10: respond to death-signal and stop ghost spawning
+-- Colonel Jules (22432), id=5: add NOT_REPEATABLE — without this, every loop of
+-- Jules' 44-waypoint cyclic path re-triggers SET_PHASE 1 when passing wp2,
+-- causing infinite ghost spawning even after the event should have ended.
+-- OnReset() (called on evade) clears runOnce so the flag works again next event.
+UPDATE `smart_scripts` SET `event_flags` = 513 -- was 512; add NOT_REPEATABLE (0x001)
+    WHERE `entryorguid` = 22432 AND `source_type` = 0 AND `id` = 5;
+-- Colonel Jules (22432), id=10: respond to Barada-death signal with EVADE
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 22432 AND `source_type` = 0 AND `id` = 10;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(22432, 0, 10, 0, 38, 0, 100, 0, 2, 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Colonel Jules - On Data Set (2,0) - Set Phase 0 (stop ghost spawn)');
+(22432, 0, 10, 0, 38, 0, 100, 0, 2, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Colonel Jules - On Data Set (2,0) - Evade (stop loop, reset AI, clear runOnce)');
 
 -- -------------------------------------------------------------------------
 -- Bug 7: A dead player (ghost / pre-release spirit form) can gossip with
