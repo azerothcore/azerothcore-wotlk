@@ -2451,6 +2451,8 @@ UPDATE `item_template_locale` SET `Name` = 'Schéma : Puissante charge d''hydrog
 UPDATE `item_template_locale` SET `Name` = 'Schéma : Réflectoflamme hyper-radiant', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 18657;
 -- AC datas : OLD Name : "Schéma : Réflectombre ultra-flash", Name AC enUS : "Schematic: Ultra-Flash Shadow Reflector" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Schéma : Réflectombre ultra-flash', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 18658;
+-- AC datas : OLD Description : "Seule la technologie gnome pouvait inventer une machine qui affecte le monde entier !", Description AC enUS : "Only Gnomish Technology could invent a device that affects the entire world!" ; Wowhead enUS : ""
+UPDATE `item_template_locale` SET `Description` = 'Seule la technologie gnome pouvait inventer une machine qui affecte le monde entier !', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 18660;
 -- AC datas : OLD Name : "Schéma : Agrandisseur de monde", Name AC enUS : "Schematic: World Enlarger" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Schéma : Agrandisseur de monde', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 18661;
 -- AC datas : OLD Name : "Un traité sur les grades", Name AC enUS : "A Treatise on Military Ranks" ; Wowhead enUS : ""
@@ -2537,6 +2539,10 @@ UPDATE `item_template_locale` SET `Description` = 'Vous apprend à invoquer cett
 UPDATE `item_template_locale` SET `Name` = 'Plans secrets : Flux embrasé', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 18922;
 -- AC datas : OLD Name : "Patron : Brassards barbares", Name AC enUS : "Pattern: Barbaric Bracers" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Patron : Brassards barbares', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 18949;
+-- AC datas : OLD Name : "Déchiqueteur dimensionnel - Long-Guet", Name AC enUS : "Dimensional Ripper - Everlook" ; Wowhead enUS : ""
+UPDATE `item_template_locale` SET `Name` = 'Déchiqueteur dimensionnel - Long-guet', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 18984;
+-- AC datas : OLD Name : "Transporteur ultra-sécurisé : Gadgetzan", Name AC enUS : "Ultrasafe Transporter: Gadgetzan" ; Wowhead enUS : ""
+UPDATE `item_template_locale` SET `Name` = 'Transporteur ultra-sécurisé : Gadgetzan', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 18986;
 -- AC datas : OLD Name : "Instructions de Main-noire", Name AC enUS : "Blackhand's Command" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Ordres de Main-noire', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 18987;
 -- AC datas : OLD Name : "Essence du seigneur du Feu", Name AC enUS : "Essence of the Firelord" ; Wowhead enUS : ""
@@ -3081,6 +3087,8 @@ UPDATE `item_template_locale` SET `Description` = 'Aïe !', `VerifiedBuild` = 0 
 UPDATE `item_template_locale` SET `Name` = 'Tueuse-d''homme des Qiraji', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 21492;
 -- AC datas : OLD Name : "Pierre d’Élune", Name AC enUS : "Elune Stone" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Pierre d''Elune', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 21536;
+-- AC datas : OLD Name : "Lanterne d’Élune", Name AC enUS : "Elune's Lantern" ; Wowhead enUS : "",  OLD Description : "Cet objet capturerait la lumière d’Élune elle-même.", Description AC enUS : "A device said to capture the light shed by Elune herself." ; Wowhead enUS : ""
+UPDATE `item_template_locale` SET `Name` = 'Lanterne d''Elune', `Description` = 'Cet objet capturerait la lumière d''Elune elle-même.', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 21540;
 -- AC datas : OLD Description : "À utiliser avant 2012", Description AC enUS : "Use before 2010" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'À utiliser avant la date d’expiration', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 21545;
 -- AC datas : OLD Name : "Recette : Elixir de maîtrise du Feu supérieure", Name AC enUS : "Recipe: Elixir of Greater Firepower" ; Wowhead enUS : ""
@@ -4791,6 +4799,8 @@ UPDATE `item_template_locale` SET `Name` = 'Manuscrit draeneï antique, Chapitre
 UPDATE `item_template_locale` SET `Name` = 'Manuscrit draeneï antique, Chapitre 2', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 30525;
 -- AC datas : OLD Name : "Manuscrit draeneï antique, chapitre 3", Name AC enUS : "Ancient Draenei Manuscript, Chapter 3" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Manuscrit draeneï antique, Chapitre 3', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 30526;
+-- AC datas : OLD Name : "Transporteur ultra-sécurisé : Poste de Toshley", Name AC enUS : "Ultrasafe Transporter: Toshley's Station" ; Wowhead enUS : ""
+UPDATE `item_template_locale` SET `Name` = 'Transporteur ultra-sécurisé : Poste de Toshley', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 30544;
 -- AC datas : OLD Name : "Cœur de don Rodrigue", Name AC enUS : "Don Rodrigo's Heart" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Coeur de don Rodrigue', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 30571;
 -- AC datas : OLD Name : "Cœur de don Amancio", Name AC enUS : "Don Amancio's Heart" ; Wowhead enUS : ""
@@ -5697,6 +5707,8 @@ UPDATE `item_template_locale` SET `Name` = 'Dents du dragon', `VerifiedBuild` = 
 UPDATE `item_template_locale` SET `Name` = 'Opale de mana', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 36799;
 -- AC datas : OLD Description : "Tout le monde s'en fiche !", Description AC enUS : "Nobody cares!" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Tout le monde s''en fiche !', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 36812;
+-- AC datas : OLD Description : "Si vous avez besoin de quelque chose, ce n'est certainement pas d'une paire de chaussures !", Description AC enUS : "Whatever you may need, it's not a pair of shoes!" ; Wowhead enUS : ""
+UPDATE `item_template_locale` SET `Description` = 'Si vous avez besoin de quelque chose, ce n''est certainement pas d''une paire de chaussures !', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 36862;
 -- AC datas : OLD Name : "Opale crépusculaire", Name AC enUS : "Twilight Opal" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Opale du crépuscule', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 36927;
 -- AC datas : OLD Name : "Feu liquide d’Élune", Name AC enUS : "Liquid Fire of Elune" ; Wowhead enUS : ""
@@ -6339,6 +6351,8 @@ UPDATE `item_template_locale` SET `Description` = 'Impossible de s''envoler !', 
 UPDATE `item_template_locale` SET `Name` = 'Glyphe de Subjugation de démon', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 43393;
 -- AC datas : OLD Name : "Dessin : Anneau sauvage en titane", Name AC enUS : "Design: Savage Titanium Ring" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Dessin : Anneau sauvage en titane', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 43485;
+-- AC datas : OLD Description : "Comme je les plains, ces imbéciles !", Description AC enUS : "It's Time to Pity Some Fools" ; Wowhead enUS : ""
+UPDATE `item_template_locale` SET `Description` = 'Comme je les plains, ces imbéciles !', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 43489;
 -- AC datas : OLD Name : "Dessin : Bague sauvage en titane", Name AC enUS : "Design: Savage Titanium Band" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Dessin : Bague sauvage en titane', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 43497;
 -- AC datas : OLD Name : "Recette : Festin gigantesque", Name AC enUS : "Recipe: Gigantic Feast" ; Wowhead enUS : ""
@@ -6419,6 +6433,8 @@ UPDATE `item_template_locale` SET `Name` = 'Robe de pestecoeur', `VerifiedBuild`
 UPDATE `item_template_locale` SET `Name` = 'Protège-épaules de pestecoeur', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 43791;
 -- AC datas : OLD Description : "Heu... Il est encore animé de pulsations !", Description AC enUS : "Um... it's still pulsing!" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Heu... Il est encore animé de pulsations !', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 43821;
+-- AC datas : OLD Name : "Les écoles de magie des Arcanes - Maîtrise", Name AC enUS : "The Schools of Arcane Magic - Mastery" ; Wowhead enUS : ""
+UPDATE `item_template_locale` SET `Name` = 'Les écoles de magie des arcanes - Maîtrise', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 43824;
 -- AC datas : OLD Description : "Les mascottes, les démons et les membres d'un groupe ne sont pas concernés par ce document.", Description AC enUS : "Companions, demons, and party members are not covered by this documentation." ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Les compagnons, les démons et les membres d''un groupe ne sont pas concernés par ce document.', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 43850;
 -- AC datas : OLD Name : "Ecusson de mérite du Kirin Tor", Name AC enUS : "Kirin Tor Commendation Badge" ; Wowhead enUS : ""
@@ -6699,6 +6715,8 @@ UPDATE `item_template_locale` SET `Name` = 'Tome de Métamorphose : serpent', `V
 UPDATE `item_template_locale` SET `Description` = 'Vous aimez la vitesse ?', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 44601;
 -- AC datas : OLD Name : "Tome d'Illumination de Dalaran", Name AC enUS : "Tome of Dalaran Intellect" ; Wowhead enUS : "",  OLD Description : "Vous apprend Illumination des Arcanes à la mode de Dalaran.", Description AC enUS : "Teaches Arcane Intellect with a Dalaran flair." ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Tome d''Intelligence de Dalaran', `Description` = 'Vous apprend Intelligence des arcanes à la mode de Dalaran.', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 44602;
+-- AC datas : OLD Description : "En voiture !", Description AC enUS : "All Aboard!" ; Wowhead enUS : ""
+UPDATE `item_template_locale` SET `Description` = 'En voiture !', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 44606;
 -- AC datas : OLD Name : "Ongle de pied d’Écorce-de-Cristal", Name AC enUS : "Crystalbark's Toenail" ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Ongle de pied d''Ecorce-de-cristal', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 44649;
 -- AC datas : OLD Name : "Torque du Vol draconique rouge", Name AC enUS : "Torque of the Red Dragonflight" ; Wowhead enUS : ""
@@ -6823,6 +6841,8 @@ UPDATE `item_template_locale` SET `Name` = 'Sceau des Pitons du Tonnerre', `Veri
 UPDATE `item_template_locale` SET `Description` = 'Vous apprend à invoquer ce compagnon.', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 44998;
 -- AC datas : OLD Description : "Vous apprend à invoquer cette mascotte.", Description AC enUS : "Teaches you how to summon this companion." ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Vous apprend à invoquer ce compagnon.', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 45002;
+-- AC datas : OLD Name : "Bannière des Pitons-du-Tonnerre", Name AC enUS : "Thunder Bluff Banner" ; Wowhead enUS : ""
+UPDATE `item_template_locale` SET `Name` = 'Bannière des Pitons du Tonnerre', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 45013;
 -- AC datas : OLD Description : "Vous apprend à invoquer cette mascotte.", Description AC enUS : "Teaches you how to summon this companion." ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Vous apprend à invoquer ce compagnon.', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 45022;
 -- AC datas : OLD Name : "Formule : Cœur fumant de la montagne", Name AC enUS : "Formula: Smoking Heart of the Mountain" ; Wowhead enUS : "",  OLD Description : "Vous apprend à créer un Cœur fumant de la montagne.", Description AC enUS : "Teaches you how to make a smoking heart of the mountain." ; Wowhead enUS : ""
@@ -7327,6 +7347,8 @@ UPDATE `item_template_locale` SET `Name` = 'Jambières de Haut-soleil', `Verifie
 UPDATE `item_template_locale` SET `Name` = 'Robe de Haut-soleil', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 48733;
 -- AC datas : OLD Name : "Protège-épaules de Haut-Soleil", Name AC enUS : "Sunstrider's Shoulderpads " ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Name` = 'Protège-épaules de Haut-soleil', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 48734;
+-- AC datas : OLD Description : "Les caractéristiques des replis dimensionnels ne sont pas vraiment comprises. Il vaut mieux avoir un parachute et du matériel médical à portée de main !", Description AC enUS : "Dimensional folding is not fully understood in any capacity.  A parachute and medical supplies are best kept on hand!" ; Wowhead enUS : ""
+UPDATE `item_template_locale` SET `Description` = 'Les caractéristiques des replis dimensionnels ne sont pas vraiment comprises. Il vaut mieux avoir un parachute et du matériel médical à portée de main !', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 48933;
 -- AC datas : OLD Description : "Vous apprend à invoquer cette monture.", Description AC enUS : "Teaches you how to summon this mount.  This is a very fast mount." ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Vous apprend à invoquer cette monture. C''est une monture très rapide.', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 49044;
 -- AC datas : OLD Description : "Vous apprend à invoquer cette monture.", Description AC enUS : "Teaches you how to summon this mount.  This is a very fast mount." ; Wowhead enUS : ""
@@ -7621,216 +7643,6 @@ UPDATE `item_template_locale` SET `Description` = 'Vous apprend à invoquer ce c
 UPDATE `item_template_locale` SET `Description` = 'Vous apprend à invoquer ce compagnon.', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 54857;
 -- AC datas : OLD Description : "Vous apprend à invoquer cette monture. Elle change selon l'endroit où vous vous trouvez et votre compétence de monte.", Description AC enUS : "Teaches you how to summon this mount." ; Wowhead enUS : ""
 UPDATE `item_template_locale` SET `Description` = 'Vous apprend à invoquer cette monture.', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 54860;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Transforme le lanceur de sorts en membre de la faction opposée.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Transforme le lanceur de sorts en membre de la faction opposée. (30 Min Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 1973;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Oblige les personnages-joueurs proches à danser.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Oblige les personnages-joueurs proches à danser. (1 Min Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 13379;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Vous transforme en quelque chose qui est plus compatible avec l'esprit des fêtes. Nécessite une boule de neige.", Description AC enUS : "For when the weather outside is frightful..." ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Vous transforme en quelque chose qui est plus compatible avec l''esprit des fêtes. Nécessite une boule de neige.', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 17712;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Permet à un ingénieur expérimenté de transformer de l'eau en boule de neige. Il faut une journée complète au Maître-neige pour fabriquer suffisamment de gel et créer une autre boule de neige.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Permet à un ingénieur expérimenté de transformer de l''eau en boule de neige. Il faut une journée complète au Maître-neige pour fabriquer suffisamment de gel et créer une autre boule de neige. (1 Jour Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 17716;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Agrandit le monde entier pendant 5 min, ou jusqu'à ce que vous attaquiez.", Description AC enUS : "Only Gnomish Technology could invent a device that affects the entire world!" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Agrandit le monde entier pendant 5 min, ou jusqu''à ce que vous attaquiez. (15 Min Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 18660;
--- AC datas : OLD Name : "Déchiqueteur dimensionnel - Long-Guet", Name AC enUS : "Dimensional Ripper - Everlook" ; Wowhead enUS : "",  OLD Description : "Ajoute ce jouet à votre collection.
-Brise les murs dimensionnels et vous transporte à Long-guet, dans le Berceau-de-l'Hiver. Il survient parfois de petits problèmes techniques, mais c'est de l'ingénierie gobeline, n'est-ce pas…", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Déchiqueteur dimensionnel - Long-guet', `Description` = 'Brise les murs dimensionnels et vous transporte à Long-guet, dans le Berceau-de-l''Hiver. Il survient parfois de petits problèmes techniques, mais c''est de l''ingénierie gobeline, n''est-ce pas... (4 Hrs Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 18984;
--- AC datas : OLD Name : "Transporteur ultra-sécurisé : Gadgetzan", Name AC enUS : "Ultrasafe Transporter: Gadgetzan" ; Wowhead enUS : "",  OLD Description : "Ajoute ce jouet à votre collection.
-Vous transporte en toute sécurité à Gadgetzan, en Tanaris ! Pour sûr, il ne peut rien vous arriver quand vous utilisez cet appareil !", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Transporteur ultra-sécurisé : Gadgetzan', `Description` = 'Vous transporte en toute sécurité à Gadgetzan, en Tanaris ! Pour sûr, il ne peut rien vous arriver quand vous utilisez cet appareil ! (4 Hrs Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 18986;
--- AC datas : OLD Name : "Lanterne d’Élune", Name AC enUS : "Elune's Lantern" ; Wowhead enUS : "",  OLD Description : "Ajoute ce jouet à votre collection.
-Crée une Pierre d'Elune. Nécessite une pierre solide.", Description AC enUS : "A device said to capture the light shed by Elune herself." ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Lanterne d''Elune', `Description` = 'Crée une Pierre d''Elune. Nécessite une pierre solide. (1 Jour Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 21540;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Clic droit pour invoquer un familier robot qui se bat contre d'autres robots de combat.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Clic droit pour invoquer un familier robot qui se bat contre d''autres robots de combat. (3 Min Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 23767;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Brise les murs dimensionnels et vous transporte dans la Zone 52 de Raz-de-Néant. Il survient parfois de petits problèmes techniques, mais c'est de l'ingénierie gobeline, n'est-ce pas…", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Brise les murs dimensionnels et vous transporte dans la Zone 52 de Raz-de-Néant. Il survient parfois de petits problèmes techniques, mais c''est de l''ingénierie gobeline, n''est-ce pas... (4 Hrs Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 30542;
--- AC datas : OLD Name : "Transporteur ultra-sécurisé : Poste de Toshley", Name AC enUS : "Ultrasafe Transporter: Toshley's Station" ; Wowhead enUS : "",  OLD Description : "Ajoute ce jouet à votre collection.
-Vous transporte en toute sécurité au poste de Toshley, dans les Tranchantes ! Aucun souci à se faire en utilisant cette merveille ! Le savoir-faire gnome vous conduira à destination rapidement et sans danger !", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Transporteur ultra-sécurisé : Poste de Toshley', `Description` = 'Vous transporte en toute sécurité au poste de Toshley, dans les Tranchantes ! Aucun souci à se faire en utilisant cette merveille ! Le savoir-faire gnome vous conduira à destination rapidement et sans danger ! (4 Hrs Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 30544;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Détruit des assemblages technologiques terrifiants.", Description AC enUS : "The next best thing to going to the Academy." ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Détruit des assemblages technologiques terrifiants. (5 Min Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 30690;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Posez une question, puis cliquez avez le bouton droit pour recevoir la réponse !", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Posez une question, puis cliquez avez le bouton droit pour recevoir la réponse ! (30 S Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 32542;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Clic droit pour faire un petit pique-nique reposant.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Clic droit pour faire un petit pique-nique reposant. (3 Min Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 32566;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Transforme le lanceur de sorts pour lui donner l'apparence d'un arakkoa de Skettis.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Transforme le lanceur de sorts pour lui donner l''apparence d''un arakkoa de Skettis. (30 Min Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 32782;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-C'est un costume de murloc.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'C''est un costume de murloc.', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 33079;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Clic droit pour créer une marmite de gumbo gobelin épicé.
-
-Le gumbo gobelin disparaît si vous quittez le jeu plus de 15 minutes.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Clic droit pour créer une marmite de gumbo gobelin épicé.Le gumbo gobelin disparaît si vous quittez le jeu plus de 15 minutes. (30 Min Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 33219;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Clic droit pour installer un siège de pêche confortable.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Clic droit pour installer un siège de pêche confortable. (5 Min Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 33223;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Clic droit pour mettre en perce un tonnelet de délicieuse bière de la fête des Brasseurs.
-
-La bière de la fête des Brasseurs disparaît si vous quittez le jeu plus de 15 minutes.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Clic droit pour mettre en perce un tonnelet de délicieuse bière de la fête des Brasseurs.La bière de la fête des Brasseurs disparaît si vous quittez le jeu plus de 15 minutes. (30 Min Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 33927;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Clic droit pour faire un pique-nique romantique.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Clic droit pour faire un pique-nique romantique. (3 Min Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 34480;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Clic droit pour faire un gyrocoptère en papier.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Clic droit pour faire un gyrocoptère en papier. (30 S Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 34499;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Clic droit pour placer votre Brasero des flammes dansantes.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Clic droit pour placer votre Brasero des flammes dansantes. (3 Min Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 34686;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Clic droit pour activer votre faiseur de météo personnel.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Clic droit pour activer votre faiseur de météo personnel. (30 S Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 35227;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Déguise l'utilisateur en elfe de sang.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Déguise l''utilisateur en elfe de sang. (30 Min Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 35275;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Lance une paire de dés, sans jamais abolir le hasard.", Description AC enUS : "Whatever you may need, it's not a pair of shoes!" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Lance une paire de dés, sans jamais abolir le hasard. (10 S Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 36862;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Lance une paire de dés.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Lance une paire de dés. (10 S Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 36863;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Déchaînez-vous dans une bulle pendant 5 min.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Déchaînez-vous dans une bulle pendant 5 min. (1 Heure Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 37254;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Une laisse en corde.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Une laisse en corde.', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 37460;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Invoquez et contrôlez votre Cogn'Baff de course.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Invoquez et contrôlez votre Cogn''Baff de course. (5 S Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 37710;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Laisse un sillage de gangrefeu aux reflets changeants pendant 5 min.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Laisse un sillage de gangrefeu aux reflets changeants pendant 5 min. (15 Min Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 38233;
--- AC datas : OLD Name : "D.I.S.C.O.", Name AC enUS : "D.I.S.C.O." ; Wowhead enUS : "",  OLD Description : "Ajoute ce jouet à votre collection.
-Clic droit pour que la fête commence.", Description AC enUS : "Dancer's Integrated Sonic Celebration Oscillator" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = NULL, `Description` = 'Clic droit pour que la fête commence. (5 Min Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 38301;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Place un drapeau sur le cadavre d'un personnage-joueur ennemi devant vous.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Place un drapeau sur le cadavre d''un personnage-joueur ennemi devant vous. (1 Min Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 38578;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Crée une boîte aux lettres portable qui dure 10 min. FAC-TEUR n'est pas détruit après usage.", Description AC enUS : "Mobile Oversized Letter and Literary Extractor" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Crée une boîte aux lettres portable qui dure 10 min. FAC-TEUR n''est pas détruit après usage. (2 Hrs Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 40768;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Clic droit pour la lancer et plaindre ces imbéciles !", Description AC enUS : "It's Time to Pity Some Fools" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Clic droit pour la lancer et plaindre ces imbéciles !', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 43489;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Adopte la forme d'un nain de fer pendant 10 min.", Description AC enUS : "It has a metallic taste..." ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Adopte la forme d''un nain de fer pendant 10 min. (Chance d''occurence :10%, 30sec de recharge) (1 Heure Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 43499;
--- AC datas : OLD Name : "Les écoles de magie des Arcanes - Maîtrise", Name AC enUS : "The Schools of Arcane Magic - Mastery" ; Wowhead enUS : "",  OLD Description : "Ajoute ce jouet à votre collection.
-Téléporte le lanceur de sorts vers ou depuis les flèches au sommet de la Citadelle Pourpre. Ce sort ne fonctionne que dans la cité de Dalaran.", Description AC enUS : "Contains the secret of higher learning." ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Les écoles de magie des arcanes - Maîtrise', `Description` = 'Téléporte le lanceur de sorts vers ou depuis les flèches au sommet de la Citadelle Pourpre. Ce sort ne fonctionne que dans la cité de Dalaran.', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 43824;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Pile ou face !", Description AC enUS : "Holding the coin up to your eye reveals a level of craftsmanship that you have rarely seen." ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Pile ou face ! (10 S Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 44430;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Clic droit pour sortir votre train électrique.", Description AC enUS : "All Aboard!" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Clic droit pour sortir votre train électrique. (30 Min Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 44606;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Réveille le varleu en vous !", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Réveille le varleu en vous ! (30 Min Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 44719;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Une laisse pour familier faite d'un ruban rouge.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Une laisse pour familier faite d''un ruban rouge.', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 44820;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Clic droit pour planter votre bannière de Hurlevent.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Clic droit pour planter votre bannière de Hurlevent. (3 Min Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 45011;
--- AC datas : OLD Name : "Bannière des Pitons-du-Tonnerre", Name AC enUS : "Thunder Bluff Banner" ; Wowhead enUS : "",  OLD Description : "Ajoute ce jouet à votre collection.
-Clic droit pour planter votre bannière des Pitons du Tonnerre.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Name` = 'Bannière des Pitons du Tonnerre', `Description` = 'Clic droit pour planter votre bannière des Pitons du Tonnerre. (3 Min Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 45013;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Clic droit pour planter votre bannière d'Orgrimmar.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Clic droit pour planter votre bannière d''Orgrimmar. (3 Min Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 45014;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Clic droit pour planter votre bannière de Sen'jin.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Clic droit pour planter votre bannière de Sen''jin. (3 Min Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 45015;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Clic droit pour planter votre bannière de Fossoyeuse.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Clic droit pour planter votre bannière de Fossoyeuse. (3 Min Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 45016;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Clic droit pour planter votre bannière de Lune-d'argent.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Clic droit pour planter votre bannière de Lune-d''argent. (3 Min Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 45017;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Clic droit pour planter votre bannière de Forgefer.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Clic droit pour planter votre bannière de Forgefer. (3 Min Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 45018;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Clic droit pour planter votre bannière de Gnomeregan.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Clic droit pour planter votre bannière de Gnomeregan. (3 Min Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 45019;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Clic droit pour planter votre bannière de l'Exodar.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Clic droit pour planter votre bannière de l''Exodar. (3 Min Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 45020;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Clic droit pour planter votre bannière de Darnassus.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Clic droit pour planter votre bannière de Darnassus. (3 Min Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 45021;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Clic droit pour sortir un dérailleur à ressort.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Clic droit pour sortir un dérailleur à ressort. (30 Min Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 45057;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Clic droit pour poser un râtelier d'épées en mousse.
-
-Les épées en mousse disparaissent si vous quittez le jeu plus de 15 minutes.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Clic droit pour poser un râtelier d''épées en mousse.Les épées en mousse disparaissent si vous quittez le jeu plus de 15 minutes. (30 Min Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 45063;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Pointez la boussole !", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Pointez la boussole ! (10 S Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 45984;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Invoque et commande votre chariotte à vapeur.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Invoque et commande votre chariotte à vapeur. (30 S Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 46709;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Place une piñata ogre remplie de bonbons.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Place une piñata ogre remplie de bonbons. (30 Min Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 46780;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Clic droit pour planter votre Bannière de la Croisade d'argent.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Clic droit pour planter votre Bannière de la Croisade d''argent. (3 Min Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 46843;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Crée un tunnel spatiotemporel instable que l'ingénieur peut utiliser pour voyager à travers le Norfendre. Dure 1 min.", Description AC enUS : "Dimensional folding is not fully understood in any capacity.  A parachute and medical supplies are best kept on hand!" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Crée un tunnel spatiotemporel instable que l''ingénieur peut utiliser pour voyager à travers le Norfendre. Dure 1 min. (4 Hrs Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 48933;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Déclenche un feu d’artifice dans le ciel qui éclate en un millier d’étoiles violettes.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Déclenche un feu d''artifice dans le ciel qui éclate en un millier d''étoiles violettes. (30 S Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 49703;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Devenez un gros ogre rouge pendant 10 min !", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Devenez un gros ogre rouge pendant 10 min ! (10 Min Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 49704;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Cet appareil expérimental devait faire exploser la cage thoracique de la cible. À la place, il provoque une brève mais pitoyable crise de sanglots déchirants.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Cet étrange appareil expérimental était conçu pour faire exploser la cavité thoracique de la cible, dans un bouillonnement d''entrailles. Au lieu de cela, il provoque une brève mais pitoyable démonstration de piteux sanglots déchirants. (1 Min Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 50471;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Adopte la forme d'un nain de givre pendant 10 min.", Description AC enUS : "I will always count you as a brother" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Adopte la forme d''un nain de givre pendant 10 min. (30 Min Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 52201;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Invoque des Pleureuses de Sylvanas.", Description AC enUS : "A lament for the days forever lost to the Banshee Queen" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Invoque des Pleureuses de Sylvanas. (1 Heure Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 52253;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Clic droit pour devenir une statue héroïque de vous-même.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Clic droit pour devenir une statue héroïque de vous-même. (30 Min Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 54212;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Invoquez et contrôlez votre Cogn'Baff de course.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Invoquez et contrôlez votre Cogn''Baff de course. (5 S Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 54343;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Clic droit pour placer une petite poupée de chiffon verte.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Clic droit pour placer une petite poupée de chiffon verte. (30 Min Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 54437;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Clic droit pour placer une petite poupée de chiffon bleue.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Clic droit pour placer une petite poupée de chiffon bleue. (30 Min Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 54438;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Transformation en soldat d'infanterie de Gnomeregan.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Transformation en soldat d''infanterie de Gnomeregan. (4 Hrs Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 54651;
--- AC datas : OLD Description : "Ajoute ce jouet à votre collection.
-Transformation en guerrier sombrelance.", Description AC enUS : "" ; Wowhead enUS : ""
-UPDATE `item_template_locale` SET `Description` = 'Transformation en guerrier sombrelance. (4 Hrs Recharge)', `VerifiedBuild` = 0 WHERE `locale` = 'frFR' AND `ID` = 54653;
 
 -- Update existing entries, from TBC
 -- AC datas : OLD Name : "[Monster] - Shield, Stormwind Guard", Name AC enUS : "Monster - Shield, Stormwind Guard" ; Wowhead enUS : ""
