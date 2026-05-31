@@ -1427,7 +1427,7 @@ struct SmartAction
             uint32 spawnTimerMax;
             uint32 respawnDelay;
             uint32 corpseDelay;
-            uint32 dontDespawn;
+            SAIBool dontDespawn;
         } scriptSpawn;
 
         struct
