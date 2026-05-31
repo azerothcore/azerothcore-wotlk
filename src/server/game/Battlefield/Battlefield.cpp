@@ -193,7 +193,15 @@ bool Battlefield::Update(uint32 diff)
         SendUpdateWorldStates();
     }
 
-    _scheduler.Update(diff);
+    // Use wall-clock update (Mode 1: _now = clock_t::now()) so the scheduler's
+    // internal clock stays in sync with clock_t::now(). This ensures that
+    // GetNextGroupOccurrence(), which returns (task->_end - clock_t::now()),
+    // is consistent with when tasks actually fire (when task->_end <= _now).
+    // Using Update(diff) (Mode 2: _now += diff) can cause clock drift due to
+    // sub-millisecond truncation in uint32 diff values, making the spirit
+    // healer resurrection timer displayed to the client expire before the
+    // server actually fires the resurrection.
+    _scheduler.Update();
 
     bool objectiveChanged = false;
     if (IsWarTime())
