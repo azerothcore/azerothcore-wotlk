@@ -1,7 +1,7 @@
 -- DB update 2026_05_23_00 -> 2026_05_30_02
 --
 -- Fixes: https://github.com/azerothcore/azerothcore-wotlk/issues/638
--- Quest "The Exorcism of Colonel Jules" (10935) — 9 SAI/movement bugs
+-- Quest "The Exorcism of Colonel Jules" (10935) — 10 SAI/movement bugs
 
 -- -------------------------------------------------------------------------
 -- Bug 1: Barada's "start exorcism" gossip menu can be triggered while the
@@ -27,10 +27,16 @@ UPDATE `creature_template_movement` SET `Swim` = 0 -- was 1 (caused swim animati
 --        Increasing to 30 000 ms (30 s) gives a visible ending before he
 --        returns to his starting position.
 -- -------------------------------------------------------------------------
--- Script9 2243201 id=0: Evade delay 5 000 → 30 000 ms
-UPDATE `smart_scripts` SET `event_param1` = 30000, -- was 5000
-    `event_param2` = 30000 -- was 5000
-    WHERE `entryorguid` = 2243201 AND `source_type` = 9 AND `id` = 0;
+-- Script9 2243201: restructured — stop waypoint immediately, evade after 10 s.
+-- Original had only id=0: EVADE after 5 000 ms (too fast, Jules snapped back
+-- before the player could read the scene). Increased to 30 000 ms but Jules
+-- then walked his 44-waypoint loop for 30 s after quest completion.
+-- Fix: add id=0 WP_STOP (55) at 0 ms so Jules halts immediately, then id=1
+-- EVADE (24) after 10 000 ms — enough time to settle without endless circles.
+DELETE FROM `smart_scripts` WHERE `entryorguid` = 2243201 AND `source_type` = 9;
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2243201, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 55, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Colonel Jules - Quest Complete - Stop Waypoint immediately'),
+(2243201, 9, 1, 0, 0, 0, 100, 0, 10000, 10000, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Colonel Jules - Quest Complete - Evade back to bed after 10s');
 
 -- -------------------------------------------------------------------------
 -- Bug 4: Barada stops kneeling (UNIT_FIELD_BYTES_1 cleared) 5 seconds
