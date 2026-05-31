@@ -119,8 +119,10 @@ public:
 protected:
     bool DelCapturePoint();
 
-    // Active players in the area of the objective, 0 - alliance, 1 - horde
-    GuidUnorderedSet ActivePlayers[2];
+    // Active players in the area of the objective. Single set keyed by GUID:
+    // team is computed from Player::GetTeamId() at the point it is needed.
+    // Splitting by team here would desync if GetTeamId() changes mid-stay.
+    GuidUnorderedSet ActivePlayers;
 
     // Total shift needed to capture the objective
     float MaxValue;
