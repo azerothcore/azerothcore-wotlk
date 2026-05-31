@@ -50,22 +50,27 @@ UPDATE `smart_scripts` SET `event_param1` = 10000, -- was 0
 --        Draenei alive.
 --
 -- The SUMMON_CREATURE event on Colonel Jules (entry 22432, id=7) has:
---   repeat timer: 3 000–8 000 ms  (avg ~5.5 s)
---   ghost despawn: 60 000 ms (60 s)
+--   repeat timer   : 3 000–8 000 ms  (avg ~5.5 s)
+--   summon type    : 2 = TIMED_OR_CORPSE_DESPAWN (may fail to despawn if
+--                    ghost is in combat with Barada or the player)
+--   ghost despawn  : 60 000 ms (60 s)
 --
 -- At steady state this produces ~11 ghosts simultaneously, each casting a
 -- damage spell every 3–8 s — the Draenei dies within seconds once ghosts
 -- accumulate, making the quest unkillable without extraordinary healing.
 --
--- Fix: slow spawn rate to 20–30 s and shorten ghost lifespan to 25 s.
--- This keeps at most 1–2 ghosts active at any given moment, matching the
--- intended difficulty of a solo TBC quest.
+-- Fix: slow spawn rate to 35–50 s, change summon type to TIMED_DESPAWN (3)
+-- so ghosts always despawn regardless of combat state, and shorten lifespan
+-- to 30 s. This keeps at most 1–2 ghosts active at any given moment,
+-- matching the intended difficulty of a solo TBC quest.
 -- -------------------------------------------------------------------------
 -- Colonel Jules (entry 22432), id=7: SUMMON_CREATURE "Darkness Released"
---   event_param3 (repeat min): 3 000  → 20 000 ms
---   event_param4 (repeat max): 8 000  → 30 000 ms
---   action_param3 (despawn)  : 60 000 → 25 000 ms
-UPDATE `smart_scripts` SET `event_param3` = 20000, -- was 3000 (repeat min)
-    `event_param4` = 30000, -- was 8000 (repeat max)
-    `action_param3` = 25000 -- was 60000 (ghost despawn time)
+--   event_param3 (repeat min): 3 000  → 35 000 ms
+--   event_param4 (repeat max): 8 000  → 50 000 ms
+--   action_param2 (summon type): 2   → 3 (TIMED_DESPAWN, guaranteed)
+--   action_param3 (despawn)  : 60 000 → 30 000 ms
+UPDATE `smart_scripts` SET `event_param3` = 35000, -- was 3000 (repeat min)
+    `event_param4` = 50000, -- was 8000 (repeat max)
+    `action_param2` = 3, -- was 2 (TIMED_OR_CORPSE_DESPAWN → TIMED_DESPAWN, guaranteed)
+    `action_param3` = 30000 -- was 60000 (ghost despawn time)
     WHERE `entryorguid` = 22432 AND `source_type` = 0 AND `id` = 7;
