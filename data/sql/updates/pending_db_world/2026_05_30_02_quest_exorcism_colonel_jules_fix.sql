@@ -1,7 +1,7 @@
 -- DB update 2026_05_23_00 -> 2026_05_30_02
 --
 -- Fixes: https://github.com/azerothcore/azerothcore-wotlk/issues/638
--- Quest "The Exorcism of Colonel Jules" (10935) — 10 SAI/movement bugs
+-- Quest "The Exorcism of Colonel Jules" (10935) — 8 scripting fixes
 
 -- -------------------------------------------------------------------------
 -- Bug 1: Barada's "start exorcism" gossip menu can be triggered while the
@@ -131,3 +131,46 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceGroup` = 0 AND `SourceEntry` = 22432 AND `SourceId` = 8;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (22, 0, 22432, 8, 0, 36, 0, 0, 0, 0, 0, 0, 0, '', 'Colonel Jules - On Gossip Hello Kill Credit - Player must be alive');
+
+-- -------------------------------------------------------------------------
+-- Bug 8: After the exorcism ends (Jules' Script9 2243200 reaches its final
+--        phase), Jules has SET_PHASE(0) applied and the GOSSIP flag set for
+--        the player to click him — but his 44-waypoint cyclic fly path is
+--        still running. Jules keeps floating in circles with the "prone"
+--        aura active (visually lying down while orbiting the room).
+--
+-- Fix: Rebuild Script9 2243200 with SMART_ACTION_WP_STOP (55) inserted
+--        immediately after the combat auras are stripped (ids 14-15). Jules
+--        stops circling at once. A 5 s window (REMOVE_ALL_AURAS delay)
+--        gives a visual transition before spell 39283 ("goes prone") is
+--        re-cast and the GOSSIP flag is set.
+--
+-- Sequential order (same total ~182 s duration as before):
+--   ids 0-15  identical to original
+--   id  16    WP_STOP(55) 0 ms       ← NEW: stop circling immediately
+--   id  17    REMOVE_ALL_AURAS 5 s   (was 8 s; reduced — WP already stopped)
+--   id  18    CAST 39283             (unchanged)
+--   id  19    SET_NPC_FLAGS GOSSIP   (unchanged, Jules floats in place)
+-- -------------------------------------------------------------------------
+DELETE FROM `smart_scripts` WHERE `entryorguid` = 2243200 AND `source_type` = 9;
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2243200,9, 0,0,0,0,100,0, 1000,1000,0,0,0,0, 1,0,0,0,0,0,0, 1,0,0,0,0, 0,0,0,0, 'Colonel Jules - Event - Talk: Keep away, the fool is mine'),
+(2243200,9, 1,0,0,0,100,0, 14000,14000,0,0,0,0, 1,1,0,0,0,0,0, 1,0,0,0,0, 0,0,0,0, 'Colonel Jules - Event - Talk: threat line (random)'),
+(2243200,9, 2,0,0,0,100,0, 9000,9000,0,0,0,0, 53,1,22432,0,0,0,0, 1,0,0,0,0, 0,0,0,0, 'Colonel Jules - Event - Start Waypoint fly path 22432'),
+(2243200,9, 3,0,0,0,100,0, 4000,4000,0,0,0,0, 11,39284,3,0,0,0,0, 1,0,0,0,0, 0,0,0,0, 'Colonel Jules - Event - Cast 39284 threatens aura'),
+(2243200,9, 4,0,0,0,100,0, 9000,9000,0,0,0,0, 1,1,0,0,0,0,0, 1,0,0,0,0, 0,0,0,0, 'Colonel Jules - Event - Talk: threat line (random)'),
+(2243200,9, 5,0,0,0,100,0, 25000,25000,0,0,0,0, 1,1,0,0,0,0,0, 1,0,0,0,0, 0,0,0,0, 'Colonel Jules - Event - Talk: threat line (random)'),
+(2243200,9, 6,0,0,0,100,0, 30000,30000,0,0,0,0, 11,39294,0,0,0,0,0, 1,0,0,0,0, 0,0,0,0, 'Colonel Jules - Event - Cast 39294 goes upright (levitates vertical)'),
+(2243200,9, 7,0,0,0,100,0, 5000,5000,0,0,0,0, 11,39294,0,0,0,0,0, 1,0,0,0,0, 0,0,0,0, 'Colonel Jules - Event - Cast 39294 upright reinforced'),
+(2243200,9, 8,0,0,0,100,0, 3500,3500,0,0,0,0, 11,39295,2,0,0,0,0, 1,0,0,0,0, 0,0,0,0, 'Colonel Jules - Event - Cast 39295 vomit aura (every 15s spawns Slimer Bunny)'),
+(2243200,9, 9,0,0,0,100,0, 8500,8500,0,0,0,0, 1,1,0,0,0,0,0, 1,0,0,0,0, 0,0,0,0, 'Colonel Jules - Event - Talk: threat line (random)'),
+(2243200,9,10,0,0,0,100,0, 18000,18000,0,0,0,0, 1,1,0,0,0,0,0, 1,0,0,0,0, 0,0,0,0, 'Colonel Jules - Event - Talk: threat line (random)'),
+(2243200,9,11,0,0,0,100,0, 18000,18000,0,0,0,0, 1,1,0,0,0,0,0, 1,0,0,0,0, 0,0,0,0, 'Colonel Jules - Event - Talk: threat line (random)'),
+(2243200,9,12,0,0,0,100,0, 18000,18000,0,0,0,0, 1,1,0,0,0,0,0, 1,0,0,0,0, 0,0,0,0, 'Colonel Jules - Event - Talk: threat line (random)'),
+(2243200,9,13,0,0,0,100,0, 11000,11000,0,0,0,0, 22,0,0,0,0,0,0, 1,0,0,0,0, 0,0,0,0, 'Colonel Jules - Event - Set Phase 0 (Barada wins, ghost spawn stops)'),
+(2243200,9,14,0,0,0,100,0, 0,0,0,0,0,0, 28,39295,0,0,0,0,0, 1,0,0,0,0, 0,0,0,0, 'Colonel Jules - Event - Remove Aura 39295 (vomit)'),
+(2243200,9,15,0,0,0,100,0, 0,0,0,0,0,0, 28,39284,0,0,0,0,0, 1,0,0,0,0, 0,0,0,0, 'Colonel Jules - Event - Remove Aura 39284 (threats)'),
+(2243200,9,16,0,0,0,100,0, 0,0,0,0,0,0, 55,0,0,0,0,0,0, 1,0,0,0,0, 0,0,0,0, 'Colonel Jules - Event - Stop Waypoint (Jules stops circling immediately)'),
+(2243200,9,17,0,0,0,100,0, 5000,5000,0,0,0,0, 28,0,0,0,0,0,0, 1,0,0,0,0, 0,0,0,0, 'Colonel Jules - Event - Remove All Auras (visual transition)'),
+(2243200,9,18,0,0,0,100,0, 0,0,0,0,0,0, 11,39283,0,0,0,0,0, 1,0,0,0,0, 0,0,0,0, 'Colonel Jules - Event - Cast 39283 (goes prone, lays back down)'),
+(2243200,9,19,0,0,0,100,0, 0,0,0,0,0,0, 81,1,0,0,0,0,0, 1,0,0,0,0, 0,0,0,0, 'Colonel Jules - Event - Set NPC Flags Gossip (Jules clickable for quest completion)');
