@@ -1,7 +1,7 @@
 -- DB update 2026_05_23_00 -> 2026_05_30_02
 --
 -- Fixes: https://github.com/azerothcore/azerothcore-wotlk/issues/638
--- Quest "The Exorcism of Colonel Jules" (10935) — 5 SAI/movement bugs
+-- Quest "The Exorcism of Colonel Jules" (10935) — 7 SAI/movement bugs
 
 -- -------------------------------------------------------------------------
 -- Bug 1: Barada's "start exorcism" gossip menu can be triggered while the
@@ -74,3 +74,38 @@ UPDATE `smart_scripts` SET `event_param3` = 35000, -- was 3000 (repeat min)
     `action_param2` = 3, -- was 2 (TIMED_OR_CORPSE_DESPAWN → TIMED_DESPAWN, guaranteed)
     `action_param3` = 30000 -- was 60000 (ghost despawn time)
     WHERE `entryorguid` = 22432 AND `source_type` = 0 AND `id` = 7;
+
+-- -------------------------------------------------------------------------
+-- Bug 6: If Anchorite Barada dies while the exorcism is in progress, Colonel
+--        Jules remains in phase 1 and continues summoning Darkness Released
+--        ghosts indefinitely. There is no JUST_DIED handler to stop the event.
+--
+-- Fix: add SMART_EVENT_JUST_DIED (6) on Barada that:
+--   1. Sets Jules (entry 22432) back to phase 0, stopping ghost spawning
+--      (id=7 on Jules has event_phase_mask=1 so only fires in phase 1).
+--   2. Despawns all summoned creatures from the event within 100 yards:
+--      - Darkness Released (22507)
+--      - Foul Purge        (22506)
+--      - Slimer Bunny DND  (22505)
+-- -------------------------------------------------------------------------
+-- Anchorite Barada (22431), ids 5–8: new JUST_DIED chain
+DELETE FROM `smart_scripts` WHERE `entryorguid` = 22431 AND `source_type` = 0 AND `id` IN (5, 6, 7, 8);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(22431, 0, 5, 6, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 0, 0, 11, 22432, 100, 0, 0, 0, 0, 0, 0, 'Anchorite Barada - On Death - Set Colonel Jules Phase 0 (stop ghost spawn)'),
+(22431, 0, 6, 7, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 11, 22507, 100, 0, 0, 0, 0, 0, 0, 'Anchorite Barada - On Death - Despawn Darkness Released (22507)'),
+(22431, 0, 7, 8, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 11, 22506, 100, 0, 0, 0, 0, 0, 0, 'Anchorite Barada - On Death - Despawn Foul Purge (22506)'),
+(22431, 0, 8, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 11, 22505, 100, 0, 0, 0, 0, 0, 0, 'Anchorite Barada - On Death - Despawn Slimer Bunny DND (22505)');
+
+-- -------------------------------------------------------------------------
+-- Bug 7: A dead player (ghost / pre-release spirit form) can gossip with
+--        Colonel Jules while he is charmed/possessed (event_flags=WHILE_CHARMED)
+--        and receive the quest kill-credit for "Colonel Jules Saved" without
+--        actually being alive during the exorcism.
+--
+-- Fix: add a condition on Jules SAI event id=8 (SMART_EVENT_GOSSIP_HELLO)
+--        requiring the action invoker (player) to be alive.
+--        ConditionType 36 = CONDITION_ALIVE, ConditionTarget 1 = invoker.
+-- -------------------------------------------------------------------------
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceGroup` = 0 AND `SourceEntry` = 22432 AND `SourceId` = 8;
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+(22, 0, 22432, 8, 0, 36, 1, 0, 0, 0, 0, 0, 0, '', 'Colonel Jules - On Gossip Hello Kill Credit - Invoker must be alive');
