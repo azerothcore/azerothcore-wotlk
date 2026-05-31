@@ -1,3 +1,4 @@
+-- DB update 2026_05_31_00 -> 2026_05_31_01
 --
 -- Update `command` help text for .bf subcommands: #battleid is now optional
 -- and defaults to 1 (Wintergrasp) when omitted.
