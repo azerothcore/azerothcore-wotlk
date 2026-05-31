@@ -106,7 +106,7 @@ INSERT INTO `game_event` (`eventEntry`, `start_time`, `end_time`, `occurence`, `
 (92, '2026-01-07 20:00:00', '2030-12-31 12:00:00', @EVENT_OCCURENCE, @EVENT_LENGTH, 'What the Cold Wind Brings...', 0);
 
 DELETE FROM `waypoint_data` WHERE `id` = 254391;
-DELETE FROM `waypoint_data` WHERE `id` IN (@GUID+1,@GUID+2,@GUID+3,@GUID+4,@GUID+5,@GUID+6,@GUID+7,@GUID+8,@GUID+9,@GUID+10,@GUID+11,@GUID+12,@GUID+13,@GUID+14,@GUID+15,@GUID+16,@GUID+17,@GUID+18,@GUID+19,@GUID+20,@GUID+21,@GUID+22,@GUID+23,@GUID+24);
+DELETE FROM `waypoint_data` WHERE `id` IN (@GUID+1,@GUID+3,@GUID+4,@GUID+5,@GUID+6,@GUID+7,@GUID+8,@GUID+9,@GUID+10,@GUID+11,@GUID+12,@GUID+13,@GUID+14,@GUID+15,@GUID+16,@GUID+17,@GUID+18,@GUID+19,@GUID+20,@GUID+21,@GUID+22,@GUID+23,@GUID+24);
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `move_type`) VALUES
 -- Ith'rix
 (@GUID+1, 1, 2563.398, 6056.7534, 157.0997, NULL, 1),
