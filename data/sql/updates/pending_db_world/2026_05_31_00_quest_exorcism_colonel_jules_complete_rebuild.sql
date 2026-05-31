@@ -12,7 +12,7 @@
 --   * smart_scripts source_type=0 (creature):  22431, 22432, 22505, 22507
 --   * smart_scripts source_type=9 (script9) :  2243100, 2243200, 2243201
 --   * conditions: SourceTypeOrReferenceId=22, Jules gossip kill-credit
---   * creature_template_movement: Jules (22432) Swim=0
+--   * creature_template_movement: Jules (22432) Swim=0, Flight=2 (CanFly)
 --
 -- Cast of NPCs:
 --   22431 — Anchorite Barada      Draenei exorcist, kneels and chants
@@ -86,9 +86,12 @@
 --   11. Jules uses his specific groups 2/3/4 lines
 --
 -- =============================================================================
--- creature_template_movement: stop Jules from playing the swim animation
+-- creature_template_movement: fix Jules fly animation
+--   Swim=0   -> removes MOVEMENTFLAG_SWIMMING (was causing swim anim in air)
+--   Flight=2 -> CreatureFlightMovementType::CanFly (calls SetCanFly -> proper fly anim)
+--   NOTE: Flight=1 = DisableGravity only (no CAN_FLY flag -> client uses swim anim fallback)
 -- =============================================================================
-UPDATE `creature_template_movement` SET `Swim` = 0 WHERE `CreatureId` = 22432;
+UPDATE `creature_template_movement` SET `Swim` = 0, `Flight` = 2 WHERE `CreatureId` = 22432;
 
 -- =============================================================================
 -- conditions: dead players cannot gossip Jules to claim quest credit
