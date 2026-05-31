@@ -132,6 +132,9 @@ enum UlduarData
     DATA_ARCHIVUM_DOORS                     = 771,
     DATA_KEEPERS_GATE                       = 772,
 
+    // Assembly of Iron - Archivum RP
+    DATA_BRANN_ARCHIVUM                     = 773,
+
     // Hodir chests (dynamically spawned)
     DATA_HODIR_CHEST_NORMAL                 = 780,
     DATA_HODIR_CHEST_HARD                   = 781,
@@ -195,6 +198,9 @@ enum UlduarNPCs
     NPC_HODIR_KEEPER                        = 33411,
     NPC_MIMIRON_KEEPER                      = 33412,
     NPC_THORIM_KEEPER                       = 33413,
+
+    // Assembly of Iron - Archivum RP
+    NPC_BRANN_ARCHIVUM                      = 33235,
 
     // Flame Leviathan
     NPC_SALVAGED_SIEGE_ENGINE               = 33060,

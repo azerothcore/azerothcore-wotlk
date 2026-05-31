@@ -120,6 +120,8 @@ ObjectData const creatureData[] =
     // Algalon helpers
     { NPC_BRANN_BRONZBEARD_ALG,     DATA_BRANN_BRONZEBEARD_ALG  },
     { NPC_BRANN_BASE_CAMP,          DATA_BRANN_BASE_CAMP        },
+    // Assembly of Iron - Archivum RP
+    { NPC_BRANN_ARCHIVUM,           DATA_BRANN_ARCHIVUM         },
     { 0,                0               }
 };
 
@@ -330,6 +332,11 @@ public:
                             go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
                     }
                     break;
+                case BOSS_ASSEMBLY:
+                    if (state == DONE)
+                        if (Creature* brann = GetCreature(DATA_BRANN_ARCHIVUM))
+                            brann->AI()->SetData(1, 1);
+                    break;
                 case BOSS_MIMIRON:
                     if (state == IN_PROGRESS)
                         _mimironTramUsed = true;
@@ -471,6 +478,10 @@ public:
                     {
                         SpawnHodirChests(instance->GetDifficulty(), creature);
                     }
+                    break;
+                case NPC_BRANN_ARCHIVUM:
+                    if (GetBossState(BOSS_ASSEMBLY) == DONE)
+                        creature->AI()->SetData(1, 1);
                     break;
                 case NPC_ALGALON:
                     if (!GetPersistentData(PERSISTENT_DATA_ALGALON_TIMER))
