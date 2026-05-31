@@ -404,8 +404,11 @@ void Battlefield::EndBattle(bool endByTimer)
     else
         DoPlaySoundToAll(BF_HORDE_WINS);
 
-    OnBattleEnd(endByTimer);
+    // Hook runs BEFORE OnBattleEnd so subscribers can read PlayersInWar
+    // while it is still populated (OnBattleEnd hands out rewards and then
+    // clears the set).
     sScriptMgr->OnBattlefieldWarEnd(this, endByTimer);
+    OnBattleEnd(endByTimer);
 
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
     {
@@ -854,7 +857,7 @@ bool BfCapturePoint::HandlePlayerEnter(Player* player)
         player->SendUpdateWorldState(go->GetGOInfo()->capturePoint.worldstate2, uint32(std::ceil((Value + MaxValue) / (2 * MaxValue) * 100.0f)));
         player->SendUpdateWorldState(go->GetGOInfo()->capturePoint.worldstate3, NeutralValuePct);
     }
-    return ActivePlayers[player->GetTeamId()].insert(player->GetGUID()).second;
+    return ActivePlayers.insert(player->GetGUID()).second;
 }
 
 GuidUnorderedSet::iterator BfCapturePoint::HandlePlayerLeave(Player* player)
@@ -862,13 +865,12 @@ GuidUnorderedSet::iterator BfCapturePoint::HandlePlayerLeave(Player* player)
     if (GameObject* go = GetCapturePointGo(player))
         player->SendUpdateWorldState(go->GetGOInfo()->capturePoint.worldState1, 0);
 
-    GuidUnorderedSet::iterator current = ActivePlayers[player->GetTeamId()].find(player->GetGUID());
+    GuidUnorderedSet::iterator current = ActivePlayers.find(player->GetGUID());
 
-    if (current == ActivePlayers[player->GetTeamId()].end())
+    if (current == ActivePlayers.end())
         return current; // return end()
 
-    current = ActivePlayers[player->GetTeamId()].erase(current);
-    return current;
+    return ActivePlayers.erase(current);
 }
 
 void BfCapturePoint::SendChangePhase()
@@ -877,17 +879,16 @@ void BfCapturePoint::SendChangePhase()
     if (!capturePoint)
         return;
 
-    for (uint8 team = 0; team < 2; ++team)
-        for (ObjectGuid const& guid : ActivePlayers[team])  // send to all players present in the area
-            if (Player* player = ObjectAccessor::FindPlayer(guid))
-            {
-                // send this too, sometimes the slider disappears, dunno why :(
-                player->SendUpdateWorldState(capturePoint->GetGOInfo()->capturePoint.worldState1, 1);
-                // send these updates to only the ones in this objective
-                player->SendUpdateWorldState(capturePoint->GetGOInfo()->capturePoint.worldstate2, (uint32) std::ceil((Value + MaxValue) / (2 * MaxValue) * 100.0f));
-                // send this too, sometimes it resets :S
-                player->SendUpdateWorldState(capturePoint->GetGOInfo()->capturePoint.worldstate3, NeutralValuePct);
-            }
+    for (ObjectGuid const& guid : ActivePlayers)  // send to all players present in the area
+        if (Player* player = ObjectAccessor::FindPlayer(guid))
+        {
+            // send this too, sometimes the slider disappears, dunno why :(
+            player->SendUpdateWorldState(capturePoint->GetGOInfo()->capturePoint.worldState1, 1);
+            // send these updates to only the ones in this objective
+            player->SendUpdateWorldState(capturePoint->GetGOInfo()->capturePoint.worldstate2, (uint32) std::ceil((Value + MaxValue) / (2 * MaxValue) * 100.0f));
+            // send this too, sometimes it resets :S
+            player->SendUpdateWorldState(capturePoint->GetGOInfo()->capturePoint.worldstate3, NeutralValuePct);
+        }
 }
 
 bool BfCapturePoint::SetCapturePointData(GameObject* capturePoint, TeamId team)
@@ -959,19 +960,19 @@ bool BfCapturePoint::Update(uint32 diff)
 
     float radius = capturePoint->GetGOInfo()->capturePoint.radius;
 
-    for (uint8 team = 0; team < 2; ++team)
+    // Single pass over the existing set: drop leavers, count survivors per team.
+    uint32 counts[PVP_TEAMS_COUNT] = { 0, 0 };
+    for (auto itr = ActivePlayers.begin(); itr != ActivePlayers.end();)
     {
-        for (auto itr = ActivePlayers[team].begin(); itr != ActivePlayers[team].end();)
+        Player* player = ObjectAccessor::FindPlayer(*itr);
+        if (player && capturePoint->IsWithinDistInMap(player, radius) && player->IsOutdoorPvPActive())
         {
-            if (Player* player = ObjectAccessor::FindPlayer(*itr))
-                if (!capturePoint->IsWithinDistInMap(player, radius) || !player->IsOutdoorPvPActive())
-                {
-                    itr = HandlePlayerLeave(player);
-                    continue;
-                }
-
+            ++counts[player->GetTeamId()];
             ++itr;
+            continue;
         }
+
+        itr = (player ? HandlePlayerLeave(player) : ActivePlayers.erase(itr));
     }
 
     std::list<Player*> players;
@@ -981,11 +982,14 @@ bool BfCapturePoint::Update(uint32 diff)
 
     for (Player* player : players)
         if (player->IsOutdoorPvPActive())
-            if (ActivePlayers[player->GetTeamId()].insert(player->GetGUID()).second)
+            if (ActivePlayers.insert(player->GetGUID()).second)
+            {
                 HandlePlayerEnter(player);
+                ++counts[player->GetTeamId()];
+            }
 
     // get the difference of numbers
-    float factDiff = ((float) ActivePlayers[0].size() - (float) ActivePlayers[1].size()) * diff / BATTLEFIELD_OBJECTIVE_UPDATE_INTERVAL;
+    float factDiff = ((float)counts[TEAM_ALLIANCE] - (float)counts[TEAM_HORDE]) * diff / BATTLEFIELD_OBJECTIVE_UPDATE_INTERVAL;
     if (G3D::fuzzyEq(factDiff, 0.0f))
         return false;
 
@@ -1071,34 +1075,36 @@ bool BfCapturePoint::Update(uint32 diff)
 
 void BfCapturePoint::SendUpdateWorldState(uint32 field, uint32 value)
 {
-    for (uint8 team = 0; team < 2; ++team)
-        for (ObjectGuid const& guid : ActivePlayers[team])  // send to all players present in the area
-            if (Player* player = ObjectAccessor::FindPlayer(guid))
-                player->SendUpdateWorldState(field, value);
+    for (ObjectGuid const& guid : ActivePlayers)  // send to all players present in the area
+        if (Player* player = ObjectAccessor::FindPlayer(guid))
+            player->SendUpdateWorldState(field, value);
 }
 
 void BfCapturePoint::SendObjectiveComplete(uint32 id, ObjectGuid guid)
 {
-    uint8 team;
+    TeamId winner;
     switch (State)
     {
         case BF_CAPTUREPOINT_OBJECTIVESTATE_ALLIANCE:
-            team = 0;
+            winner = TEAM_ALLIANCE;
             break;
         case BF_CAPTUREPOINT_OBJECTIVESTATE_HORDE:
-            team = 1;
+            winner = TEAM_HORDE;
             break;
         default:
             return;
     }
 
-    // send to all players present in the area
-    for (ObjectGuid const& playerGuid : ActivePlayers[team])
+    // Credit only players on the controlling team. Team is read from the
+    // player at iteration time, not at insert time, so players whose
+    // GetTeamId() changed mid-stay get credit on their current side.
+    for (ObjectGuid const& playerGuid : ActivePlayers)
         if (Player* player = ObjectAccessor::FindPlayer(playerGuid))
-            player->KilledMonsterCredit(id, guid);
+            if (player->GetTeamId() == winner)
+                player->KilledMonsterCredit(id, guid);
 }
 
 bool BfCapturePoint::IsInsideObjective(Player* player) const
 {
-    return ActivePlayers[player->GetTeamId()].find(player->GetGUID()) != ActivePlayers[player->GetTeamId()].end();
+    return ActivePlayers.find(player->GetGUID()) != ActivePlayers.end();
 }
