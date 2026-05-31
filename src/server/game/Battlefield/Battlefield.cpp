@@ -1096,8 +1096,8 @@ void BfCapturePoint::SendObjectiveComplete(uint32 id, ObjectGuid guid)
     }
 
     // Credit only players on the controlling team. Team is read from the
-    // player now (not at insert time) so CFBG-faked players get credit on
-    // their assigned side.
+    // player at iteration time, not at insert time, so players whose
+    // GetTeamId() changed mid-stay get credit on their current side.
     for (ObjectGuid const& playerGuid : ActivePlayers)
         if (Player* player = ObjectAccessor::FindPlayer(playerGuid))
             if (player->GetTeamId() == winner)

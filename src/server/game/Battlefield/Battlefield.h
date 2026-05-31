@@ -121,8 +121,7 @@ protected:
 
     // Active players in the area of the objective. Single set keyed by GUID:
     // team is computed from Player::GetTeamId() at the point it is needed.
-    // Splitting by team here would desync if GetTeamId() changes mid-stay
-    // (CFBG faking flips the team after the player is already tracked).
+    // Splitting by team here would desync if GetTeamId() changes mid-stay.
     GuidUnorderedSet ActivePlayers;
 
     // Total shift needed to capture the objective
