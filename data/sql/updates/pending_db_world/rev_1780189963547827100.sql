@@ -2,8 +2,7 @@
 -- Update `command` help text for .bf subcommands: #battleid is now optional
 -- and defaults to 1 (Wintergrasp) when omitted.
 
-DELETE FROM `command` WHERE `name` IN
-    ('bf start', 'bf stop', 'bf switch', 'bf enable', 'bf timer', 'bf queue');
+DELETE FROM `command` WHERE `name` IN ('bf start', 'bf stop', 'bf switch', 'bf enable', 'bf timer', 'bf queue');
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
 ('bf start',  3, 'Syntax: .bf start [#battleid]\r\n#battleid is optional and defaults to 1 (Wintergrasp).'),
 ('bf stop',   3, 'Syntax: .bf stop [#battleid]\r\n#battleid is optional and defaults to 1 (Wintergrasp).'),
