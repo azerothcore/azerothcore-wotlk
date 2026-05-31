@@ -119,8 +119,10 @@ public:
 protected:
     bool DelCapturePoint();
 
-    // Active players in the area of the objective, 0 - alliance, 1 - horde
-    GuidUnorderedSet ActivePlayers[2];
+    // Active players in the area of the objective. Single set keyed by GUID:
+    // team is computed from Player::GetTeamId() at the point it is needed.
+    // Splitting by team here would desync if GetTeamId() changes mid-stay.
+    GuidUnorderedSet ActivePlayers;
 
     // Total shift needed to capture the objective
     float MaxValue;
@@ -278,6 +280,11 @@ public:
     /// Force player to join a battlefield group
     bool AddOrSetPlayerToCorrectBfGroup(Player* player);
 
+    /// Auto-rejoin a player who relogged within the grace window after a mid-war
+    /// logout, via the normal join hooks. No-op without a pending logout marker.
+    /// Called from HandlePlayerEnterZone (which fires on the post-login zone set).
+    void TryRejoinAfterLogout(Player* player);
+
     // Graveyard methods
     // Find which graveyard the player must be teleported to to be resurrected by spiritguide
     GraveyardStruct const* GetClosestGraveyard(Player* player);
@@ -381,6 +388,10 @@ protected:
     GuidUnorderedSet PlayersInWar[PVP_TEAMS_COUNT];         // Players in WG combat
     PlayerTimerMap InvitedPlayers[PVP_TEAMS_COUNT];
     PlayerTimerMap PlayersWillBeKick[PVP_TEAMS_COUNT];
+    // Mid-war logouts: GUID -> timestamp until which a relog auto-rejoins the war.
+    PlayerTimerMap LogoutGracePlayers[PVP_TEAMS_COUNT];
+
+    static constexpr uint32 LOGOUT_GRACE_SECONDS = 120; // relog auto-rejoin window
 
     // Variables that must exist for each battlefield
     uint32 TypeId;                                          // See enum BattlefieldTypes
