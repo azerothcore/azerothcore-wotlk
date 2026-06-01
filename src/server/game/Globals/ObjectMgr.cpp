@@ -9197,6 +9197,73 @@ void ObjectMgr::AddProfanityPlayerName(std::string const& name)
     }
 }
 
+void ObjectMgr::LoadFilteredWords()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _filteredWordsAutomaton.reset();                            // need for reload case
+
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_FILTERED_WORDS);
+    PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+    if (!result)
+    {
+        LOG_WARN("server.loading", ">> Loaded 0 filtered words. DB table `filtered_words` is empty!");
+        LOG_INFO("server.loading", " ");
+        return;
+    }
+
+    auto automaton = std::make_unique<Acore::AhoCorasick<wchar_t>>();
+    uint32 count = 0;
+
+    do
+    {
+        Field* fields = result->Fetch();
+        std::string word = fields[1].Get<std::string>();
+
+        if (word.empty())
+            continue;
+
+        std::wstring wstr;
+        if (!Utf8toWStr(word, wstr))
+        {
+            LOG_ERROR("sql.sql", "Table `filtered_words` has invalid word: {}", word);
+            continue;
+        }
+
+        wstrToLower(wstr);
+
+        if (wstr.empty())
+            continue;
+
+        automaton->Insert(wstr);
+        ++count;
+    } while (result->NextRow());
+
+    if (count > 0)
+    {
+        automaton->Build();
+        _filteredWordsAutomaton = std::move(automaton);
+    }
+
+    LOG_INFO("server.loading", ">> Loaded {} filtered words in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
+}
+
+bool ObjectMgr::IsFilteredWord(std::string const& text) const
+{
+    if (!_filteredWordsAutomaton || text.empty())
+        return false;
+
+    std::wstring wtext;
+    if (!Utf8toWStr(text, wtext))
+        return false;
+
+    wstrToLower(wtext);
+
+    return _filteredWordsAutomaton->ContainsAny(wtext);
+}
+
 enum LanguageType
 {
     LT_BASIC_LATIN    = 0x0000,

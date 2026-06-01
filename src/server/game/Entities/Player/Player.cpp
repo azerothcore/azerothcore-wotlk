@@ -9390,8 +9390,12 @@ void Player::Say(std::string_view text, Language language, WorldObject const* /*
     if (!sScriptMgr->OnPlayerCanUseChat(this, CHAT_MSG_SAY, language, _text))
         return;
 
+    ChatMsg msgType = CHAT_MSG_SAY;
+    if (FilteredWord(_text))
+        msgType = CHAT_MSG_FILTERED;
+
     WorldPacket data;
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_SAY, language, this, this, _text);
+    ChatHandler::BuildChatPacket(data, msgType, language, this, this, _text);
 
     SendDirectMessage(&data);
 
@@ -9412,8 +9416,12 @@ void Player::Yell(std::string_view text, Language language, WorldObject const* /
     if (!sScriptMgr->OnPlayerCanUseChat(this, CHAT_MSG_YELL, language, _text))
         return;
 
+    ChatMsg msgType = CHAT_MSG_YELL;
+    if (FilteredWord(_text))
+        msgType = CHAT_MSG_FILTERED;
+
     WorldPacket data;
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_YELL, language, this, this, _text);
+    ChatHandler::BuildChatPacket(data, msgType, language, this, this, _text);
 
     SendDirectMessage(&data);
 
@@ -9434,8 +9442,12 @@ void Player::TextEmote(std::string_view text, WorldObject const* /*= nullptr*/, 
     if (!sScriptMgr->OnPlayerCanUseChat(this, CHAT_MSG_EMOTE, LANG_UNIVERSAL, _text))
         return;
 
+    ChatMsg msgType = CHAT_MSG_EMOTE;
+    if (FilteredWord(_text))
+        msgType = CHAT_MSG_FILTERED;
+
     WorldPacket data;
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_EMOTE, LANG_UNIVERSAL, this, this, _text);
+    ChatHandler::BuildChatPacket(data, msgType, LANG_UNIVERSAL, this, this, _text);
 
     SendDirectMessage(&data);
 
@@ -9463,8 +9475,12 @@ void Player::Whisper(std::string_view text, Language language, Player* target, b
     if (!sScriptMgr->OnPlayerCanUseChat(this, CHAT_MSG_WHISPER, language, _text, target))
         return;
 
+    ChatMsg msgType = CHAT_MSG_WHISPER;
+    if (FilteredWord(_text))
+        msgType = CHAT_MSG_FILTERED;
+
     WorldPacket data;
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER, language, this, this, _text);
+    ChatHandler::BuildChatPacket(data, msgType, language, this, this, _text);
     target->SendDirectMessage(&data);
 
     // rest stuff shouldn't happen in case of addon message
@@ -9510,6 +9526,11 @@ void Player::Whisper(uint32 textId, Player* target, bool isBossWhisper)
     else
         ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER, LANG_UNIVERSAL, this, target, bct->GetText(locale, getGender()), 0, "", locale);
     target->SendDirectMessage(&data);
+}
+
+bool Player::FilteredWord(std::string text)
+{
+    return sObjectMgr->IsFilteredWord(text);
 }
 
 void Player::PetSpellInitialize()

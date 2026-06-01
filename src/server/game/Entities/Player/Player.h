@@ -1245,6 +1245,8 @@ public:
     /// Handles whispers from Addons and players based on sender, receiver's guid and language.
     void Whisper(std::string_view text, Language language, Player* receiver, bool = false) override;
     void Whisper(uint32 textId, Player* target, bool isBossWhisper = false) override;
+    /// Returns true if @p text contains any word from the `filtered_words` DB table (substring, case-insensitive).
+    static bool FilteredWord(std::string text);
 
     /*********************************************************/
     /***                    STORAGE SYSTEM                 ***/
