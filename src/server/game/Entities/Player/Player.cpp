@@ -9390,7 +9390,7 @@ void Player::Say(std::string_view text, Language language, WorldObject const* /*
     if (!sScriptMgr->OnPlayerCanUseChat(this, CHAT_MSG_SAY, language, _text))
         return;
 
-    if (sWorld->getBoolConfig(CONFIG_CHAT_FILTER_YELL) && IsChatFiltered(text))
+    if (sWorld->getBoolConfig(CONFIG_CHAT_FILTER_SAY) && IsChatFiltered(text))
     {
         ChatHandler(GetSession()).SendSysMessage(LANG_CHATFILTER_SAY);
         return;
