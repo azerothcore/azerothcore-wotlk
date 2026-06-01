@@ -1,6 +1,6 @@
 -- Fix: Hemet Nesingwary faction reset during first talbuk hunt on server startup.
 --
--- Root cause (confirmed via runtime faction inspection):
+-- Potential Root cause:
 --   Gankly Rottenfist's action list 1829701 sends SetData(1,3) to HEMET as well
 --   as Fitz. On first server startup Gankly's patrol cycle aligns with Hemet's
 --   30-minute Point 1 pause, so 1829701 fires during the active talbuk hunt.
@@ -45,7 +45,7 @@ VALUES
  0, 0, 100, 0,
  2000, 2000, 3000, 3000, 0, 0,
  2, 495, 0, 0, 0, 0, 0,
- 19, 18200, 0, 0, 0,
+ 19, 18200, 100, 0, 0,
  0, 0, 0, 0,
  'Hemet Nesingwary - In Combat - Maintain Fitz Combat Faction 495');
 

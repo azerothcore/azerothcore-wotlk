@@ -85,10 +85,10 @@ VALUES
  61, 0, 100, 0,
  0, 0, 0, 0, 0, 0,
  2, 35, 0, 0, 0, 0, 0,
- 19, 18200, 0, 0, 0,
+ 19, 18200, 100, 0, 0,
  0, 0, 0, 0,
  'Hemet Nesingwary - On Evade - Set Faction 35 (Shado Fitz Farstrider)'),
--- On EVADE: run action list 1818001 to trigger Harold's closing line (linked off id=17)
+-- On EVADE: run action list 1818001 to trigger Harold's closing line
 (18180, 0, 22, 0,
  7, 0, 100, 0,
  0, 0, 0, 0, 0, 0,
