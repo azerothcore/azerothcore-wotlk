@@ -1422,7 +1422,7 @@ public:
 
     // chat filter (substring chat content filter)
     void LoadChatFilter();
-    [[nodiscard]] bool IsChatFiltered(std::string const& text) const;
+    [[nodiscard]] bool IsChatFiltered(std::string_view text) const;
 
     // name with valid structure and symbols
     static uint8 CheckPlayerName(std::string_view name, bool create = false);

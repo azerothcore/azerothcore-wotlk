@@ -9250,7 +9250,7 @@ void ObjectMgr::LoadChatFilter()
     LOG_INFO("server.loading", " ");
 }
 
-bool ObjectMgr::IsChatFiltered(std::string const& text) const
+bool ObjectMgr::IsChatFiltered(std::string_view text) const
 {
     if (!_chatFilterAutomaton || text.empty())
         return false;

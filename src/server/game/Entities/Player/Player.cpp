@@ -9390,6 +9390,12 @@ void Player::Say(std::string_view text, Language language, WorldObject const* /*
     if (!sScriptMgr->OnPlayerCanUseChat(this, CHAT_MSG_SAY, language, _text))
         return;
 
+    if (sWorld->getBoolConfig(CONFIG_CHAT_FILTER_YELL) && IsChatFiltered(text))
+    {
+        ChatHandler(GetSession()).SendSysMessage(LANG_CHATFILTER_SAY);
+        return;
+    }
+
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_SAY, language, this, this, _text);
 
@@ -9412,6 +9418,12 @@ void Player::Yell(std::string_view text, Language language, WorldObject const* /
     if (!sScriptMgr->OnPlayerCanUseChat(this, CHAT_MSG_YELL, language, _text))
         return;
 
+    if (sWorld->getBoolConfig(CONFIG_CHAT_FILTER_YELL) && IsChatFiltered(text))
+    {
+        ChatHandler(GetSession()).SendSysMessage(LANG_CHATFILTER_YELL);
+        return;
+    }
+
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_YELL, language, this, this, _text);
 
@@ -9433,6 +9445,12 @@ void Player::TextEmote(std::string_view text, WorldObject const* /*= nullptr*/, 
 
     if (!sScriptMgr->OnPlayerCanUseChat(this, CHAT_MSG_EMOTE, LANG_UNIVERSAL, _text))
         return;
+
+    if (sWorld->getBoolConfig(CONFIG_CHAT_FILTER_EMOTE) && IsChatFiltered(text))
+    {
+        ChatHandler(GetSession()).SendSysMessage(LANG_CHATFILTER_EMOTE);
+        return;
+    }
 
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_EMOTE, LANG_UNIVERSAL, this, this, _text);
@@ -9459,13 +9477,14 @@ void Player::Whisper(std::string_view text, Language language, Player* target, b
         language = LANG_UNIVERSAL;                          // whispers should always be readable
 
     std::string _text(text);
-    bool isFiltered = IsChatFiltered(_text);
 
     if (!sScriptMgr->OnPlayerCanUseChat(this, CHAT_MSG_WHISPER, language, _text, target))
         return;
 
+    bool isFiltered = sWorld->getBoolConfig(CONFIG_CHAT_FILTER_WHISPER) && IsChatFiltered(text);
+
     WorldPacket data;
-    if (!isFiltered)
+    if (!isFiltered || isAddonMessage)
     {
         ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER, language, this, this, _text);
         target->SendDirectMessage(&data);
@@ -9520,11 +9539,8 @@ void Player::Whisper(uint32 textId, Player* target, bool isBossWhisper)
     target->SendDirectMessage(&data);
 }
 
-bool Player::IsChatFiltered(std::string const& text)
+bool Player::IsChatFiltered(std::string_view text)
 {
-    if (!sWorld->getBoolConfig(CONFIG_CHAT_FILTER_WHISPER_ENABLE))
-        return false;
-
     return sObjectMgr->IsChatFiltered(text);
 }
 

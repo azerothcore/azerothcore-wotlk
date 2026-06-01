@@ -4382,15 +4382,19 @@ PreserveCustomChannels = 0
 PreserveCustomChannelDuration = 14
 
 #
-#    ChatFilter.Whisper.Enable
-#        Description: Blocks whispers when the message contains any entry from the `chat_filter`
+#    ChatFilter
+#        Description: Blocks chat messages when they contain any entry from the `chat_filter`
 #                     table (substring, case-insensitive).
 #                     Manage entries with .chatfilter add / remove / list and .reload chat_filter.
-#        Default:     0 - (Disabled)
+#                     Blizzlike is only whispers are enabled.
+#        Default:     0 - (Disbaled)
 #                     1 - (Enabled)
 #
 
-ChatFilter.Whisper.Enable = 0
+ChatFilter.Whisper = 1
+ChatFilter.Say     = 0
+ChatFilter.Yell    = 0
+ChatFilter.Emote   = 0
 
 #
 ###################################################################################################
