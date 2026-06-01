@@ -51,14 +51,21 @@ std::span<uint8> RingBuffer::WriteSpan()
 {
     ASSERT(_base, "RingBuffer::WriteSpan called on an empty buffer");
 
-    return { _base + _position, _mappedSize };
+    return { _base + (_position % _mappedSize), _mappedSize };
 }
 
 std::span<uint8 const> RingBuffer::ReadSpan() const
 {
     ASSERT(_base, "RingBuffer::ReadSpan called on an empty buffer");
 
-    return { _base + _position, _mappedSize };
+    return { _base + (_position % _mappedSize), _mappedSize };
+}
+
+std::size_t RingBuffer::Position() const
+{
+    ASSERT(_base, "RingBuffer::Position called on an empty buffer");
+
+    return _position;
 }
 
 void RingBuffer::Advance(std::size_t bytes)
@@ -66,10 +73,10 @@ void RingBuffer::Advance(std::size_t bytes)
     ASSERT(_base, "RingBuffer::Advance called on an empty buffer");
     ASSERT(_mappedSize, "RingBuffer::Advance called on an unmapped buffer");
     ASSERT(bytes <= _mappedSize, "RingBuffer::Advance({}) exceeds mapped size {}", bytes, _mappedSize);
+    ASSERT(_position <= std::numeric_limits<std::size_t>::max() - bytes,
+        "RingBuffer position overflow");
 
     _position += bytes;
-    if (_position >= _mappedSize)
-        _position -= _mappedSize;
 }
 
 void RingBuffer::Reset()

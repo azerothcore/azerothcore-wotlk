@@ -84,6 +84,15 @@ public:
     [[nodiscard]] std::span<uint8 const> ReadSpan() const;
 
     /**
+     * @brief Return the logical current position of this buffer.
+     *
+     * @return The logical current position of this buffer.
+     *
+     * The behavior is undefined unless this object contains a mapping.
+     */
+    [[nodiscard]] std::size_t Position() const;
+
+    /**
      * @brief Advance the current position by the specified @p bytes.
      *
      * @param bytes The number of bytes by which to advance the current

@@ -101,6 +101,24 @@ TEST_F(RingBufferTest, AdvanceWrapsPosition)
     EXPECT_EQ(Buffer().WriteSpan().data(), base);
 }
 
+TEST_F(RingBufferTest, PositionIsLogical)
+{
+    std::span<uint8> span = Buffer().WriteSpan();
+    uint8* const base = span.data();
+    std::size_t const size = span.size();
+
+    Buffer().Advance(size - 1);
+    EXPECT_EQ(Buffer().Position(), size - 1);
+
+    Buffer().Advance(1);
+    EXPECT_EQ(Buffer().Position(), size);
+    EXPECT_EQ(Buffer().WriteSpan().data(), Buffer().ReadSpan().data());
+
+    Buffer().Advance(3);
+    EXPECT_EQ(Buffer().Position(), size + 3);
+    EXPECT_EQ(Buffer().WriteSpan().data(), base + 3);
+}
+
 TEST_F(RingBufferTest, CanWriteContiguouslyAcrossEnd)
 {
     std::span<uint8> span = Buffer().WriteSpan();

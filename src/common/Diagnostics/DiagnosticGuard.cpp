@@ -1,0 +1,94 @@
+/*
+ * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include "DiagnosticGuard.h"
+
+#include <utility>
+
+DiagnosticGuard::DiagnosticGuard(DiagnosticWriter writer, StringLiteralView name) noexcept :
+    _writer(std::move(writer))
+{
+    _beginPosition = _writer.CurrentPosition();
+    _active = _writer.OpenSection(name);
+}
+
+DiagnosticGuard::DiagnosticGuard(DiagnosticGuard&& other) noexcept :
+    _writer(other._writer),
+    _beginPosition(std::exchange(other._beginPosition, 0)),
+    _active(std::exchange(other._active, false))
+{
+}
+
+DiagnosticGuard::~DiagnosticGuard() noexcept
+{
+    if (_active)
+        (void)_writer.CloseSection(_beginPosition);
+}
+
+void DiagnosticGuard::Arg(StringLiteralView name, bool value) noexcept
+{
+    if (_active)
+        (void)_writer.WriteArgument(name, value);
+}
+
+void DiagnosticGuard::Arg(StringLiteralView name, int value) noexcept
+{
+    if (_active)
+        (void)_writer.WriteArgument(name, value);
+}
+
+void DiagnosticGuard::Arg(StringLiteralView name, uint32 value) noexcept
+{
+    if (_active)
+        (void)_writer.WriteArgument(name, value);
+}
+
+void DiagnosticGuard::Arg(StringLiteralView name, int64 value) noexcept
+{
+    if (_active)
+        (void)_writer.WriteArgument(name, value);
+}
+
+void DiagnosticGuard::Arg(StringLiteralView name, uint64 value) noexcept
+{
+    if (_active)
+        (void)_writer.WriteArgument(name, value);
+}
+
+void DiagnosticGuard::Arg(StringLiteralView name, double value) noexcept
+{
+    if (_active)
+        (void)_writer.WriteArgument(name, value);
+}
+
+void DiagnosticGuard::Arg(StringLiteralView name, char const* value) noexcept
+{
+    if (_active)
+        (void)_writer.WriteArgument(name, value);
+}
+
+void DiagnosticGuard::Arg(StringLiteralView name, StringLiteralView value) noexcept
+{
+    if (_active)
+        (void)_writer.WriteArgument(name, value);
+}
+
+void DiagnosticGuard::Arg(StringLiteralView name, std::string_view value) noexcept
+{
+    if (_active)
+        (void)_writer.WriteArgument(name, value);
+}
