@@ -2391,6 +2391,11 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate, bool isLFGReward)
     if (level >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
         return;
 
+    // Trial account level cap (0 disables the cap)
+    if (uint32 trialLevelCap = sWorld->getIntConfig(CONFIG_TRIAL_LEVEL_CAP))
+        if (GetSession()->IsTrialAccount() && level >= trialLevelCap)
+            return;
+
     uint32 bonus_xp = 0;
     bool recruitAFriend = GetsRecruitAFriendBonus(true);
 
@@ -11500,6 +11505,17 @@ bool Player::ModifyMoney(int32 amount, bool sendError /*= true*/)
         SetMoney (GetMoney() > uint32(-amount) ? GetMoney() + amount : 0);
     else
     {
+        // Trial account money cap (0 disables the cap)
+        if (uint32 trialMoneyCap = sWorld->getIntConfig(CONFIG_TRIAL_MONEY_CAP))
+        {
+            if (GetSession()->IsTrialAccount() && GetMoney() + uint32(amount) > trialMoneyCap)
+            {
+                if (sendError)
+                    SendEquipError(EQUIP_ERR_TOO_MUCH_GOLD, nullptr, nullptr);
+                return false;
+            }
+        }
+
         if (GetMoney() < uint32(MAX_MONEY_AMOUNT - amount))
             SetMoney(GetMoney() + amount);
         else

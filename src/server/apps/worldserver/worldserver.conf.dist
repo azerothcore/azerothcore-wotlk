@@ -1779,6 +1779,30 @@ Trial.Restriction.Chat = 1
 Trial.Restriction.Mail = 1
 
 #
+#    Trial.LevelCap
+#        Description: Maximum level a trial account can reach. XP gain stops once this level is reached.
+#        Default:     20
+#                     0  - (Disabled, no cap)
+
+Trial.LevelCap = 20
+
+#
+#    Trial.MoneyCap
+#        Description: Maximum money a trial account can hold, in copper.
+#        Default:     100000 - (10 gold)
+#                     0      - (Disabled, no cap)
+
+Trial.MoneyCap = 100000
+
+#
+#    Trial.TradeSkillCap
+#        Description: Maximum value any profession skill can reach on a trial account.
+#        Default:     100
+#                     0   - (Disabled, no cap)
+
+Trial.TradeSkillCap = 100
+
+#
 ###################################################################################################
 
 ###################################################################################################
@@ -4328,24 +4352,6 @@ Chat.MuteFirstLogin = 0
 #        Default:     120 - (Minutes)
 
 Chat.MuteTimeFirstLogin = 120
-
-#
-#    Trial.Restriction.Chat
-#        Description: Restrict chat for trial accounts. Trial accounts cannot speak in chat channels,
-#                     guild chat or officer chat, and can only whisper players who either have them
-#                     on their friend list or whispered them first.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-
-Trial.Restriction.Chat = 1
-
-#
-#    Trial.Restriction.Mail
-#        Description: Block trial accounts from sending mail.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-
-Trial.Restriction.Mail = 1
 
 #
 #    Channel.RestrictedLfg
