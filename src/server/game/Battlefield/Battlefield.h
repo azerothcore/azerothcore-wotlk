@@ -272,6 +272,8 @@ public:
     void ToggleBattlefield(bool enable) { Enabled = enable; }
     /// Return if battlefield is enabled
     bool IsEnabled() const { return Enabled; }
+    bool SetDiagnosticsEnabled(std::string_view name, bool enable);
+    bool IsDiagnosticsEnabled() const { return _diagnosticWriter.has_value(); }
 
     /**
      * \brief Kick player from battlefield and teleport him to kick-point location
@@ -403,7 +405,6 @@ public:
     void InitStalker(uint32 entry, float x, float y, float z, float o);
 
 protected:
-    void EnableDiagnostics(std::string_view name);
     [[nodiscard]] BattlefieldDiagnosticTrace Trace(StringLiteralView name) const;
 
     ObjectGuid StalkerGuid;

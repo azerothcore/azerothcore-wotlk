@@ -88,6 +88,7 @@ INSERT INTO `command` VALUES
 ('banlist character',2,'Syntax: .banlist character $Name\r\nSearches the banlist for a character name pattern. Pattern required.'),
 ('banlist ip',2,'Syntax: .banlist ip [$Ip]\r\nSearches the banlist for a IP pattern or show full list of IP bans.'),
 ('bf',3,'Syntax: .bf $subcommand\nType .bf to see the list of possible subcommands or .help bf $subcommand to see info on subcommands.'),
+('bf diagnostics',3,'Syntax: .bf diagnostics #battleid [on|off]\r\nShows or toggles diagnostic tracing for the specified battlefield.\r\n#battleid: the battle ID (1 for Wintergrasp).'),
 ('bf enable',3,'Syntax: .bf enable #battleid'),
 ('bf queue',2,'Syntax: .bf queue #battleid\r\nDisplays all players currently in queue, invited, or actively in war for the specified battlefield.\r\n#battleid: the battle ID (e.g. 1 for Wintergrasp).'),
 ('bf start',3,'Syntax: .bf start #battleid'),

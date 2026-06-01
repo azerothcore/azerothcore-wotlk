@@ -26,6 +26,20 @@
 
 using namespace Acore::ChatCommands;
 
+namespace
+{
+    char const* GetBattlefieldDiagnosticsName(uint32 battleId)
+    {
+        switch (battleId)
+        {
+            case BATTLEFIELD_BATTLEID_WG:
+                return "wg_issue";
+            default:
+                return nullptr;
+        }
+    }
+}
+
 class bf_commandscript : public CommandScript
 {
 public:
@@ -40,6 +54,7 @@ public:
             { "switch", HandleBattlefieldSwitch, rbac::RBAC_PERM_COMMAND_BF_SWITCH, Console::Yes },
             { "timer",  HandleBattlefieldTimer,  rbac::RBAC_PERM_COMMAND_BF_TIMER,  Console::Yes },
             { "enable", HandleBattlefieldEnable, rbac::RBAC_PERM_COMMAND_BF_ENABLE, Console::Yes },
+            { "diagnostics", HandleBattlefieldDiagnostics, rbac::RBAC_PERM_COMMAND_BF_ENABLE, Console::Yes },
             { "queue",  HandleBattlefieldQueue,  rbac::RBAC_PERM_COMMAND_BF_QUEUE,  Console::Yes }
         };
         static ChatCommandTable commandTable =
@@ -110,6 +125,41 @@ public:
                 handler->PSendSysMessage(LANG_BF_ENABLED, battleId);
         }
 
+        return true;
+    }
+
+    static bool HandleBattlefieldDiagnostics(ChatHandler* handler, uint32 battleId, Optional<bool> enableArg)
+    {
+        Battlefield* bf = sBattlefieldMgr->GetBattlefieldByBattleId(battleId);
+
+        if (!bf)
+        {
+            handler->SendErrorMessage(LANG_BF_NOT_FOUND, battleId);
+            return false;
+        }
+
+        char const* diagnosticsName = GetBattlefieldDiagnosticsName(battleId);
+        if (!diagnosticsName)
+        {
+            handler->SendErrorMessage("Battlefield {} has no diagnostics stream.", battleId);
+            return false;
+        }
+
+        if (!enableArg)
+        {
+            handler->PSendSysMessage("Battlefield {} diagnostics ({}) are {}.",
+                battleId, diagnosticsName, bf->IsDiagnosticsEnabled() ? "enabled" : "disabled");
+            return true;
+        }
+
+        if (!bf->SetDiagnosticsEnabled(diagnosticsName, *enableArg))
+        {
+            handler->SendErrorMessage("Failed to enable battlefield {} diagnostics ({}).", battleId, diagnosticsName);
+            return false;
+        }
+
+        handler->PSendSysMessage("Battlefield {} diagnostics ({}) are now {}.",
+            battleId, diagnosticsName, bf->IsDiagnosticsEnabled() ? "enabled" : "disabled");
         return true;
     }
 

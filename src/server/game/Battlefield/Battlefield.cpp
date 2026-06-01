@@ -107,16 +107,24 @@ Battlefield::~Battlefield()
     CapturePoints.clear();
 }
 
-void Battlefield::EnableDiagnostics(std::string_view name)
+bool Battlefield::SetDiagnosticsEnabled(std::string_view name, bool enable)
 {
+    if (!enable)
+    {
+        _diagnosticWriter.reset();
+        return true;
+    }
+
     try
     {
         _diagnosticWriter.emplace(sDiagnostics->GetWriter(name));
+        return true;
     }
     catch (std::system_error const& error)
     {
         LOG_ERROR("bg.battlefield", "Battlefield diagnostics '{}' disabled: {}", name, error.what());
         _diagnosticWriter.reset();
+        return false;
     }
 }
 

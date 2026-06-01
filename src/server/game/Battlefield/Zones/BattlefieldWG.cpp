@@ -71,7 +71,6 @@ BattlefieldWG::~BattlefieldWG()
 
 bool BattlefieldWG::SetupBattlefield()
 {
-    EnableDiagnostics("wg_issue");
     auto trace = Trace("BattlefieldWG::SetupBattlefield");
 
     TypeId = BATTLEFIELD_WG;                              // See enum BattlefieldTypes
