@@ -31,9 +31,9 @@ public:
     {
         static ChatCommandTable filteredwordsCommandTable =
         {
-            { "list",   HandleFilteredWordsListCommand,   SEC_GAMEMASTER,    Console::Yes },
-            { "add",    HandleFilteredWordsAddCommand,    SEC_ADMINISTRATOR, Console::Yes },
-            { "remove", HandleFilteredWordsRemoveCommand, SEC_ADMINISTRATOR, Console::Yes }
+            { "list",   HandleFilteredWordsListCommand,   rbac::RBAC_PERM_COMMAND_FILTEREDWORDS_LIST,    Console::Yes },
+            { "add",    HandleFilteredWordsAddCommand,    rbac::RBAC_PERM_COMMAND_FILTEREDWORDS_ADD, Console::Yes },
+            { "remove", HandleFilteredWordsRemoveCommand, rbac::RBAC_PERM_COMMAND_FILTEREDWORDS_REMOVE, Console::Yes }
         };
 
         static ChatCommandTable commandTable =
