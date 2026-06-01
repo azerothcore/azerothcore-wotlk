@@ -105,6 +105,11 @@ struct boss_murmur : public BossAI
         return true;
     }
 
+    bool IsPlayerControlledEngager(Unit* who) const
+    {
+        return who && (who->IsPlayer() || who->IsPet() || who->IsGuardian());
+    }
+
     void SetGUID(ObjectGuid const& guid, int32 index) override
     {
         if (index == GUID_MURMUR_NPCS)
@@ -116,10 +121,20 @@ struct boss_murmur : public BossAI
         }
     }
 
+    void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask) override
+    {
+        BossAI::DamageTaken(attacker, damage, damagetype, damageSchoolMask);
+
+        if (!me->GetVictim() && IsPlayerControlledEngager(attacker))
+        {
+            AttackStart(attacker);
+        }
+    }
+
     void JustEngagedWith(Unit* who) override
     {
         // Boss engages mobs during roleplay, this checks prevents it from setting the zone in combat before players engage it.
-        if (who->IsPlayer() || who->IsPet() || who->IsGuardian())
+        if (IsPlayerControlledEngager(who))
         {
             _JustEngagedWith();
         }
