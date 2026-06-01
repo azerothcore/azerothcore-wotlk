@@ -48,8 +48,7 @@ UPDATE `smart_scripts` SET
 -- ============================================================
 -- Hemet Nesingwary (18180): new rows
 -- ============================================================
-DELETE FROM `smart_scripts` WHERE `entryorguid` = 18180 AND `source_type` = 0
-    AND `id` IN (13, 19, 20, 21, 23, 24, 25, 26, 27);
+DELETE FROM `smart_scripts` WHERE `entryorguid` = 18180 AND `source_type` = 0 AND `id` IN (13, 19, 20, 21, 23, 24, 25, 26, 27);
 INSERT INTO `smart_scripts`
     (`entryorguid`, `source_type`, `id`, `link`,
      `event_type`, `event_phase_mask`, `event_chance`, `event_flags`,

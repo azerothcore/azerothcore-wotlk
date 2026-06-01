@@ -104,4 +104,3 @@ VALUES
  19, 18218, 0, 0, 0,
  0, 0, 0, 0,
  'Hemet Nesingwary - On Script - Say Line 4 (Harold Lane - Closing Line)');
-
