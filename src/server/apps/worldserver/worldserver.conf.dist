@@ -30,6 +30,7 @@
 #  GAME SETTINGS
 #    GAME MASTER
 #    CHEAT
+#    ACCOUNT
 #    CHARACTER DATABASE
 #    CHARACTER DELETE
 #    CHARACTER CREATION
@@ -1753,6 +1754,29 @@ PlayerStart.MapsExplored = 0
 #                     4  - (Disabled)
 
 InstantLogout = 1
+
+#
+###################################################################################################
+
+###################################################################################################
+# ACCOUNT
+#
+#    Trial.Restriction.Chat
+#        Description: Restrict trial accounts from using whisper/channel/guild chats.
+#                     Whispers are only allowed when the trial player is on the recipients friendslist
+#                     or when the trial account was messaged first.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+Trial.Restriction.Chat = 1
+
+#
+#    Trial.Restriction.Mail
+#        Description: Restrict trial accounts from sending mail.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+Trial.Restriction.Mail = 1
 
 #
 ###################################################################################################
@@ -4304,6 +4328,24 @@ Chat.MuteFirstLogin = 0
 #        Default:     120 - (Minutes)
 
 Chat.MuteTimeFirstLogin = 120
+
+#
+#    Trial.Restriction.Chat
+#        Description: Restrict chat for trial accounts. Trial accounts cannot speak in chat channels,
+#                     guild chat or officer chat, and can only whisper players who either have them
+#                     on their friend list or whispered them first.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+Trial.Restriction.Chat = 1
+
+#
+#    Trial.Restriction.Mail
+#        Description: Block trial accounts from sending mail.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+Trial.Restriction.Mail = 1
 
 #
 #    Channel.RestrictedLfg
