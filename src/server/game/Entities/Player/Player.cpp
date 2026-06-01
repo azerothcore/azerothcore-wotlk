@@ -9390,12 +9390,8 @@ void Player::Say(std::string_view text, Language language, WorldObject const* /*
     if (!sScriptMgr->OnPlayerCanUseChat(this, CHAT_MSG_SAY, language, _text))
         return;
 
-    ChatMsg msgType = CHAT_MSG_SAY;
-    if (FilteredWord(_text))
-        msgType = CHAT_MSG_FILTERED;
-
     WorldPacket data;
-    ChatHandler::BuildChatPacket(data, msgType, language, this, this, _text);
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_SAY, language, this, this, _text);
 
     SendDirectMessage(&data);
 
@@ -9416,12 +9412,8 @@ void Player::Yell(std::string_view text, Language language, WorldObject const* /
     if (!sScriptMgr->OnPlayerCanUseChat(this, CHAT_MSG_YELL, language, _text))
         return;
 
-    ChatMsg msgType = CHAT_MSG_YELL;
-    if (FilteredWord(_text))
-        msgType = CHAT_MSG_FILTERED;
-
     WorldPacket data;
-    ChatHandler::BuildChatPacket(data, msgType, language, this, this, _text);
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_YELL, language, this, this, _text);
 
     SendDirectMessage(&data);
 
@@ -9442,12 +9434,8 @@ void Player::TextEmote(std::string_view text, WorldObject const* /*= nullptr*/, 
     if (!sScriptMgr->OnPlayerCanUseChat(this, CHAT_MSG_EMOTE, LANG_UNIVERSAL, _text))
         return;
 
-    ChatMsg msgType = CHAT_MSG_EMOTE;
-    if (FilteredWord(_text))
-        msgType = CHAT_MSG_FILTERED;
-
     WorldPacket data;
-    ChatHandler::BuildChatPacket(data, msgType, LANG_UNIVERSAL, this, this, _text);
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_EMOTE, LANG_UNIVERSAL, this, this, _text);
 
     SendDirectMessage(&data);
 
