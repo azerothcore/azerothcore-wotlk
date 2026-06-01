@@ -362,6 +362,8 @@ public:
      */
     bool SetupBattlefield() override;
 
+    [[nodiscard]] BattlefieldDiagnosticTrace TraceWintergrasp(StringLiteralView name) const { return Trace(name); }
+
     /// Return pointer to relic object
     GameObject* GetRelic() { return GetGameObject(TitansRelic); }
 
@@ -1128,9 +1130,17 @@ struct BfWGGameObjectBuilding
     // Called when associated gameobject is damaged
     void Damaged()
     {
+        auto trace = m_WG->TraceWintergrasp("BattlefieldWG::BfWGGameObjectBuilding::Damaged");
+        trace.Arg("buildingGuid", m_Build.GetRawValue());
+        trace.Arg("type", m_Type);
+        trace.Arg("team", uint32(m_Team));
+        trace.Arg("stateBefore", m_State);
+        trace.Arg("attacker", uint32(m_WG->GetAttackerTeam()));
+
         // Update worldstate
         m_State = BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_DAMAGE - (m_Team * 3);
         m_WG->SendUpdateWorldState(m_WorldState, m_State);
+        trace.Arg("stateAfter", m_State);
 
         // Send warning message
         if (m_damagedText)                                       // tower damage + name
@@ -1145,15 +1155,26 @@ struct BfWGGameObjectBuilding
                 m_WG->HideNpc(creature);
 
         if (m_Type == BATTLEFIELD_WG_OBJECTTYPE_TOWER)
+        {
+            trace.Arg("result", "towerDamaged");
             m_WG->UpdateDamagedTowerCount(m_WG->GetAttackerTeam());
+        }
     }
 
     // Called when associated gameobject is destroyed
     void Destroyed()
     {
+        auto trace = m_WG->TraceWintergrasp("BattlefieldWG::BfWGGameObjectBuilding::Destroyed");
+        trace.Arg("buildingGuid", m_Build.GetRawValue());
+        trace.Arg("type", m_Type);
+        trace.Arg("team", uint32(m_Team));
+        trace.Arg("stateBefore", m_State);
+        trace.Arg("attacker", uint32(m_WG->GetAttackerTeam()));
+
         // Update worldstate
         m_State = BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_DESTROY - (m_Team * 3);
         m_WG->SendUpdateWorldState(m_WorldState, m_State);
+        trace.Arg("stateAfter", m_State);
 
         // Warn players
         if (m_destroyedText)
@@ -1163,18 +1184,26 @@ struct BfWGGameObjectBuilding
         {
             // Inform the global wintergrasp script of the destruction of this object
             case BATTLEFIELD_WG_OBJECTTYPE_TOWER:
+                trace.Arg("result", "towerDestroyed");
                 m_WG->UpdatedDestroyedTowerCount(TeamId(m_Team), m_WG->GetGameObject(m_Build));
                 break;
             case BATTLEFIELD_WG_OBJECTTYPE_DOOR_LAST:
                 m_WG->SetRelicInteractible(true);
                 if (GameObject* go = m_WG->GetRelic())
+                {
                     go->RemoveGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
+                    trace.Arg("result", "relicUnlocked");
+                }
                 else
+                {
+                    trace.Arg("result", "relicMissing");
                     LOG_ERROR("bg.battlefield", "BattlefieldWG: Relic not found.");
+                }
                 break;
             case BATTLEFIELD_WG_OBJECTTYPE_DOOR:
             case BATTLEFIELD_WG_OBJECTTYPE_WALL:
             case BATTLEFIELD_WG_OBJECTTYPE_KEEP_TOWER:
+                trace.Arg("result", "keepStructureDestroyed");
                 m_WG->UpdatedDestroyedTowerCount(TeamId(m_Team), m_WG->GetGameObject(m_Build));
                 break;
         }
@@ -1425,6 +1454,13 @@ struct WGWorkshop
 
     void GiveControlTo(TeamId team, bool init /* for first call in setup*/)
     {
+        BattlefieldDiagnosticTrace trace = init ? BattlefieldDiagnosticTrace() : bf->TraceWintergrasp("BattlefieldWG::WGWorkshop::GiveControlTo");
+        trace.Arg("workshopId", uint32(workshopId));
+        trace.Arg("teamBefore", uint32(teamControl));
+        trace.Arg("requestedTeam", uint32(team));
+        trace.Arg("stateBefore", state);
+        trace.Arg("init", init);
+
         switch (team)
         {
             case TEAM_NEUTRAL:
@@ -1468,9 +1504,13 @@ struct WGWorkshop
 
         if (!init)
         {
+            trace.Arg("refreshVehicleLimits", true);
             bf->UpdateCounterVehicle(false);
             bf->CapturePointTaken(bf->GetAreaByGraveyardId(workshopId));
         }
+
+        trace.Arg("teamAfter", uint32(teamControl));
+        trace.Arg("stateAfter", state);
     }
 
     void UpdateGraveyardAndWorkshop()

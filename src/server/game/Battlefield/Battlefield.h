@@ -19,11 +19,16 @@
 #define BATTLEFIELD_H_
 
 #include "Battleground.h"
+#include "DiagnosticGuard.h"
 #include "GameObject.h"
 #include "ObjectAccessor.h"
 #include "SharedDefines.h"
 #include "TaskScheduler.h"
 #include "ZoneScript.h"
+
+#include <optional>
+#include <string_view>
+#include <utility>
 
 enum BattlefieldTypes
 {
@@ -81,6 +86,29 @@ class BfGraveyard;
 
 using GraveyardVect = std::vector<BfGraveyard*>;
 using PlayerTimerMap = std::map<ObjectGuid, time_t>;
+
+class BattlefieldDiagnosticTrace
+{
+public:
+    BattlefieldDiagnosticTrace() = default;
+    BattlefieldDiagnosticTrace(DiagnosticWriter writer, StringLiteralView name) noexcept;
+
+    BattlefieldDiagnosticTrace(BattlefieldDiagnosticTrace&&) noexcept = default;
+    BattlefieldDiagnosticTrace& operator=(BattlefieldDiagnosticTrace&&) = delete;
+
+    BattlefieldDiagnosticTrace(BattlefieldDiagnosticTrace const&) = delete;
+    BattlefieldDiagnosticTrace& operator=(BattlefieldDiagnosticTrace const&) = delete;
+
+    template <typename T>
+    void Arg(StringLiteralView name, T&& value) noexcept
+    {
+        if (_guard)
+            _guard->Arg(name, std::forward<T>(value));
+    }
+
+private:
+    std::optional<DiagnosticGuard> _guard;
+};
 
 class BfCapturePoint
 {
@@ -195,6 +223,8 @@ protected:
 class Battlefield : public ZoneScript
 {
     friend class BattlefieldMgr;
+    friend class BfCapturePoint;
+    friend class BfGraveyard;
 
 public:
     /// Constructor
@@ -373,6 +403,9 @@ public:
     void InitStalker(uint32 entry, float x, float y, float z, float o);
 
 protected:
+    void EnableDiagnostics(std::string_view name);
+    [[nodiscard]] BattlefieldDiagnosticTrace Trace(StringLiteralView name) const;
+
     ObjectGuid StalkerGuid;
     uint32 Timer;                                           // Global timer for event
     bool Enabled;
@@ -420,6 +453,7 @@ protected:
 
     std::vector<uint64> Data64;
     std::vector<uint32> Data32;
+    std::optional<DiagnosticWriter> _diagnosticWriter;
 
     void KickAfkPlayers();
 
