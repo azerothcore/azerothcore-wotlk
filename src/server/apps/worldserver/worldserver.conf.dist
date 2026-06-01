@@ -1814,6 +1814,16 @@ Trial.Restriction.Party = 1
 Trial.Restriction.Guild = 1
 
 #
+#    Trial.Restriction.Queue
+#        Description: Force trial accounts through the world session queue even if their account
+#                     flags would otherwise grant skip-queue priority. The RBAC_PERM_SKIP_QUEUE
+#                     permission and recent-disconnect grace are still honored.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+Trial.Restriction.Queue = 1
+
+#
 #    Trial.LevelCap
 #        Description: Maximum level a trial account can reach. XP gain stops once this level is reached.
 #        Default:     20
