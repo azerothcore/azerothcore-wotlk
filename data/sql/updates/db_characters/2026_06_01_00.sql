@@ -1,3 +1,4 @@
+-- DB update 2026_04_12_00 -> 2026_06_01_00
 -- Add `chat_filter` table for chat content filtering.
 DROP TABLE IF EXISTS `chat_filter`;
 CREATE TABLE `chat_filter` (
