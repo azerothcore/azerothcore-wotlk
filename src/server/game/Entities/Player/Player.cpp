@@ -9459,7 +9459,7 @@ void Player::Whisper(std::string_view text, Language language, Player* target, b
         language = LANG_UNIVERSAL;                          // whispers should always be readable
 
     std::string _text(text);
-    bool isFiltered = FilteredWord(_text);
+    bool isFiltered = IsChatFiltered(_text);
 
     if (!sScriptMgr->OnPlayerCanUseChat(this, CHAT_MSG_WHISPER, language, _text, target))
         return;
@@ -9520,12 +9520,12 @@ void Player::Whisper(uint32 textId, Player* target, bool isBossWhisper)
     target->SendDirectMessage(&data);
 }
 
-bool Player::FilteredWord(std::string const& text)
+bool Player::IsChatFiltered(std::string const& text)
 {
     if (!sWorld->getBoolConfig(CONFIG_CHAT_FILTER_WHISPER_ENABLE))
         return false;
 
-    return sObjectMgr->IsFilteredWord(text);
+    return sObjectMgr->IsChatFiltered(text);
 }
 
 void Player::PetSpellInitialize()

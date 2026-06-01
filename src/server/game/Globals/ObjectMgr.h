@@ -1420,9 +1420,9 @@ public:
     [[nodiscard]] bool IsProfanityName(std::string_view name) const;
     void AddProfanityPlayerName(std::string const& name);
 
-    // filtered words (chat content filter)
-    void LoadFilteredWords();
-    [[nodiscard]] bool IsFilteredWord(std::string const& text) const;
+    // chat filter (substring chat content filter)
+    void LoadChatFilter();
+    [[nodiscard]] bool IsChatFiltered(std::string const& text) const;
 
     // name with valid structure and symbols
     static uint8 CheckPlayerName(std::string_view name, bool create = false);
@@ -1593,8 +1593,8 @@ private:
     typedef std::set<std::wstring> ProfanityNamesContainer;
     ProfanityNamesContainer _profanityNamesStore;
 
-    //chat filtered words (Aho-Corasick automaton; matches any banned word as substring of input)
-    std::unique_ptr<Acore::AhoCorasick<wchar_t>> _filteredWordsAutomaton;
+    //chat filter (Aho-Corasick automaton; matches any banned word as substring of input)
+    std::unique_ptr<Acore::AhoCorasick<wchar_t>> _chatFilterAutomaton;
 
     GameTeleContainer _gameTeleStore;
 

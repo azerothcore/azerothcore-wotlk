@@ -1,6 +1,6 @@
--- Add `filtered_words` table for chat content filtering.
-DROP TABLE IF EXISTS `filtered_words`;
-CREATE TABLE `filtered_words` (
+-- Add `chat_filter` table for chat content filtering.
+DROP TABLE IF EXISTS `chat_filter`;
+CREATE TABLE `chat_filter` (
     `ID` INT UNSIGNED NOT NULL AUTO_INCREMENT,
     `Word` VARCHAR(255) NOT NULL,
     PRIMARY KEY (`ID`) USING BTREE

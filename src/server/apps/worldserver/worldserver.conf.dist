@@ -4384,9 +4384,9 @@ PreserveCustomChannelDuration = 14
 #
 #    ChatFilter.Whisper.Enable
 #        Description: Replace Whisper chat type with CHAT_MSG_FILTERED
-#                     when the message contains any entry from the `filtered_words`
+#                     when the message contains any entry from the `chat_filter`
 #                     table (substring, case-insensitive). Manage entries with
-#                     .filteredwords add / remove / list and .reload filtered_words.
+#                     .chatfilter add / remove / list and .reload chat_filter.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 #

@@ -1,9 +1,9 @@
 --
 DELETE FROM `rbac_permissions` WHERE `id` IN (923, 924, 925);
 INSERT INTO `rbac_permissions` (`id`, `name`) VALUES
-(923, 'Command: filteredwords list'),
-(924, 'Command: filteredwords add'),
-(925, 'Command: filteredwords remove');
+(923, 'Command: chatfilter list'),
+(924, 'Command: chatfilter add'),
+(925, 'Command: chatfilter remove');
 
 DELETE FROM `rbac_linked_permissions` WHERE `id` = 197 AND `linkedId` IN (923, 924, 925);
 INSERT INTO `rbac_linked_permissions` (`id`, `linkedId`) VALUES

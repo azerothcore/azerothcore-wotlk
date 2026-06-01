@@ -9197,18 +9197,18 @@ void ObjectMgr::AddProfanityPlayerName(std::string const& name)
     }
 }
 
-void ObjectMgr::LoadFilteredWords()
+void ObjectMgr::LoadChatFilter()
 {
     uint32 oldMSTime = getMSTime();
 
-    _filteredWordsAutomaton.reset();                            // need for reload case
+    _chatFilterAutomaton.reset();                               // need for reload case
 
-    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_FILTERED_WORDS);
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAT_FILTER);
     PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
     if (!result)
     {
-        LOG_WARN("server.loading", ">> Loaded 0 filtered words. DB table `filtered_words` is empty!");
+        LOG_WARN("server.loading", ">> Loaded 0 chat filter words. DB table `chat_filter` is empty!");
         LOG_INFO("server.loading", " ");
         return;
     }
@@ -9227,7 +9227,7 @@ void ObjectMgr::LoadFilteredWords()
         std::wstring wstr;
         if (!Utf8toWStr(word, wstr))
         {
-            LOG_ERROR("sql.sql", "Table `filtered_words` has invalid word: {}", word);
+            LOG_ERROR("sql.sql", "Table `chat_filter` has invalid word: {}", word);
             continue;
         }
 
@@ -9243,16 +9243,16 @@ void ObjectMgr::LoadFilteredWords()
     if (count > 0)
     {
         automaton->Build();
-        _filteredWordsAutomaton = std::move(automaton);
+        _chatFilterAutomaton = std::move(automaton);
     }
 
-    LOG_INFO("server.loading", ">> Loaded {} filtered words in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", ">> Loaded {} chat filter words in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 
-bool ObjectMgr::IsFilteredWord(std::string const& text) const
+bool ObjectMgr::IsChatFiltered(std::string const& text) const
 {
-    if (!_filteredWordsAutomaton || text.empty())
+    if (!_chatFilterAutomaton || text.empty())
         return false;
 
     std::wstring wtext;
@@ -9261,7 +9261,7 @@ bool ObjectMgr::IsFilteredWord(std::string const& text) const
 
     wstrToLower(wtext);
 
-    return _filteredWordsAutomaton->ContainsAny(wtext);
+    return _chatFilterAutomaton->ContainsAny(wtext);
 }
 
 enum LanguageType

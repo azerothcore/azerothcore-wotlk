@@ -22,40 +22,40 @@
 
 using namespace Acore::ChatCommands;
 
-class filteredwords_commandscript : public CommandScript
+class chatfilter_commandscript : public CommandScript
 {
 public:
-    filteredwords_commandscript() : CommandScript("filteredwords_commandscript") { }
+    chatfilter_commandscript() : CommandScript("chatfilter_commandscript") { }
 
     ChatCommandTable GetCommands() const override
     {
-        static ChatCommandTable filteredwordsCommandTable =
+        static ChatCommandTable chatfilterCommandTable =
         {
-            { "list",   HandleFilteredWordsListCommand,   rbac::RBAC_PERM_COMMAND_FILTEREDWORDS_LIST,    Console::Yes },
-            { "add",    HandleFilteredWordsAddCommand,    rbac::RBAC_PERM_COMMAND_FILTEREDWORDS_ADD, Console::Yes },
-            { "remove", HandleFilteredWordsRemoveCommand, rbac::RBAC_PERM_COMMAND_FILTEREDWORDS_REMOVE, Console::Yes }
+            { "list",   HandleChatFilterListCommand,   rbac::RBAC_PERM_COMMAND_CHATFILTER_LIST,   Console::Yes },
+            { "add",    HandleChatFilterAddCommand,    rbac::RBAC_PERM_COMMAND_CHATFILTER_ADD,    Console::Yes },
+            { "remove", HandleChatFilterRemoveCommand, rbac::RBAC_PERM_COMMAND_CHATFILTER_REMOVE, Console::Yes }
         };
 
         static ChatCommandTable commandTable =
         {
-            { "filteredwords", filteredwordsCommandTable }
+            { "chatfilter", chatfilterCommandTable }
         };
 
         return commandTable;
     }
 
-    static bool HandleFilteredWordsListCommand(ChatHandler* handler)
+    static bool HandleChatFilterListCommand(ChatHandler* handler)
     {
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_FILTERED_WORDS);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAT_FILTER);
         PreparedQueryResult result = CharacterDatabase.Query(stmt);
 
         if (!result)
         {
-            handler->SendSysMessage("No filtered words found.");
+            handler->SendSysMessage("No chat filter words found.");
             return true;
         }
 
-        handler->SendSysMessage("Filtered words:");
+        handler->SendSysMessage("Chat filter words:");
         uint32 count = 0;
         do
         {
@@ -66,62 +66,62 @@ public:
             ++count;
         } while (result->NextRow());
 
-        handler->PSendSysMessage("{} filtered word(s) total.", count);
+        handler->PSendSysMessage("{} chat filter word(s) total.", count);
         return true;
     }
 
-    static bool HandleFilteredWordsAddCommand(ChatHandler* handler, Tail word)
+    static bool HandleChatFilterAddCommand(ChatHandler* handler, Tail word)
     {
         if (word.empty())
             return false;
 
         std::string text(word);
 
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_FILTERED_WORD);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAT_FILTER_WORD);
         stmt->SetData(0, text);
         if (CharacterDatabase.Query(stmt))
         {
-            handler->SendErrorMessage("Filtered word \"{}\" already exists.", text);
+            handler->SendErrorMessage("Chat filter word \"{}\" already exists.", text);
             return true;
         }
 
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_FILTERED_WORD);
+        stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAT_FILTER_WORD);
         stmt->SetData(0, text);
         CharacterDatabase.DirectExecute(stmt);
 
-        sObjectMgr->LoadFilteredWords();
+        sObjectMgr->LoadChatFilter();
 
-        handler->PSendSysMessage("Filtered word \"{}\" added.", text);
+        handler->PSendSysMessage("Chat filter word \"{}\" added.", text);
         return true;
     }
 
-    static bool HandleFilteredWordsRemoveCommand(ChatHandler* handler, Tail word)
+    static bool HandleChatFilterRemoveCommand(ChatHandler* handler, Tail word)
     {
         if (word.empty())
             return false;
 
         std::string text(word);
 
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_FILTERED_WORD);
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAT_FILTER_WORD);
         stmt->SetData(0, text);
         if (!CharacterDatabase.Query(stmt))
         {
-            handler->SendErrorMessage("Filtered word \"{}\" not found.", text);
+            handler->SendErrorMessage("Chat filter word \"{}\" not found.", text);
             return true;
         }
 
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_FILTERED_WORD);
+        stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAT_FILTER_WORD);
         stmt->SetData(0, text);
         CharacterDatabase.DirectExecute(stmt);
 
-        sObjectMgr->LoadFilteredWords();
+        sObjectMgr->LoadChatFilter();
 
-        handler->PSendSysMessage("Filtered word \"{}\" removed.", text);
+        handler->PSendSysMessage("Chat filter word \"{}\" removed.", text);
         return true;
     }
 };
 
-void AddSC_filteredwords_commandscript()
+void AddSC_chatfilter_commandscript()
 {
-    new filteredwords_commandscript();
+    new chatfilter_commandscript();
 }
