@@ -9459,23 +9459,27 @@ void Player::Whisper(std::string_view text, Language language, Player* target, b
         language = LANG_UNIVERSAL;                          // whispers should always be readable
 
     std::string _text(text);
+    bool isFiltered = FilteredWord(_text);
 
     if (!sScriptMgr->OnPlayerCanUseChat(this, CHAT_MSG_WHISPER, language, _text, target))
         return;
 
-    ChatMsg msgType = CHAT_MSG_WHISPER;
-    if (FilteredWord(_text))
-        msgType = CHAT_MSG_FILTERED;
-
     WorldPacket data;
-    ChatHandler::BuildChatPacket(data, msgType, language, this, this, _text);
-    target->SendDirectMessage(&data);
+    if (!isFiltered)
+    {
+        ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER, language, this, this, _text);
+        target->SendDirectMessage(&data);
+    }
 
     // rest stuff shouldn't happen in case of addon message
     if (isAddonMessage)
         return;
 
-    ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER_INFORM, Language(language), target, target, _text);
+    ChatMsg msgType = CHAT_MSG_WHISPER_INFORM;
+    if (isFiltered)
+        msgType = CHAT_MSG_FILTERED;
+
+    ChatHandler::BuildChatPacket(data, msgType, Language(language), target, target, _text);
     SendDirectMessage(&data);
 
     if (!isAcceptWhispers() && !IsGameMaster() && !target->IsGameMaster())
@@ -9516,7 +9520,7 @@ void Player::Whisper(uint32 textId, Player* target, bool isBossWhisper)
     target->SendDirectMessage(&data);
 }
 
-bool Player::FilteredWord(std::string text)
+bool Player::FilteredWord(std::string const& text)
 {
     if (!sWorld->getBoolConfig(CONFIG_CHAT_FILTER_WHISPER_ENABLE))
         return false;
