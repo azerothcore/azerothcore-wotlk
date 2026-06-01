@@ -1779,6 +1779,22 @@ Trial.Restriction.Chat = 1
 Trial.Restriction.Mail = 1
 
 #
+#    Trial.Restriction.Trade
+#        Description: Restrict trial accounts from initiating or being the target of in-game trade.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+Trial.Restriction.Trade = 1
+
+#
+#    Trial.Restriction.Auction
+#        Description: Restrict trial accounts from selling, bidding, or cancelling auctions at the auction house.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+Trial.Restriction.Auction = 1
+
+#
 #    Trial.LevelCap
 #        Description: Maximum level a trial account can reach. XP gain stops once this level is reached.
 #        Default:     20

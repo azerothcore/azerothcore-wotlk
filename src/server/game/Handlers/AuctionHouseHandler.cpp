@@ -132,6 +132,13 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
         return;
     }
 
+    if (sWorld->getBoolConfig(CONFIG_TRIAL_RESTRICTION_AUCTION) && IsTrialAccount())
+    {
+        SendAuctionCommandResult(0, AUCTION_SELL_ITEM, ERR_AUCTION_RESTRICTED_ACCOUNT);
+        recvData.rfinish();
+        return;
+    }
+
     for (uint32 i = 0; i < itemsCount; ++i)
     {
         recvData >> itemGUIDs[i];
@@ -426,6 +433,12 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket& recvData)
     if (!auctionId || !price)
         return;                                             //check for cheaters
 
+    if (sWorld->getBoolConfig(CONFIG_TRIAL_RESTRICTION_AUCTION) && IsTrialAccount())
+    {
+        SendAuctionCommandResult(0, AUCTION_PLACE_BID, ERR_AUCTION_RESTRICTED_ACCOUNT);
+        return;
+    }
+
     Creature* creature = GetPlayer()->GetNPCIfCanInteractWith(auctioneer, UNIT_NPC_FLAG_AUCTIONEER);
     if (!creature)
     {
@@ -577,6 +590,12 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket& recvData)
     uint32 auctionId;
     recvData >> auctioneer;
     recvData >> auctionId;
+
+    if (sWorld->getBoolConfig(CONFIG_TRIAL_RESTRICTION_AUCTION) && IsTrialAccount())
+    {
+        SendAuctionCommandResult(0, AUCTION_CANCEL, ERR_AUCTION_RESTRICTED_ACCOUNT);
+        return;
+    }
 
     Creature* creature = GetPlayer()->GetNPCIfCanInteractWith(auctioneer, UNIT_NPC_FLAG_AUCTIONEER);
     if (!creature)

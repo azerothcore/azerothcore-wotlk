@@ -350,6 +350,8 @@ void WorldConfig::BuildConfigCache()
 
     SetConfigValue<bool>(CONFIG_TRIAL_RESTRICTION_CHAT, "Trial.Restriction.Chat", true);
     SetConfigValue<bool>(CONFIG_TRIAL_RESTRICTION_MAIL, "Trial.Restriction.Mail", true);
+    SetConfigValue<bool>(CONFIG_TRIAL_RESTRICTION_TRADE, "Trial.Restriction.Trade", true);
+    SetConfigValue<bool>(CONFIG_TRIAL_RESTRICTION_AUCTION, "Trial.Restriction.Auction", true);
     SetConfigValue<uint32>(CONFIG_TRIAL_LEVEL_CAP, "Trial.LevelCap", 20);
     SetConfigValue<uint32>(CONFIG_TRIAL_MONEY_CAP, "Trial.MoneyCap", 100000); // copper, 10 gold
     SetConfigValue<uint32>(CONFIG_TRIAL_TRADE_SKILL_CAP, "Trial.TradeSkillCap", 100);
