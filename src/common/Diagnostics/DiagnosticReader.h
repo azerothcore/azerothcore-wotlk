@@ -117,8 +117,8 @@ public:
      */
     ~DiagnosticReader() = default;
 
-    DiagnosticReader(DiagnosticReader&&) noexcept = default;
-    DiagnosticReader& operator=(DiagnosticReader&&) noexcept = default;
+    DiagnosticReader(DiagnosticReader&& other) noexcept;
+    DiagnosticReader& operator=(DiagnosticReader&& other) noexcept;
 
     DiagnosticReader(DiagnosticReader const&) = delete;
     DiagnosticReader& operator=(DiagnosticReader const&) = delete;

@@ -18,16 +18,35 @@
 #include "BattlefieldMgr.h"
 #include "Chat.h"
 #include "CommandScript.h"
+#include "DiagnosticDump.h"
+#include "Diagnostics.h"
 #include "GameTime.h"
+#include "IoContext.h"
 #include "Language.h"
+#include "Log.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
 #include "RBAC.h"
+#include "ScopeExit.h"
+#include "ServerScript.h"
+
+#include <atomic>
+#include <cctype>
+#include <exception>
+#include <filesystem>
+#include <memory>
+#include <sstream>
+#include <thread>
+#include <utility>
 
 using namespace Acore::ChatCommands;
 
 namespace
 {
+    std::atomic<Acore::Asio::IoContext*> BattlefieldDiagnosticsIoContext = nullptr;
+    std::atomic_bool BattlefieldDiagnosticsDumpInProgress = false;
+    std::atomic_uint32_t BattlefieldDiagnosticsDumpSerial = 0;
+
     char const* GetBattlefieldDiagnosticsName(uint32 battleId)
     {
         switch (battleId)
@@ -38,6 +57,95 @@ namespace
                 return nullptr;
         }
     }
+
+    std::string SanitizeDiagnosticFileName(std::string_view name)
+    {
+        std::string result;
+        result.reserve(name.size());
+
+        for (unsigned char ch : name)
+        {
+            if (std::isalnum(ch) || ch == '_' || ch == '-' || ch == '.')
+                result.push_back(static_cast<char>(ch));
+            else
+                result.push_back('_');
+        }
+
+        if (result.empty())
+            result = "diagnostics";
+
+        return result;
+    }
+
+    std::filesystem::path MakeBattlefieldDiagnosticDumpPath(std::string_view name)
+    {
+        std::filesystem::path directory = sLog->GetLogsDir();
+        if (directory.empty())
+            directory = ".";
+
+        directory /= "diagnostics";
+
+        std::ostringstream fileName;
+        fileName << SanitizeDiagnosticFileName(name)
+            << '-'
+            << GameTime::GetGameTime().count()
+            << '-'
+            << ++BattlefieldDiagnosticsDumpSerial
+            << ".txt";
+
+        return directory / fileName.str();
+    }
+
+    struct BattlefieldDiagnosticDumpJob
+    {
+        std::string name;
+        std::filesystem::path path;
+        DiagnosticReader reader;
+    };
+
+    void RunBattlefieldDiagnosticDump(BattlefieldDiagnosticDumpJob& job)
+    {
+        ScopeExit resetDumpInProgress([]() noexcept
+        {
+            BattlefieldDiagnosticsDumpInProgress.store(false, std::memory_order_release);
+        });
+
+        try
+        {
+            std::size_t const rootEventCount = WriteDiagnosticDump(job.name, job.path, job.reader);
+            LOG_INFO("server.battlefield", "Battlefield diagnostics dump '{}' written with {} root events.",
+                job.path.string(), rootEventCount);
+        }
+        catch (std::exception const& e)
+        {
+            LOG_ERROR("server.battlefield", "Battlefield diagnostics dump '{}' failed: {}",
+                job.path.string(), e.what());
+        }
+        catch (...)
+        {
+            LOG_ERROR("server.battlefield", "Battlefield diagnostics dump '{}' failed with an unknown exception.",
+                job.path.string());
+        }
+    }
+
+    void QueueBattlefieldDiagnosticDump(std::string name, std::filesystem::path path, DiagnosticReader&& reader)
+    {
+        auto job = std::make_shared<BattlefieldDiagnosticDumpJob>(
+            BattlefieldDiagnosticDumpJob{ std::move(name), std::move(path), std::move(reader) });
+
+        auto task = [job = std::move(job)]() mutable
+        {
+            RunBattlefieldDiagnosticDump(*job);
+        };
+
+        if (Acore::Asio::IoContext* ioContext = BattlefieldDiagnosticsIoContext.load(std::memory_order_acquire))
+        {
+            Acore::Asio::post(*ioContext, std::move(task));
+            return;
+        }
+
+        std::thread(std::move(task)).detach();
+    }
 }
 
 class bf_commandscript : public CommandScript
@@ -47,6 +155,11 @@ public:
 
     ChatCommandTable GetCommands() const override
     {
+        static ChatCommandTable diagnosticsCommandTable =
+        {
+            { "",     HandleBattlefieldDiagnostics,     rbac::RBAC_PERM_COMMAND_BF_ENABLE, Console::Yes },
+            { "dump", HandleBattlefieldDiagnosticsDump, rbac::RBAC_PERM_COMMAND_BF_ENABLE, Console::Yes }
+        };
         static ChatCommandTable battlefieldcommandTable =
         {
             { "start",  HandleBattlefieldStart,  rbac::RBAC_PERM_COMMAND_BF_START,  Console::Yes },
@@ -54,7 +167,7 @@ public:
             { "switch", HandleBattlefieldSwitch, rbac::RBAC_PERM_COMMAND_BF_SWITCH, Console::Yes },
             { "timer",  HandleBattlefieldTimer,  rbac::RBAC_PERM_COMMAND_BF_TIMER,  Console::Yes },
             { "enable", HandleBattlefieldEnable, rbac::RBAC_PERM_COMMAND_BF_ENABLE, Console::Yes },
-            { "diagnostics", HandleBattlefieldDiagnostics, rbac::RBAC_PERM_COMMAND_BF_ENABLE, Console::Yes },
+            { "diagnostics", diagnosticsCommandTable },
             { "queue",  HandleBattlefieldQueue,  rbac::RBAC_PERM_COMMAND_BF_QUEUE,  Console::Yes }
         };
         static ChatCommandTable commandTable =
@@ -160,6 +273,49 @@ public:
 
         handler->PSendSysMessage("Battlefield {} diagnostics ({}) are now {}.",
             battleId, diagnosticsName, bf->IsDiagnosticsEnabled() ? "enabled" : "disabled");
+        return true;
+    }
+
+    static bool HandleBattlefieldDiagnosticsDump(ChatHandler* handler, uint32 battleId)
+    {
+        Battlefield* bf = sBattlefieldMgr->GetBattlefieldByBattleId(battleId);
+
+        if (!bf)
+        {
+            handler->SendErrorMessage(LANG_BF_NOT_FOUND, battleId);
+            return false;
+        }
+
+        char const* diagnosticsName = GetBattlefieldDiagnosticsName(battleId);
+        if (!diagnosticsName)
+        {
+            handler->SendErrorMessage("Battlefield {} has no diagnostics stream.", battleId);
+            return false;
+        }
+
+        if (BattlefieldDiagnosticsDumpInProgress.exchange(true, std::memory_order_acq_rel))
+        {
+            handler->SendErrorMessage("A battlefield diagnostics dump is already in progress.");
+            return false;
+        }
+
+        try
+        {
+            DiagnosticReader reader = sDiagnostics->GetReader(diagnosticsName, true);
+            std::filesystem::path path = MakeBattlefieldDiagnosticDumpPath(diagnosticsName);
+
+            QueueBattlefieldDiagnosticDump(diagnosticsName, path, std::move(reader));
+
+            handler->PSendSysMessage("Battlefield {} diagnostics dump scheduled: {}",
+                battleId, path.string());
+        }
+        catch (std::exception const& e)
+        {
+            BattlefieldDiagnosticsDumpInProgress.store(false, std::memory_order_release);
+            handler->SendErrorMessage("Failed to schedule battlefield {} diagnostics dump: {}", battleId, e.what());
+            return false;
+        }
+
         return true;
     }
 
@@ -281,7 +437,25 @@ public:
     }
 };
 
+class bf_diagnostics_serverscript : public ServerScript
+{
+public:
+    bf_diagnostics_serverscript() : ServerScript("bf_diagnostics_serverscript",
+        { SERVERHOOK_ON_NETWORK_START, SERVERHOOK_ON_NETWORK_STOP }) { }
+
+    void OnNetworkStart(Acore::Asio::IoContext& ioContext) override
+    {
+        BattlefieldDiagnosticsIoContext.store(&ioContext, std::memory_order_release);
+    }
+
+    void OnNetworkStop() override
+    {
+        BattlefieldDiagnosticsIoContext.store(nullptr, std::memory_order_release);
+    }
+};
+
 void AddSC_bf_commandscript()
 {
     new bf_commandscript();
+    new bf_diagnostics_serverscript();
 }

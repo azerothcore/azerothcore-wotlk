@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "DiagnosticDump.h"
 #include "DiagnosticGuard.h"
 #include "DiagnosticReader.h"
 #include "DiagnosticWriter.h"
@@ -22,7 +23,11 @@
 #include "gtest/gtest.h"
 
 #include <cerrno>
+#include <chrono>
 #include <cstring>
+#include <filesystem>
+#include <fstream>
+#include <iterator>
 #include <limits>
 #include <memory>
 #include <span>
@@ -272,4 +277,37 @@ TEST_F(DiagnosticStreamTest, OversizedArgumentIsDropped)
     EXPECT_EQ(events[0].children[1].name, "Sibling");
     ASSERT_EQ(events[0].children[1].args.size(), 1u);
     EXPECT_EQ(std::get<int64>(events[0].children[1].args[0].value), 3);
+}
+
+TEST_F(DiagnosticStreamTest, WritesTextDump)
+{
+    {
+        DiagnosticGuard guard(Writer(), "Dump");
+        guard.Arg("answer", 42);
+        guard.Arg("text", "hello\nthere");
+    }
+
+    RingBuffer snapshot = Snapshot(Buffer());
+    DiagnosticReader reader(std::move(snapshot));
+
+    std::filesystem::path path = std::filesystem::temp_directory_path() /
+        ("acore-diagnostic-dump-" + std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()) + ".txt");
+
+    std::error_code error;
+    std::filesystem::remove(path, error);
+
+    EXPECT_EQ(WriteDiagnosticDump("test_stream", path, reader), 1u);
+
+    std::ifstream input(path, std::ios::binary);
+    ASSERT_TRUE(input);
+
+    std::string dump((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
+
+    EXPECT_NE(dump.find("diagnostics \"test_stream\""), std::string::npos);
+    EXPECT_NE(dump.find("events 1"), std::string::npos);
+    EXPECT_NE(dump.find("event \"Dump\""), std::string::npos);
+    EXPECT_NE(dump.find("arg \"answer\" = 42"), std::string::npos);
+    EXPECT_NE(dump.find("arg \"text\" = \"hello\\nthere\""), std::string::npos);
+
+    std::filesystem::remove(path, error);
 }
