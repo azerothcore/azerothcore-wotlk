@@ -6,10 +6,8 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
 (129971, 129971, 0, 0, 515, 0, 0),
 (129971, 129972, 3, 90, 515, 0, 0);
 
-DELETE FROM `creature` WHERE (`id1` = 29080) AND (`guid` IN (129971, 129972));
-INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `Comment`, `VerifiedBuild`) VALUES
-(129971, 29080, 0, 0, 609, 0, 0, 1, 4, 1, 1301.78, -6101.76, 14.1091, 1.58574, 360, 0, 0, 13495, 0, 2, 0, 0, 0, '', NULL, 0),
-(129972, 29080, 0, 0, 609, 0, 0, 1, 4, 1, 1301.25, -6104.29, 14.1091, 1.36388, 360, 0, 0, 13495, 0, 0, 0, 0, 0, '', NULL, 0);
+UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 2 WHERE (`id1` = 29080) AND (`guid` IN (129971));
+UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 0 WHERE (`id1` = 29080) AND (`guid` IN (129972));
 
 DELETE FROM `creature_addon` WHERE (`guid` IN (129971));
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
