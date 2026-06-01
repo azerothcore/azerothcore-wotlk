@@ -67,6 +67,9 @@ INSERT INTO `pool_creature` VALUES
 (12816,477,0,'ZG Before Bats Troll 3-Pack entry 11351'),
 (14616,1003,50,'Or\'Kalar (2773) - Spawn 1'),
 (14652,370,0,'Marez Cowl Spawn 1'),
+(15066,144,0,'Baron Longshore 1'),
+(15215,144,0,'Baron Longshore 2'),
+(15217,144,0,'Baron Longshore 3'),
 (16400,359,0,'Sister Riven Spawn 1'),
 (17066,1108,0,'Araga (14222) Spawn 1'),
 (23431,1108,0,'Araga (14222) Spawn 2'),
@@ -1717,4 +1720,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-03-15 20:39:03
+-- Dump completed on 2026-06-01 22:40:23
