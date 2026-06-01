@@ -146,6 +146,7 @@ public:
             { "reference_loot_template",       HandleReloadLootTemplatesReferenceCommand,     rbac::RBAC_PERM_COMMAND_RELOAD_REFERENCE_LOOT_TEMPLATE, Console::Yes },
             { "reserved_name",                 HandleReloadReservedNameCommand,               rbac::RBAC_PERM_COMMAND_RELOAD_RESERVED_NAME, Console::Yes },
             { "profanity_name",                HandleReloadProfanityNameCommand,              rbac::RBAC_PERM_COMMAND_RELOAD, Console::Yes },
+            { "chat_filter",                   HandleReloadChatFilterCommand,                 rbac::RBAC_PERM_COMMAND_RELOAD, Console::Yes },
             { "reputation_reward_rate",        HandleReloadReputationRewardRateCommand,       rbac::RBAC_PERM_COMMAND_RELOAD_REPUTATION_REWARD_RATE, Console::Yes },
             { "reputation_spillover_template", HandleReloadReputationRewardRateCommand,       rbac::RBAC_PERM_COMMAND_RELOAD_SPILLOVER_TEMPLATE, Console::Yes },
             { "skill_discovery_template",      HandleReloadSkillDiscoveryTemplateCommand,     rbac::RBAC_PERM_COMMAND_RELOAD_SKILL_DISCOVERY_TEMPLATE, Console::Yes },
@@ -210,6 +211,7 @@ public:
         HandleReloadCommandCommand(handler);
         HandleReloadReservedNameCommand(handler);
         HandleReloadProfanityNameCommand(handler);
+        HandleReloadChatFilterCommand(handler);
         HandleReloadAcoreStringCommand(handler);
         HandleReloadGameTeleCommand(handler);
         HandleReloadCreatureMovementOverrideCommand(handler);
@@ -829,6 +831,14 @@ public:
         sObjectMgr->LoadProfanityNamesFromDB();
         sObjectMgr->LoadProfanityNamesFromDBC(); // Needed because we clear the store in LoadProfanityNamesFromDB()
         handler->SendGlobalGMSysMessage("Profanity Names reloaded.");
+        return true;
+    }
+
+    static bool HandleReloadChatFilterCommand(ChatHandler* handler)
+    {
+        LOG_INFO("server.loading", "Reloading Chat Filter!");
+        sObjectMgr->LoadChatFilter();
+        handler->SendGlobalGMSysMessage("Chat Filter reloaded.");
         return true;
     }
 
