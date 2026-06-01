@@ -193,7 +193,7 @@ void WorldConfig::BuildConfigCache()
 
     SetConfigValue<bool>(CONFIG_STRICT_NAMES_RESERVED, "StrictNames.Reserved", true);
     SetConfigValue<bool>(CONFIG_STRICT_NAMES_PROFANITY, "StrictNames.Profanity", true);
-    SetConfigValue<bool>(CONFIG_CHAT_FILTER_ENABLE, "ChatFilter.Enable", false);
+    SetConfigValue<bool>(CONFIG_CHAT_FILTER_WHISPER_ENABLE, "ChatFilter.Whisper.Enable", false);
     SetConfigValue<uint32>(CONFIG_STRICT_PLAYER_NAMES, "StrictPlayerNames", 0);
     SetConfigValue<uint32>(CONFIG_STRICT_CHARTER_NAMES, "StrictCharterNames", 0);
     SetConfigValue<uint32>(CONFIG_STRICT_CHANNEL_NAMES, "StrictChannelNames", 0);

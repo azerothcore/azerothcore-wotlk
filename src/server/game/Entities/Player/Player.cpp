@@ -9518,7 +9518,7 @@ void Player::Whisper(uint32 textId, Player* target, bool isBossWhisper)
 
 bool Player::FilteredWord(std::string text)
 {
-    if (!sWorld->getBoolConfig(CONFIG_CHAT_FILTER_ENABLE))
+    if (!sWorld->getBoolConfig(CONFIG_CHAT_FILTER_WHISPER_ENABLE))
         return false;
 
     return sObjectMgr->IsFilteredWord(text);

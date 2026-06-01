@@ -4382,8 +4382,8 @@ PreserveCustomChannels = 0
 PreserveCustomChannelDuration = 14
 
 #
-#    ChatFilter.Enable
-#        Description: Replace Say/Yell/TextEmote/Whisper chat type with CHAT_MSG_FILTERED
+#    ChatFilter.Whisper.Enable
+#        Description: Replace Whisper chat type with CHAT_MSG_FILTERED
 #                     when the message contains any entry from the `filtered_words`
 #                     table (substring, case-insensitive). Manage entries with
 #                     .filteredwords add / remove / list and .reload filtered_words.
@@ -4391,7 +4391,7 @@ PreserveCustomChannelDuration = 14
 #                     1 - (Enabled)
 #
 
-ChatFilter.Enable = 0
+ChatFilter.Whisper.Enable = 0
 
 #
 ###################################################################################################
