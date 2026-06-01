@@ -1,3 +1,4 @@
+-- DB update 2026_06_01_00 -> 2026_06_01_01
 -- Add chatfilter and reload chat_filter commands.
 DELETE FROM `command` WHERE `name` IN ('chatfilter', 'chatfilter list', 'chatfilter add', 'chatfilter remove', 'reload chat_filter');
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
