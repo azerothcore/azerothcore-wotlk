@@ -1,0 +1,16 @@
+# Config file for @PROJECT_NAME_LOWER@
+#
+# It defines the following variables:
+#
+# @PROJECT_NAME_UPPER@_INCLUDE_DIRS     - include directory
+# @PROJECT_NAME_UPPER@_LIBRARIES        - all dynamic libraries
+# @PROJECT_NAME_UPPER@_STATIC_LIBRARIES - all static libraries
+
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+
+# Add optional dependencies here
+
+include("${CMAKE_CURRENT_LIST_DIR}/@TARGETS_EXPORT_NAME@.cmake")
+check_required_components("@PROJECT_NAME@")

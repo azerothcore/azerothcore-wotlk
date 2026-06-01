@@ -1,0 +1,17 @@
+Makefile
+debug
+moc_predefs.h
+release
+target_wrapper.*
+
+# The executables
+c90/c90
+c90/c90.exe
+cpp/cpp
+cpp/cpp.exe
+encoder/encoder
+encoder/encoder.exe
+parser/parser
+parser/parser.exe
+tojson/tojson
+tojson/tojson.exe

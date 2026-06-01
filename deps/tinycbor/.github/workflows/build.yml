@@ -1,0 +1,141 @@
+name: CI
+permissions: read-all
+
+on:
+  push:
+    branches: [ main, dev ]
+  pull_request:
+    branches: [ main, dev ]
+
+
+# When a PR is updated, cancel the jobs from the previous version. Merges
+# do not define head_ref, so use run_id to never cancel those jobs.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  TinyCBOR:
+    timeout-minutes: 45
+    # Common environment variables
+    env:
+      HOMEBREW_NO_INSTALL_CLEANUP: 1
+      HOMEBREW_NO_ANALYTICS: 1
+
+    strategy:
+      # Always run all jobs in the matrix, even if one fails.
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest ]
+        build_cfg:
+        - name: gcc-no-math
+          cmakeflags: >-
+            -DCMAKE_C_FLAGS="-Os -Werror"
+            -DWITH_FLOATING_POINT=OFF
+            -DWITH_FREESTANDING=ON
+        - name: gcc-freestanding
+          cmakeflags: >-
+            -DCMAKE_C_FLAGS="-Os -Werror"
+            -DWITH_FREESTANDING=ON
+        - name: gcc-small
+          cmakeflags: >-
+            -DBUILD_TESTING=OFF
+            -DCMAKE_C_FLAGS="-Os -Werror"
+        - name: clang-small
+          cmakeflags: >-
+            -DBUILD_TESTING=OFF
+            -DCMAKE_C_COMPILER=clang
+            -DCMAKE_C_FLAGS="-Oz -g -Werror"
+        - name: clang
+          cmakeflags: >-
+            -DBUILD_EXAMPLES=ON
+            -DBUILD_SHARED_LIBS=ON
+            -DCMAKE_BUILD_TYPE=Debug
+            -DCMAKE_C_COMPILER=clang
+            -DCMAKE_C_FLAGS_DEBUG="-Werror"
+            -DCMAKE_CXX_COMPILER=clang++
+            -DCMAKE_CXX_FLAGS_DEBUG="-Werror"
+        - name: linux-g++
+          cmakeflags: >-
+            -DBUILD_EXAMPLES=ON
+            -DBUILD_SHARED_LIBS=ON
+            -DCMAKE_BUILD_TYPE=Debug
+            -DCMAKE_C_COMPILER=gcc
+            -DCMAKE_C_FLAGS_DEBUG="-Werror"
+            -DCMAKE_CXX_COMPILER=g++
+            -DCMAKE_CXX_FLAGS_DEBUG="-Werror"
+        include:
+        - os: macos-latest
+          build_cfg:
+            name: clang-small
+            cmakeflags: >-
+              -DBUILD_TESTING=OFF
+              -DBUILD_TOOLS=OFF
+              -DCMAKE_C_COMPILER=clang
+              -DCMAKE_C_FLAGS="-Oz -g -Werror"
+              -DCMAKE_CXX_COMPILER=clang++
+              -DCMAKE_CXX_FLAGS="-O2 -g -Werror"
+        - os: macos-15-intel
+          build_cfg:
+            name: clang
+            cmakeflags: >-
+              -DBUILD_EXAMPLES=ON
+              -DBUILD_SHARED_LIBS=ON
+              -DCMAKE_BUILD_TYPE=Debug
+              -DCMAKE_C_COMPILER=clang
+              -DCMAKE_C_FLAGS_DEBUG="-Werror -fsanitize=address"
+              -DCMAKE_CXX_COMPILER=clang++
+              -DCMAKE_CXX_FLAGS_DEBUG="-Werror -fsanitize=address"
+              -DCMAKE_EXE_LINKER_FLAGS="-fsanitize=address"
+              -DCMAKE_MODULE_LINKER_FLAGS="-fsanitize=address"
+
+
+    # Default job name is too long to be visible in the "Checks" tab.
+    name: ${{ matrix.os }}/${{ matrix.build_cfg.name }}
+    # The type of runner that the job will run on
+    runs-on: ${{ matrix.os }}
+    steps:
+    - name: Clone tinycbor
+      uses: actions/checkout@v6
+
+    - name: install Linux software
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        # Need a recent Valgrind, otherwise debug info cannot be read.
+        sudo snap install valgrind --classic
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends \
+          doxygen \
+          cmake \
+          libc6-dbg \
+          libcjson-dev \
+          libfuntools-dev \
+          ninja-build \
+          qt6-base-dev
+
+    - name: install macOS software
+      if: runner.os == 'macOS'
+      run: |
+        brew install -q \
+             cjson \
+             cmake \
+             ninja \
+             qt
+
+    - name: Compile
+      run: |
+        set -x
+        cmake -S. -Bbuild -GNinja -DBUILD_TESTING=ON \
+              ${{ matrix.build_cfg.cmakeflags }}
+        ninja -C build -v
+        if [[ -f build/libtinycbor.a ]]; then
+            size build/libtinycbor.a | tee sizes
+        fi
+
+    - name: Execute tests
+      run: |
+        ctest --output-on-failure --test-dir build
+
+    - name: Build docs
+      if: matrix.build_cfg.docs
+      run: ./scripts/update-docs.sh

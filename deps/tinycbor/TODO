@@ -1,0 +1,25 @@
+==== To Do list for libcbor ====
+=== General ===
+* API review
+* Benchmark
+* Write examples
+** Simple decoder
+** Decoder to JSON
+** Windowed encoding/decoding (limited memory)
+
+=== Encoder ===
+* Write API docs
+* Add API for creating indeterminate-length arrays and maps
+* Add API for creating indeterminate-length strings
+* Add API for relaxing doubles to floats and to integers
+* Add length-checking of the sub-containers (#ifndef CBOR_ENCODER_NO_USER_CHECK)
+* Decide how to indicate number of bytes needed
+** Suggestion: return negative number from the functions
+
+=== Decoder ===
+* Write functions not yet implemented
+* Add API for stream-decoding strings
+* Add API for checking known tags and simple types
+* (unlikely) Add API for checking the pairing of a tag and the tagged type
+* Write tests for error conditions
+* Fuzzy-test the decoder

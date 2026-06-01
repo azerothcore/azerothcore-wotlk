@@ -24,6 +24,34 @@ add_subdirectory(jemalloc)
 add_subdirectory(openssl)
 add_subdirectory(stdfs)
 add_subdirectory(threads)
+
+function(add_tinycbor)
+  if (POLICY CMP0077)
+    cmake_policy(PUSH)
+    cmake_policy(SET CMP0077 NEW)
+  endif()
+
+  set(BUILD_EXAMPLES OFF)
+  set(BUILD_TESTING OFF)
+  set(BUILD_TOOLS OFF)
+  set(WITH_CBOR2JSON OFF)
+  add_subdirectory(tinycbor EXCLUDE_FROM_ALL)
+
+  if (POLICY CMP0077)
+    cmake_policy(POP)
+  endif()
+
+  target_compile_options(tinycbor
+    PRIVATE
+      $<$<C_COMPILER_ID:MSVC>:/wd4244 /wd5287>
+      $<$<NOT:$<C_COMPILER_ID:MSVC>>:-w>)
+  set_target_properties(tinycbor
+    PROPERTIES
+      FOLDER
+        "deps")
+endfunction()
+
+add_tinycbor()
 add_subdirectory(utf8cpp)
 
 if ((APPS_BUILD AND (NOT APPS_BUILD STREQUAL "none")) OR BUILD_TOOLS_DB_IMPORT)

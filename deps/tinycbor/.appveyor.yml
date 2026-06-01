@@ -1,0 +1,30 @@
+version: build-{build}
+pull_requests:
+  do_not_increment_build_number: true
+image:
+- Visual Studio 2019
+- Visual Studio 2022
+install:
+- cmd: >-
+    if /i "%APPVEYOR_BUILD_WORKER_IMAGE%"=="Visual Studio 2019" (call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat" x64) & (set QTDIR=C:\Qt\6.5\msvc2019_64)
+
+    if /i "%APPVEYOR_BUILD_WORKER_IMAGE%"=="Visual Studio 2022" (call "C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat") & (set QTDIR=C:\Qt\6.8\msvc2022_64)
+
+    set path=%PATH%;%QTDIR%\bin
+build_script:
+- cmd: >-
+    cmake -S. -Bbuild -GNinja -DWITH_CBOR2JSON=OFF -DBUILD_TESTING=ON -DCMAKE_C_FLAGS="-W3 -Os -MDd" -DCMAKE_CXX_FLAGS="-W3 -O2 -MDd"
+
+    ninja -C build
+
+test_script:
+- cmd: >-
+    ctest --test-dir build --output-on-failure --output-junit ctest.junitxml
+
+after_test:
+- cmd: >-
+    curl -F file=@build/ctest.junitxml https://ci.appveyor.com/api/testresults/junit/%APPVEYOR_JOB_ID%
+
+artifacts:
+#- path: build\tinycbor.lib
+deploy: off
