@@ -74,11 +74,26 @@ Battlefield::~Battlefield()
     CapturePoints.clear();
 }
 
+void Battlefield::RemovePlayerFromTracking(ObjectGuid playerGuid)
+{
+    for (uint8 i = 0; i < PVP_TEAMS_COUNT; ++i)
+    {
+        InvitedPlayers[i].erase(playerGuid);
+        PlayersInQueue[i].erase(playerGuid);
+        PlayersWillBeKick[i].erase(playerGuid);
+        Players[i].erase(playerGuid);
+    }
+}
+
 void Battlefield::HandlePlayerEnterZone(Player* player, uint32 /*zone*/)
 {
+    RemovePlayerFromTracking(player->GetGUID());
+
     // Allow scripts to adjust the player's effective team or appearance before
     // any team-based battlefield containers (such as player lists or queues) are updated.
     sScriptMgr->OnBattlefieldPlayerEnterZone(this, player);
+
+    TryRejoinAfterLogout(player); // relog: auto-rejoin, skip invite below
 
     // Xinef: do not invite players on taxi
     if (!player->IsInFlight())
@@ -111,12 +126,20 @@ void Battlefield::HandlePlayerEnterZone(Player* player, uint32 /*zone*/)
 
 void Battlefield::HandlePlayerLeaveZone(Player* player, uint32 /*zone*/)
 {
+    // Logout still runs full leave-war cleanup, but marks the player for grace-window auto-rejoin.
+    bool const isLogout = player->GetSession() && player->GetSession()->PlayerLogout();
+
     if (IsWarTime())
     {
         // If the player is participating to the battle
         if (PlayersInWar[player->GetTeamId()].erase(player->GetGUID()))
         {
-            player->GetSession()->SendBfLeaveMessage(BattleId);
+            if (isLogout)
+                LogoutGracePlayers[player->GetTeamId()][player->GetGUID()] =
+                    GameTime::GetGameTime().count() + LOGOUT_GRACE_SECONDS;
+            else
+                player->GetSession()->SendBfLeaveMessage(BattleId);
+
             if (Group* group = player->GetGroup()) // Remove the player from the raid group
                 if (group->isBFGroup())
                     group->RemoveMember(player->GetGUID());
@@ -129,13 +152,7 @@ void Battlefield::HandlePlayerLeaveZone(Player* player, uint32 /*zone*/)
     for (BfCapturePoint* cp : CapturePoints)
         cp->HandlePlayerLeave(player);
 
-    for (uint8 i = 0; i < PVP_TEAMS_COUNT; ++i)
-    {
-        InvitedPlayers[i].erase(player->GetGUID());
-        PlayersInQueue[i].erase(player->GetGUID());
-        PlayersWillBeKick[i].erase(player->GetGUID());
-        Players[i].erase(player->GetGUID());
-    }
+    RemovePlayerFromTracking(player->GetGUID());
     SendRemoveWorldStates(player);
     RemovePlayerFromResurrectQueue(player->GetGUID());
     OnPlayerLeaveZone(player);
@@ -235,6 +252,9 @@ void Battlefield::InvitePlayerToWar(Player* player)
     if (!player)
         return;
 
+    if (player->IsGameMaster())
+        return;
+
     /// @todo : needed ?
     if (player->IsInFlight())
         return;
@@ -292,7 +312,14 @@ void Battlefield::KickPlayerFromBattlefield(ObjectGuid guid)
     if (Player* player = ObjectAccessor::FindPlayer(guid))
         if (player->GetZoneId() == GetZoneId() && !player->IsGameMaster()
             && !PlayersInWar[player->GetTeamId()].count(guid))
+        {
             player->TeleportTo(KickPosition);
+            // Eagerly drop zone tracking: the teleport's zone change does not
+            // propagate until the next Player::Update, so callers iterating
+            // Players[team] in the same tick would otherwise still see them.
+            for (uint8 i = 0; i < PVP_TEAMS_COUNT; ++i)
+                Players[i].erase(guid);
+        }
 }
 
 void Battlefield::StartBattle()
@@ -304,6 +331,7 @@ void Battlefield::StartBattle()
     {
         PlayersInWar[team].clear();
         Groups[team].clear();
+        LogoutGracePlayers[team].clear();
     }
 
     Timer = BattleTime;
@@ -318,11 +346,25 @@ void Battlefield::StartBattle()
 
     _scheduler.Schedule(1s, BATTLEFIELD_TIMER_GROUP_WAR, [this](TaskContext context)
     {
-        time_t now = GameTime::GetGameTime().count();
+        time_t const now = GameTime::GetGameTime().count();
+
+        // Send eject so the 3.3.5 client closes its popup (it does not on its
+        // own when the timer hits zero), then drop the entry and teleport.
         for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
-            for (PlayerTimerMap::value_type const& pair : InvitedPlayers[team])
-                if (pair.second <= now)
-                    KickPlayerFromBattlefield(pair.first);
+        {
+            std::vector<ObjectGuid> expired;
+            for (auto const& [guid, expireAt] : InvitedPlayers[team])
+                if (expireAt <= now)
+                    expired.push_back(guid);
+
+            for (ObjectGuid const& guid : expired)
+            {
+                if (Player* player = ObjectAccessor::FindPlayer(guid))
+                    player->GetSession()->SendBfLeaveMessage(BattleId, BF_LEAVE_REASON_EXITED);
+                InvitedPlayers[team].erase(guid);
+                KickPlayerFromBattlefield(guid);
+            }
+        }
 
         InvitePlayersInZoneToWar();
         for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
@@ -362,8 +404,19 @@ void Battlefield::EndBattle(bool endByTimer)
     else
         DoPlaySoundToAll(BF_HORDE_WINS);
 
-    OnBattleEnd(endByTimer);
+    // Hook runs BEFORE OnBattleEnd so subscribers can read PlayersInWar
+    // while it is still populated (OnBattleEnd hands out rewards and then
+    // clears the set).
     sScriptMgr->OnBattlefieldWarEnd(this, endByTimer);
+    OnBattleEnd(endByTimer);
+
+    for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
+    {
+        for (ObjectGuid const& guid : Groups[team])
+            if (Group* group = sGroupMgr->GetGroupByGUID(guid.GetCounter()))
+                group->Disband();
+        Groups[team].clear();
+    }
 
     // Reset battlefield timer
     Timer = NoWarBattleTime;
@@ -415,13 +468,21 @@ void Battlefield::PlayerAcceptInviteToWar(Player* player)
     if (!IsWarTime())
         return;
 
+    // Reject unknown / expired invites; the kick task only sweeps every 5s.
+    TeamId const invitedTeam = player->GetTeamId();
+    auto itr = InvitedPlayers[invitedTeam].find(player->GetGUID());
+    if (itr == InvitedPlayers[invitedTeam].end()
+        || itr->second <= GameTime::GetGameTime().count())
+        return;
+
     sScriptMgr->OnBattlefieldPlayerJoinWar(this, player);
 
     if (AddOrSetPlayerToCorrectBfGroup(player))
     {
         player->GetSession()->SendBfEntered(BattleId);
         PlayersInWar[player->GetTeamId()].insert(player->GetGUID());
-        InvitedPlayers[player->GetTeamId()].erase(player->GetGUID());
+        // Use pre-hook team: JoinWar may have just reassigned GetTeamId().
+        InvitedPlayers[invitedTeam].erase(player->GetGUID());
 
         if (player->isAFK())
             player->ToggleAFK();
@@ -549,6 +610,41 @@ bool Battlefield::AddOrSetPlayerToCorrectBfGroup(Player* player)
     return true;
 }
 
+void Battlefield::TryRejoinAfterLogout(Player* player)
+{
+    ObjectGuid const guid = player->GetGUID();
+    time_t const now = GameTime::GetGameTime().count();
+
+    // Consume the marker and honor its grace window (check both teams; team may have changed).
+    bool pending = false;
+    for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
+        if (auto itr = LogoutGracePlayers[team].find(guid); itr != LogoutGracePlayers[team].end())
+        {
+            pending = itr->second > now;
+            LogoutGracePlayers[team].erase(itr);
+        }
+
+    // Vacancy gate mirrors HandlePlayerEnterZone (full team -> queue path). Pre-hook:
+    // we can't abort after JoinWar, which may already have mutated module state.
+    if (!pending || !IsWarTime() || !HasWarVacancy(player->GetTeamId()))
+        return;
+
+    if (Group* current = player->GetGroup())
+        if (current->isBGGroup() || current->isBFGroup())
+            return;
+
+    // Rejoin via the normal join path: firing JoinWar lets modules rebuild
+    // per-session (Player*-keyed) state and pick the team before the raid bind.
+    sScriptMgr->OnBattlefieldPlayerJoinWar(this, player);
+
+    if (AddOrSetPlayerToCorrectBfGroup(player))
+    {
+        player->GetSession()->SendBfEntered(BattleId);
+        PlayersInWar[player->GetTeamId()].insert(guid);
+        OnPlayerJoinWar(player);
+    }
+}
+
 BfGraveyard* Battlefield::GetGraveyardById(uint32 id) const
 {
     if (id < GraveyardList.size())
@@ -590,34 +686,22 @@ GraveyardStruct const* Battlefield::GetClosestGraveyard(Player* player)
     return nullptr;
 }
 
-void Battlefield::AddPlayerToResurrectQueue(ObjectGuid npcGuid, ObjectGuid playerGuid)
+void Battlefield::AddPlayerToResurrectQueue(ObjectGuid /*npcGuid*/, ObjectGuid playerGuid)
 {
-    for (BfGraveyard* gy : GraveyardList)
-    {
-        if (!gy)
-            continue;
+    Player* player = ObjectAccessor::FindPlayer(playerGuid);
+    if (!player)
+        return;
 
-        if (gy->HasNpc(npcGuid))
-        {
-            gy->AddPlayer(playerGuid);
-            break;
-        }
-    }
+    player->CastSpell(player, SPELL_WAITING_FOR_RESURRECT, true);
 }
 
 void Battlefield::RemovePlayerFromResurrectQueue(ObjectGuid playerGuid)
 {
-    for (BfGraveyard* gy : GraveyardList)
-    {
-        if (!gy)
-            continue;
+    Player* player = ObjectAccessor::FindPlayer(playerGuid);
+    if (!player)
+        return;
 
-        if (gy->HasPlayer(playerGuid))
-        {
-            gy->RemovePlayer(playerGuid);
-            break;
-        }
-    }
+    player->RemoveAurasDueToSpell(SPELL_WAITING_FOR_RESURRECT);
 }
 
 void Battlefield::SendAreaSpiritHealerQueryOpcode(Player* player, ObjectGuid const& guid)
@@ -663,80 +747,9 @@ float BfGraveyard::GetDistance(Player* player)
     return player->GetDistance2d(safeLoc->x, safeLoc->y);
 }
 
-void BfGraveyard::AddPlayer(ObjectGuid playerGuid)
-{
-    if (!ResurrectQueue.count(playerGuid))
-    {
-        ResurrectQueue.insert(playerGuid);
-
-        if (Player* player = ObjectAccessor::FindPlayer(playerGuid))
-            player->CastSpell(player, SPELL_WAITING_FOR_RESURRECT, true);
-    }
-}
-
-void BfGraveyard::RemovePlayer(ObjectGuid playerGuid)
-{
-    ResurrectQueue.erase(ResurrectQueue.find(playerGuid));
-
-    if (Player* player = ObjectAccessor::FindPlayer(playerGuid))
-        player->RemoveAurasDueToSpell(SPELL_WAITING_FOR_RESURRECT);
-}
-
-void BfGraveyard::Resurrect()
-{
-    if (ResurrectQueue.empty())
-        return;
-
-    for (ObjectGuid const& guid : ResurrectQueue)
-    {
-        // Get player object from his guid
-        Player* player = ObjectAccessor::FindPlayer(guid);
-        if (!player)
-            continue;
-
-        // Check if the player is in world and on the good graveyard
-        if (player->IsInWorld())
-            if (Unit* spirit = ObjectAccessor::GetCreature(*player, SpiritGuide[ControlTeam]))
-                spirit->CastSpell(spirit, SPELL_SPIRIT_HEAL, true);
-
-        // Resurrect player
-        player->CastSpell(player, SPELL_RESURRECTION_VISUAL, true);
-        player->ResurrectPlayer(1.0f);
-        player->CastSpell(player, 6962, true);
-        player->CastSpell(player, SPELL_SPIRIT_HEAL_MANA, true);
-
-        player->SpawnCorpseBones(false);
-    }
-
-    ResurrectQueue.clear();
-}
-
-// For changing graveyard control
 void BfGraveyard::GiveControlTo(TeamId team)
 {
     ControlTeam = team;
-    // Teleport to other graveyard, players which were on this graveyard
-    RelocateDeadPlayers();
-}
-
-void BfGraveyard::RelocateDeadPlayers()
-{
-    GraveyardStruct const* closestGrave = nullptr;
-    for (ObjectGuid const& guid : ResurrectQueue)
-    {
-        Player* player = ObjectAccessor::FindPlayer(guid);
-        if (!player)
-            continue;
-
-        if (closestGrave)
-            player->TeleportTo(player->GetMapId(), closestGrave->x, closestGrave->y, closestGrave->z, player->GetOrientation());
-        else
-        {
-            closestGrave = Bf->GetClosestGraveyard(player);
-            if (closestGrave)
-                player->TeleportTo(player->GetMapId(), closestGrave->x, closestGrave->y, closestGrave->z, player->GetOrientation());
-        }
-    }
 }
 
 Creature* Battlefield::SpawnCreature(uint32 entry, Position pos, TeamId teamId)
@@ -844,7 +857,7 @@ bool BfCapturePoint::HandlePlayerEnter(Player* player)
         player->SendUpdateWorldState(go->GetGOInfo()->capturePoint.worldstate2, uint32(std::ceil((Value + MaxValue) / (2 * MaxValue) * 100.0f)));
         player->SendUpdateWorldState(go->GetGOInfo()->capturePoint.worldstate3, NeutralValuePct);
     }
-    return ActivePlayers[player->GetTeamId()].insert(player->GetGUID()).second;
+    return ActivePlayers.insert(player->GetGUID()).second;
 }
 
 GuidUnorderedSet::iterator BfCapturePoint::HandlePlayerLeave(Player* player)
@@ -852,13 +865,12 @@ GuidUnorderedSet::iterator BfCapturePoint::HandlePlayerLeave(Player* player)
     if (GameObject* go = GetCapturePointGo(player))
         player->SendUpdateWorldState(go->GetGOInfo()->capturePoint.worldState1, 0);
 
-    GuidUnorderedSet::iterator current = ActivePlayers[player->GetTeamId()].find(player->GetGUID());
+    GuidUnorderedSet::iterator current = ActivePlayers.find(player->GetGUID());
 
-    if (current == ActivePlayers[player->GetTeamId()].end())
+    if (current == ActivePlayers.end())
         return current; // return end()
 
-    current = ActivePlayers[player->GetTeamId()].erase(current);
-    return current;
+    return ActivePlayers.erase(current);
 }
 
 void BfCapturePoint::SendChangePhase()
@@ -867,17 +879,16 @@ void BfCapturePoint::SendChangePhase()
     if (!capturePoint)
         return;
 
-    for (uint8 team = 0; team < 2; ++team)
-        for (ObjectGuid const& guid : ActivePlayers[team])  // send to all players present in the area
-            if (Player* player = ObjectAccessor::FindPlayer(guid))
-            {
-                // send this too, sometimes the slider disappears, dunno why :(
-                player->SendUpdateWorldState(capturePoint->GetGOInfo()->capturePoint.worldState1, 1);
-                // send these updates to only the ones in this objective
-                player->SendUpdateWorldState(capturePoint->GetGOInfo()->capturePoint.worldstate2, (uint32) std::ceil((Value + MaxValue) / (2 * MaxValue) * 100.0f));
-                // send this too, sometimes it resets :S
-                player->SendUpdateWorldState(capturePoint->GetGOInfo()->capturePoint.worldstate3, NeutralValuePct);
-            }
+    for (ObjectGuid const& guid : ActivePlayers)  // send to all players present in the area
+        if (Player* player = ObjectAccessor::FindPlayer(guid))
+        {
+            // send this too, sometimes the slider disappears, dunno why :(
+            player->SendUpdateWorldState(capturePoint->GetGOInfo()->capturePoint.worldState1, 1);
+            // send these updates to only the ones in this objective
+            player->SendUpdateWorldState(capturePoint->GetGOInfo()->capturePoint.worldstate2, (uint32) std::ceil((Value + MaxValue) / (2 * MaxValue) * 100.0f));
+            // send this too, sometimes it resets :S
+            player->SendUpdateWorldState(capturePoint->GetGOInfo()->capturePoint.worldstate3, NeutralValuePct);
+        }
 }
 
 bool BfCapturePoint::SetCapturePointData(GameObject* capturePoint, TeamId team)
@@ -949,19 +960,19 @@ bool BfCapturePoint::Update(uint32 diff)
 
     float radius = capturePoint->GetGOInfo()->capturePoint.radius;
 
-    for (uint8 team = 0; team < 2; ++team)
+    // Single pass over the existing set: drop leavers, count survivors per team.
+    uint32 counts[PVP_TEAMS_COUNT] = { 0, 0 };
+    for (auto itr = ActivePlayers.begin(); itr != ActivePlayers.end();)
     {
-        for (auto itr = ActivePlayers[team].begin(); itr != ActivePlayers[team].end();)
+        Player* player = ObjectAccessor::FindPlayer(*itr);
+        if (player && capturePoint->IsWithinDistInMap(player, radius) && player->IsOutdoorPvPActive())
         {
-            if (Player* player = ObjectAccessor::FindPlayer(*itr))
-                if (!capturePoint->IsWithinDistInMap(player, radius) || !player->IsOutdoorPvPActive())
-                {
-                    itr = HandlePlayerLeave(player);
-                    continue;
-                }
-
+            ++counts[player->GetTeamId()];
             ++itr;
+            continue;
         }
+
+        itr = (player ? HandlePlayerLeave(player) : ActivePlayers.erase(itr));
     }
 
     std::list<Player*> players;
@@ -971,11 +982,14 @@ bool BfCapturePoint::Update(uint32 diff)
 
     for (Player* player : players)
         if (player->IsOutdoorPvPActive())
-            if (ActivePlayers[player->GetTeamId()].insert(player->GetGUID()).second)
+            if (ActivePlayers.insert(player->GetGUID()).second)
+            {
                 HandlePlayerEnter(player);
+                ++counts[player->GetTeamId()];
+            }
 
     // get the difference of numbers
-    float factDiff = ((float) ActivePlayers[0].size() - (float) ActivePlayers[1].size()) * diff / BATTLEFIELD_OBJECTIVE_UPDATE_INTERVAL;
+    float factDiff = ((float)counts[TEAM_ALLIANCE] - (float)counts[TEAM_HORDE]) * diff / BATTLEFIELD_OBJECTIVE_UPDATE_INTERVAL;
     if (G3D::fuzzyEq(factDiff, 0.0f))
         return false;
 
@@ -1061,34 +1075,36 @@ bool BfCapturePoint::Update(uint32 diff)
 
 void BfCapturePoint::SendUpdateWorldState(uint32 field, uint32 value)
 {
-    for (uint8 team = 0; team < 2; ++team)
-        for (ObjectGuid const& guid : ActivePlayers[team])  // send to all players present in the area
-            if (Player* player = ObjectAccessor::FindPlayer(guid))
-                player->SendUpdateWorldState(field, value);
+    for (ObjectGuid const& guid : ActivePlayers)  // send to all players present in the area
+        if (Player* player = ObjectAccessor::FindPlayer(guid))
+            player->SendUpdateWorldState(field, value);
 }
 
 void BfCapturePoint::SendObjectiveComplete(uint32 id, ObjectGuid guid)
 {
-    uint8 team;
+    TeamId winner;
     switch (State)
     {
         case BF_CAPTUREPOINT_OBJECTIVESTATE_ALLIANCE:
-            team = 0;
+            winner = TEAM_ALLIANCE;
             break;
         case BF_CAPTUREPOINT_OBJECTIVESTATE_HORDE:
-            team = 1;
+            winner = TEAM_HORDE;
             break;
         default:
             return;
     }
 
-    // send to all players present in the area
-    for (ObjectGuid const& playerGuid : ActivePlayers[team])
+    // Credit only players on the controlling team. Team is read from the
+    // player at iteration time, not at insert time, so players whose
+    // GetTeamId() changed mid-stay get credit on their current side.
+    for (ObjectGuid const& playerGuid : ActivePlayers)
         if (Player* player = ObjectAccessor::FindPlayer(playerGuid))
-            player->KilledMonsterCredit(id, guid);
+            if (player->GetTeamId() == winner)
+                player->KilledMonsterCredit(id, guid);
 }
 
 bool BfCapturePoint::IsInsideObjective(Player* player) const
 {
-    return ActivePlayers[player->GetTeamId()].find(player->GetGUID()) != ActivePlayers[player->GetTeamId()].end();
+    return ActivePlayers.find(player->GetGUID()) != ActivePlayers.end();
 }
