@@ -63,6 +63,11 @@ private:
     bool WriteArgument(StringLiteralView name, int64 value) noexcept;
     bool WriteArgument(StringLiteralView name, uint64 value) noexcept;
     bool WriteArgument(StringLiteralView name, double value) noexcept;
+    template <std::size_t Size>
+    bool WriteArgument(StringLiteralView name, char const (&value)[Size]) noexcept
+    {
+        return WriteStringLiteralArgument(name, value);
+    }
     bool WriteArgument(StringLiteralView name, char const* value) noexcept;
     bool WriteArgument(StringLiteralView name, StringLiteralView value) noexcept;
     bool WriteArgument(StringLiteralView name, std::string_view value) noexcept;
@@ -73,6 +78,7 @@ private:
     bool WriteTaggedRecord(uint64 tag, std::size_t arrayLength, Encode&& encode) noexcept;
 
     bool WriteSectionFooter(uint64 sectionLength) noexcept;
+    bool WriteStringLiteralArgument(StringLiteralView name, char const* value) noexcept;
     void WriteZeroFooterAtHead() noexcept;
 
     RingBuffer* _buffer = nullptr;

@@ -55,6 +55,13 @@ public:
      * @param name The name of the argument.
      * @param value The value of the argument.
      */
+    template <std::size_t Size>
+    void Arg(StringLiteralView name, char const (&value)[Size]) noexcept
+    {
+        if (_active)
+            (void)_writer.WriteStringLiteralArgument(name, value);
+    }
+
     template <typename T>
     void Arg(StringLiteralView name, T&& value) noexcept
     {

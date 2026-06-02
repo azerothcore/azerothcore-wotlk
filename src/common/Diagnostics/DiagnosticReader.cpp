@@ -19,9 +19,11 @@
 #include "DiagnosticFormat.h"
 
 #include <algorithm>
+#include <cstdint>
 #include <cstring>
 #include <limits>
 #include <optional>
+#include <string_view>
 #include <utility>
 
 namespace
@@ -194,6 +196,9 @@ namespace
 
         static bool ReadText(CborValue& value, std::string_view& text)
         {
+            if (ReadStringLiteral(value, text))
+                return true;
+
             if (!cbor_value_is_text_string(&value))
                 return false;
 
@@ -218,6 +223,39 @@ namespace
             value = string;
             text = result;
 
+            return true;
+        }
+
+        static bool ReadStringLiteral(CborValue& value, std::string_view& text)
+        {
+            if (!cbor_value_is_tag(&value))
+                return false;
+
+            CborTag cborTag;
+            if (cbor_value_get_tag(&value, &cborTag) != CborNoError)
+                return false;
+            if (cborTag != static_cast<CborTag>(DiagnosticTag::StringLiteral))
+                return false;
+
+            CborValue literal = value;
+            if (cbor_value_skip_tag(&literal) != CborNoError)
+                return false;
+            if (!cbor_value_is_unsigned_integer(&literal))
+                return false;
+
+            uint64 encodedPointer;
+            if (cbor_value_get_uint64(&literal, &encodedPointer) != CborNoError)
+                return false;
+            if (encodedPointer > std::numeric_limits<std::uintptr_t>::max() || !encodedPointer)
+                return false;
+
+            char const* pointer = reinterpret_cast<char const*>(static_cast<std::uintptr_t>(encodedPointer));
+            text = std::string_view(pointer);
+
+            if (cbor_value_advance_fixed(&literal) != CborNoError)
+                return false;
+
+            value = literal;
             return true;
         }
 
@@ -249,12 +287,8 @@ namespace
                 return cbor_value_advance_fixed(&cborValue) == CborNoError;
             }
 
-            if (cbor_value_is_text_string(&cborValue))
+            if (std::string_view stringValue; ReadText(cborValue, stringValue))
             {
-                std::string_view stringValue;
-                if (!ReadText(cborValue, stringValue))
-                    return false;
-
                 value = stringValue;
                 return true;
             }

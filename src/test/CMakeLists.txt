@@ -56,5 +56,5 @@ add_test(
         NAME
         unit
         COMMAND
-        ${CMAKE_BINARY_DIR}/src/test/unit_tests
+        $<TARGET_FILE:unit_tests>
 )

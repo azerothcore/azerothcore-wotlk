@@ -138,23 +138,26 @@ TEST_F(DiagnosticStreamTest, RecoversNestedSections)
 
     ASSERT_EQ(events.size(), 1u);
     EXPECT_EQ(events[0].name, "Foo");
-    EXPECT_TRUE(PointsInto(events[0].name, snapshotBytes));
+    EXPECT_FALSE(PointsInto(events[0].name, snapshotBytes));
 
     ASSERT_EQ(events[0].args.size(), 2u);
     EXPECT_EQ(events[0].args[0].name, "arg1");
+    EXPECT_FALSE(PointsInto(events[0].args[0].name, snapshotBytes));
     EXPECT_EQ(std::get<int64>(events[0].args[0].value), 11);
     EXPECT_EQ(events[0].args[1].name, "arg3");
+    EXPECT_FALSE(PointsInto(events[0].args[1].name, snapshotBytes));
     EXPECT_EQ(std::get<bool>(events[0].args[1].value), true);
 
     ASSERT_EQ(events[0].children.size(), 1u);
     EXPECT_EQ(events[0].children[0].name, "Bar");
-    EXPECT_TRUE(PointsInto(events[0].children[0].name, snapshotBytes));
+    EXPECT_FALSE(PointsInto(events[0].children[0].name, snapshotBytes));
 
     ASSERT_EQ(events[0].children[0].args.size(), 1u);
     EXPECT_EQ(events[0].children[0].args[0].name, "arg2");
+    EXPECT_FALSE(PointsInto(events[0].children[0].args[0].name, snapshotBytes));
     std::string_view childValue = std::get<std::string_view>(events[0].children[0].args[0].value);
     EXPECT_EQ(childValue, "child");
-    EXPECT_TRUE(PointsInto(childValue, snapshotBytes));
+    EXPECT_FALSE(PointsInto(childValue, snapshotBytes));
 }
 
 TEST_F(DiagnosticStreamTest, RecoversSupportedArgumentValues)
@@ -168,6 +171,7 @@ TEST_F(DiagnosticStreamTest, RecoversSupportedArgumentValues)
 
         std::string_view view = "view-value";
         guard.Arg("view", view);
+        guard.Arg("literal", StringLiteralView("literal-value"));
     }
 
     RingBuffer snapshot = Snapshot(Buffer());
@@ -175,24 +179,35 @@ TEST_F(DiagnosticStreamTest, RecoversSupportedArgumentValues)
     std::vector<DiagnosticEvent> events = RecoverFrom(snapshot);
 
     ASSERT_EQ(events.size(), 1u);
-    ASSERT_EQ(events[0].args.size(), 5u);
+    ASSERT_EQ(events[0].args.size(), 6u);
 
     EXPECT_EQ(events[0].args[0].name, "false");
+    EXPECT_FALSE(PointsInto(events[0].args[0].name, snapshotBytes));
     EXPECT_EQ(std::get<bool>(events[0].args[0].value), false);
 
     EXPECT_EQ(events[0].args[1].name, "signed");
+    EXPECT_FALSE(PointsInto(events[0].args[1].name, snapshotBytes));
     EXPECT_EQ(std::get<int64>(events[0].args[1].value), -17);
 
     EXPECT_EQ(events[0].args[2].name, "unsigned");
+    EXPECT_FALSE(PointsInto(events[0].args[2].name, snapshotBytes));
     EXPECT_EQ(std::get<uint64>(events[0].args[2].value), std::numeric_limits<uint64>::max());
 
     EXPECT_EQ(events[0].args[3].name, "double");
+    EXPECT_FALSE(PointsInto(events[0].args[3].name, snapshotBytes));
     EXPECT_EQ(std::get<double>(events[0].args[3].value), 1.25);
 
     EXPECT_EQ(events[0].args[4].name, "view");
+    EXPECT_FALSE(PointsInto(events[0].args[4].name, snapshotBytes));
     std::string_view value = std::get<std::string_view>(events[0].args[4].value);
     EXPECT_EQ(value, "view-value");
     EXPECT_TRUE(PointsInto(value, snapshotBytes));
+
+    EXPECT_EQ(events[0].args[5].name, "literal");
+    EXPECT_FALSE(PointsInto(events[0].args[5].name, snapshotBytes));
+    std::string_view literalValue = std::get<std::string_view>(events[0].args[5].value);
+    EXPECT_EQ(literalValue, "literal-value");
+    EXPECT_FALSE(PointsInto(literalValue, snapshotBytes));
 }
 
 TEST_F(DiagnosticStreamTest, ReturnsTopLevelSectionsInForwardOrder)

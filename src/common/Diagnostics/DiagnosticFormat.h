@@ -26,9 +26,10 @@
 // the low unassigned range for compact diagnostic record markers.
 enum class DiagnosticTag : CborTag
 {
-    Open  = 6,
-    Arg   = 7,
-    Close = 8
+    Open          = 6,
+    Arg           = 7,
+    Close         = 8,
+    StringLiteral = 9
 };
 
 using DiagnosticSectionFooter = uint64;

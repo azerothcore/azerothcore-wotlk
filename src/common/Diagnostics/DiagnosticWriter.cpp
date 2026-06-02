@@ -19,6 +19,7 @@
 #include "DiagnosticFormat.h"
 #include "Errors.h"
 
+#include <cstdint>
 #include <cstring>
 #include <limits>
 #include <string_view>
@@ -36,6 +37,22 @@ namespace
     CborError EncodeText(CborEncoder* encoder, std::string_view value) noexcept
     {
         return cbor_encode_text_string(encoder, value.data(), value.size());
+    }
+
+    CborError EncodeStringLiteralPointer(CborEncoder* encoder, char const* value) noexcept
+    {
+        static_assert(sizeof(std::uintptr_t) <= sizeof(uint64));
+
+        CborError error = cbor_encode_tag(encoder, static_cast<CborTag>(DiagnosticTag::StringLiteral));
+        if (error)
+            return error;
+
+        return cbor_encode_uint(encoder, static_cast<uint64>(reinterpret_cast<std::uintptr_t>(value)));
+    }
+
+    CborError EncodeStringLiteral(CborEncoder* encoder, StringLiteralView value) noexcept
+    {
+        return EncodeStringLiteralPointer(encoder, value.data());
     }
 
     bool CborSucceeded(CborError error) noexcept
@@ -61,23 +78,19 @@ std::size_t DiagnosticWriter::BufferSize() const noexcept
 
 bool DiagnosticWriter::OpenSection(StringLiteralView name) noexcept
 {
-    std::string_view nameView = name;
-
     return WriteTaggedRecord(TagValue(DiagnosticTag::Open), 1,
-        [nameView](CborEncoder* array) noexcept
+        [name](CborEncoder* array) noexcept
         {
-            return EncodeText(array, nameView);
+            return EncodeStringLiteral(array, name);
         });
 }
 
 bool DiagnosticWriter::WriteArgument(StringLiteralView name, bool value) noexcept
 {
-    std::string_view nameView = name;
-
     return WriteTaggedRecord(TagValue(DiagnosticTag::Arg), 2,
-        [nameView, value](CborEncoder* array) noexcept
+        [name, value](CborEncoder* array) noexcept
         {
-            CborError error = EncodeText(array, nameView);
+            CborError error = EncodeStringLiteral(array, name);
             if (error)
                 return error;
 
@@ -97,12 +110,10 @@ bool DiagnosticWriter::WriteArgument(StringLiteralView name, uint32 value) noexc
 
 bool DiagnosticWriter::WriteArgument(StringLiteralView name, int64 value) noexcept
 {
-    std::string_view nameView = name;
-
     return WriteTaggedRecord(TagValue(DiagnosticTag::Arg), 2,
-        [nameView, value](CborEncoder* array) noexcept
+        [name, value](CborEncoder* array) noexcept
         {
-            CborError error = EncodeText(array, nameView);
+            CborError error = EncodeStringLiteral(array, name);
             if (error)
                 return error;
 
@@ -112,12 +123,10 @@ bool DiagnosticWriter::WriteArgument(StringLiteralView name, int64 value) noexce
 
 bool DiagnosticWriter::WriteArgument(StringLiteralView name, uint64 value) noexcept
 {
-    std::string_view nameView = name;
-
     return WriteTaggedRecord(TagValue(DiagnosticTag::Arg), 2,
-        [nameView, value](CborEncoder* array) noexcept
+        [name, value](CborEncoder* array) noexcept
         {
-            CborError error = EncodeText(array, nameView);
+            CborError error = EncodeStringLiteral(array, name);
             if (error)
                 return error;
 
@@ -127,12 +136,10 @@ bool DiagnosticWriter::WriteArgument(StringLiteralView name, uint64 value) noexc
 
 bool DiagnosticWriter::WriteArgument(StringLiteralView name, double value) noexcept
 {
-    std::string_view nameView = name;
-
     return WriteTaggedRecord(TagValue(DiagnosticTag::Arg), 2,
-        [nameView, value](CborEncoder* array) noexcept
+        [name, value](CborEncoder* array) noexcept
         {
-            CborError error = EncodeText(array, nameView);
+            CborError error = EncodeStringLiteral(array, name);
             if (error)
                 return error;
 
@@ -152,17 +159,28 @@ bool DiagnosticWriter::WriteArgument(StringLiteralView name, char const* value) 
 
 bool DiagnosticWriter::WriteArgument(StringLiteralView name, StringLiteralView value) noexcept
 {
-    return WriteArgument(name, static_cast<std::string_view>(value));
+    return WriteStringLiteralArgument(name, value.data());
+}
+
+bool DiagnosticWriter::WriteStringLiteralArgument(StringLiteralView name, char const* value) noexcept
+{
+    return WriteTaggedRecord(TagValue(DiagnosticTag::Arg), 2,
+        [name, value](CborEncoder* array) noexcept
+        {
+            CborError error = EncodeStringLiteral(array, name);
+            if (error)
+                return error;
+
+            return EncodeStringLiteralPointer(array, value);
+        });
 }
 
 bool DiagnosticWriter::WriteArgument(StringLiteralView name, std::string_view value) noexcept
 {
-    std::string_view nameView = name;
-
     return WriteTaggedRecord(TagValue(DiagnosticTag::Arg), 2,
-        [nameView, value](CborEncoder* array) noexcept
+        [name, value](CborEncoder* array) noexcept
         {
-            CborError error = EncodeText(array, nameView);
+            CborError error = EncodeStringLiteral(array, name);
             if (error)
                 return error;
 
