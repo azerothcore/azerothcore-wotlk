@@ -1,3 +1,4 @@
+
 -- Adjust Scarlet Champion (NPC ID 29080, GUIDs 129971 & 129972)
 -- Add waypoints for pathing up and down the hill from the harbor
 -- Set 129971 as leader and 129972 as follower
