@@ -1,3 +1,4 @@
+-- DB update 2026_06_02_00 -> 2026_06_02_01
 
 -- Adjust Scarlet Champion (NPC ID 29080, GUIDs 129971 & 129972)
 -- Add waypoints for pathing up and down the hill from the harbor
