@@ -21,31 +21,23 @@
 #include "DiagnosticDump.h"
 #include "Diagnostics.h"
 #include "GameTime.h"
-#include "IoContext.h"
 #include "Language.h"
 #include "Log.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
 #include "RBAC.h"
-#include "ScopeExit.h"
-#include "ServerScript.h"
 
-#include <atomic>
 #include <cctype>
 #include <exception>
 #include <filesystem>
-#include <memory>
 #include <sstream>
-#include <thread>
-#include <utility>
 
 using namespace Acore::ChatCommands;
 
 namespace
 {
-    std::atomic<Acore::Asio::IoContext*> BattlefieldDiagnosticsIoContext = nullptr;
-    std::atomic_bool BattlefieldDiagnosticsDumpInProgress = false;
-    std::atomic_uint32_t BattlefieldDiagnosticsDumpSerial = 0;
+    // Only ever touched on the world-update thread (GM-only dump command).
+    uint32 BattlefieldDiagnosticsDumpSerial = 0;
 
     char const* GetBattlefieldDiagnosticsName(uint32 battleId)
     {
@@ -95,57 +87,6 @@ namespace
 
         return directory / fileName.str();
     }
-
-    struct BattlefieldDiagnosticDumpJob
-    {
-        std::string name;
-        std::filesystem::path path;
-        DiagnosticReader reader;
-    };
-
-    void RunBattlefieldDiagnosticDump(BattlefieldDiagnosticDumpJob& job)
-    {
-        ScopeExit resetDumpInProgress([]() noexcept
-        {
-            BattlefieldDiagnosticsDumpInProgress.store(false, std::memory_order_release);
-        });
-
-        try
-        {
-            std::size_t const rootEventCount = WriteDiagnosticDump(job.name, job.path, job.reader);
-            LOG_INFO("server.battlefield", "Battlefield diagnostics dump '{}' written with {} root events.",
-                job.path.string(), rootEventCount);
-        }
-        catch (std::exception const& e)
-        {
-            LOG_ERROR("server.battlefield", "Battlefield diagnostics dump '{}' failed: {}",
-                job.path.string(), e.what());
-        }
-        catch (...)
-        {
-            LOG_ERROR("server.battlefield", "Battlefield diagnostics dump '{}' failed with an unknown exception.",
-                job.path.string());
-        }
-    }
-
-    void QueueBattlefieldDiagnosticDump(std::string name, std::filesystem::path path, DiagnosticReader&& reader)
-    {
-        auto job = std::make_shared<BattlefieldDiagnosticDumpJob>(
-            BattlefieldDiagnosticDumpJob{ std::move(name), std::move(path), std::move(reader) });
-
-        auto task = [job = std::move(job)]() mutable
-        {
-            RunBattlefieldDiagnosticDump(*job);
-        };
-
-        if (Acore::Asio::IoContext* ioContext = BattlefieldDiagnosticsIoContext.load(std::memory_order_acquire))
-        {
-            Acore::Asio::post(*ioContext, std::move(task));
-            return;
-        }
-
-        std::thread(std::move(task)).detach();
-    }
 }
 
 class bf_commandscript : public CommandScript
@@ -158,7 +99,7 @@ public:
         static ChatCommandTable diagnosticsCommandTable =
         {
             { "",     HandleBattlefieldDiagnostics,     rbac::RBAC_PERM_COMMAND_BF_ENABLE, Console::Yes },
-            { "dump", HandleBattlefieldDiagnosticsDump, rbac::RBAC_PERM_COMMAND_BF_ENABLE, Console::Yes }
+            { "dump", HandleBattlefieldDiagnosticsDump, rbac::RBAC_PERM_COMMAND_BF_ENABLE, Console::No }
         };
         static ChatCommandTable battlefieldcommandTable =
         {
@@ -293,26 +234,21 @@ public:
             return false;
         }
 
-        if (BattlefieldDiagnosticsDumpInProgress.exchange(true, std::memory_order_acq_rel))
-        {
-            handler->SendErrorMessage("A battlefield diagnostics dump is already in progress.");
-            return false;
-        }
-
+        // GM-only command, so this runs on the world-update thread: the same
+        // context that writes the diagnostics buffer. The snapshot and dump can
+        // therefore be taken synchronously without racing live tracing.
         try
         {
             DiagnosticReader reader = sDiagnostics->GetReader(diagnosticsName, true);
             std::filesystem::path path = MakeBattlefieldDiagnosticDumpPath(diagnosticsName);
+            std::size_t const rootEventCount = WriteDiagnosticDump(diagnosticsName, path, reader);
 
-            QueueBattlefieldDiagnosticDump(diagnosticsName, path, std::move(reader));
-
-            handler->PSendSysMessage("Battlefield {} diagnostics dump scheduled: {}",
-                battleId, path.string());
+            handler->PSendSysMessage("Battlefield {} diagnostics dump written with {} events: {}",
+                battleId, rootEventCount, path.string());
         }
         catch (std::exception const& e)
         {
-            BattlefieldDiagnosticsDumpInProgress.store(false, std::memory_order_release);
-            handler->SendErrorMessage("Failed to schedule battlefield {} diagnostics dump: {}", battleId, e.what());
+            handler->SendErrorMessage("Failed to write battlefield {} diagnostics dump: {}", battleId, e.what());
             return false;
         }
 
@@ -437,25 +373,7 @@ public:
     }
 };
 
-class bf_diagnostics_serverscript : public ServerScript
-{
-public:
-    bf_diagnostics_serverscript() : ServerScript("bf_diagnostics_serverscript",
-        { SERVERHOOK_ON_NETWORK_START, SERVERHOOK_ON_NETWORK_STOP }) { }
-
-    void OnNetworkStart(Acore::Asio::IoContext& ioContext) override
-    {
-        BattlefieldDiagnosticsIoContext.store(&ioContext, std::memory_order_release);
-    }
-
-    void OnNetworkStop() override
-    {
-        BattlefieldDiagnosticsIoContext.store(nullptr, std::memory_order_release);
-    }
-};
-
 void AddSC_bf_commandscript()
 {
     new bf_commandscript();
-    new bf_diagnostics_serverscript();
 }
