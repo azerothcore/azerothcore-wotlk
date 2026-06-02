@@ -257,7 +257,8 @@ void WorldSession::HandleGroupAcceptOpcode(WorldPacket& recvData)
     {
         if (uint32 trialLevelCap = sWorld->getIntConfig(CONFIG_TRIAL_LEVEL_CAP))
         {
-            if (leader->GetLevel() > trialLevelCap)
+            uint8 leaderLevel = leader ? leader->GetLevel() : sCharacterCache->GetCharacterLevelByGuid(group->GetLeaderGUID());
+            if (leaderLevel > trialLevelCap)
             {
                 SendPartyResult(PARTY_OP_INVITE, "", ERR_INVITE_RESTRICTED);
                 return;
