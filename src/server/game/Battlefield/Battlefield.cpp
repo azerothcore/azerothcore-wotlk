@@ -102,9 +102,9 @@ bool Battlefield::SetDiagnosticsEnabled(std::string_view name, bool enable)
         _diagnosticWriter.emplace(sDiagnostics->GetWriter(name));
         return true;
     }
-    catch (std::system_error const& error)
+    catch (std::exception const& e)
     {
-        LOG_ERROR("bg.battlefield", "Battlefield diagnostics '{}' disabled: {}", name, error.what());
+        LOG_ERROR("bg.battlefield", "Battlefield diagnostics '{}' disabled: {}", name, e.what());
         _diagnosticWriter.reset();
         return false;
     }
