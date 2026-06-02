@@ -1,3 +1,4 @@
+-- DB update 2026_06_01_02 -> 2026_06_02_00
 -- Adjust Scarlet Champion (NPC ID 29080, GUID 129992)
 -- Set Idle
 -- Set Wander Dist to 0
