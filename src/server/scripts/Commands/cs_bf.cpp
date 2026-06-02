@@ -118,8 +118,9 @@ public:
         return commandTable;
     }
 
-    static bool HandleBattlefieldStart(ChatHandler* handler, uint32 battleId)
+    static bool HandleBattlefieldStart(ChatHandler* handler, Optional<uint32> battleIdArg)
     {
+        uint32 const battleId = battleIdArg.value_or(BATTLEFIELD_BATTLEID_WG);
         Battlefield* bf = sBattlefieldMgr->GetBattlefieldByBattleId(battleId);
 
         if (!bf)
@@ -136,8 +137,9 @@ public:
         return true;
     }
 
-    static bool HandleBattlefieldEnd(ChatHandler* handler, uint32 battleId)
+    static bool HandleBattlefieldEnd(ChatHandler* handler, Optional<uint32> battleIdArg)
     {
+        uint32 const battleId = battleIdArg.value_or(BATTLEFIELD_BATTLEID_WG);
         Battlefield* bf = sBattlefieldMgr->GetBattlefieldByBattleId(battleId);
 
         if (!bf)
@@ -154,8 +156,9 @@ public:
         return true;
     }
 
-    static bool HandleBattlefieldEnable(ChatHandler* handler, uint32 battleId)
+    static bool HandleBattlefieldEnable(ChatHandler* handler, Optional<uint32> battleIdArg)
     {
+        uint32 const battleId = battleIdArg.value_or(BATTLEFIELD_BATTLEID_WG);
         Battlefield* bf = sBattlefieldMgr->GetBattlefieldByBattleId(battleId);
 
         if (!bf)
@@ -182,8 +185,9 @@ public:
         return true;
     }
 
-    static bool HandleBattlefieldDiagnostics(ChatHandler* handler, uint32 battleId, Optional<bool> enableArg)
+    static bool HandleBattlefieldDiagnostics(ChatHandler* handler, Optional<uint32> battleIdArg, Optional<bool> enableArg)
     {
+        uint32 const battleId = battleIdArg.value_or(BATTLEFIELD_BATTLEID_WG);
         Battlefield* bf = sBattlefieldMgr->GetBattlefieldByBattleId(battleId);
 
         if (!bf)
@@ -217,8 +221,9 @@ public:
         return true;
     }
 
-    static bool HandleBattlefieldDiagnosticsDump(ChatHandler* handler, uint32 battleId)
+    static bool HandleBattlefieldDiagnosticsDump(ChatHandler* handler, Optional<uint32> battleIdArg)
     {
+        uint32 const battleId = battleIdArg.value_or(BATTLEFIELD_BATTLEID_WG);
         Battlefield* bf = sBattlefieldMgr->GetBattlefieldByBattleId(battleId);
 
         if (!bf)
@@ -255,8 +260,9 @@ public:
         return true;
     }
 
-    static bool HandleBattlefieldSwitch(ChatHandler* handler, uint32 battleId)
+    static bool HandleBattlefieldSwitch(ChatHandler* handler, Optional<uint32> battleIdArg)
     {
+        uint32 const battleId = battleIdArg.value_or(BATTLEFIELD_BATTLEID_WG);
         Battlefield* bf = sBattlefieldMgr->GetBattlefieldByBattleId(battleId);
 
         if (!bf)
@@ -273,12 +279,14 @@ public:
         return true;
     }
 
-    static bool HandleBattlefieldTimer(ChatHandler* handler, uint32 battleId, std::string timeStr)
+    static bool HandleBattlefieldTimer(ChatHandler* handler, Optional<uint32> battleIdArg, std::string timeStr)
     {
         if (timeStr.empty())
         {
             return false;
         }
+
+        uint32 const battleId = battleIdArg.value_or(BATTLEFIELD_BATTLEID_WG);
 
         if (Acore::StringTo<int32>(timeStr).value_or(0) < 0)
         {
@@ -315,8 +323,9 @@ public:
         return true;
     }
 
-    static bool HandleBattlefieldQueue(ChatHandler* handler, uint32 battleId)
+    static bool HandleBattlefieldQueue(ChatHandler* handler, Optional<uint32> battleIdArg)
     {
+        uint32 const battleId = battleIdArg.value_or(BATTLEFIELD_BATTLEID_WG);
         Battlefield* bf = sBattlefieldMgr->GetBattlefieldByBattleId(battleId);
 
         if (!bf)
