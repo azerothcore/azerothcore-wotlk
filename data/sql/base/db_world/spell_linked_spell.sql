@@ -104,6 +104,7 @@ INSERT INTO `spell_linked_spell` VALUES
 (-49097,49098,0,'When Out of Body Experience expires cast Arugal Teleport Back'),
 (-48809,-48143,0,'Removing Binding Life removes Forgotten Aura'),
 (-48417,-47406,0,'On Strip Detect Drakuru 04 fade - Remove Envision Drakuru'),
+(-48323,48330,0,'On Indisposed Expiring - Cast Create Amberseeds'),
 (-48263,-57340,0,'Frost Presence - Tank Class Passive Threat Remove'),
 (-47960,-63311,0,'Glyph of Shadowflame Rank 1'),
 (-47744,61611,0,'Cast other side when curse expires'),
@@ -655,4 +656,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-03-15 20:39:18
+-- Dump completed on 2026-06-01 22:40:38
