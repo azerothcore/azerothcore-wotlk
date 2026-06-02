@@ -20,6 +20,7 @@
 
 #include "Define.h"
 #include "DiagnosticWriter.h"
+#include "Errors.h"
 #include "StringLiteralView.h"
 
 #include <cstddef>
@@ -30,22 +31,17 @@ class AC_COMMON_API DiagnosticGuard
 {
 public:
     /**
-     * @brief Create a guard that opens a diagnostic section having the
-     *        specified @p name in the specified @p writer.
+     * @brief Create a guard that writes a @c "function" entry having the
+     *        specified @p name to the specified @p writer.
      *
-     * @param writer The writer to receive this section.
-     * @param name The name of the section.
+     * @param writer The writer to receive this guard's entries.
+     * @param name The name identifying this scope.
      */
     DiagnosticGuard(DiagnosticWriter writer, StringLiteralView name) noexcept;
 
-    /**
-     * @brief Close this guard's diagnostic section.
-     */
-    ~DiagnosticGuard() noexcept;
-
     DiagnosticGuard(DiagnosticGuard const&) = delete;
     DiagnosticGuard& operator=(DiagnosticGuard const&) = delete;
-    DiagnosticGuard(DiagnosticGuard&& other) noexcept;
+    DiagnosticGuard(DiagnosticGuard&&) noexcept = default;
     DiagnosticGuard& operator=(DiagnosticGuard&&) = delete;
 
     /**
@@ -58,21 +54,26 @@ public:
     template <std::size_t Size>
     void Arg(StringLiteralView name, char const (&value)[Size]) noexcept
     {
-        if (_active)
-            (void)_writer.WriteStringLiteralArgument(name, value);
+        static_assert(Size > 0);
+        Arg(name, std::string_view(value, Size - 1));
+    }
+
+    void Arg(StringLiteralView name, char const* value) noexcept
+    {
+        ASSERT(value, "DiagnosticGuard::Arg called with a null string");
+
+        if (value)
+            Arg(name, std::string_view(value));
     }
 
     template <typename T>
     void Arg(StringLiteralView name, T&& value) noexcept
     {
-        if (_active)
-            (void)_writer.WriteArgument(name, std::forward<T>(value));
+        _writer.WriteArgument(name, std::forward<T>(value));
     }
 
 private:
     DiagnosticWriter _writer;
-    std::size_t _beginPosition = 0;
-    bool _active = false;
 };
 
 #endif // ACORE_DIAGNOSTIC_GUARD_H

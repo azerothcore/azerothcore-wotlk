@@ -16,257 +16,57 @@
  */
 
 #include "DiagnosticWriter.h"
-#include "DiagnosticFormat.h"
-#include "Errors.h"
 
-#include <cstdint>
-#include <cstring>
-#include <limits>
+#include <algorithm>
 #include <string_view>
-#include <utility>
 
-namespace
-{
-    constexpr std::size_t CloseRecordSize = 2;
-
-    uint64 TagValue(DiagnosticTag tag) noexcept
-    {
-        return static_cast<uint64>(static_cast<CborTag>(tag));
-    }
-
-    CborError EncodeText(CborEncoder* encoder, std::string_view value) noexcept
-    {
-        return cbor_encode_text_string(encoder, value.data(), value.size());
-    }
-
-    CborError EncodeStringLiteralPointer(CborEncoder* encoder, char const* value) noexcept
-    {
-        static_assert(sizeof(std::uintptr_t) <= sizeof(uint64));
-
-        CborError error = cbor_encode_tag(encoder, static_cast<CborTag>(DiagnosticTag::StringLiteral));
-        if (error)
-            return error;
-
-        return cbor_encode_uint(encoder, static_cast<uint64>(reinterpret_cast<std::uintptr_t>(value)));
-    }
-
-    CborError EncodeStringLiteral(CborEncoder* encoder, StringLiteralView value) noexcept
-    {
-        return EncodeStringLiteralPointer(encoder, value.data());
-    }
-
-    bool CborSucceeded(CborError error) noexcept
-    {
-        return error == CborNoError;
-    }
-}
-
-DiagnosticWriter::DiagnosticWriter(RingBuffer& buffer) noexcept :
+DiagnosticWriter::DiagnosticWriter(DiagnosticBuffer& buffer) noexcept :
     _buffer(&buffer)
 {
 }
 
-std::size_t DiagnosticWriter::CurrentPosition() const noexcept
+void DiagnosticWriter::WriteArgument(StringLiteralView name, bool value) noexcept
 {
-    return _buffer->Position();
+    _buffer->Push(DiagnosticRecord(name, DiagnosticStoredValue(value)));
 }
 
-std::size_t DiagnosticWriter::BufferSize() const noexcept
+void DiagnosticWriter::WriteArgument(StringLiteralView name, int value) noexcept
 {
-    return _buffer->ReadSpan().size();
+    WriteArgument(name, static_cast<int64>(value));
 }
 
-bool DiagnosticWriter::OpenSection(StringLiteralView name) noexcept
+void DiagnosticWriter::WriteArgument(StringLiteralView name, uint32 value) noexcept
 {
-    return WriteTaggedRecord(TagValue(DiagnosticTag::Open), 1,
-        [name](CborEncoder* array) noexcept
-        {
-            return EncodeStringLiteral(array, name);
-        });
+    WriteArgument(name, static_cast<uint64>(value));
 }
 
-bool DiagnosticWriter::WriteArgument(StringLiteralView name, bool value) noexcept
+void DiagnosticWriter::WriteArgument(StringLiteralView name, int64 value) noexcept
 {
-    return WriteTaggedRecord(TagValue(DiagnosticTag::Arg), 2,
-        [name, value](CborEncoder* array) noexcept
-        {
-            CborError error = EncodeStringLiteral(array, name);
-            if (error)
-                return error;
-
-            return cbor_encode_boolean(array, value);
-        });
+    _buffer->Push(DiagnosticRecord(name, DiagnosticStoredValue(value)));
 }
 
-bool DiagnosticWriter::WriteArgument(StringLiteralView name, int value) noexcept
+void DiagnosticWriter::WriteArgument(StringLiteralView name, uint64 value) noexcept
 {
-    return WriteArgument(name, static_cast<int64>(value));
+    _buffer->Push(DiagnosticRecord(name, DiagnosticStoredValue(value)));
 }
 
-bool DiagnosticWriter::WriteArgument(StringLiteralView name, uint32 value) noexcept
+void DiagnosticWriter::WriteArgument(StringLiteralView name, double value) noexcept
 {
-    return WriteArgument(name, static_cast<uint64>(value));
+    _buffer->Push(DiagnosticRecord(name, DiagnosticStoredValue(value)));
 }
 
-bool DiagnosticWriter::WriteArgument(StringLiteralView name, int64 value) noexcept
+void DiagnosticWriter::WriteArgument(StringLiteralView name, StringLiteralView value) noexcept
 {
-    return WriteTaggedRecord(TagValue(DiagnosticTag::Arg), 2,
-        [name, value](CborEncoder* array) noexcept
-        {
-            CborError error = EncodeStringLiteral(array, name);
-            if (error)
-                return error;
-
-            return cbor_encode_int(array, value);
-        });
+    _buffer->Push(DiagnosticRecord(name, DiagnosticStoredValue(value)));
 }
 
-bool DiagnosticWriter::WriteArgument(StringLiteralView name, uint64 value) noexcept
+void DiagnosticWriter::WriteArgument(StringLiteralView name, std::string_view value) noexcept
 {
-    return WriteTaggedRecord(TagValue(DiagnosticTag::Arg), 2,
-        [name, value](CborEncoder* array) noexcept
-        {
-            CborError error = EncodeStringLiteral(array, name);
-            if (error)
-                return error;
+    // Values longer than the inline capacity are truncated rather than dropped.
+    std::size_t const count = std::min(value.size(), DiagnosticStaticStringCapacity);
 
-            return cbor_encode_uint(array, value);
-        });
-}
+    DiagnosticStaticString stored;
+    stored.assign(value.data(), count);
 
-bool DiagnosticWriter::WriteArgument(StringLiteralView name, double value) noexcept
-{
-    return WriteTaggedRecord(TagValue(DiagnosticTag::Arg), 2,
-        [name, value](CborEncoder* array) noexcept
-        {
-            CborError error = EncodeStringLiteral(array, name);
-            if (error)
-                return error;
-
-            return cbor_encode_double(array, value);
-        });
-}
-
-bool DiagnosticWriter::WriteArgument(StringLiteralView name, char const* value) noexcept
-{
-    ASSERT(value, "DiagnosticWriter::WriteArgument called with a null string");
-
-    if (!value)
-        return false;
-
-    return WriteArgument(name, std::string_view(value));
-}
-
-bool DiagnosticWriter::WriteArgument(StringLiteralView name, StringLiteralView value) noexcept
-{
-    return WriteStringLiteralArgument(name, value.data());
-}
-
-bool DiagnosticWriter::WriteStringLiteralArgument(StringLiteralView name, char const* value) noexcept
-{
-    return WriteTaggedRecord(TagValue(DiagnosticTag::Arg), 2,
-        [name, value](CborEncoder* array) noexcept
-        {
-            CborError error = EncodeStringLiteral(array, name);
-            if (error)
-                return error;
-
-            return EncodeStringLiteralPointer(array, value);
-        });
-}
-
-bool DiagnosticWriter::WriteArgument(StringLiteralView name, std::string_view value) noexcept
-{
-    return WriteTaggedRecord(TagValue(DiagnosticTag::Arg), 2,
-        [name, value](CborEncoder* array) noexcept
-        {
-            CborError error = EncodeStringLiteral(array, name);
-            if (error)
-                return error;
-
-            return EncodeText(array, value);
-        });
-}
-
-bool DiagnosticWriter::CloseSection(std::size_t sectionBegin) noexcept
-{
-    ASSERT(sectionBegin <= CurrentPosition(), "Diagnostic section begin is after the current buffer position");
-
-    uint64 const sectionLength =
-        static_cast<uint64>(CurrentPosition() - sectionBegin) +
-        CloseRecordSize +
-        sizeof(DiagnosticSectionFooter);
-    uint64 const bufferSize = BufferSize();
-    bool const fitsWithTerminator =
-        sectionLength <= bufferSize &&
-        bufferSize - sectionLength >= sizeof(DiagnosticSectionFooter);
-
-    ASSERT(fitsWithTerminator, "Diagnostic section length {} leaves no room for a terminator in buffer size {}",
-        sectionLength, bufferSize);
-
-    if (!fitsWithTerminator)
-        return false;
-
-    if (!WriteTaggedRecord(TagValue(DiagnosticTag::Close), 0,
-        [](CborEncoder*) noexcept
-        {
-            return CborNoError;
-        }))
-    {
-        return false;
-    }
-
-    return WriteSectionFooter(sectionLength);
-}
-
-template <typename Encode>
-bool DiagnosticWriter::WriteTaggedRecord(uint64 tag, std::size_t arrayLength, Encode&& encode) noexcept
-{
-    std::span<uint8> target = _buffer->WriteSpan();
-    CborEncoder encoder;
-    CborEncoder array;
-
-    cbor_encoder_init(&encoder, target.data(), target.size(), 0);
-
-    CborError error = cbor_encode_tag(&encoder, static_cast<CborTag>(tag));
-    if (CborSucceeded(error))
-        error = cbor_encoder_create_array(&encoder, &array, arrayLength);
-    if (CborSucceeded(error))
-        error = std::forward<Encode>(encode)(&array);
-    if (CborSucceeded(error))
-        error = cbor_encoder_close_container_checked(&encoder, &array);
-
-    if (!CborSucceeded(error))
-        return false;
-
-    std::size_t const bytes = cbor_encoder_get_buffer_size(&encoder, target.data());
-    ASSERT(bytes <= target.size(), "Diagnostic record length {} exceeds buffer size {}", bytes, target.size());
-
-    _buffer->Advance(bytes);
-
-    return true;
-}
-
-bool DiagnosticWriter::WriteSectionFooter(uint64 sectionLength) noexcept
-{
-    DiagnosticSectionFooter const footer = sectionLength;
-    std::span<uint8> target = _buffer->WriteSpan();
-    ASSERT(target.size() >= sizeof(footer), "Diagnostic ring buffer is too small for a section footer");
-
-    if (target.size() < sizeof(footer))
-        return false;
-
-    std::memcpy(target.data(), &footer, sizeof(footer));
-    _buffer->Advance(sizeof(footer));
-    WriteZeroFooterAtHead();
-
-    return true;
-}
-
-void DiagnosticWriter::WriteZeroFooterAtHead() noexcept
-{
-    std::span<uint8> target = _buffer->WriteSpan();
-
-    if (target.size() >= sizeof(DiagnosticSectionFooter))
-        std::memset(target.data(), 0, sizeof(DiagnosticSectionFooter));
+    _buffer->Push(DiagnosticRecord(name, DiagnosticStoredValue(stored)));
 }

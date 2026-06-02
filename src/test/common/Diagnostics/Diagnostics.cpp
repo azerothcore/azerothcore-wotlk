@@ -23,6 +23,7 @@
 #include <cerrno>
 #include <string>
 #include <system_error>
+#include <variant>
 
 #if AC_PLATFORM == AC_PLATFORM_WINDOWS
 #include <winerror.h>
@@ -77,12 +78,14 @@ TEST(DiagnosticsTest, WritersForSameNameUseSameBuffer)
             guard.Arg("value", 2);
         }
 
-        DiagnosticReadResult result = sDiagnostics->GetReader(name).ReadEvents();
-        std::vector<DiagnosticEvent> const& events = result.events;
+        DiagnosticReadResult result = sDiagnostics->GetReader(name).ReadEntries();
+        std::vector<DiagnosticArg> const& entries = result.entries;
 
-        ASSERT_GE(events.size(), 2u);
-        EXPECT_EQ(events[events.size() - 2].name, "First");
-        EXPECT_EQ(events[events.size() - 1].name, "Second");
+        ASSERT_EQ(entries.size(), 4u);
+        EXPECT_EQ(entries[1].name, "value");
+        EXPECT_EQ(std::get<int64>(entries[1].value), 1);
+        EXPECT_EQ(entries[3].name, "value");
+        EXPECT_EQ(std::get<int64>(entries[3].value), 2);
     }
     catch (std::system_error const& error)
     {
@@ -107,15 +110,17 @@ TEST(DiagnosticsTest, KeepsNamesIsolated)
             guard.Arg("value", 2);
         }
 
-        DiagnosticReadResult firstResult = sDiagnostics->GetReader(firstName).ReadEvents();
-        DiagnosticReadResult secondResult = sDiagnostics->GetReader(secondName).ReadEvents();
-        std::vector<DiagnosticEvent> const& firstEvents = firstResult.events;
-        std::vector<DiagnosticEvent> const& secondEvents = secondResult.events;
+        DiagnosticReadResult firstResult = sDiagnostics->GetReader(firstName).ReadEntries();
+        DiagnosticReadResult secondResult = sDiagnostics->GetReader(secondName).ReadEntries();
+        std::vector<DiagnosticArg> const& firstEntries = firstResult.entries;
+        std::vector<DiagnosticArg> const& secondEntries = secondResult.entries;
 
-        ASSERT_FALSE(firstEvents.empty());
-        ASSERT_FALSE(secondEvents.empty());
-        EXPECT_EQ(firstEvents.back().name, "FirstOnly");
-        EXPECT_EQ(secondEvents.back().name, "SecondOnly");
+        ASSERT_FALSE(firstEntries.empty());
+        ASSERT_FALSE(secondEntries.empty());
+        EXPECT_EQ(firstEntries.back().name, "value");
+        EXPECT_EQ(std::get<int64>(firstEntries.back().value), 1);
+        EXPECT_EQ(secondEntries.back().name, "value");
+        EXPECT_EQ(std::get<int64>(secondEntries.back().value), 2);
     }
     catch (std::system_error const& error)
     {
@@ -134,46 +139,18 @@ TEST(DiagnosticsTest, ClonedReaderIsIndependent)
             guard.Arg("value", 1);
         }
 
-        DiagnosticReadResult result = sDiagnostics->GetReader(name).ReadEvents();
+        DiagnosticReadResult result = sDiagnostics->GetReader(name).ReadEntries();
 
         {
             DiagnosticGuard guard(sDiagnostics->GetWriter(name), "After");
             guard.Arg("value", 2);
         }
 
-        std::vector<DiagnosticEvent> const& events = result.events;
+        std::vector<DiagnosticArg> const& entries = result.entries;
 
-        ASSERT_FALSE(events.empty());
-        EXPECT_EQ(events.back().name, "Before");
-    }
-    catch (std::system_error const& error)
-    {
-        SkipIfUnsupported(error);
-    }
-}
-
-TEST(DiagnosticsTest, RecoversMultipleEventsInForwardOrder)
-{
-    try
-    {
-        std::string name = "diagnostics_test_forward_order";
-
-        {
-            DiagnosticGuard guard(sDiagnostics->GetWriter(name), "First");
-            guard.Arg("value", 1);
-        }
-
-        {
-            DiagnosticGuard guard(sDiagnostics->GetWriter(name), "Second");
-            guard.Arg("value", 2);
-        }
-
-        DiagnosticReadResult result = sDiagnostics->GetReader(name).ReadEvents();
-        std::vector<DiagnosticEvent> const& events = result.events;
-
-        ASSERT_GE(events.size(), 2u);
-        EXPECT_EQ(events[events.size() - 2].name, "First");
-        EXPECT_EQ(events[events.size() - 1].name, "Second");
+        ASSERT_FALSE(entries.empty());
+        EXPECT_EQ(entries.back().name, "value");
+        EXPECT_EQ(std::get<int64>(entries.back().value), 1);
     }
     catch (std::system_error const& error)
     {

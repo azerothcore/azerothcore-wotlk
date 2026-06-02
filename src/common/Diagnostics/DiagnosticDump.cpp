@@ -82,38 +82,20 @@ namespace
         }, value);
     }
 
-    void WriteDiagnosticIndent(std::ostream& output, std::size_t depth)
+    void WriteDiagnosticEntry(std::ostream& output, DiagnosticArg const& entry)
     {
-        for (std::size_t i = 0; i < depth; ++i)
-            output << "  ";
-    }
-
-    void WriteDiagnosticEvent(std::ostream& output, DiagnosticEvent const& event, std::size_t depth)
-    {
-        WriteDiagnosticIndent(output, depth);
-        output << "event ";
-        WriteEscapedText(output, event.name);
+        output << "arg ";
+        WriteEscapedText(output, entry.name);
+        output << " = ";
+        WriteDiagnosticValue(output, entry.value);
         output << '\n';
-
-        for (DiagnosticArg const& arg : event.args)
-        {
-            WriteDiagnosticIndent(output, depth + 1);
-            output << "arg ";
-            WriteEscapedText(output, arg.name);
-            output << " = ";
-            WriteDiagnosticValue(output, arg.value);
-            output << '\n';
-        }
-
-        for (DiagnosticEvent const& child : event.children)
-            WriteDiagnosticEvent(output, child, depth + 1);
     }
 }
 
 std::size_t WriteDiagnosticDump(std::string_view name, std::filesystem::path const& path, DiagnosticReader& reader)
 {
-    DiagnosticReadResult result = reader.ReadEvents();
-    std::size_t const rootEventCount = result.events.size();
+    DiagnosticReadResult result = reader.ReadEntries();
+    std::size_t const entryCount = result.entries.size();
 
     if (!path.parent_path().empty())
         std::filesystem::create_directories(path.parent_path());
@@ -125,13 +107,13 @@ std::size_t WriteDiagnosticDump(std::string_view name, std::filesystem::path con
     output << "diagnostics ";
     WriteEscapedText(output, name);
     output << '\n';
-    output << "events " << rootEventCount << "\n\n";
+    output << "entries " << entryCount << "\n\n";
 
-    for (DiagnosticEvent const& event : result.events)
-        WriteDiagnosticEvent(output, event, 0);
+    for (DiagnosticArg const& entry : result.entries)
+        WriteDiagnosticEntry(output, entry);
 
     if (!output)
         throw std::runtime_error("failed to write diagnostics dump file");
 
-    return rootEventCount;
+    return entryCount;
 }

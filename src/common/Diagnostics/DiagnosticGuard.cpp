@@ -22,19 +22,5 @@
 DiagnosticGuard::DiagnosticGuard(DiagnosticWriter writer, StringLiteralView name) noexcept :
     _writer(std::move(writer))
 {
-    _beginPosition = _writer.CurrentPosition();
-    _active = _writer.OpenSection(name);
-}
-
-DiagnosticGuard::DiagnosticGuard(DiagnosticGuard&& other) noexcept :
-    _writer(other._writer),
-    _beginPosition(std::exchange(other._beginPosition, 0)),
-    _active(std::exchange(other._active, false))
-{
-}
-
-DiagnosticGuard::~DiagnosticGuard() noexcept
-{
-    if (_active)
-        (void)_writer.CloseSection(_beginPosition);
+    _writer.WriteArgument("function", name);
 }

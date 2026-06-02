@@ -19,7 +19,7 @@
 #define ACORE_DIAGNOSTIC_WRITER_H
 
 #include "Define.h"
-#include "RingBuffer.h"
+#include "DiagnosticBuffer.h"
 #include "StringLiteralView.h"
 
 #include <cstddef>
@@ -33,11 +33,9 @@ public:
     /**
      * @brief Create a writer backed by the specified @p buffer.
      *
-     * @param buffer The ring buffer backing this writer.
-     *
-     * The behavior is undefined unless @p buffer contains a mapping.
+     * @param buffer The diagnostic buffer backing this writer.
      */
-    explicit DiagnosticWriter(RingBuffer& buffer) noexcept;
+    explicit DiagnosticWriter(DiagnosticBuffer& buffer) noexcept;
 
     /**
      * @brief Destroy this object.
@@ -53,35 +51,16 @@ public:
 private:
     friend class DiagnosticGuard;
 
-    [[nodiscard]] std::size_t CurrentPosition() const noexcept;
-    [[nodiscard]] std::size_t BufferSize() const noexcept;
+    void WriteArgument(StringLiteralView name, bool value) noexcept;
+    void WriteArgument(StringLiteralView name, int value) noexcept;
+    void WriteArgument(StringLiteralView name, uint32 value) noexcept;
+    void WriteArgument(StringLiteralView name, int64 value) noexcept;
+    void WriteArgument(StringLiteralView name, uint64 value) noexcept;
+    void WriteArgument(StringLiteralView name, double value) noexcept;
+    void WriteArgument(StringLiteralView name, StringLiteralView value) noexcept;
+    void WriteArgument(StringLiteralView name, std::string_view value) noexcept;
 
-    bool OpenSection(StringLiteralView name) noexcept;
-    bool WriteArgument(StringLiteralView name, bool value) noexcept;
-    bool WriteArgument(StringLiteralView name, int value) noexcept;
-    bool WriteArgument(StringLiteralView name, uint32 value) noexcept;
-    bool WriteArgument(StringLiteralView name, int64 value) noexcept;
-    bool WriteArgument(StringLiteralView name, uint64 value) noexcept;
-    bool WriteArgument(StringLiteralView name, double value) noexcept;
-    template <std::size_t Size>
-    bool WriteArgument(StringLiteralView name, char const (&value)[Size]) noexcept
-    {
-        return WriteStringLiteralArgument(name, value);
-    }
-    bool WriteArgument(StringLiteralView name, char const* value) noexcept;
-    bool WriteArgument(StringLiteralView name, StringLiteralView value) noexcept;
-    bool WriteArgument(StringLiteralView name, std::string_view value) noexcept;
-
-    bool CloseSection(std::size_t sectionBegin) noexcept;
-
-    template <typename Encode>
-    bool WriteTaggedRecord(uint64 tag, std::size_t arrayLength, Encode&& encode) noexcept;
-
-    bool WriteSectionFooter(uint64 sectionLength) noexcept;
-    bool WriteStringLiteralArgument(StringLiteralView name, char const* value) noexcept;
-    void WriteZeroFooterAtHead() noexcept;
-
-    RingBuffer* _buffer = nullptr;
+    DiagnosticBuffer* _buffer = nullptr;
 };
 
 #endif // ACORE_DIAGNOSTIC_WRITER_H

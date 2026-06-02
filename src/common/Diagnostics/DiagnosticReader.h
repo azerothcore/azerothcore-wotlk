@@ -19,9 +19,8 @@
 #define ACORE_DIAGNOSTIC_READER_H
 
 #include "Define.h"
-#include "RingBuffer.h"
+#include "DiagnosticBuffer.h"
 
-#include <optional>
 #include <span>
 #include <string_view>
 #include <variant>
@@ -32,32 +31,14 @@ using DiagnosticValue = std::variant<bool, int64, uint64, double, std::string_vi
 struct DiagnosticArg
 {
     /**
-     * @brief The name of this argument.
+     * @brief The name of this entry.
      */
     std::string_view name;
 
     /**
-     * @brief The value of this argument.
+     * @brief The value of this entry.
      */
     DiagnosticValue value;
-};
-
-struct DiagnosticEvent
-{
-    /**
-     * @brief The name of this event.
-     */
-    std::string_view name;
-
-    /**
-     * @brief The arguments written directly to this event.
-     */
-    std::vector<DiagnosticArg> args;
-
-    /**
-     * @brief The nested events written directly to this event.
-     */
-    std::vector<DiagnosticEvent> children;
 };
 
 class AC_COMMON_API DiagnosticReadResult
@@ -80,16 +61,16 @@ public:
     DiagnosticReadResult& operator=(DiagnosticReadResult const&) = delete;
 
     /**
-     * @brief The recovered diagnostic events in natural forward order.
+     * @brief The recovered diagnostic entries in natural forward order.
      */
-    std::vector<DiagnosticEvent> events;
+    std::vector<DiagnosticArg> entries;
 
 private:
     friend class DiagnosticReader;
 
-    DiagnosticReadResult(std::optional<RingBuffer>&& records, std::vector<DiagnosticEvent>&& recoveredEvents);
+    DiagnosticReadResult(std::vector<DiagnosticRecord>&& records, std::vector<DiagnosticArg>&& recoveredEntries);
 
-    std::optional<RingBuffer> _ownedRecords;
+    std::vector<DiagnosticRecord> _ownedRecords;
 };
 
 class AC_COMMON_API DiagnosticReader
@@ -98,9 +79,9 @@ public:
     /**
      * @brief Create a reader owning the specified @p records.
      *
-     * @param records The cloned diagnostic buffer to read.
+     * @param records The cloned diagnostic records to read.
      */
-    explicit DiagnosticReader(RingBuffer&& records) noexcept;
+    explicit DiagnosticReader(std::vector<DiagnosticRecord>&& records) noexcept;
 
     /**
      * @brief Destroy this object.
@@ -114,25 +95,25 @@ public:
     DiagnosticReader& operator=(DiagnosticReader const&) = delete;
 
     /**
-     * @brief Return the recovered diagnostic events in natural forward order.
+     * @brief Return the recovered diagnostic entries in natural forward order.
      *
-     * @return The recovered diagnostic events in natural forward order, along
+     * @return The recovered diagnostic entries in natural forward order, along
      *         with the cloned backing storage that owns their string data.
      */
-    [[nodiscard]] DiagnosticReadResult ReadEvents();
+    [[nodiscard]] DiagnosticReadResult ReadEntries();
 
 private:
-    RingBuffer _records;
+    std::vector<DiagnosticRecord> _records;
 };
 
 /**
- * @brief Recover diagnostic events from the specified @p snapshot.
+ * @brief Recover diagnostic entries from the specified @p snapshot.
  *
- * @param snapshot The cloned ring-buffer read span to recover from.
- * @return The recovered diagnostic events in natural forward order.
+ * @param snapshot The cloned diagnostic records to recover from.
+ * @return The recovered diagnostic entries in natural forward order.
  *
- * The returned events contain string views into the specified @p snapshot.
+ * The returned entries contain string views into the specified @p snapshot.
  */
-AC_COMMON_API std::vector<DiagnosticEvent> RecoverRecords(std::span<uint8 const> snapshot);
+AC_COMMON_API std::vector<DiagnosticArg> RecoverRecords(std::span<DiagnosticRecord const> snapshot);
 
 #endif // ACORE_DIAGNOSTIC_READER_H

@@ -246,10 +246,10 @@ public:
         {
             DiagnosticReader reader = sDiagnostics->GetReader(diagnosticsName);
             std::filesystem::path path = MakeBattlefieldDiagnosticDumpPath(diagnosticsName);
-            std::size_t const rootEventCount = WriteDiagnosticDump(diagnosticsName, path, reader);
+            std::size_t const entryCount = WriteDiagnosticDump(diagnosticsName, path, reader);
 
-            handler->PSendSysMessage("Battlefield {} diagnostics dump written with {} events: {}",
-                battleId, rootEventCount, path.string());
+            handler->PSendSysMessage("Battlefield {} diagnostics dump written with {} entries: {}",
+                battleId, entryCount, path.string());
         }
         catch (std::exception const& e)
         {

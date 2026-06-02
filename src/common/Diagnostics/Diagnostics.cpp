@@ -18,7 +18,6 @@
 #include "Diagnostics.h"
 #include "Errors.h"
 
-#include <cstring>
 #include <functional>
 
 /*static*/ Diagnostics* Diagnostics::instance()
@@ -46,22 +45,17 @@ std::size_t Diagnostics::TransparentStringHash::operator()(std::string_view valu
     return std::hash<std::string_view>{}(value);
 }
 
-RingBuffer& Diagnostics::GetOrCreate(std::string_view name)
+DiagnosticBuffer& Diagnostics::GetOrCreate(std::string_view name)
 {
     ASSERT(!name.empty(), "Diagnostics buffer name must not be empty");
 
     if (auto itr = _buffers.find(name); itr != _buffers.end())
         return itr->second;
 
-    return _buffers.try_emplace(std::string(name), DefaultBufferSize).first->second;
+    return _buffers.try_emplace(std::string(name), DefaultBufferRecords).first->second;
 }
 
-RingBuffer Diagnostics::Clone(RingBuffer const& buffer)
+std::vector<DiagnosticRecord> Diagnostics::Clone(DiagnosticBuffer const& buffer)
 {
-    std::span<uint8 const> source = buffer.ReadSpan();
-    RingBuffer clone(source.size());
-
-    std::memcpy(clone.WriteSpan().data(), source.data(), source.size());
-
-    return clone;
+    return buffer.Snapshot();
 }

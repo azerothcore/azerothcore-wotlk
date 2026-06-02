@@ -19,15 +19,16 @@
 #define ACORE_DIAGNOSTICS_H
 
 #include "Define.h"
+#include "DiagnosticBuffer.h"
 #include "DiagnosticReader.h"
 #include "DiagnosticWriter.h"
-#include "RingBuffer.h"
 
 #include <cstddef>
 #include <mutex>
 #include <string>
 #include <string_view>
 #include <unordered_map>
+#include <vector>
 
 class AC_COMMON_API Diagnostics
 {
@@ -56,7 +57,10 @@ public:
      * @param name The name of the diagnostic buffer.
      * @return A reader owning a cloned snapshot of the specified buffer.
      *
-     * The behavior is undefined unless @p name is non-empty.
+     * The behavior is undefined unless @p name is non-empty.  This function is
+     * not thread-safe with respect to the named buffer: the behavior is
+     * undefined if any writer for the same buffer is used concurrently, since
+     * snapshotting reads the buffer without synchronizing against writes.
      */
     [[nodiscard]] DiagnosticReader GetReader(std::string_view name);
 
@@ -74,15 +78,18 @@ private:
         std::size_t operator()(std::string_view value) const noexcept;
     };
 
-    RingBuffer& GetOrCreate(std::string_view name);
-    static RingBuffer Clone(RingBuffer const& buffer);
+    DiagnosticBuffer& GetOrCreate(std::string_view name);
+    static std::vector<DiagnosticRecord> Clone(DiagnosticBuffer const& buffer);
 
-    static constexpr std::size_t DefaultBufferSize = 1024 * 1024;
+    static constexpr std::size_t DefaultBufferBytes = 1024 * 1024;
+    static constexpr std::size_t DefaultBufferRecords = DefaultBufferBytes / sizeof(DiagnosticRecord);
+    static_assert(DefaultBufferRecords > 0);
 
-    // Protects _buffers invariants and entry lifetime only.  Individual ring
-    // buffers and writer handles remain single-threaded.
+    // Protects _buffers invariants and entry lifetime only.  Individual
+    // diagnostic buffers are single-threaded: a given buffer's writer handles
+    // and any reader snapshot of it must all run on the same thread.
     std::mutex _buffersLock;
-    std::unordered_map<std::string, RingBuffer, TransparentStringHash, std::equal_to<>> _buffers;
+    std::unordered_map<std::string, DiagnosticBuffer, TransparentStringHash, std::equal_to<>> _buffers;
 };
 
 #define sDiagnostics Diagnostics::instance()

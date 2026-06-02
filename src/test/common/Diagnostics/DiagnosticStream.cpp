@@ -16,15 +16,13 @@
  */
 
 #include "DiagnosticDump.h"
+#include "DiagnosticBuffer.h"
 #include "DiagnosticGuard.h"
 #include "DiagnosticReader.h"
 #include "DiagnosticWriter.h"
-#include "RingBuffer.h"
 #include "gtest/gtest.h"
 
-#include <cerrno>
 #include <chrono>
-#include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <iterator>
@@ -33,131 +31,75 @@
 #include <span>
 #include <string>
 #include <string_view>
-#include <system_error>
 #include <variant>
-
-#if AC_PLATFORM == AC_PLATFORM_WINDOWS
-#include <winerror.h>
-#endif
 
 namespace
 {
-    bool IsUnsupportedPlatformError(std::system_error const& error)
-    {
-        if (error.code() == std::make_error_code(std::errc::function_not_supported))
-            return true;
-
-#if AC_PLATFORM == AC_PLATFORM_UNIX && defined(__linux__)
-        if (error.code().category() == std::generic_category() && error.code().value() == ENOSYS)
-            return true;
-#endif
-
-#if AC_PLATFORM == AC_PLATFORM_WINDOWS
-        if (error.code().category() == std::system_category() && error.code().value() == ERROR_PROC_NOT_FOUND)
-            return true;
-#endif
-
-        return false;
-    }
-
     class DiagnosticStreamTest : public testing::Test
     {
     protected:
         void SetUp() override
         {
-            try
-            {
-                _buffer = std::make_unique<RingBuffer>(4096);
-                _writer = std::make_unique<DiagnosticWriter>(*_buffer);
-            }
-            catch (std::system_error const& error)
-            {
-                if (IsUnsupportedPlatformError(error))
-                    GTEST_SKIP() << error.what();
-
-                throw;
-            }
+            _buffer = std::make_unique<DiagnosticBuffer>(4096);
+            _writer = std::make_unique<DiagnosticWriter>(*_buffer);
         }
 
         DiagnosticWriter& Writer() { return *_writer; }
-        RingBuffer& Buffer() { return *_buffer; }
+        DiagnosticBuffer& Buffer() { return *_buffer; }
 
     private:
-        std::unique_ptr<RingBuffer> _buffer;
+        std::unique_ptr<DiagnosticBuffer> _buffer;
         std::unique_ptr<DiagnosticWriter> _writer;
     };
 
-    bool PointsInto(std::string_view value, std::span<uint8 const> bytes)
+    bool PointsInto(std::string_view value, std::span<DiagnosticRecord const> records)
     {
-        char const* const begin = reinterpret_cast<char const*>(bytes.data());
-        char const* const end = begin + bytes.size();
+        char const* const begin = reinterpret_cast<char const*>(records.data());
+        char const* const end = begin + records.size_bytes();
 
         return value.data() >= begin && value.data() + value.size() <= end;
     }
 
-    std::vector<DiagnosticEvent> RecoverFrom(RingBuffer& snapshot)
+    std::vector<DiagnosticArg> RecoverFrom(std::vector<DiagnosticRecord> const& snapshot)
     {
-        return RecoverRecords(snapshot.ReadSpan());
+        return RecoverRecords(snapshot);
     }
 
-    RingBuffer Snapshot(RingBuffer const& buffer)
+    std::vector<DiagnosticRecord> Snapshot(DiagnosticBuffer const& buffer)
     {
-        std::span<uint8 const> source = buffer.ReadSpan();
-        RingBuffer snapshot(source.size());
-
-        std::memcpy(snapshot.WriteSpan().data(), source.data(), source.size());
-
-        return snapshot;
+        return buffer.Snapshot();
     }
 }
 
-TEST_F(DiagnosticStreamTest, EmptySnapshotRecoversNoEvents)
+TEST_F(DiagnosticStreamTest, EmptySnapshotRecoversNoEntries)
 {
-    RingBuffer snapshot = Snapshot(Buffer());
+    std::vector<DiagnosticRecord> snapshot = Snapshot(Buffer());
 
     EXPECT_TRUE(RecoverFrom(snapshot).empty());
 }
 
-TEST_F(DiagnosticStreamTest, RecoversNestedSections)
+TEST_F(DiagnosticStreamTest, GuardStampsFunctionEntry)
 {
     {
-        DiagnosticGuard foo(Writer(), "Foo");
-        foo.Arg("arg1", 11);
-
-        {
-            DiagnosticGuard bar(Writer(), "Bar");
-            bar.Arg("arg2", "child");
-        }
-
-        foo.Arg("arg3", true);
+        DiagnosticGuard guard(Writer(), "Scope");
+        guard.Arg("answer", 11);
     }
 
-    RingBuffer snapshot = Snapshot(Buffer());
-    std::span<uint8 const> snapshotBytes = snapshot.ReadSpan();
-    std::vector<DiagnosticEvent> events = RecoverFrom(snapshot);
+    std::vector<DiagnosticRecord> snapshot = Snapshot(Buffer());
+    std::span<DiagnosticRecord const> snapshotRecords = snapshot;
+    std::vector<DiagnosticArg> entries = RecoverFrom(snapshot);
 
-    ASSERT_EQ(events.size(), 1u);
-    EXPECT_EQ(events[0].name, "Foo");
-    EXPECT_FALSE(PointsInto(events[0].name, snapshotBytes));
+    ASSERT_EQ(entries.size(), 2u);
 
-    ASSERT_EQ(events[0].args.size(), 2u);
-    EXPECT_EQ(events[0].args[0].name, "arg1");
-    EXPECT_FALSE(PointsInto(events[0].args[0].name, snapshotBytes));
-    EXPECT_EQ(std::get<int64>(events[0].args[0].value), 11);
-    EXPECT_EQ(events[0].args[1].name, "arg3");
-    EXPECT_FALSE(PointsInto(events[0].args[1].name, snapshotBytes));
-    EXPECT_EQ(std::get<bool>(events[0].args[1].value), true);
+    EXPECT_EQ(entries[0].name, "function");
+    std::string_view function = std::get<std::string_view>(entries[0].value);
+    EXPECT_EQ(function, "Scope");
+    // The name is a string literal, so it is viewed in place and never copied
+    // into the snapshot records.
+    EXPECT_FALSE(PointsInto(function, snapshotRecords));
 
-    ASSERT_EQ(events[0].children.size(), 1u);
-    EXPECT_EQ(events[0].children[0].name, "Bar");
-    EXPECT_FALSE(PointsInto(events[0].children[0].name, snapshotBytes));
-
-    ASSERT_EQ(events[0].children[0].args.size(), 1u);
-    EXPECT_EQ(events[0].children[0].args[0].name, "arg2");
-    EXPECT_FALSE(PointsInto(events[0].children[0].args[0].name, snapshotBytes));
-    std::string_view childValue = std::get<std::string_view>(events[0].children[0].args[0].value);
-    EXPECT_EQ(childValue, "child");
-    EXPECT_FALSE(PointsInto(childValue, snapshotBytes));
+    EXPECT_EQ(entries[1].name, "answer");
+    EXPECT_EQ(std::get<int64>(entries[1].value), 11);
 }
 
 TEST_F(DiagnosticStreamTest, RecoversSupportedArgumentValues)
@@ -174,43 +116,39 @@ TEST_F(DiagnosticStreamTest, RecoversSupportedArgumentValues)
         guard.Arg("literal", StringLiteralView("literal-value"));
     }
 
-    RingBuffer snapshot = Snapshot(Buffer());
-    std::span<uint8 const> snapshotBytes = snapshot.ReadSpan();
-    std::vector<DiagnosticEvent> events = RecoverFrom(snapshot);
+    std::vector<DiagnosticRecord> snapshot = Snapshot(Buffer());
+    std::span<DiagnosticRecord const> snapshotRecords = snapshot;
+    std::vector<DiagnosticArg> entries = RecoverFrom(snapshot);
 
-    ASSERT_EQ(events.size(), 1u);
-    ASSERT_EQ(events[0].args.size(), 6u);
+    ASSERT_EQ(entries.size(), 7u);
+    EXPECT_EQ(entries[0].name, "function");
+    EXPECT_EQ(std::get<std::string_view>(entries[0].value), "Values");
 
-    EXPECT_EQ(events[0].args[0].name, "false");
-    EXPECT_FALSE(PointsInto(events[0].args[0].name, snapshotBytes));
-    EXPECT_EQ(std::get<bool>(events[0].args[0].value), false);
+    EXPECT_EQ(entries[1].name, "false");
+    EXPECT_FALSE(PointsInto(entries[1].name, snapshotRecords));
+    EXPECT_EQ(std::get<bool>(entries[1].value), false);
 
-    EXPECT_EQ(events[0].args[1].name, "signed");
-    EXPECT_FALSE(PointsInto(events[0].args[1].name, snapshotBytes));
-    EXPECT_EQ(std::get<int64>(events[0].args[1].value), -17);
+    EXPECT_EQ(entries[2].name, "signed");
+    EXPECT_EQ(std::get<int64>(entries[2].value), -17);
 
-    EXPECT_EQ(events[0].args[2].name, "unsigned");
-    EXPECT_FALSE(PointsInto(events[0].args[2].name, snapshotBytes));
-    EXPECT_EQ(std::get<uint64>(events[0].args[2].value), std::numeric_limits<uint64>::max());
+    EXPECT_EQ(entries[3].name, "unsigned");
+    EXPECT_EQ(std::get<uint64>(entries[3].value), std::numeric_limits<uint64>::max());
 
-    EXPECT_EQ(events[0].args[3].name, "double");
-    EXPECT_FALSE(PointsInto(events[0].args[3].name, snapshotBytes));
-    EXPECT_EQ(std::get<double>(events[0].args[3].value), 1.25);
+    EXPECT_EQ(entries[4].name, "double");
+    EXPECT_EQ(std::get<double>(entries[4].value), 1.25);
 
-    EXPECT_EQ(events[0].args[4].name, "view");
-    EXPECT_FALSE(PointsInto(events[0].args[4].name, snapshotBytes));
-    std::string_view value = std::get<std::string_view>(events[0].args[4].value);
+    EXPECT_EQ(entries[5].name, "view");
+    std::string_view value = std::get<std::string_view>(entries[5].value);
     EXPECT_EQ(value, "view-value");
-    EXPECT_TRUE(PointsInto(value, snapshotBytes));
+    EXPECT_TRUE(PointsInto(value, snapshotRecords));
 
-    EXPECT_EQ(events[0].args[5].name, "literal");
-    EXPECT_FALSE(PointsInto(events[0].args[5].name, snapshotBytes));
-    std::string_view literalValue = std::get<std::string_view>(events[0].args[5].value);
+    EXPECT_EQ(entries[6].name, "literal");
+    std::string_view literalValue = std::get<std::string_view>(entries[6].value);
     EXPECT_EQ(literalValue, "literal-value");
-    EXPECT_FALSE(PointsInto(literalValue, snapshotBytes));
+    EXPECT_FALSE(PointsInto(literalValue, snapshotRecords));
 }
 
-TEST_F(DiagnosticStreamTest, ReturnsTopLevelSectionsInForwardOrder)
+TEST_F(DiagnosticStreamTest, ReturnsEntriesInForwardOrder)
 {
     {
         DiagnosticGuard first(Writer(), "First");
@@ -222,14 +160,18 @@ TEST_F(DiagnosticStreamTest, ReturnsTopLevelSectionsInForwardOrder)
         second.Arg("value", 2);
     }
 
-    RingBuffer snapshot = Snapshot(Buffer());
-    std::vector<DiagnosticEvent> events = RecoverFrom(snapshot);
+    std::vector<DiagnosticRecord> snapshot = Snapshot(Buffer());
+    std::vector<DiagnosticArg> entries = RecoverFrom(snapshot);
 
-    ASSERT_EQ(events.size(), 2u);
-    EXPECT_EQ(events[0].name, "First");
-    EXPECT_EQ(std::get<int64>(events[0].args[0].value), 1);
-    EXPECT_EQ(events[1].name, "Second");
-    EXPECT_EQ(std::get<int64>(events[1].args[0].value), 2);
+    ASSERT_EQ(entries.size(), 4u);
+    EXPECT_EQ(entries[0].name, "function");
+    EXPECT_EQ(std::get<std::string_view>(entries[0].value), "First");
+    EXPECT_EQ(entries[1].name, "value");
+    EXPECT_EQ(std::get<int64>(entries[1].value), 1);
+    EXPECT_EQ(entries[2].name, "function");
+    EXPECT_EQ(std::get<std::string_view>(entries[2].value), "Second");
+    EXPECT_EQ(entries[3].name, "value");
+    EXPECT_EQ(std::get<int64>(entries[3].value), 2);
 }
 
 TEST_F(DiagnosticStreamTest, SnapshotIsIndependent)
@@ -239,59 +181,46 @@ TEST_F(DiagnosticStreamTest, SnapshotIsIndependent)
         first.Arg("value", 1);
     }
 
-    RingBuffer snapshot = Snapshot(Buffer());
+    std::vector<DiagnosticRecord> snapshot = Snapshot(Buffer());
 
     {
         DiagnosticGuard second(Writer(), "Second");
         second.Arg("value", 2);
     }
 
-    std::vector<DiagnosticEvent> events = RecoverFrom(snapshot);
+    std::vector<DiagnosticArg> entries = RecoverFrom(snapshot);
 
-    ASSERT_EQ(events.size(), 1u);
-    EXPECT_EQ(events[0].name, "First");
-    EXPECT_EQ(std::get<int64>(events[0].args[0].value), 1);
+    ASSERT_EQ(entries.size(), 2u);
+    EXPECT_EQ(std::get<std::string_view>(entries[0].value), "First");
+    EXPECT_EQ(entries[1].name, "value");
+    EXPECT_EQ(std::get<int64>(entries[1].value), 1);
 }
 
-TEST_F(DiagnosticStreamTest, OversizedArgumentIsDropped)
+TEST_F(DiagnosticStreamTest, OversizedArgumentIsTruncated)
 {
-    std::string largeValue(1024 * 1024, 'x');
+    std::string largeValue(1024, 'x');
 
     {
-        DiagnosticGuard parent(Writer(), "Parent");
-        parent.Arg("before", 1);
-
-        {
-            DiagnosticGuard child(Writer(), "Child");
-            child.Arg("too_large", std::string_view(largeValue));
-        }
-
-        parent.Arg("after", 2);
-
-        {
-            DiagnosticGuard sibling(Writer(), "Sibling");
-            sibling.Arg("value", 3);
-        }
+        DiagnosticGuard guard(Writer(), "Parent");
+        guard.Arg("before", 1);
+        guard.Arg("too_large", std::string_view(largeValue));
+        guard.Arg("after", 2);
     }
 
-    RingBuffer snapshot = Snapshot(Buffer());
-    std::vector<DiagnosticEvent> events = RecoverFrom(snapshot);
+    std::vector<DiagnosticRecord> snapshot = Snapshot(Buffer());
+    std::vector<DiagnosticArg> entries = RecoverFrom(snapshot);
 
-    ASSERT_EQ(events.size(), 1u);
-    EXPECT_EQ(events[0].name, "Parent");
+    ASSERT_EQ(entries.size(), 4u);
+    EXPECT_EQ(entries[0].name, "function");
+    EXPECT_EQ(entries[1].name, "before");
+    EXPECT_EQ(std::get<int64>(entries[1].value), 1);
 
-    ASSERT_EQ(events[0].args.size(), 2u);
-    EXPECT_EQ(events[0].args[0].name, "before");
-    EXPECT_EQ(std::get<int64>(events[0].args[0].value), 1);
-    EXPECT_EQ(events[0].args[1].name, "after");
-    EXPECT_EQ(std::get<int64>(events[0].args[1].value), 2);
+    EXPECT_EQ(entries[2].name, "too_large");
+    std::string_view truncated = std::get<std::string_view>(entries[2].value);
+    EXPECT_EQ(truncated, std::string(DiagnosticStaticStringCapacity, 'x'));
 
-    ASSERT_EQ(events[0].children.size(), 2u);
-    EXPECT_EQ(events[0].children[0].name, "Child");
-    EXPECT_TRUE(events[0].children[0].args.empty());
-    EXPECT_EQ(events[0].children[1].name, "Sibling");
-    ASSERT_EQ(events[0].children[1].args.size(), 1u);
-    EXPECT_EQ(std::get<int64>(events[0].children[1].args[0].value), 3);
+    EXPECT_EQ(entries[3].name, "after");
+    EXPECT_EQ(std::get<int64>(entries[3].value), 2);
 }
 
 TEST_F(DiagnosticStreamTest, WritesTextDump)
@@ -302,7 +231,7 @@ TEST_F(DiagnosticStreamTest, WritesTextDump)
         guard.Arg("text", "hello\nthere");
     }
 
-    RingBuffer snapshot = Snapshot(Buffer());
+    std::vector<DiagnosticRecord> snapshot = Snapshot(Buffer());
     DiagnosticReader reader(std::move(snapshot));
 
     std::filesystem::path path = std::filesystem::temp_directory_path() /
@@ -311,7 +240,7 @@ TEST_F(DiagnosticStreamTest, WritesTextDump)
     std::error_code error;
     std::filesystem::remove(path, error);
 
-    EXPECT_EQ(WriteDiagnosticDump("test_stream", path, reader), 1u);
+    EXPECT_EQ(WriteDiagnosticDump("test_stream", path, reader), 3u);
 
     std::ifstream input(path, std::ios::binary);
     ASSERT_TRUE(input);
@@ -319,8 +248,8 @@ TEST_F(DiagnosticStreamTest, WritesTextDump)
     std::string dump((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
 
     EXPECT_NE(dump.find("diagnostics \"test_stream\""), std::string::npos);
-    EXPECT_NE(dump.find("events 1"), std::string::npos);
-    EXPECT_NE(dump.find("event \"Dump\""), std::string::npos);
+    EXPECT_NE(dump.find("entries 3"), std::string::npos);
+    EXPECT_NE(dump.find("arg \"function\" = \"Dump\""), std::string::npos);
     EXPECT_NE(dump.find("arg \"answer\" = 42"), std::string::npos);
     EXPECT_NE(dump.find("arg \"text\" = \"hello\\nthere\""), std::string::npos);
 

@@ -74,8 +74,7 @@ target_link_libraries(common
     threads
     jemalloc
     stdfs
-    fmt
-    tinycbor)
+    fmt)
 
 if (BUILD_APPLICATION_WORLDSERVER OR BUILD_TOOLS_MAPS)
   target_link_libraries(common
