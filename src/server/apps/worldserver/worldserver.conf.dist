@@ -3387,6 +3387,16 @@ DungeonAccessRequirements.OptionalStringID = 0
 JoinBGAndLFG.Enable = 0
 
 #
+#     LFG.MailItemOnFullInventory
+#        Description: When a player wins a group roll but their inventory is full, mail
+#                     the item to them instead of leaving it on the corpse.
+#        Default:     0 - Disabled
+#                     1 - Only in LFG/RDF groups
+#                     2 - In all group types
+
+LFG.MailItemOnFullInventory = 0
+
+#
 #     DungeonFinder.OptionsMask
 #        Description: Dungeon and raid finder system.
 #        Value is a bitmask consisting of:
@@ -3664,6 +3674,31 @@ Wintergrasp.CrashRestartTimer = 10
 #         Default:     3500
 
 Wintergrasp.SkipBattleSessionCount = 3500
+
+#
+#     Wintergrasp.KickVoAPlayers
+#         Description: Kick players from Vault of Archavon and freeze its bosses
+#                      in the minutes leading up to a Wintergrasp battle, and
+#                      block new entries during wartime / the 10-minute warmup.
+#                      Requires a server restart to take effect (not reloadable).
+#         Default:     1 - (Enabled, players are warned then teleported to their
+#                           homebind before the battle starts)
+#                      0 - (Disabled, players stay inside and bosses behave
+#                           normally during Wintergrasp)
+
+Wintergrasp.KickVoAPlayers = 1
+
+#
+#     Wintergrasp.EssenceBothFactions
+#         Description: Grant the "Essence of Wintergrasp" buff to both factions
+#                      during peacetime, regardless of who controls the keep.
+#                      The wartime suppression still applies; this only affects
+#                      who receives the buff once the battle is over.
+#         Default:     0 - (Disabled, only the defending faction gets the buff)
+#                      1 - (Enabled, attackers and defenders both get the buff,
+#                           so both factions can access Vault of Archavon)
+
+Wintergrasp.EssenceBothFactions = 0
 
 #
 ###################################################################################################
@@ -4345,6 +4380,21 @@ PreserveCustomChannels = 0
 #                     0  - (Disabled, Infinite channel storage)
 
 PreserveCustomChannelDuration = 14
+
+#
+#    ChatFilter
+#        Description: Blocks chat messages when they contain any entry from the `chat_filter`
+#                     table (substring, case-insensitive).
+#                     Manage entries with .chatfilter add / remove / list and .reload chat_filter.
+#                     Blizzlike is only whispers are enabled.
+#        Default:     0 - (Disbaled)
+#                     1 - (Enabled)
+#
+
+ChatFilter.Whisper = 1
+ChatFilter.Say     = 0
+ChatFilter.Yell    = 0
+ChatFilter.Emote   = 0
 
 #
 ###################################################################################################

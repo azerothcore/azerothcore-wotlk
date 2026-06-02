@@ -128,6 +128,13 @@ enum lfgGroupFlags
     GROUP_LFG_FLAG_IS_HEROIC                = 0x004
 };
 
+enum MailItemOnFullInventory
+{
+    MAIL_ITEM_ON_FULL_INVENTORY_DISABLED    = 0,
+    MAIL_ITEM_ON_FULL_INVENTORY_LFG_ONLY    = 1,
+    MAIL_ITEM_ON_FULL_INVENTORY_EVERYWHERE  = 2,
+};
+
 enum DifficultyPreventionChangeType
 {
     DIFFICULTY_PREVENTION_CHANGE_NONE                   = 0,
