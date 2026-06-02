@@ -96,16 +96,6 @@ class AC_COMMON_API DiagnosticReader
 {
 public:
     /**
-     * @brief Create a non-owning reader over the specified @p records.
-     *
-     * @param records The diagnostic bytes to read.
-     *
-     * The behavior is undefined unless @p records remains valid and unchanged
-     * while this reader is read, and while using the result of that read.
-     */
-    explicit DiagnosticReader(std::span<uint8 const> records) noexcept;
-
-    /**
      * @brief Create a reader owning the specified @p records.
      *
      * @param records The cloned diagnostic buffer to read.
@@ -117,8 +107,8 @@ public:
      */
     ~DiagnosticReader() = default;
 
-    DiagnosticReader(DiagnosticReader&& other) noexcept;
-    DiagnosticReader& operator=(DiagnosticReader&& other) noexcept;
+    DiagnosticReader(DiagnosticReader&&) noexcept = default;
+    DiagnosticReader& operator=(DiagnosticReader&&) noexcept = default;
 
     DiagnosticReader(DiagnosticReader const&) = delete;
     DiagnosticReader& operator=(DiagnosticReader const&) = delete;
@@ -127,18 +117,12 @@ public:
      * @brief Return the recovered diagnostic events in natural forward order.
      *
      * @return The recovered diagnostic events in natural forward order, along
-     *         with any cloned backing storage owned by this reader.
-     *
-     * The returned events contain string views into either the result's cloned
-     * storage, if this reader owns one, or into the live buffer used by a
-     * non-owning reader.  For non-owning reads, the caller must keep the live
-     * buffer stable while using the result.
+     *         with the cloned backing storage that owns their string data.
      */
     [[nodiscard]] DiagnosticReadResult ReadEvents();
 
 private:
-    std::optional<RingBuffer> _ownedRecords;
-    std::span<uint8 const> _records;
+    RingBuffer _records;
 };
 
 /**

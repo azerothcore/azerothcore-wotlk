@@ -239,7 +239,7 @@ public:
         // therefore be taken synchronously without racing live tracing.
         try
         {
-            DiagnosticReader reader = sDiagnostics->GetReader(diagnosticsName, true);
+            DiagnosticReader reader = sDiagnostics->GetReader(diagnosticsName);
             std::filesystem::path path = MakeBattlefieldDiagnosticDumpPath(diagnosticsName);
             std::size_t const rootEventCount = WriteDiagnosticDump(diagnosticsName, path, reader);
 

@@ -106,6 +106,13 @@ public:
             _guard->Arg(name, std::forward<T>(value));
     }
 
+    void ArgGuid(StringLiteralView name, ObjectGuid guid) noexcept
+    {
+        Arg(name, guid.GetRawValue());
+    }
+
+    void ArgPlayer(Player const* player) noexcept;
+
 private:
     std::optional<DiagnosticGuard> _guard;
 };

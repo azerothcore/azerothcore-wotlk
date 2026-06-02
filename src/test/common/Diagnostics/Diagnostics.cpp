@@ -152,11 +152,11 @@ TEST(DiagnosticsTest, ClonedReaderIsIndependent)
     }
 }
 
-TEST(DiagnosticsTest, NonClonedReaderReadsLiveBuffer)
+TEST(DiagnosticsTest, RecoversMultipleEventsInForwardOrder)
 {
     try
     {
-        std::string name = "diagnostics_test_live_reader";
+        std::string name = "diagnostics_test_forward_order";
 
         {
             DiagnosticGuard guard(sDiagnostics->GetWriter(name), "First");
@@ -168,7 +168,7 @@ TEST(DiagnosticsTest, NonClonedReaderReadsLiveBuffer)
             guard.Arg("value", 2);
         }
 
-        DiagnosticReadResult result = sDiagnostics->GetReader(name, false).ReadEvents();
+        DiagnosticReadResult result = sDiagnostics->GetReader(name).ReadEvents();
         std::vector<DiagnosticEvent> const& events = result.events;
 
         ASSERT_GE(events.size(), 2u);

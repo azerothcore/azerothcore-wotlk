@@ -103,12 +103,6 @@ public:
      */
     void Advance(std::size_t bytes);
 
-    /**
-     * @brief Set the current position of this buffer to the beginning of its
-     *        mapping.
-     */
-    void Reset();
-
 private:
     void Release() noexcept;
     static std::size_t AlignUp(std::size_t value, std::size_t alignment);

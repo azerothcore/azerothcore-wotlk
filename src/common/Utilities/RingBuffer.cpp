@@ -79,11 +79,6 @@ void RingBuffer::Advance(std::size_t bytes)
     _position += bytes;
 }
 
-void RingBuffer::Reset()
-{
-    _position = 0;
-}
-
 std::size_t RingBuffer::AlignUp(std::size_t value, std::size_t alignment)
 {
     ASSERT(value, "RingBuffer size must be greater than zero");

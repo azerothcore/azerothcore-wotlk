@@ -34,30 +34,16 @@ DiagnosticWriter Diagnostics::GetWriter(std::string_view name)
     return DiagnosticWriter(GetOrCreate(name));
 }
 
-DiagnosticReader Diagnostics::GetReader(std::string_view name, bool clone)
+DiagnosticReader Diagnostics::GetReader(std::string_view name)
 {
     std::lock_guard<std::mutex> guard(_buffersLock);
-    RingBuffer& buffer = GetOrCreate(name);
 
-    if (clone)
-        return DiagnosticReader(Clone(buffer));
-
-    return DiagnosticReader(buffer.ReadSpan());
+    return DiagnosticReader(Clone(GetOrCreate(name)));
 }
 
 std::size_t Diagnostics::TransparentStringHash::operator()(std::string_view value) const noexcept
 {
     return std::hash<std::string_view>{}(value);
-}
-
-std::size_t Diagnostics::TransparentStringHash::operator()(std::string const& value) const noexcept
-{
-    return (*this)(std::string_view(value));
-}
-
-std::size_t Diagnostics::TransparentStringHash::operator()(char const* value) const noexcept
-{
-    return (*this)(std::string_view(value));
 }
 
 RingBuffer& Diagnostics::GetOrCreate(std::string_view name)

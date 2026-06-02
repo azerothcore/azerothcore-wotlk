@@ -50,19 +50,15 @@ public:
     [[nodiscard]] DiagnosticWriter GetWriter(std::string_view name);
 
     /**
-     * @brief Return a reader for the buffer having the specified @p name.
+     * @brief Return a reader owning a cloned snapshot of the buffer having the
+     *        specified @p name.
      *
      * @param name The name of the diagnostic buffer.
-     * @param clone If true, the returned reader owns a cloned buffer.  If
-     *              false, the returned reader reads directly from the live
-     *              buffer.
-     * @return A reader for the specified diagnostic buffer.
+     * @return A reader owning a cloned snapshot of the specified buffer.
      *
      * The behavior is undefined unless @p name is non-empty.
-     * The behavior is undefined unless the live buffer is not modified while
-     * a non-cloning reader is used.
      */
-    [[nodiscard]] DiagnosticReader GetReader(std::string_view name, bool clone = true);
+    [[nodiscard]] DiagnosticReader GetReader(std::string_view name);
 
 private:
     Diagnostics() = default;
@@ -76,8 +72,6 @@ private:
         using is_transparent = void;
 
         std::size_t operator()(std::string_view value) const noexcept;
-        std::size_t operator()(std::string const& value) const noexcept;
-        std::size_t operator()(char const* value) const noexcept;
     };
 
     RingBuffer& GetOrCreate(std::string_view name);

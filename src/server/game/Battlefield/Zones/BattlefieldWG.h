@@ -1131,7 +1131,7 @@ struct BfWGGameObjectBuilding
     void Damaged()
     {
         auto trace = m_WG->TraceWintergrasp("BattlefieldWG::BfWGGameObjectBuilding::Damaged");
-        trace.Arg("buildingGuid", m_Build.GetRawValue());
+        trace.ArgGuid("buildingGuid", m_Build);
         trace.Arg("type", m_Type);
         trace.Arg("team", uint32(m_Team));
         trace.Arg("stateBefore", m_State);
@@ -1165,7 +1165,7 @@ struct BfWGGameObjectBuilding
     void Destroyed()
     {
         auto trace = m_WG->TraceWintergrasp("BattlefieldWG::BfWGGameObjectBuilding::Destroyed");
-        trace.Arg("buildingGuid", m_Build.GetRawValue());
+        trace.ArgGuid("buildingGuid", m_Build);
         trace.Arg("type", m_Type);
         trace.Arg("team", uint32(m_Team));
         trace.Arg("stateBefore", m_State);

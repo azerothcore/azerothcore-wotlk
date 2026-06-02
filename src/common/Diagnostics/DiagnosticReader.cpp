@@ -330,42 +330,16 @@ DiagnosticReadResult::DiagnosticReadResult(std::optional<RingBuffer>&& records, 
 {
 }
 
-DiagnosticReader::DiagnosticReader(std::span<uint8 const> records) noexcept :
-    _records(records)
-{
-}
-
 DiagnosticReader::DiagnosticReader(RingBuffer&& records) noexcept :
-    _ownedRecords(std::move(records))
+    _records(std::move(records))
 {
-    _records = _ownedRecords->ReadSpan();
-}
-
-DiagnosticReader::DiagnosticReader(DiagnosticReader&& other) noexcept :
-    _ownedRecords(std::move(other._ownedRecords))
-{
-    _records = _ownedRecords ? _ownedRecords->ReadSpan() : other._records;
-    other._records = {};
-}
-
-DiagnosticReader& DiagnosticReader::operator=(DiagnosticReader&& other) noexcept
-{
-    if (this != &other)
-    {
-        _ownedRecords = std::move(other._ownedRecords);
-        _records = _ownedRecords ? _ownedRecords->ReadSpan() : other._records;
-        other._records = {};
-    }
-
-    return *this;
 }
 
 DiagnosticReadResult DiagnosticReader::ReadEvents()
 {
-    DiagnosticReadResult result(std::move(_ownedRecords), RecoverRecords(_records));
-    _records = {};
+    std::vector<DiagnosticEvent> events = RecoverRecords(_records.ReadSpan());
 
-    return result;
+    return DiagnosticReadResult(std::move(_records), std::move(events));
 }
 
 std::vector<DiagnosticEvent> RecoverRecords(std::span<uint8 const> snapshot)

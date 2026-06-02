@@ -24,6 +24,7 @@
 
 #include <cstddef>
 #include <string_view>
+#include <utility>
 
 class AC_COMMON_API DiagnosticGuard
 {
@@ -54,15 +55,12 @@ public:
      * @param name The name of the argument.
      * @param value The value of the argument.
      */
-    void Arg(StringLiteralView name, bool value) noexcept;
-    void Arg(StringLiteralView name, int value) noexcept;
-    void Arg(StringLiteralView name, uint32 value) noexcept;
-    void Arg(StringLiteralView name, int64 value) noexcept;
-    void Arg(StringLiteralView name, uint64 value) noexcept;
-    void Arg(StringLiteralView name, double value) noexcept;
-    void Arg(StringLiteralView name, char const* value) noexcept;
-    void Arg(StringLiteralView name, StringLiteralView value) noexcept;
-    void Arg(StringLiteralView name, std::string_view value) noexcept;
+    template <typename T>
+    void Arg(StringLiteralView name, T&& value) noexcept
+    {
+        if (_active)
+            (void)_writer.WriteArgument(name, std::forward<T>(value));
+    }
 
 private:
     DiagnosticWriter _writer;
