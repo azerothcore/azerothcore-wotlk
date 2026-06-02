@@ -416,6 +416,8 @@ protected:
 
     TaskScheduler _scheduler;
 
+    TimePoint _nextResurrectTime{};  // absolute time of next resurrection tick; set by SetupResurrectionTimer()
+
     GuidUnorderedSet Groups[PVP_TEAMS_COUNT];               // Contains different raid groups
 
     std::vector<uint64> Data64;

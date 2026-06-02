@@ -707,9 +707,16 @@ void Battlefield::RemovePlayerFromResurrectQueue(ObjectGuid playerGuid)
 void Battlefield::SendAreaSpiritHealerQueryOpcode(Player* player, ObjectGuid const& guid)
 {
     WorldPacket data(SMSG_AREA_SPIRIT_HEALER_TIME, 12);
-    Milliseconds remaining = _scheduler.GetNextGroupOccurrence(BATTLEFIELD_TIMER_GROUP_RESURRECT);
-    uint32 time = static_cast<uint32>(std::clamp(remaining,
-        Milliseconds::zero(), Milliseconds(RESURRECTION_INTERVAL)).count());
+    // _nextResurrectTime is updated atomically by the resurrect callback itself, so
+    // it always reflects the exact wall-clock moment the next Resurrect() will fire.
+    uint32 time = 0;
+    if (_nextResurrectTime != TimePoint{})
+    {
+        Milliseconds remaining = std::chrono::duration_cast<Milliseconds>(
+            _nextResurrectTime - GameTime::Now());
+        time = static_cast<uint32>(std::clamp(remaining,
+            Milliseconds::zero(), Milliseconds(RESURRECTION_INTERVAL)).count());
+    }
 
     data << guid << time;
     ASSERT(player);

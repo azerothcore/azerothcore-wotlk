@@ -190,6 +190,10 @@ bool BattlefieldWG::SetupBattlefield()
     UpdateCounterVehicle(true);
 
     // Schedule always-running periodic timers
+    // Update _nextResurrectTime before scheduling so that any
+    // CMSG_AREA_SPIRIT_HEALER_QUERY that arrives before the first tick
+    // already returns the correct countdown.
+    _nextResurrectTime = GameTime::Now() + Milliseconds(RESURRECTION_INTERVAL);
     _scheduler.Schedule(Milliseconds(RESURRECTION_INTERVAL),
         BATTLEFIELD_TIMER_GROUP_RESURRECT, [this](TaskContext context)
     {
@@ -205,9 +209,11 @@ bool BattlefieldWG::SetupBattlefield()
             {
                 if (!gy)
                     continue;
+
                 Unit* spirit = ObjectAccessor::GetCreature(*player, gy->GetSpiritGuide(team));
                 if (!spirit)
                     continue;
+
                 float dist = player->GetDistance(spirit);
                 if (closestDist < 0.0f || dist < closestDist)
                 {
@@ -226,6 +232,10 @@ bool BattlefieldWG::SetupBattlefield()
             player->SpawnCorpseBones(false);
             player->RemoveAurasDueToSpell(SPELL_WAITING_FOR_RESURRECT);
         });
+
+        // Update the timestamp for the NEXT cycle before Repeat(), so that
+        // any query received in the gap between now and the next tick is correct.
+        _nextResurrectTime = GameTime::Now() + Milliseconds(RESURRECTION_INTERVAL);
         context.Repeat();
     });
 
