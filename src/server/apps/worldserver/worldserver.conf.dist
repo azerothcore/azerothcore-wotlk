@@ -1761,6 +1761,29 @@ InstantLogout = 1
 ###################################################################################################
 # ACCOUNT
 #
+#    Trial.LevelCap
+#        Description: Maximum level a trial account can reach. XP gain stops once this level is reached.
+#        Default:     20
+#                     0  - (Disabled, no cap)
+
+Trial.LevelCap = 20
+
+#
+#    Trial.MoneyCap
+#        Description: Maximum money a trial account can hold, in copper.
+#        Default:     100000 - (10 gold)
+#                     0      - (Disabled, no cap)
+
+Trial.MoneyCap = 100000
+
+#
+#    Trial.TradeSkillCap
+#        Description: Maximum value any profession skill can reach on a trial account.
+#        Default:     100
+#                     0   - (Disabled, no cap)
+
+Trial.TradeSkillCap = 100
+
 #    Trial.Restriction.Chat
 #        Description: Restrict trial accounts from using whisper/channel/guild chats.
 #                     Whispers are only allowed when the trial player is on the recipients friendslist
@@ -1822,30 +1845,6 @@ Trial.Restriction.Guild = 1
 #                     0 - (Disabled)
 
 Trial.Restriction.Queue = 1
-
-#
-#    Trial.LevelCap
-#        Description: Maximum level a trial account can reach. XP gain stops once this level is reached.
-#        Default:     20
-#                     0  - (Disabled, no cap)
-
-Trial.LevelCap = 20
-
-#
-#    Trial.MoneyCap
-#        Description: Maximum money a trial account can hold, in copper.
-#        Default:     100000 - (10 gold)
-#                     0      - (Disabled, no cap)
-
-Trial.MoneyCap = 100000
-
-#
-#    Trial.TradeSkillCap
-#        Description: Maximum value any profession skill can reach on a trial account.
-#        Default:     100
-#                     0   - (Disabled, no cap)
-
-Trial.TradeSkillCap = 100
 
 #
 ###################################################################################################

@@ -250,11 +250,19 @@ void WorldSession::HandleGroupAcceptOpcode(WorldPacket& recvData)
     if (!sScriptMgr->OnPlayerCanGroupAccept(GetPlayer(), group))
         return;
 
+    Player* leader = ObjectAccessor::FindConnectedPlayer(group->GetLeaderGUID());
+
     // Trial accounts cannot join a group whose existing members are above the trial level cap.
     if (sWorld->getBoolConfig(CONFIG_TRIAL_RESTRICTION_PARTY) && IsTrialAccount())
     {
         if (uint32 trialLevelCap = sWorld->getIntConfig(CONFIG_TRIAL_LEVEL_CAP))
         {
+            if (leader->GetLevel() > trialLevelCap)
+            {
+                SendPartyResult(PARTY_OP_INVITE, "", ERR_INVITE_RESTRICTED);
+                return;
+            }
+
             for (auto const& slot : group->GetMemberSlots())
             {
                 if (slot.guid == GetPlayer()->GetGUID())
@@ -288,8 +296,6 @@ void WorldSession::HandleGroupAcceptOpcode(WorldPacket& recvData)
         SendPartyResult(PARTY_OP_INVITE, "", ERR_GROUP_FULL);
         return;
     }
-
-    Player* leader = ObjectAccessor::FindConnectedPlayer(group->GetLeaderGUID());
 
     // Forming a new group, create it
     if (!group->IsCreated())

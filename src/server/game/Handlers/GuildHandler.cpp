@@ -63,6 +63,8 @@ void WorldSession::HandleGuildAcceptOpcode(WorldPackets::Guild::AcceptGuildInvit
     if (sWorld->getBoolConfig(CONFIG_TRIAL_RESTRICTION_GUILD) && IsTrialAccount())
     {
         Guild::SendCommandResult(this, GUILD_COMMAND_INVITE, ERR_GUILD_PERMISSIONS);
+        GetPlayer()->SetGuildIdInvited(0);
+        GetPlayer()->SetInGuild(0);
         return;
     }
 
