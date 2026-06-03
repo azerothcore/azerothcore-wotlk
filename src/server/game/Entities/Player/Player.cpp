@@ -13943,29 +13943,33 @@ InventoryResult Player::CanEquipUniqueItem(ItemTemplate const* itemProto, uint8 
     return EQUIP_ERR_OK;
 }
 
+static constexpr float   FALL_DMG_EQU_SLOPE         = 0.018f;
+static constexpr float   FALL_DMG_EQU_INTERCEPT     = -0.2426f;
+static constexpr float   MIN_FALL_DMG_DIST          = 13.48f;       // Minimum fall distance that deals damage
+// 13.48 can be calculated by resolving damageperc to 0 in the fall damage equation below, and assuming safe_fall reduction = 0
+
+static constexpr uint32  SPELL_GUST_OF_WIND         = 43621;
+static constexpr uint32  SPELL_DIVINE_PROTECTION    = 498;
+
 void Player::HandleFall(MovementInfo const& movementInfo)
 {
     // calculate total z distance of the fall
     float z_diff = m_lastFallZ - movementInfo.pos.GetPositionZ();
 
     //Players with low fall distance, Feather Fall or physical immunity (charges used) are ignored
-    // 14.57 can be calculated by resolving damageperc formula below to 0
-    if (z_diff >= 14.57f && !isDead() && !IsGameMaster() && !GetCommandStatus(CHEAT_GOD) &&
+    if (z_diff >= MIN_FALL_DMG_DIST && !isDead() && !IsGameMaster() && !GetCommandStatus(CHEAT_GOD) &&
             !HasHoverAura() && !HasFeatherFallAura() &&
             !HasFlyAura())
     {
         //Safe fall, fall height reduction
         int32 safe_fall = GetTotalAuraModifier(SPELL_AURA_SAFE_FALL);
 
-        float damageperc = 0.018f * (z_diff - safe_fall) - 0.2426f;
+        float damageperc = FALL_DMG_EQU_SLOPE * (z_diff - safe_fall) + FALL_DMG_EQU_INTERCEPT;
         uint32 original_health = GetHealth(), final_damage = 0;
 
         if (damageperc > 0 && !IsImmunedToDamageOrSchool(SPELL_SCHOOL_MASK_NORMAL))
         {
             uint32 damage = (uint32)(damageperc * GetMaxHealth() * sWorld->getRate(RATE_DAMAGE_FALL));
-
-            //float height = movementInfo.pos.m_positionZ;
-            //UpdateGroundPositionZ(movementInfo.pos.m_positionX, movementInfo.pos.m_positionY, height);
 
             if (damage > 0)
             {
@@ -13973,15 +13977,11 @@ void Player::HandleFall(MovementInfo const& movementInfo)
                 if (damage > GetMaxHealth())
                     damage = GetMaxHealth();
 
-                // Gust of Wind
-                if (HasAura(43621))
+                if (HasAura(SPELL_GUST_OF_WIND))
                     damage = GetMaxHealth() / 2;
 
-                // Divine Protection
-                if (HasAura(498))
-                {
+                if (HasAura(SPELL_DIVINE_PROTECTION))
                     damage /= 2;
-                }
 
                 final_damage = EnvironmentalDamage(DAMAGE_FALL, damage);
             }
