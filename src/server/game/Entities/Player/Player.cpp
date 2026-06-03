@@ -8200,6 +8200,10 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
 
         if (loot_type == LOOT_CORPSE && !guid.IsItem())
             SetUnitFlag(UNIT_FLAG_LOOTING);
+
+        if (guid.IsCreature())
+            if (Creature* creature = GetMap()->GetCreature(guid))
+                sScriptMgr->OnPlayerCreatureLootOpened(this, creature);
     }
     else
         SendLootError(guid, LOOT_ERROR_DIDNT_KILL);
@@ -13707,6 +13711,50 @@ LootItem* Player::StoreLootItem(uint8 lootSlot, Loot* loot, InventoryResult& msg
     }
 
     return item;
+}
+
+bool Player::AutoTakeCreatureLoot(Creature* creature)
+{
+    if (!creature || !creature->HasDynamicFlag(UNIT_DYNFLAG_LOOTABLE))
+        return false;
+
+    if (!isAllowedToLoot(creature))
+        return false;
+
+    Loot* loot = &creature->loot;
+
+    // Ensure per-player item tracking is initialised (no-op if already done
+    // for this player at creature death via Loot::FillLoot).
+    loot->FillNotNormalLootFor(this);
+
+    // Temporarily redirect the player's active loot GUID so StoreLootItem
+    // internal checks operate against this creature.
+    ObjectGuid savedLootGuid = GetLootGUID();
+    SetLootGUID(creature->GetGUID());
+    loot->AddLooter(GetGUID());
+
+    bool tookAnything = false;
+    uint32 const maxSlots = loot->GetMaxSlotInLootFor(this);
+    for (uint32 slot = 0; slot < maxSlots; ++slot)
+    {
+        if (slot > std::numeric_limits<uint8>::max())
+            break;
+
+        InventoryResult msg;
+        if (StoreLootItem(static_cast<uint8>(slot), loot, msg))
+            tookAnything = true;
+    }
+
+    loot->RemoveLooter(GetGUID());
+    SetLootGUID(savedLootGuid);
+
+    if (loot->isLooted())
+    {
+        creature->AllLootRemovedFromCorpse();
+        creature->RemoveDynamicFlag(UNIT_DYNFLAG_LOOTABLE);
+    }
+
+    return tookAnything;
 }
 
 uint32 Player::CalculateTalentsPoints() const

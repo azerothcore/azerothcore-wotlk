@@ -458,6 +458,7 @@ public: /* PlayerScript */
     bool OnPlayerCanSendErrorAlreadyLooted(Player* player);
     void OnPlayerAfterCreatureLoot(Player* player);
     void OnPlayerAfterCreatureLootMoney(Player* player);
+    void OnPlayerCreatureLootOpened(Player* player, Creature* creature);
     bool OnPlayerCanFlyInZone(Player* player, uint32 mapId, uint32 zoneId, SpellInfo const* bySpell);
     bool OnPlayerCanUpdateSkill(Player* player, uint32 skillId);
     void OnPlayerBeforeUpdateSkill(Player* player, uint32 skill_id, uint32& value, uint32 max, uint32 step);
