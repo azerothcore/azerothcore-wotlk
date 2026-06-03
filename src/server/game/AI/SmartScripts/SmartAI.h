@@ -188,6 +188,8 @@ public:
 
     void SetInvincibilityHpLevel(uint32 level) { mInvincibilityHpLevel = level; }
 
+    void OnInteractionPause(uint32 pauseTimer) override;
+
     void sGossipHello(Player* player) override;
     void sGossipSelect(Player* player, uint32 sender, uint32 action) override;
     void sGossipSelectCode(Player* player, uint32 sender, uint32 action, const char* code) override;

@@ -1138,6 +1138,11 @@ void SmartAI::SetEvadeDisabled(bool disable)
     mEvadeDisabled = disable;
 }
 
+void SmartAI::OnInteractionPause(uint32 pauseTimer)
+{
+    PausePath(pauseTimer, true);
+}
+
 void SmartAI::sGossipHello(Player* player)
 {
     GetScript()->ProcessEventsFor(SMART_EVENT_GOSSIP_HELLO, player);
