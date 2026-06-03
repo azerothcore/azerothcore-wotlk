@@ -22,15 +22,22 @@
 #include "DiagnosticWriter.h"
 #include "gtest/gtest.h"
 
+#include <algorithm>
 #include <chrono>
+#include <cstdint>
+#include <cstdio>
+#include <cstdlib>
 #include <filesystem>
 #include <fstream>
 #include <iterator>
 #include <limits>
 #include <memory>
+#include <random>
 #include <span>
 #include <string>
 #include <string_view>
+#include <type_traits>
+#include <utility>
 #include <variant>
 
 namespace
@@ -68,6 +75,22 @@ namespace
     std::vector<DiagnosticRecord> Snapshot(DiagnosticBuffer const& buffer)
     {
         return buffer.Snapshot();
+    }
+
+    // Returns whether a recovered value equals the originally stored value,
+    // mapping the stored string types onto the recovered string view.
+    bool ValueMatches(DiagnosticValue const& recovered, DiagnosticStoredValue const& stored)
+    {
+        return std::visit([&recovered](auto const& value) -> bool
+        {
+            using T = std::decay_t<decltype(value)>;
+
+            if constexpr (std::is_same_v<T, StringLiteralView> || std::is_same_v<T, DiagnosticStaticString>)
+                return std::holds_alternative<std::string_view>(recovered)
+                    && std::get<std::string_view>(recovered) == DiagnosticStringView(value);
+            else
+                return std::holds_alternative<T>(recovered) && std::get<T>(recovered) == value;
+        }, stored);
     }
 }
 
@@ -254,4 +277,131 @@ TEST_F(DiagnosticStreamTest, WritesTextDump)
     EXPECT_NE(dump.find("arg \"text\" = \"hello\\nthere\""), std::string::npos);
 
     std::filesystem::remove(path, error);
+}
+
+TEST_F(DiagnosticStreamTest, OverrunKeepsMostRecentRecordsInOrder)
+{
+    constexpr std::size_t Capacity = 4;
+    constexpr std::uint64_t PushCount = 10;
+
+    DiagnosticBuffer buffer(Capacity);
+
+    for (std::uint64_t i = 0; i < PushCount; ++i)
+        buffer.Push(DiagnosticRecord("v", DiagnosticStoredValue(static_cast<uint64>(i))));
+
+    std::vector<DiagnosticRecord> snapshot = Snapshot(buffer);
+    std::vector<DiagnosticArg> entries = RecoverFrom(snapshot);
+
+    // The buffer wrapped, so only the most recent Capacity records survive,
+    // and they must still read back in forward order.
+    ASSERT_EQ(entries.size(), Capacity);
+    for (std::size_t k = 0; k < entries.size(); ++k)
+    {
+        EXPECT_EQ(entries[k].name, "v");
+        EXPECT_EQ(std::get<uint64>(entries[k].value), PushCount - Capacity + k);
+    }
+}
+
+// Randomised round-trip: across many wrapping buffers of random capacity and
+// random record streams, the recovered entries must always equal the most
+// recent min(pushed, capacity) records in forward order.  Uses <random> rather
+// than the project RNG so the run is reproducible from a printed seed; export
+// DIAGNOSTIC_FUZZ_SEED=<value> to replay a specific failure.
+TEST(DiagnosticFuzzTest, OverrunRoundTripsMostRecentRecords)
+{
+    char const* const seedEnv = std::getenv("DIAGNOSTIC_FUZZ_SEED");
+    unsigned const seed = seedEnv ? static_cast<unsigned>(std::strtoul(seedEnv, nullptr, 10)) : std::random_device{}();
+    std::printf("[ RUN      ] DiagnosticFuzzTest.OverrunRoundTripsMostRecentRecords seed = %u\n", seed);
+    std::fflush(stdout);
+
+    std::mt19937 rng(seed);
+
+    auto pickName = [](int index) -> StringLiteralView
+    {
+        switch (index)
+        {
+            case 0: return "alpha";
+            case 1: return "beta";
+            default: return "gamma";
+        }
+    };
+
+    auto pickLiteral = [](int index) -> StringLiteralView
+    {
+        switch (index)
+        {
+            case 0: return "lit-a";
+            case 1: return "lit-bb";
+            default: return "lit-ccc";
+        }
+    };
+
+    constexpr int Iterations = 512;
+
+    for (int iteration = 0; iteration < Iterations; ++iteration)
+    {
+        SCOPED_TRACE("seed=" + std::to_string(seed) + " iteration=" + std::to_string(iteration));
+
+        std::size_t const capacity = std::uniform_int_distribution<std::size_t>(1, 16)(rng);
+        std::size_t const pushCount = std::uniform_int_distribution<std::size_t>(0, 80)(rng);
+
+        DiagnosticBuffer buffer(capacity);
+        std::vector<std::pair<StringLiteralView, DiagnosticStoredValue>> pushed;
+        pushed.reserve(pushCount);
+
+        for (std::size_t i = 0; i < pushCount; ++i)
+        {
+            StringLiteralView const name = pickName(std::uniform_int_distribution<int>(0, 2)(rng));
+
+            DiagnosticStoredValue value(false);
+            switch (std::uniform_int_distribution<int>(0, 5)(rng))
+            {
+                case 0:
+                    value = DiagnosticStoredValue(std::uniform_int_distribution<int>(0, 1)(rng) != 0);
+                    break;
+                case 1:
+                    value = DiagnosticStoredValue(static_cast<int64>(
+                        std::uniform_int_distribution<std::int64_t>(std::numeric_limits<std::int64_t>::min(), std::numeric_limits<std::int64_t>::max())(rng)));
+                    break;
+                case 2:
+                    value = DiagnosticStoredValue(static_cast<uint64>(
+                        std::uniform_int_distribution<std::uint64_t>(0, std::numeric_limits<std::uint64_t>::max())(rng)));
+                    break;
+                case 3:
+                    // Finite doubles only, so the stored bits round-trip exactly.
+                    value = DiagnosticStoredValue(std::uniform_real_distribution<double>(-1.0e9, 1.0e9)(rng));
+                    break;
+                case 4:
+                    value = DiagnosticStoredValue(pickLiteral(std::uniform_int_distribution<int>(0, 2)(rng)));
+                    break;
+                default:
+                {
+                    std::size_t const length = std::uniform_int_distribution<std::size_t>(0, DiagnosticStaticStringCapacity)(rng);
+                    DiagnosticStaticString stored;
+                    for (std::size_t c = 0; c < length; ++c)
+                        stored.push_back(static_cast<char>('a' + std::uniform_int_distribution<int>(0, 25)(rng)));
+
+                    value = DiagnosticStoredValue(stored);
+                    break;
+                }
+            }
+
+            buffer.Push(DiagnosticRecord(name, value));
+            pushed.emplace_back(name, value);
+        }
+
+        std::vector<DiagnosticRecord> snapshot = Snapshot(buffer);
+        std::vector<DiagnosticArg> entries = RecoverFrom(snapshot);
+
+        std::size_t const expectedCount = std::min(pushCount, capacity);
+        ASSERT_EQ(entries.size(), expectedCount);
+
+        std::size_t const offset = pushCount - expectedCount;
+        for (std::size_t k = 0; k < expectedCount; ++k)
+        {
+            auto const& [name, value] = pushed[offset + k];
+            EXPECT_EQ(entries[k].name, static_cast<std::string_view>(name));
+            EXPECT_TRUE(ValueMatches(entries[k].value, value));
+        }
+    }
 }
