@@ -17,66 +17,9 @@
 
 #include "DiagnosticReader.h"
 
-#include <string_view>
-#include <type_traits>
 #include <utility>
-
-namespace
-{
-    std::string_view ReadStoredString(StringLiteralView value) noexcept
-    {
-        return DiagnosticStringView(value);
-    }
-
-    std::string_view ReadStoredString(DiagnosticStaticString const& value) noexcept
-    {
-        return DiagnosticStringView(value);
-    }
-
-    DiagnosticValue ReadStoredValue(DiagnosticStoredValue const& value)
-    {
-        return std::visit([](auto const& stored) -> DiagnosticValue
-        {
-            using T = std::decay_t<decltype(stored)>;
-
-            if constexpr (std::is_same_v<T, StringLiteralView> || std::is_same_v<T, DiagnosticStaticString>)
-                return ReadStoredString(stored);
-            else
-                return stored;
-        }, value);
-    }
-}
-
-DiagnosticReadResult::DiagnosticReadResult(std::vector<DiagnosticRecord>&& records, std::vector<DiagnosticArg>&& recoveredEntries) :
-    entries(std::move(recoveredEntries)),
-    _ownedRecords(std::move(records))
-{
-}
 
 DiagnosticReader::DiagnosticReader(std::vector<DiagnosticRecord>&& records) noexcept :
     _records(std::move(records))
 {
-}
-
-DiagnosticReadResult DiagnosticReader::ReadEntries()
-{
-    std::vector<DiagnosticArg> entries = RecoverRecords(_records);
-
-    return DiagnosticReadResult(std::move(_records), std::move(entries));
-}
-
-std::vector<DiagnosticArg> RecoverRecords(std::span<DiagnosticRecord const> snapshot)
-{
-    std::vector<DiagnosticArg> entries;
-    entries.reserve(snapshot.size());
-
-    for (DiagnosticRecord const& record : snapshot)
-    {
-        DiagnosticArg entry;
-        entry.name = DiagnosticStringView(record.name);
-        entry.value = ReadStoredValue(record.value);
-        entries.push_back(entry);
-    }
-
-    return entries;
 }

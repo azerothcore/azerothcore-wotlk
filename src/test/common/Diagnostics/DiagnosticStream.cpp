@@ -69,7 +69,9 @@ namespace
 
     std::vector<DiagnosticArg> RecoverFrom(std::vector<DiagnosticRecord> const& snapshot)
     {
-        return RecoverRecords(snapshot);
+        std::vector<DiagnosticArg> entries;
+        VisitDiagnosticRecords(snapshot, [&entries](DiagnosticArg const& entry) { entries.push_back(entry); });
+        return entries;
     }
 
     std::vector<DiagnosticRecord> Snapshot(DiagnosticBuffer const& buffer)

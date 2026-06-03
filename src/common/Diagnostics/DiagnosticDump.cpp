@@ -92,10 +92,9 @@ namespace
     }
 }
 
-std::size_t WriteDiagnosticDump(std::string_view name, std::filesystem::path const& path, DiagnosticReader& reader)
+std::size_t WriteDiagnosticDump(std::string_view name, std::filesystem::path const& path, DiagnosticReader const& reader)
 {
-    DiagnosticReadResult result = reader.ReadEntries();
-    std::size_t const entryCount = result.entries.size();
+    std::size_t const entryCount = reader.Size();
 
     if (!path.parent_path().empty())
         std::filesystem::create_directories(path.parent_path());
@@ -109,8 +108,10 @@ std::size_t WriteDiagnosticDump(std::string_view name, std::filesystem::path con
     output << '\n';
     output << "entries " << entryCount << "\n\n";
 
-    for (DiagnosticArg const& entry : result.entries)
+    reader.Visit([&output](DiagnosticArg const& entry)
+    {
         WriteDiagnosticEntry(output, entry);
+    });
 
     if (!output)
         throw std::runtime_error("failed to write diagnostics dump file");

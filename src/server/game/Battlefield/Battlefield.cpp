@@ -36,8 +36,6 @@
 #include "WorldPacket.h"
 #include "WorldSessionMgr.h"
 
-#include <system_error>
-
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
 //  there is probably some underlying problem with imports which should properly addressed

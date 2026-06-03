@@ -37,7 +37,7 @@ DiagnosticReader Diagnostics::GetReader(std::string_view name)
 {
     std::lock_guard<std::mutex> guard(_buffersLock);
 
-    return DiagnosticReader(Clone(GetOrCreate(name)));
+    return DiagnosticReader(GetOrCreate(name).Snapshot());
 }
 
 std::size_t Diagnostics::TransparentStringHash::operator()(std::string_view value) const noexcept
@@ -53,9 +53,4 @@ DiagnosticBuffer& Diagnostics::GetOrCreate(std::string_view name)
         return itr->second;
 
     return _buffers.try_emplace(std::string(name), DefaultBufferRecords).first->second;
-}
-
-std::vector<DiagnosticRecord> Diagnostics::Clone(DiagnosticBuffer const& buffer)
-{
-    return buffer.Snapshot();
 }

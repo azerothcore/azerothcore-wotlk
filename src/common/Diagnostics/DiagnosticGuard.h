@@ -20,7 +20,6 @@
 
 #include "Define.h"
 #include "DiagnosticWriter.h"
-#include "Errors.h"
 #include "StringLiteralView.h"
 
 #include <cstddef>
@@ -56,14 +55,6 @@ public:
     {
         static_assert(Size > 0);
         Arg(name, std::string_view(value, Size - 1));
-    }
-
-    void Arg(StringLiteralView name, char const* value) noexcept
-    {
-        ASSERT(value, "DiagnosticGuard::Arg called with a null string");
-
-        if (value)
-            Arg(name, std::string_view(value));
     }
 
     template <typename T>

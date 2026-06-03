@@ -79,7 +79,6 @@ private:
     };
 
     DiagnosticBuffer& GetOrCreate(std::string_view name);
-    static std::vector<DiagnosticRecord> Clone(DiagnosticBuffer const& buffer);
 
     static constexpr std::size_t DefaultBufferBytes = 1024 * 1024;
     static constexpr std::size_t DefaultBufferRecords = DefaultBufferBytes / sizeof(DiagnosticRecord);

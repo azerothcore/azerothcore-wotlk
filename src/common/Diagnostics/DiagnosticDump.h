@@ -34,6 +34,6 @@
  *
  * The behavior is undefined unless @p name is non-empty.
  */
-[[nodiscard]] AC_COMMON_API std::size_t WriteDiagnosticDump(std::string_view name, std::filesystem::path const& path, DiagnosticReader& reader);
+[[nodiscard]] AC_COMMON_API std::size_t WriteDiagnosticDump(std::string_view name, std::filesystem::path const& path, DiagnosticReader const& reader);
 
 #endif // ACORE_DIAGNOSTIC_DUMP_H

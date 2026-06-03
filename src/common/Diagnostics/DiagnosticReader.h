@@ -21,8 +21,11 @@
 #include "Define.h"
 #include "DiagnosticBuffer.h"
 
+#include <cstddef>
 #include <span>
 #include <string_view>
+#include <type_traits>
+#include <utility>
 #include <variant>
 #include <vector>
 
@@ -41,37 +44,45 @@ struct DiagnosticArg
     DiagnosticValue value;
 };
 
-class AC_COMMON_API DiagnosticReadResult
+/**
+ * @brief Recover the consumer-facing value of the specified stored @p value,
+ *        mapping both stored string representations onto a string view.
+ *
+ * @param value The stored value to recover.
+ * @return The recovered value.
+ *
+ * A recovered string view refers into @p value and is valid for as long as the
+ * storage backing @p value outlives it.
+ */
+[[nodiscard]] inline DiagnosticValue DiagnosticRecoverValue(DiagnosticStoredValue const& value)
 {
-public:
-    /**
-     * @brief Create an empty result.
-     */
-    DiagnosticReadResult() = default;
+    return std::visit([](auto const& stored) -> DiagnosticValue
+    {
+        using T = std::decay_t<decltype(stored)>;
 
-    /**
-     * @brief Destroy this object.
-     */
-    ~DiagnosticReadResult() = default;
+        if constexpr (std::is_same_v<T, StringLiteralView> || std::is_same_v<T, DiagnosticStaticString>)
+            return DiagnosticStringView(stored);
+        else
+            return stored;
+    }, value);
+}
 
-    DiagnosticReadResult(DiagnosticReadResult&&) noexcept = default;
-    DiagnosticReadResult& operator=(DiagnosticReadResult&&) noexcept = default;
-
-    DiagnosticReadResult(DiagnosticReadResult const&) = delete;
-    DiagnosticReadResult& operator=(DiagnosticReadResult const&) = delete;
-
-    /**
-     * @brief The recovered diagnostic entries in natural forward order.
-     */
-    std::vector<DiagnosticArg> entries;
-
-private:
-    friend class DiagnosticReader;
-
-    DiagnosticReadResult(std::vector<DiagnosticRecord>&& records, std::vector<DiagnosticArg>&& recoveredEntries);
-
-    std::vector<DiagnosticRecord> _ownedRecords;
-};
+/**
+ * @brief Invoke @p visitor with a DiagnosticArg for each of the specified
+ *        @p records, in natural forward order.
+ *
+ * @param records The records to recover.
+ * @param visitor The callable, invoked as `visitor(DiagnosticArg const&)`.
+ *
+ * No storage is allocated; each visited argument's string views refer into
+ * @p records and are valid only for the duration of the visit.
+ */
+template <typename Visitor>
+void VisitDiagnosticRecords(std::span<DiagnosticRecord const> records, Visitor&& visitor)
+{
+    for (DiagnosticRecord const& record : records)
+        visitor(DiagnosticArg{ DiagnosticStringView(record.name), DiagnosticRecoverValue(record.value) });
+}
 
 class AC_COMMON_API DiagnosticReader
 {
@@ -95,25 +106,29 @@ public:
     DiagnosticReader& operator=(DiagnosticReader const&) = delete;
 
     /**
-     * @brief Return the recovered diagnostic entries in natural forward order.
+     * @brief Return the number of recovered entries.
      *
-     * @return The recovered diagnostic entries in natural forward order, along
-     *         with the cloned backing storage that owns their string data.
+     * @return The number of recovered entries.
      */
-    [[nodiscard]] DiagnosticReadResult ReadEntries();
+    [[nodiscard]] std::size_t Size() const noexcept { return _records.size(); }
+
+    /**
+     * @brief Invoke @p visitor with each recovered DiagnosticArg in natural
+     *        forward order.
+     *
+     * @param visitor The callable, invoked as `visitor(DiagnosticArg const&)`.
+     *
+     * Each visited argument's string views refer into this reader's storage and
+     * are valid for as long as this reader outlives them.
+     */
+    template <typename Visitor>
+    void Visit(Visitor&& visitor) const
+    {
+        VisitDiagnosticRecords(_records, std::forward<Visitor>(visitor));
+    }
 
 private:
     std::vector<DiagnosticRecord> _records;
 };
-
-/**
- * @brief Recover diagnostic entries from the specified @p snapshot.
- *
- * @param snapshot The cloned diagnostic records to recover from.
- * @return The recovered diagnostic entries in natural forward order.
- *
- * The returned entries contain string views into the specified @p snapshot.
- */
-AC_COMMON_API std::vector<DiagnosticArg> RecoverRecords(std::span<DiagnosticRecord const> snapshot);
 
 #endif // ACORE_DIAGNOSTIC_READER_H

@@ -20,10 +20,9 @@
 
 #include "Errors.h"
 
+#include <algorithm>
 #include <cstddef>
-#include <limits>
 #include <type_traits>
-#include <utility>
 #include <vector>
 
 template <typename T>
@@ -41,16 +40,11 @@ public:
         ASSERT(capacity, "OverwritingRingBuffer capacity must be greater than zero");
     }
 
-    [[nodiscard]] std::size_t Capacity() const noexcept { return _storage.size(); }
     [[nodiscard]] std::size_t Size() const noexcept { return _size; }
     [[nodiscard]] std::size_t Position() const noexcept { return _position; }
-    [[nodiscard]] bool Empty() const noexcept { return !_size; }
 
     void Push(T const& value) noexcept
     {
-        ASSERT(!_storage.empty(), "OverwritingRingBuffer::Push called on an empty buffer");
-        ASSERT(_position != (std::numeric_limits<std::size_t>::max)(), "OverwritingRingBuffer position overflow");
-
         _storage[_head] = value;
         _head = (_head + 1) % _storage.size();
 
@@ -60,20 +54,15 @@ public:
         ++_position;
     }
 
-    template <typename... Args>
-    void Emplace(Args&&... args) noexcept
-    {
-        Push(T(std::forward<Args>(args)...));
-    }
-
     [[nodiscard]] std::vector<T> Snapshot() const
     {
         std::vector<T> snapshot;
         snapshot.reserve(_size);
 
         std::size_t const first = _size == _storage.size() ? _head : 0;
-        for (std::size_t i = 0; i < _size; ++i)
-            snapshot.push_back(_storage[(first + i) % _storage.size()]);
+        std::size_t const firstRun = std::min(_size, _storage.size() - first);
+        snapshot.insert(snapshot.end(), _storage.begin() + first, _storage.begin() + first + firstRun);
+        snapshot.insert(snapshot.end(), _storage.begin(), _storage.begin() + (_size - firstRun));
 
         return snapshot;
     }
