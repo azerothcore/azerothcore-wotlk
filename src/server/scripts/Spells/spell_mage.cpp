@@ -35,6 +35,7 @@ enum MageSpells
     SPELL_MAGE_MAGIC_ABSORPTION_MANA             = 29442,
     SPELL_MAGE_BURNOUT_TRIGGER                   = 44450,
     SPELL_MAGE_IMPROVED_BLIZZARD_CHILLED         = 12486,
+    SPELL_MAGE_BLIZZARD_TRIGGERED_R1             = 42208,
     SPELL_MAGE_COMBUSTION                        = 11129,
     SPELL_MAGE_COMBUSTION_PROC                   = 28682,
     SPELL_MAGE_COLD_SNAP                         = 11958,
@@ -1525,7 +1526,15 @@ class spell_mage_clearcasting : public AuraScript
     {
         SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
         if (!spellInfo)
-            return true;
+            return false;
+
+        SpellInfo const* firstRankSpell = spellInfo->GetFirstRankSpell();
+        bool const isBlizzardPeriodicTick = (eventInfo.GetTypeMask() & PROC_FLAG_DONE_PERIODIC) &&
+                                            firstRankSpell &&
+                                            firstRankSpell->Id == SPELL_MAGE_BLIZZARD_TRIGGERED_R1;
+
+        if (!isBlizzardPeriodicTick && !spellInfo->ManaCost && !spellInfo->ManaCostPercentage)
+            return false;
 
         // Missile Barrage has priority over Clearcasting for Arcane Missiles
         if (spellInfo->SpellFamilyName == SPELLFAMILY_MAGE && (spellInfo->SpellFamilyFlags[0] & 0x800))
