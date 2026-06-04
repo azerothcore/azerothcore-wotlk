@@ -26,4 +26,8 @@ choco install -y --skip-checksums "${INSTALL_ARGS[@]}"  cmake.install -y --insta
 choco install -y --skip-checksums "${INSTALL_ARGS[@]}"  visualstudio2022-workload-nativedesktop
 choco install -y --skip-checksums "${INSTALL_ARGS[@]}"  openssl --force --version=3.6.2
 choco install -y --skip-checksums "${INSTALL_ARGS[@]}"  boost-msvc-14.3 --force --version=1.87.0
-choco install -y --skip-checksums "${INSTALL_ARGS[@]}"  mysql --force --version=8.4.6
+if [[ $CONTINUOUS_INTEGRATION ]]; then
+    choco install -y --skip-checksums --no-progress mysql
+else
+    choco install -y --skip-checksums mysql --force
+fi
