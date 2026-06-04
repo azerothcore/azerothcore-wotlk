@@ -103,6 +103,30 @@
 //  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
 #include "GridNotifiersImpl.h"
 
+namespace
+{
+bool IsHealthDependentAuraState(AuraStateType auraState)
+{
+    return auraState == AURA_STATE_HEALTHLESS_35_PERCENT ||
+        auraState == AURA_STATE_HEALTH_ABOVE_75_PERCENT ||
+        auraState == AURA_STATE_HEALTHLESS_20_PERCENT;
+}
+
+void RecheckHealthDependentAuraState(Player* player, uint32 spellId)
+{
+    Aura* aura = player->GetAura(spellId);
+    if (!aura)
+        return;
+
+    AuraStateType auraState = AuraStateType(aura->GetSpellInfo()->CasterAuraState);
+    if (!IsHealthDependentAuraState(auraState) || player->HasAuraState(auraState))
+        return;
+
+    if (AuraApplication* application = aura->GetApplicationOfTarget(player->GetGUID()))
+        aura->HandleAllEffects(application, AURA_EFFECT_HANDLE_REAL, false);
+}
+}
+
 enum CharacterFlags
 {
     CHARACTER_FLAG_NONE                 = 0x00000000,
@@ -3015,7 +3039,11 @@ void Player::_addTalentAurasAndSpells(uint32 spellId)
     else if (spellInfo->IsPassive() || (spellInfo->HasAttribute(SPELL_ATTR0_DO_NOT_DISPLAY) && spellInfo->Stances))
     {
         if (IsNeedCastPassiveSpellAtLearn(spellInfo))
+        {
             CastSpell(this, spellId, true);
+            if (!isBeingLoaded())
+                RecheckHealthDependentAuraState(this, spellId);
+        }
     }
 }
 
@@ -3213,14 +3241,7 @@ bool Player::_addSpell(uint32 spellId, uint8 addSpecMask, bool temporary, bool l
     // xinef: unapply aura stats if dont meet requirements
     // xinef: handle only if player is not loaded, loading is handled in loadfromdb
     if (!isBeingLoaded())
-        if (Aura* aura = GetAura(spellId))
-        {
-            if (aura->GetSpellInfo()->CasterAuraState == AURA_STATE_HEALTHLESS_35_PERCENT ||
-                    aura->GetSpellInfo()->CasterAuraState == AURA_STATE_HEALTH_ABOVE_75_PERCENT ||
-                    aura->GetSpellInfo()->CasterAuraState == AURA_STATE_HEALTHLESS_20_PERCENT )
-                if (!HasAuraState((AuraStateType)aura->GetSpellInfo()->CasterAuraState))
-                    aura->HandleAllEffects(aura->GetApplicationOfTarget(GetGUID()), AURA_EFFECT_HANDLE_REAL, false);
-        }
+        RecheckHealthDependentAuraState(this, spellId);
 
     // pussywizard: update free primary prof points
     if (uint32 freeProfs = GetFreePrimaryProfessionPoints())
