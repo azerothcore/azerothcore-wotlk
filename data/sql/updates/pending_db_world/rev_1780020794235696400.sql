@@ -11,4 +11,4 @@ VALUES
     (253190, 7, 1666.394, 594.8594, 139.1098, NULL, 0, 0, 1, 1, 0, 100),
     (253190, 8, 1704.55, 579.4996, 140.3171, NULL, 0, 0, 1, 1, 0, 100);
 
-UPDATE `creature_template` SET `speed_run` = 1.71429 WHERE `entry` = 25319;
+UPDATE `creature_template` SET `speed_run` = 1.71429, `flags_extra` = `flags_extra` | 512 WHERE `entry` = 25319;

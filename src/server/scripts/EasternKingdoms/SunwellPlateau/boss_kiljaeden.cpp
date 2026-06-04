@@ -87,6 +87,9 @@ enum Spells
     // Misc
     SPELL_ANVEENA_ENERGY_DRAIN                  = 46410,
     SPELL_ARCANE_BOLT                           = 45670,
+    // TODO
+    // 45670 is an aura that triggers 45666; 45666 needs to be scripted
+    // SPELL_ARCANE_BOLT_DAMAGE                    = 45666,
     SPELL_RING_OF_BLUE_FLAMES                   = 45825,
     SPELL_SUMMON_BLUE_DRAKE                     = 45836,
     SPELL_VENGEANCE_OF_THE_BLUE_FLIGHT          = 45839,
@@ -175,6 +178,7 @@ struct npc_kiljaeden_controller : public NullCreatureAI
     void JustSummoned(Creature* summon) override
     {
         summons.Summon(summon);
+
         if (summon->GetEntry() == NPC_SINISTER_REFLECTION)
         {
             summon->m_Events.AddEventAtOffset([summon] {
@@ -187,6 +191,7 @@ struct npc_kiljaeden_controller : public NullCreatureAI
             summon->setActive(true);
             summon->SetCanFly(true);
             summon->SetDisableGravity(true);
+            summon->SetAnimTier(AnimTier::Fly);
             summon->GetMotionMaster()->MoveWaypoint(NPC_KALECGOS_KJ * 10, true);
             summon->AI()->DoAction(ACTION_START_AERIAL_SUPPORT);
         }
