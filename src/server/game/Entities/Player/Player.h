@@ -1334,7 +1334,6 @@ public:
     void AutoStoreLoot(uint8 bag, uint8 slot, uint32 loot_id, LootStore const& store, bool broadcast = false);
     void AutoStoreLoot(uint32 loot_id, LootStore const& store, bool broadcast = false) { AutoStoreLoot(NULL_BAG, NULL_SLOT, loot_id, store, broadcast); }
     LootItem* StoreLootItem(uint8 lootSlot, Loot* loot, InventoryResult& msg);
-    bool AutoTakeCreatureLoot(Creature* creature);
     void UpdateLootAchievements(LootItem* item, Loot* loot);
     void UpdateTitansGrip();
 
