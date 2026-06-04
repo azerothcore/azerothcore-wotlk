@@ -18,6 +18,18 @@ if(WIN32)
   set(Boost_USE_STATIC_LIBS        ON)
   set(Boost_USE_MULTITHREADED      ON)
   set(Boost_USE_STATIC_RUNTIME     OFF)
+
+  # Boost 1.81 maps vc143 only up to MSVC_VERSION 1939; MSVC 19.40-19.49 (VS 2022 17.10+)
+  # is ABI-compatible with vc143 but unrecognised by BoostDetectToolset-1.81.0.cmake.
+  # Pre-set both variables: Boost_COMPILER controls variant selection; BOOST_DETECTED_TOOLSET
+  # prevents the "toolset is unknown" message (the detect file does not reset it, only assigns
+  # it on a matched branch, so our value survives the include when no branch fires).
+  if(MSVC AND MSVC_VERSION GREATER_EQUAL 1940 AND MSVC_VERSION LESS 1950)
+    if(NOT DEFINED Boost_COMPILER)
+      set(Boost_COMPILER "vc143")
+    endif()
+    set(BOOST_DETECTED_TOOLSET "vc143")
+  endif()
 endif()
 
 set(Boost_NO_WARN_NEW_VERSIONS ON)
@@ -29,6 +41,30 @@ if (WIN32)
   set(BOOST_REQUIRED_VERSION 1.78)
 else()
   set(BOOST_REQUIRED_VERSION 1.74)
+endif()
+
+if (POLICY CMP0167)
+  cmake_policy(SET CMP0167 NEW)
+  # Windows pre-built Boost binaries place cmake config files under lib<arch>-msvc-<ver>/cmake/
+  # which is not in CMake's standard config-mode search path; auto-discover and set Boost_DIR.
+  if (WIN32 AND NOT DEFINED Boost_DIR)
+    set(_boost_hint "")
+    if (DEFINED Boost_ROOT)
+      set(_boost_hint "${Boost_ROOT}")
+    elseif (DEFINED ENV{Boost_ROOT})
+      set(_boost_hint "$ENV{Boost_ROOT}")
+    elseif (DEFINED ENV{BOOST_ROOT})
+      set(_boost_hint "$ENV{BOOST_ROOT}")
+    endif()
+    if (_boost_hint)
+      file(GLOB _boost_cmake_dirs "${_boost_hint}/lib*/cmake/Boost-*")
+      if (_boost_cmake_dirs)
+        list(GET _boost_cmake_dirs 0 Boost_DIR)
+      endif()
+      unset(_boost_cmake_dirs)
+    endif()
+    unset(_boost_hint)
+  endif()
 endif()
 
 # Boost.System is header-only since 1.69; do not require it explicitly.
