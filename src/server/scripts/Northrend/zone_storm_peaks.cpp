@@ -211,7 +211,10 @@ enum eTimeLost
     SPELL_TIME_LAPSE = 51020,
     SPELL_FROST_BREATH = 47425,
     SPELL_FROST_CLEAVE = 51857,
+};
 
+enum eTLPDActions
+{
     ACTION_TLPD_REVEAL = 1,
 };
 
@@ -227,6 +230,7 @@ public:
         void Reset() override
         {
             scheduler.CancelAll();
+            me->m_Events.KillAllEvents(false);
         }
 
         void DoAction(int32 action) override
