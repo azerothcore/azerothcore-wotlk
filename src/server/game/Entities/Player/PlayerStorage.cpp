@@ -6234,6 +6234,32 @@ Item* Player::_LoadMailedItem(ObjectGuid const& playerGuid, Player* player, uint
         return nullptr;
     }
 
+    // Rehydrate looters for BoP-tradeable mail items; only the LFG mail path writes this flag, gated on the same config.
+    if (item->IsBOPTradable() && sWorld->getBoolConfig(CONFIG_SET_BOP_ITEM_TRADEABLE))
+    {
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_ITEM_BOP_TRADE);
+        stmt->SetData(0, item->GetGUID().GetCounter());
+
+        if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
+        {
+            AllowedLooterSet looters;
+            for (std::string_view guidStr : Acore::Tokenize((*result)[0].Get<std::string_view>(), ' ', false))
+            {
+                if (Optional<ObjectGuid::LowType> guid = Acore::StringTo<ObjectGuid::LowType>(guidStr))
+                    looters.insert(ObjectGuid::Create<HighGuid::Player>(*guid));
+                else
+                    LOG_WARN("entities.player.loading", "Player::_LoadMailedItem: invalid item_soulbound_trade_data GUID '{}' for item {}. Skipped.", guidStr, item->GetGUID().ToString());
+            }
+
+            if (looters.size() > 1 && proto->GetMaxStackSize() == 1 && item->IsSoulBound())
+                item->SetSoulboundTradeable(looters);
+            else
+                item->RemoveFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_BOP_TRADEABLE);
+        }
+        else
+            item->RemoveFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_BOP_TRADEABLE);
+    }
+
     if (mail)
     {
         mail->AddItem(itemGuid, itemEntry);
