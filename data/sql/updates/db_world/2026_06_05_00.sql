@@ -1,3 +1,4 @@
+-- DB update 2026_06_02_03 -> 2026_06_05_00
 
 -- Update SAI (Lured Colossus)
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 20599;
