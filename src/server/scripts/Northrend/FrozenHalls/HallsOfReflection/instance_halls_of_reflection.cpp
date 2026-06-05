@@ -382,7 +382,11 @@ public:
                     if (Creature* leader = GetCreature(NPC_SYLVANAS_PART2))
                         leader->setActive(false);
                     if (Creature* lichKing = GetCreature(NPC_LICH_KING_BOSS))
+                    {
+                        lichKing->GetThreatMgr().ClearAllThreat();
+                        lichKing->CombatStop(true);
                         lichKing->setActive(false);
+                    }
                     _isLichKingFightActive = false;
                     _outroStep = 1;
                     _outroTimer = 0;

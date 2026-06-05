@@ -119,8 +119,10 @@ public:
 protected:
     bool DelCapturePoint();
 
-    // Active players in the area of the objective, 0 - alliance, 1 - horde
-    GuidUnorderedSet ActivePlayers[2];
+    // Active players in the area of the objective. Single set keyed by GUID:
+    // team is computed from Player::GetTeamId() at the point it is needed.
+    // Splitting by team here would desync if GetTeamId() changes mid-stay.
+    GuidUnorderedSet ActivePlayers;
 
     // Total shift needed to capture the objective
     float MaxValue;
@@ -169,18 +171,6 @@ public:
     // Set spirit service for the graveyard
     void SetSpirit(Creature* spirit, TeamId team);
 
-    // Add a player to the graveyard
-    void AddPlayer(ObjectGuid playerGuid);
-
-    // Remove a player from the graveyard
-    void RemovePlayer(ObjectGuid playerGuid);
-
-    // Resurrect players
-    void Resurrect();
-
-    // Move players waiting to that graveyard on the nearest one
-    void RelocateDeadPlayers();
-
     // Check if this graveyard has a spirit guide
     bool HasNpc(ObjectGuid guid)
     {
@@ -190,8 +180,7 @@ public:
         return (SpiritGuide[0] == guid || SpiritGuide[1] == guid);
     }
 
-    // Check if a player is in this graveyard's resurrect queue
-    bool HasPlayer(ObjectGuid guid) const { return ResurrectQueue.find(guid) != ResurrectQueue.end(); }
+    ObjectGuid GetSpiritGuide(TeamId team) const { return SpiritGuide[team]; }
 
     // Get the graveyard's ID.
     uint32 GetGraveyardId() const { return GraveyardId; }
@@ -200,7 +189,6 @@ protected:
     TeamId ControlTeam;
     uint32 GraveyardId;
     ObjectGuid SpiritGuide[2];
-    GuidUnorderedSet ResurrectQueue;
     Battlefield* Bf;
 };
 
@@ -291,6 +279,11 @@ public:
     Group* GetGroupPlayer(ObjectGuid guid, TeamId teamId);
     /// Force player to join a battlefield group
     bool AddOrSetPlayerToCorrectBfGroup(Player* player);
+
+    /// Auto-rejoin a player who relogged within the grace window after a mid-war
+    /// logout, via the normal join hooks. No-op without a pending logout marker.
+    /// Called from HandlePlayerEnterZone (which fires on the post-login zone set).
+    void TryRejoinAfterLogout(Player* player);
 
     // Graveyard methods
     // Find which graveyard the player must be teleported to to be resurrected by spiritguide
@@ -395,6 +388,10 @@ protected:
     GuidUnorderedSet PlayersInWar[PVP_TEAMS_COUNT];         // Players in WG combat
     PlayerTimerMap InvitedPlayers[PVP_TEAMS_COUNT];
     PlayerTimerMap PlayersWillBeKick[PVP_TEAMS_COUNT];
+    // Mid-war logouts: GUID -> timestamp until which a relog auto-rejoins the war.
+    PlayerTimerMap LogoutGracePlayers[PVP_TEAMS_COUNT];
+
+    static constexpr uint32 LOGOUT_GRACE_SECONDS = 120; // relog auto-rejoin window
 
     // Variables that must exist for each battlefield
     uint32 TypeId;                                          // See enum BattlefieldTypes
@@ -443,6 +440,8 @@ protected:
 
     /// Returns true if the player is already tracked as actively in the war or invited to join it.
     bool IsPlayerInWarOrInvited(Player* player) const;
+
+    void RemovePlayerFromTracking(ObjectGuid playerGuid);
 
     // Player-iteration helpers: resolve each GUID to a live Player* and call fn(player).
     // Using templates avoids std::function overhead and works naturally with lambdas.
