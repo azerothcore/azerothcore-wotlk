@@ -1592,6 +1592,7 @@ public:
     }
 };
 
+// 63238 Lightning Pillar
 class spell_thorim_lightning_pillar_P2_aura : public AuraScript
 {
     PrepareAuraScript(spell_thorim_lightning_pillar_P2_aura);
@@ -1609,6 +1610,7 @@ class spell_thorim_lightning_pillar_P2_aura : public AuraScript
     }
 };
 
+// 62976 Lightning Pillar
 class spell_thorim_lightning_pillar_P2 : public SpellScript
 {
     PrepareSpellScript(spell_thorim_lightning_pillar_P2);
@@ -1618,13 +1620,10 @@ class spell_thorim_lightning_pillar_P2 : public SpellScript
         if (Unit* caster = GetCaster())
         {
             std::list<Creature*> pillars;
-            caster->GetCreatureListWithEntryInGrid(pillars, NPC_PILLAR, GetSpellInfo()->GetMaxRange(GetSpellInfo()->IsPositive(), caster));
+            caster->GetCreatureListWithEntryInGrid(pillars, NPC_PILLAR, GetSpellInfo()->GetMaxRange());
 
             if (!pillars.empty())
-            {
-                Acore::Containers::RandomResize(pillars, 1);
-                target = pillars.front();
-            }
+                target = Acore::Containers::SelectRandomContainerElement(pillars);
         }
     }
 
