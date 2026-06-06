@@ -289,7 +289,7 @@ TEST_F(DiagnosticStreamTest, OverrunKeepsMostRecentRecordsInOrder)
     DiagnosticBuffer buffer(Capacity);
 
     for (std::uint64_t i = 0; i < PushCount; ++i)
-        buffer.Push(DiagnosticRecord("v", DiagnosticStoredValue(static_cast<uint64>(i))));
+        buffer.Emplace("v", static_cast<uint64>(i));
 
     std::vector<DiagnosticRecord> snapshot = Snapshot(buffer);
     std::vector<DiagnosticArg> entries = RecoverFrom(snapshot);
@@ -388,7 +388,7 @@ TEST(DiagnosticFuzzTest, OverrunRoundTripsMostRecentRecords)
                 }
             }
 
-            buffer.Push(DiagnosticRecord(name, value));
+            buffer.Emplace(name, value);
             pushed.emplace_back(name, value);
         }
 

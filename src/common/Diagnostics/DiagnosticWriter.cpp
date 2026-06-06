@@ -27,7 +27,7 @@ DiagnosticWriter::DiagnosticWriter(DiagnosticBuffer& buffer) noexcept :
 
 void DiagnosticWriter::WriteArgument(StringLiteralView name, bool value) noexcept
 {
-    _buffer->Push(DiagnosticRecord(name, DiagnosticStoredValue(value)));
+    _buffer->Emplace(name, value);
 }
 
 void DiagnosticWriter::WriteArgument(StringLiteralView name, int value) noexcept
@@ -42,22 +42,22 @@ void DiagnosticWriter::WriteArgument(StringLiteralView name, uint32 value) noexc
 
 void DiagnosticWriter::WriteArgument(StringLiteralView name, int64 value) noexcept
 {
-    _buffer->Push(DiagnosticRecord(name, DiagnosticStoredValue(value)));
+    _buffer->Emplace(name, value);
 }
 
 void DiagnosticWriter::WriteArgument(StringLiteralView name, uint64 value) noexcept
 {
-    _buffer->Push(DiagnosticRecord(name, DiagnosticStoredValue(value)));
+    _buffer->Emplace(name, value);
 }
 
 void DiagnosticWriter::WriteArgument(StringLiteralView name, double value) noexcept
 {
-    _buffer->Push(DiagnosticRecord(name, DiagnosticStoredValue(value)));
+    _buffer->Emplace(name, value);
 }
 
 void DiagnosticWriter::WriteArgument(StringLiteralView name, StringLiteralView value) noexcept
 {
-    _buffer->Push(DiagnosticRecord(name, DiagnosticStoredValue(value)));
+    _buffer->Emplace(name, value);
 }
 
 void DiagnosticWriter::WriteArgument(StringLiteralView name, std::string_view value) noexcept
@@ -68,5 +68,5 @@ void DiagnosticWriter::WriteArgument(StringLiteralView name, std::string_view va
     DiagnosticStaticString stored;
     stored.assign(value.data(), count);
 
-    _buffer->Push(DiagnosticRecord(name, DiagnosticStoredValue(stored)));
+    _buffer->Emplace(name, stored);
 }

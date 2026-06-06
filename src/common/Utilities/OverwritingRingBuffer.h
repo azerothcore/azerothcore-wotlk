@@ -22,7 +22,10 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <memory>
+#include <new>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 template <typename T>
@@ -34,23 +37,25 @@ class OverwritingRingBuffer
         "OverwritingRingBuffer snapshots and overwrites slots by value");
 
 public:
-    explicit OverwritingRingBuffer(std::size_t capacity) :
-        _storage(capacity)
+    explicit OverwritingRingBuffer(std::size_t capacity)
     {
         ASSERT(capacity, "OverwritingRingBuffer capacity must be greater than zero");
+        _storage = std::make_unique_for_overwrite<SlotStorage[]>(capacity);
+        _capacity = capacity;
     }
 
     [[nodiscard]] std::size_t Size() const noexcept { return _size; }
     [[nodiscard]] std::size_t Position() const noexcept { return _position; }
 
-    void Push(T const& value) noexcept
+    template <typename... Args>
+    void Emplace(Args&&... args)
     {
-        _storage[_head] = value;
-        _head = (_head + 1) % _storage.size();
-
-        if (_size < _storage.size())
+        if (_size < _capacity)
             ++_size;
 
+        std::construct_at(Slot(_head), std::forward<Args>(args)...);
+
+        _head = (_head + 1) % _capacity;
         ++_position;
     }
 
@@ -59,16 +64,36 @@ public:
         std::vector<T> snapshot;
         snapshot.reserve(_size);
 
-        std::size_t const first = _size == _storage.size() ? _head : 0;
-        std::size_t const firstRun = std::min(_size, _storage.size() - first);
-        snapshot.insert(snapshot.end(), _storage.begin() + first, _storage.begin() + first + firstRun);
-        snapshot.insert(snapshot.end(), _storage.begin(), _storage.begin() + (_size - firstRun));
+        std::size_t const first = _size == _capacity ? _head : 0;
+        std::size_t const contiguousCount = std::min(_size, _capacity - first);
+        if (contiguousCount)
+            snapshot.insert(snapshot.end(), Slot(first), Slot(first) + contiguousCount);
+
+        std::size_t const wrappedCount = _size - contiguousCount;
+        if (wrappedCount)
+            snapshot.insert(snapshot.end(), Slot(0), Slot(0) + wrappedCount);
 
         return snapshot;
     }
 
 private:
-    std::vector<T> _storage;
+    struct SlotStorage
+    {
+        alignas(T) std::byte bytes[sizeof(T)];
+    };
+
+    [[nodiscard]] T* Slot(std::size_t index) noexcept
+    {
+        return std::launder(reinterpret_cast<T*>(_storage[index].bytes));
+    }
+
+    [[nodiscard]] T const* Slot(std::size_t index) const noexcept
+    {
+        return std::launder(reinterpret_cast<T const*>(_storage[index].bytes));
+    }
+
+    std::unique_ptr<SlotStorage[]> _storage;
+    std::size_t _capacity = 0;
     std::size_t _head = 0;
     std::size_t _size = 0;
     std::size_t _position = 0;

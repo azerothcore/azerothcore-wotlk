@@ -20,12 +20,28 @@
 
 #include <vector>
 
+namespace
+{
+    struct NonDefaultConstructibleValue
+    {
+        NonDefaultConstructibleValue() = delete;
+        explicit NonDefaultConstructibleValue(int value) : Value(value) { }
+
+        int Value;
+    };
+
+    bool operator==(NonDefaultConstructibleValue const& left, NonDefaultConstructibleValue const& right)
+    {
+        return left.Value == right.Value;
+    }
+}
+
 TEST(OverwritingRingBufferTest, SnapshotReturnsValuesInWriteOrder)
 {
     OverwritingRingBuffer<int> buffer(3);
 
-    buffer.Push(1);
-    buffer.Push(2);
+    buffer.Emplace(1);
+    buffer.Emplace(2);
 
     EXPECT_EQ(buffer.Position(), 2u);
     EXPECT_EQ(buffer.Size(), 2u);
@@ -36,11 +52,11 @@ TEST(OverwritingRingBufferTest, OverwritesOldestValues)
 {
     OverwritingRingBuffer<int> buffer(3);
 
-    buffer.Push(1);
-    buffer.Push(2);
-    buffer.Push(3);
-    buffer.Push(4);
-    buffer.Push(5);
+    buffer.Emplace(1);
+    buffer.Emplace(2);
+    buffer.Emplace(3);
+    buffer.Emplace(4);
+    buffer.Emplace(5);
 
     EXPECT_EQ(buffer.Position(), 5u);
     EXPECT_EQ(buffer.Size(), 3u);
@@ -51,12 +67,26 @@ TEST(OverwritingRingBufferTest, SnapshotIsIndependent)
 {
     OverwritingRingBuffer<int> buffer(2);
 
-    buffer.Push(1);
+    buffer.Emplace(1);
     std::vector<int> snapshot = buffer.Snapshot();
 
-    buffer.Push(2);
-    buffer.Push(3);
+    buffer.Emplace(2);
+    buffer.Emplace(3);
 
     EXPECT_EQ(snapshot, std::vector<int>({ 1 }));
     EXPECT_EQ(buffer.Snapshot(), std::vector<int>({ 2, 3 }));
+}
+
+TEST(OverwritingRingBufferTest, EmplaceDoesNotRequireDefaultConstructibleValues)
+{
+    OverwritingRingBuffer<NonDefaultConstructibleValue> buffer(2);
+
+    buffer.Emplace(1);
+    buffer.Emplace(2);
+    buffer.Emplace(3);
+
+    EXPECT_EQ(buffer.Snapshot(), std::vector<NonDefaultConstructibleValue>({
+        NonDefaultConstructibleValue(2),
+        NonDefaultConstructibleValue(3)
+    }));
 }

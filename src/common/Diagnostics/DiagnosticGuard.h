@@ -22,8 +22,6 @@
 #include "DiagnosticWriter.h"
 #include "StringLiteralView.h"
 
-#include <cstddef>
-#include <string_view>
 #include <utility>
 
 class AC_COMMON_API DiagnosticGuard
@@ -50,13 +48,6 @@ public:
      * @param name The name of the argument.
      * @param value The value of the argument.
      */
-    template <std::size_t Size>
-    void Arg(StringLiteralView name, char const (&value)[Size]) noexcept
-    {
-        static_assert(Size > 0);
-        Arg(name, std::string_view(value, Size - 1));
-    }
-
     template <typename T>
     void Arg(StringLiteralView name, T&& value) noexcept
     {

@@ -27,6 +27,7 @@
 #include <cstddef>
 #include <string_view>
 #include <type_traits>
+#include <utility>
 #include <variant>
 
 inline constexpr std::size_t DiagnosticStaticStringCapacity = 64;
@@ -36,17 +37,10 @@ using DiagnosticStoredValue = std::variant<bool, int64, uint64, double, StringLi
 
 struct DiagnosticRecord
 {
-    // Default-constructed slots back the ring buffer's storage and are never
-    // read; StringLiteralView has no default constructor, so seed it with the
-    // empty literal.
-    DiagnosticRecord() noexcept :
-        name("")
-    {
-    }
-
-    DiagnosticRecord(StringLiteralView recordName, DiagnosticStoredValue const& recordValue) :
+    template <typename Value>
+    DiagnosticRecord(StringLiteralView recordName, Value&& recordValue) :
         name(recordName),
-        value(recordValue)
+        value(std::forward<Value>(recordValue))
     {
     }
 

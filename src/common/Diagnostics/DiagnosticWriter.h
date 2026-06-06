@@ -60,6 +60,13 @@ private:
     void WriteArgument(StringLiteralView name, StringLiteralView value) noexcept;
     void WriteArgument(StringLiteralView name, std::string_view value) noexcept;
 
+    template <std::size_t Size>
+    void WriteArgument(StringLiteralView name, char const (&value)[Size]) noexcept
+    {
+        static_assert(Size > 0);
+        WriteArgument(name, std::string_view(value, Size - 1));
+    }
+
     DiagnosticBuffer* _buffer = nullptr;
 };
 
