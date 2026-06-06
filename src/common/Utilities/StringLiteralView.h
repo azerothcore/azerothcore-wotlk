@@ -40,6 +40,11 @@ public:
     {
     }
 
+    constexpr StringLiteralView(StringLiteralView const&) noexcept = default;
+    constexpr StringLiteralView& operator=(StringLiteralView const&) noexcept = default;
+    constexpr StringLiteralView(StringLiteralView&&) noexcept = default;
+    constexpr StringLiteralView& operator=(StringLiteralView&&) noexcept = default;
+
     /**
      * @brief Return the address of the first character in this view.
      *

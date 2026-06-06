@@ -31,6 +31,7 @@
 #include <exception>
 #include <filesystem>
 #include <sstream>
+#include <vector>
 
 using namespace Acore::ChatCommands;
 
@@ -240,9 +241,9 @@ public:
 
         try
         {
-            DiagnosticReader reader = sDiagnostics->GetReader(diagnosticsName);
+            std::vector<DiagnosticRecord> records = sDiagnostics->Snapshot(diagnosticsName);
             std::filesystem::path path = MakeBattlefieldDiagnosticDumpPath(diagnosticsName);
-            std::size_t const entryCount = WriteDiagnosticDump(diagnosticsName, path, reader);
+            std::size_t const entryCount = WriteDiagnosticDump(diagnosticsName, path, records);
 
             handler->PSendSysMessage("Battlefield {} diagnostics dump written with {} entries: {}",
                 battleId, entryCount, path.string());

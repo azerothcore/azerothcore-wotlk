@@ -18,7 +18,6 @@
 #include "DiagnosticDump.h"
 #include "DiagnosticBuffer.h"
 #include "DiagnosticGuard.h"
-#include "DiagnosticReader.h"
 #include "DiagnosticWriter.h"
 #include "gtest/gtest.h"
 
@@ -67,40 +66,47 @@ namespace
         return value.data() >= begin && value.data() + value.size() <= end;
     }
 
-    std::vector<DiagnosticArg> RecoverFrom(std::vector<DiagnosticRecord> const& snapshot)
-    {
-        std::vector<DiagnosticArg> entries;
-        VisitDiagnosticRecords(snapshot, [&entries](DiagnosticArg const& entry) { entries.push_back(entry); });
-        return entries;
-    }
-
     std::vector<DiagnosticRecord> Snapshot(DiagnosticBuffer const& buffer)
     {
         return buffer.Snapshot();
     }
 
-    // Returns whether a recovered value equals the originally stored value,
-    // mapping the stored string types onto the recovered string view.
-    bool ValueMatches(DiagnosticValue const& recovered, DiagnosticStoredValue const& stored)
+    std::string_view AsView(StringLiteralView value) { return value; }
+    std::string_view AsView(DiagnosticStaticString const& value) { return { value.data(), value.size() }; }
+
+    // Returns the string view stored for a string-typed value, whether it was
+    // stored as a literal view or copied into the inline buffer.
+    std::string_view StoredText(DiagnosticStoredValue const& value)
     {
-        return std::visit([&recovered](auto const& value) -> bool
+        if (auto const* literal = std::get_if<StringLiteralView>(&value))
+            return AsView(*literal);
+        if (auto const* inlineText = std::get_if<DiagnosticStaticString>(&value))
+            return AsView(*inlineText);
+        return {};
+    }
+
+    // Returns whether two stored values hold the same alternative and value,
+    // comparing the string alternatives by their viewed contents.
+    bool StoredEquals(DiagnosticStoredValue const& left, DiagnosticStoredValue const& right)
+    {
+        if (left.index() != right.index())
+            return false;
+
+        return std::visit([&right](auto const& value) -> bool
         {
             using T = std::decay_t<decltype(value)>;
 
             if constexpr (std::is_same_v<T, StringLiteralView> || std::is_same_v<T, DiagnosticStaticString>)
-                return std::holds_alternative<std::string_view>(recovered)
-                    && std::get<std::string_view>(recovered) == DiagnosticStringView(value);
+                return AsView(value) == AsView(std::get<T>(right));
             else
-                return std::holds_alternative<T>(recovered) && std::get<T>(recovered) == value;
-        }, stored);
+                return value == std::get<T>(right);
+        }, left);
     }
 }
 
-TEST_F(DiagnosticStreamTest, EmptySnapshotRecoversNoEntries)
+TEST_F(DiagnosticStreamTest, EmptySnapshotHasNoEntries)
 {
-    std::vector<DiagnosticRecord> snapshot = Snapshot(Buffer());
-
-    EXPECT_TRUE(RecoverFrom(snapshot).empty());
+    EXPECT_TRUE(Snapshot(Buffer()).empty());
 }
 
 TEST_F(DiagnosticStreamTest, GuardStampsFunctionEntry)
@@ -111,23 +117,22 @@ TEST_F(DiagnosticStreamTest, GuardStampsFunctionEntry)
     }
 
     std::vector<DiagnosticRecord> snapshot = Snapshot(Buffer());
-    std::span<DiagnosticRecord const> snapshotRecords = snapshot;
-    std::vector<DiagnosticArg> entries = RecoverFrom(snapshot);
+    std::span<DiagnosticRecord const> records = snapshot;
 
-    ASSERT_EQ(entries.size(), 2u);
+    ASSERT_EQ(records.size(), 2u);
 
-    EXPECT_EQ(entries[0].name, "function");
-    std::string_view function = std::get<std::string_view>(entries[0].value);
+    EXPECT_EQ(AsView(records[0].name), "function");
+    std::string_view function = StoredText(records[0].value);
     EXPECT_EQ(function, "Scope");
     // The name is a string literal, so it is viewed in place and never copied
     // into the snapshot records.
-    EXPECT_FALSE(PointsInto(function, snapshotRecords));
+    EXPECT_FALSE(PointsInto(function, records));
 
-    EXPECT_EQ(entries[1].name, "answer");
-    EXPECT_EQ(std::get<int64>(entries[1].value), 11);
+    EXPECT_EQ(AsView(records[1].name), "answer");
+    EXPECT_EQ(std::get<int64>(records[1].value), 11);
 }
 
-TEST_F(DiagnosticStreamTest, RecoversSupportedArgumentValues)
+TEST_F(DiagnosticStreamTest, ReadsSupportedArgumentValues)
 {
     {
         DiagnosticGuard guard(Writer(), "Values");
@@ -142,35 +147,37 @@ TEST_F(DiagnosticStreamTest, RecoversSupportedArgumentValues)
     }
 
     std::vector<DiagnosticRecord> snapshot = Snapshot(Buffer());
-    std::span<DiagnosticRecord const> snapshotRecords = snapshot;
-    std::vector<DiagnosticArg> entries = RecoverFrom(snapshot);
+    std::span<DiagnosticRecord const> records = snapshot;
 
-    ASSERT_EQ(entries.size(), 7u);
-    EXPECT_EQ(entries[0].name, "function");
-    EXPECT_EQ(std::get<std::string_view>(entries[0].value), "Values");
+    ASSERT_EQ(records.size(), 7u);
+    EXPECT_EQ(AsView(records[0].name), "function");
+    EXPECT_EQ(StoredText(records[0].value), "Values");
 
-    EXPECT_EQ(entries[1].name, "false");
-    EXPECT_FALSE(PointsInto(entries[1].name, snapshotRecords));
-    EXPECT_EQ(std::get<bool>(entries[1].value), false);
+    EXPECT_EQ(AsView(records[1].name), "false");
+    EXPECT_FALSE(PointsInto(AsView(records[1].name), records));
+    EXPECT_EQ(std::get<bool>(records[1].value), false);
 
-    EXPECT_EQ(entries[2].name, "signed");
-    EXPECT_EQ(std::get<int64>(entries[2].value), -17);
+    EXPECT_EQ(AsView(records[2].name), "signed");
+    EXPECT_EQ(std::get<int64>(records[2].value), -17);
 
-    EXPECT_EQ(entries[3].name, "unsigned");
-    EXPECT_EQ(std::get<uint64>(entries[3].value), std::numeric_limits<uint64>::max());
+    EXPECT_EQ(AsView(records[3].name), "unsigned");
+    EXPECT_EQ(std::get<uint64>(records[3].value), std::numeric_limits<uint64>::max());
 
-    EXPECT_EQ(entries[4].name, "double");
-    EXPECT_EQ(std::get<double>(entries[4].value), 1.25);
+    EXPECT_EQ(AsView(records[4].name), "double");
+    EXPECT_EQ(std::get<double>(records[4].value), 1.25);
 
-    EXPECT_EQ(entries[5].name, "view");
-    std::string_view value = std::get<std::string_view>(entries[5].value);
+    EXPECT_EQ(AsView(records[5].name), "view");
+    std::string_view value = StoredText(records[5].value);
     EXPECT_EQ(value, "view-value");
-    EXPECT_TRUE(PointsInto(value, snapshotRecords));
+    // A std::string_view argument is copied into the inline buffer, so its view
+    // refers into the snapshot records.
+    EXPECT_TRUE(PointsInto(value, records));
 
-    EXPECT_EQ(entries[6].name, "literal");
-    std::string_view literalValue = std::get<std::string_view>(entries[6].value);
+    EXPECT_EQ(AsView(records[6].name), "literal");
+    std::string_view literalValue = StoredText(records[6].value);
     EXPECT_EQ(literalValue, "literal-value");
-    EXPECT_FALSE(PointsInto(literalValue, snapshotRecords));
+    // A literal argument is viewed in place and never copied into the records.
+    EXPECT_FALSE(PointsInto(literalValue, records));
 }
 
 TEST_F(DiagnosticStreamTest, ReturnsEntriesInForwardOrder)
@@ -185,18 +192,17 @@ TEST_F(DiagnosticStreamTest, ReturnsEntriesInForwardOrder)
         second.Arg("value", 2);
     }
 
-    std::vector<DiagnosticRecord> snapshot = Snapshot(Buffer());
-    std::vector<DiagnosticArg> entries = RecoverFrom(snapshot);
+    std::vector<DiagnosticRecord> records = Snapshot(Buffer());
 
-    ASSERT_EQ(entries.size(), 4u);
-    EXPECT_EQ(entries[0].name, "function");
-    EXPECT_EQ(std::get<std::string_view>(entries[0].value), "First");
-    EXPECT_EQ(entries[1].name, "value");
-    EXPECT_EQ(std::get<int64>(entries[1].value), 1);
-    EXPECT_EQ(entries[2].name, "function");
-    EXPECT_EQ(std::get<std::string_view>(entries[2].value), "Second");
-    EXPECT_EQ(entries[3].name, "value");
-    EXPECT_EQ(std::get<int64>(entries[3].value), 2);
+    ASSERT_EQ(records.size(), 4u);
+    EXPECT_EQ(AsView(records[0].name), "function");
+    EXPECT_EQ(StoredText(records[0].value), "First");
+    EXPECT_EQ(AsView(records[1].name), "value");
+    EXPECT_EQ(std::get<int64>(records[1].value), 1);
+    EXPECT_EQ(AsView(records[2].name), "function");
+    EXPECT_EQ(StoredText(records[2].value), "Second");
+    EXPECT_EQ(AsView(records[3].name), "value");
+    EXPECT_EQ(std::get<int64>(records[3].value), 2);
 }
 
 TEST_F(DiagnosticStreamTest, SnapshotIsIndependent)
@@ -206,19 +212,17 @@ TEST_F(DiagnosticStreamTest, SnapshotIsIndependent)
         first.Arg("value", 1);
     }
 
-    std::vector<DiagnosticRecord> snapshot = Snapshot(Buffer());
+    std::vector<DiagnosticRecord> records = Snapshot(Buffer());
 
     {
         DiagnosticGuard second(Writer(), "Second");
         second.Arg("value", 2);
     }
 
-    std::vector<DiagnosticArg> entries = RecoverFrom(snapshot);
-
-    ASSERT_EQ(entries.size(), 2u);
-    EXPECT_EQ(std::get<std::string_view>(entries[0].value), "First");
-    EXPECT_EQ(entries[1].name, "value");
-    EXPECT_EQ(std::get<int64>(entries[1].value), 1);
+    ASSERT_EQ(records.size(), 2u);
+    EXPECT_EQ(StoredText(records[0].value), "First");
+    EXPECT_EQ(AsView(records[1].name), "value");
+    EXPECT_EQ(std::get<int64>(records[1].value), 1);
 }
 
 TEST_F(DiagnosticStreamTest, OversizedArgumentIsTruncated)
@@ -232,20 +236,19 @@ TEST_F(DiagnosticStreamTest, OversizedArgumentIsTruncated)
         guard.Arg("after", 2);
     }
 
-    std::vector<DiagnosticRecord> snapshot = Snapshot(Buffer());
-    std::vector<DiagnosticArg> entries = RecoverFrom(snapshot);
+    std::vector<DiagnosticRecord> records = Snapshot(Buffer());
 
-    ASSERT_EQ(entries.size(), 4u);
-    EXPECT_EQ(entries[0].name, "function");
-    EXPECT_EQ(entries[1].name, "before");
-    EXPECT_EQ(std::get<int64>(entries[1].value), 1);
+    ASSERT_EQ(records.size(), 4u);
+    EXPECT_EQ(AsView(records[0].name), "function");
+    EXPECT_EQ(AsView(records[1].name), "before");
+    EXPECT_EQ(std::get<int64>(records[1].value), 1);
 
-    EXPECT_EQ(entries[2].name, "too_large");
-    std::string_view truncated = std::get<std::string_view>(entries[2].value);
+    EXPECT_EQ(AsView(records[2].name), "too_large");
+    std::string_view truncated = StoredText(records[2].value);
     EXPECT_EQ(truncated, std::string(DiagnosticStaticStringCapacity, 'x'));
 
-    EXPECT_EQ(entries[3].name, "after");
-    EXPECT_EQ(std::get<int64>(entries[3].value), 2);
+    EXPECT_EQ(AsView(records[3].name), "after");
+    EXPECT_EQ(std::get<int64>(records[3].value), 2);
 }
 
 TEST_F(DiagnosticStreamTest, WritesTextDump)
@@ -257,7 +260,6 @@ TEST_F(DiagnosticStreamTest, WritesTextDump)
     }
 
     std::vector<DiagnosticRecord> snapshot = Snapshot(Buffer());
-    DiagnosticReader reader(std::move(snapshot));
 
     std::filesystem::path path = std::filesystem::temp_directory_path() /
         ("acore-diagnostic-dump-" + std::to_string(std::chrono::steady_clock::now().time_since_epoch().count()) + ".txt");
@@ -265,7 +267,7 @@ TEST_F(DiagnosticStreamTest, WritesTextDump)
     std::error_code error;
     std::filesystem::remove(path, error);
 
-    EXPECT_EQ(WriteDiagnosticDump("test_stream", path, reader), 3u);
+    EXPECT_EQ(WriteDiagnosticDump("test_stream", path, snapshot), 3u);
 
     std::ifstream input(path, std::ios::binary);
     ASSERT_TRUE(input);
@@ -292,21 +294,20 @@ TEST_F(DiagnosticStreamTest, OverrunKeepsMostRecentRecordsInOrder)
     for (std::uint64_t i = 0; i < PushCount; ++i)
         buffer.Emplace(name, static_cast<uint64>(i));
 
-    std::vector<DiagnosticRecord> snapshot = Snapshot(buffer);
-    std::vector<DiagnosticArg> entries = RecoverFrom(snapshot);
+    std::vector<DiagnosticRecord> records = Snapshot(buffer);
 
     // The buffer wrapped, so only the most recent Capacity records survive,
     // and they must still read back in forward order.
-    ASSERT_EQ(entries.size(), Capacity);
-    for (std::size_t k = 0; k < entries.size(); ++k)
+    ASSERT_EQ(records.size(), Capacity);
+    for (std::size_t k = 0; k < records.size(); ++k)
     {
-        EXPECT_EQ(entries[k].name, "v");
-        EXPECT_EQ(std::get<uint64>(entries[k].value), PushCount - Capacity + k);
+        EXPECT_EQ(AsView(records[k].name), "v");
+        EXPECT_EQ(std::get<uint64>(records[k].value), PushCount - Capacity + k);
     }
 }
 
 // Randomised round-trip: across many wrapping buffers of random capacity and
-// random record streams, the recovered entries must always equal the most
+// random record streams, the read entries must always equal the most
 // recent min(pushed, capacity) records in forward order.  Uses <random> rather
 // than the project RNG so the run is reproducible from a printed seed; export
 // DIAGNOSTIC_FUZZ_SEED=<value> to replay a specific failure.
@@ -393,18 +394,17 @@ TEST(DiagnosticFuzzTest, OverrunRoundTripsMostRecentRecords)
             pushed.emplace_back(name, value);
         }
 
-        std::vector<DiagnosticRecord> snapshot = Snapshot(buffer);
-        std::vector<DiagnosticArg> entries = RecoverFrom(snapshot);
+        std::vector<DiagnosticRecord> records = Snapshot(buffer);
 
         std::size_t const expectedCount = std::min(pushCount, capacity);
-        ASSERT_EQ(entries.size(), expectedCount);
+        ASSERT_EQ(records.size(), expectedCount);
 
         std::size_t const offset = pushCount - expectedCount;
         for (std::size_t k = 0; k < expectedCount; ++k)
         {
             auto const& [name, value] = pushed[offset + k];
-            EXPECT_EQ(entries[k].name, static_cast<std::string_view>(name));
-            EXPECT_TRUE(ValueMatches(entries[k].value, value));
+            EXPECT_EQ(AsView(records[k].name), static_cast<std::string_view>(name));
+            EXPECT_TRUE(StoredEquals(records[k].value, value));
         }
     }
 }

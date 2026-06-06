@@ -21,6 +21,7 @@
 #include <iomanip>
 #include <stdexcept>
 #include <type_traits>
+#include <variant>
 
 namespace
 {
@@ -67,7 +68,7 @@ namespace
         output << '"';
     }
 
-    void WriteDiagnosticValue(std::ostream& output, DiagnosticValue const& value)
+    void WriteDiagnosticValue(std::ostream& output, DiagnosticStoredValue const& value)
     {
         std::visit([&output](auto const& v)
         {
@@ -75,26 +76,28 @@ namespace
 
             if constexpr (std::is_same_v<T, bool>)
                 output << (v ? "true" : "false");
-            else if constexpr (std::is_same_v<T, std::string_view>)
+            else if constexpr (std::is_same_v<T, StringLiteralView>)
                 WriteEscapedText(output, v);
+            else if constexpr (std::is_same_v<T, DiagnosticStaticString>)
+                WriteEscapedText(output, { v.data(), v.size() });
             else
                 output << v;
         }, value);
     }
 
-    void WriteDiagnosticEntry(std::ostream& output, DiagnosticArg const& entry)
+    void WriteDiagnosticEntry(std::ostream& output, DiagnosticRecord const& record)
     {
         output << "arg ";
-        WriteEscapedText(output, entry.name);
+        WriteEscapedText(output, record.name);
         output << " = ";
-        WriteDiagnosticValue(output, entry.value);
+        WriteDiagnosticValue(output, record.value);
         output << '\n';
     }
 }
 
-std::size_t WriteDiagnosticDump(std::string_view name, std::filesystem::path const& path, DiagnosticReader const& reader)
+std::size_t WriteDiagnosticDump(std::string_view name, std::filesystem::path const& path, std::span<DiagnosticRecord const> records)
 {
-    std::size_t const entryCount = reader.Size();
+    std::size_t const entryCount = records.size();
 
     if (!path.parent_path().empty())
         std::filesystem::create_directories(path.parent_path());
@@ -108,10 +111,8 @@ std::size_t WriteDiagnosticDump(std::string_view name, std::filesystem::path con
     output << '\n';
     output << "entries " << entryCount << "\n\n";
 
-    reader.Visit([&output](DiagnosticArg const& entry)
-    {
-        WriteDiagnosticEntry(output, entry);
-    });
+    for (DiagnosticRecord const& record : records)
+        WriteDiagnosticEntry(output, record);
 
     if (!output)
         throw std::runtime_error("failed to write diagnostics dump file");

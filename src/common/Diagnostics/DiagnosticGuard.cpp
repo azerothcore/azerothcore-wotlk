@@ -22,5 +22,5 @@
 DiagnosticGuard::DiagnosticGuard(DiagnosticWriter writer, StringLiteralView name) noexcept :
     _writer(std::move(writer))
 {
-    _writer.WriteArgument("function", name);
+    _writer.WriteArgument("FUNCTION", name);
 }

@@ -19,21 +19,23 @@
 #define ACORE_DIAGNOSTIC_DUMP_H
 
 #include "Define.h"
-#include "DiagnosticReader.h"
+#include "DiagnosticBuffer.h"
 
 #include <cstddef>
 #include <filesystem>
+#include <span>
 #include <string_view>
 
 /**
- * @brief Write a text dump of the specified diagnostic stream.
+ * @brief Write a text dump of the specified diagnostic @p records.
  *
  * @param name The diagnostic stream name to write in the dump header.
  * @param path The target dump file path.
- * @param reader The reader to drain into the dump.
+ * @param records The records to write, in forward order.
+ * @return The number of records written.
  *
  * The behavior is undefined unless @p name is non-empty.
  */
-[[nodiscard]] AC_COMMON_API std::size_t WriteDiagnosticDump(std::string_view name, std::filesystem::path const& path, DiagnosticReader const& reader);
+AC_COMMON_API std::size_t WriteDiagnosticDump(std::string_view name, std::filesystem::path const& path, std::span<DiagnosticRecord const> records);
 
 #endif // ACORE_DIAGNOSTIC_DUMP_H

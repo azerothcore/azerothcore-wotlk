@@ -43,7 +43,6 @@ TEST(OverwritingRingBufferTest, SnapshotReturnsValuesInWriteOrder)
     buffer.Emplace(1);
     buffer.Emplace(2);
 
-    EXPECT_EQ(buffer.Position(), 2u);
     EXPECT_EQ(buffer.Size(), 2u);
     EXPECT_EQ(buffer.Snapshot(), std::vector<int>({ 1, 2 }));
 }
@@ -58,7 +57,6 @@ TEST(OverwritingRingBufferTest, OverwritesOldestValues)
     buffer.Emplace(4);
     buffer.Emplace(5);
 
-    EXPECT_EQ(buffer.Position(), 5u);
     EXPECT_EQ(buffer.Size(), 3u);
     EXPECT_EQ(buffer.Snapshot(), std::vector<int>({ 3, 4, 5 }));
 }

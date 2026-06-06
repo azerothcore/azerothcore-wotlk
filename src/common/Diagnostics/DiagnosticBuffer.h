@@ -25,9 +25,7 @@
 #include <boost/static_string.hpp>
 
 #include <cstddef>
-#include <string_view>
 #include <type_traits>
-#include <utility>
 #include <variant>
 
 inline constexpr std::size_t DiagnosticStaticStringCapacity = 64;
@@ -37,13 +35,6 @@ using DiagnosticStoredValue = std::variant<bool, int64, uint64, double, StringLi
 
 struct DiagnosticRecord
 {
-    template <typename Value>
-    DiagnosticRecord(StringLiteralView recordName, Value&& recordValue) :
-        name(recordName),
-        value(std::forward<Value>(recordValue))
-    {
-    }
-
     StringLiteralView name;
     DiagnosticStoredValue value;
 };
@@ -55,15 +46,5 @@ static_assert(std::is_trivially_copyable_v<DiagnosticStaticString>);
 static_assert(std::is_trivially_copyable_v<DiagnosticStoredValue>);
 static_assert(std::is_trivially_copyable_v<DiagnosticRecord>);
 static_assert(std::is_trivially_destructible_v<DiagnosticRecord>);
-
-[[nodiscard]] inline std::string_view DiagnosticStringView(StringLiteralView value) noexcept
-{
-    return static_cast<std::string_view>(value);
-}
-
-[[nodiscard]] inline std::string_view DiagnosticStringView(DiagnosticStaticString const& value) noexcept
-{
-    return { value.data(), value.size() };
-}
 
 #endif // ACORE_DIAGNOSTIC_BUFFER_H

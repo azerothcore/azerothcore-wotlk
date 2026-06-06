@@ -16,7 +16,6 @@
  */
 
 #include "DiagnosticGuard.h"
-#include "DiagnosticReader.h"
 #include "Diagnostics.h"
 #include "gtest/gtest.h"
 
@@ -24,16 +23,6 @@
 #include <string_view>
 #include <variant>
 #include <vector>
-
-namespace
-{
-    std::vector<DiagnosticArg> Collect(DiagnosticReader const& reader)
-    {
-        std::vector<DiagnosticArg> entries;
-        reader.Visit([&entries](DiagnosticArg const& entry) { entries.push_back(entry); });
-        return entries;
-    }
-}
 
 TEST(DiagnosticsTest, WritersForSameNameUseSameBuffer)
 {
@@ -52,14 +41,13 @@ TEST(DiagnosticsTest, WritersForSameNameUseSameBuffer)
         guard.Arg("value", 2);
     }
 
-    DiagnosticReader reader = sDiagnostics->GetReader(name);
-    std::vector<DiagnosticArg> entries = Collect(reader);
+    std::vector<DiagnosticRecord> records = sDiagnostics->Snapshot(name);
 
-    ASSERT_EQ(entries.size(), 4u);
-    EXPECT_EQ(entries[1].name, "value");
-    EXPECT_EQ(std::get<int64>(entries[1].value), 1);
-    EXPECT_EQ(entries[3].name, "value");
-    EXPECT_EQ(std::get<int64>(entries[3].value), 2);
+    ASSERT_EQ(records.size(), 4u);
+    EXPECT_EQ(static_cast<std::string_view>(records[1].name), "value");
+    EXPECT_EQ(std::get<int64>(records[1].value), 1);
+    EXPECT_EQ(static_cast<std::string_view>(records[3].name), "value");
+    EXPECT_EQ(std::get<int64>(records[3].value), 2);
 }
 
 TEST(DiagnosticsTest, KeepsNamesIsolated)
@@ -77,20 +65,18 @@ TEST(DiagnosticsTest, KeepsNamesIsolated)
         guard.Arg("value", 2);
     }
 
-    DiagnosticReader firstReader = sDiagnostics->GetReader(firstName);
-    DiagnosticReader secondReader = sDiagnostics->GetReader(secondName);
-    std::vector<DiagnosticArg> firstEntries = Collect(firstReader);
-    std::vector<DiagnosticArg> secondEntries = Collect(secondReader);
+    std::vector<DiagnosticRecord> firstRecords = sDiagnostics->Snapshot(firstName);
+    std::vector<DiagnosticRecord> secondRecords = sDiagnostics->Snapshot(secondName);
 
-    ASSERT_FALSE(firstEntries.empty());
-    ASSERT_FALSE(secondEntries.empty());
-    EXPECT_EQ(firstEntries.back().name, "value");
-    EXPECT_EQ(std::get<int64>(firstEntries.back().value), 1);
-    EXPECT_EQ(secondEntries.back().name, "value");
-    EXPECT_EQ(std::get<int64>(secondEntries.back().value), 2);
+    ASSERT_FALSE(firstRecords.empty());
+    ASSERT_FALSE(secondRecords.empty());
+    EXPECT_EQ(static_cast<std::string_view>(firstRecords.back().name), "value");
+    EXPECT_EQ(std::get<int64>(firstRecords.back().value), 1);
+    EXPECT_EQ(static_cast<std::string_view>(secondRecords.back().name), "value");
+    EXPECT_EQ(std::get<int64>(secondRecords.back().value), 2);
 }
 
-TEST(DiagnosticsTest, ClonedReaderIsIndependent)
+TEST(DiagnosticsTest, ClonedSnapshotIsIndependent)
 {
     std::string name = "diagnostics_test_snapshot";
 
@@ -99,16 +85,14 @@ TEST(DiagnosticsTest, ClonedReaderIsIndependent)
         guard.Arg("value", 1);
     }
 
-    DiagnosticReader reader = sDiagnostics->GetReader(name);
+    std::vector<DiagnosticRecord> records = sDiagnostics->Snapshot(name);
 
     {
         DiagnosticGuard guard(sDiagnostics->GetWriter(name), "After");
         guard.Arg("value", 2);
     }
 
-    std::vector<DiagnosticArg> entries = Collect(reader);
-
-    ASSERT_FALSE(entries.empty());
-    EXPECT_EQ(entries.back().name, "value");
-    EXPECT_EQ(std::get<int64>(entries.back().value), 1);
+    ASSERT_FALSE(records.empty());
+    EXPECT_EQ(static_cast<std::string_view>(records.back().name), "value");
+    EXPECT_EQ(std::get<int64>(records.back().value), 1);
 }

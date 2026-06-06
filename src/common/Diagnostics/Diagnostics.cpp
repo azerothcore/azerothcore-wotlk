@@ -18,8 +18,6 @@
 #include "Diagnostics.h"
 #include "Errors.h"
 
-#include <functional>
-
 /*static*/ Diagnostics* Diagnostics::instance()
 {
     static Diagnostics instance;
@@ -28,29 +26,23 @@
 
 DiagnosticWriter Diagnostics::GetWriter(std::string_view name)
 {
-    std::lock_guard<std::mutex> guard(_buffersLock);
+    std::scoped_lock guard(_buffersLock);
 
     return DiagnosticWriter(GetOrCreate(name));
 }
 
-DiagnosticReader Diagnostics::GetReader(std::string_view name)
+std::vector<DiagnosticRecord> Diagnostics::Snapshot(std::string_view name)
 {
-    std::lock_guard<std::mutex> guard(_buffersLock);
+    std::scoped_lock guard(_buffersLock);
 
-    return DiagnosticReader(GetOrCreate(name).Snapshot());
-}
-
-std::size_t Diagnostics::TransparentStringHash::operator()(std::string_view value) const noexcept
-{
-    return std::hash<std::string_view>{}(value);
+    return GetOrCreate(name).Snapshot();
 }
 
 DiagnosticBuffer& Diagnostics::GetOrCreate(std::string_view name)
 {
     ASSERT(!name.empty(), "Diagnostics buffer name must not be empty");
 
-    if (auto itr = _buffers.find(name); itr != _buffers.end())
-        return itr->second;
-
+    // Cold path (a handful of named buffers), so the std::string key is
+    // constructed unconditionally rather than via a heterogeneous lookup.
     return _buffers.try_emplace(std::string(name), DefaultBufferRecords).first->second;
 }

@@ -44,8 +44,7 @@ public:
         _capacity = capacity;
     }
 
-    [[nodiscard]] std::size_t Size() const noexcept { return _size; }
-    [[nodiscard]] std::size_t Position() const noexcept { return _position; }
+    std::size_t Size() const noexcept { return _size; }
 
     template <typename... Args>
     void Emplace(Args&&... args)
@@ -53,10 +52,11 @@ public:
         if (_size < _capacity)
             ++_size;
 
-        std::construct_at(Slot(_head), std::forward<Args>(args)...);
+        // Construct directly on the raw storage: laundering before an object
+        // lives in the slot would be undefined on the first lap.
+        std::construct_at(reinterpret_cast<T*>(_storage[_head].bytes), std::forward<Args>(args)...);
 
         _head = (_head + 1) % _capacity;
-        ++_position;
     }
 
     [[nodiscard]] std::vector<T> Snapshot() const
@@ -82,11 +82,6 @@ private:
         alignas(T) std::byte bytes[sizeof(T)];
     };
 
-    [[nodiscard]] T* Slot(std::size_t index) noexcept
-    {
-        return std::launder(reinterpret_cast<T*>(_storage[index].bytes));
-    }
-
     [[nodiscard]] T const* Slot(std::size_t index) const noexcept
     {
         return std::launder(reinterpret_cast<T const*>(_storage[index].bytes));
@@ -96,7 +91,6 @@ private:
     std::size_t _capacity = 0;
     std::size_t _head = 0;
     std::size_t _size = 0;
-    std::size_t _position = 0;
 };
 
 #endif // ACORE_OVERWRITING_RING_BUFFER_H
