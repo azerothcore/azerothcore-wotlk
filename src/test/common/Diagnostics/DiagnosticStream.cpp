@@ -287,9 +287,10 @@ TEST_F(DiagnosticStreamTest, OverrunKeepsMostRecentRecordsInOrder)
     constexpr std::uint64_t PushCount = 10;
 
     DiagnosticBuffer buffer(Capacity);
+    StringLiteralView const name = "v";
 
     for (std::uint64_t i = 0; i < PushCount; ++i)
-        buffer.Emplace("v", static_cast<uint64>(i));
+        buffer.Emplace(name, static_cast<uint64>(i));
 
     std::vector<DiagnosticRecord> snapshot = Snapshot(buffer);
     std::vector<DiagnosticArg> entries = RecoverFrom(snapshot);

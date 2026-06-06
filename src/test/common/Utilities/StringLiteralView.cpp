@@ -42,6 +42,7 @@ namespace
     static_assert(std::is_copy_assignable_v<StringLiteralView>);
     static_assert(std::is_move_constructible_v<StringLiteralView>);
     static_assert(std::is_move_assignable_v<StringLiteralView>);
+    static_assert(std::is_trivially_copy_constructible_v<StringLiteralView>);
     static_assert(CopyAndAssignWorks());
 }
 
