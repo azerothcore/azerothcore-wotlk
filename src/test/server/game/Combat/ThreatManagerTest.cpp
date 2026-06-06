@@ -1155,8 +1155,12 @@ TEST_F(ThreatManagerIntegrationTest,
 
     // Verify B's ref starts as ONLINE
     for (ThreatReference const* ref : _creatureA->TestGetThreatMgr().GetUnsortedThreatList())
+    {
         if (ref->GetVictim() == _creatureB)
+        {
             EXPECT_TRUE(ref->IsOnline());
+        }
+    }
 
     // Make B immune to physical damage (A's melee school is SPELL_SCHOOL_MASK_NORMAL)
     // This triggers ShouldBeSuppressed via IsImmunedToDamage
@@ -1195,8 +1199,12 @@ TEST_F(ThreatManagerIntegrationTest,
 
     // Verify suppressed
     for (ThreatReference const* ref : _creatureA->TestGetThreatMgr().GetUnsortedThreatList())
+    {
         if (ref->GetVictim() == _creatureB)
+        {
             EXPECT_TRUE(ref->IsSuppressed());
+        }
+    }
 
     // Remove immunity
     _creatureB->ApplySpellImmune(1, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, false);
@@ -1204,8 +1212,12 @@ TEST_F(ThreatManagerIntegrationTest,
     // EvaluateSuppressed with canExpire=false should NOT restore to online
     _creatureB->TestGetThreatMgr().EvaluateSuppressed(false);
     for (ThreatReference const* ref : _creatureA->TestGetThreatMgr().GetUnsortedThreatList())
+    {
         if (ref->GetVictim() == _creatureB)
+        {
             EXPECT_TRUE(ref->IsSuppressed()); // still suppressed
+        }
+    }
 
     // EvaluateSuppressed with canExpire=true SHOULD restore to online
     _creatureB->TestGetThreatMgr().EvaluateSuppressed(true);
@@ -1234,8 +1246,12 @@ TEST_F(ThreatManagerIntegrationTest,
 
     // Taunted victims should never be suppressed (ShouldBeSuppressed returns false)
     for (ThreatReference const* ref : _creatureA->TestGetThreatMgr().GetUnsortedThreatList())
+    {
         if (ref->GetVictim() == _creatureB)
+        {
             EXPECT_TRUE(ref->IsOnline());
+        }
+    }
 
     // Cleanup
     _creatureA->TestGetThreatMgr().SetTauntStateForTesting(
@@ -1260,11 +1276,19 @@ TEST_F(ThreatManagerIntegrationTest,
 
     // Both refs should be suppressed
     for (ThreatReference const* ref : _creatureA->TestGetThreatMgr().GetUnsortedThreatList())
+    {
         if (ref->GetVictim() == _creatureB)
+        {
             EXPECT_TRUE(ref->IsSuppressed());
+        }
+    }
     for (ThreatReference const* ref : creatureC->TestGetThreatMgr().GetUnsortedThreatList())
+    {
         if (ref->GetVictim() == _creatureB)
+        {
             EXPECT_TRUE(ref->IsSuppressed());
+        }
+    }
 
     // Remove immunity and expire
     _creatureB->ApplySpellImmune(1, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, false);
@@ -1272,11 +1296,19 @@ TEST_F(ThreatManagerIntegrationTest,
 
     // Both should be online again
     for (ThreatReference const* ref : _creatureA->TestGetThreatMgr().GetUnsortedThreatList())
+    {
         if (ref->GetVictim() == _creatureB)
+        {
             EXPECT_TRUE(ref->IsOnline());
+        }
+    }
     for (ThreatReference const* ref : creatureC->TestGetThreatMgr().GetUnsortedThreatList())
+    {
         if (ref->GetVictim() == _creatureB)
+        {
             EXPECT_TRUE(ref->IsOnline());
+        }
+    }
 
     creatureC->CleanupCombatState();
     delete creatureC;
@@ -2073,8 +2105,12 @@ TEST_F(ThreatManagerIntegrationTest,
 
     // Verify B is SUPPRESSED
     for (ThreatReference const* ref : _creatureA->TestGetThreatMgr().GetUnsortedThreatList())
+    {
         if (ref->GetVictim() == _creatureB)
+        {
             EXPECT_TRUE(ref->IsSuppressed());
+        }
+    }
 
     // Remove immunity (but do NOT call EvaluateSuppressed)
     _creatureB->ApplySpellImmune(1, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, false);
@@ -2111,8 +2147,12 @@ TEST_F(ThreatManagerIntegrationTest,
     _creatureA->TestGetThreatMgr().AddThreat(_creatureB, 50.0f, nullptr, true);
 
     for (ThreatReference const* ref : _creatureA->TestGetThreatMgr().GetUnsortedThreatList())
+    {
         if (ref->GetVictim() == _creatureB)
+        {
             EXPECT_TRUE(ref->IsSuppressed());
+        }
+    }
 
     // Threat should be unchanged (AddThreat skips non-online refs)
     EXPECT_FLOAT_EQ(
