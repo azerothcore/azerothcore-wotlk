@@ -276,9 +276,9 @@ TEST_F(DiagnosticStreamTest, WritesTextDump)
 
     EXPECT_NE(dump.find("diagnostics \"test_stream\""), std::string::npos);
     EXPECT_NE(dump.find("entries 3"), std::string::npos);
-    EXPECT_NE(dump.find("arg \"FUNCTION\" = \"Dump\""), std::string::npos);
-    EXPECT_NE(dump.find("arg \"answer\" = 42"), std::string::npos);
-    EXPECT_NE(dump.find("arg \"text\" = \"hello\\nthere\""), std::string::npos);
+    EXPECT_NE(dump.find("\"FUNCTION\" = \"Dump\""), std::string::npos);
+    EXPECT_NE(dump.find("\"answer\" = 42"), std::string::npos);
+    EXPECT_NE(dump.find("\"text\" = \"hello\\nthere\""), std::string::npos);
 
     std::filesystem::remove(path, error);
 }

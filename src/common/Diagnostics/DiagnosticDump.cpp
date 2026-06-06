@@ -90,7 +90,7 @@ std::size_t WriteDiagnosticDump(std::string_view name, std::filesystem::path con
     fmt::format_to(out, "diagnostics {}\nentries {}\n\n", EscapeText(name), entryCount);
 
     for (DiagnosticRecord const& record : records)
-        fmt::format_to(out, "arg {} = {}\n", EscapeText(record.name), FormatValue(record.value));
+        fmt::format_to(out, "{} = {}\n", EscapeText(record.name), FormatValue(record.value));
 
     if (!output)
         throw std::runtime_error("failed to write diagnostics dump file");
