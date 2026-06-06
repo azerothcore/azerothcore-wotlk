@@ -281,6 +281,7 @@ public:
     bool IsEnabled() const { return Enabled; }
     bool SetDiagnosticsEnabled(std::string_view name, bool enable);
     bool IsDiagnosticsEnabled() const { return _diagnosticWriter.has_value(); }
+    [[nodiscard]] BattlefieldDiagnosticTrace Trace(StringLiteralView name) const;
 
     /**
      * \brief Kick player from battlefield and teleport him to kick-point location
@@ -412,8 +413,6 @@ public:
     void InitStalker(uint32 entry, float x, float y, float z, float o);
 
 protected:
-    [[nodiscard]] BattlefieldDiagnosticTrace Trace(StringLiteralView name) const;
-
     ObjectGuid StalkerGuid;
     uint32 Timer;                                           // Global timer for event
     bool Enabled;
