@@ -32,9 +32,6 @@ class TestSpellEntryHelper
 public:
     TestSpellEntryHelper()
     {
-        // Zero initialize all fields
-        std::memset(&_entry, 0, sizeof(_entry));
-
         // Set safe defaults
         _entry.EquippedItemClass = -1;
         _entry.SchoolMask = SPELL_SCHOOL_MASK_NORMAL;
@@ -147,7 +144,7 @@ public:
     }
 
 private:
-    SpellEntry _entry;
+    SpellEntry _entry{};
 };
 
 /**

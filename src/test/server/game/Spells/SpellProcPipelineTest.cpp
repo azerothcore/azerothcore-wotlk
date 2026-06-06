@@ -242,9 +242,8 @@ TEST_F(SpellProcPipelineTest, Scenario_OmenOfClarity)
             procCount++;
     }
 
-    // With deterministic rolls, should have 3 procs (indexes 0, 4, 8)
-    // But our test is roll > chance check, so roll 10 fails against 25% chance
-    // Actually roll 0 always passes, non-zero rolls check roll > chance
+    // With deterministic rolls, should have 3 procs (indexes 0, 4, 8).
+    EXPECT_EQ(procCount, 3);
 }
 
 TEST_F(SpellProcPipelineTest, Scenario_LeaderOfThePack)
