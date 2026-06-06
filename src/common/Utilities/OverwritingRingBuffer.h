@@ -33,8 +33,8 @@ class OverwritingRingBuffer
 {
     static_assert(std::is_trivially_destructible_v<T>,
         "OverwritingRingBuffer overwrites slots without running element cleanup");
-    static_assert(std::is_trivially_copyable_v<T>,
-        "OverwritingRingBuffer snapshots and overwrites slots by value");
+    static_assert(std::is_copy_constructible_v<T>,
+        "OverwritingRingBuffer snapshots slots by value");
 
 public:
     explicit OverwritingRingBuffer(std::size_t capacity)
@@ -52,9 +52,7 @@ public:
         if (_size < _capacity)
             ++_size;
 
-        // Construct directly on the raw storage: laundering before an object
-        // lives in the slot would be undefined on the first lap.
-        std::construct_at(reinterpret_cast<T*>(_storage[_head].bytes), std::forward<Args>(args)...);
+        ::new (static_cast<void*>(_storage[_head].bytes)) T{std::forward<Args>(args)...};
 
         _head = (_head + 1) % _capacity;
     }

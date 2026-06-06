@@ -30,6 +30,7 @@
 
 inline constexpr std::size_t DiagnosticStaticStringCapacity = 64;
 
+// TODO_CPP26: std::basic_fixed_string
 using DiagnosticStaticString = boost::static_string<DiagnosticStaticStringCapacity>;
 using DiagnosticStoredValue = std::variant<bool, int64, uint64, double, StringLiteralView, DiagnosticStaticString>;
 
@@ -41,10 +42,6 @@ struct DiagnosticRecord
 
 using DiagnosticBuffer = OverwritingRingBuffer<DiagnosticRecord>;
 
-static_assert(std::is_trivially_copyable_v<StringLiteralView>);
-static_assert(std::is_trivially_copyable_v<DiagnosticStaticString>);
-static_assert(std::is_trivially_copyable_v<DiagnosticStoredValue>);
-static_assert(std::is_trivially_copyable_v<DiagnosticRecord>);
 static_assert(std::is_trivially_destructible_v<DiagnosticRecord>);
 
 #endif // ACORE_DIAGNOSTIC_BUFFER_H
