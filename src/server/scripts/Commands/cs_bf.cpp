@@ -36,7 +36,6 @@ using namespace Acore::ChatCommands;
 
 namespace
 {
-    // Only ever touched on the world-update thread (GM-only dump command).
     uint32 BattlefieldDiagnosticsDumpSerial = 0;
 
     char const* GetBattlefieldDiagnosticsName(uint32 battleId)
@@ -99,7 +98,7 @@ public:
         static ChatCommandTable diagnosticsCommandTable =
         {
             { "",     HandleBattlefieldDiagnostics,     rbac::RBAC_PERM_COMMAND_BF_ENABLE, Console::Yes },
-            { "dump", HandleBattlefieldDiagnosticsDump, rbac::RBAC_PERM_COMMAND_BF_ENABLE, Console::No }
+            { "dump", HandleBattlefieldDiagnosticsDump, rbac::RBAC_PERM_COMMAND_BF_ENABLE, Console::Yes }
         };
         static ChatCommandTable battlefieldcommandTable =
         {
@@ -239,9 +238,6 @@ public:
             return false;
         }
 
-        // GM-only command, so this runs on the world-update thread: the same
-        // context that writes the diagnostics buffer. The snapshot and dump can
-        // therefore be taken synchronously without racing live tracing.
         try
         {
             DiagnosticReader reader = sDiagnostics->GetReader(diagnosticsName);
