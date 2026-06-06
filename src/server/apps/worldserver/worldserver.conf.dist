@@ -2207,6 +2207,34 @@ Rate.MissChanceMultiplier.TargetPlayer = 7
 Rate.MissChanceMultiplier.OnlyAffectsPlayer = 0
 
 #
+#    GlyphLevelReq.Enable
+#
+#       Description: Enables configurable glyph slot level requirements.
+#       Default:     0 - Disabled, use stock WotLK/AzerothCore requirements.
+#                    1 - Enabled, use GlyphLevelReq.Slot*.Level values.
+#
+#       Description: Minimum character level required to unlock each glyph slot.
+#                    These are server-side slot indexes, 0 through 5. Client-side slot values are handled as 1 through 6.
+#       Default:     GlyphLevelReq.Slot0.Level = 15
+#                    GlyphLevelReq.Slot1.Level = 15
+#                    GlyphLevelReq.Slot2.Level = 50
+#                    GlyphLevelReq.Slot3.Level = 30
+#                    GlyphLevelReq.Slot4.Level = 70
+#                    GlyphLevelReq.Slot5.Level = 80
+#                    Note: This does NOT change stock Blizzard tooltip text like: "Unlocked at level 80".
+#                    The client-side UI handles the glyph slot text and the level at which the glyph tab becomes visible.
+#                    
+
+GlyphLevelReq.Enable = 0
+
+GlyphLevelReq.Slot0.Level = 15
+GlyphLevelReq.Slot1.Level = 15
+GlyphLevelReq.Slot2.Level = 50
+GlyphLevelReq.Slot3.Level = 30
+GlyphLevelReq.Slot4.Level = 70
+GlyphLevelReq.Slot5.Level = 80
+
+#
 #     LevelReq.Trade
 #        Description: Level requirement for characters to be able to initiate a trade.
 #        Default:     1
