@@ -1039,42 +1039,51 @@ void BattlegroundQueue::BattlegroundQueueAnnouncerUpdate(uint32 diff, Battlegrou
         return;
     }
 
-    if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_TIMED))
-    {
-        uint32 qPlayers = 0;
+    // The armed per-bracket timer drives both Timed mode and the deferred
+    // immediate-mode world announcement. They are mutually exclusive by config;
+    // the per-bracket spam-window/Limit throttle is consulted only in immediate
+    // mode (Timed mode keeps its original behaviour).
+    bool const isTimed = sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_TIMED);
 
-        if (_queueAnnouncementCrossfactioned)
+    uint32 qPlayers = 0;
+
+    if (_queueAnnouncementCrossfactioned)
+    {
+        qPlayers = GetPlayersCountInGroupsQueue(bracket_id, BG_QUEUE_CFBG);
+    }
+    else
+    {
+        qPlayers = GetPlayersCountInGroupsQueue(bracket_id, BG_QUEUE_NORMAL_HORDE) + GetPlayersCountInGroupsQueue(bracket_id, BG_QUEUE_NORMAL_ALLIANCE);
+    }
+
+    if (!qPlayers)
+    {
+        _queueAnnouncementTimer[bracket_id] = -1;
+        return;
+    }
+
+    if (_queueAnnouncementTimer[bracket_id] >= 0)
+    {
+        if (_queueAnnouncementTimer[bracket_id] <= static_cast<int32>(diff))
         {
-            qPlayers = GetPlayersCountInGroupsQueue(bracket_id, BG_QUEUE_CFBG);
+            _queueAnnouncementTimer[bracket_id] = -1;
+
+            uint32 q_min_level = std::min(bracketEntry->minLevel, (uint32) 80);
+
+            if (!isTimed && !sBGSpam->CanAnnounce(bg_template, bracket_id, q_min_level, qPlayers))
+            {
+                return;
+            }
+
+            auto bgName = bg_template->GetName();
+            uint32 MaxPlayers = GetMinPlayersPerTeam(bg_template, bracketEntry) * 2;
+            uint32 q_max_level = std::min(bracketEntry->maxLevel, (uint32) 80);
+
+            ChatHandler(nullptr).SendWorldTextOptional(LANG_BG_QUEUE_ANNOUNCE_WORLD, ANNOUNCER_FLAG_DISABLE_BG_QUEUE, bgName.c_str(), q_min_level, q_max_level, qPlayers, MaxPlayers);
         }
         else
         {
-            qPlayers = GetPlayersCountInGroupsQueue(bracket_id, BG_QUEUE_NORMAL_HORDE) + GetPlayersCountInGroupsQueue(bracket_id, BG_QUEUE_NORMAL_ALLIANCE);
-        }
-
-        if (!qPlayers)
-        {
-            _queueAnnouncementTimer[bracket_id] = -1;
-            return;
-        }
-
-        if (_queueAnnouncementTimer[bracket_id] >= 0)
-        {
-            if (_queueAnnouncementTimer[bracket_id] <= static_cast<int32>(diff))
-            {
-                _queueAnnouncementTimer[bracket_id] = -1;
-
-                auto bgName = bg_template->GetName();
-                uint32 MaxPlayers = GetMinPlayersPerTeam(bg_template, bracketEntry) * 2;
-                uint32 q_min_level = std::min(bracketEntry->minLevel, (uint32) 80);
-                uint32 q_max_level = std::min(bracketEntry->maxLevel, (uint32) 80);
-
-                ChatHandler(nullptr).SendWorldTextOptional(LANG_BG_QUEUE_ANNOUNCE_WORLD, ANNOUNCER_FLAG_DISABLE_BG_QUEUE, bgName.c_str(), q_min_level, q_max_level, qPlayers, MaxPlayers);
-            }
-            else
-            {
-                _queueAnnouncementTimer[bracket_id] -= static_cast<int32>(diff);
-            }
+            _queueAnnouncementTimer[bracket_id] -= static_cast<int32>(diff);
         }
     }
 }
@@ -1145,12 +1154,14 @@ void BattlegroundQueue::SendMessageBGQueue(Player* leader, Battleground* bg, PvP
         }
         else
         {
-            if (!sBGSpam->CanAnnounce(leader, bg, q_min_level, qTotal))
+            // Collapse a same-tick queue burst into a single deferred line: the
+            // first join arms the per-bracket debounce, the rest are no-ops. The
+            // aggregated line (with post-burst total + spam-window/Limit gating)
+            // is emitted by BattlegroundQueueAnnouncerUpdate on the next pass.
+            if (_queueAnnouncementTimer[bracketId] < 0)
             {
-                return;
+                SetQueueAnnouncementTimer(bracketId, BG_QUEUE_ANNOUNCER_IMMEDIATE_DEBOUNCE, false);
             }
-
-            ChatHandler(nullptr).SendWorldTextOptional(LANG_BG_QUEUE_ANNOUNCE_WORLD, ANNOUNCER_FLAG_DISABLE_BG_QUEUE, bgName.c_str(), q_min_level, q_max_level, qAlliance + qHorde, MaxPlayers);
         }
     }
 }
