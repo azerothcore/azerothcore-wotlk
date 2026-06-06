@@ -1039,10 +1039,8 @@ void BattlegroundQueue::BattlegroundQueueAnnouncerUpdate(uint32 diff, Battlegrou
         return;
     }
 
-    // The armed per-bracket timer drives both Timed mode and the deferred
-    // immediate-mode world announcement. They are mutually exclusive by config;
-    // the per-bracket spam-window/Limit throttle is consulted only in immediate
-    // mode (Timed mode keeps its original behaviour).
+    // Armed per-bracket timer drives both Timed mode and the deferred immediate
+    // announcement; the spam-window/Limit throttle gates only immediate mode.
     bool const isTimed = sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_TIMED);
 
     uint32 qPlayers = 0;
@@ -1154,10 +1152,8 @@ void BattlegroundQueue::SendMessageBGQueue(Player* leader, Battleground* bg, PvP
         }
         else
         {
-            // Collapse a same-tick queue burst into a single deferred line: the
-            // first join arms the per-bracket debounce, the rest are no-ops. The
-            // aggregated line (with post-burst total + spam-window/Limit gating)
-            // is emitted by BattlegroundQueueAnnouncerUpdate on the next pass.
+            // Arm the per-bracket debounce; first join arms, rest are no-ops.
+            // BattlegroundQueueAnnouncerUpdate emits the aggregated line later.
             if (_queueAnnouncementTimer[bracketId] < 0)
             {
                 SetQueueAnnouncementTimer(bracketId, BG_QUEUE_ANNOUNCER_IMMEDIATE_DEBOUNCE, false);

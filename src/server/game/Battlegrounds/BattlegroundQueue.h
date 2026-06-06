@@ -27,10 +27,8 @@
 
 constexpr auto COUNT_OF_PLAYERS_TO_AVERAGE_WAIT_TIME = 10;
 
-// Tiny debounce (ms) used by the immediate-mode world announcer: arming the
-// per-bracket timer with this value makes it fire on the next periodic announcer
-// pass, by which point the whole same-tick queue burst has been collapsed into
-// one aggregated line.
+// Immediate-mode announcer debounce (ms): fires on the next periodic pass, by
+// which point a same-tick queue burst has collapsed into one aggregated line.
 constexpr int32 BG_QUEUE_ANNOUNCER_IMMEDIATE_DEBOUNCE = 1;
 
 struct GroupQueueInfo                                       // stores information about the group in queue (also used when joined as solo!)
