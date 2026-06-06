@@ -17,81 +17,61 @@
 
 #include "DiagnosticDump.h"
 
+#include <fmt/format.h>
+
 #include <fstream>
-#include <iomanip>
+#include <iterator>
 #include <stdexcept>
+#include <string>
 #include <type_traits>
 #include <variant>
 
 namespace
 {
-    void WriteEscapedText(std::ostream& output, std::string_view value)
+    // Returns @p value as a double-quoted, escaped string literal.
+    std::string EscapeText(std::string_view value)
     {
-        output << '"';
+        std::string result;
+        result.reserve(value.size() + 2);
+        result += '"';
 
         for (unsigned char ch : value)
         {
             switch (ch)
             {
-                case '\\':
-                    output << "\\\\";
-                    break;
-                case '"':
-                    output << "\\\"";
-                    break;
-                case '\n':
-                    output << "\\n";
-                    break;
-                case '\r':
-                    output << "\\r";
-                    break;
-                case '\t':
-                    output << "\\t";
-                    break;
+                case '\\': result += "\\\\"; break;
+                case '"':  result += "\\\""; break;
+                case '\n': result += "\\n"; break;
+                case '\r': result += "\\r"; break;
+                case '\t': result += "\\t"; break;
                 default:
                     if (ch < 0x20 || ch == 0x7F)
-                    {
-                        output << "\\x"
-                            << std::hex
-                            << std::setw(2)
-                            << std::setfill('0')
-                            << static_cast<uint32>(ch)
-                            << std::dec
-                            << std::setfill(' ');
-                    }
+                        fmt::format_to(std::back_inserter(result), "\\x{:02x}", ch);
                     else
-                        output << static_cast<char>(ch);
+                        result += static_cast<char>(ch);
                     break;
             }
         }
 
-        output << '"';
+        result += '"';
+        return result;
     }
 
-    void WriteDiagnosticValue(std::ostream& output, DiagnosticStoredValue const& value)
+    std::string FormatValue(DiagnosticStoredValue const& value)
     {
-        std::visit([&output](auto const& v)
+        return std::visit([](auto const& v) -> std::string
         {
             using T = std::decay_t<decltype(v)>;
 
             if constexpr (std::is_same_v<T, bool>)
-                output << (v ? "true" : "false");
+                return v ? "true" : "false";
             else if constexpr (std::is_same_v<T, StringLiteralView>)
-                WriteEscapedText(output, v);
+                return EscapeText(v);
             else if constexpr (std::is_same_v<T, DiagnosticStaticString>)
-                WriteEscapedText(output, { v.data(), v.size() });
+                return EscapeText({ v.data(), v.size() });
             else
-                output << v;
+                return fmt::format("{}", v);
         }, value);
-    }
-
-    void WriteDiagnosticEntry(std::ostream& output, DiagnosticRecord const& record)
-    {
-        output << "arg ";
-        WriteEscapedText(output, record.name);
-        output << " = ";
-        WriteDiagnosticValue(output, record.value);
-        output << '\n';
     }
 }
 
@@ -106,13 +86,11 @@ std::size_t WriteDiagnosticDump(std::string_view name, std::filesystem::path con
     if (!output)
         throw std::runtime_error("failed to open diagnostics dump file");
 
-    output << "diagnostics ";
-    WriteEscapedText(output, name);
-    output << '\n';
-    output << "entries " << entryCount << "\n\n";
+    auto out = std::ostreambuf_iterator<char>(output);
+    fmt::format_to(out, "diagnostics {}\nentries {}\n\n", EscapeText(name), entryCount);
 
     for (DiagnosticRecord const& record : records)
-        WriteDiagnosticEntry(output, record);
+        fmt::format_to(out, "arg {} = {}\n", EscapeText(record.name), FormatValue(record.value));
 
     if (!output)
         throw std::runtime_error("failed to write diagnostics dump file");

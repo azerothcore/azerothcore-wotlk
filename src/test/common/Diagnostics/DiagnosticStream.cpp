@@ -121,7 +121,7 @@ TEST_F(DiagnosticStreamTest, GuardStampsFunctionEntry)
 
     ASSERT_EQ(records.size(), 2u);
 
-    EXPECT_EQ(AsView(records[0].name), "function");
+    EXPECT_EQ(AsView(records[0].name), "FUNCTION");
     std::string_view function = StoredText(records[0].value);
     EXPECT_EQ(function, "Scope");
     // The name is a string literal, so it is viewed in place and never copied
@@ -150,7 +150,7 @@ TEST_F(DiagnosticStreamTest, ReadsSupportedArgumentValues)
     std::span<DiagnosticRecord const> records = snapshot;
 
     ASSERT_EQ(records.size(), 7u);
-    EXPECT_EQ(AsView(records[0].name), "function");
+    EXPECT_EQ(AsView(records[0].name), "FUNCTION");
     EXPECT_EQ(StoredText(records[0].value), "Values");
 
     EXPECT_EQ(AsView(records[1].name), "false");
@@ -195,11 +195,11 @@ TEST_F(DiagnosticStreamTest, ReturnsEntriesInForwardOrder)
     std::vector<DiagnosticRecord> records = Snapshot(Buffer());
 
     ASSERT_EQ(records.size(), 4u);
-    EXPECT_EQ(AsView(records[0].name), "function");
+    EXPECT_EQ(AsView(records[0].name), "FUNCTION");
     EXPECT_EQ(StoredText(records[0].value), "First");
     EXPECT_EQ(AsView(records[1].name), "value");
     EXPECT_EQ(std::get<int64>(records[1].value), 1);
-    EXPECT_EQ(AsView(records[2].name), "function");
+    EXPECT_EQ(AsView(records[2].name), "FUNCTION");
     EXPECT_EQ(StoredText(records[2].value), "Second");
     EXPECT_EQ(AsView(records[3].name), "value");
     EXPECT_EQ(std::get<int64>(records[3].value), 2);
@@ -239,7 +239,7 @@ TEST_F(DiagnosticStreamTest, OversizedArgumentIsTruncated)
     std::vector<DiagnosticRecord> records = Snapshot(Buffer());
 
     ASSERT_EQ(records.size(), 4u);
-    EXPECT_EQ(AsView(records[0].name), "function");
+    EXPECT_EQ(AsView(records[0].name), "FUNCTION");
     EXPECT_EQ(AsView(records[1].name), "before");
     EXPECT_EQ(std::get<int64>(records[1].value), 1);
 
@@ -276,7 +276,7 @@ TEST_F(DiagnosticStreamTest, WritesTextDump)
 
     EXPECT_NE(dump.find("diagnostics \"test_stream\""), std::string::npos);
     EXPECT_NE(dump.find("entries 3"), std::string::npos);
-    EXPECT_NE(dump.find("arg \"function\" = \"Dump\""), std::string::npos);
+    EXPECT_NE(dump.find("arg \"FUNCTION\" = \"Dump\""), std::string::npos);
     EXPECT_NE(dump.find("arg \"answer\" = 42"), std::string::npos);
     EXPECT_NE(dump.find("arg \"text\" = \"hello\\nthere\""), std::string::npos);
 
