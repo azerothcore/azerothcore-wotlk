@@ -16,6 +16,7 @@
  */
 
 #include "AccountMgr.h"
+#include "Corpse.h"
 #include "AreaDefines.h"
 #include "RBAC.h"
 #include "ArenaTeamMgr.h"
@@ -950,15 +951,47 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
     // Place character in world (and load zone) before some object loading
     pCurrChar->LoadCorpse(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_CORPSE_LOCATION));
 
-    // Re-send corpse reclaim delay to client — the packet is sent on death but not on relog,
-    // so the player would not see the countdown timer after logging back in while dead.
+    // setting Ghost+speed if dead
     if (pCurrChar->m_deathState != DeathState::Alive)
     {
-        if (Corpse* corpse = pCurrChar->GetCorpse())
+        // not blizz like, we must correctly save and load player instead...
+        if (pCurrChar->getRace() == RACE_NIGHTELF)
+            pCurrChar->CastSpell(pCurrChar, 20584, true, 0); // auras SPELL_AURA_INCREASE_SPEED(+speed in wisp form), SPELL_AURA_INCREASE_SWIM_SPEED(+swim speed in wisp form), SPELL_AURA_TRANSFORM (to wisp form)
+
+        pCurrChar->CastSpell(pCurrChar, 8326, true, 0);     // auras SPELL_AURA_GHOST, SPELL_AURA_INCREASE_SPEED(why?), SPELL_AURA_INCREASE_SWIM_SPEED(why?)
+
+        // The ghost re-cast clears the mount display on the client (e.g. spectral gryphon in
+        // Northrend). Two nested deferred events replicate the sequence from the Lua workaround
+        // that confirmed to work: remove at 300ms, then recast+teleport 100ms later. The
+        // teleport to the same position forces the client to refresh the mount visual.
+        pCurrChar->m_Events.AddEventAtOffset([pCurrChar]
         {
-            uint32 delay = pCurrChar->GetCorpseReclaimDelay(corpse->GetType() == CORPSE_RESURRECTABLE_PVP);
+            if (!pCurrChar->IsInWorld() || pCurrChar->IsAlive())
+                return;
+            Unit::AuraEffectList const& mountAuras = pCurrChar->GetAuraEffectsByType(SPELL_AURA_MOUNTED);
+            if (mountAuras.empty())
+                return;
+            uint32 mountSpellId = mountAuras.front()->GetId();
+            pCurrChar->RemoveAura(mountSpellId);
+            pCurrChar->m_Events.AddEventAtOffset([pCurrChar, mountSpellId]
+            {
+                if (!pCurrChar->IsInWorld() || pCurrChar->IsAlive())
+                    return;
+                pCurrChar->CastSpell(pCurrChar, mountSpellId, true);
+                pCurrChar->TeleportTo(pCurrChar->GetMapId(),
+                    pCurrChar->GetPositionX(), pCurrChar->GetPositionY(),
+                    pCurrChar->GetPositionZ(), pCurrChar->GetOrientation());
+            }, 100ms);
+        }, 300ms);
+
+        // Re-send corpse reclaim delay to client — the packet is sent on death but not on relog,
+        // so the player would not see the countdown timer after logging back in while dead.
+        // CalculateCorpseReclaimDelay(true) returns the remaining time in milliseconds,
+        // which is what SendCorpseReclaimDelay expects.
+        {
+            int32 delay = pCurrChar->CalculateCorpseReclaimDelay(true);
             if (delay > 0)
-                pCurrChar->SendCorpseReclaimDelay(delay);
+                pCurrChar->SendCorpseReclaimDelay(uint32(delay));
         }
     }
 
