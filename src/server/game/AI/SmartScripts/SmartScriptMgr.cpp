@@ -185,6 +185,15 @@ void SmartAIMgr::LoadSmartAIFromDB()
                     }
                 case SMART_SCRIPT_TYPE_TIMED_ACTIONLIST:
                     break;//nothing to check, really
+                case SMART_SCRIPT_TYPE_QUEST:
+                    {
+                        if (!sObjectMgr->GetQuestTemplate((uint32)temp.entryOrGuid))
+                        {
+                            LOG_ERROR("sql.sql", "SmartAIMgr::LoadSmartAIFromDB: Quest entry ({}) does not exist, skipped loading.", uint32(temp.entryOrGuid));
+                            continue;
+                        }
+                        break;
+                    }
                 default:
                     LOG_ERROR("sql.sql", "SmartAIMgr::LoadSmartAIFromDB: not yet implemented source_type {}", (uint32)source_type);
                     continue;
@@ -438,6 +447,12 @@ void SmartAIMgr::CheckIfSmartAIInDatabaseExists()
         case SMART_EVENT_SUMMONED_UNIT_EVADE:
         case SMART_EVENT_DATA_SET:
         case SMART_EVENT_IS_IN_MELEE_RANGE:
+        // Quest script events (source_type=5): the invoker is always the player who triggered the event
+        case SMART_EVENT_QUEST_ACCEPTED:
+        case SMART_EVENT_QUEST_OBJ_COMPLETION:
+        case SMART_EVENT_QUEST_COMPLETION:
+        case SMART_EVENT_QUEST_REWARDED:
+        case SMART_EVENT_QUEST_FAIL:
             return true;
         default:
             return false;
