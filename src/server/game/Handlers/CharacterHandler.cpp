@@ -2665,4 +2665,3 @@ void WorldSession::SendSetPlayerDeclinedNamesResult(DeclinedNameResult result, O
     data << guid;
     SendPacket(&data);
 }
-
