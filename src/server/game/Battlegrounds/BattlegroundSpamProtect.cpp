@@ -58,9 +58,7 @@ namespace
     {
         auto const& itr = _brackets.find(key);
         if (itr != _brackets.end())
-        {
             return itr->second;
-        }
 
         return 0;
     }
@@ -111,17 +109,13 @@ bool BGSpamProtect::CanAnnounce(Player* player, Battleground* bg, uint32 minLeve
 bool BGSpamProtect::CanAnnounce(Battleground* bg, BattlegroundBracketId bracketId, uint32 minLevel, uint32 queueTotal)
 {
     if (!bg)
-    {
         return false;
-    }
 
     uint32 key = uint32(bg->GetBgTypeID()) * MAX_BATTLEGROUND_BRACKETS + uint32(bracketId);
 
     // Check prev time
     if (!IsCorrectDelay(key))
-    {
         return false;
-    }
 
     // When limited, it announces only if there are at least CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_LIMIT_MIN_PLAYERS in queue
     auto limitQueueMinLevel = sWorld->getIntConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_LIMIT_MIN_LEVEL);
@@ -131,9 +125,7 @@ bool BGSpamProtect::CanAnnounce(Battleground* bg, BattlegroundBracketId bracketI
         auto bgTypeToLimit = minLevel == 80 ? BATTLEGROUND_RB : BATTLEGROUND_WS;
 
         if (bg->GetBgTypeID() == bgTypeToLimit && queueTotal < sWorld->getIntConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_LIMIT_MIN_PLAYERS))
-        {
             return false;
-        }
     }
 
     AddTime(key);

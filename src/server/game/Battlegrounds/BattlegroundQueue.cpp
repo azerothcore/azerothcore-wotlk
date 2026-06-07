@@ -1046,13 +1046,9 @@ void BattlegroundQueue::BattlegroundQueueAnnouncerUpdate(uint32 diff, Battlegrou
     uint32 qPlayers = 0;
 
     if (_queueAnnouncementCrossfactioned)
-    {
         qPlayers = GetPlayersCountInGroupsQueue(bracket_id, BG_QUEUE_CFBG);
-    }
     else
-    {
         qPlayers = GetPlayersCountInGroupsQueue(bracket_id, BG_QUEUE_NORMAL_HORDE) + GetPlayersCountInGroupsQueue(bracket_id, BG_QUEUE_NORMAL_ALLIANCE);
-    }
 
     if (!qPlayers)
     {
@@ -1069,9 +1065,7 @@ void BattlegroundQueue::BattlegroundQueueAnnouncerUpdate(uint32 diff, Battlegrou
             uint32 q_min_level = std::min(bracketEntry->minLevel, (uint32) 80);
 
             if (!isTimed && !sBGSpam->CanAnnounce(bg_template, bracket_id, q_min_level, qPlayers))
-            {
                 return;
-            }
 
             auto bgName = bg_template->GetName();
             uint32 MaxPlayers = GetMinPlayersPerTeam(bg_template, bracketEntry) * 2;
@@ -1155,9 +1149,7 @@ void BattlegroundQueue::SendMessageBGQueue(Player* leader, Battleground* bg, PvP
             // Arm the per-bracket debounce; first join arms, rest are no-ops.
             // BattlegroundQueueAnnouncerUpdate emits the aggregated line later.
             if (_queueAnnouncementTimer[bracketId] < 0)
-            {
                 SetQueueAnnouncementTimer(bracketId, BG_QUEUE_ANNOUNCER_IMMEDIATE_DEBOUNCE, false);
-            }
         }
     }
 }
