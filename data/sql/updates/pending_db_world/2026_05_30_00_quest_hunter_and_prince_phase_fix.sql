@@ -9,8 +9,8 @@
 -- (bits 1 + 4) to see him. Without this the player cannot interact with Illidan and
 -- the quest cannot be completed.
 --
--- Root cause 2 (No cleanup): No REWARD_QUEST or QUEST_FAIL handler exists to restore
--- the player's phaseMask to 1 after the quest is finished or abandoned.
+-- Root cause 2 (No cleanup): No REWARD_QUEST handler exists to restore
+-- the player phaseMask to 1 after the quest is finished.
 --
 -- Fix for Matthias Lehner (entry 32497), source_type 0 (CREATURE):
 --   id 0  On Quest Accept (Horde  13361) -> SET_INGAME_PHASE_MASK(5) on INVOKER, link to id 2
@@ -19,10 +19,6 @@
 --   id 3  LINKED -> SUMMON_CREATURE 31395 at spawn coords, TIMED_DESPAWN 60 000 ms
 --   id 4  On Quest Reward (Alliance 13400) -> SET_INGAME_PHASE_MASK(1) on INVOKER (restore)
 --   id 5  On Quest Reward (Horde  13361)  -> SET_INGAME_PHASE_MASK(1) on INVOKER (restore)
---
--- Fix via Quest SmartAI (source_type 5) for both quest IDs:
---   entryorguid = questId, event SMART_EVENT_QUEST_FAIL(51)
---   -> SET_INGAME_PHASE_MASK(1) on INVOKER (restore phase on quest fail/abandon)
 
 -- 1. Remove current (broken) scripts for Matthias Lehner
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 32497 AND `source_type` = 0;
@@ -40,12 +36,3 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (32497, 0, 4, 0, 20, 0, 100, 512, 13400, 0, 0, 0, 0, 0, 44, 1, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Matthias Lehner - On Quest Reward (Alliance 13400) - Restore InGame Phase Mask 1 on Invoker'),
 -- id 5: Quest Reward Horde (13361) -> restore phase to 1
 (32497, 0, 5, 0, 20, 0, 100, 512, 13361, 0, 0, 0, 0, 0, 44, 1, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Matthias Lehner - On Quest Reward (Horde 13361) - Restore InGame Phase Mask 1 on Invoker');
-
--- 3. Quest SmartAI (source_type 5): restore phase on quest fail/abandon
--- SMART_EVENT_QUEST_FAIL = 51, target_type 7 = SMART_TARGET_ACTION_INVOKER (the player)
-DELETE FROM `smart_scripts` WHERE `entryorguid` IN (13400, 13361) AND `source_type` = 5;
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
--- Alliance quest fail/abandon -> restore phase to 1
-(13400, 5, 0, 0, 51, 0, 100, 512, 0, 0, 0, 0, 0, 0, 44, 1, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Quest 13400 (Alliance) - On Quest Fail/Abandon - Restore InGame Phase Mask 1 on Player'),
--- Horde quest fail/abandon -> restore phase to 1
-(13361, 5, 0, 0, 51, 0, 100, 512, 0, 0, 0, 0, 0, 0, 44, 1, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Quest 13361 (Horde) - On Quest Fail/Abandon - Restore InGame Phase Mask 1 on Player');
