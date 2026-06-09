@@ -1,9 +1,11 @@
 ### TITLE
 ## Type(Scope/Subscope): Commit ultra short explanation
-## |---- Write below the examples with a maximum of 50 characters ----|
+## |---- Write below the examples with a maximum of 72 characters ----|
 ## Example 1: fix(DB/SAI): Missing spell to NPC Hogger
-## Example 2: fix(CORE/Raid): Phase 2 of Ragnaros
-## Example 3: feat(CORE/Commands): New GM command to do something
+## Example 2: feat(Scripts/Commands): Add .mail list and .mail return commands
+## Example 3: refactor(Scripts/Ulduar): Leverage DoorData and persistent data
+## Example 4: fix(Scripts/SlavePens): Despawn Frozen Core after Ahune emerges
+## Example 5: fix(Scripts/VioletHold): Prevent Sinclari from despawning
 
 
 ### DESCRIPTION
@@ -46,7 +48,7 @@
 ## More info here https://www.conventionalcommits.org/en/v1.0.0-beta.2/
 ## =======================================================
 ## "Scope" can be:
-##    CORE     (core related, c++)
+##    Core     (core related, c++)
 ##    DB       (database related, sql)
 ## =======================================================
 ## "Subscope" is optional and depends on the nature of the commit.

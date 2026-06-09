@@ -1245,6 +1245,8 @@ public:
     /// Handles whispers from Addons and players based on sender, receiver's guid and language.
     void Whisper(std::string_view text, Language language, Player* receiver, bool = false) override;
     void Whisper(uint32 textId, Player* target, bool isBossWhisper = false) override;
+    /// Returns true if @p text contains any word from the `chat_filter` DB table (substring, case-insensitive).
+    static bool IsChatFiltered(std::string_view text);
 
     /*********************************************************/
     /***                    STORAGE SYSTEM                 ***/
@@ -1668,6 +1670,7 @@ public:
     [[nodiscard]] PlayerMails const& GetMails() const { return m_mail; }
     void SendItemRetrievalMail(uint32 itemEntry, uint32 count); // Item retrieval mails sent by The Postmaster (34337)
     void SendItemRetrievalMail(std::vector<std::pair<uint32, uint32>> mailItems); // Item retrieval mails sent by The Postmaster (34337)
+    void SendItemRetrievalMail(Item* item); // As above, but for a pre-created item (preserves randomPropertyId)
 
     /*********************************************************/
     /*** MAILED ITEMS SYSTEM ***/
