@@ -421,7 +421,7 @@ Player* Group::GetInvited(const std::string& name) const
     return nullptr;
 }
 
-bool Group::AddMember(Player* player)
+bool Group::AddMember(Player* player, bool skipUpdate /* = false */)
 {
     if (!player)
         return false;
@@ -490,7 +490,8 @@ bool Group::AddMember(Player* player)
         CharacterDatabase.Execute(stmt);
     }
 
-    SendUpdate();
+    if (!skipUpdate)
+        SendUpdate();
 
     if (player)
     {
