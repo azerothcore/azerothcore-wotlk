@@ -330,8 +330,8 @@ namespace Acore::Impl::ChatCommands
     if (cmd)
     {
         /* if the command has visible subcommands, show them before executing */
-        bool const shownHelp = cmd->HasVisibleSubCommands(handler);
-        if (shownHelp)
+        bool const hasSubCommands = cmd->HasVisibleSubCommands(handler);
+        if (hasSubCommands)
             cmd->SendCommandHelp(handler);
 
         handler.SetSentErrorMessage(false);
@@ -342,7 +342,7 @@ namespace Acore::Impl::ChatCommands
         }
         else if (!handler.HasSentErrorMessage()) /* invocation failed, we should show usage */
         {
-            if (!shownHelp) /* avoid showing help twice */
+            if (!hasSubCommands) /* avoid showing help twice */
                 cmd->SendCommandHelp(handler);
             handler.SetSentErrorMessage(true);
         }
