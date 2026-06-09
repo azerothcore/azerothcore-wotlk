@@ -593,8 +593,18 @@ void Vehicle::TeleportVehicle(float x, float y, float z, float ang)
     _me->GetMap()->LoadGrid(x, y);
     _me->NearTeleportTo(x, y, z, ang, true);
 
+    // Copy passenger GUIDs to a temporary vector before iteration
+    // to avoid iterator invalidation when TeleportVehicle is called recursively
+    // (e.g., when a passenger is also a vehicle carrying its own passengers)
+    GuidVector passengerGuids;
     for (SeatMap::const_iterator itr = Seats.begin(); itr != Seats.end(); ++itr)
-        if (Unit* passenger = ObjectAccessor::GetUnit(*GetBase(), itr->second.Passenger.Guid))
+    {
+        if (!itr->second.Passenger.Guid.IsEmpty())
+            passengerGuids.push_back(itr->second.Passenger.Guid);
+    }
+
+    for (ObjectGuid const& guid : passengerGuids)
+        if (Unit* passenger = ObjectAccessor::GetUnit(*GetBase(), guid))
         {
             if (passenger->IsPlayer())
             {
@@ -603,7 +613,11 @@ void Vehicle::TeleportVehicle(float x, float y, float z, float ang)
                 passenger->ToPlayer()->ScheduleDelayedOperation(DELAYED_VEHICLE_TELEPORT);
             }
             else if (passenger->IsCreature() && passenger->GetVehicleKit())
+            {
+                // This recursive call may modify Seats map of the nested vehicle,
+                // but our local passengerGuids vector is already a safe copy
                 passenger->GetVehicleKit()->TeleportVehicle(x, y, z, ang);
+            }
         }
 }
 
