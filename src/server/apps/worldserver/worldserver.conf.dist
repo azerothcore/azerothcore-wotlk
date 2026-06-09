@@ -2262,9 +2262,8 @@ Achievement.RealmFirstKillWindow = 60
 
 #
 #    Achievement.RealmFirstRaceLimitOnePerCharacter
-#        Description: Limit 'Realm First!' race achievements (e.g. 'First Gnome!') to one per
-#                     character. Prevents abuse of the race/faction change service to obtain
-#                     multiple realm first achievements on the same account.
+#        Description: Limit 'Realm First!' race achievements to one per character. Prevents abuse
+#                     of the race/faction change service to obtain multiple achievements.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 
