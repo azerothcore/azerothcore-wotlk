@@ -764,6 +764,9 @@ void World::SetInitialWorldSettings()
     sObjectMgr->LoadProfanityNamesFromDB();
     sObjectMgr->LoadProfanityNamesFromDBC(); // Needs to be after LoadProfanityNamesFromDB()
 
+    LOG_INFO("server.loading", "Loading Chat Filter...");
+    sObjectMgr->LoadChatFilter();
+
     LOG_INFO("server.loading", "Loading GameObjects for Quests...");
     sObjectMgr->LoadGameObjectForQuests();
 

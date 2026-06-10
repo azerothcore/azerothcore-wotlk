@@ -2261,6 +2261,15 @@ SpellQueue.Window = 400
 Achievement.RealmFirstKillWindow = 60
 
 #
+#    Achievement.RealmFirstRaceLimitOnePerCharacter
+#        Description: Limit 'Realm First!' race achievements to one per character. Prevents abuse
+#                     of the race/faction change service to obtain multiple achievements.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+Achievement.RealmFirstRaceLimitOnePerCharacter = 1
+
+#
 ###################################################################################################
 
 ###################################################################################################
@@ -4380,6 +4389,24 @@ PreserveCustomChannels = 0
 #                     0  - (Disabled, Infinite channel storage)
 
 PreserveCustomChannelDuration = 14
+
+#
+#    ChatFilter.Whisper / ChatFilter.Say / ChatFilter.Yell / ChatFilter.Emote
+#        Description: Block chat messages that contain any entry from the `chat_filter` table
+#                     (substring match, case-insensitive).
+#                     Manage entries with: .chatfilter add / .chatfilter remove / .chatfilter list
+#                     and .reload chat_filter.
+#                     Blizzlike: only Whisper filtering is enabled.
+#        Default:     ChatFilter.Whisper = 1 - (Enabled)
+#                     ChatFilter.Say     = 0 - (Disabled)
+#                     ChatFilter.Yell    = 0 - (Disabled)
+#                     ChatFilter.Emote   = 0 - (Disabled)
+#
+
+ChatFilter.Whisper = 1
+ChatFilter.Say     = 0
+ChatFilter.Yell    = 0
+ChatFilter.Emote   = 0
 
 #
 ###################################################################################################
