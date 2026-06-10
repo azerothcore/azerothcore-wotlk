@@ -18,13 +18,76 @@
 #include "BattlefieldMgr.h"
 #include "Chat.h"
 #include "CommandScript.h"
+#include "DiagnosticDump.h"
+#include "Diagnostics.h"
 #include "GameTime.h"
 #include "Language.h"
+#include "Log.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
 #include "RBAC.h"
 
+#include <cctype>
+#include <exception>
+#include <filesystem>
+#include <sstream>
+#include <vector>
+
 using namespace Acore::ChatCommands;
+
+namespace
+{
+    uint32 BattlefieldDiagnosticsDumpSerial = 0;
+
+    char const* GetBattlefieldDiagnosticsName(uint32 battleId)
+    {
+        switch (battleId)
+        {
+            case BATTLEFIELD_BATTLEID_WG:
+                return "wg_issue";
+            default:
+                return nullptr;
+        }
+    }
+
+    std::string SanitizeDiagnosticFileName(std::string_view name)
+    {
+        std::string result;
+        result.reserve(name.size());
+
+        for (unsigned char ch : name)
+        {
+            if (std::isalnum(ch) || ch == '_' || ch == '-' || ch == '.')
+                result.push_back(static_cast<char>(ch));
+            else
+                result.push_back('_');
+        }
+
+        if (result.empty())
+            result = "diagnostics";
+
+        return result;
+    }
+
+    std::filesystem::path MakeBattlefieldDiagnosticDumpPath(std::string_view name)
+    {
+        std::filesystem::path directory = sLog->GetLogsDir();
+        if (directory.empty())
+            directory = ".";
+
+        directory /= "diagnostics";
+
+        std::ostringstream fileName;
+        fileName << SanitizeDiagnosticFileName(name)
+            << '-'
+            << GameTime::GetGameTime().count()
+            << '-'
+            << ++BattlefieldDiagnosticsDumpSerial
+            << ".txt";
+
+        return directory / fileName.str();
+    }
+}
 
 class bf_commandscript : public CommandScript
 {
@@ -33,6 +96,11 @@ public:
 
     ChatCommandTable GetCommands() const override
     {
+        static ChatCommandTable diagnosticsCommandTable =
+        {
+            { "",     HandleBattlefieldDiagnostics,     rbac::RBAC_PERM_COMMAND_BF_ENABLE, Console::Yes },
+            { "dump", HandleBattlefieldDiagnosticsDump, rbac::RBAC_PERM_COMMAND_BF_ENABLE, Console::Yes }
+        };
         static ChatCommandTable battlefieldcommandTable =
         {
             { "start",  HandleBattlefieldStart,  rbac::RBAC_PERM_COMMAND_BF_START,  Console::Yes },
@@ -40,6 +108,7 @@ public:
             { "switch", HandleBattlefieldSwitch, rbac::RBAC_PERM_COMMAND_BF_SWITCH, Console::Yes },
             { "timer",  HandleBattlefieldTimer,  rbac::RBAC_PERM_COMMAND_BF_TIMER,  Console::Yes },
             { "enable", HandleBattlefieldEnable, rbac::RBAC_PERM_COMMAND_BF_ENABLE, Console::Yes },
+            { "diagnostics", diagnosticsCommandTable },
             { "queue",  HandleBattlefieldQueue,  rbac::RBAC_PERM_COMMAND_BF_QUEUE,  Console::Yes }
         };
         static ChatCommandTable commandTable =
@@ -111,6 +180,78 @@ public:
             handler->SendWorldText(LANG_BF_ENABLED, battleId);
             if (handler->IsConsole())
                 handler->PSendSysMessage(LANG_BF_ENABLED, battleId);
+        }
+
+        return true;
+    }
+
+    static bool HandleBattlefieldDiagnostics(ChatHandler* handler, Optional<uint32> battleIdArg, Optional<bool> enableArg)
+    {
+        uint32 const battleId = battleIdArg.value_or(BATTLEFIELD_BATTLEID_WG);
+        Battlefield* bf = sBattlefieldMgr->GetBattlefieldByBattleId(battleId);
+
+        if (!bf)
+        {
+            handler->SendErrorMessage(LANG_BF_NOT_FOUND, battleId);
+            return false;
+        }
+
+        char const* diagnosticsName = GetBattlefieldDiagnosticsName(battleId);
+        if (!diagnosticsName)
+        {
+            handler->SendErrorMessage("Battlefield {} has no diagnostics stream.", battleId);
+            return false;
+        }
+
+        if (!enableArg)
+        {
+            handler->PSendSysMessage("Battlefield {} diagnostics ({}) are {}.",
+                battleId, diagnosticsName, bf->IsDiagnosticsEnabled() ? "enabled" : "disabled");
+            return true;
+        }
+
+        if (!bf->SetDiagnosticsEnabled(diagnosticsName, *enableArg))
+        {
+            handler->SendErrorMessage("Failed to enable battlefield {} diagnostics ({}).", battleId, diagnosticsName);
+            return false;
+        }
+
+        handler->PSendSysMessage("Battlefield {} diagnostics ({}) are now {}.",
+            battleId, diagnosticsName, bf->IsDiagnosticsEnabled() ? "enabled" : "disabled");
+        return true;
+    }
+
+    static bool HandleBattlefieldDiagnosticsDump(ChatHandler* handler, Optional<uint32> battleIdArg)
+    {
+        uint32 const battleId = battleIdArg.value_or(BATTLEFIELD_BATTLEID_WG);
+        Battlefield* bf = sBattlefieldMgr->GetBattlefieldByBattleId(battleId);
+
+        if (!bf)
+        {
+            handler->SendErrorMessage(LANG_BF_NOT_FOUND, battleId);
+            return false;
+        }
+
+        char const* diagnosticsName = GetBattlefieldDiagnosticsName(battleId);
+        if (!diagnosticsName)
+        {
+            handler->SendErrorMessage("Battlefield {} has no diagnostics stream.", battleId);
+            return false;
+        }
+
+        try
+        {
+            std::vector<DiagnosticRecord> records = sDiagnostics->Snapshot(diagnosticsName);
+            std::filesystem::path path = MakeBattlefieldDiagnosticDumpPath(diagnosticsName);
+            std::size_t const entryCount = WriteDiagnosticDump(diagnosticsName, path, records);
+
+            handler->PSendSysMessage("Battlefield {} diagnostics dump written with {} entries: {}",
+                battleId, entryCount, path.string());
+        }
+        catch (std::exception const& e)
+        {
+            handler->SendErrorMessage("Failed to write battlefield {} diagnostics dump: {}", battleId, e.what());
+            return false;
         }
 
         return true;

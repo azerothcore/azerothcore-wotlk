@@ -19,11 +19,16 @@
 #define BATTLEFIELD_H_
 
 #include "Battleground.h"
+#include "DiagnosticGuard.h"
 #include "GameObject.h"
 #include "ObjectAccessor.h"
 #include "SharedDefines.h"
 #include "TaskScheduler.h"
 #include "ZoneScript.h"
+
+#include <optional>
+#include <string_view>
+#include <utility>
 
 enum BattlefieldTypes
 {
@@ -81,6 +86,36 @@ class BfGraveyard;
 
 using GraveyardVect = std::vector<BfGraveyard*>;
 using PlayerTimerMap = std::map<ObjectGuid, time_t>;
+
+class BattlefieldDiagnosticTrace
+{
+public:
+    BattlefieldDiagnosticTrace() = default;
+    BattlefieldDiagnosticTrace(DiagnosticWriter writer, StringLiteralView name) noexcept;
+
+    BattlefieldDiagnosticTrace(BattlefieldDiagnosticTrace&&) noexcept = default;
+    BattlefieldDiagnosticTrace& operator=(BattlefieldDiagnosticTrace&&) = delete;
+
+    BattlefieldDiagnosticTrace(BattlefieldDiagnosticTrace const&) = delete;
+    BattlefieldDiagnosticTrace& operator=(BattlefieldDiagnosticTrace const&) = delete;
+
+    template <typename T>
+    void Arg(StringLiteralView name, T&& value) noexcept
+    {
+        if (_guard)
+            _guard->Arg(name, std::forward<T>(value));
+    }
+
+    void ArgGuid(StringLiteralView name, ObjectGuid guid) noexcept
+    {
+        Arg(name, guid.GetRawValue());
+    }
+
+    void ArgPlayer(Player const* player) noexcept;
+
+private:
+    std::optional<DiagnosticGuard> _guard;
+};
 
 class BfCapturePoint
 {
@@ -195,6 +230,8 @@ protected:
 class Battlefield : public ZoneScript
 {
     friend class BattlefieldMgr;
+    friend class BfCapturePoint;
+    friend class BfGraveyard;
 
 public:
     /// Constructor
@@ -242,6 +279,9 @@ public:
     void ToggleBattlefield(bool enable) { Enabled = enable; }
     /// Return if battlefield is enabled
     bool IsEnabled() const { return Enabled; }
+    bool SetDiagnosticsEnabled(std::string_view name, bool enable);
+    bool IsDiagnosticsEnabled() const { return _diagnosticWriter.has_value(); }
+    [[nodiscard]] BattlefieldDiagnosticTrace Trace(StringLiteralView name) const;
 
     /**
      * \brief Kick player from battlefield and teleport him to kick-point location
@@ -420,6 +460,7 @@ protected:
 
     std::vector<uint64> Data64;
     std::vector<uint32> Data32;
+    std::optional<DiagnosticWriter> _diagnosticWriter;
 
     void KickAfkPlayers();
 

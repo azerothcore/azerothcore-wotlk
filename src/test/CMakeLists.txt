@@ -25,6 +25,7 @@ add_executable(
 
 target_link_libraries(
         unit_tests
+        acore-core-interface
         game
         gtest_main
         gmock_main
@@ -55,5 +56,5 @@ add_test(
         NAME
         unit
         COMMAND
-        ${CMAKE_BINARY_DIR}/src/test/unit_tests
+        $<TARGET_FILE:unit_tests>
 )

@@ -46,6 +46,8 @@ BattlefieldWG::~BattlefieldWG()
 
 bool BattlefieldWG::SetupBattlefield()
 {
+    auto trace = Trace("BattlefieldWG::SetupBattlefield");
+
     TypeId = BATTLEFIELD_WG;                              // See enum BattlefieldTypes
     BattleId = BATTLEFIELD_BATTLEID_WG;
     ZoneId = AREA_WINTERGRASP;
@@ -62,6 +64,13 @@ bool BattlefieldWG::SetupBattlefield()
     BattleTime = sWorld->getIntConfig(CONFIG_WINTERGRASP_BATTLETIME) * MINUTE * IN_MILLISECONDS;
     NoWarBattleTime = sWorld->getIntConfig(CONFIG_WINTERGRASP_NOBATTLETIME) * MINUTE * IN_MILLISECONDS;
     RestartAfterCrash = sWorld->getIntConfig(CONFIG_WINTERGRASP_RESTART_AFTER_CRASH) * MINUTE * IN_MILLISECONDS;
+    trace.Arg("maxPlayer", MaxPlayer);
+    trace.Arg("enabled", Enabled);
+    trace.Arg("minPlayer", MinPlayer);
+    trace.Arg("minLevel", MinLevel);
+    trace.Arg("battleTime", BattleTime);
+    trace.Arg("noWarBattleTime", NoWarBattleTime);
+    trace.Arg("restartAfterCrash", RestartAfterCrash);
 
     TimeForAcceptInvite = 20;
     StartGroupingTimer = 15 * MINUTE * IN_MILLISECONDS;
@@ -93,12 +102,16 @@ bool BattlefieldWG::SetupBattlefield()
 
     Active = bool(sWorldState->getWorldState(WORLD_STATE_BATTLEFIELD_WG_ACTIVE));
     DefenderTeam = TeamId(sWorldState->getWorldState(WORLD_STATE_BATTLEFIELD_WG_DEFENDER));
+    trace.Arg("activeFromWorldState", Active);
+    trace.Arg("defenderFromWorldState", uint32(DefenderTeam));
 
     Timer = sWorldState->getWorldState(ClockWorldState[0]);
+    trace.Arg("timerFromWorldState", Timer);
     if (Active)
     {
         Active = false;
         Timer = RestartAfterCrash;
+        trace.Arg("crashRestart", true);
     }
 
     for (uint8 i = 0; i < BATTLEFIELD_WG_GRAVEYARD_MAX; i++)
@@ -247,6 +260,12 @@ bool BattlefieldWG::Update(uint32 diff)
 
 void BattlefieldWG::OnBattleStart()
 {
+    auto trace = Trace("BattlefieldWG::OnBattleStart");
+    trace.Arg("defender", uint32(GetDefenderTeam()));
+    trace.Arg("attacker", uint32(GetAttackerTeam()));
+    trace.Arg("allianceWar", GetPlayersInWarCount(TEAM_ALLIANCE));
+    trace.Arg("hordeWar", GetPlayersInWarCount(TEAM_HORDE));
+
     // Spawn titan relic
     GameObject* go = SpawnGameObject(GO_WINTERGRASP_TITAN_S_RELIC, 5440.37890625f, 2840.493408203125f, 430.2816162109375, 4.45059061050415039f); // VerifiedBuild 51943
     if (go)
@@ -258,9 +277,13 @@ void BattlefieldWG::OnBattleStart()
 
         // save guid
         TitansRelic = go->GetGUID();
+        trace.ArgGuid("titansRelicGuid", TitansRelic);
     }
     else
+    {
+        trace.Arg("titansRelicGuid", uint64(0));
         LOG_ERROR("bg.battlefield", "WG: Failed to spawn titan relic.");
+    }
 
     // Update tower visibility and update faction
     for (ObjectGuid const& guid : CanonList)
@@ -304,6 +327,7 @@ void BattlefieldWG::OnBattleStart()
 
     // Xinef: reset tenacity counter
     TenacityStack = 0;
+    trace.Arg("tenacityStack", TenacityStack);
 
     _scheduler.Schedule(20s, BATTLEFIELD_TIMER_GROUP_WAR, [this](TaskContext context)
     {
@@ -319,6 +343,9 @@ void BattlefieldWG::OnBattleStart()
 
 void BattlefieldWG::UpdateCounterVehicle(bool init)
 {
+    auto trace = Trace("BattlefieldWG::UpdateCounterVehicle");
+    trace.Arg("init", init);
+
     if (init)
     {
         SetData(BATTLEFIELD_WG_DATA_VEHICLE_H, 0);
@@ -339,6 +366,8 @@ void BattlefieldWG::UpdateCounterVehicle(bool init)
     }
 
     UpdateVehicleCountWG();
+    trace.Arg("maxVehicleAlliance", GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_A));
+    trace.Arg("maxVehicleHorde", GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_H));
 }
 
 // Update vehicle count WorldState to player
@@ -366,8 +395,16 @@ void BattlefieldWG::CapturePointTaken(uint32 areaId)
 
 void BattlefieldWG::OnBattleEnd(bool endByTimer)
 {
+    auto trace = Trace("BattlefieldWG::OnBattleEnd");
+    trace.Arg("endByTimer", endByTimer);
+    trace.Arg("defender", uint32(GetDefenderTeam()));
+    trace.Arg("attacker", uint32(GetAttackerTeam()));
+    trace.Arg("allianceWar", GetPlayersInWarCount(TEAM_ALLIANCE));
+    trace.Arg("hordeWar", GetPlayersInWarCount(TEAM_HORDE));
+
     // Must be set before SPELL_VICTORY_REWARD so the 1755 criterion can gate on it.
     LastBattleAttackerVictory = !endByTimer;
+    trace.Arg("lastBattleAttackerVictory", LastBattleAttackerVictory);
 
     // Remove relic
     if (GameObject* go = GetRelic())
@@ -480,6 +517,7 @@ void BattlefieldWG::OnBattleEnd(bool endByTimer)
     }
 
     bool const grantEssenceToAttackers = sWorld->getBoolConfig(CONFIG_WINTERGRASP_ESSENCE_BOTH_FACTIONS);
+    trace.Arg("grantEssenceToAttackers", grantEssenceToAttackers);
 
     for (ObjectGuid const& guid : PlayersInWar[GetAttackerTeam()])
         if (Player* player = ObjectAccessor::FindPlayer(guid))
@@ -610,41 +648,61 @@ void BattlefieldWG::OnCreatureCreate(Creature* creature)
             case NPC_WINTERGRASP_CATAPULT:
             case NPC_WINTERGRASP_DEMOLISHER:
                 {
+                    auto trace = Trace("BattlefieldWG::OnCreatureCreate");
+                    trace.ArgGuid("creatureGuid", creature->GetGUID());
+                    trace.Arg("entry", creature->GetEntry());
+
                     if (!creature->IsSummon() || !creature->ToTempSummon()->GetSummonerGUID())
+                    {
+                        trace.Arg("result", "missingSummoner");
                         return;
+                    }
 
                     Player* creator = ObjectAccessor::FindPlayer(creature->ToTempSummon()->GetSummonerGUID());
                     if (!creator)
+                    {
+                        trace.Arg("result", "summonerNotFound");
                         return;
+                    }
                     TeamId team = creator->GetTeamId();
+                    trace.ArgGuid("summonerGuid", creator->GetGUID());
+                    trace.Arg("team", uint32(team));
 
                     if (team == TEAM_HORDE)
                     {
+                        trace.Arg("vehicleCountBefore", GetData(BATTLEFIELD_WG_DATA_VEHICLE_H));
+                        trace.Arg("vehicleMax", GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_H));
                         if (GetData(BATTLEFIELD_WG_DATA_VEHICLE_H) < GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_H))
                         {
                             UpdateData(BATTLEFIELD_WG_DATA_VEHICLE_H, 1);
                             creature->CastSpell(creature, SPELL_HORDE_FLAG, true);
                             Vehicles[team].insert(creature->GetGUID());
                             UpdateVehicleCountWG();
+                            trace.Arg("result", "vehicleAccepted");
                         }
                         else
                         {
                             creature->DespawnOrUnsummon();
+                            trace.Arg("result", "vehicleLimit");
                             return;
                         }
                     }
                     else
                     {
+                        trace.Arg("vehicleCountBefore", GetData(BATTLEFIELD_WG_DATA_VEHICLE_A));
+                        trace.Arg("vehicleMax", GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_A));
                         if (GetData(BATTLEFIELD_WG_DATA_VEHICLE_A) < GetData(BATTLEFIELD_WG_DATA_MAX_VEHICLE_A))
                         {
                             UpdateData(BATTLEFIELD_WG_DATA_VEHICLE_A, 1);
                             creature->CastSpell(creature, SPELL_ALLIANCE_FLAG, true);
                             Vehicles[team].insert(creature->GetGUID());
                             UpdateVehicleCountWG();
+                            trace.Arg("result", "vehicleAccepted");
                         }
                         else
                         {
                             creature->DespawnOrUnsummon();
+                            trace.Arg("result", "vehicleLimit");
                             return;
                         }
                     }
@@ -740,9 +798,7 @@ void BattlefieldWG::OnGameObjectCreate(GameObject* go)
 void BattlefieldWG::HandleKill(Player* killer, Unit* victim)
 {
     if (killer == victim)
-    {
         return;
-    }
 
     TeamId killerTeam = killer->GetTeamId();
 
@@ -802,6 +858,9 @@ void BattlefieldWG::HandleKill(Player* killer, Unit* victim)
 
 bool BattlefieldWG::FindAndRemoveVehicleFromList(Unit* vehicle)
 {
+    auto trace = Trace("BattlefieldWG::FindAndRemoveVehicleFromList");
+    trace.ArgGuid("vehicleGuid", vehicle ? vehicle->GetGUID() : ObjectGuid::Empty);
+
     for (uint32 i = 0; i < 2; ++i)
     {
         if (Vehicles[i].find(vehicle->GetGUID()) != Vehicles[i].end())
@@ -811,9 +870,12 @@ bool BattlefieldWG::FindAndRemoveVehicleFromList(Unit* vehicle)
                 UpdateData(BATTLEFIELD_WG_DATA_VEHICLE_H, -1);
             else
                 UpdateData(BATTLEFIELD_WG_DATA_VEHICLE_A, -1);
+            trace.Arg("team", i);
+            trace.Arg("result", "removed");
             return true;
         }
     }
+    trace.Arg("result", "notFound");
     return false;
 }
 
@@ -830,32 +892,41 @@ void BattlefieldWG::PromotePlayer(Player* killer)
 {
     if (!Active)
         return;
+
     // Updating rank of player
     if (Aura* recruitAura = killer->GetAura(SPELL_RECRUIT))
     {
         if (recruitAura->GetStackAmount() >= 5)
         {
+            uint32 const stack = recruitAura->GetStackAmount();
             killer->RemoveAura(SPELL_RECRUIT);
             killer->CastSpell(killer, SPELL_CORPORAL, true);
             SendWarning(BATTLEFIELD_WG_TEXT_FIRSTRANK, killer);
+            auto trace = Trace("BattlefieldWG::PromotePlayer");
+            trace.ArgPlayer(killer);
+            trace.Arg("rankBefore", "recruit");
+            trace.Arg("stack", stack);
+            trace.Arg("result", "corporal");
         }
         else
-        {
             killer->CastSpell(killer, SPELL_RECRUIT, true);
-        }
     }
     else if (Aura* corporalAura = killer->GetAura(SPELL_CORPORAL))
     {
         if (corporalAura->GetStackAmount() >= 5)
         {
+            uint32 const stack = corporalAura->GetStackAmount();
             killer->RemoveAura(SPELL_CORPORAL);
             killer->CastSpell(killer, SPELL_LIEUTENANT, true);
             SendWarning(BATTLEFIELD_WG_TEXT_SECONDRANK, killer);
+            auto trace = Trace("BattlefieldWG::PromotePlayer");
+            trace.ArgPlayer(killer);
+            trace.Arg("rankBefore", "corporal");
+            trace.Arg("stack", stack);
+            trace.Arg("result", "lieutenant");
         }
         else
-        {
             killer->CastSpell(killer, SPELL_CORPORAL, true);
-        }
     }
 }
 
@@ -873,36 +944,62 @@ void BattlefieldWG::RemoveAurasFromPlayer(Player* player)
 
 void BattlefieldWG::OnPlayerJoinWar(Player* player)
 {
+    auto trace = Trace("BattlefieldWG::OnPlayerJoinWar");
+    trace.ArgPlayer(player);
+    trace.Arg("defender", uint32(GetDefenderTeam()));
+    trace.Arg("attacker", uint32(GetAttackerTeam()));
+    trace.Arg("brokenAttackerTowers", GetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_ATT));
+
     RemoveAurasFromPlayer(player);
 
     player->CastSpell(player, SPELL_RECRUIT, true);
     AddUpdateTenacity(player);
 
     if (player->GetTeamId() == GetDefenderTeam())
+    {
+        trace.Arg("teleport", "defender");
         player->TeleportTo(MAP_NORTHREND, 5345, 2842, 410, 3.14f);
+    }
     else
     {
         if (player->GetTeamId() == TEAM_HORDE)
+        {
+            trace.Arg("teleport", "hordeAttacker");
             player->TeleportTo(MAP_NORTHREND, 5025.857422f, 3674.628906f, 362.737122f, 4.135169f);
+        }
         else
+        {
+            trace.Arg("teleport", "allianceAttacker");
             player->TeleportTo(MAP_NORTHREND, 5101.284f, 2186.564f, 365.549f, 3.812f);
+        }
     }
 
     if (player->GetTeamId() == GetAttackerTeam())
     {
         if (GetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_ATT) < 3)
+        {
+            trace.Arg("towerControlStack", 3 - GetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_ATT));
             player->SetAuraStack(SPELL_TOWER_CONTROL, player, 3 - GetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_ATT));
+        }
     }
     else
     {
         if (GetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_ATT) > 0)
+        {
+            trace.Arg("towerControlStack", GetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_ATT));
             player->SetAuraStack(SPELL_TOWER_CONTROL, player, GetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_ATT));
+        }
     }
     SendInitWorldStatesTo(player);
 }
 
 void BattlefieldWG::OnPlayerLeaveWar(Player* player)
 {
+    auto trace = Trace("BattlefieldWG::OnPlayerLeaveWar");
+    trace.ArgPlayer(player);
+    trace.Arg("logout", player->GetSession()->PlayerLogout());
+    trace.Arg("hasVehicle", player->GetVehicle() != nullptr);
+
     // Remove all aura from WG /// @todo: false we can go out of this zone on retail and keep Rank buff, remove on end of WG
     if (!player->GetSession()->PlayerLogout())
     {
@@ -937,7 +1034,12 @@ void BattlefieldWG::OnPlayerEnterZone(Player* player)
     // xinef: Attacker, if hidden in relic room kick him out (only during wartime)
     if (IsWarTime() && player->GetTeamId() == GetAttackerTeam())
         if (player->GetPositionX() > 5400.0f && player->GetPositionX() < 5490.0f && player->GetPositionY() > 2803.0f && player->GetPositionY() < 2878.0f)
+        {
+            auto trace = Trace("BattlefieldWG::OnPlayerEnterZone");
+            trace.ArgPlayer(player);
+            trace.Arg("result", "attackerRelicRoomKick");
             KickPlayerFromBattlefield(player->GetGUID());
+        }
 }
 
 uint32 BattlefieldWG::GetData(uint32 data) const
@@ -1062,6 +1164,15 @@ void BattlefieldWG::BrokenWallOrTower(TeamId  /*team*/)
 // Called when a tower is broke
 void BattlefieldWG::UpdatedDestroyedTowerCount(TeamId team, GameObject* go)
 {
+    auto trace = Trace("BattlefieldWG::UpdatedDestroyedTowerCount");
+    trace.Arg("team", uint32(team));
+    trace.ArgGuid("gameObjectGuid", go ? go->GetGUID() : ObjectGuid::Empty);
+    trace.Arg("entry", go ? go->GetEntry() : 0u);
+    trace.Arg("attacker", uint32(GetAttackerTeam()));
+    trace.Arg("brokenBefore", GetData(BATTLEFIELD_WG_DATA_BROKEN_TOWER_ATT));
+    trace.Arg("damagedBefore", GetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_ATT));
+    trace.Arg("timerBefore", Timer);
+
     // Destroy an attack tower
     if (team == GetAttackerTeam())
     {
@@ -1094,6 +1205,8 @@ void BattlefieldWG::UpdatedDestroyedTowerCount(TeamId team, GameObject* go)
             else
                 Timer -= 600000;
             SendInitWorldStatesToAll();
+            trace.Arg("removedTenMinutes", true);
+            trace.Arg("timerAfter", Timer);
         }
     }
     else
@@ -1111,23 +1224,37 @@ void BattlefieldWG::UpdatedDestroyedTowerCount(TeamId team, GameObject* go)
 
 void BattlefieldWG::ProcessEvent(WorldObject* obj, uint32 eventId)
 {
+    auto trace = Trace("BattlefieldWG::ProcessEvent");
+    trace.ArgGuid("objectGuid", obj ? obj->GetGUID() : ObjectGuid::Empty);
+    trace.Arg("eventId", eventId);
+    trace.Arg("warTime", IsWarTime());
+
     if (!obj || !IsWarTime())
+    {
+        trace.Arg("result", "ignored");
         return;
+    }
 
     // We handle only gameobjects here
     GameObject* go = obj->ToGameObject();
     if (!go)
+    {
+        trace.Arg("result", "notGameObject");
         return;
+    }
+    trace.Arg("entry", go->GetEntry());
 
     // On click on titan relic
     if (go->GetEntry() == GO_WINTERGRASP_TITAN_S_RELIC)
     {
         if (CanInteractWithRelic())
         {
+            trace.Arg("result", "relicEndBattle");
             EndBattle(false);
         }
         else if (GameObject* relic = GetRelic())
         {
+            trace.Arg("result", "relicRespawn");
             relic->SetRespawnTime(RESPAWN_IMMEDIATELY);
         }
     }
@@ -1154,10 +1281,18 @@ void BattlefieldWG::ProcessEvent(WorldObject* obj, uint32 eventId)
 // Called when a tower is damaged, used for honor reward calcul
 void BattlefieldWG::UpdateDamagedTowerCount(TeamId team)
 {
+    auto trace = Trace("BattlefieldWG::UpdateDamagedTowerCount");
+    trace.Arg("team", uint32(team));
+    trace.Arg("attacker", uint32(GetAttackerTeam()));
+    trace.Arg("damagedBefore", GetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_ATT));
+    trace.Arg("intactBefore", GetData(BATTLEFIELD_WG_DATA_INTACT_TOWER_ATT));
+
     if (team == GetAttackerTeam())
     {
         UpdateData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_ATT, 1);
         UpdateData(BATTLEFIELD_WG_DATA_INTACT_TOWER_ATT, -1);
+        trace.Arg("damagedAfter", GetData(BATTLEFIELD_WG_DATA_DAMAGED_TOWER_ATT));
+        trace.Arg("intactAfter", GetData(BATTLEFIELD_WG_DATA_INTACT_TOWER_ATT));
     }
 }
 
@@ -1185,10 +1320,15 @@ void BattlefieldWG::RemoveUpdateTenacity(Player* player)
 
 void BattlefieldWG::UpdateTenacity()
 {
+    auto trace = Trace("BattlefieldWG::UpdateTenacity");
+
     TeamId team = TEAM_NEUTRAL;
     uint32 alliancePlayers = PlayersInWar[TEAM_ALLIANCE].size();
     uint32 hordePlayers = PlayersInWar[TEAM_HORDE].size();
     int32 newStack = 0;
+    trace.Arg("alliancePlayers", alliancePlayers);
+    trace.Arg("hordePlayers", hordePlayers);
+    trace.Arg("oldStack", TenacityStack);
 
     if (alliancePlayers && hordePlayers)
     {
@@ -1201,6 +1341,8 @@ void BattlefieldWG::UpdateTenacity()
     // Return if no change in stack and apply tenacity to new player
     if (newStack == TenacityStack)
     {
+        trace.Arg("result", "unchanged");
+        trace.Arg("newStack", newStack);
         for (ObjectGuid const& guid : UpdateTenacityList)
             if (Player* newPlayer = ObjectAccessor::FindPlayer(guid))
                 if ((newPlayer->GetTeamId() == TEAM_ALLIANCE && TenacityStack > 0) || (newPlayer->GetTeamId() == TEAM_HORDE && TenacityStack < 0))
@@ -1223,6 +1365,7 @@ void BattlefieldWG::UpdateTenacity()
     }
 
     TenacityStack = newStack;
+    trace.Arg("newStack", TenacityStack);
     // Remove old buff
     if (team != TEAM_NEUTRAL)
     {
@@ -1241,6 +1384,9 @@ void BattlefieldWG::UpdateTenacity()
         team = newStack > 0 ? TEAM_ALLIANCE : TEAM_HORDE;
         newStack = std::min(std::abs(newStack), 20);
         uint32 buff_honor = GetHonorBuff(newStack);
+        trace.Arg("applyTeam", uint32(team));
+        trace.Arg("appliedStack", newStack);
+        trace.Arg("honorBuff", buff_honor);
 
         for (ObjectGuid const& guid : PlayersInWar[team])
             if (Player* player = ObjectAccessor::FindPlayer(guid))
@@ -1267,9 +1413,13 @@ WintergraspCapturePoint::WintergraspCapturePoint(BattlefieldWG* battlefield, Tea
     LinkedWorkshop = nullptr;
 }
 
-void WintergraspCapturePoint::ChangeTeam(TeamId /*oldTeam*/)
+void WintergraspCapturePoint::ChangeTeam(TeamId oldTeam)
 {
     ASSERT(LinkedWorkshop);
+    auto trace = static_cast<BattlefieldWG*>(Bf)->TraceWintergrasp("BattlefieldWG::WintergraspCapturePoint::ChangeTeam");
+    trace.Arg("oldTeam", uint32(oldTeam));
+    trace.Arg("newTeam", uint32(Team));
+    trace.Arg("workshopId", uint32(LinkedWorkshop->workshopId));
     LinkedWorkshop->GiveControlTo(Team, false);
 }
 

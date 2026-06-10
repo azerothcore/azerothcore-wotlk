@@ -17,6 +17,7 @@
 
 #include "Battlefield.h"
 #include "BattlefieldMgr.h"
+#include "Diagnostics.h"
 #include "ScriptMgr.h"
 #include "CellImpl.h"
 #include "CreatureTextMgr.h"
@@ -40,6 +41,18 @@
 //  there is probably some underlying problem with imports which should properly addressed
 //  see: https://github.com/azerothcore/azerothcore-wotlk/issues/9766
 #include "GridNotifiersImpl.h"
+
+BattlefieldDiagnosticTrace::BattlefieldDiagnosticTrace(DiagnosticWriter writer, StringLiteralView name) noexcept :
+    _guard(std::in_place, std::move(writer), name)
+{
+}
+
+void BattlefieldDiagnosticTrace::ArgPlayer(Player const* player) noexcept
+{
+    ArgGuid("playerGuid", player ? player->GetGUID() : ObjectGuid::Empty);
+    Arg("team", player ? uint32(player->GetTeamId()) : uint32(TEAM_NEUTRAL));
+    Arg("level", player ? uint32(player->GetLevel()) : 0u);
+}
 
 Battlefield::Battlefield() :
     Timer(0),
@@ -74,24 +87,74 @@ Battlefield::~Battlefield()
     CapturePoints.clear();
 }
 
+bool Battlefield::SetDiagnosticsEnabled(std::string_view name, bool enable)
+{
+    if (!enable)
+    {
+        _diagnosticWriter.reset();
+        return true;
+    }
+
+    try
+    {
+        _diagnosticWriter.emplace(sDiagnostics->GetWriter(name));
+        return true;
+    }
+    catch (std::exception const& e)
+    {
+        LOG_ERROR("bg.battlefield", "Battlefield diagnostics '{}' disabled: {}", name, e.what());
+        _diagnosticWriter.reset();
+        return false;
+    }
+}
+
+BattlefieldDiagnosticTrace Battlefield::Trace(StringLiteralView name) const
+{
+    if (!_diagnosticWriter)
+        return {};
+
+    return BattlefieldDiagnosticTrace(*_diagnosticWriter, name);
+}
+
 void Battlefield::RemovePlayerFromTracking(ObjectGuid playerGuid)
 {
+    uint32 removedInvites = 0;
+    uint32 removedQueues = 0;
+    uint32 removedKicks = 0;
+    uint32 removedZones = 0;
     for (uint8 i = 0; i < PVP_TEAMS_COUNT; ++i)
     {
-        InvitedPlayers[i].erase(playerGuid);
-        PlayersInQueue[i].erase(playerGuid);
-        PlayersWillBeKick[i].erase(playerGuid);
-        Players[i].erase(playerGuid);
+        removedInvites += uint32(InvitedPlayers[i].erase(playerGuid));
+        removedQueues += uint32(PlayersInQueue[i].erase(playerGuid));
+        removedKicks += uint32(PlayersWillBeKick[i].erase(playerGuid));
+        removedZones += uint32(Players[i].erase(playerGuid));
+    }
+
+    if (removedInvites || removedQueues || removedKicks || removedZones)
+    {
+        auto trace = Trace("Battlefield::RemovePlayerFromTracking");
+        trace.ArgGuid("playerGuid", playerGuid);
+        trace.Arg("removedInvites", removedInvites);
+        trace.Arg("removedQueues", removedQueues);
+        trace.Arg("removedKicks", removedKicks);
+        trace.Arg("removedZones", removedZones);
     }
 }
 
 void Battlefield::HandlePlayerEnterZone(Player* player, uint32 /*zone*/)
 {
+    auto trace = Trace("Battlefield::HandlePlayerEnterZone");
+    trace.ArgPlayer(player);
+    trace.Arg("warTime", IsWarTime());
+    trace.Arg("timer", Timer);
+    trace.Arg("startGroupingTimer", StartGroupingTimer);
+
     RemovePlayerFromTracking(player->GetGUID());
 
     // Allow scripts to adjust the player's effective team or appearance before
     // any team-based battlefield containers (such as player lists or queues) are updated.
     sScriptMgr->OnBattlefieldPlayerEnterZone(this, player);
+    trace.Arg("teamAfterEnterHook", uint32(player->GetTeamId()));
 
     TryRejoinAfterLogout(player); // relog: auto-rejoin, skip invite below
 
@@ -103,12 +166,18 @@ void Battlefield::HandlePlayerEnterZone(Player* player, uint32 /*zone*/)
         // If full of players > announce to player that BF is full and kick him after a few second if he doesn't leave
         if (IsWarTime())
         {
-            if (HasWarVacancy(player->GetTeamId()))
+            bool const hasVacancy = HasWarVacancy(player->GetTeamId());
+            trace.Arg("hasWarVacancy", hasVacancy);
+            trace.Arg("warCount", GetPlayersInWarCount(player->GetTeamId()));
+            trace.Arg("maxPlayer", MaxPlayer);
+
+            if (hasVacancy)
                 InvitePlayerToWar(player);
             else
             {
                 /// @todo: Send a packet to announce it to player
                 PlayersWillBeKick[player->GetTeamId()][player->GetGUID()] = GameTime::GetGameTime().count() + (player->IsGameMaster() ? 30 * MINUTE : 10);
+                trace.Arg("queuedKick", true);
                 InvitePlayerToQueue(player);
             }
         }
@@ -116,33 +185,51 @@ void Battlefield::HandlePlayerEnterZone(Player* player, uint32 /*zone*/)
         {
             // If time left is < 15 minutes invite player to join queue
             if (Timer <= StartGroupingTimer)
+            {
+                trace.Arg("preBattleQueueInvite", true);
                 InvitePlayerToQueue(player);
+            }
         }
     }
+    else
+        trace.Arg("inFlight", true);
 
     Players[player->GetTeamId()].insert(player->GetGUID());
+    trace.Arg("zoneCountAfter", GetPlayersInZoneCount(player->GetTeamId()));
     OnPlayerEnterZone(player);
 }
 
 void Battlefield::HandlePlayerLeaveZone(Player* player, uint32 /*zone*/)
 {
+    auto trace = Trace("Battlefield::HandlePlayerLeaveZone");
+    trace.ArgPlayer(player);
+    trace.Arg("warTime", IsWarTime());
+
     // Logout still runs full leave-war cleanup, but marks the player for grace-window auto-rejoin.
     bool const isLogout = player->GetSession() && player->GetSession()->PlayerLogout();
+    trace.Arg("logout", isLogout);
 
     if (IsWarTime())
     {
         // If the player is participating to the battle
         if (PlayersInWar[player->GetTeamId()].erase(player->GetGUID()))
         {
+            trace.Arg("removedFromWar", true);
             if (isLogout)
+            {
                 LogoutGracePlayers[player->GetTeamId()][player->GetGUID()] =
                     GameTime::GetGameTime().count() + LOGOUT_GRACE_SECONDS;
+                trace.Arg("logoutGraceUntil", uint64(LogoutGracePlayers[player->GetTeamId()][player->GetGUID()]));
+            }
             else
                 player->GetSession()->SendBfLeaveMessage(BattleId);
 
             if (Group* group = player->GetGroup()) // Remove the player from the raid group
                 if (group->isBFGroup())
+                {
+                    trace.ArgGuid("removedFromBfGroupGuid", group->GetGUID());
                     group->RemoveMember(player->GetGUID());
+                }
 
             OnPlayerLeaveWar(player);
             sScriptMgr->OnBattlefieldPlayerLeaveWar(this, player);
@@ -162,21 +249,37 @@ bool Battlefield::Update(uint32 diff)
 {
     if (Timer <= diff)
     {
+        auto trace = Trace("Battlefield::UpdateTimerExpired");
+        trace.Arg("diff", diff);
+        trace.Arg("timer", Timer);
+        trace.Arg("warTime", IsWarTime());
+
         uint32 sessionLimit = sWorld->getIntConfig(CONFIG_WINTERGRASP_SKIP_BATTLE_SESSION_COUNT);
         bool tooManySessions = sessionLimit && !IsWarTime()
             && sWorldSessionMgr->GetActiveSessionCount() > sessionLimit;
+        trace.Arg("enabled", IsEnabled());
+        trace.Arg("sessionLimit", sessionLimit);
+        trace.Arg("activeSessions", uint32(sWorldSessionMgr->GetActiveSessionCount()));
+        trace.Arg("tooManySessions", tooManySessions);
 
         if (!IsEnabled() || tooManySessions)
         {
+            trace.Arg("action", "endDisabledOrOverloaded");
             Active = true;
             EndBattle(false);
             return false;
         }
         // Battlefield ends on time
         if (IsWarTime())
+        {
+            trace.Arg("action", "endByTimer");
             EndBattle(true);
+        }
         else // Time to start a new battle!
+        {
+            trace.Arg("action", "startBattle");
             StartBattle();
+        }
     }
     else
         Timer -= diff;
@@ -187,6 +290,12 @@ bool Battlefield::Update(uint32 diff)
     // Invite players a few minutes before the battle's beginning
     if (!IsWarTime() && !StartGrouping && Timer <= StartGroupingTimer)
     {
+        auto trace = Trace("Battlefield::StartGrouping");
+        trace.Arg("timer", Timer);
+        trace.Arg("startGroupingTimer", StartGroupingTimer);
+        trace.Arg("allianceZone", GetPlayersInZoneCount(TEAM_ALLIANCE));
+        trace.Arg("hordeZone", GetPlayersInZoneCount(TEAM_HORDE));
+
         StartGrouping = true;
         InvitePlayersInZoneToQueue();
         OnStartGrouping();
@@ -208,60 +317,117 @@ bool Battlefield::Update(uint32 diff)
 
 void Battlefield::InvitePlayersInZoneToQueue()
 {
+    auto trace = Trace("Battlefield::InvitePlayersInZoneToQueue");
+    trace.Arg("allianceZone", GetPlayersInZoneCount(TEAM_ALLIANCE));
+    trace.Arg("hordeZone", GetPlayersInZoneCount(TEAM_HORDE));
+
     ForEachPlayerInZone([this](Player* player) { InvitePlayerToQueue(player); });
 }
 
 void Battlefield::InvitePlayerToQueue(Player* player)
 {
+    auto trace = Trace("Battlefield::InvitePlayerToQueue");
+    trace.ArgPlayer(player);
+    trace.Arg("queueBefore", uint32(PlayersInQueue[player->GetTeamId()].size()));
+    trace.Arg("otherQueue", uint32(PlayersInQueue[GetOtherTeam(player->GetTeamId())].size()));
+    trace.Arg("minPlayer", MinPlayer);
+
     if (PlayersInQueue[player->GetTeamId()].count(player->GetGUID()))
+    {
+        trace.Arg("result", "alreadyQueued");
         return;
+    }
 
     if (PlayersInQueue[player->GetTeamId()].size() <= MinPlayer || PlayersInQueue[GetOtherTeam(player->GetTeamId())].size() >= MinPlayer)
+    {
+        trace.Arg("result", "sentInvite");
         player->GetSession()->SendBfInvitePlayerToQueue(BattleId);
+    }
+    else
+        trace.Arg("result", "balanceGate");
 }
 
 void Battlefield::InvitePlayersInQueueToWar()
 {
+    auto trace = Trace("Battlefield::InvitePlayersInQueueToWar");
+    trace.Arg("allianceQueue", uint32(PlayersInQueue[TEAM_ALLIANCE].size()));
+    trace.Arg("hordeQueue", uint32(PlayersInQueue[TEAM_HORDE].size()));
+
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
     {
         GuidUnorderedSet copy(PlayersInQueue[team]);
+        trace.Arg("team", uint32(team));
+        trace.Arg("copiedQueue", uint32(copy.size()));
         for (ObjectGuid const& guid : copy)
             if (Player* player = ObjectAccessor::FindPlayer(guid))
-                if (HasWarVacancy(player->GetTeamId()))
+            {
+                bool const hasVacancy = HasWarVacancy(player->GetTeamId());
+                if (hasVacancy)
                     InvitePlayerToWar(player);
+            }
         PlayersInQueue[team].clear();
+        trace.Arg("queueAfterClear", uint32(PlayersInQueue[team].size()));
     }
 }
 
 void Battlefield::InvitePlayersInZoneToWar()
 {
+    auto trace = Trace("Battlefield::InvitePlayersInZoneToWar");
+    trace.Arg("allianceZone", GetPlayersInZoneCount(TEAM_ALLIANCE));
+    trace.Arg("hordeZone", GetPlayersInZoneCount(TEAM_HORDE));
+    trace.Arg("allianceWar", GetPlayersInWarCount(TEAM_ALLIANCE));
+    trace.Arg("hordeWar", GetPlayersInWarCount(TEAM_HORDE));
+
     ForEachPlayerInZone([this](Player* player)
     {
         if (IsPlayerInWarOrInvited(player))
             return;
 
-        if (HasWarVacancy(player->GetTeamId()))
+        bool const hasVacancy = HasWarVacancy(player->GetTeamId());
+
+        if (hasVacancy)
             InvitePlayerToWar(player);
         else if (!PlayersWillBeKick[player->GetTeamId()].count(player->GetGUID())) // Battlefield is full of players
+        {
             PlayersWillBeKick[player->GetTeamId()][player->GetGUID()] = GameTime::GetGameTime().count() + 10;
+            auto playerTrace = Trace("Battlefield::InvitePlayersInZoneToWar::QueuedKick");
+            playerTrace.ArgPlayer(player);
+            playerTrace.Arg("result", "queuedKick");
+        }
     });
 }
 
 void Battlefield::InvitePlayerToWar(Player* player)
 {
+    auto trace = Trace("Battlefield::InvitePlayerToWar");
+    trace.ArgPlayer(player);
+
     if (!player)
+    {
+        trace.Arg("result", "nullPlayer");
         return;
+    }
+
+    trace.Arg("warCount", GetPlayersInWarCount(player->GetTeamId()));
+    trace.Arg("maxPlayer", MaxPlayer);
 
     if (player->IsGameMaster())
+    {
+        trace.Arg("result", "gameMaster");
         return;
+    }
 
     /// @todo : needed ?
     if (player->IsInFlight())
+    {
+        trace.Arg("result", "inFlight");
         return;
+    }
 
     if (player->InBattleground())
     {
         PlayersInQueue[player->GetTeamId()].erase(player->GetGUID());
+        trace.Arg("result", "inBattlegroundRemovedFromQueue");
         return;
     }
 
@@ -270,17 +436,26 @@ void Battlefield::InvitePlayerToWar(Player* player)
     {
         if (!PlayersWillBeKick[player->GetTeamId()].count(player->GetGUID()))
             PlayersWillBeKick[player->GetTeamId()][player->GetGUID()] = GameTime::GetGameTime().count() + 10;
+        trace.Arg("result", "levelTooLowQueuedKick");
+        trace.Arg("minLevel", MinLevel);
         return;
     }
 
     // Check if player is not already in war
     if (IsPlayerInWarOrInvited(player))
+    {
+        trace.Arg("result", "alreadyInWarOrInvited");
         return;
+    }
 
     sScriptMgr->OnBattlefieldBeforeInvitePlayerToWar(this, player);
+    trace.Arg("teamAfterBeforeInviteHook", uint32(player->GetTeamId()));
 
     PlayersWillBeKick[player->GetTeamId()].erase(player->GetGUID());
     InvitedPlayers[player->GetTeamId()][player->GetGUID()] = GameTime::GetGameTime().count() + TimeForAcceptInvite;
+    trace.Arg("inviteExpiresAt", uint64(InvitedPlayers[player->GetTeamId()][player->GetGUID()]));
+    trace.Arg("invitedCount", uint32(InvitedPlayers[player->GetTeamId()].size()));
+    trace.Arg("result", "sentInvite");
     player->GetSession()->SendBfInvitePlayerToWar(BattleId, ZoneId, TimeForAcceptInvite);
 }
 
@@ -303,13 +478,25 @@ void Battlefield::KickAfkPlayers()
     ForEachPlayerInWar([this](Player* player)
     {
         if (player->isAFK() && player->GetZoneId() == GetZoneId() && !player->IsGameMaster())
+        {
+            auto playerTrace = Trace("Battlefield::KickAfkPlayers::Kick");
+            playerTrace.ArgPlayer(player);
             player->TeleportTo(KickPosition);
+        }
     });
 }
 
 void Battlefield::KickPlayerFromBattlefield(ObjectGuid guid)
 {
+    auto trace = Trace("Battlefield::KickPlayerFromBattlefield");
+    trace.ArgGuid("playerGuid", guid);
+
     if (Player* player = ObjectAccessor::FindPlayer(guid))
+    {
+        trace.ArgPlayer(player);
+        trace.Arg("zone", player->GetZoneId());
+        trace.Arg("trackedInWar", bool(PlayersInWar[player->GetTeamId()].count(guid)));
+
         if (player->GetZoneId() == GetZoneId() && !player->IsGameMaster()
             && !PlayersInWar[player->GetTeamId()].count(guid))
         {
@@ -319,13 +506,29 @@ void Battlefield::KickPlayerFromBattlefield(ObjectGuid guid)
             // Players[team] in the same tick would otherwise still see them.
             for (uint8 i = 0; i < PVP_TEAMS_COUNT; ++i)
                 Players[i].erase(guid);
+            trace.Arg("result", "teleported");
         }
+        else
+            trace.Arg("result", "ignored");
+    }
+    else
+        trace.Arg("result", "playerNotFound");
 }
 
 void Battlefield::StartBattle()
 {
+    auto trace = Trace("Battlefield::StartBattle");
+    trace.Arg("active", Active);
+    trace.Arg("allianceZone", GetPlayersInZoneCount(TEAM_ALLIANCE));
+    trace.Arg("hordeZone", GetPlayersInZoneCount(TEAM_HORDE));
+    trace.Arg("allianceQueue", uint32(PlayersInQueue[TEAM_ALLIANCE].size()));
+    trace.Arg("hordeQueue", uint32(PlayersInQueue[TEAM_HORDE].size()));
+
     if (Active)
+    {
+        trace.Arg("result", "alreadyActive");
         return;
+    }
 
     for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
     {
@@ -336,6 +539,7 @@ void Battlefield::StartBattle()
 
     Timer = BattleTime;
     Active = true;
+    trace.Arg("battleTime", BattleTime);
 
     // Schedule war-only periodic timers
     _scheduler.Schedule(1s, BATTLEFIELD_TIMER_GROUP_WAR, [this](TaskContext context)
@@ -383,12 +587,24 @@ void Battlefield::StartBattle()
     OnBattleStart();
 
     SendUpdateWorldStates();
+    trace.Arg("allianceInvited", uint32(InvitedPlayers[TEAM_ALLIANCE].size()));
+    trace.Arg("hordeInvited", uint32(InvitedPlayers[TEAM_HORDE].size()));
 }
 
 void Battlefield::EndBattle(bool endByTimer)
 {
+    auto trace = Trace("Battlefield::EndBattle");
+    trace.Arg("active", Active);
+    trace.Arg("endByTimer", endByTimer);
+    trace.Arg("defenderBefore", uint32(GetDefenderTeam()));
+    trace.Arg("allianceWar", uint32(PlayersInWar[TEAM_ALLIANCE].size()));
+    trace.Arg("hordeWar", uint32(PlayersInWar[TEAM_HORDE].size()));
+
     if (!Active)
+    {
+        trace.Arg("result", "notActive");
         return;
+    }
 
     Active = false;
 
@@ -398,6 +614,7 @@ void Battlefield::EndBattle(bool endByTimer)
 
     if (!endByTimer)
         SetDefenderTeam(GetAttackerTeam());
+    trace.Arg("defenderAfter", uint32(GetDefenderTeam()));
 
     if (GetDefenderTeam() == TEAM_ALLIANCE)
         DoPlaySoundToAll(BF_ALLIANCE_WINS);
@@ -422,6 +639,7 @@ void Battlefield::EndBattle(bool endByTimer)
     Timer = NoWarBattleTime;
     SendInitWorldStatesToAll();
     SendUpdateWorldStates();
+    trace.Arg("nextTimer", Timer);
 }
 
 void Battlefield::DoPlaySoundToAll(uint32 soundId)
@@ -440,8 +658,13 @@ bool Battlefield::HasPlayer(Player* player) const
 // Called in WorldSession::HandleBfQueueInviteResponse
 void Battlefield::PlayerAcceptInviteToQueue(Player* player)
 {
+    auto trace = Trace("Battlefield::PlayerAcceptInviteToQueue");
+    trace.ArgPlayer(player);
+    trace.Arg("queueBefore", uint32(PlayersInQueue[player->GetTeamId()].size()));
+
     // Add player in queue
     PlayersInQueue[player->GetTeamId()].insert(player->GetGUID());
+    trace.Arg("queueAfter", uint32(PlayersInQueue[player->GetTeamId()].size()));
     // Send notification
     player->GetSession()->SendBfQueueInviteResponse(BattleId, ZoneId);
 }
@@ -449,8 +672,13 @@ void Battlefield::PlayerAcceptInviteToQueue(Player* player)
 // Called in WorldSession::HandleBfExitRequest
 void Battlefield::AskToLeaveQueue(Player* player)
 {
+    auto trace = Trace("Battlefield::AskToLeaveQueue");
+    trace.ArgPlayer(player);
+    trace.Arg("queueBefore", uint32(PlayersInQueue[player->GetTeamId()].size()));
+
     // Remove player from queue
     PlayersInQueue[player->GetTeamId()].erase(player->GetGUID());
+    trace.Arg("queueAfter", uint32(PlayersInQueue[player->GetTeamId()].size()));
     // Send notification
     player->GetSession()->SendBfLeaveMessage(BattleId, BF_LEAVE_REASON_CLOSE);
 }
@@ -458,6 +686,9 @@ void Battlefield::AskToLeaveQueue(Player* player)
 // Called in WorldSession::HandleHearthAndResurrect
 void Battlefield::PlayerAskToLeave(Player* player)
 {
+    auto trace = Trace("Battlefield::PlayerAskToLeave");
+    trace.ArgPlayer(player);
+
     // Player leaving Wintergrasp, teleport to homebind position.
     player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->GetOrientation());
 }
@@ -465,17 +696,31 @@ void Battlefield::PlayerAskToLeave(Player* player)
 // Called in WorldSession::HandleBfEntryInviteResponse
 void Battlefield::PlayerAcceptInviteToWar(Player* player)
 {
+    auto trace = Trace("Battlefield::PlayerAcceptInviteToWar");
+    trace.ArgPlayer(player);
+    trace.Arg("warTime", IsWarTime());
+
     if (!IsWarTime())
+    {
+        trace.Arg("result", "notWarTime");
         return;
+    }
 
     // Reject unknown / expired invites; the kick task only sweeps every 5s.
     TeamId const invitedTeam = player->GetTeamId();
     auto itr = InvitedPlayers[invitedTeam].find(player->GetGUID());
+    trace.Arg("invitedTeam", uint32(invitedTeam));
+    trace.Arg("inviteFound", itr != InvitedPlayers[invitedTeam].end());
     if (itr == InvitedPlayers[invitedTeam].end()
         || itr->second <= GameTime::GetGameTime().count())
+    {
+        trace.Arg("result", "inviteMissingOrExpired");
         return;
+    }
+    trace.Arg("inviteExpiresAt", uint64(itr->second));
 
     sScriptMgr->OnBattlefieldPlayerJoinWar(this, player);
+    trace.Arg("teamAfterJoinHook", uint32(player->GetTeamId()));
 
     if (AddOrSetPlayerToCorrectBfGroup(player))
     {
@@ -488,7 +733,11 @@ void Battlefield::PlayerAcceptInviteToWar(Player* player)
             player->ToggleAFK();
 
         OnPlayerJoinWar(player);
+        trace.Arg("result", "joined");
+        trace.Arg("warCount", GetPlayersInWarCount(player->GetTeamId()));
     }
+    else
+        trace.Arg("result", "groupRejected");
 }
 
 void Battlefield::TeamCastSpell(TeamId team, int32 spellId)
@@ -581,12 +830,20 @@ Group* Battlefield::GetGroupPlayer(ObjectGuid guid, TeamId teamId)
 
 bool Battlefield::AddOrSetPlayerToCorrectBfGroup(Player* player)
 {
+    auto trace = Trace("Battlefield::AddOrSetPlayerToCorrectBfGroup");
+    trace.ArgPlayer(player);
+
     if (!player->IsInWorld())
+    {
+        trace.Arg("result", "notInWorld");
         return false;
+    }
 
     if (player->GetGroup() && (player->GetGroup()->isBGGroup() || player->GetGroup()->isBFGroup()))
     {
         LOG_INFO("misc", "Battlefield::AddOrSetPlayerToCorrectBfGroup - player is already in {} group!", (player->GetGroup()->isBGGroup() ? "BG" : "BF"));
+        trace.Arg("result", "alreadyInBgOrBfGroup");
+        trace.ArgGuid("groupGuid", player->GetGroup()->GetGUID());
         return false;
     }
 
@@ -598,20 +855,33 @@ bool Battlefield::AddOrSetPlayerToCorrectBfGroup(Player* player)
         group->Create(player);
         sGroupMgr->AddGroup(group);
         Groups[player->GetTeamId()].insert(group->GetGUID());
+        trace.Arg("groupAction", "created");
+        trace.ArgGuid("groupGuid", group->GetGUID());
     }
     else if (group->IsMember(player->GetGUID()))
     {
         uint8 subgroup = group->GetMemberGroup(player->GetGUID());
         player->SetBattlegroundOrBattlefieldRaid(group, subgroup);
+        trace.Arg("groupAction", "reboundExistingMember");
+        trace.ArgGuid("groupGuid", group->GetGUID());
+        trace.Arg("subgroup", uint32(subgroup));
     }
     else
+    {
         group->AddMember(player);
+        trace.Arg("groupAction", "addedToExisting");
+        trace.ArgGuid("groupGuid", group->GetGUID());
+    }
 
+    trace.Arg("result", "ok");
     return true;
 }
 
 void Battlefield::TryRejoinAfterLogout(Player* player)
 {
+    auto trace = Trace("Battlefield::TryRejoinAfterLogout");
+    trace.ArgPlayer(player);
+
     ObjectGuid const guid = player->GetGUID();
     time_t const now = GameTime::GetGameTime().count();
 
@@ -621,28 +891,45 @@ void Battlefield::TryRejoinAfterLogout(Player* player)
         if (auto itr = LogoutGracePlayers[team].find(guid); itr != LogoutGracePlayers[team].end())
         {
             pending = itr->second > now;
+            trace.Arg("markerTeam", uint32(team));
+            trace.Arg("markerExpiresAt", uint64(itr->second));
             LogoutGracePlayers[team].erase(itr);
         }
+    trace.Arg("pending", pending);
+    trace.Arg("warTime", IsWarTime());
+    trace.Arg("hasVacancy", HasWarVacancy(player->GetTeamId()));
 
     // Vacancy gate mirrors HandlePlayerEnterZone (full team -> queue path). Pre-hook:
     // we can't abort after JoinWar, which may already have mutated module state.
     if (!pending || !IsWarTime() || !HasWarVacancy(player->GetTeamId()))
+    {
+        trace.Arg("result", "notEligible");
         return;
+    }
 
     if (Group* current = player->GetGroup())
         if (current->isBGGroup() || current->isBFGroup())
+        {
+            trace.Arg("result", "alreadyInBgOrBfGroup");
+            trace.ArgGuid("groupGuid", current->GetGUID());
             return;
+        }
 
     // Rejoin via the normal join path: firing JoinWar lets modules rebuild
     // per-session (Player*-keyed) state and pick the team before the raid bind.
     sScriptMgr->OnBattlefieldPlayerJoinWar(this, player);
+    trace.Arg("teamAfterJoinHook", uint32(player->GetTeamId()));
 
     if (AddOrSetPlayerToCorrectBfGroup(player))
     {
         player->GetSession()->SendBfEntered(BattleId);
         PlayersInWar[player->GetTeamId()].insert(guid);
         OnPlayerJoinWar(player);
+        trace.Arg("result", "joined");
+        trace.Arg("warCount", GetPlayersInWarCount(player->GetTeamId()));
     }
+    else
+        trace.Arg("result", "groupRejected");
 }
 
 BfGraveyard* Battlefield::GetGraveyardById(uint32 id) const
@@ -749,6 +1036,11 @@ float BfGraveyard::GetDistance(Player* player)
 
 void BfGraveyard::GiveControlTo(TeamId team)
 {
+    auto trace = Bf->Trace("Battlefield::BfGraveyard::GiveControlTo");
+    trace.Arg("graveyardId", GraveyardId);
+    trace.Arg("teamBefore", uint32(ControlTeam));
+    trace.Arg("teamAfter", uint32(team));
+
     ControlTeam = team;
 }
 
@@ -1065,8 +1357,28 @@ bool BfCapturePoint::Update(uint32 diff)
 
     if (OldState != State)
     {
+        auto trace = Bf->Trace("Battlefield::BfCapturePoint::Update");
+        trace.Arg("capturePointGuid", CapturePoint.GetRawValue());
+        trace.Arg("entry", CapturePointEntry);
+        trace.Arg("diff", diff);
+        trace.Arg("alliancePlayers", counts[TEAM_ALLIANCE]);
+        trace.Arg("hordePlayers", counts[TEAM_HORDE]);
+        trace.Arg("activePlayers", uint32(ActivePlayers.size()));
+        trace.Arg("challenger", uint32(challengerId));
+        trace.Arg("valueBefore", double(oldValue));
+        trace.Arg("teamBefore", uint32(oldTeam));
+        trace.Arg("stateBefore", uint32(OldState));
+        trace.Arg("factDiff", double(factDiff));
+        trace.Arg("valueAfter", double(Value));
+        trace.Arg("teamAfter", uint32(Team));
+        trace.Arg("stateAfter", uint32(State));
         if (oldTeam != Team)
+        {
+            trace.Arg("result", "teamChanged");
             ChangeTeam(oldTeam);
+        }
+        else
+            trace.Arg("result", "stateChanged");
         return true;
     }
 
