@@ -193,7 +193,7 @@ bool Battlefield::Update(uint32 diff)
         SendUpdateWorldStates();
     }
 
-    _scheduler.Update(diff);
+    _scheduler.Update();
 
     bool objectiveChanged = false;
     if (IsWarTime())
