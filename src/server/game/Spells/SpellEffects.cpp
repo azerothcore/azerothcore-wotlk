@@ -2629,10 +2629,11 @@ void Spell::EffectDispel(SpellEffIndex effIndex)
                 bool alreadyListed = false;
                 for (DispelChargesList::iterator successItr = success_list.begin(); successItr != success_list.end(); ++successItr)
                 {
-                    if (successItr->first->GetId() == itr->first->GetId())
+                    if (successItr->first == itr->first)
                     {
                         ++successItr->second;
                         alreadyListed = true;
+                        break;
                     }
                 }
                 if (!alreadyListed)
