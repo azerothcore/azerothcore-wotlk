@@ -1,3 +1,4 @@
+-- DB update 2026_06_10_02 -> 2026_06_10_03
 DELETE FROM `waypoint_data` WHERE `id` = 253190;
 INSERT INTO `waypoint_data`
     (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `velocity`, `delay`, `smoothTransition`, `move_type`, `action`, `action_chance`)
