@@ -344,6 +344,7 @@ namespace Acore::Impl::ChatCommands
         {
             if (!hasSubCommands) /* avoid showing help twice */
                 cmd->SendCommandHelp(handler);
+
             handler.SetSentErrorMessage(true);
         }
 
