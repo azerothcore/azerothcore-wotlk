@@ -10017,7 +10017,12 @@ bool Unit::IsImmunedToAuraPeriodicTick(Unit const* caster, SpellInfo const* spel
     return false;
 }
 
-bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, Spell const* spell)
+bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, Unit const* caster)
+{
+    return IsImmunedToSpell(spellInfo, caster, spellInfo ? spellInfo->GetSchoolMask() : SPELL_SCHOOL_MASK_NONE);
+}
+
+bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, Unit const* caster, SpellSchoolMask spellSchoolMask)
 {
     if (!spellInfo)
         return false;
@@ -10063,7 +10068,7 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, Spell const* spell)
             continue;
 
         // Xinef: if target is immune to one effect, and the spell has transform aura - it is immune to whole spell
-        if (IsImmunedToSpellEffect(spellInfo, i))
+        if (IsImmunedToSpellEffect(spellInfo, i, caster))
         {
             if (spellInfo->HasAura(SPELL_AURA_TRANSFORM))
                 return true;
@@ -10078,13 +10083,6 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, Spell const* spell)
 
     if (!spellInfo->HasAttribute(SPELL_ATTR2_NO_SCHOOL_IMMUNITIES))
     {
-        SpellSchoolMask spellSchoolMask = spellInfo->GetSchoolMask();
-        Unit const* spellCaster = spell ? spell->GetCaster() : nullptr;
-        if (spell)
-        {
-            spellSchoolMask = spell->GetSpellSchoolMask();
-        }
-
         if (spellSchoolMask != SPELL_SCHOOL_MASK_NONE)
         {
             SpellImmuneContainer const& schoolList = m_spellImmune[IMMUNITY_SCHOOL];
@@ -10097,7 +10095,7 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, Spell const* spell)
                 if (!(itr->first & spellSchoolMask))
                     continue;
 
-                if (IgnoresSchoolImmunityFromFriendlyCaster(spellCaster, itr->second, immuneSpellInfo))
+                if (IgnoresSchoolImmunityFromFriendlyCaster(caster, itr->second, immuneSpellInfo))
                     continue;
 
                 if (spellInfo->CanPierceImmuneAura(immuneSpellInfo))
@@ -10109,6 +10107,16 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, Spell const* spell)
     }
 
     return false;
+}
+
+bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, Spell const* spell)
+{
+    if (!spellInfo)
+        return false;
+
+    Unit const* spellCaster = spell ? spell->GetCaster() : nullptr;
+    SpellSchoolMask spellSchoolMask = spell ? spell->GetSpellSchoolMask() : spellInfo->GetSchoolMask();
+    return IsImmunedToSpell(spellInfo, spellCaster, spellSchoolMask);
 }
 
 bool Unit::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index, Unit const* caster /*= nullptr*/) const
