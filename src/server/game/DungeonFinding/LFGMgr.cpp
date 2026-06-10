@@ -1795,14 +1795,17 @@ namespace lfg
                 ObjectGuid gguid = grp->GetGUID();
                 SetState(gguid, LFG_STATE_PROPOSAL);
                 sGroupMgr->AddGroup(grp);
+                grp->SetLfgRoles(pguid, proposal.players.find(pguid)->second.role);
             }
             else if (group != grp)
             {
                 if (!grp->IsFull())
-                    grp->AddMember(player, true);
+                    grp->AddMember(player, proposal.players.find(pguid)->second.role);
             }
-
-            grp->SetLfgRoles(pguid, proposal.players.find(pguid)->second.role);
+            else
+            {
+                grp->SetLfgRoles(pguid, proposal.players.find(pguid)->second.role);
+            }
         }
 
         // pussywizard: crashfix, group wasn't created when iterating players (no player found by guid), proposal is deleted by the calling function
