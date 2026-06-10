@@ -298,6 +298,20 @@ bool Battlefield::IsPlayerInWarOrInvited(Player* player) const
     return PlayersInWar[teamId].count(player->GetGUID()) || InvitedPlayers[teamId].count(player->GetGUID());
 }
 
+bool Battlefield::IsPlayerInBattlefield(ObjectGuid guid) const
+{
+    if (!IsWarTime())
+        return false;
+
+    // PlayersInWar is split into per-team sets, but a GUID alone does not indicate the team, so check both sets.
+    // This also stays correct if an OnBattlefieldPlayerJoinWar handler reassigned the team GetTeamId() returns.
+    for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
+        if (PlayersInWar[team].count(guid))
+            return true;
+
+    return false;
+}
+
 void Battlefield::KickAfkPlayers()
 {
     ForEachPlayerInWar([this](Player* player)
