@@ -172,8 +172,9 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     if (owner->HasUnitState(UNIT_STATE_NOT_MOVE) || HasLostTarget(owner) || isStoppedBecauseOfCasting)
     {
         // Every time a caster mob stops to cast a spell, the leash timer ticks down. Once the timer expires, the mob evades and walks home.
-    owner->StopMoving();
-    _lastTargetPosition.reset();
+        owner->StopMoving();
+        _lastTargetPosition.reset();
+
         if (cOwner)
         {
             if (!isStoppedBecauseOfCasting)
