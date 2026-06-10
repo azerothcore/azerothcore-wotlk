@@ -1592,6 +1592,7 @@ public:
     }
 };
 
+// 63238 Lightning Pillar
 class spell_thorim_lightning_pillar_P2_aura : public AuraScript
 {
     PrepareAuraScript(spell_thorim_lightning_pillar_P2_aura);
@@ -1606,6 +1607,29 @@ class spell_thorim_lightning_pillar_P2_aura : public AuraScript
     void Register() override
     {
         OnEffectPeriodic += AuraEffectPeriodicFn(spell_thorim_lightning_pillar_P2_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
+// 62976 Lightning Pillar
+class spell_thorim_lightning_pillar_P2 : public SpellScript
+{
+    PrepareSpellScript(spell_thorim_lightning_pillar_P2);
+
+    void SelectPillar(WorldObject*& target)
+    {
+        if (Unit* caster = GetCaster())
+        {
+            std::list<Creature*> pillars;
+            caster->GetCreatureListWithEntryInGrid(pillars, NPC_PILLAR, GetSpellInfo()->GetMaxRange());
+
+            if (!pillars.empty())
+                target = Acore::Containers::SelectRandomContainerElement(pillars);
+        }
+    }
+
+    void Register() override
+    {
+        OnObjectTargetSelect += SpellObjectTargetSelectFn(spell_thorim_lightning_pillar_P2::SelectPillar, EFFECT_0, TARGET_UNIT_NEARBY_ENTRY);
     }
 };
 
@@ -1679,6 +1703,7 @@ void AddSC_boss_thorim()
     new go_thorim_lever();
 
     // Spells
+    RegisterSpellScript(spell_thorim_lightning_pillar_P2);
     RegisterSpellScript(spell_thorim_lightning_pillar_P2_aura);
     RegisterSpellScript(spell_thorim_trash_impale_aura);
 
