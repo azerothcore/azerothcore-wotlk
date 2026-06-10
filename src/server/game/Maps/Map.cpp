@@ -1732,6 +1732,19 @@ uint32 Map::ApplyDynamicModeRespawnScaling(WorldObject const* obj, uint32 respaw
     if (obj->GetMap()->Instanceable())
         return respawnDelay;
 
+    // Temporary spawns (no DB spawn id, e.g. summons / battlefield-spawned objects)
+    // are not part of the dynamic respawn system.
+    if (Creature const* creature = obj->ToCreature())
+    {
+        if (!creature->GetSpawnId())
+            return respawnDelay;
+    }
+    else if (GameObject const* go = obj->ToGameObject())
+    {
+        if (!go->GetSpawnId())
+            return respawnDelay;
+    }
+
     // No quest givers or world bosses
     if (Creature const* creature = obj->ToCreature())
         if (creature->IsQuestGiver() || creature->isWorldBoss()
