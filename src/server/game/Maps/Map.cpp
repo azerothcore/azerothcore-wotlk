@@ -1732,25 +1732,25 @@ uint32 Map::ApplyDynamicModeRespawnScaling(WorldObject const* obj, uint32 respaw
     if (obj->GetMap()->Instanceable())
         return respawnDelay;
 
-    // Temporary spawns (no DB spawn id, e.g. summons / battlefield-spawned objects)
-    // are not part of the dynamic respawn system.
     if (Creature const* creature = obj->ToCreature())
     {
+        // Temporary spawns (no DB spawn id, e.g. summons / battlefield-spawned
+        // creatures such as Wintergrasp turrets) are not part of the respawn system.
         if (!creature->GetSpawnId())
             return respawnDelay;
+
+        // No quest givers or world bosses
+        if (creature->IsQuestGiver() || creature->isWorldBoss()
+            || (creature->GetCreatureTemplate()->rank == CREATURE_ELITE_RARE)
+            || (creature->GetCreatureTemplate()->rank == CREATURE_ELITE_RAREELITE))
+            return respawnDelay;
     }
+    // Temporary gameobjects (no DB spawn id) are likewise excluded.
     else if (GameObject const* go = obj->ToGameObject())
     {
         if (!go->GetSpawnId())
             return respawnDelay;
     }
-
-    // No quest givers or world bosses
-    if (Creature const* creature = obj->ToCreature())
-        if (creature->IsQuestGiver() || creature->isWorldBoss()
-            || (creature->GetCreatureTemplate()->rank == CREATURE_ELITE_RARE)
-            || (creature->GetCreatureTemplate()->rank == CREATURE_ELITE_RAREELITE))
-            return respawnDelay;
 
     auto it = _zonePlayerCountMap.find(obj->GetZoneId());
     if (it == _zonePlayerCountMap.end())
