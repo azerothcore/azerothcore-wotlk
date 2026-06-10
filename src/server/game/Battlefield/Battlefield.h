@@ -365,6 +365,9 @@ public:
     /// Returns the set of players actively fighting in the war (per team, read-only).
     GuidUnorderedSet const& GetPlayersInWarSet(TeamId teamId) const { return PlayersInWar[teamId]; }
 
+    // Returns true if the player is enrolled as a participant in the currently active battle.
+    bool IsPlayerInBattlefield(ObjectGuid guid) const;
+
     void DoPlaySoundToAll(uint32 soundId);
 
     void InvitePlayerToQueue(Player* player);
