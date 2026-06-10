@@ -1,3 +1,4 @@
+-- DB update 2026_06_08_01 -> 2026_06_10_00
 -- Stoneclaw Totem pulses should not break stealth (Patch 3.2.2).
 DELETE FROM `spell_custom_attr` WHERE `spell_id` IN (5729, 6393, 6394, 6395, 10423, 10424, 25512, 58586, 58587, 58588);
 INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES
