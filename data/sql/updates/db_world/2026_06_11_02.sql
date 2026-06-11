@@ -1,3 +1,4 @@
+-- DB update 2026_06_11_01 -> 2026_06_11_02
 --
 DELETE FROM `spell_cone` WHERE `Id` > 0;
 INSERT INTO `spell_cone` (`ID`, `ConeDegrees`) VALUES
