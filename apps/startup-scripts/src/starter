@@ -45,6 +45,142 @@ if [ ! -f "$BINARY" ]; then
     exit 1
 fi
 
+function config_value() {
+    local key="$1"
+
+    if [ -z "${CONFIG_ABS:-}" ] || [ ! -f "$CONFIG_ABS" ]; then
+        return 1
+    fi
+
+    awk -F= -v key="$key" '
+        $0 ~ "^[[:space:]]*" key "[[:space:]]*=" {
+            value = $2
+            sub(/[[:space:]]*[#;].*$/, "", value)
+            gsub(/"/, "", value)
+            gsub(/^[[:space:]]+|[[:space:]]+$/, "", value)
+            print value
+            exit
+        }
+    ' "$CONFIG_ABS"
+}
+
+function command_contains_config() {
+    local command_line="$1"
+
+    if [ -z "${CONFIG_ABS:-}" ]; then
+        return 0
+    fi
+
+    case "$command_line" in
+        *" -c $CONFIG_ABS"*|*" -c \"$CONFIG_ABS\""*)
+            return 0
+            ;;
+    esac
+
+    return 1
+}
+
+function find_existing_instances() {
+    local line pid command_line
+
+    while IFS= read -r line; do
+        pid="${line%% *}"
+        command_line="${line#* }"
+
+        [ -z "$pid" ] && continue
+        [ "$pid" = "$$" ] && continue
+        [ "$pid" = "$PPID" ] && continue
+
+        case "$command_line" in
+            *"/starter "*|*"pgrep "*)
+                continue
+                ;;
+        esac
+
+        if command_contains_config "$command_line"; then
+            printf '%s\n' "$line"
+        fi
+    done < <(pgrep -fa "$EXECPATH" 2>/dev/null || true)
+}
+
+function listening_on_port() {
+    local port="$1"
+
+    command -v ss >/dev/null 2>&1 || return 1
+    ss -H -ltn "sport = :$port" 2>/dev/null | grep -q .
+}
+
+function guarded_ports() {
+    local port soap_enabled soap_port
+
+    if [ "$BINFILE" != "worldserver" ]; then
+        return 0
+    fi
+
+    port="$(config_value "WorldServerPort" || true)"
+    if [ -n "$port" ]; then
+        printf '%s\n' "$port"
+    fi
+
+    soap_enabled="$(config_value "SOAP.Enabled" || true)"
+    soap_port="$(config_value "SOAP.Port" || true)"
+    if [ "$soap_enabled" = "1" ] && [ -n "$soap_port" ]; then
+        printf '%s\n' "$soap_port"
+    fi
+}
+
+function find_listening_guard_ports() {
+    local port
+
+    while IFS= read -r port; do
+        [ -z "$port" ] && continue
+        if listening_on_port "$port"; then
+            printf '%s\n' "$port"
+        fi
+    done < <(guarded_ports)
+}
+
+function wait_for_startup_guard() {
+    local timeout="${AC_STARTUP_GUARD_TIMEOUT:-90}"
+    local interval="${AC_STARTUP_GUARD_INTERVAL:-2}"
+    local elapsed=0
+    local instances ports
+    local warned=0
+
+    if [ "${AC_STARTUP_SKIP_GUARD:-0}" = "1" ]; then
+        return 0
+    fi
+
+    while true; do
+        instances="$(find_existing_instances)"
+        ports="$(find_listening_guard_ports)"
+
+        if [ -z "$instances" ] && [ -z "$ports" ]; then
+            return 0
+        fi
+
+        if [ "$elapsed" -ge "$timeout" ]; then
+            echo "Startup guard: refusing to start duplicate $BINFILE after waiting ${timeout}s."
+            if [ -n "$instances" ]; then
+                echo "Startup guard: existing matching process(es):"
+                echo "$instances"
+            fi
+            if [ -n "$ports" ]; then
+                echo "Startup guard: configured port(s) still listening: $(echo "$ports" | paste -sd ',' -)"
+            fi
+            exit 0
+        fi
+
+        if [ "$warned" -eq 0 ]; then
+            echo "Startup guard: waiting for existing $BINFILE instance or configured port(s) to clear..."
+            warned=1
+        fi
+
+        sleep "$interval"
+        elapsed=$((elapsed + interval))
+    done
+}
+
 # Create crashes directory if it doesn't exist
 mkdir -p "$CRASHES_PATH"
 
@@ -54,6 +190,8 @@ cd "$BINPATH" || {
 }
 
 EXECPATH=$(realpath "$BINFILE")
+
+wait_for_startup_guard
 
 if [ "$GDB_ENABLED" -eq 1 ]; then
     echo "Starting $EXECPATH with GDB enabled"
