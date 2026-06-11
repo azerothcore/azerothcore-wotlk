@@ -549,3 +549,63 @@ TEST(FlatMultimapAuraPattern, DuplicateKeysInterleavedErase)
     EXPECT_EQ(map.count(100), 2u);
     EXPECT_EQ(map.count(200), 1u);
 }
+
+// -----------------------------------------------------------------------
+// 13. Cascade-after-reset (Unit::RemoveAura contract): Aura::Remove can
+//     mutate the map after _UnapplyAura reset the iterator. The DISABLED_
+//     test is deliberate UB - run it only under ASAN, where it reports a
+//     deterministic heap-use-after-free:
+//       ./unit_tests --gtest_also_run_disabled_tests --gtest_filter='*StaleIteratorAfterCascade*'
+// -----------------------------------------------------------------------
+TEST(FlatMultimapAuraPattern, DISABLED_StaleIteratorAfterCascade_AsanOnly)
+{
+    FakeAura a1(100), a2(200), a3(300), cascade1(999), cascade2(998);
+
+    AuraMap map;
+    map.emplace(100, &a1);
+    map.emplace(200, &a2);
+    map.emplace(300, &a3);
+    map.shrink_to_fit();
+
+    // caller loop holds an iterator
+    AuraMap::iterator iter = map.begin();
+
+    // RemoveAura: erase + reset, then cascades grow past capacity -> realloc
+    map.erase(iter);
+    iter = map.begin();
+    map.emplace(999, &cascade1);
+    map.emplace(998, &cascade2);
+
+    // resume with the pre-cascade iterator: heap-use-after-free under ASAN
+    EXPECT_NE(iter->second->spellId, 0u);
+}
+
+// The fixed contract: reset after all cascade mutations (mirrors Unit::RemoveAura).
+TEST(FlatMultimapAuraPattern, IteratorResetAfterCascade)
+{
+    FakeAura a1(100), a2(200), a3(300), cascade1(999), cascade2(998);
+
+    AuraMap map;
+    map.emplace(100, &a1);
+    map.emplace(200, &a2);
+    map.emplace(300, &a3);
+    map.shrink_to_fit();
+
+    AuraMap::iterator iter = map.begin();
+
+    map.erase(iter);
+    map.emplace(999, &cascade1);
+    map.emplace(998, &cascade2);
+    iter = map.begin(); // reset AFTER the cascades
+
+    std::set<uint32_t> seen;
+    for (; iter != map.end(); ++iter)
+        seen.insert(iter->second->spellId);
+
+    EXPECT_EQ(seen.size(), 4u);
+    EXPECT_FALSE(seen.count(100));  // removed
+    EXPECT_TRUE(seen.count(200));
+    EXPECT_TRUE(seen.count(300));
+    EXPECT_TRUE(seen.count(999));   // cascade-applied
+    EXPECT_TRUE(seen.count(998));
+}

@@ -4018,12 +4018,14 @@ void Unit::_UpdateSpells(uint32 time)
         }
     }
 
-    std::vector<Aura*> aurasToUpdate;
-    aurasToUpdate.reserve(m_ownedAuras.size());
+    // snapshot - UpdateOwner can mutate the map; pointers stay valid (removed auras
+    // are deleted later in _DeleteRemovedAuras)
+    m_auraUpdateSnapshot.clear();
+    m_auraUpdateSnapshot.reserve(m_ownedAuras.size());
     for (auto& [id, aura] : m_ownedAuras)
-        aurasToUpdate.push_back(aura);
+        m_auraUpdateSnapshot.push_back(aura);
 
-    for (Aura* aura : aurasToUpdate)
+    for (Aura* aura : m_auraUpdateSnapshot)
         if (!aura->IsRemoved())
             aura->UpdateOwner(time, this);
 
@@ -5044,6 +5046,9 @@ void Unit::RemoveAura(AuraApplicationMap::iterator& i, AuraRemoveMode mode)
     // Remove aura - for Area and Target auras
     if (aura->GetOwner() == this)
         aura->Remove(mode);
+
+    // Aura::Remove can cascade into m_appliedAuras mutations - reset again for the caller
+    i = m_appliedAuras.begin();
 }
 
 void Unit::RemoveAura(uint32 spellId, ObjectGuid caster, uint8 reqEffMask, AuraRemoveMode removeMode)
@@ -5131,7 +5136,8 @@ void Unit::RemoveAppliedAuras(std::function<bool(AuraApplication const*)> const&
 {
     for (AuraApplicationMap::iterator iter = m_appliedAuras.begin(); iter != m_appliedAuras.end();)
     {
-        if (check(iter->second))
+        // RemoveAura no-ops on applications already mid-removal
+        if (!iter->second->GetRemoveMode() && check(iter->second))
         {
             RemoveAura(iter);
             continue;
@@ -5157,7 +5163,8 @@ void Unit::RemoveAppliedAuras(uint32 spellId, std::function<bool(AuraApplication
 {
     for (AuraApplicationMap::iterator iter = m_appliedAuras.lower_bound(spellId); iter != m_appliedAuras.upper_bound(spellId);)
     {
-        if (check(iter->second))
+        // RemoveAura no-ops on applications already mid-removal
+        if (!iter->second->GetRemoveMode() && check(iter->second))
         {
             RemoveAura(iter);
             iter = m_appliedAuras.lower_bound(spellId);
