@@ -14,6 +14,4 @@
 -- Issue: AC #24277
 -- ============================================================
 
-UPDATE `creature_template`
-SET `ScriptName` = 'npc_valhalas_fallen_hero'
-WHERE `entry` IN (31191, 31192, 31193, 31194, 31195, 31196);
+UPDATE `creature_template` SET `ScriptName` = 'npc_valhalas_fallen_hero' WHERE `entry` IN (31191, 31192, 31193, 31194, 31195, 31196);
