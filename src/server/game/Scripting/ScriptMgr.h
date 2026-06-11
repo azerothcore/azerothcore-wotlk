@@ -454,6 +454,7 @@ public: /* PlayerScript */
     void OnPlayerEnterCombat(Player* player, Unit* enemy);
     void OnPlayerLeaveCombat(Player* player);
     void OnPlayerQuestAbandon(Player* player, uint32 questId);
+    void OnPlayerQuestAccept(Player* player, Quest const* quest);
     bool OnPlayerCanSendErrorAlreadyLooted(Player* player);
     void OnPlayerAfterCreatureLoot(Player* player);
     void OnPlayerAfterCreatureLootMoney(Player* player);
@@ -461,6 +462,7 @@ public: /* PlayerScript */
     bool OnPlayerCanUpdateSkill(Player* player, uint32 skillId);
     void OnPlayerBeforeUpdateSkill(Player* player, uint32 skill_id, uint32& value, uint32 max, uint32 step);
     void OnPlayerUpdateSkill(Player* player, uint32 skillId, uint32 value, uint32 max, uint32 step, uint32 newValue);
+    void OnPlayerSetSkill(Player* player, uint32 skillId, uint32 value, uint32 max, uint32 step, uint32 newValue);
     bool OnPlayerCanResurrect(Player* player);
     bool OnPlayerCanGiveLevel(Player* player, uint8 newLevel);
     void OnPlayerSendListInventory(Player* player, ObjectGuid vendorGuid, uint32& vendorEntry);
@@ -588,6 +590,7 @@ public: /* BattlefieldScript */
     void OnBattlefieldPlayerLeaveWar(Battlefield* bf, Player* player);
     void OnBattlefieldBeforeInvitePlayerToWar(Battlefield* bf, Player* player);
     void OnBattlefieldWarEnd(Battlefield* bf, bool endByTimer);
+    void OnBattlefieldPlayerKill(Battlefield* bf, Player* killer, Player* victim);
 
 public: /* BGScript */
     void OnBattlegroundStart(Battleground* bg);
