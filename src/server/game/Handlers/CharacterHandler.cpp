@@ -958,6 +958,28 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
             pCurrChar->CastSpell(pCurrChar, 20584, true, 0); // auras SPELL_AURA_INCREASE_SPEED(+speed in wisp form), SPELL_AURA_INCREASE_SWIM_SPEED(+swim speed in wisp form), SPELL_AURA_TRANSFORM (to wisp form)
 
         pCurrChar->CastSpell(pCurrChar, 8326, true, 0);     // auras SPELL_AURA_GHOST, SPELL_AURA_INCREASE_SPEED(why?), SPELL_AURA_INCREASE_SWIM_SPEED(why?)
+
+        // The spectral gryphon mount (applied via spell_area when dead in Northrend) is applied
+        // immediately by HandleAuraSpecificMods but the client discards the visual during login.
+        // Remove any mount aura, let UpdateAreaDependentAuras reapply it via spell_area, then
+        // teleport to the same position to force the client to resync UNIT_FIELD_MOUNTDISPLAYID.
+        pCurrChar->m_Events.AddEventAtOffset([pCurrChar]
+        {
+            if (!pCurrChar->IsInWorld() || pCurrChar->IsAlive())
+                return;
+            pCurrChar->RemoveAurasByType(SPELL_AURA_MOUNTED);
+            pCurrChar->UpdateAreaDependentAuras(pCurrChar->GetAreaId());
+            pCurrChar->TeleportTo(pCurrChar->GetMapId(),
+                pCurrChar->GetPositionX(), pCurrChar->GetPositionY(),
+                pCurrChar->GetPositionZ(), pCurrChar->GetOrientation());
+        }, 400ms);
+
+        // Re-send corpse reclaim delay — the packet is sent on death but not on relog,
+        // so the countdown timer disappears after logging back in while dead.
+        // CalculateCorpseReclaimDelay(true) returns the remaining time in milliseconds.
+        int32 delay = pCurrChar->CalculateCorpseReclaimDelay(true);
+        if (delay > 0)
+            pCurrChar->SendCorpseReclaimDelay(uint32(delay));
     }
 
     // Set FFA PvP for non GM in non-rest mode
