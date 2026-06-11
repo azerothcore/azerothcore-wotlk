@@ -550,7 +550,7 @@ struct boss_thorim : public BossAI
                 if (_hardMode)
                     chestId += 1; // hard mode offset
 
-                if ((go = me->SummonGameObject(chestId, 2134.73f, -286.32f, 419.51f, 4.65f, 0, 0, 0, 0, 0)))
+                if ((go = me->SummonGameObject(chestId, 2134.73f, -286.32f, 419.51f, 4.65f, 0, 0, 0, 0, 0, true, GO_SUMMON_TIMED_DESPAWN)))
                 {
                     go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
                     go->SetLootRecipient(me->GetMap());
