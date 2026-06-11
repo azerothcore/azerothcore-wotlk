@@ -16,7 +16,6 @@
  */
 
 #include "AccountMgr.h"
-#include "Corpse.h"
 #include "AreaDefines.h"
 #include "RBAC.h"
 #include "ArenaTeamMgr.h"
@@ -960,39 +959,27 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
 
         pCurrChar->CastSpell(pCurrChar, 8326, true, 0);     // auras SPELL_AURA_GHOST, SPELL_AURA_INCREASE_SPEED(why?), SPELL_AURA_INCREASE_SWIM_SPEED(why?)
 
-        // The ghost re-cast clears the mount display on the client (e.g. spectral gryphon in
-        // Northrend). Two nested deferred events replicate the sequence from the Lua workaround
-        // that confirmed to work: remove at 300ms, then recast+teleport 100ms later. The
-        // teleport to the same position forces the client to refresh the mount visual.
+        // The spectral gryphon mount (applied via spell_area when dead in Northrend) is applied
+        // immediately by HandleAuraSpecificMods but the client discards the visual during login.
+        // Remove any mount aura, let UpdateAreaDependentAuras reapply it via spell_area, then
+        // teleport to the same position to force the client to resync UNIT_FIELD_MOUNTDISPLAYID.
         pCurrChar->m_Events.AddEventAtOffset([pCurrChar]
         {
             if (!pCurrChar->IsInWorld() || pCurrChar->IsAlive())
                 return;
-            Unit::AuraEffectList const& mountAuras = pCurrChar->GetAuraEffectsByType(SPELL_AURA_MOUNTED);
-            if (mountAuras.empty())
-                return;
-            uint32 mountSpellId = mountAuras.front()->GetId();
-            pCurrChar->RemoveAura(mountSpellId);
-            pCurrChar->m_Events.AddEventAtOffset([pCurrChar, mountSpellId]
-            {
-                if (!pCurrChar->IsInWorld() || pCurrChar->IsAlive())
-                    return;
-                pCurrChar->CastSpell(pCurrChar, mountSpellId, true);
-                pCurrChar->TeleportTo(pCurrChar->GetMapId(),
-                    pCurrChar->GetPositionX(), pCurrChar->GetPositionY(),
-                    pCurrChar->GetPositionZ(), pCurrChar->GetOrientation());
-            }, 100ms);
-        }, 300ms);
+            pCurrChar->RemoveAurasByType(SPELL_AURA_MOUNTED);
+            pCurrChar->UpdateAreaDependentAuras(pCurrChar->GetAreaId());
+            pCurrChar->TeleportTo(pCurrChar->GetMapId(),
+                pCurrChar->GetPositionX(), pCurrChar->GetPositionY(),
+                pCurrChar->GetPositionZ(), pCurrChar->GetOrientation());
+        }, 400ms);
 
-        // Re-send corpse reclaim delay to client — the packet is sent on death but not on relog,
-        // so the player would not see the countdown timer after logging back in while dead.
-        // CalculateCorpseReclaimDelay(true) returns the remaining time in milliseconds,
-        // which is what SendCorpseReclaimDelay expects.
-        {
-            int32 delay = pCurrChar->CalculateCorpseReclaimDelay(true);
-            if (delay > 0)
-                pCurrChar->SendCorpseReclaimDelay(uint32(delay));
-        }
+        // Re-send corpse reclaim delay — the packet is sent on death but not on relog,
+        // so the countdown timer disappears after logging back in while dead.
+        // CalculateCorpseReclaimDelay(true) returns the remaining time in milliseconds.
+        int32 delay = pCurrChar->CalculateCorpseReclaimDelay(true);
+        if (delay > 0)
+            pCurrChar->SendCorpseReclaimDelay(uint32(delay));
     }
 
     // Set FFA PvP for non GM in non-rest mode
