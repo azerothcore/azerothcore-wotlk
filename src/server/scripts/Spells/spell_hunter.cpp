@@ -1258,7 +1258,9 @@ class spell_hun_lock_and_load : public AuraScript
         if (!(eventInfo.GetTypeMask() & PROC_FLAG_DONE_PERIODIC))
             return false;
 
-        return roll_chance_i(aurEff->GetAmount());
+        // Rank 3 used a hidden 20% periodic proc chance in 3.3.5.
+        uint32 procChance = GetSpellInfo()->GetRank() == 3 ? 20 : aurEff->GetAmount();
+        return roll_chance_i(procChance);
     }
 
     void HandleProc(ProcEventInfo& eventInfo)
@@ -1267,6 +1269,15 @@ class spell_hun_lock_and_load : public AuraScript
 
         Unit* caster = eventInfo.GetActor();
         caster->CastSpell(caster, SPELL_LOCK_AND_LOAD_TRIGGER, true);
+
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        // Frost Trap can be blocked by an existing ICD, but does not start one itself.
+        if (spellInfo && spellInfo->SpellFamilyFlags[0] & 0x10)
+        {
+            GetAura()->ResetProcCooldown();
+            return;
+        }
+
         caster->CastSpell(caster, SPELL_LOCK_AND_LOAD_MARKER, true);
     }
 
