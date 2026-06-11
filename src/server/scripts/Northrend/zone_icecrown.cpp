@@ -83,7 +83,7 @@ enum valhalas
     EVENT_VALHALAS_CHECK_PLAYER                 = 4,
     EVENT_VALHALAS_THIRD_2                      = 5,
 
-    // Fallen Heroes
+    // Fallen Heroes — NPC entries
     NPC_ELDRETH                                 = 31195,
     NPC_GENESS                                  = 31193,
     NPC_JHADRAS                                 = 31191,
@@ -91,11 +91,320 @@ enum valhalas
     NPC_RITH                                    = 31196,
     NPC_TALLA                                   = 31194,
 
+    // Fallen Hero events (EventMap in npc_valhalas_fallen_hero, separate from battle_at_valhalas)
+    EVENT_HERO_SPELL_1                          = 10,
+    EVENT_HERO_SPELL_2                          = 11,
+    EVENT_HERO_INTERRUPT                        = 12, // Geness: Pummel if player is casting
+    EVENT_HERO_SNARE                            = 13, // Masud: Hamstring to prevent kiting
+    EVENT_HERO_SPELL_3                          = 14,
+    EVENT_HERO_SPELL_4                          = 15,
+    EVENT_HERO_SPELL_5                          = 16,
+
+    // Geirrvif (31135) creature_text GroupIDs
+    SAY_GEIRRVIF_FALLEN_HEROES                  = 3,
+
+    // Jhadras — shadow priest caster
+    SPELL_JHADRAS_1                             = 25054, // Mind Blast
+    SPELL_JHADRAS_2                             = 15586, // Mind Flay
+    SPELL_JHADRAS_3                             = 25367, // Shadow Word: Pain (DoT)
+    SPELL_JHADRAS_4                             = 32379, // Shadow Word: Death
+    SPELL_JHADRAS_5                             = 34433, // Vampiric Touch (DoT)
+
+    // Masud — warrior melee DPS
+    SPELL_MASUD_1                               = 15496,
+    SPELL_MASUD_2                               = 41056,
+    SPELL_MASUD_3                               = 21551, // Mortal Strike (healing debuff)
+    SPELL_MASUD_4                               = 25208, // Rend (bleed DoT)
+
+    // Geness — warrior melee DPS + interrupt
+    SPELL_GENESS_1                              = 61041,
+    SPELL_GENESS_2                              = 46182,
+    SPELL_GENESS_3                              = 23894, // Bloodthirst
+    SPELL_GENESS_4                              = 12809, // Concussion Blow (stun)
+
+    // Talla — rogue melee DPS
+    SPELL_TALLA_1                               = 14873,
+    SPELL_TALLA_2                               = 16511, // Hemorrhage (bleed DoT)
+    SPELL_TALLA_3                               = 8647,  // Expose Armor (armor debuff)
+    SPELL_TALLA_4                               = 1776,  // Gouge (stun)
+    SPELL_TALLA_5                               = 26867, // Rupture (bleed DoT)
+
+    // Rith — tank warrior
+    SPELL_RITH_1                                = 61044,
+    SPELL_RITH_2                                = 58461,
+    SPELL_RITH_3                                = 355,   // Taunt
+    SPELL_RITH_4                                = 23922, // Shield Slam
+    SPELL_RITH_5                                = 23931, // Thunder Clap (AoE slow)
+
+    // Eldreth — warlock caster DPS
+    SPELL_ELDRETH_1                             = 17921, // Shadow Bolt
+    SPELL_ELDRETH_2                             = 25311, // Corruption (DoT)
+    SPELL_ELDRETH_3                             = 47864, // Curse of Agony (DoT)
+    SPELL_ELDRETH_4                             = 11699, // Drain Life (channeled)
+    SPELL_ELDRETH_5                             = 29722, // Incinerate (fire nuke)
+
+    // PvP coordination spells
+    SPELL_HAMSTRING                             = 1715, // Masud snares the player
+    SPELL_PUMMEL                                = 6552, // Geness interrupts player casts
+
     NPC_DARK_MASTER                             = 31222,
     NPC_SIGRID                                  = 31242,
     NPC_CARNAGE                                 = 31271,
     NPC_THANE                                   = 31277,
     NPC_PRINCE                                  = 14688, // no mistake
+};
+
+static constexpr uint32 VALHALAS_HERO_ENTRIES[] =
+{
+    NPC_ELDRETH,
+    NPC_GENESS,
+    NPC_JHADRAS,
+    NPC_MASUD,
+    NPC_RITH,
+    NPC_TALLA,
+};
+
+// Arena radius — covers the full Valhalas arena
+static constexpr float VALHALAS_ARENA_RANGE = 60.0f;
+
+/*
+ * [QUEST] Battle at Valhalas: Fallen Heroes (Quest ID: 13214)
+ *
+ * Bug:  The 6 Fallen Heroes have no linked aggro. Players can use Feign Death
+ *       or Shadowmeld to reset each hero individually, then kill them one by one.
+ *
+ * Fix:  When any hero enters combat, all remaining heroes in the arena engage
+ *       the same target. Individual evade is suppressed while any companion
+ *       remains in combat.
+ *
+ * Blizzlike: "in a single combat" — Wowhead WotLK Quest 13214
+ *            "To flee is to lose and be dishonored" — Geirrvif yell (Wowpedia)
+ *
+ * Issue: AC #24277
+ */
+struct npc_valhalas_fallen_hero : public ScriptedAI
+{
+    npc_valhalas_fallen_hero(Creature* creature) : ScriptedAI(creature) { }
+
+    EventMap _events;
+
+    void Reset() override
+    {
+        ScriptedAI::Reset();
+        _events.Reset();
+    }
+
+    // Eldreth and Jhadras have mana — fight at range, no melee attack
+    bool IsCaster() const
+    {
+        uint32 entry = me->GetEntry();
+        return entry == NPC_ELDRETH || entry == NPC_JHADRAS;
+    }
+
+    void AttackStart(Unit* target) override
+    {
+        StartCombatMovement(target);
+    }
+
+    // Casters keep 15 yd distance; melee heroes chase to melee range
+    // Walk/run is managed dynamically in UpdateAI based on distance
+    void StartCombatMovement(Unit* target)
+    {
+        if (!me->Attack(target, true))
+            return;
+        me->GetMotionMaster()->Clear();
+        float const chaseDist = IsCaster() ? 15.0f : 0.0f;
+        me->GetMotionMaster()->MoveChase(target, chaseDist);
+    }
+
+    // If a companion is still fighting, re-engage their target instead of walking back to spawn.
+    // This prevents casters or any hero from resetting when the player kites out of range.
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        for (uint32 entry : VALHALAS_HERO_ENTRIES)
+        {
+            std::list<Creature*> companions;
+            GetCreatureListWithEntryInGrid(companions, me, entry, VALHALAS_ARENA_RANGE);
+            for (Creature* companion : companions)
+            {
+                if (companion != me && companion->IsInCombat())
+                {
+                    if (Unit* target = companion->GetVictim())
+                    {
+                        AttackStart(target);
+                        return;
+                    }
+                }
+            }
+        }
+        ScriptedAI::EnterEvadeMode(why);
+    }
+
+    void JustEngagedWith(Unit* who) override
+    {
+        ScriptedAI::JustEngagedWith(who);
+
+        // Linked aggro — pull every other hero that hasn't engaged yet
+        for (uint32 entry : VALHALAS_HERO_ENTRIES)
+        {
+            std::list<Creature*> companions;
+            GetCreatureListWithEntryInGrid(companions, me, entry, VALHALAS_ARENA_RANGE);
+            for (Creature* companion : companions)
+                if (companion != me && companion->IsAlive() && !companion->IsEngaged())
+                    companion->AI()->AttackStart(who);
+        }
+
+        // Schedule per-hero full spell rotations (5 abilities each)
+        switch (me->GetEntry())
+        {
+            case NPC_JHADRAS:
+                _events.ScheduleEvent(EVENT_HERO_SPELL_1, randtime(5s,  6s));  // Mind Blast
+                _events.ScheduleEvent(EVENT_HERO_SPELL_2, randtime(7s,  8s));  // Mind Flay
+                _events.ScheduleEvent(EVENT_HERO_SPELL_3, randtime(3s,  4s));  // SW: Pain
+                _events.ScheduleEvent(EVENT_HERO_SPELL_4, randtime(12s, 15s)); // SW: Death
+                _events.ScheduleEvent(EVENT_HERO_SPELL_5, randtime(8s,  10s)); // Vampiric Touch
+                break;
+            case NPC_MASUD:
+                _events.ScheduleEvent(EVENT_HERO_SPELL_1, randtime(4s,  5s));  // spell 1
+                _events.ScheduleEvent(EVENT_HERO_SPELL_2, randtime(8s,  9s));  // spell 2
+                _events.ScheduleEvent(EVENT_HERO_SPELL_3, randtime(6s,  8s));  // Mortal Strike
+                _events.ScheduleEvent(EVENT_HERO_SPELL_4, randtime(5s,  7s));  // Rend
+                _events.ScheduleEvent(EVENT_HERO_SNARE,   randtime(3s,  5s));  // Hamstring
+                break;
+            case NPC_GENESS:
+                _events.ScheduleEvent(EVENT_HERO_SPELL_1, randtime(3s,  4s));  // spell 1
+                _events.ScheduleEvent(EVENT_HERO_SPELL_2, randtime(6s,  7s));  // spell 2
+                _events.ScheduleEvent(EVENT_HERO_SPELL_3, randtime(4s,  6s));  // Bloodthirst
+                _events.ScheduleEvent(EVENT_HERO_SPELL_4, randtime(10s, 14s)); // Concussion Blow
+                _events.ScheduleEvent(EVENT_HERO_INTERRUPT, randtime(2s, 3s)); // Pummel
+                break;
+            case NPC_TALLA:
+                _events.ScheduleEvent(EVENT_HERO_SPELL_1, 4s);                 // spell 1
+                _events.ScheduleEvent(EVENT_HERO_SPELL_2, randtime(7s,  9s));  // Hemorrhage
+                _events.ScheduleEvent(EVENT_HERO_SPELL_3, randtime(5s,  7s));  // Expose Armor
+                _events.ScheduleEvent(EVENT_HERO_SPELL_4, randtime(8s,  10s)); // Gouge
+                _events.ScheduleEvent(EVENT_HERO_SPELL_5, randtime(6s,  8s));  // Rupture
+                break;
+            case NPC_RITH:
+                _events.ScheduleEvent(EVENT_HERO_SPELL_1, randtime(5s,  7s));  // spell 1
+                _events.ScheduleEvent(EVENT_HERO_SPELL_2, randtime(3s,  4s));  // spell 2
+                _events.ScheduleEvent(EVENT_HERO_SPELL_3, randtime(8s,  12s)); // Taunt
+                _events.ScheduleEvent(EVENT_HERO_SPELL_4, randtime(6s,  8s));  // Shield Slam
+                _events.ScheduleEvent(EVENT_HERO_SPELL_5, randtime(4s,  6s));  // Thunder Clap
+                break;
+            case NPC_ELDRETH:
+                _events.ScheduleEvent(EVENT_HERO_SPELL_1, randtime(2s,  4s));  // Shadow Bolt
+                _events.ScheduleEvent(EVENT_HERO_SPELL_2, randtime(6s,  8s));  // Corruption
+                _events.ScheduleEvent(EVENT_HERO_SPELL_3, randtime(4s,  6s));  // Curse of Agony
+                _events.ScheduleEvent(EVENT_HERO_SPELL_4, randtime(15s, 20s)); // Drain Life
+                _events.ScheduleEvent(EVENT_HERO_SPELL_5, randtime(8s,  10s)); // Immolate
+                break;
+            default:
+                break;
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        _events.Update(diff);
+
+        while (uint32 eventId = _events.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+                case EVENT_HERO_SPELL_1:
+                    me->StopMoving();
+                    switch (me->GetEntry())
+                    {
+                        case NPC_JHADRAS: DoCastVictim(SPELL_JHADRAS_1); _events.ScheduleEvent(EVENT_HERO_SPELL_1, randtime(10s, 12s)); break;
+                        case NPC_MASUD:   DoCastVictim(SPELL_MASUD_1);   _events.ScheduleEvent(EVENT_HERO_SPELL_1, randtime(10s, 11s)); break;
+                        case NPC_GENESS:  DoCastVictim(SPELL_GENESS_1);  _events.ScheduleEvent(EVENT_HERO_SPELL_1, randtime(10s, 12s)); break;
+                        case NPC_TALLA:   DoCastVictim(SPELL_TALLA_1);   _events.ScheduleEvent(EVENT_HERO_SPELL_1, randtime(10s, 11s)); break;
+                        case NPC_RITH:    DoCastVictim(SPELL_RITH_1);    _events.ScheduleEvent(EVENT_HERO_SPELL_1, randtime(14s, 16s)); break;
+                        case NPC_ELDRETH: DoCastVictim(SPELL_ELDRETH_1); _events.ScheduleEvent(EVENT_HERO_SPELL_1, randtime(3s,  4s));  break;
+                        default: break;
+                    }
+                    break;
+                case EVENT_HERO_SPELL_2:
+                    me->StopMoving();
+                    switch (me->GetEntry())
+                    {
+                        case NPC_JHADRAS: DoCastVictim(SPELL_JHADRAS_2); _events.ScheduleEvent(EVENT_HERO_SPELL_2, randtime(12s, 14s)); break;
+                        case NPC_MASUD:   DoCastVictim(SPELL_MASUD_2);   _events.ScheduleEvent(EVENT_HERO_SPELL_2, randtime(16s, 19s)); break;
+                        case NPC_GENESS:  DoCastVictim(SPELL_GENESS_2);  _events.ScheduleEvent(EVENT_HERO_SPELL_2, randtime(14s, 16s)); break;
+                        case NPC_TALLA:   DoCastVictim(SPELL_TALLA_2, true); _events.ScheduleEvent(EVENT_HERO_SPELL_2, randtime(8s, 10s)); break;
+                        case NPC_RITH:    DoCastVictim(SPELL_RITH_2);    _events.ScheduleEvent(EVENT_HERO_SPELL_2, randtime(10s, 11s)); break;
+                        case NPC_ELDRETH: DoCastVictim(SPELL_ELDRETH_2); _events.ScheduleEvent(EVENT_HERO_SPELL_2, randtime(14s, 18s)); break;
+                        default: break;
+                    }
+                    break;
+                case EVENT_HERO_SPELL_3:
+                    me->StopMoving();
+                    switch (me->GetEntry())
+                    {
+                        case NPC_JHADRAS: DoCastVictim(SPELL_JHADRAS_3);       _events.ScheduleEvent(EVENT_HERO_SPELL_3, randtime(14s, 16s)); break;
+                        case NPC_MASUD:   DoCastVictim(SPELL_MASUD_3,   true); _events.ScheduleEvent(EVENT_HERO_SPELL_3, randtime(12s, 14s)); break;
+                        case NPC_GENESS:  DoCastVictim(SPELL_GENESS_3,  true); _events.ScheduleEvent(EVENT_HERO_SPELL_3, randtime(5s,  7s));  break;
+                        case NPC_TALLA:   DoCastVictim(SPELL_TALLA_3,   true); _events.ScheduleEvent(EVENT_HERO_SPELL_3, randtime(12s, 14s)); break;
+                        case NPC_RITH:    DoCastVictim(SPELL_RITH_3,    true); _events.ScheduleEvent(EVENT_HERO_SPELL_3, randtime(20s, 25s)); break;
+                        case NPC_ELDRETH: DoCastVictim(SPELL_ELDRETH_3);       _events.ScheduleEvent(EVENT_HERO_SPELL_3, randtime(20s, 24s)); break;
+                        default: break;
+                    }
+                    break;
+                case EVENT_HERO_SPELL_4:
+                    me->StopMoving();
+                    switch (me->GetEntry())
+                    {
+                        case NPC_JHADRAS: DoCastVictim(SPELL_JHADRAS_4);       _events.ScheduleEvent(EVENT_HERO_SPELL_4, randtime(8s,  10s)); break;
+                        case NPC_MASUD:   DoCastVictim(SPELL_MASUD_4,   true); _events.ScheduleEvent(EVENT_HERO_SPELL_4, randtime(12s, 15s)); break;
+                        case NPC_GENESS:  DoCastVictim(SPELL_GENESS_4,  true); _events.ScheduleEvent(EVENT_HERO_SPELL_4, randtime(20s, 25s)); break;
+                        case NPC_TALLA:   DoCastVictim(SPELL_TALLA_4,   true); _events.ScheduleEvent(EVENT_HERO_SPELL_4, randtime(15s, 20s)); break;
+                        case NPC_RITH:    DoCastVictim(SPELL_RITH_4,    true); _events.ScheduleEvent(EVENT_HERO_SPELL_4, randtime(8s,  10s)); break;
+                        case NPC_ELDRETH: DoCastVictim(SPELL_ELDRETH_4);       _events.ScheduleEvent(EVENT_HERO_SPELL_4, randtime(18s, 22s)); break;
+                        default: break;
+                    }
+                    break;
+                case EVENT_HERO_SPELL_5:
+                    me->StopMoving();
+                    switch (me->GetEntry())
+                    {
+                        case NPC_JHADRAS: DoCastVictim(SPELL_JHADRAS_5);       _events.ScheduleEvent(EVENT_HERO_SPELL_5, randtime(12s, 15s)); break;
+                        case NPC_TALLA:   DoCastVictim(SPELL_TALLA_5,   true); _events.ScheduleEvent(EVENT_HERO_SPELL_5, randtime(10s, 12s)); break;
+                        case NPC_RITH:    DoCastVictim(SPELL_RITH_5,    true); _events.ScheduleEvent(EVENT_HERO_SPELL_5, randtime(6s,  8s));  break;
+                        case NPC_ELDRETH: DoCastVictim(SPELL_ELDRETH_5);       _events.ScheduleEvent(EVENT_HERO_SPELL_5, randtime(15s, 20s)); break;
+                        default: break;
+                    }
+                    break;
+                case EVENT_HERO_SNARE:
+                    if (Unit* victim = me->GetVictim())
+                        if (!victim->HasAura(SPELL_HAMSTRING))
+                            DoCastVictim(SPELL_HAMSTRING);
+                    _events.ScheduleEvent(EVENT_HERO_SNARE, randtime(10s, 14s));
+                    break;
+                case EVENT_HERO_INTERRUPT:
+                    if (Unit* victim = me->GetVictim())
+                        if (victim->IsNonMeleeSpellCast(false))
+                            DoCastVictim(SPELL_PUMMEL);
+                    _events.ScheduleEvent(EVENT_HERO_INTERRUPT, randtime(3s, 5s));
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        if (!UpdateVictim())
+            return;
+
+        if (!IsCaster())
+        {
+            // PvP behavior: run to close distance when player kites, walk in melee range
+            bool const shouldWalk = me->GetDistance(me->GetVictim()) <= 8.0f;
+            if (me->IsWalking() != shouldWalk)
+                me->SetWalk(shouldWalk);
+
+            DoMeleeAttackIfReady();
+        }
+    }
 };
 
 class npc_battle_at_valhalas : public CreatureScript
@@ -146,6 +455,7 @@ public:
             switch (currentQuest)
             {
                 case QUEST_BFV_FALLEN_HEROES:
+                    Talk(SAY_GEIRRVIF_FALLEN_HEROES);
                     me->SummonCreature(NPC_ELDRETH, 8245.5f, 3522.7f, 627.67f, 3.11f, TEMPSUMMON_MANUAL_DESPAWN, 30000);
                     me->SummonCreature(NPC_GENESS, 8217.45f, 3546.0f, 628.20f, 4.41f, TEMPSUMMON_MANUAL_DESPAWN, 30000);
                     me->SummonCreature(NPC_JHADRAS, 8179.99f, 3523.72f, 628.1f, 5.95f, TEMPSUMMON_MANUAL_DESPAWN, 30000);
@@ -232,7 +542,6 @@ public:
                         {
                             case QUEST_BFV_FALLEN_HEROES:
                                 me->Yell("There can only be one outcome to such a battle: death for one side or the other. Let $n prove himself upon the bones of these outsiders who have fallen before!", LANG_UNIVERSAL, ObjectAccessor::GetPlayer(*me, playerGUID));
-                                me->TextEmote("The fallen heroes of Valhalas emerge from the ground to do battle once more!", nullptr, true);
                                 break;
                             case QUEST_BFV_DARK_MASTER:
                                 me->TextEmote("Khit'rix the Dark Master skitters into Valhalas from the southeast!", nullptr, true);
@@ -2116,6 +2425,7 @@ void AddSC_icecrown()
 {
     new npc_black_knight_graveyard();
     new npc_battle_at_valhalas();
+    RegisterCreatureAI(npc_valhalas_fallen_hero);
     new npc_llod_generic();
     new npc_lord_arete();
     new npc_boneguard_footman();
