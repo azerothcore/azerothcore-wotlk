@@ -53,8 +53,13 @@ function config_value() {
     fi
 
     awk -F= -v key="$key" '
-        $0 ~ "^[[:space:]]*" key "[[:space:]]*=" {
-            value = $2
+        {
+            configKey = $1
+            gsub(/^[[:space:]]+|[[:space:]]+$/, "", configKey)
+        }
+        configKey == key {
+            value = $0
+            sub(/^[^=]*=/, "", value)
             sub(/[[:space:]]*[#;].*$/, "", value)
             gsub(/"/, "", value)
             gsub(/^[[:space:]]+|[[:space:]]+$/, "", value)
@@ -145,10 +150,30 @@ function wait_for_startup_guard() {
     local interval="${AC_STARTUP_GUARD_INTERVAL:-2}"
     local elapsed=0
     local instances ports
+    local sleep_for
     local warned=0
 
     if [ "${AC_STARTUP_SKIP_GUARD:-0}" = "1" ]; then
         return 0
+    fi
+
+    case "$timeout" in
+        ''|*[!0-9]*)
+            echo "Startup guard: invalid AC_STARTUP_GUARD_TIMEOUT '$timeout', using 90."
+            timeout=90
+            ;;
+    esac
+
+    case "$interval" in
+        ''|*[!0-9]*)
+            echo "Startup guard: invalid AC_STARTUP_GUARD_INTERVAL '$interval', using 2."
+            interval=2
+            ;;
+    esac
+
+    if [ "$interval" -lt 1 ]; then
+        echo "Startup guard: AC_STARTUP_GUARD_INTERVAL must be at least 1, using 1."
+        interval=1
     fi
 
     while true; do
@@ -176,8 +201,15 @@ function wait_for_startup_guard() {
             warned=1
         fi
 
-        sleep "$interval"
-        elapsed=$((elapsed + interval))
+        sleep_for="$interval"
+        if [ $((elapsed + sleep_for)) -gt "$timeout" ]; then
+            sleep_for=$((timeout - elapsed))
+        fi
+
+        [ "$sleep_for" -le 0 ] && continue
+
+        sleep "$sleep_for"
+        elapsed=$((elapsed + sleep_for))
     done
 }
 
