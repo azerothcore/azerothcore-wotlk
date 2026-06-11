@@ -647,7 +647,7 @@ namespace Acore
     class GameObjectFocusCheck
     {
     public:
-        GameObjectFocusCheck(Unit const* unit, uint32 focusId) : i_unit(unit), i_focusId(focusId) {}
+        GameObjectFocusCheck(WorldObject const* caster, uint32 focusId) : i_caster(caster), i_focusId(focusId) {}
         bool operator()(GameObject* go) const
         {
             if (go->GetGOInfo()->type != GAMEOBJECT_TYPE_SPELL_FOCUS)
@@ -661,10 +661,10 @@ namespace Acore
 
             float dist = (float)((go->GetGOInfo()->spellFocus.dist) / 2);
 
-            return go->IsWithinDistInMap(i_unit, dist);
+            return go->IsWithinDistInMap(i_caster, dist);
         }
     private:
-        Unit const* i_unit;
+        WorldObject const* i_caster;
         uint32 i_focusId;
     };
 

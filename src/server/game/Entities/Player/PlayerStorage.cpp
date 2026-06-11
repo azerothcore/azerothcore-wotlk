@@ -5807,6 +5807,13 @@ void Player::_LoadAuras(PreparedQueryResult result, uint32 timediff)
                 continue;
             }
 
+            // auras without a caster guid cannot be restored (Aura::TryCreate requires one)
+            if (!caster_guid)
+            {
+                LOG_ERROR("entities.player", "Aura (spellid {}) with empty caster guid, ignore.", spellid);
+                continue;
+            }
+
             // Xinef: leave this
             if (spellInfo->HasAura(SPELL_AURA_MOUNTED))
             {

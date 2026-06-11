@@ -310,7 +310,14 @@ Aura* Aura::Create(SpellInfo const* spellproto, uint8 effMask, WorldObject* owne
     // try to get caster of aura
     if (casterGUID)
     {
-        if (owner->GetGUID() == casterGUID)
+        // world gameobjects can't own auras and they send empty casterguid
+        // checked on sniffs with spell 22247
+        if (casterGUID.IsGameObject())
+        {
+            caster = nullptr;
+            casterGUID.Clear();
+        }
+        else if (owner->GetGUID() == casterGUID)
             caster = owner->ToUnit();
         else
             caster = ObjectAccessor::GetUnit(*owner, casterGUID);
@@ -346,7 +353,7 @@ Aura* Aura::Create(SpellInfo const* spellproto, uint8 effMask, WorldObject* owne
 }
 
 Aura::Aura(SpellInfo const* spellproto, WorldObject* owner, Unit* caster, Item* castItem, ObjectGuid casterGUID, ObjectGuid itemGUID /*= ObjectGuid::Empty*/) :
-    m_spellInfo(spellproto), m_casterGuid(casterGUID ? casterGUID : caster->GetGUID()),
+    m_spellInfo(spellproto), m_casterGuid(casterGUID ? casterGUID : (caster ? caster->GetGUID() : ObjectGuid::Empty)),
     m_castItemGuid(itemGUID ? itemGUID : castItem ? castItem->GetGUID() : ObjectGuid::Empty), m_castItemEntry(castItem ? castItem->GetEntry() : 0), m_applyTime(GameTime::GetGameTime().count()),
     m_owner(owner), m_timeCla(0), m_updateTargetMapInterval(0),
     m_casterLevel(caster ? caster->GetLevel() : m_spellInfo->SpellLevel), m_procCharges(0), m_stackAmount(1),
@@ -1055,6 +1062,13 @@ bool Aura::CanBeSaved() const
     }
 
     if (IsPassive() || (spellInfo->HasAttribute(SPELL_ATTR0_DO_NOT_DISPLAY) && spellInfo->Stances))
+    {
+        return false;
+    }
+
+    // GameObject-cast auras have no caster guid (cleared in Aura::Create) and cannot
+    // be restored on login - do not save them
+    if (!GetCasterGUID())
     {
         return false;
     }
