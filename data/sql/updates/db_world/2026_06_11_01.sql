@@ -1,3 +1,4 @@
+-- DB update 2026_06_11_00 -> 2026_06_11_01
 --
 -- https://www.wowhead.com/quest=24743/shadows-edge
 DELETE FROM `quest_offer_reward_locale` WHERE `ID` = 24743  AND `locale` IN ('esMX', 'esES');
