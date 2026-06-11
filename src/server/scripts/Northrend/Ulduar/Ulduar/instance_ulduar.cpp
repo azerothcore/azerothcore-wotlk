@@ -404,7 +404,7 @@ public:
                             normalChestPosition.GetPositionX(),
                             normalChestPosition.GetPositionY(),
                             normalChestPosition.GetPositionZ(),
-                            normalChestPosition.GetOrientation(), 0, 0, 0, 0, 0))
+                            normalChestPosition.GetOrientation(), 0, 0, 0, 0, 0, true, GO_SUMMON_TIMED_DESPAWN))
                         {
                             go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                         }
@@ -416,7 +416,7 @@ public:
                             hardChestPosition.GetPositionX(),
                             hardChestPosition.GetPositionY(),
                             hardChestPosition.GetPositionZ(),
-                            hardChestPosition.GetOrientation(), 0, 0, 0, 0, 0))
+                            hardChestPosition.GetOrientation(), 0, 0, 0, 0, 0, true, GO_SUMMON_TIMED_DESPAWN))
                         {
                             go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                             _hmHodir = true;
@@ -433,7 +433,7 @@ public:
                             normalChestPosition.GetPositionX(),
                             normalChestPosition.GetPositionY(),
                             normalChestPosition.GetPositionZ(),
-                            normalChestPosition.GetOrientation(), 0, 0, 0, 0, 0))
+                            normalChestPosition.GetOrientation(), 0, 0, 0, 0, 0, true, GO_SUMMON_TIMED_DESPAWN))
                         {
                             go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                         }
@@ -445,7 +445,7 @@ public:
                             hardChestPosition.GetPositionX(),
                             hardChestPosition.GetPositionY(),
                             hardChestPosition.GetPositionZ(),
-                            hardChestPosition.GetOrientation(), 0, 0, 0, 0, 0))
+                            hardChestPosition.GetOrientation(), 0, 0, 0, 0, 0, true, GO_SUMMON_TIMED_DESPAWN))
                         {
                             go->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE);
                             _hmHodir = true;

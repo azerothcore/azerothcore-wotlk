@@ -74,12 +74,13 @@ Battlefield::~Battlefield()
     CapturePoints.clear();
 }
 
-void Battlefield::RemovePlayerFromTracking(ObjectGuid playerGuid)
+void Battlefield::RemovePlayerFromTracking(ObjectGuid playerGuid, bool removeFromQueue /*= true*/)
 {
     for (uint8 i = 0; i < PVP_TEAMS_COUNT; ++i)
     {
         InvitedPlayers[i].erase(playerGuid);
-        PlayersInQueue[i].erase(playerGuid);
+        if (removeFromQueue)
+            PlayersInQueue[i].erase(playerGuid);
         PlayersWillBeKick[i].erase(playerGuid);
         Players[i].erase(playerGuid);
     }
@@ -152,7 +153,7 @@ void Battlefield::HandlePlayerLeaveZone(Player* player, uint32 /*zone*/)
     for (BfCapturePoint* cp : CapturePoints)
         cp->HandlePlayerLeave(player);
 
-    RemovePlayerFromTracking(player->GetGUID());
+    RemovePlayerFromTracking(player->GetGUID(), /*removeFromQueue=*/false);
     SendRemoveWorldStates(player);
     RemovePlayerFromResurrectQueue(player->GetGUID());
     OnPlayerLeaveZone(player);
@@ -304,6 +305,20 @@ bool Battlefield::IsPlayerInWarOrInvited(Player* player) const
 {
     TeamId teamId = player->GetTeamId();
     return PlayersInWar[teamId].count(player->GetGUID()) || InvitedPlayers[teamId].count(player->GetGUID());
+}
+
+bool Battlefield::IsPlayerInBattlefield(ObjectGuid guid) const
+{
+    if (!IsWarTime())
+        return false;
+
+    // PlayersInWar is split into per-team sets, but a GUID alone does not indicate the team, so check both sets.
+    // This also stays correct if an OnBattlefieldPlayerJoinWar handler reassigned the team GetTeamId() returns.
+    for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
+        if (PlayersInWar[team].count(guid))
+            return true;
+
+    return false;
 }
 
 void Battlefield::KickAfkPlayers()

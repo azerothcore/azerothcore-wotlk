@@ -292,7 +292,7 @@ struct boss_freya : public BossAI
                 uint32 chestId = RAID_MODE(GO_FREYA_CHEST, GO_FREYA_CHEST_HERO);
                 chestId -= 2 * _elderCount; // offset
 
-                if (GameObject* go = me->SummonGameObject(chestId, 2345.61f, -71.20f, 425.104f, 3.0f, 0, 0, 0, 0, 0))
+                if (GameObject* go = me->SummonGameObject(chestId, 2345.61f, -71.20f, 425.104f, 3.0f, 0, 0, 0, 0, 0, true, GO_SUMMON_TIMED_DESPAWN))
                 {
                     go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
                     go->SetLootRecipient(me->GetMap());
