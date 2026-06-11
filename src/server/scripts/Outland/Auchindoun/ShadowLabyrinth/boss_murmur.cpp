@@ -120,7 +120,7 @@ struct boss_murmur : public BossAI
     {
         BossAI::DamageTaken(attacker, damage, damagetype, damageSchoolMask);
 
-        if (!me->GetVictim() && attacker->IsControlledByPlayer())
+        if (attacker && !me->GetVictim() && attacker->IsControlledByPlayer())
             AttackStart(attacker);
     }
 
