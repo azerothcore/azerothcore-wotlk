@@ -23,6 +23,8 @@
 #include "Group.h"
 #include "ObjectDefines.h"
 #include "ObjectMgr.h"
+#include "PlayerScript.h"
+#include "QuestDef.h"
 #include "ScriptedCreature.h"
 #include "SpellMgr.h"
 #include "Vehicle.h"
@@ -1506,7 +1508,94 @@ public:
     }
 };
 
+// SmartQuestScript — PlayerScript that fires SmartAI events for quests
+// using source_type = 5 (SMART_SCRIPT_TYPE_QUEST) in smart_scripts.
+//
+// Supported events:
+//   SMART_EVENT_QUEST_ACCEPTED    (47) — fired when player accepts the quest
+//   SMART_EVENT_QUEST_COMPLETION  (49) — fired when player completes all objectives (before reward)
+//   SMART_EVENT_QUEST_REWARDED    (50) — fired when player receives the quest reward
+//   SMART_EVENT_QUEST_FAIL        (51) — fired when player abandons the quest
+//
+// Usage (smart_scripts table):
+//   entryOrGuid = quest_id
+//   source_type = 5
+//   event_type  = 47/49/50/51
+class SmartQuestScript : public PlayerScript
+{
+public:
+    SmartQuestScript() : PlayerScript("SmartQuestScript") { }
+
+    // Fired when a player accepts any quest (all quest givers)
+    void OnPlayerQuestAccept(Player* player, Quest const* quest) override
+    {
+        if (!player || !quest)
+            return;
+
+        uint32 questId = quest->GetQuestId();
+        SmartAIEventList events = sSmartScriptMgr->GetScript((int32)questId, SMART_SCRIPT_TYPE_QUEST);
+        if (events.empty())
+            return;
+
+        LOG_DEBUG("sql.sql", "SmartQuestScript::OnPlayerQuestAccept: Quest {} fired SMART_EVENT_QUEST_ACCEPTED", questId);
+        SmartScript script;
+        script.OnInitializeQuest(questId);
+        script.ProcessEventsFor(SMART_EVENT_QUEST_ACCEPTED, player);
+    }
+
+    // Fired when a player completes all quest objectives (before receiving reward)
+    bool OnPlayerBeforeQuestComplete(Player* player, uint32 quest_id) override
+    {
+        if (!player)
+            return true;
+
+        SmartAIEventList events = sSmartScriptMgr->GetScript((int32)quest_id, SMART_SCRIPT_TYPE_QUEST);
+        if (events.empty())
+            return true;
+
+        LOG_DEBUG("sql.sql", "SmartQuestScript::OnPlayerBeforeQuestComplete: Quest {} fired SMART_EVENT_QUEST_COMPLETION", quest_id);
+        SmartScript script;
+        script.OnInitializeQuest(quest_id);
+        script.ProcessEventsFor(SMART_EVENT_QUEST_COMPLETION, player);
+        return true;
+    }
+
+    // Fired when a player receives the quest reward
+    void OnPlayerCompleteQuest(Player* player, Quest const* quest) override
+    {
+        if (!player || !quest)
+            return;
+
+        uint32 questId = quest->GetQuestId();
+        SmartAIEventList events = sSmartScriptMgr->GetScript((int32)questId, SMART_SCRIPT_TYPE_QUEST);
+        if (events.empty())
+            return;
+
+        LOG_DEBUG("sql.sql", "SmartQuestScript::OnPlayerCompleteQuest: Quest {} fired SMART_EVENT_QUEST_REWARDED", questId);
+        SmartScript script;
+        script.OnInitializeQuest(questId);
+        script.ProcessEventsFor(SMART_EVENT_QUEST_REWARDED, player);
+    }
+
+    // Fired when a player abandons a quest
+    void OnPlayerQuestAbandon(Player* player, uint32 questId) override
+    {
+        if (!player)
+            return;
+
+        SmartAIEventList events = sSmartScriptMgr->GetScript((int32)questId, SMART_SCRIPT_TYPE_QUEST);
+        if (events.empty())
+            return;
+
+        LOG_DEBUG("sql.sql", "SmartQuestScript::OnPlayerQuestAbandon: Quest {} fired SMART_EVENT_QUEST_FAIL", questId);
+        SmartScript script;
+        script.OnInitializeQuest(questId);
+        script.ProcessEventsFor(SMART_EVENT_QUEST_FAIL, player);
+    }
+};
+
 void AddSC_SmartScripts()
 {
     new SmartTrigger();
+    new SmartQuestScript();
 }
