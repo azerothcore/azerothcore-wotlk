@@ -365,6 +365,9 @@ public:
     /// Returns the set of players actively fighting in the war (per team, read-only).
     GuidUnorderedSet const& GetPlayersInWarSet(TeamId teamId) const { return PlayersInWar[teamId]; }
 
+    // Returns true if the player is enrolled as a participant in the currently active battle.
+    bool IsPlayerInBattlefield(ObjectGuid guid) const;
+
     void DoPlaySoundToAll(uint32 soundId);
 
     void InvitePlayerToQueue(Player* player);
@@ -441,7 +444,7 @@ protected:
     /// Returns true if the player is already tracked as actively in the war or invited to join it.
     bool IsPlayerInWarOrInvited(Player* player) const;
 
-    void RemovePlayerFromTracking(ObjectGuid playerGuid);
+    void RemovePlayerFromTracking(ObjectGuid playerGuid, bool removeFromQueue = true);
 
     // Player-iteration helpers: resolve each GUID to a live Player* and call fn(player).
     // Using templates avoids std::function overhead and works naturally with lambdas.
