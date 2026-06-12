@@ -1,11 +1,5 @@
 -- JHORDY LAPFORGE (Engineering(260 / Gnomish Engineer)) - Ultrasafe Transporter: Gadgetzan
 
--- Update NPC Text for base gossip to fix spacing
-UPDATE `npc_text` SET `text0_0` = 'With some of the technology that was recovered by bold gnomes venturing into Gnomeregan, I have managed to construct my greatest invention: The Matter Transporter!$B$BAll I need now is a skilled Gnomish Engineer to build a powerful beacon attuned to the transporter.' WHERE (`ID` = 7251);
-
--- Update NPC Text for learn schematic gossip
-UPDATE `npc_text` SET `text0_0` = 'Once you have built the device, you simply activate the device to be whisked away to lovely Gadgetzan! Nearly everyone who has used the device has arrived on the pad here looking just the way they did when they began!$B$BThere have been some reported problems with transportees being replaced by their evil selves from an alternate universe, but I''m sure we will have that worked out soon...' WHERE (`ID` = 7252);
-
 -- Add gossip option (0) to learn schematic
 DELETE FROM `gossip_menu_option` WHERE (`MenuID` = 6094) AND (`OptionID` IN (0));
 INSERT INTO `gossip_menu_option` (`MenuID`, `OptionID`, `OptionIcon`, `OptionText`, `OptionBroadcastTextID`, `OptionType`, `OptionNpcFlag`, `ActionMenuID`, `ActionPoiID`, `BoxCoded`, `BoxMoney`, `BoxText`, `BoxBroadcastTextID`, `VerifiedBuild`) VALUES
