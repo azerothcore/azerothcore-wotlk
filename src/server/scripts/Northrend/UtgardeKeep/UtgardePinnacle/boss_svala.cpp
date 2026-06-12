@@ -138,8 +138,8 @@ public:
             {
                 me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetImmuneToAll(false);
-                me->SetHover(true);
-                me->SetAnimTier(AnimTier::Hover);
+                me->SetHover(false);
+                me->SetAnimTier(AnimTier::Fly);
                 me->ClearUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
             }
         }
@@ -287,8 +287,8 @@ public:
                     events2.ScheduleEvent(EVENT_SVALA_TALK9, 2s);
                     break;
                 case EVENT_SVALA_TALK9:
-                    me->SetHover(true);
-                    me->SetAnimTier(AnimTier::Hover);
+                    me->SetHover(false);
+                    me->SetAnimTier(AnimTier::Fly);
                     me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 1.0f);
                     me->SetImmuneToAll(false);
                     me->LoadEquipment(1, true);
