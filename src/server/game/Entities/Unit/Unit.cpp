@@ -7128,10 +7128,16 @@ ReputationRank Unit::GetReactionTo(Unit const* target, bool checkOriginalFaction
                     if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_PVP))
                         return REP_FRIENDLY; // allow cross-faction party members to heal or assist each other
 
-                    // cannot assist/heal a PvP-flagged opposite-faction target in the open world
-                    if (!(target->IsPvP() && selfPlayerOwner->GetTeamId() != targetPlayerOwner->GetTeamId()
-                        && selfPlayerOwner->GetMap() && selfPlayerOwner->GetMap()->IsWorldMap()))
+                    // disallow assisting a PvP-flagged opposite-faction player (or their pet/guardian) in the open world
+                    Map const* map = selfPlayerOwner->GetMap();
+                    bool const isCrossFactionWorldPvpAssistDisallowed = static_cast<Unit const*>(targetPlayerOwner)->IsPvP()
+                        && selfPlayerOwner->GetTeamId() != targetPlayerOwner->GetTeamId()
+                        && map && map->IsWorldMap();
+
+                    if (!isCrossFactionWorldPvpAssistDisallowed)
                         return REP_FRIENDLY; // return true to allow config option AllowTwoSide.Interaction.Group to work
+
+                    // otherwise fall through to the faction-based reaction below (hostile for opposite factions)
                 }
                 // however client seems to allow mixed group parties, because in 13850 client it works like:
                 // return GetFactionReactionTo(GetFactionTemplateEntry(), target);
