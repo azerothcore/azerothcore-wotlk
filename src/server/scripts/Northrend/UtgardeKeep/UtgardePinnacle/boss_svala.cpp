@@ -192,6 +192,8 @@ public:
 
         void JustDied(Unit*) override
         {
+            me->SetDisableGravity(false);
+            me->SetAnimTier(AnimTier::Ground);
             summons.DespawnAll();
             Talk(SAY_DEATH);
             if (instance)
