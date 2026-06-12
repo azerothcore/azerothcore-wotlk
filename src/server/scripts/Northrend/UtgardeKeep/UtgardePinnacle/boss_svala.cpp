@@ -138,7 +138,8 @@ public:
             {
                 me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetImmuneToAll(false);
-                me->SetHover(false);
+                me->SetCanFly(true);
+                me->SetDisableGravity(true);
                 me->SetAnimTier(AnimTier::Fly);
                 me->ClearUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
             }
@@ -231,9 +232,10 @@ public:
                     events2.ScheduleEvent(EVENT_SVALA_TALK3, 3s);
                     break;
                 case EVENT_SVALA_TALK3:
+                    me->SetCanFly(true);
+                    me->SetDisableGravity(true);
+                    me->SetAnimTier(AnimTier::Fly);
                     me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 6.0f);
-                    me->SetHover(true);
-                    me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
                     events2.ScheduleEvent(30, 1s);
                     events2.ScheduleEvent(EVENT_SVALA_TALK4, 9s);
                     break;
@@ -281,13 +283,16 @@ public:
                     events2.ScheduleEvent(EVENT_SVALA_TALK8, 13s);
                     break;
                 case EVENT_SVALA_TALK8:
-                    me->SetHover(false);
+                    me->SetCanFly(false);
+                    me->SetDisableGravity(false);
+                    me->SetAnimTier(AnimTier::Ground);
                     me->ClearUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
                     me->GetMotionMaster()->MoveFall(0, true);
                     events2.ScheduleEvent(EVENT_SVALA_TALK9, 2s);
                     break;
                 case EVENT_SVALA_TALK9:
-                    me->SetHover(false);
+                    me->SetCanFly(true);
+                    me->SetDisableGravity(true);
                     me->SetAnimTier(AnimTier::Fly);
                     me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 1.0f);
                     me->SetImmuneToAll(false);
