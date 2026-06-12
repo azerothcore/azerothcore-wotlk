@@ -97,7 +97,8 @@ void Battlefield::HandlePlayerEnterZone(Player* player, uint32 /*zone*/)
     TryRejoinAfterLogout(player); // relog: auto-rejoin, skip invite below
 
     // Xinef: do not invite players on taxi
-    if (!player->IsInFlight())
+    // GMs are not invited to war (see InvitePlayerToWar), so skip queue and slot tracking too
+    if (!player->IsInFlight() && !player->IsGameMaster())
     {
         // If battle is started,
         // If not full of players > invite player to join the war
@@ -109,7 +110,7 @@ void Battlefield::HandlePlayerEnterZone(Player* player, uint32 /*zone*/)
             else
             {
                 /// @todo: Send a packet to announce it to player
-                PlayersWillBeKick[player->GetTeamId()][player->GetGUID()] = GameTime::GetGameTime().count() + (player->IsGameMaster() ? 30 * MINUTE : 10);
+                PlayersWillBeKick[player->GetTeamId()][player->GetGUID()] = GameTime::GetGameTime().count() + 10;
                 InvitePlayerToQueue(player);
             }
         }
@@ -214,6 +215,9 @@ void Battlefield::InvitePlayersInZoneToQueue()
 
 void Battlefield::InvitePlayerToQueue(Player* player)
 {
+    if (player->IsGameMaster()) // GMs are not invited to war, so don't queue them either
+        return;
+
     if (PlayersInQueue[player->GetTeamId()].count(player->GetGUID()))
         return;
 
@@ -238,6 +242,10 @@ void Battlefield::InvitePlayersInZoneToWar()
 {
     ForEachPlayerInZone([this](Player* player)
     {
+        // Skip GMs: they are never invited, so they would linger in PlayersWillBeKick forever
+        if (player->IsGameMaster())
+            return;
+
         if (IsPlayerInWarOrInvited(player))
             return;
 
