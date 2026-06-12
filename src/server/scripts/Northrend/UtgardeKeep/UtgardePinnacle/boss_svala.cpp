@@ -138,7 +138,6 @@ public:
             {
                 me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetImmuneToAll(false);
-                me->SetAnimTier(AnimTier::Ground);
                 me->ClearUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
             }
         }
@@ -230,7 +229,6 @@ public:
                     events2.ScheduleEvent(EVENT_SVALA_TALK3, 3s);
                     break;
                 case EVENT_SVALA_TALK3:
-                    me->SetAnimTier(AnimTier::Fly);
                     me->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 6.0f, me->GetOrientation());
                     me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
                     me->GetMotionMaster()->MoveIdle();
@@ -241,7 +239,6 @@ public:
                         me->CastSpell(me, SPELL_SVALA_TRANSFORMING1, true);
                         me->UpdateEntry(NPC_SVALA_SORROWGRAVE);
                         // UpdateEntry resets unit states — restore suspended state
-                        me->SetAnimTier(AnimTier::Fly);
                         me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
                         me->GetMotionMaster()->MoveIdle();
                         me->SetCorpseDelay(sWorld->getIntConfig(CONFIG_CORPSE_DECAY_ELITE));
@@ -276,8 +273,6 @@ public:
                     events2.ScheduleEvent(EVENT_SVALA_TALK8, 13s);
                     break;
                 case EVENT_SVALA_TALK8:
-                    me->SetDisableGravity(false);
-                    me->SetAnimTier(AnimTier::Ground);
                     me->ClearUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
                     me->GetMotionMaster()->MoveFall(0, true);
                     events2.ScheduleEvent(EVENT_SVALA_TALK9, 3s);
