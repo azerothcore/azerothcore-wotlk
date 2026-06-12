@@ -139,7 +139,7 @@ public:
                 me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetImmuneToAll(false);
                 me->SetDisableGravity(false);
-                me->SetAnimTier(AnimTier::Fly);
+                me->SetAnimTier(AnimTier::Ground);
                 me->ClearUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
             }
         }
