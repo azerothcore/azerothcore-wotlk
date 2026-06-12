@@ -30,6 +30,7 @@ void AddSC_debug_commandscript();
 void AddSC_deserter_commandscript();
 void AddSC_disable_commandscript();
 void AddSC_event_commandscript();
+void AddSC_chatfilter_commandscript();
 void AddSC_gear_commandscript();
 void AddSC_gm_commandscript();
 void AddSC_go_commandscript();
@@ -88,6 +89,7 @@ void AddCommandsScripts()
     AddSC_deserter_commandscript();
     AddSC_disable_commandscript();
     AddSC_event_commandscript();
+    AddSC_chatfilter_commandscript();
     AddSC_gear_commandscript();
     AddSC_gm_commandscript();
     AddSC_go_commandscript();
