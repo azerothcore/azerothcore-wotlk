@@ -138,6 +138,8 @@ public:
             {
                 me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetImmuneToAll(false);
+                me->SetHover(false);
+                me->SetDisableGravity(false);
                 me->SetAnimTier(AnimTier::Fly);
                 me->ClearUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
             }
@@ -230,7 +232,7 @@ public:
                     events2.ScheduleEvent(EVENT_SVALA_TALK3, 3s);
                     break;
                 case EVENT_SVALA_TALK3:
-                    me->SetCanFly(true);
+                    me->SetHover(true);
                     me->SetDisableGravity(true);
                     me->SetAnimTier(AnimTier::Fly);
                     me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 6.0f);
@@ -241,8 +243,8 @@ public:
                     {
                         me->CastSpell(me, SPELL_SVALA_TRANSFORMING1, true);
                         me->UpdateEntry(NPC_SVALA_SORROWGRAVE);
-                        // UpdateEntry resets movement flags — restore fly state
-                        me->SetCanFly(true);
+                        // UpdateEntry resets movement flags — restore elevated hover state
+                        me->SetHover(true);
                         me->SetDisableGravity(true);
                         me->SetAnimTier(AnimTier::Fly);
                         me->GetMotionMaster()->MoveIdle();
@@ -279,7 +281,7 @@ public:
                     events2.ScheduleEvent(EVENT_SVALA_TALK8, 13s);
                     break;
                 case EVENT_SVALA_TALK8:
-                    me->SetCanFly(false);
+                    me->SetHover(false);
                     me->SetDisableGravity(false);
                     me->SetAnimTier(AnimTier::Ground);
                     me->ClearUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
