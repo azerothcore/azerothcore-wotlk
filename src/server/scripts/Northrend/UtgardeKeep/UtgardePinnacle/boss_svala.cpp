@@ -234,20 +234,18 @@ public:
                     me->SetDisableGravity(true);
                     me->SetAnimTier(AnimTier::Fly);
                     me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 6.0f);
-                    events2.ScheduleEvent(30, 1s);
+                    me->GetMotionMaster()->MoveIdle();
                     events2.ScheduleEvent(EVENT_SVALA_TALK4, 9s);
                     break;
-                case 30:
-                    {
-                        WorldPacket data(SMSG_SPLINE_MOVE_SET_HOVER, 9);
-                        data << me->GetPackGUID();
-                        me->SendMessageToSet(&data, false);
-                        break;
-                    }
                 case EVENT_SVALA_TALK4:
                     {
                         me->CastSpell(me, SPELL_SVALA_TRANSFORMING1, true);
                         me->UpdateEntry(NPC_SVALA_SORROWGRAVE);
+                        // UpdateEntry resets movement flags — restore fly state
+                        me->SetCanFly(true);
+                        me->SetDisableGravity(true);
+                        me->SetAnimTier(AnimTier::Fly);
+                        me->GetMotionMaster()->MoveIdle();
                         me->SetCorpseDelay(sWorld->getIntConfig(CONFIG_CORPSE_DECAY_ELITE));
                         me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 6.0f);
                         me->SetImmuneToAll(true);
