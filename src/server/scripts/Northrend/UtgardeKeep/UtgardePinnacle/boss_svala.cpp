@@ -192,9 +192,6 @@ public:
 
         void JustDied(Unit*) override
         {
-            me->SetCanFly(false);
-            me->SetDisableGravity(false);
-            me->SetAnimTier(AnimTier::Ground);
             summons.DespawnAll();
             Talk(SAY_DEATH);
             if (instance)
@@ -287,7 +284,6 @@ public:
                     events2.ScheduleEvent(EVENT_SVALA_TALK9, 3s);
                     break;
                 case EVENT_SVALA_TALK9:
-                    me->SetAnimTier(AnimTier::Fly);
                     me->SetImmuneToAll(false);
                     me->LoadEquipment(1, true);
                     me->setActive(false);
