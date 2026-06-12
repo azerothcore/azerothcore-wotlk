@@ -726,8 +726,9 @@ enum SMART_ACTION
     SMART_ACTION_SET_ANIM_TIER                      = 239,    // animtier
     SMART_ACTION_SET_GOSSIP_MENU                    = 240,    // gossipMenuId
     SMART_ACTION_SUMMON_GAMEOBJECT_GROUP            = 241,    // group
+    SMART_ACTION_INC_DATA                           = 242,    // field, increment (uses aiDataSet, wipe-safe across evade)
 
-    SMART_ACTION_AC_END                             = 242,    // placeholder
+    SMART_ACTION_AC_END                             = 243,    // placeholder
 };
 
 enum class SmartActionSummonCreatureFlags

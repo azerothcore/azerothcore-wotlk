@@ -1229,7 +1229,12 @@ enum AcoreStrings
     LANG_MAIL_RETURN_ALREADY_RETURNED   = 5142,
     LANG_MAIL_RETURN_HOOK_BLOCKED       = 5143,
 
-    // Room for more strings    5144-9999
+    // Chat filter
+    LANG_CHATFILTER_EMOTE               = 5144,
+    LANG_CHATFILTER_SAY                 = 5145,
+    LANG_CHATFILTER_YELL                = 5146,
+
+    // Room for more strings    5147-9999
 
     // Level requirement notifications
     LANG_SAY_REQ                        = 6604,
@@ -1508,6 +1513,10 @@ enum AcoreStrings
     LANG_RESPAWN_ENTRY_GAMEOBJECT_QUEUED     = 35452,
 
     // List respawns console support
-    LANG_LIST_RESPAWNS_NO_MAP           = 35447
+    LANG_LIST_RESPAWNS_NO_MAP           = 35447,
+
+    // Pet rename command
+    LANG_PET_RENAME_INVALID             = 35453,
+    LANG_PET_RENAME_SUCCESS             = 35454
 };
 #endif
