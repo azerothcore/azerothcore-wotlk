@@ -377,7 +377,7 @@ public:
     {
         npc_ritual_channelerAI(Creature* pCreature) : ScriptedAI(pCreature), _targetGUID(), _paralyzeTimer(0)
         {
-            SetCombatMovement(false);
+            me->SetCombatMovement(false);
         }
 
         ObjectGuid _targetGUID;
