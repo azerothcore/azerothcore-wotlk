@@ -33,3 +33,11 @@ UPDATE `acore_string` SET `locale_zhTW` = REPLACE(`locale_zhTW`, '├─ ', '|--
 UPDATE `acore_string` SET `locale_esES` = REPLACE(`locale_esES`, '├─ ', '|-- ') WHERE `locale_esES` LIKE '├─%';
 UPDATE `acore_string` SET `locale_esMX` = REPLACE(`locale_esMX`, '├─ ', '|-- ') WHERE `locale_esMX` LIKE '├─%';
 UPDATE `acore_string` SET `locale_ruRU` = REPLACE(`locale_ruRU`, '├─ ', '|-- ') WHERE `locale_ruRU` LIKE '├─%';
+
+-- Translated with Claude by Anthropic
+-- Corrected the Arguments "| OS: {} - Latency: {} ms" which lead to format errors. (OLD: "公会: {} ({}) 排名: {} 附注: {} 关闭附注: {}")
+UPDATE `acore_string` SET `locale_zhCN` = '| 系统: {} - 延迟: {} 毫秒' WHERE `entry` = 749;
+
+-- Corrected the Arguments "| Map: {}, Zone: {}" which lead to format errors. (OLD: "¦ 地图: {}, Area: {}, Zone: {})" and "¦ Karte: {}, Bereich: {}, Zone: {}"
+UPDATE `acore_string` SET `locale_zhCN` = '| 地图: {}, 区域: {}' WHERE `entry` = 848;
+UPDATE `acore_string` SET `locale_deDE` = '| Karte: {}, Gebiet: {}' WHERE `entry` = 848;
