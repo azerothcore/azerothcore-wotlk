@@ -194,6 +194,9 @@ public:
         {
             me->SetDisableGravity(false);
             me->SetAnimTier(AnimTier::Ground);
+            float groundZ = me->GetMap()->GetHeight(me->GetPositionX(), me->GetPositionY(), MAX_HEIGHT);
+            if (groundZ != INVALID_HEIGHT)
+                me->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), groundZ, me->GetOrientation());
             summons.DespawnAll();
             Talk(SAY_DEATH);
             if (instance)
