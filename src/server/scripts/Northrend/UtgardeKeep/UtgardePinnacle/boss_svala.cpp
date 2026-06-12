@@ -138,7 +138,6 @@ public:
             {
                 me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetImmuneToAll(false);
-                me->SetHover(false);
                 me->SetDisableGravity(false);
                 me->SetAnimTier(AnimTier::Fly);
                 me->ClearUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
@@ -232,10 +231,9 @@ public:
                     events2.ScheduleEvent(EVENT_SVALA_TALK3, 3s);
                     break;
                 case EVENT_SVALA_TALK3:
-                    me->SetHover(true);
                     me->SetDisableGravity(true);
                     me->SetAnimTier(AnimTier::Fly);
-                    me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 6.0f);
+                    me->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 6.0f, me->GetOrientation());
                     me->GetMotionMaster()->MoveIdle();
                     events2.ScheduleEvent(EVENT_SVALA_TALK4, 9s);
                     break;
@@ -243,13 +241,11 @@ public:
                     {
                         me->CastSpell(me, SPELL_SVALA_TRANSFORMING1, true);
                         me->UpdateEntry(NPC_SVALA_SORROWGRAVE);
-                        // UpdateEntry resets movement flags — restore elevated hover state
-                        me->SetHover(true);
+                        // UpdateEntry resets movement flags — restore fly state
                         me->SetDisableGravity(true);
                         me->SetAnimTier(AnimTier::Fly);
                         me->GetMotionMaster()->MoveIdle();
                         me->SetCorpseDelay(sWorld->getIntConfig(CONFIG_CORPSE_DECAY_ELITE));
-                        me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 6.0f);
                         me->SetImmuneToAll(true);
                         if (Creature* Arthas = ObjectAccessor::GetCreature(*me, ArthasGUID))
                             Arthas->InterruptNonMeleeSpells(false);
@@ -281,16 +277,14 @@ public:
                     events2.ScheduleEvent(EVENT_SVALA_TALK8, 13s);
                     break;
                 case EVENT_SVALA_TALK8:
-                    me->SetHover(false);
                     me->SetDisableGravity(false);
                     me->SetAnimTier(AnimTier::Ground);
                     me->ClearUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
                     me->GetMotionMaster()->MoveFall(0, true);
-                    events2.ScheduleEvent(EVENT_SVALA_TALK9, 2s);
+                    events2.ScheduleEvent(EVENT_SVALA_TALK9, 3s);
                     break;
                 case EVENT_SVALA_TALK9:
                     me->SetAnimTier(AnimTier::Fly);
-                    me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 0.0f);
                     me->SetImmuneToAll(false);
                     me->LoadEquipment(1, true);
                     me->setActive(false);
