@@ -44,10 +44,7 @@ enum Spells
 
 enum Misc
 {
-    ACHIEV_TIMED_START_EVENT        = 9891,
-    EVENT_SPAWN_CRYPT_GUARDS_1      = 0,
-    EVENT_BERSERK                   = 1,
-    EVENT_SPAWN_CRYPT_GUARDS_EXTRA  = 2,
+    ACHIEV_TIMED_START_EVENT        = 9891
 };
 
 Position const cryptguardPositions[] = {
@@ -121,9 +118,10 @@ struct boss_anubrekhan : public BossAI
             SummonCryptGuards();
         if (!Is25ManRaid())
         {
-            ScheduleUniqueTimedEvent(17500ms, [&] {
+            me->m_Events.AddEventAtOffset([this]()
+            {
                 me->SummonCreature(NPC_CRYPT_GUARD, cryptguardPositions[2], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
-            }, EVENT_SPAWN_CRYPT_GUARDS_1);
+            }, 17500ms);
         }
 
         ScheduleTimedEvent(15s, [&] {

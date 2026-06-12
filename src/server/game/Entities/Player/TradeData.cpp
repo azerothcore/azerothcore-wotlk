@@ -20,12 +20,12 @@
 
 TradeData* TradeData::GetTraderData() const
 {
-    return m_trader->GetTradeData();
+    return _trader->GetTradeData();
 }
 
 Item* TradeData::GetItem(TradeSlots slot) const
 {
-    return m_items[slot] ? m_player->GetItemByGuid(m_items[slot]) : nullptr;
+    return m_items[slot] ? _player->GetItemByGuid(m_items[slot]) : nullptr;
 }
 
 bool TradeData::HasItem(ObjectGuid itemGuid) const
@@ -48,7 +48,7 @@ TradeSlots TradeData::GetTradeSlotForItem(ObjectGuid itemGuid) const
 
 Item* TradeData::GetSpellCastItem() const
 {
-    return m_spellCastItem ? m_player->GetItemByGuid(m_spellCastItem) : nullptr;
+    return m_spellCastItem ? _player->GetItemByGuid(m_spellCastItem) : nullptr;
 }
 
 void TradeData::SetItem(TradeSlots slot, Item* item)
@@ -92,16 +92,19 @@ void TradeData::SetSpell(uint32 spell_id, Item* castItem /*= nullptr*/)
 
 void TradeData::SetMoney(uint32 money)
 {
-    if (m_money == money)
+    if (_money == money)
         return;
 
-    if (!m_player->HasEnoughMoney(money))
+    if (!_player->HasEnoughMoney(money))
     {
-        m_player->GetSession()->SendTradeStatus(TRADE_STATUS_BUSY);
+        TradeStatusInfo info;
+        info.Status = TRADE_STATUS_CLOSE_WINDOW;
+        info.Result = EQUIP_ERR_NOT_ENOUGH_MONEY;
+        _player->GetSession()->SendTradeStatus(info);
         return;
     }
 
-    m_money = money;
+    _money = money;
 
     SetAccepted(false);
     GetTraderData()->SetAccepted(false);
@@ -112,20 +115,22 @@ void TradeData::SetMoney(uint32 money)
 void TradeData::Update(bool forTarget /*= true*/)
 {
     if (forTarget)
-        m_trader->GetSession()->SendUpdateTrade(true);      // player state for trader
+        _trader->GetSession()->SendUpdateTrade(true);      // player state for trader
     else
-        m_player->GetSession()->SendUpdateTrade(false);     // player state for player
+        _player->GetSession()->SendUpdateTrade(false);     // player state for player
 }
 
-void TradeData::SetAccepted(bool state, bool crosssend /*= false*/)
+void TradeData::SetAccepted(bool state, bool forTrader /*= false*/)
 {
-    m_accepted = state;
+    _accepted = state;
 
     if (!state)
     {
-        if (crosssend)
-            m_trader->GetSession()->SendTradeStatus(TRADE_STATUS_BACK_TO_TRADE);
+        TradeStatusInfo info;
+        info.Status = TRADE_STATUS_BACK_TO_TRADE;
+        if (forTrader)
+            _trader->GetSession()->SendTradeStatus(info);
         else
-            m_player->GetSession()->SendTradeStatus(TRADE_STATUS_BACK_TO_TRADE);
+            _player->GetSession()->SendTradeStatus(info);
     }
 }
