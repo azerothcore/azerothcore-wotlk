@@ -379,8 +379,8 @@ void OpcodeTable::Initialize()
     /*0x0F8*/ DEFINE_HANDLER(CMSG_TRIGGER_CINEMATIC_CHEAT,                                          STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x0F9*/ DEFINE_HANDLER(CMSG_OPENING_CINEMATIC,                                                STATUS_NEVER,      PROCESS_INPLACE,        &WorldSession::Handle_NULL                              );
     /*0x0FA*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_TRIGGER_CINEMATIC,                                  STATUS_NEVER);
-    /*0x0FB*/ DEFINE_HANDLER(CMSG_NEXT_CINEMATIC_CAMERA,                                            STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleNextCinematicCamera                );
-    /*0x0FC*/ DEFINE_HANDLER(CMSG_COMPLETE_CINEMATIC,                                               STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleCompleteCinematic                  );
+    /*0x0FB*/ DEFINE_HANDLER(CMSG_NEXT_CINEMATIC_CAMERA,                                            STATUS_LOGGEDIN,   PROCESS_THREADSAFE,     &WorldSession::HandleNextCinematicCamera                );
+    /*0x0FC*/ DEFINE_HANDLER(CMSG_COMPLETE_CINEMATIC,                                               STATUS_LOGGEDIN,   PROCESS_THREADSAFE,     &WorldSession::HandleCompleteCinematic                  );
     /*0x0FD*/ DEFINE_SERVER_OPCODE_HANDLER(SMSG_TUTORIAL_FLAGS,                                     STATUS_NEVER);
     /*0x0FE*/ DEFINE_HANDLER(CMSG_TUTORIAL_FLAG,                                                    STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleTutorialFlag                       );
     /*0x0FF*/ DEFINE_HANDLER(CMSG_TUTORIAL_CLEAR,                                                   STATUS_LOGGEDIN,   PROCESS_THREADUNSAFE,   &WorldSession::HandleTutorialClear                      );
