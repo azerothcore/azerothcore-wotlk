@@ -16,6 +16,7 @@
  */
 
 #include "CreatureScript.h"
+#include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
@@ -373,44 +374,20 @@ public:
         return GetUtgardePinnacleAI<npc_ritual_channelerAI>(pCreature);
     }
 
-    struct npc_ritual_channelerAI : public ScriptedAI
+    struct npc_ritual_channelerAI : public NullCreatureAI
     {
-        npc_ritual_channelerAI(Creature* pCreature) : ScriptedAI(pCreature), _targetGUID(), _paralyzeTimer(0)
-        {
-            me->SetCombatMovement(false);
-        }
-
-        ObjectGuid _targetGUID;
-        uint32 _paralyzeTimer;
+        npc_ritual_channelerAI(Creature* pCreature) : NullCreatureAI(pCreature) {}
 
         void AttackStart(Unit* pWho) override
         {
-            if (!pWho)
-                return;
-
             if (me->GetMap()->GetDifficulty() == DUNGEON_DIFFICULTY_HEROIC)
                 me->AddAura(SPELL_SHADOWS_IN_THE_DARK, me);
 
-            _targetGUID = pWho->GetGUID();
-            me->AddThreat(pWho, 10000000.0f);
-            me->CastSpell(pWho, SPELL_PARALYZE, false);
-            _paralyzeTimer = 2000;
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (_targetGUID.IsEmpty())
-                return;
-
-            if (_paralyzeTimer <= diff)
+            if (pWho)
             {
-                if (Unit* target = ObjectAccessor::GetUnit(*me, _targetGUID))
-                    if (!target->HasAura(SPELL_PARALYZE))
-                        me->CastSpell(target, SPELL_PARALYZE, false);
-                _paralyzeTimer = 2000;
+                me->AddThreat(pWho, 10000000.0f);
+                me->CastSpell(pWho, SPELL_PARALYZE, false);
             }
-            else
-                _paralyzeTimer -= diff;
         }
     };
 };
