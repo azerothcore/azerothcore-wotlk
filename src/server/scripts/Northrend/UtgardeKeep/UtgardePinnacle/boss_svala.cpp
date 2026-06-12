@@ -138,6 +138,8 @@ public:
             {
                 me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetImmuneToAll(false);
+                me->SetDisableGravity(false);
+                me->SetCanFly(false);
                 me->ClearUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
             }
         }
@@ -273,6 +275,8 @@ public:
                     events2.ScheduleEvent(EVENT_SVALA_TALK8, 13s);
                     break;
                 case EVENT_SVALA_TALK8:
+                    me->SetDisableGravity(false);
+                    me->SetCanFly(false);
                     me->ClearUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
                     me->GetMotionMaster()->MoveFall(0, true);
                     events2.ScheduleEvent(EVENT_SVALA_TALK9, 3s);
