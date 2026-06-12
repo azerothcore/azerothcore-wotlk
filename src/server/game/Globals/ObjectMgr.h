@@ -18,6 +18,7 @@
 #ifndef _OBJECTMGR_H
 #define _OBJECTMGR_H
 
+#include "AhoCorasick.h"
 #include "Bag.h"
 #include "ConditionMgr.h"
 #include "Creature.h"
@@ -38,6 +39,7 @@
 #include <functional>
 #include <limits>
 #include <map>
+#include <memory>
 #include <string>
 
 class Item;
@@ -1419,6 +1421,10 @@ public:
     [[nodiscard]] bool IsProfanityName(std::string_view name) const;
     void AddProfanityPlayerName(std::string const& name);
 
+    // chat filter (substring chat content filter)
+    void LoadChatFilter();
+    [[nodiscard]] bool IsChatFiltered(std::string_view text) const;
+
     // name with valid structure and symbols
     static uint8 CheckPlayerName(std::string_view name, bool create = false);
     static PetNameInvalidReason CheckPetName(std::string_view name);
@@ -1587,6 +1593,9 @@ private:
     //character profanity names
     typedef std::set<std::wstring> ProfanityNamesContainer;
     ProfanityNamesContainer _profanityNamesStore;
+
+    //chat filter (Aho-Corasick automaton; matches any banned word as substring of input)
+    std::unique_ptr<Acore::AhoCorasick<wchar_t>> _chatFilterAutomaton;
 
     GameTeleContainer _gameTeleStore;
 

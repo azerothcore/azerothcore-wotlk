@@ -198,6 +198,11 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_STRICT_CHANNEL_NAMES, "StrictChannelNames", 0);
     SetConfigValue<uint32>(CONFIG_STRICT_PET_NAMES, "StrictPetNames", 0);
 
+    SetConfigValue<bool>(CONFIG_CHAT_FILTER_WHISPER, "ChatFilter.Whisper", true);
+    SetConfigValue<bool>(CONFIG_CHAT_FILTER_SAY, "ChatFilter.Say", false);
+    SetConfigValue<bool>(CONFIG_CHAT_FILTER_YELL, "ChatFilter.Yell", false);
+    SetConfigValue<bool>(CONFIG_CHAT_FILTER_EMOTE, "ChatFilter.Emote", false);
+
     SetConfigValue<bool>(CONFIG_ALLOW_TWO_SIDE_ACCOUNTS, "AllowTwoSide.Accounts", true);
     SetConfigValue<bool>(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CALENDAR, "AllowTwoSide.Interaction.Calendar", false);
     SetConfigValue<bool>(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHAT, "AllowTwoSide.Interaction.Chat", false);
@@ -688,4 +693,5 @@ void WorldConfig::BuildConfigCache()
 
     // Achievement
     SetConfigValue<uint32>(CONFIG_ACHIEVEMENT_REALM_FIRST_KILL_WINDOW, "Achievement.RealmFirstKillWindow", 60);
+    SetConfigValue<bool>(CONFIG_ACHIEVEMENT_REALM_FIRST_RACE_LIMIT_ONE_PER_CHARACTER, "Achievement.RealmFirstRaceLimitOnePerCharacter", true);
 }
