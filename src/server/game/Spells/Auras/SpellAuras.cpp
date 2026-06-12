@@ -597,7 +597,7 @@ void Aura::UpdateTargetMap(Unit* caster, bool apply)
             if ((itr->second & (1 << effIndex)) && itr->first->IsImmunedToSpellEffect(GetSpellInfo(), effIndex, GetCaster()))
                 itr->second &= ~(1 << effIndex);
         }
-        if (!itr->second || itr->first->IsImmunedToSpell(GetSpellInfo()) || !CanBeAppliedOn(itr->first))
+        if (!itr->second || itr->first->IsImmunedToSpell(GetSpellInfo(), GetCaster()) || !CanBeAppliedOn(itr->first))
             addUnit = false;
 
         if (addUnit && !itr->first->IsHighestExclusiveAura(this, true))
