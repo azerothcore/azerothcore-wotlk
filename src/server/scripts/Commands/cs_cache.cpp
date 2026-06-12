@@ -20,6 +20,7 @@
 #include "Group.h"
 #include "Language.h"
 #include "Player.h"
+#include "RBAC.h"
 
 using namespace Acore::ChatCommands;
 
@@ -32,9 +33,9 @@ public:
     {
         static ChatCommandTable cacheCommandTable =
         {
-            { "info",      HandleCacheInfoCommand,       SEC_GAMEMASTER, Console::Yes    },
-            { "delete",    HandleCacheDeleteCommand,     SEC_ADMINISTRATOR, Console::Yes },
-            { "refresh",   HandleCacheRefreshCommand,    SEC_GAMEMASTER, Console::Yes    }
+            { "info",      HandleCacheInfoCommand,       rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes    },
+            { "delete",    HandleCacheDeleteCommand,     rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes },
+            { "refresh",   HandleCacheRefreshCommand,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::Yes    }
         };
 
         static ChatCommandTable commandTable =

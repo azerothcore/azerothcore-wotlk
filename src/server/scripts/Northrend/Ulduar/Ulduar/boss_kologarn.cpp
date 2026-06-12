@@ -441,7 +441,6 @@ struct boss_kologarn : public BossAI
                 {
                     events.ScheduleEvent(EVENT_FOCUSED_EYEBEAM, 20s);
                     me->CastSpell(me, SPELL_FOCUSED_EYEBEAM_SUMMON, false);
-                    Talk(EMOTE_EYES);
                     return;
                 }
                 case EVENT_RESTORE_ARM_LEFT:
@@ -572,10 +571,10 @@ struct boss_kologarn_eyebeam : public ScriptedAI
 {
     boss_kologarn_eyebeam(Creature* c) : ScriptedAI(c), _timer(1), _damaged(false)
     {
-        m_pInstance = (InstanceScript*)c->GetInstanceScript();
+        _instance = c->GetInstanceScript();
     }
 
-    InstanceScript* m_pInstance;
+    InstanceScript* _instance;
     uint32 _timer;
     bool _damaged;
 
@@ -602,9 +601,10 @@ struct boss_kologarn_eyebeam : public ScriptedAI
             me->Attack(player, false);
             me->GetMotionMaster()->MoveChase(player);
 
-            if (Creature* cr = m_pInstance->GetCreature(BOSS_KOLOGARN))
+            if (Creature* cr = _instance->GetCreature(BOSS_KOLOGARN))
             {
                 me->CastSpell(cr, me->GetEntry() == NPC_EYE_LEFT ? SPELL_FOCUSED_EYEBEAM_LEFT : SPELL_FOCUSED_EYEBEAM_RIGHT, true);
+                cr->AI()->Talk(EMOTE_EYES, player);
             }
         }
     }
@@ -669,25 +669,29 @@ class spell_kologarn_focused_eyebeam : public SpellScript
     }
 };
 
+namespace pitKillBoundary {
+    static auto const boundaryIntersect = new BoundaryIntersectBoundary(
+        new RectangleBoundary(1782.0f, 1832.0f, -56.0f, 8.0f),
+        new ZRangeBoundary(400.0f, 439.0f)
+    );
+}
+
 struct boss_kologarn_pit_kill_bunny : public NullCreatureAI
 {
-    boss_kologarn_pit_kill_bunny(Creature* creature) : NullCreatureAI(creature) { }
+    explicit boss_kologarn_pit_kill_bunny(Creature* creature) : NullCreatureAI(creature) { }
 
     void Reset() override
     {
-        RectangleBoundary* _boundaryXY = new RectangleBoundary(1782.0f, 1832.0f, -56.0f, 8.0f);
-        ZRangeBoundary* _boundaryZ = new ZRangeBoundary(400.0f, 439.0f);
-        _boundaryIntersect = new BoundaryIntersectBoundary(_boundaryXY, _boundaryZ);
-
-        scheduler.Schedule(0s, [this](TaskContext context)
+        scheduler.CancelAll();
+        scheduler.Schedule(0s,
+            [this](TaskContext context)
         {
             me->GetMap()->DoForAllPlayers([&](Player* player)
             {
-                if (_boundaryIntersect->IsWithinBoundary(player->GetPosition()) && !player->IsGameMaster())
-                {
+                if (pitKillBoundary::boundaryIntersect->IsWithinBoundary(player->GetPosition()) && !player->IsGameMaster())
                     player->KillSelf(false);
-                }
             });
+
             context.Repeat(1s);
         });
     }
@@ -696,8 +700,6 @@ struct boss_kologarn_pit_kill_bunny : public NullCreatureAI
     {
         scheduler.Update(diff);
     }
-private:
-    BoundaryIntersectBoundary const* _boundaryIntersect;
 };
 
 // predicate function to select non main tank target

@@ -81,7 +81,7 @@ public:
                         creature->Respawn();
                     break;
                 case NPC_MASTERS_EYE:
-                    if (GetBossState(DATA_TWIN_EMPERORS) != DONE)
+                    if (GetBossState(DATA_TWIN_EMPERORS) != DONE && !creature->IsAlive())
                         creature->Respawn(true);
                     break;
                 case NPC_CTHUN:

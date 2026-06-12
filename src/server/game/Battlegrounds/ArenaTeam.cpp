@@ -132,6 +132,8 @@ bool ArenaTeam::AddMember(ObjectGuid playerGuid)
 
     if (sWorld->getIntConfig(CONFIG_ARENA_START_PERSONAL_RATING) > 0)
         personalRating = sWorld->getIntConfig(CONFIG_ARENA_START_PERSONAL_RATING);
+    else if (sArenaSeasonMgr->GetCurrentSeason() < 6)
+        personalRating = 1500;
     else if (GetRating() >= 1000)
         personalRating = 1000;
 
@@ -180,6 +182,7 @@ bool ArenaTeam::AddMember(ObjectGuid playerGuid)
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ARENA_TEAM_MEMBER);
     stmt->SetData(0, TeamId);
     stmt->SetData(1, playerGuid.GetCounter());
+    stmt->SetData(2, personalRating);
     CharacterDatabase.Execute(stmt);
 
     // Inform player if online

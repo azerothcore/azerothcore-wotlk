@@ -16,7 +16,6 @@
  */
 
 #include "AreaDefines.h"
-#include "CreatureScript.h"
 #include "PetDefines.h"
 #include "Player.h"
 #include "SpellAuraEffects.h"
@@ -60,6 +59,7 @@ enum DeathKnightSpells
     SPELL_DK_IMPROVED_BLOOD_PRESENCE_R1         = 50365,
     SPELL_DK_IMPROVED_FROST_PRESENCE_R1         = 50384,
     SPELL_DK_IMPROVED_UNHOLY_PRESENCE_R1        = 50391,
+    SPELL_DK_IMPROVED_BLOOD_PRESENCE_HEAL       = 50475,
     SPELL_DK_IMPROVED_BLOOD_PRESENCE_TRIGGERED  = 63611,
     SPELL_DK_IMPROVED_UNHOLY_PRESENCE_TRIGGERED = 63622,
     SPELL_DK_ITEM_SIGIL_VENGEFUL_HEART          = 64962,
@@ -492,19 +492,35 @@ class spell_dk_summon_gargoyle : public SpellScript
     }
 };
 
-// 63611 - Improved Blood Presence
-class spell_dk_improved_blood_presence_proc : public AuraScript
+// 63611 - Improved Blood Presence Triggered
+class spell_dk_improved_blood_presence_triggered : public AuraScript
 {
-    PrepareAuraScript(spell_dk_improved_blood_presence_proc);
+    PrepareAuraScript(spell_dk_improved_blood_presence_triggered);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DK_IMPROVED_BLOOD_PRESENCE_HEAL });
+    }
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        return eventInfo.GetDamageInfo() && eventInfo.GetDamageInfo()->GetDamage();
+        return eventInfo.GetActor()->IsPlayer();
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+        if (DamageInfo* dmgInfo = eventInfo.GetDamageInfo())
+        {
+            int32 bp0 = CalculatePct(static_cast<int32>(dmgInfo->GetDamage()), aurEff->GetAmount());
+            eventInfo.GetActor()->CastCustomSpell(SPELL_DK_IMPROVED_BLOOD_PRESENCE_HEAL, SPELLVALUE_BASE_POINT0, bp0, eventInfo.GetActor(), true, nullptr, aurEff);
+        }
     }
 
     void Register() override
     {
-        DoCheckProc += AuraCheckProcFn(spell_dk_improved_blood_presence_proc::CheckProc);
+        DoCheckProc += AuraCheckProcFn(spell_dk_improved_blood_presence_triggered::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_dk_improved_blood_presence_triggered::HandleProc, EFFECT_1, SPELL_AURA_PROC_TRIGGER_SPELL);
     }
 };
 
@@ -564,49 +580,23 @@ class spell_dk_rune_of_the_fallen_crusader : public SpellScript
     }
 };
 
-// 49222 - Bone Shield
-class spell_dk_bone_shield : public AuraScript
-{
-    PrepareAuraScript(spell_dk_bone_shield);
-
-    uint32 lastChargeUsedTime = 0;
-
-    void HandleProc(ProcEventInfo& eventInfo)
-    {
-        PreventDefaultAction();
-        uint32 currentTime = getMSTime();
-        // Checks for 2 seconds between uses of bone shield charges
-        if ((currentTime - lastChargeUsedTime) < 2000)
-            return;
-
-        if (!eventInfo.GetSpellInfo() || !eventInfo.GetSpellInfo()->IsTargetingArea())
-        {
-            DropCharge();
-            lastChargeUsedTime = currentTime;
-        }
-    }
-
-    void Register() override
-    {
-        OnProc += AuraProcFn(spell_dk_bone_shield::HandleProc);
-    }
-};
-
 // 51209 - Hungering Cold
 class spell_dk_hungering_cold : public AuraScript
 {
     PrepareAuraScript(spell_dk_hungering_cold);
 
-    void HandleProc(ProcEventInfo& eventInfo)
+    bool CheckProc(ProcEventInfo& eventInfo)
     {
-        PreventDefaultAction();
-        if (eventInfo.GetDamageInfo() && eventInfo.GetDamageInfo()->GetDamage() > 0 && (!eventInfo.GetSpellInfo() || eventInfo.GetSpellInfo()->Dispel != DISPEL_DISEASE))
-            SetDuration(0);
+        SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
+        if (!spellInfo)
+            return true;
+
+        return spellInfo->Dispel != DISPEL_DISEASE;
     }
 
     void Register() override
     {
-        OnProc += AuraProcFn(spell_dk_hungering_cold::HandleProc);
+        DoCheckProc += AuraCheckProcFn(spell_dk_hungering_cold::CheckProc);
     }
 };
 
@@ -653,6 +643,20 @@ class spell_dk_blood_caked_blade : public AuraScript
 class spell_dk_dancing_rune_weapon : public AuraScript
 {
     PrepareAuraScript(spell_dk_dancing_rune_weapon);
+
+    void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+
+        // Redirect 100% of the DRW's threat to the DK player
+        uint32 npcEntry = GetSpellInfo()->Effects[EFFECT_0].MiscValue;
+        std::list<Creature*> runeWeapons;
+        caster->GetAllMinionsByEntry(runeWeapons, npcEntry);
+        for (Creature* temp : runeWeapons)
+            temp->GetThreatMgr().RegisterRedirectThreat(GetId(), caster->GetGUID(), 100);
+    }
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
@@ -730,6 +734,7 @@ class spell_dk_dancing_rune_weapon : public AuraScript
 
     void Register() override
     {
+        AfterEffectApply += AuraEffectApplyFn(spell_dk_dancing_rune_weapon::HandleApply, EFFECT_2, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         DoCheckProc += AuraCheckProcFn(spell_dk_dancing_rune_weapon::CheckProc);
         OnEffectProc += AuraEffectProcFn(spell_dk_dancing_rune_weapon::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
     }
@@ -2968,7 +2973,7 @@ class spell_dk_pvp_4p_bonus : public AuraScript
         if (!spellInfo)
             return false;
 
-        return (spellInfo->GetAllEffectsMechanicMask() & ((1 << MECHANIC_ROOT) | (1 << MECHANIC_SNARE))) != 0;
+        return (spellInfo->GetAllEffectsMechanicMask() & ((1ULL << MECHANIC_ROOT) | (1ULL << MECHANIC_SNARE))) != 0;
     }
 
     void HandleProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
@@ -2995,10 +3000,9 @@ void AddSC_deathknight_spell_scripts()
     RegisterSpellAndAuraScriptPair(spell_dk_chains_of_ice, spell_dk_chains_of_ice_aura);
     RegisterSpellScript(spell_dk_bloodworms);
     RegisterSpellScript(spell_dk_summon_gargoyle);
-    RegisterSpellScript(spell_dk_improved_blood_presence_proc);
+    RegisterSpellScript(spell_dk_improved_blood_presence_triggered);
     RegisterSpellScript(spell_dk_wandering_plague_aura);
     RegisterSpellScript(spell_dk_rune_of_the_fallen_crusader);
-    RegisterSpellScript(spell_dk_bone_shield);
     RegisterSpellScript(spell_dk_hungering_cold);
     RegisterSpellScript(spell_dk_blood_caked_blade);
     RegisterSpellScript(spell_dk_dancing_rune_weapon);
