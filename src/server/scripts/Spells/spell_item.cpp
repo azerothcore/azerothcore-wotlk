@@ -344,6 +344,10 @@ class spell_item_mind_amplify_dish : public SpellScript
         if (!caster || !target)
             return;
 
+        // little protection
+        if (target->ToCreature() && target->ToCreature()->GetCreatureTemplate()->rank > CREATURE_ELITE_NORMAL)
+                return;
+
         uint32 charmSpell = GetSpellInfo()->Id == SPELL_AMPLIFICATION_DISH ? SPELL_MIND_CONTROL_CAP_CHARM_10S : SPELL_MIND_CONTROL_CAP_CHARM_30S;
 
         // 5% of the time - Backfire
