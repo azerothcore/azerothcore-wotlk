@@ -102,7 +102,7 @@ public:
         {
             if (unit->IsPlayer() && GetBossState(BOSS_TRIBUNAL_OF_AGES) == IN_PROGRESS)
             {
-                if (Creature* brann = GetCreature(NPC_BRANN))
+                if (Creature* brann = instance->GetCreature(GetGuidData(NPC_BRANN)))
                     brann->AI()->DoAction(ACTION_PLAYER_DEATH_IN_TRIBUNAL);
             }
         }
