@@ -315,7 +315,7 @@ void BattlegroundQueue::RemovePlayer(ObjectGuid guid, bool decreaseInvitedCount)
         {
             bg->DecreaseInvitedCount(groupInfo->teamId);
 
-            // FIX: re-enqueue BG if free slots reopened due to invite expiration
+            // re-enqueue BG if free slots reopened due to invite expiration
             if (bg->HasFreeSlots())
             {
                 bg->AddToBGFreeSlotQueue();
