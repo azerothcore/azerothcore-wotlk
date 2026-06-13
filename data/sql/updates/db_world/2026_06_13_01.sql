@@ -1,3 +1,4 @@
+-- DB update 2026_06_13_00 -> 2026_06_13_01
 -- KABLAMM FARFLINGER (Engineering(350 / Goblin Engineer)) - Dimensional Ripper: Area 52
 
 -- Add NPC Text for learn schematic gossip

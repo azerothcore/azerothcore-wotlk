@@ -1,3 +1,4 @@
+-- DB update 2026_06_12_02 -> 2026_06_13_00
 -- SMILES O'BYRON (Engineering(350 / Gnomish Engineer) - Ultrasafe Transporter: Toshley's Station)
 
 -- Add NPC Text for learn Ultrasafe Transporter gossip concurrent to already learned schematic gossip
