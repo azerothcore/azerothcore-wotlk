@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -43,12 +43,14 @@ private:
     void _RewardKillCredit(Player* player);
     void _RewardPlayer(Player* player, bool isDungeon);
     void _RewardGroup();
+    uint8 _GetPlayerLevel(Player const* player);
 
     Player* _killer;
     Unit* _victim;
     Group* _group;
     float _groupRate;
     Player* _maxNotGrayMember;
+    uint8 _maxNotGrayMemberLevel;
     uint32 _count;
     uint32 _aliveSumLevel;
     uint32 _sumLevel;

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -21,6 +21,7 @@
 #include "Language.h"
 #include "Pet.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "ScriptMgr.h"
 #include "WorldSessionMgr.h"
 
@@ -36,25 +37,25 @@ public:
     {
         static ChatCommandTable resetItemsCommandTable =
         {
-            { "equipped",       HandleResetItemsEquippedCommand,             SEC_ADMINISTRATOR, Console::Yes },
-            { "bags",           HandleResetItemsInBagsCommand,              SEC_ADMINISTRATOR, Console::Yes },
-            { "bank",           HandleResetItemsInBankCommand,              SEC_ADMINISTRATOR, Console::Yes },
-            { "keyring",        HandleResetItemsKeyringCommand,             SEC_ADMINISTRATOR, Console::Yes },
-            { "currency",       HandleResetItemsInCurrenciesListCommand,    SEC_ADMINISTRATOR, Console::Yes },
-            { "vendor_buyback", HandleResetItemsInVendorBuyBackTabCommand,  SEC_ADMINISTRATOR, Console::Yes },
-            { "all",            HandleResetItemsAllCommand,                 SEC_ADMINISTRATOR, Console::Yes },
-            { "allbags",        HandleResetItemsAllAndDeleteBagsCommand,    SEC_ADMINISTRATOR, Console::Yes },
+            { "equipped",       HandleResetItemsEquippedCommand,             rbac::RBAC_PERM_COMMAND_RESET, Console::Yes },
+            { "bags",           HandleResetItemsInBagsCommand,              rbac::RBAC_PERM_COMMAND_RESET, Console::Yes },
+            { "bank",           HandleResetItemsInBankCommand,              rbac::RBAC_PERM_COMMAND_RESET, Console::Yes },
+            { "keyring",        HandleResetItemsKeyringCommand,             rbac::RBAC_PERM_COMMAND_RESET, Console::Yes },
+            { "currency",       HandleResetItemsInCurrenciesListCommand,    rbac::RBAC_PERM_COMMAND_RESET, Console::Yes },
+            { "vendor_buyback", HandleResetItemsInVendorBuyBackTabCommand,  rbac::RBAC_PERM_COMMAND_RESET, Console::Yes },
+            { "all",            HandleResetItemsAllCommand,                 rbac::RBAC_PERM_COMMAND_RESET, Console::Yes },
+            { "allbags",        HandleResetItemsAllAndDeleteBagsCommand,    rbac::RBAC_PERM_COMMAND_RESET, Console::Yes },
         };
         static ChatCommandTable resetCommandTable =
         {
-            { "achievements",   HandleResetAchievementsCommand, SEC_CONSOLE,       Console::Yes },
-            { "honor",          HandleResetHonorCommand,        SEC_ADMINISTRATOR, Console::Yes },
-            { "level",          HandleResetLevelCommand,        SEC_ADMINISTRATOR, Console::Yes },
-            { "spells",         HandleResetSpellsCommand,       SEC_ADMINISTRATOR, Console::Yes },
-            { "stats",          HandleResetStatsCommand,        SEC_ADMINISTRATOR, Console::Yes },
-            { "talents",        HandleResetTalentsCommand,      SEC_ADMINISTRATOR, Console::Yes },
-            { "items",          resetItemsCommandTable                                          },
-            { "all",            HandleResetAllCommand,          SEC_CONSOLE,       Console::Yes }
+            { "achievements",   HandleResetAchievementsCommand, rbac::RBAC_PERM_COMMAND_RESET_ACHIEVEMENTS, Console::Yes },
+            { "honor",          HandleResetHonorCommand,        rbac::RBAC_PERM_COMMAND_RESET_HONOR,        Console::Yes },
+            { "level",          HandleResetLevelCommand,        rbac::RBAC_PERM_COMMAND_RESET_LEVEL,        Console::Yes },
+            { "spells",         HandleResetSpellsCommand,       rbac::RBAC_PERM_COMMAND_RESET_SPELLS,       Console::Yes },
+            { "stats",          HandleResetStatsCommand,        rbac::RBAC_PERM_COMMAND_RESET_STATS,        Console::Yes },
+            { "talents",        HandleResetTalentsCommand,      rbac::RBAC_PERM_COMMAND_RESET_TALENTS,      Console::Yes },
+            { "items",          resetItemsCommandTable                                                                    },
+            { "all",            HandleResetAllCommand,          rbac::RBAC_PERM_COMMAND_RESET_ALL,          Console::Yes }
         };
         static ChatCommandTable commandTable =
         {
@@ -285,6 +286,34 @@ public:
             handler->SendWorldText(LANG_RESETALL_TALENTS);
             if (!handler->GetSession())
                 handler->SendSysMessage(LANG_RESETALL_TALENTS);
+        }
+        else if (caseName == "honor")
+        {
+            CharacterDatabase.Execute(CharacterDatabase.GetPreparedStatement(CHAR_UPD_ALL_HONOR_POINTS));
+
+            sWorldSessionMgr->DoForAllOnlinePlayers([](Player* player)
+            {
+                player->SetHonorPoints(0);
+            });
+
+            handler->SendWorldText(LANG_RESETALL_HONOR);
+            if (!handler->GetSession())
+                handler->SendSysMessage(LANG_RESETALL_HONOR);
+            return true;
+        }
+        else if (caseName == "arena")
+        {
+            CharacterDatabase.Execute(CharacterDatabase.GetPreparedStatement(CHAR_UPD_ALL_ARENA_POINTS));
+
+            sWorldSessionMgr->DoForAllOnlinePlayers([](Player* player)
+            {
+                player->SetArenaPoints(0);
+            });
+
+            handler->SendWorldText(LANG_RESETALL_ARENA);
+            if (!handler->GetSession())
+                handler->SendSysMessage(LANG_RESETALL_ARENA);
+            return true;
         }
         else
         {

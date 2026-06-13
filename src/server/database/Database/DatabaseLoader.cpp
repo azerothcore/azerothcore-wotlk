@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -24,6 +24,24 @@
 #include <errmsg.h>
 #include <mysqld_error.h>
 #include <thread>
+#include <string_view>
+namespace
+{
+    std::string const EMPTY_DATABASE_INFO;
+    std::string const LOGIN_DATABASE_INFO_DEFAULT = "127.0.0.1;3306;acore;acore;acore_auth";
+    std::string const WORLD_DATABASE_INFO_DEFAULT = "127.0.0.1;3306;acore;acore;acore_world";
+    std::string const CHARACTER_DATABASE_INFO_DEFAULT = "127.0.0.1;3306;acore;acore;acore_characters";
+    std::string const& GetDefaultDatabaseInfo(std::string_view name)
+    {
+        if (name == "Login")
+            return LOGIN_DATABASE_INFO_DEFAULT;
+        if (name == "World")
+            return WORLD_DATABASE_INFO_DEFAULT;
+        if (name == "Character")
+            return CHARACTER_DATABASE_INFO_DEFAULT;
+        return EMPTY_DATABASE_INFO;
+    }
+}
 
 DatabaseLoader::DatabaseLoader(std::string const& logger, uint32 const defaultUpdateMask, std::string_view modulesList)
     : _logger(logger),
@@ -38,7 +56,8 @@ DatabaseLoader& DatabaseLoader::AddDatabase(DatabaseWorkerPool<T>& pool, std::st
 
     _open.push([this, name, updatesEnabledForThis, &pool]() -> bool
     {
-        std::string const dbString = sConfigMgr->GetOption<std::string>(name + "DatabaseInfo", "");
+        std::string const& defaultDatabaseInfo = GetDefaultDatabaseInfo(name);
+        std::string const dbString = sConfigMgr->GetOption<std::string>(name + "DatabaseInfo", defaultDatabaseInfo);
         if (dbString.empty())
         {
             LOG_ERROR(_logger, "Database {} not specified in configuration file!", name);

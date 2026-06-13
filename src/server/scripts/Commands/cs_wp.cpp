@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -18,6 +18,7 @@
 #include "Chat.h"
 #include "CommandScript.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "WaypointMgr.h"
 
 #if AC_COMPILER == AC_COMPILER_GNU
@@ -35,13 +36,13 @@ public:
     {
         static ChatCommandTable wpCommandTable =
         {
-            { "add",        HandleWpAddCommand,      SEC_ADMINISTRATOR, Console::No },
-            { "event",      HandleWpEventCommand,    SEC_ADMINISTRATOR, Console::No },
-            { "load",       HandleWpLoadCommand,     SEC_ADMINISTRATOR, Console::No },
-            { "modify",     HandleWpModifyCommand,   SEC_ADMINISTRATOR, Console::No },
-            { "unload",     HandleWpUnLoadCommand,   SEC_ADMINISTRATOR, Console::No },
-            { "reload",     HandleWpReloadCommand,   SEC_ADMINISTRATOR, Console::No },
-            { "show",       HandleWpShowCommand,     SEC_ADMINISTRATOR, Console::No }
+            { "add",        HandleWpAddCommand,      rbac::RBAC_PERM_COMMAND_WP_ADD,    Console::No },
+            { "event",      HandleWpEventCommand,    rbac::RBAC_PERM_COMMAND_WP_EVENT,  Console::No },
+            { "load",       HandleWpLoadCommand,     rbac::RBAC_PERM_COMMAND_WP_LOAD,   Console::No },
+            { "modify",     HandleWpModifyCommand,   rbac::RBAC_PERM_COMMAND_WP_MODIFY, Console::No },
+            { "unload",     HandleWpUnLoadCommand,   rbac::RBAC_PERM_COMMAND_WP_UNLOAD, Console::No },
+            { "reload",     HandleWpReloadCommand,   rbac::RBAC_PERM_COMMAND_WP_RELOAD, Console::No },
+            { "show",       HandleWpShowCommand,     rbac::RBAC_PERM_COMMAND_WP_SHOW,   Console::No }
         };
         static ChatCommandTable commandTable =
         {
@@ -339,7 +340,7 @@ public:
 
             uint32 a2, a3, a4, a5, a6;
             float a8, a9, a10, a11;
-            char const* a7;
+            std::string a7;
 
             WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_WAYPOINT_SCRIPT_BY_ID);
             stmt->SetData(0, id);
@@ -361,7 +362,7 @@ public:
                 a4 = fields[2].Get<uint32>();
                 a5 = fields[3].Get<uint32>();
                 a6 = fields[4].Get<uint32>();
-                a7 = fields[5].Get<std::string>().c_str();
+                a7 = fields[5].Get<std::string>();
                 a8 = fields[6].Get<float>();
                 a9 = fields[7].Get<float>();
                 a10 = fields[8].Get<float>();

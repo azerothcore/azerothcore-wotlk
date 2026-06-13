@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -21,113 +21,81 @@
 void EventMap::Reset()
 {
     _eventMap.clear();
-    _time = 0;
-    _phase = 0;
+    _time = TimePoint::min();
+    _phaseMask = 0;
 }
 
-void EventMap::SetPhase(uint8 phase)
+void EventMap::SetPhase(PhaseIndex phase)
 {
     if (!phase)
-    {
-        _phase = 0;
-    }
-    else if (phase <= 8)
-    {
-        _phase = (1 << (phase - 1));
-    }
+        _phaseMask = 0;
+    else if (phase <= sizeof(PhaseMask) * 8)
+        _phaseMask = PhaseMask(1u << (phase - 1u));
 }
 
-void EventMap::AddPhase(uint8 phase)
+void EventMap::AddPhase(PhaseIndex phase)
 {
-    if (phase && phase <= 8)
-    {
-        _phase |= (1 << (phase - 1));
-    }
+    if (phase && phase <= sizeof(PhaseMask) * 8)
+        _phaseMask |= PhaseMask(1u << (phase - 1u));
 }
 
-void EventMap::RemovePhase(uint8 phase)
+void EventMap::RemovePhase(PhaseIndex phase)
 {
-    if (phase && phase <= 8)
-    {
-        _phase &= ~(1 << (phase - 1));
-    }
+    if (phase && phase <= sizeof(PhaseMask) * 8)
+        _phaseMask &= PhaseMask(~(1u << (phase - 1u)));
 }
 
-void EventMap::ScheduleEvent(uint32 eventId, uint32 time, uint32 group /*= 0*/, uint32 phase /*= 0*/)
+void EventMap::ScheduleEvent(EventId eventId, Milliseconds time, GroupIndex group /*= 0u*/, PhaseIndex phase /*= 0u*/)
 {
-    if (group && group <= 8)
-    {
-        eventId |= (1 << (group + 15));
-    }
+    if (group > sizeof(GroupMask) * 8)
+        return;
 
-    if (phase && phase <= 8)
-    {
-        eventId |= (1 << (phase + 23));
-    }
+    if (phase > sizeof(PhaseMask) * 8)
+        return;
 
-    _eventMap.emplace(_time + time, eventId);
+    _eventMap.emplace(_time + time, Event(eventId, group, phase));
 }
 
-void EventMap::ScheduleEvent(uint32 eventId, Milliseconds time, uint32 group /*= 0*/, uint8 phase /* = 0*/)
+void EventMap::ScheduleEvent(EventId eventId, Milliseconds minTime, Milliseconds maxTime, GroupIndex group /*= 0u*/, PhaseIndex phase /*= 0u*/)
 {
-    ScheduleEvent(eventId, time.count(), group, phase);
+    ScheduleEvent(eventId, randtime(minTime, maxTime), group, phase);
 }
 
-void EventMap::ScheduleEvent(uint32 eventId, Milliseconds minTime, Milliseconds maxTime, uint32 group /*= 0*/, uint32 phase /*= 0*/)
-{
-    ScheduleEvent(eventId, randtime(minTime, maxTime).count(), group, phase);
-}
-
-void EventMap::RescheduleEvent(uint32 eventId, uint32 time, uint32 groupId /*= 0*/, uint32 phase/* = 0*/)
+void EventMap::RescheduleEvent(EventId eventId, Milliseconds minTime, Milliseconds maxTime, GroupIndex group /*= 0u*/, PhaseIndex phase /*= 0u*/)
 {
     CancelEvent(eventId);
-    ScheduleEvent(eventId, time, groupId, phase);
+    ScheduleEvent(eventId, randtime(minTime, maxTime), group, phase);
 }
 
-void EventMap::RescheduleEvent(uint32 eventId, Milliseconds time, uint32 group /*= 0*/, uint8 phase /* = 0*/)
+void EventMap::RescheduleEvent(EventId eventId, Milliseconds time, GroupIndex group /*= 0u*/, PhaseIndex phase /*= 0u*/)
 {
     CancelEvent(eventId);
-    ScheduleEvent(eventId, time.count(), group, phase);
-}
-
-void EventMap::RescheduleEvent(uint32 eventId, Milliseconds minTime, Milliseconds maxTime, uint32 group /*= 0*/, uint32 phase /*= 0*/)
-{
-    CancelEvent(eventId);
-    ScheduleEvent(eventId, randtime(minTime, maxTime).count(), group, phase);
-}
-
-void EventMap::RepeatEvent(uint32 time)
-{
-    _eventMap.emplace(_time + time, _lastEvent);
+    ScheduleEvent(eventId, time, group, phase);
 }
 
 void EventMap::Repeat(Milliseconds time)
 {
-    RepeatEvent(time.count());
+    _eventMap.emplace(_time + time, _lastEvent);
 }
 
 void EventMap::Repeat(Milliseconds minTime, Milliseconds maxTime)
 {
-    RepeatEvent(randtime(minTime, maxTime).count());
+    Repeat(randtime(minTime, maxTime));
 }
 
-uint32 EventMap::ExecuteEvent()
+EventMap::EventId EventMap::ExecuteEvent()
 {
     while (!Empty())
     {
         auto const& itr = _eventMap.begin();
 
         if (itr->first > _time)
-        {
             return 0;
-        }
-        else if (_phase && (itr->second & 0xFF000000) && !((itr->second >> 24) & _phase))
-        {
+        else if (_phaseMask && itr->second._phaseMask && !(itr->second._phaseMask & _phaseMask))
             _eventMap.erase(itr);
-        }
         else
         {
-            uint32 eventId = (itr->second & 0x0000FFFF);
+            auto eventId = itr->second._id;
             _lastEvent = itr->second;
             _eventMap.erase(itr);
             return eventId;
@@ -137,30 +105,32 @@ uint32 EventMap::ExecuteEvent()
     return 0;
 }
 
-void EventMap::DelayEvents(uint32 delay)
-{
-    _time = delay < _time ? _time - delay : 0;
-}
-
 void EventMap::DelayEvents(Milliseconds delay)
 {
-    DelayEvents(delay.count());
+    if (Empty())
+        return;
+
+    EventStore delayed = std::move(_eventMap);
+    for (auto itr = delayed.begin(); itr != delayed.end();)
+    {
+        auto node = delayed.extract(itr++);
+        node.key() = node.key() + delay;
+        _eventMap.insert(_eventMap.end(), std::move(node));
+    }
 }
 
-void EventMap::DelayEvents(uint32 delay, uint32 group)
+void EventMap::DelayEvents(Milliseconds delay, GroupIndex group)
 {
-    if (group > 8 || Empty())
-    {
+    if (group > sizeof(GroupMask) * 8 || Empty())
         return;
-    }
 
     EventStore delayed;
 
-    for (EventStore::iterator itr = _eventMap.begin(); itr != _eventMap.end();)
+    for (auto itr = _eventMap.begin(); itr != _eventMap.end();)
     {
-        if (!group || (itr->second & (1 << (group + 15))))
+        if (!group || (itr->second._groupMask & GroupMask(1u << (group - 1u))))
         {
-            delayed.insert(EventStore::value_type(itr->first + delay, itr->second));
+            delayed.emplace(itr->first + delay, itr->second);
             itr = _eventMap.erase(itr);
             continue;
         }
@@ -171,13 +141,13 @@ void EventMap::DelayEvents(uint32 delay, uint32 group)
     _eventMap.insert(delayed.begin(), delayed.end());
 }
 
-void EventMap::DelayEventsToMax(uint32 delay, uint32 group)
+void EventMap::DelayEventsToMax(Milliseconds delay, GroupIndex group)
 {
     for (auto itr = _eventMap.begin(); itr != _eventMap.end();)
     {
-        if (itr->first < _time + delay && (group == 0 || ((1 << (group + 15)) & itr->second)))
+        if (itr->first < _time + delay && (!group || (itr->second._groupMask & GroupMask(1u << (group - 1u)))))
         {
-            ScheduleEvent(itr->second, delay);
+            ScheduleEvent(itr->second._id, delay, group);
             _eventMap.erase(itr);
             itr = _eventMap.begin();
             continue;
@@ -187,16 +157,14 @@ void EventMap::DelayEventsToMax(uint32 delay, uint32 group)
     }
 }
 
-void EventMap::CancelEvent(uint32 eventId)
+void EventMap::CancelEvent(EventId eventId)
 {
     if (Empty())
-    {
         return;
-    }
 
     for (auto itr = _eventMap.begin(); itr != _eventMap.end();)
     {
-        if (eventId == (itr->second & 0x0000FFFF))
+        if (eventId == itr->second._id)
         {
             itr = _eventMap.erase(itr);
             continue;
@@ -206,17 +174,14 @@ void EventMap::CancelEvent(uint32 eventId)
     }
 }
 
-void EventMap::CancelEventGroup(uint32 group)
+void EventMap::CancelEventGroup(GroupIndex group)
 {
-    if (!group || group > 8 || Empty())
-    {
+    if (!group || group > sizeof(GroupMask) * 8 || Empty())
         return;
-    }
 
-    uint32 groupMask = (1 << (group + 15));
-    for (EventStore::iterator itr = _eventMap.begin(); itr != _eventMap.end();)
+    for (auto itr = _eventMap.begin(); itr != _eventMap.end();)
     {
-        if (itr->second & groupMask)
+        if (itr->second._groupMask & GroupMask(1u << (group - 1u)))
         {
             _eventMap.erase(itr);
             itr = _eventMap.begin();
@@ -227,39 +192,21 @@ void EventMap::CancelEventGroup(uint32 group)
     }
 }
 
-uint32 EventMap::GetNextEventTime(uint32 eventId) const
+bool EventMap::IsInPhase(PhaseIndex phase) const
 {
-    if (Empty())
-    {
-        return 0;
-    }
-
-    for (auto const& itr : _eventMap)
-    {
-        if (eventId == (itr.second & 0x0000FFFF))
-        {
-            return itr.first;
-        }
-    }
-
-    return 0;
+    return phase <= sizeof(PhaseIndex) * 8 && (!phase || _phaseMask & PhaseMask(1u << (phase - 1u)));
 }
 
-uint32 EventMap::GetNextEventTime() const
+Milliseconds EventMap::GetTimeUntilEvent(EventId eventId) const
 {
-    return Empty() ? 0 : _eventMap.begin()->first;
-}
-
-bool EventMap::IsInPhase(uint8 phase)
-{
-    return phase <= 8 && (!phase || _phase & (1 << (phase - 1)));
-}
-
-Milliseconds EventMap::GetTimeUntilEvent(uint32 eventId) const
-{
-    for (std::pair<uint32 const, uint32> const& itr : _eventMap)
-        if (eventId == (itr.second & 0x0000FFFF))
-            return std::chrono::duration_cast<Milliseconds>(Milliseconds(itr.first) - Milliseconds(_time));
+    for (auto const& [time, event] : _eventMap)
+        if (eventId == event._id)
+            return std::chrono::duration_cast<Milliseconds>(time - _time);
 
     return Milliseconds::max();
+}
+
+bool EventMap::HasTimeUntilEvent(EventId eventId) const
+{
+    return GetTimeUntilEvent(eventId) != Milliseconds::max();
 }

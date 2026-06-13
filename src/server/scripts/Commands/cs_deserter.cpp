@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -24,8 +24,10 @@
 
 #include "Chat.h"
 #include "CommandScript.h"
+#include "GroupMgr.h"
 #include "Language.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "SpellAuras.h"
 
 using namespace Acore::ChatCommands;
@@ -49,15 +51,15 @@ public:
     {
         static ChatCommandTable deserterInstanceCommandTable =
         {
-            { "add",        HandleDeserterInstanceAdd,       SEC_ADMINISTRATOR, Console::Yes },
-            { "remove all", HandleDeserterInstanceRemoveAll, SEC_ADMINISTRATOR, Console::Yes },
-            { "remove",     HandleDeserterInstanceRemove,    SEC_ADMINISTRATOR, Console::Yes }
+            { "add",        HandleDeserterInstanceAdd,       rbac::RBAC_PERM_COMMAND_DESERTER_INSTANCE_ADD,    Console::Yes },
+            { "remove all", HandleDeserterInstanceRemoveAll, rbac::RBAC_PERM_COMMAND_DESERTER_INSTANCE_REMOVE, Console::Yes },
+            { "remove",     HandleDeserterInstanceRemove,    rbac::RBAC_PERM_COMMAND_DESERTER_INSTANCE_REMOVE, Console::Yes }
         };
         static ChatCommandTable deserterBGCommandTable =
         {
-            { "add",        HandleDeserterBGAdd,       SEC_ADMINISTRATOR, Console::Yes },
-            { "remove all", HandleDeserterBGRemoveAll, SEC_ADMINISTRATOR, Console::Yes },
-            { "remove",     HandleDeserterBGRemove,    SEC_ADMINISTRATOR, Console::Yes }
+            { "add",        HandleDeserterBGAdd,       rbac::RBAC_PERM_COMMAND_DESERTER_BG_ADD,    Console::Yes },
+            { "remove all", HandleDeserterBGRemoveAll, rbac::RBAC_PERM_COMMAND_DESERTER_BG_REMOVE, Console::Yes },
+            { "remove",     HandleDeserterBGRemove,    rbac::RBAC_PERM_COMMAND_DESERTER_BG_REMOVE, Console::Yes }
         };
 
         static ChatCommandTable deserterCommandTable =
@@ -210,6 +212,16 @@ public:
             stmt->SetData(index, 0);
             CharacterDatabase.Execute(stmt);
         }
+
+        if (isInstance)
+        {
+            if (ObjectGuid groupId = sCharacterCache->GetCharacterGroupGuidByGuid(guid))
+                if (Group* group = sGroupMgr->GetGroupByGUID(groupId.GetCounter()))
+                    if (group->isLFGGroup())
+                        Player::RemoveFromGroup(group, guid);
+        }
+        else if (target && target->GetMap()->IsBattleground())
+            target->LeaveBattleground();
 
         handler->PSendSysMessage("{} of {} Deserter has been added to player {}.", secsToTimeString(duration), isInstance ? "Instance" : "Battleground", handler->playerLink(*playerName));
         return true;

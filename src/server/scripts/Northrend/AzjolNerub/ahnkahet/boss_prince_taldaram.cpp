@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -20,6 +20,7 @@
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellInfo.h"
+#include "SpellMgr.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "ahnkahet.h"
@@ -38,10 +39,9 @@ enum Spells
     SPELL_BEAM_VISUAL                       = 60342,
     SPELL_VANISH                            = 55964,
     SPELL_SHADOWSTEP                        = 55966,
-    SPELL_HOVER_FALL                        = 60425
+    SPELL_HOVER_FALL                        = 60425,
+    SPELL_EMBRACE_OF_THE_VAMPYR             = 55959,
 };
-
-#define SPELL_EMBRACE_OF_THE_VAMPYR         DUNGEON_MODE(55959, 59513)
 
 enum Spheres
 {
@@ -103,6 +103,15 @@ struct npc_taldaram_flamesphere : public NullCreatureAI
         }
     }
 
+    void MovementInform(uint32 type, uint32 id) override
+    {
+        if (type == POINT_MOTION_TYPE && id == POINT_ORB)
+        {
+            me->DespawnOrUnsummon(1s);
+            DoCastSelf(SPELL_FLAME_SPHERE_DEATH_EFFECT, true);
+        }
+    }
+
     void IsSummonedBy(WorldObject* /*summoner*/) override
     {
         // Replace sphere instantly if sphere is summoned after prince death
@@ -114,11 +123,6 @@ struct npc_taldaram_flamesphere : public NullCreatureAI
 
         DoCastSelf(SPELL_FLAME_SPHERE_SPAWN_EFFECT);
         DoCastSelf(SPELL_FLAME_SPHERE_VISUAL);
-    }
-
-    void JustDied(Unit* /*who*/) override
-    {
-        DoCastSelf(SPELL_FLAME_SPHERE_DEATH_EFFECT);
     }
 
     void UpdateAI(uint32 diff) override
@@ -147,7 +151,7 @@ struct npc_taldaram_flamesphere : public NullCreatureAI
                 float angle = me->GetAngle(&victimPos) + angleOffset;
                 float x = me->GetPositionX() + DATA_SPHERE_DISTANCE * cos(angle);
                 float y = me->GetPositionY() + DATA_SPHERE_DISTANCE * std::sin(angle);
-                me->GetMotionMaster()->MovePoint(POINT_ORB, x, y, me->GetPositionZ());
+                me->GetMotionMaster()->MovePoint(POINT_ORB, x, y, me->GetPositionZ(), FORCED_MOVEMENT_WALK);
 
                 moveTimer = 0;
             }
@@ -172,12 +176,7 @@ private:
 struct boss_taldaram : public BossAI
 {
     boss_taldaram(Creature* pCreature) : BossAI(pCreature, DATA_PRINCE_TALDARAM), vanishDamage(0)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    {    }
 
     void InitializeAI() override
     {
@@ -291,7 +290,7 @@ struct boss_taldaram : public BossAI
     {
         BossAI::DamageTaken(attacker, damage, damageType, school);
 
-        if (me->FindCurrentSpellBySpellId(SPELL_EMBRACE_OF_THE_VAMPYR))
+        if (me->FindCurrentSpellBySpellId(sSpellMgr->GetSpellIdForDifficulty(SPELL_EMBRACE_OF_THE_VAMPYR, me)))
         {
             vanishDamage += damage;
             if (vanishDamage >= DUNGEON_MODE<uint32>(MAX_EMBRACE_DMG, MAX_EMBRACE_DMG_H))

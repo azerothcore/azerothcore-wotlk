@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -16,7 +16,6 @@
  */
 
 #include "AreaDefines.h"
-#include "CreatureScript.h"
 #include "ItemScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -53,18 +52,25 @@ public:
                 if (player->GetZoneId() != AREA_ISLE_OF_QUEL_DANAS)
                     disabled = true;
                 break;
-            case 34475:
-                if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_ARCANE_CHARGES))
-                    Spell::SendCastResult(player, spellInfo, 1, SPELL_FAILED_NOT_ON_GROUND);
-                break;
         }
 
         // allow use in flight only
-        if (player->IsInFlight() && !disabled)
-            return false;
+        if (player->IsInFlight())
+        {
+            if (!disabled)
+                return false;	
+        }
+        else // error
+        {
+            if (itemId == 34475)
+            {
+                if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_ARCANE_CHARGES))
+                    Spell::SendCastResult(player, spellInfo, 1, SPELL_FAILED_NOT_ON_GROUND);
+            }
+            else
+                player->SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW, item, nullptr);
+        }
 
-        // error
-        player->SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW, item, nullptr);
         return true;
     }
 };

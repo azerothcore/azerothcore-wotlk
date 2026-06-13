@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -301,13 +301,13 @@ public:
             if (events.GetPhaseMask() & PHASE_ONE_MASK && damage >= me->GetPower(POWER_MANA))
             {
                 // reset threat
-                ThreatContainer::StorageType const& threatlist = me->GetThreatMgr().GetThreatList();
-                for (ThreatContainer::StorageType::const_iterator itr = threatlist.begin(); itr != threatlist.end(); ++itr)
+                for (ThreatReference const* ref : me->GetThreatMgr().GetUnsortedThreatList())
                 {
-                    Unit* unit = ObjectAccessor::GetUnit((*me), (*itr)->getUnitGuid());
-
-                    if (unit && DoGetThreat(unit))
-                        DoModifyThreatByPercent(unit, -100);
+                    if (Unit* unit = ref->GetVictim())
+                    {
+                        if (DoGetThreat(unit))
+                            DoModifyThreatByPercent(unit, -100);
+                    }
                 }
 
                 Talk(SAY_PHASE_2);
@@ -482,7 +482,7 @@ public:
                             minrange = summon->GetExactDist(p);
                         }
 
-                summon->ToTempSummon()->DespawnOrUnsummon(30000);
+                summon->ToTempSummon()->DespawnOrUnsummon(30s);
             }
             else
             {
@@ -522,7 +522,7 @@ public:
                     darnavan->GetMotionMaster()->MoveIdle();
                     darnavan->StopMoving();
                     darnavan->SetReactState(REACT_PASSIVE);
-                    darnavan->m_Events.AddEvent(new DaranavanMoveEvent(*darnavan), darnavan->m_Events.CalculateTime(10000));
+                    darnavan->m_Events.AddEventAtOffset(new DaranavanMoveEvent(*darnavan), 10s);
                     darnavan->AI()->Talk(SAY_DARNAVAN_RESCUED);
                     if (Player* owner = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
                     {
@@ -949,7 +949,7 @@ public:
                     me->GetMotionMaster()->MovementExpired();
                     me->StopMoving();
                     me->SetControlled(true, UNIT_STATE_STUNNED);
-                    me->DespawnOrUnsummon(500);
+                    me->DespawnOrUnsummon(500ms);
                     break;
                 default:
                     break;
@@ -977,7 +977,7 @@ public:
 
             if (!me->GetVictim() || me->GetVictim()->GetGUID() != targetGUID)
             {
-                me->DespawnOrUnsummon(1);
+                me->DespawnOrUnsummon(1ms);
                 return;
             }
 
@@ -1176,8 +1176,7 @@ public:
     {
         if (InstanceScript* instance = player->GetInstanceScript())
             if (instance->GetBossState(DATA_LADY_DEATHWHISPER) != DONE)
-                if (!player->IsGameMaster())
-                    if (Creature* ladyDeathwhisper = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_LADY_DEATHWHISPER)))
+                if (Creature* ladyDeathwhisper = ObjectAccessor::GetCreature(*player, instance->GetGuidData(DATA_LADY_DEATHWHISPER)))
                         ladyDeathwhisper->AI()->DoAction(ACTION_START_INTRO);
         return true;
     }

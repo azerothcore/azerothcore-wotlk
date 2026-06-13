@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -59,7 +59,12 @@ struct AC_GAME_API BattlegroundScore
     friend class Arena;
     friend class Battleground;
 
-protected:
+    public:
+    [[nodiscard]] uint32 GetKillingBlows() const    { return KillingBlows; }
+    [[nodiscard]] uint32 GetDamageDone() const      { return DamageDone; }
+    [[nodiscard]] uint32 GetHealingDone() const     { return HealingDone; }
+
+    protected:
     BattlegroundScore(ObjectGuid playerGuid) : PlayerGuid(playerGuid) { }
     virtual ~BattlegroundScore() = default;
 
@@ -97,12 +102,9 @@ protected:
     // For Logging purpose
     virtual std::string ToString() const { return ""; }
 
-    [[nodiscard]] uint32 GetKillingBlows() const    { return KillingBlows; }
     [[nodiscard]] uint32 GetDeaths() const          { return Deaths; }
     [[nodiscard]] uint32 GetHonorableKills() const  { return HonorableKills; }
     [[nodiscard]] uint32 GetBonusHonor() const      { return BonusHonor; }
-    [[nodiscard]] uint32 GetDamageDone() const      { return DamageDone; }
-    [[nodiscard]] uint32 GetHealingDone() const     { return HealingDone; }
 
     [[nodiscard]] virtual uint32 GetAttr1() const { return 0; }
     [[nodiscard]] virtual uint32 GetAttr2() const { return 0; }

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -17,6 +17,7 @@
 
 #include "AccountMgr.h"
 #include "CellImpl.h"
+#include "RBAC.h"
 #include "ChannelMgr.h"
 #include "Chat.h"
 #include "ChatPackets.h"
@@ -112,7 +113,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     }
 
     // pussywizard: chatting on most chat types requires 2 hours played to prevent spam/abuse
-    if (AccountMgr::IsPlayerAccount(GetSecurity()))
+    if (!HasPermission(rbac::RBAC_PERM_SKIP_CHECK_CHAT_CHANNEL_REQ))
     {
         switch (type)
         {
@@ -382,8 +383,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 }
 
                 Player* receiver = ObjectAccessor::FindPlayerByName(to, false);
-                bool senderIsPlayer = AccountMgr::IsPlayerAccount(GetSecurity());
-                bool receiverIsPlayer = AccountMgr::IsPlayerAccount(receiver ? receiver->GetSession()->GetSecurity() : SEC_PLAYER);
+                bool senderIsPlayer = !HasPermission(rbac::RBAC_PERM_TWO_SIDE_INTERACTION_CHAT);
+                bool receiverIsPlayer = receiver ? !receiver->GetSession()->HasPermission(rbac::RBAC_PERM_TWO_SIDE_INTERACTION_CHAT) : true;
 
                 if (sender->GetLevel() < sWorld->getIntConfig(CONFIG_CHAT_WHISPER_LEVEL_REQ) && receiver != sender && receiver && !receiver->IsGameMaster())
                 {
@@ -391,7 +392,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                     return;
                 }
 
-                if (!receiver || (senderIsPlayer && !receiverIsPlayer && !receiver->isAcceptWhispers() && !receiver->IsInWhisperWhiteList(sender->GetGUID())))
+                if (!receiver || (lang != LANG_ADDON && !receiver->isAcceptWhispers() && receiver->GetSession()->HasPermission(rbac::RBAC_PERM_CAN_FILTER_WHISPERS) && !receiver->IsInWhisperWhiteList(sender->GetGUID())))
                 {
                     SendPlayerNotFoundNotice(to);
                     return;
@@ -404,7 +405,6 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                         return;
                     }
 
-                // pussywizard: optimization
                 if (GetPlayer()->HasAura(1852) && !receiver->IsGameMaster())
                 {
                     ChatHandler(this).SendNotification(LANG_GM_SILENCE, GetPlayer()->GetName());
@@ -412,7 +412,9 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 }
 
                 // If player is a Gamemaster and doesn't accept whisper, we auto-whitelist every player that the Gamemaster is talking to
-                if (!senderIsPlayer && !sender->isAcceptWhispers() && !sender->IsInWhisperWhiteList(receiver->GetGUID()))
+                // We also do that if a player is under the required level for whispers.
+                if (receiver->GetLevel() < sWorld->getIntConfig(CONFIG_CHAT_WHISPER_LEVEL_REQ) ||
+                    (HasPermission(rbac::RBAC_PERM_CAN_FILTER_WHISPERS) && !sender->isAcceptWhispers() && !sender->IsInWhisperWhiteList(receiver->GetGUID())))
                     sender->AddWhisperWhiteList(receiver->GetGUID());
 
                 GetPlayer()->Whisper(msg, Language(lang), receiver);
@@ -434,11 +436,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                     return;
 
                 if (!sScriptMgr->OnPlayerCanUseChat(GetPlayer(), type, lang, msg, group))
-                {
                     return;
-                }
-
-                sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);
 
                 WorldPacket data;
                 ChatHandler::BuildChatPacket(data, ChatMsg(type), Language(lang), sender, nullptr, msg);
@@ -452,11 +450,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                     if (Guild* guild = sGuildMgr->GetGuildById(GetPlayer()->GetGuildId()))
                     {
                         if (!sScriptMgr->OnPlayerCanUseChat(GetPlayer(), type, lang, msg, guild))
-                        {
                             return;
-                        }
-
-                        sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, guild);
 
                         guild->BroadcastToGuild(this, false, msg, lang == LANG_ADDON ? LANG_ADDON : LANG_UNIVERSAL);
                     }
@@ -470,11 +464,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                     if (Guild* guild = sGuildMgr->GetGuildById(GetPlayer()->GetGuildId()))
                     {
                         if (!sScriptMgr->OnPlayerCanUseChat(GetPlayer(), type, lang, msg, guild))
-                        {
                             return;
-                        }
-
-                        sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, guild);
 
                         guild->BroadcastToGuild(this, true, msg, lang == LANG_ADDON ? LANG_ADDON : LANG_UNIVERSAL);
                     }
@@ -493,11 +483,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 }
 
                 if (!sScriptMgr->OnPlayerCanUseChat(GetPlayer(), type, lang, msg, group))
-                {
                     return;
-                }
-
-                sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);
 
                 WorldPacket data;
                 ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID, Language(lang), sender, nullptr, msg);
@@ -516,11 +502,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 }
 
                 if (!sScriptMgr->OnPlayerCanUseChat(GetPlayer(), type, lang, msg, group))
-                {
                     return;
-                }
-
-                sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);
 
                 WorldPacket data;
                 ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_LEADER, Language(lang), sender, nullptr, msg);
@@ -534,11 +516,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                     return;
 
                 if (!sScriptMgr->OnPlayerCanUseChat(GetPlayer(), type, lang, msg, group))
-                {
                     return;
-                }
-
-                sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);
 
                 // In battleground, raid warning is sent only to players in battleground - code is ok
                 WorldPacket data;
@@ -554,11 +532,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                     return;
 
                 if (!sScriptMgr->OnPlayerCanUseChat(GetPlayer(), type, lang, msg, group))
-                {
                     return;
-                }
-
-                sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);
 
                 WorldPacket data;
                 ChatHandler::BuildChatPacket(data, CHAT_MSG_BATTLEGROUND, Language(lang), sender, nullptr, msg);
@@ -573,11 +547,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                     return;
 
                 if (!sScriptMgr->OnPlayerCanUseChat(GetPlayer(), type, lang, msg, group))
-                {
                     return;
-                }
-
-                sScriptMgr->OnPlayerChat(GetPlayer(), type, lang, msg, group);
 
                 WorldPacket data;
                 ChatHandler::BuildChatPacket(data, CHAT_MSG_BATTLEGROUND_LEADER, Language(lang), sender, nullptr, msg);
@@ -586,7 +556,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             break;
         case CHAT_MSG_CHANNEL:
             {
-                if (AccountMgr::IsPlayerAccount(GetSecurity()))
+                if (!HasPermission(rbac::RBAC_PERM_SKIP_CHECK_CHAT_CHANNEL_REQ))
                 {
                     if (sender->GetLevel() < sWorld->getIntConfig(CONFIG_CHAT_CHANNEL_LEVEL_REQ))
                     {
@@ -600,11 +570,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                     if (Channel* chn = cMgr->GetChannel(channel, sender))
                     {
                         if (!sScriptMgr->OnPlayerCanUseChat(sender, type, lang, msg, chn))
-                        {
                             return;
-                        }
-
-                        sScriptMgr->OnPlayerChat(sender, type, lang, msg, chn);
 
                         chn->Say(sender->GetGUID(), msg.c_str(), lang);
                     }
@@ -633,11 +599,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                     }
 
                     if (!sScriptMgr->OnPlayerCanUseChat(sender, type, lang, msg))
-                    {
                         return;
-                    }
-
-                    sScriptMgr->OnPlayerChat(sender, type, lang, msg);
                 }
                 break;
             }
@@ -661,11 +623,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 }
 
                 if (!sScriptMgr->OnPlayerCanUseChat(sender, type, lang, msg))
-                {
                     return;
-                }
-
-                sScriptMgr->OnPlayerChat(sender, type, lang, msg);
 
                 break;
             }
@@ -803,7 +761,7 @@ void WorldSession::HandleChatIgnoredOpcode(WorldPacket& recvData)
 
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_IGNORED, LANG_UNIVERSAL, _player, _player, GetPlayer()->GetName());
-    player->GetSession()->SendPacket(&data);
+    player->SendDirectMessage(&data);
 }
 
 void WorldSession::HandleChannelDeclineInvite(WorldPacket& recvPacket)

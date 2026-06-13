@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -121,7 +121,7 @@ public:
 
         void KilledUnit(Unit*  /*victim*/) override
         {
-            if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+            if (!events.HasTimeUntilEvent(EVENT_KILL_TALK))
             {
                 Talk(SAY_KILL);
                 events.ScheduleEvent(EVENT_KILL_TALK, 6s);
@@ -144,7 +144,7 @@ public:
                         me->SetReactState(REACT_PASSIVE);
                         me->AttackStop();
                         me->SetDisableGravity(true);
-                        me->GetMotionMaster()->MovePoint(POINT_TAKEOFF, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 6.0f, false);
+                        me->GetMotionMaster()->MovePoint(POINT_TAKEOFF, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 6.0f, FORCED_MOVEMENT_NONE, 0.f, 0.f, false);
                         events.ScheduleEvent(EVENT_FLIGHT, 50s);
                         events.DelayEvents(15s);
                         events.ScheduleEvent(EVENT_AIR_MOVEMENT, 2s);
@@ -163,10 +163,10 @@ public:
                     events.ScheduleEvent(EVENT_FLAME_BREATH, 20s, 30s);
                     break;
                 case EVENT_AIR_MOVEMENT:
-                    me->GetMotionMaster()->MovePoint(POINT_FLIGHT, 3155.51f, 683.844f, 95.0f, false);
+                    me->GetMotionMaster()->MovePoint(POINT_FLIGHT, 3155.51f, 683.844f, 95.0f, FORCED_MOVEMENT_NONE, 0.f, 0.f, false);
                     break;
                 case EVENT_LAND_BACK:
-                    me->GetMotionMaster()->MovePoint(POINT_LAND, 3151.07f, 636.443f, 80.0f, false);
+                    me->GetMotionMaster()->MovePoint(POINT_LAND, 3151.07f, 636.443f, 80.0f, FORCED_MOVEMENT_NONE, 0.f, 0.f, false);
                     break;
                 case EVENT_LAND_GROUND:
                     me->SetReactState(REACT_AGGRESSIVE);

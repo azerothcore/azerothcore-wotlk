@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -195,7 +195,7 @@ float const BG_SA_ObjSpawnlocs[BG_SA_MAXOBJ][4] =
     { 1227.667f, -212.555f, 55.372f, 0.5023f },
     { 1214.681f, 81.21f, 53.413f, 5.745f },
     { 878.555f, -108.2f, 117.845f, 0.0f },
-    { 836.5f, -108.8f, 120.219f, 0.0f },
+    { 837.0653076171875f, -107.536727905273437f, 127.0248489379882812f, 4.468043327331542968f }, // VerifiedBuild 46158
     // Ships
     { 2679.696777f, -826.891235f, 3.712860f, 5.78367f}, //rot2 1 rot3 0.0002f
     { 2574.003662f, 981.261475f, 2.603424f, 0.807696f},
@@ -620,5 +620,7 @@ private:
 
     // Achievement: Not Even a Scratch
     bool _notEvenAScratch[PVP_TEAMS_COUNT];
+    /// Toggle for alternating player spawns between East and West ships (true = first/East ship, false = second/West ship)
+    bool _nextShipIsEast;
 };
 #endif

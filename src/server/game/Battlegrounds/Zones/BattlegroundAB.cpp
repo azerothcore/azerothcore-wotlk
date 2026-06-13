@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -101,7 +101,7 @@ void BattlegroundAB::PostUpdateImpl(uint32 diff)
                         uint8 controlledPoints = _controlledPoints[teamId];
                         if (controlledPoints == 0)
                         {
-                            _bgEvents.ScheduleEvent(eventId, 3000);
+                            _bgEvents.ScheduleEvent(eventId, 3s);
                             break;
                         }
 
@@ -115,7 +115,7 @@ void BattlegroundAB::PostUpdateImpl(uint32 diff)
                         if (honorRewards < uint8(m_TeamScores[teamId] / _honorTics))
                             RewardHonorToTeam(GetBonusHonorFromKill(1), teamId);
                         if (reputationRewards < uint8(m_TeamScores[teamId] / _reputationTics))
-                            RewardReputationToTeam(teamId == TEAM_ALLIANCE ? 509 : 510, 10, teamId);
+                            RewardReputationToTeam(teamId == TEAM_ALLIANCE ? 509 : 510, uint32(10 * _abReputationRate), teamId);
                         if (information < uint8(m_TeamScores[teamId] / BG_AB_WARNING_NEAR_VICTORY_SCORE))
                         {
                             if (teamId == TEAM_ALLIANCE)
@@ -170,8 +170,8 @@ void BattlegroundAB::StartingEventOpenDoors()
     DoorOpen(BG_AB_OBJECT_GATE_A);
     DoorOpen(BG_AB_OBJECT_GATE_H);
     StartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, BG_AB_EVENT_START_BATTLE);
-    _bgEvents.ScheduleEvent(BG_AB_EVENT_ALLIANCE_TICK, 3000);
-    _bgEvents.ScheduleEvent(BG_AB_EVENT_HORDE_TICK, 3000);
+    _bgEvents.ScheduleEvent(BG_AB_EVENT_ALLIANCE_TICK, 3s);
+    _bgEvents.ScheduleEvent(BG_AB_EVENT_HORDE_TICK, 3s);
 }
 
 void BattlegroundAB::AddPlayer(Player* player)
@@ -180,9 +180,8 @@ void BattlegroundAB::AddPlayer(Player* player)
     PlayerScores.emplace(player->GetGUID().GetCounter(), new BattlegroundABScore(player->GetGUID()));
 }
 
-void BattlegroundAB::RemovePlayer(Player* player)
+void BattlegroundAB::RemovePlayer(Player* /*player*/)
 {
-    player->SetPhaseMask(1, false);
 }
 
 void BattlegroundAB::HandleAreaTrigger(Player* player, uint32 trigger)
@@ -269,7 +268,6 @@ void BattlegroundAB::SendNodeUpdate(uint8 node)
 
 void BattlegroundAB::NodeOccupied(uint8 node)
 {
-    ApplyPhaseMask();
     AddSpiritGuide(node, BG_AB_SpiritGuidePos[node][0], BG_AB_SpiritGuidePos[node][1], BG_AB_SpiritGuidePos[node][2], BG_AB_SpiritGuidePos[node][3], _capturePointInfo[node]._ownerTeamId);
 
     ++_controlledPoints[_capturePointInfo[node]._ownerTeamId];
@@ -392,7 +390,6 @@ void BattlegroundAB::EventPlayerClickedOnFlag(Player* player, GameObject* gameOb
 
         _capturePointInfo[node]._state = static_cast<uint8>(BG_AB_NODE_STATE_ALLY_CONTESTED) + player->GetTeamId();
 
-        ApplyPhaseMask();
         _bgEvents.RescheduleEvent(BG_AB_EVENT_CAPTURE_STABLE + node, BG_AB_FLAG_CAPTURING_TIME);
         sound = player->GetTeamId() == TEAM_ALLIANCE ? BG_AB_SOUND_NODE_ASSAULTED_ALLIANCE : BG_AB_SOUND_NODE_ASSAULTED_HORDE;
 
@@ -421,6 +418,7 @@ bool BattlegroundAB::SetupBattleground()
 {
     _honorTics = BattlegroundMgr::IsBGWeekend(GetBgTypeID(true)) ? BG_AB_HONOR_TICK_WEEKEND : BG_AB_HONOR_TICK_NORMAL;
     _reputationTics = BattlegroundMgr::IsBGWeekend(GetBgTypeID(true)) ? BG_AB_REP_TICK_WEEKEND : BG_AB_REP_TICK_NORMAL;
+    _abReputationRate = sWorld->getRate(RATE_REPUTATION_GAIN_AB);
 
     for (uint32 i = 0; i < BG_AB_DYNAMIC_NODES_COUNT; ++i)
     {
@@ -545,20 +543,4 @@ bool BattlegroundAB::UpdatePlayerScore(Player* player, uint32 type, uint32 value
 bool BattlegroundAB::AllNodesConrolledByTeam(TeamId teamId) const
 {
     return _controlledPoints[teamId] == BG_AB_DYNAMIC_NODES_COUNT;
-}
-
-void BattlegroundAB::ApplyPhaseMask()
-{
-    uint32 phaseMask = 1;
-    for (uint32 i = BG_AB_NODE_STABLES; i < BG_AB_DYNAMIC_NODES_COUNT; ++i)
-        if (_capturePointInfo[i]._ownerTeamId != TEAM_NEUTRAL)
-            phaseMask |= 1 << (i * 2 + 1 + _capturePointInfo[i]._ownerTeamId);
-
-    const BattlegroundPlayerMap& bgPlayerMap = GetPlayers();
-
-    for (auto const& itr : bgPlayerMap)
-    {
-        itr.second->SetPhaseMask(phaseMask, false);
-        itr.second->UpdateObjectVisibility(true, false);
-    }
 }

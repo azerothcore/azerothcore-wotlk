@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -75,7 +75,7 @@ void EventProcessor::Update(uint32 p_time)
 
         // Reschedule non deletable events to be checked at
         // the next update tick
-        AddEvent(event, CalculateTime(1), false, 0);
+        AddEvent(event, CalculateTime(1), false);
     }
 }
 
@@ -133,13 +133,13 @@ void EventProcessor::CancelEventGroup(uint8 group)
     }
 }
 
-void EventProcessor::AddEvent(BasicEvent* Event, uint64 e_time, bool set_addtime, uint8 eventGroup)
+void EventProcessor::AddEvent(BasicEvent* Event, uint64 e_time, bool set_addtime /*= true*/, uint8 eventGroup /*= 0*/)
 {
     if (set_addtime)
         Event->m_addTime = m_time;
     Event->m_execTime = e_time;
     Event->m_eventGroup = eventGroup;
-    m_events.insert(std::pair<uint64, BasicEvent*>(e_time, Event));
+    m_events.emplace(e_time, Event);
 }
 
 void EventProcessor::ModifyEventTime(BasicEvent* event, Milliseconds newTime)
@@ -151,7 +151,7 @@ void EventProcessor::ModifyEventTime(BasicEvent* event, Milliseconds newTime)
 
         event->m_execTime = newTime.count();
         m_events.erase(itr);
-        m_events.insert(std::pair<uint64, BasicEvent*>(newTime.count(), event));
+        m_events.emplace(newTime.count(), event);
         break;
     }
 }

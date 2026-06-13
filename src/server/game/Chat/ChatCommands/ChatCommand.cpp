@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -22,6 +22,7 @@
 #include "DatabaseEnv.h"
 #include "Log.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "ScriptMgr.h"
 #include "StringFormat.h"
 #include "Tokenize.h"
@@ -514,6 +515,10 @@ bool Acore::Impl::ChatCommands::ChatCommandNode::IsInvokerVisible(ChatHandler co
 
     if (who.IsConsole() && (_permission.AllowConsole == Acore::ChatCommands::Console::Yes))
         return true;
+
+    // RBAC permissions start at 200, SEC_* levels are 0-4
+    if (_permission.RequiredLevel >= rbac::RBAC_PERM_COMMAND_RBAC)
+        return who.HasPermission(_permission.RequiredLevel);
 
     return !who.IsConsole() && who.IsAvailable(_permission.RequiredLevel);
 }

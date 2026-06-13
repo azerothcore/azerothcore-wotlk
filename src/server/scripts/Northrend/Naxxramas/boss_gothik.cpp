@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -41,8 +41,7 @@ enum Spells
 {
     // Gothik
     SPELL_HARVEST_SOUL              = 28679,
-    SPELL_SHADOW_BOLT_10            = 29317,
-    SPELL_SHADOW_BOLT_25            = 56405,
+    SPELL_SHADOW_BOLT               = 29317,
     // Teleport spells
     SPELL_TELEPORT_DEAD             = 28025,
     SPELL_TELEPORT_LIVE             = 28026,
@@ -112,7 +111,9 @@ enum Events
     // Intro
     EVENT_INTRO_2                   = 15,
     EVENT_INTRO_3                   = 16,
-    EVENT_INTRO_4                   = 17
+    EVENT_INTRO_4                   = 17,
+    // Resume after teleport
+    EVENT_RESUME_ATTACK             = 18
 };
 
 const uint32 gothikWaves[24][2] =
@@ -173,21 +174,6 @@ const Position PosSummonDead[5] =
 #define POS_X_SOUTH  2633.84f
 #define IN_LIVE_SIDE(who) (who->GetPositionY() < POS_Y_GATE)
 
-// Predicate function to check that the r   efzr unit is NOT on the same side as the source.
-struct NotOnSameSide
-{
-public:
-    explicit NotOnSameSide(Unit* pSource) : m_inLiveSide(IN_LIVE_SIDE(pSource)) { }
-
-    bool operator() (Unit const* pTarget)
-    {
-        return (m_inLiveSide != IN_LIVE_SIDE(pTarget));
-    }
-
-private:
-    bool m_inLiveSide;
-};
-
 class boss_gothik : public CreatureScript
 {
 public:
@@ -207,6 +193,7 @@ public:
         SummonList summons;
         bool secondPhase{};
         bool gateOpened{};
+        bool lastTeleportDead{};
         uint8 waveCount{};
 
         bool IsInRoom()
@@ -229,6 +216,7 @@ public:
             me->SetReactState(REACT_PASSIVE);
             secondPhase = false;
             gateOpened = false;
+            lastTeleportDead = false;
             waveCount = 0;
             me->NearTeleportTo(2642.139f, -3386.959f, 285.492f, 6.265f);
         }
@@ -267,7 +255,7 @@ public:
                 std::vector<Player*> tList;
                 for(Map::PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
                 {
-                    if (!me->IsWithinDistInMap(itr->GetSource(), 200.0f, true, false) || !itr->GetSource()->IsAlive() || itr->GetSource()->IsGameMaster())
+                    if (!me->IsWithinDistInMap(itr->GetSource(), 200.0f, true, false, false) || !itr->GetSource()->IsAlive() || itr->GetSource()->IsGameMaster())
                     {
                         continue;
                     }
@@ -283,7 +271,6 @@ public:
                     summon->AI()->AttackStart(target);
                     summon->SetInCombatWithZone();
                     summon->SetReactState(REACT_AGGRESSIVE);
-                    summon->CallForHelp(150.0f);
                 }
             }
         }
@@ -368,6 +355,18 @@ public:
             return false;
         }
 
+        void OpenGate()
+        {
+            if (gateOpened)
+                return;
+
+            if (GameObject* go = instance->GetGameObject(DATA_GOTHIK_INNER_GATE))
+                go->SetGoState(GO_STATE_ACTIVE);
+
+            gateOpened = true;
+            Talk(EMOTE_GATE_OPENED);
+        }
+
         void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (!secondPhase)
@@ -383,6 +382,35 @@ public:
 
             if (!UpdateVictim())
                 return;
+
+            // Safety net: if our victim is on the wrong side, find a
+            // same-side target or open the gate
+            if (secondPhase && me->HasReactState(REACT_AGGRESSIVE) && !gateOpened
+                && !IN_LIVE_SIDE(me) != !IN_LIVE_SIDE(me->GetVictim()))
+            {
+                Map::PlayerList const& pList = me->GetMap()->GetPlayers();
+                Player* newTarget = nullptr;
+                for (auto const& itr : pList)
+                {
+                    Player* player = itr.GetSource();
+                    if (player && player->IsAlive() && !player->IsGameMaster()
+                        && me->IsValidAttackTarget(player)
+                        && IN_LIVE_SIDE(me) == IN_LIVE_SIDE(player))
+                    {
+                        newTarget = player;
+                        break;
+                    }
+                }
+
+                if (newTarget)
+                {
+                    me->GetThreatMgr().ResetAllThreat();
+                    me->GetThreatMgr().AddThreat(newTarget, 1.0f);
+                    AttackStart(newTarget);
+                }
+                else
+                    OpenGate();
+            }
 
             events.Update(diff);
             if (me->HasUnitState(UNIT_STATE_CASTING))
@@ -400,7 +428,7 @@ public:
                     Talk(SAY_INTRO_4);
                     break;
                 case EVENT_SHADOW_BOLT:
-                    me->CastSpell(me->GetVictim(), RAID_MODE(SPELL_SHADOW_BOLT_10, SPELL_SHADOW_BOLT_25), false);
+                    me->CastSpell(me->GetVictim(), SPELL_SHADOW_BOLT, false);
                     events.Repeat(1s);
                     break;
                 case EVENT_HARVEST_SOUL:
@@ -408,29 +436,30 @@ public:
                     events.Repeat(15s);
                     break;
                 case EVENT_TELEPORT:
+                {
+                    if (me->HealthBelowPct(30))
+                        break;
+
+                    me->CastStop();
                     me->AttackStop();
-                    if (IN_LIVE_SIDE(me))
-                    {
-                        me->CastSpell(me, SPELL_TELEPORT_DEAD, false);
-                    }
-                    else
-                    {
-                        me->CastSpell(me, SPELL_TELEPORT_LIVE, false);
-                    }
-                    me->GetThreatMgr().resetAggro(NotOnSameSide(me));
-                    if (Unit* pTarget = SelectTarget(SelectTargetMethod::MaxDistance, 0))
-                    {
-                        me->GetThreatMgr().AddThreat(pTarget, 100.0f);
-                        AttackStart(pTarget);
-                    }
+                    me->SetReactState(REACT_PASSIVE);
+                    me->GetThreatMgr().ResetAllThreat();
+                    me->CastSpell(me, lastTeleportDead ? SPELL_TELEPORT_LIVE : SPELL_TELEPORT_DEAD, false);
+                    lastTeleportDead = !lastTeleportDead;
+
+                    events.CancelEvent(EVENT_SHADOW_BOLT);
+                    events.ScheduleEvent(EVENT_RESUME_ATTACK, 2s);
                     events.Repeat(20s);
                     break;
+                }
+                case EVENT_RESUME_ATTACK:
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    events.ScheduleEvent(EVENT_SHADOW_BOLT, 0s);
+                    return UpdateAI(0);
                 case EVENT_CHECK_HEALTH:
                     if (me->HealthBelowPct(30))
                     {
-                        if (GameObject* go = instance->GetGameObject(DATA_GOTHIK_INNER_GATE))
-                            go->SetGoState(GO_STATE_ACTIVE);
-
+                        OpenGate();
                         events.CancelEvent(EVENT_TELEPORT);
                         break;
                     }
@@ -440,7 +469,7 @@ public:
                     if (gothikWaves[waveCount][0])
                     {
                         SummonHelpers(gothikWaves[waveCount][0]);
-                        events.RepeatEvent(gothikWaves[waveCount][1]);
+                        events.Repeat(Milliseconds(gothikWaves[waveCount][1]));
                     }
                     else
                     {
@@ -462,11 +491,20 @@ public:
                 case EVENT_CHECK_PLAYERS:
                     if (!CheckGroupSplitted())
                     {
-                        if (GameObject* go = instance->GetGameObject(DATA_GOTHIK_INNER_GATE))
-                            go->SetGoState(GO_STATE_ACTIVE);
-
-                        gateOpened = true;
-                        Talk(EMOTE_GATE_OPENED);
+                        OpenGate();
+                        summons.DoForAllSummons([&](WorldObject* summon)
+                        {
+                            if (Creature* gothikMinion = summon->ToCreature())
+                                if (gothikMinion->IsAlive())
+                                {
+                                    if (Unit* target = SelectTarget(SelectTargetMethod::MinDistance, 0, 200.0f))
+                                    {
+                                        gothikMinion->AI()->AttackStart(target);
+                                        gothikMinion->SetReactState(REACT_AGGRESSIVE);
+                                        gothikMinion->SetInCombatWithZone();
+                                    }
+                                }
+                        });
                     }
                     break;
             }
@@ -502,7 +540,7 @@ public:
             events.Reset();
         }
 
-        void JustEngagedWith(Unit*  /*who*/) override
+        void JustEngagedWith(Unit* /*who*/) override
         {
             switch (me->GetEntry())
             {
@@ -522,7 +560,7 @@ public:
                     events.ScheduleEvent(EVENT_SHADOW_BOLT_VOLLEY, 3s);
                     break;
                 case NPC_DEAD_RIDER:
-                    events.ScheduleEvent(EVENT_DRAIN_LIFE, 2000ms, 3500ms);
+                    events.ScheduleEvent(EVENT_DRAIN_LIFE, 2s, 3500ms);
                     events.ScheduleEvent(EVENT_UNHOLY_FRENZY, 5s, 9s);
                     break;
                 case NPC_DEAD_HORSE:

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -23,10 +23,8 @@ enum Spells
 {
     SPELL_NECROTIC_AURA                         = 55593,
     SPELL_SUMMON_SPORE                          = 29234,
-    SPELL_DEATHBLOOM_10                         = 29865,
-    SPELL_DEATHBLOOM_25                         = 55053,
-    SPELL_INEVITABLE_DOOM_10                    = 29204,
-    SPELL_INEVITABLE_DOOM_25                    = 55052,
+    SPELL_DEATHBLOOM                            = 29865,
+    SPELL_INEVITABLE_DOOM                       = 29204,
     SPELL_BERSERK                               = 26662
 };
 
@@ -134,11 +132,11 @@ public:
                     events.Repeat(20s);
                     break;
                 case EVENT_DEATHBLOOM:
-                    me->CastSpell(me, RAID_MODE(SPELL_DEATHBLOOM_10, SPELL_DEATHBLOOM_25), false);
+                    me->CastSpell(me, SPELL_DEATHBLOOM, false);
                     events.Repeat(30s);
                     break;
                 case EVENT_INEVITABLE_DOOM:
-                    me->CastSpell(me, RAID_MODE(SPELL_INEVITABLE_DOOM_10, SPELL_INEVITABLE_DOOM_25), false);
+                    me->CastSpell(me, SPELL_INEVITABLE_DOOM, false);
                     doomCounter++;
                     events.Repeat(doomCounter < 6 ? 30s : 15s);
                     break;

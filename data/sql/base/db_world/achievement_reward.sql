@@ -99,8 +99,8 @@ INSERT INTO `achievement_reward` VALUES
 (2096,0,0,44430,29478,'The Coin Master','Greetings and congratulations on collecting the full set of Dalaran coins! As a reward for all your hard work I have enclosed a freshly minted Titanium Seal of Dalaran. This is a special coin that we only grant to the most ardent of collectors.$B$BI hope you enjoy this special reward. You\'ve earned it!$B$BSincerely,$BJepetto Joybuzz',0),
 (2136,0,0,44160,26917,'Glory of the Hero','Champion,$B$BWord has traveled to Wyrmrest Temple of the great heroic deeds you have accomplished since arriving in Northrend.$B$BYour bravery should not go unrecognized. Please accept this gift on behalf of the Aspects. Together we shall rid Azeroth of evil, once and for eternity.$B$BAlexstrasza the Life-Binder',0),
 (2143,0,0,44178,32216,'Leading the Cavalry','I couldn\'t help but to notice how good you are with the livestock. With all the activity around here, business has been better than ever for me. I don\'t suppose you\'d mind looking after this Albino Drake for me? I simply don\'t have enough spare minutes in the day to care for all of these animals. Yours, Mei',0),
-(2144,0,0,44177,26917,'Time and Time again','With the drums of war pounding in the distance, it is easy for the denizens of Azeroth to forget all that life has to offer.$B$BYou, on the other hand, have maintained the dignity of the good races of Azeroth with your ability to remember what we fight for. To not celebrate our victories is another form of defeat. Remeber that well, Reveler.$B$BMay others be inspired by your good cheer,$B$BAlexstrasza the Life-Binder',0),
-(2145,0,0,44177,26917,'Time and Time again','With the drums of war pounding in the distance, it is easy for the denizens of Azeroth to forget all that life has to offer.$B$BYou, on the other hand, have maintained the dignity of the good races of Azeroth with your ability to remember what we fight for. To not celebrate our victories is another form of defeat. Remeber that well, Reveler.$B$BMay others be inspired by your good cheer,$B$BAlexstrasza the Life-Binder',0),
+(2144,0,0,44177,26917,'Time and Time again','With the drums of war pounding in the distance, it is easy for the denizens of Azeroth to forget all that life has to offer.$B$BYou, on the other hand, have maintained the dignity of the good races of Azeroth with your ability to remember what we fight for. To not celebrate our victories is another form of defeat. Remember that well, Reveler.$B$BMay others be inspired by your good cheer,$B$BAlexstrasza the Life-Binder',0),
+(2145,0,0,44177,26917,'Time and Time again','With the drums of war pounding in the distance, it is easy for the denizens of Azeroth to forget all that life has to offer.$B$BYou, on the other hand, have maintained the dignity of the good races of Azeroth with your ability to remember what we fight for. To not celebrate our victories is another form of defeat. Remember that well, Reveler.$B$BMay others be inspired by your good cheer,$B$BAlexstrasza the Life-Binder',0),
 (2186,141,141,0,0,'','',0),
 (2187,142,142,0,0,'','',0),
 (2188,143,143,0,0,'','',0),
@@ -166,4 +166,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-07-19 12:08:35
+-- Dump completed on 2026-06-01 22:39:27

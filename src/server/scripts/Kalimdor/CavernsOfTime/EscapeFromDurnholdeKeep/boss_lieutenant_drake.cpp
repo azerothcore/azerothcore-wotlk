@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -48,7 +48,7 @@ struct boss_lieutenant_drake : public BossAI
     {
         runSecondPath = false;
         pathId = me->GetEntry() * 10;
-        me->GetMotionMaster()->MovePath(pathId, false);
+        me->GetMotionMaster()->MoveWaypoint(pathId, false);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -114,10 +114,10 @@ struct boss_lieutenant_drake : public BossAI
         {
             switch (point)
             {
-                case 7:
+                case 8:
                     Talk(SAY_ENTER);
                     break;
-                case 10:
+                case 11:
                     pathId = (me->GetEntry() * 10) + 1;
                     runSecondPath = true;
                     break;
@@ -132,7 +132,7 @@ struct boss_lieutenant_drake : public BossAI
         if (runSecondPath)
         {
             runSecondPath = false;
-            me->GetMotionMaster()->MovePath(pathId, true);
+            me->GetMotionMaster()->MoveWaypoint(pathId, true);
         }
 
         if (!UpdateVictim())

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -19,6 +19,7 @@
 #include "CommandScript.h"
 #include "DBCStores.h"
 #include "Player.h"
+#include "RBAC.h"
 
 using namespace Acore::ChatCommands;
 
@@ -31,13 +32,13 @@ public:
     {
         static ChatCommandTable titlesSetCommandTable =
         {
-            { "mask", HandleTitlesSetMaskCommand, SEC_GAMEMASTER, Console::No },
+            { "mask", HandleTitlesSetMaskCommand, rbac::RBAC_PERM_COMMAND_TITLES_SET_MASK, Console::No },
         };
         static ChatCommandTable titlesCommandTable =
         {
-            { "add",     HandleTitlesAddCommand,     SEC_GAMEMASTER, Console::No },
-            { "current", HandleTitlesCurrentCommand, SEC_GAMEMASTER, Console::No },
-            { "remove",  HandleTitlesRemoveCommand,  SEC_GAMEMASTER, Console::No },
+            { "add",     HandleTitlesAddCommand,     rbac::RBAC_PERM_COMMAND_TITLES_ADD,     Console::No },
+            { "current", HandleTitlesCurrentCommand, rbac::RBAC_PERM_COMMAND_TITLES_CURRENT, Console::No },
+            { "remove",  HandleTitlesRemoveCommand,  rbac::RBAC_PERM_COMMAND_TITLES_REMOVE,  Console::No },
             { "set",     titlesSetCommandTable },
         };
         static ChatCommandTable commandTable =

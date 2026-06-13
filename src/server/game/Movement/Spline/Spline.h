@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -48,6 +48,7 @@ namespace Movement
 
         uint8 m_mode{UninitializedMode};
         bool cyclic{false};
+        float initialOrientation{0};
 
         enum
         {
@@ -116,8 +117,8 @@ namespace Movement
         [[nodiscard]] const Vector3& getPoint(index_type i) const { return points[i];}
 
         /** Initializes spline. Don't call other methods while spline not initialized. */
-        void init_spline(const Vector3* controls, index_type count, EvaluationMode m);
-        void init_cyclic_spline(const Vector3* controls, index_type count, EvaluationMode m, index_type cyclic_point);
+        void init_spline(const Vector3* controls, index_type count, EvaluationMode m, float orientation);
+        void init_cyclic_spline(const Vector3* controls, index_type count, EvaluationMode m, index_type cyclic_point, float orientation);
 
         /** As i can see there are a lot of ways how spline can be initialized
             would be no harm to have some custom initializers. */
@@ -170,8 +171,8 @@ namespace Movement
         void computeIndex(float t, index_type& out_idx, float& out_u) const;
 
         /** Initializes spline. Don't call other methods while spline not initialized. */
-        void init_spline(const Vector3* controls, index_type count, EvaluationMode m) { SplineBase::init_spline(controls, count, m);}
-        void init_cyclic_spline(const Vector3* controls, index_type count, EvaluationMode m, index_type cyclic_point) { SplineBase::init_cyclic_spline(controls, count, m, cyclic_point);}
+        void init_spline(const Vector3* controls, index_type count, EvaluationMode m, float orientation = 0) { SplineBase::init_spline(controls, count, m, orientation);}
+        void init_cyclic_spline(const Vector3* controls, index_type count, EvaluationMode m, index_type cyclic_point, float orientation = 0) { SplineBase::init_cyclic_spline(controls, count, m, cyclic_point, orientation);}
 
         /**  Initializes lengths with SplineBase::SegLength method. */
         void initLengths();

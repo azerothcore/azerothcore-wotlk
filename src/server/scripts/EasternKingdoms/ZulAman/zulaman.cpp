@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -78,7 +78,7 @@ struct npc_forest_frog : public ScriptedAI
     void MovementInform(uint32 type, uint32 data) override
     {
         if (type == POINT_MOTION_TYPE && data == POINT_DESPAWN)
-            me->DespawnOrUnsummon(1000);
+            me->DespawnOrUnsummon(1s);
     }
 
     void UpdateAI(uint32 diff) override
@@ -103,7 +103,7 @@ struct npc_forest_frog : public ScriptedAI
                     Talk(SAY_THANKS_FREED, player);
 
                 eventTimer = 2;
-                events.ScheduleEvent(eventTimer, urand(4000, 5000));
+                events.ScheduleEvent(eventTimer, 4s, 5s);
                 break;
             case 2:
                 if (me->GetEntry() != NPC_GUNTER && me->GetEntry() != NPC_KYREN) // vendors don't kneel?
@@ -140,7 +140,7 @@ struct npc_forest_frog : public ScriptedAI
                     break;
                 }
                 eventTimer = 3;
-                events.ScheduleEvent(eventTimer, urand(6000, 7000));
+                events.ScheduleEvent(eventTimer, 6s, 7s);
                 break;
             case 3:
                 me->SetStandState(EMOTE_ONESHOT_NONE);
@@ -152,9 +152,9 @@ struct npc_forest_frog : public ScriptedAI
 
                 eventTimer = 4;
                 if (me->GetEntry() == NPC_GUNTER || me->GetEntry() == NPC_KYREN)
-                    events.ScheduleEvent(eventTimer, 5 * MINUTE * IN_MILLISECONDS); // vendors wait for 5 minutes before running away and despawning
+                    events.ScheduleEvent(eventTimer, 300s); // vendors wait for 5 minutes before running away and despawning
                 else
-                    events.ScheduleEvent(eventTimer, 6000);
+                    events.ScheduleEvent(eventTimer, 6s);
                 break;
             case 4:
                 me->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
@@ -165,7 +165,7 @@ struct npc_forest_frog : public ScriptedAI
                     Talk(SAY_GOODBYE, player);
 
                 eventTimer = 5;
-                events.ScheduleEvent(eventTimer, 2000);
+                events.ScheduleEvent(eventTimer, 2s);
                 break;
             case 5:
 
@@ -205,7 +205,7 @@ struct npc_forest_frog : public ScriptedAI
 
         // start generic rp
         eventTimer = 1;
-        events.ScheduleEvent(eventTimer, 3000);
+        events.ScheduleEvent(eventTimer, 3s);
 
         me->UpdateEntry(cEntry);
 
@@ -400,7 +400,7 @@ struct npc_harrison_jones : public ScriptedAI
             Talk(SAY_HARRISON_0);
             scheduler.Schedule(2s, [this](TaskContext /*task*/)
             {
-                me->GetMotionMaster()->MovePath(HARRISON_MOVE_1, false);
+                me->GetMotionMaster()->MoveWaypoint(HARRISON_MOVE_1, false);
             });
         }
     }
@@ -448,7 +448,7 @@ struct npc_harrison_jones : public ScriptedAI
             // Players are Now Saved to instance at SPECIAL (Player should be notified?)
             scheduler.Schedule(500ms, [this](TaskContext /*task*/)
             {
-                me->GetMotionMaster()->MovePath(HARRISON_MOVE_2, false);
+                me->GetMotionMaster()->MoveWaypoint(HARRISON_MOVE_2, false);
             });
         }
     }
@@ -486,7 +486,7 @@ struct npc_harrison_jones : public ScriptedAI
     void MovementInform(uint32 type, uint32 id) override
     {
         // at gong
-        if (type == WAYPOINT_MOTION_TYPE && id == 2 && _phase == PHASE_GONG)
+        if (type == WAYPOINT_MOTION_TYPE && id == 3 && _phase == PHASE_GONG)
         {
             if (GameObject* gong = _instance->GetGameObject(DATA_STRANGE_GONG))
                 me->SetFacingToObject(gong);
@@ -503,13 +503,13 @@ struct npc_harrison_jones : public ScriptedAI
             });
         }
         // to the massive gate
-        else if (type == WAYPOINT_MOTION_TYPE && id == 1 && _phase == PHASE_GATE_CLOSED)
+        else if (type == WAYPOINT_MOTION_TYPE && id == 2 && _phase == PHASE_GATE_CLOSED)
         {
             me->SetEntry(NPC_HARRISON_JONES_1);
             Talk(SAY_HARRISON_2);
         }
         // at massive gate
-        else if (type == WAYPOINT_MOTION_TYPE && id == 2 && _phase == PHASE_GATE_CLOSED)
+        else if (type == WAYPOINT_MOTION_TYPE && id == 3 && _phase == PHASE_GATE_CLOSED)
         {
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_USE_STANDING);
             Talk(SAY_HARRISON_3);
@@ -521,7 +521,7 @@ struct npc_harrison_jones : public ScriptedAI
             {
                 DoCastSelf(SPELL_STEALTH);
                 me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
-                me->GetMotionMaster()->MovePath(HARRISON_MOVE_3, false);
+                me->GetMotionMaster()->MoveWaypoint(HARRISON_MOVE_3, false);
             });
         }
     }
@@ -592,14 +592,14 @@ struct npc_amanishi_lookout : public NullCreatureAI
             Talk(SAY_INVADERS);
             me->SetUnitFlag(UNIT_FLAG_IMMUNE_TO_PC);
             me->SetUnitFlag(UNIT_FLAG_RENAME);
-            me->GetMotionMaster()->MovePath(PATH_LOOKOUT, false);
+            me->GetMotionMaster()->MoveWaypoint(PATH_LOOKOUT, false);
         }
     }
 
     void MovementInform(uint32 type, uint32 id) override
     {
         // at boss
-        if (type == WAYPOINT_MOTION_TYPE && id == 8) // should despawn with waypoint script
+        if (type == WAYPOINT_MOTION_TYPE && id == 9) // should despawn with waypoint script
             me->DespawnOrUnsummon(0s, 0s);
     }
 private:

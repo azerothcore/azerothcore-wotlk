@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -20,6 +20,7 @@
 #include "Creature.h"
 #include "Language.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 
@@ -34,12 +35,12 @@ public:
     {
         static ChatCommandTable castCommandTable =
         {
-            { "back",   HandleCastBackCommand,  SEC_GAMEMASTER, Console::No },
-            { "dist",   HandleCastDistCommand,  SEC_GAMEMASTER, Console::No },
-            { "self",   HandleCastSelfCommand,  SEC_GAMEMASTER, Console::No },
-            { "target", HandleCastTargetCommad, SEC_GAMEMASTER, Console::No },
-            { "dest",   HandleCastDestCommand,  SEC_GAMEMASTER, Console::No },
-            { "",       HandleCastCommand,      SEC_GAMEMASTER, Console::No }
+            { "back",   HandleCastBackCommand,  rbac::RBAC_PERM_COMMAND_CAST_BACK,   Console::No },
+            { "dist",   HandleCastDistCommand,  rbac::RBAC_PERM_COMMAND_CAST_DIST,   Console::No },
+            { "self",   HandleCastSelfCommand,  rbac::RBAC_PERM_COMMAND_CAST_SELF,   Console::No },
+            { "target", HandleCastTargetCommad, rbac::RBAC_PERM_COMMAND_CAST_TARGET, Console::No },
+            { "dest",   HandleCastDestCommand,  rbac::RBAC_PERM_COMMAND_CAST_DEST,   Console::No },
+            { "",       HandleCastCommand,      rbac::RBAC_PERM_COMMAND_CAST,        Console::No }
         };
         static ChatCommandTable commandTable =
         {

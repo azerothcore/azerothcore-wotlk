@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -20,11 +20,13 @@
 #include "Creature.h"
 #include "DBCStores.h"
 #include "DatabaseEnv.h"
+#include "GameTime.h"
 #include "GameObject.h"
 #include "Language.h"
 #include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "SpellAuraEffects.h"
 
 using namespace Acore::ChatCommands;
@@ -38,17 +40,18 @@ public:
     {
         static ChatCommandTable listAurasCommandTable =
         {
-            { "",         HandleListAllAurasCommand,    SEC_MODERATOR, Console::No  },
-            { "id",       HandleListAurasByIdCommand,   SEC_MODERATOR, Console::No  },
-            { "name",     HandleListAurasByNameCommand, SEC_MODERATOR, Console::No  },
+            { "",         HandleListAllAurasCommand,    rbac::RBAC_PERM_COMMAND_LIST_AURAS, Console::No  },
+            { "id",       HandleListAurasByIdCommand,   rbac::RBAC_PERM_COMMAND_LIST_AURAS, Console::No  },
+            { "name",     HandleListAurasByNameCommand, rbac::RBAC_PERM_COMMAND_LIST_AURAS, Console::No  },
         };
 
         static ChatCommandTable listCommandTable =
         {
-            { "creature", HandleListCreatureCommand,    SEC_MODERATOR, Console::Yes },
-            { "item",     HandleListItemCommand,        SEC_MODERATOR, Console::Yes },
-            { "object",   HandleListObjectCommand,      SEC_MODERATOR, Console::Yes },
+            { "creature", HandleListCreatureCommand,    rbac::RBAC_PERM_COMMAND_LIST_CREATURE, Console::Yes },
+            { "item",     HandleListItemCommand,        rbac::RBAC_PERM_COMMAND_LIST_ITEM,     Console::Yes },
+            { "object",   HandleListObjectCommand,      rbac::RBAC_PERM_COMMAND_LIST_OBJECT,   Console::Yes },
             { "auras",    listAurasCommandTable },
+            { "respawns", HandleListRespawnsCommand,    rbac::RBAC_PERM_COMMAND_LIST_RESPAWNS, Console::Yes },
         };
         static ChatCommandTable commandTable =
         {
@@ -513,6 +516,80 @@ public:
         {
             std::string name = spellInfo->SpellName[locale];
             return Utf8FitTo(name, namePart);
+        }
+
+        return true;
+    }
+
+    static bool HandleListRespawnsCommand(ChatHandler* handler, Optional<uint32> firstArg, Optional<uint32> secondArg, Optional<uint32> thirdArg)
+    {
+        Map* map = nullptr;
+        Optional<uint32> entryFilter;
+
+        if (handler->GetSession())
+        {
+            // In-game: first arg = entryId (optional), use player's current map
+            map = handler->GetSession()->GetPlayer()->GetMap();
+            entryFilter = firstArg;
+        }
+        else
+        {
+            // Console: first arg = mapId (required), second = instanceId, third = entryId
+            if (!firstArg)
+            {
+                handler->SendSysMessage(LANG_LIST_RESPAWNS_NO_MAP);
+                return false;
+            }
+            map = sMapMgr->FindMap(*firstArg, secondArg.value_or(0));
+            entryFilter = thirdArg;
+        }
+
+        if (!map)
+        {
+            handler->PSendSysMessage(LANG_RESPAWN_GUID_MAP_NOT_LOADED, firstArg.value_or(0));
+            return false;
+        }
+
+        uint32 count = 0;
+        time_t now = GameTime::GetGameTime().count();
+
+        handler->PSendSysMessage(LANG_LIST_RESPAWNS_CREATURE_HEADER, map->GetId(), map->GetInstanceId());
+        for (auto const& pair : map->GetCreatureRespawnTimes())
+        {
+            CreatureData const* data = sObjectMgr->GetCreatureData(pair.first);
+            if (!data || (entryFilter && data->id1 != *entryFilter))
+                continue;
+
+            CreatureTemplate const* cTemplate = sObjectMgr->GetCreatureTemplate(data->id1);
+            std::string name = cTemplate ? cTemplate->Name : "Unknown";
+            time_t remaining = pair.second > now ? pair.second - now : 0;
+            handler->PSendSysMessage(LANG_LIST_RESPAWNS_CREATURE_ENTRY, pair.first, name, data->id1, remaining);
+            ++count;
+            if (count >= 50)
+            {
+                handler->SendSysMessage(LANG_LIST_RESPAWNS_LIMIT);
+                break;
+            }
+        }
+
+        count = 0;
+        handler->SendSysMessage(LANG_LIST_RESPAWNS_GO_HEADER);
+        for (auto const& pair : map->GetGORespawnTimes())
+        {
+            GameObjectData const* data = sObjectMgr->GetGameObjectData(pair.first);
+            if (!data || (entryFilter && data->id != *entryFilter))
+                continue;
+
+            GameObjectTemplate const* goTemplate = sObjectMgr->GetGameObjectTemplate(data->id);
+            std::string name = goTemplate ? goTemplate->name : "Unknown";
+            time_t remaining = pair.second > now ? pair.second - now : 0;
+            handler->PSendSysMessage(LANG_LIST_RESPAWNS_GO_ENTRY, pair.first, name, data->id, remaining);
+            ++count;
+            if (count >= 50)
+            {
+                handler->SendSysMessage(LANG_LIST_RESPAWNS_LIMIT);
+                break;
+            }
         }
 
         return true;

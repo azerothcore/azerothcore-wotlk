@@ -1,31 +1,36 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "CellImpl.h"
 #include "Chat.h"
 #include "CommandScript.h"
 #include "GameEventMgr.h"
 #include "GameObject.h"
 #include "GameTime.h"
+#include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
 #include "Language.h"
 #include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "PoolMgr.h"
+#include "RBAC.h"
 #include "Transport.h"
+#include <unordered_set>
 
 using namespace Acore::ChatCommands;
 
@@ -41,18 +46,21 @@ public:
     {
         static ChatCommandTable gobjectCommandTable =
         {
-            { "activate",  HandleGameObjectActivateCommand, SEC_GAMEMASTER,    Console::No },
-            { "delete",    HandleGameObjectDeleteCommand,   SEC_ADMINISTRATOR, Console::No },
-            { "info",      HandleGameObjectInfoCommand,     SEC_MODERATOR,     Console::No },
-            { "move",      HandleGameObjectMoveCommand,     SEC_ADMINISTRATOR, Console::No },
-            { "near",      HandleGameObjectNearCommand,     SEC_MODERATOR,     Console::No },
-            { "target",    HandleGameObjectTargetCommand,   SEC_MODERATOR,     Console::No },
-            { "turn",      HandleGameObjectTurnCommand,     SEC_ADMINISTRATOR, Console::No },
-            { "add temp",  HandleGameObjectAddTempCommand,  SEC_GAMEMASTER,    Console::No },
-            { "add",       HandleGameObjectAddCommand,      SEC_ADMINISTRATOR, Console::No },
-            { "set phase", HandleGameObjectSetPhaseCommand, SEC_ADMINISTRATOR, Console::No },
-            { "set state", HandleGameObjectSetStateCommand, SEC_ADMINISTRATOR, Console::No },
-            { "respawn",   HandleGameObjectRespawn,         SEC_GAMEMASTER,    Console::No }
+            { "activate",     HandleGameObjectActivateCommand,     rbac::RBAC_PERM_COMMAND_GOBJECT_ACTIVATE,  Console::No },
+            { "delete",       HandleGameObjectDeleteCommand,       rbac::RBAC_PERM_COMMAND_GOBJECT_DELETE,    Console::No },
+            { "info",         HandleGameObjectInfoCommand,         rbac::RBAC_PERM_COMMAND_GOBJECT_INFO,      Console::No },
+            { "move",         HandleGameObjectMoveCommand,         rbac::RBAC_PERM_COMMAND_GOBJECT_MOVE,      Console::No },
+            { "near",         HandleGameObjectNearCommand,         rbac::RBAC_PERM_COMMAND_GOBJECT_NEAR,      Console::No },
+            { "target",       HandleGameObjectTargetCommand,       rbac::RBAC_PERM_COMMAND_GOBJECT_TARGET,    Console::No },
+            { "turn",         HandleGameObjectTurnCommand,         rbac::RBAC_PERM_COMMAND_GOBJECT_TURN,      Console::No },
+            { "add temp",     HandleGameObjectAddTempCommand,      rbac::RBAC_PERM_COMMAND_GOBJECT_ADD_TEMP,  Console::No },
+            { "add",          HandleGameObjectAddCommand,          rbac::RBAC_PERM_COMMAND_GOBJECT_ADD,       Console::No },
+            { "load",         HandleGameObjectLoadCommand,         rbac::RBAC_PERM_COMMAND_GOBJECT_LOAD,      Console::Yes },
+            { "set phase",    HandleGameObjectSetPhaseCommand,     rbac::RBAC_PERM_COMMAND_GOBJECT_SET_PHASE, Console::No },
+            { "set state",    HandleGameObjectSetStateCommand,     rbac::RBAC_PERM_COMMAND_GOBJECT_SET_STATE, Console::No },
+            { "respawn",      HandleGameObjectRespawn,             rbac::RBAC_PERM_COMMAND_GOBJECT_ACTIVATE,  Console::No },
+            { "spawngroup",   HandleGameObjectSpawnGroupCommand,   rbac::RBAC_PERM_COMMAND_GOBJECT_ADD,       Console::No },
+            { "despawngroup", HandleGameObjectDespawnGroupCommand, rbac::RBAC_PERM_COMMAND_GOBJECT_DELETE,    Console::No }
         };
         static ChatCommandTable commandTable =
         {
@@ -112,7 +120,8 @@ public:
         GameObject* object = sObjectMgr->IsGameObjectStaticTransport(objectInfo->entry) ? new StaticTransport() : new GameObject();
         ObjectGuid::LowType guidLow = map->GenerateLowGuid<HighGuid::GameObject>();
 
-        if (!object->Create(guidLow, objectInfo->entry, map, player->GetPhaseMaskForSpawn(), x, y, z, o, G3D::Quat(), 0, GO_STATE_READY))
+        G3D::Quat rotation = G3D::Quat::fromAxisAngleRotation(G3D::Vector3::unitZ(), o);
+        if (!object->Create(guidLow, objectInfo->entry, map, player->GetPhaseMaskForSpawn(), x, y, z, o, rotation, 0, GO_STATE_READY))
         {
             delete object;
             return false;
@@ -141,6 +150,64 @@ public:
         sObjectMgr->AddGameobjectToGrid(guidLow, sObjectMgr->GetGameObjectData(guidLow));
 
         handler->PSendSysMessage(LANG_GAMEOBJECT_ADD, uint32(objectId), objectInfo->name, guidLow, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ());
+        return true;
+    }
+
+    static bool HandleGameObjectLoadCommand(ChatHandler* handler, GameObjectSpawnId spawnId)
+    {
+        if (!spawnId)
+            return false;
+
+        if (sObjectMgr->GetGameObjectData(spawnId))
+        {
+            handler->SendErrorMessage("Gameobject spawn {} is already loaded.", uint32(spawnId));
+            return false;
+        }
+
+        GameObjectData const* data = sObjectMgr->LoadGameObjectDataFromDB(spawnId);
+        if (!data)
+        {
+            handler->SendErrorMessage("Gameobject spawn {} not found in the database.", uint32(spawnId));
+            return false;
+        }
+
+        if (sPoolMgr->IsPartOfAPool<GameObject>(spawnId))
+        {
+            handler->SendErrorMessage("Gameobject spawn {} is part of a pool and cannot be manually loaded.", uint32(spawnId));
+            return false;
+        }
+
+        QueryResult eventResult = WorldDatabase.Query("SELECT guid FROM game_event_gameobject WHERE guid = {}", uint32(spawnId));
+        if (eventResult)
+        {
+            handler->SendErrorMessage("Gameobject spawn {} is managed by the game event system and cannot be manually loaded.", uint32(spawnId));
+            return false;
+        }
+
+        Map* map = sMapMgr->FindBaseNonInstanceMap(data->mapid);
+        if (!map)
+        {
+            handler->SendErrorMessage("Gameobject spawn {} is on a non-continent map (ID: {}). Only continent maps are supported.", uint32(spawnId), data->mapid);
+            return false;
+        }
+
+        GameObjectTemplate const* objectInfo = sObjectMgr->GetGameObjectTemplate(data->id);
+        if (!objectInfo)
+        {
+            handler->SendErrorMessage("Gameobject template not found for entry {}.", data->id);
+            return false;
+        }
+
+        GameObject* object = sObjectMgr->IsGameObjectStaticTransport(objectInfo->entry) ? new StaticTransport() : new GameObject();
+        if (!object->LoadGameObjectFromDB(spawnId, map, true))
+        {
+            delete object;
+            handler->SendErrorMessage("Failed to load gameobject spawn {}.", uint32(spawnId));
+            return false;
+        }
+
+        sObjectMgr->AddGameobjectToGrid(spawnId, data);
+        handler->PSendSysMessage("Gameobject spawn {} loaded successfully.", uint32(spawnId));
         return true;
     }
 
@@ -332,7 +399,7 @@ public:
 
         Map* map = object->GetMap();
         object->Relocate(object->GetPositionX(), object->GetPositionY(), object->GetPositionZ(), *oz);
-        object->SetLocalRotationAngles(*oz, oy.value_or(0.0f), ox.value_or(0.0f));
+        object->SetWorldRotationAngles(*oz, oy.value_or(0.0f), ox.value_or(0.0f));
         object->SaveToDB();
 
         // Generate a completely new spawn with new guid
@@ -438,6 +505,37 @@ public:
 
         Player* player = handler->GetSession()->GetPlayer();
 
+        // Grid search - finds all game objects including temporary spawns
+        std::list<GameObject*> gameobjects;
+        Acore::GameObjectInRangeCheck check(player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), distance);
+        Acore::GameObjectListSearcher<Acore::GameObjectInRangeCheck> searcher(player, gameobjects, check);
+        Cell::VisitObjects(player, searcher, distance);
+
+        std::unordered_set<ObjectGuid::LowType> gridSpawnIds;
+
+        for (GameObject* go : gameobjects)
+        {
+            GameObjectTemplate const* gameObjectInfo = sObjectMgr->GetGameObjectTemplate(go->GetEntry());
+            if (!gameObjectInfo)
+                continue;
+
+            handler->PSendSysMessage(LANG_GO_LIST_CHAT, go->GetSpawnId(), go->GetEntry(),
+                go->GetSpawnId(), gameObjectInfo->name,
+                go->GetPositionX(), go->GetPositionY(), go->GetPositionZ(),
+                go->GetMapId(), "", "");
+
+            if (go->GetSpawnId())
+                gridSpawnIds.insert(go->GetSpawnId());
+            ++count;
+        }
+
+        if (count > 0 && distance <= SIZE_OF_GRIDS)
+        {
+            handler->PSendSysMessage(LANG_COMMAND_NEAROBJMESSAGE, distance, count);
+            return true;
+        }
+
+        // Fallback to DB query
         WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_GAMEOBJECT_NEAREST);
         stmt->SetData(0, player->GetPositionX());
         stmt->SetData(1, player->GetPositionY());
@@ -456,6 +554,11 @@ public:
             {
                 Field* fields = result->Fetch();
                 ObjectGuid::LowType guid = fields[0].Get<uint32>();
+
+                // Skip entries already emitted via grid search
+                if (gridSpawnIds.count(guid))
+                    continue;
+
                 uint32 entry = fields[1].Get<uint32>();
                 float x = fields[2].Get<float>();
                 float y = fields[3].Get<float>();
@@ -586,6 +689,60 @@ public:
 
         object->Respawn();
         handler->PSendSysMessage(LANG_CMD_GO_RESPAWN, object->GetNameForLocaleIdx(handler->GetSessionDbcLocale()), object->GetEntry(), object->GetSpawnId());
+        return true;
+    }
+
+    static bool HandleGameObjectSpawnGroupCommand(ChatHandler* handler, uint32 groupId)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+        if (!player)
+            return false;
+
+        SpawnGroupTemplateData const* groupData = sObjectMgr->GetSpawnGroupData(groupId);
+        if (!groupData)
+        {
+            handler->SendErrorMessage(LANG_SPAWNGROUP_NOT_FOUND, groupId);
+            return false;
+        }
+
+        if (groupData->flags & SPAWNGROUP_FLAG_SYSTEM)
+        {
+            handler->SendErrorMessage(LANG_SPAWNGROUP_SPAWN_SYSTEM_ERROR, groupId, groupData->name);
+            return false;
+        }
+
+        if (player->GetMap()->SpawnGroupSpawn(groupId, true, true))
+            handler->PSendSysMessage(LANG_SPAWNGROUP_SPAWN_SUCCESS, groupId, groupData->name);
+        else
+            handler->SendErrorMessage(LANG_SPAWNGROUP_SPAWN_FAILED, groupId, groupData->name);
+
+        return true;
+    }
+
+    static bool HandleGameObjectDespawnGroupCommand(ChatHandler* handler, uint32 groupId)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+        if (!player)
+            return false;
+
+        SpawnGroupTemplateData const* groupData = sObjectMgr->GetSpawnGroupData(groupId);
+        if (!groupData)
+        {
+            handler->SendErrorMessage(LANG_SPAWNGROUP_NOT_FOUND, groupId);
+            return false;
+        }
+
+        if (groupData->flags & SPAWNGROUP_FLAG_SYSTEM)
+        {
+            handler->SendErrorMessage(LANG_SPAWNGROUP_DESPAWN_SYSTEM_ERROR, groupId, groupData->name);
+            return false;
+        }
+
+        if (player->GetMap()->SpawnGroupDespawn(groupId, true))
+            handler->PSendSysMessage(LANG_SPAWNGROUP_DESPAWN_SUCCESS, groupId, groupData->name);
+        else
+            handler->SendErrorMessage(LANG_SPAWNGROUP_DESPAWN_FAILED, groupId, groupData->name);
+
         return true;
     }
 };

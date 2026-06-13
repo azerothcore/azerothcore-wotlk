@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -68,14 +68,8 @@ void Player::Update(uint32 p_time)
         m_nextMailDelivereTime = time_t(0);
     }
 
-    // Update cinematic location, if 500ms have passed and we're doing a
-    // cinematic now.
-    _cinematicMgr->m_cinematicDiff += p_time;
-    if (_cinematicMgr->m_cinematicCamera && _cinematicMgr->m_activeCinematicCameraId && GetMSTimeDiffToNow(_cinematicMgr->m_lastCinematicCheck) > CINEMATIC_UPDATEDIFF)
-    {
-        _cinematicMgr->m_lastCinematicCheck = getMSTime();
-        _cinematicMgr->UpdateCinematicLocation(p_time);
-    }
+    // Update cinematic camera (if needed)
+    _cinematicMgr.UpdateCinematic(p_time);
 
     // used to implement delayed far teleports
     SetMustDelayTeleport(true);
@@ -204,6 +198,9 @@ void Player::Update(uint32 p_time)
                     // do attack
                     AttackerStateUpdate(victim, BASE_ATTACK);
                     resetAttackTimer(BASE_ATTACK);
+
+                    // Blizzlike: Reset ranged swing timer when performing melee attack
+                    resetAttackTimer(RANGED_ATTACK);
                 }
             }
 
@@ -223,6 +220,9 @@ void Player::Update(uint32 p_time)
                     // do attack
                     AttackerStateUpdate(victim, OFF_ATTACK);
                     resetAttackTimer(OFF_ATTACK);
+
+                    // Blizzlike: Reset ranged swing timer when performing melee attack
+                    resetAttackTimer(RANGED_ATTACK);
                 }
             }
 
@@ -396,13 +396,11 @@ void Player::Update(uint32 p_time)
         // != GetCharmGUID())))
         RemovePet(pet, PET_SAVE_NOT_IN_SLOT, true);
 
-    // pussywizard:
     if (m_hostileReferenceCheckTimer <= p_time)
     {
         m_hostileReferenceCheckTimer = 15000;
         if (!GetMap()->IsDungeon())
-            getHostileRefMgr().deleteReferencesOutOfRange(
-                GetVisibilityRange());
+            GetCombatManager().EndCombatBeyondRange(GetVisibilityRange(), true);
     }
     else
         m_hostileReferenceCheckTimer -= p_time;
@@ -701,7 +699,7 @@ void Player::UpdateRating(CombatRating cr)
 
 void Player::UpdateAllRatings()
 {
-    for (int cr = 0; cr < MAX_COMBAT_RATING; ++cr)
+    for (uint8 cr = 0; cr < MAX_COMBAT_RATING; ++cr)
         UpdateRating(CombatRating(cr));
 }
 
@@ -1171,9 +1169,6 @@ bool Player::UpdatePosition(float x, float y, float z, float orientation,
     if (GetGroup())
         SetGroupUpdateFlag(GROUP_UPDATE_FLAG_POSITION);
 
-    if (GetTrader() && !IsWithinDistInMap(GetTrader(), INTERACTION_DISTANCE))
-        GetSession()->SendCancelTrade(TRADE_STATUS_TRADE_CANCELED);
-
     CheckAreaExploreAndOutdoor();
 
     return true;
@@ -1235,7 +1230,8 @@ void Player::UpdateArea(uint32 newArea)
     {
         SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_SANCTUARY);
         pvpInfo.IsInNoPvPArea = true;
-        CombatStopWithPets();
+        if (!duel && GetCombatManager().HasPvPCombat())
+            CombatStopWithPets();
     }
     else
         RemoveByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_SANCTUARY);
@@ -1401,7 +1397,7 @@ void Player::UpdateHomebindTime(uint32 time)
             WorldPacket data(SMSG_RAID_GROUP_ONLY, 4 + 4);
             data << uint32(0);
             data << uint32(0);
-            GetSession()->SendPacket(&data);
+            SendDirectMessage(&data);
         }
         // instance is valid, reset homebind timer
         m_HomebindTimer = 0;
@@ -1424,7 +1420,7 @@ void Player::UpdateHomebindTime(uint32 time)
         WorldPacket data(SMSG_RAID_GROUP_ONLY, 4 + 4);
         data << uint32(m_HomebindTimer);
         data << uint32(1);
-        GetSession()->SendPacket(&data);
+        SendDirectMessage(&data);
         LOG_DEBUG(
             "maps",
             "PLAYER: Player '{}' ({}) will be teleported to homebind in 60 "
@@ -1439,6 +1435,9 @@ void Player::UpdatePvPState()
 
     if (pvpInfo.IsHostile) // in hostile area
     {
+        if (IsInFlight() || !m_taxi.empty()) // on taxi or taxi pending resume after login
+            return;
+
         if (!IsPvP() || pvpInfo.EndTimer != 0)
             UpdatePvP(true, true);
     }
@@ -1540,6 +1539,16 @@ void Player::UpdatePvP(bool state, bool _override)
     sScriptMgr->OnPlayerPVPFlagChange(this, state);
 }
 
+void Player::AtExitCombat()
+{
+    Unit::AtExitCombat();
+    UpdatePotionCooldown();
+
+    if (IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_ABILITY))
+        for (uint8 i = 0; i < MAX_RUNES; ++i)
+            SetGracePeriod(i, 0);
+}
+
 void Player::UpdatePotionCooldown(Spell* spell)
 {
     // no potion used i combat or still in combat
@@ -1593,8 +1602,8 @@ void Player::UpdateVisibilityForPlayer(bool mapChange)
         m_seer = this;
 
     Acore::VisibleNotifier notifier(*this, mapChange);
-    Cell::VisitObjects(m_seer, notifier, GetSightRange());
-    Cell::VisitFarVisibleObjects(m_seer, notifier, VISIBILITY_DISTANCE_GIGANTIC);
+    Cell::VisitObjects(GetSightPosition().GetPositionX(), GetSightPosition().GetPositionY(), GetMap(), notifier, GetSightRange());
+    Cell::VisitFarVisibleObjects(GetSightPosition().GetPositionX(), GetSightPosition().GetPositionY(), GetMap(), notifier, VISIBILITY_DISTANCE_GIGANTIC);
     notifier.SendToSelf();
 
     if (mapChange)
@@ -1771,7 +1780,7 @@ void Player::UpdateTriggerVisibility()
 
     WorldPacket packet;
     udata.BuildPacket(packet);
-    GetSession()->SendPacket(&packet);
+    SendDirectMessage(&packet);
 }
 
 void Player::UpdateForQuestWorldObjects()
@@ -1824,7 +1833,7 @@ void Player::UpdateForQuestWorldObjects()
 
     WorldPacket packet;
     udata.BuildPacket(packet);
-    GetSession()->SendPacket(&packet);
+    SendDirectMessage(&packet);
 }
 
 void Player::UpdateTitansGrip()
@@ -1968,10 +1977,7 @@ void Player::UpdateCharmedAI()
 
     Unit* target = GetVictim();
     if (target)
-    {
         SetInFront(target);
-        SendMovementFlagUpdate(true);
-    }
 
     if (HasUnitState(UNIT_STATE_CASTING))
         return;

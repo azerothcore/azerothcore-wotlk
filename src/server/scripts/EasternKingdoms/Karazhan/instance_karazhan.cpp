@@ -1,20 +1,21 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "AreaBoundary.h"
 #include "Creature.h"
 #include "GameObject.h"
 #include "InstanceMapScript.h"
@@ -65,6 +66,12 @@ DoorData const doorData[] =
     { 0,                        0,              DOOR_TYPE_ROOM  }
 };
 
+BossBoundaryData const boundaries =
+{
+    { DATA_ATTUMEN,     new CircleBoundary(Position(-11126.3f, -1929.11f), 50.0f) },
+    { DATA_ATTUMEN,     new ZRangeBoundary(49.0f, 55.0f) },
+};
+
 class instance_karazhan : public InstanceMapScript
 {
 public:
@@ -81,6 +88,7 @@ public:
         {
             SetHeaders(DataHeader);
             SetBossNumber(EncounterCount);
+            LoadBossBoundaries(boundaries);
             LoadObjectData(creatureData, gameObjectData);
             LoadDoorData(doorData);
 

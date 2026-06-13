@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -88,8 +88,10 @@ enum ConditionTypes
     CONDITION_HAS_AURA_TYPE            = 102,           // aura_type        0              0                  true if has aura type
     CONDITION_WORLD_SCRIPT             = 103,           // conditionId      state          0                  true if WorldState::IsConditionFulfilled returns true
     CONDITION_AI_DATA                  = 104,           // dataId           value          0                  true if AI::GetData returns value
+    CONDITION_PLAYER_QUEUED_RANDOM_DUNGEON = 105,       // checkDifficulty  difficulty     0                  true if player is queued for a random dungeon via RDF
+    CONDITION_UNIT_IN_COMBAT           = 106,           // 0                0              0                  true if unit is engaged in combat
 
-    CONDITION_AC_END                   = 105            // placeholder
+    CONDITION_AC_END                   = 107            // placeholder
 };
 
 /*! Documentation on implementing a new ConditionSourceType:
@@ -141,7 +143,7 @@ enum ConditionSourceType
     CONDITION_SOURCE_TYPE_SPELL                          = 17,
     CONDITION_SOURCE_TYPE_SPELL_CLICK_EVENT              = 18,
     CONDITION_SOURCE_TYPE_QUEST_AVAILABLE                = 19,
-    CONDITION_SOURCE_TYPE_UNUSED_20                      = 20, // placeholder
+    CONDITION_SOURCE_TYPE_GOSSIP_HELLO                   = 20,
     CONDITION_SOURCE_TYPE_VEHICLE_SPELL                  = 21,
     CONDITION_SOURCE_TYPE_SMART_EVENT                    = 22,
     CONDITION_SOURCE_TYPE_NPC_VENDOR                     = 23,
@@ -151,7 +153,7 @@ enum ConditionSourceType
     CONDITION_SOURCE_TYPE_GRAVEYARD                      = 27, // don't use on 3.3.5a
     CONDITION_SOURCE_TYPE_PLAYER_LOOT_TEMPLATE           = 28,
     CONDITION_SOURCE_TYPE_CREATURE_RESPAWN               = 29,
-    CONDITION_SOURCE_TYPE_CREATURE_VISIBILITY            = 30,
+    CONDITION_SOURCE_TYPE_OBJECT_VISIBILITY              = 30,
     CONDITION_SOURCE_TYPE_MAX                            = 31 // placeholder
 };
 
@@ -197,7 +199,7 @@ struct Condition
     ConditionSourceType     SourceType;        //SourceTypeOrReferenceId
     uint32                  SourceGroup;
     int32                   SourceEntry;
-    uint32                  SourceId;          // So far, only used in CONDITION_SOURCE_TYPE_SMART_EVENT
+    uint32                  SourceId;          // Used in CONDITION_SOURCE_TYPE_SMART_EVENT and CONDITION_SOURCE_TYPE_OBJECT_VISIBILITY
     uint32                  ElseGroup;
     ConditionTypes          ConditionType;     //ConditionTypeOrReference
     uint32                  ConditionValue1;
@@ -241,6 +243,7 @@ typedef std::map<ConditionSourceType, ConditionTypeContainer> ConditionContainer
 typedef std::map<uint32, ConditionTypeContainer> CreatureSpellConditionContainer;
 typedef std::map<uint32, ConditionTypeContainer> NpcVendorConditionContainer;
 typedef std::map<std::pair<int32, uint32 /*SAI source_type*/>, ConditionTypeContainer> SmartEventConditionContainer;
+typedef std::map<std::pair<uint32 /*SourceEntry*/, uint32 /*SourceGroup*/>, std::map<uint32 /*SourceId*/, ConditionList>> ObjectVisibilityConditionContainer;
 
 typedef std::map<uint32, ConditionList> ConditionReferenceContainer;//only used for references
 
@@ -268,6 +271,7 @@ public:
     ConditionList GetConditionsForSmartEvent(int32 entryOrGuid, uint32 eventId, uint32 sourceType);
     ConditionList GetConditionsForVehicleSpell(uint32 creatureId, uint32 spellId);
     ConditionList GetConditionsForNpcVendorEvent(uint32 creatureId, uint32 itemId);
+    ConditionList GetConditionsForObjectVisibility(const WorldObject* object) const;
 
 private:
     bool isSourceTypeValid(Condition* cond);
@@ -280,12 +284,13 @@ private:
     void Clean(); // free up resources
     std::list<Condition*> AllocatedMemoryStore; // some garbage collection :)
 
-    ConditionContainer                ConditionStore;
-    ConditionReferenceContainer       ConditionReferenceStore;
-    CreatureSpellConditionContainer   VehicleSpellConditionStore;
-    CreatureSpellConditionContainer   SpellClickEventConditionStore;
-    NpcVendorConditionContainer       NpcVendorConditionContainerStore;
-    SmartEventConditionContainer      SmartEventConditionStore;
+    ConditionContainer                 ConditionStore;
+    ConditionReferenceContainer        ConditionReferenceStore;
+    CreatureSpellConditionContainer    VehicleSpellConditionStore;
+    CreatureSpellConditionContainer    SpellClickEventConditionStore;
+    NpcVendorConditionContainer        NpcVendorConditionContainerStore;
+    SmartEventConditionContainer       SmartEventConditionStore;
+    ObjectVisibilityConditionContainer ObjectVisibilityConditionStore;
 };
 
 #define sConditionMgr ConditionMgr::instance()

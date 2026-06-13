@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -68,7 +68,7 @@ public:
         npc_elder_clearwaterAI(Creature* c) : ScriptedAI(c)
         {
             events.Reset();
-            events.ScheduleEvent(EVENT_CLEARWATER_ANNOUNCE, 1000, 1, 0);
+            events.ScheduleEvent(EVENT_CLEARWATER_ANNOUNCE, 1s, 1, 0);
             finished = false;
             preWarning = false;
             startWarning = false;
@@ -126,7 +126,7 @@ public:
                             }
                         }
 
-                        events.RepeatEvent(1000);
+                        events.Repeat(1s);
                         break;
                     }
             }
@@ -312,123 +312,91 @@ public:
     }
 };
 
-enum eTrainingDummy
+struct npc_training_dummy : NullCreatureAI
 {
-    SPELL_STUN_PERMANENT        = 61204
-};
+    npc_training_dummy(Creature* creature) : NullCreatureAI(creature) { }
 
-class npc_training_dummy : public CreatureScript
-{
-public:
-    npc_training_dummy() : CreatureScript("npc_training_dummy") { }
-
-    struct npc_training_dummyAI : ScriptedAI
+    void JustEnteredCombat(Unit* who) override
     {
-        npc_training_dummyAI(Creature* creature) : ScriptedAI(creature)
+        _combatTimer[who->GetGUID()] = 5s;
+    }
+
+    void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType damageType, SpellSchoolMask) override
+    {
+        damage = 0;
+
+        if (!attacker || damageType == DOT)
+            return;
+
+        _combatTimer[attacker->GetGUID()] = 5s;
+
+        // Pet attacks engage the owner via propagation without firing
+        // JustEnteredCombat here, so track the owner's timer too.
+        if (Unit* owner = attacker->GetCharmerOrOwner())
+            if (me->GetCombatManager().IsInCombatWith(owner))
+                _combatTimer[owner->GetGUID()] = 5s;
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        for (auto itr = _combatTimer.begin(); itr != _combatTimer.end();)
         {
-            me->SetCombatMovement(false);
-            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true); //imune to knock aways like blast wave
-        }
-
-        uint32 resetTimer;
-
-        void Reset() override
-        {
-            me->CastSpell(me, SPELL_STUN_PERMANENT, true);
-            resetTimer = 5000;
-        }
-
-        void EnterEvadeMode(EvadeReason why) override
-        {
-            if (!_EnterEvadeMode(why))
-                return;
-
-            Reset();
-        }
-
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
-        {
-            resetTimer = 5000;
-            damage = 0;
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            if (resetTimer <= diff)
+            itr->second -= Milliseconds(diff);
+            if (itr->second <= 0s)
             {
-                EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
-                resetTimer = 5000;
+                // The attacker has not dealt any damage to the dummy for over 5 seconds. End combat.
+                auto const& pveRefs = me->GetCombatManager().GetPvECombatRefs();
+                auto it = pveRefs.find(itr->first);
+                if (it != pveRefs.end())
+                    it->second->EndCombat();
+
+                itr = _combatTimer.erase(itr);
             }
             else
-                resetTimer -= diff;
+                ++itr;
         }
-
-        void MoveInLineOfSight(Unit* /*who*/) override { }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_training_dummyAI(creature);
     }
+
+private:
+    std::unordered_map<ObjectGuid, Milliseconds> _combatTimer;
 };
 
-class npc_target_dummy : public CreatureScript
+struct npc_target_dummy : NullCreatureAI
 {
-public:
-    npc_target_dummy() : CreatureScript("npc_target_dummy") { }
-
-    struct npc_target_dummyAI : ScriptedAI
+    npc_target_dummy(Creature* creature) : NullCreatureAI(creature)
     {
-        npc_target_dummyAI(Creature* creature) : ScriptedAI(creature)
-        {
-            me->SetCombatMovement(false);
-            deathTimer = 15000;
-            me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_KNOCK_BACK, true); //imune to knock aways like blast wave
-        }
+        _deathTimer = 15s;
+    }
 
-        uint32 deathTimer;
+    void Reset() override
+    {
+        me->SetControlled(true, UNIT_STATE_STUNNED);
+        me->SetLootRecipient(me->GetOwner());
+        me->SelectLevel();
+    }
 
-        void Reset() override
+    void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
+    {
+        damage = 0;
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!me->HasUnitState(UNIT_STATE_STUNNED))
+            me->SetControlled(true, UNIT_STATE_STUNNED);
+
+        _deathTimer -= Milliseconds(diff);
+        if (_deathTimer <= 0s)
         {
-            me->SetControlled(true, UNIT_STATE_STUNNED); //disable rotate
             me->SetLootRecipient(me->GetOwner());
-            me->SelectLevel();
+            me->LowerPlayerDamageReq(me->GetMaxHealth());
+            me->KillSelf();
+            _deathTimer = 600s;
         }
-
-        void EnterEvadeMode(EvadeReason why) override
-        {
-            if (!_EnterEvadeMode(why))
-                return;
-
-            Reset();
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!me->HasUnitState(UNIT_STATE_STUNNED))
-                me->SetControlled(true, UNIT_STATE_STUNNED);//disable rotate
-
-            if (deathTimer <= diff)
-            {
-                me->SetLootRecipient(me->GetOwner());
-                me->LowerPlayerDamageReq(me->GetMaxHealth());
-                me->KillSelf();
-                deathTimer = 600000;
-            }
-            else
-                deathTimer -= diff;
-        }
-
-        void MoveInLineOfSight(Unit* /*who*/) override { }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_target_dummyAI(creature);
     }
+
+private:
+    Milliseconds _deathTimer;
 };
 
 /*########
@@ -561,10 +529,6 @@ public:
 
         {
             if (!SpawnAssoc)
-                return;
-
-            // check if they're hostile
-            if (!(me->IsHostileTo(who) || who->IsHostileTo(me)))
                 return;
 
             if (me->IsValidAttackTarget(who))
@@ -1398,6 +1362,7 @@ public:
             }
         }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 /*waypointId*/) override
         {
         }
@@ -1421,7 +1386,8 @@ public:
                                 break;
                         }
 
-                        Start(false, true);
+                        me->SetWalk(true);
+                        Start(false);
                     }
                     else
                         EnterEvadeMode();                       //something went wrong
@@ -2677,7 +2643,62 @@ struct npc_controller : public PossessedAI
     {
         if (!apply)
         {
-            me->GetCharmerOrOwner()->InterruptNonMeleeSpells(false);
+            if (Unit* charmerOrOwner = me->GetCharmerOrOwner())
+                charmerOrOwner->InterruptNonMeleeSpells(false);
+        }
+    }
+};
+
+enum TravelerMammothVendor
+{
+    SAY_DISMISS      = 0,
+};
+
+struct npc_traveler_mammoth_vendor : public ScriptedAI
+{
+    npc_traveler_mammoth_vendor(Creature* creature) : ScriptedAI(creature) { }
+
+    bool _hasEjected = false;
+    ObjectGuid _playerGuid;
+
+    void Reset() override
+    {
+        _hasEjected = false;
+        _playerGuid.Clear();
+
+        if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP) && !me->GetMap()->IsBattlegroundOrArena())
+            me->SetFaction(FACTION_FRIENDLY);
+
+        me->m_Events.KillAllEvents(false);
+    }
+
+    void UpdateAI(uint32 /*diff*/) override
+    {
+        if (_playerGuid.IsEmpty() && me->GetVehicle())
+        {
+            _playerGuid = me->GetVehicleBase()->GetGUID();
+        }
+        if (!me->GetVehicle() && !_hasEjected)
+        {
+            _hasEjected = true;
+
+            me->m_Events.AddEventAtOffset([this] {
+                if (Unit* driver = ObjectAccessor::GetUnit(*me, _playerGuid))
+                    me->SetFacingToObject(driver);
+            }, 2500ms);
+
+            me->m_Events.AddEventAtOffset([this] {
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_VENDOR_MASK);
+            }, 3300ms);
+
+            me->m_Events.AddEventAtOffset([this] {
+                Talk(SAY_DISMISS);
+                me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
+            }, 4100ms);
+
+            me->m_Events.AddEventAtOffset([this] {
+                me->DespawnOrUnsummon();
+            }, 10200ms);
         }
     }
 };
@@ -2686,8 +2707,8 @@ void AddSC_npcs_special()
 {
     new npc_elder_clearwater();
     new npc_riggle_bassbait();
-    new npc_target_dummy();
-    new npc_training_dummy();
+    RegisterCreatureAI(npc_target_dummy);
+    RegisterCreatureAI(npc_training_dummy);
     new npc_venomhide_hatchling();
     new npc_air_force_bots();
     new npc_chicken_cluck();
@@ -2708,4 +2729,5 @@ void AddSC_npcs_special()
     RegisterCreatureAI(npc_arcanite_dragonling);
     RegisterCreatureAI(npc_crashin_thrashin_robot);
     RegisterCreatureAI(npc_controller);
+    RegisterCreatureAI(npc_traveler_mammoth_vendor);
 }

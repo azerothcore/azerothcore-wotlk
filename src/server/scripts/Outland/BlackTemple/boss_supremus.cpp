@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -48,12 +48,7 @@ enum Supremus
 struct boss_supremus : public BossAI
 {
     boss_supremus(Creature* creature) : BossAI(creature, DATA_SUPREMUS)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    {    }
 
     void Reset() override
     {
@@ -168,13 +163,14 @@ struct boss_supremus : public BossAI
     Unit* FindHatefulStrikeTarget()
     {
         Unit* target = nullptr;
-        ThreatContainer::StorageType const& threatlist = me->GetThreatMgr().GetThreatList();
-        for (ThreatContainer::StorageType::const_iterator i = threatlist.begin(); i != threatlist.end(); ++i)
+        for (ThreatReference const* ref : me->GetThreatMgr().GetUnsortedThreatList())
         {
-            Unit* unit = ObjectAccessor::GetUnit(*me, (*i)->getUnitGuid());
-            if (unit && me->IsWithinMeleeRange(unit))
-                if (!target || unit->GetHealth() > target->GetHealth())
-                    target = unit;
+            if (Unit* unit = ref->GetVictim())
+            {
+                if (me->IsWithinMeleeRange(unit))
+                    if (!target || unit->GetHealth() > target->GetHealth())
+                        target = unit;
+            }
         }
 
         return target;

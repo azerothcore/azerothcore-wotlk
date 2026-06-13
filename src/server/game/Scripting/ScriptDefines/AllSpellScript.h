@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -24,8 +24,6 @@
 enum AllSpellHook
 {
     ALLSPELLHOOK_ON_CALC_MAX_DURATION,
-    ALLSPELLHOOK_CAN_MOD_AURA_EFFECT_DAMAGE_DONE,
-    ALLSPELLHOOK_CAN_MOD_AURA_EFFECT_MOD_DAMAGE_PERCENT_DONE,
     ALLSPELLHOOK_ON_SPELL_CHECK_CAST,
     ALLSPELLHOOK_CAN_PREPARE,
     ALLSPELLHOOK_CAN_SCALING_EVERYTHING,
@@ -55,10 +53,6 @@ public:
 
     // Calculate max duration in applying aura
     virtual void OnCalcMaxDuration(Aura const* /*aura*/, int32& /*maxDuration*/) { }
-
-    [[nodiscard]] virtual bool CanModAuraEffectDamageDone(AuraEffect const* /*auraEff*/, Unit* /*target*/, AuraApplication const* /*aurApp*/, uint8 /*mode*/, bool /*apply*/) { return true; }
-
-    [[nodiscard]] virtual bool CanModAuraEffectModDamagePercentDone(AuraEffect const* /*auraEff*/, Unit* /*target*/, AuraApplication const* /*aurApp*/, uint8 /*mode*/, bool /*apply*/) { return true; }
 
     virtual void OnSpellCheckCast(Spell* /*spell*/, bool /*strict*/, SpellCastResult& /*res*/) { }
 

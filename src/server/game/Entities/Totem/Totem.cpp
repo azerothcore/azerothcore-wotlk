@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -34,9 +34,17 @@ Totem::Totem(SummonPropertiesEntry const* properties, ObjectGuid owner) : Minion
 void Totem::Update(uint32 time)
 {
     Unit* owner = GetOwner();
-    if (!owner || !owner->IsAlive() || !IsAlive() || m_duration <= time)
+
+    if (!owner || !IsAlive() || m_duration <= time)
     {
         UnSummon();                                         // remove self
+        return;
+    }
+
+    // If owner is dead and this is not a lightwell, despawn
+    if (!owner->IsAlive() && !(m_Properties && m_Properties->Type == SUMMON_TYPE_LIGHTWELL))
+    {
+        UnSummon();
         return;
     }
 
@@ -119,11 +127,11 @@ void Totem::InitSummon()
     }
 }
 
-void Totem::UnSummon(uint32 msTime)
+void Totem::UnSummon(Milliseconds msTime)
 {
-    if (msTime)
+    if (msTime > 0ms)
     {
-        m_Events.AddEvent(new ForcedUnsummonDelayEvent(*this), m_Events.CalculateTime(msTime));
+        m_Events.AddEventAtOffset(new ForcedUnsummonDelayEvent(*this), msTime);
         return;
     }
 
@@ -171,7 +179,7 @@ void Totem::UnSummon(uint32 msTime)
     AddObjectToRemoveList();
 }
 
-bool Totem::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) const
+bool Totem::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index, Unit const* caster /*= nullptr*/) const
 {
     // xinef: immune to all positive spells, except of stoneclaw totem absorb, sentry totem bind sight and intervene
     // totems positive spells have unit_caster target
@@ -201,5 +209,5 @@ bool Totem::IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index) con
             break;
     }
 
-    return Creature::IsImmunedToSpellEffect(spellInfo, index);
+    return Creature::IsImmunedToSpellEffect(spellInfo, index, caster);
 }

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -47,73 +47,58 @@ enum Events
 
 constexpr float MELEE_TARGET_LOOKUP_DIST = 10.0f;
 
-class boss_magmadar : public CreatureScript
+struct boss_magmadar : public BossAI
 {
-public:
-    boss_magmadar() : CreatureScript("boss_magmadar") {}
+    boss_magmadar(Creature* creature) : BossAI(creature, DATA_MAGMADAR) {}
 
-    struct boss_magmadarAI : public BossAI
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        boss_magmadarAI(Creature* creature) : BossAI(creature, DATA_MAGMADAR) {}
+        _JustEngagedWith();
+        events.ScheduleEvent(EVENT_FRENZY, 8500ms);
+        events.ScheduleEvent(EVENT_PANIC, 9500ms);
+        events.ScheduleEvent(EVENT_LAVA_BOMB, 12s);
+        events.ScheduleEvent(EVENT_LAVA_BOMB_RANGED, 15s);
+    }
 
-        void JustEngagedWith(Unit* /*who*/) override
+    void ExecuteEvent(uint32 eventId) override
+    {
+        switch (eventId)
         {
-            _JustEngagedWith();
-            events.ScheduleEvent(EVENT_FRENZY, 8500ms);
-            events.ScheduleEvent(EVENT_PANIC, 9500ms);
-            events.ScheduleEvent(EVENT_LAVA_BOMB, 12s);
-            events.ScheduleEvent(EVENT_LAVA_BOMB_RANGED, 15s);
-        }
-
-        void ExecuteEvent(uint32 eventId) override
-        {
-            switch (eventId)
+            case EVENT_FRENZY:
             {
-                case EVENT_FRENZY:
-                {
-                    Talk(EMOTE_FRENZY);
-                    DoCastSelf(SPELL_FRENZY);
-                    events.RepeatEvent(urand(15000, 20000));
-                    break;
-                }
-                case EVENT_PANIC:
-                {
-                    DoCastVictim(SPELL_PANIC);
-                    events.RepeatEvent(urand(31000, 38000));
-                    break;
-                }
-                case EVENT_LAVA_BOMB:
-                {
-                    if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, MELEE_TARGET_LOOKUP_DIST, true))
-                    {
-                        DoCast(target, SPELL_LAVA_BOMB);
-                    }
+                Talk(EMOTE_FRENZY);
+                DoCastSelf(SPELL_FRENZY);
+                events.Repeat(15s, 20s);
+                break;
+            }
+            case EVENT_PANIC:
+            {
+                DoCastVictim(SPELL_PANIC);
+                events.Repeat(31s, 38s);
+                break;
+            }
+            case EVENT_LAVA_BOMB:
+            {
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, MELEE_TARGET_LOOKUP_DIST, true))
+                    DoCast(target, SPELL_LAVA_BOMB);
 
-                    events.RepeatEvent(urand(12000, 15000));
-                    break;
-                }
-                case EVENT_LAVA_BOMB_RANGED:
+                events.Repeat(12s, 15s);
+                break;
+            }
+            case EVENT_LAVA_BOMB_RANGED:
+            {
+                std::list<Unit*> targets;
+                SelectTargetList(targets, 1, SelectTargetMethod::Random, 1, [this](Unit* target)
                 {
-                    std::list<Unit*> targets;
-                    SelectTargetList(targets, 1, SelectTargetMethod::Random, 1, [this](Unit* target)
-                    {
-                        return target && target->IsPlayer() && target->GetDistance(me) > MELEE_TARGET_LOOKUP_DIST && target->GetDistance(me) < 100.0f;
-                    });
+                    return target && target->IsPlayer() && target->GetDistance(me) > MELEE_TARGET_LOOKUP_DIST && target->GetDistance(me) < 100.0f;
+                });
 
-                    if (!targets.empty())
-                    {
-                        DoCast(targets.front() , SPELL_LAVA_BOMB_RANGED);
-                    }
-                    events.RepeatEvent(urand(12000, 15000));
-                    break;
-                }
+                if (!targets.empty())
+                    DoCast(targets.front() , SPELL_LAVA_BOMB_RANGED);
+                events.Repeat(12s, 15s);
+                break;
             }
         }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetMoltenCoreAI<boss_magmadarAI>(creature);
     }
 };
 
@@ -162,7 +147,7 @@ class spell_magmadar_lava_bomb : public SpellScript
 
 void AddSC_boss_magmadar()
 {
-    new boss_magmadar();
+    RegisterMoltenCoreCreatureAI(boss_magmadar);
 
     // Spells
     RegisterSpellScript(spell_magmadar_lava_bomb);

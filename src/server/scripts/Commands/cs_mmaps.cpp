@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -28,10 +28,11 @@
 #include "CommandScript.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
-#include "MMapFactory.h"
+#include "MMapMgr.h"
 #include "Map.h"
 #include "PathGenerator.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "TargetedMovementGenerator.h"
 
 using namespace Acore::ChatCommands;
@@ -45,11 +46,11 @@ public:
     {
         static ChatCommandTable mmapCommandTable =
         {
-            { "loadedtiles", HandleMmapLoadedTilesCommand, SEC_ADMINISTRATOR, Console::No },
-            { "loc",         HandleMmapLocCommand,         SEC_ADMINISTRATOR, Console::No },
-            { "path",        HandleMmapPathCommand,        SEC_ADMINISTRATOR, Console::No },
-            { "stats",       HandleMmapStatsCommand,       SEC_ADMINISTRATOR, Console::No },
-            { "testarea",    HandleMmapTestArea,           SEC_ADMINISTRATOR, Console::No }
+            { "loadedtiles", HandleMmapLoadedTilesCommand, rbac::RBAC_PERM_COMMAND_MMAP_LOADEDTILES, Console::No },
+            { "loc",         HandleMmapLocCommand,         rbac::RBAC_PERM_COMMAND_MMAP_LOC,         Console::No },
+            { "path",        HandleMmapPathCommand,        rbac::RBAC_PERM_COMMAND_MMAP_PATH,        Console::No },
+            { "stats",       HandleMmapStatsCommand,       rbac::RBAC_PERM_COMMAND_MMAP_STATS,       Console::No },
+            { "testarea",    HandleMmapTestArea,           rbac::RBAC_PERM_COMMAND_MMAP_TESTAREA,    Console::No }
         };
 
         static ChatCommandTable commandTable =
@@ -61,7 +62,8 @@ public:
 
     static bool HandleMmapPathCommand(ChatHandler* handler, Optional<std::string> param)
     {
-        if (!MMAP::MMapFactory::createOrGetMMapMgr()->GetNavMesh(handler->GetSession()->GetPlayer()->GetMapId()))
+        Map* map = handler->GetSession()->GetPlayer()->GetMap();
+        if (!map->GetMapCollisionData().GetMMapData().GetNavMesh())
         {
             handler->PSendSysMessage("NavMesh not loaded for current map.");
             return true;
@@ -136,11 +138,47 @@ public:
         GridCoord const gridCoord = Acore::ComputeGridCoord(player->GetPositionX(), player->GetPositionY());
 
         handler->PSendSysMessage("{}{}{}.mmtile", player->GetMapId(), gridCoord.x_coord, gridCoord.y_coord);
+
+        std::string fileName = Acore::StringFormat(MMAP::TILE_FILE_NAME_FORMAT, sConfigMgr->GetOption<std::string>("DataDir", "."), player->GetMapId(), gridCoord.x_coord, gridCoord.y_coord);
+        FILE* file = fopen(fileName.c_str(), "rb");
+        if (!file)
+        {
+            LOG_DEBUG("maps", "MMAP:loadMap: Could not open mmtile file '{}'", fileName);
+            return false;
+        }
+
+        // read header
+        MmapTileHeader fileHeader;
+        if (fread(&fileHeader, sizeof(MmapTileHeader), 1, file) != 1 || fileHeader.mmapMagic != MMAP_MAGIC)
+        {
+            LOG_ERROR("maps", "MMAP:loadMap: Bad header in mmap {:03}{:02}{:02}.mmtile", player->GetMapId(), gridCoord.x_coord, gridCoord.y_coord);
+            fclose(file);
+            return false;
+        }
+        fclose(file);
+        handler->PSendSysMessage("Recast config used:");
+        handler->PSendSysMessage("- walkableSlopeAngle: {}", fileHeader.recastConfig.walkableSlopeAngle);
+
+        const float cellHeight = fileHeader.recastConfig.cellSizeVertical;
+        handler->PSendSysMessage("- walkableHeight: {} ({} units)", fileHeader.recastConfig.walkableHeight * cellHeight, fileHeader.recastConfig.walkableHeight);
+        handler->PSendSysMessage("- walkableClimb: {} ({} units)", fileHeader.recastConfig.walkableClimb * cellHeight, fileHeader.recastConfig.walkableClimb);
+        handler->PSendSysMessage("- walkableRadius: {} ({} units)", fileHeader.recastConfig.walkableRadius * cellHeight, fileHeader.recastConfig.walkableRadius);
+
+        handler->PSendSysMessage("- maxSimplificationError: {}", fileHeader.recastConfig.maxSimplificationError);
+        handler->PSendSysMessage("- vertexPerMapEdge: {}", fileHeader.recastConfig.vertexPerMapEdge);
+        handler->PSendSysMessage("- vertexPerTileEdge: {}", fileHeader.recastConfig.vertexPerTileEdge);
+        handler->PSendSysMessage("- tilesPerMapEdge: {}", fileHeader.recastConfig.tilesPerMapEdge);
+        handler->PSendSysMessage("- baseUnitDim: {}", fileHeader.recastConfig.baseUnitDim);
+        handler->PSendSysMessage("- cellSizeHorizontal: {}", fileHeader.recastConfig.cellSizeHorizontal);
+        handler->PSendSysMessage("- cellSizeVertical: {}", fileHeader.recastConfig.cellSizeVertical);
+
         handler->PSendSysMessage("gridloc [{}, {}]", gridCoord.x_coord, gridCoord.y_coord);
 
+        Map* map = handler->GetSession()->GetPlayer()->GetMap();
+
         // calculate navmesh tile location
-        dtNavMesh const* navmesh = MMAP::MMapFactory::createOrGetMMapMgr()->GetNavMesh(handler->GetSession()->GetPlayer()->GetMapId());
-        dtNavMeshQuery const* navmeshquery = MMAP::MMapFactory::createOrGetMMapMgr()->GetNavMeshQuery(handler->GetSession()->GetPlayer()->GetMapId(), player->GetInstanceId());
+        dtNavMesh const* navmesh = map->GetMapCollisionData().GetMMapData().GetNavMesh();
+        dtNavMeshQuery const* navmeshquery = map->GetMapCollisionData().GetMMapData().GetNavMeshQuery();
         if (!navmesh || !navmeshquery)
         {
             handler->PSendSysMessage("NavMesh not loaded for current map.");
@@ -190,9 +228,9 @@ public:
 
     static bool HandleMmapLoadedTilesCommand(ChatHandler* handler)
     {
-        uint32 mapid = handler->GetSession()->GetPlayer()->GetMapId();
-        dtNavMesh const* navmesh = MMAP::MMapFactory::createOrGetMMapMgr()->GetNavMesh(mapid);
-        dtNavMeshQuery const* navmeshquery = MMAP::MMapFactory::createOrGetMMapMgr()->GetNavMeshQuery(mapid, handler->GetSession()->GetPlayer()->GetInstanceId());
+        Map* map = handler->GetSession()->GetPlayer()->GetMap();
+        dtNavMesh const* navmesh = map->GetMapCollisionData().GetMMapData().GetNavMesh();
+        dtNavMeshQuery const* navmeshquery = map->GetMapCollisionData().GetMMapData().GetNavMeshQuery();
         if (!navmesh || !navmeshquery)
         {
             handler->PSendSysMessage("NavMesh not loaded for current map.");
@@ -215,12 +253,14 @@ public:
 
     static bool HandleMmapStatsCommand(ChatHandler* handler)
     {
-        handler->PSendSysMessage("mmap stats:");
-        //handler->PSendSysMessage("  global mmap pathfinding is {}abled", sDisableMgr->IsPathfindingEnabled(mapId) ? "en" : "dis");
-        MMAP::MMapMgr* manager = MMAP::MMapFactory::createOrGetMMapMgr();
-        handler->PSendSysMessage(" {} maps loaded with {} tiles overall", manager->getLoadedMapsCount(), manager->getLoadedTilesCount());
+        Map* map = handler->GetSession()->GetPlayer()->GetMap();
 
-        dtNavMesh const* navmesh = manager->GetNavMesh(handler->GetSession()->GetPlayer()->GetMapId());
+        //handler->PSendSysMessage("mmap stats:");
+        //handler->PSendSysMessage("  global mmap pathfinding is {}abled", sDisableMgr->IsPathfindingEnabled(mapId) ? "en" : "dis");
+        //MMAP::MMapMgr* manager = MMAP::MMapFactory::createOrGetMMapMgr();
+        //handler->PSendSysMessage(" {} maps loaded with {} tiles overall", manager->getLoadedMapsCount(), manager->getLoadedTilesCount());
+
+        dtNavMesh const* navmesh = map->GetMapCollisionData().GetMMapData().GetNavMesh();
         if (!navmesh)
         {
             handler->PSendSysMessage("NavMesh not loaded for current map.");

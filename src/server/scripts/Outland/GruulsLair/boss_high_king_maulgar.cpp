@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -64,12 +64,7 @@ enum HighKingMaulgar
 struct boss_high_king_maulgar : public BossAI
 {
     boss_high_king_maulgar(Creature* creature) : BossAI(creature, DATA_MAULGAR)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    {    }
 
     void Reset() override
     {
@@ -146,7 +141,7 @@ struct boss_high_king_maulgar : public BossAI
         {
             DoCastVictim(SPELL_MIGHTY_BLOW);
             context.Repeat(16200ms, 19s);
-        }).Schedule(67000ms, [this](TaskContext context)
+        }).Schedule(67s, [this](TaskContext context)
         {
             scheduler.DelayAll(15s);
             DoCastSelf(SPELL_WHIRLWIND);
@@ -186,15 +181,6 @@ struct boss_olm_the_summoner : public ScriptedAI
         _scheduler.CancelAll();
         summons.DespawnAll();
         instance->SetBossState(DATA_MAULGAR, NOT_STARTED);
-    }
-
-    void AttackStart(Unit* who) override
-    {
-        if (!who)
-            return;
-
-        if (me->Attack(who, true))
-            me->GetMotionMaster()->MoveChase(who, 25.0f);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -268,7 +254,7 @@ struct boss_kiggler_the_crazed : public ScriptedAI
             return;
 
         if (me->Attack(who, true))
-            me->GetMotionMaster()->MoveChase(who, 25.0f);
+            me->GetMotionMaster()->MoveChase(who, 40.0f);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -347,7 +333,7 @@ struct boss_blindeye_the_seer : public ScriptedAI
                 DoCast(target, SPELL_HEAL);
             }
             context.Repeat(7200ms);
-        }).Schedule(37500s, [this](TaskContext context)
+        }).Schedule(37500ms, [this](TaskContext context)
         {
             DoCastSelf(SPELL_GREATER_PW_SHIELD);
             _scheduler.Schedule(1200ms, [this](TaskContext)

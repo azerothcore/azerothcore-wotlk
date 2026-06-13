@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -36,16 +36,13 @@ enum BossData
     GANDLING_ROOM_TO_USE
 };
 
-enum Timers
-{
-    TIMER_ARCANE_MIN = 8000,
-    TIMER_ARCANE_MAX = 14000,
-    TIMER_CURSE_MIN = 20000,
-    TIMER_CURSE_MAX = 30000,
-    TIMER_SHIELD_MIN = 30000,
-    TIMER_SHIELD_MAX = 40000,
-    TIMER_PORTAL = 25000
-};
+constexpr Milliseconds TIMER_ARCANE_MIN = 8s;
+constexpr Milliseconds TIMER_ARCANE_MAX = 14s;
+constexpr Milliseconds TIMER_CURSE_MIN = 20s;
+//constexpr Milliseconds TIMER_CURSE_MAX = 30s;
+constexpr Milliseconds TIMER_SHIELD_MIN = 30s;
+//constexpr Milliseconds TIMER_SHIELD_MAX = 40s;
+constexpr Milliseconds TIMER_PORTAL = 25s;
 
  enum IdPortalSpells
  {
@@ -335,18 +332,18 @@ public:
                 {
                 case SPELL_ARCANE_MISSILES:
                     DoCastVictim(SPELL_ARCANE_MISSILES);
-                    events.ScheduleEvent(SPELL_ARCANE_MISSILES, urand(TIMER_ARCANE_MIN, TIMER_ARCANE_MAX));
+                    events.ScheduleEvent(SPELL_ARCANE_MISSILES, TIMER_ARCANE_MIN, TIMER_ARCANE_MAX);
                     break;
                 case SPELL_CURSE_DARKMASTER:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true))
                     {
                         DoCast(target, SPELL_CURSE_DARKMASTER);
                     }
-                    events.ScheduleEvent(SPELL_ARCANE_MISSILES, urand(TIMER_ARCANE_MIN, TIMER_ARCANE_MAX));
+                    events.ScheduleEvent(SPELL_ARCANE_MISSILES, TIMER_ARCANE_MIN, TIMER_ARCANE_MAX);
                     break;
                 case SPELL_SHADOW_SHIELD:
                     DoCastSelf(SPELL_SHADOW_SHIELD);
-                    events.ScheduleEvent(SPELL_ARCANE_MISSILES, urand(TIMER_ARCANE_MIN, TIMER_ARCANE_MAX));
+                    events.ScheduleEvent(SPELL_ARCANE_MISSILES, TIMER_ARCANE_MIN, TIMER_ARCANE_MAX);
                     break;
 
                 case SPELL_SHADOW_PORTAL:

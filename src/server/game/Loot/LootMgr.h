@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -258,9 +258,9 @@ public:
     bool CopyConditions(LootItem* li, uint32 conditionLootId = 0) const;
 
     // True if template includes at least 1 quest drop entry
-    [[nodiscard]] bool HasQuestDrop(LootTemplateMap const& store, uint8 groupId = 0) const;
+    [[nodiscard]] bool HasQuestDrop(LootTemplateMap const& store) const;
     // True if template includes at least 1 quest drop for an active quest of the player
-    bool HasQuestDropForPlayer(LootTemplateMap const& store, Player const* player, uint8 groupId = 0) const;
+    bool HasQuestDropForPlayer(LootTemplateMap const& store, Player const* player) const;
 
     // Checks integrity of the template
     void Verify(LootStore const& store, uint32 Id) const;

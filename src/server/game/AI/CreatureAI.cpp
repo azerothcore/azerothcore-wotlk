@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -33,9 +33,23 @@
 #include <functional>
 
 //Disable CreatureAI when charmed
-void CreatureAI::OnCharmed(bool /*apply*/)
+void CreatureAI::OnCharmed(bool /* apply */)
 {
-    //me->IsAIEnabled = !apply;*/
+    if (!me->IsCharmed() && !me->LastCharmerGUID.IsEmpty())
+    {
+        if (!me->HasReactState(REACT_PASSIVE))
+        {
+            if (Unit* lastCharmer = ObjectAccessor::GetUnit(*me, me->LastCharmerGUID))
+                me->EngageWithTarget(lastCharmer);
+        }
+
+        me->LastCharmerGUID.Clear();
+
+        if (!me->IsInCombat())
+            EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
+    }
+
+    // trigger AI switch
     me->NeedChangeAI = true;
     me->IsAIEnabled = false;
 }
@@ -50,9 +64,9 @@ AISpellInfoType* GetAISpellInfo(uint32 i) { return &CreatureAI::AISpellInfo[i]; 
  * @param WorldObject target The target of the speech, in case it has elements such as $n, where the target's name will be referrenced.
  * @param Milliseconds delay Delay until the creature says the text line. Creatures will talk immediately by default.
  */
-void CreatureAI::Talk(uint8 id, WorldObject const* target /*= nullptr*/, Milliseconds delay /*= 0s*/)
+void CreatureAI::Talk(uint8 id, WorldObject const* target /*= nullptr*/, Milliseconds delay /*= 0ms*/)
 {
-    if (delay > Seconds::zero())
+    if (delay > 0ms)
     {
         ObjectGuid targetGuid;
 
@@ -83,29 +97,19 @@ WorldObject* CreatureAI::GetSummoner() const
 inline bool IsValidCombatTarget(Creature* source, Player* target)
 {
     if (target->IsGameMaster())
-    {
         return false;
-    }
 
     if (!source->IsInWorld() || !target->IsInWorld())
-    {
         return false;
-    }
 
     if (!source->IsAlive() || !target->IsAlive())
-    {
         return false;
-    }
 
     if (!source->InSamePhase(target))
-    {
         return false;
-    }
 
-    if (source->HasUnitState(UNIT_STATE_IN_FLIGHT) || target->HasUnitState(UNIT_STATE_IN_FLIGHT))
-    {
+    if (source->IsInFlight() || target->IsInFlight())
         return false;
-    }
 
     return true;
 }
@@ -149,13 +153,13 @@ void CreatureAI::DoZoneInCombat(Creature* creature /*= nullptr*/, float maxRange
                 continue;
             }
 
-            creature->SetInCombatWith(player);
-            player->SetInCombatWith(creature);
+            creature->EngageWithTarget(player);
 
-            if (creature->CanHaveThreatList())
-            {
-                creature->AddThreat(player, 0.0f);
-            }
+            for (Unit* pet : player->m_Controlled)
+                creature->EngageWithTarget(pet);
+
+            if (Unit* vehicle = player->GetVehicleBase())
+                creature->EngageWithTarget(vehicle);
         }
     }
 }
@@ -182,11 +186,24 @@ void CreatureAI::MoveInLineOfSight(Unit* who)
     if (me->IsMoveInLineOfSightDisabled())
         if (me->GetCreatureType() == CREATURE_TYPE_NON_COMBAT_PET ||      // nothing more to do, return
                 !who->IsInCombat() ||                                         // if not in combat, nothing more to do
-                !me->IsWithinDist(who, ATTACK_DISTANCE, true, false))                      // if in combat and in dist - neutral to all can actually assist other creatures
+                !me->IsWithinDist(who, ATTACK_DISTANCE, true, false, false))                      // if in combat and in dist - neutral to all can actually assist other creatures
             return;
 
     if (me->HasReactState(REACT_AGGRESSIVE) && me->CanStartAttack(who))
         AttackStart(who);
+}
+
+void CreatureAI::OnOwnerCombatInteraction(Unit* target)
+{
+    if (!target || !me->IsAlive())
+        return;
+
+    // Prevent guardian from disengaging from current target
+    if (me->GetVictim() && me->GetVictim()->IsAlive())
+        return;
+
+    if (!me->HasReactState(REACT_PASSIVE) && me->CanStartAttack(target, true))
+        AttackStart(target);
 }
 
 // Distract creature, if player gets too close while stealthed/prowling
@@ -197,6 +214,9 @@ void CreatureAI::TriggerAlert(Unit const* who) const
         return;
     // If this unit isn't an NPC, is already distracted, is in combat, is confused, stunned or fleeing, do nothing
     if (!me->IsCreature() || me->IsEngaged() || me->HasUnitState(UNIT_STATE_CONFUSED | UNIT_STATE_STUNNED | UNIT_STATE_FLEEING | UNIT_STATE_DISTRACTED))
+        return;
+    // If the creature is immune to players, it should not be alerted by them
+    if (me->IsImmuneToPC())
         return;
     // Only alert for hostiles!
     if (me->IsCivilian() || me->HasReactState(REACT_PASSIVE) || !me->IsHostileTo(who) || !me->_IsTargetAcceptable(who))
@@ -223,14 +243,19 @@ void CreatureAI::EnterEvadeMode(EvadeReason why)
     {
         if (Unit* owner = me->GetCharmerOrOwner())
         {
-            me->GetMotionMaster()->Clear(false);
-            me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle(), MOTION_SLOT_ACTIVE);
+            // Owned creatures (pets/guardians) follow their owner — clear evade state
+            // so they can re-enter combat immediately via CanBeginCombat
+            me->ClearUnitState(UNIT_STATE_EVADE);
+            if (!me->IsVehicle()) // vehicles should not follow their owner (passenger)
+            {
+                me->GetMotionMaster()->Clear(false);
+                me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle(), MOTION_SLOT_ACTIVE);
+            }
         }
         else
         {
             // Required to prevent attacking creatures that are evading and cause them to reenter combat
-            // Does not apply to MoveFollow
-            me->AddUnitState(UNIT_STATE_EVADE);
+            // Does not apply to MoveFollow — UNIT_STATE_EVADE is already set from _EnterEvadeMode
             me->GetMotionMaster()->MoveTargetedHome();
         }
     }
@@ -249,6 +274,44 @@ void CreatureAI::EnterEvadeMode(EvadeReason why)
     {
         me->DespawnOnEvade();
     }
+}
+
+void CreatureAI::JustEnteredCombat(Unit* who)
+{
+    // Creatures without threat list use JustEnteredCombat to trigger engagement
+    if (!IsEngaged() && !me->CanHaveThreatList())
+        EngagementStart(who);
+}
+
+void CreatureAI::EngagementStart(Unit* who)
+{
+    if (_isEngaged)
+    {
+        LOG_ERROR("scripts.ai", "CreatureAI::EngagementStart called even though creature is already engaged. Creature debug info:\n{}", me->GetDebugInfo());
+        return;
+    }
+    _isEngaged = true;
+
+    me->AtEngage(who);
+}
+
+void CreatureAI::EngagementOver()
+{
+    if (!_isEngaged)
+    {
+        LOG_DEBUG("scripts.ai", "CreatureAI::EngagementOver called even though creature is not currently engaged. Creature debug info:\n{}", me->GetDebugInfo());
+        return;
+    }
+    _isEngaged = false;
+
+    me->AtDisengage();
+}
+
+void CreatureAI::JustExitedCombat()
+{
+    // No-op: synchronous EnterEvadeMode cascades via MemberEvaded and frees
+    // refs held by upstream iterators (StopAttackFaction crash). EngagementOver
+    // here also resets scripted fights on brief combat gaps (Valithria).
 }
 
 /*void CreatureAI::AttackedBy(Unit* attacker)
@@ -289,38 +352,57 @@ bool CreatureAI::UpdateVictim()
     if (!me->IsEngaged())
         return false;
 
+    if (!me->IsAlive())
+    {
+        EngagementOver();
+        return false;
+    }
+
+    // Charmed creatures: the charmer controls target selection, don't interfere
+    if (me->IsCharmed())
+        return me->GetVictim() != nullptr;
+
     if (!me->HasReactState(REACT_PASSIVE))
     {
         if (Unit* victim = me->SelectVictim())
-            AttackStart(victim);
-        return me->GetVictim();
+            if (victim != me->GetVictim())
+                AttackStart(victim);
+        return me->GetVictim() != nullptr;
     }
-    // xinef: if we have any victim, just return true
-    else if (me->GetVictim() && me->GetExactDist(me->GetVictim()) < 30.0f)
-        return true;
-    else if (me->GetThreatMgr().isThreatListEmpty())
+    else if (!me->IsInCombat())
     {
-        EnterEvadeMode();
+        EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
         return false;
     }
+    else if (me->GetVictim())
+        me->AttackStop();
 
     return true;
 }
 
 bool CreatureAI::_EnterEvadeMode(EvadeReason /*why*/)
 {
+    if (me->IsInEvadeMode())
+        return false;
+
     if (!me->IsAlive())
     {
+        EngagementOver();
         return false;
     }
+
+    // Set evade state early to prevent recursion: CombatStop below purges combat
+    // refs, which triggers JustExitedCombat -> EnterEvadeMode -> _EnterEvadeMode.
+    // The IsInEvadeMode() check above will catch it.
+    // EnterEvadeMode will clear this for owned creatures (pets/guardians) that
+    // use MoveFollow instead of MoveTargetedHome.
+    me->AddUnitState(UNIT_STATE_EVADE);
 
     // don't remove vehicle auras, passengers aren't supposed to drop off the vehicle
     // don't remove clone caster on evade (to be verified)
     me->RemoveEvadeAuras();
 
     me->ClearComboPointHolders(); // Remove all combo points targeting this unit
-    // sometimes bosses stuck in combat?
-    me->GetThreatMgr().ClearAllThreat();
     me->CombatStop(true);
     me->LoadCreaturesAddon(true);
     me->SetLootRecipient(nullptr);
@@ -331,14 +413,8 @@ bool CreatureAI::_EnterEvadeMode(EvadeReason /*why*/)
     if (ZoneScript* zoneScript = me->GetZoneScript() ? me->GetZoneScript() : (ZoneScript*)me->GetInstanceScript())
         zoneScript->OnCreatureEvade(me);
 
-    if (me->IsInEvadeMode())
-    {
-        return false;
-    }
-    else if (CreatureGroup* formation = me->GetFormation())
-    {
+    if (CreatureGroup* formation = me->GetFormation())
         formation->MemberEvaded(me);
-    }
 
     if (TempSummon* summon = me->ToTempSummon())
     {
@@ -354,6 +430,8 @@ bool CreatureAI::_EnterEvadeMode(EvadeReason /*why*/)
             }
         }
     }
+
+    EngagementOver();
 
     return true;
 }

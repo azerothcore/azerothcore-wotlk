@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -31,6 +31,7 @@
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "ScriptMgr.h"
 #include "SocialMgr.h"
 #include "World.h"
@@ -903,6 +904,13 @@ void Guild::BankMoveItemData::LogBankEvent(CharacterDatabaseTransaction trans, M
 void Guild::BankMoveItemData::LogAction(MoveItemData* pFrom) const
 {
     MoveItemData::LogAction(pFrom);
+    if (!pFrom->IsBank() && m_pPlayer->GetSession()->HasPermission(rbac::RBAC_PERM_LOG_GM_TRADE))
+    {
+        LOG_GM(m_pPlayer->GetSession()->GetAccountId(), "GM {} (Account: {}) deposit item: {} (Entry: {} Count: {}) to guild bank named: {} (Guild ID: {})",
+            m_pPlayer->GetName(), m_pPlayer->GetSession()->GetAccountId(),
+            pFrom->GetItem()->GetTemplate()->Name1, pFrom->GetItem()->GetEntry(), pFrom->GetItem()->GetCount(),
+            m_pGuild->GetName(), m_pGuild->GetId());
+    }
 }
 
 Item* Guild::BankMoveItemData::_StoreItem(CharacterDatabaseTransaction trans, BankTab* pTab, Item* pItem, ItemPosCount& pos, bool clone) const
@@ -1683,6 +1691,12 @@ void Guild::HandleMemberDepositMoney(WorldSession* session, uint32 amount)
 
     CharacterDatabase.CommitTransaction(trans);
 
+    if (session->HasPermission(rbac::RBAC_PERM_LOG_GM_TRADE))
+    {
+        LOG_GM(session->GetAccountId(), "GM {} (Account: {}) deposited {} to guild bank (Guild: {} GuildId: {})",
+            player->GetName(), session->GetAccountId(), amount, GetName(), GetId());
+    }
+
     std::string aux = Acore::Impl::ByteArrayToHexStr(reinterpret_cast<uint8*>(&m_bankMoney), 8, true);
     _BroadcastEvent(GE_BANK_MONEY_SET, ObjectGuid::Empty, aux.c_str());
 
@@ -1715,23 +1729,33 @@ bool Guild::HandleMemberWithdrawMoney(WorldSession* session, uint32 amount, bool
     sScriptMgr->OnGuildMemberWitdrawMoney(this, player, amount, repair);
 
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
-    // Add money to player (if required)
+
+    if (!_ModifyBankMoney(trans, amount, false))
+        return false;
+
     if (!repair)
     {
         if (!player->ModifyMoney(amount))
+        {
+            _ModifyBankMoney(trans, amount, true);
             return false;
+        }
 
         player->SaveGoldToDB(trans);
     }
 
     // Update remaining money amount
     member->UpdateBankWithdrawValue(trans, GUILD_BANK_MAX_TABS, amount);
-    // Remove money from bank
-    _ModifyBankMoney(trans, amount, false);
 
     // Log guild bank event
     _LogBankEvent(trans, repair ? GUILD_BANK_LOG_REPAIR_MONEY : GUILD_BANK_LOG_WITHDRAW_MONEY, uint8(0), player->GetGUID(), amount);
     CharacterDatabase.CommitTransaction(trans);
+
+    if (session->HasPermission(rbac::RBAC_PERM_LOG_GM_TRADE))
+    {
+        LOG_GM(session->GetAccountId(), "GM {} (Account: {}) withdrew {} from guild bank (Guild: {} GuildId: {})",
+            player->GetName(), session->GetAccountId(), amount, GetName(), GetId());
+    }
 
     if (amount > 10 * GOLD)     // sender_acc = 0 (guild has no account), sender_guid = Guild id, sender_name = Guild name
         CharacterDatabase.Execute("INSERT INTO log_money VALUES({}, {}, \"{}\", \"{}\", {}, \"{}\", {}, \"(guild, members: {}, new amount: {}, leader guid low: {}, withdrawer level: {})\", NOW(), {})",
@@ -2123,7 +2147,7 @@ void Guild::BroadcastToGuild(WorldSession* session, bool officerOnly, std::strin
         for (auto const& [guid, member] : m_members)
             if (Player* player = member.FindPlayer())
                 if (_HasRankRight(player, officerOnly ? GR_RIGHT_OFFCHATLISTEN : GR_RIGHT_GCHATLISTEN) && !player->GetSocial()->HasIgnore(session->GetPlayer()->GetGUID()))
-                    player->GetSession()->SendPacket(&data);
+                    player->SendDirectMessage(&data);
     }
 }
 
@@ -2132,14 +2156,14 @@ void Guild::BroadcastPacketToRank(WorldPacket const* packet, uint8 rankId) const
     for (auto const& [guid, member] : m_members)
         if (member.IsRank(rankId))
             if (Player* player = member.FindPlayer())
-                player->GetSession()->SendPacket(packet);
+                player->SendDirectMessage(packet);
 }
 
 void Guild::BroadcastPacket(WorldPacket const* packet) const
 {
     for (auto const& [guid, member] : m_members)
         if (Player* player = member.FindPlayer())
-            player->GetSession()->SendPacket(packet);
+            player->SendDirectMessage(packet);
 }
 
 void Guild::MassInviteToEvent(WorldSession* session, uint32 minLevel, uint32 maxLevel, uint32 minRank)

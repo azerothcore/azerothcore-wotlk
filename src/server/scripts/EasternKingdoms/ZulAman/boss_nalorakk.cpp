@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -127,7 +127,7 @@ struct boss_nalorakk : public BossAI
                             {
                                 _introScheduler.CancelGroup(GROUP_CHECK_DEAD);
                                 _waveList.clear();
-                                me->GetMotionMaster()->MovePath(me->GetEntry()*100+1, false);
+                                me->GetMotionMaster()->MoveWaypoint(me->GetEntry()*100+1, false);
                                 Talk(SAY_RUN_AWAY);
                                 _introScheduler.Schedule(5s, [this](TaskContext)
                                 {
@@ -153,7 +153,7 @@ struct boss_nalorakk : public BossAI
                                 _introScheduler.CancelGroup(GROUP_CHECK_DEAD);
                                 _waveList.clear();
                                 Talk(SAY_RUN_AWAY);
-                                me->GetMotionMaster()->MovePath(me->GetEntry()*100+2, false);
+                                me->GetMotionMaster()->MoveWaypoint(me->GetEntry()*100+2, false);
                                 _introScheduler.Schedule(6s, [this](TaskContext)
                                 {
                                     me->SetFacingTo(1.54f);
@@ -176,7 +176,7 @@ struct boss_nalorakk : public BossAI
                                 _introScheduler.CancelGroup(GROUP_CHECK_DEAD);
                                 _waveList.clear();
                                 Talk(SAY_RUN_AWAY);
-                                me->GetMotionMaster()->MovePath(me->GetEntry() * 100 + 3, false);
+                                me->GetMotionMaster()->MoveWaypoint(me->GetEntry() * 100 + 3, false);
                                 _introScheduler.Schedule(6s, [this](TaskContext)
                                 {
                                     me->SetFacingTo(1.54f);

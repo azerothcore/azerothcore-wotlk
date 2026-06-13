@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -33,9 +33,6 @@ enum UnitHook
     UNITHOOK_ON_AURA_APPLY,
     UNITHOOK_ON_AURA_REMOVE,
     UNITHOOK_IF_NORMAL_REACTION,
-    UNITHOOK_IS_NEEDMOD_SPELL_DAMAGE_PERCENT,
-    UNITHOOK_IS_NEEDMOD_MELEE_DAMAGE_PERCENT,
-    UNITHOOK_IS_NEEDMOD_HEAL_PERCENT,
     UNITHOOK_CAN_SET_PHASE_MASK,
     UNITHOOK_IS_CUSTOM_BUILD_VALUES_UPDATE,
     UNITHOOK_SHOULD_TRACK_VALUES_UPDATE_POS_BY_INDEX,
@@ -88,12 +85,6 @@ public:
     virtual void OnAuraRemove(Unit* /*unit*/, AuraApplication* /*aurApp*/, AuraRemoveMode /*mode*/) { }
 
     [[nodiscard]] virtual bool IfNormalReaction(Unit const* /*unit*/, Unit const* /*target*/, ReputationRank& /*repRank*/) { return true; }
-
-    [[nodiscard]] virtual bool IsNeedModSpellDamagePercent(Unit const* /*unit*/, AuraEffect* /*auraEff*/, float& /*doneTotalMod*/, SpellInfo const* /*spellProto*/) { return true; }
-
-    [[nodiscard]] virtual bool IsNeedModMeleeDamagePercent(Unit const* /*unit*/, AuraEffect* /*auraEff*/, float& /*doneTotalMod*/, SpellInfo const* /*spellProto*/) { return true; }
-
-    [[nodiscard]] virtual bool IsNeedModHealPercent(Unit const* /*unit*/, AuraEffect* /*auraEff*/, float& /*doneTotalMod*/, SpellInfo const* /*spellProto*/) { return true; }
 
     [[nodiscard]] virtual bool CanSetPhaseMask(Unit const* /*unit*/, uint32 /*newPhaseMask*/, bool /*update*/) { return true; }
 
