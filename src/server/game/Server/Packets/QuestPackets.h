@@ -119,7 +119,7 @@ namespace WorldPackets
         public:
             QuestUpdateAddItem() : ServerPacket(SMSG_QUESTUPDATE_ADD_ITEM, 0) {}
 
-            WorldPacket const* Write() override { return &_worldPacket; };
+            WorldPacket const* Write() override { return &_worldPacket; }
         };
 
         class QuestUpdateAddKill final : public ServerPacket
@@ -165,7 +165,7 @@ namespace WorldPackets
         public:
             QuestGiverQuestAutoLaunch(WorldPacket&& packet) : ClientPacket(CMSG_QUESTGIVER_QUEST_AUTOLAUNCH, std::move(packet)) {}
 
-            void Read() override {};
+            void Read() override {}
         };
 
         class QuestLogSwapQuest final : public ClientPacket
