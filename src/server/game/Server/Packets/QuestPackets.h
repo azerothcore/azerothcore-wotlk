@@ -111,7 +111,7 @@ namespace WorldPackets
             WorldPacket const* Write() override;
 
             ObjectGuid PlayerGuid;
-            QuestShareMessages QuestShareMessage = QUEST_PARTY_MSG_SHARING_QUEST; // valid values: 0-8
+            QuestShareMessages QuestShareMessage = QUEST_PARTY_MSG_SHARING_QUEST; // valid values: 0-10
         };
 
         class QuestUpdateAddItem final : public ServerPacket
