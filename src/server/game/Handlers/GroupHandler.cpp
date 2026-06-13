@@ -126,6 +126,16 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket& recvData)
         return;
     }
 
+    // Battlefield raids (e.g. Wintergrasp) have their composition managed by the BF
+    // system based on queue and team balance. Letting raid members recruit outsiders
+    // bypasses Battlefield::AddOrSetPlayerToCorrectBfGroup, which on WG entry then
+    // refuses to add the invitee because they are already in a BF group.
+    if (Group* invitingGroup = invitingPlayer->GetGroup(); invitingGroup && invitingGroup->isBFGroup())
+    {
+        SendPartyResult(PARTY_OP_INVITE, membername, ERR_NOT_LEADER);
+        return;
+    }
+
     Group* group = invitingPlayer->GetGroup();
     if (group && group->isBGGroup())
         group = invitingPlayer->GetOriginalGroup();

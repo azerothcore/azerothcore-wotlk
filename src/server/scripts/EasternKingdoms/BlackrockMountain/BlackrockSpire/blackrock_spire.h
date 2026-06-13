@@ -155,5 +155,6 @@ inline AI* GetBlackrockSpireAI(T* obj)
 }
 
 #define RegisterBlackrockSpireCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetBlackrockSpireAI)
+#define RegisterBlackrockSpireGameObjectAI(ai_name) RegisterGameObjectAIWithFactory(ai_name, GetBlackrockSpireAI)
 
 #endif

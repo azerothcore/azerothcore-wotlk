@@ -226,7 +226,7 @@ INSERT INTO `creature_default_trainer` VALUES
 (3557,60),
 (3593,2),
 (3594,10),
-(3595,11),
+(3595,12),
 (3596,8),
 (3597,34),
 (3598,1),
@@ -377,7 +377,7 @@ INSERT INTO `creature_default_trainer` VALUES
 (5880,16),
 (5882,16),
 (5883,16),
-(5884,16),
+(5884,17),
 (5885,16),
 (5938,98),
 (5939,83),
@@ -583,7 +583,7 @@ INSERT INTO `creature_default_trainer` VALUES
 (17442,61),
 (17480,1),
 (17481,16),
-(17482,12),
+(17482,11),
 (17483,3),
 (17487,74),
 (17488,80),
@@ -793,8 +793,8 @@ INSERT INTO `creature_default_trainer` VALUES
 (33608,66),
 (33609,58),
 (33610,95),
-(33611,62),
-(33612,91),
+(33611,91),
+(33612,62),
 (33613,73),
 (33614,112),
 (33615,120),
@@ -851,4 +851,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-29 17:53:42
+-- Dump completed on 2026-06-01 22:39:38

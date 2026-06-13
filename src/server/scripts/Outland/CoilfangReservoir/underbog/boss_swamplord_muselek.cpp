@@ -47,12 +47,7 @@ enum Misc
 struct boss_swamplord_muselek : public BossAI
 {
     boss_swamplord_muselek(Creature* creature) : BossAI(creature, DATA_MUSELEK)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    {    }
 
     void Reset() override
     {

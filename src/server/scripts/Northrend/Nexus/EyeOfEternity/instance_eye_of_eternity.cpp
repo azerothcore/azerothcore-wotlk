@@ -48,18 +48,51 @@ struct instance_eye_of_eternity : public InstanceScript
     }
 
     bool _pokeAchievementValid = false;
+    GuidVector _vortexTriggers;
+
+    void OnCreatureCreate(Creature* creature) override
+    {
+        InstanceScript::OnCreatureCreate(creature);
+
+        if (creature->GetEntry() == NPC_VORTEX)
+            _vortexTriggers.push_back(creature->GetGUID());
+
+        if (sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GROUP))
+            if (creature->GetEntry() == NPC_WYRMREST_SKYTALON)
+                creature->SetFaction(FACTION_FRIENDLY);
+    }
+
+    ObjectGuid GetGuidData(uint32 data) const override
+    {
+        if (data == DATA_VORTEX_TRIGGER)
+            return !_vortexTriggers.empty() ? _vortexTriggers.front() : ObjectGuid::Empty;
+
+        return InstanceScript::GetGuidData(data);
+    }
+
+    void VortexHandling()
+    {
+        if (_vortexTriggers.empty())
+            return;
+
+        size_t triggerIndex = 0;
+        size_t triggerCount = _vortexTriggers.size();
+
+        instance->DoForAllPlayers([&](Player* player)
+        {
+            if (!player->IsAlive() || player->IsGameMaster())
+                return;
+
+            if (Creature* trigger = instance->GetCreature(_vortexTriggers[triggerIndex]))
+                player->CastSpell(trigger, SPELL_VORTEX_4, true);
+
+            triggerIndex = (triggerIndex + 1) % triggerCount;
+        });
+    }
 
     void OnPlayerEnter(Player* player) override
     {
-        if (GetBossState(DATA_MALYGOS) != DONE)
-            return;
-
-        ProcessEvent(nullptr, EVENT_IRIS_ACTIVATED);
-        if (GameObject* iris = GetGameObject(DATA_IRIS))
-            if (iris->GetPhaseMask() != 2)
-                iris->SetPhaseMask(2, true);
-
-        if (player && player->IsAlive())
+        if (player && player->IsAlive() && IsBossDone(DATA_MALYGOS))
             player->CastSpell(player, SPELL_SUMMON_RED_DRAGON_BUDDY, true);
     }
 
@@ -68,13 +101,16 @@ struct instance_eye_of_eternity : public InstanceScript
         InstanceScript::OnGameObjectCreate(gameobject);
 
         uint32 entry = gameobject->GetEntry();
-        if ((entry == GO_IRIS_N || entry == GO_IRIS_H) && GetBossState(DATA_MALYGOS) == DONE)
-            gameobject->SetPhaseMask(2, true);
 
-        if (entry == GO_NEXUS_PLATFORM && GetBossState(DATA_MALYGOS) == DONE)
+        if (IsBossDone(DATA_MALYGOS))
         {
-            gameobject->ModifyHealth(-int32(PLATFORM_DESTROY_DAMAGE));
-            gameobject->EnableCollision(false);
+            if (entry == GO_IRIS_N || entry == GO_IRIS_H)
+                gameobject->SetPhaseMask(2, true);
+            else if (entry == GO_NEXUS_PLATFORM)
+            {
+                gameobject->SetDestructibleState(GO_DESTRUCTIBLE_DESTROYED, nullptr, true);
+                gameobject->EnableCollision(false);
+            }
         }
     }
 
@@ -82,16 +118,6 @@ struct instance_eye_of_eternity : public InstanceScript
     {
         switch (type)
         {
-            case DATA_IRIS_ACTIVATED:
-                if (GetBossState(DATA_MALYGOS) == NOT_STARTED)
-                {
-                    if (Creature* malygos = GetCreature(DATA_MALYGOS))
-                    {
-                        if (Player* player = malygos->SelectNearestPlayer(250.0f))
-                            malygos->AI()->AttackStart(player);
-                    }
-                }
-                break;
             case DATA_SET_IRIS_INACTIVE:
             {
                 if (GameObject* iris = GetGameObject(DATA_IRIS))
@@ -107,6 +133,9 @@ struct instance_eye_of_eternity : public InstanceScript
                     iris->SetPhaseMask(2, true);
                 if (GameObject* portal = GetGameObject(DATA_EXIT_PORTAL))
                     portal->SetPhaseMask(2, true);
+                break;
+            case DATA_VORTEX_HANDLING:
+                VortexHandling();
                 break;
         }
     }
@@ -155,15 +184,20 @@ struct instance_eye_of_eternity : public InstanceScript
 
     void ProcessEvent(WorldObject* /*unit*/, uint32 eventId) override
     {
-        if (eventId != EVENT_IRIS_ACTIVATED)
-            return;
-
-        if (GameObject* platform = GetGameObject(DATA_NEXUS_PLATFORM))
+        if (eventId == EVENT_IRIS_ACTIVATED)
+        {
             if (Creature* malygos = GetCreature(DATA_MALYGOS))
+                if (Player* player = malygos->SelectNearestPlayer(250.0f))
+                    malygos->AI()->AttackStart(player);
+        }
+        else if (eventId == EVENT_DESTROY_PLATFORM)
+        {
+            if (GameObject* platform = GetGameObject(DATA_NEXUS_PLATFORM))
             {
-                platform->ModifyHealth(-int32(PLATFORM_DESTROY_DAMAGE), malygos);
+                platform->SetDestructibleState(GO_DESTRUCTIBLE_DESTROYED, nullptr, true);
                 platform->EnableCollision(false);
             }
+        }
     }
 
     bool CheckAchievementCriteriaMeet(uint32 criteria_id, Player const* source, Unit const*  /*target*/, uint32  /*miscvalue1*/) override
