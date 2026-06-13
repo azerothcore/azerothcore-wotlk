@@ -15,7 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
 #include "Pet.h"
 #include "Player.h"
 #include "SpellAuraEffects.h"
@@ -121,7 +120,7 @@ class spell_mage_burning_determination : public AuraScript
             return false;
 
         // Need Interrupt or Silenced mechanic
-        if (!(eventInfo.GetSpellInfo()->GetAllEffectsMechanicMask() & ((1 << MECHANIC_INTERRUPT) | (1 << MECHANIC_SILENCE))))
+        if (!(eventInfo.GetSpellInfo()->GetAllEffectsMechanicMask() & ((1ULL << MECHANIC_INTERRUPT) | (1ULL << MECHANIC_SILENCE))))
             return false;
 
         // Xinef: immuned effect should just eat charge
@@ -1614,6 +1613,7 @@ void AddSC_mage_spell_scripts()
     RegisterSpellScript(spell_mage_glyph_of_polymorph);
     RegisterSpellScript(spell_mage_hot_streak);
     RegisterSpellScript(spell_mage_ice_barrier);
+    RegisterSpellScript(spell_mage_ice_barrier_aura);
     RegisterSpellScript(spell_mage_ice_block);
     RegisterSpellScript(spell_mage_imp_blizzard);
     RegisterSpellScript(spell_mage_imp_mana_gems);

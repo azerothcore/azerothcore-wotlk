@@ -132,6 +132,8 @@ bool ArenaTeam::AddMember(ObjectGuid playerGuid)
 
     if (sWorld->getIntConfig(CONFIG_ARENA_START_PERSONAL_RATING) > 0)
         personalRating = sWorld->getIntConfig(CONFIG_ARENA_START_PERSONAL_RATING);
+    else if (sArenaSeasonMgr->GetCurrentSeason() < 6)
+        personalRating = 1500;
     else if (GetRating() >= 1000)
         personalRating = 1000;
 

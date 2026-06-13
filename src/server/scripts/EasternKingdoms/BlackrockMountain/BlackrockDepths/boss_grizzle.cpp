@@ -29,74 +29,60 @@ enum Grizzle
 constexpr Milliseconds TIMER_GROUNDTREMOR = 10s;
 constexpr Milliseconds TIMER_FRENZY = 15s;
 
-class boss_grizzle : public CreatureScript
+struct boss_grizzle : public BossAI
 {
-public:
-    boss_grizzle() : CreatureScript("boss_grizzle") { }
+    boss_grizzle(Creature* creature) : BossAI(creature, DATA_GRIZZLE) {}
 
-    CreatureAI* GetAI(Creature* creature) const override
+    Milliseconds nextTremorTime;
+
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        return GetBlackrockDepthsAI<boss_grizzleAI>(creature);
+        _JustEngagedWith();
+        events.ScheduleEvent(SPELL_GROUNDTREMOR, TIMER_GROUNDTREMOR / 5);
+        events.ScheduleEvent(SPELL_FRENZY, TIMER_FRENZY / 5);
     }
 
-    struct boss_grizzleAI : public BossAI
+    void UpdateAI(uint32 diff) override
     {
-        boss_grizzleAI(Creature* creature) : BossAI(creature, DATA_GRIZZLE) {}
+        //Return since we have no target
+        if (!UpdateVictim())
+            return;
 
-        Milliseconds nextTremorTime;
+        events.Update(diff);
 
-        void JustEngagedWith(Unit* /*who*/) override
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        while (uint32 eventId = events.ExecuteEvent())
         {
-            _JustEngagedWith();
-            events.ScheduleEvent(SPELL_GROUNDTREMOR, TIMER_GROUNDTREMOR / 5);
-            events.ScheduleEvent(SPELL_FRENZY, TIMER_FRENZY / 5);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            //Return since we have no target
-            if (!UpdateVictim())
+            switch (eventId)
             {
-                return;
-            }
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-            {
-                return;
-            }
-
-            while (uint32 eventId = events.ExecuteEvent())
-            {
-                switch (eventId)
+            case SPELL_GROUNDTREMOR:
+                if (me->GetDistance2d(me->GetVictim()) < 10.0f)
                 {
-                case SPELL_GROUNDTREMOR:
-                    if (me->GetDistance2d(me->GetVictim()) < 10.0f)
-                    {
-                        DoCastVictim(SPELL_GROUNDTREMOR);
-                        nextTremorTime = randtime(TIMER_GROUNDTREMOR - 2s, TIMER_GROUNDTREMOR + 2s);
-                    }
-                    else
-                    {
-                        nextTremorTime = randtime(TIMER_GROUNDTREMOR - 2s, TIMER_GROUNDTREMOR + 2s) / 3;
-                    }
-                    events.ScheduleEvent(SPELL_GROUNDTREMOR, nextTremorTime);
-                    break;
-                case SPELL_FRENZY:
-                    DoCastSelf(SPELL_FRENZY);
-                    events.ScheduleEvent(SPELL_FRENZY, TIMER_FRENZY - 2s, TIMER_FRENZY + 2s);
-                    Talk(EMOTE_FRENZY_KILL);
-                    break;
-                default:
-                    break;
+                    DoCastVictim(SPELL_GROUNDTREMOR);
+                    nextTremorTime = randtime(TIMER_GROUNDTREMOR - 2s, TIMER_GROUNDTREMOR + 2s);
                 }
+                else
+                {
+                    nextTremorTime = randtime(TIMER_GROUNDTREMOR - 2s, TIMER_GROUNDTREMOR + 2s) / 3;
+                }
+                events.ScheduleEvent(SPELL_GROUNDTREMOR, nextTremorTime);
+                break;
+            case SPELL_FRENZY:
+                DoCastSelf(SPELL_FRENZY);
+                events.ScheduleEvent(SPELL_FRENZY, TIMER_FRENZY - 2s, TIMER_FRENZY + 2s);
+                Talk(EMOTE_FRENZY_KILL);
+                break;
+            default:
+                break;
             }
-            DoMeleeAttackIfReady();
         }
-    };
+        DoMeleeAttackIfReady();
+    }
 };
 
 void AddSC_boss_grizzle()
 {
-    new boss_grizzle();
+    RegisterBlackrockDepthsCreatureAI(boss_grizzle);
 }

@@ -670,8 +670,8 @@ enum SMART_ACTION
     SMART_ACTION_PLAY_ANIMKIT                       = 128,    // don't use on 3.3.5a
     SMART_ACTION_SCENE_PLAY                         = 129,    // don't use on 3.3.5a
     SMART_ACTION_SCENE_CANCEL                       = 130,    // don't use on 3.3.5a
-    SMART_ACTION_SPAWN_SPAWNGROUP                   = 131,    /// @todo: NOT SUPPORTED YET
-    SMART_ACTION_DESPAWN_SPAWNGROUP                 = 132,    /// @todo: NOT SUPPORTED YET
+    SMART_ACTION_SPAWN_SPAWNGROUP                   = 131,    // groupId, ignoreRespawn, force
+    SMART_ACTION_DESPAWN_SPAWNGROUP                 = 132,    // groupId, deleteRespawnTimes
     SMART_ACTION_RESPAWN_BY_SPAWNID                 = 133,    /// @todo: NOT SUPPORTED YET
     SMART_ACTION_INVOKER_CAST                       = 134,    // spellID, castFlags, triggerFlags, targetsLimit
     SMART_ACTION_PLAY_CINEMATIC                     = 135,    // entry
@@ -726,8 +726,9 @@ enum SMART_ACTION
     SMART_ACTION_SET_ANIM_TIER                      = 239,    // animtier
     SMART_ACTION_SET_GOSSIP_MENU                    = 240,    // gossipMenuId
     SMART_ACTION_SUMMON_GAMEOBJECT_GROUP            = 241,    // group
+    SMART_ACTION_INC_DATA                           = 242,    // field, increment (uses aiDataSet, wipe-safe across evade)
 
-    SMART_ACTION_AC_END                             = 242,    // placeholder
+    SMART_ACTION_AC_END                             = 243,    // placeholder
 };
 
 enum class SmartActionSummonCreatureFlags
@@ -1523,6 +1524,13 @@ struct SmartAction
         {
             uint32 group;
         } gameobjectGroup;
+
+        struct
+        {
+            uint32 groupId;
+            uint32 ignoreRespawn;
+            uint32 force;
+        } groupSpawn;
     };
 };
 
@@ -2064,21 +2072,22 @@ class SmartWaypointMgr
 {
     SmartWaypointMgr() {}
 public:
-    ~SmartWaypointMgr();
+    ~SmartWaypointMgr() = default;
 
     static SmartWaypointMgr* instance();
 
     void LoadFromDB();
 
-    WaypointPath* GetPath(uint32 id)
+    WaypointPath const* GetPath(uint32 id) const
     {
-        if (waypoint_map.find(id) != waypoint_map.end())
-            return waypoint_map[id];
-        else return 0;
+        auto itr = waypoint_map.find(id);
+        if (itr != waypoint_map.end())
+            return &itr->second;
+        return nullptr;
     }
 
 private:
-    std::unordered_map<uint32, WaypointPath*> waypoint_map;
+    std::unordered_map<uint32, WaypointPath> waypoint_map;
 };
 
 // all events for a single entry

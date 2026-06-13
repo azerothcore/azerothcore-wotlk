@@ -199,7 +199,7 @@ HodirHelperData hhd[4][4] =
 
 struct boss_hodir : public BossAI
 {
-    boss_hodir(Creature* pCreature) : BossAI(pCreature, BOSS_HODIR)
+    boss_hodir(Creature* creature) : BossAI(creature, BOSS_HODIR)
     {
         if (!me->IsAlive())
             instance->SetBossState(BOSS_HODIR, DONE);
@@ -217,6 +217,14 @@ struct boss_hodir : public BossAI
     const Position ENTRANCE_DOOR{ 1999.160034f, -297.792999f, 431.960999f, 0 };
     const Position EXIT_DOOR{ 1999.709961f, -166.259003f, 432.822998f, 0 };
 
+    void JustExitedCombat() override
+    {
+        EngagementOver();
+        if (me->HasUnitFlag(UNIT_FLAG_NON_ATTACKABLE))
+            return;
+        EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
+    }
+
     void Reset() override
     {
         _Reset();
@@ -231,17 +239,12 @@ struct boss_hodir : public BossAI
         me->RemoveAllAuras();
         instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_BITING_COLD_PLAYER_AURA);
 
-        if (GameObject* go = me->FindNearestGameObject(GO_HODIR_FRONTDOOR, 900.0f))
-        {
-            go->SetGoState(GO_STATE_ACTIVE);
-        }
-
         // Reset helpers
         if (!summons.size())
             SpawnHelpers();
     }
 
-    void JustEngagedWith(Unit*  /*pWho*/) override
+    void JustEngagedWith(Unit*  /*who*/) override
     {
         me->CastSpell(me, SPELL_BITING_COLD_BOSS_AURA, true);
         SmallIcicles(true);
@@ -253,14 +256,7 @@ struct boss_hodir : public BossAI
         Talk(TEXT_AGGRO);
 
         if (instance->GetBossState(BOSS_HODIR) != DONE)
-        {
             instance->SetBossState(BOSS_HODIR, IN_PROGRESS);
-        }
-
-        if (GameObject* go = me->FindNearestGameObject(GO_HODIR_FRONTDOOR, 300.0f))
-        {
-            go->SetGoState(GO_STATE_READY);
-        }
     }
 
     GameObject* GetHardmodeChest()
@@ -341,28 +337,6 @@ struct boss_hodir : public BossAI
 
                 events.Reset();
                 summons.DespawnAll();
-
-                if (GameObject* d = me->FindNearestGameObject(GO_HODIR_FROZEN_DOOR, 250.0f))
-                {
-                    if (d->GetGoState() != GO_STATE_ACTIVE )
-                    {
-                        d->SetLootState(GO_READY);
-                        d->UseDoorOrButton(0, false);
-                    }
-                }
-                if (GameObject* d = me->FindNearestGameObject(GO_HODIR_DOOR, 250.0f))
-                {
-                    if (d->GetGoState() != GO_STATE_ACTIVE )
-                    {
-                        d->SetLootState(GO_READY);
-                        d->UseDoorOrButton(0, false);
-                    }
-                }
-
-                if (GameObject* go = me->FindNearestGameObject(GO_HODIR_FRONTDOOR, 300.0f))
-                {
-                    go->SetGoState(GO_STATE_ACTIVE);
-                }
 
                 Talk(TEXT_DEATH);
                 scheduler.Schedule(14s, [this](TaskContext /*context*/)
@@ -592,7 +566,7 @@ struct boss_hodir : public BossAI
 
 struct npc_ulduar_icicle : public NullCreatureAI
 {
-    npc_ulduar_icicle(Creature* pCreature) : NullCreatureAI(pCreature)
+    npc_ulduar_icicle(Creature* creature) : NullCreatureAI(creature)
     {
         timer1 = 2000;
         timer2 = 5000;
@@ -624,20 +598,20 @@ struct npc_ulduar_icicle : public NullCreatureAI
 
 struct npc_ulduar_flash_freeze : public NullCreatureAI
 {
-    npc_ulduar_flash_freeze(Creature* pCreature) : NullCreatureAI(pCreature)
+    npc_ulduar_flash_freeze(Creature* creature) : NullCreatureAI(creature)
     {
         timer = 2500;
-        pInstance = me->GetInstanceScript();
+        _instance = me->GetInstanceScript();
     }
 
-    InstanceScript* pInstance;
+    InstanceScript* _instance;
     uint16 timer;
 
     void DamageTaken(Unit* doneBy, uint32& /*damage*/, DamageEffectType, SpellSchoolMask) override
     {
-        if (pInstance && doneBy)
-            if (pInstance->GetBossState(BOSS_HODIR) == NOT_STARTED)
-                if (Creature* hodir = pInstance->GetCreature(BOSS_HODIR))
+        if (_instance && doneBy)
+            if (_instance->GetBossState(BOSS_HODIR) == NOT_STARTED)
+                if (Creature* hodir = _instance->GetCreature(BOSS_HODIR))
                     hodir->AI()->AttackStart(doneBy);
     }
 
@@ -673,7 +647,7 @@ struct npc_ulduar_flash_freeze : public NullCreatureAI
 
 struct npc_ulduar_toasty_fire : public NullCreatureAI
 {
-    npc_ulduar_toasty_fire(Creature* pCreature) : NullCreatureAI(pCreature)
+    npc_ulduar_toasty_fire(Creature* creature) : NullCreatureAI(creature)
     {
         me->CastSpell(me, SPELL_MAGE_TOASTY_FIRE_AURA, true);
     }
@@ -705,15 +679,15 @@ struct npc_ulduar_toasty_fire : public NullCreatureAI
 
 struct npc_ulduar_hodir_priest : public ScriptedAI
 {
-    npc_ulduar_hodir_priest(Creature* pCreature) : ScriptedAI(pCreature)
+    npc_ulduar_hodir_priest(Creature* creature) : ScriptedAI(creature)
     {
-        pInstance = me->GetInstanceScript();
+        _instance = me->GetInstanceScript();
         events.Reset();
         me->SetReactState(REACT_PASSIVE);
     }
 
     EventMap events;
-    InstanceScript* pInstance;
+    InstanceScript* _instance;
 
     void AttackStart(Unit* who) override
     {
@@ -750,8 +724,8 @@ struct npc_ulduar_hodir_priest : public ScriptedAI
             case EVENT_TRY_FREE_HELPER:
                 {
                     if (!me->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC))
-                        if (pInstance)
-                            if (Creature* hodir = pInstance->GetCreature(BOSS_HODIR))
+                        if (_instance)
+                            if (Creature* hodir = _instance->GetCreature(BOSS_HODIR))
                                 {
                                     AttackStart(hodir);
                                     ScheduleAbilities();
@@ -783,23 +757,23 @@ struct npc_ulduar_hodir_priest : public ScriptedAI
 
     void JustDied(Unit* /*killer*/) override
     {
-        if (pInstance)
-            if (Creature* hodir = pInstance->GetCreature(BOSS_HODIR))
+        if (_instance)
+            if (Creature* hodir = _instance->GetCreature(BOSS_HODIR))
                 hodir->AI()->SetData(4, 1);
     }
 };
 
 struct npc_ulduar_hodir_druid : public ScriptedAI
 {
-    npc_ulduar_hodir_druid(Creature* pCreature) : ScriptedAI(pCreature)
+    npc_ulduar_hodir_druid(Creature* creature) : ScriptedAI(creature)
     {
-        pInstance = me->GetInstanceScript();
+        _instance = me->GetInstanceScript();
         events.Reset();
         me->SetReactState(REACT_PASSIVE);
     }
 
     EventMap events;
-    InstanceScript* pInstance;
+    InstanceScript* _instance;
 
     void AttackStart(Unit* who) override
     {
@@ -835,8 +809,8 @@ struct npc_ulduar_hodir_druid : public ScriptedAI
             case EVENT_TRY_FREE_HELPER:
                 {
                     if (!me->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC))
-                        if (pInstance)
-                            if (Creature* hodir = pInstance->GetCreature(BOSS_HODIR))
+                        if (_instance)
+                            if (Creature* hodir = _instance->GetCreature(BOSS_HODIR))
                                 {
                                     AttackStart(hodir);
                                     ScheduleAbilities();
@@ -869,23 +843,23 @@ struct npc_ulduar_hodir_druid : public ScriptedAI
 
     void JustDied(Unit* /*killer*/) override
     {
-        if (pInstance)
-            if (Creature* hodir = pInstance->GetCreature(BOSS_HODIR))
+        if (_instance)
+            if (Creature* hodir = _instance->GetCreature(BOSS_HODIR))
                 hodir->AI()->SetData(4, 1);
     }
 };
 
 struct npc_ulduar_hodir_shaman : public ScriptedAI
 {
-    npc_ulduar_hodir_shaman(Creature* pCreature) : ScriptedAI(pCreature)
+    npc_ulduar_hodir_shaman(Creature* creature) : ScriptedAI(creature)
     {
-        pInstance = me->GetInstanceScript();
+        _instance = me->GetInstanceScript();
         events.Reset();
         me->SetReactState(REACT_PASSIVE);
     }
 
     EventMap events;
-    InstanceScript* pInstance;
+    InstanceScript* _instance;
 
     void AttackStart(Unit* who) override
     {
@@ -929,8 +903,8 @@ struct npc_ulduar_hodir_shaman : public ScriptedAI
             case EVENT_TRY_FREE_HELPER:
                 {
                     if (!me->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC))
-                        if (pInstance)
-                            if (Creature* hodir = pInstance->GetCreature(BOSS_HODIR))
+                        if (_instance)
+                            if (Creature* hodir = _instance->GetCreature(BOSS_HODIR))
                                 {
                                     AttackStart(hodir);
                                     ScheduleAbilities();
@@ -962,23 +936,23 @@ struct npc_ulduar_hodir_shaman : public ScriptedAI
 
     void JustDied(Unit* /*killer*/) override
     {
-        if (pInstance)
-            if (Creature* hodir = pInstance->GetCreature(BOSS_HODIR))
+        if (_instance)
+            if (Creature* hodir = _instance->GetCreature(BOSS_HODIR))
                 hodir->AI()->SetData(4, 1);
     }
 };
 
 struct npc_ulduar_hodir_mage : public ScriptedAI
 {
-    npc_ulduar_hodir_mage(Creature* pCreature) : ScriptedAI(pCreature)
+    npc_ulduar_hodir_mage(Creature* creature) : ScriptedAI(creature)
     {
-        pInstance = me->GetInstanceScript();
+        _instance = me->GetInstanceScript();
         events.Reset();
         me->SetReactState(REACT_PASSIVE);
     }
 
     EventMap events;
-    InstanceScript* pInstance;
+    InstanceScript* _instance;
 
     void AttackStart(Unit* who) override
     {
@@ -1015,8 +989,8 @@ struct npc_ulduar_hodir_mage : public ScriptedAI
             case EVENT_TRY_FREE_HELPER:
                 {
                     if (!me->HasAura(SPELL_FLASH_FREEZE_TRAPPED_NPC))
-                        if (pInstance)
-                            if (Creature* hodir = pInstance->GetCreature(BOSS_HODIR))
+                        if (_instance)
+                            if (Creature* hodir = _instance->GetCreature(BOSS_HODIR))
                                 {
                                     AttackStart(hodir);
                                     ScheduleAbilities();
@@ -1066,8 +1040,8 @@ struct npc_ulduar_hodir_mage : public ScriptedAI
 
     void JustDied(Unit* /*killer*/) override
     {
-        if (pInstance)
-            if (Creature* hodir = pInstance->GetCreature(BOSS_HODIR))
+        if (_instance)
+            if (Creature* hodir = _instance->GetCreature(BOSS_HODIR))
                 hodir->AI()->SetData(4, 1);
     }
 };
@@ -1162,8 +1136,8 @@ class spell_hodir_biting_cold_player_aura : public AuraScript
                 if (_counter >= 4)
                 {
                     if (GetStackAmount() == 2) // increasing from 2 to 3 (not checking >= to improve performance)
-                        if (InstanceScript* pInstance = target->GetInstanceScript())
-                            if (Creature* hodir = pInstance->GetCreature(BOSS_HODIR))
+                        if (InstanceScript* _instance = target->GetInstanceScript())
+                            if (Creature* hodir = _instance->GetCreature(BOSS_HODIR))
                                 hodir->AI()->SetData(2, 1);
                     ModStackAmount(1);
                     _counter = 0;

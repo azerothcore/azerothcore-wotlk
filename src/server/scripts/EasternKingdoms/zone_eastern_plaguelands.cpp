@@ -296,39 +296,8 @@ public:
     };
 };
 
-/*######
-## npc_augustus_the_touched
-######*/
-
-class npc_augustus_the_touched : public CreatureScript
-{
-public:
-    npc_augustus_the_touched() : CreatureScript("npc_augustus_the_touched") { }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_TRADE)
-            player->GetSession()->SendListInventory(creature->GetGUID());
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        if (creature->IsVendor() && player->GetQuestRewardStatus(6164))
-            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
-
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-        return true;
-    }
-};
-
 void AddSC_eastern_plaguelands()
 {
     new npc_eris_hevenfire();
     new npc_balance_of_light_and_shadow();
-    new npc_augustus_the_touched();
 }

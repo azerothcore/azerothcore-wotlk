@@ -55,12 +55,7 @@ constexpr uint8 MAX_VOID_BLAST = 5;
 struct boss_pandemonius : public BossAI
 {
     boss_pandemonius(Creature* creature) : BossAI(creature, DATA_PANDEMONIUS)
-    {
-        scheduler.SetValidator([this]
-            {
-                return !me->HasUnitState(UNIT_STATE_CASTING);
-            });
-    }
+    {    }
 
     void JustEngagedWith(Unit* who) override
     {
