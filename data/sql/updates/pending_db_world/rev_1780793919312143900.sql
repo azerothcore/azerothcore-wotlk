@@ -1,39 +1,45 @@
--- High General Abbendis (NPC ID 28548) speech/talk sequence with Citizen of Havenshire (28660, 28662) & High Abbot Landgren (28558)
+
+-- Add SAI (High General Abbendis)
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28548;
 
-DELETE FROM `smart_scripts` WHERE (`entryorguid` = 28548) AND (`source_type` = 0) AND (`id` IN (0, 1));
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 28548);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (28548, 0, 0, 0, 25, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High General Abbendis - On Reset - Set Event Phase 1'),
-(28548, 0, 1, 0, 1, 1, 100, 0, 15000, 35000, 15000, 35000, 0, 0, 88, 2854800, 2854803, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High General Abbendis - Out of Combat - Run Random Script (Phase 1)'),
-(2854800, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "High General Abbendis - On Script - Set Event Phase 2"),
-(2854800, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 10, 129476, 28660, 0, 0, 0, 0, 0, "High General Abbendis - On Script - Say Line 0 (Citizen of Havenshire)"),
-(2854800, 9, 2, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "High General Abbendis - On Script - Say Line 0"),
-(2854800, 9, 3, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 5, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "High General Abbendis - On Script - Play Emote 'Talk'"),
-(2854800, 9, 4, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 10, 129476, 28660, 0, 0, 0, 0, 0, "High General Abbendis - On Script - Say Line 1 (Citizen of Havenshire)"),
-(2854800, 9, 5, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 19, 28558, 20, 0, 0, 0, 0, 0, "High General Abbendis - On Script - Say Line 0 (High Abbot Landgren)"),
-(2854800, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "High General Abbendis - On Script - Set Event Phase 1"),
-(2854800, 9, 7, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 5, 6, 0, 0, 0, 0, 0, 19, 28558, 20, 0, 0, 0, 0, 0, "High General Abbendis - On Script - Play Emote 'Question' (High Abbot Landgren)"),
-(2854801, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "High General Abbendis - On Script - Set Event Phase 2"),
-(2854801, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 10, 129478, 28660, 0, 0, 0, 0, 0, "High General Abbendis - On Script - Say Line 2 (Citizen of Havenshire)"),
-(2854801, 9, 2, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 10, 129489, 28662, 0, 0, 0, 0, 0, "High General Abbendis - On Script - Say Line 0 (Citizen of Havenshire)"),
-(2854801, 9, 3, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 10, 129474, 28660, 0, 0, 0, 0, 0, "High General Abbendis - On Script - Say Line 3 (Citizen of Havenshire)"),
-(2854801, 9, 4, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 10, 129490, 28662, 0, 0, 0, 0, 0, "High General Abbendis - On Script - Say Line 1 (Citizen of Havenshire)"),
-(2854801, 9, 5, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "High General Abbendis - On Script - Say Line 1"),
-(2854801, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "High General Abbendis - On Script - Set Event Phase 1"),
-(2854801, 9, 7, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 5, 6, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "High General Abbendis - On Script - Play Emote 'Question'"),
-(2854801, 9, 8, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 5, 5, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "High General Abbendis - On Script - Play Emote 'Point'"),
-(2854802, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "High General Abbendis - On Script - Set Event Phase 2"),
-(2854802, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 10, 129475, 28660, 0, 0, 0, 0, 0, "High General Abbendis - On Script - Say Line 4 (Citizen of Havenshire)"),
-(2854802, 9, 2, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "High General Abbendis - On Script - Say Line 2"),
-(2854802, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "High General Abbendis - On Script - Set Event Phase 1"),
-(2854802, 9, 4, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 5, 6, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "High General Abbendis - On Script - Play Emote 'Question'"),
-(2854803, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "High General Abbendis - On Script - Set Event Phase 2"),
-(2854803, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 10, 129487, 28662, 0, 0, 0, 0, 0, "High General Abbendis - On Script - Say Line 2 (Citizen of Havenshire)"),
-(2854803, 9, 2, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 10, 129483, 28662, 0, 0, 0, 0, 0, "High General Abbendis - On Script - Say Line 3 (Citizen of Havenshire)"),
-(2854803, 9, 3, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "High General Abbendis - On Script - Say Line 3"),
-(2854803, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "High General Abbendis - On Script - Set Event Phase 1"),
-(2854803, 9, 5, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 5, 15, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, "High General Abbendis - On Script - Play Emote 'Roar'");
+(28548, 0, 1, 0, 1, 1, 100, 0, 15000, 35000, 15000, 35000, 0, 0, 88, 2854800, 2854803, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High General Abbendis - OOC - Call Random Actionlist (Phase 1)');
 
+-- Set Action Lists
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9) AND (`entryorguid` IN (2854800, 2854801, 2854802, 2854803));
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2854800, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High General Abbendis - On Script - Set Event Phase 2'),
+(2854800, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 10, 129476, 28660, 0, 0, 0, 0, 0, 0, 'High General Abbendis - On Script - Say Line 0 (Citizen of Havenshire)'),
+(2854800, 9, 2, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High General Abbendis - On Script - Say Line 0'),
+(2854800, 9, 3, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 5, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High General Abbendis - On Script - Play Emote \'Talk\''),
+(2854800, 9, 4, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 10, 129476, 28660, 0, 0, 0, 0, 0, 0, 'High General Abbendis - On Script - Say Line 1 (Citizen of Havenshire)'),
+(2854800, 9, 5, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 19, 28558, 20, 0, 0, 0, 0, 0, 0, 'High General Abbendis - On Script - Say Line 0 (High Abbot Landgren)'),
+(2854800, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High General Abbendis - On Script - Set Event Phase 1'),
+(2854800, 9, 7, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 0, 5, 6, 0, 0, 0, 0, 0, 19, 28558, 20, 0, 0, 0, 0, 0, 0, 'High General Abbendis - On Script - Play Emote \'Question\' (High Abbot Landgren)'),
+(2854801, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High General Abbendis - On Script - Set Event Phase 2'),
+(2854801, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 10, 129478, 28660, 0, 0, 0, 0, 0, 0, 'High General Abbendis - On Script - Say Line 2 (Citizen of Havenshire)'),
+(2854801, 9, 2, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 10, 129489, 28662, 0, 0, 0, 0, 0, 0, 'High General Abbendis - On Script - Say Line 0 (Citizen of Havenshire)'),
+(2854801, 9, 3, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 10, 129474, 28660, 0, 0, 0, 0, 0, 0, 'High General Abbendis - On Script - Say Line 3 (Citizen of Havenshire)'),
+(2854801, 9, 4, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 10, 129490, 28662, 0, 0, 0, 0, 0, 0, 'High General Abbendis - On Script - Say Line 1 (Citizen of Havenshire)'),
+(2854801, 9, 5, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High General Abbendis - On Script - Say Line 1'),
+(2854801, 9, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High General Abbendis - On Script - Set Event Phase 1'),
+(2854801, 9, 7, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 5, 6, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High General Abbendis - On Script - Play Emote \'Question\''),
+(2854801, 9, 8, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 0, 5, 5, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High General Abbendis - On Script - Play Emote \'Point\''),
+(2854802, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High General Abbendis - On Script - Set Event Phase 2'),
+(2854802, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 4, 0, 0, 0, 0, 0, 10, 129475, 28660, 0, 0, 0, 0, 0, 0, 'High General Abbendis - On Script - Say Line 4 (Citizen of Havenshire)'),
+(2854802, 9, 2, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High General Abbendis - On Script - Say Line 2'),
+(2854802, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High General Abbendis - On Script - Set Event Phase 1'),
+(2854802, 9, 4, 0, 0, 0, 100, 0, 3000, 3000, 0, 0, 0, 0, 5, 6, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High General Abbendis - On Script - Play Emote \'Question\''),
+(2854803, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High General Abbendis - On Script - Set Event Phase 2'),
+(2854803, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 10, 129487, 28662, 0, 0, 0, 0, 0, 0, 'High General Abbendis - On Script - Say Line 2 (Citizen of Havenshire)'),
+(2854803, 9, 2, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 10, 129483, 28662, 0, 0, 0, 0, 0, 0, 'High General Abbendis - On Script - Say Line 3 (Citizen of Havenshire)'),
+(2854803, 9, 3, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High General Abbendis - On Script - Say Line 3'),
+(2854803, 9, 4, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High General Abbendis - On Script - Set Event Phase 1'),
+(2854803, 9, 5, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 0, 5, 15, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'High General Abbendis - On Script - Play Emote \'Roar\'');
+
+-- Add Creature Texts
 DELETE FROM `creature_text` WHERE `CreatureID` IN (28548, 28558, 28660, 28662);
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
 (28548, 0, 0, "The pure of heart will be allowed to remain in New Avalon. Those that the inquisitors find bereft of the holy Light will be turned away.", 12, 0, 100, 1, 0, 0, 28580, 0, "High General Abbendis"),
