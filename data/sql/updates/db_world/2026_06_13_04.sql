@@ -1,3 +1,4 @@
+-- DB update 2026_06_13_03 -> 2026_06_13_04
 UPDATE `smart_scripts` SET
     `event_param1` = 10000, -- InitialMin: 10s
     `event_param2` = 20000, -- InitialMax: 20s
