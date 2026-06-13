@@ -31,6 +31,7 @@
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "ScriptMgr.h"
 #include "SocialMgr.h"
 #include "World.h"
@@ -903,6 +904,13 @@ void Guild::BankMoveItemData::LogBankEvent(CharacterDatabaseTransaction trans, M
 void Guild::BankMoveItemData::LogAction(MoveItemData* pFrom) const
 {
     MoveItemData::LogAction(pFrom);
+    if (!pFrom->IsBank() && m_pPlayer->GetSession()->HasPermission(rbac::RBAC_PERM_LOG_GM_TRADE))
+    {
+        LOG_GM(m_pPlayer->GetSession()->GetAccountId(), "GM {} (Account: {}) deposit item: {} (Entry: {} Count: {}) to guild bank named: {} (Guild ID: {})",
+            m_pPlayer->GetName(), m_pPlayer->GetSession()->GetAccountId(),
+            pFrom->GetItem()->GetTemplate()->Name1, pFrom->GetItem()->GetEntry(), pFrom->GetItem()->GetCount(),
+            m_pGuild->GetName(), m_pGuild->GetId());
+    }
 }
 
 Item* Guild::BankMoveItemData::_StoreItem(CharacterDatabaseTransaction trans, BankTab* pTab, Item* pItem, ItemPosCount& pos, bool clone) const
@@ -1683,6 +1691,12 @@ void Guild::HandleMemberDepositMoney(WorldSession* session, uint32 amount)
 
     CharacterDatabase.CommitTransaction(trans);
 
+    if (session->HasPermission(rbac::RBAC_PERM_LOG_GM_TRADE))
+    {
+        LOG_GM(session->GetAccountId(), "GM {} (Account: {}) deposited {} to guild bank (Guild: {} GuildId: {})",
+            player->GetName(), session->GetAccountId(), amount, GetName(), GetId());
+    }
+
     std::string aux = Acore::Impl::ByteArrayToHexStr(reinterpret_cast<uint8*>(&m_bankMoney), 8, true);
     _BroadcastEvent(GE_BANK_MONEY_SET, ObjectGuid::Empty, aux.c_str());
 
@@ -1736,6 +1750,12 @@ bool Guild::HandleMemberWithdrawMoney(WorldSession* session, uint32 amount, bool
     // Log guild bank event
     _LogBankEvent(trans, repair ? GUILD_BANK_LOG_REPAIR_MONEY : GUILD_BANK_LOG_WITHDRAW_MONEY, uint8(0), player->GetGUID(), amount);
     CharacterDatabase.CommitTransaction(trans);
+
+    if (session->HasPermission(rbac::RBAC_PERM_LOG_GM_TRADE))
+    {
+        LOG_GM(session->GetAccountId(), "GM {} (Account: {}) withdrew {} from guild bank (Guild: {} GuildId: {})",
+            player->GetName(), session->GetAccountId(), amount, GetName(), GetId());
+    }
 
     if (amount > 10 * GOLD)     // sender_acc = 0 (guild has no account), sender_guid = Guild id, sender_name = Guild name
         CharacterDatabase.Execute("INSERT INTO log_money VALUES({}, {}, \"{}\", \"{}\", {}, \"{}\", {}, \"(guild, members: {}, new amount: {}, leader guid low: {}, withdrawer level: {})\", NOW(), {})",

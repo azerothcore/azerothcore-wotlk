@@ -109,7 +109,7 @@ Based on CLAUDE.md, always verify:
 
 - Be constructive and educational
 - Reference specific sections of CLAUDE.md, C++ Code Standards, or SQL Standards when applicable
-- Suggest specific fixes with code examples when possible
+- Suggest specific fixes with code examples if necessary
 - Highlight both issues and good practices
 - For C++ issues, cite specific rule from C++ Code Standards wiki
 - For SQL issues, cite specific rule from SQL Standards wiki

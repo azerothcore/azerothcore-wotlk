@@ -552,7 +552,7 @@ void Aura::UpdateTargetMap(Unit* caster, bool apply)
             if (IsArea())
                 for (uint8 effIndex = 0; effIndex < MAX_SPELL_EFFECTS; ++effIndex)
                 {
-                    if ((existing->second & (1 << effIndex)) && existing->first->IsImmunedToSpellEffect(GetSpellInfo(), effIndex))
+                    if ((existing->second & (1 << effIndex)) && existing->first->IsImmunedToSpellEffect(GetSpellInfo(), effIndex, GetCaster()))
                         existing->second &= ~(1 << effIndex);
                 }
 
@@ -594,10 +594,10 @@ void Aura::UpdateTargetMap(Unit* caster, bool apply)
         // check target immunities
         for (uint8 effIndex = 0; effIndex < MAX_SPELL_EFFECTS; ++effIndex)
         {
-            if ((itr->second & (1 << effIndex)) && itr->first->IsImmunedToSpellEffect(GetSpellInfo(), effIndex))
+            if ((itr->second & (1 << effIndex)) && itr->first->IsImmunedToSpellEffect(GetSpellInfo(), effIndex, GetCaster()))
                 itr->second &= ~(1 << effIndex);
         }
-        if (!itr->second || itr->first->IsImmunedToSpell(GetSpellInfo()) || !CanBeAppliedOn(itr->first))
+        if (!itr->second || itr->first->IsImmunedToSpell(GetSpellInfo(), GetCaster()) || !CanBeAppliedOn(itr->first))
             addUnit = false;
 
         if (addUnit && !itr->first->IsHighestExclusiveAura(this, true))
@@ -1348,28 +1348,6 @@ void Aura::HandleAuraSpecificMods(AuraApplication const* aurApp, Unit* caster, b
                 }
                 switch (GetId())
                 {
-                    case 12536: // Clearcasting
-                    case 12043: // Presence of Mind
-                        // Arcane Potency
-                        if (AuraEffect const* aurEff = caster->GetAuraEffect(SPELL_AURA_DUMMY, SPELLFAMILY_MAGE, 2120, 0))
-                        {
-                            uint32 spellId = 0;
-
-                            switch (aurEff->GetId())
-                            {
-                                case 31571:
-                                    spellId = 57529;
-                                    break;
-                                case 31572:
-                                    spellId = 57531;
-                                    break;
-                                default:
-                                    LOG_ERROR("spells.aura", "Aura::HandleAuraSpecificMods: Unknown rank of Arcane Potency ({}) found", aurEff->GetId());
-                            }
-                            if (spellId)
-                                caster->CastSpell(caster, spellId, true);
-                        }
-                        break;
                     case 44544: // Fingers of Frost
                         {
                             // See if we already have the indicator aura. If not, create one.
@@ -2164,9 +2142,12 @@ uint8 Aura::GetProcEffectMask(AuraApplication* aurApp, ProcEventInfo& eventInfo,
             return 0;
 
         // check if aura can proc when spell is triggered (exception for hunter auto shot & wands)
+        // Kill/killed/death events should not be blocked by the triggered-spell check -
+        // the kill itself is the proc trigger, not the spell that dealt the killing blow
         if (!GetSpellInfo()->HasAttribute(SPELL_ATTR3_CAN_PROC_FROM_PROCS) &&
             !(procEntry->AttributesMask & PROC_ATTR_TRIGGERED_CAN_PROC) &&
-            !(eventInfo.GetTypeMask() & AUTO_ATTACK_PROC_FLAG_MASK))
+            !(eventInfo.GetTypeMask() & AUTO_ATTACK_PROC_FLAG_MASK) &&
+            !(eventInfo.GetTypeMask() & (PROC_FLAG_KILL | PROC_FLAG_KILLED | PROC_FLAG_DEATH)))
         {
             if (spell->IsTriggered() && !spell->GetSpellInfo()->HasAttribute(SPELL_ATTR3_NOT_A_PROC))
                 return 0;
@@ -2175,6 +2156,14 @@ uint8 Aura::GetProcEffectMask(AuraApplication* aurApp, ProcEventInfo& eventInfo,
         // do not allow aura proc if proc is caused by a spell cast by item
         if (spell->m_CastItem && (procEntry->AttributesMask & PROC_ATTR_CANT_PROC_FROM_ITEM_CAST))
             return 0;
+    }
+
+    // Don't consume stealth charges from friendly spells
+    if (m_spellInfo->HasAura(SPELL_AURA_MOD_STEALTH))
+    {
+        if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
+            if (spellInfo->IsPositive() || !eventInfo.GetActor()->IsHostileTo(aurApp->GetTarget()) || spellInfo->HasAttribute(SPELL_ATTR0_CU_DONT_BREAK_STEALTH))
+                return 0;
     }
 
     // check if we have charges to proc with
@@ -2833,7 +2822,7 @@ void UnitAura::FillTargetMap(std::map<Unit*, uint8>& targets, Unit* caster)
         {
             float radius = GetSpellInfo()->Effects[effIndex].CalcRadius(caster);
 
-            if (!GetUnitOwner()->HasUnitState(UNIT_STATE_ISOLATED))
+            if (!GetUnitOwner()->HasAuraState(AURA_STATE_BANISHED, GetSpellInfo(), caster))
             {
                 switch (GetSpellInfo()->Effects[effIndex].Effect)
                 {

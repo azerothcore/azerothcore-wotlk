@@ -8,9 +8,19 @@ void MapGridManager::CreateGrid(uint16 const x, uint16 const y)
     if (IsGridCreated(x, y))
         return;
 
+    // If we are an instance, ensure parent map has already created the grid before proceeding.
+    // Note: grid loading is locked and is safe across multiple map threads in the
+    // event of multiple child maps attempting to create the same parent map grid
+    if (_map->GetInstanceId() != 0)
+    {
+        Map* parentMap = const_cast<Map*>(_map->GetParent());
+        parentMap->EnsureGridCreated(GridCoord(x, y));
+    }
+
     std::unique_ptr<MapGridType> grid = std::make_unique<MapGridType>(x, y);
     grid->link(_map);
 
+    // Terrain is loading during create (should/can we move this to LoadGrid?)
     GridTerrainLoader loader(*grid, _map);
     loader.LoadTerrain();
 
@@ -19,6 +29,7 @@ void MapGridManager::CreateGrid(uint16 const x, uint16 const y)
     ++_createdGridsCount;
 }
 
+// Loads objects, terrain already loaded in CreateGrid
 bool MapGridManager::LoadGrid(uint16 const x, uint16 const y)
 {
     MapGridType* grid = GetGrid(x, y);
@@ -54,9 +65,6 @@ void MapGridManager::UnloadGrid(uint16 const x, uint16 const y)
         TypeContainerVisitor<GridObjectUnloader, GridTypeMapContainer> visitor(worker);
         grid->VisitAllCells(visitor);
     }
-
-    GridTerrainUnloader terrainUnloader(*grid, _map);
-    terrainUnloader.UnloadTerrain();
 
     _mapGrid[x][y] = nullptr;
 }

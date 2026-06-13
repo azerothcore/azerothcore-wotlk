@@ -17,6 +17,7 @@
 
 #include "Chat.h"
 #include "ChatPackets.h"
+#include "RBAC.h"
 #include "GameTime.h"
 #include "Metric.h"
 #include "Player.h"
@@ -323,7 +324,7 @@ void WorldSessionMgr::AddSession_(WorldSession* session)
     // don't count this session when checking player limit
     --Sessions;
 
-    if (pLimit > 0 && Sessions >= pLimit && AccountMgr::IsPlayerAccount(session->GetSecurity()) && !session->CanSkipQueue() && !HasRecentlyDisconnected(session))
+    if (pLimit > 0 && Sessions >= pLimit && !session->HasPermission(rbac::RBAC_PERM_SKIP_QUEUE) && !session->CanSkipQueue() && !HasRecentlyDisconnected(session))
     {
         AddQueuedPlayer(session);
         UpdateMaxSessionCounters();
@@ -390,7 +391,7 @@ void WorldSessionMgr::SendGlobalGMMessage(WorldPacket const* packet, WorldSessio
             itr->second->GetPlayer() &&
             itr->second->GetPlayer()->IsInWorld() &&
             itr->second != self &&
-            !AccountMgr::IsPlayerAccount(itr->second->GetSecurity()) &&
+            itr->second->HasPermission(rbac::RBAC_PERM_RECEIVE_GLOBAL_GM_TEXTMESSAGE) &&
             (teamId == TEAM_NEUTRAL || itr->second->GetPlayer()->GetTeamId() == teamId))
         {
             itr->second->SendPacket(packet);

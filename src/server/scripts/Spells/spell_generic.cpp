@@ -23,7 +23,6 @@
 #include "Cell.h"
 #include "CellImpl.h"
 #include "Chat.h"
-#include "CreatureScript.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
 #include "Group.h"
@@ -2559,7 +2558,7 @@ class spell_gen_vehicle_scaling_aura: public AuraScript
 
     bool Load() override
     {
-        return GetCaster() && GetCaster()->IsPlayer() && GetOwner()->IsCreature();
+        return GetCaster() && GetCaster()->IsPlayer() && GetOwner() && GetOwner()->IsCreature();
     }
 
     void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
@@ -3775,7 +3774,6 @@ private:
    29435 - Capture Female Kaliri Hatchling
    42268 - Quest - Mindless Abomination Explosion FX Master
    51592 - Pickup Primordial Hatchling
-   51910 - Kickin' Nass: Quest Completion
    52267 - Despawn Horse
    54420 - Deliver Gryphon */
 class spell_gen_despawn_self : public SpellScript
