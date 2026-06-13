@@ -310,8 +310,23 @@ void BattlegroundQueue::RemovePlayer(ObjectGuid guid, bool decreaseInvitedCount)
 
     // if invited to bg, and should decrease invited count, then do it
     if (decreaseInvitedCount && groupInfo->IsInvitedToBGInstanceGUID)
+    {
         if (Battleground* bg = sBattlegroundMgr->GetBattleground(groupInfo->IsInvitedToBGInstanceGUID, groupInfo->BgTypeId))
+        {
             bg->DecreaseInvitedCount(groupInfo->teamId);
+
+            // re-enqueue BG if free slots reopened due to invite expiration
+            if (bg->HasFreeSlots())
+            {
+                bg->AddToBGFreeSlotQueue();
+
+                BattlegroundQueueTypeId queueTypeId =
+                    BattlegroundMgr::BGQueueTypeId(bg->GetBgTypeID(), bg->GetArenaType());
+
+                sBattlegroundMgr->ScheduleQueueUpdate(0, 0, queueTypeId, bg->GetBgTypeID(), bg->GetBracketId());
+            }
+        }
+    }
 
     // remove player queue info
     m_QueuedPlayers.erase(itr);
