@@ -318,11 +318,11 @@ public:
                 continue;
 
             if ((skillInfo->categoryId == SKILL_CATEGORY_PROFESSION || skillInfo->categoryId == SKILL_CATEGORY_SECONDARY) &&
-                    skillInfo->canLink)
+                    skillInfo->canLink)                             // only prof. with recipes have
             {
                 HandleLearnSkillRecipesHelper(target, skillInfo->id);
 
-                const uint16 maxLevel = target->GetPureMaxSkillValue(skillInfo->id);
+                uint16 const maxLevel = target->GetPureMaxSkillValue(skillInfo->id);
                 target->SetSkill(skillInfo->id, target->GetSkillStep(skillInfo->id), maxLevel, maxLevel);
             }
         }
@@ -393,10 +393,12 @@ public:
 
     static void HandleLearnSkillRecipesHelper(Player* player, uint32 skillId)
     {
-        // Rank spells (Apprentice → Grand Master) must be learned so that
-        // Player::removeSpell can walk the spell chain on profession unlearn
-        // and properly remove the skill.  Without them the profession
-        // reappears after relog (issue #2330).
+        // Rank spells (Apprentice -> Grand Master) must be learned so that the
+        // skill-cleanup loop in Player::SetSkill (which calls removeSpell on the
+        // first spell in each chain) can walk forward and strip every rank on
+        // profession unlearn. Without the first rank in the spellbook that loop
+        // bails out and the leftover rank spells re-grant the skill after relog
+        // (issue #2330).
         for (uint32 rankSpell : sSpellMgr->GetSkillRankSpells(skillId))
             player->learnSpell(rankSpell);
 
