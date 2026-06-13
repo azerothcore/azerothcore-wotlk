@@ -1,3 +1,4 @@
+-- DB update 2026_06_13_01 -> 2026_06_13_02
 -- ZAP FARFLINGER (Engineering(260 / Goblin Engineer)) - Dimensional Ripper: Everlook
 
 -- Dimensional Ripper gossip option already updated in Kablamm Farflinger update / Both brothers share post learn gossip texts

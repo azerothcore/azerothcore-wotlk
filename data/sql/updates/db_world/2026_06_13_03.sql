@@ -1,3 +1,4 @@
+-- DB update 2026_06_13_02 -> 2026_06_13_03
 -- JHORDY LAPFORGE (Engineering(260 / Gnomish Engineer)) - Ultrasafe Transporter: Gadgetzan
 
 -- Add gossip option (0) to learn schematic
