@@ -33,6 +33,8 @@
 #include "Tokenize.h"
 #include "World.h"
 
+#include <algorithm>
+
 bool IsPrimaryProfessionSkill(uint32 skill)
 {
     SkillLineEntry const* pSkill = sSkillLineStore.LookupEntry(skill);
@@ -685,6 +687,24 @@ SpellLearnSkillNode const* SpellMgr::GetSpellLearnSkill(uint32 spell_id) const
         return &itr->second;
     else
         return nullptr;
+}
+
+std::vector<uint32> SpellMgr::GetSkillRankSpells(uint32 skillId) const
+{
+    // Returns every spell that grants this skill via SPELL_EFFECT_SKILL,
+    // i.e. the profession rank/proficiency spells (Apprentice -> Grand Master),
+    // ordered by step. Not strictly limited to the six ranks: any skill-granting
+    // spell for the line is included.
+    std::vector<uint32> result;
+    for (auto const& [spellId, node] : mSpellLearnSkills)
+        if (node.skill == skillId)
+            result.push_back(spellId);
+
+    std::ranges::sort(result, [this](uint32 a, uint32 b)
+    {
+        return mSpellLearnSkills.at(a).step < mSpellLearnSkills.at(b).step;
+    });
+    return result;
 }
 
 SpellTargetPosition const* SpellMgr::GetSpellTargetPosition(uint32 spell_id, SpellEffIndex effIndex) const

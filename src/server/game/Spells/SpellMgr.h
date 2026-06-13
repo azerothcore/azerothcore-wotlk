@@ -687,6 +687,7 @@ public:
 
     // Spell learning
     [[nodiscard]] SpellLearnSkillNode const* GetSpellLearnSkill(uint32 spell_id) const;
+    [[nodiscard]] std::vector<uint32> GetSkillRankSpells(uint32 skillId) const;
 
     // Spell target coordinates
     [[nodiscard]] SpellTargetPosition const* GetSpellTargetPosition(uint32 spell_id, SpellEffIndex effIndex) const;
