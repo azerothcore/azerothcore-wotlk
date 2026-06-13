@@ -531,6 +531,24 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].SpellClassMask[2] = 0x8000000;
     });
 
+    // Swift Retribution: SPELL_AURA_MELEE_SLOW (aura 193) requires negative amounts for haste;
+    // positive amounts cause attack speed reduction. DBC BasePoints are +1/+2/+3 for ranks 1/2/3.
+    // Negate so CalcValue = BasePoints + DieSides(1) produces -1/-2/-3 (1/2/3% haste).
+    ApplySpellFix({ 53379 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].BasePoints = -2;
+    });
+
+    ApplySpellFix({ 53484 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].BasePoints = -3;
+    });
+
+    ApplySpellFix({ 53648 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].BasePoints = -4;
+    });
+
     // Sanctified Retribution
     ApplySpellFix({ 31869 }, [](SpellInfo* spellInfo)
     {
