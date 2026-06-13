@@ -71,6 +71,8 @@ enum PaladinSpells
 
     SPELL_PALADIN_SEAL_OF_RIGHTEOUSNESS          = 25742,
 
+    SPELL_PALADIN_RETRIBUTION_AURA               = 7294,
+    SPELL_PALADIN_BATTLE_AURA                    = 41106,
     SPELL_PALADIN_CONCENTRACTION_AURA            = 19746,
     SPELL_PALADIN_SANCTIFIED_RETRIBUTION_R1      = 31869,
     SPELL_PALADIN_SWIFT_RETRIBUTION_R1           = 53379,
@@ -2133,6 +2135,29 @@ private:
     uint32 _spellId;
 };
 
+// 63531 - Sanctified Retribution Aura
+// Applied by Sanctified Retribution (31869) and Swift Retribution (-53379) talents.
+// Only applies to nearby allies when the Paladin has Retribution Aura active.
+class spell_pal_sanctified_retribution_aura : public AuraScript
+{
+    PrepareAuraScript(spell_pal_sanctified_retribution_aura);
+
+    bool CheckAreaTarget(Unit* /*target*/)
+    {
+        Unit* caster = GetCaster();
+        if (!caster)
+            return false;
+
+        return caster->GetAuraOfRankedSpell(SPELL_PALADIN_RETRIBUTION_AURA) ||
+               caster->HasAura(SPELL_PALADIN_BATTLE_AURA);
+    }
+
+    void Register() override
+    {
+        DoCheckAreaTarget += AuraCheckAreaTargetFn(spell_pal_sanctified_retribution_aura::CheckAreaTarget);
+    }
+};
+
 // 53651 - Light's Beacon - Beacon of Light
 // Each source heal has a dedicated beacon copy spell:
 //   53652 - Holy Light, 53653 - Flash of Light, 53654 - Holy Shock
@@ -2256,5 +2281,6 @@ void AddSC_paladin_spell_scripts()
     RegisterSpellScriptWithArgs(spell_pal_improved_aura, "spell_pal_improved_devotion_aura", SPELL_PALADIN_IMPROVED_DEVOTION_AURA);
     RegisterSpellScriptWithArgs(spell_pal_improved_aura, "spell_pal_sanctified_retribution", SPELL_PALADIN_SANCTIFIED_RETRIBUTION_AURA);
     RegisterSpellScriptWithArgs(spell_pal_improved_aura, "spell_pal_swift_retribution", SPELL_PALADIN_SANCTIFIED_RETRIBUTION_AURA);
+    RegisterSpellScript(spell_pal_sanctified_retribution_aura);
     RegisterSpellScript(spell_pal_light_s_beacon);
 }
