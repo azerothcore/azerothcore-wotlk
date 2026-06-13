@@ -374,9 +374,15 @@ public:
         return GetUtgardePinnacleAI<npc_ritual_channelerAI>(pCreature);
     }
 
-    struct npc_ritual_channelerAI : public NullCreatureAI
+    struct npc_ritual_channelerAI : public ScriptedAI
     {
-        npc_ritual_channelerAI(Creature* pCreature) : NullCreatureAI(pCreature) {}
+        npc_ritual_channelerAI(Creature* pCreature) : ScriptedAI(pCreature), _paralyzeTarget(), _paralyzeTimer(2000)
+        {
+            me->SetCombatMovement(false);
+        }
+
+        ObjectGuid _paralyzeTarget;
+        uint32 _paralyzeTimer;
 
         void AttackStart(Unit* pWho) override
         {
@@ -385,9 +391,26 @@ public:
 
             if (pWho)
             {
+                _paralyzeTarget = pWho->GetGUID();
                 me->AddThreat(pWho, 10000000.0f);
                 me->CastSpell(pWho, SPELL_PARALYZE, false);
             }
+        }
+
+        void UpdateAI(uint32 diff) override
+        {
+            if (_paralyzeTarget.IsEmpty())
+                return;
+
+            if (_paralyzeTimer <= diff)
+            {
+                if (Unit* target = ObjectAccessor::GetUnit(*me, _paralyzeTarget))
+                    if (!target->HasAura(SPELL_PARALYZE))
+                        me->CastSpell(target, SPELL_PARALYZE, false);
+                _paralyzeTimer = 2000;
+            }
+            else
+                _paralyzeTimer -= diff;
         }
     };
 };
