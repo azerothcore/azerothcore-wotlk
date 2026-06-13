@@ -327,9 +327,7 @@ class spell_item_mind_amplify_dish : public SpellScript
 
     bool Load() override
     {
-        if (!GetCastItem())
-            return false;
-        return true;
+        return GetCastItem() != nullptr;
     }
 
     bool Validate(SpellInfo const* /*spell*/) override
