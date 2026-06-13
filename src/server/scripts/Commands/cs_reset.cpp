@@ -21,6 +21,7 @@
 #include "Language.h"
 #include "Pet.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "ScriptMgr.h"
 #include "WorldSessionMgr.h"
 
@@ -36,25 +37,25 @@ public:
     {
         static ChatCommandTable resetItemsCommandTable =
         {
-            { "equipped",       HandleResetItemsEquippedCommand,             SEC_ADMINISTRATOR, Console::Yes },
-            { "bags",           HandleResetItemsInBagsCommand,              SEC_ADMINISTRATOR, Console::Yes },
-            { "bank",           HandleResetItemsInBankCommand,              SEC_ADMINISTRATOR, Console::Yes },
-            { "keyring",        HandleResetItemsKeyringCommand,             SEC_ADMINISTRATOR, Console::Yes },
-            { "currency",       HandleResetItemsInCurrenciesListCommand,    SEC_ADMINISTRATOR, Console::Yes },
-            { "vendor_buyback", HandleResetItemsInVendorBuyBackTabCommand,  SEC_ADMINISTRATOR, Console::Yes },
-            { "all",            HandleResetItemsAllCommand,                 SEC_ADMINISTRATOR, Console::Yes },
-            { "allbags",        HandleResetItemsAllAndDeleteBagsCommand,    SEC_ADMINISTRATOR, Console::Yes },
+            { "equipped",       HandleResetItemsEquippedCommand,             rbac::RBAC_PERM_COMMAND_RESET, Console::Yes },
+            { "bags",           HandleResetItemsInBagsCommand,              rbac::RBAC_PERM_COMMAND_RESET, Console::Yes },
+            { "bank",           HandleResetItemsInBankCommand,              rbac::RBAC_PERM_COMMAND_RESET, Console::Yes },
+            { "keyring",        HandleResetItemsKeyringCommand,             rbac::RBAC_PERM_COMMAND_RESET, Console::Yes },
+            { "currency",       HandleResetItemsInCurrenciesListCommand,    rbac::RBAC_PERM_COMMAND_RESET, Console::Yes },
+            { "vendor_buyback", HandleResetItemsInVendorBuyBackTabCommand,  rbac::RBAC_PERM_COMMAND_RESET, Console::Yes },
+            { "all",            HandleResetItemsAllCommand,                 rbac::RBAC_PERM_COMMAND_RESET, Console::Yes },
+            { "allbags",        HandleResetItemsAllAndDeleteBagsCommand,    rbac::RBAC_PERM_COMMAND_RESET, Console::Yes },
         };
         static ChatCommandTable resetCommandTable =
         {
-            { "achievements",   HandleResetAchievementsCommand, SEC_CONSOLE,       Console::Yes },
-            { "honor",          HandleResetHonorCommand,        SEC_ADMINISTRATOR, Console::Yes },
-            { "level",          HandleResetLevelCommand,        SEC_ADMINISTRATOR, Console::Yes },
-            { "spells",         HandleResetSpellsCommand,       SEC_ADMINISTRATOR, Console::Yes },
-            { "stats",          HandleResetStatsCommand,        SEC_ADMINISTRATOR, Console::Yes },
-            { "talents",        HandleResetTalentsCommand,      SEC_ADMINISTRATOR, Console::Yes },
-            { "items",          resetItemsCommandTable                                          },
-            { "all",            HandleResetAllCommand,          SEC_CONSOLE,       Console::Yes }
+            { "achievements",   HandleResetAchievementsCommand, rbac::RBAC_PERM_COMMAND_RESET_ACHIEVEMENTS, Console::Yes },
+            { "honor",          HandleResetHonorCommand,        rbac::RBAC_PERM_COMMAND_RESET_HONOR,        Console::Yes },
+            { "level",          HandleResetLevelCommand,        rbac::RBAC_PERM_COMMAND_RESET_LEVEL,        Console::Yes },
+            { "spells",         HandleResetSpellsCommand,       rbac::RBAC_PERM_COMMAND_RESET_SPELLS,       Console::Yes },
+            { "stats",          HandleResetStatsCommand,        rbac::RBAC_PERM_COMMAND_RESET_STATS,        Console::Yes },
+            { "talents",        HandleResetTalentsCommand,      rbac::RBAC_PERM_COMMAND_RESET_TALENTS,      Console::Yes },
+            { "items",          resetItemsCommandTable                                                                    },
+            { "all",            HandleResetAllCommand,          rbac::RBAC_PERM_COMMAND_RESET_ALL,          Console::Yes }
         };
         static ChatCommandTable commandTable =
         {

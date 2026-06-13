@@ -31,6 +31,7 @@
 #include "ObjectGuid.h"
 #include "Optional.h"
 #include "Position.h"
+#include "UnitDefines.h"
 #include "UpdateData.h"
 #include "UpdateMask.h"
 #include "ObjectVisibilityContainer.h"
@@ -344,6 +345,9 @@ struct MovementInfo
     void RemoveMovementFlag(uint32 flag) { flags &= ~flag; }
     [[nodiscard]] bool HasMovementFlag(uint32 flag) const { return flags & flag; }
 
+    [[nodiscard]] UnitMoveType GetSpeedType() const { return GetSpeedType(flags); }
+    [[nodiscard]] static UnitMoveType GetSpeedType(uint32 moveFlags);
+
     [[nodiscard]] uint16 GetExtraMovementFlags() const { return flags2; }
     void AddExtraMovementFlag(uint16 flag) { flags2 |= flag; }
     [[nodiscard]] bool HasExtraMovementFlag(uint16 flag) const { return flags2 & flag; }
@@ -539,6 +543,7 @@ public:
     bool IsWithinDist3d(const Position* pos, float dist) const;
     [[nodiscard]] bool IsWithinDist2d(float x, float y, float dist) const;
     bool IsWithinDist2d(const Position* pos, float dist) const;
+    virtual bool IsWithinSightRange(Position const& pos, float dist) const;
     // use only if you will sure about placing both object at same map
     bool IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D = true, bool incOwnRadius = true, bool incTargetRadius = true) const;
     bool IsWithinDistInMap(WorldObject const* obj, float dist2compare, bool is3D = true, bool incOwnRadius = true, bool incTargetRadius = true) const;

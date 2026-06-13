@@ -158,6 +158,7 @@ public:
     void SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask, bool saveAddon = false);
     virtual bool LoadFromDB(ObjectGuid::LowType guid, Map* map) { return LoadGameObjectFromDB(guid, map, false); }
     virtual bool LoadGameObjectFromDB(ObjectGuid::LowType guid, Map* map, bool addToMap = true);
+    [[nodiscard]] bool IsRespawnCompatibilityMode() const { return _respawnCompatibilityMode; }
     void DeleteFromDB();
 
     void SetOwnerGUID(ObjectGuid owner)
@@ -284,7 +285,8 @@ public:
 
     void CastSpell(Unit* target, uint32 spell);
     void SendCustomAnim(uint32 anim);
-    [[nodiscard]] bool IsInRange(float x, float y, float z, float radius) const;
+    bool IsInRange2d(float x, float y, float radius) const;
+    bool IsInRange3d(float x, float y, float z, float radius) const;
 
     void ModifyHealth(int32 change, Unit* attackerOrHealer = nullptr, uint32 spellId = 0);
     void SetDestructibleBuildingModifyState(bool allow) { m_allowModifyDestructibleBuilding = allow; }
@@ -368,6 +370,7 @@ protected:
     bool AIM_Initialize();
     GameObjectModel* CreateModel();
     void UpdateModel();                                 // updates model in case displayId were changed
+    bool        _respawnCompatibilityMode{true};
     uint32      m_spellId;
     time_t      m_respawnTime;                          // (secs) time of next respawn (or despawn if GO have owner()),
     uint32      m_respawnDelayTime;                     // (secs) if 0 then current GO state no dependent from timer
@@ -418,8 +421,11 @@ private:
     {
         //! Following check does check 3d distance
         dist2compare += obj->GetObjectSize();
-        return IsInRange(obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ(), dist2compare);
+        return IsInRange3d(obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ(), dist2compare);
     }
+
+    bool IsWithinSightRange(Position const& pos, float dist) const override;
+
     GameObjectAI* m_AI;
 
     bool m_saveStateOnDb = false;
