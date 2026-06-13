@@ -125,11 +125,6 @@ struct npc_taldaram_flamesphere : public NullCreatureAI
         DoCastSelf(SPELL_FLAME_SPHERE_VISUAL);
     }
 
-    void JustDied(Unit* /*who*/) override
-    {
-        DoCastSelf(SPELL_FLAME_SPHERE_DEATH_EFFECT);
-    }
-
     void UpdateAI(uint32 diff) override
     {
         if (moveTimer)
