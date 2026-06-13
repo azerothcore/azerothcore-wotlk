@@ -255,10 +255,12 @@ bool ChaseMovementGenerator<T>::DoUpdate(T* owner, uint32 time_diff)
     {
         i_recalculateTravel = false;
         i_path = nullptr;
-        if (cOwner)
-            cOwner->SetCannotReachTarget();
         owner->ClearUnitState(UNIT_STATE_CHASE_MOVE);
         owner->SetInFront(target);
+
+        if (cOwner)
+            cOwner->SetCannotReachTarget();
+
         MovementInform(owner);
     }
 

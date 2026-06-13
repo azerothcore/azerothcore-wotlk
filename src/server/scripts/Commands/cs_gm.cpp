@@ -23,6 +23,7 @@
 #include "ObjectAccessor.h"
 #include "Opcodes.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "Realm.h"
 #include "World.h"
 #include "WorldSession.h"
@@ -38,14 +39,14 @@ public:
     {
         static ChatCommandTable gmCommandTable =
         {
-            { "chat",      HandleGMChatCommand,       SEC_GAMEMASTER,     Console::No  },
-            { "fly",       HandleGMFlyCommand,        SEC_GAMEMASTER,     Console::No  },
-            { "ingame",    HandleGMListIngameCommand, SEC_PLAYER,         Console::Yes },
-            { "list",      HandleGMListFullCommand,   SEC_ADMINISTRATOR,  Console::Yes },
-            { "visible",   HandleGMVisibleCommand,    SEC_GAMEMASTER,     Console::No  },
-            { "on",        HandleGMOnCommand,         SEC_MODERATOR,      Console::No  },
-            { "off",       HandleGMOffCommand,        SEC_MODERATOR,      Console::No  },
-            { "spectator", HandleGMSpectatorCommand,  SEC_GAMEMASTER,     Console::No  },
+            { "chat",      HandleGMChatCommand,       rbac::RBAC_PERM_COMMAND_GM_CHAT,    Console::No  },
+            { "fly",       HandleGMFlyCommand,        rbac::RBAC_PERM_COMMAND_GM_FLY,     Console::No  },
+            { "ingame",    HandleGMListIngameCommand, rbac::RBAC_PERM_COMMAND_GM_INGAME,  Console::Yes },
+            { "list",      HandleGMListFullCommand,   rbac::RBAC_PERM_COMMAND_GM_LIST,    Console::Yes },
+            { "visible",   HandleGMVisibleCommand,    rbac::RBAC_PERM_COMMAND_GM_VISIBLE, Console::No  },
+            { "on",        HandleGMOnCommand,         rbac::RBAC_PERM_COMMAND_GM,         Console::No  },
+            { "off",       HandleGMOffCommand,        rbac::RBAC_PERM_COMMAND_GM,         Console::No  },
+            { "spectator", HandleGMSpectatorCommand,  rbac::RBAC_PERM_COMMAND_GM,         Console::No  },
         };
         static ChatCommandTable commandTable =
         {

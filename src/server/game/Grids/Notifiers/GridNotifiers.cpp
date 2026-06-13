@@ -131,12 +131,6 @@ inline void CreatureUnitRelocationWorker(Creature* c, Unit* u)
         return;
     }
 
-    // Prevents AI reaction when immunity flags are active
-    if (c->IsImmuneToNPC())
-    {
-        return;
-    }
-
     if (!c->HasUnitState(UNIT_STATE_SIGHTLESS))
     {
         if (c->IsAIEnabled && c->CanSeeOrDetect(u, false, true))
@@ -198,7 +192,7 @@ void MessageDistDeliverer::Visit(VisiblePlayersMap const& m)
     for (auto const& kvPair : m)
     {
         Player const* target = kvPair.second;
-        if (i_distSq != 0.0f && target->m_seer->GetExactDist2dSq(i_source) > i_distSq)
+        if (i_distSq != 0.0f && target->GetSightPosition().GetExactDist2dSq(i_source) > i_distSq)
             continue;
 
         // @todo: Might not need this check anymore

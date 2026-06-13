@@ -19,6 +19,7 @@
 #include "CommandScript.h"
 #include "Language.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "WorldSession.h"
 
 using namespace Acore::ChatCommands;
@@ -32,14 +33,14 @@ public:
     {
         static ChatCommandTable cheatCommandTable =
         {
-            { "god",       HandleGodModeCheatCommand,   SEC_GAMEMASTER, Console::No },
-            { "casttime",  HandleCasttimeCheatCommand,  SEC_GAMEMASTER, Console::No },
-            { "cooldown",  HandleCoolDownCheatCommand,  SEC_GAMEMASTER, Console::No },
-            { "power",     HandlePowerCheatCommand,     SEC_GAMEMASTER, Console::No },
-            { "waterwalk", HandleWaterWalkCheatCommand, SEC_GAMEMASTER, Console::No },
-            { "status",    HandleCheatStatusCommand,    SEC_GAMEMASTER, Console::No },
-            { "taxi",      HandleTaxiCheatCommand,      SEC_GAMEMASTER, Console::No },
-            { "explore",   HandleExploreCheatCommand,   SEC_GAMEMASTER, Console::No }
+            { "god",       HandleGodModeCheatCommand,   rbac::RBAC_PERM_COMMAND_CHEAT_GOD,       Console::No },
+            { "casttime",  HandleCasttimeCheatCommand,  rbac::RBAC_PERM_COMMAND_CHEAT_CASTTIME,  Console::No },
+            { "cooldown",  HandleCoolDownCheatCommand,  rbac::RBAC_PERM_COMMAND_CHEAT_COOLDOWN,  Console::No },
+            { "power",     HandlePowerCheatCommand,     rbac::RBAC_PERM_COMMAND_CHEAT_POWER,     Console::No },
+            { "waterwalk", HandleWaterWalkCheatCommand, rbac::RBAC_PERM_COMMAND_CHEAT_WATERWALK, Console::No },
+            { "status",    HandleCheatStatusCommand,    rbac::RBAC_PERM_COMMAND_CHEAT_STATUS,    Console::No },
+            { "taxi",      HandleTaxiCheatCommand,      rbac::RBAC_PERM_COMMAND_CHEAT_TAXI,      Console::No },
+            { "explore",   HandleExploreCheatCommand,   rbac::RBAC_PERM_COMMAND_CHEAT_EXPLORE,   Console::No }
         };
 
         static ChatCommandTable commandTable =

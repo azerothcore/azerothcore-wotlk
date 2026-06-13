@@ -74,11 +74,6 @@ public:
 
     void InitializeAI() override
     {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-
         Reset();
     }
 
