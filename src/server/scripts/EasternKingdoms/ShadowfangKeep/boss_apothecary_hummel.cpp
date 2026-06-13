@@ -87,12 +87,7 @@ public:
     struct boss_apothecary_hummelAI : public BossAI
     {
         boss_apothecary_hummelAI(Creature* creature) : BossAI(creature, DATA_APOTHECARY_HUMMEL), _deadCount(0), _isDead(false)
-        {
-            scheduler.SetValidator([this]
-            {
-                return !me->HasUnitState(UNIT_STATE_CASTING);
-            });
-        }
+        {        }
 
         void sGossipSelect(Player* player, uint32 menuId, uint32 gossipListId) override
         {
@@ -113,6 +108,7 @@ public:
             me->SetFaction(FACTION_FRIENDLY);
             me->SummonCreatureGroup(1);
             me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         }
 
         void DoAction(int32 action) override

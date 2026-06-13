@@ -29,31 +29,7 @@ namespace Movement
 {
     UnitMoveType SelectSpeedType(uint32 moveFlags)
     {
-        if (moveFlags & MOVEMENTFLAG_FLYING)
-        {
-            if (moveFlags & MOVEMENTFLAG_BACKWARD /*&& speed_obj.flight >= speed_obj.flight_back*/)
-                return MOVE_FLIGHT_BACK;
-            else
-                return MOVE_FLIGHT;
-        }
-        else if (moveFlags & MOVEMENTFLAG_SWIMMING)
-        {
-            if (moveFlags & MOVEMENTFLAG_BACKWARD /*&& speed_obj.swim >= speed_obj.swim_back*/)
-                return MOVE_SWIM_BACK;
-            else
-                return MOVE_SWIM;
-        }
-        else if (moveFlags & MOVEMENTFLAG_WALKING)
-        {
-            //if (speed_obj.run > speed_obj.walk)
-            return MOVE_WALK;
-        }
-        else if (moveFlags & MOVEMENTFLAG_BACKWARD /*&& speed_obj.run >= speed_obj.run_back*/)
-            return MOVE_RUN_BACK;
-
-        // Flying creatures use MOVEMENTFLAG_CAN_FLY or MOVEMENTFLAG_DISABLE_GRAVITY
-        // Run speed is their default flight speed.
-        return MOVE_RUN;
+        return MovementInfo::GetSpeedType(moveFlags);
     }
 
     int32 MoveSplineInit::Launch()
@@ -221,6 +197,25 @@ namespace Movement
 
         args.facing.angle = G3D::wrap(angle, 0.f, (float)G3D::twoPi());
         args.flags.EnableFacingAngle();
+    }
+
+    void MoveSplineInit::MoveTo(Vector3 const& start, Vector3 const& dest, bool generatePath, bool forceDestination)
+    {
+        if (generatePath)
+        {
+            PathGenerator path(unit);
+            bool result = path.CalculatePath(start.x, start.y, start.z, dest.x, dest.y, dest.z, forceDestination);
+            if (result && !(path.GetPathType() & PATHFIND_NOPATH))
+            {
+                MovebyPath(path.GetPath());
+                return;
+            }
+        }
+
+        args.path_Idx_offset = 0;
+        args.path.resize(2);
+        TransportPathTransform transform(unit, args.TransformForTransport);
+        args.path[1] = transform(dest);
     }
 
     void MoveSplineInit::MoveTo(const Vector3& dest, bool generatePath, bool forceDestination)

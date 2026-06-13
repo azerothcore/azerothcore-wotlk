@@ -20,7 +20,6 @@
 #include "DetourCommon.h"
 #include "Geometry.h"
 #include "Log.h"
-#include "MMapFactory.h"
 #include "MMapMgr.h"
 #include "Map.h"
 #include "Metric.h"
@@ -34,12 +33,10 @@ PathGenerator::PathGenerator(WorldObject const* owner) :
 {
     memset(_pathPolyRefs, 0, sizeof(_pathPolyRefs));
 
-    uint32 mapId = _source->GetMapId();
     //if (sDisableMgr->IsPathfindingEnabled(_sourceUnit->FindMap()))
     {
-        MMAP::MMapMgr* mmap = MMAP::MMapFactory::createOrGetMMapMgr();
-        _navMesh = mmap->GetNavMesh(mapId);
-        _navMeshQuery = mmap->GetNavMeshQuery(mapId, _source->GetInstanceId());
+        _navMesh = _source->GetMap()->GetMapCollisionData().GetMMapData().GetNavMesh();
+        _navMeshQuery = _source->GetMap()->GetMapCollisionData().GetMMapData().GetNavMeshQuery();
     }
 
     CreateFilter();
