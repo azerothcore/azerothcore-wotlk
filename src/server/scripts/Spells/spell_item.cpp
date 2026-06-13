@@ -344,7 +344,7 @@ class spell_item_mind_amplify_dish : public SpellScript
         if (!caster || !target)
             return;
 
-        uint32 charmSpell = target->IsPlayer() ? SPELL_MIND_CONTROL_CAP_CHARM_10S : SPELL_MIND_CONTROL_CAP_CHARM_30S;
+        uint32 charmSpell = GetSpellInfo()->Id == SPELL_AMPLIFICATION_DISH ? SPELL_MIND_CONTROL_CAP_CHARM_10S : SPELL_MIND_CONTROL_CAP_CHARM_30S;
 
         // 5% of the time - Backfire
         // 65% of the time - Successful Mind Control.
