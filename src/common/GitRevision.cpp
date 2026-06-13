@@ -81,25 +81,25 @@ char const* GitRevision::GetMySQLExecutable()
 
 char const* GitRevision::GetFullVersion()
 {
-    return VER_COMPANYNAME_STR " rev. " VER_PRODUCTVERSION_STR " (" AZEROTH_PLATFORM_STR ", " _BUILD_DIRECTIVE ", " ACORE_LINKAGE_TYPE_STR ")"; // cppcheck-suppress unknownMacro
+    return AC_COMPANYNAME_STR " rev. " AC_PRODUCTVERSION_STR " (" AZEROTH_PLATFORM_STR ", " AC_BUILD_TYPE ", " ACORE_LINKAGE_TYPE_STR ")"; // cppcheck-suppress unknownMacro
 }
 
 char const* GitRevision::GetCompanyNameStr()
 {
-    return VER_COMPANYNAME_STR;
+    return AC_COMPANYNAME_STR;
 }
 
 char const* GitRevision::GetLegalCopyrightStr()
 {
-    return VER_LEGALCOPYRIGHT_STR;
+    return AC_LEGALCOPYRIGHT_STR;
 }
 
 char const* GitRevision::GetFileVersionStr()
 {
-    return VER_FILEVERSION_STR;
+    return AC_FILEVERSION_STR;
 }
 
 char const* GitRevision::GetProductVersionStr()
 {
-    return VER_PRODUCTVERSION_STR;
+    return AC_PRODUCTVERSION_STR;
 }

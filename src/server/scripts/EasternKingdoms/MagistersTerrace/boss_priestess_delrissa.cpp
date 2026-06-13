@@ -129,6 +129,10 @@ struct boss_priestess_delrissa : public BossAI
         Talk(SAY_AGGRO);
         _JustEngagedWith();
 
+        // Prevent Splitting
+        DoZoneInCombat();
+        summons.DoZoneInCombat();
+
         ScheduleTimedEvent(15s, [&] {
             if (Unit* target = DoSelectLowestHpFriendly(40.0f, 1000))
                 DoCast(target, SPELL_FLASH_HEAL);
@@ -235,16 +239,14 @@ struct boss_priestess_lackey_commonAI : public ScriptedAI
 
     void RecalculateThreat()
     {
-        ThreatContainer::StorageType const& tList = me->GetThreatMgr().GetThreatList();
-        for (auto const& ref : tList)
+        for (ThreatReference const* ref : me->GetThreatMgr().GetUnsortedThreatList())
         {
-            Unit* pUnit = ObjectAccessor::GetUnit(*me, ref->getUnitGuid());
+            Unit* pUnit = ref->GetVictim();
             if (pUnit && pUnit->IsPlayer() && me->GetThreatMgr().GetThreat(pUnit))
             {
                 float threatMod = GetThreatMod(me->GetDistance2d(pUnit), (float)pUnit->GetArmor(), pUnit->GetHealth(), pUnit->GetMaxHealth(), pUnit);
-                me->GetThreatMgr().ModifyThreatByPercent(pUnit, -100);
-                if (HostileReference* ref = me->GetThreatMgr().GetOnlineContainer().getReferenceByTarget(pUnit))
-                    ref->AddThreat(10000000.0f * threatMod);
+                me->GetThreatMgr().ResetThreat(pUnit);
+                me->GetThreatMgr().AddThreat(pUnit, 10000000.0f * threatMod, nullptr, true, true);
             }
         }
     }

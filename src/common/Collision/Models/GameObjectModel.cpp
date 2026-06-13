@@ -24,6 +24,7 @@
 #include "VMapFactory.h"
 #include "VMapMgr2.h"
 #include "WorldModel.h"
+#include "WorldModelStore.h"
 
 using G3D::Vector3;
 using G3D::Ray;
@@ -101,14 +102,6 @@ void LoadGameObjectModelList(std::string const& dataPath)
     LOG_INFO("server.loading", " ");
 }
 
-GameObjectModel::~GameObjectModel()
-{
-    if (iModel)
-    {
-        VMAP::VMapFactory::createOrGetVMapMgr()->releaseModelInstance(name);
-    }
-}
-
 bool GameObjectModel::initialize(std::unique_ptr<GameObjectModelOwnerBase> modelOwner, std::string const& dataPath)
 {
     ModelList::const_iterator it = model_list.find(modelOwner->GetDisplayId());
@@ -125,7 +118,7 @@ bool GameObjectModel::initialize(std::unique_ptr<GameObjectModelOwnerBase> model
         return false;
     }
 
-    iModel = VMAP::VMapFactory::createOrGetVMapMgr()->acquireModelInstance(dataPath + "vmaps/", it->second.name,
+    iModel = sWorldModelStore->AcquireModelInstance(dataPath + "vmaps/", it->second.name,
         it->second.isWmo ? VMAP::ModelFlags::MOD_WORLDSPAWN : VMAP::ModelFlags::MOD_M2);
 
     if (!iModel)

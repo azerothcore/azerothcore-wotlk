@@ -215,12 +215,18 @@ public:
 
     bool OnGossipHello(Player* player, Creature* creature) override
     {
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
         Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
         if (!wintergrasp)
             return true;
+
+        if (!player->IsAlive())
+        {
+            wintergrasp->SendAreaSpiritHealerQueryOpcode(player, creature->GetGUID());
+            player->CastSpell(player, SPELL_WAITING_FOR_RESURRECT, true);
+        }
+
+        if (creature->IsQuestGiver())
+            player->PrepareQuestMenu(creature->GetGUID());
 
         GraveyardVect graveyard = wintergrasp->GetGraveyardVector();
         for (uint8 i = 0; i < graveyard.size(); i++)
@@ -859,8 +865,12 @@ public:
 
         bool IsFriendly(Unit* passenger)
         {
-            return ((me->GetUInt32Value(GAMEOBJECT_FACTION) == WintergraspFaction[TEAM_HORDE] && passenger->getRaceMask() & RACEMASK_HORDE) ||
-                    (me->GetUInt32Value(GAMEOBJECT_FACTION) == WintergraspFaction[TEAM_ALLIANCE] && passenger->getRaceMask() & RACEMASK_ALLIANCE));
+            Player* player = passenger->ToPlayer();
+            if (!player)
+                return false;
+
+            TeamId goTeam = me->GetUInt32Value(GAMEOBJECT_FACTION) == WintergraspFaction[TEAM_HORDE] ? TEAM_HORDE : TEAM_ALLIANCE;
+            return player->GetTeamId() == goTeam;
         }
 
         Creature* IsValidVehicle(Creature* cVeh)
@@ -1157,6 +1167,10 @@ public:
     {
         Battlefield* wintergrasp = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
         if (!wintergrasp)
+            return false;
+
+        // Attacker-only achievement -- defenders winning fast must not qualify.
+        if (!sBattlefieldMgr->IsWintergraspAttackerVictory())
             return false;
 
         return wintergrasp->GetTimer() >= (20 * MINUTE * IN_MILLISECONDS);
