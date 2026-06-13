@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -98,6 +98,14 @@ namespace lfg
         LFG_ANSWER_PENDING                           = -1,
         LFG_ANSWER_DENY                              = 0,
         LFG_ANSWER_AGREE                             = 1
+    };
+
+    enum LfgRandomDungeonIds : uint32
+    {
+        RANDOM_DUNGEON_NORMAL_TBC                    = 259,
+        RANDOM_DUNGEON_HEROIC_TBC                    = 260,
+        RANDOM_DUNGEON_NORMAL_WOTLK                  = 261,
+        RANDOM_DUNGEON_HEROIC_WOTLK                  = 262
     };
 
     class Lfg5Guids;

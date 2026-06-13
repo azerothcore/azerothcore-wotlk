@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -62,10 +62,18 @@ struct npc_pet_mage_mirror_image : CasterAI
     ObjectGuid _ebonGargoyleGUID;
     uint32 checktarget;
     uint32 dist = urand(1, 5);
+    bool _delayAttack;
 
     void InitializeAI() override
     {
         CasterAI::InitializeAI();
+
+        _delayAttack = true;
+        me->m_Events.AddEventAtOffset([this]()
+        {
+            _delayAttack = false;
+        }, 1200ms);
+
         Unit* owner = me->GetOwner();
         if (!owner)
             return;
@@ -98,12 +106,10 @@ struct npc_pet_mage_mirror_image : CasterAI
 
         // Xinef: Inherit Master's Threat List (not yet implemented)
         //owner->CastSpell((Unit*)nullptr, SPELL_MAGE_MASTERS_THREAT_LIST, true);
-        HostileReference* ref = owner->getHostileRefMgr().getFirst();
-        while (ref)
+        for (auto const& pair : owner->GetThreatMgr().GetThreatenedByMeList())
         {
-            if (Unit* unit = ref->GetSource()->GetOwner())
-                unit->AddThreat(me, ref->GetThreat() - ref->getTempThreatModifier());
-            ref = ref->next();
+            if (Unit* unit = pair.second->GetOwner())
+                unit->GetThreatMgr().AddThreat(me, pair.second->GetThreat());
         }
 
         _ebonGargoyleGUID.Clear();
@@ -130,7 +136,7 @@ struct npc_pet_mage_mirror_image : CasterAI
                     newAura->SetDuration(visAura->GetDuration());
             }
 
-        me->m_Events.AddEvent(new DeathEvent(*me), me->m_Events.CalculateTime(29500));
+        me->m_Events.AddEventAtOffset(new DeathEvent(*me), 29500ms);
     }
 
     // Do not reload Creature templates on evade mode enter - prevent visual lost
@@ -163,7 +169,7 @@ struct npc_pet_mage_mirror_image : CasterAI
         {
             Unit* selection = owner->ToPlayer()->GetSelectedUnit();
 
-            if (selection)
+            if (selection && me->CanSeeOrDetect(selection))
             {
                 me->GetThreatMgr().ResetAllThreat();
                 me->AddThreat(selection, 1000000.0f);
@@ -185,9 +191,10 @@ struct npc_pet_mage_mirror_image : CasterAI
 
     void UpdateAI(uint32 diff) override
     {
-        events.Update(diff);
-        if (events.GetTimer() < 1200)
+        if (_delayAttack)
             return;
+
+        events.Update(diff);
 
         if (!me->IsInCombat() || !me->GetVictim())
         {
@@ -199,10 +206,10 @@ struct npc_pet_mage_mirror_image : CasterAI
 
         if (checktarget >= 1000)
         {
-            if (me->GetVictim()->HasBreakableByDamageCrowdControlAura() || !me->GetVictim()->IsAlive())
+            if (!me->GetVictim()->IsAlive() || me->GetVictim()->HasBreakableByDamageCrowdControlAura() || !me->CanSeeOrDetect(me->GetVictim()))
             {
                 MySelectNextTarget();
-                me->InterruptNonMeleeSpells(true); // Stop casting if target is CC or not Alive.
+                me->InterruptNonMeleeSpells(true);
                 return;
             }
         }
@@ -212,7 +219,7 @@ struct npc_pet_mage_mirror_image : CasterAI
 
         if (uint32 spellId = events.ExecuteEvent())
         {
-            events.RescheduleEvent(spellId, spellId == 59637 ? 6500 : 2500);
+            events.RescheduleEvent(spellId, spellId == 59637 ? 6500ms : 2500ms);
             me->CastSpell(me->GetVictim(), spellId, false);
         }
     }

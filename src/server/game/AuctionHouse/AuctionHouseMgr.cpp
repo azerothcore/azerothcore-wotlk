@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -153,6 +153,10 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry* auction, CharacterDatabas
                 .AddItem(pItem)
                 .SendMailTo(trans, MailReceiver(bidder, auction->bidder.GetCounter()), auction, MAIL_CHECK_MASK_COPIED);
         }
+
+        LOG_INFO("entities.player.auctionhouse", "AuctionHouse: Auction #{} won: Bidder {} (GUID: {}), Item (Entry: {}) x{}, Bid: {} copper, Seller: {}",
+            auction->Id, bidder ? bidder->GetName() : "offline", auction->bidder.GetCounter(),
+            auction->item_template, auction->itemCount, auction->bid, auction->owner.GetCounter());
     }
     else
         RemoveAItem(auction->item_guid, true, &trans);
@@ -212,6 +216,11 @@ void AuctionHouseMgr::SendAuctionSuccessfulMail(AuctionEntry* auction, Character
             .AddMoney(profit)
             .SendMailTo(trans, MailReceiver(owner, auction->owner.GetCounter()), auction, MAIL_CHECK_MASK_COPIED, sWorld->getIntConfig(CONFIG_MAIL_DELIVERY_DELAY));
 
+        LOG_INFO("entities.player.auctionhouse", "AuctionHouse: Auction #{} sold: Seller {} (GUID: {}), Buyer: {} (GUID: {}), Item (Entry: {}) x{}, Sale Price: {} copper, Profit: {} copper (cut: {} copper)",
+            auction->Id, owner ? owner->GetName() : "offline", auction->owner.GetCounter(),
+            auction->bidder.GetCounter(), auction->item_template, auction->itemCount,
+            auction->bid, profit, auction->GetAuctionCut());
+
         if (auction->bid >= 500 * GOLD)
             if (CharacterCacheEntry const* gpd = sCharacterCache->GetCharacterCacheByGuid(auction->bidder))
             {
@@ -254,6 +263,10 @@ void AuctionHouseMgr::SendAuctionExpiredMail(AuctionEntry* auction, CharacterDat
                 .AddItem(pItem)
                 .SendMailTo(trans, MailReceiver(owner, auction->owner.GetCounter()), auction, MAIL_CHECK_MASK_COPIED, 0);
         }
+
+        LOG_INFO("entities.player.auctionhouse", "AuctionHouse: Auction #{} expired: Seller {} (GUID: {}), Item (Entry: {}) x{}, Buyout was: {} copper",
+            auction->Id, owner ? owner->GetName() : "offline", auction->owner.GetCounter(),
+            auction->item_template, auction->itemCount, auction->buyout);
     }
     else
         RemoveAItem(auction->item_guid, true, &trans);

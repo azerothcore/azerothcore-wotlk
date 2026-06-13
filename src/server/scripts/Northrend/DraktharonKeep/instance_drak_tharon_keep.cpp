@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -31,50 +31,39 @@ DoorData const doorData[] =
     { 0,                    0,                      DOOR_TYPE_ROOM }
 };
 
-class instance_drak_tharon_keep : public InstanceMapScript
+struct instance_drak_tharon_keep : public InstanceScript
 {
-public:
-    instance_drak_tharon_keep() : InstanceMapScript("instance_drak_tharon_keep", MAP_DRAK_THARON_KEEP) { }
-
-    struct instance_drak_tharon_keep_InstanceScript : public InstanceScript
+    instance_drak_tharon_keep(Map* map) : InstanceScript(map)
     {
-        instance_drak_tharon_keep_InstanceScript(Map* map) : InstanceScript(map)
-        {
-            SetHeaders(DataHeader);
-            SetBossNumber(MAX_ENCOUNTERS);
-            LoadDoorData(doorData);
-        }
+        SetHeaders(DataHeader);
+        SetBossNumber(MAX_ENCOUNTERS);
+        LoadDoorData(doorData);
+    }
 
-        void OnGameObjectCreate(GameObject* go) override
-        {
-            switch (go->GetEntry())
-            {
-                case GO_NOVOS_CRYSTAL_1:
-                case GO_NOVOS_CRYSTAL_2:
-                case GO_NOVOS_CRYSTAL_3:
-                case GO_NOVOS_CRYSTAL_4:
-                    AddDoor(go);
-                    break;
-            }
-        }
-
-        void OnGameObjectRemove(GameObject* go) override
-        {
-            switch (go->GetEntry())
-            {
-                case GO_NOVOS_CRYSTAL_1:
-                case GO_NOVOS_CRYSTAL_2:
-                case GO_NOVOS_CRYSTAL_3:
-                case GO_NOVOS_CRYSTAL_4:
-                    RemoveDoor(go);
-                    break;
-            }
-        }
-    };
-
-    InstanceScript* GetInstanceScript(InstanceMap* map) const override
+    void OnGameObjectCreate(GameObject* go) override
     {
-        return new instance_drak_tharon_keep_InstanceScript(map);
+        switch (go->GetEntry())
+        {
+            case GO_NOVOS_CRYSTAL_1:
+            case GO_NOVOS_CRYSTAL_2:
+            case GO_NOVOS_CRYSTAL_3:
+            case GO_NOVOS_CRYSTAL_4:
+                AddDoor(go);
+                break;
+        }
+    }
+
+    void OnGameObjectRemove(GameObject* go) override
+    {
+        switch (go->GetEntry())
+        {
+            case GO_NOVOS_CRYSTAL_1:
+            case GO_NOVOS_CRYSTAL_2:
+            case GO_NOVOS_CRYSTAL_3:
+            case GO_NOVOS_CRYSTAL_4:
+                RemoveDoor(go);
+                break;
+        }
     }
 };
 
@@ -89,7 +78,7 @@ class spell_dtk_raise_dead_aura : public AuraScript
 
     void HandleEffectRemove(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        GetUnitOwner()->ToCreature()->DespawnOrUnsummon(1);
+        GetUnitOwner()->ToCreature()->DespawnOrUnsummon(1ms);
         GetUnitOwner()->SummonCreature(NPC_RISEN_DRAKKARI_WARRIOR, *GetUnitOwner());
     }
 
@@ -121,7 +110,7 @@ class spell_dtk_summon_random_drakkari : public SpellScript
 
 void AddSC_instance_drak_tharon_keep()
 {
-    new instance_drak_tharon_keep();
+    RegisterInstanceScript(instance_drak_tharon_keep, MAP_DRAK_THARON_KEEP);
     RegisterSpellScript(spell_dtk_raise_dead_aura);
     RegisterSpellScript(spell_dtk_summon_random_drakkari);
 }

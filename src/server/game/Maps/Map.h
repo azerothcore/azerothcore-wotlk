@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -23,9 +23,11 @@
 #include "DataMap.h"
 #include "Define.h"
 #include "DynamicTree.h"
+#include "EventProcessor.h"
 #include "GameObjectModel.h"
 #include "GridDefines.h"
 #include "GridRefMgr.h"
+#include "MapCollisionData.h"
 #include "MapGridManager.h"
 #include "MapRefMgr.h"
 #include "ObjectDefines.h"
@@ -33,12 +35,13 @@
 #include "PathGenerator.h"
 #include "Position.h"
 #include "SharedDefines.h"
-#include "TaskScheduler.h"
+#include "SpawnData.h"
 #include "Timer.h"
 #include "GridTerrainData.h"
 #include <bitset>
 #include <list>
 #include <memory>
+#include <set>
 #include <shared_mutex>
 
 class Unit;
@@ -172,7 +175,7 @@ public:
     // currently unused for normal maps
     bool CanUnload(uint32 diff)
     {
-        if (!m_unloadTimer)
+        if (!m_unloadTimer || Events.HasEvents())
             return false;
 
         if (m_unloadTimer <= diff)
@@ -230,8 +233,6 @@ public:
 
     [[nodiscard]] Map const* GetParent() const { return m_parentMap; }
 
-    // pussywizard: movemaps, mmaps
-    [[nodiscard]] std::shared_mutex& GetMMapLock() const { return *(const_cast<std::shared_mutex*>(&MMapLock)); }
     // pussywizard:
     std::unordered_set<Unit*> i_objectsForDelayedVisibility;
     void HandleDelayedVisibility();
@@ -239,12 +240,13 @@ public:
     // some calls like isInWater should not use vmaps due to processor power
     // can return INVALID_HEIGHT if under z+2 z coord not found height
     [[nodiscard]] float GetHeight(float x, float y, float z, bool checkVMap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const;
+    [[nodiscard]] float GetHeight(Position const& pos, bool checkVMap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const { return GetHeight(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), checkVMap, maxSearchDist); }
     [[nodiscard]] float GetGridHeight(float x, float y) const;
     [[nodiscard]] float GetMinHeight(float x, float y) const;
     Transport* GetTransportForPos(uint32 phase, float x, float y, float z, WorldObject* worldobject = nullptr);
 
-    void GetFullTerrainStatusForPosition(uint32 phaseMask, float x, float y, float z, float collisionHeight, PositionFullTerrainStatus& data, uint8 reqLiquidType = MAP_ALL_LIQUIDS);
-    LiquidData const GetLiquidData(uint32 phaseMask, float x, float y, float z, float collisionHeight, uint8 ReqLiquidType);
+    void GetFullTerrainStatusForPosition(uint32 phaseMask, float x, float y, float z, float collisionHeight, PositionFullTerrainStatus& data, Optional<uint8> reqLiquidType = {});
+    LiquidData const GetLiquidData(uint32 phaseMask, float x, float y, float z, float collisionHeight, Optional<uint8> ReqLiquidType);
 
     [[nodiscard]] bool GetAreaInfo(uint32 phaseMask, float x, float y, float z, uint32& mogpflags, int32& adtId, int32& rootId, int32& groupId) const;
     [[nodiscard]] uint32 GetAreaId(uint32 phaseMask, float x, float y, float z) const;
@@ -318,7 +320,8 @@ public:
     void markCell(uint32 pCellId) { marked_cells.set(pCellId); }
 
     [[nodiscard]] bool HavePlayers() const { return !m_mapRefMgr.IsEmpty(); }
-    [[nodiscard]] uint32 GetPlayersCountExceptGMs() const;
+    // When aliveOnly is true, counts only players that are alive and not in Spirit of Redemption form.
+    [[nodiscard]] uint32 GetPlayersCountExceptGMs(bool aliveOnly = false) const;
 
     void SendToPlayers(WorldPacket const* data) const;
 
@@ -337,13 +340,14 @@ public:
     GameObject* SummonGameObject(uint32 entry, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime, bool checkTransport = true);
     GameObject* SummonGameObject(uint32 entry, Position const& pos, float rotation0 = 0.0f, float rotation1 = 0.0f, float rotation2 = 0.0f, float rotation3 = 0.0f, uint32 respawnTime = 100, bool checkTransport = true);
     void SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list = nullptr);
+    void SummonGameObjectGroup(uint8 group, std::list<GameObject*>* list = nullptr);
 
-    Corpse* GetCorpse(ObjectGuid const guid);
-    Creature* GetCreature(ObjectGuid const guid);
-    GameObject* GetGameObject(ObjectGuid const guid);
-    Transport* GetTransport(ObjectGuid const guid);
-    DynamicObject* GetDynamicObject(ObjectGuid const guid);
-    Pet* GetPet(ObjectGuid const guid);
+    Corpse* GetCorpse(ObjectGuid const& guid);
+    Creature* GetCreature(ObjectGuid const& guid);
+    GameObject* GetGameObject(ObjectGuid const& guid);
+    Transport* GetTransport(ObjectGuid const& guid);
+    DynamicObject* GetDynamicObject(ObjectGuid const& guid);
+    Pet* GetPet(ObjectGuid const& guid);
 
     MapStoredObjectTypesContainer& GetObjectsStore() { return _objectsStore; }
 
@@ -387,15 +391,14 @@ public:
     bool CanReachPositionAndGetValidCoords(WorldObject const* source, float &destX, float &destY, float &destZ, bool failOnCollision = true, bool failOnSlopes = true) const;
     bool CanReachPositionAndGetValidCoords(WorldObject const* source, float startX, float startY, float startZ, float &destX, float &destY, float &destZ, bool failOnCollision = true, bool failOnSlopes = true) const;
     bool CheckCollisionAndGetValidCoords(WorldObject const* source, float startX, float startY, float startZ, float &destX, float &destY, float &destZ, bool failOnCollision = true) const;
-    void Balance() { _dynamicTree.balance(); }
-    void RemoveGameObjectModel(const GameObjectModel& model) { _dynamicTree.remove(model); }
-    void InsertGameObjectModel(const GameObjectModel& model) { _dynamicTree.insert(model); }
-    [[nodiscard]] bool ContainsGameObjectModel(const GameObjectModel& model) const { return _dynamicTree.contains(model);}
-    [[nodiscard]] DynamicMapTree const& GetDynamicMapTree() const { return _dynamicTree; }
-    bool GetObjectHitPos(uint32 phasemask, float x1, float y1, float z1, float x2, float y2, float z2, float& rx, float& ry, float& rz, float modifyDist);
+    void Balance() { _mapCollisionData.GetDynamicTree().balance(); }
+    void RemoveGameObjectModel(const GameObjectModel& model) { _mapCollisionData.GetDynamicTree().remove(model); }
+    void InsertGameObjectModel(const GameObjectModel& model) { _mapCollisionData.GetDynamicTree().insert(model); }
+    [[nodiscard]] bool ContainsGameObjectModel(const GameObjectModel& model) const { return _mapCollisionData.GetDynamicTree().contains(model);}
+    [[nodiscard]] DynamicMapTree const& GetDynamicMapTree() const { return _mapCollisionData.GetDynamicTree(); }
     [[nodiscard]] float GetGameObjectFloor(uint32 phasemask, float x, float y, float z, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const
     {
-        return _dynamicTree.getHeight(x, y, z, maxSearchDist, phasemask);
+        return _mapCollisionData.GetDynamicTree().getHeight(x, y, z, maxSearchDist, phasemask);
     }
     /*
         RESPAWN TIMES
@@ -423,6 +426,8 @@ public:
     void RemoveCreatureRespawnTime(ObjectGuid::LowType dbGuid);
     void SaveGORespawnTime(ObjectGuid::LowType dbGuid, time_t& respawnTime);
     void RemoveGORespawnTime(ObjectGuid::LowType dbGuid);
+    [[nodiscard]] std::unordered_map<ObjectGuid::LowType, time_t> const& GetCreatureRespawnTimes() const { return _creatureRespawnTimes; }
+    [[nodiscard]] std::unordered_map<ObjectGuid::LowType, time_t> const& GetGORespawnTimes() const { return _goRespawnTimes; }
     void LoadRespawnTimes();
     void DeleteRespawnTimes();
     [[nodiscard]] time_t GetInstanceResetPeriod() const { return _instanceResetPeriod; }
@@ -430,7 +435,41 @@ public:
     void UpdatePlayerZoneStats(uint32 oldZone, uint32 newZone);
     [[nodiscard]] uint32 ApplyDynamicModeRespawnScaling(WorldObject const* obj, uint32 respawnDelay) const;
 
-    TaskScheduler _creatureRespawnScheduler;
+    bool SpawnGroupSpawn(uint32 groupId, bool ignoreRespawn = false, bool force = false);
+    bool SpawnGroupDespawn(uint32 groupId, bool deleteRespawnTimes = false);
+    [[nodiscard]] bool IsSpawnGroupActive(uint32 groupId) const;
+    void ProcessRespawns();
+    void ProcessCreatureRespawn(ObjectGuid::LowType spawnId);
+    void ProcessGameObjectRespawn(ObjectGuid::LowType spawnId);
+
+    [[nodiscard]] time_t GetRespawnTime(SpawnObjectType type, ObjectGuid::LowType spawnId) const
+    {
+        switch (type)
+        {
+            case SPAWN_TYPE_CREATURE:
+                return GetCreatureRespawnTime(spawnId);
+            case SPAWN_TYPE_GAMEOBJECT:
+                return GetGORespawnTime(spawnId);
+            default:
+                return time_t(0);
+        }
+    }
+    void RemoveRespawnTime(SpawnObjectType type, ObjectGuid::LowType spawnId)
+    {
+        switch (type)
+        {
+            case SPAWN_TYPE_CREATURE:
+                RemoveCreatureRespawnTime(spawnId);
+                break;
+            case SPAWN_TYPE_GAMEOBJECT:
+                RemoveGORespawnTime(spawnId);
+                break;
+            default:
+                break;
+        }
+    }
+
+    EventProcessor Events;
 
     void ScheduleCreatureRespawn(ObjectGuid /*creatureGuid*/, Milliseconds /*respawnTimer*/, Position pos = Position());
 
@@ -438,7 +477,7 @@ public:
     void DeleteCorpseData();
     void AddCorpse(Corpse* corpse);
     void RemoveCorpse(Corpse* corpse);
-    Corpse* ConvertCorpseToBones(ObjectGuid const ownerGuid, bool insignia = false);
+    Corpse* ConvertCorpseToBones(ObjectGuid const& ownerGuid, bool insignia = false);
     void RemoveOldCorpses();
 
     static void DeleteRespawnTimesInDB(uint16 mapId, uint32 instanceId);
@@ -514,6 +553,17 @@ public:
     void RemoveWorldObjectFromZoneWideVisibleMap(uint32 zoneId, WorldObject* obj);
     ZoneWideVisibleWorldObjectsSet const* GetZoneWideVisibleWorldObjectsForZone(uint32 zoneId) const;
 
+    [[nodiscard]] uint32 GetPlayerCountInZone(uint32 zoneId) const
+    {
+        if (auto const& it = _zonePlayerCountMap.find(zoneId); it != _zonePlayerCountMap.end())
+            return it->second;
+
+        return 0;
+    };
+
+    MapCollisionData& GetMapCollisionData() { return _mapCollisionData; }
+    MapCollisionData const& GetMapCollisionData()  const { return _mapCollisionData; }
+
 private:
 
     template<class T> void InitializeObject(T* obj);
@@ -541,15 +591,14 @@ protected:
     void AddToGrid(T* object, Cell const& cell);
 
     std::mutex Lock;
-    std::shared_mutex MMapLock;
 
     MapGridManager _mapGridManager;
     MapEntry const* i_mapEntry;
+    MapCollisionData _mapCollisionData;
     uint8 i_spawnMode;
     uint32 i_InstanceId;
     uint32 m_unloadTimer;
     float m_VisibleDistance;
-    DynamicMapTree _dynamicTree;
     time_t _instanceResetPeriod; // pussywizard
 
     MapRefMgr m_mapRefMgr;
@@ -590,6 +639,27 @@ private:
 
     std::unordered_map<ObjectGuid::LowType /*dbGUID*/, time_t> _creatureRespawnTimes;
     std::unordered_map<ObjectGuid::LowType /*dbGUID*/, time_t> _goRespawnTimes;
+
+    // Time-ordered index for ProcessRespawns() — avoids O(n) full scan.
+    // Based on TrinityCore's priority queue approach (r00ty-tc, 59db2eee).
+    struct RespawnEntry
+    {
+        time_t respawnTime;
+        SpawnObjectType type;
+        ObjectGuid::LowType spawnId;
+        bool operator<(RespawnEntry const& other) const
+        {
+            if (respawnTime != other.respawnTime)
+                return respawnTime < other.respawnTime;
+            if (type != other.type)
+                return type < other.type;
+            return spawnId < other.spawnId;
+        }
+    };
+    std::set<RespawnEntry> _respawnQueue;
+
+    std::unordered_set<uint32> _toggledSpawnGroupIds;
+    uint32 _respawnCheckTimer{0};
 
     std::unordered_map<uint32, uint32> _zonePlayerCountMap;
 

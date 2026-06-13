@@ -2,14 +2,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -75,7 +75,7 @@ struct boss_keristrasza : public BossAI
 
         me->CastSpell(me, SPELL_INTENSE_COLD, true);
         events.ScheduleEvent(EVENT_CRYSTALFIRE_BREATH, 14s);
-        events.ScheduleEvent(EVENT_CRYSTAL_CHAINS, DUNGEON_MODE(20000, 11000));
+        events.ScheduleEvent(EVENT_CRYSTAL_CHAINS, DUNGEON_MODE(20s, 11s));
         events.ScheduleEvent(EVENT_TAIL_SWEEP, 5s);
         events.ScheduleEvent(EVENT_HEALTH_CHECK, 1s);
         events.ScheduleEvent(EVENT_ACHIEVEMENT_CHECK, 1s);
@@ -89,7 +89,7 @@ struct boss_keristrasza : public BossAI
 
     void KilledUnit(Unit*) override
     {
-        if (events.GetNextEventTime(EVENT_KILL_TALK) == 0)
+        if (!events.HasTimeUntilEvent(EVENT_KILL_TALK))
         {
             Talk(SAY_SLAY);
             events.ScheduleEvent(EVENT_KILL_TALK, 6s);
@@ -174,7 +174,7 @@ struct boss_keristrasza : public BossAI
                 me->CastSpell(me, SPELL_CRYSTALIZE, false);
             else if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
                 me->CastSpell(target, SPELL_CRYSTAL_CHAINS, false);
-            events.ScheduleEvent(EVENT_CRYSTAL_CHAINS, DUNGEON_MODE(20000, 11000));
+            events.ScheduleEvent(EVENT_CRYSTAL_CHAINS, DUNGEON_MODE(20s, 11s));
             break;
         }
 

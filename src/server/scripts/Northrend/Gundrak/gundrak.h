@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -30,14 +30,19 @@ enum Data
     DATA_MOORABI                        = 1,
     DATA_DRAKKARI_COLOSSUS              = 2,
     DATA_GAL_DARAH                      = 3,
-    DATA_ECK_THE_FEROCIOUS_INIT         = 4,
-    DATA_ECK_THE_FEROCIOUS              = 5,
-    MAX_ENCOUNTERS                      = 6
+    DATA_ECK_THE_FEROCIOUS              = 4,
+    MAX_ENCOUNTERS                      = 5
 };
 
 enum Creatures
 {
+    NPC_RUINS_DWELLER                   = 29920,
     NPC_ECK_THE_FEROCIOUS               = 29932
+};
+
+enum GDTexts
+{
+    EMOTE_SUMMON_ECK                    = 0
 };
 
 enum GameObjects
@@ -65,5 +70,7 @@ inline AI* GetGundrakAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, GundrakScriptName);
 }
+
+#define RegisterGundrakCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetGundrakAI)
 
 #endif

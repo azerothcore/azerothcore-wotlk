@@ -1,19 +1,22 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+#ifndef ACORE_UNITDEFINES_H
+#define ACORE_UNITDEFINES_H
 
 #include "Define.h"
 #include "EnumFlag.h"
@@ -169,7 +172,7 @@ enum UnitState
 {
     UNIT_STATE_DIED                     = 0x00000001,       // player has fake death aura
     UNIT_STATE_MELEE_ATTACKING          = 0x00000002,       // player is melee attacking someone
-    //UNIT_STATE_MELEE_ATTACK_BY        = 0x00000004,       // player is melee attack by someone
+    UNIT_STATE_CHARMED                  = 0x00000004,       // having any kind of charm aura on self
     UNIT_STATE_STUNNED                  = 0x00000008,
     UNIT_STATE_ROAMING                  = 0x00000010,
     UNIT_STATE_CHASE                    = 0x00000020,
@@ -197,9 +200,11 @@ enum UnitState
     UNIT_STATE_IGNORE_PATHFINDING       = 0x10000000,       // do not use pathfinding in any MovementGenerator
     UNIT_STATE_NO_ENVIRONMENT_UPD       = 0x20000000,
 
-    UNIT_STATE_NO_COMBAT_MOVEMENT, // serverside only - should never be changed outside of core and hence shouldnt have a defined static value and be at the end
+    // serverside region
+    UNIT_STATE_NO_COMBAT_MOVEMENT       = 0x40000000,       // should not be changed outside the core and should be placed at the end
+    UNIT_STATE_LOGOUT_TIMER             = 0x80000000,       // Unit is logging out
 
-    UNIT_STATE_ALL_STATE_SUPPORTED = UNIT_STATE_DIED | UNIT_STATE_MELEE_ATTACKING | UNIT_STATE_STUNNED | UNIT_STATE_ROAMING | UNIT_STATE_CHASE
+    UNIT_STATE_ALL_STATE_SUPPORTED = UNIT_STATE_DIED | UNIT_STATE_MELEE_ATTACKING | UNIT_STATE_CHARMED | UNIT_STATE_STUNNED | UNIT_STATE_ROAMING | UNIT_STATE_CHASE
     | UNIT_STATE_FLEEING | UNIT_STATE_IN_FLIGHT | UNIT_STATE_FOLLOW | UNIT_STATE_ROOT | UNIT_STATE_CONFUSED
     | UNIT_STATE_DISTRACTED | UNIT_STATE_ISOLATED | UNIT_STATE_ATTACK_PLAYER | UNIT_STATE_CASTING
     | UNIT_STATE_POSSESSED | UNIT_STATE_CHARGING | UNIT_STATE_JUMPING | UNIT_STATE_MOVE | UNIT_STATE_ROTATING
@@ -412,6 +417,8 @@ enum MovementFlags
     MOVEMENTFLAG_MASK_PLAYER_ONLY =
     MOVEMENTFLAG_FLYING,
 
+    MOVEMENTFLAG_MASK_MOVING_OR_TURN = MOVEMENTFLAG_MASK_MOVING | MOVEMENTFLAG_MASK_TURNING,
+
     /// Movement flags that have change status opcodes associated for players
     MOVEMENTFLAG_MASK_HAS_PLAYER_STATUS_OPCODE = MOVEMENTFLAG_DISABLE_GRAVITY | MOVEMENTFLAG_ROOT |
     MOVEMENTFLAG_CAN_FLY | MOVEMENTFLAG_WATERWALKING | MOVEMENTFLAG_FALLING_SLOW | MOVEMENTFLAG_HOVER
@@ -483,3 +490,5 @@ enum SplineType
     SPLINETYPE_FACING_TARGET    = 3,
     SPLINETYPE_FACING_ANGLE     = 4
 };
+
+#endif // ACORE_UNITDEFINES_H

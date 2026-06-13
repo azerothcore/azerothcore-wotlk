@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -231,7 +231,9 @@ enum UnkorTheRuthless
     FACTION_HOSTILE                 = 45,
     QUEST_DONTKILLTHEFATONE         = 9889,
 
-    SPELL_PULVERIZE                 = 2676
+    SPELL_PULVERIZE                 = 2676,
+
+    SUBMIT_DURATION                 = 120000
 };
 
 class npc_unkor_the_ruthless : public CreatureScript
@@ -248,22 +250,28 @@ public:
     {
         npc_unkor_the_ruthlessAI(Creature* creature) : ScriptedAI(creature) { }
 
-        bool CanDoQuest;
-        uint32 UnkorUnfriendly_Timer;
-        uint32 Pulverize_Timer;
+        bool Submitted;
+        uint32 UnfriendlyTimer;
+        uint32 PulverizeTimer;
 
         void Reset() override
         {
-            CanDoQuest = false;
-            UnkorUnfriendly_Timer = 0;
-            Pulverize_Timer = 3000;
+            Submitted = false;
+            UnfriendlyTimer = 0;
+            PulverizeTimer = 3000;
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->SetFaction(FACTION_HOSTILE);
         }
 
         void JustEngagedWith(Unit* /*who*/) override { }
 
-        void DoNice()
+        bool HasQuestActive(Player* player) const
+        {
+            QuestStatus status = player->GetQuestStatus(QUEST_DONTKILLTHEFATONE);
+            return status == QUEST_STATUS_INCOMPLETE || status == QUEST_STATUS_COMPLETE;
+        }
+
+        void Submit()
         {
             Talk(SAY_SUBMIT);
             me->SetFaction(FACTION_FRIENDLY);
@@ -271,7 +279,8 @@ public:
             me->RemoveAllAuras();
             me->GetThreatMgr().ClearAllThreat();
             me->CombatStop(true);
-            UnkorUnfriendly_Timer = 60000;
+            Submitted = true;
+            UnfriendlyTimer = SUBMIT_DURATION;
         }
 
         void DamageTaken(Unit* done_by, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -280,61 +289,47 @@ public:
                 return;
 
             Player* player = done_by->ToPlayer();
-            if (player && me->HealthBelowPctDamaged(30, damage))
-            {
-                if (Group* group = player->GetGroup())
-                {
-                    for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
-                    {
-                        Player* groupie = itr->GetSource();
-                        if (groupie && groupie->IsInMap(player) &&
-                                groupie->GetQuestStatus(QUEST_DONTKILLTHEFATONE) == QUEST_STATUS_INCOMPLETE &&
-                                groupie->GetReqKillOrCastCurrentCount(QUEST_DONTKILLTHEFATONE, 18260) == 10)
-                        {
-                            groupie->AreaExploredOrEventHappens(QUEST_DONTKILLTHEFATONE);
-                            if (!CanDoQuest)
-                                CanDoQuest = true;
-                        }
-                    }
-                }
-                else if (player->GetQuestStatus(QUEST_DONTKILLTHEFATONE) == QUEST_STATUS_INCOMPLETE &&
-                         player->GetReqKillOrCastCurrentCount(QUEST_DONTKILLTHEFATONE, 18260) == 10)
-                {
-                    player->AreaExploredOrEventHappens(QUEST_DONTKILLTHEFATONE);
-                    CanDoQuest = true;
-                }
-            }
+            if (!player)
+                if (Unit* owner = done_by->GetOwner())
+                    player = owner->ToPlayer();
+            if (!player || !HasQuestActive(player))
+                return;
+
+            // Cap damage from quest holders so DoTs/pets/burst can't kill him.
+            if (damage >= me->GetHealth())
+                damage = me->GetHealth() - 1;
+
+            if (!me->HealthBelowPctDamaged(30, damage))
+                return;
+
+            player->GroupEventHappens(QUEST_DONTKILLTHEFATONE, me);
+
+            if (!Submitted)
+                Submit();
         }
 
         void UpdateAI(uint32 diff) override
         {
-            if (CanDoQuest)
+            if (Submitted)
             {
-                if (!UnkorUnfriendly_Timer)
+                if (UnfriendlyTimer <= diff)
                 {
-                    //DoCast(me, SPELL_QUID9889);        //not using spell for now
-                    DoNice();
+                    EnterEvadeMode();
+                    return;
                 }
-                else
-                {
-                    if (UnkorUnfriendly_Timer <= diff)
-                    {
-                        EnterEvadeMode();
-                        return;
-                    }
-                    else UnkorUnfriendly_Timer -= diff;
-                }
+                UnfriendlyTimer -= diff;
+                return;
             }
 
             if (!UpdateVictim())
                 return;
 
-            if (Pulverize_Timer <= diff)
+            if (PulverizeTimer <= diff)
             {
                 DoCast(me, SPELL_PULVERIZE);
-                Pulverize_Timer = 9000;
+                PulverizeTimer = 9000;
             }
-            else Pulverize_Timer -= diff;
+            else PulverizeTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
@@ -374,6 +369,7 @@ public:
     {
         npc_isla_starmaneAI(Creature* creature) : npc_escortAI(creature) { }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();
@@ -433,9 +429,9 @@ public:
         void JustEngagedWith(Unit*) override
         {
             events.Reset();
-            events.ScheduleEvent(EVENT_SPELL_WRATH, 0);
-            events.ScheduleEvent(EVENT_SPELL_MOONFIRE, 4000);
-            events.ScheduleEvent(EVENT_SPELL_ENTANGLING_ROOTS, 10000);
+            events.ScheduleEvent(EVENT_SPELL_WRATH, 0ms);
+            events.ScheduleEvent(EVENT_SPELL_MOONFIRE, 4s);
+            events.ScheduleEvent(EVENT_SPELL_ENTANGLING_ROOTS, 10s);
         }
 
         void UpdateEscortAI(uint32 diff) override
@@ -451,15 +447,15 @@ public:
             {
                 case EVENT_SPELL_WRATH:
                     me->CastSpell(me->GetVictim(), SPELL_WRATH, false);
-                    events.ScheduleEvent(EVENT_SPELL_WRATH, 3000);
+                    events.ScheduleEvent(EVENT_SPELL_WRATH, 3s);
                     break;
                 case EVENT_SPELL_MOONFIRE:
                     me->CastSpell(me->GetVictim(), SPELL_MOONFIRE, false);
-                    events.ScheduleEvent(EVENT_SPELL_MOONFIRE, 12000);
+                    events.ScheduleEvent(EVENT_SPELL_MOONFIRE, 12s);
                     break;
                 case EVENT_SPELL_ENTANGLING_ROOTS:
                     me->CastSpell(me->GetVictim(), SPELL_ENTANGLING_ROOTS, false);
-                    events.ScheduleEvent(EVENT_SPELL_ENTANGLING_ROOTS, 20000);
+                    events.ScheduleEvent(EVENT_SPELL_ENTANGLING_ROOTS, 20s);
                     break;
             }
 
@@ -473,7 +469,8 @@ public:
     {
         if (quest->GetQuestId() == QUEST_EFTW_H || quest->GetQuestId() == QUEST_EFTW_A)
         {
-            CAST_AI(npc_escortAI, (creature->AI()))->Start(true, false, player->GetGUID());
+            creature->SetWalk(true);
+            CAST_AI(npc_escortAI, (creature->AI()))->Start(true, player->GetGUID());
             creature->SetFaction(FACTION_ESCORTEE_N_NEUTRAL_ACTIVE);
         }
         return true;
@@ -572,38 +569,41 @@ private:
 };
 
 /*######
-## npc_slim
+## go_ancient_skull_pile
 ######*/
 
-enum Slim
+enum AncientSkullPile
 {
-    FACTION_CONSORTIUM  = 933
+    ITEM_TIME_LOST_OFFERING = 32720,
+    SPELL_SUMMON_TEROKK     = 41004,
+
+    GOSSIP_MENU_ANCIENT_SKULL_PILE        = 8687,
+    GOSSIP_MENU_TEXT_ANCIENT_SKULL_PILE   = 11058
 };
 
-class npc_slim : public CreatureScript
+class go_ancient_skull_pile : public GameObjectScript
 {
 public:
-    npc_slim() : CreatureScript("npc_slim") { }
+    go_ancient_skull_pile() : GameObjectScript("go_ancient_skull_pile") {}
 
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
+    bool OnGossipSelect(Player* player, GameObject* go, uint32 sender, uint32 /*action*/) override
     {
         ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_TRADE)
-            player->GetSession()->SendListInventory(creature->GetGUID());
 
+        if (sender == GOSSIP_SENDER_MAIN)
+        {
+            CloseGossipMenuFor(player);
+            if (player->HasItemCount(ITEM_TIME_LOST_OFFERING, 1))
+                go->DespawnOrUnsummon();
+            player->CastSpell(player, SPELL_SUMMON_TEROKK);
+        }
         return true;
     }
 
-    bool OnGossipHello(Player* player, Creature* creature) override
+    bool OnGossipHello(Player* player, GameObject* go) override
     {
-        if (creature->IsVendor() && player->GetReputationRank(FACTION_CONSORTIUM) >= REP_FRIENDLY)
-        {
-            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
-            SendGossipMenuFor(player, 9896, creature->GetGUID());
-        }
-        else
-            SendGossipMenuFor(player, 9895, creature->GetGUID());
-
+        AddGossipItemFor(player, GOSSIP_MENU_ANCIENT_SKULL_PILE, 0, GOSSIP_SENDER_MAIN, 0);
+        SendGossipMenuFor(player, GOSSIP_MENU_TEXT_ANCIENT_SKULL_PILE, go->GetGUID());
         return true;
     }
 };
@@ -620,5 +620,5 @@ void AddSC_terokkar_forest()
     new npc_unkor_the_ruthless();
     new npc_isla_starmane();
     new go_skull_pile();
-    new npc_slim();
+    new go_ancient_skull_pile();
 }

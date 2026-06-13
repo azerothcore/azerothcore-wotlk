@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -64,9 +64,13 @@ public:
 
     void JustRespawned() override;
 
+    bool IsEscortNPC(bool /*onlyIfActive*/ = true) const override { return true; }
+
     void ReturnToLastPoint();
 
     void EnterEvadeMode(EvadeReason /*why*/ = EVADE_REASON_OTHER) override;
+
+    void JustExitedCombat() override;
 
     void UpdateAI(uint32 diff) override;                   //the "internal" update, calls UpdateEscortAI()
     virtual void UpdateEscortAI(uint32 diff);     //used when it's needed to add code in update (abilities, scripted events, etc)
@@ -87,12 +91,12 @@ public:
 
     void GenerateWaypointArray(Movement::PointsArray* points);
 
+    using CreatureAI::WaypointReached;
     virtual void WaypointReached(uint32 pointId) = 0;
     virtual void WaypointStart(uint32 /*pointId*/) {}
 
-    void Start(bool isActiveAttacker = true, bool run = false, ObjectGuid playerGUID = ObjectGuid::Empty, Quest const* quest = nullptr, bool instantRespawn = false, bool canLoopPath = false, bool resetWaypoints = true);
+    void Start(bool isActiveAttacker = true, ObjectGuid playerGUID = ObjectGuid::Empty, Quest const* quest = nullptr, bool instantRespawn = false, bool canLoopPath = false, bool resetWaypoints = true);
 
-    void SetRun(bool on = true);
     void SetEscortPaused(bool on);
 
     bool HasEscortState(uint32 escortState) { return (m_uiEscortState & escortState); }
@@ -130,7 +134,6 @@ private:
     std::list<Escort_Waypoint>::iterator CurrentWP;
 
     bool m_bIsActiveAttacker;                           //obsolete, determined by faction.
-    bool m_bIsRunning;                                  //all creatures are walking by default (has flag MOVEMENTFLAG_WALK)
     bool m_bCanInstantRespawn;                          //if creature should respawn instantly after escort over (if not, database respawntime are used)
     bool m_bCanReturnToStart;                           //if creature can walk same path (loop) without despawn. Not for regular escort quests.
     bool DespawnAtEnd;

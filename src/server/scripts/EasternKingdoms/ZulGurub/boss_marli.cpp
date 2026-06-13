@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -73,6 +73,10 @@ enum Misc
     GO_SPIDER_EGGS            = 179985,
 };
 
+// hack
+float const DamageIncrease = 35.0f;
+float const DamageDecrease = 100.f / (1.f + DamageIncrease / 100.f) - 100.f;
+
 // High Priestess Mar'li (14510)
 struct boss_marli : public BossAI
 {
@@ -84,7 +88,7 @@ public:
         if (_phase == PHASE_SPIDER)
         {
             me->RemoveAura(SPELL_SPIDER_FORM);
-            me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, false);
+            me->ApplyStatPctModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, DamageDecrease);
             _phase = PHASE_TROLL;
         }
 
@@ -143,7 +147,7 @@ private:
             me->RemoveAura(SPELL_SPIDER_FORM);
             DoCastSelf(SPELL_TRANSFORM_BACK, true);
             Talk(SAY_TRANSFORM_BACK);
-            me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, false);
+            me->ApplyStatPctModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, DamageDecrease);
 
             scheduler.CancelGroup(PHASE_SPIDER);
         }
@@ -186,7 +190,7 @@ private:
 
         Talk(SAY_TRANSFORM);
         DoCastSelf(SPELL_SPIDER_FORM, true);
-        me->HandleStatModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, 35.0f, true);
+        me->ApplyStatPctModifier(UNIT_MOD_DAMAGE_MAINHAND, TOTAL_PCT, DamageIncrease);
 
         scheduler.Schedule(5s, PHASE_SPIDER, [this](TaskContext context)
         {

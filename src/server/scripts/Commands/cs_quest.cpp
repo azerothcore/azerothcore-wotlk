@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -17,9 +17,12 @@
 
 #include "Chat.h"
 #include "CommandScript.h"
+#include "ConditionMgr.h"
+#include "DisableMgr.h"
 #include "GameTime.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "ReputationMgr.h"
 
 using namespace Acore::ChatCommands;
@@ -33,10 +36,11 @@ public:
     {
         static ChatCommandTable questCommandTable =
         {
-            { "add",      HandleQuestAdd,      SEC_GAMEMASTER, Console::Yes },
-            { "complete", HandleQuestComplete, SEC_GAMEMASTER, Console::Yes },
-            { "remove",   HandleQuestRemove,   SEC_GAMEMASTER, Console::Yes },
-            { "reward",   HandleQuestReward,   SEC_GAMEMASTER, Console::Yes },
+            { "add",      HandleQuestAdd,      rbac::RBAC_PERM_COMMAND_QUEST_ADD,      Console::Yes },
+            { "complete", HandleQuestComplete, rbac::RBAC_PERM_COMMAND_QUEST_COMPLETE, Console::Yes },
+            { "remove",   HandleQuestRemove,   rbac::RBAC_PERM_COMMAND_QUEST_REMOVE,   Console::Yes },
+            { "reward",   HandleQuestReward,   rbac::RBAC_PERM_COMMAND_QUEST_REWARD,   Console::Yes },
+            { "status",   HandleQuestStatus,   rbac::RBAC_PERM_COMMAND_QUEST,          Console::Yes },
         };
         static ChatCommandTable commandTable =
         {
@@ -722,6 +726,130 @@ public:
 
         handler->PSendSysMessage(LANG_COMMAND_QUEST_REWARDED, quest->GetTitle(), entry);
         handler->SetSentErrorMessage(false);
+        return true;
+    }
+
+    static bool HandleQuestStatus(ChatHandler* handler, Quest const* quest, Optional<PlayerIdentifier> playerTarget)
+    {
+        if (!playerTarget)
+            playerTarget = PlayerIdentifier::FromTargetOrSelf(handler);
+
+        if (!playerTarget)
+        {
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+            return false;
+        }
+
+        uint32 entry = quest->GetQuestId();
+        std::string status;
+        if (Player* player = playerTarget->GetConnectedPlayer())
+        {
+            QuestStatus qs = player->GetQuestStatus(entry);
+            switch (qs)
+            {
+                case QUEST_STATUS_NONE:
+                    status = "Not Taken";
+                    break;
+                case QUEST_STATUS_COMPLETE:
+                    status = "Complete";
+                    break;
+                case QUEST_STATUS_INCOMPLETE:
+                    status = "Incomplete";
+                    break;
+                case QUEST_STATUS_FAILED:
+                    status = "Failed";
+                    break;
+                case QUEST_STATUS_REWARDED:
+                    status = "Rewarded";
+                    break;
+                default:
+                    status = "Unknown";
+                    break;
+            }
+
+            handler->PSendSysMessage(LANG_CMD_QUEST_STATUS, quest->GetTitle(), entry, status);
+
+            if (!player->CanTakeQuest(quest, false))
+            {
+                handler->PSendSysMessage(LANG_CMD_QUEST_UNAVAILABLE, entry);
+
+                if (sDisableMgr->IsDisabledFor(DISABLE_TYPE_QUEST, entry, player))
+                    handler->SendSysMessage(LANG_CMD_QUEST_STATUS_DISABLED);
+
+                if (!player->SatisfyQuestStatus(quest, false))
+                    handler->SendSysMessage(LANG_CMD_QUEST_STATUS_ALREADY_DONE);
+
+                if (!player->SatisfyQuestClass(quest, false))
+                    handler->SendSysMessage(LANG_CMD_QUEST_STATUS_CLASS);
+
+                if (!player->SatisfyQuestRace(quest, false))
+                    handler->SendSysMessage(LANG_CMD_QUEST_STATUS_RACE);
+
+                if (player->GetLevel() < quest->GetMinLevel())
+                    handler->PSendSysMessage(LANG_CMD_QUEST_STATUS_LOW_LEVEL, quest->GetMinLevel());
+
+                if (quest->GetMaxLevel() > 0 && player->GetLevel() > quest->GetMaxLevel())
+                    handler->PSendSysMessage(LANG_CMD_QUEST_STATUS_HIGH_LEVEL, quest->GetMaxLevel());
+
+                if (!player->SatisfyQuestSkill(quest, false))
+                    handler->SendSysMessage(LANG_CMD_QUEST_STATUS_SKILL);
+
+                if (!player->SatisfyQuestReputation(quest, false))
+                    handler->SendSysMessage(LANG_CMD_QUEST_STATUS_REPUTATION);
+
+                if (!player->SatisfyQuestPreviousQuest(quest, false))
+                    handler->SendSysMessage(LANG_CMD_QUEST_STATUS_PREV_QUEST);
+
+                if (!player->SatisfyQuestTimed(quest, false))
+                    handler->SendSysMessage(LANG_CMD_QUEST_STATUS_TIMED);
+
+                if (!player->SatisfyQuestExclusiveGroup(quest, false))
+                    handler->SendSysMessage(LANG_CMD_QUEST_STATUS_EXCLUSIVE);
+
+                if (!player->SatisfyQuestNextChain(quest, false))
+                    handler->SendSysMessage(LANG_CMD_QUEST_STATUS_NEXT_CHAIN);
+
+                if (!player->SatisfyQuestPrevChain(quest, false))
+                    handler->SendSysMessage(LANG_CMD_QUEST_STATUS_PREV_CHAIN);
+
+                if (!player->SatisfyQuestBreadcrumb(quest, false))
+                    handler->SendSysMessage(LANG_CMD_QUEST_STATUS_BREADCRUMB);
+
+                if (!player->SatisfyQuestDay(quest, false))
+                    handler->SendSysMessage(LANG_CMD_QUEST_STATUS_DAY);
+
+                if (!player->SatisfyQuestWeek(quest, false))
+                    handler->SendSysMessage(LANG_CMD_QUEST_STATUS_WEEK);
+
+                if (!player->SatisfyQuestMonth(quest, false))
+                    handler->SendSysMessage(LANG_CMD_QUEST_STATUS_MONTH);
+
+                if (!player->SatisfyQuestSeasonal(quest, false))
+                    handler->SendSysMessage(LANG_CMD_QUEST_STATUS_SEASONAL);
+
+                if (!player->SatisfyQuestConditions(quest, false))
+                {
+                    handler->SendSysMessage(LANG_CMD_QUEST_STATUS_CONDITION);
+
+                    ConditionList conditions = sConditionMgr->GetConditionsForNotGroupedEntry(CONDITION_SOURCE_TYPE_QUEST_AVAILABLE, entry);
+                    ConditionSourceInfo srcInfo = ConditionSourceInfo(player);
+                    for (Condition* cond : conditions)
+                    {
+                        if (!cond->Meets(srcInfo))
+                            handler->PSendSysMessage(LANG_CMD_QUEST_STATUS_COND_DETAIL, uint32(cond->ConditionType), cond->ConditionValue1, cond->ConditionValue2, cond->ConditionValue3);
+                    }
+                }
+
+                if (!player->SatisfyQuestLog(false))
+                    handler->SendSysMessage(LANG_CMD_QUEST_STATUS_LOG_FULL);
+            }
+        }
+        else
+        {
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+            return false;
+        }
+
         return true;
     }
 };

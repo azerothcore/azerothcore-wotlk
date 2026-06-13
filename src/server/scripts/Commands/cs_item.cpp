@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -22,6 +22,7 @@
 #include "Language.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "RBAC.h"
 
 using namespace Acore::ChatCommands;
 
@@ -34,14 +35,14 @@ public:
     {
         static ChatCommandTable HandleItemRestoreCommandTable =
         {
-            { "list",      HandleItemRestoreListCommand,        SEC_GAMEMASTER,    Console::Yes },
-            { "",          HandleItemRestoreCommand,            SEC_GAMEMASTER,    Console::Yes },
+            { "list",      HandleItemRestoreListCommand,        rbac::RBAC_PERM_COMMAND_ITEM_RESTORE_LIST, Console::Yes },
+            { "",          HandleItemRestoreCommand,            rbac::RBAC_PERM_COMMAND_ITEM_RESTORE,      Console::Yes },
         };
         static ChatCommandTable itemCommandTable =
         {
             { "restore",   HandleItemRestoreCommandTable },
-            { "move",      HandleItemMoveCommand,               SEC_GAMEMASTER,    Console::Yes },
-            { "refund",    HandleItemRefundCommand,             SEC_ADMINISTRATOR, Console::Yes },
+            { "move",      HandleItemMoveCommand,               rbac::RBAC_PERM_COMMAND_ITEMMOVE,          Console::Yes },
+            { "refund",    HandleItemRefundCommand,             rbac::RBAC_PERM_COMMAND_ITEM_REFUND,       Console::Yes },
         };
         static ChatCommandTable commandTable =
         {

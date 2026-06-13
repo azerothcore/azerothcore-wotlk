@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -126,6 +126,13 @@ enum lfgGroupFlags
     GROUP_LFG_FLAG_APPLY_RANDOM_BUFF        = 0x001,
     GROUP_LFG_FLAG_IS_RANDOM_INSTANCE       = 0x002,
     GROUP_LFG_FLAG_IS_HEROIC                = 0x004
+};
+
+enum MailItemOnFullInventory
+{
+    MAIL_ITEM_ON_FULL_INVENTORY_DISABLED    = 0,
+    MAIL_ITEM_ON_FULL_INVENTORY_LFG_ONLY    = 1,
+    MAIL_ITEM_ON_FULL_INVENTORY_EVERYWHERE  = 2,
 };
 
 enum DifficultyPreventionChangeType
@@ -299,6 +306,7 @@ public:
     void CountTheRoll(Rolls::iterator roll, Map* allowedMap);
     bool CountRollVote(ObjectGuid playerGUID, ObjectGuid Guid, uint8 Choise);
     void EndRoll(Loot* loot, Map* allowedMap);
+    void RemovePlayerFromRolls(ObjectGuid guid);
 
     // related to disenchant rolls
     void ResetMaxEnchantingLevel();

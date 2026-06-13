@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -29,10 +29,8 @@ enum Spells
     SPELL_OVERCHARGE                = 64218,
     SPELL_BERSERK                   = 26662,
 
-    SPELL_CHAIN_LIGHTNING_10        = 64213,
-    SPELL_CHAIN_LIGHTNING_25        = 64215,
-    SPELL_LIGHTNING_NOVA_10         = 64216,
-    SPELL_LIGHTNING_NOVA_25         = 65279,
+    SPELL_CHAIN_LIGHTNING           = 64213,
+    SPELL_LIGHTNING_NOVA            = 64216,
 };
 
 enum Events
@@ -171,11 +169,11 @@ public:
             {
                 case EVENT_CHAIN_LIGHTNING:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                        me->CastSpell(target, RAID_MODE(SPELL_CHAIN_LIGHTNING_10, SPELL_CHAIN_LIGHTNING_25), false);
+                        me->CastSpell(target, SPELL_CHAIN_LIGHTNING, false);
                     events.Repeat(25s);
                     break;
                 case EVENT_LIGHTNING_NOVA:
-                    me->CastSpell(me, RAID_MODE(SPELL_LIGHTNING_NOVA_10, SPELL_LIGHTNING_NOVA_25), false);
+                    me->CastSpell(me, SPELL_LIGHTNING_NOVA, false);
                     events.Repeat(40s);
                     break;
                 case EVENT_OVERCHARGE:

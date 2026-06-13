@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -25,6 +25,7 @@
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "RBAC.h"
 
 /// Ban function modes
 enum BanMode
@@ -49,32 +50,32 @@ public:
     {
         static ChatCommandTable unbanCommandTable =
         {
-            { "account",       HandleUnBanAccountCommand,       SEC_ADMINISTRATOR, Console::Yes },
-            { "character",     HandleUnBanCharacterCommand,     SEC_ADMINISTRATOR, Console::Yes },
-            { "playeraccount", HandleUnBanAccountByCharCommand, SEC_ADMINISTRATOR, Console::Yes },
-            { "ip",            HandleUnBanIPCommand,            SEC_ADMINISTRATOR, Console::Yes }
+            { "account",       HandleUnBanAccountCommand,       rbac::RBAC_PERM_COMMAND_UNBAN_ACCOUNT, Console::Yes },
+            { "character",     HandleUnBanCharacterCommand,     rbac::RBAC_PERM_COMMAND_UNBAN_CHARACTER, Console::Yes },
+            { "playeraccount", HandleUnBanAccountByCharCommand, rbac::RBAC_PERM_COMMAND_UNBAN_PLAYERACCOUNT, Console::Yes },
+            { "ip",            HandleUnBanIPCommand,            rbac::RBAC_PERM_COMMAND_UNBAN_IP, Console::Yes }
         };
 
         static ChatCommandTable banlistCommandTable =
         {
-            { "account",      HandleBanListAccountCommand,   SEC_GAMEMASTER, Console::Yes },
-            { "character",    HandleBanListCharacterCommand, SEC_GAMEMASTER, Console::Yes },
-            { "ip",           HandleBanListIPCommand,        SEC_GAMEMASTER, Console::Yes }
+            { "account",      HandleBanListAccountCommand,   rbac::RBAC_PERM_COMMAND_BANLIST_ACCOUNT, Console::Yes },
+            { "character",    HandleBanListCharacterCommand, rbac::RBAC_PERM_COMMAND_BANLIST_CHARACTER, Console::Yes },
+            { "ip",           HandleBanListIPCommand,        rbac::RBAC_PERM_COMMAND_BANLIST_IP, Console::Yes }
         };
 
         static ChatCommandTable baninfoCommandTable =
         {
-            { "account",      HandleBanInfoAccountCommand,   SEC_GAMEMASTER, Console::Yes },
-            { "character",    HandleBanInfoCharacterCommand, SEC_GAMEMASTER, Console::Yes },
-            { "ip",           HandleBanInfoIPCommand,        SEC_GAMEMASTER, Console::Yes }
+            { "account",      HandleBanInfoAccountCommand,   rbac::RBAC_PERM_COMMAND_BANINFO_ACCOUNT, Console::Yes },
+            { "character",    HandleBanInfoCharacterCommand, rbac::RBAC_PERM_COMMAND_BANINFO_CHARACTER, Console::Yes },
+            { "ip",           HandleBanInfoIPCommand,        rbac::RBAC_PERM_COMMAND_BANINFO_IP, Console::Yes }
         };
 
         static ChatCommandTable banCommandTable =
         {
-            { "account",      HandleBanAccountCommand,       SEC_GAMEMASTER, Console::Yes },
-            { "character",    HandleBanCharacterCommand,     SEC_GAMEMASTER, Console::Yes },
-            { "playeraccount",HandleBanAccountByCharCommand, SEC_GAMEMASTER, Console::Yes },
-            { "ip",           HandleBanIPCommand,            SEC_GAMEMASTER, Console::Yes }
+            { "account",      HandleBanAccountCommand,       rbac::RBAC_PERM_COMMAND_BAN_ACCOUNT, Console::Yes },
+            { "character",    HandleBanCharacterCommand,     rbac::RBAC_PERM_COMMAND_BAN_CHARACTER, Console::Yes },
+            { "playeraccount",HandleBanAccountByCharCommand, rbac::RBAC_PERM_COMMAND_BAN_PLAYERACCOUNT, Console::Yes },
+            { "ip",           HandleBanIPCommand,            rbac::RBAC_PERM_COMMAND_BAN_IP, Console::Yes }
         };
 
         static ChatCommandTable commandTable =

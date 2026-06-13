@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -70,7 +70,7 @@ enum Emotes
 enum Points
 {
     POINT_AIR                               = 0,
-    POINT_GROUND                            = 2,
+    POINT_GROUND                            = 3,
     POINT_PARALYZE                          = 2
 };
 
@@ -92,7 +92,7 @@ struct boss_ayamiss : public BossAI
             me->SetReactState(REACT_PASSIVE);
             me->SetCanFly(false);
             me->SetDisableGravity(false);
-            me->GetMotionMaster()->MovePath(me->GetEntry() * 10, false);
+            me->GetMotionMaster()->MoveWaypoint(me->GetEntry() * 10, false);
             DoResetThreatList();
             scheduler.CancelGroup(GROUP_AIR);
         });
@@ -291,7 +291,7 @@ class spell_ayamiss_swarmer_teleport_trigger : public SpellScript
         uint32 pathId = data.pathId;
         caster->m_Events.AddEventAtOffset([caster, pathId]()
         {
-            caster->GetMotionMaster()->MovePath(pathId, false);
+            caster->GetMotionMaster()->MoveWaypoint(pathId, false);
         }, 1s);
     }
 
@@ -361,7 +361,7 @@ public:
     void HandleScript(SpellEffIndex /*effIndex*/)
     {
         GetCaster()->ToCreature()->GetMotionMaster()->Clear();
-        GetCaster()->ToCreature()->GetMotionMaster()->MovePath(_pathId, false);
+        GetCaster()->ToCreature()->GetMotionMaster()->MoveWaypoint(_pathId, false);
     }
 
     void Register() override

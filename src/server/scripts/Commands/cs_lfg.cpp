@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -21,6 +21,7 @@
 #include "LFGMgr.h"
 #include "Language.h"
 #include "Player.h"
+#include "RBAC.h"
 
 void GetPlayerInfo(ChatHandler*  handler, Player* player)
 {
@@ -47,11 +48,12 @@ public:
     {
         static ChatCommandTable lfgCommandTable =
         {
-            { "player",  HandleLfgPlayerInfoCommand, SEC_MODERATOR,     Console::No },
-            { "group",   HandleLfgGroupInfoCommand,  SEC_MODERATOR,     Console::No },
-            { "queue",   HandleLfgQueueInfoCommand,  SEC_MODERATOR,     Console::Yes },
-            { "clean",   HandleLfgCleanCommand,      SEC_ADMINISTRATOR, Console::Yes },
-            { "options", HandleLfgOptionsCommand,    SEC_GAMEMASTER,    Console::Yes },
+            { "player",   HandleLfgPlayerInfoCommand,    rbac::RBAC_PERM_COMMAND_LFG_PLAYER,   Console::No },
+            { "group",    HandleLfgGroupInfoCommand,     rbac::RBAC_PERM_COMMAND_LFG_GROUP,    Console::No },
+            { "queue",    HandleLfgQueueInfoCommand,     rbac::RBAC_PERM_COMMAND_LFG_QUEUE,    Console::Yes },
+            { "clean",    HandleLfgCleanCommand,         rbac::RBAC_PERM_COMMAND_LFG_CLEAN,    Console::Yes },
+            { "options",  HandleLfgOptionsCommand,       rbac::RBAC_PERM_COMMAND_LFG_OPTIONS,  Console::Yes },
+            { "cooldown", HandleLfgCooldownClearCommand, rbac::RBAC_PERM_COMMAND_LFG_COOLDOWN, Console::Yes },
         };
 
         static ChatCommandTable commandTable =
@@ -124,6 +126,13 @@ public:
     {
         handler->PSendSysMessage(LANG_LFG_CLEAN);
         sLFGMgr->Clean();
+        return true;
+    }
+
+    static bool HandleLfgCooldownClearCommand(ChatHandler* handler)
+    {
+        sLFGMgr->ClearDungeonCooldowns();
+        handler->SendSysMessage(LANG_LFG_COOLDOWN_CLEARED);
         return true;
     }
 };

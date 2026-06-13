@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -193,10 +193,20 @@ public:
     //Called when a player enters/leaves water bodies.
     virtual void OnPlayerInWaterStateUpdate(Player* /*player*/, bool /*inWater*/) {}
 
-    //Handle open / close objects
-    //use HandleGameObject(ObjectGuid::Empty, boolen, GO); in OnObjectCreate in instance scripts
-    //use HandleGameObject(GUID, boolen, nullptr); in any other script
+    /**
+     * @brief Open or close a GameObject by GUID.
+     * @param guid The GUID of the GameObject. Pass ObjectGuid::Empty when providing the go pointer directly.
+     * @param open true to open (GO_STATE_ACTIVE), false to close (GO_STATE_READY).
+     * @param go Optional pointer to the GameObject. If nullptr, the object is looked up by GUID.
+     */
     void HandleGameObject(ObjectGuid guid, bool open, GameObject* go = nullptr);
+
+    /**
+     * @brief Open or close a GameObject registered via LoadObjectData.
+     * @param type The ObjectData type constant (e.g. GO_FRONT_DOOR) used in the gameObjectData array.
+     * @param open true to open (GO_STATE_ACTIVE), false to close (GO_STATE_READY).
+     */
+    void HandleGameObject(uint32 type, bool open);
 
     //change active state of doors or buttons
     void DoUseDoorOrButton(ObjectGuid guid, uint32 withRestoreTime = 0, bool useAlternativeState = false);
@@ -253,6 +263,8 @@ public:
 
     // Checks boss requirements (one boss required to kill other)
     virtual bool CheckRequiredBosses(uint32 /*bossId*/, Player const* /*player*/ = nullptr) const { return true; }
+
+    bool _SkipCheckRequiredBosses(Player const* player = nullptr) const;
 
     void SetCompletedEncountersMask(uint32 newMask, bool save);
 

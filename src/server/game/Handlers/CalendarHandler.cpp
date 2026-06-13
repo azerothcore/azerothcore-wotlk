@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -35,6 +35,7 @@ Copied events should probably have a new owner
 
 #include "ArenaTeamMgr.h"
 #include "CalendarMgr.h"
+#include "CalendarPackets.h"
 #include "DatabaseEnv.h"
 #include "DisableMgr.h"
 #include "GameEventMgr.h"
@@ -184,43 +185,31 @@ void WorldSession::HandleCalendarGetCalendar(WorldPacket& /*recvData*/)
     SendPacket(&data);
 }
 
-void WorldSession::HandleCalendarGetEvent(WorldPacket& recvData)
+void WorldSession::HandleCalendarGetEvent(WorldPackets::Calendar::GetEvent& packet)
 {
-    uint64 eventId;
-    recvData >> eventId;
+    LOG_DEBUG("network", "CMSG_CALENDAR_GET_EVENT. Player [{}] Event [{}]", _player->GetGUID().ToString(), packet.EventId);
 
-    LOG_DEBUG("network", "CMSG_CALENDAR_GET_EVENT. Player [{}] Event [{}]", _player->GetGUID().ToString(), eventId);
-
-    if (CalendarEvent* calendarEvent = sCalendarMgr->GetEvent(eventId))
+    if (CalendarEvent* calendarEvent = sCalendarMgr->GetEvent(packet.EventId))
         sCalendarMgr->SendCalendarEvent(_player->GetGUID(), *calendarEvent, CALENDAR_SENDTYPE_GET);
     else
         sCalendarMgr->SendCalendarCommandResult(_player->GetGUID(), CALENDAR_ERROR_EVENT_INVALID);
 }
 
-void WorldSession::HandleCalendarGuildFilter(WorldPacket& recvData)
+void WorldSession::HandleCalendarGuildFilter(WorldPackets::Calendar::GuildFilter& packet)
 {
     LOG_DEBUG("network", "CMSG_CALENDAR_GUILD_FILTER [{}]", _player->GetGUID().ToString());
 
-    uint32 minLevel;
-    uint32 maxLevel;
-    uint32 minRank;
-
-    recvData >> minLevel >> maxLevel >> minRank;
-
     if (Guild* guild = sGuildMgr->GetGuildById(_player->GetGuildId()))
-        guild->MassInviteToEvent(this, minLevel, maxLevel, minRank);
+        guild->MassInviteToEvent(this, packet.MinimumLevel, packet.MaximumLevel, packet.MinimumRank);
 
-    LOG_DEBUG("network", "CMSG_CALENDAR_GUILD_FILTER: Min level [{}], Max level [{}], Min rank [{}]", minLevel, maxLevel, minRank);
+    LOG_DEBUG("network", "CMSG_CALENDAR_GUILD_FILTER: Min level [{}], Max level [{}], Min rank [{}]", packet.MinimumLevel, packet.MaximumLevel, packet.MinimumRank);
 }
 
-void WorldSession::HandleCalendarArenaTeam(WorldPacket& recvData)
+void WorldSession::HandleCalendarArenaTeam(WorldPackets::Calendar::ArenaTeam& packet)
 {
     LOG_DEBUG("network", "CMSG_CALENDAR_ARENA_TEAM [{}]", _player->GetGUID().ToString());
 
-    uint32 arenaTeamId;
-    recvData >> arenaTeamId;
-
-    if (ArenaTeam* team = sArenaTeamMgr->GetArenaTeamById(arenaTeamId))
+    if (ArenaTeam* team = sArenaTeamMgr->GetArenaTeamById(packet.ArenaTeamId))
         team->MassInviteToEvent(this);
 }
 
@@ -763,16 +752,23 @@ void WorldSession::HandleCalendarEventModeratorStatus(WorldPacket& recvData)
         sCalendarMgr->SendCalendarCommandResult(guid, CALENDAR_ERROR_EVENT_INVALID);
 }
 
-void WorldSession::HandleCalendarComplain(WorldPacket& recvData)
+void WorldSession::HandleCalendarComplain(WorldPackets::Calendar::CalendarComplain& packet)
 {
-    ObjectGuid guid = _player->GetGUID();
-    uint64 eventId;
-    ObjectGuid complainGUID;
+    if (sWorld->getBoolConfig(CONFIG_LOGSPAMREPORTS))
+    {
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_SPAM_REPORT);
 
-    recvData >> eventId >> complainGUID;
-    LOG_DEBUG("network", "CMSG_CALENDAR_COMPLAIN [{}] EventId [{}] guid [{}]", guid.ToString(), eventId, complainGUID.ToString());
+        stmt->SetData(0, 2); // SpamType 2 = Calendar
+        stmt->SetData(1, packet.ComplainGuid.GetCounter());
+        stmt->SetData(2, 0);
+        stmt->SetData(3, 0);
+        stmt->SetData(4, 0);
+        stmt->SetData(5, 0);
+        stmt->SetData(6, "EventId: " + std::to_string(packet.EventId));
+        stmt->SetData(7, GameTime::GetGameTime().count());
 
-    // what to do with complains?
+        CharacterDatabase.Execute(stmt);
+    }
 }
 
 void WorldSession::HandleCalendarGetNumPending(WorldPacket& /*recvData*/)

@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -188,7 +188,7 @@ struct boss_ahune : public BossAI
     {
         BossAI::JustEngagedWith(who);
         events.ScheduleEvent(EVENT_INITIAL_EMERGE, 4ms);
-        events.ScheduleEvent(EVENT_SYNCH_HEALTH, 3000);
+        events.ScheduleEvent(EVENT_SYNCH_HEALTH, 3s);
     }
 
     void EnterEvadeMode(EvadeReason /*why*/) override
@@ -318,7 +318,7 @@ struct npc_frozen_core : public ScriptedAI
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetImmuneToPC(false);
             me->RemoveAurasDueToSpell(SPELL_ICE_SPEAR_CONTROL_AURA);
-            _events.ScheduleEvent(EVENT_SYNCH_HEALTH, 3000, 0, PHASE_TWO);
+            _events.ScheduleEvent(EVENT_SYNCH_HEALTH, 3s, 0, PHASE_TWO);
         }
         else if (action == ACTION_AHUNE_RESURFACE)
         {
@@ -342,7 +342,7 @@ struct npc_frozen_core : public ScriptedAI
                     DoCast(ahune, SPELL_SYNCH_HEALTH, true);
                 else
                     DoCastSelf(SPELL_SUICIDE);
-                _events.Repeat(3000ms, 3000ms);
+                _events.Repeat(3s, 3s);
                 break;
             default:
                 break;
@@ -394,11 +394,11 @@ struct npc_ahune_bunny : public ScriptedAI
             _submerged = false;
             _events.Reset();
             _events.SetPhase(PHASE_ONE);
-            _events.ScheduleEvent(EVENT_SUMMON_AHUNE, 10000);
-            _events.ScheduleEvent(EVENT_START_LOOKING_FOR_OPENING, 14000, 0, PHASE_ONE);
-            _events.ScheduleEvent(EVENT_SUMMON_COLDWEAVE, 22000, 0, PHASE_ONE);
-            _events.ScheduleEvent(EVENT_SUMMON_HAILSTONE, 14000, 0, PHASE_ONE);
-            _events.ScheduleEvent(EVENT_AHUNE_PHASE_TWO, 108000, 0, PHASE_ONE);
+            _events.ScheduleEvent(EVENT_SUMMON_AHUNE, 10s);
+            _events.ScheduleEvent(EVENT_START_LOOKING_FOR_OPENING, 14s, 0, PHASE_ONE);
+            _events.ScheduleEvent(EVENT_SUMMON_COLDWEAVE, 22s, 0, PHASE_ONE);
+            _events.ScheduleEvent(EVENT_SUMMON_HAILSTONE, 14s, 0, PHASE_ONE);
+            _events.ScheduleEvent(EVENT_AHUNE_PHASE_TWO, 108s, 0, PHASE_ONE);
         }
         else if (action == ACTION_STOP_EVENT)
         {
@@ -430,9 +430,9 @@ struct npc_ahune_bunny : public ScriptedAI
             case EVENT_SUMMON_COLDWEAVE:
                 DoCast(SPELL_SUMMON_COLDWEAVE);
                 DoCast(SPELL_SUMMON_COLDWEAVE);
-                _events.Repeat(8000ms);
+                _events.Repeat(8s);
                 if (_submerged)
-                    _events.ScheduleEvent(EVENT_SUMMON_FROSTWIND, 4000, 0, PHASE_ONE);
+                    _events.ScheduleEvent(EVENT_SUMMON_FROSTWIND, 4s, 0, PHASE_ONE);
                 break;
             case EVENT_SUMMON_FROSTWIND:
                 DoCast(SPELL_SUMMON_FROSTWIND);
@@ -458,17 +458,17 @@ struct npc_ahune_bunny : public ScriptedAI
                     ahune->AI()->DoAction(ACTION_AHUNE_RETREAT);
                 _events.Reset();
                 _events.SetPhase(PHASE_TWO);
-                _events.ScheduleEvent(EVENT_CLOSE_OPENING, 25000, 0, PHASE_TWO);
-                _events.ScheduleEvent(EVENT_AHUNE_PHASE_ONE, 35000, 0, PHASE_TWO);
+                _events.ScheduleEvent(EVENT_CLOSE_OPENING, 25s, 0, PHASE_TWO);
+                _events.ScheduleEvent(EVENT_AHUNE_PHASE_ONE, 35s, 0, PHASE_TWO);
                 break;
             case EVENT_AHUNE_PHASE_ONE:
                 _submerged = true;
                 _events.Reset();
                 _events.SetPhase(PHASE_ONE);
-                _events.ScheduleEvent(EVENT_SUMMON_COLDWEAVE, 8000, 0, PHASE_ONE);
-                _events.ScheduleEvent(EVENT_SUMMON_HAILSTONE, 5000, 0, PHASE_ONE);
-                _events.ScheduleEvent(EVENT_START_LOOKING_FOR_OPENING, 5000, 0, PHASE_ONE);
-                _events.ScheduleEvent(EVENT_AHUNE_PHASE_TWO, 100000, 0, PHASE_ONE);
+                _events.ScheduleEvent(EVENT_SUMMON_COLDWEAVE, 8s, 0, PHASE_ONE);
+                _events.ScheduleEvent(EVENT_SUMMON_HAILSTONE, 5s, 0, PHASE_ONE);
+                _events.ScheduleEvent(EVENT_START_LOOKING_FOR_OPENING, 5s, 0, PHASE_ONE);
+                _events.ScheduleEvent(EVENT_AHUNE_PHASE_TWO, 100s, 0, PHASE_ONE);
                 break;
             default:
                 break;
@@ -534,7 +534,7 @@ struct npc_earthen_ring_flamecaller : public ScriptedAI
         switch (spellInfo->Id)
         {
         case SPELL_SHAMANS_LOOK_FOR_OPENING:
-            _events.ScheduleEvent(EVENT_LOOKFOROPENING_0, 17000);
+            _events.ScheduleEvent(EVENT_LOOKFOROPENING_0, 17s);
             break;
         case SPELL_FOUND_OPENING:
             Talk(EMOTE_RETREAT);
@@ -560,15 +560,15 @@ struct npc_earthen_ring_flamecaller : public ScriptedAI
             {
             case EVENT_LOOKFOROPENING_0:
                 LookOpening(true, 0);
-                _events.ScheduleEvent(EVENT_LOOKFOROPENING_1, 26000);
+                _events.ScheduleEvent(EVENT_LOOKFOROPENING_1, 26s);
                 break;
             case EVENT_LOOKFOROPENING_1:
                 LookOpening(true, 1);
-                _events.ScheduleEvent(EVENT_LOOKFOROPENING_2, 25000);
+                _events.ScheduleEvent(EVENT_LOOKFOROPENING_2, 25s);
                 break;
             case EVENT_LOOKFOROPENING_2:
                 LookOpening(true, 2);
-                _events.ScheduleEvent(EVENT_STOP_LOOKING_FOR_OPENING, 27000);
+                _events.ScheduleEvent(EVENT_STOP_LOOKING_FOR_OPENING, 27s);
                 break;
             case EVENT_STOP_LOOKING_FOR_OPENING:
                 LookOpening(false, _mySpot);
@@ -619,7 +619,7 @@ struct npc_ahune_ice_spear_bunny : public ScriptedAI
         _scheduler.Schedule(2500ms, [this](TaskContext /*task*/)
             {
                 DoCastSelf(SPELL_ICE_SPEAR_DELAY);
-                me->DespawnOrUnsummon(3500);
+                me->DespawnOrUnsummon(3500ms);
             });
     }
 

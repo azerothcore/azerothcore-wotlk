@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -19,6 +19,7 @@
 #include "CommandScript.h"
 #include "Guild.h"
 #include "GuildMgr.h"
+#include "RBAC.h"
 
 using namespace Acore::ChatCommands;
 
@@ -31,13 +32,13 @@ public:
     {
         static ChatCommandTable guildCommandTable =
         {
-            { "create",     HandleGuildCreateCommand,   SEC_GAMEMASTER, Console::Yes },
-            { "delete",     HandleGuildDeleteCommand,   SEC_GAMEMASTER, Console::Yes },
-            { "invite",     HandleGuildInviteCommand,   SEC_GAMEMASTER, Console::Yes },
-            { "uninvite",   HandleGuildUninviteCommand, SEC_GAMEMASTER, Console::Yes },
-            { "rank",       HandleGuildRankCommand,     SEC_GAMEMASTER, Console::Yes },
-            { "rename",     HandleGuildRenameCommand,   SEC_GAMEMASTER, Console::Yes },
-            { "info",       HandleGuildInfoCommand,     SEC_GAMEMASTER, Console::Yes }
+            { "create",     HandleGuildCreateCommand,   rbac::RBAC_PERM_COMMAND_GUILD_CREATE,   Console::Yes },
+            { "delete",     HandleGuildDeleteCommand,   rbac::RBAC_PERM_COMMAND_GUILD_DELETE,   Console::Yes },
+            { "invite",     HandleGuildInviteCommand,   rbac::RBAC_PERM_COMMAND_GUILD_INVITE,   Console::Yes },
+            { "uninvite",   HandleGuildUninviteCommand, rbac::RBAC_PERM_COMMAND_GUILD_UNINVITE, Console::Yes },
+            { "rank",       HandleGuildRankCommand,     rbac::RBAC_PERM_COMMAND_GUILD_RANK,     Console::Yes },
+            { "rename",     HandleGuildRenameCommand,   rbac::RBAC_PERM_COMMAND_GUILD_RENAME,   Console::Yes },
+            { "info",       HandleGuildInfoCommand,     rbac::RBAC_PERM_COMMAND_GUILD_INFO,     Console::Yes }
         };
         static ChatCommandTable commandTable =
         {

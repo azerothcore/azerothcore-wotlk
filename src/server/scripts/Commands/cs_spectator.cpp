@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -20,6 +20,7 @@
 #include "Chat.h"
 #include "CommandScript.h"
 #include "Player.h"
+#include "RBAC.h"
 
 using namespace Acore::ChatCommands;
 
@@ -32,12 +33,12 @@ public:
     {
         static ChatCommandTable spectatorCommandTable =
         {
-            { "version",  HandleSpectatorVersionCommand,  SEC_PLAYER, Console::No },
-            { "reset",    HandleSpectatorResetCommand,    SEC_PLAYER, Console::No },
-            { "spectate", HandleSpectatorSpectateCommand, SEC_PLAYER, Console::No },
-            { "watch",    HandleSpectatorWatchCommand,    SEC_PLAYER, Console::No },
-            { "leave",    HandleSpectatorLeaveCommand,    SEC_PLAYER, Console::No },
-            { "",         HandleSpectatorCommand,         SEC_PLAYER, Console::No }
+            { "version",  HandleSpectatorVersionCommand,  rbac::RBAC_PERM_COMMAND_SPECT_VERSION,  Console::No },
+            { "reset",    HandleSpectatorResetCommand,    rbac::RBAC_PERM_COMMAND_SPECT_RESET,    Console::No },
+            { "spectate", HandleSpectatorSpectateCommand, rbac::RBAC_PERM_COMMAND_SPECT_SPECTATE, Console::No },
+            { "watch",    HandleSpectatorWatchCommand,    rbac::RBAC_PERM_COMMAND_SPECT_WATCH,    Console::No },
+            { "leave",    HandleSpectatorLeaveCommand,    rbac::RBAC_PERM_COMMAND_SPECT_LEAVE,    Console::No },
+            { "",         HandleSpectatorCommand,         rbac::RBAC_PERM_COMMAND_SPECT,          Console::No }
         };
         static ChatCommandTable commandTable =
         {

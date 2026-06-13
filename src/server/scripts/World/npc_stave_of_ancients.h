@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -88,6 +88,15 @@ enum NPCPrecious
     PRECIOUS_EVIL_ENTRY                       = 14538
 };
 
+enum SimoneAIData
+{
+    DATA_SIMONE_REVEAL = 1,
+    DATA_SIMONE_PREPARE_ENCOUNTER = 2,
+    DATA_SIMONE_VALID_THREATLIST = 3,
+    DATA_SIMONE_SET_HOME = 4,
+    DATA_SIMONE_CORPSE_REMOVED = 5
+};
+
 enum NPCNelson
 {
     NELSON_EVENT_DREADFUL_FRIGHT              = 6,
@@ -137,7 +146,6 @@ struct NPCStaveQuestAI : public ScriptedAI
     ObjectGuid gossipPlayerGUID;
     ObjectGuid playerGUID;
     bool encounterStarted;
-    ThreatContainer::StorageType const& threatList = me->GetThreatMgr().GetThreatList();
 
     std::map<int, int> entryKeys = {
         { ARTORIUS_NORMAL_ENTRY, 1 },
@@ -190,10 +198,10 @@ struct NPCStaveQuestAI : public ScriptedAI
     void RevealForm();
     void StorePlayerGUID();
     Player* GetGossipPlayer();
-    bool IsAllowedEntry(uint32 /*entry*/);
-    bool UnitIsUnfair(Unit* unit);
-    bool IsFairFight();
-    bool ValidThreatlist();
+    bool IsAllowedEntry(uint32 /*entry*/) const;
+    bool UnitIsUnfair(Unit* unit) const;
+    bool IsFairFight() const;
+    bool ValidThreatlist() const;
     void SetHomePosition();
     void PrepareForEncounter();
     void ClearLootIfUnfair(Unit* killer);

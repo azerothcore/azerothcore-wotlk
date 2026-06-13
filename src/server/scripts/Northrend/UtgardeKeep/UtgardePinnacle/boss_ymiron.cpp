@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -32,16 +32,12 @@ enum Misc
     SAY_SUMMON_TORGYN                       = 6,
 
     // SPELLS
-    SPELL_BANE_N                            = 48294,
-    SPELL_BANE_H                            = 59301,
+    SPELL_BANE                              = 48294,
     SPELL_DARK_SLASH                        = 48292,
-    SPELL_FETID_ROT_N                       = 48291,
-    SPELL_FETID_ROT_H                       = 59300,
+    SPELL_FETID_ROT                         = 48291,
     SPELL_SCREAMS_OF_THE_DEAD               = 51750,
-    SPELL_SPIRIT_BURST_N                    = 48529, // when Ranulf
-    SPELL_SPIRIT_BURST_H                    = 59305, // when Ranulf
-    SPELL_SPIRIT_STRIKE_N                   = 48423, // when Haldor
-    SPELL_SPIRIT_STRIKE_H                   = 59304, // when Haldor
+    SPELL_SPIRIT_BURST                      = 48529, // when Ranulf
+    SPELL_SPIRIT_STRIKE                     = 48423, // when Haldor
 
     SPELL_SUMMON_AVENGING_SPIRIT            = 48592,
     SPELL_SUMMON_SPIRIT_FOUNT               = 48386,
@@ -49,8 +45,7 @@ enum Misc
     SPELL_CHANNEL_SPIRIT_TO_YMIRON          = 48316,
     SPELL_CHANNEL_YMIRON_TO_SPIRIT          = 48307,
 
-    SPELL_SPIRIT_FOUNT_N                    = 48380,
-    SPELL_SPIRIT_FOUNT_H                    = 59320,
+    SPELL_SPIRIT_FOUNT                    = 48380,
 
     SPELL_FLAMES                            = 39199,
 
@@ -217,7 +212,7 @@ public:
                     {
                         if (me->GetHealth() < std::max(0.0f, float(me->GetMaxHealth() * (1.0f - (IsHeroic() ? 0.2f : 0.334f)*float(BoatNum + 1)))))
                         {
-                            events.DelayEvents(12000);
+                            events.DelayEvents(12s);
                             me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                             me->InterruptNonMeleeSpells(true);
                             me->CastSpell(me, SPELL_SCREAMS_OF_THE_DEAD, true);
@@ -242,13 +237,13 @@ public:
                     }
                 case EVENT_YMIRON_BANE:
                     {
-                        me->CastSpell(me, IsHeroic() ? SPELL_BANE_H : SPELL_BANE_N, false);
+                        me->CastSpell(me, SPELL_BANE, false);
                         events.Repeat(20s, 25s);
                         break;
                     }
                 case EVENT_YMIRON_FETID_ROT:
                     {
-                        me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_FETID_ROT_H : SPELL_FETID_ROT_N, false);
+                        me->CastSpell(me->GetVictim(), SPELL_FETID_ROT, false);
                         events.Repeat(10s, 13s);
                         break;
                     }
@@ -297,7 +292,7 @@ public:
                         {
                             summons.Summon(sf);
                             sf->SetSpeed(MOVE_RUN, 0.4f);
-                            sf->AddAura(IsHeroic() ? SPELL_SPIRIT_FOUNT_H : SPELL_SPIRIT_FOUNT_N, sf);
+                            sf->AddAura(SPELL_SPIRIT_FOUNT, sf);
                             sf->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                             sf->GetMotionMaster()->MoveFollow(me->GetVictim(), 0, rand_norm()*M_PI * 2, MOTION_SLOT_ACTIVE, false, false);
                         }
@@ -305,13 +300,13 @@ public:
                     }
                 case EVENT_YMIRON_HALDOR_ABILITY:
                     {
-                        me->CastSpell(me->GetVictim(), IsHeroic() ? SPELL_SPIRIT_STRIKE_H : SPELL_SPIRIT_STRIKE_N, false);
+                        me->CastSpell(me->GetVictim(), SPELL_SPIRIT_STRIKE, false);
                         events.Repeat(5s);
                         break;
                     }
                 case EVENT_YMIRON_RANULF_ABILITY:
                     {
-                        me->CastSpell(me, IsHeroic() ? SPELL_SPIRIT_BURST_H : SPELL_SPIRIT_BURST_N, false);
+                        me->CastSpell(me, SPELL_SPIRIT_BURST, false);
                         events.Repeat(10s);
                         break;
                     }

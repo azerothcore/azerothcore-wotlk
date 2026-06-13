@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -100,6 +100,13 @@ enum LoginDatabaseStatements : uint32
     LOGIN_DEL_ACCOUNT,
     LOGIN_SEL_AUTOBROADCAST,
     LOGIN_SEL_AUTOBROADCAST_LOCALIZED,
+    LOGIN_INS_AUTOBROADCAST,
+    LOGIN_DEL_AUTOBROADCAST,
+    LOGIN_INS_AUTOBROADCAST_LOCALE,
+    LOGIN_DEL_AUTOBROADCAST_LOCALE,
+    LOGIN_SEL_AUTOBROADCAST_BY_ID,
+    LOGIN_SEL_AUTOBROADCAST_LOCALE_BY_ID,
+    LOGIN_SEL_AUTOBROADCAST_MAX_ID,
     LOGIN_SEL_MOTD,
     LOGIN_SEL_MOTD_LOCALE,
     LOGIN_REP_MOTD,
@@ -125,6 +132,14 @@ enum LoginDatabaseStatements : uint32
     LOGIN_UPD_ACCOUNT_TOTP_SECRET,
 
     LOGIN_INS_UPTIME,
+
+    LOGIN_GET_EMAIL_BY_ID,
+
+    // RBAC
+    LOGIN_SEL_RBAC_ACCOUNT_PERMISSIONS,
+    LOGIN_INS_RBAC_ACCOUNT_PERMISSION,
+    LOGIN_DEL_RBAC_ACCOUNT_PERMISSION,
+    LOGIN_SEL_RBAC_DEFAULT_PERMISSIONS,
 
     MAX_LOGINDATABASE_STATEMENTS
 };

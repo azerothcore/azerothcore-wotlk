@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -16,6 +16,8 @@
  */
 
 #include "IntermediateValues.h"
+#include <string>
+#include "StringFormat.h"
 
 namespace MMAP
 {
@@ -28,15 +30,15 @@ namespace MMAP
         rcFreePolyMeshDetail(polyMeshDetail);
     }
 
-    void IntermediateValues::writeIV(uint32 mapID, uint32 tileX, uint32 tileY)
+    void IntermediateValues::writeIV(const std::string& dataPath, uint32 mapID, uint32 tileX, uint32 tileY)
     {
-        char fileName[255];
+        char fileName[512];
         char tileString[25];
         sprintf(tileString, "[%02u,%02u]: ", tileX, tileY);
 
         printf("%sWriting debug output...                       \r", tileString);
 
-        std::string name("meshes/%03u%02i%02i.");
+        std::string name(dataPath+"/meshes/%03u%02i%02i.");
 
 #define DEBUG_WRITE(fileExtension,data) \
     do { \
@@ -198,16 +200,19 @@ namespace MMAP
         fwrite(mesh->meshes, sizeof(int), mesh->nmeshes * 4, file);
     }
 
-    void IntermediateValues::generateObjFile(uint32 mapID, uint32 tileX, uint32 tileY, MeshData& meshData)
+    void IntermediateValues::generateObjFile(const std::string& dataPath, uint32 mapID, uint32 tileX, uint32 tileY, MeshData& meshData)
     {
-        char objFileName[255];
-        sprintf(objFileName, "meshes/map%03u%02u%02u.obj", mapID, tileY, tileX);
+        std::string objFileName = Acore::StringFormat(
+            "{}/meshes/map{:03}{:02}{:02}.obj",
+            dataPath,
+            mapID, tileY, tileX
+        );
 
-        FILE* objFile = fopen(objFileName, "wb");
+        FILE* objFile = fopen(objFileName.c_str(), "wb");
         if (!objFile)
         {
             char message[1024];
-            sprintf(message, "Failed to open %s for writing!\n", objFileName);
+            sprintf(message, "Failed to open %s for writing!\n", objFileName.c_str());
             perror(message);
             return;
         }
@@ -237,13 +242,17 @@ namespace MMAP
         sprintf(tileString, "[%02u,%02u]: ", tileY, tileX);
         printf("%sWriting debug output...                       \r", tileString);
 
-        sprintf(objFileName, "meshes/%03u.map", mapID);
+        objFileName = Acore::StringFormat(
+            "{}/meshes/{:03}.map",
+            dataPath,
+            mapID
+        );
 
-        objFile = fopen(objFileName, "wb");
+        objFile = fopen(objFileName.c_str(), "wb");
         if (!objFile)
         {
             char message[1024];
-            sprintf(message, "Failed to open %s for writing!\n", objFileName);
+            sprintf(message, "Failed to open %s for writing!\n", objFileName.c_str());
             perror(message);
             return;
         }
@@ -252,12 +261,17 @@ namespace MMAP
         fwrite(&b, sizeof(char), 1, objFile);
         fclose(objFile);
 
-        sprintf(objFileName, "meshes/%03u%02u%02u.mesh", mapID, tileY, tileX);
-        objFile = fopen(objFileName, "wb");
+        objFileName = Acore::StringFormat(
+            "{}/meshes/{:03}{:02}{:02}.mesh",
+            dataPath,
+            mapID, tileY, tileX
+        );
+
+        objFile = fopen(objFileName.c_str(), "wb");
         if (!objFile)
         {
             char message[1024];
-            sprintf(message, "Failed to open %s for writing!\n", objFileName);
+            sprintf(message, "Failed to open %s for writing!\n", objFileName.c_str());
             perror(message);
             return;
         }

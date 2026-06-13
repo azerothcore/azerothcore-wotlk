@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -256,8 +256,8 @@ void WorldSession::HandleAutoEquipItemOpcode(WorldPackets::Item::AutoEquipItem& 
         }
 
         // now do moves, remove...
-        _player->RemoveItem(dstbag, dstslot, true, true);
-        _player->RemoveItem(packet.SourceBag, packet.SourceSlot, true, true);
+        _player->RemoveItem(dstbag, dstslot, true);
+        _player->RemoveItem(packet.SourceBag, packet.SourceSlot, true);
 
         // add to dest
         _player->EquipItem(dest, pSrcItem, true);
@@ -602,7 +602,10 @@ void WorldSession::HandleSellItemOpcode(WorldPackets::Item::SellItem& packet)
     if (pItem)
     {
         if (!sScriptMgr->OnPlayerCanSellItem(_player, pItem, creature))
+        {
+            _player->SendSellError(SELL_ERR_CANT_SELL_ITEM, creature, packet.ItemGuid, 0);
             return;
+        }
 
         // prevent sell not owner item
         if (_player->GetGUID() != pItem->GetOwnerGUID())
@@ -868,10 +871,12 @@ void WorldSession::SendListInventory(ObjectGuid vendorGuid, uint32 vendorEntry)
         GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
     }
 
-    // Stop the npc if moving
-    if (uint32 pause = vendor->GetMovementTemplate().GetInteractionPauseTimer())
-        vendor->PauseMovement(pause);
-    vendor->SetHomePosition(vendor->GetPosition());
+    vendor->PauseMovementForInteraction();
+
+    // Update home position for patrolling NPCs only (prevents drift for stationary NPCs)
+    if (vendor->GetDefaultMovementType() == WAYPOINT_MOTION_TYPE ||
+        vendor->GetMotionMaster()->GetCurrentMovementGeneratorType() == WAYPOINT_MOTION_TYPE)
+        vendor->SetHomePosition(vendor->GetPosition());
 
     SetCurrentVendor(vendorEntry);
 

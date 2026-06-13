@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -21,10 +21,14 @@
 #include "StringFormat.h"
 #include "Tokenize.h"
 #include "Util.h"
+#include <algorithm>
+#include <cctype>
 #include <cstdlib>
 #include <fstream>
+#include <locale>
 #include <mutex>
 #include <unordered_map>
+#include <unordered_set>
 
 namespace
 {
@@ -34,13 +38,14 @@ namespace
     std::unordered_map<std::string /*name*/, std::string /*value*/> _configOptions;
     std::unordered_map<std::string /*name*/, std::string /*value*/> _envVarCache;
     std::mutex _configLock;
+    ConfigPolicy _policy;
 
-    std::vector<std::string> _fatalConfigOptions =
+    std::unordered_set<std::string> _criticalConfigOptions =
     {
-        { "RealmID" },
-        { "LoginDatabaseInfo" },
-        { "WorldDatabaseInfo" },
-        { "CharacterDatabaseInfo" },
+        "RealmID",
+        "LoginDatabaseInfo",
+        "WorldDatabaseInfo",
+        "CharacterDatabaseInfo",
     };
 
     // Check system configs like *server.conf*
@@ -62,6 +67,29 @@ namespace
         return foundAppender != std::string_view::npos || foundLogger != std::string_view::npos;
     }
 
+    Optional<ConfigSeverity> ParseSeverity(std::string_view value)
+    {
+        if (value.empty())
+            return std::nullopt;
+
+        std::string lowered(value);
+        std::transform(lowered.begin(), lowered.end(), lowered.begin(), [](unsigned char c) { return std::tolower(c); });
+
+        if (lowered == "skip")
+            return ConfigSeverity::Skip;
+
+        if (lowered == "warn" || lowered == "warning")
+            return ConfigSeverity::Warn;
+
+        if (lowered == "error")
+            return ConfigSeverity::Error;
+
+        if (lowered == "fatal" || lowered == "abort" || lowered == "panic")
+            return ConfigSeverity::Fatal;
+
+        return std::nullopt;
+    }
+
     template<typename Format, typename... Args>
     inline void PrintError(std::string_view filename, Format&& fmt, Args&& ... args)
     {
@@ -77,6 +105,138 @@ namespace
         }
     }
 
+    template<typename Format, typename... Args>
+    inline void LogWithSeverity(ConfigSeverity severity, std::string_view filename, Format&& fmt, Args&&... args)
+    {
+        std::string message = Acore::StringFormat(std::forward<Format>(fmt), std::forward<Args>(args)...);
+
+        switch (severity)
+        {
+            case ConfigSeverity::Skip:
+                return;
+            case ConfigSeverity::Warn:
+            {
+                if (IsAppConfig(filename))
+                    fmt::print("{}\n", message);
+
+                LOG_WARN("server.loading", message);
+                return;
+            }
+            case ConfigSeverity::Error:
+            {
+                if (IsAppConfig(filename))
+                    fmt::print("{}\n", message);
+
+                LOG_ERROR("server.loading", message);
+                return;
+            }
+            case ConfigSeverity::Fatal:
+            {
+                if (IsAppConfig(filename))
+                    fmt::print("{}\n", message);
+
+                LOG_FATAL("server.loading", message);
+                ABORT(message);
+            }
+        }
+    }
+
+    ConfigPolicy ApplyPolicyString(ConfigPolicy policy, std::string_view input)
+    {
+        if (input.empty())
+            return policy;
+
+        std::vector<std::pair<std::string, ConfigSeverity>> overrides;
+        Optional<ConfigSeverity> defaultOverride;
+
+        std::string tokenBuffer(input);
+        for (std::string_view rawToken : Acore::Tokenize(tokenBuffer, ',', false))
+        {
+            std::string token = Acore::String::Trim(std::string(rawToken), std::locale());
+            if (token.empty())
+                continue;
+
+            auto separator = token.find('=');
+            if (separator == std::string::npos)
+                continue;
+
+            std::string key = Acore::String::Trim(token.substr(0, separator), std::locale());
+            std::string value = Acore::String::Trim(token.substr(separator + 1), std::locale());
+
+            if (key.empty() || value.empty())
+                continue;
+
+            auto severity = ParseSeverity(value);
+            if (!severity)
+                continue;
+
+            std::transform(key.begin(), key.end(), key.begin(), [](unsigned char c) { return std::tolower(c); });
+
+            if (key == "default")
+            {
+                defaultOverride = severity;
+                continue;
+            }
+
+            overrides.emplace_back(std::move(key), *severity);
+        }
+
+        if (defaultOverride)
+        {
+            policy.defaultSeverity = *defaultOverride;
+            policy.missingFileSeverity = *defaultOverride;
+            policy.missingOptionSeverity = *defaultOverride;
+            policy.criticalOptionSeverity = *defaultOverride;
+            policy.unknownOptionSeverity = *defaultOverride;
+            policy.valueErrorSeverity = *defaultOverride;
+        }
+
+        for (auto const& [key, severity] : overrides)
+        {
+            if (key == "missing_file" || key == "file")
+                policy.missingFileSeverity = severity;
+            else if (key == "missing_option" || key == "option")
+                policy.missingOptionSeverity = severity;
+            else if (key == "critical_option" || key == "critical")
+                policy.criticalOptionSeverity = severity;
+            else if (key == "unknown_option" || key == "unknown")
+                policy.unknownOptionSeverity = severity;
+            else if (key == "value_error" || key == "value")
+                policy.valueErrorSeverity = severity;
+        }
+
+        return policy;
+    }
+
+    ConfigPolicy ApplyPolicyFromArgs(ConfigPolicy policy, std::vector<std::string> const& args)
+    {
+        for (std::size_t i = 0; i < args.size(); ++i)
+        {
+            std::string const& arg = args[i];
+            std::string_view value;
+
+            constexpr std::string_view shortOpt = "--config-policy";
+
+            if (arg.rfind(shortOpt, 0) == 0)
+            {
+                if (arg.size() == shortOpt.size() && (i + 1) < args.size())
+                {
+                    value = args[i + 1];
+                    ++i;
+                }
+                else if (arg.size() > shortOpt.size() && arg[shortOpt.size()] == '=')
+                {
+                    value = std::string_view(arg).substr(shortOpt.size() + 1);
+                }
+
+                if (!value.empty())
+                    policy = ApplyPolicyString(policy, value);
+            }
+        }
+
+        return policy;
+    }
+
     void AddKey(std::string const& optionName, std::string const& optionKey, std::string_view fileName, bool isOptional, [[maybe_unused]] bool isReload)
     {
         auto const& itr = _configOptions.find(optionName);
@@ -86,7 +246,7 @@ namespace
         {
             if (!IsLoggingSystemOptions(optionName) && !isReload)
             {
-                PrintError(fileName, "> Config::LoadFile: Found incorrect option '{}' in config file '{}'. Skip", optionName, fileName);
+                LogWithSeverity(_policy.unknownOptionSeverity, fileName, "> Config::LoadFile: Found incorrect option '{}' in config file '{}'. Skip", optionName, fileName);
 
 #ifdef CONFIG_ABORT_INCORRECT_OPTIONS
                 ABORT("> Core can't start if found incorrect options");
@@ -111,13 +271,10 @@ namespace
 
         if (in.fail())
         {
-            if (isOptional)
-            {
-                // No display erorr if file optional
-                return false;
-            }
-
-            throw ConfigException(Acore::StringFormat("Config::LoadFile: Failed open {}file '{}'", isOptional ? "optional " : "", file));
+            ConfigSeverity severity = isOptional ? ConfigSeverity::Skip : _policy.missingFileSeverity;
+            LogWithSeverity(severity, file, "> Config::LoadFile: Failed open {}file '{}'", isOptional ? "optional " : "", file);
+            // Treat SKIP as a successful no-op so the app can proceed
+            return severity == ConfigSeverity::Skip;
         }
 
         uint32 count = 0;
@@ -181,13 +338,10 @@ namespace
         // No lines read
         if (!count)
         {
-            if (isOptional)
-            {
-                // No display erorr if file optional
-                return false;
-            }
-
-            throw ConfigException(Acore::StringFormat("Config::LoadFile: Empty file '{}'", file));
+            ConfigSeverity severity = isOptional ? ConfigSeverity::Skip : _policy.missingFileSeverity;
+            LogWithSeverity(severity, file, "> Config::LoadFile: Empty file '{}'", file);
+            // Treat SKIP as a successful no-op
+            return severity == ConfigSeverity::Skip;
         }
 
         // Add correct keys if file load without errors
@@ -382,7 +536,6 @@ T ConfigMgr::GetValueDefault(std::string const& name, T const& def, bool showLog
     std::string strValue;
 
     auto const& itr = _configOptions.find(name);
-    bool fatalConfig = false;
     bool notFound = itr == _configOptions.end();
     auto envVarName = GetEnvVarName(name);
     Optional<std::string> envVar = GetEnvFromCache(name, envVarName);
@@ -401,19 +554,25 @@ T ConfigMgr::GetValueDefault(std::string const& name, T const& def, bool showLog
     {
         if (showLogs)
         {
-            for (std::string s : _fatalConfigOptions)
-                if (s == name)
-                {
-                    fatalConfig = true;
-                    break;
-                }
+            bool isCritical = _criticalConfigOptions.find(name) != _criticalConfigOptions.end();
+            ConfigSeverity severity = isCritical ? _policy.criticalOptionSeverity : _policy.missingOptionSeverity;
 
-            if (fatalConfig)
-                LOG_FATAL("server.loading", "> Config:\n\nFATAL ERROR: Missing property {} in config file {}, add \"{} = {}\" to this file or define '{}' as an environment variable\n\nYour server cannot start without this option!",
+            if (isCritical)
+            {
+                LogWithSeverity(severity, _filename,
+                    "> Config:\n\nFATAL ERROR: Missing property {} in config file {}, add \"{} = {}\" to this file or define '{}' as an environment variable\n\nYour server cannot start without this option!",
                     name, _filename, name, Acore::ToString(def), envVarName);
+            }
             else
-                LOG_WARN("server.loading", "> Config: Missing property {} in config file {}, add \"{} = {}\" to this file or define '{}' as an environment variable.",
-                    name, _filename, name, Acore::ToString(def), envVarName);
+            {
+                std::string configs = _filename;
+                if (!_moduleConfigFiles.empty())
+                    configs += " or module config";
+
+                LogWithSeverity(severity, _filename,
+                    "> Config: Missing property {} in config file {}, add \"{} = {}\" to this file or define '{}' as an environment variable.",
+                    name, configs, name, def, envVarName);
+            }
         }
         return def;
     }
@@ -427,7 +586,8 @@ T ConfigMgr::GetValueDefault(std::string const& name, T const& def, bool showLog
     {
         if (showLogs)
         {
-            LOG_ERROR("server.loading", "> Config: Bad value defined for name '{}', going to use '{}' instead",
+            LogWithSeverity(_policy.valueErrorSeverity, _filename,
+                "> Config: Bad value defined for name '{}', going to use '{}' instead",
                 name, Acore::ToString(def));
         }
 
@@ -441,7 +601,6 @@ template<>
 std::string ConfigMgr::GetValueDefault<std::string>(std::string const& name, std::string const& def, bool showLogs /*= true*/) const
 {
     auto const& itr = _configOptions.find(name);
-    bool fatalConfig = false;
     bool notFound = itr == _configOptions.end();
     auto envVarName = GetEnvVarName(name);
     Optional<std::string> envVar = GetEnvFromCache(name, envVarName);
@@ -460,19 +619,25 @@ std::string ConfigMgr::GetValueDefault<std::string>(std::string const& name, std
     {
         if (showLogs)
         {
-            for (std::string s : _fatalConfigOptions)
-                if (s == name)
-                {
-                    fatalConfig = true;
-                    break;
-                }
+            bool isCritical = _criticalConfigOptions.find(name) != _criticalConfigOptions.end();
+            ConfigSeverity severity = isCritical ? _policy.criticalOptionSeverity : _policy.missingOptionSeverity;
 
-            if (fatalConfig)
-                LOG_FATAL("server.loading", "> Config:\n\nFATAL ERROR: Missing property {} in config file {}, add \"{} = {}\" to this file or define '{}' as an environment variable.\n\nYour server cannot start without this option!",
+            if (isCritical)
+            {
+                LogWithSeverity(severity, _filename,
+                    "> Config:\n\nFATAL ERROR: Missing property {} in config file {}, add \"{} = {}\" to this file or define '{}' as an environment variable.\n\nYour server cannot start without this option!",
                     name, _filename, name, def, envVarName);
+            }
             else
-                LOG_WARN("server.loading", "> Config: Missing property {} in config file {}, add \"{} = {}\" to this file or define '{}' as an environment variable.",
-                    name, _filename, name, def, envVarName);
+            {
+                std::string configs = _filename;
+                if (!_moduleConfigFiles.empty())
+                    configs += " or module config";
+
+                LogWithSeverity(severity, _filename,
+                    "> Config: Missing property {} in config file {}, add \"{} = {}\" to this file or define '{}' as an environment variable.",
+                    name, configs, name, def, envVarName);
+            }
         }
 
         return def;
@@ -497,7 +662,8 @@ bool ConfigMgr::GetOption<bool>(std::string const& name, bool const& def, bool s
     {
         if (showLogs)
         {
-            LOG_ERROR("server.loading", "> Config: Bad value defined for name '{}', going to use '{}' instead",
+            LogWithSeverity(_policy.valueErrorSeverity, _filename,
+                "> Config: Bad value defined for name '{}', going to use '{}' instead",
                 name, def ? "true" : "false");
         }
 
@@ -546,17 +712,27 @@ std::string const ConfigMgr::GetConfigPath()
 #endif
 }
 
-void ConfigMgr::Configure(std::string const& initFileName, std::vector<std::string> args, std::string_view modulesConfigList /*= {}*/)
+void ConfigMgr::Configure(std::string const& initFileName, std::vector<std::string> args, std::string_view modulesConfigList /*= {}*/, ConfigPolicy policy /*= {}*/)
 {
     _filename = initFileName;
     _args = std::move(args);
+    _policy = policy;
+
+    if (char const* env = std::getenv("AC_CONFIG_POLICY"))
+        _policy = ApplyPolicyString(_policy, env);
+
+    _policy = ApplyPolicyFromArgs(_policy, _args);
+
+    _additonalFiles.clear();
+    _moduleConfigFiles.clear();
 
     // Add modules config if exist
     if (!modulesConfigList.empty())
     {
         for (auto const& itr : Acore::Tokenize(modulesConfigList, ',', false))
         {
-            _additonalFiles.emplace_back(itr);
+            if (!itr.empty())
+                _additonalFiles.emplace_back(itr);
         }
     }
 }
@@ -588,38 +764,13 @@ bool ConfigMgr::LoadModulesConfigs(bool isReload /*= false*/, bool isNeedPrintIn
 
     // Start loading module configs
     std::string const& moduleConfigPath = GetConfigPath() + "modules/";
-    bool isExistDefaultConfig = true;
-    bool isExistDistConfig = true;
 
-    for (auto const& distFileName : _additonalFiles)
+    for (auto const& fileName : _additonalFiles)
     {
-        std::string defaultFileName = distFileName;
+        bool isExistConfig = LoadAdditionalFile(moduleConfigPath + fileName, false, isReload);
 
-        if (!defaultFileName.empty())
-        {
-            defaultFileName.erase(defaultFileName.end() - 5, defaultFileName.end());
-        }
-
-        // Load .conf.dist config
-        isExistDistConfig = LoadAdditionalFile(moduleConfigPath + distFileName, false, isReload);
-
-        if (!isReload && !isExistDistConfig)
-        {
-            LOG_FATAL("server.loading", "> ConfigMgr::LoadModulesConfigs: Not found original config '{}'. Stop loading", distFileName);
-            ABORT();
-        }
-
-        // Load .conf config
-        isExistDefaultConfig = LoadAdditionalFile(moduleConfigPath + defaultFileName, true, isReload);
-
-        if (isExistDefaultConfig && isExistDistConfig)
-        {
-            _moduleConfigFiles.emplace_back(defaultFileName);
-        }
-        else if (!isExistDefaultConfig && isExistDistConfig)
-        {
-            _moduleConfigFiles.emplace_back(distFileName);
-        }
+        if (isExistConfig)
+            _moduleConfigFiles.emplace_back(fileName);
     }
 
     if (isNeedPrintInfo)

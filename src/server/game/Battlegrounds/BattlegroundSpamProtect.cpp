@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -25,6 +25,7 @@
 namespace
 {
     std::unordered_map<ObjectGuid /*player guid*/, uint32 /*time*/> _players;
+    std::unordered_map<uint32 /*bracket+bg key*/, uint32 /*time*/> _brackets;
 
     void AddTime(ObjectGuid guid)
     {
@@ -46,6 +47,26 @@ namespace
     {
         // Skip if spam time < 30 secs (default)
         return GameTime::GetGameTime().count() - GetTime(guid) >= sWorld->getIntConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_SPAM_DELAY);
+    }
+
+    void AddTime(uint32 key)
+    {
+        _brackets.insert_or_assign(key, GameTime::GetGameTime().count());
+    }
+
+    uint32 GetTime(uint32 key)
+    {
+        auto const& itr = _brackets.find(key);
+        if (itr != _brackets.end())
+            return itr->second;
+
+        return 0;
+    }
+
+    bool IsCorrectDelay(uint32 key)
+    {
+        // Skip if spam time < 30 secs (default)
+        return GameTime::GetGameTime().count() - GetTime(key) >= sWorld->getIntConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_SPAM_DELAY);
     }
 }
 
@@ -82,5 +103,31 @@ bool BGSpamProtect::CanAnnounce(Player* player, Battleground* bg, uint32 minLeve
     }
 
     AddTime(guid);
+    return true;
+}
+
+bool BGSpamProtect::CanAnnounce(Battleground* bg, BattlegroundBracketId bracketId, uint32 minLevel, uint32 queueTotal)
+{
+    if (!bg)
+        return false;
+
+    uint32 key = uint32(bg->GetBgTypeID()) * MAX_BATTLEGROUND_BRACKETS + uint32(bracketId);
+
+    // Check prev time
+    if (!IsCorrectDelay(key))
+        return false;
+
+    // When limited, it announces only if there are at least CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_LIMIT_MIN_PLAYERS in queue
+    auto limitQueueMinLevel = sWorld->getIntConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_LIMIT_MIN_LEVEL);
+    if (limitQueueMinLevel && minLevel >= limitQueueMinLevel)
+    {
+        // limit only RBG for 80, WSG for lower levels
+        auto bgTypeToLimit = minLevel == 80 ? BATTLEGROUND_RB : BATTLEGROUND_WS;
+
+        if (bg->GetBgTypeID() == bgTypeToLimit && queueTotal < sWorld->getIntConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_LIMIT_MIN_PLAYERS))
+            return false;
+    }
+
+    AddTime(key);
     return true;
 }

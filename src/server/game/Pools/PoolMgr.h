@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -25,7 +25,8 @@
 
 struct PoolTemplateData
 {
-    uint32  MaxLimit;
+    uint32      MaxLimit;
+    std::string Description;
 };
 
 struct PoolObject
@@ -89,6 +90,8 @@ public:
         return EqualChanced.front().guid;
     }
     uint32 GetPoolId() const { return poolId; }
+    std::vector<PoolObject> const& GetExplicitlyChanced() const { return ExplicitlyChanced; }
+    std::vector<PoolObject> const& GetEqualChanced() const { return EqualChanced; }
 private:
     uint32 poolId;
     PoolObjectList ExplicitlyChanced;
@@ -130,10 +133,21 @@ public:
 
     void ChangeDailyQuests();
     void ChangeWeeklyQuests();
+    void ReSpawnPoolQuests();
 
     PooledQuestRelation mQuestCreatureRelation;
     PooledQuestRelation mQuestGORelation;
 
+    // Pool info accessors for debug commands
+    PoolTemplateData const* GetPoolTemplate(uint32 poolId) const;
+    PoolGroup<Creature> const* GetPoolCreatureGroup(uint32 poolId) const;
+    PoolGroup<GameObject> const* GetPoolGameObjectGroup(uint32 poolId) const;
+    PoolGroup<Pool> const* GetPoolPoolGroup(uint32 poolId) const;
+    ActivePoolData const& GetSpawnedData() const { return mSpawnedData; }
+    uint32 GetCreaturePoolId(uint32 guid) const;
+    uint32 GetGameObjectPoolId(uint32 guid) const;
+
+    friend class PoolQuestReloadFixTest;
 private:
     template<typename T>
     void SpawnPool(uint32 pool_id, uint32 db_guid_or_pool_id);

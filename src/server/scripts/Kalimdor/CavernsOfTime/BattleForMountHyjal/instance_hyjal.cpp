@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -53,16 +53,16 @@ ObjectData const creatureData[] =
 
 Milliseconds hyjalWaveTimers[4][MAX_WAVES_STANDARD]
 {
-    { 130000ms, 130000ms, 130000ms, 130000ms, 130000ms, 130000ms, 130000ms, 190000ms, 0ms },    // Winterchill
-    { 130000ms, 130000ms, 130000ms, 130000ms, 130000ms, 130000ms, 130000ms, 190000ms, 0ms },    // Anetheron
-    { 130000ms, 155000ms, 130000ms, 155000ms, 130000ms, 130000ms, 155000ms, 225000ms, 0ms },    // Kaz'rogal
-    { 130000ms, 190000ms, 190000ms, 190000ms, 130000ms, 155000ms, 190000ms, 225000ms, 0ms }     // Azgalor
+    { 130s, 130s, 130s, 130s, 130s, 130s, 130s, 190s, 0ms },    // Winterchill
+    { 130s, 130s, 130s, 130s, 130s, 130s, 130s, 190s, 0ms },    // Anetheron
+    { 130s, 155s, 130s, 155s, 130s, 130s, 155s, 225s, 0ms },    // Kaz'rogal
+    { 130s, 190s, 190s, 190s, 130s, 155s, 190s, 225s, 0ms }     // Azgalor
 };
 
 Milliseconds hyjalRetreatTimers[2][MAX_WAVES_RETREAT]
 {
-    { 10000ms, 6000ms , 0ms },   // Alliance
-    { 10000ms, 40000ms, 0ms }    // Horde
+    { 10s, 6s , 0ms },   // Alliance
+    { 10s, 40s, 0ms }    // Horde
 };
 
 Milliseconds hyjalNightElfWaveTimers[1][MAX_WAVES_NIGHT_ELF]
@@ -295,7 +295,7 @@ public:
                     }
 
                     // Despawn all alliance NPCs
-                    scheduler.Schedule(21000ms, [this](TaskContext)
+                    scheduler.Schedule(21s, [this](TaskContext)
                         {
                             for (ObjectGuid const& guid : _baseAlliance)
                                 if (Creature* creature = instance->GetCreature(guid))
@@ -343,7 +343,7 @@ public:
                         }
                     }
 
-                    scheduler.Schedule(21000ms, [this](TaskContext)
+                    scheduler.Schedule(21s, [this](TaskContext)
                         {
                             for (ObjectGuid const& guid : _baseHorde)
                                 if (Creature* creature = instance->GetCreature(guid))

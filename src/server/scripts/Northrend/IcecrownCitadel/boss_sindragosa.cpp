@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -384,7 +384,7 @@ public:
                 me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetSpeed(MOVE_RUN, 4.28571f);
                 float moveTime = me->GetExactDist(&SindragosaFlyInPos) / (me->GetSpeed(MOVE_RUN) * 0.001f);
-                me->m_Events.AddEvent(new FrostwyrmLandEvent(*me, SindragosaLandPos), me->m_Events.CalculateTime(uint64(moveTime) + 250));
+                me->m_Events.AddEventAtOffset(new FrostwyrmLandEvent(*me, SindragosaLandPos), Milliseconds(uint32(moveTime) + 250));
                 me->GetMotionMaster()->MovePoint(POINT_FROSTWYRM_FLY_IN, SindragosaFlyInPos);
 
                 if (!instance->GetData(DATA_SINDRAGOSA_INTRO))
@@ -478,7 +478,7 @@ public:
         {
             summons.Summon(summon);
             if (summon->GetEntry() == NPC_FROST_BOMB)
-                summon->m_Events.AddEvent(new FrostBombExplosion(summon, me->GetGUID()), summon->m_Events.CalculateTime(5500));
+                summon->m_Events.AddEventAtOffset(new FrostBombExplosion(summon, me->GetGUID()), 5500ms);
         }
 
         void SummonedCreatureDespawn(Creature* summon) override
@@ -523,7 +523,7 @@ public:
                     me->SetControlled(true, UNIT_STATE_ROOT);
                     me->SendMovementFlagUpdate();
                     me->CastSpell(me->GetVictim(), SPELL_TAIL_SMASH, false);
-                    events.DelayEventsToMax(1, 0);
+                    events.DelayEventsToMax(1ms, 0);
                     events.ScheduleEvent(EVENT_UNROOT, 0ms);
                     events.ScheduleEvent(EVENT_TAIL_SMASH, 22s, 27s, EVENT_GROUP_LAND_PHASE);
                     break;
@@ -532,7 +532,7 @@ public:
                     me->SetControlled(true, UNIT_STATE_ROOT);
                     me->SendMovementFlagUpdate();
                     me->CastSpell(me->GetVictim(), _isThirdPhase ? SPELL_FROST_BREATH_P2 : SPELL_FROST_BREATH_P1, false);
-                    events.DelayEventsToMax(1, 0);
+                    events.DelayEventsToMax(1ms, 0);
                     events.ScheduleEvent(EVENT_UNROOT, 0ms);
                     events.ScheduleEvent(EVENT_FROST_BREATH, 20s, 25s, EVENT_GROUP_LAND_PHASE);
                     break;
@@ -547,11 +547,10 @@ public:
                     break;
                 case EVENT_ICY_GRIP:
                     me->CastSpell((Unit*)nullptr, SPELL_ICY_GRIP, false);
-                    events.DelayEventsToMax(1001, 0);
+                    events.DelayEventsToMax(1001ms, 0);
                     events.ScheduleEvent(EVENT_BLISTERING_COLD, 1s, EVENT_GROUP_LAND_PHASE);
-                    if (uint32 evTime = events.GetNextEventTime(EVENT_ICE_TOMB))
-                        if (events.GetTimer() > evTime || evTime - events.GetTimer() < 7000)
-                            events.RescheduleEvent(EVENT_ICE_TOMB, 7s);
+                    if (events.GetTimeUntilEvent(EVENT_ICE_TOMB) < 7s)
+                        events.RescheduleEvent(EVENT_ICE_TOMB, 7s);
                     break;
                 case EVENT_BLISTERING_COLD:
                     Talk(EMOTE_WARN_BLISTERING_COLD);
@@ -652,9 +651,8 @@ public:
                         Talk(EMOTE_WARN_FROZEN_ORB, target);
                         me->CastSpell(target, SPELL_ICE_TOMB_DUMMY, true);
                         me->CastSpell(target, SPELL_FROST_BEACON, true);
-                        if (uint32 evTime = events.GetNextEventTime(EVENT_ICY_GRIP))
-                            if (events.GetTimer() > evTime || evTime - events.GetTimer() < 8000)
-                                events.RescheduleEvent(EVENT_ICY_GRIP, 8s, EVENT_GROUP_LAND_PHASE);
+                        if (events.GetTimeUntilEvent(EVENT_ICY_GRIP) < 8s)
+                            events.RescheduleEvent(EVENT_ICY_GRIP, 8s, EVENT_GROUP_LAND_PHASE);
                     }
                     events.ScheduleEvent(EVENT_ICE_TOMB, 18s, 22s);
                     break;
@@ -700,7 +698,7 @@ public:
         uint32 _existenceCheckTimer;
         uint16 _asphyxiationTimer;
 
-        void SetGUID(ObjectGuid guid, int32 type) override
+        void SetGUID(ObjectGuid const& guid, int32 type) override
         {
             if (type == DATA_TRAPPED_PLAYER)
                 _trappedPlayerGUID = guid;
@@ -722,7 +720,7 @@ public:
                 player->RemoveAurasDueToSpell(SPELL_ICE_TOMB_DAMAGE);
                 player->RemoveAurasDueToSpell(SPELL_ASPHYXIATION);
                 player->RemoveAurasDueToSpell(SPELL_ICE_TOMB_UNTARGETABLE);
-                me->DespawnOrUnsummon(5000);
+                me->DespawnOrUnsummon(5s);
             }
         }
 
@@ -1081,7 +1079,7 @@ class spell_sindragosa_ice_tomb_trap_aura : public AuraScript
     void AfterApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (Unit* c = GetCaster())
-            GetTarget()->m_Events.AddEvent(new IceTombSummonEvent(GetTarget(), c->GetGUID()), GetTarget()->m_Events.CalculateTime(500));
+            GetTarget()->m_Events.AddEventAtOffset(new IceTombSummonEvent(GetTarget(), c->GetGUID()), 500ms);
     }
 
     void ExtraRemoveEffect(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -1247,7 +1245,7 @@ public:
                 me->setActive(true);
                 me->SetImmuneToPC(true);
                 float moveTime = me->GetExactDist(&SpinestalkerFlyPos) / (me->GetSpeed(MOVE_RUN) * 0.001f);
-                me->m_Events.AddEvent(new FrostwyrmLandEvent(*me, SpinestalkerLandPos), me->m_Events.CalculateTime(uint64(moveTime) + 250));
+                me->m_Events.AddEventAtOffset(new FrostwyrmLandEvent(*me, SpinestalkerLandPos), Milliseconds(uint32(moveTime) + 250));
                 me->SetDefaultMovementType(IDLE_MOTION_TYPE);
                 me->GetMotionMaster()->MoveIdle();
                 me->StopMoving();
@@ -1378,7 +1376,7 @@ public:
                 me->setActive(true);
                 me->SetImmuneToPC(true);
                 float moveTime = me->GetExactDist(&RimefangFlyPos) / (me->GetSpeed(MOVE_RUN) * 0.001f);
-                me->m_Events.AddEvent(new FrostwyrmLandEvent(*me, RimefangLandPos), me->m_Events.CalculateTime(uint64(moveTime) + 250));
+                me->m_Events.AddEventAtOffset(new FrostwyrmLandEvent(*me, RimefangLandPos), Milliseconds(uint32(moveTime) + 250));
                 me->SetDefaultMovementType(IDLE_MOTION_TYPE);
                 me->GetMotionMaster()->MoveIdle();
                 me->StopMoving();
@@ -1451,8 +1449,8 @@ public:
                         else destZ = me->GetPositionZ() + 25.0f;
                         me->GetMotionMaster()->MoveTakeoff(0, me->GetPositionX(), me->GetPositionY(), destZ, me->GetSpeed(MOVE_RUN));
                         float moveTime = std::fabs(destZ - me->GetPositionZ()) / (me->GetSpeed(MOVE_RUN) * 0.001f);
-                        _events.ScheduleEvent(EVENT_ICY_BLAST, uint32(moveTime) + urand(60000, 70000));
-                        _events.ScheduleEvent(EVENT_ICY_BLAST_CAST, uint32(moveTime) + 250);
+                        _events.Repeat(Milliseconds(uint32(moveTime) + urand(60000, 70000)));
+                        _events.ScheduleEvent(EVENT_ICY_BLAST_CAST, Milliseconds(uint32(moveTime) + 250));
                         break;
                     }
                 case EVENT_ICY_BLAST_CAST:

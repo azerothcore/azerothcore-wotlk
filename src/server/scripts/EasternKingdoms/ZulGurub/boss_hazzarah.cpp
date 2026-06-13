@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -83,14 +83,14 @@ struct boss_hazzarah : public BossAI
     {
         if (me->GetThreatMgr().GetThreatListSize() > 1)
         {
-            ThreatContainer::StorageType::const_iterator lastRef = me->GetThreatMgr().GetOnlineContainer().GetThreatList().end();
-            --lastRef;
-            if (Unit* lastTarget = (*lastRef)->getTarget())
+            // Check if target is the lowest threat (last in sorted list)
+            ThreatReference const* lowestRef = nullptr;
+            for (ThreatReference const* ref : me->GetThreatMgr().GetSortedThreatList())
+                lowestRef = ref; // Last iteration will have the lowest threat target
+
+            if (lowestRef && lowestRef->GetVictim() != target)
             {
-                if (lastTarget != target)
-                {
-                    return !target->HasAura(SPELL_SLEEP);
-                }
+                return !target->HasAura(SPELL_SLEEP);
             }
         }
 

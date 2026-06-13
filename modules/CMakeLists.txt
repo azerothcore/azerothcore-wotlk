@@ -35,8 +35,8 @@ CU_GET_GLOBAL("AC_ADD_SCRIPTS_INCLUDE")
 set("AC_SCRIPTS_INCLUDES" "")
 set("AC_MODULE_LIST" "")
 set("AC_SCRIPTS_LIST" "")
-set(MOD_ELUNA_FOUND 0)
-set(MOD_ELUNA_PATH "")
+set(MOD_ALE_FOUND 0)
+set(MOD_ALE_PATH "")
 
 foreach(include ${AC_ADD_SCRIPTS_INCLUDE})
   set("AC_SCRIPTS_INCLUDES" "#include \"${include}\"\n${AC_SCRIPTS_INCLUDES}")
@@ -50,12 +50,12 @@ foreach(scriptName ${AC_ADD_SCRIPTS_LIST})
   set("AC_SCRIPTS_LIST" "    ${scriptName};\n${AC_SCRIPTS_LIST}")
 endforeach()
 
-function(ConfigureElunaModule moduleName)
-  set(MOD_ELUNA_FOUND 1 PARENT_SCOPE)
+function(ConfigureALEModule moduleName)
+  set(MOD_ALE_FOUND 1 PARENT_SCOPE)
   GetPathToModuleSource(${SOURCE_MODULE} MODULE_SOURCE_PATH)
-  set(MOD_ELUNA_PATH ${MODULE_SOURCE_PATH} PARENT_SCOPE)
+  set(MOD_ALE_PATH ${MODULE_SOURCE_PATH} PARENT_SCOPE)
 
-  # Define eluna compile options
+  # Define ALE compile options
   target_compile_options(game-interface
     INTERFACE
       -DAZEROTHCORE
@@ -76,9 +76,9 @@ foreach(SOURCE_MODULE ${MODULES_MODULE_LIST})
     set(${MODULE_MODULE_VARIABLE} "static")
   endif()
 
-  # Use only static for mod-eluna
-  if (SOURCE_MODULE MATCHES "mod-eluna")
-    ConfigureElunaModule(${SOURCE_MODULE})
+  # Use only static for mod-ALE
+  if (SOURCE_MODULE MATCHES "mod-ale")
+    ConfigureALEModule(${SOURCE_MODULE})
   endif()
 
   # Build the Graph values
@@ -267,9 +267,9 @@ ConfigureScriptLoader("static" SCRIPT_MODULE_PRIVATE_SCRIPTLOADER OFF ${STATIC_S
 
 list(REMOVE_DUPLICATES SCRIPT_MODULE_PRIVATE_SCRIPTLOADER)
 
-if (MOD_ELUNA_FOUND)
-  list(REMOVE_ITEM PRIVATE_SOURCES_MODULES ${MOD_ELUNA_PATH}/lualib/lua.c)
-  list(REMOVE_ITEM PRIVATE_SOURCES_MODULES ${MOD_ELUNA_PATH}/lualib/luac.c)
+if (MOD_ALE_FOUND)
+  list(REMOVE_ITEM PRIVATE_SOURCES_MODULES ${MOD_ALE_PATH}/lualib/lua.c)
+  list(REMOVE_ITEM PRIVATE_SOURCES_MODULES ${MOD_ALE_PATH}/lualib/luac.c)
 endif()
 
 add_library(modules STATIC
@@ -277,8 +277,13 @@ add_library(modules STATIC
     ${SCRIPT_MODULE_PRIVATE_SCRIPTLOADER}
     ${PRIVATE_SOURCES_MODULES})
 
-if (MOD_ELUNA_FOUND)
+if (MOD_ALE_FOUND)
     target_link_libraries(modules PUBLIC lualib)
+    # Also ensure include directories are propagated for modules that include sol.hpp
+    get_target_property(LUALIB_INCLUDE_DIRS lualib INTERFACE_INCLUDE_DIRECTORIES)
+    if(LUALIB_INCLUDE_DIRS)
+        list(APPEND PUBLIC_INCLUDES ${LUALIB_INCLUDE_DIRS})
+    endif()
 endif()
 
 target_link_libraries(modules
@@ -342,6 +347,7 @@ foreach(ModuleName ${MODULE_LIST__})
 
   foreach(configFileName ${MODULE_CONFIG_LIST})
     CopyModuleConfig("${MODULE_CONFIG_PATH}/${configFileName}")
+    string(REGEX REPLACE "\.dist$" "" configFileName ${configFileName})
     set(CONFIG_LIST ${CONFIG_LIST}${configFileName},)
     message(STATUS "  |  * ${configFileName}")
   endforeach()
@@ -357,7 +363,7 @@ target_compile_options(modules
   INTERFACE
     -DCONFIG_FILE_LIST=$<1:"${CONFIG_LIST}">)
 
-if (MOD_ELUNA_FOUND)
+if (MOD_ALE_FOUND)
   if (APPLE)
     target_compile_definitions(modules
       PUBLIC
@@ -376,10 +382,10 @@ if (MOD_ELUNA_FOUND)
     add_custom_command(TARGET modules
     POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/bin/${MSVC_CONFIGURATION_NAME}lua_scripts/extensions/"
-    COMMAND ${CMAKE_COMMAND} -E copy_directory "${MOD_ELUNA_PATH}/LuaEngine/extensions" "${CMAKE_BINARY_DIR}/bin/${MSVC_CONFIGURATION_NAME}lua_scripts/extensions/")
+    COMMAND ${CMAKE_COMMAND} -E copy_directory "${MOD_ALE_PATH}/LuaEngine/extensions" "${CMAKE_BINARY_DIR}/bin/${MSVC_CONFIGURATION_NAME}lua_scripts/extensions/")
   endif()
 
-  install(DIRECTORY "${MOD_ELUNA_PATH}/LuaEngine/extensions" DESTINATION "${CMAKE_INSTALL_PREFIX}/bin/lua_scripts/")
+  install(DIRECTORY "${MOD_ALE_PATH}/LuaEngine/extensions" DESTINATION "${CMAKE_INSTALL_PREFIX}/bin/lua_scripts/")
 endif()
 
 message("")

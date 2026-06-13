@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -21,13 +21,10 @@
 
 enum spells
 {
-    PARTING_SORROW          = 59723,
-    PILLAR_OF_WOE           = 50761,
-    PILLAR_OF_WOE_H         = 59727,
-    SHOCK_OF_SORROW         = 50760,
-    SHOCK_OF_SORROW_H       = 59726,
-    STORM_OF_GRIEF          = 50752,
-    STORM_OF_GRIEF_H        = 59772,
+    SPELL_PARTING_SORROW    = 59723,
+    SPELL_PILLAR_OF_WOE     = 50761,
+    SPELL_SHOCK_OF_SORROW   = 50760,
+    SPELL_STORM_OF_GRIEF    = 50752,
 
     ACHIEVEMENT_GOOD_GRIEF  = 20383,
 };
@@ -80,10 +77,11 @@ public:
 
         void JustEngagedWith(Unit*  /*who*/) override
         {
-            events.ScheduleEvent(EVENT_STORM, 5s);
-            events.ScheduleEvent(EVENT_SHOCK, 26s, 32s);
-            events.ScheduleEvent(EVENT_PILLAR, 12s, 20s);
-            events.ScheduleEvent(EVENT_PARTING, 8s);
+            events.ScheduleEvent(EVENT_STORM, 6s, 10s);
+            events.ScheduleEvent(EVENT_SHOCK, 14s, 29s);
+            events.ScheduleEvent(EVENT_PILLAR, 7s, 15s);
+            if (IsHeroic())
+                events.ScheduleEvent(EVENT_PARTING, 27s, 45s);
 
             Talk(SAY_AGGRO);
             if (pInstance)
@@ -107,32 +105,45 @@ public:
             {
                 case EVENT_STORM:
                     {
-                        me->CastSpell(me->GetVictim(), DUNGEON_MODE(STORM_OF_GRIEF, STORM_OF_GRIEF_H), true);
-                        events.Repeat(10s);
+                        me->CastSpell(me->GetVictim(), SPELL_STORM_OF_GRIEF, true);
+                        events.Repeat(16s, 20s);
                         break;
                     }
                 case EVENT_SHOCK:
                     {
-                        me->CastSpell(me->GetVictim(), DUNGEON_MODE(SHOCK_OF_SORROW, SHOCK_OF_SORROW_H), false);
+                        me->CastSpell(me->GetVictim(), SPELL_SHOCK_OF_SORROW, false);
                         Talk(SAY_STUN);
 
-                        events.Repeat(16s, 22s);
+                        events.Repeat(19s, 33s);
                         break;
                     }
                 case EVENT_PILLAR:
                     {
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true, 0))
-                            me->CastSpell(target, DUNGEON_MODE(PILLAR_OF_WOE, PILLAR_OF_WOE_H), false);
+                            me->CastSpell(target, SPELL_PILLAR_OF_WOE, false);
 
-                        events.Repeat(12s, 20s);
+                        events.Repeat(8s, 31s);
                         break;
                     }
                 case EVENT_PARTING:
                     {
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 50.0f, true, 0))
-                            me->CastSpell(target, PARTING_SORROW, false);
+                        Unit* target = nullptr;
+                        std::list<Unit*> targetList;
 
-                        events.Repeat(6s, 16s);
+                        SelectTargetList(targetList, 10, SelectTargetMethod::Random, 0, 50.0f, true);
+                        for (Unit* possibleTarget : targetList)
+                        {
+                            if (possibleTarget && possibleTarget->IsPlayer() && possibleTarget->getPowerType() == POWER_MANA)
+                            {
+                                target = possibleTarget;
+                                break;
+                            }
+                        }
+
+                        if (target)
+                            me->CastSpell(target, SPELL_PARTING_SORROW, false);
+
+                        events.Repeat(27s, 45s);
                         break;
                     }
             }

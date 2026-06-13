@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -23,6 +23,7 @@
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
 
@@ -188,10 +189,13 @@ void WorldSession::HandleLfgPlayerLockInfoRequestOpcode(WorldPacket& /*recvData*
         if (quest)
         {
             uint8 playerLevel = GetPlayer() ? GetPlayer()->GetLevel() : 0;
+            uint8 playerLevelForXP = playerLevel;
+            sScriptMgr->OnPlayerBeforeGetLevelForXPGain(GetPlayer(), playerLevelForXP);
+
             data << uint8(done);
             data << uint32(quest->GetRewOrReqMoney(playerLevel));
-            if (!GetPlayer()->IsMaxLevel())
-                data << uint32(quest->XPValue(playerLevel));
+            if (playerLevelForXP < GetPlayer()->GetUInt32Value(PLAYER_FIELD_MAX_LEVEL))
+                data << uint32(quest->XPValue(playerLevelForXP));
             else
                 data << uint32(0);
             data << uint32(0);
@@ -479,6 +483,8 @@ void WorldSession::SendLfgPlayerReward(lfg::LfgPlayerRewardData const& rewardDat
     uint8 itemNum = rewardData.quest->GetRewItemsCount();
 
     uint8 playerLevel = GetPlayer() ? GetPlayer()->GetLevel() : 0;
+    uint8 playerLevelForXP = playerLevel;
+    sScriptMgr->OnPlayerBeforeGetLevelForXPGain(GetPlayer(), playerLevelForXP);
 
     WorldPacket data(SMSG_LFG_PLAYER_REWARD, 4 + 4 + 1 + 4 + 4 + 4 + 4 + 4 + 1 + itemNum * (4 + 4 + 4));
     data << uint32(rewardData.rdungeonEntry);              // Random Dungeon Finished
@@ -486,7 +492,7 @@ void WorldSession::SendLfgPlayerReward(lfg::LfgPlayerRewardData const& rewardDat
     data << uint8(rewardData.done);
     data << uint32(1);
     data << uint32(rewardData.quest->GetRewOrReqMoney(playerLevel));
-    data << uint32(rewardData.quest->XPValue(playerLevel));
+    data << uint32(rewardData.quest->XPValue(playerLevelForXP));
     data << uint32(0);
     data << uint32(0);
     data << uint8(itemNum);
@@ -563,12 +569,32 @@ void WorldSession::SendLfgUpdateProposal(lfg::LfgProposal const& proposal)
     data << uint8(silent);                                 // Show proposal window
     data << uint8(proposal.players.size());                // Group size
 
-    for (lfg::LfgProposalPlayerContainer::const_iterator it = proposal.players.begin(); it != proposal.players.end(); ++it)
+    // Sort by roles: tank, healer, dps
+    std::vector<ObjectGuid> ordered;
+    ordered.reserve(proposal.players.size());
+
+    std::vector<ObjectGuid> tanks, healers, dps;
+
+    for (auto const& [pguid, player] : proposal.players)
     {
-        lfg::LfgProposalPlayer const& player = it->second;
+        if (player.role & lfg::PLAYER_ROLE_TANK)
+            tanks.push_back(pguid);
+        else if (player.role & lfg::PLAYER_ROLE_HEALER)
+            healers.push_back(pguid);
+        else
+            dps.push_back(pguid);
+    }
+
+    ordered.insert(ordered.end(), tanks.begin(), tanks.end());
+    ordered.insert(ordered.end(), healers.begin(), healers.end());
+    ordered.insert(ordered.end(), dps.begin(), dps.end());
+
+    for (auto const& pguid : ordered)
+    {
+        lfg::LfgProposalPlayer const& player = proposal.players.find(pguid)->second;
         data << uint32(player.role);                       // Role
-        data << uint8(it->first == guid);                  // Self player
-        if (!player.group)                                 // Player not it a group
+        data << uint8(pguid == guid);                      // Self player
+        if (!player.group)                                 // Player not in a group
         {
             data << uint8(0);                              // Not in dungeon
             data << uint8(0);                              // Not same group

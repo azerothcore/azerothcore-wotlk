@@ -140,7 +140,8 @@ foreach(TOOL_NAME ${TOOLS_BUILD_LIST})
         mpq
         zlib
         Recast
-        g3dlib)
+        g3dlib
+        fkYAML)
   endif()
 
   unset(TOOL_PUBLIC_INCLUDES)
@@ -169,5 +170,25 @@ foreach(TOOL_NAME ${TOOLS_BUILD_LIST})
     install(TARGETS ${TOOL_PROJECT_NAME} DESTINATION bin)
   elseif (WIN32)
     install(TARGETS ${TOOL_PROJECT_NAME} DESTINATION "${CMAKE_INSTALL_PREFIX}")
+  endif()
+
+  if (${TOOL_PROJECT_NAME} STREQUAL "mmaps_generator")
+    if(WIN32)
+      if("${CMAKE_MAKE_PROGRAM}" MATCHES "MSBuild")
+        add_custom_command(TARGET ${TOOL_PROJECT_NAME}
+          POST_BUILD
+          COMMAND ${CMAKE_COMMAND} -E copy_if_different "${SOURCE_TOOL_PATH}/mmaps-config.yaml" "${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/mmaps-config.yaml")
+      elseif(MINGW)
+        add_custom_command(TARGET ${TOOL_PROJECT_NAME}
+          POST_BUILD
+          COMMAND ${CMAKE_COMMAND} -E copy_if_different "${SOURCE_TOOL_PATH}/mmaps-config.yaml" "${CMAKE_BINARY_DIR}/bin/mmaps-config.yaml")
+      endif()
+    endif()
+
+    if (UNIX)
+      install(FILES ${SOURCE_TOOL_PATH}/mmaps-config.yaml DESTINATION bin)
+    elseif (WIN32)
+      install(FILES ${SOURCE_TOOL_PATH}/mmaps-config.yaml DESTINATION "${CMAKE_INSTALL_PREFIX}")
+    endif()
   endif()
 endforeach()

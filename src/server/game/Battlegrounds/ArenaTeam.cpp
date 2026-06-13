@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -132,6 +132,8 @@ bool ArenaTeam::AddMember(ObjectGuid playerGuid)
 
     if (sWorld->getIntConfig(CONFIG_ARENA_START_PERSONAL_RATING) > 0)
         personalRating = sWorld->getIntConfig(CONFIG_ARENA_START_PERSONAL_RATING);
+    else if (sArenaSeasonMgr->GetCurrentSeason() < 6)
+        personalRating = 1500;
     else if (GetRating() >= 1000)
         personalRating = 1000;
 
@@ -162,7 +164,7 @@ bool ArenaTeam::AddMember(ObjectGuid playerGuid)
 
     // Feed data to the struct
     ArenaTeamMember newMember;
-    //newMember.Name             = playerName;
+    newMember.Name             = playerName;
     newMember.Guid             = playerGuid;
     newMember.Class            = playerClass;
     newMember.SeasonGames      = 0;
@@ -180,6 +182,7 @@ bool ArenaTeam::AddMember(ObjectGuid playerGuid)
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ARENA_TEAM_MEMBER);
     stmt->SetData(0, TeamId);
     stmt->SetData(1, playerGuid.GetCounter());
+    stmt->SetData(2, personalRating);
     CharacterDatabase.Execute(stmt);
 
     // Inform player if online
@@ -249,7 +252,7 @@ bool ArenaTeam::LoadMembersFromDB(QueryResult result)
         newMember.WeekWins         = fields[3].Get<uint16>();
         newMember.SeasonGames      = fields[4].Get<uint16>();
         newMember.SeasonWins       = fields[5].Get<uint16>();
-        //newMember.Name             = fields[6].Get<std::string>();
+        newMember.Name             = fields[6].Get<std::string>();
         newMember.Class            = fields[7].Get<uint8>();
         newMember.PersonalRating   = fields[8].Get<uint16>();
         newMember.MatchMakerRating = fields[9].Get<uint16>() > 0 ? fields[9].Get<uint16>() : sWorld->getIntConfig(CONFIG_ARENA_START_MATCHMAKER_RATING);
@@ -349,7 +352,7 @@ void ArenaTeam::DelMember(ObjectGuid guid, bool cleanDb)
                             playerMember->RemoveBattlegroundQueueId(bgQueue);
                             sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, nullptr, playerMember->GetBattlegroundQueueIndex(bgQueue), STATUS_NONE, 0, 0, 0, TEAM_NEUTRAL);
                             queue.RemovePlayer(playerMember->GetGUID(), true);
-                            playerMember->GetSession()->SendPacket(&data);
+                            playerMember->SendDirectMessage(&data);
                         }
                     }
                 }
@@ -567,7 +570,7 @@ void ArenaTeam::BroadcastPacket(WorldPacket* packet)
 {
     for (MemberList::const_iterator itr = Members.begin(); itr != Members.end(); ++itr)
         if (Player* player = ObjectAccessor::FindConnectedPlayer(itr->Guid))
-            player->GetSession()->SendPacket(packet);
+            player->SendDirectMessage(packet);
 }
 
 void ArenaTeam::BroadcastEvent(ArenaTeamEvents event, ObjectGuid guid, uint8 strCount, std::string const& str1, std::string const& str2, std::string const& str3)
@@ -671,9 +674,9 @@ uint32 ArenaTeam::GetPoints(uint32 memberRating)
 
     // Type penalties for teams < 5v5
     if (Type == ARENA_TEAM_2v2)
-        points *= 0.76f;
+        points *= sWorld->getRate(RATE_ARENA_POINTS_2V2);
     else if (Type == ARENA_TEAM_3v3)
-        points *= 0.88f;
+        points *= sWorld->getRate(RATE_ARENA_POINTS_3V3);
 
     sScriptMgr->OnGetArenaPoints(this, points);
 
@@ -966,12 +969,15 @@ void ArenaTeam::SaveToDB(bool forceMemberSave)
         stmt->SetData(6, itr->Guid.GetCounter());
         trans->Append(stmt);
 
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CHARACTER_ARENA_STATS);
-        stmt->SetData(0, itr->Guid.GetCounter());
-        stmt->SetData(1, GetSlot());
-        stmt->SetData(2, itr->MatchMakerRating);
-        stmt->SetData(3, itr->MaxMMR);
-        trans->Append(stmt);
+        if (sScriptMgr->CanSaveArenaStatsForMember(this, itr->Guid))
+        {
+            stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CHARACTER_ARENA_STATS);
+            stmt->SetData(0, itr->Guid.GetCounter());
+            stmt->SetData(1, GetSlot());
+            stmt->SetData(2, itr->MatchMakerRating);
+            stmt->SetData(3, itr->MaxMMR);
+            trans->Append(stmt);
+        }
     }
 
     CharacterDatabase.CommitTransaction(trans);

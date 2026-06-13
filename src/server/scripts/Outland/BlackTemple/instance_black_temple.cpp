@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -215,8 +215,9 @@ class spell_black_template_harpooners_mark_aura : public AuraScript
         GetUnitOwner()->GetCreaturesWithEntryInRange(creatureList, 80.0f, NPC_DRAGON_TURTLE);
         for (std::list<Creature*>::const_iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
         {
-            (*itr)->TauntApply(GetUnitOwner());
             (*itr)->AddThreat(GetUnitOwner(), 10000000.0f);
+            if ((*itr)->AI())
+                (*itr)->AI()->AttackStart(GetUnitOwner());
             _turtleSet.insert((*itr)->GetGUID());
         }
     }
@@ -226,7 +227,6 @@ class spell_black_template_harpooners_mark_aura : public AuraScript
         for (ObjectGuid const& guid : _turtleSet)
             if (Creature* turtle = ObjectAccessor::GetCreature(*GetUnitOwner(), guid))
             {
-                turtle->TauntFadeOut(GetUnitOwner());
                 turtle->AddThreat(GetUnitOwner(), -10000000.0f);
             }
     }
@@ -446,29 +446,6 @@ class spell_black_temple_curse_of_vitality_aura : public AuraScript
     }
 };
 
-class spell_black_temple_dementia_aura : public AuraScript
-{
-    PrepareAuraScript(spell_black_temple_dementia_aura);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_DEMENTIA1, SPELL_DEMENTIA2 });
-    }
-
-    void OnPeriodic(AuraEffect const*  /*aurEff*/)
-    {
-        if (roll_chance_i(50))
-            GetTarget()->CastSpell(GetTarget(), SPELL_DEMENTIA1, true);
-        else
-            GetTarget()->CastSpell(GetTarget(), SPELL_DEMENTIA2, true);
-    }
-
-    void Register() override
-    {
-        OnEffectPeriodic += AuraEffectPeriodicFn(spell_black_temple_dementia_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
-    }
-};
-
 // 39649 - Summon Shadowfiends
 class spell_black_temple_summon_shadowfiends : public SpellScript
 {
@@ -525,7 +502,6 @@ void AddSC_instance_black_temple()
     RegisterSpellScript(spell_black_temple_bloodbolt);
     RegisterSpellScript(spell_black_temple_consuming_strikes_aura);
     RegisterSpellScript(spell_black_temple_curse_of_vitality_aura);
-    RegisterSpellScript(spell_black_temple_dementia_aura);
     RegisterSpellScript(spell_black_temple_summon_shadowfiends);
     RegisterSpellScript(spell_black_temple_l5_arcane_charge);
 }

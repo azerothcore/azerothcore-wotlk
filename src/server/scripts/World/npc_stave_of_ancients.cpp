@@ -1,14 +1,14 @@
 /*
  * This file is part of the AzerothCore Project. See AUTHORS file for Copyright information
  *
- * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU Affero General Public License as published by the
- * Free Software Foundation; either version 3 of the License, or (at your
- * option) any later version.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for
+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
  * more details.
  *
  * You should have received a copy of the GNU General Public License along
@@ -42,7 +42,7 @@ void NPCStaveQuestAI::RevealForm()
     {
         me->UpdateEntry(GetFormEntry("evil"));
         me->SetFullHealth();
-        me->DespawnOrUnsummon(900000);
+        me->DespawnOrUnsummon(900s);
     }
 }
 
@@ -53,11 +53,14 @@ void NPCStaveQuestAI::StorePlayerGUID()
         return;
     }
 
-    for (ThreatContainer::StorageType::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
+    for (ThreatReference const* ref : me->GetThreatMgr().GetUnsortedThreatList())
     {
-        if ((*itr)->getTarget()->IsPlayer())
+        if (Unit* target = ref->GetVictim())
         {
-            playerGUID = (*itr)->getUnitGuid();
+            if (target->IsPlayer())
+            {
+                playerGUID = target->GetGUID();
+            }
         }
     }
 }
@@ -67,14 +70,14 @@ Player* NPCStaveQuestAI::GetGossipPlayer()
     return ObjectAccessor::GetPlayer(*me, gossipPlayerGUID);
 }
 
-bool NPCStaveQuestAI::IsAllowedEntry(uint32 entry)
+bool NPCStaveQuestAI::IsAllowedEntry(uint32 entry) const
 {
     uint32 allowedEntries[4] = { 0, 12999, 19833, 19921 }; //player, World Invisible Trigger(traps) and snake trap snakes
     bool isAllowed = std::find(std::begin(allowedEntries), std::end(allowedEntries), entry) != std::end(allowedEntries);
     return isAllowed;
 }
 
-bool NPCStaveQuestAI::UnitIsUnfair(Unit* unit)
+bool NPCStaveQuestAI::UnitIsUnfair(Unit* unit) const
 {
     if (!unit || playerGUID.IsEmpty())
     {
@@ -105,20 +108,18 @@ bool NPCStaveQuestAI::UnitIsUnfair(Unit* unit)
     return false;
 }
 
-bool NPCStaveQuestAI::IsFairFight()
+bool NPCStaveQuestAI::IsFairFight() const
 {
-    for (ThreatContainer::StorageType::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
+    for (ThreatReference const* ref : me->GetThreatMgr().GetUnsortedThreatList())
     {
-        Unit* unit = ObjectAccessor::GetUnit(*me, (*itr)->getUnitGuid());
-
-        if (!(*itr)->GetThreat())
+        if (!ref->GetThreat())
         {
             // if target threat is 0 its fair, this prevents despawn in the case when
             // there is a bystander since UpdateVictim adds nearby enemies to the threatlist
             continue;
         }
 
-        if (UnitIsUnfair(unit))
+        if (UnitIsUnfair(ref->GetVictim()))
         {
             return false;
         }
@@ -127,12 +128,10 @@ bool NPCStaveQuestAI::IsFairFight()
     return true;
 }
 
-bool NPCStaveQuestAI::ValidThreatlist()
+bool NPCStaveQuestAI::ValidThreatlist() const
 {
-    if (threatList.size() == 1)
-    {
+    if (me->GetThreatMgr().GetThreatListSize() == 1)
         return true;
-    }
 
     bool isFair = IsFairFight();
 
@@ -232,7 +231,7 @@ void NPCStaveQuestAI::ResetState(uint32 aura = 0)
 
     if (InNormalForm())
     {
-        me->m_Events.KillAllEvents(true);
+        me->m_Events.KillAllEvents(false);
         me->SetNpcFlag(UNIT_NPC_FLAG_GOSSIP);
     }
 
@@ -306,11 +305,11 @@ public:
                 me->CastSpell(who, SPELL_FOOLS_PLIGHT, true);
             }
 
-            events.ScheduleEvent(EVENT_FOOLS_PLIGHT, urand(2000, 3000));
-            events.ScheduleEvent(EVENT_RANGE_CHECK, 1000);
-            events.ScheduleEvent(EVENT_UNFAIR_FIGHT, 1000);
-            events.ScheduleEvent(ARTORIUS_EVENT_DEMONIC_DOOM, urand(3000, 5000));
-            events.ScheduleEvent(ARTORIUS_EVENT_DEMONIC_ENRAGE, urand(6000, 8000));
+            events.ScheduleEvent(EVENT_FOOLS_PLIGHT, 2s, 3s);
+            events.ScheduleEvent(EVENT_RANGE_CHECK, 1s);
+            events.ScheduleEvent(EVENT_UNFAIR_FIGHT, 1s);
+            events.ScheduleEvent(ARTORIUS_EVENT_DEMONIC_DOOM, 3s, 5s);
+            events.ScheduleEvent(ARTORIUS_EVENT_DEMONIC_ENRAGE, 6s, 8s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -325,7 +324,7 @@ public:
                     me->Say(ARTORIUS_SAY);
                     me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                    events.ScheduleEvent(EVENT_REVEAL, 5000);
+                    events.ScheduleEvent(EVENT_REVEAL, 5s);
                     break;
                 case EVENT_REVEAL:
                     RevealForm();
@@ -355,7 +354,7 @@ public:
                     {
                         me->CastSpell(me->GetVictim(), SPELL_FOOLS_PLIGHT, true);
                     }
-                    events.RepeatEvent(urand(3000, 6000));
+                    events.Repeat(3s, 6s);
                     break;
                 case EVENT_RANGE_CHECK:
                     if (!me->GetVictim() || !me->GetVictim()->IsWithinDist2d(me, 60.0f))
@@ -364,7 +363,7 @@ public:
                     }
                     else
                     {
-                        events.RepeatEvent(2000);
+                        events.Repeat(2s);
                     }
                     break;
                 case EVENT_UNFAIR_FIGHT:
@@ -373,21 +372,21 @@ public:
                         SetHomePosition();
                         me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1);
                         me->SetImmuneToAll(true);
-                        me->DespawnOrUnsummon(5000);
+                        me->DespawnOrUnsummon(5s);
                         break;
                     }
-                    events.RepeatEvent(2000);
+                    events.Repeat(2s);
                     break;
                 case ARTORIUS_EVENT_DEMONIC_DOOM:
                     if (!me->GetVictim()->HasAura(ARTORIUS_SPELL_DEMONIC_DOOM))
                     {
                         me->CastSpell(me->GetVictim(), ARTORIUS_SPELL_DEMONIC_DOOM, false);
                     }
-                    events.RepeatEvent(urand(5000, 10000));
+                    events.Repeat(5s, 10s);
                     break;
                 case ARTORIUS_EVENT_DEMONIC_ENRAGE:
                     me->CastSpell(me, SPELL_DEMONIC_ENRAGE, false);
-                    events.RepeatEvent(urand(22000, 39000));
+                    events.Repeat(22s, 39s);
                     break;
             }
 
@@ -423,7 +422,7 @@ public:
             if (action == EVENT_ENCOUNTER_START)
             {
                 PrepareForEncounter();
-                events.ScheduleEvent(EVENT_ENCOUNTER_START, 5000);
+                events.ScheduleEvent(EVENT_ENCOUNTER_START, 5s);
             }
         }
     };
@@ -462,10 +461,10 @@ public:
 
     struct npc_preciousAI : public NPCStaveQuestAI
     {
-        npc_preciousAI(Creature *creature) : NPCStaveQuestAI(creature) { }
+        explicit npc_preciousAI(Creature *creature) : NPCStaveQuestAI(creature) { }
 
         EventMap events;
-        bool flaggedForDespawn;
+        bool flaggedForDespawn{};
 
         void InitializeAI() override
         {
@@ -476,7 +475,7 @@ public:
         {
             if (flaggedForDespawn)
             {
-                me->DespawnOrUnsummon(0);
+                me->DespawnOrUnsummon(0ms);
                 flaggedForDespawn = false;
             }
         }
@@ -511,6 +510,37 @@ public:
         {
             flaggedForDespawn = true;
         }
+
+        uint32 GetData(uint32 type) const override
+        {
+            if (type == DATA_SIMONE_VALID_THREATLIST)
+                return ValidThreatlist() ? 1 : 0;
+
+            return 0;
+        }
+
+        void SetData(uint32 type, uint32 data) override
+        {
+            switch (type)
+            {
+                case DATA_SIMONE_REVEAL:
+                    if (data)
+                        RevealForm();
+                    break;
+                case DATA_SIMONE_PREPARE_ENCOUNTER:
+                    PrepareForEncounter();
+                    break;
+                case DATA_SIMONE_SET_HOME:
+                    SetHomePosition();
+                    break;
+                case DATA_SIMONE_CORPSE_REMOVED:
+                    EnterEvadeMode();
+                    FlagForDespawn();
+                    break;
+                default:
+                    break;
+            }
+        }
     };
 };
 
@@ -526,7 +556,7 @@ public:
 
     struct npc_simoneAI : public NPCStaveQuestAI
     {
-        npc_simoneAI(Creature *creature) : NPCStaveQuestAI(creature) { }
+        explicit npc_simoneAI(Creature *creature) : NPCStaveQuestAI(creature) { }
 
         EventMap events;
         ObjectGuid preciousGUID;
@@ -534,51 +564,34 @@ public:
         void SetPreciousGUID()
         {
             if (CreatureGroup* formation = me->GetFormation())
-            {
-                const CreatureGroup::CreatureGroupMemberType& members = formation->GetMembers();
-                for (CreatureGroup::CreatureGroupMemberType::const_iterator itr = members.begin(); itr != members.end(); ++itr)
-                {
-                    if (itr->first && itr->first->GetOriginalEntry() == PRECIOUS_NORMAL_ENTRY)
-                    {
-                        preciousGUID = itr->first->GetGUID();
-                    }
-                }
-            }
+                for ([[maybe_unused]] auto const& [member, info] : formation->GetMembers())
+                    if (member && member->GetOriginalEntry() == PRECIOUS_NORMAL_ENTRY)
+                        preciousGUID = member->GetGUID();
         }
 
         Creature* Precious()
         {
             if (preciousGUID.IsEmpty())
-            {
                 SetPreciousGUID();
-            }
 
             if (!preciousGUID.IsEmpty())
-            {
                 return ObjectAccessor::GetCreature(*me, preciousGUID);
-            }
-
-            return nullptr;
-        }
-
-        npc_precious::npc_preciousAI* PreciousAI()
-        {
-            if (Precious())
-            {
-                return CAST_AI(npc_precious::npc_preciousAI, Precious()->AI());
-            }
 
             return nullptr;
         }
 
         void RespawnPet()
         {
+            Creature* precious = Precious();
+            if (!precious)
+                return;
+
             Position current = me->GetNearPosition(-5.0f, 0.0f);
-            Precious()->RemoveCorpse(false, false);
-            Precious()->SetPosition(current);
-            Precious()->SetHomePosition(current);
-            Precious()->setDeathState(DeathState::JustRespawned);
-            Precious()->UpdateObjectVisibility(true);
+            precious->RemoveCorpse(false, false);
+            precious->SetPosition(current);
+            precious->SetHomePosition(current);
+            precious->setDeathState(DeathState::JustRespawned);
+            precious->UpdateObjectVisibility(true);
         }
 
         void HandlePetRespawn()
@@ -627,21 +640,20 @@ public:
 
         void CorpseRemoved(uint32& /*respawnDelay*/) override
         {
-            if (!Precious())
-            {
+            Creature* creature = Precious();
+            if (!creature)
                 return;
-            }
 
-            if (Precious()->IsInCombat())
+            if (creature->IsInCombat())
             {
-                // If Simone corpse is removed but pet is InCombat, EnterEvadeMode and auto despawn on pet reaching home
-                PreciousAI()->EnterEvadeMode();
-                PreciousAI()->FlagForDespawn();
+                // If Simone corpse is removed but pet is InCombat, ask pet AI to enter evade and flag for despawn
+                if (creature->AI())
+                    creature->AI()->SetData(DATA_SIMONE_CORPSE_REMOVED, 1);
+                else
+                    creature->DespawnOrUnsummon(0ms);
             }
             else
-            {
-                Precious()->DespawnOrUnsummon(0);
-            }
+                creature->DespawnOrUnsummon(0ms);
         }
 
         void Reset() override
@@ -649,7 +661,7 @@ public:
             ResetState(SIMONE_SPELL_SILENCE);
             events.Reset();
 
-            events.ScheduleEvent(SIMONE_EVENT_CHECK_PET_STATE, 2000);
+            events.ScheduleEvent(SIMONE_EVENT_CHECK_PET_STATE, 2s);
         }
 
         void JustEngagedWith(Unit* who) override
@@ -664,13 +676,13 @@ public:
                     me->CastSpell(who, SPELL_FOOLS_PLIGHT, true);
                 }
 
-                events.ScheduleEvent(EVENT_RANGE_CHECK, 1000);
-                events.ScheduleEvent(EVENT_UNFAIR_FIGHT, 1000);
-                events.ScheduleEvent(SIMONE_EVENT_CHAIN_LIGHTNING, 3000);
-                events.ScheduleEvent(SIMONE_EVENT_TEMPTRESS_KISS, 1000);
+                events.ScheduleEvent(EVENT_RANGE_CHECK, 1s);
+                events.ScheduleEvent(EVENT_UNFAIR_FIGHT, 1s);
+                events.ScheduleEvent(SIMONE_EVENT_CHAIN_LIGHTNING, 3s);
+                events.ScheduleEvent(SIMONE_EVENT_TEMPTRESS_KISS, 1s);
             }
 
-            events.ScheduleEvent(EVENT_FOOLS_PLIGHT, urand(2000, 3000));
+            events.ScheduleEvent(EVENT_FOOLS_PLIGHT, 2s, 3s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -685,7 +697,7 @@ public:
                     me->TextEmote(SIMONE_EMOTE, GetGossipPlayer());
                     me->HandleEmoteCommand(EMOTE_ONESHOT_NONE);
                     me->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
-                    events.ScheduleEvent(SIMONE_EVENT_TALK, 4000);
+                    events.ScheduleEvent(SIMONE_EVENT_TALK, 4s);
                     break;
                 case SIMONE_EVENT_TALK:
                     me->Say(SIMONE_SAY, GetGossipPlayer());
@@ -695,14 +707,13 @@ public:
                     {
                         Precious()->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                     }
-                    events.ScheduleEvent(EVENT_REVEAL, 5000);
+                    events.ScheduleEvent(EVENT_REVEAL, 5s);
                     break;
                 case EVENT_REVEAL:
                     RevealForm();
-                    if (PreciousAI())
-                    {
-                        PreciousAI()->RevealForm();
-                    }
+                    if (Creature* creature = Precious())
+                        if (creature->AI())
+                            creature->AI()->SetData(DATA_SIMONE_REVEAL, 1);
                     break;
                 // Prevent hunters from figthing Simone alone
                 case SIMONE_EVENT_CHECK_PET_STATE:
@@ -713,8 +724,10 @@ public:
                             HandlePetRespawn();
                         }
 
-                        events.ScheduleEvent(SIMONE_EVENT_CHECK_PET_STATE, 1000);
+                        events.ScheduleEvent(SIMONE_EVENT_CHECK_PET_STATE, 1s);
                     }
+                    break;
+                default:
                     break;
             }
 
@@ -730,7 +743,7 @@ public:
 
             if (me->HasUnitState(UNIT_STATE_CASTING) && eventId != EVENT_RANGE_CHECK && eventId != EVENT_UNFAIR_FIGHT)
             {
-                events.RepeatEvent(1000);
+                events.Repeat(1s);
                 return;
             }
 
@@ -742,7 +755,7 @@ public:
                     {
                         me->CastSpell(me->GetVictim(), SPELL_FOOLS_PLIGHT, true);
                     }
-                    events.RepeatEvent(urand(3000, 6000));
+                    events.Repeat(3s, 6s);
                     break;
                 case EVENT_RANGE_CHECK:
                     if (!me->GetVictim()->IsWithinDist2d(me, 60.0f))
@@ -751,34 +764,45 @@ public:
                     }
                     else
                     {
-                        events.RepeatEvent(2000);
+                        events.Repeat(2s);
                     }
                     break;
                 case EVENT_UNFAIR_FIGHT:
-                    if (!ValidThreatlist() || (PreciousAI() && !PreciousAI()->ValidThreatlist()))
+                {
+                    Creature* creature = Precious();
+                    bool isPreciousThreatListValid = creature && creature->AI() && creature->AI()->GetData(DATA_SIMONE_VALID_THREATLIST) == 1;
+
+                    if (!ValidThreatlist() || !isPreciousThreatListValid)
                     {
                         SetHomePosition();
-                        PreciousAI()->SetHomePosition();
-
-                        Precious()->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1);
-                        Precious()->SetImmuneToAll(true);
+                        me->DespawnOrUnsummon(5s);
                         me->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1);
                         me->SetImmuneToAll(true);
 
-                        Precious()->DespawnOrUnsummon(5000);
+                        if (creature)
+                        {
+                            if (creature->AI())
+                                creature->AI()->SetData(DATA_SIMONE_SET_HOME, 1);
 
-                        me->DespawnOrUnsummon(5000);
+                            creature->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1);
+                            creature->SetImmuneToAll(true);
+                            creature->DespawnOrUnsummon(5s);
+                        }
+
                         break;
                     }
-                    events.RepeatEvent(2000);
+                    events.Repeat(2s);
                     break;
+                }
                 case SIMONE_EVENT_CHAIN_LIGHTNING:
                     me->CastSpell(me->GetVictim(), SIMONE_SPELL_CHAIN_LIGHTNING, false);
-                    events.RepeatEvent(7000);
+                    events.Repeat(7s);
                     break;
                 case SIMONE_EVENT_TEMPTRESS_KISS:
                     me->CastSpell(me->GetVictim(), SIMONE_SPELL_TEMPTRESS_KISS, false);
-                    events.RepeatEvent(45000);
+                    events.Repeat(45s);
+                    break;
+                default:
                     break;
             }
 
@@ -800,12 +824,12 @@ public:
         void ScheduleEncounterStart(ObjectGuid playerGUID)
         {
             PrepareForEncounter();
-            if (PreciousAI())
-            {
-                PreciousAI()->PrepareForEncounter();
-            }
+            if (Creature* creature = Precious())
+                if (creature->AI())
+                    creature->AI()->SetData(DATA_SIMONE_PREPARE_ENCOUNTER, 1);
+
             gossipPlayerGUID = playerGUID;
-            events.ScheduleEvent(EVENT_ENCOUNTER_START, 1000);
+            events.ScheduleEvent(EVENT_ENCOUNTER_START, 1s);
         }
     };
 
@@ -906,11 +930,11 @@ public:
                 me->CastSpell(who, SPELL_FOOLS_PLIGHT, true);
             }
 
-            events.ScheduleEvent(EVENT_FOOLS_PLIGHT, urand(2000, 3000));
-            events.ScheduleEvent(EVENT_RANGE_CHECK, 1000);
-            events.ScheduleEvent(EVENT_UNFAIR_FIGHT, 1000);
-            events.ScheduleEvent(NELSON_EVENT_DREADFUL_FRIGHT, 10000);
-            events.ScheduleEvent(NELSON_EVENT_CREEPING_DOOM, 5000);
+            events.ScheduleEvent(EVENT_FOOLS_PLIGHT, 2s, 3s);
+            events.ScheduleEvent(EVENT_RANGE_CHECK, 1s);
+            events.ScheduleEvent(EVENT_UNFAIR_FIGHT, 1s);
+            events.ScheduleEvent(NELSON_EVENT_DREADFUL_FRIGHT, 10s);
+            events.ScheduleEvent(NELSON_EVENT_CREEPING_DOOM, 5s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -925,7 +949,7 @@ public:
                     me->Say(NELSON_SAY);
                     me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                    events.ScheduleEvent(EVENT_REVEAL, 5000);
+                    events.ScheduleEvent(EVENT_REVEAL, 5s);
                     break;
                 case EVENT_REVEAL:
                     RevealForm();
@@ -944,7 +968,7 @@ public:
 
             if (me->HasUnitState(UNIT_STATE_CASTING))
             {
-                events.RepeatEvent(1000);
+                events.Repeat(1s);
                 return;
             }
 
@@ -956,7 +980,7 @@ public:
                     {
                         me->CastSpell(me->GetVictim(), SPELL_FOOLS_PLIGHT, true);
                     }
-                    events.RepeatEvent(urand(3000, 6000));
+                    events.Repeat(3s, 6s);
                     break;
                 case EVENT_RANGE_CHECK:
                     if (!me->GetVictim()->IsWithinDist2d(me, 60.0f))
@@ -965,7 +989,7 @@ public:
                     }
                     else
                     {
-                        events.RepeatEvent(2000);
+                        events.Repeat(2s);
                     }
                     break;
                 case EVENT_UNFAIR_FIGHT:
@@ -978,18 +1002,18 @@ public:
                         me->CombatStop(true);
                         me->Say(NELSON_DESPAWN_SAY);
                         me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                        me->DespawnOrUnsummon(5000);
+                        me->DespawnOrUnsummon(5s);
                         break;
                     }
-                    events.RepeatEvent(2000);
+                    events.Repeat(2s);
                     break;
                 case NELSON_EVENT_DREADFUL_FRIGHT:
                     me->CastSpell(me->GetVictim(), NELSON_SPELL_DREADFUL_FRIGHT, false);
-                    events.RepeatEvent(urand(12000, 19000));
+                    events.Repeat(12s, 19s);
                     break;
                 case NELSON_EVENT_CREEPING_DOOM:
                     me->CastSpell(me->GetVictim(), NELSON_SPELL_CREEPING_DOOM, false);
-                    events.RepeatEvent(urand(10000, 12000));
+                    events.Repeat(10s, 12s);
                     break;
             }
 
@@ -1016,7 +1040,7 @@ public:
             if (action == EVENT_ENCOUNTER_START)
             {
                 PrepareForEncounter();
-                events.ScheduleEvent(EVENT_ENCOUNTER_START, 5000);
+                events.ScheduleEvent(EVENT_ENCOUNTER_START, 5s);
             }
         }
     };
@@ -1077,12 +1101,12 @@ public:
                     me->CastSpell(who, SPELL_FOOLS_PLIGHT, true);
                 }
 
-                events.ScheduleEvent(FRANKLIN_EVENT_DEMONIC_ENRAGE, urand(9000, 13000));
-                events.ScheduleEvent(EVENT_RANGE_CHECK, 1000);
-                events.ScheduleEvent(EVENT_UNFAIR_FIGHT, 1000);
+                events.ScheduleEvent(FRANKLIN_EVENT_DEMONIC_ENRAGE, 9s, 13s);
+                events.ScheduleEvent(EVENT_RANGE_CHECK, 1s);
+                events.ScheduleEvent(EVENT_UNFAIR_FIGHT, 1s);
             }
 
-            events.ScheduleEvent(EVENT_FOOLS_PLIGHT, urand(2000, 3000));
+            events.ScheduleEvent(EVENT_FOOLS_PLIGHT, 2s, 3s);
         }
 
         void UpdateAI(uint32 diff) override
@@ -1097,7 +1121,7 @@ public:
                     me->Say(FRANKLIN_SAY, GetGossipPlayer());
                     me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                     me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                    events.ScheduleEvent(EVENT_REVEAL, 5000);
+                    events.ScheduleEvent(EVENT_REVEAL, 5s);
                     break;
                 case EVENT_REVEAL:
                     RevealForm();
@@ -1116,7 +1140,7 @@ public:
 
             if (me->HasUnitState(UNIT_STATE_CASTING))
             {
-                events.RepeatEvent(1000);
+                events.Repeat(1s);
                 return;
             }
 
@@ -1128,7 +1152,7 @@ public:
                     {
                         me->CastSpell(me->GetVictim(), SPELL_FOOLS_PLIGHT, true);
                     }
-                    events.RepeatEvent(urand(3000, 6000));
+                    events.Repeat(3s, 6s);
                     break;
                 case EVENT_RANGE_CHECK:
                     if (!me->GetVictim()->IsWithinDist2d(me, 60.0f))
@@ -1137,7 +1161,7 @@ public:
                     }
                     else
                     {
-                        events.RepeatEvent(2000);
+                        events.Repeat(2s);
                     }
                     break;
                 case EVENT_UNFAIR_FIGHT:
@@ -1149,15 +1173,15 @@ public:
                         me->CombatStop(true);
                         me->Say(FRANKLIN_DESPAWN_SAY);
                         me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
-                        me->DespawnOrUnsummon(5000);
+                        me->DespawnOrUnsummon(5s);
                         break;
                     }
-                    events.RepeatEvent(2000);
+                    events.Repeat(2s);
                     break;
                 case FRANKLIN_EVENT_DEMONIC_ENRAGE:
                     me->CastSpell(me, SPELL_DEMONIC_ENRAGE, false);
                     me->TextEmote(FRANKLIN_ENRAGE_EMOTE);
-                    events.RepeatEvent(urand(9000, 22000));
+                    events.Repeat(9s, 22s);
                     break;
             }
 
@@ -1189,7 +1213,7 @@ public:
         {
             PrepareForEncounter();
             gossipPlayerGUID = playerGUID;
-            events.ScheduleEvent(EVENT_ENCOUNTER_START, 5000);
+            events.ScheduleEvent(EVENT_ENCOUNTER_START, 5s);
         }
     };
 
