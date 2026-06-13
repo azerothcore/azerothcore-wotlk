@@ -307,7 +307,7 @@ bool Map::AddToMap(T* obj, bool checkTransport)
     if (obj->IsInWorld())
     {
         ASSERT(obj->IsInGrid());
-        obj->UpdateObjectVisibilityOnCreate();
+        obj->UpdateObjectVisibility(true);
         return true;
     }
 
@@ -344,7 +344,7 @@ bool Map::AddToMap(T* obj, bool checkTransport)
 
     //something, such as vehicle, needs to be update immediately
     //also, trigger needs to cast spell, if not update, cannot see visual
-    obj->UpdateObjectVisibility(true);
+    obj->UpdateObjectVisibilityOnCreate();
 
     // Post-visibility so accessories seat after the vehicle's create packet reaches clients.
     if (obj->IsCreature())
