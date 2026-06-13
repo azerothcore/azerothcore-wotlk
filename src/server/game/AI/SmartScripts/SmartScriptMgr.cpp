@@ -48,11 +48,6 @@ void SmartWaypointMgr::LoadFromDB()
 {
     uint32 oldMSTime = getMSTime();
 
-    for (auto itr : waypoint_map)
-    {
-        delete itr.second;
-    }
-
     waypoint_map.clear();
 
     WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_SEL_SMARTAI_WP);
@@ -78,14 +73,15 @@ void SmartWaypointMgr::LoadFromDB()
         float x = fields[2].Get<float>();
         float y = fields[3].Get<float>();
         float z = fields[4].Get<float>();
-        Optional<float> o;
+        std::optional<float> o;
         if (!fields[5].IsNull())
             o = fields[5].Get<float>();
         uint32 delay = fields[6].Get<uint32>();
 
         if (last_entry != entry)
         {
-            waypoint_map[entry] = new WaypointPath();
+            waypoint_map[entry] = WaypointPath();
+            waypoint_map[entry].Id = entry;
             last_id = 1;
             count++;
         }
@@ -94,15 +90,15 @@ void SmartWaypointMgr::LoadFromDB()
             LOG_ERROR("sql.sql", "SmartWaypointMgr::LoadFromDB: Path entry {}, unexpected point id {}, expected {}.", entry, id, last_id);
 
         last_id++;
-        WaypointData data;
-        data.id = id;
-        data.x = x;
-        data.y = y;
-        data.z = z;
-        data.orientation = o;
-        data.delay = delay;
-        data.move_type = WAYPOINT_MOVE_TYPE_MAX;
-        (*waypoint_map[entry]).emplace(id, data);
+        WaypointNode node;
+        node.Id = id;
+        node.X = x;
+        node.Y = y;
+        node.Z = z;
+        node.Orientation = o;
+        node.Delay = delay;
+        node.MoveType = WAYPOINT_MOVE_TYPE_MAX;
+        waypoint_map[entry].Nodes.push_back(std::move(node));
 
         last_entry = entry;
         total++;
@@ -110,14 +106,6 @@ void SmartWaypointMgr::LoadFromDB()
 
     LOG_INFO("server.loading", ">> Loaded {} SmartAI waypoint paths (total {} waypoints) in {} ms", count, total, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
-}
-
-SmartWaypointMgr::~SmartWaypointMgr()
-{
-    for (auto itr : waypoint_map)
-    {
-        delete itr.second;
-    }
 }
 
 SmartAIMgr* SmartAIMgr::instance()
@@ -771,6 +759,7 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_MOUNT_TO_ENTRY_OR_MODEL: return sizeof(SmartAction::morphOrMount);
             case SMART_ACTION_SET_INGAME_PHASE_MASK: return sizeof(SmartAction::ingamePhaseMask);
             case SMART_ACTION_SET_DATA: return sizeof(SmartAction::setData);
+            case SMART_ACTION_INC_DATA: return sizeof(SmartAction::setData);
             case SMART_ACTION_MOVE_FORWARD: return sizeof(SmartAction::moveRandom);
             case SMART_ACTION_ATTACK_STOP: return NO_PARAMS;
             case SMART_ACTION_SET_VISIBILITY: return sizeof(SmartAction::visibility);
@@ -858,8 +847,8 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_PLAY_ANIMKIT: return sizeof(SmartAction::raw);
             case SMART_ACTION_SCENE_PLAY: return sizeof(SmartAction::raw);
             case SMART_ACTION_SCENE_CANCEL: return sizeof(SmartAction::raw);
-            // case SMART_ACTION_SPAWN_SPAWNGROUP: return sizeof(SmartAction::groupSpawn);
-            // case SMART_ACTION_DESPAWN_SPAWNGROUP: return sizeof(SmartAction::groupSpawn);
+            case SMART_ACTION_SPAWN_SPAWNGROUP: return sizeof(SmartAction::groupSpawn);
+            case SMART_ACTION_DESPAWN_SPAWNGROUP: return sizeof(SmartAction::groupSpawn);
             // case SMART_ACTION_RESPAWN_BY_SPAWNID: return sizeof(SmartAction::respawnData);
             case SMART_ACTION_PLAY_CINEMATIC: return sizeof(SmartAction::cinematic);
             case SMART_ACTION_SET_MOVEMENT_SPEED: return sizeof(SmartAction::movementSpeed);
@@ -1025,12 +1014,21 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_SET_CAN_FLY:
         case SMART_ACTION_REMOVE_AURAS_BY_TYPE:
         case SMART_ACTION_REMOVE_MOVEMENT:
-        case SMART_ACTION_SPAWN_SPAWNGROUP:
-        case SMART_ACTION_DESPAWN_SPAWNGROUP:
         case SMART_ACTION_RESPAWN_BY_SPAWNID:
             LOG_ERROR("sql.sql", "SmartAIMgr: EntryOrGuid {} using event({}) has an action type that is not yet supported on AzerothCore ({}), skipped.",
                              e.entryOrGuid, e.event_id, e.GetActionType());
             return false;
+        case SMART_ACTION_SPAWN_SPAWNGROUP:
+        case SMART_ACTION_DESPAWN_SPAWNGROUP:
+        {
+            if (!sObjectMgr->GetSpawnGroupData(e.action.groupSpawn.groupId))
+            {
+                LOG_ERROR("sql.sql", "SmartAIMgr: EntryOrGuid {} using event({}) has action type {} with invalid spawn group id {}.",
+                    e.entryOrGuid, e.event_id, e.GetActionType(), e.action.groupSpawn.groupId);
+                return false;
+            }
+            break;
+        }
         default:
             break;
     }
@@ -1978,6 +1976,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_THREAT_SINGLE_PCT:
         case SMART_ACTION_SET_INST_DATA64:
         case SMART_ACTION_SET_DATA:
+        case SMART_ACTION_INC_DATA:
         case SMART_ACTION_MOVE_FORWARD:
         case SMART_ACTION_ESCORT_PAUSE:
         case SMART_ACTION_SET_FLY:
@@ -2057,6 +2056,8 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_WORLD_SCRIPT:
         case SMART_ACTION_SET_GOSSIP_MENU:
         case SMART_ACTION_SUMMON_GAMEOBJECT_GROUP:
+        case SMART_ACTION_SPAWN_SPAWNGROUP:
+        case SMART_ACTION_DESPAWN_SPAWNGROUP:
             break;
         default:
             LOG_ERROR("sql.sql", "SmartAIMgr: Not handled action_type({}), event_type({}), Entry {} SourceType {} Event {}, skipped.", e.GetActionType(), e.GetEventType(), e.entryOrGuid, e.GetScriptType(), e.event_id);

@@ -491,7 +491,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petEntry, uint32 petnumber, bool c
         }
 
         // must be after SetMinion (owner guid check)
-        //LoadTemplateImmunities();
+        LoadTemplateImmunities(0);
         //LoadMechanicTemplateImmunity();
         m_loading = false;
     });
@@ -2318,6 +2318,7 @@ bool Pet::Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32
     // Force regen flag for player pets, just like we do for players themselves
     SetUnitFlag2(UNIT_FLAG2_REGENERATE_POWER);
     SetSheath(SHEATH_STATE_MELEE);
+    GetThreatMgr().Initialize();
 
     return true;
 }

@@ -460,7 +460,7 @@ INSERT INTO `instance_encounters` VALUES
 (649,0,18831,0,'High King Maulgar'),
 (650,0,19044,177,'Gruul the Dragonkiller'),
 (651,0,17257,176,'Magtheridon'),
-(652,0,15550,0,'Attumen the Huntsman'),
+(652,0,16152,0,'Attumen the Huntsman'),
 (653,0,15687,0,'Moroes'),
 (654,0,16457,0,'Maiden of the Virtue'),
 (655,0,16812,0,'Opera Event'),
@@ -660,4 +660,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-29 17:54:06
+-- Dump completed on 2026-06-01 22:40:04
