@@ -2478,6 +2478,10 @@ void Player::SendPushToPartyResponse(Player const* player, QuestShareMessages ms
 
 void Player::SendQuestUpdateAddItem(Quest const* /*quest*/, uint32 /*item_idx*/, uint16 /*count*/)
 {
+    // Packet is intentionally sent empty; the optional payload (item id and
+    // count) is not required by the 3.3.5 client:
+    //questUpdateAddItem.ItemId = quest->RequiredItemId[item_idx];
+    //questUpdateAddItem.Count = count;
     SendDirectMessage(WorldPackets::Quest::QuestUpdateAddItem().Write());
     LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTUPDATE_ADD_ITEM");
 }
