@@ -48,12 +48,7 @@ enum Supremus
 struct boss_supremus : public BossAI
 {
     boss_supremus(Creature* creature) : BossAI(creature, DATA_SUPREMUS)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    {    }
 
     void Reset() override
     {

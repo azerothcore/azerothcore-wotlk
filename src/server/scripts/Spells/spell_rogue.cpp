@@ -17,7 +17,6 @@
 
 #include "AreaDefines.h"
 #include "CellImpl.h"
-#include "CreatureScript.h"
 #include "GameTime.h"
 #include "GridNotifiers.h"
 #include "SpellAuraEffects.h"
@@ -736,13 +735,13 @@ class spell_rog_vanish_purge : public SpellScript
     void HandleRootRemove(SpellEffIndex /*effIndex*/)
     {
         if (GetCaster() && !GetCaster()->HasAura(SPELL_PARALYZE)) // Root from Tainted Core SSC, should not be removed by vanish.
-            GetCaster()->RemoveAurasWithMechanic(1 << MECHANIC_ROOT);
+            GetCaster()->RemoveAurasWithMechanic(1ULL << MECHANIC_ROOT);
     }
 
     void HandleSnareRemove(SpellEffIndex /*effIndex*/)
     {
         if (GetCaster())
-            GetCaster()->RemoveAurasWithMechanic(1 << MECHANIC_SNARE);
+            GetCaster()->RemoveAurasWithMechanic(1ULL << MECHANIC_SNARE);
     }
 
     void Register() override

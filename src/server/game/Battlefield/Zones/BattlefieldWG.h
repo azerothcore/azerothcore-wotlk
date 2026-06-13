@@ -403,6 +403,9 @@ public:
 
     uint32 GetData(uint32 data) const override;
 
+    // True iff the most recent battle ended with the keep captured (attacker win).
+    [[nodiscard]] bool IsLastBattleAttackerVictory() const { return LastBattleAttackerVictory; }
+
     bool IsKeepNpc(uint32 entry)
     {
         switch (entry)
@@ -449,10 +452,10 @@ protected:
     GuidUnorderedSet UpdateTenacityList;
 
     int32 TenacityStack;
-    uint32 TenacityUpdateTimer;
-    uint32 SaveTimer;
 
     ObjectGuid TitansRelic;
+
+    bool LastBattleAttackerVictory{false};
 };
 
 uint8 const WG_MAX_OBJ = 32;

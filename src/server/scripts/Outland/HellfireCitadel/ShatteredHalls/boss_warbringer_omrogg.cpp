@@ -66,12 +66,7 @@ enum Phase
 struct boss_warbringer_omrogg : public BossAI
 {
     boss_warbringer_omrogg(Creature* creature) : BossAI(creature, DATA_OMROGG)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    {    }
 
     void HandleHeadTalk(HeadYells yell)
     {

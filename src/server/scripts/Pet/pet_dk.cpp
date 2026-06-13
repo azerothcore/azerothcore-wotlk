@@ -70,6 +70,25 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
         }
     }
 
+    void JustExitedCombat() override
+    {
+        EngagementOver();
+    }
+
+    void EnterEvadeMode(EvadeReason /*why*/) override
+    {
+        if (!_EnterEvadeMode())
+            return;
+
+        me->ClearUnitState(UNIT_STATE_EVADE);
+
+        if (Unit* owner = me->GetOwner())
+        {
+            me->GetMotionMaster()->Clear(false);
+            me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle(), MOTION_SLOT_ACTIVE);
+        }
+    }
+
     void InitializeAI() override
     {
         ScriptedAI::InitializeAI();
@@ -190,6 +209,16 @@ struct npc_pet_dk_ebon_gargoyle : ScriptedAI
             _decisionTimer -= diff;
             if (!UpdateVictimWithGaze())
             {
+                // Re-engage if we still have a valid victim but lost engagement
+                // (e.g., PvP combat reference expired during CC like Cyclone)
+                if (Unit* victim = me->GetVictim())
+                {
+                    if (me->IsValidAttackTarget(victim))
+                    {
+                        me->EngageWithTarget(victim);
+                        return;
+                    }
+                }
                 MySelectNextTarget();
                 return;
             }
@@ -336,6 +365,26 @@ struct npc_pet_dk_army_of_the_dead : public AggressorAI
             return;
         if (me->IsValidAttackTarget(attacker))
             AttackStart(attacker);
+    }
+
+    void UpdateAI(uint32 /*diff*/) override
+    {
+        if (!UpdateVictim())
+        {
+            // Re-engage if we still have a valid victim but lost engagement
+            // (e.g., combat reference expired during CC like knockback)
+            if (Unit* victim = me->GetVictim())
+            {
+                if (me->IsValidAttackTarget(victim))
+                {
+                    me->EngageWithTarget(victim);
+                    return;
+                }
+            }
+            return;
+        }
+
+        DoMeleeAttackIfReady();
     }
 };
 

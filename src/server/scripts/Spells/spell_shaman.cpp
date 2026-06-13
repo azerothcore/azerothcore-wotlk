@@ -15,7 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
 #include "GridNotifiers.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
@@ -1495,7 +1494,7 @@ class spell_sha_astral_shift_aura : public AuraScript
     bool CheckProc(ProcEventInfo& eventInfo)
     {
         if (SpellInfo const* spellInfo = eventInfo.GetSpellInfo())
-            if (spellInfo->GetAllEffectsMechanicMask() & ((1 << MECHANIC_SILENCE) | (1 << MECHANIC_STUN) | (1 << MECHANIC_FEAR)))
+            if (spellInfo->GetAllEffectsMechanicMask() & ((1ULL << MECHANIC_SILENCE) | (1ULL << MECHANIC_STUN) | (1ULL << MECHANIC_FEAR)))
                 return true;
 
         return false;
