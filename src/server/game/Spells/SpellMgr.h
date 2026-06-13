@@ -25,6 +25,9 @@
 #include "SharedDefines.h"
 #include "Unit.h"
 
+#include <vector>
+#include <bitset>
+
 class SpellInfo;
 class Player;
 class Unit;
@@ -390,6 +393,13 @@ struct SpellTargetPosition
 
 typedef std::map<std::pair<uint32 /*spell_id*/, SpellEffIndex /*effIndex*/>, SpellTargetPosition> SpellTargetPositionMap;
 
+struct SpellCone
+{
+    int16_t cone_degrees;
+};
+
+typedef std::map<uint32 /*spell_id*/, SpellCone> SpellConeMap;
+
 // Enum with EffectRadiusIndex and their actual radius
 enum EffectRadiusIndex
 {
@@ -557,6 +567,18 @@ typedef std::multimap<uint32, uint32> SpellsRequiringSpellMap;
 typedef std::pair<SpellsRequiringSpellMap::const_iterator, SpellsRequiringSpellMap::const_iterator> SpellsRequiringSpellMapBounds;
 
 // Spell learning properties (accessed using SpellMgr functions)
+struct CreatureImmunities
+{
+    std::bitset<MAX_SPELL_SCHOOL> School;
+    std::bitset<DISPEL_MAX> DispelType;
+    std::bitset<MAX_MECHANIC> Mechanic;
+    std::vector<SpellEffects> Effect;
+    std::vector<AuraType> Aura;
+    bool ImmuneAoE = false;
+    bool ImmuneChain = false;
+};
+
+typedef std::unordered_map<int32, CreatureImmunities> CreatureImmunitiesMap;
 struct SpellLearnSkillNode
 {
     uint16 skill;
@@ -634,6 +656,9 @@ private:
 public:
     static SpellMgr* instance();
 
+    // creature immunity definitions loaded from DB
+    CreatureImmunities const* GetCreatureImmunities(int32 creatureImmunitiesId) const;
+
     // Spell correctness for client using
     static bool ComputeIsSpellValid(SpellInfo const* spellInfo, bool msg = true);
     static bool IsSpellValid(SpellInfo const* spellInfo);
@@ -665,6 +690,7 @@ public:
 
     // Spell target coordinates
     [[nodiscard]] SpellTargetPosition const* GetSpellTargetPosition(uint32 spell_id, SpellEffIndex effIndex) const;
+    [[nodiscard]] SpellCone const* GetSpellCone(uint32 spell_id) const;
 
     // Spell Groups table
     SpellSpellGroupMapBounds GetSpellSpellGroupMapBounds(uint32 spell_id) const;
@@ -757,6 +783,7 @@ public:
     void LoadSpellRequired();
     void LoadSpellLearnSkills();
     void LoadSpellTargetPositions();
+    void LoadSpellCones();
     void LoadSpellGroups();
     void LoadSpellGroupStackRules();
     void LoadSpellProcs();
@@ -772,12 +799,15 @@ public:
     void LoadPetDefaultSpells();
     void LoadSpellAreas();
     void LoadSpellInfoStore();
+    void LoadCreatureImmunities();
     void LoadSpellCooldownOverrides();
     void UnloadSpellInfoStore();
     void UnloadSpellInfoImplicitTargetConditionLists();
     void LoadSpellInfoCustomAttributes();
+    void LoadSpellInfoImmunities();
     void LoadSpellInfoCorrections();
     void LoadSpellSpecificAndAuraState();
+    void LoadSpellJumpDistances();
 
 private:
     SpellDifficultySearcherMap mSpellDifficultySearcherMap;
@@ -786,11 +816,13 @@ private:
     SpellRequiredMap           mSpellReq;
     SpellLearnSkillMap         mSpellLearnSkills;
     SpellTargetPositionMap     mSpellTargetPositions;
+    SpellConeMap               mSpellCones;
     SpellSpellGroupMap         mSpellSpellGroup;
     SpellGroupSpellMap         mSpellGroupSpell;
     SpellGroupStackMap         mSpellGroupStack;
     SameEffectStackMap         mSpellSameEffectStack;
     SpellProcMap               mSpellProcMap;
+    CreatureImmunitiesMap      mCreatureImmunities;
     SpellBonusMap              mSpellBonusMap;
     SpellThreatMap             mSpellThreatMap;
     SpellMixologyMap           mSpellMixologyMap;

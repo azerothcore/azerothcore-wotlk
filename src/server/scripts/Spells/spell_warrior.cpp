@@ -15,7 +15,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "CreatureScript.h"
 #include "Player.h"
 #include "SpellAuraEffects.h"
 #include "SpellInfo.h"
@@ -613,7 +612,7 @@ class spell_warr_shattering_throw : public SpellScript
 
         // remove shields, will still display immune to damage part
         if (Unit* target = GetHitUnit())
-            target->RemoveAurasWithMechanic(1 << MECHANIC_IMMUNE_SHIELD, AURA_REMOVE_BY_ENEMY_SPELL);
+            target->RemoveAurasWithMechanic(1ULL << MECHANIC_IMMUNE_SHIELD, AURA_REMOVE_BY_ENEMY_SPELL);
     }
 
     void Register() override
@@ -748,7 +747,7 @@ class spell_warr_vigilance : public AuraScript
             target->RemoveAurasDueToSpell(SPELL_GEN_DAMAGE_REDUCTION_AURA);
         }
 
-        target->ResetRedirectThreat();
+        target->GetThreatMgr().UnregisterRedirectThreat(SPELL_WARRIOR_VIGILANCE_REDIRECT_THREAT, GetCasterGUID());
     }
 
     bool CheckProc(ProcEventInfo& /*eventInfo*/)
@@ -884,6 +883,10 @@ class spell_warr_retaliation : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
+        // Prevent counterattacking yourself on activation
+        if (eventInfo.GetActor() == eventInfo.GetActionTarget())
+            return false;
+
         // check attack comes not from behind and warrior is not stunned
         return eventInfo.GetActionTarget()->isInFront(eventInfo.GetActor(), float(M_PI)) && !GetTarget()->HasUnitState(UNIT_STATE_STUNNED);
     }
@@ -1010,7 +1013,7 @@ class spell_warr_second_wind : public AuraScript
             return false;
 
         // Must be from stun or root mechanic
-        if (!(procSpell->GetAllEffectsMechanicMask() & ((1 << MECHANIC_ROOT) | (1 << MECHANIC_STUN))))
+        if (!(procSpell->GetAllEffectsMechanicMask() & ((1ULL << MECHANIC_ROOT) | (1ULL << MECHANIC_STUN))))
             return false;
 
         // Not from self

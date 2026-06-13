@@ -151,12 +151,6 @@ enum Texts
     BRANN_RADIO_SAY_FL_START_0          = 0,
     BRANN_RADIO_SAY_FL_START_1          = 1,
     BRANN_RADIO_SAY_FL_START_2          = 2,
-    BRANN_RADIO_SAY_GENERATORS          = 3,
-    BRANN_RADIO_SAY_STATIONS            = 4,
-    BRANN_RADIO_SAY_TOWER_THORIM        = 5,
-    BRANN_RADIO_SAY_TOWER_HODIR         = 6,
-    BRANN_RADIO_SAY_TOWER_FREYA         = 7,
-    BRANN_RADIO_SAY_TOWER_MIMIRON       = 8,
 
     // Vehicle Repair - Said by a spell, BroadcastTextID, same as FLAME_LEVIATHAN_EMOTE_REPAIR
     VEHICLE_EMOTE_REPAIR                = 33538,
@@ -193,7 +187,7 @@ const Position homePos = {322.39f, -14.5f, 409.8f, 3.14f};
 
 struct boss_flame_leviathan : public BossAI
 {
-    boss_flame_leviathan(Creature* pCreature) : BossAI(pCreature, BOSS_LEVIATHAN), vehicle(me->GetVehicleKit())
+    boss_flame_leviathan(Creature* creature) : BossAI(creature, BOSS_LEVIATHAN), vehicle(me->GetVehicleKit())
     {
         assert(vehicle);
     }
@@ -220,7 +214,7 @@ struct boss_flame_leviathan : public BossAI
     {
         _JustReachedHome();
         // For achievement
-        instance->SetData(DATA_UNBROKEN_ACHIEVEMENT, 0);
+        instance->StorePersistentData(PERSISTENT_DATA_UNBROKEN, 0);
         me->setActive(false);
     }
 
@@ -980,6 +974,7 @@ struct npc_mimirons_inferno : public npc_escortAI
 
     void AttackStart(Unit*) override { }
     void MoveInLineOfSight(Unit*) override { }
+    using CreatureAI::WaypointReached;
     void WaypointReached(uint32 /*waypointId*/) override { }
 
     void DoAction(int32 param) override
@@ -1079,87 +1074,6 @@ struct npc_pool_of_tar : public NullCreatureAI
     {
         if (spellInfo->SchoolMask & SPELL_SCHOOL_MASK_FIRE && !me->HasAura(SPELL_BLAZE))
             me->CastSpell(me, SPELL_BLAZE, true);
-    }
-};
-
-struct npc_brann_radio : public NullCreatureAI
-{
-    npc_brann_radio(Creature* c) : NullCreatureAI(c)
-    {
-        _lock = (me->GetInstanceScript() && me->GetInstanceScript()->GetBossState(BOSS_LEVIATHAN) > NOT_STARTED);
-        _helpLock = _lock;
-    }
-
-    bool _lock;
-    bool _helpLock;
-
-    void Reset() override
-    {
-        me->SetReactState(REACT_AGGRESSIVE);
-    }
-
-    void MoveInLineOfSight(Unit* who) override
-    {
-        if (!_lock)
-        {
-            if (!who->IsPlayer() && !who->IsVehicle())
-                return;
-
-            // MIMIRON
-            else if (me->GetDistance2d(-81.9207f, 111.432f) < 5.0f)
-            {
-                if (me->GetDistance2d(who) <= 60.0f && who->GetPositionZ() > 430.0f)
-                {
-                    Talk(BRANN_RADIO_SAY_TOWER_MIMIRON);
-                    _lock = true;
-                }
-            }
-            // FREYA
-            else if (me->GetDistance2d(-221.475f, -271.087f) < 5.0f)
-            {
-                if (me->GetDistance2d(who) <= 60.0f && who->GetPositionZ() < 380.0f)
-                {
-                    Talk(BRANN_RADIO_SAY_TOWER_FREYA);
-                    _lock = true;
-                }
-            }
-            // STATIONS
-            else if (me->GetDistance2d(73.8978f, -29.3306f) < 5.0f)
-            {
-                if (me->GetDistance2d(who) <= 40.0f)
-                {
-                    Talk(BRANN_RADIO_SAY_STATIONS);
-                    _lock = true;
-                }
-            }
-            // HODIR
-            else if (me->GetDistance2d(68.7679f, -325.026f) < 5.0f)
-            {
-                if (me->GetDistance2d(who) <= 40.0f)
-                {
-                    Talk(BRANN_RADIO_SAY_TOWER_HODIR);
-                    _lock = true;
-                }
-            }
-            // THORIM
-            else if (me->GetDistance2d(174.442f, 345.679f) < 5.0f)
-            {
-                if (me->GetDistance2d(who) <= 60.0f)
-                {
-                    Talk(BRANN_RADIO_SAY_TOWER_THORIM);
-                    _lock = true;
-                }
-            }
-            // COME A BIT CLOSER
-            else if (me->GetDistance2d(-508.898f, -32.9631f) < 5.0f)
-            {
-                if (who->GetPositionX() >= -480.0f)
-                {
-                    Talk(BRANN_RADIO_SAY_GENERATORS);
-                    _lock = true;
-                }
-            }
-        }
     }
 };
 
@@ -1325,7 +1239,7 @@ class spell_auto_repair : public SpellScript
 
         // Achievement
         if (InstanceScript* instance = vehicle->GetBase()->GetInstanceScript())
-            instance->SetData(DATA_UNBROKEN_ACHIEVEMENT, 0);
+            instance->StorePersistentData(PERSISTENT_DATA_UNBROKEN, 0);
     }
 
     void Register() override
@@ -1380,7 +1294,7 @@ public:
 
     bool operator()(WorldObject* target) const
     {
-        //! No players, only vehicles (todo: check if blizzlike)
+        //! No players, only vehicles. Pursue is never cast on players.
         Creature* creatureTarget = target->ToCreature();
         if (!creatureTarget)
             return true;
@@ -1415,12 +1329,7 @@ class spell_pursue : public SpellScript
     void FilterTargets(std::list<WorldObject*>& targets)
     {
         targets.remove_if(FlameLeviathanPursuedTargetSelector());
-        if (targets.empty())
-        {
-            if (Creature* caster = GetCaster()->ToCreature())
-                caster->AI()->EnterEvadeMode();
-        }
-        else
+        if (!targets.empty())
         {
             //! In the end, only one target should be selected
             WorldObject* _target = Acore::Containers::SelectRandomContainerElement(targets);
@@ -1808,10 +1717,9 @@ public:
 
     bool OnCheck(Player* player, Unit*, uint32 /*criteria_id*/) override
     {
-        if (player->GetInstanceScript())
-            if (player->GetInstanceScript()->GetData(DATA_UNBROKEN_ACHIEVEMENT))
-                return true;
-        return false;
+        InstanceScript* instance = player->GetInstanceScript();
+        return instance
+            && instance->GetPersistentData(PERSISTENT_DATA_UNBROKEN);
     }
 };
 
@@ -1830,7 +1738,6 @@ void AddSC_boss_flame_leviathan()
     RegisterUlduarCreatureAI(npc_hodirs_fury);
 
     // Helpers
-    RegisterUlduarCreatureAI(npc_brann_radio);
     RegisterUlduarCreatureAI(npc_storm_beacon_spawn);
     RegisterUlduarCreatureAI(boss_flame_leviathan_safety_container);
 

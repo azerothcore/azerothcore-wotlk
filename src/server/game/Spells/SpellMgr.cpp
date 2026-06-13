@@ -16,6 +16,7 @@
  */
 
 #include "SpellMgr.h"
+#include "Log.h"
 #include "BattlefieldMgr.h"
 #include "BattlegroundIC.h"
 #include "Chat.h"
@@ -29,6 +30,7 @@
 #include "Spell.h"
 #include "SpellAuraDefines.h"
 #include "SpellInfo.h"
+#include "Tokenize.h"
 #include "World.h"
 
 bool IsPrimaryProfessionSkill(uint32 skill)
@@ -51,6 +53,53 @@ bool IsPartOfSkillLine(uint32 skillId, uint32 spellId)
             return true;
 
     return false;
+}
+
+CreatureImmunities const* SpellMgr::GetCreatureImmunities(int32 creatureImmunitiesId) const
+{
+    return Acore::Containers::MapGetValuePtr(mCreatureImmunities, creatureImmunitiesId);
+}
+
+void SpellMgr::LoadCreatureImmunities()
+{
+    mCreatureImmunities.clear();
+    if (QueryResult result = WorldDatabase.Query("SELECT ID, SchoolMask, DispelTypeMask, MechanicsMask, Effects, Auras, ImmuneAoE, ImmuneChain FROM creature_immunities"))
+    {
+        do
+        {
+            Field* fields = result->Fetch();
+            int32 id = fields[0].Get<int32>();
+            uint8 school = fields[1].Get<uint8>();
+            uint16 dispelType = fields[2].Get<uint16>();
+            uint64 mechanics = fields[3].Get<uint64>();
+            CreatureImmunities& immunities = mCreatureImmunities[id];
+            immunities.School = school;
+            immunities.DispelType = dispelType;
+            immunities.Mechanic = mechanics;
+            immunities.ImmuneAoE = fields[6].Get<bool>();
+            immunities.ImmuneChain = fields[7].Get<bool>();
+            {
+                std::string effects = fields[4].Get<std::string>();
+                for (std::string_view token : Acore::Tokenize(effects, ',', false))
+                {
+                    if (Optional<uint32> val = Acore::StringTo<uint32>(token); val && *val < uint32(TOTAL_SPELL_EFFECTS))
+                        immunities.Effect.push_back(SpellEffects(*val));
+                    else
+                        LOG_ERROR("sql.sql", "Invalid effect type in `Effects` {} for creature immunities {}, skipped", token, id);
+                }
+            }
+            {
+                std::string auras = fields[5].Get<std::string>();
+                for (std::string_view token : Acore::Tokenize(auras, ',', false))
+                {
+                    if (Optional<uint32> val = Acore::StringTo<uint32>(token); val && *val < TOTAL_AURAS)
+                        immunities.Aura.push_back(AuraType(*val));
+                    else
+                        LOG_ERROR("sql.sql", "Invalid aura type in `Auras` {} for creature immunities {}, skipped", token, id);
+                }
+            }
+        } while (result->NextRow());
+    }
 }
 
 DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellInfo const* spellproto, bool triggered)
@@ -212,29 +261,29 @@ DiminishingGroup GetDiminishingReturnsGroupForSpell(SpellInfo const* spellproto,
     }
 
     // Lastly - Set diminishing depending on mechanic
-    uint32 mechanic = spellproto->GetAllEffectsMechanicMask();
-    if (mechanic & (1 << MECHANIC_CHARM))
+    uint64 mechanic = spellproto->GetAllEffectsMechanicMask();
+    if (mechanic & (1ULL << MECHANIC_CHARM))
         return DIMINISHING_MIND_CONTROL;
-    if (mechanic & (1 << MECHANIC_SILENCE))
+    if (mechanic & (1ULL << MECHANIC_SILENCE))
         return DIMINISHING_SILENCE;
-    if (mechanic & (1 << MECHANIC_SLEEP))
+    if (mechanic & (1ULL << MECHANIC_SLEEP))
         return DIMINISHING_SLEEP;
-    if (mechanic & ((1 << MECHANIC_SAPPED) | (1 << MECHANIC_POLYMORPH) | (1 << MECHANIC_SHACKLE)))
+    if (mechanic & ((1ULL << MECHANIC_SAPPED) | (1ULL << MECHANIC_POLYMORPH) | (1ULL << MECHANIC_SHACKLE)))
         return DIMINISHING_DISORIENT;
     // Mechanic Knockout, except Blast Wave
-    if (mechanic & (1 << MECHANIC_KNOCKOUT) && spellproto->SpellIconID != 292)
+    if (mechanic & (1ULL << MECHANIC_KNOCKOUT) && spellproto->SpellIconID != 292)
         return DIMINISHING_DISORIENT;
-    if (mechanic & (1 << MECHANIC_DISARM))
+    if (mechanic & (1ULL << MECHANIC_DISARM))
         return DIMINISHING_DISARM;
-    if (mechanic & (1 << MECHANIC_FEAR))
+    if (mechanic & (1ULL << MECHANIC_FEAR))
         return DIMINISHING_FEAR;
-    if (mechanic & (1 << MECHANIC_STUN))
+    if (mechanic & (1ULL << MECHANIC_STUN))
         return triggered ? DIMINISHING_STUN : DIMINISHING_CONTROLLED_STUN;
-    if (mechanic & (1 << MECHANIC_BANISH))
+    if (mechanic & (1ULL << MECHANIC_BANISH))
         return DIMINISHING_BANISH;
-    if (mechanic & (1 << MECHANIC_ROOT))
+    if (mechanic & (1ULL << MECHANIC_ROOT))
         return triggered ? DIMINISHING_ROOT : DIMINISHING_CONTROLLED_ROOT;
-    if (mechanic & (1 << MECHANIC_HORROR))
+    if (mechanic & (1ULL << MECHANIC_HORROR))
         return DIMINISHING_HORROR;
 
     return DIMINISHING_NONE;
@@ -646,6 +695,16 @@ SpellTargetPosition const* SpellMgr::GetSpellTargetPosition(uint32 spell_id, Spe
     return nullptr;
 }
 
+SpellCone const* SpellMgr::GetSpellCone(uint32 spell_id) const
+{
+    spell_id = GetFirstSpellInChain(spell_id);
+    auto itr = mSpellCones.find(spell_id);
+    if (itr != mSpellCones.end())
+        return &itr->second;
+
+    return nullptr;
+}
+
 SpellSpellGroupMapBounds SpellMgr::GetSpellSpellGroupMapBounds(uint32 spell_id) const
 {
     spell_id = GetFirstSpellInChain(spell_id);
@@ -823,16 +882,9 @@ bool SpellMgr::CanSpellTriggerProcOnEvent(SpellProcEntry const& procEntry, ProcE
 
     // check spell family name/flags (if set) for spells
     if (eventInfo.GetTypeMask() & SPELL_PROC_FLAG_MASK)
-    {
         if (SpellInfo const* eventSpellInfo = eventInfo.GetSpellInfo())
-        {
-            if (procEntry.SpellFamilyName && procEntry.SpellFamilyName != eventSpellInfo->SpellFamilyName)
+            if (!eventSpellInfo->IsAffected(procEntry.SpellFamilyName, procEntry.SpellFamilyMask))
                 return false;
-
-            if (procEntry.SpellFamilyMask && !(procEntry.SpellFamilyMask & eventSpellInfo->SpellFamilyFlags))
-                return false;
-        }
-    }
 
     // check spell type mask (if set)
     if (eventInfo.GetTypeMask() & (SPELL_PROC_FLAG_MASK | PERIODIC_PROC_FLAG_MASK))
@@ -1059,7 +1111,9 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
                     return false;
 
                 Battlefield* Bf = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
-                if (!Bf || player->GetTeamId() != Bf->GetDefenderTeam() || Bf->IsWarTime())
+                if (!Bf || Bf->IsWarTime())
+                    return false;
+                if (!sWorld->getBoolConfig(CONFIG_WINTERGRASP_ESSENCE_BOTH_FACTIONS) && player->GetTeamId() != Bf->GetDefenderTeam())
                     return false;
                 break;
             }
@@ -1536,6 +1590,93 @@ void SpellMgr::LoadSpellTargetPositions()
     LOG_INFO("server.loading", " ");
 }
 
+void SpellMgr::LoadSpellCones()
+{
+    uint32 oldMSTime = getMSTime();
+
+    mSpellCones.clear(); // need for reload case
+
+    //                                                    0       1
+    QueryResult result = WorldDatabase.Query("SELECT ID, ConeDegrees FROM spell_cone");
+
+    if (!result)
+    {
+        LOG_WARN("server.loading", ">> Loaded 0 spell cone definitions. DB table `spell_cone` is empty.");
+        LOG_INFO("server.loading", " ");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 spellId = fields[0].Get<uint32>();
+        int16 coneDeg = fields[1].Get<int16>();
+
+        SpellInfo const* spellInfo = GetSpellInfo(spellId);
+        if (!spellInfo)
+        {
+            LOG_ERROR("sql.sql", "Spell (ID:{}) listed in `spell_cone` does not exist.", spellId);
+            continue;
+        }
+
+        if (coneDeg < -360 || coneDeg > 360)
+        {
+            LOG_ERROR("sql.sql", "Spell (Id: {}) cone degrees {} out of range (-360..360).", spellId, coneDeg);
+            continue;
+        }
+
+        uint32 firstRankId = GetFirstSpellInChain(spellId);
+        SpellInfo const* firstSpellInfo = GetSpellInfo(firstRankId);
+
+        SpellInfo const* checkInfo = firstSpellInfo ? firstSpellInfo : spellInfo;
+
+        bool hasCone = false;
+        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+        {
+            if (checkInfo->Effects[i].TargetA.GetSelectionCategory() == TARGET_SELECT_CATEGORY_CONE ||
+                checkInfo->Effects[i].TargetB.GetSelectionCategory() == TARGET_SELECT_CATEGORY_CONE)
+            {
+                hasCone = true;
+                break;
+            }
+        }
+
+        if (!hasCone)
+        {
+            LOG_ERROR("sql.sql", "Spell (ID:{}) listed in `spell_cone` does not have a cone implicit target.", spellId);
+            continue;
+        }
+
+        if (firstRankId != spellId)
+            LOG_INFO("server.loading", "Spell (ID:{}) listed in `spell_cone` is not first rank; mapping to first rank {}.", spellId, firstRankId);
+
+        SpellCone sc{};
+        sc.cone_degrees = coneDeg;
+
+        // Avoid overwriting an existing first-rank entry with conflicting values
+        auto itr = mSpellCones.find(firstRankId);
+        if (itr != mSpellCones.end())
+        {
+            if (itr->second.cone_degrees != sc.cone_degrees)
+                LOG_ERROR("sql.sql",
+                    "Conflicting `spell_cone` entries for first-rank spell ID {}: {} vs {}. Keeping first value.",
+                    firstRankId,
+                    itr->second.cone_degrees,
+                    sc.cone_degrees);
+        }
+        else
+        {
+            mSpellCones[firstRankId] = sc;
+            ++count;
+        }
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} Spell Cone definitions in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
+}
+
 void SpellMgr::LoadSpellGroups()
 {
     uint32 oldMSTime = getMSTime();
@@ -1970,7 +2111,8 @@ void SpellMgr::LoadSpellProcs()
                     if (!spellInfo->Effects[i].IsAura())
                         continue;
 
-                    if (spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_ADD_PCT_MODIFIER || spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_ADD_FLAT_MODIFIER)
+                    if (spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_ADD_PCT_MODIFIER || spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_ADD_FLAT_MODIFIER
+                        || spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_MOD_SPELL_CRIT_CHANCE || spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_MOD_SPELL_CRIT_CHANCE_SCHOOL)
                     {
                         found = true;
                         break;
@@ -2882,6 +3024,8 @@ void SpellMgr::LoadSpellInfoStore()
         }
     }
 
+    LoadCreatureImmunities();
+
     LOG_INFO("server.loading", ">> Loaded Spell Custom Attributes in {} ms", GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
@@ -2960,6 +3104,42 @@ void SpellMgr::LoadSpellSpecificAndAuraState()
     }
 
     LOG_INFO("server.loading", ">> Loaded Spell Specific And Aura State in {} ms", GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
+}
+
+void SpellMgr::LoadSpellJumpDistances()
+{
+    uint32 oldMSTime = getMSTime();
+
+    QueryResult result = WorldDatabase.Query("SELECT ID, JumpDistance FROM spell_jump_distance");
+
+    if (!result)
+    {
+        LOG_WARN("server.loading", ">> Loaded 0 spell jump distances. DB table `spell_jump_distance` is empty.");
+        LOG_INFO("server.loading", " ");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field const* fields = result->Fetch();
+
+        uint32 const spellId = fields[0].Get<uint32>();
+        float const jumpDistance = fields[1].Get<float>();
+
+        SpellInfo* spellInfo = _GetSpellInfo(spellId);
+        if (!spellInfo)
+        {
+            LOG_ERROR("sql.sql", "Table `spell_jump_distance` has wrong spell (spell_id: {}), ignored.", spellId);
+            continue;
+        }
+
+        spellInfo->JumpDistance = jumpDistance;
+        ++count;
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} spell jump distances in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 
@@ -3076,6 +3256,7 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
                         // Exceptions
                         case 44801: // Spectral Invisibility (Kalecgos, SWP)
                         case 46021: // Spectral Realm (SWP)
+                        case 52951: // Chapel Invisibility (DK starting zone)
                             break;
                         default:
                             spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CAST;
@@ -3230,7 +3411,7 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
                                 continue;
                             [[fallthrough]]; /// @todo: Not sure whether the fallthrough was a mistake (forgetting a break) or intended. This should be double-checked.
                         default:
-                            if (!(spellInfo->Effects[j].CalcValue() &&
+                            if (!(spellInfo->Effects[j].CalcValue() ||
                                 ((spellInfo->Effects[j].Effect == SPELL_EFFECT_INTERRUPT_CAST || spellInfo->HasAttribute(SPELL_ATTR0_CU_DONT_BREAK_STEALTH)) &&
                                 !spellInfo->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES))))
                                 continue;
@@ -3683,4 +3864,18 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
 
     LOG_INFO("server.loading", ">> Loaded SpellInfo Custom Attributes in {} ms", GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
+}
+
+void SpellMgr::LoadSpellInfoImmunities()
+{
+    uint32 oldMSTime = getMSTime();
+
+    for (SpellInfo* spellInfo : mSpellInfoMap)
+    {
+        if (!spellInfo)
+            continue;
+        spellInfo->_LoadImmunityInfo();
+    }
+
+    LOG_INFO("server.loading", ">> Loaded SpellInfo immunity infos in {} ms", GetMSTimeDiffToNow(oldMSTime));
 }

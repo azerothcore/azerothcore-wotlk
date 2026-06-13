@@ -17,6 +17,7 @@
 
 #include "AccountMgr.h"
 #include "BattlefieldMgr.h"
+#include "RBAC.h"
 #include "Battleground.h"
 #include "BattlegroundMgr.h"
 #include "CharacterPackets.h"
@@ -95,6 +96,12 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recv_data)
     std::string code = "";
 
     recv_data >> guid >> menuId >> gossipListId;
+
+    if (!_player->PlayerTalkClass->GetGossipMenu().GetItem(gossipListId))
+    {
+        recv_data.rfinish();
+        return;
+    }
 
     if (_player->PlayerTalkClass->IsGossipOptionCoded(gossipListId))
         recv_data >> code;
@@ -277,8 +284,6 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
         levelMax = STRONG_MAX_LEVEL;
 
     uint32 team = _player->GetTeamId();
-    uint32 security = GetSecurity();
-    bool allowTwoSideWhoList = sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_WHO_LIST);
     uint32 gmLevelInWhoList = sWorld->getIntConfig(CONFIG_GM_LEVEL_IN_WHO_LIST);
     uint32 displaycount = 0;
 
@@ -288,20 +293,12 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
 
     for (auto const& target : sWhoListCacheMgr->GetWhoList())
     {
-        if (AccountMgr::IsPlayerAccount(security))
-        {
-            // player can see member of other team only if CONFIG_ALLOW_TWO_SIDE_WHO_LIST
-            if (target.GetTeamId() != team && !allowTwoSideWhoList)
-            {
-                continue;
-            }
+        if (target.GetTeamId() != team && !HasPermission(rbac::RBAC_PERM_TWO_SIDE_WHO_LIST))
+            continue;
 
-            // player can see MODERATOR, GAME MASTER, ADMINISTRATOR only if CONFIG_GM_IN_WHO_LIST
-            if (target.GetSecurity() > AccountTypes(gmLevelInWhoList))
-            {
-                continue;
-            }
-        }
+        // player can see MODERATOR, GAME MASTER, ADMINISTRATOR only if CONFIG_GM_IN_WHO_LIST
+        if (!HasPermission(rbac::RBAC_PERM_WHO_SEE_ALL_SEC_LEVELS) && target.GetSecurity() > AccountTypes(gmLevelInWhoList))
+            continue;
 
         // check if target is globally visible for player
         if ((_player->GetGUID() != target.GetGuid() && !target.IsVisible()) &&
@@ -423,7 +420,7 @@ void WorldSession::HandleLogoutRequestOpcode(WorldPackets::Character::LogoutRequ
     if (ObjectGuid lguid = GetPlayer()->GetLootGUID())
         DoLootRelease(lguid);
 
-    bool instantLogout = ((GetSecurity() >= 0 && uint32(GetSecurity()) >= sWorld->getIntConfig(CONFIG_INSTANT_LOGOUT))
+    bool instantLogout = (HasPermission(rbac::RBAC_PERM_INSTANT_LOGOUT)
                           || (GetPlayer()->HasPlayerFlag(PLAYER_FLAGS_RESTING) && !GetPlayer()->IsInCombat())) || GetPlayer()->IsInFlight();
 
     bool preventAfkSanctuaryLogout = sWorld->getIntConfig(CONFIG_AFK_PREVENT_LOGOUT) == 1
@@ -726,7 +723,8 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
     if (player->isDebugAreaTriggers)
         ChatHandler(this).PSendSysMessage(LANG_DEBUG_AREATRIGGER_REACHED, triggerId);
 
-    if (sScriptMgr->OnAreaTrigger(player, atEntry))
+    // Skip areatrigger scripts for GMs unless debug areatriggers is enabled
+    if ((!player->IsGameMaster() || player->isDebugAreaTriggers) && sScriptMgr->OnAreaTrigger(player, atEntry))
         return;
 
     if (player->IsAlive())
@@ -941,14 +939,14 @@ void WorldSession::HandleSetActionButtonOpcode(WorldPacket& recv_data)
 
 void WorldSession::HandleCompleteCinematic(WorldPacket& /*recv_data*/)
 {
-    // If player has sight bound to visual waypoint NPC we should remove it
-    GetPlayer()->GetCinematicMgr()->EndCinematic();
+    // End the current cinematic and restore the normal player view
+    GetPlayer()->GetCinematicMgr().EndCinematic();
 }
 
 void WorldSession::HandleNextCinematicCamera(WorldPacket& /*recv_data*/)
 {
     // Sent by client when cinematic actually begun. So we begin the server side process
-    GetPlayer()->GetCinematicMgr()->BeginCinematic();
+    GetPlayer()->GetCinematicMgr().StartCinematicCamera();
 }
 
 void WorldSession::HandleSetActionBarToggles(WorldPacket& recv_data)
@@ -1003,7 +1001,7 @@ void WorldSession::HandleInspectOpcode(WorldPacket& recv_data)
     WorldPacket data(SMSG_INSPECT_TALENT, guid_size + 4 + talent_points);
     data << player->GetPackGUID();
 
-    if (sWorld->getBoolConfig(CONFIG_TALENTS_INSPECTING) || _player->IsGameMaster())
+    if (sWorld->getBoolConfig(CONFIG_TALENTS_INSPECTING) || _player->CanBeGameMaster())
     {
         player->BuildPlayerTalentsInfoData(&data);
     }
@@ -1074,7 +1072,7 @@ void WorldSession::HandleWorldTeleportOpcode(WorldPacket& recv_data)
 
     LOG_DEBUG("network", "CMSG_WORLD_TELEPORT: Player = {}, Time = {}, map = {}, x = {}, y = {}, z = {}, o = {}", GetPlayer()->GetName(), time, mapid, PositionX, PositionY, PositionZ, Orientation);
 
-    if (AccountMgr::IsAdminAccount(GetSecurity()))
+    if (HasPermission(rbac::RBAC_PERM_OPCODE_WORLD_TELEPORT))
         GetPlayer()->TeleportTo(mapid, PositionX, PositionY, PositionZ, Orientation);
     else
         ChatHandler(this).SendNotification(LANG_PERMISSION_DENIED);
@@ -1086,7 +1084,7 @@ void WorldSession::HandleWhoisOpcode(WorldPacket& recv_data)
     std::string charname;
     recv_data >> charname;
 
-    if (!AccountMgr::IsAdminAccount(GetSecurity()))
+    if (!HasPermission(rbac::RBAC_PERM_OPCODE_WHOIS))
     {
         ChatHandler(this).SendNotification(LANG_PERMISSION_DENIED);
         return;
@@ -1150,8 +1148,21 @@ void WorldSession::HandleComplainOpcode(WorldPackets::Misc::Complain& packet)
     // Complaint Received message
     SendPacket(WorldPackets::Misc::ComplainResult().Write());
 
-    LOG_DEBUG("network", "REPORT SPAM: type {}, {}, unk1 {}, unk2 {}, unk3 {}, unk4 {}, message {}",
-        packet.SpamType, packet.SpammerGuid.ToString(), packet.Unk1, packet.Unk2, packet.Unk3, packet.Unk4, packet.Description);
+    if (sWorld->getBoolConfig(CONFIG_LOGSPAMREPORTS))
+    {
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_SPAM_REPORT);
+
+        stmt->SetData(0, packet.SpamType);
+        stmt->SetData(1, packet.SpammerGuid.GetCounter());
+        stmt->SetData(2, packet.Unk1);
+        stmt->SetData(3, packet.MailIdOrMessageType);
+        stmt->SetData(4, packet.ChannelId);
+        stmt->SetData(5, packet.SecondsSinceMessage);
+        stmt->SetData(6, packet.Description);
+        stmt->SetData(7, GameTime::GetGameTime().count());
+
+        CharacterDatabase.Execute(stmt);
+    }
 }
 
 void WorldSession::HandleRealmSplitOpcode(WorldPacket& recv_data)
