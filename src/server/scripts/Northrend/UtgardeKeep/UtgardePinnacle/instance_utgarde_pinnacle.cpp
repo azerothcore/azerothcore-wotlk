@@ -23,7 +23,16 @@
 ObjectData const creatureData[] =
 {
     { NPC_SKADI_THE_RUTHLESS, DATA_SKADI_THE_RUTHLESS },
+    { NPC_GARUF,              DATA_GRAUF              },
     { 0,                      0                       }
+};
+
+ObjectData const summonData[] =
+{
+    { NPC_YMIRJAR_WARRIOR,      DATA_SKADI_THE_RUTHLESS },
+    { NPC_YMIRJAR_WITCH_DOCTOR, DATA_SKADI_THE_RUTHLESS },
+    { NPC_YMIRJAR_HARPOONER,    DATA_SKADI_THE_RUTHLESS },
+    { 0,                        0                       }
 };
 
 class instance_utgarde_pinnacle : public InstanceMapScript
@@ -65,6 +74,7 @@ public:
         {
             SetHeaders(DataHeader);
             LoadObjectData(creatureData, nullptr);
+            LoadSummonData(summonData);
             SkadiHits        = 0;
             SkadiInRange     = 0;
 

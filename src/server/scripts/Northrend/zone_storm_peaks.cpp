@@ -20,8 +20,8 @@
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
+#include "SpellMgr.h"
 #include "ScriptedEscortAI.h"
-#include "ScriptedGossip.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
@@ -72,6 +72,7 @@ struct npc_frosthound : public npc_escortAI
             return;
     }
 
+    using CreatureAI::WaypointReached;
     void WaypointReached(uint32 waypointId) override
     {
         Player* player = GetPlayerForEscort();
@@ -203,109 +204,74 @@ public:
 
 enum eTimeLost
 {
-    NPC_TIME_LOST_PROTO_DRAKE   = 32491,
-    NPC_VYRAGOSA                = 32630,
+    NPC_TIME_LOST_PROTO_DRAKE = 32491,
+    NPC_VYRAGOSA = 32630,
 
-    SPELL_TIME_SHIFT            = 61084,
-    SPELL_TIME_LAPSE            = 51020,
-    SPELL_FROST_BREATH          = 47425,
-    SPELL_FROST_CLEAVE          = 51857,
+    SPELL_TIME_SHIFT = 61084,
+    SPELL_TIME_LAPSE = 51020,
+    SPELL_FROST_BREATH = 47425,
+    SPELL_FROST_CLEAVE = 51857,
 };
 
 class npc_time_lost_proto_drake : public CreatureScript
 {
 public:
-    npc_time_lost_proto_drake() : CreatureScript("npc_time_lost_proto_drake") { }
+    npc_time_lost_proto_drake() : CreatureScript("npc_time_lost_proto_drake") {}
 
-    struct npc_time_lost_proto_drakeAI : public npc_escortAI
+    struct npc_time_lost_proto_drakeAI : public ScriptedAI
     {
-        npc_time_lost_proto_drakeAI(Creature* creature) : npc_escortAI(creature)
-        {
-            rollPath = false;
-            setVisible = false;
-            me->setActive(true);
-            me->SetVisible(false);
-        }
-
-        EventMap events;
-        bool rollPath;
-        bool setVisible;
+        npc_time_lost_proto_drakeAI(Creature* creature) : ScriptedAI(creature) {}
 
         void Reset() override
         {
-            npc_escortAI::Reset();
-            if (me->HasUnitState(UNIT_STATE_EVADE))
-                return;
-            me->SetVisible(false); // pussywizard: zeby nie dostawali info o npc w miejscu spawna (kampienie z addonem npc scan)
-            rollPath = true;
+            scheduler.CancelAll();
         }
 
-        void RollPath()
+        void InitializeAI() override
         {
-            me->SetEntry(NPC_TIME_LOST_PROTO_DRAKE);
-            Start(true, ObjectGuid::Empty, 0, false, true, true);
-            SetNextWaypoint(urand(0, 250), true);
-            me->UpdateEntry(roll_chance_i(25) ? NPC_TIME_LOST_PROTO_DRAKE : NPC_VYRAGOSA, 0, false);
+            ScriptedAI::InitializeAI();
+            me->SetAnimTier(AnimTier::Fly);
+            me->setActive(true);
+            me->SetVisible(false);
+            me->SetImmuneToAll(true);
+
+            me->m_Events.AddEventAtOffset([&] {
+                me->SetVisible(true);
+                me->SetImmuneToAll(false);
+            }, Hours(urand(6, 22)));
         }
 
-        void WaypointReached(uint32  /*pointId*/) override { }
-
-        void JustEngagedWith(Unit*) override
+        void JustEngagedWith(Unit* who) override
         {
-            events.Reset();
+            ScriptedAI::JustEngagedWith(who);
+
             if (me->GetEntry() == NPC_TIME_LOST_PROTO_DRAKE)
             {
-                events.ScheduleEvent(SPELL_TIME_SHIFT, 10s);
-                events.ScheduleEvent(SPELL_TIME_LAPSE, 5s);
+                ScheduleTimedEvent(5s, [&] {
+                    DoCastVictim(SPELL_TIME_LAPSE);
+                }, 12s);
+                ScheduleTimedEvent(10s, [&] {
+                    DoCastSelf(SPELL_TIME_SHIFT);
+                }, 18s);
             }
             else
             {
-                events.ScheduleEvent(SPELL_FROST_BREATH, 8s);
-                events.ScheduleEvent(SPELL_FROST_CLEAVE, 5s);
+                ScheduleTimedEvent(5s, [&] {
+                    DoCastVictim(SPELL_FROST_CLEAVE);
+                }, 8s);
+                ScheduleTimedEvent(8s, [&] {
+                    DoCastVictim(SPELL_FROST_BREATH);
+                }, 12s);
             }
         }
 
-        void UpdateEscortAI(uint32 diff) override
+        void UpdateAI(uint32 diff) override
         {
-            if (rollPath)
-            {
-                RollPath();
-                rollPath = false;
-                setVisible = true;
-                return;
-            }
-
-            if (setVisible)
-            {
-                me->SetVisible(true);
-                setVisible = false;
-            }
-
             if (!UpdateVictim())
                 return;
 
-            events.Update(diff);
-            switch (events.ExecuteEvent())
-            {
-                case SPELL_TIME_SHIFT:
-                    me->CastSpell(me, SPELL_TIME_SHIFT, false);
-                    events.Repeat(18s);
-                    break;
-                case SPELL_TIME_LAPSE:
-                    me->CastSpell(me->GetVictim(), SPELL_TIME_LAPSE, false);
-                    events.Repeat(12s);
-                    break;
-                case SPELL_FROST_BREATH:
-                    me->CastSpell(me->GetVictim(), SPELL_FROST_BREATH, false);
-                    events.Repeat(12s);
-                    break;
-                case SPELL_FROST_CLEAVE:
-                    me->CastSpell(me->GetVictim(), SPELL_FROST_CLEAVE, false);
-                    events.Repeat(8s);
-                    break;
-            }
-
             DoMeleeAttackIfReady();
+            scheduler.Update(diff);
         }
     };
 
@@ -369,56 +335,6 @@ class spell_q13007_iron_colossus : public SpellScript
     void Register() override
     {
         OnEffectHitTarget += SpellEffectFn(spell_q13007_iron_colossus::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
-    }
-};
-
-/*######
-## npc_roxi_ramrocket
-######*/
-
-enum RoxiRamrocket
-{
-    SPELL_MECHANO_HOG               = 60866,
-    SPELL_MEKGINEERS_CHOPPER        = 60867
-};
-
-class npc_roxi_ramrocket : public CreatureScript
-{
-public:
-    npc_roxi_ramrocket() : CreatureScript("npc_roxi_ramrocket") { }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        //Quest Menu
-        if (creature->IsQuestGiver())
-            player->PrepareQuestMenu(creature->GetGUID());
-
-        //Trainer Menu
-        if (creature->IsTrainer())
-            AddGossipItemFor(player, GOSSIP_ICON_TRAINER, GOSSIP_TEXT_TRAIN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
-
-        //Vendor Menu
-        if (creature->IsVendor())
-            if (player->HasSpell(SPELL_MECHANO_HOG) || player->HasSpell(SPELL_MEKGINEERS_CHOPPER))
-                AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
-
-        SendGossipMenuFor(player, player->GetGossipTextId(creature), creature->GetGUID());
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        switch (action)
-        {
-            case GOSSIP_ACTION_TRAIN:
-                player->GetSession()->SendTrainerList(creature);
-                break;
-            case GOSSIP_ACTION_TRADE:
-                player->GetSession()->SendListInventory(creature->GetGUID());
-                break;
-        }
-        return true;
     }
 };
 
@@ -577,83 +493,46 @@ public:
     }
 };
 
-class npc_icefang : public CreatureScript
-{
-public:
-    npc_icefang() : CreatureScript("npc_icefang") { }
-
-    struct npc_icefangAI : public npc_escortAI
-    {
-        npc_icefangAI(Creature* creature) : npc_escortAI(creature) { }
-
-        void AttackStart(Unit* /*who*/) override { }
-        void JustEngagedWith(Unit* /*who*/) override { }
-        void EnterEvadeMode(EvadeReason /*why*/) override { }
-
-        void PassengerBoarded(Unit* who, int8 /*seatId*/, bool apply) override
-        {
-            if (who->IsPlayer())
-            {
-                if (apply)
-                {
-                    me->SetWalk(false);
-                    Start(false, who->GetGUID());
-                }
-            }
-        }
-
-        void WaypointReached(uint32 /*waypointId*/) override { }
-        void JustDied(Unit* /*killer*/) override { }
-        void OnCharmed(bool /*apply*/) override { }
-
-        void UpdateAI(uint32 diff) override
-        {
-            npc_escortAI::UpdateAI(diff);
-
-            if (!UpdateVictim())
-                return;
-        }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return new npc_icefangAI(creature);
-    }
-};
-
-enum HyldsmeetProtoDrake
-{
-    NPC_HYLDSMEET_DRAKERIDER = 29694
-};
-
 struct npc_hyldsmeet_protodrake : public CreatureAI
 {
-    explicit npc_hyldsmeet_protodrake(Creature* creature) : CreatureAI(creature), _accessoryRespawnTimer(0) { }
+    explicit npc_hyldsmeet_protodrake(Creature* creature) : CreatureAI(creature), _accessoryInstalled(false), _accessoryRespawnTimer(0)
+    {
+        me->SetUnitFlag2(UNIT_FLAG2_PREVENT_SPELL_CLICK);
+     }
 
     void PassengerBoarded(Unit* who, int8 /*seat*/, bool apply) override
     {
-        if (apply)
+        if (who->IsPlayer())
             return;
 
-        if (who->GetEntry() == NPC_HYLDSMEET_DRAKERIDER)
+        if (apply)
+            _accessoryInstalled = true;
+        else
+        {
+            _accessoryInstalled = false;
             _accessoryRespawnTimer = 5 * MINUTE * IN_MILLISECONDS;
+        }
     }
 
     void UpdateAI(uint32 diff) override
     {
-        //! We need to manually reinstall accessories because the vehicle itself is friendly to players,
-        //! so EnterEvadeMode is never triggered. The accessory on the other hand is hostile and killable.
+        // We need to manually reinstall accessories because the vehicle itself is friendly to players,
+        // so EnterEvadeMode is never triggered. The accessory on the other hand is hostile and killable.
+        if (_accessoryInstalled)
+            return;
+
         Vehicle* vehicleKit = me->GetVehicleKit();
-        if (_accessoryRespawnTimer && _accessoryRespawnTimer <= diff && vehicleKit)
-        {
+        if (!vehicleKit)
+            return;
+
+        if (_accessoryRespawnTimer <= diff)
             vehicleKit->InstallAllAccessories(true);
-            _accessoryRespawnTimer = 0;
-        }
         else
             _accessoryRespawnTimer -= diff;
     }
 
 private:
+    bool _accessoryInstalled;
     uint32 _accessoryRespawnTimer;
 };
 
@@ -1375,16 +1254,51 @@ class spell_eject_passenger_wild_wyrm : public SpellScript
     }
 };
 
+struct npc_oathbound_warder : public ScriptedAI
+{
+    npc_oathbound_warder(Creature* creature) : ScriptedAI(creature) { }
+
+    void AttackStart(Unit* /*who*/) override { }
+    void JustEngagedWith(Unit* /*who*/) override { }
+    void UpdateAI(uint32 /*diff*/) override { } // Need so AI doesn't stop casting when hit in combat
+
+    void InitializeAI() override
+    {
+        ScriptedAI::InitializeAI();
+        me->SetReactState(REACT_PASSIVE);
+
+        CharmInfo* charmInfo = me->GetCharmInfo();
+        if (!charmInfo)
+            return;
+
+        charmInfo->InitEmptyActionBar(false);
+
+        uint32 slot = 0;
+        for (uint32 i = 0; i < MAX_CREATURE_SPELLS; ++i)
+        {
+            uint32 spellId = me->m_spells[i];
+            if (!spellId)
+                continue;
+
+            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+            if (spellInfo && spellInfo->IsPassive())
+                me->CastSpell(me, spellInfo, true);
+
+            charmInfo->SetActionBar(6 + slot, spellId, ACT_PASSIVE);
+            ++slot;
+        }
+    }
+};
+
 void AddSC_storm_peaks()
 {
     RegisterCreatureAI(npc_frosthound);
+    RegisterCreatureAI(npc_oathbound_warder);
     new npc_iron_watcher();
     new npc_time_lost_proto_drake();
     RegisterSpellScript(spell_q13007_iron_colossus);
-    new npc_roxi_ramrocket();
     new npc_brunnhildar_prisoner();
     new npc_freed_protodrake();
-    new npc_icefang();
     RegisterCreatureAI(npc_hyldsmeet_protodrake);
     RegisterSpellScript(spell_close_rift_aura);
     new npc_vehicle_d16_propelled_delivery();

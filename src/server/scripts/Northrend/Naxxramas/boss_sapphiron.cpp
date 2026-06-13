@@ -128,6 +128,7 @@ public:
             spawnTimer = 0;
             currentTarget.Clear();
             blockList.clear();
+            me->SetAnimTier(AnimTier::Fly);
         }
 
         void EnterCombatSelfFunction()
@@ -291,7 +292,7 @@ public:
                     me->AttackStop();
                     float x, y, z, o;
                     me->GetHomePosition(x, y, z, o);
-                    me->GetMotionMaster()->MovePoint(POINT_CENTER, x, y, z);
+                    me->GetMotionMaster()->MovePoint(POINT_CENTER, x, y, z, FORCED_MOVEMENT_NONE, 0.f, o);
                     return;
                 case EVENT_FLIGHT_LIFTOFF:
                     Talk(EMOTE_AIR_PHASE);
@@ -314,17 +315,17 @@ public:
                         }
 
                         std::vector<Unit*> targets;
-                        auto i = me->GetThreatMgr().GetThreatList().begin();
-                        for (; i != me->GetThreatMgr().GetThreatList().end(); ++i)
+                        auto i = me->GetThreatMgr().GetUnsortedThreatList().begin();
+                        for (; i != me->GetThreatMgr().GetUnsortedThreatList().end(); ++i)
                         {
-                            if ((*i)->getTarget()->IsPlayer())
+                            if ((*i)->GetVictim()->IsPlayer())
                             {
                                 bool inList = false;
                                 if (!blockList.empty())
                                 {
                                     for (GuidList::const_iterator itr = blockList.begin(); itr != blockList.end(); ++itr)
                                     {
-                                        if ((*i)->getTarget()->GetGUID() == *itr)
+                                        if ((*i)->GetVictim()->GetGUID() == *itr)
                                         {
                                             inList = true;
                                             break;
@@ -333,7 +334,7 @@ public:
                                 }
                                 if (!inList)
                                 {
-                                    targets.push_back((*i)->getTarget());
+                                    targets.push_back((*i)->GetVictim());
                                 }
                             }
                         }

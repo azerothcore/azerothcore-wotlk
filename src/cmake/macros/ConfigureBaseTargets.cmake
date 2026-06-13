@@ -20,6 +20,12 @@ set(CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD 20)
 message(STATUS "Enabled С++20 standard")
 
+# Set build-directive (used in core to tell which buildtype we used)
+target_compile_definitions(acore-compile-option-interface
+  INTERFACE
+    AC_BUILD_TYPE="$<CONFIG>"
+    AC_BUILD_HAS_DEBUG_INFO=$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>)
+
 # An interface library to make the warnings level available to other targets
 # This interface taget is set-up through the platform specific script
 add_library(acore-warning-interface INTERFACE)

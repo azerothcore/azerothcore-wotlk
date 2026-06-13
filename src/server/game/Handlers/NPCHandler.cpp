@@ -16,6 +16,7 @@
  */
 
 #include "Battleground.h"
+#include "ConditionMgr.h"
 #include "BattlegroundMgr.h"
 #include "Creature.h"
 #include "DatabaseEnv.h"
@@ -109,6 +110,8 @@ void WorldSession::SendTrainerList(Creature* npc)
         return;
     }
 
+    npc->PauseMovementForInteraction();
+
     trainer->SendSpells(npc, _player, GetSessionDbLocaleIndex());
 }
 
@@ -150,6 +153,11 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket& recvData)
     if (unit->GetNpcFlags() == UNIT_NPC_FLAG_NONE)
         return;
 
+    // Check GossipHello conditions - block gossip opening if conditions not met
+    ConditionList gossipConditions = sConditionMgr->GetConditionsForNotGroupedEntry(CONDITION_SOURCE_TYPE_GOSSIP_HELLO, unit->GetEntry());
+    if (!sConditionMgr->IsObjectMeetToConditions(_player, unit, gossipConditions))
+        return;
+
     // set faction visible if needed
     if (FactionTemplateEntry const* factionTemplateEntry = sFactionTemplateStore.LookupEntry(unit->GetFaction()))
         _player->GetReputationMgr().SetVisible(factionTemplateEntry);
@@ -159,10 +167,12 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket& recvData)
     //if (GetPlayer()->HasUnitState(UNIT_STATE_DIED))
     //    GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
 
-    // Stop the npc if moving
-    if (uint32 pause = unit->GetMovementTemplate().GetInteractionPauseTimer())
-        unit->PauseMovement(pause);
-    unit->SetHomePosition(unit->GetPosition());
+    unit->PauseMovementForInteraction();
+
+    // Update home position for patrolling NPCs only (prevents drift for stationary NPCs)
+    if (unit->GetDefaultMovementType() == WAYPOINT_MOTION_TYPE ||
+        unit->GetMotionMaster()->GetCurrentMovementGeneratorType() == WAYPOINT_MOTION_TYPE)
+        unit->SetHomePosition(unit->GetPosition());
 
     // If spiritguide, no need for gossip menu, just put player into resurrect queue
     if (unit->IsSpiritGuide())
@@ -179,7 +189,7 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket& recvData)
     if (!sScriptMgr->OnGossipHello(_player, unit))
     {
         //        _player->TalkedToCreature(unit->GetEntry(), unit->GetGUID());
-        _player->PrepareGossipMenu(unit, unit->GetCreatureTemplate()->GossipMenuId, true);
+        _player->PrepareGossipMenu(unit, unit->GetGossipMenuId(), true);
         _player->SendPreparedGossip(unit);
     }
     unit->AI()->sGossipHello(_player);
@@ -252,7 +262,9 @@ void WorldSession::SendSpiritResurrect()
 {
     _player->ResurrectPlayer(0.5f, true);
 
-    _player->DurabilityLossAll(0.25f, true);
+    float durabilityLossOnSpiritResurrect = sWorld->getRate(RATE_DURABILITY_LOSS_ON_SPIRIT_RESURRECT) / 100.0f;
+    if (durabilityLossOnSpiritResurrect)
+        _player->DurabilityLossAll(durabilityLossOnSpiritResurrect, true);
 
     // get corpse nearest graveyard
     GraveyardStruct const* corpseGrave = nullptr;

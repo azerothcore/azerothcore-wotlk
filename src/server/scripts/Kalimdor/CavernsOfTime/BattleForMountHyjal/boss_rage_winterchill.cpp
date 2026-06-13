@@ -50,10 +50,6 @@ public:
     boss_rage_winterchill(Creature* creature) : BossAI(creature, DATA_WINTERCHILL)
     {
         _recentlySpoken = false;
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
     }
 
     void JustEngagedWith(Unit* who) override
@@ -121,7 +117,7 @@ public:
 
     void KilledUnit(Unit* victim) override
     {
-        if (!_recentlySpoken && victim->IsPlayer())
+        if (!_recentlySpoken && victim->IsPlayer() && me->IsAlive())
         {
             Talk(SAY_ONSLAY);
             _recentlySpoken = true;

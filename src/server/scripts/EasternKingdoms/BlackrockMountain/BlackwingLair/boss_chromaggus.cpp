@@ -70,203 +70,171 @@ enum Misc
 
 Position const homePos = { -7491.1587f, -1069.718f, 476.59094, 476.59094f };
 
-class boss_chromaggus : public CreatureScript
+struct boss_chromaggus : public BossAI
 {
-public:
-    boss_chromaggus() : CreatureScript("boss_chromaggus") { }
-
-    struct boss_chromaggusAI : public BossAI
+    boss_chromaggus(Creature* creature) : BossAI(creature, DATA_CHROMAGGUS)
     {
-        boss_chromaggusAI(Creature* creature) : BossAI(creature, DATA_CHROMAGGUS)
+        Initialize();
+
+        // Select the 2 breaths that we are going to use until despawned so we don't end up casting 2 of the same breath.
+        _breathSpells = { SPELL_INCINERATE, SPELL_TIMELAPSE,  SPELL_CORROSIVEACID, SPELL_IGNITEFLESH, SPELL_FROSTBURN };
+
+        Acore::Containers::RandomResize(_breathSpells, 2);
+
+        // Hack fix: This is here to prevent him from being pulled from the floor underneath, remove it once maps are fixed.
+        creature->SetImmuneToAll(true);
+    }
+
+    void Initialize()
+    {
+        Enraged = false;
+    }
+
+    void Reset() override
+    {
+        _Reset();
+
+        Initialize();
+    }
+
+    void JustEngagedWith(Unit* who) override
+    {
+        BossAI::JustEngagedWith(who);
+
+        events.ScheduleEvent(EVENT_SHIMMER, 1s);
+        events.ScheduleEvent(EVENT_BREATH, 30s);
+        events.ScheduleEvent(EVENT_BREATH, 60s);
+        events.ScheduleEvent(EVENT_AFFLICTION, 10s);
+        events.ScheduleEvent(EVENT_FRENZY, 15s);
+    }
+
+    bool CanAIAttack(Unit const* victim) const override
+    {
+        return !victim->HasAura(SPELL_TIMELAPSE);
+    }
+
+    void SetGUID(ObjectGuid const& guid, int32 id) override
+    {
+        if (id == GUID_LEVER_USER)
         {
-            Initialize();
-
-            // Select the 2 breaths that we are going to use until despawned so we don't end up casting 2 of the same breath.
-            _breathSpells = { SPELL_INCINERATE, SPELL_TIMELAPSE,  SPELL_CORROSIVEACID, SPELL_IGNITEFLESH, SPELL_FROSTBURN };
-
-            Acore::Containers::RandomResize(_breathSpells, 2);
-
+            _playerGUID = guid;
             // Hack fix: This is here to prevent him from being pulled from the floor underneath, remove it once maps are fixed.
-            creature->SetImmuneToAll(true);
+            me->SetImmuneToAll(false);
         }
+    }
 
-        void Initialize()
+    void PathEndReached(uint32 /*pathId*/) override
+    {
+        if (Unit* player = ObjectAccessor::GetUnit(*me, _playerGUID))
+            me->SetInCombatWith(player);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        while (uint32 eventId = events.ExecuteEvent())
         {
-            Enraged = false;
-        }
-
-        void Reset() override
-        {
-            _Reset();
-
-            Initialize();
-        }
-
-        void JustEngagedWith(Unit* who) override
-        {
-            BossAI::JustEngagedWith(who);
-
-            events.ScheduleEvent(EVENT_SHIMMER, 1s);
-            events.ScheduleEvent(EVENT_BREATH, 30s);
-            events.ScheduleEvent(EVENT_BREATH, 60s);
-            events.ScheduleEvent(EVENT_AFFLICTION, 10s);
-            events.ScheduleEvent(EVENT_FRENZY, 15s);
-        }
-
-        bool CanAIAttack(Unit const* victim) const override
-        {
-            return !victim->HasAura(SPELL_TIMELAPSE);
-        }
-
-        void SetGUID(ObjectGuid const& guid, int32 id) override
-        {
-            if (id == GUID_LEVER_USER)
+            switch (eventId)
             {
-                _playerGUID = guid;
-                // Hack fix: This is here to prevent him from being pulled from the floor underneath, remove it once maps are fixed.
-                me->SetImmuneToAll(false);
+                case EVENT_SHIMMER:
+                    {
+                        // Cast new random vulnerabilty on self
+                        DoCast(me, SPELL_ELEMENTAL_SHIELD);
+                        Talk(EMOTE_SHIMMER);
+                        events.ScheduleEvent(EVENT_SHIMMER, 17s, 25s);
+                        break;
+                    }
+                case EVENT_BREATH:
+                    DoCastVictim(_breathSpells.front());
+                    _breathSpells.reverse();
+                    events.ScheduleEvent(EVENT_BREATH, 60s);
+                    break;
+                case EVENT_AFFLICTION:
+                    {
+                        uint32 afflictionSpellID = RAND(SPELL_BROODAF_BLUE, SPELL_BROODAF_BLACK, SPELL_BROODAF_RED, SPELL_BROODAF_BRONZE, SPELL_BROODAF_GREEN);
+                        std::vector<Player*> playerTargets;
+                        Map::PlayerList const& players = me->GetMap()->GetPlayers();
+                        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                            if (Player* player = itr->GetSource()->ToPlayer())
+                                if (!player->IsGameMaster() && !player->IsSpectator() && player->IsAlive())
+                                    playerTargets.push_back(player);
+
+                        if (playerTargets.size() > 12)
+                            Acore::Containers::RandomResize(playerTargets, 12);
+
+                        for (Player* player : playerTargets)
+                        {
+                            DoCast(player, afflictionSpellID, true);
+
+                            if (player->HasAllAuras(SPELL_BROODAF_BLUE, SPELL_BROODAF_BLACK, SPELL_BROODAF_RED, SPELL_BROODAF_BRONZE, SPELL_BROODAF_GREEN))
+                                DoCast(player, SPELL_CHROMATIC_MUT_1);
+                        }
+                    }
+                    events.ScheduleEvent(EVENT_AFFLICTION, 10s);
+                    break;
+                case EVENT_FRENZY:
+                    DoCast(me, SPELL_FRENZY);
+                    events.ScheduleEvent(EVENT_FRENZY, 10s, 15s);
+                    break;
             }
-        }
-
-        void PathEndReached(uint32 /*pathId*/) override
-        {
-            if (Unit* player = ObjectAccessor::GetUnit(*me, _playerGUID))
-            {
-                me->SetInCombatWith(player);
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
 
             if (me->HasUnitState(UNIT_STATE_CASTING))
                 return;
-
-            while (uint32 eventId = events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                    case EVENT_SHIMMER:
-                        {
-                            // Cast new random vulnerabilty on self
-                            DoCast(me, SPELL_ELEMENTAL_SHIELD);
-                            Talk(EMOTE_SHIMMER);
-                            events.ScheduleEvent(EVENT_SHIMMER, 17s, 25s);
-                            break;
-                        }
-                    case EVENT_BREATH:
-                        DoCastVictim(_breathSpells.front());
-                        _breathSpells.reverse();
-                        events.ScheduleEvent(EVENT_BREATH, 60s);
-                        break;
-                    case EVENT_AFFLICTION:
-                        {
-                            uint32 afflictionSpellID = RAND(SPELL_BROODAF_BLUE, SPELL_BROODAF_BLACK, SPELL_BROODAF_RED, SPELL_BROODAF_BRONZE, SPELL_BROODAF_GREEN);
-                            std::vector<Player*> playerTargets;
-                            Map::PlayerList const& players = me->GetMap()->GetPlayers();
-                            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                            {
-                                if (Player* player = itr->GetSource()->ToPlayer())
-                                {
-                                    if (!player->IsGameMaster() && !player->IsSpectator() && player->IsAlive())
-                                    {
-                                        playerTargets.push_back(player);
-                                    }
-                                }
-                            }
-
-                            if (playerTargets.size() > 12)
-                            {
-                                Acore::Containers::RandomResize(playerTargets, 12);
-                            }
-
-                            for (Player* player : playerTargets)
-                            {
-                                DoCast(player, afflictionSpellID, true);
-
-                                if (player->HasAllAuras(SPELL_BROODAF_BLUE, SPELL_BROODAF_BLACK, SPELL_BROODAF_RED, SPELL_BROODAF_BRONZE, SPELL_BROODAF_GREEN))
-                                    DoCast(player, SPELL_CHROMATIC_MUT_1);
-                            }
-                        }
-                        events.ScheduleEvent(EVENT_AFFLICTION, 10s);
-                        break;
-                    case EVENT_FRENZY:
-                        DoCast(me, SPELL_FRENZY);
-                        events.ScheduleEvent(EVENT_FRENZY, 10s, 15s);
-                        break;
-                }
-
-                if (me->HasUnitState(UNIT_STATE_CASTING))
-                    return;
-            }
-
-            // Enrage if not already enraged and below 20%
-            if (!Enraged && HealthBelowPct(20))
-            {
-                DoCast(me, SPELL_ENRAGE);
-                Enraged = true;
-            }
-
-            DoMeleeAttackIfReady();
         }
 
-    private:
-        std::list<uint32> _breathSpells;
-        bool Enraged;
-        ObjectGuid _playerGUID;
-    };
+        // Enrage if not already enraged and below 20%
+        if (!Enraged && HealthBelowPct(20))
+        {
+            DoCast(me, SPELL_ENRAGE);
+            Enraged = true;
+        }
 
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetBlackwingLairAI<boss_chromaggusAI>(creature);
+        DoMeleeAttackIfReady();
     }
+
+private:
+    std::list<uint32> _breathSpells;
+    bool Enraged;
+    ObjectGuid _playerGUID;
 };
 
-class go_chromaggus_lever : public GameObjectScript
+struct go_chromaggus_lever : public GameObjectAI
 {
-    public:
-        go_chromaggus_lever() : GameObjectScript("go_chromaggus_lever") { }
+    go_chromaggus_lever(GameObject* go) : GameObjectAI(go), _instance(go->GetInstanceScript()) { }
 
-        struct go_chromaggus_leverAI : public GameObjectAI
+    bool GossipHello(Player* player, bool reportUse) override
+    {
+        if (reportUse)
         {
-            go_chromaggus_leverAI(GameObject* go) : GameObjectAI(go), _instance(go->GetInstanceScript()) { }
-
-            bool GossipHello(Player* player, bool reportUse) override
+            if (_instance->GetBossState(DATA_CHROMAGGUS) != DONE && _instance->GetBossState(DATA_CHROMAGGUS) != IN_PROGRESS)
             {
-                if (reportUse)
+                if (Creature* creature = _instance->GetCreature(DATA_CHROMAGGUS))
                 {
-                    if (_instance->GetBossState(DATA_CHROMAGGUS) != DONE && _instance->GetBossState(DATA_CHROMAGGUS) != IN_PROGRESS)
-                    {
-                        if (Creature* creature = _instance->GetCreature(DATA_CHROMAGGUS))
-                        {
-                            creature->SetHomePosition(homePos);
-                            creature->GetMotionMaster()->MoveWaypoint(creature->GetEntry() * 10, false);
-                            creature->AI()->SetGUID(player->GetGUID(), GUID_LEVER_USER);
-                        }
-
-                        if (GameObject* go = _instance->GetGameObject(DATA_GO_CHROMAGGUS_DOOR))
-                            _instance->HandleGameObject(ObjectGuid::Empty, true, go);
-                    }
-
-                    me->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE | GO_FLAG_IN_USE);
-                    me->SetGoState(GO_STATE_ACTIVE);
+                    creature->SetHomePosition(homePos);
+                    creature->GetMotionMaster()->MoveWaypoint(creature->GetEntry() * 10, false);
+                    creature->AI()->SetGUID(player->GetGUID(), GUID_LEVER_USER);
                 }
 
-                return true;
+                if (GameObject* go = _instance->GetGameObject(DATA_GO_CHROMAGGUS_DOOR))
+                    _instance->HandleGameObject(ObjectGuid::Empty, true, go);
             }
 
-        private:
-            InstanceScript* _instance;
-        };
-
-        GameObjectAI* GetAI(GameObject* go) const override
-        {
-            return GetBlackwingLairAI<go_chromaggus_leverAI>(go);
+            me->SetGameObjectFlag(GO_FLAG_NOT_SELECTABLE | GO_FLAG_IN_USE);
+            me->SetGoState(GO_STATE_ACTIVE);
         }
+
+        return true;
+    }
+
+private:
+    InstanceScript* _instance;
 };
 
 enum ElementalShieldSpells
@@ -306,9 +274,7 @@ class spell_gen_elemental_shield : public SpellScript
         if (Unit* caster = GetCaster())
         {
             for (uint32 spell = SPELL_FIRE_ELEMENTAL_SHIELD; spell <= SPELL_ARCANE_ELEMENTAL_SHIELD; ++spell)
-            {
                 caster->RemoveAurasDueToSpell(spell);
-            }
 
             caster->CastSpell(caster, SPELL_FIRE_ELEMENTAL_SHIELD + urand(0, 4), true);
         }
@@ -341,9 +307,7 @@ class spell_gen_brood_power : public SpellScript
         if (Unit* caster = GetCaster())
         {
             for (uint32 spell = SPELL_RED_BROOD_POWER; spell <= SPELL_GREEN_BROOD_POWER; ++spell)
-            {
                 caster->RemoveAurasDueToSpell(spell);
-            }
 
             caster->CastSpell(caster, RAND(SPELL_RED_BROOD_POWER, SPELL_BLUE_BROOD_POWER, SPELL_BRONZE_BROOD_POWER, SPELL_BLACK_BROOD_POWER, SPELL_GREEN_BROOD_POWER), true);
         }
@@ -357,8 +321,8 @@ class spell_gen_brood_power : public SpellScript
 
 void AddSC_boss_chromaggus()
 {
-    new boss_chromaggus();
-    new go_chromaggus_lever();
+    RegisterBlackwingLairCreatureAI(boss_chromaggus);
+    RegisterBlackwingLairGameObjectAI(go_chromaggus_lever);
     RegisterSpellScript(spell_gen_elemental_shield);
     RegisterSpellScript(spell_gen_brood_power);
 }
