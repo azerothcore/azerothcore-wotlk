@@ -1,3 +1,4 @@
+-- DB update 2026_03_24_03 -> 2026_03_24_04
 --
 DELETE FROM `command` WHERE `name` = 'debug loot';
 INSERT INTO `command` (`name`, `security`, `help`) VALUES

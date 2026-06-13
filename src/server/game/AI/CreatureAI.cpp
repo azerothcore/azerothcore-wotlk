@@ -246,8 +246,11 @@ void CreatureAI::EnterEvadeMode(EvadeReason why)
             // Owned creatures (pets/guardians) follow their owner — clear evade state
             // so they can re-enter combat immediately via CanBeginCombat
             me->ClearUnitState(UNIT_STATE_EVADE);
-            me->GetMotionMaster()->Clear(false);
-            me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle(), MOTION_SLOT_ACTIVE);
+            if (!me->IsVehicle()) // vehicles should not follow their owner (passenger)
+            {
+                me->GetMotionMaster()->Clear(false);
+                me->GetMotionMaster()->MoveFollow(owner, PET_FOLLOW_DIST, me->GetFollowAngle(), MOTION_SLOT_ACTIVE);
+            }
         }
         else
         {
@@ -306,12 +309,9 @@ void CreatureAI::EngagementOver()
 
 void CreatureAI::JustExitedCombat()
 {
-    EngagementOver();
-
-    // If creature is alive, in world, and not already evading, trigger evade to return home
-    // Check IsInWorld to avoid evade during server shutdown/cleanup
-    if (me->IsAlive() && me->IsInWorld() && !me->IsInEvadeMode())
-        EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
+    // No-op: synchronous EnterEvadeMode cascades via MemberEvaded and frees
+    // refs held by upstream iterators (StopAttackFaction crash). EngagementOver
+    // here also resets scripted fights on brief combat gaps (Valithria).
 }
 
 /*void CreatureAI::AttackedBy(Unit* attacker)
@@ -357,6 +357,10 @@ bool CreatureAI::UpdateVictim()
         EngagementOver();
         return false;
     }
+
+    // Charmed creatures: the charmer controls target selection, don't interfere
+    if (me->IsCharmed())
+        return me->GetVictim() != nullptr;
 
     if (!me->HasReactState(REACT_PASSIVE))
     {

@@ -267,12 +267,12 @@ struct boss_algalon_the_observer : public ScriptedAI
         _fedOnTears = true;
         _firstPull = true;
         _fightWon = false;
-        m_pInstance = me->GetInstanceScript();
+        _instance = me->GetInstanceScript();
     }
 
     EventMap events;
     SummonList summons;
-    InstanceScript* m_pInstance;
+    InstanceScript* _instance;
 
     bool _firstPull;
     bool _fightWon;
@@ -363,8 +363,8 @@ struct boss_algalon_the_observer : public ScriptedAI
             return;
         }
 
-        if (m_pInstance)
-            m_pInstance->SetData(BOSS_ALGALON, FAIL);
+        if (_instance)
+            _instance->SetData(BOSS_ALGALON, FAIL);
 
         ScriptedAI::EnterEvadeMode(why);
     }
@@ -385,13 +385,13 @@ struct boss_algalon_the_observer : public ScriptedAI
         _phaseTwo = false;
         _heraldOfTheTitans = true;
 
-        if (m_pInstance->GetBossState(BOSS_ALGALON) == FAIL)
+        if (_instance->GetBossState(BOSS_ALGALON) == FAIL)
         {
             _firstPull = false;
         }
 
-        if (m_pInstance)
-            m_pInstance->SetData(BOSS_ALGALON, NOT_STARTED);
+        if (_instance)
+            _instance->SetData(BOSS_ALGALON, NOT_STARTED);
     }
 
     void KilledUnit(Unit* victim) override
@@ -445,8 +445,8 @@ struct boss_algalon_the_observer : public ScriptedAI
                 me->SetFaction(FACTION_FRIENDLY);
                 me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->InterruptNonMeleeSpells(false);
-                if (m_pInstance)
-                    m_pInstance->SetData(BOSS_ALGALON, NOT_STARTED);
+                if (_instance)
+                    _instance->SetData(BOSS_ALGALON, NOT_STARTED);
                 break;
             case ACTION_INIT_ALGALON:
                 _firstPull = false;
@@ -473,7 +473,7 @@ struct boss_algalon_the_observer : public ScriptedAI
         if (_fightWon)
             return;
 
-        if (!m_pInstance)
+        if (!_instance)
         {
             EnterEvadeMode(EVADE_REASON_OTHER);
             return;
@@ -499,7 +499,7 @@ struct boss_algalon_the_observer : public ScriptedAI
             Talk(SAY_ALGALON_START_TIMER);
             introDelay = 22s;
             events.ScheduleEvent(EVENT_START_COMBAT, 14s);
-            m_pInstance->SetData(DATA_DESPAWN_ALGALON, 0);
+            _instance->SetData(DATA_DESPAWN_ALGALON, 0);
         }
 
         events.ScheduleEvent(EVENT_REMOVE_UNNATTACKABLE, introDelay - 500ms);
@@ -656,11 +656,11 @@ struct boss_algalon_the_observer : public ScriptedAI
             case EVENT_INTRO_FINISH:
                 events.Reset();
                 me->SetImmuneToPC(false);
-                if (Creature* brann = m_pInstance->GetCreature(DATA_BRANN_BRONZEBEARD_ALG))
+                if (Creature* brann = _instance->GetCreature(DATA_BRANN_BRONZEBEARD_ALG))
                     brann->AI()->DoAction(ACTION_FINISH_INTRO);
                 break;
             case EVENT_START_COMBAT:
-                m_pInstance->SetData(BOSS_ALGALON, IN_PROGRESS);
+                _instance->SetData(BOSS_ALGALON, IN_PROGRESS);
                 Talk(SAY_ALGALON_AGGRO);
                 break;
             case EVENT_REMOVE_UNNATTACKABLE:
@@ -735,10 +735,10 @@ struct boss_algalon_the_observer : public ScriptedAI
                 ScriptedAI::EnterEvadeMode();
                 return;
             case EVENT_OUTRO_START:
-                if (m_pInstance)
+                if (_instance)
                 {
-                    m_pInstance->SetData(BOSS_ALGALON, DONE);
-                    m_pInstance->SetData(DATA_ALGALON_DEFEATED, 1);
+                    _instance->SetData(BOSS_ALGALON, DONE);
+                    _instance->SetData(DATA_ALGALON_DEFEATED, 1);
                 }
                 break;
             case EVENT_OUTRO_1:

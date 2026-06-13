@@ -23,6 +23,7 @@
 #include "ScriptedEscortAI.h"
 #include "ScriptedFollowerAI.h"
 #include "ScriptedGossip.h"
+#include "SmartAI.h"
 #include "SpellAuras.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
@@ -55,6 +56,8 @@ class spell_q11919_q11940_drake_hunt_aura : public AuraScript
 
         Creature* owner = GetOwner()->ToCreature();
         owner->RemoveAllAurasExceptType(SPELL_AURA_DUMMY);
+        if (SmartAI* ai = CAST_AI(SmartAI, owner->AI()))
+            ai->SetEvadeDisabled(true);
         owner->CombatStop(true);
         owner->GetThreatMgr().ClearAllThreat();
         owner->GetMotionMaster()->Clear(false);
@@ -236,50 +239,6 @@ public:
     CreatureAI* GetAI(Creature* creature) const override
     {
         return new npc_khunok_the_behemothAI(creature);
-    }
-};
-
-/*######
-## npc_iruk
-######*/
-
-enum Iruk
-{
-    GOSSIP_MENU_ID_NPC_IRUK                 = 9280,
-    GOSSIP_OPTION_SEARCH_CORPSE             = 0,
-    NPC_TEXT_THIS_YOUNG_TUSKARR             = 12585,
-
-    QUEST_SPIRITS_WATCH_OVER_US             = 11961,
-
-    SPELL_CREATE_TOTEM_OF_ISSLIRUK          = 46816
-};
-
-class npc_iruk : public CreatureScript
-{
-public:
-    npc_iruk() : CreatureScript("npc_iruk") { }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (player->GetQuestStatus(QUEST_SPIRITS_WATCH_OVER_US) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_MENU_ID_NPC_IRUK, GOSSIP_OPTION_SEARCH_CORPSE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-        SendGossipMenuFor(player, NPC_TEXT_THIS_YOUNG_TUSKARR, creature->GetGUID());
-
-        return true;
-    }
-
-    bool OnGossipSelect(Player* player, Creature* /*creature*/, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-
-        if (action == GOSSIP_ACTION_INFO_DEF + 1)
-        {
-            player->CastSpell(player, SPELL_CREATE_TOTEM_OF_ISSLIRUK, true);
-            CloseGossipMenuFor(player);
-        }
-
-        return true;
     }
 };
 
@@ -1379,7 +1338,6 @@ void AddSC_borean_tundra()
     RegisterSpellScript(spell_q11919_q11940_drake_hunt_aura);
     new npc_sinkhole_kill_credit();
     new npc_khunok_the_behemoth();
-    new npc_iruk();
     new npc_nerubar_victim();
     new npc_lurgglbr();
     RegisterSpellScript(spell_arcane_chains_character_force_cast);
