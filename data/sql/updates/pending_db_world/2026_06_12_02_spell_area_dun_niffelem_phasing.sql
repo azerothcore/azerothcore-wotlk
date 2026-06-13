@@ -6,5 +6,6 @@
 -- causing players who finished Battling the Elements to lose the phase needed to
 -- interact with NPCs and pick up follow-up quests in Dun Niffelem.
 -- Fixes: https://github.com/azerothcore/azerothcore-wotlk/issues/25365
+DELETE FROM `spell_area` WHERE `spell` = 55858 AND `area` = 4495 AND `quest_start` = 12967 AND `aura_spell` = 0 AND `racemask` = 0 AND `gender` = 2;
 INSERT INTO `spell_area` (`spell`, `area`, `quest_start`, `quest_end`, `aura_spell`, `racemask`, `gender`, `autocast`, `quest_start_status`, `quest_end_status`)
 VALUES (55858, 4495, 12967, 0, 0, 0, 2, 1, 64, 11);
