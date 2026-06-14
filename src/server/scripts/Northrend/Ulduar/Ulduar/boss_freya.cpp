@@ -1058,7 +1058,7 @@ struct boss_freya_summons : public ScriptedAI
         switch (events.ExecuteEvent())
         {
             case EVENT_ANCIENT_CONSERVATOR_NATURE_FURY:
-                me->CastSpell(me->GetVictim(), SPELL_NATURE_FURY, false);
+                DoCastRandomTarget(SPELL_NATURE_FURY, 0, 100.0f, true, false, true, -SPELL_NATURE_FURY);
                 events.Repeat(14s);
                 break;
             case EVENT_ANCIENT_CONSERVATOR_GRIP:
