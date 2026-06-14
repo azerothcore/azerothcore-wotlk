@@ -4569,23 +4569,23 @@ PlayerDump.DisallowOverwrite = 1
 #
 #    ICC.Buff.Alliance
 #    ICC.Buff.Horde
-#       Description: Specify ICC buff
-#       Note:        It is necessary to restart the server after changing the values!
-#       Example:     | Spell IDs | Amount | Faction  |
-#                    |     73762 |     5% | Alliance |
-#                    |     73824 |    10% | Alliance |
-#                    |     73825 |    15% | Alliance |
-#                    |     73826 |    20% | Alliance |
-#                    |     73827 |    25% | Alliance |
-#                    |     73828 |    30% | Alliance |
-#                    |     73816 |     5% |    Horde |
-#                    |     73818 |    10% |    Horde |
-#                    |     73819 |    15% |    Horde |
-#                    |     73820 |    20% |    Horde |
-#                    |     73821 |    25% |    Horde |
-#                    |     73822 |    30% |    Horde |
-#       Default:     ICC.Buff.Alliance = 73828
-#                    ICC.Buff.Horde    = 73822
+#        Description: Specify ICC buff
+#        Note:        It is necessary to restart the server after changing the values!
+#        Example:     | Spell IDs | Amount | Faction  |
+#                     |     73762 |     5% | Alliance |
+#                     |     73824 |    10% | Alliance |
+#                     |     73825 |    15% | Alliance |
+#                     |     73826 |    20% | Alliance |
+#                     |     73827 |    25% | Alliance |
+#                     |     73828 |    30% | Alliance |
+#                     |     73816 |     5% |    Horde |
+#                     |     73818 |    10% |    Horde |
+#                     |     73819 |    15% |    Horde |
+#                     |     73820 |    20% |    Horde |
+#                     |     73821 |    25% |    Horde |
+#                     |     73822 |    30% |    Horde |
+#        Default:     ICC.Buff.Alliance = 73828
+#                     ICC.Buff.Horde    = 73822
 
 ICC.Buff.Alliance = 73828
 ICC.Buff.Horde    = 73822
