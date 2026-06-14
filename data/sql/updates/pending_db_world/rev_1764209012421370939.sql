@@ -6,6 +6,8 @@ UPDATE `creature_template_spell` SET `VerifiedBuild` = 46368 WHERE `CreatureID` 
 DELETE FROM `creature_template_spell` WHERE `CreatureID` = 32535 AND `Index` IN (5, 6);
 INSERT INTO `creature_template_spell` (`CreatureID`, `Index`, `Spell`, `VerifiedBuild`) VALUES
 (32535, 5, 57092, 46368); -- Blazing Speed
+-- Add 57403 Flight aura
+UPDATE `creature_template_addon` SET `auras` = '57403' WHERE (`entry` = 32535);
 
 -- 2. Set Scalesworn Elite (32534) to use SmartAI for combat abilities
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 32534;
