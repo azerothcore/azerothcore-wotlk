@@ -38,10 +38,10 @@ struct SHostageInfo
 
 static SHostageInfo HostageInfo[] =
 {
-    {23790, 186648, { -57.0f, 1343.0f, 40.77f, 3.2f } }, // bear
-    {23999, 187021, { 400.0f, 1414.0f, 74.36f, 3.3f } }, // eagle
-    {24001, 186672, { -35.0f, 1134.0f, 18.71f, 1.9f } }, // dragonhawk
-    {24024, 186667, { 413.0f, 1117.0f, 6.32f,  3.1f } }  // lynx
+    {23999, 187021, { 400.0f, 1414.0f, 74.36f, 3.3f } }, // Harkor (Akil'zon)
+    {23790, 186648, { -57.0f, 1343.0f, 40.77f, 3.2f } }, // Tanzar (Nalorakk)
+    {24024, 186667, { -35.0f, 1134.0f, 18.71f, 1.9f } }, // Kraz (Jan'alai)
+    {24001, 186672, { 413.0f, 1117.0f, 6.32f,  3.1f } }  // Ashli (Halazzi)
 };
 
 Position const HarrisonJonesLoc = {120.687f, 1674.0f, 42.0217f, 1.59044f};
