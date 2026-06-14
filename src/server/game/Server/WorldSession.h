@@ -192,6 +192,16 @@ namespace WorldPackets
         class ItemRefund;
     }
 
+    namespace Quest
+    {
+        class QuestPushResultClient;
+        class QuestGiverQuestAutoLaunch;
+        class QuestLogSwapQuest;
+        class QuestLogRemoveQuest;
+        class QuestConfirmAcceptClient;
+        class PushQuestToParty;
+    }
+
     namespace Calendar
     {
         class GetEvent;
@@ -440,6 +450,16 @@ public:
 
     AccountTypes GetSecurity() const { return _security; }
     bool CanSkipQueue() const { return _skipQueue; }
+
+    // RBAC
+    rbac::RBACData* GetRBACData() const { return _RBACData; }
+    bool HasPermission(uint32 permissionId);
+    void LoadPermissions();
+    QueryCallback LoadPermissionsAsync();
+    void InvalidateRBACData();
+
+    /// For unit testing - initializes RBAC data without database access
+    void InitRBACDataForTest();
     uint32 GetAccountId() const { return _accountId; }
     Player* GetPlayer() const { return _player; }
     std::string const& GetPlayerName() const;
@@ -905,13 +925,13 @@ public:                                                 // opcodes handlers
     void HandleQuestgiverRequestRewardOpcode(WorldPacket& recvPacket);
     void HandleQuestQueryOpcode(WorldPacket& recvPacket);
     void HandleQuestgiverCancel(WorldPacket& recvData);
-    void HandleQuestLogSwapQuest(WorldPacket& recvData);
-    void HandleQuestLogRemoveQuest(WorldPacket& recvData);
-    void HandleQuestConfirmAccept(WorldPacket& recvData);
+    void HandleQuestLogSwapQuest(WorldPackets::Quest::QuestLogSwapQuest& packet);
+    void HandleQuestLogRemoveQuest(WorldPackets::Quest::QuestLogRemoveQuest& packet);
+    void HandleQuestConfirmAccept(WorldPackets::Quest::QuestConfirmAcceptClient& packet);
     void HandleQuestgiverCompleteQuest(WorldPacket& recvData);
-    void HandleQuestgiverQuestAutoLaunch(WorldPacket& recvPacket);
-    void HandlePushQuestToParty(WorldPacket& recvPacket);
-    void HandleQuestPushResult(WorldPacket& recvPacket);
+    void HandleQuestgiverQuestAutoLaunch(WorldPackets::Quest::QuestGiverQuestAutoLaunch& packet);
+    void HandlePushQuestToParty(WorldPackets::Quest::PushQuestToParty& packet);
+    void HandleQuestPushResult(WorldPackets::Quest::QuestPushResultClient& packet);
 
     void HandleMessagechatOpcode(WorldPacket& recvPacket);
     void SendPlayerNotFoundNotice(std::string const& name);
@@ -1224,6 +1244,7 @@ private:
     AccountTypes _security;
     bool _skipQueue;
     uint32 _accountId;
+    rbac::RBACData* _RBACData;
     std::string _accountName;
     uint32 _accountFlags;
     uint8 m_expansion;

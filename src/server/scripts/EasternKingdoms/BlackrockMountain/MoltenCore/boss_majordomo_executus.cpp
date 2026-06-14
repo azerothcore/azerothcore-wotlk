@@ -95,13 +95,7 @@ enum Events
 
 enum Misc
 {
-    TEXT_ID_SUMMON_1                        = 4995,
-    TEXT_ID_SUMMON_2                        = 5011,
-    TEXT_ID_SUMMON_3                        = 5012,
-
-    GOSSIP_ITEM_SUMMON_1                    = 4093,
-    GOSSIP_ITEM_SUMMON_2                    = 4109,
-    GOSSIP_ITEM_SUMMON_3                    = 4108,
+    MENU_ID_RAGNAROS_SUMMON                 = 4108,
 
     FACTION_MAJORDOMO_FRIENDLY              = 1080,
     SUMMON_GROUP_ADDS                       = 1,
@@ -507,46 +501,14 @@ struct boss_majordomo : public BossAI
         }
     }
 
-    void sGossipHello(Player* player) override
+    void sGossipSelect(Player* player, uint32 menuId, uint32 /*gossipListId*/) override
     {
-        AddGossipItemFor(player, GOSSIP_ITEM_SUMMON_1, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-        SendGossipMenuFor(player, TEXT_ID_SUMMON_1, me->GetGUID());
-    }
-
-    void sGossipSelect(Player* player, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        switch (action)
+        if (menuId == MENU_ID_RAGNAROS_SUMMON)
         {
-            case GOSSIP_ACTION_INFO_DEF:
-            {
-                AddGossipItemFor(player, GOSSIP_ITEM_SUMMON_2, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-                SendGossipMenuFor(player, TEXT_ID_SUMMON_2, me->GetGUID());
-                break;
-            }
-            case GOSSIP_ACTION_INFO_DEF+1:
-            {
-                AddGossipItemFor(player, GOSSIP_ITEM_SUMMON_2, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-                SendGossipMenuFor(player, TEXT_ID_SUMMON_2, me->GetGUID());
-                break;
-            }
-            case GOSSIP_ACTION_INFO_DEF+2:
-            {
-                AddGossipItemFor(player, GOSSIP_ITEM_SUMMON_3, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-                SendGossipMenuFor(player, TEXT_ID_SUMMON_3, me->GetGUID());
-                break;
-            }
-            case GOSSIP_ACTION_INFO_DEF+3:
-            {
-                CloseGossipMenuFor(player);
-                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                Talk(SAY_RAG_SUM_1, player);
-                DoAction(ACTION_START_RAGNAROS_INTRO);
-                break;
-            }
-            default:
-                CloseGossipMenuFor(player);
-                break;
+            CloseGossipMenuFor(player);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+            Talk(SAY_RAG_SUM_1, player);
+            DoAction(ACTION_START_RAGNAROS_INTRO);
         }
     }
 
