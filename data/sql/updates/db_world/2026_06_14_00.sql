@@ -1,3 +1,4 @@
+-- DB update 2026_06_13_05 -> 2026_06_14_00
 
 -- Add SAI (High General Abbendis)
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28548;
