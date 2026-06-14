@@ -609,6 +609,12 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_INS_RESERVED_PLAYER_NAME, "INSERT IGNORE INTO reserved_name (name) VALUES (?)", CONNECTION_ASYNC);
     PrepareStatement(CHAR_INS_PROFANITY_PLAYER_NAME, "INSERT IGNORE INTO profanity_name (name) VALUES (?)", CONNECTION_ASYNC);
 
+    // Chat filter
+    PrepareStatement(CHAR_SEL_CHAT_FILTER, "SELECT ID, Word FROM chat_filter ORDER BY ID", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_SEL_CHAT_FILTER_WORD, "SELECT ID FROM chat_filter WHERE Word = ?", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_INS_CHAT_FILTER_WORD, "INSERT INTO chat_filter (Word) VALUES (?)", CONNECTION_SYNCH);
+    PrepareStatement(CHAR_DEL_CHAT_FILTER_WORD, "DELETE FROM chat_filter WHERE Word = ?", CONNECTION_SYNCH);
+
     // Character settings
     PrepareStatement(CHAR_SEL_CHAR_SETTINGS, "SELECT source, data FROM character_settings WHERE guid = ?", CONNECTION_BOTH);
     PrepareStatement(CHAR_REP_CHAR_SETTINGS, "REPLACE INTO character_settings (guid, source, data) VALUES (?, ?, ?)", CONNECTION_ASYNC);
