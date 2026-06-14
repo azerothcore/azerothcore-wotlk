@@ -759,6 +759,7 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_MOUNT_TO_ENTRY_OR_MODEL: return sizeof(SmartAction::morphOrMount);
             case SMART_ACTION_SET_INGAME_PHASE_MASK: return sizeof(SmartAction::ingamePhaseMask);
             case SMART_ACTION_SET_DATA: return sizeof(SmartAction::setData);
+            case SMART_ACTION_INC_DATA: return sizeof(SmartAction::setData);
             case SMART_ACTION_MOVE_FORWARD: return sizeof(SmartAction::moveRandom);
             case SMART_ACTION_ATTACK_STOP: return NO_PARAMS;
             case SMART_ACTION_SET_VISIBILITY: return sizeof(SmartAction::visibility);
@@ -1975,6 +1976,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_THREAT_SINGLE_PCT:
         case SMART_ACTION_SET_INST_DATA64:
         case SMART_ACTION_SET_DATA:
+        case SMART_ACTION_INC_DATA:
         case SMART_ACTION_MOVE_FORWARD:
         case SMART_ACTION_ESCORT_PAUSE:
         case SMART_ACTION_SET_FLY:

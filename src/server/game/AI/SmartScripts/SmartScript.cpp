@@ -1463,6 +1463,35 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             }
             break;
         }
+        case SMART_ACTION_INC_DATA:
+        {
+            WorldObject* invoker = me ? static_cast<WorldObject*>(me) : static_cast<WorldObject*>(go);
+
+            for (WorldObject* target : targets)
+            {
+                if (Creature* cTarget = target->ToCreature())
+                {
+                    if (SmartAI* smartAI = CAST_AI(SmartAI, cTarget->AI()))
+                    {
+                        uint32 const newValue = smartAI->GetData(e.action.setData.field) + e.action.setData.data;
+                        smartAI->SetData(e.action.setData.field, newValue, invoker);
+                    }
+                    else
+                        LOG_ERROR("sql.sql", "SmartScript: Action target for SMART_ACTION_INC_DATA is not using SmartAI, skipping");
+                }
+                else if (GameObject* oTarget = target->ToGameObject())
+                {
+                    if (SmartGameObjectAI* smartGOAI = CAST_AI(SmartGameObjectAI, oTarget->AI()))
+                    {
+                        uint32 const newValue = smartGOAI->GetData(e.action.setData.field) + e.action.setData.data;
+                        smartGOAI->SetData(e.action.setData.field, newValue, invoker);
+                    }
+                    else
+                        LOG_ERROR("sql.sql", "SmartScript: Action target for SMART_ACTION_INC_DATA is not using SmartGameObjectAI, skipping");
+                }
+            }
+            break;
+        }
         case SMART_ACTION_MOVE_FORWARD:
         {
             if (!me)
