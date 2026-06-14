@@ -309,9 +309,12 @@ void CreatureAI::EngagementOver()
 
 void CreatureAI::JustExitedCombat()
 {
-    // No-op: synchronous EnterEvadeMode cascades via MemberEvaded and frees
-    // refs held by upstream iterators (StopAttackFaction crash). EngagementOver
-    // here also resets scripted fights on brief combat gaps (Valithria).
+   EngagementOver();
+
+    // If creature is alive, in world, and not already evading, trigger evade to return home
+    // Check IsInWorld to avoid evade during server shutdown/cleanup
+    if (me->IsAlive() && me->IsInWorld() && !me->IsInEvadeMode())
+        EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
 }
 
 /*void CreatureAI::AttackedBy(Unit* attacker)
