@@ -27,9 +27,6 @@ case $UBUNTU_VERSION in
 esac
 
 $SUDO apt update
-# ensure universe is enabled (required for google-perftools on 26.04)
-$SUDO add-apt-repository -y universe
-$SUDO apt update
 
 # shared deps
 DEBIAN_FRONTEND="noninteractive" $SUDO \
