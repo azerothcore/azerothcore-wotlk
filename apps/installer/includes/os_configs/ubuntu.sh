@@ -30,19 +30,9 @@ $SUDO apt update
 
 # shared deps
 DEBIAN_FRONTEND="noninteractive" $SUDO \
-apt-get -y install ccache clang cmake curl google-perftools make unzip jq screen tmux \
-  libreadline-dev libbz2-dev git gcc g++ libssl-dev \
+apt-get -y install ccache clang cmake curl google-perftools libmysqlclient-dev make unzip jq screen tmux \
+  libreadline-dev libncurses5-dev libncursesw5-dev libbz2-dev git gcc g++ libssl-dev \
   libncurses-dev libboost-all-dev gdb gdbserver expect
-
-# version-specific deps
-if [[ "$UBUNTU_VERSION" == "26.04" ]]; then
-  $SUDO add-apt-repository -y universe
-  $SUDO apt-get update
-  DEBIAN_FRONTEND="noninteractive" $SUDO apt-get -y install default-libmysqlclient-dev
-else
-  DEBIAN_FRONTEND="noninteractive" $SUDO apt-get -y install \
-    libmysqlclient-dev libncurses5-dev libncursesw5-dev
-fi
 
   VAR_PATH="$CURRENT_PATH/../../../../var"
 
