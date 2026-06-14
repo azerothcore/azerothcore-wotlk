@@ -64,10 +64,15 @@ runs:
       run: |
         sudo apt update
         sudo apt remove needrestart #refer: https://github.com/actions/runner-images/issues/9937
-        sudo apt-get -y install ccache clang cmake curl google-perftools \
-          libmysqlclient-dev make unzip build-essential cmake-data  \
-          libboost-all-dev libbz2-dev libncurses5-dev libmysql++-dev \
+        sudo apt-get -y install ccache clang cmake curl \
+          make unzip build-essential cmake-data  \
+          libboost-all-dev libbz2-dev libmysql++-dev \
           libreadline6-dev libssl-dev libtool openssl zlib1g-dev
+        if [[ "$(lsb_release -sr)" == "26.04" ]]; then
+          sudo apt-get -y install libgoogle-perftools-dev default-libmysqlclient-dev
+        else
+          sudo apt-get -y install google-perftools libmysqlclient-dev libncurses5-dev
+        fi
 
     - name: setup ccache
       shell: bash
