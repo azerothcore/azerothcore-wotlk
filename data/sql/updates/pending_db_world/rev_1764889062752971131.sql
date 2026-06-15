@@ -1,5 +1,5 @@
 --
-DELETE FROM `creature_text` WHERE `CreatureID` = 31028;
+DELETE FROM `creature_text` WHERE `CreatureID` = 31028 AND `GroupID` IN (0, 1);
 DELETE FROM `creature_text` WHERE `CreatureID` = 31126 AND `GroupID` = 2;
 DELETE FROM `creature_text` WHERE `CreatureID` = 31127 AND `GroupID` = 0;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
