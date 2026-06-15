@@ -187,6 +187,10 @@ enum Misc
     // Brandon Eiredeck crowd
     NPC_BRANDON_EIREDECK                    = 31023,
     SAY_BRANDON_CROWD_AMBIENT               = 3,
+
+    // Patricia O'Reilly crowd
+    SAY_AGITATED_CITIZEN_AMBIENT           = 2,
+    SAY_AGITATED_RESIDENT_AMBIENT          = 0,
 };
 
 enum Events
@@ -1531,8 +1535,6 @@ public:
         npc_cos_stratholme_citizienAI(Creature* creature) : ScriptedAI(creature)
         {
             allowTimer = 0;
-            talkTimer = urand(5000, 10000);
-            emoteTimer = urand(1000, 3000);
             pInstance = me->GetInstanceScript();
             if (!pInstance || pInstance->GetData(DATA_ARTHAS_EVENT) < COS_PROGRESS_FINISHED_CITY_INTRO)
                 allowTimer++;
@@ -1543,19 +1545,24 @@ public:
 
             isBrandonCrowd = me->GetDistance(2267.86f, 1144.93f, 138.403f) < 10.0f;
             ambientTalkTimer = isBrandonCrowd ? urand(5000, 15000) : 0;
+
+            isPatriciaCrowd = (me->GetEntry() == NPC_CITY_MAN3 || me->GetEntry() == NPC_CITY_MAN4) && me->GetDistance(2372.0f, 1199.0f, 135.0f) < 20.0f;
+            talkTimer = isPatriciaCrowd ? urand(5000, 10000) : 0;
+            emoteTimer = isPatriciaCrowd ? urand(1000, 3000) : 0;
         }
 
         bool locked;
         uint32 changeTimer;
         InstanceScript* pInstance;
         uint32 allowTimer;
-        uint32 talkTimer;
-        uint32 emoteTimer;
         bool isStephanieCrowd;
         uint32 stephanieDialogueTimer;
         uint8 stephanieDialoguePhase;
         bool isBrandonCrowd;
         uint32 ambientTalkTimer;
+        bool isPatriciaCrowd;
+        uint32 talkTimer;
+        uint32 emoteTimer;
 
         void Reset() override
         {
@@ -1672,14 +1679,11 @@ public:
             }
 
             // Agitated crowd near Patricia - active as soon as instance is loaded
-            float dist = me->GetDistance(2372.0f, 1199.0f, 135.0f);
-            if ((me->GetEntry() == NPC_CITY_MAN3 || me->GetEntry() == NPC_CITY_MAN4) && dist < 20.0f)
+            if (isPatriciaCrowd)
             {
                 if (talkTimer <= diff)
                 {
-                    // GroupID 2 for Citizens (31126), GroupID 0 for Residents (31127)
-                    uint8 groupId = (me->GetEntry() == NPC_CITY_MAN3) ? 2 : 0;
-                    Talk(groupId);
+                    Talk(me->GetEntry() == NPC_CITY_MAN3 ? SAY_AGITATED_CITIZEN_AMBIENT : SAY_AGITATED_RESIDENT_AMBIENT);
                     talkTimer = urand(8000, 15000);
                 }
                 else
