@@ -58,6 +58,9 @@ enum OSActions
     // Portal
     ACTION_CLEAR_PORTAL               = -1,
     ACTION_ADD_PORTAL                 = -2,
+
+    // Dragon patrol
+    ACTION_START_PATROL               = -3,
 };
 
 template <class AI, class T>
@@ -65,5 +68,7 @@ inline AI* GetObsidianSanctumAI(T* obj)
 {
     return GetInstanceAI<AI>(obj, ObsidianSanctumScriptName);
 }
+
+#define RegisterObsidianSanctumCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetObsidianSanctumAI)
 
 #endif

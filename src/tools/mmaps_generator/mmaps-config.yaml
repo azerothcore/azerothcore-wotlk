@@ -119,6 +119,11 @@ mmapsConfig:
             # https://github.com/azerothcore/azerothcore-wotlk/pull/22462#issuecomment-3067024680
             walkableSlopeAngle: 45
 
+      "530": # Outland
+        tilesOverrides:
+          "32,30": # Dark portal
+            walkableSlopeAngle: 45 # https://github.com/chromiecraft/chromiecraft/issues/8404#issuecomment-3476012660
+
   # debugOutput generates debug files in the `meshes` directory for use with RecastDemo.
   # This is useful for inspecting and debugging mmap generation visually.
   #

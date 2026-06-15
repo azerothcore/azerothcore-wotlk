@@ -24,8 +24,10 @@
 
 #include "Chat.h"
 #include "CommandScript.h"
+#include "GroupMgr.h"
 #include "Language.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "SpellAuras.h"
 
 using namespace Acore::ChatCommands;
@@ -49,15 +51,15 @@ public:
     {
         static ChatCommandTable deserterInstanceCommandTable =
         {
-            { "add",        HandleDeserterInstanceAdd,       SEC_ADMINISTRATOR, Console::Yes },
-            { "remove all", HandleDeserterInstanceRemoveAll, SEC_ADMINISTRATOR, Console::Yes },
-            { "remove",     HandleDeserterInstanceRemove,    SEC_ADMINISTRATOR, Console::Yes }
+            { "add",        HandleDeserterInstanceAdd,       rbac::RBAC_PERM_COMMAND_DESERTER_INSTANCE_ADD,    Console::Yes },
+            { "remove all", HandleDeserterInstanceRemoveAll, rbac::RBAC_PERM_COMMAND_DESERTER_INSTANCE_REMOVE, Console::Yes },
+            { "remove",     HandleDeserterInstanceRemove,    rbac::RBAC_PERM_COMMAND_DESERTER_INSTANCE_REMOVE, Console::Yes }
         };
         static ChatCommandTable deserterBGCommandTable =
         {
-            { "add",        HandleDeserterBGAdd,       SEC_ADMINISTRATOR, Console::Yes },
-            { "remove all", HandleDeserterBGRemoveAll, SEC_ADMINISTRATOR, Console::Yes },
-            { "remove",     HandleDeserterBGRemove,    SEC_ADMINISTRATOR, Console::Yes }
+            { "add",        HandleDeserterBGAdd,       rbac::RBAC_PERM_COMMAND_DESERTER_BG_ADD,    Console::Yes },
+            { "remove all", HandleDeserterBGRemoveAll, rbac::RBAC_PERM_COMMAND_DESERTER_BG_REMOVE, Console::Yes },
+            { "remove",     HandleDeserterBGRemove,    rbac::RBAC_PERM_COMMAND_DESERTER_BG_REMOVE, Console::Yes }
         };
 
         static ChatCommandTable deserterCommandTable =
@@ -210,6 +212,16 @@ public:
             stmt->SetData(index, 0);
             CharacterDatabase.Execute(stmt);
         }
+
+        if (isInstance)
+        {
+            if (ObjectGuid groupId = sCharacterCache->GetCharacterGroupGuidByGuid(guid))
+                if (Group* group = sGroupMgr->GetGroupByGUID(groupId.GetCounter()))
+                    if (group->isLFGGroup())
+                        Player::RemoveFromGroup(group, guid);
+        }
+        else if (target && target->GetMap()->IsBattleground())
+            target->LeaveBattleground();
 
         handler->PSendSysMessage("{} of {} Deserter has been added to player {}.", secsToTimeString(duration), isInstance ? "Instance" : "Battleground", handler->playerLink(*playerName));
         return true;

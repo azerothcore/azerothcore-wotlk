@@ -41,6 +41,7 @@
 #include "PacketUtilities.h"
 #include "Pet.h"
 #include "Player.h"
+#include "Realm.h"
 #include "QueryHolder.h"
 #include "ScriptMgr.h"
 #include "SocialMgr.h"
@@ -115,6 +116,7 @@ WorldSession::WorldSession(uint32 id, std::string&& name, uint32 accountFlags, s
     _security(sec),
     _skipQueue(skipQueue),
     _accountId(id),
+    _RBACData(nullptr),
     _accountName(std::move(name)),
     _accountFlags(accountFlags),
     m_expansion(expansion),
@@ -171,6 +173,8 @@ WorldSession::~WorldSession()
         m_Socket = nullptr;
     }
 
+    delete _RBACData;
+
     ///- empty incoming packet queue
     WorldPacket* packet = nullptr;
     while (_recvQueue.next(packet))
@@ -206,6 +210,37 @@ void WorldSession::ValidateAccountFlags()
 bool WorldSession::IsGMAccount() const
 {
     return GetSecurity() >= SEC_GAMEMASTER;
+}
+
+bool WorldSession::IsTrialAccount() const
+{
+    return HasAccountFlag(ACCOUNT_FLAG_TRIAL);
+}
+
+bool WorldSession::IsInternetGameRoomAccount() const
+{
+    return HasAccountFlag(ACCOUNT_FLAG_IGR);
+}
+
+bool WorldSession::IsRecurringBillingAccount() const
+{
+    return HasAccountFlag(ACCOUNT_FLAG_RECURRING_BILLING);
+}
+
+uint8 WorldSession::GetBillingPlanFlags() const
+{
+    uint8 flags = SESSION_NONE;
+
+    if (IsRecurringBillingAccount())
+        flags |= SESSION_RECURRING_BILL;
+
+    if (IsTrialAccount())
+        flags |= SESSION_FREE_TRIAL;
+
+    if (IsInternetGameRoomAccount())
+        flags |= SESSION_IGR;
+
+    return flags;
 }
 
 std::string const& WorldSession::GetPlayerName() const
@@ -329,13 +364,11 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
     ///- Before we process anything:
     /// If necessary, kick the player because the client didn't send anything for too long
     /// (or they've been idling in character select)
-    if (sWorld->getBoolConfig(CONFIG_CLOSE_IDLE_CONNECTIONS) && IsConnectionIdle() && m_Socket)
+    if (m_Socket && IsConnectionIdle() && !HasPermission(rbac::RBAC_PERM_IGNORE_IDLE_CONNECTION))
         m_Socket->CloseSocket();
 
     if (updater.ProcessUnsafe())
         UpdateTimeOutTime(diff);
-
-    HandleTeleportTimeout(updater.ProcessUnsafe());
 
     ///- Retrieve packets from the receive queue and call the appropriate handlers
     /// not process packets if socket already closed
@@ -577,36 +610,6 @@ bool WorldSession::IsSocketClosed() const
     return !m_Socket || !m_Socket->IsOpen();
 }
 
-void WorldSession::HandleTeleportTimeout(bool updateInSessions)
-{
-    // pussywizard: handle teleport ack timeout
-    if (m_Socket && m_Socket->IsOpen() && GetPlayer() && GetPlayer()->IsBeingTeleported())
-    {
-        time_t currTime = GameTime::GetGameTime().count();
-        if (updateInSessions) // session update from World::UpdateSessions
-        {
-            if (GetPlayer()->IsBeingTeleportedFar() && GetPlayer()->GetSemaphoreTeleportFar() + sWorld->getIntConfig(CONFIG_TELEPORT_TIMEOUT_FAR) < currTime)
-                while (GetPlayer() && GetPlayer()->IsBeingTeleportedFar())
-                    HandleMoveWorldportAck();
-        }
-        else // session update from Map::Update
-        {
-            if (GetPlayer()->IsBeingTeleportedNear() && GetPlayer()->GetSemaphoreTeleportNear() + sWorld->getIntConfig(CONFIG_TELEPORT_TIMEOUT_NEAR) < currTime)
-                while (GetPlayer() && GetPlayer()->IsInWorld() && GetPlayer()->IsBeingTeleportedNear())
-                {
-                    Player* plMover = GetPlayer()->m_mover->ToPlayer();
-                    if (!plMover)
-                        break;
-                    WorldPacket pkt(MSG_MOVE_TELEPORT_ACK, 20);
-                    pkt << plMover->GetPackGUID();
-                    pkt << uint32(0); // flags
-                    pkt << uint32(0); // time
-                    HandleMoveTeleportAck(pkt);
-                }
-        }
-    }
-}
-
 /// %Log the player out
 void WorldSession::LogoutPlayer(bool save)
 {
@@ -629,7 +632,7 @@ void WorldSession::LogoutPlayer(bool save)
         //FIXME: logout must be delayed in case lost connection with client in time of combat
         if (_player->GetDeathTimer())
         {
-            _player->getHostileRefMgr().deleteReferences(true);
+            _player->GetThreatMgr().RemoveMeFromThreatLists();
             _player->BuildPlayerRepop();
             _player->RepopAtGraveyard();
         }
@@ -703,6 +706,10 @@ void WorldSession::LogoutPlayer(bool save)
         // a) in group; b) not in raid group; c) logging out normally (not being kicked or disconnected) d) LeaveGroupOnLogout is enabled
         if (_player->GetGroup() && !_player->GetGroup()->isRaidGroup() && !_player->GetGroup()->isLFGGroup() && m_Socket && sWorld->getBoolConfig(CONFIG_LEAVE_GROUP_ON_LOGOUT))
             _player->RemoveFromGroup();
+        // Remove player from active loot rolls in LFG groups (player stays in group but should not block rolls)
+        else if (Group* group = _player->GetGroup())
+            if (group->isLFGGroup())
+                group->RemovePlayerFromRolls(_player->GetGUID());
 
         // pussywizard: checked second time after being removed from a group
         if (!_player->IsBeingTeleportedFar() && !_player->m_InstanceValid && !_player->IsGameMaster())
@@ -1515,4 +1522,55 @@ void WorldSession::SetPacketLogging(bool state)
 {
     if (m_Socket)
         m_Socket->SetPacketLogging(state);
+}
+
+void WorldSession::LoadPermissions()
+{
+    uint32 id = GetAccountId();
+    uint8 secLevel = GetSecurity();
+
+    LOG_DEBUG("rbac", "WorldSession::LoadPermissions [AccountId: {}, Name: {}, realmId: {}, secLevel: {}]",
+        id, _accountName, realm.Id.Realm, secLevel);
+
+    _RBACData = new rbac::RBACData(id, _accountName, realm.Id.Realm, secLevel);
+    _RBACData->LoadFromDB();
+}
+
+QueryCallback WorldSession::LoadPermissionsAsync()
+{
+    uint32 id = GetAccountId();
+    uint8 secLevel = GetSecurity();
+
+    LOG_DEBUG("rbac", "WorldSession::LoadPermissions [AccountId: {}, Name: {}, realmId: {}, secLevel: {}]",
+        id, _accountName, realm.Id.Realm, secLevel);
+
+    _RBACData = new rbac::RBACData(id, _accountName, realm.Id.Realm, secLevel);
+    return _RBACData->LoadFromDBAsync();
+}
+
+bool WorldSession::HasPermission(uint32 permission)
+{
+    if (!_RBACData)
+        LoadPermissions();
+
+    bool hasPermission = _RBACData->HasPermission(permission);
+    LOG_DEBUG("rbac", "WorldSession::HasPermission [AccountId: {}, Name: {}, realmId: {}]",
+                   _RBACData->GetId(), _RBACData->GetName(), realm.Id.Realm);
+
+    return hasPermission;
+}
+
+void WorldSession::InvalidateRBACData()
+{
+    LOG_DEBUG("rbac", "WorldSession::InvalidateRBACData [AccountId: {}, Name: {}, realmId: {}]",
+                   _RBACData->GetId(), _RBACData->GetName(), realm.Id.Realm);
+    delete _RBACData;
+    _RBACData = nullptr;
+}
+
+void WorldSession::InitRBACDataForTest()
+{
+    delete _RBACData;
+    _RBACData = new rbac::RBACData(_accountId, _accountName, realm.Id.Realm, _security);
+    _RBACData->LoadFromDBCallback(nullptr);
 }

@@ -27,6 +27,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <vector>
 
 std::string DBUpdaterUtil::GetCorrectedMySQLExecutable()
 {
@@ -92,7 +93,8 @@ bool DBUpdater<LoginDatabaseConnection>::IsEnabled(uint32 const updateMask)
 template<>
 std::string DBUpdater<LoginDatabaseConnection>::GetDBModuleName()
 {
-    return "db-auth";
+    // must be lowercase
+    return "auth";
 }
 
 // World Database
@@ -124,7 +126,8 @@ bool DBUpdater<WorldDatabaseConnection>::IsEnabled(uint32 const updateMask)
 template<>
 std::string DBUpdater<WorldDatabaseConnection>::GetDBModuleName()
 {
-    return "db-world";
+    // must be lowercase
+    return "world";
 }
 
 // Character Database
@@ -156,7 +159,8 @@ bool DBUpdater<CharacterDatabaseConnection>::IsEnabled(uint32 const updateMask)
 template<>
 std::string DBUpdater<CharacterDatabaseConnection>::GetDBModuleName()
 {
-    return "db-characters";
+    // must be lowercase
+    return "characters";
 }
 
 // All
@@ -396,16 +400,23 @@ bool DBUpdater<T>::Populate(DatabaseWorkerPool<T>& pool)
         return false;
     }
 
-    for (std::filesystem::directory_iterator itr(DirPath); itr != DirItr; ++itr)
-    {
-        if (itr->path().extension() != ".sql")
-            continue;
+    std::vector<std::filesystem::path> sqlFiles;
 
-        LOG_INFO("sql.updates", ">> Applying \'{}\'...", itr->path().filename().generic_string());
+    for (const auto &entry : std::filesystem::directory_iterator(DirPath))
+    {
+        if (entry.path().extension() == ".sql")
+            sqlFiles.push_back(entry.path());
+    }
+
+    std::sort(sqlFiles.begin(), sqlFiles.end());
+
+    for (const auto &file : sqlFiles)
+    {
+        LOG_INFO("sql.updates", ">> Applying \'{}\'...", file.filename().generic_string());
 
         try
         {
-            ApplyFile(pool, itr->path());
+            ApplyFile(pool, file);
         }
         catch (UpdateException&)
         {

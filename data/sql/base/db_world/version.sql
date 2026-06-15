@@ -36,7 +36,7 @@ CREATE TABLE `version` (
 LOCK TABLES `version` WRITE;
 /*!40000 ALTER TABLE `version` DISABLE KEYS */;
 INSERT INTO `version` VALUES
-('AzerothCore rev. 9415d1bef80d 2025-07-05 11:29:15 +0200 (whisper-something-something branch) (Win64, RelWithDebInfo, Static)','9415d1bef80d','ACDB 335.14-dev',14);
+('AzerothCore rev. 8b8ba243d8f7 2026-06-01 22:26:28 +0200 (squashies branch) (Win64, RelWithDebInfo, Static)','8b8ba243d8f7','ACDB 335.16-dev',16);
 /*!40000 ALTER TABLE `version` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -48,4 +48,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-07-19 12:09:51
+-- Dump completed on 2026-06-01 22:40:50

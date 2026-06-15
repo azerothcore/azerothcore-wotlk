@@ -75,22 +75,6 @@ struct boss_moroes : public BossAI
     boss_moroes(Creature* creature) : BossAI(creature, DATA_MOROES)
     {
         _activeGuests = 0;
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
-
-    void InitializeAI() override
-    {
-        BossAI::InitializeAI();
-        InitializeGuests();
-    }
-
-    void JustReachedHome() override
-    {
-        BossAI::JustReachedHome();
-        InitializeGuests();
     }
 
     void InitializeGuests()
@@ -100,16 +84,18 @@ struct boss_moroes : public BossAI
 
         if (_activeGuests == 0)
         {
-            _activeGuests |= 0x3F;
+            _activeGuests = 0x3F;
             uint8 rand1 = RAND(0x01, 0x02, 0x04);
             uint8 rand2 = RAND(0x08, 0x10, 0x20);
             _activeGuests &= ~(rand1 | rand2);
         }
-        for (uint8 i = 0; i < MAX_GUEST_COUNT; ++i)
+
+        uint8 positionIndex = 0;
+        for (uint8 i = 0; i < MAX_GUEST_COUNT && positionIndex < ACTIVE_GUEST_COUNT; ++i)
         {
             if ((1 << i) & _activeGuests)
             {
-                me->SummonCreature(GuestEntries[i], GuestsPosition[summons.size()], TEMPSUMMON_MANUAL_DESPAWN);
+                me->SummonCreature(GuestEntries[i], GuestsPosition[positionIndex++], TEMPSUMMON_MANUAL_DESPAWN);
             }
         }
 
@@ -133,6 +119,10 @@ struct boss_moroes : public BossAI
         DoCastSelf(SPELL_DUAL_WIELD, true);
         _recentlySpoken = false;
         _vanished = false;
+        me->SetImmuneToAll(false);
+        me->SetReactState(REACT_AGGRESSIVE);
+
+        InitializeGuests();
 
         ScheduleHealthCheckEvent(30, [&] {
             DoCastSelf(SPELL_FRENZY, true);
@@ -153,10 +143,12 @@ struct boss_moroes : public BossAI
             _vanished = true;
             Talk(SAY_SPECIAL);
             DoCastSelf(SPELL_VANISH);
-            me->SetImmuneToAll(true);
+            me->SetImmuneToAll(true, true);
+            me->SetReactState(REACT_PASSIVE);
             scheduler.Schedule(5s, 7s, [this](TaskContext)
             {
                 me->SetImmuneToAll(false);
+                me->SetReactState(REACT_AGGRESSIVE);
                 DoCastSelf(SPELL_VANISH_TELEPORT);
                 _vanished = false;
             });
@@ -207,6 +199,9 @@ struct boss_moroes : public BossAI
             }
         }
 
+        if (guestList.empty())
+            return nullptr;
+
         return Acore::Containers::SelectRandomContainerElement(guestList);
     }
 
@@ -215,12 +210,12 @@ struct boss_moroes : public BossAI
         bool guestsInRoom = true;
         summons.DoForAllSummons([&guestsInRoom](WorldObject* summon)
         {
-            if ((summon->ToCreature()->GetPositionX()) < -11028.f || (summon->ToCreature()->GetPositionY()) < -1955.f) //boundaries of the two doors
+            Creature* creature = summon->ToCreature();
+            if (creature->IsAlive() &&
+                ((creature->GetPositionX() < -11028.f) || (creature->GetPositionY() < -1955.f))) // boundaries of the two doors
             {
                 guestsInRoom = false;
-                return false;
             }
-            return true;
         });
 
         return guestsInRoom;
@@ -233,10 +228,6 @@ struct boss_moroes : public BossAI
         if (!CheckGuestsInRoom())
         {
             EnterEvadeMode();
-            summons.DoForAllSummons([](WorldObject* summon)
-            {
-                summon->ToCreature()->DespawnOnEvade(5s);
-            });
             return;
         }
 

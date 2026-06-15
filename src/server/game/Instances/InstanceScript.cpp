@@ -28,6 +28,7 @@
 #include "Opcodes.h"
 #include "Pet.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "ScriptMgr.h"
 #include "Spell.h"
 #include "WorldSession.h"
@@ -132,6 +133,11 @@ void InstanceScript::HandleGameObject(ObjectGuid GUID, bool open, GameObject* go
     {
         LOG_DEBUG("scripts.ai", "InstanceScript: HandleGameObject failed");
     }
+}
+
+void InstanceScript::HandleGameObject(uint32 type, bool open)
+{
+    HandleGameObject(ObjectGuid::Empty, open, GetGameObject(type));
 }
 
 bool InstanceScript::IsEncounterInProgress() const
@@ -380,6 +386,11 @@ void InstanceScript::SetSummoner(Creature* creature)
         if (Creature* summoner = GetCreature(summonData->second))
             if (summoner->IsAIEnabled)
                 summoner->AI()->JustSummoned(creature);
+}
+
+bool InstanceScript::_SkipCheckRequiredBosses(Player const* player /*= nullptr*/) const
+{
+    return player && player->GetSession()->HasPermission(rbac::RBAC_PERM_SKIP_CHECK_INSTANCE_REQUIRED_BOSSES);
 }
 
 bool InstanceScript::SetBossState(uint32 id, EncounterState state)

@@ -16,6 +16,7 @@
  */
 
 #include "AreaBoundary.h"
+#include "CreatureGroups.h"
 #include "CreatureScript.h"
 #include "InstanceMapScript.h"
 #include "ScriptedCreature.h"
@@ -50,6 +51,7 @@ ObjectData const summonData[] =
     { NPC_ANUB_AR_CHAMPION,      DATA_HADRONOX  },
     { NPC_ANUB_AR_NECROMANCER,   DATA_HADRONOX  },
     { NPC_ANUB_AR_CRYPTFIEND,    DATA_HADRONOX  },
+    { NPC_WORLD_TRIGGER_LAOI,    DATA_HADRONOX  },
     { 0, 0 }
 };
 
@@ -79,9 +81,78 @@ public:
 
         void OnCreatureEvade(Creature* creature) override
         {
-            if (creature->EntryEquals(NPC_WATCHER_NARJIL, NPC_WATCHER_GASHRA, NPC_WATCHER_SILTHIK))
+            switch (creature->GetEntry())
+            {
+                case NPC_WATCHER_NARJIL:
+                case NPC_WATCHER_GASHRA:
+                case NPC_WATCHER_SILTHIK:
+                    if (Creature* krikthir = GetCreature(DATA_KRIKTHIR))
+                        krikthir->AI()->EnterEvadeMode();
+                    break;
+                case NPC_ANUBAR_SHADOWCASTER:
+                case NPC_ANUBAR_SKIRMISHER:
+                case NPC_ANUBAR_WARRIOR:
+                    if (CreatureGroup* formation = creature->GetFormation())
+                        if (Creature* leader = formation->GetLeader())
+                            if (leader->EntryEquals(NPC_WATCHER_GASHRA, NPC_WATCHER_NARJIL, NPC_WATCHER_SILTHIK))
+                                if (Creature* krikthir = GetCreature(DATA_KRIKTHIR))
+                                    krikthir->AI()->EnterEvadeMode();
+                    break;
+                case NPC_KRIKTHIR_THE_GATEWATCHER:
+                    if (Creature* narjil = GetCreature(DATA_NARJIL))
+                        if (CreatureGroup* formation = narjil->GetFormation())
+                            formation->DespawnFormation(0s, 20s);
+
+                    if (Creature* gashra = GetCreature(DATA_GASHRA))
+                        if (CreatureGroup* formation = gashra->GetFormation())
+                            formation->DespawnFormation(0s, 20s);
+
+                    if (Creature* silthik = GetCreature(DATA_SILTHIK))
+                        if (CreatureGroup* formation = silthik->GetFormation())
+                            formation->DespawnFormation(0s, 20s);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        void OnUnitDeath(Unit* unit) override
+        {
+            if (!unit->EntryEquals(NPC_WATCHER_GASHRA, NPC_WATCHER_NARJIL, NPC_WATCHER_SILTHIK, NPC_ANUBAR_SHADOWCASTER, NPC_ANUBAR_SKIRMISHER, NPC_ANUBAR_WARRIOR))
+                return;
+
+            Creature* creature = unit->ToCreature();
+            if (!creature)
+                return;
+
+            // For trash mobs, ensure their leader is a Watcher
+            if (unit->EntryEquals(NPC_ANUBAR_SHADOWCASTER, NPC_ANUBAR_SKIRMISHER, NPC_ANUBAR_WARRIOR))
+            {
+                CreatureGroup* formation = creature->GetFormation();
+                if (!formation)
+                    return;
+
+                Creature* leader = formation->GetLeader();
+                if (!leader || !leader->EntryEquals(NPC_WATCHER_GASHRA, NPC_WATCHER_NARJIL, NPC_WATCHER_SILTHIK))
+                    return;
+            }
+
+            ObjectGuid creatureGuid = creature->GetGUID();
+
+            scheduler.CancelAll();
+            scheduler.Schedule(1s, [this, creatureGuid](TaskContext /*context*/)
+            {
+                Creature* creature = instance->GetCreature(creatureGuid);
+                if (!creature)
+                    return;
+
+                CreatureGroup* formation = creature->GetFormation();
+                if (!formation || formation->IsAnyMemberAlive())
+                    return;
+
                 if (Creature* krikthir = GetCreature(DATA_KRIKTHIR))
-                    krikthir->AI()->EnterEvadeMode();
+                    krikthir->AI()->DoAction(ACTION_MINION_DIED);
+            });
         }
     };
 

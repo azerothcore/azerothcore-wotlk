@@ -21,6 +21,7 @@
 #include "Pet.h"
 #include "Player.h"
 #include "PlayerCommand.h"
+#include "RBAC.h"
 #include "SpellInfo.h"
 #include "SpellMgr.h"
 
@@ -35,32 +36,33 @@ public:
     {
         static ChatCommandTable learnAllMyCommandTable =
         {
-            { "class",      HandleLearnAllMyClassCommand,      SEC_GAMEMASTER, Console::No },
-            { "pettalents", HandleLearnAllMyPetTalentsCommand, SEC_GAMEMASTER, Console::No },
-            { "spells",     HandleLearnAllMySpellsCommand,     SEC_GAMEMASTER, Console::No },
-            { "talents",    HandleLearnAllMyTalentsCommand,    SEC_GAMEMASTER, Console::No }
+            { "class",      HandleLearnAllMyClassCommand,      rbac::RBAC_PERM_COMMAND_LEARN_ALL_MY_CLASS, Console::No },
+            { "pettalents", HandleLearnAllMyPetTalentsCommand, rbac::RBAC_PERM_COMMAND_LEARN_MY_PETTALENTS, Console::No },
+            { "trainer",    HandleLearnAllMyTrainerSpellsCommand, rbac::RBAC_PERM_COMMAND_LEARN_ALL_MY_SPELLS, Console::No },
+            { "talents",    HandleLearnAllMyTalentsCommand,    rbac::RBAC_PERM_COMMAND_LEARN_ALL_TALENTS, Console::No },
+            { "quest",      HandleLearnAllMyQuestSpells,       rbac::RBAC_PERM_COMMAND_LEARN_ALL_MY_SPELLS, Console::No }
         };
 
         static ChatCommandTable learnAllCommandTable =
         {
             { "my",        learnAllMyCommandTable },
-            { "gm",        HandleLearnAllGMCommand,            SEC_GAMEMASTER, Console::No },
-            { "crafts",    HandleLearnAllCraftsCommand,        SEC_GAMEMASTER, Console::No },
-            { "default",   HandleLearnAllDefaultCommand,       SEC_GAMEMASTER, Console::No },
-            { "lang",      HandleLearnAllLangCommand,          SEC_GAMEMASTER, Console::No },
-            { "recipes",   HandleLearnAllRecipesCommand,       SEC_GAMEMASTER, Console::No },
+            { "gm",        HandleLearnAllGMCommand,            rbac::RBAC_PERM_COMMAND_LEARN_ALL_GM, Console::No },
+            { "crafts",    HandleLearnAllCraftsCommand,        rbac::RBAC_PERM_COMMAND_LEARN_ALL_CRAFTS, Console::No },
+            { "default",   HandleLearnAllDefaultCommand,       rbac::RBAC_PERM_COMMAND_LEARN_ALL_DEFAULT, Console::No },
+            { "lang",      HandleLearnAllLangCommand,          rbac::RBAC_PERM_COMMAND_LEARN_ALL_LANG, Console::No },
+            { "recipes",   HandleLearnAllRecipesCommand,       rbac::RBAC_PERM_COMMAND_LEARN_ALL_RECIPES, Console::No },
         };
 
         static ChatCommandTable learnCommandTable =
         {
             { "all",  learnAllCommandTable },
-            { "",     HandleLearnCommand,                      SEC_GAMEMASTER, Console::No }
+            { "",     HandleLearnCommand,                      rbac::RBAC_PERM_COMMAND_LEARN, Console::No }
         };
 
         static ChatCommandTable commandTable =
         {
             { "learn",   learnCommandTable },
-            { "unlearn", HandleUnLearnCommand,             SEC_GAMEMASTER, Console::No }
+            { "unlearn", HandleUnLearnCommand,             rbac::RBAC_PERM_COMMAND_UNLEARN, Console::No }
         };
         return commandTable;
     }
@@ -98,51 +100,56 @@ public:
 
     static bool HandleLearnAllMyClassCommand(ChatHandler* handler)
     {
-        HandleLearnAllMySpellsCommand(handler);
+        HandleLearnAllMyTrainerSpellsCommand(handler);
         HandleLearnAllMyTalentsCommand(handler);
+        HandleLearnAllMyQuestSpells(handler);
         return true;
     }
 
-    static bool HandleLearnAllMySpellsCommand(ChatHandler* handler)
+    static bool HandleLearnAllMyQuestSpells(ChatHandler* handler)
     {
-        ChrClassesEntry const* classEntry = sChrClassesStore.LookupEntry(handler->GetSession()->GetPlayer()->getClass());
-        if (!classEntry)
-            return true;
-        uint32 family = classEntry->spellfamily;
-
-        for (uint32 i = 0; i < sSkillLineAbilityStore.GetNumRows(); ++i)
+        Player* player = handler->GetPlayer();
+        for (auto const& questPair : sObjectMgr->GetQuestTemplates())
         {
-            SkillLineAbilityEntry const* entry = sSkillLineAbilityStore.LookupEntry(i);
-            if (!entry)
-                continue;
-
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(entry->Spell);
-            if (!spellInfo)
-                continue;
-
-            // skip server-side/triggered spells
-            if (spellInfo->SpellLevel == 0)
-                continue;
-
-            // skip wrong class/race skills
-            if (!handler->GetSession()->GetPlayer()->IsSpellFitByClassAndRace(spellInfo->Id))
-                continue;
-
-            // skip other spell families
-            if (spellInfo->SpellFamilyName != family)
-                continue;
-
-            // skip spells with first rank learned as talent (and all talents then also)
-            uint32 firstRank = sSpellMgr->GetFirstSpellInChain(spellInfo->Id);
-            if (GetTalentSpellCost(firstRank) > 0)
-                continue;
-
-            // skip broken spells
-            if (!SpellMgr::IsSpellValid(spellInfo))
-                continue;
-
-            handler->GetSession()->GetPlayer()->learnSpell(spellInfo->Id);
+            Quest const* quest = questPair.second;
+            if (quest->GetRequiredClasses() && player->SatisfyQuestClass(quest, false))
+                player->learnQuestRewardedSpells(quest);
         }
+
+        return true;
+    }
+
+    static bool HandleLearnAllMyTrainerSpellsCommand(ChatHandler* handler)
+    {
+        if (!sChrClassesStore.LookupEntry(handler->GetSession()->GetPlayer()->getClass()))
+            return true;
+
+        Player* player = handler->GetPlayer();
+        std::vector<Trainer::Trainer const*> const& trainers = sObjectMgr->GetClassTrainers(player->getClass());
+
+        bool hadNew;
+        do
+        {
+            hadNew = false;
+            for (Trainer::Trainer const* trainer : trainers)
+            {
+                if (!trainer->IsTrainerValidForPlayer(player))
+                    continue;
+
+                for (Trainer::Spell const& trainerSpell : trainer->GetSpells())
+                {
+                    if (!trainer->CanTeachSpell(player, &trainerSpell))
+                        continue;
+
+                    if (trainerSpell.IsCastable())
+                        player->CastSpell(player, trainerSpell.SpellId, true);
+                    else
+                        player->learnSpell(trainerSpell.SpellId, false);
+
+                    hadNew = true;
+                }
+            }
+        } while (hadNew);
 
         handler->SendSysMessage(LANG_COMMAND_LEARN_CLASS_SPELLS);
         return true;
@@ -302,6 +309,8 @@ public:
 
     static bool HandleLearnAllCraftsCommand(ChatHandler* handler)
     {
+        Player* target = handler->GetSession()->GetPlayer();
+
         for (uint32 i = 0; i < sSkillLineStore.GetNumRows(); ++i)
         {
             SkillLineEntry const* skillInfo = sSkillLineStore.LookupEntry(i);
@@ -311,7 +320,10 @@ public:
             if ((skillInfo->categoryId == SKILL_CATEGORY_PROFESSION || skillInfo->categoryId == SKILL_CATEGORY_SECONDARY) &&
                     skillInfo->canLink)                             // only prof. with recipes have
             {
-                HandleLearnSkillRecipesHelper(handler->GetSession()->GetPlayer(), skillInfo->id);
+                HandleLearnSkillRecipesHelper(target, skillInfo->id);
+
+                uint16 const maxLevel = target->GetPureMaxSkillValue(skillInfo->id);
+                target->SetSkill(skillInfo->id, target->GetSkillStep(skillInfo->id), maxLevel, maxLevel);
             }
         }
 
@@ -381,6 +393,15 @@ public:
 
     static void HandleLearnSkillRecipesHelper(Player* player, uint32 skillId)
     {
+        // Rank spells (Apprentice -> Grand Master) must be learned so that the
+        // skill-cleanup loop in Player::SetSkill (which calls removeSpell on the
+        // first spell in each chain) can walk forward and strip every rank on
+        // profession unlearn. Without the first rank in the spellbook that loop
+        // bails out and the leftover rank spells re-grant the skill after relog
+        // (issue #2330).
+        for (uint32 rankSpell : sSpellMgr->GetSkillRankSpells(skillId))
+            player->learnSpell(rankSpell);
+
         uint32 classmask = player->getClassMask();
 
         for (SkillLineAbilityEntry const* skillLine : GetSkillLineAbilitiesBySkillLine(skillId))
