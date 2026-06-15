@@ -90,7 +90,6 @@
 -- Expected on unpatched database: 538 (462 fixable + 76 unfixable test items)
 -- =============================================================================
 
-
 -- =============================================================================
 -- PASS 1: Name-match (95 items)
 -- Fixes items that have an exact name twin with a known-good armor value.
@@ -105,6 +104,8 @@ JOIN (
     SELECT name, MIN(armor) AS armor
     FROM item_template
     WHERE armor > 0
+      AND class = 4
+      AND subclass IN (1, 2, 3, 4)
     GROUP BY name
     HAVING MIN(armor) = MAX(armor)
 ) ref ON bad.name = ref.name
@@ -115,7 +116,6 @@ WHERE bad.class = 4
   AND bad.ScalingStatValue = 0
   AND bad.Quality >= 2
   AND bad.ItemLevel > 1;
-
 
 -- =============================================================================
 -- PASS 2: Slot-reference (367 items)
@@ -149,7 +149,6 @@ WHERE bad.class = 4
   AND bad.ScalingStatValue = 0
   AND bad.Quality >= 2
   AND bad.ItemLevel > 1;
-
 
 -- =============================================================================
 -- POST-FIX VERIFICATION
@@ -190,3 +189,4 @@ WHERE entry IN (
 )
 ORDER BY entry;
 -- =============================================================================
+

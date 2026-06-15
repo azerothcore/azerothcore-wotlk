@@ -113,11 +113,10 @@
 -- Expected on unpatched database: 61
 -- =============================================================================
 
-
 -- =============================================================================
 -- FIX: Compute dmg_min1/dmg_max1 from reference DPS + per-subclass ratios
 -- Covers all major weapon types except wands (19) and Brewfest steins (14).
--- Each item uses its own delay value â€” weapons with different swing speeds at
+-- Each item uses its own delay value - weapons with different swing speeds at
 -- the same ilvl/quality get the correct absolute damage values for their speed.
 -- =============================================================================
 UPDATE item_template bad
@@ -149,11 +148,14 @@ JOIN (
     WHERE class = 2
       AND dmg_min1 > 0
       AND Quality >= 2
+      AND ItemLevel > 1
     GROUP BY subclass
 ) ratios ON bad.subclass = ratios.subclass
 SET
-    bad.dmg_min1 = GREATEST(1, ROUND(ref.ref_dps * (bad.delay / 1000.0) * ratios.min_ratio)),
-    bad.dmg_max1 = GREATEST(2, ROUND(ref.ref_dps * (bad.delay / 1000.0) * ratios.max_ratio))
+    bad.dmg_min1 = GREATEST(1, ROUND(
+        ref.ref_dps * (bad.delay / 1000.0) * ratios.min_ratio)),
+    bad.dmg_max1 = GREATEST(2, ROUND(
+        ref.ref_dps * (bad.delay / 1000.0) * ratios.max_ratio))
 WHERE bad.class = 2
   AND bad.Quality >= 2
   AND bad.ItemLevel > 1
@@ -165,7 +167,6 @@ WHERE bad.class = 2
   AND bad.name NOT LIKE '%Deprecated%'
   AND bad.name NOT LIKE '%Frostmourne%'         -- art/NPC-only Frostmourne entries
   AND bad.name NOT LIKE '%Art Demo%';
-
 
 -- =============================================================================
 -- POST-FIX VERIFICATION
@@ -207,11 +208,11 @@ SELECT
     ROUND((dmg_min1 + dmg_max1) / 2.0 / (delay / 1000.0), 1) AS dps
 FROM item_template
 WHERE entry IN (
-    42238,  -- Furious Gladiator's Waraxe   (1H Axe, ilvl 232) â†’ expected ~178.8 DPS
-    44948,  -- Titansteel Defender           (2H Axe, ilvl 200) â†’ expected ~186.5 DPS
-    44926,  -- Titansteel Deflector          (2H Sword, ilvl 200) â†’ expected ~186.5 DPS
-    44191,  -- Ice-Rimed Chopper             (2H Axe, ilvl 200) â†’ expected ~169.2 DPS
-    37697   -- Trade District Knife          (Dagger, ilvl 200) â†’ expected ~113.5 DPS
+    42238,  -- Furious Gladiator’s Waraxe   (1H Axe, ilvl 232) -> expected ~178.8 DPS
+    44948,  -- Titansteel Defender           (2H Axe, ilvl 200) -> expected ~186.5 DPS
+    44926,  -- Titansteel Deflector          (2H Sword, ilvl 200) -> expected ~186.5 DPS
+    44191,  -- Ice-Rimed Chopper             (2H Axe, ilvl 200) -> expected ~169.2 DPS
+    37697   -- Trade District Knife          (Dagger, ilvl 200) -> expected ~113.5 DPS
 )
 ORDER BY ItemLevel DESC;
 
@@ -223,3 +224,4 @@ WHERE subclass = 0 AND Quality = 4 AND ItemLevel = 232 AND delay = 2600
 ORDER BY entry;
 -- All entries with delay=2600 should show dmg_min1=325, dmg_max1=605, dps=178.8
 -- =============================================================================
+
