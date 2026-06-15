@@ -10092,7 +10092,7 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, Unit const* caster, Spel
                     continue;
 
                 SpellInfo const* immuneSpellInfo = sSpellMgr->GetSpellInfo(itr->second);
-                if (!(itr->first & spellSchoolMask))
+                if ((itr->first & spellSchoolMask) != spellSchoolMask)
                     continue;
 
                 if (IgnoresSchoolImmunityFromFriendlyCaster(caster, itr->second, immuneSpellInfo))
