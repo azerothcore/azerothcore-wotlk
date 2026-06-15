@@ -18,6 +18,7 @@
 #ifndef SCRIPT_OBJECT_SERVER_SCRIPT_H_
 #define SCRIPT_OBJECT_SERVER_SCRIPT_H_
 
+#include "IoContext.h"
 #include "ScriptObject.h"
 #include <vector>
 #include <memory> // NOTE: this import is NEEDED (even though some IDEs report it as unused)
@@ -41,6 +42,7 @@ protected:
 public:
     // Called when reactive socket I/O is started (WorldSocketMgr).
     virtual void OnNetworkStart() { }
+    virtual void OnNetworkStart(Acore::Asio::IoContext& /*ioContext*/) { OnNetworkStart(); }
 
     // Called when reactive I/O is stopped.
     virtual void OnNetworkStop() { }

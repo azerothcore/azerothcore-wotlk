@@ -316,11 +316,20 @@ struct boss_steelbreaker : public ScriptedAI
                 events.Repeat(15s, 20s);
                 break;
             case EVENT_STATIC_DISRUPTION:
-                if (Unit* pTarget = SelectTarget(SelectTargetMethod::MinDistance, 0, 0, true))
-                    me->CastSpell(pTarget, SPELL_STATIC_DISRUPTION, false);
+            {
+                // Prefer a random player out of melee range so the nature damage debuff
+                // (and its 5y splash) stays off the melee/tank cluster; if everyone is in
+                // melee, fall back to a random player regardless of range.
+                Unit* target = SelectTarget(SelectTargetMethod::Random, 0, -10.0f, true);
+                if (!target)
+                    target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true);
+
+                if (target)
+                    me->CastSpell(target, SPELL_STATIC_DISRUPTION, false);
 
                 events.Repeat(20s, 40s);
                 break;
+            }
             case EVENT_OVERWHELMING_POWER:
                 Talk(SAY_STEELBREAKER_POWER);
                 me->CastSpell(me->GetVictim(), SPELL_OVERWHELMING_POWER, true);

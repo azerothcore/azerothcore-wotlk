@@ -40,6 +40,7 @@
 #include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "RaceMgr.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
@@ -520,6 +521,8 @@ void AchievementMgr::ResetAchievementCriteria(AchievementCriteriaCondition condi
     // disable for gamemasters with GM-mode enabled
     if (_player->IsGameMaster())
         return;
+    if (_player->GetSession()->HasPermission(rbac::RBAC_PERM_CANNOT_EARN_ACHIEVEMENTS))
+        return;
 
     LOG_DEBUG("achievement", "AchievementMgr::ResetAchievementCriteria({}, {}, {})", condition, value, evenIfCriteriaComplete);
 
@@ -820,6 +823,8 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
 {
     // disable for gamemasters with GM-mode enabled
     if (_player->IsGameMaster())
+        return;
+    if (_player->GetSession()->HasPermission(rbac::RBAC_PERM_CANNOT_EARN_ACHIEVEMENTS))
         return;
 
     if (type >= ACHIEVEMENT_CRITERIA_TYPE_TOTAL)
@@ -1829,14 +1834,17 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
         if (sAchievementMgr->IsRealmCompleted(achievement))
             return false;
 
-        // A character may only have 1 race-specific 'Realm First!' achievement
-        // prevent clever use of the race/faction change service to obtain multiple 'Realm First!' achievements
-        constexpr std::array<uint32, 9> raceSpecificRealmFirstAchievements { 1405, 1406, 1407, 1408, 1409, 1410, 1411, 1412, 1413 };
-        bool isRaceSpecific = std::ranges::find(raceSpecificRealmFirstAchievements, achievement->ID) != std::ranges::end(raceSpecificRealmFirstAchievements);
-        if (isRaceSpecific)
-            for (uint32 raceAchievementId : raceSpecificRealmFirstAchievements)
-                if (raceAchievementId != achievement->ID && HasAchieved(raceAchievementId))
-                    return false;
+        if (sWorld->getBoolConfig(CONFIG_ACHIEVEMENT_REALM_FIRST_RACE_LIMIT_ONE_PER_CHARACTER))
+        {
+            // A character may only have 1 race-specific 'Realm First!' achievement
+            // prevent clever use of the race/faction change service to obtain multiple 'Realm First!' achievements
+            constexpr std::array<uint32, 9> raceSpecificRealmFirstAchievements { 1405, 1406, 1407, 1408, 1409, 1410, 1411, 1412, 1413 };
+            bool isRaceSpecific = std::ranges::find(raceSpecificRealmFirstAchievements, achievement->ID) != std::ranges::end(raceSpecificRealmFirstAchievements);
+            if (isRaceSpecific)
+                for (uint32 raceAchievementId : raceSpecificRealmFirstAchievements)
+                    if (raceAchievementId != achievement->ID && HasAchieved(raceAchievementId))
+                        return false;
+        }
     }
 
     // pussywizard: progress will be deleted after getting the achievement (optimization)
@@ -2282,6 +2290,8 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
         ChatHandler(_player->GetSession()).PSendSysMessage("Not available in GM mode");
         return;
     }
+    if (_player->GetSession()->HasPermission(rbac::RBAC_PERM_CANNOT_EARN_ACHIEVEMENTS))
+        return;
 
     if (!sScriptMgr->OnPlayerBeforeAchievementComplete(GetPlayer(), achievement))
     {
@@ -2323,7 +2333,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
                     }
     }
 
-    if (achievement->flags & (ACHIEVEMENT_FLAG_REALM_FIRST_REACH | ACHIEVEMENT_FLAG_REALM_FIRST_KILL) && AccountMgr::IsPlayerAccount(_player->GetSession()->GetSecurity()))
+    if (achievement->flags & (ACHIEVEMENT_FLAG_REALM_FIRST_REACH | ACHIEVEMENT_FLAG_REALM_FIRST_KILL) && !_player->GetSession()->HasPermission(rbac::RBAC_PERM_CANNOT_EARN_REALM_FIRST_ACHIEVEMENTS))
         sAchievementMgr->SetRealmCompleted(achievement);
 
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ACHIEVEMENT, achievement->ID);

@@ -41,29 +41,29 @@ namespace Acore
 
     /// Default AC string format function.
     template<typename... Args>
-    inline std::string StringFormat(FormatString<Args...> fmt, Args&&... args)
+    inline std::string StringFormat(FormatStringView fmt, Args&&... args)
     {
         try
         {
-            return fmt::format(fmt, std::forward<Args>(args)...);
+            return fmt::vformat(fmt, fmt::make_format_args(args...));
         }
         catch (std::exception const& e)
         {
-            return fmt::format("Wrong format occurred ({}). Fmt string: '{}'", e.what(), fmt.get());
+            return fmt::format("Wrong format occurred ({}). Fmt string: '{}'", e.what(), fmt);
         }
     }
 
     /// Format directly to an output iterator.
     template<typename OutputIt, typename... Args>
-    inline OutputIt StringFormatTo(OutputIt out, FormatString<Args...> fmt, Args&&... args)
+    inline OutputIt StringFormatTo(OutputIt out, FormatStringView fmt, Args&&... args)
     {
         try
         {
-            return fmt::format_to(out, fmt, std::forward<Args>(args)...);
+            return fmt::vformat_to(out, fmt, fmt::make_format_args(args...));
         }
         catch (std::exception const& e)
         {
-            return fmt::format_to(out, "Wrong format occurred ({}). Fmt string: '{}'", e.what(), fmt.get());
+            return fmt::format_to(out, "Wrong format occurred ({}). Fmt string: '{}'", e.what(), fmt);
         }
     }
 

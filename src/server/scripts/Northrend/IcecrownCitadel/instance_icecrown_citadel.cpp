@@ -1421,10 +1421,8 @@ public:
 
         bool CheckRequiredBosses(uint32 bossId, Player const* player) const override
         {
-            if (player && player->GetSession() && player->GetSession()->GetSecurity() >= SEC_MODERATOR)
-            {
+            if (_SkipCheckRequiredBosses(player))
                 return true;
-            }
 
             switch (bossId)
             {

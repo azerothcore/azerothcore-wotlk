@@ -34,6 +34,7 @@
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "ScriptMgr.h"
 #include "SharedDefines.h"
 #include "SocialMgr.h"
@@ -493,7 +494,9 @@ namespace lfg
 
             uint32 lockData = 0;
 
-            if (dungeon->expansion > expansion || (onlySeasonalBosses && !dungeon->seasonal))
+            if (!player->GetSession()->HasPermission(rbac::RBAC_PERM_JOIN_DUNGEON_FINDER))
+                lockData = LFG_LOCKSTATUS_RAID_LOCKED;
+            else if (dungeon->expansion > expansion || (onlySeasonalBosses && !dungeon->seasonal))
                 lockData = LFG_LOCKSTATUS_INSUFFICIENT_EXPANSION;
             else if (IsDungeonDisabled(dungeon->map, dungeon->difficulty))
                 lockData = LFG_LOCKSTATUS_RAID_LOCKED;
@@ -698,7 +701,11 @@ namespace lfg
         if (!isRaid && joinData.result == LFG_JOIN_OK)
         {
             // Check player or group member restrictions
-            if (player->InBattleground() || (player->InBattlegroundQueue() && !sWorld->getBoolConfig(CONFIG_ALLOW_JOIN_BG_AND_LFG)))
+            if (!player->GetSession()->HasPermission(rbac::RBAC_PERM_JOIN_DUNGEON_FINDER))
+            {
+                joinData.result = LFG_JOIN_NOT_MEET_REQS;
+            }
+            else if (player->InBattleground() || (player->InBattlegroundQueue() && !sWorld->getBoolConfig(CONFIG_ALLOW_JOIN_BG_AND_LFG)))
             {
                 joinData.result = LFG_JOIN_USING_BG_SYSTEM;
             }
@@ -721,7 +728,11 @@ namespace lfg
                     {
                         if (Player* plrg = itr->GetSource())
                         {
-                            if (plrg->HasAura(LFG_SPELL_DUNGEON_DESERTER))
+                            if (!plrg->GetSession()->HasPermission(rbac::RBAC_PERM_JOIN_DUNGEON_FINDER))
+                            {
+                                joinData.result = LFG_JOIN_PARTY_NOT_MEET_REQS;
+                            }
+                            else if (plrg->HasAura(LFG_SPELL_DUNGEON_DESERTER))
                             {
                                 joinData.result = LFG_JOIN_PARTY_DESERTER;
                             }
@@ -1681,17 +1692,31 @@ namespace lfg
         LfgGuidList players;
         GuidUnorderedSet playersToTeleport;
 
-        for (LfgProposalPlayerContainer::const_iterator it = proposal.players.begin(); it != proposal.players.end(); ++it)
-        {
-            ObjectGuid guid = it->first;
-            if (guid == proposal.leader)
-                players.push_front(guid);
-            else
-                players.push_back(guid);
+        // Sort players by role, leader first, then tank, healer and dps
+        std::vector<ObjectGuid> tanks, healers, dps;
 
+        if (proposal.leader && proposal.players.contains(proposal.leader))
+            players.push_back(proposal.leader);
+
+        for (auto const& [guid, player] : proposal.players)
+        {
             if (proposal.isNew || GetGroup(guid) != proposal.group)
                 playersToTeleport.insert(guid);
+
+            if (guid == proposal.leader)
+                continue;
+
+            if (player.role & lfg::PLAYER_ROLE_TANK)
+                tanks.push_back(guid);
+            else if (player.role & lfg::PLAYER_ROLE_HEALER)
+                healers.push_back(guid);
+            else
+                dps.push_back(guid);
         }
+
+        players.insert(players.end(), tanks.begin(), tanks.end());
+        players.insert(players.end(), healers.begin(), healers.end());
+        players.insert(players.end(), dps.begin(), dps.end());
 
         // Set the dungeon difficulty
         LFGDungeonData const* dungeon = GetLFGDungeon(proposal.dungeonId);
