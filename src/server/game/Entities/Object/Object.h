@@ -31,6 +31,7 @@
 #include "ObjectGuid.h"
 #include "Optional.h"
 #include "Position.h"
+#include "UnitDefines.h"
 #include "UpdateData.h"
 #include "UpdateMask.h"
 #include "ObjectVisibilityContainer.h"
@@ -344,6 +345,9 @@ struct MovementInfo
     void RemoveMovementFlag(uint32 flag) { flags &= ~flag; }
     [[nodiscard]] bool HasMovementFlag(uint32 flag) const { return flags & flag; }
 
+    [[nodiscard]] UnitMoveType GetSpeedType() const { return GetSpeedType(flags); }
+    [[nodiscard]] static UnitMoveType GetSpeedType(uint32 moveFlags);
+
     [[nodiscard]] uint16 GetExtraMovementFlags() const { return flags2; }
     void AddExtraMovementFlag(uint16 flag) { flags2 |= flag; }
     [[nodiscard]] bool HasExtraMovementFlag(uint16 flag) const { return flags2 & flag; }
@@ -539,6 +543,7 @@ public:
     bool IsWithinDist3d(const Position* pos, float dist) const;
     [[nodiscard]] bool IsWithinDist2d(float x, float y, float dist) const;
     bool IsWithinDist2d(const Position* pos, float dist) const;
+    virtual bool IsWithinSightRange(Position const& pos, float dist) const;
     // use only if you will sure about placing both object at same map
     bool IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D = true, bool incOwnRadius = true, bool incTargetRadius = true) const;
     bool IsWithinDistInMap(WorldObject const* obj, float dist2compare, bool is3D = true, bool incOwnRadius = true, bool incTargetRadius = true) const;
@@ -630,6 +635,7 @@ public:
     GameObject* SummonGameObject(uint32 entry, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime, bool checkTransport = true, GOSummonType summonType = GO_SUMMON_TIMED_OR_CORPSE_DESPAWN);
     Creature*   SummonTrigger(float x, float y, float z, float ang, uint32 dur, bool setLevel = false, CreatureAI * (*GetAI)(Creature*) = nullptr);
     void SummonCreatureGroup(uint8 group, std::list<TempSummon*>* list = nullptr);
+    void SummonGameObjectGroup(uint8 group, std::list<GameObject*>* list = nullptr);
 
     [[nodiscard]] Creature*   FindNearestCreature(uint32 entry, float range, bool alive = true) const;
     [[nodiscard]] GameObject* FindNearestGameObject(uint32 entry, float range, bool onlySpawned = false) const;

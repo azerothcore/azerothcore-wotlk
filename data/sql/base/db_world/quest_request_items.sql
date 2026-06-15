@@ -1405,7 +1405,7 @@ INSERT INTO `quest_request_items` VALUES
 (1665,6,0,'I saw your fight with Bartleby. Nicely done! Did you get his mug?',12340),
 (1666,1,0,NULL,12340),
 (1667,6,6,'Do you have my badge? I don\'t want to think of the mischief Dead-tooth Jack could cause with it.',12340),
-(1678,1,0,'Have you been to Vejrek\'s hut, $N? Is that $R stink I smell on you?',12340),
+(1678,1,0,'Have you been to Vejrek\'s hut, $N? Is that troll stink I smell on you?',12340),
 (1679,1,0,'Did you make the switch?',12340),
 (1680,1,0,NULL,12340),
 (1681,1,0,'Have you entered Ironband\'s Compound? Did you find the umbral ore?',12340),
@@ -7805,4 +7805,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-07-19 12:09:31
+-- Dump completed on 2026-06-01 22:40:27
