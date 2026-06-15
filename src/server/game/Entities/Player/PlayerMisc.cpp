@@ -20,6 +20,7 @@
 #include "InstancePackets.h"
 #include "MapMgr.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "ScriptMgr.h"
 #include "WorldSession.h"
 
@@ -30,7 +31,7 @@
 void Player::UpdateSpeakTime(ChatFloodThrottle::Index index)
 {
     // ignore chat spam protection for GMs in any mode
-    if (!AccountMgr::IsPlayerAccount(GetSession()->GetSecurity()))
+    if (GetSession()->HasPermission(rbac::RBAC_PERM_SKIP_CHECK_CHAT_SPAM))
         return;
 
     uint32 limit, delay;
@@ -505,5 +506,18 @@ void Player::SendItemRetrievalMail(std::vector<std::pair<uint32, uint32>> mailIt
         draft.SendMailTo(trans, MailReceiver(this, GetGUID().GetCounter()), sender);
     }
 
+    CharacterDatabase.CommitTransaction(trans);
+}
+
+void Player::SendItemRetrievalMail(Item* item)
+{
+    if (!item)
+        return;
+
+    CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+    item->SaveToDB(trans);
+    MailDraft("Recovered Item", "We recovered a lost item in the twisting nether and noted that it was yours.$B$BPlease find said object enclosed.")
+        .AddItem(item)
+        .SendMailTo(trans, MailReceiver(this, GetGUID().GetCounter()), MailSender(MAIL_CREATURE, 34337 /* The Postmaster */));
     CharacterDatabase.CommitTransaction(trans);
 }

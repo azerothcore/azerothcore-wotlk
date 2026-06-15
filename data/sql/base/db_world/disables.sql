@@ -113,6 +113,7 @@ INSERT INTO `disables` VALUES
 (0,48541,64,'','','Disable LOS for Revitalize'),
 (0,48542,64,'','','Disable LOS for Revitalize'),
 (0,48543,64,'','','Disable LOS for Revitalize'),
+(0,49308,64,'0','0','Disable LoS for spell Utgarde Pinnacle Reset Check'),
 (0,50313,64,'0','0','Disable LOS for Spell Mole Machine Emerge'),
 (0,50439,64,'','','Ignore LOS on Script Cast Summon Image of Drakuru 05'),
 (0,50563,64,'','','Ignore LOS for Carve Stone'),
@@ -941,4 +942,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-29 17:53:50
+-- Dump completed on 2026-06-01 22:39:46

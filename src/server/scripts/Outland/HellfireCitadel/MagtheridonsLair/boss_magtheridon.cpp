@@ -70,26 +70,14 @@ enum Groups
     GROUP_EARLY_RELEASE_CHECK   = 0
 };
 
-enum Actions
-{
-    ACTION_INCREASE_HELLFIRE_CHANNELER_DEATH_COUNT  = 1,
-    ACTION_BANISH_SELF = 2
-};
-
 struct boss_magtheridon : public BossAI
 {
     boss_magtheridon(Creature* creature) : BossAI(creature, DATA_MAGTHERIDON)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    {    }
 
     void Reset() override
     {
         BossAI::Reset();
-        _channelersKilled = 0;
         _currentPhase = 0;
         _castingQuake = false;
         _recentlySpoken = false;
@@ -199,21 +187,19 @@ struct boss_magtheridon : public BossAI
 
     void DoAction(int32 action) override
     {
-        if (action == ACTION_INCREASE_HELLFIRE_CHANNELER_DEATH_COUNT)
+        if (action == ACTION_RELEASE_MAGTHERIDON)
         {
-            _channelersKilled++;
+            if (_magReleased)
+                return;
 
-            if (_channelersKilled >= 5 && !_magReleased)
+            Talk(SAY_EMOTE_FREE);
+            Talk(SAY_FREE);
+            scheduler.CancelGroup(GROUP_EARLY_RELEASE_CHECK); //cancel regular countdown
+            _magReleased = true;
+            scheduler.Schedule(3s, [this](TaskContext)
             {
-                Talk(SAY_EMOTE_FREE);
-                Talk(SAY_FREE);
-                scheduler.CancelGroup(GROUP_EARLY_RELEASE_CHECK); //cancel regular countdown
-                _magReleased = true;
-                scheduler.Schedule(3s, [this](TaskContext)
-                {
-                    ScheduleCombatEvents();
-                });
-            }
+                ScheduleCombatEvents();
+            });
         }
         else if (action == ACTION_BANISH_SELF)
         {
@@ -226,10 +212,6 @@ struct boss_magtheridon : public BossAI
     {
         BossAI::JustEngagedWith(who);
         Talk(SAY_EMOTE_BEGIN);
-
-        instance->DoForAllMinions(DATA_MAGTHERIDON, [&](Creature* creature) {
-            creature->SetInCombatWithZone();
-        });
 
         scheduler.Schedule(60s, GROUP_EARLY_RELEASE_CHECK, [this](TaskContext /*context*/)
         {
@@ -247,10 +229,11 @@ struct boss_magtheridon : public BossAI
 
     void UpdateAI(uint32 diff) override
     {
+        scheduler.Update(diff);
+
         if (!UpdateVictim())
             return;
 
-        scheduler.Update(diff);
         _interruptScheduler.Update(diff);
 
         if (_currentPhase != 1 && !_castingQuake)
@@ -264,7 +247,6 @@ private:
     bool _recentlySpoken;
     bool _magReleased;
     uint8 _currentPhase;
-    uint8 _channelersKilled;
     TaskScheduler _interruptScheduler;
 };
 

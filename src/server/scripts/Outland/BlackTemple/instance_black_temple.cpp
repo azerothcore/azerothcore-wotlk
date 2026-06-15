@@ -215,8 +215,9 @@ class spell_black_template_harpooners_mark_aura : public AuraScript
         GetUnitOwner()->GetCreaturesWithEntryInRange(creatureList, 80.0f, NPC_DRAGON_TURTLE);
         for (std::list<Creature*>::const_iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
         {
-            (*itr)->TauntApply(GetUnitOwner());
             (*itr)->AddThreat(GetUnitOwner(), 10000000.0f);
+            if ((*itr)->AI())
+                (*itr)->AI()->AttackStart(GetUnitOwner());
             _turtleSet.insert((*itr)->GetGUID());
         }
     }
@@ -226,7 +227,6 @@ class spell_black_template_harpooners_mark_aura : public AuraScript
         for (ObjectGuid const& guid : _turtleSet)
             if (Creature* turtle = ObjectAccessor::GetCreature(*GetUnitOwner(), guid))
             {
-                turtle->TauntFadeOut(GetUnitOwner());
                 turtle->AddThreat(GetUnitOwner(), -10000000.0f);
             }
     }
