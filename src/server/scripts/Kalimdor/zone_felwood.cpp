@@ -127,7 +127,7 @@ public:
 
     bool OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
     {
-        if (player->IsGameMaster() || !player->IsAlive())
+        if (!player->IsAlive())
             return false;
 
         // Handle Call Ancients event start - The area trigger summons 3 ancients

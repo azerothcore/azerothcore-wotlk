@@ -107,6 +107,7 @@ struct Cell
     template<class T> static void VisitObjects(float x, float y, Map* map, T& visitor, float radius);
 
     template<class T> static void VisitFarVisibleObjects(WorldObject const* obj, T& visitor, float radius);
+    template<class T> static void VisitFarVisibleObjects(float x, float y, Map* map, T& visitor, float radius);
 
 private:
     template<class T, class CONTAINER> void VisitCircle(TypeContainerVisitor<T, CONTAINER>&, Map&, CellCoord const&, CellCoord const&) const;

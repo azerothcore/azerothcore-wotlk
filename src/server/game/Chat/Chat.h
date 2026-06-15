@@ -156,7 +156,7 @@ public:
         return Acore::StringFormat(GetAcoreString(entry), std::forward<Args>(args)...);
     }
 
-    std::string const* GetModuleString(std::string module, uint32 id) const;
+    virtual std::string const* GetModuleString(std::string module, uint32 id) const;
 
     template<typename... Args>
     void PSendModuleSysMessage(std::string module, uint32 id, Args&&... args)
@@ -241,6 +241,7 @@ public:
     Player* GetPlayer() const;
     WorldSession* GetSession() { return m_session; }
     bool IsAvailable(uint32 securityLevel) const;
+    bool HasPermission(uint32 permissionId) const;
 protected:
     explicit ChatHandler() : m_session(nullptr), sentErrorMessage(false) {}      // for CLI subclass
 
@@ -259,6 +260,7 @@ public:
 
     // overwrite functions
     std::string GetAcoreString(uint32 entry) const override;
+    std::string const* GetModuleString(std::string module, uint32 id) const override;
     void SendSysMessage(std::string_view, bool escapeCharacters) override;
     bool ParseCommands(std::string_view str) override;
     std::string GetNameLink() const override;

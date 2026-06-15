@@ -1096,7 +1096,6 @@ INSERT INTO `spell_cooldown_overrides` VALUES
 (59894,3000,4000,0,0,'Ymirheim Spear Gun - Launch Spear'),
 (59992,8000,10000,0,0,'Freed Alliance Slave - Cleave'),
 (61139,15000,17000,0,0,'Thane Banahogg - Whirlwind'),
-(62306,4000,7000,0,0,'Salvaged Demolisher - Hurl Boulder'),
 (69565,15000,30000,0,0,'Freed Alliance Slave - Demoralizing Shout'),
 (69566,4000,5000,0,0,'Freed Alliance Slave - Heroic Strike'),
 (69570,4000,4000,0,0,'Freed Alliance Slave - Fireball'),
@@ -1114,4 +1113,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-29 17:54:35
+-- Dump completed on 2026-06-01 22:40:36

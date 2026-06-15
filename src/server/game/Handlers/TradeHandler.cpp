@@ -22,6 +22,7 @@
 #include "ObjectAccessor.h"
 #include "Opcodes.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "ScriptMgr.h"
 #include "SocialMgr.h"
 #include "Spell.h"
@@ -458,6 +459,37 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
             return;
         }
 
+        // cache traded item info before moving (pointers become invalid after moveItems if items merge into existing stacks)
+        struct TradedItemInfo
+        {
+            bool present = false;
+            std::string name;
+            uint32 entry = 0;
+            uint32 count = 0;
+        };
+        TradedItemInfo myItemsInfo[TRADE_SLOT_TRADED_COUNT];
+        TradedItemInfo hisItemsInfo[TRADE_SLOT_TRADED_COUNT];
+        std::string myItemsStr, hisItemsStr;
+        for (uint8 i = 0; i < TRADE_SLOT_TRADED_COUNT; ++i)
+        {
+            if (myItems[i])
+            {
+                myItemsInfo[i].present = true;
+                myItemsInfo[i].name = myItems[i]->GetTemplate()->Name1;
+                myItemsInfo[i].entry = myItems[i]->GetEntry();
+                myItemsInfo[i].count = myItems[i]->GetCount();
+                myItemsStr += Acore::StringFormat("{} (Entry:{}) x{}, ", myItemsInfo[i].name, myItemsInfo[i].entry, myItemsInfo[i].count);
+            }
+            if (hisItems[i])
+            {
+                hisItemsInfo[i].present = true;
+                hisItemsInfo[i].name = hisItems[i]->GetTemplate()->Name1;
+                hisItemsInfo[i].entry = hisItems[i]->GetEntry();
+                hisItemsInfo[i].count = hisItems[i]->GetCount();
+                hisItemsStr += Acore::StringFormat("{} (Entry:{}) x{}, ", hisItemsInfo[i].name, hisItemsInfo[i].entry, hisItemsInfo[i].count);
+            }
+        }
+
         // execute trade: 1. remove
         for (uint8 i = 0; i < TRADE_SLOT_TRADED_COUNT; ++i)
         {
@@ -493,6 +525,42 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& /*recvPacket*/)
         _player->ModifyMoney(his_trade->GetMoney());
         trader->ModifyMoney(-int32(his_trade->GetMoney()));
         trader->ModifyMoney(my_trade->GetMoney());
+
+        if (HasPermission(rbac::RBAC_PERM_LOG_GM_TRADE))
+        {
+            for (uint8 i = 0; i < TRADE_SLOT_TRADED_COUNT; ++i)
+            {
+                if (myItemsInfo[i].present)
+                    LOG_GM(GetAccountId(), "GM {} (Account: {}) traded item: {} (Entry: {} Count: {}) to {}",
+                        _player->GetName(), GetAccountId(),
+                        myItemsInfo[i].name, myItemsInfo[i].entry, myItemsInfo[i].count,
+                        trader->GetName());
+            }
+            if (my_trade->GetMoney() > 0)
+                LOG_GM(GetAccountId(), "GM {} (Account: {}) traded money: {} to {}",
+                    _player->GetName(), GetAccountId(), my_trade->GetMoney(), trader->GetName());
+        }
+        if (trader->GetSession()->HasPermission(rbac::RBAC_PERM_LOG_GM_TRADE))
+        {
+            for (uint8 i = 0; i < TRADE_SLOT_TRADED_COUNT; ++i)
+            {
+                if (hisItemsInfo[i].present)
+                    LOG_GM(trader->GetSession()->GetAccountId(), "GM {} (Account: {}) traded item: {} (Entry: {} Count: {}) to {}",
+                        trader->GetName(), trader->GetSession()->GetAccountId(),
+                        hisItemsInfo[i].name, hisItemsInfo[i].entry, hisItemsInfo[i].count,
+                        _player->GetName());
+            }
+            if (his_trade->GetMoney() > 0)
+                LOG_GM(trader->GetSession()->GetAccountId(), "GM {} (Account: {}) traded money: {} to {}",
+                    trader->GetName(), trader->GetSession()->GetAccountId(), his_trade->GetMoney(), _player->GetName());
+        }
+
+        // log completed trade
+        LOG_INFO("entities.player.trade", "Trade: Account: {} (IP: {}), Player [{}] ({}) traded with Player [{}] ({}): gave {} copper, received {} copper, gave item(s) [{}], received item(s) [{}]",
+            GetAccountId(), GetRemoteAddress(), _player->GetName(), _player->GetGUID().GetCounter(),
+            trader->GetName(), trader->GetGUID().GetCounter(),
+            my_trade->GetMoney(), his_trade->GetMoney(),
+            myItemsStr, hisItemsStr);
 
         if (my_spell)
             my_spell->prepare(&my_targets);
@@ -654,7 +722,8 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_TRADE) && pOther->GetTeamId() != _player->GetTeamId())
+    if (pOther->GetTeamId() != _player->GetTeamId() &&
+        !GetPlayer()->GetSession()->HasPermission(rbac::RBAC_PERM_ALLOW_TWO_SIDE_TRADE))
     {
         info.Status = TRADE_STATUS_WRONG_FACTION;
         SendTradeStatus(info);

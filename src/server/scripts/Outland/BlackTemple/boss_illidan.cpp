@@ -1101,16 +1101,29 @@ struct npc_maiev_illidan : public ScriptedAI
         instance = creature->GetInstanceScript();
     }
 
+    bool _outroActive{ false };
+
     void Reset() override
     {
+        if (_outroActive)
+            return;
         scheduler.CancelAll();
-        me->m_Events.KillAllEvents(true);
+        me->m_Events.KillAllEvents(false);
+    }
+
+    void JustExitedCombat() override
+    {
+        EngagementOver();
+        if (_outroActive)
+            return;
+        EnterEvadeMode(EVADE_REASON_NO_HOSTILES);
     }
 
     void DoAction(int32 param) override
     {
         if (param == ACTION_MAIEV_ENDING)
         {
+            _outroActive = true;
             scheduler.CancelAll();
             me->SetReactState(REACT_PASSIVE);
             DoStopAttack();
