@@ -7679,7 +7679,27 @@ SpellCastResult Spell::CheckItems(uint32* param1, uint32* param2)
                                     if (m_caster->HasAura(46699))
                                         break;                      // skip other checks
 
-                                    return SPELL_FAILED_NO_AMMO;
+                                    if (sWorld->getBoolConfig(CONFIG_ENABLE_INFINITEAMMO))
+                                    {
+                                        // Auto-assign ammo based on weapon type so CheckAmmoCompatibility passes
+                                        switch (pItem->GetTemplate()->SubClass)
+                                        {
+                                            case ITEM_SUBCLASS_WEAPON_BOW:
+                                            case ITEM_SUBCLASS_WEAPON_CROSSBOW:
+                                                m_caster->ToPlayer()->SetAmmo(41165); // Iceblade Arrow
+                                                break;
+                                            case ITEM_SUBCLASS_WEAPON_GUN:
+                                                m_caster->ToPlayer()->SetAmmo(41584); // Mammoth Cutters
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                        ammo = m_caster->ToPlayer()->GetUInt32Value(PLAYER_AMMO_ID);
+                                        if (!ammo)
+                                            return SPELL_FAILED_NO_AMMO;
+                                    }
+                                    else
+                                        return SPELL_FAILED_NO_AMMO;
                                 }
 
                                 ItemTemplate const* ammoProto = sObjectMgr->GetItemTemplate(ammo);
@@ -7689,17 +7709,31 @@ SpellCastResult Spell::CheckItems(uint32* param1, uint32* param2)
                                 if (ammoProto->Class != ITEM_CLASS_PROJECTILE)
                                     return SPELL_FAILED_NO_AMMO;
 
-                                // check ammo ws. weapon compatibility
+                                // check ammo vs. weapon compatibility; auto-correct type on weapon swap
                                 switch (pItem->GetTemplate()->SubClass)
                                 {
                                     case ITEM_SUBCLASS_WEAPON_BOW:
                                     case ITEM_SUBCLASS_WEAPON_CROSSBOW:
                                         if (ammoProto->SubClass != ITEM_SUBCLASS_ARROW)
+                                        {
+                                            if (sWorld->getBoolConfig(CONFIG_ENABLE_INFINITEAMMO))
+                                            {
+                                                m_caster->ToPlayer()->SetAmmo(41165);
+                                                break;
+                                            }
                                             return SPELL_FAILED_NO_AMMO;
+                                        }
                                         break;
                                     case ITEM_SUBCLASS_WEAPON_GUN:
                                         if (ammoProto->SubClass != ITEM_SUBCLASS_BULLET)
+                                        {
+                                            if (sWorld->getBoolConfig(CONFIG_ENABLE_INFINITEAMMO))
+                                            {
+                                                m_caster->ToPlayer()->SetAmmo(41584);
+                                                break;
+                                            }
                                             return SPELL_FAILED_NO_AMMO;
+                                        }
                                         break;
                                     default:
                                         return SPELL_FAILED_NO_AMMO;
@@ -7707,8 +7741,11 @@ SpellCastResult Spell::CheckItems(uint32* param1, uint32* param2)
 
                                 if (!m_caster->ToPlayer()->HasItemCount(ammo))
                                 {
-                                    m_caster->ToPlayer()->SetUInt32Value(PLAYER_AMMO_ID, 0);
-                                    return SPELL_FAILED_NO_AMMO;
+                                    if (!sWorld->getBoolConfig(CONFIG_ENABLE_INFINITEAMMO))
+                                    {
+                                        m_caster->ToPlayer()->SetUInt32Value(PLAYER_AMMO_ID, 0);
+                                        return SPELL_FAILED_NO_AMMO;
+                                    }
                                 }
                             };
                             break;
