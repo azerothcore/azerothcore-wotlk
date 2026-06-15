@@ -1,3 +1,4 @@
+-- DB update 2026_06_15_00 -> 2026_06_15_01
 --
 -- Ony 25man difficulty Tail Sweep
 DELETE FROM `spell_cone` WHERE `ID` = 69286;
