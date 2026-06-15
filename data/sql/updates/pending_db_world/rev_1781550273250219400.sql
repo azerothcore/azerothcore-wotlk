@@ -36,7 +36,7 @@ UPDATE `quest_template_addon` SET `BreadcrumbForQuestId` = 1062 WHERE `ID` = 106
 UPDATE `quest_template_addon` SET `BreadcrumbForQuestId` = 1131 WHERE `ID` = 1130; -- "Melor Sends Word" -> "Steelsnap"
 UPDATE `quest_template_addon` SET `BreadcrumbForQuestId` = 1133 WHERE `ID` = 1132; -- "Fiora Longears" -> "Journey to Astranaar"
 UPDATE `quest_template_addon` SET `BreadcrumbForQuestId` = 1200 WHERE `ID` = 1198; -- "In Search of Thaelrid" -> "Blackfathom Villainy"
-UPDATE `quest_template_addon` SET `BreadcrumbForQuestId` = 1301 WHERE `ID` = 1282; -- "They Call Him Smiling Jim" -> "James Hyal"
+UPDATE `quest_template_addon` SET `BreadcrumbForQuestId` = 11123 WHERE `ID` = 1282; -- "They Call Him Smiling Jim" -> "Inspecting the Ruins"
 UPDATE `quest_template_addon` SET `BreadcrumbForQuestId` = 1362 WHERE `ID` = 1361; -- "Regthar Deathgate" -> "The Kolkar of Desolace"
 UPDATE `quest_template_addon` SET `BreadcrumbForQuestId` = 1485 WHERE `ID` = 1470; -- "Piercing the Veil" -> "Vile Familiars"
 UPDATE `quest_template_addon` SET `BreadcrumbForQuestId` = 1504 WHERE `ID` = 1471; -- "The Binding" [1471] -> "The Binding" [1504]
