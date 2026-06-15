@@ -127,5 +127,6 @@ inline AI* GetBlackwingLairAI(T* obj)
 }
 
 #define RegisterBlackwingLairCreatureAI(ai_name) RegisterCreatureAIWithFactory(ai_name, GetBlackwingLairAI)
+#define RegisterBlackwingLairGameObjectAI(ai_name) RegisterGameObjectAIWithFactory(ai_name, GetBlackwingLairAI)
 
 #endif

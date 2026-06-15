@@ -352,12 +352,7 @@ class spell_cannibalize_heal : public SpellScript
 struct npc_hyjal_ground_trash : public ScriptedAI
 {
     npc_hyjal_ground_trash(Creature* creature) : ScriptedAI(creature)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    {    }
 
     void Reset() override
     {
@@ -574,12 +569,7 @@ struct npc_hyjal_ground_trash : public ScriptedAI
 struct npc_hyjal_gargoyle : public ScriptedAI
 {
     npc_hyjal_gargoyle(Creature* creature) : ScriptedAI(creature)
-    {
-        scheduler.SetValidator([this]
-            {
-                return !me->HasUnitState(UNIT_STATE_CASTING);
-            });
-    }
+    {    }
 
     void Reset() override
     {
@@ -648,12 +638,7 @@ struct npc_hyjal_gargoyle : public ScriptedAI
 struct npc_hyjal_frost_wyrm : public ScriptedAI
 {
     npc_hyjal_frost_wyrm(Creature* creature) : ScriptedAI(creature)
-    {
-        scheduler.SetValidator([this]
-            {
-                return !me->HasUnitState(UNIT_STATE_CASTING);
-            });
-    }
+    {    }
 
     void Reset() override
     {

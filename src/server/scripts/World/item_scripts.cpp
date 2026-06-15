@@ -16,7 +16,6 @@
  */
 
 #include "AreaDefines.h"
-#include "CreatureScript.h"
 #include "ItemScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -53,18 +52,25 @@ public:
                 if (player->GetZoneId() != AREA_ISLE_OF_QUEL_DANAS)
                     disabled = true;
                 break;
-            case 34475:
-                if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_ARCANE_CHARGES))
-                    Spell::SendCastResult(player, spellInfo, 1, SPELL_FAILED_NOT_ON_GROUND);
-                break;
         }
 
         // allow use in flight only
-        if (player->IsInFlight() && !disabled)
-            return false;
+        if (player->IsInFlight())
+        {
+            if (!disabled)
+                return false;	
+        }
+        else // error
+        {
+            if (itemId == 34475)
+            {
+                if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(SPELL_ARCANE_CHARGES))
+                    Spell::SendCastResult(player, spellInfo, 1, SPELL_FAILED_NOT_ON_GROUND);
+            }
+            else
+                player->SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW, item, nullptr);
+        }
 
-        // error
-        player->SendEquipError(EQUIP_ERR_CANT_DO_RIGHT_NOW, item, nullptr);
         return true;
     }
 };

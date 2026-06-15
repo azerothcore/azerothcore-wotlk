@@ -1121,6 +1121,11 @@ bool GameObject::LoadGameObjectFromDB(ObjectGuid::LowType spawnId, Map* map, boo
     m_goData = data;
     m_spawnId = spawnId;
 
+    // Set respawn compatibility mode based on spawn group flags
+    SpawnGroupTemplateData const* groupData = sObjectMgr->GetSpawnGroupData(data->spawnGroupId);
+    _respawnCompatibilityMode = sWorld->getBoolConfig(CONFIG_RESPAWN_FORCE_COMPATIBILITY_MODE)
+        || !groupData || (groupData->flags & SPAWNGROUP_FLAG_COMPATIBILITY_MODE);
+
     if (!Create(map->GenerateLowGuid<HighGuid::GameObject>(), entry, map, phaseMask, x, y, z, ang, data->rotation, animprogress, go_state, artKit))
         return false;
 
@@ -1703,7 +1708,7 @@ void GameObject::Use(Unit* user)
                 Player* player = user->ToPlayer();
 
                 if (info->camera.cinematicId)
-                    player->SendCinematicStart(info->camera.cinematicId);
+                    player->GetCinematicMgr().StartCinematic(info->camera.cinematicId);
 
                 if (info->camera.eventID)
                 {
@@ -2142,7 +2147,32 @@ void GameObject::SendCustomAnim(uint32 anim)
     SendMessageToSet(&data, true);
 }
 
-bool GameObject::IsInRange(float x, float y, float z, float radius) const
+bool GameObject::IsInRange2d(float x, float y, float radius) const
+{
+    GameObjectDisplayInfoEntry const* info = sGameObjectDisplayInfoStore.LookupEntry(m_goInfo->displayId);
+    if (!info)
+        return IsWithinDist2d(x, y, radius);
+
+    float sinA = std::sin(GetOrientation());
+    float cosA = cos(GetOrientation());
+    float dx = x - GetPositionX();
+    float dy = y - GetPositionY();
+    float dist = std::sqrt(dx * dx + dy * dy);
+    //! Check if the distance between the 2 objects is 0, can happen if both objects are on the same position.
+    //! The code below this check wont crash if dist is 0 because 0/0 in float operations is valid, and returns infinite
+    if (G3D::fuzzyEq(dist, 0.0f))
+        return true;
+
+    float scale = GetObjectScale();
+    float sinB = dx / dist;
+    float cosB = dy / dist;
+    dx = dist * (cosA * cosB + sinA * sinB);
+    dy = dist * (cosA * sinB - sinA * cosB);
+    return dx < (info->maxX * scale) + radius && dx >(info->minX * scale) - radius
+        && dy < (info->maxY * scale) + radius && dy >(info->minY * scale) - radius;
+}
+
+bool GameObject::IsInRange3d(float x, float y, float z, float radius) const
 {
     GameObjectDisplayInfoEntry const* info = sGameObjectDisplayInfoStore.LookupEntry(m_goInfo->displayId);
     if (!info)
@@ -2215,6 +2245,11 @@ void GameObject::UpdatePackedRotation()
     int64 y = int32(WorldRotation.y * PACK_YZ) * w_sign & PACK_YZ_MASK;
     int64 z = int32(WorldRotation.z * PACK_YZ) * w_sign & PACK_YZ_MASK;
     m_packedRotation = z | (y << 21) | (x << 42);
+}
+
+bool GameObject::IsWithinSightRange(Position const& pos, float dist) const
+{
+    return IsInRange2d(pos.GetPositionX(), pos.GetPositionY(), dist);
 }
 
 void GameObject::SetWorldRotation(G3D::Quat const& rot)
