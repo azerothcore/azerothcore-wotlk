@@ -67,10 +67,6 @@ struct boss_high_astromancer_solarian : public BossAI
     boss_high_astromancer_solarian(Creature* creature) : BossAI(creature, DATA_ASTROMANCER)
     {
         callForHelpRange = 105.0f;
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
     }
 
     void Reset() override
@@ -198,8 +194,8 @@ struct boss_high_astromancer_solarian : public BossAI
                 });
             }).Schedule(23s, [this](TaskContext)
             {
-                me->GetThreatMgr().ClearAllThreat();
                 me->SetReactState(REACT_AGGRESSIVE);
+                DoResetThreatList();
                 summons.DoForAllSummons([&](WorldObject* summon)
                 {
                     if (Creature* light = summon->ToCreature())

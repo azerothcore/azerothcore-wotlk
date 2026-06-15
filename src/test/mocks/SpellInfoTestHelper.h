@@ -121,6 +121,26 @@ public:
         return *this;
     }
 
+    TestSpellEntryHelper& WithEffectBasePoints(uint8 effIndex, int32 basePoints)
+    {
+        if (effIndex < MAX_SPELL_EFFECTS)
+            _entry.EffectBasePoints[effIndex] = basePoints;
+        return *this;
+    }
+
+    TestSpellEntryHelper& WithEffectDieSides(uint8 effIndex, int32 dieSides)
+    {
+        if (effIndex < MAX_SPELL_EFFECTS)
+            _entry.EffectDieSides[effIndex] = dieSides;
+        return *this;
+    }
+
+    TestSpellEntryHelper& WithAttributes(uint32 attr)
+    {
+        _entry.Attributes = attr;
+        return *this;
+    }
+
     SpellEntry const* Get() const
     {
         return &_entry;
@@ -204,6 +224,24 @@ public:
     SpellInfoBuilder& WithEffectTriggerSpell(uint8 effIndex, uint32 triggerSpell)
     {
         _entryHelper.WithEffectTriggerSpell(effIndex, triggerSpell);
+        return *this;
+    }
+
+    SpellInfoBuilder& WithEffectBasePoints(uint8 effIndex, int32 basePoints)
+    {
+        _entryHelper.WithEffectBasePoints(effIndex, basePoints);
+        return *this;
+    }
+
+    SpellInfoBuilder& WithEffectDieSides(uint8 effIndex, int32 dieSides)
+    {
+        _entryHelper.WithEffectDieSides(effIndex, dieSides);
+        return *this;
+    }
+
+    SpellInfoBuilder& WithAttributes(uint32 attr)
+    {
+        _entryHelper.WithAttributes(attr);
         return *this;
     }
 

@@ -1,0 +1,6 @@
+-- DB update 2026_03_28_00 -> 2026_03_28_01
+-- Achievement add command feedback strings
+DELETE FROM `acore_string` WHERE `entry` IN (30126, 30127);
+INSERT INTO `acore_string` (`entry`, `content_default`, `locale_koKR`, `locale_frFR`, `locale_deDE`, `locale_zhCN`, `locale_zhTW`, `locale_esES`, `locale_esMX`, `locale_ruRU`) VALUES
+(30126, 'Achievement {} ({}) added to player {}.', '업적 {} ({})이(가) 플레이어 {}에게 추가되었습니다.', 'Le haut fait {} ({}) a été ajouté au joueur {}.', 'Erfolg {} ({}) wurde Spieler {} hinzugefügt.', '成就 {} ({}) 已添加给玩家 {}。', '成就 {} ({}) 已新增給玩家 {}。', 'El logro {} ({}) ha sido añadido al jugador {}.', 'El logro {} ({}) ha sido añadido al jugador {}.', 'Достижение {} ({}) добавлено игроку {}.'),
+(30127, 'Achievement {} ({}) will be added to player {} on next login.', '업적 {} ({})이(가) 다음 로그인 시 플레이어 {}에게 추가됩니다.', 'Le haut fait {} ({}) sera ajouté au joueur {} à la prochaine connexion.', 'Erfolg {} ({}) wird Spieler {} beim nächsten Login hinzugefügt.', '成就 {} ({}) 将在玩家 {} 下次登录时添加。', '成就 {} ({}) 將在玩家 {} 下次登入時新增。', 'El logro {} ({}) será añadido al jugador {} en el próximo inicio de sesión.', 'El logro {} ({}) será añadido al jugador {} en el próximo inicio de sesión.', 'Достижение {} ({}) будет добавлено игроку {} при следующем входе.');

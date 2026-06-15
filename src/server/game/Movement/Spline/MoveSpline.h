@@ -64,6 +64,7 @@ namespace Movement
         //float           duration_mod_next;
         float           vertical_acceleration;
         float           initialOrientation;
+        float           velocity;
         int32           effect_start_time;
         int32           point_Idx;
         int32           point_Idx_offset;
@@ -85,6 +86,7 @@ namespace Movement
         [[nodiscard]] int32 Duration() const { return spline.length(); }
         [[nodiscard]] MySpline const& _Spline() const { return spline; }
         [[nodiscard]] int32 _currentSplineIdx() const { return point_Idx; }
+        [[nodiscard]] float Velocity() const { return velocity; }
         void _Finalize();
         void _Interrupt() { splineflags.done = true; }
 
@@ -120,6 +122,7 @@ namespace Movement
         [[nodiscard]] Vector3 FinalDestination() const { return Initialized() ? spline.getPoint(spline.last()) : Vector3(); }
         [[nodiscard]] Vector3 CurrentDestination() const { return Initialized() ? spline.getPoint(point_Idx + 1) : Vector3(); }
         [[nodiscard]] int32 currentPathIdx() const;
+        [[nodiscard]] int32 MaxPathIdx() const { return spline.last() - 1; }
 
         [[nodiscard]] bool HasAnimation() const { return splineflags.animation; }
         [[nodiscard]] uint8 GetAnimationType() const { return splineflags.animId; }

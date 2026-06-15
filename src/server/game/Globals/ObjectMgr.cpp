@@ -310,6 +310,10 @@ ObjectMgr::ObjectMgr():
     {
         _playerClassInfo[i] = nullptr;
     }
+
+    // Initialize default spawn groups
+    _spawnGroupDataStore[0] = {0, "Default Group", SPAWNGROUP_MAP_UNSET, SpawnGroupFlags(SPAWNGROUP_FLAG_SYSTEM)};
+    _spawnGroupDataStore[1] = {1, "Legacy Group", SPAWNGROUP_MAP_UNSET, SpawnGroupFlags(SPAWNGROUP_FLAG_SYSTEM | SPAWNGROUP_FLAG_COMPATIBILITY_MODE)};
 }
 
 ObjectMgr::~ObjectMgr()
@@ -522,18 +526,18 @@ void ObjectMgr::LoadCreatureTemplates()
 
 //                                                        0      1                   2                   3                   4            5            6     7        8
     QueryResult result = WorldDatabase.Query("SELECT entry, difficulty_entry_1, difficulty_entry_2, difficulty_entry_3, KillCredit1, KillCredit2, name, subname, IconName, "
-//                        9               10        11        12   13       14       15          16         17          18            19               20     21      22
-                         "gossip_menu_id, minlevel, maxlevel, exp, faction, npcflag, speed_walk, speed_run, speed_swim, speed_flight, detection_range, scale, `rank`, dmgschool, "
-//                        23              24              25               26            27             28          29          30           31            32
+//                        9               10        11        12   13       14       15          16         17          18            19               20      21
+                         "gossip_menu_id, minlevel, maxlevel, exp, faction, npcflag, speed_walk, speed_run, speed_swim, speed_flight, detection_range, `rank`, dmgschool, "
+//                        22              23              24               25            26             27          28          29           30            31
                          "DamageModifier, BaseAttackTime, RangeAttackTime, BaseVariance, RangeVariance, unit_class, unit_flags, unit_flags2, dynamicflags, family, "
-//                        33    34          35      36              37
+//                        32    33          34      35              36
                          "type, type_flags, lootid, pickpocketloot, skinloot, "
-//                        38              39         40       41       42      43            44          45        46          47
+//                        37              38         39       40       41      42            43          44        45          46
                          "PetSpellDataId, VehicleId, mingold, maxgold, AIName, MovementType, ctm.Ground, ctm.Swim, ctm.Flight, ctm.Rooted, "
-//                        48         49          50                         51           52              53            54             55                  56            57          58           59
-                         "ctm.Chase, ctm.Random, ctm.InteractionPauseTimer, HoverHeight, HealthModifier, ManaModifier, ArmorModifier, ExperienceModifier, RacialLeader, movementId, RegenHealth, mechanic_immune_mask, "
-//                        60                        61           62
-                         "spell_school_immune_mask, flags_extra, ScriptName "
+//                        47         48          49                         50           51              52            53             54                  55            56          57
+                         "ctm.Chase, ctm.Random, ctm.InteractionPauseTimer, HoverHeight, HealthModifier, ManaModifier, ArmorModifier, ExperienceModifier, RacialLeader, movementId, RegenHealth, "
+//                       58                     59           60
+                         "CreatureImmunitiesId, flags_extra, ScriptName "
                          "FROM creature_template ct LEFT JOIN creature_template_movement ctm ON ct.entry = ctm.CreatureId ORDER BY entry DESC;");
 
     if (!result)
@@ -619,24 +623,23 @@ void ObjectMgr::LoadCreatureTemplate(Field* fields, bool triggerHook)
     creatureTemplate.speed_swim       = fields[17].Get<float>();
     creatureTemplate.speed_flight     = fields[18].Get<float>();
     creatureTemplate.detection_range  = fields[19].Get<float>();
-    creatureTemplate.scale            = fields[20].Get<float>();
-    creatureTemplate.rank             = uint32(fields[21].Get<uint8>());
-    creatureTemplate.dmgschool        = uint32(fields[22].Get<int8>());
-    creatureTemplate.DamageModifier   = fields[23].Get<float>();
-    creatureTemplate.BaseAttackTime   = fields[24].Get<uint32>();
-    creatureTemplate.RangeAttackTime  = fields[25].Get<uint32>();
-    creatureTemplate.BaseVariance     = fields[26].Get<float>();
-    creatureTemplate.RangeVariance    = fields[27].Get<float>();
-    creatureTemplate.unit_class       = uint32(fields[28].Get<uint8>());
-    creatureTemplate.unit_flags       = fields[29].Get<uint32>();
-    creatureTemplate.unit_flags2      = fields[30].Get<uint32>();
-    creatureTemplate.dynamicflags     = fields[31].Get<uint32>();
-    creatureTemplate.family           = uint32(fields[32].Get<uint8>());
-    creatureTemplate.type             = uint32(fields[33].Get<uint8>());
-    creatureTemplate.type_flags       = fields[34].Get<uint32>();
-    creatureTemplate.lootid           = fields[35].Get<uint32>();
-    creatureTemplate.pickpocketLootId = fields[36].Get<uint32>();
-    creatureTemplate.SkinLootId       = fields[37].Get<uint32>();
+    creatureTemplate.rank             = uint32(fields[20].Get<uint8>());
+    creatureTemplate.dmgschool        = uint32(fields[21].Get<int8>());
+    creatureTemplate.DamageModifier   = fields[22].Get<float>();
+    creatureTemplate.BaseAttackTime   = fields[23].Get<uint32>();
+    creatureTemplate.RangeAttackTime  = fields[24].Get<uint32>();
+    creatureTemplate.BaseVariance     = fields[25].Get<float>();
+    creatureTemplate.RangeVariance    = fields[26].Get<float>();
+    creatureTemplate.unit_class       = uint32(fields[27].Get<uint8>());
+    creatureTemplate.unit_flags       = fields[28].Get<uint32>();
+    creatureTemplate.unit_flags2      = fields[29].Get<uint32>();
+    creatureTemplate.dynamicflags     = fields[30].Get<uint32>();
+    creatureTemplate.family           = uint32(fields[31].Get<uint8>());
+    creatureTemplate.type             = uint32(fields[32].Get<uint8>());
+    creatureTemplate.type_flags       = fields[33].Get<uint32>();
+    creatureTemplate.lootid           = fields[34].Get<uint32>();
+    creatureTemplate.pickpocketLootId = fields[35].Get<uint32>();
+    creatureTemplate.SkinLootId       = fields[36].Get<uint32>();
 
     for (uint8 i = SPELL_SCHOOL_HOLY; i < MAX_SPELL_SCHOOL; ++i)
     {
@@ -648,49 +651,56 @@ void ObjectMgr::LoadCreatureTemplate(Field* fields, bool triggerHook)
         creatureTemplate.spells[i] = 0;
     }
 
-    creatureTemplate.PetSpellDataId = fields[38].Get<uint32>();
-    creatureTemplate.VehicleId      = fields[39].Get<uint32>();
-    creatureTemplate.mingold        = fields[40].Get<uint32>();
-    creatureTemplate.maxgold        = fields[41].Get<uint32>();
-    creatureTemplate.AIName         = fields[42].Get<std::string>();
-    creatureTemplate.MovementType   = uint32(fields[43].Get<uint8>());
-    if (!fields[44].IsNull())
+    creatureTemplate.PetSpellDataId = fields[37].Get<uint32>();
+    creatureTemplate.VehicleId      = fields[38].Get<uint32>();
+    creatureTemplate.mingold        = fields[39].Get<uint32>();
+    creatureTemplate.maxgold        = fields[40].Get<uint32>();
+    creatureTemplate.AIName         = fields[41].Get<std::string>();
+    creatureTemplate.MovementType   = uint32(fields[42].Get<uint8>());
+    if (!fields[43].IsNull())
     {
-        creatureTemplate.Movement.Ground = static_cast<CreatureGroundMovementType>(fields[44].Get<uint8>());
+        creatureTemplate.Movement.Ground = static_cast<CreatureGroundMovementType>(fields[43].Get<uint8>());
     }
 
-    creatureTemplate.Movement.Swim = fields[45].Get<bool>();
-    if (!fields[46].IsNull())
+    creatureTemplate.Movement.Swim = fields[44].Get<bool>();
+    if (!fields[45].IsNull())
     {
-        creatureTemplate.Movement.Flight = static_cast<CreatureFlightMovementType>(fields[46].Get<uint8>());
+        creatureTemplate.Movement.Flight = static_cast<CreatureFlightMovementType>(fields[45].Get<uint8>());
     }
 
-    creatureTemplate.Movement.Rooted = fields[47].Get<bool>();
+    creatureTemplate.Movement.Rooted = fields[46].Get<bool>();
+    if (!fields[47].IsNull())
+    {
+        creatureTemplate.Movement.Chase = static_cast<CreatureChaseMovementType>(fields[47].Get<uint8>());
+    }
     if (!fields[48].IsNull())
     {
-        creatureTemplate.Movement.Chase = static_cast<CreatureChaseMovementType>(fields[48].Get<uint8>());
+        creatureTemplate.Movement.Random = static_cast<CreatureRandomMovementType>(fields[48].Get<uint8>());
     }
     if (!fields[49].IsNull())
     {
-        creatureTemplate.Movement.Random = static_cast<CreatureRandomMovementType>(fields[49].Get<uint8>());
-    }
-    if (!fields[50].IsNull())
-    {
-        creatureTemplate.Movement.InteractionPauseTimer = fields[50].Get<uint32>();
+        creatureTemplate.Movement.InteractionPauseTimer = fields[49].Get<uint32>();
     }
 
-    creatureTemplate.HoverHeight           = fields[51].Get<float>();
-    creatureTemplate.ModHealth             = fields[52].Get<float>();
-    creatureTemplate.ModMana               = fields[53].Get<float>();
-    creatureTemplate.ModArmor              = fields[54].Get<float>();
-    creatureTemplate.ModExperience         = fields[55].Get<float>();
-    creatureTemplate.RacialLeader          = fields[56].Get<bool>();
-    creatureTemplate.movementId            = fields[57].Get<uint32>();
-    creatureTemplate.RegenHealth           = fields[58].Get<bool>();
-    creatureTemplate.MechanicImmuneMask    = fields[59].Get<uint32>();
-    creatureTemplate.SpellSchoolImmuneMask = fields[60].Get<uint8>();
-    creatureTemplate.flags_extra           = fields[61].Get<uint32>();
-    creatureTemplate.ScriptID              = GetScriptId(fields[62].Get<std::string>());
+    creatureTemplate.HoverHeight           = fields[50].Get<float>();
+    creatureTemplate.ModHealth             = fields[51].Get<float>();
+    creatureTemplate.ModMana               = fields[52].Get<float>();
+    creatureTemplate.ModArmor              = fields[53].Get<float>();
+    creatureTemplate.ModExperience         = fields[54].Get<float>();
+    creatureTemplate.RacialLeader          = fields[55].Get<bool>();
+    creatureTemplate.movementId            = fields[56].Get<uint32>();
+    creatureTemplate.RegenHealth           = fields[57].Get<bool>();
+    creatureTemplate.CreatureImmunitiesId  = fields[58].Get<int32>();
+    creatureTemplate.flags_extra           = fields[59].Get<uint32>();
+    creatureTemplate.ScriptID              = GetScriptId(fields[60].Get<std::string>());
+
+    // Warn about deprecated immunity flags that should be moved to `creature_immunities` table
+    if (creatureTemplate.flags_extra & CREATURE_FLAG_EXTRA_NO_TAUNT)
+        LOG_WARN("server.loading", "Creature (Entry: {}) has deprecated flags_extra bit NO_TAUNT (0x100) set. This will be migrated to the `creature_immunities` table in a future update.", entry);
+    if (creatureTemplate.flags_extra & CREATURE_FLAG_EXTRA_AVOID_AOE)
+        LOG_WARN("server.loading", "Creature (Entry: {}) has deprecated flags_extra bit AVOID_AOE (0x400000) set. This will be migrated to the `creature_immunities` table in a future update.", entry);
+    if (creatureTemplate.flags_extra & CREATURE_FLAG_EXTRA_IMMUNITY_KNOCKBACK)
+        LOG_WARN("server.loading", "Creature (Entry: {}) has deprecated flags_extra bit IMMUNITY_KNOCKBACK (0x40000000) set. This will be migrated to the `creature_immunities` table in a future update.", entry);
 
     // useful if the creature template load is being triggered from outside this class
     if (triggerHook)
@@ -1885,7 +1895,10 @@ uint32 ObjectMgr::GetModelForShapeshift(ShapeshiftForm form, Player* player) con
     else
         customizationID = player->GetByteValue(PLAYER_BYTES, 0); // Use Skin Color
 
-    auto itr = _playerShapeshiftModel.find(std::make_tuple(form, player->getRace(), customizationID, player->getGender()));
+    // getGender() tracks the active display model; real gender lives in PLAYER_BYTES_3
+    uint8 gender = player->GetByteValue(PLAYER_BYTES_3, PLAYER_BYTES_3_OFFSET_GENDER);
+
+    auto itr = _playerShapeshiftModel.find(std::make_tuple(form, player->getRace(), customizationID, gender));
     if (itr != _playerShapeshiftModel.end())
         return itr->second; // Explicit combination
 
@@ -1893,7 +1906,7 @@ uint32 ObjectMgr::GetModelForShapeshift(ShapeshiftForm form, Player* player) con
     if (itr != _playerShapeshiftModel.end())
         return itr->second; // Combination applied to both genders
 
-    itr = _playerShapeshiftModel.find(std::make_tuple(form, player->getRace(), 255, player->getGender()));
+    itr = _playerShapeshiftModel.find(std::make_tuple(form, player->getRace(), 255, gender));
     if (itr != _playerShapeshiftModel.end())
         return itr->second; // Default gender-dependent model
 
@@ -2371,6 +2384,7 @@ void ObjectMgr::LoadCreatures()
             continue;
         }
         CreatureData& data      = _creatureDataStore[spawnId];
+        data.spawnId            = spawnId;
         data.id1                = id1;
         data.id2                = id2;
         data.id3                = id3;
@@ -2394,6 +2408,7 @@ void ObjectMgr::LoadCreatures()
         data.unit_flags         = fields[21].Get<uint32>();
         data.dynamicflags       = fields[22].Get<uint32>();
         data.ScriptId           = GetScriptId(fields[23].Get<std::string>());
+        data.spawnGroupId       = 0;
 
         if (!data.ScriptId)
             data.ScriptId = cInfo->ScriptID;
@@ -2410,9 +2425,14 @@ void ObjectMgr::LoadCreatures()
             data.spawntimesecs = 14 * DAY;
 
         // Skip spawnMask check for transport maps
-        if (!_transportMaps.count(data.mapid) && data.spawnMask & ~spawnMasks[data.mapid])
-            LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: {}) that have wrong spawn mask {} including not supported difficulty modes for map (Id: {}).",
-                spawnId, data.spawnMask, data.mapid);
+        if (!_transportMaps.count(data.mapid))
+        {
+            if (data.spawnMask & ~spawnMasks[data.mapid])
+                LOG_ERROR("sql.sql", "Table `creature` have creature (SpawnId: {}) that have wrong spawn mask {} including not supported difficulty modes for map (Id: {}).",
+                    spawnId, data.spawnMask, data.mapid);
+        }
+        else
+            data.spawnGroupId = 1; // force compatibility group for transport spawns
 
         bool ok = true;
         for (uint32 diff = 0; diff < MAX_DIFFICULTY - 1 && ok; ++diff)
@@ -2572,6 +2592,7 @@ CreatureData const* ObjectMgr::LoadCreatureDataFromDB(ObjectGuid::LowType spawnI
     creatureData.unit_flags       = fields[19].Get<uint32>();
     creatureData.dynamicflags     = fields[20].Get<uint32>();
     creatureData.ScriptId         = GetScriptId(fields[21].Get<std::string>());
+    creatureData.spawnGroupId     = 0;
 
     if (!creatureData.ScriptId)
         creatureData.ScriptId = cInfo->ScriptID;
@@ -2737,6 +2758,7 @@ ObjectGuid::LowType ObjectMgr::AddGOData(uint32 entry, uint32 mapId, float x, fl
     ObjectGuid::LowType spawnId = GenerateGameObjectSpawnId();
 
     GameObjectData& data = NewGOData(spawnId);
+    data.spawnId        = spawnId;
     data.id             = entry;
     data.mapid          = mapId;
     data.posX           = x;
@@ -2754,6 +2776,7 @@ ObjectGuid::LowType ObjectMgr::AddGOData(uint32 entry, uint32 mapId, float x, fl
     data.phaseMask      = PHASEMASK_NORMAL;
     data.artKit         = goinfo->type == GAMEOBJECT_TYPE_CAPTURE_POINT ? 21 : 0;
     data.dbData = false;
+    data.spawnGroupId   = 0;
 
     AddGameobjectToGrid(spawnId, &data);
 
@@ -2789,6 +2812,7 @@ ObjectGuid::LowType ObjectMgr::AddCreData(uint32 entry, uint32 mapId, float x, f
 
     ObjectGuid::LowType spawnId = GenerateCreatureSpawnId();
     CreatureData& data = NewOrExistCreatureData(spawnId);
+    data.spawnId = spawnId;
     data.spawnMask = spawnId;
     data.id1 = entry;
     data.id2 = 0;
@@ -2897,6 +2921,7 @@ void ObjectMgr::LoadGameobjects()
 
         GameObjectData& data = _gameObjectDataStore[guid];
 
+        data.spawnId        = guid;
         data.id             = entry;
         data.mapid          = fields[2].Get<uint16>();
         data.posX           = fields[3].Get<float>();
@@ -2909,6 +2934,7 @@ void ObjectMgr::LoadGameobjects()
         data.rotation.w     = fields[10].Get<float>();
         data.spawntimesecs  = fields[11].Get<int32>();
         data.ScriptId       = GetScriptId(fields[18].Get<std::string>());
+        data.spawnGroupId   = 0;
         if (!data.ScriptId)
             data.ScriptId = gInfo->ScriptId;
 
@@ -2937,8 +2963,13 @@ void ObjectMgr::LoadGameobjects()
 
         data.spawnMask      = fields[14].Get<uint8>();
 
-        if (!_transportMaps.count(data.mapid) && data.spawnMask & ~spawnMasks[data.mapid])
-            LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) that has wrong spawn mask {} including not supported difficulty modes for map (Id: {}), skip", guid, data.id, data.spawnMask, data.mapid);
+        if (!_transportMaps.count(data.mapid))
+        {
+            if (data.spawnMask & ~spawnMasks[data.mapid])
+                LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) that has wrong spawn mask {} including not supported difficulty modes for map (Id: {}), skip", guid, data.id, data.spawnMask, data.mapid);
+        }
+        else
+            data.spawnGroupId = 1; // force compatibility group for transport spawns
 
         data.phaseMask      = fields[15].Get<uint32>();
         int16 gameEvent     = fields[16].Get<int16>();
@@ -3304,12 +3335,14 @@ void ObjectMgr::LoadItemTemplates()
         itemTemplate.ContainerSlots            = uint32(fields[26].Get<uint8>());
 
         uint8 statsCount = 0;
-        while (statsCount < MAX_ITEM_PROTO_STATS)
+        uint8 statsIterator = 0;
+        while (statsIterator < MAX_ITEM_PROTO_STATS)
         {
-            uint32 statType = uint32(fields[27 + statsCount * 2].Get<uint8>());
-            int32 statValue = fields[28 + statsCount * 2].Get<int32>();
-            if (statType == 0)
-                break;
+            uint32 statType = uint32(fields[27 + statsIterator * 2].Get<uint8>());
+            int32 statValue = fields[28 + statsIterator * 2].Get<int32>();
+            statsIterator++;
+            if (statValue == 0)
+                continue;
 
             itemTemplate.ItemStat[statsCount].ItemStatType = statType;
             itemTemplate.ItemStat[statsCount].ItemStatValue = statValue;
@@ -7160,6 +7193,11 @@ void ObjectMgr::LoadAreaTriggerScripts()
     LOG_INFO("server.loading", " ");
 }
 
+uint32 ObjectMgr::GetNearestTaxiNode(WorldLocation const& loc, uint32 teamId)
+{
+    return GetNearestTaxiNode(loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ(), loc.GetMapId(), teamId);
+}
+
 uint32 ObjectMgr::GetNearestTaxiNode(float x, float y, float z, uint32 mapid, uint32 teamId)
 {
     bool found = false;
@@ -8672,6 +8710,186 @@ void ObjectMgr::DeleteGOData(ObjectGuid::LowType guid)
     _gameObjectDataStore.erase(guid);
 }
 
+SpawnData const* ObjectMgr::GetSpawnData(SpawnObjectType type, ObjectGuid::LowType spawnId) const
+{
+    switch (type)
+    {
+        case SPAWN_TYPE_CREATURE:
+            return GetCreatureData(spawnId);
+        case SPAWN_TYPE_GAMEOBJECT:
+            return GetGameObjectData(spawnId);
+        default:
+            return nullptr;
+    }
+}
+
+void ObjectMgr::LoadSpawnGroupTemplates()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _spawnGroupDataStore.clear();
+
+    //                                               0        1          2
+    QueryResult result = WorldDatabase.Query("SELECT groupId, groupName, groupFlags FROM spawn_group_template");
+
+    if (result)
+    {
+        do
+        {
+            Field* fields = result->Fetch();
+            uint32 groupId = fields[0].Get<uint32>();
+            SpawnGroupTemplateData& group = _spawnGroupDataStore[groupId];
+            group.groupId = groupId;
+            group.name = fields[1].Get<std::string>();
+            group.mapId = SPAWNGROUP_MAP_UNSET;
+            uint32 flags = fields[2].Get<uint32>();
+            if (flags & ~uint32(SPAWNGROUP_FLAG_ALL))
+            {
+                flags &= uint32(SPAWNGROUP_FLAG_ALL);
+                LOG_ERROR("sql.sql", "Invalid spawn group flag {} on group ID {} ({}), reduced to valid flags {}.",
+                    fields[2].Get<uint32>(), groupId, group.name, flags);
+            }
+            if ((flags & SPAWNGROUP_FLAG_SYSTEM) && (flags & SPAWNGROUP_FLAG_MANUAL_SPAWN))
+            {
+                flags &= ~SPAWNGROUP_FLAG_MANUAL_SPAWN;
+                LOG_ERROR("sql.sql", "System spawn group {} ({}) has invalid manual spawn flag. Ignored.", groupId, group.name);
+            }
+            group.flags = SpawnGroupFlags(flags);
+        } while (result->NextRow());
+    }
+
+    if (_spawnGroupDataStore.find(0) == _spawnGroupDataStore.end())
+    {
+        LOG_ERROR("sql.sql", "Default spawn group (index 0) is missing from DB! Manually inserted.");
+        SpawnGroupTemplateData& data = _spawnGroupDataStore[0];
+        data.groupId = 0;
+        data.name = "Default Group";
+        data.mapId = SPAWNGROUP_MAP_UNSET;
+        data.flags = SpawnGroupFlags(SPAWNGROUP_FLAG_SYSTEM);
+    }
+    if (_spawnGroupDataStore.find(1) == _spawnGroupDataStore.end())
+    {
+        LOG_ERROR("sql.sql", "Default legacy spawn group (index 1) is missing from DB! Manually inserted.");
+        SpawnGroupTemplateData& data = _spawnGroupDataStore[1];
+        data.groupId = 1;
+        data.name = "Legacy Group";
+        data.mapId = SPAWNGROUP_MAP_UNSET;
+        data.flags = SpawnGroupFlags(SPAWNGROUP_FLAG_SYSTEM | SPAWNGROUP_FLAG_COMPATIBILITY_MODE);
+    }
+
+    LOG_INFO("server.loading", ">> Loaded {} spawn group templates in {} ms", _spawnGroupDataStore.size(), GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
+}
+
+void ObjectMgr::LoadSpawnGroups()
+{
+    uint32 oldMSTime = getMSTime();
+
+    // Reset prior state for hot-reload support
+    // Preserve the forced legacy group for spawns on transport maps (set in LoadCreatures/LoadGameobjects).
+    _spawnGroupMapStore.clear();
+    for (auto& [id, data] : _creatureDataStore)
+        data.spawnGroupId = _transportMaps.count(data.mapid) ? 1 : 0;
+    for (auto& [id, data] : _gameObjectDataStore)
+        data.spawnGroupId = _transportMaps.count(data.mapid) ? 1 : 0;
+
+    //                                               0        1          2
+    QueryResult result = WorldDatabase.Query("SELECT groupId, spawnType, spawnId FROM spawn_group");
+
+    if (!result)
+    {
+        LOG_INFO("server.loading", ">> Loaded 0 spawn group members. DB table `spawn_group` is empty.");
+        LOG_INFO("server.loading", " ");
+        return;
+    }
+
+    uint32 numMembers = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+        uint32 groupId = fields[0].Get<uint32>();
+        uint32 type = fields[1].Get<uint8>();
+        if (type >= SPAWN_TYPE_MAX)
+        {
+            LOG_ERROR("sql.sql", "Spawn data with invalid type {} listed for spawn group {}. Skipped.", type, groupId);
+            continue;
+        }
+        SpawnObjectType spawnType = SpawnObjectType(type);
+        ObjectGuid::LowType spawnId = fields[2].Get<uint32>();
+
+        SpawnData const* data = GetSpawnData(spawnType, spawnId);
+        if (!data)
+        {
+            LOG_ERROR("sql.sql", "Spawn data with ID ({},{}) not found, but is listed as a member of spawn group {}!",
+                uint32(spawnType), spawnId, groupId);
+            continue;
+        }
+        if (data->spawnGroupId)
+        {
+            LOG_ERROR("sql.sql", "Spawn with ID ({},{}) is listed as a member of spawn group {}, but is already a member of spawn group {}. Skipping.",
+                uint32(spawnType), spawnId, groupId, data->spawnGroupId);
+            continue;
+        }
+
+        auto it = _spawnGroupDataStore.find(groupId);
+        if (it == _spawnGroupDataStore.end())
+        {
+            LOG_ERROR("sql.sql", "Spawn group {} assigned to spawn ID ({},{}), but group is not found!", groupId, uint32(spawnType), spawnId);
+            continue;
+        }
+
+        SpawnGroupTemplateData& groupTemplate = it->second;
+        if (groupTemplate.mapId == SPAWNGROUP_MAP_UNSET)
+            groupTemplate.mapId = data->mapid;
+        else if (groupTemplate.mapId != data->mapid && !(groupTemplate.flags & SPAWNGROUP_FLAG_SYSTEM))
+        {
+            LOG_ERROR("sql.sql", "Spawn group {} has map ID {}, but spawn ({},{}) has map id {} - spawn NOT added to group!",
+                groupId, groupTemplate.mapId, uint32(spawnType), spawnId, data->mapid);
+            continue;
+        }
+
+        // Warn if spawn is also in a pool (non-system groups and pools are mutually exclusive)
+        if (!(groupTemplate.flags & SPAWNGROUP_FLAG_SYSTEM))
+        {
+            uint32 poolId = 0;
+            if (spawnType == SPAWN_TYPE_CREATURE)
+                poolId = sPoolMgr->IsPartOfAPool<Creature>(spawnId);
+            else if (spawnType == SPAWN_TYPE_GAMEOBJECT)
+                poolId = sPoolMgr->IsPartOfAPool<GameObject>(spawnId);
+
+            if (poolId)
+                LOG_WARN("sql.sql", "Spawn ({},{}) is a member of spawn group {} and also part of pool {}. This may cause issues!",
+                    uint32(spawnType), spawnId, groupId, poolId);
+        }
+
+        const_cast<SpawnData*>(data)->spawnGroupId = groupId;
+        if (!(groupTemplate.flags & SPAWNGROUP_FLAG_SYSTEM))
+            _spawnGroupMapStore.emplace(groupId, data);
+        ++numMembers;
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} spawn group members in {} ms", numMembers, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
+}
+
+void ObjectMgr::OnDeleteSpawnData(SpawnData const* data)
+{
+    auto templateIt = _spawnGroupDataStore.find(data->spawnGroupId);
+    ASSERT(templateIt != _spawnGroupDataStore.end(), "Spawn data is being deleted and has invalid spawn group index {}!", data->spawnGroupId);
+    if (templateIt->second.flags & SPAWNGROUP_FLAG_SYSTEM)
+        return;
+
+    auto pair = _spawnGroupMapStore.equal_range(data->spawnGroupId);
+    for (auto it = pair.first; it != pair.second; ++it)
+    {
+        if (it->second != data)
+            continue;
+        _spawnGroupMapStore.erase(it);
+        return;
+    }
+    ASSERT(false, "Spawn data being removed is member of spawn group {}, but not found in lookup table!", data->spawnGroupId);
+}
+
 void ObjectMgr::LoadQuestRelationsHelper(QuestRelations& map, std::string const& table, bool starter, bool go)
 {
     uint32 oldMSTime = getMSTime();
@@ -8977,6 +9195,73 @@ void ObjectMgr::AddProfanityPlayerName(std::string const& name)
         stmt->SetData(0, name);
         CharacterDatabase.Execute(stmt);
     }
+}
+
+void ObjectMgr::LoadChatFilter()
+{
+    uint32 oldMSTime = getMSTime();
+
+    _chatFilterAutomaton.reset();                               // need for reload case
+
+    CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAT_FILTER);
+    PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+    if (!result)
+    {
+        LOG_WARN("server.loading", ">> Loaded 0 chat filter words. DB table `chat_filter` is empty!");
+        LOG_INFO("server.loading", " ");
+        return;
+    }
+
+    auto automaton = std::make_unique<Acore::AhoCorasick<wchar_t>>();
+    uint32 count = 0;
+
+    do
+    {
+        Field* fields = result->Fetch();
+        std::string word = fields[1].Get<std::string>();
+
+        if (word.empty())
+            continue;
+
+        std::wstring wstr;
+        if (!Utf8toWStr(word, wstr))
+        {
+            LOG_ERROR("sql.sql", "Table `chat_filter` has invalid word: {}", word);
+            continue;
+        }
+
+        wstrToLower(wstr);
+
+        if (wstr.empty())
+            continue;
+
+        automaton->Insert(wstr);
+        ++count;
+    } while (result->NextRow());
+
+    if (count > 0)
+    {
+        automaton->Build();
+        _chatFilterAutomaton = std::move(automaton);
+    }
+
+    LOG_INFO("server.loading", ">> Loaded {} chat filter words in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
+}
+
+bool ObjectMgr::IsChatFiltered(std::string_view text) const
+{
+    if (!_chatFilterAutomaton || text.empty())
+        return false;
+
+    std::wstring wtext;
+    if (!Utf8toWStr(text, wtext))
+        return false;
+
+    wstrToLower(wtext);
+
+    return _chatFilterAutomaton->ContainsAny(wtext);
 }
 
 enum LanguageType
@@ -9719,6 +10004,7 @@ void ObjectMgr::LoadTrainers()
 
     // For reload case
     _trainers.clear();
+    _classTrainers.clear();
 
     std::unordered_map<int32, std::vector<Trainer::Spell>> spellsByTrainer;
     if (QueryResult trainerSpellsResult = WorldDatabase.Query("SELECT TrainerId, SpellId, MoneyCost, ReqSkillLine, ReqSkillRank, ReqAbility1, ReqAbility2, ReqAbility3, ReqLevel FROM trainer_spell"))
@@ -9795,7 +10081,18 @@ void ObjectMgr::LoadTrainers()
                 spellsByTrainer.erase(spellsItr);
             }
 
-            _trainers.emplace(std::piecewise_construct, std::forward_as_tuple(trainerId), std::forward_as_tuple(trainerId, trainerType, requirement, std::move(greeting), std::move(spells)));
+            auto [it, isNew] = _trainers.emplace(std::piecewise_construct, std::forward_as_tuple(trainerId), std::forward_as_tuple(trainerId, trainerType, requirement, std::move(greeting), std::move(spells)));
+            ASSERT(isNew);
+            if (trainerType == Trainer::Type::Class)
+            {
+                if (!requirement || requirement >= MAX_CLASSES)
+                    LOG_ERROR("sql.sql", "Table `trainer` has invalid class requirement for trainer {}, ignoring");
+                else
+                {
+                    uint8 classId = static_cast<uint8>(requirement);
+                    _classTrainers[classId].push_back(&it->second);
+                }
+            }
         } while (trainersResult->NextRow());
     }
 
@@ -10431,6 +10728,11 @@ CreatureBaseStats const* ObjectMgr::GetCreatureBaseStats(uint8 level, uint8 unit
             BaseMana = 0;
             AttackPower = 0;
             RangedAttackPower = 0;
+            Strength = 0;
+            Agility = 0;
+            Stamina = 0;
+            Intellect = 0;
+            Spirit = 0;
         }
     };
     static const DefaultCreatureBaseStats defStats;
@@ -10441,7 +10743,7 @@ void ObjectMgr::LoadCreatureClassLevelStats()
 {
     uint32 oldMSTime = getMSTime();
 
-    QueryResult result = WorldDatabase.Query("SELECT level, class, basehp0, basehp1, basehp2, basemana, basearmor, attackpower, rangedattackpower, damage_base, damage_exp1, damage_exp2 FROM creature_classlevelstats");
+    QueryResult result = WorldDatabase.Query("SELECT level, class, basehp0, basehp1, basehp2, basemana, basearmor, attackpower, rangedattackpower, damage_base, damage_exp1, damage_exp2, Strength, Agility, Stamina, Intellect, Spirit FROM creature_classlevelstats");
 
     if (!result)
     {
@@ -10500,6 +10802,18 @@ void ObjectMgr::LoadCreatureClassLevelStats()
 
         stats.AttackPower = fields[7].Get<uint32>();
         stats.RangedAttackPower = fields[8].Get<uint32>();
+
+        stats.Strength = fields[12].Get<uint32>();
+        stats.Agility = fields[13].Get<uint32>();
+        stats.Stamina = fields[14].Get<uint32>();
+        stats.Intellect = fields[15].Get<uint32>();
+        stats.Spirit = fields[16].Get<uint32>();
+
+        if (!stats.Strength || !stats.Agility || !stats.Stamina || !stats.Intellect || !stats.Spirit)
+        {
+            // Once these attributes are implemented, this should probably be uncommented.
+            // LOG_WARN("server.loading", "Creature base attributes for class {}, level {} are missing!", Class, Level);
+        }
 
         _creatureBaseStatsStore[MAKE_PAIR16(Level, Class)] = stats;
 

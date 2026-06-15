@@ -121,23 +121,30 @@ enum Misc
     POINT_CHANNEL_STEELBREAKER  = 1
 };
 
+static uint8 CountAliveBosses(InstanceScript* instance)
+{
+    uint8 count = 0;
+    if (!instance)
+        return count;
+
+    for (uint8 i = 0; i < 3; ++i)
+        if (Creature* boss = instance->GetCreature(DATA_STEELBREAKER + i))
+            if (boss->IsAlive())
+                ++count;
+
+    return count;
+}
+
 bool IsEncounterComplete(InstanceScript* pInstance, Creature* me)
 {
     if (!pInstance || !me)
         return false;
 
     for (uint8 i = 0; i < 3; ++i)
-    {
-        if (Creature* boss = pInstance->GetCreature(DATA_STEELBREAKER + i))
-        {
-            if (boss->IsAlive())
-                return false;
-            continue;
-        }
-        else
+        if (!pInstance->GetCreature(DATA_STEELBREAKER + i))
             return false;
-    }
-    return true;
+
+    return CountAliveBosses(pInstance) == 0;
 }
 
 void RespawnAssemblyOfIron(InstanceScript* pInstance, Creature* me)
@@ -309,11 +316,20 @@ struct boss_steelbreaker : public ScriptedAI
                 events.Repeat(15s, 20s);
                 break;
             case EVENT_STATIC_DISRUPTION:
-                if (Unit* pTarget = SelectTarget(SelectTargetMethod::MinDistance, 0, 0, true))
-                    me->CastSpell(pTarget, SPELL_STATIC_DISRUPTION, false);
+            {
+                // Prefer a random player out of melee range so the nature damage debuff
+                // (and its 5y splash) stays off the melee/tank cluster; if everyone is in
+                // melee, fall back to a random player regardless of range.
+                Unit* target = SelectTarget(SelectTargetMethod::Random, 0, -10.0f, true);
+                if (!target)
+                    target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true);
+
+                if (target)
+                    me->CastSpell(target, SPELL_STATIC_DISRUPTION, false);
 
                 events.Repeat(20s, 40s);
                 break;
+            }
             case EVENT_OVERWHELMING_POWER:
                 Talk(SAY_STEELBREAKER_POWER);
                 me->CastSpell(me->GetVictim(), SPELL_OVERWHELMING_POWER, true);
@@ -550,6 +566,7 @@ struct boss_stormcaller_brundir : public ScriptedAI
 
     void Reset() override
     {
+        SetInvincibility(false);
         me->SetLootMode(0);
         RespawnAssemblyOfIron(pInstance, me);
 
@@ -665,6 +682,26 @@ struct boss_stormcaller_brundir : public ScriptedAI
     {
         if (type == POINT_MOTION_TYPE && point == POINT_CHANNEL_STEELBREAKER)
             me->CastSpell(me, SPELL_LIGHTNING_CHANNEL_PRE, true);
+    }
+
+    void OnSpellCast(SpellInfo const* spellInfo) override
+    {
+        // When Overload begins, prevent Brundir from dying unless he is the last boss alive
+        if (spellInfo->Id == SPELL_OVERLOAD && CountAliveBosses(pInstance) > 1)
+            SetInvincibility(true);
+    }
+
+    void OnChannelFinished(SpellInfo const* spellInfo) override
+    {
+        if (spellInfo->Id == SPELL_OVERLOAD)
+            SetInvincibility(false);
+    }
+
+    void OnSpellFailed(SpellInfo const* spellInfo) override
+    {
+        // Also lift invincibility if the channel is somehow interrupted
+        if (spellInfo->Id == SPELL_OVERLOAD)
+            SetInvincibility(false);
     }
 
     void UpdateAI(uint32 diff) override
