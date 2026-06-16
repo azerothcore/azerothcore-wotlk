@@ -330,7 +330,7 @@ void SmartAIMgr::CheckIfSmartAIInDatabaseExists()
             // check GUID SAI
             for (auto const& pair : sObjectMgr->GetAllCreatureData())
             {
-                if (pair.second.id1 != creatureTemplate.Entry)
+                if (pair.second.id != creatureTemplate.Entry)
                     continue;
 
                 if (mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_CREATURE)].find((-1) * pair.first) != mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_CREATURE)].end())
@@ -2100,7 +2100,7 @@ bool SmartAIMgr::IsTextValid(SmartScriptHolder const& e, uint32 id)
                         return false;
                     }
                     else
-                        entry = data->id1;
+                        entry = data->id;
                 }
                 else
                     entry = uint32(e.entryOrGuid);
