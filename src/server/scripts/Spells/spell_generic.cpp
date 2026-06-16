@@ -2563,28 +2563,56 @@ class spell_gen_vehicle_scaling_aura: public AuraScript
 
     void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
-        Unit* caster = GetCaster();
-        float factor;
-        uint16 baseItemLevel;
+        Player* player = GetCaster()->ToPlayer();
 
         /// @todo Reserach coeffs for different vehicles
         switch (GetId())
         {
             case SPELL_GEAR_SCALING:
-                factor = 1.0f;
-                baseItemLevel = 205;
+            {
+                float avgILvl = player->GetAverageItemLevel();
+                if (avgILvl < 205.0f)
+                    return;
+
+                amount = uint16((avgILvl - 205.0f) * 1.0f);
                 break;
+            }
             default:
-                factor = 1.0f;
-                baseItemLevel = 170;
+            {
+                // Ulduar vehicle scaling: (((total iLvl - 2500) - p) / 5) / 100
+                // total iLvl = sum of base ItemLevel (excludes offhand/ranged)
+                // p = quality penalty: 26 per uncommon/below, 13 per rare
+                // floor at 0.1
+                float totalILvl = 0.0f;
+                float p = 0.0f;
+
+                for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
+                {
+                    // Exclude offhand, ranged, body (shirt), and tabard (same as GetAverageItemLevel)
+                    if (i == EQUIPMENT_SLOT_TABARD || i == EQUIPMENT_SLOT_RANGED || i == EQUIPMENT_SLOT_OFFHAND || i == EQUIPMENT_SLOT_BODY)
+                        continue;
+
+                    if (Item* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+                    {
+                        if (ItemTemplate const* itemTemplate = item->GetTemplate())
+                        {
+                            totalILvl += static_cast<float>(itemTemplate->ItemLevel);
+
+                            // Quality penalty: 13 per quality drop from epic
+                            if (itemTemplate->Quality < ITEM_QUALITY_EPIC)
+                            {
+                                // -26 for uncommon or below, -13 for rare (matches GetItemLevelIncludingQuality)
+                                p += (itemTemplate->Quality <= ITEM_QUALITY_UNCOMMON) ? 26.0f : 13.0f;
+                            }
+                        }
+                    }
+                }
+
+                float result = ((totalILvl - 2500.0f) - p) / 5.0f / 100.0f;
+                amount = static_cast<int32>(std::max(0.1f, result));
                 break;
+            }
         }
-
-        float avgILvl = caster->ToPlayer()->GetAverageItemLevel();
-        if (avgILvl < baseItemLevel)
-            return;                     /// @todo Research possibility of scaling down
-
-        amount = uint16((avgILvl - baseItemLevel) * factor);
     }
 
     void Register() override
