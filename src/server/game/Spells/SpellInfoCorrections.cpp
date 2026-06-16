@@ -531,24 +531,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].SpellClassMask[2] = 0x8000000;
     });
 
-    // Swift Retribution: SPELL_AURA_MELEE_SLOW (193) requires negative amounts for haste.
-    // Positive amounts cause attack speed reduction. Negate the modifier so ranks 1/2/3
-    // produce -1/-2/-3 CalcValue (= 1/2/3% haste) via SPELLMOD_EFFECT3 on spell 63531.
-    ApplySpellFix({ 53379 }, [](SpellInfo* spellInfo)  // rank 1: -2 + DieSides(1) = -1
-    {
-        spellInfo->Effects[EFFECT_0].BasePoints = -2;
-    });
-
-    ApplySpellFix({ 53484 }, [](SpellInfo* spellInfo)  // rank 2: -3 + DieSides(1) = -2
-    {
-        spellInfo->Effects[EFFECT_0].BasePoints = -3;
-    });
-
-    ApplySpellFix({ 53648 }, [](SpellInfo* spellInfo)  // rank 3: -4 + DieSides(1) = -3
-    {
-        spellInfo->Effects[EFFECT_0].BasePoints = -4;
-    });
-
     // Sanctified Retribution
     ApplySpellFix({ 31869 }, [](SpellInfo* spellInfo)
     {
