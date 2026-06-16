@@ -1,3 +1,4 @@
+-- DB update 2026_06_16_06 -> 2026_06_16_07
 --
 UPDATE `spell_dbc` SET `RangeIndex`= 12, `ProcChance` = 101, `Effect_1` = 140, `ImplicitTargetA_1` = 25, `EffectTriggerSpell_1` = 47681 WHERE `Id` = 47680;
 
