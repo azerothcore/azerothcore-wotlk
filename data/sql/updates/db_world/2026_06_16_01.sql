@@ -1,3 +1,4 @@
+-- DB update 2026_06_16_00 -> 2026_06_16_01
 -- Troll Patrol dailies 12563 and 12587 were missing the spells that gate the
 -- "Congratulations!" (12604) follow-up. 12604 requires both On Patrol (51573)
 -- and On Patrol Heartbeat Script (53707); the time limit is enforced by 51573's
