@@ -1555,28 +1555,32 @@ void Unit::CalculateSpellDamageTaken(SpellNonMeleeDamage* damageInfo, int32 dama
                 {
                     damageInfo->HitInfo |= SPELL_HIT_TYPE_CRIT;
 
-                    // Calculate crit bonus
-                    uint32 crit_bonus = damage;
-                    // Apply crit_damage bonus for melee spells
-                    if (Player* modOwner = GetSpellModOwner())
-                        modOwner->ApplySpellMod(spellInfo->Id, SPELLMOD_CRIT_DAMAGE_BONUS, crit_bonus);
-                    damage += crit_bonus;
+                    // Calculate crit bonus (100% for melee/ranged spells)
+                    int32 crit_bonus = damage;
+                    crit_bonus += damage;
 
                     // Apply SPELL_AURA_MOD_ATTACKER_RANGED_CRIT_DAMAGE or SPELL_AURA_MOD_ATTACKER_MELEE_CRIT_DAMAGE
-                    float critPctDamageMod = 0.0f;
+                    float crit_mod = 0.0f;
                     if (attackType == RANGED_ATTACK)
-                        critPctDamageMod += victim->GetTotalAuraModifier(SPELL_AURA_MOD_ATTACKER_RANGED_CRIT_DAMAGE);
+                        crit_mod += victim->GetTotalAuraModifier(SPELL_AURA_MOD_ATTACKER_RANGED_CRIT_DAMAGE);
                     else
-                        critPctDamageMod += victim->GetTotalAuraModifier(SPELL_AURA_MOD_ATTACKER_MELEE_CRIT_DAMAGE);
+                        crit_mod += victim->GetTotalAuraModifier(SPELL_AURA_MOD_ATTACKER_MELEE_CRIT_DAMAGE);
 
                     // Increase crit damage from SPELL_AURA_MOD_CRIT_DAMAGE_BONUS
-                    critPctDamageMod += GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_CRIT_DAMAGE_BONUS, spellInfo->GetSchoolMask());
-
+                    crit_mod += GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_CRIT_DAMAGE_BONUS, spellInfo->GetSchoolMask());
                     // Increase crit damage from SPELL_AURA_MOD_CRIT_PERCENT_VERSUS
-                    critPctDamageMod += GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_CRIT_PERCENT_VERSUS, crTypeMask);
+                    crit_mod += GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_CRIT_PERCENT_VERSUS, crTypeMask);
 
-                    if (critPctDamageMod != 0)
-                        AddPct(damage, critPctDamageMod);
+                    if (crit_bonus != 0 && crit_mod != 0.0f)
+                        AddPct(crit_bonus, crit_mod);
+
+                    crit_bonus -= damage;
+
+                    // adds additional damage to critBonus (from talents)
+                    if (Player* modOwner = GetSpellModOwner())
+                        modOwner->ApplySpellMod(spellInfo->Id, SPELLMOD_CRIT_DAMAGE_BONUS, crit_bonus);
+
+                    damage = crit_bonus + damage;
                 }
 
                 // Spell weapon based damage CAN BE crit & blocked at same time
@@ -9384,7 +9388,6 @@ uint32 Unit::SpellCriticalDamageBonus(Unit const* caster, SpellInfo const* spell
     {
         case SPELL_DAMAGE_CLASS_MELEE:                      // for melee based spells is 100%
         case SPELL_DAMAGE_CLASS_RANGED:
-            /// @todo: write here full calculation for melee/ranged spells
             crit_bonus += damage;
             break;
         default:
