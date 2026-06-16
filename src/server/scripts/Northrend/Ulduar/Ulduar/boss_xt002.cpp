@@ -50,7 +50,7 @@ enum XT002Spells
 
     // VOID ZONE
     SPELL_VOID_ZONE_SUMMON      = 64203,
-    SPELL_VOID_ZONE_DAMAGE      = 46262,
+    SPELL_VOID_ZONE_DAMAGE      = 64208,
 
     // SPARK
     SPELL_SPARK_SUMMON          = 64210,
