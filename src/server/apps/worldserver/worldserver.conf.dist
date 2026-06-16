@@ -30,6 +30,7 @@
 #  GAME SETTINGS
 #    GAME MASTER
 #    CHEAT
+#    ACCOUNT
 #    CHARACTER DATABASE
 #    CHARACTER DELETE
 #    CHARACTER CREATION
@@ -1714,6 +1715,98 @@ PlayerStart.MapsExplored = 0
 #                     4  - (Disabled)
 
 InstantLogout = 1
+
+#
+###################################################################################################
+
+###################################################################################################
+# ACCOUNT
+#
+#    Trial.LevelCap
+#        Description: Maximum level a trial account can reach. XP gain stops once this level is reached.
+#        Default:     20
+#                     0  - (Disabled, no cap)
+
+Trial.LevelCap = 20
+
+#
+#    Trial.MoneyCap
+#        Description: Maximum money a trial account can hold, in copper.
+#        Default:     100000 - (10 gold)
+#                     0      - (Disabled, no cap)
+
+Trial.MoneyCap = 100000
+
+#
+#    Trial.TradeSkillCap
+#        Description: Maximum value any profession skill can reach on a trial account.
+#        Default:     100
+#                     0   - (Disabled, no cap)
+
+Trial.TradeSkillCap = 100
+
+#
+#    Trial.Restriction.Chat
+#        Description: Restrict trial accounts from using whisper/channel/guild chats.
+#                     Whispers are only allowed when the trial player is on the recipients friendslist
+#                     or when the trial account was messaged first.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+Trial.Restriction.Chat = 1
+
+#
+#    Trial.Restriction.Mail
+#        Description: Restrict trial accounts from sending mail.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+Trial.Restriction.Mail = 1
+
+#
+#    Trial.Restriction.Trade
+#        Description: Restrict trial accounts from initiating or being the target of in-game trade.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+Trial.Restriction.Trade = 1
+
+#
+#    Trial.Restriction.Auction
+#        Description: Restrict trial accounts from selling, bidding, or cancelling auctions at the auction house.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+Trial.Restriction.Auction = 1
+
+#
+#    Trial.Restriction.Party
+#        Description: Restrict trial accounts from inviting players to a party, and from accepting
+#                     an invite to a party whose existing members are above Trial.LevelCap.
+#                     The join check is skipped when Trial.LevelCap is 0.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+Trial.Restriction.Party = 1
+
+#
+#    Trial.Restriction.Guild
+#        Description: Restrict trial accounts from joining a guild (accepting an invite) and from
+#                     creating one (buying, signing, or turning in a guild charter).
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+Trial.Restriction.Guild = 1
+
+#
+#    Trial.Restriction.Queue
+#        Description: Force trial accounts through the world session queue even if their account
+#                     flags would otherwise grant skip-queue priority. The RBAC_PERM_SKIP_QUEUE
+#                     permission and recent-disconnect grace are still honored.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+Trial.Restriction.Queue = 1
 
 #
 ###################################################################################################

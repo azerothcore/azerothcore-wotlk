@@ -675,6 +675,13 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
         return;
     }
 
+    if (sWorld->getBoolConfig(CONFIG_TRIAL_RESTRICTION_TRADE) && IsTrialAccount())
+    {
+        info.Status = TRADE_STATUS_TRIAL_ACCOUNT;
+        SendTradeStatus(info);
+        return;
+    }
+
     if (GetPlayer()->IsSpectator())
         return;
 
@@ -718,6 +725,13 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
     if (pOther->GetSession()->isLogingOut())
     {
         info.Status = TRADE_STATUS_TARGET_LOGOUT;
+        SendTradeStatus(info);
+        return;
+    }
+
+    if (sWorld->getBoolConfig(CONFIG_TRIAL_RESTRICTION_TRADE) && pOther->GetSession()->IsTrialAccount())
+    {
+        info.Status = TRADE_STATUS_TRIAL_ACCOUNT;
         SendTradeStatus(info);
         return;
     }

@@ -2388,7 +2388,14 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate, bool isLFGReward)
     // Favored experience increase END
 
     // XP to money conversion processed in Player::RewardQuest
-    if (level >= sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
+    uint32 maxLevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
+
+    // Trial account level cap (0 disables the cap)
+    if (uint32 trialLevelCap = sWorld->getIntConfig(CONFIG_TRIAL_LEVEL_CAP))
+        if (GetSession()->IsTrialAccount())
+            maxLevel = std::min(maxLevel, trialLevelCap);
+
+    if (level >= maxLevel)
         return;
 
     uint32 bonus_xp = 0;
@@ -2413,11 +2420,11 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate, bool isLFGReward)
     uint32 nextLvlXP = GetUInt32Value(PLAYER_NEXT_LEVEL_XP);
     uint32 newXP = curXP + xp + bonus_xp;
 
-    while (newXP >= nextLvlXP && level < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
+    while (newXP >= nextLvlXP && level < maxLevel)
     {
         newXP -= nextLvlXP;
 
-        if (level < sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
+        if (level < maxLevel)
             GiveLevel(level + 1);
 
         level = GetLevel();
@@ -11500,6 +11507,17 @@ bool Player::ModifyMoney(int32 amount, bool sendError /*= true*/)
         SetMoney (GetMoney() > uint32(-amount) ? GetMoney() + amount : 0);
     else
     {
+        // Trial account money cap (0 disables the cap)
+        if (uint32 trialMoneyCap = sWorld->getIntConfig(CONFIG_TRIAL_MONEY_CAP))
+        {
+            if (GetSession()->IsTrialAccount() && GetMoney() + uint32(amount) > trialMoneyCap)
+            {
+                if (sendError)
+                    SendEquipError(EQUIP_ERR_TOO_MUCH_GOLD, nullptr, nullptr);
+                return false;
+            }
+        }
+
         if (GetMoney() < uint32(MAX_MONEY_AMOUNT - amount))
             SetMoney(GetMoney() + amount);
         else
