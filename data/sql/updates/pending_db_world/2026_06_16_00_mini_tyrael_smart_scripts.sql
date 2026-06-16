@@ -1,32 +1,64 @@
--- Mini Tyrael (entry 29089): fix overly frequent sleep/enrage text spam and dance behavior
+-- Mini Tyrael (entry 29089): fix sleep/dance/follow behavior
 -- Issue: https://github.com/azerothcore/azerothcore-wotlk/issues/19781
 --
--- Root causes:
--- 1. Spell 69205 (periodic trigger, every 30s) → spell 69204 → SMART_EVENT_SPELLHIT
---    always fired SMART_ACTION_TALK "falls asleep" unconditionally, spamming chat every 30s
---    even when the pet woke up instantly (action list 2908900 path).
---    Fix: remove the unconditional TALK from the main event. Move it into the action lists
---    that actually put the pet to sleep (2908901 and 2908902). Action list 2908900 remains
---    silent, so visible chat spam is reduced by ~33%.
--- 2. Dance response used SMART_ACTION_PLAY_EMOTE (one-shot anim, prevents follow movement).
---    Fix: use SMART_ACTION_CAST with spell 54398 (Tyrael Dance, DUMMY aura visual) which
---    allows the pet to keep following while the dance animation plays.
---    Cooldown increased from 5s to 60s to prevent excessive response spam.
--- 3. Event structure: remove the now-unnecessary linked event (id=2) that was only needed
---    to chain from the unconditional TALK to the random action list.
+-- Root causes fixed:
+-- 1. Spell 69205 (periodic trigger, every 30s) → spell 69204 → SMART_EVENT_SPELLHIT always
+--    fired SMART_ACTION_TALK unconditionally, spamming chat every 30s even when the pet woke
+--    up instantly (action list 2908900 path). Fix: TALK moved only into action lists 2908901
+--    and 2908902 that actually produce visible behavior. Action list 2908900 stays silent.
+-- 2. Dance used SMART_ACTION_PLAY_EMOTE which freezes movement. Fix: use SMART_ACTION_CAST
+--    with spell 54398 (Tyrael Dance, DUMMY aura visual) which allows follow movement.
+--    Cooldown increased from 5s to 60s to prevent response spam.
+-- 3. Sleep triggered while player was moving, making the pet drift away. Fix: added
+--    CONDITION_UNIT_STATE (NOT UNIT_STATE_MOVE) on the SPELLHIT event (conditions table) so
+--    sleep/enrage only triggers when the pet is stationary.
+-- 4. Pet dances while following a moving player via UPDATE_OOC (1s) + IS-MOVING condition.
+-- 5. After waking from sleep the pet re-establishes follow position beside the owner.
+-- 6. Pet follows beside the player (angle 90 degrees) instead of directly behind.
+--
+-- Spell reference:
+--   69205: SPELL_AURA_PERIODIC_TRIGGER_SPELL (amplitude 30s) → triggers 69204 on self
+--   69204: SPELL_AURA_DUMMY — fires SMART_EVENT_SPELLHIT every 30s
+--   54398: Tyrael Dance — SPELL_AURA_DUMMY with dance visual animation
+--
+-- Condition reference (conditions table):
+--   SourceTypeOrReferenceId=22 (CONDITION_SOURCE_TYPE_SMART_EVENT)
+--   SourceGroup = event_id + 1
+--   ConditionTypeOrReference=21 (CONDITION_UNIT_STATE)
+--   ConditionTarget=1 (GetBaseObject = the pet itself)
+--   ConditionValue1=1048576 (UNIT_STATE_MOVE = 0x00100000)
+--   Event id=1 (SPELLHIT):       SourceGroup=2, NegativeCondition=1  → only when NOT moving
+--   Event id=3 (UPDATE dance):   SourceGroup=4, NegativeCondition=0  → only when IS moving
+--   Event id=4 (UPDATE no-dance): SourceGroup=5, NegativeCondition=1 → only when NOT moving
 
 DELETE FROM `smart_scripts` WHERE `entryorguid` IN (29089, 2908900, 2908901, 2908902) AND `source_type` IN (0, 9);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
--- On /dance emote received: cast Tyrael Dance spell (allows movement, 60s cooldown)
-(29089, 0, 0, 0, 22, 0, 100, 0, 34, 60000, 60000, 0, 0, 0, 11, 54398, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mini Tyrael - On Receive Emote Dance: Cast Tyrael Dance'),
--- On spell 69204 hit (every 30s from aura 69205): pick random behavior (1/3 each)
-(29089, 0, 1, 0, 8, 0, 100, 0, 69204, 0, 0, 0, 0, 0, 87, 2908900, 2908901, 2908902, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mini Tyrael - On Spell Hit 69204: Random Behavior'),
+-- On /dance emote received: cast Tyrael Dance spell (triggered, 60s cooldown)
+(29089, 0, 0, 0, 22, 0, 100, 0, 34, 60000, 60000, 0, 0, 0, 11, 54398, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mini Tyrael - On Receive Emote Dance: Cast Tyrael Dance'),
+-- On spell 69204 hit every 30s: random behavior 1/3 each; condition blocks when pet is moving
+(29089, 0, 1, 0, 8, 0, 100, 0, 69204, 0, 0, 0, 0, 0, 87, 2908900, 2908901, 2908902, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mini Tyrael - On Spell Hit 69204: Random Behavior (stationary only)'),
+-- On summoned: follow owner beside (dist=1, angle=90 degrees)
+(29089, 0, 2, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 0, 29, 1, 90, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 'Mini Tyrael - On Summoned: Follow owner beside'),
+-- Update OOC every 1s: cast Tyrael Dance (triggered, aura-not-present) when pet is moving
+(29089, 0, 3, 0, 2, 0, 100, 0, 1000, 1000, 0, 0, 0, 0, 11, 54398, 34, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mini Tyrael - Update OOC: Cast dance while moving'),
+-- Update OOC every 1s: remove Tyrael Dance aura when pet is stationary
+(29089, 0, 4, 0, 2, 0, 100, 0, 1000, 1000, 0, 0, 0, 0, 28, 54398, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mini Tyrael - Update OOC: Remove dance when stationary'),
 -- Action list 2908900: silent immediate wake (no chat, ~33% of triggers)
 (2908900, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 28, 69204, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mini Tyrael - Wake immediately (silent)'),
--- Action list 2908901: say "falls asleep", wake after 15s (~33% of triggers)
+-- Action list 2908901: say falls asleep, wake after 15s, re-follow beside owner (~33%)
 (2908901, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mini Tyrael - Say: falls asleep'),
 (2908901, 9, 1, 0, 0, 0, 100, 0, 15000, 15000, 0, 0, 0, 0, 28, 69204, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mini Tyrael - Wake after 15s'),
--- Action list 2908902: say "falls asleep", wake after 15s, say "becomes enraged" (~33% of triggers)
+(2908901, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 29, 1, 90, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 'Mini Tyrael - Re-follow owner beside after waking'),
+-- Action list 2908902: say falls asleep, wake after 15s, say becomes enraged, re-follow (~33%)
 (2908902, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mini Tyrael - Say: falls asleep'),
 (2908902, 9, 1, 0, 0, 0, 100, 0, 15000, 15000, 0, 0, 0, 0, 28, 69204, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mini Tyrael - Wake after 15s'),
-(2908902, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mini Tyrael - Say: becomes enraged');
+(2908902, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mini Tyrael - Say: becomes enraged'),
+(2908902, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 29, 1, 90, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 'Mini Tyrael - Re-follow owner beside after waking');
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 22 AND `SourceEntry` = 29089 AND `SourceId` = 0;
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
+-- event id=1 SPELLHIT (SourceGroup=2): only fire when pet is NOT moving
+(22, 2, 29089, 0, 0, 21, 1, 1048576, 0, 0, 1, 0, 0, '', 'Mini Tyrael - SPELLHIT 69204 only when stationary'),
+-- event id=3 UPDATE_OOC cast dance (SourceGroup=4): only fire when pet IS moving
+(22, 4, 29089, 0, 0, 21, 1, 1048576, 0, 0, 0, 0, 0, '', 'Mini Tyrael - Update OOC dance only when moving'),
+-- event id=4 UPDATE_OOC remove dance (SourceGroup=5): only fire when pet is NOT moving
+(22, 5, 29089, 0, 0, 21, 1, 1048576, 0, 0, 1, 0, 0, '', 'Mini Tyrael - Update OOC stop dance only when stationary');
