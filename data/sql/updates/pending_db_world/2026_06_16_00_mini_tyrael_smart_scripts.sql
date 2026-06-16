@@ -10,8 +10,11 @@
 -- 2. Dance used SMART_ACTION_PLAY_EMOTE which freezes movement.
 --    Fix: use SMART_ACTION_CAST with spell 54398 (Tyrael Dance, DUMMY aura visual)
 --    which allows the pet to keep following while the animation plays. 60s cooldown on /dance.
--- 3. Pet followed at angle 180 (behind) with dist=1, drifting away from the player.
---    Fix: follow at angle 90 (beside) with dist=0 for a closer, tighter position.
+-- 3. Pet spawned behind player (MINI_PET_FOLLOW_ANGLE = π). SpellEffects.cpp SUMMON_TYPE_MINIPET
+--    handler calls GetMotionMaster()->Clear() then MoveFollow(owner, PET_FOLLOW_DIST,
+--    MINI_PET_FOLLOW_ANGLE) AFTER IsSummonedBy returns, overriding any JUST_SUMMONED follow.
+--    Fix: UPDATE_OOC with NOT_REPEATABLE flag (event_flags=1) at 100ms re-applies follow at
+--    angle 90 (beside player) on the first update tick, after SpellEffects has finished.
 -- 4. Pet dances automatically while the player is moving (UPDATE_OOC every 1s + condition).
 --    Stops dancing when player stops, resumes when player moves again.
 --
@@ -32,8 +35,8 @@ DELETE FROM `smart_scripts` WHERE `entryorguid` IN (29089, 2908900, 2908901, 290
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 -- On /dance emote received: cast Tyrael Dance spell (triggered, 60s cooldown)
 (29089, 0, 0, 0, 22, 0, 100, 0, 34, 60000, 60000, 0, 0, 0, 11, 54398, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mini Tyrael - On Receive Emote Dance: Cast Tyrael Dance'),
--- On summoned: follow owner beside (dist=0, angle=90 degrees)
-(29089, 0, 1, 0, 54, 0, 100, 0, 0, 0, 0, 0, 0, 0, 29, 0, 90, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 'Mini Tyrael - On Summoned: Follow owner beside'),
+-- Update OOC 100ms one-shot: re-apply follow beside owner AFTER SpellEffects overrides angle
+(29089, 0, 1, 0, 2, 0, 100, 1, 100, 100, 0, 0, 0, 0, 29, 0, 90, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 'Mini Tyrael - Follow beside owner on first update (one-shot)'),
 -- Update OOC every 1s: cast Tyrael Dance (triggered, aura-not-present) when pet is moving
 (29089, 0, 2, 0, 2, 0, 100, 0, 1000, 1000, 0, 0, 0, 0, 11, 54398, 34, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Mini Tyrael - Update OOC: Cast dance while moving'),
 -- Update OOC every 1s: remove Tyrael Dance aura when pet is stationary
