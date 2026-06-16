@@ -98,7 +98,8 @@ enum PaladinSpells
     SPELL_PALADIN_SEAL_OF_VENGEANCE_EFFECT       = 42463,
     SPELL_PALADIN_SEAL_OF_CORRUPTION_EFFECT      = 53739,
 
-    SPELL_PALADIN_SEAL_OF_COMMAND                = 20375
+    SPELL_PALADIN_SEAL_OF_COMMAND                = 20375,
+    SPELL_PALADIN_DIVINE_FAVOR                   = 20216
 };
 
 enum PaladinSpellIcons
@@ -2200,6 +2201,33 @@ class spell_pal_light_s_beacon : public AuraScript
     }
 };
 
+// Divine Favor (20216) – ghost window fix
+// After HL/FoL/HS consumes the proc charge (AURA_REMOVE_BY_DEFAULT), re-apply
+// Divine Favor for 400 ms so a queued Holy Shock still receives the crit bonus.
+// GetMaxDuration() == 400 guards against an infinite re-apply loop on the second removal.
+class spell_pal_divine_favor : public AuraScript
+{
+    PrepareAuraScript(spell_pal_divine_favor);
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_DEFAULT)
+            return;
+        if (GetAura()->GetMaxDuration() == 400)
+            return;
+        if (Aura* ghostAura = GetTarget()->AddAura(SPELL_PALADIN_DIVINE_FAVOR, GetTarget()))
+        {
+            ghostAura->SetMaxDuration(400);
+            ghostAura->SetDuration(400);
+        }
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(spell_pal_divine_favor::OnRemove, EFFECT_0, SPELL_AURA_ADD_PCT_MODIFIER, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_paladin_spell_scripts()
 {
     RegisterSpellAndAuraScriptPair(spell_pal_seal_of_command, spell_pal_seal_of_command_aura);
@@ -2256,5 +2284,6 @@ void AddSC_paladin_spell_scripts()
     RegisterSpellScriptWithArgs(spell_pal_improved_aura, "spell_pal_improved_devotion_aura", SPELL_PALADIN_IMPROVED_DEVOTION_AURA);
     RegisterSpellScriptWithArgs(spell_pal_improved_aura, "spell_pal_sanctified_retribution", SPELL_PALADIN_SANCTIFIED_RETRIBUTION_AURA);
     RegisterSpellScriptWithArgs(spell_pal_improved_aura, "spell_pal_swift_retribution", SPELL_PALADIN_SANCTIFIED_RETRIBUTION_AURA);
+    RegisterSpellScript(spell_pal_divine_favor);
     RegisterSpellScript(spell_pal_light_s_beacon);
 }
