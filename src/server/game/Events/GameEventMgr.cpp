@@ -300,7 +300,7 @@ void GameEventMgr::LoadEventVendors()
         // Get creature entry
         newEntry.Entry = 0;
         if (CreatureData const* data = sObjectMgr->GetCreatureData(guid))
-            newEntry.Entry = data->id1;
+            newEntry.Entry = data->id;
 
         // Validate vendor item
         if (!sObjectMgr->IsVendorItemValid(newEntry.Entry, newEntry.Item, newEntry.MaxCount, newEntry.Incrtime, newEntry.ExtendedCost, nullptr, nullptr, event_npc_flag))
@@ -614,9 +614,7 @@ void GameEventMgr::LoadEventModelEquipmentChangeData()
 
             ObjectGuid::LowType guid = fields[0].Get<uint32>();
             uint32 entry = fields[1].Get<uint32>();
-            uint32 entry2 = fields[2].Get<uint32>();
-            uint32 entry3 = fields[3].Get<uint32>();
-            uint16 eventId = fields[4].Get<uint8>();
+            uint16 eventId = fields[2].Get<uint8>();
 
             if (eventId >= _gameEventModelEquip.size())
             {
@@ -626,15 +624,15 @@ void GameEventMgr::LoadEventModelEquipmentChangeData()
 
             ModelEquipList& equiplist = _gameEventModelEquip[eventId];
             ModelEquip newModelEquipSet;
-            newModelEquipSet.ModelId = fields[5].Get<uint32>();
-            newModelEquipSet.EquipmentId = fields[6].Get<uint8>();
+            newModelEquipSet.ModelId = fields[3].Get<uint32>();
+            newModelEquipSet.EquipmentId = fields[4].Get<uint8>();
             newModelEquipSet.EquipementIdPrev = 0;
             newModelEquipSet.ModelIdPrev = 0;
 
             if (newModelEquipSet.EquipmentId > 0)
             {
                 int8 equipId = static_cast<int8>(newModelEquipSet.EquipmentId);
-                if ((!sObjectMgr->GetEquipmentInfo(entry, equipId)) || (entry2 && !sObjectMgr->GetEquipmentInfo(entry2, equipId)) || (entry3 && !sObjectMgr->GetEquipmentInfo(entry3, equipId)))
+                if (!sObjectMgr->GetEquipmentInfo(entry, equipId))
                 {
                     LOG_ERROR("sql.sql", "Table `game_event_model_equip` have creature (Guid: {}) with equipment_id {} not found in table `creature_equip_template`, set to no equipment.",
                         guid, newModelEquipSet.EquipmentId);

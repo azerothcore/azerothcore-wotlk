@@ -1958,7 +1958,7 @@ bool ConditionMgr::isSourceTypeValid(Condition* cond)
                     return false;
                 }
 
-                if (data->id1 != uint32(cond->SourceEntry))
+                if (data->id != uint32(cond->SourceEntry))
                 {
                     LOG_ERROR("sql.sql", "CONDITION_SOURCE_TYPE_OBJECT_VISIBILITY has creature guid {} that does not match SourceEntry {}, skipped.", cond->SourceId, cond->SourceEntry);
                     return false;
@@ -2322,7 +2322,7 @@ bool ConditionMgr::isConditionTypeValid(Condition* cond)
             {
                 if (CreatureData const* creatureData = sObjectMgr->GetCreatureData(cond->ConditionValue3))
                 {
-                    if (cond->ConditionValue2 && creatureData->id1 != cond->ConditionValue2)
+                    if (cond->ConditionValue2 && creatureData->id != cond->ConditionValue2)
                     {
                         LOG_ERROR("sql.sql", "ObjectEntryGuid condition has guid {} set but does not match creature entry ({}), skipped", cond->ConditionValue3, cond->ConditionValue2);
                         return false;

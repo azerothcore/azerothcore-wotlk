@@ -96,7 +96,7 @@ void OPvPCapturePoint::AddCre(uint32 type, ObjectGuid::LowType guid, uint32 entr
             return;
         }
 
-        entry = data->id1;
+        entry = data->id;
     }
 
     _creatures[type] = guid;
