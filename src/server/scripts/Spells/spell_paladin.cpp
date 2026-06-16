@@ -2209,6 +2209,11 @@ class spell_pal_divine_favor : public AuraScript
 {
     PrepareAuraScript(spell_pal_divine_favor);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_PALADIN_DIVINE_FAVOR });
+    }
+
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (GetTargetApplication()->GetRemoveMode() != AURA_REMOVE_BY_DEFAULT)
@@ -2219,6 +2224,7 @@ class spell_pal_divine_favor : public AuraScript
         {
             ghostAura->SetMaxDuration(400);
             ghostAura->SetDuration(400);
+            ghostAura->SetUsingCharges(false);
         }
     }
 
