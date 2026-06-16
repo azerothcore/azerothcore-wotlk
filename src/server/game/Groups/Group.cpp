@@ -63,6 +63,40 @@ Loot* Roll::getLoot()
     return getTarget();
 }
 
+static void SendRollWonItemViaMail(Player* player, LootItem const* lootItem, uint32 itemId)
+{
+    Item* mailItem = Item::CreateItem(itemId, lootItem->count, player, false, lootItem->randomPropertyId);
+    if (!mailItem)
+        return;
+
+    AllowedLooterSet looters = lootItem->GetAllowedLooters();
+    ItemTemplate const* proto = mailItem->GetTemplate();
+    // Preserve the 2-hour group trade window the item would have had if stored directly.
+    if (looters.size() > 1 && proto->GetMaxStackSize() == 1 &&
+        (proto->Bonding == BIND_WHEN_PICKED_UP || proto->Bonding == BIND_QUEST_ITEM) &&
+        sWorld->getBoolConfig(CONFIG_SET_BOP_ITEM_TRADEABLE))
+    {
+        mailItem->SetBinding(true);
+        mailItem->SetSoulboundTradeable(looters);
+        mailItem->SetUInt32Value(ITEM_FIELD_CREATE_PLAYED_TIME, player->GetTotalPlayedTime());
+
+        std::string lootersStr;
+        for (ObjectGuid const& guid : looters)
+        {
+            if (!lootersStr.empty())
+                lootersStr += ' ';
+            lootersStr += std::to_string(guid.GetCounter());
+        }
+
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ITEM_BOP_TRADE);
+        stmt->SetData(0, mailItem->GetGUID().GetCounter());
+        stmt->SetData(1, lootersStr);
+        CharacterDatabase.Execute(stmt);
+    }
+
+    player->SendItemRetrievalMail(mailItem);
+}
+
 Group::Group() : m_leaderName(""), m_groupType(GROUPTYPE_NORMAL),
     m_dungeonDifficulty(DUNGEON_DIFFICULTY_NORMAL), m_raidDifficulty(RAID_DIFFICULTY_10MAN_NORMAL),
     m_bfGroup(nullptr), m_bgGroup(nullptr), m_lootMethod(FREE_FOR_ALL), m_lootThreshold(ITEM_QUALITY_UNCOMMON),
@@ -1485,14 +1519,28 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
                         AllowedLooterSet looters = item->GetAllowedLooters();
                         Item* _item = player->StoreNewItem(dest, roll->itemid, true, item->randomPropertyId, looters);
                         if (_item)
-                            sScriptMgr->OnPlayerGroupRollRewardItem(player, _item, _item->GetCount(), NEED, roll);
+                            sScriptMgr->OnPlayerGroupRollRewardItem(player, _item, item->count, NEED, roll);
                         player->UpdateLootAchievements(item, roll->getLoot());
                     }
                     else
                     {
-                        item->is_blocked = false;
-                        item->rollWinnerGUID = player->GetGUID();
-                        player->SendEquipError(msg, nullptr, nullptr, roll->itemid);
+                        uint32 mailOnFull = sWorld->getIntConfig(CONFIG_LFG_MAIL_ITEM_ON_FULL_INVENTORY);
+                        // Only mail when bags are genuinely full. Unique/max-count failures must
+                        // leave the item on the corpse so it can be re-rolled or freely looted.
+                        if (msg == EQUIP_ERR_INVENTORY_FULL && (mailOnFull == MAIL_ITEM_ON_FULL_INVENTORY_EVERYWHERE || (mailOnFull == MAIL_ITEM_ON_FULL_INVENTORY_LFG_ONLY && isLFGGroup())))
+                        {
+                            item->is_looted = true;
+                            roll->getLoot()->NotifyItemRemoved(roll->itemSlot);
+                            roll->getLoot()->unlootedCount--;
+                            player->SendEquipError(msg, nullptr, nullptr, roll->itemid);
+                            SendRollWonItemViaMail(player, item, roll->itemid);
+                        }
+                        else
+                        {
+                            item->is_blocked = false;
+                            item->rollWinnerGUID = player->GetGUID();
+                            player->SendEquipError(msg, nullptr, nullptr, roll->itemid);
+                        }
                     }
                 }
             }
@@ -1555,14 +1603,28 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
                             AllowedLooterSet looters = item->GetAllowedLooters();
                             Item* _item = player->StoreNewItem(dest, roll->itemid, true, item->randomPropertyId, looters);
                             if (_item)
-                                sScriptMgr->OnPlayerGroupRollRewardItem(player, _item, _item->GetCount(), GREED, roll);
+                                sScriptMgr->OnPlayerGroupRollRewardItem(player, _item, item->count, GREED, roll);
                             player->UpdateLootAchievements(item, roll->getLoot());
                         }
                         else
                         {
-                            item->is_blocked = false;
-                            item->rollWinnerGUID = player->GetGUID();
-                            player->SendEquipError(msg, nullptr, nullptr, roll->itemid);
+                            uint32 mailOnFull = sWorld->getIntConfig(CONFIG_LFG_MAIL_ITEM_ON_FULL_INVENTORY);
+                            // Only mail when bags are genuinely full. Unique/max-count failures must
+                            // leave the item on the corpse so it can be re-rolled or freely looted.
+                            if (msg == EQUIP_ERR_INVENTORY_FULL && (mailOnFull == MAIL_ITEM_ON_FULL_INVENTORY_EVERYWHERE || (mailOnFull == MAIL_ITEM_ON_FULL_INVENTORY_LFG_ONLY && isLFGGroup())))
+                            {
+                                item->is_looted = true;
+                                roll->getLoot()->NotifyItemRemoved(roll->itemSlot);
+                                roll->getLoot()->unlootedCount--;
+                                player->SendEquipError(msg, nullptr, nullptr, roll->itemid);
+                                SendRollWonItemViaMail(player, item, roll->itemid);
+                            }
+                            else
+                            {
+                                item->is_blocked = false;
+                                item->rollWinnerGUID = player->GetGUID();
+                                player->SendEquipError(msg, nullptr, nullptr, roll->itemid);
+                            }
                         }
                     }
                     else if (rollvote == DISENCHANT)
@@ -1985,7 +2047,7 @@ GroupJoinBattlegroundResult Group::CanJoinBattlegroundQueue(Battleground const* 
             return ERR_BATTLEGROUND_JOIN_RANGE_INDEX;
 
         // check for deserter debuff in case not arena queue
-        if (bgTemplate->GetBgTypeID() != BATTLEGROUND_AA && !member->CanJoinToBattleground())
+        if (bgTemplate->GetBgTypeID() != BATTLEGROUND_AA && !member->CanJoinToBattleground(bgTemplate))
             return ERR_GROUP_JOIN_BATTLEGROUND_DESERTERS;
 
         // check if someone in party is using dungeon system

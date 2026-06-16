@@ -39,8 +39,6 @@ enum eSpells
     SPELL_SUMMON_ETHEREAL_SPHERE_3              = 54138,
 
     SPELL_ARCANE_POWER                          = 54160
-    //SPELL_SUMMON_PLAYERS                      = 54164, // not used
-    //SPELL_POWER_BALL_VISUAL                   = 54141,
 };
 
 enum eEvents
@@ -51,159 +49,114 @@ enum eEvents
     EVENT_CHECK_DISTANCE,
 };
 
-class boss_xevozz : public CreatureScript
+struct boss_xevozz : public BossAI
 {
-public:
-    boss_xevozz() : CreatureScript("boss_xevozz") { }
+    boss_xevozz(Creature* c) : BossAI(c, BOSS_XEVOZZ) { }
 
-    CreatureAI* GetAI(Creature* pCreature) const override
+    void JustEngagedWith(Unit* who) override
     {
-        return GetVioletHoldAI<boss_xevozzAI>(pCreature);
+        Talk(SAY_AGGRO);
+        BossAI::JustEngagedWith(who);
+        events.RescheduleEvent(EVENT_SPELL_ARCANE_BARRAGE_VOLLEY, 16s, 20s);
+        events.RescheduleEvent(EVENT_SUMMON_SPHERES, 10s);
     }
 
-    struct boss_xevozzAI : public ScriptedAI
+    void ExecuteEvent(uint32 eventId) override
     {
-        boss_xevozzAI(Creature* c) : ScriptedAI(c), spheres(me)
+        switch (eventId)
         {
-            pInstance = c->GetInstanceScript();
-        }
-
-        InstanceScript* pInstance;
-        EventMap events;
-        SummonList spheres;
-
-        void Reset() override
-        {
-            events.Reset();
-            spheres.DespawnAll();
-        }
-
-        void JustEngagedWith(Unit* /*who*/) override
-        {
-            Talk(SAY_AGGRO);
-            DoZoneInCombat();
-            events.Reset();
-            events.RescheduleEvent(EVENT_SPELL_ARCANE_BARRAGE_VOLLEY, 16s, 20s);
-            events.RescheduleEvent(EVENT_SUMMON_SPHERES, 10s);
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            switch (events.ExecuteEvent())
-            {
-                case 0:
-                    break;
-                case EVENT_SPELL_ARCANE_BARRAGE_VOLLEY:
-                    me->CastSpell((Unit*)nullptr, SPELL_ARCANE_BARRAGE_VOLLEY, false);
-                    events.Repeat(20s);
-                    break;
-                case EVENT_SPELL_ARCANE_BUFFET:
-                    me->CastSpell(me->GetVictim(), SPELL_ARCANE_BUFFET, false);
-                    break;
-                case EVENT_SUMMON_SPHERES:
+            case EVENT_SPELL_ARCANE_BARRAGE_VOLLEY:
+                DoCastAOE(SPELL_ARCANE_BARRAGE_VOLLEY);
+                events.Repeat(20s);
+                break;
+            case EVENT_SPELL_ARCANE_BUFFET:
+                DoCastVictim(SPELL_ARCANE_BUFFET);
+                break;
+            case EVENT_SUMMON_SPHERES:
+                {
+                    Talk(SAY_SUMMON_ENERGY);
+                    summons.DespawnAll();
+                    uint32 entry1 = RAND(SPELL_SUMMON_ETHEREAL_SPHERE_1, SPELL_SUMMON_ETHEREAL_SPHERE_2, SPELL_SUMMON_ETHEREAL_SPHERE_3);
+                    DoCastAOE(entry1, true);
+                    if (IsHeroic())
                     {
-                        Talk(SAY_SUMMON_ENERGY);
-                        spheres.DespawnAll();
-                        uint32 entry1 = RAND(SPELL_SUMMON_ETHEREAL_SPHERE_1, SPELL_SUMMON_ETHEREAL_SPHERE_2, SPELL_SUMMON_ETHEREAL_SPHERE_3);
-                        me->CastSpell((Unit*)nullptr, entry1, true);
-                        if (IsHeroic())
-                        {
-                            uint32 entry2;
-                            do { entry2 = RAND(SPELL_SUMMON_ETHEREAL_SPHERE_1, SPELL_SUMMON_ETHEREAL_SPHERE_2, SPELL_SUMMON_ETHEREAL_SPHERE_3); }
-                            while (entry1 == entry2);
-                            me->CastSpell((Unit*)nullptr, entry2, true);
-                        }
-                        events.Repeat(45s);
-                        events.RescheduleEvent(EVENT_SPELL_ARCANE_BUFFET, 5s);
-                        events.RescheduleEvent(EVENT_CHECK_DISTANCE, 6s);
+                        uint32 entry2;
+                        do { entry2 = RAND(SPELL_SUMMON_ETHEREAL_SPHERE_1, SPELL_SUMMON_ETHEREAL_SPHERE_2, SPELL_SUMMON_ETHEREAL_SPHERE_3); }
+                        while (entry1 == entry2);
+                        DoCastAOE(entry2, true);
                     }
-                    break;
-                case EVENT_CHECK_DISTANCE:
+                    events.Repeat(45s);
+                    events.RescheduleEvent(EVENT_SPELL_ARCANE_BUFFET, 5s);
+                    events.RescheduleEvent(EVENT_CHECK_DISTANCE, 6s);
+                }
+                break;
+            case EVENT_CHECK_DISTANCE:
+                {
+                    bool found = false;
+                    for (ObjectGuid const& guid : summons)
+                        if (Creature* sphere = instance->instance->GetCreature(guid))
+                            if (me->GetDistance(sphere) < 3.0f)
+                            {
+                                sphere->CastSpell(me, SPELL_ARCANE_POWER, false);
+                                sphere->DespawnOrUnsummon(8s);
+                                found = true;
+                            }
+                    if (found)
                     {
-                        bool found = false;
-                        if (pInstance)
-                            for (ObjectGuid const& guid : spheres)
-                                if (Creature* c = pInstance->instance->GetCreature(guid))
-                                    if (me->GetDistance(c) < 3.0f)
-                                    {
-                                        c->CastSpell(me, SPELL_ARCANE_POWER, false);
-                                        c->DespawnOrUnsummon(8s);
-                                        found = true;
-                                    }
-                        if (found)
-                        {
-                            Talk(SAY_CHARGED);
-                            events.Repeat(9s);
-                            events.RescheduleEvent(EVENT_SUMMON_SPHERES, 10s);
-                        }
-                        else
-                            events.Repeat(2s);
+                        Talk(SAY_CHARGED);
+                        events.Repeat(9s);
+                        events.RescheduleEvent(EVENT_SUMMON_SPHERES, 10s);
                     }
-                    break;
-            }
-
-            DoMeleeAttackIfReady();
+                    else
+                        events.Repeat(2s);
+                }
+                break;
         }
+    }
 
-        void JustSummoned(Creature* pSummoned) override
+    void JustSummoned(Creature* summoned) override
+    {
+        if (summoned)
         {
-            if (pSummoned)
-            {
-                pSummoned->GetMotionMaster()->MoveFollow(me, 0.0f, 0.0f, MOTION_SLOT_ACTIVE, true, false);
-                spheres.Summon(pSummoned);
-                if (pInstance)
-                    pInstance->SetGuidData(DATA_ADD_TRASH_MOB, pSummoned->GetGUID());
-            }
+            summoned->GetMotionMaster()->MoveFollow(me, 0.0f, 0.0f, MOTION_SLOT_ACTIVE, true, false);
+            BossAI::JustSummoned(summoned);
+            instance->SetGuidData(DATA_ADD_TRASH_MOB, summoned->GetGUID());
         }
+    }
 
-        void SummonedCreatureDespawn(Creature* pSummoned) override
+    void SummonedCreatureDespawn(Creature* summoned) override
+    {
+        if (summoned)
         {
-            if (pSummoned)
-            {
-                spheres.Despawn(pSummoned);
-                if (pInstance)
-                    pInstance->SetGuidData(DATA_DELETE_TRASH_MOB, pSummoned->GetGUID());
-            }
+            BossAI::SummonedCreatureDespawn(summoned);
+            instance->SetGuidData(DATA_DELETE_TRASH_MOB, summoned->GetGUID());
         }
+    }
 
-        void JustDied(Unit* /*killer*/) override
-        {
-            Talk(SAY_DEATH);
-            spheres.DespawnAll();
-            if (pInstance)
-                pInstance->SetData(DATA_BOSS_DIED, 0);
-        }
+    void JustDied(Unit* killer) override
+    {
+        Talk(SAY_DEATH);
+        BossAI::JustDied(killer);
+    }
 
-        void KilledUnit(Unit* pVictim) override
-        {
-            if (pVictim && pVictim->GetGUID() == me->GetGUID())
-                return;
+    void KilledUnit(Unit* victim) override
+    {
+        if (victim && victim->GetGUID() == me->GetGUID())
+            return;
 
-            Talk(SAY_SLAY);
-        }
+        Talk(SAY_SLAY);
+    }
 
-        void MoveInLineOfSight(Unit* /*who*/) override {}
+    void MoveInLineOfSight(Unit* /*who*/) override {}
 
-        void EnterEvadeMode(EvadeReason why) override
-        {
-            ScriptedAI::EnterEvadeMode(why);
-            events.Reset();
-            me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-            if (pInstance)
-                pInstance->SetData(DATA_FAILED, 1);
-        }
-    };
+    void EnterEvadeMode(EvadeReason why) override
+    {
+        me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+        _EnterEvadeMode(why);
+    }
 };
 
 void AddSC_boss_xevozz()
 {
-    new boss_xevozz();
+    RegisterVioletHoldCreatureAI(boss_xevozz);
 }
