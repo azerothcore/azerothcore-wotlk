@@ -329,6 +329,12 @@ struct npc_training_dummy : NullCreatureAI
             return;
 
         _combatTimer[attacker->GetGUID()] = 5s;
+
+        // Pet attacks engage the owner via propagation without firing
+        // JustEnteredCombat here, so track the owner's timer too.
+        if (Unit* owner = attacker->GetCharmerOrOwner())
+            if (me->GetCombatManager().IsInCombatWith(owner))
+                _combatTimer[owner->GetGUID()] = 5s;
     }
 
     void UpdateAI(uint32 diff) override
@@ -1356,6 +1362,7 @@ public:
             }
         }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 /*waypointId*/) override
         {
         }

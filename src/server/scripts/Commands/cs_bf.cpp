@@ -18,10 +18,11 @@
 #include "BattlefieldMgr.h"
 #include "Chat.h"
 #include "CommandScript.h"
-#include "Language.h"
 #include "GameTime.h"
+#include "Language.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
+#include "RBAC.h"
 
 using namespace Acore::ChatCommands;
 
@@ -34,12 +35,12 @@ public:
     {
         static ChatCommandTable battlefieldcommandTable =
         {
-            { "start",  HandleBattlefieldStart,  SEC_ADMINISTRATOR, Console::Yes },
-            { "stop",   HandleBattlefieldEnd,    SEC_ADMINISTRATOR, Console::Yes },
-            { "switch", HandleBattlefieldSwitch, SEC_ADMINISTRATOR, Console::Yes },
-            { "timer",  HandleBattlefieldTimer,  SEC_ADMINISTRATOR, Console::Yes },
-            { "enable", HandleBattlefieldEnable, SEC_ADMINISTRATOR, Console::Yes },
-            { "queue",  HandleBattlefieldQueue,  SEC_GAMEMASTER,    Console::Yes }
+            { "start",  HandleBattlefieldStart,  rbac::RBAC_PERM_COMMAND_BF_START,  Console::Yes },
+            { "stop",   HandleBattlefieldEnd,    rbac::RBAC_PERM_COMMAND_BF_STOP,   Console::Yes },
+            { "switch", HandleBattlefieldSwitch, rbac::RBAC_PERM_COMMAND_BF_SWITCH, Console::Yes },
+            { "timer",  HandleBattlefieldTimer,  rbac::RBAC_PERM_COMMAND_BF_TIMER,  Console::Yes },
+            { "enable", HandleBattlefieldEnable, rbac::RBAC_PERM_COMMAND_BF_ENABLE, Console::Yes },
+            { "queue",  HandleBattlefieldQueue,  rbac::RBAC_PERM_COMMAND_BF_QUEUE,  Console::Yes }
         };
         static ChatCommandTable commandTable =
         {
@@ -48,8 +49,9 @@ public:
         return commandTable;
     }
 
-    static bool HandleBattlefieldStart(ChatHandler* handler, uint32 battleId)
+    static bool HandleBattlefieldStart(ChatHandler* handler, Optional<uint32> battleIdArg)
     {
+        uint32 const battleId = battleIdArg.value_or(BATTLEFIELD_BATTLEID_WG);
         Battlefield* bf = sBattlefieldMgr->GetBattlefieldByBattleId(battleId);
 
         if (!bf)
@@ -66,8 +68,9 @@ public:
         return true;
     }
 
-    static bool HandleBattlefieldEnd(ChatHandler* handler, uint32 battleId)
+    static bool HandleBattlefieldEnd(ChatHandler* handler, Optional<uint32> battleIdArg)
     {
+        uint32 const battleId = battleIdArg.value_or(BATTLEFIELD_BATTLEID_WG);
         Battlefield* bf = sBattlefieldMgr->GetBattlefieldByBattleId(battleId);
 
         if (!bf)
@@ -84,8 +87,9 @@ public:
         return true;
     }
 
-    static bool HandleBattlefieldEnable(ChatHandler* handler, uint32 battleId)
+    static bool HandleBattlefieldEnable(ChatHandler* handler, Optional<uint32> battleIdArg)
     {
+        uint32 const battleId = battleIdArg.value_or(BATTLEFIELD_BATTLEID_WG);
         Battlefield* bf = sBattlefieldMgr->GetBattlefieldByBattleId(battleId);
 
         if (!bf)
@@ -112,8 +116,9 @@ public:
         return true;
     }
 
-    static bool HandleBattlefieldSwitch(ChatHandler* handler, uint32 battleId)
+    static bool HandleBattlefieldSwitch(ChatHandler* handler, Optional<uint32> battleIdArg)
     {
+        uint32 const battleId = battleIdArg.value_or(BATTLEFIELD_BATTLEID_WG);
         Battlefield* bf = sBattlefieldMgr->GetBattlefieldByBattleId(battleId);
 
         if (!bf)
@@ -130,12 +135,14 @@ public:
         return true;
     }
 
-    static bool HandleBattlefieldTimer(ChatHandler* handler, uint32 battleId, std::string timeStr)
+    static bool HandleBattlefieldTimer(ChatHandler* handler, Optional<uint32> battleIdArg, std::string timeStr)
     {
         if (timeStr.empty())
         {
             return false;
         }
+
+        uint32 const battleId = battleIdArg.value_or(BATTLEFIELD_BATTLEID_WG);
 
         if (Acore::StringTo<int32>(timeStr).value_or(0) < 0)
         {
@@ -172,8 +179,9 @@ public:
         return true;
     }
 
-    static bool HandleBattlefieldQueue(ChatHandler* handler, uint32 battleId)
+    static bool HandleBattlefieldQueue(ChatHandler* handler, Optional<uint32> battleIdArg)
     {
+        uint32 const battleId = battleIdArg.value_or(BATTLEFIELD_BATTLEID_WG);
         Battlefield* bf = sBattlefieldMgr->GetBattlefieldByBattleId(battleId);
 
         if (!bf)

@@ -60,7 +60,6 @@ void TestCreature::ForceInitValues(ObjectGuid::LowType guidLow, uint32 entry)
         _fakeCreatureTemplate->speed_run = 1.14286f;
         _fakeCreatureTemplate->speed_swim = 1.0f;
         _fakeCreatureTemplate->speed_flight = 1.0f;
-        _fakeCreatureTemplate->scale = 1.0f;
         _fakeCreatureTemplate->DamageModifier = 1.0f;
         _fakeCreatureTemplate->BaseAttackTime = 2000;
         _fakeCreatureTemplate->RangeAttackTime = 2000;

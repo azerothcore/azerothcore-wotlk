@@ -19,11 +19,13 @@
 #include "CellImpl.h"
 #include "Chat.h"
 #include "CommandScript.h"
+#include <fmt/ranges.h>
 #include "GameObject.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "MapMgr.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "ScriptMgr.h"
 #include "Tokenize.h"
 
@@ -62,12 +64,12 @@ public:
     {
         static ChatCommandTable poolToolsCommandTable =
         {
-            { "start",  HandlePoolStart,  SEC_ADMINISTRATOR, Console::No },
-            { "def",    HandlePoolDef,    SEC_ADMINISTRATOR, Console::No },
-            { "add",    HandlePoolAdd,    SEC_ADMINISTRATOR, Console::No },
-            { "remove", HandlePoolRemove, SEC_ADMINISTRATOR, Console::No },
-            { "end",    HandlePoolEnd,    SEC_ADMINISTRATOR, Console::No },
-            { "clear",  HandlePoolClear,  SEC_ADMINISTRATOR, Console::No }
+            { "start",  HandlePoolStart,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "def",    HandlePoolDef,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "add",    HandlePoolAdd,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "remove", HandlePoolRemove, rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "end",    HandlePoolEnd,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "clear",  HandlePoolClear,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::No }
         };
 
         static ChatCommandTable commandTable =

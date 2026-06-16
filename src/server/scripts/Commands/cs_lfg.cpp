@@ -21,6 +21,7 @@
 #include "LFGMgr.h"
 #include "Language.h"
 #include "Player.h"
+#include "RBAC.h"
 
 void GetPlayerInfo(ChatHandler*  handler, Player* player)
 {
@@ -47,12 +48,12 @@ public:
     {
         static ChatCommandTable lfgCommandTable =
         {
-            { "player",   HandleLfgPlayerInfoCommand,       SEC_MODERATOR,     Console::No },
-            { "group",    HandleLfgGroupInfoCommand,        SEC_MODERATOR,     Console::No },
-            { "queue",    HandleLfgQueueInfoCommand,        SEC_MODERATOR,     Console::Yes },
-            { "clean",    HandleLfgCleanCommand,            SEC_ADMINISTRATOR, Console::Yes },
-            { "options",  HandleLfgOptionsCommand,          SEC_GAMEMASTER,    Console::Yes },
-            { "cooldown", HandleLfgCooldownClearCommand,    SEC_ADMINISTRATOR, Console::Yes },
+            { "player",   HandleLfgPlayerInfoCommand,    rbac::RBAC_PERM_COMMAND_LFG_PLAYER,   Console::No },
+            { "group",    HandleLfgGroupInfoCommand,     rbac::RBAC_PERM_COMMAND_LFG_GROUP,    Console::No },
+            { "queue",    HandleLfgQueueInfoCommand,     rbac::RBAC_PERM_COMMAND_LFG_QUEUE,    Console::Yes },
+            { "clean",    HandleLfgCleanCommand,         rbac::RBAC_PERM_COMMAND_LFG_CLEAN,    Console::Yes },
+            { "options",  HandleLfgOptionsCommand,       rbac::RBAC_PERM_COMMAND_LFG_OPTIONS,  Console::Yes },
+            { "cooldown", HandleLfgCooldownClearCommand, rbac::RBAC_PERM_COMMAND_LFG_COOLDOWN, Console::Yes },
         };
 
         static ChatCommandTable commandTable =

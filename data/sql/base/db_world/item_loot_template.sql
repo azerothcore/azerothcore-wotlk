@@ -694,7 +694,7 @@ INSERT INTO `item_loot_template` VALUES
 (11107,11104,0,100,1,1,0,1,1,'A Small Pack - Large Compass'),
 (11107,11105,0,100,1,1,0,1,1,'A Small Pack - Curled Map Parchment'),
 (11107,11106,0,100,1,1,0,1,1,'A Small Pack - Lion-headed Key'),
-(11107,11108,0,100,1,1,0,1,1,'A Small Pack - Faded Photograph'),
+(11107,11108,0,100,0,1,0,1,1,'A Small Pack - Faded Photograph'),
 (11422,4394,0,0,0,1,1,4,6,'Goblin Engineer\'s Renewal Gift - Big Iron Bomb'),
 (11422,4416,0,5,0,1,1,1,1,'Goblin Engineer\'s Renewal Gift - Schematic: Goblin Land Mine'),
 (11422,4417,0,5,0,1,1,1,1,'Goblin Engineer\'s Renewal Gift - Schematic: Large Seaforium Charge'),
@@ -3003,12 +3003,12 @@ INSERT INTO `item_loot_template` VALUES
 (41426,33448,0,100,0,1,0,5,5,'Magically Wrapped Gift - Runic Mana Potion'),
 (41426,40211,0,100,0,1,0,5,5,'Magically Wrapped Gift - Potion of Speed'),
 (41426,41427,0,100,0,1,0,5,5,'Magically Wrapped Gift - Dalaran Firework'),
-(41888,41450,0,16.9,0,1,0,1,1,'Small Velvet Bag - Perfect Balanced Shadow Crystal'),
-(41888,41452,0,16.9,0,1,0,1,1,'Small Velvet Bag - Perfect Glowing Shadow Crystal'),
-(41888,41466,0,17.7,0,1,0,1,1,'Small Velvet Bag - Perfect Forceful Dark Jade'),
-(41888,41468,0,16.3,0,1,0,1,1,'Small Velvet Bag - Perfect Jagged Dark Jade'),
-(41888,41492,0,13,0,1,0,1,1,'Small Velvet Bag - Perfect Inscribed Huge Citrine'),
-(41888,41497,0,19.3,0,1,0,1,1,'Small Velvet Bag - Perfect Reckless Huge Citrine'),
+(41888,41450,0,0,0,1,1,1,1,'Small Velvet Bag - Perfect Balanced Shadow Crystal'),
+(41888,41452,0,0,0,1,1,1,1,'Small Velvet Bag - Perfect Glowing Shadow Crystal'),
+(41888,41466,0,0,0,1,1,1,1,'Small Velvet Bag - Perfect Forceful Dark Jade'),
+(41888,41468,0,0,0,1,1,1,1,'Small Velvet Bag - Perfect Jagged Dark Jade'),
+(41888,41492,0,0,0,1,1,1,1,'Small Velvet Bag - Perfect Inscribed Huge Citrine'),
+(41888,41497,0,0,0,1,1,1,1,'Small Velvet Bag - Perfect Reckless Huge Citrine'),
 (43346,47241,0,100,0,1,0,5,5,'Large Satchel of Spoils - Emblem of Triumph'),
 (43347,47241,0,100,0,1,0,5,5,'Satchel of Spoils - Emblem of Triumph'),
 (43556,36012,0,1.6,0,1,1,1,1,'Patroller\'s Pack - Tethys Slippers'),
@@ -3274,6 +3274,7 @@ INSERT INTO `item_loot_template` VALUES
 (52006,50472,0,1,0,1,1,1,1,'Sack of Frosty Treasures - Nightmare Ender'),
 (52676,1,526760,100,0,1,0,1,1,'Cache of the Ley-Guardian - (ReferenceTable)'),
 (52676,43953,0,5,0,1,0,1,1,'Cache of the Ley-Guardian - Reins of the Blue Drake'),
+(52676,47241,0,100,0,1,0,2,2,''),
 (54218,23720,0,0.5,0,1,2,1,1,'Landro\'s Gift Box - Riding Turtle'),
 (54218,35223,0,36.36,0,1,1,50,50,'Landro\'s Gift Box - Papa Hummel\'s Old-Fashioned Pet Biscuit'),
 (54218,45047,0,27.28,0,1,1,50,50,'Landro\'s Gift Box - Sandbox Tiger'),
@@ -3321,4 +3322,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-03-15 20:38:46
+-- Dump completed on 2026-06-01 22:40:05

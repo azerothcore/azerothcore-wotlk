@@ -45,12 +45,7 @@ enum Npc
 struct boss_blackheart_the_inciter : public BossAI
 {
     boss_blackheart_the_inciter(Creature* creature) : BossAI(creature, DATA_BLACKHEARTTHEINCITEREVENT)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    {    }
 
     bool InciteChaos;
 

@@ -41,12 +41,7 @@ enum MekgineerSteamrigger
 struct boss_mekgineer_steamrigger : public BossAI
 {
     boss_mekgineer_steamrigger(Creature* creature) : BossAI(creature, DATA_MEKGINEER_STEAMRIGGER)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    {    }
 
     void JustDied(Unit* /*killer*/) override
     {
