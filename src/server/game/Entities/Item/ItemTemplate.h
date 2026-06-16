@@ -183,7 +183,7 @@ enum ItemFlags2 : uint32
     ITEM_FLAG2_FACTION_HORDE                            = 0x00000001, // Only Horde can equip, loot, or buy back this item
     ITEM_FLAG2_FACTION_ALLIANCE                         = 0x00000002, // Only Alliance can equip, loot, or buy back this item
     ITEM_FLAG2_DONT_IGNORE_BUY_PRICE                    = 0x00000004, // when item uses extended cost, gold is also required
-    ITEM_FLAG2_CLASSIFY_AS_CASTER                       = 0x00000008, // unused
+    ITEM_FLAG2_CLASSIFY_AS_CASTER                       = 0x00000008, // NYI - unused
     ITEM_FLAG2_CLASSIFY_AS_PHYSICAL                     = 0x00000010, // NYI
     ITEM_FLAG2_EVERYONE_CAN_ROLL_NEED                   = 0x00000020, // Anyone can roll need
     ITEM_FLAG2_NO_TRADE_BIND_ON_ACQUIRE                 = 0x00000040, // NYI - unused
