@@ -2430,6 +2430,10 @@ InventoryResult Player::CanRollForItemInLFG(ItemTemplate const* proto, WorldObje
         SKILL_FISHING
     }; //Copy from function Item::GetSkill()
 
+    // Anyone can roll need on this item
+    if (proto && proto->HasFlag2(ITEM_FLAG2_EVERYONE_CAN_ROLL_NEED))
+        return EQUIP_ERR_OK;
+
     if ((proto->AllowableClass & getClassMask()) == 0 || (proto->AllowableRace & getRaceMask()) == 0)
         return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
 
