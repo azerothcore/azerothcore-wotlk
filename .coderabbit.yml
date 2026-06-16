@@ -6,12 +6,15 @@ language: en-US
 reviews:
   profile: chill
   request_changes_workflow: false
-  high_level_summary: true
+  high_level_summary: false
   poem: false
-  review_status: true
+  review_status: false
+  collapse_walkthrough: true
+  sequence_diagrams: false
   auto_review:
     enabled: true
-    auto_incremental_review: true
+    # Review on PR open only; don't re-post a walkthrough on every push.
+    auto_incremental_review: false
     drafts: false
 
   # Skip generated, vendored, and immutable content so reviews stay focused.
