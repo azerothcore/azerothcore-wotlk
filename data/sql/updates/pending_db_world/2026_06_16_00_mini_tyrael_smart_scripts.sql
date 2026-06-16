@@ -3,8 +3,10 @@
 --
 -- Root causes fixed:
 -- 1. Spell 69205 (periodic trigger 30s) → spell 69204 → SMART_EVENT_SPELLHIT fired
---    SMART_ACTION_TALK unconditionally every 30s ("falls asleep"/"becomes enraged") spamming chat.
---    Fix: remove the SPELLHIT handler entirely. The pet no longer sleeps or enrages.
+--    SMART_ACTION_TALK unconditionally every 30s ("falls asleep"/"becomes enraged") spamming chat,
+--    and spell 69204 applied a sleep visual animation every 30s.
+--    Fix: remove 69205 from creature_template_addon (no more periodic trigger) and remove the
+--    SPELLHIT handler. The pet no longer sleeps or enrages.
 -- 2. Dance used SMART_ACTION_PLAY_EMOTE which freezes movement.
 --    Fix: use SMART_ACTION_CAST with spell 54398 (Tyrael Dance, DUMMY aura visual)
 --    which allows the pet to keep following while the animation plays. 60s cooldown on /dance.
@@ -42,3 +44,8 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 (22, 3, 29089, 0, 0, 21, 1, 1048576, 0, 0, 0, 0, 0, '', 'Mini Tyrael - Update OOC dance only when moving'),
 -- event id=3 UPDATE_OOC remove dance (SourceGroup=4): only fire when pet is NOT moving
 (22, 4, 29089, 0, 0, 21, 1, 1048576, 0, 0, 1, 0, 0, '', 'Mini Tyrael - Update OOC stop dance only when stationary');
+-- Remove aura 69205 from creature_template_addon: it was the periodic trigger for sleep/enrage
+-- behavior (69205 → triggers 69204 every 30s → sleep visual aura applied to the pet).
+DELETE FROM `creature_template_addon` WHERE `entry` = 29089;
+INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
+(29089, 0, 0, 0, 0, 0, 0, '');
