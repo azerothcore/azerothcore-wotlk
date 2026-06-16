@@ -2431,7 +2431,7 @@ InventoryResult Player::CanRollForItemInLFG(ItemTemplate const* proto, WorldObje
     }; //Copy from function Item::GetSkill()
 
     // Anyone can roll need on this item
-    if (proto && proto->HasFlag2(ITEM_FLAG2_EVERYONE_CAN_ROLL_NEED))
+    if (proto->HasFlag2(ITEM_FLAG2_EVERYONE_CAN_ROLL_NEED))
         return EQUIP_ERR_OK;
 
     if ((proto->AllowableClass & getClassMask()) == 0 || (proto->AllowableRace & getRaceMask()) == 0)
