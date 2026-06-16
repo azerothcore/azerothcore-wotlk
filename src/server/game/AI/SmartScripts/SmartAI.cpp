@@ -1524,7 +1524,12 @@ public:
 class SmartQuestScript : public PlayerScript
 {
 public:
-    SmartQuestScript() : PlayerScript("SmartQuestScript") { }
+    SmartQuestScript() : PlayerScript("SmartQuestScript", {
+        PLAYERHOOK_ON_PLAYER_QUEST_ACCEPT,
+        PLAYERHOOK_ON_BEFORE_QUEST_COMPLETE,
+        PLAYERHOOK_ON_PLAYER_COMPLETE_QUEST,
+        PLAYERHOOK_ON_QUEST_ABANDON
+    }) { }
 
     // Fired when a player accepts any quest (all quest givers)
     void OnPlayerQuestAccept(Player* player, Quest const* quest) override

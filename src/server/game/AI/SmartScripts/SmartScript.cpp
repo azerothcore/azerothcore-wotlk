@@ -5336,6 +5336,9 @@ void SmartScript::OnInitializeQuest(uint32 questEntry)
 {
     mScriptType = SMART_SCRIPT_TYPE_QUEST;
     mQuestEntry = questEntry;
+    me = nullptr;
+    go = nullptr;
+    trigger = nullptr;
     LOG_DEBUG("sql.sql", "SmartScript::OnInitializeQuest: source is Quest {}", questEntry);
     GetScript();
     for (SmartScriptHolder& event : mEvents)
