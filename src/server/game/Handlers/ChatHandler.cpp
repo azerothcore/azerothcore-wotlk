@@ -114,7 +114,8 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
     }
 
     // Trial accounts cannot speak in chat channels or guild/officer chat. Whisper is handled later.
-    if (sWorld->getBoolConfig(CONFIG_TRIAL_RESTRICTION_CHAT) && IsTrialAccount()
+    // Addon traffic (LANG_ADDON) is excluded; it carries the Warden Lua check response over guild chat.
+    if (sWorld->getBoolConfig(CONFIG_TRIAL_RESTRICTION_CHAT) && IsTrialAccount() && lang != LANG_ADDON
         && (type == CHAT_MSG_CHANNEL || type == CHAT_MSG_GUILD || type == CHAT_MSG_OFFICER))
     {
         WorldPacket data;
