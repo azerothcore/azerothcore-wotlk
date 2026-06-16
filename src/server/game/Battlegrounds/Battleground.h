@@ -258,11 +258,21 @@ public:
         IP = ip;
     }
 
+    void SaveStats(uint32 damageDone, uint32 healingDone, uint32 killingBlows)
+    {
+        DamageDone = damageDone;
+        HealingDone = healingDone;
+        KillingBlows = killingBlows;
+    }
+
     std::string Name{};
     ObjectGuid::LowType Guid{0};
     uint32 Acc{0};
     uint32 ArenaTeamId{0};
     std::string IP{};
+    uint32 DamageDone{0};
+    uint32 HealingDone{0};
+    uint32 KillingBlows{0};
 };
 
 enum BGHonorMode
