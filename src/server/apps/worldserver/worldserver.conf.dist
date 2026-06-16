@@ -1745,6 +1745,7 @@ Trial.MoneyCap = 100000
 
 Trial.TradeSkillCap = 100
 
+#
 #    Trial.Restriction.Chat
 #        Description: Restrict trial accounts from using whisper/channel/guild chats.
 #                     Whispers are only allowed when the trial player is on the recipients friendslist
