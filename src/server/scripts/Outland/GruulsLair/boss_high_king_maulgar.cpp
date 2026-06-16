@@ -171,15 +171,6 @@ struct boss_olm_the_summoner : public ScriptedAI
         instance->SetBossState(DATA_MAULGAR, NOT_STARTED);
     }
 
-    void AttackStart(Unit* who) override
-    {
-        if (!who)
-            return;
-
-        if (me->Attack(who, true))
-            me->GetMotionMaster()->MoveChase(who, 25.0f);
-    }
-
     void JustEngagedWith(Unit* /*who*/) override
     {
         me->SetInCombatWithZone();
@@ -251,7 +242,7 @@ struct boss_kiggler_the_crazed : public ScriptedAI
             return;
 
         if (me->Attack(who, true))
-            me->GetMotionMaster()->MoveChase(who, 25.0f);
+            me->GetMotionMaster()->MoveChase(who, 40.0f);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -330,7 +321,7 @@ struct boss_blindeye_the_seer : public ScriptedAI
                 DoCast(target, SPELL_HEAL);
             }
             context.Repeat(7200ms);
-        }).Schedule(37500s, [this](TaskContext context)
+        }).Schedule(37500ms, [this](TaskContext context)
         {
             DoCastSelf(SPELL_GREATER_PW_SHIELD);
             _scheduler.Schedule(1200ms, [this](TaskContext)
