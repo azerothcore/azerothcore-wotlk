@@ -204,7 +204,9 @@ public:
                     case EVENT_COMPLETE:
                         {
                             DoCast(me, SPELL_IDOM_ROOM_CAMERA_SHAKE);
-                            me->SummonGameObject(GO_BELNISTRASZS_BRAZIER, 2577.196f, 947.0781f, 53.16757f, 2.356195f, 0, 0, 0.9238796f, 0.3826832f, 3600);
+                            // Summon via the map so the brazier is not tied to Belnistrasz's
+                            // m_gameObj list and survives his despawn below.
+                            me->GetMap()->SummonGameObject(GO_BELNISTRASZS_BRAZIER, 2577.196f, 947.0781f, 53.16757f, 2.356195f, 0, 0, 0.9238796f, 0.3826832f, 3600);
                             std::list<WorldObject*> ClusterList;
                             Acore::AllWorldObjectsInRange objects(me, 50.0f);
                             Acore::WorldObjectListSearcher<Acore::AllWorldObjectsInRange> searcher(me, ClusterList, objects);
@@ -223,7 +225,7 @@ public:
                                 }
                             }
                             instance->SetData(GO_BELNISTRASZS_BRAZIER, DONE);
-                            me->DespawnOrUnsummon();
+                            me->DespawnOrUnsummon(5s);
                             break;
                         }
                     case EVENT_FIREBALL:

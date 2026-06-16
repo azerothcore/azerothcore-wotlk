@@ -677,6 +677,16 @@ enum RBACPermissions
     RBAC_PERM_COMMAND_BF_QUEUE                              = 913,
     RBAC_PERM_COMMAND_PET_LIST                               = 914,
     RBAC_PERM_COMMAND_PET_DELETE                             = 915,
+    RBAC_PERM_COMMAND_RESPAWN_CREATURE_GUID                  = 916,
+    RBAC_PERM_COMMAND_RESPAWN_GAMEOBJECT_GUID                = 917,
+    RBAC_PERM_COMMAND_RESPAWN_CREATURE_ENTRY                 = 918,
+    RBAC_PERM_COMMAND_RESPAWN_GAMEOBJECT_ENTRY               = 919,
+    RBAC_PERM_COMMAND_DEBUG_INFO                             = 920,
+    RBAC_PERM_COMMAND_DEBUG_COSMETIC                         = 921,
+    RBAC_PERM_COMMAND_PET_RENAME                             = 922,
+    RBAC_PERM_COMMAND_CHATFILTER_LIST                        = 923,
+    RBAC_PERM_COMMAND_CHATFILTER_ADD                         = 924,
+    RBAC_PERM_COMMAND_CHATFILTER_REMOVE                      = 925,
     // custom permissions 1000+
     RBAC_PERM_MAX
 };

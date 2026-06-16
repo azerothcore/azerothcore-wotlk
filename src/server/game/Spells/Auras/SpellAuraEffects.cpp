@@ -847,7 +847,9 @@ void AuraEffect::ApplySpellMod(Unit* target, bool apply)
                     Aura* aura = iter->second->GetBase();
                     // only passive and permament auras-active auras should have amount set on spellcast and not be affected
                     // if aura is casted by others, it will not be affected
-                    if ((aura->IsPassive() || aura->IsPermanent()) && aura->GetCasterGUID() == guid && aura->GetSpellInfo()->IsAffectedBySpellMod(m_spellmod))
+                    if ((aura->IsPassive() || aura->IsPermanent()) && aura->GetCasterGUID() == guid &&
+                        aura->GetSpellInfo()->CheckShapeshift(target->GetShapeshiftForm()) == SPELL_CAST_OK &&
+                        aura->GetSpellInfo()->IsAffectedBySpellMod(m_spellmod))
                     {
                         if (GetMiscValue() == SPELLMOD_ALL_EFFECTS)
                         {
@@ -5344,13 +5346,10 @@ void AuraEffect::HandleAuraDummy(AuraApplication const* aurApp, uint8 mode, bool
                     {
                         case 2584: // Waiting to Resurrect
                             // Waiting to resurrect spell cancel, we must remove player from resurrect queue
+                            // bf branch omitted: it would cascade back into this handler.
                             if (target->IsPlayer())
-                            {
                                 if (Battleground* bg = target->ToPlayer()->GetBattleground())
                                     bg->RemovePlayerFromResurrectQueue(target->ToPlayer());
-                                if (Battlefield* bf = sBattlefieldMgr->GetBattlefieldToZoneId(target->GetZoneId()))
-                                    bf->RemovePlayerFromResurrectQueue(target->GetGUID());
-                            }
                             break;
                         case 43681: // Inactive
                             {
