@@ -1,3 +1,4 @@
+-- DB update 2026_06_15_01 -> 2026_06_16_00
 -- Create creature_multispawn table for multi-ID spawning
 CREATE TABLE IF NOT EXISTS `creature_multispawn` (
   `spawnId` int unsigned NOT NULL COMMENT 'creature.guid',
