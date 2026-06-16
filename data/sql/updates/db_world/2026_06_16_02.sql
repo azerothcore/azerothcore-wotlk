@@ -1,3 +1,4 @@
+-- DB update 2026_06_16_01 -> 2026_06_16_02
 -- Fix for issue #23784: Rhydian should spawn portal to Shattrath when quest 13081 "The Will of the Naaru" is accepted
 
 -- Enable SmartAI for Rhydian and Tirion
