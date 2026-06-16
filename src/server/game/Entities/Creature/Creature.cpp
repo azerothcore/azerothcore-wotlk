@@ -1850,6 +1850,10 @@ void Creature::DeleteFromDB()
     stmt->SetData(0, m_spawnId);
     trans->Append(stmt);
 
+    stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_CREATURE_MULTISPAWN);
+    stmt->SetData(0, m_spawnId);
+    trans->Append(stmt);
+
     stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_GAME_EVENT_CREATURE);
     stmt->SetData(0, m_spawnId);
     trans->Append(stmt);
