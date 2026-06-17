@@ -755,15 +755,6 @@ struct boss_mimiron : public BossAI
                 Talk(SAY_V07TRON_DEATH);
                 me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                 instance->SetBossState(BOSS_MIMIRON, DONE);
-                // spawn chest
-                if (uint32 chestId = (_hardmode ? RAID_MODE(GO_MIMIRON_CHEST_HARD, GO_MIMIRON_CHEST_HERO_HARD) : RAID_MODE(GO_MIMIRON_CHEST, GO_MIMIRON_CHEST_HERO)))
-                {
-                    if (GameObject* go = me->SummonGameObject(chestId, 2744.65f, 2569.46f, 364.397f, 0, 0, 0, 0, 0, 0, true, GO_SUMMON_TIMED_DESPAWN))
-                    {
-                        go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
-                        go->SetLootRecipient(me->GetMap());
-                    }
-                }
                 events.ScheduleEvent(EVENT_DISAPPEAR, 9s);
                 break;
             case EVENT_DISAPPEAR:
