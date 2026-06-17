@@ -19,7 +19,8 @@ WHERE bad.class = 4
   AND bad.Quality >= 2
   AND bad.ItemLevel > 1;
 
--- pass 2: slot-reference (367 items); HAVING MIN=MAX prevents tank/DPS cross-contamination
+-- pass 2: slot-reference (367 items)
+-- HAVING MIN=MAX prevents tank/DPS cross-contamination
 UPDATE item_template bad
 JOIN (
     SELECT ItemLevel, Quality, subclass, InventoryType,
@@ -44,7 +45,8 @@ WHERE bad.class = 4
   AND bad.Quality >= 2
   AND bad.ItemLevel > 1;
 
--- fix dmg_min1=dmg_max1=0 on real weapons (class=2) with valid delay (61 items)
+-- fix dmg_min1=dmg_max1=0 on real weapons (class=2)
+-- with valid delay (61 items)
 UPDATE item_template bad
 JOIN (
     SELECT ItemLevel, Quality, subclass,
@@ -52,9 +54,16 @@ JOIN (
     FROM item_template
     WHERE class = 2
       AND dmg_min1 > 0
+      AND dmg_max1 > 0
       AND delay > 0
       AND Quality >= 2
       AND ItemLevel > 1
+      AND subclass NOT IN (14, 19)
+      AND name NOT LIKE '%Test%'
+      AND name NOT LIKE '%TEST%'
+      AND name NOT LIKE '%Deprecated%'
+      AND name NOT LIKE '%Frostmourne%'
+      AND name NOT LIKE '%Art Demo%'
     GROUP BY ItemLevel, Quality, subclass
     HAVING COUNT(*) >= 2
 ) ref ON bad.ItemLevel = ref.ItemLevel
@@ -67,19 +76,31 @@ JOIN (
     FROM item_template
     WHERE class = 2
       AND dmg_min1 > 0
+      AND dmg_max1 > 0
+      AND delay > 0
       AND Quality >= 2
       AND ItemLevel > 1
+      AND subclass NOT IN (14, 19)
+      AND name NOT LIKE '%Test%'
+      AND name NOT LIKE '%TEST%'
+      AND name NOT LIKE '%Deprecated%'
+      AND name NOT LIKE '%Frostmourne%'
+      AND name NOT LIKE '%Art Demo%'
     GROUP BY subclass
 ) ratios ON bad.subclass = ratios.subclass
 SET
-    bad.dmg_min1 = GREATEST(1, ROUND(ref.ref_dps * (bad.delay / 1000.0) * ratios.min_ratio)),
-    bad.dmg_max1 = GREATEST(2, ROUND(ref.ref_dps * (bad.delay / 1000.0) * ratios.max_ratio))
+    bad.dmg_min1 = GREATEST(1, ROUND(
+        ref.ref_dps * (bad.delay / 1000.0) * ratios.min_ratio)),
+    bad.dmg_max1 = GREATEST(2, ROUND(
+        ref.ref_dps * (bad.delay / 1000.0) * ratios.max_ratio))
 WHERE bad.class = 2
   AND bad.Quality >= 2
   AND bad.ItemLevel > 1
   AND bad.dmg_min1 = 0
+  AND bad.dmg_max1 = 0
   AND bad.delay > 0
-  AND bad.subclass NOT IN (14, 19)  -- Brewfest steins (cosmetic) and wands (separate fix)
+  -- Brewfest steins (cosmetic) and wands (handled separately)
+  AND bad.subclass NOT IN (14, 19)
   AND bad.name NOT LIKE '%Test%'
   AND bad.name NOT LIKE '%TEST%'
   AND bad.name NOT LIKE '%Deprecated%'
