@@ -352,8 +352,16 @@ struct boss_freya : public BossAI
         else if (_waveNumber == 3)
         {
             Talk(SAY_SUMMON_LASHERS);
+            // Spread the lashers evenly in a ring around Freya instead of
+            // clustering them in one spot, matching retail.
             for (uint8 i = 0; i < 10; ++i)
-                me->SummonCreature(NPC_DETONATING_LASHER, me->GetPositionX() + urand(5, 20), me->GetPositionY() + urand(5, 20), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), 0, TEMPSUMMON_CORPSE_DESPAWN);
+            {
+                float angle = i * 2.0f * float(M_PI) / 10.0f + frand(-0.35f, 0.35f);
+                float dist = frand(18.0f, 28.0f);
+                float x = me->GetPositionX() + dist * std::cos(angle);
+                float y = me->GetPositionY() + dist * std::sin(angle);
+                me->SummonCreature(NPC_DETONATING_LASHER, x, y, me->GetMapHeight(x, y, me->GetPositionZ()), 0, TEMPSUMMON_CORPSE_DESPAWN);
+            }
         }
     }
 
@@ -981,6 +989,30 @@ struct boss_freya_summons : public ScriptedAI
     {
         _stackCount = 0;
         events.Reset();
+
+        // Detonating Lashers spawn submerged in the ground and stay passive for a
+        // few seconds, then burst out with the emerge/birth animation (driven by
+        // the SUBMERGED -> STAND stand state change, like XT-002) and only start
+        // attacking once it has played out, so the jump is not cut short by
+        // combat movement (see issue #26255). They remain hostile and attackable
+        // while submerged, matching retail.
+        if (me->GetEntry() == NPC_DETONATING_LASHER)
+        {
+            me->SetReactState(REACT_PASSIVE);
+            me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
+            me->m_Events.AddEventAtOffset([this]()
+            {
+                me->SetStandState(UNIT_STAND_STATE_STAND);
+            }, 4s);
+            me->m_Events.AddEventAtOffset([this]()
+            {
+                me->SetReactState(REACT_AGGRESSIVE);
+                if (Unit* target = SelectTargetFromPlayerList(70))
+                    AttackStart(target);
+            }, 5s);
+            return;
+        }
+
         if (Unit* target = SelectTargetFromPlayerList(70))
             AttackStart(target);
     }
