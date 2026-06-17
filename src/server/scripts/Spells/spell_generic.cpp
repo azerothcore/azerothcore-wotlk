@@ -4563,7 +4563,7 @@ class spell_gen_ethereal_pet_aura : public AuraScript
             return false;
 
         // Only trigger on players killing creatures that are not grey mobs
-        uint32 levelDiff = std::abs(int32(GetTarget()->GetLevel()) - int32(procTarget->GetLevel()));
+        int32 levelDiff = int32(GetTarget()->GetLevel()) - int32(procTarget->GetLevel());
         return levelDiff <= 9;
     }
 
