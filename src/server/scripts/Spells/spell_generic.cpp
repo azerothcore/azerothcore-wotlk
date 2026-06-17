@@ -4578,7 +4578,7 @@ class spell_gen_ethereal_pet_aura : public AuraScript
         // Get all Ethereal Soul-Trader minions owned by this player
         std::list<Creature*> minionList;
         GetUnitOwner()->GetAllMinionsByEntry(minionList, NPC_ETHEREAL_SOUL_TRADER);
-        
+
         for (Creature* minion : minionList)
         {
             // Cast the laser beam visual from the pet to the killed mob
