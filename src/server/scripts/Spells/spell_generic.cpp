@@ -4543,6 +4543,58 @@ class spell_gen_eject_passenger : public SpellScript
     }
 };
 
+// 50051 - Ethereal Pet Aura (Soultrader Beacon)
+// Triggers when the owner kills an opponent, applying spell 50050 (SPELL_OWNER_KILLED_INFORM) to notify the pet
+class spell_gen_ethereal_pet_aura : public AuraScript
+{
+    PrepareAuraScript(spell_gen_ethereal_pet_aura);
+
+    enum EtherealSoulTrader
+    {
+        NPC_ETHEREAL_SOUL_TRADER        = 27914,
+        SPELL_OWNER_KILLED_INFORM       = 50050,
+        SPELL_STEAL_ESSENCE_VISUAL      = 50101,
+    };
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        Unit* procTarget = eventInfo.GetProcTarget();
+        if (!procTarget)
+            return false;
+
+        // Only trigger on players killing creatures that are not grey mobs
+        uint32 levelDiff = std::abs(int32(GetTarget()->GetLevel()) - int32(procTarget->GetLevel()));
+        return levelDiff <= 9;
+    }
+
+    void HandleProc(const AuraEffect* /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        PreventDefaultAction();
+
+        Unit* procTarget = eventInfo.GetProcTarget();
+        if (!procTarget)
+            return;
+
+        // Get all Ethereal Soul-Trader minions owned by this player
+        std::list<Creature*> minionList;
+        GetUnitOwner()->GetAllMinionsByEntry(minionList, NPC_ETHEREAL_SOUL_TRADER);
+        
+        for (Creature* minion : minionList)
+        {
+            // Cast the laser beam visual from the pet to the killed mob
+            minion->CastSpell(procTarget, SPELL_STEAL_ESSENCE_VISUAL);
+            // Notify the pet AI that a valid kill occurred (triggers the pet's SpellHit handler)
+            minion->CastSpell(minion, SPELL_OWNER_KILLED_INFORM, true);
+        }
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_gen_ethereal_pet_aura::CheckProc);
+        OnEffectProc += AuraEffectProcFn(spell_gen_ethereal_pet_aura::HandleProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
+    }
+};
+
 /* 37727 - Touch of Darkness
    37851 - Tag Greater Felfire Diemetradon
    37917 - Arcano-Cloak
@@ -6236,6 +6288,7 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_whisper_gulch_yogg_saron_whisper);
     RegisterSpellScript(spell_gen_eject_all_passengers);
     RegisterSpellScript(spell_gen_eject_passenger);
+    RegisterSpellScript(spell_gen_ethereal_pet_aura);
     RegisterSpellScript(spell_gen_charmed_unit_spell_cooldown);
     RegisterSpellScript(spell_contagion_of_rot);
     RegisterSpellScript(spell_gen_holiday_buff_food);
