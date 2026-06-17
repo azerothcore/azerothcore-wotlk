@@ -5209,6 +5209,22 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].BasePoints = 1;
     });
 
+    // 43062 - Alpha Worg: Garwal's Invisibility
+    ApplySpellFix({ 43062 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_APPLY_AURA;
+        spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_MOD_INVISIBILITY;
+        spellInfo->Effects[EFFECT_0].BasePoints = 999;
+        spellInfo->Effects[EFFECT_0].MiscValue = 8;
+        spellInfo->Effects[EFFECT_0].TargetA = TARGET_UNIT_CASTER;
+
+        spellInfo->Effects[EFFECT_1].Effect = SPELL_EFFECT_APPLY_AURA;
+        spellInfo->Effects[EFFECT_1].ApplyAuraName = SPELL_AURA_MOD_INVISIBILITY_DETECT;
+        spellInfo->Effects[EFFECT_1].BasePoints = 999;
+        spellInfo->Effects[EFFECT_1].MiscValue = 8;
+        spellInfo->Effects[EFFECT_1].TargetA = TARGET_UNIT_CASTER;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
