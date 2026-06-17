@@ -21,14 +21,15 @@
  *
  * Formula (from spell_gen_vehicle_scaling_aura in spell_generic.cpp):
  *
- *   result = ((totalILvl - 2500) - p) / 500
+ *   result = (totalAdjustedILvl - 2500) / 500
  *   amount = int32(max(0.1f, result))
  *
  * Where:
- *   totalILvl = sum of base ItemLevel across 15 equipped slots
- *               (excludes offhand, ranged, shirt, tabard)
- *   p = quality penalty: 26 per uncommon/below, 13 per rare
- *   floor: 0.1 when totalILvl < 2500
+ *   totalAdjustedILvl = sum of GetItemLevelIncludingQuality across 15 equipped slots
+ *                       (excludes offhand, ranged, shirt, tabard)
+ *   GetItemLevelIncludingQuality bakes in quality penalty: -26 for uncommon/below,
+ *   -13 for rare; heirloom items use pLevel * 2.33f instead of base ItemLevel.
+ *   floor: 0.1 when totalAdjustedILvl < 2500
  *
  * Source data: Google Sheets "Ulduar Vehicle Scaling"
  * Vehicle: Salvaged Demolisher (entry 33109)
@@ -43,37 +44,25 @@
 namespace
 {
     /// Mirrors the Ulduar vehicle scaling formula from spell_gen_vehicle_scaling_aura::CalculateAmount.
+    /// totalAdjustedILvl is the sum of GetItemLevelIncludingQuality across equipped slots
+    /// (quality penalty is already baked into each item's value).
     /// Computes the raw float result before int32 truncation.
-    float CalcUlduarVehicleScale(float totalILvl, float qualityPenalty = 0.0f)
+    float CalcUlduarVehicleScale(float totalAdjustedILvl)
     {
         float const baseILvl = 2500.0f;
-        float result = ((totalILvl - baseILvl) - qualityPenalty) / 5.0f / 100.0f;
+        float result = (totalAdjustedILvl - baseILvl) / 5.0f / 100.0f;
         return std::max(0.1f, result);
     }
 
     /// Mirrors the final int32 amount stored on the aura effect.
-    int32_t CalcUlduarVehicleScaleAmount(float totalILvl, float qualityPenalty = 0.0f)
+    int32_t CalcUlduarVehicleScaleAmount(float totalAdjustedILvl)
     {
-return static_cast<int32_t>(CalcUlduarVehicleScale(totalILvl, qualityPenalty));
-    }
-
-    /// Computes quality penalty for a set of items.
-    /// Each ItemLevel entry: first is iLvl, second is quality (4=epic, 3=rare, 2=uncommon).
-    float CalcQualityPenalty(std::initializer_list<std::pair<float, int>> items)
-    {
-        float p = 0.0f;
-        for (auto const& [iLvl, quality] : items)
-        {
-            (void)iLvl; // unused in penalty calc
-            if (quality < 4) // ITEM_QUALITY_EPIC
-                p += (quality <= 2) ? 26.0f : 13.0f;
-        }
-        return p;
+        return static_cast<int32_t>(CalcUlduarVehicleScale(totalAdjustedILvl));
     }
 }
 
 // =============================================================================
-// Formula structure: result = ((totalILvl - 2500) - p) / 500
+// Formula structure: result = (totalAdjustedILvl - 2500) / 500
 // =============================================================================
 
 class UlduarVehicleScaleTest : public ::testing::Test {};
@@ -174,63 +163,37 @@ TEST_F(UlduarVehicleScaleTest, RSBiSGear)
 
 TEST_F(UlduarVehicleScaleTest, AllEpicNoPenalty)
 {
-    // 15 epic items at avg 200: totalILvl = 3000
-    float p = CalcQualityPenalty({
-        {200, 4}, {200, 4}, {200, 4}, {200, 4}, {200, 4},
-        {200, 4}, {200, 4}, {200, 4}, {200, 4}, {200, 4},
-        {200, 4}, {200, 4}, {200, 4}, {200, 4}, {200, 4}
-    });
-    EXPECT_FLOAT_EQ(p, 0.0f);
-
-    float result = CalcUlduarVehicleScale(3000.0f, p);
+    // 15 epic items at avg 200: totalAdjustedILvl = 15 * 200 = 3000
+    // (3000 - 2500) / 500 = 1.0
+    float result = CalcUlduarVehicleScale(3000.0f);
     EXPECT_FLOAT_EQ(result, 1.0f);
 }
 
 TEST_F(UlduarVehicleScaleTest, OneRareItemPenalty)
 {
-    // 14 epic + 1 rare at avg 200: totalILvl = 3000
-    float p = CalcQualityPenalty({
-        {200, 4}, {200, 4}, {200, 4}, {200, 4}, {200, 4},
-        {200, 4}, {200, 4}, {200, 4}, {200, 4}, {200, 4},
-        {200, 4}, {200, 4}, {200, 4}, {200, 4}, {200, 3}  // 1 rare
-    });
-    EXPECT_FLOAT_EQ(p, 13.0f);
-
-    // result = ((3000 - 2500) - 13) / 500 = 487/500 = 0.974
-    float result = CalcUlduarVehicleScale(3000.0f, p);
+    // 14 epic (200) + 1 rare (200 - 13 = 187): totalAdjustedILvl = 14*200 + 187 = 2987
+    // (2987 - 2500) / 500 = 487/500 = 0.974
+    float result = CalcUlduarVehicleScale(2987.0f);
     EXPECT_FLOAT_EQ(result, 0.974f);
-    EXPECT_EQ(CalcUlduarVehicleScaleAmount(3000.0f, p), 0);
+    EXPECT_EQ(CalcUlduarVehicleScaleAmount(2987.0f), 0);
 }
 
 TEST_F(UlduarVehicleScaleTest, OneUncommonItemPenalty)
 {
-    // 14 epic + 1 uncommon at avg 200: totalILvl = 3000
-    float p = CalcQualityPenalty({
-        {200, 4}, {200, 4}, {200, 4}, {200, 4}, {200, 4},
-        {200, 4}, {200, 4}, {200, 4}, {200, 4}, {200, 4},
-        {200, 4}, {200, 4}, {200, 4}, {200, 4}, {200, 2}  // 1 uncommon
-    });
-    EXPECT_FLOAT_EQ(p, 26.0f);
-
-    // result = ((3000 - 2500) - 26) / 500 = 474/500 = 0.948
-    float result = CalcUlduarVehicleScale(3000.0f, p);
+    // 14 epic (200) + 1 uncommon (200 - 26 = 174): totalAdjustedILvl = 14*200 + 174 = 2974
+    // (2974 - 2500) / 500 = 474/500 = 0.948
+    float result = CalcUlduarVehicleScale(2974.0f);
     EXPECT_FLOAT_EQ(result, 0.948f);
-    EXPECT_EQ(CalcUlduarVehicleScaleAmount(3000.0f, p), 0);
+    EXPECT_EQ(CalcUlduarVehicleScaleAmount(2974.0f), 0);
 }
 
 TEST_F(UlduarVehicleScaleTest, MixedQualityPenalty)
 {
-    // 10 epic + 3 rare + 2 uncommon at avg 200: totalILvl = 3000
-    float p = CalcQualityPenalty({
-        {200, 4}, {200, 4}, {200, 4}, {200, 4}, {200, 4},
-        {200, 4}, {200, 4}, {200, 4}, {200, 4}, {200, 4}, // 10 epic
-        {200, 3}, {200, 3}, {200, 3},                       // 3 rare
-        {200, 2}, {200, 2}                                   // 2 uncommon
-    });
-    EXPECT_FLOAT_EQ(p, 3 * 13.0f + 2 * 26.0f); // 39 + 52 = 91
-
-    float result = CalcUlduarVehicleScale(3000.0f, p);
-    EXPECT_FLOAT_EQ(result, 0.818f); // (500-91)/500 = 409/500 = 0.818
+    // 10 epic (200) + 3 rare (187) + 2 uncommon (174):
+    // totalAdjustedILvl = 10*200 + 3*187 + 2*174 = 2000 + 561 + 348 = 2909
+    // (2909 - 2500) / 500 = 409/500 = 0.818
+    float result = CalcUlduarVehicleScale(2909.0f);
+    EXPECT_FLOAT_EQ(result, 0.818f);
 }
 
 // =============================================================================
@@ -247,11 +210,11 @@ TEST_F(UlduarVehicleScaleTest, FloorAtLowItemLevel)
 
 TEST_F(UlduarVehicleScaleTest, FloorWithQualityPenalty)
 {
-    // totalILvl = 2600 with p = 200 (many low-quality items)
-    // (2600 - 2500 - 200) / 500 = -100/500 = -0.2 → floor to 0.1
-    float result = CalcUlduarVehicleScale(2600.0f, 200.0f);
+    // totalAdjustedILvl = 2400 (e.g. sum of quality-adjusted iLvl below 2500)
+    // (2400 - 2500) / 500 = -0.2 → floor to 0.1
+    float result = CalcUlduarVehicleScale(2400.0f);
     EXPECT_FLOAT_EQ(result, 0.1f);
-    EXPECT_EQ(CalcUlduarVehicleScaleAmount(2600.0f, 200.0f), 0);
+    EXPECT_EQ(CalcUlduarVehicleScaleAmount(2400.0f), 0);
 }
 
 // =============================================================================

@@ -15941,6 +15941,24 @@ void Player::_LoadRandomBGStatus(PreparedQueryResult result)
         m_IsBGRandomWinner = true;
 }
 
+float Player::GetTotalItemLevel() const
+{
+    float sum = 0;
+    uint8 level = GetLevel();
+
+    for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
+    {
+        // don't check tabard, ranged, offhand or shirt
+        if (i == EQUIPMENT_SLOT_TABARD || i == EQUIPMENT_SLOT_RANGED || i == EQUIPMENT_SLOT_OFFHAND || i == EQUIPMENT_SLOT_BODY)
+            continue;
+
+        if (m_items[i] && m_items[i]->GetTemplate())
+            sum += m_items[i]->GetTemplate()->GetItemLevelIncludingQuality(level);
+    }
+
+    return sum;
+}
+
 float Player::GetAverageItemLevel()
 {
     float sum = 0;
