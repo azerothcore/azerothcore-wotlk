@@ -10086,14 +10086,20 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, Unit const* caster, Spel
         if (spellSchoolMask != SPELL_SCHOOL_MASK_NONE)
         {
             SpellImmuneContainer const& schoolList = m_spellImmune[IMMUNITY_SCHOOL];
+            // Accumulate all valid school immunity bits that overlap with the spell's schools.
+            // A multi-school spell (e.g. Frostfire Bolt) may have its schools covered by
+            // separate per-school entries (as produced by creature_immunities), so we must
+            // check the combined mask rather than requiring any single entry to cover all schools.
+            uint32 coveredSchoolMask = 0;
             for (auto itr = schoolList.begin(); itr != schoolList.end(); ++itr)
             {
                 if (itr->second == spellInfo->Id)
                     continue;
 
-                SpellInfo const* immuneSpellInfo = sSpellMgr->GetSpellInfo(itr->second);
-                if ((itr->first & spellSchoolMask) != spellSchoolMask)
+                if (!(itr->first & spellSchoolMask))
                     continue;
+
+                SpellInfo const* immuneSpellInfo = sSpellMgr->GetSpellInfo(itr->second);
 
                 if (IgnoresSchoolImmunityFromFriendlyCaster(caster, itr->second, immuneSpellInfo))
                     continue;
@@ -10101,8 +10107,10 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, Unit const* caster, Spel
                 if (spellInfo->CanPierceImmuneAura(immuneSpellInfo))
                     continue;
 
-                return true;
+                coveredSchoolMask |= itr->first;
             }
+            if ((coveredSchoolMask & spellSchoolMask) == spellSchoolMask)
+                return true;
         }
     }
 
