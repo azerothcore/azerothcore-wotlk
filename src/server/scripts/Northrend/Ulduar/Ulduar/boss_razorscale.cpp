@@ -819,6 +819,8 @@ struct npc_ulduar_expedition_engineer : public NullCreatureAI
 
                     std::list<Creature*> hfsList;
                     me->GetCreaturesWithEntryInRange(hfsList, 300.0f, NPC_HARPOON_FIRE_STATE);
+                    // Rebuild the turrets left-to-right (1 -> 4) instead of in grid/spawn order
+                    hfsList.sort([](Creature const* a, Creature const* b) { return a->GetPositionX() < b->GetPositionX(); });
                     for (Creature* fs : hfsList)
                         if (!fs->AI()->GetData(2))
                         {
