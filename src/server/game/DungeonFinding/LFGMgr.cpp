@@ -1504,7 +1504,6 @@ namespace lfg
         if (!gguid)
             return;
 
-        LfgRolesMap check_roles;
         LfgRoleCheckContainer::iterator itRoleCheck = RoleChecksStore.find(gguid);
         if (itRoleCheck == RoleChecksStore.end())
             return;
@@ -1527,9 +1526,7 @@ namespace lfg
 
             if (itRoles == roleCheck.roles.end())
             {
-                // use temporal var to check roles, CheckGroupRoles modifies the roles
-                check_roles = roleCheck.roles;
-                roleCheck.state = CheckGroupRoles(check_roles) ? LFG_ROLECHECK_FINISHED : LFG_ROLECHECK_WRONG_ROLES;
+                roleCheck.state = CheckGroupRoles(roleCheck.roles) ? LFG_ROLECHECK_FINISHED : LFG_ROLECHECK_WRONG_ROLES;
             }
         }
 
@@ -1798,14 +1795,17 @@ namespace lfg
                 ObjectGuid gguid = grp->GetGUID();
                 SetState(gguid, LFG_STATE_PROPOSAL);
                 sGroupMgr->AddGroup(grp);
+                grp->SetLfgRoles(pguid, proposal.players.find(pguid)->second.role);
             }
             else if (group != grp)
             {
                 if (!grp->IsFull())
-                    grp->AddMember(player);
+                    grp->AddMember(player, proposal.players.find(pguid)->second.role);
             }
-
-            grp->SetLfgRoles(pguid, proposal.players.find(pguid)->second.role);
+            else
+            {
+                grp->SetLfgRoles(pguid, proposal.players.find(pguid)->second.role);
+            }
         }
 
         // pussywizard: crashfix, group wasn't created when iterating players (no player found by guid), proposal is deleted by the calling function
