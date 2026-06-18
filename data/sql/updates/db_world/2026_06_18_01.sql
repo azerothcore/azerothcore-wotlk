@@ -1,3 +1,4 @@
+-- DB update 2026_06_18_00 -> 2026_06_18_01
 -- Ulduar: Flame Leviathan - give the Salvaged Chopper its "Grab Pyrite" hook ability (spell 67372 -> 67387).
 -- Mirrors the Salvaged Demolisher's "Grab Crate" (62479 -> 62482).
 
