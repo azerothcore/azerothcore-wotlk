@@ -77,6 +77,16 @@ enum eEvents
     EVENT_GRAB,
 };
 
+enum IgnisActions
+{
+    ACTION_CONSTRUCT_SHATTERED = 0,
+};
+
+enum IgnisData
+{
+    DATA_SHATTERED = 0,
+};
+
 struct npc_ulduar_iron_construct : public ScriptedAI
 {
     npc_ulduar_iron_construct(Creature* pCreature) : ScriptedAI(pCreature)
@@ -127,19 +137,6 @@ struct npc_ulduar_iron_construct : public ScriptedAI
                     me->GetThreatMgr().ResetAllThreat();
                 }
             }
-        }
-    }
-
-    void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType, SpellSchoolMask) override
-    {
-        if (damage >= RAID_MODE(3000U, 5000U) && me->GetAura(sSpellMgr->GetSpellIdForDifficulty(SPELL_BRITTLE, me)))
-        {
-            me->CastSpell(me, SPELL_SHATTER, true);
-            Unit::Kill(attacker, me);
-
-            if (InstanceScript* instance = me->GetInstanceScript())
-                if (Creature* ignis = instance->GetCreature(BOSS_IGNIS))
-                    ignis->AI()->SetData(1337, 0);
         }
     }
 
@@ -233,9 +230,9 @@ struct boss_ignis : public BossAI
         }
     }
 
-    void SetData(uint32 id, uint32  /*value*/) override
+    void DoAction(int32 action) override
     {
-        if (id == 1337)
+        if (action == ACTION_CONSTRUCT_SHATTERED)
         {
             if (lastShatterMSTime)
                 if (getMSTimeDiff(lastShatterMSTime, GameTime::GetGameTimeMS().count()) <= 5000)
@@ -247,7 +244,7 @@ struct boss_ignis : public BossAI
 
     uint32 GetData(uint32 id) const override
     {
-        if (id == 1337)
+        if (id == DATA_SHATTERED)
             return (bShattered ? 1 : 0);
         return 0;
     }
@@ -498,6 +495,42 @@ class spell_ignis_slag_pot_aura : public AuraScript
     }
 };
 
+// 62382, 67114 - Brittle
+class spell_ignis_brittle_aura : public AuraScript
+{
+    PrepareAuraScript(spell_ignis_brittle_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_SHATTER });
+    }
+
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        DamageInfo* damageInfo = eventInfo.GetDamageInfo();
+        return damageInfo && damageInfo->GetDamage() >= (GetId() == SPELL_BRITTLE ? 5000u : 3000u);
+    }
+
+    void HandleProc(ProcEventInfo& eventInfo)
+    {
+        Unit* construct = GetTarget();
+        construct->CastSpell(construct, SPELL_SHATTER, true);
+
+        Unit* attacker = eventInfo.GetActor();
+        Unit::Kill(attacker ? attacker : construct, construct);
+
+        if (InstanceScript* instance = construct->GetInstanceScript())
+            if (Creature* ignis = instance->GetCreature(BOSS_IGNIS))
+                ignis->AI()->DoAction(ACTION_CONSTRUCT_SHATTERED);
+    }
+
+    void Register() override
+    {
+        DoCheckProc += AuraCheckProcFn(spell_ignis_brittle_aura::CheckProc);
+        OnProc += AuraProcFn(spell_ignis_brittle_aura::HandleProc);
+    }
+};
+
 class achievement_ignis_shattered : public AchievementCriteriaScript
 {
 public:
@@ -507,7 +540,7 @@ public:
     {
         if (!target || !target->IsCreature())
             return false;
-        return !!target->ToCreature()->AI()->GetData(1337);
+        return !!target->ToCreature()->AI()->GetData(DATA_SHATTERED);
     }
 };
 
@@ -518,5 +551,6 @@ void AddSC_boss_ignis()
     RegisterSpellScript(spell_ignis_scorch_aura);
     RegisterSpellScript(spell_ignis_grab_initial);
     RegisterSpellScript(spell_ignis_slag_pot_aura);
+    RegisterSpellScript(spell_ignis_brittle_aura);
     new achievement_ignis_shattered();
 }
