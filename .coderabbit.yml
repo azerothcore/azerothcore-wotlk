@@ -26,7 +26,7 @@ reviews:
     - path: "**/*.{cpp,h,hpp}"
       instructions: |
         AzerothCore C++ conventions (CI enforces these with -Werror; flag violations):
-        - C++20. 4-space indent, tabs forbidden. UTF-8, LF, max 80 columns, trailing newline.
+        - C++20. 4-space indent, tabs forbidden. UTF-8, LF, max 120 columns, trailing newline.
         - Allman braces. No braces around single-line statements. `if (x)`, never `if(x)` or `if ( x )`.
         - `auto const&` (not `const auto&`); `Type const*` (not `const Type*`).
         - Use fmt-style `{}` format specifiers, never printf-style `%u`/`%s`.
