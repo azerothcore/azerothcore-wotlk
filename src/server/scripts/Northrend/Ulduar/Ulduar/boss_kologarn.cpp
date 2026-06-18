@@ -702,28 +702,6 @@ struct boss_kologarn_pit_kill_bunny : public NullCreatureAI
     }
 };
 
-// predicate function to select non main tank target
-class StoneGripTargetSelector
-{
-public:
-    StoneGripTargetSelector(Creature* me, Unit const* victim) : _me(me), _victim(victim) {}
-
-    bool operator() (WorldObject* target) const
-    {
-        if (target == _victim && _me->GetThreatMgr().GetThreatListSize() > 1)
-            return true;
-
-        if (!target->IsPlayer())
-            return true;
-
-        return false;
-    }
-
-private:
-    Creature* _me;
-    Unit const* _victim;
-};
-
 class spell_ulduar_stone_grip_cast_target : public SpellScript
 {
     PrepareSpellScript(spell_ulduar_stone_grip_cast_target);
@@ -735,18 +713,12 @@ class spell_ulduar_stone_grip_cast_target : public SpellScript
 
     void FilterTargetsInitial(std::list<WorldObject*>& targets)
     {
-        // Remove "main tank" and non-player targets
-        targets.remove_if(StoneGripTargetSelector(GetCaster()->ToCreature(), GetCaster()->GetVictim()));
-        // Maximum affected targets per difficulty mode
-        uint32 maxTargets = GetSpellInfo()->Id == SPELL_STONE_GRIP ? 1 : 3;
+        if (Unit* victim = GetCaster()->GetVictim())
+            targets.remove_if(Acore::ObjectGUIDCheck(victim->GetGUID(), true));
 
-        // Return a random amount of targets based on maxTargets
-        while (maxTargets < targets.size())
-        {
-            std::list<WorldObject*>::iterator itr = targets.begin();
-            advance(itr, urand(0, targets.size() - 1));
-            targets.erase(itr);
-        }
+        targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+
+        Acore::Containers::RandomResize(targets, GetSpellInfo()->Id == SPELL_STONE_GRIP ? 1 : 3);
     }
 
     void Register() override
