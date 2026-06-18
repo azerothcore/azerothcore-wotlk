@@ -64,7 +64,7 @@ python apps/codestyle/codestyle-sql.py     # SQL (compares to origin/master)
 
 Hard rules (also enforced by CI with `-Werror`):
 
-- 4-space indent for C++ (tabs forbidden); 2-space for JSON/YAML/sh/ts/js. UTF-8, LF, max 80 cols, trailing newline.
+- 4-space indent for C++ (tabs forbidden); 2-space for JSON/YAML/sh/ts/js. UTF-8, LF, max 120 cols, trailing newline.
 - Allman braces. No braces around single-line statements. `if (x)` — never `if(x)` or `if ( x )`.
 - `auto const&` (not `const auto&`); `Type const*` (not `const Type*`).
 - Use `{}` format specifiers (`fmt`-style), not `%u`/`%s`.
