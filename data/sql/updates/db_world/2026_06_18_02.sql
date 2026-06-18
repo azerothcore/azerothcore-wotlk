@@ -1,3 +1,4 @@
+-- DB update 2026_06_18_01 -> 2026_06_18_02
 -- DB update 2026_06_11_02 -> 2026_06_15_00
 --
 -- Fix Brann Bronzebeard (33235) SAI condition for Assembly of Iron completion check.
