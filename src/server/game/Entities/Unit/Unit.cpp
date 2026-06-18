@@ -15777,15 +15777,23 @@ void Unit::_ExitVehicle(Position const* exitPosition)
         if (seatAddon)
         {
             if (seatAddon->ExitParameter == VehicleExitParameters::VehicleExitParamOffset)
+            {
                 pos.RelocateOffset({ seatAddon->ExitParameterX, seatAddon->ExitParameterY, seatAddon->ExitParameterZ, seatAddon->ExitParameterO });
+
+                bool isInLoS = GetMap()->isInLineOfSight(GetPositionX(), GetPositionY(), GetPositionZ(), pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), GetPhaseMask(), LINEOFSIGHT_ALL_CHECKS, VMAP::ModelIgnoreFlags::Nothing);
+                float floorZ = GetMapHeight(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ());
+
+                if (!isInLoS || pos.GetPositionZ() < floorZ)
+                    pos = vehicleBase->GetPosition();
+            }
             else if (seatAddon->ExitParameter == VehicleExitParameters::VehicleExitParamDest)
+            {
                 pos.Relocate({ seatAddon->ExitParameterX, seatAddon->ExitParameterY, seatAddon->ExitParameterZ, seatAddon->ExitParameterO });
 
-            bool isInLoS = GetMap()->isInLineOfSight(GetPositionX(), GetPositionY(), GetPositionZ(), pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), GetPhaseMask(), LINEOFSIGHT_ALL_CHECKS, VMAP::ModelIgnoreFlags::Nothing);
-            float floorZ = GetMapHeight(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ());
-
-            if (!isInLoS || pos.GetPositionZ() < floorZ)
-                pos = vehicleBase->GetPosition();
+                float floorZ = GetMapHeight(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ());
+                if (pos.GetPositionZ() < floorZ)
+                    pos.m_positionZ = floorZ + 0.1f;
+            }
         }
     }
 
