@@ -12236,6 +12236,12 @@ Battleground* Player::GetBattleground(bool create) const
     return (create || (bg && bg->FindBgMap()) ? bg : nullptr);
 }
 
+bool Player::InBattlefield() const
+{
+    Battlefield* bf = sBattlefieldMgr->GetBattlefieldToZoneId(GetZoneId());
+    return bf && bf->IsWarTime();
+}
+
 bool Player::InBattlegroundQueue(bool ignoreArena) const
 {
     for (uint8 i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)

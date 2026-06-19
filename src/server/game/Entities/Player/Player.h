@@ -2293,6 +2293,7 @@ public:
     /*********************************************************/
 
     [[nodiscard]] bool InBattleground() const { return m_bgData.bgInstanceID != 0; }
+    [[nodiscard]] bool InBattlefield() const;   // True if the player is in Wintergrasp and it's war time.
     [[nodiscard]] bool InArena() const;
     [[nodiscard]] uint32 GetBattlegroundId() const { return m_bgData.bgInstanceID; }
     [[nodiscard]] BattlegroundTypeId GetBattlegroundTypeId() const { return m_bgData.bgTypeID; }
