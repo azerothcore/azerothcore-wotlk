@@ -329,7 +329,12 @@ void WorldSessionMgr::AddSession_(WorldSession* session)
     // don't count this session when checking player limit
     --Sessions;
 
-    if (pLimit > 0 && Sessions >= pLimit && !session->HasPermission(rbac::RBAC_PERM_SKIP_QUEUE) && !session->CanSkipQueue() && !HasRecentlyDisconnected(session))
+    // Trial accounts do not get account-flag queue priority. RBAC_PERM_SKIP_QUEUE is still honored
+    // since it can be granted intentionally to specific accounts.
+    bool trialQueueRestricted = sWorld->getBoolConfig(CONFIG_TRIAL_RESTRICTION_QUEUE) && session->IsTrialAccount();
+    bool canSkipQueue = session->HasPermission(rbac::RBAC_PERM_SKIP_QUEUE) || (!trialQueueRestricted && session->CanSkipQueue());
+
+    if (pLimit > 0 && Sessions >= pLimit && !canSkipQueue && !HasRecentlyDisconnected(session))
     {
         AddQueuedPlayer(session);
         UpdateMaxSessionCounters();

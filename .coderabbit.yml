@@ -1,0 +1,83 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+# CodeRabbit review config. Mirrors the hard rules in CLAUDE.md so the AI
+# reviewer enforces project conventions on every PR.
+language: en-US
+
+reviews:
+  profile: chill
+  request_changes_workflow: false
+  high_level_summary: false
+  poem: false
+  review_status: false
+  collapse_walkthrough: true
+  sequence_diagrams: false
+  auto_review:
+    enabled: true
+    # Review on PR open only; don't re-post a walkthrough on every push.
+    auto_incremental_review: false
+    drafts: false
+
+  # Skip generated, vendored, and immutable content so reviews stay focused.
+  path_filters:
+    - "!deps/**"
+    - "!data/sql/updates/db_*/**"
+
+  path_instructions:
+    - path: "**/*.{cpp,h,hpp}"
+      instructions: |
+        AzerothCore C++ conventions (CI enforces these with -Werror; flag violations):
+        - C++20. 4-space indent, tabs forbidden. UTF-8, LF, max 120 columns, trailing newline.
+        - Allman braces. No braces around single-line statements. `if (x)`, never `if(x)` or `if ( x )`.
+        - `auto const&` (not `const auto&`); `Type const*` (not `const Type*`).
+        - Use fmt-style `{}` format specifiers, never printf-style `%u`/`%s`.
+        - Logging: `LOG_INFO("category.sub", "msg {}", arg)` (also LOG_WARN/ERROR/DEBUG/TRACE).
+          No printf, no `sLog->`, no `TC_LOG_*`.
+        - Random: use Random.h helpers (urand, irand, frand, rand32, rand_chance,
+          roll_chance_f/i). Never `std::rand` or `<random>` directly.
+        - Strings: `Acore::StringFormat(fmt, args...)`.
+        - Config: `sConfigMgr->GetOption<T>("Name", default)`.
+        - Namespace is `Acore::` — flag any leftover `Trinity::` from upstream ports.
+        - Use typed helpers instead of raw flag access: IsPlayer()/IsCreature()/IsItem();
+          GetNpcFlags()/HasNpcFlag()/SetNpcFlag()/RemoveNpcFlag()/ReplaceAllNpcFlags();
+          IsRefundable()/IsBOPTradable()/IsWrapped(); HasFlag(ItemFlag)/HasFlag2()/HasFlagCu();
+          ObjectGuid::ToString().c_str() instead of GetCounter().
+        - Never store a raw Player*/Creature*/Unit* past the current call/tick — store the
+          ObjectGuid and resolve at use time (ObjectAccessor::FindPlayer,
+          ObjectAccessor::GetCreature(*from, guid), Map::GetCreature, …).
+        - DB access: use PreparedStatement, not raw query strings. Non-blocking reads go through
+          the async path (_queryProcessor.AddCallback(db.AsyncQuery(...))). Multi-statement
+          writes wrap in SQLTransaction.
+        - Timed AI actions: use EventMap or TaskScheduler, not hand-rolled tick counters.
+        - Prefer SmartAI (DB) for new creature behaviour; reach for CreatureScript only when the
+          SmartAI vocabulary isn't enough. New creature AI prefers RegisterCreatureAI(ClassName).
+        - Script registration: spell/aura scripts use RegisterSpellScript(ClassName) or
+          RegisterSpellAndAuraScriptPair(...) inside AddSC_(); creature AI uses
+          RegisterCreatureAI(ClassName) (preferred) or new ClassName() (legacy). Declare and
+          call AddSC_() from the regional loader (e.g. Spells/spells_script_loader.cpp,
+          EasternKingdoms/eastern_kingdoms_script_loader.cpp). Module hooks inherit from
+          PlayerScript/WorldScript/etc. and register with new MyClass() in AddSC_().
+    - path: "data/sql/updates/pending_db_*/**/*.sql"
+      instructions: |
+        AzerothCore SQL update conventions (enforced by apps/codestyle/codestyle-sql.py):
+        - Every INSERT must be preceded by a matching DELETE for idempotency, and that DELETE must include a WHERE clause scoped precisely to the intended rows. A predicate that is too broad will remove unrelated data, so confirm it matches exactly what the INSERT will re-add.
+        - 4-space indent (no tabs), trailing newline, no double semicolons, no multiple blank lines.
+        - Tables must use the InnoDB engine.
+    - path: "data/sql/base/**"
+      instructions: |
+        This SQL directory is immutable. Changes here should not happen in a normal PR —
+        flag any modification. New SQL belongs in data/sql/updates/pending_db_*/.
+    - path: "data/sql/archive/**"
+      instructions: |
+        This SQL directory is immutable. Changes here should not happen in a normal PR —
+        flag any modification. New SQL belongs in data/sql/updates/pending_db_*/.
+
+knowledge_base:
+  code_guidelines:
+    enabled: true
+    # CLAUDE.md is in CodeRabbit's defaults, but list it explicitly so the project's
+    # full guideline doc is always pulled into review context.
+    filePatterns:
+      - "CLAUDE.md"
+
+chat:
+  auto_reply: true

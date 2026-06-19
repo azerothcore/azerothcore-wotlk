@@ -192,6 +192,16 @@ namespace WorldPackets
         class ItemRefund;
     }
 
+    namespace Quest
+    {
+        class QuestPushResultClient;
+        class QuestGiverQuestAutoLaunch;
+        class QuestLogSwapQuest;
+        class QuestLogRemoveQuest;
+        class QuestConfirmAcceptClient;
+        class PushQuestToParty;
+    }
+
     namespace Calendar
     {
         class GetEvent;
@@ -934,13 +944,13 @@ public:                                                 // opcodes handlers
     void HandleQuestgiverRequestRewardOpcode(WorldPacket& recvPacket);
     void HandleQuestQueryOpcode(WorldPacket& recvPacket);
     void HandleQuestgiverCancel(WorldPacket& recvData);
-    void HandleQuestLogSwapQuest(WorldPacket& recvData);
-    void HandleQuestLogRemoveQuest(WorldPacket& recvData);
-    void HandleQuestConfirmAccept(WorldPacket& recvData);
+    void HandleQuestLogSwapQuest(WorldPackets::Quest::QuestLogSwapQuest& packet);
+    void HandleQuestLogRemoveQuest(WorldPackets::Quest::QuestLogRemoveQuest& packet);
+    void HandleQuestConfirmAccept(WorldPackets::Quest::QuestConfirmAcceptClient& packet);
     void HandleQuestgiverCompleteQuest(WorldPacket& recvData);
-    void HandleQuestgiverQuestAutoLaunch(WorldPacket& recvPacket);
-    void HandlePushQuestToParty(WorldPacket& recvPacket);
-    void HandleQuestPushResult(WorldPacket& recvPacket);
+    void HandleQuestgiverQuestAutoLaunch(WorldPackets::Quest::QuestGiverQuestAutoLaunch& packet);
+    void HandlePushQuestToParty(WorldPackets::Quest::PushQuestToParty& packet);
+    void HandleQuestPushResult(WorldPackets::Quest::QuestPushResultClient& packet);
 
     void HandleMessagechatOpcode(WorldPacket& recvPacket);
     void SendPlayerNotFoundNotice(std::string const& name);
