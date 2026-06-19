@@ -309,7 +309,7 @@ public:
         CreatureData const* spawnpoint = nullptr;
         for (auto const& pair : sObjectMgr->GetAllCreatureData())
         {
-            if (pair.second.id1 != *creatureId)
+            if (pair.second.id != *creatureId)
                 continue;
 
             if (!spawnpoint)
@@ -341,7 +341,7 @@ public:
             return false;
         }
 
-        CreatureTemplate const* creatureTemplate = ASSERT_NOTNULL(sObjectMgr->GetCreatureTemplate(spawnpoint->id1));
+        CreatureTemplate const* creatureTemplate = ASSERT_NOTNULL(sObjectMgr->GetCreatureTemplate(spawnpoint->id));
 
         return DoNameTeleport(handler, player, spawnpoint->mapid, { spawnpoint->posX, spawnpoint->posY, spawnpoint->posZ }, creatureTemplate->Name);
     }
@@ -352,7 +352,7 @@ public:
         WorldDatabase.EscapeString(normalizedName);
 
         // May need work //PussyWizardEliteMalcrom
-        QueryResult result = WorldDatabase.Query("SELECT c.position_x, c.position_y, c.position_z, c.orientation, c.map, ct.name FROM creature c INNER JOIN creature_template ct ON c.id1 = ct.entry WHERE ct.name LIKE '{}'", normalizedName);
+        QueryResult result = WorldDatabase.Query("SELECT c.position_x, c.position_y, c.position_z, c.orientation, c.map, ct.name FROM creature c INNER JOIN creature_template ct ON c.id = ct.entry WHERE ct.name LIKE '{}'", normalizedName);
         if (!result)
         {
             handler->SendErrorMessage(LANG_COMMAND_GOCREATNOTFOUND);

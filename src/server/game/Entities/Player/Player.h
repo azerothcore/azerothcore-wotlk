@@ -1559,9 +1559,9 @@ public:
     void SendQuestReward(Quest const* quest, uint32 XP);
     void SendQuestFailed(uint32 questId, InventoryResult reason = EQUIP_ERR_OK);
     void SendQuestTimerFailed(uint32 quest_id);
-    void SendCanTakeQuestResponse(uint32 msg) const;
+    void SendCanTakeQuestResponse(QuestFailedReason msg) const;
     void SendQuestConfirmAccept(Quest const* quest, Player* pReceiver);
-    void SendPushToPartyResponse(Player const* player, uint8 msg) const;
+    void SendPushToPartyResponse(Player const* player, QuestShareMessages msg) const;
     void SendQuestUpdateAddItem(Quest const* quest, uint32 item_idx, uint16 count);
     void SendQuestUpdateAddCreatureOrGo(Quest const* quest, ObjectGuid guid, uint32 creatureOrGO_idx, uint16 old_count, uint16 add_count);
     void SendQuestUpdateAddPlayer(Quest const* quest, uint16 old_count, uint16 add_count);
@@ -2289,6 +2289,7 @@ public:
     /*********************************************************/
 
     [[nodiscard]] bool InBattleground() const { return m_bgData.bgInstanceID != 0; }
+    [[nodiscard]] bool InBattlefield() const;   // True if the player is in Wintergrasp and it's war time.
     [[nodiscard]] bool InArena() const;
     [[nodiscard]] uint32 GetBattlegroundId() const { return m_bgData.bgInstanceID; }
     [[nodiscard]] BattlegroundTypeId GetBattlegroundTypeId() const { return m_bgData.bgTypeID; }

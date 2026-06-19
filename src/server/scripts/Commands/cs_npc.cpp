@@ -229,7 +229,7 @@ public:
             {
                 ObjectGuid::LowType guid = sObjectMgr->GenerateCreatureSpawnId();
                 CreatureData& data = sObjectMgr->NewOrExistCreatureData(guid);
-                data.id1 = id;
+                data.id = id;
                 data.phaseMask = chr->GetPhaseMaskForSpawn();
                 data.posX = chr->GetTransOffsetX();
                 data.posY = chr->GetTransOffsetY();
@@ -677,7 +677,7 @@ public:
         uint32 id3 = 0;
         if (CreatureData const* cData = target->GetCreatureData())
         {
-            id1 = cData->id1;
+            id1 = cData->id;
             id2 = cData->id2;
             id3 = cData->id3;
         }
@@ -721,7 +721,7 @@ public:
 
     static bool HandleNpcInfoCommandShowFromDB(ChatHandler* handler, ObjectGuid::LowType lowGuid, CreatureData const* cData)
     {
-        CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(cData->id1);
+        CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(cData->id);
         if (!cInfo)
         {
             handler->SendErrorMessage(LANG_COMMAND_CREATGUIDNOTFOUND, lowGuid);
@@ -730,8 +730,8 @@ public:
 
         handler->PSendSysMessage("(Not in world - showing DB data)");
         uint32 scriptId = cData->ScriptId ? cData->ScriptId : cInfo->ScriptID;
-        handler->PSendSysMessage(LANG_NPCINFO_CHAR, lowGuid, ObjectGuid::Create<HighGuid::Unit>(cData->id1, lowGuid).ToString(), cData->id1,
-            cData->id2, cData->id3, cData->displayid, cData->displayid, cInfo->faction,
+        handler->PSendSysMessage(LANG_NPCINFO_CHAR, lowGuid, ObjectGuid::Create<HighGuid::Unit>(cData->id, lowGuid).ToString(), cData->id,
+            cData->id, cData->id2, cData->id3, cData->displayid, cData->displayid, cInfo->faction,
             cData->npcflag);
         handler->PSendSysMessage(LANG_NPCINFO_PHASEMASK, cData->phaseMask);
         handler->PSendSysMessage(LANG_NPCINFO_POSITION, cData->posX, cData->posY, cData->posZ);
@@ -763,7 +763,7 @@ public:
         uint32 id3 = 0;
         if (CreatureData const* cData = target->GetCreatureData())
         {
-            id1 = cData->id1;
+            id1 = cData->id;
             id2 = cData->id2;
             id3 = cData->id3;
         }
@@ -835,12 +835,10 @@ public:
                     continue;
 
                 uint32 entry = fields[1].Get<uint32>();
-                //uint32 entry2 = fields[2].Get<uint32>();
-                //uint32 entry3 = fields[3].Get<uint32>();
-                float x = fields[4].Get<float>();
-                float y = fields[5].Get<float>();
-                float z = fields[6].Get<float>();
-                uint16 mapId = fields[7].Get<uint16>();
+                float x = fields[2].Get<float>();
+                float y = fields[3].Get<float>();
+                float z = fields[4].Get<float>();
+                uint16 mapId = fields[5].Get<uint16>();
 
                 CreatureTemplate const* creatureTemplate = sObjectMgr->GetCreatureTemplate(entry);
                 if (!creatureTemplate)
