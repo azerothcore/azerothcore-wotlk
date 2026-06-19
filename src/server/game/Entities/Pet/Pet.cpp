@@ -1582,6 +1582,11 @@ void Pet::_SaveSpells(CharacterDatabaseTransaction trans)
 
                 break;
             case PETSPELL_NEW:
+                stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PET_SPELL_BY_SPELL);
+                stmt->SetData(0, m_charmInfo->GetPetNumber());
+                stmt->SetData(1, itr->first);
+                trans->Append(stmt);
+
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PET_SPELL);
                 stmt->SetData(0, m_charmInfo->GetPetNumber());
                 stmt->SetData(1, itr->first);
