@@ -152,8 +152,10 @@ the encounter scales to the group (§2.2), and branding (§7.9) applies per play
 - **Monotonic reward**: `materialQuantity` and `maxTier` are non-decreasing in `groupSize` — a full
   raid drops *at least* as much and as good as a smaller group (the core "full raid is worth it").
 - **Per-capita policy** *(open question — see §11)*: whether per-player reward is flat, favors
-  larger groups, or favors smaller groups is a tunable encoded in `IBrandingConfig` and pinned by a
+  larger groups, or favors smaller groups is a tunable encoded in `IScalingConfig` and pinned by a
   test once chosen. This decides whether players zerg for efficiency or split for pace.
+  *(Slice 2 default: total reward ∝ group fraction ⇒ ≈flat per-capita; only the monotonic-total
+  invariant is asserted, not a per-capita policy, pending the §11 decision.)*
 - Reward scaling reuses the §9.4/§4 personal-loot delivery path (per-player, no tagging).
 
 ---
@@ -263,8 +265,9 @@ Bold = the testable pure-logic heart of each system.
 Each slice = spec section + failing tests + green core + thin adapter + persistence.
 
 1. **Slice 1 — Brand XP + Proficiency** (the spine; see §7). Everything downstream reads proficiency.
-2. **Slice 2 — Scaling formulas** (§2.1 zone + event override; §2.2 group-size encounter & reward
-   scaling). Pure math; gates dungeon/raid/invasion access and yield.
+2. **Slice 2 — Scaling formulas** ✓ (§2.1 zone + event override; §2.2 group-size encounter & reward
+   scaling). Pure math; gates dungeon/raid/invasion access and yield. *Implemented: `src/core/scaling/`
+   (Scaling, GroupScaling, IScalingConfig); 12 tests green.*
 3. **Slice 3 — Dynamic events + Contribution → reward tiers** (§9): action scoring engine, the
    four guardrails (hourly cap, daily DR, anti-leech, reward diversity), reward tiers, and region
    containment. Subscription/spawns/overlay are adapter/data.
