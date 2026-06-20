@@ -281,7 +281,10 @@ Each slice = spec section + failing tests + green core + thin adapter + persiste
    `src/core/allegiance/`, `src/core/economy/` (Discovery, Economy); 9 tests green.*
    **Deferred:** the §8.5 XP-balance regression sim (needs the representative play-session profile
    you sanity-check) and §8.4 world-spawned content (data, authored against the tier rules).
-6. **Slice 6 — Account vault + Mastery wiring** (mostly persistence + adapters).
+6. **Slice 6 — Account vault + Mastery wiring** ✓ pure parts (mostly persistence + adapters).
+   *Implemented: `src/core/vault/` (transfer friction + capacity) and `src/core/mastery/`
+   (dual-key effectiveness: account-unlock × character-skill, anti-P2W); 5 tests green.
+   Persistence/adapters deferred.*
 7. **Slice 7 — Combat effect application + Item branding + Prestige cosmetics** (adapter-heavy).
 
 Rationale: build pure-logic, high-leverage cores first; defer adapter-heavy/cosmetic systems.
