@@ -74,16 +74,6 @@ struct npc_pet_gen_soul_trader_beacon : public ScriptedAI
         }
     }
 
-    void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
-    {
-        if (spellInfo->Id == SPELL_STEAL_ESSENCE_VISUAL && target == me)
-        {
-            Talk(1);
-            events.ScheduleEvent(EVENT_ADD_TOKEN, 3s);
-            me->CastSpell(me, SPELL_EMOTE_STATE_SWIM_RUN, true);
-        }
-    }
-
     void UpdateAI(uint32 diff) override
     {
         events.Update(diff);
