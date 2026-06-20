@@ -276,9 +276,11 @@ Each slice = spec section + failing tests + green core + thin adapter + persiste
 4. **Slice 4 — Catalyst stacking DR.** ✓ Small, sharp; consumes proficiency from Slice 1.
    *Implemented: `src/core/catalyst/` (CatalystStacking, ICatalystConfig); 6 tests green.
    RaidCatalystMultiplier ∈ [1.0, MaxRaidMul], non-increasing in rank (1st full, 3rd+ heavy).*
-5. **Slice 5 — Exploration/Discovery + Allegiance + Economy** (§8): discovery XP + tier
-   classification + economy resolution (pure), allegiance efficiency, and the XP-balance regression
-   sim. World-spawned content (§8.4) is data, authored against the tier rules afterward.
+5. **Slice 5 — Exploration/Discovery + Allegiance + Economy** ✓ (§8/§12): discovery XP + tier
+   classification + economy resolution (pure), allegiance efficiency. *Implemented:
+   `src/core/allegiance/`, `src/core/economy/` (Discovery, Economy); 9 tests green.*
+   **Deferred:** the §8.5 XP-balance regression sim (needs the representative play-session profile
+   you sanity-check) and §8.4 world-spawned content (data, authored against the tier rules).
 6. **Slice 6 — Account vault + Mastery wiring** (mostly persistence + adapters).
 7. **Slice 7 — Combat effect application + Item branding + Prestige cosmetics** (adapter-heavy).
 
