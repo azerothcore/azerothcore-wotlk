@@ -3,6 +3,8 @@
 
 #include "EventConfig.h"
 #include "ServerClock.h"
+#include "ServerRng.h"
+#include "contribution/AccountCeiling.h"
 #include "contribution/ContributionTypes.h"
 #include "ObjectGuid.h"
 #include <cstdint>
@@ -34,6 +36,17 @@ namespace Branding
         RewardTier PlayerTier(ObjectGuid guid) const;
         void Unload(ObjectGuid guid);
 
+        // Reward resolution (§9.4/§9.5/§9.3#5): tier -> diversity-selected category -> grant clamped
+        // to the account economy ceiling. The caller delivers the grant to the game (AddItem etc.).
+        struct ResolvedReward
+        {
+            RewardTier tier = RewardTier::None;
+            RewardCategory category = RewardCategory::CraftingMats;
+            RewardGrant grant;
+        };
+        ResolvedReward ResolveReward(ObjectGuid guid, uint32_t accountId, uint32_t zoneId);
+        uint32_t RewardMaterialItem() const { return _config.RewardMaterialItem(); }
+
     private:
         EventMgr() = default;
 
@@ -52,8 +65,10 @@ namespace Branding
 
         EventConfig _config;
         ServerClock _clock;
+        ServerRng _rng;
         std::unordered_map<uint32_t, ActiveEvent> _events;
         std::unordered_map<ObjectGuid, PlayerState> _players;
+        std::unordered_map<uint32_t, AccountEconomyState> _accountState;
     };
 }
 

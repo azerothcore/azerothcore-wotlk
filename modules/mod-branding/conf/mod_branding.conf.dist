@@ -172,3 +172,12 @@ Branding.Event.DrFloor = 0.1
 Branding.Event.BronzeThreshold = 50
 Branding.Event.SilverThreshold = 150
 Branding.Event.GoldThreshold = 400
+
+#
+#    Branding.Event.RewardItemId
+#        Description: Item entry granted for a CraftingMats reward (claimed via `.branding event
+#                     claim`). Quantity scales with tier; bounded by the account economy ceiling.
+#        Default:     2589 (Linen Cloth, placeholder)
+#
+
+Branding.Event.RewardItemId = 2589

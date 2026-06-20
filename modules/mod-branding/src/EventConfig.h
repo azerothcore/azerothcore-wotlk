@@ -16,6 +16,9 @@ namespace Branding
         void Load();
         bool Enabled() const { return _enabled; }
 
+        // Adapter-specific (not part of IContributionConfig): item granted for CraftingMats rewards.
+        uint32_t RewardMaterialItem() const { return _rewardMaterialItem; }
+
         uint32_t ActionBasePoints(EventAction action) const override { return _actionPoints[static_cast<size_t>(action)]; }
         uint32_t HealUnitsPerPoint() const override { return _healUnitsPerPoint; }
         uint32_t HealMaxPoints() const override { return _healMaxPoints; }
@@ -59,6 +62,8 @@ namespace Branding
         uint32_t _accountMaterialsCeiling = 1000;
         uint32_t _accountCurrencyCeiling = 500;
         uint64_t _accountCeilingPeriodSeconds = 86400;
+
+        uint32_t _rewardMaterialItem = 2589;   // Linen Cloth (placeholder reward material)
     };
 }
 

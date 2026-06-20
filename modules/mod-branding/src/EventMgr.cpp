@@ -1,7 +1,35 @@
 #include "EventMgr.h"
 #include "contribution/Containment.h"
 #include "contribution/Contribution.h"
+#include "contribution/RewardDiversity.h"
 #include "contribution/RewardTier.h"
+
+namespace Branding
+{
+    namespace
+    {
+        // Base economy reward by tier; only the field matching the selected category is filled.
+        RewardGrant BaseGrant(RewardTier tier, RewardCategory category)
+        {
+            uint32_t mats = 0;
+            uint32_t currency = 0;
+            switch (tier)
+            {
+                case RewardTier::Bronze: mats = 10; currency = 1000; break;
+                case RewardTier::Silver: mats = 25; currency = 3000; break;
+                case RewardTier::Gold:   mats = 60; currency = 8000; break;
+                default: break;
+            }
+
+            RewardGrant grant;
+            if (category == RewardCategory::CraftingMats)
+                grant.materials = mats;
+            else if (category == RewardCategory::Currency)
+                grant.currency = currency;
+            return grant;
+        }
+    }
+}
 
 namespace Branding
 {
@@ -87,5 +115,24 @@ namespace Branding
     void EventMgr::Unload(ObjectGuid guid)
     {
         _players.erase(guid);
+    }
+
+    EventMgr::ResolvedReward EventMgr::ResolveReward(ObjectGuid guid, uint32_t accountId, uint32_t zoneId)
+    {
+        ResolvedReward reward;
+        reward.tier = PlayerTier(guid);
+        if (reward.tier == RewardTier::None)
+            return reward;
+
+        EventType type = EventType::Invasion;
+        ActiveEventType(zoneId, type);      // falls back to Invasion if no active event in the zone
+
+        // §9.5 diversity: pick an allowed category for this event type.
+        reward.category = SelectRewardCategory(type, _rng, _config);
+
+        // §9.3#5: economy output (mats/currency) is clamped to the account ceiling for the period.
+        reward.grant = ClampToAccountCeiling(BaseGrant(reward.tier, reward.category),
+            _accountState[accountId], _config, _clock);
+        return reward;
     }
 }

@@ -12,5 +12,6 @@ namespace Branding
         _bronze = sConfigMgr->GetOption<uint32_t>("Branding.Event.BronzeThreshold", 50);
         _silver = sConfigMgr->GetOption<uint32_t>("Branding.Event.SilverThreshold", 150);
         _gold = sConfigMgr->GetOption<uint32_t>("Branding.Event.GoldThreshold", 400);
+        _rewardMaterialItem = sConfigMgr->GetOption<uint32_t>("Branding.Event.RewardItemId", 2589);
     }
 }

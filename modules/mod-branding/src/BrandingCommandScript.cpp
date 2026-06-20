@@ -39,6 +39,7 @@ public:
             { "start",  HandleBrandingEventStartCommand,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
             { "stop",   HandleBrandingEventStopCommand,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
             { "status", HandleBrandingEventStatusCommand, rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "claim",  HandleBrandingEventClaimCommand,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
         };
 
         static ChatCommandTable brandingCommandTable =
@@ -113,6 +114,56 @@ public:
 
         handler->PSendSysMessage("Your contribution: {} points, tier {}.",
             sEventMgr->PlayerPoints(guid), TierName(sEventMgr->PlayerTier(guid)));
+        return true;
+    }
+
+    static bool HandleBrandingEventClaimCommand(ChatHandler* handler)
+    {
+        Player* player = handler->GetPlayer();
+        if (!player)
+        {
+            handler->SendErrorMessage("This command must be used in-world.");
+            return false;
+        }
+
+        EventMgr::ResolvedReward const reward =
+            sEventMgr->ResolveReward(player->GetGUID(), player->GetSession()->GetAccountId(), player->GetZoneId());
+
+        if (reward.tier == RewardTier::None)
+        {
+            handler->PSendSysMessage("No contribution to claim yet.");
+            return true;
+        }
+
+        switch (reward.category)
+        {
+            case RewardCategory::CraftingMats:
+                if (reward.grant.materials == 0)
+                    handler->PSendSysMessage("Material reward is bounded by your account ceiling this period.");
+                else if (player->AddItem(sEventMgr->RewardMaterialItem(), reward.grant.materials))
+                    handler->PSendSysMessage("Reward: {} x item {}.", reward.grant.materials, sEventMgr->RewardMaterialItem());
+                else
+                    handler->PSendSysMessage("Reward of {} materials did not fit (inventory full; mail delivery TODO).", reward.grant.materials);
+                break;
+            case RewardCategory::Currency:
+                if (reward.grant.currency == 0)
+                    handler->PSendSysMessage("Currency reward is bounded by your account ceiling this period.");
+                else
+                {
+                    player->ModifyMoney(static_cast<int32>(reward.grant.currency));
+                    handler->PSendSysMessage("Reward: {} copper.", reward.grant.currency);
+                }
+                break;
+            case RewardCategory::Xp:
+                player->GiveXP(100 * static_cast<uint32>(reward.tier), nullptr);
+                handler->PSendSysMessage("Reward: bonus XP.");
+                break;
+            default:
+                handler->PSendSysMessage("Reward category {} (cosmetic/reputation grant TODO).", uint32(reward.category));
+                break;
+        }
+
+        handler->PSendSysMessage("Claimed tier {}, category {}.", TierName(reward.tier), uint32(reward.category));
         return true;
     }
 
