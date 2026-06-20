@@ -1571,11 +1571,9 @@ struct boss_yoggsaron_constrictor_tentacle : public ScriptedAI
     boss_yoggsaron_constrictor_tentacle(Creature* creature) : ScriptedAI(creature)
     {
         me->SetCombatMovement(false);
-        _checkTimer = 1;
         _playerGUID.Clear();
     }
 
-    uint32 _checkTimer;
     ObjectGuid _playerGUID;
 
     void GrabPlayer(Unit* target)
@@ -1583,7 +1581,6 @@ struct boss_yoggsaron_constrictor_tentacle : public ScriptedAI
         target->CastSpell(me, SPELL_LUNGE, true);
         target->CastSpell(target, SPELL_SQUEEZE, true);
         _playerGUID = target->GetGUID();
-        _checkTimer = 0;
     }
 
     void IsSummonedBy(WorldObject* summoner) override
@@ -1593,13 +1590,21 @@ struct boss_yoggsaron_constrictor_tentacle : public ScriptedAI
         me->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
         me->SetInCombatWithZone();
 
-        // The summoner is the marked player (64133 is self-cast), so grab them at
-        // once instead of waiting for the periodic scan to pick a nearby player.
+        // The summoner is the marked player (64133 is self-cast); grab them
+        // directly, falling back to the nearest valid player only if that one
+        // can no longer be squeezed.
+        Unit* target = nullptr;
         if (Player* player = summoner ? summoner->ToPlayer() : nullptr)
             if (player->IsAlive() && !player->IsGameMaster()
                 && !player->HasAura(sSpellMgr->GetSpellIdForDifficulty(SPELL_SQUEEZE, me))
                 && !player->HasAura(SPELL_INSANE1))
-                GrabPlayer(player);
+                target = player;
+
+        if (!target)
+            target = SelectConstrictTarget();
+
+        if (target)
+            GrabPlayer(target);
 
         // Summoned from a player, so register with Sara to keep the encounter's
         // despawn handling working.
@@ -1628,24 +1633,6 @@ struct boss_yoggsaron_constrictor_tentacle : public ScriptedAI
         }
 
         return target;
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (_checkTimer)
-        {
-            _checkTimer += diff;
-            if (_checkTimer >= 1000 && !me->HasUnitState(UNIT_STATE_STUNNED))
-            {
-                if (Unit* target = SelectConstrictTarget())
-                {
-                    GrabPlayer(target);
-                    return;
-                }
-
-                _checkTimer = 1;
-            }
-        }
     }
 
     void DoAction(int32 param) override
