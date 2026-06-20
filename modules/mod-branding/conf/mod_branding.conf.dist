@@ -134,3 +134,41 @@ Branding.Scaling.Enable = 0
 #
 
 Branding.Scaling.Exponent = 2.0
+
+#
+#    Branding.Event.Enable
+#        Description: Dynamic-event contribution engine (§9): kills in a zone with an active event
+#                     score through the anti-leech / daily-DR / hourly-cap guardrails. Events are
+#                     GM-driven via `.branding event start|stop|status` (spawner/scheduler deferred).
+#        Default:     0 - (disabled)
+#
+
+Branding.Event.Enable = 0
+
+#
+#    Branding.Event.HourlyCap
+#        Description: Max contribution points credited per rolling hour (anti-AFK-farm).
+#        Default:     100000
+#
+
+Branding.Event.HourlyCap = 100000
+
+#
+#    Branding.Event.DrSlope / DrFloor
+#        Description: Daily per-event-type diminishing returns: each repeat decays by DrSlope down
+#                     to the DrFloor multiplier.
+#        Default:     0.1 / 0.1
+#
+
+Branding.Event.DrSlope = 0.1
+Branding.Event.DrFloor = 0.1
+
+#
+#    Branding.Event.BronzeThreshold / SilverThreshold / GoldThreshold
+#        Description: Contribution points required for each reward tier.
+#        Default:     50 / 150 / 400
+#
+
+Branding.Event.BronzeThreshold = 50
+Branding.Event.SilverThreshold = 150
+Branding.Event.GoldThreshold = 400

@@ -1,6 +1,8 @@
 #include "DiscoveryMgr.h"
+#include "EventMgr.h"
 #include "ProficiencyMgr.h"
 #include "ScalingMgr.h"
+#include "contribution/ContributionTypes.h"
 #include "mod_branding_loader.h"
 #include "Chat.h"
 #include "CommandScript.h"
@@ -10,6 +12,20 @@
 using namespace Acore::ChatCommands;
 using namespace Branding;
 
+namespace
+{
+    char const* TierName(RewardTier tier)
+    {
+        switch (tier)
+        {
+            case RewardTier::Bronze: return "Bronze";
+            case RewardTier::Silver: return "Silver";
+            case RewardTier::Gold:   return "Gold";
+            default:                 return "None";
+        }
+    }
+}
+
 // `.branding info` -- read-only inspection of the wired branding systems for the calling player.
 class branding_commandscript : public CommandScript
 {
@@ -18,9 +34,17 @@ public:
 
     ChatCommandTable GetCommands() const override
     {
+        static ChatCommandTable eventCommandTable =
+        {
+            { "start",  HandleBrandingEventStartCommand,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "stop",   HandleBrandingEventStopCommand,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "status", HandleBrandingEventStatusCommand, rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+        };
+
         static ChatCommandTable brandingCommandTable =
         {
-            { "info", HandleBrandingInfoCommand, rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "info",  HandleBrandingInfoCommand, rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "event", eventCommandTable },
         };
 
         static ChatCommandTable commandTable =
@@ -28,6 +52,68 @@ public:
             { "branding", brandingCommandTable },
         };
         return commandTable;
+    }
+
+    static bool HandleBrandingEventStartCommand(ChatHandler* handler, uint32 type, uint32 goal)
+    {
+        Player* player = handler->GetPlayer();
+        if (!player)
+        {
+            handler->SendErrorMessage("This command must be used in-world.");
+            return false;
+        }
+        if (type >= static_cast<uint32>(EventType::COUNT))
+        {
+            handler->SendErrorMessage("Event type must be 0..{} (0=Invasion,1=ResourceSurge,2=EliteHunt,3=ProfessionAnomaly).",
+                static_cast<uint32>(EventType::COUNT) - 1);
+            return false;
+        }
+
+        uint32 const zone = player->GetZoneId();
+        sEventMgr->StartEvent(zone, static_cast<EventType>(type), goal);
+        handler->PSendSysMessage("Started branding event (type {}, goal {}) in zone {}.", type, goal, zone);
+        return true;
+    }
+
+    static bool HandleBrandingEventStopCommand(ChatHandler* handler)
+    {
+        Player* player = handler->GetPlayer();
+        if (!player)
+        {
+            handler->SendErrorMessage("This command must be used in-world.");
+            return false;
+        }
+
+        uint32 const zone = player->GetZoneId();
+        if (sEventMgr->StopEvent(zone))
+            handler->PSendSysMessage("Stopped branding event in zone {}.", zone);
+        else
+            handler->PSendSysMessage("No active branding event in zone {}.", zone);
+        return true;
+    }
+
+    static bool HandleBrandingEventStatusCommand(ChatHandler* handler)
+    {
+        Player* player = handler->GetPlayer();
+        if (!player)
+        {
+            handler->SendErrorMessage("This command must be used in-world.");
+            return false;
+        }
+
+        uint32 const zone = player->GetZoneId();
+        ObjectGuid const guid = player->GetGUID();
+
+        EventType type;
+        if (sEventMgr->ActiveEventType(zone, type))
+            handler->PSendSysMessage("Zone {} event: type {}, {:.0f}% contained.",
+                zone, static_cast<uint32>(type), sEventMgr->Containment(zone) * 100.0);
+        else
+            handler->PSendSysMessage("Zone {}: no active event.", zone);
+
+        handler->PSendSysMessage("Your contribution: {} points, tier {}.",
+            sEventMgr->PlayerPoints(guid), TierName(sEventMgr->PlayerTier(guid)));
+        return true;
     }
 
     static bool HandleBrandingInfoCommand(ChatHandler* handler)
