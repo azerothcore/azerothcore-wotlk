@@ -1,6 +1,7 @@
 #include "DiscoveryMgr.h"
 #include "EventMgr.h"
 #include "ProficiencyMgr.h"
+#include "RewardDelivery.h"
 #include "ScalingMgr.h"
 #include "contribution/ContributionTypes.h"
 #include "mod_branding_loader.h"
@@ -139,11 +140,23 @@ public:
         {
             case RewardCategory::CraftingMats:
                 if (reward.grant.materials == 0)
+                {
                     handler->PSendSysMessage("Material reward is bounded by your account ceiling this period.");
-                else if (player->AddItem(sEventMgr->RewardMaterialItem(), reward.grant.materials))
-                    handler->PSendSysMessage("Reward: {} x item {}.", reward.grant.materials, sEventMgr->RewardMaterialItem());
-                else
-                    handler->PSendSysMessage("Reward of {} materials did not fit (inventory full; mail delivery TODO).", reward.grant.materials);
+                    break;
+                }
+                switch (DeliverItem(player, sEventMgr->RewardMaterialItem(), reward.grant.materials,
+                    "Branding Event Reward", "Your event contribution has been rewarded."))
+                {
+                    case DeliveryResult::Inventory:
+                        handler->PSendSysMessage("Reward: {} x item {} (added to bags).", reward.grant.materials, sEventMgr->RewardMaterialItem());
+                        break;
+                    case DeliveryResult::Mailed:
+                        handler->PSendSysMessage("Reward: {} x item {} (bags full -> mailed).", reward.grant.materials, sEventMgr->RewardMaterialItem());
+                        break;
+                    default:
+                        handler->PSendSysMessage("Reward could not be delivered.");
+                        break;
+                }
                 break;
             case RewardCategory::Currency:
                 if (reward.grant.currency == 0)
