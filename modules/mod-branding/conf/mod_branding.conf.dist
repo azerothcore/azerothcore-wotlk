@@ -116,3 +116,21 @@ Branding.Discovery.DangerMultiplier = 2.0
 Branding.Discovery.CommonMaxLevel = 20
 Branding.Discovery.UncommonMaxLevel = 40
 Branding.Discovery.RareMaxLevel = 60
+
+#
+#    Branding.Scaling.Enable
+#        Description: Downward zone scaling (§2.1) -- an over-leveled player's OUTGOING damage is
+#                     scaled down in lower-level zones so old content stays dangerous.
+#        Default:     0 - (disabled)
+#
+
+Branding.Scaling.Enable = 0
+
+#
+#    Branding.Scaling.Exponent
+#        Description: Stat-scaling curve exponent: factor = (zoneLevel/playerLevel)^Exponent,
+#                     clamped to <= 1.0 (never scales up). Higher = steeper downscaling.
+#        Default:     2.0
+#
+
+Branding.Scaling.Exponent = 2.0

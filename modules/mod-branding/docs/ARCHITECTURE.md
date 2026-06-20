@@ -160,6 +160,23 @@ the encounter scales to the group (§2.2), and branding (§7.9) applies per play
 
 ---
 
+## 2.3 Reference implementations (study, do NOT import or depend on)
+
+Existing AzerothCore modules solve adjacent problems. Use them to mine hook points and known
+exploits — but none is downward-only-then-branding-on-top, so we study and reimplement, not link.
+
+| Reference module | Relevant to | What to borrow | Why not import |
+|---|---|---|---|
+| **mod-zone-difficulty** | §2.1 zone brackets | The `zone_difficulty_info` **table shape** — the official per-zone nerf/debuff support pattern. Our v1 reads `AreaTableEntry::area_level`; evolve to a configurable per-zone bracket table like this. | It's nerf/debuff-per-zone, not a downward stat-scaling pipeline feeding branding. |
+| **mod-autobalance** | §2.2 / §15 group encounter scaling | Encounter-side hook points (scale creature HP/dmg to player count) **and its count-snapshot timing exploit** — exactly our Risk #4 (`GroupSize_SnapshotAtGrant_NotPull`): sample group size at grant/continuously, never at pull. | Its scaling isn't downward-only and doesn't layer branding on top. |
+| **mod-solocraft** | §2.2 small-group-clears-big-content (player side) | Group-size detection + stat-application plumbing. | It scales players **up**; we downscale (§2.1) — opposite direction, same plumbing. |
+
+**Current scaling adapter status:** player downscaling is wired (`src/Scaling*` — `UnitScript::Modify*Damage`
+scales an over-leveled player's *outgoing* damage by the §2.1 core factor; bracket = `area_level` v1).
+Group-size encounter/reward scaling (§2.2) and incoming-damage/healing scaling are not yet wired.
+
+---
+
 ## 3. Module Layout
 
 One module. The pure core lives **under `src/`** (`src/core/`) because the AzerothCore module

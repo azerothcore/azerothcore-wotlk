@@ -6,4 +6,5 @@ void Addmod_brandingScripts()
 {
     AddBrandingProficiencyScripts();
     AddBrandingDiscoveryScripts();
+    AddBrandingScalingScripts();
 }
