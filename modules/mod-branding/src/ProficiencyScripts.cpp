@@ -1,4 +1,5 @@
 #include "ProficiencyMgr.h"
+#include "mod_branding_loader.h"
 #include "proficiency/Types.h"
 #include "Creature.h"
 #include "Player.h"
@@ -53,8 +54,7 @@ public:
     }
 };
 
-// Entrypoint invoked by the modules loader (Add<dir-with-underscores>Scripts).
-void Addmod_brandingScripts()
+void AddBrandingProficiencyScripts()
 {
     new BrandingWorldScript();
     new BrandingProficiencyPlayerScript();

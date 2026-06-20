@@ -77,3 +77,42 @@ Branding.Level.Exponent = 2.0
 #
 
 Branding.Level.Max = 50
+
+#
+#    Branding.Discovery.Enable
+#        Description: Layer bonus discovery XP onto exploration XP (§8.2).
+#        Default:     0 - (disabled)
+#
+
+Branding.Discovery.Enable = 0
+
+#
+#    Branding.Discovery.SubzonePct / LandmarkPct / HiddenPct
+#        Description: Discovery XP as a fraction of the player's level-to-next, by discovery type.
+#        Default:     0.06 / 0.08 / 0.12
+#
+
+Branding.Discovery.SubzonePct = 0.06
+Branding.Discovery.LandmarkPct = 0.08
+Branding.Discovery.HiddenPct = 0.12
+
+#
+#    Branding.Discovery.DangerThreshold / DangerMultiplier
+#        Description: A zone more than Threshold levels above the player is "dangerous" and its
+#                     discovery XP is multiplied by Multiplier.
+#        Default:     5 / 2.0
+#
+
+Branding.Discovery.DangerThreshold = 5
+Branding.Discovery.DangerMultiplier = 2.0
+
+#
+#    Branding.Discovery.CommonMaxLevel / UncommonMaxLevel / RareMaxLevel
+#        Description: Zone-level upper bounds for the Common/Uncommon/Rare discovery tiers (§8.3);
+#                     above RareMaxLevel is Epic.
+#        Default:     20 / 40 / 60
+#
+
+Branding.Discovery.CommonMaxLevel = 20
+Branding.Discovery.UncommonMaxLevel = 40
+Branding.Discovery.RareMaxLevel = 60
