@@ -160,80 +160,58 @@ the encounter scales to the group (§2.2), and branding (§7.9) applies per play
 
 ## 3. Module Layout
 
-One module, federated core libraries:
+One module. The pure core lives **under `src/`** (`src/core/`) because the AzerothCore module
+build collects compiled sources and include dirs from `src/` only. `tests/` is a *sibling* of
+`src/`, so it is naturally excluded from the server build while remaining available to the
+standalone fast-loop target. (✓ = implemented in Slice 1.)
 
 ```
 modules/mod-branding/
-├── ARCHITECTURE.md                  # this file
-├── docs/
-│   └── slices/                      # per-slice specs (spec-first)
-├── CMakeLists.txt                   # registers adapters with the module system
-├── mod-branding.cmake               # advanced CMake (core libs + standalone test target)
-│
-├── core/                            # PURE C++20. No AzerothCore includes anywhere here.
-│   ├── common/                      # shared value types, Fixed-point, DI interfaces
-│   │   ├── Brand.h                  # enum BrandId { Fire, Frost, Nature, Shadow, ... }
-│   │   ├── Clock.h                  # IClock interface (inject time)
-│   │   ├── Rng.h                    # IRng interface (inject randomness; default = seeded)
-│   │   └── Config.h                 # IBrandingConfig interface (inject tunables)
-│   ├── proficiency/                 # ◀ SLICE 1
-│   │   ├── BrandXp.h/.cpp           # XP gain computation + modifiers + diminishing returns
-│   │   ├── Proficiency.h/.cpp       # level curve, XP→level, level→effect strength
-│   │   └── Knowledge.h/.cpp         # account-wide unlock state queries
-│   ├── scaling/                     # ◀ SLICE 2
-│   │   ├── ZoneScaling.h/.cpp       # player stats → downward bracket
-│   │   └── EventScaling.h/.cpp      # event normalization (overrides zone)
-│   ├── contribution/                # ◀ SLICE 3
-│   │   ├── Contribution.h/.cpp      # dmg/heal/mitigation/control/objective → score
-│   │   └── RewardTier.h/.cpp        # score → tiered personal reward
-│   ├── catalyst/                    # ◀ SLICE 4
-│   │   └── CatalystStacking.h/.cpp  # raid stacking diminishing returns
-│   ├── allegiance/
-│   │   └── Allegiance.h/.cpp        # allegiance → efficiency modifiers
-│   └── economy/
-│       └── Economy.h/.cpp           # fragments/materials → recipe resolution
-│
-├── tests/                           # GoogleTest. Links ONLY core libs + gtest. FAST.
-│   ├── CMakeLists.txt               # builds `branding_core_tests` standalone executable
-│   ├── proficiency/
-│   │   ├── BrandXpTest.cpp
-│   │   └── ProficiencyTest.cpp
-│   └── fakes/                       # FakeClock, FakeRng, FakeConfig (DI test doubles)
-│
-└── src/                             # ADAPTERS. Depend on AzerothCore + core libs.
-    ├── BrandingLoader.cpp           # AddSC_mod_branding()
-    ├── adapters/
-    │   ├── ProficiencyPlayerScript.cpp   # OnLogin/OnLogout/OnXpActivity → core → DB
-    │   ├── EventEnrollHook.cpp           # enter event phase → auto raid enroll
-    │   ├── ContributionTracker.cpp       # capture dmg/heal/etc → feed contribution core
-    │   └── ScalingApplier.cpp            # apply bracket from scaling core
-    ├── persistence/
-    │   ├── BrandingDB.cpp                # PreparedStatement load/save (chars + account)
-    │   └── statements.h
-    └── integration_tests/           # OPTIONAL: registered into core unit_tests via
-                                      #   ACORE_MODULE_TEST_SOURCES (needs game lib)
+├── docs/ARCHITECTURE.md             # this file
+├── conf/mod_branding.conf.dist      # tunables (collected by the module build)            ✓
+├── src/                             # COMPILED INTO THE SERVER (AzerothCore collects src/ only)
+│   ├── core/                        # PURE C++20. No AzerothCore includes anywhere here.
+│   │   ├── common/                  # DI interfaces injected by adapters
+│   │   │   ├── Brand.h              # BrandId / ActivitySource / RoleContribution enums       ✓
+│   │   │   ├── Clock.h              # IClock interface (inject time)                           ✓
+│   │   │   └── Config.h             # IBrandingConfig interface (inject tunables)             ✓
+│   │   ├── proficiency/             # ◀ SLICE 1
+│   │   │   ├── Types.h              # XpActivity, ProficiencyState, XpResult, KnowledgeState   ✓
+│   │   │   ├── BrandXp.{h,cpp}      # XP gain + modifiers + diminishing returns                ✓
+│   │   │   ├── Proficiency.{h,cpp}  # level curve, XP→level, effect strength                   ✓
+│   │   │   └── Knowledge.{h,cpp}    # account access gates (earn + express, anti-P2W)          ✓
+│   │   ├── scaling/ (Slice 2)  contribution/ (Slice 3)  catalyst/ (Slice 4)  economy/ (Slice 5)
+│   ├── ServerClock.h                # IClock over GameTime (adapter)                          ✓
+│   ├── BrandingConfig.{h,cpp}       # IBrandingConfig over sConfigMgr (adapter)               ✓
+│   ├── ProficiencyMgr.{h,cpp}       # ObjectGuid-keyed cache, load/save, ApplyActivity         ✓
+│   └── ProficiencyScripts.cpp       # World/Player hooks + Addmod_brandingScripts()            ✓
+└── tests/                           # GoogleTest. NOT compiled into the server (sibling of src/)
+    ├── standalone/CMakeLists.txt    # builds branding_core_tests (FetchContent gtest 1.12.1)   ✓
+    ├── fakes/                       # FakeClock, FakeConfig (DI test doubles)                  ✓
+    └── proficiency/                 # BrandXpTest, ProficiencyTest, KnowledgeTest (20 tests)   ✓
 ```
 
 ### CMake strategy (the key to fast TDD)
 
-`mod-branding.cmake` (auto-included by the module CMake config) does two things:
+There are **two build paths**, by design:
 
-1. **Defines each `core/<system>` as an `OBJECT`/`STATIC` library** with `target_compile_features(... cxx_std_20)` and **no link to `game`/`shared`/`common`**. These compile in isolation.
-2. **Defines a standalone test executable** `branding_core_tests` that links only
-   `branding-core-* + gtest_main + gmock_main`. This is the **primary TDD loop**:
+1. **Standalone fast loop (primary TDD).** `tests/standalone/CMakeLists.txt` is a self-contained
+   project: it FetchContent-pulls googletest 1.12.1 (the version AzerothCore pins) and compiles
+   `src/core/*.cpp` + `tests/**` into `branding_core_tests`, linking **only** gtest — no `game`,
+   no worldserver, no DB. Configure + build + run in seconds:
 
    ```bash
-   cmake --build build --target branding_core_tests && ./build/branding_core_tests
+   cmake -S modules/mod-branding/tests/standalone -B <build> && cmake --build <build>
+   <build>/branding_core_tests        # or: ctest --test-dir <build> --output-on-failure
    ```
 
-   No worldserver. No DB. No game lib. Seconds, not minutes.
+2. **Server build.** The AzerothCore module system auto-collects all sources and include dirs
+   under `src/` (so `src/core` headers resolve with no extra CMake), links `game`, and wires
+   `Addmod_brandingScripts()` into the module loader. `tests/` is untouched by this path.
 
-The adapter `src/` sources are collected by the normal module mechanism and link `game`.
-Adapter integration tests (the few that need `game`/mocks) register via the existing
-`ACORE_MODULE_TEST_SOURCES` global property so they join the core `unit_tests` target.
-
-> **Rule:** anything under `core/` that `#include`s an AzerothCore header is a spec violation.
-> A CI guard greps `core/` for forbidden includes.
+> **Rule:** anything under `src/core/` that `#include`s an AzerothCore header is a spec violation.
+> Verified by grepping `src/core/` for forbidden includes (currently only `<cstdint>`,
+> `<algorithm>`, `<cmath>` and own headers).
 
 ---
 

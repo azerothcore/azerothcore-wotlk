@@ -1,0 +1,81 @@
+#
+# mod-branding configuration
+#
+# Tunables for the Brand XP + Proficiency system (design slice 1). All values are read once at
+# startup and on `.reload config`. The pure core reads none of these directly -- BrandingConfig
+# snapshots them and injects them, so formulas stay deterministic and unit-testable.
+#
+
+[worldserver]
+
+#
+#    Branding.Enable
+#        Description: Master switch for the branding module.
+#        Default:     0 - (disabled)
+#
+
+Branding.Enable = 0
+
+#
+#    Branding.Xp.MatchBonus
+#        Description: XP multiplier when the active brand matches the content's aligned brand.
+#        Default:     1.25
+#
+
+Branding.Xp.MatchBonus = 1.25
+
+#
+#    Branding.Xp.DrSoftCap
+#        Description: Recent-window XP above this soft cap begins diminishing returns.
+#        Default:     50000
+#
+
+Branding.Xp.DrSoftCap = 50000
+
+#
+#    Branding.Xp.DrFloor
+#        Description: Lower bound the diminishing-returns multiplier never drops below.
+#        Default:     0.1
+#
+
+Branding.Xp.DrFloor = 0.1
+
+#
+#    Branding.Xp.DrSlope
+#        Description: Linear DR decay applied per XP unit past the soft cap.
+#        Default:     0.00001
+#
+
+Branding.Xp.DrSlope = 0.00001
+
+#
+#    Branding.Xp.DrWindowSeconds
+#        Description: Seconds after which the recent-window decays to 0 (full XP restored).
+#        Default:     3600
+#
+
+Branding.Xp.DrWindowSeconds = 3600
+
+#
+#    Branding.Level.BaseXp
+#        Description: Level curve base: XpForLevel(n) = round(BaseXp * n^Exponent).
+#        Default:     100.0
+#
+
+Branding.Level.BaseXp = 100.0
+
+#
+#    Branding.Level.Exponent
+#        Description: Level curve exponent.
+#        Default:     2.0
+#
+
+Branding.Level.Exponent = 2.0
+
+#
+#    Branding.Level.Max
+#        Description: Maximum brand proficiency level (prestige cap).
+#        Default:     50
+#
+
+Branding.Level.Max = 50

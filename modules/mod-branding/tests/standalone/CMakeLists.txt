@@ -26,7 +26,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(googletest)
 
 set(BRANDING_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../..)
-set(CORE_DIR ${BRANDING_ROOT}/core)
+set(CORE_DIR ${BRANDING_ROOT}/src/core)
 set(TESTS_DIR ${BRANDING_ROOT}/tests)
 
 file(GLOB_RECURSE CORE_SOURCES CONFIGURE_DEPENDS ${CORE_DIR}/*.cpp)
