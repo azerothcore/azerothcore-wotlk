@@ -1578,15 +1578,31 @@ struct boss_yoggsaron_constrictor_tentacle : public ScriptedAI
     uint32 _checkTimer;
     ObjectGuid _playerGUID;
 
-    void IsSummonedBy(WorldObject* /*summoner*/) override
+    void GrabPlayer(Unit* target)
+    {
+        target->CastSpell(me, SPELL_LUNGE, true);
+        target->CastSpell(target, SPELL_SQUEEZE, true);
+        _playerGUID = target->GetGUID();
+        _checkTimer = 0;
+    }
+
+    void IsSummonedBy(WorldObject* summoner) override
     {
         me->CastSpell(me, SPELL_TENTACLE_ERUPT, true);
         me->CastSpell(me, SPELL_VOID_ZONE_SMALL, true);
         me->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
         me->SetInCombatWithZone();
 
-        // Summoned from a player (Constrictor Tentacle 64133), so register with
-        // Sara to keep the encounter's despawn handling working.
+        // The summoner is the marked player (64133 is self-cast), so grab them at
+        // once instead of waiting for the periodic scan to pick a nearby player.
+        if (Player* player = summoner ? summoner->ToPlayer() : nullptr)
+            if (player->IsAlive() && !player->IsGameMaster()
+                && !player->HasAura(sSpellMgr->GetSpellIdForDifficulty(SPELL_SQUEEZE, me))
+                && !player->HasAura(SPELL_INSANE1))
+                GrabPlayer(player);
+
+        // Summoned from a player, so register with Sara to keep the encounter's
+        // despawn handling working.
         if (InstanceScript* instance = me->GetInstanceScript())
             if (Creature* sara = instance->GetCreature(DATA_SARA))
                 sara->AI()->JustSummoned(me);
@@ -1623,10 +1639,7 @@ struct boss_yoggsaron_constrictor_tentacle : public ScriptedAI
             {
                 if (Unit* target = SelectConstrictTarget())
                 {
-                    target->CastSpell(me, SPELL_LUNGE, true);
-                    target->CastSpell(target, SPELL_SQUEEZE, true);
-                    _playerGUID = target->GetGUID();
-                    _checkTimer = 0;
+                    GrabPlayer(target);
                     return;
                 }
 
