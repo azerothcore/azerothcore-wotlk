@@ -6,8 +6,6 @@
 # snapshots them and injects them, so formulas stay deterministic and unit-testable.
 #
 
-[worldserver]
-
 #
 #    Branding.Enable
 #        Description: Master switch for the branding module.

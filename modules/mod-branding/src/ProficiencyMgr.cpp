@@ -64,6 +64,9 @@ namespace Branding
 
     void ProficiencyMgr::LoadPlayer(Player* player)
     {
+        // NOTE: loads run as blocking queries on the login path for simplicity. Both reads are tiny,
+        // primary-key-indexed lookups. TODO: move to the async path (AsyncQuery + WithCallback via a
+        // query processor) per §7.7 / project convention once running under a full build.
         if (!_config.Enabled() || !player)
             return;
 

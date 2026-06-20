@@ -439,10 +439,17 @@ PRIMARY KEY (account, brand)  -- InnoDB
 SQL goes in `data/sql/updates/pending_db_characters/` and `pending_db_auth/` via
 `create_sql.sh`, every `INSERT` preceded by a matching `DELETE` (codestyle-sql rule).
 
-Adapter (`ProficiencyPlayerScript`): load on `OnLogin` (async query → cache by `ObjectGuid`),
+Adapter (`ProficiencyPlayerScript` + `ProficiencyMgr`): load on `OnLogin` → cache by `ObjectGuid`,
 mutate the cached `ProficiencyState` when activity hooks fire (calling `ApplyActivity`), flush
-on `OnLogout` / periodic save. **No raw `Player*` stored past the tick** — cache keyed by
-`ObjectGuid`, resolved via `ObjectAccessor::FindPlayer`.
+on `OnLogout`. **No raw `Player*` stored past the tick** — cache keyed by `ObjectGuid`.
+
+> **Implemented (Slice 1) — status:** the adapter layer is **header-audited correct** against the
+> actual AzerothCore APIs (script-base ctors, empty `enabledHooks` ⇒ all hooks, hook signatures,
+> `DatabaseWorkerPool::Query/Execute` `{}`-formatting + `Field::Get<T>`, `GameTime`, `GetOption<T>`,
+> `std::hash<ObjectGuid>`, module auto-detection + `Addmod_brandingScripts()` entrypoint). It is
+> **not yet compiled against a worldserver** (build deps boost/openssl/mysqlclient are absent in
+> the dev sandbox). Known simplification: login loads are **blocking** `Query`s (tiny PK lookups);
+> moving to the async `WithCallback` path is a TODO for when a full build is available.
 
 ### 7.8 Adapter activity sources (where XpActivity comes from)
 
