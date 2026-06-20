@@ -89,6 +89,12 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket& recvData)
     if (!sScriptMgr->OnPlayerCanGroupInvite(invitingPlayer, membername))
         return;
 
+    if (sWorld->getBoolConfig(CONFIG_TRIAL_RESTRICTION_PARTY) && IsTrialAccount())
+    {
+        SendPartyResult(PARTY_OP_INVITE, membername, ERR_INVITE_RESTRICTED);
+        return;
+    }
+
     if (invitingPlayer->IsSpectator() || invitedPlayer->IsSpectator())
     {
         SendPartyResult(PARTY_OP_INVITE, membername, ERR_INVITE_RESTRICTED);
@@ -244,6 +250,40 @@ void WorldSession::HandleGroupAcceptOpcode(WorldPacket& recvData)
     if (!sScriptMgr->OnPlayerCanGroupAccept(GetPlayer(), group))
         return;
 
+    Player* leader = ObjectAccessor::FindConnectedPlayer(group->GetLeaderGUID());
+
+    // Trial accounts cannot join a group whose existing members are above the trial level cap.
+    if (sWorld->getBoolConfig(CONFIG_TRIAL_RESTRICTION_PARTY) && IsTrialAccount())
+    {
+        if (uint32 trialLevelCap = sWorld->getIntConfig(CONFIG_TRIAL_LEVEL_CAP))
+        {
+            uint8 leaderLevel = leader ? leader->GetLevel() : sCharacterCache->GetCharacterLevelByGuid(group->GetLeaderGUID());
+            if (leaderLevel > trialLevelCap)
+            {
+                SendPartyResult(PARTY_OP_INVITE, "", ERR_INVITE_RESTRICTED);
+                return;
+            }
+
+            for (auto const& slot : group->GetMemberSlots())
+            {
+                if (slot.guid == GetPlayer()->GetGUID())
+                    continue;
+
+                uint8 memberLevel = 0;
+                if (Player* member = ObjectAccessor::FindConnectedPlayer(slot.guid))
+                    memberLevel = member->GetLevel();
+                else
+                    memberLevel = sCharacterCache->GetCharacterLevelByGuid(slot.guid);
+
+                if (memberLevel > trialLevelCap)
+                {
+                    SendPartyResult(PARTY_OP_INVITE, "", ERR_INVITE_RESTRICTED);
+                    return;
+                }
+            }
+        }
+    }
+
     if (group->GetLeaderGUID() == GetPlayer()->GetGUID())
     {
         LOG_ERROR("network.opcode", "HandleGroupAcceptOpcode: player {} ({}) tried to accept an invite to his own group",
@@ -257,8 +297,6 @@ void WorldSession::HandleGroupAcceptOpcode(WorldPacket& recvData)
         SendPartyResult(PARTY_OP_INVITE, "", ERR_GROUP_FULL);
         return;
     }
-
-    Player* leader = ObjectAccessor::FindConnectedPlayer(group->GetLeaderGUID());
 
     // Forming a new group, create it
     if (!group->IsCreated())
