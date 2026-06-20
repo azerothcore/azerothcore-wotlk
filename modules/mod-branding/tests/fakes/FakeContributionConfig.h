@@ -29,6 +29,15 @@ namespace Branding::Test
         uint32_t silverThreshold = 150;
         uint32_t goldThreshold = 400;
 
+        // Per-EventType allowed reward categories (bits over RewardCategory). None spans all 5.
+        // Invasion: Mats|Currency|Rep; ResourceSurge: Mats|Xp; EliteHunt: Currency|Cosmetic|Rep;
+        // ProfessionAnomaly: Mats|Xp|Cosmetic.
+        std::array<uint32_t, static_cast<size_t>(EventType::COUNT)> allowedCategoryMask{ { 21u, 3u, 28u, 11u } };
+
+        uint32_t accountMaterialsCeiling = 1000;
+        uint32_t accountCurrencyCeiling = 500;
+        uint64_t accountCeilingPeriodSeconds = 86400;
+
         uint32_t ActionBasePoints(EventAction action) const override { return actionPoints[static_cast<size_t>(action)]; }
         uint32_t HealUnitsPerPoint() const override { return healUnitsPerPoint; }
         uint32_t HealMaxPoints() const override { return healMaxPoints; }
@@ -44,6 +53,11 @@ namespace Branding::Test
         uint32_t BronzeThreshold() const override { return bronzeThreshold; }
         uint32_t SilverThreshold() const override { return silverThreshold; }
         uint32_t GoldThreshold() const override { return goldThreshold; }
+
+        uint32_t AllowedCategoryMask(EventType type) const override { return allowedCategoryMask[static_cast<size_t>(type)]; }
+        uint32_t AccountMaterialsCeiling() const override { return accountMaterialsCeiling; }
+        uint32_t AccountCurrencyCeiling() const override { return accountCurrencyCeiling; }
+        uint64_t AccountCeilingPeriodSeconds() const override { return accountCeilingPeriodSeconds; }
     };
 }
 

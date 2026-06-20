@@ -268,9 +268,11 @@ Each slice = spec section + failing tests + green core + thin adapter + persiste
 2. **Slice 2 — Scaling formulas** ✓ (§2.1 zone + event override; §2.2 group-size encounter & reward
    scaling). Pure math; gates dungeon/raid/invasion access and yield. *Implemented: `src/core/scaling/`
    (Scaling, GroupScaling, IScalingConfig); 12 tests green.*
-3. **Slice 3 — Dynamic events + Contribution → reward tiers** (§9): action scoring engine, the
-   four guardrails (hourly cap, daily DR, anti-leech, reward diversity), reward tiers, and region
-   containment. Subscription/spawns/overlay are adapter/data.
+3. **Slice 3 — Dynamic events + Contribution → reward tiers** ✓ (§9): action scoring engine, the
+   guardrails (hourly cap, daily DR, anti-leech, reward diversity, account economy ceiling), reward
+   tiers, and region containment. Subscription/spawns/overlay are adapter/data (not yet built).
+   *Implemented: `src/core/contribution/` (Contribution, RewardTier, Containment, RewardDiversity,
+   AccountCeiling) + `common/Rng.h`; 23 tests green incl. the §10 adversarial named cases.*
 4. **Slice 4 — Catalyst stacking DR.** Small, sharp; consumes proficiency from Slice 1.
 5. **Slice 5 — Exploration/Discovery + Allegiance + Economy** (§8): discovery XP + tier
    classification + economy resolution (pure), allegiance efficiency, and the XP-balance regression

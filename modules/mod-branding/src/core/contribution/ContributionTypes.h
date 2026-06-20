@@ -39,6 +39,17 @@ namespace Branding
         Gold
     };
 
+    // Reward categories for diversity (§9.5). No single EventType may drop all of these.
+    enum class RewardCategory : uint8_t
+    {
+        CraftingMats = 0,
+        Xp,
+        Currency,
+        Cosmetic,
+        Reputation,
+        COUNT
+    };
+
     // Anti-leech heuristics captured by the adapter (§9.3): a player below the floors scores 0.
     struct ActivitySignal
     {

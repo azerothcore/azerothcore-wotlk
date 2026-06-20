@@ -30,6 +30,15 @@ namespace Branding
         virtual uint32_t BronzeThreshold() const = 0;
         virtual uint32_t SilverThreshold() const = 0;
         virtual uint32_t GoldThreshold() const = 0;
+
+        // --- §9.5 reward diversity ---
+        // Bitmask over RewardCategory of the categories an EventType may award. Must NOT span all.
+        virtual uint32_t AllowedCategoryMask(EventType type) const = 0;
+
+        // --- §9.3#5 account-wide economy ceiling (Hybrid) ---
+        virtual uint32_t AccountMaterialsCeiling() const = 0;
+        virtual uint32_t AccountCurrencyCeiling() const = 0;
+        virtual uint64_t AccountCeilingPeriodSeconds() const = 0;
     };
 }
 
