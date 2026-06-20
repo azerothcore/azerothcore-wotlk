@@ -273,7 +273,9 @@ Each slice = spec section + failing tests + green core + thin adapter + persiste
    tiers, and region containment. Subscription/spawns/overlay are adapter/data (not yet built).
    *Implemented: `src/core/contribution/` (Contribution, RewardTier, Containment, RewardDiversity,
    AccountCeiling) + `common/Rng.h`; 23 tests green incl. the §10 adversarial named cases.*
-4. **Slice 4 — Catalyst stacking DR.** Small, sharp; consumes proficiency from Slice 1.
+4. **Slice 4 — Catalyst stacking DR.** ✓ Small, sharp; consumes proficiency from Slice 1.
+   *Implemented: `src/core/catalyst/` (CatalystStacking, ICatalystConfig); 6 tests green.
+   RaidCatalystMultiplier ∈ [1.0, MaxRaidMul], non-increasing in rank (1st full, 3rd+ heavy).*
 5. **Slice 5 — Exploration/Discovery + Allegiance + Economy** (§8): discovery XP + tier
    classification + economy resolution (pure), allegiance efficiency, and the XP-balance regression
    sim. World-spawned content (§8.4) is data, authored against the tier rules afterward.
