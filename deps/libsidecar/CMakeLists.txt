@@ -34,16 +34,23 @@ if (WIN32 OR NOT USE_REAL_LIBSIDECAR)
 else()
     add_library(libsidecar SHARED IMPORTED GLOBAL)
 
+    # Determine the correct library extension based on platform
+    if(APPLE)
+        set(LIBSIDECAR_EXTENSION "dylib")
+    else()
+        set(LIBSIDECAR_EXTENSION "so")
+    endif()
+
     set_target_properties(libsidecar
       PROPERTIES
         IMPORTED_LOCATION
-          ${CMAKE_CURRENT_SOURCE_DIR}/libsidecar.so
+          ${CMAKE_CURRENT_SOURCE_DIR}/libsidecar.${LIBSIDECAR_EXTENSION}
         INTERFACE_INCLUDE_DIRECTORIES
           ${CMAKE_CURRENT_SOURCE_DIR}/include
         IMPORTED_NO_SONAME true)
 
     set_target_properties(libsidecar PROPERTIES
-                          IMPORTED_LOCATION_NOCONFIG  "${CMAKE_INSTALL_RPATH}/libsidecar.so"
-                          IMPORTED_SONAME_NOCONFIG libsidecar.so
+                          IMPORTED_LOCATION_NOCONFIG  "${CMAKE_INSTALL_RPATH}/libsidecar.${LIBSIDECAR_EXTENSION}"
+                          IMPORTED_SONAME_NOCONFIG libsidecar.${LIBSIDECAR_EXTENSION}
     )
 endif()
