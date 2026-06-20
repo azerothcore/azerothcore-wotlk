@@ -29,4 +29,11 @@ namespace Branding
         return DiscoveryXp(playerLevel, static_cast<uint8_t>(area->area_level),
             DiscoveryType::Subzone, true, _config);
     }
+
+    DiscoveryTier DiscoveryMgr::AreaTier(uint32_t areaId) const
+    {
+        AreaTableEntry const* area = sAreaTableStore.LookupEntry(areaId);
+        uint8_t const level = area && area->area_level > 0 ? static_cast<uint8_t>(area->area_level) : 0;
+        return TierForZoneLevel(level, _config);
+    }
 }

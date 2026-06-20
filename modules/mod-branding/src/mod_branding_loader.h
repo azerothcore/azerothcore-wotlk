@@ -5,5 +5,6 @@
 void AddBrandingProficiencyScripts();
 void AddBrandingDiscoveryScripts();
 void AddBrandingScalingScripts();
+void AddBrandingCommandScripts();
 
 #endif // MOD_BRANDING_SRC_LOADER_H

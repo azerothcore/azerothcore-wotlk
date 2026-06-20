@@ -125,4 +125,13 @@ namespace Branding
         uint8_t const level = LevelForXp(state.totalXp, _config);
         return ResolvedEffectStrength(level, brand, knowledge, _config);
     }
+
+    uint8_t ProficiencyMgr::BrandLevel(ObjectGuid charGuid, BrandId brand) const
+    {
+        auto it = _charStates.find(charGuid);
+        if (it == _charStates.end())
+            return 0;
+
+        return LevelForXp(it->second[static_cast<size_t>(brand)].totalXp, _config);
+    }
 }

@@ -20,6 +20,9 @@ namespace Branding
         // Bonus discovery XP for first-exploring `areaId` at `playerLevel` (0 if disabled/unknown).
         uint32_t AreaDiscoveryBonus(uint8_t playerLevel, uint32_t areaId) const;
 
+        // Discovery tier of an area's zone level (§8.3). For inspection.
+        DiscoveryTier AreaTier(uint32_t areaId) const;
+
     private:
         DiscoveryMgr() = default;
         DiscoveryConfig _config;

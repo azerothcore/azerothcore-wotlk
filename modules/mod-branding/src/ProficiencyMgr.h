@@ -36,6 +36,9 @@ namespace Branding
         // Resolved, anti-P2W effect strength for a brand on the character's current account.
         double EffectStrength(ObjectGuid charGuid, uint32_t accountId, BrandId brand) const;
 
+        // Cached proficiency level for a brand (0 if the character isn't loaded). For inspection.
+        uint8_t BrandLevel(ObjectGuid charGuid, BrandId brand) const;
+
     private:
         ProficiencyMgr() = default;
 
