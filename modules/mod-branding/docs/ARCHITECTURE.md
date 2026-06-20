@@ -285,7 +285,11 @@ Each slice = spec section + failing tests + green core + thin adapter + persiste
    *Implemented: `src/core/vault/` (transfer friction + capacity) and `src/core/mastery/`
    (dual-key effectiveness: account-unlock × character-skill, anti-P2W); 5 tests green.
    Persistence/adapters deferred.*
-7. **Slice 7 — Combat effect application + Item branding + Prestige cosmetics** (adapter-heavy).
+7. **Slice 7 — Combat effect application + Item branding + Prestige cosmetics** ✓ pure parts
+   (application is adapter-heavy, deferred). *Implemented: `src/core/effects/` (EffectModel:
+   Personal/Raid multipliers with caps + catalyst-weighted stacking + role asymmetry + windowed
+   uptime + prestige; ItemBrand: step/level intensity, upgrade, difficulty ordering, anti-P2W,
+   loadout validation); 12 tests green. Spell/aura/proc application to AzerothCore deferred.*
 
 Rationale: build pure-logic, high-leverage cores first; defer adapter-heavy/cosmetic systems.
 
