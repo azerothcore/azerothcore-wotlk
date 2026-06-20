@@ -443,13 +443,14 @@ Adapter (`ProficiencyPlayerScript` + `ProficiencyMgr`): load on `OnLogin` → ca
 mutate the cached `ProficiencyState` when activity hooks fire (calling `ApplyActivity`), flush
 on `OnLogout`. **No raw `Player*` stored past the tick** — cache keyed by `ObjectGuid`.
 
-> **Implemented (Slice 1) — status:** the adapter layer is **header-audited correct** against the
-> actual AzerothCore APIs (script-base ctors, empty `enabledHooks` ⇒ all hooks, hook signatures,
-> `DatabaseWorkerPool::Query/Execute` `{}`-formatting + `Field::Get<T>`, `GameTime`, `GetOption<T>`,
-> `std::hash<ObjectGuid>`, module auto-detection + `Addmod_brandingScripts()` entrypoint). It is
-> **not yet compiled against a worldserver** (build deps boost/openssl/mysqlclient are absent in
-> the dev sandbox). Known simplification: login loads are **blocking** `Query`s (tiny PK lookups);
-> moving to the async `WithCallback` path is a TODO for when a full build is available.
+> **Implemented (Slice 1) — status:** the adapter layer is **compile-verified** — CMake configure
+> detects the module (it appears in the static-modules list with `mod_branding.conf`), and all three
+> adapter TUs (`BrandingConfig`, `ProficiencyMgr`, `ProficiencyScripts`) pass `g++ -fsyntax-only`
+> with the build's exact flags against the real game headers. (The verification caught a real bug:
+> `BrandingConfig.cpp` used the `uint32` typedef without pulling in `Define.h` — fixed to `uint32_t`.)
+> Only full linking is unverified (the multi-hour worldserver link was not run). Known
+> simplification: login loads are **blocking** `Query`s (tiny PK lookups); moving to the async
+> `WithCallback` path is a TODO.
 
 ### 7.8 Adapter activity sources (where XpActivity comes from)
 
