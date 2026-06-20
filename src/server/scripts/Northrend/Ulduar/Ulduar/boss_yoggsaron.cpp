@@ -1590,14 +1590,12 @@ struct boss_yoggsaron_constrictor_tentacle : public ScriptedAI
         me->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
         me->SetInCombatWithZone();
 
-        // The summoner is the marked player (64133 is self-cast); grab them
-        // directly, falling back to the nearest valid player only if that one
-        // can no longer be squeezed.
+        // The summoner is the marked player (64133 is self-cast); 64132 already
+        // picked a valid enemy, so only re-check that they can still be squeezed.
+        // Fall back to the nearest valid player otherwise.
         Unit* target = nullptr;
         if (Player* player = summoner ? summoner->ToPlayer() : nullptr)
-            if (player->IsAlive() && !player->IsGameMaster()
-                && !player->HasAura(sSpellMgr->GetSpellIdForDifficulty(SPELL_SQUEEZE, me))
-                && !player->HasAura(SPELL_INSANE1))
+            if (player->IsAlive() && !player->HasAura(sSpellMgr->GetSpellIdForDifficulty(SPELL_SQUEEZE, me)))
                 target = player;
 
         if (!target)
