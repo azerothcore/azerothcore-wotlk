@@ -5,6 +5,10 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum PlayerMoneyErrorCode {
     PlayerMoneyErrorCodeNoError        = 0,
     PlayerMoneyErrorCodeNoHandler      = 1,
@@ -31,5 +35,9 @@ typedef struct {
 typedef ModifyMoneyForPlayerResponse (*ModifyMoneyForPlayerHandler) (uint64_t /*player_guid*/, int32_t /*amount*/);
 void SetModifyMoneyForPlayerHandler(ModifyMoneyForPlayerHandler h);
 ModifyMoneyForPlayerResponse CallModifyMoneyForPlayerHandler(uint64_t player_guid, int32_t amount);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

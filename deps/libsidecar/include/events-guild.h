@@ -3,9 +3,13 @@
 
 #include <stdint.h>
 
-enum CallStatus {
-    OK = 0,
-    NoHook = 1
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+enum GuildHookStatus {
+    GuildHookStatusOK = 0,
+    GuildHookStatusNoHook = 1
 };
 
 typedef void (*OnGuildMemberAddedHook) (uint64_t /*guild_id*/, uint64_t /*player_guid*/);
@@ -19,5 +23,9 @@ int CallOnGuildMemberLeftHook(uint64_t guild_id, uint64_t player_guid);
 typedef void (*OnGuildMemberRemovedHook) (uint64_t /*guild_id*/, uint64_t /*player_guid*/);
 void SetOnGuildMemberRemovedHook(OnGuildMemberRemovedHook h);
 int CallOnGuildMemberRemovedHook(uint64_t guild_id, uint64_t player_guid);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

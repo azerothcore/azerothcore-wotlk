@@ -5,6 +5,10 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum BattlegroundErrorCode {
     BattlegroundErrorCodeNoError          = 0,
     BattlegroundErrorCodeNoHandler        = 1,
@@ -65,5 +69,9 @@ BattlegroundJoinCheckErrorCode CallCanPlayerJoinBattlegroundQueueHandler(uint64_
 typedef BattlegroundJoinCheckErrorCode (*CanPlayerTeleportToBattlegroundHandler)(uint64_t playerGuid);
 void SetCanPlayerTeleportToBattlegroundHandler(CanPlayerTeleportToBattlegroundHandler h);
 BattlegroundJoinCheckErrorCode CallCanPlayerTeleportToBattlegroundHandler(uint64_t playerGuid);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

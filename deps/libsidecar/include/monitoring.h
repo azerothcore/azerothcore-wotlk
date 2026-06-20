@@ -5,6 +5,10 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 typedef enum MonitoringErrorCode {
     MonitoringErrorCodeNoError    = 0,
     MonitoringErrorCodeNoHandler  = 1,
@@ -24,5 +28,9 @@ typedef struct {
 typedef MonitoringDataCollectorResponse (*MonitoringDataCollectorHandler)();
 void SetMonitoringDataCollectorHandler(MonitoringDataCollectorHandler h);
 MonitoringDataCollectorResponse CallMonitoringDataCollectorHandler();
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

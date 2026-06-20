@@ -4,6 +4,10 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 enum GroupStatus {
     GroupHookStatusOK = 0,
     GroupHookStatusNoHook = 1
@@ -54,5 +58,9 @@ int CallOnGroupRaidDifficultyChangedHook(uint32_t guid, uint8_t difficulty);
 typedef void (*OnGroupConvertedToRaidHook) (uint32_t guid);
 void SetOnGroupConvertedToRaidHook(OnGroupConvertedToRaidHook h);
 int CallOnGroupConvertedToRaidHook(uint32_t guid);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
