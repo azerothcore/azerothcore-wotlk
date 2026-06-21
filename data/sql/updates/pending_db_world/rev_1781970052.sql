@@ -42,7 +42,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-100536, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 53, 0, 10053600, 1, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Heb\'Drakkar Striker - On Respawn - Start Patrol Path 10053600'),
 (-100536, 0, 2, 3, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 60, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Heb\'Drakkar Striker - On Aggro - Set Disable Gravity Off'),
 (-100536, 0, 3, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 43, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Heb\'Drakkar Striker - On Aggro - Dismount'),
-(-100536, 0, 4, 5, 7, 0, 100, 0, 0, 0, 0, 0, 0, 0, 60, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Heb\'Drakkar Striker - On Evade - Set Disable Gravity On'),
+(-100536, 0, 4, 5, 7, 0, 100, 0, 0, 0, 0, 0, 0, 0, 60, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Heb\'Drakkar Striker - On Evade - Set Disable Gravity On'),
 (-100536, 0, 5, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 43, 0, 9074, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Heb\'Drakkar Striker - On Evade - Mount To Model 9074'),
 (-100536, 0, 6, 0, 0, 0, 100, 0, 5000, 5000, 16000, 16000, 0, 0, 11, 11976, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Heb\'Drakkar Striker - In Combat - Cast \'Strike\''),
 (-100536, 0, 7, 0, 0, 0, 100, 0, 4000, 14000, 50000, 60000, 0, 0, 11, 51951, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Heb\'Drakkar Striker - In Combat - Cast \'Rabies\''),
@@ -50,7 +50,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-100540, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 53, 0, 10054000, 1, 0, 0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Heb\'Drakkar Striker - On Respawn - Start Patrol Path 10054000'),
 (-100540, 0, 2, 3, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 60, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Heb\'Drakkar Striker - On Aggro - Set Disable Gravity Off'),
 (-100540, 0, 3, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 43, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Heb\'Drakkar Striker - On Aggro - Dismount'),
-(-100540, 0, 4, 5, 7, 0, 100, 0, 0, 0, 0, 0, 0, 0, 60, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Heb\'Drakkar Striker - On Evade - Set Disable Gravity On'),
+(-100540, 0, 4, 5, 7, 0, 100, 0, 0, 0, 0, 0, 0, 0, 60, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Heb\'Drakkar Striker - On Evade - Set Disable Gravity On'),
 (-100540, 0, 5, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 43, 0, 9074, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Heb\'Drakkar Striker - On Evade - Mount To Model 9074'),
 (-100540, 0, 6, 0, 0, 0, 100, 0, 5000, 5000, 16000, 16000, 0, 0, 11, 11976, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Heb\'Drakkar Striker - In Combat - Cast \'Strike\''),
 (-100540, 0, 7, 0, 0, 0, 100, 0, 4000, 14000, 50000, 60000, 0, 0, 11, 51951, 32, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Heb\'Drakkar Striker - In Combat - Cast \'Rabies\'');
