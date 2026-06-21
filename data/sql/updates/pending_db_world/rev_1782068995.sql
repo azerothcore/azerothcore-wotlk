@@ -1,7 +1,7 @@
 
 -- Add Spell Script Name.
 DELETE FROM `spell_script_names` WHERE `spell_id` = 51036;
-INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES 
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (51036, 'spell_venture_pilot_summon');
 
 -- Add new Sniffed Waypoints
