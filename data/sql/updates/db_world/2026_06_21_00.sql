@@ -1,3 +1,4 @@
+-- DB update 2026_06_20_00 -> 2026_06_21_00
 
 -- Set Extra Flag NO_MOVE_FLAGS_UPDATE.
 UPDATE `creature_template` SET `flags_extra` = `flags_extra` |512 WHERE (`entry` = 28465);
