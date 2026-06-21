@@ -1,4 +1,4 @@
-#include "contribution/PersistenceRow.h"
+#include "branding/contribution/PersistenceRow.h"
 #include <gtest/gtest.h>
 
 using namespace Branding;

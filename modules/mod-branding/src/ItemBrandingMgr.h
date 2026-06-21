@@ -2,7 +2,7 @@
 #define MOD_BRANDING_SRC_ITEMBRANDINGMGR_H
 
 #include "ItemBrandConfig.h"
-#include "effects/ItemBrand.h"
+#include "branding/effects/ItemBrand.h"
 #include "ObjectGuid.h"
 #include <cstdint>
 #include <unordered_map>

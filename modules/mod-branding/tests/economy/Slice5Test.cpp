@@ -1,6 +1,6 @@
-#include "allegiance/Allegiance.h"
-#include "economy/Discovery.h"
-#include "economy/Economy.h"
+#include "branding/allegiance/Allegiance.h"
+#include "branding/economy/Discovery.h"
+#include "branding/economy/Economy.h"
 #include "fakes/FakeWorldConfig.h"
 #include <gtest/gtest.h>
 

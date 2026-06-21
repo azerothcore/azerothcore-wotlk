@@ -1,7 +1,7 @@
 #ifndef MOD_BRANDING_CORE_ECONOMY_DISCOVERABLE_H
 #define MOD_BRANDING_CORE_ECONOMY_DISCOVERABLE_H
 
-#include "economy/Discovery.h"
+#include "branding/economy/Discovery.h"
 #include <cstdint>
 
 namespace Branding

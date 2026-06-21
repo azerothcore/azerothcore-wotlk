@@ -1,5 +1,5 @@
-#include "mastery/Mastery.h"
-#include "vault/Vault.h"
+#include "branding/mastery/Mastery.h"
+#include "branding/vault/Vault.h"
 #include <gtest/gtest.h>
 
 using namespace Branding;

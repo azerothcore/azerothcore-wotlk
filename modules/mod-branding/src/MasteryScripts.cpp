@@ -1,6 +1,6 @@
 #include "MasteryMgr.h"
 #include "mod_branding_loader.h"
-#include "mastery/Mastery.h"
+#include "branding/mastery/Mastery.h"
 #include "Item.h"
 #include "Player.h"
 #include "Random.h"

@@ -1,5 +1,5 @@
-#include "effects/EffectModel.h"
-#include "effects/ItemBrand.h"
+#include "branding/effects/EffectModel.h"
+#include "branding/effects/ItemBrand.h"
 #include "fakes/FakeEffectConfig.h"
 #include <gtest/gtest.h>
 

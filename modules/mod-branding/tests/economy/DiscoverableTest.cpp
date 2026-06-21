@@ -1,4 +1,4 @@
-#include "economy/Discoverable.h"
+#include "branding/economy/Discoverable.h"
 #include <gtest/gtest.h>
 
 using namespace Branding;

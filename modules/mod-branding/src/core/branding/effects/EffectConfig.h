@@ -1,7 +1,7 @@
 #ifndef MOD_BRANDING_CORE_EFFECTS_EFFECTCONFIG_H
 #define MOD_BRANDING_CORE_EFFECTS_EFFECTCONFIG_H
 
-#include "common/Brand.h"
+#include "branding/common/Brand.h"
 #include <cstdint>
 
 namespace Branding

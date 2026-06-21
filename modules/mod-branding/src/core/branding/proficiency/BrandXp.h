@@ -2,8 +2,8 @@
 #define MOD_BRANDING_CORE_PROFICIENCY_BRANDXP_H
 
 #include "Types.h"
-#include "common/Clock.h"
-#include "common/Config.h"
+#include "branding/common/Clock.h"
+#include "branding/common/Config.h"
 
 namespace Branding
 {

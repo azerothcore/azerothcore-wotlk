@@ -1,8 +1,8 @@
 #ifndef MOD_BRANDING_SRC_EFFECTCONFIG_H
 #define MOD_BRANDING_SRC_EFFECTCONFIG_H
 
-#include "effects/EffectConfig.h"
-#include "common/Brand.h"
+#include "branding/effects/EffectConfig.h"
+#include "branding/common/Brand.h"
 #include <array>
 #include <cstddef>
 

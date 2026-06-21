@@ -1,4 +1,4 @@
-#include "vault/Vault.h"
+#include "branding/vault/Vault.h"
 #include <gtest/gtest.h>
 
 using namespace Branding;

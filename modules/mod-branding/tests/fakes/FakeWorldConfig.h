@@ -1,8 +1,8 @@
 #ifndef MOD_BRANDING_TESTS_FAKES_FAKEWORLDCONFIG_H
 #define MOD_BRANDING_TESTS_FAKES_FAKEWORLDCONFIG_H
 
-#include "allegiance/Allegiance.h"
-#include "economy/Discovery.h"
+#include "branding/allegiance/Allegiance.h"
+#include "branding/economy/Discovery.h"
 
 namespace Branding::Test
 {

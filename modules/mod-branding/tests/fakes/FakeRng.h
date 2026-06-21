@@ -1,7 +1,7 @@
 #ifndef MOD_BRANDING_TESTS_FAKES_FAKERNG_H
 #define MOD_BRANDING_TESTS_FAKES_FAKERNG_H
 
-#include "common/Rng.h"
+#include "branding/common/Rng.h"
 
 namespace Branding::Test
 {

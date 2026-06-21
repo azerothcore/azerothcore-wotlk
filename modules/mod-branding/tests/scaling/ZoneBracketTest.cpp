@@ -1,4 +1,4 @@
-#include "scaling/ZoneBracket.h"
+#include "branding/scaling/ZoneBracket.h"
 #include <gtest/gtest.h>
 
 using namespace Branding;

@@ -1,4 +1,4 @@
-#include "contribution/RewardTier.h"
+#include "branding/contribution/RewardTier.h"
 #include "fakes/FakeContributionConfig.h"
 #include <gtest/gtest.h>
 

@@ -1,7 +1,7 @@
 #include "DiscoverableMgr.h"
 #include "RewardDelivery.h"
 #include "mod_branding_loader.h"
-#include "economy/Discoverable.h"
+#include "branding/economy/Discoverable.h"
 #include "DBCStores.h"
 #include "GameObject.h"
 #include "ObjectMgr.h"

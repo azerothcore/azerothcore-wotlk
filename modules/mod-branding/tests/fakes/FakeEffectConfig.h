@@ -1,8 +1,8 @@
 #ifndef MOD_BRANDING_TESTS_FAKES_FAKEEFFECTCONFIG_H
 #define MOD_BRANDING_TESTS_FAKES_FAKEEFFECTCONFIG_H
 
-#include "effects/EffectConfig.h"
-#include "effects/ItemBrand.h"
+#include "branding/effects/EffectConfig.h"
+#include "branding/effects/ItemBrand.h"
 #include <array>
 #include <cstddef>
 

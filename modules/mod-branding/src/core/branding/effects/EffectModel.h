@@ -2,7 +2,7 @@
 #define MOD_BRANDING_CORE_EFFECTS_EFFECTMODEL_H
 
 #include "EffectConfig.h"
-#include "common/Brand.h"
+#include "branding/common/Brand.h"
 #include <cstdint>
 
 namespace Branding

@@ -1,7 +1,7 @@
 #ifndef MOD_BRANDING_TESTS_FAKES_FAKECONFIG_H
 #define MOD_BRANDING_TESTS_FAKES_FAKECONFIG_H
 
-#include "common/Config.h"
+#include "branding/common/Config.h"
 #include <array>
 #include <cstddef>
 

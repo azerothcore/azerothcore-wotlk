@@ -2,7 +2,7 @@
 #define MOD_BRANDING_SRC_DISCOVERABLEMGR_H
 
 #include "DiscoveryConfig.h"
-#include "economy/Discoverable.h"
+#include "branding/economy/Discoverable.h"
 #include "ObjectGuid.h"
 #include <cstdint>
 #include <unordered_map>

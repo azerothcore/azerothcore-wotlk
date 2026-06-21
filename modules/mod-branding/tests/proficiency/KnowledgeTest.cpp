@@ -1,5 +1,5 @@
-#include "proficiency/Knowledge.h"
-#include "proficiency/Proficiency.h"
+#include "branding/proficiency/Knowledge.h"
+#include "branding/proficiency/Proficiency.h"
 #include "fakes/FakeConfig.h"
 #include <gtest/gtest.h>
 

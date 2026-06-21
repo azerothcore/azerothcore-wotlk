@@ -1,7 +1,7 @@
 #ifndef MOD_BRANDING_SRC_SERVERRNG_H
 #define MOD_BRANDING_SRC_SERVERRNG_H
 
-#include "common/Rng.h"
+#include "branding/common/Rng.h"
 #include "Random.h"
 
 namespace Branding

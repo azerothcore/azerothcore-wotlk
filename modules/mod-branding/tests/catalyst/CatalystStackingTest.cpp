@@ -1,4 +1,4 @@
-#include "catalyst/CatalystStacking.h"
+#include "branding/catalyst/CatalystStacking.h"
 #include "fakes/FakeCatalystConfig.h"
 #include <gtest/gtest.h>
 

@@ -3,7 +3,7 @@
 
 #include "ContributionConfig.h"
 #include "ContributionTypes.h"
-#include "common/Rng.h"
+#include "branding/common/Rng.h"
 
 namespace Branding
 {

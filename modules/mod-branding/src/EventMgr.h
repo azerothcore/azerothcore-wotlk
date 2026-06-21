@@ -4,8 +4,8 @@
 #include "EventConfig.h"
 #include "ServerClock.h"
 #include "ServerRng.h"
-#include "contribution/AccountCeiling.h"
-#include "contribution/ContributionTypes.h"
+#include "branding/contribution/AccountCeiling.h"
+#include "branding/contribution/ContributionTypes.h"
 #include "ObjectGuid.h"
 #include <cstdint>
 #include <unordered_map>

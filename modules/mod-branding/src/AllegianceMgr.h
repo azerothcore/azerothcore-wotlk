@@ -2,7 +2,7 @@
 #define MOD_BRANDING_SRC_ALLEGIANCEMGR_H
 
 #include "AllegianceConfig.h"
-#include "allegiance/Allegiance.h"
+#include "branding/allegiance/Allegiance.h"
 #include "ObjectGuid.h"
 #include <unordered_map>
 

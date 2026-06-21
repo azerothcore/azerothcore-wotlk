@@ -2,7 +2,7 @@
 #define MOD_BRANDING_CORE_CONTRIBUTION_ACCOUNTCEILING_H
 
 #include "ContributionConfig.h"
-#include "common/Clock.h"
+#include "branding/common/Clock.h"
 #include <cstdint>
 
 namespace Branding

@@ -1,4 +1,4 @@
-#include "contribution/Contribution.h"
+#include "branding/contribution/Contribution.h"
 #include "fakes/FakeClock.h"
 #include "fakes/FakeContributionConfig.h"
 #include <gtest/gtest.h>

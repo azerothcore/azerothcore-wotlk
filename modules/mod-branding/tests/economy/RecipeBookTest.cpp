@@ -1,5 +1,5 @@
-#include "economy/Economy.h"
-#include "economy/RecipeBook.h"
+#include "branding/economy/Economy.h"
+#include "branding/economy/RecipeBook.h"
 #include <gtest/gtest.h>
 
 using namespace Branding;

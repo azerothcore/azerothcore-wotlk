@@ -1,7 +1,7 @@
 #ifndef MOD_BRANDING_SRC_SERVERCLOCK_H
 #define MOD_BRANDING_SRC_SERVERCLOCK_H
 
-#include "common/Clock.h"
+#include "branding/common/Clock.h"
 #include "GameTime.h"
 
 namespace Branding

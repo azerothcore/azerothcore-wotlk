@@ -2,7 +2,7 @@
 #define MOD_BRANDING_SRC_MASTERYMGR_H
 
 #include "MasteryConfig.h"
-#include "mastery/Mastery.h"
+#include "branding/mastery/Mastery.h"
 #include "ObjectGuid.h"
 #include <array>
 #include <cstddef>

@@ -1,7 +1,7 @@
 #ifndef MOD_BRANDING_SRC_EVENTSCHEDULER_H
 #define MOD_BRANDING_SRC_EVENTSCHEDULER_H
 
-#include "contribution/ContributionTypes.h"
+#include "branding/contribution/ContributionTypes.h"
 #include <cstdint>
 #include <vector>
 

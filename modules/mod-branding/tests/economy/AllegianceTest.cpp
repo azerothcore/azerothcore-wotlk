@@ -1,6 +1,6 @@
-#include "allegiance/Allegiance.h"
-#include "common/Brand.h"
-#include "contribution/ContributionTypes.h"
+#include "branding/allegiance/Allegiance.h"
+#include "branding/common/Brand.h"
+#include "branding/contribution/ContributionTypes.h"
 #include "fakes/FakeWorldConfig.h"
 #include <gtest/gtest.h>
 

@@ -3,7 +3,7 @@
 
 #include "BrandingConfig.h"
 #include "ServerClock.h"
-#include "proficiency/Types.h"
+#include "branding/proficiency/Types.h"
 #include "ObjectGuid.h"
 #include <array>
 #include <cstddef>

@@ -1,7 +1,7 @@
 #ifndef MOD_BRANDING_CORE_PROFICIENCY_TYPES_H
 #define MOD_BRANDING_CORE_PROFICIENCY_TYPES_H
 
-#include "common/Brand.h"
+#include "branding/common/Brand.h"
 #include <cstdint>
 
 namespace Branding

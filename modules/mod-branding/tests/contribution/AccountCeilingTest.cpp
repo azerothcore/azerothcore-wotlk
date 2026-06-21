@@ -1,4 +1,4 @@
-#include "contribution/AccountCeiling.h"
+#include "branding/contribution/AccountCeiling.h"
 #include "fakes/FakeClock.h"
 #include "fakes/FakeContributionConfig.h"
 #include <gtest/gtest.h>

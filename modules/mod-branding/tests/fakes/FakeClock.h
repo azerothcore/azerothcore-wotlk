@@ -1,7 +1,7 @@
 #ifndef MOD_BRANDING_TESTS_FAKES_FAKECLOCK_H
 #define MOD_BRANDING_TESTS_FAKES_FAKECLOCK_H
 
-#include "common/Clock.h"
+#include "branding/common/Clock.h"
 
 namespace Branding::Test
 {

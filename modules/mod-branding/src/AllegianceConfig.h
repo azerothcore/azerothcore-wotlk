@@ -1,7 +1,7 @@
 #ifndef MOD_BRANDING_SRC_ALLEGIANCECONFIG_H
 #define MOD_BRANDING_SRC_ALLEGIANCECONFIG_H
 
-#include "allegiance/Allegiance.h"
+#include "branding/allegiance/Allegiance.h"
 
 namespace Branding
 {

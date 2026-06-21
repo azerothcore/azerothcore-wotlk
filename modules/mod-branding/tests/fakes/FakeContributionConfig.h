@@ -1,7 +1,7 @@
 #ifndef MOD_BRANDING_TESTS_FAKES_FAKECONTRIBUTIONCONFIG_H
 #define MOD_BRANDING_TESTS_FAKES_FAKECONTRIBUTIONCONFIG_H
 
-#include "contribution/ContributionConfig.h"
+#include "branding/contribution/ContributionConfig.h"
 #include <array>
 #include <cstddef>
 
