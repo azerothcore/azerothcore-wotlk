@@ -1744,6 +1744,7 @@ public:
     [[nodiscard]] float GetSpeedRate(UnitMoveType mtype) const { return m_speed_rate[mtype]; }
     void SetSpeed(UnitMoveType mtype, float rate, bool forced = false);
     void SetSpeedRate(UnitMoveType mtype, float rate) { m_speed_rate[mtype] = rate; }
+    void SendSpeedToController(UnitMoveType mtype, Player* target) const;
 
     void propagateSpeedChange() { GetMotionMaster()->propagateSpeedChange(); }
 

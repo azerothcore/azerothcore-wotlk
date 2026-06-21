@@ -11329,22 +11329,7 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
 
     if (forced && IsClientControlled())
     {
-        Player* player = const_cast<Player*>(GetClientControlling());
-        uint32 const counter = player->GetSession()->GetOrderCounter();
-
-        // register forced speed changes for WorldSession::HandleForceSpeedChangeAck
-        // and do it only for real sent packets and use run for run/mounted as client expected
-        ++player->m_forced_speed_changes[mtype];
-
-        WorldPacket data(speedOpcodes[static_cast<size_t>(SpeedOpcodeIndex::PC)], 18);
-        data << GetPackGUID();
-        data << counter;
-        if (mtype == MOVE_RUN)
-            data << uint8(0);                           // new 2.1.0
-
-        data << GetSpeed(mtype);
-        player->GetSession()->SendPacket(&data);
-        player->GetSession()->IncrementOrderCounter();
+        SendSpeedToController(mtype, const_cast<Player*>(GetClientControlling()));
     }
     else if (forced)
     {
@@ -11375,6 +11360,24 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
         }
         ToPlayer()->SetCanTeleport(true);
     }
+}
+
+void Unit::SendSpeedToController(UnitMoveType mtype, Player* target) const
+{
+    SpeedOpcodePair const& speedOpcodes = SetSpeed2Opc_table[mtype];
+    uint32 const counter = target->GetSession()->GetOrderCounter();
+
+    ++target->m_forced_speed_changes[mtype];
+
+    WorldPacket data(speedOpcodes[static_cast<size_t>(SpeedOpcodeIndex::PC)], 18);
+    data << GetPackGUID();
+    data << counter;
+    if (mtype == MOVE_RUN)
+        data << uint8(0);
+
+    data << GetSpeed(mtype);
+    target->GetSession()->SendPacket(&data);
+    target->GetSession()->IncrementOrderCounter();
 }
 
 void Unit::setDeathState(DeathState s, bool despawn)
@@ -14961,26 +14964,8 @@ void Unit::RemoveCharmedBy(Unit* charmer)
 
         // Re-sync only the speed types that changed during the charm.
         for (uint8 i = MOVE_WALK; i < MAX_MOVE_TYPE; ++i)
-        {
-            if (m_speed_rate[i] == _charmStartSpeedRate[i])
-                continue;
-
-            UnitMoveType mtype = UnitMoveType(i);
-            SpeedOpcodePair const& speedOpcodes = SetSpeed2Opc_table[mtype];
-            uint32 const counter = targetPlayer->GetSession()->GetOrderCounter();
-
-            ++targetPlayer->m_forced_speed_changes[mtype];
-
-            WorldPacket data(speedOpcodes[static_cast<size_t>(SpeedOpcodeIndex::PC)], 18);
-            data << GetPackGUID();
-            data << counter;
-            if (mtype == MOVE_RUN)
-                data << uint8(0);
-
-            data << GetSpeed(mtype);
-            targetPlayer->GetSession()->SendPacket(&data);
-            targetPlayer->GetSession()->IncrementOrderCounter();
-        }
+            if (m_speed_rate[i] != _charmStartSpeedRate[i])
+                SendSpeedToController(UnitMoveType(i), targetPlayer);
     }
 
     // a guardian should always have charminfo
