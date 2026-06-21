@@ -23,6 +23,10 @@ namespace Branding
         Lightning,
         Blood,
         Void,
+        Stone,
+        Venom,
+        Chrono,
+        Spirit,
         COUNT
     };
 

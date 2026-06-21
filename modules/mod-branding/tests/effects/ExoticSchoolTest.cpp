@@ -3,6 +3,7 @@
 #include "branding/proficiency/Knowledge.h"
 #include "fakes/FakeEffectConfig.h"
 #include <gtest/gtest.h>
+#include <iterator>
 #include <set>
 
 using namespace Branding;
@@ -17,23 +18,27 @@ namespace
 {
     constexpr uint8_t kBrandCount = static_cast<uint8_t>(BrandId::COUNT);
 
+    // All exotic schools (§7.10): v1 Wind/Lightning/Blood/Void + v2 Stone/Venom/Chrono/Spirit.
+    constexpr BrandId kExoticSchools[] = {
+        BrandId::Wind, BrandId::Lightning, BrandId::Blood, BrandId::Void,
+        BrandId::Stone, BrandId::Venom, BrandId::Chrono, BrandId::Spirit };
+
     KnowledgeState Unlocked(BrandId b)
     {
         return KnowledgeState{ static_cast<uint32_t>(1u << static_cast<int>(b)) };
     }
 }
 
-// The v1 exotic schools (§7.10) exist, are distinct, and are valid enum members below COUNT.
-TEST(ExoticSchool, V1SchoolsExistDistinctAndInRange)
+// The exotic schools (§7.10) exist, are distinct, and are valid enum members below COUNT.
+TEST(ExoticSchool, SchoolsExistDistinctAndInRange)
 {
-    BrandId const exotic[] = { BrandId::Wind, BrandId::Lightning, BrandId::Blood, BrandId::Void };
-    for (BrandId b : exotic)
+    for (BrandId b : kExoticSchools)
         EXPECT_LT(static_cast<uint8_t>(b), kBrandCount);
 
     std::set<uint8_t> ids;
-    for (BrandId b : exotic)
+    for (BrandId b : kExoticSchools)
         ids.insert(static_cast<uint8_t>(b));
-    EXPECT_EQ(ids.size(), 4u) << "exotic school ids must be distinct";
+    EXPECT_EQ(ids.size(), std::size(kExoticSchools)) << "exotic school ids must be distinct";
 }
 
 // ProfileFor resolves the role-correct EffectKind for EVERY brand (§7.9 / §7.10 invariant).
@@ -90,7 +95,7 @@ TEST(ExoticSchool, MagnitudeInvariantsUniformAcrossAllBrands)
 // Knowledge gating is uniform: exotic brands unlock, gate earning, and gate expression like any brand.
 TEST(ExoticSchool, KnowledgeGatingUniformForExoticSchools)
 {
-    for (BrandId b : { BrandId::Wind, BrandId::Lightning, BrandId::Blood, BrandId::Void })
+    for (BrandId b : kExoticSchools)
     {
         KnowledgeState none{ 0 };
         EXPECT_FALSE(CanEarnProficiency(b, none));
@@ -107,7 +112,7 @@ TEST(ExoticSchool, KnowledgeGatingUniformForExoticSchools)
 TEST(ExoticSchool, LoadoutValidationUniformForExoticSchools)
 {
     FakeItemBrandConfig cfg;
-    for (BrandId b : { BrandId::Wind, BrandId::Lightning, BrandId::Blood, BrandId::Void })
+    for (BrandId b : kExoticSchools)
     {
         KnowledgeState const unlocked = Unlocked(b);
         EXPECT_TRUE(IsLoadoutValid(BrandLoadout{ b, 0 }, unlocked, 0, cfg));   // 1 archetype at lvl 0

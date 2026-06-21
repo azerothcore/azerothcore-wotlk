@@ -54,6 +54,10 @@ namespace
             case BrandId::Lightning: return "Lightning";
             case BrandId::Blood:    return "Blood";
             case BrandId::Void:     return "Void";
+            case BrandId::Stone:    return "Stone";
+            case BrandId::Venom:    return "Venom";
+            case BrandId::Chrono:   return "Chrono";
+            case BrandId::Spirit:   return "Spirit";
             default:                return "Unknown";
         }
     }
