@@ -1,8 +1,8 @@
 #ifndef MOD_BRANDING_SRC_EVENTCONFIG_H
 #define MOD_BRANDING_SRC_EVENTCONFIG_H
 
-#include "contribution/ContributionConfig.h"
-#include "contribution/ContributionTypes.h"
+#include "branding/contribution/ContributionConfig.h"
+#include "branding/contribution/ContributionTypes.h"
 #include <array>
 #include <cstddef>
 

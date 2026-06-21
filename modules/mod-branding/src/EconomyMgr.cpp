@@ -1,6 +1,6 @@
 #include "EconomyMgr.h"
 #include "RewardDelivery.h"
-#include "economy/Economy.h"
+#include "branding/economy/Economy.h"
 #include "DatabaseEnv.h"
 #include "Log.h"
 #include "Player.h"

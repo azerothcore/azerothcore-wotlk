@@ -2,8 +2,8 @@
 #define MOD_BRANDING_CORE_PROFICIENCY_PROFICIENCY_H
 
 #include "Types.h"
-#include "common/Brand.h"
-#include "common/Config.h"
+#include "branding/common/Brand.h"
+#include "branding/common/Config.h"
 #include <cstdint>
 
 namespace Branding

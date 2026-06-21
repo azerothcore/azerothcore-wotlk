@@ -1,7 +1,7 @@
 #ifndef MOD_BRANDING_SRC_CATALYSTCONFIG_H
 #define MOD_BRANDING_SRC_CATALYSTCONFIG_H
 
-#include "catalyst/CatalystConfig.h"
+#include "branding/catalyst/CatalystConfig.h"
 
 namespace Branding
 {

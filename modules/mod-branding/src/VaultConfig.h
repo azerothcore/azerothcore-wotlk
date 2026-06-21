@@ -1,7 +1,7 @@
 #ifndef MOD_BRANDING_SRC_VAULTCONFIG_H
 #define MOD_BRANDING_SRC_VAULTCONFIG_H
 
-#include "vault/Vault.h"
+#include "branding/vault/Vault.h"
 #include <cstdint>
 
 namespace Branding

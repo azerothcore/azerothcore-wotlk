@@ -2,7 +2,7 @@
 #define MOD_BRANDING_SRC_SCALINGMGR_H
 
 #include "ScalingConfig.h"
-#include "scaling/ZoneBracket.h"
+#include "branding/scaling/ZoneBracket.h"
 
 class Player;
 

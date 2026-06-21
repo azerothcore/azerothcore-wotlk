@@ -1,5 +1,5 @@
-#include "proficiency/BrandXp.h"
-#include "proficiency/Proficiency.h"
+#include "branding/proficiency/BrandXp.h"
+#include "branding/proficiency/Proficiency.h"
 #include "fakes/FakeClock.h"
 #include "fakes/FakeConfig.h"
 #include <gtest/gtest.h>

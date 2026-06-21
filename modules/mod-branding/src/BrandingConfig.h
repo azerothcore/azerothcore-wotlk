@@ -1,7 +1,7 @@
 #ifndef MOD_BRANDING_SRC_BRANDINGCONFIG_H
 #define MOD_BRANDING_SRC_BRANDINGCONFIG_H
 
-#include "common/Config.h"
+#include "branding/common/Config.h"
 #include <array>
 #include <cstddef>
 

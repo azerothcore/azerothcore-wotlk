@@ -1,7 +1,7 @@
 #include "LoadoutMgr.h"
 #include "ProficiencyMgr.h"
 #include "mod_branding_loader.h"
-#include "proficiency/Types.h"
+#include "branding/proficiency/Types.h"
 #include "Creature.h"
 #include "Player.h"
 #include "ScriptMgr.h"

@@ -1,7 +1,7 @@
 #ifndef MOD_BRANDING_TESTS_FAKES_FAKECATALYSTCONFIG_H
 #define MOD_BRANDING_TESTS_FAKES_FAKECATALYSTCONFIG_H
 
-#include "catalyst/CatalystConfig.h"
+#include "branding/catalyst/CatalystConfig.h"
 
 namespace Branding::Test
 {

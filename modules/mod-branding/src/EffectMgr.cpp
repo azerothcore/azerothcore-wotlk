@@ -1,8 +1,8 @@
 #include "EffectMgr.h"
 #include "LoadoutMgr.h"
 #include "ProficiencyMgr.h"
-#include "effects/EffectModel.h"
-#include "proficiency/Knowledge.h"
+#include "branding/effects/EffectModel.h"
+#include "branding/proficiency/Knowledge.h"
 #include "GameTime.h"
 #include "Player.h"
 

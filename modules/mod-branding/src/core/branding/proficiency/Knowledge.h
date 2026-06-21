@@ -2,7 +2,7 @@
 #define MOD_BRANDING_CORE_PROFICIENCY_KNOWLEDGE_H
 
 #include "Types.h"
-#include "common/Brand.h"
+#include "branding/common/Brand.h"
 
 namespace Branding
 {

@@ -1,7 +1,7 @@
 #ifndef MOD_BRANDING_SRC_MASTERYCONFIG_H
 #define MOD_BRANDING_SRC_MASTERYCONFIG_H
 
-#include "mastery/Mastery.h"
+#include "branding/mastery/Mastery.h"
 #include <cstdint>
 
 namespace Branding

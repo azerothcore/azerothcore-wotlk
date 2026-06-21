@@ -1,4 +1,4 @@
-#include "effects/EffectModel.h"
+#include "branding/effects/EffectModel.h"
 #include <gtest/gtest.h>
 
 using namespace Branding;

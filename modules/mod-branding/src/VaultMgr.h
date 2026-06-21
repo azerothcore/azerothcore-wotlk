@@ -2,7 +2,7 @@
 #define MOD_BRANDING_SRC_VAULTMGR_H
 
 #include "VaultConfig.h"
-#include "vault/Vault.h"
+#include "branding/vault/Vault.h"
 #include <cstdint>
 #include <map>
 #include <unordered_map>

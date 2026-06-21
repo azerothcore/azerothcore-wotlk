@@ -1,5 +1,5 @@
 #include "DiscoveryMgr.h"
-#include "economy/Discovery.h"
+#include "branding/economy/Discovery.h"
 #include "DBCStores.h"
 
 namespace Branding

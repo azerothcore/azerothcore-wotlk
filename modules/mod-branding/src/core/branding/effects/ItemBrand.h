@@ -1,9 +1,9 @@
 #ifndef MOD_BRANDING_CORE_EFFECTS_ITEMBRAND_H
 #define MOD_BRANDING_CORE_EFFECTS_ITEMBRAND_H
 
-#include "common/Brand.h"
-#include "proficiency/Knowledge.h"
-#include "proficiency/Types.h"
+#include "branding/common/Brand.h"
+#include "branding/proficiency/Knowledge.h"
+#include "branding/proficiency/Types.h"
 #include <cstdint>
 
 namespace Branding

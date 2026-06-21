@@ -1,4 +1,4 @@
-#include "contribution/Containment.h"
+#include "branding/contribution/Containment.h"
 #include <gtest/gtest.h>
 
 using namespace Branding;

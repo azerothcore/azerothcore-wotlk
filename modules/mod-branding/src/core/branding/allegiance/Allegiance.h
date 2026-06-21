@@ -1,8 +1,8 @@
 #ifndef MOD_BRANDING_CORE_ALLEGIANCE_ALLEGIANCE_H
 #define MOD_BRANDING_CORE_ALLEGIANCE_ALLEGIANCE_H
 
-#include "common/Brand.h"
-#include "contribution/ContributionTypes.h"
+#include "branding/common/Brand.h"
+#include "branding/contribution/ContributionTypes.h"
 #include <cstdint>
 
 namespace Branding

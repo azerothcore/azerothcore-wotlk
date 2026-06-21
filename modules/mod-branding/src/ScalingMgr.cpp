@@ -1,5 +1,5 @@
 #include "ScalingMgr.h"
-#include "scaling/Scaling.h"
+#include "branding/scaling/Scaling.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
 #include "Log.h"

@@ -1,4 +1,4 @@
-#include "scaling/GroupScaling.h"
+#include "branding/scaling/GroupScaling.h"
 #include "fakes/FakeScalingConfig.h"
 #include <gtest/gtest.h>
 

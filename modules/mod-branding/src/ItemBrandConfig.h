@@ -1,7 +1,7 @@
 #ifndef MOD_BRANDING_SRC_ITEMBRANDCONFIG_H
 #define MOD_BRANDING_SRC_ITEMBRANDCONFIG_H
 
-#include "effects/ItemBrand.h"
+#include "branding/effects/ItemBrand.h"
 #include <cstdint>
 
 namespace Branding

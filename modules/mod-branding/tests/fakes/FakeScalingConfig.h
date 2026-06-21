@@ -1,7 +1,7 @@
 #ifndef MOD_BRANDING_TESTS_FAKES_FAKESCALINGCONFIG_H
 #define MOD_BRANDING_TESTS_FAKES_FAKESCALINGCONFIG_H
 
-#include "scaling/ScalingConfig.h"
+#include "branding/scaling/ScalingConfig.h"
 
 namespace Branding::Test
 {

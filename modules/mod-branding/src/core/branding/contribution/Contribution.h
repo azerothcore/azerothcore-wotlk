@@ -3,7 +3,7 @@
 
 #include "ContributionConfig.h"
 #include "ContributionTypes.h"
-#include "common/Clock.h"
+#include "branding/common/Clock.h"
 #include <cstdint>
 
 namespace Branding

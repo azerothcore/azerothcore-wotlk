@@ -1,7 +1,7 @@
 #ifndef MOD_BRANDING_SRC_SCALINGCONFIG_H
 #define MOD_BRANDING_SRC_SCALINGCONFIG_H
 
-#include "scaling/ScalingConfig.h"
+#include "branding/scaling/ScalingConfig.h"
 #include <cstdint>
 
 namespace Branding

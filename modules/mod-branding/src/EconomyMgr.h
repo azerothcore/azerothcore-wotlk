@@ -2,7 +2,7 @@
 #define MOD_BRANDING_SRC_ECONOMYMGR_H
 
 #include "EconomyConfig.h"
-#include "economy/RecipeBook.h"
+#include "branding/economy/RecipeBook.h"
 #include <cstdint>
 
 class Player;
