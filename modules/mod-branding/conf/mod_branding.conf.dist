@@ -372,3 +372,23 @@ Branding.Effect.MaxRaidMul = 2.0
 #
 
 Branding.Effect.MaxEffectLevel = 50
+
+#
+#    Branding.Catalyst.Enable
+#        Description: Catalyst stacking diminishing returns (§7.9/§9). A branded specialist's raid
+#                     multiplier diminishes as same-role specialists stack (1st full, 2nd reduced,
+#                     3rd+ heavy) -- rewards one specialist per role, discourages stacking.
+#        Default:     0 - (disabled)
+#
+
+Branding.Catalyst.Enable = 0
+
+#
+#    Branding.Catalyst.MaxRaidMul / StackDecay
+#        Description: Raid multiplier cap and the per-rank geometric decay (rank 1 = full, rank 2 =
+#                     StackDecay, rank 3 = StackDecay^2, ...).
+#        Default:     2.0 / 0.4
+#
+
+Branding.Catalyst.MaxRaidMul = 2.0
+Branding.Catalyst.StackDecay = 0.4

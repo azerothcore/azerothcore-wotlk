@@ -1,4 +1,5 @@
 #include "AllegianceMgr.h"
+#include "CatalystMgr.h"
 #include "DiscoveryMgr.h"
 #include "EventMgr.h"
 #include "LoadoutMgr.h"
@@ -289,6 +290,9 @@ public:
         BrandLoadout const loadout = sLoadoutMgr->GetLoadout(guid);
         handler->PSendSysMessage("Active loadout: {} brand, proc archetype {}.",
             BrandName(loadout.activeBrand), uint32(loadout.selectedProcArchetype));
+
+        handler->PSendSysMessage("Catalyst: same-role rank {}, raid multiplier x{:.2f}.",
+            uint32(sCatalystMgr->SameRoleBrandedRank(player)), sCatalystMgr->RaidMultiplierFor(player));
 
         for (uint8 m = 0; m < static_cast<uint8>(MasterySystem::COUNT); ++m)
         {
