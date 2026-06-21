@@ -1303,19 +1303,58 @@ std::string EncodeSchedule(std::vector<ScheduleEntry> const&, bool& trunc);  // 
 std::string EncodeYou(YouFrame const&);                                      // BRND\tYOU\t...
 std::string EncodeChar(CharSnapshot const&);                                 // BRND\tCHAR\t...
 std::string EncodeHello(HelloFrame const&);                                  // BRND\tHELLO\t<ver>\t<en>
+std::string EncodeMastery(MasterySnapshot const&, bool& trunc);              // BRND\tMAST\t...  (§14, v2)
 ```
 
 Permille keeps the round-trip exact (equality, not epsilon). HELLO carries a **protocol version**
 so a mismatched client is told to update rather than mis-parsing.
 
+**§14 Mastery lattice frame (MAST, protocol v2 — issue #32).** Carries the whole 5-school × 3-tree
+lattice for the Mastery client UI:
+
+```cpp
+struct MasteryCellFrame {           // one (school, tree) cell as the client renders it
+    uint8_t school, tree, kind;     // BrandId / MasteryTree / EffectKind ordinals
+    bool situational, sustained;    // SM/SE flag · Support sustained-aura flag (§14.2/§14.4)
+    uint8_t level, archetype;       // EARNED mastery level (§14.11) · selected proc archetype (§7.9)
+    uint8_t axisMask;               // applicable §14.10 axes (bit i ⇒ ProcAxis i tunable)
+    uint8_t alloc[4];               // point spend per axis (Ppm,Duration,Magnitude,Reach)
+    bool active;                    // is this cell currently running?  ← a per-cell flag, NOT a
+};                                  //   single "active mastery" field (multi-mastery forward-compat)
+struct MasterySnapshot { uint16_t pointsAvailable, respecCost; std::vector<MasteryCellFrame> cells; };
+```
+
+Wire: `BRND\tMAST\t<pointsAvailable>\t<respecCost>\t<cell;cell;…>\t<trunc>`, each cell
+`school:tree:kind:situational:sustained:level:archetype:axisMask:a0:a1:a2:a3:active`. The active set
+is the list of cells with `active==1` — **the model never hardcodes a single active mastery**, so a
+character running MULTIPLE masteries at once (an explicit forward-compat requirement) needs no schema
+change; the server just flags more cells active.
+
+**Client→server mastery request grammar (v2, §19.3 reserved).** Mirrors three request encoders +
+parsers (`EncodeAlloc`/`ParseAlloc`, `EncodeArchetype`/`ParseArchetype`, `EncodeRespec`/`ParseRespec`)
+and a `REQ\tMAST` verb:
+
+```
+BRND\tREQ\tMAST                                  request a fresh MAST snapshot
+BRND\tALLOC\t<school>\t<tree>\t<axis>\t<points>  spend/redistribute points on one cell axis (§14.10)
+BRND\tARCH\t<school>\t<tree>\t<archetype>        select a proc archetype (§7.9 loadout)
+BRND\tRESPEC\t<school>\t<tree>                   refund a cell's allocation (charges §14.5 token)
+```
+
+The server validates the §14.10 budget + caps and pushes a fresh MAST; the addon never mutates state
+locally (server-authoritative).
+
 **Invariants (tests — `tests/addon/ProtocolTest.cpp`):**
 
-- Round-trip `Decode*(Encode*(x)) == x` for every frame type.
+- Round-trip `Decode*(Encode*(x)) == x` for every frame type (incl. MAST and the three requests).
 - Every frame begins `BRND\t<KIND>\t`, contains no newline, length ≤ 255.
-- List frames pack/round-trip N records and **truncate deterministically with a marker** (never a
-  silent split) when they would exceed 255 bytes.
+- List frames (SCH, **MAST**) pack/round-trip N records and **truncate deterministically with a
+  marker** (never a silent split) when they would exceed 255 bytes.
+- The MAST active set round-trips as a per-cell flag list — **multiple cells may be `active` at
+  once** (`MasterySupportsMultipleActiveCells`), the multi-mastery forward-compat invariant.
 - `ParseRequest` is case-sensitive, returns `Unknown` for anything malformed, never throws (a
-  hostile oversized body included).
+  hostile oversized body included); the request parsers (`ParseAlloc`/…) reject wrong verbs and
+  malformed bodies cleanly.
 - Decode of an unknown KIND / malformed body is a clean `false`, not a crash (forward-compat).
 
 ### 19.3 Server adapter (`src/AddonProtocolMgr.*`, `src/AddonScripts.cpp`)
@@ -1333,24 +1372,41 @@ so a mismatched client is told to update rather than mis-parsing.
 - `EventScheduler` calls `AddonProtocolMgr::BroadcastZoneEvent(zoneId)` on every start/stop
   transition; `EventScheduler::SnapshotSchedule()` exposes the per-zone state/countdown for SCHED.
 - Config: `Branding.Addon.Enable` (master switch, default 0), `Branding.Addon.PushIntervalSeconds`.
-- `ParseRequest` (§19.2) is kept and tested but currently unused by the adapter — it reserves the
-  request grammar for a future client→server channel (group/guild/channel or a seeded RBAC perm).
+- `ParseRequest` (§19.2) — and the v2 mastery request parsers (`ParseAlloc`/`ParseArchetype`/
+  `ParseRespec`, REQ\tMAST) — are kept and tested but currently unused by the adapter: they reserve
+  the request grammar for a future client→server channel (group/guild/channel or a seeded RBAC perm).
+  The MAST push itself (`EncodeMastery`) is the server→client half and is wired the same way as CHAR.
 - **No SQL** — every value is already persisted by the owning Mgr; this slice only transports it.
 
 ### 19.4 The addon (`modules/mod-branding/client-addon/Branding/`)
 
-A single addon, two surfaces, one shared comms layer (`Comms.lua` mirrors the §19.2 codec):
+A single addon, three surfaces, one shared comms layer (`Comms.lua` mirrors the §19.2 codec):
 
-- **Invasion Tracker** — a movable HUD frame: current zone's event type + live containment bar +
-  your points/tier; plus a schedule list (per-zone next/active/cooldown countdown). Backed by the
-  EVT push (live) and a SCHED poll on open.
-- **Character panel** — tabbed: Brand proficiency (levels + effect strength), Mastery
+- **Invasion Tracker** (`Tracker.lua`) — a movable HUD frame: current zone's event type + live
+  containment bar + your points/tier; plus a schedule list (per-zone next/active/cooldown countdown).
+  Backed by the EVT push (live) and a SCHED poll on open.
+- **Character panel** (`Panel.lua`) — tabbed: Brand proficiency (levels + effect strength), Mastery
   (unlock/level/bonus), Loadout (active brand + proc archetype), Item brand (step/level/intensity),
   Allegiance. Backed by the CHAR poll, refreshed on open and on login push.
+- **Mastery panel** (`MasteryPanel.lua`, issue #32) — a standalone frame rendering the §14 lattice
+  (5 schools × 3 trees) from the MAST push: each cell's earned level, archetype/expression family,
+  active/invested/selected state, and per-cell §14.10 point-buy (only the axes the cell exposes) with
+  `+`/`-` and a respec button that send the v2 ALLOC/ARCH/RESPEC requests. Server-authoritative: it
+  displays MAST and *requests* changes; it never mutates locally, and gates sending behind
+  `ns.CanSend()` (disabled, display-only, until a realm enables a client→server channel).
 
-Ships with `Branding.toc`, the Lua/XML, and an install README (copy to `Interface/AddOns/`). The
-addon needs a live 3.3.5a client to verify, so it is **manual-verify**; the codec it depends on is
-unit-tested server-side (§19.2) and the Lua parser mirrors the same `permille`/`\t`/`;`/`:` grammar.
+**Talent-frame dock (#32 decision).** Native talent-frame integration (a real tab on
+`PlayerTalentFrame`) would need client DBC + secure-frame edits and would **taint** the protected
+talent frame. Instead the addon **docks a plain button** onto `PlayerTalentFrame` (parented to it,
+loaded via a `Blizzard_TalentUI` `ADDON_LOADED` watcher since the talent UI is load-on-demand) that
+merely toggles the *separate, unprotected* Mastery frame — the talent frame's internals are never
+touched, so there is no taint. The whole addon ships inside a custom `patch-?.MPQ` (auto-loaded, no
+AddOns-list opt-in) and stays 3.3.5a / build 12340 (stock frame APIs only, no DBC edits).
+
+Ships with `Branding.toc`, the Lua, and an install README (copy to `Interface/AddOns/`, or bundle the
+patch-MPQ). The addon needs a live 3.3.5a client to verify, so it is **manual-verify**; the codec it
+depends on is unit-tested server-side (§19.2) and the Lua parser mirrors the same
+`permille`/`\t`/`;`/`:` grammar.
 
 ### 19.5 Placement / Definition of Done
 
