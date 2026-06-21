@@ -625,11 +625,13 @@ Most of it is pure, structured rules — ideal for both TDD and bulk LLM content
    discover        → hidden world objects → profession XP / recipes / reputation / hidden quests
    craft           → character XP, consumes materials + fragments
    specialize      → brand proficiency (§7), allegiance influence (§12)
-   influence/invade→ fragments + catalysts → feed crafting/branding → repeat
+   influence/invade→ fragments + materials → feed crafting/branding → repeat
 ```
 
-Self-regulating: invasions generate fragments, dungeons materials, raids high-tier catalysts;
-crafting + branding consume them. Goal (design): no content obsolescence; no inflation collapse.
+Self-regulating: invasions generate fragments, dungeons materials, raids high-grade
+fragments/materials; crafting + branding consume them. Goal (design): no content obsolescence; no
+inflation collapse. (*"Catalyst"* is reserved for the raid stacking-DR mechanic §7.9 — raid-tier
+crafting drops are just high-grade fragments/materials; see §16.2.)
 
 ### 8.2 Area Discovery XP (pure)
 
@@ -1530,6 +1532,92 @@ A dedicated adapter (`MasteryEnemyMgr` + a `UnitScript`) scales an invasion elit
    per-character/earned (§6/§14), so a rushed alt is a leveled shell, not power. If an XP bonus is
    still wanted: scope to `QuestRate`/`KillRate` only (never discovery/event, §10.1), cap it, and
    add a test that §8.5 holds at the max bonus.
+
+---
+
+## 16. Canonical Vocabulary & Naming Conventions
+
+The framework every economy/branding slice (#04, #05, #06, #09, §8) names its nouns against. The
+rule of thumb: **one concept → one term, identical across C++, SQL, config, and player-facing
+strings.** Most of this codifies what already shipped; where two usages collided, the resolution is
+called out.
+
+### 16.1 The noun glossary (one canonical term each)
+
+| Concept | Canonical term | Scope / lifetime | Backed by | Player-facing |
+|---|---|---|---|---|
+| Account-wide unlock gate for a brand | **Knowledge** | account | `account_brand_knowledge`, `KnowledgeState` | "Brand Knowledge" |
+| Per-character, per-brand earned progression | **Proficiency** (Level) | character × brand | `character_branding`, `Proficiency` | "Proficiency Level N" |
+| Per-item earned progression (the major step) | **Brand Rank** | item GUID | `item_branding.step`, `ItemBrandState::step` | "Brand Rank N" |
+| Progress within a Brand Rank | **(unnamed progress)** | item GUID | `ItemBrandState::levelInStep` / `upgradeProgress` | progress bar only |
+| Common crafting input (dungeon-sourced) | **Material** | item in bag/vault, tradeable | `Branding.Economy.MaterialItemId`, `Resources::materials` | "Materials" |
+| Premium crafting input (invasion/event-sourced) | **Fragment** | item in bag/vault, tradeable | `Branding.Economy.FragmentItemId`, `Resources::fragments` | "Fragments" |
+| Craft definition: inputs → output item + char XP | **Recipe** | world data | `branding_recipe`, `Recipe` / `RecipeBook` | "Recipe" |
+| Raid synergy stacking diminishing-returns mechanic | **Catalyst** | combat, per `(school, tree)` | `core/branding/catalyst/`, `RaidCatalystMultiplier` | "Catalyst (raid synergy)" |
+
+### 16.2 Two collisions, resolved
+
+- **"Catalyst" is the raid stacking-DR mechanic — and *only* that.** It is shipped and tested
+  (Slice 4, `CatalystStacking`, §7.9 / §9 / §14.9). §8.1 previously also called a *raid-tier crafting
+  input* a "catalyst"; that second sense is retired. **Raid-tier inputs are simply high-grade
+  Fragments/Materials** — there is no third resource type and `Resources { materials, fragments }`
+  stays as-is. (If a distinct raid-only crafting resource is ever wanted, name it **Essence** and add
+  a field — do *not* reuse "Catalyst".)
+- **Three progression axes, three nouns — never conflate.** *Knowledge* (account, unlock), *Proficiency*
+  (character, earned power), *Brand Rank* (item, upgraded power). "Level" is qualified
+  (`Proficiency Level`) so it never reads as a WoW item level. Internal field names (`step`,
+  `levelInStep`) stay; only the public mapping is fixed (`step` → "Brand Rank").
+
+### 16.3 Resource representation — decided: item-entry-backed (resolves #09)
+
+Fragments and Materials are **real item entries** (config-mapped via `Branding.Economy.*ItemId`,
+`Branding.Event.RewardItemId`), *not* a custom currency table. This was already committed in shipped
+config and is the right call:
+
+- Reuses `RewardDelivery` (inventory + mail fallback) to grant, `RemoveItem` to consume, the **vault
+  (#06)** to store/overflow, and native bag/tooltip/trade/mail UI for free.
+- Keeps the economy **tradeable** (a player market is part of the §8.1 loop) while staying anti-P2W:
+  power gates on account *Knowledge* (§7.5), never on holding an item — so a traded maxed item is
+  inert without access (§16.1, #05).
+- Trade-off (bag clutter, stack caps) is mitigated by the vault and generous stack sizes; no new
+  client work. A custom currency table was rejected (needs bespoke UI, breaks trading, duplicates the
+  inventory plumbing already built).
+
+`Resources` (`core/branding/economy/Economy.h`) is the pure in-memory tally the crafting functions
+operate on; the adapter reads the player's item counts into it and writes consumption back via item
+APIs. Progression state (Knowledge, Proficiency, Brand Rank) is **DB state, never items**.
+
+### 16.4 Naming conventions by layer
+
+- **C++** — namespace `Branding::`; PascalCase types (`Recipe`, `ItemBrandState`, `Resources`);
+  `IXxxConfig` for injected pure-config interfaces; `lowerCamelCase` struct fields; pure logic under
+  `src/core/branding/<system>/`, thin adapter per TU under `src/`.
+- **SQL tables — two families** (the shipped pattern; follow it):
+  - **Definition / content** — read-mostly world data loaded into a core registry, in `acore_world`:
+    `branding_<noun>` (`branding_recipe`, `branding_event_def`, `branding_event_spawn`,
+    `branding_zone_bracket`, `branding_discovery_object`).
+  - **Per-entity state** — mutable, keyed by an existing AzerothCore entity id/GUID, in
+    `acore_characters` / `acore_auth`: `<entity>_branding[_<detail>]` (`character_branding`,
+    `character_branding_discovery`, `item_branding`).
+  - Columns `snake_case`; obey `codestyle-sql.py` (DELETE-before-INSERT, InnoDB, 4-space, trailing
+    newline). New per-item / per-character state tables for #05/#09 go in `pending_db_characters`;
+    new recipe/content tables in `pending_db_world`.
+  - *Known drift:* `account_brand_knowledge` uses `brand` rather than `branding`. It is shipped with
+    data — **leave it**; do not propagate the shortened form to new tables.
+- **Config** — `Branding.<Subsystem>.<Setting>` (PascalCase, dotted); a `Branding.<Subsystem>.Enable`
+  toggle per subsystem under the master `Branding.Enable`; item-id mappings suffixed `ItemId`.
+- **Commands / player strings** — all under the `.branding` tree; display the §16.1 canonical nouns
+  verbatim (Knowledge, Proficiency Level, Brand Rank, Fragments, Materials, Recipe, Catalyst).
+
+### 16.5 Code-review checklist (naming)
+
+1. New resource? It's an item entry behind a `Branding.<Sub>.*ItemId` key — not a currency table.
+2. New table named by family: `branding_<noun>` (world def) **or** `<entity>_branding[_detail]`
+   (per-entity state)? Columns `snake_case`, in the right `pending_db_*`?
+3. The word "catalyst" used only for the raid stacking-DR mechanic?
+4. Progression named precisely — Knowledge / Proficiency Level / Brand Rank — never bare "level"?
+5. Config key is `Branding.<Subsystem>.<Setting>` with an `Enable` toggle?
+6. Player-facing string uses the §16.1 canonical noun?
 
 ---
 
