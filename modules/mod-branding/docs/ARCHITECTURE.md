@@ -1036,12 +1036,15 @@ recorded per school:
 | **Frost** | frost-exposure vs Fire `SE` (sustained, school-matched) | **frost resistance `SM`** — sustained school-matched mitigation |
 | **Physical** | physical mitigation `SM` (sustained, school-matched) | *(none — single archetype; the §14.4 table lists only one)* |
 | **Arcane** | arcane resistance `SM` (sustained, school-matched) | **intellect/mana aura `PW`** — sustained raid utility (`RaidWindow`, non-situational) |
-| **Holy** | holy-exposure vs Undead `SE` (sustained, school-matched) | **blessing `PW`** — sustained mitigation/utility (`PersonalSpike`, non-situational; Holy has no resistance gear, so like Physical it uses a blessing instead of a resist) |
+| **Holy** | holy-exposure vs Undead `SE` (sustained, school-matched) | **circle of healing `PW`** — sustained raid-heal utility (`RaidWindow`, non-situational: a constant, non-situational raid-heal aura — Holy's raid-utility secondary, mirroring Fire/Nature/Arcane) |
 
-Design choices recorded: (a) the Fire/Nature secondary archetypes are the **raid-utility** entries
-called out in the issue (flame aura / raid-heal) — both are non-situational sustained auras, so they
-keep the Support magnitude+reach axis set but drop the school-matched gating that the resistance
-archetype carries. (b) Shadow/Frost expose the two `·` entries from the table directly — the
+Design choices recorded: (a) the Fire/Nature/Arcane/Holy secondary archetypes are the **raid-utility**
+entries (flame aura / raid-heal / intellect-mana aura / circle of healing) — all non-situational
+sustained auras, so they keep the Support magnitude+reach axis set but drop the school-matched gating
+that the resistance/exposure archetype carries. Holy's secondary is **circle of healing** — a
+sustained, non-situational raid-heal (`RaidWindow`), not a generic blessing: Holy has no resistance
+gear, so its raid-utility secondary mirrors Fire/Nature/Arcane rather than a personal spike.
+(b) Shadow/Frost expose the two `·` entries from the table directly — the
 windowed-exposure `SE` is primary (the build-defining pick), the `SM` resistance is the safer
 secondary. (c) Physical's table cell lists only `physical mitigation`, so it stays single-archetype
 (`count == 1`); `LatticeArchetype(Physical, Support, 0)` is the only legal index. Def/Off cells are
@@ -1304,6 +1307,103 @@ bool IsActiveSetValid(ActiveMasterySet const&, /* dual-key lookups */, IMasteryT
 > **Deferred:** the lattice content (per-(school,tree) `ProcCell` values) as config/data, the
 > account-unlock/char-level persistence + adapter consumer for the combat layer (extends the §6
 > `MasteryMgr`). The §14.8 enemy-side composition is resolved + implemented (`EnemyMasteryMultiplier`).
+
+### 14.12 Mastery application plan (combat adapter core, issue #27)
+
+The combat adapter does **not** decide magnitudes in the worldserver. It builds, from the live game
+state it can read (the character's `ActiveMasterySet`, per-school earned level, account unlock), a
+**pure application plan** — a deterministic list of resolved effects the adapter then mechanically
+applies. This is the testable heart of the combat layer: it ties together everything the prior
+mastery/effect/catalyst slices produced (`PointsToAllocation` → `ResolveTreeCell`, the §14.4 lattice
+defs, `RaidMultiplier`/`PersonalMultiplier`, `CatalystRankInBucket`) and is asserted with no
+AzerothCore types in play.
+
+```cpp
+// core/mastery/MasteryPlan.{h,cpp}
+
+// Per-school dual-key + earned level for the planning character, as a plain injected accessor (no AC
+// types). The adapter fills it from ProficiencyMgr (level + IsBrandKnown). schoolLevel/accountUnlocked
+// are indexed by BrandId ordinal; an out-of-range school reads as level 0 / locked.
+struct MasterySchoolState
+{
+    uint8_t level[BrandId::COUNT]      = {};      // earned mastery level per school (§14.11 EARNED layer)
+    bool    unlocked[BrandId::COUNT]   = {};      // account Brand Knowledge per school (anti-P2W)
+};
+
+// One resolved active cell — everything the adapter needs to apply ONE mastery effect in-world.
+struct ResolvedMasteryEffect
+{
+    BrandId        school;
+    MasteryTree    tree;
+    uint8_t        archetype;              // §7.9 selected proc archetype (index into the cell)
+    LatticeCellDef def;                    // §14.4 kind/situational/sustained/axes for the archetype
+    ResolvedCell   resolved;               // §14.10 ppm/duration/magnitude/reach from the point-buy
+    double         magnitude;              // BOUND magnitude actually applied (see below)
+    bool           raidWide;              // true => RaidMultiplier path, false => PersonalMultiplier
+    uint8_t        catalystRank;           // §14.9 rank in the (school,tree) bucket (1 = full, no DR)
+    double         uptimeFraction;         // sustained => 1.0 (constant); windowed => window/(window+cd) < 1.0
+};
+
+// The plan: a fixed-cap list (no <vector> in core), one entry per VALID active cell.
+struct MasteryPlan
+{
+    static constexpr size_t Capacity = ActiveMasterySet::Capacity;
+    std::array<ResolvedMasteryEffect, Capacity> effects{};
+    uint8_t count = 0;
+};
+
+// Build the plan. Iterates the WHOLE ActiveMasterySet (multi-mastery: never assumes one cell). For
+// each entry that is valid (IsActiveEntryValid: dual-key + archetype unlocked + points within budget)
+// it: resolves the §14.4 archetype def; runs PointsToAllocation -> ResolveTreeCell over the def's
+// applicable axes at the school's earned level; computes the catalyst rank for the cell's (school,tree)
+// bucket across the supplied raid roster (the (school,tree) keys of the player's own set PLUS any
+// surrounding raid roster the adapter passes — the raid-roster seam); and binds the magnitude via
+// RaidMultiplier (raid-wide cells: Off + non-situational sustained Support utility) or
+// PersonalMultiplier (personal cells: Def personal spikes + situational Support), clamped to the §7.9
+// caps. Invalid/absent cells are skipped. Deterministic: same inputs -> identical plan.
+MasteryPlan BuildMasteryPlan(ActiveMasterySet const& set, MasterySchoolState const& state,
+    CatalystKey const* raidRoster, std::size_t raidRosterCount,
+    IMasteryTreeConfig const& treeCfg, IMasteryLoadoutConfig const& loadoutCfg,
+    IEffectConfig const& effectCfg, ICatalystConfig const& catalystCfg);
+```
+
+**Raid-wide vs personal classification.** A cell is **raid-wide** when its effect reaches the raid:
+Offensive cells (`RaidWindow`) and the non-situational sustained Support utilities (flame aura,
+raid-heal, intellect/mana aura, circle of healing — `def.sustained && !def.situational`). It is
+**personal** otherwise: Defensive personal spikes and the situational (SM/SE) Support cells, which are
+the character's own mitigation/exposure. Raid-wide magnitude flows through `RaidMultiplier` (bounded
+by `MaxRaidMul`, catalyst-DR'd via the bucket rank); personal magnitude through `PersonalMultiplier`
+(bounded by `MaxPersonalMul`, role-scaled — the adapter passes the character's role).
+
+**The raid-roster seam (multi-mastery / catalyst DR).** Catalyst DR rank is computed per `(school,
+tree)` bucket. `BuildMasteryPlan` takes a `raidRoster` of `CatalystKey`s (the cells running across the
+surrounding raid). v1's adapter passes just the player's own active cells (so a solo player's every
+cell is rank 1, no DR); the seam is documented so a later task can feed the real raid roster without a
+signature churn. The plan's own cells are always counted, so even a solo player stacking the *same*
+cell twice (when `MaxActive > 1`) sees DR — the redundancy rule holds regardless of roster source.
+
+**Invariants (tests — `tests/mastery/MasteryPlanTest.cpp`, written first):**
+
+- **Only valid cells appear**: a cell with a locked account, level 0, an out-of-range/locked
+  archetype, or over-budget points is excluded; an empty or all-invalid set yields an empty plan.
+- **Multi-mastery**: a set with N valid cells yields N effects (never silently one); each carries its
+  own school/tree/archetype/resolved params.
+- **Raid magnitude bound**: every raid-wide effect has `magnitude <= MaxRaidMul` and `>= 1.0`
+  (a brand never hurts the raid), and is non-increasing as the same `(school,tree)` bucket stacks.
+- **Personal magnitude bound**: personal effects are in `[1.0, MaxPersonalMul]`.
+- **Sustained vs windowed uptime**: `def.sustained` effects carry `uptimeFraction == 1.0` (constant
+  aura); windowed effects carry `0 < uptimeFraction < 1.0` (no passive uptime, §7.9).
+- **Determinism**: identical inputs produce a byte-identical plan (no global/clock/RNG state).
+
+> **Implemented (issue #27).** `core/mastery/MasteryPlan.{h,cpp}` + `MasteryCombatMgr` adapter. The
+> adapter builds the plan from `MasteryLoadoutMgr` (active set) + `ProficiencyMgr` (per-school level +
+> `IsBrandKnown`) + `MasteryConfig` (all three injected configs), then applies it on combat/proc
+> hooks: windowed Off/Def cells → proc-cadence buff/debuff auras (PPM via `ExpectedProcs`), sustained
+> Support cells → maintained auras, personal-spike Def cells → tank surv-ability auras — all respecting
+> the §7.9 caps + catalyst DR already baked into the plan. `AddonProtocolMgr::SendMastery` now fills
+> live `level`/`alloc`/`active`/`archetype` from the loadout + earned levels (replacing the zeroed
+> TODO), and `.branding info` surfaces an active-mastery summary. Pure-core is TDD'd; full worldserver
+> link is compile-verify-deferred per module practice.
 
 ### 14.8 Enemy-side cap composition (resolved)
 
