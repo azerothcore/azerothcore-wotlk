@@ -208,8 +208,30 @@ namespace Branding
                 }
                 break;
 
+            case BrandId::Arcane:
+                switch (tree)
+                {
+                    case MasteryTree::Defensive: return One(Win(EK::PersonalSpike, BASE));        // arcane barrier (absorb)
+                    case MasteryTree::Offensive: return One(Win(EK::RaidWindow, BASE_REACH));      // arcane explosion (area)
+                    // arcane resistance (SM) · intellect/mana aura (raid utility)
+                    case MasteryTree::Support:   return Two(Sup(EK::PersonalSpike), SupUtil(EK::RaidWindow));
+                    default: break;
+                }
+                break;
+
+            case BrandId::Holy:
+                switch (tree)
+                {
+                    case MasteryTree::Defensive: return One(Win(EK::PersonalSpike, BASE));        // holy shield (absorb)
+                    case MasteryTree::Offensive: return One(Win(EK::RaidWindow, BASE_REACH));      // holy nova (area)
+                    // holy-exposure vs Undead (SE) · blessing (sustained mitigation, raid utility)
+                    case MasteryTree::Support:   return Two(Sup(EK::RaidWindow), SupUtil(EK::PersonalSpike));
+                    default: break;
+                }
+                break;
+
             default:
-                break;  // Arcane / Holy: no authored trees yet.
+                break;  // reserved for future custom schools (BrandId additions)
         }
 
         // Neutral default for unauthored (school, tree) pairs.

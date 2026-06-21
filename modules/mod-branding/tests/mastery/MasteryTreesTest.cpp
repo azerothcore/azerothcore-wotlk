@@ -249,7 +249,8 @@ TEST(MasteryTrees, TreeTuningEnvelopeGrowsWithMastery)
 namespace
 {
     constexpr BrandId AUTHORED_SCHOOLS[] = {
-        BrandId::Fire, BrandId::Nature, BrandId::Shadow, BrandId::Frost, BrandId::Physical
+        BrandId::Fire, BrandId::Nature, BrandId::Shadow, BrandId::Frost, BrandId::Physical,
+        BrandId::Arcane, BrandId::Holy
     };
     constexpr MasteryTree TREES[] = {
         MasteryTree::Defensive, MasteryTree::Offensive, MasteryTree::Support
@@ -319,10 +320,11 @@ TEST(MasteryTrees, LatticeReachOnAreaCleaveWindowedCells)
     EXPECT_FALSE(hasReach(BrandId::Frost, MasteryTree::Defensive));    // damage-reduction
 }
 
-// Unauthored schools fall back to the neutral default (no crash, sane shape).
-TEST(MasteryTrees, LatticeUnauthoredSchoolDefault)
+// All 7 standard BrandId schools are now authored; an unknown/out-of-range school still falls back
+// to the neutral default (safety net, no crash).
+TEST(MasteryTrees, LatticeUnknownSchoolDefault)
 {
-    LatticeCellDef def = LatticeCell(BrandId::Arcane, MasteryTree::Offensive);
+    LatticeCellDef def = LatticeCell(static_cast<BrandId>(BrandId::COUNT), MasteryTree::Offensive);
     EXPECT_EQ(def.kind, EffectKind::RaidWindow);
     EXPECT_FALSE(def.situational);
     EXPECT_EQ(def.applicableAxes & BASE3, BASE3);
@@ -436,6 +438,28 @@ TEST(MasteryTrees, SupportSecondaryArchetypesAuthored)
 
     // Physical Support: single archetype only (the table lists one mitigation).
     EXPECT_EQ(LatticeArchetypeCount(BrandId::Physical, MasteryTree::Support), 1);
+
+    // Arcane/Holy Support: two archetypes (school-matched primary + sustained raid-utility secondary).
+    for (BrandId s : { BrandId::Arcane, BrandId::Holy })
+    {
+        EXPECT_EQ(LatticeArchetypeCount(s, MasteryTree::Support), 2);
+        EXPECT_TRUE(LatticeArchetype(s, MasteryTree::Support, 0).situational);   // SM/SE primary
+        LatticeCellDef util = LatticeArchetype(s, MasteryTree::Support, 1);
+        EXPECT_FALSE(util.situational);                                          // raid utility
+        EXPECT_TRUE(util.sustained);
+    }
+}
+
+// Arcane/Holy complete the 7 standard WoW schools: Off = bounded raid damage (area, +reach).
+TEST(MasteryTrees, ArcaneAndHolyOffensiveAreAreaRaid)
+{
+    for (BrandId s : { BrandId::Arcane, BrandId::Holy })
+    {
+        LatticeCellDef off = LatticeCell(s, MasteryTree::Offensive);
+        EXPECT_EQ(off.kind, EffectKind::RaidWindow);
+        EXPECT_NE(off.applicableAxes & AxisBit(ProcAxis::Reach), 0u);  // arcane explosion / holy nova
+        EXPECT_EQ(LatticeCell(s, MasteryTree::Defensive).kind, EffectKind::PersonalSpike);
+    }
 }
 
 // §14.4.1: every archetype is a valid Support-shaped def -- sustained, magnitude+reach axes only.

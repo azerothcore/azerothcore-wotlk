@@ -931,9 +931,10 @@ per-source weights — rates and the 45/25/20/10 target are tuned *together*, ne
 
 ### 14.1 Shape
 
-Mastery is a lattice of **5 damage schools × 3 trees**. Each (school, tree) cell is one or more
-**procs**. The schools (issue #24): `Fire, Nature, Shadow, Frost, Physical` (a subset of `BrandId`;
-`Arcane`/`Holy` are extension slots, no trees yet).
+Mastery is a lattice of **7 damage schools × 3 trees** — all of WoW's standard damage schools.
+Each (school, tree) cell is one or more **procs**. Schools: `Fire, Nature, Shadow, Frost, Physical`
+(issue #24) plus `Arcane` and `Holy` (the full `BrandId` set). Further (custom) schools are an
+append-only `BrandId` extension.
 
 | Tree | Expression | Mastery tunes | Governing cap (§7.9) |
 |---|---|---|---|
@@ -987,6 +988,8 @@ matching invasion school — replaces flat counter-school "+dmg %").
 | **Shadow** | life-steal proc `PW` | shadow volley proc `PW` | shadow-exposure vs Nature `SE` · shadow resistance `SM` |
 | **Frost** | damage-reduction proc `PW` | Frost Nova proc `PW` | frost-exposure vs Fire `SE` · frost resistance `SM` |
 | **Physical** | evasion proc `PW` | cleave proc `PW` | physical mitigation `SM` (armor-like, DR'd) |
+| **Arcane** | arcane barrier (absorb) `PW` | arcane explosion proc `PW` | intellect/mana aura `PW` · arcane resistance `SM` |
+| **Holy** | holy shield (absorb) `PW` | holy nova proc `PW` | holy-exposure vs Undead `SE` · blessing `PW` (sustained mitigation) |
 
 - **`SE` (was "+dmg % vs X")**: a *windowed exposure* you proc onto a target, not a standing aura,
   and full-value only inside content themed to the relevant school — so it's desirable, never the
@@ -1032,6 +1035,8 @@ recorded per school:
 | **Shadow** | shadow-exposure vs Nature `SE` (sustained, school-matched) | **shadow resistance `SM`** — sustained school-matched mitigation |
 | **Frost** | frost-exposure vs Fire `SE` (sustained, school-matched) | **frost resistance `SM`** — sustained school-matched mitigation |
 | **Physical** | physical mitigation `SM` (sustained, school-matched) | *(none — single archetype; the §14.4 table lists only one)* |
+| **Arcane** | arcane resistance `SM` (sustained, school-matched) | **intellect/mana aura `PW`** — sustained raid utility (`RaidWindow`, non-situational) |
+| **Holy** | holy-exposure vs Undead `SE` (sustained, school-matched) | **blessing `PW`** — sustained mitigation/utility (`PersonalSpike`, non-situational; Holy has no resistance gear, so like Physical it uses a blessing instead of a resist) |
 
 Design choices recorded: (a) the Fire/Nature secondary archetypes are the **raid-utility** entries
 called out in the issue (flame aura / raid-heal) — both are non-situational sustained auras, so they
@@ -1219,8 +1224,9 @@ Resulting behaviour:
 > the design ruleset: each authored cell's `EffectKind`, situational (SM/SE) flag, **sustained flag**
 > (Support = sustained aura; Def/Off = windowed), and §14.10 applicable-axis mask (windowed cells get
 > ppm/duration/magnitude +Reach for area/cleave; Support cells get **magnitude + reach only**). Off
-> cells are `RaidWindow`, Support cells are situational + sustained, unauthored schools (Arcane/Holy)
-> return a neutral default. **Multi-archetype cells (§14.4.1, issue #29)** are now enumerable:
+> cells are `RaidWindow`, Support cells are situational + sustained. All **7 standard schools** are
+> authored (Fire/Nature/Shadow/Frost/Physical/Arcane/Holy); an unknown/out-of-range school still
+> returns a neutral default (safety net). **Multi-archetype cells (§14.4.1, issue #29)** are now enumerable:
 > `LatticeArchetypeCount(school, tree)` (1..N) and `LatticeArchetype(school, tree, index)` expose the
 > `·` secondary archetypes (Fire/Nature Support += raid-utility aura; Shadow/Frost Support += `SM`
 > resistance), `LatticeCell` is the archetype-0 primary, and `IsLatticeArchetypeUnlocked` gates higher
