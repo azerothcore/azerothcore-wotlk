@@ -1,4 +1,5 @@
 #include "AllegianceMgr.h"
+#include "CatalystMgr.h"
 #include "DiscoveryMgr.h"
 #include "EventMgr.h"
 #include "ItemBrandingMgr.h"
@@ -298,6 +299,9 @@ public:
             handler->PSendSysMessage("Equipped item: {} brand, step {}, level {}, intensity x{:.2f}.",
                 BrandName(itemState.brand), uint32(itemState.step), uint32(itemState.levelInStep),
                 sItemBrandingMgr->EquippedIntensity(player));
+
+        handler->PSendSysMessage("Catalyst: same-role rank {}, raid multiplier x{:.2f}.",
+            uint32(sCatalystMgr->SameRoleBrandedRank(player)), sCatalystMgr->RaidMultiplierFor(player));
 
         for (uint8 m = 0; m < static_cast<uint8>(MasterySystem::COUNT); ++m)
         {

@@ -364,3 +364,51 @@ Branding.Item.Enable = 0
 #
 
 Branding.Event.SchedulerEnable = 0
+
+#
+#    Branding.Effect.Enable
+#        Description: Branding combat effects (§7.9). A branded player's OUTGOING damage is boosted
+#                     by the personal multiplier during its active window (no passive uptime).
+#                     Composes on top of zone downscaling (§2.1).
+#        Default:     0 - (disabled)
+#
+
+Branding.Effect.Enable = 0
+
+#
+#    Branding.Effect.MaxPersonalMul / MaxRaidMul
+#        Description: §7.9 magnitude caps -- large personal (fantasy, felt by the player) vs bounded
+#                     raid (desirability, not mandate; further reduced by catalyst DR in #04).
+#        Default:     3.5 / 2.0
+#
+
+Branding.Effect.MaxPersonalMul = 3.5
+Branding.Effect.MaxRaidMul = 2.0
+
+#
+#    Branding.Effect.MaxEffectLevel
+#        Description: Proficiency level at which the effect reaches full strength.
+#        Default:     50
+#
+
+Branding.Effect.MaxEffectLevel = 50
+
+#
+#    Branding.Catalyst.Enable
+#        Description: Catalyst stacking diminishing returns (§7.9/§9). A branded specialist's raid
+#                     multiplier diminishes as same-role specialists stack (1st full, 2nd reduced,
+#                     3rd+ heavy) -- rewards one specialist per role, discourages stacking.
+#        Default:     0 - (disabled)
+#
+
+Branding.Catalyst.Enable = 0
+
+#
+#    Branding.Catalyst.MaxRaidMul / StackDecay
+#        Description: Raid multiplier cap and the per-rank geometric decay (rank 1 = full, rank 2 =
+#                     StackDecay, rank 3 = StackDecay^2, ...).
+#        Default:     2.0 / 0.4
+#
+
+Branding.Catalyst.MaxRaidMul = 2.0
+Branding.Catalyst.StackDecay = 0.4
