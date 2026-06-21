@@ -19,4 +19,17 @@ namespace Branding
     {
         return HasBrandBit(brand, currentAccount);
     }
+
+    bool UnlockBrand(BrandId brand, KnowledgeState& knowledge)
+    {
+        if (brand >= BrandId::COUNT)
+            return false;
+
+        uint32_t const bit = 1u << static_cast<int>(brand);
+        if ((knowledge.unlockedMask & bit) != 0u)
+            return false;
+
+        knowledge.unlockedMask |= bit;
+        return true;
+    }
 }

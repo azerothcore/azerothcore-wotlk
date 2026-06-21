@@ -62,6 +62,16 @@ namespace Branding
         } while (result->NextRow());
     }
 
+    KnowledgeState& ProficiencyMgr::EnsureAccountKnowledge(uint32_t accountId)
+    {
+        auto it = _accountKnowledge.find(accountId);
+        if (it != _accountKnowledge.end())
+            return it->second;
+
+        LoadAccountKnowledge(accountId);
+        return _accountKnowledge[accountId];
+    }
+
     void ProficiencyMgr::LoadPlayer(Player* player)
     {
         // NOTE: loads run as blocking queries on the login path for simplicity. Both reads are tiny,
@@ -133,5 +143,42 @@ namespace Branding
             return 0;
 
         return LevelForXp(it->second[static_cast<size_t>(brand)].totalXp, _config);
+    }
+
+    bool ProficiencyMgr::UnlockBrand(uint32_t accountId, BrandId brand)
+    {
+        if (brand >= BrandId::COUNT)
+            return false;
+
+        // Refresh the in-memory mask first (pure-core mutation) so earning works immediately for any
+        // currently logged-in character on this account; only persist when it is a new unlock.
+        KnowledgeState& knowledge = EnsureAccountKnowledge(accountId);
+        if (!Branding::UnlockBrand(brand, knowledge))
+            return false;
+
+        LoginDatabase.Execute(
+            "REPLACE INTO `account_brand_knowledge` (`account`, `brand`, `unlocked_at`) "
+            "VALUES ({}, {}, UNIX_TIMESTAMP())",
+            accountId, static_cast<uint32>(brand));
+
+        LOG_INFO("module.branding", "Brand knowledge unlocked: account {} brand {}.",
+            accountId, static_cast<uint32>(brand));
+        return true;
+    }
+
+    bool ProficiencyMgr::IsBrandKnown(uint32_t accountId, BrandId brand)
+    {
+        return CanEarnProficiency(brand, EnsureAccountKnowledge(accountId));
+    }
+
+    uint32_t ProficiencyMgr::KnowledgeMask(uint32_t accountId)
+    {
+        return EnsureAccountKnowledge(accountId).unlockedMask;
+    }
+
+    KnowledgeState ProficiencyMgr::AccountKnowledge(uint32_t accountId) const
+    {
+        auto it = _accountKnowledge.find(accountId);
+        return it != _accountKnowledge.end() ? it->second : KnowledgeState{};
     }
 }

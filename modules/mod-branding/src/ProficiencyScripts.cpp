@@ -1,3 +1,4 @@
+#include "LoadoutMgr.h"
 #include "ProficiencyMgr.h"
 #include "mod_branding_loader.h"
 #include "proficiency/Types.h"
@@ -42,11 +43,14 @@ public:
         if (!killer || !sProficiencyMgr->Config().Enabled())
             return;
 
-        // TODO(Slice 3): source/brand/role come from the contribution tracker + active loadout.
+        // The active brand comes from the player's selected loadout (§7.9, issue #02). Source/role
+        // and content-brand still arrive with the Slice 3 contribution tracker (TODO).
+        BrandId const activeBrand = sLoadoutMgr->GetLoadout(killer->GetGUID()).activeBrand;
+
         XpActivity activity;
         activity.source = ActivitySource::Invasion;
-        activity.activeBrand = BrandId::Fire;
-        activity.contentBrand = BrandId::Fire;
+        activity.activeBrand = activeBrand;
+        activity.contentBrand = activeBrand;
         activity.role = RoleContribution::Damage;
         activity.baseUnits = 1;
 

@@ -5,7 +5,7 @@
 
 using namespace Branding;
 
-// Loads/refreshes scaling config on startup and on `.reload config`.
+// Loads/refreshes scaling config and the per-zone bracket table on startup and on `.reload config`.
 class BrandingScalingWorldScript : public WorldScript
 {
 public:
@@ -14,6 +14,7 @@ public:
     void OnAfterConfigLoad(bool /*reload*/) override
     {
         sScalingMgr->LoadConfig();
+        sScalingMgr->LoadZoneBrackets();
     }
 };
 

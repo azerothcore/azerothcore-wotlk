@@ -172,8 +172,12 @@ exploits — but none is downward-only-then-branding-on-top, so we study and rei
 | **mod-solocraft** | §2.2 small-group-clears-big-content (player side) | Group-size detection + stat-application plumbing. | It scales players **up**; we downscale (§2.1) — opposite direction, same plumbing. |
 
 **Current scaling adapter status:** player downscaling is wired (`src/Scaling*` — `UnitScript::Modify*Damage`
-scales an over-leveled player's *outgoing* damage by the §2.1 core factor; bracket = `area_level` v1).
-Group-size encounter/reward scaling (§2.2) and incoming-damage/healing scaling are not yet wired.
+scales an over-leveled player's *outgoing* damage by the §2.1 core factor). The bracket now comes from
+the admin-tunable `branding_zone_bracket` (zone_id → target_level) table, loaded into the pure
+`ZoneBracketTable` (`src/core/scaling/ZoneBracket.h`) at startup/`.reload config`; a configured zone
+overrides the built-in `AreaTableEntry::area_level`, and unconfigured zones keep the `area_level`
+fallback (v1 behaviour). Event-phase bracket override is a noted future extension layered on this
+resolution. Group-size encounter/reward scaling (§2.2) and incoming-damage/healing scaling are not yet wired.
 
 ---
 
@@ -296,12 +300,20 @@ Each slice = spec section + failing tests + green core + thin adapter + persiste
 5. **Slice 5 — Exploration/Discovery + Allegiance + Economy** ✓ (§8/§12): discovery XP + tier
    classification + economy resolution (pure), allegiance efficiency. *Implemented:
    `src/core/allegiance/`, `src/core/economy/` (Discovery, Economy); 9 tests green.*
+   *Allegiance adapter (§12) wired:* `character_allegiance` persistence, `AllegianceMgr` (load/save +
+   `Efficiency`), `.branding allegiance set <id>` (validates via the pure `ParseAllegiance`), and one
+   application point — the event XP reward is multiplied by the player's efficiency for the event's
+   alignment (`EventAlignment`); a mismatch / no allegiance / disabled system stays exactly 1.0.
    **Deferred:** the §8.5 XP-balance regression sim (needs the representative play-session profile
    you sanity-check) and §8.4 world-spawned content (data, authored against the tier rules).
 6. **Slice 6 — Account vault + Mastery wiring** ✓ pure parts (mostly persistence + adapters).
    *Implemented: `src/core/vault/` (transfer friction + capacity) and `src/core/mastery/`
-   (dual-key effectiveness: account-unlock × character-skill, anti-P2W); 5 tests green.
-   Persistence/adapters deferred.*
+   (dual-key effectiveness: account-unlock × character-skill, anti-P2W; plus `MasteryBonus` =
+   bounded efficiency value and the `MasterySystem` list Gathering/Crafting); 9 mastery+vault tests
+   green. **Mastery adapter wired (#07):** `MasteryMgr` (account-unlock cache + per-char level cache,
+   keyed by ObjectGuid) calls the core dual-key; tables `account_mastery` + `character_mastery`;
+   consumer = small crafting/gathering efficiency bonus (`OnPlayerCreateItem`/`OnPlayerLootItem`),
+   surfaced in `.branding info`. Vault adapter still deferred.*
 7. **Slice 7 — Combat effect application + Item branding + Prestige cosmetics** ✓ pure parts
    (application is adapter-heavy, deferred). *Implemented: `src/core/effects/` (EffectModel:
    Personal/Raid multipliers with caps + catalyst-weighted stacking + role asymmetry + windowed
@@ -673,6 +685,18 @@ The world spawns profession-flavored discoverables (e.g. *rusted dwarven hammerh
 - **Adapter:** interact hook → resolves reward via core, grants it, marks discovered (idempotent).
 - **Core (pure):** reward resolution given (discovery id, tier, player state); dedupe.
 
+**Implemented (scaffold).** Core: `economy/Discoverable.{h,cpp}` — `ResolveDiscoverable(def,
+alreadyDiscovered)` (idempotent; malformed defs are a no-op) and `RewardFitsTier(tier, type)` (the
+§8.3 tier↔reward contract: Common→Recipe/ProfessionXp, Uncommon→ProfessionXp/Reputation,
+Rare→Recipe/Reputation, Epic→HiddenQuest). Adapter: `DiscoverableMgr` loads the
+`branding_discovery_object` map (off-contract rows rejected) and a per-character dedupe set
+(`character_branding_discovery`); `DiscoverableScripts.cpp` registers a `GameObjectScript`
+interact hook (`OnGossipHello`) that grants the tier-appropriate reward once and records the
+discovery. Reward delivery: Recipe via `RewardDelivery::DeliverItem`; ProfessionXp via `SetSkill`;
+Reputation via `ReputationMgr::ModifyReputation`; HiddenQuest via `Player::AddQuest`. SQL ships a
+representative set (two discoverables per tier, entries/guids 5000000+); **bulk content authoring
+(the full per-profession/zone set) remains** — it extends the three data tables, no code change.
+
 ### 8.5 XP-source balance (the anti-obsolescence invariant)
 
 Target XP mix so no single source optimizes the fun out: **Questing 45% · Professions 25% ·
@@ -769,6 +793,32 @@ RewardGrant ClampToAccountCeiling(RewardGrant proposed, AccountEconomyState&, IB
 (`EventCap_PerChar_PacesActivity`); account mat/currency output never exceeds the account ceiling
 across N alts in one period (`EconomyOutput_AccountCeiling_Bounded`); the ceiling resets on the
 period boundary (injected clock).
+
+**Persistence (adapter, §9.3#5 — implemented).** Both states are persisted so pacing and especially
+the account economy ceiling survive a relog (an alt-army cannot reset the ceiling by relogging):
+
+```sql
+-- character_event_participation (acore_characters): per guid
+guid INT UNSIGNED, total_points INT UNSIGNED,
+points_this_hour INT UNSIGNED, hour_window_start BIGINT UNSIGNED, day_start BIGINT UNSIGNED,
+daily_invasion INT UNSIGNED, daily_resource_surge INT UNSIGNED,        -- one column per EventType
+daily_elite_hunt INT UNSIGNED, daily_profession_anomaly INT UNSIGNED,  -- (the DR counters)
+PRIMARY KEY (guid)  -- InnoDB
+
+-- account_economy_ledger (acore_auth): per account
+account INT UNSIGNED, materials_this_period INT UNSIGNED,
+currency_this_period INT UNSIGNED, period_start BIGINT UNSIGNED,
+PRIMARY KEY (account)  -- InnoDB
+```
+
+A pure `PersistenceRow` projection (`src/core/contribution/PersistenceRow.*`) maps each struct field
+1:1 to a column so the round-trip (`load(save(state)) == state`) is unit-tested without any DB.
+Adapter (`EventMgr` + `BrandingEventPlayerScript`): load character participation on `OnLogin` and the
+shared account ledger once per account (ref-counted across concurrent alts); flush both on `OnLogout`
+and on a periodic timer (`BrandingEventWorldScript::OnUpdate`, default 5 min). Cache keyed by
+`ObjectGuid`/account; **no raw `Player*` stored past the tick**. Login loads are blocking PK `Query`s
+(tiny rows), mirroring `ProficiencyMgr`; moving to the async `WithCallback` path is a TODO. Adapter TU
+link is **compile-verify deferred to CI** (no local worldserver build).
 
 ### 9.4 Reward tiers + auto-distribution (pure tier; adapter delivery)
 

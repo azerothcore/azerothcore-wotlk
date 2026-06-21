@@ -21,7 +21,9 @@ namespace
     {
     public:
         uint8_t maxLevel = 50;
+        double maxBonus = 0.20;
         uint8_t MaxMasteryLevel() const override { return maxLevel; }
+        double MaxBonus() const override { return maxBonus; }
     };
 }
 
@@ -76,4 +78,51 @@ TEST(Mastery, BothKeysScaleEffectiveness)
         EXPECT_GE(e, prev);
         prev = e;
     }
+}
+
+// --- Mastery consumer bonus (§14, the observable gathering/craft efficiency value) ---
+
+TEST(Mastery, BonusIsZeroUnlessBothKeysPresent)
+{
+    FakeMasteryConfig cfg;
+    EXPECT_DOUBLE_EQ(MasteryBonus(true, 0, cfg), 0.0);            // unlocked, no skill -> no bonus
+    EXPECT_DOUBLE_EQ(MasteryBonus(false, cfg.maxLevel, cfg), 0.0); // skill, no unlock -> no bonus
+}
+
+TEST(Mastery, BonusScalesToMaxAtFullEffectiveness)
+{
+    FakeMasteryConfig cfg;
+    EXPECT_DOUBLE_EQ(MasteryBonus(true, cfg.maxLevel, cfg), cfg.maxBonus);  // full key -> full bonus
+    EXPECT_GT(MasteryBonus(true, cfg.maxLevel, cfg), MasteryBonus(true, 10, cfg));
+}
+
+TEST(Mastery, BonusIsBoundedAndMonotonic)
+{
+    FakeMasteryConfig cfg;
+    double prev = -1.0;
+    for (uint8_t lvl = 0; lvl <= cfg.maxLevel; ++lvl)
+    {
+        double b = MasteryBonus(true, lvl, cfg);
+        EXPECT_GE(b, 0.0);
+        EXPECT_LE(b, cfg.maxBonus);
+        EXPECT_GE(b, prev);
+        prev = b;
+    }
+    // Equals MaxBonus weighted by effectiveness (linear consumer mapping).
+    EXPECT_DOUBLE_EQ(MasteryBonus(true, 25, cfg), cfg.maxBonus * MasteryEffectiveness(true, 25, cfg));
+}
+
+TEST(Mastery, ZeroMaxBonusYieldsNoEffect)
+{
+    FakeMasteryConfig cfg;
+    cfg.maxBonus = 0.0;
+    EXPECT_DOUBLE_EQ(MasteryBonus(true, cfg.maxLevel, cfg), 0.0);
+}
+
+TEST(Mastery, SystemListIsDefined)
+{
+    // 1-2 concrete masteries defined (§14 scope): at least Gathering + Crafting.
+    EXPECT_GE(static_cast<uint8_t>(MasterySystem::COUNT), 2);
+    EXPECT_EQ(static_cast<uint8_t>(MasterySystem::Gathering), 0);
+    EXPECT_EQ(static_cast<uint8_t>(MasterySystem::Crafting), 1);
 }

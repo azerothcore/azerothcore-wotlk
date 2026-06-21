@@ -181,3 +181,166 @@ Branding.Event.GoldThreshold = 400
 #
 
 Branding.Event.RewardItemId = 2589
+
+
+#
+#    Branding.Item.LevelsPerStep / MaxStep
+#        Description: Item-brand progression (§7.9): internal upgrade levels per major Step and the
+#                     number of major Steps. Used by item branding (#04/#05) and the loadout config.
+#        Default:     8 / 3
+#
+
+Branding.Item.LevelsPerStep = 8
+Branding.Item.MaxStep = 3
+
+#
+#    Branding.Item.BaseIntensity / IntensityPerLevel
+#        Description: Effect/proc INTENSITY at item-brand level 0 and the intensity added per internal
+#                     level. Behavior/proc intensity only -- never a flat character-stat delta.
+#        Default:     1.0 / 0.05
+#
+
+Branding.Item.BaseIntensity = 1.0
+Branding.Item.IntensityPerLevel = 0.05
+
+#
+#    Branding.Item.UpgradeCostPerLevel / AccountKnowledgeCost
+#        Description: Economy resources per internal item-brand level, and the (larger) account-side
+#                     Knowledge unlock cost. The difficulty-ordering invariant requires the cumulative
+#                     item upgrade cost to stay below AccountKnowledgeCost (item branding is easier).
+#        Default:     100 / 100000
+#
+
+Branding.Item.UpgradeCostPerLevel = 100
+Branding.Item.AccountKnowledgeCost = 100000
+
+#
+#    Branding.Loadout.BaseArchetypes / ArchetypeLevelStep / MaxArchetypes
+#        Description: Proc archetypes unlocked by the player-selected loadout (§7.9): the count is
+#                     BaseArchetypes + proficiencyLevel / ArchetypeLevelStep, capped at MaxArchetypes.
+#                     `.branding setproc <n>` rejects an archetype above this count.
+#        Default:     1 / 10 / 6
+#
+
+Branding.Loadout.BaseArchetypes = 1
+Branding.Loadout.ArchetypeLevelStep = 10
+Branding.Loadout.MaxArchetypes = 6
+
+
+#
+# Account vault (design slice 6, §13). An account-bound shared stash. Deposits carry a friction fee
+# (anti instant-infinite-storage) and the vault has a unit capacity. Commands: `.vault deposit`,
+# `.vault withdraw`, `.vault list`.
+#
+
+#
+#    Branding.Vault.Enable
+#        Description: Master switch for the account vault feature.
+#        Default:     0 - (disabled)
+#
+
+Branding.Vault.Enable = 0
+
+#
+#    Branding.Vault.Capacity
+#        Description: Maximum total units (summed across all stacks) the account vault can hold.
+#        Default:     1000
+#
+
+Branding.Vault.Capacity = 1000
+
+#
+#    Branding.Vault.TransferBaseCost
+#        Description: Flat copper friction charged on any non-empty deposit.
+#        Default:     1000
+#
+
+Branding.Vault.TransferBaseCost = 1000
+
+#
+#    Branding.Vault.TransferCostPerUnit
+#        Description: Additional copper friction per deposited unit.
+#        Default:     50
+#
+
+Branding.Vault.TransferCostPerUnit = 50
+
+
+#
+# Mastery (design slice 6 / §14). Dual-key, anti-P2W: a mastery is effective only when the account
+# has UNLOCKED it (account_mastery) AND the character has EARNED the skill (character_mastery).
+# Either key alone is inert. The observable consumer is a small crafting/gathering efficiency bonus.
+#
+
+#
+#    Branding.Mastery.Enable
+#        Description: Master switch for the §14 mastery system (unlock IO + efficiency bonus).
+#        Default:     0 - (disabled)
+#
+
+Branding.Mastery.Enable = 0
+
+#
+#    Branding.Mastery.MaxLevel
+#        Description: Character mastery level at which effectiveness reaches 1.0 (full bonus).
+#        Default:     50
+#
+
+Branding.Mastery.MaxLevel = 50
+
+#
+#    Branding.Mastery.MaxBonus
+#        Description: Largest fractional efficiency bonus a fully-effective mastery grants (extra
+#                     crafted/gathered units). 0.20 = up to +20%.
+#        Default:     0.20
+#
+
+Branding.Mastery.MaxBonus = 0.20
+
+
+#
+#    Branding.Allegiance.Enable
+#        Description: Soft ideological allegiances (§12). A character picks a side with
+#                     `.branding allegiance set <id>`; content aligned with that side grants a small
+#                     efficiency bonus. Allegiance is soft -- a mismatch is never a penalty.
+#        Default:     0 - (disabled)
+#
+
+Branding.Allegiance.Enable = 0
+
+#
+#    Branding.Allegiance.MatchEfficiency
+#        Description: Reward/efficiency multiplier when the character's allegiance matches the
+#                     content's alignment. Clamped to >= 1.0 (never a penalty).
+#        Default:     1.15
+#
+
+Branding.Allegiance.MatchEfficiency = 1.15
+
+
+#
+#    Branding.Economy.Enable
+#        Description: Master switch for the economy/crafting adapter (§8.6). Loads the
+#                     `branding_recipe` world table and enables `.branding craft <recipeId>`.
+#        Default:     0 - (disabled)
+#
+
+Branding.Economy.Enable = 0
+
+#
+#    Branding.Economy.MaterialItemId
+#        Description: Item entry representing crafting "materials" in the closed economy loop.
+#                     Mirror Branding.Event.RewardItemId so a craft consumes exactly what events
+#                     grant (faucet == sink representation).
+#        Default:     2589 (Linen Cloth, placeholder)
+#
+
+Branding.Economy.MaterialItemId = 2589
+
+#
+#    Branding.Economy.FragmentItemId
+#        Description: Item entry representing invasion "fragments" in the closed economy loop.
+#        Default:     2592 (Wool Cloth, placeholder)
+#
+
+Branding.Economy.FragmentItemId = 2592

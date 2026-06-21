@@ -1,14 +1,23 @@
+#include "AllegianceMgr.h"
 #include "DiscoveryMgr.h"
 #include "EventMgr.h"
+#include "LoadoutMgr.h"
+#include "MasteryMgr.h"
 #include "ProficiencyMgr.h"
 #include "RewardDelivery.h"
 #include "ScalingMgr.h"
+#include "allegiance/Allegiance.h"
 #include "contribution/ContributionTypes.h"
 #include "mod_branding_loader.h"
 #include "Chat.h"
 #include "CommandScript.h"
 #include "Player.h"
 #include "RBAC.h"
+#include <algorithm>
+#include <cctype>
+#include <cstdlib>
+#include <string>
+#include <string_view>
 
 using namespace Acore::ChatCommands;
 using namespace Branding;
@@ -25,9 +34,46 @@ namespace
             default:                 return "None";
         }
     }
+
+    char const* BrandName(BrandId brand)
+    {
+        switch (brand)
+        {
+            case BrandId::Fire:     return "Fire";
+            case BrandId::Frost:    return "Frost";
+            case BrandId::Nature:   return "Nature";
+            case BrandId::Shadow:   return "Shadow";
+            case BrandId::Arcane:   return "Arcane";
+            case BrandId::Holy:     return "Holy";
+            case BrandId::Physical: return "Physical";
+            default:                return "Unknown";
+        }
+    }
+
+    char const* MasteryName(MasterySystem system)
+    {
+        switch (system)
+        {
+            case MasterySystem::Gathering: return "Gathering";
+            case MasterySystem::Crafting:  return "Crafting";
+            default:                       return "Unknown";
+        }
+    }
+
+    char const* AllegianceName(Allegiance allegiance)
+    {
+        switch (allegiance)
+        {
+            case Allegiance::FireChaos:  return "Fire/Chaos";
+            case Allegiance::NatureWild: return "Nature/Wild";
+            case Allegiance::ShadowVoid: return "Shadow/Void";
+            case Allegiance::TitanOrder: return "Titan/Order";
+            default:                     return "None";
+        }
+    }
 }
 
-// `.branding info` -- read-only inspection of the wired branding systems for the calling player.
+// `.branding ...` -- inspection + control surface for the wired branding systems.
 class branding_commandscript : public CommandScript
 {
 public:
@@ -43,10 +89,25 @@ public:
             { "claim",  HandleBrandingEventClaimCommand,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
         };
 
+        static ChatCommandTable knowledgeCommandTable =
+        {
+            { "grant", HandleBrandingKnowledgeGrantCommand, rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "list",  HandleBrandingKnowledgeListCommand,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+        };
+
+        static ChatCommandTable allegianceCommandTable =
+        {
+            { "set", HandleBrandingAllegianceSetCommand, rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+        };
+
         static ChatCommandTable brandingCommandTable =
         {
-            { "info",  HandleBrandingInfoCommand, rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
-            { "event", eventCommandTable },
+            { "info",       HandleBrandingInfoCommand,     rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "setbrand",   HandleBrandingSetBrandCommand, rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "setproc",    HandleBrandingSetProcCommand,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "knowledge",  knowledgeCommandTable },
+            { "allegiance", allegianceCommandTable },
+            { "event",      eventCommandTable },
         };
 
         static ChatCommandTable commandTable =
@@ -168,9 +229,19 @@ public:
                 }
                 break;
             case RewardCategory::Xp:
-                player->GiveXP(100 * static_cast<uint32>(reward.tier), nullptr);
-                handler->PSendSysMessage("Reward: bonus XP.");
+            {
+                // Allegiance application point (§12): scale the event XP reward by the player's
+                // efficiency for the event's ideological alignment. A match boosts it; a mismatch,
+                // no allegiance, or a disabled system stays exactly neutral -- never a penalty.
+                uint32 const baseXp = 100 * static_cast<uint32>(reward.tier);
+                EventType type;
+                Allegiance const content =
+                    sEventMgr->ActiveEventType(player->GetZoneId(), type) ? EventAlignment(type) : Allegiance::None;
+                double const efficiency = sAllegianceMgr->Efficiency(player->GetGUID(), content);
+                player->GiveXP(static_cast<uint32>(baseXp * efficiency), nullptr);
+                handler->PSendSysMessage("Reward: bonus XP (allegiance x{:.2f}).", efficiency);
                 break;
+            }
             default:
                 handler->PSendSysMessage("Reward category {} (cosmetic/reputation grant TODO).", uint32(reward.category));
                 break;
@@ -214,6 +285,193 @@ public:
         handler->PSendSysMessage("Discovery: tier {}, first-visit bonus {} xp",
             uint32(sDiscoveryMgr->AreaTier(player->GetAreaId())),
             sDiscoveryMgr->AreaDiscoveryBonus(player->GetLevel(), player->GetAreaId()));
+
+        BrandLoadout const loadout = sLoadoutMgr->GetLoadout(guid);
+        handler->PSendSysMessage("Active loadout: {} brand, proc archetype {}.",
+            BrandName(loadout.activeBrand), uint32(loadout.selectedProcArchetype));
+
+        for (uint8 m = 0; m < static_cast<uint8>(MasterySystem::COUNT); ++m)
+        {
+            MasterySystem const system = static_cast<MasterySystem>(m);
+            bool const unlocked = sMasteryMgr->AccountUnlocked(account, system);
+            uint8 const level = sMasteryMgr->MasteryLevel(guid, system);
+            handler->PSendSysMessage("Mastery {}: account {}, char level {}, efficiency bonus +{:.1f}%",
+                MasteryName(system), unlocked ? "unlocked" : "locked", uint32(level),
+                sMasteryMgr->Bonus(guid, account, system) * 100.0);
+        }
+        return true;
+    }
+
+    // Resolves a brand token (numeric id 0..COUNT-1, or a case-insensitive name) to a BrandId.
+    static bool ParseBrand(std::string_view token, BrandId& out)
+    {
+        if (!token.empty() && std::all_of(token.begin(), token.end(), [](unsigned char c) { return std::isdigit(c); }))
+        {
+            uint32 const id = static_cast<uint32>(std::strtoul(std::string(token).c_str(), nullptr, 10));
+            if (id >= static_cast<uint32>(BrandId::COUNT))
+                return false;
+            out = static_cast<BrandId>(id);
+            return true;
+        }
+
+        for (uint8 b = 0; b < static_cast<uint8>(BrandId::COUNT); ++b)
+        {
+            BrandId const brand = static_cast<BrandId>(b);
+            std::string const name = BrandName(brand);
+            if (token.size() == name.size()
+                && std::equal(token.begin(), token.end(), name.begin(),
+                    [](unsigned char a, unsigned char c) { return std::tolower(a) == std::tolower(c); }))
+            {
+                out = brand;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // `.branding knowledge grant <brand>` -- GM/debug unlock of an account-wide brand (design §6).
+    static bool HandleBrandingKnowledgeGrantCommand(ChatHandler* handler, std::string_view brandToken)
+    {
+        Player* player = handler->GetPlayer();
+        if (!player)
+        {
+            handler->SendErrorMessage("This command must be used in-world.");
+            return false;
+        }
+        if (!sProficiencyMgr->Config().Enabled())
+        {
+            handler->SendErrorMessage("Branding module is disabled.");
+            return false;
+        }
+
+        BrandId brand;
+        if (!ParseBrand(brandToken, brand))
+        {
+            handler->SendErrorMessage("Unknown brand '{}'. Use a name (Fire, Frost, Nature, Shadow, Arcane, Holy, Physical) or id 0..{}.",
+                brandToken, static_cast<uint32>(BrandId::COUNT) - 1);
+            return false;
+        }
+
+        uint32 const account = player->GetSession()->GetAccountId();
+        if (sProficiencyMgr->UnlockBrand(account, brand))
+            handler->PSendSysMessage("Unlocked brand {} ({}) for account {}.",
+                BrandName(brand), static_cast<uint32>(brand), account);
+        else
+            handler->PSendSysMessage("Brand {} is already unlocked for account {}.",
+                BrandName(brand), account);
+        return true;
+    }
+
+    // `.branding knowledge list` -- shows which brands the calling account has unlocked.
+    static bool HandleBrandingKnowledgeListCommand(ChatHandler* handler)
+    {
+        Player* player = handler->GetPlayer();
+        if (!player)
+        {
+            handler->SendErrorMessage("This command must be used in-world.");
+            return false;
+        }
+
+        uint32 const account = player->GetSession()->GetAccountId();
+        handler->PSendSysMessage("Brand knowledge for account {}:", account);
+
+        bool any = false;
+        for (uint8 b = 0; b < static_cast<uint8>(BrandId::COUNT); ++b)
+        {
+            BrandId const brand = static_cast<BrandId>(b);
+            if (!sProficiencyMgr->IsBrandKnown(account, brand))
+                continue;
+
+            any = true;
+            handler->PSendSysMessage("  {} ({}): unlocked", BrandName(brand), uint32(b));
+        }
+        if (!any)
+            handler->PSendSysMessage("  (no brands unlocked -- use .branding knowledge grant <brand>)");
+        return true;
+    }
+
+    // `.branding setbrand <brand>` -- select the active brand (rejected if the account lacks Knowledge).
+    static bool HandleBrandingSetBrandCommand(ChatHandler* handler, uint32 brand)
+    {
+        Player* player = handler->GetPlayer();
+        if (!player)
+        {
+            handler->SendErrorMessage("This command must be used in-world.");
+            return false;
+        }
+        if (brand >= static_cast<uint32>(BrandId::COUNT))
+        {
+            handler->SendErrorMessage("Brand must be 0..{} (0=Fire,1=Frost,2=Nature,3=Shadow,4=Arcane,5=Holy,6=Physical).",
+                static_cast<uint32>(BrandId::COUNT) - 1);
+            return false;
+        }
+
+        BrandId const brandId = static_cast<BrandId>(brand);
+        if (!sLoadoutMgr->SetActiveBrand(player, brandId))
+        {
+            handler->SendErrorMessage("Cannot select {}: your account has not unlocked its Brand Knowledge.",
+                BrandName(brandId));
+            return false;
+        }
+
+        handler->PSendSysMessage("Active brand set to {} (proc archetype reset to 0).", BrandName(brandId));
+        return true;
+    }
+
+    // `.branding setproc <n>` -- select the proc archetype for the active brand (proficiency-gated).
+    static bool HandleBrandingSetProcCommand(ChatHandler* handler, uint32 archetype)
+    {
+        Player* player = handler->GetPlayer();
+        if (!player)
+        {
+            handler->SendErrorMessage("This command must be used in-world.");
+            return false;
+        }
+        if (archetype > 0xFF)
+        {
+            handler->SendErrorMessage("Proc archetype index out of range.");
+            return false;
+        }
+
+        if (!sLoadoutMgr->SetArchetype(player, static_cast<uint8>(archetype)))
+        {
+            BrandLoadout const current = sLoadoutMgr->GetLoadout(player->GetGUID());
+            uint8 const unlocked = sLoadoutMgr->Config().ArchetypesAtLevel(
+                sProficiencyMgr->BrandLevel(player->GetGUID(), current.activeBrand));
+            handler->SendErrorMessage("Proc archetype {} is not available: {} unlocked at your {} proficiency.",
+                archetype, unlocked, BrandName(current.activeBrand));
+            return false;
+        }
+
+        handler->PSendSysMessage("Proc archetype set to {}.", archetype);
+        return true;
+    }
+
+    // `.branding allegiance set <id>` -- commit to a soft allegiance (§12); validated by the core.
+    static bool HandleBrandingAllegianceSetCommand(ChatHandler* handler, uint32 id)
+    {
+        Player* player = handler->GetPlayer();
+        if (!player)
+        {
+            handler->SendErrorMessage("This command must be used in-world.");
+            return false;
+        }
+        if (!sAllegianceMgr->Enabled())
+        {
+            handler->SendErrorMessage("Allegiance system is disabled (Branding.Allegiance.Enable).");
+            return false;
+        }
+
+        Allegiance parsed = Allegiance::None;
+        if (!ParseAllegiance(id, parsed))
+        {
+            handler->SendErrorMessage("Allegiance id must be 1..{} (1=Fire/Chaos, 2=Nature/Wild, 3=Shadow/Void, 4=Titan/Order).",
+                static_cast<uint32>(Allegiance::COUNT) - 1);
+            return false;
+        }
+
+        sAllegianceMgr->Select(player->GetGUID(), player->GetGUID().GetCounter(), id);
+        handler->PSendSysMessage("Allegiance set to {} (mostly permanent).", AllegianceName(parsed));
         return true;
     }
 };

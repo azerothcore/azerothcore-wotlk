@@ -1,0 +1,110 @@
+# =====================================================================================
+# mod-branding CI (GitLab) -- fast gates for issue #15.
+#
+# GitLab only auto-runs the .gitlab-ci.yml at the REPOSITORY ROOT. Two ways to use this:
+#
+#   A) Module-only repo / mirror: this file is already at the root -- nothing to do.
+#
+#   B) In-tree under modules/mod-branding/ (AzerothCore monorepo): add an `include` to the
+#      root .gitlab-ci.yml so these jobs run without editing core build files:
+#
+#         include:
+#           - local: 'modules/mod-branding/.gitlab-ci.yml'
+#
+# Every job here is FAST (seconds-to-low-minutes). The heavy full worldserver link is a
+# separate, manual/nightly job (see `full-link-build` at the bottom) and is NOT run on
+# every push. All commands are also runnable locally -- see README.md.
+# =====================================================================================
+
+stages:
+  - lint
+  - test
+
+# Debian 13 is the primary target OS (org workflow). Pin to it for parity with prod.
+default:
+  image: debian:trixie
+  before_script:
+    - apt-get update -qq
+    - apt-get install -y -qq --no-install-recommends
+        git ca-certificates cmake g++ make python3 grep findutils
+    - cmake --version
+    - g++ --version
+
+variables:
+  # codestyle-sql.py diffs against origin/master; give CI enough history to do so.
+  GIT_DEPTH: "50"
+  MODULE_DIR: "modules/mod-branding"
+
+# ------------------------------------------------------------------------------------
+# Lint stage
+# ------------------------------------------------------------------------------------
+
+# C++ codestyle. codestyle-cpp.py walks "<cwd>/src", so we run it from the module dir.
+codestyle-cpp:
+  stage: lint
+  script:
+    - cd "$MODULE_DIR"
+    - python3 "$CI_PROJECT_DIR/apps/codestyle/codestyle-cpp.py"
+
+# SQL codestyle. Compares the working tree to origin/master, so run it from the repo root.
+codestyle-sql:
+  stage: lint
+  script:
+    - git fetch --no-tags origin master
+    - python3 apps/codestyle/codestyle-sql.py
+
+# CORE-PURITY guard: fail if anything under src/core/ depends on AzerothCore.
+core-purity:
+  stage: lint
+  script:
+    - bash "$MODULE_DIR/tools/core-purity.sh"
+
+# Secret scan on the whole module (defence in depth alongside the pre-commit hook).
+gitleaks:
+  stage: lint
+  image: zricethezav/gitleaks:latest
+  before_script: []
+  script:
+    - gitleaks detect --source "$MODULE_DIR" --redact --no-banner --verbose
+  allow_failure: false
+
+# ------------------------------------------------------------------------------------
+# Test stage -- standalone pure-core GoogleTests (the fast TDD loop).
+# ------------------------------------------------------------------------------------
+core-tests:
+  stage: test
+  script:
+    - cmake -S "$MODULE_DIR/tests/standalone" -B build-core
+    - cmake --build build-core -j "$(nproc)"
+    - ctest --test-dir build-core --output-on-failure
+  artifacts:
+    when: on_failure
+    paths:
+      - build-core/Testing/
+    expire_in: 1 week
+
+# ------------------------------------------------------------------------------------
+# HEAVY: full worldserver link with the module (catches link-stage regressions).
+# Manual-only (and/or nightly via a schedule) -- it pulls the AzerothCore build deps and
+# compiles a large C++ codebase, so it must NOT gate every push.
+#
+# To wire a nightly run: add a pipeline schedule and gate with `rules: if $CI_PIPELINE_SOURCE
+# == "schedule"`. Left as `when: manual` here so it never blocks the fast pipeline.
+# ------------------------------------------------------------------------------------
+full-link-build:
+  stage: test
+  when: manual
+  allow_failure: true
+  timeout: 3h
+  before_script:
+    - apt-get update -qq
+    - apt-get install -y -qq --no-install-recommends
+        git ca-certificates cmake g++ make python3
+        libboost-all-dev libmysqlclient-dev libssl-dev libreadline-dev
+        zlib1g-dev libbz2-dev
+  script:
+    - mkdir -p build && cd build
+    - cmake .. -DCMAKE_INSTALL_PREFIX="$HOME/azeroth-server"
+        -DCMAKE_BUILD_TYPE=RelWithDebInfo -DSCRIPTS=static -DMODULES=static -DTOOLS=0
+    - make -j "$(nproc)"
+    - make install

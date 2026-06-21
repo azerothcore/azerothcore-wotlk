@@ -48,3 +48,44 @@ TEST(Knowledge, TradedCharacterInertWithoutAccountAccess)
     KnowledgeState emptyAccount;          // bought a maxed character, but no Knowledge earned
     EXPECT_DOUBLE_EQ(ResolvedEffectStrength(cfg.maxLevel, BrandId::Fire, emptyAccount, cfg), 0.0);
 }
+
+// UnlockBrand flips the brand bit and reports the transition (false -> true on first unlock)
+TEST(Knowledge, UnlockBrandSetsBitAndReportsTransition)
+{
+    KnowledgeState k;
+    EXPECT_FALSE(CanEarnProficiency(BrandId::Fire, k));
+
+    EXPECT_TRUE(UnlockBrand(BrandId::Fire, k));   // newly unlocked
+    EXPECT_TRUE(CanEarnProficiency(BrandId::Fire, k));
+    EXPECT_TRUE(CanExpressBrand(BrandId::Fire, k));
+}
+
+// UnlockBrand is idempotent: a second unlock reports "already known" and leaves the mask unchanged
+TEST(Knowledge, UnlockBrandIsIdempotent)
+{
+    KnowledgeState k;
+    EXPECT_TRUE(UnlockBrand(BrandId::Frost, k));
+    uint32_t const after = k.unlockedMask;
+
+    EXPECT_FALSE(UnlockBrand(BrandId::Frost, k)); // already known
+    EXPECT_EQ(k.unlockedMask, after);
+}
+
+// UnlockBrand affects only the requested brand, never its neighbours
+TEST(Knowledge, UnlockBrandIsolatesBrands)
+{
+    KnowledgeState k;
+    UnlockBrand(BrandId::Shadow, k);
+
+    EXPECT_TRUE(CanEarnProficiency(BrandId::Shadow, k));
+    EXPECT_FALSE(CanEarnProficiency(BrandId::Fire, k));
+    EXPECT_FALSE(CanEarnProficiency(BrandId::Holy, k));
+}
+
+// An out-of-range brand never unlocks anything (defensive, matches adapter validation)
+TEST(Knowledge, UnlockBrandRejectsCountSentinel)
+{
+    KnowledgeState k;
+    EXPECT_FALSE(UnlockBrand(BrandId::COUNT, k));
+    EXPECT_EQ(k.unlockedMask, 0u);
+}

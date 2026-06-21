@@ -10,12 +10,15 @@
 #include <cstdint>
 #include <unordered_map>
 
+class Player;
+
 namespace Branding
 {
     // Minimal runtime scaffold for the §9 dynamic-event engine: GM-startable events per zone, kill
     // capture feeding the pure scoring engine (with all guardrails), containment aggregation, and
-    // per-player tiering. Runtime-only (no persistence); spawner/scheduler and reward delivery are
-    // deferred. This makes the Slice 3 contribution core observable and testable in-world.
+    // per-player tiering. Per-character participation pacing (`character_event_participation`) and
+    // the per-account economy ceiling (`account_economy_ledger`) are persisted (§9.3#5) so the
+    // account ceiling bounds an alt-army across sessions; spawner/scheduler are deferred.
     class EventMgr
     {
     public:
@@ -35,6 +38,14 @@ namespace Branding
         uint32_t PlayerPoints(ObjectGuid guid) const;
         RewardTier PlayerTier(ObjectGuid guid) const;
         void Unload(ObjectGuid guid);
+
+        // Persistence lifecycle (§9.3#5). Load pulls the character's participation pacing and the
+        // account economy ledger into the caches on login (account loaded once per account); Save
+        // flushes both back; Unload drops the character cache (account cache survives concurrent
+        // alts). FlushAll persists every cached row for the periodic timer.
+        void LoadPlayer(Player* player);
+        void SavePlayer(Player* player);
+        void FlushAll();
 
         // Reward resolution (§9.4/§9.5/§9.3#5): tier -> diversity-selected category -> grant clamped
         // to the account economy ceiling. The caller delivers the grant to the game (AddItem etc.).
@@ -63,12 +74,22 @@ namespace Branding
             uint32_t totalPoints = 0;
         };
 
+        void LoadCharacterParticipation(ObjectGuid guid, uint32_t lowGuid);
+        void LoadAccountEconomy(uint32_t accountId);
+        void SaveCharacterParticipation(uint32_t lowGuid, PlayerState const& state);
+        void SaveAccountEconomy(uint32_t accountId, AccountEconomyState const& state);
+
         EventConfig _config;
         ServerClock _clock;
         ServerRng _rng;
         std::unordered_map<uint32_t, ActiveEvent> _events;
         std::unordered_map<ObjectGuid, PlayerState> _players;
         std::unordered_map<uint32_t, AccountEconomyState> _accountState;
+
+        // Maps a loaded character to its account, and counts loaded chars per account so the shared
+        // account economy row is only dropped/loaded once across concurrently-online alts.
+        std::unordered_map<ObjectGuid, uint32_t> _charAccount;
+        std::unordered_map<uint32_t, uint32_t> _accountRefs;
     };
 }
 
