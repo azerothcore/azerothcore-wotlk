@@ -110,27 +110,53 @@ function ns:DecodeChar(t)
     return c
 end
 
--- Decode the §14 Mastery lattice frame. `t` is the tab-split frame; t[1]=="MAST". Mirrors the
--- server's EncodeMastery (Protocol.cpp): t[2]=pointsAvailable, t[3]=respecCost, t[4]=cell records
--- (';'-separated; each ':'-separated as
+-- Decode a §14 Mastery lattice frame and MERGE it into ns.state.mastery. `t` is the tab-split frame;
+-- t[1]=="MAST". Mirrors the server's EncodeMastery (Protocol.cpp): t[2]=pointsAvailable,
+-- t[3]=respecCost, t[4]=cell records (';'-separated; each ':'-separated as
 --   school:tree:kind:situational:sustained:level:archetype:axisMask:a0:a1:a2:a3:active),
--- t[5]=truncation marker ("T" if the lattice didn't fit one frame).
+-- t[5]=truncation marker ("T" if this frame's own cells didn't fit -- a safety net, not the norm).
+--
+-- PAGED BY SCHOOL: the full 7-school x 3-tree lattice (21 cells) does NOT fit one 255-byte
+-- CHAT_MSG_ADDON body, so the server pushes ONE frame PER SCHOOL (§19.2). We therefore MERGE: each
+-- frame REPLACES the cells of whatever schools it carries and refreshes points/respec, leaving cells
+-- for other schools intact. Keyed by school, so frames may arrive in any order and re-pushing one
+-- school updates just that school -- we never assume a single frame is the whole lattice.
 -- MULTI-MASTERY: `cells` is a flat list and each cell carries its own `active` flag, so any number
 -- of cells may be active at once -- the model never assumes a single active mastery.
 function ns:DecodeMastery(t)
-    local m = { pointsAvailable = num(t[2]), respecCost = num(t[3]), cells = {}, truncated = (t[5] == "T") }
+    local m = ns.state.mastery
+    if not m then
+        m = { pointsAvailable = 0, respecCost = 0, cells = {}, truncated = false }
+        ns.state.mastery = m
+    end
+    m.pointsAvailable = num(t[2])
+    m.respecCost = num(t[3])
+    m.truncated = (t[5] == "T")
+
+    -- Parse this frame's cells; track which schools it covers so we can drop their stale cells.
+    local incoming, schoolsSeen = {}, {}
     if t[4] and t[4] ~= "" then
         for _, rec in ipairs(split(t[4], ";")) do
             local f = split(rec, ":")
-            m.cells[#m.cells + 1] = {
+            local cell = {
                 school = num(f[1]), tree = num(f[2]), kind = num(f[3]),
                 situational = (f[4] == "1"), sustained = (f[5] == "1"),
                 level = num(f[6]), archetype = num(f[7]), axisMask = num(f[8]),
                 alloc = { num(f[9]), num(f[10]), num(f[11]), num(f[12]) },
                 active = (f[13] == "1"),
             }
+            incoming[#incoming + 1] = cell
+            schoolsSeen[cell.school] = true
         end
     end
+
+    -- Keep cells for schools NOT in this frame, then append this frame's (refreshed) cells.
+    local kept = {}
+    for _, c in ipairs(m.cells) do
+        if not schoolsSeen[c.school] then kept[#kept + 1] = c end
+    end
+    for _, c in ipairs(incoming) do kept[#kept + 1] = c end
+    m.cells = kept
     return m
 end
 
@@ -167,7 +193,7 @@ local function decode(message)
         ns.state.char = ns:DecodeChar(t)
         ns:Fire("char")
     elseif kind == "MAST" then
-        ns.state.mastery = ns:DecodeMastery(t)
+        ns:DecodeMastery(t)   -- merges into ns.state.mastery (paged by school, §19.2)
         ns:Fire("mastery")
     end
 end

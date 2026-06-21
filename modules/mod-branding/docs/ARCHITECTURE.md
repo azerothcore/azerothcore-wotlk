@@ -1539,8 +1539,12 @@ std::string EncodeMastery(MasterySnapshot const&, bool& trunc);              // 
 Permille keeps the round-trip exact (equality, not epsilon). HELLO carries a **protocol version**
 so a mismatched client is told to update rather than mis-parsing.
 
-**§14 Mastery lattice frame (MAST, protocol v2 — issue #32).** Carries the whole 5-school × 3-tree
-lattice for the Mastery client UI:
+**§14 Mastery lattice frame (MAST, protocol v2 — issue #32).** Carries the Mastery lattice for the
+client UI across all **7 standard damage schools × 3 trees** (the full `BrandId` set). The 21-cell
+lattice does not fit one 255-byte addon body, so the adapter **pages it one `MAST` frame per school**
+(3 cells each, comfortably inside `MaxFrame`); the client merges frames by school into one lattice.
+`EncodeMastery` still flags `truncated` per frame as a safety net, and the per-frame schema is
+unchanged — paging is purely a send/merge concern, not a wire-format change:
 
 ```cpp
 struct MasteryCellFrame {           // one (school, tree) cell as the client renders it
@@ -1619,11 +1623,14 @@ A single addon, three surfaces, one shared comms layer (`Comms.lua` mirrors the 
   (unlock/level/bonus), Loadout (active brand + proc archetype), Item brand (step/level/intensity),
   Allegiance. Backed by the CHAR poll, refreshed on open and on login push.
 - **Mastery panel** (`MasteryPanel.lua`, issue #32) — a standalone frame rendering the §14 lattice
-  (5 schools × 3 trees) from the MAST push: each cell's earned level, archetype/expression family,
-  active/invested/selected state, and per-cell §14.10 point-buy (only the axes the cell exposes) with
-  `+`/`-` and a respec button that send the v2 ALLOC/ARCH/RESPEC requests. Server-authoritative: it
-  displays MAST and *requests* changes; it never mutates locally, and gates sending behind
-  `ns.CanSend()` (disabled, display-only, until a realm enables a client→server channel).
+  (all 7 standard damage schools × 3 trees) from the MAST push: each cell's earned level,
+  archetype/expression family, active/invested/selected state, and per-cell §14.10 point-buy (only the
+  axes the cell exposes) with `+`/`-` and a respec button that send the v2 ALLOC/ARCH/RESPEC requests.
+  The 21-cell lattice exceeds one 255-byte addon frame, so the server pages it **one MAST frame per
+  school** and `Comms.lua` merges frames by school into a single lattice (`DecodeMastery` is a merge,
+  not a replace). Server-authoritative: it displays MAST and *requests* changes; it never mutates
+  locally, and gates sending behind `ns.CanSend()` (disabled, display-only, until a realm enables a
+  client→server channel).
 
 **Talent-frame dock (#32 decision).** Native talent-frame integration (a real tab on
 `PlayerTalentFrame`) would need client DBC + secure-frame edits and would **taint** the protected
