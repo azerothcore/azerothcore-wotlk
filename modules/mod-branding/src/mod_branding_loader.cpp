@@ -15,5 +15,6 @@ void Addmod_brandingScripts()
     AddBrandingEconomyScripts();
     AddBrandingDiscoverableScripts();
     AddBrandingEffectScripts();
+    AddBrandingCatalystScripts();
     AddBrandingCommandScripts();
 }
