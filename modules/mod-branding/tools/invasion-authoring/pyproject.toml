@@ -1,0 +1,40 @@
+[project]
+name = "invasion-authoring"
+version = "0.1.0"
+description = "Qt6 visual editor for authoring mod-branding ambient invasions (spawns + waypoint paths) to AzerothCore SQL"
+readme = "README.md"
+requires-python = ">=3.11"
+# Pure core only. The DB reader and GUI are optional adapters (see extras) so the headless
+# core tests stay dependency-light and CI does not need Qt.
+dependencies = []
+
+[project.optional-dependencies]
+gui = ["PySide6>=6.6"]
+db = ["PyMySQL>=1.1"]
+
+[project.scripts]
+invasion-authoring = "invasion_authoring.gui.app:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.6",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/invasion_authoring"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 120
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "W"]

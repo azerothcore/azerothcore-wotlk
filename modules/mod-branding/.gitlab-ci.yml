@@ -84,6 +84,29 @@ core-tests:
     expire_in: 1 week
 
 # ------------------------------------------------------------------------------------
+# Invasion authoring tool (Python/uv) -- ruff + pytest on the pure core.
+# Headless: the Qt GUI smoke test self-skips when PySide6 is absent, so no display/Qt
+# deps are needed here. Both jobs override the C++ default before_script.
+# ------------------------------------------------------------------------------------
+invasion-tool-lint:
+  stage: lint
+  image: python:3.12-slim
+  before_script:
+    - pip install --quiet uv
+  script:
+    - cd "$MODULE_DIR/tools/invasion-authoring"
+    - uv run ruff check
+
+invasion-tool-tests:
+  stage: test
+  image: python:3.12-slim
+  before_script:
+    - pip install --quiet uv
+  script:
+    - cd "$MODULE_DIR/tools/invasion-authoring"
+    - uv run pytest
+
+# ------------------------------------------------------------------------------------
 # HEAVY: full worldserver link with the module (catches link-stage regressions).
 # Manual-only (and/or nightly via a schedule) -- it pulls the AzerothCore build deps and
 # compiles a large C++ codebase, so it must NOT gate every push.
