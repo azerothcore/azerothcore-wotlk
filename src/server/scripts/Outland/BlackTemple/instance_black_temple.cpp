@@ -26,23 +26,16 @@
 
 DoorData const doorData[] =
 {
-    { GO_NAJENTUS_GATE,         DATA_HIGH_WARLORD_NAJENTUS, DOOR_TYPE_PASSAGE  },
-    { GO_NAJENTUS_GATE,         DATA_SUPREMUS,              DOOR_TYPE_ROOM     },
-    { GO_SUPREMUS_GATE,         DATA_SUPREMUS,              DOOR_TYPE_PASSAGE  },
-    { GO_SHADE_OF_AKAMA_DOOR,   DATA_SHADE_OF_AKAMA,        DOOR_TYPE_ROOM     },
-    { GO_TERON_DOOR_1,          DATA_TERON_GOREFIEND,       DOOR_TYPE_ROOM     },
-    { GO_TERON_DOOR_2,          DATA_TERON_GOREFIEND,       DOOR_TYPE_ROOM     },
-    { GO_GURTOGG_DOOR,          DATA_GURTOGG_BLOODBOIL,     DOOR_TYPE_PASSAGE  },
-    { GO_TEMPLE_DOOR,           DATA_GURTOGG_BLOODBOIL,     DOOR_TYPE_PASSAGE  },
-    { GO_TEMPLE_DOOR,           DATA_TERON_GOREFIEND,       DOOR_TYPE_PASSAGE  },
-    { GO_TEMPLE_DOOR,           DATA_RELIQUARY_OF_SOULS,    DOOR_TYPE_PASSAGE  },
-    { GO_MOTHER_SHAHRAZ_DOOR,   DATA_MOTHER_SHAHRAZ,        DOOR_TYPE_PASSAGE  },
-    { GO_COUNCIL_DOOR_1,        DATA_ILLIDARI_COUNCIL,      DOOR_TYPE_ROOM     },
-    { GO_COUNCIL_DOOR_2,        DATA_ILLIDARI_COUNCIL,      DOOR_TYPE_ROOM     },
-    { GO_ILLIDAN_GATE,          DATA_AKAMA_ILLIDAN,         DOOR_TYPE_PASSAGE  },
-    { GO_ILLIDAN_DOOR_L,        DATA_ILLIDAN_STORMRAGE,     DOOR_TYPE_ROOM     },
-    { GO_ILLIDAN_DOOR_R,        DATA_ILLIDAN_STORMRAGE,     DOOR_TYPE_ROOM     },
-    { 0,                        0,                          DOOR_TYPE_ROOM     }
+    // PASSAGE entries removed: passage doors are always open — boss order is not enforced in BT (blizzlike)
+    // ROOM entries ostaju - boss lockout zone-e zatvaraju se tokom borbe
+    { GO_SHADE_OF_AKAMA_DOOR,   DATA_SHADE_OF_AKAMA,       DOOR_TYPE_ROOM     },
+    { GO_TERON_DOOR_1,          DATA_TERON_GOREFIEND,      DOOR_TYPE_ROOM     },
+    { GO_TERON_DOOR_2,          DATA_TERON_GOREFIEND,      DOOR_TYPE_ROOM     },
+    { GO_COUNCIL_DOOR_1,        DATA_ILLIDARI_COUNCIL,     DOOR_TYPE_ROOM     },
+    { GO_COUNCIL_DOOR_2,        DATA_ILLIDARI_COUNCIL,     DOOR_TYPE_ROOM     },
+    { GO_ILLIDAN_DOOR_L,        DATA_ILLIDAN_STORMRAGE,    DOOR_TYPE_ROOM     },
+    { GO_ILLIDAN_DOOR_R,        DATA_ILLIDAN_STORMRAGE,    DOOR_TYPE_ROOM     },
+    { 0,                        0,                         DOOR_TYPE_ROOM     }
 };
 
 ObjectData const creatureData[] =
@@ -140,14 +133,19 @@ public:
 
         void OnGameObjectCreate(GameObject* go) override
         {
-            // If created after Illidari Council is done, then skip Akama's event. Used for crashes/reset
-            if (go->GetEntry() == GO_ILLIDAN_GATE)
+            // Force-open all passage doors at instance creation — boss skipping is blizzlike in Black Temple
+            switch (go->GetEntry())
             {
-                if (GetBossState(DATA_ILLIDARI_COUNCIL) == DONE)
-                {
-                    SetBossState(DATA_AKAMA_ILLIDAN, DONE);
+                case GO_NAJENTUS_GATE:
+                case GO_SUPREMUS_GATE:
+                case GO_GURTOGG_DOOR:
+                case GO_TEMPLE_DOOR:
+                case GO_MOTHER_SHAHRAZ_DOOR:
+                case GO_ILLIDAN_GATE:
                     HandleGameObject(ObjectGuid::Empty, true, go);
-                }
+                    break;
+                default:
+                    break;
             }
 
             InstanceScript::OnGameObjectCreate(go);

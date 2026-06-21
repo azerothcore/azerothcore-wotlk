@@ -799,7 +799,26 @@ struct npc_akama_illidan : public ScriptedAI
         else
         {
             me->SetSheath(SHEATH_STATE_UNARMED);
-            me->GetMotionMaster()->MovePoint(POINT_FACE_ILLIDAN, FaceIllidan);
+            me->NearTeleportTo(FaceIllidan);
+            // NearTeleportTo does not trigger MovementInform, so we invoke the Illidan encounter directly
+            if (Creature* illidan = instance->GetCreature(DATA_ILLIDAN_STORMRAGE))
+            {
+                me->SetFacingToObject(illidan);
+                illidan->AI()->DoAction(ACTION_START_EVENT);
+                me->SetHomePosition(me->GetPosition());
+            }
+            me->m_Events.AddEventAtOffset([&] { Talk(SAY_AKAMA_FREE); }, 15400ms);
+            me->m_Events.AddEventAtOffset([&] { me->HandleEmoteCommand(EMOTE_ONESHOT_TALK); }, 19440ms);
+            me->m_Events.AddEventAtOffset([&] { me->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE); }, 23080ms);
+            me->m_Events.AddEventAtOffset([&] { Talk(SAY_AKAMA_TIME_HAS_COME); }, 33840ms);
+            me->m_Events.AddEventAtOffset([&] {
+                me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
+                me->SetSheath(SHEATH_STATE_MELEE);
+            }, 35210ms);
+            me->m_Events.AddEventAtOffset([&] {
+                me->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
+                me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY1H);
+            }, 37640ms);
         }
     }
 

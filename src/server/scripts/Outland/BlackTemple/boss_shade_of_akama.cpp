@@ -107,7 +107,7 @@ struct boss_shade_of_akama : public BossAI
         generators.clear();
 
         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-        me->SetWalk(true);
+        // SetWalk(true) removed: channeler auras reduce walk speed to 0, causing MoveSpline velocity failure
         me->SetReactState(REACT_DEFENSIVE);
         BossAI::Reset();
     }
