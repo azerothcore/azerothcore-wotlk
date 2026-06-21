@@ -6,9 +6,11 @@
 // Pure core. No AzerothCore includes are permitted anywhere under core/.
 namespace Branding
 {
-    // The set of brands. Extensible; order is stable (used as bitmask index in KnowledgeState).
+    // The set of brands. Extensible; order is stable (used as bitmask index in KnowledgeState's
+    // uint32_t mask -> up to 32 brands). Append new schools BEFORE COUNT to preserve persisted ids.
     enum class BrandId : uint8_t
     {
+        // Classic spell schools.
         Fire = 0,
         Frost,
         Nature,
@@ -16,6 +18,11 @@ namespace Branding
         Arcane,
         Holy,
         Physical,
+        // Exotic schools (§7.10) -- hybrid/conceptual brands; expressed via the same effect model.
+        Wind,
+        Lightning,
+        Blood,
+        Void,
         COUNT
     };
 
