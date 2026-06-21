@@ -5,6 +5,7 @@
 #include "EventScheduler.h"
 #include "ItemBrandingMgr.h"
 #include "LoadoutMgr.h"
+#include "MasteryLoadoutMgr.h"
 #include "MasteryMgr.h"
 #include "ProficiencyMgr.h"
 #include "branding/allegiance/Allegiance.h"
@@ -142,26 +143,37 @@ namespace Branding
         if (!_enabled || !player)
             return;
 
-        // §14 / issue #32: build the lattice SHAPE from the pure `LatticeCell` core (the §14.4
-        // authored table). The schools the UI exposes are the §14.4 subset; trees are Def/Off/Support.
+        // §14 / issue #32: build the lattice SHAPE from the pure `LatticeArchetype` core (the §14.4
+        // authored table) and fill it with LIVE progression (issue #27). The schools the UI exposes are
+        // the §14.4 subset; trees are Def/Off/Support.
         //
-        // The earned level / per-cell point allocation / active flag come from the §14 COMBAT-mastery
-        // adapter + persistence (§14.7/§14.11), which is DEFERRED -- it is sibling-owned and not yet
-        // built (the existing MasteryMgr is the §6 Gathering/Crafting dual-key, a different system).
-        // Until it lands we transport the lattice shape with zeroed progression so the client renders
-        // the full grid; once the §14 adapter exists, fill `level`/`alloc`/`active`/`pointsAvailable`
-        // /`respecCost` from it here (the wire schema already carries them, see Protocol.h MAST).
+        // Earned level comes from ProficiencyMgr (per-school proficiency, the §14.11 EARNED layer);
+        // archetype + per-cell point allocation + the active flag come from MasteryLoadoutMgr's
+        // ACTIVE set (the §14.11 per-spec ALLOCATED layer); pointsAvailable/respecCost from config.
+        // Each cell renders the selected archetype's def (so the kind/situational/sustained reflect the
+        // player's pick, not just the primary). The active set is a per-cell flag list, so a character
+        // running MULTIPLE masteries lights up multiple cells -- no single "active mastery" field.
         static constexpr BrandId Schools[] = {
             BrandId::Fire, BrandId::Nature, BrandId::Shadow, BrandId::Frost, BrandId::Physical };
         static constexpr MasteryTree Trees[] = {
             MasteryTree::Defensive, MasteryTree::Offensive, MasteryTree::Support };
 
+        ObjectGuid const guid = player->GetGUID();
+        MasteryConfig const& cfg = sMasteryLoadoutMgr->Config();
+        ActiveMasterySet const& activeSet = sMasteryLoadoutMgr->ActiveLoadout(guid);
+
         Addon::MasterySnapshot snap;
+        snap.pointsAvailable = cfg.PointsBudget();
+        snap.respecCost = static_cast<uint16_t>(std::min<uint32_t>(cfg.RespecCost(), 65535u));
+
         for (BrandId const school : Schools)
         {
             for (MasteryTree const tree : Trees)
             {
-                LatticeCellDef const def = LatticeCell(school, tree);
+                // The player's active entry for this cell, if any (selects the archetype + alloc).
+                ActiveMasteryEntry const* entry = activeSet.Find(school, tree);
+                uint8_t const archetype = entry ? entry->archetype : 0;
+                LatticeCellDef const def = LatticeArchetype(school, tree, archetype);
 
                 Addon::MasteryCellFrame cell;
                 cell.school = static_cast<uint8_t>(school);
@@ -170,7 +182,13 @@ namespace Branding
                 cell.situational = def.situational;
                 cell.sustained = def.sustained;
                 cell.axisMask = static_cast<uint8_t>(def.applicableAxes);
-                // Progression fields default to 0/false (deferred §14 adapter fills them).
+                cell.level = sProficiencyMgr->BrandLevel(guid, school);   // §14.11 earned layer
+                cell.archetype = archetype;
+                cell.active = entry != nullptr;                            // a per-cell flag (multi-mastery)
+                if (entry)
+                    for (uint8_t a = 0; a < Addon::AxisCount; ++a)
+                        cell.alloc[a] = entry->pointsPerAxis[a];
+
                 snap.cells.push_back(cell);
             }
         }

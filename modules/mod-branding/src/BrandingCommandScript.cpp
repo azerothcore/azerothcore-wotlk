@@ -4,6 +4,8 @@
 #include "EventMgr.h"
 #include "ItemBrandingMgr.h"
 #include "LoadoutMgr.h"
+#include "MasteryCombatMgr.h"
+#include "MasteryLoadoutMgr.h"
 #include "MasteryMgr.h"
 #include "ProficiencyMgr.h"
 #include "RewardDelivery.h"
@@ -49,6 +51,17 @@ namespace
             case BrandId::Holy:     return "Holy";
             case BrandId::Physical: return "Physical";
             default:                return "Unknown";
+        }
+    }
+
+    char const* TreeName(MasteryTree tree)
+    {
+        switch (tree)
+        {
+            case MasteryTree::Defensive: return "Def";
+            case MasteryTree::Offensive: return "Off";
+            case MasteryTree::Support:   return "Support";
+            default:                     return "?";
         }
     }
 
@@ -311,6 +324,25 @@ public:
             handler->PSendSysMessage("Mastery {}: account {}, char level {}, efficiency bonus +{:.1f}%",
                 MasteryName(system), unlocked ? "unlocked" : "locked", uint32(level),
                 sMasteryMgr->Bonus(guid, account, system) * 100.0);
+        }
+
+        // §14.12 (issue #27): the COMBAT-mastery application plan -- the active (school, tree) cells
+        // resolved to their bound magnitude (raid-wide via MaxRaidMul + catalyst DR, or personal via
+        // MaxPersonalMul), plus the aggregate outgoing multiplier the UnitScript applies right now.
+        MasteryPlan const plan = sMasteryCombatMgr->BuildPlan(player);
+        if (plan.count == 0)
+            handler->PSendSysMessage("Mastery combat: no active cell (or system disabled).");
+        else
+            handler->PSendSysMessage("Mastery combat: {} active cell(s), aggregate outgoing x{:.2f}.",
+                uint32(plan.count), sMasteryCombatMgr->OutgoingMultiplierFor(player));
+        for (uint8 i = 0; i < plan.count; ++i)
+        {
+            ResolvedMasteryEffect const& e = plan.effects[i];
+            handler->PSendSysMessage(
+                "  {} {} (arch {}): {}, x{:.2f}, rank {}, ppm {:.1f}, window {} ms, uptime {:.0f}%",
+                BrandName(e.school), TreeName(e.tree), uint32(e.archetype),
+                e.raidWide ? "raid" : "personal", e.magnitude, uint32(e.catalystRank),
+                e.resolved.ppm, e.resolved.windowDurationMs, e.uptimeFraction * 100.0);
         }
         return true;
     }

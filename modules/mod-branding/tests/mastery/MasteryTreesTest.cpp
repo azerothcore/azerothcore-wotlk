@@ -448,6 +448,14 @@ TEST(MasteryTrees, SupportSecondaryArchetypesAuthored)
         EXPECT_FALSE(util.situational);                                          // raid utility
         EXPECT_TRUE(util.sustained);
     }
+
+    // Holy Support secondary = circle of healing: a sustained, non-situational raid-heal (RaidWindow),
+    // not a generic blessing/personal-spike. Holy has no resistance gear, so its raid-utility mirrors
+    // Fire/Nature/Arcane (a constant raid-wide aura), not a tank-flavoured personal spike.
+    LatticeCellDef circleOfHealing = LatticeArchetype(BrandId::Holy, MasteryTree::Support, 1);
+    EXPECT_EQ(circleOfHealing.kind, EffectKind::RaidWindow);
+    EXPECT_FALSE(circleOfHealing.situational);
+    EXPECT_TRUE(circleOfHealing.sustained);
 }
 
 // Arcane/Holy complete the 7 standard WoW schools: Off = bounded raid damage (area, +reach).

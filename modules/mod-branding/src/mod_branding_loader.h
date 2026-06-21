@@ -11,6 +11,7 @@ void AddBrandingLoadoutScripts();
 void AddBrandingVaultScripts();
 void AddBrandingMasteryScripts();
 void AddBrandingMasteryLoadoutScripts();
+void AddBrandingMasteryCombatScripts();
 void AddBrandingAllegianceScripts();
 void AddBrandingEconomyScripts();
 void AddBrandingDiscoverableScripts();

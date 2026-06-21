@@ -224,8 +224,8 @@ namespace Branding
                 {
                     case MasteryTree::Defensive: return One(Win(EK::PersonalSpike, BASE));        // holy shield (absorb)
                     case MasteryTree::Offensive: return One(Win(EK::RaidWindow, BASE_REACH));      // holy nova (area)
-                    // holy-exposure vs Undead (SE) · blessing (sustained mitigation, raid utility)
-                    case MasteryTree::Support:   return Two(Sup(EK::RaidWindow), SupUtil(EK::PersonalSpike));
+                    // holy-exposure vs Undead (SE) · circle of healing (raid-heal)
+                    case MasteryTree::Support:   return Two(Sup(EK::RaidWindow), SupUtil(EK::RaidWindow));
                     default: break;
                 }
                 break;
