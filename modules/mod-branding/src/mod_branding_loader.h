@@ -10,6 +10,7 @@ void AddBrandingEventSchedulerScripts();
 void AddBrandingLoadoutScripts();
 void AddBrandingVaultScripts();
 void AddBrandingMasteryScripts();
+void AddBrandingMasteryLoadoutScripts();
 void AddBrandingAllegianceScripts();
 void AddBrandingEconomyScripts();
 void AddBrandingDiscoverableScripts();

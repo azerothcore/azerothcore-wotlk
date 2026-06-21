@@ -2,16 +2,18 @@
 #define MOD_BRANDING_SRC_MASTERYCONFIG_H
 
 #include "branding/mastery/Mastery.h"
+#include "branding/mastery/MasteryActive.h"
 #include "branding/mastery/MasteryTrees.h"
 #include <cstdint>
 
 namespace Branding
 {
     // Production config for §14 mastery: snapshots the tunables from sConfigMgr at load time. Backs
-    // BOTH IMasteryConfig (the gathering/craft efficiency bonus) and IMasteryTreeConfig (the combat
-    // trees: upkeep asymptote, enemy ceiling, and the §14.10 ppm/duration/magnitude tuning budget).
-    // The pure core reads no globals; this adapter is the only place sConfigMgr is touched here.
-    class MasteryConfig : public IMasteryConfig, public IMasteryTreeConfig
+    // IMasteryConfig (the gathering/craft efficiency bonus), IMasteryTreeConfig (the combat trees:
+    // upkeep asymptote, enemy ceiling, the §14.10 ppm/duration/magnitude tuning budget), and
+    // IMasteryLoadoutConfig (§14.10/§14.11 point-buy budget, respec token, active-cell cap). The
+    // pure core reads no globals; this adapter is the only place sConfigMgr is touched here.
+    class MasteryConfig : public IMasteryConfig, public IMasteryTreeConfig, public IMasteryLoadoutConfig
     {
     public:
         void Load();
@@ -40,6 +42,12 @@ namespace Branding
             return static_cast<uint8_t>(1 + proficiencyLevel / step);
         }
 
+        // IMasteryLoadoutConfig (§14.10 point-buy + §14.11 per-spec loadout).
+        uint8_t  PointsBudget() const override { return _pointsBudget; }
+        uint32_t RespecCost() const override { return _respecCost; }
+        uint8_t  MaxActive() const override { return _maxActive; }
+        uint8_t  MaxArchetypesPerCell() const override { return _maxArchetypes; }
+
     private:
         bool _enabled = false;
         uint8_t _maxLevel = 50;
@@ -58,6 +66,12 @@ namespace Branding
         double _minReach = 0.0;
         double _maxReach = 40.0;
         uint32_t _archetypeUnlockStep = 20;  // §14.4.1: levels per additional unlocked proc archetype
+
+        // §14.10/§14.11 loadout tunables.
+        uint8_t _pointsBudget = 10;
+        uint32_t _respecCost = 500;
+        uint8_t _maxActive = 1;
+        uint8_t _maxArchetypes = 3;
     };
 }
 
