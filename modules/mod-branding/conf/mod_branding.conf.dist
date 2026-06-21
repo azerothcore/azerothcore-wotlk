@@ -346,6 +346,16 @@ Branding.Economy.MaterialItemId = 2589
 Branding.Economy.FragmentItemId = 2592
 
 #
+#    Branding.Item.Enable
+#        Description: Item branding (§7.9): brand + upgrade the equipped weapon to raise its proc/
+#                     behavior intensity (never flat stats). Inert without the account's Knowledge.
+#                     (Item-brand tunables Branding.Item.* are defined above.)
+#        Default:     0 - (disabled)
+#
+
+Branding.Item.Enable = 0
+
+#
 #    Branding.Effect.Enable
 #        Description: Branding combat effects (§7.9). A branded player's OUTGOING damage is boosted
 #                     by the personal multiplier during its active window (no passive uptime).

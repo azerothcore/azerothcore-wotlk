@@ -12,6 +12,7 @@ void AddBrandingMasteryScripts();
 void AddBrandingAllegianceScripts();
 void AddBrandingEconomyScripts();
 void AddBrandingDiscoverableScripts();
+void AddBrandingItemScripts();
 void AddBrandingEffectScripts();
 void AddBrandingCatalystScripts();
 void AddBrandingCommandScripts();
