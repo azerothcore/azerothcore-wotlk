@@ -22,8 +22,14 @@ namespace
         double   maxProcMagnitude = 2.0;
         double   minReach = 0.0;
         double   maxReach = 40.0;
+        // §14.4.1: archetypes unlocked at a proficiency level. 1 at level 0, +1 every 20 levels.
+        uint8_t archetypeUnlockLevel = 20;
 
         uint8_t MaxMasteryLevel() const override { return maxLevel; }
+        uint8_t MaxArchetypesAtLevel(uint8_t profLevel) const override
+        {
+            return static_cast<uint8_t>(1 + profLevel / archetypeUnlockLevel);
+        }
         double  MaxUptime() const override { return maxUptime; }
         double  UpkeepHalfLevel() const override { return halfLevel; }
         double  OffSchoolFactor() const override { return offSchool; }
@@ -378,6 +384,115 @@ TEST(MasteryTrees, EnemyMasteryGroupInvariantFractionNotFlat)
     // same multiplier both sides -> the small group never gets a disproportionate flat spike
     EXPECT_NEAR(final5 / scaled5man, final40 / scaled40man, 1e-9);
     EXPECT_LT(final5, scaled40man);               // a 5-man elite stays below a 40-man baseline
+}
+
+// --- §14.4.1 multi-archetype cells (issue #29) ---
+
+// LatticeCell still returns archetype 0 (the primary) for every authored cell -- nothing else breaks.
+TEST(MasteryTrees, ArchetypeZeroEqualsPrimaryCell)
+{
+    for (BrandId s : AUTHORED_SCHOOLS)
+    {
+        for (MasteryTree t : TREES)
+        {
+            LatticeCellDef primary = LatticeCell(s, t);
+            LatticeCellDef arch0 = LatticeArchetype(s, t, 0);
+            EXPECT_EQ(arch0.kind, primary.kind);
+            EXPECT_EQ(arch0.situational, primary.situational);
+            EXPECT_EQ(arch0.sustained, primary.sustained);
+            EXPECT_EQ(arch0.applicableAxes, primary.applicableAxes);
+            EXPECT_GE(LatticeArchetypeCount(s, t), 1);  // always at least the primary
+        }
+    }
+}
+
+// §14.4.1: the Support column carries the multi-archetype (`·`) entries.
+// Fire/Nature Support gain a non-situational sustained raid-utility aura as archetype 1;
+// Shadow/Frost gain an SM resistance; Physical stays single-archetype.
+TEST(MasteryTrees, SupportSecondaryArchetypesAuthored)
+{
+    // Fire Support: primary = fire resistance (SM, situational); secondary = flame aura (raid utility).
+    EXPECT_EQ(LatticeArchetypeCount(BrandId::Fire, MasteryTree::Support), 2);
+    EXPECT_TRUE(LatticeArchetype(BrandId::Fire, MasteryTree::Support, 0).situational);
+    LatticeCellDef flameAura = LatticeArchetype(BrandId::Fire, MasteryTree::Support, 1);
+    EXPECT_FALSE(flameAura.situational);                 // raid utility, not school-matched
+    EXPECT_TRUE(flameAura.sustained);                    // a constant aura
+    EXPECT_EQ(flameAura.kind, EffectKind::RaidWindow);
+
+    // Nature Support: secondary = raid-heal (transform, non-situational).
+    EXPECT_EQ(LatticeArchetypeCount(BrandId::Nature, MasteryTree::Support), 2);
+    LatticeCellDef raidHeal = LatticeArchetype(BrandId::Nature, MasteryTree::Support, 1);
+    EXPECT_FALSE(raidHeal.situational);
+    EXPECT_TRUE(raidHeal.sustained);
+    EXPECT_EQ(raidHeal.kind, EffectKind::MechanicTransform);
+
+    // Shadow/Frost Support: secondary = SM resistance (situational, sustained).
+    for (BrandId s : { BrandId::Shadow, BrandId::Frost })
+    {
+        EXPECT_EQ(LatticeArchetypeCount(s, MasteryTree::Support), 2);
+        EXPECT_TRUE(LatticeArchetype(s, MasteryTree::Support, 1).situational);
+        EXPECT_TRUE(LatticeArchetype(s, MasteryTree::Support, 1).sustained);
+    }
+
+    // Physical Support: single archetype only (the table lists one mitigation).
+    EXPECT_EQ(LatticeArchetypeCount(BrandId::Physical, MasteryTree::Support), 1);
+}
+
+// §14.4.1: every archetype is a valid Support-shaped def -- sustained, magnitude+reach axes only.
+TEST(MasteryTrees, SupportArchetypesKeepSupportAxisSet)
+{
+    uint32_t const expected = AxisBit(ProcAxis::Magnitude) | AxisBit(ProcAxis::Reach);
+    for (BrandId s : AUTHORED_SCHOOLS)
+    {
+        uint8_t const count = LatticeArchetypeCount(s, MasteryTree::Support);
+        for (uint8_t i = 0; i < count; ++i)
+        {
+            LatticeCellDef def = LatticeArchetype(s, MasteryTree::Support, i);
+            EXPECT_TRUE(def.sustained);
+            EXPECT_EQ(def.applicableAxes, expected);
+        }
+    }
+}
+
+// Out-of-range archetype index clamps to the primary (no UB / crash on a bad selection).
+TEST(MasteryTrees, ArchetypeIndexOutOfRangeFallsBackToPrimary)
+{
+    LatticeCellDef primary = LatticeCell(BrandId::Physical, MasteryTree::Support);
+    LatticeCellDef oob = LatticeArchetype(BrandId::Physical, MasteryTree::Support, 99);
+    EXPECT_EQ(oob.kind, primary.kind);
+    EXPECT_EQ(oob.applicableAxes, primary.applicableAxes);
+}
+
+// §14.4.1 validation: index must be < count AND unlocked at the proficiency level. Index 0 always
+// legal; higher indices gate behind MaxArchetypesAtLevel; an index >= count is never legal.
+TEST(MasteryTrees, ArchetypeUnlockGatedByCountAndLevel)
+{
+    FakeMasteryTreeConfig cfg;  // MaxArchetypesAtLevel: 1 at lvl 0, 2 at lvl 20, 3 at lvl 40
+
+    // Primary is always unlocked, even at level 0.
+    EXPECT_TRUE(IsLatticeArchetypeUnlocked(BrandId::Fire, MasteryTree::Support, 0, 0, cfg));
+
+    // Fire Support has 2 archetypes; index 1 needs the level gate (>= 20 here).
+    EXPECT_FALSE(IsLatticeArchetypeUnlocked(BrandId::Fire, MasteryTree::Support, 1, 0, cfg));
+    EXPECT_FALSE(IsLatticeArchetypeUnlocked(BrandId::Fire, MasteryTree::Support, 1, 19, cfg));
+    EXPECT_TRUE(IsLatticeArchetypeUnlocked(BrandId::Fire, MasteryTree::Support, 1, 20, cfg));
+
+    // Index beyond the cell's authored count is never legal, regardless of level.
+    EXPECT_FALSE(IsLatticeArchetypeUnlocked(BrandId::Fire, MasteryTree::Support, 2, cfg.maxLevel, cfg));
+    // Physical Support is single-archetype: only index 0 is ever legal.
+    EXPECT_TRUE(IsLatticeArchetypeUnlocked(BrandId::Physical, MasteryTree::Support, 0, cfg.maxLevel, cfg));
+    EXPECT_FALSE(IsLatticeArchetypeUnlocked(BrandId::Physical, MasteryTree::Support, 1, cfg.maxLevel, cfg));
+}
+
+// Forward-compat (multi-mastery): archetype lookups for two distinct cells are independent -- no
+// shared "current archetype" state. Resolving one does not perturb the other.
+TEST(MasteryTrees, ArchetypeLookupKeyedPurelyByCell)
+{
+    LatticeCellDef fireSup1 = LatticeArchetype(BrandId::Fire, MasteryTree::Support, 1);
+    LatticeCellDef natureSup1 = LatticeArchetype(BrandId::Nature, MasteryTree::Support, 1);
+    // Re-reading Fire after Nature yields the same def -> no cross-cell coupling / global state.
+    EXPECT_EQ(LatticeArchetype(BrandId::Fire, MasteryTree::Support, 1).kind, fireSup1.kind);
+    EXPECT_NE(fireSup1.kind, natureSup1.kind);  // distinct cells resolve distinctly
 }
 
 // §14.1/§7.9 composition: a raid-wide tree cell's magnitude still obeys the MaxRaidMul cap +

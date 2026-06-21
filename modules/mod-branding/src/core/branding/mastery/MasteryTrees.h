@@ -2,6 +2,7 @@
 #define MOD_BRANDING_CORE_MASTERY_MASTERYTREES_H
 
 #include "branding/effects/EffectModel.h"
+#include <array>
 #include <cstdint>
 
 namespace Branding
@@ -58,6 +59,12 @@ namespace Branding
         // target-count -- a tooltip/adapter interpretation; core treats it as one envelope.
         virtual double   MinReach() const = 0;
         virtual double   MaxReach() const = 0;
+
+        // §14.4.1: how many of a cell's authored proc archetypes are unlocked at a given proficiency
+        // level (1-based; >= 1 at level 0 so the primary is always available, growing with level).
+        // Mirrors the §7.9 loadout gate IItemBrandConfig::ArchetypesAtLevel -- secondary archetypes
+        // gate behind proficiency. The bound is config, retunable without a recompile.
+        virtual uint8_t MaxArchetypesAtLevel(uint8_t proficiencyLevel) const = 0;
     };
 
     // §14.2/§14.7: expected uptime fraction a character can SUSTAIN for a cell's proc-window, given
@@ -110,12 +117,12 @@ namespace Branding
     ResolvedCell ResolveTreeCell(TreeAllocation const& alloc, uint32_t applicableAxes,
         uint8_t masteryLevel, IMasteryTreeConfig const& cfg);
 
-    // §14.4: structural definition of one (school, tree) lattice cell -- its primary proc archetype.
-    // This is the DESIGN ruleset (the §14.4 table): the §7.9 expression family, whether the cell is
-    // school-matched/situational, and which §14.10 axes it exposes. Concrete spell ids and per-cell
-    // envelopes are data/config layered on top; this fixes the shape. Multi-archetype cells (e.g. a
-    // Support cell's resistance + utility proc) are represented by their PRIMARY archetype for now;
-    // secondary archetypes are a §7.9 loadout expansion (selectedProcArchetype).
+    // §14.4: structural definition of ONE proc archetype of a (school, tree) lattice cell. This is
+    // the DESIGN ruleset (the §14.4 table): the §7.9 expression family, whether the archetype is
+    // school-matched/situational, sustained-vs-windowed, and which §14.10 axes it exposes. Concrete
+    // spell ids and per-cell envelopes are data/config layered on top; this fixes the shape.
+    // §14.4.1: a cell carries 1..N of these (the `·` entries in the §14.4 table); the player's §7.9
+    // selectedProcArchetype indexes them. Archetype 0 is always the cell's PRIMARY.
     struct LatticeCellDef
     {
         EffectKind kind = EffectKind::RaidWindow;
@@ -127,8 +134,40 @@ namespace Branding
         uint32_t   applicableAxes = 0;      // §14.10 tunable axes for this cell (OR of AxisBit(...))
     };
 
-    // Look up a cell's definition (§14.4). Schools without authored trees (Arcane/Holy) return a
-    // neutral default (RaidWindow, non-situational, ppm/duration/magnitude axes).
+    // §14.4.1: max proc archetypes any single cell can carry. A fixed cap keeps the pure core free of
+    // <vector>; the §14.4 Support multi-entries fit in 2, with headroom for later authoring.
+    constexpr uint8_t kMaxLatticeArchetypes = 4;
+
+    // §14.4.1: a cell's authored proc archetypes -- a fixed-cap array + count (NO <vector> in core).
+    // archetype[0] is the primary; archetype[1..count-1] are the §14.4 `·` secondaries.
+    struct LatticeCellArchetypes
+    {
+        std::array<LatticeCellDef, kMaxLatticeArchetypes> archetype{};
+        uint8_t count = 1;
+    };
+
+    // §14.4.1: the full set of proc archetypes for a (school, tree) cell. Keyed PURELY by (school,
+    // tree) -- no global "active cell" state, so this composes with later multi-mastery (a character
+    // running several active cells at once). Unauthored schools return the neutral default (count 1).
+    LatticeCellArchetypes LatticeArchetypes(BrandId school, MasteryTree tree);
+
+    // §14.4.1: number of authored archetypes for a cell (always >= 1; the primary).
+    uint8_t LatticeArchetypeCount(BrandId school, MasteryTree tree);
+
+    // §14.4.1: one archetype of a cell. archetypeIndex 0 is the primary; an out-of-range index clamps
+    // to the primary (a bad selection never UB's -- callers validate via IsLatticeArchetypeUnlocked).
+    LatticeCellDef LatticeArchetype(BrandId school, MasteryTree tree, uint8_t archetypeIndex);
+
+    // §14.4.1 validation: is `archetypeIndex` a legal pick for a character at `proficiencyLevel`?
+    // True iff the index is within the cell's authored count AND within the level-gated unlock count
+    // (cfg.MaxArchetypesAtLevel). Index 0 (the primary) is always legal once the cell exists. Mirrors
+    // the §7.9 loadout gate (IsLoadoutValid / ArchetypesAtLevel) on the mastery side.
+    bool IsLatticeArchetypeUnlocked(BrandId school, MasteryTree tree, uint8_t archetypeIndex,
+        uint8_t proficiencyLevel, IMasteryTreeConfig const& cfg);
+
+    // Look up a cell's PRIMARY archetype (§14.4) -- identical to LatticeArchetype(school, tree, 0).
+    // Schools without authored trees (Arcane/Holy) return a neutral default (RaidWindow,
+    // non-situational, ppm/duration/magnitude axes). Kept stable so existing consumers are undisturbed.
     LatticeCellDef LatticeCell(BrandId school, MasteryTree tree);
 
     // §14.8: enemy (elite/boss) mastery magnitude. Rides on top of the §2.2-scaled encounter

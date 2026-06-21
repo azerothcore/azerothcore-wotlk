@@ -33,6 +33,12 @@ namespace Branding
         double   MaxProcMagnitude() const override { return _maxProcMagnitude; }
         double   MinReach() const override { return _minReach; }
         double   MaxReach() const override { return _maxReach; }
+        // §14.4.1: 1 archetype at level 0, +1 every _archetypeUnlockStep levels (>= 1 step).
+        uint8_t  MaxArchetypesAtLevel(uint8_t proficiencyLevel) const override
+        {
+            uint32_t const step = _archetypeUnlockStep > 0 ? _archetypeUnlockStep : 1;
+            return static_cast<uint8_t>(1 + proficiencyLevel / step);
+        }
 
     private:
         bool _enabled = false;
@@ -51,6 +57,7 @@ namespace Branding
         double _maxProcMagnitude = 2.0;
         double _minReach = 0.0;
         double _maxReach = 40.0;
+        uint32_t _archetypeUnlockStep = 20;  // §14.4.1: levels per additional unlocked proc archetype
     };
 }
 

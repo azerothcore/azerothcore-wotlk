@@ -378,6 +378,17 @@ Branding.Mastery.Tree.MaxProcMagnitude = 2.0
 Branding.Mastery.Tree.MinReach = 0.0
 Branding.Mastery.Tree.MaxReach = 40.0
 
+#
+#    Branding.Mastery.Tree.ArchetypeUnlockStep
+#        Description: §14.4.1 proficiency levels per ADDITIONAL unlocked proc archetype for a
+#                     (school, tree) cell. 1 archetype (the primary) at level 0; +1 every step.
+#                     Gates the secondary Support archetypes (Fire/Nature raid utility, Shadow/Frost
+#                     resistance) behind proficiency. Mirrors Branding.Loadout.ArchetypeLevelStep.
+#        Default:     20
+#
+
+Branding.Mastery.Tree.ArchetypeUnlockStep = 20
+
 
 #
 #    Branding.Allegiance.Enable

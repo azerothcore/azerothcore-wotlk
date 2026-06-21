@@ -994,6 +994,63 @@ matching invasion school — replaces flat counter-school "+dmg %").
 - **`SM` resistances + physical mitigation**: one coherent axis — a capped, DR'd, **school-matched**
   defensive window. Full value vs matching-school invasion content, reduced/inert otherwise.
 
+#### 14.4.1 Multi-archetype Support cells (issue #29)
+
+Several cells in the table above carry **two** archetypes (the `·`-separated entries) — most visibly
+the Support column. A character's §7.9 `selectedProcArchetype` is the player's pick among them. Core
+models this as **1..N archetypes per (school, tree) cell** (fixed cap, `std::array` + count — no
+`<vector>` in the pure core). Each archetype is a full `LatticeCellDef` (`kind` / `situational` /
+`sustained` / `applicableAxes`), so two archetypes of one cell can differ in expression family and
+even in sustained-vs-windowed shape.
+
+Pure API (keyed purely by `(school, tree, archetypeIndex)` — see the multi-mastery note below):
+
+```cpp
+uint8_t        LatticeArchetypeCount(BrandId school, MasteryTree tree);                 // 1..N
+LatticeCellDef LatticeArchetype(BrandId school, MasteryTree tree, uint8_t archetypeIndex);
+LatticeCellDef LatticeCell(BrandId school, MasteryTree tree);   // == archetype 0 (the PRIMARY)
+// Legal iff index < count AND unlocked at the character's proficiency level.
+bool IsLatticeArchetypeUnlocked(BrandId school, MasteryTree tree, uint8_t archetypeIndex,
+                                uint8_t proficiencyLevel, IMasteryTreeConfig const& cfg);
+```
+
+**Archetype 0 is always the primary** — `LatticeCell(school, tree)` keeps returning it unchanged, so
+every existing consumer is undisturbed. Index 0 is always unlocked (it is the base cell); higher
+indices gate behind proficiency via the **same config pattern** as the §7.9 loadout
+(`IItemBrandConfig::ArchetypesAtLevel`): `IMasteryTreeConfig::MaxArchetypesAtLevel(level)` returns how
+many archetypes are unlocked at a given proficiency level (1-based count; `level 0 → 1`, growing with
+level), and `IsLatticeArchetypeUnlocked` requires `archetypeIndex < min(count, MaxArchetypesAtLevel)`.
+The unlock bound is therefore a **config value**, retunable without a recompile.
+
+**Authored secondary archetypes (the `·` entries in §14.4).** Per the table, with one design choice
+recorded per school:
+
+| School | Support archetype 0 (primary) | Support archetype 1 (secondary) |
+|---|---|---|
+| **Fire** | fire resistance `SM` (sustained, school-matched) | **flame aura `PW`** — sustained raid utility (`RaidWindow`, non-situational: a constant party-wide buff aura) |
+| **Nature** | nature resistance `SM` (sustained, school-matched) | **raid-heal `PW`** — sustained raid utility (`MechanicTransform`, non-situational: a constant raid HoT/transform) |
+| **Shadow** | shadow-exposure vs Nature `SE` (sustained, school-matched) | **shadow resistance `SM`** — sustained school-matched mitigation |
+| **Frost** | frost-exposure vs Fire `SE` (sustained, school-matched) | **frost resistance `SM`** — sustained school-matched mitigation |
+| **Physical** | physical mitigation `SM` (sustained, school-matched) | *(none — single archetype; the §14.4 table lists only one)* |
+
+Design choices recorded: (a) the Fire/Nature secondary archetypes are the **raid-utility** entries
+called out in the issue (flame aura / raid-heal) — both are non-situational sustained auras, so they
+keep the Support magnitude+reach axis set but drop the school-matched gating that the resistance
+archetype carries. (b) Shadow/Frost expose the two `·` entries from the table directly — the
+windowed-exposure `SE` is primary (the build-defining pick), the `SM` resistance is the safer
+secondary. (c) Physical's table cell lists only `physical mitigation`, so it stays single-archetype
+(`count == 1`); `LatticeArchetype(Physical, Support, 0)` is the only legal index. Def/Off cells are
+single-archetype today (the `·` multi-entries live in the Support column); the API supports growing
+them later with no signature change.
+
+**Multi-mastery forward-compat.** A character will later run **multiple** active `(school, tree)`
+cells at once, not just one. The archetype API is therefore keyed purely by
+`(school, tree, archetypeIndex)` with **no global "the active cell" / "current archetype" state** — no
+singletons, no statics. Resolving archetype N of Fire-Support is independent of, and composes with,
+resolving archetype M of Nature-Defensive. The per-character *selection* of which archetype is active
+for which running cell is adapter/persistence state (deferred, like the §14.11 per-spec loadout); the
+pure core only enumerates, resolves, and validates by key.
+
 ### 14.5 Respec
 
 Tree respec consumes an **expensive token** = the §7.9 loadout-change friction (no free instant
@@ -1163,9 +1220,12 @@ Resulting behaviour:
 > (Support = sustained aura; Def/Off = windowed), and §14.10 applicable-axis mask (windowed cells get
 > ppm/duration/magnitude +Reach for area/cleave; Support cells get **magnitude + reach only**). Off
 > cells are `RaidWindow`, Support cells are situational + sustained, unauthored schools (Arcane/Holy)
-> return a neutral default. Multi-archetype cells are
-> represented by their primary archetype; secondary archetypes + concrete spell ids / per-cell
-> envelopes are the next (data/config) expansion. 6 tests.
+> return a neutral default. **Multi-archetype cells (§14.4.1, issue #29)** are now enumerable:
+> `LatticeArchetypeCount(school, tree)` (1..N) and `LatticeArchetype(school, tree, index)` expose the
+> `·` secondary archetypes (Fire/Nature Support += raid-utility aura; Shadow/Frost Support += `SM`
+> resistance), `LatticeCell` is the archetype-0 primary, and `IsLatticeArchetypeUnlocked` gates higher
+> indices behind `IMasteryTreeConfig::MaxArchetypesAtLevel`. Concrete spell ids / per-cell envelopes
+> remain the next (data/config) expansion. 6 + 6 tests.
 
 > **Implemented (pure core).** `core/mastery/MasteryTrees.{h,cpp}` — `MasteryUpkeep` (dual-key gate
 > + saturating-hyperbola upkeep with the §14.3 #1 sub-1.0 asymptote + SM/SE context gating) and

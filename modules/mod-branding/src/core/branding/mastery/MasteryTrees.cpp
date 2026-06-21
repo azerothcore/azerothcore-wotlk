@@ -119,23 +119,48 @@ namespace Branding
         {
             return LatticeCellDef{ kind, /*situational*/ true, /*sustained*/ true, SUSTAINED };
         }
+        // §14.4.1: a sustained Support utility aura -- non-situational (raid-wide, not school-matched),
+        // same magnitude+reach axis set (flame aura, raid-heal).
+        constexpr LatticeCellDef SupUtil(EffectKind kind)
+        {
+            return LatticeCellDef{ kind, /*situational*/ false, /*sustained*/ true, SUSTAINED };
+        }
+
+        // §14.4.1: build a 1-archetype cell (the common Def/Off case + single-archetype Support).
+        constexpr LatticeCellArchetypes One(LatticeCellDef primary)
+        {
+            LatticeCellArchetypes out{};
+            out.archetype[0] = primary;
+            out.count = 1;
+            return out;
+        }
+        // §14.4.1: build a 2-archetype cell (primary + the §14.4 `·` secondary).
+        constexpr LatticeCellArchetypes Two(LatticeCellDef primary, LatticeCellDef secondary)
+        {
+            LatticeCellArchetypes out{};
+            out.archetype[0] = primary;
+            out.archetype[1] = secondary;
+            out.count = 2;
+            return out;
+        }
     }
 
-    LatticeCellDef LatticeCell(BrandId school, MasteryTree tree)
+    LatticeCellArchetypes LatticeArchetypes(BrandId school, MasteryTree tree)
     {
         using EK = EffectKind;
 
         // §14.4 lattice. Off cells = RaidWindow (bounded raid damage); Def = personal survivability
-        // or a healing transform; Support = a school-matched (situational) resistance/exposure. Reach
-        // marks the area/cleave procs (radius OR target count).
+        // or a healing transform; Support = school-matched (situational) resistance/exposure, PLUS the
+        // §14.4.1 `·` secondary archetype where the table lists one. Reach marks the area/cleave procs.
         switch (school)
         {
             case BrandId::Fire:
                 switch (tree)
                 {
-                    case MasteryTree::Defensive: return Win(EK::RaidWindow, BASE_REACH);  // fire AoE proc
-                    case MasteryTree::Offensive: return Win(EK::RaidWindow, BASE);         // fire damage proc
-                    case MasteryTree::Support:   return Sup(EK::PersonalSpike);            // fire resistance
+                    case MasteryTree::Defensive: return One(Win(EK::RaidWindow, BASE_REACH));   // fire AoE proc
+                    case MasteryTree::Offensive: return One(Win(EK::RaidWindow, BASE));          // fire damage proc
+                    // fire resistance (SM) · flame aura (raid utility)
+                    case MasteryTree::Support:   return Two(Sup(EK::PersonalSpike), SupUtil(EK::RaidWindow));
                     default: break;
                 }
                 break;
@@ -143,9 +168,10 @@ namespace Branding
             case BrandId::Nature:
                 switch (tree)
                 {
-                    case MasteryTree::Defensive: return Win(EK::MechanicTransform, BASE);  // HoT proc (spread)
-                    case MasteryTree::Offensive: return Win(EK::RaidWindow, BASE_REACH);    // poison cloud (area)
-                    case MasteryTree::Support:   return Sup(EK::PersonalSpike);            // nature resistance
+                    case MasteryTree::Defensive: return One(Win(EK::MechanicTransform, BASE));   // HoT proc (spread)
+                    case MasteryTree::Offensive: return One(Win(EK::RaidWindow, BASE_REACH));     // poison cloud (area)
+                    // nature resistance (SM) · raid-heal (transform, raid utility)
+                    case MasteryTree::Support:   return Two(Sup(EK::PersonalSpike), SupUtil(EK::MechanicTransform));
                     default: break;
                 }
                 break;
@@ -153,9 +179,10 @@ namespace Branding
             case BrandId::Shadow:
                 switch (tree)
                 {
-                    case MasteryTree::Defensive: return Win(EK::PersonalSpike, BASE);       // life-steal proc
-                    case MasteryTree::Offensive: return Win(EK::RaidWindow, BASE_REACH);     // shadow volley (area)
-                    case MasteryTree::Support:   return Sup(EK::RaidWindow);                // shadow-exposure vs Nature
+                    case MasteryTree::Defensive: return One(Win(EK::PersonalSpike, BASE));        // life-steal proc
+                    case MasteryTree::Offensive: return One(Win(EK::RaidWindow, BASE_REACH));      // shadow volley (area)
+                    // shadow-exposure vs Nature (SE) · shadow resistance (SM)
+                    case MasteryTree::Support:   return Two(Sup(EK::RaidWindow), Sup(EK::PersonalSpike));
                     default: break;
                 }
                 break;
@@ -163,9 +190,10 @@ namespace Branding
             case BrandId::Frost:
                 switch (tree)
                 {
-                    case MasteryTree::Defensive: return Win(EK::PersonalSpike, BASE);       // damage-reduction proc
-                    case MasteryTree::Offensive: return Win(EK::RaidWindow, BASE_REACH);     // Frost Nova (area)
-                    case MasteryTree::Support:   return Sup(EK::RaidWindow);                // frost-exposure vs Fire
+                    case MasteryTree::Defensive: return One(Win(EK::PersonalSpike, BASE));        // damage-reduction proc
+                    case MasteryTree::Offensive: return One(Win(EK::RaidWindow, BASE_REACH));      // Frost Nova (area)
+                    // frost-exposure vs Fire (SE) · frost resistance (SM)
+                    case MasteryTree::Support:   return Two(Sup(EK::RaidWindow), Sup(EK::PersonalSpike));
                     default: break;
                 }
                 break;
@@ -173,9 +201,9 @@ namespace Branding
             case BrandId::Physical:
                 switch (tree)
                 {
-                    case MasteryTree::Defensive: return Win(EK::PersonalSpike, BASE);       // evasion proc
-                    case MasteryTree::Offensive: return Win(EK::RaidWindow, BASE_REACH);     // cleave (target count)
-                    case MasteryTree::Support:   return Sup(EK::PersonalSpike);            // physical mitigation
+                    case MasteryTree::Defensive: return One(Win(EK::PersonalSpike, BASE));        // evasion proc
+                    case MasteryTree::Offensive: return One(Win(EK::RaidWindow, BASE_REACH));      // cleave (target count)
+                    case MasteryTree::Support:   return One(Sup(EK::PersonalSpike));              // physical mitigation (single)
                     default: break;
                 }
                 break;
@@ -185,7 +213,36 @@ namespace Branding
         }
 
         // Neutral default for unauthored (school, tree) pairs.
-        return Win(EK::RaidWindow, BASE);
+        return One(Win(EK::RaidWindow, BASE));
+    }
+
+    uint8_t LatticeArchetypeCount(BrandId school, MasteryTree tree)
+    {
+        return LatticeArchetypes(school, tree).count;
+    }
+
+    LatticeCellDef LatticeArchetype(BrandId school, MasteryTree tree, uint8_t archetypeIndex)
+    {
+        LatticeCellArchetypes const cell = LatticeArchetypes(school, tree);
+        // Out-of-range clamps to the primary -- a bad selection never reads past the count.
+        uint8_t const idx = archetypeIndex < cell.count ? archetypeIndex : 0;
+        return cell.archetype[idx];
+    }
+
+    bool IsLatticeArchetypeUnlocked(BrandId school, MasteryTree tree, uint8_t archetypeIndex,
+        uint8_t proficiencyLevel, IMasteryTreeConfig const& cfg)
+    {
+        // §14.4.1: legal iff within the cell's authored count AND within the level-gated unlock count.
+        // Index 0 (the primary) is therefore always legal; higher indices gate behind proficiency.
+        uint8_t const authored = LatticeArchetypeCount(school, tree);
+        uint8_t const unlocked = cfg.MaxArchetypesAtLevel(proficiencyLevel);
+        uint8_t const allowed = authored < unlocked ? authored : unlocked;
+        return archetypeIndex < allowed;
+    }
+
+    LatticeCellDef LatticeCell(BrandId school, MasteryTree tree)
+    {
+        return LatticeArchetype(school, tree, 0);
     }
 
     double EnemyMasteryMultiplier(uint8_t masteryLevel, IMasteryTreeConfig const& cfg)

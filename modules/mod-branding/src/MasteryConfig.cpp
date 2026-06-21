@@ -21,5 +21,6 @@ namespace Branding
         _maxProcMagnitude = sConfigMgr->GetOption<float>("Branding.Mastery.Tree.MaxProcMagnitude", 2.0f);
         _minReach = sConfigMgr->GetOption<float>("Branding.Mastery.Tree.MinReach", 0.0f);
         _maxReach = sConfigMgr->GetOption<float>("Branding.Mastery.Tree.MaxReach", 40.0f);
+        _archetypeUnlockStep = sConfigMgr->GetOption<uint32_t>("Branding.Mastery.Tree.ArchetypeUnlockStep", 20);
     }
 }
