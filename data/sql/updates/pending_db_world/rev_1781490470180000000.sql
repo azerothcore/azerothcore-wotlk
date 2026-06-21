@@ -468,89 +468,89 @@ UPDATE `item_template` SET `armor` = 618 WHERE `entry` = 54592;
 -- 29 items: class = 2
 
 UPDATE `item_template`
-  SET `dmg_min1` = 9, `dmg_max1` = 18
-  WHERE `entry` = 2664;
+    SET `dmg_min1` = 9, `dmg_max1` = 18
+    WHERE `entry` = 2664;
 UPDATE `item_template`
-  SET `dmg_min1` = 38, `dmg_max1` = 60
-  WHERE `entry` = 3738;
+    SET `dmg_min1` = 38, `dmg_max1` = 60
+    WHERE `entry` = 3738;
 UPDATE `item_template`
-  SET `dmg_min1` = 14, `dmg_max1` = 25
-  WHERE `entry` = 5255;
+    SET `dmg_min1` = 14, `dmg_max1` = 25
+    WHERE `entry` = 5255;
 UPDATE `item_template`
-  SET `dmg_min1` = 117, `dmg_max1` = 173
-  WHERE `entry` = 12469;
+    SET `dmg_min1` = 117, `dmg_max1` = 173
+    WHERE `entry` = 12469;
 UPDATE `item_template`
-  SET `dmg_min1` = 23, `dmg_max1` = 51
-  WHERE `entry` = 16792;
+    SET `dmg_min1` = 23, `dmg_max1` = 51
+    WHERE `entry` = 16792;
 UPDATE `item_template`
-  SET `dmg_min1` = 42, `dmg_max1` = 75
-  WHERE `entry` = 20368;
+    SET `dmg_min1` = 42, `dmg_max1` = 75
+    WHERE `entry` = 20368;
 UPDATE `item_template`
-  SET `dmg_min1` = 104, `dmg_max1` = 165
-  WHERE `entry` = 20522;
+    SET `dmg_min1` = 104, `dmg_max1` = 165
+    WHERE `entry` = 20522;
 UPDATE `item_template`
-  SET `dmg_min1` = 104, `dmg_max1` = 200
-  WHERE `entry` = 22805;
+    SET `dmg_min1` = 104, `dmg_max1` = 200
+    WHERE `entry` = 22805;
 UPDATE `item_template`
-  SET `dmg_min1` = 230, `dmg_max1` = 343
-  WHERE `entry` = 22814;
+    SET `dmg_min1` = 230, `dmg_max1` = 343
+    WHERE `entry` = 22814;
 UPDATE `item_template`
-  SET `dmg_min1` = 36, `dmg_max1` = 70
-  WHERE `entry` = 23229;
+    SET `dmg_min1` = 36, `dmg_max1` = 70
+    WHERE `entry` = 23229;
 UPDATE `item_template`
-  SET `dmg_min1` = 13, `dmg_max1` = 24
-  WHERE `entry` = 23421;
+    SET `dmg_min1` = 13, `dmg_max1` = 24
+    WHERE `entry` = 23421;
 UPDATE `item_template`
-  SET `dmg_min1` = 8, `dmg_max1` = 15
-  WHERE `entry` = 23422;
+    SET `dmg_min1` = 8, `dmg_max1` = 15
+    WHERE `entry` = 23422;
 UPDATE `item_template`
-  SET `dmg_min1` = 23, `dmg_max1` = 35
-  WHERE `entry` = 23432;
+    SET `dmg_min1` = 23, `dmg_max1` = 35
+    WHERE `entry` = 23432;
 UPDATE `item_template`
-  SET `dmg_min1` = 99, `dmg_max1` = 194
-  WHERE `entry` = 32914;
+    SET `dmg_min1` = 99, `dmg_max1` = 194
+    WHERE `entry` = 32914;
 UPDATE `item_template`
-  SET `dmg_min1` = 255, `dmg_max1` = 490
-  WHERE `entry` = 32949;
+    SET `dmg_min1` = 255, `dmg_max1` = 490
+    WHERE `entry` = 32949;
 UPDATE `item_template`
-  SET `dmg_min1` = 228, `dmg_max1` = 496
-  WHERE `entry` = 32950;
+    SET `dmg_min1` = 228, `dmg_max1` = 496
+    WHERE `entry` = 32950;
 UPDATE `item_template`
-  SET `dmg_min1` = 124, `dmg_max1` = 206
-  WHERE `entry` = 37534;
+    SET `dmg_min1` = 124, `dmg_max1` = 206
+    WHERE `entry` = 37534;
 UPDATE `item_template`
-  SET `dmg_min1` = 67, `dmg_max1` = 146
-  WHERE `entry` = 37536;
+    SET `dmg_min1` = 67, `dmg_max1` = 146
+    WHERE `entry` = 37536;
 UPDATE `item_template`
-  SET `dmg_min1` = 107, `dmg_max1` = 209
-  WHERE `entry` = 37611;
+    SET `dmg_min1` = 107, `dmg_max1` = 209
+    WHERE `entry` = 37611;
 UPDATE `item_template`
-  SET `dmg_min1` = 107, `dmg_max1` = 210
-  WHERE `entry` = 37649;
+    SET `dmg_min1` = 107, `dmg_max1` = 210
+    WHERE `entry` = 37649;
 UPDATE `item_template`
-  SET `dmg_min1` = 138, `dmg_max1` = 271
-  WHERE `entry` = 37697;
+    SET `dmg_min1` = 138, `dmg_max1` = 271
+    WHERE `entry` = 37697;
 UPDATE `item_template`
-  SET `dmg_min1` = 192, `dmg_max1` = 304
-  WHERE `entry` = 38245;
+    SET `dmg_min1` = 192, `dmg_max1` = 304
+    WHERE `entry` = 38245;
 UPDATE `item_template`
-  SET `dmg_min1` = 192, `dmg_max1` = 304
-  WHERE `entry` = 38248;
+    SET `dmg_min1` = 192, `dmg_max1` = 304
+    WHERE `entry` = 38248;
 UPDATE `item_template`
-  SET `dmg_min1` = 257, `dmg_max1` = 493
-  WHERE `entry` = 40553;
+    SET `dmg_min1` = 257, `dmg_max1` = 493
+    WHERE `entry` = 40553;
 UPDATE `item_template`
-  SET `dmg_min1` = 112, `dmg_max1` = 214
-  WHERE `entry` = 43922;
+    SET `dmg_min1` = 112, `dmg_max1` = 214
+    WHERE `entry` = 43922;
 UPDATE `item_template`
-  SET `dmg_min1` = 489, `dmg_max1` = 729
-  WHERE `entry` = 44191;
+    SET `dmg_min1` = 489, `dmg_max1` = 729
+    WHERE `entry` = 44191;
 UPDATE `item_template`
-  SET `dmg_min1` = 510, `dmg_max1` = 758
-  WHERE `entry` = 44926;
+    SET `dmg_min1` = 510, `dmg_max1` = 758
+    WHERE `entry` = 44926;
 UPDATE `item_template`
-  SET `dmg_min1` = 509, `dmg_max1` = 759
-  WHERE `entry` = 44948;
+    SET `dmg_min1` = 509, `dmg_max1` = 759
+    WHERE `entry` = 44948;
 UPDATE `item_template`
-  SET `dmg_min1` = 98, `dmg_max1` = 189
-  WHERE `entry` = 50815;
+    SET `dmg_min1` = 98, `dmg_max1` = 189
+    WHERE `entry` = 50815;
