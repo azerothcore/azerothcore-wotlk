@@ -1,0 +1,439 @@
+#
+# mod-branding configuration
+#
+# Tunables for the Brand XP + Proficiency system (design slice 1). All values are read once at
+# startup and on `.reload config`. The pure core reads none of these directly -- BrandingConfig
+# snapshots them and injects them, so formulas stay deterministic and unit-testable.
+#
+
+#
+#    Branding.Enable
+#        Description: Master switch for the branding module.
+#        Default:     0 - (disabled)
+#
+
+Branding.Enable = 0
+
+#
+#    Branding.Xp.MatchBonus
+#        Description: XP multiplier when the active brand matches the content's aligned brand.
+#        Default:     1.25
+#
+
+Branding.Xp.MatchBonus = 1.25
+
+#
+#    Branding.Xp.DrSoftCap
+#        Description: Recent-window XP above this soft cap begins diminishing returns.
+#        Default:     50000
+#
+
+Branding.Xp.DrSoftCap = 50000
+
+#
+#    Branding.Xp.DrFloor
+#        Description: Lower bound the diminishing-returns multiplier never drops below.
+#        Default:     0.1
+#
+
+Branding.Xp.DrFloor = 0.1
+
+#
+#    Branding.Xp.DrSlope
+#        Description: Linear DR decay applied per XP unit past the soft cap.
+#        Default:     0.00001
+#
+
+Branding.Xp.DrSlope = 0.00001
+
+#
+#    Branding.Xp.DrWindowSeconds
+#        Description: Seconds after which the recent-window decays to 0 (full XP restored).
+#        Default:     3600
+#
+
+Branding.Xp.DrWindowSeconds = 3600
+
+#
+#    Branding.Level.BaseXp
+#        Description: Level curve base: XpForLevel(n) = round(BaseXp * n^Exponent).
+#        Default:     100.0
+#
+
+Branding.Level.BaseXp = 100.0
+
+#
+#    Branding.Level.Exponent
+#        Description: Level curve exponent.
+#        Default:     2.0
+#
+
+Branding.Level.Exponent = 2.0
+
+#
+#    Branding.Level.Max
+#        Description: Maximum brand proficiency level (prestige cap).
+#        Default:     50
+#
+
+Branding.Level.Max = 50
+
+#
+#    Branding.Discovery.Enable
+#        Description: Layer bonus discovery XP onto exploration XP (§8.2).
+#        Default:     0 - (disabled)
+#
+
+Branding.Discovery.Enable = 0
+
+#
+#    Branding.Discovery.SubzonePct / LandmarkPct / HiddenPct
+#        Description: Discovery XP as a fraction of the player's level-to-next, by discovery type.
+#        Default:     0.06 / 0.08 / 0.12
+#
+
+Branding.Discovery.SubzonePct = 0.06
+Branding.Discovery.LandmarkPct = 0.08
+Branding.Discovery.HiddenPct = 0.12
+
+#
+#    Branding.Discovery.DangerThreshold / DangerMultiplier
+#        Description: A zone more than Threshold levels above the player is "dangerous" and its
+#                     discovery XP is multiplied by Multiplier.
+#        Default:     5 / 2.0
+#
+
+Branding.Discovery.DangerThreshold = 5
+Branding.Discovery.DangerMultiplier = 2.0
+
+#
+#    Branding.Discovery.CommonMaxLevel / UncommonMaxLevel / RareMaxLevel
+#        Description: Zone-level upper bounds for the Common/Uncommon/Rare discovery tiers (§8.3);
+#                     above RareMaxLevel is Epic.
+#        Default:     20 / 40 / 60
+#
+
+Branding.Discovery.CommonMaxLevel = 20
+Branding.Discovery.UncommonMaxLevel = 40
+Branding.Discovery.RareMaxLevel = 60
+
+#
+#    Branding.Scaling.Enable
+#        Description: Downward zone scaling (§2.1) -- an over-leveled player's OUTGOING damage is
+#                     scaled down in lower-level zones so old content stays dangerous.
+#        Default:     0 - (disabled)
+#
+
+Branding.Scaling.Enable = 0
+
+#
+#    Branding.Scaling.Exponent
+#        Description: Stat-scaling curve exponent: factor = (zoneLevel/playerLevel)^Exponent,
+#                     clamped to <= 1.0 (never scales up). Higher = steeper downscaling.
+#        Default:     2.0
+#
+
+Branding.Scaling.Exponent = 2.0
+
+#
+#    Branding.Event.Enable
+#        Description: Dynamic-event contribution engine (§9): kills in a zone with an active event
+#                     score through the anti-leech / daily-DR / hourly-cap guardrails. Events are
+#                     GM-driven via `.branding event start|stop|status` (spawner/scheduler deferred).
+#        Default:     0 - (disabled)
+#
+
+Branding.Event.Enable = 0
+
+#
+#    Branding.Event.HourlyCap
+#        Description: Max contribution points credited per rolling hour (anti-AFK-farm).
+#        Default:     100000
+#
+
+Branding.Event.HourlyCap = 100000
+
+#
+#    Branding.Event.DrSlope / DrFloor
+#        Description: Daily per-event-type diminishing returns: each repeat decays by DrSlope down
+#                     to the DrFloor multiplier.
+#        Default:     0.1 / 0.1
+#
+
+Branding.Event.DrSlope = 0.1
+Branding.Event.DrFloor = 0.1
+
+#
+#    Branding.Event.BronzeThreshold / SilverThreshold / GoldThreshold
+#        Description: Contribution points required for each reward tier.
+#        Default:     50 / 150 / 400
+#
+
+Branding.Event.BronzeThreshold = 50
+Branding.Event.SilverThreshold = 150
+Branding.Event.GoldThreshold = 400
+
+#
+#    Branding.Event.RewardItemId
+#        Description: Item entry granted for a CraftingMats reward (claimed via `.branding event
+#                     claim`). Quantity scales with tier; bounded by the account economy ceiling.
+#        Default:     2589 (Linen Cloth, placeholder)
+#
+
+Branding.Event.RewardItemId = 2589
+
+
+#
+#    Branding.Item.LevelsPerStep / MaxStep
+#        Description: Item-brand progression (§7.9): internal upgrade levels per major Step and the
+#                     number of major Steps. Used by item branding (#04/#05) and the loadout config.
+#        Default:     8 / 3
+#
+
+Branding.Item.LevelsPerStep = 8
+Branding.Item.MaxStep = 3
+
+#
+#    Branding.Item.BaseIntensity / IntensityPerLevel
+#        Description: Effect/proc INTENSITY at item-brand level 0 and the intensity added per internal
+#                     level. Behavior/proc intensity only -- never a flat character-stat delta.
+#        Default:     1.0 / 0.05
+#
+
+Branding.Item.BaseIntensity = 1.0
+Branding.Item.IntensityPerLevel = 0.05
+
+#
+#    Branding.Item.UpgradeCostPerLevel / AccountKnowledgeCost
+#        Description: Economy resources per internal item-brand level, and the (larger) account-side
+#                     Knowledge unlock cost. The difficulty-ordering invariant requires the cumulative
+#                     item upgrade cost to stay below AccountKnowledgeCost (item branding is easier).
+#        Default:     100 / 100000
+#
+
+Branding.Item.UpgradeCostPerLevel = 100
+Branding.Item.AccountKnowledgeCost = 100000
+
+#
+#    Branding.Loadout.BaseArchetypes / ArchetypeLevelStep / MaxArchetypes
+#        Description: Proc archetypes unlocked by the player-selected loadout (§7.9): the count is
+#                     BaseArchetypes + proficiencyLevel / ArchetypeLevelStep, capped at MaxArchetypes.
+#                     `.branding setproc <n>` rejects an archetype above this count.
+#        Default:     1 / 10 / 6
+#
+
+Branding.Loadout.BaseArchetypes = 1
+Branding.Loadout.ArchetypeLevelStep = 10
+Branding.Loadout.MaxArchetypes = 6
+
+
+#
+# Account vault (design slice 6, §13). An account-bound shared stash. Deposits carry a friction fee
+# (anti instant-infinite-storage) and the vault has a unit capacity. Commands: `.vault deposit`,
+# `.vault withdraw`, `.vault list`.
+#
+
+#
+#    Branding.Vault.Enable
+#        Description: Master switch for the account vault feature.
+#        Default:     0 - (disabled)
+#
+
+Branding.Vault.Enable = 0
+
+#
+#    Branding.Vault.Capacity
+#        Description: Maximum total units (summed across all stacks) the account vault can hold.
+#        Default:     1000
+#
+
+Branding.Vault.Capacity = 1000
+
+#
+#    Branding.Vault.TransferBaseCost
+#        Description: Flat copper friction charged on any non-empty deposit.
+#        Default:     1000
+#
+
+Branding.Vault.TransferBaseCost = 1000
+
+#
+#    Branding.Vault.TransferCostPerUnit
+#        Description: Additional copper friction per deposited unit.
+#        Default:     50
+#
+
+Branding.Vault.TransferCostPerUnit = 50
+
+
+#
+# Mastery (design slice 6 / §14). Dual-key, anti-P2W: a mastery is effective only when the account
+# has UNLOCKED it (account_mastery) AND the character has EARNED the skill (character_mastery).
+# Either key alone is inert. The observable consumer is a small crafting/gathering efficiency bonus.
+#
+
+#
+#    Branding.Mastery.Enable
+#        Description: Master switch for the §14 mastery system (unlock IO + efficiency bonus).
+#        Default:     0 - (disabled)
+#
+
+Branding.Mastery.Enable = 0
+
+#
+#    Branding.Mastery.MaxLevel
+#        Description: Character mastery level at which effectiveness reaches 1.0 (full bonus).
+#        Default:     50
+#
+
+Branding.Mastery.MaxLevel = 50
+
+#
+#    Branding.Mastery.MaxBonus
+#        Description: Largest fractional efficiency bonus a fully-effective mastery grants (extra
+#                     crafted/gathered units). 0.20 = up to +20%.
+#        Default:     0.20
+#
+
+Branding.Mastery.MaxBonus = 0.20
+
+
+#
+#    Branding.Allegiance.Enable
+#        Description: Soft ideological allegiances (§12). A character picks a side with
+#                     `.branding allegiance set <id>`; content aligned with that side grants a small
+#                     efficiency bonus. Allegiance is soft -- a mismatch is never a penalty.
+#        Default:     0 - (disabled)
+#
+
+Branding.Allegiance.Enable = 0
+
+#
+#    Branding.Allegiance.MatchEfficiency
+#        Description: Reward/efficiency multiplier when the character's allegiance matches the
+#                     content's alignment. Clamped to >= 1.0 (never a penalty).
+#        Default:     1.15
+#
+
+Branding.Allegiance.MatchEfficiency = 1.15
+
+
+#
+#    Branding.Economy.Enable
+#        Description: Master switch for the economy/crafting adapter (§8.6). Loads the
+#                     `branding_recipe` world table and enables `.branding craft <recipeId>`.
+#        Default:     0 - (disabled)
+#
+
+Branding.Economy.Enable = 0
+
+#
+#    Branding.Economy.MaterialItemId
+#        Description: Item entry representing crafting "materials" in the closed economy loop.
+#                     Mirror Branding.Event.RewardItemId so a craft consumes exactly what events
+#                     grant (faucet == sink representation).
+#        Default:     2589 (Linen Cloth, placeholder)
+#
+
+Branding.Economy.MaterialItemId = 2589
+
+#
+#    Branding.Economy.FragmentItemId
+#        Description: Item entry representing invasion "fragments" in the closed economy loop.
+#        Default:     2592 (Wool Cloth, placeholder)
+#
+
+Branding.Economy.FragmentItemId = 2592
+
+#
+#    Branding.Item.Enable
+#        Description: Item branding (§7.9): brand + upgrade the equipped weapon to raise its proc/
+#                     behavior intensity (never flat stats). Inert without the account's Knowledge.
+#                     (Item-brand tunables Branding.Item.* are defined above.)
+#        Default:     0 - (disabled)
+#
+
+Branding.Item.Enable = 0
+
+#
+#    Branding.Event.SchedulerEnable
+#        Description: Ambient event scheduler (§9.1): auto-cycles events per the branding_event_def
+#                     table (active -> cooldown), resolving early at 100% containment. Requires the
+#                     event engine (Branding.Event.Enable) to score kills.
+#        Default:     0 - (disabled)
+#
+
+Branding.Event.SchedulerEnable = 0
+
+#
+#    Branding.Effect.Enable
+#        Description: Branding combat effects (§7.9). A branded player's OUTGOING damage is boosted
+#                     by the personal multiplier during its active window (no passive uptime).
+#                     Composes on top of zone downscaling (§2.1).
+#        Default:     0 - (disabled)
+#
+
+Branding.Effect.Enable = 0
+
+#
+#    Branding.Effect.MaxPersonalMul / MaxRaidMul
+#        Description: §7.9 magnitude caps -- large personal (fantasy, felt by the player) vs bounded
+#                     raid (desirability, not mandate; further reduced by catalyst DR in #04).
+#        Default:     3.5 / 2.0
+#
+
+Branding.Effect.MaxPersonalMul = 3.5
+Branding.Effect.MaxRaidMul = 2.0
+
+#
+#    Branding.Effect.MaxEffectLevel
+#        Description: Proficiency level at which the effect reaches full strength.
+#        Default:     50
+#
+
+Branding.Effect.MaxEffectLevel = 50
+
+#
+#    Branding.Catalyst.Enable
+#        Description: Catalyst stacking diminishing returns (§7.9/§9). A branded specialist's raid
+#                     multiplier diminishes as same-role specialists stack (1st full, 2nd reduced,
+#                     3rd+ heavy) -- rewards one specialist per role, discourages stacking.
+#        Default:     0 - (disabled)
+#
+
+Branding.Catalyst.Enable = 0
+
+#
+#    Branding.Catalyst.MaxRaidMul / StackDecay
+#        Description: Raid multiplier cap and the per-rank geometric decay (rank 1 = full, rank 2 =
+#                     StackDecay, rank 3 = StackDecay^2, ...).
+#        Default:     2.0 / 0.4
+#
+
+Branding.Catalyst.MaxRaidMul = 2.0
+Branding.Catalyst.StackDecay = 0.4
+
+#
+# Client addon transport (design slice 8, §19). Pushes branding state (invasion schedule, live
+# containment, your contribution, brands, mastery, loadout, item brand, allegiance) to the
+# `Branding` WoW addon over the native CHAT_MSG_ADDON channel (prefix BRND). Server-push only --
+# the addon is a pure renderer. See modules/mod-branding/client-addon/ for the addon + install guide.
+#
+
+#
+#    Branding.Addon.Enable
+#        Description: Master switch for the §19 client-addon push transport.
+#        Default:     0 - (disabled)
+#
+
+Branding.Addon.Enable = 0
+
+#
+#    Branding.Addon.PushIntervalSeconds
+#        Description: How often the server pushes live updates. Each tick re-pushes the active-zone
+#                     event/containment; every 6th tick also re-pushes the character + schedule
+#                     snapshots. Lower = more responsive, more addon-channel traffic.
+#        Default:     5
+#
+
+Branding.Addon.PushIntervalSeconds = 5
