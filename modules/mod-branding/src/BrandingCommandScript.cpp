@@ -1,6 +1,7 @@
 #include "AllegianceMgr.h"
 #include "DiscoveryMgr.h"
 #include "EventMgr.h"
+#include "ItemBrandingMgr.h"
 #include "LoadoutMgr.h"
 #include "MasteryMgr.h"
 #include "ProficiencyMgr.h"
@@ -102,9 +103,11 @@ public:
 
         static ChatCommandTable brandingCommandTable =
         {
-            { "info",       HandleBrandingInfoCommand,     rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
-            { "setbrand",   HandleBrandingSetBrandCommand, rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
-            { "setproc",    HandleBrandingSetProcCommand,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "info",        HandleBrandingInfoCommand,        rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "setbrand",    HandleBrandingSetBrandCommand,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "setproc",     HandleBrandingSetProcCommand,     rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "itembrand",   HandleBrandingItemBrandCommand,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "upgradeitem", HandleBrandingUpgradeItemCommand, rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
             { "knowledge",  knowledgeCommandTable },
             { "allegiance", allegianceCommandTable },
             { "event",      eventCommandTable },
@@ -290,6 +293,12 @@ public:
         handler->PSendSysMessage("Active loadout: {} brand, proc archetype {}.",
             BrandName(loadout.activeBrand), uint32(loadout.selectedProcArchetype));
 
+        ItemBrandState itemState;
+        if (sItemBrandingMgr->EquippedState(player, itemState))
+            handler->PSendSysMessage("Equipped item: {} brand, step {}, level {}, intensity x{:.2f}.",
+                BrandName(itemState.brand), uint32(itemState.step), uint32(itemState.levelInStep),
+                sItemBrandingMgr->EquippedIntensity(player));
+
         for (uint8 m = 0; m < static_cast<uint8>(MasterySystem::COUNT); ++m)
         {
             MasterySystem const system = static_cast<MasterySystem>(m);
@@ -327,6 +336,62 @@ public:
             }
         }
         return false;
+    }
+
+    // `.branding itembrand` -- brand the equipped main-hand weapon with the player's active brand.
+    static bool HandleBrandingItemBrandCommand(ChatHandler* handler)
+    {
+        Player* player = handler->GetPlayer();
+        if (!player)
+        {
+            handler->SendErrorMessage("This command must be used in-world.");
+            return false;
+        }
+        if (!sItemBrandingMgr->Enabled())
+        {
+            handler->SendErrorMessage("Item branding is disabled (Branding.Item.Enable).");
+            return false;
+        }
+
+        BrandId const brand = sLoadoutMgr->GetLoadout(player->GetGUID()).activeBrand;
+        if (!sItemBrandingMgr->BrandEquipped(player, brand))
+        {
+            handler->SendErrorMessage("No equipped main-hand weapon to brand.");
+            return false;
+        }
+
+        handler->PSendSysMessage("Equipped weapon branded {}.", BrandName(brand));
+        return true;
+    }
+
+    // `.branding upgradeitem <levels>` -- spend resources to raise the equipped weapon's intensity.
+    static bool HandleBrandingUpgradeItemCommand(ChatHandler* handler, uint32 levels)
+    {
+        Player* player = handler->GetPlayer();
+        if (!player)
+        {
+            handler->SendErrorMessage("This command must be used in-world.");
+            return false;
+        }
+        if (!sItemBrandingMgr->Enabled())
+        {
+            handler->SendErrorMessage("Item branding is disabled (Branding.Item.Enable).");
+            return false;
+        }
+
+        if (levels == 0)
+            levels = 1;
+
+        uint32 const resources = levels * sItemBrandingMgr->Config().UpgradeCostPerLevel();
+        uint8 const gained = sItemBrandingMgr->UpgradeEquipped(player, resources);
+        if (gained == 0)
+        {
+            handler->SendErrorMessage("Nothing upgraded -- no branded weapon equipped, or already maxed.");
+            return false;
+        }
+
+        handler->PSendSysMessage("Upgraded equipped weapon by {} level(s).", uint32(gained));
+        return true;
     }
 
     // `.branding knowledge grant <brand>` -- GM/debug unlock of an account-wide brand (design §6).

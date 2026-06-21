@@ -344,3 +344,13 @@ Branding.Economy.MaterialItemId = 2589
 #
 
 Branding.Economy.FragmentItemId = 2592
+
+#
+#    Branding.Item.Enable
+#        Description: Item branding (§7.9): brand + upgrade the equipped weapon to raise its proc/
+#                     behavior intensity (never flat stats). Inert without the account's Knowledge.
+#                     (Item-brand tunables Branding.Item.* are defined above.)
+#        Default:     0 - (disabled)
+#
+
+Branding.Item.Enable = 0
