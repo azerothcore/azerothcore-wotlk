@@ -15,6 +15,7 @@ namespace
         double  halfLevel = 25.0;     // upkeep == maxUptime/2 here
         double  offSchool = 0.25;     // situational falloff out of matching school
         double  maxEnemyMul = 1.5;    // §14.8: enemy spike ceiling (< MaxPersonalMul)
+        double  enemyEliteLevelFraction = 0.5;  // §14.8.1: elite mastery level as a fraction of max
         double   minPpm = 1.0;        // §14.10 per-axis tuning bounds
         double   maxPpm = 10.0;
         uint32_t minWindowMs = 3000;
@@ -34,6 +35,7 @@ namespace
         double  UpkeepHalfLevel() const override { return halfLevel; }
         double  OffSchoolFactor() const override { return offSchool; }
         double  MaxEnemyMul() const override { return maxEnemyMul; }
+        double  EnemyEliteLevelFraction() const override { return enemyEliteLevelFraction; }
         double   MinPpm() const override { return minPpm; }
         double   MaxPpm() const override { return maxPpm; }
         uint32_t MinWindowMs() const override { return minWindowMs; }

@@ -14,6 +14,7 @@ void Addmod_brandingScripts()
     AddBrandingMasteryScripts();
     AddBrandingMasteryLoadoutScripts();
     AddBrandingMasteryCombatScripts();
+    AddBrandingMasteryEnemyScripts();
     AddBrandingAllegianceScripts();
     AddBrandingEconomyScripts();
     AddBrandingDiscoverableScripts();
