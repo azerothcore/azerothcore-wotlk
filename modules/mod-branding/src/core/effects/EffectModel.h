@@ -39,6 +39,15 @@ namespace Branding
 
     // §11/§7.9 prestige: at max proficiency level (unlocks cosmetic title/aura).
     bool IsPrestige(uint8_t profLevel, IEffectConfig const& cfg);
+
+    // Default effect profile for a (brand, role) pairing (§7.9): Tank -> PersonalSpike (dramatic),
+    // Healer -> MechanicTransform (structural), otherwise -> RaidWindow (restrained). Brand-specific
+    // profiles are a later refinement; the role drives the kind + window timing for now.
+    EffectProfile ProfileFor(BrandId brand, RoleContribution role);
+
+    // Whether a windowed effect is in its active phase at server time `nowMs` (§7.9 "no passive
+    // uptime"). PersonalSpike/RaidWindow cycle window-then-cooldown; MechanicTransform is always on.
+    bool IsWindowActive(EffectProfile const& profile, uint64_t nowMs);
 }
 
 #endif // MOD_BRANDING_CORE_EFFECTS_EFFECTMODEL_H
