@@ -21,5 +21,11 @@ namespace Branding
         _maxProcMagnitude = sConfigMgr->GetOption<float>("Branding.Mastery.Tree.MaxProcMagnitude", 2.0f);
         _minReach = sConfigMgr->GetOption<float>("Branding.Mastery.Tree.MinReach", 0.0f);
         _maxReach = sConfigMgr->GetOption<float>("Branding.Mastery.Tree.MaxReach", 40.0f);
+
+        // §14.10/§14.11 per-spec loadout tunables (point-buy budget, respec token, active-cell cap).
+        _pointsBudget = static_cast<uint8_t>(sConfigMgr->GetOption<uint32_t>("Branding.Mastery.PointsBudget", 10));
+        _respecCost = sConfigMgr->GetOption<uint32_t>("Branding.Mastery.RespecCost", 500);
+        _maxActive = static_cast<uint8_t>(sConfigMgr->GetOption<uint32_t>("Branding.Mastery.MaxActive", 1));
+        _maxArchetypes = static_cast<uint8_t>(sConfigMgr->GetOption<uint32_t>("Branding.Mastery.MaxArchetypesPerCell", 3));
     }
 }

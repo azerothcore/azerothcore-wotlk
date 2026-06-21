@@ -1116,6 +1116,39 @@ ResolvedCell ResolveTreeCell(TreeAllocation const& alloc, uint32_t applicableAxe
     uint8_t masteryLevel, IMasteryTreeConfig const& cfg);
 ```
 
+**Point-buy → shares (the quantization contract, `core/mastery/MasteryActive.{h,cpp}`).** The
+adapter never hands `ResolveTreeCell` arbitrary doubles — it hands it **quantized** shares derived
+from a bounded integer point spend. The pure function
+
+```cpp
+// Convert a discrete per-axis point spend into the normalized TreeAllocation.share[] weights that
+// ResolveTreeCell consumes. The total spend across APPLICABLE axes is clamped to cfg.PointsBudget()
+// (conservation -- a player can never exceed the budget); each share = points / budget. Points on a
+// non-applicable axis are ignored (the cell's mask governs). Zero points -> all-zero shares -> the
+// resolver's even-split baseline. Deterministic: same points + same mask -> identical shares.
+TreeAllocation PointsToAllocation(uint8_t const pointsPerAxis[ProcAxis::COUNT],
+    uint32_t applicableAxes, IMasteryTreeConfig const& cfg);
+```
+
+is the single source of truth for the discrete→continuous mapping. Because `ResolveTreeCell`
+already multiplies normalized shares by the saturating budget `b`, two point spends with the same
+*ratio* resolve to the same cell — the integer points buy *relative emphasis*, and mastery level
+buys the absolute envelope. **Invariants (tested):** total spend over the budget is clamped, not
+overflowed (conservation); a zero spend reproduces the even-split baseline; the mapping is
+deterministic; non-applicable-axis points are inert.
+
+**Respec vs spec-switch cost (`MasteryRespecCost`).** Re-allocating points within a loadout costs
+the §14.5 / §7.9 expensive token; **switching talent spec is free** (it loads a *saved* set, not a
+re-allocation). The distinction is a pure function so the adapter can't accidentally charge a spec
+swap:
+
+```cpp
+enum class LoadoutChange : uint8_t { SwitchSpec, Reallocate };
+// Friction cost (in the abstract token unit) of applying a loadout change. SwitchSpec -> 0 (free);
+// Reallocate -> cfg.RespecCost() (a flat, expensive token). Pure; the adapter charges the result.
+uint32_t MasteryRespecCost(LoadoutChange change, IMasteryTreeConfig const& cfg);
+```
+
 **The knob is module configuration.** The per-axis bounds (and the upkeep/enemy dials) live in
 `mod_branding.conf` under `Branding.Mastery.Tree.*` (`MinPpm`/`MaxPpm`, `MinWindowMs`/`MaxWindowMs`,
 `MaxProcMagnitude`, `MinReach`/`MaxReach`, `MaxUptime`, `UpkeepHalfLevel`, `OffSchoolFactor`,
@@ -1153,10 +1186,41 @@ Resulting behaviour:
 - **Talent retrain that changes a slot's detected role**: keep earned progression untouched, keep the
   loadout but flag it for review (optionally one free re-allocation on role change). Never auto-wipe.
 
-> **Placement:** the earned layer is the §6/Slice-6 `MasteryMgr` progression (shared). The per-spec
-> loadout (selection + persistence keyed by spec slot) is **adapter/persistence (deferred)** — it
-> reads the active talent group from the player and swaps the cached loadout on spec change. The pure
-> core only validates a loadout and resolves it (§14.10); it never reads spec.
+**Multi-mastery: the loadout is a COLLECTION, not a single active brand** *(decided)*. A character's
+active loadout is modeled as a **set of active mastery cells** keyed by `(school, tree)` — not one
+"active brand". Even when v1 caps the active count at `Branding.Mastery.MaxActive` (default 1), the
+type, schema, cache, and validation are built for **N** entries so multi-mastery needs no rebuild:
+aggregation and validation **iterate the set**. Each entry carries its own point-buy spend, so the
+combat adapter (a later task) reads the set, resolves every entry via §14.10, and applies the active
+cells. The pure model:
+
+```cpp
+// One active mastery cell + its §14.10 point-buy spend. (school, tree) is the catalyst-DR bucket
+// key (§14.9) and the collection key. archetype indexes the cell's available proc archetypes (§7.9).
+struct ActiveMasteryEntry {
+    BrandId    school;
+    MasteryTree tree;
+    uint8_t    archetype;
+    uint8_t    pointsPerAxis[ProcAxis::COUNT];   // discrete point-buy (PointsToAllocation feeds §14.10)
+};
+
+// Fixed-cap collection (std::array + count -- NO <vector> in core). Capacity covers future
+// multi-mastery; v1 enforces cfg.MaxActive() <= Capacity. Keyed by (school, tree): no duplicate cell.
+struct ActiveMasterySet { /* std::array<ActiveMasteryEntry, Capacity> entries; uint8_t count; */ };
+
+// A single entry is valid iff dual-keyed (account-unlocked AND char school level > 0), archetype in
+// range, and points within budget. The set is valid iff every entry is valid, no (school,tree) repeats,
+// and count <= cfg.MaxActive(). Mirrors the §7.9 / §14 dual-key.
+bool IsActiveEntryValid(ActiveMasteryEntry const&, bool accountUnlocked, uint8_t schoolLevel,
+    IMasteryTreeConfig const&);
+bool IsActiveSetValid(ActiveMasterySet const&, /* dual-key lookups */, IMasteryTreeConfig const&);
+```
+
+> **Placement:** the earned layer is the §6/Slice-6 `MasteryMgr` progression (shared, per-school
+> level + account unlock). The per-spec **loadout** (the `ActiveMasterySet` + its point spends,
+> persisted per `(guid, spec slot)`) is `MasteryLoadoutMgr` — it reads the active talent group from
+> the player and swaps the cached set on spec change (free), charging the respec token only on
+> re-allocation. The pure core only validates/resolves a loadout (§14.10) and never reads spec.
 
 > **Lattice content (pure core, first cut).** `LatticeCell(school, tree)` encodes the §14.4 table as
 > the design ruleset: each authored cell's `EffectKind`, situational (SM/SE) flag, **sustained flag**

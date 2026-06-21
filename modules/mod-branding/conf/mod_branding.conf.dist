@@ -378,6 +378,51 @@ Branding.Mastery.Tree.MaxProcMagnitude = 2.0
 Branding.Mastery.Tree.MinReach = 0.0
 Branding.Mastery.Tree.MaxReach = 40.0
 
+#
+# Mastery loadout (§14.10 point-buy + §14.11 per-spec). The EARNED layer (per-school level + account
+# unlock) is shared across talent specs; the LOADOUT below -- which (school, tree) cells are active
+# and how each spends its point-buy budget across the proc axes -- is stored PER talent-spec slot and
+# auto-swaps for free on a dual-spec change. Only re-allocating points costs the respec token.
+#
+
+#
+#    Branding.Mastery.MaxActive
+#        Description: §14.11 max simultaneously-active mastery cells per spec. The model is a
+#                     COLLECTION keyed by (school, tree); v1 caps it at 1, but the schema/cache/
+#                     validation handle N with no rebuild -- raise this to enable multi-mastery.
+#        Default:     1
+#
+
+Branding.Mastery.MaxActive = 1
+
+#
+#    Branding.Mastery.PointsBudget
+#        Description: §14.10 total discrete points a character spends across an active cell's
+#                     applicable proc axes (ppm/duration/magnitude/reach). Favouring one axis costs
+#                     the others; the resolver normalizes the spend against the §14.2 mastery budget.
+#        Default:     10
+#
+
+Branding.Mastery.PointsBudget = 10
+
+#
+#    Branding.Mastery.RespecCost
+#        Description: §14.5/§14.11 flat, expensive token cost to RE-ALLOCATE a loadout's points.
+#                     Switching talent spec loads a saved set and is always free.
+#        Default:     500
+#
+
+Branding.Mastery.RespecCost = 500
+
+#
+#    Branding.Mastery.MaxArchetypesPerCell
+#        Description: §7.9 number of proc archetypes a cell exposes; a loadout's archetype index must
+#                     be below this. (Concrete per-cell archetype menus are a later data expansion.)
+#        Default:     3
+#
+
+Branding.Mastery.MaxArchetypesPerCell = 3
+
 
 #
 #    Branding.Allegiance.Enable
