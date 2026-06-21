@@ -1517,6 +1517,14 @@ enum AcoreStrings
 
     // Pet rename command
     LANG_PET_RENAME_INVALID             = 35453,
-    LANG_PET_RENAME_SUCCESS             = 35454
+    LANG_PET_RENAME_SUCCESS             = 35454,
+
+    // Account flag command
+    LANG_ACCOUNT_FLAG_LIST_HEADER       = 35455,
+    LANG_ACCOUNT_FLAG_LIST_EMPTY        = 35456,
+    LANG_ACCOUNT_FLAG_INVALID           = 35457,
+    LANG_ACCOUNT_FLAG_RESERVED          = 35458,
+    LANG_ACCOUNT_FLAG_ADDED             = 35459,
+    LANG_ACCOUNT_FLAG_REMOVED           = 35460
 };
 #endif
