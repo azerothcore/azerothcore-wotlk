@@ -922,6 +922,277 @@ per-source weights — rates and the 45/25/20/10 target are tuned *together*, ne
 
 ---
 
+## 14. Mastery Trees — Combat Expression (design §14, issue #24)
+
+> Heading kept at **§14** to match every existing `§14`/mastery cross-reference (§5 row 14,
+> §6 Slice 6, `core/mastery/`, issue `07-mastery-adapter.md`). This section is the combat-expression
+> layer of Mastery; the §6/Slice-6 dual-key (`MasteryEffectiveness`) and the gathering/craft consumer
+> already shipped — this extends Mastery with a **combat** consumer built on the §7.9 effect model.
+
+### 14.1 Shape
+
+Mastery is a lattice of **5 damage schools × 3 trees**. Each (school, tree) cell is one or more
+**procs**. The schools (issue #24): `Fire, Nature, Shadow, Frost, Physical` (a subset of `BrandId`;
+`Arcane`/`Holy` are extension slots, no trees yet).
+
+| Tree | Intent | Governing cap (§7.9) |
+|---|---|---|
+| **Def** | survivability / sustain procs | `MaxPersonalMul` (personal) / `MaxRaidMul` (raid-wide) |
+| **Off** | damage / control procs | `MaxRaidMul` + catalyst DR (Slice 4) |
+| **Support** | school-matched mitigation + raid utility | `MaxRaidMul` (utility) / `MaxMitigation`+DR (resist) |
+
+### 14.2 Core principle — *everything is a proc-window; mastery scales upkeep, not a flat value*
+
+There are **no always-on passives anywhere in the lattice**, including the resistances/auras. Every
+cell is a proc that opens a bounded **window** (a buff, debuff, mitigation, or §7.9 mechanic
+transform). **Mastery raises *upkeep*** — how reliably a character keeps its windows up — **never a
+flat magnitude.** This is the same windowed-uptime contract as §7.9:
+
+```
+uptime = Σ window time / elapsed   — asserted strictly < 1.0 at ALL mastery levels.
+```
+
+So a "fire resistance" support cell is *"your casts/attacks proc a fire-resist window; mastery makes
+that window easier to sustain"* — a maintain-through-active-play loop, not a buff-bar slot.
+
+### 14.3 Two new balance rails (added by this section)
+
+1. **Uptime-asymptote cap.** Upkeep gain from mastery has **diminishing returns toward a ceiling
+   `< 1.0`** — max mastery can *approach* but never *reach* permanent uptime. Without this rail a
+   high-upkeep proc degenerates back into the flat passive §1/§7.9 forbids. This is the load-bearing
+   invariant of the whole layer.
+2. **PPM normalization.** Proc rate is **procs-per-minute** (real-time; weapon-speed-normalized for
+   melee), **not** flat per-action chance. Otherwise a fast-auto-attacking melee gets vastly more
+   proc opportunities than a slow caster at equal mastery — pure class imbalance. PPM decouples
+   upkeep from action density (the standard WotLK fix).
+
+### 14.4 The lattice (issue #24 content, tagged by mechanic type)
+
+Mechanic tags: **PW** = proc-window (buff/debuff), **MT** = §7.9 mechanic-transform, **SM** =
+situational mitigation (school-matched, DR'd), **SE** = situational exposure (active only vs the
+matching invasion school — replaces flat counter-school "+dmg %").
+
+| School | Def | Off | Support |
+|---|---|---|---|
+| **Fire** | fire AoE proc `PW` | fire damage proc `PW` | flame aura `PW` · fire resistance `SM` |
+| **Nature** | HoT proc `PW`/`MT` | poison cloud proc `PW` | raid-heal proc `PW` · nature resistance `SM` |
+| **Shadow** | life-steal proc `PW` | shadow volley proc `PW` | shadow-exposure vs Nature `SE` · shadow resistance `SM` |
+| **Frost** | damage-reduction proc `PW` | Frost Nova proc `PW` | frost-exposure vs Fire `SE` · frost resistance `SM` |
+| **Physical** | evasion proc `PW` | cleave proc `PW` | physical mitigation `SM` (armor-like, DR'd) |
+
+- **`SE` (was "+dmg % vs X")**: a *windowed exposure* you proc onto a target, not a standing aura,
+  and full-value only inside content themed to the relevant school — so it's desirable, never the
+  mandatory hard-counter that flat counter-school % would create in fixed-school PvE.
+- **`SM` resistances + physical mitigation**: one coherent axis — a capped, DR'd, **school-matched**
+  defensive window. Full value vs matching-school invasion content, reduced/inert otherwise.
+
+### 14.5 Respec
+
+Tree respec consumes an **expensive token** = the §7.9 loadout-change friction (no free instant
+re-spec). Friction cost is computed in core; the adapter charges it.
+
+### 14.6 Enemy-side mastery
+
+Invasion **elites carry tree procs; bosses are at max mastery**. Their procs run through the **same
+caps and the same §2.1 pipeline** (downward scaling first, mastery procs on top) — so an elite never
+becomes unpredictably spiky beyond `MaxRaidMul`/`MaxMitigation`. *(Open: see §14.8.)*
+
+### 14.7 Pure model & invariants (test contract — written first, red)
+
+```cpp
+enum class MasteryTree : uint8_t { Defensive, Offensive, Support };
+
+struct ProcCell {                 // one (school, tree) entry, resolved from config
+    EffectKind kind;              // PW / MT mapped onto §7.9 EffectKind (+ SM/SE flags)
+    double     ppm;               // procs-per-minute at this mastery (PRE-normalization input)
+    uint32_t   windowDurationMs;
+    bool       schoolMatched;     // SM/SE: full value only vs matching invasion school
+};
+
+// Upkeep (expected uptime) from mastery — DR toward a ceiling < 1.0.
+double MasteryUpkeep(uint8_t masteryLevel, ProcCell const&, IBrandingConfig const&);
+
+// PPM → expected procs given real elapsed time + (melee) weapon speed; NOT per-action.
+double ExpectedProcs(double ppm, uint32_t elapsedMs, double weaponSpeedS, IBrandingConfig const&);
+```
+
+**Invariants (tests):**
+- **Uptime asymptote**: `MasteryUpkeep(level, ...) < cfg.MaxUptime` for *all* levels, and
+  `MaxUptime < 1.0` (`Mastery_Upkeep_NeverReachesPermanent`).
+- **Monotonic upkeep**: non-decreasing in `masteryLevel`, with diminishing increments
+  (`Mastery_Upkeep_DiminishingReturns`).
+- **PPM decouples density**: a fast and a slow attacker at equal `ppm` reach upkeep within tolerance
+  over equal real time (`Mastery_PPM_DensityIndependent`).
+- **Raid cap holds**: any raid-wide cell still obeys `RaidMultiplier ≤ MaxRaidMul` + catalyst DR
+  (reuses §7.9 / Slice 4 invariants).
+- **School-matched gating**: `SM`/`SE` cells yield full value only when `schoolMatched`, reduced/0
+  otherwise (`Mastery_SchoolMatched_SituationalOnly`).
+- **Dual-key (§14/§6)**: account-unlock-only and char-level-only both ⇒ 0 (existing
+  `MasteryEffectiveness` tests); combined scales upkeep.
+
+### 14.9 Catalyst DR bucketing — per (school × tree), not per school
+
+The Slice-4 catalyst DR (§7.9 / §9: 1st full, 2nd reduced, 3rd+ heavy) originally bucketed by
+**role**. With the lattice, the DR bucket key is **`(school, tree)`** — the catalyst identity of a
+specialist is *which cell of the lattice they run*, which is more precise than role and captures the
+same "redundant specialist" intent (Def≈survivability, Off≈damage, Support≈utility).
+
+**Rule:** DR counts only specialists sharing the **same `(school, tree)`**. So a raid fielding **one
+Fire-Def + one Fire-Off + one Fire-Support** has three *independent* rank-1 buckets — **all three
+hit full effect, no DR** — because they are complementary, not redundant. DR bites only when the
+*same* cell repeats (a second Fire-Off is rank 2, a third is rank 3+). This rewards spreading the
+lattice across a raid and only penalises stacking the identical proc.
+
+```cpp
+struct CatalystKey { BrandId school; MasteryTree tree; };   // the DR bucket identity
+bool    SameCatalystBucket(CatalystKey const& a, CatalystKey const& b);   // both must match
+// 1-based rank of roster[index] among PRIOR entries sharing its bucket (adapter passes a
+// deterministically ordered, e.g. GUID-sorted, roster). Feeds CatalystStackWeight / RaidCatalystMultiplier.
+uint8_t CatalystRankInBucket(CatalystKey const* roster, size_t count, size_t index);
+```
+
+**Invariants (tests):**
+- Distinct `(school, tree)` keys are independent: one Fire-Def + one Fire-Off + one Fire-Support ⇒
+  every rank == 1 ⇒ every `RaidCatalystMultiplier` == full (`CatalystDR_PerTree_ComplementaryNoDr`).
+- Same key repeats ⇒ rank increments (1, 2, 3…) ⇒ DR applies (`CatalystDR_PerTree_RedundantStacks`).
+- Same tree, different school ⇒ independent buckets (rank 1 each). Same school, different tree ⇒
+  independent buckets (rank 1 each).
+- Risk #6 (DR evasion) holds: rank counts *presence in the bucket*, so brand/tree rotation can't dodge
+  DR for a genuinely-redundant cell.
+
+### 14.10 Per-cell player tuning — a budget across a per-cell axis set (point-buy)
+
+Within each (school, tree) cell a character **redistributes** how their proc expresses across a menu
+of axes: **ppm** (how often — the lever for instant attacks), **duration** (how long the window
+lasts), **magnitude** (how strong each proc is), and **reach** (breadth). This is the per-cell
+expression-customization knob (the §7.9 loadout idea, made granular).
+
+**Reach is one axis with two tooltips.** "Bigger AoE radius" and "cleave hits more targets" are the
+*same* underlying breadth axis — only the presentation differs (yards for an area proc, target count
+for a cleave). Core treats `reach` as one normalized value within a configured envelope; the
+adapter/lattice renders it per-cell. Adding "count" did not add an axis.
+
+**Per-cell axis set — the complexity governor.** Not every cell exposes every axis: reach only
+applies to *area/cleave* procs (Fire AoE, poison cloud, raid-heal, flame aura, Physical cleave); a
+single-target lifesteal or a personal mitigation has none. Each cell declares an **applicable-axis
+mask**, and the budget divides only among the axes that cell exposes. So adding an axis is a one-line
+config change with **zero new balance risk** (the budget+caps framework bounds any allocation), and
+players only ever see the axes their cell actually has — a single-target cell shows 3 knobs, an
+area/cleave cell shows 4.
+
+**Point-buy, not a continuous slider** *(decided)*. The player spends discrete points across the
+applicable axes (talent-tree feel: legible builds, exhaustively testable, native to the 3.3.5a mental
+model). The pure resolver is the continuous general case; the adapter only ever feeds it **quantized**
+shares from integer point spends. Respec = refund points for the expensive token (§14.5 / §7.9).
+
+**It is a fixed budget — favoring one axis costs the others.** A free "max everything" would defeat
+the §7.9/§14 caps, so the allocations draw from one mastery budget `b = level / (level +
+UpkeepHalfLevel)` (the saturating-below-1 shape of §14.2). With shares normalized over the applicable
+axes, their "fill fractions" sum to exactly `b (< 1)` — so a player picks **burst** (high magnitude,
+low uptime), **sustained** (high uptime), **wide** (more range), or a blend, never all maxed at once.
+
+```cpp
+enum class ProcAxis : uint8_t { Ppm = 0, Duration, Magnitude, Reach, COUNT };  // Reach = AoE radius OR cleave count
+constexpr uint32_t AxisBit(ProcAxis a);   // applicable-axis mask is an OR of these
+
+struct TreeAllocation { double share[ProcAxis::COUNT]; };  // relative weights (>= 0) per axis
+struct ResolvedCell   { double ppm; uint32_t windowDurationMs; double magnitude; double reach; };
+
+// Resolve a player's allocation at a mastery level into concrete proc params, dividing the budget b
+// only among the axes in `applicableAxes`. Shares normalized over applicable axes (all-zero -> even
+// split); each applicable axis = Min + (Max-Min) * (normalizedShare * b); NON-applicable axes resolve
+// to their Min (inherent baseline; magnitude floor 1.0). Every axis stays within its config bound,
+// applicable fills sum to b, magnitude bounded by MaxProcMagnitude (lattice sets <= MaxRaidMul /
+// MaxPersonalMul so §7.9 subsumes it). Realized uptime (ppm x duration) still clamped by MaxUptime.
+ResolvedCell ResolveTreeCell(TreeAllocation const& alloc, uint32_t applicableAxes,
+    uint8_t masteryLevel, IMasteryTreeConfig const& cfg);
+```
+
+**The knob is module configuration.** The per-axis bounds (and the upkeep/enemy dials) live in
+`mod_branding.conf` under `Branding.Mastery.Tree.*` (`MinPpm`/`MaxPpm`, `MinWindowMs`/`MaxWindowMs`,
+`MaxProcMagnitude`, `MinReach`/`MaxReach`, `MaxUptime`, `UpkeepHalfLevel`, `OffSchoolFactor`,
+`MaxEnemyMul`). Core stays pure; the production `MasteryConfig` adapter snapshots them via
+`sConfigMgr` and is injected as `IMasteryTreeConfig`. Admins retune the envelopes without a recompile.
+
+**Invariants (tests):**
+- **Conservation / no free lunch**: applicable fill fractions sum to `b`; no two axes both reach
+  their per-axis max (`TreeTuning_BudgetConserved_NoMaxAllAxes`).
+- **Per-cell axis mask**: a non-applicable axis resolves to its Min and consumes no budget, so a
+  3-axis cell concentrates the same `b` over 3 axes (`TreeTuning_NonApplicableAxisExcludedFromBudget`).
+- **Trade-off direction**: all-into-one-axis raises it at the cost of the others (`TreeTuning_FavorsOneAxisAtCostOfOthers`).
+- **Caps hold for every allocation/mask**: each axis within `[Min,Max]`, `magnitude ∈ [1, MaxProcMagnitude]`,
+  realized uptime `< MaxUptime` (`TreeTuning_AllAllocationsRespectCaps`).
+- **Normalization**: all-zero/negative shares → even split over applicable axes (`TreeTuning_DegenerateSharesNormalized`).
+- **Monotone in mastery**: a fixed allocation at higher level resolves to `>=` on each applicable axis (`TreeTuning_EnvelopeGrowsWithMastery`).
+
+### 14.11 Mastery × talents / dual-spec — earned vs allocated
+
+A character's role (hence which tree expression fits) is **spec-dependent** for hybrids (Prot/Ret
+paladin, Feral/Resto druid, …), and WotLK lets them swap specs freely via Dual Talent Specialization.
+The system must never punish using that core feature. It cracks by splitting two layers *(decided)*:
+
+- **Earned** — mastery level/XP per school + account Knowledge (§1 anti-P2W progression). **Shared
+  across specs, never reset by a talent change.** You don't lose your Nature investment by respeccing.
+- **Allocated** — the loadout: tree choice (Def/Off/Support) + the §14.10 point split. This is stored
+  **per talent-spec slot**, exactly as WotLK already stores dual-spec talents/glyphs/action bars.
+
+Resulting behaviour:
+- **Dual-spec switch auto-swaps the mastery loadout — free, no token** (it's a saved set, not a
+  respec). The Prot loadout (Defensive-heavy) and Ret loadout (Offensive-heavy) both just exist.
+- **Role / expression resolves live** from the active spec, so §7.9 role-asymmetry (tank spike vs dps
+  restraint vs healer transform) flips automatically — same earned level, different expression, no loss.
+- **The expensive token applies only to re-allocating points within a loadout**, never to switching specs.
+- **Talent retrain that changes a slot's detected role**: keep earned progression untouched, keep the
+  loadout but flag it for review (optionally one free re-allocation on role change). Never auto-wipe.
+
+> **Placement:** the earned layer is the §6/Slice-6 `MasteryMgr` progression (shared). The per-spec
+> loadout (selection + persistence keyed by spec slot) is **adapter/persistence (deferred)** — it
+> reads the active talent group from the player and swaps the cached loadout on spec change. The pure
+> core only validates a loadout and resolves it (§14.10); it never reads spec.
+
+> **Implemented (pure core).** `core/mastery/MasteryTrees.{h,cpp}` — `MasteryUpkeep` (dual-key gate
+> + saturating-hyperbola upkeep with the §14.3 #1 sub-1.0 asymptote + SM/SE context gating) and
+> `ExpectedProcs` (§14.3 #2 PPM normalization, weapon-speed-cancelling). 6 tests green
+> (`tests/mastery/MasteryTreesTest.cpp`), full core suite 149/149, codestyle + core-purity clean.
+> **Deferred:** the lattice content (per-(school,tree) `ProcCell` values) as config/data, the
+> account-unlock/char-level persistence + adapter consumer for the combat layer (extends the §6
+> `MasteryMgr`). The §14.8 enemy-side composition is resolved + implemented (`EnemyMasteryMultiplier`).
+
+### 14.8 Enemy-side cap composition (resolved)
+
+**Decision: a separate NPC ceiling `MaxEnemyMul`, applied multiplicatively *after* §2.2 encounter
+scaling, with a group-size-invariant multiplier.** Rationale:
+
+- **Separate cap, not the player caps.** Enemy procs threaten *players* (incoming damage / enemy
+  survivability) — a different risk axis than player raid buffs. Reusing `MaxRaidMul` (tuned for
+  "desirable, not mandatory" *player* buffs) would conflate two unrelated tuning goals. Enemy spikes
+  get their own dial.
+- **Spikes are mechanics, not gear checks.** `MaxEnemyMul < MaxPersonalMul` (asserted) — an elite's
+  proc is a *visible window to react to*, never a one-shot. "Boss at max mastery" means windows are
+  frequent/sustained (high upkeep on the §14.2 curve), **not** bigger per-proc numbers.
+- **Composition order (extends §2.1):** `EncounterScale (§2.2)` sets the fair baseline for the group,
+  then the enemy mastery multiplier (`≤ MaxEnemyMul`) rides on top — same scaling-then-branding
+  discipline as the player side.
+- **Group-size invariance (protects §2.2 completability / Risk #4):** the multiplier is a function of
+  mastery level only, **not** group size. A 5-man-scaled elite and a 40-man-scaled elite see the
+  *same* proc multiplier; only the already-scaled baseline differs. So enemy mastery never reaches
+  down and breaks small-group completability — it is a bounded *fraction*, never a flat addition.
+
+```cpp
+// Enemy-side magnitude: 1.0 (level 0) .. asymptote below MaxEnemyMul. Monotonic, never < 1.0
+// (mastery never makes an enemy weaker -- mirror of "a brand never hurts the raid"), group-invariant.
+double EnemyMasteryMultiplier(uint8_t masteryLevel, IMasteryTreeConfig const& cfg);
+```
+
+**Invariants (fixture tests):**
+- `EnemyMasteryMultiplier(level, cfg) <= cfg.MaxEnemyMul` for all levels (`EnemyMastery_BoundedByCeiling`).
+- `>= 1.0`, monotonic non-decreasing in level (`EnemyMastery_NeverWeakensMonotonic`).
+- `cfg.MaxEnemyMul() < eff.MaxPersonalMul()` — spikes are mechanics, not one-shots (`EnemyMastery_BelowPlayerFantasy`).
+- Group-invariant composition: same multiplier applied to a 5-man-scaled and 40-man-scaled baseline
+  preserves the completability ordering (`EnemyMastery_GroupSizeInvariant_FractionNotFlat`).
+
+---
+
 ## 11. Determinism & Project-Convention Compliance
 
 - **No `std::rand` / `<random>`** in core; inject `IRng` (production impl wraps project
