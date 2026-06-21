@@ -297,6 +297,87 @@ Branding.Mastery.MaxLevel = 50
 
 Branding.Mastery.MaxBonus = 0.20
 
+#
+# Mastery combat trees (§14.1-§14.10). Each damage school has a Defensive/Offensive/Support tree;
+# every cell is a PROC-WINDOW (no flat passives). Mastery scales UPKEEP toward a sub-1.0 ceiling, and
+# within a cell the player redistributes a single budget across ppm / proc-duration / proc-magnitude
+# (§14.10) -- favouring one axis costs the others. These keys are that knob.
+#
+
+#
+#    Branding.Mastery.Tree.MaxUptime
+#        Description: §14.3 ceiling -- the maximum proc-window uptime fraction a character can sustain.
+#                     MUST be < 1.0: upkeep approaches but never reaches permanent uptime (no passive).
+#        Default:     0.60
+#
+
+Branding.Mastery.Tree.MaxUptime = 0.60
+
+#
+#    Branding.Mastery.Tree.UpkeepHalfLevel
+#        Description: Mastery level at which upkeep / tuning budget reaches half its ceiling
+#                     (saturating-hyperbola scale; higher = slower ramp).
+#        Default:     25
+#
+
+Branding.Mastery.Tree.UpkeepHalfLevel = 25
+
+#
+#    Branding.Mastery.Tree.OffSchoolFactor
+#        Description: §14.4 falloff for a situational (resistance / school-exposure) cell when NOT in
+#                     its matching invasion school. 0..1; 0.25 = quarter value off-school.
+#        Default:     0.25
+#
+
+Branding.Mastery.Tree.OffSchoolFactor = 0.25
+
+#
+#    Branding.Mastery.Tree.MaxEnemyMul
+#        Description: §14.8 separate ceiling for elite/boss mastery procs. Keep < Effect.MaxPersonalMul
+#                     -- enemy spikes are reactable windows, not one-shots.
+#        Default:     1.5
+#
+
+Branding.Mastery.Tree.MaxEnemyMul = 1.5
+
+#
+#    Branding.Mastery.Tree.MinPpm / MaxPpm
+#        Description: §14.10 bounds for the proc-frequency (procs-per-minute) tuning axis.
+#        Default:     1.0 / 10.0
+#
+
+Branding.Mastery.Tree.MinPpm = 1.0
+Branding.Mastery.Tree.MaxPpm = 10.0
+
+#
+#    Branding.Mastery.Tree.MinWindowMs / MaxWindowMs
+#        Description: §14.10 bounds (milliseconds) for the proc-duration tuning axis.
+#        Default:     3000 / 12000
+#
+
+Branding.Mastery.Tree.MinWindowMs = 3000
+Branding.Mastery.Tree.MaxWindowMs = 12000
+
+#
+#    Branding.Mastery.Tree.MaxProcMagnitude
+#        Description: §14.10 ceiling for the proc-magnitude tuning axis. Keep <= Effect.MaxRaidMul for
+#                     raid cells / <= Effect.MaxPersonalMul for personal cells so §7.9 caps subsume it.
+#        Default:     2.0
+#
+
+Branding.Mastery.Tree.MaxProcMagnitude = 2.0
+
+#
+#    Branding.Mastery.Tree.MinReach / MaxReach
+#        Description: §14.10 bounds for the reach (breadth) axis -- rendered per-cell as AoE radius
+#                     (yards) or cleave target count (a tooltip difference; same underlying axis).
+#                     Only area/cleave cells expose it.
+#        Default:     0.0 / 40.0
+#
+
+Branding.Mastery.Tree.MinReach = 0.0
+Branding.Mastery.Tree.MaxReach = 40.0
+
 
 #
 #    Branding.Allegiance.Enable

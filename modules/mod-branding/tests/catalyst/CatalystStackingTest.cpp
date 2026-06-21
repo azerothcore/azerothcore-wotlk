@@ -64,3 +64,70 @@ TEST(CatalystStacking, Deterministic)
     FakeCatalystConfig cfg;
     EXPECT_DOUBLE_EQ(RaidCatalystMultiplier(3, cfg), RaidCatalystMultiplier(3, cfg));
 }
+
+// --- §14.9 per (school, tree) DR bucketing ---
+
+// The bucket identity is (school, tree): both must match to share a DR bucket.
+TEST(CatalystStacking, SameBucketRequiresSchoolAndTree)
+{
+    EXPECT_TRUE(SameCatalystBucket({ BrandId::Fire, MasteryTree::Defensive },
+                                   { BrandId::Fire, MasteryTree::Defensive }));
+    EXPECT_FALSE(SameCatalystBucket({ BrandId::Fire, MasteryTree::Defensive },
+                                    { BrandId::Fire, MasteryTree::Offensive }));   // same school, diff tree
+    EXPECT_FALSE(SameCatalystBucket({ BrandId::Fire, MasteryTree::Defensive },
+                                    { BrandId::Frost, MasteryTree::Defensive }));  // same tree, diff school
+}
+
+// The headline case: one Fire-Def + one Fire-Off + one Fire-Support => three independent rank-1
+// buckets, so ALL THREE keep the full raid multiplier (no DR among complementary specialists).
+TEST(CatalystStacking, ComplementaryTreesDoNotTriggerDr)
+{
+    FakeCatalystConfig cfg;
+    CatalystKey roster[] = {
+        { BrandId::Fire, MasteryTree::Defensive },
+        { BrandId::Fire, MasteryTree::Offensive },
+        { BrandId::Fire, MasteryTree::Support },
+    };
+    for (std::size_t i = 0; i < 3; ++i)
+    {
+        uint8_t rank = CatalystRankInBucket(roster, 3, i);
+        EXPECT_EQ(rank, 1u);
+        EXPECT_DOUBLE_EQ(RaidCatalystMultiplier(rank, cfg), cfg.maxRaidMul);  // full effect, no DR
+    }
+}
+
+// Redundant specialists (the SAME cell repeated) DO stack DR: ranks increment 1, 2, 3...
+TEST(CatalystStacking, RedundantSameCellStacksDr)
+{
+    CatalystKey roster[] = {
+        { BrandId::Fire, MasteryTree::Offensive },   // rank 1
+        { BrandId::Fire, MasteryTree::Defensive },   // rank 1 (different bucket)
+        { BrandId::Fire, MasteryTree::Offensive },   // rank 2 (second Fire-Off)
+        { BrandId::Fire, MasteryTree::Offensive },   // rank 3 (third Fire-Off)
+    };
+    EXPECT_EQ(CatalystRankInBucket(roster, 4, 0), 1u);
+    EXPECT_EQ(CatalystRankInBucket(roster, 4, 1), 1u);
+    EXPECT_EQ(CatalystRankInBucket(roster, 4, 2), 2u);
+    EXPECT_EQ(CatalystRankInBucket(roster, 4, 3), 3u);
+}
+
+// Different school, same tree are independent buckets (rank 1 each) -- mirror of the tree case.
+TEST(CatalystStacking, DifferentSchoolSameTreeIndependent)
+{
+    CatalystKey roster[] = {
+        { BrandId::Fire,  MasteryTree::Defensive },
+        { BrandId::Frost, MasteryTree::Defensive },
+        { BrandId::Shadow, MasteryTree::Defensive },
+    };
+    EXPECT_EQ(CatalystRankInBucket(roster, 3, 0), 1u);
+    EXPECT_EQ(CatalystRankInBucket(roster, 3, 1), 1u);
+    EXPECT_EQ(CatalystRankInBucket(roster, 3, 2), 1u);
+}
+
+// Defensive guards: null roster / out-of-range index => rank 0 (neutral).
+TEST(CatalystStacking, RankInBucketHandlesBadInput)
+{
+    CatalystKey roster[] = { { BrandId::Fire, MasteryTree::Offensive } };
+    EXPECT_EQ(CatalystRankInBucket(nullptr, 0, 0), 0u);
+    EXPECT_EQ(CatalystRankInBucket(roster, 1, 5), 0u);
+}
