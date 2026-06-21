@@ -18,5 +18,6 @@ void Addmod_brandingScripts()
     AddBrandingItemScripts();
     AddBrandingEffectScripts();
     AddBrandingCatalystScripts();
+    AddBrandingAddonScripts();
     AddBrandingCommandScripts();
 }

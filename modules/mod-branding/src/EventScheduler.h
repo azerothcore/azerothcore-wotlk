@@ -1,6 +1,7 @@
 #ifndef MOD_BRANDING_SRC_EVENTSCHEDULER_H
 #define MOD_BRANDING_SRC_EVENTSCHEDULER_H
 
+#include "branding/addon/Protocol.h"
 #include "branding/contribution/ContributionTypes.h"
 #include <cstdint>
 #include <vector>
@@ -24,6 +25,10 @@ namespace Branding
         // arriving mid-event still sees the invasion creatures even if the map was empty (and thus
         // skipped) at the start transition.
         void EnsureSpawnedForZone(uint32_t zoneId);
+
+        // §19.3: per-zone schedule snapshot for the client addon (state 1 = active, 0 = cooldown;
+        // secondsRemaining = time left in the current phase). Empty when the scheduler is disabled.
+        std::vector<Addon::ScheduleEntry> SnapshotSchedule() const;
 
     private:
         EventScheduler() = default;

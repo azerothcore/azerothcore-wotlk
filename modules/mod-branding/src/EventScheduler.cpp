@@ -1,4 +1,5 @@
 #include "EventScheduler.h"
+#include "AddonProtocolMgr.h"
 #include "EventMgr.h"
 #include "Configuration/Config.h"
 #include "DatabaseEnv.h"
@@ -114,6 +115,22 @@ namespace Branding
                 DriveSpawnGroup(s, true);
     }
 
+    std::vector<Addon::ScheduleEntry> EventScheduler::SnapshotSchedule() const
+    {
+        std::vector<Addon::ScheduleEntry> out;
+        out.reserve(_zones.size());
+        for (Scheduled const& s : _zones)
+        {
+            Addon::ScheduleEntry e;
+            e.zoneId = s.zoneId;
+            e.type = static_cast<uint8_t>(s.type);
+            e.state = s.active ? 1 : 0;
+            e.secondsRemaining = s.timerMs / 1000;
+            out.push_back(e);
+        }
+        return out;
+    }
+
     void EventScheduler::Update(uint32_t diffMs)
     {
         if (!_enabled)
@@ -128,6 +145,7 @@ namespace Branding
                 DriveSpawnGroup(s, false);
                 s.active = false;
                 s.timerMs = s.cooldownMs;
+                sAddonProtocolMgr->BroadcastZoneEvent(s.zoneId);
                 continue;
             }
 
@@ -152,6 +170,7 @@ namespace Branding
                 s.active = true;
                 s.timerMs = s.activeMs;
             }
+            sAddonProtocolMgr->BroadcastZoneEvent(s.zoneId);
         }
     }
 }
