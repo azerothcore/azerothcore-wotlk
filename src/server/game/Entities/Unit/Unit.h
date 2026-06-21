@@ -2186,6 +2186,9 @@ protected:
 
     float m_speed_rate[MAX_MOVE_TYPE];
 
+    // snapshot of speed rates taken when SetCharmedBy() is called
+    float _charmStartSpeedRate[MAX_MOVE_TYPE]{};
+
     CharmInfo* m_charmInfo;
     SharedVisionList m_sharedVision;
 
