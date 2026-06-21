@@ -354,3 +354,13 @@ Branding.Economy.FragmentItemId = 2592
 #
 
 Branding.Item.Enable = 0
+
+#
+#    Branding.Event.SchedulerEnable
+#        Description: Ambient event scheduler (§9.1): auto-cycles events per the branding_event_def
+#                     table (active -> cooldown), resolving early at 100% containment. Requires the
+#                     event engine (Branding.Event.Enable) to score kills.
+#        Default:     0 - (disabled)
+#
+
+Branding.Event.SchedulerEnable = 0
