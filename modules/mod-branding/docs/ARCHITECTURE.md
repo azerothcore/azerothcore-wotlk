@@ -935,25 +935,33 @@ Mastery is a lattice of **5 damage schools × 3 trees**. Each (school, tree) cel
 **procs**. The schools (issue #24): `Fire, Nature, Shadow, Frost, Physical` (a subset of `BrandId`;
 `Arcane`/`Holy` are extension slots, no trees yet).
 
-| Tree | Intent | Governing cap (§7.9) |
-|---|---|---|
-| **Def** | survivability / sustain procs | `MaxPersonalMul` (personal) / `MaxRaidMul` (raid-wide) |
-| **Off** | damage / control procs | `MaxRaidMul` + catalyst DR (Slice 4) |
-| **Support** | school-matched mitigation + raid utility | `MaxRaidMul` (utility) / `MaxMitigation`+DR (resist) |
+| Tree | Expression | Mastery tunes | Governing cap (§7.9) |
+|---|---|---|---|
+| **Def** | windowed proc | ppm / duration / magnitude (+reach if AoE) | `MaxPersonalMul` (personal) / `MaxRaidMul` (raid-wide) |
+| **Off** | windowed proc | ppm / duration / magnitude (+reach if area/cleave) | `MaxRaidMul` + catalyst DR (Slice 4) |
+| **Support** | **sustained aura** | **magnitude + reach** (constant uptime) | `MaxRaidMul` (utility) / `MaxMitigation`+DR (resist) |
 
-### 14.2 Core principle — *everything is a proc-window; mastery scales upkeep, not a flat value*
+### 14.2 Core principle — windowed procs vs sustained auras
 
-There are **no always-on passives anywhere in the lattice**, including the resistances/auras. Every
-cell is a proc that opens a bounded **window** (a buff, debuff, mitigation, or §7.9 mechanic
-transform). **Mastery raises *upkeep*** — how reliably a character keeps its windows up — **never a
-flat magnitude.** This is the same windowed-uptime contract as §7.9:
+The thing the design forbids is a **flat passive `+damage%`**. Two expression modes deliver power
+without one:
 
-```
-uptime = Σ window time / elapsed   — asserted strictly < 1.0 at ALL mastery levels.
-```
+- **Def / Off = proc-windows.** Each is a proc that opens a bounded window (buff, debuff, mitigation,
+  §7.9 transform). **Mastery raises *upkeep*** — how reliably you keep the windows up, **never a flat
+  magnitude** — under the windowed-uptime contract (§14.3): `uptime = Σ window / elapsed`, asserted
+  strictly `< 1.0` at all mastery levels. A maintain-through-active-play loop, not a buff-bar slot.
+- **Support = sustained auras.** Support buffs (resistances, raid utility, school-exposures) are the
+  **aura pattern** — bounded team buffs that are *meant to be up* (like paladin auras / totems).
+  Constant uptime is intended, so the §14.3 uptime asymptote does **not** apply to Support; instead
+  **mastery scales magnitude (stronger buff) and reach (more allies / bigger radius)** — Support cells
+  expose only those two §14.10 axes (no ppm/duration). This is still not a flat `+damage%`: magnitude
+  stays bounded by `MaxProcMagnitude` (≤ the §7.9 cap) + catalyst DR, and the situational (SM/SE)
+  ones stay school-gated, so a permanent Support buff is desirable, never mandatory.
 
-So a "fire resistance" support cell is *"your casts/attacks proc a fire-resist window; mastery makes
-that window easier to sustain"* — a maintain-through-active-play loop, not a buff-bar slot.
+> **Magnitude ceiling for sustained raid buffs:** because a Support aura is *permanent*, even a
+> bounded raid-wide magnitude is strong — sustained raid cells should carry a conservative magnitude
+> ceiling (per-cell magnitude ceilings are a noted config refinement; today `MaxProcMagnitude` is
+> global).
 
 ### 14.3 Two new balance rails (added by this section)
 
@@ -1149,6 +1157,15 @@ Resulting behaviour:
 > loadout (selection + persistence keyed by spec slot) is **adapter/persistence (deferred)** — it
 > reads the active talent group from the player and swaps the cached loadout on spec change. The pure
 > core only validates a loadout and resolves it (§14.10); it never reads spec.
+
+> **Lattice content (pure core, first cut).** `LatticeCell(school, tree)` encodes the §14.4 table as
+> the design ruleset: each authored cell's `EffectKind`, situational (SM/SE) flag, **sustained flag**
+> (Support = sustained aura; Def/Off = windowed), and §14.10 applicable-axis mask (windowed cells get
+> ppm/duration/magnitude +Reach for area/cleave; Support cells get **magnitude + reach only**). Off
+> cells are `RaidWindow`, Support cells are situational + sustained, unauthored schools (Arcane/Holy)
+> return a neutral default. Multi-archetype cells are
+> represented by their primary archetype; secondary archetypes + concrete spell ids / per-cell
+> envelopes are the next (data/config) expansion. 6 tests.
 
 > **Implemented (pure core).** `core/mastery/MasteryTrees.{h,cpp}` — `MasteryUpkeep` (dual-key gate
 > + saturating-hyperbola upkeep with the §14.3 #1 sub-1.0 asymptote + SM/SE context gating) and

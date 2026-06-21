@@ -110,6 +110,27 @@ namespace Branding
     ResolvedCell ResolveTreeCell(TreeAllocation const& alloc, uint32_t applicableAxes,
         uint8_t masteryLevel, IMasteryTreeConfig const& cfg);
 
+    // §14.4: structural definition of one (school, tree) lattice cell -- its primary proc archetype.
+    // This is the DESIGN ruleset (the §14.4 table): the §7.9 expression family, whether the cell is
+    // school-matched/situational, and which §14.10 axes it exposes. Concrete spell ids and per-cell
+    // envelopes are data/config layered on top; this fixes the shape. Multi-archetype cells (e.g. a
+    // Support cell's resistance + utility proc) are represented by their PRIMARY archetype for now;
+    // secondary archetypes are a §7.9 loadout expansion (selectedProcArchetype).
+    struct LatticeCellDef
+    {
+        EffectKind kind = EffectKind::RaidWindow;
+        bool       situational = false;     // SM/SE: school-matched mitigation/exposure
+        // Support buffs are SUSTAINED auras -- constant uptime is intended, so the §14.3 uptime
+        // asymptote does NOT apply and mastery tunes magnitude + reach instead of ppm/duration.
+        // Def/Off cells are windowed (sustained == false).
+        bool       sustained = false;
+        uint32_t   applicableAxes = 0;      // §14.10 tunable axes for this cell (OR of AxisBit(...))
+    };
+
+    // Look up a cell's definition (§14.4). Schools without authored trees (Arcane/Holy) return a
+    // neutral default (RaidWindow, non-situational, ppm/duration/magnitude axes).
+    LatticeCellDef LatticeCell(BrandId school, MasteryTree tree);
+
     // §14.8: enemy (elite/boss) mastery magnitude. Rides on top of the §2.2-scaled encounter
     // baseline (scaling-then-branding, §2.1). Function of mastery level ONLY -- group-size invariant,
     // so it never reaches down and breaks small-group completability. 1.0 at level 0, monotonic

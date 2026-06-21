@@ -101,6 +101,93 @@ namespace Branding
         return out;
     }
 
+    namespace
+    {
+        // §14.10 axis masks. Windowed (Def/Off): ppm/duration/magnitude; +Reach for area/cleave.
+        constexpr uint32_t BASE = AxisBit(ProcAxis::Ppm) | AxisBit(ProcAxis::Duration) |
+            AxisBit(ProcAxis::Magnitude);
+        constexpr uint32_t BASE_REACH = BASE | AxisBit(ProcAxis::Reach);
+        // Sustained (Support) auras tune magnitude + reach only -- no proc cadence (ppm/duration).
+        constexpr uint32_t SUSTAINED = AxisBit(ProcAxis::Magnitude) | AxisBit(ProcAxis::Reach);
+
+        // Compact helpers for the §14.4 table below.
+        constexpr LatticeCellDef Win(EffectKind kind, uint32_t axes)        // windowed Def/Off cell
+        {
+            return LatticeCellDef{ kind, /*situational*/ false, /*sustained*/ false, axes };
+        }
+        constexpr LatticeCellDef Sup(EffectKind kind)                       // sustained Support cell (SM/SE)
+        {
+            return LatticeCellDef{ kind, /*situational*/ true, /*sustained*/ true, SUSTAINED };
+        }
+    }
+
+    LatticeCellDef LatticeCell(BrandId school, MasteryTree tree)
+    {
+        using EK = EffectKind;
+
+        // §14.4 lattice. Off cells = RaidWindow (bounded raid damage); Def = personal survivability
+        // or a healing transform; Support = a school-matched (situational) resistance/exposure. Reach
+        // marks the area/cleave procs (radius OR target count).
+        switch (school)
+        {
+            case BrandId::Fire:
+                switch (tree)
+                {
+                    case MasteryTree::Defensive: return Win(EK::RaidWindow, BASE_REACH);  // fire AoE proc
+                    case MasteryTree::Offensive: return Win(EK::RaidWindow, BASE);         // fire damage proc
+                    case MasteryTree::Support:   return Sup(EK::PersonalSpike);            // fire resistance
+                    default: break;
+                }
+                break;
+
+            case BrandId::Nature:
+                switch (tree)
+                {
+                    case MasteryTree::Defensive: return Win(EK::MechanicTransform, BASE);  // HoT proc (spread)
+                    case MasteryTree::Offensive: return Win(EK::RaidWindow, BASE_REACH);    // poison cloud (area)
+                    case MasteryTree::Support:   return Sup(EK::PersonalSpike);            // nature resistance
+                    default: break;
+                }
+                break;
+
+            case BrandId::Shadow:
+                switch (tree)
+                {
+                    case MasteryTree::Defensive: return Win(EK::PersonalSpike, BASE);       // life-steal proc
+                    case MasteryTree::Offensive: return Win(EK::RaidWindow, BASE_REACH);     // shadow volley (area)
+                    case MasteryTree::Support:   return Sup(EK::RaidWindow);                // shadow-exposure vs Nature
+                    default: break;
+                }
+                break;
+
+            case BrandId::Frost:
+                switch (tree)
+                {
+                    case MasteryTree::Defensive: return Win(EK::PersonalSpike, BASE);       // damage-reduction proc
+                    case MasteryTree::Offensive: return Win(EK::RaidWindow, BASE_REACH);     // Frost Nova (area)
+                    case MasteryTree::Support:   return Sup(EK::RaidWindow);                // frost-exposure vs Fire
+                    default: break;
+                }
+                break;
+
+            case BrandId::Physical:
+                switch (tree)
+                {
+                    case MasteryTree::Defensive: return Win(EK::PersonalSpike, BASE);       // evasion proc
+                    case MasteryTree::Offensive: return Win(EK::RaidWindow, BASE_REACH);     // cleave (target count)
+                    case MasteryTree::Support:   return Sup(EK::PersonalSpike);            // physical mitigation
+                    default: break;
+                }
+                break;
+
+            default:
+                break;  // Arcane / Holy: no authored trees yet.
+        }
+
+        // Neutral default for unauthored (school, tree) pairs.
+        return Win(EK::RaidWindow, BASE);
+    }
+
     double EnemyMasteryMultiplier(uint8_t masteryLevel, IMasteryTreeConfig const& cfg)
     {
         // §14.8: 1.0 at level 0, asymptotes toward MaxEnemyMul from below (same saturating shape as

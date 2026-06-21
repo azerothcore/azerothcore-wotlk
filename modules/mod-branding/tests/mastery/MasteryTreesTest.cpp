@@ -238,6 +238,105 @@ TEST(MasteryTrees, TreeTuningEnvelopeGrowsWithMastery)
     EXPECT_GT(hi.reach, lo.reach);
 }
 
+// --- §14.4 lattice content ---
+
+namespace
+{
+    constexpr BrandId AUTHORED_SCHOOLS[] = {
+        BrandId::Fire, BrandId::Nature, BrandId::Shadow, BrandId::Frost, BrandId::Physical
+    };
+    constexpr MasteryTree TREES[] = {
+        MasteryTree::Defensive, MasteryTree::Offensive, MasteryTree::Support
+    };
+    constexpr uint32_t BASE3 = AxisBit(ProcAxis::Ppm) | AxisBit(ProcAxis::Duration) |
+                               AxisBit(ProcAxis::Magnitude);
+}
+
+// §14.4: windowed Def/Off cells expose the ppm/duration/magnitude axes; sustained Support cells
+// tune magnitude + reach only (no proc cadence).
+TEST(MasteryTrees, LatticeCellAxesMatchExpression)
+{
+    for (BrandId s : AUTHORED_SCHOOLS)
+    {
+        EXPECT_EQ(LatticeCell(s, MasteryTree::Defensive).applicableAxes & BASE3, BASE3);
+        EXPECT_EQ(LatticeCell(s, MasteryTree::Offensive).applicableAxes & BASE3, BASE3);
+
+        LatticeCellDef sup = LatticeCell(s, MasteryTree::Support);
+        uint32_t const expected = AxisBit(ProcAxis::Magnitude) | AxisBit(ProcAxis::Reach);
+        EXPECT_EQ(sup.applicableAxes, expected);                           // magnitude + reach only
+        EXPECT_EQ(sup.applicableAxes & AxisBit(ProcAxis::Ppm), 0u);        // no proc cadence
+        EXPECT_EQ(sup.applicableAxes & AxisBit(ProcAxis::Duration), 0u);
+    }
+}
+
+// §14.4: Support buffs are SUSTAINED auras (constant uptime); Def/Off are windowed.
+TEST(MasteryTrees, LatticeSupportSustainedDefOffWindowed)
+{
+    for (BrandId s : AUTHORED_SCHOOLS)
+    {
+        EXPECT_TRUE(LatticeCell(s, MasteryTree::Support).sustained);
+        EXPECT_FALSE(LatticeCell(s, MasteryTree::Defensive).sustained);
+        EXPECT_FALSE(LatticeCell(s, MasteryTree::Offensive).sustained);
+    }
+}
+
+// §14.4: Offensive cells are bounded raid-damage windows; Support cells are all school-matched.
+TEST(MasteryTrees, LatticeOffensiveAreRaidSupportAreSituational)
+{
+    for (BrandId s : AUTHORED_SCHOOLS)
+    {
+        EXPECT_EQ(LatticeCell(s, MasteryTree::Offensive).kind, EffectKind::RaidWindow);
+        EXPECT_TRUE(LatticeCell(s, MasteryTree::Support).situational);
+        EXPECT_FALSE(LatticeCell(s, MasteryTree::Defensive).situational);
+        EXPECT_FALSE(LatticeCell(s, MasteryTree::Offensive).situational);
+    }
+}
+
+// §14.4/§14.10: among WINDOWED cells, reach marks the area/cleave procs; single-target windowed
+// cells have none. (Sustained Support cells always tune reach -- the "more allies / bigger radius"
+// lever -- and are covered by LatticeCellAxesMatchExpression.)
+TEST(MasteryTrees, LatticeReachOnAreaCleaveWindowedCells)
+{
+    auto hasReach = [](BrandId s, MasteryTree t)
+    {
+        return (LatticeCell(s, t).applicableAxes & AxisBit(ProcAxis::Reach)) != 0u;
+    };
+    // Fire Def (AoE), and every school's Offensive except Fire (poison cloud / volley / nova / cleave).
+    EXPECT_TRUE(hasReach(BrandId::Fire, MasteryTree::Defensive));
+    EXPECT_TRUE(hasReach(BrandId::Nature, MasteryTree::Offensive));
+    EXPECT_TRUE(hasReach(BrandId::Shadow, MasteryTree::Offensive));
+    EXPECT_TRUE(hasReach(BrandId::Frost, MasteryTree::Offensive));
+    EXPECT_TRUE(hasReach(BrandId::Physical, MasteryTree::Offensive));
+    // Single-target windowed cells: no reach.
+    EXPECT_FALSE(hasReach(BrandId::Fire, MasteryTree::Offensive));     // fire damage proc (single)
+    EXPECT_FALSE(hasReach(BrandId::Shadow, MasteryTree::Defensive));   // life-steal
+    EXPECT_FALSE(hasReach(BrandId::Frost, MasteryTree::Defensive));    // damage-reduction
+}
+
+// Unauthored schools fall back to the neutral default (no crash, sane shape).
+TEST(MasteryTrees, LatticeUnauthoredSchoolDefault)
+{
+    LatticeCellDef def = LatticeCell(BrandId::Arcane, MasteryTree::Offensive);
+    EXPECT_EQ(def.kind, EffectKind::RaidWindow);
+    EXPECT_FALSE(def.situational);
+    EXPECT_EQ(def.applicableAxes & BASE3, BASE3);
+}
+
+// Integration: a cell's own mask drives ResolveTreeCell. The cleave cell (Physical Off) tunes reach
+// (target count); the single-target fire damage cell (Fire Off) does not.
+TEST(MasteryTrees, LatticeMaskDrivesResolve)
+{
+    FakeMasteryTreeConfig cfg;
+    LatticeCellDef cleave = LatticeCell(BrandId::Physical, MasteryTree::Offensive);
+    LatticeCellDef fireBolt = LatticeCell(BrandId::Fire, MasteryTree::Offensive);
+
+    ResolvedCell c = ResolveTreeCell(Alloc(1, 1, 1, 1), cleave.applicableAxes, 40, cfg);
+    ResolvedCell f = ResolveTreeCell(Alloc(1, 1, 1, 1), fireBolt.applicableAxes, 40, cfg);
+
+    EXPECT_GT(c.reach, cfg.minReach);              // cleave invests in reach (count)
+    EXPECT_DOUBLE_EQ(f.reach, cfg.minReach);       // single-target: reach stays at baseline
+}
+
 // §14.8 -- enemy spikes are bounded by their own ceiling, never below 1.0, monotonic in mastery.
 TEST(MasteryTrees, EnemyMasteryBoundedAndNeverWeakens)
 {
