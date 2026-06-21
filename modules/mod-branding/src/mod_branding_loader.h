@@ -6,6 +6,7 @@ void AddBrandingProficiencyScripts();
 void AddBrandingDiscoveryScripts();
 void AddBrandingScalingScripts();
 void AddBrandingEventScripts();
+void AddBrandingEventSchedulerScripts();
 void AddBrandingLoadoutScripts();
 void AddBrandingVaultScripts();
 void AddBrandingMasteryScripts();
