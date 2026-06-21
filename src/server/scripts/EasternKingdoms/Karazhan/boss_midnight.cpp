@@ -146,14 +146,8 @@ struct boss_attumen : public BossAI
         {
             if (Creature* midnight = instance->GetCreature(DATA_MIDNIGHT))
             {
-                if (midnight->GetHealth() > me->GetHealth())
-                {
-                    summon->SetHealth(midnight->GetHealth());
-                }
-                else
-                {
-                    summon->SetHealth(me->GetHealth());
-                }
+                // Mounted Attumen spawns at 100% HP (blizzlike - confirmed via live sniffs)
+                summon->SetHealth(summon->GetMaxHealth());
                 summon->AI()->DoZoneInCombat();
             }
         }
@@ -162,11 +156,10 @@ struct boss_attumen : public BossAI
 
     void IsSummonedBy(WorldObject* summoner) override
     {
-        if (summoner->GetEntry() == NPC_MIDNIGHT)
-        {
-            _phase = PHASE_ATTUMEN_ENGAGES;
-        }
-        if (summoner->GetEntry() == NPC_ATTUMEN_THE_HUNTSMAN)
+        // Use entry-based check to ensure phase is set correctly
+        // regardless of whether summoner is valid
+        if (me->GetEntry() == NPC_ATTUMEN_THE_HUNTSMAN_MOUNTED
+            || (summoner && summoner->GetEntry() == NPC_ATTUMEN_THE_HUNTSMAN))
         {
             _phase = PHASE_MOUNTED;
             DoCastSelf(SPELL_SPAWN_SMOKE);
@@ -195,6 +188,11 @@ struct boss_attumen : public BossAI
                 DoCastVictim(SPELL_KNOCKDOWN);
                 task.Repeat(25s, 35s);
             });
+        }
+        else
+        {
+            // Unmounted Attumen - always enter PHASE_ATTUMEN_ENGAGES
+            _phase = PHASE_ATTUMEN_ENGAGES;
         }
     }
 
