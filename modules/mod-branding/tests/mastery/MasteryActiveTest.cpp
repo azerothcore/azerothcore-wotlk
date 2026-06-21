@@ -177,16 +177,17 @@ TEST(MasteryActive, SetAddRejectsDuplicateCellAndFullCapacity)
     EXPECT_TRUE(set.Add(fireDef));    // distinct cell -> ok
     EXPECT_EQ(set.Count(), 2u);
 
-    // Fill to capacity, then the next distinct cell is rejected (fixed-cap collection).
-    BrandId const schools[] = { BrandId::Frost, BrandId::Nature, BrandId::Shadow, BrandId::Arcane,
-                                BrandId::Holy, BrandId::Physical };
-    MasteryTree const trees[] = { MasteryTree::Defensive, MasteryTree::Offensive, MasteryTree::Support };
-    for (BrandId s : schools)
-        for (MasteryTree t : trees)
-            set.Add(ActiveMasteryEntry{ s, t, 0, { 0, 0, 0, 0 } });
-    set.Add(ActiveMasteryEntry{ BrandId::Fire, MasteryTree::Support, 0, { 0, 0, 0, 0 } });
+    // Fill to capacity, then the next distinct cell is rejected (fixed-cap collection). Iterate
+    // EVERY (school, tree) cell so the fill tracks Capacity regardless of how many brands exist
+    // (Capacity = BrandId::COUNT * MasteryTree::COUNT); the two Fire cells above are re-offered and
+    // rejected as duplicates, so exactly Capacity distinct cells end up present.
+    for (uint8_t s = 0; s < static_cast<uint8_t>(BrandId::COUNT); ++s)
+        for (uint8_t t = 0; t < static_cast<uint8_t>(MasteryTree::COUNT); ++t)
+            set.Add(ActiveMasteryEntry{ static_cast<BrandId>(s), static_cast<MasteryTree>(t), 0, { 0, 0, 0, 0 } });
 
     EXPECT_EQ(set.Count(), ActiveMasterySet::Capacity);
+    // Every cell is now occupied, so any further distinct add is rejected by the fixed cap. Use a
+    // cell guaranteed to exist (Fire/Defensive) -- already present, so this also re-confirms no dup.
     EXPECT_FALSE(set.Add(ActiveMasteryEntry{ BrandId::Fire, MasteryTree::Defensive, 2, { 0, 0, 0, 0 } }));
 }
 

@@ -50,6 +50,14 @@ namespace
             case BrandId::Arcane:   return "Arcane";
             case BrandId::Holy:     return "Holy";
             case BrandId::Physical: return "Physical";
+            case BrandId::Wind:     return "Wind";
+            case BrandId::Lightning: return "Lightning";
+            case BrandId::Blood:    return "Blood";
+            case BrandId::Void:     return "Void";
+            case BrandId::Stone:    return "Stone";
+            case BrandId::Venom:    return "Venom";
+            case BrandId::Chrono:   return "Chrono";
+            case BrandId::Spirit:   return "Spirit";
             default:                return "Unknown";
         }
     }

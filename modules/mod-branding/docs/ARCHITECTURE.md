@@ -328,7 +328,11 @@ Rationale: build pure-logic, high-leverage cores first; defer adapter-heavy/cosm
 
 ### 7.1 Concepts
 
-- **BrandId** — enum of brands: `Fire, Frost, Nature, Shadow, Arcane, Holy, Physical` (extensible).
+- **BrandId** — enum of brands: the seven classic schools `Fire, Frost, Nature, Shadow, Arcane,
+  Holy, Physical`, plus the **exotic schools** `Wind, Lightning, Blood, Void, Stone, Venom, Chrono,
+  Spirit` (§7.10). Extensible;
+  order is stable (the value is a bit index into `KnowledgeState::unlockedMask`, a `uint32_t` — room
+  for up to 32 brands). New schools must be appended **before `COUNT`**.
 - **Brand Knowledge** *(account)* — set of `BrandId` the account has unlocked. Gates whether a
   character may earn proficiency in that brand. Pure queries; persistence is account-scoped.
 - **Brand Proficiency** *(character)* — per `(character, BrandId)`: an XP total and a derived
@@ -607,6 +611,50 @@ ItemUpgradeResult ApplyItemUpgrade(ItemBrandState&, uint32_t resources, IBrandin
 The adapter layer (Slice 7) maps these decisions onto AzerothCore: exposure windows → debuff auras
 + proc-frequency modification; personal spikes → tank survivability auras; mechanic transforms →
 spell-script behavior changes. Core stays pure; only the adapter touches `Spell`/`Aura`/`Unit`.
+
+### 7.10 Exotic brand schools (extending §7.1)
+
+Beyond the seven classic schools, the system ships **exotic schools** — hybrid/conceptual brands that
+cross the elemental lines so they read as *exotic* rather than "another element". An exotic school is
+**not new machinery**: it is a new `BrandId` value that flows through the existing effect model
+(§7.9). Each school's identity is expressed **role-asymmetrically** through the three `EffectKind`s —
+Tank → `PersonalSpike` (dramatic), DPS/Support/Control → `RaidWindow` (bounded + catalyst-DR'd),
+Healer → `MechanicTransform` (structural) — and obeys every §7.9 invariant unchanged. Per §1/§7.9 the
+expression is always **proc/behaviour transforms, never flat ±% stats**.
+
+**Groundwork shipped (enum + names + uniform Knowledge/loadout/`ProfileFor` handling)** for all eight
+schools below — v1 `Wind, Lightning, Blood, Void` and v2 `Stone, Venom, Chrono, Spirit`. The
+role-driven `ProfileFor` (§7.9) already resolves a sensible per-role default for each; the
+brand-specific *flavour* in the table below is realised by the effect-application adapter (issue #03)
+and is documented here as the authoring contract.
+
+| School | Theme | Tank — PersonalSpike | DPS — RaidWindow | Support/Control — RaidWindow | Healer — MechanicTransform |
+|---|---|---|---|---|---|
+| **Wind** | tempest / motion | dodge/evasion spike window | Windfury — extra-attack proc cadence | group haste window | gusts spread a HoT to a 2nd ally |
+| **Lightning** | chain arc | static shield (brief reflect/absorb) | procs arc to a nearby enemy (single-target → cleave) | "overload": group's next casts gain a bonus chain target | overheal jumps as a small heal to the lowest nearby ally |
+| **Blood** | lifedrain / execute | leech window (% of damage dealt → HP) | execute cadence — proc rate ramps as target HP drops | bounded group leech window | a fraction of allied overkill converts to raid healing (damage → heal) |
+| **Void** | phase / gravity | blink/displacement (brief damage-avoidance phase) | phase procs (periodic armor-ignore burst) | gravity well: pull/cluster adds (control) or short CDR window | dispel-on-heal (heals also remove a magic effect) |
+| **Stone** | earth / immovability | stoneform: large armor/HP spike, knock-immune | tremor procs (brief target slow / interrupt cadence) | earthen totem: group damage-taken reduction window | overheal → earthen barrier (absorb shield) |
+| **Venom** | contagion / DoT | contagion aura: attackers gain stacking weaken | DoT-spread proc (single DoT → cleave to nearby) | brittle: group's periodic effects tick faster window | cleanse-on-heal (heals also purge a poison/disease) |
+| **Chrono** | time / rewind | anachronism: periodically rewind own HP to a recent snapshot | echo procs (a fraction of a hit repeats a beat later) | bounded time-warp: group haste + minor CDR (heavy DR) | heals leave a short "rewind" HoT echo |
+| **Spirit** | soul / ghostform | ghost-walk: brief damage-immunity blink | soul-harvest cadence (procs build on kills/low-HP) | spectral veil: group threat-drop / stealth-assist window | overheal spawns a roaming wisp that heals the lowest ally |
+
+**Invariants (tested, brand-agnostic so they hold across the enlarged enum — `ExoticSchoolTest`):**
+
+- Every `BrandId` value in `[0, COUNT)` resolves through `ProfileFor` to the role-correct `EffectKind`
+  (Tank→PersonalSpike, Healer→MechanicTransform, else RaidWindow), with windowed uptime `< 1.0`.
+- `RaidMultiplier` stays bounded by `MaxRaidMul` and `PersonalMultiplier(Tank) > PersonalMultiplier(Damage)`
+  for **every** brand (guards future brand-specific `ProfileFor` refinements from breaking §7.9).
+- Knowledge gating is uniform: an exotic brand can be unlocked, earns proficiency only when unlocked
+  (`CanEarnProficiency`), expresses only on an account holding the Knowledge (`CanExpressBrand`,
+  anti-P2W §1), and validates in a loadout exactly like a classic school.
+
+**Open (deferred to the adapter):** whether exotic schools are their own ids (the choice here) or
+compositions of two base brands (WotLK combined schools); their Knowledge-unlock cost vs the classic
+seven (encoded in the §6/#01 unlock-cost table, never in effect strength); and the brand-specific
+`ProfileFor`/mastery-lattice (§14.4) flavour from the table above (issue #03). The §14.4 mastery
+lattice and the addon mastery UI expose only their authored subset, so exotic schools fall through to
+the neutral lattice default until authored.
 
 ---
 
