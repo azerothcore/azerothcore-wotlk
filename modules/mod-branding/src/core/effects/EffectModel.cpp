@@ -45,3 +45,42 @@ namespace Branding
         return profLevel >= cfg.MaxEffectLevel();
     }
 }
+
+namespace Branding
+{
+    EffectProfile ProfileFor(BrandId /*brand*/, RoleContribution role)
+    {
+        // Brand-specific profiles are a future refinement; for now the role drives kind + timing.
+        EffectProfile profile;
+        profile.role = role;
+        switch (role)
+        {
+            case RoleContribution::Tank:
+                profile.kind = EffectKind::PersonalSpike;   // dramatic, visible survivability spike
+                profile.windowDurationMs = 8000;
+                profile.cooldownMs = 24000;
+                break;
+            case RoleContribution::Healer:
+                profile.kind = EffectKind::MechanicTransform; // structural (overheal->shield, ...)
+                break;
+            default:
+                profile.kind = EffectKind::RaidWindow;      // restrained burst window
+                profile.windowDurationMs = 6000;
+                profile.cooldownMs = 18000;
+                break;
+        }
+        return profile;
+    }
+
+    bool IsWindowActive(EffectProfile const& profile, uint64_t nowMs)
+    {
+        if (profile.kind == EffectKind::MechanicTransform)
+            return true;    // structural transforms are always on; gated by strength, not time
+
+        uint64_t const period = static_cast<uint64_t>(profile.windowDurationMs) + profile.cooldownMs;
+        if (period == 0)
+            return true;
+
+        return (nowMs % period) < profile.windowDurationMs;
+    }
+}

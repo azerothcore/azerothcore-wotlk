@@ -344,3 +344,31 @@ Branding.Economy.MaterialItemId = 2589
 #
 
 Branding.Economy.FragmentItemId = 2592
+
+#
+#    Branding.Effect.Enable
+#        Description: Branding combat effects (§7.9). A branded player's OUTGOING damage is boosted
+#                     by the personal multiplier during its active window (no passive uptime).
+#                     Composes on top of zone downscaling (§2.1).
+#        Default:     0 - (disabled)
+#
+
+Branding.Effect.Enable = 0
+
+#
+#    Branding.Effect.MaxPersonalMul / MaxRaidMul
+#        Description: §7.9 magnitude caps -- large personal (fantasy, felt by the player) vs bounded
+#                     raid (desirability, not mandate; further reduced by catalyst DR in #04).
+#        Default:     3.5 / 2.0
+#
+
+Branding.Effect.MaxPersonalMul = 3.5
+Branding.Effect.MaxRaidMul = 2.0
+
+#
+#    Branding.Effect.MaxEffectLevel
+#        Description: Proficiency level at which the effect reaches full strength.
+#        Default:     50
+#
+
+Branding.Effect.MaxEffectLevel = 50

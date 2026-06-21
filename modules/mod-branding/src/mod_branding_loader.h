@@ -12,6 +12,7 @@ void AddBrandingMasteryScripts();
 void AddBrandingAllegianceScripts();
 void AddBrandingEconomyScripts();
 void AddBrandingDiscoverableScripts();
+void AddBrandingEffectScripts();
 void AddBrandingCommandScripts();
 
 #endif // MOD_BRANDING_SRC_LOADER_H
