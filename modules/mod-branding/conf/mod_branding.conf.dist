@@ -364,3 +364,29 @@ Branding.Item.Enable = 0
 #
 
 Branding.Event.SchedulerEnable = 0
+
+
+#
+# Client addon transport (design slice 8, §19). Pushes branding state (invasion schedule, live
+# containment, your contribution, brands, mastery, loadout, item brand, allegiance) to the
+# `Branding` WoW addon over the native CHAT_MSG_ADDON channel (prefix BRND). Server-push only --
+# the addon is a pure renderer. See modules/mod-branding/client-addon/ for the addon + install guide.
+#
+
+#
+#    Branding.Addon.Enable
+#        Description: Master switch for the §19 client-addon push transport.
+#        Default:     0 - (disabled)
+#
+
+Branding.Addon.Enable = 0
+
+#
+#    Branding.Addon.PushIntervalSeconds
+#        Description: How often the server pushes live updates. Each tick re-pushes the active-zone
+#                     event/containment; every 6th tick also re-pushes the character + schedule
+#                     snapshots. Lower = more responsive, more addon-channel traffic.
+#        Default:     5
+#
+
+Branding.Addon.PushIntervalSeconds = 5

@@ -1,0 +1,10 @@
+## Interface: 30300
+## Title: Branding
+## Notes: Invasion tracker + brand/mastery/allegiance panel for the mod-branding server system.
+## Author: mod-branding
+## Version: 1.0
+## SavedVariablesPerCharacter: BrandingDB
+
+Comms.lua
+Tracker.lua
+Panel.lua

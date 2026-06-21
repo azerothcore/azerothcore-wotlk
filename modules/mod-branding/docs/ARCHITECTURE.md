@@ -962,6 +962,117 @@ per-source weights — rates and the 45/25/20/10 target are tuned *together*, ne
 
 ---
 
+## 19. SLICE 8 SPEC — Client Addon Protocol & UI
+
+The server computes every player-facing number (§9.6: *"the client overlay/addon renders it; the
+server computes and broadcasts the number"*). This slice adds the **transport** that carries those
+numbers to a WotLK 3.3.5a client addon, and the addon itself. The build target is 3.3.5a, which has
+**no Eluna and no AIO** in this server — so the transport is the **native addon message channel**.
+
+### 19.1 Transport (no Eluna) — server-push driven
+
+A single addon-message prefix, **`BRND`**, carries all server→client traffic. Payloads are short
+tab-delimited ASCII (`CHAT_MSG_ADDON` bodies are capped at 255 bytes — see `ChatHandler.cpp` length
+guard — so every message is a single small frame). The module builds a `CHAT_MSG_ADDON` /
+`LANG_ADDON` packet with `Chat::BuildChatPacket(...)`, body prefixed `BRND\t...`, and sends it to a
+player's session.
+
+**Why push-only.** On 3.3.5a there is no reliable *client→server* addon hook for a solo player:
+`CHAT_MSG_WHISPER` is delivered straight to the recipient (`ChatHandler.cpp` whisper case) and never
+calls `OnPlayerCanUseChat`; the `OnPlayerCanUseChat` hook only fires for SAY/CHANNEL/PARTY/GUILD; and
+the native `AddonChannelCommandHandler` relay runs the body as a real chat command, which is
+RBAC-gated and so needs a player-seeded permission. Rather than depend on a group/guild/channel or an
+`rbac_default_permissions` change, the addon is a **pure renderer** and the server **pushes** state on
+every event that can change it. The periodic re-push *is* the live refresh — functionally the
+"push + poll" the design wanted, with the poll replaced by a server-side cadence the client can't miss.
+
+The server pushes:
+
+- **on login** — HELLO (protocol version + enabled), CHAR snapshot, the current zone's EVT, SCHED;
+- **on zone change** (`OnPlayerUpdateZone`) — the new zone's EVT + SCHED;
+- **on event start/stop** (driven from `EventScheduler`) — EVT broadcast to everyone in that zone;
+- **on a throttled tick** (`Branding.Addon.PushIntervalSeconds`, default 5) — EVT (live containment)
+  to players whose current zone has an active event, and a slower CHAR+SCHED refresh.
+
+No new chat commands and no un-gating of the GM `.branding` commands: the addon is the player
+interface, the existing `.branding` debug commands stay GM-only.
+
+### 19.2 Pure protocol core (`src/core/addon/`, TDD)
+
+The testable heart is the **wire codec** — encoding snapshot POD structs to frames and parsing
+request lines. It is dependency-free (no AzerothCore includes); the adapter fills the snapshot
+structs from live Mgrs and performs the actual send/receive.
+
+```cpp
+// Snapshot POD inputs (adapter fills from Mgrs; no AC types). Floats cross as permille (x1000).
+struct EventFrame    { uint32_t zoneId; uint8_t type; uint16_t containmentPermille; bool active; };
+struct ScheduleEntry { uint32_t zoneId; uint8_t type; uint8_t state; uint32_t secondsRemaining; };
+struct YouFrame      { uint32_t points; uint8_t tier; };
+struct CharSnapshot  { /* brands, masteries, loadout, item, allegiance */ };
+
+std::string EncodeEvent(EventFrame const&);                                  // BRND\tEVT\t...
+std::string EncodeSchedule(std::vector<ScheduleEntry> const&, bool& trunc);  // BRND\tSCH\t...
+std::string EncodeYou(YouFrame const&);                                      // BRND\tYOU\t...
+std::string EncodeChar(CharSnapshot const&);                                 // BRND\tCHAR\t...
+std::string EncodeHello(HelloFrame const&);                                  // BRND\tHELLO\t<ver>\t<en>
+```
+
+Permille keeps the round-trip exact (equality, not epsilon). HELLO carries a **protocol version**
+so a mismatched client is told to update rather than mis-parsing.
+
+**Invariants (tests — `tests/addon/ProtocolTest.cpp`):**
+
+- Round-trip `Decode*(Encode*(x)) == x` for every frame type.
+- Every frame begins `BRND\t<KIND>\t`, contains no newline, length ≤ 255.
+- List frames pack/round-trip N records and **truncate deterministically with a marker** (never a
+  silent split) when they would exceed 255 bytes.
+- `ParseRequest` is case-sensitive, returns `Unknown` for anything malformed, never throws (a
+  hostile oversized body included).
+- Decode of an unknown KIND / malformed body is a clean `false`, not a crash (forward-compat).
+
+### 19.3 Server adapter (`src/AddonProtocolMgr.*`, `src/AddonScripts.cpp`)
+
+- `AddonProtocolMgr` — gathers snapshots from the existing Mgrs (`EventMgr`, `EventScheduler`,
+  `ProficiencyMgr`, `MasteryMgr`, `LoadoutMgr`, `ItemBrandingMgr`, `AllegianceMgr`), calls the pure
+  `Encode*`, and sends frames via `Chat::BuildChatPacket` to a player session. **No raw `Player*`
+  stored past the tick** — sends resolve the player at call time.
+- `AddonScripts.cpp`:
+  - `PlayerScript::OnPlayerLogin` — push HELLO + CHAR + the current zone's EVT + SCHED.
+  - `PlayerScript::OnPlayerUpdateZone` — push the new zone's EVT + SCHED.
+  - `WorldScript::OnUpdate` — throttled (config `Branding.Addon.PushIntervalSeconds`, default 5) EVT
+    push to players whose current zone has an active event, plus a slower CHAR+SCHED refresh.
+  - `WorldScript::OnAfterConfigLoad` — `AddonProtocolMgr::LoadConfig()`.
+- `EventScheduler` calls `AddonProtocolMgr::BroadcastZoneEvent(zoneId)` on every start/stop
+  transition; `EventScheduler::SnapshotSchedule()` exposes the per-zone state/countdown for SCHED.
+- Config: `Branding.Addon.Enable` (master switch, default 0), `Branding.Addon.PushIntervalSeconds`.
+- `ParseRequest` (§19.2) is kept and tested but currently unused by the adapter — it reserves the
+  request grammar for a future client→server channel (group/guild/channel or a seeded RBAC perm).
+- **No SQL** — every value is already persisted by the owning Mgr; this slice only transports it.
+
+### 19.4 The addon (`modules/mod-branding/client-addon/Branding/`)
+
+A single addon, two surfaces, one shared comms layer (`Comms.lua` mirrors the §19.2 codec):
+
+- **Invasion Tracker** — a movable HUD frame: current zone's event type + live containment bar +
+  your points/tier; plus a schedule list (per-zone next/active/cooldown countdown). Backed by the
+  EVT push (live) and a SCHED poll on open.
+- **Character panel** — tabbed: Brand proficiency (levels + effect strength), Mastery
+  (unlock/level/bonus), Loadout (active brand + proc archetype), Item brand (step/level/intensity),
+  Allegiance. Backed by the CHAR poll, refreshed on open and on login push.
+
+Ships with `Branding.toc`, the Lua/XML, and an install README (copy to `Interface/AddOns/`). The
+addon needs a live 3.3.5a client to verify, so it is **manual-verify**; the codec it depends on is
+unit-tested server-side (§19.2) and the Lua parser mirrors the same `permille`/`\t`/`;`/`:` grammar.
+
+### 19.5 Placement / Definition of Done
+
+- §19.2 pure codec is TDD'd in `branding_core_tests` (no AC includes — CI purity guard applies).
+- §19.3 adapter is compile-verified against game headers (as prior slices); link deferred to CI.
+- §19.4 Lua is manual-verify in-client; grammar parity with §19.2 is the contract.
+- No SQL; no raw entity pointers stored across ticks; linters clean.
+
+---
+
 ## 13. Definition of Done (per slice)
 
 - [ ] Spec section updated in this doc (and `docs/slices/` if detailed).

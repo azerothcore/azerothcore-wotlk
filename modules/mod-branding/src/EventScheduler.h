@@ -1,6 +1,7 @@
 #ifndef MOD_BRANDING_SRC_EVENTSCHEDULER_H
 #define MOD_BRANDING_SRC_EVENTSCHEDULER_H
 
+#include "addon/Protocol.h"
 #include "contribution/ContributionTypes.h"
 #include <cstdint>
 #include <vector>
@@ -19,6 +20,10 @@ namespace Branding
 
         void LoadConfig();          // reads enable + (re)loads branding_event_def
         void Update(uint32_t diffMs);
+
+        // §19.3: per-zone schedule snapshot for the client addon (state 1 = active, 0 = cooldown;
+        // secondsRemaining = time left in the current phase). Empty when the scheduler is disabled.
+        std::vector<Addon::ScheduleEntry> SnapshotSchedule() const;
 
     private:
         EventScheduler() = default;
