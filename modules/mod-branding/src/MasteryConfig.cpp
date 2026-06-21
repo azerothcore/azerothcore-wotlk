@@ -14,6 +14,7 @@ namespace Branding
         _upkeepHalfLevel = sConfigMgr->GetOption<float>("Branding.Mastery.Tree.UpkeepHalfLevel", 25.0f);
         _offSchoolFactor = sConfigMgr->GetOption<float>("Branding.Mastery.Tree.OffSchoolFactor", 0.25f);
         _maxEnemyMul = sConfigMgr->GetOption<float>("Branding.Mastery.Tree.MaxEnemyMul", 1.5f);
+        _enemyEliteLevelFraction = sConfigMgr->GetOption<float>("Branding.Mastery.Tree.EnemyEliteLevelFraction", 0.5f);
         _minPpm = sConfigMgr->GetOption<float>("Branding.Mastery.Tree.MinPpm", 1.0f);
         _maxPpm = sConfigMgr->GetOption<float>("Branding.Mastery.Tree.MaxPpm", 10.0f);
         _minWindowMs = sConfigMgr->GetOption<uint32_t>("Branding.Mastery.Tree.MinWindowMs", 3000);

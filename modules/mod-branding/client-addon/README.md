@@ -3,7 +3,7 @@
 The in-game UI for the `mod-branding` server system (design §19). It shows the **invasion
 schedule**, the **current invasion** in your zone with a live containment bar, your **contribution**
 (points + tier), your **brand proficiency / mastery / loadout / item brand / allegiance**, and the
-**§14 Mastery lattice** (5 schools × 3 trees) with per-cell point-buy.
+**§14 Mastery lattice** (all 7 standard damage schools × 3 trees) with per-cell point-buy.
 
 The addon is primarily a **renderer**: it *receives* data the server pushes over the native addon
 channel (prefix `BRND`), needs no Eluna/AIO, and works for a solo player. The Mastery panel can also
@@ -78,13 +78,17 @@ for why). When you open the talent frame (`N`), a **Mastery** button appears doc
 it toggles the panel. The button is *parented* to `PlayerTalentFrame` but only ever opens a separate
 frame, so it never touches the protected talent frame's internals.
 
-The panel renders the **§14 lattice**: 5 damage schools (Fire, Nature, Shadow, Frost, Physical) × 3
-trees (Def / Off / Support). Each cell shows its earned mastery level, total points invested, and
-its expression family; cell colour flags **active** (green), **invested** (gold) and **selected**
-(blue). Click a cell to select it, then the per-cell **point-buy** rows below show only the axes that
-cell exposes (§14.10: PPM / Duration / Magnitude / Reach — a single-target cell shows 3, an
-area/cleave cell shows 4). `+`/`-` send an allocation request; **Respec cell** refunds it (charging
-the §14.5 token server-side).
+The panel renders the **§14 lattice**: all 7 standard WoW damage schools (Fire, Nature, Shadow,
+Frost, Arcane, Holy, Physical) × 3 trees (Def / Off / Support). Each cell shows its earned mastery
+level, total points invested, and its expression family; cell colour flags **active** (green),
+**invested** (gold) and **selected** (blue). Click a cell to select it, then the per-cell
+**point-buy** rows below show only the axes that cell exposes (§14.10: PPM / Duration / Magnitude /
+Reach — a single-target cell shows 3, an area/cleave cell shows 4). `+`/`-` send an allocation
+request; **Respec cell** refunds it (charging the §14.5 token server-side).
+
+The 7×3 lattice (21 cells) does not fit one 255-byte addon frame, so the server **pages** the lattice
+**one `MAST` frame per school** (§19.2); `Comms.lua` merges incoming frames by school into a single
+lattice, so the panel never assumes a single frame carries the whole lattice.
 
 **Server-authoritative.** The panel never mutates state locally: it displays the server's `MAST`
 snapshot and *requests* changes. The server validates the §14.10 budget + caps and pushes a fresh

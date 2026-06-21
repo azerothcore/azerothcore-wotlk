@@ -1438,6 +1438,59 @@ double EnemyMasteryMultiplier(uint8_t masteryLevel, IMasteryTreeConfig const& cf
 - Group-invariant composition: same multiplier applied to a 5-man-scaled and 40-man-scaled baseline
   preserves the completability ordering (`EnemyMastery_GroupSizeInvariant_FractionNotFlat`).
 
+#### 14.8.1 Rank → mastery level (issue #31, pure)
+
+The §14.6 design — *"elites carry tree procs; bosses are at max mastery"* — is encoded as a small pure
+mapping from a creature's **rank** to the enemy mastery level fed to `EnemyMasteryMultiplier`. No raw
+creature math; the magnitude curve is **reused**, never reimplemented.
+
+```cpp
+// core/branding/mastery/EnemyMastery.{h,cpp}
+enum class EnemyRank : uint8_t { Normal = 0, Elite, Boss };
+
+// Rank -> mastery level: Boss = MaxMasteryLevel (full mastery); Elite = round(MaxMasteryLevel *
+// cfg.EnemyEliteLevelFraction()) (a scaled level, config-driven, fraction clamped to [0,1]);
+// Normal = 0 (no mastery).
+uint8_t EnemyMasteryLevelForRank(EnemyRank rank, IMasteryTreeConfig const& cfg);
+
+// Convenience: the bounded OUTGOING-damage multiplier for a ranked enemy. == EnemyMasteryMultiplier(
+// EnemyMasteryLevelForRank(rank, cfg), cfg). 1.0 for Normal; <= MaxEnemyMul; group-size invariant.
+double EnemyMasteryMultiplierForRank(EnemyRank rank, IMasteryTreeConfig const& cfg);
+```
+
+`IMasteryTreeConfig` gains `double EnemyEliteLevelFraction() const` (default `0.5`; the helper clamps to
+`[0,1]`). Config key `Branding.Mastery.Tree.EnemyEliteLevelFraction`.
+
+**Invariants (tests, written first):**
+- `Normal` → level 0 → multiplier exactly `1.0` (`EnemyRank_NormalIsBaseline`).
+- `Boss` → `MaxMasteryLevel`; `Elite` level `<= Boss` level and `>= 0`; both bounded by `MaxEnemyMul`
+  (`EnemyRank_BossMaxEliteScaled`).
+- `EnemyMasteryMultiplierForRank` is **monotonic non-decreasing** in rank `Normal <= Elite <= Boss`
+  (`EnemyRank_MultiplierMonotonicInRank`) and never `< 1.0`.
+- Elite fraction clamps: a fraction `> 1.0` produces no level above `MaxMasteryLevel`; `< 0` floors at 0
+  (`EnemyRank_EliteFractionClamped`).
+
+#### 14.8.2 Application adapter (issue #31)
+
+A dedicated adapter (`MasteryEnemyMgr` + a `UnitScript`) scales an invasion elite/boss creature's
+**OUTGOING** damage by `EnemyMasteryMultiplierForRank`, mirroring the §7.9 `EffectMgr` /
+§2.1 `ScalingMgr` outgoing-damage UnitScript pattern. It is the enemy-side twin of the player-side
+`MasteryCombatMgr` UnitScript and is deliberately a *dumb applier* over the pure helper.
+
+- **Composition (§2.1/§2.2):** the §2.1 player-downscale UnitScripts only touch *player* attackers; the
+  §2.2 encounter scale sets the creature's baseline HP/damage. This adapter multiplies the creature's
+  already-scaled outgoing damage — it runs on the creature-attacker branch the player scripts skip, so
+  the enemy multiplier *always rides on top of* the scaled baseline, never before it (no reach-down).
+- **Group-size invariance:** the multiplier is `EnemyMasteryMultiplierForRank(rank)` — a function of
+  rank/level only, never group size — so a 5-man-scaled and a 40-man-scaled elite see the *same*
+  fraction; completability (§2.2 / Risk #4) is preserved.
+- **Gating:** `Branding.Mastery.EnemyEnable` switch **and** the creature must be part of an active
+  invasion. The invasion check reuses the event system: `EventMgr::ActiveEventType(zoneId, …)` for the
+  creature's zone, gated on the type being `Invasion`. The creature's rank comes from
+  `Creature::isWorldBoss()` / `GetCreatureTemplate()->rank` → `EnemyRank`. If a future per-creature
+  invasion-roster tag lands it can replace the zone-level check without a core change (documented seam).
+- ObjectGuid-keyed, no raw `Creature*`/`Unit*` stored across ticks; `LOG_*`, `Acore::StringFormat`.
+
 ---
 
 ## 11. Determinism & Project-Convention Compliance
@@ -1539,8 +1592,12 @@ std::string EncodeMastery(MasterySnapshot const&, bool& trunc);              // 
 Permille keeps the round-trip exact (equality, not epsilon). HELLO carries a **protocol version**
 so a mismatched client is told to update rather than mis-parsing.
 
-**§14 Mastery lattice frame (MAST, protocol v2 — issue #32).** Carries the whole 5-school × 3-tree
-lattice for the Mastery client UI:
+**§14 Mastery lattice frame (MAST, protocol v2 — issue #32).** Carries the Mastery lattice for the
+client UI across all **7 standard damage schools × 3 trees** (the full `BrandId` set). The 21-cell
+lattice does not fit one 255-byte addon body, so the adapter **pages it one `MAST` frame per school**
+(3 cells each, comfortably inside `MaxFrame`); the client merges frames by school into one lattice.
+`EncodeMastery` still flags `truncated` per frame as a safety net, and the per-frame schema is
+unchanged — paging is purely a send/merge concern, not a wire-format change:
 
 ```cpp
 struct MasteryCellFrame {           // one (school, tree) cell as the client renders it
@@ -1619,11 +1676,14 @@ A single addon, three surfaces, one shared comms layer (`Comms.lua` mirrors the 
   (unlock/level/bonus), Loadout (active brand + proc archetype), Item brand (step/level/intensity),
   Allegiance. Backed by the CHAR poll, refreshed on open and on login push.
 - **Mastery panel** (`MasteryPanel.lua`, issue #32) — a standalone frame rendering the §14 lattice
-  (5 schools × 3 trees) from the MAST push: each cell's earned level, archetype/expression family,
-  active/invested/selected state, and per-cell §14.10 point-buy (only the axes the cell exposes) with
-  `+`/`-` and a respec button that send the v2 ALLOC/ARCH/RESPEC requests. Server-authoritative: it
-  displays MAST and *requests* changes; it never mutates locally, and gates sending behind
-  `ns.CanSend()` (disabled, display-only, until a realm enables a client→server channel).
+  (all 7 standard damage schools × 3 trees) from the MAST push: each cell's earned level,
+  archetype/expression family, active/invested/selected state, and per-cell §14.10 point-buy (only the
+  axes the cell exposes) with `+`/`-` and a respec button that send the v2 ALLOC/ARCH/RESPEC requests.
+  The 21-cell lattice exceeds one 255-byte addon frame, so the server pages it **one MAST frame per
+  school** and `Comms.lua` merges frames by school into a single lattice (`DecodeMastery` is a merge,
+  not a replace). Server-authoritative: it displays MAST and *requests* changes; it never mutates
+  locally, and gates sending behind `ns.CanSend()` (disabled, display-only, until a realm enables a
+  client→server channel).
 
 **Talent-frame dock (#32 decision).** Native talent-frame integration (a real tab on
 `PlayerTalentFrame`) would need client DBC + secure-frame edits and would **taint** the protected

@@ -281,6 +281,17 @@ Branding.Vault.TransferCostPerUnit = 50
 Branding.Mastery.Enable = 0
 
 #
+#    Branding.Mastery.EnemyEnable
+#        Description: §14.8 switch for ENEMY-side mastery -- scaling an invasion elite/boss creature's
+#                     OUTGOING damage by the bounded, group-size-invariant enemy multiplier (boss = max
+#                     mastery; elite = a scaled level). Requires Branding.Mastery.Enable too. Applies
+#                     ON TOP of the §2.2-scaled encounter baseline; only inside an active invasion.
+#        Default:     0 - (disabled)
+#
+
+Branding.Mastery.EnemyEnable = 0
+
+#
 #    Branding.Mastery.MaxLevel
 #        Description: Character mastery level at which effectiveness reaches 1.0 (full bonus).
 #        Default:     50
@@ -339,6 +350,15 @@ Branding.Mastery.Tree.OffSchoolFactor = 0.25
 #
 
 Branding.Mastery.Tree.MaxEnemyMul = 1.5
+
+#
+#    Branding.Mastery.Tree.EnemyEliteLevelFraction
+#        Description: §14.8.1 an invasion ELITE's enemy mastery level as a fraction of MaxLevel (a boss
+#                     is at full mastery). Clamped to 0..1; 0.5 = elite procs at half the boss curve.
+#        Default:     0.5
+#
+
+Branding.Mastery.Tree.EnemyEliteLevelFraction = 0.5
 
 #
 #    Branding.Mastery.Tree.MinPpm / MaxPpm

@@ -46,6 +46,9 @@ namespace Branding
         // §14.8: separate ceiling for ENEMY (elite/boss) mastery procs. MUST be < an effect config's
         // MaxPersonalMul -- enemy spikes are reactable windows, not one-shots. >= 1.0.
         virtual double  MaxEnemyMul() const = 0;
+        // §14.8.1: an invasion ELITE's enemy mastery level as a fraction of MaxMasteryLevel (a boss is
+        // at full mastery; an elite at a scaled level). Clamped to [0,1] by EnemyMasteryLevelForRank.
+        virtual double  EnemyEliteLevelFraction() const = 0;
 
         // §14.10: per-axis bounds for the player tuning budget. ppm and window define the achievable
         // envelope each axis can occupy; MaxProcMagnitude caps the magnitude axis (lattice sets it

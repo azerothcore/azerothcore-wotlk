@@ -144,8 +144,10 @@ namespace Branding
             return;
 
         // §14 / issue #32: build the lattice SHAPE from the pure `LatticeArchetype` core (the §14.4
-        // authored table) and fill it with LIVE progression (issue #27). The schools the UI exposes are
-        // the §14.4 subset; trees are Def/Off/Support.
+        // authored table) and fill it with LIVE progression (issue #27). The UI exposes the FULL
+        // `BrandId` set (Fire, Frost, Nature, Shadow, Arcane, Holy, Physical -- all of WoW's standard
+        // damage schools); trees are Def/Off/Support. Arcane/Holy resolve to authored cells too (the
+        // core returns a neutral default for any school without a hand-authored archetype).
         //
         // Earned level comes from ProficiencyMgr (per-school proficiency, the §14.11 EARNED layer);
         // archetype + per-cell point allocation + the active flag come from MasteryLoadoutMgr's
@@ -153,8 +155,12 @@ namespace Branding
         // Each cell renders the selected archetype's def (so the kind/situational/sustained reflect the
         // player's pick, not just the primary). The active set is a per-cell flag list, so a character
         // running MULTIPLE masteries lights up multiple cells -- no single "active mastery" field.
-        static constexpr BrandId Schools[] = {
-            BrandId::Fire, BrandId::Nature, BrandId::Shadow, BrandId::Frost, BrandId::Physical };
+        //
+        // PAGED BY SCHOOL: the full 7x3 lattice (21 cells) far exceeds the 255-byte CHAT_MSG_ADDON body
+        // (EncodeMastery would truncate it -- and even the old 5-school lattice already overflowed). So
+        // we send ONE MAST frame PER SCHOOL (3 cells each, ~105 bytes -- comfortably inside MaxFrame);
+        // the client merges frames by school (replacing that school's cells), never assuming one frame
+        // carries the whole lattice. EncodeMastery still flags `truncated` per frame as a safety net.
         static constexpr MasteryTree Trees[] = {
             MasteryTree::Defensive, MasteryTree::Offensive, MasteryTree::Support };
 
@@ -162,12 +168,17 @@ namespace Branding
         MasteryConfig const& cfg = sMasteryLoadoutMgr->Config();
         ActiveMasterySet const& activeSet = sMasteryLoadoutMgr->ActiveLoadout(guid);
 
-        Addon::MasterySnapshot snap;
-        snap.pointsAvailable = cfg.PointsBudget();
-        snap.respecCost = static_cast<uint16_t>(std::min<uint32_t>(cfg.RespecCost(), 65535u));
+        uint16_t const pointsAvailable = cfg.PointsBudget();
+        uint16_t const respecCost = static_cast<uint16_t>(std::min<uint32_t>(cfg.RespecCost(), 65535u));
 
-        for (BrandId const school : Schools)
+        for (uint8_t s = 0; s < static_cast<uint8_t>(BrandId::COUNT); ++s)
         {
+            BrandId const school = static_cast<BrandId>(s);
+
+            Addon::MasterySnapshot snap;
+            snap.pointsAvailable = pointsAvailable;
+            snap.respecCost = respecCost;
+
             for (MasteryTree const tree : Trees)
             {
                 // The player's active entry for this cell, if any (selects the archetype + alloc).
@@ -191,10 +202,10 @@ namespace Branding
 
                 snap.cells.push_back(cell);
             }
-        }
 
-        bool truncated = false;
-        Send(player, Addon::EncodeMastery(snap, truncated));
+            bool truncated = false;
+            Send(player, Addon::EncodeMastery(snap, truncated));
+        }
     }
 
     void AddonProtocolMgr::SendZoneEvent(Player* player, uint32_t zoneId) const

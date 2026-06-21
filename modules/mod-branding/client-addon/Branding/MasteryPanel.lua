@@ -1,8 +1,9 @@
 --[[
   Branding -- Mastery panel (issue #32, §14 / §19).
 
-  A STANDALONE frame showing the §14 Mastery lattice: 5 damage schools x 3 trees (Def / Off /
-  Support). Each cell shows its archetype/expression family, earned mastery level, and the per-axis
+  A STANDALONE frame showing the §14 Mastery lattice: all 7 standard WoW damage schools x 3 trees
+  (Def / Off / Support). Each cell shows its archetype/expression family, earned mastery level, and
+  the per-axis
   point-buy allocation (§14.10: ppm / duration / magnitude / reach -- only the axes the cell exposes),
   plus a respec button.
 
@@ -27,7 +28,10 @@
 local ADDON, ns = ...
 
 -- §14.1 lattice axes. Schools are BrandId ordinals; trees are MasteryTree ordinals.
-local SCHOOLS = { 0, 2, 3, 1, 6 }            -- Fire, Nature, Shadow, Frost, Physical (§14.4 order)
+-- All 7 standard WoW damage schools (issue #32): the full BrandId set, in §14.4 authoring order
+-- (Fire, Nature, Shadow, Frost, Arcane, Holy, Physical). Arcane/Holy now render too -- the server
+-- pages the lattice one frame per school (§19.2) and Comms.lua merges, so all 7 arrive.
+local SCHOOLS = { 0, 2, 3, 1, 4, 5, 6 }      -- Fire, Nature, Shadow, Frost, Arcane, Holy, Physical
 local TREES = { 0, 1, 2 }                    -- Def, Off, Support
 ns.TreeName = { [0] = "Def", [1] = "Off", [2] = "Support" }
 ns.AxisName = { [0] = "PPM", [1] = "Dur", [2] = "Mag", [3] = "Reach" }
@@ -141,7 +145,7 @@ local function CreateMasteryPanel()
 
   local f = CreateFrame("Frame", "BrandingMasteryPanel", UIParent)
   f:SetWidth(520)
-  f:SetHeight(420)
+  f:SetHeight(520)          -- tall enough for all 7 schools (issue #32) + the detail/point-buy area
   f:SetPoint(ns.db.masteryPoint or "CENTER", UIParent, ns.db.masteryRel or "CENTER",
     ns.db.masteryX or 0, ns.db.masteryY or 0)
   f:SetBackdrop({
@@ -174,11 +178,11 @@ local function CreateMasteryPanel()
   f.budget = f:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
   f.budget:SetPoint("TOP", 0, -40)
 
-  -- The 5x3 lattice grid. A container frame so the tooltip can anchor to it.
+  -- The 7x3 lattice grid (all standard damage schools). A container frame so the tooltip anchors to it.
   local grid = CreateFrame("Frame", "MasteryPanelGrid", f)
   grid:SetPoint("TOPLEFT", 24, -60)
   grid:SetWidth(470)
-  grid:SetHeight(210)
+  grid:SetHeight(286)       -- 7 rows x 38px pitch + header (issue #32)
   f.grid = grid
 
   -- Column headers (trees).
@@ -226,8 +230,8 @@ local function CreateMasteryPanel()
 
   -- Selected-cell detail + point-buy area.
   f.selTitle = f:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-  f.selTitle:SetPoint("TOPLEFT", 24, -284)
-  f.selTitle:SetPoint("TOPRIGHT", -24, -284)
+  f.selTitle:SetPoint("TOPLEFT", 24, -360)
+  f.selTitle:SetPoint("TOPRIGHT", -24, -360)
   f.selTitle:SetJustifyH("LEFT")
 
   f.axisRows = {}
@@ -235,7 +239,7 @@ local function CreateMasteryPanel()
     local row = CreateFrame("Frame", nil, f)
     row:SetWidth(470)
     row:SetHeight(24)
-    row:SetPoint("TOPLEFT", 28, -306 - axis * 26)
+    row:SetPoint("TOPLEFT", 28, -382 - axis * 26)
 
     row.text = row:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     row.text:SetPoint("LEFT", 0, 0)

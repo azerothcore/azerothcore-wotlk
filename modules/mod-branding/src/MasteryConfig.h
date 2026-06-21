@@ -28,6 +28,7 @@ namespace Branding
         double   UpkeepHalfLevel() const override { return _upkeepHalfLevel; }
         double   OffSchoolFactor() const override { return _offSchoolFactor; }
         double   MaxEnemyMul() const override { return _maxEnemyMul; }
+        double   EnemyEliteLevelFraction() const override { return _enemyEliteLevelFraction; }
         double   MinPpm() const override { return _minPpm; }
         double   MaxPpm() const override { return _maxPpm; }
         uint32_t MinWindowMs() const override { return _minWindowMs; }
@@ -58,6 +59,7 @@ namespace Branding
         double _upkeepHalfLevel = 25.0;
         double _offSchoolFactor = 0.25;
         double _maxEnemyMul = 1.5;
+        double _enemyEliteLevelFraction = 0.5;  // §14.8.1: elite enemy mastery level / MaxMasteryLevel
         double _minPpm = 1.0;
         double _maxPpm = 10.0;
         uint32_t _minWindowMs = 3000;
