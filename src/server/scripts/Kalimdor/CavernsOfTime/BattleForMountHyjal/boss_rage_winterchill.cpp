@@ -132,6 +132,8 @@ public:
     void JustDied(Unit* killer) override
     {
         Talk(SAY_ONDEATH);
+        if (instance)
+            instance->SetBossState(DATA_WINTERCHILL, DONE);
         BossAI::JustDied(killer);
     }
 

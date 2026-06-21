@@ -121,6 +121,8 @@ public:
     void JustDied(Unit * killer) override
     {
         me->PlayDirectSound(SOUND_ONDEATH);
+        if (instance)
+            instance->SetBossState(DATA_KAZROGAL, DONE);
         BossAI::JustDied(killer);
     }
 

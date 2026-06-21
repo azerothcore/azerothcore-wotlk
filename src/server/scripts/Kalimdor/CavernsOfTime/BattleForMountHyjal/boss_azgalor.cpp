@@ -108,6 +108,8 @@ public:
             archi->AI()->DoAction(ACTION_BECOME_ACTIVE_AND_CHANNEL);
             archi->AI()->Talk(SAY_ARCHIMONDE_INTRO, 25s);
         }
+        if (instance)
+            instance->SetBossState(DATA_AZGALOR, DONE);
         BossAI::JustDied(killer);
     }
 
