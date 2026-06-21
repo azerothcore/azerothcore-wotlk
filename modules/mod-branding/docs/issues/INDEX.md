@@ -56,3 +56,10 @@ See [../ARCHITECTURE.md](../ARCHITECTURE.md) for the full spec. Section refs (§
 `#10 event-spawner`, `#12 persistence-layer`, and `#04/#05` all touch `EventMgr`/`ProficiencyMgr`.
 To avoid merge churn, persistence (#12) should land first or coordinate; the others add new files
 where possible rather than editing the managers.
+
+**Naming/vocabulary framework (GitHub #35 → `ARCHITECTURE.md` §16):** the economy/branding cluster
+(#04 catalyst, #05 item-branding, #06 vault, #09 economy) shares one canonical vocabulary and naming
+convention. Read §16 before adding resources, tables, config keys, or player strings. Settled there:
+resources are item-entry-backed (§16.3, not a currency table); "Catalyst" means **only** the raid
+stacking-DR mechanic (§16.2); progression nouns are Knowledge / Proficiency Level / Brand Rank;
+tables follow `branding_<noun>` (world def) vs `<entity>_branding[_detail]` (per-entity state).

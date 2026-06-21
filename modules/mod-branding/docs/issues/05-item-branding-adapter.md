@@ -9,7 +9,9 @@ account-Knowledge cost`, `ResolvedItemEffectIntensity` (anti-P2W). Needs server 
 
 ## Scope
 - Persistence: per-item brand state (`item_branding` keyed by item GUID): brand, step, level_in_step.
-  SQL in `pending_db_characters`.
+  SQL in `pending_db_characters`. Player-facing, `step` is **"Brand Rank"** and `level_in_step` is
+  unnamed progress toward the next rank (§16.1, #35) — keep the internal field names, fix only the
+  display string. Resources spent are config-mapped items (§16.3).
 - Upgrade flow: spend economy resources (reuse `core/economy` + the reward/economy plumbing) to call
   `ApplyItemUpgrade`; a gossip/command entry point. Enforce `ItemMaxCumulativeCost` ordering.
 - Application: `ItemEffectIntensity` modifies the item's **proc behaviour/frequency** (NOT flat
