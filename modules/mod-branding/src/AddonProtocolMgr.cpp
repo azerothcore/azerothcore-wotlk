@@ -12,6 +12,7 @@
 #include "branding/contribution/ContributionTypes.h"
 #include "branding/effects/ItemBrand.h"
 #include "branding/mastery/Mastery.h"
+#include "branding/mastery/MasteryTrees.h"
 
 #include "Chat.h"
 #include "Config.h"
@@ -65,6 +66,7 @@ namespace Branding
 
         SendHello(player);
         SendCharSnapshot(player);
+        SendMastery(player);
         SendZoneEvent(player, player->GetZoneId());
         SendSchedule(player);
     }
@@ -133,6 +135,48 @@ namespace Branding
         snap.allegiance = { static_cast<uint8_t>(current), Permille(sAllegianceMgr->Efficiency(guid, current)) };
 
         Send(player, Addon::EncodeChar(snap));
+    }
+
+    void AddonProtocolMgr::SendMastery(Player* player) const
+    {
+        if (!_enabled || !player)
+            return;
+
+        // §14 / issue #32: build the lattice SHAPE from the pure `LatticeCell` core (the §14.4
+        // authored table). The schools the UI exposes are the §14.4 subset; trees are Def/Off/Support.
+        //
+        // The earned level / per-cell point allocation / active flag come from the §14 COMBAT-mastery
+        // adapter + persistence (§14.7/§14.11), which is DEFERRED -- it is sibling-owned and not yet
+        // built (the existing MasteryMgr is the §6 Gathering/Crafting dual-key, a different system).
+        // Until it lands we transport the lattice shape with zeroed progression so the client renders
+        // the full grid; once the §14 adapter exists, fill `level`/`alloc`/`active`/`pointsAvailable`
+        // /`respecCost` from it here (the wire schema already carries them, see Protocol.h MAST).
+        static constexpr BrandId Schools[] = {
+            BrandId::Fire, BrandId::Nature, BrandId::Shadow, BrandId::Frost, BrandId::Physical };
+        static constexpr MasteryTree Trees[] = {
+            MasteryTree::Defensive, MasteryTree::Offensive, MasteryTree::Support };
+
+        Addon::MasterySnapshot snap;
+        for (BrandId const school : Schools)
+        {
+            for (MasteryTree const tree : Trees)
+            {
+                LatticeCellDef const def = LatticeCell(school, tree);
+
+                Addon::MasteryCellFrame cell;
+                cell.school = static_cast<uint8_t>(school);
+                cell.tree = static_cast<uint8_t>(tree);
+                cell.kind = static_cast<uint8_t>(def.kind);
+                cell.situational = def.situational;
+                cell.sustained = def.sustained;
+                cell.axisMask = static_cast<uint8_t>(def.applicableAxes);
+                // Progression fields default to 0/false (deferred §14 adapter fills them).
+                snap.cells.push_back(cell);
+            }
+        }
+
+        bool truncated = false;
+        Send(player, Addon::EncodeMastery(snap, truncated));
     }
 
     void AddonProtocolMgr::SendZoneEvent(Player* player, uint32_t zoneId) const

@@ -931,9 +931,10 @@ per-source weights — rates and the 45/25/20/10 target are tuned *together*, ne
 
 ### 14.1 Shape
 
-Mastery is a lattice of **5 damage schools × 3 trees**. Each (school, tree) cell is one or more
-**procs**. The schools (issue #24): `Fire, Nature, Shadow, Frost, Physical` (a subset of `BrandId`;
-`Arcane`/`Holy` are extension slots, no trees yet).
+Mastery is a lattice of **7 damage schools × 3 trees** — all of WoW's standard damage schools.
+Each (school, tree) cell is one or more **procs**. Schools: `Fire, Nature, Shadow, Frost, Physical`
+(issue #24) plus `Arcane` and `Holy` (the full `BrandId` set). Further (custom) schools are an
+append-only `BrandId` extension.
 
 | Tree | Expression | Mastery tunes | Governing cap (§7.9) |
 |---|---|---|---|
@@ -987,12 +988,73 @@ matching invasion school — replaces flat counter-school "+dmg %").
 | **Shadow** | life-steal proc `PW` | shadow volley proc `PW` | shadow-exposure vs Nature `SE` · shadow resistance `SM` |
 | **Frost** | damage-reduction proc `PW` | Frost Nova proc `PW` | frost-exposure vs Fire `SE` · frost resistance `SM` |
 | **Physical** | evasion proc `PW` | cleave proc `PW` | physical mitigation `SM` (armor-like, DR'd) |
+| **Arcane** | arcane barrier (absorb) `PW` | arcane explosion proc `PW` | intellect/mana aura `PW` · arcane resistance `SM` |
+| **Holy** | holy shield (absorb) `PW` | holy nova proc `PW` | holy-exposure vs Undead `SE` · blessing `PW` (sustained mitigation) |
 
 - **`SE` (was "+dmg % vs X")**: a *windowed exposure* you proc onto a target, not a standing aura,
   and full-value only inside content themed to the relevant school — so it's desirable, never the
   mandatory hard-counter that flat counter-school % would create in fixed-school PvE.
 - **`SM` resistances + physical mitigation**: one coherent axis — a capped, DR'd, **school-matched**
   defensive window. Full value vs matching-school invasion content, reduced/inert otherwise.
+
+#### 14.4.1 Multi-archetype Support cells (issue #29)
+
+Several cells in the table above carry **two** archetypes (the `·`-separated entries) — most visibly
+the Support column. A character's §7.9 `selectedProcArchetype` is the player's pick among them. Core
+models this as **1..N archetypes per (school, tree) cell** (fixed cap, `std::array` + count — no
+`<vector>` in the pure core). Each archetype is a full `LatticeCellDef` (`kind` / `situational` /
+`sustained` / `applicableAxes`), so two archetypes of one cell can differ in expression family and
+even in sustained-vs-windowed shape.
+
+Pure API (keyed purely by `(school, tree, archetypeIndex)` — see the multi-mastery note below):
+
+```cpp
+uint8_t        LatticeArchetypeCount(BrandId school, MasteryTree tree);                 // 1..N
+LatticeCellDef LatticeArchetype(BrandId school, MasteryTree tree, uint8_t archetypeIndex);
+LatticeCellDef LatticeCell(BrandId school, MasteryTree tree);   // == archetype 0 (the PRIMARY)
+// Legal iff index < count AND unlocked at the character's proficiency level.
+bool IsLatticeArchetypeUnlocked(BrandId school, MasteryTree tree, uint8_t archetypeIndex,
+                                uint8_t proficiencyLevel, IMasteryTreeConfig const& cfg);
+```
+
+**Archetype 0 is always the primary** — `LatticeCell(school, tree)` keeps returning it unchanged, so
+every existing consumer is undisturbed. Index 0 is always unlocked (it is the base cell); higher
+indices gate behind proficiency via the **same config pattern** as the §7.9 loadout
+(`IItemBrandConfig::ArchetypesAtLevel`): `IMasteryTreeConfig::MaxArchetypesAtLevel(level)` returns how
+many archetypes are unlocked at a given proficiency level (1-based count; `level 0 → 1`, growing with
+level), and `IsLatticeArchetypeUnlocked` requires `archetypeIndex < min(count, MaxArchetypesAtLevel)`.
+The unlock bound is therefore a **config value**, retunable without a recompile.
+
+**Authored secondary archetypes (the `·` entries in §14.4).** Per the table, with one design choice
+recorded per school:
+
+| School | Support archetype 0 (primary) | Support archetype 1 (secondary) |
+|---|---|---|
+| **Fire** | fire resistance `SM` (sustained, school-matched) | **flame aura `PW`** — sustained raid utility (`RaidWindow`, non-situational: a constant party-wide buff aura) |
+| **Nature** | nature resistance `SM` (sustained, school-matched) | **raid-heal `PW`** — sustained raid utility (`MechanicTransform`, non-situational: a constant raid HoT/transform) |
+| **Shadow** | shadow-exposure vs Nature `SE` (sustained, school-matched) | **shadow resistance `SM`** — sustained school-matched mitigation |
+| **Frost** | frost-exposure vs Fire `SE` (sustained, school-matched) | **frost resistance `SM`** — sustained school-matched mitigation |
+| **Physical** | physical mitigation `SM` (sustained, school-matched) | *(none — single archetype; the §14.4 table lists only one)* |
+| **Arcane** | arcane resistance `SM` (sustained, school-matched) | **intellect/mana aura `PW`** — sustained raid utility (`RaidWindow`, non-situational) |
+| **Holy** | holy-exposure vs Undead `SE` (sustained, school-matched) | **blessing `PW`** — sustained mitigation/utility (`PersonalSpike`, non-situational; Holy has no resistance gear, so like Physical it uses a blessing instead of a resist) |
+
+Design choices recorded: (a) the Fire/Nature secondary archetypes are the **raid-utility** entries
+called out in the issue (flame aura / raid-heal) — both are non-situational sustained auras, so they
+keep the Support magnitude+reach axis set but drop the school-matched gating that the resistance
+archetype carries. (b) Shadow/Frost expose the two `·` entries from the table directly — the
+windowed-exposure `SE` is primary (the build-defining pick), the `SM` resistance is the safer
+secondary. (c) Physical's table cell lists only `physical mitigation`, so it stays single-archetype
+(`count == 1`); `LatticeArchetype(Physical, Support, 0)` is the only legal index. Def/Off cells are
+single-archetype today (the `·` multi-entries live in the Support column); the API supports growing
+them later with no signature change.
+
+**Multi-mastery forward-compat.** A character will later run **multiple** active `(school, tree)`
+cells at once, not just one. The archetype API is therefore keyed purely by
+`(school, tree, archetypeIndex)` with **no global "the active cell" / "current archetype" state** — no
+singletons, no statics. Resolving archetype N of Fire-Support is independent of, and composes with,
+resolving archetype M of Nature-Defensive. The per-character *selection* of which archetype is active
+for which running cell is adapter/persistence state (deferred, like the §14.11 per-spec loadout); the
+pure core only enumerates, resolves, and validates by key.
 
 ### 14.5 Respec
 
@@ -1116,6 +1178,39 @@ ResolvedCell ResolveTreeCell(TreeAllocation const& alloc, uint32_t applicableAxe
     uint8_t masteryLevel, IMasteryTreeConfig const& cfg);
 ```
 
+**Point-buy → shares (the quantization contract, `core/mastery/MasteryActive.{h,cpp}`).** The
+adapter never hands `ResolveTreeCell` arbitrary doubles — it hands it **quantized** shares derived
+from a bounded integer point spend. The pure function
+
+```cpp
+// Convert a discrete per-axis point spend into the normalized TreeAllocation.share[] weights that
+// ResolveTreeCell consumes. The total spend across APPLICABLE axes is clamped to cfg.PointsBudget()
+// (conservation -- a player can never exceed the budget); each share = points / budget. Points on a
+// non-applicable axis are ignored (the cell's mask governs). Zero points -> all-zero shares -> the
+// resolver's even-split baseline. Deterministic: same points + same mask -> identical shares.
+TreeAllocation PointsToAllocation(uint8_t const pointsPerAxis[ProcAxis::COUNT],
+    uint32_t applicableAxes, IMasteryTreeConfig const& cfg);
+```
+
+is the single source of truth for the discrete→continuous mapping. Because `ResolveTreeCell`
+already multiplies normalized shares by the saturating budget `b`, two point spends with the same
+*ratio* resolve to the same cell — the integer points buy *relative emphasis*, and mastery level
+buys the absolute envelope. **Invariants (tested):** total spend over the budget is clamped, not
+overflowed (conservation); a zero spend reproduces the even-split baseline; the mapping is
+deterministic; non-applicable-axis points are inert.
+
+**Respec vs spec-switch cost (`MasteryRespecCost`).** Re-allocating points within a loadout costs
+the §14.5 / §7.9 expensive token; **switching talent spec is free** (it loads a *saved* set, not a
+re-allocation). The distinction is a pure function so the adapter can't accidentally charge a spec
+swap:
+
+```cpp
+enum class LoadoutChange : uint8_t { SwitchSpec, Reallocate };
+// Friction cost (in the abstract token unit) of applying a loadout change. SwitchSpec -> 0 (free);
+// Reallocate -> cfg.RespecCost() (a flat, expensive token). Pure; the adapter charges the result.
+uint32_t MasteryRespecCost(LoadoutChange change, IMasteryTreeConfig const& cfg);
+```
+
 **The knob is module configuration.** The per-axis bounds (and the upkeep/enemy dials) live in
 `mod_branding.conf` under `Branding.Mastery.Tree.*` (`MinPpm`/`MaxPpm`, `MinWindowMs`/`MaxWindowMs`,
 `MaxProcMagnitude`, `MinReach`/`MaxReach`, `MaxUptime`, `UpkeepHalfLevel`, `OffSchoolFactor`,
@@ -1153,19 +1248,54 @@ Resulting behaviour:
 - **Talent retrain that changes a slot's detected role**: keep earned progression untouched, keep the
   loadout but flag it for review (optionally one free re-allocation on role change). Never auto-wipe.
 
-> **Placement:** the earned layer is the §6/Slice-6 `MasteryMgr` progression (shared). The per-spec
-> loadout (selection + persistence keyed by spec slot) is **adapter/persistence (deferred)** — it
-> reads the active talent group from the player and swaps the cached loadout on spec change. The pure
-> core only validates a loadout and resolves it (§14.10); it never reads spec.
+**Multi-mastery: the loadout is a COLLECTION, not a single active brand** *(decided)*. A character's
+active loadout is modeled as a **set of active mastery cells** keyed by `(school, tree)` — not one
+"active brand". Even when v1 caps the active count at `Branding.Mastery.MaxActive` (default 1), the
+type, schema, cache, and validation are built for **N** entries so multi-mastery needs no rebuild:
+aggregation and validation **iterate the set**. Each entry carries its own point-buy spend, so the
+combat adapter (a later task) reads the set, resolves every entry via §14.10, and applies the active
+cells. The pure model:
+
+```cpp
+// One active mastery cell + its §14.10 point-buy spend. (school, tree) is the catalyst-DR bucket
+// key (§14.9) and the collection key. archetype indexes the cell's available proc archetypes (§7.9).
+struct ActiveMasteryEntry {
+    BrandId    school;
+    MasteryTree tree;
+    uint8_t    archetype;
+    uint8_t    pointsPerAxis[ProcAxis::COUNT];   // discrete point-buy (PointsToAllocation feeds §14.10)
+};
+
+// Fixed-cap collection (std::array + count -- NO <vector> in core). Capacity covers future
+// multi-mastery; v1 enforces cfg.MaxActive() <= Capacity. Keyed by (school, tree): no duplicate cell.
+struct ActiveMasterySet { /* std::array<ActiveMasteryEntry, Capacity> entries; uint8_t count; */ };
+
+// A single entry is valid iff dual-keyed (account-unlocked AND char school level > 0), archetype in
+// range, and points within budget. The set is valid iff every entry is valid, no (school,tree) repeats,
+// and count <= cfg.MaxActive(). Mirrors the §7.9 / §14 dual-key.
+bool IsActiveEntryValid(ActiveMasteryEntry const&, bool accountUnlocked, uint8_t schoolLevel,
+    IMasteryTreeConfig const&);
+bool IsActiveSetValid(ActiveMasterySet const&, /* dual-key lookups */, IMasteryTreeConfig const&);
+```
+
+> **Placement:** the earned layer is the §6/Slice-6 `MasteryMgr` progression (shared, per-school
+> level + account unlock). The per-spec **loadout** (the `ActiveMasterySet` + its point spends,
+> persisted per `(guid, spec slot)`) is `MasteryLoadoutMgr` — it reads the active talent group from
+> the player and swaps the cached set on spec change (free), charging the respec token only on
+> re-allocation. The pure core only validates/resolves a loadout (§14.10) and never reads spec.
 
 > **Lattice content (pure core, first cut).** `LatticeCell(school, tree)` encodes the §14.4 table as
 > the design ruleset: each authored cell's `EffectKind`, situational (SM/SE) flag, **sustained flag**
 > (Support = sustained aura; Def/Off = windowed), and §14.10 applicable-axis mask (windowed cells get
 > ppm/duration/magnitude +Reach for area/cleave; Support cells get **magnitude + reach only**). Off
-> cells are `RaidWindow`, Support cells are situational + sustained, unauthored schools (Arcane/Holy)
-> return a neutral default. Multi-archetype cells are
-> represented by their primary archetype; secondary archetypes + concrete spell ids / per-cell
-> envelopes are the next (data/config) expansion. 6 tests.
+> cells are `RaidWindow`, Support cells are situational + sustained. All **7 standard schools** are
+> authored (Fire/Nature/Shadow/Frost/Physical/Arcane/Holy); an unknown/out-of-range school still
+> returns a neutral default (safety net). **Multi-archetype cells (§14.4.1, issue #29)** are now enumerable:
+> `LatticeArchetypeCount(school, tree)` (1..N) and `LatticeArchetype(school, tree, index)` expose the
+> `·` secondary archetypes (Fire/Nature Support += raid-utility aura; Shadow/Frost Support += `SM`
+> resistance), `LatticeCell` is the archetype-0 primary, and `IsLatticeArchetypeUnlocked` gates higher
+> indices behind `IMasteryTreeConfig::MaxArchetypesAtLevel`. Concrete spell ids / per-cell envelopes
+> remain the next (data/config) expansion. 6 + 6 tests.
 
 > **Implemented (pure core).** `core/mastery/MasteryTrees.{h,cpp}` — `MasteryUpkeep` (dual-key gate
 > + saturating-hyperbola upkeep with the §14.3 #1 sub-1.0 asymptote + SM/SE context gating) and
@@ -1303,19 +1433,58 @@ std::string EncodeSchedule(std::vector<ScheduleEntry> const&, bool& trunc);  // 
 std::string EncodeYou(YouFrame const&);                                      // BRND\tYOU\t...
 std::string EncodeChar(CharSnapshot const&);                                 // BRND\tCHAR\t...
 std::string EncodeHello(HelloFrame const&);                                  // BRND\tHELLO\t<ver>\t<en>
+std::string EncodeMastery(MasterySnapshot const&, bool& trunc);              // BRND\tMAST\t...  (§14, v2)
 ```
 
 Permille keeps the round-trip exact (equality, not epsilon). HELLO carries a **protocol version**
 so a mismatched client is told to update rather than mis-parsing.
 
+**§14 Mastery lattice frame (MAST, protocol v2 — issue #32).** Carries the whole 5-school × 3-tree
+lattice for the Mastery client UI:
+
+```cpp
+struct MasteryCellFrame {           // one (school, tree) cell as the client renders it
+    uint8_t school, tree, kind;     // BrandId / MasteryTree / EffectKind ordinals
+    bool situational, sustained;    // SM/SE flag · Support sustained-aura flag (§14.2/§14.4)
+    uint8_t level, archetype;       // EARNED mastery level (§14.11) · selected proc archetype (§7.9)
+    uint8_t axisMask;               // applicable §14.10 axes (bit i ⇒ ProcAxis i tunable)
+    uint8_t alloc[4];               // point spend per axis (Ppm,Duration,Magnitude,Reach)
+    bool active;                    // is this cell currently running?  ← a per-cell flag, NOT a
+};                                  //   single "active mastery" field (multi-mastery forward-compat)
+struct MasterySnapshot { uint16_t pointsAvailable, respecCost; std::vector<MasteryCellFrame> cells; };
+```
+
+Wire: `BRND\tMAST\t<pointsAvailable>\t<respecCost>\t<cell;cell;…>\t<trunc>`, each cell
+`school:tree:kind:situational:sustained:level:archetype:axisMask:a0:a1:a2:a3:active`. The active set
+is the list of cells with `active==1` — **the model never hardcodes a single active mastery**, so a
+character running MULTIPLE masteries at once (an explicit forward-compat requirement) needs no schema
+change; the server just flags more cells active.
+
+**Client→server mastery request grammar (v2, §19.3 reserved).** Mirrors three request encoders +
+parsers (`EncodeAlloc`/`ParseAlloc`, `EncodeArchetype`/`ParseArchetype`, `EncodeRespec`/`ParseRespec`)
+and a `REQ\tMAST` verb:
+
+```
+BRND\tREQ\tMAST                                  request a fresh MAST snapshot
+BRND\tALLOC\t<school>\t<tree>\t<axis>\t<points>  spend/redistribute points on one cell axis (§14.10)
+BRND\tARCH\t<school>\t<tree>\t<archetype>        select a proc archetype (§7.9 loadout)
+BRND\tRESPEC\t<school>\t<tree>                   refund a cell's allocation (charges §14.5 token)
+```
+
+The server validates the §14.10 budget + caps and pushes a fresh MAST; the addon never mutates state
+locally (server-authoritative).
+
 **Invariants (tests — `tests/addon/ProtocolTest.cpp`):**
 
-- Round-trip `Decode*(Encode*(x)) == x` for every frame type.
+- Round-trip `Decode*(Encode*(x)) == x` for every frame type (incl. MAST and the three requests).
 - Every frame begins `BRND\t<KIND>\t`, contains no newline, length ≤ 255.
-- List frames pack/round-trip N records and **truncate deterministically with a marker** (never a
-  silent split) when they would exceed 255 bytes.
+- List frames (SCH, **MAST**) pack/round-trip N records and **truncate deterministically with a
+  marker** (never a silent split) when they would exceed 255 bytes.
+- The MAST active set round-trips as a per-cell flag list — **multiple cells may be `active` at
+  once** (`MasterySupportsMultipleActiveCells`), the multi-mastery forward-compat invariant.
 - `ParseRequest` is case-sensitive, returns `Unknown` for anything malformed, never throws (a
-  hostile oversized body included).
+  hostile oversized body included); the request parsers (`ParseAlloc`/…) reject wrong verbs and
+  malformed bodies cleanly.
 - Decode of an unknown KIND / malformed body is a clean `false`, not a crash (forward-compat).
 
 ### 19.3 Server adapter (`src/AddonProtocolMgr.*`, `src/AddonScripts.cpp`)
@@ -1333,24 +1502,41 @@ so a mismatched client is told to update rather than mis-parsing.
 - `EventScheduler` calls `AddonProtocolMgr::BroadcastZoneEvent(zoneId)` on every start/stop
   transition; `EventScheduler::SnapshotSchedule()` exposes the per-zone state/countdown for SCHED.
 - Config: `Branding.Addon.Enable` (master switch, default 0), `Branding.Addon.PushIntervalSeconds`.
-- `ParseRequest` (§19.2) is kept and tested but currently unused by the adapter — it reserves the
-  request grammar for a future client→server channel (group/guild/channel or a seeded RBAC perm).
+- `ParseRequest` (§19.2) — and the v2 mastery request parsers (`ParseAlloc`/`ParseArchetype`/
+  `ParseRespec`, REQ\tMAST) — are kept and tested but currently unused by the adapter: they reserve
+  the request grammar for a future client→server channel (group/guild/channel or a seeded RBAC perm).
+  The MAST push itself (`EncodeMastery`) is the server→client half and is wired the same way as CHAR.
 - **No SQL** — every value is already persisted by the owning Mgr; this slice only transports it.
 
 ### 19.4 The addon (`modules/mod-branding/client-addon/Branding/`)
 
-A single addon, two surfaces, one shared comms layer (`Comms.lua` mirrors the §19.2 codec):
+A single addon, three surfaces, one shared comms layer (`Comms.lua` mirrors the §19.2 codec):
 
-- **Invasion Tracker** — a movable HUD frame: current zone's event type + live containment bar +
-  your points/tier; plus a schedule list (per-zone next/active/cooldown countdown). Backed by the
-  EVT push (live) and a SCHED poll on open.
-- **Character panel** — tabbed: Brand proficiency (levels + effect strength), Mastery
+- **Invasion Tracker** (`Tracker.lua`) — a movable HUD frame: current zone's event type + live
+  containment bar + your points/tier; plus a schedule list (per-zone next/active/cooldown countdown).
+  Backed by the EVT push (live) and a SCHED poll on open.
+- **Character panel** (`Panel.lua`) — tabbed: Brand proficiency (levels + effect strength), Mastery
   (unlock/level/bonus), Loadout (active brand + proc archetype), Item brand (step/level/intensity),
   Allegiance. Backed by the CHAR poll, refreshed on open and on login push.
+- **Mastery panel** (`MasteryPanel.lua`, issue #32) — a standalone frame rendering the §14 lattice
+  (5 schools × 3 trees) from the MAST push: each cell's earned level, archetype/expression family,
+  active/invested/selected state, and per-cell §14.10 point-buy (only the axes the cell exposes) with
+  `+`/`-` and a respec button that send the v2 ALLOC/ARCH/RESPEC requests. Server-authoritative: it
+  displays MAST and *requests* changes; it never mutates locally, and gates sending behind
+  `ns.CanSend()` (disabled, display-only, until a realm enables a client→server channel).
 
-Ships with `Branding.toc`, the Lua/XML, and an install README (copy to `Interface/AddOns/`). The
-addon needs a live 3.3.5a client to verify, so it is **manual-verify**; the codec it depends on is
-unit-tested server-side (§19.2) and the Lua parser mirrors the same `permille`/`\t`/`;`/`:` grammar.
+**Talent-frame dock (#32 decision).** Native talent-frame integration (a real tab on
+`PlayerTalentFrame`) would need client DBC + secure-frame edits and would **taint** the protected
+talent frame. Instead the addon **docks a plain button** onto `PlayerTalentFrame` (parented to it,
+loaded via a `Blizzard_TalentUI` `ADDON_LOADED` watcher since the talent UI is load-on-demand) that
+merely toggles the *separate, unprotected* Mastery frame — the talent frame's internals are never
+touched, so there is no taint. The whole addon ships inside a custom `patch-?.MPQ` (auto-loaded, no
+AddOns-list opt-in) and stays 3.3.5a / build 12340 (stock frame APIs only, no DBC edits).
+
+Ships with `Branding.toc`, the Lua, and an install README (copy to `Interface/AddOns/`, or bundle the
+patch-MPQ). The addon needs a live 3.3.5a client to verify, so it is **manual-verify**; the codec it
+depends on is unit-tested server-side (§19.2) and the Lua parser mirrors the same
+`permille`/`\t`/`;`/`:` grammar.
 
 ### 19.5 Placement / Definition of Done
 

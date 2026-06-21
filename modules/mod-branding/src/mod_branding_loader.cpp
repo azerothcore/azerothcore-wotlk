@@ -12,6 +12,7 @@ void Addmod_brandingScripts()
     AddBrandingLoadoutScripts();
     AddBrandingVaultScripts();
     AddBrandingMasteryScripts();
+    AddBrandingMasteryLoadoutScripts();
     AddBrandingAllegianceScripts();
     AddBrandingEconomyScripts();
     AddBrandingDiscoverableScripts();

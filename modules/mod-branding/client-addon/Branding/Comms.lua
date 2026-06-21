@@ -12,7 +12,7 @@
 
 local ADDON, ns = ...
 
-ns.PROTOCOL = 1
+ns.PROTOCOL = 2                  -- v2 adds the §14 Mastery (MAST) frame + mastery request grammar
 ns.PREFIX = "BRND"
 
 -- Latest decoded state. UI reads these; nil/empty until the first push arrives.
@@ -22,6 +22,7 @@ ns.state = {
     you = nil,                   -- { points, tier }
     schedule = { entries = {}, truncated = false },
     char = nil,                  -- decoded character snapshot (see DecodeChar)
+    mastery = nil,               -- decoded §14 lattice snapshot (see DecodeMastery)
 }
 
 -- ---- Display name tables (mirror the server enums) ----
@@ -109,6 +110,30 @@ function ns:DecodeChar(t)
     return c
 end
 
+-- Decode the §14 Mastery lattice frame. `t` is the tab-split frame; t[1]=="MAST". Mirrors the
+-- server's EncodeMastery (Protocol.cpp): t[2]=pointsAvailable, t[3]=respecCost, t[4]=cell records
+-- (';'-separated; each ':'-separated as
+--   school:tree:kind:situational:sustained:level:archetype:axisMask:a0:a1:a2:a3:active),
+-- t[5]=truncation marker ("T" if the lattice didn't fit one frame).
+-- MULTI-MASTERY: `cells` is a flat list and each cell carries its own `active` flag, so any number
+-- of cells may be active at once -- the model never assumes a single active mastery.
+function ns:DecodeMastery(t)
+    local m = { pointsAvailable = num(t[2]), respecCost = num(t[3]), cells = {}, truncated = (t[5] == "T") }
+    if t[4] and t[4] ~= "" then
+        for _, rec in ipairs(split(t[4], ";")) do
+            local f = split(rec, ":")
+            m.cells[#m.cells + 1] = {
+                school = num(f[1]), tree = num(f[2]), kind = num(f[3]),
+                situational = (f[4] == "1"), sustained = (f[5] == "1"),
+                level = num(f[6]), archetype = num(f[7]), axisMask = num(f[8]),
+                alloc = { num(f[9]), num(f[10]), num(f[11]), num(f[12]) },
+                active = (f[13] == "1"),
+            }
+        end
+    end
+    return m
+end
+
 -- `message` is the frame body with the BRND prefix already stripped by the client (so it starts at
 -- the KIND token). Unknown kinds are ignored (forward-compat).
 local function decode(message)
@@ -141,7 +166,48 @@ local function decode(message)
     elseif kind == "CHAR" then
         ns.state.char = ns:DecodeChar(t)
         ns:Fire("char")
+    elseif kind == "MAST" then
+        ns.state.mastery = ns:DecodeMastery(t)
+        ns:Fire("mastery")
     end
+end
+
+-- ---- Client -> server requests (§14 mastery; §19.3 reserved grammar) ----
+--
+-- On 3.3.5a there is no guaranteed solo client->server addon hook (see the §19.1 note at the top of
+-- this file), so this is OFF unless the server opts a relay in. ns.CanSend() centralises that gate:
+-- the addon stays a pure renderer when sending is unavailable, and the Mastery panel falls back to
+-- "use the server's branding commands". The wire grammar below MIRRORS the server's request encoders
+-- (Protocol.cpp EncodeAlloc/EncodeArchetype/EncodeRespec + the "REQ\tMAST" verb) so the path lights
+-- up with no addon change the moment a channel is enabled. Set BrandingDB.sendChannel to one of
+-- "GUILD" / "PARTY" / "RAID" / "WHISPER" (whisper target = self) to try it on a realm that relays.
+function ns.CanSend()
+    return ns.db and ns.db.sendChannel ~= nil
+end
+
+-- SendAddonMessage routes by chat type; we use the configured channel (default: none -> no-op).
+local function sendFrame(body)
+    if not ns.CanSend() then return false end
+    local chan = ns.db.sendChannel
+    local target = (chan == "WHISPER") and UnitName("player") or nil
+    SendAddonMessage(ns.PREFIX, body, chan, target)
+    return true
+end
+
+function ns:RequestMastery()
+    return sendFrame("REQ\tMAST")
+end
+
+function ns:SendAlloc(school, tree, axis, points)
+    return sendFrame(string.format("ALLOC\t%d\t%d\t%d\t%d", school, tree, axis, points))
+end
+
+function ns:SendArchetype(school, tree, archetype)
+    return sendFrame(string.format("ARCH\t%d\t%d\t%d", school, tree, archetype))
+end
+
+function ns:SendRespec(school, tree)
+    return sendFrame(string.format("RESPEC\t%d\t%d", school, tree))
 end
 
 -- ---- Event wiring ----
@@ -157,8 +223,11 @@ frame:SetScript("OnEvent", function(_, event, ...)
     elseif event == "PLAYER_LOGIN" then
         BrandingDB = BrandingDB or {}
         ns.db = BrandingDB
+        if ns.PREFIX and RegisterAddonMessagePrefix then RegisterAddonMessagePrefix(ns.PREFIX) end
         if ns.CreateTracker then ns.CreateTracker() end
         if ns.CreatePanel then ns.CreatePanel() end
+        if ns.CreateMastery then ns.CreateMastery() end
+        if ns.HookMasteryDock then ns.HookMasteryDock() end
     end
 end)
 
@@ -169,6 +238,8 @@ SlashCmdList["BRANDING"] = function(arg)
     arg = string.lower(arg or "")
     if arg == "tracker" then
         if ns.ToggleTracker then ns.ToggleTracker() end
+    elseif arg == "mastery" then
+        if ns.ToggleMastery then ns.ToggleMastery() end
     else
         if ns.TogglePanel then ns.TogglePanel() end
     end
