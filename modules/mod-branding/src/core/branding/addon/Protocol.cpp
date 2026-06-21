@@ -144,6 +144,36 @@ namespace Branding::Addon
             && a.item == b.item && a.allegiance == b.allegiance;
     }
 
+    bool operator==(MasteryCellFrame const& a, MasteryCellFrame const& b)
+    {
+        for (uint8_t i = 0; i < AxisCount; ++i)
+            if (a.alloc[i] != b.alloc[i])
+                return false;
+        return a.school == b.school && a.tree == b.tree && a.kind == b.kind
+            && a.situational == b.situational && a.sustained == b.sustained && a.level == b.level
+            && a.archetype == b.archetype && a.axisMask == b.axisMask && a.active == b.active;
+    }
+
+    bool operator==(MasterySnapshot const& a, MasterySnapshot const& b)
+    {
+        return a.pointsAvailable == b.pointsAvailable && a.respecCost == b.respecCost && a.cells == b.cells;
+    }
+
+    bool operator==(AllocRequest const& a, AllocRequest const& b)
+    {
+        return a.school == b.school && a.tree == b.tree && a.axis == b.axis && a.points == b.points;
+    }
+
+    bool operator==(ArchetypeRequest const& a, ArchetypeRequest const& b)
+    {
+        return a.school == b.school && a.tree == b.tree && a.archetype == b.archetype;
+    }
+
+    bool operator==(RespecRequest const& a, RespecRequest const& b)
+    {
+        return a.school == b.school && a.tree == b.tree;
+    }
+
     // ---- Request parsing ----
 
     AddonRequest ParseRequest(std::string_view body, uint8_t& outVersion)
@@ -164,9 +194,51 @@ namespace Branding::Addon
             if (tok[1] == "CHAR")   return AddonRequest::Char;
             if (tok[1] == "SCH")    return AddonRequest::Schedule;
             if (tok[1] == "STATUS") return AddonRequest::Status;
+            if (tok[1] == "MAST")   return AddonRequest::Mastery;
         }
 
+        if (tok[0] == "ALLOC")  return AddonRequest::Allocate;
+        if (tok[0] == "ARCH")   return AddonRequest::Archetype;
+        if (tok[0] == "RESPEC") return AddonRequest::Respec;
+
         return AddonRequest::Unknown;
+    }
+
+    bool ParseAlloc(std::string_view body, AllocRequest& out)
+    {
+        std::vector<std::string_view> const t = Split(body, Sep);
+        if (t.size() != 5 || t[0] != "ALLOC")
+            return false;
+        AllocRequest r;
+        if (!ParseU8(t[1], r.school) || !ParseU8(t[2], r.tree)
+            || !ParseU8(t[3], r.axis) || !ParseU8(t[4], r.points))
+            return false;
+        out = r;
+        return true;
+    }
+
+    bool ParseArchetype(std::string_view body, ArchetypeRequest& out)
+    {
+        std::vector<std::string_view> const t = Split(body, Sep);
+        if (t.size() != 4 || t[0] != "ARCH")
+            return false;
+        ArchetypeRequest r;
+        if (!ParseU8(t[1], r.school) || !ParseU8(t[2], r.tree) || !ParseU8(t[3], r.archetype))
+            return false;
+        out = r;
+        return true;
+    }
+
+    bool ParseRespec(std::string_view body, RespecRequest& out)
+    {
+        std::vector<std::string_view> const t = Split(body, Sep);
+        if (t.size() != 3 || t[0] != "RESPEC")
+            return false;
+        RespecRequest r;
+        if (!ParseU8(t[1], r.school) || !ParseU8(t[2], r.tree))
+            return false;
+        out = r;
+        return true;
     }
 
     bool StripPrefix(std::string_view raw, std::string_view& outBody)
@@ -278,6 +350,78 @@ namespace Branding::Addon
         out += std::to_string(s.allegiance.id);        out += FieldSep;
         out += std::to_string(s.allegiance.efficiencyPermille);
 
+        return out;
+    }
+
+    std::string EncodeMastery(MasterySnapshot const& s, bool& outTruncated)
+    {
+        outTruncated = false;
+        std::string const base = FramePrefix("MAST");
+        std::string head = base;
+        head += Sep; head += std::to_string(s.pointsAvailable);
+        head += Sep; head += std::to_string(s.respecCost);
+
+        std::string records;
+        for (MasteryCellFrame const& c : s.cells)
+        {
+            std::string rec;
+            if (!records.empty())
+                rec += RecSep;
+            rec += std::to_string(c.school);          rec += FieldSep;
+            rec += std::to_string(c.tree);            rec += FieldSep;
+            rec += std::to_string(c.kind);            rec += FieldSep;
+            rec += (c.situational ? '1' : '0');       rec += FieldSep;
+            rec += (c.sustained ? '1' : '0');         rec += FieldSep;
+            rec += std::to_string(c.level);           rec += FieldSep;
+            rec += std::to_string(c.archetype);       rec += FieldSep;
+            rec += std::to_string(c.axisMask);
+            for (uint8_t i = 0; i < AxisCount; ++i)
+            {
+                rec += FieldSep;
+                rec += std::to_string(c.alloc[i]);
+            }
+            rec += FieldSep; rec += (c.active ? '1' : '0');
+
+            // Reserve room for the "\t<records>\t<marker>" tail incl. a possible truncation flag.
+            std::size_t const projected = head.size() + 1 + records.size() + rec.size() + 2;
+            if (projected > MaxFrame)
+            {
+                outTruncated = true;
+                break;
+            }
+            records += rec;
+        }
+
+        std::string out = head;
+        out += Sep; out += records;
+        out += Sep; out += (outTruncated ? "T" : "");
+        return out;
+    }
+
+    std::string EncodeAlloc(AllocRequest const& r)
+    {
+        std::string out = FramePrefix("ALLOC");
+        out += Sep; out += std::to_string(r.school);
+        out += Sep; out += std::to_string(r.tree);
+        out += Sep; out += std::to_string(r.axis);
+        out += Sep; out += std::to_string(r.points);
+        return out;
+    }
+
+    std::string EncodeArchetype(ArchetypeRequest const& r)
+    {
+        std::string out = FramePrefix("ARCH");
+        out += Sep; out += std::to_string(r.school);
+        out += Sep; out += std::to_string(r.tree);
+        out += Sep; out += std::to_string(r.archetype);
+        return out;
+    }
+
+    std::string EncodeRespec(RespecRequest const& r)
+    {
+        std::string out = FramePrefix("RESPEC");
+        out += Sep; out += std::to_string(r.school);
+        out += Sep; out += std::to_string(r.tree);
         return out;
     }
 
@@ -395,6 +539,42 @@ namespace Branding::Addon
                 return false;
         }
 
+        return true;
+    }
+
+    bool DecodeMastery(std::string_view frame, MasterySnapshot& out, bool& outTruncated)
+    {
+        out = MasterySnapshot{};
+        std::vector<std::string_view> const t = Split(frame, Sep);
+        if (t.size() != 6 || t[0] != Prefix || t[1] != "MAST")
+            return false;
+
+        if (!ParseU16(t[2], out.pointsAvailable) || !ParseU16(t[3], out.respecCost))
+            return false;
+
+        outTruncated = (t[5] == "T");
+
+        if (!t[4].empty())
+        {
+            for (std::string_view const rec : Split(t[4], RecSep))
+            {
+                std::vector<std::string_view> const f = Split(rec, FieldSep);
+                // 8 scalar fields + AxisCount alloc fields + 1 active flag.
+                if (f.size() != static_cast<std::size_t>(9 + AxisCount))
+                    return false;
+                MasteryCellFrame c;
+                if (!ParseU8(f[0], c.school) || !ParseU8(f[1], c.tree) || !ParseU8(f[2], c.kind)
+                    || !ParseBool(f[3], c.situational) || !ParseBool(f[4], c.sustained)
+                    || !ParseU8(f[5], c.level) || !ParseU8(f[6], c.archetype) || !ParseU8(f[7], c.axisMask))
+                    return false;
+                bool allocOk = true;
+                for (uint8_t i = 0; i < AxisCount; ++i)
+                    allocOk = allocOk && ParseU8(f[8 + i], c.alloc[i]);
+                if (!allocOk || !ParseBool(f[8 + AxisCount], c.active))
+                    return false;
+                out.cells.push_back(c);
+            }
+        }
         return true;
     }
 }

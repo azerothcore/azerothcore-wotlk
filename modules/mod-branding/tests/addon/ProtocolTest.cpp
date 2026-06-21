@@ -190,3 +190,160 @@ TEST(AddonProtocol, DecodeRejectsMalformed)
     YouFrame you;
     EXPECT_FALSE(DecodeYou("BRND\tHELLO\t1\t0", you)) << "wrong KIND for YOU";
 }
+
+// ---- §14 Mastery lattice (MAST) ----
+
+TEST(AddonProtocol, MasteryRoundTrip)
+{
+    MasterySnapshot in;
+    in.pointsAvailable = 7;
+    in.respecCost = 250;
+    // Fire-Def (windowed, 4 axes incl. reach), one active cell; Shadow-Support (situational +
+    // sustained, magnitude+reach only); Frost-Off (windowed, single-target -> 3 axes).
+    in.cells.push_back({ 0, 0, 1, false, false, 18, 1, 0x0F, { 3, 1, 2, 1 }, true });
+    in.cells.push_back({ 3, 2, 1, true, true, 5, 0, 0x0C, { 0, 0, 2, 1 }, false });
+    in.cells.push_back({ 1, 1, 1, false, false, 9, 0, 0x07, { 2, 1, 1, 0 }, true });
+
+    bool truncated = true;
+    std::string const frame = EncodeMastery(in, truncated);
+    ExpectWellFormed(frame);
+    EXPECT_FALSE(truncated) << "three cells fit a single frame";
+
+    MasterySnapshot out;
+    bool outTrunc = true;
+    ASSERT_TRUE(DecodeMastery(frame, out, outTrunc));
+    EXPECT_FALSE(outTrunc);
+    EXPECT_EQ(in, out);
+}
+
+TEST(AddonProtocol, MasteryEmptyRoundTrip)
+{
+    MasterySnapshot in;
+    in.pointsAvailable = 0;
+    in.respecCost = 0;
+
+    bool truncated = true;
+    std::string const frame = EncodeMastery(in, truncated);
+    ExpectWellFormed(frame);
+    EXPECT_FALSE(truncated);
+
+    MasterySnapshot out;
+    out.cells.push_back({ 9, 9, 9, true, true, 9, 9, 9, { 9, 9, 9, 9 }, true });   // must be cleared
+    bool outTrunc = false;
+    ASSERT_TRUE(DecodeMastery(frame, out, outTrunc));
+    EXPECT_TRUE(out.cells.empty());
+    EXPECT_EQ(in, out);
+}
+
+// Multi-mastery forward-compat: the active set is a per-cell flag list, so MORE THAN ONE cell may
+// be active at once -- the wire model already supports running multiple masteries simultaneously.
+TEST(AddonProtocol, MasterySupportsMultipleActiveCells)
+{
+    MasterySnapshot in;
+    in.cells.push_back({ 0, 0, 1, false, false, 10, 0, 0x0F, { 1, 1, 1, 1 }, true });
+    in.cells.push_back({ 1, 1, 1, false, false, 10, 0, 0x07, { 1, 1, 1, 0 }, true });
+    in.cells.push_back({ 2, 2, 1, true, true, 10, 0, 0x0C, { 0, 0, 1, 1 }, false });
+
+    bool truncated = false;
+    std::string const frame = EncodeMastery(in, truncated);
+    MasterySnapshot out;
+    bool outTrunc = false;
+    ASSERT_TRUE(DecodeMastery(frame, out, outTrunc));
+
+    int activeCount = 0;
+    for (auto const& c : out.cells)
+        if (c.active)
+            ++activeCount;
+    EXPECT_EQ(activeCount, 2) << "multiple cells active simultaneously must survive the round-trip";
+}
+
+// A lattice too large for one frame truncates deterministically and flags -- never a silent split.
+TEST(AddonProtocol, MasteryTruncatesAndFlags)
+{
+    MasterySnapshot in;
+    for (uint32_t i = 0; i < 200; ++i)
+        in.cells.push_back({ static_cast<uint8_t>(i % 7), static_cast<uint8_t>(i % 3), 1,
+            false, false, 60, 1, 0x0F, { 99, 99, 99, 99 }, true });
+
+    bool truncated = false;
+    std::string const frame = EncodeMastery(in, truncated);
+    ExpectWellFormed(frame);
+    EXPECT_TRUE(truncated) << "200 cells cannot fit 255 bytes";
+
+    MasterySnapshot out;
+    bool outTrunc = false;
+    ASSERT_TRUE(DecodeMastery(frame, out, outTrunc));
+    EXPECT_TRUE(outTrunc) << "the truncation marker must survive";
+    EXPECT_LT(out.cells.size(), in.cells.size());
+    EXPECT_FALSE(out.cells.empty());
+    for (std::size_t i = 0; i < out.cells.size(); ++i)
+        EXPECT_EQ(out.cells[i], in.cells[i]) << "kept prefix is the deterministic head";
+}
+
+TEST(AddonProtocol, MasteryDecodeRejectsMalformed)
+{
+    MasterySnapshot out;
+    bool trunc = false;
+    EXPECT_FALSE(DecodeMastery("BRND\tCHAR\t0\t0\t\t", out, trunc)) << "wrong KIND";
+    EXPECT_FALSE(DecodeMastery("BRND\tMAST\t0\t0", out, trunc)) << "missing fields";
+    EXPECT_FALSE(DecodeMastery("BRND\tMAST\tx\t0\t\t", out, trunc)) << "non-numeric points";
+    EXPECT_FALSE(DecodeMastery("BRND\tMAST\t0\t0\t0:0:1\t", out, trunc)) << "short cell record";
+}
+
+// ---- §14 client->server request grammar (§19.3 reserved) ----
+
+TEST(AddonProtocol, ParseMasteryRequestVerbs)
+{
+    uint8_t version = 0;
+    EXPECT_EQ(ParseRequest("REQ\tMAST", version), AddonRequest::Mastery);
+    EXPECT_EQ(ParseRequest("ALLOC\t0\t0\t2\t3", version), AddonRequest::Allocate);
+    EXPECT_EQ(ParseRequest("ARCH\t0\t1\t2", version), AddonRequest::Archetype);
+    EXPECT_EQ(ParseRequest("RESPEC\t0\t0", version), AddonRequest::Respec);
+}
+
+TEST(AddonProtocol, AllocRequestRoundTrip)
+{
+    AllocRequest in{ 3, 1, 2, 4 };   // Shadow, Off tree, Magnitude axis, 4 points
+    std::string const frame = EncodeAlloc(in);
+    ExpectWellFormed(frame);
+
+    std::string_view body;
+    ASSERT_TRUE(StripPrefix(frame, body));
+    AllocRequest out;
+    ASSERT_TRUE(ParseAlloc(body, out));
+    EXPECT_EQ(in, out);
+}
+
+TEST(AddonProtocol, ArchetypeRequestRoundTrip)
+{
+    ArchetypeRequest in{ 1, 0, 2 };
+    std::string_view body;
+    ASSERT_TRUE(StripPrefix(EncodeArchetype(in), body));
+    ArchetypeRequest out;
+    ASSERT_TRUE(ParseArchetype(body, out));
+    EXPECT_EQ(in, out);
+}
+
+TEST(AddonProtocol, RespecRequestRoundTrip)
+{
+    RespecRequest in{ 4, 2 };
+    std::string_view body;
+    ASSERT_TRUE(StripPrefix(EncodeRespec(in), body));
+    RespecRequest out;
+    ASSERT_TRUE(ParseRespec(body, out));
+    EXPECT_EQ(in, out);
+}
+
+TEST(AddonProtocol, RequestParsersRejectMalformed)
+{
+    AllocRequest a;
+    EXPECT_FALSE(ParseAlloc("ALLOC\t0\t0\t2", a)) << "missing field";
+    EXPECT_FALSE(ParseAlloc("ARCH\t0\t0\t2\t3", a)) << "wrong verb";
+    EXPECT_FALSE(ParseAlloc("ALLOC\t0\t0\tx\t3", a)) << "non-numeric";
+
+    ArchetypeRequest ar;
+    EXPECT_FALSE(ParseArchetype("ARCH\t0\t0", ar));
+
+    RespecRequest r;
+    EXPECT_FALSE(ParseRespec("RESPEC\t0", r));
+}

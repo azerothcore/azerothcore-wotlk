@@ -19,10 +19,15 @@ namespace Branding::Addon
     inline constexpr char RecSep = ';';
     inline constexpr char FieldSep = ':';
     inline constexpr std::size_t MaxFrame = 255;
-    inline constexpr uint8_t ProtocolVersion = 1;
+    // v2 adds the §14 Mastery lattice frame (MAST) + the client->server mastery request grammar
+    // (REQ MAST / ALLOC / ARCH / RESPEC). A v1 client simply ignores MAST and never sends the new
+    // requests, so the bump is backward-tolerant; HELLO still tells a mismatched client to update.
+    inline constexpr uint8_t ProtocolVersion = 2;
 
-    // What the client asked for (after the BRND prefix is stripped).
-    enum class AddonRequest : uint8_t { Hello, Char, Schedule, Status, Unknown };
+    // What the client asked for (after the BRND prefix is stripped). The mastery verbs (Mastery,
+    // Allocate, Archetype, Respec) are the §14 client->server channel reserved by §19.3 -- parsed
+    // and tested here; live adapter wiring of a client->server path is future work (see §19.3).
+    enum class AddonRequest : uint8_t { Hello, Char, Schedule, Status, Mastery, Allocate, Archetype, Respec, Unknown };
 
     // ---- Snapshot POD inputs (adapter fills from Mgrs; no AC types) ----
 
@@ -46,6 +51,56 @@ namespace Branding::Addon
         AllegianceFrame allegiance;
     };
 
+    // ---- §14 Mastery lattice (MAST frame) ----
+
+    // The four §14.10 point-buy axes, on the wire in fixed order. Mirrors core ProcAxis
+    // (Ppm, Duration, Magnitude, Reach) so the addon and core agree on index meaning.
+    inline constexpr uint8_t AxisCount = 4;
+
+    // One (school, tree) lattice cell as the client renders it (§14.4/§14.10). `axisMask` is the
+    // applicable-axis bitmask (bit i set => axis i is tunable for this cell); `alloc[i]` is the
+    // player's current point spend on axis i (0 for non-applicable axes). `kind` is the §7.9
+    // EffectKind ordinal; `situational`/`sustained` carry the SM/SE + Support-aura flags so the UI
+    // can label the cell. `level` is the EARNED mastery level for this school (§14.11 "earned"
+    // layer, shared across specs). `archetype` is the selected proc archetype (§7.9 loadout).
+    struct MasteryCellFrame
+    {
+        uint8_t  school = 0;        // BrandId ordinal (0..6)
+        uint8_t  tree = 0;          // MasteryTree ordinal (0=Def,1=Off,2=Support)
+        uint8_t  kind = 0;          // EffectKind ordinal
+        bool     situational = false;
+        bool     sustained = false;
+        uint8_t  level = 0;         // earned mastery level for this school
+        uint8_t  archetype = 0;     // selected proc archetype
+        uint8_t  axisMask = 0;      // applicable §14.10 axes (bit per axis)
+        uint8_t  alloc[AxisCount] = { 0, 0, 0, 0 };  // points spent per axis
+        bool     active = false;    // is this cell one of the character's ACTIVE masteries?
+    };
+
+    // §14 mastery snapshot. `pointsAvailable` is the unspent point-buy budget the player may
+    // allocate; `respecCost` is the §14.5/§7.9 friction token cost for a respec. `cells` is the
+    // full lattice (server sends every authored cell; `active` flags the ones currently running).
+    //
+    // MULTI-MASTERY forward-compat: the active set is intentionally a property of the cell list
+    // (each cell's `active` flag), NOT a single "active mastery" field -- a character will later run
+    // MULTIPLE masteries at once and the wire/UI model must already represent that as a list.
+    struct MasterySnapshot
+    {
+        uint16_t pointsAvailable = 0;
+        uint16_t respecCost = 0;
+        std::vector<MasteryCellFrame> cells;
+    };
+
+    // ---- Parsed client->server request payloads (§19.3 reserved grammar) ----
+
+    // ALLOC: spend/restribute points on one cell's axis. school/tree identify the cell; axis is the
+    // §14.10 ProcAxis ordinal; points is the desired new spend on that axis.
+    struct AllocRequest { uint8_t school = 0; uint8_t tree = 0; uint8_t axis = 0; uint8_t points = 0; };
+    // ARCH: select a proc archetype for a cell.
+    struct ArchetypeRequest { uint8_t school = 0; uint8_t tree = 0; uint8_t archetype = 0; };
+    // RESPEC: refund a cell's allocation (charges the §14.5 token, adapter-side).
+    struct RespecRequest { uint8_t school = 0; uint8_t tree = 0; };
+
     // ---- Equality (for round-trip tests) ----
     bool operator==(HelloFrame const&, HelloFrame const&);
     bool operator==(EventFrame const&, EventFrame const&);
@@ -57,11 +112,25 @@ namespace Branding::Addon
     bool operator==(ItemFrame const&, ItemFrame const&);
     bool operator==(AllegianceFrame const&, AllegianceFrame const&);
     bool operator==(CharSnapshot const&, CharSnapshot const&);
+    bool operator==(MasteryCellFrame const&, MasteryCellFrame const&);
+    bool operator==(MasterySnapshot const&, MasterySnapshot const&);
+    bool operator==(AllocRequest const&, AllocRequest const&);
+    bool operator==(ArchetypeRequest const&, ArchetypeRequest const&);
+    bool operator==(RespecRequest const&, RespecRequest const&);
 
     // ---- Request parsing (client -> server) ----
     // `body` is the message with the leading "BRND\t" already removed. Never throws; an unknown or
     // malformed verb yields Unknown. For Hello, `outVersion` is set to the client's protocol version.
     AddonRequest ParseRequest(std::string_view body, uint8_t& outVersion);
+
+    // §14 client->server payload parsers. Each returns false (leaving `out` untouched) on a wrong
+    // verb or malformed body; never throws. Grammar mirrors the encoders below.
+    //   BRND\tALLOC\t<school>\t<tree>\t<axis>\t<points>
+    //   BRND\tARCH\t<school>\t<tree>\t<archetype>
+    //   BRND\tRESPEC\t<school>\t<tree>
+    bool ParseAlloc(std::string_view body, AllocRequest& out);
+    bool ParseArchetype(std::string_view body, ArchetypeRequest& out);
+    bool ParseRespec(std::string_view body, RespecRequest& out);
 
     // Strips the "BRND\t" prefix from a raw incoming addon body. Returns false (and leaves outBody
     // untouched) if `raw` is not one of our frames.
@@ -74,6 +143,14 @@ namespace Branding::Addon
     std::string EncodeSchedule(std::vector<ScheduleEntry> const&, bool& outTruncated);
     std::string EncodeYou(YouFrame const&);
     std::string EncodeChar(CharSnapshot const&);
+    // §14 lattice. Packs as many cells as fit MaxFrame; sets `outTruncated` if any were dropped
+    // (deterministic head, never a silent split -- same contract as EncodeSchedule).
+    std::string EncodeMastery(MasterySnapshot const&, bool& outTruncated);
+
+    // Request encoders (client side mirrors these in Lua; provided here for round-trip tests).
+    std::string EncodeAlloc(AllocRequest const&);
+    std::string EncodeArchetype(ArchetypeRequest const&);
+    std::string EncodeRespec(RespecRequest const&);
 
     // ---- Decoders (test + Lua-parity reference). Return false on malformed input; never throw ----
     bool DecodeHello(std::string_view frame, HelloFrame& out);
@@ -81,6 +158,7 @@ namespace Branding::Addon
     bool DecodeSchedule(std::string_view frame, std::vector<ScheduleEntry>& out, bool& outTruncated);
     bool DecodeYou(std::string_view frame, YouFrame& out);
     bool DecodeChar(std::string_view frame, CharSnapshot& out);
+    bool DecodeMastery(std::string_view frame, MasterySnapshot& out, bool& outTruncated);
 }
 
 #endif // MOD_BRANDING_SRC_CORE_ADDON_PROTOCOL_H
