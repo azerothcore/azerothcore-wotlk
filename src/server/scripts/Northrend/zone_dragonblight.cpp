@@ -1690,6 +1690,7 @@ enum CommanderEligorDawnbringer
     MODEL_IMAGE_OF_NOTH                = 24797, // Image of Noth
     MODEL_IMAGE_OF_HEIGAN              = 24793, // Image of Heigan
     MODEL_IMAGE_OF_LOATHEB             = 24795, // Image of Loatheb
+    MODEL_IMAGE_OF_MR_BIGGLESWORTH     = 26055, // Image of Mr. Bigglesworth
 
     NPC_IMAGE_OF_KELTHUZAD             = 27766, // Image of Kel'Thuzad
     NPC_IMAGE_OF_SAPPHIRON             = 27767, // Image of Sapphiron
@@ -1708,9 +1709,10 @@ enum CommanderEligorDawnbringer
     NPC_IMAGE_OF_NOTH                  = 27779, // Image of Noth
     NPC_IMAGE_OF_HEIGAN                = 27780, // Image of Heigan
     NPC_IMAGE_OF_LOATHEB               = 27781, // Image of Loatheb
+    NPC_IMAGE_OF_MR_BIGGLESWORTH       = 29223, // Image of Mr. Bigglesworth
 
     NPC_INFANTRYMAN                    = 27160, // Add in case I randomize the spawning
-    NPC_SENTINAL                       = 27162,
+    NPC_SENTINEL                       = 27162,
     NPC_BATTLE_MAGE                    = 27164,
 
     // Five platforms to choose from
@@ -1747,6 +1749,10 @@ enum CommanderEligorDawnbringer
     SAY_HEIGAN_1                       = 24,
     SAY_HEIGAN_2                       = 25,
     SAY_LOATHEB                        = 26,
+    // Pinnacle Mr. Bigglesworth gag
+    SAY_BIGGLESWORTH                   = 27,
+    EMOTE_BIGGLESWORTH_POUND           = 28,
+    SAY_NEVERMIND                      = 29,
 
     SPELL_HEROIC_IMAGE_CHANNEL         = 49519,
 
@@ -1759,10 +1765,17 @@ enum CommanderEligorDawnbringer
     EVENT_DEATH_KNIGHTS_2              = 7,
     EVENT_DEATH_KNIGHTS_3              = 8,
     EVENT_DEATH_KNIGHTS_4              = 9,
-    EVENT_HEIGAN_2                     = 10
+    EVENT_HEIGAN_2                     = 10,
+    EVENT_BIGGLESWORTH_POUND           = 11,
+    EVENT_BIGGLESWORTH_NEVERMIND       = 12,
+    EVENT_MOVE_WATCHDOG                = 13
 };
 
-uint32 const AudienceMobs[3] = { NPC_INFANTRYMAN, NPC_SENTINAL, NPC_BATTLE_MAGE };
+uint32 const AudienceMobs[3] = { NPC_INFANTRYMAN, NPC_SENTINEL, NPC_BATTLE_MAGE };
+
+// The middle/Pinnacle display (Kel'Thuzad, Sapphiron, Bigglesworth) faces the area entrance,
+// 180 degrees opposite Eligor's home position.
+float const FACING_PINNACLE_ENTRANCE = 5.91667f;
 
 Position const PosTalkLocations[6] =
 {
@@ -1806,6 +1819,7 @@ public:
             {
                 if (id == 1)
                 {
+                    _events.CancelEvent(EVENT_MOVE_WATCHDOG); // arrived, the move succeeded
                     me->SetFacingTo(PosTalkLocations[talkWing].GetOrientation());
                     TurnAudience();
 
@@ -1813,7 +1827,7 @@ public:
                     {
                         case 0: // Pinnacle of Naxxramas
                             {
-                                switch (urand (0, 1))
+                                switch (urand (0, 2))
                                 {
                                     case 0:
                                         ChangeImage(NPC_IMAGE_OF_KELTHUZAD, MODEL_IMAGE_OF_KELTHUZAD, SAY_KELTHUZAD_1);
@@ -1821,6 +1835,10 @@ public:
                                         break;
                                     case 1:
                                         ChangeImage(NPC_IMAGE_OF_SAPPHIRON, MODEL_IMAGE_OF_SAPPHIRON, SAY_SAPPHIRON);
+                                        break;
+                                    case 2: // Mr. Bigglesworth gag
+                                        ChangeImage(NPC_IMAGE_OF_MR_BIGGLESWORTH, MODEL_IMAGE_OF_MR_BIGGLESWORTH, SAY_BIGGLESWORTH);
+                                        _events.ScheduleEvent(EVENT_BIGGLESWORTH_POUND, 6s);
                                         break;
                                 }
                             }
@@ -1930,6 +1948,23 @@ public:
                 imageList[3] = creature->GetGUID();
             if (Creature* creature = me->FindNearestCreature(NPC_IMAGE_OF_NOTH, 20.0f, true))
                 imageList[4] = creature->GetGUID();
+
+            FaceImagesToRest();
+        }
+
+        // Snap every image back to its resting orientation: the four corner platforms face the
+        // central display, the middle/Pinnacle platform faces the area entrance.
+        void FaceImagesToRest()
+        {
+            Creature* center = ObjectAccessor::GetCreature(*me, imageList[0]);
+
+            for (uint8 i = 1; i < 5; ++i)
+                if (Creature* image = ObjectAccessor::GetCreature(*me, imageList[i]))
+                    if (center)
+                        image->SetFacingToObject(center);
+
+            if (center)
+                center->SetFacingTo(FACING_PINNACLE_ENTRANCE);
         }
 
         void ChangeImage(uint32 entry, uint32 model, uint8 text)
@@ -1953,6 +1988,16 @@ public:
             }
         }
 
+        // Walk to the current platform (or home). Arms a watchdog so the cycle recovers if the
+        // move is ever interrupted and MovementInform never reports arrival.
+        void MoveToTalkPoint()
+        {
+            me->SetWalk(true);
+            me->GetMotionMaster()->Clear();
+            me->GetMotionMaster()->MovePoint(1, PosTalkLocations[talkWing].m_positionX, PosTalkLocations[talkWing].m_positionY, PosTalkLocations[talkWing].m_positionZ);
+            _events.RescheduleEvent(EVENT_MOVE_WATCHDOG, 15s);
+        }
+
         void UpdateAI(uint32 diff) override
         {
             _events.Update(diff);
@@ -1967,13 +2012,26 @@ public:
                         _events.ScheduleEvent(EVENT_MOVE_TO_POINT, 8s);
                         break;
                     case EVENT_MOVE_TO_POINT:
-                        me->SetWalk(true);
-                        me->GetMotionMaster()->Clear();
-                        me->GetMotionMaster()->MovePoint(1, PosTalkLocations[talkWing].m_positionX, PosTalkLocations[talkWing].m_positionY, PosTalkLocations[talkWing].m_positionZ);
+                        MoveToTalkPoint();
+                        break;
+                    case EVENT_MOVE_WATCHDOG:
+                        // Arrival was never reported (the walk got interrupted) - re-issue it so the
+                        // narration cycle can't get stuck, e.g. from an on-click interaction.
+                        MoveToTalkPoint();
                         break;
                     case EVENT_TALK_COMPLETE:
+                        // The image's spin/narration is done: snap it back to its resting facing.
+                        if (Creature* image = ObjectAccessor::GetCreature(*me, imageList[talkWing]))
+                        {
+                            if (talkWing == 0)
+                                image->SetFacingTo(FACING_PINNACLE_ENTRANCE);
+                            else if (Creature* center = ObjectAccessor::GetCreature(*me, imageList[0]))
+                                image->SetFacingToObject(center);
+                        }
+                        // Eligor only sometimes adds his closing remark before heading home.
+                        if (roll_chance_i(50))
+                            Talk(SAY_TALK_COMPLETE);
                         talkWing = 5;
-                        Talk(talkWing);
                         _events.ScheduleEvent(EVENT_MOVE_TO_POINT, 5s);
                         break;
                     case EVENT_GET_TARGETS:
@@ -2009,6 +2067,13 @@ public:
                         break;
                     case EVENT_HEIGAN_2:
                         Talk(SAY_HEIGAN_2);
+                        break;
+                    case EVENT_BIGGLESWORTH_POUND:
+                        Talk(EMOTE_BIGGLESWORTH_POUND);
+                        _events.ScheduleEvent(EVENT_BIGGLESWORTH_NEVERMIND, 4s);
+                        break;
+                    case EVENT_BIGGLESWORTH_NEVERMIND:
+                        Talk(SAY_NEVERMIND);
                         break;
                     default:
                         break;
