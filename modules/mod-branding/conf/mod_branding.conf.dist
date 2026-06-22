@@ -594,3 +594,206 @@ Branding.Addon.Enable = 0
 #
 
 Branding.Addon.PushIntervalSeconds = 5
+
+#
+# Insight -- the Knowledge-unlock currency (design §14.13.1, issue #18). A per-(account, school)
+# NON-tradeable fractional DB point counter (NOT an item; the deliberate exception to §16.3). Earned
+# from kills with ACCOUNT-WIDE diminishing returns; reaching the threshold unlocks the permanent
+# Brand Knowledge row once. Raid bosses are the backbone (no intra-week DR -- the lockout throttles);
+# dungeon bosses are farmable so they are DR'd within a rolling window (heroic > normal); a generic
+# trash "mote" is a VERY low-rate, school-agnostic breadcrumb feeding the active school.
+#
+
+#
+#    Branding.Insight.Enable
+#        Description: Master switch for the Insight Knowledge-unlock currency.
+#        Default:     0 - (disabled)
+#
+
+Branding.Insight.Enable = 0
+
+#
+#    Branding.Insight.RaidBossBase
+#        Description: Base Insight per raid-boss kill (the backbone; not DR'd -- weekly lockout throttles).
+#        Default:     1.0
+#
+
+Branding.Insight.RaidBossBase = 1.0
+
+#
+#    Branding.Insight.DungeonHeroicBase / DungeonNormalBase
+#        Description: Base Insight per heroic / normal dungeon-boss kill (farmable, so DR'd; heroic > normal).
+#        Default:     0.5 / 0.25
+#
+
+Branding.Insight.DungeonHeroicBase = 0.5
+Branding.Insight.DungeonNormalBase = 0.25
+
+#
+#    Branding.Insight.MoteBase
+#        Description: Base Insight per generic trash "mote" (school-agnostic breadcrumb; kept tiny).
+#        Default:     0.01
+#
+
+Branding.Insight.MoteBase = 0.01
+
+#
+#    Branding.Insight.DungeonDrFactor / MoteDrFactor
+#        Description: Geometric DR factor applied per prior windowed kill: yield = base * factor^prior
+#                     (1st full, 2nd x factor, 3rd x factor^2, ...). In [0,1]. Raid bosses are never DR'd.
+#        Default:     0.5 / 0.5
+#
+
+Branding.Insight.DungeonDrFactor = 0.5
+Branding.Insight.MoteDrFactor = 0.5
+
+#
+#    Branding.Insight.MoteChance
+#        Description: Per-trash-kill chance (0..1) to award a mote -- keeps the world-mob faucet a trickle.
+#        Default:     0.02
+#
+
+Branding.Insight.MoteChance = 0.02
+
+#
+#    Branding.Insight.WindowSeconds
+#        Description: After this many seconds the ACCOUNT-WIDE DR window decays back to empty (prior
+#                     windowed-kill count resets, so repeat kills are full value again).
+#        Default:     3600
+#
+
+Branding.Insight.WindowSeconds = 3600
+
+#
+#    Branding.Insight.UnlockThreshold
+#        Description: Insight needed in a school to unlock its permanent Brand Knowledge (§14.13.1
+#                     targets ~30-40 -- tuned to ~a month of daily grinding, not a raw number).
+#        Default:     35.0
+#
+
+Branding.Insight.UnlockThreshold = 35.0
+# Active-school switch fee (design slice §14.13.2, issue #19). One active school at a time; switching
+# the active school (the §7.9 active brand) costs an escalating gold tuition -- a recurring gold sink
+# and an anti-flip-flop friction. Knowledge is account-permanent, so switching BACK to a previously
+# unlocked school is gold-only and retains per-school Proficiency (character_branding rows persist);
+# a never-known school must be Insight-unlocked first (#18) and is never charged on rejection.
+#
+
+#
+#    Branding.Selection.Enable
+#        Description: Master switch for the §14.13.2 active-school switch fee.
+#        Default:     0 - (disabled)
+#
+
+Branding.Selection.Enable = 0
+
+#
+#    Branding.Selection.TuitionBase
+#        Description: Gold tuition (copper) for the first switch (recent-switch count 0). The curve is
+#                     TuitionCost = clamp(round(TuitionBase * TuitionFactor^recentSwitches), <= cap).
+#        Default:     100000 - (10 gold)
+#
+
+Branding.Selection.TuitionBase = 100000
+
+#
+#    Branding.Selection.TuitionFactor
+#        Description: Geometric escalation per recent (un-decayed) switch. Values below 1.0 are clamped
+#                     to 1.0 so the curve is always non-decreasing.
+#        Default:     2.0
+#
+
+Branding.Selection.TuitionFactor = 2.0
+
+#
+#    Branding.Selection.TuitionCap
+#        Description: Upper bound (copper) the escalating tuition is clamped to.
+#        Default:     5000000 - (500 gold)
+#
+
+Branding.Selection.TuitionCap = 5000000
+
+#
+#    Branding.Selection.SwitchDecayDays
+#        Description: Days with no switch after which the recent-switch counter decays back to 0 (the
+#                     escalation resets). 0 disables decay (the counter only ever grows).
+#        Default:     7
+#
+
+Branding.Selection.SwitchDecayDays = 7
+
+#
+# Post-cap XP redirect (§14.13.3). At the server's max player level normal XP has no sink, so it is
+# redirected into the ACTIVE school's Proficiency (§7). Only the active brand grows; dormant/unknown
+# brands are untouched. ConversionRatio is the single pacing knob the #14 / §8.5 XP-balance sim
+# calibrates against to keep time-to-Prestige near the ~3-month target (§14.13.4/§14.13.6).
+#
+
+#
+#    Branding.PostCapXp.Enable
+#        Description: Master switch for redirecting post-cap XP into the active brand's Proficiency.
+#        Default:     0 - (disabled)
+#
+
+Branding.PostCapXp.Enable = 0
+
+#
+#    Branding.PostCapXp.ConversionRatio
+#        Description: Fraction of a drained post-cap XP amount converted into Proficiency baseUnits
+#                     (before the core's source/match weighting + diminishing returns). The #14 sim
+#                     pins this to the ~3-month Prestige pacing target.
+#        Default:     0.01
+#
+
+Branding.PostCapXp.ConversionRatio = 0.01
+# Prestige graduation titles (design §14.13.4 / §11). Hitting max Proficiency in a school grants a
+# per-character COSMETIC title (no stat/effect, trade-safe); maxing every school grants a capstone.
+# Granting is idempotent and driven from OnLogin (catch-up) + OnLevelChanged.
+#
+# v1 is SERVER-ONLY: it repurposes spare/unused CharTitlesEntry ids the 3.3.5a client already ships,
+# so NO client-side CharTitles.dbc patch is required. The per-school id is config-mapped, so a later
+# custom DBC patch that defines literal strings ("the Fire-Branded", ...) only needs these ids
+# repointed -- no code change. The ids below are PLACEHOLDERS chosen from the high end of the shipped
+# 3.3.5a title-id range (last shipped id is 177); pick ids your client/realm does not otherwise grant.
+#
+
+#
+#    Branding.Prestige.Enable
+#        Description: Master switch for the §14.13.4 graduation-title feature.
+#        Default:     0 - (disabled)
+#
+
+Branding.Prestige.Enable = 0
+
+#
+#    Branding.Prestige.TitleId.<School>
+#        Description: CharTitlesEntry id granted on maxing the named school's Proficiency. One key per
+#                     school (Fire, Frost, Nature, Shadow, Arcane, Holy, Physical, Wind, Lightning,
+#                     Blood, Void, Stone, Venom, Chrono, Spirit). 0 disables that school's title.
+#        Default:     PLACEHOLDER spare ids 150..164 (one per school, in BrandId order).
+#
+
+Branding.Prestige.TitleId.Fire = 150
+Branding.Prestige.TitleId.Frost = 151
+Branding.Prestige.TitleId.Nature = 152
+Branding.Prestige.TitleId.Shadow = 153
+Branding.Prestige.TitleId.Arcane = 154
+Branding.Prestige.TitleId.Holy = 155
+Branding.Prestige.TitleId.Physical = 156
+Branding.Prestige.TitleId.Wind = 157
+Branding.Prestige.TitleId.Lightning = 158
+Branding.Prestige.TitleId.Blood = 159
+Branding.Prestige.TitleId.Void = 160
+Branding.Prestige.TitleId.Stone = 161
+Branding.Prestige.TitleId.Venom = 162
+Branding.Prestige.TitleId.Chrono = 163
+Branding.Prestige.TitleId.Spirit = 164
+
+#
+#    Branding.Prestige.CapstoneTitleId
+#        Description: CharTitlesEntry id granted when ALL schools are maxed (the "Grandmaster of
+#                     Branding" capstone, §14.13.4). 0 disables the capstone.
+#        Default:     PLACEHOLDER spare id 177.
+#
+
+Branding.Prestige.CapstoneTitleId = 177

@@ -8,9 +8,15 @@ The `account_brand_knowledge` table and the `CanEarnProficiency` / `CanExpressBr
 exist, but nothing ever *populates* knowledge — so today every character earns 0 XP and every
 effect resolves to 0. This issue defines how an account unlocks a brand.
 
+> **Unlock trigger decided (ARCHITECTURE.md §14.13):** the production trigger is the **Insight**
+> economy — spending the per-`(account, school)` Insight point counter (raid/dungeon DR drops + generic
+> world mote) **once** writes the permanent `account_brand_knowledge` row. The GM/debug grant below
+> stays as the bootstrap/test path; this issue ships that grant, and the Insight earn/spend loop lands
+> with the selection-economy issue (#17).
+
 ## Scope
 - Decide + implement the unlock trigger (design open question §12.5): pick one to start —
-  recommended a GM/debug grant now, with a quest/economy hook stubbed for later.
+  recommended a GM/debug grant now, with the §14.13 Insight economy hook (#17) as the production path.
 - Pure core (if any new rules): extend `core/proficiency/Knowledge.*` only if logic is needed
   (e.g. unlock prerequisites); most of this is adapter + DB.
 - Adapter: a `KnowledgeMgr` (or extend `ProficiencyMgr`) that loads/saves `account_brand_knowledge`

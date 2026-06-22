@@ -8,11 +8,17 @@ See [../ARCHITECTURE.md](../ARCHITECTURE.md) for the full spec. Section refs (§
 
 ## Done (do not re-do)
 
-- Pure cores for all 9 slices — 87 GoogleTests (`tests/`, standalone fast loop).
+- Pure cores for all 9 slices — 87+ GoogleTests (`tests/`, standalone fast loop).
 - Adapters wired + compile-verified: proficiency XP, discovery XP, zone downscaling, dynamic events
   (scoring/guardrails/containment/tier), reward claim (diversity + account ceiling), reward delivery
-  (inventory + mail fallback), `.branding` command surface.
-- SQL: `character_branding`, `account_brand_knowledge`.
+  (inventory + mail fallback), allegiance, economy/crafting, item-branding, effects, catalyst, addon
+  protocol, vault, the **mastery stack** (`MasteryMgr`/`MasteryCombat`/`MasteryEnemy`/`MasteryLoadout`),
+  loadout (`SetActiveBrand`), and the `.branding` command surface incl. `knowledge grant/list`.
+- SQL: `character_branding`, `account_brand_knowledge`, mastery + allegiance + economy tables.
+
+> **Re #01 / #07:** effectively in place — `MasteryMgr` is wired (#07) and `.branding knowledge grant`
+> exists (#01's bootstrap). The §14.13 *economy* unlock path is the remaining work, tracked under the
+> #17 epic below, **not** by re-doing #01/#07.
 
 ## Standard Definition of Done (every issue)
 
@@ -39,6 +45,13 @@ See [../ARCHITECTURE.md](../ARCHITECTURE.md) for the full spec. Section refs (§
    #02 active-brand-loadout ─▶ #03 effect-application ─┬▶ #04 catalyst-adapter
                                                        ├▶ #05 item-branding-adapter
                                                        └▶ #16 exotic-brand-schools (enum/spec groundwork done; flavour needs #03)
+
+  (selection economy — #17 epic, children parallel-safe in worktrees)
+   #17 ─┬▶ #18 insight-currency        (pure DR core + InsightMgr + kill hooks)
+        ├▶ #19 tuition-school-switch    (pure tuition curve + .branding school select)
+        ├▶ #20 postcap-xp-redirect      (OnPlayerGiveXP → active-school Proficiency)
+        └▶ #21 prestige-titles          (max Proficiency → Player::SetTitle)
+   shared integration files only: mod_branding_loader.cpp, BrandingCommandScript.cpp, conf .dist
 ```
 
 `*` #14 needs a design decision (play-session profile) before it can be finalized — see the issue.
@@ -51,7 +64,8 @@ See [../ARCHITECTURE.md](../ARCHITECTURE.md) for the full spec. Section refs (§
 - **Batch C (after #02→#03):** #04 catalyst, #05 item-branding.
 - **Batch D (content/infra, anytime):** #10 event-spawner, #13 world-spawn-content, #15 full-build-ci.
 - **Batch E (groundwork done, flavour after #03):** #16 exotic-brand-schools.
-- **Needs design input:** #14 xp-balance-sim.
+- **Batch F (selection economy, after #01+#07):** #17 mastery-selection-economy.
+- **Needs design input:** #14 xp-balance-sim; #17 has open *[DEFAULT]* decisions (title path, tuition curve).
 
 ## Cross-cutting note
 

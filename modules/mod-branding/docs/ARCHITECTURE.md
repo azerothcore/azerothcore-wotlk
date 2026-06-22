@@ -1111,8 +1111,15 @@ pure core only enumerates, resolves, and validates by key.
 
 ### 14.5 Respec
 
-Tree respec consumes an **expensive token** = the §7.9 loadout-change friction (no free instant
-re-spec). Friction cost is computed in core; the adapter charges it.
+Two distinct frictions, denominated differently (see §14.13):
+
+- **Within-school** tree/loadout respec consumes an **expensive token** = the §7.9 loadout-change
+  friction (no free instant re-spec). The cheaper, more frequent knob.
+- **Switching the active *school*** costs the **gold tuition** of §14.13.2 (escalating, anti-flip-flop);
+  Knowledge is already account-permanent, so a switch back to a known school is gold-only and retains
+  Proficiency.
+
+Friction cost is computed in core; the adapter charges it.
 
 ### 14.6 Enemy-side mastery
 
@@ -1541,6 +1548,132 @@ A dedicated adapter (`MasteryEnemyMgr` + a `UnitScript`) scales an invasion elit
   invasion-roster tag lands it can replace the zone-level check without a core change (documented seam).
 - ObjectGuid-keyed, no raw `Creature*`/`Unit*` stored across ticks; `LOG_*`, `Acore::StringFormat`.
 
+### 14.13 Mastery Selection & Knowledge Economy (enroll → study → graduate)
+
+The acquisition spine that decides *which* school a character expresses and how it is earned. It is the
+concrete answer to #01's open "unlock trigger", and it instantiates three existing layers into one
+coherent loop: the Knowledge gate (design §6), the §14.5 respec friction, and the §11 Prestige
+cosmetic. The academic metaphor is load-bearing — each step is a real layer already in the spec:
+
+> **Enroll** (unlock Knowledge — spend Insight + pay gold tuition) → **study** (grind Proficiency from
+> post-cap XP) → **graduate** (max Proficiency → a Prestige title).
+
+#### 14.13.1 Insight — the Knowledge-unlock currency
+
+- **What it buys:** a **one-time, account-permanent** Knowledge unlock for one school (writes the
+  `account_brand_knowledge` row, which already exists forever once written). You pay Insight for a
+  school **once, ever**.
+- **Not an item — a DB point counter.** Insight is tracked per `(account, school)` as a *fractional*
+  point total, **not** a tradeable item entry. This is the deliberate exception to §16.3 (Fragments /
+  Materials *are* tradeable items): Knowledge gates *access*, so its currency must be
+  **non-tradeable / non-mailable / un-buyable** or the §1 dual-key anti-P2W guarantee collapses (a rich
+  player would simply buy access). A DB counter can't be traded, and the fractional DR accrual below
+  needs sub-item granularity anyway.
+- **Sources (school-branded), with account-wide diminishing returns:**
+  - **Raid bosses — the backbone.** ~1 Insight per boss; weekly-locked content so each boss is killable
+    once/week → roughly one raid's worth per week. No intra-week DR needed — the lockout *is* the throttle.
+  - **Dungeon bosses (heroic > normal) — farmable, so DR is essential:** per-kill DR within a rolling
+    window (e.g. 1st `0.5`, 2nd `0.25`, …) so repeat runs are a *supplement*, not a treadmill.
+  - **Generic world-mob "mote" — VERY low rate** from any mob, school-agnostic, feeding the
+    *currently-selected* school's Insight (or a wildcard pool). This is both the mystery/wonder
+    breadcrumb *and* the only viable source for the **exotic schools** (Chrono/Venom/Spirit/Void) that
+    have no themed bosses.
+  - **DR is account-wide, not per-character** (reuses the Slice 3 account economy ceiling) — otherwise
+    the counter is just "farm it on 10 alts".
+- **Cost designed to *time*, not to a number:** target **~a month of daily grinding to unlock one new
+  school**. With the rates above (~10/week raiding + a dungeon trickle) the unlock threshold lands near
+  **~30–40 Insight**, *not* the 1000 floated early on (a pre-DR guess). Tune the *month*; let the
+  threshold fall out. All thresholds live behind `IBrandingConfig`.
+
+#### 14.13.2 Gold tuition — the active-school switch fee
+
+A character has **one active school** at a time (the §7.9 `activeBrand`); only the active school accrues
+Proficiency from play. Switching the active school costs a **gold tuition** — the §14.5 friction, now
+denominated in gold.
+
+- **Knowledge is permanent, so switching *back* is gold-only.** *[DEFAULT]* Re-selecting a school you
+  have **already unlocked** costs **gold tuition only** — no Insight (Knowledge is already bought) and
+  **Proficiency is retained** (per-school `character_branding` rows persist; you never "forget").
+  Selecting a *never-known* school is the full Insight unlock **+** tuition, starting Proficiency at 0.
+  This is exactly the "back to zero only if you haven't already known the school" rule.
+- **Why gold:** tuition is a large, recurring **gold sink** — a far better inflation lever than deleting
+  a faucet. Keep a *modest* gold faucet (mob/dungeon gold) so players can fund repairs **and** tuition;
+  redirect *quest* rewards from gold → Insight/Proficiency so questing stays relevant at cap (§8.5)
+  without being a raw gold faucet. **Faucet ≈ sink** is what kills inflation, not faucet deletion.
+- **Anti-flip-flop:** *[DEFAULT]* tuition **escalates** with recent switch frequency (or a cooldown) so
+  per-encounter school-swapping isn't viable; within-school tree/loadout respec stays the cheaper knob
+  (§14.5).
+
+#### 14.13.3 Post-cap XP → Proficiency
+
+At max player level, normal XP has no sink. *[DEFAULT]* Redirect post-cap XP into the **active school's
+Proficiency** (the §7 per-`(character, brand)` total). The adapter hooks the XP-gain path
+(`OnGiveXP`-style); only the active school grows, dormant schools hold their totals. "Mastery
+experience instead of normal XP" is therefore a thin adapter over the existing Proficiency core — **no
+new pure logic**.
+
+#### 14.13.4 Graduation — Prestige titles (§11)
+
+Hitting **max Proficiency** in a school (the existing `XpResult::reachedPrestige` boundary) grants a
+per-character cosmetic title — *"[Name] the Fire-Branded"*, *"… the Chrono-Branded"*, etc. — the
+doctorate.
+
+- **Per-character, earned by *study* (Proficiency), not enrollment (Knowledge)** — a doctorate is
+  personal and earned, matching both the metaphor and the per-character Proficiency store.
+- **Trade-safe:** a title grants no power, so it may persist even if a maxed character is traded to an
+  account lacking the Knowledge (effects go inert per §1; the name is harmless). No special-casing.
+- **Capstone:** *[DEFAULT]* maxing *all* schools grants a single capstone title (e.g. "the Branded" /
+  "Grandmaster of Branding") — a long-tail goal, no new machinery.
+- **Implementation constraint (AzerothCore-specific — DECISION NEEDED):** custom title strings live in
+  the client's `CharTitles.dbc`. A literal *"the Fire-Branded"* requires a **DBC patch shipped to
+  clients** (a patch MPQ — a real distribution cost). The server-only alternative is to **repurpose
+  spare/unused `CharTitlesEntry` IDs** the 3.3.5a client already ships (no client patch, but the
+  displayed string is limited to existing strings, so it may only *approximate* the desired text).
+  Server side is trivial either way (`Player::SetTitle` on the `reachedPrestige` boundary, driven by
+  `character_branding`). *[DEFAULT: repurpose spare IDs for v1 — no client dependency — with a custom
+  DBC patch as an optional later upgrade.]*
+
+#### 14.13.5 The complete spine (how the layers compose)
+
+| Step | Currency / source | Scope & lifetime | Spec layer |
+|---|---|---|---|
+| **Enroll** (unlock a school) | **Insight** points (school-branded; raid/dungeon DR + generic mote) | account, **permanent**, one-time | Knowledge (§6, #01) |
+| **Switch** active school | **gold tuition** (escalating) | account/character, recurring | §14.5 friction |
+| **Study** (grow power) | **post-cap XP** → active school | character × school, persistent | Proficiency (§7) |
+| **Respec** within school | small gold / Insight | character, cheap | §14.5 / §7.9 loadout |
+| **Graduate** | **max Proficiency** → title | character, cosmetic | Prestige (§11) |
+
+Every power step is **dual-keyed** (account Insight-bought Knowledge × character-earned Proficiency,
+§1), so the whole spine is un-buyable: Insight can't be traded, Proficiency can't be bought, and a
+purchased maxed character is inert without the account's own Knowledge.
+
+#### 14.13.6 Pacing targets (the tuning contract)
+
+Enrolling is fast; graduating is the long game. The two clocks are deliberately far apart so a school is
+*reachable* quickly but *mastered* slowly — the classic "easy to start, hard to finish" longevity curve.
+
+| Milestone | Scope | Target time | Relationship |
+|---|---|---|---|
+| **Unlock** one school's Knowledge (Insight) | account, one-time | **~1 month** of daily play | baseline |
+| **Prestige** one school (max Proficiency → title) | character × school | **~3 months** of active play *on that school* | ≈ **3×** the unlock grind |
+| **Full doctorate** from scratch (unlock + grind to Prestige) | character × school | **~4 months** | unlock (1) + study (3) |
+| **Capstone** (all schools Prestiged) | character | **multi-year, emergent** | not separately tuned |
+
+- **Per-school, serial.** Only the *active* school accrues Proficiency (§14.13.3), so the 3-month clock
+  is per school and runs one at a time — switching focus costs tuition and pauses the others. The
+  capstone is therefore a long-tail sum of many 3-month grinds, intentionally a multi-year flex, not a
+  separate grind to balance.
+- **One knob, defined against a play-profile.** "~3 months" only means something relative to a
+  *representative daily session*, so the **post-cap XP→Proficiency rate** is the single tuning knob and
+  is calibrated against the **#14 / §8.5 XP-balance sim's** play-session profile. This makes Prestige
+  pacing a **CI-gated target** (the sim asserts time-to-Prestige stays within tolerance of ~3 months for
+  the representative profile), not a hope — the same treatment §8.5 gives the XP-source mix.
+
+**Open decisions (recorded as *[DEFAULT]* above — veto any):** (1) re-select known school = gold-only;
+(2) tuition escalates vs flat — escalating; (3) title path — repurpose spare `CharTitles.dbc` IDs for
+v1; (4) the player-facing name for the currency — §16.1 names the *gate* "Knowledge"; the currency is
+provisionally **"Insight"** (alternatives: school-flavoured "Cinder/Rime/…").
+
 ---
 
 ## 11. Determinism & Project-Convention Compliance
@@ -1595,6 +1728,8 @@ called out.
 | Concept | Canonical term | Scope / lifetime | Backed by | Player-facing |
 |---|---|---|---|---|
 | Account-wide unlock gate for a brand | **Knowledge** | account | `account_brand_knowledge`, `KnowledgeState` | "Brand Knowledge" |
+| Currency spent to unlock a brand's Knowledge | **Insight** | account, **non-tradeable DB points** | per-`(account, school)` point counter (§14.13.1) | "Insight" |
+| Recurring gold fee to switch the active school | **Tuition** | character/account, recurring | gold (native), §14.13.2 | "tuition" |
 | Per-character, per-brand earned progression | **Proficiency** (Level) | character × brand | `character_branding`, `Proficiency` | "Proficiency Level N" |
 | Per-item earned progression (the major step) | **Brand Rank** | item GUID | `item_branding.step`, `ItemBrandState::step` | "Brand Rank N" |
 | Progress within a Brand Rank | **(unnamed progress)** | item GUID | `ItemBrandState::levelInStep` / `upgradeProgress` | progress bar only |
@@ -1634,6 +1769,15 @@ config and is the right call:
 `Resources` (`core/branding/economy/Economy.h`) is the pure in-memory tally the crafting functions
 operate on; the adapter reads the player's item counts into it and writes consumption back via item
 APIs. Progression state (Knowledge, Proficiency, Brand Rank) is **DB state, never items**.
+
+**The one currency that is *not* an item — Insight (the §14.13 Knowledge-unlock points).** Fragments
+and Materials are tradeable item-entries precisely *because* power never gates on holding them (it
+gates on account Knowledge). **Insight is the opposite case: it buys the Knowledge gate itself**, so it
+must be **non-tradeable / non-mailable / un-buyable**, or the §1 anti-P2W guarantee collapses. It is
+therefore tracked as a **per-`(account, school)` DB point counter**, *not* an item entry and *not* the
+rejected generic currency table — the same "progression is DB state, never items" rule that already
+governs Knowledge/Proficiency/Brand Rank. (Gold *tuition*, §14.13.2, uses native gold and needs no new
+representation.)
 
 ### 16.4 Naming conventions by layer
 
