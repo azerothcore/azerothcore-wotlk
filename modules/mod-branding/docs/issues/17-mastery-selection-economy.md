@@ -1,6 +1,15 @@
-# #17 — Mastery selection economy (Insight · tuition · post-cap XP · titles)
+# #17 — Mastery selection economy (EPIC) (Insight · tuition · post-cap XP · titles)
 
-**Status:** open · **Deps:** #01 (Knowledge unlock), #07 (mastery effectiveness) · **Parallel-safe:** partial · **Size:** L
+**Status:** epic — decomposed · **Deps:** #01 (present), #07 (present) · **Size:** L
+
+> **Decomposed into implementable children** (each parallel-safe in a worktree; they share only the
+> append-style integration files — loader, `.branding` command table, conf):
+> - **#18** Insight currency (§14.13.1) — pure DR core + `account_insight` + `InsightMgr` + kill hooks.
+> - **#19** Gold tuition & active-school switch (§14.13.2) — pure tuition curve + `.branding school select`.
+> - **#20** Post-cap XP → active-school Proficiency (§14.13.3) — `OnPlayerGiveXP` redirect adapter.
+> - **#21** Prestige titles (§14.13.4) — `reachedPrestige`/max-Proficiency → `Player::SetTitle`.
+>
+> This file remains the design reference; the children carry the actionable scope.
 
 ## Context
 ARCHITECTURE.md §14.13 defines the acquisition spine for school selection:
