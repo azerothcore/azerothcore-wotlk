@@ -146,10 +146,46 @@ private:
     }
 };
 
+// §2.4 instanced boss-reward trigger (#26): on an instance boss death, grant each present player the
+// per-player branding currency (heroic tier bump + group-size reduction). Personal, no tagging; kept
+// decoupled from the §9 invasion/event reward stream.
+class BrandingHeroicRewardScript : public PlayerScript
+{
+public:
+    BrandingHeroicRewardScript() : PlayerScript("BrandingHeroicRewardScript") { }
+
+    void OnPlayerCreatureKill(Player* killer, Creature* killed) override
+    {
+        if (!killer || !killed || !sHeroicMgr->Enabled())
+        {
+            return;
+        }
+
+        uint32 const reward = sHeroicMgr->BossCurrencyReward(killed);
+        if (reward == 0)
+        {
+            return;
+        }
+
+        Map* map = killed->GetMap();
+        for (auto const& it : map->GetPlayers())
+        {
+            if (Player* player = it.GetSource())
+            {
+                if (!player->IsGameMaster())
+                {
+                    player->ModifyMoney(static_cast<int32>(reward));
+                }
+            }
+        }
+    }
+};
+
 void AddBrandingHeroicScripts()
 {
     new BrandingHeroicWorldScript();
     new BrandingHeroicMapScript();
     new BrandingHeroicCreatureScript();
     new BrandingHeroicUnitScript();
+    new BrandingHeroicRewardScript();
 }

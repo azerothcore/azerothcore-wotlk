@@ -186,6 +186,26 @@ Branding.Heroic.DamageMul = 1.5
 Branding.Heroic.TierBonus = 1
 
 #
+#    Branding.Heroic.BossReward.Enable
+#        Description: Instanced boss-reward trigger (§2.4, #26). On an instance boss kill, grant each
+#                     present player branding currency: base tier by boss rank (world boss/raid/
+#                     dungeon), heroic tier bump, then the §2.4.3 group-size currency reduction.
+#                     Opt-in and SEPARATE from the scaling gate; does not touch the event reward path.
+#        Default:     0 - (disabled)
+#
+
+Branding.Heroic.BossReward.Enable = 0
+
+#
+#    Branding.Heroic.BossReward.CurrencyMultiplier
+#        Description: Flat tuning multiplier on the instanced boss currency reward (before the
+#                     group-size reduction). 1.0 = the built-in per-tier schedule.
+#        Default:     1.0
+#
+
+Branding.Heroic.BossReward.CurrencyMultiplier = 1.0
+
+#
 #    Branding.Event.Enable
 #        Description: Dynamic-event contribution engine (§9): kills in a zone with an active event
 #                     score through the anti-leech / daily-DR / hourly-cap guardrails. Events are

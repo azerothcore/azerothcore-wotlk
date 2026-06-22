@@ -61,3 +61,12 @@ TEST(RewardTier, BumpMonotonicInBonus)
         prev = tier;
     }
 }
+
+// §2.4 instanced boss base currency: strictly increasing by tier; None earns nothing.
+TEST(RewardTier, BaseBossCurrencyByTier)
+{
+    EXPECT_EQ(BaseBossCurrency(RewardTier::None), 0u);
+    EXPECT_GT(BaseBossCurrency(RewardTier::Bronze), 0u);
+    EXPECT_GT(BaseBossCurrency(RewardTier::Silver), BaseBossCurrency(RewardTier::Bronze));
+    EXPECT_GT(BaseBossCurrency(RewardTier::Gold), BaseBossCurrency(RewardTier::Silver));
+}

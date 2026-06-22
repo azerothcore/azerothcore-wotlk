@@ -253,8 +253,10 @@ With group fraction `r = groupSize / contentSize` (e.g. 5-man MC ⇒ `r = 0.125`
 - **Stream separation:** this is the *instanced* reward path. It is **decoupled** from the §9
   open-world invasion/event contribution rewards (`EventMgr::ResolveReward`) — heroic dungeons/raids
   and invasions are distinct reward streams that only share the §2.2 `RewardScale` math. The heroic
-  modifiers are exposed via `HeroicMgr::RewardModifiersFor` (issue #25) for an instanced boss-reward
-  trigger to consume; the trigger lands with the §2.2 instanced-reward wiring.
+  modifiers are exposed via `HeroicMgr::RewardModifiersFor` (issue #25); the instanced boss-reward
+  trigger consuming them (`OnPlayerCreatureKill` → per-player currency, issue #26) is a self-contained
+  instanced stream — currency-only baseline, gear stays engine loot. A richer instanced personal-loot
+  table is future work under the broader §2.2 instanced-reward design.
 
 ### 2.4.4 Composition order (all independent)
 

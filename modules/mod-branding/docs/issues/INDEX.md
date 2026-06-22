@@ -56,7 +56,8 @@ See [../ARCHITECTURE.md](../ARCHITECTURE.md) for the full spec. Section refs (§
   (heroic overlay — #22 epic, extends §2.2/§2.4; reference autobalance, do NOT import per §2.3)
    #22 ─┬▶ #23 heroic-tier-core        (pure HeroicContext muls + RewardScale.currencyMul)
         ├▶ #24 heroic-overlay-adapter   (read SELECTED difficulty, encounter scale, snapshot, exceptions) ◀ needs #23
-        └▶ #25 heroic-reward-wiring      (currencyMul + tier bonus through §9.4 personal loot)            ◀ needs #23
+        ├▶ #25 heroic-reward-modifiers   (BumpTier + currencyMul exposure; decoupled from EventMgr)       ◀ needs #23
+        └▶ #26 instanced-boss-reward     (OnPlayerCreatureKill -> per-player currency grant)              ◀ needs #25
 ```
 
 `*` #14 needs a design decision (play-session profile) before it can be finalized — see the issue.

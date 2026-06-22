@@ -23,4 +23,15 @@ namespace Branding
             ? bumped : static_cast<uint32_t>(RewardTier::Gold);
         return static_cast<RewardTier>(capped);
     }
+
+    uint32_t BaseBossCurrency(RewardTier tier)
+    {
+        switch (tier)
+        {
+            case RewardTier::Bronze: return 1000;
+            case RewardTier::Silver: return 3000;
+            case RewardTier::Gold:   return 8000;
+            default:                 return 0;
+        }
+    }
 }

@@ -1,5 +1,7 @@
 #include "HeroicMgr.h"
 #include "ScalingMgr.h"
+#include "branding/contribution/RewardTier.h"
+#include "Creature.h"
 #include "DBCStores.h"
 #include "DatabaseEnv.h"
 #include "Field.h"
@@ -186,6 +188,35 @@ namespace Branding
         mods.tierBonus = TierBonusFor(map);
         mods.currencyMul = sScalingMgr->CurrencyMulForGroup(InstancePlayerCount(map), InstanceContentSize(map));
         return mods;
+    }
+
+    uint32_t HeroicMgr::BossCurrencyReward(Creature* boss)
+    {
+        if (!_config.BossRewardEnabled() || !boss)
+        {
+            return 0;
+        }
+
+        Map* map = boss->GetMap();
+        if (!map || !map->IsDungeon())
+        {
+            return 0;
+        }
+
+        if (!boss->IsDungeonBoss() && !boss->isWorldBoss())
+        {
+            return 0;
+        }
+
+        // Base tier by boss rank; heroic bumps it; the group-size reduction then scales the currency.
+        RewardTier const baseTier = boss->isWorldBoss() ? RewardTier::Gold
+            : (map->IsRaid() ? RewardTier::Silver : RewardTier::Bronze);
+
+        RewardModifiers const mods = RewardModifiersFor(map);
+        RewardTier const tier = BumpTier(baseTier, mods.tierBonus);
+
+        double const currency = BaseBossCurrency(tier) * _config.BossRewardCurrencyMultiplier() * mods.currencyMul;
+        return static_cast<uint32_t>(currency + 0.5);
     }
 
     uint8_t HeroicMgr::RecommendedMinBodies(uint32_t mapId, uint32_t bossEntry) const

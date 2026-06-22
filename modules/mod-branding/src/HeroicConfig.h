@@ -14,6 +14,10 @@ namespace Branding
         bool Enabled() const { return _enabled; }
         uint8_t LevelCap() const { return _levelCap; }
 
+        // Instanced boss-reward trigger (§2.4, issue #26) -- opt-in, separate from the scaling gate.
+        bool BossRewardEnabled() const { return _bossRewardEnable; }
+        double BossRewardCurrencyMultiplier() const { return _bossRewardCurrencyMul; }
+
         double HeroicHealthMul() const override { return _healthMul; }
         double HeroicDamageMul() const override { return _damageMul; }
         uint8_t HeroicTierBonus() const override { return _tierBonus; }
@@ -24,6 +28,8 @@ namespace Branding
         double _healthMul = 2.0;
         double _damageMul = 1.5;
         uint8_t _tierBonus = 1;
+        bool _bossRewardEnable = false;
+        double _bossRewardCurrencyMul = 1.0;
     };
 }
 

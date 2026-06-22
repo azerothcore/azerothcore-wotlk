@@ -7,6 +7,7 @@
 #include <string>
 #include <unordered_map>
 
+class Creature;
 class Map;
 class Player;
 
@@ -54,6 +55,13 @@ namespace Branding
             uint8_t tierBonus = 0;
         };
         RewardModifiers RewardModifiersFor(Map* map);
+
+        // §2.4 instanced boss-reward trigger (#26): per-player branding currency (copper) for killing
+        // an instance boss -- base tier by boss rank (world boss / raid / dungeon), heroic tier bump,
+        // then the group-size currency reduction. 0 when the boss-reward gate is off, the creature is
+        // not an instance boss, or outside an instance. Delivery (per present player) is the script's
+        // job; this returns the flat per-player amount.
+        uint32_t BossCurrencyReward(Creature* boss);
 
         // Advisory recommended group size for a map/boss (0 = no advice). §2.4.6.
         uint8_t RecommendedMinBodies(uint32_t mapId, uint32_t bossEntry) const;

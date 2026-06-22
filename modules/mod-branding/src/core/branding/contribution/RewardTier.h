@@ -14,6 +14,10 @@ namespace Branding
     // contribution earned) stays None -- heroic difficulty bumps an earned reward, it never conjures
     // one from nothing.
     RewardTier BumpTier(RewardTier base, uint8_t bonus);
+
+    // §2.4 instanced boss reward: base branding currency (copper) for a boss kill at a given tier,
+    // before the group-size currency multiplier (§2.4.3) and config tuning are applied. None = 0.
+    uint32_t BaseBossCurrency(RewardTier tier);
 }
 
 #endif // MOD_BRANDING_CORE_CONTRIBUTION_REWARDTIER_H
