@@ -23,6 +23,10 @@ namespace Branding
         void LoadConfig();
         bool Enabled() const { return _catalyst.Enabled(); }
 
+        // The catalyst DR config (StackDecay / MaxRaidMul), shared with other systems that reuse the
+        // catalyst curve -- e.g. the #31 Etch self-stack aggregate (CatalystSelfStackMultiplier).
+        ICatalystConfig const& Config() const { return _catalyst; }
+
         // 1-based rank of the player among same-role branded specialists in their group (1 = sole/
         // first specialist, full effect). 0 if the player isn't a branded, expressible specialist.
         uint8_t SameRoleBrandedRank(Player* player) const;

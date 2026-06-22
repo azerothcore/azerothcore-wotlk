@@ -1,7 +1,7 @@
 # #31 — One-shot item Etch (low-friction Branded-system on-ramp) (§7.9, server-only)
 
-**Status:** first cut implemented on `feat/branding-item-etch` (pure guard tested; adapter/SQL/conf written,
-worldserver build unverified) ·
+**Status:** implemented on `feat/branding-item-etch` — pure core tested (296/296), multi-slot + self-stack DR
+wired; adapter/command/SQL/conf written (worldserver build unverified) ·
 **Deps:** #05 (`ItemBrand`/`ResolvedItemEffectIntensity`), #04 (`CatalystStacking`), #02 (active loadout),
 #07 (`MasteryMgr`) — all shipped · **Parallel-safe:** yes · **Size:** M
 
@@ -125,26 +125,32 @@ marker column + soulbind), `conf/mod_branding.conf.dist` (`Branding.Etch.*`). Re
 `core/branding/catalyst/CatalystStacking`, `ItemBrand`, `CanExpressBrand`, `MasteryPlan` —
 **no new `src/core/` logic expected.** Coordinate Essence sourcing with #13/#25/#26.
 
-## Implemented (first cut, `feat/branding-item-etch`)
-- **Pure guard (TDD, verified):** `ItemBrandState::etched`; `ApplyItemUpgrade` refuses an etched item
-  (no-op, no consume) so the rank-lock is enforced in core. Tests `ItemBrand.EtchedItemRefusesUpgrade`
-  + `EtchedItemProcsAtRankZeroAndGatedByAccess` — full suite 291/291 green on the standalone target.
-- **Adapter:** `ItemBrandingMgr::EtchEquipped` — validates enrollment (active school known) → checks/consumes
-  `EssenceCost` Essence → writes a rank-0 `etched` state → soulbinds the main-hand (`SetBinding(true)`).
-  `EquippedIntensity` gains the active-school-match gate for etched items (decision 2). `item_branding`
-  gains an `etched` column (save/load). `.branding etch` command with per-failure messaging.
-- **Data/conf:** `item_branding` table created with `etched` (`db-characters` rev); Essence item `190002`
-  (`db-world` rev, BoP); `Branding.Etch.{Enable,EssenceItemId,EssenceCost}` in the conf dist. SQL + C++
-  codestyle clean.
-- **Verification limit:** the pure core is run-verified; the **adapter/command TUs are not compile-verified**
-  (would need a worldserver CMake configure, not run). APIs used (`SetBinding`/`SetState`/`ITEM_CHANGED`,
-  variadic `SendErrorMessage`, `LoadoutMgr::GetLoadout`) were checked against the real game headers.
+## Implemented (`feat/branding-item-etch`)
+- **Pure core (TDD, verified):**
+  - `ItemBrandState::etched`; `ApplyItemUpgrade` refuses an etched item (no-op, no consume) — rank-lock
+    enforced in core. Tests `ItemBrand.EtchedItemRefusesUpgrade` + `EtchedItemProcsAtRankZeroAndGatedByAccess`.
+  - `CatalystSelfStackMultiplier(count, cfg)` (decision 5) — reuses `CatalystStackWeight`; saturating, bounded
+    by `MaxRaidMul`, monotonic in count, 1st source dominates. 5 tests (`CatalystSelfStack.*`).
+  - Full standalone suite **296/296 green**.
+- **Adapter (multi-slot):** `ItemBrandingMgr` tracks all Etch-eligible slots (main-hand, off-hand, ranged,
+  both trinkets). `EtchSlot(player, slot)` validates enrollment → checks/consumes `EssenceCost` Essence →
+  writes a rank-0 `etched` state → soulbinds the item. `AggregateEtchedIntensity` counts equipped
+  expressible Etched items of the active school and combines them via `CatalystSelfStackMultiplier`
+  (decisions 1 & 5 — "unlimited items = flexibility, not stacked power"). `EquippedIntensity` gains the
+  active-school-match gate (decision 2). `LoadEquipped` loads every eligible slot at login.
+- **Command/data/conf:** `.branding etch [mainhand|offhand|ranged|trinket1|trinket2]` (default main-hand),
+  per-failure messaging; aggregate surfaced in `.branding info`. `item_branding` table + `etched` column;
+  Essence item `190002` (BoP); `Branding.Etch.{Enable,EssenceItemId,EssenceCost}`. SQL + C++ codestyle clean.
+- **Verification limit:** pure core is run-verified; the **adapter/command TUs are not compile-verified**
+  (needs a worldserver CMake configure, not run). APIs used (`SetBinding`/`SetState`/`ITEM_CHANGED`, variadic
+  `SendErrorMessage`, `LoadoutMgr::GetLoadout`, `CatalystMgr::Config`) were checked against the real headers.
 
-**Deferred (first cut is main-hand only):**
-- **Multi-slot + self-stack DR (decisions 1 & 5).** `ItemBrandingMgr` tracks only the equipped main-hand,
-  so "unlimited items" and the `CatalystRankInBucket` self-roster are **not yet wired** — they land with the
-  multi-slot item-brand tracking in the broader effect-application layer (#03). The pure DR core already exists.
-- **Combat proc application beyond intensity gating** rides on #03 (still adapter-deferred per §7.9).
+**Deferred / limitations:**
+- **Combat proc application** beyond the resolved intensity (turning `AggregateEtchedIntensity` into actual
+  in-combat proc behaviour) rides on the effect-application layer (#03, still adapter-deferred per §7.9).
+- **Mid-session equip refresh:** the brand-state cache loads eligible slots at login and updates on Etch;
+  an item branded earlier and *equipped* later in the same session isn't re-cached until relog (the Etch
+  command itself is safe — it does an authoritative DB check). A small `OnEquip` refresh hook is the fix.
 
 ## ARCHITECTURE.md amendments (applied with this draft)
 - **§16.1 glossary** — two new rows: **Etch** / *Etched item* (item GUID, BoP, rank-locked) and **Essence**

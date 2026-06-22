@@ -385,6 +385,10 @@ public:
                 BrandName(itemState.brand), uint32(itemState.step), uint32(itemState.levelInStep),
                 sItemBrandingMgr->EquippedIntensity(player));
 
+        if (sItemBrandingMgr->EtchEnabled())
+            handler->PSendSysMessage("Etched ({} brand): aggregate proc x{:.2f} (self-stack DR).",
+                BrandName(loadout.activeBrand), sItemBrandingMgr->AggregateEtchedIntensity(player));
+
         handler->PSendSysMessage("Catalyst: same-role rank {}, raid multiplier x{:.2f}.",
             uint32(sCatalystMgr->SameRoleBrandedRank(player)), sCatalystMgr->RaidMultiplierFor(player));
 
@@ -502,9 +506,10 @@ public:
         return true;
     }
 
-    // `.branding etch` -- one-shot Etch of the equipped weapon with the active school (#31): rank-locked,
-    // soulbound, paid in Essence. The low-friction, server-only on-ramp into the Branded system.
-    static bool HandleBrandingEtchCommand(ChatHandler* handler)
+    // `.branding etch [slot]` -- one-shot Etch of an equipped item with the active school (#31):
+    // rank-locked, soulbound, paid in Essence. `slot` is one of mainhand|offhand|ranged|trinket1|trinket2
+    // (default mainhand). The low-friction, server-only on-ramp into the Branded system.
+    static bool HandleBrandingEtchCommand(ChatHandler* handler, Optional<std::string_view> slotToken)
     {
         Player* player = handler->GetPlayer();
         if (!player)
@@ -513,8 +518,32 @@ public:
             return false;
         }
 
+        uint8 equipSlot = EQUIPMENT_SLOT_MAINHAND;
+        if (slotToken)
+        {
+            std::string token(*slotToken);
+            std::transform(token.begin(), token.end(), token.begin(),
+                [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+
+            if (token == "mainhand" || token == "mh")
+                equipSlot = EQUIPMENT_SLOT_MAINHAND;
+            else if (token == "offhand" || token == "oh")
+                equipSlot = EQUIPMENT_SLOT_OFFHAND;
+            else if (token == "ranged" || token == "rg")
+                equipSlot = EQUIPMENT_SLOT_RANGED;
+            else if (token == "trinket1" || token == "t1")
+                equipSlot = EQUIPMENT_SLOT_TRINKET1;
+            else if (token == "trinket2" || token == "t2")
+                equipSlot = EQUIPMENT_SLOT_TRINKET2;
+            else
+            {
+                handler->SendErrorMessage("Unknown slot '{}'. Use: mainhand, offhand, ranged, trinket1, trinket2.", token);
+                return false;
+            }
+        }
+
         BrandId const brand = sLoadoutMgr->GetLoadout(player->GetGUID()).activeBrand;
-        switch (sItemBrandingMgr->EtchEquipped(player))
+        switch (sItemBrandingMgr->EtchSlot(player, equipSlot))
         {
             case EtchResult::Success:
                 handler->PSendSysMessage("Etched your equipped weapon with the {} brand -- it is now soulbound "
@@ -524,7 +553,7 @@ public:
                 handler->SendErrorMessage("Etching is disabled (Branding.Item.Enable / Branding.Etch.Enable).");
                 return false;
             case EtchResult::NoWeapon:
-                handler->SendErrorMessage("No equipped main-hand weapon to etch.");
+                handler->SendErrorMessage("No eligible item equipped in that slot to etch (weapons and trinkets only).");
                 return false;
             case EtchResult::AlreadyBranded:
                 handler->SendErrorMessage("That weapon already carries a Brand -- an Etch is permanent and one per item.");

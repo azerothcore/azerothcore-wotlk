@@ -1,12 +1,21 @@
 #include "ItemBrandingMgr.h"
+#include "CatalystMgr.h"
 #include "LoadoutMgr.h"
 #include "ProficiencyMgr.h"
+#include "branding/catalyst/CatalystStacking.h"
 #include "branding/effects/ItemBrand.h"
 #include "branding/proficiency/Knowledge.h"
 #include "Configuration/Config.h"
 #include "DatabaseEnv.h"
 #include "Item.h"
 #include "Player.h"
+
+namespace
+{
+    // Etch-eligible equipment slots (proc-surface: weapons + trinkets, #31 first cut).
+    constexpr uint8 EtchSlots[] = { EQUIPMENT_SLOT_MAINHAND, EQUIPMENT_SLOT_OFFHAND,
+        EQUIPMENT_SLOT_RANGED, EQUIPMENT_SLOT_TRINKET1, EQUIPMENT_SLOT_TRINKET2 };
+}
 
 namespace Branding
 {
@@ -25,13 +34,27 @@ namespace Branding
         _config.Load();
     }
 
-    uint32_t ItemBrandingMgr::EquippedItemGuid(Player* player) const
+    uint32_t ItemBrandingMgr::ItemGuidAtSlot(Player* player, uint8_t equipSlot) const
     {
         if (!player)
             return 0;
 
-        Item* weapon = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
-        return weapon ? weapon->GetGUID().GetCounter() : 0;
+        Item* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, equipSlot);
+        return item ? item->GetGUID().GetCounter() : 0;
+    }
+
+    uint32_t ItemBrandingMgr::EquippedItemGuid(Player* player) const
+    {
+        return ItemGuidAtSlot(player, EQUIPMENT_SLOT_MAINHAND);
+    }
+
+    bool ItemBrandingMgr::EtchEligibleSlot(uint8_t equipSlot)
+    {
+        for (uint8 slot : EtchSlots)
+            if (slot == equipSlot)
+                return true;
+
+        return false;
     }
 
     void ItemBrandingMgr::Save(uint32_t itemGuid, ItemBrandState const& state)
@@ -45,26 +68,31 @@ namespace Branding
 
     void ItemBrandingMgr::LoadEquipped(Player* player)
     {
-        if (!_enabled)
+        if (!_enabled || !player)
             return;
 
-        uint32_t const itemGuid = EquippedItemGuid(player);
-        if (itemGuid == 0)
-            return;
+        // Load the brand state of every equipped Etch-eligible item (weapons + trinkets), so the
+        // multi-slot aggregate (AggregateEtchedIntensity) and the per-item gates see them all (#31).
+        for (uint8 slot : EtchSlots)
+        {
+            uint32_t const itemGuid = ItemGuidAtSlot(player, slot);
+            if (itemGuid == 0)
+                continue;
 
-        QueryResult result = CharacterDatabase.Query(
-            "SELECT `brand`, `step`, `level_in_step`, `etched` FROM `item_branding` WHERE `item_guid` = {}",
-            itemGuid);
-        if (!result)
-            return;
+            QueryResult result = CharacterDatabase.Query(
+                "SELECT `brand`, `step`, `level_in_step`, `etched` FROM `item_branding` WHERE `item_guid` = {}",
+                itemGuid);
+            if (!result)
+                continue;
 
-        Field* fields = result->Fetch();
-        ItemBrandState state;
-        state.brand = static_cast<BrandId>(fields[0].Get<uint8>());
-        state.step = fields[1].Get<uint8>();
-        state.levelInStep = fields[2].Get<uint8>();
-        state.etched = fields[3].Get<uint8>() != 0;
-        _items[itemGuid] = state;
+            Field* fields = result->Fetch();
+            ItemBrandState state;
+            state.brand = static_cast<BrandId>(fields[0].Get<uint8>());
+            state.step = fields[1].Get<uint8>();
+            state.levelInStep = fields[2].Get<uint8>();
+            state.etched = fields[3].Get<uint8>() != 0;
+            _items[itemGuid] = state;
+        }
     }
 
     bool ItemBrandingMgr::BrandEquipped(Player* player, BrandId brand)
@@ -111,19 +139,22 @@ namespace Branding
         return ResolvedItemEffectIntensity(it->second, canExpress, _config);
     }
 
-    EtchResult ItemBrandingMgr::EtchEquipped(Player* player)
+    EtchResult ItemBrandingMgr::EtchSlot(Player* player, uint8_t equipSlot)
     {
         if (!EtchEnabled())
             return EtchResult::Disabled;
 
-        uint32_t const itemGuid = EquippedItemGuid(player);
+        if (!EtchEligibleSlot(equipSlot))
+            return EtchResult::NoWeapon;
+
+        uint32_t const itemGuid = ItemGuidAtSlot(player, equipSlot);
         if (itemGuid == 0)
             return EtchResult::NoWeapon;
 
         // One Etch per item, permanent: refuse if this item already carries any Brand (etched or crafted).
-        // Authoritative DB check, not just the cache -- the cache only holds items loaded at login, so a
-        // weapon branded earlier and equipped mid-session would otherwise be re-etched (double-charging
-        // the premium Essence). A rare command, so a blocking lookup is fine.
+        // Authoritative DB check, not just the cache -- the cache only holds items loaded at login, so an
+        // item branded earlier and equipped mid-session would otherwise be re-etched (double-charging the
+        // premium Essence). A rare command, so a blocking lookup is fine.
         if (_items.find(itemGuid) != _items.end())
             return EtchResult::AlreadyBranded;
         if (CharacterDatabase.Query("SELECT 1 FROM `item_branding` WHERE `item_guid` = {}", itemGuid))
@@ -140,7 +171,7 @@ namespace Branding
             return EtchResult::InsufficientEssence;
 
         // Commit only past every gate: consume the premium BoP Essence, write the rank-locked Etched
-        // state, and soulbind the weapon (BoE -> BoP, #31 decision 3 / §16.3).
+        // state, and soulbind the item (BoE -> BoP, #31 decision 3 / §16.3).
         player->DestroyItemCount(_essenceItemId, _essenceCost, true);
 
         ItemBrandState state;
@@ -149,13 +180,39 @@ namespace Branding
         _items[itemGuid] = state;
         Save(itemGuid, state);
 
-        if (Item* weapon = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND))
+        if (Item* item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, equipSlot))
         {
-            weapon->SetBinding(true);
-            weapon->SetState(ITEM_CHANGED, player);
+            item->SetBinding(true);
+            item->SetState(ITEM_CHANGED, player);
         }
 
         return EtchResult::Success;
+    }
+
+    double ItemBrandingMgr::AggregateEtchedIntensity(Player* player) const
+    {
+        if (!player)
+            return 1.0;
+
+        BrandId const active = sLoadoutMgr->GetLoadout(player->GetGUID()).activeBrand;
+
+        // Etched procs express only while their brand is the active school AND the account can express it
+        // (#31 decision 2). If the active school is inexpressible, every Etched item is dormant.
+        if (!CanExpressBrand(active, sProficiencyMgr->AccountKnowledge(player->GetSession()->GetAccountId())))
+            return 1.0;
+
+        // Count equipped Etched items of the active school across the eligible slots; they all share the
+        // active (school, tree) catalyst bucket, so the self-stack DR collapses them to one saturating
+        // multiplier -- more items, a little more, never past the cap (decisions 1 & 5).
+        uint8_t count = 0;
+        for (uint8 slot : EtchSlots)
+        {
+            auto it = _items.find(ItemGuidAtSlot(player, slot));
+            if (it != _items.end() && it->second.etched && it->second.brand == active)
+                ++count;
+        }
+
+        return CatalystSelfStackMultiplier(count, sCatalystMgr->Config());
     }
 
     bool ItemBrandingMgr::EquippedState(Player* player, ItemBrandState& out) const
