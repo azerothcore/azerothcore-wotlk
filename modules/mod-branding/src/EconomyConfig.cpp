@@ -8,5 +8,7 @@ namespace Branding
         _enabled = sConfigMgr->GetOption<bool>("Branding.Economy.Enable", false);
         _materialItem = sConfigMgr->GetOption<uint32_t>("Branding.Economy.MaterialItemId", 190000);
         _fragmentItem = sConfigMgr->GetOption<uint32_t>("Branding.Economy.FragmentItemId", 190001);
+        _schoolFragments = sConfigMgr->GetOption<bool>("Branding.Economy.SchoolFragments.Enable", false);
+        _schoolFragmentBase = sConfigMgr->GetOption<uint32_t>("Branding.Economy.SchoolFragmentBaseItemId", 190100);
     }
 }

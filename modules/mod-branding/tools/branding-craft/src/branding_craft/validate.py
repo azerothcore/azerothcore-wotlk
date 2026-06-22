@@ -28,8 +28,24 @@ def validate(catalog: Catalog = CATALOG) -> list[str]:
         if res.bonding != want_bind:
             problems.append(f"resource {res.name} bonding {res.bonding} != required {want_bind} (§16.3)")
 
+    # Per-school Fragments: one per BrandId, laid out as SCHOOL_FRAGMENT_BASE + school (the C++ adapter
+    # depends on this offset), BoA like the generic Fragment, all within the school-Fragment sub-band.
+    if len(catalog.school_fragments) != C.BRAND_SCHOOL_COUNT:
+        problems.append(
+            f"school Fragments: {len(catalog.school_fragments)} entries != {C.BRAND_SCHOOL_COUNT} BrandIds"
+        )
+    for school, frag in enumerate(catalog.school_fragments):
+        want_entry = C.SCHOOL_FRAGMENT_BASE + school
+        if frag.entry != want_entry:
+            problems.append(f"school Fragment {frag.name}: entry {frag.entry} != base+school {want_entry}")
+        if frag.entry not in C.SCHOOL_FRAGMENT_BAND:
+            problems.append(f"school Fragment {frag.entry} outside band {C.SCHOOL_FRAGMENT_BAND}")
+        if frag.bonding != C.BIND_TO_ACCOUNT:
+            problems.append(f"school Fragment {frag.name} bonding {frag.bonding} != BoA (§16.3)")
+
     seen_recipe_ids: set[int] = set()
     seen_entries: set[int] = {catalog.material.entry, catalog.fragment.entry}
+    seen_entries |= {f.entry for f in catalog.school_fragments}
     seen_spells: set[int] = set()
     seen_sla: set[int] = set()
 
@@ -67,6 +83,10 @@ def validate(catalog: Catalog = CATALOG) -> list[str]:
         if r.material_count == 0 and r.fragment_count == 0:
             problems.append(f"{ctx}: no reagents -- a free craft is not allowed")
 
+        # School: a real BrandId (per-school Fragment) or the generic sentinel (generic Fragment).
+        if not (r.school < C.BRAND_SCHOOL_COUNT or r.school == C.BRAND_GENERIC):
+            problems.append(f"{ctx}: school {r.school} is neither a BrandId (<{C.BRAND_SCHOOL_COUNT}) nor generic")
+
         # Skill gate sanity: learnable at req, greys out at/after trivial_high.
         if r.trivial_high < r.req_skill_value:
             problems.append(f"{ctx}: trivial_high {r.trivial_high} < req_skill_value {r.req_skill_value}")
@@ -98,6 +118,7 @@ def recipe_mirror_rows(catalog: Catalog = CATALOG) -> dict[int, dict[str, int]]:
             "fragments": r.fragment_count,
             "output_item": r.output.entry,
             "char_xp": r.char_xp,
+            "school": r.school,
         }
         for r in catalog.recipes
     }

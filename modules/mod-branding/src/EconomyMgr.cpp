@@ -25,7 +25,7 @@ namespace Branding
             return;
 
         QueryResult result = WorldDatabase.Query(
-            "SELECT `id`, `materials`, `fragments`, `output_item`, `char_xp` FROM `branding_recipe`");
+            "SELECT `id`, `materials`, `fragments`, `output_item`, `char_xp`, `school` FROM `branding_recipe`");
         if (!result)
         {
             LOG_INFO("server.loading", ">> Loaded 0 branding recipes (table empty).");
@@ -42,6 +42,11 @@ namespace Branding
             recipe.fragments = fields[2].Get<uint32>();
             recipe.outputItemId = fields[3].Get<uint32>();
             recipe.charXp = fields[4].Get<uint32>();
+            // school: a BrandId (per-school Fragment) or >= COUNT (generic Fragment). Clamp anything
+            // out of range to COUNT so a bad row degrades to the generic Fragment, never crashes.
+            uint32 const school = fields[5].Get<uint32>();
+            recipe.school = school < static_cast<uint32>(BrandId::COUNT)
+                ? static_cast<BrandId>(school) : BrandId::COUNT;
 
             if (_recipes.Add(id, recipe))
                 ++count;
@@ -73,9 +78,16 @@ namespace Branding
         report.outputItemId = recipe->outputItemId;
         report.charXp = recipe->charXp;
 
+        // §16: a schooled recipe draws from its school's Fragment (the "Fire-Branded Fragment" loop)
+        // when per-school Fragments are enabled; otherwise it falls back to the generic Fragment.
+        uint32_t const fragmentItem =
+            (_config.SchoolFragmentsEnabled() && recipe->school < BrandId::COUNT)
+                ? _config.SchoolFragmentItem(recipe->school)
+                : _config.FragmentItem();
+
         Resources available;
         available.materials = player->GetItemCount(_config.MaterialItem(), false);
-        available.fragments = player->GetItemCount(_config.FragmentItem(), false);
+        available.fragments = player->GetItemCount(fragmentItem, false);
         report.materialsHave = available.materials;
         report.fragmentsHave = available.fragments;
 
@@ -91,7 +103,7 @@ namespace Branding
         if (craft.consumed.materials > 0)
             player->DestroyItemCount(_config.MaterialItem(), craft.consumed.materials, true);
         if (craft.consumed.fragments > 0)
-            player->DestroyItemCount(_config.FragmentItem(), craft.consumed.fragments, true);
+            player->DestroyItemCount(fragmentItem, craft.consumed.fragments, true);
 
         DeliveryResult const delivered = DeliverItem(player, craft.outputItemId, 1,
             "Branding Crafting", "Your crafted item.");
