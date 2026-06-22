@@ -34,7 +34,8 @@ def _values_block(sql: str, table: str) -> str:
 
 def _branding_recipe_rows(sql: str) -> dict[int, tuple[int, int]]:
     block = _values_block(sql, "branding_recipe")
-    rows = re.findall(r"\((\d+), (\d+), (\d+), (\d+), (\d+)\)", block)
+    # columns: id, materials, fragments, output_item, char_xp, school
+    rows = re.findall(r"\((\d+), (\d+), (\d+), (\d+), (\d+), (\d+)\)", block)
     return {int(r[0]): (int(r[1]), int(r[2])) for r in rows}
 
 
@@ -87,3 +88,30 @@ def test_skill_csv_maps_each_spell_to_its_profession():
     reader = {int(r["Spell"]): int(r["SkillLine"]) for r in csv.DictReader(io.StringIO(emit_skill_line_ability_csv()))}
     for r in CATALOG.recipes:
         assert reader[r.spell_id] == r.skill_line
+
+
+def test_every_school_fragment_item_is_emitted_boa():
+    block = emit_world_sql().split("INSERT INTO `item_template`")[1].split(";")[0]
+    for frag in CATALOG.school_fragments:
+        # entry ... bonding(5) Material(4) are the last two cells -> "..., 5, 4)" with this name present.
+        assert f"'{frag.name}'" in block
+        assert re.search(rf"\(\s*{frag.entry},.*?, 5, 4\)", block), frag.entry
+
+
+def test_schooled_spell_reagent_points_at_the_school_fragment():
+    # The native craft spell for a Fire recipe must require the Fire-Branded Fragment, not the generic.
+    block = _values_block(emit_world_sql(), "spell_dbc")
+    reagent2 = {}
+    for row in re.findall(r"\(([^)]*)\)", block):
+        cells = [c.strip() for c in row.split(",")]
+        reagent2[int(cells[0])] = int(cells[6])  # Reagent_2 (0-indexed cell 6)
+    fire = CATALOG.recipes[1]
+    assert reagent2[fire.spell_id] == CATALOG.school_fragments[fire.school].entry
+
+
+def test_branding_recipe_school_column_matches_catalog():
+    block = _values_block(emit_branding_recipe_sql(), "branding_recipe")
+    rows = re.findall(r"\((\d+), (\d+), (\d+), (\d+), (\d+), (\d+)\)", block)
+    school_by_id = {int(r[0]): int(r[5]) for r in rows}
+    for r in CATALOG.recipes:
+        assert school_by_id[r.id] == r.school

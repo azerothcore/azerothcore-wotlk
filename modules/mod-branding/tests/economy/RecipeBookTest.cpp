@@ -84,3 +84,42 @@ TEST(RecipeBook, ResolvedRecipeFromBookCraftsExactly)
     Resources broke{ 8, 5 };
     EXPECT_FALSE(ResolveCraft(*recipe, broke).crafted);
 }
+
+// §16 per-school Fragments: a recipe carries the BrandId of the Fragment it consumes. The pure core
+// only routes the *count* (ResolveCraft is school-blind); the adapter maps school -> Fragment entry.
+TEST(RecipeBook, RecipeDefaultsToNoSchool)
+{
+    Recipe recipe;
+    EXPECT_EQ(recipe.school, BrandId::COUNT);   // COUNT == "no school" -> generic Fragment
+}
+
+TEST(RecipeBook, SchoolRoundTripsThroughTheBook)
+{
+    RecipeBook book;
+    Recipe recipe{ 10, 5, 42, 100 };
+    recipe.school = BrandId::Fire;
+    book.Add(7, recipe);
+
+    Recipe const* found = book.Find(7);
+    ASSERT_NE(found, nullptr);
+    EXPECT_EQ(found->school, BrandId::Fire);
+}
+
+TEST(RecipeBook, ResolveCraftIsSchoolBlind)
+{
+    // Two recipes identical but for school resolve to the same craft outcome -- school never changes
+    // what or how much is consumed; it only tells the adapter which Fragment item to draw from.
+    Recipe fire{ 10, 5, 42, 100 };
+    fire.school = BrandId::Fire;
+    Recipe frost{ 10, 5, 42, 100 };
+    frost.school = BrandId::Frost;
+
+    Resources have{ 30, 20 };
+    CraftResult a = ResolveCraft(fire, have);
+    CraftResult b = ResolveCraft(frost, have);
+    EXPECT_TRUE(a.crafted);
+    EXPECT_TRUE(b.crafted);
+    EXPECT_EQ(a.consumed.fragments, b.consumed.fragments);
+    EXPECT_EQ(a.consumed.materials, b.consumed.materials);
+    EXPECT_EQ(a.outputItemId, b.outputItemId);
+}

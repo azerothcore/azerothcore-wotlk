@@ -5,12 +5,33 @@ trivially auditable against the AzerothCore base schema and the §16.4 entry-ban
 """
 
 # --- mod-branding reserved entry bands (ARCHITECTURE.md §16.4) ---------------------------------
-# item_template reserved band: 190000-190099.
+# item_template reserved band: 190000-190199 (widened for the per-school Fragment sub-band).
 ITEM_BAND_MIN = 190000
-ITEM_BAND_MAX = 190099
-RESOURCE_BAND = range(190000, 190010)  # Material, Fragment
-OUTPUT_BAND = range(190010, 190050)    # Branded outputs
-PATTERN_BAND = range(190050, 190100)   # Recipe pattern items
+ITEM_BAND_MAX = 190199
+RESOURCE_BAND = range(190000, 190010)         # generic Material, generic Fragment
+OUTPUT_BAND = range(190010, 190050)           # Branded outputs
+PATTERN_BAND = range(190050, 190100)          # Recipe pattern items
+SCHOOL_FRAGMENT_BAND = range(190100, 190150)  # per-school Fragments (190100 + BrandId)
+
+# Per-school Fragment entries are laid out contiguously as SCHOOL_FRAGMENT_BASE + BrandId, so the C++
+# adapter resolves a recipe's school -> Fragment item with a single base + offset (no 15 config keys).
+# This base MUST equal the EconomyConfig default Branding.Economy.SchoolFragmentBaseItemId.
+SCHOOL_FRAGMENT_BASE = 190100
+
+# BrandId order -- MUST match src/core/branding/common/Brand.h (the value is a stable index). The
+# per-school Fragment for school i lives at SCHOOL_FRAGMENT_BASE + i; school >= BRAND_SCHOOL_COUNT
+# means "no school" (a recipe that consumes the generic Fragment instead).
+BRAND_SCHOOL_NAMES = [
+    "Fire", "Frost", "Nature", "Shadow", "Arcane", "Holy", "Physical",            # classic schools
+    "Wind", "Lightning", "Blood", "Void", "Stone", "Venom", "Chrono", "Spirit",   # exotic (§7.10)
+]
+BRAND_SCHOOL_COUNT = len(BRAND_SCHOOL_NAMES)  # == BrandId::COUNT
+BRAND_GENERIC = 255  # recipe.school sentinel: consume the generic Fragment, not a per-school one
+
+# Named indices used by the shipped starter recipes (readability at the call site).
+BRAND_FIRE = 0
+BRAND_NATURE = 2
+BRAND_ARCANE = 4
 
 # Reserved Spell.dbc / spell_dbc band for Branded craft spells (#29). Far above the 3.3.5a shipped
 # spell id range so a custom craft spell can never collide with a Blizzard spell.

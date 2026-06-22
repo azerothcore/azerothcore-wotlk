@@ -1,6 +1,7 @@
 #ifndef MOD_BRANDING_CORE_ECONOMY_ECONOMY_H
 #define MOD_BRANDING_CORE_ECONOMY_ECONOMY_H
 
+#include "branding/common/Brand.h"
 #include <cstdint>
 
 namespace Branding
@@ -19,6 +20,10 @@ namespace Branding
         uint32_t fragments = 0;
         uint32_t outputItemId = 0;
         uint32_t charXp = 0;
+        // BrandId of the Fragment this recipe consumes (the §16 per-school Fragment loop). The pure
+        // ResolveCraft ignores it -- it routes only the *count* -- but the adapter reads it to pick
+        // which Fragment item entry to consume. BrandId::COUNT means "no school" -> generic Fragment.
+        BrandId school = BrandId::COUNT;
     };
 
     struct CraftResult

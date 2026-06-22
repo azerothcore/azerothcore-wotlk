@@ -678,6 +678,30 @@ Branding.Economy.MaterialItemId = 190000
 Branding.Economy.FragmentItemId = 190001
 
 #
+#    Branding.Economy.SchoolFragments.Enable
+#        Description: Per-school Fragments (§16). When on, a recipe whose branding_recipe.school is a
+#                     BrandId (0..14) consumes that school's Fragment -- "<School>-Branded Fragment",
+#                     item SchoolFragmentBaseItemId + school -- instead of the generic Fragment above
+#                     (the "mine fire in a fire event, forge fire gear" loop). Recipes with school
+#                     >= 15 always use the generic Fragment. Off => every recipe uses the generic
+#                     Fragment (the pre-§16 behaviour), so this is back-compatible.
+#        Default:     0 - (disabled)
+#
+
+Branding.Economy.SchoolFragments.Enable = 0
+
+#
+#    Branding.Economy.SchoolFragmentBaseItemId
+#        Description: item_template entry of the BrandId-0 (Fire) per-school Fragment; school N lives
+#                     at base + N (Fire 190100 .. Spirit 190114). MUST match the generator's
+#                     SCHOOL_FRAGMENT_BASE (tools/branding-craft) or the craft window and the adapter
+#                     will consume different items. Account-bound (BoA), like the generic Fragment.
+#        Default:     190100 (mod-branding school-Fragment band, §16.4)
+#
+
+Branding.Economy.SchoolFragmentBaseItemId = 190100
+
+#
 #    Branding.Item.Enable
 #        Description: Item branding (§7.9): brand + upgrade the equipped weapon to raise its proc/
 #                     behavior intensity (never flat stats). Inert without the account's Knowledge.
