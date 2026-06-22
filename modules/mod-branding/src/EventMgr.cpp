@@ -65,6 +65,13 @@ namespace Branding
         return _events.erase(zoneId) > 0;
     }
 
+    void EventMgr::SetGoal(uint32_t zoneId, uint64_t goal)
+    {
+        auto it = _events.find(zoneId);
+        if (it != _events.end())
+            it->second.goal = goal;
+    }
+
     bool EventMgr::ActiveEventType(uint32_t zoneId, EventType& outType) const
     {
         auto it = _events.find(zoneId);

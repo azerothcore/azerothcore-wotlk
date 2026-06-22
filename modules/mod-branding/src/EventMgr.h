@@ -33,6 +33,11 @@ namespace Branding
         // Event lifecycle (GM-driven for now).
         bool StartEvent(uint32_t zoneId, EventType type, uint64_t goal);
         bool StopEvent(uint32_t zoneId);
+
+        // Update the live containment goal of an active event (§2.5.4): the scheduler raises/lowers it
+        // as reinforcement tiers spawn/despawn so containment tracks the actual mob volume. No-op if
+        // the zone has no active event.
+        void SetGoal(uint32_t zoneId, uint64_t goal);
         bool ActiveEventType(uint32_t zoneId, EventType& outType) const;
         double Containment(uint32_t zoneId) const;
 
