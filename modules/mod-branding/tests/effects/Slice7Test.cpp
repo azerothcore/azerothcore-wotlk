@@ -116,6 +116,32 @@ TEST(ItemBrand, UpgradeAdvancesLevelsAndStepsThenCaps)
     EXPECT_EQ(s.levelInStep, cfg.levelsPerStep);
 }
 
+// Etch (#31): a one-shot Etched item is rank-locked -- ApplyItemUpgrade is refused (no-op), so the
+// #05 upgrade flow can never advance an Etched item past its rank-0 proc.
+TEST(ItemBrand, EtchedItemRefusesUpgrade)
+{
+    FakeItemBrandConfig cfg;
+    ItemBrandState etched{ BrandId::Fire, 0, 0, 0 };
+    etched.etched = true;
+
+    ItemUpgradeResult r = ApplyItemUpgrade(etched, 100000, cfg);   // plenty of resources, but locked
+    EXPECT_EQ(r.levelsGained, 0);
+    EXPECT_EQ(r.consumed, 0u);     // refused without consuming
+    EXPECT_EQ(etched.step, 0);     // state unchanged -- stays rank 0
+    EXPECT_EQ(etched.levelInStep, 0);
+}
+
+// Etch still carries the rank-0 proc and obeys the same anti-P2W gate as any branded item.
+TEST(ItemBrand, EtchedItemProcsAtRankZeroAndGatedByAccess)
+{
+    FakeItemBrandConfig cfg;
+    ItemBrandState etched{ BrandId::Fire, 0, 0, 0 };
+    etched.etched = true;
+
+    EXPECT_GT(ResolvedItemEffectIntensity(etched, true, cfg), 0.0);            // base proc present
+    EXPECT_DOUBLE_EQ(ResolvedItemEffectIntensity(etched, false, cfg), 0.0);    // inert without access
+}
+
 TEST(ItemBrand, MaxCumulativeCostCheaperThanAccountKnowledge)
 {
     FakeItemBrandConfig cfg;

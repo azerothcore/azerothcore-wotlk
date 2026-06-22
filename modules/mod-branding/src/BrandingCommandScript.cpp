@@ -146,6 +146,7 @@ public:
             { "setproc",     HandleBrandingSetProcCommand,     rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
             { "itembrand",   HandleBrandingItemBrandCommand,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
             { "upgradeitem", HandleBrandingUpgradeItemCommand, rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "etch",        HandleBrandingEtchCommand,        rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
             { "knowledge",  knowledgeCommandTable },
             { "insight",    insightCommandTable },
             { "allegiance", allegianceCommandTable },
@@ -499,6 +500,46 @@ public:
 
         handler->PSendSysMessage("Upgraded equipped weapon by {} level(s).", uint32(gained));
         return true;
+    }
+
+    // `.branding etch` -- one-shot Etch of the equipped weapon with the active school (#31): rank-locked,
+    // soulbound, paid in Essence. The low-friction, server-only on-ramp into the Branded system.
+    static bool HandleBrandingEtchCommand(ChatHandler* handler)
+    {
+        Player* player = handler->GetPlayer();
+        if (!player)
+        {
+            handler->SendErrorMessage("This command must be used in-world.");
+            return false;
+        }
+
+        BrandId const brand = sLoadoutMgr->GetLoadout(player->GetGUID()).activeBrand;
+        switch (sItemBrandingMgr->EtchEquipped(player))
+        {
+            case EtchResult::Success:
+                handler->PSendSysMessage("Etched your equipped weapon with the {} brand -- it is now soulbound "
+                    "and its proc expresses while {} is your active school.", BrandName(brand), BrandName(brand));
+                return true;
+            case EtchResult::Disabled:
+                handler->SendErrorMessage("Etching is disabled (Branding.Item.Enable / Branding.Etch.Enable).");
+                return false;
+            case EtchResult::NoWeapon:
+                handler->SendErrorMessage("No equipped main-hand weapon to etch.");
+                return false;
+            case EtchResult::AlreadyBranded:
+                handler->SendErrorMessage("That weapon already carries a Brand -- an Etch is permanent and one per item.");
+                return false;
+            case EtchResult::NotEnrolled:
+                handler->SendErrorMessage("Your active school is not unlocked -- enroll (learn its Knowledge) before etching.");
+                return false;
+            case EtchResult::InsufficientEssence:
+                handler->SendErrorMessage("Not enough Essence: need {}, have {}.",
+                    sItemBrandingMgr->EssenceCost(),
+                    player->GetItemCount(sItemBrandingMgr->EssenceItemId(), false));
+                return false;
+        }
+
+        return false;
     }
 
     // `.branding knowledge grant <brand>` -- GM/debug unlock of an account-wide brand (design §6).

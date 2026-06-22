@@ -357,6 +357,37 @@ Branding.Item.AccountKnowledgeCost = 100000
 Branding.Item.StatBonusAtMaxRank = 0.25
 
 #
+#    Branding.Etch.Enable
+#        Description: Master switch for the one-shot Etch on-ramp (#31): `.branding etch` brands the
+#                     equipped weapon with the player's active school, rank-locked (never upgradeable)
+#                     and soulbound (BoP). Requires Branding.Item.Enable as well. The deliberately
+#                     weaker, server-only sibling of the crafted Branded-item economy (#27/#29).
+#        Default:     0 - (disabled)
+#
+
+Branding.Etch.Enable = 0
+
+#
+#    Branding.Etch.EssenceItemId
+#        Description: Item entry of the premium, BoP cost resource consumed by an Etch (§16.1/§16.2,
+#                     reserved band §16.4). "Essence" is a placeholder name.
+#        Default:     190002
+#
+
+Branding.Etch.EssenceItemId = 190002
+
+#
+#    Branding.Etch.EssenceCost
+#        Description: Quantity of Essence consumed per Etch. Tune against the Essence drop rate so a
+#                     single Etch is ~2 weeks of premium-source grinding, and so the ordering
+#                     initial-craft < Etch < fully-maxed-Branded-item holds (#31 decision 8). Flat
+#                     per item -- the combat self-stack DR, not cost, is what bounds etching many slots.
+#        Default:     500
+#
+
+Branding.Etch.EssenceCost = 500
+
+#
 #    Branding.Loadout.BaseArchetypes / ArchetypeLevelStep / MaxArchetypes
 #        Description: Proc archetypes unlocked by the player-selected loadout (§7.9): the count is
 #                     BaseArchetypes + proficiencyLevel / ArchetypeLevelStep, capped at MaxArchetypes.

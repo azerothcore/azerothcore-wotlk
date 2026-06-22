@@ -11,6 +11,17 @@ class Player;
 
 namespace Branding
 {
+    // Outcome of a one-shot Etch attempt (#31) -- mapped to a player message by the command layer.
+    enum class EtchResult : uint8_t
+    {
+        Success,
+        Disabled,            // Branding.Item.Enable or Branding.Etch.Enable off
+        NoWeapon,            // no equipped main-hand to etch
+        AlreadyBranded,      // this item already carries a Brand (etched or crafted)
+        NotEnrolled,         // active school not account-unlocked (no Knowledge -- can't express)
+        InsufficientEssence, // not enough Essence held
+    };
+
     // Adapter for item branding (§7.9). Per-item brand state keyed by the item's GUID, persisted to
     // `item_branding`. Upgrades spend economy resources to raise the item's proc/behavior INTENSITY
     // (never flat stats). Anti-P2W: a traded/maxed item is inert unless the current account can
@@ -23,14 +34,23 @@ namespace Branding
 
         void LoadConfig();
         bool Enabled() const { return _enabled; }
+        bool EtchEnabled() const { return _enabled && _etchEnabled; }
 
         IItemBrandConfig const& Config() const { return _config; }
+
+        uint32_t EssenceItemId() const { return _essenceItemId; }
+        uint32_t EssenceCost() const { return _essenceCost; }
 
         // Load the player's equipped main-hand brand state into the cache on login.
         void LoadEquipped(Player* player);
 
         // Brand the equipped weapon with the player's active brand (step 0). Persists.
         bool BrandEquipped(Player* player, BrandId brand);
+
+        // One-shot Etch (#31): brand the equipped weapon with the player's active school, rank-locked
+        // (never upgradeable) and soulbound (BoP), consuming Essence. Validates + consumes only on
+        // success; refuses (no consume) otherwise. See EtchResult.
+        EtchResult EtchEquipped(Player* player);
 
         // Spend `resources` to upgrade the equipped weapon's brand (ApplyItemUpgrade). Persists.
         // Returns the internal levels gained (0 if no branded weapon / nothing affordable).
@@ -50,6 +70,9 @@ namespace Branding
         void Save(uint32_t itemGuid, ItemBrandState const& state);
 
         bool _enabled = false;
+        bool _etchEnabled = false;
+        uint32_t _essenceItemId = 190002;
+        uint32_t _essenceCost = 500;
         ItemBrandConfig _config;
         std::unordered_map<uint32_t, ItemBrandState> _items;   // keyed by item GUID counter
     };

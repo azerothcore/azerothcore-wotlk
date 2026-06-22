@@ -30,6 +30,10 @@ namespace Branding
         uint8_t step = 0;
         uint8_t levelInStep = 0;
         uint32_t upgradeProgress = 0;
+        // Etch (#31): a one-shot Etched item is rank-locked -- it carries only the rank-0 proc and is
+        // never upgradeable. ApplyItemUpgrade refuses (no-op) when set, so the crafted upgrade path
+        // stays the only route to higher Brand Ranks (decision 4 / §7.9).
+        bool etched = false;
     };
 
     // Effect/proc INTENSITY multiplier (behavior, not raw stats). Monotonic non-decreasing in

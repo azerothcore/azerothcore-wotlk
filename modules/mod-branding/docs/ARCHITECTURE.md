@@ -849,6 +849,38 @@ The adapter layer (Slice 7) maps these decisions onto AzerothCore: exposure wind
 + proc-frequency modification; personal spikes → tank survivability auras; mechanic transforms →
 spell-script behavior changes. Core stays pure; only the adapter touches `Spell`/`Aura`/`Unit`.
 
+**One-shot Etch — the low-friction on-ramp (issue #31, server-only).** Alongside the crafted Branded
+item (recipe → BoA → multi-week upgrade, §16/#27/#29), a max-level character with at least one unlocked
+school may **Etch** an item they already own — a single, permanent, enchant-like brand. It is the
+**deliberately weaker sibling** of the item-upgrade path above, and reuses the existing cores with **no
+new pure logic**:
+
+- **Rank-locked.** An Etched item carries only the **rank-0** `ItemEffectIntensity` proc — no
+  `ApplyItemUpgrade`, no Brand-Rank progression, and **no `ItemStatScale` bonus** (base stats unchanged).
+  Higher Brand Ranks + the stat bonus stay exclusive to crafted Branded items, so Etching is outgrown,
+  never a replacement for the economy.
+- **Active-mastery gated.** The item brands with the character's **active school** at Etch time, and its
+  proc expresses only while that school is the active mastery *and* `CanExpressBrand` holds (§7.3) — a
+  strictly stronger gate than Knowledge alone.
+- **Character-bound.** Etching soulbinds the item (BoE → BoP, §16.3) — strictly safer than BoA.
+- **Cost is the primary balance lever (not the rank-lock).** The rank-lock bounds the *proc*, but Etch
+  can put that proc on a **raid-BiS base** (a crafted Branded item is stuck on a modest base) — a strong
+  package. The containment is **price**: Etching consumes a large quantity of **Essence** (premium, BoP,
+  §16.1), tuned to the ordering **initial Branded craft `<` Etch `<` fully-maxed Branded item**. Above
+  initial craft so the BiS-base premium is paid for (the modest-base crafted entry product isn't dead on
+  arrival); below the max-out so the endgame (max-rank proc + stat bonus, the multi-week grind) stays the
+  bigger investment and the strongest result. **No recipe gate** — `.branding etch` is open to anyone
+  enrolled, so planning friction stays low; the *expense* is the gate. This makes Etch an
+  **endgame-convenience** path (friction = cost), not a fresh-level freebie. All knobs behind `Branding.Etch.*`.
+- **Self-stack DR = the §14.9 catalyst curve, reused.** Multiple Etched items in the same active
+  `(school, tree)` cell form a self-roster ranked by `CatalystRankInBucket`; `RaidCatalystMultiplier`
+  bounds the aggregate (1st full, 2nd reduced, 3rd+ heavy, ≤ `MaxRaidMul`). "Unlimited items" therefore
+  buys wardrobe flexibility, not stacked power.
+
+**Invariants (beyond the §7.9 set above):** an Etched item never exceeds rank 0; its self-stack DR never
+exceeds `MaxRaidMul`; a traded outcome is impossible (BoP). No new `core/` function — Etch is an adapter
+over `ItemBrand` + `CatalystStacking` + `CanExpressBrand` + the active `MasteryPlan`.
+
 ### 7.10 Exotic brand schools (extending §7.1)
 
 Beyond the seven classic schools, the system ships **exotic schools** — hybrid/conceptual brands that
@@ -1994,8 +2026,10 @@ called out.
 | Progress within a Brand Rank | **(unnamed progress)** | item GUID | `ItemBrandState::levelInStep` / `upgradeProgress` | progress bar only |
 | Common crafting input (dungeon-sourced) | **Material** | item in bag/vault, **tradeable** (BoE) | `Branding.Economy.MaterialItemId`, `Resources::materials` | "Materials" |
 | Premium crafting input (raid/invasion-sourced) | **Fragment** | item, **account-bound** (BoA) | `Branding.Economy.FragmentItemId`, `Resources::fragments` | "Fragments" |
+| Premium **Etch**-only cost (raid/invasion-sourced) | **Essence** | item, **character-bound** (BoP) | `Branding.Etch.EssenceItemId` (no `Resources` field — adapter-consumed, §16.2) | "Essence" |
 | Craft definition: inputs → output item | **Recipe** | native profession spell + `branding_recipe` mirror | `skill_line_ability`/`Spell.dbc`, `branding_recipe`, `RecipeBook` | "Recipe" |
 | Crafted brandable item | **Branded item** | item GUID, **account-bound** (BoA) | `item_template` (modest base), `item_branding` (#05) | "Branded <item>" |
+| One-shot brand of a pre-owned item | **Etch** / *Etched item* | item GUID, **character-bound** (BoP), rank-locked | `item_branding` (#05, `step` pinned 0, etch marker) | "Etch" / "Etched <item>" |
 | Raid synergy stacking diminishing-returns mechanic | **Catalyst** | combat, per `(school, tree)` | `core/branding/catalyst/`, `RaidCatalystMultiplier` | "Catalyst (raid synergy)" |
 
 ### 16.2 Two collisions, resolved
@@ -2005,7 +2039,11 @@ called out.
   input* a "catalyst"; that second sense is retired. **Raid-tier inputs are simply high-grade
   Fragments/Materials** — there is no third resource type and `Resources { materials, fragments }`
   stays as-is. (If a distinct raid-only crafting resource is ever wanted, name it **Essence** and add
-  a field — do *not* reuse "Catalyst".)
+  a field — do *not* reuse "Catalyst".) **Essence is now realized** as the premium, **BoP** cost of the
+  §7.9 one-shot **Etch** (#31). It is a third resource *item entry*, **not** a `Resources { materials,
+  fragments }` field — the Etch adapter consumes it directly (Etch does not go through `ResolveCraft`),
+  so the pure economy tally is untouched. BoP (stricter than the BoA Fragment) keeps the Etch cost a
+  strictly personal grind, matched to the BoP Etched item.
 - **Three progression axes, three nouns — never conflate.** *Knowledge* (account, unlock), *Proficiency*
   (character, earned power), *Brand Rank* (item, upgraded power). "Level" is qualified
   (`Proficiency Level`) so it never reads as a WoW item level. Internal field names (`step`,
@@ -2027,7 +2065,11 @@ config and is the right call:
   **account-bound (BoA)** — account-wide, so the prestige grind belongs to the account, not the auction
   house. This narrows the §8.1 market to the common-input tier on purpose; the high-end loop is
   personal effort. Account-wide Fragments are held BoA (mailable to own characters) and/or in the
-  account vault (#06). Recipe patterns are **BoP** (non-tradeable) per §8.6.1.
+  account vault (#06). Recipe patterns are **BoP** (non-tradeable) per §8.6.1. **Etching** (the §7.9
+  one-shot on-ramp, #31) **soulbinds** the item (BoE → BoP) and is permanent + non-upgradeable; the
+  crafted **Branded item** (BoA, upgradeable) stays the only account-wide / higher-rank path. Etch's
+  cost resource — **Essence** — is **BoP** (stricter than the BoA Fragment), so the on-ramp's expense
+  is a strictly personal grind, never account-shared or bought.
 - Trade-off (bag clutter, stack caps) is mitigated by the vault and generous stack sizes; no new
   client work. A custom currency table was rejected (needs bespoke UI, breaks trading, duplicates the
   inventory plumbing already built).
