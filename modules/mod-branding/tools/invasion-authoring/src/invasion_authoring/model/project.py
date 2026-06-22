@@ -83,6 +83,36 @@ class Path:
 
 
 @dataclass
+class SpawnTier:
+    """A §2.5.3 additive spawn tier: a reinforcement layer gated on enrolled-participant headcount.
+
+    Spawns reference a tier by its index in :attr:`Invasion.tiers`; the base tier (index 0) has
+    ``min_participants == 0`` and is up for the whole active phase, with reinforcement tiers layering
+    in as the crowd grows. ``goal_contribution`` is what the tier adds to the live containment goal
+    while spawned (§2.5.4); 0 means the event falls back to its static ``branding_event_def`` goal.
+    """
+
+    name: str = "base"
+    min_participants: int = 0
+    goal_contribution: int = 0
+
+    def to_dict(self) -> dict:
+        return {
+            "name": self.name,
+            "min_participants": self.min_participants,
+            "goal_contribution": self.goal_contribution,
+        }
+
+    @classmethod
+    def from_dict(cls, d: dict) -> SpawnTier:
+        return cls(
+            name=d.get("name", "base"),
+            min_participants=d.get("min_participants", 0),
+            goal_contribution=d.get("goal_contribution", 0),
+        )
+
+
+@dataclass
 class Spawn:
     """A single creature spawn (``creature`` row)."""
 
@@ -96,6 +126,7 @@ class Spawn:
     movement_type: int = MOVEMENT_IDLE
     path_local_id: int | None = None
     is_boss: bool = False
+    tier: int = 0  # index into Invasion.tiers (§2.5.3); 0 = base tier
 
     def to_dict(self) -> dict:
         return {
@@ -109,6 +140,7 @@ class Spawn:
             "movement_type": self.movement_type,
             "path_local_id": self.path_local_id,
             "is_boss": self.is_boss,
+            "tier": self.tier,
         }
 
     @classmethod
@@ -124,6 +156,7 @@ class Spawn:
             movement_type=d.get("movement_type", MOVEMENT_IDLE),
             path_local_id=d.get("path_local_id"),
             is_boss=d.get("is_boss", False),
+            tier=d.get("tier", 0),
         )
 
 
@@ -229,6 +262,9 @@ class Invasion:
     spawns: list[Spawn] = field(default_factory=list)
     paths: list[Path] = field(default_factory=list)
     formations: list[Formation] = field(default_factory=list)
+    # §2.5.3 additive spawn tiers. Empty => a single implicit base tier holds every spawn (the
+    # pre-crowd-scaling behaviour). Spawns index into this list via Spawn.tier.
+    tiers: list[SpawnTier] = field(default_factory=list)
 
     def to_dict(self) -> dict:
         return {
@@ -239,6 +275,7 @@ class Invasion:
             "spawns": [s.to_dict() for s in self.spawns],
             "paths": [p.to_dict() for p in self.paths],
             "formations": [f.to_dict() for f in self.formations],
+            "tiers": [t.to_dict() for t in self.tiers],
         }
 
     @classmethod
@@ -252,6 +289,7 @@ class Invasion:
             spawns=[Spawn.from_dict(s) for s in d.get("spawns", [])],
             paths=[Path.from_dict(p) for p in d.get("paths", [])],
             formations=[Formation.from_dict(f) for f in d.get("formations", [])],
+            tiers=[SpawnTier.from_dict(t) for t in d.get("tiers", [])],
         )
 
 

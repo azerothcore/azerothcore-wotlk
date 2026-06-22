@@ -12,6 +12,7 @@ from .project import (
     Path,
     Project,
     Spawn,
+    SpawnTier,
     Waypoint,
 )
 
@@ -27,5 +28,6 @@ __all__ = [
     "Path",
     "Project",
     "Spawn",
+    "SpawnTier",
     "Waypoint",
 ]

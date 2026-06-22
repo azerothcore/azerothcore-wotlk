@@ -16,7 +16,7 @@ one blank line, which keeps ``DELETE``/``INSERT`` pairs adjacent while separatin
 from __future__ import annotations
 
 from ..guid import GuidAllocator
-from ..model import Invasion, Project, Spawn
+from ..model import Invasion, Project, Spawn, SpawnTier
 
 # creature.guid is supplied; every other column falls back to its schema default.
 _CREATURE_COLS = (
@@ -28,7 +28,7 @@ _ADDON_COLS = ("guid", "path_id")
 _FORMATION_COLS = ("leaderGUID", "memberGUID", "dist", "angle", "groupAI")
 _GROUP_TEMPLATE_COLS = ("groupId", "groupName", "groupFlags")
 _GROUP_COLS = ("groupId", "spawnType", "spawnId")
-_EVENT_SPAWN_COLS = ("zone_id", "event_type", "group_id", "map_id")
+_EVENT_SPAWN_COLS = ("zone_id", "event_type", "group_id", "map_id", "min_participants", "goal_contribution")
 
 # AzerothCore SpawnGroupFlags / SpawnObjectType.
 _SPAWNGROUP_FLAG_MANUAL_SPAWN = 4  # members do not auto-spawn on grid load; the scheduler drives them
@@ -90,15 +90,18 @@ def _delete_event(table: str, zone_id: int, event_type: int) -> str:
 
 def _create_event_spawn_table() -> list[str]:
     return [
-        "-- branding_event_spawn (design §9.1): links an event (zone, type) to the manual spawn_group",
-        "-- the tool authored, so EventScheduler drives SpawnGroupSpawn/Despawn on the map on cycle.",
+        "-- branding_event_spawn (design §2.5.3): an event (zone, type) owns one row per additive spawn",
+        "-- tier -- the base tier (min_participants 0) plus reinforcements -- so EventScheduler drives",
+        "-- SpawnGroupSpawn/Despawn per tier as the enrolled crowd crosses each threshold.",
         "CREATE TABLE IF NOT EXISTS `branding_event_spawn`",
         "(",
         "    `zone_id` INT UNSIGNED NOT NULL,",
         "    `event_type` TINYINT UNSIGNED NOT NULL COMMENT '0=Invasion,1=Surge,2=EliteHunt,3=ProfAnomaly',",
         "    `group_id` INT UNSIGNED NOT NULL COMMENT 'spawn_group_template.groupId (manual-spawn group)',",
         "    `map_id` SMALLINT UNSIGNED NOT NULL COMMENT 'map the group lives on',",
-        "    PRIMARY KEY (`zone_id`, `event_type`)",
+        "    `min_participants` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'headcount to spawn this tier',",
+        "    `goal_contribution` INT UNSIGNED NOT NULL DEFAULT 0 COMMENT 'goal added while active',",
+        "    PRIMARY KEY (`zone_id`, `event_type`, `group_id`)",
         ") ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;",
     ]
 
@@ -107,12 +110,20 @@ def _invasion_blocks(inv: Invasion, allocator: GuidAllocator) -> list[list[str]]
     zone = inv.event.zone_id
     etype = int(inv.event.event_type)
 
-    # Allocate one creature GUID per spawn (in order), one path id per non-empty path, one spawn
-    # group id for the whole invasion.
+    # An empty tier list means a single implicit base tier holds every spawn (pre-§2.5 behaviour).
+    tiers = inv.tiers or [SpawnTier()]
+    spawns_by_tier: dict[int, list[Spawn]] = {i: [] for i in range(len(tiers))}
+    for s in inv.spawns:
+        if s.tier < 0 or s.tier >= len(tiers):
+            raise ValueError(f"spawn {s.local_id} references tier {s.tier} but invasion has {len(tiers)} tier(s)")
+        spawns_by_tier[s.tier].append(s)
+
+    # Allocate one creature GUID per spawn (in order), one path id per non-empty path, then one
+    # spawn group id per NON-EMPTY tier (in tier order) -- empty tiers author no group.
     guids = allocator.allocate_guids(len(inv.spawns))
     guid_of = {s.local_id: g for s, g in zip(inv.spawns, guids, strict=True)}
     path_id_of = {p.local_id: allocator.allocate_path_id() for p in inv.paths if p.waypoints}
-    group_id = allocator.allocate_group_id()
+    group_id_of = {i: allocator.allocate_group_id() for i in range(len(tiers)) if spawns_by_tier[i]}
 
     blocks: list[list[str]] = []
 
@@ -191,44 +202,48 @@ def _invasion_blocks(inv: Invasion, allocator: GuidAllocator) -> list[list[str]]
             ]
         )
 
-    # spawn_group_template (a manual-spawn group so the creatures never auto-appear on grid load)
-    group_name = f"branding inv z{zone} t{etype}"[:100]
-    blocks.append(
-        [
-            "-- manual spawn group (driven by EventScheduler)",
-            _delete_in("spawn_group_template", "groupId", [group_id]),
-            *_insert(
-                "spawn_group_template",
-                _GROUP_TEMPLATE_COLS,
-                [(group_id, group_name, _SPAWNGROUP_FLAG_MANUAL_SPAWN)],
-            ),
+    # One manual-spawn group per non-empty tier (creatures never auto-appear; the scheduler drives
+    # each tier as the crowd crosses its threshold). Tier order is stable, so the bitmask the engine
+    # builds from these rows lines up with the authored tiers.
+    active_tiers = [i for i in range(len(tiers)) if spawns_by_tier[i]]
+    if active_tiers:
+        all_group_ids = [group_id_of[i] for i in active_tiers]
+        template_rows = [
+            (group_id_of[i], f"branding inv z{zone} t{etype} {tiers[i].name}"[:100], _SPAWNGROUP_FLAG_MANUAL_SPAWN)
+            for i in active_tiers
         ]
-    )
+        blocks.append(
+            [
+                "-- manual spawn groups, one per additive tier (driven by EventScheduler)",
+                _delete_in("spawn_group_template", "groupId", all_group_ids),
+                *_insert("spawn_group_template", _GROUP_TEMPLATE_COLS, template_rows),
+            ]
+        )
 
-    # spawn_group (group membership: every authored creature)
-    blocks.append(
-        [
-            "-- spawn group membership",
-            _delete_in("spawn_group", "groupId", [group_id]),
-            *_insert(
-                "spawn_group",
-                _GROUP_COLS,
-                [(group_id, _SPAWN_TYPE_CREATURE, guid_of[s.local_id]) for s in inv.spawns],
-            ),
+        member_rows = [
+            (group_id_of[i], _SPAWN_TYPE_CREATURE, guid_of[s.local_id])
+            for i in active_tiers
+            for s in spawns_by_tier[i]
         ]
-    )
+        blocks.append(
+            [
+                "-- spawn group membership (per tier)",
+                _delete_in("spawn_group", "groupId", all_group_ids),
+                *_insert("spawn_group", _GROUP_COLS, member_rows),
+            ]
+        )
 
-    # branding_event_spawn mapping (event -> group + map)
-    blocks.append(
-        [
-            "-- event -> spawn group mapping",
-            _delete_event("branding_event_spawn", zone, etype),
-            *_insert(
-                "branding_event_spawn",
-                _EVENT_SPAWN_COLS,
-                [(zone, etype, group_id, inv.map_id)],
-            ),
+        # branding_event_spawn: one DELETE for the event, then one row per tier (group + thresholds).
+        event_rows = [
+            (zone, etype, group_id_of[i], inv.map_id, tiers[i].min_participants, tiers[i].goal_contribution)
+            for i in active_tiers
         ]
-    )
+        blocks.append(
+            [
+                "-- event -> spawn tiers mapping",
+                _delete_event("branding_event_spawn", zone, etype),
+                *_insert("branding_event_spawn", _EVENT_SPAWN_COLS, event_rows),
+            ]
+        )
 
     return blocks
