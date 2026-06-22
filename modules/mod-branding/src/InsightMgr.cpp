@@ -1,6 +1,8 @@
 #include "InsightMgr.h"
 #include "ProficiencyMgr.h"
 #include "DatabaseEnv.h"
+#include "Field.h"
+#include "QueryResult.h"
 #include "Log.h"
 
 namespace Branding
