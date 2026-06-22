@@ -594,3 +594,81 @@ Branding.Addon.Enable = 0
 #
 
 Branding.Addon.PushIntervalSeconds = 5
+
+#
+# Insight -- the Knowledge-unlock currency (design §14.13.1, issue #18). A per-(account, school)
+# NON-tradeable fractional DB point counter (NOT an item; the deliberate exception to §16.3). Earned
+# from kills with ACCOUNT-WIDE diminishing returns; reaching the threshold unlocks the permanent
+# Brand Knowledge row once. Raid bosses are the backbone (no intra-week DR -- the lockout throttles);
+# dungeon bosses are farmable so they are DR'd within a rolling window (heroic > normal); a generic
+# trash "mote" is a VERY low-rate, school-agnostic breadcrumb feeding the active school.
+#
+
+#
+#    Branding.Insight.Enable
+#        Description: Master switch for the Insight Knowledge-unlock currency.
+#        Default:     0 - (disabled)
+#
+
+Branding.Insight.Enable = 0
+
+#
+#    Branding.Insight.RaidBossBase
+#        Description: Base Insight per raid-boss kill (the backbone; not DR'd -- weekly lockout throttles).
+#        Default:     1.0
+#
+
+Branding.Insight.RaidBossBase = 1.0
+
+#
+#    Branding.Insight.DungeonHeroicBase / DungeonNormalBase
+#        Description: Base Insight per heroic / normal dungeon-boss kill (farmable, so DR'd; heroic > normal).
+#        Default:     0.5 / 0.25
+#
+
+Branding.Insight.DungeonHeroicBase = 0.5
+Branding.Insight.DungeonNormalBase = 0.25
+
+#
+#    Branding.Insight.MoteBase
+#        Description: Base Insight per generic trash "mote" (school-agnostic breadcrumb; kept tiny).
+#        Default:     0.01
+#
+
+Branding.Insight.MoteBase = 0.01
+
+#
+#    Branding.Insight.DungeonDrFactor / MoteDrFactor
+#        Description: Geometric DR factor applied per prior windowed kill: yield = base * factor^prior
+#                     (1st full, 2nd x factor, 3rd x factor^2, ...). In [0,1]. Raid bosses are never DR'd.
+#        Default:     0.5 / 0.5
+#
+
+Branding.Insight.DungeonDrFactor = 0.5
+Branding.Insight.MoteDrFactor = 0.5
+
+#
+#    Branding.Insight.MoteChance
+#        Description: Per-trash-kill chance (0..1) to award a mote -- keeps the world-mob faucet a trickle.
+#        Default:     0.02
+#
+
+Branding.Insight.MoteChance = 0.02
+
+#
+#    Branding.Insight.WindowSeconds
+#        Description: After this many seconds the ACCOUNT-WIDE DR window decays back to empty (prior
+#                     windowed-kill count resets, so repeat kills are full value again).
+#        Default:     3600
+#
+
+Branding.Insight.WindowSeconds = 3600
+
+#
+#    Branding.Insight.UnlockThreshold
+#        Description: Insight needed in a school to unlock its permanent Brand Knowledge (§14.13.1
+#                     targets ~30-40 -- tuned to ~a month of daily grinding, not a raw number).
+#        Default:     35.0
+#
+
+Branding.Insight.UnlockThreshold = 35.0

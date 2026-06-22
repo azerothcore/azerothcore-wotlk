@@ -2,6 +2,7 @@
 #include "CatalystMgr.h"
 #include "DiscoveryMgr.h"
 #include "EventMgr.h"
+#include "InsightMgr.h"
 #include "ItemBrandingMgr.h"
 #include "LoadoutMgr.h"
 #include "MasteryCombatMgr.h"
@@ -123,6 +124,12 @@ public:
             { "set", HandleBrandingAllegianceSetCommand, rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
         };
 
+        static ChatCommandTable insightCommandTable =
+        {
+            { "list",  HandleBrandingInsightListCommand,  rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "grant", HandleBrandingInsightGrantCommand, rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+        };
+
         static ChatCommandTable brandingCommandTable =
         {
             { "info",        HandleBrandingInfoCommand,        rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
@@ -131,6 +138,7 @@ public:
             { "itembrand",   HandleBrandingItemBrandCommand,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
             { "upgradeitem", HandleBrandingUpgradeItemCommand, rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
             { "knowledge",  knowledgeCommandTable },
+            { "insight",    insightCommandTable },
             { "allegiance", allegianceCommandTable },
             { "event",      eventCommandTable },
         };
@@ -496,6 +504,86 @@ public:
         }
         if (!any)
             handler->PSendSysMessage("  (no brands unlocked -- use .branding knowledge grant <brand>)");
+        return true;
+    }
+
+    // `.branding insight list` -- shows the calling account's fractional Insight per school (§14.13.1).
+    static bool HandleBrandingInsightListCommand(ChatHandler* handler)
+    {
+        Player* player = handler->GetPlayer();
+        if (!player)
+        {
+            handler->SendErrorMessage("This command must be used in-world.");
+            return false;
+        }
+        if (!sInsightMgr->Enabled())
+        {
+            handler->SendErrorMessage("Insight is disabled (Branding.Insight.Enable).");
+            return false;
+        }
+
+        uint32 const account = player->GetSession()->GetAccountId();
+        double const threshold = sInsightMgr->Config().UnlockThreshold();
+        handler->PSendSysMessage("Insight for account {} (unlock threshold {:.1f}):", account, threshold);
+
+        bool any = false;
+        for (uint8 b = 0; b < static_cast<uint8>(BrandId::COUNT); ++b)
+        {
+            BrandId const brand = static_cast<BrandId>(b);
+            double const points = sInsightMgr->Points(account, brand);
+            if (points <= 0.0)
+                continue;
+
+            any = true;
+            handler->PSendSysMessage("  {} ({}): {:.4f} Insight{}", BrandName(brand), uint32(b), points,
+                points >= threshold ? " (threshold reached)" : "");
+        }
+        if (!any)
+            handler->PSendSysMessage("  (no Insight earned yet)");
+        return true;
+    }
+
+    // `.branding insight grant <brand> [rank]` -- debug: award one kill's Insight (rank 0=RaidBoss,
+    // 1=DungeonHeroic, 2=DungeonNormal, 3=TrashMote) to a school, applying the account-wide DR.
+    static bool HandleBrandingInsightGrantCommand(ChatHandler* handler, std::string_view brandToken, Optional<uint32> rankArg)
+    {
+        Player* player = handler->GetPlayer();
+        if (!player)
+        {
+            handler->SendErrorMessage("This command must be used in-world.");
+            return false;
+        }
+        if (!sInsightMgr->Enabled())
+        {
+            handler->SendErrorMessage("Insight is disabled (Branding.Insight.Enable).");
+            return false;
+        }
+
+        BrandId brand;
+        if (!ParseBrand(brandToken, brand))
+        {
+            handler->SendErrorMessage("Unknown brand '{}'. Use a name or id 0..{}.",
+                brandToken, static_cast<uint32>(BrandId::COUNT) - 1);
+            return false;
+        }
+
+        uint32 const rankId = rankArg.value_or(0);
+        if (rankId >= static_cast<uint32>(SourceRank::COUNT))
+        {
+            handler->SendErrorMessage("Rank must be 0..{} (0=RaidBoss,1=DungeonHeroic,2=DungeonNormal,3=TrashMote).",
+                static_cast<uint32>(SourceRank::COUNT) - 1);
+            return false;
+        }
+
+        uint32 const account = player->GetSession()->GetAccountId();
+        bool unlocked = false;
+        double const granted = sInsightMgr->Earn(account, brand, static_cast<SourceRank>(rankId), &unlocked);
+
+        handler->PSendSysMessage("Granted {:.4f} Insight to {} (total {:.4f}).",
+            granted, BrandName(brand), sInsightMgr->Points(account, brand));
+        if (unlocked)
+            handler->PSendSysMessage("Threshold reached -- Knowledge for {} unlocked for account {}.",
+                BrandName(brand), account);
         return true;
     }
 

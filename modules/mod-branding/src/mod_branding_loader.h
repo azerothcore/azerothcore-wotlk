@@ -19,6 +19,7 @@ void AddBrandingDiscoverableScripts();
 void AddBrandingItemScripts();
 void AddBrandingEffectScripts();
 void AddBrandingCatalystScripts();
+void AddBrandingInsightScripts();
 void AddBrandingAddonScripts();
 void AddBrandingCommandScripts();
 
