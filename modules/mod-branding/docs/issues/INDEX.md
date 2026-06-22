@@ -77,8 +77,8 @@ See [../ARCHITECTURE.md](../ARCHITECTURE.md) for the full spec. Section refs (§
 - **Batch F (selection economy, after #01+#07):** #17 mastery-selection-economy.
 - **Batch G (heroic overlay):** #23 heroic-tier-core first (pure), then #24 + #25 in parallel worktrees.
 - **Batch H (invasion crowd scaling):** #26 — **complete**: pure `src/core/branding/scaling/Invasion*`,
-  EventMgr roster + EventScheduler multi-tier reconcile, `InvasionScalingMgr` damage+health hooks, and
-  the authoring-tool `SpawnTier` emitter. Noted refinements: dynamic health re-scale, GUI tier UI.
+  EventMgr roster + EventScheduler multi-tier reconcile, `InvasionScalingMgr` live damage + dynamic
+  health, the authoring-tool `SpawnTier` emitter, and the GUI tier editor.
 - **Needs design input:** #14 xp-balance-sim; #17 has open *[DEFAULT]* decisions (title path, tuition curve).
 
 ## Cross-cutting note

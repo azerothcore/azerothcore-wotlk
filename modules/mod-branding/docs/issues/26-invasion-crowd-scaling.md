@@ -1,6 +1,6 @@
 # #26 — Invasion crowd scaling (§2.5)
 
-**Status:** complete (`-fsyntax-only` + pytest/ruff + codestyle verified) — dynamic health re-scale + GUI tier-editing are noted refinements · **Deps:** §2.2 group-size core (done, pure); **#10 event-spawn-wiring (merged)**; **#12 persistence (merged)** · **Size:** L
+**Status:** complete (`-fsyntax-only` + pytest/ruff + codestyle verified) · **Deps:** §2.2 group-size core (done, pure); **#10 event-spawn-wiring (merged)**; **#12 persistence (merged)** · **Size:** L
 
 ## Progress
 - **Pure core** (`src/core/branding/scaling/Invasion*`) — `CrowdTracker`, `ActiveSpawnTiers`/`ReconcileSpawnTiers`, `LiveContainmentGoal`, `InvasionTrashMul`; 18 GoogleTests. **Done.**
@@ -8,8 +8,9 @@
 - **26b** — `EventScheduler` multi-tier reconcile (hysteresis) + live containment goal (`EventMgr::SetGoal`). **Done.**
 - **26c** — `InvasionScalingMgr` + `UnitScript` (damage) + `AllCreatureScript` (health): an invasion creature's OUTGOING damage scales by crowd live per hit (boss via §2.2 `EncounterDamageMul`, trash via `InvasionTrashMul`); max health is scaled at spawn (`OnCreatureAddWorld`, snapshot, boss via `EncounterHealthMul`). **Done.**
 - **Authoring-tool emitter** (Python) — `SpawnTier` model + `Spawn.tier`; emitter writes the new `branding_event_spawn` columns and one manual spawn group + mapping row **per tier**; the generated SQL passes `codestyle-sql.py`. 41 pytest green, ruff clean. **Done.**
+- **Dynamic health** — `InvasionScalingMgr::ApplyHealth` (idempotent, reverses as the crowd shrinks) is applied at spawn AND from the scheduler whenever effective headcount changes: it walks each active tier's `spawn_group` → spawn id → live `Creature*` and re-scales. A boss's pool grows as the raid gathers and shrinks if they leave. **Done.**
+- **GUI tier editing** — new **Spawn tiers** dock (add/remove/edit name·min_participants·goal_contribution, with spawn-index fix-up on removal) + a **Spawn tier** selector in the Properties panel. 48 pytest (incl. offscreen GUI) + ruff green. **Done.**
 - **Incidental fix** — production `ScalingConfig` was abstract (missing the §2.4.3 currency dials the interface declared); implemented so the worldserver build links. Surfaced by `-fsyntax-only`; module CI runs no full build.
-- **Noted refinements (not blocking)** — (1) dynamic health re-scale as the crowd changes (currently a spawn snapshot per §2.3 Risk #4); (2) GUI tier-assignment UI (the model + emitter support tiers; projects can author them via the `.invasion` JSON today).
 
 ## Context
 Open-world invasions (§9.1 `EventType::Invasion`) have a **fluctuating** population, unlike the

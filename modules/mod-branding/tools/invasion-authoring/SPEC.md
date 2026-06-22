@@ -20,6 +20,8 @@ the event's creatures on cycle (`Map::SpawnGroupSpawn`/`Despawn`). The group use
 In scope:
 - Visual editor over a **calibrated per-zone image** (world X/Y ↔ pixels).
 - Draw/edit **waypoint paths** (mob-style moving invasions) and place idle **boss** spawns.
+- Author **additive spawn tiers** (§2.5.3): edit each tier's threshold + goal contribution and assign
+  spawns to a tier, so the invasion spawns more mobs as the enrolled crowd grows.
 - Pick creature templates from a **read-only live `acore_world`** connection.
 - Save/load authoring projects (`.invasion`, JSON).
 - Export one `rev_*.sql` writing: `branding_event_def`, `creature`, `waypoint_data`,
