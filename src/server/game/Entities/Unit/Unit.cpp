@@ -11329,22 +11329,7 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
 
     if (forced && IsClientControlled())
     {
-        Player* player = const_cast<Player*>(GetClientControlling());
-        uint32 const counter = player->GetSession()->GetOrderCounter();
-
-        // register forced speed changes for WorldSession::HandleForceSpeedChangeAck
-        // and do it only for real sent packets and use run for run/mounted as client expected
-        ++player->m_forced_speed_changes[mtype];
-
-        WorldPacket data(speedOpcodes[static_cast<size_t>(SpeedOpcodeIndex::PC)], 18);
-        data << GetPackGUID();
-        data << counter;
-        if (mtype == MOVE_RUN)
-            data << uint8(0);                           // new 2.1.0
-
-        data << GetSpeed(mtype);
-        player->GetSession()->SendPacket(&data);
-        player->GetSession()->IncrementOrderCounter();
+        SendSpeedToController(mtype, const_cast<Player*>(GetClientControlling()));
     }
     else if (forced)
     {
@@ -11375,6 +11360,24 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
         }
         ToPlayer()->SetCanTeleport(true);
     }
+}
+
+void Unit::SendSpeedToController(UnitMoveType mtype, Player* target) const
+{
+    SpeedOpcodePair const& speedOpcodes = SetSpeed2Opc_table[mtype];
+    uint32 const counter = target->GetSession()->GetOrderCounter();
+
+    ++target->m_forced_speed_changes[mtype];
+
+    WorldPacket data(speedOpcodes[static_cast<size_t>(SpeedOpcodeIndex::PC)], 18);
+    data << GetPackGUID();
+    data << counter;
+    if (mtype == MOVE_RUN)
+        data << uint8(0);
+
+    data << GetSpeed(mtype);
+    target->GetSession()->SendPacket(&data);
+    target->GetSession()->IncrementOrderCounter();
 }
 
 void Unit::setDeathState(DeathState s, bool despawn)
@@ -14698,6 +14701,10 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
     _oldFactionId = GetFaction();
     SetFaction(charmer->GetFaction());
 
+    // snapshot current speed rates so we can detect speed changes
+    for (uint8 i = MOVE_WALK; i < MAX_MOVE_TYPE; ++i)
+        _charmStartSpeedRate[i] = m_speed_rate[i];
+
     // Set charmed
     charmer->SetCharm(this, true);
 
@@ -14849,9 +14856,6 @@ void Unit::RemoveCharmedBy(Unit* charmer)
     CastStop();
     AttackStop();
 
-    // xinef: update speed after charming
-    UpdateSpeed(MOVE_RUN, false);
-
     // xinef: do not break any controlled motion slot
     if (GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) == NULL_MOTION_TYPE)
     {
@@ -14954,7 +14958,15 @@ void Unit::RemoveCharmedBy(Unit* charmer)
         RemoveUnitMovementFlag(MOVEMENTFLAG_FLYING);
     }
     else
-        ToPlayer()->SetClientControl(this, true); // verified
+    {
+        Player* targetPlayer = ToPlayer();
+        targetPlayer->SetClientControl(this, true); // verified
+
+        // Re-sync only the speed types that changed during the charm.
+        for (uint8 i = MOVE_WALK; i < MAX_MOVE_TYPE; ++i)
+            if (m_speed_rate[i] != _charmStartSpeedRate[i])
+                SendSpeedToController(UnitMoveType(i), targetPlayer);
+    }
 
     // a guardian should always have charminfo
     if (playerCharmer && this != charmer->GetFirstControlled())

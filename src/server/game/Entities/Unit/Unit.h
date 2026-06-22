@@ -1744,6 +1744,7 @@ public:
     [[nodiscard]] float GetSpeedRate(UnitMoveType mtype) const { return m_speed_rate[mtype]; }
     void SetSpeed(UnitMoveType mtype, float rate, bool forced = false);
     void SetSpeedRate(UnitMoveType mtype, float rate) { m_speed_rate[mtype] = rate; }
+    void SendSpeedToController(UnitMoveType mtype, Player* target) const;
 
     void propagateSpeedChange() { GetMotionMaster()->propagateSpeedChange(); }
 
@@ -2185,6 +2186,9 @@ protected:
     VisibleAuraMap m_visibleAuras;
 
     float m_speed_rate[MAX_MOVE_TYPE];
+
+    // snapshot of speed rates taken when SetCharmedBy() is called
+    float _charmStartSpeedRate[MAX_MOVE_TYPE]{};
 
     CharmInfo* m_charmInfo;
     SharedVisionList m_sharedVision;
