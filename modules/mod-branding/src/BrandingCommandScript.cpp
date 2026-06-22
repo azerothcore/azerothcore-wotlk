@@ -187,6 +187,10 @@ public:
             levelTarget, sHeroicMgr->HealthMulFor(map),
             sHeroicMgr->DamageMulFor(map), sHeroicMgr->TierBonusFor(map));
 
+        HeroicMgr::RewardModifiers const mods = sHeroicMgr->RewardModifiersFor(map);
+        handler->PSendSysMessage("  reward: currencyMul={:.2f}, tierBonus={} (instanced stream; not the event path).",
+            mods.currencyMul, mods.tierBonus);
+
         if (uint8 const minBodies = sHeroicMgr->RecommendedMinBodies(map->GetId(), 0))
         {
             handler->PSendSysMessage("  advisory: recommended >= {} players. {}",

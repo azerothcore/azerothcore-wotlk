@@ -43,6 +43,18 @@ namespace Branding
         double DamageMulFor(Map* map);
         uint8_t TierBonusFor(Map* map);
 
+        // Reward adjustments for a heroic/small-group instance run (§2.4.3 currency reduction +
+        // §2.4.2 tier bump), for a future instanced boss-reward trigger to consume. Currency reduction
+        // comes from the instance's body-count vs intended size; tier bonus from the heroic overlay.
+        // Identity ({1.0, 0}) outside instances or when disabled. Does NOT touch the §9 invasion/event
+        // reward stream (kept decoupled).
+        struct RewardModifiers
+        {
+            double currencyMul = 1.0;
+            uint8_t tierBonus = 0;
+        };
+        RewardModifiers RewardModifiersFor(Map* map);
+
         // Advisory recommended group size for a map/boss (0 = no advice). §2.4.6.
         uint8_t RecommendedMinBodies(uint32_t mapId, uint32_t bossEntry) const;
         std::string ExceptionNote(uint32_t mapId, uint32_t bossEntry) const;
@@ -53,6 +65,9 @@ namespace Branding
         static bool HasNativeHeroic(Map* map);
         static SelectedDifficulty ResolveSelected(Player* player, bool isRaid);
         HeroicContext Resolve(Map* map) const;
+
+        static uint8_t InstancePlayerCount(Map* map);   // non-GM bodies present (the group size)
+        static uint8_t InstanceContentSize(Map* map);    // the instance's intended size (0 = unknown)
 
         static uint64_t Key(uint32_t mapId, uint32_t bossEntry)
         {

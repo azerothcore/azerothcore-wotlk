@@ -250,6 +250,11 @@ With group fraction `r = groupSize / contentSize` (e.g. 5-man MC ⇒ `r = 0.125`
   the §2.2 group reward scale).
 - The heroic overlay then multiplies tier/quantity/currency **up** by the heroic bonus, applied per
   player through the existing §9.4 personal-loot delivery path (no tagging).
+- **Stream separation:** this is the *instanced* reward path. It is **decoupled** from the §9
+  open-world invasion/event contribution rewards (`EventMgr::ResolveReward`) — heroic dungeons/raids
+  and invasions are distinct reward streams that only share the §2.2 `RewardScale` math. The heroic
+  modifiers are exposed via `HeroicMgr::RewardModifiersFor` (issue #25) for an instanced boss-reward
+  trigger to consume; the trigger lands with the §2.2 instanced-reward wiring.
 
 ### 2.4.4 Composition order (all independent)
 

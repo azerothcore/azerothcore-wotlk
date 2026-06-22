@@ -1,4 +1,5 @@
 #include "HeroicMgr.h"
+#include "ScalingMgr.h"
 #include "DBCStores.h"
 #include "DatabaseEnv.h"
 #include "Field.h"
@@ -7,6 +8,7 @@
 #include "Map.h"
 #include "Player.h"
 #include "QueryResult.h"
+#include <algorithm>
 
 namespace Branding
 {
@@ -141,6 +143,49 @@ namespace Branding
     uint8_t HeroicMgr::TierBonusFor(Map* map)
     {
         return HeroicTierBonus(ContextFor(map), _config);
+    }
+
+    uint8_t HeroicMgr::InstancePlayerCount(Map* map)
+    {
+        uint32_t count = 0;
+        for (auto const& it : map->GetPlayers())
+        {
+            if (Player* player = it.GetSource())
+            {
+                if (!player->IsGameMaster())
+                {
+                    ++count;
+                }
+            }
+        }
+
+        return static_cast<uint8_t>(std::min<uint32_t>(count, 255));
+    }
+
+    uint8_t HeroicMgr::InstanceContentSize(Map* map)
+    {
+        if (InstanceMap* instance = map->ToInstanceMap())
+        {
+            if (uint32 const maxPlayers = instance->GetMaxPlayers())
+            {
+                return static_cast<uint8_t>(std::min<uint32>(maxPlayers, 255));
+            }
+        }
+
+        return 0;   // unknown intended size -> caller treats as no reduction
+    }
+
+    HeroicMgr::RewardModifiers HeroicMgr::RewardModifiersFor(Map* map)
+    {
+        RewardModifiers mods;   // identity {1.0, 0}
+        if (!Enabled() || !map || !map->IsDungeon())
+        {
+            return mods;
+        }
+
+        mods.tierBonus = TierBonusFor(map);
+        mods.currencyMul = sScalingMgr->CurrencyMulForGroup(InstancePlayerCount(map), InstanceContentSize(map));
+        return mods;
     }
 
     uint8_t HeroicMgr::RecommendedMinBodies(uint32_t mapId, uint32_t bossEntry) const

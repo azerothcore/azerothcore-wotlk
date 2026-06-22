@@ -12,4 +12,15 @@ namespace Branding
             return RewardTier::Bronze;
         return RewardTier::None;
     }
+
+    RewardTier BumpTier(RewardTier base, uint8_t bonus)
+    {
+        if (base == RewardTier::None || bonus == 0)
+            return base;
+
+        uint32_t const bumped = static_cast<uint32_t>(base) + bonus;
+        uint32_t const capped = bumped < static_cast<uint32_t>(RewardTier::Gold)
+            ? bumped : static_cast<uint32_t>(RewardTier::Gold);
+        return static_cast<RewardTier>(capped);
+    }
 }
