@@ -30,33 +30,51 @@ namespace Branding
         return type == EventType::Invasion;
     }
 
+    bool InvasionScalingMgr::ResolveCrowd(Creature* creature, uint32_t& headcount, bool& isBoss) const
+    {
+        if (!Enabled() || !creature)
+            return false;
+
+        if (!InActiveInvasion(creature))
+            return false;
+
+        headcount = sEventMgr->EffectiveHeadcount(creature->GetZoneId());
+        isBoss = creature->isWorldBoss() || creature->isElite();
+        return true;
+    }
+
     double InvasionScalingMgr::OutgoingMultiplierFor(Creature* attacker) const
     {
-        if (!Enabled() || !attacker)
+        uint32_t headcount = 0;
+        bool isBoss = false;
+        if (!ResolveCrowd(attacker, headcount, isBoss))
             return 1.0;
 
-        if (!InActiveInvasion(attacker))
-            return 1.0;
+        // Boss / mini-boss: full §2.2 curve -- softer for a small crowd, rising to the authored
+        // difficulty at the intended size. Trash: the gentle invasion curve.
+        double const mul = isBoss
+            ? EncounterDamageMul(GroupContext{
+                  static_cast<uint8_t>(std::min<uint32_t>(headcount, _invConfig.IntendedInvasionSize())),
+                  _invConfig.IntendedInvasionSize()}, _scaling)
+            : InvasionTrashMul(headcount, _invConfig);
 
-        uint32_t const headcount = sEventMgr->EffectiveHeadcount(attacker->GetZoneId());
-
-        // Boss / mini-boss (worldboss or elite): full §2.2 curve -- softer for a small crowd, rising
-        // to the authored difficulty at the intended size. Trash: the gentle invasion curve.
-        double mul;
-        if (attacker->isWorldBoss() || attacker->isElite())
-        {
-            GroupContext const group{
-                static_cast<uint8_t>(std::min<uint32_t>(headcount, _invConfig.IntendedInvasionSize())),
-                _invConfig.IntendedInvasionSize()};
-            mul = EncounterDamageMul(group, _scaling);
-        }
-        else
-            mul = InvasionTrashMul(headcount, _invConfig);
-
-        LOG_DEBUG("module.branding", "InvasionScalingMgr: x{:.3f} on {} (headcount {}, {})",
-            mul, attacker->GetGUID().ToString(), headcount,
-            (attacker->isWorldBoss() || attacker->isElite()) ? "boss" : "trash");
+        LOG_DEBUG("module.branding", "InvasionScalingMgr: dmg x{:.3f} on {} (headcount {}, {})",
+            mul, attacker->GetGUID().ToString(), headcount, isBoss ? "boss" : "trash");
 
         return mul;
+    }
+
+    double InvasionScalingMgr::HealthMultiplierFor(Creature* creature) const
+    {
+        uint32_t headcount = 0;
+        bool isBoss = false;
+        if (!ResolveCrowd(creature, headcount, isBoss))
+            return 1.0;
+
+        return isBoss
+            ? EncounterHealthMul(GroupContext{
+                  static_cast<uint8_t>(std::min<uint32_t>(headcount, _invConfig.IntendedInvasionSize())),
+                  _invConfig.IntendedInvasionSize()}, _scaling)
+            : InvasionTrashMul(headcount, _invConfig);
     }
 }

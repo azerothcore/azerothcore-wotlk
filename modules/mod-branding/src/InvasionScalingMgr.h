@@ -30,13 +30,23 @@ namespace Branding
         bool Enabled() const { return _invConfig.Enabled(); }
 
         // OUTGOING-damage multiplier for an invasion creature; 1.0 when disabled, not in an active
-        // invasion, or (for trash at a solo crowd) simply the authored baseline.
+        // invasion, or (for trash at a solo crowd) simply the authored baseline. Recomputed live per
+        // hit, so the boss/trash damage tracks the current crowd.
         double OutgoingMultiplierFor(Creature* attacker) const;
+
+        // Max-health multiplier for an invasion creature, applied once at spawn (snapshot-not-pull,
+        // §2.3 Risk #4). Boss/elite via §2.2 EncounterHealthMul (<=1.0, softer for a small crowd);
+        // trash via InvasionTrashMul (>=1.0). 1.0 when disabled / not an active invasion.
+        double HealthMultiplierFor(Creature* creature) const;
 
     private:
         InvasionScalingMgr() = default;
 
-        // §2.5.1 gate: an Invasion event is active in the creature's zone (mirrors MasteryEnemyMgr).
+        // Shared gate + classification. Returns false (no scaling) when disabled or the creature is
+        // not in an active invasion; otherwise fills the effective crowd headcount and boss/trash
+        // class. §2.5.1 gate: an Invasion event is active in the creature's zone (mirrors
+        // MasteryEnemyMgr); a later per-creature invasion-roster tag would slot in here.
+        bool ResolveCrowd(Creature* creature, uint32_t& headcount, bool& isBoss) const;
         static bool InActiveInvasion(Creature const* creature);
 
         ScalingConfig _scaling;            // §2.2 group dials, reused for the boss curve

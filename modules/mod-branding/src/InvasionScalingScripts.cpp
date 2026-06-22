@@ -2,6 +2,7 @@
 #include "mod_branding_loader.h"
 #include "Creature.h"
 #include "ScriptMgr.h"
+#include <algorithm>
 
 using namespace Branding;
 
@@ -57,8 +58,38 @@ private:
     }
 };
 
+// §2.5.1 health lever: an invasion creature's max health is scaled once when it enters the world
+// (snapshot-not-pull, §2.3 Risk #4). Boss/elite via the §2.2 EncounterHealthMul curve (softer for a
+// small crowd), trash via the gentle InvasionTrashMul. Applied relative to GetCreateHealth() so a
+// grid reload re-applies the same target rather than compounding; the current-health % is preserved.
+class BrandingInvasionScalingCreatureScript : public AllCreatureScript
+{
+public:
+    BrandingInvasionScalingCreatureScript() : AllCreatureScript("BrandingInvasionScalingCreatureScript") { }
+
+    void OnCreatureAddWorld(Creature* creature) override
+    {
+        if (!sInvasionScalingMgr->Enabled() || !creature)
+            return;
+
+        double const mul = sInvasionScalingMgr->HealthMultiplierFor(creature);
+        if (mul == 1.0)
+            return;
+
+        uint32 const base = creature->GetCreateHealth();
+        if (base == 0)
+            return;
+
+        float const pct = creature->GetHealthPct();
+        uint32 const target = std::max<uint32>(1, static_cast<uint32>(base * mul));
+        creature->SetMaxHealth(target);
+        creature->SetHealth(static_cast<uint32>(target * pct / 100.0f));
+    }
+};
+
 void AddBrandingInvasionScalingScripts()
 {
     new BrandingInvasionScalingWorldScript();
     new BrandingInvasionScalingUnitScript();
+    new BrandingInvasionScalingCreatureScript();
 }
