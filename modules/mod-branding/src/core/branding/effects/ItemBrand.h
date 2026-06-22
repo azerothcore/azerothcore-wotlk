@@ -19,6 +19,7 @@ namespace Branding
         virtual double IntensityPerLevel() const = 0;     // intensity added per internal level
         virtual uint32_t UpgradeCostPerLevel() const = 0; // economy resources per internal level
         virtual uint32_t AccountKnowledgeCost() const = 0;// for the difficulty-ordering invariant
+        virtual double StatBonusAtMaxRank() const = 0;    // total flat-stat bonus at full upgrade, e.g. 0.25 = +25% (§7.9)
         virtual uint8_t ArchetypesAtLevel(uint8_t profLevel) const = 0; // proc archetypes unlocked
     };
 
@@ -50,6 +51,18 @@ namespace Branding
     // Anti-P2W: item intensity contributes only when the current account can express the brand
     // (§1/§7.5). A traded/maxed branded item is inert without account access.
     double ResolvedItemEffectIntensity(ItemBrandState const& state, bool canExpress, IItemBrandConfig const& cfg);
+
+    // Modest flat-stat MULTIPLIER from Brand Rank progression (§7.9 amended). 1.0 at rank 0, rising
+    // linearly with upgrade progress to exactly 1 + StatBonusAtMaxRank() at the fully-upgraded state.
+    // The single tuning knob is that headline percentage (e.g. 0.25 -> a maxed item is +25% stats);
+    // the per-level step is derived, so the end-state is always what the designer set. Deliberately
+    // modest -- the base item stays modest and the proc intensity (ItemEffectIntensity) remains the
+    // primary power source (§1 anti-obsolescence). Multiplies the item's base stats; never the sole power.
+    double ItemStatScale(ItemBrandState const& state, IItemBrandConfig const& cfg);
+
+    // Anti-P2W gate, mirroring ResolvedItemEffectIntensity: without account access the upgrade bonus
+    // falls away and the item keeps only its base stats (multiplier 1.0), never the upgraded delta.
+    double ResolvedItemStatScale(ItemBrandState const& state, bool canExpress, IItemBrandConfig const& cfg);
 
     // Player-selected proc loadout (§7.9).
     struct BrandLoadout

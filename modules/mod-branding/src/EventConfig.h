@@ -63,7 +63,7 @@ namespace Branding
         uint32_t _accountCurrencyCeiling = 500;
         uint64_t _accountCeilingPeriodSeconds = 86400;
 
-        uint32_t _rewardMaterialItem = 2589;   // Linen Cloth (placeholder reward material)
+        uint32_t _rewardMaterialItem = 190000;   // Branding Material (mirrors Economy.MaterialItemId, §16.3)
     };
 }
 

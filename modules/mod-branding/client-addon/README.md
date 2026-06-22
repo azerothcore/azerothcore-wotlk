@@ -43,6 +43,17 @@ native talent-frame tab:** a native tab would require client DBC + secure-frame 
 that toggles a **separate, unprotected** Mastery frame — the talent frame itself is never modified,
 so there is no taint.
 
+## Native crafting DBC patch (issue #29)
+
+Native profession crafting of Branded items adds custom craft **spells**, which the client only
+recognises if its `Spell.dbc` / `SkillLineAbility.dbc` carry them. That patch is a **separate client
+deliverable that ships in the same MPQ** as this addon — generate and build it with
+[`tools/branding-craft`](../tools/branding-craft/) (`spell-csv` / `skill-csv` + the MPQ steps in that
+README). It must be **versioned with the server build**: a craft spell the client lacks is uncastable,
+one the server lacks is rejected. Skip the DBC patch and the recipes simply won't appear in the
+profession window — the server-only `.branding craft <id>` path keeps working as the documented
+fallback.
+
 ## Server side
 
 Enable the transport in `mod_branding.conf`:

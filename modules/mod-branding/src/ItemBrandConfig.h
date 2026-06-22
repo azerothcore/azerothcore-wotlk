@@ -22,6 +22,7 @@ namespace Branding
         double IntensityPerLevel() const override { return _intensityPerLevel; }
         uint32_t UpgradeCostPerLevel() const override { return _upgradeCostPerLevel; }
         uint32_t AccountKnowledgeCost() const override { return _accountKnowledgeCost; }
+        double StatBonusAtMaxRank() const override { return _statBonusAtMaxRank; }
 
         // Number of proc archetypes unlocked at this proficiency level (§7.9 loadout gating):
         // BaseArchetypes + profLevel / ArchetypeLevelStep, capped at MaxArchetypes.
@@ -34,6 +35,7 @@ namespace Branding
         double _intensityPerLevel = 0.05;
         uint32_t _upgradeCostPerLevel = 100;
         uint32_t _accountKnowledgeCost = 100000;
+        double _statBonusAtMaxRank = 0.25;
 
         uint8_t _baseArchetypes = 1;
         uint8_t _archetypeLevelStep = 10;

@@ -131,6 +131,50 @@ TEST(ItemBrand, TradedMaxedItemInertWithoutAccess)
     EXPECT_DOUBLE_EQ(ResolvedItemEffectIntensity(maxed, false, cfg), 0.0);
 }
 
+// §7.9 amended: a small, capped flat-stat multiplier scales with Brand Rank (noticeable per level,
+// modest overall -- the proc intensity stays the primary power source, §1).
+TEST(ItemBrand, StatScaleIsUnityAtRankZero)
+{
+    FakeItemBrandConfig cfg;
+    ItemBrandState fresh{ BrandId::Fire, 0, 0, 0 };
+    EXPECT_DOUBLE_EQ(ItemStatScale(fresh, cfg), 1.0);
+}
+
+TEST(ItemBrand, StatScaleMonotonicAndBounded)
+{
+    FakeItemBrandConfig cfg;
+    ItemBrandState a{ BrandId::Fire, 0, 0, 0 };
+    ItemBrandState b{ BrandId::Fire, 0, 3, 0 };
+    ItemBrandState c{ BrandId::Fire, 2, 0, 0 };
+    ItemBrandState maxed{ BrandId::Fire, cfg.maxStep, cfg.levelsPerStep, 0 };
+    EXPECT_LT(ItemStatScale(a, cfg), ItemStatScale(b, cfg));
+    EXPECT_LT(ItemStatScale(b, cfg), ItemStatScale(c, cfg));
+    EXPECT_GE(ItemStatScale(maxed, cfg), ItemStatScale(c, cfg));
+    EXPECT_LE(ItemStatScale(maxed, cfg), 1.5);
+}
+
+// The headline knob is the end-state: a fully-upgraded item is exactly 1 + StatBonusAtMaxRank, so a
+// designer tunes the single percentage and the whole curve follows.
+TEST(ItemBrand, StatScaleHitsConfiguredMaxBonusWhenFullyUpgraded)
+{
+    FakeItemBrandConfig cfg;
+    cfg.statBonusAtMaxRank = 0.30;
+    ItemBrandState maxed{ BrandId::Fire, cfg.maxStep, cfg.levelsPerStep, 0 };
+    EXPECT_DOUBLE_EQ(ItemStatScale(maxed, cfg), 1.30);
+
+    cfg.statBonusAtMaxRank = 0.0;   // knob fully disables stat scaling
+    EXPECT_DOUBLE_EQ(ItemStatScale(maxed, cfg), 1.0);
+}
+
+TEST(ItemBrand, StatScaleBonusGatedByAccess)
+{
+    FakeItemBrandConfig cfg;
+    ItemBrandState maxed{ BrandId::Fire, cfg.maxStep, cfg.levelsPerStep, 0 };
+    // With access the bonus applies; without it the item keeps only its base stats (multiplier 1.0).
+    EXPECT_GT(ResolvedItemStatScale(maxed, true, cfg), 1.0);
+    EXPECT_DOUBLE_EQ(ResolvedItemStatScale(maxed, false, cfg), 1.0);
+}
+
 // === Loadout (§7.9) ===
 
 TEST(ItemBrand, LoadoutValidWhenUnlockedAndArchetypeInRange)

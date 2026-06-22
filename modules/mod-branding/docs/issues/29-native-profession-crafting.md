@@ -1,7 +1,18 @@
 # #29 — Native profession crafting for Branded items (§8.6.1, client-coupled)
 
-**Status:** open · **Deps:** #27 (output items, resources, `branding_recipe` mirror) · **Parallel-safe:** partially (client work isolated) · **Size:** L
+**Status:** implemented (server SQL + single-source tool + docs); client MPQ is a manual build step ·
+**Deps:** #27 (output items, resources, `branding_recipe` mirror) · **Parallel-safe:** partially (client work isolated) · **Size:** L
 **Companion:** #27 (server-side content/bind/upgrade half)
+
+> **Implementation note.** All recipes are defined once in `tools/branding-craft`
+> (`src/branding_craft/catalog.py`), which generates the server `spell_dbc` / `skilllineability_dbc` /
+> `item_template` rows (`modules/mod-branding/data/sql/db-world/2026_06_22_00_native_craft.sql`) and the
+> client `Spell.dbc` / `SkillLineAbility.dbc` patch CSVs, with `branding-craft validate` guarding the
+> reagent lockstep in CI. Correction to the scope below: AzerothCore's DBC-override tables are
+> **`spell_dbc`** and **`skilllineability_dbc`** (`DBCStores.cpp` `LoadFromDB`), not a
+> `skill_line_ability` table. The only step not reproducible in-repo is merging the CSVs into the
+> binary client DBCs + packing the MPQ (needs an extracted 3.3.5a client) — documented in the tool
+> README.
 
 ## Context
 Decision (2026-06-22): the **initial craft** of a Branded item is done by WoW's *native* crafting engine

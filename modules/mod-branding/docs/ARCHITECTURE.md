@@ -827,12 +827,23 @@ ItemUpgradeResult ApplyItemUpgrade(ItemBrandState&, uint32_t resources, IBrandin
 
 **Invariants (tested):**
 - `ItemEffectIntensity` is monotonic non-decreasing in `(step, levelInStep)`, bounded by a cap — and
-  scales **behavior/proc intensity only**, asserted to contribute *no* flat character-stat delta.
+  scales **behavior/proc intensity only**, asserted to contribute *no* flat character-stat delta. The
+  proc is and stays the primary power source.
+- **Modest stat scaling (amended).** `ItemStatScale` adds a *small, bounded* flat-stat MULTIPLIER on
+  top — linear from `1.0` at rank 0 to exactly `1 + StatBonusAtMaxRank` when fully upgraded — so an
+  upgraded item feels a little stronger per Brand Rank without becoming the power source. The single
+  tuning knob is that headline percentage (`Branding.Item.StatBonusAtMaxRank`, default `0.25` = +25%
+  at max; the per-level step is derived, and `0` disables it). Monotonic, unity at rank 0, **modest by
+  design**. This refines §1: the *primary* power is still the proc, never the base stats; the stat bump
+  is a secondary, capped progression feel, not a raid-BiS clone. Branded items are BoA, so the bump
+  never enters the cross-account market.
 - Filling `levelInStep == cfg.LevelsPerStep` advances `step` (resets level), up to `cfg.MaxStep`.
 - **Difficulty ordering**: cumulative upgrade cost to max an item's brand `<` cumulative cost to
   unlock account-side Knowledge for that brand (item branding is *hard but easier than account*).
-- **Anti-P2W**: item intensity contributes to the effect only when `CanExpressBrand(currentAccount)`
-  — a traded/maxed branded item is inert on an account lacking the Knowledge (`ItemBrand_TradedMaxed_InertWithoutAccess`).
+- **Anti-P2W**: item intensity *and* the stat-scale bonus contribute only when
+  `CanExpressBrand(currentAccount)` — a traded/maxed branded item is inert (proc) and keeps only its
+  base stats (`ResolvedItemStatScale → 1.0`) on an account lacking the Knowledge
+  (`ItemBrand_TradedMaxed_InertWithoutAccess`, `ItemBrand_StatScaleBonusGatedByAccess`).
 
 The adapter layer (Slice 7) maps these decisions onto AzerothCore: exposure windows → debuff auras
 + proc-frequency modification; personal spikes → tank survivability auras; mechanic transforms →
@@ -2056,6 +2067,19 @@ representation.)
   collide with other modules or upstream content: resources `190000–190001` (Material, Fragment),
   Branded outputs `190010+`, recipe patterns `190050+`. Map every entry to a `Branding.<Sub>.*ItemId`
   config key (§16.3); never hard-code an entry in C++.
+- **Custom craft spells — reserved band `1900000–1900099`** (decided, #29). Native profession craft
+  spells (`SPELL_EFFECT_CREATE_ITEM`) sit far above the 3.3.5a shipped spell-id range so a Branded
+  recipe can never collide with a Blizzard spell; the matching `skilllineability_dbc` mapping rows use
+  `1900100–1900199`. Both are injected server-side via AzerothCore's DBC-override world tables
+  **`spell_dbc`** and **`skilllineability_dbc`** (`DBCStores.cpp` `LoadFromDB`) — *not* a
+  `skill_line_ability` table (that name does not exist). The client gets the same rows from the
+  `Spell.dbc`/`SkillLineAbility.dbc` patch shipped in the module MPQ; both halves are generated from a
+  single catalog (`tools/branding-craft`) so reagents cannot drift.
+- **Module content SQL home.** Module-owned content (resources, Branded outputs, recipe patterns,
+  craft-spell DBC rows) ships in `modules/mod-branding/data/sql/db-world/` (auto-imported by AC),
+  *not* the core `data/sql/updates/pending_db_*` tree — the latter is core content and its SQL linter
+  forbids `DELETE FROM item_template`. The custom `branding_recipe` table is the exception: it is
+  created and seeded in the #09 core pending rev, so its #27 repoint stays there (single home).
 - **Config** — `Branding.<Subsystem>.<Setting>` (PascalCase, dotted); a `Branding.<Subsystem>.Enable`
   toggle per subsystem under the master `Branding.Enable`; item-id mappings suffixed `ItemId`.
 - **Commands / player strings** — all under the `.branding` tree; display the §16.1 canonical nouns
