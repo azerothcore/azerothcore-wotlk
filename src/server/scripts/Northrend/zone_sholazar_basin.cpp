@@ -1089,6 +1089,24 @@ class spell_shango_tracks : public SpellScript
     }
 };
 
+// 51036 - Summon Venture Co. Pilot
+class spell_venture_pilot_summon : public SpellScript
+{
+    PrepareSpellScript(spell_venture_pilot_summon);
+
+    void SetDest(SpellDestination& dest)
+    {
+        // Spawn to the right of the caster at flight altitude (negative Y = right in local coords)
+        Position const offset = { 0.0f, -10.0f, 0.0f, 0.0f };
+        dest.RelocateOffset(offset);
+    }
+
+    void Register() override
+    {
+        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_venture_pilot_summon::SetDest, EFFECT_0, TARGET_DEST_CASTER);
+    }
+};
+
 enum ReturnedSevenfold
 {
     SPELL_FREYAS_WARD           = 51845,
@@ -1138,4 +1156,5 @@ void AddSC_sholazar_basin()
     RegisterSpellScript(spell_shango_tracks);
 
     RegisterSpellScript(spell_q12611_deathbolt);
+    RegisterSpellScript(spell_venture_pilot_summon);
 }
