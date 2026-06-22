@@ -27,6 +27,16 @@ static libraries** plus a thin adapter layer that wires those libraries into the
 - Branded items modify **XP sources/efficiency and proc behavior**, never grant proficiency directly.
 - Catalyst effects in a raid follow **diminishing returns** (1st full, 2nd reduced, 3rd+ heavy).
 - Nothing becomes obsolete: scaling + economy keep all content relevant.
+- **Profession skill gates *creation*, never *use*.** A character's trade skill (e.g. Blacksmithing 450)
+  is required to **craft / upgrade** a Branded item (`item_template.RequiredSkill`, native craft window
+  #29) — but is **never** part of the *use* gate. Activating a brand keys only on the dual-key below
+  (account Knowledge × character Proficiency); anyone can equip and fully express a Branded item.
+  Because crafted Branded items + per-school Fragments are **BoA**, you craft on whichever character has
+  the profession and mail the result account-wide — so the per-character profession gate never forces a
+  crafter-alt grind. Companion realm setting: raising `MaxPrimaryTradeSkill` (worldserver core config,
+  default 2) to 3–4 further softens the gate; it is realm-wide and out of this module's scope. The
+  one-shot **Etch** (#31) is the deliberately profession-free *creation* surface (gated on Essence cost
+  instead) for players without the profession.
 - **No pay-to-win (foundational).** Power is **dual-keyed**: account-layer *access* (Brand Knowledge
   §6, Mastery unlocks §14) × character-layer *earned proficiency* (§7). Both are required for an
   effect to fire, and expression is gated by the **current account's** access at *use* time. So
@@ -1993,7 +2003,7 @@ called out.
 | Per-item earned progression (the major step) | **Brand Rank** | item GUID | `item_branding.step`, `ItemBrandState::step` | "Brand Rank N" |
 | Progress within a Brand Rank | **(unnamed progress)** | item GUID | `ItemBrandState::levelInStep` / `upgradeProgress` | progress bar only |
 | Common crafting input (dungeon-sourced) | **Material** | item in bag/vault, **tradeable** (BoE) | `Branding.Economy.MaterialItemId`, `Resources::materials` | "Materials" |
-| Premium crafting input (raid/invasion-sourced) | **Fragment** | item, **account-bound** (BoA) | `Branding.Economy.FragmentItemId`, `Resources::fragments` | "Fragments" |
+| Premium crafting input (raid/invasion-sourced) | **Fragment** | item, **account-bound** (BoA); per-school (§16.3) | generic `Branding.Economy.FragmentItemId`; per-school `SchoolFragmentBaseItemId + BrandId`; `Resources::fragments` | "Fragments" / "<School>-Branded Fragment" |
 | Craft definition: inputs → output item | **Recipe** | native profession spell + `branding_recipe` mirror | `skill_line_ability`/`Spell.dbc`, `branding_recipe`, `RecipeBook` | "Recipe" |
 | Crafted brandable item | **Branded item** | item GUID, **account-bound** (BoA) | `item_template` (modest base), `item_branding` (#05) | "Branded <item>" |
 | Raid synergy stacking diminishing-returns mechanic | **Catalyst** | combat, per `(school, tree)` | `core/branding/catalyst/`, `RaidCatalystMultiplier` | "Catalyst (raid synergy)" |
@@ -2028,6 +2038,20 @@ config and is the right call:
   house. This narrows the §8.1 market to the common-input tier on purpose; the high-end loop is
   personal effort. Account-wide Fragments are held BoA (mailable to own characters) and/or in the
   account vault (#06). Recipe patterns are **BoP** (non-tradeable) per §8.6.1.
+- **Per-school Fragments (decided).** The premium **Fragment** is *flavoured by brand school*: one item
+  entry per `BrandId` ("Fire-Branded Fragment", "Frost-Branded Fragment", …, `SchoolFragmentBaseItemId
+  + BrandId`, Fire `190100` .. Spirit `190114`), all BoA like the generic Fragment. A recipe names its
+  school in `branding_recipe.school`; with `Branding.Economy.SchoolFragments.Enable` on, the adapter
+  consumes that school's Fragment — the "mine fire in a fire event, forge fire gear" loop the design
+  started from. **Materials stay generic** (the surviving BoE market is unchanged). This is mechanically
+  distinct (a Fire recipe needs Fire Fragments), not cosmetic, but the **pure economy core is untouched**:
+  `Resources`/`ResolveCraft` still tally a single `fragments` count; only the *adapter* (and the native
+  craft spell's `Reagent`) route which Fragment *item* a school draws from — the same DI trick that keeps
+  `core/` host-free. School `>= BrandId::COUNT` (or the feature disabled) falls back to the generic
+  Fragment, so pre-§16 recipes and configs keep working. Anti-P2W is unchanged: per-school Fragments are
+  still BoA and power still gates on account *Knowledge*, never on holding a Fragment. *(The faucet side —
+  events granting the school-aligned Fragment — is follow-up; this slice ships the crafting **sink** and
+  the resource items.)*
 - Trade-off (bag clutter, stack caps) is mitigated by the vault and generous stack sizes; no new
   client work. A custom currency table was rejected (needs bespoke UI, breaks trading, duplicates the
   inventory plumbing already built).
@@ -2062,11 +2086,14 @@ representation.)
     new recipe/content tables in `pending_db_world`.
   - *Known drift:* `account_brand_knowledge` uses `brand` rather than `branding`. It is shipped with
     data — **leave it**; do not propagate the shortened form to new tables.
-- **Custom `item_template` entries — reserved band `190000–190099`** (decided). All mod-branding
-  custom items (resources, Branded outputs, recipe patterns) draw from this band so entries can't
-  collide with other modules or upstream content: resources `190000–190001` (Material, Fragment),
-  Branded outputs `190010+`, recipe patterns `190050+`. Map every entry to a `Branding.<Sub>.*ItemId`
-  config key (§16.3); never hard-code an entry in C++.
+- **Custom `item_template` entries — reserved band `190000–190199`** (decided; widened from `190099`
+  for the per-school Fragment sub-band). All mod-branding custom items draw from this band so entries
+  can't collide with other modules or upstream content: generic resources `190000–190001` (Material,
+  Fragment), Branded outputs `190010+`, recipe patterns `190050+`, **per-school Fragments `190100–190114`**
+  (one per `BrandId`, laid out as `SchoolFragmentBaseItemId + BrandId`; sub-band reserved through
+  `190149`). Map every entry to a `Branding.<Sub>.*ItemId` config key (§16.3); never hard-code an entry
+  in C++. The per-school-Fragment base is shared by the C++ adapter (`Branding.Economy.SchoolFragmentBaseItemId`)
+  and the generator (`tools/branding-craft` `SCHOOL_FRAGMENT_BASE`) and **must** stay equal.
 - **Custom craft spells — reserved band `1900000–1900099`** (decided, #29). Native profession craft
   spells (`SPELL_EFFECT_CREATE_ITEM`) sit far above the 3.3.5a shipped spell-id range so a Branded
   recipe can never collide with a Blizzard spell; the matching `skilllineability_dbc` mapping rows use

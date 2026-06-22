@@ -66,6 +66,31 @@ class Recipe:
     char_xp: int
     req_skill_value: int      # MinSkillLineRank: skill needed to learn/craft
     trivial_high: int         # TrivialSkillLineRankHigh: skill at which the recipe greys out
+    school: int = C.BRAND_GENERIC  # BrandId of the Fragment this recipe consumes; BRAND_GENERIC keeps
+    #                                the generic Fragment. A schooled recipe consumes the per-school
+    #                                Fragment at SCHOOL_FRAGMENT_BASE + school (the "Fire-Branded
+    #                                Fragment" loop): mine fire in a fire event, forge fire gear.
+
+
+def _school_fragment(school: int) -> ResourceItem:
+    """The per-school Fragment for BrandId ``school`` (BoA, like the generic Fragment)."""
+
+    name = C.BRAND_SCHOOL_NAMES[school]
+    return ResourceItem(
+        entry=C.SCHOOL_FRAGMENT_BASE + school,
+        name=f"{name}-Branded Fragment",
+        bonding=C.BIND_TO_ACCOUNT,  # BoA -- raid/invasion-sourced, account-wide (§16.3)
+        item_class=C.ITEM_CLASS_TRADE_GOODS,
+        subclass=C.ITEM_SUBCLASS_TRADE_GOODS_CLOTH,
+        quality=C.QUALITY_RARE,
+        displayid=41111,
+        stackable=1000,
+        config_key="Branding.Economy.SchoolFragmentBaseItemId",
+    )
+
+
+# One per-school Fragment for every BrandId, in enum order (so its entry == base + index).
+SCHOOL_FRAGMENTS = [_school_fragment(i) for i in range(C.BRAND_SCHOOL_COUNT)]
 
 
 @dataclass(frozen=True)
@@ -73,23 +98,32 @@ class Catalog:
     material: ResourceItem
     fragment: ResourceItem
     recipes: list[Recipe] = field(default_factory=list)
+    school_fragments: list[ResourceItem] = field(default_factory=lambda: list(SCHOOL_FRAGMENTS))
 
     @property
     def outputs(self) -> list[BrandedItem]:
         return [r.output for r in self.recipes]
 
+    def fragment_for(self, recipe: Recipe) -> ResourceItem:
+        """The Fragment a recipe consumes: its per-school Fragment, or the generic one."""
+
+        if recipe.school < C.BRAND_SCHOOL_COUNT:
+            return self.school_fragments[recipe.school]
+        return self.fragment
+
     def reagents(self, recipe: Recipe) -> list[tuple[int, int]]:
         """(item_entry, count) reagent pairs for a recipe, in (Material, Fragment) order.
 
         This is the canonical reagent definition consumed by BOTH the spell_dbc/Spell.dbc emitter
-        and the branding_recipe mirror -- the single point that keeps them in lockstep.
+        and the branding_recipe mirror -- the single point that keeps them in lockstep. The Fragment
+        entry is the recipe's per-school Fragment (or the generic Fragment for an unschooled recipe).
         """
 
         pairs: list[tuple[int, int]] = []
         if recipe.material_count:
             pairs.append((self.material.entry, recipe.material_count))
         if recipe.fragment_count:
-            pairs.append((self.fragment.entry, recipe.fragment_count))
+            pairs.append((self.fragment_for(recipe).entry, recipe.fragment_count))
         return pairs
 
 
@@ -162,6 +196,7 @@ CATALOG = Catalog(
             char_xp=100,
             req_skill_value=350,
             trivial_high=375,
+            school=C.BRAND_NATURE,
         ),
         Recipe(
             id=2,
@@ -183,6 +218,7 @@ CATALOG = Catalog(
             char_xp=250,
             req_skill_value=400,
             trivial_high=425,
+            school=C.BRAND_FIRE,
         ),
         Recipe(
             id=3,
@@ -204,6 +240,7 @@ CATALOG = Catalog(
             char_xp=600,
             req_skill_value=450,
             trivial_high=450,
+            school=C.BRAND_ARCANE,
         ),
     ],
 )

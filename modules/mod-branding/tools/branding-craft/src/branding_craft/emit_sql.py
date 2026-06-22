@@ -56,8 +56,10 @@ def _item_template_block(cat: Catalog) -> str:
     rows: list[list] = []
     entries: list[int] = []
 
-    # Resources (trade goods). Material 4 == cloth sound/material; harmless flavour.
-    for res in (cat.material, cat.fragment):
+    # Resources (trade goods). Material 4 == cloth sound/material; harmless flavour. The generic
+    # Material/Fragment plus one per-school Fragment for every BrandId (the "Fire-Branded Fragment"
+    # loop) -- all share the resource emit shape; only bind/quality/name differ.
+    for res in (cat.material, cat.fragment, *cat.school_fragments):
         entries.append(res.entry)
         rows.append([
             res.entry, res.item_class, res.subclass, res.name, res.displayid, res.quality,
@@ -87,8 +89,11 @@ def _item_template_block(cat: Catalog) -> str:
 
 
 def _branding_recipe_block(cat: Catalog) -> str:
-    columns = ["id", "materials", "fragments", "output_item", "char_xp"]
-    rows = [[r.id, r.material_count, r.fragment_count, r.output.entry, r.char_xp] for r in cat.recipes]
+    columns = ["id", "materials", "fragments", "output_item", "char_xp", "school"]
+    rows = [
+        [r.id, r.material_count, r.fragment_count, r.output.entry, r.char_xp, r.school]
+        for r in cat.recipes
+    ]
     ids = ", ".join(str(r.id) for r in cat.recipes)
     return _insert("branding_recipe", columns, rows, f"`id` IN ({ids})")
 

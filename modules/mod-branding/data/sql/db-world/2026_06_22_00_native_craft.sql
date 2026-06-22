@@ -7,10 +7,25 @@
 
 -- #27 item_template: resources, Branded outputs, recipe patterns.
 
-DELETE FROM `item_template` WHERE `entry` IN (190000, 190001, 190010, 190011, 190012, 190050, 190051, 190052);
+DELETE FROM `item_template` WHERE `entry` IN (190000, 190001, 190100, 190101, 190102, 190103, 190104, 190105, 190106, 190107, 190108, 190109, 190110, 190111, 190112, 190113, 190114, 190010, 190011, 190012, 190050, 190051, 190052);
 INSERT INTO `item_template` (`entry`, `class`, `subclass`, `name`, `displayid`, `Quality`, `BuyPrice`, `SellPrice`, `InventoryType`, `ItemLevel`, `RequiredLevel`, `RequiredSkill`, `RequiredSkillRank`, `stackable`, `stat_type1`, `stat_value1`, `stat_type2`, `stat_value2`, `armor`, `spellid_1`, `spelltrigger_1`, `bonding`, `Material`) VALUES
     (190000, 7, 5, 'Branding Material', 6884, 1, 0, 1, 0, 0, 0, 0, 0, 1000, 0, 0, 0, 0, 0, 0, 0, 2, 4),
     (190001, 7, 5, 'Branding Fragment', 41111, 3, 0, 1, 0, 0, 0, 0, 0, 1000, 0, 0, 0, 0, 0, 0, 0, 5, 4),
+    (190100, 7, 5, 'Fire-Branded Fragment', 41111, 3, 0, 1, 0, 0, 0, 0, 0, 1000, 0, 0, 0, 0, 0, 0, 0, 5, 4),
+    (190101, 7, 5, 'Frost-Branded Fragment', 41111, 3, 0, 1, 0, 0, 0, 0, 0, 1000, 0, 0, 0, 0, 0, 0, 0, 5, 4),
+    (190102, 7, 5, 'Nature-Branded Fragment', 41111, 3, 0, 1, 0, 0, 0, 0, 0, 1000, 0, 0, 0, 0, 0, 0, 0, 5, 4),
+    (190103, 7, 5, 'Shadow-Branded Fragment', 41111, 3, 0, 1, 0, 0, 0, 0, 0, 1000, 0, 0, 0, 0, 0, 0, 0, 5, 4),
+    (190104, 7, 5, 'Arcane-Branded Fragment', 41111, 3, 0, 1, 0, 0, 0, 0, 0, 1000, 0, 0, 0, 0, 0, 0, 0, 5, 4),
+    (190105, 7, 5, 'Holy-Branded Fragment', 41111, 3, 0, 1, 0, 0, 0, 0, 0, 1000, 0, 0, 0, 0, 0, 0, 0, 5, 4),
+    (190106, 7, 5, 'Physical-Branded Fragment', 41111, 3, 0, 1, 0, 0, 0, 0, 0, 1000, 0, 0, 0, 0, 0, 0, 0, 5, 4),
+    (190107, 7, 5, 'Wind-Branded Fragment', 41111, 3, 0, 1, 0, 0, 0, 0, 0, 1000, 0, 0, 0, 0, 0, 0, 0, 5, 4),
+    (190108, 7, 5, 'Lightning-Branded Fragment', 41111, 3, 0, 1, 0, 0, 0, 0, 0, 1000, 0, 0, 0, 0, 0, 0, 0, 5, 4),
+    (190109, 7, 5, 'Blood-Branded Fragment', 41111, 3, 0, 1, 0, 0, 0, 0, 0, 1000, 0, 0, 0, 0, 0, 0, 0, 5, 4),
+    (190110, 7, 5, 'Void-Branded Fragment', 41111, 3, 0, 1, 0, 0, 0, 0, 0, 1000, 0, 0, 0, 0, 0, 0, 0, 5, 4),
+    (190111, 7, 5, 'Stone-Branded Fragment', 41111, 3, 0, 1, 0, 0, 0, 0, 0, 1000, 0, 0, 0, 0, 0, 0, 0, 5, 4),
+    (190112, 7, 5, 'Venom-Branded Fragment', 41111, 3, 0, 1, 0, 0, 0, 0, 0, 1000, 0, 0, 0, 0, 0, 0, 0, 5, 4),
+    (190113, 7, 5, 'Chrono-Branded Fragment', 41111, 3, 0, 1, 0, 0, 0, 0, 0, 1000, 0, 0, 0, 0, 0, 0, 0, 5, 4),
+    (190114, 7, 5, 'Spirit-Branded Fragment', 41111, 3, 0, 1, 0, 0, 0, 0, 0, 1000, 0, 0, 0, 0, 0, 0, 0, 5, 4),
     (190010, 4, 2, 'Branded Leather Chestguard', 48723, 2, 0, 100, 5, 187, 0, 165, 350, 1, 7, 12, 5, 8, 250, 0, 0, 5, 4),
     (190011, 4, 4, 'Branded Plate Chestpiece', 48729, 3, 0, 100, 5, 200, 0, 164, 400, 1, 7, 12, 5, 8, 250, 0, 0, 5, 4),
     (190012, 4, 1, 'Branded Cloth Robe', 48733, 3, 0, 100, 5, 213, 0, 197, 450, 1, 7, 12, 5, 8, 250, 0, 0, 5, 4),
@@ -23,8 +38,8 @@ INSERT INTO `item_template` (`entry`, `class`, `subclass`, `name`, `displayid`, 
 DELETE FROM `spell_dbc` WHERE `ID` IN (1900010, 1900011, 1900012);
 INSERT INTO `spell_dbc` (`ID`, `Attributes`, `CastingTimeIndex`, `RangeIndex`, `EquippedItemClass`, `Reagent_1`, `Reagent_2`, `ReagentCount_1`, `ReagentCount_2`, `Effect_1`, `EffectDieSides_1`, `EffectBasePoints_1`, `ImplicitTargetA_1`, `EffectItemType_1`, `Name_Lang_enUS`) VALUES
     (1900010, 64, 1, 1, -1, 190000, 0, 5, 0, 24, 1, 0, 1, 190010, 'Branded Leather Chestguard'),
-    (1900011, 64, 1, 1, -1, 190000, 190001, 10, 5, 24, 1, 0, 1, 190011, 'Branded Plate Chestpiece'),
-    (1900012, 64, 1, 1, -1, 190000, 190001, 20, 10, 24, 1, 0, 1, 190012, 'Branded Cloth Robe');
+    (1900011, 64, 1, 1, -1, 190000, 190100, 10, 5, 24, 1, 0, 1, 190011, 'Branded Plate Chestpiece'),
+    (1900012, 64, 1, 1, -1, 190000, 190104, 20, 10, 24, 1, 0, 1, 190012, 'Branded Cloth Robe');
 
 -- #29 skilllineability_dbc: craft spell -> profession skill line.
 
