@@ -723,9 +723,10 @@ Branding.Event.SchedulerEnable = 0
 
 #
 #    Branding.Effect.Enable
-#        Description: Branding combat effects (§7.9). A branded player's OUTGOING damage is boosted
-#                     by the personal multiplier during its active window (no passive uptime).
-#                     Composes on top of zone downscaling (§2.1).
+#        Description: Branding combat effects (§7.9), role-aware and windowed (no passive uptime):
+#                     dps -> bounded OUTGOING-damage window; tank -> large OUTGOING window plus an
+#                     INCOMING-damage reduction (survivability spike); healer -> wasted overheal
+#                     converted to an absorb shield. Composes on top of zone downscaling (§2.1).
 #        Default:     0 - (disabled)
 #
 
@@ -748,6 +749,27 @@ Branding.Effect.MaxRaidMul = 2.0
 #
 
 Branding.Effect.MaxEffectLevel = 50
+
+#
+#    Branding.Effect.MaxOverhealShieldFraction
+#        Description: Healer MechanicTransform cap (§7.9 #3). A branded healer's wasted overheal is
+#                     converted to a temporary absorb on the target, scaled by effect strength and
+#                     hard-capped to this fraction of the target's max health (anti-degenerate).
+#        Default:     0.30
+#
+
+Branding.Effect.MaxOverhealShieldFraction = 0.30
+
+#
+#    Branding.Effect.OverhealShieldSpell
+#        Description: Spell id used as the absorb-shield "costume" for the overheal transform; the
+#                     amount is overridden at cast time (SPELLVALUE_BASE_POINT0). Default is Power
+#                     Word: Shield (48066). A clean basepoint-driven SCHOOL_ABSORB id can be set here
+#                     (final per-school costume choice is the #30 spell-map work).
+#        Default:     48066 - (Power Word: Shield)
+#
+
+Branding.Effect.OverhealShieldSpell = 48066
 
 #
 #    Branding.Catalyst.Enable

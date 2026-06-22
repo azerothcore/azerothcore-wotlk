@@ -1,6 +1,7 @@
 #include "AllegianceMgr.h"
 #include "CatalystMgr.h"
 #include "DiscoveryMgr.h"
+#include "EffectMgr.h"
 #include "EventMgr.h"
 #include "HeroicMgr.h"
 #include "InsightMgr.h"
@@ -18,6 +19,7 @@
 #include "mod_branding_loader.h"
 #include "Chat.h"
 #include "CommandScript.h"
+#include "GameTime.h"
 #include "Map.h"
 #include "Player.h"
 #include "RBAC.h"
@@ -391,6 +393,26 @@ public:
 
         handler->PSendSysMessage("Catalyst: same-role rank {}, raid multiplier x{:.2f}.",
             uint32(sCatalystMgr->SameRoleBrandedRank(player)), sCatalystMgr->RaidMultiplierFor(player));
+
+        // §7.9 (issue #03): the role-resolved branding effect -- its kind + the outgoing/incoming
+        // multipliers the UnitScript applies right now (windowed; 1.0 outside the active window).
+        EffectProfile effProfile;
+        uint8 effLevel = 0;
+        if (sEffectMgr->ResolveActiveProfile(player, effProfile, effLevel))
+        {
+            char const* effKind =
+                effProfile.kind == EffectKind::PersonalSpike ? "PersonalSpike (tank)" :
+                effProfile.kind == EffectKind::MechanicTransform ? "MechanicTransform (healer)" : "RaidWindow (dps)";
+            bool const active = IsWindowActive(effProfile,
+                static_cast<uint64_t>(GameTime::GetGameTimeMS().count()));
+            handler->PSendSysMessage("Effect (§7.9): {}, level {}, window {} -- outgoing x{:.2f}, incoming x{:.2f}.",
+                effKind, uint32(effLevel), active ? "active" : "idle",
+                sEffectMgr->OutgoingMultiplierFor(player), sEffectMgr->IncomingDamageMultiplierFor(player));
+            if (effProfile.kind == EffectKind::MechanicTransform)
+                handler->PSendSysMessage("  healer transform: wasted overheal -> absorb shield (mastery-scaled, capped).");
+        }
+        else
+            handler->PSendSysMessage("Effect (§7.9): inactive (disabled or no account-expressible brand).");
 
         for (uint8 m = 0; m < static_cast<uint8>(MasterySystem::COUNT); ++m)
         {

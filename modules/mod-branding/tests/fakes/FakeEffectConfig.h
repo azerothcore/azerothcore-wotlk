@@ -14,12 +14,14 @@ namespace Branding::Test
         double maxPersonalMul = 3.5;
         double maxRaidMul = 2.0;
         uint8_t maxEffectLevel = 50;
+        double maxOverhealShieldFraction = 0.30;
         // None, Tank, Healer, Damage, Control, Support
         std::array<double, static_cast<size_t>(RoleContribution::COUNT)> rolePersonalScale{ { 0.5, 1.0, 0.7, 0.5, 0.6, 0.6 } };
 
         double MaxPersonalMul() const override { return maxPersonalMul; }
         double MaxRaidMul() const override { return maxRaidMul; }
         uint8_t MaxEffectLevel() const override { return maxEffectLevel; }
+        double MaxOverhealShieldFraction() const override { return maxOverhealShieldFraction; }
         double RolePersonalScale(RoleContribution role) const override { return rolePersonalScale[static_cast<size_t>(role)]; }
     };
 
