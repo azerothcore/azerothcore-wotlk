@@ -59,9 +59,14 @@ See [../ARCHITECTURE.md](../ARCHITECTURE.md) for the full spec. Section refs (§
         ├▶ #25 heroic-reward-modifiers   (BumpTier + currencyMul exposure; decoupled from EventMgr)       ◀ needs #23
         └▶ #26 instanced-boss-reward     (OnPlayerCreatureKill -> per-player currency grant)              ◀ needs #25
 
-  (economy content — fills the #09 loop; #27 server-data, #28 client-coupled)
+  (economy content — fills the #09 loop; #27 server-data, #29 client-coupled)
    #09 economy-crafting ─▶ #27 branded-item-content   (item_template + branding_recipe mirror + bind + upgrade curve; no client patch)
-                            └▶ #28 native-profession-crafting  (Spell.dbc craft spells + skill_line_ability + BoP patterns + MPQ) ◀ needs #27
+                            └▶ #29 native-profession-crafting  (Spell.dbc craft spells + skill_line_ability + BoP patterns + MPQ) ◀ needs #27
+
+  (invasion crowd scaling — #28, extends §2.2; first live consumer of the §2.2 boss core)
+   #10 event-spawner ─┐
+   #12 persistence   ─┴▶ #28 invasion-crowd-scaling (pure CrowdTracker/ActiveSpawnTiers/trash curve;
+                                                     EventMgr roster; multi-row branding_event_spawn)
 ```
 
 `*` #14 needs a design decision (play-session profile) before it can be finalized — see the issue.
@@ -73,11 +78,14 @@ See [../ARCHITECTURE.md](../ARCHITECTURE.md) for the full spec. Section refs (§
 - **Batch B (independent features):** #06 vault, #07 mastery, #08 allegiance, #09 economy.
 - **Batch C (after #02→#03):** #04 catalyst, #05 item-branding.
 - **Batch D (content/infra, anytime):** #10 event-spawner, #13 world-spawn-content, #15 full-build-ci,
-  #27 branded-item-content (server data; #09's loader is shipped). #28 native-profession-crafting is
+  #27 branded-item-content (server data; #09's loader is shipped). #29 native-profession-crafting is
   client-coupled (Spell.dbc/MPQ) — schedule after #27.
 - **Batch E (groundwork done, flavour after #03):** #16 exotic-brand-schools.
 - **Batch F (selection economy, after #01+#07):** #17 mastery-selection-economy.
 - **Batch G (heroic overlay):** #23 heroic-tier-core first (pure), then #24 + #25 in parallel worktrees.
+- **Batch H (invasion crowd scaling):** #28 — **complete**: pure `src/core/branding/scaling/Invasion*`,
+  EventMgr roster + EventScheduler multi-tier reconcile, `InvasionScalingMgr` live damage + dynamic
+  health, the authoring-tool `SpawnTier` emitter, and the GUI tier editor.
 - **Needs design input:** #14 xp-balance-sim; #17 has open *[DEFAULT]* decisions (title path, tuition curve).
 
 ## Cross-cutting note

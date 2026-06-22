@@ -24,7 +24,7 @@ from ..sql import emit_sql
 from ..storage import load_project, save_project
 from .canvas import MODE_PATH, MODE_SELECT, MODE_SPAWN, MapCanvas
 from .dialogs import CalibrationDialog, DbConnectDialog
-from .panels import CreatureSearchPanel, EventDefPanel, PropertiesPanel
+from .panels import CreatureSearchPanel, EventDefPanel, PropertiesPanel, TiersPanel
 
 
 def _find_pending_dir() -> Path:
@@ -55,6 +55,7 @@ class MainWindow(QMainWindow):
 
         self._invasion_list = QListWidget()
         self._event_panel = EventDefPanel()
+        self._tiers = TiersPanel()
         self._props = PropertiesPanel()
         self._search = CreatureSearchPanel()
 
@@ -74,6 +75,10 @@ class MainWindow(QMainWindow):
         event_dock = QDockWidget("Event", self)
         event_dock.setWidget(self._event_panel)
         self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, event_dock)
+
+        tiers_dock = QDockWidget("Spawn tiers", self)
+        tiers_dock.setWidget(self._tiers)
+        self.addDockWidget(Qt.DockWidgetArea.LeftDockWidgetArea, tiers_dock)
 
         search_dock = QDockWidget("Creatures", self)
         search_dock.setWidget(self._search)
@@ -125,6 +130,7 @@ class MainWindow(QMainWindow):
     def _wire(self) -> None:
         self._invasion_list.currentRowChanged.connect(self._select_invasion)
         self._event_panel.changed.connect(self._on_event_changed)
+        self._tiers.changed.connect(self._on_tiers_changed)
         self._props.changed.connect(self._canvas.rebuild)
         self._canvas.changed.connect(self._on_canvas_changed)
         self._canvas.selectionChanged.connect(self._props.set_target)
@@ -152,6 +158,8 @@ class MainWindow(QMainWindow):
         inv = self._current_invasion()
         self._canvas.set_invasion(inv)
         self._event_panel.set_invasion(inv)
+        self._tiers.set_invasion(inv)
+        self._props.set_invasion(inv)
         self._props.set_target(None)
 
     def _on_event_changed(self) -> None:
@@ -162,6 +170,11 @@ class MainWindow(QMainWindow):
 
     def _on_canvas_changed(self) -> None:
         self.statusBar().showMessage("Modified", 1500)
+
+    def _on_tiers_changed(self) -> None:
+        # The tier list drives the spawn properties' tier selector -- re-show it so options match.
+        self._props.refresh()
+        self.statusBar().showMessage("Tiers updated", 1500)
 
     def _add_invasion(self) -> None:
         n = len(self._project.invasions) + 1

@@ -20,6 +20,8 @@ the event's creatures on cycle (`Map::SpawnGroupSpawn`/`Despawn`). The group use
 In scope:
 - Visual editor over a **calibrated per-zone image** (world X/Y ↔ pixels).
 - Draw/edit **waypoint paths** (mob-style moving invasions) and place idle **boss** spawns.
+- Author **additive spawn tiers** (§2.5.3): edit each tier's threshold + goal contribution and assign
+  spawns to a tier, so the invasion spawns more mobs as the enrolled crowd grows.
 - Pick creature templates from a **read-only live `acore_world`** connection.
 - Save/load authoring projects (`.invasion`, JSON).
 - Export one `rev_*.sql` writing: `branding_event_def`, `creature`, `waypoint_data`,
@@ -35,10 +37,19 @@ Out of scope (follow-ups):
 
 - **Project**: name, target DB info (host/schema, no stored password), list of `Invasion`s.
 - **Invasion**: bound to one `EventDef` `(zone_id, event_type, goal, active_seconds,
-  cooldown_seconds)`; a `Calibration`; a list of `Spawn`s; a list of `Path`s; a list of `Formation`s.
+  cooldown_seconds)`; a `Calibration`; a list of `Tier`s (each owning its `Spawn`s); a list of
+  `Path`s; a list of `Formation`s.
+- **Tier** *(crowd-scaling, design §2.5.3)*: a named reinforcement layer with a `min_participants`
+  threshold and a `goal_contribution`. Each tier exports one manual `spawn_group`; the base tier is
+  `min_participants = 0` (always up while the event is active) and additive tiers layer on top as the
+  enrolled crowd grows. `EventScheduler` spawns/despawns each tier's group by threshold and sums the
+  active tiers' `goal_contribution` into the live containment goal. A single-tier (base only)
+  invasion is the degenerate, pre-§2.5 case.
 - **Calibration**: image path + reference points mapping pixel↔world; yields an affine transform.
-- **Spawn**: `creature_template` id (`id1`), world x/y/z, orientation, `spawntimesecs`,
-  `MovementType` (0 idle/boss, 2 waypoint), optional `path_id`, optional `formation` membership.
+- **Spawn**: belongs to one `Tier`; `creature_template` id (`id1`), world x/y/z, orientation,
+  `spawntimesecs`, `MovementType` (0 idle/boss, 2 waypoint), optional `path_id`, optional `formation`
+  membership. Boss/mini-boss spawns belong to the base tier (they stay singular; only their stats
+  scale, per §2.5.1) — additive tiers carry trash reinforcements.
 - **Path**: ordered `Waypoint`s `(x, y, z, orientation, delay_ms, move_type)`; owns a `path_id`.
 - **Formation**: leader spawn + member spawns + follow params (angle, distance, group_ai).
 
@@ -72,9 +83,12 @@ base is recorded in the project so re-exports are stable.
 - 4-space indent, LF, no tabs, no trailing whitespace, no double blank lines, no `;;`, final newline.
 - `creature_template` is never `DELETE`d (the codestyle "not_delete" set); the tool only references
   existing templates by id — it does not author templates.
-- New `branding_event_spawn` created with `CREATE TABLE IF NOT EXISTS` + InnoDB, then its row
-  refreshed with DELETE-before-INSERT keyed on `(zone_id, event_type)`. Each invasion also writes a
-  `spawn_group_template` (flag `MANUAL_SPAWN`) and `spawn_group` membership rows for its creatures.
+- New `branding_event_spawn` created with `CREATE TABLE IF NOT EXISTS` + InnoDB. Per §2.5.3 it holds
+  **multiple rows** per `(zone_id, event_type)` — one per tier — with `min_participants` and
+  `goal_contribution` columns; the primary key is `(zone_id, event_type, group_id)`. The tool
+  refreshes an invasion's rows with a single DELETE on `(zone_id, event_type)` immediately followed by
+  the per-tier INSERTs. Each tier also writes its own `spawn_group_template` (flag `MANUAL_SPAWN`) and
+  `spawn_group` membership rows for that tier's creatures.
 
 ## 8. Architecture
 

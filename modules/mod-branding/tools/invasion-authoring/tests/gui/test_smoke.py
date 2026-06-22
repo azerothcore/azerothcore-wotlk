@@ -12,6 +12,7 @@ from PySide6.QtWidgets import QApplication  # noqa: E402
 
 from invasion_authoring.gui.canvas import MODE_PATH, MODE_SPAWN, MapCanvas  # noqa: E402
 from invasion_authoring.gui.main_window import MainWindow  # noqa: E402
+from invasion_authoring.model import Spawn  # noqa: E402
 from invasion_authoring.sql import emit_sql  # noqa: E402
 
 
@@ -58,4 +59,55 @@ def test_add_and_remove_invasion(app):
     assert len(win._project.invasions) == 2
     win._remove_invasion()
     assert len(win._project.invasions) == 1
+    win.close()
+
+
+def test_tiers_panel_adds_and_edits_tiers(app):
+    win = MainWindow()
+    inv = win._current_invasion()
+    tiers = win._tiers
+
+    tiers._add_tier()  # first add -> base (min 0)
+    tiers._add_tier()  # second -> reinforcement
+    assert len(inv.tiers) == 2
+    assert inv.tiers[0].min_participants == 0
+
+    # Edit the second tier's threshold + goal via the panel fields.
+    tiers._list.setCurrentRow(1)
+    tiers._min.setValue(8)
+    tiers._goal.setValue(250)
+    assert inv.tiers[1].min_participants == 8
+    assert inv.tiers[1].goal_contribution == 250
+    win.close()
+
+
+def test_removing_tier_fixes_up_spawn_indices(app):
+    win = MainWindow()
+    inv = win._current_invasion()
+    tiers = win._tiers
+    tiers._add_tier()
+    tiers._add_tier()  # tiers: [0, 1]
+
+    inv.spawns.append(Spawn(local_id=1, template_id=1, x=0.0, y=0.0, z=0.0, tier=1))
+    tiers._list.setCurrentRow(0)
+    tiers._remove_tier()  # removing tier 0 -> the spawn on tier 1 shifts down to 0
+
+    assert len(inv.tiers) == 1
+    assert inv.spawns[0].tier == 0
+    win.close()
+
+
+def test_spawn_tier_selector_assigns_tier(app):
+    win = MainWindow()
+    inv = win._current_invasion()
+    win._tiers._add_tier()
+    win._tiers._add_tier()  # two tiers available
+
+    spawn = Spawn(local_id=1, template_id=299, x=0.0, y=0.0, z=0.0)
+    inv.spawns.append(spawn)
+    win._props.set_invasion(inv)
+    win._props.set_target(spawn)
+
+    win._props._tier.setCurrentIndex(1)  # assign to the reinforcement tier
+    assert spawn.tier == 1
     win.close()

@@ -1,4 +1,4 @@
-# #28 — Native profession crafting for Branded items (§8.6.1, client-coupled)
+# #29 — Native profession crafting for Branded items (§8.6.1, client-coupled)
 
 **Status:** open · **Deps:** #27 (output items, resources, `branding_recipe` mirror) · **Parallel-safe:** partially (client work isolated) · **Size:** L
 **Companion:** #27 (server-side content/bind/upgrade half)

@@ -10,6 +10,7 @@ from invasion_authoring.model import (
     Path,
     Project,
     Spawn,
+    SpawnTier,
     Waypoint,
 )
 
@@ -51,6 +52,26 @@ def test_json_round_trip_preserves_everything():
     proj = _sample_project()
     restored = Project.from_dict(proj.to_dict())
     assert restored == proj
+
+
+def test_spawn_tiers_round_trip():
+    inv = Invasion(
+        name="Tiered",
+        event=EventDef(zone_id=12, event_type=EventType.INVASION),
+        spawns=[
+            Spawn(local_id=1, template_id=299, x=0.0, y=0.0, z=0.0, tier=0),
+            Spawn(local_id=2, template_id=300, x=1.0, y=0.0, z=0.0, tier=1),
+        ],
+        tiers=[
+            SpawnTier(name="base", min_participants=0, goal_contribution=100),
+            SpawnTier(name="reinforce", min_participants=5, goal_contribution=250),
+        ],
+    )
+    proj = Project(name="t", invasions=[inv])
+    restored = Project.from_dict(proj.to_dict())
+    assert restored == proj
+    assert restored.invasions[0].tiers[1].min_participants == 5
+    assert restored.invasions[0].spawns[1].tier == 1
 
 
 def test_to_dict_includes_schema_version():

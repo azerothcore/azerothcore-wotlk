@@ -5,6 +5,7 @@
 void AddBrandingProficiencyScripts();
 void AddBrandingDiscoveryScripts();
 void AddBrandingScalingScripts();
+void AddBrandingInvasionScalingScripts();
 void AddBrandingHeroicScripts();
 void AddBrandingEventScripts();
 void AddBrandingEventSchedulerScripts();

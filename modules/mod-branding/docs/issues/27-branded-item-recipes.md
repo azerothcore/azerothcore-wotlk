@@ -1,7 +1,7 @@
 # #27 — Branded-item content, economy bind & upgrade tuning (§8.1/§8.6/§16.3)
 
 **Status:** open · **Deps:** #09 (`EconomyMgr`/`RecipeBook` loader, shipped) · **Parallel-safe:** yes (data + conf) · **Size:** M
-**Companion:** #28 (native profession crafting — the client-coupled half of the initial-craft surface)
+**Companion:** #29 (native profession crafting — the client-coupled half of the initial-craft surface)
 
 ## Context
 #09 built the crafting *machinery* — `EconomyMgr` queries
@@ -12,15 +12,15 @@ Linen, `FragmentItemId = 2592` Wool), and there are no actual **Branded items** 
 
 This issue is the **server-side, no-client-patch half** — item content, the economy resources, the
 `branding_recipe` mirror, the bind model, and the branding-upgrade cost curve. The *initial-craft UX*
-(recipes inside the real Leatherworking/Blacksmithing window) is client-coupled and lives in **#28**.
+(recipes inside the real Leatherworking/Blacksmithing window) is client-coupled and lives in **#29**.
 
 ## Decisions (locked with owner, 2026-06-22)
 - **Base power = modest heroic-dungeon level.** Branded outputs clone the *model/icon/slot* of WotLK
   heroic-dungeon items but carry **modest stats**; power comes from branding procs, never the base item
   (§1 anti-obsolescence). No raid-BiS stat clones.
 - **Bind = hybrid** (§16.3 amended). **Materials** tradeable (BoE, the surviving market). **Fragments**
-  and **Branded items** **account-bound (BoA)** / account-wide. **Recipe patterns** BoP (see #28).
-- **Two craft surfaces** (§8.6.1): *initial craft* → native profession (#28); *branding upgrade* →
+  and **Branded items** **account-bound (BoA)** / account-wide. **Recipe patterns** BoP (see #29).
+- **Two craft surfaces** (§8.6.1): *initial craft* → native profession (#29); *branding upgrade* →
   custom `.branding` + `ResolveCraft` (this issue). `branding_recipe` is the **server-side mirror** of
   the native reagent defs, so counts can't drift from `Spell.dbc`.
 - **Upgrade cost curve.** A single Brand Rank is cheap/fast; a **full max-out = focused multi-week guild
@@ -34,11 +34,11 @@ This issue is the **server-side, no-client-patch half** — item content, the ec
 2. **Branded output items** (`pending_db_world`, `item_template`) — starter set across §8.3 tiers,
    `bonding=5` (BoA), `displayid` cloned from heroic gear, **modest** `stat_type/value` + `ItemLevel`,
    proc carried in `spellid_N`/`spelltrigger_N` (the surface #05 modulates). `RequiredSkill` set to the
-   matching profession (e.g. leather → Leatherworking) so the gate holds even before #28's window UX.
+   matching profession (e.g. leather → Leatherworking) so the gate holds even before #29's window UX.
 3. **`branding_recipe` table** — DDL + seed in `pending_db_world`; columns match the #09 query exactly
    (`id` PK, `materials`, `fragments`, `output_item`, `char_xp`). InnoDB, DELETE-before-INSERT, 4-space,
    trailing newline. One row per Branded output (input cost scaling with tier). Zero `output_item` rows
-   are dropped by `RecipeBook::Add`. These mirror #28's native reagent defs.
+   are dropped by `RecipeBook::Add`. These mirror #29's native reagent defs.
 4. **Config** — repoint `Branding.Economy.MaterialItemId` / `FragmentItemId` (and the mirrored
    `Branding.Event.RewardItemId`, §16.3) to the new entries in `conf/mod_branding.conf.dist`; fix the
    Linen/Wool comments.
@@ -60,4 +60,4 @@ Reserved band `190000–190099` (`ARCHITECTURE.md` §16.4): resources `190000–
 ## Touch points
 `data/sql/updates/pending_db_world/rev_*.sql` (new), `conf/mod_branding.conf.dist`,
 `docs/ARCHITECTURE.md` §16 (entry band), #05 upgrade-curve constants. No new C++ for craft resolution.
-Coordinate: #05 (upgrade sink), #06 (vault stores BoA Fragments), #09 (loader), **#28** (native craft).
+Coordinate: #05 (upgrade sink), #06 (vault stores BoA Fragments), #09 (loader), **#29** (native craft).
