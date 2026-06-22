@@ -26,6 +26,11 @@ namespace Branding
         virtual uint8_t MaxRewardTier() const = 0;        // reward-tier cap at full group
         virtual double RareChanceMulMin() const = 0;      // rare/epic chance mult at smallest group
         virtual double RareChanceMulMax() const = 0;      // ...at full group
+
+        // --- Branding-currency reduction (§2.4.3) ---
+        // currencyMul = clamp(fraction^exp, floor, 1.0); exp >= 1 makes currency steeper than gear.
+        virtual double CurrencyReductionExponent() const = 0;
+        virtual double CurrencyMulFloor() const = 0;
     };
 }
 

@@ -16,6 +16,8 @@ namespace Branding::Test
         uint8_t maxRewardTier = 4;
         double rareChanceMulMin = 0.5;
         double rareChanceMulMax = 2.0;
+        double currencyReductionExponent = 2.0;
+        double currencyMulFloor = 0.05;
 
         double StatScalingExponent() const override { return statScalingExponent; }
         double GroupHealthFloor() const override { return groupHealthFloor; }
@@ -24,6 +26,8 @@ namespace Branding::Test
         uint8_t MaxRewardTier() const override { return maxRewardTier; }
         double RareChanceMulMin() const override { return rareChanceMulMin; }
         double RareChanceMulMax() const override { return rareChanceMulMax; }
+        double CurrencyReductionExponent() const override { return currencyReductionExponent; }
+        double CurrencyMulFloor() const override { return currencyMulFloor; }
     };
 }
 

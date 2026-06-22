@@ -242,9 +242,12 @@ struct RewardScale {            // §2.2, extended
 
 With group fraction `r = groupSize / contentSize` (e.g. 5-man MC ⇒ `r = 0.125`):
 
-- **Item quantity** ∝ `r^0.5`, floor `0.5` — gear still drops, mildly reduced.
-- **Currency** `currencyMul` ∝ `r^1.0`, floor `0.05` — a 5/40 clear yields ≈⅛ currency; never zero
-  (anti-frustration) but ≪ a full clear (anti-farm). Exponents/floors are `IHeroicConfig` knobs.
+- **Item quantity** ∝ `r` (linear — the existing §2.2 behaviour, floored at 1 drop). Unchanged.
+- **Currency** `currencyMul` = `clamp(r^N, floor, 1.0)` with `N ≥ 1` (default `2.0`) and `floor`
+  default `0.05`. For `r < 1` this is **strictly below** the linear gear fraction, so currency falls
+  off faster than gear; never zero (anti-frustration) but ≪ a full clear (anti-farm). A 5/40 clear
+  lands on the floor (≈5% of full). Exponent/floor are `IScalingConfig` knobs (this term is part of
+  the §2.2 group reward scale).
 - The heroic overlay then multiplies tier/quantity/currency **up** by the heroic bonus, applied per
   player through the existing §9.4 personal-loot delivery path (no tagging).
 

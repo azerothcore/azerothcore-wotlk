@@ -15,8 +15,10 @@ currency-specific reward reduction.
   - `uint8_t HeroicLevelTarget(ctx, cfg)` — `maxLevel` when the overlay engages, else unchanged.
   - `uint8_t HeroicTierBonus(ctx, cfg)` — `0` when `Normal`.
 - **Extend §2.2 `RewardScale`** with `double currencyMul` (§2.4.3). Currency reduction is **steeper**
-  than item reduction: with `r = groupSize/contentSize`, item quantity ∝ `r^0.5` (floor `0.5`),
-  `currencyMul` ∝ `r^1.0` (floor `0.05`). Exponents/floors come from `IHeroicConfig`.
+  than item reduction: item quantity stays linear in `r = groupSize/contentSize` (existing §2.2),
+  `currencyMul = clamp(r^N, floor, 1.0)` with `N ≥ 1` (default `2.0`) and `floor` default `0.05` —
+  strictly below the linear gear fraction for `r < 1`. Exponent/floor are `IScalingConfig` knobs
+  (the currency term is part of `RewardScaleForGroup`).
 - **Tests** `tests/heroic/HeroicTest.cpp` (red→green), asserting the §2.4.5 invariants:
   monotonic-in-difficulty; `currencyMul ≤ item-quantity-fraction` for `r<1`; bounded muls
   (completability under combined small-group + heroic); native-heroic deference (`mul == 1.0`);
