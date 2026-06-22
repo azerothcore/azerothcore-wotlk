@@ -991,6 +991,26 @@ resources here. Tested for: insufficient-inputs rejection, exact consumption, de
 > **Placement:** §8.2/§8.3/§8.5/§8.6 are pure core (TDD). §8.4 spawns + content are data (SQL,
 > LLM-generated). Discovery hooks (`OnAreaExplored`/zone-update, interact) are thin adapters.
 
+#### 8.6.1 Two craft surfaces — native initial craft vs custom upgrade (decided)
+
+Crafting splits into two distinct surfaces; do not conflate them:
+
+- **Initial craft → native profession.** A Branded base item is created by WoW's own crafting engine.
+  The recipe is a **profession pattern** (a BoP, non-tradeable recipe item; `spelltrigger=6` learn)
+  bound to a skill line via `skill_line_ability`, with the craft spell carried in `Spell.dbc` —
+  a **client-side deliverable** shipped in the module MPQ patch (alongside the existing `client-addon`).
+  Reagents (defined in the craft spell) are the §16 resources: tradeable **Materials** + account-bound
+  **Fragments**. `branding_recipe` becomes the **server-side mirror** of these defs (id → inputs,
+  output, char XP) so `RecipeBook`/`ResolveCraft` stay the source of truth for validation/tests and the
+  reagent counts cannot drift from the DBC. Output items use a **modest, heroic-dungeon-level base stat
+  block** (model/icon cloned from heroic gear, stats kept modest) — power comes from branding, never the
+  base item (§1). Native crafting is a separate, client-coupled workstream from the pure economy core.
+- **Branding upgrade → custom `.branding` path.** Raising an item's **Brand Rank** (§7.9/#05) is *not*
+  a native craft (you upgrade an existing item in place, not create a new one). It stays on the custom
+  gossip/command + `ResolveCraft`/#05 sink, consuming Materials/Fragments. Cost curve (decided): a
+  *single* rank is cheap/fast, but a **full max-out is a focused multi-week guild effort** — tuned via
+  `ApplyItemUpgrade` per-rank cost + `ItemMaxCumulativeCost` (vanilla-legendary feel).
+
 ---
 
 ## 9. Dynamic Event & Participation Model (Slice 3)
@@ -1961,9 +1981,10 @@ called out.
 | Per-character, per-brand earned progression | **Proficiency** (Level) | character × brand | `character_branding`, `Proficiency` | "Proficiency Level N" |
 | Per-item earned progression (the major step) | **Brand Rank** | item GUID | `item_branding.step`, `ItemBrandState::step` | "Brand Rank N" |
 | Progress within a Brand Rank | **(unnamed progress)** | item GUID | `ItemBrandState::levelInStep` / `upgradeProgress` | progress bar only |
-| Common crafting input (dungeon-sourced) | **Material** | item in bag/vault, tradeable | `Branding.Economy.MaterialItemId`, `Resources::materials` | "Materials" |
-| Premium crafting input (invasion/event-sourced) | **Fragment** | item in bag/vault, tradeable | `Branding.Economy.FragmentItemId`, `Resources::fragments` | "Fragments" |
-| Craft definition: inputs → output item + char XP | **Recipe** | world data | `branding_recipe`, `Recipe` / `RecipeBook` | "Recipe" |
+| Common crafting input (dungeon-sourced) | **Material** | item in bag/vault, **tradeable** (BoE) | `Branding.Economy.MaterialItemId`, `Resources::materials` | "Materials" |
+| Premium crafting input (raid/invasion-sourced) | **Fragment** | item, **account-bound** (BoA) | `Branding.Economy.FragmentItemId`, `Resources::fragments` | "Fragments" |
+| Craft definition: inputs → output item | **Recipe** | native profession spell + `branding_recipe` mirror | `skill_line_ability`/`Spell.dbc`, `branding_recipe`, `RecipeBook` | "Recipe" |
+| Crafted brandable item | **Branded item** | item GUID, **account-bound** (BoA) | `item_template` (modest base), `item_branding` (#05) | "Branded <item>" |
 | Raid synergy stacking diminishing-returns mechanic | **Catalyst** | combat, per `(school, tree)` | `core/branding/catalyst/`, `RaidCatalystMultiplier` | "Catalyst (raid synergy)" |
 
 ### 16.2 Two collisions, resolved
@@ -1987,9 +2008,15 @@ config and is the right call:
 
 - Reuses `RewardDelivery` (inventory + mail fallback) to grant, `RemoveItem` to consume, the **vault
   (#06)** to store/overflow, and native bag/tooltip/trade/mail UI for free.
-- Keeps the economy **tradeable** (a player market is part of the §8.1 loop) while staying anti-P2W:
-  power gates on account *Knowledge* (§7.5), never on holding an item — so a traded maxed item is
-  inert without access (§16.1, #05).
+- Keeps a **light player market** (part of the §8.1 loop) while staying anti-P2W: power gates on
+  account *Knowledge* (§7.5), never on holding an item — so even a traded maxed item is inert without
+  access (§16.1, #05).
+- **Bind model (decided — hybrid).** Not everything trades: only **Materials** stay tradeable (BoE,
+  the surviving market). **Fragments** (premium, raid-sourced) and **Branded items** are
+  **account-bound (BoA)** — account-wide, so the prestige grind belongs to the account, not the auction
+  house. This narrows the §8.1 market to the common-input tier on purpose; the high-end loop is
+  personal effort. Account-wide Fragments are held BoA (mailable to own characters) and/or in the
+  account vault (#06). Recipe patterns are **BoP** (non-tradeable) per §8.6.1.
 - Trade-off (bag clutter, stack caps) is mitigated by the vault and generous stack sizes; no new
   client work. A custom currency table was rejected (needs bespoke UI, breaks trading, duplicates the
   inventory plumbing already built).
@@ -2024,6 +2051,11 @@ representation.)
     new recipe/content tables in `pending_db_world`.
   - *Known drift:* `account_brand_knowledge` uses `brand` rather than `branding`. It is shipped with
     data — **leave it**; do not propagate the shortened form to new tables.
+- **Custom `item_template` entries — reserved band `190000–190099`** (decided). All mod-branding
+  custom items (resources, Branded outputs, recipe patterns) draw from this band so entries can't
+  collide with other modules or upstream content: resources `190000–190001` (Material, Fragment),
+  Branded outputs `190010+`, recipe patterns `190050+`. Map every entry to a `Branding.<Sub>.*ItemId`
+  config key (§16.3); never hard-code an entry in C++.
 - **Config** — `Branding.<Subsystem>.<Setting>` (PascalCase, dotted); a `Branding.<Subsystem>.Enable`
   toggle per subsystem under the master `Branding.Enable`; item-id mappings suffixed `ItemId`.
 - **Commands / player strings** — all under the `.branding` tree; display the §16.1 canonical nouns
