@@ -746,3 +746,54 @@ Branding.PostCapXp.Enable = 0
 #
 
 Branding.PostCapXp.ConversionRatio = 0.01
+# Prestige graduation titles (design §14.13.4 / §11). Hitting max Proficiency in a school grants a
+# per-character COSMETIC title (no stat/effect, trade-safe); maxing every school grants a capstone.
+# Granting is idempotent and driven from OnLogin (catch-up) + OnLevelChanged.
+#
+# v1 is SERVER-ONLY: it repurposes spare/unused CharTitlesEntry ids the 3.3.5a client already ships,
+# so NO client-side CharTitles.dbc patch is required. The per-school id is config-mapped, so a later
+# custom DBC patch that defines literal strings ("the Fire-Branded", ...) only needs these ids
+# repointed -- no code change. The ids below are PLACEHOLDERS chosen from the high end of the shipped
+# 3.3.5a title-id range (last shipped id is 177); pick ids your client/realm does not otherwise grant.
+#
+
+#
+#    Branding.Prestige.Enable
+#        Description: Master switch for the §14.13.4 graduation-title feature.
+#        Default:     0 - (disabled)
+#
+
+Branding.Prestige.Enable = 0
+
+#
+#    Branding.Prestige.TitleId.<School>
+#        Description: CharTitlesEntry id granted on maxing the named school's Proficiency. One key per
+#                     school (Fire, Frost, Nature, Shadow, Arcane, Holy, Physical, Wind, Lightning,
+#                     Blood, Void, Stone, Venom, Chrono, Spirit). 0 disables that school's title.
+#        Default:     PLACEHOLDER spare ids 150..164 (one per school, in BrandId order).
+#
+
+Branding.Prestige.TitleId.Fire = 150
+Branding.Prestige.TitleId.Frost = 151
+Branding.Prestige.TitleId.Nature = 152
+Branding.Prestige.TitleId.Shadow = 153
+Branding.Prestige.TitleId.Arcane = 154
+Branding.Prestige.TitleId.Holy = 155
+Branding.Prestige.TitleId.Physical = 156
+Branding.Prestige.TitleId.Wind = 157
+Branding.Prestige.TitleId.Lightning = 158
+Branding.Prestige.TitleId.Blood = 159
+Branding.Prestige.TitleId.Void = 160
+Branding.Prestige.TitleId.Stone = 161
+Branding.Prestige.TitleId.Venom = 162
+Branding.Prestige.TitleId.Chrono = 163
+Branding.Prestige.TitleId.Spirit = 164
+
+#
+#    Branding.Prestige.CapstoneTitleId
+#        Description: CharTitlesEntry id granted when ALL schools are maxed (the "Grandmaster of
+#                     Branding" capstone, §14.13.4). 0 disables the capstone.
+#        Default:     PLACEHOLDER spare id 177.
+#
+
+Branding.Prestige.CapstoneTitleId = 177

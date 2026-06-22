@@ -23,6 +23,7 @@ void AddBrandingInsightScripts();
 void AddBrandingAddonScripts();
 void AddBrandingSelectionScripts();
 void AddBrandingPostCapXpScripts();
+void AddBrandingPrestigeScripts();
 void AddBrandingCommandScripts();
 
 #endif // MOD_BRANDING_SRC_LOADER_H
