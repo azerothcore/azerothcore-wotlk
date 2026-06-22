@@ -14,14 +14,22 @@ account-Knowledge cost`, `ResolvedItemEffectIntensity` (anti-P2W). Needs server 
   display string. Resources spent are config-mapped items (§16.3).
 - Upgrade flow: spend economy resources (reuse `core/economy` + the reward/economy plumbing) to call
   `ApplyItemUpgrade`; a gossip/command entry point. Enforce `ItemMaxCumulativeCost` ordering.
-- Application: `ItemEffectIntensity` modifies the item's **proc behaviour/frequency** (NOT flat
-  stats — §1) via the effect layer (#03) and the player's selected archetype (#02). Gate with
+- Application: `ItemEffectIntensity` modifies the item's **proc behaviour/frequency** (the primary
+  power, §1) via the effect layer (#03) and the player's selected archetype (#02). Gate with
   `ResolvedItemEffectIntensity` (inert without the current account's Knowledge → trading stays safe).
+- Stat scaling (amended §7.9): also apply `ResolvedItemStatScale(state, canExpress, cfg)` — a small,
+  bounded MULTIPLIER on the item's **base stats** that grows with Brand Rank to exactly
+  `1 + Branding.Item.StatBonusAtMaxRank` at full upgrade (one headline-percentage knob, default +25%).
+  Apply it on equip / stat recalculation and **remove on unequip**; the multiplier is 1.0 (base stats
+  only) without account access, so a traded — but BoA — item never carries the upgrade delta. Pure core
+  + invariants are shipped (`ItemStatScale`, `ResolvedItemStatScale`, `Slice7Test`); this issue is the
+  on-equip wiring.
 - Tradeable: upgrade state travels with the item; verify a traded maxed item is inert without access.
 
 ## Acceptance
-- Standard DoD (incl. codestyle-sql). Manual verify: upgrading raises proc intensity (not stats);
-  a traded maxed item does nothing on an account lacking the brand Knowledge.
+- Standard DoD (incl. codestyle-sql). Manual verify: upgrading raises proc intensity AND nudges base
+  stats modestly (bounded per Brand Rank); a traded maxed item does nothing (proc) and keeps only its
+  base stats on an account lacking the brand Knowledge.
 
 ## Touch points
 `src/ItemBranding*.*` (new), `pending_db_characters` SQL, effect layer (#03), loadout (#02).

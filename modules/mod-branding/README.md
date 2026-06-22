@@ -141,6 +141,8 @@ modules/mod-branding/
 ├── README.md               # this file
 ├── conf/
 │   └── mod_branding.conf.dist
+├── data/
+│   └── sql/db-world/       # module-owned world content (auto-imported by AC)
 ├── docs/
 │   ├── ARCHITECTURE.md     # authoritative spec
 │   └── issues/             # parallel-development backlog
@@ -152,6 +154,8 @@ modules/mod-branding/
 │   ├── <system>/           # GoogleTests per core
 │   └── standalone/         # fast standalone CMake target
 └── tools/
+    ├── branding-craft/     # #27/#29 craft single-source-of-truth: emits world SQL + client DBC patch
+    ├── invasion-authoring/ # Qt6 invasion editor
     ├── core-purity.sh      # CORE-PURITY guard
     └── pre-commit          # gitleaks + linters + tests hook
 ```

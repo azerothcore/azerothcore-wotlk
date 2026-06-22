@@ -63,6 +63,27 @@ namespace Branding
         return ItemEffectIntensity(state, cfg);
     }
 
+    double ItemStatScale(ItemBrandState const& state, IItemBrandConfig const& cfg)
+    {
+        // Linear from 1.0 at rank 0 to exactly 1 + StatBonusAtMaxRank() when fully upgraded -- the
+        // headline percentage is the single tuning knob; per-level is derived (§7.9 amended / §1).
+        uint32_t const maxLevels = MaxTotalLevels(cfg);
+        if (maxLevels == 0)
+            return 1.0;
+
+        uint32_t const levels = std::min(TotalLevels(state, cfg), maxLevels);
+        double const progress = static_cast<double>(levels) / static_cast<double>(maxLevels);
+        return 1.0 + progress * cfg.StatBonusAtMaxRank();
+    }
+
+    double ResolvedItemStatScale(ItemBrandState const& state, bool canExpress, IItemBrandConfig const& cfg)
+    {
+        if (!canExpress)
+            return 1.0;   // base stats only -- the upgrade bonus is gated on account access
+
+        return ItemStatScale(state, cfg);
+    }
+
     bool IsLoadoutValid(BrandLoadout const& loadout, KnowledgeState const& knowledge,
         uint8_t profLevel, IItemBrandConfig const& cfg)
     {

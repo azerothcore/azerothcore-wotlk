@@ -20,8 +20,8 @@ namespace Branding
 
     private:
         bool _enabled = false;
-        uint32_t _materialItem = 2589;   // Linen Cloth (matches the event reward material)
-        uint32_t _fragmentItem = 2592;   // Wool Cloth  (invasion fragment placeholder)
+        uint32_t _materialItem = 190000;   // Branding Material (BoE; mirrors the event reward, §16.3/§16.4)
+        uint32_t _fragmentItem = 190001;   // Branding Fragment (BoA; raid/invasion-sourced)
     };
 }
 

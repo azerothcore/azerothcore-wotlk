@@ -12,6 +12,7 @@ namespace Branding
         _intensityPerLevel = sConfigMgr->GetOption<float>("Branding.Item.IntensityPerLevel", 0.05f);
         _upgradeCostPerLevel = sConfigMgr->GetOption<uint32_t>("Branding.Item.UpgradeCostPerLevel", 100);
         _accountKnowledgeCost = sConfigMgr->GetOption<uint32_t>("Branding.Item.AccountKnowledgeCost", 100000);
+        _statBonusAtMaxRank = sConfigMgr->GetOption<float>("Branding.Item.StatBonusAtMaxRank", 0.25f);
 
         _baseArchetypes = static_cast<uint8_t>(sConfigMgr->GetOption<uint32_t>("Branding.Loadout.BaseArchetypes", 1));
         _archetypeLevelStep = static_cast<uint8_t>(sConfigMgr->GetOption<uint32_t>("Branding.Loadout.ArchetypeLevelStep", 10));

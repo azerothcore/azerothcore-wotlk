@@ -1,0 +1,36 @@
+[project]
+name = "branding-craft"
+version = "0.1.0"
+description = "Single source of truth for mod-branding native profession crafting (#29): emits server world SQL (spell_dbc / skilllineability_dbc / item_template / branding_recipe) and the client Spell.dbc patch, and guards them against drift."
+readme = "README.md"
+requires-python = ">=3.11"
+# Pure stdlib. The catalog is the one place craft spells/recipes are defined; everything else is
+# generated from it, so the server (spell_dbc) and client (Spell.dbc) can never drift.
+dependencies = []
+
+[project.scripts]
+branding-craft = "branding_craft.cli:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.6",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/branding_craft"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 120
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "W"]

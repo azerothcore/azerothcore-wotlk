@@ -32,6 +32,7 @@ namespace Branding::Test
         double intensityPerLevel = 0.05;
         uint32_t upgradeCostPerLevel = 100;
         uint32_t accountKnowledgeCost = 100000;
+        double statBonusAtMaxRank = 0.25;
 
         uint8_t LevelsPerStep() const override { return levelsPerStep; }
         uint8_t MaxStep() const override { return maxStep; }
@@ -39,6 +40,7 @@ namespace Branding::Test
         double IntensityPerLevel() const override { return intensityPerLevel; }
         uint32_t UpgradeCostPerLevel() const override { return upgradeCostPerLevel; }
         uint32_t AccountKnowledgeCost() const override { return accountKnowledgeCost; }
+        double StatBonusAtMaxRank() const override { return statBonusAtMaxRank; }
         uint8_t ArchetypesAtLevel(uint8_t profLevel) const override { return static_cast<uint8_t>(1 + profLevel / 10); }
     };
 }

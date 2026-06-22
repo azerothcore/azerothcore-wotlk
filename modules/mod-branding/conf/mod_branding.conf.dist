@@ -302,10 +302,12 @@ Branding.Event.GoldThreshold = 400
 #    Branding.Event.RewardItemId
 #        Description: Item entry granted for a CraftingMats reward (claimed via `.branding event
 #                     claim`). Quantity scales with tier; bounded by the account economy ceiling.
-#        Default:     2589 (Linen Cloth, placeholder)
+#                     Mirrors Branding.Economy.MaterialItemId so an event grants exactly what a craft
+#                     consumes (faucet == sink, §16.3).
+#        Default:     190000 (Branding Material, mod-branding entry band §16.4)
 #
 
-Branding.Event.RewardItemId = 2589
+Branding.Event.RewardItemId = 190000
 
 
 #
@@ -338,6 +340,21 @@ Branding.Item.IntensityPerLevel = 0.05
 
 Branding.Item.UpgradeCostPerLevel = 100
 Branding.Item.AccountKnowledgeCost = 100000
+
+#
+#    Branding.Item.StatBonusAtMaxRank
+#        Description: THE stat-scaling knob. Total flat-stat bonus a Branded item gains at full
+#                     upgrade, as a fraction: 0.25 = a fully-maxed item has +25% base stats. The bonus
+#                     scales linearly with upgrade progress (rank 0 = +0%, half-upgraded = +12.5%,
+#                     maxed = the value here), so tuning this one percentage sets the whole curve --
+#                     no per-level math. Kept deliberately modest: the base item stays a modest
+#                     heroic-tier clone and the branding PROC remains the primary power source (§1
+#                     anti-obsolescence). The bonus is gated on account Knowledge (a traded -- but
+#                     BoA -- item keeps only its base stats without access). 0 disables stat scaling.
+#        Default:     0.25 - (+25% at max; e.g. 0.15 = subtler, 0.40 = stronger)
+#
+
+Branding.Item.StatBonusAtMaxRank = 0.25
 
 #
 #    Branding.Loadout.BaseArchetypes / ArchetypeLevelStep / MaxArchetypes
@@ -613,19 +630,21 @@ Branding.Economy.Enable = 0
 #    Branding.Economy.MaterialItemId
 #        Description: Item entry representing crafting "materials" in the closed economy loop.
 #                     Mirror Branding.Event.RewardItemId so a craft consumes exactly what events
-#                     grant (faucet == sink representation).
-#        Default:     2589 (Linen Cloth, placeholder)
+#                     grant (faucet == sink representation). Tradeable (BoE) -- the surviving market
+#                     (§16.3).
+#        Default:     190000 (Branding Material, mod-branding entry band §16.4)
 #
 
-Branding.Economy.MaterialItemId = 2589
+Branding.Economy.MaterialItemId = 190000
 
 #
 #    Branding.Economy.FragmentItemId
 #        Description: Item entry representing invasion "fragments" in the closed economy loop.
-#        Default:     2592 (Wool Cloth, placeholder)
+#                     Account-bound (BoA) -- the premium, account-wide input (§16.3).
+#        Default:     190001 (Branding Fragment, mod-branding entry band §16.4)
 #
 
-Branding.Economy.FragmentItemId = 2592
+Branding.Economy.FragmentItemId = 190001
 
 #
 #    Branding.Item.Enable
