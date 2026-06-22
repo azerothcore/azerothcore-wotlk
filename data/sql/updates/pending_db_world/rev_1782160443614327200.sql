@@ -18,3 +18,4 @@ INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Fligh
 -- broadcast_text that actually displays). REPLACE is idempotent (no match once already uppercase).
 UPDATE `creature_text` SET `Text`=REPLACE(`Text`, 'Kel\'thuzad', 'Kel\'Thuzad') WHERE `CreatureID`=27784;
 UPDATE `broadcast_text` SET `MaleText`=REPLACE(`MaleText`, 'Kel\'thuzad', 'Kel\'Thuzad'), `FemaleText`=REPLACE(`FemaleText`, 'Kel\'thuzad', 'Kel\'Thuzad') WHERE `ID` IN (27079, 27081, 27082);
+
