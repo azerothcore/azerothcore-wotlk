@@ -721,3 +721,28 @@ Branding.Selection.TuitionCap = 5000000
 #
 
 Branding.Selection.SwitchDecayDays = 7
+
+#
+# Post-cap XP redirect (§14.13.3). At the server's max player level normal XP has no sink, so it is
+# redirected into the ACTIVE school's Proficiency (§7). Only the active brand grows; dormant/unknown
+# brands are untouched. ConversionRatio is the single pacing knob the #14 / §8.5 XP-balance sim
+# calibrates against to keep time-to-Prestige near the ~3-month target (§14.13.4/§14.13.6).
+#
+
+#
+#    Branding.PostCapXp.Enable
+#        Description: Master switch for redirecting post-cap XP into the active brand's Proficiency.
+#        Default:     0 - (disabled)
+#
+
+Branding.PostCapXp.Enable = 0
+
+#
+#    Branding.PostCapXp.ConversionRatio
+#        Description: Fraction of a drained post-cap XP amount converted into Proficiency baseUnits
+#                     (before the core's source/match weighting + diminishing returns). The #14 sim
+#                     pins this to the ~3-month Prestige pacing target.
+#        Default:     0.01
+#
+
+Branding.PostCapXp.ConversionRatio = 0.01

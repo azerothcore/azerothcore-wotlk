@@ -24,5 +24,6 @@ void Addmod_brandingScripts()
     AddBrandingInsightScripts();
     AddBrandingAddonScripts();
     AddBrandingSelectionScripts();
+    AddBrandingPostCapXpScripts();
     AddBrandingCommandScripts();
 }
