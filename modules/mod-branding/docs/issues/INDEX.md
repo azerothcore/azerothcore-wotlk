@@ -63,6 +63,11 @@ See [../ARCHITECTURE.md](../ARCHITECTURE.md) for the full spec. Section refs (§
    #09 economy-crafting ─▶ #27 branded-item-content   (item_template + branding_recipe mirror + bind + upgrade curve; no client patch)
                             └▶ #29 native-profession-crafting  (Spell.dbc craft spells + skill_line_ability + BoP patterns + MPQ) ◀ needs #27
 
+  (low-friction on-ramp — server-only, reuses shipped cores; sibling of the crafted economy)
+   #05 item-branding ─┐
+   #04 catalyst       ─┴▶ #31 one-shot-item-etch  (.branding etch: rank-0 proc, active-mastery gated,
+                                                    BoP, self-stack DR via catalyst curve; no client patch, no new core)
+
   (invasion crowd scaling — #28, extends §2.2; first live consumer of the §2.2 boss core)
    #10 event-spawner ─┐
    #12 persistence   ─┴▶ #28 invasion-crowd-scaling (pure CrowdTracker/ActiveSpawnTiers/trash curve;

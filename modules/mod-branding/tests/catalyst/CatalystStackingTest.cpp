@@ -124,6 +124,56 @@ TEST(CatalystStacking, DifferentSchoolSameTreeIndependent)
     EXPECT_EQ(CatalystRankInBucket(roster, 3, 2), 1u);
 }
 
+// --- #31 self-stack: many same-bucket branded SOURCES on ONE actor (Etched items) ---
+
+// No expressible source => neutral (1.0).
+TEST(CatalystSelfStack, ZeroSourcesIsNeutral)
+{
+    FakeCatalystConfig cfg;
+    EXPECT_DOUBLE_EQ(CatalystSelfStackMultiplier(0, cfg), 1.0);
+}
+
+// The first source carries the bulk of the bonus (closed form 1 + (max-1)(1-decay)).
+TEST(CatalystSelfStack, FirstSourceClosedForm)
+{
+    FakeCatalystConfig cfg;
+    double const expected = 1.0 + (cfg.maxRaidMul - 1.0) * (1.0 - cfg.stackDecay);
+    EXPECT_DOUBLE_EQ(CatalystSelfStackMultiplier(1, cfg), expected);
+}
+
+// Monotonic non-decreasing in count, always bounded by MaxRaidMul (the §7.9 cap): more Etched items
+// give a little more, never unbounded power -- "flexibility, not stacked power" (#31 decision 5).
+TEST(CatalystSelfStack, MonotonicAndBoundedByCap)
+{
+    FakeCatalystConfig cfg;
+    double prev = 1.0;
+    for (uint8_t count = 1; count <= 20; ++count)
+    {
+        double mul = CatalystSelfStackMultiplier(count, cfg);
+        EXPECT_GE(mul, prev);              // non-decreasing
+        EXPECT_LE(mul, cfg.maxRaidMul);    // never exceeds the cap
+        prev = mul;
+    }
+}
+
+// The marginal gain shrinks fast (catalyst DR): 2nd adds less than the 1st, 3rd less than the 2nd.
+TEST(CatalystSelfStack, MarginalGainDiminishes)
+{
+    FakeCatalystConfig cfg;
+    double m1 = CatalystSelfStackMultiplier(1, cfg);
+    double m2 = CatalystSelfStackMultiplier(2, cfg);
+    double m3 = CatalystSelfStackMultiplier(3, cfg);
+    EXPECT_GT(m2 - m1, m3 - m2);                       // diminishing increments
+    EXPECT_GT(m1 - 1.0, m2 - m1);                      // the 1st item dominates
+}
+
+// Saturates toward the cap as sources pile up.
+TEST(CatalystSelfStack, SaturatesTowardCap)
+{
+    FakeCatalystConfig cfg;
+    EXPECT_NEAR(CatalystSelfStackMultiplier(40, cfg), cfg.maxRaidMul, 1e-6);
+}
+
 // Defensive guards: null roster / out-of-range index => rank 0 (neutral).
 TEST(CatalystStacking, RankInBucketHandlesBadInput)
 {

@@ -1,5 +1,6 @@
 #include "ItemBrandingMgr.h"
 #include "mod_branding_loader.h"
+#include "Item.h"
 #include "Player.h"
 #include "ScriptMgr.h"
 
@@ -17,7 +18,8 @@ public:
     }
 };
 
-// Loads the equipped weapon's brand state on login.
+// Loads equipped items' brand state on login, and refreshes the cache when an Etch-eligible item is
+// equipped mid-session (so the multi-slot aggregate / gates stay correct without a relog, #31).
 class BrandingItemPlayerScript : public PlayerScript
 {
 public:
@@ -26,6 +28,12 @@ public:
     void OnPlayerLogin(Player* player) override
     {
         sItemBrandingMgr->LoadEquipped(player);
+    }
+
+    void OnPlayerEquip(Player* /*player*/, Item* it, uint8 bag, uint8 slot, bool /*update*/) override
+    {
+        if (bag == INVENTORY_SLOT_BAG_0 && ItemBrandingMgr::EtchEligibleSlot(slot))
+            sItemBrandingMgr->CacheItem(it);
     }
 };
 

@@ -21,6 +21,22 @@ namespace Branding
         return std::clamp(multiplier, 1.0, cfg.MaxRaidMul());
     }
 
+    double CatalystSelfStackMultiplier(uint8_t count, ICatalystConfig const& cfg)
+    {
+        if (count == 0)
+            return 1.0;
+
+        // Sum the per-source stack weights (1, decay, decay^2, ...) -- the same DR the raid curve uses,
+        // here applied to multiple sources on one actor (#31). The (1 - decay) factor normalises the
+        // geometric series so the total approaches exactly MaxRaidMul as count grows.
+        double weightSum = 0.0;
+        for (uint8_t rank = 1; rank <= count; ++rank)
+            weightSum += CatalystStackWeight(rank, cfg);
+
+        double const multiplier = 1.0 + (cfg.MaxRaidMul() - 1.0) * (1.0 - cfg.StackDecay()) * weightSum;
+        return std::clamp(multiplier, 1.0, cfg.MaxRaidMul());
+    }
+
     bool SameCatalystBucket(CatalystKey const& a, CatalystKey const& b)
     {
         // §14.9: both school AND tree must match -- Fire-Def and Fire-Off are different buckets.

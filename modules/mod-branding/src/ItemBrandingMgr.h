@@ -7,10 +7,22 @@
 #include <cstdint>
 #include <unordered_map>
 
+class Item;
 class Player;
 
 namespace Branding
 {
+    // Outcome of a one-shot Etch attempt (#31) -- mapped to a player message by the command layer.
+    enum class EtchResult : uint8_t
+    {
+        Success,
+        Disabled,            // Branding.Item.Enable or Branding.Etch.Enable off
+        NoWeapon,            // no equipped main-hand to etch
+        AlreadyBranded,      // this item already carries a Brand (etched or crafted)
+        NotEnrolled,         // active school not account-unlocked (no Knowledge -- can't express)
+        InsufficientEssence, // not enough Essence held
+    };
+
     // Adapter for item branding (§7.9). Per-item brand state keyed by the item's GUID, persisted to
     // `item_branding`. Upgrades spend economy resources to raise the item's proc/behavior INTENSITY
     // (never flat stats). Anti-P2W: a traded/maxed item is inert unless the current account can
@@ -23,14 +35,38 @@ namespace Branding
 
         void LoadConfig();
         bool Enabled() const { return _enabled; }
+        bool EtchEnabled() const { return _enabled && _etchEnabled; }
 
         IItemBrandConfig const& Config() const { return _config; }
 
-        // Load the player's equipped main-hand brand state into the cache on login.
+        uint32_t EssenceItemId() const { return _essenceItemId; }
+        uint32_t EssenceCost() const { return _essenceCost; }
+
+        // Load the brand state of every equipped Etch-eligible item into the cache on login.
         void LoadEquipped(Player* player);
+
+        // Cache an item's brand state when it is equipped mid-session (keeps the multi-slot aggregate /
+        // gates correct without a relog). No-op if already cached or the item carries no Brand.
+        void CacheItem(Item* item);
 
         // Brand the equipped weapon with the player's active brand (step 0). Persists.
         bool BrandEquipped(Player* player, BrandId brand);
+
+        // One-shot Etch (#31): brand the item in `equipSlot` with the player's active school, rank-locked
+        // (never upgradeable) and soulbound (BoP), consuming Essence. Validates + consumes only on
+        // success; refuses (no consume) otherwise. See EtchResult. `equipSlot` must be Etch-eligible
+        // (weapon/trinket -- see EtchEligibleSlot); ineligible slots return NoWeapon.
+        EtchResult EtchSlot(Player* player, uint8_t equipSlot);
+
+        // True if `equipSlot` is an Etch-eligible equipment slot (main-hand / off-hand / ranged / the
+        // two trinkets -- the proc-surface slots, #31 first cut).
+        static bool EtchEligibleSlot(uint8_t equipSlot);
+
+        // Aggregate proc multiplier from ALL equipped, expressible Etched items of the player's active
+        // school (#31 decisions 1 & 5): one per item across slots, combined through the catalyst
+        // self-stack DR (CatalystSelfStackMultiplier). In [1.0, MaxRaidMul]; 1.0 with none. This is where
+        // "unlimited items = wardrobe flexibility, not stacked power" is realised.
+        double AggregateEtchedIntensity(Player* player) const;
 
         // Spend `resources` to upgrade the equipped weapon's brand (ApplyItemUpgrade). Persists.
         // Returns the internal levels gained (0 if no branded weapon / nothing affordable).
@@ -47,9 +83,16 @@ namespace Branding
 
         // Resolves the equipped main-hand item GUID counter, or 0 if none.
         uint32_t EquippedItemGuid(Player* player) const;
+        // Resolves the item GUID counter in an arbitrary equipment slot, or 0 if empty.
+        uint32_t ItemGuidAtSlot(Player* player, uint8_t equipSlot) const;
+        // Loads one item's brand row into the cache (skips if already cached or no row exists).
+        void CacheBrandState(uint32_t itemGuid);
         void Save(uint32_t itemGuid, ItemBrandState const& state);
 
         bool _enabled = false;
+        bool _etchEnabled = false;
+        uint32_t _essenceItemId = 190002;
+        uint32_t _essenceCost = 500;
         ItemBrandConfig _config;
         std::unordered_map<uint32_t, ItemBrandState> _items;   // keyed by item GUID counter
     };

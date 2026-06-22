@@ -26,6 +26,10 @@ namespace Branding
     ItemUpgradeResult ApplyItemUpgrade(ItemBrandState& state, uint32_t resources, IItemBrandConfig const& cfg)
     {
         ItemUpgradeResult result;
+        // Etch (#31): a rank-locked Etched item is never upgradeable -- refuse without consuming.
+        if (state.etched)
+            return result;
+
         if (cfg.UpgradeCostPerLevel() == 0 || cfg.LevelsPerStep() == 0)
             return result;
 

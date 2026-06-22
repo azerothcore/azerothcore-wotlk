@@ -18,6 +18,15 @@ namespace Branding
     // NON-INCREASING in rank (1st full, 2nd reduced, 3rd+ heavily reduced; §7.9).
     double RaidCatalystMultiplier(uint8_t rank, ICatalystConfig const& cfg);
 
+    // Aggregate multiplier from `count` same-bucket branded SOURCES stacked on ONE actor -- e.g. several
+    // Etched items of the active school on a character (#31 decision 5). Each successive source is DR'd by
+    // the same geometric stack weight as the raid curve, so the total SATURATES: the 1st source carries
+    // most of the bonus and extra sources add ever less, capped at MaxRaidMul. Closed form (reusing
+    // CatalystStackWeight): 1 + (MaxRaidMul - 1) * (1 - StackDecay) * sum_{r=1..count} StackWeight(r),
+    // clamped to [1, MaxRaidMul]. count 0 -> 1.0. Monotonic non-decreasing in count. This is the
+    // "wardrobe flexibility, not stacked power" guarantee: stacking Etched items never runs past the cap.
+    double CatalystSelfStackMultiplier(uint8_t count, ICatalystConfig const& cfg);
+
     // §14.9: the catalyst DR bucket identity is (school, tree) -- NOT school alone and NOT role.
     // Two specialists share a DR bucket only when BOTH match, so Fire-Def / Fire-Off / Fire-Support
     // are three independent buckets (complementary, no DR); only a repeated cell stacks DR.
