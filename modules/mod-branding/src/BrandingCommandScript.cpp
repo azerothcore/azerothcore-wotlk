@@ -209,8 +209,13 @@ public:
 
         EventType type;
         if (sEventMgr->ActiveEventType(zone, type))
+        {
             handler->PSendSysMessage("Zone {} event: type {}, {:.0f}% contained.",
                 zone, static_cast<uint32>(type), sEventMgr->Containment(zone) * 100.0);
+            // §2.5 crowd scaling: live enrolled count vs the decayed-peak headcount that drives it.
+            handler->PSendSysMessage("Crowd: {} enrolled, effective headcount {}.",
+                sEventMgr->ParticipantCount(zone), sEventMgr->EffectiveHeadcount(zone));
+        }
         else
             handler->PSendSysMessage("Zone {}: no active event.", zone);
 

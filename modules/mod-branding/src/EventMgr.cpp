@@ -45,6 +45,7 @@ namespace Branding
     void EventMgr::LoadConfig()
     {
         _config.Load();
+        _invConfig.Load();
     }
 
     bool EventMgr::StartEvent(uint32_t zoneId, EventType type, uint64_t goal)
@@ -102,6 +103,38 @@ namespace Branding
 
         state.totalPoints += granted;
         eventIt->second.contributed += granted;
+
+        // §2.5.2: scoring enrols the player into this zone's invasion crowd (anti-AFK -- presence
+        // alone never inflates the field). Idempotent; they leave on zone change / logout / stop.
+        eventIt->second.roster.insert(guid);
+    }
+
+    uint32_t EventMgr::ParticipantCount(uint32_t zoneId) const
+    {
+        auto it = _events.find(zoneId);
+        return it != _events.end() ? static_cast<uint32_t>(it->second.roster.size()) : 0;
+    }
+
+    uint32_t EventMgr::EffectiveHeadcount(uint32_t zoneId) const
+    {
+        auto it = _events.find(zoneId);
+        return it != _events.end() ? it->second.effectiveHeadcount : 0;
+    }
+
+    void EventMgr::SampleCrowds()
+    {
+        uint64_t const now = _clock.NowUnix();
+        for (auto& [zoneId, event] : _events)
+        {
+            event.crowd.Sample(now, static_cast<uint32_t>(event.roster.size()), _invConfig);
+            event.effectiveHeadcount = event.crowd.Effective(now, _invConfig);
+        }
+    }
+
+    void EventMgr::DropFromRosters(ObjectGuid guid)
+    {
+        for (auto& [zoneId, event] : _events)
+            event.roster.erase(guid);
     }
 
     uint32_t EventMgr::PlayerPoints(ObjectGuid guid) const
@@ -118,6 +151,7 @@ namespace Branding
     void EventMgr::Unload(ObjectGuid guid)
     {
         _players.erase(guid);
+        DropFromRosters(guid);
 
         // Drop the shared account economy row only when the last online alt unloads, so a relog of
         // one character can't reset the account ceiling while another alt is still online.
