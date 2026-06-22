@@ -1,6 +1,6 @@
 # #26 — Invasion crowd scaling (§2.5)
 
-**Status:** open · **Deps:** §2.2 group-size core (done, pure); #10 event-spawner/scheduler; #12 persistence (EventMgr roster) · **Parallel-safe:** pure core yes (worktree); adapter coordinates with #10 on `EventScheduler`/`branding_event_spawn` · **Size:** L
+**Status:** pure core done · **Deps:** §2.2 group-size core (done, pure); **#10 event-spawn-wiring (merged)**; **#12 persistence (merged)** · **Parallel-safe:** pure core landed; adapter extends the merged single-group `EventScheduler`/`branding_event_spawn` in place · **Size:** L
 
 ## Context
 Open-world invasions (§9.1 `EventType::Invasion`) have a **fluctuating** population, unlike the
@@ -44,4 +44,6 @@ New `src/core/scaling/invasion/*` + tests; `EventMgr.*` (roster/`CrowdTracker`),
 `EventScheduler.*` (multi-row reconcile), a creature-stat adapter TU, §2.2 `EncounterHealthMul`
 (boss reuse), `branding_event_spawn` SQL (`pending_db_world`), `conf/mod_branding.conf.dist`,
 `mod_branding_loader.cpp` (register), `ARCHITECTURE.md` §2.5 (done), `tools/invasion-authoring/SPEC.md`.
-**Coordinate with #10/#12** (shared `EventMgr`/`EventScheduler`/`branding_event_spawn`).
+Extends the **already-merged** #10 single-group wiring (`EventScheduler` reads
+`SELECT zone_id, event_type, group_id, map_id FROM branding_event_spawn` today) and the #12
+EventMgr persistence — both are in `master`, so this is an in-place extension, not a coordination.

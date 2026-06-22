@@ -76,8 +76,8 @@ See [../ARCHITECTURE.md](../ARCHITECTURE.md) for the full spec. Section refs (§
 - **Batch E (groundwork done, flavour after #03):** #16 exotic-brand-schools.
 - **Batch F (selection economy, after #01+#07):** #17 mastery-selection-economy.
 - **Batch G (heroic overlay):** #23 heroic-tier-core first (pure), then #24 + #25 in parallel worktrees.
-- **Batch H (invasion crowd scaling):** #26 — pure `src/core/scaling/invasion/` first, then the
-  EventMgr/EventScheduler adapter (coordinate with #10/#12 on the shared event plumbing).
+- **Batch H (invasion crowd scaling):** #26 — pure `src/core/branding/scaling/Invasion*` (done), then
+  the EventMgr/EventScheduler adapter, extending the **merged** #10 single-group wiring in place.
 - **Needs design input:** #14 xp-balance-sim; #17 has open *[DEFAULT]* decisions (title path, tuition curve).
 
 ## Cross-cutting note
