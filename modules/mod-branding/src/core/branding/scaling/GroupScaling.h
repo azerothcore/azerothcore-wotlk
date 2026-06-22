@@ -20,9 +20,10 @@ namespace Branding
     // Reward yield: "won't drop as good or as many" for a smaller group (§2.2).
     struct RewardScale
     {
-        uint32_t materialQuantity = 0;   // how MANY drops
+        uint32_t materialQuantity = 0;   // how MANY drops (linear in group fraction)
         uint8_t maxTier = 0;             // how GOOD (caps reward tier)
         double rareChanceMul = 0.0;      // rare/epic catalyst chance multiplier
+        double currencyMul = 0.0;        // branding-currency yield -- steeper than gear (§2.4.3)
     };
 
     RewardScale RewardScaleForGroup(GroupContext const& group, IScalingConfig const& cfg);

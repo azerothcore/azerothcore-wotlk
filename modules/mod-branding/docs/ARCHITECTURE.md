@@ -181,6 +181,116 @@ resolution. Group-size encounter/reward scaling (§2.2) and incoming-damage/heal
 
 ---
 
+## 2.4 Heroic Overlay (issue #22)
+
+A fourth scaling consideration, orthogonal to §2.1 (per-player downscale) and §2.2 (group-size
+encounter+reward). Goal: **every** dungeon and raid — including classic/TBC content that has *no*
+native heroic difficulty in `MapDifficulty.dbc` — can be run as a **max-level heroic**, selected
+through the **native client Normal/Heroic difficulty UI**, with a higher reward tier.
+
+### 2.4.1 The linchpin — read the *selected* difficulty, not the *map* difficulty
+
+The native difficulty selector is a **character/group-wide flag**, not per-map, so a player can set
+Heroic and enter *any* instance. The overlay keys off the player/group selection, **not**
+`Map::GetDifficulty()`:
+
+- `Player::GetDungeonDifficulty()` / `GetRaidDifficulty()` (+ the `Group` equivalents) return what
+  the player *selected* and persist regardless of the map.
+- On entering a classic/TBC instance with no heroic DBC row, the core calls
+  `GetDownscaledMapDifficultyData` and silently runs the map as **normal** (difficulty 0) — but the
+  selected flag stays `…_HEROIC`.
+
+So one native toggle covers all content: WotLK 5-mans/raids engage the *engine's* real heroic
+(native `difficulty_entry` mobs + heroic loot already exist — we do not touch those); for everything
+else the map runs normal and the overlay supplies the heroic tuning + reward tier. **No DBC edit, no
+client patch.**
+
+### 2.4.2 Pure core (`src/core/scaling/heroic/`)
+
+```cpp
+enum class SelectedDifficulty : uint8_t { Normal, Heroic };
+
+struct HeroicContext {
+    SelectedDifficulty selected;
+    bool   nativeHeroicMap;   // true ⇒ engine already runs real heroic; overlay defers stats to it
+    uint8_t maxLevel;         // server level cap (overlay level target)
+};
+
+// Encounter side — an ADDITIONAL scalar that composes onto the §2.2 muls (multiplicative).
+double HeroicHealthMul(HeroicContext const&, IHeroicConfig const&);   // 1.0 when Normal or native-heroic
+double HeroicDamageMul(HeroicContext const&, IHeroicConfig const&);
+uint8_t HeroicLevelTarget(HeroicContext const&, IHeroicConfig const&);// maxLevel when Heroic overlay engages
+
+// Reward side — heroic bumps tier/quantity; composes with §2.2 RewardScale.
+uint8_t HeroicTierBonus(HeroicContext const&, IHeroicConfig const&);  // 0 when Normal
+```
+
+### 2.4.3 Reward currency reduction (extends §2.2 `RewardScale`)
+
+§2.2's `RewardScale` gains a **branding-currency-specific** term so currency tracks real difficulty
+more steeply than gear does (small-group clears of trivialised old content must not be a currency
+farm):
+
+```cpp
+struct RewardScale {            // §2.2, extended
+    uint32_t materialQuantity;  // item drops — gentle reduction
+    uint8_t  maxTier;
+    double   rareChanceMul;
+    double   currencyMul;       // NEW — branding currency, steeper reduction
+};
+```
+
+With group fraction `r = groupSize / contentSize` (e.g. 5-man MC ⇒ `r = 0.125`):
+
+- **Item quantity** ∝ `r` (linear — the existing §2.2 behaviour, floored at 1 drop). Unchanged.
+- **Currency** `currencyMul` = `clamp(r^N, floor, 1.0)` with `N ≥ 1` (default `2.0`) and `floor`
+  default `0.05`. For `r < 1` this is **strictly below** the linear gear fraction, so currency falls
+  off faster than gear; never zero (anti-frustration) but ≪ a full clear (anti-farm). A 5/40 clear
+  lands on the floor (≈5% of full). Exponent/floor are `IScalingConfig` knobs (this term is part of
+  the §2.2 group reward scale).
+- The heroic overlay then multiplies tier/quantity/currency **up** by the heroic bonus, applied per
+  player through the existing §9.4 personal-loot delivery path (no tagging).
+- **Stream separation:** this is the *instanced* reward path. It is **decoupled** from the §9
+  open-world invasion/event contribution rewards (`EventMgr::ResolveReward`) — heroic dungeons/raids
+  and invasions are distinct reward streams that only share the §2.2 `RewardScale` math. The heroic
+  modifiers are exposed via `HeroicMgr::RewardModifiersFor` (issue #25); the instanced boss-reward
+  trigger consuming them (`OnPlayerCreatureKill` → per-player currency, issue #26) is a self-contained
+  instanced stream — currency-only baseline, gear stays engine loot. A richer instanced personal-loot
+  table is future work under the broader §2.2 instanced-reward design.
+
+### 2.4.4 Composition order (all independent)
+
+1. **§2.1** per-player — over-levelled player's outgoing stats downscale to the zone bracket.
+2. **§2.2** group-size — encounter HP/dmg scale to the group; reward quantity/tier/currency scale to `r`.
+3. **§2.4** heroic — if Heroic selected (and not a native-heroic map), level-target → `maxLevel`,
+   encounter muls multiply on top of §2.2, reward tier/currency bump up.
+4. **§7.9** branding — applied per player last.
+
+### 2.4.5 Invariants (tested)
+
+- **Monotonic in difficulty**: heroic reward ≥ normal reward for the same group; heroic encounter
+  muls ≥ 1.0.
+- **Currency steeper than gear**: for `r < 1`, `currencyMul ≤ materialQuantity-fraction`.
+- **Completability preserved**: heroic muls bounded so a *downscaled small group on heroic* is still
+  beatable — the §2.2 small-group clamp and the heroic mul compose without producing an impossible
+  wall.
+- **Native-heroic deference**: when `nativeHeroicMap`, `HeroicHealthMul == HeroicDamageMul == 1.0`
+  (we never double-scale content the engine already tuned).
+- **Snapshot, not pull** (Risk #4, carried from §2.3): group size *and* selected difficulty are
+  sampled at grant / continuously, **never** at pull.
+
+### 2.4.6 Mechanic exceptions — advisory, the group's call (not a gate)
+
+Stat scaling cannot satisfy body-count-dependent encounter scripts (BWL Razorgore orb, Naxx Four
+Horsemen, AQ40 C'Thun, BWL Vaelastrasz, …). The overlay neither rescripts **nor gates** these: the
+encounter still scales to whatever group enters (§2.2), and it stays **the group's call** to bring
+enough bodies — a 5-man that can't hold the four Horsemen positions simply forms a 10-man. The
+`branding_heroic_exception` table (`map/boss → recommended-min-bodies + note`) is **advisory only**,
+surfaced to players (addon/UI hint) so they size the raid appropriately; it does **not** block entry,
+force a minimum, or disable the overlay. Rescripting these encounters is explicitly out of scope.
+
+---
+
 ## 3. Module Layout
 
 One module. The pure core lives **under `src/`** (`src/core/`) because the AzerothCore module

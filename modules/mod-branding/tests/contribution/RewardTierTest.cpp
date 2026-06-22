@@ -31,3 +31,42 @@ TEST(RewardTier, MonotonicInPoints)
         prev = tier;
     }
 }
+
+// §2.4.2 heroic bump: a contribution-earned tier advances, capped at Gold.
+TEST(RewardTier, BumpAdvancesAndCapsAtGold)
+{
+    EXPECT_EQ(BumpTier(RewardTier::Bronze, 1), RewardTier::Silver);
+    EXPECT_EQ(BumpTier(RewardTier::Bronze, 2), RewardTier::Gold);
+    EXPECT_EQ(BumpTier(RewardTier::Silver, 1), RewardTier::Gold);
+    EXPECT_EQ(BumpTier(RewardTier::Silver, 5), RewardTier::Gold);   // capped
+    EXPECT_EQ(BumpTier(RewardTier::Gold, 1), RewardTier::Gold);
+}
+
+// A zero bonus (normal difficulty) is identity; None never gains a reward from heroic alone.
+TEST(RewardTier, BumpIdentityAndNoneFloor)
+{
+    EXPECT_EQ(BumpTier(RewardTier::Bronze, 0), RewardTier::Bronze);
+    EXPECT_EQ(BumpTier(RewardTier::None, 0), RewardTier::None);
+    EXPECT_EQ(BumpTier(RewardTier::None, 3), RewardTier::None);
+}
+
+// Bump never lowers a tier (monotonic in bonus).
+TEST(RewardTier, BumpMonotonicInBonus)
+{
+    RewardTier prev = RewardTier::Bronze;
+    for (uint8_t bonus = 0; bonus <= 6; ++bonus)
+    {
+        RewardTier const tier = BumpTier(RewardTier::Bronze, bonus);
+        EXPECT_GE(static_cast<uint8_t>(tier), static_cast<uint8_t>(prev));
+        prev = tier;
+    }
+}
+
+// §2.4 instanced boss base currency: strictly increasing by tier; None earns nothing.
+TEST(RewardTier, BaseBossCurrencyByTier)
+{
+    EXPECT_EQ(BaseBossCurrency(RewardTier::None), 0u);
+    EXPECT_GT(BaseBossCurrency(RewardTier::Bronze), 0u);
+    EXPECT_GT(BaseBossCurrency(RewardTier::Silver), BaseBossCurrency(RewardTier::Bronze));
+    EXPECT_GT(BaseBossCurrency(RewardTier::Gold), BaseBossCurrency(RewardTier::Silver));
+}

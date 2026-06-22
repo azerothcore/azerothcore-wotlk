@@ -1,0 +1,58 @@
+name: branding-modules
+
+# Fast, module-scoped CI for mod-branding. Builds and runs the standalone pure-core
+# test target (no worldserver, no game lib, no DB) plus codestyle. The upstream
+# full-server build workflows are gated to azerothcore/azerothcore-wotlk and never
+# run here, and they only trigger on src/** anyway -- this fills that gap for the
+# module without paying for a multi-hour worldserver compile.
+on:
+  push:
+    paths:
+      - 'modules/mod-branding/**'
+      - '.github/workflows/branding-modules.yml'
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - synchronize
+    paths:
+      - 'modules/mod-branding/**'
+      - '.github/workflows/branding-modules.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  core-tests:
+    name: core-tests (standalone, no worldserver)
+    runs-on: ubuntu-24.04
+    if: github.repository == 'and-elf/azerothcore-wotlk'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -S modules/mod-branding/tests/standalone -B build-branding -DCMAKE_BUILD_TYPE=Debug
+      - name: Build
+        run: cmake --build build-branding -j"$(nproc)"
+      - name: Test
+        run: ctest --test-dir build-branding --output-on-failure
+
+  codestyle:
+    name: codestyle (cpp + sql)
+    runs-on: ubuntu-24.04
+    if: github.repository == 'and-elf/azerothcore-wotlk'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # codestyle-sql.py diffs against origin/master, so fetch full history.
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: C++ codestyle
+        run: python3 apps/codestyle/codestyle-cpp.py
+      - name: SQL codestyle
+        run: python3 apps/codestyle/codestyle-sql.py

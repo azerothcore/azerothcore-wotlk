@@ -1,5 +1,6 @@
 #include "GroupScaling.h"
 #include <algorithm>
+#include <cmath>
 
 namespace Branding
 {
@@ -42,6 +43,11 @@ namespace Branding
         reward.materialQuantity = std::max<uint32_t>(1, static_cast<uint32_t>(cfg.MaxGroupMaterials() * fraction + 0.5));
         reward.maxTier = std::max<uint8_t>(1, static_cast<uint8_t>(cfg.MaxRewardTier() * fraction + 0.5));
         reward.rareChanceMul = Lerp(cfg.RareChanceMulMin(), cfg.RareChanceMulMax(), Progress(group));
+
+        // Currency falls off steeper than gear: fraction^exp (exp >= 1), floored so a small group is
+        // never zeroed out but a trivialised clear is no farm (§2.4.3).
+        double const currency = std::pow(fraction, cfg.CurrencyReductionExponent());
+        reward.currencyMul = std::clamp(currency, cfg.CurrencyMulFloor(), 1.0);
         return reward;
     }
 }

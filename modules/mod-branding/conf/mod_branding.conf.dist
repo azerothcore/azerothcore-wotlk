@@ -136,6 +136,76 @@ Branding.Scaling.Enable = 0
 Branding.Scaling.Exponent = 2.0
 
 #
+#    Branding.Scaling.CurrencyReductionExponent / Branding.Scaling.CurrencyMulFloor
+#        Description: Small-group branding-currency reduction (§2.4.3). currencyMul =
+#                     clamp(groupFraction^Exponent, Floor, 1.0). Exponent >= 1 makes currency fall off
+#                     STEEPER than gear (which is linear in group fraction); the floor keeps a
+#                     trivialised small-group clear non-zero but far below a full clear.
+#        Default:     2.0 / 0.05  (a 5/40 clear lands on the floor)
+#
+
+Branding.Scaling.CurrencyReductionExponent = 2.0
+Branding.Scaling.CurrencyMulFloor = 0.05
+
+#
+#    Branding.Heroic.Enable
+#        Description: Heroic overlay (§2.4). When a group SELECTS heroic in the native difficulty UI,
+#                     instance creatures on maps WITHOUT a native heroic difficulty (classic/TBC) are
+#                     tuned toward the level cap with the multipliers below. Native-heroic WotLK
+#                     content is left to the engine (never double-scaled).
+#        Default:     0 - (disabled)
+#
+
+Branding.Heroic.Enable = 0
+
+#
+#    Branding.Heroic.LevelCap
+#        Description: Level target instance creatures are raised to when the overlay engages.
+#        Default:     80
+#
+
+Branding.Heroic.LevelCap = 80
+
+#
+#    Branding.Heroic.HealthMul / Branding.Heroic.DamageMul
+#        Description: Overlay encounter multipliers applied ON TOP of the level target (and §2.2 group
+#                     scaling). Health scales creature max HP at spawn; damage scales outgoing damage.
+#        Default:     2.0 / 1.5
+#
+
+Branding.Heroic.HealthMul = 2.0
+Branding.Heroic.DamageMul = 1.5
+
+#
+#    Branding.Heroic.TierBonus
+#        Description: Reward-tier bump applied to a heroic run (native or overlay), consumed by the
+#                     reward path (#25).
+#        Default:     1
+#
+
+Branding.Heroic.TierBonus = 1
+
+#
+#    Branding.Heroic.BossReward.Enable
+#        Description: Instanced boss-reward trigger (§2.4, #26). On an instance boss kill, grant each
+#                     present player branding currency: base tier by boss rank (world boss/raid/
+#                     dungeon), heroic tier bump, then the §2.4.3 group-size currency reduction.
+#                     Opt-in and SEPARATE from the scaling gate; does not touch the event reward path.
+#        Default:     0 - (disabled)
+#
+
+Branding.Heroic.BossReward.Enable = 0
+
+#
+#    Branding.Heroic.BossReward.CurrencyMultiplier
+#        Description: Flat tuning multiplier on the instanced boss currency reward (before the
+#                     group-size reduction). 1.0 = the built-in per-tier schedule.
+#        Default:     1.0
+#
+
+Branding.Heroic.BossReward.CurrencyMultiplier = 1.0
+
+#
 #    Branding.Event.Enable
 #        Description: Dynamic-event contribution engine (§9): kills in a zone with an active event
 #                     score through the anti-leech / daily-DR / hourly-cap guardrails. Events are

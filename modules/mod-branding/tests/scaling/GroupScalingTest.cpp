@@ -81,3 +81,37 @@ TEST(GroupScaling, Deterministic)
     FakeScalingConfig cfg;
     EXPECT_DOUBLE_EQ(EncounterHealthMul(Group(13, 25), cfg), EncounterHealthMul(Group(13, 25), cfg));
 }
+
+// A full group earns full currency (no reduction).
+TEST(GroupScaling, FullGroupHasFullCurrency)
+{
+    FakeScalingConfig cfg;
+    EXPECT_DOUBLE_EQ(RewardScaleForGroup(Group(40, 40), cfg).currencyMul, 1.0);
+}
+
+// Currency falls off strictly faster than gear for a smaller group (§2.4.3 "especially currency").
+TEST(GroupScaling, CurrencySteeperThanGear)
+{
+    FakeScalingConfig cfg;
+    for (uint8_t size : {5, 10, 20})
+    {
+        RewardScale const r = RewardScaleForGroup(Group(size, 40), cfg);
+        double const gearFraction = static_cast<double>(r.materialQuantity) / cfg.maxGroupMaterials;
+        EXPECT_LT(r.currencyMul, gearFraction) << "size=" << static_cast<int>(size);
+    }
+}
+
+// Currency is monotonic non-decreasing in group size, never exceeds 1.0, and respects the floor.
+TEST(GroupScaling, CurrencyMonotonicBoundedAndFloored)
+{
+    FakeScalingConfig cfg;
+    double prev = -1.0;
+    for (uint8_t size = 1; size <= 40; ++size)
+    {
+        double const mul = RewardScaleForGroup(Group(size, 40), cfg).currencyMul;
+        EXPECT_GE(mul, prev);
+        EXPECT_GE(mul, cfg.currencyMulFloor);
+        EXPECT_LE(mul, 1.0);
+        prev = mul;
+    }
+}
