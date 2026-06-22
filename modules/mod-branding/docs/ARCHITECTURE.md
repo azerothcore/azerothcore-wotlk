@@ -250,6 +250,13 @@ With group fraction `r = groupSize / contentSize` (e.g. 5-man MC ⇒ `r = 0.125`
   the §2.2 group reward scale).
 - The heroic overlay then multiplies tier/quantity/currency **up** by the heroic bonus, applied per
   player through the existing §9.4 personal-loot delivery path (no tagging).
+- **Stream separation:** this is the *instanced* reward path. It is **decoupled** from the §9
+  open-world invasion/event contribution rewards (`EventMgr::ResolveReward`) — heroic dungeons/raids
+  and invasions are distinct reward streams that only share the §2.2 `RewardScale` math. The heroic
+  modifiers are exposed via `HeroicMgr::RewardModifiersFor` (issue #25); the instanced boss-reward
+  trigger consuming them (`OnPlayerCreatureKill` → per-player currency, issue #26) is a self-contained
+  instanced stream — currency-only baseline, gear stays engine loot. A richer instanced personal-loot
+  table is future work under the broader §2.2 instanced-reward design.
 
 ### 2.4.4 Composition order (all independent)
 
@@ -284,7 +291,7 @@ force a minimum, or disable the overlay. Rescripting these encounters is explici
 
 ---
 
-## 2.5 Invasion Crowd Scaling (issue #26)
+## 2.5 Invasion Crowd Scaling (issue #28)
 
 A fifth scaling consideration, **specific to open-world invasions** (§9.1 `EventType::Invasion`).
 Where §2.2 scales a **fixed-roster** instance (a 5-man in a 40-man slot), an invasion is open-world

@@ -56,11 +56,12 @@ See [../ARCHITECTURE.md](../ARCHITECTURE.md) for the full spec. Section refs (§
   (heroic overlay — #22 epic, extends §2.2/§2.4; reference autobalance, do NOT import per §2.3)
    #22 ─┬▶ #23 heroic-tier-core        (pure HeroicContext muls + RewardScale.currencyMul)
         ├▶ #24 heroic-overlay-adapter   (read SELECTED difficulty, encounter scale, snapshot, exceptions) ◀ needs #23
-        └▶ #25 heroic-reward-wiring      (currencyMul + tier bonus through §9.4 personal loot)            ◀ needs #23
+        ├▶ #25 heroic-reward-modifiers   (BumpTier + currencyMul exposure; decoupled from EventMgr)       ◀ needs #23
+        └▶ #26 instanced-boss-reward     (OnPlayerCreatureKill -> per-player currency grant)              ◀ needs #25
 
-  (invasion crowd scaling — #26, extends §2.2; first live consumer of the §2.2 boss core)
+  (invasion crowd scaling — #28, extends §2.2; first live consumer of the §2.2 boss core)
    #10 event-spawner ─┐
-   #12 persistence   ─┴▶ #26 invasion-crowd-scaling (pure CrowdTracker/ActiveSpawnTiers/trash curve;
+   #12 persistence   ─┴▶ #28 invasion-crowd-scaling (pure CrowdTracker/ActiveSpawnTiers/trash curve;
                                                      EventMgr roster; multi-row branding_event_spawn)
 ```
 
@@ -76,7 +77,7 @@ See [../ARCHITECTURE.md](../ARCHITECTURE.md) for the full spec. Section refs (§
 - **Batch E (groundwork done, flavour after #03):** #16 exotic-brand-schools.
 - **Batch F (selection economy, after #01+#07):** #17 mastery-selection-economy.
 - **Batch G (heroic overlay):** #23 heroic-tier-core first (pure), then #24 + #25 in parallel worktrees.
-- **Batch H (invasion crowd scaling):** #26 — **complete**: pure `src/core/branding/scaling/Invasion*`,
+- **Batch H (invasion crowd scaling):** #28 — **complete**: pure `src/core/branding/scaling/Invasion*`,
   EventMgr roster + EventScheduler multi-tier reconcile, `InvasionScalingMgr` live damage + dynamic
   health, the authoring-tool `SpawnTier` emitter, and the GUI tier editor.
 - **Needs design input:** #14 xp-balance-sim; #17 has open *[DEFAULT]* decisions (title path, tuition curve).

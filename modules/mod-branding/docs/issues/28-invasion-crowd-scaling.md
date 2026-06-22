@@ -1,4 +1,4 @@
-# #26 — Invasion crowd scaling (§2.5)
+# #28 — Invasion crowd scaling (§2.5)
 
 **Status:** complete (`-fsyntax-only` + pytest/ruff + codestyle verified) · **Deps:** §2.2 group-size core (done, pure); **#10 event-spawn-wiring (merged)**; **#12 persistence (merged)** · **Size:** L
 

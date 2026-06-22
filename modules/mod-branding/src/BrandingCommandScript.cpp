@@ -2,6 +2,7 @@
 #include "CatalystMgr.h"
 #include "DiscoveryMgr.h"
 #include "EventMgr.h"
+#include "HeroicMgr.h"
 #include "InsightMgr.h"
 #include "ItemBrandingMgr.h"
 #include "LoadoutMgr.h"
@@ -17,6 +18,7 @@
 #include "mod_branding_loader.h"
 #include "Chat.h"
 #include "CommandScript.h"
+#include "Map.h"
 #include "Player.h"
 #include "RBAC.h"
 #include <algorithm>
@@ -139,6 +141,7 @@ public:
         static ChatCommandTable brandingCommandTable =
         {
             { "info",        HandleBrandingInfoCommand,        rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "heroic",      HandleBrandingHeroicCommand,      rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
             { "setbrand",    HandleBrandingSetBrandCommand,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
             { "setproc",     HandleBrandingSetProcCommand,     rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
             { "itembrand",   HandleBrandingItemBrandCommand,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
@@ -155,6 +158,46 @@ public:
             { "branding", brandingCommandTable },
         };
         return commandTable;
+    }
+
+    static bool HandleBrandingHeroicCommand(ChatHandler* handler)
+    {
+        Player* player = handler->GetPlayer();
+        if (!player)
+        {
+            handler->SendErrorMessage("This command must be used in-world.");
+            return false;
+        }
+
+        Map* map = player->GetMap();
+        if (!map || !map->IsDungeon())
+        {
+            handler->PSendSysMessage("Heroic overlay: not in an instance.");
+            return true;
+        }
+
+        HeroicContext const ctx = sHeroicMgr->ContextFor(map);
+        uint8_t levelTarget = 0;
+        sHeroicMgr->LevelTargetFor(map, levelTarget);
+        handler->PSendSysMessage("Heroic overlay [{}]: selected={}, nativeHeroicMap={}, engages={}.",
+            sHeroicMgr->Enabled() ? "enabled" : "disabled",
+            ctx.selected == SelectedDifficulty::Heroic ? "Heroic" : "Normal",
+            ctx.nativeHeroicMap, HeroicOverlayEngages(ctx));
+        handler->PSendSysMessage("  levelTarget={}, healthMul={:.2f}, damageMul={:.2f}, tierBonus={}.",
+            levelTarget, sHeroicMgr->HealthMulFor(map),
+            sHeroicMgr->DamageMulFor(map), sHeroicMgr->TierBonusFor(map));
+
+        HeroicMgr::RewardModifiers const mods = sHeroicMgr->RewardModifiersFor(map);
+        handler->PSendSysMessage("  reward: currencyMul={:.2f}, tierBonus={} (instanced stream; not the event path).",
+            mods.currencyMul, mods.tierBonus);
+
+        if (uint8 const minBodies = sHeroicMgr->RecommendedMinBodies(map->GetId(), 0))
+        {
+            handler->PSendSysMessage("  advisory: recommended >= {} players. {}",
+                minBodies, sHeroicMgr->ExceptionNote(map->GetId(), 0));
+        }
+
+        return true;
     }
 
     static bool HandleBrandingEventStartCommand(ChatHandler* handler, uint32 type, uint32 goal)

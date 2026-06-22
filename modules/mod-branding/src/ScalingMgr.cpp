@@ -1,4 +1,5 @@
 #include "ScalingMgr.h"
+#include "branding/scaling/GroupScaling.h"
 #include "branding/scaling/Scaling.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
@@ -61,5 +62,13 @@ namespace Branding
 
         // Downward only: ScalingFactor returns 1.0 when the player is at or below the zone bracket.
         return ScalingFactor(attacker->GetLevel(), targetLevel, _config);
+    }
+
+    double ScalingMgr::CurrencyMulForGroup(uint8_t groupSize, uint8_t contentSize) const
+    {
+        GroupContext group;
+        group.groupSize = groupSize;
+        group.contentSize = contentSize;
+        return RewardScaleForGroup(group, _config).currencyMul;
     }
 }

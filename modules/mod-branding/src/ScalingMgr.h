@@ -26,6 +26,11 @@ namespace Branding
         // disabled, or the zone has no defined level.
         double PlayerOutgoingFactor(Player* attacker) const;
 
+        // §2.4.3 branding-currency multiplier for a group running content of a given intended size
+        // (e.g. 5 in a 40-man). Independent of Branding.Scaling.Enable -- it uses only the currency
+        // dials. 1.0 at full group; floored for a small group (steeper than gear).
+        double CurrencyMulForGroup(uint8_t groupSize, uint8_t contentSize) const;
+
     private:
         ScalingMgr() = default;
         ScalingConfig _config;

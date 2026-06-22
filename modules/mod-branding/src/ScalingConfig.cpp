@@ -16,7 +16,7 @@ namespace Branding
         _rareChanceMulMin = sConfigMgr->GetOption<float>("Branding.Scaling.RareChanceMulMin", 0.5f);
         _rareChanceMulMax = sConfigMgr->GetOption<float>("Branding.Scaling.RareChanceMulMax", 2.0f);
 
-        // Branding-currency reduction (§2.4.3): steeper-than-gear falloff for a smaller group.
+        // Branding-currency reduction (§2.4.3): currency falls off steeper than gear.
         _currencyReductionExponent = sConfigMgr->GetOption<float>("Branding.Scaling.CurrencyReductionExponent", 2.0f);
         _currencyMulFloor = sConfigMgr->GetOption<float>("Branding.Scaling.CurrencyMulFloor", 0.05f);
     }
