@@ -1,13 +1,18 @@
 #include "EventScheduler.h"
 #include "AddonProtocolMgr.h"
 #include "EventMgr.h"
+#include "InvasionScalingMgr.h"
+#include "branding/scaling/InvasionScaling.h"
 #include "Configuration/Config.h"
 #include "DatabaseEnv.h"
 #include "Field.h"
 #include "Log.h"
 #include "Map.h"
 #include "MapMgr.h"
+#include "ObjectMgr.h"
 #include "QueryResult.h"
+#include "SpawnData.h"
+#include <vector>
 
 namespace Branding
 {
@@ -20,13 +25,14 @@ namespace Branding
     void EventScheduler::LoadConfig()
     {
         _enabled = sConfigMgr->GetOption<bool>("Branding.Event.SchedulerEnable", false);
+        _invConfig.Load();
 
-        // Stop anything we had running (and despawn its group), then rebuild from the table.
-        for (Scheduled const& s : _zones)
+        // Stop anything we had running (and despawn its tiers), then rebuild from the table.
+        for (Scheduled& s : _zones)
             if (s.active)
             {
                 sEventMgr->StopEvent(s.zoneId);
-                DriveSpawnGroup(s, false);
+                DespawnAllTiers(s);
             }
         _zones.clear();
 
@@ -58,9 +64,10 @@ namespace Branding
 
     void EventScheduler::LoadSpawnGroups()
     {
-        // Map each (zone, type) schedule entry to its authored manual spawn group, if any.
+        // Each (zone, type) owns one Tier per row -- the base tier plus any reinforcement tiers.
         QueryResult result = WorldDatabase.Query(
-            "SELECT `zone_id`, `event_type`, `group_id`, `map_id` FROM `branding_event_spawn`");
+            "SELECT `zone_id`, `event_type`, `group_id`, `map_id`, `min_participants`, `goal_contribution` "
+            "FROM `branding_event_spawn`");
         if (!result)
             return;     // table absent or empty -- events simply have no authored spawns
 
@@ -75,32 +82,117 @@ namespace Branding
                 if (s.zoneId != zoneId || static_cast<uint8>(s.type) != type)
                     continue;
 
-                s.spawnGroupId = fields[2].Get<uint32>();
-                s.mapId = fields[3].Get<uint16>();
-                s.hasSpawnGroup = s.spawnGroupId != 0;
+                if (s.tiers.size() >= 64)
+                    break;      // bitmask ceiling -- far above any authored invasion
+
+                Tier tier;
+                tier.groupId = fields[2].Get<uint32>();
+                tier.mapId = fields[3].Get<uint16>();
+                tier.minParticipants = fields[4].Get<uint32>();
+                tier.goalContribution = fields[5].Get<uint32>();
+                if (tier.groupId != 0)
+                    s.tiers.push_back(tier);
                 break;
             }
         } while (result->NextRow());
     }
 
-    void EventScheduler::DriveSpawnGroup(Scheduled const& s, bool spawn)
+    void EventScheduler::DriveGroup(uint32_t groupId, uint16_t mapId, uint32_t zoneId, bool spawn)
     {
-        if (!s.hasSpawnGroup)
-            return;
-
         // World zones live on the continent's base, non-instance map. If no players are on the
         // continent the map is not instantiated yet -- nothing to (de)spawn, so just skip.
-        Map* map = sMapMgr->FindBaseNonInstanceMap(s.mapId);
+        Map* map = sMapMgr->FindBaseNonInstanceMap(mapId);
         if (!map)
             return;
 
         if (spawn)
-            map->SpawnGroupSpawn(s.spawnGroupId, true, true);
+            map->SpawnGroupSpawn(groupId, true, true);
         else
-            map->SpawnGroupDespawn(s.spawnGroupId, true);
+            map->SpawnGroupDespawn(groupId, true);
 
         LOG_DEBUG("module.branding", "EventScheduler: {} spawn group {} on map {} (zone {})",
-            spawn ? "spawned" : "despawned", s.spawnGroupId, s.mapId, s.zoneId);
+            spawn ? "spawned" : "despawned", groupId, mapId, zoneId);
+    }
+
+    void EventScheduler::ReconcileTiers(Scheduled& s)
+    {
+        if (s.tiers.empty())
+            return;
+
+        std::vector<uint32_t> thresholds;
+        std::vector<uint64_t> goalContribs;
+        thresholds.reserve(s.tiers.size());
+        goalContribs.reserve(s.tiers.size());
+        for (Tier const& t : s.tiers)
+        {
+            thresholds.push_back(t.minParticipants);
+            goalContribs.push_back(t.goalContribution);
+        }
+
+        uint32_t const headcount = sEventMgr->EffectiveHeadcount(s.zoneId);
+        uint64_t const newMask = ReconcileSpawnTiers(
+            std::span<uint32_t const>(thresholds.data(), thresholds.size()), headcount, s.activeTierMask, _invConfig);
+
+        // Apply only the deltas -- spawn newly-crossed tiers, despawn released ones.
+        for (std::size_t i = 0; i < s.tiers.size() && i < 64; ++i)
+        {
+            bool const wasUp = ((s.activeTierMask >> i) & 1ULL) != 0;
+            bool const nowUp = ((newMask >> i) & 1ULL) != 0;
+            if (nowUp != wasUp)
+                DriveGroup(s.tiers[i].groupId, s.tiers[i].mapId, s.zoneId, nowUp);
+        }
+        s.activeTierMask = newMask;
+
+        // §2.5.4: the live containment goal is the sum of the active tiers' contributions; fall back
+        // to the static `branding_event_def` goal when no tier authors a contribution.
+        uint64_t liveGoal = LiveContainmentGoal(
+            std::span<uint64_t const>(goalContribs.data(), goalContribs.size()), newMask);
+        if (liveGoal == 0)
+            liveGoal = s.goal;
+        sEventMgr->SetGoal(s.zoneId, liveGoal);
+
+        // §2.5.1 dynamic health: when the crowd moved, re-scale the live creatures' health pools so a
+        // boss/field that players join or abandon mid-fight tracks the headcount (damage is already
+        // live per hit). Gated on a real change so the creature walk runs only when needed.
+        if (headcount != s.healthHeadcount)
+        {
+            RescaleActiveTierHealth(s);
+            s.healthHeadcount = headcount;
+        }
+    }
+
+    void EventScheduler::RescaleActiveTierHealth(Scheduled const& s)
+    {
+        for (std::size_t i = 0; i < s.tiers.size() && i < 64; ++i)
+        {
+            if (((s.activeTierMask >> i) & 1ULL) == 0)
+                continue;
+
+            Tier const& t = s.tiers[i];
+            Map* map = sMapMgr->FindBaseNonInstanceMap(t.mapId);
+            if (!map)
+                continue;
+
+            auto const range = sObjectMgr->GetSpawnDataForGroup(t.groupId);
+            for (auto it = range.first; it != range.second; ++it)
+            {
+                SpawnData const* data = it->second;
+                if (data->type != SPAWN_TYPE_CREATURE)
+                    continue;
+
+                auto bounds = map->GetCreatureBySpawnIdStore().equal_range(data->spawnId);
+                for (auto cr = bounds.first; cr != bounds.second; ++cr)
+                    sInvasionScalingMgr->ApplyHealth(cr->second);
+            }
+        }
+    }
+
+    void EventScheduler::DespawnAllTiers(Scheduled& s)
+    {
+        for (std::size_t i = 0; i < s.tiers.size() && i < 64; ++i)
+            if (((s.activeTierMask >> i) & 1ULL) != 0)
+                DriveGroup(s.tiers[i].groupId, s.tiers[i].mapId, s.zoneId, false);
+        s.activeTierMask = 0;
     }
 
     void EventScheduler::EnsureSpawnedForZone(uint32_t zoneId)
@@ -108,11 +200,17 @@ namespace Branding
         if (!_enabled)
             return;
 
-        // A zone may host several event types; re-assert every active one. The entering player makes
-        // the map live, so DriveSpawnGroup will resolve it (idempotent if the group is already up).
+        // A zone may host several event types; re-assert every active tier. The entering player makes
+        // the map live, so DriveGroup resolves it (idempotent if the group is already up).
         for (Scheduled const& s : _zones)
-            if (s.zoneId == zoneId && s.active && s.hasSpawnGroup)
-                DriveSpawnGroup(s, true);
+        {
+            if (s.zoneId != zoneId || !s.active)
+                continue;
+
+            for (std::size_t i = 0; i < s.tiers.size() && i < 64; ++i)
+                if (((s.activeTierMask >> i) & 1ULL) != 0)
+                    DriveGroup(s.tiers[i].groupId, s.tiers[i].mapId, s.zoneId, true);
+        }
     }
 
     std::vector<Addon::ScheduleEntry> EventScheduler::SnapshotSchedule() const
@@ -138,11 +236,15 @@ namespace Branding
 
         for (Scheduled& s : _zones)
         {
+            // Keep the spawn tiers + live goal in step with the crowd before any containment check.
+            if (s.active)
+                ReconcileTiers(s);
+
             // Resolve early on full containment (§9.6), then enter cooldown.
             if (s.active && sEventMgr->Containment(s.zoneId) >= 1.0)
             {
                 sEventMgr->StopEvent(s.zoneId);
-                DriveSpawnGroup(s, false);
+                DespawnAllTiers(s);
                 s.active = false;
                 s.timerMs = s.cooldownMs;
                 sAddonProtocolMgr->BroadcastZoneEvent(s.zoneId);
@@ -159,16 +261,16 @@ namespace Branding
             if (s.active)
             {
                 sEventMgr->StopEvent(s.zoneId);
-                DriveSpawnGroup(s, false);
+                DespawnAllTiers(s);
                 s.active = false;
                 s.timerMs = s.cooldownMs;
             }
             else
             {
                 sEventMgr->StartEvent(s.zoneId, s.type, s.goal);
-                DriveSpawnGroup(s, true);
                 s.active = true;
                 s.timerMs = s.activeMs;
+                ReconcileTiers(s);      // spawn the base tier(s) and set the live goal immediately
             }
             sAddonProtocolMgr->BroadcastZoneEvent(s.zoneId);
         }

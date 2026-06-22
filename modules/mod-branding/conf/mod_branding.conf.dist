@@ -148,6 +148,61 @@ Branding.Scaling.CurrencyReductionExponent = 2.0
 Branding.Scaling.CurrencyMulFloor = 0.05
 
 #
+#    Branding.Invasion.ScalingEnable
+#        Description: Open-world invasion crowd scaling (§2.5). Gates the per-creature difficulty
+#                     hook for invasion mobs (trash gentle, boss via the §2.2 group curve). The
+#                     spawn-COUNT lever is gated separately by the event scheduler + active invasion.
+#        Default:     0 - (disabled)
+#
+
+Branding.Invasion.ScalingEnable = 0
+
+#
+#    Branding.Invasion.IntendedSize
+#        Description: Enrolled headcount that counts as a "full" invasion -- the difficulty and
+#                     spawn-tier ceiling. Crowd beyond this adds nothing.
+#        Default:     40
+#
+
+Branding.Invasion.IntendedSize = 40
+
+#
+#    Branding.Invasion.CrowdDecaySeconds
+#        Description: Decayed-peak window (§2.5.2). Effective headcount is the high-water mark over
+#                     this trailing window, so a wipe / brief AFK does not instantly soften the field.
+#        Default:     60
+#
+
+Branding.Invasion.CrowdDecaySeconds = 60
+
+#
+#    Branding.Invasion.TrashMaxMul
+#        Description: Trash difficulty ceiling at a full crowd (§2.5.1). 1.0 baseline at a solo
+#                     straggler rising to this at IntendedSize. 1.0 = count-only (no trash scaling).
+#        Default:     1.5
+#
+
+Branding.Invasion.TrashMaxMul = 1.5
+
+#
+#    Branding.Invasion.TrashExponent
+#        Description: Shape of the trash ramp (>= 1.0). Higher = slower start, kinder to small crowds.
+#        Default:     2.0
+#
+
+Branding.Invasion.TrashExponent = 2.0
+
+#
+#    Branding.Invasion.TierReleaseMargin
+#        Description: Hysteresis (§2.5.3). A spawned reinforcement tier is only released once the
+#                     effective headcount falls this many participants below its threshold, so a
+#                     crowd hovering on a boundary does not strobe spawn groups in and out.
+#        Default:     3
+#
+
+Branding.Invasion.TierReleaseMargin = 3
+
+#
 #    Branding.Heroic.Enable
 #        Description: Heroic overlay (§2.4). When a group SELECTS heroic in the native difficulty UI,
 #                     instance creatures on maps WITHOUT a native heroic difficulty (classic/TBC) are

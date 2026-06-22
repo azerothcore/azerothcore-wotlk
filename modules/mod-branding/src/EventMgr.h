@@ -2,13 +2,16 @@
 #define MOD_BRANDING_SRC_EVENTMGR_H
 
 #include "EventConfig.h"
+#include "InvasionScalingConfig.h"
 #include "ServerClock.h"
 #include "ServerRng.h"
 #include "branding/contribution/AccountCeiling.h"
 #include "branding/contribution/ContributionTypes.h"
+#include "branding/scaling/InvasionScaling.h"
 #include "ObjectGuid.h"
 #include <cstdint>
 #include <unordered_map>
+#include <unordered_set>
 
 class Player;
 
@@ -30,6 +33,11 @@ namespace Branding
         // Event lifecycle (GM-driven for now).
         bool StartEvent(uint32_t zoneId, EventType type, uint64_t goal);
         bool StopEvent(uint32_t zoneId);
+
+        // Update the live containment goal of an active event (§2.5.4): the scheduler raises/lowers it
+        // as reinforcement tiers spawn/despawn so containment tracks the actual mob volume. No-op if
+        // the zone has no active event.
+        void SetGoal(uint32_t zoneId, uint64_t goal);
         bool ActiveEventType(uint32_t zoneId, EventType& outType) const;
         double Containment(uint32_t zoneId) const;
 
@@ -38,6 +46,16 @@ namespace Branding
         uint32_t PlayerPoints(ObjectGuid guid) const;
         RewardTier PlayerTier(ObjectGuid guid) const;
         void Unload(ObjectGuid guid);
+
+        // Invasion crowd scaling (§2.5). A participant enrols when they first score in a zone with an
+        // active event (CaptureKill); they leave the roster on zone change / logout / event end.
+        // ParticipantCount is the live enrolled headcount; EffectiveHeadcount is the decayed-peak
+        // value the spawn-tier reconcile and creature-stat hook key off (cached, refreshed by
+        // SampleCrowds each tick). DropFromRosters removes a player from every zone roster.
+        uint32_t ParticipantCount(uint32_t zoneId) const;
+        uint32_t EffectiveHeadcount(uint32_t zoneId) const;
+        void SampleCrowds();
+        void DropFromRosters(ObjectGuid guid);
 
         // Persistence lifecycle (§9.3#5). Load pulls the character's participation pacing and the
         // account economy ledger into the caches on login (account loaded once per account); Save
@@ -66,6 +84,12 @@ namespace Branding
             EventType type = EventType::Invasion;
             uint64_t goal = 0;
             uint64_t contributed = 0;
+
+            // §2.5 crowd scaling: enrolled participants, the decayed-peak tracker fed from them, and
+            // the cached effective headcount (refreshed by SampleCrowds, read on the hot path).
+            std::unordered_set<ObjectGuid> roster;
+            CrowdTracker crowd;
+            uint32_t effectiveHeadcount = 0;
         };
 
         struct PlayerState
@@ -80,6 +104,7 @@ namespace Branding
         void SaveAccountEconomy(uint32_t accountId, AccountEconomyState const& state);
 
         EventConfig _config;
+        InvasionScalingConfig _invConfig;
         ServerClock _clock;
         ServerRng _rng;
         std::unordered_map<uint32_t, ActiveEvent> _events;
