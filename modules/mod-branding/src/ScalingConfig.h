@@ -21,6 +21,8 @@ namespace Branding
         uint8_t MaxRewardTier() const override { return _maxRewardTier; }
         double RareChanceMulMin() const override { return _rareChanceMulMin; }
         double RareChanceMulMax() const override { return _rareChanceMulMax; }
+        double CurrencyReductionExponent() const override { return _currencyReductionExponent; }
+        double CurrencyMulFloor() const override { return _currencyMulFloor; }
 
     private:
         bool _enabled = false;
@@ -31,6 +33,8 @@ namespace Branding
         uint8_t _maxRewardTier = 4;
         double _rareChanceMulMin = 0.5;
         double _rareChanceMulMax = 2.0;
+        double _currencyReductionExponent = 2.0;
+        double _currencyMulFloor = 0.05;
     };
 }
 

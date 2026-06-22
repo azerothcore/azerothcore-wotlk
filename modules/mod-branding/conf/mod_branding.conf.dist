@@ -136,6 +136,17 @@ Branding.Scaling.Enable = 0
 Branding.Scaling.Exponent = 2.0
 
 #
+#    Branding.Scaling.CurrencyReductionExponent / CurrencyMulFloor
+#        Description: §2.4.3 branding-currency reduction for a smaller group: currencyMul =
+#                     clamp(groupFraction^Exponent, Floor, 1.0). Exponent >= 1 makes currency fall
+#                     off steeper than gear; Floor keeps a small group from being zeroed out.
+#        Default:     2.0 / 0.05
+#
+
+Branding.Scaling.CurrencyReductionExponent = 2.0
+Branding.Scaling.CurrencyMulFloor = 0.05
+
+#
 #    Branding.Invasion.ScalingEnable
 #        Description: Open-world invasion crowd scaling (§2.5). Gates the per-creature difficulty
 #                     hook for invasion mobs (trash gentle, boss via the §2.2 group curve). The
