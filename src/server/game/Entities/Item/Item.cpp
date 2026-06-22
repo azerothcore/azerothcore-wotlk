@@ -1014,8 +1014,11 @@ bool Item::HasSocket() const
 uint8 Item::GetGemCountWithID(uint32 GemID) const
 {
     uint8 count = 0;
-    for (uint32 enchant_slot = SOCK_ENCHANTMENT_SLOT; enchant_slot < SOCK_ENCHANTMENT_SLOT + MAX_GEM_SOCKETS; ++enchant_slot)
+    for (uint32 enchant_slot = SOCK_ENCHANTMENT_SLOT; enchant_slot <= PRISMATIC_ENCHANTMENT_SLOT; ++enchant_slot)
     {
+        if (enchant_slot == BONUS_ENCHANTMENT_SLOT)
+            continue;
+
         uint32 enchant_id = GetEnchantmentId(EnchantmentSlot(enchant_slot));
         if (!enchant_id)
             continue;
@@ -1033,8 +1036,11 @@ uint8 Item::GetGemCountWithID(uint32 GemID) const
 uint8 Item::GetGemCountWithLimitCategory(uint32 limitCategory) const
 {
     uint8 count = 0;
-    for (uint32 enchant_slot = SOCK_ENCHANTMENT_SLOT; enchant_slot < SOCK_ENCHANTMENT_SLOT + MAX_GEM_SOCKETS; ++enchant_slot)
+    for (uint32 enchant_slot = SOCK_ENCHANTMENT_SLOT; enchant_slot <= PRISMATIC_ENCHANTMENT_SLOT; ++enchant_slot)
     {
+        if (enchant_slot == BONUS_ENCHANTMENT_SLOT)
+            continue;
+
         uint32 enchant_id = GetEnchantmentId(EnchantmentSlot(enchant_slot));
         if (!enchant_id)
             continue;
