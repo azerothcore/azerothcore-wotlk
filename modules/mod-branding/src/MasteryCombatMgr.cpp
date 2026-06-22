@@ -1,5 +1,6 @@
 #include "MasteryCombatMgr.h"
 
+#include "BrandRole.h"
 #include "MasteryConfig.h"
 #include "MasteryLoadoutMgr.h"
 #include "ProficiencyMgr.h"
@@ -12,32 +13,6 @@
 
 namespace Branding
 {
-    namespace
-    {
-        // Best-effort role lens for the §7.9 personal asymmetry (tank dramatic, dps restrained). The
-        // pure plan only consumes RoleContribution; this stays a coarse heuristic (the proper per-spec
-        // role detection is the §14.11 talent-spec seam, deferred). Default Damage when unsure.
-        RoleContribution DetectRole(Player* player)
-        {
-            if (!player)
-                return RoleContribution::Damage;
-
-            switch (player->getClass())
-            {
-                case CLASS_WARRIOR:
-                case CLASS_DEATH_KNIGHT:
-                    return RoleContribution::Tank;     // coarse: most likely the survivability fantasy
-                case CLASS_PRIEST:
-                case CLASS_DRUID:
-                case CLASS_PALADIN:
-                case CLASS_SHAMAN:
-                    return RoleContribution::Healer;   // hybrid healers -> transform expression
-                default:
-                    return RoleContribution::Damage;
-            }
-        }
-    }
-
     MasteryCombatMgr* MasteryCombatMgr::instance()
     {
         static MasteryCombatMgr mgr;

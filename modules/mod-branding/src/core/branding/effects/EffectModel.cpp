@@ -83,4 +83,52 @@ namespace Branding
 
         return (nowMs % period) < profile.windowDurationMs;
     }
+
+    double WindowedOutgoingMultiplier(EffectProfile const& profile, uint8_t profLevel,
+        double catalystStackWeight, uint64_t nowMs, IEffectConfig const& cfg)
+    {
+        // The healer transform expresses through the heal hook, never as an outgoing multiplier.
+        if (profile.kind == EffectKind::MechanicTransform)
+            return 1.0;
+
+        // §7.9 no passive uptime: outside the active window the brand contributes nothing.
+        if (!IsWindowActive(profile, nowMs))
+            return 1.0;
+
+        // PersonalSpike (tank) gets the large personal cap; RaidWindow gets the bounded, catalyst-DR'd
+        // raid cap. Both are already clamped inside the respective Multiplier functions.
+        if (profile.kind == EffectKind::PersonalSpike)
+            return PersonalMultiplier(profLevel, profile, cfg);
+
+        return RaidMultiplier(profLevel, profile, catalystStackWeight, cfg);
+    }
+
+    double WindowedIncomingMultiplier(EffectProfile const& profile, uint8_t profLevel,
+        uint64_t nowMs, IEffectConfig const& cfg)
+    {
+        // Only a tank's PersonalSpike mitigates incoming damage, and only inside its window. The
+        // reduction is the inverse of the personal multiplier -- a dramatic, short, windowed spike.
+        if (profile.kind != EffectKind::PersonalSpike || !IsWindowActive(profile, nowMs))
+            return 1.0;
+
+        double const personal = PersonalMultiplier(profLevel, profile, cfg);
+        return personal > 0.0 ? 1.0 / personal : 1.0;
+    }
+
+    uint32_t OverhealShieldAmount(uint32_t heal, uint32_t missingHealth, uint32_t maxHealth,
+        uint8_t profLevel, IEffectConfig const& cfg)
+    {
+        // No overheal (heal at or below missing health) -> nothing to transform.
+        if (heal <= missingHealth)
+            return 0;
+
+        // The overheal portion, scaled by mastery (0 at level 0), then hard-capped to a fraction of
+        // the target's max health so a single transform can never snowball (§7.9 #3).
+        double shield = static_cast<double>(heal - missingHealth) * Strength(profLevel, cfg);
+        double const cap = static_cast<double>(maxHealth) * cfg.MaxOverhealShieldFraction();
+        if (shield > cap)
+            shield = cap;
+
+        return static_cast<uint32_t>(shield);
+    }
 }

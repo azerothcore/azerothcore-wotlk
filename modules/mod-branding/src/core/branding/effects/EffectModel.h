@@ -48,6 +48,26 @@ namespace Branding
     // Whether a windowed effect is in its active phase at server time `nowMs` (§7.9 "no passive
     // uptime"). PersonalSpike/RaidWindow cycle window-then-cooldown; MechanicTransform is always on.
     bool IsWindowActive(EffectProfile const& profile, uint64_t nowMs);
+
+    // §03 application: OUTGOING-damage multiplier the adapter applies right now. Gated by the window
+    // (1.0 outside it); dispatches by kind -- PersonalSpike -> PersonalMultiplier (large, personal),
+    // RaidWindow -> RaidMultiplier (bounded + catalyst-DR'd), MechanicTransform -> 1.0 (it expresses
+    // through the heal hook, not outgoing damage). Always >= 1.0.
+    double WindowedOutgoingMultiplier(EffectProfile const& profile, uint8_t profLevel,
+        double catalystStackWeight, uint64_t nowMs, IEffectConfig const& cfg);
+
+    // §03 application: INCOMING-damage multiplier for tank survivability. Only a PersonalSpike (tank)
+    // reduces incoming damage, and only inside its window: returns 1/PersonalMultiplier in (0, 1].
+    // Every other kind/phase returns 1.0 (no reduction).
+    double WindowedIncomingMultiplier(EffectProfile const& profile, uint8_t profLevel,
+        uint64_t nowMs, IEffectConfig const& cfg);
+
+    // §7.9 #3 healer MechanicTransform: convert wasted overheal into a temporary absorb shield. The
+    // shield is the overheal portion (heal beyond the target's missing health) scaled by effect
+    // strength (mastery-gated, 0 at level 0), then hard-capped to MaxOverhealShieldFraction of the
+    // target's max health. Pure: the adapter passes the live heal/health and applies the result.
+    uint32_t OverhealShieldAmount(uint32_t heal, uint32_t missingHealth, uint32_t maxHealth,
+        uint8_t profLevel, IEffectConfig const& cfg);
 }
 
 #endif // MOD_BRANDING_CORE_EFFECTS_EFFECTMODEL_H

@@ -17,6 +17,10 @@ namespace Branding
         virtual double MaxRaidMul() const = 0;       // bounded, e.g. 2.0 (granted to the raid)
         virtual uint8_t MaxEffectLevel() const = 0;  // proficiency level that yields full strength
 
+        // Healer MechanicTransform (§7.9 #3): hard cap on the overheal->shield grant, as a fraction of
+        // the target's max health. Anti-degenerate -- a single transform can never snowball. In [0, 1].
+        virtual double MaxOverhealShieldFraction() const = 0;
+
         // Role asymmetry (§7.9): tank effects are dramatic, dps restrained. In (0, 1], tank highest.
         virtual double RolePersonalScale(RoleContribution role) const = 0;
     };
