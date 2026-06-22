@@ -304,14 +304,15 @@ weight; the boss carries the difficulty weight (the §2.2 raid feel). This is th
 choice — symmetric (full §2.2 on every mob) and count-only are config-reachable degenerate cases
 (`TrashMaxMul = boss curve` ⇒ symmetric; `TrashMaxMul = 1.0` ⇒ count-only).
 
-**Damage is live, health is a spawn snapshot.** Outgoing damage is recomputed per hit from the
-current effective headcount (a `UnitScript` on the creature-attacker branch), so the field hits
-harder as the crowd grows. Max health is scaled once when the creature enters the world
-(`OnCreatureAddWorld`), snapshotting the headcount at spawn — the "sample at grant, not pull"
-guardrail (§2.3 Risk #4), and idempotent across grid reloads (always relative to `GetCreateHealth()`).
-Because reinforcement tiers spawn *when* their crowd threshold is crossed, their trash snapshots a
-representative headcount; the base tier (and a base-tier boss) snapshots the start-of-event crowd —
-a **dynamic health re-scale** as the crowd later changes is a noted refinement.
+**Both levers track the crowd live.** Outgoing damage is recomputed per hit from the current
+effective headcount (a `UnitScript` on the creature-attacker branch). Max health is re-scaled
+dynamically: applied at spawn (`OnCreatureAddWorld`) and again whenever the effective headcount
+changes — the scheduler walks each active tier's `spawn_group` → spawn id → live `Creature*`
+(`ObjectMgr::GetSpawnDataForGroup` + `Map::GetCreatureBySpawnIdStore`) and re-applies, gated on a
+real headcount change so the walk runs only when the crowd actually moved. This matters because
+players join and abandon an open-world invasion at any time: a boss the raid gathers around grows
+its health pool, and it shrinks back if they leave. Re-scaling is always relative to
+`GetCreateHealth()` (idempotent, and it reverses cleanly), and preserves the current health %.
 
 ### 2.5.2 Headcount — enrolled participants, decayed peak
 

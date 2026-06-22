@@ -34,10 +34,13 @@ namespace Branding
         // hit, so the boss/trash damage tracks the current crowd.
         double OutgoingMultiplierFor(Creature* attacker) const;
 
-        // Max-health multiplier for an invasion creature, applied once at spawn (snapshot-not-pull,
-        // §2.3 Risk #4). Boss/elite via §2.2 EncounterHealthMul (<=1.0, softer for a small crowd);
-        // trash via InvasionTrashMul (>=1.0). 1.0 when disabled / not an active invasion.
-        double HealthMultiplierFor(Creature* creature) const;
+        // Re-scale an invasion creature's MAX health to the current crowd (boss/elite via §2.2
+        // EncounterHealthMul, trash via InvasionTrashMul), preserving its health %. A no-op for
+        // non-invasion creatures and when already at the target. Applied at spawn AND whenever the
+        // effective headcount changes, so the field tracks players arriving/leaving mid-invasion.
+        // Always relative to GetCreateHealth(), so it is idempotent and reverses cleanly as the crowd
+        // shrinks.
+        void ApplyHealth(Creature* creature) const;
 
     private:
         InvasionScalingMgr() = default;

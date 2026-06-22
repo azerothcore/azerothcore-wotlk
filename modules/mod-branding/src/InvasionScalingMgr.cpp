@@ -64,17 +64,29 @@ namespace Branding
         return mul;
     }
 
-    double InvasionScalingMgr::HealthMultiplierFor(Creature* creature) const
+    void InvasionScalingMgr::ApplyHealth(Creature* creature) const
     {
         uint32_t headcount = 0;
         bool isBoss = false;
         if (!ResolveCrowd(creature, headcount, isBoss))
-            return 1.0;
+            return;     // not an invasion creature -> never touch its health
 
-        return isBoss
+        double const mul = isBoss
             ? EncounterHealthMul(GroupContext{
                   static_cast<uint8_t>(std::min<uint32_t>(headcount, _invConfig.IntendedInvasionSize())),
                   _invConfig.IntendedInvasionSize()}, _scaling)
             : InvasionTrashMul(headcount, _invConfig);
+
+        uint32 const base = creature->GetCreateHealth();
+        if (base == 0)
+            return;
+
+        uint32 const target = std::max<uint32>(1, static_cast<uint32>(base * mul));
+        if (creature->GetMaxHealth() == target)
+            return;     // already at the right pool -- avoids redundant field updates
+
+        float const pct = creature->GetHealthPct();
+        creature->SetMaxHealth(target);
+        creature->SetHealth(static_cast<uint32>(target * pct / 100.0f));
     }
 }

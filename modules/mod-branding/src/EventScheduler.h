@@ -57,6 +57,7 @@ namespace Branding
 
             std::vector<Tier> tiers;    // additive spawn tiers (empty => event reuses ambient mobs)
             uint64_t activeTierMask = 0;   // bit i set => tier i is currently spawned
+            uint32_t healthHeadcount = UINT32_MAX;   // headcount the live creatures' health is scaled to
         };
 
         // Pull `branding_event_spawn` rows onto the matching schedule entries (one Tier per row).
@@ -65,6 +66,9 @@ namespace Branding
         static void DriveGroup(uint32_t groupId, uint16_t mapId, uint32_t zoneId, bool spawn);
         // Reconcile an active event's spawned tiers to the current crowd, and refresh its live goal.
         void ReconcileTiers(Scheduled& s);
+        // Re-scale the live creatures of an event's active tiers to the current crowd (§2.5.1 dynamic
+        // health -- players arrive/leave mid-invasion). Walks spawn-group -> spawn id -> Creature*.
+        static void RescaleActiveTierHealth(Scheduled const& s);
         // Despawn every currently-active tier (event end) and clear the mask.
         void DespawnAllTiers(Scheduled& s);
 

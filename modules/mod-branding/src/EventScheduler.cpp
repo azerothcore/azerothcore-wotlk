@@ -1,6 +1,7 @@
 #include "EventScheduler.h"
 #include "AddonProtocolMgr.h"
 #include "EventMgr.h"
+#include "InvasionScalingMgr.h"
 #include "branding/scaling/InvasionScaling.h"
 #include "Configuration/Config.h"
 #include "DatabaseEnv.h"
@@ -8,7 +9,9 @@
 #include "Log.h"
 #include "Map.h"
 #include "MapMgr.h"
+#include "ObjectMgr.h"
 #include "QueryResult.h"
+#include "SpawnData.h"
 #include <vector>
 
 namespace Branding
@@ -147,6 +150,41 @@ namespace Branding
         if (liveGoal == 0)
             liveGoal = s.goal;
         sEventMgr->SetGoal(s.zoneId, liveGoal);
+
+        // §2.5.1 dynamic health: when the crowd moved, re-scale the live creatures' health pools so a
+        // boss/field that players join or abandon mid-fight tracks the headcount (damage is already
+        // live per hit). Gated on a real change so the creature walk runs only when needed.
+        if (headcount != s.healthHeadcount)
+        {
+            RescaleActiveTierHealth(s);
+            s.healthHeadcount = headcount;
+        }
+    }
+
+    void EventScheduler::RescaleActiveTierHealth(Scheduled const& s)
+    {
+        for (std::size_t i = 0; i < s.tiers.size() && i < 64; ++i)
+        {
+            if (((s.activeTierMask >> i) & 1ULL) == 0)
+                continue;
+
+            Tier const& t = s.tiers[i];
+            Map* map = sMapMgr->FindBaseNonInstanceMap(t.mapId);
+            if (!map)
+                continue;
+
+            auto const range = sObjectMgr->GetSpawnDataForGroup(t.groupId);
+            for (auto it = range.first; it != range.second; ++it)
+            {
+                SpawnData const* data = it->second;
+                if (data->type != SPAWN_TYPE_CREATURE)
+                    continue;
+
+                auto bounds = map->GetCreatureBySpawnIdStore().equal_range(data->spawnId);
+                for (auto cr = bounds.first; cr != bounds.second; ++cr)
+                    sInvasionScalingMgr->ApplyHealth(cr->second);
+            }
+        }
     }
 
     void EventScheduler::DespawnAllTiers(Scheduled& s)
