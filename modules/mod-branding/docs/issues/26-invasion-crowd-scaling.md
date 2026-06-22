@@ -1,6 +1,14 @@
 # #26 — Invasion crowd scaling (§2.5)
 
-**Status:** pure core done · **Deps:** §2.2 group-size core (done, pure); **#10 event-spawn-wiring (merged)**; **#12 persistence (merged)** · **Parallel-safe:** pure core landed; adapter extends the merged single-group `EventScheduler`/`branding_event_spawn` in place · **Size:** L
+**Status:** core + server adapter done (`-fsyntax-only` verified); authoring-tool emitter + health scaling remain · **Deps:** §2.2 group-size core (done, pure); **#10 event-spawn-wiring (merged)**; **#12 persistence (merged)** · **Size:** L
+
+## Progress
+- **Pure core** (`src/core/branding/scaling/Invasion*`) — `CrowdTracker`, `ActiveSpawnTiers`/`ReconcileSpawnTiers`, `LiveContainmentGoal`, `InvasionTrashMul`; 18 GoogleTests. **Done.**
+- **26a** — `branding_event_spawn` schema (`min_participants`/`goal_contribution`/PK); `InvasionScalingConfig` + conf; EventMgr enrolled roster + decayed-peak `CrowdTracker` + `ParticipantCount`/`EffectiveHeadcount`/`SampleCrowds`; `.branding event status` readout. **Done.**
+- **26b** — `EventScheduler` multi-tier reconcile (hysteresis) + live containment goal (`EventMgr::SetGoal`). **Done.**
+- **26c** — `InvasionScalingMgr` + `UnitScript`: invasion creature OUTGOING damage scales by crowd (boss via §2.2 `EncounterDamageMul`, trash via `InvasionTrashMul`). **Done.**
+- **Incidental fix** — production `ScalingConfig` was abstract (missing the §2.4.3 currency dials the interface declared); implemented so the worldserver build links. Surfaced by `-fsyntax-only`; module CI runs no full build.
+- **Remaining** — (1) authoring-tool emitter (Python): emit the new columns + per-tier reinforcement groups; (2) creature **health** scaling (needs a creature-add hook; §2.2 health is likewise unwired) — damage lever is live, health is a follow-up.
 
 ## Context
 Open-world invasions (§9.1 `EventType::Invasion`) have a **fluctuating** population, unlike the
