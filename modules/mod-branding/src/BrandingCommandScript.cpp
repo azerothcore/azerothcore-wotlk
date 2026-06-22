@@ -11,6 +11,7 @@
 #include "ProficiencyMgr.h"
 #include "RewardDelivery.h"
 #include "ScalingMgr.h"
+#include "SelectionMgr.h"
 #include "branding/allegiance/Allegiance.h"
 #include "branding/contribution/ContributionTypes.h"
 #include "mod_branding_loader.h"
@@ -130,6 +131,11 @@ public:
             { "grant", HandleBrandingInsightGrantCommand, rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
         };
 
+        static ChatCommandTable schoolCommandTable =
+        {
+            { "select", HandleBrandingSchoolSelectCommand, rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+        };
+
         static ChatCommandTable brandingCommandTable =
         {
             { "info",        HandleBrandingInfoCommand,        rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
@@ -140,6 +146,7 @@ public:
             { "knowledge",  knowledgeCommandTable },
             { "insight",    insightCommandTable },
             { "allegiance", allegianceCommandTable },
+            { "school",     schoolCommandTable },
             { "event",      eventCommandTable },
         };
 
@@ -670,6 +677,54 @@ public:
         sAllegianceMgr->Select(player->GetGUID(), player->GetGUID().GetCounter(), id);
         handler->PSendSysMessage("Allegiance set to {} (mostly permanent).", AllegianceName(parsed));
         return true;
+    }
+
+    // `.branding school select <school>` -- switch the active school for an escalating gold tuition
+    // (§14.13.2). Re-selecting a known school is gold-only and retains Proficiency; a never-known
+    // school is rejected (no charge) until its Insight Knowledge is unlocked (#18).
+    static bool HandleBrandingSchoolSelectCommand(ChatHandler* handler, std::string_view brandToken)
+    {
+        Player* player = handler->GetPlayer();
+        if (!player)
+        {
+            handler->SendErrorMessage("This command must be used in-world.");
+            return false;
+        }
+        if (!sSelectionMgr->Config().Enabled())
+        {
+            handler->SendErrorMessage("School selection is disabled (Branding.Selection.Enable).");
+            return false;
+        }
+
+        BrandId brand;
+        if (!ParseBrand(brandToken, brand))
+        {
+            handler->SendErrorMessage("Unknown school '{}'. Use a name (Fire, Frost, ...) or id 0..{}.",
+                brandToken, static_cast<uint32>(BrandId::COUNT) - 1);
+            return false;
+        }
+
+        SwitchResult const result = sSelectionMgr->SelectSchool(player, brand);
+        switch (result.outcome)
+        {
+            case SwitchOutcome::Disabled:
+                handler->SendErrorMessage("School selection is disabled (Branding.Selection.Enable).");
+                return false;
+            case SwitchOutcome::NotKnown:
+                handler->SendErrorMessage("You have not unlocked the {} school. Earn its Insight Knowledge first (.branding knowledge).",
+                    BrandName(brand));
+                return false;
+            case SwitchOutcome::InsufficientGold:
+                handler->SendErrorMessage("Switching to {} costs {} copper tuition -- you cannot afford it.",
+                    BrandName(brand), result.tuition);
+                return false;
+            case SwitchOutcome::Switched:
+                handler->PSendSysMessage("Active school set to {} for {} copper. Proficiency retained.",
+                    BrandName(brand), result.tuition);
+                return true;
+            default:
+                return false;
+        }
     }
 };
 

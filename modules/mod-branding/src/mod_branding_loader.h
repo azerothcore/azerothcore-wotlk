@@ -21,6 +21,7 @@ void AddBrandingEffectScripts();
 void AddBrandingCatalystScripts();
 void AddBrandingInsightScripts();
 void AddBrandingAddonScripts();
+void AddBrandingSelectionScripts();
 void AddBrandingCommandScripts();
 
 #endif // MOD_BRANDING_SRC_LOADER_H

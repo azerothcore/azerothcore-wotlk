@@ -672,3 +672,52 @@ Branding.Insight.WindowSeconds = 3600
 #
 
 Branding.Insight.UnlockThreshold = 35.0
+# Active-school switch fee (design slice §14.13.2, issue #19). One active school at a time; switching
+# the active school (the §7.9 active brand) costs an escalating gold tuition -- a recurring gold sink
+# and an anti-flip-flop friction. Knowledge is account-permanent, so switching BACK to a previously
+# unlocked school is gold-only and retains per-school Proficiency (character_branding rows persist);
+# a never-known school must be Insight-unlocked first (#18) and is never charged on rejection.
+#
+
+#
+#    Branding.Selection.Enable
+#        Description: Master switch for the §14.13.2 active-school switch fee.
+#        Default:     0 - (disabled)
+#
+
+Branding.Selection.Enable = 0
+
+#
+#    Branding.Selection.TuitionBase
+#        Description: Gold tuition (copper) for the first switch (recent-switch count 0). The curve is
+#                     TuitionCost = clamp(round(TuitionBase * TuitionFactor^recentSwitches), <= cap).
+#        Default:     100000 - (10 gold)
+#
+
+Branding.Selection.TuitionBase = 100000
+
+#
+#    Branding.Selection.TuitionFactor
+#        Description: Geometric escalation per recent (un-decayed) switch. Values below 1.0 are clamped
+#                     to 1.0 so the curve is always non-decreasing.
+#        Default:     2.0
+#
+
+Branding.Selection.TuitionFactor = 2.0
+
+#
+#    Branding.Selection.TuitionCap
+#        Description: Upper bound (copper) the escalating tuition is clamped to.
+#        Default:     5000000 - (500 gold)
+#
+
+Branding.Selection.TuitionCap = 5000000
+
+#
+#    Branding.Selection.SwitchDecayDays
+#        Description: Days with no switch after which the recent-switch counter decays back to 0 (the
+#                     escalation resets). 0 disables decay (the counter only ever grows).
+#        Default:     7
+#
+
+Branding.Selection.SwitchDecayDays = 7
