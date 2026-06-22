@@ -138,6 +138,9 @@ marker column + soulbind), `conf/mod_branding.conf.dist` (`Branding.Etch.*`). Re
   expressible Etched items of the active school and combines them via `CatalystSelfStackMultiplier`
   (decisions 1 & 5 — "unlimited items = flexibility, not stacked power"). `EquippedIntensity` gains the
   active-school-match gate (decision 2). `LoadEquipped` loads every eligible slot at login.
+- **Cache coherency:** `LoadEquipped` caches all eligible slots at login; an `OnPlayerEquip` hook caches an
+  Etch-eligible item's brand state when equipped mid-session (shared `CacheBrandState`, no-op if cached / no
+  row) — so the aggregate and gates stay correct without a relog.
 - **Command/data/conf:** `.branding etch [mainhand|offhand|ranged|trinket1|trinket2]` (default main-hand),
   per-failure messaging; aggregate surfaced in `.branding info`. `item_branding` table + `etched` column;
   Essence item `190002` (BoP); `Branding.Etch.{Enable,EssenceItemId,EssenceCost}`. SQL + C++ codestyle clean.
@@ -148,9 +151,6 @@ marker column + soulbind), `conf/mod_branding.conf.dist` (`Branding.Etch.*`). Re
 **Deferred / limitations:**
 - **Combat proc application** beyond the resolved intensity (turning `AggregateEtchedIntensity` into actual
   in-combat proc behaviour) rides on the effect-application layer (#03, still adapter-deferred per §7.9).
-- **Mid-session equip refresh:** the brand-state cache loads eligible slots at login and updates on Etch;
-  an item branded earlier and *equipped* later in the same session isn't re-cached until relog (the Etch
-  command itself is safe — it does an authoritative DB check). A small `OnEquip` refresh hook is the fix.
 
 ## ARCHITECTURE.md amendments (applied with this draft)
 - **§16.1 glossary** — two new rows: **Etch** / *Etched item* (item GUID, BoP, rank-locked) and **Essence**

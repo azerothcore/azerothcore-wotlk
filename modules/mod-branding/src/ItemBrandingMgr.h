@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <unordered_map>
 
+class Item;
 class Player;
 
 namespace Branding
@@ -41,8 +42,12 @@ namespace Branding
         uint32_t EssenceItemId() const { return _essenceItemId; }
         uint32_t EssenceCost() const { return _essenceCost; }
 
-        // Load the player's equipped main-hand brand state into the cache on login.
+        // Load the brand state of every equipped Etch-eligible item into the cache on login.
         void LoadEquipped(Player* player);
+
+        // Cache an item's brand state when it is equipped mid-session (keeps the multi-slot aggregate /
+        // gates correct without a relog). No-op if already cached or the item carries no Brand.
+        void CacheItem(Item* item);
 
         // Brand the equipped weapon with the player's active brand (step 0). Persists.
         bool BrandEquipped(Player* player, BrandId brand);
@@ -80,6 +85,8 @@ namespace Branding
         uint32_t EquippedItemGuid(Player* player) const;
         // Resolves the item GUID counter in an arbitrary equipment slot, or 0 if empty.
         uint32_t ItemGuidAtSlot(Player* player, uint8_t equipSlot) const;
+        // Loads one item's brand row into the cache (skips if already cached or no row exists).
+        void CacheBrandState(uint32_t itemGuid);
         void Save(uint32_t itemGuid, ItemBrandState const& state);
 
         bool _enabled = false;

@@ -66,6 +66,26 @@ namespace Branding
             static_cast<uint32>(state.levelInStep), static_cast<uint32>(state.etched ? 1 : 0));
     }
 
+    void ItemBrandingMgr::CacheBrandState(uint32_t itemGuid)
+    {
+        if (itemGuid == 0 || _items.find(itemGuid) != _items.end())
+            return;
+
+        QueryResult result = CharacterDatabase.Query(
+            "SELECT `brand`, `step`, `level_in_step`, `etched` FROM `item_branding` WHERE `item_guid` = {}",
+            itemGuid);
+        if (!result)
+            return;
+
+        Field* fields = result->Fetch();
+        ItemBrandState state;
+        state.brand = static_cast<BrandId>(fields[0].Get<uint8>());
+        state.step = fields[1].Get<uint8>();
+        state.levelInStep = fields[2].Get<uint8>();
+        state.etched = fields[3].Get<uint8>() != 0;
+        _items[itemGuid] = state;
+    }
+
     void ItemBrandingMgr::LoadEquipped(Player* player)
     {
         if (!_enabled || !player)
@@ -74,25 +94,17 @@ namespace Branding
         // Load the brand state of every equipped Etch-eligible item (weapons + trinkets), so the
         // multi-slot aggregate (AggregateEtchedIntensity) and the per-item gates see them all (#31).
         for (uint8 slot : EtchSlots)
-        {
-            uint32_t const itemGuid = ItemGuidAtSlot(player, slot);
-            if (itemGuid == 0)
-                continue;
+            CacheBrandState(ItemGuidAtSlot(player, slot));
+    }
 
-            QueryResult result = CharacterDatabase.Query(
-                "SELECT `brand`, `step`, `level_in_step`, `etched` FROM `item_branding` WHERE `item_guid` = {}",
-                itemGuid);
-            if (!result)
-                continue;
+    void ItemBrandingMgr::CacheItem(Item* item)
+    {
+        if (!_enabled || !item)
+            return;
 
-            Field* fields = result->Fetch();
-            ItemBrandState state;
-            state.brand = static_cast<BrandId>(fields[0].Get<uint8>());
-            state.step = fields[1].Get<uint8>();
-            state.levelInStep = fields[2].Get<uint8>();
-            state.etched = fields[3].Get<uint8>() != 0;
-            _items[itemGuid] = state;
-        }
+        // Mid-session equip refresh: an item branded earlier and equipped now lands in the cache so the
+        // multi-slot aggregate and the active-school gate stay correct without a relog (#31).
+        CacheBrandState(item->GetGUID().GetCounter());
     }
 
     bool ItemBrandingMgr::BrandEquipped(Player* player, BrandId brand)
