@@ -52,6 +52,11 @@ See [../ARCHITECTURE.md](../ARCHITECTURE.md) for the full spec. Section refs (§
         ├▶ #20 postcap-xp-redirect      (OnPlayerGiveXP → active-school Proficiency)
         └▶ #21 prestige-titles          (max Proficiency → Player::SetTitle)
    shared integration files only: mod_branding_loader.cpp, BrandingCommandScript.cpp, conf .dist
+
+  (heroic overlay — #22 epic, extends §2.2/§2.4; reference autobalance, do NOT import per §2.3)
+   #22 ─┬▶ #23 heroic-tier-core        (pure HeroicContext muls + RewardScale.currencyMul)
+        ├▶ #24 heroic-overlay-adapter   (read SELECTED difficulty, encounter scale, snapshot, exceptions) ◀ needs #23
+        └▶ #25 heroic-reward-wiring      (currencyMul + tier bonus through §9.4 personal loot)            ◀ needs #23
 ```
 
 `*` #14 needs a design decision (play-session profile) before it can be finalized — see the issue.
@@ -65,6 +70,7 @@ See [../ARCHITECTURE.md](../ARCHITECTURE.md) for the full spec. Section refs (§
 - **Batch D (content/infra, anytime):** #10 event-spawner, #13 world-spawn-content, #15 full-build-ci.
 - **Batch E (groundwork done, flavour after #03):** #16 exotic-brand-schools.
 - **Batch F (selection economy, after #01+#07):** #17 mastery-selection-economy.
+- **Batch G (heroic overlay):** #23 heroic-tier-core first (pure), then #24 + #25 in parallel worktrees.
 - **Needs design input:** #14 xp-balance-sim; #17 has open *[DEFAULT]* decisions (title path, tuition curve).
 
 ## Cross-cutting note
