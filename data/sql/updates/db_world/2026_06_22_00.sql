@@ -1,3 +1,4 @@
+-- DB update 2026_06_21_00 -> 2026_06_22_00
 
 -- Add Spell Script Name.
 DELETE FROM `spell_script_names` WHERE `spell_id` = 51036;
