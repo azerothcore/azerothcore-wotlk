@@ -284,6 +284,112 @@ force a minimum, or disable the overlay. Rescripting these encounters is explici
 
 ---
 
+## 2.5 Invasion Crowd Scaling (issue #26)
+
+A fifth scaling consideration, **specific to open-world invasions** (§9.1 `EventType::Invasion`).
+Where §2.2 scales a **fixed-roster** instance (a 5-man in a 40-man slot), an invasion is open-world
+with a **fluctuating** population — so it scales differently: the primary lever is **how many mobs
+spawn**, not how hard each one hits. "Likes raids" for the boss; "more bodies" for the field.
+
+### 2.5.1 Two levers, asymmetric
+
+| Target | Spawn count | Per-mob difficulty |
+|---|---|---|
+| **Trash** | scales ↑↑ with crowd (primary lever) | scales ↑ **gently** — a lone straggler can still kill one |
+| **Boss / mini-boss** | stays singular (count = 1) | scales ↑↑ via the full §2.2 `EncounterHealthMul`/`DamageMul` |
+
+Rationale: open-world content has no entry gate, so a solo player who wanders into an active
+invasion must still be able to fight *something*. Volume (more trash) carries the crowd-scaling
+weight; the boss carries the difficulty weight (the §2.2 raid feel). This is the **asymmetric**
+choice — symmetric (full §2.2 on every mob) and count-only are config-reachable degenerate cases
+(`TrashMaxMul = boss curve` ⇒ symmetric; `TrashMaxMul = 1.0` ⇒ count-only).
+
+### 2.5.2 Headcount — enrolled participants, decayed peak
+
+The scaling input is **enrolled participants in the zone's active event**, not bodies present:
+enrollment requires having actually scored (≥1 §9.2 action), so AFK/spectators can't inflate the
+field (and can't make a straggler's fight harder). EventMgr gains a per-zone participant roster
+(keyed by `ObjectGuid`, dropped on leave/logout/event-end) exposing `ParticipantCount(zoneId)`.
+
+The raw count is smoothed by a **decayed peak** — a pure rolling high-water mark over a window
+(`CrowdDecaySeconds`, default 60s): the effective headcount is the max instantaneous count seen in
+the trailing window. This stops the field from softening the instant a wipe or a brief AFK drops the
+count, while still relaxing after a sustained exodus.
+
+```cpp
+// src/core/scaling/invasion/ — pure, deterministic, tested.
+class CrowdTracker {                  // decayed-peak headcount
+public:
+    void Sample(uint64_t nowSec, uint32_t instantaneous, IInvasionScalingConfig const&);
+    uint32_t Effective(uint64_t nowSec, IInvasionScalingConfig const&) const; // max over trailing window
+};
+```
+
+### 2.5.3 Spawn-count — threshold-gated additive groups
+
+`branding_event_spawn` gains a `min_participants` column and allows **multiple rows** per
+`(zone_id, event_type)`. Each row links a manual `spawn_group` to a participant threshold:
+
+```
+thr 0   base camp        (always up while the event is active)
+thr 5   +reinforcements
+thr 15  +elite pack
+thr 30  +second wave
+```
+
+`EventScheduler` reconciles each Update tick: every group whose `min_participants ≤ effectiveHeadcount`
+is kept spawned (`Map::SpawnGroupSpawn`), the rest despawned (`Map::SpawnGroupDespawn`). Groups are
+**additive** (a higher tier layers *on top of* lower tiers, it does not replace them), so the pure
+core only decides set membership:
+
+```cpp
+// thresholds sorted asc; returns indices active for this headcount. Monotonic: more headcount ⇒ superset.
+std::vector<size_t> ActiveSpawnTiers(std::span<uint32_t const> thresholds, uint32_t headcount);
+```
+
+**Hysteresis:** the decayed peak already resists downward flapping; additionally a tier despawns only
+once the effective headcount falls a `TierReleaseMargin` below its threshold, so a crowd hovering on a
+boundary doesn't strobe groups in and out. Boss spawns live in the threshold-0 base group.
+
+### 2.5.4 Containment scales with the field (anti-trivialisation)
+
+If more mobs spawn but the §9.6 containment `goal` is fixed, a bigger crowd trivially completes the
+event. So the event goal is a **function of the active tiers** — each `branding_event_spawn` row
+carries a `goal_contribution`, and the live goal is the sum over currently-active tiers. The crowd
+that summons the second wave also has to clear it; containment % stays meaningful at every size.
+
+### 2.5.5 Composition & invariants (tested)
+
+Independent of §2.1–§2.4: §2.1 still downscales an over-levelled participant's *outgoing* damage;
+the invasion supplies the *encounter* side (trash/boss muls + spawn volume); branding (§7.9) applies
+per player on top.
+
+- **Straggler-completable**: at `headcount == 1`, trash difficulty mul is bounded near 1.0 and only
+  the base tier is up — a solo player can meaningfully fight (never an impossible wall).
+- **Monotonic spawns**: `ActiveSpawnTiers` is a superset as headcount rises (no tier vanishes when
+  the crowd grows); monotonic difficulty per §2.2 for the boss.
+- **Capped crowd**: effective headcount is clamped to `IntendedInvasionSize` for the difficulty
+  lever and tiers are capped — a 41st body adds nothing (the §2.2 invariant, restated; also closes
+  the §2.3 Risk #4 count-inflation analog from the *up* direction, while the decayed peak closes it
+  from the *down* direction).
+- **Reward stays §9-personal**: per-player reward remains contribution-based (§9.2–§9.4, with the
+  §9.3 hourly cap / DR / leech floor / account ceiling). Invasions do **not** use §2.2
+  `RewardScaleForGroup` (that is for fixed-roster instances) — more mobs yield more reward only via
+  more *scored kills*, already bounded by §9.3.
+
+### 2.5.6 Wiring (adapter)
+
+- **EventMgr** — per-zone enrolled roster + `ParticipantCount`; owns a `CrowdTracker` per active event.
+- **EventScheduler** — load multi-row `branding_event_spawn` (`min_participants`, `goal_contribution`);
+  reconcile active tiers each tick with hysteresis; recompute the live containment goal.
+- **Creature stat hook** — reuse the `MasteryEnemyMgr::InActiveInvasion` gate to identify invasion
+  creatures, classify boss (`isWorldBoss`/`IsDungeonBoss`/elite mini-boss) vs trash, and apply the
+  §2.5.1 mul. Boss reuses §2.2 `EncounterHealthMul`/`DamageMul`; trash uses the gentle invasion curve.
+- **Authoring tool** (`tools/invasion-authoring/`) — author the per-tier reinforcement groups and emit
+  the `min_participants` / `goal_contribution` columns (see that tool's SPEC §7).
+
+---
+
 ## 3. Module Layout
 
 One module. The pure core lives **under `src/`** (`src/core/`) because the AzerothCore module
@@ -881,6 +987,8 @@ heart of Slice 3. Subscription, spawning, delivery, and the overlay are thin ada
 Each zone hosts event types: `Invasion`, `ResourceSurge`, `EliteHunt`, `ProfessionAnomaly`.
 Entering a zone **auto-subscribes** the player to event tracking — no UI friction, no turn-ins,
 no NPC bottlenecks. Subscription is an adapter (`OnUpdateZone`); event scheduling/spawns are data.
+For `Invasion` events, the spawn volume and creature difficulty **scale with the enrolled crowd** —
+see §2.5 (threshold-gated additive spawn groups + asymmetric trash/boss difficulty).
 
 ### 9.2 Participation scoring (pure — the real engine)
 

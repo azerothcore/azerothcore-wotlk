@@ -57,6 +57,11 @@ See [../ARCHITECTURE.md](../ARCHITECTURE.md) for the full spec. Section refs (§
    #22 ─┬▶ #23 heroic-tier-core        (pure HeroicContext muls + RewardScale.currencyMul)
         ├▶ #24 heroic-overlay-adapter   (read SELECTED difficulty, encounter scale, snapshot, exceptions) ◀ needs #23
         └▶ #25 heroic-reward-wiring      (currencyMul + tier bonus through §9.4 personal loot)            ◀ needs #23
+
+  (invasion crowd scaling — #26, extends §2.2; first live consumer of the §2.2 boss core)
+   #10 event-spawner ─┐
+   #12 persistence   ─┴▶ #26 invasion-crowd-scaling (pure CrowdTracker/ActiveSpawnTiers/trash curve;
+                                                     EventMgr roster; multi-row branding_event_spawn)
 ```
 
 `*` #14 needs a design decision (play-session profile) before it can be finalized — see the issue.
@@ -71,6 +76,8 @@ See [../ARCHITECTURE.md](../ARCHITECTURE.md) for the full spec. Section refs (§
 - **Batch E (groundwork done, flavour after #03):** #16 exotic-brand-schools.
 - **Batch F (selection economy, after #01+#07):** #17 mastery-selection-economy.
 - **Batch G (heroic overlay):** #23 heroic-tier-core first (pure), then #24 + #25 in parallel worktrees.
+- **Batch H (invasion crowd scaling):** #26 — pure `src/core/scaling/invasion/` first, then the
+  EventMgr/EventScheduler adapter (coordinate with #10/#12 on the shared event plumbing).
 - **Needs design input:** #14 xp-balance-sim; #17 has open *[DEFAULT]* decisions (title path, tuition curve).
 
 ## Cross-cutting note
