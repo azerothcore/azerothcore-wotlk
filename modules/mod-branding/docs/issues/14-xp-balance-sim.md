@@ -18,6 +18,10 @@ ARCHITECTURE.md §8.5 / Open Questions. Do not invent it silently.
   each share is within tolerance of target, with `share(Questing)` the largest. Fails if profession/
   discovery tuning drifts.
 - Run the sim at the configured 5x/7x baseline (not 1x) — the ratio is rate-coupled (Risk #2).
+- **Prestige-pacing assertion (§14.13.6):** the *same* representative profile drives the post-cap
+  XP→Proficiency rate. Add a second assertion that **time-to-Prestige for one school stays within
+  tolerance of ~3 months** (and unlock ~1 month) for that profile — so the §14.13.6 pacing contract is
+  CI-gated, not a hope. Shares the profile artifact below.
 
 ## Acceptance
 - Standard DoD. The regression test is part of the standalone GoogleTest suite and is deterministic.

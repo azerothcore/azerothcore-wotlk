@@ -16,6 +16,11 @@ account-unlock layer, a character-level layer, and a consumer.
 - A consumer: pick one effect the effectiveness scales (e.g. a small gathering/craft efficiency
   bonus) so the value is observable; surface in `.branding info`.
 
+> **Selection economy is its own issue (#17, ARCHITECTURE.md §14.13).** The Insight unlock currency,
+> the gold tuition switch fee, the post-cap-XP→active-school redirect, and the Prestige graduation
+> title (`reachedPrestige` → `Player::SetTitle`) live in #17, not here. This issue stays the
+> account-unlock × char-level *effectiveness* adapter; #17 consumes it for school selection.
+
 ## Acceptance
 - Standard DoD (incl. codestyle-sql). Account-unlock-only and char-level-only both yield 0 effect;
   both present scales it (mirror the core tests in-world).

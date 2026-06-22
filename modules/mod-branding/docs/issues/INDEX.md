@@ -39,6 +39,9 @@ See [../ARCHITECTURE.md](../ARCHITECTURE.md) for the full spec. Section refs (§
    #02 active-brand-loadout ─▶ #03 effect-application ─┬▶ #04 catalyst-adapter
                                                        ├▶ #05 item-branding-adapter
                                                        └▶ #16 exotic-brand-schools (enum/spec groundwork done; flavour needs #03)
+
+  (chain — selection economy)
+   #01 knowledge-unlock + #07 mastery-adapter ─▶ #17 mastery-selection-economy
 ```
 
 `*` #14 needs a design decision (play-session profile) before it can be finalized — see the issue.
@@ -51,7 +54,8 @@ See [../ARCHITECTURE.md](../ARCHITECTURE.md) for the full spec. Section refs (§
 - **Batch C (after #02→#03):** #04 catalyst, #05 item-branding.
 - **Batch D (content/infra, anytime):** #10 event-spawner, #13 world-spawn-content, #15 full-build-ci.
 - **Batch E (groundwork done, flavour after #03):** #16 exotic-brand-schools.
-- **Needs design input:** #14 xp-balance-sim.
+- **Batch F (selection economy, after #01+#07):** #17 mastery-selection-economy.
+- **Needs design input:** #14 xp-balance-sim; #17 has open *[DEFAULT]* decisions (title path, tuition curve).
 
 ## Cross-cutting note
 
