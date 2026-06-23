@@ -33,10 +33,15 @@ void ACSoapThread(const std::string& host, uint16 port)
     soap.recv_timeout = 5;
     soap.send_timeout = 5;
 
+    // allow rebinding while the previous socket is still in TIME_WAIT (e.g. on a quick restart)
+    soap.bind_flags = SO_REUSEADDR;
+
     if (!soap_valid_socket(soap_bind(&soap, host.c_str(), port, 100)))
     {
         LOG_ERROR("network.soap", "ACSoap: couldn't bind to {}:{}", host, port);
-        exit(-1);
+        // graceful shutdown: exit() here would destroy SocketMgr before StopNetwork() and assert
+        World::StopNow(ERROR_EXIT_CODE);
+        return;
     }
 
     LOG_INFO("network.soap", "ACSoap: bound to http://{}:{}", host, port);
