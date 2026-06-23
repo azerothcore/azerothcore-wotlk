@@ -41,6 +41,8 @@ class spell_gordunni_trap : public SpellScript
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
         Unit* target = GetHitUnit();
+        if (!target)
+            return;
 
         // spawn the dug up mound at the trap itself, lying flush on the terrain
         WorldObject* anchor = GetGObjCaster();

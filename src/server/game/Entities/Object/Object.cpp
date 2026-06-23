@@ -3940,12 +3940,12 @@ float WorldObject::GetSpellMaxRangeForTarget(Unit const* target, SpellInfo const
         return 0;
 
     if (spellInfo->RangeEntry->RangeMax[1] == spellInfo->RangeEntry->RangeMax[0])
-        return spellInfo->GetMaxRange();
+        return spellInfo->GetMaxRange(false, const_cast<WorldObject*>(this));
 
     if (!target)
-        return spellInfo->GetMaxRange(true);
+        return spellInfo->GetMaxRange(true, const_cast<WorldObject*>(this));
 
-    return spellInfo->GetMaxRange(!IsHostileTo(target));
+    return spellInfo->GetMaxRange(!IsHostileTo(target), const_cast<WorldObject*>(this));
 }
 
 float WorldObject::GetSpellMinRangeForTarget(Unit const* target, SpellInfo const* spellInfo) const
