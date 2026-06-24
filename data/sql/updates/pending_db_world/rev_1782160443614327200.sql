@@ -9,7 +9,7 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 DELETE FROM `npc_text` WHERE `ID` IN (12958, 12961);
 INSERT INTO `npc_text` VALUES
 (12958,'Yes, $c, what can I do for you?$B$BIf you\'re here for a lesson on Naxxramas, there\'s plenty of room.','',0,0,1,1000,1,0,0,0,0,'','',0,0,0,0,0,0,0,0,0,'','',0,0,0,0,0,0,0,0,0,'','',0,0,0,0,0,0,0,0,0,'','',0,0,0,0,0,0,0,0,0,'','',0,0,0,0,0,0,0,0,0,'','',0,0,0,0,0,0,0,0,0,'','',0,0,0,0,0,0,0,0,0,11685),
-(12961,'Yes, $c, what can I do for you?$B$BIf you\'re here for a lesson on Naxxramas, there\'s plenty of room.','',0,0,1,0,1,0,0,0,0,'','',0,0,0,0,0,0,0,0,0,'','',0,0,0,0,0,0,0,0,0,'','',0,0,0,0,0,0,0,0,0,'','',0,0,0,0,0,0,0,0,0,'','',0,0,0,0,0,0,0,0,0,'','',0,0,0,0,0,0,0,0,0,11723);
+(12961,'Yes, $c, what can I do for you?$B$BIf you\'re here for a lesson on Naxxramas, there\'s plenty of room.','',0,0,1,0,1,0,0,0,0,'','',0,0,0,0,0,0,0,0,0,'','',0,0,0,0,0,0,0,0,0,'','',0,0,0,0,0,0,0,0,0,'','',0,0,0,0,0,0,0,0,0,'','',0,0,0,0,0,0,0,0,0,'','',0,0,0,0,0,0,0,0,0,'','',0,0,0,0,0,0,0,0,0,11723);
 
 -- Commander Eligor Dawnbringer (27784): don't pause his scripted narration walk when a player interacts.
 -- InteractionPauseTimer 0 disables the gossip-hello movement pause (default is the 3s Creature.MovingStopTimeForPlayer).
