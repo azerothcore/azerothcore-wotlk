@@ -20,6 +20,7 @@
 #include "Log.h"
 #include "World.h"
 #include "soapStub.h"
+#include <chrono>
 
 void ACSoapThread(const std::string& host, uint16 port)
 {
@@ -117,8 +118,14 @@ int ns1__executeCommand(soap* soap, char* command, char** result)
         sWorld->QueueCliCommand(cmd);
     }
 
-    // Wait until the command has finished executing
-    connection.finishedPromise.get_future().wait();
+    // Wait for the command to finish, but bail on shutdown: ProcessCliCommands() (which fulfils
+    // the promise) stops once the world loop exits, so an unbounded wait here would deadlock.
+    std::future<void> finished = connection.finishedPromise.get_future();
+    while (finished.wait_for(std::chrono::seconds(1)) != std::future_status::ready)
+    {
+        if (World::IsStopped())
+            return soap_receiver_fault(soap, "Server is shutting down", "Command aborted: the server is shutting down");
+    }
 
     // The command has finished executing already
     char* printBuffer = soap_strdup(soap, connection.m_printBuffer.c_str());
