@@ -465,92 +465,34 @@ UPDATE `item_template` SET `armor` = 636 WHERE `entry` = 53508;
 UPDATE `item_template` SET `armor` = 618 WHERE `entry` = 54592;
 
 -- Fix dmg_min1 = dmg_max1 = 0 on weapons
--- 29 items: class = 2
+-- 29 items sourced from WotLK Wowhead tooltips
 
-UPDATE `item_template`
-    SET `dmg_min1` = 9, `dmg_max1` = 18
-    WHERE `entry` = 2664;
-UPDATE `item_template`
-    SET `dmg_min1` = 38, `dmg_max1` = 60
-    WHERE `entry` = 3738;
-UPDATE `item_template`
-    SET `dmg_min1` = 14, `dmg_max1` = 25
-    WHERE `entry` = 5255;
-UPDATE `item_template`
-    SET `dmg_min1` = 117, `dmg_max1` = 173
-    WHERE `entry` = 12469;
-UPDATE `item_template`
-    SET `dmg_min1` = 23, `dmg_max1` = 51
-    WHERE `entry` = 16792;
-UPDATE `item_template`
-    SET `dmg_min1` = 42, `dmg_max1` = 75
-    WHERE `entry` = 20368;
-UPDATE `item_template`
-    SET `dmg_min1` = 104, `dmg_max1` = 165
-    WHERE `entry` = 20522;
-UPDATE `item_template`
-    SET `dmg_min1` = 104, `dmg_max1` = 200
-    WHERE `entry` = 22805;
-UPDATE `item_template`
-    SET `dmg_min1` = 230, `dmg_max1` = 343
-    WHERE `entry` = 22814;
-UPDATE `item_template`
-    SET `dmg_min1` = 36, `dmg_max1` = 70
-    WHERE `entry` = 23229;
-UPDATE `item_template`
-    SET `dmg_min1` = 13, `dmg_max1` = 24
-    WHERE `entry` = 23421;
-UPDATE `item_template`
-    SET `dmg_min1` = 8, `dmg_max1` = 15
-    WHERE `entry` = 23422;
-UPDATE `item_template`
-    SET `dmg_min1` = 23, `dmg_max1` = 35
-    WHERE `entry` = 23432;
-UPDATE `item_template`
-    SET `dmg_min1` = 99, `dmg_max1` = 194
-    WHERE `entry` = 32914;
-UPDATE `item_template`
-    SET `dmg_min1` = 255, `dmg_max1` = 490
-    WHERE `entry` = 32949;
-UPDATE `item_template`
-    SET `dmg_min1` = 228, `dmg_max1` = 496
-    WHERE `entry` = 32950;
-UPDATE `item_template`
-    SET `dmg_min1` = 124, `dmg_max1` = 206
-    WHERE `entry` = 37534;
-UPDATE `item_template`
-    SET `dmg_min1` = 67, `dmg_max1` = 146
-    WHERE `entry` = 37536;
-UPDATE `item_template`
-    SET `dmg_min1` = 107, `dmg_max1` = 209
-    WHERE `entry` = 37611;
-UPDATE `item_template`
-    SET `dmg_min1` = 107, `dmg_max1` = 210
-    WHERE `entry` = 37649;
-UPDATE `item_template`
-    SET `dmg_min1` = 138, `dmg_max1` = 271
-    WHERE `entry` = 37697;
-UPDATE `item_template`
-    SET `dmg_min1` = 192, `dmg_max1` = 304
-    WHERE `entry` = 38245;
-UPDATE `item_template`
-    SET `dmg_min1` = 192, `dmg_max1` = 304
-    WHERE `entry` = 38248;
-UPDATE `item_template`
-    SET `dmg_min1` = 257, `dmg_max1` = 493
-    WHERE `entry` = 40553;
-UPDATE `item_template`
-    SET `dmg_min1` = 112, `dmg_max1` = 214
-    WHERE `entry` = 43922;
-UPDATE `item_template`
-    SET `dmg_min1` = 489, `dmg_max1` = 729
-    WHERE `entry` = 44191;
-UPDATE `item_template`
-    SET `dmg_min1` = 510, `dmg_max1` = 758
-    WHERE `entry` = 44926;
-UPDATE `item_template`
-    SET `dmg_min1` = 509, `dmg_max1` = 759
-    WHERE `entry` = 44948;
-UPDATE `item_template`
-    SET `dmg_min1` = 98, `dmg_max1` = 189
-    WHERE `entry` = 50815;
+UPDATE `item_template` SET `dmg_min1` = 9, `dmg_max1` = 18 WHERE `entry` = 2664;
+UPDATE `item_template` SET `dmg_min1` = 39, `dmg_max1` = 59 WHERE `entry` = 3738;
+UPDATE `item_template` SET `dmg_min1` = 13, `dmg_max1` = 26 WHERE `entry` = 5255;
+UPDATE `item_template` SET `dmg_min1` = 82, `dmg_max1` = 124 WHERE `entry` = 12469;
+UPDATE `item_template` SET `dmg_min1` = 26, `dmg_max1` = 49 WHERE `entry` = 16792;
+UPDATE `item_template` SET `dmg_min1` = 58, `dmg_max1` = 59 WHERE `entry` = 20368;
+UPDATE `item_template` SET `dmg_min1` = 108, `dmg_max1` = 162 WHERE `entry` = 20522;
+UPDATE `item_template` SET `dmg_min1` = 106, `dmg_max1` = 198 WHERE `entry` = 22805;
+UPDATE `item_template` SET `dmg_min1` = 229, `dmg_max1` = 344 WHERE `entry` = 22814;
+UPDATE `item_template` SET `dmg_min1` = 37, `dmg_max1` = 69 WHERE `entry` = 23229;
+UPDATE `item_template` SET `dmg_min1` = 13, `dmg_max1` = 24 WHERE `entry` = 23421;
+UPDATE `item_template` SET `dmg_min1` = 8, `dmg_max1` = 15 WHERE `entry` = 23422;
+UPDATE `item_template` SET `dmg_min1` = 23, `dmg_max1` = 35 WHERE `entry` = 23432;
+UPDATE `item_template` SET `dmg_min1` = 146, `dmg_max1` = 146 WHERE `entry` = 32914;
+UPDATE `item_template` SET `dmg_min1` = 430, `dmg_max1` = 431 WHERE `entry` = 32949;
+UPDATE `item_template` SET `dmg_min1` = 363, `dmg_max1` = 363 WHERE `entry` = 32950;
+UPDATE `item_template` SET `dmg_min1` = 115, `dmg_max1` = 215 WHERE `entry` = 37534;
+UPDATE `item_template` SET `dmg_min1` = 94, `dmg_max1` = 176 WHERE `entry` = 37536;
+UPDATE `item_template` SET `dmg_min1` = 185, `dmg_max1` = 186 WHERE `entry` = 37611;
+UPDATE `item_template` SET `dmg_min1` = 145, `dmg_max1` = 219 WHERE `entry` = 37649;
+UPDATE `item_template` SET `dmg_min1` = 187, `dmg_max1` = 281 WHERE `entry` = 37697;
+UPDATE `item_template` SET `dmg_min1` = 168, `dmg_max1` = 311 WHERE `entry` = 38245;
+UPDATE `item_template` SET `dmg_min1` = 168, `dmg_max1` = 311 WHERE `entry` = 38248;
+UPDATE `item_template` SET `dmg_min1` = 291, `dmg_max1` = 541 WHERE `entry` = 40553;
+UPDATE `item_template` SET `dmg_min1` = 114, `dmg_max1` = 212 WHERE `entry` = 43922;
+UPDATE `item_template` SET `dmg_min1` = 487, `dmg_max1` = 731 WHERE `entry` = 44191;
+UPDATE `item_template` SET `dmg_min1` = 507, `dmg_max1` = 761 WHERE `entry` = 44926;
+UPDATE `item_template` SET `dmg_min1` = 507, `dmg_max1` = 761 WHERE `entry` = 44948;
+UPDATE `item_template` SET `dmg_min1` = 100, `dmg_max1` = 187 WHERE `entry` = 50815;
