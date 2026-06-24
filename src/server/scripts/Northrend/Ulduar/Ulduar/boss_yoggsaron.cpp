@@ -102,6 +102,8 @@ enum YoggSpells
     SPELL_FOCUSED_ANGER                 = 57688,
 
     // CONSTRICTOR TENTACLE
+    SPELL_CONSTRICTOR_TENTACLE          = 64132,
+    SPELL_CONSTRICTOR_TENTACLE_SUMMON   = 64133,
     SPELL_LUNGE                         = 64123,
     SPELL_SQUEEZE                       = 64125,
 
@@ -853,7 +855,7 @@ struct boss_yoggsaron_sara : public ScriptedAI
                 events.Repeat(Milliseconds(uint32((50000 + urand(0, 10000)) * _summonSpeed)));
                 break;
             case EVENT_SARA_P2_SUMMON_T2: // CONSTRICTOR
-                SpawnTentacle(NPC_CONSTRICTOR_TENTACLE);
+                me->CastCustomSpell(SPELL_CONSTRICTOR_TENTACLE, SPELLVALUE_MAX_TARGETS, 1, me, false);
                 events.Repeat(Milliseconds(uint32((15000 + urand(0, 5000))* _summonSpeed)));
                 break;
             case EVENT_SARA_P2_SUMMON_T3: // CORRUPTOR
@@ -886,7 +888,7 @@ struct boss_yoggsaron_sara : public ScriptedAI
                 me->SetPosition(me->GetPositionX(), me->GetPositionY(), 355, me->GetOrientation());
 
                 SpawnTentacle(NPC_CRUSHER_TENTACLE);
-                SpawnTentacle(NPC_CONSTRICTOR_TENTACLE);
+                me->CastCustomSpell(SPELL_CONSTRICTOR_TENTACLE, SPELLVALUE_MAX_TARGETS, 1, me, false);
                 SpawnTentacle(NPC_CORRUPTOR_TENTACLE);
                 SpawnTentacle(NPC_CORRUPTOR_TENTACLE);
 
@@ -1569,12 +1571,45 @@ struct boss_yoggsaron_constrictor_tentacle : public ScriptedAI
     boss_yoggsaron_constrictor_tentacle(Creature* creature) : ScriptedAI(creature)
     {
         me->SetCombatMovement(false);
-        _checkTimer = 1;
         _playerGUID.Clear();
     }
 
-    uint32 _checkTimer;
     ObjectGuid _playerGUID;
+
+    void GrabPlayer(Unit* target)
+    {
+        target->CastSpell(me, SPELL_LUNGE, true);
+        target->CastSpell(target, SPELL_SQUEEZE, true);
+        _playerGUID = target->GetGUID();
+    }
+
+    void IsSummonedBy(WorldObject* summoner) override
+    {
+        me->CastSpell(me, SPELL_TENTACLE_ERUPT, true);
+        me->CastSpell(me, SPELL_VOID_ZONE_SMALL, true);
+        me->HandleEmoteCommand(EMOTE_ONESHOT_EMERGE);
+        me->SetInCombatWithZone();
+
+        // The summoner is the marked player (64133 is self-cast); 64132 already
+        // picked a valid enemy, so only re-check that they can still be squeezed.
+        // Fall back to the nearest valid player otherwise.
+        Unit* target = nullptr;
+        if (Player* player = summoner ? summoner->ToPlayer() : nullptr)
+            if (player->IsAlive() && !player->HasAura(sSpellMgr->GetSpellIdForDifficulty(SPELL_SQUEEZE, me)))
+                target = player;
+
+        if (!target)
+            target = SelectConstrictTarget();
+
+        if (target)
+            GrabPlayer(target);
+
+        // Summoned from a player, so register with Sara to keep the encounter's
+        // despawn handling working.
+        if (InstanceScript* instance = me->GetInstanceScript())
+            if (Creature* sara = instance->GetCreature(DATA_SARA))
+                sara->AI()->JustSummoned(me);
+    }
 
     Unit* SelectConstrictTarget()
     {
@@ -1598,27 +1633,6 @@ struct boss_yoggsaron_constrictor_tentacle : public ScriptedAI
         return target;
     }
 
-    void UpdateAI(uint32 diff) override
-    {
-        if (_checkTimer)
-        {
-            _checkTimer += diff;
-            if (_checkTimer >= 1000 && !me->HasUnitState(UNIT_STATE_STUNNED))
-            {
-                if (Unit* target = SelectConstrictTarget())
-                {
-                    target->CastSpell(me, SPELL_LUNGE, true);
-                    target->CastSpell(target, SPELL_SQUEEZE, true);
-                    _playerGUID = target->GetGUID();
-                    _checkTimer = 0;
-                    return;
-                }
-
-                _checkTimer = 1;
-            }
-        }
-    }
-
     void DoAction(int32 param) override
     {
         if (param == ACTION_REMOVE_STUN)
@@ -1629,6 +1643,8 @@ struct boss_yoggsaron_constrictor_tentacle : public ScriptedAI
     {
         if (Unit* player = ObjectAccessor::GetUnit(*me, _playerGUID))
             player->RemoveAura(sSpellMgr->GetSpellIdForDifficulty(SPELL_SQUEEZE, me));
+
+        me->DespawnOrUnsummon(5s);
     }
 };
 
@@ -2677,6 +2693,28 @@ class spell_yogg_saron_target_selectors : public SpellScript
     }
 };
 
+// 64132 - Constrictor Tentacle
+class spell_yogg_saron_constrictor_tentacle_aura : public AuraScript
+{
+    PrepareAuraScript(spell_yogg_saron_constrictor_tentacle_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_CONSTRICTOR_TENTACLE_SUMMON });
+    }
+
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        // Spawns the tentacle on the marked player so it grabs them on the spot.
+        GetTarget()->CastSpell(GetTarget(), SPELL_CONSTRICTOR_TENTACLE_SUMMON, true);
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_yogg_saron_constrictor_tentacle_aura::OnApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 // 63305 - Grim Reprisal
 class spell_yogg_saron_grim_reprisal_aura : public AuraScript
 {
@@ -2807,6 +2845,7 @@ void AddSC_boss_yoggsaron()
     RegisterSpellScript(spell_yogg_saron_empowering_shadows);
     RegisterSpellScript(spell_yogg_saron_in_the_maws_of_the_old_god);
     RegisterSpellScript(spell_yogg_saron_target_selectors);
+    RegisterSpellScript(spell_yogg_saron_constrictor_tentacle_aura);
     RegisterSpellScript(spell_yogg_saron_grim_reprisal_aura);
 
     // ACHIEVEMENTS
