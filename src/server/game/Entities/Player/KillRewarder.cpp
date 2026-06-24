@@ -162,27 +162,19 @@ void KillRewarder::_RewardXP(Player* player, float rate)
         else
             xp = 0;
     }
-    else if (Creature* creature = _victim->ToCreature())
-    {
-        // If an ungrouped helper attacked this creature and the mob
-        // is gray for that helper, reduce XP — consistent with the
-        // group formula (half XP when a gray-level member is present).
-        // If an ungrouped higher-level player helped kill this creature,
-        // apply group-like XP scaling: level ratio + gray penalty.
-        uint8 highestLevel = creature->GetHighestPlayerAttackerLevel();
-        if (highestLevel > player->GetLevel())
-        {
-            // Level ratio: same as group formula (playerLevel / sumOfLevels)
-            uint32 sumLevel = uint32(player->GetLevel()) + uint32(highestLevel);
-            float levelRate = float(player->GetLevel()) / float(sumLevel);
 
-            uint8 grayLevel = Acore::XP::GetGrayLevel(highestLevel);
-            if (creature->GetLevel() <= grayLevel)
-                xp = uint32(xp * levelRate / 2) + 1;
-            else
-                xp = uint32(xp * levelRate);
+    // An ungrouped helper who out-levels everyone eligible for the kill and for
+    // whom the victim is gray halves the tagger's XP, matching the group
+    // gray-member penalty. Closes a power-leveling exploit.
+    if (xp)
+        if (Creature* creature = _victim->ToCreature())
+        {
+            uint8 const referenceLevel = _group ? _maxLevel : player->GetLevel();
+            uint8 const highestLevel = creature->GetHighestPlayerAttackerLevel();
+            if (highestLevel > referenceLevel && creature->GetLevel() <= Acore::XP::GetGrayLevel(highestLevel))
+                xp = xp / 2 + 1;
         }
-    }
+
     if (xp)
     {
         // 4.2.2. Apply auras modifying rewarded XP (SPELL_AURA_MOD_XP_PCT).
