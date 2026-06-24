@@ -175,8 +175,8 @@ bool DBUpdater<T>::Create(DatabaseWorkerPool<T>& pool)
 {
     LOG_WARN("sql.updates", "Database \"{}\" does not exist", pool.GetConnectionInfo()->database);
 	
-	if (!DBUpdaterUtil::CheckExecutable())
-		return false;
+    if (!DBUpdaterUtil::CheckExecutable())
+        return false;
 
     const char* disableInteractive = std::getenv("AC_DISABLE_INTERACTIVE");
 
