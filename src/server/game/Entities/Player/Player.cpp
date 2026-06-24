@@ -703,7 +703,7 @@ bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo
         {
             StoreNewItemInBestSlots(voucherId, 1);
 
-            // Prevent characters from recieving duplicate vouchers through the mail system.
+            // Prevent characters from receiving duplicate vouchers through the mail system.
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_MAIL_SERVER_CHARACTER);
             stmt->SetData(0, guidlow);
             stmt->SetData(1, voucherId);
