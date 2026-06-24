@@ -303,9 +303,9 @@ public:
     void NeedBeforeGreed(Loot* loot, WorldObject* pLootedObject);
     void MasterLoot(Loot* loot, WorldObject* pLootedObject);
     Rolls::iterator GetRoll(ObjectGuid Guid);
-    void CountTheRoll(Rolls::iterator roll, Map* allowedMap);
+    void CountTheRoll(Rolls::iterator roll);
     bool CountRollVote(ObjectGuid playerGUID, ObjectGuid Guid, uint8 Choise);
-    void EndRoll(Loot* loot, Map* allowedMap);
+    void EndRoll(Loot* loot);
     void RemovePlayerFromRolls(ObjectGuid guid);
 
     // related to disenchant rolls
