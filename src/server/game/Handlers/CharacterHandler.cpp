@@ -379,7 +379,8 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
 
     // speedup check for heroic class disabled case
     uint32 req_level_for_heroic = sWorld->getIntConfig(CONFIG_CHARACTER_CREATING_MIN_LEVEL_FOR_HEROIC_CHARACTER);
-    if (!HasPermission(rbac::RBAC_PERM_SKIP_CHECK_CHARACTER_CREATION_DEATH_KNIGHT) && createInfo->Class == CLASS_DEATH_KNIGHT && req_level_for_heroic > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
+    if (!HasPermission(rbac::RBAC_PERM_SKIP_CHECK_CHARACTER_CREATION_DEATH_KNIGHT) && createInfo->Class == CLASS_DEATH_KNIGHT
+        && req_level_for_heroic > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL) && !HasAccountFlag(ACCOUNT_FLAG_DEATH_KNIGHT_OK))
     {
         SendCharCreate(CHAR_CREATE_LEVEL_REQUIREMENT);
         return;
@@ -446,7 +447,8 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
             }
             bool haveSameRace = false;
             uint32 heroicReqLevel = sWorld->getIntConfig(CONFIG_CHARACTER_CREATING_MIN_LEVEL_FOR_HEROIC_CHARACTER);
-            bool hasHeroicReqLevel = (heroicReqLevel == 0);
+            bool const deathKnightFlagAlreadySet = HasAccountFlag(ACCOUNT_FLAG_DEATH_KNIGHT_OK); // Account flag is superior to level requirement.
+            bool hasHeroicReqLevel = (heroicReqLevel == 0) || deathKnightFlagAlreadySet;
             bool allowTwoSideAccounts = !sWorld->IsPvPRealm() || sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_ACCOUNTS) || HasPermission(rbac::RBAC_PERM_TWO_SIDE_CHARACTER_CREATION);
             uint32 skipCinematics = sWorld->getIntConfig(CONFIG_SKIP_CINEMATICS);
             bool checkDeathKnightReqs = !HasPermission(rbac::RBAC_PERM_SKIP_CHECK_CHARACTER_CREATION_DEATH_KNIGHT) && createInfo->Class == CLASS_DEATH_KNIGHT;
@@ -535,10 +537,16 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recvData)
                 }
             }
 
-            if (checkDeathKnightReqs && !hasHeroicReqLevel)
+            if (checkDeathKnightReqs)
             {
-                SendCharCreate(CHAR_CREATE_LEVEL_REQUIREMENT);
-                return;
+                if (!deathKnightFlagAlreadySet && hasHeroicReqLevel)
+                    UpdateAccountFlag(ACCOUNT_FLAG_DEATH_KNIGHT_OK);
+
+                if (!hasHeroicReqLevel)
+                {
+                    SendCharCreate(CHAR_CREATE_LEVEL_REQUIREMENT);
+                    return;
+                }
             }
 
             // Check name uniqueness in the same step as saving to database
