@@ -283,9 +283,9 @@ void SmartAIMgr::LoadSmartAIFromDB()
                     temp.event.event_flags |= SMART_EVENT_FLAG_NOT_REPEATABLE;
                 break;
             case SMART_EVENT_DAMAGED:
-                if (temp.event.minMaxRepeat.rangeMin) // health check mode: always one-shot
-                    temp.event.event_flags |= SMART_EVENT_FLAG_NOT_REPEATABLE;
-                else if (temp.event.minMaxRepeat.repeatMin == 0 && temp.event.minMaxRepeat.repeatMax == 0)
+                // health check mode stays below the threshold on every following hit, so force one-shot;
+                // normal mode keeps repeatMin/repeatMax as a cooldown (0 = fire on every hit), so leave it repeatable.
+                if (temp.event.minMaxRepeat.rangeMin)
                     temp.event.event_flags |= SMART_EVENT_FLAG_NOT_REPEATABLE;
                 break;
             case SMART_EVENT_VICTIM_CASTING:
