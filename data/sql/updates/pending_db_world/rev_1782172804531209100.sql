@@ -1,11 +1,5 @@
 -- Quest 13142 "Banshee's Revenge" - Overthane Balargarde encounter.
--- The SmartAI implementation is replaced by C++ (zone_icecrown.cpp); this update
--- wires the creatures to the new scripts and provides the supporting data.
 
--- Attach the C++ AIs and clear the legacy SmartAI / apply the encounter unit flags.
--- NOTE: AzerothCore has no `creature_template`.`InhabitType` column (TC-only); flight is stored in
--- `creature_template_movement`. 31050/31030/31029/31087 are already `Flight`=1 in the base data, so no
--- movement rows are needed here.
 UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_overthane',
     `unit_flags`=33088 WHERE `entry`=31016;
 UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_safirdrang',
@@ -18,13 +12,6 @@ UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_li
     `unit_flags`=768 WHERE `entry`=31083;
 UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_chill_target',
     `unit_flags`=33555200 WHERE `entry`=31077;
-
--- The Balargarde Elites use a cosmetic proto-drake mount (creature_addon mount 26882) and fly their own
--- patrols, so the custom proto-drake vehicle NPC (310300) is removed (clean up any earlier import of it).
-DELETE FROM `creature_template` WHERE `entry`=310300;
-DELETE FROM `creature_template_model` WHERE `CreatureID`=310300;
-DELETE FROM `creature_template_movement` WHERE `CreatureId`=310300;
-DELETE FROM `creature_template_addon` WHERE `entry`=310300;
 
 -- Remove the legacy SmartAI rows for the encounter creatures (source_type 0) and Overthane's
 -- timed action list (source_type 9, entryorguid 31016).
