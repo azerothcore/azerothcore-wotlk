@@ -1348,9 +1348,7 @@ class spell_riding_jokkum : public AuraScript
 
         AuraRemoveMode removeMode = GetTargetApplication()->GetRemoveMode();
         if (removeMode == AURA_REMOVE_BY_CANCEL)
-        {
             summoned->DespawnOrUnsummon();
-        }
     }
 
     void Register() override
