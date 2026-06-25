@@ -11,7 +11,17 @@ namespace Branding
             return 0;
 
         uint8_t const capped = std::min<uint8_t>(level, cfg.MaxLevel());
-        double const xp = cfg.BaseXp() * std::pow(static_cast<double>(capped), cfg.Exponent());
+        double const n = static_cast<double>(capped);
+        double const growth = cfg.RankGrowth();
+
+        // Geometric per-rank ladder (§7.4): cumulative cost of ranks 1..n. The closed-form sum of
+        // RankBaseXp * growth^(k-1) for k in [1, n]. growth == 1 degenerates to a linear ladder.
+        double xp;
+        if (std::abs(growth - 1.0) < 1e-9)
+            xp = cfg.RankBaseXp() * n;
+        else
+            xp = cfg.RankBaseXp() * (std::pow(growth, n) - 1.0) / (growth - 1.0);
+
         return static_cast<uint64_t>(std::llround(xp));
     }
 

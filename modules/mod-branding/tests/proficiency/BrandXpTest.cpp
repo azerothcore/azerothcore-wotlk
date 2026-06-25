@@ -200,9 +200,9 @@ TEST(BrandXp, DeterministicGivenInputs)
 TEST(BrandXp, ReachedPrestigeFiresOnceAtCap)
 {
     FakeConfig cfg;
-    cfg.baseXp = 10.0;
-    cfg.exponent = 2.0;
-    cfg.maxLevel = 2;                     // XpForLevel(2) = 40
+    cfg.rankBaseXp = 10.0;
+    cfg.rankGrowth = 2.0;
+    cfg.maxLevel = 2;                     // geometric: XpForLevel(2) = 10 * (2^2 - 1)/(2 - 1) = 30
     FakeClock clock;
     ProficiencyState s;
     auto a = MakeActivity(ActivitySource::Invasion, BrandId::Fire, BrandId::Frost, RoleContribution::None, 100);

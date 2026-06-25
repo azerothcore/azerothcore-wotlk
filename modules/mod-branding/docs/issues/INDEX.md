@@ -74,7 +74,7 @@ See [../ARCHITECTURE.md](../ARCHITECTURE.md) for the full spec. Section refs (§
                                                      EventMgr roster; multi-row branding_event_spawn)
 ```
 
-`*` #14 needs a design decision (play-session profile) before it can be finalized — see the issue.
+`*` #14 — play-session profile + prestige curve **ratified 2026-06-25**; unblocked and in progress (see the issue).
 
 ## Suggested parallel batches
 

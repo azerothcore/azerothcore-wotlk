@@ -33,10 +33,12 @@ namespace Branding
         // After this many seconds the recent-window decays back to 0 (full XP restored).
         virtual uint64_t DrWindowSeconds() const = 0;
 
-        // --- Level curve (§7.4) ---
-        // XpForLevel(n) = round(BaseXp * n^Exponent), clamped at MaxLevel.
-        virtual double BaseXp() const = 0;
-        virtual double Exponent() const = 0;
+        // --- Level curve (§7.4 — geometric per-rank; prestige = max level, §14.13.6) ---
+        // rankCost(n) = round(RankBaseXp * RankGrowth^(n-1)); the cumulative threshold is
+        // XpForLevel(n) = round(RankBaseXp * (RankGrowth^n - 1) / (RankGrowth - 1)), clamped at MaxLevel.
+        // Defaults: RankBaseXp = 1670800 (live level-79->80 XP), RankGrowth = 1.01 (+1%/rank), MaxLevel = 50.
+        virtual double RankBaseXp() const = 0;
+        virtual double RankGrowth() const = 0;
         virtual uint8_t MaxLevel() const = 0;
     };
 }

@@ -1,5 +1,8 @@
 #include "branding/proficiency/Proficiency.h"
 #include "fakes/FakeConfig.h"
+#include <cmath>
+#include <cstdint>
+#include <cstdlib>
 #include <gtest/gtest.h>
 
 using namespace Branding;
@@ -60,4 +63,39 @@ TEST(Proficiency, EffectStrengthBoundedAndMonotonic)
         EXPECT_GE(s, prev);
         prev = s;
     }
+}
+
+// XpForLevel is the closed-form sum of the geometric per-rank ladder (§7.4): the cumulative cost to
+// reach level n equals the sum of rankBaseXp * growth^(k-1) for k in [1, n].
+TEST(Proficiency, XpForLevelMatchesGeometricRankSum)
+{
+    FakeConfig cfg;
+    cfg.rankBaseXp = 1670800.0;   // live level-79->80 XP
+    cfg.rankGrowth = 1.01;        // +1%/rank
+
+    double running = 0.0;
+    for (uint8_t lvl = 1; lvl <= cfg.maxLevel; ++lvl)
+    {
+        running += cfg.rankBaseXp * std::pow(cfg.rankGrowth, lvl - 1);   // rankCost(lvl)
+        // Allow rounding slack (the closed form rounds once; the running sum accumulates per-rank).
+        uint64_t const expected = static_cast<uint64_t>(std::llround(running));
+        uint64_t const actual = XpForLevel(lvl, cfg);
+        int64_t const diff = static_cast<int64_t>(actual) - static_cast<int64_t>(expected);
+        EXPECT_LE(std::abs(diff), 2) << "level " << static_cast<int>(lvl);
+    }
+
+    // The full 50-rank ladder is ~107.7M XP (the §14.13.6 pacing anchor).
+    uint64_t const full = XpForLevel(cfg.maxLevel, cfg);
+    EXPECT_GT(full, 107'000'000ull);
+    EXPECT_LT(full, 109'000'000ull);
+}
+
+// growth == 1.0 degenerates to a linear ladder (n * rankBaseXp), no division by zero.
+TEST(Proficiency, XpForLevelLinearWhenGrowthIsOne)
+{
+    FakeConfig cfg;
+    cfg.rankBaseXp = 1000.0;
+    cfg.rankGrowth = 1.0;
+    EXPECT_EQ(XpForLevel(1, cfg), 1000ull);
+    EXPECT_EQ(XpForLevel(7, cfg), 7000ull);
 }
