@@ -2285,6 +2285,7 @@ std::string EncodeYou(YouFrame const&);                                      // 
 std::string EncodeChar(CharSnapshot const&);                                 // BRND\tCHAR\t...
 std::string EncodeHello(HelloFrame const&);                                  // BRND\tHELLO\t<ver>\t<en>
 std::string EncodeMastery(MasterySnapshot const&, bool& trunc);              // BRND\tMAST\t...  (§14, v2)
+std::string EncodeXp(XpFrame const&);                                        // BRND\tXPB\t...  (§14.13, #54)
 ```
 
 Permille keeps the round-trip exact (equality, not epsilon). HELLO carries a **protocol version**
@@ -2315,6 +2316,32 @@ is the list of cells with `active==1` — **the model never hardcodes a single a
 character running MULTIPLE masteries at once (an explicit forward-compat requirement) needs no schema
 change; the server just flags more cells active.
 
+**XP-bar progression frame (XPB, §14.13 / issue #54).** Carries the **active brand's** proficiency
+progression so the addon can render it on (or over) the native XP bar — the way reputation can be
+watched on the XP bar, but driven entirely by the server's own numbers (the client never knows the
+§7.4 curve). The active brand is one progression at a time, so this is a single fixed-arity frame
+(no list, no truncation). The server decomposes `totalXp` into the current level and the position
+within it (§7.4 `XpForLevel`/`LevelForXp`); at `MaxLevel` the brand is **graduated** (Prestige,
+§14.13.4) and the bar reads full:
+
+```cpp
+struct XpFrame {
+    uint8_t  brand;          // active BrandId ordinal — lets the bar tint by school (cosmetic)
+    uint8_t  level;          // active brand's earned proficiency level (§7.4)
+    uint8_t  maxLevel;       // configured cap; level == maxLevel ⇒ Prestige (bar full)
+    uint32_t xpIntoLevel;    // XP earned into the current level (single-level span fits u32)
+    uint32_t xpForLevel;     // XP span of the current level (0 at max level)
+    bool     prestige;       // active brand is at max level (graduated, §14.13.4)
+};
+```
+
+Wire: `BRND\tXPB\t<brand>\t<level>\t<maxLevel>\t<xpIntoLevel>\t<xpForLevel>\t<prestige>`. Additive
+under protocol v2 (a client that does not know XPB ignores the unknown KIND — same forward-compat
+contract as every other frame), so no version bump. The decomposition is a pure core function
+(`ComputeLevelProgress`, §7.4) reused by the adapter; **the addon never duplicates the curve.** This
+dovetails with §14.13.3 (post-cap XP redirect, #20): at max *player* level the native XP bar is
+inert, and this frame repurposes that screen real estate to show the active brand's progress instead.
+
 **Client→server mastery request grammar (v2, §19.3 reserved).** Mirrors three request encoders +
 parsers (`EncodeAlloc`/`ParseAlloc`, `EncodeArchetype`/`ParseArchetype`, `EncodeRespec`/`ParseRespec`)
 and a `REQ\tMAST` verb:
@@ -2331,7 +2358,9 @@ locally (server-authoritative).
 
 **Invariants (tests — `tests/addon/ProtocolTest.cpp`):**
 
-- Round-trip `Decode*(Encode*(x)) == x` for every frame type (incl. MAST and the three requests).
+- Round-trip `Decode*(Encode*(x)) == x` for every frame type (incl. MAST, **XPB**, and the three requests).
+- `ComputeLevelProgress` (§7.4): splits `totalXp` into `level`/`xpIntoLevel`/`xpForLevel` exactly
+  (sums match `XpForLevel`); at and above `MaxLevel` it reports `prestige`/`atMax` with `xpForLevel == 0`.
 - Every frame begins `BRND\t<KIND>\t`, contains no newline, length ≤ 255.
 - List frames (SCH, **MAST**) pack/round-trip N records and **truncate deterministically with a
   marker** (never a silent split) when they would exceed 255 bytes.
@@ -2365,7 +2394,7 @@ locally (server-authoritative).
 
 ### 19.4 The addon (`modules/mod-branding/client-addon/Branding/`)
 
-A single addon, three surfaces, one shared comms layer (`Comms.lua` mirrors the §19.2 codec):
+A single addon, four surfaces, one shared comms layer (`Comms.lua` mirrors the §19.2 codec):
 
 - **Invasion Tracker** (`Tracker.lua`) — a movable HUD frame: current zone's event type + live
   containment bar + your points/tier; plus a schedule list (per-zone next/active/cooldown countdown).
@@ -2382,6 +2411,12 @@ A single addon, three surfaces, one shared comms layer (`Comms.lua` mirrors the 
   not a replace). Server-authoritative: it displays MAST and *requests* changes; it never mutates
   locally, and gates sending behind `ns.CanSend()` (disabled, display-only, until a realm enables a
   client→server channel).
+- **Mastery XP bar** (`XPBar.lua`, issue #54) — a thin `StatusBar` anchored over the native
+  `MainMenuExpBar` region (movable, like the Tracker) that renders the **XPB** push: the active
+  brand's level + fill (`xpIntoLevel / xpForLevel`) and an `N / M` label, tinted by the brand's
+  school colour (`ns.SchoolColor`, cosmetic). At Prestige (max level) it shows a full bar labelled
+  *"Prestige"*. It is an **unprotected overlay**, never a secure edit of the Blizzard XP frame — the
+  same no-taint discipline as the talent-frame dock below; it does not fight `MainMenuExpBar_Update`.
 
 **Talent-frame dock (#32 decision).** Native talent-frame integration (a real tab on
 `PlayerTalentFrame`) would need client DBC + secure-frame edits and would **taint** the protected

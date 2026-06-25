@@ -7,5 +7,6 @@
 
 Comms.lua
 Tracker.lua
+XPBar.lua
 Panel.lua
 MasteryPanel.lua

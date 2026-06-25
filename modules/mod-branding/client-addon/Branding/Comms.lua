@@ -23,10 +23,21 @@ ns.state = {
     schedule = { entries = {}, truncated = false },
     char = nil,                  -- decoded character snapshot (see DecodeChar)
     mastery = nil,               -- decoded §14 lattice snapshot (see DecodeMastery)
+    xp = nil,                    -- active-brand XP-bar progression (XPB, #54)
 }
 
 -- ---- Display name tables (mirror the server enums) ----
 ns.BrandName = { [0] = "Fire", [1] = "Frost", [2] = "Nature", [3] = "Shadow", [4] = "Arcane", [5] = "Holy", [6] = "Physical" }
+-- Per-school bar tint (cosmetic, #54). Keyed by BrandId ordinal; { r, g, b } in 0..1.
+ns.SchoolColor = {
+    [0] = { 1.00, 0.32, 0.12 },   -- Fire    (orange-red)
+    [1] = { 0.40, 0.78, 1.00 },   -- Frost   (ice blue)
+    [2] = { 0.30, 0.88, 0.36 },   -- Nature  (green)
+    [3] = { 0.55, 0.25, 0.72 },   -- Shadow  (violet)
+    [4] = { 0.82, 0.44, 0.92 },   -- Arcane  (magenta)
+    [5] = { 1.00, 0.90, 0.45 },   -- Holy    (gold)
+    [6] = { 0.80, 0.72, 0.56 },   -- Physical (tan)
+}
 ns.EventName = { [0] = "Invasion", [1] = "Resource Surge", [2] = "Elite Hunt", [3] = "Profession Anomaly" }
 ns.TierName = { [0] = "None", [1] = "Bronze", [2] = "Silver", [3] = "Gold" }
 ns.TierColor = { [0] = "ffffffff", [1] = "ffcd7f32", [2] = "ffc0c0c0", [3] = "ffffd700" }
@@ -189,6 +200,12 @@ local function decode(message)
         end
         ns.state.schedule = { entries = list, truncated = (t[3] == "T") }
         ns:Fire("schedule")
+    elseif kind == "XPB" then
+        ns.state.xp = {
+            brand = num(t[2]), level = num(t[3]), maxLevel = num(t[4]),
+            xpInto = num(t[5]), xpFor = num(t[6]), prestige = (t[7] == "1"),
+        }
+        ns:Fire("xp")
     elseif kind == "CHAR" then
         ns.state.char = ns:DecodeChar(t)
         ns:Fire("char")
@@ -251,6 +268,7 @@ frame:SetScript("OnEvent", function(_, event, ...)
         ns.db = BrandingDB
         if ns.PREFIX and RegisterAddonMessagePrefix then RegisterAddonMessagePrefix(ns.PREFIX) end
         if ns.CreateTracker then ns.CreateTracker() end
+        if ns.CreateXPBar then ns.CreateXPBar() end
         if ns.CreatePanel then ns.CreatePanel() end
         if ns.CreateMastery then ns.CreateMastery() end
         if ns.HookMasteryDock then ns.HookMasteryDock() end
@@ -264,6 +282,8 @@ SlashCmdList["BRANDING"] = function(arg)
     arg = string.lower(arg or "")
     if arg == "tracker" then
         if ns.ToggleTracker then ns.ToggleTracker() end
+    elseif arg == "xpbar" or arg == "xp" then
+        if ns.ToggleXPBar then ns.ToggleXPBar() end
     elseif arg == "mastery" then
         if ns.ToggleMastery then ns.ToggleMastery() end
     else

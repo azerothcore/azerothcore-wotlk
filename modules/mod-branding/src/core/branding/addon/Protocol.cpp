@@ -138,6 +138,12 @@ namespace Branding::Addon
         return a.id == b.id && a.efficiencyPermille == b.efficiencyPermille;
     }
 
+    bool operator==(XpFrame const& a, XpFrame const& b)
+    {
+        return a.brand == b.brand && a.level == b.level && a.maxLevel == b.maxLevel
+            && a.xpIntoLevel == b.xpIntoLevel && a.xpForLevel == b.xpForLevel && a.prestige == b.prestige;
+    }
+
     bool operator==(CharSnapshot const& a, CharSnapshot const& b)
     {
         return a.brands == b.brands && a.masteries == b.masteries && a.loadout == b.loadout
@@ -275,6 +281,18 @@ namespace Branding::Addon
         std::string out = FramePrefix("YOU");
         out += Sep; out += std::to_string(f.points);
         out += Sep; out += std::to_string(f.tier);
+        return out;
+    }
+
+    std::string EncodeXp(XpFrame const& f)
+    {
+        std::string out = FramePrefix("XPB");
+        out += Sep; out += std::to_string(f.brand);
+        out += Sep; out += std::to_string(f.level);
+        out += Sep; out += std::to_string(f.maxLevel);
+        out += Sep; out += std::to_string(f.xpIntoLevel);
+        out += Sep; out += std::to_string(f.xpForLevel);
+        out += Sep; out += (f.prestige ? '1' : '0');
         return out;
     }
 
@@ -451,6 +469,15 @@ namespace Branding::Addon
         if (t.size() != 4 || t[0] != Prefix || t[1] != "YOU")
             return false;
         return ParseU32(t[2], out.points) && ParseU8(t[3], out.tier);
+    }
+
+    bool DecodeXp(std::string_view frame, XpFrame& out)
+    {
+        std::vector<std::string_view> const t = Split(frame, Sep);
+        if (t.size() != 8 || t[0] != Prefix || t[1] != "XPB")
+            return false;
+        return ParseU8(t[2], out.brand) && ParseU8(t[3], out.level) && ParseU8(t[4], out.maxLevel)
+            && ParseU32(t[5], out.xpIntoLevel) && ParseU32(t[6], out.xpForLevel) && ParseBool(t[7], out.prestige);
     }
 
     bool DecodeSchedule(std::string_view frame, std::vector<ScheduleEntry>& out, bool& outTruncated)
