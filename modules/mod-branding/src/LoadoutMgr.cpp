@@ -1,5 +1,6 @@
 #include "LoadoutMgr.h"
 #include "ProficiencyMgr.h"
+#include "branding/effects/RolePolicy.h"
 #include "DatabaseEnv.h"
 #include "Player.h"
 #include <cstddef>
@@ -28,7 +29,7 @@ namespace Branding
         loadout = BrandLoadout{};
 
         QueryResult result = CharacterDatabase.Query(
-            "SELECT `active_brand`, `proc_archetype` FROM `character_brand_loadout` WHERE `guid` = {}",
+            "SELECT `active_brand`, `proc_archetype`, `selected_role` FROM `character_brand_loadout` WHERE `guid` = {}",
             guid.GetCounter());
         if (!result)
             return;
@@ -38,6 +39,10 @@ namespace Branding
         if (brand < static_cast<uint8>(BrandId::COUNT))
             loadout.activeBrand = static_cast<BrandId>(brand);
         loadout.selectedProcArchetype = fields[1].Get<uint8>();
+
+        uint8 const role = fields[2].Get<uint8>();
+        if (role < static_cast<uint8>(RoleContribution::COUNT))
+            loadout.selectedRole = static_cast<RoleContribution>(role);
     }
 
     void LoadoutMgr::SavePlayer(Player* player)
@@ -73,8 +78,10 @@ namespace Branding
     void LoadoutMgr::Persist(uint32_t lowGuid, BrandLoadout const& loadout) const
     {
         CharacterDatabase.Execute(
-            "REPLACE INTO `character_brand_loadout` (`guid`, `active_brand`, `proc_archetype`) VALUES ({}, {}, {})",
-            lowGuid, static_cast<uint32>(loadout.activeBrand), static_cast<uint32>(loadout.selectedProcArchetype));
+            "REPLACE INTO `character_brand_loadout` (`guid`, `active_brand`, `proc_archetype`, `selected_role`) "
+            "VALUES ({}, {}, {}, {})",
+            lowGuid, static_cast<uint32>(loadout.activeBrand), static_cast<uint32>(loadout.selectedProcArchetype),
+            static_cast<uint32>(loadout.selectedRole));
     }
 
     bool LoadoutMgr::SetActiveBrand(Player* player, BrandId brand)
@@ -113,6 +120,25 @@ namespace Branding
 
         if (!IsValidFor(guid, accountId, candidate))
             return false;
+
+        _loadouts[guid] = candidate;
+        Persist(guid.GetCounter(), candidate);
+        return true;
+    }
+
+    bool LoadoutMgr::SetRole(Player* player, RoleContribution role)
+    {
+        if (!player)
+            return false;
+
+        // None resets to auto (default policy). An explicit role must be one the class can express
+        // (§14.11 capability gate -- this is the anti-OP guardrail; no proficiency/knowledge gate).
+        if (role != RoleContribution::None && !RoleAllowed(player->getClass(), role))
+            return false;
+
+        ObjectGuid const guid = player->GetGUID();
+        BrandLoadout candidate = GetLoadout(guid);
+        candidate.selectedRole = role;
 
         _loadouts[guid] = candidate;
         Persist(guid.GetCounter(), candidate);

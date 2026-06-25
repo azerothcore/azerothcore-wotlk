@@ -121,7 +121,8 @@ namespace Branding
         }
 
         BrandLoadout const loadout = sLoadoutMgr->GetLoadout(guid);
-        snap.loadout = { static_cast<uint8_t>(loadout.activeBrand), loadout.selectedProcArchetype };
+        snap.loadout = { static_cast<uint8_t>(loadout.activeBrand), loadout.selectedProcArchetype,
+            static_cast<uint8_t>(loadout.selectedRole) };
 
         ItemBrandState itemState;
         bool const equipped = sItemBrandingMgr->EquippedState(player, itemState);

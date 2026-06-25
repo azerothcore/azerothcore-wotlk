@@ -148,7 +148,7 @@ TEST(AddonProtocol, CharRoundTrip)
     CharSnapshot in;
     in.brands = { { 0, 12, 240 }, { 3, 50, 1000 } };       // Fire L12, Shadow L50 (maxed)
     in.masteries = { { 0, true, 30, 120 }, { 1, false, 0, 0 } };
-    in.loadout = { 0, 2 };                                  // Fire, archetype 2
+    in.loadout = { 0, 2, 2 };                               // Fire, archetype 2, role Healer
     in.item = { true, 0, 2, 5, 1350 };                      // Fire weapon, step 2 lvl 5, x1.35
     in.allegiance = { 1, 1150 };                            // Fire/Chaos, x1.15
 
@@ -173,6 +173,25 @@ TEST(AddonProtocol, CharRoundTripEmptyBrands)
     CharSnapshot out;
     ASSERT_TRUE(DecodeChar(frame, out));
     EXPECT_EQ(in, out);
+}
+
+// Backward tolerance: a v2-style 2-field LDT (no role) still decodes, with role defaulting to None.
+TEST(AddonProtocol, CharDecodeLegacyLoadoutWithoutRole)
+{
+    CharSnapshot in;
+    in.loadout = { 3, 1, 0 };   // role None, so the decoded snapshot matches after stripping the field
+    std::string frame = EncodeChar(in);
+
+    // Simulate a v2 encoder by dropping the trailing role subfield from the LDT section.
+    auto const pos = frame.find("LDT=3:1:0");
+    ASSERT_NE(pos, std::string::npos);
+    frame.replace(pos, std::string("LDT=3:1:0").size(), "LDT=3:1");
+
+    CharSnapshot out;
+    ASSERT_TRUE(DecodeChar(frame, out));
+    EXPECT_EQ(out.loadout.activeBrand, 3);
+    EXPECT_EQ(out.loadout.archetype, 1);
+    EXPECT_EQ(out.loadout.role, 0);
 }
 
 // Forward-compat: an unknown KIND or malformed body decodes to a clean failure, never a crash.

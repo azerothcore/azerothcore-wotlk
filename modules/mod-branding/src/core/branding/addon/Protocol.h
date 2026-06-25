@@ -22,7 +22,9 @@ namespace Branding::Addon
     // v2 adds the §14 Mastery lattice frame (MAST) + the client->server mastery request grammar
     // (REQ MAST / ALLOC / ARCH / RESPEC). A v1 client simply ignores MAST and never sends the new
     // requests, so the bump is backward-tolerant; HELLO still tells a mismatched client to update.
-    inline constexpr uint8_t ProtocolVersion = 2;
+    // v3 appends the §14.11 selected role to the LDT loadout field (decode stays tolerant of the older
+    // 2-field form -> role None), so a v2 client that reads only the first two LDT fields still works.
+    inline constexpr uint8_t ProtocolVersion = 3;
 
     // What the client asked for (after the BRND prefix is stripped). The mastery verbs (Mastery,
     // Allocate, Archetype, Respec) are the §14 client->server channel reserved by §19.3 -- parsed
@@ -37,7 +39,7 @@ namespace Branding::Addon
     struct YouFrame { uint32_t points = 0; uint8_t tier = 0; };
     struct BrandFrame { uint8_t brand = 0; uint8_t level = 0; uint16_t strengthPermille = 0; };
     struct MasteryFrame { uint8_t system = 0; bool unlocked = false; uint8_t level = 0; uint16_t bonusPermille = 0; };
-    struct LoadoutFrame { uint8_t activeBrand = 0; uint8_t archetype = 0; };
+    struct LoadoutFrame { uint8_t activeBrand = 0; uint8_t archetype = 0; uint8_t role = 0; };
     struct ItemFrame { bool equipped = false; uint8_t brand = 0; uint8_t step = 0; uint8_t level = 0; uint16_t intensityPermille = 0; };
     struct AllegianceFrame { uint8_t id = 0; uint16_t efficiencyPermille = 0; };
 

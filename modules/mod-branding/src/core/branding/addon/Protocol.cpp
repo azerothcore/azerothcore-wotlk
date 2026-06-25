@@ -124,7 +124,7 @@ namespace Branding::Addon
 
     bool operator==(LoadoutFrame const& a, LoadoutFrame const& b)
     {
-        return a.activeBrand == b.activeBrand && a.archetype == b.archetype;
+        return a.activeBrand == b.activeBrand && a.archetype == b.archetype && a.role == b.role;
     }
 
     bool operator==(ItemFrame const& a, ItemFrame const& b)
@@ -337,7 +337,8 @@ namespace Branding::Addon
 
         out += Sep; out += "LDT=";
         out += std::to_string(s.loadout.activeBrand);  out += FieldSep;
-        out += std::to_string(s.loadout.archetype);
+        out += std::to_string(s.loadout.archetype);    out += FieldSep;
+        out += std::to_string(s.loadout.role);
 
         out += Sep; out += "ITM=";
         out += (s.item.equipped ? '1' : '0');          out += FieldSep;
@@ -520,8 +521,12 @@ namespace Branding::Addon
         }
 
         {
+            // Backward-tolerant: v2 sends 2 fields (role absent -> None), v3 sends 3 (with role).
             std::vector<std::string_view> const f = Split(ldt, FieldSep);
-            if (f.size() != 2 || !ParseU8(f[0], out.loadout.activeBrand) || !ParseU8(f[1], out.loadout.archetype))
+            if ((f.size() != 2 && f.size() != 3)
+                || !ParseU8(f[0], out.loadout.activeBrand) || !ParseU8(f[1], out.loadout.archetype))
+                return false;
+            if (f.size() == 3 && !ParseU8(f[2], out.loadout.role))
                 return false;
         }
 
