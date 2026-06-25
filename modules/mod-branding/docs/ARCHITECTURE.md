@@ -802,8 +802,9 @@ branded, and which expression of the active brand fires). This is the expression
 
 ```cpp
 struct BrandLoadout {                 // per character, persisted
-    BrandId  activeBrand;
-    uint8_t  selectedProcArchetype;   // index into the brand+role's available archetypes
+    BrandId          activeBrand;
+    uint8_t          selectedProcArchetype;   // index into the brand+role's available archetypes
+    RoleContribution selectedRole;            // §14.11 player-chosen role; None = auto (policy default)
     // (future) per-slot item-brand proc selections
 };
 
@@ -818,6 +819,19 @@ character's proficiency level (higher archetypes gate behind proficiency). The *
 validates and resolves** the chosen archetype to an `EffectProfile`; the **adapter** applies the
 chosen proc to the actual weapon/spell. Loadout changes are subject to friction/cost per design
 (no free instant re-spec abuse) — friction cost computed in core, charged by adapter.
+
+**Role is a player choice, not a class guess (§14.11 talent-spec seam).** The effect's
+`RoleContribution` (which drives the §7.9 PersonalSpike/RaidWindow/MechanicTransform asymmetry) is
+selected **per loadout** by the player (`.branding setrole`), gated by **class capability** — the pure
+`RoleCapabilityMask(classId)` (`core/effects/RolePolicy.h`) decides which roles a class may express
+(e.g. a Rogue may only be Damage; this is the anti-degenerate guardrail that stops a dps class from
+proccing healer shields or tank mitigation). An **unset** role (`None`) is resolved by an injected
+`IDefaultRolePolicy` (DI seam, config-swappable via `Branding.Effect.DefaultRolePolicy`):
+`ClassDefaultRolePolicy` (prod — always Damage, never over-powered) or `TalentInferredRolePolicy`
+(test realms — dominant talent tab, with Druid bear-form and DK Frost-Presence resolving the two
+tree-ambiguous cases). The adapter (`BrandRole`) samples the live signals (talents/form/presence) only
+on the policy path; an explicit choice needs no talent walk. Both the §7.9 effect and §14.12 mastery
+adapters resolve role through this one seam.
 
 **Item brand upgrade progression (Slice 7, pure).** A branded item progresses through a few major
 **Steps** (I/II/III…), each filled by **5–10 internal upgrade levels**. Internal levels scale a

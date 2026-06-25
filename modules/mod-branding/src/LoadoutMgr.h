@@ -37,6 +37,11 @@ namespace Branding
         // Set the proc archetype for the current active brand. Validates + persists on success.
         bool SetArchetype(Player* player, uint8_t archetype);
 
+        // Set the player-chosen role (§14.11). Gated by class CAPABILITY (RolePolicy.h), not by
+        // IsLoadoutValid: an explicit role must be one the class can express; None resets to auto
+        // (default policy). Persists on success; returns false (no change) when the class can't take it.
+        bool SetRole(Player* player, RoleContribution role);
+
     private:
         LoadoutMgr() = default;
 

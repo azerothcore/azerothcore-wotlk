@@ -1,3 +1,4 @@
+#include "BrandRole.h"
 #include "EffectMgr.h"
 #include "mod_branding_loader.h"
 #include "Player.h"
@@ -15,6 +16,7 @@ public:
     void OnAfterConfigLoad(bool /*reload*/) override
     {
         sEffectMgr->LoadConfig();
+        LoadRolePolicyConfig();   // §14.11: select the default-role policy (class | talent)
     }
 };
 

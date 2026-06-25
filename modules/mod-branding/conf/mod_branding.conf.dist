@@ -772,6 +772,19 @@ Branding.Effect.MaxOverhealShieldFraction = 0.30
 Branding.Effect.OverhealShieldSpell = 48066
 
 #
+#    Branding.Effect.DefaultRolePolicy
+#        Description: How a loadout's role is chosen when the player has not set one explicitly
+#                     (§14.11). Players always pick their role with `.branding setrole` (gated by class
+#                     capability); this only governs the UNSET default:
+#                       class  - always Damage (safe, never over-powered); players opt in to tank/heal.
+#                       talent - infer from the dominant talent tree (Druid form / DK Frost Presence
+#                                disambiguate the tank cases). Handy on test realms.
+#        Default:     class
+#
+
+Branding.Effect.DefaultRolePolicy = class
+
+#
 #    Branding.Catalyst.Enable
 #        Description: Catalyst stacking diminishing returns (§7.9/§9). A branded specialist's raid
 #                     multiplier diminishes as same-role specialists stack (1st full, 2nd reduced,

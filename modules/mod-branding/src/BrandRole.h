@@ -7,11 +7,16 @@ class Player;
 
 namespace Branding
 {
-    // Coarse role lens for the §7.9 personal/raid asymmetry: tanks get the dramatic personal spike,
-    // dps the restrained raid window, hybrid healers the structural transform. Shared by the
-    // mastery-combat (§14.12) and §7.9 effect adapters so the heuristic stays in one place. The proper
-    // per-spec role detection is the §14.11 talent-spec seam (deferred); defaults to Damage when unsure.
+    // Resolve a player's effective branding role (§7.9 / §14.11 talent-spec seam): an explicit
+    // per-loadout choice gated by class capability, otherwise the config-selected default policy
+    // (RolePolicy.h). Shared by the §7.9 effect and §14.12 mastery-combat adapters. Live signals
+    // (talents/form/presence) are sampled only on the default-policy path AND only when the active
+    // policy uses them -- an explicit choice (or the class-default policy) needs no talent walk.
     RoleContribution DetectRole(Player* player);
+
+    // Select the default-role policy from config: Branding.Effect.DefaultRolePolicy = class | talent.
+    // Call on startup and on `.reload config`.
+    void LoadRolePolicyConfig();
 }
 
 #endif // MOD_BRANDING_SRC_BRANDROLE_H

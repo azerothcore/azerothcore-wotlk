@@ -1,4 +1,5 @@
 #include "AllegianceMgr.h"
+#include "BrandRole.h"
 #include "CatalystMgr.h"
 #include "DiscoveryMgr.h"
 #include "EffectMgr.h"
@@ -65,6 +66,20 @@ namespace
             case BrandId::Chrono:   return "Chrono";
             case BrandId::Spirit:   return "Spirit";
             default:                return "Unknown";
+        }
+    }
+
+    char const* RoleName(RoleContribution role)
+    {
+        switch (role)
+        {
+            case RoleContribution::None:    return "Auto";
+            case RoleContribution::Tank:    return "Tank";
+            case RoleContribution::Healer:  return "Healer";
+            case RoleContribution::Damage:  return "Damage";
+            case RoleContribution::Control: return "Control";
+            case RoleContribution::Support: return "Support";
+            default:                        return "Unknown";
         }
     }
 
@@ -146,6 +161,7 @@ public:
             { "heroic",      HandleBrandingHeroicCommand,      rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
             { "setbrand",    HandleBrandingSetBrandCommand,    rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
             { "setproc",     HandleBrandingSetProcCommand,     rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "setrole",     HandleBrandingSetRoleCommand,     rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
             { "itembrand",   HandleBrandingItemBrandCommand,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
             { "upgradeitem", HandleBrandingUpgradeItemCommand, rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
             { "etch",        HandleBrandingEtchCommand,        rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
@@ -393,6 +409,13 @@ public:
 
         handler->PSendSysMessage("Catalyst: same-role rank {}, raid multiplier x{:.2f}.",
             uint32(sCatalystMgr->SameRoleBrandedRank(player)), sCatalystMgr->RaidMultiplierFor(player));
+
+        // §14.11: the chosen role for this loadout (explicit or auto) and the role it resolves to via
+        // the active default policy + class capability clamp.
+        handler->PSendSysMessage("Role: {} ({}) -> resolved {}.",
+            RoleName(loadout.selectedRole),
+            loadout.selectedRole == RoleContribution::None ? "auto" : "explicit",
+            RoleName(DetectRole(player)));
 
         // §7.9 (issue #03): the role-resolved branding effect -- its kind + the outgoing/incoming
         // multipliers the UnitScript applies right now (windowed; 1.0 outside the active window).
@@ -788,6 +811,46 @@ public:
         }
 
         handler->PSendSysMessage("Proc archetype set to {}.", archetype);
+        return true;
+    }
+
+    // `.branding setrole <auto|tank|healer|dps>` -- choose the role this loadout expresses (§14.11).
+    // Gated by class capability: a class that can't fill a role is refused; `auto` clears the choice so
+    // the configured default policy decides.
+    static bool HandleBrandingSetRoleCommand(ChatHandler* handler, std::string roleArg)
+    {
+        Player* player = handler->GetPlayer();
+        if (!player)
+        {
+            handler->SendErrorMessage("This command must be used in-world.");
+            return false;
+        }
+
+        std::string token = roleArg;
+        std::transform(token.begin(), token.end(), token.begin(),
+            [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+
+        RoleContribution role;
+        if (token == "auto" || token == "none")    role = RoleContribution::None;
+        else if (token == "tank")                  role = RoleContribution::Tank;
+        else if (token == "healer" || token == "heal") role = RoleContribution::Healer;
+        else if (token == "dps" || token == "damage")  role = RoleContribution::Damage;
+        else
+        {
+            handler->SendErrorMessage("Unknown role '{}'. Use auto, tank, healer, or dps.", roleArg);
+            return false;
+        }
+
+        if (!sLoadoutMgr->SetRole(player, role))
+        {
+            handler->SendErrorMessage("Your class cannot express the {} role.", RoleName(role));
+            return false;
+        }
+
+        if (role == RoleContribution::None)
+            handler->PSendSysMessage("Role set to Auto (resolved by the server's default policy).");
+        else
+            handler->PSendSysMessage("Role set to {}.", RoleName(role));
         return true;
     }
 
