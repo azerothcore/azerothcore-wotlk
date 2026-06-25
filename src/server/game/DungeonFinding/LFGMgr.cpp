@@ -1213,6 +1213,7 @@ namespace lfg
                     {
                         if (sitr->second.isGroupLeader)
                             _rbDeletedGroups.insert(sitr->second.groupGuid);
+
                         ++deletedCounter;
                         _rbBufferDeleted << sitr->second.guid;
                     }
