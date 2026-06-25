@@ -178,6 +178,7 @@ INSERT INTO `pool_template` VALUES
 (141,12,'Blackfathom Deeps - Giant Clam - 12/27'),
 (142,20,'Eastern Kingdoms - Giant Clam - 20/80'),
 (143,1,'Brackwell Pumpkin Patch - Battered Chest (106319)'),
+(144,1,'Baron Longshore'),
 (145,1,''),
 (146,1,''),
 (147,1,''),
@@ -9274,4 +9275,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-03-15 20:39:04
+-- Dump completed on 2026-06-01 22:40:24

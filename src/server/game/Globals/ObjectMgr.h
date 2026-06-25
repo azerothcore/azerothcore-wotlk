@@ -18,6 +18,7 @@
 #ifndef _OBJECTMGR_H
 #define _OBJECTMGR_H
 
+#include "AhoCorasick.h"
 #include "Bag.h"
 #include "ConditionMgr.h"
 #include "Creature.h"
@@ -38,6 +39,7 @@
 #include <functional>
 #include <limits>
 #include <map>
+#include <memory>
 #include <string>
 
 class Item;
@@ -507,6 +509,7 @@ typedef std::map<ObjectGuid, ObjectGuid> LinkedRespawnContainer;
 typedef std::unordered_map<ObjectGuid::LowType, CreatureData> CreatureDataContainer;
 typedef std::unordered_map<ObjectGuid::LowType, GameObjectData> GameObjectDataContainer;
 typedef std::unordered_map<uint32, SpawnGroupTemplateData> SpawnGroupDataContainer;
+typedef std::multimap<uint32, SpawnData const*> SpawnGroupLinkContainer;
 typedef std::map<TempSummonGroupKey, std::vector<TempSummonData> > TempSummonDataContainer;
 typedef std::map<TempSummonGroupKey, std::vector<GameObjectSummonData> > GameObjectSummonDataContainer;
 typedef std::unordered_map<uint32, CreatureLocale> CreatureLocaleContainer;
@@ -1040,6 +1043,8 @@ public:
     void LoadCreatureQuestItems();
     void LoadTempSummons();
     void LoadGameObjectSummons();
+    void LoadSpawnGroupTemplates();
+    void LoadSpawnGroups();
     void LoadCreatures();
     void LoadCreatureSparring();
     void LoadLinkedRespawn();
@@ -1277,6 +1282,13 @@ public:
         auto itr = _spawnGroupDataStore.find(groupId);
         return itr != _spawnGroupDataStore.end() ? &itr->second : nullptr;
     }
+    [[nodiscard]] SpawnGroupTemplateData const* GetDefaultSpawnGroup() const { return &_spawnGroupDataStore.at(0); }
+    [[nodiscard]] SpawnGroupTemplateData const* GetLegacySpawnGroup() const { return &_spawnGroupDataStore.at(1); }
+    std::pair<SpawnGroupLinkContainer::const_iterator, SpawnGroupLinkContainer::const_iterator> GetSpawnDataForGroup(uint32 groupId) const
+    {
+        return _spawnGroupMapStore.equal_range(groupId);
+    }
+    void OnDeleteSpawnData(SpawnData const* data);
 
     [[nodiscard]] CreatureLocale const* GetCreatureLocale(uint32 entry) const
     {
@@ -1407,6 +1419,10 @@ public:
     void LoadProfanityNamesFromDBC();
     [[nodiscard]] bool IsProfanityName(std::string_view name) const;
     void AddProfanityPlayerName(std::string const& name);
+
+    // chat filter (substring chat content filter)
+    void LoadChatFilter();
+    [[nodiscard]] bool IsChatFiltered(std::string_view text) const;
 
     // name with valid structure and symbols
     static uint8 CheckPlayerName(std::string_view name, bool create = false);
@@ -1577,6 +1593,9 @@ private:
     typedef std::set<std::wstring> ProfanityNamesContainer;
     ProfanityNamesContainer _profanityNamesStore;
 
+    //chat filter (Aho-Corasick automaton; matches any banned word as substring of input)
+    std::unique_ptr<Acore::AhoCorasick<wchar_t>> _chatFilterAutomaton;
+
     GameTeleContainer _gameTeleStore;
 
     ScriptNameContainer _scriptNamesStore;
@@ -1653,6 +1672,7 @@ private:
     CreatureLocaleContainer _creatureLocaleStore;
     GameObjectDataContainer _gameObjectDataStore;
     SpawnGroupDataContainer _spawnGroupDataStore;
+    SpawnGroupLinkContainer _spawnGroupMapStore;
     GameObjectLocaleContainer _gameObjectLocaleStore;
     GameObjectTemplateContainer _gameObjectTemplateStore;
     GameObjectTemplateAddonContainer _gameObjectTemplateAddonStore;
