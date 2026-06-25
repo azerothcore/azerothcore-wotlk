@@ -6,13 +6,18 @@
 -- NOTE: AzerothCore has no `creature_template`.`InhabitType` column (TC-only); flight is stored in
 -- `creature_template_movement`. 31050/31030/31029/31087 are already `Flight`=1 in the base data, so no
 -- movement rows are needed here.
-UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_overthane', `unit_flags`=33088 WHERE `entry`=31016;
-UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_safirdrang', `unit_flags`=256 WHERE `entry`=31050;
+UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_overthane',
+    `unit_flags`=33088 WHERE `entry`=31016;
+UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_safirdrang',
+    `unit_flags`=256 WHERE `entry`=31050;
 UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_elite' WHERE `entry`=31030;
-UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_vardmadra', `unit_flags`=33536 WHERE `entry`=31029;
+UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_vardmadra',
+    `unit_flags`=33536 WHERE `entry`=31029;
 UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_nightswood' WHERE `entry`=31087;
-UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_lich_king', `unit_flags`=768 WHERE `entry`=31083;
-UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_chill_target', `unit_flags`=33555200 WHERE `entry`=31077;
+UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_lich_king',
+    `unit_flags`=768 WHERE `entry`=31083;
+UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_chill_target',
+    `unit_flags`=33555200 WHERE `entry`=31077;
 
 -- The Balargarde Elites use a cosmetic proto-drake mount (creature_addon mount 26882) and fly their own
 -- patrols, so the custom proto-drake vehicle NPC (310300) is removed (clean up any earlier import of it).
@@ -21,8 +26,10 @@ DELETE FROM `creature_template_model` WHERE `CreatureID`=310300;
 DELETE FROM `creature_template_movement` WHERE `CreatureId`=310300;
 DELETE FROM `creature_template_addon` WHERE `entry`=310300;
 
--- Remove the legacy SmartAI rows for the encounter creatures.
+-- Remove the legacy SmartAI rows for the encounter creatures (source_type 0) and Overthane's
+-- timed action list (source_type 9, entryorguid 31016).
 DELETE FROM `smart_scripts` WHERE `source_type`=0 AND `entryorguid` IN (31016, 31029, 31030, 31050, 31077, 31083, 31087);
+DELETE FROM `smart_scripts` WHERE `source_type`=9 AND `entryorguid`=31016;
 
 -- Cosmetic spawn auras / hover anim states. The elite (31030) gets the cosmetic proto-drake mount (26882).
 DELETE FROM `creature_template_addon` WHERE `entry` IN (31016, 31029, 31030, 31050, 31083);
@@ -39,7 +46,7 @@ INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, 
 (20108, 0, 10, 31029, 1800000, 0, 7116.824, 4308.362, 883.3842, 2.46227);
 
 -- Safirdrang's Chill (4020) only affects the chill target stalkers.
-DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=13 AND `SourceEntry`=4020;
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=13 AND `SourceGroup`=1 AND `SourceEntry`=4020 AND `SourceId`=0 AND `ElseGroup`=0;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
 (13, 1, 4020, 0, 0, 31, 0, 3, 31077, 0, 0, 0, 0, '', 'Safirdrangs Chill targets Safirdrangs Chill Target');
 
