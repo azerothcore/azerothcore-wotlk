@@ -1045,7 +1045,7 @@ public:
                 if (Creature* crusader = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_CAPTAIN_ARNATH + i)))
                     if (crusader->IsAlive())
                     {
-                        if (crusader->GetEntry() == crusader->GetCreatureData()->id1)
+                        if (crusader->GetEntry() == crusader->GetCreatureData()->id)
                         {
                             crusader->m_Events.AddEventAtOffset(new CaptainSurviveTalk(*crusader), delay);
                             delay += 6s;
@@ -1235,7 +1235,7 @@ public:
     void Reset() override
     {
         me->SetCorpseDelay(DAY); // leave corpse for a long time so svalna can resurrect
-        IsUndead = (me->GetCreatureData() && me->GetCreatureData()->id1 != me->GetEntry());
+        IsUndead = (me->GetCreatureData() && me->GetCreatureData()->id != me->GetEntry());
     }
 
     void JustDied(Unit* /*killer*/) override
