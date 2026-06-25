@@ -218,10 +218,11 @@ TEST(AddonProtocol, MasteryRoundTrip)
     in.pointsAvailable = 7;
     in.respecCost = 250;
     // Fire-Def (windowed, 4 axes incl. reach), one active cell; Shadow-Support (situational +
-    // sustained, magnitude+reach only); Frost-Off (windowed, single-target -> 3 axes).
-    in.cells.push_back({ 0, 0, 1, false, false, 18, 1, 0x0F, { 3, 1, 2, 1 }, true });
-    in.cells.push_back({ 3, 2, 1, true, true, 5, 0, 0x0C, { 0, 0, 2, 1 }, false });
-    in.cells.push_back({ 1, 1, 1, false, false, 9, 0, 0x07, { 2, 1, 1, 0 }, true });
+    // sustained, magnitude+reach only); Frost-Off (windowed, single-target -> 3 axes). The trailing
+    // field is the §14.4.2 reachMode (1=RadiusYards, 2=TargetCount, 0=None) -- it must round-trip.
+    in.cells.push_back({ 0, 0, 1, false, false, 18, 1, 0x0F, { 3, 1, 2, 1 }, true, 1 });
+    in.cells.push_back({ 3, 2, 1, true, true, 5, 0, 0x0C, { 0, 0, 2, 1 }, false, 2 });
+    in.cells.push_back({ 1, 1, 1, false, false, 9, 0, 0x07, { 2, 1, 1, 0 }, true, 0 });
 
     bool truncated = true;
     std::string const frame = EncodeMastery(in, truncated);

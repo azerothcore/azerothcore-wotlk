@@ -5,6 +5,7 @@
 #include "branding/common/Brand.h"
 #include "branding/effects/EffectConfig.h"
 #include "branding/mastery/MasteryActive.h"
+#include "branding/mastery/MasteryContent.h"
 #include "branding/mastery/MasteryTrees.h"
 #include <array>
 #include <cstddef>
@@ -35,6 +36,8 @@ namespace Branding
         uint8_t        archetype = 0;            // §7.9 selected proc archetype (index into the cell)
         uint8_t        masteryLevel = 0;         // earned level for this school (the resolve envelope)
         LatticeCellDef def{};                    // §14.4 kind/situational/sustained/axes (the archetype)
+        uint32_t       spellId = 0;              // §14.4.2 reused 3.3.5a spell shell the adapter applies
+        ReachMode      reachMode = ReachMode::None;  // §14.4.2 how `resolved.reach` renders (radius vs count)
         ResolvedCell   resolved{};               // §14.10 ppm/duration/magnitude/reach from the point-buy
         double         magnitude = 1.0;          // BOUND magnitude actually applied (raid or personal)
         bool           raidWide = false;         // true => RaidMultiplier path, false => PersonalMultiplier

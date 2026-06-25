@@ -124,7 +124,8 @@ end
 -- Decode a §14 Mastery lattice frame and MERGE it into ns.state.mastery. `t` is the tab-split frame;
 -- t[1]=="MAST". Mirrors the server's EncodeMastery (Protocol.cpp): t[2]=pointsAvailable,
 -- t[3]=respecCost, t[4]=cell records (';'-separated; each ':'-separated as
---   school:tree:kind:situational:sustained:level:archetype:axisMask:a0:a1:a2:a3:active),
+--   school:tree:kind:situational:sustained:level:archetype:axisMask:a0:a1:a2:a3:active:reachMode),
+--   where reachMode (§14.4.2) is 0=None, 1=RadiusYards, 2=TargetCount -- how the reach axis renders.
 -- t[5]=truncation marker ("T" if this frame's own cells didn't fit -- a safety net, not the norm).
 --
 -- PAGED BY SCHOOL: the full 7-school x 3-tree lattice (21 cells) does NOT fit one 255-byte
@@ -155,6 +156,7 @@ function ns:DecodeMastery(t)
                 level = num(f[6]), archetype = num(f[7]), axisMask = num(f[8]),
                 alloc = { num(f[9]), num(f[10]), num(f[11]), num(f[12]) },
                 active = (f[13] == "1"),
+                reachMode = num(f[14]),   -- §14.4.2: 0=None, 1=RadiusYards, 2=TargetCount
             }
             incoming[#incoming + 1] = cell
             schoolsSeen[cell.school] = true

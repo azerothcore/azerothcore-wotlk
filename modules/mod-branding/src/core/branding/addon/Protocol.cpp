@@ -157,7 +157,8 @@ namespace Branding::Addon
                 return false;
         return a.school == b.school && a.tree == b.tree && a.kind == b.kind
             && a.situational == b.situational && a.sustained == b.sustained && a.level == b.level
-            && a.archetype == b.archetype && a.axisMask == b.axisMask && a.active == b.active;
+            && a.archetype == b.archetype && a.axisMask == b.axisMask && a.active == b.active
+            && a.reachMode == b.reachMode;
     }
 
     bool operator==(MasterySnapshot const& a, MasterySnapshot const& b)
@@ -400,6 +401,7 @@ namespace Branding::Addon
                 rec += std::to_string(c.alloc[i]);
             }
             rec += FieldSep; rec += (c.active ? '1' : '0');
+            rec += FieldSep; rec += std::to_string(c.reachMode);   // §14.4.2 reach rendering hint
 
             // Reserve room for the "\t<records>\t<marker>" tail incl. a possible truncation flag.
             std::size_t const projected = head.size() + 1 + records.size() + rec.size() + 2;
@@ -591,8 +593,8 @@ namespace Branding::Addon
             for (std::string_view const rec : Split(t[4], RecSep))
             {
                 std::vector<std::string_view> const f = Split(rec, FieldSep);
-                // 8 scalar fields + AxisCount alloc fields + 1 active flag.
-                if (f.size() != static_cast<std::size_t>(9 + AxisCount))
+                // 8 scalar fields + AxisCount alloc fields + active flag + reachMode (§14.4.2).
+                if (f.size() != static_cast<std::size_t>(10 + AxisCount))
                     return false;
                 MasteryCellFrame c;
                 if (!ParseU8(f[0], c.school) || !ParseU8(f[1], c.tree) || !ParseU8(f[2], c.kind)
@@ -602,7 +604,8 @@ namespace Branding::Addon
                 bool allocOk = true;
                 for (uint8_t i = 0; i < AxisCount; ++i)
                     allocOk = allocOk && ParseU8(f[8 + i], c.alloc[i]);
-                if (!allocOk || !ParseBool(f[8 + AxisCount], c.active))
+                if (!allocOk || !ParseBool(f[8 + AxisCount], c.active)
+                    || !ParseU8(f[9 + AxisCount], c.reachMode))
                     return false;
                 out.cells.push_back(c);
             }

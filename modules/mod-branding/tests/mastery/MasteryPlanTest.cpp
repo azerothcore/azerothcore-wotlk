@@ -1,5 +1,6 @@
 #include "branding/mastery/MasteryPlan.h"
 #include "branding/mastery/MasteryActive.h"
+#include "branding/mastery/MasteryContent.h"
 #include "branding/mastery/MasteryTrees.h"
 #include "branding/common/Brand.h"
 #include "fakes/FakeCatalystConfig.h"
@@ -276,6 +277,48 @@ TEST(MasteryPlan, Deterministic)
         EXPECT_EQ(a.effects[i].resolved.windowDurationMs, b.effects[i].resolved.windowDurationMs);
         EXPECT_DOUBLE_EQ(a.effects[i].uptimeFraction, b.effects[i].uptimeFraction);
     }
+}
+
+// §14.4.2 (issue #30): each planned effect carries the concrete spell it expresses through and how its
+// reach renders, so the adapter can apply a real proc + choose the target set.
+TEST(MasteryPlan, CarriesContentSpellIdAndReachMode)
+{
+    Cfgs c;
+    ActiveMasterySet set;
+    set.Add(Cell(BrandId::Fire, MasteryTree::Offensive));        // Fireball, single-target
+    set.Add(Cell(BrandId::Physical, MasteryTree::Offensive));    // Cleave, target count
+
+    MasteryPlan plan = Build(set, FullState(), c);
+    ASSERT_EQ(plan.count, 2);
+    for (uint8_t i = 0; i < plan.count; ++i)
+    {
+        ResolvedMasteryEffect const& e = plan.effects[i];
+        EXPECT_EQ(e.spellId, LatticeSpellId(e.school, e.tree, e.archetype));
+        EXPECT_NE(e.spellId, 0u);   // every authored cell maps to a real proc
+        if (e.school == BrandId::Fire)
+            EXPECT_EQ(e.reachMode, ReachMode::None);
+        else
+            EXPECT_EQ(e.reachMode, ReachMode::TargetCount);   // cleave breadth is a count
+    }
+}
+
+// §14.2 (issue #30): a sustained raid-utility cell's resolved magnitude axis honours its conservative
+// per-cell ceiling -- the plan resolves against the EFFECTIVE (per-cell ∩ global) envelope.
+TEST(MasteryPlan, SustainedRaidCellResolvesUnderPerCellCeiling)
+{
+    Cfgs c;
+    ActiveMasteryEntry flameAura = Cell(BrandId::Fire, MasteryTree::Support, /*archetype*/ 1);
+    SetPoints(flameAura, /*ppm*/ 0, /*dur*/ 0, /*mag*/ 10, /*reach*/ 0);   // all budget into magnitude
+    ActiveMasterySet set;
+    set.Add(flameAura);
+
+    MasteryPlan plan = Build(set, FullState(/*level*/ 50), c);
+    ASSERT_EQ(plan.count, 1);
+
+    double const ceiling = LatticeContent(BrandId::Fire, MasteryTree::Support, 1).envelope.maxMagnitude;
+    EXPECT_GT(ceiling, 0.0);
+    EXPECT_LT(ceiling, c.tree.MaxProcMagnitude());                       // it is conservative
+    EXPECT_LE(plan.effects[0].resolved.magnitude, ceiling + 1e-9);      // ... and it binds in the plan
 }
 
 // The resolved cell reflects the point-buy: a ppm-heavy spend resolves to a higher ppm than a

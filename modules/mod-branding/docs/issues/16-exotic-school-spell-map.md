@@ -132,15 +132,15 @@ DPS/Support/Control→RaidWindow, Healer→MechanicTransform.
   against the server's `spell_dbc` before wiring.
 
 ## Remaining for #30 (this doc is the exotic-school spell-ID slice)
-#30 wants the full **§14.4 lattice content** as data/config. Still open:
-1. **Classic-school cells** (the §14.4 table, lines 1034–1042): fire AoE / fire damage / flame aura,
-   poison cloud / HoT / raid-heal, life-steal / shadow volley, damage-reduction / Frost Nova, evasion /
-   cleave, arcane barrier / arcane explosion / int-mana aura, holy shield / holy nova / circle of
-   healing — plus resistances/exposures (`SM`/`SE`). None mapped to spell IDs yet.
-2. **Tree projection.** This doc keys on the §7.9 *role* (Tank/DPS/Support/Healer); the lattice keys on
-   the *tree* (Def/Off/Support) with §14.4.1 multi-archetype Support secondaries. Re-project the role
-   rows onto Def≈Tank-spike, Off≈DPS-proc, Support≈Support-window + the Healer transform.
-3. **Per-cell envelopes** — Min/Max ppm, duration, magnitude, reach overrides per cell.
-4. **Per-cell magnitude ceilings** — sustained raid buffs (flame aura, circle of healing, int-mana
-   aura) carry a *conservative* ceiling (§14.2: `MaxProcMagnitude` is global today).
-5. **Reach rendering** — AoE radius (yards) vs cleave target count, per cell, for the tooltip.
+The **classic-school** §14.4 lattice content of #30 is now implemented in
+`src/core/branding/mastery/MasteryContent.{h,cpp}` (§14.4.2) — see `30-classic-school-spell-map.md`,
+whose tree-axis cells are authored with concrete spell IDs, per-cell envelopes (incl. the conservative
+sustained-raid magnitude ceilings), and `ReachMode` (radius vs target count). Still open for the
+**exotic** schools specifically:
+1. ✅ **Classic-school cells** — authored (see the classic doc + `MasteryContentTest.cpp`).
+2. **Exotic tree projection.** This doc keys on the §7.9 *role* (Tank/DPS/Support/Healer); the lattice
+   keys on the *tree* (Def/Off/Support). The exotic schools (Wind/Lightning/…) have no authored
+   tree-axis lattice cells yet (`LatticeArchetypes`/`LatticeContents` return the neutral default for
+   them), so projecting these role rows onto Def/Off/Support cells is the remaining exotic-school work.
+3–5. ✅ **Per-cell envelopes / magnitude ceilings / reach rendering** — the mechanism is implemented
+   for authored cells; it applies automatically once the exotic tree cells (item 2) are authored.

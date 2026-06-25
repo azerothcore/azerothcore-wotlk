@@ -35,6 +35,16 @@ local SCHOOLS = { 0, 2, 3, 1, 4, 5, 6 }      -- Fire, Nature, Shadow, Frost, Arc
 local TREES = { 0, 1, 2 }                    -- Def, Off, Support
 ns.TreeName = { [0] = "Def", [1] = "Off", [2] = "Support" }
 ns.AxisName = { [0] = "PPM", [1] = "Dur", [2] = "Mag", [3] = "Reach" }
+
+-- §14.4.2: how the Reach axis renders for a cell -- a field-shaped radius (yards) vs a spread/cleave
+-- target count. Drives the tooltip label so "Reach" reads as "hits N targets" or "N yd radius".
+ns.ReachModeName = { [1] = "Reach (yd radius)", [2] = "Reach (targets hit)" }
+local function reachAxisLabel(c, axis)
+  if axis == 3 and c.reachMode and ns.ReachModeName[c.reachMode] then
+    return ns.ReachModeName[c.reachMode]
+  end
+  return ns.AxisName[axis]
+end
 ns.KindName = { [0] = "Spike", [1] = "Window", [2] = "Transform" }
 
 -- Bit per axis in a cell's applicable-axis mask (mirrors core AxisBit / ProcAxis order).
@@ -69,7 +79,7 @@ local function cellTooltip(c)
   GameTooltip:AddLine(" ")
   for axis = 0, 3 do
     if axisApplies(c.axisMask, axis) then
-      GameTooltip:AddLine(string.format("  %-6s %d pts", ns.AxisName[axis], c.alloc[axis + 1] or 0), 0.9, 0.9, 0.9)
+      GameTooltip:AddLine(string.format("  %-18s %d pts", reachAxisLabel(c, axis), c.alloc[axis + 1] or 0), 0.9, 0.9, 0.9)
     end
   end
   GameTooltip:AddLine(" ")

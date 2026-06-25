@@ -47,8 +47,15 @@ namespace Branding
         return swings * perSwingChance;
     }
 
+    ResolvedEnvelope GlobalEnvelope(IMasteryTreeConfig const& cfg)
+    {
+        // The whole-lattice bounds, straight from config: the magnitude ceiling is MaxProcMagnitude.
+        return ResolvedEnvelope{ cfg.MinPpm(), cfg.MaxPpm(), cfg.MinWindowMs(), cfg.MaxWindowMs(),
+            cfg.MaxProcMagnitude(), cfg.MinReach(), cfg.MaxReach() };
+    }
+
     ResolvedCell ResolveTreeCell(TreeAllocation const& alloc, uint32_t applicableAxes,
-        uint8_t masteryLevel, IMasteryTreeConfig const& cfg)
+        uint8_t masteryLevel, ResolvedEnvelope const& env, double upkeepHalfLevel)
     {
         constexpr auto AXES = static_cast<std::size_t>(ProcAxis::COUNT);
 
@@ -76,7 +83,7 @@ namespace Branding
         // §14.10 budget: same saturating-below-1 shape as upkeep. The applicable fills sum to exactly
         // b, so maxing one axis leaves nothing for the others -- the conservation property.
         double const level = static_cast<double>(masteryLevel);
-        double const half = cfg.UpkeepHalfLevel() > 0.0 ? cfg.UpkeepHalfLevel() : 1.0;
+        double const half = upkeepHalfLevel > 0.0 ? upkeepHalfLevel : 1.0;
         double const budget = level / (level + half);
 
         // Normalized fill fraction for an axis: 0 if not applicable (resolves to its Min baseline).
@@ -88,17 +95,25 @@ namespace Branding
         };
 
         ResolvedCell out;
-        out.ppm = cfg.MinPpm() + (cfg.MaxPpm() - cfg.MinPpm()) * fill(ProcAxis::Ppm);
+        out.ppm = env.minPpm + (env.maxPpm - env.minPpm) * fill(ProcAxis::Ppm);
 
-        double const minW = static_cast<double>(cfg.MinWindowMs());
-        double const maxW = static_cast<double>(cfg.MaxWindowMs());
+        double const minW = static_cast<double>(env.minWindowMs);
+        double const maxW = static_cast<double>(env.maxWindowMs);
         out.windowDurationMs = static_cast<uint32_t>(minW + (maxW - minW) * fill(ProcAxis::Duration));
 
-        out.magnitude = 1.0 + (cfg.MaxProcMagnitude() - 1.0) * fill(ProcAxis::Magnitude);
+        out.magnitude = 1.0 + (env.maxMagnitude - 1.0) * fill(ProcAxis::Magnitude);
 
-        out.reach = cfg.MinReach() + (cfg.MaxReach() - cfg.MinReach()) * fill(ProcAxis::Reach);
+        out.reach = env.minReach + (env.maxReach - env.minReach) * fill(ProcAxis::Reach);
 
         return out;
+    }
+
+    ResolvedCell ResolveTreeCell(TreeAllocation const& alloc, uint32_t applicableAxes,
+        uint8_t masteryLevel, IMasteryTreeConfig const& cfg)
+    {
+        // The whole-lattice path: the per-cell content layer (§14.4.2) narrows this envelope per cell.
+        return ResolveTreeCell(alloc, applicableAxes, masteryLevel, GlobalEnvelope(cfg),
+            cfg.UpkeepHalfLevel());
     }
 
     namespace

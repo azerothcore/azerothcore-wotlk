@@ -111,6 +111,23 @@ namespace Branding
         double   reach = 0.0;       // breadth: AoE radius (yd) or cleave target-count; Min for single-target
     };
 
+    // §14.10: the concrete numeric bounds the resolver fills between. Built from the whole-lattice
+    // IMasteryTreeConfig (GlobalEnvelope) and optionally NARROWED per cell by the §14.4.2 content layer
+    // (EffectiveEnvelope, issue #30). The magnitude floor is always 1.0; `maxMagnitude` is its ceiling.
+    struct ResolvedEnvelope
+    {
+        double   minPpm = 0.0;
+        double   maxPpm = 0.0;
+        uint32_t minWindowMs = 0;
+        uint32_t maxWindowMs = 0;
+        double   maxMagnitude = 1.0;   // magnitude axis ceiling (floor is 1.0); <= MaxProcMagnitude
+        double   minReach = 0.0;
+        double   maxReach = 0.0;
+    };
+
+    // The whole-lattice envelope (no per-cell narrowing): each axis bound taken straight from config.
+    ResolvedEnvelope GlobalEnvelope(IMasteryTreeConfig const& cfg);
+
     // §14.10: resolve a player's tuning allocation at a mastery level into concrete proc params,
     // dividing the budget b = level/(level+UpkeepHalfLevel) (saturating below 1) ONLY among the axes
     // in `applicableAxes` (an OR of AxisBit(...)). Favouring one axis costs the others -- burst vs
@@ -119,6 +136,12 @@ namespace Branding
     // negative) shares fall back to an even split over the applicable axes.
     ResolvedCell ResolveTreeCell(TreeAllocation const& alloc, uint32_t applicableAxes,
         uint8_t masteryLevel, IMasteryTreeConfig const& cfg);
+
+    // §14.10 / §14.4.2: the same resolve against an EXPLICIT envelope + budget half-level. The
+    // config overload above is exactly this with GlobalEnvelope(cfg) and cfg.UpkeepHalfLevel(); the
+    // per-cell content path (ResolveContentCell) calls it with a narrowed envelope.
+    ResolvedCell ResolveTreeCell(TreeAllocation const& alloc, uint32_t applicableAxes,
+        uint8_t masteryLevel, ResolvedEnvelope const& env, double upkeepHalfLevel);
 
     // §14.4: structural definition of ONE proc archetype of a (school, tree) lattice cell. This is
     // the DESIGN ruleset (the §14.4 table): the §7.9 expression family, whether the archetype is

@@ -85,10 +85,18 @@ namespace Branding
             eff.masteryLevel = schoolLevel;
             eff.def = LatticeArchetype(entry.school, entry.tree, entry.archetype);
 
-            // §14.10: point-buy -> normalized shares -> concrete proc params at the earned level.
+            // §14.4.2: the concrete spell shell + per-cell envelope (incl. the conservative magnitude
+            // ceiling + reach mode) that ride on the cell's shape.
+            LatticeCellContent const content = LatticeContent(entry.school, entry.tree, entry.archetype);
+            eff.spellId = content.spellId;
+            eff.reachMode = content.envelope.reachMode;
+
+            // §14.10: point-buy -> normalized shares -> concrete proc params at the earned level,
+            // resolved against the cell's EFFECTIVE envelope (the per-cell caps narrow the global ones).
             TreeAllocation const alloc = PointsToAllocation(entry.pointsPerAxis, eff.def.applicableAxes,
                 loadoutCfg);
-            eff.resolved = ResolveTreeCell(alloc, eff.def.applicableAxes, schoolLevel, treeCfg);
+            eff.resolved = ResolveContentCell(alloc, eff.def.applicableAxes, content.envelope, schoolLevel,
+                treeCfg);
 
             // §14.9 catalyst DR bucket (school, tree) rank across the raid + the player's own set.
             CatalystKey const key{ entry.school, entry.tree };

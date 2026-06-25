@@ -1357,9 +1357,10 @@ without one:
   ones stay school-gated, so a permanent Support buff is desirable, never mandatory.
 
 > **Magnitude ceiling for sustained raid buffs:** because a Support aura is *permanent*, even a
-> bounded raid-wide magnitude is strong — sustained raid cells should carry a conservative magnitude
-> ceiling (per-cell magnitude ceilings are a noted config refinement; today `MaxProcMagnitude` is
-> global).
+> bounded raid-wide magnitude is strong — sustained raid cells carry a conservative magnitude
+> ceiling. `MaxProcMagnitude` is the whole-lattice default; the §14.4.2 per-cell content layer
+> (issue #30) narrows it per cell, so the non-situational sustained raid-utility cells (flame aura,
+> raid-heal, intellect/mana aura, circle of healing) resolve below it. See §14.4.2.
 
 ### 14.3 Two new balance rails (added by this section)
 
@@ -1455,6 +1456,51 @@ singletons, no statics. Resolving archetype N of Fire-Support is independent of,
 resolving archetype M of Nature-Defensive. The per-character *selection* of which archetype is active
 for which running cell is adapter/persistence state (deferred, like the §14.11 per-spec loadout); the
 pure core only enumerates, resolves, and validates by key.
+
+#### 14.4.2 Concrete lattice content — spell IDs, per-cell envelopes, reach rendering (issue #30)
+
+§14.4/§14.4.1 fix the lattice **shape** (`LatticeCellDef`: kind / situational / sustained / axis-mask).
+This section adds the **content** that rides on top: the concrete 3.3.5a spell each cell reuses as its
+visual/mechanical shell, the per-cell tuning envelope, and how the §14.10 reach axis is rendered. It is
+authored in the pure core (`core/branding/mastery/MasteryContent.{h,cpp}`), keyed identically by
+`(school, tree, archetypeIndex)`, so it composes with multi-mastery and stays AzerothCore-free; the
+adapter applies the named spell and chooses the per-proc target set. Spell IDs come from the verified
+maps in `docs/issues/30-classic-school-spell-map.md` (classic) and `16-exotic-school-spell-map.md`.
+
+```cpp
+enum class ReachMode : uint8_t { None = 0, RadiusYards, TargetCount };  // how the reach axis renders
+struct CellEnvelope {            // per-cell caps; 0 / None == inherit the global IMasteryTreeConfig bound
+    double   maxPpm; uint32_t maxWindowMs;
+    double   maxMagnitude;       // §14.2 per-cell magnitude ceiling (sustained raid cells: conservative)
+    ReachMode reachMode; double minReach, maxReach;   // reach base → ceiling, in yards OR target count
+};
+struct LatticeCellContent { uint32_t spellId; CellEnvelope envelope; };
+LatticeCellContent LatticeContent(BrandId, MasteryTree, uint8_t archetypeIndex);   // parallel to LatticeArchetype
+uint32_t           LatticeSpellId(BrandId, MasteryTree, uint8_t archetypeIndex);
+ResolvedEnvelope   EffectiveEnvelope(CellEnvelope const&, IMasteryTreeConfig const&);  // per-cell ∩ global
+```
+
+- **Per-cell magnitude ceiling.** `MaxProcMagnitude` is the whole-lattice cap; each cell may narrow it.
+  The non-situational sustained raid-utility cells (Fire flame aura, Nature raid-heal, Arcane
+  intellect/mana aura, Holy circle of healing) carry a **conservative** ceiling (below the global) so a
+  *permanent* raid buff stays desirable, never mandatory (§14.2). School-matched `SM`/`SE` sustained
+  cells take a moderate ceiling; windowed Def/Off cells inherit the global cap (they have no passive
+  uptime). `EffectiveEnvelope` intersects the per-cell caps with the global ones (per-cell never widens).
+- **Reach rendering (`ReachMode`).** The §14.10 reach axis is one abstract envelope in core, but it
+  renders two ways: **`RadiusYards`** for genuinely field-shaped effects (Fire AoE, poison cloud, holy
+  nova, Support party auras) and **`TargetCount`** for spread/chain/cleave effects whose breadth is an
+  integer target count the adapter applies itself (Physical cleave 2→N, the `SE` exposures 1→N enemies),
+  independent of the source spell's hardcoded cap. An integer count is a controlled, readable,
+  anti-degenerate progression; a radius is reserved for where pack-density scaling is intended. The
+  per-cell `[minReach, maxReach]` replaces the global `0..MaxReach` (a 40-yard default is meaningless for
+  a target count), and the mode is sent to the client so the tooltip labels it "hits N targets" vs "N yd".
+- **Shape ↔ content invariant.** `LatticeContent` carries the same archetype `count` as
+  `LatticeArchetypes`, every authored archetype maps to a non-zero `spellId`, and a cell exposes the
+  reach axis iff its content sets a `reachMode` (single-target windowed cells: `None`).
+
+The per-cell envelope feeds the production resolve path: `BuildMasteryPlan` resolves each cell against
+`EffectiveEnvelope(...)` (so the ceiling/reach bounds actually bind) and carries the `spellId` +
+`reachMode` on each `ResolvedMasteryEffect` for the adapter to apply.
 
 ### 14.5 Respec
 
@@ -1701,8 +1747,8 @@ bool IsActiveSetValid(ActiveMasterySet const&, /* dual-key lookups */, IMasteryT
 > `LatticeArchetypeCount(school, tree)` (1..N) and `LatticeArchetype(school, tree, index)` expose the
 > `·` secondary archetypes (Fire/Nature Support += raid-utility aura; Shadow/Frost Support += `SM`
 > resistance), `LatticeCell` is the archetype-0 primary, and `IsLatticeArchetypeUnlocked` gates higher
-> indices behind `IMasteryTreeConfig::MaxArchetypesAtLevel`. Concrete spell ids / per-cell envelopes
-> remain the next (data/config) expansion. 6 + 6 tests.
+> indices behind `IMasteryTreeConfig::MaxArchetypesAtLevel`. Concrete spell ids / per-cell envelopes /
+> reach rendering are layered on top in `core/mastery/MasteryContent.{h,cpp}` (§14.4.2, issue #30). 6 + 6 tests.
 
 > **Implemented (pure core).** `core/mastery/MasteryTrees.{h,cpp}` — `MasteryUpkeep` (dual-key gate
 > + saturating-hyperbola upkeep with the §14.3 #1 sub-1.0 asymptote + SM/SE context gating) and
