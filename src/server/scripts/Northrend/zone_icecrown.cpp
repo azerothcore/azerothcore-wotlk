@@ -2121,21 +2121,21 @@ class spell_crashing_wave : public SpellScript
 enum BansheesRevenge
 {
     // Creatures
-    NPC_OVERTHANE_BALARGARDE        = 31016,
+    NPC_BALARGARDE                  = 31016,
     NPC_POSSESSED_VARDMADRA         = 31029,
     NPC_BALARGARDE_ELITE            = 31030,
     NPC_SAFIRDRANG                  = 31050,
     NPC_SAFIRDRANGS_CHILL_TARGET    = 31077,
-    NPC_BANSHEE_LICH_KING           = 31083,
+    NPC_LICH_KING                   = 31083,
     NPC_LADY_NIGHTSWOOD             = 31087,
 
     GO_WAR_HORN_OF_JOTUNHEIM        = 193028,
 
     // Overthane combat
-    SPELL_BR_HEROIC_LEAP            = 60108,
-    SPELL_BR_WHIRLWIND              = 61076,
-    SPELL_BR_FROSTBOLT              = 15043,
-    SPELL_BR_BLIZZARD               = 61085,
+    SPELL_HEROIC_LEAP               = 60108,
+    SPELL_WHIRLWIND                 = 61076,
+    SPELL_FROSTBOLT                 = 15043,
+    SPELL_BLIZZARD                  = 61085,
 
     // Encounter spells
     SPELL_SAFIRDRANGS_CHILL         = 4020,
@@ -2143,7 +2143,7 @@ enum BansheesRevenge
     SPELL_ETHEREAL_TELEPORT         = 34427,
     SPELL_ICEBOUND_VISAGE           = 53274,
     SPELL_SUMMON_LADY_NIGHTSWOOD    = 58359,
-    SPELL_BR_SUICIDE                = 51744,
+    SPELL_SUICIDE                   = 51744,
     SPELL_LK_SPECIAL_2H             = 42904,
 
     SOUND_LICH_KING_LAUGH           = 15714,
@@ -2171,32 +2171,34 @@ enum BansheesRevenge
     SAY_LK_FROZEN_HEART             = 6,
 
     // Phases: opening combat -> Lich King interlude -> resumed combat -> Lich King outro
-    BR_PHASE_ONE                    = 1,
-    BR_PHASE_INTERLUDE              = 2,
-    BR_PHASE_RESUME                 = 3,
-    BR_PHASE_OUTRO                  = 4,
+    PHASE_ONE                       = 1,
+    PHASE_INTERLUDE                 = 2,
+    PHASE_RESUME                    = 3,
+    PHASE_OUTRO                     = 4,
 
     // Actions
-    ACTION_ELITE_START_PATROL       = 1,
-    ACTION_ELITE_DESPAWN            = 2,
-    ACTION_SAFIRDRANG_CHILL         = 3,
-    ACTION_SAFIRDRANG_DEPART        = 4,
-    ACTION_BALARGARDE_ENGAGE        = 5,
-    ACTION_BALARGARDE_RESUME        = 6,
-    ACTION_LK_FINALE                = 7,
-    ACTION_VARDMADRA_REVEAL         = 8,
-    ACTION_VARDMADRA_KNEEL          = 9,
+    ACTION_ELITE_DESPAWN            = 1,
+    ACTION_SAFIRDRANG_CHILL         = 2,
+    ACTION_SAFIRDRANG_DEPART        = 3,
+    ACTION_BALARGARDE_ENGAGE        = 4,
+    ACTION_BALARGARDE_RESUME        = 5,
+    ACTION_LK_FINALE                = 6,
+    ACTION_VARDMADRA_REVEAL         = 7,
+    ACTION_VARDMADRA_KNEEL          = 8,
+    // Elite patrol: DoAction(ACTION_ELITE_START_PATROL + index), index 0..5 selects that elite's patrol
+    // path; offset high so the per-index values cannot collide with the actions above.
+    ACTION_ELITE_START_PATROL       = 1000,
 
     // MovePoint ids (Lich King interlude walk)
     POINT_LK_CONFRONT               = 1,
     POINT_LK_RETURN                 = 2,
 
     // EventMap (Overthane combat)
-    EVENT_BR_HEROIC_LEAP            = 1,
-    EVENT_BR_WHIRLWIND              = 2,
-    EVENT_BR_FROSTBOLT              = 3,
-    EVENT_BR_BLIZZARD               = 4,
-    EVENT_BR_CHILL_RUN              = 5
+    EVENT_HEROIC_LEAP               = 1,
+    EVENT_WHIRLWIND                 = 2,
+    EVENT_FROSTBOLT                 = 3,
+    EVENT_BLIZZARD                  = 4,
+    EVENT_CHILL_RUN                 = 5
 };
 
 enum BansheesPaths
@@ -2215,7 +2217,7 @@ Position const SafirdrangSpawnPos   = { 7097.292f, 4416.581f, 831.8486f, 4.48549
 Position const LichKingSpawnPos      = { 7088.768f, 4385.59f,  872.4484f, 4.468043f };
 // The Lich King walks up to confront Vardmadra during the interlude, then walks back to his guard spot.
 Position const LichKingConfrontPos   = { 7094.104f, 4331.222f, 871.5023f, 0.0f };
-float const LK_INTERLUDE_WALK_SPEED  = 4.5f; // brisk walk pace (walk animation, faster than the default ~2.5)
+float const LichKingWalkSpeed  = 4.5f; // brisk walk pace (walk animation, faster than the default ~2.5)
 Position const BalargardeElitePos[6] =
 {
     { 7108.229f, 4428.539f, 837.9857f, 4.782202f },
@@ -2245,12 +2247,7 @@ public:
 
     struct npc_bansheesrevenge_overthaneAI : public ScriptedAI
     {
-        npc_bansheesrevenge_overthaneAI(Creature* creature) : ScriptedAI(creature)
-        {
-            _phase = BR_PHASE_ONE;
-            _interludeStarted = false;
-            _chillActive = false;
-        }
+        npc_bansheesrevenge_overthaneAI(Creature* creature) : ScriptedAI(creature) { }
 
         void InitializeAI() override
         {
@@ -2263,7 +2260,7 @@ public:
         {
             _events.Reset();
             scheduler.CancelAll();
-            _phase = BR_PHASE_ONE;
+            _phase = PHASE_ONE;
             _interludeStarted = false;
             _chillActive = false;
         }
@@ -2294,10 +2291,8 @@ public:
                     break;
                 case ACTION_BALARGARDE_RESUME:
                     me->SetStandState(UNIT_STAND_STATE_STAND);
-                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    me->SetImmuneToPC(false);
                     me->SetReactState(REACT_AGGRESSIVE);
-                    _phase = BR_PHASE_RESUME; // b633a62: resume into the combat phase, not the opening
+                    _phase = PHASE_RESUME; // b633a62: resume into the combat phase, not the opening
                     if (Player* player = me->SelectNearestPlayer(100.0f))
                         AttackStart(player);
                     ScheduleCombatEvents();
@@ -2315,12 +2310,12 @@ public:
         void ScheduleCombatEvents()
         {
             _events.Reset();
-            _events.ScheduleEvent(EVENT_BR_HEROIC_LEAP, 20s, 30s);
-            _events.ScheduleEvent(EVENT_BR_WHIRLWIND, 60s, 90s);
-            _events.ScheduleEvent(EVENT_BR_FROSTBOLT, 20s, 25s);
-            _events.ScheduleEvent(EVENT_BR_BLIZZARD, 15s, 25s);
+            _events.ScheduleEvent(EVENT_HEROIC_LEAP, 20s, 30s);
+            _events.ScheduleEvent(EVENT_WHIRLWIND, 60s, 90s);
+            _events.ScheduleEvent(EVENT_FROSTBOLT, 20s, 25s);
+            _events.ScheduleEvent(EVENT_BLIZZARD, 15s, 25s);
             if (_chillActive)
-                _events.ScheduleEvent(EVENT_BR_CHILL_RUN, 3s, 5s);
+                _events.ScheduleEvent(EVENT_CHILL_RUN, 3s, 5s);
         }
 
         // Summon one of the two axis-centred elites (#4 behind / #5 in front) at its spawn point and
@@ -2329,13 +2324,13 @@ public:
         {
             if (Creature* elite = me->SummonCreature(NPC_BALARGARDE_ELITE,
                 BalargardeElitePos[index], TEMPSUMMON_MANUAL_DESPAWN))
-                elite->AI()->DoAction(ACTION_ELITE_START_PATROL + 1000 + index);
+                elite->AI()->DoAction(ACTION_ELITE_START_PATROL + index);
         }
 
         void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             // Invulnerable while the interlude plays out: still targettable/attackable, just takes no damage.
-            if (_phase == BR_PHASE_INTERLUDE)
+            if (_phase == PHASE_INTERLUDE)
             {
                 damage = 0;
                 return;
@@ -2357,14 +2352,14 @@ public:
             {
                 _chillActive = true;
                 Talk(SAY_BALARGARDE_80PCT);
-                _events.ScheduleEvent(EVENT_BR_CHILL_RUN, 3s, 5s);
+                _events.ScheduleEvent(EVENT_CHILL_RUN, 3s, 5s);
             }
         }
 
         void StartInterlude()
         {
             _interludeStarted = true;
-            _phase = BR_PHASE_INTERLUDE;
+            _phase = PHASE_INTERLUDE;
             _events.Reset();
 
             me->AttackStop();
@@ -2376,7 +2371,7 @@ public:
             me->SetReactState(REACT_PASSIVE);
             Talk(SAY_BALARGARDE_KNEEL);
 
-            Creature* lichKing = me->SummonCreature(NPC_BANSHEE_LICH_KING, LichKingSpawnPos, TEMPSUMMON_MANUAL_DESPAWN);
+            Creature* lichKing = me->SummonCreature(NPC_LICH_KING, LichKingSpawnPos, TEMPSUMMON_MANUAL_DESPAWN);
             if (!lichKing)
                 return;
 
@@ -2394,19 +2389,18 @@ public:
 
         void JustDied(Unit* /*killer*/) override
         {
-            _phase = BR_PHASE_OUTRO; // the Lich King now runs the outro sequence
-            if (Creature* lichKing = me->FindNearestCreature(NPC_BANSHEE_LICH_KING, 200.0f))
+            _phase = PHASE_OUTRO; // the Lich King now runs the outro sequence
+            if (Creature* lichKing = me->FindNearestCreature(NPC_LICH_KING, 200.0f))
                 lichKing->AI()->DoAction(ACTION_LK_FINALE);
 
-            // Allow the War Horn to be used again.
-            if (GameObject* horn = me->FindNearestGameObject(GO_WAR_HORN_OF_JOTUNHEIM, 200.0f))
-                horn->ResetDoorOrButton();
+            // The War Horn is re-armed at the end of the Lich King's outro (see ACTION_LK_FINALE), not here,
+            // so a fresh group cannot ring it until the event is completely over and the platform is clear.
         }
 
         void EnterEvadeMode(EvadeReason why) override
         {
             // The scripted interlude deliberately stops combat; never let an evade reset it mid-cutscene.
-            if (_phase == BR_PHASE_INTERLUDE)
+            if (_phase == PHASE_INTERLUDE)
                 return;
 
             ScriptedAI::EnterEvadeMode(why);
@@ -2419,7 +2413,7 @@ public:
             uint32 const entries[] =
             {
                 NPC_SAFIRDRANG, NPC_BALARGARDE_ELITE,
-                NPC_POSSESSED_VARDMADRA, NPC_LADY_NIGHTSWOOD, NPC_BANSHEE_LICH_KING
+                NPC_POSSESSED_VARDMADRA, NPC_LADY_NIGHTSWOOD, NPC_LICH_KING
             };
             for (uint32 entry : entries)
             {
@@ -2439,7 +2433,7 @@ public:
         {
             scheduler.Update(diff);
 
-            if (_phase == BR_PHASE_INTERLUDE)
+            if (_phase == PHASE_INTERLUDE)
                 return;
 
             if (!UpdateVictim())
@@ -2454,25 +2448,25 @@ public:
             {
                 switch (eventId)
                 {
-                    case EVENT_BR_HEROIC_LEAP:
+                    case EVENT_HEROIC_LEAP:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
-                            DoCast(target, SPELL_BR_HEROIC_LEAP);
+                            DoCast(target, SPELL_HEROIC_LEAP);
                         _events.Repeat(25s, 32s);
                         break;
-                    case EVENT_BR_WHIRLWIND:
-                        DoCastSelf(SPELL_BR_WHIRLWIND);
+                    case EVENT_WHIRLWIND:
+                        DoCastSelf(SPELL_WHIRLWIND);
                         _events.Repeat(60s, 90s);
                         break;
-                    case EVENT_BR_FROSTBOLT:
-                        DoCastVictim(SPELL_BR_FROSTBOLT);
+                    case EVENT_FROSTBOLT:
+                        DoCastVictim(SPELL_FROSTBOLT);
                         _events.Repeat(25s, 30s);
                         break;
-                    case EVENT_BR_BLIZZARD:
+                    case EVENT_BLIZZARD:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                            DoCast(target, SPELL_BR_BLIZZARD);
+                            DoCast(target, SPELL_BLIZZARD);
                         _events.Repeat(25s, 35s);
                         break;
-                    case EVENT_BR_CHILL_RUN:
+                    case EVENT_CHILL_RUN:
                         if (Creature* safirdrang = me->FindNearestCreature(NPC_SAFIRDRANG, 200.0f))
                             safirdrang->AI()->DoAction(ACTION_SAFIRDRANG_CHILL);
                         _events.Repeat(13s, 14s);
@@ -2490,9 +2484,9 @@ public:
 
     private:
         EventMap _events;
-        uint8 _phase;
-        bool _interludeStarted;
-        bool _chillActive;
+        uint8 _phase = PHASE_ONE;
+        bool _interludeStarted = false;
+        bool _chillActive = false;
     };
 
     CreatureAI* GetAI(Creature* creature) const override
@@ -2522,8 +2516,8 @@ public:
             scheduler.Schedule(1s, [this](TaskContext /*context*/)
             {
                 // Carry Overthane in seat 0 and fly the intro path.
-                if (Creature* overthane = me->SummonCreature(NPC_OVERTHANE_BALARGARDE, *me, TEMPSUMMON_MANUAL_DESPAWN))
-                    overthane->EnterVehicleUnattackable(me, 0);
+                if (Creature* balargarde = me->SummonCreature(NPC_BALARGARDE, *me, TEMPSUMMON_MANUAL_DESPAWN))
+                    balargarde->EnterVehicleUnattackable(me, 0);
 
                 me->GetMotionMaster()->MovePath(PATH_SAFIRDRANG_INTRO, FORCED_MOVEMENT_NONE, PathSource::WAYPOINT_MGR);
             });
@@ -2549,29 +2543,29 @@ public:
         {
             scheduler.Schedule(0s, [this](TaskContext /*context*/)
             {
-                if (Creature* overthane = GetSeatedOverthane())
-                    overthane->AI()->Talk(SAY_BALARGARDE_TO_SAFIRDRANG);
+                if (Creature* balargarde = GetSeatedBalargarde())
+                    balargarde->AI()->Talk(SAY_BALARGARDE_TO_SAFIRDRANG);
             }).Schedule(6s, [this](TaskContext /*context*/)
             {
                 if (Creature* vardmadra = me->FindNearestCreature(NPC_POSSESSED_VARDMADRA, 200.0f))
                     vardmadra->AI()->Talk(SAY_VARDMADRA_CHALLENGE);
             }).Schedule(12s, [this](TaskContext /*context*/)
             {
-                if (Creature* overthane = GetSeatedOverthane())
-                    overthane->AI()->Talk(SAY_BALARGARDE_TO_VARDMADRA_1);
+                if (Creature* balargarde = GetSeatedBalargarde())
+                    balargarde->AI()->Talk(SAY_BALARGARDE_TO_VARDMADRA_1);
             }).Schedule(18s, [this](TaskContext /*context*/)
             {
-                if (Creature* overthane = GetSeatedOverthane())
-                    overthane->AI()->Talk(SAY_BALARGARDE_TO_VARDMADRA_2);
+                if (Creature* balargarde = GetSeatedBalargarde())
+                    balargarde->AI()->Talk(SAY_BALARGARDE_TO_VARDMADRA_2);
             }).Schedule(23s, [this](TaskContext /*context*/)
             {
-                if (Creature* overthane = GetSeatedOverthane())
-                    overthane->AI()->DoAction(ACTION_BALARGARDE_ENGAGE);
+                if (Creature* balargarde = GetSeatedBalargarde())
+                    balargarde->AI()->DoAction(ACTION_BALARGARDE_ENGAGE);
                 me->SetHomePosition(me->GetPosition());
             });
         }
 
-        Creature* GetSeatedOverthane()
+        Creature* GetSeatedBalargarde()
         {
             if (Vehicle* kit = me->GetVehicleKit())
                 if (Unit* passenger = kit->GetPassenger(0))
@@ -2637,9 +2631,9 @@ public:
 
         void DoAction(int32 action) override
         {
-            if (action >= ACTION_ELITE_START_PATROL + 1000) // patrol path encoded as action + 1000 + index
+            if (action >= ACTION_ELITE_START_PATROL) // patrol path encoded as action + index
             {
-                uint32 const index = action - (ACTION_ELITE_START_PATROL + 1000);
+                uint32 const index = action - ACTION_ELITE_START_PATROL;
                 // #5 (front) loops the long way around, so fly it faster to reach its spot at about the same
                 // time the short rear patrol (#4) lands. Tuning knob: raise if #5 still trails, lower if it
                 // beats #4 there. The factor ~matches its patrol length relative to #4's.
@@ -2708,7 +2702,7 @@ public:
                 for (uint8 i = 0; i < 4; ++i)
                     if (Creature* elite = me->SummonCreature(NPC_BALARGARDE_ELITE,
                         BalargardeElitePos[i], TEMPSUMMON_MANUAL_DESPAWN))
-                        elite->AI()->DoAction(ACTION_ELITE_START_PATROL + 1000 + i);
+                        elite->AI()->DoAction(ACTION_ELITE_START_PATROL + i);
             }
         }
 
@@ -2725,7 +2719,7 @@ public:
                     scheduler.Schedule(1500ms, [this](TaskContext /*context*/)
                     {
                         me->SetStandState(UNIT_STAND_STATE_KNEEL);
-                        if (Creature* lichKing = me->FindNearestCreature(NPC_BANSHEE_LICH_KING, 200.0f))
+                        if (Creature* lichKing = me->FindNearestCreature(NPC_LICH_KING, 200.0f))
                             me->SetFacingToObject(lichKing);
                     });
                     break;
@@ -2738,7 +2732,7 @@ public:
                         Talk(SAY_VARDMADRA_BUT);
                     }).Schedule(1s, [this](TaskContext /*context*/)
                     {
-                        DoCastSelf(SPELL_BR_SUICIDE, true);
+                        DoCastSelf(SPELL_SUICIDE, true);
                         me->DespawnOrUnsummon(15s);
                     });
                     break;
@@ -2777,7 +2771,7 @@ public:
         void InitializeAI() override
         {
             BansheesMakeFlyer(me);
-            if (Creature* lichKing = me->FindNearestCreature(NPC_BANSHEE_LICH_KING, 200.0f))
+            if (Creature* lichKing = me->FindNearestCreature(NPC_LICH_KING, 200.0f))
                 me->SetFacingToObject(lichKing);
 
             scheduler.Schedule(20s, [this](TaskContext /*context*/)
@@ -2843,7 +2837,7 @@ public:
                 // Brisk WALK up to Vardmadra and stop in front of her (no run, no out-and-back). He stays
                 // here through the dialogue and the reveal, then walks back to his guard spot afterwards.
                 me->GetMotionMaster()->MovePoint(POINT_LK_CONFRONT, LichKingConfrontPos,
-                    FORCED_MOVEMENT_WALK, LK_INTERLUDE_WALK_SPEED);
+                    FORCED_MOVEMENT_WALK, LichKingWalkSpeed);
             }).Schedule(23s, [this](TaskContext /*context*/)
             {
                 if (Creature* vardmadra = me->FindNearestCreature(NPC_POSSESSED_VARDMADRA, 200.0f))
@@ -2865,27 +2859,27 @@ public:
             }).Schedule(43s, [this](TaskContext /*context*/)
             {
                 Talk(SAY_LK_CONTINUE);
-                FaceCreature(NPC_OVERTHANE_BALARGARDE);
+                FaceCreature(NPC_BALARGARDE);
             }).Schedule(46s, [this](TaskContext /*context*/)
             {
                 // Reveal done: walk back to his honor-guard position to observe the resumed fight.
                 me->GetMotionMaster()->MovePoint(POINT_LK_RETURN, LichKingSpawnPos,
-                    FORCED_MOVEMENT_WALK, LK_INTERLUDE_WALK_SPEED);
+                    FORCED_MOVEMENT_WALK, LichKingWalkSpeed);
             }).Schedule(48s, [this](TaskContext /*context*/)
             {
-                if (Creature* overthane = me->FindNearestCreature(NPC_OVERTHANE_BALARGARDE, 200.0f))
-                    overthane->AI()->Talk(SAY_BALARGARDE_MY_LORD);
+                if (Creature* balargarde = me->FindNearestCreature(NPC_BALARGARDE, 200.0f))
+                    balargarde->AI()->Talk(SAY_BALARGARDE_MY_LORD);
             }).Schedule(52s, [this](TaskContext /*context*/)
             {
                 Talk(SAY_LK_FINISH_THEM);
             }).Schedule(59s, [this](TaskContext /*context*/)
             {
-                if (Creature* overthane = me->FindNearestCreature(NPC_OVERTHANE_BALARGARDE, 200.0f))
-                    overthane->AI()->Talk(SAY_BALARGARDE_DIE_DOGS);
+                if (Creature* balargarde = me->FindNearestCreature(NPC_BALARGARDE, 200.0f))
+                    balargarde->AI()->Talk(SAY_BALARGARDE_DIE_DOGS);
             }).Schedule(60s, [this](TaskContext /*context*/)
             {
-                if (Creature* overthane = me->FindNearestCreature(NPC_OVERTHANE_BALARGARDE, 200.0f))
-                    overthane->AI()->DoAction(ACTION_BALARGARDE_RESUME);
+                if (Creature* balargarde = me->FindNearestCreature(NPC_BALARGARDE, 200.0f))
+                    balargarde->AI()->DoAction(ACTION_BALARGARDE_RESUME);
             });
         }
 
@@ -2916,6 +2910,10 @@ public:
                     nightswood->DespawnOrUnsummon();
             }).Schedule(20s, [this](TaskContext /*context*/)
             {
+                // Event fully over: Overthane is dead and the Lich King has left the platform. Re-arm the
+                // War Horn of Jotunheim so a new group can ring it and start the event again.
+                if (GameObject* horn = me->FindNearestGameObject(GO_WAR_HORN_OF_JOTUNHEIM, 200.0f))
+                    horn->ResetDoorOrButton();
                 me->DespawnOrUnsummon();
             });
         }
