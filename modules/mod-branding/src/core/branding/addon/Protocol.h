@@ -75,6 +75,8 @@ namespace Branding::Addon
         uint8_t  axisMask = 0;      // applicable §14.10 axes (bit per axis)
         uint8_t  alloc[AxisCount] = { 0, 0, 0, 0 };  // points spent per axis
         bool     active = false;    // is this cell one of the character's ACTIVE masteries?
+        uint8_t  reachMode = 0;     // §14.4.2 ReachMode ordinal (0=None, 1=RadiusYards, 2=TargetCount):
+                                    // lets the tooltip label the reach axis "N yd" vs "hits N targets"
     };
 
     // §14 mastery snapshot. `pointsAvailable` is the unspent point-buy budget the player may

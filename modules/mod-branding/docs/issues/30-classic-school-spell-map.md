@@ -134,16 +134,20 @@ visual/cast effect only. Tree→`EffectKind`: Def→PersonalSpike, Off→RaidWin
 
 ---
 
-## Remaining for #30 (after this doc)
+## Remaining for #30 (after this doc) — DONE
 This doc + `16-exotic-school-spell-map.md` complete the **spell-ID** deliverable for all 15 schools.
-Still open in #30:
-1. **Per-cell envelopes** — Min/Max ppm, duration, magnitude, reach overrides per cell, as data/config.
-2. **Per-cell magnitude ceilings** — sustained raid buffs (flame aura, circle of healing, int/mana
-   aura, raid-heal) carry a *conservative* ceiling (§14.2: `MaxProcMagnitude` is global today; this
-   decomposes it per-cell).
-3. **Reach rendering** — the AoE radius (yd) / cleave target counts captured in the Reach column above
-   wired into the tooltip per cell (AoE radius vs cleave count distinction).
-4. **§14.4.1 secondaries authored** — the Support archetype-1 picks above map to `LatticeArchetype(…, 1)`.
+The rest of #30 is now implemented in `src/core/branding/mastery/MasteryContent.{h,cpp}` (§14.4.2),
+wired through `BuildMasteryPlan` and the addon MAST frame; see `tests/mastery/MasteryContentTest.cpp`:
+1. ✅ **Per-cell envelopes** — `CellEnvelope` narrows the global ppm/window/magnitude/reach bounds per
+   cell (`EffectiveEnvelope`); the classic-school cells above are authored with their reach bounds.
+2. ✅ **Per-cell magnitude ceilings** — the sustained raid-utility cells (flame aura, circle of healing,
+   int/mana aura, raid-heal) carry a conservative ceiling below the global `MaxProcMagnitude`.
+3. ✅ **Reach rendering** — `ReachMode` (`RadiusYards` vs `TargetCount`) per cell, sent to the client so
+   the tooltip labels the reach axis "N yd radius" vs "hits N targets".
+4. ✅ **§14.4.1 secondaries authored** — the Support archetype-1 picks above map to `LatticeContent(…, 1)`.
+
+> The spell IDs here are reused as visual/mechanical shells; re-verify each against the server's
+> `spell_dbc` before the #03 adapter wires them to live casts.
 
 **Convention — reach axis is a target *count*, not a radius, wherever a count exists.** The base spell
 is only the visual; the #03 adapter applies the effect, so it chooses how many targets/jumps/spreads a

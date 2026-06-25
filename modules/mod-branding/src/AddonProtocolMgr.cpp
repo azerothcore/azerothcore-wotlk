@@ -13,6 +13,7 @@
 #include "branding/contribution/ContributionTypes.h"
 #include "branding/effects/ItemBrand.h"
 #include "branding/mastery/Mastery.h"
+#include "branding/mastery/MasteryContent.h"
 #include "branding/mastery/MasteryTrees.h"
 
 #include "Chat.h"
@@ -185,6 +186,8 @@ namespace Branding
                 ActiveMasteryEntry const* entry = activeSet.Find(school, tree);
                 uint8_t const archetype = entry ? entry->archetype : 0;
                 LatticeCellDef const def = LatticeArchetype(school, tree, archetype);
+                // §14.4.2: how this cell's reach axis renders (radius vs cleave count) for the tooltip.
+                ReachMode const reachMode = LatticeContent(school, tree, archetype).envelope.reachMode;
 
                 Addon::MasteryCellFrame cell;
                 cell.school = static_cast<uint8_t>(school);
@@ -196,6 +199,7 @@ namespace Branding
                 cell.level = sProficiencyMgr->BrandLevel(guid, school);   // §14.11 earned layer
                 cell.archetype = archetype;
                 cell.active = entry != nullptr;                            // a per-cell flag (multi-mastery)
+                cell.reachMode = static_cast<uint8_t>(reachMode);          // §14.4.2 reach rendering hint
                 if (entry)
                     for (uint8_t a = 0; a < Addon::AxisCount; ++a)
                         cell.alloc[a] = entry->pointsPerAxis[a];
