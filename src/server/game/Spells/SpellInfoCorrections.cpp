@@ -101,7 +101,8 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({
         53096,  // Quetz'lun's Judgment
         70743,  // AoD Special
-        70614   // AoD Special - Vegard
+        70614,  // AoD Special - Vegard
+        4020    // Safirdrang's Chill
         }, [](SpellInfo* spellInfo)
     {
         spellInfo->MaxAffectedTargets = 1;
