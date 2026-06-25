@@ -83,9 +83,14 @@ enum Shadowmourne
 
 bool IsVampire(Unit const* unit)
 {
-    if (unit->HasAnyAuras(SPELL_ESSENCE_OF_BLOOD_QUEEN, SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_PLR, SPELL_FRENZIED_BLOODTHIRST))
-        return true;
-    return false;
+    if (!unit)
+        return false;
+
+    return unit->HasAnyAuras(
+        sSpellMgr->GetSpellIdForDifficulty(SPELL_ESSENCE_OF_BLOOD_QUEEN, unit),
+        sSpellMgr->GetSpellIdForDifficulty(SPELL_ESSENCE_OF_THE_BLOOD_QUEEN_PLR, unit),
+        sSpellMgr->GetSpellIdForDifficulty(SPELL_FRENZIED_BLOODTHIRST, unit)
+    );
 }
 
 enum Events
