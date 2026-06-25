@@ -1,0 +1,4 @@
+[submodule "modules/mod-branded-mercenary"]
+	path = modules/mod-branded-mercenary
+	url = git@github.com:and-elf/mod-branded-mercenary.git
+	branch = feat/fragment-branding-hire
