@@ -166,7 +166,6 @@ struct violet_hold_trashAI : public npc_escortAI
     {
         Instance = c->GetInstanceScript();
         PortalLoc = Instance->GetData(DATA_PORTAL_LOCATION);
-        AddedWaypoints = false;
         UseAlternate = false;
     }
 
@@ -258,7 +257,6 @@ struct violet_hold_trashAI : public npc_escortAI
         }
         SetDespawnAtEnd(false);
         Start(true);
-        AddedWaypoints = true;
     }
 
     void UpdateAI(uint32 diff) override
@@ -304,7 +302,6 @@ struct violet_hold_trashAI : public npc_escortAI
 
 protected:
     InstanceScript* Instance;
-    bool AddedWaypoints;
     uint32 PortalLoc;
     bool UseAlternate;
 };
@@ -836,7 +833,6 @@ struct npc_azure_saboteur : public npc_escortAI
         _boss = _instance->GetData(DATA_WAVE_COUNT) == 6
             ? _instance->GetPersistentData(PERSISTENT_DATA_FIRST_BOSS)
             : _instance->GetPersistentData(PERSISTENT_DATA_SECOND_BOSS);
-        _addedWaypoints = false;
         _isOpening = false;
     }
 
@@ -909,7 +905,6 @@ struct npc_azure_saboteur : public npc_escortAI
         }
         SetDespawnAtEnd(false);
         Start(true);
-        _addedWaypoints = true;
     }
 
     void UpdateAI(uint32 diff) override
@@ -955,7 +950,6 @@ struct npc_azure_saboteur : public npc_escortAI
 
 private:
     InstanceScript* _instance;
-    bool _addedWaypoints;
     uint8 _boss;
     bool _isOpening;
     EventMap _events;
