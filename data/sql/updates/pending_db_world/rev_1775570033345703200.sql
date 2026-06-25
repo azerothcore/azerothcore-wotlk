@@ -1,4 +1,4 @@
--- is no longer used
+-- Riding Jokkum cast is now handled by spell_q13010_jokkum_summon
 DELETE FROM `smart_scripts` WHERE (`entryorguid` = 30331) AND (`source_type` = 0) AND (`id` IN (5));
 
 DELETE FROM `spell_script_names` WHERE `ScriptName`='spell_q13010_jokkum_summon';

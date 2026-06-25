@@ -1299,12 +1299,12 @@ class spell_q13010_jokkum_summon : public SpellScript
         PreventHitDefaultEffect(effIndex);
 
         Unit* caster = GetCaster();
-        Player* target = caster->ToPlayer();
-        if (!target)
+        Player* player = caster->ToPlayer();
+        if (!player)
             return;
 
-        if (target->IsInDisallowedMountForm())
-            target->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
+        if (player->IsInDisallowedMountForm())
+            player->RemoveAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
 
         uint32 entry = uint32(GetSpellInfo()->Effects[effIndex].MiscValue);
         SummonPropertiesEntry const* properties = sSummonPropertiesStore.LookupEntry(uint32(GetSpellInfo()->Effects[effIndex].MiscValueB));
