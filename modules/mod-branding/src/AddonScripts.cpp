@@ -49,6 +49,7 @@ public:
             if (slowRefresh)
             {
                 sAddonProtocolMgr->SendCharSnapshot(player);
+                sAddonProtocolMgr->SendXp(player);   // active-brand XP bar (#54)
                 sAddonProtocolMgr->SendSchedule(player);
             }
         }

@@ -347,3 +347,37 @@ TEST(AddonProtocol, RequestParsersRejectMalformed)
     RespecRequest r;
     EXPECT_FALSE(ParseRespec("RESPEC\t0", r));
 }
+
+// ---- XP-bar progression frame (XPB, issue #54) ----
+
+TEST(AddonProtocol, XpRoundTrip)
+{
+    XpFrame in{ 3, 7, 50, 12345, 67890, false };   // Shadow brand, level 7/50, mid-level
+    std::string const frame = EncodeXp(in);
+    ExpectWellFormed(frame);
+
+    XpFrame out;
+    ASSERT_TRUE(DecodeXp(frame, out));
+    EXPECT_EQ(in, out);
+}
+
+TEST(AddonProtocol, XpPrestigeRoundTrip)
+{
+    XpFrame in{ 0, 50, 50, 0, 0, true };   // Fire brand graduated (max level): full bar, no span
+    std::string const frame = EncodeXp(in);
+    ExpectWellFormed(frame);
+
+    XpFrame out;
+    ASSERT_TRUE(DecodeXp(frame, out));
+    EXPECT_EQ(in, out);
+    EXPECT_TRUE(out.prestige);
+    EXPECT_EQ(out.xpForLevel, 0u);
+}
+
+TEST(AddonProtocol, XpDecodeRejectsMalformed)
+{
+    XpFrame out;
+    EXPECT_FALSE(DecodeXp("BRND\tXPB\t3\t7\t50\t12345\t67890", out)) << "missing field";
+    EXPECT_FALSE(DecodeXp("BRND\tMAST\t3\t7\t50\t12345\t67890\t0", out)) << "wrong kind";
+    EXPECT_FALSE(DecodeXp("BRND\tXPB\t3\t7\t50\tx\t67890\t0", out)) << "non-numeric";
+}

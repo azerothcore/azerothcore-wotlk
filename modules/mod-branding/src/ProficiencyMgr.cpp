@@ -145,6 +145,15 @@ namespace Branding
         return LevelForXp(it->second[static_cast<size_t>(brand)].totalXp, _config);
     }
 
+    LevelProgress ProficiencyMgr::BrandProgress(ObjectGuid charGuid, BrandId brand) const
+    {
+        auto it = _charStates.find(charGuid);
+        if (it == _charStates.end())
+            return ComputeLevelProgress(0, _config);
+
+        return ComputeLevelProgress(it->second[static_cast<size_t>(brand)].totalXp, _config);
+    }
+
     bool ProficiencyMgr::UnlockBrand(uint32_t accountId, BrandId brand)
     {
         if (brand >= BrandId::COUNT)

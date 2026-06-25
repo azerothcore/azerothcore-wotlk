@@ -12,6 +12,19 @@ namespace Branding
     uint64_t XpForLevel(uint8_t level, IBrandingConfig const& cfg);
     uint8_t LevelForXp(uint64_t totalXp, IBrandingConfig const& cfg);
 
+    // Decomposition of totalXp into an XP-bar position (design §7.4, issue #54). `level` is the
+    // earned level, `xpIntoLevel`/`xpForLevel` locate progress within it (bar fill = into/for). At
+    // (or beyond) MaxLevel the brand is graduated: `atMax` is set and `xpForLevel == 0` (full bar).
+    struct LevelProgress
+    {
+        uint8_t  level = 0;
+        uint8_t  maxLevel = 0;
+        uint64_t xpIntoLevel = 0;
+        uint64_t xpForLevel = 0;   // span of the current level; 0 at max
+        bool     atMax = false;
+    };
+    LevelProgress ComputeLevelProgress(uint64_t totalXp, IBrandingConfig const& cfg);
+
     // Effect strength (design §8): level -> normalized multiplier for proc behavior, not raw stats.
     double EffectStrength(uint8_t level, IBrandingConfig const& cfg);
 

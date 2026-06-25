@@ -41,6 +41,21 @@ namespace Branding::Addon
     struct ItemFrame { bool equipped = false; uint8_t brand = 0; uint8_t step = 0; uint8_t level = 0; uint16_t intensityPermille = 0; };
     struct AllegianceFrame { uint8_t id = 0; uint16_t efficiencyPermille = 0; };
 
+    // §14.13 / issue #54: the active brand's proficiency progression, for an XP-bar overlay. One
+    // progression at a time, so this is a single fixed-arity frame (no list/truncation). `brand`
+    // is the active BrandId (lets the bar tint by school -- cosmetic); `level`/`maxLevel` are the
+    // §7.4 earned/cap levels; `xpIntoLevel`/`xpForLevel` locate progress within the level (bar fill
+    // = into/for, a single level's span fits uint32); `prestige` ⇒ at max level (graduated, full).
+    struct XpFrame
+    {
+        uint8_t  brand = 0;
+        uint8_t  level = 0;
+        uint8_t  maxLevel = 0;
+        uint32_t xpIntoLevel = 0;
+        uint32_t xpForLevel = 0;   // 0 at max level
+        bool     prestige = false;
+    };
+
     // Composite character-panel snapshot (one frame).
     struct CharSnapshot
     {
@@ -111,6 +126,7 @@ namespace Branding::Addon
     bool operator==(LoadoutFrame const&, LoadoutFrame const&);
     bool operator==(ItemFrame const&, ItemFrame const&);
     bool operator==(AllegianceFrame const&, AllegianceFrame const&);
+    bool operator==(XpFrame const&, XpFrame const&);
     bool operator==(CharSnapshot const&, CharSnapshot const&);
     bool operator==(MasteryCellFrame const&, MasteryCellFrame const&);
     bool operator==(MasterySnapshot const&, MasterySnapshot const&);
@@ -142,6 +158,7 @@ namespace Branding::Addon
     // Packs as many entries as fit MaxFrame; sets `outTruncated` if any were dropped (never silent).
     std::string EncodeSchedule(std::vector<ScheduleEntry> const&, bool& outTruncated);
     std::string EncodeYou(YouFrame const&);
+    std::string EncodeXp(XpFrame const&);
     std::string EncodeChar(CharSnapshot const&);
     // §14 lattice. Packs as many cells as fit MaxFrame; sets `outTruncated` if any were dropped
     // (deterministic head, never a silent split -- same contract as EncodeSchedule).
@@ -157,6 +174,7 @@ namespace Branding::Addon
     bool DecodeEvent(std::string_view frame, EventFrame& out);
     bool DecodeSchedule(std::string_view frame, std::vector<ScheduleEntry>& out, bool& outTruncated);
     bool DecodeYou(std::string_view frame, YouFrame& out);
+    bool DecodeXp(std::string_view frame, XpFrame& out);
     bool DecodeChar(std::string_view frame, CharSnapshot& out);
     bool DecodeMastery(std::string_view frame, MasterySnapshot& out, bool& outTruncated);
 }

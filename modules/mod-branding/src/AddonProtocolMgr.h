@@ -26,6 +26,7 @@ namespace Branding
         void SendHello(Player* player) const;
         void SendCharSnapshot(Player* player) const;
         void SendMastery(Player* player) const;                      // §14 lattice (MAST), issue #32
+        void SendXp(Player* player) const;                           // active-brand XP bar (XPB), issue #54
         void SendZoneEvent(Player* player, uint32_t zoneId) const;   // EVT + the player's YOU frame
         void SendSchedule(Player* player) const;
         void SendLoginSnapshot(Player* player) const;               // HELLO + CHAR + zone EVT + SCHED

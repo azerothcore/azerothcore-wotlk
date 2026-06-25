@@ -3,6 +3,7 @@
 
 #include "BrandingConfig.h"
 #include "ServerClock.h"
+#include "branding/proficiency/Proficiency.h"
 #include "branding/proficiency/Types.h"
 #include "ObjectGuid.h"
 #include <array>
@@ -38,6 +39,10 @@ namespace Branding
 
         // Cached proficiency level for a brand (0 if the character isn't loaded). For inspection.
         uint8_t BrandLevel(ObjectGuid charGuid, BrandId brand) const;
+
+        // XP-bar progression for a brand on this character (issue #54): level + position within it.
+        // Zeroed (level 0, no span) if the character isn't loaded. Pure decomposition over §7.4.
+        LevelProgress BrandProgress(ObjectGuid charGuid, BrandId brand) const;
 
         // Knowledge unlock flow (design §6). Persists the row to `account_brand_knowledge` and
         // refreshes the in-memory account mask so earning works immediately. Returns true iff this

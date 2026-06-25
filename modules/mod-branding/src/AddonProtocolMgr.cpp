@@ -67,6 +67,7 @@ namespace Branding
 
         SendHello(player);
         SendCharSnapshot(player);
+        SendXp(player);
         SendMastery(player);
         SendZoneEvent(player, player->GetZoneId());
         SendSchedule(player);
@@ -136,6 +137,31 @@ namespace Branding
         snap.allegiance = { static_cast<uint8_t>(current), Permille(sAllegianceMgr->Efficiency(guid, current)) };
 
         Send(player, Addon::EncodeChar(snap));
+    }
+
+    void AddonProtocolMgr::SendXp(Player* player) const
+    {
+        if (!_enabled || !player)
+            return;
+
+        // §14.13 / issue #54: the XP bar tracks the player's ACTIVE brand (one progression at a
+        // time, like the native bar). The server owns the §7.4 curve and sends the decomposed
+        // position; the addon only renders it. A single level's span fits uint32 (the wire type),
+        // but clamp defensively in case a custom curve config inflates it.
+        ObjectGuid const guid = player->GetGUID();
+        BrandLoadout const loadout = sLoadoutMgr->GetLoadout(guid);
+        BrandId const brand = loadout.activeBrand;
+        LevelProgress const prog = sProficiencyMgr->BrandProgress(guid, brand);
+
+        Addon::XpFrame frame;
+        frame.brand = static_cast<uint8_t>(brand);
+        frame.level = prog.level;
+        frame.maxLevel = prog.maxLevel;
+        frame.xpIntoLevel = static_cast<uint32_t>(std::min<uint64_t>(prog.xpIntoLevel, 0xFFFFFFFFu));
+        frame.xpForLevel = static_cast<uint32_t>(std::min<uint64_t>(prog.xpForLevel, 0xFFFFFFFFu));
+        frame.prestige = prog.atMax;
+
+        Send(player, Addon::EncodeXp(frame));
     }
 
     void AddonProtocolMgr::SendMastery(Player* player) const

@@ -38,6 +38,30 @@ namespace Branding
         return level;
     }
 
+    LevelProgress ComputeLevelProgress(uint64_t totalXp, IBrandingConfig const& cfg)
+    {
+        LevelProgress p;
+        p.maxLevel = cfg.MaxLevel();
+        p.level = LevelForXp(totalXp, cfg);
+
+        uint64_t const base = XpForLevel(p.level, cfg);
+
+        // At or beyond the cap there is no further span -- the brand is graduated (§14.13.4). We
+        // still report any XP earned past the cap (xpIntoLevel) so callers can show it if they wish.
+        if (p.level >= p.maxLevel)
+        {
+            p.atMax = true;
+            p.xpIntoLevel = totalXp > base ? totalXp - base : 0;
+            p.xpForLevel = 0;
+            return p;
+        }
+
+        uint64_t const next = XpForLevel(p.level + 1, cfg);
+        p.xpIntoLevel = totalXp - base;
+        p.xpForLevel = next - base;
+        return p;
+    }
+
     double EffectStrength(uint8_t level, IBrandingConfig const& cfg)
     {
         if (cfg.MaxLevel() == 0)
