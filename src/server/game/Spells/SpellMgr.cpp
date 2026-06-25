@@ -33,6 +33,8 @@
 #include "Tokenize.h"
 #include "World.h"
 
+#include <algorithm>
+
 bool IsPrimaryProfessionSkill(uint32 skill)
 {
     SkillLineEntry const* pSkill = sSkillLineStore.LookupEntry(skill);
@@ -687,11 +689,39 @@ SpellLearnSkillNode const* SpellMgr::GetSpellLearnSkill(uint32 spell_id) const
         return nullptr;
 }
 
+std::vector<uint32> SpellMgr::GetSkillRankSpells(uint32 skillId) const
+{
+    // Returns every spell that grants this skill via SPELL_EFFECT_SKILL,
+    // i.e. the profession rank/proficiency spells (Apprentice -> Grand Master),
+    // ordered by step. Not strictly limited to the six ranks: any skill-granting
+    // spell for the line is included.
+    std::vector<uint32> result;
+    for (auto const& [spellId, node] : mSpellLearnSkills)
+        if (node.skill == skillId)
+            result.push_back(spellId);
+
+    std::ranges::sort(result, [this](uint32 a, uint32 b)
+    {
+        return mSpellLearnSkills.at(a).step < mSpellLearnSkills.at(b).step;
+    });
+    return result;
+}
+
 SpellTargetPosition const* SpellMgr::GetSpellTargetPosition(uint32 spell_id, SpellEffIndex effIndex) const
 {
     SpellTargetPositionMap::const_iterator itr = mSpellTargetPositions.find(std::make_pair(spell_id, effIndex));
     if (itr != mSpellTargetPositions.end())
         return &itr->second;
+    return nullptr;
+}
+
+SpellCone const* SpellMgr::GetSpellCone(uint32 spell_id) const
+{
+    spell_id = GetFirstSpellInChain(spell_id);
+    auto itr = mSpellCones.find(spell_id);
+    if (itr != mSpellCones.end())
+        return &itr->second;
+
     return nullptr;
 }
 
@@ -1101,7 +1131,9 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
                     return false;
 
                 Battlefield* Bf = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
-                if (!Bf || player->GetTeamId() != Bf->GetDefenderTeam() || Bf->IsWarTime())
+                if (!Bf || Bf->IsWarTime())
+                    return false;
+                if (!sWorld->getBoolConfig(CONFIG_WINTERGRASP_ESSENCE_BOTH_FACTIONS) && player->GetTeamId() != Bf->GetDefenderTeam())
                     return false;
                 break;
             }
@@ -1575,6 +1607,93 @@ void SpellMgr::LoadSpellTargetPositions()
     }*/
 
     LOG_INFO("server.loading", ">> Loaded {} Spell Teleport Coordinates in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
+    LOG_INFO("server.loading", " ");
+}
+
+void SpellMgr::LoadSpellCones()
+{
+    uint32 oldMSTime = getMSTime();
+
+    mSpellCones.clear(); // need for reload case
+
+    //                                                    0       1
+    QueryResult result = WorldDatabase.Query("SELECT ID, ConeDegrees FROM spell_cone");
+
+    if (!result)
+    {
+        LOG_WARN("server.loading", ">> Loaded 0 spell cone definitions. DB table `spell_cone` is empty.");
+        LOG_INFO("server.loading", " ");
+        return;
+    }
+
+    uint32 count = 0;
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 spellId = fields[0].Get<uint32>();
+        int16 coneDeg = fields[1].Get<int16>();
+
+        SpellInfo const* spellInfo = GetSpellInfo(spellId);
+        if (!spellInfo)
+        {
+            LOG_ERROR("sql.sql", "Spell (ID:{}) listed in `spell_cone` does not exist.", spellId);
+            continue;
+        }
+
+        if (coneDeg < -360 || coneDeg > 360)
+        {
+            LOG_ERROR("sql.sql", "Spell (Id: {}) cone degrees {} out of range (-360..360).", spellId, coneDeg);
+            continue;
+        }
+
+        uint32 firstRankId = GetFirstSpellInChain(spellId);
+        SpellInfo const* firstSpellInfo = GetSpellInfo(firstRankId);
+
+        SpellInfo const* checkInfo = firstSpellInfo ? firstSpellInfo : spellInfo;
+
+        bool hasCone = false;
+        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+        {
+            if (checkInfo->Effects[i].TargetA.GetSelectionCategory() == TARGET_SELECT_CATEGORY_CONE ||
+                checkInfo->Effects[i].TargetB.GetSelectionCategory() == TARGET_SELECT_CATEGORY_CONE)
+            {
+                hasCone = true;
+                break;
+            }
+        }
+
+        if (!hasCone)
+        {
+            LOG_ERROR("sql.sql", "Spell (ID:{}) listed in `spell_cone` does not have a cone implicit target.", spellId);
+            continue;
+        }
+
+        if (firstRankId != spellId)
+            LOG_INFO("server.loading", "Spell (ID:{}) listed in `spell_cone` is not first rank; mapping to first rank {}.", spellId, firstRankId);
+
+        SpellCone sc{};
+        sc.cone_degrees = coneDeg;
+
+        // Avoid overwriting an existing first-rank entry with conflicting values
+        auto itr = mSpellCones.find(firstRankId);
+        if (itr != mSpellCones.end())
+        {
+            if (itr->second.cone_degrees != sc.cone_degrees)
+                LOG_ERROR("sql.sql",
+                    "Conflicting `spell_cone` entries for first-rank spell ID {}: {} vs {}. Keeping first value.",
+                    firstRankId,
+                    itr->second.cone_degrees,
+                    sc.cone_degrees);
+        }
+        else
+        {
+            mSpellCones[firstRankId] = sc;
+            ++count;
+        }
+    } while (result->NextRow());
+
+    LOG_INFO("server.loading", ">> Loaded {} Spell Cone definitions in {} ms", count, GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
 
@@ -3157,6 +3276,8 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
                         // Exceptions
                         case 44801: // Spectral Invisibility (Kalecgos, SWP)
                         case 46021: // Spectral Realm (SWP)
+                        case 52951: // Chapel Invisibility (DK starting zone)
+                        case 43062: // Alpha Worg: Garwal's Invisibility
                             break;
                         default:
                             spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CAST;

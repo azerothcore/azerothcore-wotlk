@@ -231,7 +231,9 @@ enum UnkorTheRuthless
     FACTION_HOSTILE                 = 45,
     QUEST_DONTKILLTHEFATONE         = 9889,
 
-    SPELL_PULVERIZE                 = 2676
+    SPELL_PULVERIZE                 = 2676,
+
+    SUBMIT_DURATION                 = 120000
 };
 
 class npc_unkor_the_ruthless : public CreatureScript
@@ -248,22 +250,28 @@ public:
     {
         npc_unkor_the_ruthlessAI(Creature* creature) : ScriptedAI(creature) { }
 
-        bool CanDoQuest;
-        uint32 UnkorUnfriendly_Timer;
-        uint32 Pulverize_Timer;
+        bool Submitted;
+        uint32 UnfriendlyTimer;
+        uint32 PulverizeTimer;
 
         void Reset() override
         {
-            CanDoQuest = false;
-            UnkorUnfriendly_Timer = 0;
-            Pulverize_Timer = 3000;
+            Submitted = false;
+            UnfriendlyTimer = 0;
+            PulverizeTimer = 3000;
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->SetFaction(FACTION_HOSTILE);
         }
 
         void JustEngagedWith(Unit* /*who*/) override { }
 
-        void DoNice()
+        bool HasQuestActive(Player* player) const
+        {
+            QuestStatus status = player->GetQuestStatus(QUEST_DONTKILLTHEFATONE);
+            return status == QUEST_STATUS_INCOMPLETE || status == QUEST_STATUS_COMPLETE;
+        }
+
+        void Submit()
         {
             Talk(SAY_SUBMIT);
             me->SetFaction(FACTION_FRIENDLY);
@@ -271,7 +279,8 @@ public:
             me->RemoveAllAuras();
             me->GetThreatMgr().ClearAllThreat();
             me->CombatStop(true);
-            UnkorUnfriendly_Timer = 60000;
+            Submitted = true;
+            UnfriendlyTimer = SUBMIT_DURATION;
         }
 
         void DamageTaken(Unit* done_by, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -280,61 +289,47 @@ public:
                 return;
 
             Player* player = done_by->ToPlayer();
-            if (player && me->HealthBelowPctDamaged(30, damage))
-            {
-                if (Group* group = player->GetGroup())
-                {
-                    for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
-                    {
-                        Player* groupie = itr->GetSource();
-                        if (groupie && groupie->IsInMap(player) &&
-                                groupie->GetQuestStatus(QUEST_DONTKILLTHEFATONE) == QUEST_STATUS_INCOMPLETE &&
-                                groupie->GetReqKillOrCastCurrentCount(QUEST_DONTKILLTHEFATONE, 18260) == 10)
-                        {
-                            groupie->AreaExploredOrEventHappens(QUEST_DONTKILLTHEFATONE);
-                            if (!CanDoQuest)
-                                CanDoQuest = true;
-                        }
-                    }
-                }
-                else if (player->GetQuestStatus(QUEST_DONTKILLTHEFATONE) == QUEST_STATUS_INCOMPLETE &&
-                         player->GetReqKillOrCastCurrentCount(QUEST_DONTKILLTHEFATONE, 18260) == 10)
-                {
-                    player->AreaExploredOrEventHappens(QUEST_DONTKILLTHEFATONE);
-                    CanDoQuest = true;
-                }
-            }
+            if (!player)
+                if (Unit* owner = done_by->GetOwner())
+                    player = owner->ToPlayer();
+            if (!player || !HasQuestActive(player))
+                return;
+
+            // Cap damage from quest holders so DoTs/pets/burst can't kill him.
+            if (damage >= me->GetHealth())
+                damage = me->GetHealth() - 1;
+
+            if (!me->HealthBelowPctDamaged(30, damage))
+                return;
+
+            player->GroupEventHappens(QUEST_DONTKILLTHEFATONE, me);
+
+            if (!Submitted)
+                Submit();
         }
 
         void UpdateAI(uint32 diff) override
         {
-            if (CanDoQuest)
+            if (Submitted)
             {
-                if (!UnkorUnfriendly_Timer)
+                if (UnfriendlyTimer <= diff)
                 {
-                    //DoCast(me, SPELL_QUID9889);        //not using spell for now
-                    DoNice();
+                    EnterEvadeMode();
+                    return;
                 }
-                else
-                {
-                    if (UnkorUnfriendly_Timer <= diff)
-                    {
-                        EnterEvadeMode();
-                        return;
-                    }
-                    else UnkorUnfriendly_Timer -= diff;
-                }
+                UnfriendlyTimer -= diff;
+                return;
             }
 
             if (!UpdateVictim())
                 return;
 
-            if (Pulverize_Timer <= diff)
+            if (PulverizeTimer <= diff)
             {
                 DoCast(me, SPELL_PULVERIZE);
-                Pulverize_Timer = 9000;
+                PulverizeTimer = 9000;
             }
-            else Pulverize_Timer -= diff;
+            else PulverizeTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
