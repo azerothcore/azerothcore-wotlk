@@ -296,7 +296,6 @@ INSERT INTO `pet_name_generation` VALUES
 (258,'roon',17252,1),
 (259,'thun',17252,1),
 (260,'tom',17252,1),
-(261,'Stone',26125,0),
 (262,'Stone',26125,0),
 (263,'Eye',26125,0),
 (264,'Dirt',26125,0),
@@ -343,7 +342,7 @@ INSERT INTO `pet_name_generation` VALUES
 (305,'chomp',26125,1),
 (306,'breaker',26125,1),
 (307,'keeper',26125,1),
-(308,'rawler',26125,1),
+(308,'crawler',26125,1),
 (309,'stealer',26125,1),
 (310,'thief',26125,1),
 (311,'catcher',26125,1),
@@ -360,4 +359,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-07-19 12:09:21
+-- Dump completed on 2026-06-01 22:40:17

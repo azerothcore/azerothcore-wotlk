@@ -33,56 +33,45 @@ enum Events
     EVENT_SHADOW_SHOCK      = 3,
 };
 
-class boss_lucifron : public CreatureScript
+struct boss_lucifron : public BossAI
 {
-public:
-    boss_lucifron() : CreatureScript("boss_lucifron") { }
+    boss_lucifron(Creature* creature) : BossAI(creature, DATA_LUCIFRON) {}
 
-    struct boss_lucifronAI : public BossAI
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        boss_lucifronAI(Creature* creature) : BossAI(creature, DATA_LUCIFRON) {}
+        _JustEngagedWith();
+        events.ScheduleEvent(EVENT_IMPENDING_DOOM, 6s, 11s);
+        events.ScheduleEvent(EVENT_LUCIFRON_CURSE, 11s, 14s);
+        events.ScheduleEvent(EVENT_SHADOW_SHOCK, 5s);
+    }
 
-        void JustEngagedWith(Unit* /*who*/) override
+    void ExecuteEvent(uint32 eventId) override
+    {
+        switch (eventId)
         {
-            _JustEngagedWith();
-            events.ScheduleEvent(EVENT_IMPENDING_DOOM, 6s, 11s);
-            events.ScheduleEvent(EVENT_LUCIFRON_CURSE, 11s, 14s);
-            events.ScheduleEvent(EVENT_SHADOW_SHOCK, 5s);
-        }
-
-        void ExecuteEvent(uint32 eventId) override
-        {
-            switch (eventId)
+            case EVENT_IMPENDING_DOOM:
             {
-                case EVENT_IMPENDING_DOOM:
-                {
-                    DoCastVictim(SPELL_IMPENDING_DOOM);
-                    events.Repeat(20s);
-                    break;
-                }
-                case EVENT_LUCIFRON_CURSE:
-                {
-                    DoCastVictim(SPELL_LUCIFRON_CURSE);
-                    events.Repeat(20s);
-                    break;
-                }
-                case EVENT_SHADOW_SHOCK:
-                {
-                    DoCastVictim(SPELL_SHADOW_SHOCK);
-                    events.Repeat(5s);
-                    break;
-                }
+                DoCastVictim(SPELL_IMPENDING_DOOM);
+                events.Repeat(20s);
+                break;
+            }
+            case EVENT_LUCIFRON_CURSE:
+            {
+                DoCastVictim(SPELL_LUCIFRON_CURSE);
+                events.Repeat(20s);
+                break;
+            }
+            case EVENT_SHADOW_SHOCK:
+            {
+                DoCastVictim(SPELL_SHADOW_SHOCK);
+                events.Repeat(5s);
+                break;
             }
         }
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetMoltenCoreAI<boss_lucifronAI>(creature);
     }
 };
 
 void AddSC_boss_lucifron()
 {
-    new boss_lucifron();
+    RegisterMoltenCoreCreatureAI(boss_lucifron);
 }

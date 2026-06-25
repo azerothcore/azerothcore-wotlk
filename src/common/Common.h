@@ -49,7 +49,7 @@ constexpr auto HOUR = MINUTE * 60;
 constexpr auto DAY = HOUR * 24;
 constexpr auto WEEK = DAY * 7;
 constexpr auto MONTH = DAY * 30;
-constexpr auto YEAR = MONTH * 12;
+constexpr auto YEAR = DAY * 365;
 constexpr auto IN_MILLISECONDS = 1000;
 
 enum AccountTypes
@@ -65,9 +65,9 @@ enum AccountTypes
 enum AccountFlag
 {
     ACCOUNT_FLAG_GM                   = 0x1,        // Account is GM
-    ACCOUNT_FLAG_NOKICK               = 0x2,        // NYI UNK
+    ACCOUNT_FLAG_NOKICK               = 0x2,        // Will not be logged out while AFK
     ACCOUNT_FLAG_COLLECTOR            = 0x4,        // NYI Collector's Edition
-    ACCOUNT_FLAG_TRIAL                = 0x8,        // NYI Trial account
+    ACCOUNT_FLAG_TRIAL                = 0x8,        // Trial account
     ACCOUNT_FLAG_CANCELLED            = 0x10,       // NYI UNK
     ACCOUNT_FLAG_IGR                  = 0x20,       // NYI Internet Game Room (Internet cafe?)
     ACCOUNT_FLAG_WHOLESALER           = 0x40,       // NYI UNK

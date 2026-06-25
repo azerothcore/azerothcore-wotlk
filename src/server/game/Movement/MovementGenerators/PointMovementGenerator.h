@@ -21,15 +21,16 @@
 #include "Creature.h"
 #include "MovementGenerator.h"
 #include "MoveSplineInit.h"
+#include <optional>
 
 template<class T>
 class PointMovementGenerator : public MovementGeneratorMedium< T, PointMovementGenerator<T> >
 {
 public:
     PointMovementGenerator(uint32 _id, float _x, float _y, float _z, ForcedMovement forcedMovement, float _speed = 0.0f, float orientation = 0.0f, const Movement::PointsArray* _path = nullptr,
-        bool generatePath = false, bool forceDestination = false, ObjectGuid chargeTargetGUID = ObjectGuid::Empty, bool reverseOrientation = false, ObjectGuid facingTargetGuid = ObjectGuid())
+        bool generatePath = false, bool forceDestination = false, std::optional<AnimTier> animTier = std::nullopt, ObjectGuid chargeTargetGUID = ObjectGuid::Empty, bool reverseOrientation = false, ObjectGuid facingTargetGuid = ObjectGuid())
         : id(_id), i_x(_x), i_y(_y), i_z(_z), speed(_speed), i_orientation(orientation), _generatePath(generatePath), _forceDestination(forceDestination), _reverseOrientation(reverseOrientation),
-        _chargeTargetGUID(chargeTargetGUID), _forcedMovement(forcedMovement), _facingTargetGuid(facingTargetGuid)
+        _chargeTargetGUID(chargeTargetGUID), _forcedMovement(forcedMovement), _facingTargetGuid(facingTargetGuid), _animTier(animTier)
     {
         if (_path)
             m_precomputedPath = *_path;
@@ -38,13 +39,17 @@ public:
     void DoInitialize(T*);
     void DoFinalize(T*);
     void DoReset(T*);
+
     bool DoUpdate(T*, uint32);
 
     void MovementInform(T*);
 
-    void unitSpeedChanged() { i_recalculateSpeed = true; }
+    void Pause(uint32 timer = 0) override;
+    void Resume(uint32 overrideTimer = 0) override;
 
-    MovementGeneratorType GetMovementGeneratorType() { return POINT_MOTION_TYPE; }
+    void unitSpeedChanged() override { i_recalculateSpeed = true; }
+
+    MovementGeneratorType GetMovementGeneratorType() override { return POINT_MOTION_TYPE; }
 
     bool GetDestination(float& x, float& y, float& z) const { x = i_x; y = i_y; z = i_z; return true; }
 private:
@@ -52,7 +57,7 @@ private:
     float i_x, i_y, i_z;
     float speed;
     float i_orientation;
-    bool i_recalculateSpeed;
+    bool i_recalculateSpeed{};
     Movement::PointsArray m_precomputedPath;
     bool _generatePath;
     bool _forceDestination;
@@ -60,6 +65,10 @@ private:
     ObjectGuid _chargeTargetGUID;
     ForcedMovement _forcedMovement;
     ObjectGuid _facingTargetGuid;
+    std::optional<AnimTier> _animTier;
+    bool _stalled{};
+    bool _hasBeenStalled{};
+    std::optional<int32> _pauseTime;
 };
 
 class AssistanceMovementGenerator : public PointMovementGenerator<Creature>
@@ -68,8 +77,8 @@ public:
     AssistanceMovementGenerator(float _x, float _y, float _z) :
         PointMovementGenerator<Creature>(0, _x, _y, _z, FORCED_MOVEMENT_NONE) {}
 
-    MovementGeneratorType GetMovementGeneratorType() { return ASSISTANCE_MOTION_TYPE; }
-    void Finalize(Unit*);
+    MovementGeneratorType GetMovementGeneratorType() override { return ASSISTANCE_MOTION_TYPE; }
+    void Finalize(Unit*) override;
 };
 
 // Does almost nothing - just doesn't allows previous movegen interrupt current effect.

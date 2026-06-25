@@ -9,9 +9,13 @@ body:
       description: |
         Paste the issue from ChromieCraft here.
       value: |
+      
         Issue linked from CC: 
+
         Triage Notes: 
+
         Original Post Below: 
+
         ---
     validations:
       required: true

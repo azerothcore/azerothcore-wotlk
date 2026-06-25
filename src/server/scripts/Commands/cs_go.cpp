@@ -22,7 +22,9 @@
 #include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "TicketMgr.h"
+#include "Transport.h"
 
 #include "boost/algorithm/string.hpp"
 #include <regex>
@@ -38,19 +40,19 @@ public:
     {
         static ChatCommandTable goCommandTable =
         {
-            { "creature",      HandleGoCreatureSpawnIdCommand,   SEC_MODERATOR,  Console::No },
-            { "creature id",   HandleGoCreatureCIdCommand,       SEC_MODERATOR,  Console::No },
-            { "creature name", HandleGoCreatureNameCommand,      SEC_MODERATOR,  Console::No },
-            { "gameobject",    HandleGoGameObjectSpawnIdCommand, SEC_MODERATOR,  Console::No },
-            { "gameobject id", HandleGoGameObjectGOIdCommand,    SEC_MODERATOR,  Console::No },
-            { "graveyard",     HandleGoGraveyardCommand,         SEC_MODERATOR,  Console::No },
-            { "grid",          HandleGoGridCommand,              SEC_MODERATOR,  Console::No },
-            { "taxinode",      HandleGoTaxinodeCommand,          SEC_MODERATOR,  Console::No },
-            { "trigger",       HandleGoTriggerCommand,           SEC_MODERATOR,  Console::No },
-            { "zonexy",        HandleGoZoneXYCommand,            SEC_MODERATOR,  Console::No },
-            { "xyz",           HandleGoXYZCommand,               SEC_MODERATOR,  Console::No },
-            { "ticket",        HandleGoTicketCommand,            SEC_GAMEMASTER, Console::No },
-            { "quest",         HandleGoQuestCommand,             SEC_MODERATOR,  Console::No },
+            { "creature",      HandleGoCreatureSpawnIdCommand,   rbac::RBAC_PERM_COMMAND_GO, Console::No },
+            { "creature id",   HandleGoCreatureCIdCommand,       rbac::RBAC_PERM_COMMAND_GO, Console::No },
+            { "creature name", HandleGoCreatureNameCommand,      rbac::RBAC_PERM_COMMAND_GO, Console::No },
+            { "gameobject",    HandleGoGameObjectSpawnIdCommand, rbac::RBAC_PERM_COMMAND_GO, Console::No },
+            { "gameobject id", HandleGoGameObjectGOIdCommand,    rbac::RBAC_PERM_COMMAND_GO, Console::No },
+            { "graveyard",     HandleGoGraveyardCommand,         rbac::RBAC_PERM_COMMAND_GO, Console::No },
+            { "grid",          HandleGoGridCommand,              rbac::RBAC_PERM_COMMAND_GO, Console::No },
+            { "taxinode",      HandleGoTaxinodeCommand,          rbac::RBAC_PERM_COMMAND_GO, Console::No },
+            { "trigger",       HandleGoTriggerCommand,           rbac::RBAC_PERM_COMMAND_GO, Console::No },
+            { "zonexy",        HandleGoZoneXYCommand,            rbac::RBAC_PERM_COMMAND_GO, Console::No },
+            { "xyz",           HandleGoXYZCommand,               rbac::RBAC_PERM_COMMAND_GO, Console::No },
+            { "ticket",        HandleGoTicketCommand,            rbac::RBAC_PERM_COMMAND_GO, Console::No },
+            { "quest",         HandleGoQuestCommand,             rbac::RBAC_PERM_COMMAND_GO, Console::No },
         };
 
         static ChatCommandTable commandTable =
@@ -66,7 +68,11 @@ public:
 
         if (mapId == MAPID_INVALID)
             mapId = player->GetMapId();
-        if (!MapMgr::IsValidMapCoord(mapId, pos) || sObjectMgr->IsTransportMap(mapId))
+
+        if (sObjectMgr->IsTransportMap(mapId))
+            return DoTeleportToTransport(handler, pos, mapId);
+
+        if (!MapMgr::IsValidMapCoord(mapId, pos))
         {
             handler->SendErrorMessage(LANG_INVALID_TARGET_COORD, pos.GetPositionX(), pos.GetPositionY(), mapId);
             return false;
@@ -83,6 +89,84 @@ public:
             player->SaveRecallPosition();
 
         player->TeleportTo({ mapId, pos });
+        return true;
+    }
+
+    static bool DoTeleportToTransport(ChatHandler* handler, Position pos, uint32 transportMapId)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+
+        uint32 transportEntry = 0;
+        for (auto const& [entry, goTemplate] : *sObjectMgr->GetGameObjectTemplates())
+        {
+            if (goTemplate.type == GAMEOBJECT_TYPE_MO_TRANSPORT && goTemplate.moTransport.mapID == transportMapId)
+            {
+                transportEntry = entry;
+                break;
+            }
+        }
+
+        if (!transportEntry)
+        {
+            handler->SendErrorMessage(LANG_INVALID_TARGET_COORD, pos.GetPositionX(), pos.GetPositionY(), transportMapId);
+            return false;
+        }
+
+        MotionTransport* transport = nullptr;
+        sMapMgr->DoForAllMaps([&](Map* map)
+        {
+            if (transport)
+                return;
+
+            for (Transport* t : map->GetAllTransports())
+            {
+                if (MotionTransport* mt = t->ToMotionTransport())
+                {
+                    if (mt->GetEntry() == transportEntry)
+                    {
+                        transport = mt;
+                        return;
+                    }
+                }
+            }
+        });
+
+        if (!transport)
+        {
+            handler->SendErrorMessage(LANG_INVALID_TARGET_COORD, pos.GetPositionX(), pos.GetPositionY(), transportMapId);
+            return false;
+        }
+
+        if (player->IsInFlight())
+        {
+            player->GetMotionMaster()->MovementExpired();
+            player->CleanupAfterTaxiFlight();
+        }
+        else
+            player->SaveRecallPosition();
+
+        if (Transport* oldTransport = player->GetTransport())
+            oldTransport->RemovePassenger(player, true);
+
+        float const localX = pos.GetPositionX();
+        float const localY = pos.GetPositionY();
+        float const localZ = pos.GetPositionZ();
+        float const localO = pos.GetOrientation();
+
+        player->SetTransport(transport);
+        player->m_movementInfo.transport.guid = transport->GetGUID();
+        player->m_movementInfo.transport.pos.Relocate(localX, localY, localZ, localO);
+        player->AddUnitMovementFlag(MOVEMENTFLAG_ONTRANSPORT);
+
+        float worldX = localX;
+        float worldY = localY;
+        float worldZ = localZ;
+        float worldO = localO;
+        transport->CalculatePassengerPosition(worldX, worldY, worldZ, &worldO);
+
+        transport->AddPassenger(player, false);
+
+        player->TeleportTo(transport->GetMapId(), worldX, worldY, worldZ, worldO, TELE_TO_NOT_LEAVE_TRANSPORT);
         return true;
     }
 
@@ -525,7 +609,7 @@ public:
         CreatureData const* spawnpoint = nullptr;
         for (auto const& pair : sObjectMgr->GetAllCreatureData())
         {
-            if (pair.second.id1 != entry)
+            if (pair.second.id != entry)
             {
                 continue;
             }
@@ -549,7 +633,7 @@ public:
         std::vector<CreatureData const*> spawnpoints;
         for (auto const& pair : sObjectMgr->GetAllCreatureData())
         {
-            if (pair.second.id1 != entry)
+            if (pair.second.id != entry)
             {
                 continue;
             }

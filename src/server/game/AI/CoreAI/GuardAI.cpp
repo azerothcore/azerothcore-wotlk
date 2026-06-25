@@ -33,7 +33,6 @@ GuardAI::GuardAI(Creature* creature) : ScriptedAI(creature)
 void GuardAI::Reset()
 {
     ScriptedAI::Reset();
-    me->CastSpell(me, 18950 /*SPELL_INVISIBILITY_AND_STEALTH_DETECTION*/, true);
 }
 
 void GuardAI::EnterEvadeMode(EvadeReason /*why*/)
@@ -43,6 +42,7 @@ void GuardAI::EnterEvadeMode(EvadeReason /*why*/)
         me->GetMotionMaster()->MoveIdle();
         me->CombatStop(true);
         me->GetThreatMgr().ClearAllThreat();
+        EngagementOver();
         return;
     }
 
@@ -51,6 +51,8 @@ void GuardAI::EnterEvadeMode(EvadeReason /*why*/)
     me->RemoveAllAuras();
     me->GetThreatMgr().ClearAllThreat();
     me->CombatStop(true);
+
+    EngagementOver();
 
     // Remove ChaseMovementGenerator from MotionMaster stack list, and add HomeMovementGenerator instead
     if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE)
