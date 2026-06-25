@@ -33,7 +33,7 @@ enum Says
 
 enum Spells
 {
-    SPELL_UNBALANCING_STRIKE        = 26613,
+    SPELL_UNBALANCING_STRIKE        = 55470,
     SPELL_DISRUPTING_SHOUT          = 55543,
     SPELL_JAGGED_KNIFE              = 55550,
     SPELL_HOPELESS                  = 29125,
