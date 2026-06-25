@@ -68,10 +68,6 @@ struct boss_anzu : public BossAI
         talkTimer = 1;
         me->ReplaceAllUnitFlags(UNIT_FLAG_NON_ATTACKABLE);
         me->AddAura(SPELL_SHADOWFORM, me);
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
     }
 
     const Position AnzuSpiritPos[3] =

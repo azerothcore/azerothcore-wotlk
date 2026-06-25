@@ -24,7 +24,7 @@ Based on CLAUDE.md, always verify:
 - 4-space indentation for C++ (no tabs)
 - 2-space indentation for JSON, YAML, shell scripts
 - UTF-8 encoding, LF line endings
-- Max 80 character line length
+- Max 120 character line length
 - No braces around single-line statements
 - Format variables in output using {} placeholders instead of printf-style format specifiers like %u
 
@@ -109,7 +109,7 @@ Based on CLAUDE.md, always verify:
 
 - Be constructive and educational
 - Reference specific sections of CLAUDE.md, C++ Code Standards, or SQL Standards when applicable
-- Suggest specific fixes with code examples when possible
+- Suggest specific fixes with code examples if necessary
 - Highlight both issues and good practices
 - For C++ issues, cite specific rule from C++ Code Standards wiki
 - For SQL issues, cite specific rule from SQL Standards wiki

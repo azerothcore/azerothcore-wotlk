@@ -32,11 +32,10 @@ class WintergraspCapturePoint;
 struct BfWGGameObjectBuilding;
 struct WGWorkshop;
 
-typedef std::set<GameObject*> GameObjectSet;
-typedef std::set<BfWGGameObjectBuilding*> GameObjectBuilding;
-typedef std::set<WGWorkshop*> Workshop;
-typedef std::set<Group*> GroupSet;
-//typedef std::set<WintergraspCapturePoint *> CapturePointSet; unused ?
+using GameObjectSet = std::set<GameObject*>;
+using GameObjectBuilding = std::set<BfWGGameObjectBuilding*>;
+using Workshop = std::set<WGWorkshop*>;
+using GroupSet = std::set<Group*>;
 
 uint32 const VehNumWorldState[2] = { WORLD_STATE_BATTLEFIELD_WG_VEHICLE_A, WORLD_STATE_BATTLEFIELD_WG_VEHICLE_H };
 uint32 const MaxVehNumWorldState[2] = { WORLD_STATE_BATTLEFIELD_WG_MAX_VEHICLE_A, WORLD_STATE_BATTLEFIELD_WG_MAX_VEHICLE_H };
@@ -110,10 +109,10 @@ class BfGraveyardWG : public BfGraveyard
 public:
     BfGraveyardWG(BattlefieldWG* Bf);
 
-    void SetTextId(uint32 textid) { m_GossipTextId = textid; }
-    uint32 GetTextId() { return m_GossipTextId; }
+    void SetTextId(uint32 textid) { GossipTextId = textid; }
+    uint32 GetTextId() const { return GossipTextId; }
 protected:
-    uint32 m_GossipTextId;
+    uint32 GossipTextId;
 };
 
 enum WGGraveyardId
@@ -236,13 +235,13 @@ class WintergraspCapturePoint : public BfCapturePoint
 public:
     WintergraspCapturePoint(BattlefieldWG* battlefield, TeamId teamInControl);
 
-    void LinkToWorkshop(WGWorkshop* workshop) { m_Workshop = workshop; }
+    void LinkToWorkshop(WGWorkshop* workshop) { LinkedWorkshop = workshop; }
 
     void ChangeTeam(TeamId oldteam) override;
-    TeamId GetTeam() const { return m_team; }
+    TeamId GetTeam() const { return Team; }
 
 protected:
-    WGWorkshop* m_Workshop;
+    WGWorkshop* LinkedWorkshop;
 };
 
 /* ######################### *
@@ -363,16 +362,16 @@ public:
     bool SetupBattlefield() override;
 
     /// Return pointer to relic object
-    GameObject* GetRelic() { return GetGameObject(m_titansRelic); }
+    GameObject* GetRelic() { return GetGameObject(TitansRelic); }
 
     /// Define relic object
-    //void SetRelic(GameObject* relic) { m_titansRelic = relic; }
+    //void SetRelic(GameObject* relic) { TitansRelic = relic; }
 
     /// Check if players can interact with the relic (Only if the last door has been broken)
-    bool CanInteractWithRelic() { return m_isRelicInteractible; }
+    bool CanInteractWithRelic() { return IsRelicInteractible; }
 
     /// Define if player can interact with the relic
-    void SetRelicInteractible(bool allow) { m_isRelicInteractible = allow; }
+    void SetRelicInteractible(bool allow) { IsRelicInteractible = allow; }
 
     /// Vehicle world states update
     void UpdateCounterVehicle(bool init);
@@ -402,6 +401,9 @@ public:
     uint32 GetAreaByGraveyardId(uint8 gId) const;
 
     uint32 GetData(uint32 data) const override;
+
+    // True iff the most recent battle ended with the keep captured (attacker win).
+    [[nodiscard]] bool IsLastBattleAttackerVictory() const { return LastBattleAttackerVictory; }
 
     bool IsKeepNpc(uint32 entry)
     {
@@ -434,25 +436,25 @@ public:
         return false;
     }
 protected:
-    bool m_isRelicInteractible;
+    bool IsRelicInteractible;
 
     Workshop WorkshopsList;
 
     GameObjectSet DefenderPortalList;
-    GameObjectSet m_KeepGameObject[2];
+    GameObjectSet KeepGameObject[2];
     GameObjectBuilding BuildingsInZone;
 
-    GuidUnorderedSet m_vehicles[2];
+    GuidUnorderedSet Vehicles[2];
     GuidUnorderedSet CanonList;
     GuidUnorderedSet KeepCreature[2];
     GuidUnorderedSet OutsideCreature[2];
-    GuidUnorderedSet m_updateTenacityList;
+    GuidUnorderedSet UpdateTenacityList;
 
-    int32 m_tenacityStack;
-    uint32 m_tenacityUpdateTimer;
-    uint32 m_saveTimer;
+    int32 TenacityStack;
 
-    ObjectGuid m_titansRelic;
+    ObjectGuid TitansRelic;
+
+    bool LastBattleAttackerVictory{false};
 };
 
 uint8 const WG_MAX_OBJ = 32;
@@ -492,8 +494,8 @@ enum WintergraspWorkshopIds
     BATTLEFIELD_WG_WORKSHOP_NW,
     BATTLEFIELD_WG_WORKSHOP_SE,
     BATTLEFIELD_WG_WORKSHOP_SW,
-    BATTLEFIELD_WG_WORKSHOP_KEEP_WEST,
     BATTLEFIELD_WG_WORKSHOP_KEEP_EAST,
+    BATTLEFIELD_WG_WORKSHOP_KEEP_WEST,
 };
 
 /// @todo: Handle this with creature_text ?
@@ -558,10 +560,7 @@ struct WintergraspObjectPositionData
     uint32 entryAlliance;
 };
 
-// *****************************************************
-// ************ Destructible (Wall,Tower..) ************
-// *****************************************************
-
+// Destructible buildings (walls, towers, etc.)
 struct WintergraspBuildingSpawnData
 {
     uint32 entry;
@@ -748,10 +747,7 @@ WintergraspTeleporterData const WGPortalDefenderData[WG_MAX_TELEPORTER] =
     { 192951, 5316.25f, 2977.04f, 408.539f, -0.820f },
 };
 
-// *********************************************************
-// **********Tower Element(GameObject,Creature)*************
-// *********************************************************
-
+// Tower elements (GameObjects and Creatures)
 struct WintergraspTowerData
 {
     uint32 towerEntry;                  // Gameobject id of tower
@@ -1022,15 +1018,14 @@ WintergraspTowerCannonData const TowerCannon[WG_MAX_TOWER_CANNON] =
     },
 };
 
-// *********************************************************
-// *****************WorkShop Data & Element*****************
-// *********************************************************
-
+// Workshop data and elements
 uint8 const WG_MAX_WORKSHOP = 6;
+
+// IDs below this are the capturable workshops (NE/NW/SE/SW) with graveyards.
+uint8 const WG_CAPTURE_WORKSHOP_COUNT = 4;
 
 struct WGWorkshopData
 {
-    uint8 id;
     uint32 worldstate;
     uint8 attackText;
     uint8 takenText;
@@ -1039,23 +1034,22 @@ struct WGWorkshopData
 WGWorkshopData const WorkshopsData[WG_MAX_WORKSHOP] =
 {
     // NE
-    {BATTLEFIELD_WG_WORKSHOP_NE, WORLD_STATE_BATTLEFIELD_WG_WORKSHOP_NE, BATTLEFIELD_WG_TEXT_WORKSHOP_NE_ATTACK, BATTLEFIELD_WG_TEXT_WORKSHOP_NE_TAKEN},
+    {WORLD_STATE_BATTLEFIELD_WG_WORKSHOP_NE, BATTLEFIELD_WG_TEXT_WORKSHOP_NE_ATTACK, BATTLEFIELD_WG_TEXT_WORKSHOP_NE_TAKEN},
     // NW
-    {BATTLEFIELD_WG_WORKSHOP_NW, WORLD_STATE_BATTLEFIELD_WG_WORKSHOP_NW, BATTLEFIELD_WG_TEXT_WORKSHOP_NW_ATTACK, BATTLEFIELD_WG_TEXT_WORKSHOP_NW_TAKEN},
+    {WORLD_STATE_BATTLEFIELD_WG_WORKSHOP_NW, BATTLEFIELD_WG_TEXT_WORKSHOP_NW_ATTACK, BATTLEFIELD_WG_TEXT_WORKSHOP_NW_TAKEN},
     // SE
-    {BATTLEFIELD_WG_WORKSHOP_SE, WORLD_STATE_BATTLEFIELD_WG_WORKSHOP_SE, BATTLEFIELD_WG_TEXT_WORKSHOP_SE_ATTACK, BATTLEFIELD_WG_TEXT_WORKSHOP_SE_TAKEN},
+    {WORLD_STATE_BATTLEFIELD_WG_WORKSHOP_SE, BATTLEFIELD_WG_TEXT_WORKSHOP_SE_ATTACK, BATTLEFIELD_WG_TEXT_WORKSHOP_SE_TAKEN},
     // SW
-    {BATTLEFIELD_WG_WORKSHOP_SW, WORLD_STATE_BATTLEFIELD_WG_WORKSHOP_SW, BATTLEFIELD_WG_TEXT_WORKSHOP_SW_ATTACK, BATTLEFIELD_WG_TEXT_WORKSHOP_SW_TAKEN},
-    // KEEP WEST - It can't be taken
-    {BATTLEFIELD_WG_WORKSHOP_KEEP_WEST, WORLD_STATE_BATTLEFIELD_WG_WORKSHOP_K_W, 0, BATTLEFIELD_WG_TEXT_WORKSHOP_NE_TAKEN},
+    {WORLD_STATE_BATTLEFIELD_WG_WORKSHOP_SW, BATTLEFIELD_WG_TEXT_WORKSHOP_SW_ATTACK, BATTLEFIELD_WG_TEXT_WORKSHOP_SW_TAKEN},
     // KEEP EAST - It can't be taken
-    {BATTLEFIELD_WG_WORKSHOP_KEEP_EAST, WORLD_STATE_BATTLEFIELD_WG_WORKSHOP_K_E, 0, BATTLEFIELD_WG_TEXT_WORKSHOP_NE_TAKEN}
+    {WORLD_STATE_BATTLEFIELD_WG_WORKSHOP_K_E, 0, BATTLEFIELD_WG_TEXT_WORKSHOP_NE_TAKEN},
+    // KEEP WEST - It can't be taken
+    {WORLD_STATE_BATTLEFIELD_WG_WORKSHOP_K_W, 0, BATTLEFIELD_WG_TEXT_WORKSHOP_NE_TAKEN}
 };
 
-// ********************************************************************
-// *         Structs using for Building,Graveyard,Workshop            *
-// ********************************************************************
-// Structure for different buildings that can be destroyed during battle
+// Structs for Building, Graveyard, and Workshop runtime objects
+
+// Buildings that can be destroyed during battle
 struct BfWGGameObjectBuilding
 {
     BfWGGameObjectBuilding(BattlefieldWG* WG)
@@ -1192,9 +1186,7 @@ struct BfWGGameObjectBuilding
     void Init(GameObject* gobj, uint32 type, uint32 worldstate, uint8 damageText, uint8 destroyText)
     {
         if (!gobj)
-        {
             return;
-        }
 
         // GameObject associated to object
         m_Build = gobj->GetGUID();
@@ -1226,23 +1218,20 @@ struct BfWGGameObjectBuilding
         }
 
         m_State = sWorldState->getWorldState(m_WorldState);
-        if (gobj)
+        switch (m_State)
         {
-            switch (m_State)
-            {
-                case BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_INTACT:
-                case BATTLEFIELD_WG_OBJECTSTATE_HORDE_INTACT:
-                    gobj->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, nullptr, true);
-                    break;
-                case BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_DESTROY:
-                case BATTLEFIELD_WG_OBJECTSTATE_HORDE_DESTROY:
-                    gobj->SetDestructibleState(GO_DESTRUCTIBLE_DESTROYED);
-                    break;
-                case BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_DAMAGE:
-                case BATTLEFIELD_WG_OBJECTSTATE_HORDE_DAMAGE:
-                    gobj->SetDestructibleState(GO_DESTRUCTIBLE_DAMAGED);
-                    break;
-            }
+            case BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_INTACT:
+            case BATTLEFIELD_WG_OBJECTSTATE_HORDE_INTACT:
+                gobj->SetDestructibleState(GO_DESTRUCTIBLE_REBUILDING, nullptr, true);
+                break;
+            case BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_DESTROY:
+            case BATTLEFIELD_WG_OBJECTSTATE_HORDE_DESTROY:
+                gobj->SetDestructibleState(GO_DESTRUCTIBLE_DESTROYED);
+                break;
+            case BATTLEFIELD_WG_OBJECTSTATE_ALLIANCE_DAMAGE:
+            case BATTLEFIELD_WG_OBJECTSTATE_HORDE_DAMAGE:
+                gobj->SetDestructibleState(GO_DESTRUCTIBLE_DAMAGED);
+                break;
         }
 
         int32 towerid = -1;
@@ -1422,13 +1411,16 @@ struct WGWorkshop
 
     WGWorkshop(BattlefieldWG* _bf, uint8 _workshopId)
     {
-        ASSERT(_bf || _workshopId < WG_MAX_WORKSHOP);
+        ASSERT(_bf && _workshopId < WG_MAX_WORKSHOP);
 
         bf = _bf;
         workshopId = _workshopId;
         teamControl = TEAM_NEUTRAL;
         state = BATTLEFIELD_WG_OBJECTSTATE_NONE;
     }
+
+    // True for the four capturable workshops.
+    bool IsCapturable() const { return workshopId < WG_CAPTURE_WORKSHOP_COUNT; }
 
     void GiveControlTo(TeamId team, bool init /* for first call in setup*/)
     {
@@ -1445,7 +1437,7 @@ struct WGWorkshop
                     bf->SendUpdateWorldState(WorkshopsData[workshopId].worldstate, state);
 
                     // Found associate graveyard and update it
-                    if (workshopId < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
+                    if (IsCapturable())
                         if (bf->GetGraveyardById(workshopId))
                             bf->GetGraveyardById(workshopId)->GiveControlTo(team);
 
@@ -1464,7 +1456,7 @@ struct WGWorkshop
                         bf->SendWarning(team == TEAM_ALLIANCE ? WorkshopsData[workshopId].takenText : (WorkshopsData[workshopId].takenText + 2));
 
                     // Found associate graveyard and update it
-                    if (workshopId < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
+                    if (IsCapturable())
                         if (bf->GetGraveyardById(workshopId))
                             bf->GetGraveyardById(workshopId)->GiveControlTo(team);
 
@@ -1482,7 +1474,7 @@ struct WGWorkshop
 
     void UpdateGraveyardAndWorkshop()
     {
-        if (workshopId < BATTLEFIELD_WG_WORKSHOP_KEEP_WEST)
+        if (IsCapturable())
             bf->GetGraveyardById(workshopId)->GiveControlTo(TeamId(teamControl));
         else
             GiveControlTo(bf->GetDefenderTeam(), true);

@@ -72,9 +72,12 @@ ClientWardenModule* WardenMac::GetModuleForClient()
 {
     auto mod = new ClientWardenModule;
 
+    uint32 length = Module_0DBBF209A27B1E279A9FEC5C168A15F7_Data.size();
+
     // data assign
-    mod->CompressedSize = Module_0DBBF209A27B1E279A9FEC5C168A15F7_Data.size();
-    mod->CompressedData = Module_0DBBF209A27B1E279A9FEC5C168A15F7_Data.data();
+    mod->CompressedSize = length;
+    mod->CompressedData = new uint8[length];
+    memcpy(mod->CompressedData, Module_0DBBF209A27B1E279A9FEC5C168A15F7_Data.data(), length);
 
     // md5 hash
     mod->Id = Acore::Crypto::MD5::GetDigestOf(mod->CompressedData, mod->CompressedSize);
