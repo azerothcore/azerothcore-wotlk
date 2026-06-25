@@ -670,8 +670,8 @@ enum SMART_ACTION
     SMART_ACTION_PLAY_ANIMKIT                       = 128,    // don't use on 3.3.5a
     SMART_ACTION_SCENE_PLAY                         = 129,    // don't use on 3.3.5a
     SMART_ACTION_SCENE_CANCEL                       = 130,    // don't use on 3.3.5a
-    SMART_ACTION_SPAWN_SPAWNGROUP                   = 131,    /// @todo: NOT SUPPORTED YET
-    SMART_ACTION_DESPAWN_SPAWNGROUP                 = 132,    /// @todo: NOT SUPPORTED YET
+    SMART_ACTION_SPAWN_SPAWNGROUP                   = 131,    // groupId, ignoreRespawn, force
+    SMART_ACTION_DESPAWN_SPAWNGROUP                 = 132,    // groupId, deleteRespawnTimes
     SMART_ACTION_RESPAWN_BY_SPAWNID                 = 133,    /// @todo: NOT SUPPORTED YET
     SMART_ACTION_INVOKER_CAST                       = 134,    // spellID, castFlags, triggerFlags, targetsLimit
     SMART_ACTION_PLAY_CINEMATIC                     = 135,    // entry
@@ -726,8 +726,9 @@ enum SMART_ACTION
     SMART_ACTION_SET_ANIM_TIER                      = 239,    // animtier
     SMART_ACTION_SET_GOSSIP_MENU                    = 240,    // gossipMenuId
     SMART_ACTION_SUMMON_GAMEOBJECT_GROUP            = 241,    // group
+    SMART_ACTION_INC_DATA                           = 242,    // field, increment (uses aiDataSet, wipe-safe across evade)
 
-    SMART_ACTION_AC_END                             = 242,    // placeholder
+    SMART_ACTION_AC_END                             = 243,    // placeholder
 };
 
 enum class SmartActionSummonCreatureFlags
@@ -1523,6 +1524,13 @@ struct SmartAction
         {
             uint32 group;
         } gameobjectGroup;
+
+        struct
+        {
+            uint32 groupId;
+            uint32 ignoreRespawn;
+            uint32 force;
+        } groupSpawn;
     };
 };
 
