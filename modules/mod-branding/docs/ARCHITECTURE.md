@@ -648,8 +648,15 @@ Let `base = a.baseUnits * cfg.SourceWeight(a.source)`.
 - **Branded items:** do **not** add XP directly. They alter `SourceWeight`/`RelevanceMul` inputs
   (passed in via the activity/config), per design §6 ("modify XP sources and efficiency instead").
 
-Level curve: `XpForLevel(n) = round(cfg.BaseXp * n^cfg.Exponent)`, clamped at `cfg.MaxLevel`.
-`EffectStrength(level) = min(1.0, level / cfg.MaxLevel)` baseline (config may reshape the curve).
+Level curve (**geometric per-rank**, decided — see §14.13.6): each rank's *increment* grows by a
+fixed factor, so the ladder steepens toward the top (a grindy endgame, not a grindy start). The
+**per-rank cost** is `rankCost(n) = round(cfg.RankBaseXp * cfg.RankGrowth^(n-1))`; the cumulative
+threshold is the closed-form sum
+`XpForLevel(n) = round(cfg.RankBaseXp * (cfg.RankGrowth^n - 1) / (cfg.RankGrowth - 1))`
+(falling back to linear `n * RankBaseXp` when `RankGrowth == 1`), clamped at `cfg.MaxLevel`.
+Defaults: `RankBaseXp = 1670800` (the live 3.3.5a level-79→80 XP requirement, so rank 1 ≈ "one more
+level at 80"), `RankGrowth = 1.01` (+1%/rank), `MaxLevel = 50`. `EffectStrength(level) =
+min(1.0, level / cfg.MaxLevel)` baseline (config may reshape the curve).
 
 > All constants live behind `IBrandingConfig`. Production reads `sConfigMgr`; tests inject a
 > `FakeConfig` so formulas are pinned and deterministic.
@@ -1035,6 +1042,17 @@ sources and asserts each aggregate share falls within tolerance of its target, w
 `share(Questing)` the largest. If profession/discovery tuning drifts and starts dwarfing questing,
 the test fails. This turns "don't make questing obsolete" from a hope into a CI gate.
 
+- **Four buckets, no separate "Events" bucket (decided).** Invasion/event XP is *not* a fifth source:
+  the per-action contribution points (§9.2) feed the event *economy* (Insight/mats, rate-independent),
+  while the **XP a contained invasion grants** — "what a normal quest would give at the player's level,"
+  at **quest-rate ×5/×7** (§10.1, decided) — folds into the **Questing** bucket. Invasions therefore
+  *reinforce* questing's 45% dominance rather than competing with it, which is exactly the §9.7
+  "don't let events skip structured content" intent. The aggregation (`XpSource::Questing`) sums
+  baseline quests **and** invasion-containment grants.
+- **Ratified profile + curve coupling.** The representative play session and the closed pacing math live
+  in §14.13.6 (≈1.20M XP/day → ~90-day Prestige). The sim runs that profile at production rates and
+  asserts both the share targets *and* time-to-Prestige in one deterministic suite (#14).
+
 ### 8.6 Economy resolution (extends §16, pure)
 
 Recipe/crafting resolution is a pure function over inputs (materials + fragments + discovered
@@ -1124,7 +1142,12 @@ uint32_t ApplyEventAction(ParticipationState& s, EventType t, EventAction a, uin
    strictly less than the (N-1)th, decaying toward `cfg.EventDrFloor` (stops endless single-invasion
    farming). Resets on the daily boundary (injected clock).
 3. **Anti-leech gate** — if `ActivitySignal` falls below floors (`damageDealt`/`actions`/`movement`),
-   the action scores **0** (simple, deterministic heuristics; no ML).
+   the action scores **0** (simple, deterministic heuristics; no ML). **Config-gated, default OFF in v1
+   (decided).** v1 deliberately *allows AFK leveling*: with `cfg.EventAntiLeech() == false` the gate is
+   skipped and every present participant takes the same flat XP split (the "everyone contributes, even
+   passively" on-ramp). The gate **code and its Risk #7 tests ship now** but enforcement is behind the
+   flag, so tightening later (flip the default to ON) is a config change, not a rewrite. The Risk #7
+   tests assert the gate scores 0 *when enabled* and the flat split *when disabled*.
 4. **(Feeds §8.5 balance)** — event XP counts toward the global XP-source mix; events must not let
    players skip questing (see the warning in §9.7).
 5. **Account-wide economy-output ceiling** *(Hybrid decision, §10.3)* — guardrails 1–3 are
@@ -1239,7 +1262,16 @@ double KillRate      = 5.0;   // or 7.0 — absolute kill XP
 double SkillRate     = 3.0;   // profession skill points
 double DiscoveryRate = 1.0;   // %-of-level (§8.2) — KEPT LOW/INDEPENDENT (see Risk #1)
 double EventRate     = 1.0;   // contribution XP (§9) — KEPT LOW/INDEPENDENT
+double InvasionRate  = 5.0;   // = QuestRate — invasion-containment XP is quest-equivalent (decided)
 ```
+
+**Invasion-containment XP rides the quest rate (decided).** Containing an invasion grants each
+participant "the XP a normal quest would give at their level," scaled by the **same ×5/×7 baseline as
+quests** (`InvasionRate == QuestRate`), and it lands in the §8.5 **Questing** bucket. This is distinct
+from the §9.2 *contribution points* (which stay rate-independent and feed the event economy). Below max
+level that XP levels the character normally (§14.13.3); at cap it redirects 1:1 to Proficiency. Because
+this is a quest-rate faucet, the #14 balance sim must re-derive per-source weights at production rates so
+`share(Questing)` stays largest (Risk #2) — a bigger quest faucet, not a balance break.
 
 **Rule:** the global "5x/7x" applies to the **absolute kill+quest baseline only**. Percentage-based
 (discovery) and contribution-based (event) XP are rate-independent or use their own small
@@ -1251,12 +1283,12 @@ per-source weights — rates and the 45/25/20/10 target are tuned *together*, ne
 | # | Risk | Where | Guard / decision | Adversarial test |
 |---|---|---|---|---|
 | 1 | **%-XP × rate compounding** — discovery (% of level) × global multiplier ⇒ level-per-discovery | §8.2 × §10.1 | discovery/event XP rate-independent; global rate = baseline only | `Discovery_RateMultiplier_DoesNotCompound`: high rate + dangerous discovery ⇒ bounded XP |
-| 2 | **Balance ratio drifts with rate** — share targets only hold at one rate config | §8.5 × §10.1 | balance sim runs at production rates; per-source weights re-derived | `BalanceSim_HoldsAtProductionRates`: shares within tolerance at 5x/7x, not just 1x |
+| 2 | **Balance ratio drifts with rate** — share targets only hold at one rate config | §8.5 × §10.1 | balance sim runs at production rates; per-source weights re-derived | `BalanceSim_HoldsAtProductionRates`: shares within tolerance at 5x/7x, not just 1x; `BalanceSim_TimeToPrestige_NearThreeMonths` gates pacing on the same profile |
 | 3 | **Faucet/sink collapse** — rates amplify mat faucets but not sinks ⇒ inflation | §8.1, §13, §7.9 | every faucet has a sink scaled to the same rate; faucet/sink ledger test | `Economy_FaucetSink_NetNonInflationary`: simulated loop net mat flow bounded |
 | 4 | **Group-size snapshot gaming** — stack 40, set ceiling, leave, kill with 5 | §2.2 | sample group size at reward-grant / averaged over fight, **not** at pull | `GroupSize_SnapshotAtGrant_NotPull`: late-leavers don't inflate ceiling |
 | 5 | **Per-character caps, account-unit farming** — alt-army funnels via shared vault | §9.3, §13 | **HYBRID (decided)**: per-character caps for pacing + account-wide soft ceiling on economy outputs (mats/currency) only | `EventCap_PerChar_PacesActivity` + `EconomyOutput_AccountCeiling_Bounded` |
 | 6 | **Catalyst DR evasion** — rotate brands so "branded ally" count never trips DR | §7.9, Slice 4 | DR counts branded *allies present*, not active-effect instants; crisp rule | `CatalystDR_CountsPresence_NotActiveWindow`: rotation can't dodge DR |
-| 7 | **Anti-leech bypass** — AFK-in-zerg, tag-and-leave, bot cadence | §9.3 | activity floors (damage/actions/movement); per-action gate | `Leech_AfkInZerg_ScoresZero`, `Leech_TagAndLeave_ScoresZero` |
+| 7 | **Anti-leech bypass** — AFK-in-zerg, tag-and-leave, bot cadence | §9.3 | activity floors (damage/actions/movement); per-action gate, **config-gated (default OFF in v1)** | `Leech_AfkInZerg_ScoresZero` / `Leech_TagAndLeave_ScoresZero` (gate ON) + `Leech_FlatSplit_WhenGateDisabled` (v1 default) |
 | 8 | **Profession trivialization** — 3x skill + discovery skill ⇒ instant cap | §8.4, §10.1 | gate progression on recipes/discoveries, not just skill points | `Profession_RecipeGated_NotSkillRushable` |
 | 9 | **Brand-XP feedback loop** — efficiency → more brand XP → more efficiency | §7.4 | per-source daily DR caps the loop; no multiplicative compounding | `BrandXp_FeedbackLoop_Dr_Bounded` |
 
@@ -1913,6 +1945,16 @@ Proficiency** (the §7 per-`(character, brand)` total). The adapter hooks the XP
 experience instead of normal XP" is therefore a thin adapter over the existing Proficiency core — **no
 new pure logic**.
 
+- **Redirect ratio = 1:1 (decided).** One unit of post-cap player XP becomes one unit of Proficiency XP.
+  There is **no separate "prestige multiplier"**: the prestige track inherits the §10.1 per-source rates
+  *as-is* (quest/kill ×5/×7, discovery/event rate-independent), because it redirects the very same XP
+  stream the player would otherwise earn. This is why the rank ladder (§7.4) is denominated in real
+  player-XP units (`RankBaseXp` = the level-79→80 requirement) — and why pacing must be checked at
+  production rates (Risk #2), not at 1x. The 1:1 ratio keeps the redirect a pure pass-through; pacing is
+  shaped by the **rank curve**, not by throttling the stream.
+- **Below max level, invasions/events grant normal leveling XP (decided).** The redirect is *post-cap
+  only*. A sub-max character in an invasion levels normally — see §10.1 for the rate that XP carries.
+
 #### 14.13.4 Graduation — Prestige titles (§11)
 
 Hitting **max Proficiency** in a school (the existing `XpResult::reachedPrestige` boundary) grants a
@@ -1964,11 +2006,20 @@ Enrolling is fast; graduating is the long game. The two clocks are deliberately 
   is per school and runs one at a time — switching focus costs tuition and pauses the others. The
   capstone is therefore a long-tail sum of many 3-month grinds, intentionally a multi-year flex, not a
   separate grind to balance.
-- **One knob, defined against a play-profile.** "~3 months" only means something relative to a
-  *representative daily session*, so the **post-cap XP→Proficiency rate** is the single tuning knob and
-  is calibrated against the **#14 / §8.5 XP-balance sim's** play-session profile. This makes Prestige
-  pacing a **CI-gated target** (the sim asserts time-to-Prestige stays within tolerance of ~3 months for
-  the representative profile), not a hope — the same treatment §8.5 gives the XP-source mix.
+- **Two pinned knobs, defined against a play-profile (decided).** With the redirect fixed at 1:1
+  (§14.13.3) and the rank curve fixed geometric (§7.4: `RankBaseXp = 1670800`, `RankGrowth = 1.01`,
+  `MaxLevel = 50`), time-to-Prestige is **no longer a free tuning knob** — it is the *derived* quotient
+  `XpForLevel(50) ÷ (Proficiency XP per representative day)`. The full ladder costs
+  `1670800 × (1.01⁵⁰ − 1) / 0.01 ≈ 107.7M` XP. "~3 months" therefore means something only relative to a
+  **representative daily session**; that profile (below) is the artifact the owner ratifies. This makes
+  Prestige pacing a **CI-gated target** (the #14 sim asserts time-to-Prestige stays within tolerance of
+  ~3 months for the representative profile), not a hope — the same treatment §8.5 gives the XP-source mix.
+- **Representative play-session profile (owner-ratified — drives #14 and §8.5).** One representative
+  *active* day on one school yields ≈ **1.20M player-XP/day** at production rates, split to hit the §8.5
+  target mix: Questing ≈ 538k · Professions ≈ 299k · Exploration ≈ 239k · Discoveries ≈ 120k. At 1:1
+  redirect that is ≈1.20M Proficiency-XP/day, so `107.7M ÷ 1.20M ≈ 90 days ≈ 3 months`. This is roughly a
+  ~1 hr/day committed player; lighter/heavier sessions scale the clock linearly. **The sim is the arbiter
+  — if this profile is re-tuned, both the §8.5 shares and the ~3-month pacing re-derive together.**
 
 **Open decisions (recorded as *[DEFAULT]* above — veto any):** (1) re-select known school = gold-only;
 (2) tuition escalates vs flat — escalating; (3) title path — repurpose spare `CharTitles.dbc` IDs for

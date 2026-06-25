@@ -25,9 +25,10 @@ namespace Branding::Test
         double drSlope = 0.0;
         uint64_t drWindowSeconds = 3600;
 
-        // Level curve: XpForLevel(n) = round(baseXp * n^exponent), capped at maxLevel.
-        double baseXp = 100.0;
-        double exponent = 2.0;
+        // Level curve (geometric per-rank): rankCost(n) = rankBaseXp * rankGrowth^(n-1), capped at maxLevel.
+        // Test default keeps small, round numbers; production defaults live in BrandingConfig.
+        double rankBaseXp = 100.0;
+        double rankGrowth = 1.01;
         uint8_t maxLevel = 50;
 
         double SourceWeight(ActivitySource source) const override { return sourceWeight[static_cast<size_t>(source)]; }
@@ -40,8 +41,8 @@ namespace Branding::Test
         double DrSlope() const override { return drSlope; }
         uint64_t DrWindowSeconds() const override { return drWindowSeconds; }
 
-        double BaseXp() const override { return baseXp; }
-        double Exponent() const override { return exponent; }
+        double RankBaseXp() const override { return rankBaseXp; }
+        double RankGrowth() const override { return rankGrowth; }
         uint8_t MaxLevel() const override { return maxLevel; }
     };
 }

@@ -27,8 +27,8 @@ namespace Branding
         double DrSlope() const override { return _drSlope; }
         uint64_t DrWindowSeconds() const override { return _drWindowSeconds; }
 
-        double BaseXp() const override { return _baseXp; }
-        double Exponent() const override { return _exponent; }
+        double RankBaseXp() const override { return _rankBaseXp; }
+        double RankGrowth() const override { return _rankGrowth; }
         uint8_t MaxLevel() const override { return _maxLevel; }
 
     private:
@@ -41,8 +41,8 @@ namespace Branding
         double _drFloor = 0.1;
         double _drSlope = 0.00001;
         uint64_t _drWindowSeconds = 3600;
-        double _baseXp = 100.0;
-        double _exponent = 2.0;
+        double _rankBaseXp = 1670800.0;   // live 3.3.5a level-79->80 XP requirement (§7.4)
+        double _rankGrowth = 1.01;         // +1%/rank geometric ladder (§14.13.6)
         uint8_t _maxLevel = 50;
     };
 }

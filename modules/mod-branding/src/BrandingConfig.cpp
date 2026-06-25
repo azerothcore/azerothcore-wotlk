@@ -13,8 +13,8 @@ namespace Branding
         _drSlope = sConfigMgr->GetOption<float>("Branding.Xp.DrSlope", 0.00001f);
         _drWindowSeconds = sConfigMgr->GetOption<uint32_t>("Branding.Xp.DrWindowSeconds", 3600);
 
-        _baseXp = sConfigMgr->GetOption<float>("Branding.Level.BaseXp", 100.0f);
-        _exponent = sConfigMgr->GetOption<float>("Branding.Level.Exponent", 2.0f);
+        _rankBaseXp = sConfigMgr->GetOption<float>("Branding.Level.RankBaseXp", 1670800.0f);
+        _rankGrowth = sConfigMgr->GetOption<float>("Branding.Level.RankGrowth", 1.01f);
         _maxLevel = static_cast<uint8_t>(sConfigMgr->GetOption<uint32_t>("Branding.Level.Max", 50));
     }
 }
