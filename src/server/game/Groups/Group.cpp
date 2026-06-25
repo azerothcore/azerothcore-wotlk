@@ -63,6 +63,40 @@ Loot* Roll::getLoot()
     return getTarget();
 }
 
+static void SendRollWonItemViaMail(Player* player, LootItem const* lootItem, uint32 itemId)
+{
+    Item* mailItem = Item::CreateItem(itemId, lootItem->count, player, false, lootItem->randomPropertyId);
+    if (!mailItem)
+        return;
+
+    AllowedLooterSet looters = lootItem->GetAllowedLooters();
+    ItemTemplate const* proto = mailItem->GetTemplate();
+    // Preserve the 2-hour group trade window the item would have had if stored directly.
+    if (looters.size() > 1 && proto->GetMaxStackSize() == 1 &&
+        (proto->Bonding == BIND_WHEN_PICKED_UP || proto->Bonding == BIND_QUEST_ITEM) &&
+        sWorld->getBoolConfig(CONFIG_SET_BOP_ITEM_TRADEABLE))
+    {
+        mailItem->SetBinding(true);
+        mailItem->SetSoulboundTradeable(looters);
+        mailItem->SetUInt32Value(ITEM_FIELD_CREATE_PLAYED_TIME, player->GetTotalPlayedTime());
+
+        std::string lootersStr;
+        for (ObjectGuid const& guid : looters)
+        {
+            if (!lootersStr.empty())
+                lootersStr += ' ';
+            lootersStr += std::to_string(guid.GetCounter());
+        }
+
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_ITEM_BOP_TRADE);
+        stmt->SetData(0, mailItem->GetGUID().GetCounter());
+        stmt->SetData(1, lootersStr);
+        CharacterDatabase.Execute(stmt);
+    }
+
+    player->SendItemRetrievalMail(mailItem);
+}
+
 Group::Group() : m_leaderName(""), m_groupType(GROUPTYPE_NORMAL),
     m_dungeonDifficulty(DUNGEON_DIFFICULTY_NORMAL), m_raidDifficulty(RAID_DIFFICULTY_10MAN_NORMAL),
     m_bfGroup(nullptr), m_bgGroup(nullptr), m_lootMethod(FREE_FOR_ALL), m_lootThreshold(ITEM_QUALITY_UNCOMMON),
@@ -387,7 +421,7 @@ Player* Group::GetInvited(const std::string& name) const
     return nullptr;
 }
 
-bool Group::AddMember(Player* player)
+bool Group::AddMember(Player* player, uint8 roles /* = 0 */)
 {
     if (!player)
         return false;
@@ -415,7 +449,7 @@ bool Group::AddMember(Player* player)
     member.name      = player->GetName();
     member.group     = subGroup;
     member.flags     = 0;
-    member.roles     = 0;
+    member.roles     = roles;
     m_memberSlots.push_back(member);
 
     if (!isBGGroup() && !isBFGroup())
@@ -1373,20 +1407,20 @@ bool Group::CountRollVote(ObjectGuid playerGUID, ObjectGuid Guid, uint8 Choice)
 
     if (roll->totalPass + roll->totalNeed + roll->totalGreed >= roll->totalPlayersRolling)
     {
-        CountTheRoll(rollI, nullptr);
+        CountTheRoll(rollI);
         return true;
     }
     return false;
 }
 
 //called when roll timer expires
-void Group::EndRoll(Loot* pLoot, Map* allowedMap)
+void Group::EndRoll(Loot* pLoot)
 {
     for (Rolls::iterator itr = RollId.begin(); itr != RollId.end();)
     {
         if ((*itr)->getLoot() == pLoot)
         {
-            CountTheRoll(itr, allowedMap);           //i don't have to edit player votes, who didn't vote ... he will pass
+            CountTheRoll(itr);           //i don't have to edit player votes, who didn't vote ... he will pass
             itr = RollId.begin();
         }
         else
@@ -1425,7 +1459,7 @@ void Group::RemovePlayerFromRolls(ObjectGuid guid)
     }
 }
 
-void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
+void Group::CountTheRoll(Rolls::iterator rollI)
 {
     Roll* roll = *rollI;
     if (!roll->isValid())                                   // is loot already deleted ?
@@ -1450,7 +1484,7 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
                     continue;
 
                 player = ObjectAccessor::FindPlayer(itr->first);
-                if (!player || (allowedMap != nullptr && player->FindMap() != allowedMap))
+                if (!player)
                 {
                     --roll->totalNeed;
                     continue;
@@ -1490,9 +1524,23 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
                     }
                     else
                     {
-                        item->is_blocked = false;
-                        item->rollWinnerGUID = player->GetGUID();
-                        player->SendEquipError(msg, nullptr, nullptr, roll->itemid);
+                        uint32 mailOnFull = sWorld->getIntConfig(CONFIG_LFG_MAIL_ITEM_ON_FULL_INVENTORY);
+                        // Only mail when bags are genuinely full. Unique/max-count failures must
+                        // leave the item on the corpse so it can be re-rolled or freely looted.
+                        if (msg == EQUIP_ERR_INVENTORY_FULL && (mailOnFull == MAIL_ITEM_ON_FULL_INVENTORY_EVERYWHERE || (mailOnFull == MAIL_ITEM_ON_FULL_INVENTORY_LFG_ONLY && isLFGGroup())))
+                        {
+                            item->is_looted = true;
+                            roll->getLoot()->NotifyItemRemoved(roll->itemSlot);
+                            roll->getLoot()->unlootedCount--;
+                            player->SendEquipError(msg, nullptr, nullptr, roll->itemid);
+                            SendRollWonItemViaMail(player, item, roll->itemid);
+                        }
+                        else
+                        {
+                            item->is_blocked = false;
+                            item->rollWinnerGUID = player->GetGUID();
+                            player->SendEquipError(msg, nullptr, nullptr, roll->itemid);
+                        }
                     }
                 }
             }
@@ -1500,7 +1548,7 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
                 roll->totalNeed = 0;
         }
     }
-    if (roll->totalNeed == 0 && roll->totalGreed > 0) // pussywizard: if (roll->totalNeed == 0 && ...), not else if, because numbers can be modified above if player is on a different map
+    if (roll->totalNeed == 0 && roll->totalGreed > 0) // if (roll->totalNeed == 0 && ...), not else if, because totalNeed can be decremented above when a needing player is offline
     {
         if (!roll->playerVote.empty())
         {
@@ -1516,7 +1564,7 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
                     continue;
 
                 player = ObjectAccessor::FindPlayer(itr->first);
-                if (!player || (allowedMap != nullptr && player->FindMap() != allowedMap))
+                if (!player)
                 {
                     --roll->totalGreed;
                     continue;
@@ -1560,9 +1608,23 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
                         }
                         else
                         {
-                            item->is_blocked = false;
-                            item->rollWinnerGUID = player->GetGUID();
-                            player->SendEquipError(msg, nullptr, nullptr, roll->itemid);
+                            uint32 mailOnFull = sWorld->getIntConfig(CONFIG_LFG_MAIL_ITEM_ON_FULL_INVENTORY);
+                            // Only mail when bags are genuinely full. Unique/max-count failures must
+                            // leave the item on the corpse so it can be re-rolled or freely looted.
+                            if (msg == EQUIP_ERR_INVENTORY_FULL && (mailOnFull == MAIL_ITEM_ON_FULL_INVENTORY_EVERYWHERE || (mailOnFull == MAIL_ITEM_ON_FULL_INVENTORY_LFG_ONLY && isLFGGroup())))
+                            {
+                                item->is_looted = true;
+                                roll->getLoot()->NotifyItemRemoved(roll->itemSlot);
+                                roll->getLoot()->unlootedCount--;
+                                player->SendEquipError(msg, nullptr, nullptr, roll->itemid);
+                                SendRollWonItemViaMail(player, item, roll->itemid);
+                            }
+                            else
+                            {
+                                item->is_blocked = false;
+                                item->rollWinnerGUID = player->GetGUID();
+                                player->SendEquipError(msg, nullptr, nullptr, roll->itemid);
+                            }
                         }
                     }
                     else if (rollvote == DISENCHANT)
@@ -1600,7 +1662,7 @@ void Group::CountTheRoll(Rolls::iterator rollI, Map* allowedMap)
                 roll->totalGreed = 0;
         }
     }
-    if (roll->totalNeed == 0 && roll->totalGreed == 0) // pussywizard: if, not else, because numbers can be modified above if player is on a different map
+    if (roll->totalNeed == 0 && roll->totalGreed == 0) // if, not else, because the totals can be decremented above when a rolling player is offline
     {
         SendLootAllPassed(*roll);
 

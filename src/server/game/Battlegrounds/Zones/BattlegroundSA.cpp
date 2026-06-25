@@ -703,13 +703,21 @@ void BattlegroundSA::OverrideGunFaction()
     for (uint8 i = BG_SA_GUN_1; i <= BG_SA_GUN_10; i++)
     {
         if (Creature* gun = GetBGCreature(i))
+        {
             gun->SetFaction(BG_SA_Factions[Attackers ? TEAM_ALLIANCE : TEAM_HORDE]);
+            // NullCreatureAI never evades and PvE combat refs have no timer,
+            // so attackers would stay in combat until death after damaging it.
+            gun->SetIsCombatDisallowed(true);
+        }
     }
 
     for (uint8 i = BG_SA_DEMOLISHER_1; i <= BG_SA_DEMOLISHER_4; i++)
     {
         if (Creature* dem = GetBGCreature(i))
+        {
             dem->SetFaction(BG_SA_Factions[Attackers]);
+            dem->SetIsCombatDisallowed(true);
+        }
     }
 }
 
@@ -968,7 +976,10 @@ void BattlegroundSA::CaptureGraveyard(BG_SA_Graveyards i, Player* Source)
                             BG_SA_NpcSpawnlocs[j][2], BG_SA_NpcSpawnlocs[j][3], 600);
 
                 if (Creature* dem = GetBGCreature(j))
+                {
                     dem->SetFaction(BG_SA_Factions[Attackers]);
+                    dem->SetIsCombatDisallowed(true);
+                }
             }
 
             UpdateWorldState(WORLD_STATE_BATTLEGROUND_SA_LEFT_GY_ALLIANCE, (GraveyardStatus[i] == TEAM_ALLIANCE ? 1 : 0));
@@ -999,7 +1010,10 @@ void BattlegroundSA::CaptureGraveyard(BG_SA_Graveyards i, Player* Source)
                             BG_SA_NpcSpawnlocs[j][2], BG_SA_NpcSpawnlocs[j][3], 600);
 
                 if (Creature* dem = GetBGCreature(j))
+                {
                     dem->SetFaction(BG_SA_Factions[Attackers]);
+                    dem->SetIsCombatDisallowed(true);
+                }
             }
 
             UpdateWorldState(WORLD_STATE_BATTLEGROUND_SA_RIGHT_GY_ALLIANCE, (GraveyardStatus[i] == TEAM_ALLIANCE ? 1 : 0));

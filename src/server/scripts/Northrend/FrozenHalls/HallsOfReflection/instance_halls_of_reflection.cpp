@@ -60,7 +60,6 @@ public:
             case 5:
                 _owner.SetFacingTo(2.82f);
                 _owner.SetStandState(UNIT_STAND_STATE_KNEEL);
-                _owner.m_Events.AddEventAtOffset(new UtherBatteredHiltEvent(_owner, 6), 3s);
                 break;
             case 6:
                 if (InstanceScript* inst = _owner.GetInstanceScript())
@@ -383,7 +382,11 @@ public:
                     if (Creature* leader = GetCreature(NPC_SYLVANAS_PART2))
                         leader->setActive(false);
                     if (Creature* lichKing = GetCreature(NPC_LICH_KING_BOSS))
+                    {
+                        lichKing->GetThreatMgr().ClearAllThreat();
+                        lichKing->CombatStop(true);
                         lichKing->setActive(false);
+                    }
                     _isLichKingFightActive = false;
                     _outroStep = 1;
                     _outroTimer = 0;

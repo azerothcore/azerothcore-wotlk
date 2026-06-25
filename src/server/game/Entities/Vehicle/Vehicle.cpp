@@ -313,7 +313,10 @@ void Vehicle::InstallAccessory(uint32 entry, int8 seatId, bool minion, uint8 typ
     if (TempSummon* accessory = _me->SummonCreature(entry, *_me, TempSummonType(type), summonTime))
     {
         if (minion)
+        {
             accessory->AddUnitTypeMask(UNIT_MASK_ACCESSORY);
+            accessory->GetThreatMgr().Initialize(); // reinitialize CanHaveThreatList cached value
+        }
 
         if (!_me->HandleSpellClick(accessory, seatId))
         {
@@ -356,12 +359,7 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
             return false;
 
         if (!seat->second.IsEmpty())
-        {
-            if (Unit* passenger = ObjectAccessor::GetUnit(*GetBase(), seat->second.Passenger.Guid))
-                passenger->ExitVehicle();
-
-            seat->second.Passenger.Guid.Clear();
-        }
+            return false;
 
         ASSERT(seat->second.IsEmpty());
     }
@@ -455,9 +453,9 @@ bool Vehicle::AddPassenger(Unit* unit, int8 seatId)
         init.SetTransportEnter();
         init.Launch();
 
-        // Transfer threat from passenger to vehicle
+        // Put the vehicle in combat with anything that was threatening the passenger; the threat itself stays on the passenger
         for (auto const& [guid, threatRef] : unit->GetThreatMgr().GetThreatenedByMeList())
-            threatRef->GetOwner()->GetThreatMgr().AddThreat(_me, threatRef->GetThreat(), nullptr, true, true);
+            threatRef->GetOwner()->GetThreatMgr().AddThreat(_me, 0.0f, nullptr, true, true);
 
         if (_me->IsCreature())
         {
@@ -503,6 +501,9 @@ void Vehicle::RemovePassenger(Unit* unit)
 
     seat->second.Passenger.Reset();
 
+    // RemoveCharmedBy() clears MOVEMENTFLAG_FLYING, so cache this before uncharm.
+    bool wasFlying = _me->IsFlying();
+
     if (_me->IsCreature() && unit->IsPlayer() && seat->second.SeatInfo->m_flags & VEHICLE_SEAT_FLAG_CAN_CONTROL)
         _me->RemoveCharmedBy(unit);
 
@@ -518,7 +519,7 @@ void Vehicle::RemovePassenger(Unit* unit)
     }
 
     // only for flyable vehicles
-    if (_me->IsFlying() && !_me->GetInstanceId() && unit->IsPlayer() && !(unit->ToPlayer()->GetDelayedOperations() & DELAYED_VEHICLE_TELEPORT) && _me->GetEntry() != 30275 /*NPC_WILD_WYRM*/)
+    if (wasFlying && !_me->GetInstanceId() && unit->IsPlayer() && !(unit->ToPlayer()->GetDelayedOperations() & DELAYED_VEHICLE_TELEPORT) && _me->GetEntry() != 30275 /*NPC_WILD_WYRM*/)
         _me->CastSpell(unit, VEHICLE_SPELL_PARACHUTE, true);
 
     if (_me->IsCreature())
