@@ -38,6 +38,15 @@ class SpellEvent;
 class ByteBuffer;
 class BasicEvent;
 
+namespace Acore
+{
+    enum class WorldObjectSpellAreaTargetSearchReason
+    {
+        Area,
+        Chain
+    };
+}
+
 #define SPELL_CHANNEL_UPDATE_INTERVAL (1 * IN_MILLISECONDS)
 #define TRAJECTORY_MISSILE_SIZE 3.0f
 
@@ -444,7 +453,7 @@ public:
     template<class SEARCHER> void SearchTargets(SEARCHER& searcher, uint32 containerMask, Unit* referer, Position const* pos, float radius);
 
     WorldObject* SearchNearbyTarget(float range, SpellTargetObjectTypes objectType, SpellTargetCheckTypes selectionType, ConditionList* condList = nullptr);
-    void SearchAreaTargets(std::list<WorldObject*>& targets, float range, Position const* position, Unit* referer, SpellTargetObjectTypes objectType, SpellTargetCheckTypes selectionType, ConditionList* condList);
+    void SearchAreaTargets(std::list<WorldObject*>& targets, float range, Position const* position, Unit* referer, SpellTargetObjectTypes objectType, SpellTargetCheckTypes selectionType, ConditionList* condList, Acore::WorldObjectSpellAreaTargetSearchReason searchReason = Acore::WorldObjectSpellAreaTargetSearchReason::Area);
     void SearchChainTargets(std::list<WorldObject*>& targets, uint32 chainTargets, WorldObject* target, SpellTargetObjectTypes objectType, SpellTargetCheckTypes selectType, SpellTargetSelectionCategories selectCategory, ConditionList* condList, bool isChainHeal);
 
     SpellCastResult prepare(SpellCastTargets const* targets, AuraEffect const* triggeredByAura = nullptr);
@@ -460,7 +469,7 @@ public:
     void TakeReagents();
     void TakeCastItem();
 
-    SpellCastResult CheckCast(bool strict);
+    SpellCastResult CheckCast(bool strict, uint32* param1 = nullptr, uint32* param2 = nullptr);
     SpellCastResult CheckPetCast(Unit* target);
 
     // handlers
@@ -472,7 +481,7 @@ public:
 
     void OnSpellLaunch();
 
-    SpellCastResult CheckItems();
+    SpellCastResult CheckItems(uint32* param1 = nullptr, uint32* param2 = nullptr);
     SpellCastResult CheckSpellFocus();
     SpellCastResult CheckRange(bool strict);
     SpellCastResult CheckPower();
@@ -827,8 +836,9 @@ namespace Acore
     {
         float _range;
         Position const* _position;
+        Acore::WorldObjectSpellAreaTargetSearchReason _searchReason;
         WorldObjectSpellAreaTargetCheck(float range, Position const* position, Unit* caster,
-                                        Unit* referer, SpellInfo const* spellInfo, SpellTargetCheckTypes selectionType, ConditionList* condList);
+                                        Unit* referer, SpellInfo const* spellInfo, SpellTargetCheckTypes selectionType, ConditionList* condList, Acore::WorldObjectSpellAreaTargetSearchReason searchReason = Acore::WorldObjectSpellAreaTargetSearchReason::Area);
         bool operator()(WorldObject* target);
     };
 

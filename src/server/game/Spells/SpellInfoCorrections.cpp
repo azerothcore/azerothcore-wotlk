@@ -562,11 +562,15 @@ void SpellMgr::LoadSpellInfoCorrections()
         20184,  // Judgement of Justice
         20185,  // Judgement of Light
         20186,  // Judgement of Wisdom
+        20267,  // Judgement of Light (triggered heal on attacker)
+        20268,  // Judgement of Wisdom (triggered mana on attacker)
         68055   // Judgements of the Just
         }, [](SpellInfo* spellInfo)
     {
         // hack for seal of light and few spells, judgement consists of few single casts and each of them can proc
         // some spell, base one has disabled proc flag but those dont have this flag
+        // 20267/20268 are passive proc effects from the judgement debuff; they must not cause the paladin's
+        // on-heal/on-cast procs (e.g. Soul Preserver, which has CAN_PROC_FROM_PROCS) to fire
         spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPPRESS_CASTER_PROCS;
     });
 
@@ -1064,6 +1068,8 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPPRESS_TARGET_PROCS;
         spellInfo->AttributesEx4 |= SPELL_ATTR4_DAMAGE_DOESNT_BREAK_AURAS;
+        // Explosion is AoE triggered on aura expiry - cannot be reflected (retail: Spell Reflection only works on single-target spells)
+        spellInfo->AttributesEx |= SPELL_ATTR1_NO_REFLECTION;
     });
 
     // Evocation
@@ -1499,7 +1505,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx3 |= SPELL_ATTR3_DOT_STACKING_RULE;
     });
 
-    // Activate Sunblade Protecto
+    // Activate Sunblade Protector
     ApplySpellFix({ 46475, 46476 }, [](SpellInfo* spellInfo)
     {
         spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(14); // 60yd
@@ -1523,7 +1529,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Speed = 8.0f;
     });
 
-    // Spell Absorption
+    // Shadowmoon Reaver - Spell Absorption
     ApplySpellFix({ 41034 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_2].Effect = SPELL_EFFECT_APPLY_AURA;
@@ -1532,12 +1538,13 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_2].MiscValue = SPELL_SCHOOL_MASK_MAGIC;
     });
 
-    // Shared Bonds
+    // Priestess of Delight and Priestess of Torment - Shared Bonds
     ApplySpellFix({ 41363 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx &= ~SPELL_ATTR1_IS_CHANNELED;
     });
 
+    // Illidari Council - Veras Darkshadow
     ApplySpellFix({
         41485,  // Deadly Poison
         41487   // Envenom
@@ -1546,26 +1553,33 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesEx6 |= SPELL_ATTR6_IGNORE_PHASE_SHIFT;
     });
 
-    // Parasitic Shadowfiend
+    // Illidan Stormrage - Parasitic Shadowfiend
     ApplySpellFix({ 41914 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Attributes |= SPELL_ATTR0_AURA_IS_DEBUFF;
         spellInfo->AttributesEx3 |= SPELL_ATTR3_DOT_STACKING_RULE;
     });
 
-    // Teleport Maiev
+    // Illidan Stormrage - Demon Fire
+    ApplySpellFix({ 40030 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
+        spellInfo->AttributesEx4 &= ~SPELL_ATTR4_NO_CAST_LOG;
+    });
+
+    // Illidan Stormrage - Teleport Maiev
     ApplySpellFix({ 41221 }, [](SpellInfo* spellInfo)
     {
         spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(13); // 0-50000yd
     });
 
-    // Watery Grave Explosion
+    // Morogrim Tidewalker - Watery Grave Explosion
     ApplySpellFix({ 37852 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx5 |= SPELL_ATTR5_ALLOW_WHILE_STUNNED;
     });
 
-    // Amplify Damage
+    // Prince Malchezaar - Amplify Damage
     ApplySpellFix({ 39095 }, [](SpellInfo* spellInfo)
     {
         spellInfo->MaxAffectedTargets = 1;
@@ -1578,6 +1592,7 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->AttributesCu |= SPELL_ATTR0_CU_SINGLE_AURA_STACK;
     });
 
+    // Archimonde
     ApplySpellFix({
         31984,  // Finger of Death
         35354   // Hand of Death
@@ -1587,10 +1602,16 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Attributes = SPELL_ATTR0_IS_ABILITY;
     });
 
-    // Finger of Death
+    // Archimonde - Finger of Death
     ApplySpellFix({ 32111 }, [](SpellInfo* spellInfo)
     {
         spellInfo->CastTimeEntry = sSpellCastTimesStore.LookupEntry(0); // We only need the animation, no damage
+    });
+
+    // Archimonde - Doomfire
+    ApplySpellFix({ 31944, 31969 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx4 |= SPELL_ATTR4_NO_CAST_LOG;
     });
 
     // Flame Breath, catapult spell
@@ -1686,12 +1707,6 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->Effects[0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ANY);
         spellInfo->Effects[0].TargetB = SpellImplicitTargetInfo();
-    });
-
-    // Flame Breath
-    ApplySpellFix({ 47592 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->Effects[EFFECT_0].Amplitude = 200;
     });
 
     // Skarvald, Charge
@@ -5074,7 +5089,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         // Eye of Acherus Flight (Boost)
     ApplySpellFix({ 51923 }, [](SpellInfo* spellInfo)
         {
-            spellInfo->Effects[EFFECT_0].ApplyAuraName = SPELL_AURA_MOD_INCREASE_FLIGHT_SPEED;
             spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
         });
 
@@ -5181,6 +5195,24 @@ void SpellMgr::LoadSpellInfoCorrections()
         }, [](SpellInfo* spellInfo)
     {
         spellInfo->InterruptFlags &= ~SPELL_INTERRUPT_FLAG_INTERRUPT;
+    });
+
+    // Twilight Torment
+    ApplySpellFix({ 57935, 58835 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->ProcCharges = 0;
+    });
+
+    // 54933 Hyldnir Harpoon
+    ApplySpellFix({ 54933 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].BasePoints = 1;
+    });
+
+    // 51036 Summon Venture Co. Air Patrol
+    ApplySpellFix({ 51036 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_CASTER);
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)

@@ -24,6 +24,7 @@
 #include "ObjectMgr.h"
 #include "Opcodes.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "ScriptMgr.h"
 #include "World.h"
 #include "WorldPacket.h"
@@ -127,6 +128,13 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
     if (itemsCount > MAX_AUCTION_ITEMS)
     {
         SendAuctionCommandResult(0, AUCTION_SELL_ITEM, ERR_AUCTION_DATABASE_ERROR);
+        recvData.rfinish();
+        return;
+    }
+
+    if (sWorld->getBoolConfig(CONFIG_TRIAL_RESTRICTION_AUCTION) && IsTrialAccount())
+    {
+        SendAuctionCommandResult(0, AUCTION_SELL_ITEM, ERR_AUCTION_RESTRICTED_ACCOUNT);
         recvData.rfinish();
         return;
     }
@@ -278,7 +286,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
                 return;
             }
 
-            CreatureTemplate const* auctioneerInfo = sObjectMgr->GetCreatureTemplate(auctioneerData->id1);
+            CreatureTemplate const* auctioneerInfo = sObjectMgr->GetCreatureTemplate(auctioneerData->id);
             if (!auctioneerInfo)
             {
                 LOG_ERROR("network.opcode", "Non existing auctioneer ({})", auctioneer.ToString());
@@ -321,7 +329,19 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
 
             SendAuctionCommandResult(AH->Id, AUCTION_SELL_ITEM, ERR_AUCTION_OK);
 
+            if (HasPermission(rbac::RBAC_PERM_LOG_GM_TRADE))
+            {
+                LOG_GM(GetAccountId(), "GM {} (Account: {}) created auction: {} (Item: {} Count: {}) Bid: {} Buyout: {}",
+                    _player->GetName(), GetAccountId(), AH->Id,
+                    item->GetTemplate()->Name1, item->GetCount(), bid, buyout);
+            }
+
             GetPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_CREATE_AUCTION, 1);
+
+            LOG_INFO("entities.player.auctionhouse", "AuctionHouse: Account: {} (IP: {}), Player [{}] (GUID: {}) created auction #{}: Item '{}' (Entry: {}) x{}, StartBid: {} copper, Buyout: {} copper, Deposit: {} copper",
+                GetAccountId(), GetRemoteAddress(), _player->GetName(), _player->GetGUID().GetCounter(), AH->Id,
+                item->GetTemplate()->Name1, item->GetEntry(), item->GetCount(), bid, buyout, deposit);
+
             return;
         }
         else // Required stack size of auction does not match to current item stack size, clone item and set correct stack size
@@ -383,7 +403,19 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recvData)
 
             SendAuctionCommandResult(AH->Id, AUCTION_SELL_ITEM, ERR_AUCTION_OK);
 
+            if (HasPermission(rbac::RBAC_PERM_LOG_GM_TRADE))
+            {
+                LOG_GM(GetAccountId(), "GM {} (Account: {}) created auction: {} (Item: {} Count: {}) Bid: {} Buyout: {}",
+                    _player->GetName(), GetAccountId(), AH->Id,
+                    newItem->GetTemplate()->Name1, newItem->GetCount(), bid, buyout);
+            }
+
             GetPlayer()->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_CREATE_AUCTION, 1);
+
+            LOG_INFO("entities.player.auctionhouse", "AuctionHouse: Account: {} (IP: {}), Player [{}] (GUID: {}) created auction #{}: Item '{}' (Entry: {}) x{}, StartBid: {} copper, Buyout: {} copper, Deposit: {} copper",
+                GetAccountId(), GetRemoteAddress(), _player->GetName(), _player->GetGUID().GetCounter(), AH->Id,
+                newItem->GetTemplate()->Name1, newItem->GetEntry(), newItem->GetCount(), bid, buyout, deposit);
+
             return;
         }
     }
@@ -400,6 +432,12 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket& recvData)
 
     if (!auctionId || !price)
         return;                                             //check for cheaters
+
+    if (sWorld->getBoolConfig(CONFIG_TRIAL_RESTRICTION_AUCTION) && IsTrialAccount())
+    {
+        SendAuctionCommandResult(0, AUCTION_PLACE_BID, ERR_AUCTION_RESTRICTED_ACCOUNT);
+        return;
+    }
 
     Creature* creature = GetPlayer()->GetNPCIfCanInteractWith(auctioneer, UNIT_NPC_FLAG_AUCTIONEER);
     if (!creature)
@@ -490,6 +528,17 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket& recvData)
         trans->Append(stmt);
 
         SendAuctionCommandResult(auction->Id, AUCTION_PLACE_BID, ERR_AUCTION_OK, 0);
+
+        if (HasPermission(rbac::RBAC_PERM_LOG_GM_TRADE))
+        {
+            LOG_GM(GetAccountId(), "GM {} (Account: {}) bid on auction: {} (Item: {} Count: {}) Bid: {}",
+                player->GetName(), GetAccountId(), auction->Id,
+                auction->item_template, auction->itemCount, price);
+        }
+
+        LOG_INFO("entities.player.auctionhouse", "AuctionHouse: Account: {} (IP: {}), Player [{}] (GUID: {}) placed bid on auction #{}: Item (Entry: {}) x{}, Bid: {} copper, Owner: {} (GUID: {})",
+            GetAccountId(), GetRemoteAddress(), player->GetName(), player->GetGUID().GetCounter(),
+            auction->Id, auction->item_template, auction->itemCount, price, auction->owner.GetCounter(), auction->owner.GetCounter());
     }
     else
     {
@@ -514,6 +563,17 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket& recvData)
 
         SendAuctionCommandResult(auction->Id, AUCTION_PLACE_BID, ERR_AUCTION_OK);
 
+        if (HasPermission(rbac::RBAC_PERM_LOG_GM_TRADE))
+        {
+            LOG_GM(GetAccountId(), "GM {} (Account: {}) bought out auction: {} (Item: {} Count: {}) Buyout: {}",
+                player->GetName(), GetAccountId(), auction->Id,
+                auction->item_template, auction->itemCount, auction->buyout);
+        }
+
+        LOG_INFO("entities.player.auctionhouse", "AuctionHouse: Account: {} (IP: {}), Player [{}] (GUID: {}) bought out auction #{}: Item (Entry: {}) x{}, Buyout: {} copper, Owner: {} (GUID: {})",
+            GetAccountId(), GetRemoteAddress(), player->GetName(), player->GetGUID().GetCounter(),
+            auction->Id, auction->item_template, auction->itemCount, auction->buyout, auction->owner.GetCounter(), auction->owner.GetCounter());
+
         auction->DeleteFromDB(trans);
 
         sAuctionMgr->RemoveAItem(auction->item_guid);
@@ -530,6 +590,12 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket& recvData)
     uint32 auctionId;
     recvData >> auctioneer;
     recvData >> auctionId;
+
+    if (sWorld->getBoolConfig(CONFIG_TRIAL_RESTRICTION_AUCTION) && IsTrialAccount())
+    {
+        SendAuctionCommandResult(0, AUCTION_CANCEL, ERR_AUCTION_RESTRICTED_ACCOUNT);
+        return;
+    }
 
     Creature* creature = GetPlayer()->GetNPCIfCanInteractWith(auctioneer, UNIT_NPC_FLAG_AUCTIONEER);
     if (!creature)
@@ -579,6 +645,10 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket& recvData)
 
     //inform player, that auction is removed
     SendAuctionCommandResult(auction->Id, AUCTION_CANCEL, ERR_AUCTION_OK);
+
+    LOG_INFO("entities.player.auctionhouse", "AuctionHouse: Account: {} (IP: {}), Player [{}] (GUID: {}) cancelled auction #{}: Item (Entry: {}) x{}, Buyout: {} copper",
+        GetAccountId(), GetRemoteAddress(), player->GetName(), player->GetGUID().GetCounter(),
+        auction->Id, auction->item_template, auction->itemCount, auction->buyout);
 
     // Now remove the auction
 

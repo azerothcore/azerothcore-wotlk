@@ -112,7 +112,10 @@ enum AcoreStrings
     LANG_PVPSTATS                       = 80,
     LANG_PVPSTATS_DISABLED              = 81,
     LANG_GENERIC_TWO_CURLIES_WITH_COLON = 82,
-    // Free 83 - 86
+    LANG_RBAC_HELP_ACC_LIST             = 83,
+    LANG_RBAC_HELP_ACC_GRANT            = 84,
+    LANG_RBAC_HELP_ACC_DENY             = 85,
+    LANG_RBAC_HELP_ACC_REVOKE           = 86,
 
     LANG_UNKNOWN_ERROR                  = 87,
     LANG_2FA_COMMANDS_NOT_SETUP         = 88,
@@ -815,6 +818,7 @@ enum AcoreStrings
     LANG_NO_REASON                      = 35407,
     LANG_UNAUTHORIZED                   = 35408,
     LANG_PINFO_CHR_MAP_WITH_AREA        = 35409,
+    LANG_PINFO_CHR_ONLINETIME           = 35410,
 
     LANG_CHARACTER_GENDER_MALE          = 855,
     LANG_CHARACTER_GENDER_FEMALE        = 856,
@@ -1194,7 +1198,43 @@ enum AcoreStrings
 
     LANG_RESETALL_HONOR                 = 5118,
     LANG_RESETALL_ARENA                 = 5119,
-    // Room for more strings    5120-9999
+
+    // Battlefield queue display (.bf queue)
+    LANG_BF_QUEUE_HDR_WAR               = 5120,
+    LANG_BF_QUEUE_HDR_WAIT              = 5121,
+    LANG_BF_QUEUE_TEAM_HDR              = 5122,
+    LANG_BF_QUEUE_PLAYER_QUEUE          = 5123,
+    LANG_BF_QUEUE_PLAYER_INVITED        = 5124,
+    LANG_BF_QUEUE_PLAYER_WAR            = 5125,
+
+    // Autobroadcast commands
+    LANG_AUTOBROADCAST_LIST_HEADER      = 5126,
+    LANG_AUTOBROADCAST_LIST_ENTRY       = 5127,
+    LANG_AUTOBROADCAST_LIST_EMPTY       = 5128,
+    LANG_AUTOBROADCAST_ADD_SUCCESS      = 5129,
+    LANG_AUTOBROADCAST_REMOVE_SUCCESS   = 5130,
+    LANG_AUTOBROADCAST_NOT_FOUND        = 5131,
+    LANG_AUTOBROADCAST_LOCALE_SUCCESS   = 5132,
+    LANG_AUTOBROADCAST_LOCALE_ENTRY     = 5133,
+    LANG_AUTOBROADCAST_INVALID_LOCALE   = 5134,
+
+    // Mail commands
+    LANG_MAIL_LIST_HEADER               = 5135,
+    LANG_MAIL_LIST_ENTRY                = 5136,
+    LANG_MAIL_LIST_EMPTY                = 5137,
+    LANG_MAIL_RETURN_SUCCESS            = 5138,
+    LANG_MAIL_RETURN_NOT_FOUND          = 5139,
+    LANG_MAIL_RETURN_NOT_NORMAL         = 5140,
+    LANG_MAIL_RETURN_NO_SENDER          = 5141,
+    LANG_MAIL_RETURN_ALREADY_RETURNED   = 5142,
+    LANG_MAIL_RETURN_HOOK_BLOCKED       = 5143,
+
+    // Chat filter
+    LANG_CHATFILTER_EMOTE               = 5144,
+    LANG_CHATFILTER_SAY                 = 5145,
+    LANG_CHATFILTER_YELL                = 5146,
+
+    // Room for more strings    5147-9999
 
     // Level requirement notifications
     LANG_SAY_REQ                        = 6604,
@@ -1382,6 +1422,101 @@ enum AcoreStrings
 
     LANG_DEBUG_LFG_ON                             = 30096,
     LANG_DEBUG_LFG_OFF                            = 30097,
-    LANG_DEBUG_LFG_CONF                           = 30098
+    LANG_DEBUG_LFG_CONF                           = 30098,
+
+    // debug loot command
+    LANG_DEBUG_LOOT_HEADER                        = 30099,
+    LANG_DEBUG_LOOT_ITEM                          = 30100,
+    LANG_DEBUG_LOOT_ITEM_QUEST                    = 30101,
+    LANG_DEBUG_LOOT_GOLD                          = 30102,
+    LANG_DEBUG_LOOT_EMPTY                         = 30103,
+    LANG_DEBUG_LOOT_INVALID_TYPE                  = 30104,
+    LANG_DEBUG_LOOT_NO_TEMPLATE                   = 30105,
+    LANG_DEBUG_LOOT_HEADER_MULTI                  = 30106,
+    LANG_DEBUG_LOOT_ITEM_MULTI                    = 30107,
+    LANG_DEBUG_LOOT_ITEM_QUEST_MULTI              = 30108,
+    LANG_DEBUG_LOOT_GOLD_MULTI                    = 30109,
+
+    // debug factionchange command (30110-30125)
+    LANG_DEBUG_FACTIONCHANGE_HEADER               = 30110,
+    LANG_DEBUG_FACTIONCHANGE_FLAG_FACTION          = 30111,
+    LANG_DEBUG_FACTIONCHANGE_FLAG_RACE             = 30112,
+    LANG_DEBUG_FACTIONCHANGE_FLAG_NONE             = 30113,
+    LANG_DEBUG_FACTIONCHANGE_GUILD_FAIL            = 30114,
+    LANG_DEBUG_FACTIONCHANGE_GUILD_OK              = 30115,
+    LANG_DEBUG_FACTIONCHANGE_ARENA_CAPTAIN_FAIL    = 30116,
+    LANG_DEBUG_FACTIONCHANGE_ARENA_CAPTAIN_OK      = 30117,
+    LANG_DEBUG_FACTIONCHANGE_MAIL_FAIL             = 30118,
+    LANG_DEBUG_FACTIONCHANGE_MAIL_OK               = 30119,
+    LANG_DEBUG_FACTIONCHANGE_AUCTION_FAIL          = 30120,
+    LANG_DEBUG_FACTIONCHANGE_AUCTION_OK            = 30121,
+    LANG_DEBUG_FACTIONCHANGE_GOLD_FAIL             = 30122,
+    LANG_DEBUG_FACTIONCHANGE_GOLD_OK               = 30123,
+    LANG_DEBUG_FACTIONCHANGE_GOLD_NOLIMIT          = 30124,
+    LANG_DEBUG_FACTIONCHANGE_NA                    = 30125,
+
+    // Achievement commands
+    LANG_ACHIEVEMENT_ADD_ONLINE                    = 30126,
+    LANG_ACHIEVEMENT_ADD_OFFLINE                   = 30127,
+
+    // Spawn group commands
+    LANG_SPAWNGROUP_SPAWN_SYSTEM_ERROR  = 35411,
+    LANG_SPAWNGROUP_SPAWN_SUCCESS       = 35412,
+    LANG_SPAWNGROUP_SPAWN_FAILED        = 35413,
+    LANG_SPAWNGROUP_DESPAWN_SYSTEM_ERROR = 35414,
+    LANG_SPAWNGROUP_DESPAWN_SUCCESS     = 35415,
+    LANG_SPAWNGROUP_DESPAWN_FAILED      = 35416,
+    LANG_LIST_RESPAWNS_CREATURE_HEADER  = 35419,
+    LANG_LIST_RESPAWNS_CREATURE_ENTRY   = 35420,
+    LANG_LIST_RESPAWNS_GO_HEADER        = 35421,
+    LANG_LIST_RESPAWNS_GO_ENTRY         = 35422,
+    LANG_LIST_RESPAWNS_LIMIT            = 35423,
+    LANG_SPAWNGROUP_NOT_FOUND           = 35424,
+
+    // Pool debug commands
+    LANG_POOL_NOT_FOUND                 = 35425,
+    LANG_POOL_INFO_HEADER               = 35426,
+    LANG_POOL_INFO_MEMBERS_HEADER       = 35427,
+    LANG_POOL_INFO_MEMBER               = 35428,
+    LANG_POOL_INFO_SUBPOOLS_HEADER      = 35429,
+    LANG_POOL_INFO_SUBPOOL              = 35430,
+    LANG_POOL_LOOKUP_IN_POOL            = 35431,
+    LANG_POOL_LOOKUP_NOT_IN_POOL        = 35432,
+    LANG_POOL_LOOKUP_USE_INFO           = 35433,
+    LANG_POOL_LOOKUP_NOTARGET           = 35434,
+
+    // Pet list command
+    LANG_PET_LIST_HEADER                = 35435,
+    LANG_PET_LIST_ENTRY                 = 35436,
+    LANG_PET_LIST_EMPTY                 = 35437,
+
+    // Pet delete command
+    LANG_PET_DELETE_NOT_FOUND           = 35438,
+    LANG_PET_DELETE_SUCCESS             = 35439,
+
+    LANG_CHARACTER_DELETED_LIST_LIMIT   = 35440,
+
+    // Respawn creature/gameobject by spawn GUID commands
+    LANG_RESPAWN_GUID_CREATURE_NOT_FOUND    = 35441,
+    LANG_RESPAWN_GUID_MAP_NOT_LOADED        = 35442,
+    LANG_RESPAWN_GUID_CREATURE_ALIVE        = 35443,
+    LANG_RESPAWN_GUID_CREATURE_QUEUED       = 35444,
+    LANG_RESPAWN_GUID_GAMEOBJECT_ACTIVE     = 35445,
+    LANG_RESPAWN_GUID_GAMEOBJECT_QUEUED     = 35446,
+    // 35447 is reserved for LANG_LIST_RESPAWNS_NO_MAP (list respawns command, defined at the end of this enum)
+    LANG_RESPAWN_GUID_GAMEOBJECT_NOT_FOUND  = 35448,
+
+    // Respawn creature/gameobject by entry commands
+    LANG_RESPAWN_ENTRY_CREATURE_NOT_FOUND    = 35449,
+    LANG_RESPAWN_ENTRY_GAMEOBJECT_NOT_FOUND  = 35450,
+    LANG_RESPAWN_ENTRY_CREATURE_QUEUED       = 35451,
+    LANG_RESPAWN_ENTRY_GAMEOBJECT_QUEUED     = 35452,
+
+    // List respawns console support
+    LANG_LIST_RESPAWNS_NO_MAP           = 35447,
+
+    // Pet rename command
+    LANG_PET_RENAME_INVALID             = 35453,
+    LANG_PET_RENAME_SUCCESS             = 35454
 };
 #endif

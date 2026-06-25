@@ -20,9 +20,13 @@
 
 void AbstractFollower::SetTarget(Unit* unit)
 {
-    if (unit == GetTarget())
+    if (unit == _target)
         return;
 
-    i_target.link(unit, this);
-    _target = i_target.getTarget();
+    if (_target)
+        _target->FollowerRemoved(this);
+
+    _target = unit;
+    if (_target)
+        _target->FollowerAdded(this);
 }
