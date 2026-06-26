@@ -2322,10 +2322,10 @@ public:
         void ScheduleCombatEvents()
         {
             _events.Reset();
-            _events.ScheduleEvent(EVENT_HEROIC_LEAP, 20s, 30s);
-            _events.ScheduleEvent(EVENT_WHIRLWIND, 60s, 90s);
-            _events.ScheduleEvent(EVENT_FROSTBOLT, 20s, 25s);
-            _events.ScheduleEvent(EVENT_BLIZZARD, 15s, 25s);
+            _events.ScheduleEvent(EVENT_HEROIC_LEAP, 10s);
+            _events.ScheduleEvent(EVENT_WHIRLWIND, 15s);
+            _events.ScheduleEvent(EVENT_FROSTBOLT, 2s);
+            _events.ScheduleEvent(EVENT_BLIZZARD, 7s, 8s);
             if (_chillActive)
                 _events.ScheduleEvent(EVENT_CHILL_RUN, 3s, 5s);
         }
@@ -2373,6 +2373,8 @@ public:
             _events.Reset();
 
             me->AttackStop();
+            me->InterruptNonMeleeSpells(true);
+            me->RemoveAurasDueToSpell(SPELL_WHIRLWIND);
             me->GetMotionMaster()->Clear();
             me->GetMotionMaster()->MoveIdle();
             me->SetReactState(REACT_PASSIVE);
@@ -2407,7 +2409,7 @@ public:
             if (_phase == PHASE_INTERLUDE)
                 return;
 
-            if (_phase == PHASE_RESUME && RepullNearbyPlayers())
+            if ((_phase == PHASE_ONE || _phase == PHASE_RESUME) && RepullNearbyPlayers())
                 return;
 
             ScriptedAI::EnterEvadeMode(why);
@@ -2460,22 +2462,26 @@ public:
                 switch (eventId)
                 {
                     case EVENT_HEROIC_LEAP:
-                        if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 40.0f, true))
-                            DoCast(target, SPELL_HEROIC_LEAP);
-                        _events.Repeat(25s, 32s);
+                        if (Unit* victim = me->GetVictim())
+                        {
+                            float const dist = me->GetDistance(victim);
+                            if (dist >= 8.0f && dist <= 25.0f)
+                                me->CastSpell(victim, SPELL_HEROIC_LEAP, TRIGGERED_IGNORE_POWER_AND_REAGENT_COST);
+                        }
+                        _events.Repeat(10s);
                         break;
                     case EVENT_WHIRLWIND:
-                        DoCastSelf(SPELL_WHIRLWIND);
-                        _events.Repeat(60s, 90s);
+                        me->CastSpell(me, SPELL_WHIRLWIND, TRIGGERED_IGNORE_POWER_AND_REAGENT_COST);
+                        _events.Repeat(30s);
                         break;
                     case EVENT_FROSTBOLT:
                         DoCastVictim(SPELL_FROSTBOLT);
-                        _events.Repeat(25s, 30s);
+                        _events.Repeat(8s);
                         break;
                     case EVENT_BLIZZARD:
                         if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
-                            DoCast(target, SPELL_BLIZZARD);
-                        _events.Repeat(25s, 35s);
+                            me->CastSpell(target, SPELL_BLIZZARD, TRIGGERED_IGNORE_POWER_AND_REAGENT_COST);
+                        _events.Repeat(15s);
                         break;
                     case EVENT_CHILL_RUN:
                         if (Creature* safirdrang = me->FindNearestCreature(NPC_SAFIRDRANG, 200.0f))

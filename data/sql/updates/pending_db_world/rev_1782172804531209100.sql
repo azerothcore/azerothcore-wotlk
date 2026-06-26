@@ -3,20 +3,20 @@
 -- Safirdrang (NPC 31050) and hidden Chill target stalkers (NPC 31077)
 
 UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_overthane',
-    `unit_flags`=33088, `CreatureImmunitiesId`=31016 WHERE `entry`=31016;
+    `unit_flags`= 33088, `CreatureImmunitiesId`= 31016, `ManaModifier`= 2 WHERE `entry`= 31016;
 UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_safirdrang',
-    `unit_flags`=256 WHERE `entry`=31050;
-UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_elite' WHERE `entry`=31030;
+    `unit_flags`= 256, `ManaModifier`= 2 WHERE `entry`= 31050;
+UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_elite' WHERE `entry`= 31030;
 UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_vardmadra',
-    `unit_flags`=33536 WHERE `entry`=31029;
-UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_nightswood' WHERE `entry`=31087;
+    `unit_flags`= 33536 WHERE `entry`= 31029;
+UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_nightswood' WHERE `entry`= 31087;
 UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_lich_king',
-    `unit_flags`=768 WHERE `entry`=31083;
+    `unit_flags`= 768 WHERE `entry`= 31083;
 UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_chill_target',
-    `unit_flags`=33555200 WHERE `entry`=31077;
+    `unit_flags`= 33555200 WHERE `entry`= 31077;
 
 -- Overthane Balargarde (NPC 31016) CC immunity
-DELETE FROM `creature_immunities` WHERE `ID`=31016;
+DELETE FROM `creature_immunities` WHERE `ID`= 31016;
 INSERT INTO `creature_immunities` (`ID`, `SchoolMask`, `DispelTypeMask`, `MechanicsMask`, `Effects`, `Auras`, `ImmuneAoE`, `ImmuneChain`, `Comment`) VALUES
 (31016, 0, 0, 1301708534, '', '', 0, 0, 'Overthane Balargarde - Banshees Revenge boss crowd-control immunity');
 
