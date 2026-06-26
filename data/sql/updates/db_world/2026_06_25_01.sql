@@ -601,7 +601,7 @@ WITH `mk` AS (
                 WHEN `position_y` >= 1096 THEN 'front'
                 ELSE 'mid' END AS band
     FROM `creature`
-    WHERE `map` = 530 AND `id1` = 19179
+    WHERE `map` = 530 AND `id` = 19179
       AND `position_x` BETWEEN -280 AND -220 AND `position_y` BETWEEN 1065 AND 1100
 ), `platrk` AS (
     SELECT `guid`, x, side,
@@ -614,20 +614,20 @@ WITH `mk` AS (
 ), `mkn` AS (
     SELECT `guid`, side, role, ROW_NUMBER() OVER (PARTITION BY side, role ORDER BY x) AS rn FROM `mkrole`
 ), `un` AS (
-    SELECT `guid`, `id1`, `position_x` AS x,
+    SELECT `guid`, `id`, `position_x` AS x,
            CASE WHEN `position_x` <= -250 THEN 'A' ELSE 'H' END AS side,
-           CASE `id1`
+           CASE `id`
                 WHEN 18948 THEN 'front' WHEN 18986 THEN 'mid' WHEN 18965 THEN 'ramp'
                 WHEN 18949 THEN 'mage'  WHEN 18966 THEN 'cmd'
                 WHEN 18950 THEN 'front' WHEN 18972 THEN 'mid' WHEN 18970 THEN 'ramp'
                 WHEN 18971 THEN 'mage'  WHEN 18969 THEN 'cmd' END AS role
     FROM `creature`
     WHERE `map` = 530
-      AND `id1` IN (18948,18986,18965,18949,18966,18950,18972,18970,18971,18969)
+      AND `id` IN (18948,18986,18965,18949,18966,18950,18972,18970,18971,18969)
       AND `position_x` BETWEEN -290 AND -210 AND `position_y` BETWEEN 1065 AND 1105
 ), `unflt` AS (
     -- drop the lone boundary grunt on the Alliance side (no Horde-melee marker there)
-    SELECT * FROM `un` WHERE NOT (`id1` = 18950 AND side = 'A')
+    SELECT * FROM `un` WHERE NOT (`id` = 18950 AND side = 'A')
 ), `unn` AS (
     SELECT `guid`, side, role, ROW_NUMBER() OVER (PARTITION BY side, role ORDER BY x) AS rn FROM `unflt`
 )
@@ -644,14 +644,14 @@ DELETE FROM `creature_formations`
 WHERE `memberGUID` IN (
     SELECT `guid` FROM `creature`
     WHERE `map` = 530
-      AND `id1` IN (18948,18949,18950,18965,18966,18969,18970,18971,18972,18986)
+      AND `id` IN (18948,18949,18950,18965,18966,18969,18970,18971,18972,18986)
       AND `position_x` BETWEEN -290 AND -210 AND `position_y` BETWEEN 1065 AND 1105
 );
 
 DELETE FROM `creature_formations`
 WHERE `leaderGUID` IN (
     SELECT `guid` FROM `creature`
-    WHERE `map` = 530 AND `id1` = 19179
+    WHERE `map` = 530 AND `id` = 19179
       AND `position_x` BETWEEN -280 AND -220 AND `position_y` BETWEEN 1065 AND 1100
 );
 
@@ -877,7 +877,7 @@ SET `map` = 530,
     `MovementType` = 0,
     `curhealth` = 143620,
     `Comment` = 'GUID SAI'
-WHERE `guid` = 68311 AND `id1` = 19005;
+WHERE `guid` = 68311 AND `id` = 19005;
 
 UPDATE `creature`
 SET `map` = 530,
@@ -894,7 +894,7 @@ SET `map` = 530,
     `MovementType` = 0,
     `curhealth` = 143620,
     `Comment` = 'GUID SAI'
-WHERE `guid` = 68312 AND `id1` = 19005;
+WHERE `guid` = 68312 AND `id` = 19005;
 
 UPDATE `creature`
 SET `map` = 530,
@@ -911,7 +911,7 @@ SET `map` = 530,
     `MovementType` = 0,
     `curhealth` = 143620,
     `Comment` = 'GUID SAI'
-WHERE `guid` = 68313 AND `id1` = 19005;
+WHERE `guid` = 68313 AND `id` = 19005;
 
 UPDATE `creature`
 SET `map` = 530,
@@ -928,7 +928,7 @@ SET `map` = 530,
     `MovementType` = 0,
     `curhealth` = 143620,
     `Comment` = 'GUID SAI'
-WHERE `guid` = 68314 AND `id1` = 19005;
+WHERE `guid` = 68314 AND `id` = 19005;
 
 -- Keep the four existing GUID SAI packages wired to the right timed scripts.
 UPDATE `smart_scripts` SET `action_param2` = 68311
@@ -1055,7 +1055,7 @@ WHERE `source_type` = 0
 UPDATE `creature`
 SET `spawntimesecs` = 0
 WHERE `map` = 530
-  AND `id1` IN (18948, 18949, 18950, 18965, 18966, 18969, 18970, 18971, 18972, 18986);
+  AND `id` IN (18948, 18949, 18950, 18965, 18966, 18969, 18970, 18971, 18972, 18986);
 
 DELETE FROM `smart_scripts`
 WHERE `source_type` = 0
