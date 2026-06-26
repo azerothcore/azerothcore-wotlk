@@ -940,6 +940,11 @@ bool Player::UpdateSkillPro(uint16 SkillId, int32 Chance, uint32 step)
     if (!MaxValue || !SkillValue || SkillValue >= MaxValue)
         return false;
 
+    // Trial account trade-skill cap (0 disables the cap)
+    if (uint32 trialSkillCap = sWorld->getIntConfig(CONFIG_TRIAL_TRADE_SKILL_CAP))
+        if (GetSession()->IsTrialAccount() && SkillValue >= trialSkillCap)
+            return false;
+
     int32 Roll = irand(1, 1000);
 
     if (Roll <= Chance)

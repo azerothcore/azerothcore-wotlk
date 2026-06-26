@@ -1423,7 +1423,7 @@ void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
             dynamicflags = 0;
     }
 
-    data.id1 = GetEntry();
+    data.id = GetEntry();
     data.mapid = mapid;
     data.phaseMask = phaseMask;
     data.displayid = displayId;
@@ -1469,8 +1469,6 @@ void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
     stmt = WorldDatabase.GetPreparedStatement(WORLD_INS_CREATURE);
     stmt->SetData(index++, m_spawnId);
     stmt->SetData(index++, GetEntry());
-    stmt->SetData(index++, 0);
-    stmt->SetData(index++, 0);
     stmt->SetData(index++, uint16(mapid));
     stmt->SetData(index++, spawnMask);
     stmt->SetData(index++, GetPhaseMask());
@@ -1725,7 +1723,7 @@ bool Creature::LoadCreatureFromDB(ObjectGuid::LowType spawnId, Map* map, bool ad
         || !groupData || (groupData->flags & SPAWNGROUP_FLAG_COMPATIBILITY_MODE);
 
     // Add to world
-    uint32 entry = GetRandomId(data->id1, data->id2, data->id3);
+    uint32 entry = GetRandomId(data->id, data->id2, data->id3);
 
     if (!Create(map->GenerateLowGuid<HighGuid::Unit>(), map, data->phaseMask, entry, 0, data->posX, data->posY, data->posZ, data->orientation, data))
         return false;
@@ -1849,6 +1847,10 @@ void Creature::DeleteFromDB()
     trans->Append(stmt);
 
     stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_CREATURE_ADDON);
+    stmt->SetData(0, m_spawnId);
+    trans->Append(stmt);
+
+    stmt = WorldDatabase.GetPreparedStatement(WORLD_DEL_CREATURE_MULTISPAWN);
     stmt->SetData(0, m_spawnId);
     trans->Append(stmt);
 
@@ -2041,7 +2043,7 @@ void Creature::Respawn(bool force)
     if (!allowed && !force) // Will be rechecked on next Update call
         return;
 
-    ObjectGuid dbtableHighGuid = ObjectGuid::Create<HighGuid::Unit>(m_creatureData ? m_creatureData->id1 : GetEntry(), m_spawnId);
+    ObjectGuid dbtableHighGuid = ObjectGuid::Create<HighGuid::Unit>(m_creatureData ? m_creatureData->id : GetEntry(), m_spawnId);
     time_t linkedRespawntime = GetMap()->GetLinkedRespawnTime(dbtableHighGuid);
 
     CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(GetEntry());
@@ -2061,7 +2063,7 @@ void Creature::Respawn(bool force)
                     // Respawn check if spawn has 2 entries
                     if (data->id2)
                     {
-                        uint32 entry = GetRandomId(data->id1, data->id2, data->id3);
+                        uint32 entry = GetRandomId(data->id, data->id2, data->id3);
                         UpdateEntry(entry, data, true);  // Select Random Entry
                         m_defaultMovementType = MovementGeneratorType(data->movementType);                    // Reload Movement Type
                         LoadEquipment(data->equipmentId);                                                     // Reload Equipment
@@ -3169,7 +3171,7 @@ uint32 Creature::GetScriptId() const
     if (CreatureData const* creatureData = GetCreatureData())
     {
         uint32 scriptId = creatureData->ScriptId;
-        if (scriptId && GetEntry() == creatureData->id1)
+        if (scriptId && GetEntry() == creatureData->id)
             return scriptId;
     }
 

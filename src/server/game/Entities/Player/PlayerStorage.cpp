@@ -4726,7 +4726,7 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                 {
                     WeaponAttackType const attackType = Player::GetAttackBySlot(item->GetSlot());
                     if (attackType != MAX_ATTACK)
-                        UpdateDamageDoneMods(attackType);
+                        UpdateDamageDoneMods(attackType, apply ? -1 : slot);
                     break;
                 }
                 case ITEM_ENCHANTMENT_TYPE_USE_SPELL:

@@ -34,6 +34,7 @@
 #include "Opcodes.h"
 #include "Player.h"
 #include "ScriptMgr.h"
+#include "SocialMgr.h"
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
 #include "Util.h"
@@ -110,6 +111,18 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
             recvData.rfinish();
             return;
         }
+    }
+
+    // Trial accounts cannot speak in chat channels or guild/officer chat. Whisper is handled later.
+    // Addon traffic (LANG_ADDON) is excluded; it carries the Warden Lua check response over guild chat.
+    if (sWorld->getBoolConfig(CONFIG_TRIAL_RESTRICTION_CHAT) && IsTrialAccount() && lang != LANG_ADDON
+        && (type == CHAT_MSG_CHANNEL || type == CHAT_MSG_GUILD || type == CHAT_MSG_OFFICER))
+    {
+        WorldPacket data;
+        ChatHandler::BuildChatPacket(data, CHAT_MSG_RESTRICTED, LANG_UNIVERSAL, sender, sender, "");
+        SendPacket(&data);
+        recvData.rfinish();
+        return;
     }
 
     // pussywizard: chatting on most chat types requires 2 hours played to prevent spam/abuse
@@ -401,6 +414,17 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                     return;
                 }
 
+                // Trial accounts can only whisper players who have them on their friend list, or players who whispered them first.
+                if (sWorld->getBoolConfig(CONFIG_TRIAL_RESTRICTION_CHAT) && IsTrialAccount() && receiver != sender
+                    && !receiver->GetSocial()->HasFriend(sender->GetGUID())
+                    && !sender->IsInWhisperWhiteList(receiver->GetGUID()))
+                {
+                    WorldPacket data;
+                    ChatHandler::BuildChatPacket(data, CHAT_MSG_RESTRICTED, LANG_UNIVERSAL, sender, sender, "");
+                    SendPacket(&data);
+                    return;
+                }
+
                 if (!sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHAT) && senderIsPlayer && receiverIsPlayer)
                     if (GetPlayer()->GetTeamId() != receiver->GetTeamId())
                     {
@@ -419,6 +443,10 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recvData)
                 if (receiver->GetLevel() < sWorld->getIntConfig(CONFIG_CHAT_WHISPER_LEVEL_REQ) ||
                     (HasPermission(rbac::RBAC_PERM_CAN_FILTER_WHISPERS) && !sender->isAcceptWhispers() && !sender->IsInWhisperWhiteList(receiver->GetGUID())))
                     sender->AddWhisperWhiteList(receiver->GetGUID());
+
+                // Allow a trial-account recipient to whisper back without being on the sender's friend list.
+                if (receiver->GetSession()->IsTrialAccount() && !receiver->IsInWhisperWhiteList(sender->GetGUID()))
+                    receiver->AddWhisperWhiteList(sender->GetGUID());
 
                 GetPlayer()->Whisper(msg, Language(lang), receiver);
             }
