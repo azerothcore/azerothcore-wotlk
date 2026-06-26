@@ -1445,22 +1445,39 @@ class spell_vehicle_grab_pyrite : public SpellScript
 
     void HandleScript(SpellEffIndex  /*effIndex*/)
     {
-        if (Unit* target = GetHitUnit())
-            if (Unit* seat = GetCaster()->GetVehicleBase())
+        Unit* target = GetHitUnit();
+        if (!target)
+            return;
+
+        // The grabbing vehicle: the demolisher's mechanic seat, or the chopper itself.
+        Unit* seat = GetCaster()->GetVehicleBase();
+        if (!seat)
+            return;
+
+        if (Vehicle* vehicle = seat->GetVehicleKit())
+            if (Unit* passenger = vehicle->GetPassenger(1))
             {
-                if (Vehicle* vehicle = seat->GetVehicleKit())
-                    if (Unit* pyrite = vehicle->GetPassenger(1))
-                        pyrite->ExitVehicle();
+                // On the chopper the rear seat may carry a player; never eject them to grab.
+                if (passenger->IsPlayer())
+                    return;
 
-                if (Unit* parent = seat->GetVehicleBase())
-                {
-                    GetCaster()->CastSpell(parent, SPELL_ADD_PYRITE, true);
-                    target->CastSpell(seat, GetEffectValue());
-
-                    if (target->IsCreature())
-                        target->ToCreature()->DespawnOrUnsummon(1300ms);
-                }
+                passenger->ExitVehicle();
             }
+
+        if (Unit* parent = seat->GetVehicleBase())
+        {
+            // Demolisher: the seat is mounted on a parent vehicle that the pyrite fuels.
+            GetCaster()->CastSpell(parent, SPELL_ADD_PYRITE, true);
+            target->CastSpell(seat, GetEffectValue());
+
+            if (target->IsCreature())
+                target->ToCreature()->DespawnOrUnsummon(1300ms);
+        }
+        else
+        {
+            // Chopper: load the crate into the rear seat so it can be ferried to other vehicles.
+            target->CastSpell(seat, GetEffectValue());
+        }
     }
 
     void Register() override
