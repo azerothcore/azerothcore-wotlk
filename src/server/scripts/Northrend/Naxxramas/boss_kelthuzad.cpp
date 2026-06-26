@@ -401,15 +401,17 @@ public:
                 case EVENT_DETONATE_MANA:
                     {
                         std::vector<Unit*> unitList;
-                        ThreatContainer::StorageType const& threatList = me->GetThreatMgr().GetThreatList();
-                        for (auto itr : threatList)
+                        for (ThreatReference const* ref : me->GetThreatMgr().GetUnsortedThreatList())
                         {
-                            if (itr->getTarget()->IsPlayer()
-                                    && itr->getTarget()->getPowerType() == POWER_MANA
-                                    && itr->getTarget()->GetPower(POWER_MANA))
-                                    {
-                                        unitList.push_back(itr->getTarget());
-                                    }
+                            if (Unit* target = ref->GetVictim())
+                            {
+                                if (target->IsPlayer()
+                                        && target->getPowerType() == POWER_MANA
+                                        && target->GetPower(POWER_MANA))
+                                {
+                                    unitList.push_back(target);
+                                }
+                            }
                         }
                         if (!unitList.empty())
                         {
@@ -678,10 +680,34 @@ class spell_kelthuzad_detonate_mana_aura : public AuraScript
     }
 };
 
+class spell_kelthuzad_void_blast : public SpellScript
+{
+    PrepareSpellScript(spell_kelthuzad_void_blast);
+
+    void HandleAfterHit()
+    {
+        Player* player = GetHitPlayer();
+        if (!player)
+            return;
+
+        if (player->IsAlive())
+            return;
+
+        if (InstanceScript* instance = player->GetInstanceScript())
+            instance->StorePersistentData(PERSISTENT_DATA_IMMORTAL_FAIL, 1);
+    }
+
+    void Register() override
+    {
+        AfterHit += SpellHitFn(spell_kelthuzad_void_blast::HandleAfterHit);
+    }
+};
+
 void AddSC_boss_kelthuzad()
 {
     new boss_kelthuzad();
     new boss_kelthuzad_minion();
     RegisterSpellScript(spell_kelthuzad_frost_blast);
     RegisterSpellScript(spell_kelthuzad_detonate_mana_aura);
+    RegisterSpellScript(spell_kelthuzad_void_blast);
 }

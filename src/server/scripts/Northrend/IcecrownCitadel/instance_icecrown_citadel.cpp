@@ -539,7 +539,7 @@ public:
 
         uint32 GetCreatureEntry(ObjectGuid::LowType /*guidLow*/, CreatureData const* data) override
         {
-            uint32 entry = data->id1;
+            uint32 entry = data->id;
             switch (entry)
             {
                 case NPC_HORDE_GUNSHIP_CANNON:
@@ -1421,10 +1421,8 @@ public:
 
         bool CheckRequiredBosses(uint32 bossId, Player const* player) const override
         {
-            if (player && player->GetSession() && player->GetSession()->GetSecurity() >= SEC_MODERATOR)
-            {
+            if (_SkipCheckRequiredBosses(player))
                 return true;
-            }
 
             switch (bossId)
             {

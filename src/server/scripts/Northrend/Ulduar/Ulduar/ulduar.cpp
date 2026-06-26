@@ -137,7 +137,13 @@ public:
             if (spellInfo->Id == SPELL_TELEPORT)
             {
                 me->DespawnOrUnsummon();
-                me->GetInstanceScript()->SetData(TYPE_WATCHERS, _keeper);
+                InstanceScript* instance = me->GetInstanceScript();
+                uint32 mask = instance->GetPersistentData(
+                    PERSISTENT_DATA_WATCHERS_MASK);
+                instance->StorePersistentData(
+                    PERSISTENT_DATA_WATCHERS_MASK,
+                    mask | (1 << _keeper));
+                instance->SetData(EVENT_KEEPER_TELEPORTED, 0);
             }
         }
 

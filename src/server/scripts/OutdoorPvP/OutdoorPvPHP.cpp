@@ -16,7 +16,6 @@
  */
 
 #include "OutdoorPvPHP.h"
-#include "CreatureScript.h"
 #include "Language.h"
 #include "MapMgr.h"
 #include "ObjectMgr.h"

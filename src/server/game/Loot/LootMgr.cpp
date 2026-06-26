@@ -405,10 +405,10 @@ LootItem::LootItem(LootStoreItem const& li)
     randomSuffix = GenerateEnchSuffixFactor(itemid);
     randomPropertyId = Item::GenerateItemRandomPropertyId(itemid);
     count = 0;
-    is_looted = 0;
-    is_blocked = 0;
-    is_underthreshold = 0;
-    is_counted = 0;
+    is_looted = false;
+    is_blocked = false;
+    is_underthreshold = false;
+    is_counted = false;
     rollWinnerGUID = ObjectGuid::Empty;
     groupid = li.groupid;
 }
@@ -418,83 +418,52 @@ bool LootItem::AllowedForPlayer(Player const* player, ObjectGuid source) const
 {
     ItemTemplate const* pProto = sObjectMgr->GetItemTemplate(itemid);
     if (!pProto)
-    {
         return false;
-    }
 
     if (sDisableMgr->IsDisabledFor(DISABLE_TYPE_LOOT, itemid, nullptr))
-    {
         return false;
-    }
 
-    bool isMasterLooter = player->GetGroup() && player->GetGroup()->GetMasterLooterGuid() == player->GetGUID();
-    bool itemVisibleForMasterLooter = !needs_quest && (!follow_loot_rules || !is_underthreshold);
-
-    // DB conditions check
     if (!sConditionMgr->IsObjectMeetToConditions(const_cast<Player*>(player), conditions))
-    {
-        // Master Looter can see conditioned recipes
-        if (isMasterLooter && itemVisibleForMasterLooter)
-        {
-            if (pProto->HasFlag(ITEM_FLAG_HIDE_UNUSABLE_RECIPE) || (pProto->Class == ITEM_CLASS_RECIPE && pProto->Bonding == BIND_WHEN_PICKED_UP && pProto->Spells[1].SpellId != 0))
-            {
-                return true;
-            }
-        }
-
         return false;
-    }
 
     // not show loot for not own team
     if (pProto->HasFlag2(ITEM_FLAG2_FACTION_HORDE) && player->GetTeamId(true) != TEAM_HORDE)
-    {
         return false;
-    }
 
     if (pProto->HasFlag2(ITEM_FLAG2_FACTION_ALLIANCE) && player->GetTeamId(true) != TEAM_ALLIANCE)
-    {
         return false;
-    }
 
-    // Master looter can see all items even if the character can't loot them
-    if (isMasterLooter && itemVisibleForMasterLooter)
-    {
-        return true;
-    }
-
-    // Don't allow loot for players without profession or those who already know the recipe
+    // profession / recipe checks
     if (pProto->HasFlag(ITEM_FLAG_HIDE_UNUSABLE_RECIPE) && (!player->HasSkill(pProto->RequiredSkill) || player->HasSpell(pProto->Spells[1].SpellId)))
-    {
         return false;
-    }
 
-    // Don't allow to loot soulbound recipes that the player has already learned
     if (pProto->Class == ITEM_CLASS_RECIPE && pProto->Bonding == BIND_WHEN_PICKED_UP && pProto->Spells[1].SpellId != 0 && player->HasSpell(pProto->Spells[1].SpellId))
-    {
         return false;
-    }
 
     // check quest requirements
     if (!pProto->HasFlagCu(ITEM_FLAGS_CU_IGNORE_QUEST_STATUS))
     {
-        //  Don't drop quest items if the player is missing the relevant quest
         if (needs_quest && !player->HasQuestForItem(itemid))
             return false;
 
-        // for items that start quests
+        // Hide quest starter items when quest is already started/rewarded,
+        // when unique count is already reached, or when prerequisite is missing.
         if (pProto->StartQuest)
         {
-            // Don't drop the item if the player has already finished the quest OR player already has the item in their inventory, and that item is unique OR the player has not finished a prerequisite quest
-            uint32 prevQuestId = sObjectMgr->GetQuestTemplate(pProto->StartQuest) ? sObjectMgr->GetQuestTemplate(pProto->StartQuest)->GetPrevQuestId() : 0;
-            if (player->GetQuestStatus(pProto->StartQuest) != QUEST_STATUS_NONE || (player->HasItemCount(itemid, pProto->MaxCount) && pProto->MaxCount) || (prevQuestId && !player->GetQuestRewardStatus(prevQuestId)))
+            uint32 prevQuestId = 0;
+            if (Quest const* startQuest = sObjectMgr->GetQuestTemplate(pProto->StartQuest))
+                prevQuestId = startQuest->GetPrevQuestId();
+
+            if (player->GetQuestStatus(pProto->StartQuest) != QUEST_STATUS_NONE ||
+                player->GetQuestRewardStatus(pProto->StartQuest) ||
+                (pProto->MaxCount && player->HasItemCount(itemid, pProto->MaxCount, true)) ||
+                (prevQuestId && !player->GetQuestRewardStatus(prevQuestId)))
                 return false;
         }
     }
 
     if (!sScriptMgr->OnAllowedForPlayerLootCheck(player, source))
-    {
         return false;
-    }
 
     return true;
 }
@@ -691,7 +660,7 @@ QuestItemList* Loot::FillQuestLoot(Player* player)
 
     QuestItemList* ql = new QuestItemList();
 
-    Player* lootOwner = (roundRobinPlayer) ? ObjectAccessor::FindPlayer(roundRobinPlayer) : player;
+    bool isMasterLooter = player->GetGroup() && player->GetGroup()->GetLootMethod() == MASTER_LOOT && player->GetGroup()->GetMasterLooterGuid() == player->GetGUID();
 
     for (uint8 i = 0; i < quest_items.size(); ++i)
     {
@@ -699,32 +668,33 @@ QuestItemList* Loot::FillQuestLoot(Player* player)
 
         sScriptMgr->OnPlayerBeforeFillQuestLootItem(player, item);
 
-        // Quest item is not free for all and is already assigned to another player
-        // or player doesn't need it
-        if (item.is_blocked || !item.AllowedForPlayer(player, sourceWorldObjectGUID))
-        {
-            continue;
-        }
+        bool allowed = item.AllowedForPlayer(player, sourceWorldObjectGUID);
 
-        // Player is not the loot owner, and loot owner still needs this quest item
-        if (!item.freeforall &&
-            lootOwner && lootOwner != player &&
-            item.AllowedForPlayer(lootOwner, sourceWorldObjectGUID))
-        {
+        if (!allowed && !isMasterLooter)
             continue;
-        }
 
         ql->push_back(QuestItem(i));
-        ++unlootedCount;
 
-        if (!item.freeforall)
+        // Only add "allowed looter" if you are actually allowed to loot.
+        if (allowed)
         {
-            item.is_blocked = true;
+            item.AddAllowedLooter(player);
+
+            if (item.freeforall)
+            {
+                ++unlootedCount;
+            }
+            else if (!item.is_counted)
+            {
+                ++unlootedCount;
+                item.is_counted = true;
+            }
         }
 
         if (items.size() + ql->size() == MAX_NR_LOOT_ITEMS)
             break;
     }
+
     if (ql->empty())
     {
         delete ql;
