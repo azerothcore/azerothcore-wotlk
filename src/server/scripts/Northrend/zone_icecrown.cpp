@@ -2184,6 +2184,7 @@ enum BansheesRevenge
     POINT_LK_RETURN                 = 2,
     POINT_LK_BODY                   = 3,
     POINT_NIGHTSWOOD_HORN           = 4,
+    POINT_BALARGARDE_LEAP           = 5,
 
     EVENT_HEROIC_LEAP               = 1,
     EVENT_WHIRLWIND                 = 2,
@@ -2206,6 +2207,9 @@ enum BansheesPaths
 Position const SafirdrangSpawnPos   = { 7097.292f, 4416.581f, 831.8486f, 4.485496f };
 Position const LichKingSpawnPos      = { 7088.768f, 4385.59f,  872.4484f, 4.468043f };
 Position const LichKingConfrontPos   = { 7094.104f, 4331.222f, 871.5023f, 0.0f };
+Position const BalargardeLandPos      = { 7095.094f, 4363.894f, 872.05566f, 0.0f };
+float const BalargardeLeapSpeedXY    = 20.0f;
+float const BalargardeLeapSpeedZ     = 6.0f;
 float const LichKingWalkSpeed        = 5.5f;
 float const SafirdrangEntryFlightSpeed = 2.25f;
 float const EliteRearFlightSpeed     = 5.0f;
@@ -2266,12 +2270,7 @@ public:
             {
                 case ACTION_BALARGARDE_JUMP:
                     me->ExitVehicle();
-                    me->GetMotionMaster()->MoveFall();
-                    scheduler.Schedule(2s, [this](TaskContext /*context*/)
-                    {
-                        if (Creature* vardmadra = me->FindNearestCreature(NPC_POSSESSED_VARDMADRA, 200.0f))
-                            me->SetFacingToObject(vardmadra);
-                    });
+                    me->GetMotionMaster()->MoveJump(BalargardeLandPos, BalargardeLeapSpeedXY, BalargardeLeapSpeedZ, POINT_BALARGARDE_LEAP);
                     break;
                 case ACTION_BALARGARDE_ENGAGE:
                     me->SetHomePosition(me->GetPosition());
@@ -2301,6 +2300,18 @@ public:
                 default:
                     break;
             }
+        }
+
+        void MovementInform(uint32 type, uint32 id) override
+        {
+            if (type != EFFECT_MOTION_TYPE || id != POINT_BALARGARDE_LEAP)
+                return;
+
+            scheduler.Schedule(1s, [this](TaskContext /*context*/)
+            {
+                if (Creature* vardmadra = me->FindNearestCreature(NPC_POSSESSED_VARDMADRA, 200.0f))
+                    me->SetFacingToObject(vardmadra);
+            });
         }
 
         void JustEngagedWith(Unit* /*who*/) override
@@ -2565,7 +2576,7 @@ public:
             {
                 if (Creature* balargarde = me->FindNearestCreature(NPC_BALARGARDE, 200.0f))
                     balargarde->AI()->Talk(SAY_BALARGARDE_TO_VARDMADRA_2);
-            }).Schedule(23s, [this](TaskContext /*context*/)
+            }).Schedule(26s, [this](TaskContext /*context*/)
             {
                 if (Creature* balargarde = me->FindNearestCreature(NPC_BALARGARDE, 200.0f))
                     balargarde->AI()->DoAction(ACTION_BALARGARDE_ENGAGE);
