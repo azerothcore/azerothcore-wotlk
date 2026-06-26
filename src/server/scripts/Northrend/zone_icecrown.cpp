@@ -2185,6 +2185,7 @@ enum BansheesRevenge
     POINT_LK_BODY                   = 3,
     POINT_NIGHTSWOOD_HORN           = 4,
     POINT_BALARGARDE_LEAP           = 5,
+    POINT_SAFIRDRANG_ASCEND         = 6,
 
     EVENT_HEROIC_LEAP               = 1,
     EVENT_WHIRLWIND                 = 2,
@@ -2578,6 +2579,10 @@ public:
             {
                 if (Creature* balargarde = GetSeatedBalargarde())
                     balargarde->AI()->DoAction(ACTION_BALARGARDE_JUMP);
+            }).Schedule(17s, [this](TaskContext /*context*/)
+            {
+                me->GetMotionMaster()->MovePoint(POINT_SAFIRDRANG_ASCEND,
+                    me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 10.0f);
             }).Schedule(18s, [this](TaskContext /*context*/)
             {
                 if (Creature* balargarde = me->FindNearestCreature(NPC_BALARGARDE, 200.0f))
