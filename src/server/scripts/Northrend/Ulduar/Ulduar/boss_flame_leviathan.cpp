@@ -1442,8 +1442,7 @@ class spell_vehicle_throw_passenger : public SpellScript
         passenger->GetMotionMaster()->MoveJump(x, y, z, GetSpell()->m_targets.GetSpeedXY(), GetSpell()->m_targets.GetSpeedZ());
 
         if (seatTarget && seatTarget->IsWithinDist2d(dst, GetSpellInfo()->Effects[EFFECT_0].CalcRadius() * 2)) // now we use *2 because the location of the seat is not correct
-            passenger->EnterVehicle(seatTarget, 0);
-            // passenger->CastCustomSpell(SPELL_HOOKSHOT_AURA, SPELLVALUE_AURA_DURATION, 5000, passenger, true);
+            passenger->CastCustomSpell(SPELL_HOOKSHOT_AURA, SPELLVALUE_AURA_DURATION, 5000, passenger, true);
     }
 
     void Register() override
