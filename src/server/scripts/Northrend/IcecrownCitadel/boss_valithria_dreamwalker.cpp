@@ -224,26 +224,20 @@ public:
         Acore::CreatureWorker<ValithriaDespawner> worker(_creature, *this);
         Cell::VisitObjects(_creature, worker, 333.0f);
 
-        // Fix respawn time for creatures that were killed and corpse-decayed
-        // during combat (Cell::VisitObjects can't find them once removed from world)
+        // Risen Archmages killed earlier in the attempt have already corpse-decayed
+        // and left the world, so the CreatureWorker above can't reach them. Re-time
+        // their (and Valithria's) saved respawns so the encounter can restart.
         if (Map* map = _creature->GetMap())
         {
-            time_t respawnTime = GameTime::GetGameTime().count() + 11;
-            for (auto const& [spawnId, rt] : map->GetCreatureRespawnTimes())
-            {
+            std::vector<ObjectGuid::LowType> toRespawn;
+            for (auto const& [spawnId, respawnTime] : map->GetCreatureRespawnTimes())
                 if (CreatureData const* data = sObjectMgr->GetCreatureData(spawnId))
-                {
-                    if (data->mapid != map->GetId())
-                        continue;
+                    if (data->id == NPC_RISEN_ARCHMAGE || data->id == NPC_VALITHRIA_DREAMWALKER)
+                        toRespawn.push_back(spawnId);
 
-                    // Both Archmage and Valithria respawn in 11s
-                    // Valithria DB default is 604800s (7 days)
-                    if (data->id1 == NPC_RISEN_ARCHMAGE || data->id1 == NPC_VALITHRIA_DREAMWALKER)
-                    {
-                        map->SaveCreatureRespawnTime(spawnId, respawnTime);
-                    }
-                }
-            }
+            time_t newRespawnTime = GameTime::GetGameTime().count() + 11;
+            for (ObjectGuid::LowType spawnId : toRespawn)
+                map->SaveCreatureRespawnTime(spawnId, newRespawnTime);
         }
 
         _creature->AI()->Reset();
@@ -286,8 +280,7 @@ public:
         if (CreatureData const* data = creature->GetCreatureData())
             creature->SetPosition(data->posX, data->posY, data->posZ, data->orientation);
 
-        // Both Archmage and Valithria respawn in 11s
-        // Valithria DB default is 604800s (7 days) - override
+        // Force the encounter's 11s reset; the DB respawn delay can be up to 7 days.
         creature->DespawnOrUnsummon(0ms, 11s);
     }
 
