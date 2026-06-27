@@ -2123,7 +2123,7 @@ void WorldObject::SendMessageToSetInRange(WorldPacket const* data, float dist, b
 
 void WorldObject::SendMessageToSet(WorldPacket const* data, Player const* skipped_rcvr) const
 {
-    Acore::MessageDistDeliverer notifier(this, data, 0.0f, false, skipped_rcvr);
+    Acore::MessageDistDeliverer notifier(this, data, 0.0f, Acore::TeamFilter::All, skipped_rcvr);
     notifier.Visit(GetObjectVisibilityContainer().GetVisiblePlayersMap());
 }
 
