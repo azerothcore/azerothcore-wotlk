@@ -16,6 +16,7 @@
  */
 
 #include "KillRewarder.h"
+#include "Creature.h"
 #include "Formulas.h"
 #include "Group.h"
 #include "Pet.h"
@@ -161,6 +162,19 @@ void KillRewarder::_RewardXP(Player* player, float rate)
         else
             xp = 0;
     }
+
+    // An ungrouped helper who out-levels everyone eligible for the kill and for
+    // whom the victim is gray halves the tagger's XP, matching the group
+    // gray-member penalty. Closes a power-leveling exploit.
+    if (xp)
+        if (Creature* creature = _victim->ToCreature())
+        {
+            uint8 const referenceLevel = _group ? _maxLevel : player->GetLevel();
+            uint8 const highestLevel = creature->GetHighestPlayerAttackerLevel();
+            if (highestLevel > referenceLevel && creature->GetLevel() <= Acore::XP::GetGrayLevel(highestLevel))
+                xp = xp / 2 + 1;
+        }
+
     if (xp)
     {
         // 4.2.2. Apply auras modifying rewarded XP (SPELL_AURA_MOD_XP_PCT).
