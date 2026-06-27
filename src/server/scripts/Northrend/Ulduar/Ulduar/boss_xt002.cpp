@@ -15,14 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * Ported from TrinityCore commits:
- *   81a6e2e5101834b4f8950ea8ecc728f5548ab906 ("Scripts/Uduar: XT002 Rework")
- *   05eeaade3e4e15028143575dcb16267959a2153d ("Fixed XT002 Heart health regeneration")
- *   9153ad621e7578f472460b9a98e21a6ed94f85c0 ("Moved Submerge script to spell_generic")
- * Adapted for AzerothCore conventions.
- */
-
+#include "AchievementCriteriaScript.h"
 #include "Containers.h"
 #include "CreatureScript.h"
 #include "InstanceScript.h"
