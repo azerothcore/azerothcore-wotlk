@@ -609,7 +609,7 @@ public:
         CreatureData const* spawnpoint = nullptr;
         for (auto const& pair : sObjectMgr->GetAllCreatureData())
         {
-            if (pair.second.id1 != entry)
+            if (pair.second.id != entry)
             {
                 continue;
             }
@@ -633,7 +633,7 @@ public:
         std::vector<CreatureData const*> spawnpoints;
         for (auto const& pair : sObjectMgr->GetAllCreatureData())
         {
-            if (pair.second.id1 != entry)
+            if (pair.second.id != entry)
             {
                 continue;
             }

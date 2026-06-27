@@ -293,7 +293,6 @@ void WorldSession::HandleWhoOpcode(WorldPacket& recvData)
 
     for (auto const& target : sWhoListCacheMgr->GetWhoList())
     {
-        // player can see member of other team only if CONFIG_ALLOW_TWO_SIDE_WHO_LIST
         if (target.GetTeamId() != team && !HasPermission(rbac::RBAC_PERM_TWO_SIDE_WHO_LIST))
             continue;
 
@@ -427,7 +426,7 @@ void WorldSession::HandleLogoutRequestOpcode(WorldPackets::Character::LogoutRequ
     bool preventAfkSanctuaryLogout = sWorld->getIntConfig(CONFIG_AFK_PREVENT_LOGOUT) == 1
                                      && GetPlayer()->isAFK() && sAreaTableStore.LookupEntry(GetPlayer()->GetAreaId())->IsSanctuary();
 
-    bool preventAfkLogout = sWorld->getIntConfig(CONFIG_AFK_PREVENT_LOGOUT) == 2
+    bool preventAfkLogout = ((sWorld->getIntConfig(CONFIG_AFK_PREVENT_LOGOUT) == 2) || HasAccountFlag(ACCOUNT_FLAG_NOKICK))
                             && GetPlayer()->isAFK();
 
     /// @todo: Possibly add RBAC permission to log out in combat

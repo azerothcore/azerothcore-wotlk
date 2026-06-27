@@ -51,7 +51,7 @@ public:
             { "item",     HandleListItemCommand,        rbac::RBAC_PERM_COMMAND_LIST_ITEM,     Console::Yes },
             { "object",   HandleListObjectCommand,      rbac::RBAC_PERM_COMMAND_LIST_OBJECT,   Console::Yes },
             { "auras",    listAurasCommandTable },
-            { "respawns", HandleListRespawnsCommand,    rbac::RBAC_PERM_COMMAND_LIST_CREATURE, Console::No },
+            { "respawns", HandleListRespawnsCommand,    rbac::RBAC_PERM_COMMAND_LIST_RESPAWNS, Console::Yes },
         };
         static ChatCommandTable commandTable =
         {
@@ -77,19 +77,19 @@ public:
         QueryResult result;
 
         uint32 creatureCount = 0;
-        result = WorldDatabase.Query("SELECT COUNT(guid) FROM creature WHERE id1='{}' OR id2='{}' OR id3='{}'", uint32(creatureId), uint32(creatureId), uint32(creatureId));
+        result = WorldDatabase.Query("SELECT COUNT(guid) FROM creature WHERE id = '{}' OR guid IN (SELECT spawnId FROM creature_multispawn WHERE entry = '{}')", uint32(creatureId), uint32(creatureId));
         if (result)
             creatureCount = (*result)[0].Get<uint64>();
 
         if (handler->GetSession())
         {
             Player* player = handler->GetSession()->GetPlayer();
-            result = WorldDatabase.Query("SELECT guid, position_x, position_y, position_z, map, (POW(position_x - '{}', 2) + POW(position_y - '{}', 2) + POW(position_z - '{}', 2)) AS order_ FROM creature WHERE id1='{}' OR id2='{}' OR id3='{}' ORDER BY order_ ASC LIMIT {}",
-                                          player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), uint32(creatureId), uint32(creatureId), uint32(creatureId), count);
+            result = WorldDatabase.Query("SELECT guid, position_x, position_y, position_z, map, (POW(position_x - '{}', 2) + POW(position_y - '{}', 2) + POW(position_z - '{}', 2)) AS order_ FROM creature WHERE id = '{}' OR guid IN (SELECT spawnId FROM creature_multispawn WHERE entry = '{}') ORDER BY order_ ASC LIMIT {}",
+                                          player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), uint32(creatureId), uint32(creatureId), count);
         }
         else
-            result = WorldDatabase.Query("SELECT guid, position_x, position_y, position_z, map FROM creature WHERE id1='{}' OR id2='{}' OR id3='{}' LIMIT {}",
-                                          uint32(creatureId), uint32(creatureId), uint32(creatureId), count);
+            result = WorldDatabase.Query("SELECT guid, position_x, position_y, position_z, map FROM creature WHERE id = '{}' OR guid IN (SELECT spawnId FROM creature_multispawn WHERE entry = '{}') LIMIT {}",
+                                          uint32(creatureId), uint32(creatureId), count);
 
         if (result)
         {
@@ -521,13 +521,35 @@ public:
         return true;
     }
 
-    static bool HandleListRespawnsCommand(ChatHandler* handler)
+    static bool HandleListRespawnsCommand(ChatHandler* handler, Optional<uint32> firstArg, Optional<uint32> secondArg, Optional<uint32> thirdArg)
     {
-        Player* player = handler->GetSession()->GetPlayer();
-        if (!player)
-            return false;
+        Map* map = nullptr;
+        Optional<uint32> entryFilter;
 
-        Map* map = player->GetMap();
+        if (handler->GetSession())
+        {
+            // In-game: first arg = entryId (optional), use player's current map
+            map = handler->GetSession()->GetPlayer()->GetMap();
+            entryFilter = firstArg;
+        }
+        else
+        {
+            // Console: first arg = mapId (required), second = instanceId, third = entryId
+            if (!firstArg)
+            {
+                handler->SendSysMessage(LANG_LIST_RESPAWNS_NO_MAP);
+                return false;
+            }
+            map = sMapMgr->FindMap(*firstArg, secondArg.value_or(0));
+            entryFilter = thirdArg;
+        }
+
+        if (!map)
+        {
+            handler->PSendSysMessage(LANG_RESPAWN_GUID_MAP_NOT_LOADED, firstArg.value_or(0));
+            return false;
+        }
+
         uint32 count = 0;
         time_t now = GameTime::GetGameTime().count();
 
@@ -535,13 +557,13 @@ public:
         for (auto const& pair : map->GetCreatureRespawnTimes())
         {
             CreatureData const* data = sObjectMgr->GetCreatureData(pair.first);
-            if (!data)
+            if (!data || (entryFilter && data->id != *entryFilter))
                 continue;
 
-            CreatureTemplate const* cTemplate = sObjectMgr->GetCreatureTemplate(data->id1);
+            CreatureTemplate const* cTemplate = sObjectMgr->GetCreatureTemplate(data->id);
             std::string name = cTemplate ? cTemplate->Name : "Unknown";
             time_t remaining = pair.second > now ? pair.second - now : 0;
-            handler->PSendSysMessage(LANG_LIST_RESPAWNS_CREATURE_ENTRY, pair.first, name, data->id1, remaining);
+            handler->PSendSysMessage(LANG_LIST_RESPAWNS_CREATURE_ENTRY, pair.first, name, data->id, remaining);
             ++count;
             if (count >= 50)
             {
@@ -555,7 +577,7 @@ public:
         for (auto const& pair : map->GetGORespawnTimes())
         {
             GameObjectData const* data = sObjectMgr->GetGameObjectData(pair.first);
-            if (!data)
+            if (!data || (entryFilter && data->id != *entryFilter))
                 continue;
 
             GameObjectTemplate const* goTemplate = sObjectMgr->GetGameObjectTemplate(data->id);

@@ -39,7 +39,14 @@ enum NpcIds
     NPC_HELLFIRE_CHANNELER          = 17256,
     NPC_HELLFIRE_WARDER             = 18829,
     NPC_HELLFIRE_RAID_TRIGGER       = 17376,
-    NPC_TARGET_TRIGGER              = 17474
+    NPC_TARGET_TRIGGER              = 17474,
+    NPC_BURNING_ABYSSAL             = 17454
+};
+
+enum MagtheridonActions
+{
+    ACTION_RELEASE_MAGTHERIDON      = 1,
+    ACTION_BANISH_SELF              = 2
 };
 
 enum GoIds

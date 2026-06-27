@@ -675,6 +675,13 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
         return;
     }
 
+    if (sWorld->getBoolConfig(CONFIG_TRIAL_RESTRICTION_TRADE) && IsTrialAccount())
+    {
+        info.Status = TRADE_STATUS_TRIAL_ACCOUNT;
+        SendTradeStatus(info);
+        return;
+    }
+
     if (GetPlayer()->IsSpectator())
         return;
 
@@ -722,8 +729,14 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
         return;
     }
 
+    if (sWorld->getBoolConfig(CONFIG_TRIAL_RESTRICTION_TRADE) && pOther->GetSession()->IsTrialAccount())
+    {
+        info.Status = TRADE_STATUS_TRIAL_ACCOUNT;
+        SendTradeStatus(info);
+        return;
+    }
+
     if (pOther->GetTeamId() != _player->GetTeamId() &&
-        !sWorld->getBoolConfig(CONFIG_ALLOW_TWO_SIDE_TRADE) &&
         !GetPlayer()->GetSession()->HasPermission(rbac::RBAC_PERM_ALLOW_TWO_SIDE_TRADE))
     {
         info.Status = TRADE_STATUS_WRONG_FACTION;

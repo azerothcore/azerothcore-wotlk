@@ -45,7 +45,7 @@ public:
             { "gmannounce",     HandleGMAnnounceCommand,     rbac::RBAC_PERM_COMMAND_GMANNOUNCE,     Console::Yes },
             { "notify",         HandleNotifyCommand,         rbac::RBAC_PERM_COMMAND_NOTIFY,         Console::Yes },
             { "gmnotify",       HandleGMNotifyCommand,       rbac::RBAC_PERM_COMMAND_GMNOTIFY,       Console::Yes },
-            { "whispers",       HandleWhispersCommand,       rbac::RBAC_PERM_COMMAND_WHISPERS,       Console::No },
+            { "whispers",       HandleWhispersCommand,       rbac::RBAC_PERM_CAN_FILTER_WHISPERS,    Console::No },
         };
         return commandTable;
     }
