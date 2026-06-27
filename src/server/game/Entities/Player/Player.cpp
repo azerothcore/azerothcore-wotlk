@@ -3338,7 +3338,7 @@ void Player::learnSpell(uint32 spellId, bool temporary /*= false*/, bool learnFr
     }
 }
 
-uint8 Player::GetLearnSpellSpecMask(uint32 const spellId) const
+uint8 Player::GetLearnSpellSpecMask(uint32 spellId) const
 {
     uint32 const firstRankSpellId = sSpellMgr->GetFirstSpellInChain(spellId);
 
