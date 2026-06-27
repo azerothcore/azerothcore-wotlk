@@ -331,45 +331,60 @@ namespace Branding::Addon
 
     std::string EncodeChar(CharSnapshot const& s)
     {
-        std::string out = FramePrefix("CHAR");
+        std::string const base = FramePrefix("CHAR");
 
-        out += Sep; out += "BRD=";
-        for (std::size_t i = 0; i < s.brands.size(); ++i)
-        {
-            if (i) out += RecSep;
-            BrandFrame const& b = s.brands[i];
-            out += std::to_string(b.brand);            out += FieldSep;
-            out += std::to_string(b.level);            out += FieldSep;
-            out += std::to_string(b.strengthPermille);
-        }
-
-        out += Sep; out += "MST=";
+        // Build the bounded tail (MST/LDT/ITM/ALG -- masteries are capped at MasterySystem::COUNT)
+        // first, so the variable-length BRD list can be budgeted against MaxFrame. An oversized
+        // CHAT_MSG_ADDON body crashes the 3.3.5a client, so the frame must never exceed MaxFrame.
+        std::string tail;
+        tail += Sep; tail += "MST=";
         for (std::size_t i = 0; i < s.masteries.size(); ++i)
         {
-            if (i) out += RecSep;
+            if (i) tail += RecSep;
             MasteryFrame const& m = s.masteries[i];
-            out += std::to_string(m.system);           out += FieldSep;
-            out += (m.unlocked ? '1' : '0');           out += FieldSep;
-            out += std::to_string(m.level);            out += FieldSep;
-            out += std::to_string(m.bonusPermille);
+            tail += std::to_string(m.system);           tail += FieldSep;
+            tail += (m.unlocked ? '1' : '0');           tail += FieldSep;
+            tail += std::to_string(m.level);            tail += FieldSep;
+            tail += std::to_string(m.bonusPermille);
         }
 
-        out += Sep; out += "LDT=";
-        out += std::to_string(s.loadout.activeBrand);  out += FieldSep;
-        out += std::to_string(s.loadout.archetype);    out += FieldSep;
-        out += std::to_string(s.loadout.role);
+        tail += Sep; tail += "LDT=";
+        tail += std::to_string(s.loadout.activeBrand);  tail += FieldSep;
+        tail += std::to_string(s.loadout.archetype);    tail += FieldSep;
+        tail += std::to_string(s.loadout.role);
 
-        out += Sep; out += "ITM=";
-        out += (s.item.equipped ? '1' : '0');          out += FieldSep;
-        out += std::to_string(s.item.brand);           out += FieldSep;
-        out += std::to_string(s.item.step);            out += FieldSep;
-        out += std::to_string(s.item.level);           out += FieldSep;
-        out += std::to_string(s.item.intensityPermille);
+        tail += Sep; tail += "ITM=";
+        tail += (s.item.equipped ? '1' : '0');          tail += FieldSep;
+        tail += std::to_string(s.item.brand);           tail += FieldSep;
+        tail += std::to_string(s.item.step);            tail += FieldSep;
+        tail += std::to_string(s.item.level);           tail += FieldSep;
+        tail += std::to_string(s.item.intensityPermille);
 
-        out += Sep; out += "ALG=";
-        out += std::to_string(s.allegiance.id);        out += FieldSep;
-        out += std::to_string(s.allegiance.efficiencyPermille);
+        tail += Sep; tail += "ALG=";
+        tail += std::to_string(s.allegiance.id);        tail += FieldSep;
+        tail += std::to_string(s.allegiance.efficiencyPermille);
 
+        // Fit as many brand records as the remaining budget allows: keep the head of the list
+        // (lowest BrandId first), drop the overflow rather than emit a client-crashing frame.
+        std::string brands;
+        std::size_t const overhead = base.size() + 1 + 4 + tail.size();   // Sep + "BRD="
+        for (BrandFrame const& b : s.brands)
+        {
+            std::string rec;
+            if (!brands.empty())
+                rec += RecSep;
+            rec += std::to_string(b.brand);            rec += FieldSep;
+            rec += std::to_string(b.level);            rec += FieldSep;
+            rec += std::to_string(b.strengthPermille);
+
+            if (overhead + brands.size() + rec.size() > MaxFrame)
+                break;
+            brands += rec;
+        }
+
+        std::string out = base;
+        out += Sep; out += "BRD="; out += brands;
+        out += tail;
         return out;
     }
 

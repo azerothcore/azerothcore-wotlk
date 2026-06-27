@@ -137,6 +137,12 @@ The server pushes (so the UI refreshes) on: **login**, **zone change**, **event 
 
 ## Wire format
 
+**Transport:** the server pushes each frame as a `LANG_ADDON` **whisper** (`CHAT_MSG_WHISPER`), never
+as `CHAT_MSG_ADDON`. `CHAT_MSG_ADDON` is a client→server message type; sending it *to* a 3.3.5a client
+is a fatal (ERROR #134) on world entry. The client delivers `LANG_ADDON` whispers to this addon's
+`CHAT_MSG_ADDON` handler and does not show them in chat. Every frame must also stay within `MaxFrame`
+(255 bytes) — an over-long body overflows the client's chat buffer and crashes it.
+
 The Lua decoder in `Branding/Comms.lua` mirrors the server's pure codec
 (`modules/mod-branding/src/core/branding/addon/Protocol.cpp`): tab between fields, `;` between list
 records, `:` between sub-fields, floats as permille (×1000). The codec is unit-tested server-side
