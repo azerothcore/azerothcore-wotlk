@@ -3357,7 +3357,7 @@ uint8 Player::GetLearnSpellSpecMask(uint32 spellId) const
         specMask |= m_spells.at(firstRankSpellId)->specMask;
     }
 
-    // When learning a talent-based spell that has other spells as a requirement, it should be not only be learned in the current spec,
+    // When learning a talent-based spell that has other spells as a requirement, it should not only be learned in the current spec,
     // but also in all other specs that have the required spells.
     // Example: Greater Blessing of Sanctuary has Blessing of Sanctuary as required spell.
     auto const spellsRequiredForSpellBounds = sSpellMgr->GetSpellsRequiredForSpellBounds(spellId);
