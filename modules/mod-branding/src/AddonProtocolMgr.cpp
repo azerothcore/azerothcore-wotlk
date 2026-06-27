@@ -18,6 +18,7 @@
 
 #include "Chat.h"
 #include "Config.h"
+#include "Log.h"
 #include "Player.h"
 #include "WorldPacket.h"
 #include "WorldSessionMgr.h"
@@ -56,8 +57,25 @@ namespace Branding
         if (!_enabled || !player || frame.empty())
             return;
 
+        // Backstop: never put an over-long body on the wire. A CHAT_MSG_ADDON message larger than
+        // MaxFrame overflows the 3.3.5a client's chat buffer and crashes it (ERROR #134) -- even
+        // for clients with no Branding addon installed. The encoders already bound their output;
+        // this guards against any future encoder that forgets to.
+        if (frame.size() > Addon::MaxFrame)
+        {
+            LOG_ERROR("module.branding.addon", "Dropping oversized addon frame ({} > {} bytes): {}",
+                frame.size(), Addon::MaxFrame, frame);
+            return;
+        }
+
+        // Server->client addon data must go out as a LANG_ADDON *whisper*, NOT type CHAT_MSG_ADDON.
+        // CHAT_MSG_ADDON is a client->server message type; a 3.3.5a client that *receives* an
+        // SMSG_MESSAGECHAT of that type has no handler path and dies with a fatal (ERROR #134) on
+        // world entry -- regardless of frame size or whether the addon is installed. The client
+        // routes LANG_ADDON whispers to the addon's CHAT_MSG_ADDON event, so the addon still gets
+        // them. This mirrors the core's own AddonChannelCommandHandler::Send (Chat.cpp).
         WorldPacket data;
-        ChatHandler::BuildChatPacket(data, CHAT_MSG_ADDON, LANG_ADDON, player->GetGUID(), player->GetGUID(), frame, 0);
+        ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER, LANG_ADDON, player->GetGUID(), player->GetGUID(), frame, 0);
         player->SendDirectMessage(&data);
     }
 
@@ -199,7 +217,12 @@ namespace Branding
         uint16_t const pointsAvailable = cfg.PointsBudget();
         uint16_t const respecCost = static_cast<uint16_t>(std::min<uint32_t>(cfg.RespecCost(), 65535u));
 
-        for (uint8_t s = 0; s < static_cast<uint8_t>(BrandId::COUNT); ++s)
+        // The §14 lattice covers only the 7 standard damage schools (BrandId Fire..Physical). The
+        // remaining BrandId values (Wind..Spirit) have no authored lattice cells, so paging a frame
+        // for each just bloated the login burst (15 frames -> 7) with empty data and risked the
+        // client's addon-message flood threshold. Page only the standard schools.
+        static constexpr uint8_t StandardSchoolCount = static_cast<uint8_t>(BrandId::Physical) + 1;   // 7
+        for (uint8_t s = 0; s < StandardSchoolCount; ++s)
         {
             BrandId const school = static_cast<BrandId>(s);
 

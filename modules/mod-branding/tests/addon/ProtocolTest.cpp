@@ -194,6 +194,27 @@ TEST(AddonProtocol, CharDecodeLegacyLoadoutWithoutRole)
     EXPECT_EQ(out.loadout.role, 0);
 }
 
+// Regression: a fully-unlocked account (every brand earned + maxed) must never produce a CHAR
+// frame larger than MaxFrame. An oversized CHAT_MSG_ADDON body crashes the 3.3.5a client, so
+// EncodeChar must bound its output like EncodeSchedule/EncodeMastery do -- truncating, never
+// emitting a frame the client can't safely receive.
+TEST(AddonProtocol, CharFrameStaysWithinMaxFrame)
+{
+    CharSnapshot in;
+    for (uint8_t b = 0; b < 15; ++b)                       // every BrandId, all maxed
+        in.brands.push_back({ b, 255, 65535 });
+    in.masteries = { { 0, true, 255, 65535 }, { 1, true, 255, 65535 } };
+    in.loadout = { 14, 255, 0 };
+    in.item = { true, 14, 255, 255, 65535 };
+    in.allegiance = { 9, 65535 };
+
+    std::string const frame = EncodeChar(in);
+    ExpectWellFormed(frame);                               // asserts size <= MaxFrame
+
+    CharSnapshot out;                                      // truncated frame still decodes cleanly
+    EXPECT_TRUE(DecodeChar(frame, out));
+}
+
 // Forward-compat: an unknown KIND or malformed body decodes to a clean failure, never a crash.
 TEST(AddonProtocol, DecodeRejectsMalformed)
 {
