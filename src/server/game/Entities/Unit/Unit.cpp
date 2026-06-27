@@ -7524,7 +7524,6 @@ void Unit::CombatStop(bool includingCast, bool mutualPvP)
     // xinef: just in case
     if (IsPetInCombat() && !IsPlayer())
         ClearInPetCombat();
-    sScriptMgr->OnUnitStopCombat(this);
 }
 
 void Unit::CombatStopWithPets(bool includingCast)
@@ -7585,6 +7584,7 @@ void Unit::UpdatePetCombatState()
 void Unit::AtExitCombat()
 {
     RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_LEAVE_COMBAT);
+    sScriptMgr->OnUnitStopCombat(this);
 }
 
 void Unit::AtEngage(Unit* /*target*/)
