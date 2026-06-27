@@ -25,3 +25,5 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 DELETE FROM `spell_script_names` WHERE `spell_id` = 62336;
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (62336, 'spell_hookshot_aura');
+
+DELETE FROM `spell_script_names` WHERE `ScriptName` = 'spell_vehicle_circuit_overload_aura';
