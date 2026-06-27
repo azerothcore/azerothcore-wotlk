@@ -99,6 +99,7 @@ enum FreyaSpells
     // DETONATING LASHER
     SPELL_DETONATE                              = 62598,
     SPELL_FLAME_LASH                            = 62608,
+    SPELL_SUBMERGE_VISUAL                       = 28819,
 
     // ACHIEVEMENT
     SPELL_DEFORESTATION_CREDIT                  = 65015,
@@ -999,10 +1000,9 @@ struct boss_freya_summons : public ScriptedAI
         if (me->GetEntry() == NPC_DETONATING_LASHER)
         {
             me->SetReactState(REACT_PASSIVE);
-            me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
             me->m_Events.AddEventAtOffset([this]()
             {
-                me->SetStandState(UNIT_STAND_STATE_STAND);
+                me->RemoveAurasDueToSpell(SPELL_SUBMERGE_VISUAL);
             }, 4s);
             me->m_Events.AddEventAtOffset([this]()
             {
