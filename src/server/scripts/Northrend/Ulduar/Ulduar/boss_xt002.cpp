@@ -995,8 +995,6 @@ class spell_xt002_stand : public SpellScript
     }
 };
 
-
-
 class achievement_nerf_engineering : public AchievementCriteriaScript
 {
     public:
