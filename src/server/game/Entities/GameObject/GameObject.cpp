@@ -165,6 +165,42 @@ void GameObject::AddToWorld()
         if (m_spawnId)
             GetMap()->GetGameObjectBySpawnIdStore().insert(std::make_pair(m_spawnId, this));
 
+        // 钓鱼节点：先判断前一个法术session是否释放，如果未释放则先释放
+        if (GetGoType() == GAMEOBJECT_TYPE_FISHINGNODE)
+        {
+            if (ObjectGuid ownerGUID = GetOwnerGUID())
+            {
+                if (Player* owner = ObjectAccessor::FindPlayer(ownerGUID))
+                {
+                    // 先释放可能打开的loot窗口
+                    if (ObjectGuid lguid = owner->GetLootGUID())
+                        if (lguid.IsGameObject())
+                            owner->GetSession()->DoLootRelease(lguid);
+
+                    // 检查并取消当前正在进行的channeled法术（前一个钓鱼法术session）
+                    if (owner->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
+                        owner->InterruptSpell(CURRENT_CHANNELED_SPELL, true, true, true);
+
+                    // 查找并删除所有者所有旧的钓鱼节点（不包括当前正在添加的这个）
+                    std::vector<GameObject*> nodesToDelete;
+                    auto& allElements = GetMap()->GetObjectsStore().GetElements();
+                    auto& goContainer = allElements._TailElements._elements;
+                    for (auto& pair : goContainer._element)
+                    {
+                        GameObject* go = pair.second;
+                        if (go && go != this && go->GetGoType() == GAMEOBJECT_TYPE_FISHINGNODE && go->GetOwnerGUID() == ownerGUID)
+                            nodesToDelete.push_back(go);
+                    }
+                    for (GameObject* go : nodesToDelete)
+                    {
+                        go->SetOwnerGUID(ObjectGuid::Empty);
+                        go->SetRespawnTime(0);
+                        go->Delete();
+                    }
+                }
+            }
+        }
+
         if (m_model)
         {
             m_model->UpdatePosition();
