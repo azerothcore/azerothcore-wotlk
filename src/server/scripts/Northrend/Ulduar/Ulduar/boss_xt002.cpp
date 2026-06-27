@@ -785,44 +785,34 @@ class spell_xt002_gravity_bomb_damage : public SpellScript
     }
 };
 
-// 62791 - XT-002 Heart Overload Trigger Spell (SERVERSIDE)
+// 62791 - XT-002 Heart Overload Trigger Spell (server-side)
 class spell_xt002_heart_overload_periodic : public SpellScript
 {
     PrepareSpellScript(spell_xt002_heart_overload_periodic);
 
     bool Validate(SpellInfo const* /*spell*/) override
     {
-        return ValidateSpellInfo
-        ({
-            SPELL_ENERGY_ORB,
-            SPELL_HEART_LIGHTNING_TETHER
-         });
+        return ValidateSpellInfo({SPELL_ENERGY_ORB, SPELL_HEART_LIGHTNING_TETHER});
     }
 
-    Creature* GetRandomToyPile()
+    static Creature* GetRandomNearbyToyPile(Unit const* caster)
     {
-        std::list<Creature*> possibleCreatures;
-        Unit* caster = GetCaster();
-        caster->GetCreatureListWithEntryInGrid(possibleCreatures, NPC_XT_TOY_PILE, 250.0f);
-        possibleCreatures.remove_if([caster](Creature* creature)
-        {
-            return caster->GetDistance2d(creature) < 60.0f;
-        });
+        std::list<Creature*> targets;
+        caster->GetCreatureListWithEntryInGrid(targets, NPC_XT_TOY_PILE, 250.0f);
+        targets.remove_if([caster](Creature* target) { return caster->GetDistance2d(target) < 60.0f; });
 
-        if (possibleCreatures.empty())
+        if (targets.empty())
             return nullptr;
 
-        return Acore::Containers::SelectRandomContainerElement(possibleCreatures);
+        return Acore::Containers::SelectRandomContainerElement(targets);
     }
 
     void HandleScript(SpellEffIndex /*effIndex*/)
     {
         Unit* caster = GetCaster();
-        if (Creature* toyPile = GetRandomToyPile())
-        {
+        caster->CastSpell((Unit*)nullptr, SPELL_HEART_LIGHTNING_TETHER, true);
+        if (Creature* toyPile = GetRandomNearbyToyPile(caster))
             caster->CastSpell(toyPile, SPELL_ENERGY_ORB, true);
-            caster->CastSpell((Unit*)nullptr, SPELL_HEART_LIGHTNING_TETHER, true);
-        }
     }
 
     void Register() override
@@ -971,6 +961,42 @@ private:
     uint32 _damageAmount = 0;
 };
 
+// 37751 - Submerged
+class spell_xt002_submerged : public SpellScript
+{
+    PrepareSpellScript(spell_xt002_submerged);
+
+    void HandleScript(SpellEffIndex /*eff*/)
+    {
+        if (Creature* target = GetHitCreature())
+            target->SetStandState(UNIT_STAND_STATE_SUBMERGED);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_xt002_submerged::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 37752 - Stand
+class spell_xt002_stand : public SpellScript
+{
+    PrepareSpellScript(spell_xt002_stand);
+
+    void HandleScript(SpellEffIndex /*eff*/)
+    {
+        if (Creature* target = GetHitCreature())
+            target->SetStandState(UNIT_STAND_STATE_STAND);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_xt002_stand::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+
+
 class achievement_nerf_engineering : public AchievementCriteriaScript
 {
     public:
@@ -1030,6 +1056,8 @@ void AddSC_boss_xt002()
     RegisterSpellScript(spell_xt002_tympanic_tantrum);
     RegisterSpellScript(spell_xt002_321_boombot_aura);
     RegisterSpellScript(spell_xt002_exposed_heart);
+    RegisterSpellScript(spell_xt002_submerged);
+    RegisterSpellScript(spell_xt002_stand);
     new achievement_nerf_engineering();
     new achievement_heartbreaker();
     new achievement_nerf_gravity_bombs();

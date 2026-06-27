@@ -1,11 +1,6 @@
 --
 -- XT-002 Deconstructor: rework
 
--- Lightning Tether condition: only hits XT-002
-DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId`=13 AND `SourceEntry`=64799;
-INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(13, 1, 64799, 0, 0, 31, 0, 3, 33293, 0, 0, 0, 0, '', 'Lightning Tether - Effect_0 hits XT002');
-
 -- Vehicle accessory: auto-spawn Heart of the Deconstructor when XT-002 spawns
 DELETE FROM `vehicle_template_accessory` WHERE `entry` = 33293 AND `accessory_entry` = 33329;
 INSERT INTO `vehicle_template_accessory` (`entry`, `accessory_entry`, `seat_id`, `minion`, `description`, `summontype`, `summontimer`) VALUES
@@ -26,14 +21,14 @@ INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 UPDATE `spell_script_names` SET `ScriptName`='spell_xt002_gravity_bomb_aura' WHERE `spell_id` IN (63024, 64234) AND `ScriptName`='spell_xt002_gravity_bomb';
 
 -- Spell script name for generic Submerge spell
-DELETE FROM `spell_script_names` WHERE `ScriptName`='spell_gen_submerged' AND `spell_id`=37751;
+DELETE FROM `spell_script_names` WHERE `ScriptName`='spell_xt002_submerged' AND `spell_id`=37751;
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
-(37751, 'spell_gen_submerged');
+(37751, 'spell_xt002_submerged');
 
 -- Spell script name for generic Stand spell
-DELETE FROM `spell_script_names` WHERE `ScriptName`='spell_gen_stand' AND `spell_id`=37752;
+DELETE FROM `spell_script_names` WHERE `ScriptName`='spell_xt002_stand' AND `spell_id`=37752;
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
-(37752, 'spell_gen_stand');
+(37752, 'spell_xt002_stand');
 
 -- Disable spell proc on Exposed Heart effect_1 (handled by script)
 DELETE FROM `spell_proc` WHERE `SpellId`=63849;
@@ -90,10 +85,10 @@ UPDATE `creature_template` SET `CreatureImmunitiesId` = @ID WHERE (`entry` IN (3
 UPDATE `creature_template` SET `unit_flags2` = `unit_flags2` | 32768 WHERE (`entry` IN (33329, 33995));
 
 -- only hits XT-002
-DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceGroup` = 1) AND (`SourceEntry` = 62791) AND (`SourceId` = 0) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 31) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 3) AND (`ConditionValue2` IN (33293, 33885)) AND (`ConditionValue3` = 0);
+DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 13) AND (`SourceGroup` = 1) AND (`SourceEntry` IN 64799) AND (`SourceId` = 0) AND (`ElseGroup` IN (0, 1)) AND (`ConditionTypeOrReference` = 31) AND (`ConditionTarget` = 0) AND (`ConditionValue1` = 3) AND (`ConditionValue2` IN (33293, 33885)) AND (`ConditionValue3` = 0);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(13, 1, 62791, 0, 0, 31, 0, 3, 33293, 0, 0, 0, 0, '', 'target must be XT-002'),
-(13, 1, 62791, 0, 0, 31, 0, 3, 33885, 0, 0, 0, 0, '', 'target must be XT-002');
+(13, 1, 64799, 0, 0, 31, 0, 3, 33293, 0, 0, 0, 0, '', 'target must be \'XT-002 Deconstructor\''),
+(13, 1, 64799, 0, 1, 31, 0, 3, 33885, 0, 0, 0, 0, '', 'target must be \'XT-002 Deconstructor (1)\'');
 
 UPDATE `spell_proc` SET `AttributesMask`=32, `DisableEffectsMask`=0 WHERE `SpellId`=63849;
 
