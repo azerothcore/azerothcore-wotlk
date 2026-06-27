@@ -1463,6 +1463,35 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             }
             break;
         }
+        case SMART_ACTION_INC_DATA:
+        {
+            WorldObject* invoker = me ? static_cast<WorldObject*>(me) : static_cast<WorldObject*>(go);
+
+            for (WorldObject* target : targets)
+            {
+                if (Creature* cTarget = target->ToCreature())
+                {
+                    if (SmartAI* smartAI = CAST_AI(SmartAI, cTarget->AI()))
+                    {
+                        uint32 const newValue = smartAI->GetData(e.action.setData.field) + e.action.setData.data;
+                        smartAI->SetData(e.action.setData.field, newValue, invoker);
+                    }
+                    else
+                        LOG_ERROR("sql.sql", "SmartScript: Action target for SMART_ACTION_INC_DATA is not using SmartAI, skipping");
+                }
+                else if (GameObject* oTarget = target->ToGameObject())
+                {
+                    if (SmartGameObjectAI* smartGOAI = CAST_AI(SmartGameObjectAI, oTarget->AI()))
+                    {
+                        uint32 const newValue = smartGOAI->GetData(e.action.setData.field) + e.action.setData.data;
+                        smartGOAI->SetData(e.action.setData.field, newValue, invoker);
+                    }
+                    else
+                        LOG_ERROR("sql.sql", "SmartScript: Action target for SMART_ACTION_INC_DATA is not using SmartGameObjectAI, skipping");
+                }
+            }
+            break;
+        }
         case SMART_ACTION_MOVE_FORWARD:
         {
             if (!me)
@@ -3082,9 +3111,9 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
             for (WorldObject* target : targets)
             {
                 if (IsUnit(target))
-                {
                     target->ToUnit()->SetObjectScale(scale);
-                }
+                else if (IsGameObject(target))
+                    target->ToGameObject()->SetObjectScale(scale);
             }
             break;
         }
@@ -4499,13 +4528,31 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                 break;
             }
         case SMART_EVENT_RECEIVE_HEAL:
-        case SMART_EVENT_DAMAGED:
         case SMART_EVENT_DAMAGED_TARGET:
             {
                 if (var0 > e.event.minMaxRepeat.max || var0 < e.event.minMaxRepeat.min)
                     return;
                 RecalcTimer(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax);
                 ProcessAction(e, unit);
+                break;
+            }
+        case SMART_EVENT_DAMAGED:
+            {
+                if (e.event.minMaxRepeat.rangeMin) // health check mode
+                {
+                    if (!me || !me->IsEngaged() || !me->GetMaxHealth())
+                        return;
+                    if (!me->HealthBelowPctDamaged(e.event.minMaxRepeat.rangeMin, var0))
+                        return;
+                    ProcessAction(e, unit);
+                }
+                else
+                {
+                    if (var0 > e.event.minMaxRepeat.max || var0 < e.event.minMaxRepeat.min)
+                        return;
+                    RecalcTimer(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax);
+                    ProcessAction(e, unit);
+                }
                 break;
             }
         case SMART_EVENT_MOVEMENTINFORM:

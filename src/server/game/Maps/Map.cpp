@@ -307,7 +307,7 @@ bool Map::AddToMap(T* obj, bool checkTransport)
     if (obj->IsInWorld())
     {
         ASSERT(obj->IsInGrid());
-        obj->UpdateObjectVisibilityOnCreate();
+        obj->UpdateObjectVisibility(true);
         return true;
     }
 
@@ -344,7 +344,7 @@ bool Map::AddToMap(T* obj, bool checkTransport)
 
     //something, such as vehicle, needs to be update immediately
     //also, trigger needs to cast spell, if not update, cannot see visual
-    obj->UpdateObjectVisibility(true);
+    obj->UpdateObjectVisibilityOnCreate();
 
     // Post-visibility so accessories seat after the vehicle's create packet reaches clients.
     if (obj->IsCreature())
@@ -1732,12 +1732,25 @@ uint32 Map::ApplyDynamicModeRespawnScaling(WorldObject const* obj, uint32 respaw
     if (obj->GetMap()->Instanceable())
         return respawnDelay;
 
-    // No quest givers or world bosses
     if (Creature const* creature = obj->ToCreature())
+    {
+        // Temporary spawns (no DB spawn id, e.g. summons / battlefield-spawned
+        // creatures such as Wintergrasp turrets) are not part of the respawn system.
+        if (!creature->GetSpawnId())
+            return respawnDelay;
+
+        // No quest givers or world bosses
         if (creature->IsQuestGiver() || creature->isWorldBoss()
             || (creature->GetCreatureTemplate()->rank == CREATURE_ELITE_RARE)
             || (creature->GetCreatureTemplate()->rank == CREATURE_ELITE_RAREELITE))
             return respawnDelay;
+    }
+    // Temporary gameobjects (no DB spawn id) are likewise excluded.
+    else if (GameObject const* go = obj->ToGameObject())
+    {
+        if (!go->GetSpawnId())
+            return respawnDelay;
+    }
 
     auto it = _zonePlayerCountMap.find(obj->GetZoneId());
     if (it == _zonePlayerCountMap.end())
@@ -2717,12 +2730,18 @@ void Map::ProcessRespawns()
 
 void Map::ProcessCreatureRespawn(ObjectGuid::LowType spawnId)
 {
-    // Pool members are handled entirely by PoolMgr
-    if (uint32 poolId = sPoolMgr->IsPartOfAPool<Creature>(spawnId))
+    // Pool members in non-instanced maps are handled entirely by PoolMgr.
+    // In instanced maps the pool system operates globally and Spawn1Object is
+    // a no-op for instanceable maps, so fall through to the normal per-instance
+    // respawn logic instead.
+    if (!Instanceable())
     {
-        sPoolMgr->UpdatePool<Creature>(poolId, spawnId);
-        RemoveCreatureRespawnTime(spawnId);
-        return;
+        if (uint32 poolId = sPoolMgr->IsPartOfAPool<Creature>(spawnId))
+        {
+            sPoolMgr->UpdatePool<Creature>(poolId, spawnId);
+            RemoveCreatureRespawnTime(spawnId);
+            return;
+        }
     }
 
     CreatureData const* data = sObjectMgr->GetCreatureData(spawnId);
@@ -2778,12 +2797,16 @@ void Map::ProcessCreatureRespawn(ObjectGuid::LowType spawnId)
 
 void Map::ProcessGameObjectRespawn(ObjectGuid::LowType spawnId)
 {
-    // Pool members are handled entirely by PoolMgr
-    if (uint32 poolId = sPoolMgr->IsPartOfAPool<GameObject>(spawnId))
+    // Same rationale as ProcessCreatureRespawn: pool management via PoolMgr is
+    // only meaningful for non-instanced maps where Spawn1Object actually spawns.
+    if (!Instanceable())
     {
-        sPoolMgr->UpdatePool<GameObject>(poolId, spawnId);
-        RemoveGORespawnTime(spawnId);
-        return;
+        if (uint32 poolId = sPoolMgr->IsPartOfAPool<GameObject>(spawnId))
+        {
+            sPoolMgr->UpdatePool<GameObject>(poolId, spawnId);
+            RemoveGORespawnTime(spawnId);
+            return;
+        }
     }
 
     GameObjectData const* data = sObjectMgr->GetGameObjectData(spawnId);

@@ -36,6 +36,11 @@ target_compile_options(acore-compile-option-interface
     INTERFACE
       /utf-8)
 
+target_compile_options(acore-compile-option-interface
+    INTERFACE
+      /Zc:preprocessor)
+message(STATUS "MSVC: Enabled standard conforming preprocessor")
+
 if(PLATFORM EQUAL 64)
   # This definition is necessary to work around a bug with Intellisense described
   # here: http://tinyurl.com/2cb428.  Syntax highlighting is important for proper

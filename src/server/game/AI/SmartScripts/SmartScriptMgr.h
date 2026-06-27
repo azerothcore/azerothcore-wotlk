@@ -128,7 +128,7 @@ enum SMART_EVENT
     SMART_EVENT_CHARMED                  = 29,      // onRemove (0 - on apply, 1 - on remove)
     SMART_EVENT_CHARMED_TARGET           = 30,      // NONE
     SMART_EVENT_SPELLHIT_TARGET          = 31,      // SpellID, School, CooldownMin, CooldownMax
-    SMART_EVENT_DAMAGED                  = 32,      // MinDmg, MaxDmg, CooldownMin, CooldownMax
+    SMART_EVENT_DAMAGED                  = 32,      // MinDmg, MaxDmg, CooldownMin, CooldownMax, rangeMin (hpPct, if set: health check mode, one-shot)
     SMART_EVENT_DAMAGED_TARGET           = 33,      // MinDmg, MaxDmg, CooldownMin, CooldownMax
     SMART_EVENT_MOVEMENTINFORM           = 34,      // MovementType(any), PointID, PathId(0 - any)
     SMART_EVENT_SUMMON_DESPAWNED         = 35,      // Entry, CooldownMin, CooldownMax
@@ -726,8 +726,9 @@ enum SMART_ACTION
     SMART_ACTION_SET_ANIM_TIER                      = 239,    // animtier
     SMART_ACTION_SET_GOSSIP_MENU                    = 240,    // gossipMenuId
     SMART_ACTION_SUMMON_GAMEOBJECT_GROUP            = 241,    // group
+    SMART_ACTION_INC_DATA                           = 242,    // field, increment (uses aiDataSet, wipe-safe across evade)
 
-    SMART_ACTION_AC_END                             = 242,    // placeholder
+    SMART_ACTION_AC_END                             = 243,    // placeholder
 };
 
 enum class SmartActionSummonCreatureFlags
