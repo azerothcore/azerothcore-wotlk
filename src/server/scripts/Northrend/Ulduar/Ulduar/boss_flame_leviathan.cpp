@@ -1096,7 +1096,7 @@ struct npc_storm_beacon_spawn : public NullCreatureAI
             if (_checkTimer >= 4000)
             {
                 _checkTimer = 0;
-                if (Unit* target = me->SelectNearbyTarget(nullptr, 80.0f))
+                if (Unit* target = me->SelectNearestTarget(80.0f))
                 {
                     ++_amount;
                     if (Creature* cr = me->SummonCreature(NPC_DEFENDER_GENERATED, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 4, me->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 900000))
