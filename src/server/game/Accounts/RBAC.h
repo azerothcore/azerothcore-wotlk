@@ -687,6 +687,7 @@ enum RBACPermissions
     RBAC_PERM_COMMAND_CHATFILTER_LIST                        = 923,
     RBAC_PERM_COMMAND_CHATFILTER_ADD                         = 924,
     RBAC_PERM_COMMAND_CHATFILTER_REMOVE                      = 925,
+    RBAC_PERM_COMMAND_GROUP_INVITES                          = 926,
     // custom permissions 1000+
     RBAC_PERM_MAX
 };

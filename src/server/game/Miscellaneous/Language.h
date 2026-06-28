@@ -1517,6 +1517,11 @@ enum AcoreStrings
 
     // Pet rename command
     LANG_PET_RENAME_INVALID             = 35453,
-    LANG_PET_RENAME_SUCCESS             = 35454
+    LANG_PET_RENAME_SUCCESS             = 35454,
+
+    // Group invites toggle command
+    LANG_COMMAND_GROUP_INVITES_ACCEPTING = 35455,
+    LANG_COMMAND_GROUP_INVITES_ON        = 35456,
+    LANG_COMMAND_GROUP_INVITES_OFF       = 35457
 };
 #endif
