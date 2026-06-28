@@ -6,7 +6,8 @@ UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_ov
     `unit_flags`= 33088, `CreatureImmunitiesId`= 31016, `ManaModifier`= 2 WHERE `entry`= 31016;
 UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_safirdrang',
     `unit_flags`= 256, `ManaModifier`= 2 WHERE `entry`= 31050;
-UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_elite' WHERE `entry`= 31030;
+UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_elite',
+    `unit_flags`= 256 WHERE `entry`= 31030;
 UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_vardmadra',
     `unit_flags`= 33536 WHERE `entry`= 31029;
 UPDATE `creature_template` SET `AIName`='', `ScriptName`='npc_bansheesrevenge_nightswood' WHERE `entry`= 31087;

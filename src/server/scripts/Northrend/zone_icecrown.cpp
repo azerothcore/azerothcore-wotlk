@@ -2215,6 +2215,9 @@ float const LichKingWalkSpeed        = 5.5f;
 float const SafirdrangEntryFlightSpeed = 2.25f;
 float const EliteRearFlightSpeed     = 5.0f;
 float const EliteFrontFlightSpeed    = 18.0f;
+uint8 const EliteCount               = 6;
+uint8 const EliteRearIndex           = 4;
+uint8 const EliteFrontIndex          = 5;
 Position const BalargardeElitePos[6] =
 {
     { 7108.229f, 4428.539f, 837.9857f, 4.782202f },
@@ -2251,7 +2254,6 @@ public:
         {
             me->SetReactState(REACT_PASSIVE);
             me->SetImmuneToPC(true);
-            me->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SAFIRDRANGS_CHILL, true);
             me->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SAFIRDRANGS_CHILL_RELAY, true);
         }
 
@@ -2550,7 +2552,7 @@ public:
                 _introDone = true;
                 me->SetSpeedRate(MOVE_FLIGHT, 1.0f);
 
-                for (uint8 i = 4; i < 6; ++i)
+                for (uint8 i = EliteRearIndex; i < EliteCount; ++i)
                     if (Creature* elite = me->SummonCreature(NPC_BALARGARDE_ELITE,
                         BalargardeElitePos[i], TEMPSUMMON_MANUAL_DESPAWN))
                         elite->AI()->DoAction(ACTION_ELITE_START_PATROL + i);
@@ -2655,7 +2657,6 @@ public:
         void InitializeAI() override
         {
             BansheesMakeFlyer(me);
-            me->SetImmuneToPC(true);
         }
 
         void DoAction(int32 action) override
@@ -2663,9 +2664,9 @@ public:
             if (action >= ACTION_ELITE_START_PATROL)
             {
                 uint32 const index = action - ACTION_ELITE_START_PATROL;
-                if (index == 4)
+                if (index == EliteRearIndex)
                     me->SetSpeedRate(MOVE_FLIGHT, EliteRearFlightSpeed);
-                else if (index == 5)
+                else if (index == EliteFrontIndex)
                     me->SetSpeedRate(MOVE_FLIGHT, EliteFrontFlightSpeed);
                 me->GetMotionMaster()->MovePath(PATH_ELITE_BASE + 1 + index,
                     FORCED_MOVEMENT_NONE, PathSource::WAYPOINT_MGR);
@@ -2734,7 +2735,7 @@ public:
                 Talk(SAY_VARDMADRA_ARRIVE);
                 me->SummonCreature(NPC_SAFIRDRANG, SafirdrangSpawnPos, TEMPSUMMON_MANUAL_DESPAWN);
 
-                for (uint8 i = 0; i < 4; ++i)
+                for (uint8 i = 0; i < EliteRearIndex; ++i)
                     if (Creature* elite = me->SummonCreature(NPC_BALARGARDE_ELITE,
                         BalargardeElitePos[i], TEMPSUMMON_MANUAL_DESPAWN))
                         elite->AI()->DoAction(ACTION_ELITE_START_PATROL + i);
@@ -2759,10 +2760,8 @@ public:
                     break;
                 case ACTION_VARDMADRA_REVEAL:
                     me->SetStandState(UNIT_STAND_STATE_STAND);
-                    scheduler.Schedule(600ms, [this](TaskContext /*context*/)
-                    {
-                        Talk(SAY_VARDMADRA_BUT);
-                    }).Schedule(1s, [this](TaskContext /*context*/)
+                    Talk(SAY_VARDMADRA_BUT, 600ms);
+                    scheduler.Schedule(1s, [this](TaskContext /*context*/)
                     {
                         DoCastSelf(SPELL_SUICIDE, true);
                     });
@@ -2802,7 +2801,6 @@ public:
         void InitializeAI() override
         {
             BansheesMakeFlyer(me);
-            me->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SAFIRDRANGS_CHILL, true);
             me->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SAFIRDRANGS_CHILL_RELAY, true);
             me->GetMotionMaster()->MovePoint(POINT_NIGHTSWOOD_HORN, NightswoodHornPos);
         }
