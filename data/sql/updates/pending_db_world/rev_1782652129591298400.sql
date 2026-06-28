@@ -7,6 +7,15 @@ DELETE FROM `quest_request_items_locale` WHERE `ID` = 10324 AND `locale` = 'ruRU
 INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `VerifiedBuild`) VALUES
 (10324, 'ruRU', 'У маралов чрезвычайно прочные шкуры, хотя мясо очень жесткое – практически несъедобное. Но мы их применим для других целей.', 0);
 
+-- Issue #14147: add missing ruRU offer reward / request items text for quest 1034 (The Ruins of Stardust). Hand-translated (wowhead has English fallback only).
+DELETE FROM `quest_offer_reward_locale` WHERE `ID` = 1034 AND `locale` = 'ruRU';
+INSERT INTO `quest_offer_reward_locale` (`ID`, `locale`, `RewardText`, `VerifiedBuild`) VALUES
+(1034, 'ruRU', 'Ты добыл пыль! Я приготовлю из нее припарку – она должна сбить жар у Релары.$B$BЕще раз спасибо тебе, $N. Без твоей помощи моя дочь обязательно бы погибла.', 0);
+
+DELETE FROM `quest_request_items_locale` WHERE `ID` = 1034 AND `locale` = 'ruRU';
+INSERT INTO `quest_request_items_locale` (`ID`, `locale`, `CompletionText`, `VerifiedBuild`) VALUES
+(1034, 'ruRU', 'Удалось ли тебе раздобыть морозную пыль, $N?', 0);
+
 -- Issue #14148: add missing ruRU offer reward text for quest 1025 (An Aggressive Defense)
 DELETE FROM `quest_offer_reward_locale` WHERE `ID` = 1025 AND `locale` = 'ruRU';
 INSERT INTO `quest_offer_reward_locale` (`ID`, `locale`, `RewardText`, `VerifiedBuild`) VALUES
