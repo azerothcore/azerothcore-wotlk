@@ -1,3 +1,4 @@
+-- DB update 2026_06_26_00 -> 2026_06_28_00
 -- Issue #14141: add missing ruRU offer reward / request items text for quest 10324 (The Great Moongraze Hunt)
 DELETE FROM `quest_offer_reward_locale` WHERE `ID` = 10324 AND `locale` = 'ruRU';
 INSERT INTO `quest_offer_reward_locale` (`ID`, `locale`, `RewardText`, `VerifiedBuild`) VALUES
