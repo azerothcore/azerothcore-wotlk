@@ -202,7 +202,7 @@ public:
             { "follow",         npcFollowCommandTable },
             { "load",           HandleNpcLoadCommand,              SEC_ADMINISTRATOR, Console::Yes },
             { "set",            npcSetCommandTable },
-            { "showloot",       HandleNpcShowLootCommand,          rbac::RBAC_PERM_COMMAND_NPC_SHOWLOOT_CORPSE, Console::No },
+            { "showloot",       HandleNpcShowLootCommand,          rbac::RBAC_PERM_COMMAND_NPC_SHOWLOOT, Console::No },
             { "spawngroup",     HandleNpcSpawnGroupCommand,        SEC_ADMINISTRATOR, Console::No },
             { "despawngroup",   HandleNpcDespawnGroupCommand,      SEC_ADMINISTRATOR, Console::No }
         };
@@ -1501,7 +1501,7 @@ public:
             if (ItemLocale const* il = sObjectMgr->GetItemLocale(item.itemid))
                 ObjectMgr::GetLocaleString(il->Name, handler->GetSessionDbLocaleIndex(), name);
 
-        uint32 color = ItemQualityColors[itemTemplate ? itemTemplate->Quality : ITEM_QUALITY_POOR];
+        uint32 color = ItemQualityColors[itemTemplate ? itemTemplate->Quality : uint32(ITEM_QUALITY_POOR)];
         handler->PSendSysMessage(LANG_COMMAND_NPC_SHOWLOOT_ENTRY, item.count, color, item.itemid, name, item.itemid);
     }
 
