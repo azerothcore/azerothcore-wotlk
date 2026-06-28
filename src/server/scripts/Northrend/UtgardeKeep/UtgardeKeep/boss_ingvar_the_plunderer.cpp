@@ -278,6 +278,7 @@ struct boss_ingvar_the_plunderer : public ScriptedAI
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             AttackStart(me->GetVictim());
             me->GetMotionMaster()->MoveChase(me->GetVictim());
+            me->CastSpell((Unit*)nullptr, SPELL_DREADFUL_ROAR, false);
             Talk(YELL_AGGRO_2);
 
             // schedule Phase 2 abilities
