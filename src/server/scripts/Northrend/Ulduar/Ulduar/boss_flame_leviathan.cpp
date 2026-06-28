@@ -121,7 +121,6 @@ enum Events
     EVENT_MIMIRONS_INFERNO              = 8,
     EVENT_THORIMS_HAMMER                = 9,
     EVENT_SOUND_BEGINNING               = 10,
-    EVENT_POSITION_CHECK                = 11,
 };
 
 enum Texts
@@ -209,13 +208,13 @@ struct boss_flame_leviathan : public BossAI
     void ScheduleEvents();
     void SummonTowerHelpers(uint8 towerId);
 
-    // Original
     void JustReachedHome() override
     {
         _JustReachedHome();
         // For achievement
         instance->StorePersistentData(PERSISTENT_DATA_UNBROKEN, 0);
         me->setActive(false);
+        me->RemoveAurasDueToSpell(SPELL_GATHERING_SPEED);
     }
 
     void MoveInLineOfSight(Unit*) override {}
@@ -380,14 +379,6 @@ struct boss_flame_leviathan : public BossAI
 
         switch (events.ExecuteEvent())
         {
-            case EVENT_POSITION_CHECK:
-                if (me->GetPositionX() > 450 || me->GetPositionX() < 120)
-                {
-                    EnterEvadeMode();
-                    return;
-                }
-                events.Repeat(5s);
-                break;
             case EVENT_PURSUE:
                 Talk(FLAME_LEVIATHAN_SAY_PURSUE);
                 me->CastSpell(me, SPELL_PURSUED, false);
@@ -577,7 +568,6 @@ void boss_flame_leviathan::ScheduleEvents()
     events.RescheduleEvent(EVENT_VENT, 20s);
     events.RescheduleEvent(EVENT_SPEED, 15s);
     events.RescheduleEvent(EVENT_SOUND_BEGINNING, 10s);
-    events.RescheduleEvent(EVENT_POSITION_CHECK, 5s);
 
     events.RescheduleEvent(EVENT_PURSUE, 0ms);
 }
