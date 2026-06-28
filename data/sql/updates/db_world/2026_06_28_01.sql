@@ -1,3 +1,4 @@
+-- DB update 2026_06_28_00 -> 2026_06_28_01
 --
 -- 62375 Gathering Speed is not removed by Evade
 -- SPELL_ATTR0_CU_IGNORE_EVADE = 0x00000800
