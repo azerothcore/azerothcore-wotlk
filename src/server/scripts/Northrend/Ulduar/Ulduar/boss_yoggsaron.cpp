@@ -727,6 +727,23 @@ struct boss_yoggsaron_sara : public ScriptedAI
         damage = 0;
     }
 
+    // Players who descend into a portal are teleported ~100 yd below to the illusion
+    // realms, out of range of the main-chamber scan in SelectTargetFromPlayerList.
+    // The fight must keep going while any of them is alive, otherwise the boss resets
+    // and traps them underground.
+    bool HasAlivePlayerInIllusion() const
+    {
+        bool found = false;
+        me->GetMap()->DoForAllPlayers([&](Player* player)
+        {
+            if (found || !player->IsAlive() || player->IsGameMaster() || player->HasAura(SPELL_INSANE1))
+                return;
+            if (player->GetPositionZ() < 300.0f && me->IsWithinDist2d(player, 200.0f))
+                found = true;
+        });
+        return found;
+    }
+
     void UpdateAI(uint32 diff) override
     {
         if (_initFight)
@@ -745,7 +762,7 @@ struct boss_yoggsaron_sara : public ScriptedAI
             return;
         }
 
-        if (!SelectTargetFromPlayerList(90, SPELL_INSANE1))
+        if (!SelectTargetFromPlayerList(90, SPELL_INSANE1) && !HasAlivePlayerInIllusion())
         {
             _instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_INSANE1);
             EnterEvadeMode(EVADE_REASON_OTHER);
