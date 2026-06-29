@@ -593,8 +593,9 @@ void BattlefieldWG::RelocateDeadPlayers(uint8 graveyardId, TeamId newOwner)
 
     ForEachPlayerInZone([this, capturedLoc, newOwner](Player* player)
     {
-        // Only ghosts of the team that just lost this graveyard.
-        if (player->IsAlive() || !player->HasPlayerFlag(PLAYER_FLAGS_GHOST) || player->GetTeamId() == newOwner)
+        // Only players of the losing team waiting to resurrect; they would otherwise be
+        // revived in place on the now-inaccessible captured platform.
+        if (player->GetTeamId() == newOwner || !player->HasAura(SPELL_WAITING_FOR_RESURRECT))
             return;
 
         // Restrict to ghosts actually waiting at the captured graveyard, not elsewhere in the zone.

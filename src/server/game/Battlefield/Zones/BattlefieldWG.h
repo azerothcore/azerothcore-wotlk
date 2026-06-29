@@ -1474,7 +1474,8 @@ struct WGWorkshop
             bf->CapturePointTaken(bf->GetAreaByGraveyardId(workshopId));
 
             // Workshop graveyard share the workshop id; repop ghosts that lost it.
-            if (IsCapturable())
+            // Only on an actual capture, not while the workshop is merely contested (neutral).
+            if (IsCapturable() && teamControl != TEAM_NEUTRAL)
                 bf->RelocateDeadPlayers(workshopId, teamControl);
         }
     }
