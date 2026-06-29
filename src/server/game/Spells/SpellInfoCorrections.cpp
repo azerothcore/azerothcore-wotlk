@@ -1068,6 +1068,8 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPPRESS_TARGET_PROCS;
         spellInfo->AttributesEx4 |= SPELL_ATTR4_DAMAGE_DOESNT_BREAK_AURAS;
+        // Explosion is AoE triggered on aura expiry - cannot be reflected (retail: Spell Reflection only works on single-target spells)
+        spellInfo->AttributesEx |= SPELL_ATTR1_NO_REFLECTION;
     });
 
     // Evocation
@@ -5207,11 +5209,10 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].BasePoints = 1;
     });
 
-    // 26025 Impale
-    ApplySpellFix({ 26025 }, [](SpellInfo* spellInfo)
+    // 51036 Summon Venture Co. Air Patrol
+    ApplySpellFix({ 51036 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_1].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CONE_ENEMY_54);
-        spellInfo->Effects[EFFECT_1].TargetB = SpellImplicitTargetInfo(0);
+        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_CASTER);
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)

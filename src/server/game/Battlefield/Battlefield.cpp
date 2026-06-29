@@ -74,12 +74,13 @@ Battlefield::~Battlefield()
     CapturePoints.clear();
 }
 
-void Battlefield::RemovePlayerFromTracking(ObjectGuid playerGuid)
+void Battlefield::RemovePlayerFromTracking(ObjectGuid playerGuid, bool removeFromQueue /*= true*/)
 {
     for (uint8 i = 0; i < PVP_TEAMS_COUNT; ++i)
     {
         InvitedPlayers[i].erase(playerGuid);
-        PlayersInQueue[i].erase(playerGuid);
+        if (removeFromQueue)
+            PlayersInQueue[i].erase(playerGuid);
         PlayersWillBeKick[i].erase(playerGuid);
         Players[i].erase(playerGuid);
     }
@@ -96,7 +97,8 @@ void Battlefield::HandlePlayerEnterZone(Player* player, uint32 /*zone*/)
     TryRejoinAfterLogout(player); // relog: auto-rejoin, skip invite below
 
     // Xinef: do not invite players on taxi
-    if (!player->IsInFlight())
+    // GMs are not invited to war (see InvitePlayerToWar), so skip queue and slot tracking too
+    if (!player->IsInFlight() && !player->IsGameMaster())
     {
         // If battle is started,
         // If not full of players > invite player to join the war
@@ -108,7 +110,7 @@ void Battlefield::HandlePlayerEnterZone(Player* player, uint32 /*zone*/)
             else
             {
                 /// @todo: Send a packet to announce it to player
-                PlayersWillBeKick[player->GetTeamId()][player->GetGUID()] = GameTime::GetGameTime().count() + (player->IsGameMaster() ? 30 * MINUTE : 10);
+                PlayersWillBeKick[player->GetTeamId()][player->GetGUID()] = GameTime::GetGameTime().count() + 10;
                 InvitePlayerToQueue(player);
             }
         }
@@ -152,7 +154,7 @@ void Battlefield::HandlePlayerLeaveZone(Player* player, uint32 /*zone*/)
     for (BfCapturePoint* cp : CapturePoints)
         cp->HandlePlayerLeave(player);
 
-    RemovePlayerFromTracking(player->GetGUID());
+    RemovePlayerFromTracking(player->GetGUID(), /*removeFromQueue=*/false);
     SendRemoveWorldStates(player);
     RemovePlayerFromResurrectQueue(player->GetGUID());
     OnPlayerLeaveZone(player);
@@ -193,7 +195,7 @@ bool Battlefield::Update(uint32 diff)
         SendUpdateWorldStates();
     }
 
-    _scheduler.Update(diff);
+    _scheduler.Update();
 
     bool objectiveChanged = false;
     if (IsWarTime())
@@ -213,6 +215,9 @@ void Battlefield::InvitePlayersInZoneToQueue()
 
 void Battlefield::InvitePlayerToQueue(Player* player)
 {
+    if (player->IsGameMaster()) // GMs are not invited to war, so don't queue them either
+        return;
+
     if (PlayersInQueue[player->GetTeamId()].count(player->GetGUID()))
         return;
 
@@ -237,6 +242,10 @@ void Battlefield::InvitePlayersInZoneToWar()
 {
     ForEachPlayerInZone([this](Player* player)
     {
+        // Skip GMs: they are never invited, so they would linger in PlayersWillBeKick forever
+        if (player->IsGameMaster())
+            return;
+
         if (IsPlayerInWarOrInvited(player))
             return;
 
@@ -296,6 +305,20 @@ bool Battlefield::IsPlayerInWarOrInvited(Player* player) const
 {
     TeamId teamId = player->GetTeamId();
     return PlayersInWar[teamId].count(player->GetGUID()) || InvitedPlayers[teamId].count(player->GetGUID());
+}
+
+bool Battlefield::IsPlayerInBattlefield(ObjectGuid guid) const
+{
+    if (!IsWarTime())
+        return false;
+
+    // PlayersInWar is split into per-team sets, but a GUID alone does not indicate the team, so check both sets.
+    // This also stays correct if an OnBattlefieldPlayerJoinWar handler reassigned the team GetTeamId() returns.
+    for (uint8 team = 0; team < PVP_TEAMS_COUNT; ++team)
+        if (PlayersInWar[team].count(guid))
+            return true;
+
+    return false;
 }
 
 void Battlefield::KickAfkPlayers()
