@@ -2457,6 +2457,7 @@ public:
     void ResummonPetTemporaryUnSummonedIfAny();
     [[nodiscard]] bool IsPetNeedBeTemporaryUnsummoned() const { return GetSession()->PlayerLogout() || !IsInWorld() || !IsAlive() || IsMounted()/*+in flight*/ || GetVehicle() || IsBeingTeleported(); }
     bool CanResummonPet(uint32 spellid);
+    void ResyncControlledUnitsAfterTeleport();
 
     void SendCinematicStart(uint32 CinematicSequenceId) const;
     void SendMovieStart(uint32 MovieId);

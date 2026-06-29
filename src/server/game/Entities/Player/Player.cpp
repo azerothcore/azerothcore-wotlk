@@ -14420,6 +14420,44 @@ bool Player::CanResummonPet(uint32 spellid)
     return HasSpell(spellid);
 }
 
+void Player::ResyncControlledUnitsAfterTeleport()
+{
+    for (Unit* controlled : m_Controlled)
+    {
+        if (!controlled || !controlled->IsInWorld() || !controlled->IsAlive())
+            continue;
+
+        if (controlled->IsPet() || !controlled->IsCreature())
+            continue;
+
+        CharmInfo* ci = controlled->GetCharmInfo();
+        if (!ci)
+            continue;
+
+        controlled->AttackStop();
+        controlled->InterruptNonMeleeSpells(false);
+        controlled->ClearInPetCombat();
+        controlled->GetMotionMaster()->MoveFollow(this, PET_FOLLOW_DIST, controlled->GetFollowAngle());
+        ci->SetCommandState(COMMAND_FOLLOW);
+        ci->SetIsCommandAttack(false);
+        ci->SetIsAtStay(false);
+        ci->SetIsReturning(true);
+        ci->SetIsCommandFollow(true);
+        ci->SetIsFollowing(false);
+        ci->RemoveStayPosition();
+        ci->SetForcedSpell(0);
+        ci->SetForcedTargetGUID();
+
+        if (!controlled->IsWithinDist3d(this, GetMap()->GetVisibilityRange() - 5.0f))
+            controlled->NearTeleportTo(
+                GetPositionX(),
+                GetPositionY(),
+                GetPositionZ(),
+                controlled->GetOrientation()
+            );
+    }
+}
+
 bool Player::CanSeeSpellClickOn(Creature const* c) const
 {
     if (!c->HasNpcFlag(UNIT_NPC_FLAG_SPELLCLICK))
