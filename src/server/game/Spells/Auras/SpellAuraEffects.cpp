@@ -3154,8 +3154,13 @@ void AuraEffect::HandleAuraModSilence(AuraApplication const* aurApp, uint8 mode,
         for (uint32 i = CURRENT_MELEE_SPELL; i < CURRENT_MAX_SPELL; ++i)
             if (Spell* spell = target->GetCurrentSpell(CurrentSpellTypes(i)))
                 if (spell->m_spellInfo->PreventionType == SPELL_PREVENTION_TYPE_SILENCE)
+                {
+                    // interrupter may be nullptr if the silence caster left the world
+                    sScriptMgr->OnSpellInterrupt(GetCaster(), target, GetSpellInfo()->Id, spell->m_spellInfo->Id);
+
                     // Stop spells on prepare or casting state
                     target->InterruptSpell(CurrentSpellTypes(i), false);
+                }
     }
     else
     {

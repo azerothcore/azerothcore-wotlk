@@ -221,6 +221,8 @@ void AuraApplication::ClientUpdate(bool remove)
 {
     _needClientUpdate = false;
 
+    sScriptMgr->OnAuraApplicationClientUpdate(GetTarget(), GetBase(), remove);
+
     WorldPacket data(SMSG_AURA_UPDATE);
     data << GetTarget()->GetPackGUID();
     BuildUpdatePacket(data, remove);

@@ -25,6 +25,10 @@
 #include <map>
 #include <vector>
 
+class Aura;
+class Spell;
+class WorldObject;
+
 enum GlobalHook
 {
     GLOBALHOOK_ON_ITEM_DEL_FROM_DB,
@@ -47,6 +51,11 @@ enum GlobalHook
     GLOBALHOOK_ON_INSTANCEID_REMOVED,
     GLOBALHOOK_ON_BEFORE_SET_BOSS_STATE,
     GLOBALHOOK_AFTER_INSTANCE_GAME_OBJECT_CREATE,
+    GLOBALHOOK_ON_SPELL_SEND_SPELL_GO,
+    GLOBALHOOK_ON_AURA_APPLICATION_CLIENT_UPDATE,
+    GLOBALHOOK_ON_SPELL_EXECUTE_LOG_SUMMON_OBJECT,
+    GLOBALHOOK_ON_SPELL_INTERRUPT,
+    GLOBALHOOK_ON_SPELL_DISPEL,
     GLOBALHOOK_END
 };
 
@@ -102,6 +111,63 @@ public:
 
     // Called when a gameobject is created by an instance
     virtual void AfterInstanceGameObjectCreate(Map* /*instance*/, GameObject* /*go*/) { }
+
+    /**
+        * @brief Called when Spell::SendSpellGo is about to send
+        *        a client-visible SMSG_SPELL_GO packet.
+        *
+     * @param spell The spell being executed
+     */
+    virtual void OnSpellSendSpellGo(Spell* /*spell*/) { }
+
+    /**
+     * @brief Called when an aura application client update is
+     *        sent (SMSG_AURA_UPDATE), covering both apply
+     *        and remove.
+     *
+     * @param target The unit whose aura state changed
+     * @param aura   The aura being applied or removed
+     * @param remove True if the aura is being removed
+     */
+    virtual void OnAuraApplicationClientUpdate(Unit* /*target*/,
+        Aura* /*aura*/, bool /*remove*/) { }
+
+    /**
+     * @brief Called when a summon execute log is recorded
+     *        (e.g. pet, totem, trap creation).
+     *
+     * @param spell The spell that performed the summon
+     * @param obj   The summoned world object
+     */
+    virtual void OnSpellExecuteLogSummonObject(Spell* /*spell*/,
+        WorldObject* /*obj*/) { }
+
+    /**
+     * @brief Called when a spell interrupt effect succeeds
+     *        (e.g. Kick, Counterspell, Pummel) or when a silence
+     *        aura interrupts a cast on application.
+     *
+     * @param interrupter        The unit that cast the interrupt spell,
+     *                           or nullptr when triggered by a silence
+     *                           aura whose caster is no longer in world
+     * @param interrupted        The unit whose cast was interrupted
+     * @param interruptSpellId   The spell used to interrupt
+     * @param interruptedSpellId The spell that was interrupted
+     */
+    virtual void OnSpellInterrupt(Unit* /*interrupter*/, Unit* /*interrupted*/,
+        uint32 /*interruptSpellId*/, uint32 /*interruptedSpellId*/) { }
+
+    /**
+     * @brief Called when a dispel or spell steal succeeds.
+     *
+     * @param dispeller      The unit that cast the dispel/steal spell
+     * @param victim         The unit that lost the aura
+     * @param dispelSpellId  The dispel/steal spell id
+     * @param removedSpellId The aura spell id that was removed
+     * @param isSteal        True for spell-steal style removals, false for normal dispels
+     */
+    virtual void OnSpellDispel(Unit* /*dispeller*/, Unit* /*victim*/,
+        uint32 /*dispelSpellId*/, uint32 /*removedSpellId*/, bool /*isSteal*/) { }
 };
 
 #endif

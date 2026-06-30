@@ -4784,6 +4784,8 @@ void Spell::SendSpellGo()
     if (!IsNeedSendToClient(true))
         return;
 
+    sScriptMgr->OnSpellSendSpellGo(this);
+
     //LOG_DEBUG("spells.aura", "Sending SMSG_SPELL_GO id={}", m_spellInfo->Id);
 
     uint32 castFlags = CAST_FLAG_UNKNOWN_9;
@@ -5141,6 +5143,7 @@ void Spell::ExecuteLogEffectSummonObject(uint8 effIndex, WorldObject* obj)
 {
     InitEffectExecuteData(effIndex);
     *m_effectExecuteData[effIndex] << obj->GetPackGUID();
+    sScriptMgr->OnSpellExecuteLogSummonObject(this, obj);
 }
 
 void Spell::ExecuteLogEffectUnsummonObject(uint8 effIndex, WorldObject* obj)

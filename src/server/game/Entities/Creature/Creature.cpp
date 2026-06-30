@@ -2187,6 +2187,8 @@ void Creature::ForcedDespawn(Milliseconds timeMSToDespawn, Seconds forceRespawnT
 
 void Creature::DespawnOrUnsummon(Milliseconds msTimeToDespawn /*= 0ms*/, Seconds forcedRespawnTimer /*= 0s*/)
 {
+    sScriptMgr->OnBeforeCreatureDespawn(this);
+
     if (TempSummon* summon = this->ToTempSummon())
         summon->UnSummon(msTimeToDespawn);
     else
