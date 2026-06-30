@@ -2027,7 +2027,11 @@ void Pet::CleanupActionBar()
                 if (!HasSpell(ab->GetAction()))
                     m_charmInfo->SetActionBar(i, 0, ACT_PASSIVE);
                 else if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(ab->GetAction()))
-                    ToggleAutocast(spellInfo, ab->GetType() == ACT_ENABLED);
+                {
+                    auto spellItr = m_spells.find(ab->GetAction());
+                    bool autocast = spellItr != m_spells.end() ? spellItr->second.active == ACT_ENABLED : ab->GetType() == ACT_ENABLED;
+                    ToggleAutocast(spellInfo, autocast);
+                }
             }
 }
 
