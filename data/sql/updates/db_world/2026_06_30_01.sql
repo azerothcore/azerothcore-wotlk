@@ -1,3 +1,4 @@
+-- DB update 2026_06_30_00 -> 2026_06_30_01
 -- Fix Aces High! quest issues (https://github.com/azerothcore/azerothcore-wotlk/issues/23834)
 
 -- 1. Update Wyrmrest Skytalon (32535) spells per sniff (build 46368)
