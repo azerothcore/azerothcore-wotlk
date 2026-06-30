@@ -605,6 +605,11 @@ public:
     [[nodiscard]] float GetGridActivationRange() const;
     [[nodiscard]] float GetVisibilityRange() const;
     virtual float GetSightRange(WorldObject const* target = nullptr) const;
+
+    [[nodiscard]] static float GetLeewayBonusRangeForTargets(Player const* player, Unit const* target);
+    [[nodiscard]] float GetLeewayBonusRange(Unit const* target) const;
+    [[nodiscard]] float GetLeewayBonusRadius() const;
+
     //bool CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth = false, bool distanceCheck = false) const;
     bool CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth = false, bool distanceCheck = false, bool checkAlert = false) const;
 
