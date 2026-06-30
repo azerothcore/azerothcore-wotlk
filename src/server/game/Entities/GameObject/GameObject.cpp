@@ -766,7 +766,7 @@ void GameObject::Update(uint32 diff)
                             {
                                 Group* group = sGroupMgr->GetGroupByGUID(lootingGroupLowGUID);
                                 if (group)
-                                    group->EndRoll(&loot, GetMap());
+                                    group->EndRoll(&loot);
                                 m_groupLootTimer = 0;
                                 lootingGroupLowGUID = 0;
                             }
