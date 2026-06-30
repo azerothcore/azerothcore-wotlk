@@ -1,3 +1,4 @@
+-- DB update 2026_06_30_05 -> 2026_06_30_06
 --   60493  Dying Curse                    item 40255 (213) "Your spells have a chance..."
 --   60490  Embrace of the Spider          item 39229 (200) "Your spells have a chance..."
 --   64742  Pandora's Plea                 item 45490 (226) "Your spells have a chance..."
