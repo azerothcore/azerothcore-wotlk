@@ -165,6 +165,11 @@ ObjectData const gameobjectData[] =
     { 0,                                0                               }
 };
 
+BossBoundaryData const boundaries =
+{
+    { BOSS_LEVIATHAN, new RectangleBoundary(130.0f, 450.0f, -170.0f, 110.0f) },
+};
+
 class instance_ulduar : public InstanceMapScript
 {
 public:
@@ -184,6 +189,7 @@ public:
             SetPersistentDataCount(MAX_PERSISTENT_DATA);
             LoadDoorData(doorData);
             LoadObjectData(creatureData, gameobjectData);
+            LoadBossBoundaries(boundaries);
             Initialize();
         };
 
