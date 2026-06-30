@@ -58,6 +58,7 @@ public:
                         sServerMailMgr->SendServerMail(
                             session->GetPlayer(),
                             servMail.id,
+                            servMail.senderEntry,
                             money,
                             items,
                             conditions,

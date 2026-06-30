@@ -20,6 +20,8 @@
 #include "Log.h"
 #include "World.h"
 #include "soapStub.h"
+#include <chrono>
+#include <memory>
 
 void ACSoapThread(const std::string& host, uint16 port)
 {
@@ -33,10 +35,15 @@ void ACSoapThread(const std::string& host, uint16 port)
     soap.recv_timeout = 5;
     soap.send_timeout = 5;
 
+    // allow rebinding while the previous socket is still in TIME_WAIT (e.g. on a quick restart)
+    soap.bind_flags = SO_REUSEADDR;
+
     if (!soap_valid_socket(soap_bind(&soap, host.c_str(), port, 100)))
     {
         LOG_ERROR("network.soap", "ACSoap: couldn't bind to {}:{}", host, port);
-        exit(-1);
+        // graceful shutdown: exit() here would destroy SocketMgr before StopNetwork() and assert
+        World::StopNow(ERROR_EXIT_CODE);
+        return;
     }
 
     LOG_INFO("network.soap", "ACSoap: bound to http://{}:{}", host, port);
@@ -103,21 +110,28 @@ int ns1__executeCommand(soap* soap, char* command, char** result)
         return soap_sender_fault(soap, "Command can not be empty", "The supplied command was an empty string");
 
     LOG_DEBUG("network.soap", "ACSoap: got command '{}'", command);
-    SOAPCommand connection;
+
+    // Shared so the object survives if we stop waiting below: the queued command keeps a raw
+    // pointer to it and the world thread may still run it after that. The extra reference is
+    // released by commandFinished() once the world side is done with it.
+    auto connection = std::make_shared<SOAPCommand>();
+    connection->m_self = connection;
 
     // commands are executed in the world thread. We have to wait for them to be completed
+    sWorld->QueueCliCommand(new CliCommandHolder(connection.get(), command, &SOAPCommand::print, &SOAPCommand::commandFinished));
+
+    // Wait for the command to finish, but bail on shutdown: ProcessCliCommands() (which fulfils
+    // the promise) stops once the world loop exits, so an unbounded wait here would deadlock.
+    std::future<void> finished = connection->finishedPromise.get_future();
+    while (finished.wait_for(std::chrono::seconds(1)) != std::future_status::ready)
     {
-        // CliCommandHolder will be deleted from world, accessing after queueing is NOT save
-        CliCommandHolder* cmd = new CliCommandHolder(&connection, command, &SOAPCommand::print, &SOAPCommand::commandFinished);
-        sWorld->QueueCliCommand(cmd);
+        if (World::IsStopped())
+            return soap_receiver_fault(soap, "Server is shutting down", "Command aborted: the server is shutting down");
     }
 
-    // Wait until the command has finished executing
-    connection.finishedPromise.get_future().wait();
-
     // The command has finished executing already
-    char* printBuffer = soap_strdup(soap, connection.m_printBuffer.c_str());
-    if (connection.hasCommandSucceeded())
+    char* printBuffer = soap_strdup(soap, connection->m_printBuffer.c_str());
+    if (connection->hasCommandSucceeded())
     {
         *result = printBuffer;
         return SOAP_OK;
@@ -130,6 +144,8 @@ void SOAPCommand::commandFinished(void* soapconnection, bool success)
 {
     SOAPCommand* con = (SOAPCommand*)soapconnection;
     con->setCommandSuccess(success);
+    // world side is done with us; drop the keep-alive (may free the object)
+    con->m_self.reset();
 }
 
 ////////////////////////////////////////////////////////////////////////////////
