@@ -198,7 +198,8 @@ void WorldSessionMgr::UpdateSessions(uint32 const diff)
         next = itr;
         ++next;
         WorldSession* pSession = itr->second;
-        if (!pSession->GetPlayer() || pSession->GetOfflineTime() + sWorld->getIntConfig(CONFIG_INTERVAL_DISCONNECT_TOLERANCE) < currTime || pSession->IsKicked())
+        if (!pSession->GetPlayer() || pSession->IsKicked() ||
+            pSession->GetOfflineTime() + sWorld->getIntConfig(CONFIG_INTERVAL_DISCONNECT_TOLERANCE) < currTime)
         {
             _offlineSessions.erase(itr);
             delete pSession;
@@ -354,13 +355,18 @@ void WorldSessionMgr::AddSession_(WorldSession* session)
                 _offlineSessions.erase(iter);
                 delete tmp;
             }
-            oldSession->SetOfflineTime(GameTime::GetGameTime().count());
-            _offlineSessions[oldSession->GetAccountId()] = oldSession;
+            // The old session was already logging out. The disconnect was intentional and the
+            // CONFIG_INTERVAL_DISCONNECT_TOLERANCE grace period should be skipped.
+            if (oldSession->isLogingOut())
+                delete oldSession;
+            else
+            {
+                oldSession->SetOfflineTime(GameTime::GetGameTime().count());
+                _offlineSessions[oldSession->GetAccountId()] = oldSession;
+            }
         }
         else
-        {
             delete oldSession;
-        }
     }
     else
     {
