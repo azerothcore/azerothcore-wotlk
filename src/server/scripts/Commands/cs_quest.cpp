@@ -742,8 +742,10 @@ public:
 
         uint32 entry = quest->GetQuestId();
         std::string status;
-        if (Player* player = playerTarget->GetConnectedPlayer())
+
+        if (playerTarget->IsConnected())
         {
+            Player* player = playerTarget->GetConnectedPlayer();
             QuestStatus qs = player->GetQuestStatus(entry);
             switch (qs)
             {
@@ -846,8 +848,53 @@ public:
         }
         else
         {
-            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
-            return false;
+            ObjectGuid::LowType guid = playerTarget->GetGUID().GetCounter();
+            QueryResult result = CharacterDatabase.Query("SELECT status FROM character_queststatus WHERE guid = {} AND quest = {}", guid, entry);
+
+            if (result)
+            {
+                uint8 rawStatus = result->Fetch()[0].Get<uint8>();
+                if (rawStatus < MAX_QUEST_STATUS)
+                {
+                    switch (QuestStatus(rawStatus))
+                    {
+                        case QUEST_STATUS_NONE:
+                            status = "Not Taken";
+                            break;
+                        case QUEST_STATUS_COMPLETE:
+                            status = "Complete";
+                            break;
+                        case QUEST_STATUS_INCOMPLETE:
+                            status = "Incomplete";
+                            break;
+                        case QUEST_STATUS_FAILED:
+                            status = "Failed";
+                            break;
+                        case QUEST_STATUS_REWARDED:
+                            status = "Rewarded";
+                            break;
+                        default:
+                            status = "Unknown";
+                            break;
+                    }
+                }
+                else
+                {
+                    status = "Unknown";
+                }
+            }
+            else if (quest->IsSeasonal())
+            {
+                QueryResult seasonalResult = CharacterDatabase.Query("SELECT 1 FROM character_queststatus_seasonal WHERE guid = {} AND quest = {} AND event = {}", guid, entry, quest->GetEventIdForQuest());
+                status = seasonalResult ? "Rewarded" : "Not Taken";
+            }
+            else
+            {
+                QueryResult rewardedResult = CharacterDatabase.Query("SELECT 1 FROM character_queststatus_rewarded WHERE guid = {} AND quest = {} AND active = 1", guid, entry);
+                status = rewardedResult ? "Rewarded" : "Not Taken";
+            }
+
+            handler->PSendSysMessage(LANG_CMD_QUEST_STATUS, quest->GetTitle(), entry, status);
         }
 
         return true;
