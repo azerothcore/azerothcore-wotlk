@@ -1,3 +1,4 @@
+-- DB update 2026_06_30_02 -> 2026_06_30_03
 --
 -- npcflag +SPELLCLICK
 -- unit_flag -NON_ATTACKABLE, +NOT_SELECTABLE
