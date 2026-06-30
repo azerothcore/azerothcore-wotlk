@@ -21,6 +21,9 @@
 #include "MoveSpline.h"
 #include "QueryResult.h"
 #include "Transport.h"
+#include "TaskScheduler.h"
+#include "Config.h"
+#include <chrono>
 
 TransportTemplate::~TransportTemplate()
 {
@@ -411,6 +414,10 @@ MotionTransport* TransportMgr::CreateTransport(uint32 entry, ObjectGuid::LowType
     trans->SetMap(map ? map : sMapMgr->CreateMap(mapId, nullptr));
     if (map && map->IsDungeon())
         trans->m_zoneScript = map->ToInstanceMap()->GetInstanceScript();
+
+    // Merge assumption that it was removed.
+    // xinef: transports are active so passengers can be relocated (grids must be loaded)
+    // trans->setActive(true);
 
     HashMapHolder<MotionTransport>::Insert(trans);
     trans->GetMap()->AddToMap<Transport>(trans);

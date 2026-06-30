@@ -27,6 +27,7 @@
 #include "GameObjectModel.h"
 #include "GridDefines.h"
 #include "GridRefMgr.h"
+#include "Timer.h"
 #include "MapCollisionData.h"
 #include "MapGridManager.h"
 #include "MapRefMgr.h"
@@ -325,6 +326,10 @@ public:
 
     void SendToPlayers(WorldPacket const* data) const;
 
+    void StartPlayersRedirectKickTimer();
+    void StopPlayersRedirectKickTimer();
+    bool IsPlayerRedirectKickTimerActive() { return !_redirectKickTimer.Passed(); }
+
     typedef MapRefMgr PlayerList;
     [[nodiscard]] PlayerList const& GetPlayers() const { return m_mapRefMgr; }
 
@@ -585,6 +590,8 @@ private:
 
     void SendObjectUpdates();
 
+    void UpdatePlayersRedirectKickEvent(uint32 diff);
+
 protected:
     // Type specific code for add/remove to/from grid
     template<class T>
@@ -693,6 +700,9 @@ private:
     PendingAddUpdatableObjectList _pendingAddUpdatableObjectList;
     IntervalTimer _updatableObjectListRecheckTimer;
     ZoneWideVisibleWorldObjectsMap _zoneWideVisibleWorldObjectsMap;
+
+    TimeTrackerSmall _redirectKickTimer;
+    TimeTrackerSmall _lastAnnounceRedirectKickTimer;
 };
 
 enum InstanceResetMethod

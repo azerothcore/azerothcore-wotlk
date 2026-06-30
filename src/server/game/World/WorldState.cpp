@@ -160,6 +160,9 @@ void WorldState::LoadWorldStates()
 // Setting a worldstate will save it to DB
 void WorldState::setWorldState(uint32 index, uint64 timeValue)
 {
+    if (sToCloud9Sidecar->IsCrossrealm())
+        return;
+
     auto const& it = _worldstates.find(index);
     if (it != _worldstates.end())
     {

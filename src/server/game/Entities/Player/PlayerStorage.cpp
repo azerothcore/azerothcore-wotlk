@@ -4973,7 +4973,7 @@ void Player::SetHomebind(WorldLocation const& loc, uint32 areaId)
     stmt->SetData (2, m_homebindX);
     stmt->SetData (3, m_homebindY);
     stmt->SetData (4, m_homebindZ);
-    stmt->SetData(5, GetGUID().GetCounter());
+    stmt->SetData(5, GetGUID().GetRawValue());
     CharacterDatabase.Execute(stmt);
 }
 
@@ -5022,9 +5022,9 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
         return false;
     }
 
-    ObjectGuid::LowType guid = playerGuid.GetCounter();
+    uint64 guid = playerGuid.GetRawValue();
 
-    Object::_Create(guid, 0, HighGuid::Player);
+    Object::_Create(playerGuid);
 
     m_name = fields[2].Get<std::string>();
 
@@ -6082,7 +6082,7 @@ Item* Player::_LoadItem(CharacterDatabaseTransaction trans, uint32 zoneId, uint3
                     // xinef: sync query
                     stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_ITEM_REFUNDS);
                     stmt->SetData(0, item->GetGUID().GetCounter());
-                    stmt->SetData(1, GetGUID().GetCounter());
+                    stmt->SetData(1, GetGUID().GetRawValue());
                     if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
                     {
                         item->SetRefundRecipient((*result)[0].Get<uint32>());
@@ -7122,7 +7122,7 @@ bool Player::_LoadHomeBind(PreparedQueryResult result)
         else
         {
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_PLAYER_HOMEBIND);
-            stmt->SetData(0, GetGUID().GetCounter());
+            stmt->SetData(0, GetGUID().GetRawValue());
             CharacterDatabase.Execute(stmt);
         }
     }
@@ -7136,7 +7136,7 @@ bool Player::_LoadHomeBind(PreparedQueryResult result)
         m_homebindZ = info->positionZ;
 
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_PLAYER_HOMEBIND);
-        stmt->SetData(0, GetGUID().GetCounter());
+        stmt->SetData(0, GetGUID().GetRawValue());
         stmt->SetData(1, m_homebindMapId);
         stmt->SetData(2, m_homebindAreaId);
         stmt->SetData (3, m_homebindX);
@@ -7235,7 +7235,7 @@ void Player::SaveGoldToDB(CharacterDatabaseTransaction trans)
 {
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_MONEY);
     stmt->SetData(0, GetMoney());
-    stmt->SetData(1, GetGUID().GetCounter());
+    stmt->SetData(1, GetGUID().GetRawValue());
     trans->Append(stmt);
 }
 
@@ -7249,7 +7249,7 @@ void Player::_SaveActions(CharacterDatabaseTransaction trans)
         {
             case ACTIONBUTTON_NEW:
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_ACTION);
-                stmt->SetData(0, GetGUID().GetCounter());
+                stmt->SetData(0, GetGUID().GetRawValue());
                 stmt->SetData(1, m_activeSpec);
                 stmt->SetData(2, itr->first);
                 stmt->SetData(3, itr->second.GetAction());
@@ -7263,7 +7263,7 @@ void Player::_SaveActions(CharacterDatabaseTransaction trans)
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_ACTION);
                 stmt->SetData(0, itr->second.GetAction());
                 stmt->SetData(1, uint8(itr->second.GetType()));
-                stmt->SetData(2, GetGUID().GetCounter());
+                stmt->SetData(2, GetGUID().GetRawValue());
                 stmt->SetData(3, itr->first);
                 stmt->SetData(4, m_activeSpec);
                 trans->Append(stmt);
@@ -7273,7 +7273,7 @@ void Player::_SaveActions(CharacterDatabaseTransaction trans)
                 break;
             case ACTIONBUTTON_DELETED:
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_ACTION_BY_BUTTON_SPEC);
-                stmt->SetData(0, GetGUID().GetCounter());
+                stmt->SetData(0, GetGUID().GetRawValue());
                 stmt->SetData(1, itr->first);
                 stmt->SetData(2, m_activeSpec);
                 trans->Append(stmt);
@@ -7290,7 +7290,7 @@ void Player::_SaveActions(CharacterDatabaseTransaction trans)
 void Player::_SaveAuras(CharacterDatabaseTransaction trans, bool logout)
 {
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_AURA);
-    stmt->SetData(0, GetGUID().GetCounter());
+    stmt->SetData(0, GetGUID().GetRawValue());
     trans->Append(stmt);
 
     for (AuraMap::const_iterator itr = m_ownedAuras.begin(); itr != m_ownedAuras.end(); ++itr)
@@ -7325,7 +7325,7 @@ void Player::_SaveAuras(CharacterDatabaseTransaction trans, bool logout)
 
         uint8 index = 0;
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_AURA);
-        stmt->SetData(index++, GetGUID().GetCounter());
+        stmt->SetData(index++, GetGUID().GetRawValue());
         stmt->SetData(index++, itr->second->GetCasterGUID().GetRawValue());
         stmt->SetData(index++, itr->second->GetCastItemGUID().GetRawValue());
         stmt->SetData(index++, itr->second->GetId());
@@ -7410,7 +7410,7 @@ void Player::_SaveInventory(CharacterDatabaseTransaction trans)
     if (m_itemUpdateQueue.empty())
         return;
 
-    ObjectGuid::LowType lowGuid = GetGUID().GetCounter();
+    uint64 guid = GetGUID().GetRawValue();
     for (std::size_t i = 0; i < m_itemUpdateQueue.size(); ++i)
     {
         Item* item = m_itemUpdateQueue[i];
@@ -7429,12 +7429,12 @@ void Player::_SaveInventory(CharacterDatabaseTransaction trans)
                 if (Item* test2 = GetItemByPos(INVENTORY_SLOT_BAG_0, item->GetBagSlot()))
                     bagTestGUID = test2->GetGUID().GetCounter();
                 LOG_ERROR("entities.player", "Player(GUID: {} Name: {})::_SaveInventory - the bag({}) and slot({}) values for the item {} (state {}) are incorrect, the player doesn't have an item at that position!",
-                          lowGuid, GetName(), item->GetBagSlot(), item->GetSlot(), item->GetGUID().ToString(), (int32)item->GetState());
+                          guid, GetName(), item->GetBagSlot(), item->GetSlot(), item->GetGUID().ToString(), (int32)item->GetState());
                 // according to the test that was just performed nothing should be in this slot, delete
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INVENTORY_BY_BAG_SLOT);
                 stmt->SetData(0, bagTestGUID);
                 stmt->SetData(1, item->GetSlot());
-                stmt->SetData(2, lowGuid);
+                stmt->SetData(2, guid);
                 trans->Append(stmt);
 
                 RemoveTradeableItem(item); // pussywizard
@@ -7450,7 +7450,7 @@ void Player::_SaveInventory(CharacterDatabaseTransaction trans)
             else if (test != item)
             {
                 LOG_ERROR("entities.player", "Player(GUID: {} Name: {})::_SaveInventory - the bag({}) and slot({}) values for the item ({}) are incorrect, the item ({}) is there instead!",
-                          lowGuid, GetName(), item->GetBagSlot(), item->GetSlot(), item->GetGUID().ToString(), test->GetGUID().ToString());
+                          guid, GetName(), item->GetBagSlot(), item->GetSlot(), item->GetGUID().ToString(), test->GetGUID().ToString());
                 // save all changes to the item...
                 if (item->GetState() != ITEM_NEW) // only for existing items, no dupes
                     item->SaveToDB(trans);
@@ -7464,7 +7464,7 @@ void Player::_SaveInventory(CharacterDatabaseTransaction trans)
             case ITEM_NEW:
             case ITEM_CHANGED:
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_INVENTORY_ITEM);
-                stmt->SetData(0, lowGuid);
+                stmt->SetData(0, guid);
                 stmt->SetData(1, bag_guid);
                 stmt->SetData (2, item->GetSlot());
                 stmt->SetData(3, item->GetGUID().GetCounter());
@@ -7580,7 +7580,7 @@ void Player::_SaveQuestStatus(CharacterDatabaseTransaction trans)
                 uint8 index = 0;
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_CHAR_QUESTSTATUS);
 
-                stmt->SetData(index++, GetGUID().GetCounter());
+                stmt->SetData(index++, GetGUID().GetRawValue());
                 stmt->SetData(index++, statusItr->first);
                 stmt->SetData(index++, uint8(statusItr->second.Status));
                 stmt->SetData(index++, statusItr->second.Explored);
@@ -7599,7 +7599,7 @@ void Player::_SaveQuestStatus(CharacterDatabaseTransaction trans)
         else
         {
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_QUESTSTATUS_BY_QUEST);
-            stmt->SetData(0, GetGUID().GetCounter());
+            stmt->SetData(0, GetGUID().GetRawValue());
             stmt->SetData(1, saveItr->first);
             trans->Append(stmt);
         }
@@ -7614,7 +7614,7 @@ void Player::_SaveQuestStatus(CharacterDatabaseTransaction trans)
         else // xinef: what the is this? quest can be removed by spelleffect if (!keepAbandoned)
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_QUESTSTATUS_REWARDED_BY_QUEST);
 
-        stmt->SetData(0, GetGUID().GetCounter());
+        stmt->SetData(0, GetGUID().GetRawValue());
         stmt->SetData(1, saveItr->first);
         trans->Append(stmt);
     }
@@ -7636,14 +7636,14 @@ void Player::_SaveDailyQuestStatus(CharacterDatabaseTransaction trans)
 
     // we don't need transactions here.
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_QUEST_STATUS_DAILY_CHAR);
-    stmt->SetData(0, GetGUID().GetCounter());
+    stmt->SetData(0, GetGUID().GetRawValue());
     trans->Append(stmt);
     for (uint32 quest_daily_idx = 0; quest_daily_idx < PLAYER_MAX_DAILY_QUESTS; ++quest_daily_idx)
     {
         if (GetUInt32Value(PLAYER_FIELD_DAILY_QUESTS_1 + quest_daily_idx))
         {
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHARACTER_DAILYQUESTSTATUS);
-            stmt->SetData(0, GetGUID().GetCounter());
+            stmt->SetData(0, GetGUID().GetRawValue());
             stmt->SetData(1, GetUInt32Value(PLAYER_FIELD_DAILY_QUESTS_1 + quest_daily_idx));
             stmt->SetData(2, uint64(m_lastDailyQuestTime));
             trans->Append(stmt);
@@ -7655,7 +7655,7 @@ void Player::_SaveDailyQuestStatus(CharacterDatabaseTransaction trans)
         for (DFQuestsDoneList::iterator itr = m_DFQuests.begin(); itr != m_DFQuests.end(); ++itr)
         {
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHARACTER_DAILYQUESTSTATUS);
-            stmt->SetData(0, GetGUID().GetCounter());
+            stmt->SetData(0, GetGUID().GetRawValue());
             stmt->SetData(1, (*itr));
             stmt->SetData(2, uint64(m_lastDailyQuestTime));
             trans->Append(stmt);
@@ -7670,7 +7670,7 @@ void Player::_SaveWeeklyQuestStatus(CharacterDatabaseTransaction trans)
 
     // we don't need transactions here.
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_QUEST_STATUS_WEEKLY_CHAR);
-    stmt->SetData(0, GetGUID().GetCounter());
+    stmt->SetData(0, GetGUID().GetRawValue());
     trans->Append(stmt);
 
     for (QuestSet::const_iterator iter = m_weeklyquests.begin(); iter != m_weeklyquests.end(); ++iter)
@@ -7678,7 +7678,7 @@ void Player::_SaveWeeklyQuestStatus(CharacterDatabaseTransaction trans)
         uint32 quest_id  = *iter;
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHARACTER_WEEKLYQUESTSTATUS);
-        stmt->SetData(0, GetGUID().GetCounter());
+        stmt->SetData(0, GetGUID().GetRawValue());
         stmt->SetData(1, quest_id);
         trans->Append(stmt);
     }
@@ -7695,7 +7695,7 @@ void Player::_SaveSeasonalQuestStatus(CharacterDatabaseTransaction trans)
 
     // we don't need transactions here.
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_QUEST_STATUS_SEASONAL_CHAR);
-    stmt->SetData(0, GetGUID().GetCounter());
+    stmt->SetData(0, GetGUID().GetRawValue());
     trans->Append(stmt);
 
     m_SeasonalQuestChanged = false;
@@ -7714,7 +7714,7 @@ void Player::_SaveSeasonalQuestStatus(CharacterDatabaseTransaction trans)
             uint32 questId = *itr;
 
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHARACTER_SEASONALQUESTSTATUS);
-            stmt->SetArguments(GetGUID().GetCounter(), questId, eventId);
+            stmt->SetArguments(GetGUID().GetRawValue(), questId, eventId);
             trans->Append(stmt);
         }
     }
@@ -7727,14 +7727,14 @@ void Player::_SaveMonthlyQuestStatus(CharacterDatabaseTransaction trans)
 
     // we don't need transactions here.
     CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_QUEST_STATUS_MONTHLY_CHAR);
-    stmt->SetData(0, GetGUID().GetCounter());
+    stmt->SetData(0, GetGUID().GetRawValue());
     trans->Append(stmt);
 
     for (QuestSet::const_iterator iter = m_monthlyquests.begin(); iter != m_monthlyquests.end(); ++iter)
     {
         uint32 quest_id = *iter;
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHARACTER_MONTHLYQUESTSTATUS);
-        stmt->SetData(0, GetGUID().GetCounter());
+        stmt->SetData(0, GetGUID().GetRawValue());
         stmt->SetData(1, quest_id);
         trans->Append(stmt);
     }
@@ -7757,7 +7757,7 @@ void Player::_SaveSkills(CharacterDatabaseTransaction trans)
         if (itr->second.uState == SKILL_DELETED)
         {
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_SKILL_BY_SKILL);
-            stmt->SetData(0, GetGUID().GetCounter());
+            stmt->SetData(0, GetGUID().GetRawValue());
             stmt->SetData(1, itr->first);
             trans->Append(stmt);
 
@@ -7773,7 +7773,7 @@ void Player::_SaveSkills(CharacterDatabaseTransaction trans)
         {
             case SKILL_NEW:
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_SKILLS);
-                stmt->SetData(0, GetGUID().GetCounter());
+                stmt->SetData(0, GetGUID().GetRawValue());
                 stmt->SetData(1, uint16(itr->first));
                 stmt->SetData(2, value);
                 stmt->SetData(3, max);
@@ -7784,7 +7784,7 @@ void Player::_SaveSkills(CharacterDatabaseTransaction trans)
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_UDP_CHAR_SKILLS);
                 stmt->SetData(0, value);
                 stmt->SetData(1, max);
-                stmt->SetData(2, GetGUID().GetCounter());
+                stmt->SetData(2, GetGUID().GetRawValue());
                 stmt->SetData(3, uint16(itr->first));
                 trans->Append(stmt);
 
@@ -7815,7 +7815,7 @@ void Player::_SaveSpells(CharacterDatabaseTransaction trans)
         if (itr->second->State == PLAYERSPELL_REMOVED || itr->second->State == PLAYERSPELL_CHANGED)
         {
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_SPELL_BY_SPELL);
-            stmt->SetData(0, GetGUID().GetCounter());
+            stmt->SetData(0, GetGUID().GetRawValue());
             stmt->SetData(1, itr->first);
             trans->Append(stmt);
         }
@@ -7824,7 +7824,7 @@ void Player::_SaveSpells(CharacterDatabaseTransaction trans)
         if (itr->second->State == PLAYERSPELL_NEW || itr->second->State == PLAYERSPELL_CHANGED)
         {
             stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_SPELL);
-            stmt->SetData(0, GetGUID().GetCounter());
+            stmt->SetData(0, GetGUID().GetRawValue());
             stmt->SetData(1, itr->first);
             stmt->SetData(2, itr->second->specMask);
             trans->Append(stmt);
@@ -7854,13 +7854,13 @@ void Player::_SaveStats(CharacterDatabaseTransaction trans)
     CharacterDatabasePreparedStatement* stmt = nullptr;
 
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_STATS);
-    stmt->SetData(0, GetGUID().GetCounter());
+    stmt->SetData(0, GetGUID().GetRawValue());
     trans->Append(stmt);
 
     uint8 index = 0;
 
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_STATS);
-    stmt->SetData(index++, GetGUID().GetCounter());
+    stmt->SetData(index++, GetGUID().GetRawValue());
     stmt->SetData(index++, GetMaxHealth());
 
     for (uint8 i = 0; i < MAX_POWERS; ++i)

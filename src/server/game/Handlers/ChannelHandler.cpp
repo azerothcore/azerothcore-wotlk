@@ -18,6 +18,7 @@
 #include "ChannelMgr.h"
 #include "ObjectMgr.h"                                      // for normalizePlayerName
 #include "Player.h"
+#include "Language.h"
 #include <cctype>
 
 void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
@@ -38,6 +39,26 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
         AreaTableEntry const* zone = sAreaTableStore.LookupEntry(GetPlayer()->GetZoneId());
         if (!zone || !GetPlayer()->CanJoinConstantChannelInZone(channel, zone))
             return;
+
+        if (const ChatChannelsEntry* channel = sChatChannelsStore.LookupEntry(channelId))
+        {
+            const auto locale = GetSessionDbcLocale();
+            const std::string& zoneName = zone->area_name[locale];
+            const char* nameExt = nullptr;
+            if (channel->flags & CHANNEL_DBC_FLAG_CITY_ONLY)
+                nameExt = sObjectMgr->GetAcoreStringForDBCLocale(LANG_CHANNEL_CITY).c_str();
+            else
+                nameExt = zoneName.c_str();
+
+            std::array<char, 128> buffer{};
+
+            const char* pattern = channel->pattern[locale];
+
+            if (pattern)
+                std::snprintf(buffer.data(), buffer.size(), pattern, nameExt);
+
+            channelName= buffer.data();
+        }
     }
 
     if (channelName.empty())

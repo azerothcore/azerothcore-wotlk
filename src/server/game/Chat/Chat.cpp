@@ -270,18 +270,19 @@ bool ChatHandler::ParseCommands(std::string_view text)
     return _ParseCommands(text.substr(1));
 }
 
-std::size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, Language language, ObjectGuid senderGUID, ObjectGuid receiverGUID, std::string_view message, uint8 chatTag,
-                                    std::string const& senderName /*= ""*/, std::string const& receiverName /*= ""*/,
-                                    uint32 achievementId /*= 0*/, bool gmMessage /*= false*/, std::string const& channelName /*= ""*/)
-{
+std::size_t ChatHandler::BuildChatPacket(WorldPacket &data, ChatMsg chatType, Language language, ObjectGuid senderGUID,
+                                         ObjectGuid receiverGUID, std::string_view message, uint8 chatTag,
+                                         std::string const &senderName /*= ""*/,
+                                         std::string const &receiverName /*= ""*/,
+                                         uint32 achievementId /*= 0*/, bool gmMessage /*= false*/,
+                                         std::string const &channelName /*= ""*/) {
     std::size_t receiverGUIDPos = 0;
     data.Initialize(!gmMessage ? SMSG_MESSAGECHAT : SMSG_GM_MESSAGECHAT);
     data << uint8(chatType);
     data << int32(language);
     data << senderGUID;
-    data << uint32(0);  // some flags
-    switch (chatType)
-    {
+    data << uint32(0); // some flags
+    switch (chatType) {
         case CHAT_MSG_MONSTER_SAY:
         case CHAT_MSG_MONSTER_PARTY:
         case CHAT_MSG_MONSTER_YELL:
@@ -294,8 +295,7 @@ std::size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, La
             data << senderName;
             receiverGUIDPos = data.wpos();
             data << receiverGUID;
-            if (receiverGUID && !receiverGUID.IsPlayer() && !receiverGUID.IsPet())
-            {
+            if (receiverGUID && !receiverGUID.IsPlayer() && !receiverGUID.IsPet()) {
                 data << uint32(receiverName.length() + 1);
                 data << receiverName;
             }
@@ -311,8 +311,7 @@ std::size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, La
         case CHAT_MSG_BG_SYSTEM_HORDE:
             receiverGUIDPos = data.wpos();
             data << receiverGUID;
-            if (receiverGUID && !receiverGUID.IsPlayer())
-            {
+            if (receiverGUID && !receiverGUID.IsPlayer()) {
                 data << uint32(receiverName.length() + 1);
                 data << receiverName;
             }
@@ -323,14 +322,12 @@ std::size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, La
             data << receiverGUID;
             break;
         default:
-            if (gmMessage)
-            {
+            if (gmMessage) {
                 data << uint32(senderName.length() + 1);
                 data << senderName;
             }
 
-            if (chatType == CHAT_MSG_CHANNEL)
-            {
+            if (chatType == CHAT_MSG_CHANNEL) {
                 ASSERT(channelName.length() > 0);
                 data << channelName;
             }
