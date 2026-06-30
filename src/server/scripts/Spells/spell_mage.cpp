@@ -1042,6 +1042,13 @@ class spell_mage_combustion : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
+        // Combustion only interacts with directly cast fire spells.
+        // Reactive/proc-triggered spells (e.g. Molten Armor) bypass the system
+        // triggered-spell guard via SPELL_ATTR3_NOT_A_PROC, so filter them here.
+        if (Spell const* procSpell = eventInfo.GetProcSpell())
+            if (procSpell->IsTriggered())
+                return false;
+
         // Do not take charges, add a stack of crit buff
         if (!(eventInfo.GetHitMask() & PROC_HIT_CRITICAL))
         {
