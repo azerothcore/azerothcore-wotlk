@@ -21,6 +21,7 @@
 #include "CreatureScript.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
+#include "GameTime.h"
 #include "ObjectMgr.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
@@ -222,6 +223,23 @@ public:
     {
         Acore::CreatureWorker<ValithriaDespawner> worker(_creature, *this);
         Cell::VisitObjects(_creature, worker, 333.0f);
+
+        // Risen Archmages killed earlier in the attempt have already corpse-decayed
+        // and left the world, so the CreatureWorker above can't reach them. Re-time
+        // their (and Valithria's) saved respawns so the encounter can restart.
+        if (Map* map = _creature->GetMap())
+        {
+            std::vector<ObjectGuid::LowType> toRespawn;
+            for (auto const& [spawnId, respawnTime] : map->GetCreatureRespawnTimes())
+                if (CreatureData const* data = sObjectMgr->GetCreatureData(spawnId))
+                    if (data->id == NPC_RISEN_ARCHMAGE || data->id == NPC_VALITHRIA_DREAMWALKER)
+                        toRespawn.push_back(spawnId);
+
+            time_t newRespawnTime = GameTime::GetGameTime().count() + 11;
+            for (ObjectGuid::LowType spawnId : toRespawn)
+                map->SaveCreatureRespawnTime(spawnId, newRespawnTime);
+        }
+
         _creature->AI()->Reset();
         _creature->setActive(false);
         return true;
@@ -259,23 +277,11 @@ public:
                 return;
         }
 
-        uint32 corpseDelay = creature->GetCorpseDelay();
-        uint32 respawnDelay = creature->GetRespawnDelay();
-        creature->SetCorpseDelay(1);
-        creature->SetRespawnDelay(10);
-
         if (CreatureData const* data = creature->GetCreatureData())
             creature->SetPosition(data->posX, data->posY, data->posZ, data->orientation);
-        if (!creature->IsAlive())
-        {
-            creature->RemoveCorpse(false);
-            creature->SetRespawnTime(11);
-        }
-        else
-            creature->DespawnOrUnsummon();
 
-        creature->SetCorpseDelay(corpseDelay);
-        creature->SetRespawnDelay(respawnDelay);
+        // Force the encounter's 11s reset; the DB respawn delay can be up to 7 days.
+        creature->DespawnOrUnsummon(0ms, 11s);
     }
 
 private:
