@@ -124,9 +124,9 @@ void ScriptMgr::OnUnitEnterCombat(Unit* unit, Unit* victim)
     CALL_ENABLED_HOOKS(UnitScript, UNITHOOK_ON_UNIT_ENTER_COMBAT, script->OnUnitEnterCombat(unit, victim));
 }
 
-void ScriptMgr::OnUnitStopCombat(Unit* unit)
+void ScriptMgr::OnUnitExitCombat(Unit* unit)
 {
-    CALL_ENABLED_HOOKS(UnitScript, UNITHOOK_ON_UNIT_STOP_COMBAT, script->OnUnitStopCombat(unit));
+    CALL_ENABLED_HOOKS(UnitScript, UNITHOOK_ON_UNIT_EXIT_COMBAT, script->OnUnitExitCombat(unit));
 }
 
 void ScriptMgr::OnUnitDeath(Unit* unit, Unit* killer)
