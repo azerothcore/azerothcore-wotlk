@@ -49,6 +49,7 @@ SmartScript::SmartScript()
     go = nullptr;
     me = nullptr;
     trigger = nullptr;
+    mQuestEntry = 0;
     mEventPhase = 0;
     mPathId = 0;
     mTextTimer = 0;
@@ -5299,6 +5300,11 @@ void SmartScript::GetScript()
         e = sSmartScriptMgr->GetScript((int32)trigger->entry, mScriptType);
         FillScript(e, nullptr, trigger);
     }
+    else if (mQuestEntry)
+    {
+        e = sSmartScriptMgr->GetScript((int32)mQuestEntry, mScriptType);
+        FillScript(e, nullptr, nullptr);
+    }
 }
 
 void SmartScript::OnInitialize(WorldObject* obj, AreaTrigger const* at)
@@ -5342,6 +5348,19 @@ void SmartScript::OnInitialize(WorldObject* obj, AreaTrigger const* at)
     ProcessEventsFor(SMART_EVENT_AI_INIT);
     InstallEvents();
     ProcessEventsFor(SMART_EVENT_JUST_CREATED);
+}
+
+void SmartScript::OnInitializeQuest(uint32 questEntry)
+{
+    mScriptType = SMART_SCRIPT_TYPE_QUEST;
+    mQuestEntry = questEntry;
+    me = nullptr;
+    go = nullptr;
+    trigger = nullptr;
+    LOG_DEBUG("sql.sql", "SmartScript::OnInitializeQuest: source is Quest {}", questEntry);
+    GetScript();
+    for (SmartScriptHolder& event : mEvents)
+        InitTimer(event);
 }
 
 void SmartScript::OnMoveInLineOfSight(Unit* who)

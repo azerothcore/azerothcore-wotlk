@@ -43,6 +43,7 @@ public:
     ~SmartScript();
 
     void OnInitialize(WorldObject* obj, AreaTrigger const* at = nullptr);
+    void OnInitializeQuest(uint32 questEntry);
     void GetScript();
     void FillScript(SmartAIEventList e, WorldObject* obj, AreaTrigger const* at);
 
@@ -228,6 +229,7 @@ private:
     GameObject* go;
     ObjectGuid goOrigGUID;
     AreaTrigger const* trigger;
+    uint32 mQuestEntry;
     SmartScriptType mScriptType;
     uint32 mEventPhase;
 
