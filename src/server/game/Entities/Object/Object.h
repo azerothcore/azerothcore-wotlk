@@ -22,6 +22,7 @@
 #include "Common.h"
 #include "DataMap.h"
 #include "EventProcessor.h"
+#include "G3D/Quat.h"
 #include "G3D/Vector3.h"
 #include "GridDefines.h"
 #include "GridReference.h"
@@ -31,6 +32,7 @@
 #include "ObjectGuid.h"
 #include "Optional.h"
 #include "Position.h"
+#include "SpellDefines.h"
 #include "UnitDefines.h"
 #include "UpdateData.h"
 #include "UpdateMask.h"
@@ -94,6 +96,11 @@ class Unit;
 class Transport;
 class StaticTransport;
 class MotionTransport;
+struct FactionTemplateEntry;
+class Spell;
+class SpellInfo;
+struct CastSpellTargetArg;
+enum SpellCastResult : uint8;
 
 struct PositionFullTerrainStatus;
 
@@ -709,6 +716,10 @@ public:
     [[nodiscard]] float GetMapWaterOrGroundLevel(float x, float y, float z, float* ground = nullptr) const;
     [[nodiscard]] float GetMapHeight(float x, float y, float z, bool vmap = true, float distanceToSearch = 50.0f) const; // DEFAULT_HEIGHT_SEARCH in map.h
 
+    // rotation lying flush on the terrain at this object's position:
+    // yaw from the orientation, pitch/roll from the sampled ground normal
+    [[nodiscard]] G3D::Quat GetTerrainAlignedRotation() const;
+
     [[nodiscard]] float GetFloorZ() const;
     [[nodiscard]] float GetMinHeightInWater() const;
 
@@ -734,6 +745,52 @@ public:
     // Event handler
     ALEEventProcessor* ALEEvents;
     EventProcessor m_Events;
+
+    // CastSpell's third arg can be a variety of things — see CastSpellExtraArgs' constructors.
+    SpellCastResult CastSpell(CastSpellTargetArg const& targets, uint32 spellId,
+                              CastSpellExtraArgs const& args = {});
+    SpellCastResult CastSpell(CastSpellTargetArg const& targets, SpellInfo const* info,
+                              CastSpellExtraArgs const& args = {});
+
+    // Ownership, faction and target validation at the WorldObject level so
+    // non-Unit casters (GameObjects, DynamicObjects, Corpses) can resolve them.
+    // Unit and GameObject override the virtuals with their field-based versions.
+    [[nodiscard]] virtual ObjectGuid GetOwnerGUID() const { return ObjectGuid::Empty; }
+    [[nodiscard]] virtual ObjectGuid GetCharmerOrOwnerGUID() const { return GetOwnerGUID(); }
+    [[nodiscard]] Unit* GetOwnerUnit() const;
+    [[nodiscard]] Unit* GetCharmerOrOwnerUnit() const;
+    [[nodiscard]] Unit* GetCharmerOrOwnerOrSelfUnit() const;
+    [[nodiscard]] Player* GetCharmerOrOwnerPlayerOrPlayerItself() const;
+    [[nodiscard]] Player* GetAffectingPlayer() const;
+    [[nodiscard]] Player* GetSpellModOwner() const;
+
+    [[nodiscard]] virtual uint32 GetFaction() const { return 0; }
+    [[nodiscard]] FactionTemplateEntry const* GetFactionTemplateEntry() const;
+    [[nodiscard]] ReputationRank GetReactionTo(WorldObject const* target) const;
+    static ReputationRank GetFactionReactionTo(FactionTemplateEntry const* factionTemplateEntry, WorldObject const* target);
+    [[nodiscard]] bool IsHostileTo(WorldObject const* target) const;
+    [[nodiscard]] bool IsFriendlyTo(WorldObject const* target) const;
+
+    [[nodiscard]] float GetSpellMaxRangeForTarget(Unit const* target, SpellInfo const* spellInfo) const;
+    [[nodiscard]] float GetSpellMinRangeForTarget(Unit const* target, SpellInfo const* spellInfo) const;
+
+    [[nodiscard]] bool IsValidAttackTarget(WorldObject const* target, SpellInfo const* bySpell = nullptr) const;
+    [[nodiscard]] bool IsValidAssistTarget(WorldObject const* target, SpellInfo const* bySpell = nullptr) const;
+    Unit* GetMagicHitRedirectTarget(Unit* victim, SpellInfo const* spellInfo);
+
+    // Spell calculations usable by any WorldObject caster. Unit-specific
+    // bonuses apply when the caster is (or is owned by) a Unit.
+    int32 CalculateSpellDamage(Unit const* target, SpellInfo const* spellProto, uint8 effect_index, int32 const* basePoints = nullptr) const;
+    int32 CalcSpellDuration(SpellInfo const* spellProto) const;
+    int32 ModSpellDuration(SpellInfo const* spellProto, Unit const* target, int32 duration, bool positive, uint32 effectMask) const;
+    void ModSpellCastTime(SpellInfo const* spellProto, int32& castTime, Spell* spell = nullptr) const;
+
+    [[nodiscard]] virtual SpellMissInfo MeleeSpellHitResult(Unit* /*victim*/, SpellInfo const* /*spellInfo*/) { return SPELL_MISS_NONE; }
+    SpellMissInfo MagicSpellHitResult(Unit* victim, SpellInfo const* spellInfo);
+    SpellMissInfo SpellHitResult(Unit* victim, SpellInfo const* spellInfo, bool canReflect = false);
+    SpellMissInfo SpellHitResult(Unit* victim, Spell const* spell, bool canReflect = false);
+    void SendSpellMiss(Unit* target, uint32 spellID, SpellMissInfo missInfo);
+    void SendSpellNonMeleeDamageLog(Unit* target, SpellInfo const* spellInfo, uint32 damage, SpellSchoolMask schoolMask, uint32 absorb, uint32 resist);
 
 protected:
     std::string m_name;

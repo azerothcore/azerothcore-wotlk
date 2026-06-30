@@ -796,7 +796,11 @@ void GameObject::Update(uint32 diff)
                         else if (Unit* target = ObjectAccessor::GetUnit(*this, _lootStateUnitGUID))
                         {
                             if (goInfo->trap.spellId)
-                                CastSpell(target, goInfo->trap.spellId);
+                            {
+                                CastSpellExtraArgs args;
+                                args.SetOriginalCaster(GetOwnerGUID());
+                                CastSpell(target, goInfo->trap.spellId, args);
+                            }
 
                             m_cooldownTime = GameTime::GetGameTimeMS().count() + (goInfo->trap.cooldown ? goInfo->trap.cooldown : uint32(4)) * IN_MILLISECONDS; // template or 4 seconds
 
@@ -1519,7 +1523,11 @@ void GameObject::Use(Unit* user)
             {
                 GameObjectTemplate const* goInfo = GetGOInfo();
                 if (goInfo->trap.spellId)
-                    CastSpell(user, goInfo->trap.spellId);
+                {
+                    CastSpellExtraArgs args;
+                    args.SetOriginalCaster(GetOwnerGUID());
+                    CastSpell(user, goInfo->trap.spellId, args);
+                }
 
                 m_cooldownTime = GameTime::GetGameTimeMS().count() + (goInfo->trap.cooldown ? goInfo->trap.cooldown :  uint32(4)) * IN_MILLISECONDS; // template or 4 seconds
 
@@ -2072,71 +2080,6 @@ void GameObject::Use(Unit* user)
     }
     else
         CastSpell(user, spellId);
-}
-
-void GameObject::CastSpell(Unit* target, uint32 spellId)
-{
-    SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-    if (!spellInfo)
-        return;
-
-    bool self = true;
-    for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
-    {
-        if (spellInfo->Effects[i].TargetA.GetReferenceType() != TARGET_REFERENCE_TYPE_CASTER || spellInfo->Effects[i].TargetB.GetTarget())
-        {
-            self = false;
-            break;
-        }
-    }
-
-    if (self && target && target->GetGUID() != GetGUID())
-    {
-        target->CastSpell(target, spellInfo, true);
-        return;
-    }
-
-    //summon world trigger
-    Creature* trigger = SummonTrigger(GetPositionX(), GetPositionY(), GetPositionZ(), 0, spellInfo->CalcCastTime() + 2000, true);
-    if (!trigger)
-        return;
-
-    if (Unit* owner = GetOwner())
-    {
-        trigger->SetLevel(owner->GetLevel(), false);
-        trigger->SetFaction(owner->GetFaction());
-        // needed for GO casts for proper target validation checks
-        trigger->SetOwnerGUID(owner->GetGUID());
-        // xinef: fixes some duel bugs with traps]
-        if (owner->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED))
-            trigger->SetUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED);
-        if (owner->IsFFAPvP())
-        {
-            if (!trigger->HasByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP))
-            {
-                sScriptMgr->OnFfaPvpStateUpdate(trigger, true);
-                trigger->SetByteFlag(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_FFA_PVP);
-            }
-
-        }
-        // xinef: Remove Immunity flags
-        trigger->SetImmuneToNPC(false);
-        // xinef: set proper orientation, fixes cast against stealthed targets
-        if (target)
-            trigger->SetInFront(target);
-        trigger->CastSpell(target ? target : trigger, spellInfo, true, 0, 0, owner->GetGUID());
-    }
-    else
-    {
-        // xinef: set faction of gameobject, if no faction - assume hostile
-        trigger->SetFaction(GetTemplateAddon() && GetTemplateAddon()->faction ? GetTemplateAddon()->faction : 14);
-        // Set owner guid for target if no owner availble - needed by trigger auras
-        // - trigger gets despawned and there's no caster avalible (see AuraEffect::TriggerSpell())
-        // xinef: set proper orientation, fixes cast against stealthed targets
-        if (target)
-            trigger->SetInFront(target);
-        trigger->CastSpell(target ? target : trigger, spellInfo, true, 0, 0, target ? target->GetGUID() : ObjectGuid::Empty);
-    }
 }
 
 void GameObject::SendCustomAnim(uint32 anim)
