@@ -3812,6 +3812,21 @@ void Creature::ClearTextRepeatGroup(uint8 textGroup)
         groupItr->second.clear();
 }
 
+bool Creature::IsTextOnCooldown(uint8 textGroup) const
+{
+    auto itr = m_textCooldowns.find(textGroup);
+    if (itr == m_textCooldowns.end())
+        return false;
+
+    return GameTime::GetGameTime().count() < itr->second;
+}
+
+void Creature::SetTextCooldown(uint8 textGroup, uint32 cooldownMs)
+{
+    m_textCooldowns[textGroup] =
+        GameTime::GetGameTime().count() + ((cooldownMs + 999) / 1000);
+}
+
 void Creature::SetRespawnTime(uint32 respawn)
 {
     m_respawnTime = respawn ? GameTime::GetGameTime().count() + respawn : 0;
