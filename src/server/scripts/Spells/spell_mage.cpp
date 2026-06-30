@@ -956,6 +956,11 @@ class spell_mage_fingers_of_frost : public AuraScript
         return ValidateSpellInfo({ SPELL_MAGE_FINGERS_OF_FROST_AURASTATE_AURA });
     }
 
+    void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        _freshlyApplied = true;
+    }
+
     void PrepareProc(ProcEventInfo& eventInfo)
     {
         if (Spell const* spell = eventInfo.GetProcSpell())
@@ -966,11 +971,21 @@ class spell_mage_fingers_of_frost : public AuraScript
             bool prevent = false;
 
             if (isTriggered)
+            {
+                // Triggered procs (e.g. Blizzard ticks) consume charges normally and clear the guard
+                _freshlyApplied = false;
                 prevent = false;
+            }
             else if (isChanneled)
                 prevent = true;
             else if (!isCastPhase)
                 prevent = true;
+            else if (_freshlyApplied)
+            {
+                // The spell that procced FoF into existence must not also consume a charge
+                prevent = true;
+                _freshlyApplied = false;
+            }
 
             if (prevent)
                 PreventDefaultAction();
@@ -979,14 +994,22 @@ class spell_mage_fingers_of_frost : public AuraScript
 
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        GetTarget()->RemoveAurasDueToSpell(SPELL_MAGE_FINGERS_OF_FROST_AURASTATE_AURA);
+        // Keep the aura state active briefly so a spell queued before the last charge
+        // was consumed can still benefit (ghost charge window, ~400ms spell queue window)
+        if (Aura* auraState = GetTarget()->GetAura(SPELL_MAGE_FINGERS_OF_FROST_AURASTATE_AURA))
+            auraState->SetDuration(400);
+        else
+            GetTarget()->RemoveAurasDueToSpell(SPELL_MAGE_FINGERS_OF_FROST_AURASTATE_AURA);
     }
 
     void Register() override
     {
+        AfterEffectApply += AuraEffectApplyFn(spell_mage_fingers_of_frost::HandleApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
         DoPrepareProc += AuraProcFn(spell_mage_fingers_of_frost::PrepareProc);
         AfterEffectRemove += AuraEffectRemoveFn(spell_mage_fingers_of_frost::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
+
+    bool _freshlyApplied = false;
 };
 
 // -31571 - Arcane Potency
