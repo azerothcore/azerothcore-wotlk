@@ -36,6 +36,26 @@ enum Texts
     SAY_BRANN_SPAWN_OOZE          = 7,
     SAY_BRANN_SPAWN_EARTHEN       = 8,
     SAY_BRANN_EVENT_INTRO_1       = 9,
+    SAY_BRANN_EVENT_INTRO_2       = 10,
+    SAY_BRANN_EVENT_A_1           = 11,
+    SAY_BRANN_EVENT_A_3           = 12,
+    SAY_BRANN_EVENT_B_1           = 13,
+    SAY_BRANN_EVENT_B_3           = 14,
+    SAY_BRANN_EVENT_C_1           = 15,
+    SAY_BRANN_EVENT_C_3           = 16,
+    SAY_BRANN_EVENT_D_1           = 17,
+    SAY_BRANN_EVENT_D_3           = 18,
+    SAY_BRANN_EVENT_END_01        = 19,
+    SAY_BRANN_EVENT_END_02        = 20,
+    SAY_BRANN_EVENT_END_04        = 21,
+    SAY_BRANN_EVENT_END_06        = 22,
+    SAY_BRANN_EVENT_END_08        = 23,
+    SAY_BRANN_EVENT_END_10        = 24,
+    SAY_BRANN_EVENT_END_12        = 25,
+    SAY_BRANN_EVENT_END_14        = 26,
+    SAY_BRANN_EVENT_END_16        = 27,
+    SAY_BRANN_EVENT_END_18        = 28,
+    SAY_BRANN_EVENT_END_20        = 29,
     SAY_BRANN_VICTORY_SJONNIR_1   = 30,
     SAY_BRANN_VICTORY_SJONNIR_2   = 31,
     SAY_BRANN_ENTRANCE_MEET       = 32,
@@ -47,8 +67,8 @@ enum Encounter
     BOSS_MAIDEN_OF_GRIEF        = 1,
     BOSS_TRIBUNAL_OF_AGES       = 2,
     BOSS_SJONNIR                = 3,
-    BRANN_BRONZEBEARD           = 4,
-    BRANN_DOOR                  = 5,
+    BRANN_BRONZEBEARD           = 4, // Escort Event
+    BRANN_DOOR                  = 5, // Sjonnir's Door
     MAX_ENCOUNTER               = 6,
 
     DATA_BRANN_ACHIEVEMENT,
@@ -88,6 +108,8 @@ enum npcs
     ACTION_START_SJONNIR_FIGHT      = 5,
     ACTION_SJONNIR_DEAD             = 6,
     ACTION_SJONNIR_WIPE_START       = 7,
+    ACTION_PLAYER_DEATH_IN_TRIBUNAL = 8,
+    ACTION_SKIP_PHASE               = 9,
 };
 
 template <class AI, class T>
