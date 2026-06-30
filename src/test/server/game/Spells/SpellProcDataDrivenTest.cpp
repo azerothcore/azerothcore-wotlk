@@ -161,7 +161,7 @@ protected:
                     return mask;
             }
         }
-        return scenario ? scenario->defaultHitMask : PROC_HIT_NORMAL;
+        return scenario ? scenario->defaultHitMask : static_cast<uint32>(PROC_HIT_NORMAL);
     }
 
     /**
@@ -178,7 +178,7 @@ protected:
             if (entry.SpellTypeMask & PROC_SPELL_TYPE_NO_DMG_HEAL)
                 return PROC_SPELL_TYPE_NO_DMG_HEAL;
         }
-        return scenario ? scenario->defaultSpellTypeMask : PROC_SPELL_TYPE_MASK_ALL;
+        return scenario ? scenario->defaultSpellTypeMask : static_cast<uint32>(PROC_SPELL_TYPE_MASK_ALL);
     }
 
     /**
@@ -189,7 +189,7 @@ protected:
         if (entry.SpellPhaseMask != 0)
             return entry.SpellPhaseMask;
         if (scenario && scenario->requiresSpellPhase)
-            return scenario->defaultSpellPhaseMask ? scenario->defaultSpellPhaseMask : PROC_SPELL_PHASE_HIT;
+            return scenario->defaultSpellPhaseMask ? scenario->defaultSpellPhaseMask : static_cast<uint32>(PROC_SPELL_PHASE_HIT);
         return 0;
     }
 
@@ -381,7 +381,7 @@ TEST_F(SpellProcDatabaseTest, MeleeProcs_AllTriggerOnMelee)
         tested++;
         SpellProcEntry procEntry = entry.ToSpellProcEntry();
 
-        uint32 hitMask = entry.HitMask != 0 ? (entry.HitMask & -entry.HitMask) : PROC_HIT_NORMAL;
+        uint32 hitMask = entry.HitMask != 0 ? (entry.HitMask & -entry.HitMask) : static_cast<uint32>(PROC_HIT_NORMAL);
 
         auto eventInfo = ProcEventInfoBuilder()
             .WithTypeMask(PROC_FLAG_DONE_MELEE_AUTO_ATTACK)
@@ -411,9 +411,9 @@ TEST_F(SpellProcDatabaseTest, SpellDamageProcs_AllTriggerOnSpellDamage)
         tested++;
         SpellProcEntry procEntry = entry.ToSpellProcEntry();
 
-        uint32 hitMask = entry.HitMask != 0 ? (entry.HitMask & -entry.HitMask) : PROC_HIT_NORMAL;
-        uint32 spellTypeMask = entry.SpellTypeMask != 0 ? entry.SpellTypeMask : PROC_SPELL_TYPE_DAMAGE;
-        uint32 spellPhaseMask = entry.SpellPhaseMask != 0 ? entry.SpellPhaseMask : PROC_SPELL_PHASE_HIT;
+        uint32 hitMask = entry.HitMask != 0 ? (entry.HitMask & -entry.HitMask) : static_cast<uint32>(PROC_HIT_NORMAL);
+        uint32 spellTypeMask = entry.SpellTypeMask != 0 ? entry.SpellTypeMask : static_cast<uint32>(PROC_SPELL_TYPE_DAMAGE);
+        uint32 spellPhaseMask = entry.SpellPhaseMask != 0 ? entry.SpellPhaseMask : static_cast<uint32>(PROC_SPELL_PHASE_HIT);
 
         auto eventInfo = CreateEventInfo(
             PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG,
@@ -444,9 +444,9 @@ TEST_F(SpellProcDatabaseTest, HealProcs_AllTriggerOnHeal)
         tested++;
         SpellProcEntry procEntry = entry.ToSpellProcEntry();
 
-        uint32 hitMask = entry.HitMask != 0 ? (entry.HitMask & -entry.HitMask) : PROC_HIT_NORMAL;
-        uint32 spellTypeMask = entry.SpellTypeMask != 0 ? entry.SpellTypeMask : PROC_SPELL_TYPE_HEAL;
-        uint32 spellPhaseMask = entry.SpellPhaseMask != 0 ? entry.SpellPhaseMask : PROC_SPELL_PHASE_HIT;
+        uint32 hitMask = entry.HitMask != 0 ? (entry.HitMask & -entry.HitMask) : static_cast<uint32>(PROC_HIT_NORMAL);
+        uint32 spellTypeMask = entry.SpellTypeMask != 0 ? entry.SpellTypeMask : static_cast<uint32>(PROC_SPELL_TYPE_HEAL);
+        uint32 spellPhaseMask = entry.SpellPhaseMask != 0 ? entry.SpellPhaseMask : static_cast<uint32>(PROC_SPELL_PHASE_HIT);
 
         auto eventInfo = CreateEventInfo(
             PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_POS,
@@ -477,9 +477,9 @@ TEST_F(SpellProcDatabaseTest, PeriodicProcs_AllTriggerOnPeriodic)
         tested++;
         SpellProcEntry procEntry = entry.ToSpellProcEntry();
 
-        uint32 hitMask = entry.HitMask != 0 ? (entry.HitMask & -entry.HitMask) : PROC_HIT_NORMAL;
-        uint32 spellTypeMask = entry.SpellTypeMask != 0 ? entry.SpellTypeMask : PROC_SPELL_TYPE_DAMAGE;
-        uint32 spellPhaseMask = entry.SpellPhaseMask != 0 ? entry.SpellPhaseMask : PROC_SPELL_PHASE_HIT;
+        uint32 hitMask = entry.HitMask != 0 ? (entry.HitMask & -entry.HitMask) : static_cast<uint32>(PROC_HIT_NORMAL);
+        uint32 spellTypeMask = entry.SpellTypeMask != 0 ? entry.SpellTypeMask : static_cast<uint32>(PROC_SPELL_TYPE_DAMAGE);
+        uint32 spellPhaseMask = entry.SpellPhaseMask != 0 ? entry.SpellPhaseMask : static_cast<uint32>(PROC_SPELL_PHASE_HIT);
 
         auto eventInfo = CreateEventInfo(
             PROC_FLAG_DONE_PERIODIC,
