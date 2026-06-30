@@ -8207,6 +8207,10 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
 
         if (loot_type == LOOT_CORPSE && !guid.IsItem())
             SetUnitFlag(UNIT_FLAG_LOOTING);
+
+        if (guid.IsCreature())
+            if (Creature* creature = GetMap()->GetCreature(guid))
+                sScriptMgr->OnPlayerCreatureLootOpened(this, creature);
     }
     else
         SendLootError(guid, LOOT_ERROR_DIDNT_KILL);

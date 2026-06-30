@@ -203,6 +203,7 @@ enum PlayerHook
     PLAYERHOOK_CAN_SEND_ERROR_ALREADY_LOOTED,
     PLAYERHOOK_ON_AFTER_CREATURE_LOOT,
     PLAYERHOOK_ON_AFTER_CREATURE_LOOT_MONEY,
+    PLAYERHOOK_ON_CREATURE_LOOT_OPENED,
     PLAYERHOOK_ON_CAN_UPDATE_SKILL,
     PLAYERHOOK_ON_BEFORE_UPDATE_SKILL,
     PLAYERHOOK_ON_UPDATE_SKILL,
@@ -782,6 +783,21 @@ public:
      * @param player Contains information about the Player
      */
     virtual void OnPlayerAfterCreatureLootMoney(Player* /*player*/) { }
+
+    /**
+     * @brief Fired when a player is granted permission to loot a creature,
+     * after the loot window has been sent to the client. At this point
+     * roundRobinPlayer is already set (assigned at creature death), per-player
+     * FillNotNormalLootFor has run for all nearby group members, and any
+     * Need/Greed rolls for above-threshold items have been started.
+     *
+     * Typical use: AOE loot modules that want to auto-collect nearby eligible
+     * corpses for the same player without showing individual loot windows.
+     *
+     * @param player The player who opened the loot.
+     * @param creature The creature whose loot window was opened.
+     */
+    virtual void OnPlayerCreatureLootOpened(Player* /*player*/, Creature* /*creature*/) { }
 
     virtual bool OnPlayerCanUpdateSkill(Player* /*player*/, uint32 /*skillId*/) { return true; }
     virtual void OnPlayerBeforeUpdateSkill(Player* /*player*/, uint32 /*skillId*/, uint32& /*value*/, uint32 /*max*/, uint32 /*step*/) { }

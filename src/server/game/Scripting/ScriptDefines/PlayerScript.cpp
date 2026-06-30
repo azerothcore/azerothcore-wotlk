@@ -532,6 +532,11 @@ void ScriptMgr::OnPlayerAfterCreatureLootMoney(Player* player)
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_AFTER_CREATURE_LOOT_MONEY, script->OnPlayerAfterCreatureLootMoney(player));
 }
 
+void ScriptMgr::OnPlayerCreatureLootOpened(Player* player, Creature* creature)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_CREATURE_LOOT_OPENED, script->OnPlayerCreatureLootOpened(player, creature));
+}
+
 void ScriptMgr::OnPlayerPetitionBuy(Player* player, Creature* creature, uint32& charterid, uint32& cost, uint32& type)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_PETITION_BUY, script->OnPlayerPetitionBuy(player, creature, charterid, cost, type));
