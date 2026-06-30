@@ -3731,7 +3731,7 @@ void Spell::cancel(bool bySelf)
     Unit* dynObjOwner = (m_caster->GetEntry() == WORLD_TRIGGER && m_originalCaster) ? m_originalCaster : m_caster;
     if (!(bySelf && m_spellInfo->HasEffect(SPELL_EFFECT_ADD_FARSIGHT)))
         dynObjOwner->RemoveDynObject(m_spellInfo->Id);
-    
+
     //set state back so finish will be processed
     m_spellState = oldState;
 
@@ -4459,7 +4459,7 @@ void Spell::finish(bool ok)
         dynObjOwner->RemoveDynObject(m_spellInfo->Id);
         m_caster->RemoveGameObject(m_spellInfo->Id, true);
     }
-    
+
     if (m_spellInfo->IsChanneled())
         m_caster->UpdateInterruptMask();
 
