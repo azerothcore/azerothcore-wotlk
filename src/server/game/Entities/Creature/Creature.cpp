@@ -1956,8 +1956,9 @@ void Creature::setDeathState(DeathState state, bool despawn)
     if (state == DeathState::JustDied)
     {
         m_corpseRemoveTime = GameTime::GetGameTime().count() + m_corpseDelay;
-        if (m_respawnDelayMin != m_respawnDelayMax)
-            m_respawnDelay = urand(m_respawnDelayMin, m_respawnDelayMax);
+        m_respawnDelay = (m_respawnDelayMin == m_respawnDelayMax)
+            ? m_respawnDelayMin
+            : urand(m_respawnDelayMin, m_respawnDelayMax);
         uint32 dynamicRespawnDelay = GetMap()->ApplyDynamicModeRespawnScaling(this, m_respawnDelay);
         m_respawnTime = GameTime::GetGameTime().count() + dynamicRespawnDelay + m_corpseDelay;
 

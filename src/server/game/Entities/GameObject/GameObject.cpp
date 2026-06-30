@@ -951,7 +951,12 @@ void GameObject::DespawnOrUnsummon(Milliseconds delay /*= 0ms*/, Seconds forceRe
                     m_respawnDelayTime = urand(m_respawnDelayTimeMin, m_respawnDelayTimeMax);
                 respawnDelay = int32(m_respawnDelayTime);
             }
-            SetRespawnTime(respawnDelay);
+            // Apply the rolled/forced delay without going through SetRespawnTime → SetRespawnDelay,
+            // which would collapse the persisted [Min, Max] bounds onto this one-shot value.
+            m_respawnTime = respawnDelay > 0 ? GameTime::GetGameTime().count() + respawnDelay : 0;
+            m_respawnDelayTime = respawnDelay > 0 ? uint32(respawnDelay) : 0;
+            if (respawnDelay && !m_spawnedByDefault)
+                UpdateObjectVisibility(true);
         }
 
        // Respawn is handled by the gameobject itself.

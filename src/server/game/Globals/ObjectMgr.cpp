@@ -3050,7 +3050,7 @@ void ObjectMgr::LoadGameobjects()
 
         if (data.SpawnTimeSecMin == 0 && gInfo->IsDespawnAtAction())
         {
-            LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with `SpawnTimeSecMin` (0) value, but the gameobejct is marked as despawnable at action.", guid, data.id);
+            LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with `SpawnTimeSecMin` (0) value, but the gameobject is marked as despawnable at action.", guid, data.id);
         }
 
         data.animprogress   = fields[13].Get<uint8>();
