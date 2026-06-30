@@ -108,6 +108,7 @@ namespace WorldPackets
     namespace Combat
     {
         class SetSheathed;
+        class SAttackStop;
     }
 
     namespace Guild
@@ -526,8 +527,6 @@ public:
     void SendTabardVendorActivate(ObjectGuid guid);
     void SendSpiritResurrect();
     void SendBindPoint(Creature* npc);
-
-    void SendAttackStop(Unit const* enemy);
 
     void SendBattleGroundList(ObjectGuid guid, BattlegroundTypeId bgTypeId = BATTLEGROUND_RB);
 
