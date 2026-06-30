@@ -580,7 +580,7 @@ struct boss_freya : public BossAI
                 break;
             case EVENT_FREYA_IRON_ROOT:
                 Talk(EMOTE_IRON_ROOTS);
-                me->CastCustomSpell(SPELL_IRON_ROOTS_FREYA, SPELLVALUE_MAX_TARGETS, 1, me, false);
+                me->CastCustomSpell(SPELL_IRON_ROOTS_FREYA, SPELLVALUE_MAX_TARGETS, 3, me, false);
                 events.Repeat(45s, 55s);
                 break;
             case EVENT_FREYA_UNSTABLE_SUN_BEAM:
