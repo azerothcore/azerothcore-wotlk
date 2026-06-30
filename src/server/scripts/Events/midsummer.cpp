@@ -428,6 +428,13 @@ class spell_bonfires_blessing : public AuraScript
         return ValidateSpellInfo({ SPELL_BONFIRES_BLESSING });
     }
 
+    bool CheckProc(ProcEventInfo& eventInfo)
+    {
+        Unit* actor = eventInfo.GetActor();
+        Unit* actionTarget = eventInfo.GetActionTarget();
+        return actor && actionTarget && actor->IsValidAttackTarget(actionTarget);
+    }
+
     void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
         if (!IsHolidayActive(HOLIDAY_FIRE_FESTIVAL))
@@ -439,6 +446,7 @@ class spell_bonfires_blessing : public AuraScript
 
     void Register() override
     {
+        DoCheckProc += AuraCheckProcFn(spell_bonfires_blessing::CheckProc);
         AfterEffectApply += AuraEffectApplyFn(spell_bonfires_blessing::OnApply, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
     }
 };

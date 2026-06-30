@@ -1728,12 +1728,6 @@ public:
                              UNIT_STATE_ROOT | UNIT_STATE_STUNNED | UNIT_STATE_DISTRACTED) && !GetOwnerGUID();
     }
 
-    [[nodiscard]] bool HasLeewayMovement() const
-    {
-         return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_STRAFE_LEFT | MOVEMENTFLAG_STRAFE_RIGHT | MOVEMENTFLAG_FALLING)
-                && !IsWalking();
-    }
-
     void KnockbackFrom(float x, float y, float speedXY, float speedZ);
     void JumpTo(float speedXY, float speedZ, bool forward = true);
     void JumpTo(WorldObject* obj, float speedZ);
@@ -1743,6 +1737,7 @@ public:
     [[nodiscard]] float GetSpeedRate(UnitMoveType mtype) const { return m_speed_rate[mtype]; }
     void SetSpeed(UnitMoveType mtype, float rate, bool forced = false);
     void SetSpeedRate(UnitMoveType mtype, float rate) { m_speed_rate[mtype] = rate; }
+    void SendSpeedToController(UnitMoveType mtype, Player* target) const;
 
     void propagateSpeedChange() { GetMotionMaster()->propagateSpeedChange(); }
 
@@ -2184,6 +2179,9 @@ protected:
     VisibleAuraMap m_visibleAuras;
 
     float m_speed_rate[MAX_MOVE_TYPE];
+
+    // snapshot of speed rates taken when SetCharmedBy() is called
+    float _charmStartSpeedRate[MAX_MOVE_TYPE]{};
 
     CharmInfo* m_charmInfo;
     SharedVisionList m_sharedVision;
