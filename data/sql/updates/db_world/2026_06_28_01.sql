@@ -9,4 +9,4 @@ INSERT INTO `spell_custom_attr` (`spell_id`, `attributes`) VALUES (62375, 0x800)
 UPDATE `creature_template_addon` SET `visibilityDistanceType` = 4 WHERE (`entry` IN (33113, 33114, 33139, 34003, 34111, 33143));
 
 -- Ulduar Colossus
-UPDATE `creature_addon` SET `visibilityDistanceType`=4 WHERE `guid` IN (137476, 137477, 137478, 137479, 137480)
+UPDATE `creature_addon` SET `visibilityDistanceType`=4 WHERE `guid` IN (137476, 137477, 137478, 137479, 137480);
