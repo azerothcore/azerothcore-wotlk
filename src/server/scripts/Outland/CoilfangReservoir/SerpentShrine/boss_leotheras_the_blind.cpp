@@ -128,6 +128,13 @@ struct boss_leotheras_the_blind : public BossAI
         });
     }
 
+    void JustReachedHome() override
+    {
+        _JustReachedHome();
+        if (CreatureGroup* formation = me->GetFormation())
+            formation->RespawnFormation(true);
+    }
+
     void AttackStart(Unit* who) override
     {
         if (me->HasAura(SPELL_METAMORPHOSIS))
