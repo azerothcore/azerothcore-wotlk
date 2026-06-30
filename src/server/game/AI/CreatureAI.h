@@ -121,6 +121,9 @@ public:
     // Whether this creature is an escort NPC (override in escort AI)
     virtual bool IsEscortNPC(bool /*onlyIfActive*/ = true) const { return false; }
 
+    // Called by PauseMovementForInteraction when the creature is using escort movement.
+    virtual void OnInteractionPause(uint32 /*pauseTimer*/) {}
+
     // Called for reaction at stopping attack at no attackers or targets
     virtual void EnterEvadeMode(EvadeReason why = EVADE_REASON_OTHER);
 

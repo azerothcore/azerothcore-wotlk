@@ -3113,6 +3113,12 @@ void Creature::PauseMovementForInteraction()
             pauseSlot = MOTION_SLOT_ACTIVE;
         else if (GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) == POINT_MOTION_TYPE)
             pauseSlot = MOTION_SLOT_CONTROLLED;
+        else if (GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_ACTIVE) == ESCORT_MOTION_TYPE)
+        {
+            if (IsAIEnabled)
+                AI()->OnInteractionPause(pause);
+            return;
+        }
 
         PauseMovement(pause, pauseSlot);
     }
