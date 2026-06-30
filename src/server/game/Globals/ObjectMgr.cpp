@@ -2321,11 +2321,11 @@ void ObjectMgr::LoadCreatures()
 {
     uint32 oldMSTime = getMSTime();
 
-    //                                                     0         1   2        3            4           5           6            7              8             9
-    QueryResult result = WorldDatabase.Query("SELECT creature.guid, id, map, equipment_id, position_x, position_y, position_z, orientation, spawntimesecs, wander_distance, "
-                         //      10            11       12          13           14         15         16          17             18                 19                    20
-                         "currentwaypoint, curhealth, curmana, MovementType, spawnMask, phaseMask, eventEntry, pool_entry, creature.npcflag, creature.unit_flags, creature.dynamicflags, "
-                         //       21
+    //                                                     0         1   2        3            4           5           6            7               8                 9
+    QueryResult result = WorldDatabase.Query("SELECT creature.guid, id, map, equipment_id, position_x, position_y, position_z, orientation, SpawnTimeSecMin, SpawnTimeSecMax, "
+                         //      10               11            12       13       14            15         16         17          18             19                 20                    21
+                         "wander_distance, currentwaypoint, curhealth, curmana, MovementType, spawnMask, phaseMask, eventEntry, pool_entry, creature.npcflag, creature.unit_flags, creature.dynamicflags, "
+                         //       22
                          "creature.ScriptName "
                          "FROM creature "
                          "LEFT OUTER JOIN game_event_creature ON creature.guid = game_event_creature.guid "
@@ -2373,20 +2373,21 @@ void ObjectMgr::LoadCreatures()
         data.posY               = fields[5].Get<float>();
         data.posZ               = fields[6].Get<float>();
         data.orientation        = fields[7].Get<float>();
-        data.spawntimesecs      = fields[8].Get<uint32>();
-        data.wander_distance    = fields[9].Get<float>();
-        data.currentwaypoint    = fields[10].Get<uint32>();
-        data.curhealth          = fields[11].Get<uint32>();
-        data.curmana            = fields[12].Get<uint32>();
-        data.movementType       = fields[13].Get<uint8>();
-        data.spawnMask          = fields[14].Get<uint8>();
-        data.phaseMask          = fields[15].Get<uint32>();
-        int16 gameEvent         = fields[16].Get<int16>();
-        uint32 PoolId           = fields[17].Get<uint32>();
-        data.npcflag            = fields[18].Get<uint32>();
-        data.unit_flags         = fields[19].Get<uint32>();
-        data.dynamicflags       = fields[20].Get<uint32>();
-        data.ScriptId           = GetScriptId(fields[21].Get<std::string>());
+        data.SpawnTimeSecMin    = fields[8].Get<uint32>();
+        data.SpawnTimeSecMax    = fields[9].Get<uint32>();
+        data.wander_distance    = fields[10].Get<float>();
+        data.currentwaypoint    = fields[11].Get<uint32>();
+        data.curhealth          = fields[12].Get<uint32>();
+        data.curmana            = fields[13].Get<uint32>();
+        data.movementType       = fields[14].Get<uint8>();
+        data.spawnMask          = fields[15].Get<uint8>();
+        data.phaseMask          = fields[16].Get<uint32>();
+        int16 gameEvent         = fields[17].Get<int16>();
+        uint32 PoolId           = fields[18].Get<uint32>();
+        data.npcflag            = fields[19].Get<uint32>();
+        data.unit_flags         = fields[20].Get<uint32>();
+        data.dynamicflags       = fields[21].Get<uint32>();
+        data.ScriptId           = GetScriptId(fields[22].Get<std::string>());
         data.spawnGroupId       = 0;
 
         if (!data.ScriptId)
@@ -2399,9 +2400,19 @@ void ObjectMgr::LoadCreatures()
             continue;
         }
 
+        if (data.SpawnTimeSecMin > data.SpawnTimeSecMax)
+        {
+            LOG_ERROR("sql.sql", "Table `creature` has creature (SpawnId: {}) with SpawnTimeSecMin ({}) > SpawnTimeSecMax ({}), swapping.",
+                spawnId, data.SpawnTimeSecMin, data.SpawnTimeSecMax);
+            std::swap(data.SpawnTimeSecMin, data.SpawnTimeSecMax);
+        }
+
         // pussywizard: 7 days means no reaspawn, so set it to 14 days, because manual id reset may be late
-        if (mapEntry->IsRaid() && data.spawntimesecs >= 7 * DAY && data.spawntimesecs < 14 * DAY)
-            data.spawntimesecs = 14 * DAY;
+        if (mapEntry->IsRaid() && data.SpawnTimeSecMax >= 7 * DAY && data.SpawnTimeSecMax < 14 * DAY)
+        {
+            data.SpawnTimeSecMin = 14 * DAY;
+            data.SpawnTimeSecMax = 14 * DAY;
+        }
 
         // Skip spawnMask check for transport maps
         if (!_transportMaps.count(data.mapid))
@@ -2577,7 +2588,7 @@ CreatureData const* ObjectMgr::LoadCreatureDataFromDB(ObjectGuid::LowType spawnI
         return data;
 
     QueryResult result = WorldDatabase.Query("SELECT creature.guid, id, map, equipment_id, "
-        "position_x, position_y, position_z, orientation, spawntimesecs, wander_distance, "
+        "position_x, position_y, position_z, orientation, SpawnTimeSecMin, SpawnTimeSecMax, wander_distance, "
         "currentwaypoint, curhealth, curmana, MovementType, spawnMask, phaseMask, "
         "creature.npcflag, creature.unit_flags, creature.dynamicflags, creature.ScriptName "
         "FROM creature WHERE creature.guid = {}", spawnId);
@@ -2603,18 +2614,19 @@ CreatureData const* ObjectMgr::LoadCreatureDataFromDB(ObjectGuid::LowType spawnI
     creatureData.posY             = fields[5].Get<float>();
     creatureData.posZ             = fields[6].Get<float>();
     creatureData.orientation      = fields[7].Get<float>();
-    creatureData.spawntimesecs    = fields[8].Get<uint32>();
-    creatureData.wander_distance  = fields[9].Get<float>();
-    creatureData.currentwaypoint  = fields[10].Get<uint32>();
-    creatureData.curhealth        = fields[11].Get<uint32>();
-    creatureData.curmana          = fields[12].Get<uint32>();
-    creatureData.movementType     = fields[13].Get<uint8>();
-    creatureData.spawnMask        = fields[14].Get<uint8>();
-    creatureData.phaseMask        = fields[15].Get<uint32>();
-    creatureData.npcflag          = fields[16].Get<uint32>();
-    creatureData.unit_flags       = fields[17].Get<uint32>();
-    creatureData.dynamicflags     = fields[18].Get<uint32>();
-    creatureData.ScriptId         = GetScriptId(fields[19].Get<std::string>());
+    creatureData.SpawnTimeSecMin  = fields[8].Get<uint32>();
+    creatureData.SpawnTimeSecMax  = fields[9].Get<uint32>();
+    creatureData.wander_distance  = fields[10].Get<float>();
+    creatureData.currentwaypoint  = fields[11].Get<uint32>();
+    creatureData.curhealth        = fields[12].Get<uint32>();
+    creatureData.curmana          = fields[13].Get<uint32>();
+    creatureData.movementType     = fields[14].Get<uint8>();
+    creatureData.spawnMask        = fields[15].Get<uint8>();
+    creatureData.phaseMask        = fields[16].Get<uint32>();
+    creatureData.npcflag          = fields[17].Get<uint32>();
+    creatureData.unit_flags       = fields[18].Get<uint32>();
+    creatureData.dynamicflags     = fields[19].Get<uint32>();
+    creatureData.ScriptId         = GetScriptId(fields[20].Get<std::string>());
     creatureData.spawnGroupId     = 0;
 
     if (!creatureData.ScriptId)
@@ -2671,8 +2683,18 @@ CreatureData const* ObjectMgr::LoadCreatureDataFromDB(ObjectGuid::LowType spawnI
         return nullptr;
     }
 
-    if (mapEntry->IsRaid() && creatureData.spawntimesecs >= 7 * DAY && creatureData.spawntimesecs < 14 * DAY)
-        creatureData.spawntimesecs = 14 * DAY;
+    if (creatureData.SpawnTimeSecMin > creatureData.SpawnTimeSecMax)
+    {
+        LOG_ERROR("sql.sql", "Table `creature` has creature (SpawnId: {}) with SpawnTimeSecMin ({}) > SpawnTimeSecMax ({}), swapping.",
+            spawnId, creatureData.SpawnTimeSecMin, creatureData.SpawnTimeSecMax);
+        std::swap(creatureData.SpawnTimeSecMin, creatureData.SpawnTimeSecMax);
+    }
+
+    if (mapEntry->IsRaid() && creatureData.SpawnTimeSecMax >= 7 * DAY && creatureData.SpawnTimeSecMax < 14 * DAY)
+    {
+        creatureData.SpawnTimeSecMin = 14 * DAY;
+        creatureData.SpawnTimeSecMax = 14 * DAY;
+    }
 
     bool ok = true;
     for (uint32 diff = 0; diff < MAX_DIFFICULTY - 1 && ok; ++diff)
@@ -2831,7 +2853,8 @@ ObjectGuid::LowType ObjectMgr::AddGOData(uint32 entry, uint32 mapId, float x, fl
     data.rotation.y     = rotation1;
     data.rotation.z     = rotation2;
     data.rotation.w     = rotation3;
-    data.spawntimesecs  = spawntimedelay;
+    data.SpawnTimeSecMin = spawntimedelay;
+    data.SpawnTimeSecMax = spawntimedelay;
     data.animprogress   = 100;
     data.spawnMask      = 1;
     data.go_state       = GO_STATE_READY;
@@ -2886,7 +2909,8 @@ ObjectGuid::LowType ObjectMgr::AddCreData(uint32 entry, uint32 mapId, float x, f
     data.posY = y;
     data.posZ = z;
     data.orientation = o;
-    data.spawntimesecs = spawntimedelay;
+    data.SpawnTimeSecMin = spawntimedelay;
+    data.SpawnTimeSecMax = spawntimedelay;
     data.wander_distance = 0;
     data.currentwaypoint = 0;
     data.curhealth = stats->GenerateHealth(cInfo);
@@ -2922,9 +2946,9 @@ void ObjectMgr::LoadGameobjects()
 
     //                                                0                1   2    3           4           5           6
     QueryResult result = WorldDatabase.Query("SELECT gameobject.guid, id, map, position_x, position_y, position_z, orientation, "
-                         //   7          8          9          10         11             12            13     14         15         16          17
-                         "rotation0, rotation1, rotation2, rotation3, spawntimesecs, animprogress, state, spawnMask, phaseMask, eventEntry, pool_entry, "
-                         //   18
+                         //   7          8          9          10         11               12               13            14     15         16         17          18
+                         "rotation0, rotation1, rotation2, rotation3, SpawnTimeSecMin, SpawnTimeSecMax, animprogress, state, spawnMask, phaseMask, eventEntry, pool_entry, "
+                         //   19
                          "ScriptName "
                          "FROM gameobject LEFT OUTER JOIN game_event_gameobject ON gameobject.guid = game_event_gameobject.guid "
                          "LEFT OUTER JOIN pool_gameobject ON gameobject.guid = pool_gameobject.guid");
@@ -2994,8 +3018,9 @@ void ObjectMgr::LoadGameobjects()
         data.rotation.y     = fields[8].Get<float>();
         data.rotation.z     = fields[9].Get<float>();
         data.rotation.w     = fields[10].Get<float>();
-        data.spawntimesecs  = fields[11].Get<int32>();
-        data.ScriptId       = GetScriptId(fields[18].Get<std::string>());
+        data.SpawnTimeSecMin = fields[11].Get<int32>();
+        data.SpawnTimeSecMax = fields[12].Get<int32>();
+        data.ScriptId       = GetScriptId(fields[19].Get<std::string>());
         data.spawnGroupId   = 0;
         if (!data.ScriptId)
             data.ScriptId = gInfo->ScriptId;
@@ -3007,15 +3032,31 @@ void ObjectMgr::LoadGameobjects()
             continue;
         }
 
-        if (data.spawntimesecs == 0 && gInfo->IsDespawnAtAction())
+        // SpawnTimeSec encodes "despawned-by-default" as a non-positive value; both columns must share the same sign.
+        if ((data.SpawnTimeSecMin >= 0) != (data.SpawnTimeSecMax >= 0))
         {
-            LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with `spawntimesecs` (0) value, but the gameobejct is marked as despawnable at action.", guid, data.id);
+            LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with mismatched signs on SpawnTimeSecMin ({}) / SpawnTimeSecMax ({}), skip.",
+                guid, data.id, data.SpawnTimeSecMin, data.SpawnTimeSecMax);
+            _gameObjectDataStore.erase(guid);
+            continue;
         }
 
-        data.animprogress   = fields[12].Get<uint8>();
+        if (data.SpawnTimeSecMin > data.SpawnTimeSecMax)
+        {
+            LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with SpawnTimeSecMin ({}) > SpawnTimeSecMax ({}), swapping.",
+                guid, data.id, data.SpawnTimeSecMin, data.SpawnTimeSecMax);
+            std::swap(data.SpawnTimeSecMin, data.SpawnTimeSecMax);
+        }
+
+        if (data.SpawnTimeSecMin == 0 && gInfo->IsDespawnAtAction())
+        {
+            LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with `SpawnTimeSecMin` (0) value, but the gameobject is marked as despawnable at action.", guid, data.id);
+        }
+
+        data.animprogress   = fields[13].Get<uint8>();
         data.artKit         = 0;
 
-        uint32 go_state     = fields[13].Get<uint8>();
+        uint32 go_state     = fields[14].Get<uint8>();
         if (go_state >= MAX_GO_STATE)
         {
             LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with invalid `state` ({}) value, skip", guid, data.id, go_state);
@@ -3023,7 +3064,7 @@ void ObjectMgr::LoadGameobjects()
         }
         data.go_state       = GOState(go_state);
 
-        data.spawnMask      = fields[14].Get<uint8>();
+        data.spawnMask      = fields[15].Get<uint8>();
 
         if (!_transportMaps.count(data.mapid))
         {
@@ -3033,9 +3074,9 @@ void ObjectMgr::LoadGameobjects()
         else
             data.spawnGroupId = 1; // force compatibility group for transport spawns
 
-        data.phaseMask      = fields[15].Get<uint32>();
-        int16 gameEvent     = fields[16].Get<int16>();
-        uint32 PoolId        = fields[17].Get<uint32>();
+        data.phaseMask      = fields[16].Get<uint32>();
+        int16 gameEvent     = fields[17].Get<int16>();
+        uint32 PoolId        = fields[18].Get<uint32>();
 
         if (data.rotation.x < -1.0f || data.rotation.x > 1.0f)
         {
@@ -3112,7 +3153,7 @@ GameObjectData const* ObjectMgr::LoadGameObjectDataFromDB(ObjectGuid::LowType sp
         return data;
 
     QueryResult result = WorldDatabase.Query("SELECT gameobject.guid, id, map, position_x, position_y, position_z, orientation, "
-        "rotation0, rotation1, rotation2, rotation3, spawntimesecs, animprogress, state, spawnMask, phaseMask, "
+        "rotation0, rotation1, rotation2, rotation3, SpawnTimeSecMin, SpawnTimeSecMax, animprogress, state, spawnMask, phaseMask, "
         "ScriptName "
         "FROM gameobject WHERE gameobject.guid = {}", spawnId);
 
@@ -3147,10 +3188,11 @@ GameObjectData const* ObjectMgr::LoadGameObjectDataFromDB(ObjectGuid::LowType sp
     goData.rotation.y       = fields[8].Get<float>();
     goData.rotation.z       = fields[9].Get<float>();
     goData.rotation.w       = fields[10].Get<float>();
-    goData.spawntimesecs    = fields[11].Get<int32>();
-    goData.animprogress     = fields[12].Get<uint8>();
+    goData.SpawnTimeSecMin  = fields[11].Get<int32>();
+    goData.SpawnTimeSecMax  = fields[12].Get<int32>();
+    goData.animprogress     = fields[13].Get<uint8>();
     goData.artKit           = 0;
-    goData.ScriptId         = GetScriptId(fields[16].Get<std::string>());
+    goData.ScriptId         = GetScriptId(fields[17].Get<std::string>());
 
     if (!goData.ScriptId)
         goData.ScriptId = gInfo->ScriptId;
@@ -3163,12 +3205,28 @@ GameObjectData const* ObjectMgr::LoadGameObjectDataFromDB(ObjectGuid::LowType sp
         return nullptr;
     }
 
-    if (goData.spawntimesecs == 0 && gInfo->IsDespawnAtAction())
+    // SpawnTimeSec encodes "despawned-by-default" as a non-positive value; both columns must share the same sign.
+    if ((goData.SpawnTimeSecMin >= 0) != (goData.SpawnTimeSecMax >= 0))
     {
-        LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with `spawntimesecs` (0) value, but the gameobject is marked as despawnable at action.", spawnId, entry);
+        LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with mismatched signs on SpawnTimeSecMin ({}) / SpawnTimeSecMax ({}), skipped.",
+            spawnId, entry, goData.SpawnTimeSecMin, goData.SpawnTimeSecMax);
+        _gameObjectDataStore.erase(spawnId);
+        return nullptr;
     }
 
-    uint32 go_state = fields[13].Get<uint8>();
+    if (goData.SpawnTimeSecMin > goData.SpawnTimeSecMax)
+    {
+        LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with SpawnTimeSecMin ({}) > SpawnTimeSecMax ({}), swapping.",
+            spawnId, entry, goData.SpawnTimeSecMin, goData.SpawnTimeSecMax);
+        std::swap(goData.SpawnTimeSecMin, goData.SpawnTimeSecMax);
+    }
+
+    if (goData.SpawnTimeSecMin == 0 && gInfo->IsDespawnAtAction())
+    {
+        LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with `SpawnTimeSecMin` (0) value, but the gameobject is marked as despawnable at action.", spawnId, entry);
+    }
+
+    uint32 go_state = fields[14].Get<uint8>();
     if (go_state >= MAX_GO_STATE)
     {
         LOG_ERROR("sql.sql", "Table `gameobject` has gameobject (GUID: {} Entry: {}) with invalid `state` ({}) value, skipped.", spawnId, entry, go_state);
@@ -3177,8 +3235,8 @@ GameObjectData const* ObjectMgr::LoadGameObjectDataFromDB(ObjectGuid::LowType sp
     }
     goData.go_state = GOState(go_state);
 
-    goData.spawnMask        = fields[14].Get<uint8>();
-    goData.phaseMask        = fields[15].Get<uint32>();
+    goData.spawnMask        = fields[15].Get<uint8>();
+    goData.phaseMask        = fields[16].Get<uint32>();
 
     if (goData.rotation.x < -1.0f || goData.rotation.x > 1.0f)
     {

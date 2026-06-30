@@ -374,7 +374,8 @@ struct CreatureData : public SpawnData
     uint32 id3{0};                                             // entry in creature_template (from creature_multispawn)
     uint32 displayid{0};
     int8 equipmentId{0};
-    uint32 spawntimesecs{0};
+    uint32 SpawnTimeSecMin{0};
+    uint32 SpawnTimeSecMax{0};
     float wander_distance{0.0f};
     uint32 currentwaypoint{0};
     uint32 curhealth{0};
