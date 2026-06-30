@@ -1,3 +1,4 @@
+-- DB update 2026_06_30_04 -> 2026_06_30_05
 
 -- Set idle for three Winter Rumblers
 UPDATE `creature` SET `wander_distance` = 0, `MovementType` = 0 WHERE (`id` = 34135) AND (`guid` IN (136275, 136276, 136277));
