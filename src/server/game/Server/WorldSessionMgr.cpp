@@ -148,13 +148,6 @@ void WorldSessionMgr::UpdateSessions(uint32 const diff)
             if (!RemoveQueuedPlayer(pSession) && sWorld->getIntConfig(CONFIG_INTERVAL_DISCONNECT_TOLERANCE))
                 _disconnects[pSession->GetAccountId()] = now.count();
             _sessions.erase(itr);
-            // If the player had already initiated logout, treat a disconnect such as one done by EXIT GAME->EXIT NOW as
-            // intentional, and skip the CONFIG_INTERVAL_DISCONNECT_TOLERANCE grace period.
-            if (pSession->isLogingOut())
-            {
-                delete pSession;
-                continue;
-            }
             // there should be no offline session if current one is logged onto a character
             SessionMap::iterator iter;
             if ((iter = _offlineSessions.find(pSession->GetAccountId())) != _offlineSessions.end())
@@ -162,6 +155,13 @@ void WorldSessionMgr::UpdateSessions(uint32 const diff)
                 WorldSession* tmp = iter->second;
                 _offlineSessions.erase(iter);
                 delete tmp;
+            }
+            // If the player had already initiated logout, treat a disconnect such as one done by EXIT GAME->EXIT NOW as
+            // intentional, and skip the CONFIG_INTERVAL_DISCONNECT_TOLERANCE grace period.
+            if (pSession->isLogingOut())
+            {
+                delete pSession;
+                continue;
             }
             pSession->SetOfflineTime(now.count());
             _offlineSessions[pSession->GetAccountId()] = pSession;
