@@ -138,7 +138,9 @@ public:
             {
                 me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetImmuneToAll(false);
-                me->SetHover(true);
+                me->SetAnimTier(AnimTier::Ground);
+                me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 0.0f);
+                me->ClearUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
             }
         }
 
@@ -229,25 +231,18 @@ public:
                     events2.ScheduleEvent(EVENT_SVALA_TALK3, 3s);
                     break;
                 case EVENT_SVALA_TALK3:
-                    me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 6.0f);
-                    me->SetHover(true);
+                    me->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 6.0f, me->GetOrientation());
                     me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
-                    events2.ScheduleEvent(30, 1s);
+                    me->SetAnimTier(AnimTier::Fly);
                     events2.ScheduleEvent(EVENT_SVALA_TALK4, 9s);
                     break;
-                case 30:
-                    {
-                        WorldPacket data(SMSG_SPLINE_MOVE_SET_HOVER, 9);
-                        data << me->GetPackGUID();
-                        me->SendMessageToSet(&data, false);
-                        break;
-                    }
                 case EVENT_SVALA_TALK4:
                     {
                         me->CastSpell(me, SPELL_SVALA_TRANSFORMING1, true);
                         me->UpdateEntry(NPC_SVALA_SORROWGRAVE);
                         me->SetCorpseDelay(sWorld->getIntConfig(CONFIG_CORPSE_DECAY_ELITE));
                         me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 6.0f);
+                        me->SetAnimTier(AnimTier::Fly);
                         me->SetImmuneToAll(true);
                         if (Creature* Arthas = ObjectAccessor::GetCreature(*me, ArthasGUID))
                             Arthas->InterruptNonMeleeSpells(false);
@@ -279,14 +274,21 @@ public:
                     events2.ScheduleEvent(EVENT_SVALA_TALK8, 13s);
                     break;
                 case EVENT_SVALA_TALK8:
-                    me->GetMotionMaster()->MoveFall(0, true);
-                    events2.ScheduleEvent(EVENT_SVALA_TALK9, 2s);
-                    break;
+                    {
+                        me->SetAnimTier(AnimTier::Ground);
+                        me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 0.0f);
+                        me->ClearUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
+                        float groundZ = me->GetMap()->GetHeight(me->GetPhaseMask(), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), true);
+                        me->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), groundZ, me->GetOrientation());
+                        events2.ScheduleEvent(EVENT_SVALA_TALK9, 3s);
+                        break;
+                    }
                 case EVENT_SVALA_TALK9:
-                    me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 3.0f);
                     me->SetImmuneToAll(false);
                     me->LoadEquipment(1, true);
                     me->setActive(false);
+                    me->SetAnimTier(AnimTier::Fly);
+                    me->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 2.0f, me->GetOrientation());
                     if (Player* target = SelectTargetFromPlayerList(100.0f))
                         AttackStart(target);
                     return;
@@ -336,6 +338,8 @@ public:
                         DoTeleportPlayer(target, 296.632f, -346.075f, 90.63f, 4.6f);
                         me->NearTeleportTo(296.632f, -346.075f, 110.0f, 4.6f, false);
                         me->SetControlled(true, UNIT_STATE_ROOT);
+                        me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
+                        me->SetAnimTier(AnimTier::Fly);
                     }
 
                     events.DelayEvents(25001ms); // +1 just to be sure
@@ -347,12 +351,16 @@ public:
                     me->CastSpell(me, SPELL_RITUAL_STRIKE, true);
                     return;
                 case EVENT_SORROWGRAVE_FINISH_RITUAL:
-                    me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
-                    me->SetControlled(false, UNIT_STATE_ROOT);
-                    AttackStart(me->GetVictim());
-                    me->GetMotionMaster()->MoveFall(0, true);
-                    summons.DespawnAll();
-                    break;
+                    {
+                        me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
+                        me->SetControlled(false, UNIT_STATE_ROOT);
+                        me->ClearUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
+                        float groundZ = me->GetMap()->GetHeight(me->GetPhaseMask(), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), true);
+                        me->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), groundZ + 2.0f, me->GetOrientation());
+                        AttackStart(me->GetVictim());
+                        summons.DespawnAll();
+                        break;
+                    }
             }
 
             DoMeleeAttackIfReady();
