@@ -100,6 +100,9 @@ protected:
     {
         auto* session = new WorldSession(guidLow, std::string(name), 0, nullptr, security,
             EXPANSION_WRATH_OF_THE_LICH_KING, 0, LOCALE_enUS, 0, false, false, 0);
+        // Pre-allocate RBAC data so Player's ctor (which calls
+        // GetSession()->HasPermission) doesn't try to load from DB.
+        session->InitRBACDataForTest();
 
         auto* player = new TestPlayer(session);
         player->ForceInitValues(guidLow);
