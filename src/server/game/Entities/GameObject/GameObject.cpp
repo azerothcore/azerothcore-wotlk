@@ -65,6 +65,8 @@ GameObject::GameObject() : WorldObject(), MovableMapObject(),
     m_valuesCount = GAMEOBJECT_END;
     m_respawnTime = 0;
     m_respawnDelayTime = 300;
+    m_respawnDelayTimeMin = 300;
+    m_respawnDelayTimeMax = 300;
     m_despawnDelay = 0;
     m_despawnRespawnTime = 0s;
     m_restockTime = 0s;
@@ -938,7 +940,17 @@ void GameObject::DespawnOrUnsummon(Milliseconds delay /*= 0ms*/, Seconds forceRe
     {
         if (m_goData)
         {
-            int32 const respawnDelay = (forceRespawnTime > 0s) ? forceRespawnTime.count() : m_goData->spawntimesecs;
+            int32 respawnDelay;
+            if (forceRespawnTime > 0s)
+            {
+                respawnDelay = forceRespawnTime.count();
+            }
+            else
+            {
+                if (m_respawnDelayTimeMin != m_respawnDelayTimeMax)
+                    m_respawnDelayTime = urand(m_respawnDelayTimeMin, m_respawnDelayTimeMax);
+                respawnDelay = int32(m_respawnDelayTime);
+            }
             SetRespawnTime(respawnDelay);
         }
 
@@ -1050,7 +1062,10 @@ void GameObject::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask, bool 
     data.posZ = GetPositionZ();
     data.orientation = GetOrientation();
     data.rotation = WorldRotation;
-    data.spawntimesecs = m_spawnedByDefault ? m_respawnDelayTime : -(int32)m_respawnDelayTime;
+    int32 const spawnTimeSecMin = m_spawnedByDefault ? int32(m_respawnDelayTimeMin) : -int32(m_respawnDelayTimeMax);
+    int32 const spawnTimeSecMax = m_spawnedByDefault ? int32(m_respawnDelayTimeMax) : -int32(m_respawnDelayTimeMin);
+    data.SpawnTimeSecMin = spawnTimeSecMin;
+    data.SpawnTimeSecMax = spawnTimeSecMax;
     data.animprogress = GetGoAnimProgress();
     data.go_state = GetGoState();
     data.spawnMask = spawnMask;
@@ -1079,7 +1094,8 @@ void GameObject::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask, bool 
     stmt->SetData(index++, WorldRotation.y);
     stmt->SetData(index++, WorldRotation.z);
     stmt->SetData(index++, WorldRotation.w);
-    stmt->SetData(index++, int32(m_respawnDelayTime));
+    stmt->SetData(index++, spawnTimeSecMin);
+    stmt->SetData(index++, spawnTimeSecMax);
     stmt->SetData(index++, GetGoAnimProgress());
     stmt->SetData(index++, uint8(GetGoState()));
     trans->Append(stmt);
@@ -1129,7 +1145,7 @@ bool GameObject::LoadGameObjectFromDB(ObjectGuid::LowType spawnId, Map* map, boo
     if (!Create(map->GenerateLowGuid<HighGuid::GameObject>(), entry, map, phaseMask, x, y, z, ang, data->rotation, animprogress, go_state, artKit))
         return false;
 
-    if (data->spawntimesecs >= 0)
+    if (data->SpawnTimeSecMin >= 0)
     {
         m_spawnedByDefault = true;
 
@@ -1137,11 +1153,15 @@ bool GameObject::LoadGameObjectFromDB(ObjectGuid::LowType spawnId, Map* map, boo
         {
             SetGameObjectFlag(GO_FLAG_NODESPAWN);
             m_respawnDelayTime = 0;
+            m_respawnDelayTimeMin = 0;
+            m_respawnDelayTimeMax = 0;
             m_respawnTime = 0;
         }
         else
         {
-            m_respawnDelayTime = data->spawntimesecs;
+            m_respawnDelayTimeMin = uint32(data->SpawnTimeSecMin);
+            m_respawnDelayTimeMax = uint32(data->SpawnTimeSecMax);
+            m_respawnDelayTime = m_respawnDelayTimeMin == m_respawnDelayTimeMax ? m_respawnDelayTimeMin : urand(m_respawnDelayTimeMin, m_respawnDelayTimeMax);
             m_respawnTime = GetMap()->GetGORespawnTime(m_spawnId);
 
             // ready to respawn
@@ -1155,7 +1175,9 @@ bool GameObject::LoadGameObjectFromDB(ObjectGuid::LowType spawnId, Map* map, boo
     else
     {
         m_spawnedByDefault = false;
-        m_respawnDelayTime = -data->spawntimesecs;
+        m_respawnDelayTimeMin = uint32(-data->SpawnTimeSecMax);
+        m_respawnDelayTimeMax = uint32(-data->SpawnTimeSecMin);
+        m_respawnDelayTime = m_respawnDelayTimeMin == m_respawnDelayTimeMax ? m_respawnDelayTimeMin : urand(m_respawnDelayTimeMin, m_respawnDelayTimeMax);
         m_respawnTime = 0;
     }
 
@@ -1294,6 +1316,8 @@ void GameObject::SetRespawnTime(int32 respawn)
 void GameObject::SetRespawnDelay(int32 respawn)
 {
     m_respawnDelayTime = respawn > 0 ? respawn : 0;
+    m_respawnDelayTimeMin = m_respawnDelayTime;
+    m_respawnDelayTimeMax = m_respawnDelayTime;
 }
 
 void GameObject::Respawn()
