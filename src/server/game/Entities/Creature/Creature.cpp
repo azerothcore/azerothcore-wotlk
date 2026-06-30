@@ -1803,8 +1803,16 @@ void Creature::LoadEquipment(int8 id, bool force /*= false*/)
         return;
 
     m_equipmentId = id;
+
+    // The WoW client skips rendering INVTYPE_HOLDABLE offhands when slot 2 is non-zero,
+    // but renders INVTYPE_SHIELD regardless. Zero out slot 2 so the holdable is visible.
+    bool hideRangedSlot = false;
+    if (einfo->ItemEntry[1] && einfo->ItemEntry[2])
+        if (ItemEntry const* offhand = sItemStore.LookupEntry(einfo->ItemEntry[1]))
+            hideRangedSlot = (offhand->InventoryType == INVTYPE_HOLDABLE);
+
     for (uint8 i = 0; i < 3; ++i)
-        SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + i, einfo->ItemEntry[i]);
+        SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_ID + i, (hideRangedSlot && i == 2) ? 0 : einfo->ItemEntry[i]);
 }
 
 bool Creature::hasQuest(uint32 quest_id) const
