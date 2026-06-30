@@ -1,3 +1,4 @@
+-- DB update 2026_06_30_03 -> 2026_06_30_04
 -- Frostwing Chimaera (24673): remove SMARTCAST_COMBAT_MOVE flag from Venom Spit.
 -- This caused SmartAI to treat Venom Spit as the primary attack and stop chasing
 -- at ~25 yards (spell range) instead of pursuing to melee.
