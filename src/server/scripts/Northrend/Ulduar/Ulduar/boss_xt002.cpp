@@ -177,7 +177,8 @@ struct boss_xt002 : public BossAI
         DoCastSelf(SPELL_STAND);
         me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
         events.SetPhase(PHASE_1);
-        me->SetReactState(REACT_DEFENSIVE);
+        me->SetReactState(REACT_AGGRESSIVE);
+        me->SetNoCallForHelp(true); // Skip pulling nearby
         Initialize();
         instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_MUST_DECONSTRUCT_FASTER);
     }
