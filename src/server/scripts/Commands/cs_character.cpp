@@ -449,8 +449,8 @@ public:
         if (newlevel < 1)
             return false;                                       // invalid level
 
-        if (newlevel > DEFAULT_MAX_LEVEL)                         // hardcoded maximum level
-            newlevel = DEFAULT_MAX_LEVEL;
+        if (newlevel > sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL))
+            newlevel = sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL);
 
         HandleCharacterLevel(player->GetConnectedPlayer(), player->GetGUID(), oldlevel, newlevel, handler);
 
