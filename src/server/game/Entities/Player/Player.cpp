@@ -8195,6 +8195,8 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
     {
         SetLootGUID(guid);
 
+        sScriptMgr->OnPlayerBeforeSendLoot(this, guid, loot);
+
         WorldPacket data(SMSG_LOOT_RESPONSE, (9 + 50));         // we guess size
         data << guid;
         data << uint8(loot_type);
