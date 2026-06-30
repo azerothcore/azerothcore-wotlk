@@ -353,6 +353,22 @@ public:
                     }
                     if (type == BOSS_HODIR && state == DONE)
                         setChestsLootable(BOSS_HODIR);
+                    if (type == BOSS_MIMIRON && state == DONE)
+                    {
+                        if (Creature* mimiron = GetCreature(BOSS_MIMIRON))
+                        {
+                            bool hardmode = mimiron->AI()->GetData(1) != 0;
+                            bool is25man = instance->GetDifficulty() == RAID_DIFFICULTY_25MAN_NORMAL;
+                            uint32 chestId = hardmode
+                                ? (is25man ? GO_MIMIRON_CHEST_HERO_HARD : GO_MIMIRON_CHEST_HARD)
+                                : (is25man ? GO_MIMIRON_CHEST_HERO : GO_MIMIRON_CHEST);
+                            if (GameObject* go = mimiron->SummonGameObject(chestId, 2744.65f, 2569.46f, 364.397f, 0, 0, 0, 0, 0, DAY, true, GO_SUMMON_TIMED_DESPAWN))
+                            {
+                                go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
+                                go->SetLootRecipient(instance);
+                            }
+                        }
+                    }
                     if (state == DONE)
                     {
                         uint8 keeperIdx = type - BOSS_FREYA;

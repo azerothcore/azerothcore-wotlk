@@ -270,10 +270,12 @@ struct boss_mimiron : public BossAI
             instance->SetBossState(BOSS_MIMIRON, DONE);
 
         _isEvading = false;
+        _outroStarted = false;
     }
 
     void Reset() override
     {
+        _outroStarted = false;
         _hardmode = false;
         _berserk = false;
         _achievProximityMine = false;
@@ -362,7 +364,7 @@ struct boss_mimiron : public BossAI
 
     void UpdateAI(uint32 diff) override
     {
-        if (!me->IsInCombat())
+        if (!me->IsInCombat() && !_outroStarted)
         {
             _outOfCombatTimer += diff;
             if (_outOfCombatTimer >= 10000)
@@ -374,11 +376,14 @@ struct boss_mimiron : public BossAI
             return;
         }
 
-        Position p = me->GetHomePosition();
-        if (me->GetExactDist(&p) > 80.0f || !SelectTargetFromPlayerList(150.0f))
+        if (!_outroStarted)
         {
-            EnterEvadeMode(EVADE_REASON_OTHER);
-            return;
+            Position p = me->GetHomePosition();
+            if (me->GetExactDist(&p) > 80.0f || !SelectTargetFromPlayerList(150.0f))
+            {
+                EnterEvadeMode(EVADE_REASON_OTHER);
+                return;
+            }
         }
 
         events.Update(diff);
@@ -735,6 +740,7 @@ struct boss_mimiron : public BossAI
                         if (Creature* computer = me->SummonCreature(NPC_COMPUTER, 2746.7f, 2569.44f, 410.39f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 1000))
                             computer->AI()->Talk(TALK_COMPUTER_TERMINATED);
 
+                    _outroStarted = true;
                     events.Reset();
                     events.ScheduleEvent(EVENT_STAND_UP_FRIENDLY, 6s);
                 }
@@ -749,15 +755,6 @@ struct boss_mimiron : public BossAI
                 Talk(SAY_V07TRON_DEATH);
                 me->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                 instance->SetBossState(BOSS_MIMIRON, DONE);
-                // spawn chest
-                if (uint32 chestId = (_hardmode ? RAID_MODE(GO_MIMIRON_CHEST_HARD, GO_MIMIRON_CHEST_HERO_HARD) : RAID_MODE(GO_MIMIRON_CHEST, GO_MIMIRON_CHEST_HERO)))
-                {
-                    if (GameObject* go = me->SummonGameObject(chestId, 2744.65f, 2569.46f, 364.397f, 0, 0, 0, 0, 0, 0))
-                    {
-                        go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
-                        go->SetLootRecipient(me->GetMap());
-                    }
-                }
                 events.ScheduleEvent(EVENT_DISAPPEAR, 9s);
                 break;
             case EVENT_DISAPPEAR:
@@ -780,6 +777,8 @@ struct boss_mimiron : public BossAI
 
     void EnterEvadeMode(EvadeReason why) override
     {
+        if (_outroStarted)
+            return;
         if (_isEvading)
             return;
         _isEvading = true;
@@ -907,6 +906,7 @@ struct boss_mimiron : public BossAI
 
 private:
     bool _isEvading;
+    bool _outroStarted;
     bool _hardmode;
     bool _berserk;
     bool _achievProximityMine;
