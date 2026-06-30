@@ -400,6 +400,9 @@ public:
     uint8 GetSpiritGraveyardId(uint32 areaId) const;
     uint32 GetAreaByGraveyardId(uint8 gId) const;
 
+    // Teleport ghosts waiting at a just-captured graveyard to their team's nearest controlled one.
+    void RelocateDeadPlayers(uint8 graveyardId, TeamId newOwner);
+
     uint32 GetData(uint32 data) const override;
 
     // True iff the most recent battle ended with the keep captured (attacker win).
@@ -1469,6 +1472,11 @@ struct WGWorkshop
         {
             bf->UpdateCounterVehicle(false);
             bf->CapturePointTaken(bf->GetAreaByGraveyardId(workshopId));
+
+            // Workshop graveyard share the workshop id; repop ghosts that lost it.
+            // Only on an actual capture, not while the workshop is merely contested (neutral).
+            if (IsCapturable() && teamControl != TEAM_NEUTRAL)
+                bf->RelocateDeadPlayers(workshopId, teamControl);
         }
     }
 
