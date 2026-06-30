@@ -77,9 +77,7 @@ void PossessedAI::KilledUnit(Unit*  /*victim*/)
 void CritterAI::JustEngagedWith(Unit* who)
 {
     if (!me->HasUnitState(UNIT_STATE_FLEEING))
-    {
         me->SetControlled(true, UNIT_STATE_FLEEING, who);
-    }
 }
 
 void CritterAI::MovementInform(uint32 type, uint32 /*id*/)
@@ -90,12 +88,29 @@ void CritterAI::MovementInform(uint32 type, uint32 /*id*/)
     }
 }
 
+void CritterAI::UpdateAI(uint32 /*diff*/)
+{
+    if (me->IsPolymorphed())
+    {
+        if (me->HasUnitState(UNIT_STATE_FLEEING))
+            me->SetControlled(false, UNIT_STATE_FLEEING);
+    }
+}
+
 void CritterAI::EnterEvadeMode(EvadeReason why)
 {
-    if (me->HasUnitState(UNIT_STATE_FLEEING))
+    // MOD_CONFUSE (effect[0]) fires before TRANSFORM (effect[1]), so IsPolymorphed() is
+    // still false when MoveConfused() triggers this via flee-generator finalization.
+    // The MOD_CONFUSE aura already carries MECHANIC_POLYMORPH, so check that directly.
+    if (me->IsPolymorphed() || me->HasAuraWithMechanic(1ULL << MECHANIC_POLYMORPH))
     {
-        me->SetControlled(false, UNIT_STATE_FLEEING);
+        if (me->HasUnitState(UNIT_STATE_FLEEING))
+            me->SetControlled(false, UNIT_STATE_FLEEING);
+        return;
     }
+
+    if (me->HasUnitState(UNIT_STATE_FLEEING))
+        me->SetControlled(false, UNIT_STATE_FLEEING);
 
     CreatureAI::EnterEvadeMode(why);
 }
