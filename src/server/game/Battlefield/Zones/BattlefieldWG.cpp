@@ -23,6 +23,7 @@
 #include "BattlefieldWG.h"
 #include "ScriptMgr.h"
 #include "Chat.h"
+#include "GameGraveyard.h"
 #include "GameTime.h"
 #include "MapMgr.h"
 #include "Opcodes.h"
@@ -578,6 +579,32 @@ uint32 BattlefieldWG::GetAreaByGraveyardId(uint8 gId) const
     }
 
     return 0;
+}
+
+void BattlefieldWG::RelocateDeadPlayers(uint8 graveyardId, TeamId newOwner)
+{
+    BfGraveyard const* graveyard = GetGraveyardById(graveyardId);
+    if (!graveyard)
+        return;
+
+    GraveyardStruct const* capturedLoc = sGraveyard->GetGraveyard(graveyard->GetGraveyardId());
+    if (!capturedLoc)
+        return;
+
+    ForEachPlayerInZone([this, capturedLoc, newOwner](Player* player)
+    {
+        // Only players of the losing team waiting to resurrect; they would otherwise be
+        // revived in place on the now-inaccessible captured platform.
+        if (player->GetTeamId() == newOwner || !player->HasAura(SPELL_WAITING_FOR_RESURRECT))
+            return;
+
+        // Restrict to ghosts actually waiting at the captured graveyard, not elsewhere in the zone.
+        if (player->GetDistance2d(capturedLoc->x, capturedLoc->y) > 50.0f)
+            return;
+
+        if (GraveyardStruct const* safeLoc = GetClosestGraveyard(player))
+            player->TeleportTo(safeLoc->Map, safeLoc->x, safeLoc->y, safeLoc->z, player->GetOrientation());
+    });
 }
 
 void BattlefieldWG::OnCreatureCreate(Creature* creature)
