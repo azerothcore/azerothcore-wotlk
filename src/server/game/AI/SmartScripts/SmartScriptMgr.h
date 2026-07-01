@@ -1786,7 +1786,7 @@ struct SmartTarget
             uint32 min;        // Minimum health point range in percent
             uint32 max;        // Maximum health point range in percent
             uint32 dist;       // Maximum range from self
-            uint32 targetmask; // Default : Will target lowest percent health ally in range
+            uint32 targetMask; // Default : Will target lowest percent health ally in range
         } byHealthPct;
     };
 };
