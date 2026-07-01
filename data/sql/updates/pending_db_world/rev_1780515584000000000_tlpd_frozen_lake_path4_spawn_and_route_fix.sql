@@ -4,7 +4,8 @@
 -- The old spawn position (6954.7627, -472.37695, 997.65027) becomes the last loop point.
 
 -- Creature spawn positions for TLPD (guid 39206) and Vyragosa (guid 39210) on Path 4
-UPDATE `creature` SET `position_x` = 6880.4116, `position_y` = -398.9924, `position_z` = 1004.92456, `orientation` = 0.9124172 WHERE `guid` IN (39206, 39210);
+UPDATE `creature` SET `position_x` = 6880.4116, `position_y` = -398.9924, `position_z` = 1004.92456, `orientation` = 0.9124172 WHERE `guid` = 39206 AND `id` = 32491;
+UPDATE `creature` SET `position_x` = 6880.4116, `position_y` = -398.9924, `position_z` = 1004.92456, `orientation` = 0.9124172 WHERE `guid` = 39210 AND `id` = 32630;
 
 -- Rebuild the patrol route with point 1 as the first airborne waypoint (old point 2).
 -- Old point 1 (spawn) is appended as the final point so the loop completes naturally.

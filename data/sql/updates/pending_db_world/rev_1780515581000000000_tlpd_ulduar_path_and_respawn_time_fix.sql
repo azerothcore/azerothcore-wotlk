@@ -50,10 +50,11 @@ UPDATE `waypoint_data` SET `smoothTransition` = 1 WHERE `id` = 392110;
 -- ---------------------------------------------------------------------------
 -- Creatures – TLPD (39211) and Vyragosa (39212) on path 5
 -- ---------------------------------------------------------------------------
-DELETE FROM `creature` WHERE `guid` IN (39211, 39212);
-INSERT INTO `creature` (`guid`, `id1`, `id2`, `id3`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`, `CreateObject`, `Comment`) VALUES
-    (39211, 32491, 0, 0, 571, 67, 0, 1, 511, 0, 8545.776, -1879.3956, 1131.0109, 6.2809854, 21600, 0, 0, 1, 0, 2, 0, 0, 0, '', 58558, 1, 'Time-Lost Proto Drake - Path 5 (Ulduar)'),
-    (39212, 32630, 0, 0, 571, 67, 0, 1, 511, 0, 8545.776, -1879.3956, 1131.0109, 6.2809854, 21600, 0, 0, 1, 0, 2, 0, 0, 0, '', 58558, 1, 'Vyragosa - Path 5 (Ulduar)');
+DELETE FROM `creature` WHERE `guid` = 39211 AND `id` = 32491;
+DELETE FROM `creature` WHERE `guid` = 39212 AND `id` = 32630;
+INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`, `CreateObject`, `Comment`) VALUES
+    (39211, 32491, 571, 67, 0, 1, 511, 0, 8545.776, -1879.3956, 1131.0109, 6.2809854, 21600, 0, 0, 1, 0, 2, 0, 0, 0, '', 58558, 1, 'Time-Lost Proto Drake - Path 5 (Ulduar)'),
+    (39212, 32630, 571, 67, 0, 1, 511, 0, 8545.776, -1879.3956, 1131.0109, 6.2809854, 21600, 0, 0, 1, 0, 2, 0, 0, 0, '', 58558, 1, 'Vyragosa - Path 5 (Ulduar)');
 
 -- ---------------------------------------------------------------------------
 -- creature_addon – assign waypoint path for path 5 creatures
@@ -83,4 +84,5 @@ INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALU
 -- spawntimesecs – set 6h (21600s) on all paths so that death-to-visibility
 -- totals 6-22h when combined with the 0-16h C++ reveal timer.
 -- ---------------------------------------------------------------------------
-UPDATE `creature` SET `spawntimesecs` = 21600 WHERE `guid` IN (39203, 39204, 39205, 39206, 39207, 39208, 39209, 39210);
+UPDATE `creature` SET `spawntimesecs` = 21600 WHERE `guid` IN (39203, 39204, 39205, 39206) AND `id` = 32491;
+UPDATE `creature` SET `spawntimesecs` = 21600 WHERE `guid` IN (39207, 39208, 39209, 39210) AND `id` = 32630;
