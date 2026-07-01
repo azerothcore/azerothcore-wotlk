@@ -138,13 +138,13 @@ void WorldSessionMgr::UpdateSessions(uint32 const diff)
 
         if (!pSession->Update(diff, updater))
         {
+            time_t const now = GameTime::GetGameTime().count();
             AccountPlayHistory& history = _accountsPlayHistory[pSession->GetAccountId()];
+            history.playedTime = pSession->GetConsecutivePlayTime(now);
+            history.logoutTime = now;
 
             if (!RemoveQueuedPlayer(pSession) && sWorld->getIntConfig(CONFIG_INTERVAL_DISCONNECT_TOLERANCE))
-            {
-                _disconnects[pSession->GetAccountId()] = GameTime::GetGameTime().count();
-                history.logoutTime = GameTime::GetGameTime().count();
-            }
+                _disconnects[pSession->GetAccountId()] = now;
             _sessions.erase(itr);
             delete pSession;
         }
