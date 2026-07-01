@@ -4163,6 +4163,7 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
             uint32 const mask = e.target.byHealthPct.targetmask;
             ObjectVector units;
             WorldObject* lastTarget = nullptr;
+            uint32 lasthealthPct;
             GetWorldObjectsInDist(units, static_cast<float>(e.target.byHealthPct.dist));
 
             for (WorldObject* unit : units)
@@ -4213,10 +4214,13 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
                 //New valid target take place of old valid target if it has more or less life depending on parameter
                 if (!lastTarget ||
                     ((mask & SMART_TARGET_BY_HEALTH_HIGHEST_HP) &&
-                        healthPct > lastTarget->ToUnit()->GetHealthPct()) ||
+                        healthPct > lasthealthPct) ||
                     (!(mask & SMART_TARGET_BY_HEALTH_HIGHEST_HP) &&
-                        healthPct < lastTarget->ToUnit()->GetHealthPct()))
+                        healthPct < lasthealthPct))
+                {
                     lastTarget = unit;
+                    lasthealthPct = healthPct;
+                }
             }
             if (lastTarget)
                 targets.push_back(lastTarget->ToUnit());
