@@ -328,10 +328,12 @@ void WorldSessionMgr::AddSession_(WorldSession* session)
         auto itr = _accountsPlayHistory.find(session->GetAccountId());
         if (itr != _accountsPlayHistory.end())
         {
+            // carry consecutive play time only if the offline gap was under the reset window
             if ((GameTime::GetGameTime().count() - itr->second.logoutTime) < PLAY_TIME_LIMIT_FULL)
                 session->SetPreviousPlayedTime(itr->second.playedTime);
-            else
-                itr->second.playedTime = 0;
+
+            // entry consumed on login; erase so _accountsPlayHistory cannot grow unbounded
+            _accountsPlayHistory.erase(itr);
         }
     }
 
