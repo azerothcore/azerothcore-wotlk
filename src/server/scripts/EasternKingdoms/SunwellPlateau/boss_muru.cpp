@@ -434,8 +434,7 @@ class spell_entropius_black_hole_effect : public SpellScript
         float targetX = baseX + maxDist * cos(angle);
         float targetY = baseY + maxDist * sin(angle);
         float hitX, hitY, hitZ;
-        if (VMAP::VMapFactory::createOrGetVMapMgr()->GetObjectHitPos(
-                unit->GetMapId(),
+        if (unit->GetMap()->GetMapCollisionData().GetStaticTree().GetObjectHitPos(
                 baseX, baseY, z,
                 targetX, targetY, z,
                 hitX, hitY, hitZ,

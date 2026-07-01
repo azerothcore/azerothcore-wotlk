@@ -28,6 +28,7 @@
 #include "DBCEnums.h"
 #include "DatabaseEnv.h"
 #include "DisableMgr.h"
+#include "Duration.h"
 #include "GameEventMgr.h"
 #include "GameTime.h"
 #include "GridNotifiersImpl.h"
@@ -39,6 +40,8 @@
 #include "MapMgr.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "RBAC.h"
+#include "RaceMgr.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
 #include "SpellMgr.h"
@@ -115,7 +118,7 @@ bool AchievementCriteriaData::IsValid(AchievementCriteriaEntry const* criteria)
                                  criteria->ID, criteria->requiredType, dataType, classRace.class_id);
                 return false;
             }
-            if (classRace.race_id && ((1 << (classRace.race_id - 1)) & RACEMASK_ALL_PLAYABLE) == 0)
+            if (classRace.race_id && ((1 << (classRace.race_id - 1)) & sRaceMgr->GetPlayableRaceMask()) == 0)
             {
                 LOG_ERROR("sql.sql", "Table `achievement_criteria_data` (Entry: {} Type: {}) for data type ACHIEVEMENT_CRITERIA_DATA_TYPE_T_PLAYER_CLASS_RACE ({}) has non-existing race in value2 ({}), ignored.",
                                  criteria->ID, criteria->requiredType, dataType, classRace.race_id);
@@ -275,7 +278,7 @@ bool AchievementCriteriaData::IsValid(AchievementCriteriaEntry const* criteria)
                                  criteria->ID, criteria->requiredType, dataType, classRace.class_id);
                 return false;
             }
-            if (classRace.race_id && ((1 << (classRace.race_id - 1)) & RACEMASK_ALL_PLAYABLE) == 0)
+            if (classRace.race_id && ((1 << (classRace.race_id - 1)) & sRaceMgr->GetPlayableRaceMask()) == 0)
             {
                 LOG_ERROR("sql.sql", "Table `achievement_criteria_data` (Entry: {} Type: {}) for data type ACHIEVEMENT_CRITERIA_DATA_TYPE_S_PLAYER_CLASS_RACE ({}) has non-existing race in value2 ({}), ignored.",
                                  criteria->ID, criteria->requiredType, dataType, classRace.race_id);
@@ -517,6 +520,8 @@ void AchievementMgr::ResetAchievementCriteria(AchievementCriteriaCondition condi
 {
     // disable for gamemasters with GM-mode enabled
     if (_player->IsGameMaster())
+        return;
+    if (_player->GetSession()->HasPermission(rbac::RBAC_PERM_CANNOT_EARN_ACHIEVEMENTS))
         return;
 
     LOG_DEBUG("achievement", "AchievementMgr::ResetAchievementCriteria({}, {}, {})", condition, value, evenIfCriteriaComplete);
@@ -818,6 +823,8 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
 {
     // disable for gamemasters with GM-mode enabled
     if (_player->IsGameMaster())
+        return;
+    if (_player->GetSession()->HasPermission(rbac::RBAC_PERM_CANNOT_EARN_ACHIEVEMENTS))
         return;
 
     if (type >= ACHIEVEMENT_CRITERIA_TYPE_TOTAL)
@@ -1827,14 +1834,17 @@ bool AchievementMgr::IsCompletedCriteria(AchievementCriteriaEntry const* achieve
         if (sAchievementMgr->IsRealmCompleted(achievement))
             return false;
 
-        // A character may only have 1 race-specific 'Realm First!' achievement
-        // prevent clever use of the race/faction change service to obtain multiple 'Realm First!' achievements
-        constexpr std::array<uint32, 9> raceSpecificRealmFirstAchievements { 1405, 1406, 1407, 1408, 1409, 1410, 1411, 1412, 1413 };
-        bool isRaceSpecific = std::ranges::find(raceSpecificRealmFirstAchievements, achievement->ID) != std::ranges::end(raceSpecificRealmFirstAchievements);
-        if (isRaceSpecific)
-            for (uint32 raceAchievementId : raceSpecificRealmFirstAchievements)
-                if (raceAchievementId != achievement->ID && HasAchieved(raceAchievementId))
-                    return false;
+        if (sWorld->getBoolConfig(CONFIG_ACHIEVEMENT_REALM_FIRST_RACE_LIMIT_ONE_PER_CHARACTER))
+        {
+            // A character may only have 1 race-specific 'Realm First!' achievement
+            // prevent clever use of the race/faction change service to obtain multiple 'Realm First!' achievements
+            constexpr std::array<uint32, 9> raceSpecificRealmFirstAchievements { 1405, 1406, 1407, 1408, 1409, 1410, 1411, 1412, 1413 };
+            bool isRaceSpecific = std::ranges::find(raceSpecificRealmFirstAchievements, achievement->ID) != std::ranges::end(raceSpecificRealmFirstAchievements);
+            if (isRaceSpecific)
+                for (uint32 raceAchievementId : raceSpecificRealmFirstAchievements)
+                    if (raceAchievementId != achievement->ID && HasAchieved(raceAchievementId))
+                        return false;
+        }
     }
 
     // pussywizard: progress will be deleted after getting the achievement (optimization)
@@ -2280,6 +2290,8 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
         ChatHandler(_player->GetSession()).PSendSysMessage("Not available in GM mode");
         return;
     }
+    if (_player->GetSession()->HasPermission(rbac::RBAC_PERM_CANNOT_EARN_ACHIEVEMENTS))
+        return;
 
     if (!sScriptMgr->OnPlayerBeforeAchievementComplete(GetPlayer(), achievement))
     {
@@ -2321,7 +2333,7 @@ void AchievementMgr::CompletedAchievement(AchievementEntry const* achievement)
                     }
     }
 
-    if (achievement->flags & (ACHIEVEMENT_FLAG_REALM_FIRST_REACH | ACHIEVEMENT_FLAG_REALM_FIRST_KILL) && AccountMgr::IsPlayerAccount(_player->GetSession()->GetSecurity()))
+    if (achievement->flags & (ACHIEVEMENT_FLAG_REALM_FIRST_REACH | ACHIEVEMENT_FLAG_REALM_FIRST_KILL) && !_player->GetSession()->HasPermission(rbac::RBAC_PERM_CANNOT_EARN_REALM_FIRST_ACHIEVEMENTS))
         sAchievementMgr->SetRealmCompleted(achievement);
 
     UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_ACHIEVEMENT, achievement->ID);
@@ -2591,11 +2603,18 @@ bool AchievementGlobalMgr::IsRealmCompleted(AchievementEntry const* achievement)
     if (itr->second == SystemTimePoint::max())
         return true;
 
-    // Allow completing the realm first kill for entire minute after first person did it
+    // Allow completing the realm first kill for configurable time window after first person did it
     // it may allow more than one group to achieve it (highly unlikely)
     // but apparently this is how blizz handles it as well
     if (achievement->flags & ACHIEVEMENT_FLAG_REALM_FIRST_KILL)
-        return (GameTime::GetSystemTime() - itr->second) > 1min;
+    {
+        Seconds windowSeconds = Seconds(sWorld->getIntConfig(CONFIG_ACHIEVEMENT_REALM_FIRST_KILL_WINDOW));
+
+        if (windowSeconds == 0s)
+            return true;
+
+        return (GameTime::GetSystemTime() - itr->second) > windowSeconds;
+    }
 
     sScriptMgr->SetRealmCompleted(achievement);
 

@@ -29,6 +29,8 @@ enum ArenaHook
     ARENAHOOK_CAN_SAVE_TO_DB,
     ARENAHOOK_ON_BEFORE_CHECK_WIN_CONDITION,
     ARENAHOOK_ON_ARENA_START,
+    ARENAHOOK_ON_BEFORE_TEAM_MEMBER_UPDATE,
+    ARENAHOOK_CAN_SAVE_ARENA_STATS_FOR_MEMBER,
     ARENAHOOK_END
 };
 
@@ -51,6 +53,10 @@ public:
     [[nodiscard]] virtual bool CanSaveToDB(ArenaTeam* /*team*/) { return true; }
 
     virtual void OnArenaStart(Battleground* /* bg */) { };
+
+    [[nodiscard]] virtual bool OnBeforeArenaTeamMemberUpdate(ArenaTeam* /*team*/, Player* /*player*/, bool /*won*/, uint32 /*opponentMatchmakerRating*/, int32 /*matchmakerChange*/) { return false; }
+
+    [[nodiscard]] virtual bool CanSaveArenaStatsForMember(ArenaTeam* /*team*/, ObjectGuid /*playerGuid*/) { return true; }
 };
 
 #endif

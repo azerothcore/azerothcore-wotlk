@@ -30,78 +30,65 @@ constexpr Milliseconds TIMER_SHADOWBOLT_VOLLEY = 7s;
 constexpr Milliseconds TIMER_REND = 20s;
 constexpr Milliseconds TIMER_SHIELD = 12s;
 
-class boss_eviscerator : public CreatureScript
+struct boss_eviscerator : public BossAI
 {
-public:
-    boss_eviscerator() : CreatureScript("boss_eviscerator") {}
+    boss_eviscerator(Creature* creature) : BossAI(creature, DATA_EVISCERATOR) {}
 
-    CreatureAI* GetAI(Creature* creature) const override
+    bool SpellShieldReady = false;
+
+    void JustEngagedWith(Unit* /*who*/) override
     {
-        return GetBlackrockDepthsAI<boss_evisceratorAI>(creature);
+        _JustEngagedWith();
+        events.ScheduleEvent(SPELL_SHADOWBOLT_VOLLEY, TIMER_SHADOWBOLT_VOLLEY / 5);
+        events.ScheduleEvent(SPELL_REND, TIMER_REND / 5);
+        events.ScheduleEvent(SPELL_SHIELD, TIMER_SHIELD / 5);
     }
 
-    struct boss_evisceratorAI : public BossAI
+    void DamageTaken(Unit* /* doneBy */, uint32& /* damage */, DamageEffectType /* damagetype */, SpellSchoolMask damageSchoolMask) override
     {
-        boss_evisceratorAI(Creature* creature) : BossAI(creature, DATA_EVISCERATOR) {}
-
-        bool SpellShieldReady = false;
-
-        void JustEngagedWith(Unit* /*who*/) override
+        if ((damageSchoolMask & SPELL_SCHOOL_MASK_MAGIC) && SpellShieldReady)
         {
-            _JustEngagedWith();
-            events.ScheduleEvent(SPELL_SHADOWBOLT_VOLLEY, TIMER_SHADOWBOLT_VOLLEY / 5);
-            events.ScheduleEvent(SPELL_REND, TIMER_REND / 5);
-            events.ScheduleEvent(SPELL_SHIELD, TIMER_SHIELD / 5);
+            DoCast(SPELL_SHIELD);
+            SpellShieldReady = false;
+            events.ScheduleEvent(SPELL_SHIELD, TIMER_SHIELD);
         }
+    }
 
-        void DamageTaken(Unit* /* doneBy */, uint32& /* damage */, DamageEffectType /* damagetype */, SpellSchoolMask damageSchoolMask) override
+    void UpdateAI(uint32 diff) override
+    {
+        //Return since we have no target
+        if (!UpdateVictim())
+            return;
+
+        events.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        while (uint32 eventId = events.ExecuteEvent())
         {
-            if ((damageSchoolMask & SPELL_SCHOOL_MASK_MAGIC) && SpellShieldReady)
+            switch (eventId)
             {
-                DoCast(SPELL_SHIELD);
-                SpellShieldReady = false;
-                events.ScheduleEvent(SPELL_SHIELD, TIMER_SHIELD);
+            case SPELL_SHADOWBOLT_VOLLEY:
+                DoCastVictim(SPELL_SHADOWBOLT_VOLLEY);
+                events.ScheduleEvent(SPELL_SHADOWBOLT_VOLLEY, TIMER_SHADOWBOLT_VOLLEY - 2s, TIMER_SHADOWBOLT_VOLLEY + 2s);
+                break;
+            case SPELL_REND:
+                DoCastVictim(SPELL_REND);
+                events.ScheduleEvent(SPELL_REND, TIMER_REND - 2s, TIMER_REND + 2s);
+                break;
+            case SPELL_SHIELD:
+                SpellShieldReady = true;
+                break;
+            default:
+                break;
             }
         }
-
-        void UpdateAI(uint32 diff) override
-        {
-            //Return since we have no target
-            if (!UpdateVictim())
-            {
-                return;
-            }
-            events.Update(diff);
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-            {
-                return;
-            }
-            while (uint32 eventId = events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                case SPELL_SHADOWBOLT_VOLLEY:
-                    DoCastVictim(SPELL_SHADOWBOLT_VOLLEY);
-                    events.ScheduleEvent(SPELL_SHADOWBOLT_VOLLEY, TIMER_SHADOWBOLT_VOLLEY - 2s, TIMER_SHADOWBOLT_VOLLEY + 2s);
-                    break;
-                case SPELL_REND:
-                    DoCastVictim(SPELL_REND);
-                    events.ScheduleEvent(SPELL_REND, TIMER_REND - 2s, TIMER_REND + 2s);
-                    break;
-                case SPELL_SHIELD:
-                    SpellShieldReady = true;
-                    break;
-                default:
-                    break;
-                }
-            }
-            DoMeleeAttackIfReady();
-        }
-    };
+        DoMeleeAttackIfReady();
+    }
 };
 
 void AddSC_boss_eviscerator()
 {
-    new boss_eviscerator();
+    RegisterBlackrockDepthsCreatureAI(boss_eviscerator);
 }

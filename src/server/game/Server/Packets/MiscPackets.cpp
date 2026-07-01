@@ -149,14 +149,14 @@ void WorldPackets::Misc::Complain::Read()
     {
     case 0:
         _worldPacket >> Unk1; // const 0
-        _worldPacket >> Unk2; // probably mail id
-        _worldPacket >> Unk3; // const 0
+        _worldPacket >> MailIdOrMessageType; // probably mail id
+        _worldPacket >> ChannelId; // const 0
         break;
     case 1:
         _worldPacket >> Unk1; // probably language
-        _worldPacket >> Unk2; // message type?
-        _worldPacket >> Unk3; // probably channel id
-        _worldPacket >> Unk4; // unk random value
+        _worldPacket >> MailIdOrMessageType;
+        _worldPacket >> ChannelId;
+        _worldPacket >> SecondsSinceMessage;
         _worldPacket >> Description; // spam description string (messagetype, channel name, player name, message)
         break;
     }

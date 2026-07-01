@@ -231,7 +231,9 @@ enum UnkorTheRuthless
     FACTION_HOSTILE                 = 45,
     QUEST_DONTKILLTHEFATONE         = 9889,
 
-    SPELL_PULVERIZE                 = 2676
+    SPELL_PULVERIZE                 = 2676,
+
+    SUBMIT_DURATION                 = 120000
 };
 
 class npc_unkor_the_ruthless : public CreatureScript
@@ -248,22 +250,28 @@ public:
     {
         npc_unkor_the_ruthlessAI(Creature* creature) : ScriptedAI(creature) { }
 
-        bool CanDoQuest;
-        uint32 UnkorUnfriendly_Timer;
-        uint32 Pulverize_Timer;
+        bool Submitted;
+        uint32 UnfriendlyTimer;
+        uint32 PulverizeTimer;
 
         void Reset() override
         {
-            CanDoQuest = false;
-            UnkorUnfriendly_Timer = 0;
-            Pulverize_Timer = 3000;
+            Submitted = false;
+            UnfriendlyTimer = 0;
+            PulverizeTimer = 3000;
             me->SetStandState(UNIT_STAND_STATE_STAND);
             me->SetFaction(FACTION_HOSTILE);
         }
 
         void JustEngagedWith(Unit* /*who*/) override { }
 
-        void DoNice()
+        bool HasQuestActive(Player* player) const
+        {
+            QuestStatus status = player->GetQuestStatus(QUEST_DONTKILLTHEFATONE);
+            return status == QUEST_STATUS_INCOMPLETE || status == QUEST_STATUS_COMPLETE;
+        }
+
+        void Submit()
         {
             Talk(SAY_SUBMIT);
             me->SetFaction(FACTION_FRIENDLY);
@@ -271,7 +279,8 @@ public:
             me->RemoveAllAuras();
             me->GetThreatMgr().ClearAllThreat();
             me->CombatStop(true);
-            UnkorUnfriendly_Timer = 60000;
+            Submitted = true;
+            UnfriendlyTimer = SUBMIT_DURATION;
         }
 
         void DamageTaken(Unit* done_by, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -280,61 +289,47 @@ public:
                 return;
 
             Player* player = done_by->ToPlayer();
-            if (player && me->HealthBelowPctDamaged(30, damage))
-            {
-                if (Group* group = player->GetGroup())
-                {
-                    for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
-                    {
-                        Player* groupie = itr->GetSource();
-                        if (groupie && groupie->IsInMap(player) &&
-                                groupie->GetQuestStatus(QUEST_DONTKILLTHEFATONE) == QUEST_STATUS_INCOMPLETE &&
-                                groupie->GetReqKillOrCastCurrentCount(QUEST_DONTKILLTHEFATONE, 18260) == 10)
-                        {
-                            groupie->AreaExploredOrEventHappens(QUEST_DONTKILLTHEFATONE);
-                            if (!CanDoQuest)
-                                CanDoQuest = true;
-                        }
-                    }
-                }
-                else if (player->GetQuestStatus(QUEST_DONTKILLTHEFATONE) == QUEST_STATUS_INCOMPLETE &&
-                         player->GetReqKillOrCastCurrentCount(QUEST_DONTKILLTHEFATONE, 18260) == 10)
-                {
-                    player->AreaExploredOrEventHappens(QUEST_DONTKILLTHEFATONE);
-                    CanDoQuest = true;
-                }
-            }
+            if (!player)
+                if (Unit* owner = done_by->GetOwner())
+                    player = owner->ToPlayer();
+            if (!player || !HasQuestActive(player))
+                return;
+
+            // Cap damage from quest holders so DoTs/pets/burst can't kill him.
+            if (damage >= me->GetHealth())
+                damage = me->GetHealth() - 1;
+
+            if (!me->HealthBelowPctDamaged(30, damage))
+                return;
+
+            player->GroupEventHappens(QUEST_DONTKILLTHEFATONE, me);
+
+            if (!Submitted)
+                Submit();
         }
 
         void UpdateAI(uint32 diff) override
         {
-            if (CanDoQuest)
+            if (Submitted)
             {
-                if (!UnkorUnfriendly_Timer)
+                if (UnfriendlyTimer <= diff)
                 {
-                    //DoCast(me, SPELL_QUID9889);        //not using spell for now
-                    DoNice();
+                    EnterEvadeMode();
+                    return;
                 }
-                else
-                {
-                    if (UnkorUnfriendly_Timer <= diff)
-                    {
-                        EnterEvadeMode();
-                        return;
-                    }
-                    else UnkorUnfriendly_Timer -= diff;
-                }
+                UnfriendlyTimer -= diff;
+                return;
             }
 
             if (!UpdateVictim())
                 return;
 
-            if (Pulverize_Timer <= diff)
+            if (PulverizeTimer <= diff)
             {
                 DoCast(me, SPELL_PULVERIZE);
-                Pulverize_Timer = 9000;
+                PulverizeTimer = 9000;
             }
-            else Pulverize_Timer -= diff;
+            else PulverizeTimer -= diff;
 
             DoMeleeAttackIfReady();
         }
@@ -374,6 +369,7 @@ public:
     {
         npc_isla_starmaneAI(Creature* creature) : npc_escortAI(creature) { }
 
+        using CreatureAI::WaypointReached;
         void WaypointReached(uint32 waypointId) override
         {
             Player* player = GetPlayerForEscort();
@@ -612,43 +608,6 @@ public:
     }
 };
 
-/*######
-## npc_slim
-######*/
-
-enum Slim
-{
-    FACTION_CONSORTIUM  = 933
-};
-
-class npc_slim : public CreatureScript
-{
-public:
-    npc_slim() : CreatureScript("npc_slim") { }
-
-    bool OnGossipSelect(Player* player, Creature* creature, uint32 /*sender*/, uint32 action) override
-    {
-        ClearGossipMenuFor(player);
-        if (action == GOSSIP_ACTION_TRADE)
-            player->GetSession()->SendListInventory(creature->GetGUID());
-
-        return true;
-    }
-
-    bool OnGossipHello(Player* player, Creature* creature) override
-    {
-        if (creature->IsVendor() && player->GetReputationRank(FACTION_CONSORTIUM) >= REP_FRIENDLY)
-        {
-            AddGossipItemFor(player, GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
-            SendGossipMenuFor(player, 9896, creature->GetGUID());
-        }
-        else
-            SendGossipMenuFor(player, 9895, creature->GetGUID());
-
-        return true;
-    }
-};
-
 void AddSC_terokkar_forest()
 {
     RegisterSpellAndAuraScriptPair(spell_q10930_big_bone_worm, spell_q10930_big_bone_worm_aura);
@@ -662,5 +621,4 @@ void AddSC_terokkar_forest()
     new npc_isla_starmane();
     new go_skull_pile();
     new go_ancient_skull_pile();
-    new npc_slim();
 }
