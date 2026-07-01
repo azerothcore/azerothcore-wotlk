@@ -56,8 +56,6 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `p
 (137564, 33822, 603, 0, 0, 2, 1, 1, 1783.4427, 118.73959, 342.4641, 5.789062, 604800, 0, 0, 471835, 0, 0, 0, 0, 0, '', NULL, 0),
 (137582, 33822, 603, 0, 0, 2, 1, 1, 1850.5469, 118.33334, 341.93735, 4.772871, 604800, 0, 0, 471835, 0, 0, 0, 0, 0, '', NULL, 0);
 
-X: 1895.8071 Y: 127.51064 Z: 412.32733
-
 DELETE FROM `creature` WHERE (`id` = 33823) AND (`guid` IN (137560, 137586));
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `Comment`, `VerifiedBuild`) VALUES
 (137560, 33823, 603, 0, 0, 2, 1, 1, 1895.8071, 127.51064, 412.32733, 4.886921, 604800, 0, 0, 471835, 0, 0, 0, 0, 0, '', NULL, 0),
