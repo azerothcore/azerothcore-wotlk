@@ -335,13 +335,12 @@ struct npc_pet_dk_army_of_the_dead : public AggressorAI
 {
     enum Spells
     {
-        SPELL_GHOUL_CLAW = 47468,
         SPELL_GHOUL_LEAP = 47482,
     };
 
-    enum Event
+    enum Events
     {
-        EVENT_START_LEAP
+        EVENT_START_LEAP = 1
     };
 
     npc_pet_dk_army_of_the_dead(Creature* creature) : AggressorAI(creature) { }
