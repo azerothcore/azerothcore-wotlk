@@ -62,6 +62,12 @@ target_include_directories(common
   PRIVATE
     ${CMAKE_CURRENT_BINARY_DIR})
 
+if(TARGET mimalloc-static)
+  target_link_libraries(common
+    PUBLIC
+      mimalloc-static)
+endif()
+
 target_link_libraries(common
   PRIVATE
     acore-core-interface
@@ -72,7 +78,6 @@ target_link_libraries(common
     utf8cpp
     openssl
     threads
-    jemalloc
     stdfs
     fmt)
 
