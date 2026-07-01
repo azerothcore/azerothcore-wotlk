@@ -122,7 +122,7 @@ WorldSession::WorldSession(uint32 id, std::string&& name, uint32 accountFlags, s
     _accountFlags(accountFlags),
     m_expansion(expansion),
     m_total_time(TotalTime),
-    _lastUpdateTime(0),
+    _lastUpdateTime(GameTime::GetGameTime().count()),
     _createTime(GameTime::GetGameTime().count()),
     _previousPlayTime(0),
     _logoutTime(0),
