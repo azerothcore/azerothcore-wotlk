@@ -4170,6 +4170,9 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
                 if (!IsCreature(unit) && !IsPlayer(unit))
                     continue;
 
+                if (!unit->ToUnit()->IsAlive())
+                    continue;
+
                 if (!IsPlayer(unit) &&
                     (mask & SMART_TARGET_BY_HEALTH_PLAYER_ONLY))
                     continue;

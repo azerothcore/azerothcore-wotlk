@@ -541,6 +541,11 @@ bool SmartAIMgr::IsTargetValid(SmartScriptHolder const& e)
         {
             if (!IsMinMaxValid(e, e.target.byHealthPct.min, e.target.byHealthPct.max))
                 return false;
+            if (e.target.byHealthPct.dist == 0)
+            {
+                LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} has dist 0 as target_param3, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
+                return false;
+            }
             if (e.target.byHealthPct.max > 100)
             {
                 LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} has pct value above 100, skipped.",
