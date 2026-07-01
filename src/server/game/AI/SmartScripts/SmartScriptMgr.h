@@ -1590,8 +1590,9 @@ enum SMARTAI_TARGETS
     SMART_TARGET_SUMMONED_CREATURES             = 204,  // Entry
     SMART_TARGET_INSTANCE_STORAGE               = 205,  // Instance data index, Type (creature (1), gameobject (2))
     SMART_TARGET_FORMATION                      = 206,  // Type (0: members only, 1: leader only, 2: all), CreatureEntry (0: any), ExcludeSelf (0/1)
+    SMART_TARGET_BY_HEALTH_PCT                  = 207,  // Lyeus edit : p1:minimum health, p2:maximum health, p3:maximum distance, p4:TargetMask
 
-    SMART_TARGET_AC_END                         = 207   // placeholder
+    SMART_TARGET_AC_END = 208   // placeholder
 };
 
 struct SmartTarget
@@ -1779,6 +1780,14 @@ struct SmartTarget
         {
             SAIBool includePets;
         } invokerParty;
+
+        struct                 // Lyeus edit
+        {
+            uint32 min;        // Minimum health point range in percent
+            uint32 max;        // Maximum health point range in percent
+            uint32 dist;       // Maximum range from self
+            uint32 targetmask; // Default : Will target lowest percent health ally in range
+        } byHealthPct;
     };
 };
 
@@ -1787,6 +1796,18 @@ enum SmartTargetRoleFlags
     SMART_TARGET_ROLE_FLAG_TANKS        = 0x001,
     SMART_TARGET_ROLE_FLAG_HEALERS      = 0x002,
     SMART_TARGET_ROLE_FLAG_DAMAGERS     = 0x004
+};
+
+enum SmartTargetByHealthFlags                                         // Lyeus edit
+{
+    SMART_TARGET_BY_HEALTH_HIGHEST_HP       = 0x001,                  // 0 = Will target lowest hp, 1 = Will target highest hp
+    SMART_TARGET_BY_HEALTH_ALL_FACTIONS     = 0x002,                  // 0 = Will exclude allies or enemies, 1 = Will ignore next flag
+    SMART_TARGET_BY_HEALTH_ALLY_OR_ENEMY    = 0x004,                  // 0 = Will exclude enemies, 1 = Will exclude allies
+    SMART_TARGET_BY_HEALTH_EXCLUDE_SELF     = 0x008,                  // 1 = Excluding self
+    SMART_TARGET_BY_HEALTH_PLAYER_ONLY      = 0x010,                  // 1 = Exclude creatures
+    SMART_TARGET_BY_HEALTH_RAID_ONLY        = 0x020,                  // 1 = Exclude non raid-members
+    SMART_TARGET_BY_HEALTH_GROUP_ONLY       = 0x040,                  // 1 = Exclude non group-members
+    SMART_TARGET_BY_HEALTH_INCLUDE_OOC      = 0x080,                  // 1 = Include out of combat Targets
 };
 
 enum SmartScriptType
