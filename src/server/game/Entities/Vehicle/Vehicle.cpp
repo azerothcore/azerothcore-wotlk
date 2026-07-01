@@ -324,6 +324,10 @@ void Vehicle::InstallAccessory(uint32 entry, int8 seatId, bool minion, uint8 typ
             return;
         }
 
+        // Trigger SmartAI JustRespawned for vehicle accessories so their SAI events (e.g. SMART_EVENT_RESPAWN) fire
+        if (accessory->IsCreature() && accessory->ToCreature()->IsAIEnabled)
+            accessory->ToCreature()->AI()->JustRespawned();
+
         if (GetBase()->IsCreature())
             sScriptMgr->OnInstallAccessory(this, accessory);
     }
