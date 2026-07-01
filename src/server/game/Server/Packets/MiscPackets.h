@@ -21,7 +21,6 @@
 #include "ObjectGuid.h"
 #include "Packet.h"
 #include "Weather.h"
-#include "WorldSession.h"
 
 enum WeatherState : uint32;
 
@@ -245,7 +244,7 @@ namespace WorldPackets
 
             WorldPacket const* Write() override;
 
-            uint32 Flag = PTF_UNHEALTHY_TIME;
+            uint32 Flag = 0; // PlayTimeFlag mask, set by WorldSession::SendPlayTimeWarning
             int32 PlayTimeRemaining = 0;
         };
     }
