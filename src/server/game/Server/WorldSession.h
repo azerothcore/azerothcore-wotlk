@@ -28,6 +28,7 @@
 #include "CircularBuffer.h"
 #include "Common.h"
 #include "DatabaseEnv.h"
+#include "Duration.h"
 #include "GossipDef.h"
 #include "Packet.h"
 #include "SharedDefines.h"
@@ -289,13 +290,10 @@ enum CharterTypes
     ARENA_TEAM_CHARTER_5v5_TYPE                   = 5
 };
 
-enum PlayTimeLimit : uint32
-{
-    PLAY_TIME_LIMIT_APPROACHING_PARTIAL = 2 * HOUR + 30 * MINUTE,
-    PLAY_TIME_LIMIT_PARTIAL             = 3 * HOUR,
-    PLAY_TIME_LIMIT_APPROACHING_FULL    = 4 * HOUR + 30 * MINUTE,
-    PLAY_TIME_LIMIT_FULL                = 5 * HOUR,
-};
+constexpr Seconds PLAY_TIME_LIMIT_APPROACHING_PARTIAL = Hours(2) + Minutes(30);
+constexpr Seconds PLAY_TIME_LIMIT_PARTIAL             = Hours(3);
+constexpr Seconds PLAY_TIME_LIMIT_APPROACHING_FULL    = Hours(4) + Minutes(30);
+constexpr Seconds PLAY_TIME_LIMIT_FULL                = Hours(5);
 
 enum PlayTimeFlag : uint32
 {
@@ -502,11 +500,11 @@ public:
     void SetInQueue(bool state) { m_inQueue = state; }
 
     // Playtime limit
-    time_t GetCreateTime() const { return _createTime; }
-    time_t GetConsecutivePlayTime(time_t now) const { return (now - _createTime) + _previousPlayTime; }
-    time_t GetPreviousPlayedTime() { return _previousPlayTime; }
-    void SetPreviousPlayedTime(time_t playedTime) { _previousPlayTime = playedTime; }
-    void CheckPlayedTimeLimit(time_t now);
+    Seconds GetCreateTime() const { return _createTime; }
+    Seconds GetConsecutivePlayTime(Seconds now) const { return (now - _createTime) + _previousPlayTime; }
+    Seconds GetPreviousPlayedTime() const { return _previousPlayTime; }
+    void SetPreviousPlayedTime(Seconds playedTime) { _previousPlayTime = playedTime; }
+    void CheckPlayedTimeLimit(Seconds now);
     void SendPlayTimeWarning(PlayTimeFlag flag, int32 playTimeRemaining);
 
     /// Is the user engaged in a log out process?
@@ -1281,9 +1279,9 @@ private:
     // Warden
     std::unique_ptr<Warden> _warden;                    // Remains nullptr if Warden system is not enabled by config
 
-    time_t _lastUpdateTime;                             // last time session was updated by world
-    time_t _createTime;                                 // when session was created
-    time_t _previousPlayTime;                           // play time from previous session less than 5 hours ago
+    Seconds _lastUpdateTime;                            // last time session was updated by world
+    Seconds _createTime;                                // when session was created
+    Seconds _previousPlayTime;                          // play time from previous session less than 5 hours ago
     time_t _logoutTime;
     bool m_inQueue;                                     // session wait in auth.queue
     bool m_playerLoading;                               // code processed in LoginPlayer

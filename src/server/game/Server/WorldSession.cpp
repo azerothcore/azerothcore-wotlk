@@ -122,8 +122,8 @@ WorldSession::WorldSession(uint32 id, std::string&& name, uint32 accountFlags, s
     _accountFlags(accountFlags),
     m_expansion(expansion),
     m_total_time(TotalTime),
-    _lastUpdateTime(GameTime::GetGameTime().count()),
-    _createTime(GameTime::GetGameTime().count()),
+    _lastUpdateTime(GameTime::GetGameTime()),
+    _createTime(GameTime::GetGameTime()),
     _previousPlayTime(0),
     _logoutTime(0),
     m_inQueue(false),
@@ -396,9 +396,9 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
     time_t currentTime = GameTime::GetGameTime().count();
 
     if (GetPlayer() && GetPlayer()->IsInWorld() && IsAffectedByCAIS())
-        CheckPlayedTimeLimit(currentTime);
+        CheckPlayedTimeLimit(Seconds(currentTime));
 
-    _lastUpdateTime = currentTime;
+    _lastUpdateTime = Seconds(currentTime);
 
     constexpr uint32 MAX_PROCESSED_PACKETS_IN_SAME_WORLDSESSION_UPDATE = 150;
 
@@ -630,10 +630,10 @@ bool WorldSession::IsSocketClosed() const
     return !m_Socket || !m_Socket->IsOpen();
 }
 
-void WorldSession::CheckPlayedTimeLimit(time_t now)
+void WorldSession::CheckPlayedTimeLimit(Seconds now)
 {
-    time_t const previousPlayed = GetConsecutivePlayTime(_lastUpdateTime);
-    time_t const currentPlayed = GetConsecutivePlayTime(now);
+    Seconds const previousPlayed = GetConsecutivePlayTime(_lastUpdateTime);
+    Seconds const currentPlayed = GetConsecutivePlayTime(now);
 
     if ((previousPlayed < PLAY_TIME_LIMIT_FULL) &&
         (currentPlayed >= PLAY_TIME_LIMIT_FULL))
@@ -645,21 +645,21 @@ void WorldSession::CheckPlayedTimeLimit(time_t now)
     else if ((previousPlayed < PLAY_TIME_LIMIT_APPROACHING_FULL) &&
         (currentPlayed >= PLAY_TIME_LIMIT_APPROACHING_FULL))
     {
-        SendPlayTimeWarning(PTF_APPROACHING_NO_PLAY_TIME, int32(PLAY_TIME_LIMIT_FULL - currentPlayed));
+        SendPlayTimeWarning(PTF_APPROACHING_NO_PLAY_TIME, int32((PLAY_TIME_LIMIT_FULL - currentPlayed).count()));
         GetPlayer()->SetPlayerFlag(PLAYER_FLAGS_PARTIAL_PLAY_TIME);
         GetPlayer()->RemovePlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME);
     }
     else if ((previousPlayed < PLAY_TIME_LIMIT_PARTIAL) &&
         (currentPlayed >= PLAY_TIME_LIMIT_PARTIAL))
     {
-        SendPlayTimeWarning(PTF_APPROACHING_NO_PLAY_TIME, int32(PLAY_TIME_LIMIT_FULL - currentPlayed));
+        SendPlayTimeWarning(PTF_APPROACHING_NO_PLAY_TIME, int32((PLAY_TIME_LIMIT_FULL - currentPlayed).count()));
         GetPlayer()->SetPlayerFlag(PLAYER_FLAGS_PARTIAL_PLAY_TIME);
         GetPlayer()->RemovePlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME);
     }
     else if ((previousPlayed < PLAY_TIME_LIMIT_APPROACHING_PARTIAL) &&
         (currentPlayed >= PLAY_TIME_LIMIT_APPROACHING_PARTIAL))
     {
-        SendPlayTimeWarning(PTF_APPROACHING_PARTIAL_PLAY_TIME, int32(PLAY_TIME_LIMIT_PARTIAL - currentPlayed));
+        SendPlayTimeWarning(PTF_APPROACHING_PARTIAL_PLAY_TIME, int32((PLAY_TIME_LIMIT_PARTIAL - currentPlayed).count()));
     }
 }
 

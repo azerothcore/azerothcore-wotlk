@@ -138,13 +138,13 @@ void WorldSessionMgr::UpdateSessions(uint32 const diff)
 
         if (!pSession->Update(diff, updater))
         {
-            time_t const now = GameTime::GetGameTime().count();
+            Seconds const now = GameTime::GetGameTime();
             AccountPlayHistory& history = _accountsPlayHistory[pSession->GetAccountId()];
             history.playedTime = pSession->GetConsecutivePlayTime(now);
             history.logoutTime = now;
 
             if (!RemoveQueuedPlayer(pSession) && sWorld->getIntConfig(CONFIG_INTERVAL_DISCONNECT_TOLERANCE))
-                _disconnects[pSession->GetAccountId()] = now;
+                _disconnects[pSession->GetAccountId()] = now.count();
             _sessions.erase(itr);
             delete pSession;
         }
@@ -302,7 +302,7 @@ void WorldSessionMgr::AddSession_(WorldSession* session)
             _disconnects[session->GetAccountId()] = GameTime::GetGameTime().count();
 
         // don't allow resetting consecutive play time on double login to same account
-        session->SetPreviousPlayedTime(old->second->GetConsecutivePlayTime(GameTime::GetGameTime().count()));
+        session->SetPreviousPlayedTime(old->second->GetConsecutivePlayTime(GameTime::GetGameTime()));
 
         // pussywizard:
         if (oldSession->HandleSocketClosed())
@@ -329,7 +329,7 @@ void WorldSessionMgr::AddSession_(WorldSession* session)
         if (itr != _accountsPlayHistory.end())
         {
             // carry consecutive play time only if the offline gap was under the reset window
-            if ((GameTime::GetGameTime().count() - itr->second.logoutTime) < PLAY_TIME_LIMIT_FULL)
+            if ((GameTime::GetGameTime() - itr->second.logoutTime) < PLAY_TIME_LIMIT_FULL)
                 session->SetPreviousPlayedTime(itr->second.playedTime);
 
             // entry consumed on login; erase so _accountsPlayHistory cannot grow unbounded

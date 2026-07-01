@@ -5098,7 +5098,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     RemovePlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME);
     RemovePlayerFlag(PLAYER_FLAGS_PARTIAL_PLAY_TIME);
 
-    time_t const accountPlayedTime = GetSession()->GetConsecutivePlayTime(GameTime::GetGameTime().count());
+    Seconds const accountPlayedTime = GetSession()->GetConsecutivePlayTime(GameTime::GetGameTime());
 
     if (GetSession()->IsAffectedByCAIS())
     {
