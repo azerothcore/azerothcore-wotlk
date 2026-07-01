@@ -233,10 +233,10 @@ bool WorldSession::IsRecurringBillingAccount() const
 
 bool WorldSession::IsAffectedByCAIS() const
 {
-    // China realm system for restricting play times
-    // Don't know of any account flag or similar denoting whether an account/session is affected by CAIS (possibly just a realm-wide flag)
-    // But just in case we find something down the road, this function just acts as a switch for accounts to use the system.
-    return false;
+    // China realm system for restricting consecutive play time (anti-addiction).
+    // There is no known per-account flag for it, so a realm-wide config gate is used;
+    // swap this out if a per-account/realm-region source is found later.
+    return sWorld->getBoolConfig(CONFIG_CAIS_ENABLED);
 }
 
 uint8 WorldSession::GetBillingPlanFlags() const
