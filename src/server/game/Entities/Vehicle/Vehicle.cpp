@@ -505,7 +505,23 @@ void Vehicle::RemovePassenger(Unit* unit)
     bool canFly = _me->IsFlying() || _me->HasUnitMovementFlag(MOVEMENTFLAG_CAN_FLY) || _me->HasAuraType(SPELL_AURA_FLY);
 
     if (_me->IsCreature() && unit->IsPlayer() && seat->second.SeatInfo->m_flags & VEHICLE_SEAT_FLAG_CAN_CONTROL)
+    {
+        if (!_me->GetCombatManager().IsInEvadeMode())
+        {
+            unit->GetCombatManager().InheritCombatStatesFrom(_me);
+
+            for (auto const& [guid, threatRef] : _me->GetThreatMgr().GetThreatenedByMeList())
+            {
+                Unit* hostile = threatRef->GetOwner();
+                if (!hostile || !hostile->IsAlive())
+                    continue;
+
+                hostile->GetThreatMgr().AddThreat(unit, hostile->GetThreatMgr().GetThreat(_me, true), nullptr, true, true);
+            }
+        }
+
         _me->RemoveCharmedBy(unit);
+    }
 
     if (_me->IsInWorld())
     {
