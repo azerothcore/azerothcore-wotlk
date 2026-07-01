@@ -1592,7 +1592,7 @@ enum SMARTAI_TARGETS
     SMART_TARGET_FORMATION                      = 206,  // Type (0: members only, 1: leader only, 2: all), CreatureEntry (0: any), ExcludeSelf (0/1)
     SMART_TARGET_BY_HEALTH_PCT                  = 207,  // Lyeus edit : p1:minimum health, p2:maximum health, p3:maximum distance, p4:TargetMask
 
-    SMART_TARGET_AC_END = 208   // placeholder
+    SMART_TARGET_AC_END                         = 208   // placeholder
 };
 
 struct SmartTarget
