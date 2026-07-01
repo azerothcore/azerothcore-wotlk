@@ -4160,7 +4160,7 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
         }
         case SMART_TARGET_BY_HEALTH_PCT:    //edit by Lyeus
         {
-            uint32 const mask = e.target.byHealthPct.targetmask;
+            uint32 const mask = e.target.byHealthPct.targetMask;
             ObjectVector units;
             WorldObject* lastTarget = nullptr;
             uint32 lasthealthPct;
