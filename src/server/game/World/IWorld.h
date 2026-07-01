@@ -51,8 +51,8 @@ private:
 
 struct AccountPlayHistory
 {
-    time_t logoutTime;
-    time_t playedTime; // reset after 5 hours offline time
+    time_t logoutTime = 0;
+    time_t playedTime = 0; // reset after 5 hours offline time
 };
 
 // ServerMessages.dbc
