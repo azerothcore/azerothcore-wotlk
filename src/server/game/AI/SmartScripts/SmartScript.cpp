@@ -4173,35 +4173,35 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
                 if (!unit->ToUnit()->IsAlive())
                     continue;
 
-                if (!IsPlayer(unit) &&
-                    (mask & SMART_TARGET_BY_HEALTH_PLAYER_ONLY))
+                if ((mask & SMART_TARGET_BY_HEALTH_PLAYER_ONLY) &&
+                    !IsPlayer(unit))
                     continue;
 
-                if (me && me->GetGUID() == unit->GetGUID() &&
-                    (mask & SMART_TARGET_BY_HEALTH_EXCLUDE_SELF))
+                if ((mask & SMART_TARGET_BY_HEALTH_EXCLUDE_SELF) &&
+                    me && me->GetGUID() == unit->GetGUID())
                     continue;
 
                 // Only filter for enemy or ally if All_Factions is 0
-                if (me && !(mask & SMART_TARGET_BY_HEALTH_ALL_FACTIONS))
+                if (!(mask & SMART_TARGET_BY_HEALTH_ALL_FACTIONS) && me)
                 {
-                    if (me->IsHostileTo(unit->ToUnit()) &&
-                        !(mask & SMART_TARGET_BY_HEALTH_ALLY_OR_ENEMY))
+                    if (!(mask & SMART_TARGET_BY_HEALTH_ALLY_OR_ENEMY) &&
+                        me->IsHostileTo(unit->ToUnit()))
                         continue;
-                    else if (!me->IsHostileTo(unit->ToUnit()) &&
-                        (mask & SMART_TARGET_BY_HEALTH_ALLY_OR_ENEMY))
+                    else if ((mask & SMART_TARGET_BY_HEALTH_ALLY_OR_ENEMY) &&
+                        !me->IsHostileTo(unit->ToUnit()))
                         continue;
                 }
 
-                if (!unit->ToUnit()->IsInCombat() &&
-                    !(mask & SMART_TARGET_BY_HEALTH_INCLUDE_OOC))
+                if (!(mask & SMART_TARGET_BY_HEALTH_INCLUDE_OOC) &&
+                    !unit->ToUnit()->IsInCombat())
                     continue;
 
-                if (me && !me->IsInRaidWith(unit->ToUnit()) &&
-                    (mask & SMART_TARGET_BY_HEALTH_RAID_ONLY))
+                if ((mask & SMART_TARGET_BY_HEALTH_RAID_ONLY) &&
+                    me && !me->IsInRaidWith(unit->ToUnit()))
                     continue;
 
-                if (me && !me->IsInPartyWith(unit->ToUnit()) &&
-                    (mask & SMART_TARGET_BY_HEALTH_GROUP_ONLY))
+                if ((mask & SMART_TARGET_BY_HEALTH_GROUP_ONLY) &&
+                    me && !me->IsInPartyWith(unit->ToUnit()))
                     continue;
 
                 uint32 healthPct = uint32(unit->ToUnit()->GetHealthPct());
@@ -4212,10 +4212,10 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
 
                 //New valid target take place of old valid target if it has more or less life depending on parameter
                 if (!lastTarget ||
-                    (healthPct > lastTarget->ToUnit()->GetHealthPct() &&
-                        (mask & SMART_TARGET_BY_HEALTH_HIGHEST_HP)) ||
-                    (healthPct < lastTarget->ToUnit()->GetHealthPct() &&
-                        !(mask & SMART_TARGET_BY_HEALTH_HIGHEST_HP)))
+                    ((mask & SMART_TARGET_BY_HEALTH_HIGHEST_HP) &&
+                        healthPct > lastTarget->ToUnit()->GetHealthPct()) ||
+                    (!(mask & SMART_TARGET_BY_HEALTH_HIGHEST_HP) &&
+                        healthPct < lastTarget->ToUnit()->GetHealthPct()))
                     lastTarget = unit;
             }
             if (lastTarget)
