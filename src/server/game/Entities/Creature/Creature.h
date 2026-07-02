@@ -537,6 +537,8 @@ private:
     // Formation variable
     CreatureGroup* m_formation;
     bool TriggerJustRespawned;
+    /// Set when AIM_Initialize() ran InitializeAI(); skips redundant JustRespawned on first tick.
+    bool _spawnInitHandledByAIMInitialize;
 
     // Shared timer between mobs who assist another.
     // Damaging one extends leash range on all of them.
