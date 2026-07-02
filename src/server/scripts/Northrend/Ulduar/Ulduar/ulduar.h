@@ -149,6 +149,16 @@ enum UlduarData
     DATA_HODIR_GOSSIP                       = 811,
     DATA_MIMIRON_GOSSIP                     = 812,
     DATA_THORIM_GOSSIP                      = 813,
+
+    // Ulduar Teleporters (raised/glowing once their unlock condition is met)
+    DATA_TELEPORTER_FORMATION_GROUNDS       = 820,
+    DATA_TELEPORTER_COLOSSAL_FORGE          = 821,
+    DATA_TELEPORTER_SCRAPYARD               = 822,
+    DATA_TELEPORTER_ANTECHAMBER             = 823,
+    DATA_TELEPORTER_SHATTERED_WALKWAY       = 824,
+    DATA_TELEPORTER_CONSERVATORY            = 825,
+    DATA_TELEPORTER_HALLS_OF_INVENTION      = 826,
+    DATA_TELEPORTER_PRISON_OF_YOGGSARON     = 827,
 };
 
 enum UlduarNPCs
@@ -304,6 +314,9 @@ enum UlduarGameObjects
     GO_DOODAD_UL_ULDUAR_TRAPDOOR_03         = 194253,
     GO_GIFT_OF_THE_OBSERVER_10              = 194821,
     GO_GIFT_OF_THE_OBSERVER_25              = 194822,
+
+    // Teleporters
+    GO_ULDUAR_TELEPORTER                    = 194569,
 };
 
 enum UlduarPersistentData
