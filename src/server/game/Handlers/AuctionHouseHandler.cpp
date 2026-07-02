@@ -461,7 +461,14 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket& recvData)
         return;
     }
 
-    if (!auction || auction->owner == player->GetGUID())
+    if (!auction)
+    {
+        // auction was cancelled or already bought by someone else
+        SendAuctionCommandResult(0, AUCTION_PLACE_BID, ERR_AUCTION_ITEM_NOT_FOUND);
+        return;
+    }
+
+    if (auction->owner == player->GetGUID())
     {
         //you cannot bid your own auction:
         SendAuctionCommandResult(0, AUCTION_PLACE_BID, ERR_AUCTION_BID_OWN);
