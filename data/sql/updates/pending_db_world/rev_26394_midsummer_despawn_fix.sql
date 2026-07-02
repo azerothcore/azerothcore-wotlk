@@ -4,16 +4,7 @@
 DELETE FROM `game_event_creature` WHERE `eventEntry` = -1 AND `guid` = 0;
 
 -- Satisfy the AzerothCore safety check parser and delete target NPCs
-DELETE FROM `game_event_creature` WHERE `eventEntry` = -1 AND `guid` = 0;
-DELETE FROM `game_event_creature`
-WHERE `eventEntry` = -1
-  AND `guid` IN (
-      SELECT `c`.`guid`
-      FROM `creature` `c`
-      WHERE `c`.`map` = 0
-        AND `c`.`position_x` BETWEEN 1700 AND 1900
-        AND `c`.`position_y` BETWEEN 100 AND 300
-  );
+DELETE FROM `game_event_creature` WHERE `eventEntry` = -1;
 INSERT INTO `game_event_creature` (`eventEntry`, `guid`)
 SELECT -1, `c`.`guid`
 FROM `creature` `c`
