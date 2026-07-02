@@ -56,6 +56,7 @@ public:
             warned15 = false;
             warned2 = false;
             kicked = false;
+            wasWarTime = false;
         }
 
         void OnPlayerEnter(Player* ) override
@@ -92,8 +93,11 @@ public:
             // of being skipped because IsWarTime() is already true.
             uint32 const timer = warTime ? 0 : bf->GetTimer();
 
-            // Far from the next war again: previous cycle is fully over, reset for a fresh countdown.
-            if (!warTime && timer > 15 * MINUTE * IN_MILLISECONDS)
+            // War just ended: reset for a fresh countdown regardless of how
+            // Wintergrasp.NoBattleTimer is configured (don't rely on the
+            // absolute timer value, which could stay below 15 minutes forever
+            // on a short config and leave the flags stuck true).
+            if (wasWarTime && !warTime)
             {
                 if (stoned)
                     for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
@@ -105,8 +109,11 @@ public:
                 stoned = false;
                 warned2 = false;
                 kicked = false;
-                return;
             }
+            wasWarTime = warTime;
+
+            if (!warTime && timer > 15 * MINUTE * IN_MILLISECONDS)
+                return;
 
             if (!warned15 && timer <= 15 * MINUTE * IN_MILLISECONDS)
             {
@@ -153,7 +160,8 @@ public:
                 Map::PlayerList const& PlayerList = instance->GetPlayers();
                 for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                     if (Player* player = i->GetSource())
-                        player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->GetOrientation());
+                        player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY,
+                            player->m_homebindZ, player->GetOrientation());
             }
         }
 
@@ -289,6 +297,7 @@ public:
         bool warned15;
         bool warned2;
         bool kicked;
+        bool wasWarTime;
 
         uint32 m_auiEncounter[MAX_ENCOUNTER];
         ObjectGuid bossGUIDs[MAX_ENCOUNTER];
