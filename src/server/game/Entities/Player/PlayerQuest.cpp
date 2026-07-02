@@ -774,6 +774,10 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
         moneyRew += rewOrReqMoney;
     }
 
+    // CAIS partial restriction halves quest money reward, mirroring looted money and XP
+    if (moneyRew > 0 && HasPlayerFlag(PLAYER_FLAGS_PARTIAL_PLAY_TIME))
+        moneyRew /= 2;
+
     if (moneyRew)
     {
         ModifyMoney(moneyRew);
