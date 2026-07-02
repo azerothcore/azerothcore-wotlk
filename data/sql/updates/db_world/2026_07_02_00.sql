@@ -1,3 +1,4 @@
+-- DB update 2026_06_30_06 -> 2026_07_02_00
 -- From ¦ to |
 UPDATE `acore_string` SET `content_default` = REPLACE(`content_default`, '¦', '|') WHERE `content_default` LIKE '%¦%';
 UPDATE `acore_string` SET `locale_koKR` = REPLACE(`locale_koKR`, '¦', '|') WHERE `locale_koKR` LIKE '%¦%';
