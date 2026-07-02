@@ -1644,14 +1644,13 @@ public:
     [[nodiscard]] bool IsImmunedToDamage(SpellSchoolMask schoolMask) const;
     [[nodiscard]] bool IsImmunedToDamage(Unit const* caster, SpellInfo const* spellInfo) const;
     [[nodiscard]] bool IsImmunedToSchool(SpellSchoolMask schoolMask) const;
+    [[nodiscard]] bool HasSchoolImmunityForMask(SpellSchoolMask schoolMask, Unit const* caster, SpellInfo const* spellInfo) const;
 
     static bool IsImmuneMaskFully(SpellSchoolMask immuneMask, SpellSchoolMask schoolMask) { return (immuneMask & schoolMask) == schoolMask; }
 
     [[nodiscard]] uint32 GetSchoolImmunityMask() const;
     [[nodiscard]] uint32 GetDamageImmunityMask() const;
 
-    [[nodiscard]] bool IsImmunedToSchool(SpellInfo const* spellInfo) const;
-    [[nodiscard]] bool IsImmunedToSchool(Spell const* spell) const;
     [[nodiscard]] bool IsImmunedToDamageOrSchool(SpellSchoolMask schoolMask) const;
     [[nodiscard]] bool IsImmunedToAuraPeriodicTick(Unit const* caster, SpellInfo const* spellInfo) const;
     virtual bool IsImmunedToSpellEffect(SpellInfo const* spellInfo, uint32 index, Unit const* caster = nullptr) const;
