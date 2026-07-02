@@ -117,8 +117,16 @@ void WorldSessionMgr::UpdateSessions(uint32 const diff)
         // pussywizard:
         if (pSession->HandleSocketClosed())
         {
+            Seconds const now = GameTime::GetGameTime();
+
+            // a reconnect builds a fresh session and carries time from _accountsPlayHistory, so persist it
+            // here at socket-close time rather than during offline cleanup (which runs ~60s later)
+            AccountPlayHistory& history = _accountsPlayHistory[pSession->GetAccountId()];
+            history.playedTime = pSession->GetConsecutivePlayTime(now);
+            history.logoutTime = now;
+
             if (!RemoveQueuedPlayer(pSession) && sWorld->getIntConfig(CONFIG_INTERVAL_DISCONNECT_TOLERANCE))
-                _disconnects[pSession->GetAccountId()] = GameTime::GetGameTime().count();
+                _disconnects[pSession->GetAccountId()] = now.count();
             _sessions.erase(itr);
             // there should be no offline session if current one is logged onto a character
             SessionMap::iterator iter;
@@ -128,7 +136,7 @@ void WorldSessionMgr::UpdateSessions(uint32 const diff)
                 _offlineSessions.erase(iter);
                 delete tmp;
             }
-            pSession->SetOfflineTime(GameTime::GetGameTime().count());
+            pSession->SetOfflineTime(now.count());
             _offlineSessions[pSession->GetAccountId()] = pSession;
             continue;
         }
@@ -161,12 +169,6 @@ void WorldSessionMgr::UpdateSessions(uint32 const diff)
         WorldSession* pSession = itr->second;
         if (!pSession->GetPlayer() || pSession->GetOfflineTime() + 60 < currTime || pSession->IsKicked())
         {
-            // persist consecutive play time (a socket-closed disconnect never reaches the Update() cleanup)
-            Seconds const offlineTime = Seconds(pSession->GetOfflineTime());
-            AccountPlayHistory& history = _accountsPlayHistory[pSession->GetAccountId()];
-            history.playedTime = pSession->GetConsecutivePlayTime(offlineTime);
-            history.logoutTime = offlineTime;
-
             _offlineSessions.erase(itr);
             delete pSession;
         }
