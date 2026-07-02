@@ -252,7 +252,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
             }
         });
 
-        if (err)
+        if (err > 0)
         {
             err = grp->CanJoinBattlegroundQueue(bg, bgQueueTypeId, 0, bg->GetMaxPlayersPerTeam(), false, 0);
         }
