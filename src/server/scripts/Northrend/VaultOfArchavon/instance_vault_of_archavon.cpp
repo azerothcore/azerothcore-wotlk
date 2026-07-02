@@ -95,6 +95,12 @@ public:
             // Far from the next war again: previous cycle is fully over, reset for a fresh countdown.
             if (!warTime && timer > 15 * MINUTE * IN_MILLISECONDS)
             {
+                if (stoned)
+                    for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
+                        if (Creature* cr = instance->GetCreature(bossGUIDs[i]))
+                            if (!cr->IsInCombat())
+                                cr->RemoveAllAuras();
+
                 warned15 = false;
                 stoned = false;
                 warned2 = false;
