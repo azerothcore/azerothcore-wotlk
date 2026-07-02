@@ -24,6 +24,105 @@
 #include "Map.h"
 #include "Metric.h"
 
+// Blades Edge Arena Ropes normalization
+namespace
+{
+    constexpr float BLADE_EDGE_ROPE_SNAP_DIST = 1.5f;
+    constexpr float BLADE_EDGE_ROPE_SNAP_DIST2 = BLADE_EDGE_ROPE_SNAP_DIST * BLADE_EDGE_ROPE_SNAP_DIST;
+    constexpr float BLADE_EDGE_ROPE_PI = 3.14159265358979323846f;
+
+    struct BladeEdgeArenaRope
+    {
+        G3D::Vector3 Start;
+        G3D::Vector3 End;
+        float Sag;
+    };
+
+    static const std::array<BladeEdgeArenaRope, 2> BladeEdgeArenaRopes =
+    {{
+        {
+            {6243.1523f, 267.53094f, 10.929295f},
+            {6245.9717f, 271.29346f, 10.879172f},
+            0.43f
+        },
+        {
+            {6234.3213f, 256.29733f, 11.002348f},
+            {6231.3247f, 252.58781f, 10.976968f},
+            0.46f
+        }
+    }};
+
+    bool IsOutsideExpandedXYBounds(G3D::Vector3 const& point, BladeEdgeArenaRope const& rope)
+    {
+        float const minX = std::min(rope.Start.x, rope.End.x) - BLADE_EDGE_ROPE_SNAP_DIST;
+        float const maxX = std::max(rope.Start.x, rope.End.x) + BLADE_EDGE_ROPE_SNAP_DIST;
+        float const minY = std::min(rope.Start.y, rope.End.y) - BLADE_EDGE_ROPE_SNAP_DIST;
+        float const maxY = std::max(rope.Start.y, rope.End.y) + BLADE_EDGE_ROPE_SNAP_DIST;
+
+        return point.x < minX || point.x > maxX || point.y < minY || point.y > maxY;
+    }
+
+    bool GetClosestPointOnBladeEdgeArenaRope(G3D::Vector3 const& point, BladeEdgeArenaRope const& rope, G3D::Vector3& closestPoint)
+    {
+        G3D::Vector3 const ropeVector = rope.End - rope.Start;
+
+        float const ropeLength2XY = ropeVector.x * ropeVector.x + ropeVector.y * ropeVector.y;
+        if (ropeLength2XY < 0.00001f)
+            return false;
+
+        G3D::Vector3 const pointVector = point - rope.Start;
+
+        float t = (pointVector.x * ropeVector.x + pointVector.y * ropeVector.y) / ropeLength2XY;
+        t = std::clamp(t, 0.0f, 1.0f);
+
+        float const closestX = rope.Start.x + ropeVector.x * t;
+        float const closestY = rope.Start.y + ropeVector.y * t;
+
+        float const dx = point.x - closestX;
+        float const dy = point.y - closestY;
+
+        // If the point is already too far in XY, it cannot be within the 3D snap radius.
+        if (dx * dx + dy * dy >= BLADE_EDGE_ROPE_SNAP_DIST2)
+            return false;
+
+        float const linearZ = rope.Start.z + (rope.End.z - rope.Start.z) * t;
+        float const sagZ = rope.Sag * std::sin(BLADE_EDGE_ROPE_PI * t);
+
+        closestPoint = { closestX, closestY, linearZ - sagZ };
+        return true;
+    }
+
+    bool TrySnapToBladeEdgeArenaRope(G3D::Vector3& point)
+    {
+        bool snapped = false;
+        float bestDist2 = BLADE_EDGE_ROPE_SNAP_DIST2;
+        G3D::Vector3 bestPoint;
+
+        for (BladeEdgeArenaRope const& rope : BladeEdgeArenaRopes)
+        {
+            if (IsOutsideExpandedXYBounds(point, rope))
+                continue;
+
+            G3D::Vector3 closestPoint;
+            if (!GetClosestPointOnBladeEdgeArenaRope(point, rope, closestPoint))
+                continue;
+
+            float const dist2 = (point - closestPoint).squaredLength();
+            if (dist2 < bestDist2)
+            {
+                bestDist2 = dist2;
+                bestPoint = closestPoint;
+                snapped = true;
+            }
+        }
+
+        if (snapped)
+            point = bestPoint;
+
+        return snapped;
+    }
+}
+
  ////////////////// PathGenerator //////////////////
 PathGenerator::PathGenerator(WorldObject const* owner) :
     _polyLength(0), _type(PATHFIND_BLANK), _useStraightPath(false), _forceDestination(false),
@@ -622,9 +721,13 @@ void PathGenerator::BuildPointPath(const float* startPoint, const float* endPoin
 
 void PathGenerator::NormalizePath()
 {
-    for (uint32 i = 0; i < _pathPoints.size(); ++i)
+    bool const snapBladeEdgeArenaRopes = _source->GetMapId() == MAP_BLADES_EDGE_ARENA;
+    for (G3D::Vector3& point : _pathPoints)
     {
-        _source->UpdateAllowedPositionZ(_pathPoints[i].x, _pathPoints[i].y, _pathPoints[i].z);
+        if (snapBladeEdgeArenaRopes && TrySnapToBladeEdgeArenaRope(point))
+            continue;
+
+        _source->UpdateAllowedPositionZ(point.x, point.y, point.z);
     }
 }
 

@@ -191,6 +191,16 @@ namespace MMAP
         tryBoolean(mmapsNode, "skipBattlegrounds", _skipBattlegrounds);
         tryBoolean(mmapsNode, "debugOutput", _debugOutput);
 
+        if (mmapsNode.contains("offmeshConnections") &&
+    mmapsNode["offmeshConnections"].is_sequence())
+        {
+            _offmeshConnection = mmapsNode["offmeshConnections"].get_value<std::vector<std::string>>();
+        }
+        else
+        {
+            _offmeshConnection.clear();
+        }
+
         std::string dataDirPath;
         tryString(mmapsNode, "dataDir", dataDirPath);
         _dataDir = dataDirPath;
@@ -202,8 +212,8 @@ namespace MMAP
         tryInt(mmapsNode, "walkableHeight", _global.walkableHeight);
         tryInt(mmapsNode, "walkableClimb", _global.walkableClimb);
         tryInt(mmapsNode, "walkableRadius", _global.walkableRadius);
-        tryInt(mmapsNode, "vertexPerMapEdge", _global.vertexPerMapEdge);
-        tryInt(mmapsNode, "vertexPerTileEdge", _global.vertexPerTileEdge);
+        tryInt(mmapsNode, "verticesPerMapEdge", _global.vertexPerMapEdge);
+        tryInt(mmapsNode, "verticesPerTileEdge", _global.vertexPerTileEdge);
         tryFloat(mmapsNode, "maxSimplificationError", _global.maxSimplificationError);
 
         // Map overrides
@@ -225,8 +235,10 @@ namespace MMAP
                     override.walkableHeight = mapNode["walkableHeight"].get_value<int>();
                 if (mapNode.contains("walkableClimb"))
                     override.walkableClimb = mapNode["walkableClimb"].get_value<int>();
-                if (mapNode.contains("vertexPerMapEdge"))
-                    override.vertexPerMapEdge = mapNode["vertexPerMapEdge"].get_value<int>();
+                if (mapNode.contains("verticesPerMapEdge"))
+                    override.vertexPerMapEdge = mapNode["verticesPerMapEdge"].get_value<int>();
+                if (mapNode.contains("verticesPerTileEdge"))
+                    override.vertexPerMapEdge = mapNode["verticesPerTileEdge"].get_value<int>();
                 if (mapNode.contains("cellSizeHorizontal"))
                     override.cellSizeHorizontal = mapNode["cellSizeHorizontal"].get_value<float>();
                 if (mapNode.contains("cellSizeVertical"))
