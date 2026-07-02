@@ -52,6 +52,9 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (1360540, 12, 880.2524, -33.8488,   409.9155,        0,     0, 0, 0, 100, 0),
 (1360540, 13, 883.6281, -12.63596,  409.799,  3.159046, 30000, 0, 0, 100, 0); -- MovementInform: emote 10
 
+DELETE FROM `waypoint_scripts` WHERE `guid`=5 and `id` = 1360540;
+DELETE FROM `waypoint_scripts` WHERE `guid`=6 and `id` = 1360541;
+
 -- Update script names for adds
 UPDATE `creature_template` SET `ScriptName`='npc_scrapbot'      WHERE `entry`=33343;
 UPDATE `creature_template` SET `ScriptName`='npc_pummeller'     WHERE `entry`=33344;
@@ -97,7 +100,10 @@ SET @CGUID := 12777;
 SET @BUILD := 0;
 DELETE FROM `creature` WHERE (`id` = 33337) AND (`guid` BETWEEN @CGUID+0 AND @CGUID+3);
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `Comment`, `VerifiedBuild`) VALUES
-(@CGUID+0, 33337, 603, 0, 0, 3, 1, 0, 897.908, 67.0764, 412.129, 3.92699, 180, 0, 0, 12600, 0, 0, 0, 0, 0, '0', '', @BUILD),
-(@CGUID+1, 33337, 603, 0, 0, 3, 1, 0, 898.099, -88.9115, 409.887, 2.23402, 180, 0, 0, 12600, 0, 0, 0, 0, 0, '0', '', @BUILD),
-(@CGUID+2, 33337, 603, 0, 0, 3, 1, 0, 793.096, -95.158, 409.887, 0.855211, 180, 0, 0, 12600, 0, 0, 0, 0, 0, '0', '', @BUILD),
-(@CGUID+3, 33337, 603, 0, 0, 3, 1, 0, 792.646, 65.3854, 414.147, 5.20108, 180, 0, 0, 12600, 0, 0, 0, 0, 0, '0', '', @BUILD);
+(@CGUID+0, 33337, 603, 0, 0, 3, 1, 0, 897.908, 67.0764, 412.129, 3.92699, 180, 0, 0, 12600, 0, 0, 0, 0, 0, '', '', @BUILD),
+(@CGUID+1, 33337, 603, 0, 0, 3, 1, 0, 898.099, -88.9115, 409.887, 2.23402, 180, 0, 0, 12600, 0, 0, 0, 0, 0, '', '', @BUILD),
+(@CGUID+2, 33337, 603, 0, 0, 3, 1, 0, 793.096, -95.158, 409.887, 0.855211, 180, 0, 0, 12600, 0, 0, 0, 0, 0, '', '', @BUILD),
+(@CGUID+3, 33337, 603, 0, 0, 3, 1, 0, 792.646, 65.3854, 414.147, 5.20108, 180, 0, 0, 12600, 0, 0, 0, 0, 0, '', '', @BUILD);
+
+DELETE FROM `spell_script_names` WHERE `spell_id`=62826 AND `ScriptName`='spell_xt002_energy_orb';
+UPDATE `creature_template` SET `AIName` = '', `ScriptName` = 'npc_xt_toy_pile' WHERE (`entry` = 33337);

@@ -54,6 +54,7 @@ enum Spells
 
     // Heart of the Deconstructor
     SPELL_ENERGY_ORB                        = 62790,
+    SPELL_ENERGY_ORB_TRIGGERED              = 62826,
     SPELL_RIDE_VEHICLE_EXPOSED              = 63313,
     SPELL_EXPOSED_HEART                     = 63849,
     SPELL_HEART_RIDE_VEHICLE                = 63852,
@@ -826,53 +827,45 @@ class spell_xt002_heart_overload_periodic : public SpellScript
     }
 };
 
-// 62826 - Energy Orb (detonation)
-// When this hits an XT-Toy Pile, it summons adds.
-// If the Toy Pile is too close to XT-002, no adds are spawned.
-class spell_xt002_energy_orb : public SpellScript
+struct npc_xt_toy_pile : public ScriptedAI
 {
-    PrepareSpellScript(spell_xt002_energy_orb);
-
-    bool Validate(SpellInfo const* /*spell*/) override
+    explicit npc_xt_toy_pile(Creature* creature) : ScriptedAI(creature)
     {
-        return ValidateSpellInfo
-        ({
-            SPELL_RECHARGE_BOOMBOT,
-            SPELL_RECHARGE_PUMMELER,
-            SPELL_RECHARGE_SCRAPBOT
-        });
+        _lastSummonTime = 0;
     }
 
-    static constexpr float SummonMinDistance = 90.0f; // Toy Piles within this range of XT-002 do not summon adds
+    static constexpr float SummonDistance = 90.0f;
+    static constexpr uint32 SummonCooldown = 15 * IN_MILLISECONDS;
 
-    void HandleSummons(SpellEffIndex /*effIndex*/)
+    void SpellHit(Unit* caster, SpellInfo const* spell) override
     {
-        Unit* target = GetHitUnit();
-        if (target->GetEntry() != NPC_XT_TOY_PILE)
+        if (spell->Id != SPELL_ENERGY_ORB_TRIGGERED)
             return;
 
-        // Only summon adds if the Toy Pile is far enough from XT-002
-        if (Creature* xt002 = GetCaster()->GetVehicleCreatureBase())
-            if (xt002->IsWithinDist(target, SummonMinDistance))
-                return;
+        Creature* xt002 = caster ? caster->GetVehicleCreatureBase() : nullptr;
+        if (!xt002 || xt002->IsWithinDist(me, SummonDistance))
+            return;
 
-        target->CastSpell(target, SPELL_RECHARGE_BOOMBOT, true);
+        uint32 now = getMSTime();
+        if (now - _lastSummonTime < SummonCooldown)
+            return;
+
+        _lastSummonTime = now;
+
+        DoCastSelf(SPELL_RECHARGE_BOOMBOT, true);
 
         if (roll_chance_i(30))
-            target->CastSpell(target, SPELL_RECHARGE_PUMMELER, true);
+            DoCastSelf(SPELL_RECHARGE_PUMMELER, true);
 
         uint8 const summonCount = urand(5, 7);
         for (uint8 i = 0; i < summonCount; ++i)
-            target->CastSpell(target, SPELL_RECHARGE_SCRAPBOT, true);
+            DoCastSelf(SPELL_RECHARGE_SCRAPBOT, true);
 
-        if (Creature* base = GetCaster()->GetVehicleCreatureBase())
-            base->AI()->Talk(SAY_SUMMON);
+        xt002->AI()->Talk(SAY_SUMMON);
     }
 
-    void Register() override
-    {
-        OnEffectHitTarget += SpellEffectFn(spell_xt002_energy_orb::HandleSummons, EFFECT_2, SPELL_EFFECT_DUMMY);
-    }
+private:
+    uint32 _lastSummonTime{};
 };
 
 // 62775 - Tympanic Tantrum
@@ -938,23 +931,18 @@ class spell_xt002_321_boombot_aura : public AuraScript
 };
 
 // 63849 - Exposed Heart
-// Accumulates damage dealt to the Heart and transfers it to XT-002
-// in batches, synchronized with the overload trigger (every ~1s).
+// Transfers damage dealt to the Heart to XT-002 on every hit.
+// Also fires Energy Orb missiles at Toy Piles on damage taken, with a 1s cooldown.
 class spell_xt002_exposed_heart : public AuraScript
 {
     PrepareAuraScript(spell_xt002_exposed_heart);
-
-    bool Load() override
-    {
-        _damageAmount = 0;
-        _lastOrbTime = 0;
-        return true;
-    }
 
     bool Validate(SpellInfo const* /*spell*/) override
     {
         return ValidateSpellInfo({ SPELL_HEART_OVERLOAD_TRIGGER });
     }
+
+    static constexpr uint32 OrbCooldown = 1500;
 
     void OnProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
     {
@@ -963,40 +951,25 @@ class spell_xt002_exposed_heart : public AuraScript
         if (!damageInfo || !damageInfo->GetDamage())
             return;
 
-        _damageAmount += damageInfo->GetDamage();
+        if (Creature* xt002 = GetTarget()->GetVehicleCreatureBase())
+            xt002->AI()->SetData(DATA_TRANSFERED_HEALTH, damageInfo->GetDamage());
 
         uint32 now = getMSTime();
-        if (now - _lastOrbTime >= 1000)
+        if (now - _lastOrbTime >= OrbCooldown)
         {
             _lastOrbTime = now;
-
-            if (Creature* xt002 = GetTarget()->GetVehicleCreatureBase())
-                xt002->AI()->SetData(DATA_TRANSFERED_HEALTH, _damageAmount);
-
-            _damageAmount = 0;
-
-            // Fire Energy Orb at a Toy Pile
             if (Unit* caster = GetCaster())
                 caster->CastSpell(caster, SPELL_HEART_OVERLOAD_TRIGGER, true);
         }
     }
 
-    void HandleLifeTransfer(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
-    {
-        if (_damageAmount > 0)
-            if (Creature* xt002 = GetTarget()->GetVehicleCreatureBase())
-                xt002->AI()->SetData(DATA_TRANSFERED_HEALTH, _damageAmount);
-    }
-
     void Register() override
     {
         OnEffectProc += AuraEffectProcFn(spell_xt002_exposed_heart::OnProc, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN);
-        AfterEffectRemove += AuraEffectRemoveFn(spell_xt002_exposed_heart::HandleLifeTransfer, EFFECT_0, SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, AURA_EFFECT_HANDLE_REAL);
     }
 
 private:
-    uint32 _damageAmount = 0;
-    uint32 _lastOrbTime = 0;
+    uint32 _lastOrbTime{};
 };
 
 // 37751 - Submerged
@@ -1088,7 +1061,7 @@ void AddSC_boss_xt002()
     RegisterSpellScript(spell_xt002_gravity_bomb_aura);
     RegisterSpellScript(spell_xt002_gravity_bomb_damage);
     RegisterSpellScript(spell_xt002_heart_overload_periodic);
-    RegisterSpellScript(spell_xt002_energy_orb);
+    RegisterUlduarCreatureAI(npc_xt_toy_pile);
     RegisterSpellScript(spell_xt002_tympanic_tantrum);
     RegisterSpellScript(spell_xt002_321_boombot_aura);
     RegisterSpellScript(spell_xt002_exposed_heart);
