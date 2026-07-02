@@ -38,6 +38,7 @@ WorldSessionMgr::WorldSessionMgr()
     _maxQueuedSessionCount = 0;
     _playerCount = 0;
     _maxPlayerCount = 0;
+    _accountsPlayHistoryPruneTimer = 0;
 }
 
 WorldSessionMgr::~WorldSessionMgr()
@@ -91,6 +92,22 @@ WorldSession* WorldSessionMgr::FindOfflineSessionForCharacterGUID(ObjectGuid::Lo
 
 void WorldSessionMgr::UpdateSessions(uint32 const diff)
 {
+    // Drop play-history entries past the reset window so the map stays bounded even for
+    // accounts that disconnect and never reconnect (login only erases their own entry).
+    _accountsPlayHistoryPruneTimer += diff;
+    if (_accountsPlayHistoryPruneTimer >= 10 * MINUTE * IN_MILLISECONDS)
+    {
+        _accountsPlayHistoryPruneTimer = 0;
+        Seconds const now = GameTime::GetGameTime();
+        for (auto itr = _accountsPlayHistory.begin(); itr != _accountsPlayHistory.end();)
+        {
+            if ((now - itr->second.logoutTime) >= PLAY_TIME_LIMIT_FULL)
+                itr = _accountsPlayHistory.erase(itr);
+            else
+                ++itr;
+        }
+    }
+
     {
         METRIC_DETAILED_NO_THRESHOLD_TIMER("world_update_time",
             METRIC_TAG("type", "Add sessions"),
