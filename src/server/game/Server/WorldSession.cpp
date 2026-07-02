@@ -396,9 +396,10 @@ bool WorldSession::Update(uint32 diff, PacketFilter& updater)
     time_t currentTime = GameTime::GetGameTime().count();
 
     if (GetPlayer() && GetPlayer()->IsInWorld() && IsAffectedByCAIS())
+    {
         CheckPlayedTimeLimit(Seconds(currentTime));
-
-    _lastUpdateTime = Seconds(currentTime);
+        _lastUpdateTime = Seconds(currentTime);
+    }
 
     constexpr uint32 MAX_PROCESSED_PACKETS_IN_SAME_WORLDSESSION_UPDATE = 150;
 
