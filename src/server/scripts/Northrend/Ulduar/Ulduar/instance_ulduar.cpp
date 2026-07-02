@@ -28,23 +28,6 @@
 #include "WorldStatePackets.h"
 #include "ulduar.h"
 
-// Ulduar Teleporter (GO_ULDUAR_TELEPORTER, entry 194569) is spawned 9 times
-// across the instance sharing the same entry; each spawn's guid identifies
-// which physical location/unlock requirement it represents. Matched by
-// position against the corresponding boss's spawn coordinates.
-enum UlduarTeleporterGuids : ObjectGuid::LowType
-{
-    ULDUAR_TELEPORTER_BASE_CAMP_GUID           = 34283, // always active
-    ULDUAR_TELEPORTER_FORMATION_GROUNDS_GUID   = 34288, // active on engaging Flame Leviathan
-    ULDUAR_TELEPORTER_COLOSSAL_FORGE_GUID      = 34223, // active on defeating Flame Leviathan
-    ULDUAR_TELEPORTER_SCRAPYARD_GUID           = 34296, // active on defeating XT-002
-    ULDUAR_TELEPORTER_ANTECHAMBER_GUID         = 34935, // active on defeating XT-002
-    ULDUAR_TELEPORTER_SHATTERED_WALKWAY_GUID   = 34219, // active on defeating Kologarn
-    ULDUAR_TELEPORTER_CONSERVATORY_GUID        = 34281, // active on defeating Auriaya
-    ULDUAR_TELEPORTER_HALLS_OF_INVENTION_GUID  = 56100, // active on engaging Mimiron
-    ULDUAR_TELEPORTER_PRISON_OF_YOGGSARON_GUID = 34923  // active on defeating General Vezax
-};
-
 DoorData const doorData[] =
 {
     { GO_LEVIATHAN_DOORS,              BOSS_LEVIATHAN, DOOR_TYPE_ROOM       },
@@ -341,11 +324,6 @@ public:
             switch (type)
             {
                 case BOSS_LEVIATHAN:
-                    if (state == IN_PROGRESS)
-                    {
-                        if (GameObject* go = GetGameObject(DATA_TELEPORTER_FORMATION_GROUNDS))
-                            go->SetGoState(GO_STATE_ACTIVE);
-                    }
                     if (state == DONE)
                     {
                         instance->DoForAllPlayers([&](Player* player)
@@ -356,42 +334,11 @@ public:
 
                         if (GameObject* go = GetGameObject(DATA_LEVIATHAN_DOORS))
                             go->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
-
-                        if (GameObject* go = GetGameObject(DATA_TELEPORTER_COLOSSAL_FORGE))
-                            go->SetGoState(GO_STATE_ACTIVE);
                     }
-                    break;
-                case BOSS_XT002:
-                    if (state == DONE)
-                    {
-                        if (GameObject* go = GetGameObject(DATA_TELEPORTER_SCRAPYARD))
-                            go->SetGoState(GO_STATE_ACTIVE);
-                        if (GameObject* go = GetGameObject(DATA_TELEPORTER_ANTECHAMBER))
-                            go->SetGoState(GO_STATE_ACTIVE);
-                    }
-                    break;
-                case BOSS_KOLOGARN:
-                    if (state == DONE)
-                        if (GameObject* go = GetGameObject(DATA_TELEPORTER_SHATTERED_WALKWAY))
-                            go->SetGoState(GO_STATE_ACTIVE);
-                    break;
-                case BOSS_AURIAYA:
-                    if (state == DONE)
-                        if (GameObject* go = GetGameObject(DATA_TELEPORTER_CONSERVATORY))
-                            go->SetGoState(GO_STATE_ACTIVE);
-                    break;
-                case BOSS_VEZAX:
-                    if (state == DONE)
-                        if (GameObject* go = GetGameObject(DATA_TELEPORTER_PRISON_OF_YOGGSARON))
-                            go->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case BOSS_MIMIRON:
                     if (state == IN_PROGRESS)
-                    {
                         _mimironTramUsed = true;
-                        if (GameObject* go = GetGameObject(DATA_TELEPORTER_HALLS_OF_INVENTION))
-                            go->SetGoState(GO_STATE_ACTIVE);
-                    }
                     [[fallthrough]];
                 case BOSS_HODIR:
                 case BOSS_THORIM:
@@ -667,51 +614,6 @@ public:
                 case 189973: // Goldclover
                     if (GetBossState(BOSS_FREYA) == DONE)
                         gameObject->SetRespawnTime(7 * DAY);
-                    break;
-                // Teleporters (raised/glowing once their unlock condition is
-                // met; Expedition Base Camp has no requirement and is
-                // always shown active)
-                case GO_ULDUAR_TELEPORTER:
-                    switch (gameObject->GetSpawnId())
-                    {
-                        case ULDUAR_TELEPORTER_BASE_CAMP_GUID:
-                            gameObject->SetGoState(GO_STATE_ACTIVE);
-                            break;
-                        case ULDUAR_TELEPORTER_FORMATION_GROUNDS_GUID:
-                            AddObject(static_cast<WorldObject*>(gameObject), DATA_TELEPORTER_FORMATION_GROUNDS);
-                            if (GetBossState(BOSS_LEVIATHAN) != NOT_STARTED)
-                                gameObject->SetGoState(GO_STATE_ACTIVE);
-                            break;
-                        case ULDUAR_TELEPORTER_COLOSSAL_FORGE_GUID:
-                            AddObject(static_cast<WorldObject*>(gameObject), DATA_TELEPORTER_COLOSSAL_FORGE);
-                            OpenIfDone(BOSS_LEVIATHAN, gameObject, GO_STATE_ACTIVE);
-                            break;
-                        case ULDUAR_TELEPORTER_SCRAPYARD_GUID:
-                            AddObject(static_cast<WorldObject*>(gameObject), DATA_TELEPORTER_SCRAPYARD);
-                            OpenIfDone(BOSS_XT002, gameObject, GO_STATE_ACTIVE);
-                            break;
-                        case ULDUAR_TELEPORTER_ANTECHAMBER_GUID:
-                            AddObject(static_cast<WorldObject*>(gameObject), DATA_TELEPORTER_ANTECHAMBER);
-                            OpenIfDone(BOSS_XT002, gameObject, GO_STATE_ACTIVE);
-                            break;
-                        case ULDUAR_TELEPORTER_SHATTERED_WALKWAY_GUID:
-                            AddObject(static_cast<WorldObject*>(gameObject), DATA_TELEPORTER_SHATTERED_WALKWAY);
-                            OpenIfDone(BOSS_KOLOGARN, gameObject, GO_STATE_ACTIVE);
-                            break;
-                        case ULDUAR_TELEPORTER_CONSERVATORY_GUID:
-                            AddObject(static_cast<WorldObject*>(gameObject), DATA_TELEPORTER_CONSERVATORY);
-                            OpenIfDone(BOSS_AURIAYA, gameObject, GO_STATE_ACTIVE);
-                            break;
-                        case ULDUAR_TELEPORTER_HALLS_OF_INVENTION_GUID:
-                            AddObject(static_cast<WorldObject*>(gameObject), DATA_TELEPORTER_HALLS_OF_INVENTION);
-                            if (GetBossState(BOSS_MIMIRON) != NOT_STARTED)
-                                gameObject->SetGoState(GO_STATE_ACTIVE);
-                            break;
-                        case ULDUAR_TELEPORTER_PRISON_OF_YOGGSARON_GUID:
-                            AddObject(static_cast<WorldObject*>(gameObject), DATA_TELEPORTER_PRISON_OF_YOGGSARON);
-                            OpenIfDone(BOSS_VEZAX, gameObject, GO_STATE_ACTIVE);
-                            break;
-                    }
                     break;
             }
         }
