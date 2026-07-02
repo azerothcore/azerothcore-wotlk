@@ -1165,7 +1165,7 @@ class spell_freya_unstable_sun_beam : public SpellScript
     void FilterTargets(std::list<WorldObject*>& targets)
     {
         targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
-        Acore::Containers::RandomResize(targets, 3);
+        Acore::Containers::RandomResize(targets, GetCaster()->GetMap()->Is25ManRaid() ? 3 : 1);
     }
 
     void Register() override
