@@ -24,7 +24,7 @@ void WorldSession::SendAuthResponse(uint8 code, bool shortForm, uint32 queuePos)
 {
     // BillingTimeRested: seconds of "healthy" play left before CAIS halves XP/loot from creatures
     // and quests (read by the client's GetBillingTimeRested()); 0 unless the CAIS flag is set.
-    // 3h/5h rules ported from VMaNGOS d015f29 (ratkosrb); field meaning per wowdev SMSG_AUTH_RESPONSE.
+    // 3h/5h rules ported from VMaNGOS d015f29 (ratkosrb); field meaning from TrinityCore 7b2274a7 (DDuarte).
     uint32 billingTimeRested = 0;
     if (IsAffectedByCAIS())
     {
