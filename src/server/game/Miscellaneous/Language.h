@@ -1517,6 +1517,12 @@ enum AcoreStrings
 
     // Pet rename command
     LANG_PET_RENAME_INVALID             = 35453,
-    LANG_PET_RENAME_SUCCESS             = 35454
+    LANG_PET_RENAME_SUCCESS             = 35454,
+
+    // Titles command help
+    LANG_TITLES_ADD_HELP              = 35455,
+    LANG_TITLES_CURRENT_HELP          = 35456,
+    LANG_TITLES_REMOVE_HELP           = 35457,
+    LANG_TITLES_SET_MASK_HELP         = 35458
 };
 #endif

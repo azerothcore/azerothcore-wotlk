@@ -32,13 +32,13 @@ public:
     {
         static ChatCommandTable titlesSetCommandTable =
         {
-            { "mask", HandleTitlesSetMaskCommand, rbac::RBAC_PERM_COMMAND_TITLES_SET_MASK, Console::Yes },
+            { "mask", HandleTitlesSetMaskCommand, LANG_TITLES_SET_MASK_HELP, rbac::RBAC_PERM_COMMAND_TITLES_SET_MASK, Console::Yes },
         };
         static ChatCommandTable titlesCommandTable =
         {
-            { "add",     HandleTitlesAddCommand,     rbac::RBAC_PERM_COMMAND_TITLES_ADD,     Console::Yes },
-            { "current", HandleTitlesCurrentCommand, rbac::RBAC_PERM_COMMAND_TITLES_CURRENT, Console::Yes },
-            { "remove",  HandleTitlesRemoveCommand,  rbac::RBAC_PERM_COMMAND_TITLES_REMOVE,  Console::Yes },
+            { "add",     HandleTitlesAddCommand,     LANG_TITLES_ADD_HELP,      rbac::RBAC_PERM_COMMAND_TITLES_ADD,     Console::Yes },
+            { "current", HandleTitlesCurrentCommand, LANG_TITLES_CURRENT_HELP,  rbac::RBAC_PERM_COMMAND_TITLES_CURRENT, Console::Yes },
+            { "remove",  HandleTitlesRemoveCommand,  LANG_TITLES_REMOVE_HELP,   rbac::RBAC_PERM_COMMAND_TITLES_REMOVE,  Console::Yes },
             { "set",     titlesSetCommandTable },
         };
         static ChatCommandTable commandTable =
