@@ -834,8 +834,8 @@ struct npc_xt_toy_pile : public ScriptedAI
         _lastSummonTime = 0;
     }
 
-    static constexpr float SummonDistance = 90.0f;
-    static constexpr uint32 SummonCooldown = 15 * IN_MILLISECONDS;
+    static constexpr float SummonDistance = 90.0f; // large enough so XT can be tanked at the door
+    static constexpr uint32 SummonCooldown = 12 * IN_MILLISECONDS; // verified with sniff
 
     void SpellHit(Unit* caster, SpellInfo const* spell) override
     {
