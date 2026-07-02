@@ -161,6 +161,12 @@ void WorldSessionMgr::UpdateSessions(uint32 const diff)
         WorldSession* pSession = itr->second;
         if (!pSession->GetPlayer() || pSession->GetOfflineTime() + 60 < currTime || pSession->IsKicked())
         {
+            // persist consecutive play time (a socket-closed disconnect never reaches the Update() cleanup)
+            Seconds const offlineTime = Seconds(pSession->GetOfflineTime());
+            AccountPlayHistory& history = _accountsPlayHistory[pSession->GetAccountId()];
+            history.playedTime = pSession->GetConsecutivePlayTime(offlineTime);
+            history.logoutTime = offlineTime;
+
             _offlineSessions.erase(itr);
             delete pSession;
         }
