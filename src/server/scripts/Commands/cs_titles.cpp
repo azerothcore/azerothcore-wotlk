@@ -32,13 +32,13 @@ public:
     {
         static ChatCommandTable titlesSetCommandTable =
         {
-            { "mask", HandleTitlesSetMaskCommand, rbac::RBAC_PERM_COMMAND_TITLES_SET_MASK, Console::No },
+            { "mask", HandleTitlesSetMaskCommand, LANG_TITLES_SET_MASK_HELP, rbac::RBAC_PERM_COMMAND_TITLES_SET_MASK, Console::Yes },
         };
         static ChatCommandTable titlesCommandTable =
         {
-            { "add",     HandleTitlesAddCommand,     rbac::RBAC_PERM_COMMAND_TITLES_ADD,     Console::No },
-            { "current", HandleTitlesCurrentCommand, rbac::RBAC_PERM_COMMAND_TITLES_CURRENT, Console::No },
-            { "remove",  HandleTitlesRemoveCommand,  rbac::RBAC_PERM_COMMAND_TITLES_REMOVE,  Console::No },
+            { "add",     HandleTitlesAddCommand,     LANG_TITLES_ADD_HELP,      rbac::RBAC_PERM_COMMAND_TITLES_ADD,     Console::Yes },
+            { "current", HandleTitlesCurrentCommand, LANG_TITLES_CURRENT_HELP,  rbac::RBAC_PERM_COMMAND_TITLES_CURRENT, Console::Yes },
+            { "remove",  HandleTitlesRemoveCommand,  LANG_TITLES_REMOVE_HELP,   rbac::RBAC_PERM_COMMAND_TITLES_REMOVE,  Console::Yes },
             { "set",     titlesSetCommandTable },
         };
         static ChatCommandTable commandTable =
@@ -48,13 +48,24 @@ public:
         return commandTable;
     }
 
-    static bool HandleTitlesCurrentCommand(ChatHandler* handler, Variant<Hyperlink<title>, uint16> titleId)
+    static bool HandleTitlesCurrentCommand(ChatHandler* handler, Variant<Hyperlink<title>, uint16> titleId, Optional<PlayerIdentifier> playerName)
     {
-        Player* target = handler->getSelectedPlayer();
-        if (!target)
+        Player* target;
+
+        if (playerName)
         {
-            handler->SendErrorMessage(LANG_NO_CHAR_SELECTED);
-            return false;
+            if (!playerName->IsConnected())
+            {
+                handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+                return false;
+            }
+            target = playerName->GetConnectedPlayer();
+        }
+        else
+        {
+            target = handler->getSelectedPlayer();
+            if (!target)
+                target = handler->GetSession()->GetPlayer();
         }
 
         // check online security
@@ -79,13 +90,24 @@ public:
         return true;
     }
 
-    static bool HandleTitlesAddCommand(ChatHandler* handler, Variant<Hyperlink<title>, uint16> titleId)
+    static bool HandleTitlesAddCommand(ChatHandler* handler, Variant<Hyperlink<title>, uint16> titleId, Optional<PlayerIdentifier> playerName)
     {
-        Player* target = handler->getSelectedPlayer();
-        if (!target)
+        Player* target;
+
+        if (playerName)
         {
-            handler->SendErrorMessage(LANG_NO_CHAR_SELECTED);
-            return false;
+            if (!playerName->IsConnected())
+            {
+                handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+                return false;
+            }
+            target = playerName->GetConnectedPlayer();
+        }
+        else
+        {
+            target = handler->getSelectedPlayer();
+            if (!target)
+                target = handler->GetSession()->GetPlayer();
         }
 
         // check online security
@@ -108,13 +130,24 @@ public:
         return true;
     }
 
-    static bool HandleTitlesRemoveCommand(ChatHandler* handler, Variant<Hyperlink<title>, uint16> titleId)
+    static bool HandleTitlesRemoveCommand(ChatHandler* handler, Variant<Hyperlink<title>, uint16> titleId, Optional<PlayerIdentifier> playerName)
     {
-        Player* target = handler->getSelectedPlayer();
-        if (!target)
+        Player* target;
+
+        if (playerName)
         {
-            handler->SendErrorMessage(LANG_NO_CHAR_SELECTED);
-            return false;
+            if (!playerName->IsConnected())
+            {
+                handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+                return false;
+            }
+            target = playerName->GetConnectedPlayer();
+        }
+        else
+        {
+            target = handler->getSelectedPlayer();
+            if (!target)
+                target = handler->GetSession()->GetPlayer();
         }
 
         // check online security
@@ -145,13 +178,24 @@ public:
     }
 
     //Edit Player KnownTitles
-    static bool HandleTitlesSetMaskCommand(ChatHandler* handler, uint64 mask)
+    static bool HandleTitlesSetMaskCommand(ChatHandler* handler, uint64 mask, Optional<PlayerIdentifier> playerName)
     {
-        Player* target = handler->getSelectedPlayer();
-        if (!target)
+        Player* target;
+
+        if (playerName)
         {
-            handler->SendErrorMessage(LANG_NO_CHAR_SELECTED);
-            return false;
+            if (!playerName->IsConnected())
+            {
+                handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+                return false;
+            }
+            target = playerName->GetConnectedPlayer();
+        }
+        else
+        {
+            target = handler->getSelectedPlayer();
+            if (!target)
+                target = handler->GetSession()->GetPlayer();
         }
 
         // check online security
