@@ -61,8 +61,8 @@ bool BattlegroundTemplate::IsArena() const
 /*********************************************************/
 
 BattlegroundMgr::BattlegroundMgr() :
-    m_ArenaTesting(false),
-    m_Testing(false),
+    m_ArenaTesting(sWorld->getBoolConfig(CONFIG_DEBUG_ARENA)),
+    m_Testing(sWorld->getBoolConfig(CONFIG_DEBUG_BATTLEGROUND)),
     m_NextAutoDistributionTime(0),
     m_AutoDistributionTimeChecker(0),
     m_NextPeriodicQueueUpdateTime(5 * IN_MILLISECONDS)
