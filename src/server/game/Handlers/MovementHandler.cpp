@@ -154,7 +154,7 @@ void WorldSession::HandleMoveWorldportAck()
         if (!mEntry->IsBattlegroundOrArena())
         {
             // release the unconsumed invite, otherwise the BG never satisfies its empty + uninvited deletion gate
-            if (Battleground* bg = _player->GetBattleground())
+            if (Battleground* bg = _player->GetBattleground(true))
                 if (_player->IsInvitedForBattlegroundInstance(bg->GetInstanceID()))
                 {
                     bg->DecreaseInvitedCount(_player->GetBgTeamId());
