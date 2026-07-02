@@ -21,6 +21,8 @@
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "ulduar.h"
 
 enum FreyaSpells
@@ -45,6 +47,7 @@ enum FreyaSpells
     SPELL_GROUND_TREMOR_FREYA                   = 62437,
     SPELL_IRON_ROOTS_FREYA                      = 62862,
     SPELL_IRON_ROOTS_FREYA_DAMAGE               = 62861,
+    SPELL_UNSTABLE_SUN_BEAM_FREYA               = 62450,
     SPELL_UNSTABLE_SUN_FREYA_DAMAGE             = 62451,
     SPELL_UNSTABLE_SUN_VISUAL                   = 62216,
 
@@ -319,16 +322,6 @@ struct boss_freya : public BossAI
         }
     }
 
-    void JustSummoned(Creature* cr) override
-    {
-        if (cr->GetEntry() == NPC_FREYA_UNSTABLE_SUN_BEAM)
-        {
-            cr->CastSpell(cr, SPELL_UNSTABLE_SUN_VISUAL, true);
-            cr->CastSpell(cr, SPELL_UNSTABLE_SUN_FREYA_DAMAGE, true);
-        }
-        BossAI::JustSummoned(cr);
-    }
-
     void SpawnWave()
     {
         _waveNumber = _waveNumber == 1 ? 3 : _waveNumber - 1;
@@ -584,12 +577,7 @@ struct boss_freya : public BossAI
                 events.Repeat(45s, 55s);
                 break;
             case EVENT_FREYA_UNSTABLE_SUN_BEAM:
-                me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX() + urand(7, 25), me->GetPositionY() + urand(7, 25), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
-                if (Is25ManRaid())
-                {
-                    me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX() + urand(7, 25), me->GetPositionY() + urand(7, 25), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
-                    me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX() + urand(7, 25), me->GetPositionY() + urand(7, 25), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
-                }
+                DoCastAOE(SPELL_UNSTABLE_SUN_BEAM_FREYA, true);
                 events.Repeat(38s, 48s);
                 break;
         }
@@ -1169,6 +1157,23 @@ private:
     uint32 const _elderCount;
 };
 
+// 62450 - Unstable Sun Beam
+class spell_freya_unstable_sun_beam : public SpellScript
+{
+    PrepareSpellScript(spell_freya_unstable_sun_beam);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+        Acore::Containers::RandomResize(targets, 3);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_freya_unstable_sun_beam::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
+};
+
 void AddSC_boss_freya()
 {
     RegisterUlduarCreatureAI(boss_freya);
@@ -1180,6 +1185,8 @@ void AddSC_boss_freya()
     RegisterUlduarCreatureAI(boss_freya_healthy_spore);
     RegisterUlduarCreatureAI(boss_freya_summons);
     RegisterUlduarCreatureAI(boss_freya_nature_bomb);
+
+    RegisterSpellScript(spell_freya_unstable_sun_beam);
 
     new achievement_freya_getting_back_to_nature();
     new achievement_freya_knock_on_wood("achievement_freya_knock_on_wood", 1);
