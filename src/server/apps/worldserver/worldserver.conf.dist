@@ -1042,10 +1042,12 @@ MaxOverspeedPings = 2
 
 #
 #    DisconnectToleranceInterval
-#        Description: Allows to skip queue after being disconnected for a given number of seconds.
-#        Default:     0
+#        Description: Allows skipping a potential login queue after being disconnected for a given number of seconds,
+#                     and keeps the session alive for the period after an unwanted disconnection, for seamless reconnection.
+#                     Minimum value is 20s.
+#        Default:     60 - (1 minute)
 
-DisconnectToleranceInterval = 0
+DisconnectToleranceInterval = 60
 
 #
 #    EnableLoginAfterDC
