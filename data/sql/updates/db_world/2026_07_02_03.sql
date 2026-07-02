@@ -1,3 +1,4 @@
+-- DB update 2026_07_02_02 -> 2026_07_02_03
 -- Cross-talk text for Infected Kodo Beast delivery
 DELETE FROM `creature_text` WHERE `CreatureID` = 25596 AND `GroupID` IN (1, 2);
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
