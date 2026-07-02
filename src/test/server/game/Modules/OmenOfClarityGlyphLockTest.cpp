@@ -128,6 +128,9 @@ protected:
             1, "test", 0, nullptr, SEC_PLAYER,
             EXPANSION_WRATH_OF_THE_LICH_KING,
             0, LOCALE_enUS, 0, false, false, 0);
+        // Pre-allocate RBAC data so Player's ctor (which calls
+        // GetSession()->HasPermission) doesn't try to load from DB.
+        session->InitRBACDataForTest();
 
         player = new TestPlayer(session);
         player->ForceInitValues(42);
@@ -203,8 +206,11 @@ TEST_F(OmenOfClarityGlyphLockTest,
     EXPECT_NE(bitsAfterInit & OOC_LOCKED_SLOT_BIT, 0u)
         << "InitGlyphsForLevel should enable slot 5 at 80";
 
-    // 4. Fire the level-change hook (same as GiveLevel does)
-    sScriptMgr->OnPlayerLevelChanged(player, 79);
+    // 4. Fire the level-change hook directly on the test-local
+    //    PlayerScript. We bypass sScriptMgr because the global
+    //    dispatcher's registry is shared state across tests and
+    //    has proven unstable in the unit_tests binary.
+    TestOocPlayerScript::Instance->OnPlayerLevelChanged(player, 79);
 
     // 5. Verify the hook cleared the bit
     uint32 bitsAfterHook =
@@ -229,7 +235,7 @@ TEST_F(OmenOfClarityGlyphLockTest,
     // Feature is NOT enabled (cache is empty)
 
     SimulateGlyphsForLevel(80);
-    sScriptMgr->OnPlayerLevelChanged(player, 79);
+    TestOocPlayerScript::Instance->OnPlayerLevelChanged(player, 79);
 
     uint32 bits =
         player->GetUInt32Value(PLAYER_GLYPHS_ENABLED);
@@ -252,7 +258,7 @@ TEST_F(OmenOfClarityGlyphLockTest,
     {
         SCOPED_TRACE("Level: " + std::to_string(newLevel));
         SimulateGlyphsForLevel(newLevel);
-        sScriptMgr->OnPlayerLevelChanged(
+        TestOocPlayerScript::Instance->OnPlayerLevelChanged(
             player, newLevel - 1);
 
         uint32 bits =
@@ -276,7 +282,7 @@ TEST_F(OmenOfClarityGlyphLockTest,
             OOC_LOCKED_SLOT_BIT, 0u);
 
     // Complete the quest → hook enables feature + locks slot
-    sScriptMgr->OnPlayerCompleteQuest(player, nullptr);
+    TestOocPlayerScript::Instance->OnPlayerCompleteQuest(player, nullptr);
     EXPECT_TRUE(s_testOocEnabled.count(
         player->GetGUID().GetCounter()) > 0)
         << "Feature should be enabled after quest completion";
@@ -289,7 +295,7 @@ TEST_F(OmenOfClarityGlyphLockTest,
         << "InitGlyphsForLevel should have set 0x20";
 
     // Level-change hook fires
-    sScriptMgr->OnPlayerLevelChanged(player, 79);
+    TestOocPlayerScript::Instance->OnPlayerLevelChanged(player, 79);
 
     uint32 bitsPostHook =
         player->GetUInt32Value(PLAYER_GLYPHS_ENABLED);
