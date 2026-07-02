@@ -1,0 +1,14 @@
+# AzerothCore pre-imported database image.
+#
+# Ships a MySQL 8.4 server whose datadir already contains the imported
+# acore_auth / acore_world / acore_characters databases, so the server boots
+# instantly with no import wait. The datadir is produced by CI (a clean
+# dbimport run against an empty mysql:8.4) and captured under mysql-seed/.
+#
+# Because the datadir is pre-initialized, the official entrypoint skips
+# initialization and runtime MYSQL_* env vars are ignored: credentials are
+# fixed at build time (root/password and acore/acore).
+FROM mysql:8.4
+
+# 999 = the mysql user/group in the official image.
+COPY --chown=999:999 mysql-seed/ /var/lib/mysql/
