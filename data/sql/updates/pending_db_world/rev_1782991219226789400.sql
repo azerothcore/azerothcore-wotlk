@@ -1,15 +1,4 @@
--- Fix Infected Kodo Beast (entry 25596, quest 11690 "Bring 'Em Back Alive")
--- getting stuck standing and unable to be re-mounted after being forcibly
--- dismounted (e.g. by taking damage from hostile NPCs near Warsong Hold).
--- Its SmartAI only ever cleared the "Standstate Dead" flag on passenger
--- boarding, but never reapplied it afterwards, unlike every other
--- interact-to-mount/interact-to-loot NPC in the DB (Deathstalker Vincent,
--- Sentinel Keldara Sunblade, etc.), which pair "remove flag on
--- aggro/board" with "set flag on reset". Adds the missing "Set Flag
--- Standstate Dead" on Reset and on Passenger Removed so the kodo returns
--- to its expected lying-down/interactable pose instead of a broken
--- standing state.
--- https://github.com/azerothcore/azerothcore-wotlk/issues/26412
+-- Update Infected Kodo Beast SAI (Standstate Dead on Reset/Passenger Removed)
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 25596 AND `source_type` = 0;
 INSERT INTO `smart_scripts`
     (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`,
@@ -29,3 +18,15 @@ VALUES
      1, 0, 0, 0, 0, 0, 0, 0, 0, 'Infected Kodo Beast - On Reset - Set Flag Standstate Dead'),
     (25596, 0, 4, 0, 28, 0, 100, 0, 0, 0, 0, 0, 0, 0, 90, 7, 0, 0, 0, 0, 0,
      1, 0, 0, 0, 0, 0, 0, 0, 0, 'Infected Kodo Beast - On Passenger Removed - Set Flag Standstate Dead');
+
+-- Add missing allowed dismount zone (Warsong Slaughterhouse); 3537/4141/4144 already exist
+DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 16 AND `SourceGroup` = 0 AND `SourceEntry` = 25596 AND `SourceId` = 0 AND `ElseGroup` = 3;
+INSERT INTO `conditions`
+    (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`,
+     `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`,
+     `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`)
+VALUES
+    (16, 0, 25596, 0, 3, 23, 0, 4143, 0, 0, 0, 0, 0, '', 'Dismount player when not in intended zone');
+
+-- Set quest timer to 10 minutes as its own log text describes
+UPDATE `quest_template` SET `TimeAllowed` = 600 WHERE `ID` = 11690;
