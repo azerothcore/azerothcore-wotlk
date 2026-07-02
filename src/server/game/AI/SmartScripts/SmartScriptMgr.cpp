@@ -537,6 +537,23 @@ bool SmartAIMgr::IsTargetValid(SmartScriptHolder const& e)
                 return false;
             return IsSAIBoolValid(e, e.target.formation.excludeSelf);
         }
+        case SMART_TARGET_BY_HEALTH_PCT:    //Lyeus edit
+        {
+            if (!IsMinMaxValid(e, e.target.byHealthPct.min, e.target.byHealthPct.max))
+                return false;
+            if (e.target.byHealthPct.dist == 0)
+            {
+                LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} has dist 0 as target_param3, skipped.", e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType());
+                return false;
+            }
+            if (e.target.byHealthPct.max > 100)
+            {
+                LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} has pct value above 100, skipped.",
+                    e.entryOrGuid, e.GetScriptType(), e.GetEventType(), e.GetActionType(), e.target.byHealthPct.max);
+                return false;
+            }
+            break;
+        }
         case SMART_TARGET_HOSTILE_SECOND_AGGRO:
         case SMART_TARGET_HOSTILE_LAST_AGGRO:
         case SMART_TARGET_HOSTILE_RANDOM:
@@ -963,6 +980,7 @@ bool SmartAIMgr::CheckUnusedTargetParams(SmartScriptHolder const& e)
             case SMART_TARGET_SUMMONED_CREATURES: return sizeof(SmartTarget::summonedCreatures);
             case SMART_TARGET_INSTANCE_STORAGE: return sizeof(SmartTarget::instanceStorage);
             case SMART_TARGET_FORMATION: return sizeof(SmartTarget::formation);
+            case SMART_TARGET_BY_HEALTH_PCT: return sizeof(SmartTarget::byHealthPct);   //Lyeus edit
             default:
                 LOG_WARN("sql.sql", "SmartAIMgr: entryorguid {} source_type {} id {} action_type {} is using a target {} with no unused params specified in SmartAIMgr::CheckUnusedTargetParams(), please report this.",
                             e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.GetTargetType());
