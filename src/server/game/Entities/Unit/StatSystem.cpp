@@ -1362,12 +1362,13 @@ void Guardian::UpdateDamagePhysical(WeaponAttackType attType)
     float base_pct    = GetPctModifierValue(unitMod, BASE_PCT);
     float total_value = GetFlatModifierValue(unitMod, TOTAL_VALUE);
     float total_pct   = GetPctModifierValue(unitMod, TOTAL_PCT);
+    float dmgMultiplier = GetCreatureTemplate()->DamageModifier;
 
     float weapon_mindamage = GetWeaponDamageRange(BASE_ATTACK, MINDAMAGE);
     float weapon_maxdamage = GetWeaponDamageRange(BASE_ATTACK, MAXDAMAGE);
 
-    float mindamage = ((base_value + weapon_mindamage) * base_pct + total_value) * total_pct;
-    float maxdamage = ((base_value + weapon_maxdamage) * base_pct + total_value) * total_pct;
+    float mindamage = ((base_value + weapon_mindamage) * dmgMultiplier * base_pct + total_value) * total_pct;
+    float maxdamage = ((base_value + weapon_maxdamage) * dmgMultiplier * base_pct + total_value) * total_pct;
 
     if (mindamage < 0.0f || mindamage > 10000000.0f)
         mindamage = BASE_MINDAMAGE;
