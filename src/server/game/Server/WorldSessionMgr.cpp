@@ -136,11 +136,14 @@ void WorldSessionMgr::UpdateSessions(uint32 const diff)
         {
             Seconds const now = GameTime::GetGameTime();
 
-            // a reconnect builds a fresh session and carries time from _accountsPlayHistory, so persist it
-            // here at socket-close time rather than during offline cleanup (which runs ~60s later)
-            AccountPlayHistory& history = _accountsPlayHistory[pSession->GetAccountId()];
-            history.playedTime = pSession->GetConsecutivePlayTime(now);
-            history.logoutTime = now;
+            if (pSession->IsAffectedByCAIS())
+            {
+                // a reconnect builds a fresh session and carries time from _accountsPlayHistory, so persist it
+                // here at socket-close time rather than during offline cleanup (which runs ~60s later)
+                AccountPlayHistory& history = _accountsPlayHistory[pSession->GetAccountId()];
+                history.playedTime = pSession->GetConsecutivePlayTime(now);
+                history.logoutTime = now;
+            }
 
             if (!RemoveQueuedPlayer(pSession) && sWorld->getIntConfig(CONFIG_INTERVAL_DISCONNECT_TOLERANCE))
                 _disconnects[pSession->GetAccountId()] = now.count();
@@ -164,9 +167,13 @@ void WorldSessionMgr::UpdateSessions(uint32 const diff)
         if (!pSession->Update(diff, updater))
         {
             Seconds const now = GameTime::GetGameTime();
-            AccountPlayHistory& history = _accountsPlayHistory[pSession->GetAccountId()];
-            history.playedTime = pSession->GetConsecutivePlayTime(now);
-            history.logoutTime = now;
+
+            if (pSession->IsAffectedByCAIS())
+            {
+                AccountPlayHistory& history = _accountsPlayHistory[pSession->GetAccountId()];
+                history.playedTime = pSession->GetConsecutivePlayTime(now);
+                history.logoutTime = now;
+            }
 
             if (!RemoveQueuedPlayer(pSession) && sWorld->getIntConfig(CONFIG_INTERVAL_DISCONNECT_TOLERANCE))
                 _disconnects[pSession->GetAccountId()] = now.count();
