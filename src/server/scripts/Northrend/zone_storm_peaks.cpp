@@ -213,6 +213,11 @@ enum eTimeLost
     SPELL_FROST_CLEAVE = 51857,
 };
 
+enum eTLPDActions
+{
+    ACTION_TLPD_REVEAL = 1,
+};
+
 class npc_time_lost_proto_drake : public CreatureScript
 {
 public:
@@ -225,6 +230,17 @@ public:
         void Reset() override
         {
             scheduler.CancelAll();
+            me->m_Events.KillAllEvents(false);
+        }
+
+        void DoAction(int32 action) override
+        {
+            if (action == ACTION_TLPD_REVEAL)
+            {
+                me->SetVisible(true);
+                me->SetImmuneToAll(false);
+                me->GetMotionMaster()->MoveWaypoint(me->GetWaypointPath(), true);
+            }
         }
 
         void InitializeAI() override
@@ -234,11 +250,14 @@ public:
             me->setActive(true);
             me->SetVisible(false);
             me->SetImmuneToAll(true);
+            me->GetMotionMaster()->MoveIdle();
 
+            // spawntimesecs is 6h, so rolling 0-16h here gives 6-22h total from
+            // death to visibility. On server restart the 0 lower bound gives a
+            // chance of spawning visibly anywhere from 0 seconds to 16 hours later.
             me->m_Events.AddEventAtOffset([&] {
-                me->SetVisible(true);
-                me->SetImmuneToAll(false);
-            }, Hours(urand(6, 22)));
+                DoAction(ACTION_TLPD_REVEAL);
+            }, Seconds(urand(0, 60 * 60 * 16)));
         }
 
         void JustEngagedWith(Unit* who) override
