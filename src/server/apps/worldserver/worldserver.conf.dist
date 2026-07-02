@@ -4479,6 +4479,20 @@ AllowTwoSide.Interaction.Channel = 0
 AllowTwoSide.Interaction.Group = 0
 
 #
+#    AllowTwoSide.Interaction.PvP
+#        Description: Requires AllowTwoSide.Interaction.Group = 1.
+#                     When enabled, cross-faction party members can heal or assist each other
+#                     even while the target is flagged for PvP in the open world.
+#                     When disabled (default), cross-faction party members cannot cast
+#                     beneficial spells on an opposite-faction party member who is PvP-flagged
+#                     in the open world. This restriction does not apply inside instances,
+#                     dungeons, raids, battlegrounds, or arenas.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+AllowTwoSide.Interaction.PvP = 0
+
+#
 #    AllowTwoSide.Interaction.Guild
 #        Description: Allow guild joining between factions.
 #        Default:     0 - (Disabled)
