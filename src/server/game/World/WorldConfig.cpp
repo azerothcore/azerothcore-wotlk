@@ -359,6 +359,8 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_TRIAL_MONEY_CAP, "Trial.MoneyCap", 100000); // copper, 10 gold
     SetConfigValue<uint32>(CONFIG_TRIAL_TRADE_SKILL_CAP, "Trial.TradeSkillCap", 100);
 
+    SetConfigValue<bool>(CONFIG_CAIS_ENABLED, "PlayTimeLimit.Enable", false);
+
     SetConfigValue<uint32>(CONFIG_EVENT_ANNOUNCE, "Event.Announce", 0);
 
     SetConfigValue<float>(CONFIG_CREATURE_LEASH_RADIUS, "CreatureLeashRadius", 30.0f);
