@@ -90,14 +90,14 @@ INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry
 (13, 1, 64799, 0, 0, 31, 0, 3, 33293, 0, 0, 0, 0, '', 'target must be \'XT-002 Deconstructor\''),
 (13, 1, 64799, 0, 1, 31, 0, 3, 33885, 0, 0, 0, 0, '', 'target must be \'XT-002 Deconstructor (1)\'');
 
-UPDATE `spell_proc` SET `AttributesMask`=32, `DisableEffectsMask`=0 WHERE `SpellId`=63849;
+UPDATE `spell_proc` SET `AttributesMask`=0, `DisableEffectsMask`=2 WHERE `SpellId`=63849;
 
 -- Toy Piles: spawn at 4 corners of the room (positions from TC, map 603 Ulduar)
 SET @CGUID := 12777;
 SET @BUILD := 0;
 DELETE FROM `creature` WHERE (`id` = 33337) AND (`guid` BETWEEN @CGUID+0 AND @CGUID+3);
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `Comment`, `VerifiedBuild`) VALUES
-(@CGUID+0, 33337, 603, 0, 0, 1, 1, 0, 897.908, 67.0764, 412.129, 3.92699, 180, 0, 0, 12600, 0, 0, 0, 0, 0, '0', '', @BUILD),
-(@CGUID+1, 33337, 603, 0, 0, 1, 1, 0, 898.099, -88.9115, 409.887, 2.23402, 180, 0, 0, 12600, 0, 0, 0, 0, 0, '0', '', @BUILD),
-(@CGUID+2, 33337, 603, 0, 0, 1, 1, 0, 793.096, -95.158, 409.887, 0.855211, 180, 0, 0, 12600, 0, 0, 0, 0, 0, '0', '', @BUILD),
-(@CGUID+3, 33337, 603, 0, 0, 1, 1, 0, 792.646, 65.3854, 414.147, 5.20108, 180, 0, 0, 12600, 0, 0, 0, 0, 0, '0', '', @BUILD);
+(@CGUID+0, 33337, 603, 0, 0, 3, 1, 0, 897.908, 67.0764, 412.129, 3.92699, 180, 0, 0, 12600, 0, 0, 0, 0, 0, '0', '', @BUILD),
+(@CGUID+1, 33337, 603, 0, 0, 3, 1, 0, 898.099, -88.9115, 409.887, 2.23402, 180, 0, 0, 12600, 0, 0, 0, 0, 0, '0', '', @BUILD),
+(@CGUID+2, 33337, 603, 0, 0, 3, 1, 0, 793.096, -95.158, 409.887, 0.855211, 180, 0, 0, 12600, 0, 0, 0, 0, 0, '0', '', @BUILD),
+(@CGUID+3, 33337, 603, 0, 0, 3, 1, 0, 792.646, 65.3854, 414.147, 5.20108, 180, 0, 0, 12600, 0, 0, 0, 0, 0, '0', '', @BUILD);

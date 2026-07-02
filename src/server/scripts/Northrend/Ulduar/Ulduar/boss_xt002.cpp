@@ -60,6 +60,7 @@ enum Spells
     SPELL_SCRAPBOT_RIDE_VEHICLE             = 47020,
     SPELL_FULL_HEAL                         = 17683,
     SPELL_HEART_OVERLOAD                    = 62789,
+    SPELL_HEART_OVERLOAD_TRIGGER            = 62791,
     SPELL_HEART_LIGHTNING_TETHER            = 64799,
 
     // Void Zone
@@ -428,7 +429,7 @@ private:
 
 struct npc_xt002_heart : public NullCreatureAI
 {
-    npc_xt002_heart(Creature* creature) : NullCreatureAI(creature), _instance(creature->GetInstanceScript()) { }
+    explicit npc_xt002_heart(Creature* creature) : NullCreatureAI(creature), _instance(creature->GetInstanceScript()) { }
 
     void Reset() override
     {
@@ -445,7 +446,7 @@ struct npc_xt002_heart : public NullCreatureAI
         {
             DoCastSelf(SPELL_FULL_HEAL);
             DoCast(xt002, SPELL_RIDE_VEHICLE_EXPOSED, true);
-            DoCastSelf(SPELL_HEART_OVERLOAD);
+            DoCastSelf(SPELL_HEART_OVERLOAD, true);
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             me->SetUnitFlag(UNIT_FLAG_PREVENT_EMOTES_FROM_CHAT_TEXT);
         }
@@ -787,6 +788,8 @@ class spell_xt002_gravity_bomb_damage : public SpellScript
 };
 
 // 62791 - XT-002 Heart Overload Trigger Spell (server-side)
+// Fires an Energy Orb (62790) at a random XT-Toy Pile.
+// The distance check for whether to summon adds happens in spell_xt002_energy_orb (62826).
 class spell_xt002_heart_overload_periodic : public SpellScript
 {
     PrepareSpellScript(spell_xt002_heart_overload_periodic);
@@ -796,11 +799,12 @@ class spell_xt002_heart_overload_periodic : public SpellScript
         return ValidateSpellInfo({SPELL_ENERGY_ORB, SPELL_HEART_LIGHTNING_TETHER});
     }
 
-    static Creature* GetRandomNearbyToyPile(Unit const* caster)
+    static constexpr float ToyPileSearchDistance = 250.0f;
+
+    static Creature* GetRandomToyPile(Unit const* caster)
     {
         std::list<Creature*> targets;
-        caster->GetCreatureListWithEntryInGrid(targets, NPC_XT_TOY_PILE, 250.0f);
-        targets.remove_if([caster](Creature* target) { return caster->GetDistance2d(target) < 60.0f; });
+        caster->GetCreatureListWithEntryInGrid(targets, NPC_XT_TOY_PILE, ToyPileSearchDistance);
 
         if (targets.empty())
             return nullptr;
@@ -812,7 +816,7 @@ class spell_xt002_heart_overload_periodic : public SpellScript
     {
         Unit* caster = GetCaster();
         caster->CastSpell((Unit*)nullptr, SPELL_HEART_LIGHTNING_TETHER, true);
-        if (Creature* toyPile = GetRandomNearbyToyPile(caster))
+        if (Creature* toyPile = GetRandomToyPile(caster))
             caster->CastSpell(toyPile, SPELL_ENERGY_ORB, true);
     }
 
@@ -822,7 +826,9 @@ class spell_xt002_heart_overload_periodic : public SpellScript
     }
 };
 
-// 62826 - Energy Orb
+// 62826 - Energy Orb (detonation)
+// When this hits an XT-Toy Pile, it summons adds.
+// If the Toy Pile is too close to XT-002, no adds are spawned.
 class spell_xt002_energy_orb : public SpellScript
 {
     PrepareSpellScript(spell_xt002_energy_orb);
@@ -837,11 +843,18 @@ class spell_xt002_energy_orb : public SpellScript
         });
     }
 
+    static constexpr float SummonMinDistance = 90.0f; // Toy Piles within this range of XT-002 do not summon adds
+
     void HandleSummons(SpellEffIndex /*effIndex*/)
     {
         Unit* target = GetHitUnit();
         if (target->GetEntry() != NPC_XT_TOY_PILE)
             return;
+
+        // Only summon adds if the Toy Pile is far enough from XT-002
+        if (Creature* xt002 = GetCaster()->GetVehicleCreatureBase())
+            if (xt002->IsWithinDist(target, SummonMinDistance))
+                return;
 
         target->CastSpell(target, SPELL_RECHARGE_BOOMBOT, true);
 
@@ -925,6 +938,8 @@ class spell_xt002_321_boombot_aura : public AuraScript
 };
 
 // 63849 - Exposed Heart
+// Accumulates damage dealt to the Heart and transfers it to XT-002
+// in batches, synchronized with the overload trigger (every ~1s).
 class spell_xt002_exposed_heart : public AuraScript
 {
     PrepareAuraScript(spell_xt002_exposed_heart);
@@ -932,7 +947,13 @@ class spell_xt002_exposed_heart : public AuraScript
     bool Load() override
     {
         _damageAmount = 0;
+        _lastOrbTime = 0;
         return true;
+    }
+
+    bool Validate(SpellInfo const* /*spell*/) override
+    {
+        return ValidateSpellInfo({ SPELL_HEART_OVERLOAD_TRIGGER });
     }
 
     void OnProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
@@ -943,12 +964,27 @@ class spell_xt002_exposed_heart : public AuraScript
             return;
 
         _damageAmount += damageInfo->GetDamage();
+
+        uint32 now = getMSTime();
+        if (now - _lastOrbTime >= 1000)
+        {
+            _lastOrbTime = now;
+
+            if (Creature* xt002 = GetTarget()->GetVehicleCreatureBase())
+                xt002->AI()->SetData(DATA_TRANSFERED_HEALTH, _damageAmount);
+
+            _damageAmount = 0;
+
+            // Fire Energy Orb at a Toy Pile
+            if (Unit* caster = GetCaster())
+                caster->CastSpell(caster, SPELL_HEART_OVERLOAD_TRIGGER, true);
+        }
     }
 
     void HandleLifeTransfer(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        if (InstanceScript* instance = GetTarget()->GetInstanceScript())
-            if (Creature* xt002 = instance->GetCreature(BOSS_XT002))
+        if (_damageAmount > 0)
+            if (Creature* xt002 = GetTarget()->GetVehicleCreatureBase())
                 xt002->AI()->SetData(DATA_TRANSFERED_HEALTH, _damageAmount);
     }
 
@@ -960,6 +996,7 @@ class spell_xt002_exposed_heart : public AuraScript
 
 private:
     uint32 _damageAmount = 0;
+    uint32 _lastOrbTime = 0;
 };
 
 // 37751 - Submerged
