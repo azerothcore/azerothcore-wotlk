@@ -352,9 +352,10 @@ public:
                         if (Creature* mimiron = GetCreature(BOSS_MIMIRON))
                         {
                             bool hardmode = mimiron->AI()->GetData(1) != 0;
+                            bool is25man = instance->Is25ManRaid();
                             uint32 chestId = hardmode
-                                ? RAID_MODE(GO_MIMIRON_CHEST_HARD, GO_MIMIRON_CHEST_HERO_HARD)
-                                : RAID_MODE(GO_MIMIRON_CHEST, GO_MIMIRON_CHEST_HERO);
+                                ? (is25man ? GO_MIMIRON_CHEST_HERO_HARD : GO_MIMIRON_CHEST_HARD)
+                                : (is25man ? GO_MIMIRON_CHEST_HERO : GO_MIMIRON_CHEST);
                             if (GameObject* go = mimiron->SummonGameObject(chestId, 2744.65f, 2569.46f, 364.397f, 0, 0, 0, 0, 0, DAY, true, GO_SUMMON_TIMED_DESPAWN))
                             {
                                 go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
