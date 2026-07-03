@@ -1,3 +1,4 @@
+-- DB update 2026_07_02_04 -> 2026_07_03_00
 -- Register Freya Unstable Sun Beam spell script (targets up to 3 random players)
 DELETE FROM `spell_script_names` WHERE `spell_id` = 62450;
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
