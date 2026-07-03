@@ -22,6 +22,7 @@
 #include "Define.h"
 #include "Map.h"
 #include "MapInstanced.h"
+#include "MapPartitioned.h"
 #include "MapUpdater.h"
 #include "Object.h"
 #include "Timer.h"
@@ -192,6 +193,11 @@ void MapMgr::DoForAllMaps(Worker&& worker)
             for (auto& instancePair : instances)
                 worker(instancePair.second);
         }
+        else if (MapPartitioned* mapPartitioned = map->ToMapPartitioned())
+        {
+            for (Map* partition : mapPartitioned->GetPartitions())
+                worker(partition);
+        }
         else
             worker(map);
     }
@@ -211,6 +217,11 @@ inline void MapMgr::DoForAllMapsWithMapId(uint32 mapId, Worker&& worker)
             MapInstanced::InstancedMaps& instances = mapInstanced->GetInstancedMaps();
             for (auto& p : instances)
                 worker(p.second);
+        }
+        else if (MapPartitioned* mapPartitioned = map->ToMapPartitioned())
+        {
+            for (Map* partition : mapPartitioned->GetPartitions())
+                worker(partition);
         }
         else
             worker(map);

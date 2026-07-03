@@ -84,7 +84,7 @@ Map* MapMgr::CreateBaseMap(uint32 id)
             if (entry->Instanceable())
                 map = new MapInstanced(id);
             else
-                map = new Map(id, 0, REGULAR_DIFFICULTY);
+                map = new MapPartitioned(id, sWorld->getIntConfig(CONFIG_MAP_PARTITION_COUNT));
 
             i_maps[id] = map;
 
@@ -127,7 +127,20 @@ Map* MapMgr::FindMap(uint32 mapid, uint32 instanceId) const
         return nullptr;
 
     if (!map->Instanceable())
-        return instanceId == 0 ? map : nullptr;
+    {
+        if (instanceId == 0)
+            return map;
+
+        if (MapPartitioned const* partitioned = map->ToMapPartitioned())
+        {
+            for (Map* partition : partitioned->GetPartitions())
+            {
+                if (partition->GetInstanceId() == instanceId)
+                    return partition;
+            }
+        }
+        return nullptr;
+    }
 
     return ((MapInstanced*)map)->FindInstanceMap(instanceId);
 }

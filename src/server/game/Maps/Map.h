@@ -60,6 +60,7 @@ struct ScriptAction;
 struct Position;
 class Battleground;
 class MapInstanced;
+class MapPartitioned;
 class InstanceMap;
 class BattlegroundMap;
 class Transport;
@@ -304,6 +305,7 @@ public:
     [[nodiscard]] bool IsBattleArena() const { return i_mapEntry && i_mapEntry->IsBattleArena(); }
     [[nodiscard]] bool IsBattlegroundOrArena() const { return i_mapEntry && i_mapEntry->IsBattlegroundOrArena(); }
     [[nodiscard]] bool IsWorldMap() const { return i_mapEntry && i_mapEntry->IsWorldMap(); }
+    virtual bool IsPartitioned() const { return false; }
 
     bool GetEntrancePos(int32& mapid, float& x, float& y)
     {
@@ -384,6 +386,9 @@ public:
     BattlegroundMap* ToBattlegroundMap() { if (IsBattlegroundOrArena()) return reinterpret_cast<BattlegroundMap*>(this); else return nullptr;  }
     [[nodiscard]] BattlegroundMap const* ToBattlegroundMap() const { if (IsBattlegroundOrArena()) return reinterpret_cast<BattlegroundMap const*>(this); return nullptr; }
 
+    MapPartitioned* ToMapPartitioned() { if (IsPartitioned()) return reinterpret_cast<MapPartitioned*>(this); else return nullptr; }
+    [[nodiscard]] MapPartitioned const* ToMapPartitioned() const { if (IsPartitioned()) return reinterpret_cast<MapPartitioned const*>(this); return nullptr; }
+
     float GetWaterOrGroundLevel(uint32 phasemask, float x, float y, float z, float* ground = nullptr, bool swim = false, float collisionHeight = DEFAULT_COLLISION_HEIGHT) const;
     [[nodiscard]] float GetHeight(uint32 phasemask, float x, float y, float z, bool vmap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const;
     [[nodiscard]] bool isInLineOfSight(float x1, float y1, float z1, float x2, float y2, float z2, uint32 phasemask, LineOfSightChecks checks, VMAP::ModelIgnoreFlags ignoreFlags) const;
@@ -428,7 +433,7 @@ public:
     void RemoveGORespawnTime(ObjectGuid::LowType dbGuid);
     [[nodiscard]] std::unordered_map<ObjectGuid::LowType, time_t> const& GetCreatureRespawnTimes() const { return _creatureRespawnTimes; }
     [[nodiscard]] std::unordered_map<ObjectGuid::LowType, time_t> const& GetGORespawnTimes() const { return _goRespawnTimes; }
-    void LoadRespawnTimes();
+    virtual void LoadRespawnTimes();
     void DeleteRespawnTimes();
     [[nodiscard]] time_t GetInstanceResetPeriod() const { return _instanceResetPeriod; }
 
@@ -439,8 +444,8 @@ public:
     bool SpawnGroupDespawn(uint32 groupId, bool deleteRespawnTimes = false);
     [[nodiscard]] bool IsSpawnGroupActive(uint32 groupId) const;
     void ProcessRespawns();
-    void ProcessCreatureRespawn(ObjectGuid::LowType spawnId);
-    void ProcessGameObjectRespawn(ObjectGuid::LowType spawnId);
+    virtual void ProcessCreatureRespawn(ObjectGuid::LowType spawnId);
+    virtual void ProcessGameObjectRespawn(ObjectGuid::LowType spawnId);
 
     [[nodiscard]] time_t GetRespawnTime(SpawnObjectType type, ObjectGuid::LowType spawnId) const
     {
@@ -637,6 +642,7 @@ private:
     void _AddObjectToUpdateList(WorldObject* obj);
     void _RemoveObjectFromUpdateList(WorldObject* obj);
 
+protected:
     std::unordered_map<ObjectGuid::LowType /*dbGUID*/, time_t> _creatureRespawnTimes;
     std::unordered_map<ObjectGuid::LowType /*dbGUID*/, time_t> _goRespawnTimes;
 
