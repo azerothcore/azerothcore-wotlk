@@ -1,5 +1,8 @@
 /cmake-build-debug/*
 /build*/
+# bundled WoW client used by the Windows launcher - never part of the build context
+/game/
+/game*/
 /var/*
 !/var/build/.gitkeep
 !/var/ccache/.gitkeep

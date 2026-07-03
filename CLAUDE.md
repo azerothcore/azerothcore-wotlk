@@ -4,13 +4,19 @@ AzerothCore is a C++ MMORPG server emulator for World of Warcraft 3.3.5a (WotLK)
 
 ## Agent rules
 
-- **Do not configure or build unless explicitly asked.** Builds are slow (CMake + compile of a large C++ codebase) and rarely needed to make code changes.
+- **This fork is run by non-programmer friends on Windows, via the idempotent `Start-Server.bat` / `Start-Server.ps1` script in the project root (one level up from this folder).** That script installs prerequisites, clones/updates this `server/` checkout, builds only what changed, and starts everything in Docker. It's safe to re-run at any time. Point users at it instead of manual `cmake`/`make`/`docker` commands — see "Build" below. Related root scripts: `Push-Changes.bat` (save/share edits), `Reset-Server.bat` (wipe local game data and start fresh if the server breaks).
+- **Assume near-zero programming knowledge.** The people running this server are not developers. Don't assume familiarity with git, CMake, Docker, or C++ concepts — explain plainly, or point to the relevant `.bat` script, when the topic comes up.
+- **Keep code readable, with comments for non-programmers.** When editing scripts or code a friend might read, add short comments explaining what a non-obvious line does and *why* — written for a reader with no programming background, not just for maintainers. Match the commenting style already used in the root `Start-Server.ps1` / `Push-Changes.ps1` (e.g. `# Give git an identity so commits work (local to this repo only)`).
+- **Always prefer simplicity.** If a request would add meaningful complexity (new dependencies, new abstractions, extra configuration surface, etc.), warn the user about the tradeoff and offer a simpler alternative instead of silently implementing the complex version.
+- **Do not configure or build unless explicitly asked.** Builds are slow (CMake + compile of a large C++ codebase) and rarely needed to make code changes. When a build is needed, prefer running `Start-Server.bat`/`Start-Server.ps1` over manual `cmake`/`make`.
 - **Never edit SQL files outside `data/sql/updates/pending_db_*/`.** `data/sql/base/`, `data/sql/archive/`, and `data/sql/updates/db_*/` are immutable (do not modify).
-- **Do not run git commands that modify repo state** (commit, branch, merge, rebase, reset, push, …) unless explicitly requested, and do not include them in plans. Read-only git (status, diff, log) is fine.
+- **Do not run git commands that modify repo state** (commit, branch, merge, rebase, reset, push, …) unless explicitly requested, and do not include them in plans. Read-only git (status, diff, log) is fine. For committing/sharing changes, `Push-Changes.ps1` in the project root is the sanctioned, user-facing flow (commit, pull --rebase, push, open a PR) — prefer directing users to it over running raw git commands on their behalf.
 
 ## Build
 
-Out-of-source build is required (in-source is blocked by CMake).
+**Normal path (Windows, non-programmer friends):** run `Start-Server.bat` (or `..\Start-Server.ps1`) from the project root. It's idempotent — safe to double-click any time — and only rebuilds what changed, so this is almost always what should be suggested instead of the manual steps below.
+
+**Manual build (reference only, e.g. for debugging the build itself):** out-of-source build is required (in-source is blocked by CMake).
 
 ```bash
 mkdir -p build && cd build
