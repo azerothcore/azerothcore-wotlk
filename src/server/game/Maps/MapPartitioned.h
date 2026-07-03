@@ -24,7 +24,7 @@
 class MapPartition : public Map
 {
 public:
-    MapPartition(uint32 id, uint32 instanceId, uint8 spawnMode, Map* parent, uint8 partitionCount, uint8 partitionIndex)
+    MapPartition(uint32 id, uint32 instanceId, uint8 spawnMode, Map* parent, uint32 partitionCount, uint8 partitionIndex)
         : Map(id, instanceId, spawnMode, parent), m_partitionCount(partitionCount), m_partitionIndex(partitionIndex) {}
 
     void ProcessCreatureRespawn(ObjectGuid::LowType spawnId) override;
@@ -34,7 +34,7 @@ private:
     bool IsPositionInPartition(float x) const;
     uint32 GetPartitionIndex(float x) const;
 
-    uint8 m_partitionCount;
+    uint32 m_partitionCount;
     uint8 m_partitionIndex;
 };
 
@@ -43,7 +43,7 @@ class MapPartitioned : public Map
 public:
     using PartitionMap = std::vector<Map*>;
 
-    MapPartitioned(uint32 id, uint8 partitionCount = 4);
+    MapPartitioned(uint32 id, uint32 partitionCount = 4);
     ~MapPartitioned() override;
 
     bool IsPartitioned() const override { return true; }

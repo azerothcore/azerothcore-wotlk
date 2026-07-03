@@ -563,7 +563,7 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<bool>(CONFIG_SHOW_MUTE_IN_WORLD, "ShowMuteInWorld", false);
     SetConfigValue<bool>(CONFIG_SHOW_BAN_IN_WORLD, "ShowBanInWorld", false);
     SetConfigValue<uint32>(CONFIG_NUMTHREADS, "MapUpdate.Threads", 1);
-    SetConfigValue<uint32>(CONFIG_MAP_PARTITION_COUNT, "MapUpdate.PartitionCount", 4);
+    SetConfigValue<uint32>(CONFIG_MAP_PARTITION_COUNT, "MapUpdate.PartitionCount", 4, ConfigValueCache::Reloadable::No, [](uint32 const& value) { return value > 0 && value <= 255; }, "> 0 && <= 255");
     SetConfigValue<uint32>(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS, "Command.LookupMaxResults", 0);
 
     // Warden

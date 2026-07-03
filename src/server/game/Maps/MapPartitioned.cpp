@@ -22,8 +22,16 @@
 #include "ObjectMgr.h"
 #include "SpawnData.h"
 #include "ScriptMgr.h"
+#include <algorithm>
 
-MapPartitioned::MapPartitioned(uint32 id, uint8 partitionCount)
+static uint32 GetPartitionIndexForCount(float x, uint32 partitionCount)
+{
+    float clampedX = std::max(-MAP_HALFSIZE, std::min(x, MAP_HALFSIZE));
+    float normalizedX = (clampedX + MAP_HALFSIZE) / (2.0f * MAP_HALFSIZE);
+    return uint32(normalizedX * partitionCount) % partitionCount;
+}
+
+MapPartitioned::MapPartitioned(uint32 id, uint32 partitionCount)
     : Map(id, 0, REGULAR_DIFFICULTY), m_partitionCount(partitionCount)
 {
     for (uint32 i = 0; i < m_partitionCount; ++i)
@@ -45,19 +53,19 @@ MapPartitioned::~MapPartitioned()
 
 Map* MapPartitioned::CreatePartition(uint32 index)
 {
-    return new MapPartition(GetId(), 0, REGULAR_DIFFICULTY, this, m_partitionCount, static_cast<uint8>(index));
+    return new MapPartition(GetId(), index + 1, REGULAR_DIFFICULTY, this, m_partitionCount, static_cast<uint8>(index));
 }
 
 uint32 MapPartitioned::GetPartitionIndex(float x) const
 {
-    float const MAP_HALF_SIZE = 17066.0f;
-    float clampedX = std::max(-MAP_HALF_SIZE, std::min(x, MAP_HALF_SIZE));
-    float normalizedX = (clampedX + MAP_HALF_SIZE) / (2.0f * MAP_HALF_SIZE);
-    return uint32(normalizedX * m_partitionCount) % m_partitionCount;
+    return GetPartitionIndexForCount(x, m_partitionCount);
 }
 
 Map* MapPartitioned::GetPartitionForPosition(float x, float y) const
 {
+    if (m_Partitions.empty())
+        return nullptr;
+
     uint32 index = GetPartitionIndex(x);
     if (index < m_Partitions.size())
         return m_Partitions[index];
@@ -78,10 +86,7 @@ bool MapPartition::IsPositionInPartition(float x) const
 
 uint32 MapPartition::GetPartitionIndex(float x) const
 {
-    float const MAP_HALF_SIZE = 17066.0f;
-    float clampedX = std::max(-MAP_HALF_SIZE, std::min(x, MAP_HALF_SIZE));
-    float normalizedX = (clampedX + MAP_HALF_SIZE) / (2.0f * MAP_HALF_SIZE);
-    return uint32(normalizedX * m_partitionCount) % m_partitionCount;
+    return GetPartitionIndexForCount(x, m_partitionCount);
 }
 
 void MapPartition::ProcessCreatureRespawn(ObjectGuid::LowType spawnId)
@@ -93,9 +98,9 @@ void MapPartition::ProcessCreatureRespawn(ObjectGuid::LowType spawnId)
         return;
     }
 
+    // Skip spawns not belonging to this partition — the owning partition will process them
     if (!IsPositionInPartition(data->posX))
     {
-        RemoveCreatureRespawnTime(spawnId);
         return;
     }
 
@@ -111,9 +116,9 @@ void MapPartition::ProcessGameObjectRespawn(ObjectGuid::LowType spawnId)
         return;
     }
 
+    // Skip spawns not belonging to this partition — the owning partition will process them
     if (!IsPositionInPartition(data->posX))
     {
-        RemoveGORespawnTime(spawnId);
         return;
     }
 
@@ -128,8 +133,6 @@ void MapPartitioned::LoadRespawnTimes()
     {
         partition->LoadRespawnTimes();
     }
-
-    Map::LoadRespawnTimes();
 }
 
 void MapPartitioned::OnCreateMap()
@@ -189,7 +192,10 @@ Map::EnterState MapPartitioned::CannotEnter(Player* /*player*/, bool /*loginChec
 bool MapPartitioned::AddPlayerToMap(Player* player)
 {
     Map* partition = GetPartitionForPlayer(player);
-    player->SetMap(partition);
+    if (!partition)
+        return false;
+
+    // Map::AddPlayerToMap handles SetMap on success — don't set it eagerly
     return partition->AddPlayerToMap(player);
 }
 
