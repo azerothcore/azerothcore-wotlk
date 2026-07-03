@@ -1481,7 +1481,8 @@ public:
                 return true;
             }
 
-            player->CastSpell(player, stoneSpell, false);
+            // Cast as the warlock owner so the clicker's trinkets can't proc.
+            owner->CastSpell(player, stoneSpell, true);
 
             // Item has to actually be created to remove a charge on the well.
             if (player->HasItemCount(stoneId))

@@ -125,8 +125,7 @@ enum Events
     EVENT_MIMIRONS_INFERNO              = 8,
     EVENT_THORIMS_HAMMER                = 9,
     EVENT_SOUND_BEGINNING               = 10,
-    EVENT_POSITION_CHECK                = 11,
-    EVENT_EJECT_PLAYERS                 = 12,
+    EVENT_EJECT_PLAYERS                 = 11,
 };
 
 enum Texts
@@ -214,13 +213,13 @@ struct boss_flame_leviathan : public BossAI
     void ScheduleEvents();
     void SummonTowerHelpers(uint8 towerId);
 
-    // Original
     void JustReachedHome() override
     {
         _JustReachedHome();
         // For achievement
         instance->StorePersistentData(PERSISTENT_DATA_UNBROKEN, 0);
         me->setActive(false);
+        me->RemoveAurasDueToSpell(SPELL_GATHERING_SPEED);
     }
 
     void MoveInLineOfSight(Unit*) override {}
@@ -385,14 +384,6 @@ struct boss_flame_leviathan : public BossAI
 
         switch (events.ExecuteEvent())
         {
-            case EVENT_POSITION_CHECK:
-                if (me->GetPositionX() > 450 || me->GetPositionX() < 120)
-                {
-                    EnterEvadeMode();
-                    return;
-                }
-                events.Repeat(5s);
-                break;
             case EVENT_PURSUE:
                 Talk(FLAME_LEVIATHAN_SAY_PURSUE);
                 me->CastSpell(me, SPELL_PURSUED, false);
@@ -568,7 +559,6 @@ void boss_flame_leviathan::ScheduleEvents()
     events.RescheduleEvent(EVENT_VENT, 20s);
     events.RescheduleEvent(EVENT_SPEED, 15s);
     events.RescheduleEvent(EVENT_SOUND_BEGINNING, 10s);
-    events.RescheduleEvent(EVENT_POSITION_CHECK, 5s);
 
     events.RescheduleEvent(EVENT_PURSUE, 0ms);
 }
@@ -1123,7 +1113,7 @@ struct npc_storm_beacon_spawn : public NullCreatureAI
             if (_checkTimer >= 4000)
             {
                 _checkTimer = 0;
-                if (Unit* target = me->SelectNearbyTarget(nullptr, 80.0f))
+                if (Unit* target = me->SelectNearestTarget(80.0f))
                 {
                     ++_amount;
                     if (Creature* cr = me->SummonCreature(NPC_DEFENDER_GENERATED, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 4, me->GetOrientation(), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 900000))
