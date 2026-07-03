@@ -306,7 +306,7 @@ public:
     [[nodiscard]] bool IsBattlegroundOrArena() const { return i_mapEntry && i_mapEntry->IsBattlegroundOrArena(); }
     [[nodiscard]] bool IsWorldMap() const { return i_mapEntry && i_mapEntry->IsWorldMap(); }
     virtual bool IsPartitioned() const { return false; }
-    virtual bool ShouldLoadGridObject(float x, float /*y*/) const { return true; }
+    virtual bool ShouldLoadGridObject(float /*x*/, float /*y*/) const { return true; }
 
     bool GetEntrancePos(int32& mapid, float& x, float& y)
     {
