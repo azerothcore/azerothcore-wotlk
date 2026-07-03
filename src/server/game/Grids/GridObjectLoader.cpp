@@ -45,6 +45,10 @@ void GridObjectLoader::LoadCreatures(CellGuidSet const& guid_set, Map* map)
         if (cData && !map->IsSpawnGroupActive(cData->spawnGroupId))
             continue;
 
+        // Skip spawns not belonging to this partition (for partitioned maps)
+        if (cData && !map->ShouldLoadGridObject(cData->posX, cData->posY))
+            continue;
+
         Creature* obj = new Creature();
         if (!obj->LoadFromDB(guid, map))
         {
@@ -78,6 +82,10 @@ void GridObjectLoader::LoadGameObjects(CellGuidSet const& guid_set, Map* map)
 
         // Skip spawns whose spawn group is not active on this map
         if (data && !map->IsSpawnGroupActive(data->spawnGroupId))
+            continue;
+
+        // Skip spawns not belonging to this partition (for partitioned maps)
+        if (data && !map->ShouldLoadGridObject(data->posX, data->posY))
             continue;
 
         if (data && sObjectMgr->IsGameObjectStaticTransport(data->id))

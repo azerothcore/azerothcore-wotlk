@@ -29,6 +29,7 @@ public:
 
     void ProcessCreatureRespawn(ObjectGuid::LowType spawnId) override;
     void ProcessGameObjectRespawn(ObjectGuid::LowType spawnId) override;
+    bool ShouldLoadGridObject(float x, float y) const override;
 
 private:
     bool IsPositionInPartition(float x) const;

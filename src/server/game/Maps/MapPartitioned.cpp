@@ -125,6 +125,11 @@ void MapPartition::ProcessGameObjectRespawn(ObjectGuid::LowType spawnId)
     Map::ProcessGameObjectRespawn(spawnId);
 }
 
+bool MapPartition::ShouldLoadGridObject(float x, float /*y*/) const
+{
+    return IsPositionInPartition(x);
+}
+
 // ---- MapPartitioned implementation ----
 
 void MapPartitioned::LoadRespawnTimes()
