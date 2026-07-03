@@ -152,7 +152,17 @@ void WorldSession::HandleMoveWorldportAck()
     {
         // but landed on another map, cleanup data
         if (!mEntry->IsBattlegroundOrArena())
+        {
+            // release the unconsumed invite, otherwise the BG never satisfies its empty + uninvited deletion gate
+            if (Battleground* bg = _player->GetBattleground(true))
+                if (_player->IsInvitedForBattlegroundInstance(bg->GetInstanceID()))
+                {
+                    bg->DecreaseInvitedCount(_player->GetBgTeamId());
+                    _player->RemoveBattlegroundQueueId(BattlegroundMgr::BGQueueTypeId(bg->GetBgTypeID(), bg->GetArenaType()));
+                }
+
             _player->SetBattlegroundId(0, BATTLEGROUND_TYPE_NONE, PLAYER_MAX_BATTLEGROUND_QUEUES, false, false, TEAM_NEUTRAL);
+        }
         // everything ok
         else if (Battleground* bg = _player->GetBattleground())
         {
