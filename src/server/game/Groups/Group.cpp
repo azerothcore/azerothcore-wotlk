@@ -880,6 +880,50 @@ void Group::SendLootStartRoll(uint32 CountDown, uint32 mapid, const Roll& r)
     }
 }
 
+void Group::SendPendingRollsToPlayer(Player* player, Map* map)
+{
+    for (Roll* roll : RollId)
+    {
+        auto itr = roll->playerVote.find(player->GetGUID());
+        if (itr == roll->playerVote.end())
+            continue;
+
+        if (itr->second != NOT_EMITED_YET)
+            continue;
+
+        Loot* loot = roll->getLoot();
+        if (!loot)
+            continue;
+
+        // Get remaining time from the loot source object
+        uint32 remainingTime = 60000;
+        WorldObject* lootedObject = nullptr;
+        if (GameObject* go = loot->sourceGameObject)
+        {
+            remainingTime = go->m_groupLootTimer;
+            lootedObject = go;
+        }
+        else if (!loot->sourceWorldObjectGUID.IsEmpty())
+        {
+            if (Creature* creature = map->GetCreature(loot->sourceWorldObjectGUID))
+            {
+                remainingTime = creature->m_groupLootTimer;
+                lootedObject = creature;
+            }
+        }
+
+        bool canNeed = true;
+        if (GetLootMethod() == NEED_BEFORE_GREED)
+        {
+            ItemTemplate const* proto = sObjectMgr->GetItemTemplate(roll->itemid);
+            if (proto && lootedObject)
+                canNeed = (player->CanRollForItemInLFG(proto, lootedObject) == EQUIP_ERR_OK);
+        }
+
+        SendLootStartRollToPlayer(remainingTime, map->GetId(), player, canNeed, *roll);
+    }
+}
+
 void Group::SendLootStartRollToPlayer(uint32 countDown, uint32 mapId, Player* p, bool canNeed, Roll const& r)
 {
     if (!p)
