@@ -50,6 +50,7 @@ enum PlayerHook
     PLAYERHOOK_ON_AFTER_UPDATE,
     PLAYERHOOK_ON_MONEY_CHANGED,
     PLAYERHOOK_ON_BEFORE_LOOT_MONEY,
+    PLAYERHOOK_ON_BEFORE_SEND_LOOT,
     PLAYERHOOK_ON_GIVE_EXP,
     PLAYERHOOK_ON_REPUTATION_CHANGE,
     PLAYERHOOK_ON_REPUTATION_RANK_CHANGE,
@@ -287,6 +288,9 @@ public:
 
     // Called before looted money is added to a player
     virtual void OnPlayerBeforeLootMoney(Player* /*player*/, Loot* /*loot*/) {}
+
+    // Called before loot is sent to a player
+    virtual void OnPlayerBeforeSendLoot(Player* /*player*/, ObjectGuid /*lootGuid*/, Loot* /*loot*/) { }
 
     // Called when a player gains XP (before anything is given)
     virtual void OnPlayerGiveXP(Player* /*player*/, uint32& /*amount*/, Unit* /*victim*/, uint8 /*xpSource*/) { }

@@ -1753,6 +1753,56 @@ float WorldObject::GetSightRange(WorldObject const* target) const
     return 0.0f;
 }
 
+float WorldObject::GetLeewayBonusRangeForTargets(Player const* player, Unit const* target)
+{
+    if (!player || !target)
+        return 0.0f;
+
+    constexpr uint32 leewayMoveFlags = MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_STRAFE_LEFT | MOVEMENTFLAG_STRAFE_RIGHT | MOVEMENTFLAG_FALLING;
+    if (player->HasUnitMovementFlag(leewayMoveFlags) && !player->IsWalking() && target->HasUnitMovementFlag(leewayMoveFlags) && !target->IsWalking())
+        return LEEWAY_BONUS_RANGE;
+
+    return 0.0f;
+}
+
+float WorldObject::GetLeewayBonusRange(Unit const* target) const
+{
+    if (!target)
+        return 0.0f;
+
+    if (Player const* player = ToPlayer())
+        return GetLeewayBonusRangeForTargets(player, target);
+
+    if (Player const* playerTarget = target->ToPlayer())
+        return GetLeewayBonusRangeForTargets(playerTarget, ToUnit());
+
+    return 0.0f;
+}
+
+float WorldObject::GetLeewayBonusRadius() const
+{
+    if (Player const* player = ToPlayer())
+    {
+        bool hasLeewayMovement = false;
+
+        if (player->HasUnitState(UNIT_STATE_JUMPING) || player->HasUnitMovementFlag(MOVEMENTFLAG_FALLING))
+            hasLeewayMovement = true;
+        else
+        {
+            float speedXY = (player->m_movementInfo.jump.xyspeed > 0.0f)
+                ? player->m_movementInfo.jump.xyspeed
+                : player->GetSpeed(player->IsWalking() ? MOVE_WALK : MOVE_RUN);
+
+            hasLeewayMovement = speedXY > LEEWAY_MIN_MOVE_SPEED;
+        }
+
+        if (hasLeewayMovement)
+            return LEEWAY_BONUS_RANGE;
+    }
+
+    return 0.0f;
+}
+
 bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, bool distanceCheck, bool checkAlert) const
 {
     if (this == obj)
