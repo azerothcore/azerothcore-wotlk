@@ -24,7 +24,7 @@ name: Deploy to Atlas
 on:
   push:
     branches:
-      - master
+      - add-ci
 
 # Never run two deploys at once. If several PRs merge close together, cancel the
 # older in-progress deploy and just ship the newest master.
