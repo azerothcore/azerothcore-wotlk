@@ -1,0 +1,64 @@
+# Deploy to Atlas
+#
+# When changes land on the `master` branch (i.e. a Pull Request is merged),
+# this rebuilds the server on the "Atlas" machine and restarts it. Atlas is a
+# Linux box reachable over our private Tailscale network; nobody outside the
+# tailnet can touch it.
+#
+# How it works, in plain terms:
+#   1. GitHub's throwaway build machine joins our Tailscale network for the
+#      duration of this job (using an "OAuth client" you set up once).
+#   2. It connects to Atlas with Tailscale SSH (no passwords or SSH keys to
+#      manage - Tailscale proves who we are).
+#   3. On Atlas it pulls the newest source and runs the SAME command our
+#      Start-Server script uses: `docker compose up -d --build`. Docker only
+#      recompiles what changed, so most deploys are quick.
+#
+# One-time setup (see the README section at the bottom of this file):
+#   - Create a Tailscale OAuth client and add its ID/secret as the repo secrets
+#     TS_OAUTH_CLIENT_ID and TS_OAUTH_SECRET.
+#   - Add a tailnet ACL rule that lets the tagged CI machine SSH into Atlas.
+
+name: Deploy to Atlas
+
+on:
+  push:
+    branches:
+      - master
+
+# Never run two deploys at once. If several PRs merge close together, cancel the
+# older in-progress deploy and just ship the newest master.
+concurrency:
+  group: deploy-atlas
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # Only deploy from OUR fork - never from upstream azerothcore or someone
+    # else's fork that happens to have this file.
+    if: github.repository == 'jessedezwart/azerothcore-wotlk'
+    steps:
+      - name: Join our Tailscale network
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          # This build machine is temporary, so tag it as a CI device. The ACL
+          # rule (see below) grants this tag SSH access to Atlas.
+          tags: tag:ci
+
+      - name: Build and restart the server on Atlas
+        # Tailscale SSH authenticates us by our tailnet identity (tag:ci), so
+        # there are no SSH keys or passwords here. The build machine is thrown
+        # away after this run, so we don't bother saving Atlas's host key
+        # (-o options below just skip the interactive "trust this host?" prompt).
+        run: |
+          ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null \
+            jesse@atlas '
+              set -e
+              cd ~/docker/azerothcore
+              git fetch --depth 1 origin master
+              git reset --hard origin/master
+              DOCKER_BUILDKIT=1 docker compose up -d --build
+            '
