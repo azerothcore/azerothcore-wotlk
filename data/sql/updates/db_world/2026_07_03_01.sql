@@ -1,3 +1,4 @@
+-- DB update 2026_07_03_00 -> 2026_07_03_01
 -- Ulduar Teleporter (194569) activation SAI + conditions (entry-level, targets
 -- each guid explicitly so the shared gossip menu isn't overridden)
 UPDATE `gameobject` SET `state` = 0 WHERE `guid` = 34283;
