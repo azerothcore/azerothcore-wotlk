@@ -10085,30 +10085,26 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, Unit const* caster, Spel
     {
         if (spellSchoolMask != SPELL_SCHOOL_MASK_NONE)
         {
+            // Accumulate valid school-immunity bits that overlap the spell's
+            // schools. A multi-school spell (e.g. Frostfire Bolt) can be
+            // covered by separate per-school entries (as produced by
+            // creature_immunities), so the combined mask must be checked
+            // instead of requiring any single entry to cover every school.
             SpellImmuneContainer const& schoolList = m_spellImmune[IMMUNITY_SCHOOL];
-            // Accumulate all valid school immunity bits that overlap with the spell's schools.
-            // A multi-school spell (e.g. Frostfire Bolt) may have its schools covered by
-            // separate per-school entries (as produced by creature_immunities), so we must
-            // check the combined mask rather than requiring any single entry to cover all schools.
             uint32 coveredSchoolMask = 0;
-            for (auto itr = schoolList.begin(); itr != schoolList.end(); ++itr)
+            for (auto const& [immunitySchoolMask, immunityAuraId] : schoolList)
             {
-                if (itr->second == spellInfo->Id)
+                if (immunityAuraId == spellInfo->Id || !(immunitySchoolMask & spellSchoolMask))
                     continue;
 
-                if (!(itr->first & spellSchoolMask))
+                SpellInfo const* immuneSpellInfo = sSpellMgr->GetSpellInfo(immunityAuraId);
+                if (IgnoresSchoolImmunityFromFriendlyCaster(caster, immunityAuraId, immuneSpellInfo) ||
+                    spellInfo->CanPierceImmuneAura(immuneSpellInfo))
                     continue;
 
-                SpellInfo const* immuneSpellInfo = sSpellMgr->GetSpellInfo(itr->second);
-
-                if (IgnoresSchoolImmunityFromFriendlyCaster(caster, itr->second, immuneSpellInfo))
-                    continue;
-
-                if (spellInfo->CanPierceImmuneAura(immuneSpellInfo))
-                    continue;
-
-                coveredSchoolMask |= itr->first;
+                coveredSchoolMask |= immunitySchoolMask;
             }
+
             if ((coveredSchoolMask & spellSchoolMask) == spellSchoolMask)
                 return true;
         }
