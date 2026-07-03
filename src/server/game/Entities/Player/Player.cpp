@@ -7896,6 +7896,15 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
                 // get next RR player (for next loot)
                 if (groupRules && !go->loot.empty())
                     group->UpdateLooterGuid(go);
+
+                if (groupRules)
+                {
+                    GuidUnorderedSet const& allowedLooters = go->GetAllowedLooters();
+                    if (!allowedLooters.empty())
+                        for (ObjectGuid const& allowedGuid : allowedLooters)
+                            if (Player* allowedPlayer = ObjectAccessor::FindPlayer(allowedGuid))
+                                loot->FillNotNormalLootFor(allowedPlayer);
+                }
             }
             if (GameObjectTemplateAddon const* addon = go->GetTemplateAddon())
                 loot->generateMoneyLoot(addon->mingold, addon->maxgold);
