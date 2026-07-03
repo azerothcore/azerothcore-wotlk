@@ -595,6 +595,7 @@ public:
                     case NOT_STARTED:
                     {
                         _horsemanAchievement = true;
+                        _events.CancelEvent(EVENT_AND_THEY_WOULD_ALL_GO_DOWN_TOGETHER);
 
                         if (!horsemanKilled)
                             break;
