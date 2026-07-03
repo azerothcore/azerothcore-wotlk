@@ -1880,6 +1880,29 @@ void Player::UpdateAreaDependentAuras(uint32 newArea)
             ++iter;
     }
 
+    // The lenient check above (strict=false) deliberately skips
+    // AREA_FLAG_NO_FLY_ZONE so unrelated area-limited auras aren't dropped
+    // over a technicality; flying mounts need that flag enforced though, or
+    // one cast/restored before entering a no-fly zone (e.g. Dalaran) never
+    // gets re-validated and the player is left flying with no valid mount.
+    Unit::AuraEffectList const& mountAuras = GetAuraEffectsByType(SPELL_AURA_MOUNTED);
+    if (!mountAuras.empty())
+    {
+        SpellInfo const* mountSpellInfo = mountAuras.front()->GetSpellInfo();
+        if (mountSpellInfo->CheckLocation(GetMapId(), m_zoneUpdateId, newArea, this) != SPELL_CAST_OK)
+        {
+            bool wasFlying = CanFly();
+            RemoveAurasDueToSpell(mountSpellInfo->Id);
+            if (wasFlying)
+            {
+                SetCanFly(false);
+                // same safe-descent used when a flying vehicle passenger is
+                // force-ejected mid-air (Vehicle::RemovePassenger)
+                CastSpell(this, VEHICLE_SPELL_PARACHUTE, true);
+            }
+        }
+    }
+
     // Xinef: check controlled auras
     if (!m_Controlled.empty())
         for (ControlSet::iterator itr = m_Controlled.begin();
