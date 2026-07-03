@@ -1,3 +1,4 @@
+-- DB update 2026_07_03_01 -> 2026_07_03_02
 
 -- Set Waypoints for Faceless Horrors.
 DELETE FROM `waypoint_data` WHERE (`id` IN (3377200, 3377201));
