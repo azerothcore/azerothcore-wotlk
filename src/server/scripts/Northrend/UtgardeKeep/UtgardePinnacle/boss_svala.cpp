@@ -121,31 +121,6 @@ public:
         EventMap events2;
         SummonList summons;
 
-        // Teleports straight up/down in place, keeping X/Y/orientation - used
-        // for every aerial phase transition instead of MoveFall/SetHover,
-        // which either silently no-op (CanFly() is true for this creature)
-        // or never send a movement packet to clients.
-        void TeleportToZ(float z)
-        {
-            me->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), z, me->GetOrientation());
-        }
-
-        // GetFloorZ() starts its search from MAX_HEIGHT, which hits the
-        // ceiling in this indoor room instead of the floor - search from the
-        // creature's current Z instead.
-        float GetGroundZ() const
-        {
-            return me->GetMap()->GetHeight(me->GetPhaseMask(), me->GetPositionX(),
-                                            me->GetPositionY(), me->GetPositionZ(), true);
-        }
-
-        void SetGrounded()
-        {
-            me->SetAnimTier(AnimTier::Ground);
-            me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 0.0f);
-            me->ClearUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
-        }
-
         void Reset() override
         {
             if (instance)
@@ -163,7 +138,9 @@ public:
             {
                 me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetImmuneToAll(false);
-                SetGrounded();
+                me->SetAnimTier(AnimTier::Ground);
+                me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 0.0f);
+                me->ClearUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
             }
         }
 
@@ -254,7 +231,7 @@ public:
                     events2.ScheduleEvent(EVENT_SVALA_TALK3, 3s);
                     break;
                 case EVENT_SVALA_TALK3:
-                    TeleportToZ(me->GetPositionZ() + 6.0f);
+                    me->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 6.0f, me->GetOrientation());
                     me->AddUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
                     me->SetAnimTier(AnimTier::Fly);
                     events2.ScheduleEvent(EVENT_SVALA_TALK4, 9s);
@@ -298,8 +275,11 @@ public:
                     break;
                 case EVENT_SVALA_TALK8:
                     {
-                        SetGrounded();
-                        TeleportToZ(GetGroundZ());
+                        me->SetAnimTier(AnimTier::Ground);
+                        me->SetFloatValue(UNIT_FIELD_HOVERHEIGHT, 0.0f);
+                        me->ClearUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
+                        float groundZ = me->GetMap()->GetHeight(me->GetPhaseMask(), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), true);
+                        me->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), groundZ, me->GetOrientation());
                         events2.ScheduleEvent(EVENT_SVALA_TALK9, 3s);
                         break;
                     }
@@ -308,7 +288,7 @@ public:
                     me->LoadEquipment(1, true);
                     me->setActive(false);
                     me->SetAnimTier(AnimTier::Fly);
-                    TeleportToZ(me->GetPositionZ() + 2.0f);
+                    me->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 2.0f, me->GetOrientation());
                     if (Player* target = SelectTargetFromPlayerList(100.0f))
                         AttackStart(target);
                     return;
@@ -375,7 +355,8 @@ public:
                         me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                         me->SetControlled(false, UNIT_STATE_ROOT);
                         me->ClearUnitState(UNIT_STATE_NO_ENVIRONMENT_UPD);
-                        TeleportToZ(GetGroundZ() + 2.0f);
+                        float groundZ = me->GetMap()->GetHeight(me->GetPhaseMask(), me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), true);
+                        me->NearTeleportTo(me->GetPositionX(), me->GetPositionY(), groundZ + 2.0f, me->GetOrientation());
                         AttackStart(me->GetVictim());
                         summons.DespawnAll();
                         break;
