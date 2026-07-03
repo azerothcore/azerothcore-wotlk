@@ -1036,7 +1036,12 @@ void Group::GroupLoot(Loot* loot, WorldObject* pLootedObject)
                 Player* member = itr->GetSource();
                 if (!member || !member->GetSession())
                     continue;
-                if (member->IsAtLootRewardDistance(pLootedObject))
+
+                bool canLoot = member->IsAtLootRewardDistance(pLootedObject);
+                if (!canLoot && !pLootedObject->GetAllowedLooters().empty())
+                    canLoot = pLootedObject->HasAllowedLooter(member->GetGUID());
+
+                if (canLoot)
                 {
                     r->totalPlayersRolling++;
 
@@ -1122,7 +1127,11 @@ void Group::GroupLoot(Loot* loot, WorldObject* pLootedObject)
             if (!member || !member->GetSession())
                 continue;
 
-            if (member->IsAtLootRewardDistance(pLootedObject))
+            bool canLoot = member->IsAtLootRewardDistance(pLootedObject);
+            if (!canLoot && !pLootedObject->GetAllowedLooters().empty())
+                canLoot = pLootedObject->HasAllowedLooter(member->GetGUID());
+
+            if (canLoot)
             {
                 r->totalPlayersRolling++;
 
@@ -1186,7 +1195,11 @@ void Group::NeedBeforeGreed(Loot* loot, WorldObject* lootedObject)
                 if (!playerToRoll || !playerToRoll->GetSession())
                     continue;
 
-                if (playerToRoll->IsAtGroupRewardDistance(lootedObject))
+                bool canLoot = playerToRoll->IsAtGroupRewardDistance(lootedObject);
+                if (!canLoot && !lootedObject->GetAllowedLooters().empty())
+                    canLoot = lootedObject->HasAllowedLooter(playerToRoll->GetGUID());
+
+                if (canLoot)
                 {
                     r->totalPlayersRolling++;
 
@@ -1335,6 +1348,7 @@ void Group::MasterLoot(Loot* loot, WorldObject* pLootedObject)
     }
 
     std::vector<Player*> looters;
+    bool hasAllowedLooters = !pLootedObject->GetAllowedLooters().empty();
     for (GroupReference* itr = GetFirstMember(); itr != nullptr; itr = itr->next())
     {
         Player* looter = itr->GetSource();
@@ -1343,7 +1357,11 @@ void Group::MasterLoot(Loot* loot, WorldObject* pLootedObject)
             continue;
         }
 
-        if (looter->IsAtLootRewardDistance(pLootedObject))
+        bool canLoot = looter->IsAtLootRewardDistance(pLootedObject);
+        if (!canLoot && hasAllowedLooters)
+            canLoot = pLootedObject->HasAllowedLooter(looter->GetGUID());
+
+        if (canLoot)
         {
             looters.push_back(looter);
         }
