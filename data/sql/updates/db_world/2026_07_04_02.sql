@@ -1,3 +1,4 @@
+-- DB update 2026_07_04_01 -> 2026_07_04_02
 
 -- Register Rain of Darkness Spell Script.
 DELETE FROM `spell_script_names` WHERE `spell_id` = 51761;
