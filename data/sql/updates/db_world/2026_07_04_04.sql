@@ -1,3 +1,4 @@
+-- DB update 2026_07_04_03 -> 2026_07_04_04
 --
 -- Flame Leviathan: Remove spell_linked_spell entries for SPELL_SYSTEMS_SHUTDOWN (62475).
 -- These effects are now handled explicitly via script
