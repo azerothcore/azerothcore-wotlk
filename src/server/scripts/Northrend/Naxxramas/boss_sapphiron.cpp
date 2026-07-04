@@ -43,6 +43,7 @@ enum Spells
     // Ice block
     SPELL_ICEBOLT_CAST              = 28526,
     SPELL_ICEBOLT_TRIGGER           = 28522,
+    SPELL_ICEBOLT_IMMUNITY          = 31800,
     SPELL_FROST_MISSILE             = 30101,
     SPELL_FROST_EXPLOSION           = 28524,
 
@@ -195,6 +196,8 @@ public:
             if (spellInfo->Id == SPELL_ICEBOLT_CAST)
             {
                 me->CastSpell(target, SPELL_ICEBOLT_TRIGGER, true);
+                // Ice tomb grants school immunity so encased players stop taking Frost Aura damage.
+                target->CastSpell(target, SPELL_ICEBOLT_IMMUNITY, true);
             }
         }
 
@@ -373,6 +376,7 @@ public:
                             if (Unit* block = ObjectAccessor::GetUnit(*me, *itr))
                             {
                                 block->RemoveAurasDueToSpell(SPELL_ICEBOLT_TRIGGER);
+                                block->RemoveAurasDueToSpell(SPELL_ICEBOLT_IMMUNITY);
                             }
                         }
                     }
