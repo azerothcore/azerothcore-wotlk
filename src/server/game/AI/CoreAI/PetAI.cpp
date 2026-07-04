@@ -616,10 +616,8 @@ void PetAI::DoAttack(Unit* target, bool chase)
 
     if (me->Attack(target, true))
     {
-        // xinef: properly fix fake combat after pet is sent to attack
-        if (Unit* owner = me->GetOwner())
-            owner->SetUnitFlag(UNIT_FLAG_PET_IN_COMBAT);
-
+        // on the pet this flag only means "actively going after a target"; the owner's copy
+        // is managed by CombatManager::UpdateOwnerCombatState once the pet really enters combat
         me->SetUnitFlag(UNIT_FLAG_PET_IN_COMBAT);
 
         // Play sound to let the player know the pet is attacking something it picked on its own
