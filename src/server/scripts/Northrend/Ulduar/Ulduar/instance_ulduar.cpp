@@ -88,6 +88,7 @@ ObjectData const creatureData[] =
     { NPC_IGNIS,        BOSS_IGNIS      },
     { NPC_RAZORSCALE,   BOSS_RAZORSCALE },
     { NPC_XT002,        BOSS_XT002      },
+    { NPC_HEART_OF_DECONSTRUCTOR,DATA_XT002_HEART },
     { NPC_KOLOGARN,     BOSS_KOLOGARN   },
     { NPC_AURIAYA,      BOSS_AURIAYA    },
     { NPC_MIMIRON,      BOSS_MIMIRON    },
@@ -164,6 +165,11 @@ ObjectData const gameobjectData[] =
     { 0,                                0                               }
 };
 
+BossBoundaryData const boundaries =
+{
+    { BOSS_LEVIATHAN, new RectangleBoundary(130.0f, 450.0f, -170.0f, 110.0f) },
+};
+
 class instance_ulduar : public InstanceMapScript
 {
 public:
@@ -183,6 +189,7 @@ public:
             SetPersistentDataCount(MAX_PERSISTENT_DATA);
             LoadDoorData(doorData);
             LoadObjectData(creatureData, gameobjectData);
+            LoadBossBoundaries(boundaries);
             Initialize();
         };
 

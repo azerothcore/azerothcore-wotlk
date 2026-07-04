@@ -792,8 +792,7 @@ bool Unit::IsWithinMeleeRange(Unit const* obj, float dist) const
 
     float maxdist = dist + GetMeleeRange(obj);
 
-    if ((IsPlayer() || obj->IsPlayer()) && HasLeewayMovement() && obj->HasLeewayMovement())
-        maxdist += LEEWAY_BONUS_RANGE;
+    maxdist += GetLeewayBonusRange(obj);
 
     return distsq < maxdist * maxdist;
 }
@@ -7584,6 +7583,7 @@ void Unit::UpdatePetCombatState()
 void Unit::AtExitCombat()
 {
     RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_LEAVE_COMBAT);
+    sScriptMgr->OnUnitExitCombat(this);
 }
 
 void Unit::AtEngage(Unit* /*target*/)
@@ -10835,7 +10835,7 @@ bool Unit::_IsValidAttackTarget(Unit const* target, SpellInfo const* bySpell, Wo
         if (Player const* player = target->GetCharmerOrOwnerPlayerOrPlayerItself())
             isContestedPvp = player->HasPlayerFlag(PLAYER_FLAGS_CONTESTED_PVP);
 
-        if (!isContestedGuard && !isContestedPvp)
+        if (!isContestedGuard || !isContestedPvp)
             return false;
     }
 
@@ -15849,7 +15849,6 @@ void Unit::_ExitVehicle(Position const* exitPosition)
         init.Launch();
         DisableSpline();
         KnockbackFrom(pos.GetPositionX(), pos.GetPositionY(), 10.0f, 20.0f);
-        CastSpell(this, VEHICLE_SPELL_PARACHUTE, true);
     }
 
     // xinef: move fall, should we support all creatures that exited vehicle in air? Currently Quest Drag and Drop only, Air Assault quest

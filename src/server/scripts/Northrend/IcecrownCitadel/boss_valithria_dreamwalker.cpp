@@ -447,7 +447,7 @@ public:
                     if (!IsHeroic())
                         Talk(SAY_VALITHRIA_DREAM_PORTAL);
                     for (uint32 i = 0; i < _portalCount; ++i)
-                        me->CastSpell(me, SPELL_PRE_SUMMON_DREAM_PORTAL, false);
+                        me->CastSpell(me, SPELL_PRE_SUMMON_DREAM_PORTAL, true);
                     _events.ScheduleEvent(EVENT_DREAM_PORTAL, 45s, 48s);
                     break;
                 case EVENT_DREAM_SLIP:
