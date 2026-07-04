@@ -2598,6 +2598,7 @@ public:
     Spell* m_spellModTakingSpell;
 
     float GetAverageItemLevel();
+    [[nodiscard]] float GetTotalItemLevel() const;
     float GetAverageItemLevelForDF();
     bool isDebugAreaTriggers;
 
