@@ -202,16 +202,26 @@ struct npc_pet_mage_mirror_image : CasterAI
             return;
         }
 
-        checktarget += diff;
+        // Cheap and correctness-critical: never start a new cast on a dead target or one under a
+        // breakable-by-damage CC aura (Polymorph, Dragon's Breath, ...). Checked every tick so a
+        // scheduled spell can't leak out and break the CC. withDelayed=false lets an already
+        // in-flight spell land, matching the 3.1.2 behaviour.
+        bool invalidTarget = !me->GetVictim()->IsAlive() || me->GetVictim()->HasBreakableByDamageCrowdControlAura();
 
+        // CanSeeOrDetect is comparatively expensive, so throttle the sight check to ~1s.
+        checktarget += diff;
         if (checktarget >= 1000)
         {
-            if (!me->GetVictim()->IsAlive() || me->GetVictim()->HasBreakableByDamageCrowdControlAura() || !me->CanSeeOrDetect(me->GetVictim()))
-            {
-                MySelectNextTarget();
-                me->InterruptNonMeleeSpells(true);
-                return;
-            }
+            checktarget = 0;
+            if (!me->CanSeeOrDetect(me->GetVictim()))
+                invalidTarget = true;
+        }
+
+        if (invalidTarget)
+        {
+            MySelectNextTarget();
+            me->InterruptNonMeleeSpells(false);
+            return;
         }
 
         if (me->HasUnitState(UNIT_STATE_CASTING))
