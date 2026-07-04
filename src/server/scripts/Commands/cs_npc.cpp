@@ -1524,12 +1524,12 @@ public:
         handler->PSendSysMessage(LANG_COMMAND_NPC_SHOWLOOT_HEADER, creatureTarget->GetName(), creatureTarget->GetEntry());
         handler->PSendSysMessage(LANG_COMMAND_NPC_SHOWLOOT_MONEY, loot.gold / GOLD, (loot.gold % GOLD) / SILVER, loot.gold % SILVER);
 
-        handler->PSendSysMessage(LANG_COMMAND_NPC_SHOWLOOT_LABEL, "Items", loot.items.size());
+        handler->PSendSysMessage(LANG_COMMAND_NPC_SHOWLOOT_ITEMS, loot.items.size());
         for (LootItem const& item : loot.items)
             if (!item.is_looted)
                 ShowLootEntry(handler, item);
 
-        handler->PSendSysMessage(LANG_COMMAND_NPC_SHOWLOOT_LABEL, "Quest items", loot.quest_items.size());
+        handler->PSendSysMessage(LANG_COMMAND_NPC_SHOWLOOT_QUEST, loot.quest_items.size());
         for (LootItem const& item : loot.quest_items)
             if (!item.is_looted)
                 ShowLootEntry(handler, item);
