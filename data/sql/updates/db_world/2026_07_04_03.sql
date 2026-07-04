@@ -1,3 +1,4 @@
+-- DB update 2026_07_04_02 -> 2026_07_04_03
 --
 -- XT-002 Deconstructor: rework
 
