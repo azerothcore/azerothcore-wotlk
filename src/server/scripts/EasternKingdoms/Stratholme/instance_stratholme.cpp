@@ -131,7 +131,7 @@ public:
                 case NPC_CRIMSON_CONJUROR:
                 case NPC_CRIMSON_INITIATE:
                 case NPC_CRIMSON_GALLANT:
-                    if (!_timmySpawned && creature->IsAlive() && creature->GetDistance2d(CrusadersSquarePos.GetPositionX(), CrusadersSquarePos.GetPositionY()) < 65.0f)
+                    if (!_timmySpawned && creature->IsAlive() && creature->GetDistance2d(CrusadersSquarePos.GetPositionX(), CrusadersSquarePos.GetPositionY()) < CRUSADERS_SQUARE_RADIUS)
                         _crusadersSquareCrimsonGUIDs.insert(creature->GetGUID());
                     break;
                 default:
@@ -199,9 +199,10 @@ public:
                         {
                             _timmyGUID = timmy->GetGUID();
                             events.ScheduleEvent(EVENT_TIMMY_EMERGE, 5s);
+
+                            _timmySpawned = DATA_TIMMY_SPAWNED;
+                            SaveToDB();
                         }
-                        _timmySpawned = DATA_TIMMY_SPAWNED;
-                        SaveToDB();
                     }
                     break;
                 case NPC_TIMMY_THE_CRUEL:

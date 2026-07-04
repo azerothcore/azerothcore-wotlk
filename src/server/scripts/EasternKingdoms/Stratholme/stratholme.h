@@ -115,6 +115,8 @@ enum MiscIds
     EVENT_TIMMY_EMERGE                  = 12,
     EVENT_TIMMY_RESPAWN                 = 13,
 
+    CRUSADERS_SQUARE_RADIUS             = 65,
+
     SPELL_BARON_ULTIMATUM               = 27861
 };
 
