@@ -87,6 +87,7 @@ enum UlduarData
 
     // XT-002
     DATA_XT002_DOORS                        = 400,
+    DATA_XT002_HEART                        = 401,
 
     // Kologarn
     DATA_KOLOGARN_DOORS                     = 410,
@@ -158,6 +159,9 @@ enum UlduarNPCs
     NPC_IGNIS                               = 33118,
     NPC_RAZORSCALE                          = 33186,
     NPC_XT002                               = 33293,
+    NPC_XT_TOY_PILE                         = 33337,
+    NPC_XS013_SCRAPBOT                      = 33343,
+    NPC_HEART_OF_DECONSTRUCTOR              = 33329,
     NPC_STEELBREAKER                        = 32867,
     NPC_MOLGEIM                             = 32927,
     NPC_BRUNDIR                             = 32857,
