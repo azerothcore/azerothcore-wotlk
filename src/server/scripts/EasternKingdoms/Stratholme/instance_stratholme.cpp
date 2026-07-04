@@ -536,7 +536,7 @@ public:
                 case EVENT_TIMMY_EMERGE:
                     if (Creature* timmy = instance->GetCreature(_timmyGUID))
                     {
-                        timmy->AI()->Talk(0);
+                        timmy->AI()->Talk(SAY_TIMMY_EMERGE);
                         timmy->GetMotionMaster()->MovePoint(0, CrusadersSquarePos);
                     }
                     break;

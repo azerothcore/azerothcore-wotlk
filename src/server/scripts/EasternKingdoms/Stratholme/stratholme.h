@@ -95,6 +95,7 @@ enum MiscIds
     SAY_BARON_0M                        = 4,
     SAY_BRAON_SUMMON_RAMSTEIN           = 5,
     SAY_BARON_GUARD_DEAD                = 6,
+    SAY_TIMMY_EMERGE                    = 0,
 
     EVENT_BARON_TIME                    = 1,
     EVENT_SPAWN_MINDLESS                = 2,
