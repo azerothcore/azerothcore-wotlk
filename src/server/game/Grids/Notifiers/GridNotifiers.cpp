@@ -188,11 +188,15 @@ void AIRelocationNotifier::Visit(CreatureMapType& m)
 
 void AIRelocationNotifier::Visit(PlayerMapType& m)
 {
-    if (!includePlayers || !isCreature || ((Creature*)(&i_unit))->IsMoveInLineOfSightStrictlyDisabled())
+    if (!includePlayers)
+        return;
+
+    Creature* creature = i_unit.ToCreature();
+    if (!creature || creature->IsMoveInLineOfSightStrictlyDisabled())
         return;
 
     for (PlayerMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
-        CreatureUnitRelocationWorker((Creature*)&i_unit, iter->GetSource());
+        CreatureUnitRelocationWorker(creature, iter->GetSource());
 }
 
 // Uses visibility map
