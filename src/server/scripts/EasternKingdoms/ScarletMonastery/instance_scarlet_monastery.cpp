@@ -279,7 +279,7 @@ class spell_forgiveess_dummy_visual : public SpellScript
         Unit* target = GetHitUnit();
         if (!target)
             return;
-        
+
         target->SendPlaySpellVisual(SPELL_FORGIVENESS_IMPACTKIT);//SPELL_FORGIVENESS IMPACTKIT 317 SpellVisualEntry.ImpactKit can't be used
 
         //Delay death to prevent the death of the creature from interrupting the animation display
@@ -298,7 +298,7 @@ class spell_forgiveess_dummy_visual : public SpellScript
 // SPELL_TRANSFORM_GHOST           = 28443
 class spell_transform_ghost_visual: public SpellScript
 {
-    PrepareSpellScript(spell_transform_ghost_visual);    
+    PrepareSpellScript(spell_transform_ghost_visual);
 
     void HandleAfterHit()
     {
