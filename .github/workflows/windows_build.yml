@@ -64,9 +64,10 @@ jobs:
           # --- MySQL 8.4 client headers + libs -> C:\tools\mysql\current (path the build expects) ---
           if (-not (Test-Path 'C:\tools\mysql\current\lib\mysqlclient.lib'))
           {
-              # Use the archives host (p/23 = Community Server); dev.mysql.com/get only serves the current GA release.
+              # Use the archives CDN directly (keeps every version, unlike dev.mysql.com/get which only
+              # serves the current GA). A browser user-agent is required or Oracle returns an HTML error page.
               $mysqlZip = Join-Path $env:RUNNER_TEMP 'mysql.zip'
-              Invoke-WebRequest -Uri 'https://downloads.mysql.com/archives/get/p/23/file/mysql-8.4.9-winx64.zip' -OutFile $mysqlZip
+              Invoke-WebRequest -Uri 'https://cdn.mysql.com/archives/mysql-8.4/mysql-8.4.9-winx64.zip' -OutFile $mysqlZip -UserAgent 'Mozilla/5.0'
               $mysqlMB = (Get-Item $mysqlZip).Length / 1MB
               Write-Host ("Downloaded MySQL zip: {0:N1} MB" -f $mysqlMB)
               if ($mysqlMB -lt 50) { throw "MySQL zip download looks wrong ($([int]$mysqlMB) MB)." }
