@@ -18,6 +18,7 @@
 #include "InstanceMapScript.h"
 #include "scarletmonastery.h"
 #include "ScriptedCreature.h"
+#include "SpellScriptLoader.h"
 
 enum AshbringerEventMisc
 {
@@ -39,17 +40,6 @@ enum AshbringerEventMisc
     GO_HIGH_INQUISITOR_DOOR        = 104600
 };
 
-enum AshbringerSpell
-{
-    //Highlord Mograine Spells
-    //Needs Fix: Increased the visual effect of spells on hit
-    SPELL_FORGIVENESS               = 28697,
-
-    //High Inquisitor Fairbanks
-    //Needs Fix: Increased the visual effect of spells on hit
-    SPELL_TRANSFORM_GHOST           = 28443
-};
-
 enum DataTypes
 {
     TYPE_MOGRAINE_AND_WHITE_EVENT = 1,
@@ -66,7 +56,7 @@ enum DataTypes
     GAMEOBJECT_PUMPKIN_SHRINE     = 10
 };
 
-float const CATHEDRAL_PULL_RANGE = 80.0f; // Distance from the Cathedral doors to where Mograine is standing
+float constexpr CATHEDRAL_PULL_RANGE = 80.0f; // Distance from the Cathedral doors to where Mograine is standing
 
 class instance_scarlet_monastery : public InstanceMapScript
 {
@@ -271,7 +261,63 @@ public:
     };
 };
 
+enum AshbringerSpell
+{
+    SPELL_FORGIVENESS = 28697,
+    SPELL_FORGIVENESS_IMPACTKIT = 317,
+    SPELL_TRANSFORM_GHOST = 28443,
+    SPELL_TRANSFORM_IMPACTKIT=500
+};
+
+// SPELL_FORGIVENESS               = 28697
+class spell_forgiveess_dummy_visual : public SpellScript
+{
+    PrepareSpellScript(spell_forgiveess_dummy_visual);
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        Unit* target = GetHitUnit();
+        if (!target)
+            return;
+        
+        target->SendPlaySpellVisual(SPELL_FORGIVENESS_IMPACTKIT);//SPELL_FORGIVENESS IMPACTKIT 317 SpellVisualEntry.ImpactKit can't be used
+
+        //Delay death to prevent the death of the creature from interrupting the animation display
+        target->m_Events.AddEventAtOffset([target]() -> void
+            {
+                target->KillSelf();
+            }, 500ms);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_forgiveess_dummy_visual::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
+// SPELL_TRANSFORM_GHOST           = 28443
+class spell_transform_ghost_visual: public SpellScript
+{
+    PrepareSpellScript(spell_transform_ghost_visual);    
+
+    void HandleAfterHit()
+    {
+        Unit* target = GetHitUnit();
+        if (!target)
+            return;
+
+        target->SendPlaySpellVisual(SPELL_TRANSFORM_IMPACTKIT); //SPELL_TRANSFORM_GHOST IMPACTKIT 500
+    }
+
+    void Register() override
+    {
+       AfterHit += SpellHitFn(spell_transform_ghost_visual::HandleAfterHit);
+    }
+};
+
 void AddSC_instance_scarlet_monastery()
 {
     new instance_scarlet_monastery();
+    RegisterSpellScript(spell_forgiveess_dummy_visual);
+    RegisterSpellScript(spell_transform_ghost_visual);
 }
