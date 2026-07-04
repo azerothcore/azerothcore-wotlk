@@ -1,3 +1,4 @@
+-- DB update 2026_07_04_05 -> 2026_07_04_06
 --
 -- Issue #18038: add .npc showloot command entry and matching acore_string rows.
 DELETE FROM `command` WHERE `name` = 'npc showloot';
