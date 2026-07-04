@@ -47,6 +47,9 @@ enum SpellData
     SPELL_MINE_EXPLOSION                            = 66351,
     SPELL_SUMMON_PROXIMITY_MINE                     = 65347,
 
+    // PHASE 1 -> 2 TRANSITION:
+    SPELL_ELEVATOR_KNOCKBACK                        = 65096, // Self-cast by the world trigger; sweeps players off the elevator as it rises
+
     // PHASE 2:
     SPELL_HEAT_WAVE                                 = 64533,
 
@@ -98,6 +101,7 @@ enum NPCs
     NPC_ASSAULT_BOT                                 = 34057,
     NPC_JUNK_BOT                                    = 33855,
     NPC_MAGNETIC_CORE                               = 34068,
+    NPC_WORLD_TRIGGER                               = 21252,
 };
 
 enum GOs
@@ -488,6 +492,8 @@ struct boss_mimiron : public BossAI
                     elevator->SetLootState(GO_READY);
                     elevator->UseDoorOrButton(0, false);
                     elevator->EnableCollision(false);
+                    if (Creature* trigger = me->SummonCreature(NPC_WORLD_TRIGGER, elevator->GetPositionX(), elevator->GetPositionY(), elevator->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 5000))
+                        trigger->CastSpell(trigger, SPELL_ELEVATOR_KNOCKBACK);
                 }
                 events.ScheduleEvent(EVENT_ELEVATOR_INTERVAL_1, 6s);
                 break;
