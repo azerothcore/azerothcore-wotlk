@@ -3175,13 +3175,6 @@ Creature.MovingStopTimeForPlayer = 180000
 
 WaypointMovementStopTimeForPlayer = 120
 
-#    NpcEvadeIfTargetIsUnreachable
-#        Description: Specifies the time (in seconds) that a creature whom target
-#                     is unreachable to end up in evade mode.
-#        Default:     5
-
-NpcEvadeIfTargetIsUnreachable = 5
-
 #    NpcRegenHPIfTargetIsUnreachable
 #        Description: Regenerates HP for Creatures in Raids if they cannot reach the target.
 #                     Keep disabled if you are experiencing mmaps/pathing issues.
@@ -3190,13 +3183,6 @@ NpcEvadeIfTargetIsUnreachable = 5
 #                     0 - (Disabled)
 
 NpcRegenHPIfTargetIsUnreachable = 1
-
-#    NpcRegenHPTimeIfTargetIsUnreachable
-#        Description: Specifies the time (in seconds) that a creature whom target
-#                     is unreachable in raid to end up regenerate health.
-#        Default:     10
-
-NpcRegenHPTimeIfTargetIsUnreachable = 10
 
 #    Creature.Instance.TeleportToUnreachableTarget
 #        Description: In dungeons and raids, non-boss creatures that cannot path to their
@@ -3757,6 +3743,17 @@ Wintergrasp.KickVoAPlayers = 1
 #                          so both factions can access Vault of Archavon)
 
 Wintergrasp.EssenceBothFactions = 0
+
+#
+#     Wintergrasp.DeferShutdownTimer
+#         Description: Defer a scheduled server shutdown/restart if a Wintergrasp battle
+#                      is still in progress when the countdown elapses. It is rescheduled
+#                      to the battle's remaining time plus this many minutes of buffer.
+#                      Idle shutdowns are not affected.
+#         Default:     0 - (Disabled)
+#                      N - (Enabled, defer to remaining battle time + N minutes)
+
+Wintergrasp.DeferShutdownTimer = 0
 
 #
 ###################################################################################################
