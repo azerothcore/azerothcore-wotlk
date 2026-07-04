@@ -1448,18 +1448,18 @@ void World::_UpdateGameTime()
     ///- if there is a shutdown timer
     if (!IsStopped() && _shutdownTimer > 0 && elapsed > 0s)
     {
-        ///- ... if it is overdue but a Wintergrasp battle is running and deferral is enabled,
-        ///  push the restart past the end of the current battle and keep the world running
-        if (_shutdownTimer <= elapsed.count() && RescheduleShutdownForWintergrasp())
-            return;
-
         ///- ... and it is overdue, stop the world (set m_stopEvent)
         if (_shutdownTimer <= elapsed.count())
         {
-            if (!(_shutdownMask & SHUTDOWN_MASK_IDLE) || sWorldSessionMgr->GetActiveAndQueuedSessionCount() == 0)
-                _stopEvent = true;                         // exist code already set
-            else
-                _shutdownTimer = 1;                        // minimum timer value to wait idle state
+            ///- ... unless a Wintergrasp battle is running and deferral is enabled, in which case the
+            ///  shutdown/restart is pushed past the end of the current battle and the world keeps running
+            if (!RescheduleShutdownForWintergrasp())
+            {
+                if (!(_shutdownMask & SHUTDOWN_MASK_IDLE) || sWorldSessionMgr->GetActiveAndQueuedSessionCount() == 0)
+                    _stopEvent = true;                     // exist code already set
+                else
+                    _shutdownTimer = 1;                    // minimum timer value to wait idle state
+            }
         }
         ///- ... else decrease it and if necessary display a shutdown countdown to the users
         else
@@ -1475,7 +1475,7 @@ void World::_UpdateGameTime()
 /// Returns true when the shutdown timer was extended (world should keep running).
 bool World::RescheduleShutdownForWintergrasp()
 {
-    uint32 const bufferMinutes = getIntConfig(CONFIG_PREVENT_WINTERGRASP_SHUTDOWN);
+    uint32 const bufferMinutes = getIntConfig(CONFIG_WINTERGRASP_DEFER_SHUTDOWN);
     if (!bufferMinutes)
         return false;
 
