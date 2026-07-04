@@ -5433,6 +5433,13 @@ void Spell::EffectTransmitted(SpellEffIndex effIndex)
     {
         case GAMEOBJECT_TYPE_FISHINGNODE:
             {
+                if (m_caster->IsPlayer())
+                {
+                    LOG_DEBUG("entities.gameobject", "Fishing bobber summon cleanup before recast (Player: {} SpellId: {})",
+                        m_caster->GetGUID().ToString(), m_spellInfo->Id);
+                    m_caster->RemoveGameObjectsByType(GAMEOBJECT_TYPE_FISHINGNODE, true);
+                }
+
                 m_caster->SetGuidValue(UNIT_FIELD_CHANNEL_OBJECT, pGameObj->GetGUID());
                 m_caster->AddGameObject(pGameObj);              // will removed at spell cancel
 
@@ -5454,6 +5461,9 @@ void Spell::EffectTransmitted(SpellEffIndex effIndex)
 
                 // Duration of the fishing bobber can't be higher than the Fishing channeling duration
                 duration = std::min(duration, duration - lastSec*IN_MILLISECONDS + FISHING_BOBBER_READY_TIME*IN_MILLISECONDS);
+
+                LOG_DEBUG("entities.gameobject", "Fishing bobber summoned (Player: {} Bobber: {} Entry: {} SpellId: {} DurationMs: {} LastSec: {})",
+                    m_caster->GetGUID().ToString(), pGameObj->GetGUID().ToString(), pGameObj->GetEntry(), m_spellInfo->Id, duration, lastSec);
 
                 break;
             }
