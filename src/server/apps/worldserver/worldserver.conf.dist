@@ -3735,6 +3735,17 @@ Wintergrasp.KickVoAPlayers = 1
 Wintergrasp.EssenceBothFactions = 0
 
 #
+#     Wintergrasp.DeferShutdownTimer
+#         Description: Defer a scheduled server shutdown/restart if a Wintergrasp battle
+#                      is still in progress when the countdown elapses. It is rescheduled
+#                      to the battle's remaining time plus this many minutes of buffer.
+#                      Idle shutdowns are not affected.
+#         Default:     0 - (Disabled)
+#                      N - (Enabled, defer to remaining battle time + N minutes)
+
+Wintergrasp.DeferShutdownTimer = 0
+
+#
 ###################################################################################################
 
 ###################################################################################################
