@@ -783,11 +783,13 @@ struct boss_stormcaller_brundir : public ScriptedAI
                     me->SetDisableGravity(true);
                     me->SetHover(true);
 
-                    me->CombatStop();
+                    // AttackStop (not CombatStop) so he stays in combat while REACT_PASSIVE;
+                    // otherwise UpdateVictim() sees engaged+passive+out-of-combat and evades
+                    // him mid-flight, resetting the whole encounter.
+                    me->AttackStop();
                     me->StopMoving();
                     me->SetReactState(REACT_PASSIVE);
                     me->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid::Empty);
-                    me->SetUnitFlag(UNIT_FLAG_STUNNED);
 
                     me->CastSpell(me, SPELL_LIGHTNING_TENDRILS, true);
                     me->CastSpell(me, SPELL_LIGHTNING_TENDRILS_2, true);
@@ -807,16 +809,17 @@ struct boss_stormcaller_brundir : public ScriptedAI
                 me->SetHover(false);
                 me->SetReactState(REACT_AGGRESSIVE);
                 me->SetDisableGravity(false);
-                if (Unit* flyTarget = ObjectAccessor::GetUnit(*me, _flyTargetGUID))
-                {
-                    me->Attack(flyTarget, false);
-                }
-
                 me->SetRegeneratingHealth(true);
-                _flyTargetGUID.Clear();
                 me->RemoveAura(sSpellMgr->GetSpellIdForDifficulty(SPELL_LIGHTNING_TENDRILS, me));
                 me->RemoveAura(SPELL_LIGHTNING_TENDRILS_2);
                 DoResetThreatList();
+
+                // AttackStart (not Attack) so MoveChase is re-issued; Attack() alone only
+                // sets the victim, leaving him landed but standing still.
+                if (Unit* flyTarget = ObjectAccessor::GetUnit(*me, _flyTargetGUID))
+                    AttackStart(flyTarget);
+
+                _flyTargetGUID.Clear();
                 events.CancelEvent(EVENT_LIGHTNING_FLIGHT);
                 break;
             case EVENT_ENRAGE:
