@@ -1517,6 +1517,9 @@ enum AcoreStrings
 
     // Pet rename command
     LANG_PET_RENAME_INVALID             = 35453,
-    LANG_PET_RENAME_SUCCESS             = 35454
+    LANG_PET_RENAME_SUCCESS             = 35454,
+
+    // Wintergrasp shutdown deferral
+    LANG_WG_SHUTDOWN_DEFERRED           = 35455
 };
 #endif
