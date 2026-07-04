@@ -663,8 +663,6 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<bool>(CONFIG_DUNGEON_ACCESS_REQUIREMENTS_PORTAL_CHECK_ILVL, "DungeonAccessRequirements.PortalAvgIlevelCheck", false);
     SetConfigValue<bool>(CONFIG_DUNGEON_ACCESS_REQUIREMENTS_LFG_DBC_LEVEL_OVERRIDE, "DungeonAccessRequirements.LFGLevelDBCOverride", false);
     SetConfigValue<uint32>(CONFIG_DUNGEON_ACCESS_REQUIREMENTS_OPTIONAL_STRING_ID, "DungeonAccessRequirements.OptionalStringID", 0);
-    SetConfigValue<uint32>(CONFIG_NPC_EVADE_IF_NOT_REACHABLE, "NpcEvadeIfTargetIsUnreachable", 5);
-    SetConfigValue<uint32>(CONFIG_NPC_REGEN_TIME_IF_NOT_REACHABLE_IN_RAID, "NpcRegenHPTimeIfTargetIsUnreachable", 10);
     SetConfigValue<bool>(CONFIG_REGEN_HP_CANNOT_REACH_TARGET_IN_RAID, "NpcRegenHPIfTargetIsUnreachable", true);
 
     //Debug
