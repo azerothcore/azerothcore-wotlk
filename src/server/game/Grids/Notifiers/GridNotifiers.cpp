@@ -186,6 +186,15 @@ void AIRelocationNotifier::Visit(CreatureMapType& m)
     }
 }
 
+void AIRelocationNotifier::Visit(PlayerMapType& m)
+{
+    if (!includePlayers || !isCreature || ((Creature*)(&i_unit))->IsMoveInLineOfSightStrictlyDisabled())
+        return;
+
+    for (PlayerMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
+        CreatureUnitRelocationWorker((Creature*)&i_unit, iter->GetSource());
+}
+
 // Uses visibility map
 void MessageDistDeliverer::Visit(VisiblePlayersMap const& m)
 {
