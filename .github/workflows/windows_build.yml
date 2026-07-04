@@ -38,11 +38,45 @@ jobs:
       - name: ccache
         uses: hendrikmuhs/ccache-action@v1.2.13
       - name: Configure OS
-        shell: bash
-        env:
-          CONTINUOUS_INTEGRATION: true
+        shell: pwsh
         run: |
-          ./acore.sh install-deps
+          $ErrorActionPreference = 'Stop'
+
+          # The windows-latest runner image already ships CMake, Visual Studio 2022
+          # (with the native desktop workload + MSVC) and OpenSSL, so we only need to
+          # provide Boost and the MySQL client libraries. We fetch these directly
+          # instead of via chocolatey, whose pinned packages keep breaking on CI
+          # (VS detection failures and slproweb removing old OpenSSL installers).
+
+          # --- Boost 1.87.0 (msvc-14.3, 64-bit) prebuilt binaries -> C:\local\boost_1_87_0 (BOOST_ROOT) ---
+          if (-not (Test-Path 'C:\local\boost_1_87_0\boost'))
+          {
+              $boostExe = Join-Path $env:RUNNER_TEMP 'boost.exe'
+              Invoke-WebRequest -Uri 'https://sourceforge.net/projects/boost/files/boost-binaries/1.87.0/boost_1_87_0-msvc-14.3-64.exe/download' -OutFile $boostExe
+              Start-Process -FilePath $boostExe -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/DIR=C:\local\boost_1_87_0' -Wait
+          }
+
+          # --- MySQL 8.4 client headers + libs -> C:\tools\mysql\current (path the build expects) ---
+          if (-not (Test-Path 'C:\tools\mysql\current\lib\mysqlclient.lib'))
+          {
+              $mysqlZip = Join-Path $env:RUNNER_TEMP 'mysql.zip'
+              Invoke-WebRequest -Uri 'https://dev.mysql.com/get/Downloads/MySQL-8.4/mysql-8.4.9-winx64.zip' -OutFile $mysqlZip
+              New-Item -ItemType Directory -Force -Path 'C:\tools\mysql' | Out-Null
+              Expand-Archive -Path $mysqlZip -DestinationPath 'C:\tools\mysql' -Force
+              if (Test-Path 'C:\tools\mysql\current') { Remove-Item -Recurse -Force 'C:\tools\mysql\current' }
+              Rename-Item 'C:\tools\mysql\mysql-8.4.9-winx64' 'C:\tools\mysql\current'
+          }
+
+          # --- OpenSSL: use the copy already installed on the runner image ---
+          $opensslRoot = @($env:OPENSSL_ROOT_DIR, 'C:\Program Files\OpenSSL', 'C:\Program Files\OpenSSL-Win64') |
+              Where-Object { $_ -and (Test-Path (Join-Path $_ 'include\openssl\opensslv.h')) } |
+              Select-Object -First 1
+          if (-not $opensslRoot)
+          {
+              throw 'No OpenSSL development install found on the runner image.'
+          }
+          "OPENSSL_ROOT_DIR=$opensslRoot" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          Write-Host "Using OpenSSL at $opensslRoot"
       - name: Build
         shell: bash
         run: |

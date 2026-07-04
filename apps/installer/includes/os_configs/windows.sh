@@ -23,14 +23,7 @@ else
 fi
 
 choco install -y --skip-checksums "${INSTALL_ARGS[@]}"  cmake.install -y --installargs 'ADD_CMAKE_TO_PATH=System'
-
-if [[ ! $CONTINUOUS_INTEGRATION ]]; then
-    # On CI the runner image already ships VS 2022 with the native desktop workload.
-    # The chocolatey workload package cannot detect that pre-installed VS and aborts
-    # with "Unable to detect any supported Visual Studio product", so only install it locally.
-    choco install -y --skip-checksums "${INSTALL_ARGS[@]}"  visualstudio2022-workload-nativedesktop
-fi
-
+choco install -y --skip-checksums "${INSTALL_ARGS[@]}"  visualstudio2022-workload-nativedesktop
 choco install -y --skip-checksums "${INSTALL_ARGS[@]}"  openssl --force --version=3.6.2
 choco install -y --skip-checksums "${INSTALL_ARGS[@]}"  boost-msvc-14.3 --force --version=1.87.0
 choco install -y --skip-checksums "${INSTALL_ARGS[@]}"  mysql --force --version=8.4.9
