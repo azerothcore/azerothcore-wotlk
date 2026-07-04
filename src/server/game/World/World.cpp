@@ -56,6 +56,7 @@
 #include "InstanceSaveMgr.h"
 #include "ItemEnchantmentMgr.h"
 #include "LFGMgr.h"
+#include "Language.h"
 #include "Log.h"
 #include "LootItemStorage.h"
 #include "LootMgr.h"
@@ -1447,6 +1448,11 @@ void World::_UpdateGameTime()
     ///- if there is a shutdown timer
     if (!IsStopped() && _shutdownTimer > 0 && elapsed > 0s)
     {
+        ///- ... if it is overdue but a Wintergrasp battle is running and deferral is enabled,
+        ///  push the restart past the end of the current battle and keep the world running
+        if (_shutdownTimer <= elapsed.count() && RescheduleShutdownForWintergrasp())
+            return;
+
         ///- ... and it is overdue, stop the world (set m_stopEvent)
         if (_shutdownTimer <= elapsed.count())
         {
@@ -1463,6 +1469,38 @@ void World::_UpdateGameTime()
             ShutdownMsg();
         }
     }
+}
+
+/// Defer a pending shutdown/restart if a Wintergrasp battle is currently running.
+/// Returns true when the shutdown timer was extended (world should keep running).
+bool World::RescheduleShutdownForWintergrasp()
+{
+    uint32 const bufferMinutes = getIntConfig(CONFIG_PREVENT_WINTERGRASP_SHUTDOWN);
+    if (!bufferMinutes)
+        return false;
+
+    // Idle shutdowns wait for an empty server anyway; don't interfere with them
+    if (_shutdownMask & SHUTDOWN_MASK_IDLE)
+        return false;
+
+    Battlefield* wg = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
+    if (!wg || !wg->IsEnabled() || !wg->IsWarTime())
+        return false;
+
+    // GetTimer() is the battle time remaining in milliseconds
+    _shutdownTimer = wg->GetTimer() / IN_MILLISECONDS + bufferMinutes * MINUTE;
+
+    LOG_INFO("server.worldserver", "Server {} deferred: Wintergrasp battle in progress, rescheduled in {}",
+        (_shutdownMask & SHUTDOWN_MASK_RESTART ? "restart" : "shutdown"), secsToTimeString(_shutdownTimer));
+
+    sWorldSessionMgr->DoForAllOnlinePlayers([](Player* player)
+    {
+        LocaleConstant locale = player->GetSession()->GetSessionDbLocaleIndex();
+        sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, sObjectMgr->GetAcoreString(LANG_WG_SHUTDOWN_DEFERRED, locale), player);
+    });
+
+    ShutdownMsg(true);
+    return true;
 }
 
 /// Shutdown the server
