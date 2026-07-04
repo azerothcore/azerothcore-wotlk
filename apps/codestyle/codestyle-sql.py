@@ -226,11 +226,19 @@ def strip_inline_comment(text: str) -> str:
             in_single_quote = not in_single_quote
         elif char == '"' and not in_single_quote:
             in_double_quote = not in_double_quote
-        elif char == '-' and index + 1 < len(text) and text[index + 1] == '-' \
-                and not in_single_quote and not in_double_quote:
+        elif (char == '-' and index + 1 < len(text) and text[index + 1] == '-'
+              and not in_single_quote and not in_double_quote):
             return text[:index].strip()
         index += 1
     return text.strip()
+
+# Count how many parentheses are still open on a line, ignoring any that appear
+# inside string literals. A positive result means a value tuple continues on the
+# following line(s).
+def open_paren_balance(text: str) -> int:
+    without_strings = re.sub(r"'(?:\\.|[^'])*'", "", text)
+    without_strings = re.sub(r'"(?:\\.|[^"])*"', "", without_strings)
+    return without_strings.count('(') - without_strings.count(')')
 
 def semicolon_check(file: io, file_path: str) -> None:
     global error_handler, results
@@ -297,12 +305,17 @@ def semicolon_check(file: io, file_path: str) -> None:
             if not tail or tail.endswith(','):
                 # Multi-line VALUES block: value rows follow on subsequent lines
                 inside_values_block = True
+            elif open_paren_balance(stripped_line) > 0:
+                # A value tuple is still open (row split across lines, or the line
+                # ends with '('); leave the statement open so the terminator is
+                # validated once the tuple closes on a following line.
+                pass
             elif tail.endswith(';'):
                 # Complete single-line insert
                 query_open = False
             else:
-                # Inline insert whose value tuple(s) are on this same line but the
-                # statement is not terminated with a semicolon
+                # Inline insert whose value tuple(s) are complete on this same line
+                # but the statement is not terminated with a semicolon
                 print(f"❌ Missing semicolon in {file_path} at line {line_number}")
                 check_failed = True
                 query_open = False
