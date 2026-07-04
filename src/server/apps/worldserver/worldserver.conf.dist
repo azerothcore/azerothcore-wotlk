@@ -3198,6 +3198,16 @@ NpcRegenHPIfTargetIsUnreachable = 1
 
 NpcRegenHPTimeIfTargetIsUnreachable = 10
 
+#    Creature.Instance.TeleportToUnreachableTarget
+#        Description: In dungeons and raids, non-boss creatures that cannot path to their
+#                     target teleport to it instead of evading or regenerating in place
+#                     (retail-like behaviour). Bosses and player-controlled creatures are
+#                     not affected.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+Creature.Instance.TeleportToUnreachableTarget = 0
+
 #    Creatures.CustomIDs
 #        Description: The list of custom creatures with gossip dialogues hardcoded in core,
 #                     divided by "," without spaces.
