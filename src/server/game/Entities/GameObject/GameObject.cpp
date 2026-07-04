@@ -629,19 +629,12 @@ void GameObject::Update(uint32 diff)
                                     Unit* caster = GetOwner();
                                     if (caster && caster->IsPlayer())
                                     {
-                                        LOG_DEBUG("entities.gameobject", "Fishing bobber expired and fish escaped (Player: {} Bobber: {} Entry: {} SpellId: {})",
-                                            caster->GetGUID().ToString(), GetGUID().ToString(), GetEntry(), GetSpellId());
-
                                         caster->ToPlayer()->RemoveGameObject(this, false);
 
                                         WorldPacket data(SMSG_FISH_ESCAPED, 0);
                                         caster->ToPlayer()->SendDirectMessage(&data);
                                     }
-                                    else
-                                        LOG_DEBUG("entities.gameobject", "Fishing bobber expired without player owner (Bobber: {} Entry: {} Owner: {} SpellId: {})",
-                                            GetGUID().ToString(), GetEntry(), GetOwnerGUID().ToString(), GetSpellId());
-
-                                    // can be delete
+                                    // can be deleted
                                     m_lootState = GO_JUST_DEACTIVATED;
                                     return;
                                 }
@@ -1782,9 +1775,6 @@ void GameObject::Use(Unit* user)
                                 // Keep the bobber owned while loot is open, but clear the
                                 // spell id so finishing the fishing channel does not delete it.
                                 SetSpellId(0); // prevent removing unintended auras at Unit::RemoveGameObject
-
-                                LOG_DEBUG("entities.gameobject", "Fishing bobber opened loot (Player: {} Bobber: {} Entry: {} FishingHole: {} Chance: {} Roll: {})",
-                                    player->GetGUID().ToString(), GetGUID().ToString(), GetEntry(), fishingHole ? fishingHole->GetGUID().ToString() : "none", chance, roll);
 
                                 // fishing pool catch
                                 if (fishingHole)
