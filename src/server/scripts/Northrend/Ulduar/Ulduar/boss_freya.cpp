@@ -21,6 +21,8 @@
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "ulduar.h"
 
 enum FreyaSpells
@@ -45,6 +47,7 @@ enum FreyaSpells
     SPELL_GROUND_TREMOR_FREYA                   = 62437,
     SPELL_IRON_ROOTS_FREYA                      = 62862,
     SPELL_IRON_ROOTS_FREYA_DAMAGE               = 62861,
+    SPELL_UNSTABLE_SUN_BEAM_FREYA               = 62450,
     SPELL_UNSTABLE_SUN_FREYA_DAMAGE             = 62451,
     SPELL_UNSTABLE_SUN_VISUAL                   = 62216,
 
@@ -99,6 +102,7 @@ enum FreyaSpells
     // DETONATING LASHER
     SPELL_DETONATE                              = 62598,
     SPELL_FLAME_LASH                            = 62608,
+    SPELL_SUBMERGE_VISUAL                       = 28819,
 
     // ACHIEVEMENT
     SPELL_DEFORESTATION_CREDIT                  = 65015,
@@ -319,16 +323,6 @@ struct boss_freya : public BossAI
         }
     }
 
-    void JustSummoned(Creature* cr) override
-    {
-        if (cr->GetEntry() == NPC_FREYA_UNSTABLE_SUN_BEAM)
-        {
-            cr->CastSpell(cr, SPELL_UNSTABLE_SUN_VISUAL, true);
-            cr->CastSpell(cr, SPELL_UNSTABLE_SUN_FREYA_DAMAGE, true);
-        }
-        BossAI::JustSummoned(cr);
-    }
-
     void SpawnWave()
     {
         _waveNumber = _waveNumber == 1 ? 3 : _waveNumber - 1;
@@ -352,8 +346,16 @@ struct boss_freya : public BossAI
         else if (_waveNumber == 3)
         {
             Talk(SAY_SUMMON_LASHERS);
+            // Spread the lashers evenly in a ring around Freya instead of
+            // clustering them in one spot, matching retail.
             for (uint8 i = 0; i < 10; ++i)
-                me->SummonCreature(NPC_DETONATING_LASHER, me->GetPositionX() + urand(5, 20), me->GetPositionY() + urand(5, 20), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), 0, TEMPSUMMON_CORPSE_DESPAWN);
+            {
+                float angle = i * 2.0f * float(M_PI) / 10.0f + frand(-0.35f, 0.35f);
+                float dist = frand(18.0f, 28.0f);
+                float x = me->GetPositionX() + dist * std::cos(angle);
+                float y = me->GetPositionY() + dist * std::sin(angle);
+                me->SummonCreature(NPC_DETONATING_LASHER, x, y, me->GetMapHeight(x, y, me->GetPositionZ()), 0, TEMPSUMMON_CORPSE_DESPAWN);
+            }
         }
     }
 
@@ -584,12 +586,7 @@ struct boss_freya : public BossAI
                 events.Repeat(45s, 55s);
                 break;
             case EVENT_FREYA_UNSTABLE_SUN_BEAM:
-                me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX() + urand(7, 25), me->GetPositionY() + urand(7, 25), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
-                if (Is25ManRaid())
-                {
-                    me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX() + urand(7, 25), me->GetPositionY() + urand(7, 25), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
-                    me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX() + urand(7, 25), me->GetPositionY() + urand(7, 25), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
-                }
+                DoCastAOE(SPELL_UNSTABLE_SUN_BEAM_FREYA, true);
                 events.Repeat(38s, 48s);
                 break;
         }
@@ -981,6 +978,29 @@ struct boss_freya_summons : public ScriptedAI
     {
         _stackCount = 0;
         events.Reset();
+
+        // Detonating Lashers spawn submerged in the ground and stay passive for a
+        // few seconds, then burst out with the emerge/birth animation (driven by
+        // the SUBMERGED -> STAND stand state change, like XT-002) and only start
+        // attacking once it has played out, so the jump is not cut short by
+        // combat movement (see issue #26255). They remain hostile and attackable
+        // while submerged, matching retail.
+        if (me->GetEntry() == NPC_DETONATING_LASHER)
+        {
+            me->SetReactState(REACT_PASSIVE);
+            me->m_Events.AddEventAtOffset([this]()
+            {
+                me->RemoveAurasDueToSpell(SPELL_SUBMERGE_VISUAL);
+            }, 4s);
+            me->m_Events.AddEventAtOffset([this]()
+            {
+                me->SetReactState(REACT_AGGRESSIVE);
+                if (Unit* target = SelectTargetFromPlayerList(70))
+                    AttackStart(target);
+            }, 5s);
+            return;
+        }
+
         if (Unit* target = SelectTargetFromPlayerList(70))
             AttackStart(target);
     }
@@ -1169,6 +1189,23 @@ private:
     uint32 const _elderCount;
 };
 
+// 62450 - Unstable Sun Beam
+class spell_freya_unstable_sun_beam : public SpellScript
+{
+    PrepareSpellScript(spell_freya_unstable_sun_beam);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+        Acore::Containers::RandomResize(targets, GetCaster()->GetMap()->Is25ManRaid() ? 3 : 1);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_freya_unstable_sun_beam::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
+};
+
 void AddSC_boss_freya()
 {
     RegisterUlduarCreatureAI(boss_freya);
@@ -1180,6 +1217,8 @@ void AddSC_boss_freya()
     RegisterUlduarCreatureAI(boss_freya_healthy_spore);
     RegisterUlduarCreatureAI(boss_freya_summons);
     RegisterUlduarCreatureAI(boss_freya_nature_bomb);
+
+    RegisterSpellScript(spell_freya_unstable_sun_beam);
 
     new achievement_freya_getting_back_to_nature();
     new achievement_freya_knock_on_wood("achievement_freya_knock_on_wood", 1);
