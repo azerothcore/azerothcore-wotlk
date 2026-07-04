@@ -56,7 +56,7 @@ Position const TimmyPos = { 3641.12f, -3190.08f, 127.96f, 0.29f };
 
 // Center of Crusaders' Square, used to identify the crimson defenders
 // whose deaths trigger Timmy the Cruel
-Position const CrusadersSquarePos = { 3671.0f, -3181.0f, 126.0f, 0.0f };
+Position const CrusadersSquarePos = { 3671.0f, -3181.0f, 126.32f, 0.0f };
 
 // uint32 m_uiGateTrapTimers[2][3] = { {0,0,0}, {0,0,0} };
 
@@ -200,9 +200,13 @@ public:
                             _timmyGUID = timmy->GetGUID();
                             events.ScheduleEvent(EVENT_TIMMY_EMERGE, 5s);
                         }
-                        _timmySpawned = 1;
+                        _timmySpawned = DATA_TIMMY_SPAWNED;
                         SaveToDB();
                     }
+                    break;
+                case NPC_TIMMY_THE_CRUEL:
+                    _timmySpawned = DATA_TIMMY_DEAD;
+                    SaveToDB();
                     break;
             }
         }
@@ -409,6 +413,9 @@ public:
             data >> _postboxesOpened;
             data >> _barthilasrunProgress;
             data >> _timmySpawned;
+            // Timmy was emerging or roaming the square when the instance unloaded - bring him back
+            if (_timmySpawned == DATA_TIMMY_SPAWNED)
+                events.ScheduleEvent(EVENT_TIMMY_RESPAWN, 5s);
             if (_baronRunTime)
             {
                 events.ScheduleEvent(EVENT_BARON_TIME, 60s);
@@ -532,6 +539,11 @@ public:
                     break;
                 case EVENT_GATE2_CRITTER_DELAY:
                     gate_critter_delay(GATE2);
+                    break;
+                case EVENT_TIMMY_RESPAWN:
+                    if (_timmyGUID.IsEmpty())
+                        if (Creature* timmy = instance->SummonCreature(NPC_TIMMY_THE_CRUEL, CrusadersSquarePos))
+                            _timmyGUID = timmy->GetGUID();
                     break;
                 case EVENT_TIMMY_EMERGE:
                     if (Creature* timmy = instance->GetCreature(_timmyGUID))

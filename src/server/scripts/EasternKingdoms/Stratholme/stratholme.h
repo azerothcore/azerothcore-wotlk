@@ -35,7 +35,11 @@ enum DataTypes
     DATA_BARON_RUN_NONE                 = 0,
     DATA_BARON_RUN_GATE                 = 1,
     DATA_JARIEN                         = 2,
-    DATA_SOTHOS                         = 3
+    DATA_SOTHOS                         = 3,
+
+    DATA_TIMMY_NONE                     = 0,
+    DATA_TIMMY_SPAWNED                  = 1,
+    DATA_TIMMY_DEAD                     = 2
 };
 
 enum CreatureIds
@@ -109,6 +113,7 @@ enum MiscIds
     EVENT_GATE2_DELAY                   = 10,
     EVENT_GATE2_CRITTER_DELAY           = 11,
     EVENT_TIMMY_EMERGE                  = 12,
+    EVENT_TIMMY_RESPAWN                 = 13,
 
     SPELL_BARON_ULTIMATUM               = 27861
 };
