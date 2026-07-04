@@ -338,6 +338,9 @@ void SmartAI::StopPath(uint32 DespawnTime, uint32 quest, bool fail)
     if (quest)
         mEscortQuestID = quest;
 
+    if (mCanRepeatPath)
+        mCanRepeatPath = false;
+
     SetDespawnTime(DespawnTime);
 
     if (me->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_ACTIVE) == ESCORT_MOTION_TYPE)
