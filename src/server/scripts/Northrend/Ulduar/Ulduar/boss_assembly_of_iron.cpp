@@ -516,9 +516,7 @@ struct boss_runemaster_molgeim : public ScriptedAI
                 events.RescheduleEvent(EVENT_SHIELD_OF_RUNES, 27s, 34s);
                 break;
             case EVENT_RUNE_OF_DEATH:
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random))
-                    me->CastSpell(target, SPELL_RUNE_OF_DEATH, true);
-
+                DoCastRandomTarget(SPELL_RUNE_OF_DEATH, 0, 0.0f, true, true);
                 Talk(SAY_MOLGEIM_RUNE_DEATH);
                 events.Repeat(30s, 40s);
                 break;
