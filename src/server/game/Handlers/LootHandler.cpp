@@ -310,10 +310,6 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
             }
             else
             {
-                if (go->GetGoType() == GAMEOBJECT_TYPE_FISHINGNODE)
-                    LOG_DEBUG("entities.gameobject", "Fishing bobber loot released (Player: {} Bobber: {} Entry: {} Looted: {})",
-                        player->GetGUID().ToString(), go->GetGUID().ToString(), go->GetEntry(), loot->isLooted());
-
                 go->SetLootState(GO_JUST_DEACTIVATED);
 
                 // Xinef: moved event execution to loot release (after everything is looted)
