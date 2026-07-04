@@ -30,6 +30,7 @@ enum DataTypes
     TYPE_BARON_FIGHT                    = 4,
     TYPE_MALLOW                         = 5,
     TYPE_BARTHILAS_RUN                  = 6,
+    TYPE_TIMMY                          = 7,
 
     DATA_BARON_RUN_NONE                 = 0,
     DATA_BARON_RUN_GATE                 = 1,
@@ -53,7 +54,12 @@ enum CreatureIds
     NPC_JARIEN                          = 16101,
     NPC_SOTHOS                          = 16102,
     NPC_SPIRIT_OF_JARIEN                = 16103,
-    NPC_SPIRIT_OF_SOTHOS                = 16104
+    NPC_SPIRIT_OF_SOTHOS                = 16104,
+    NPC_TIMMY_THE_CRUEL                 = 10808,
+    NPC_CRIMSON_GUARDSMAN               = 10418,
+    NPC_CRIMSON_CONJUROR                = 10419,
+    NPC_CRIMSON_INITIATE                = 10420,
+    NPC_CRIMSON_GALLANT                 = 10424
 };
 
 enum GameobjectIds
@@ -101,6 +107,7 @@ enum MiscIds
     EVENT_GATE2_TRAP                    = 9,
     EVENT_GATE2_DELAY                   = 10,
     EVENT_GATE2_CRITTER_DELAY           = 11,
+    EVENT_TIMMY_EMERGE                  = 12,
 
     SPELL_BARON_ULTIMATUM               = 27861
 };

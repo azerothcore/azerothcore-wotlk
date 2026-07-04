@@ -52,6 +52,11 @@ static const Position aGateTrap[] =
 Position const MindlessUndeadPos = { 3941.75f, -3393.06f, 119.70f, 0.0f };
 Position const BarthilasPos = { 4068.74f, -3535.97f, 122.825f, 2.478367567062377929f };
 Position const SlaughterPos = { 4032.20f, -3378.06f, 119.75f, 4.67f };
+Position const TimmyPos = { 3641.12f, -3190.08f, 127.96f, 0.29f };
+
+// Center of Crusaders' Square, used to identify the crimson defenders
+// whose deaths trigger Timmy the Cruel
+Position const CrusadersSquarePos = { 3671.0f, -3181.0f, 126.0f, 0.0f };
 
 // uint32 m_uiGateTrapTimers[2][3] = { {0,0,0}, {0,0,0} };
 
@@ -77,6 +82,10 @@ public:
             _slaughterProgress = 0;
             _slaughterNPCs = 0;
             _postboxesOpened = 0;
+
+            _timmySpawned = 0;
+            _timmyGUID = ObjectGuid::Empty;
+            _crusadersSquareCrimsonGUIDs.clear();
 
             _gateTrapsCooldown[0] = false;
             _gateTrapsCooldown[1] = false;
@@ -117,6 +126,13 @@ public:
                     break;
                 case NPC_BARTHILAS:
                     _barthilasGUID = creature->GetGUID();
+                    break;
+                case NPC_CRIMSON_GUARDSMAN:
+                case NPC_CRIMSON_CONJUROR:
+                case NPC_CRIMSON_INITIATE:
+                case NPC_CRIMSON_GALLANT:
+                    if (!_timmySpawned && creature->IsAlive() && creature->GetDistance2d(CrusadersSquarePos.GetPositionX(), CrusadersSquarePos.GetPositionY()) < 65.0f)
+                        _crusadersSquareCrimsonGUIDs.insert(creature->GetGUID());
                     break;
                 default:
                     break;
@@ -172,6 +188,21 @@ public:
                 case NPC_BARON_RIVENDARE:
                     events.CancelEvent(EVENT_BARON_TIME);
                     DoRemoveAurasDueToSpellOnPlayers(SPELL_BARON_ULTIMATUM);
+                    break;
+                case NPC_CRIMSON_GUARDSMAN:
+                case NPC_CRIMSON_CONJUROR:
+                case NPC_CRIMSON_INITIATE:
+                case NPC_CRIMSON_GALLANT:
+                    if (!_timmySpawned && _crusadersSquareCrimsonGUIDs.erase(unit->GetGUID()) && _crusadersSquareCrimsonGUIDs.empty())
+                    {
+                        if (Creature* timmy = instance->SummonCreature(NPC_TIMMY_THE_CRUEL, TimmyPos))
+                        {
+                            _timmyGUID = timmy->GetGUID();
+                            events.ScheduleEvent(EVENT_TIMMY_EMERGE, 5s);
+                        }
+                        _timmySpawned = 1;
+                        SaveToDB();
+                    }
                     break;
             }
         }
@@ -377,6 +408,7 @@ public:
             data >> _slaughterProgress;
             data >> _postboxesOpened;
             data >> _barthilasrunProgress;
+            data >> _timmySpawned;
             if (_baronRunTime)
             {
                 events.ScheduleEvent(EVENT_BARON_TIME, 60s);
@@ -397,7 +429,8 @@ public:
                 << _zigguratState3 << ' '
                 << _slaughterProgress << ' '
                 << _postboxesOpened << ' '
-                << _barthilasrunProgress;
+                << _barthilasrunProgress << ' '
+                << _timmySpawned;
         }
 
         uint32 GetData(uint32 type) const override
@@ -414,6 +447,8 @@ public:
                     return _postboxesOpened;
                 case TYPE_BARTHILAS_RUN:
                     return _barthilasrunProgress;
+                case TYPE_TIMMY:
+                    return _timmySpawned;
             }
             return 0;
         }
@@ -497,6 +532,13 @@ public:
                     break;
                 case EVENT_GATE2_CRITTER_DELAY:
                     gate_critter_delay(GATE2);
+                    break;
+                case EVENT_TIMMY_EMERGE:
+                    if (Creature* timmy = instance->GetCreature(_timmyGUID))
+                    {
+                        timmy->AI()->Talk(0);
+                        timmy->GetMotionMaster()->MovePoint(0, CrusadersSquarePos);
+                    }
                     break;
                 case EVENT_BARON_TIME:
                 {
@@ -611,6 +653,10 @@ public:
         bool _gateTrapsCooldown[2];
         ObjectGuid _trappedPlayerGUID;
         ObjectGuid _trapGatesGUIDs[4];
+
+        uint32 _timmySpawned;
+        ObjectGuid _timmyGUID;
+        GuidSet _crusadersSquareCrimsonGUIDs;
 
         void gate_delay(int gate)
         {
