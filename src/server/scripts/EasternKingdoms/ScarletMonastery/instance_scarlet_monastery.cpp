@@ -18,6 +18,7 @@
 #include "InstanceMapScript.h"
 #include "scarletmonastery.h"
 #include "ScriptedCreature.h"
+#include "SpellScript.h"
 #include "SpellScriptLoader.h"
 
 enum AshbringerEventMisc
