@@ -202,29 +202,32 @@ struct npc_pet_mage_mirror_image : CasterAI
             return;
         }
 
-        // Cheap and correctness-critical: never start a new cast on a dead target or one under a
-        // breakable-by-damage CC aura (Polymorph, Dragon's Breath, ...). Checked every tick so a
-        // scheduled spell can't leak out and break the CC. withDelayed=false lets an already
-        // in-flight spell land, matching the 3.1.2 behaviour.
-        bool invalidTarget = !me->GetVictim()->IsAlive() || me->GetVictim()->HasBreakableByDamageCrowdControlAura();
-
+        // A dead target, or one we lost sight of, is invalid: drop it and reselect.
         // CanSeeOrDetect is comparatively expensive, so throttle the sight check to ~1s.
+        bool lostTarget = !me->GetVictim()->IsAlive();
+
         checktarget += diff;
         if (checktarget >= 1000)
         {
             checktarget = 0;
             if (!me->CanSeeOrDetect(me->GetVictim()))
-                invalidTarget = true;
+                lostTarget = true;
         }
 
-        if (invalidTarget)
+        if (lostTarget)
         {
             MySelectNextTarget();
             me->InterruptNonMeleeSpells(false);
             return;
         }
 
+        // Let a cast that was already in progress when the crowd control landed finish (3.1.2).
         if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        // Never start a new cast on a target under a breakable-by-damage CC aura (Polymorph,
+        // Dragon's Breath, ...) - that is what would break the crowd control.
+        if (me->GetVictim()->HasBreakableByDamageCrowdControlAura(me))
             return;
 
         if (uint32 spellId = events.ExecuteEvent())
