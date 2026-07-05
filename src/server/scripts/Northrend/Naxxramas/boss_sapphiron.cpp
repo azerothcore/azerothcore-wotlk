@@ -128,8 +128,6 @@ public:
             iceboltCount = 0;
             spawnTimer = 0;
             currentTarget.Clear();
-            // Evading mid-air skips the landing cleanup, so strip lingering ice tomb auras here.
-            ClearIceTombs();
             blockList.clear();
             me->SetAnimTier(AnimTier::Fly);
         }
@@ -223,18 +221,6 @@ public:
         {
             if (who->IsPlayer())
                 instance->StorePersistentData(PERSISTENT_DATA_IMMORTAL_FAIL, 1);
-        }
-
-        void ClearIceTombs()
-        {
-            for (ObjectGuid const& guid : blockList)
-            {
-                if (Unit* player = ObjectAccessor::GetUnit(*me, guid))
-                {
-                    player->RemoveAurasDueToSpell(SPELL_ICEBOLT_TRIGGER);
-                    player->RemoveAurasDueToSpell(SPELL_ICEBOLT_IMMUNITY);
-                }
-            }
         }
 
         void UpdateAI(uint32 diff) override
@@ -383,7 +369,14 @@ public:
                     events.ScheduleEvent(EVENT_FLIGHT_START_LAND, 3s);
                     return;
                 case EVENT_FLIGHT_START_LAND:
-                    ClearIceTombs();
+                    for (ObjectGuid const& guid : blockList)
+                    {
+                        if (Unit* player = ObjectAccessor::GetUnit(*me, guid))
+                        {
+                            player->RemoveAurasDueToSpell(SPELL_ICEBOLT_TRIGGER);
+                            player->RemoveAurasDueToSpell(SPELL_ICEBOLT_IMMUNITY);
+                        }
+                    }
                     blockList.clear();
                     me->RemoveAllGameObjects();
                     events.ScheduleEvent(EVENT_LAND, 1s);
