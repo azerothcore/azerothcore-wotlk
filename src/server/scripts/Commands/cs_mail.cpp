@@ -288,87 +288,84 @@ public:
 
         if (player)
         {
-            // Online: same logic as WorldSession::HandleReturnToSender
-            // Get pointer before RemoveMail (which removes from deque but does not delete the object)
+            // Drop the mail from the session's loaded state if present. Attachments are
+            // collected from the DB below, so mails the session never loaded (expired at
+            // login, delivered mid-login, inserted externally) still return with their items.
+            // RemoveMail only erases from the deque, it does not delete the object.
             Mail* m = player->GetMail(mailId);
-
             player->RemoveMail(mailId);
-
-            if (m && m->HasItems())
-            {
-                for (auto const& itemInfo : m->items)
-                {
-                    if (Item* item = player->GetMItem(itemInfo.item_guid))
-                        draft.AddItem(item);
-
-                    player->RemoveMItem(itemInfo.item_guid);
-                }
-            }
-
             delete m;
         }
-        else
+
+        // mail_items is flushed to the DB on every item take, so it is authoritative even
+        // for online players. Same query shape as CHAR_SEL_MAILITEMS (LEFT JOIN to handle
+        // dangling mail_items) and same logic as Player::_LoadMailedItem
+        QueryResult itemResult = CharacterDatabase.Query(
+            "SELECT creatorGuid, giftCreatorGuid, count, duration, charges, flags, enchantments,"
+            " randomPropertyId, durability, playedTime, text, mi.item_guid, itemEntry, ii.owner_guid"
+            " FROM mail_items mi LEFT JOIN item_instance ii ON mi.item_guid = ii.guid"
+            " WHERE mi.mail_id = {}", mailId);
+
+        if (itemResult)
         {
-            // Offline: load Item* objects from DB using same query shape as CHAR_SEL_MAILITEMS
-            // (LEFT JOIN to handle dangling mail_items) and same logic as Player::_LoadMailedItem
-            QueryResult itemResult = CharacterDatabase.Query(
-                "SELECT creatorGuid, giftCreatorGuid, count, duration, charges, flags, enchantments,"
-                " randomPropertyId, durability, playedTime, text, mi.item_guid, itemEntry, ii.owner_guid"
-                " FROM mail_items mi LEFT JOIN item_instance ii ON mi.item_guid = ii.guid"
-                " WHERE mi.mail_id = {}", mailId);
-
-            if (itemResult)
+            do
             {
-                do
+                Field* itemFields = itemResult->Fetch();
+                uint32 itemGuid  = itemFields[11].Get<uint32>();
+                uint32 itemEntry = itemFields[12].Get<uint32>();
+
+                // Prefer the item object the session already has loaded over creating a duplicate
+                if (Item* item = player ? player->GetMItem(itemGuid) : nullptr)
                 {
-                    Field* itemFields = itemResult->Fetch();
-                    uint32 itemGuid  = itemFields[11].Get<uint32>();
-                    uint32 itemEntry = itemFields[12].Get<uint32>();
-
-                    // Handle dangling mail_items (missing item_instance)
-                    if (!itemEntry)
-                    {
-                        LOG_ERROR("misc", "cs_mail: Mail #{} has dangling mail_items row for item_guid {}. Cleaning up.", mailId, itemGuid);
-
-                        CharacterDatabasePreparedStatement* delStmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INVALID_MAIL_ITEM);
-                        delStmt->SetData(0, itemGuid);
-                        trans->Append(delStmt);
-                        continue;
-                    }
-
-                    ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemEntry);
-                    if (!proto)
-                    {
-                        LOG_ERROR("misc", "cs_mail: Mail #{} has unknown item (entry: {}, guid: {}). Cleaning up.", mailId, itemEntry, itemGuid);
-
-                        CharacterDatabasePreparedStatement* delStmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INVALID_MAIL_ITEM);
-                        delStmt->SetData(0, itemGuid);
-                        trans->Append(delStmt);
-                        continue;
-                    }
-
-                    Item* item = NewItemOrBag(proto);
-                    ObjectGuid ownerGuid = itemFields[13].Get<uint32>()
-                        ? ObjectGuid::Create<HighGuid::Player>(itemFields[13].Get<uint32>())
-                        : ObjectGuid::Empty;
-
-                    if (!item->LoadFromDB(itemGuid, ownerGuid, itemFields, itemEntry))
-                    {
-                        LOG_ERROR("misc", "cs_mail: Item (GUID: {}) in mail #{} failed to load. Cleaning up.", itemGuid, mailId);
-
-                        CharacterDatabasePreparedStatement* delStmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INVALID_MAIL_ITEM);
-                        delStmt->SetData(0, itemGuid);
-                        trans->Append(delStmt);
-
-                        item->FSetState(ITEM_REMOVED);
-                        CharacterDatabaseTransaction nullTrans = CharacterDatabaseTransaction(nullptr);
-                        item->SaveToDB(nullTrans);
-                        return true;
-                    }
-
                     draft.AddItem(item);
-                } while (itemResult->NextRow());
-            }
+                    player->RemoveMItem(itemGuid);
+                    continue;
+                }
+
+                // Handle dangling mail_items (missing item_instance)
+                if (!itemEntry)
+                {
+                    LOG_ERROR("misc", "cs_mail: Mail #{} has dangling mail_items row for item_guid {}. Cleaning up.", mailId, itemGuid);
+
+                    CharacterDatabasePreparedStatement* delStmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INVALID_MAIL_ITEM);
+                    delStmt->SetData(0, itemGuid);
+                    trans->Append(delStmt);
+                    continue;
+                }
+
+                ItemTemplate const* proto = sObjectMgr->GetItemTemplate(itemEntry);
+                if (!proto)
+                {
+                    LOG_ERROR("misc", "cs_mail: Mail #{} has unknown item (entry: {}, guid: {}). Cleaning up.", mailId, itemEntry, itemGuid);
+
+                    CharacterDatabasePreparedStatement* delStmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INVALID_MAIL_ITEM);
+                    delStmt->SetData(0, itemGuid);
+                    trans->Append(delStmt);
+                    continue;
+                }
+
+                Item* item = NewItemOrBag(proto);
+                ObjectGuid ownerGuid = itemFields[13].Get<uint32>()
+                    ? ObjectGuid::Create<HighGuid::Player>(itemFields[13].Get<uint32>())
+                    : ObjectGuid::Empty;
+
+                if (!item->LoadFromDB(itemGuid, ownerGuid, itemFields, itemEntry))
+                {
+                    LOG_ERROR("misc", "cs_mail: Item (GUID: {}) in mail #{} failed to load. Cleaning up.", itemGuid, mailId);
+
+                    CharacterDatabasePreparedStatement* delStmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INVALID_MAIL_ITEM);
+                    delStmt->SetData(0, itemGuid);
+                    trans->Append(delStmt);
+
+                    // Queue the row cleanup on the shared transaction instead of executing it
+                    // immediately; SaveToDB in ITEM_REMOVED state also frees the object
+                    item->FSetState(ITEM_REMOVED);
+                    item->SaveToDB(trans);
+                    continue;
+                }
+
+                draft.AddItem(item);
+            } while (itemResult->NextRow());
         }
 
         uint32 accountId = sCharacterCache->GetCharacterAccountIdByGuid(ObjectGuid(HighGuid::Player, receiver));
