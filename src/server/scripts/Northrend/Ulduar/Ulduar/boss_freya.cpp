@@ -299,8 +299,8 @@ struct boss_freya : public BossAI
                 static constexpr uint32 summonChestSpell[2][4] =
                 {
                     // 0 Elder, 1 Elder, 2 Elder, 3 Elder
-                    { 62950, 62952, 62953, 62954 }, // 10-man
-                    { 62955, 62956, 62957, 62958 }  // 25-man
+                    { 62957, 62955, 62953, 62950 }, // 10-man
+                    { 62958, 62956, 62954, 62952 }  // 25-man
                 };
 
                 me->CastSpell(me, summonChestSpell[me->GetMap()->Is25ManRaid() ? 1 : 0][_elderCount], true);
