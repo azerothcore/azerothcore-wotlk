@@ -1,3 +1,4 @@
+-- DB update 2026_07_04_06 -> 2026_07_05_00
 --
 -- General Vezax (33271) must resist spell-haste debuffs (Curse of Tongues, Mind-numbing Poison,
 -- Slow, core hound Lava Breath). They inflate his Shadow Crash / Searing Flames cast times and
