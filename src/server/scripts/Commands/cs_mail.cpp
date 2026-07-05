@@ -243,63 +243,19 @@ public:
 
         Player* player = target.GetConnectedPlayer();
 
-        // Run the same script hook as the client return handler, failing early before any deletions
-        if (player)
-        {
-            Mail* m = player->GetMail(mailId);
-            if (m)
-            {
-                ObjectGuid senderGuid = ObjectGuid(HighGuid::Player, sender);
-
-                if (m->HasItems())
-                {
-                    for (auto const& itemInfo : m->items)
-                    {
-                        Item* item = player->GetMItem(itemInfo.item_guid);
-                        if (item && !sScriptMgr->OnPlayerCanSendMail(player, senderGuid, ObjectGuid::Empty, subject, body, money, 0, item))
-                        {
-                            handler->SendErrorMessage(LANG_MAIL_RETURN_HOOK_BLOCKED);
-                            return true;
-                        }
-                    }
-                }
-                else if (!sScriptMgr->OnPlayerCanSendMail(player, senderGuid, ObjectGuid::Empty, subject, body, money, 0, nullptr))
-                {
-                    handler->SendErrorMessage(LANG_MAIL_RETURN_HOOK_BLOCKED);
-                    return true;
-                }
-            }
-        }
-
-        // Same logic as WorldSession::HandleReturnToSender
         CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_BY_ID);
-        stmt->SetData(0, mailId);
-        trans->Append(stmt);
-
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_ITEM_BY_ID);
-        stmt->SetData(0, mailId);
-        trans->Append(stmt);
-
-        MailDraft draft(subject, body);
-        if (mailTemplate)
-            draft = MailDraft(mailTemplate, false);
-
-        if (player)
-        {
-            // Drop the mail from the session's loaded state if present. Attachments are
-            // collected from the DB below, so mails the session never loaded (expired at
-            // login, delivered mid-login, inserted externally) still return with their items.
-            // RemoveMail only erases from the deque, it does not delete the object.
-            Mail* m = player->GetMail(mailId);
-            player->RemoveMail(mailId);
-            delete m;
-        }
-
+        // Collect attachments before the script-hook check and any deletion, so a hook
+        // veto can still abort the command with nothing changed.
         // mail_items is flushed to the DB on every item take, so it is authoritative even
-        // for online players. Same query shape as CHAR_SEL_MAILITEMS (LEFT JOIN to handle
-        // dangling mail_items) and same logic as Player::_LoadMailedItem
+        // for online players; mails the session never loaded (expired at login, delivered
+        // mid-login, inserted externally) are returned with their items too. Same query
+        // shape as CHAR_SEL_MAILITEMS (LEFT JOIN to handle dangling mail_items) and same
+        // logic as Player::_LoadMailedItem. Items the session already has loaded are
+        // reused and stay owned by the session; the bool marks objects loaded (and owned)
+        // here.
+        std::vector<std::pair<Item*, bool /*loadedFromDb*/>> attachments;
+
         QueryResult itemResult = CharacterDatabase.Query(
             "SELECT creatorGuid, giftCreatorGuid, count, duration, charges, flags, enchantments,"
             " randomPropertyId, durability, playedTime, text, mi.item_guid, itemEntry, ii.owner_guid"
@@ -317,8 +273,7 @@ public:
                 // Prefer the item object the session already has loaded over creating a duplicate
                 if (Item* item = player ? player->GetMItem(itemGuid) : nullptr)
                 {
-                    draft.AddItem(item);
-                    player->RemoveMItem(itemGuid);
+                    attachments.emplace_back(item, false);
                     continue;
                 }
 
@@ -341,6 +296,9 @@ public:
                     CharacterDatabasePreparedStatement* delStmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_INVALID_MAIL_ITEM);
                     delStmt->SetData(0, itemGuid);
                     trans->Append(delStmt);
+
+                    // The mail is going away, so drop the unloadable item_instance row too
+                    Item::DeleteFromDB(trans, itemGuid);
                     continue;
                 }
 
@@ -364,8 +322,67 @@ public:
                     continue;
                 }
 
-                draft.AddItem(item);
+                attachments.emplace_back(item, true);
             } while (itemResult->NextRow());
+        }
+
+        // Run the same script hook as the client return handler for online targets,
+        // covering DB-loaded attachments as well, before any deletion
+        if (player)
+        {
+            ObjectGuid senderGuid = ObjectGuid(HighGuid::Player, sender);
+            bool blocked = false;
+
+            if (attachments.empty())
+                blocked = !sScriptMgr->OnPlayerCanSendMail(player, senderGuid, ObjectGuid::Empty, subject, body, money, 0, nullptr);
+
+            for (auto const& [item, loadedFromDb] : attachments)
+            {
+                if (blocked)
+                    break;
+
+                blocked = !sScriptMgr->OnPlayerCanSendMail(player, senderGuid, ObjectGuid::Empty, subject, body, money, 0, item);
+            }
+
+            if (blocked)
+            {
+                for (auto const& [item, loadedFromDb] : attachments)
+                    if (loadedFromDb)
+                        delete item;
+
+                handler->SendErrorMessage(LANG_MAIL_RETURN_HOOK_BLOCKED);
+                return true;
+            }
+        }
+
+        // Same logic as WorldSession::HandleReturnToSender
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_BY_ID);
+        stmt->SetData(0, mailId);
+        trans->Append(stmt);
+
+        stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_ITEM_BY_ID);
+        stmt->SetData(0, mailId);
+        trans->Append(stmt);
+
+        MailDraft draft(subject, body);
+        if (mailTemplate)
+            draft = MailDraft(mailTemplate, false);
+
+        if (player)
+        {
+            // Drop the mail from the session's loaded state if present.
+            // RemoveMail only erases from the deque, it does not delete the object.
+            Mail* m = player->GetMail(mailId);
+            player->RemoveMail(mailId);
+            delete m;
+        }
+
+        for (auto const& [item, loadedFromDb] : attachments)
+        {
+            if (!loadedFromDb)
+                player->RemoveMItem(item->GetGUID().GetCounter());
+
+            draft.AddItem(item);
         }
 
         uint32 accountId = sCharacterCache->GetCharacterAccountIdByGuid(ObjectGuid(HighGuid::Player, receiver));
