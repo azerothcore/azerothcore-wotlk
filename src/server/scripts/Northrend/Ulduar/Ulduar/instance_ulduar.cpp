@@ -356,10 +356,12 @@ public:
                             uint32 chestId = hardmode
                                 ? (is25man ? GO_MIMIRON_CHEST_HERO_HARD : GO_MIMIRON_CHEST_HARD)
                                 : (is25man ? GO_MIMIRON_CHEST_HERO : GO_MIMIRON_CHEST);
-                            if (GameObject* go = mimiron->SummonGameObject(chestId, 2744.65f, 2569.46f, 364.397f, 0, 0, 0, 0, 0, DAY, true, GO_SUMMON_TIMED_DESPAWN))
+                            if (GameObject* go = instance->SummonGameObject(chestId,
+                                    2744.65f, 2569.46f, 364.397f, 0, 0, 0, 0, 0, 0))
                             {
                                 go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
                                 go->SetLootRecipient(instance);
+                                go->SetRespawnTime(7 * DAY);
                             }
                         }
                     }
