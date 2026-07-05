@@ -296,6 +296,7 @@ struct boss_freya : public BossAI
                 // Summon the chest via spell so it is a wild object not owned by Freya,
                 // otherwise it despawns with her when she teleports out. The spell is
                 // chosen by raid size and how many Elders empowered her.
+                // Order intentionally differs from TC/cMaNGOS to match AC's even/odd chest-loot grouping.
                 static constexpr uint32 summonChestSpell[2][4] =
                 {
                     // 0 Elder, 1 Elder, 2 Elder, 3 Elder
