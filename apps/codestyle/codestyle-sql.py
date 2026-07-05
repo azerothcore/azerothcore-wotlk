@@ -19,6 +19,17 @@ base_directory = glob.glob(base_pattern)
 archive_pattern = os.path.join(base_dir, 'data/sql/archive/db_*')
 archive_directory = glob.glob(archive_pattern)
 
+# Matches quoted string literals, used to blank them out before looking for
+# a '--' comment marker so a literal '--' inside dialogue text (e.g. an
+# interrupted sentence) isn't mistaken for a comment delimiter.
+quoted_string_pattern = re.compile(r"'(?:\\'|[^'])*'|\"(?:\\\"|[^\"])*\"")
+
+
+def strip_inline_comment(line: str) -> str:
+    sanitized = quoted_string_pattern.sub(lambda m: '\0' * len(m.group()), line)
+    comment_index = sanitized.find('--')
+    return line if comment_index == -1 else line[:comment_index]
+
 # Global variables
 error_handler = False
 results = {
@@ -255,8 +266,8 @@ def semicolon_check(file: io, file_path: str) -> None:
         if not stripped_line and not inside_values_block:
             continue
 
-        # Remove inline comments after SQL
-        stripped_line = stripped_line.split('--', 1)[0].strip()
+        # Remove inline comments after SQL (ignoring '--' inside quoted strings)
+        stripped_line = strip_inline_comment(stripped_line).strip()
 
         if stripped_line.upper().startswith("SET") and not stripped_line.endswith(";"):
             print(f"❌ Missing semicolon in {file_path} at line {line_number}")

@@ -18,6 +18,7 @@
 #include "CreatureScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
+#include "ScriptedGossip.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "halls_of_stone.h"
@@ -151,7 +152,7 @@ struct brann_bronzebeard : public ScriptedAI
             // Past Sjonnir's Door
             me->NearTeleportTo(brannDoorDone);
             me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY_UNARMED);
+            me->SetEmoteState(EMOTE_STATE_READY_UNARMED);
             me->SetImmuneToAll(true);
         }
         else if (instance && instance->GetBossState(BOSS_TRIBUNAL_OF_AGES) == DONE)
@@ -170,9 +171,12 @@ struct brann_bronzebeard : public ScriptedAI
         }
     }
 
-    void sGossipSelect(Player* /*player*/, uint32 /*sender*/, uint32  /*action*/) override
+    void sGossipSelect(Player* player, uint32 /*sender*/, uint32  /*action*/) override
     {
         me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+        // Removing the NPC flags only affects future interactions, not the
+        // gossip window already open on the client - close it explicitly.
+        CloseGossipMenuFor(player);
         switch (me->GetGossipMenuId())
         {
         case TRIBUNAL_BEFORE:
@@ -226,8 +230,8 @@ struct brann_bronzebeard : public ScriptedAI
 
             ResetEvent();
             me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
-            DoCast(me, 58506, false);
-            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_READY_UNARMED);
+            DoCast(me, SPELL_STEALTH, false);
+            me->SetEmoteState(EMOTE_STATE_READY_UNARMED);
 
             me->GetMotionMaster()->MovePoint(POINT_TRIBUNAL_LEAVE, 935.955f, 371.031f, 207.41751f);
             break;
@@ -243,7 +247,7 @@ struct brann_bronzebeard : public ScriptedAI
         case ACTION_SJONNIR_DEAD: // Received by Sjonnir
             me->m_Events.KillAllEvents(false);
             scheduler.CancelAll();
-            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_STAND);
+            me->SetEmoteState(EMOTE_STATE_STAND);
             me->ReplaceAllNpcFlags(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
             me->SetGossipMenuId(SJONNIR_END);
             me->SetFacingTo(3.147235631942749023f);
@@ -663,6 +667,12 @@ struct brann_bronzebeard : public ScriptedAI
         // Stop all combat abilities and spawning
         scheduler.CancelAll();
 
+        // A Dark Matter cast already mid-flight (chase start / explosion) isn't
+        // tied to a scheduler group, so cancelling only the scheduler above
+        // isn't enough - clear it here too, or it can still land during the
+        // outro dialogue below.
+        me->m_Events.KillAllEvents(false);
+
         // Schedule end sequence talks
         me->m_Events.AddEventAtOffset([this] {
             Talk(SAY_BRANN_EVENT_D_1);
@@ -699,7 +709,7 @@ struct brann_bronzebeard : public ScriptedAI
                 plr->GroupEventHappens(QUEST_HALLS_OF_STONE, me);
             }
 
-            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_STAND);
+            me->SetEmoteState(EMOTE_STATE_STAND);
         }, 17s, TALK_GROUP_EVENT_END);
 
         // Post-fight lore conversation
@@ -902,6 +912,7 @@ struct brann_bronzebeard : public ScriptedAI
 
         if (instance && instance->GetBossState(BOSS_TRIBUNAL_OF_AGES) == IN_PROGRESS)
         {
+            instance->SetBossState(BOSS_TRIBUNAL_OF_AGES, NOT_STARTED);
             instance->SetData(BOSS_TRIBUNAL_OF_AGES, NOT_STARTED);
         }
     }
