@@ -37,6 +37,16 @@ jobs:
       - uses: actions/checkout@v4
       - name: ccache
         uses: hendrikmuhs/ccache-action@v1.2.13
+      # Cache the fetched Boost + MySQL client so we don't re-download ~350 MB
+      # and re-run the Boost installer on every run. The Test-Path guards in
+      # "Configure OS" short-circuit the install work when these are restored.
+      - name: Cache Boost & MySQL
+        uses: actions/cache@v4
+        with:
+          path: |
+            C:\local\boost_1_87_0
+            C:\tools\mysql\current
+          key: winbuild-deps:boost-1.87.0:mysql-8.4.9
       - name: Configure OS
         shell: pwsh
         run: |
