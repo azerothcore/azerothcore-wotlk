@@ -293,14 +293,17 @@ struct boss_freya : public BossAI
                     ++_elderCount;
                 }
 
-                uint32 chestId = RAID_MODE(GO_FREYA_CHEST, GO_FREYA_CHEST_HERO);
-                chestId -= 2 * _elderCount; // offset
-
-                if (GameObject* go = me->SummonGameObject(chestId, 2345.61f, -71.20f, 425.104f, 3.0f, 0, 0, 0, 0, 0))
+                // Summon the chest via spell so it is a wild object not owned by Freya,
+                // otherwise it despawns with her when she teleports out. The spell is
+                // chosen by raid size and how many Elders empowered her.
+                static constexpr uint32 summonChestSpell[2][4] =
                 {
-                    go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
-                    go->SetLootRecipient(me->GetMap());
-                }
+                    // 0 Elder, 1 Elder, 2 Elder, 3 Elder
+                    { 62950, 62952, 62953, 62954 }, // 10-man
+                    { 62955, 62956, 62957, 62958 }  // 25-man
+                };
+
+                me->CastSpell(me, summonChestSpell[me->GetMap()->Is25ManRaid() ? 1 : 0][_elderCount], true);
 
                 // Defeat credit
                 me->CastSpell(me, 65074, true); // credit
