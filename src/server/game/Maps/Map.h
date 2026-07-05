@@ -67,6 +67,7 @@ class StaticTransport;
 class MotionTransport;
 class PathGenerator;
 class WorldSession;
+class MapPartition;
 
 enum WeatherState : uint32;
 
@@ -564,6 +565,9 @@ public:
     MapCollisionData& GetMapCollisionData() { return _mapCollisionData; }
     MapCollisionData const& GetMapCollisionData()  const { return _mapCollisionData; }
 
+    MapPartition* GetPartition(uint16 gridX, uint16 gridY);
+    std::vector<MapPartition*> const& GetPartitions() const { return _partitions; }
+
 private:
 
     template<class T> void InitializeObject(T* obj);
@@ -577,6 +581,7 @@ private:
     std::vector<Creature*> _creaturesToMove;
     std::vector<GameObject*> _gameObjectsToMove;
     std::vector<DynamicObject*> _dynamicObjectsToMove;
+    std::vector<MapPartition*> _partitions;
 
     bool EnsureGridLoaded(Cell const& cell);
     MapGridType* GetMapGrid(uint16 const x, uint16 const y);

@@ -51,9 +51,25 @@ void MapPartition::RemoveObject(WorldObject* obj)
     }
 }
 
+//Pushes a world object into the transfer queue
+void MapPartition::QueueTransfer(WorldObject* obj)
+{
+    _transferQueue.add(obj);
+}
+
 // The core physics and AI update loop
 void MapPartition::Update(uint32 const diff)
 {
+    //Add objects from transfer queue before starting updates
+    WorldObject* incomingObj = nullptr;
+    while (_transferQueue.next(incomingObj))
+    {
+        if (incomingObj && incomingObj->IsInWorld())
+        {
+            AddObject(incomingObj);
+        }
+    }
+
     // Conditionally increment i inside the loop to avoid skipping swaped elements
     for (uint32 i = 0; i < _updatableObjects.size();)
     {

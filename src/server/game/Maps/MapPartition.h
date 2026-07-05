@@ -19,6 +19,7 @@
 #define MAPPARTITION_H
 
 #include "Common.h"
+#include "LockedQueue.h"
 #include <vector>
 
 class Map;
@@ -26,10 +27,11 @@ class WorldObject;
 
 /**
  * @class MapPartition 
- * @brief Represents a thread safe subdivision of a map
+ * @brief Represents a subdivision of a map
  *
- * To prevent bottlenecking on populated maps, the maps will be subdivided into map partitions.
- * Each partition will manage its own subset of entities and will run its update loop in parallel across multiple threads.
+ * Subdivides maps into paritions to avoid bottlenecking with high volumes of world objects
+ * Paritions manages it own subset of world objects
+ * Update loops run parallel across multiple threads
  */
 class MapPartition
 {
@@ -65,6 +67,12 @@ public:
     void RemoveObject(WorldObject* obj);
 
     /**
+     * @brief Safely queues an entity to be added to this partition
+     * @param obj the entity to queue
+     */
+    void QueueTransfer(WorldObject* obj);
+
+    /**
      * @brief Checks if a grid coordinate is within the partition
      * @param gridX The X of the coordinate to check
      * @param gridY The Y of the coordinate to check
@@ -87,6 +95,8 @@ private:
     uint16 _maxY;
 
     std::vector<WorldObject*> _updatableObjects;
+
+    LockedQueue<WorldObject*> _transferQueue;
 };
 
 #endif //MAPPARTITION_H

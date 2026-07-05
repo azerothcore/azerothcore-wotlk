@@ -44,6 +44,7 @@
 #include "VMapMgr2.h"
 #include "Weather.h"
 #include "WeatherMgr.h"
+#include "MapPartition.h"
 
 #define MAP_INVALID_ZONE        0xFFFFFFFF
 
@@ -62,6 +63,12 @@ Map::~Map()
 
     if (!m_scriptSchedule.empty())
         sScriptMgr->DecreaseScheduledScriptCount(m_scriptSchedule.size());
+
+    for (MapPartition* partition : _partitions)
+    {
+        delete partition;
+    }
+    _partitions.clear();
 }
 
 Map::Map(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent) :
@@ -80,6 +87,13 @@ Map::Map(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent) :
 
     _weatherUpdateTimer.SetInterval(1 * IN_MILLISECONDS);
     _corpseUpdateTimer.SetInterval(20 * MINUTE * IN_MILLISECONDS);
+
+    // Splits the 64x64 map grid into 4 quadrants, this is good for 4 core cpu
+    // Can expand the num of partitions, but they should be equal to the num of cpu cores the server is run on
+    _partitions.push_back(new MapPartition(this, 0, 31, 0, 31)); //Northwest
+    _partitions.push_back(new MapPartition(this, 32, 63, 0, 31)); //Northeast
+    _partitions.push_back(new MapPartition(this, 0, 31, 32, 63)); //Southwest
+    _partitions.push_back(new MapPartition(this, 32, 63, 32, 63)); //Southeast
 }
 
 // Hook called after map is created AND after added to map list
@@ -3522,4 +3536,17 @@ std::string InstanceMap::GetDebugInfo() const
         << std::boolalpha
         << "ScriptId: " << GetScriptId() << " ScriptName: " << GetScriptName();
     return sstr.str();
+}
+
+// Finds which of the partitions the coordniates belongs to
+MapPartition* Map::GetPartition(uint16 gridX, uint16 gridY)
+{
+    for (MapPartition* partition : _partitions)
+    {
+        if (partition->Contains(gridX, gridY))
+        {
+            return partition;
+        }
+    }
+    return nullptr;
 }
