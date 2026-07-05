@@ -2024,14 +2024,18 @@ void Pet::CleanupActionBar()
         if (UnitActionBarEntry const* ab = m_charmInfo->GetActionBarEntry(i))
             if (ab->GetAction() && ab->IsActionBarForSpell())
             {
-                if (!HasSpell(ab->GetAction()))
+                PetSpellMap::const_iterator spellItr = m_spells.find(ab->GetAction());
+                bool hasSpell = spellItr != m_spells.end() && spellItr->second.state != PETSPELL_REMOVED;
+
+                if (!hasSpell)
                     m_charmInfo->SetActionBar(i, 0, ACT_PASSIVE);
                 else if (SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(ab->GetAction()))
-                {
-                    auto spellItr = m_spells.find(ab->GetAction());
-                    bool autocast = spellItr != m_spells.end() ? spellItr->second.active == ACT_ENABLED : ab->GetType() == ACT_ENABLED;
-                    ToggleAutocast(spellInfo, autocast);
-                }
+                    // CharmInfo::LoadPetActionBar() runs before _LoadSpells()
+                    // while loading a pet, so the action bar entry's own type
+                    // can be stale relative to what's actually saved in
+                    // pet_spell. m_spells is populated by the time this runs,
+                    // so trust its active state over the action bar's copy.
+                    ToggleAutocast(spellInfo, spellItr->second.active == ACT_ENABLED);
             }
 }
 
