@@ -23,22 +23,25 @@
 
 #define ShadowLabyrinthScriptName "instance_shadow_labyrinth"
 
-enum slData
+enum slEncounterData
 {
-    TYPE_RITUALISTS                 = 0,
-    TYPE_HELLMAW                    = 1,
-    DATA_BLACKHEARTTHEINCITEREVENT  = 2,
-    DATA_GRANDMASTER_VORPIL         = 3,
-    DATA_GRANDMASTER_VORPIL_EVENT   = 4,
-    DATA_MURMUR                     = 5,
-    DATA_MURMUREVENT                = 6,
-    MAX_ENCOUNTER                   = 7
+    TYPE_HELLMAW                    = 0,
+    DATA_BLACKHEARTTHEINCITEREVENT  = 1,
+    DATA_GRANDMASTER_VORPIL         = 2,
+    DATA_MURMUR                     = 3
+};
+
+enum slPersistentData
+{
+    TYPE_RITUALISTS             = 0
 };
 
 enum slNPCandGO
 {
     NPC_CABAL_RITUALIST         = 18794,
     NPC_HELLMAW                 = 18731,
+    NPC_CABAL_SUMMONER          = 18634,
+    NPC_CABAL_SPELLBINDER       = 18639,
 
     GO_REFECTORY_DOOR           = 183296,                     //door opened when blackheart the inciter dies
     GO_SCREAMING_HALL_DOOR      = 183295                      //door opened when grandmaster vorpil dies

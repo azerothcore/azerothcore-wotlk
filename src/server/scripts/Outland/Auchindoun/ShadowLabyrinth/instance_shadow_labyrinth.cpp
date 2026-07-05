@@ -15,8 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GameTime.h"
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
+#include "Map.h"
+#include <set>
 #include "SpellScriptLoader.h"
 #include "shadow_labyrinth.h"
 #include "SpellScript.h"
@@ -55,6 +58,7 @@ public:
         }
 
         uint32 _ritualistsAliveCount;
+        std::set<ObjectGuid::LowType> _murmurReinforcementSpawnIds;
 
         void Initialize() override
         {
@@ -65,13 +69,71 @@ public:
         {
             InstanceScript::OnCreatureCreate(creature);
 
-            if (creature->GetEntry() == NPC_CABAL_RITUALIST)
+            switch (creature->GetEntry())
             {
-                if (creature->IsAlive())
+                case NPC_CABAL_RITUALIST:
+                    if (creature->IsAlive())
+                    {
+                        ++_ritualistsAliveCount;
+                    }
+                    break;
+                case NPC_CABAL_SUMMONER:
+                case NPC_CABAL_SPELLBINDER:
+                    // Only the corridor reinforcements have a short respawn timer:
+                    // they respawn endlessly to be zapped during Murmur's intro event.
+                    if (creature->GetRespawnDelay() < MINUTE)
+                    {
+                        _murmurReinforcementSpawnIds.insert(creature->GetSpawnId());
+                        if (GetBossState(DATA_MURMUR) == DONE)
+                        {
+                            creature->SetRespawnDelay(WEEK);
+                            if (!creature->IsAlive())
+                            {
+                                creature->SetRespawnTime(WEEK);
+                                creature->SaveRespawnTime();
+                            }
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        bool SetBossState(uint32 type, EncounterState state) override
+        {
+            if (!InstanceScript::SetBossState(type, state))
+                return false;
+
+            // Once Murmur is dead his corridor reinforcements must stop respawning
+            if (type == DATA_MURMUR && state == DONE)
+            {
+                for (ObjectGuid::LowType spawnId : _murmurReinforcementSpawnIds)
                 {
-                    ++_ritualistsAliveCount;
+                    bool found = false;
+                    auto const bounds = instance->GetCreatureBySpawnIdStore().equal_range(spawnId);
+                    for (auto itr = bounds.first; itr != bounds.second; ++itr)
+                    {
+                        found = true;
+                        Creature* reinforcement = itr->second;
+                        reinforcement->SetRespawnDelay(WEEK);
+                        if (!reinforcement->IsAlive())
+                        {
+                            reinforcement->SetRespawnTime(WEEK);
+                            reinforcement->SaveRespawnTime();
+                        }
+                    }
+
+                    if (!found)
+                    {
+                        // Died and already despawned: override its pending map-level respawn
+                        time_t respawnTime = GameTime::GetGameTime().count() + WEEK;
+                        instance->SaveCreatureRespawnTime(spawnId, respawnTime);
+                    }
                 }
             }
+
+            return true;
         }
 
         void OnUnitDeath(Unit* unit) override
