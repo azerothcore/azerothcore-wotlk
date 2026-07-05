@@ -568,44 +568,55 @@ bool IsNodeIncludedInShortenedPath(TaxiPathNodeEntry const* p1, TaxiPathNodeEntr
     return p1->mapid != p2->mapid || std::pow(p1->x - p2->x, 2) + std::pow(p1->y - p2->y, 2) > SKIP_SPLINE_POINT_DISTANCE_SQ;
 }
 
-void FlightPathMovementGenerator::LoadPath(Player* player)
+bool FlightPathMovementGenerator::LoadPath(Player* player)
 {
+    i_path.clear();
     _pointsForPathSwitch.clear();
+    auto fail = [&]()
+    {
+        i_path.clear();
+        _pointsForPathSwitch.clear();
+        return false;
+    };
+
     std::deque<uint32> const& taxi = player->m_taxi.GetPath();
     float discount = player->GetReputationPriceDiscount(player->m_taxi.GetFlightMasterFactionTemplate());
     for (uint32 src = 0, dst = 1; dst < taxi.size(); src = dst++)
     {
         uint32 path, cost;
         sObjectMgr->GetTaxiPath(taxi[src], taxi[dst], path, cost);
-        if (path > sTaxiPathNodesByPath.size())
-        {
-            return;
-        }
+        if (path >= sTaxiPathNodesByPath.size())
+            return fail();
 
         TaxiPathNodeList const& nodes = sTaxiPathNodesByPath[path];
-        if (!nodes.empty())
+        if (nodes.empty())
+            return fail();
+
+        TaxiPathNodeEntry const* start = nodes[0];
+        TaxiPathNodeEntry const* end = nodes[nodes.size() - 1];
+        bool passedPreviousSegmentProximityCheck = false;
+        bool addedPathNode = false;
+        for (uint32 i = 0; i < nodes.size(); ++i)
         {
-            TaxiPathNodeEntry const* start = nodes[0];
-            TaxiPathNodeEntry const* end = nodes[nodes.size() - 1];
-            bool passedPreviousSegmentProximityCheck = false;
-            for (uint32 i = 0; i < nodes.size(); ++i)
+            if (passedPreviousSegmentProximityCheck || !src || i_path.empty() || IsNodeIncludedInShortenedPath(i_path[i_path.size() - 1], nodes[i]))
             {
-                if (passedPreviousSegmentProximityCheck || !src || i_path.empty() || IsNodeIncludedInShortenedPath(i_path[i_path.size() - 1], nodes[i]))
+                if ((!src || (IsNodeIncludedInShortenedPath(start, nodes[i]) && i >= 2)) &&
+                    (dst == taxi.size() - 1 || (IsNodeIncludedInShortenedPath(end, nodes[i]) && i < nodes.size() - 1)))
                 {
-                    if ((!src || (IsNodeIncludedInShortenedPath(start, nodes[i]) && i >= 2)) &&
-                        (dst == taxi.size() - 1 || (IsNodeIncludedInShortenedPath(end, nodes[i]) && i < nodes.size() - 1)))
-                    {
-                        passedPreviousSegmentProximityCheck = true;
-                        i_path.push_back(nodes[i]);
-                    }
-                }
-                else
-                {
-                    i_path.pop_back();
-                    --_pointsForPathSwitch.back().PathIndex;
+                    passedPreviousSegmentProximityCheck = true;
+                    i_path.push_back(nodes[i]);
+                    addedPathNode = true;
                 }
             }
+            else
+            {
+                i_path.pop_back();
+                --_pointsForPathSwitch.back().PathIndex;
+            }
         }
+
+        if (!addedPathNode || i_path.empty())
+            return fail();
 
         _pointsForPathSwitch.push_back({ uint32(i_path.size() - 1), int32(ceil(cost * discount)) });
     }
@@ -630,6 +641,11 @@ void FlightPathMovementGenerator::LoadPath(Player* player)
         else
             i_currentNode = 0;
     }
+
+    if (i_path.empty())
+        return fail();
+
+    return true;
 }
 
 void FlightPathMovementGenerator::DoInitialize(Player* player)
