@@ -129,7 +129,6 @@ bool LoginQueryHolder::Initialize()
 
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MAIL);
     stmt->SetData(0, lowGuid);
-    stmt->SetData(1, uint32(GameTime::GetGameTime().count()));
     res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_MAILS, stmt);
 
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MAILITEMS);
@@ -950,33 +949,11 @@ void WorldSession::HandlePlayerLoginFromDB(LoginQueryHolder const& holder)
     // Place character in world (and load zone) before some object loading
     pCurrChar->LoadCorpse(holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_CORPSE_LOCATION));
 
-    // setting Ghost+speed if dead
+    // Re-send corpse reclaim delay — the packet is sent on death but not on relog,
+    // so the countdown timer disappears after logging back in while dead.
+    // CalculateCorpseReclaimDelay(true) returns the remaining time in milliseconds.
     if (pCurrChar->m_deathState != DeathState::Alive)
     {
-        // not blizz like, we must correctly save and load player instead...
-        if (pCurrChar->getRace() == RACE_NIGHTELF)
-            pCurrChar->CastSpell(pCurrChar, 20584, true, 0); // auras SPELL_AURA_INCREASE_SPEED(+speed in wisp form), SPELL_AURA_INCREASE_SWIM_SPEED(+swim speed in wisp form), SPELL_AURA_TRANSFORM (to wisp form)
-
-        pCurrChar->CastSpell(pCurrChar, 8326, true, 0);     // auras SPELL_AURA_GHOST, SPELL_AURA_INCREASE_SPEED(why?), SPELL_AURA_INCREASE_SWIM_SPEED(why?)
-
-        // The spectral gryphon mount (applied via spell_area when dead in Northrend) is applied
-        // immediately by HandleAuraSpecificMods but the client discards the visual during login.
-        // Remove any mount aura, let UpdateAreaDependentAuras reapply it via spell_area, then
-        // teleport to the same position to force the client to resync UNIT_FIELD_MOUNTDISPLAYID.
-        pCurrChar->m_Events.AddEventAtOffset([pCurrChar]
-        {
-            if (!pCurrChar->IsInWorld() || pCurrChar->IsAlive())
-                return;
-            pCurrChar->RemoveAurasByType(SPELL_AURA_MOUNTED);
-            pCurrChar->UpdateAreaDependentAuras(pCurrChar->GetAreaId());
-            pCurrChar->TeleportTo(pCurrChar->GetMapId(),
-                pCurrChar->GetPositionX(), pCurrChar->GetPositionY(),
-                pCurrChar->GetPositionZ(), pCurrChar->GetOrientation());
-        }, 400ms);
-
-        // Re-send corpse reclaim delay — the packet is sent on death but not on relog,
-        // so the countdown timer disappears after logging back in while dead.
-        // CalculateCorpseReclaimDelay(true) returns the remaining time in milliseconds.
         int32 delay = pCurrChar->CalculateCorpseReclaimDelay(true);
         if (delay > 0)
             pCurrChar->SendCorpseReclaimDelay(uint32(delay));

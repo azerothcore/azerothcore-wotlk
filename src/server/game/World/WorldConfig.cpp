@@ -348,6 +348,17 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<bool>(CONFIG_CHAT_MUTE_FIRST_LOGIN, "Chat.MuteFirstLogin", false);
     SetConfigValue<uint32>(CONFIG_CHAT_TIME_MUTE_FIRST_LOGIN, "Chat.MuteTimeFirstLogin", 120);
 
+    SetConfigValue<bool>(CONFIG_TRIAL_RESTRICTION_CHAT, "Trial.Restriction.Chat", true);
+    SetConfigValue<bool>(CONFIG_TRIAL_RESTRICTION_MAIL, "Trial.Restriction.Mail", true);
+    SetConfigValue<bool>(CONFIG_TRIAL_RESTRICTION_TRADE, "Trial.Restriction.Trade", true);
+    SetConfigValue<bool>(CONFIG_TRIAL_RESTRICTION_AUCTION, "Trial.Restriction.Auction", true);
+    SetConfigValue<bool>(CONFIG_TRIAL_RESTRICTION_PARTY, "Trial.Restriction.Party", true);
+    SetConfigValue<bool>(CONFIG_TRIAL_RESTRICTION_GUILD, "Trial.Restriction.Guild", true);
+    SetConfigValue<bool>(CONFIG_TRIAL_RESTRICTION_QUEUE, "Trial.Restriction.Queue", true);
+    SetConfigValue<uint32>(CONFIG_TRIAL_LEVEL_CAP, "Trial.LevelCap", 20);
+    SetConfigValue<uint32>(CONFIG_TRIAL_MONEY_CAP, "Trial.MoneyCap", 100000); // copper, 10 gold
+    SetConfigValue<uint32>(CONFIG_TRIAL_TRADE_SKILL_CAP, "Trial.TradeSkillCap", 100);
+
     SetConfigValue<uint32>(CONFIG_EVENT_ANNOUNCE, "Event.Announce", 0);
 
     SetConfigValue<float>(CONFIG_CREATURE_LEASH_RADIUS, "CreatureLeashRadius", 30.0f);
@@ -602,6 +613,7 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_WINTERGRASP_SKIP_BATTLE_SESSION_COUNT, "Wintergrasp.SkipBattleSessionCount", 3500);
     SetConfigValue<bool>(CONFIG_WINTERGRASP_KICK_VOA_PLAYERS, "Wintergrasp.KickVoAPlayers", true, ConfigValueCache::Reloadable::No);
     SetConfigValue<bool>(CONFIG_WINTERGRASP_ESSENCE_BOTH_FACTIONS, "Wintergrasp.EssenceBothFactions", false);
+    SetConfigValue<uint32>(CONFIG_WINTERGRASP_DEFER_SHUTDOWN, "Wintergrasp.DeferShutdownTimer", 0);
 
     SetConfigValue<uint32>(CONFIG_BIRTHDAY_TIME, "BirthdayTime", 1222964635);
     SetConfigValue<bool>(CONFIG_MINIGOB_MANABONK, "Minigob.Manabonk.Enable", true);
@@ -652,8 +664,6 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<bool>(CONFIG_DUNGEON_ACCESS_REQUIREMENTS_PORTAL_CHECK_ILVL, "DungeonAccessRequirements.PortalAvgIlevelCheck", false);
     SetConfigValue<bool>(CONFIG_DUNGEON_ACCESS_REQUIREMENTS_LFG_DBC_LEVEL_OVERRIDE, "DungeonAccessRequirements.LFGLevelDBCOverride", false);
     SetConfigValue<uint32>(CONFIG_DUNGEON_ACCESS_REQUIREMENTS_OPTIONAL_STRING_ID, "DungeonAccessRequirements.OptionalStringID", 0);
-    SetConfigValue<uint32>(CONFIG_NPC_EVADE_IF_NOT_REACHABLE, "NpcEvadeIfTargetIsUnreachable", 5);
-    SetConfigValue<uint32>(CONFIG_NPC_REGEN_TIME_IF_NOT_REACHABLE_IN_RAID, "NpcRegenHPTimeIfTargetIsUnreachable", 10);
     SetConfigValue<bool>(CONFIG_REGEN_HP_CANNOT_REACH_TARGET_IN_RAID, "NpcRegenHPIfTargetIsUnreachable", true);
 
     //Debug
