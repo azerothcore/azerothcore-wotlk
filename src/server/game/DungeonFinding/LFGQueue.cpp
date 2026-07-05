@@ -374,7 +374,7 @@ namespace lfg
                 LfgDungeonSet temporal;
                 LfgDungeonSet& dungeons = QueueDataStore[check.guids[i]].dungeons;
                 std::set_intersection(proposalDungeons.begin(), proposalDungeons.end(), dungeons.begin(), dungeons.end(), std::inserter(temporal, temporal.begin()));
-                proposalDungeons = temporal;
+                std::swap(proposalDungeons, temporal);
             }
 
             if (proposalDungeons.empty())
