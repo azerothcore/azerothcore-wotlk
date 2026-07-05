@@ -137,15 +137,16 @@ jobs:
 
       - name: Echo cache key
         shell: bash
-        run: echo "Cache key -> ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}"
+        run: echo "Cache key -> ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}-${{ github.run_id }}"
 
       - name: Restore ccache
         id: restore_ccache
         uses: actions/cache/restore@v4
         with:
           path: ${{ github.workspace }}/var/ccache
-          key: ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}
+          key: ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}-${{ github.run_id }}
           restore-keys: |
+            ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}-
             ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:true:pch=false:
             ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:false:pch=false:
             ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:true:pch=true:
@@ -164,10 +165,10 @@ jobs:
           CCACHE_BASEDIR=${{ github.workspace }}
           CCACHE_DIR=${{ github.workspace }}/var/ccache
           CCACHE_HASHDIR=1
-          CCACHE_MAXSIZE=5G
+          CCACHE_MAXSIZE=2G
           CCACHE_SLOPPINESS=pch_defines,time_macros,include_file_mtime
           CCACHE_COMPRESS=1
-          CCACHE_COMPRESSLEVEL=9
+          CCACHE_COMPRESSLEVEL=3
           CCACHE_COMPILERCHECK=content
           CCACHE_LOGFILE=${{ github.workspace }}/var/ccache/cache.debug
           CMAKE_C_COMPILER_LAUNCHER=ccache
@@ -273,13 +274,15 @@ jobs:
         timeout-minutes: 30
         continue-on-error: false
 
-      # save only if we didn't hit the cache
+      # Always save: the primary key is unique per run (`-${{ github.run_id }}`)
+      # so this never collides with an existing cache. Saving unconditionally
+      # keeps the cache fresh as the branch accumulates commits.
       - name: Save ccache
-        if: steps.restore_ccache.outputs.cache-hit != 'true'
+        if: always()
         uses: actions/cache/save@v4
         with:
           path: ${{ github.workspace }}/var/ccache
-          key: ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}
+          key: ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}-${{ github.run_id }}
 
       - name: ccache stats (after)
         shell: bash
