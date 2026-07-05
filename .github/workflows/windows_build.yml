@@ -69,6 +69,10 @@ jobs:
               if ($boostMB -lt 50) { throw "Boost installer download looks wrong ($([int]$boostMB) MB) - likely an HTML page." }
               $boostProc = Start-Process -FilePath $boostExe -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/DIR=C:\local\boost_1_87_0' -Wait -PassThru
               if ($boostProc.ExitCode -ne 0) { throw "Boost installer failed with exit code $($boostProc.ExitCode)." }
+              # Fail fast if the installer "succeeded" but didn't lay down the expected tree,
+              # instead of surfacing a cryptic error later during CMake configuration.
+              if (-not (Test-Path 'C:\local\boost_1_87_0\boost\version.hpp')) { throw 'Boost install missing headers at C:\local\boost_1_87_0\boost.' }
+              if (-not (Test-Path 'C:\local\boost_1_87_0\lib64-msvc-14.3')) { throw 'Boost install missing prebuilt libs at C:\local\boost_1_87_0\lib64-msvc-14.3.' }
           }
 
           # --- MySQL 8.4 client headers + libs -> C:\tools\mysql\current (path the build expects) ---
@@ -85,6 +89,9 @@ jobs:
               Expand-Archive -Path $mysqlZip -DestinationPath 'C:\tools\mysql' -Force
               if (Test-Path 'C:\tools\mysql\current') { Remove-Item -Recurse -Force 'C:\tools\mysql\current' }
               Rename-Item 'C:\tools\mysql\mysql-8.4.9-winx64' 'C:\tools\mysql\current'
+              # Fail fast if the archive layout changed and the client import library isn't
+              # where the build expects it, rather than failing later during CMake/link.
+              if (-not (Test-Path 'C:\tools\mysql\current\lib\mysqlclient.lib')) { throw 'MySQL client import library missing at C:\tools\mysql\current\lib\mysqlclient.lib.' }
           }
 
           # --- OpenSSL: use the copy already installed on the runner image ---
