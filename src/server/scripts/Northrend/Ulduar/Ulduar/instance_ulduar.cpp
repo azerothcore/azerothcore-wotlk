@@ -361,7 +361,13 @@ public:
                             {
                                 go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
                                 go->SetLootRecipient(instance);
-                                go->SetRespawnTime(7 * DAY);
+                                // GameObject::Update()'s GO_JUST_DEACTIVATED handler only
+                                // deletes a non-consumable chest (chest.consumable/data3 is
+                                // sniffed 0 here, and that's not something to override via
+                                // SQL) if GetSpellId() is set AND m_respawnTime is still 0 -
+                                // SetSpellId(1) alone (no SetRespawnTime call, which would
+                                // make m_respawnTime nonzero and block this) gets us there.
+                                go->SetSpellId(1);
                             }
                         }
                     }
