@@ -1,0 +1,4 @@
+UPDATE `command` SET `help` = 'Syntax: .titles add #title [$playername]\r\nAdd title #title (id or shift-link) to known titles list for selected or named character.' WHERE `name` = 'titles add';
+UPDATE `command` SET `help` = 'Syntax: .titles current #title [$playername]\r\nSet title #title (id or shift-link) as current selected title for selected or named character. If title is not in known title list for character then it will be added to list.' WHERE `name` = 'titles current';
+UPDATE `command` SET `help` = 'Syntax: .titles remove #title [$playername]\r\nRemove title #title (id or shift-link) from known titles list for selected or named character.' WHERE `name` = 'titles remove';
+UPDATE `command` SET `help` = 'Syntax: .titles set mask #mask [$playername]\r\n\r\nAllows user to use all titles from #mask for selected or named character.\r\n\r\n #mask=0 disables the title-choose-field' WHERE `name` = 'titles set mask';
