@@ -88,6 +88,7 @@ ObjectData const creatureData[] =
     { NPC_IGNIS,        BOSS_IGNIS      },
     { NPC_RAZORSCALE,   BOSS_RAZORSCALE },
     { NPC_XT002,        BOSS_XT002      },
+    { NPC_HEART_OF_DECONSTRUCTOR,DATA_XT002_HEART },
     { NPC_KOLOGARN,     BOSS_KOLOGARN   },
     { NPC_AURIAYA,      BOSS_AURIAYA    },
     { NPC_MIMIRON,      BOSS_MIMIRON    },
