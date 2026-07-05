@@ -397,7 +397,7 @@ struct instance_blackrock_depths : public InstanceScript
                 break;
             case NPC_SHADOWFORGE_SENATOR:
                 deadSenators = 1; //hacky, but we cannot count the unit that just died through its state because OnUnitDeath() is called before the state is set.
-                for (const auto &senatorGUID: EmperorSenatorsVector)
+                for (auto const&senatorGUID: EmperorSenatorsVector)
                     if (Creature* senator = instance->GetCreature(senatorGUID))
                         if (!senator->IsAlive() || senator->isDying())
                             deadSenators++;
@@ -684,7 +684,7 @@ struct instance_blackrock_depths : public InstanceScript
         return str_data;
     }
 
-    void Load(const char* in) override
+    void Load(char const* in) override
     {
         if (!in)
         {

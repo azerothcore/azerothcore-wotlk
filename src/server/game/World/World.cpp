@@ -265,7 +265,7 @@ void World::LoadConfigSettings(bool reload)
 #if AC_PLATFORM == AC_PLATFORM_UNIX || AC_PLATFORM == AC_PLATFORM_APPLE
     if (dataPath[0] == '~')
     {
-        const char* home = getenv("HOME");
+        char const* home = getenv("HOME");
         if (home)
             dataPath.replace(0, 1, home);
     }

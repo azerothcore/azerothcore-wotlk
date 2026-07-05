@@ -514,7 +514,7 @@ void PathGenerator::BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 con
     BuildPointPath(startPoint, endPoint);
 }
 
-void PathGenerator::BuildPointPath(const float* startPoint, const float* endPoint)
+void PathGenerator::BuildPointPath(float const* startPoint, float const* endPoint)
 {
     float pathPoints[MAX_POINT_PATH_LENGTH * VERTEX_SIZE];
     uint32 pointCount = 0;
@@ -712,7 +712,7 @@ NavTerrain PathGenerator::GetNavTerrain(float x, float y, float z) const
     }
 }
 
-bool PathGenerator::HaveTile(const G3D::Vector3& p) const
+bool PathGenerator::HaveTile(G3D::Vector3 const& p) const
 {
     int tx = -1, ty = -1;
     float point[VERTEX_SIZE] = { p.y, p.z, p.x };

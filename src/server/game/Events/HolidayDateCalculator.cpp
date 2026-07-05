@@ -143,7 +143,7 @@ static const std::vector<HolidayRule> HolidayRules = {
     { HOLIDAY_DARKMOON_FAIRE_SHATTRATH, HolidayCalculationType::DARKMOON_FAIRE, 2, 0, 0, -2 }  // Feb, May, Aug, Nov
 };
 
-const std::vector<HolidayRule>& HolidayDateCalculator::GetHolidayRules()
+std::vector<HolidayRule> const& HolidayDateCalculator::GetHolidayRules()
 {
     return HolidayRules;
 }
@@ -479,7 +479,7 @@ std::tm HolidayDateCalculator::CalculateWinterSolstice(int year)
     return result;
 }
 
-std::tm HolidayDateCalculator::CalculateHolidayDate(const HolidayRule& rule, int year)
+std::tm HolidayDateCalculator::CalculateHolidayDate(HolidayRule const& rule, int year)
 {
     std::tm result = {};
 
@@ -572,7 +572,7 @@ std::tm HolidayDateCalculator::CalculateHolidayDate(const HolidayRule& rule, int
     return result;
 }
 
-uint32_t HolidayDateCalculator::PackDate(const std::tm& date)
+uint32_t HolidayDateCalculator::PackDate(std::tm const& date)
 {
     // WoW packed date format (same as ByteBuffer::AppendPackedTime):
     // bits 24-28: year offset from 2000 (5 bits = 0-31, valid years 2000-2031)
@@ -648,7 +648,7 @@ std::vector<uint32_t> HolidayDateCalculator::GetDarkmoonFaireDates(int locationO
     return dates;
 }
 
-time_t HolidayDateCalculator::FindStartTimeForStage(const uint32_t* packedDates, uint8_t numDates,
+time_t HolidayDateCalculator::FindStartTimeForStage(uint32_t const* packedDates, uint8_t numDates,
     time_t stageOffset, uint32_t stageLengthMinutes, time_t curTime)
 {
     for (uint8_t i = 0; i < numDates && packedDates[i]; ++i)

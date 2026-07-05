@@ -177,7 +177,7 @@ public:
             {
                 if (candidates.empty())
                     break;
-                const Position &randomPos = PosWrap[positions[i]];
+                Position const&randomPos = PosWrap[positions[i]];
 
                 auto itr = candidates.begin();
 

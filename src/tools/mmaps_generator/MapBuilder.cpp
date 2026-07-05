@@ -55,7 +55,7 @@ namespace MMAP
             m_workerThread.join();
     }
 
-    MapBuilder::MapBuilder(Config* config, int mapid, const char* offMeshFilePath, unsigned int threads) :
+    MapBuilder::MapBuilder(Config* config, int mapid, char const* offMeshFilePath, unsigned int threads) :
         m_config             (config),
         m_debugOutput        (config->IsDebugOutputEnabled()),
         m_offMeshFilePath    (offMeshFilePath),
@@ -1060,7 +1060,7 @@ namespace MMAP
         return header.recastConfig == desiredRecastConfig;
     }
 
-    rcConfig MapBuilder::getRecastConfig(const ResolvedMeshConfig &cfg, float bmin[3], float bmax[3]) const
+    rcConfig MapBuilder::getRecastConfig(ResolvedMeshConfig const&cfg, float bmin[3], float bmax[3]) const
     {
         rcConfig config;
         memset(&config, 0, sizeof(rcConfig));

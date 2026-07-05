@@ -182,7 +182,7 @@ public:
                     break;
             }
             if (creature->GetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID))
-                if (const CreatureAddon* ca = creature->GetCreatureAddon())
+                if (CreatureAddon const* ca = creature->GetCreatureAddon())
                     if (ca->mount != creature->GetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID))
                         creature->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, ca->mount);
         }
@@ -216,7 +216,7 @@ public:
             return str_data;
         }
 
-        void Load(const char* in) override
+        void Load(char const* in) override
         {
             CLEANED = false;
             events.Reset();
@@ -269,7 +269,7 @@ public:
         bool DoNeedCleanup(Player* ignoredPlayer = nullptr)
         {
             uint8 aliveCount = 0;
-            for (const auto &itr: instance->GetPlayers())
+            for (auto const&itr: instance->GetPlayers())
             {
                 if (Player* plr = itr.GetSource())
                 {

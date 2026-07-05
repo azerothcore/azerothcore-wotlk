@@ -86,7 +86,7 @@ namespace MMAP
 
     uint32 const MAP_VERSION_MAGIC = 9;
 
-    TerrainBuilder::TerrainBuilder(const std::string &dataDirPath, bool skipLiquid) :
+    TerrainBuilder::TerrainBuilder(std::string const&dataDirPath, bool skipLiquid) :
                 m_skipLiquid (skipLiquid),
                 m_mapsPath((std::filesystem::path(dataDirPath) / "maps").string()),
                 m_vmapsPath((std::filesystem::path(dataDirPath) / "vmaps").string())
@@ -927,7 +927,7 @@ namespace MMAP
     }
 
     /**************************************************************************/
-    void TerrainBuilder::loadOffMeshConnections(uint32 mapID, uint32 tileX, uint32 tileY, MeshData& meshData, const char* offMeshFilePath)
+    void TerrainBuilder::loadOffMeshConnections(uint32 mapID, uint32 tileX, uint32 tileY, MeshData& meshData, char const* offMeshFilePath)
     {
         // no meshfile input given?
         if (!offMeshFilePath)

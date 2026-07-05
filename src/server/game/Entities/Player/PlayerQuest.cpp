@@ -288,7 +288,7 @@ bool Player::CanAddQuest(Quest const* quest, bool msg)
     return true;
 }
 
-bool Player::CanCompleteQuest(uint32 quest_id, const QuestStatusData* q_savedStatus)
+bool Player::CanCompleteQuest(uint32 quest_id, QuestStatusData const* q_savedStatus)
 {
     if (quest_id)
     {
@@ -2442,7 +2442,7 @@ void Player::SendCanTakeQuestResponse(QuestFailedReason msg) const
     LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTGIVER_QUEST_INVALID");
 }
 
-void Player::SendQuestConfirmAccept(const Quest* quest, Player* pReceiver)
+void Player::SendQuestConfirmAccept(Quest const* quest, Player* pReceiver)
 {
     if (pReceiver)
     {
@@ -2451,7 +2451,7 @@ void Player::SendQuestConfirmAccept(const Quest* quest, Player* pReceiver)
 
         int loc_idx = pReceiver->GetSession()->GetSessionDbLocaleIndex();
         if (loc_idx >= 0)
-            if (const QuestLocale* pLocale = sObjectMgr->GetQuestLocale(quest->GetQuestId()))
+            if (QuestLocale const* pLocale = sObjectMgr->GetQuestLocale(quest->GetQuestId()))
                 ObjectMgr::GetLocaleString(pLocale->Title, loc_idx, strTitle);
 
         WorldPackets::Quest::QuestConfirmAccept questConfirmAccept;

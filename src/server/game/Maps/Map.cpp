@@ -2933,7 +2933,7 @@ void Map::LogEncounterFinished(EncounterCreditType type, uint32 creditEntry)
         if (Player* p = itr->GetSource())
         {
             std::string auraStr;
-            const Unit::AuraApplicationMap& a = p->GetAppliedAuras();
+            Unit::AuraApplicationMap const& a = p->GetAppliedAuras();
             for (auto iterator = a.begin(); iterator != a.end(); ++iterator)
             {
                 snprintf(buffer2, 255, "%u(%u) ", iterator->first, iterator->second->GetEffectMask());

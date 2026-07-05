@@ -56,7 +56,7 @@ struct GroupQueueInfo;
 class AllBattlegroundScript : public ScriptObject
 {
 protected:
-    AllBattlegroundScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
+    AllBattlegroundScript(char const* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     [[nodiscard]] bool IsDatabaseBound() const override { return false; }
