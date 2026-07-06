@@ -26,7 +26,7 @@ class Map;
 class WorldObject;
 
 /**
- * @class MapPartition 
+ * @class MapPartition
  * @brief Represents a subdivision of a map
  *
  * Subdivides maps into paritions to avoid bottlenecking with high volumes of world objects
@@ -46,7 +46,7 @@ public:
      */
     MapPartition(Map* parent, uint16 minGridX, uint16 maxGridX, uint16 minGridY, uint16 maxGridY);
 
-    ~MapPartition() = default;  
+    ~MapPartition() = default;
 
     /**
      * @brief The core AI and physics loop for the partition
@@ -96,7 +96,7 @@ private:
 
     std::vector<WorldObject*> _updatableObjects;
 
-    LockedQueue<WorldObject*> _transferQueue;
+    LockedQueue<ObjectGuid> _transferQueue;
 };
 
 #endif //MAPPARTITION_H

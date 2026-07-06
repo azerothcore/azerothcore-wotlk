@@ -19,6 +19,11 @@
 #include "Map.h"
 #include "Object.h"
 #include <algorithm>
+#include "ObjectAccessor.h"
+#include "Player.h"
+#include "Pet.h"
+#include "DynamicObject.h"
+#include "Corpse.h"
 
 // Constructor: Initializes a MapPartition object with its parent map and grid boudnaries
 MapPartition::MapPartition(Map* parent, uint16 minGridX, uint16 maxGridX, uint16 minGridY, uint16 maxGridY)
@@ -45,7 +50,7 @@ void MapPartition::RemoveObject(WorldObject* obj)
     auto it = std::find(_updatableObjects.begin(), _updatableObjects.end(), obj);
     if (it != _updatableObjects.end())
     {
-        //overwrites the deleted object with the last object in the list and shrinks the list size by 1 
+        //overwrites the deleted object with the last object in the list and shrinks the list size by 1
         *it = _updatableObjects.back();
         _updatableObjects.pop_back();
 
@@ -60,16 +65,34 @@ void MapPartition::RemoveObject(WorldObject* obj)
 //Pushes a world object into the transfer queue
 void MapPartition::QueueTransfer(WorldObject* obj)
 {
-    _transferQueue.add(obj);
+    if(obj)
+    {
+        _transferQueue.add(obj->GetGUID());
+    }
 }
 
 // The core physics and AI update loop
 void MapPartition::Update(uint32 const diff)
 {
     //Add objects from transfer queue before starting updates
-    WorldObject* incomingObj = nullptr;
-    while (_transferQueue.next(incomingObj))
+    ObjectGuid incomingGuid;
+    while (_transferQueue.next(incomingGuid))
     {
+        WorldObject* incomingObj = nullptr;
+
+        switch (incomingGuid.GetHigh())
+        {
+        case HighGuid::Player: incomingObj = ObjectAccessor::FindPlayer(incomingGuid); break;
+        case HighGuid::Transport:
+        case HighGuid::Mo_Transport:
+        case HighGuid::GameObject: incomingObj = _parentMap->GetGameObject(incomingGuid); break;
+        case HighGuid::Vehicle:
+        case HighGuid::Unit: incomingObj = _parentMap->GetCreature(incomingGuid); break;
+        case HighGuid::Pet: incomingObj = _parentMap->GetPet(incomingGuid); break;
+        case HighGuid::DynamicObject: incomingObj = _parentMap->GetDynamicObject(incomingGuid); break;
+        case HighGuid::Corpse: incomingObj = _parentMap->GetCorpse(incomingGuid); break;
+        default: break;
+        }
         if (incomingObj && incomingObj->IsInWorld())
         {
             AddObject(incomingObj);
@@ -121,7 +144,8 @@ void MapPartition::Update(uint32 const diff)
 
             // intentionally skip ++i because RemoveObject swaps array elements
         }
-        else {
+        else
+        {
             // object gets updated and is still active, moves onto the next object
             ++i;
         }

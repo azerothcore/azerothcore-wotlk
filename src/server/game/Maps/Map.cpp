@@ -565,7 +565,7 @@ void Map::UpdateNonPlayerObjects(uint32 const diff)
     // stop master thread until cores finish calculations
     for (auto& future : futures)
     {
-        future.wait();
+        future.get();
     }
 }
 
@@ -706,7 +706,7 @@ void Map::HandleDelayedVisibility()
             return;
         localCopy = std::move(i_objectsForDelayedVisibility);
     }
-    
+
     for (std::unordered_set<Unit*>::iterator itr = localCopy.begin(); itr != localCopy.end(); ++itr)
         (*itr)->ExecuteDelayedUnitRelocationEvent();
 }

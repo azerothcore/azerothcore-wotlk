@@ -704,7 +704,7 @@ private:
     std::mutex _updateObjectsLock;
     // protects _creaturesToMove, _gameObjectsToMove, _dynamicObjectsToMove when mutliple partitions trigger object relocations concurrently
     std::mutex _moveListLock;
-    
+
     std::unordered_set<Object*> _updateObjects;
 
     UpdatableObjectList _updatableObjectList;
