@@ -91,6 +91,11 @@ void MapPartition::Update(uint32 const diff)
         // triggers combat, spellcasting, movement, and pathfinding calc here
         obj->Update(diff);
 
+        if (i >= _updatableObjects.size() || _updatableObjects[i] != obj)
+        {
+            continue;
+        }
+
         // Check if the object is no longer within the partition
         GridCoord currentGrid = Acore::ComputeGridCoord(obj->GetPositionX(), obj->GetPositionY());
         if (!Contains(currentGrid.x_coord, currentGrid.y_coord))

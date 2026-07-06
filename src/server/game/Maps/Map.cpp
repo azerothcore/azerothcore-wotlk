@@ -194,11 +194,15 @@ void Map::DeleteFromWorld(Player* player)
 
 void Map::EnsureGridCreated(GridCoord const& gridCoord)
 {
+    // prevent concurrent MapGridManager memory corruption
+    std::lock_guard<std::recursive_mutex> lock(_gridLock);
     _mapGridManager.CreateGrid(gridCoord.x_coord, gridCoord.y_coord);
 }
 
 bool Map::EnsureGridLoaded(Cell const& cell)
 {
+    // prevent concurrent NavMesh corruption from addTile()
+    std::lock_guard<std::recursive_mutex> lock(_gridLock);
     EnsureGridCreated(GridCoord(cell.GridX(), cell.GridY()));
 
     if (_mapGridManager.LoadGrid(cell.GridX(), cell.GridY()))
@@ -696,11 +700,17 @@ ZoneWideVisibleWorldObjectsSet const* Map::GetZoneWideVisibleWorldObjectsForZone
 
 void Map::HandleDelayedVisibility()
 {
-    if (i_objectsForDelayedVisibility.empty())
-        return;
-    for (std::unordered_set<Unit*>::iterator itr = i_objectsForDelayedVisibility.begin(); itr != i_objectsForDelayedVisibility.end(); ++itr)
+    std::unordered_set<Unit*> localCopy;
+    {
+        // Lock set and safely move the contents to a local copy to prevent deadlocks
+        std::lock_guard<std::mutex> lock(_delayedVisibilityLock);
+        if (i_objectsForDelayedVisibility.empty())
+            return;
+        localCopy = std::move(i_objectsForDelayedVisibility);
+    }
+    
+    for (std::unordered_set<Unit*>::iterator itr = localCopy.begin(); itr != localCopy.end(); ++itr)
         (*itr)->ExecuteDelayedUnitRelocationEvent();
-    i_objectsForDelayedVisibility.clear();
 }
 
 struct ResetNotifier
@@ -827,9 +837,7 @@ void Map::CreatureRelocation(Creature* creature, float x, float y, float z, floa
 
     if (old_cell.DiffGrid(new_cell) || old_cell.DiffCell(new_cell))
     {
-        if (old_cell.DiffGrid(new_cell))
-            EnsureGridLoaded(new_cell);
-
+        //Removed EnsureGridLoaded(new_cell), runs syncronously in MoveAllCreatures later and will corrupt pathfinding if ran here
         AddCreatureToMoveList(creature);
     }
     else
@@ -849,9 +857,7 @@ void Map::GameObjectRelocation(GameObject* go, float x, float y, float z, float 
 
     if (old_cell.DiffGrid(new_cell) || old_cell.DiffCell(new_cell))
     {
-        if (old_cell.DiffGrid(new_cell))
-            EnsureGridLoaded(new_cell);
-
+        //Removed EnsureGridLoaded(new_cell), runs syncronously in MoveAllCreatures later and will corrupt pathfinding if ran here
         AddGameObjectToMoveList(go);
     }
     else
@@ -885,6 +891,7 @@ void Map::DynamicObjectRelocation(DynamicObject* dynObj, float x, float y, float
 
 void Map::AddCreatureToMoveList(Creature* c)
 {
+    std::lock_guard<std::mutex> lock(_moveListLock);
     if (c->_moveState == MAP_OBJECT_CELL_MOVE_NONE)
         _creaturesToMove.push_back(c);
     c->_moveState = MAP_OBJECT_CELL_MOVE_ACTIVE;
@@ -898,6 +905,7 @@ void Map::RemoveCreatureFromMoveList(Creature* c)
 
 void Map::AddGameObjectToMoveList(GameObject* go)
 {
+    std::lock_guard<std::mutex> lock(_moveListLock);
     if (go->_moveState == MAP_OBJECT_CELL_MOVE_NONE)
         _gameObjectsToMove.push_back(go);
     go->_moveState = MAP_OBJECT_CELL_MOVE_ACTIVE;
@@ -911,6 +919,7 @@ void Map::RemoveGameObjectFromMoveList(GameObject* go)
 
 void Map::AddDynamicObjectToMoveList(DynamicObject* dynObj)
 {
+    std::lock_guard<std::mutex> lock(_moveListLock);
     if (dynObj->_moveState == MAP_OBJECT_CELL_MOVE_NONE)
         _dynamicObjectsToMove.push_back(dynObj);
     dynObj->_moveState = MAP_OBJECT_CELL_MOVE_ACTIVE;
@@ -1022,6 +1031,8 @@ void Map::MoveAllDynamicObjectsInMoveList()
 
 bool Map::UnloadGrid(MapGridType& grid)
 {
+    // prevent concurrent NavMesh corruption from removeTile()
+    std::lock_guard<std::recursive_mutex> lock(_gridLock);
     _mapGridManager.UnloadGrid(grid.GetX(), grid.GetY());
 
     ASSERT(i_objectsToRemove.empty());

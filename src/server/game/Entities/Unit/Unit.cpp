@@ -521,7 +521,11 @@ void Unit::Update(uint32 p_time)
             {
                 m_delayed_unit_relocation_timer = 0;
                 //ExecuteDelayedUnitRelocationEvent();
-                FindMap()->i_objectsForDelayedVisibility.insert(this);
+                {
+                    // Locks the maps delayed visibility list to prevent concurrent unordered_set corruption
+                    std::lock_guard<std::mutex> lock(FindMap()->_delayedVisibilityLock);
+                    FindMap()->i_objectsForDelayedVisibility.insert(this);
+                }
             }
             else
                 m_delayed_unit_relocation_timer -= p_time;

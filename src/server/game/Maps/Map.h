@@ -43,6 +43,7 @@
 #include <memory>
 #include <set>
 #include <shared_mutex>
+#include <mutex>
 
 class Unit;
 class WorldPacket;
@@ -525,11 +526,13 @@ public:
 
     void AddUpdateObject(Object* obj)
     {
+        std::lock_guard<std::mutex> lock(_updateObjectsLock);
         _updateObjects.insert(obj);
     }
 
     void RemoveUpdateObject(Object* obj)
     {
+        std::lock_guard<std::mutex> lock(_updateObjectsLock);
         _updateObjects.erase(obj);
     }
 
@@ -567,6 +570,11 @@ public:
 
     MapPartition* GetPartition(uint16 gridX, uint16 gridY);
     std::vector<MapPartition*> const& GetPartitions() const { return _partitions; }
+
+    // protects i_objectsForDelayedVisibility when multiple partitions Uint::Update call insert() concurrently
+    std::mutex _delayedVisibilityLock;
+    // protects MapGridManager and NavMesh from concurrent memory corruption and infinite loops
+    std::recursive_mutex _gridLock;
 
 private:
 
@@ -692,6 +700,11 @@ private:
     std::unordered_map<ObjectGuid, Corpse*> _corpsesByPlayer;
     std::unordered_set<Corpse*> _corpseBones;
 
+    // mutex prevents unordered_set corruption during the multithreaded MapPartition updates
+    std::mutex _updateObjectsLock;
+    // protects _creaturesToMove, _gameObjectsToMove, _dynamicObjectsToMove when mutliple partitions trigger object relocations concurrently
+    std::mutex _moveListLock;
+    
     std::unordered_set<Object*> _updateObjects;
 
     UpdatableObjectList _updatableObjectList;
