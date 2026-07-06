@@ -65,7 +65,7 @@ void MapPartition::RemoveObject(WorldObject* obj)
 //Pushes a world object into the transfer queue
 void MapPartition::QueueTransfer(WorldObject* obj)
 {
-    if(obj)
+    if (obj)
     {
         _transferQueue.add(obj->GetGUID());
     }
