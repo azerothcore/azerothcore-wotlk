@@ -172,6 +172,7 @@ enum UlduarNPCs
     NPC_THORIM                              = 32865,
     NPC_FREYA                               = 32906,
     NPC_VEZAX                               = 33271,
+    NPC_SARONITE_ANIMUS                     = 33524,
     NPC_SARA                                = 33134,
     NPC_YOGGSARON                           = 33288,
     NPC_BRAIN_OF_YOGG_SARON                 = 33890,
