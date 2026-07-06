@@ -758,10 +758,12 @@ struct boss_mimiron : public BossAI
                 // spawn chest
                 if (uint32 chestId = (_hardmode ? RAID_MODE(GO_MIMIRON_CHEST_HARD, GO_MIMIRON_CHEST_HERO_HARD) : RAID_MODE(GO_MIMIRON_CHEST, GO_MIMIRON_CHEST_HERO)))
                 {
-                    if (GameObject* go = me->SummonGameObject(chestId, 2744.65f, 2569.46f, 364.397f, 0, 0, 0, 0, 0, 0))
+                    // Summoned by the map, not Mimiron, so the chest survives his despawn during the outro.
+                    if (GameObject* go = me->GetMap()->SummonGameObject(chestId, 2744.65f, 2569.46f, 364.397f, 0, 0, 0, 0, 0, 0))
                     {
                         go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
                         go->SetLootRecipient(me->GetMap());
+                        go->SetRespawnTime(7 * DAY);
                     }
                 }
                 events.ScheduleEvent(EVENT_DISAPPEAR, 9s);
@@ -786,6 +788,9 @@ struct boss_mimiron : public BossAI
 
     void EnterEvadeMode(EvadeReason why) override
     {
+        // Once Mimiron turns friendly for the defeat RP, don't reset the encounter.
+        if (me->GetFaction() == FACTION_FRIENDLY)
+            return;
         if (_isEvading)
             return;
         _isEvading = true;
