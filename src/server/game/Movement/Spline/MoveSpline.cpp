@@ -211,7 +211,17 @@ namespace Movement
             return false;\
         }
         CHECK(path.size() > 1);
-        CHECK(velocity > 0.01f);
+   
+        // quieter handling for small velocities: log at DEBUG instead of ERROR
+        if (!(velocity > 0.01f))
+        {
+            if (unit)
+                LOG_DEBUG("misc.movesplineinitargs", "MoveSplineInitArgs::Validate: small velocity ({:.4f}) for {}", velocity, unit->GetGUID().ToString());
+            else
+                LOG_DEBUG("misc.movesplineinitargs", "MoveSplineInitArgs::Validate: small velocity for cyclic spline continuation");
+            return false;
+        }
+ 
         CHECK(time_perc >= 0.f && time_perc <= 1.f);
         //CHECK(_checkPathBounds());
         return true;
