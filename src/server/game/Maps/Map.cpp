@@ -45,6 +45,7 @@
 #include "Weather.h"
 #include "WeatherMgr.h"
 #include "MapPartition.h"
+#include <future>
 
 #define MAP_INVALID_ZONE        0xFFFFFFFF
 
@@ -546,44 +547,44 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
 void Map::UpdateNonPlayerObjects(uint32 const diff)
 {
     for (WorldObject* obj : _pendingAddUpdatableObjectList)
-        _AddObjectToUpdateList(obj);
+    {
+        UpdatableMapObject* mapUpdatableObject = dynamic_cast<UpdatableMapObject*>(obj);
+        if (mapUpdatableObject)
+        {
+            mapUpdatableObject->SetUpdateState(UpdatableMapObject::UpdateState::Updating);
+        }
+
+        // Convert World Coordinates to Grid Coordinates
+        GridCoord coord = Acore::ComputeGridCoord(obj->GetPositionX(), obj->GetPositionY());
+
+        // Find the partition the coords reside in and push the object to the transfer list
+        MapPartition* p = GetPartition(coord.x_coord, coord.y_coord);
+        if (p)
+        {
+            p->QueueTransfer(obj);
+        }
+    }
+
     _pendingAddUpdatableObjectList.clear();
 
-    if (_updatableObjectListRecheckTimer.Passed())
+    // Fork-Join Model Multithreading
+    // Dispatches partitions simultaniously to C++ async thread pool
+    std::vector<std::future<void>> futures;
+    for (MapPartition* partition : _partitions)
     {
-        for (uint32 i = 0; i < _updatableObjectList.size();)
+        futures.push_back(std::async(std::launch::async, [partition, diff]()
         {
-            WorldObject* obj = _updatableObjectList[i];
-            if (!obj->IsInWorld())
-            {
-                ++i;
-                continue;
-            }
-
-            obj->Update(diff);
-
-            if (!obj->IsUpdateNeeded())
-            {
-                _RemoveObjectFromUpdateList(obj);
-                // Intentional no iteration here, obj is swapped with last element in
-                // _updatableObjectList so next loop will update that object at the same index
-            }
-            else
-                ++i;
-        }
-        _updatableObjectListRecheckTimer.Reset();
+            // Runs on seperate cpu thread
+            partition->Update(diff);
+        }));
     }
-    else
+
+    // stop master thread until cores finish calculations
+    for (auto& future : futures)
     {
-        for (uint32 i = 0; i < _updatableObjectList.size(); ++i)
-        {
-            WorldObject* obj = _updatableObjectList[i];
-            if (!obj->IsInWorld())
-                continue;
-
-            obj->Update(diff);
-        }
+        future.wait();
     }
+
 }
 
 void Map::AddObjectToPendingUpdateList(WorldObject* obj)

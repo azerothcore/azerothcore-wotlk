@@ -85,14 +85,30 @@ void MapPartition::Update(uint32 const diff)
         // triggers combat, spellcasting, movement, and pathfinding calc here
         obj->Update(diff);
 
+        // Check if the object is no longer within the partition
+        GridCoord currentGrid = Acore::ComputeGridCoord(obj->GetPositionX(), obj->GetPositionY());
+        if (!Contains(currentGrid.x_coord, currentGrid.y_coord))
+        {
+            // Remove object from partition if it is no longer inside the partition
+            RemoveObject(obj);
+
+            // Ask parent map what partition the object is in, then push the object to that partitions queue
+            MapPartition* newPartition = GetParent()->GetPartition(currentGrid.x_coord, currentGrid.y_coord);
+            if (newPartition)
+            {
+                newPartition->QueueTransfer(obj);
+            }
+
+            // intentionally skip ++i because RemoveObject swaps array elements
+            continue;
+        }
+
         // removes the entity from the active list if it does not need updating
         if (!obj->IsUpdateNeeded())
         {
             RemoveObject(obj);
 
-            // intentionally not executing ++i here
-            // RemoveObject() swaps the deleted object with the last element of the array
-            // keeping i the same correctly processes the swapped elements
+            // intentionally skip ++i because RemoveObject swaps array elements
         }
         else {
             // object gets updated and is still active, moves onto the next object
