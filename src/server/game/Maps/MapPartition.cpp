@@ -48,6 +48,12 @@ void MapPartition::RemoveObject(WorldObject* obj)
         //overwrites the deleted object with the last object in the list and shrinks the list size by 1 
         *it = _updatableObjects.back();
         _updatableObjects.pop_back();
+
+        UpdatableMapObject* mapUpdatableObject = dynamic_cast<UpdatableMapObject*>(obj);
+        if (mapUpdatableObject)
+        {
+            mapUpdatableObject->SetUpdateState(UpdatableMapObject::UpdateState::NotUpdating);
+        }
     }
 }
 

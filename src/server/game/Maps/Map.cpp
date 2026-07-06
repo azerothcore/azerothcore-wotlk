@@ -552,16 +552,16 @@ void Map::UpdateNonPlayerObjects(uint32 const diff)
         if (mapUpdatableObject)
         {
             mapUpdatableObject->SetUpdateState(UpdatableMapObject::UpdateState::Updating);
-        }
 
-        // Convert World Coordinates to Grid Coordinates
-        GridCoord coord = Acore::ComputeGridCoord(obj->GetPositionX(), obj->GetPositionY());
+            // Convert World Coordinates to Grid Coordinates
+            GridCoord coord = Acore::ComputeGridCoord(obj->GetPositionX(), obj->GetPositionY());
 
-        // Find the partition the coords reside in and push the object to the transfer list
-        MapPartition* p = GetPartition(coord.x_coord, coord.y_coord);
-        if (p)
-        {
-            p->QueueTransfer(obj);
+            // Find the partition the coords reside in and push the object to the transfer list
+            MapPartition* p = GetPartition(coord.x_coord, coord.y_coord);
+            if (p)
+            {
+                p->QueueTransfer(obj);
+            }
         }
     }
 
@@ -633,10 +633,19 @@ void Map::RemoveObjectFromMapUpdateList(WorldObject* obj)
         return;
 
     UpdatableMapObject* mapUpdatableObject = dynamic_cast<UpdatableMapObject*>(obj);
+    if (!mapUpdatableObject)
+        return;
     if (mapUpdatableObject->GetUpdateState() == UpdatableMapObject::UpdateState::PendingAdd)
         _pendingAddUpdatableObjectList.erase(obj);
     else if (mapUpdatableObject->GetUpdateState() == UpdatableMapObject::UpdateState::Updating)
-        _RemoveObjectFromUpdateList(obj);
+    {
+        GridCoord coord = Acore::ComputeGridCoord(obj->GetPositionX(), obj->GetPositionY());
+        MapPartition* p = GetPartition(coord.x_coord, coord.y_coord);
+        if (p)
+        {
+            p->RemoveObject(obj);
+        }
+    }
 }
 
 // Used in VisibilityDistanceType::Large and VisibilityDistanceType::Gigantic
