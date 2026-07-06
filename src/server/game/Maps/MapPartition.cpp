@@ -84,7 +84,7 @@ void MapPartition::Update(uint32 const diff)
         // skips the loop if the object was deleted from memory or is not in the world
         if (!obj || !obj->IsInWorld())
         {
-            ++i;
+            RemoveObject(obj);
             continue;
         }
 

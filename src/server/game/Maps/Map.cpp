@@ -626,9 +626,7 @@ void Map::RemoveObjectFromMapUpdateList(WorldObject* obj)
         _pendingAddUpdatableObjectList.erase(obj);
     else if (mapUpdatableObject->GetUpdateState() == UpdatableMapObject::UpdateState::Updating)
     {
-        GridCoord coord = Acore::ComputeGridCoord(obj->GetPositionX(), obj->GetPositionY());
-        MapPartition* p = GetPartition(coord.x_coord, coord.y_coord);
-        if (p)
+        for (MapPartition* p : _partitions)
         {
             p->RemoveObject(obj);
         }

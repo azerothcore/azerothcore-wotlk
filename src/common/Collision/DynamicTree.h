@@ -20,6 +20,7 @@
 
 #include "Define.h"
 #include "Optional.h"
+#include <shared_mutex>
 
 namespace G3D
 {
@@ -39,6 +40,8 @@ struct DynTreeImpl;
 class DynamicMapTree
 {
     DynTreeImpl* impl;
+    // Using shared_mutex to allow infinite reads but locks for writing to prevent G3D::Table from getting corrupted
+    mutable std::shared_mutex _lock;
 
 public:
     DynamicMapTree();
