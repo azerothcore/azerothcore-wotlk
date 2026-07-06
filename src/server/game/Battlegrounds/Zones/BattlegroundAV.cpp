@@ -349,13 +349,7 @@ Creature* BattlegroundAV::AddAVCreature(uint16 cinfoid, uint16 type)
             CreatureData& data = sObjectMgr->NewOrExistCreatureData(creature->GetSpawnId());
             data.wander_distance = 5;
         }
-        //else wander_distance will be 15, so creatures move maximum=10
-        //creature->SetDefaultMovementType(RANDOM_MOTION_TYPE);
-        creature->GetMotionMaster()->Initialize();
-        creature->setDeathState(DeathState::JustDied);
-        creature->Respawn();
-        //TODO: find a way to add a motionmaster without killing the creature (i
-        //just copied this code from a gm-command
+        creature->GetMotionMaster()->MoveRandom(10.0f);
     }
 
     uint32 triggerSpawnID = 0;
