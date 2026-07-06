@@ -349,10 +349,7 @@ Creature* BattlegroundAV::AddAVCreature(uint16 cinfoid, uint16 type)
             CreatureData& data = sObjectMgr->NewOrExistCreatureData(creature->GetSpawnId());
             data.wander_distance = 5;
         }
-        //else wander_distance will be 15, so creatures move maximum=10
-        creature->SetDefaultMovementType(RANDOM_MOTION_TYPE);
-        creature->GetMotionMaster()->Initialize();
-        creature->GetMotionMaster()->MoveRandom(10.0f); // initial push needed to activate movement
+        creature->GetMotionMaster()->MoveRandom(10.0f);
     }
 
     uint32 triggerSpawnID = 0;
