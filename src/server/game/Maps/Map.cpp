@@ -546,27 +546,6 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
 
 void Map::UpdateNonPlayerObjects(uint32 const diff)
 {
-    for (WorldObject* obj : _pendingAddUpdatableObjectList)
-    {
-        UpdatableMapObject* mapUpdatableObject = dynamic_cast<UpdatableMapObject*>(obj);
-        if (mapUpdatableObject)
-        {
-            mapUpdatableObject->SetUpdateState(UpdatableMapObject::UpdateState::Updating);
-
-            // Convert World Coordinates to Grid Coordinates
-            GridCoord coord = Acore::ComputeGridCoord(obj->GetPositionX(), obj->GetPositionY());
-
-            // Find the partition the coords reside in and push the object to the transfer list
-            MapPartition* p = GetPartition(coord.x_coord, coord.y_coord);
-            if (p)
-            {
-                p->QueueTransfer(obj);
-            }
-        }
-    }
-
-    _pendingAddUpdatableObjectList.clear();
-
     // Fork-Join Model Multithreading
     // Dispatches partitions simultaniously to C++ async thread pool
     std::vector<std::future<void>> futures;
@@ -584,7 +563,6 @@ void Map::UpdateNonPlayerObjects(uint32 const diff)
     {
         future.wait();
     }
-
 }
 
 void Map::AddObjectToPendingUpdateList(WorldObject* obj)
@@ -596,8 +574,13 @@ void Map::AddObjectToPendingUpdateList(WorldObject* obj)
     if (!mapUpdatableObject || mapUpdatableObject->GetUpdateState() != UpdatableMapObject::UpdateState::NotUpdating)
         return;
 
-    _pendingAddUpdatableObjectList.insert(obj);
-    mapUpdatableObject->SetUpdateState(UpdatableMapObject::UpdateState::PendingAdd);
+    GridCoord coord = Acore::ComputeGridCoord(obj->GetPositionX(), obj->GetPositionY());
+    MapPartition* p = GetPartition(coord.x_coord, coord.y_coord);
+    if (p)
+    {
+        mapUpdatableObject->SetUpdateState(UpdatableMapObject::UpdateState::Updating);
+        p->QueueTransfer(obj);
+    }
 }
 
 // Internal use only
