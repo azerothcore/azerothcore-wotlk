@@ -21,6 +21,7 @@
 #include "Common.h"
 #include "LockedQueue.h"
 #include <vector>
+#include "ObjectGuid.h"
 
 class Map;
 class WorldObject;
