@@ -129,7 +129,6 @@ bool LoginQueryHolder::Initialize()
 
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MAIL);
     stmt->SetData(0, lowGuid);
-    stmt->SetData(1, uint32(GameTime::GetGameTime().count()));
     res &= SetPreparedQuery(PLAYER_LOGIN_QUERY_LOAD_MAILS, stmt);
 
     stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_MAILITEMS);
