@@ -650,7 +650,24 @@ bool FlightPathMovementGenerator::LoadPath(Player* player)
 
 void FlightPathMovementGenerator::DoInitialize(Player* player)
 {
+    if (i_path.empty())
+    {
+        LOG_ERROR("movement.flightpath", "FlightPathMovementGenerator::DoInitialize: empty taxi path for player {}", player->GetGUID().ToString());
+        player->m_taxi.ClearTaxiDestinations();
+        player->Dismount();
+        return;
+    }
+
     Reset(player);
+
+    if (i_path.empty())
+    {
+        LOG_ERROR("movement.flightpath", "FlightPathMovementGenerator::DoInitialize: empty taxi path after reset for player {}", player->GetGUID().ToString());
+        player->m_taxi.ClearTaxiDestinations();
+        player->Dismount();
+        return;
+    }
+
     InitEndGridInfo();
 }
 
@@ -682,8 +699,15 @@ void FlightPathMovementGenerator::DoFinalize(Player* player)
 
 void FlightPathMovementGenerator::DoReset(Player* player)
 {
-    uint32 end = GetPathAtMapEnd();
     uint32 currentNodeId = GetCurrentNode();
+
+    if (i_path.empty() || currentNodeId >= i_path.size())
+    {
+        LOG_ERROR("movement.flightpath", "FlightPathMovementGenerator::DoReset: invalid taxi path for player {}. Current node: {}, max nodes: {}", player->GetGUID().ToString(), currentNodeId, i_path.size());
+        return;
+    }
+
+    uint32 end = GetPathAtMapEnd();
 
     if (currentNodeId == end)
     {
@@ -713,6 +737,9 @@ void FlightPathMovementGenerator::DoReset(Player* player)
 
 bool FlightPathMovementGenerator::DoUpdate(Player* player, uint32 /*diff*/)
 {
+    if (i_path.empty() || i_currentNode >= i_path.size())
+        return false;
+
     // skipping the first spline path point because it's our starting point and not a taxi path point
     uint32 pointId = player->movespline->currentPathIdx() <= 0 ? 0 : player->movespline->currentPathIdx() - 1;
     if (pointId > i_currentNode && i_currentNode < i_path.size() - 1)
@@ -781,6 +808,9 @@ void FlightPathMovementGenerator::DoEventIfAny(Player* player, TaxiPathNodeEntry
 
 bool FlightPathMovementGenerator::GetResetPos(Player*, float& x, float& y, float& z)
 {
+    if (i_path.empty() || i_currentNode >= i_path.size())
+        return false;
+
     TaxiPathNodeEntry const* node = i_path[i_currentNode];
     x = node->x;
     y = node->y;
@@ -793,6 +823,9 @@ void FlightPathMovementGenerator::InitEndGridInfo()
     /*! Storage to preload flightmaster grid at end of flight. For multi-stop flights, this will
        be reinitialized for each flightmaster at the end of each spline (or stop) in the flight. */
     uint32 nodeCount = i_path.size();        //! Number of nodes in path.
+    if (!nodeCount)
+        return;
+
     _endMapId = i_path[nodeCount - 1]->mapid; //! MapId of last node
 
     // pussywizard:
