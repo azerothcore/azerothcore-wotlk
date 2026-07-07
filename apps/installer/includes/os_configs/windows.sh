@@ -14,7 +14,7 @@ if [[ $CONTINUOUS_INTEGRATION ]]; then
     INSTALL_ARGS+=(--no-progress)
 else
     { # try
-        choco uninstall -y -n cmake.install cmake # needed to make sure that following installation set the env properly
+        choco uninstall -y -n cmake.install cmake # needed to make sure that following install set the env properly
     } || { # catch
         echo "nothing to do"
     }
@@ -23,7 +23,7 @@ else
 fi
 
 choco install -y --skip-checksums "${INSTALL_ARGS[@]}"  cmake.install -y --installargs 'ADD_CMAKE_TO_PATH=System'
-#choco install -y --skip-checksums "${INSTALL_ARGS[@]}"  visualstudio2022-workload-nativedesktop
-#choco install -y --skip-checksums "${INSTALL_ARGS[@]}"  openssl --force --version=3.6.2
+choco install -y --skip-checksums "${INSTALL_ARGS[@]}"  visualstudio2022-workload-nativedesktop
+choco install -y --skip-checksums "${INSTALL_ARGS[@]}"  openssl --force --version=3.6.2
 choco install -y --skip-checksums "${INSTALL_ARGS[@]}"  boost-msvc-14.3 --force --version=1.87.0
-choco install -y --skip-checksums "${INSTALL_ARGS[@]}"  mysql --force --version=8.4.6 --allow-downgrade
+choco install -y --skip-checksums "${INSTALL_ARGS[@]}"  mysql --force --version=8.4.9
