@@ -5,7 +5,7 @@
 -- Visual model; assign the sniffed flight per warden GUID via creature_addon.
 -- Draw the wardens' stock polearm with the melee weapon stance (bytes2 = 1).
 -- Mark the two red wardens (131056, 131059) dead (Permanent Feign Death 29266).
--- Correct blue warden 105487 orientation to sniff.
+-- Correct blue warden 105487 orientation.
 -- Stop the Invisible Stalker (131066) from spawning (keep row for future use).
 -- Give the six Wyrmrest Protector (27953) Transform spells (50158/50159/50160/
 -- 51117/51118/51119) a real transform aura -> Wyrmrest Protector Visual model.
@@ -13,7 +13,6 @@
 -- (Red 38488, Blue 32729, Bronze 38491, Green 38209, Black 38487, Nether 38490).
 -- Give selected Protectors the low weapon stance (EMOTE_STATE_WORK 173).
 -- Relocate Protector 131030 to its sniffed spot, was incorrectly placed.
--- (accurate to retail 12.0.7 sniff.)
 -- ============================================================================
 
 -- ---------------------------------------------------------------------------
