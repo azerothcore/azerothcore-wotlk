@@ -43,7 +43,7 @@ UPDATE `creature` SET `orientation` = 2.990109920501708984 WHERE `guid` = 105487
 -- ---------------------------------------------------------------------------
 -- Wyrmrest Protector (27953)
 -- ---------------------------------------------------------------------------
--- spell_dbc populate protector transform spells
+-- populate protector transform spells
 --   50158 Red    - 27952 (display 14357)
 --   51118 Blue   - 28251 (display 14356)
 --   50160 Bronze - 27955 (display 14358)
