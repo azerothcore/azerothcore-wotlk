@@ -1,98 +1,118 @@
 -- ============================================================================
--- Wyrmrest Temple Adjustments --
--- Correct Warden of the Chamber (30058) displayID and size (single model, scale 1).
--- SAI to correct displayID depending on what color beam that is being fired.
--- Mark the two Ruby Sanctum red wardens (131056, 131059) dead (Permanent Feign Death 29266).
+-- Wyrmrest Temple NPC Adjustments --
+-- Give the five Warden of the Chamber (30058) Transform spells (55827-55831) a
+-- real transform aura so each warden shows its dragonflight's Wyrmrest Warden
+-- Visual model; assign the sniffed flight per warden GUID via creature_addon.
+-- Draw the wardens' stock polearm with the melee weapon stance (bytes2 = 1).
+-- Mark the two red wardens (131056, 131059) dead (Permanent Feign Death 29266).
 -- Correct blue warden 105487 orientation to sniff.
--- Stop the Invisible Stalker (131066) from spawning (keep row for future use)
--- (accurate for Ruby Sanctum release).
--- Correct Wyrmrest Protector (27953) displayID (single base model).
--- SAI to roll a random dragonflight on respawn and equip the matching polearm.
--- Correct Protector polearm equip IDs (Red, Bronze, Nether) to sniff values.
+-- Stop the Invisible Stalker (131066) from spawning (keep row for future use).
+-- Give the six Wyrmrest Protector (27953) Transform spells (50158/50159/50160/
+-- 51117/51118/51119) a real transform aura -> Wyrmrest Protector Visual model.
+-- SAI to roll a random dragonflight on respawn and equip the matching polearm
+-- (Red 38488, Blue 32729, Bronze 38491, Green 38209, Black 38487, Nether 38490).
 -- Give selected Protectors the low weapon stance (EMOTE_STATE_WORK 173).
--- Relocate Protector 131030 to its sniffed spot, was incorrectly on mid-level
--- of the temple.
+-- Relocate Protector 131030 to its sniffed spot, was incorrectly placed.
+-- (accurate to retail 12.0.7 sniff.)
 -- ============================================================================
 
 -- ---------------------------------------------------------------------------
 -- Warden of the Chamber (30058)
 -- ---------------------------------------------------------------------------
--- Remove second displayid from pool, correct base
-DELETE FROM `creature_template_model` WHERE `CreatureID` = 30058;
-INSERT INTO `creature_template_model` (`CreatureID`, `Idx`, `CreatureDisplayID`, `DisplayScale`, `Probability`, `VerifiedBuild`) VALUES
-(30058, 0, 14308, 1, 1, 68275);
+-- spell_dbc: turn the effect-less Warden Transform spells into real transforms.
+-- Effect_1 = 6 (SPELL_EFFECT_APPLY_AURA), EffectAura_1 = 56
+-- (SPELL_AURA_TRANSFORM), ImplicitTargetA_1 = 1 (TARGET_UNIT_CASTER).
+-- SPELL_AURA_TRANSFORM reads EffectMiscValue as a creature entry and uses that
+-- creature's model, so each points at the single-model "Wyrmrest Warden Visual"
+-- NPC for its flight. The rows are already passive with an infinite duration
+-- (Attributes 384, DurationIndex 21), which is exactly what a spawn aura needs.
+--   55831 Red    -> 30072 (display 26747)
+--   55830 Bronze -> 30059 (display 26741)
+--   55828 Blue   -> 30076 (display 26749)
+--   55829 Green  -> 30073 (display 26748)
+--   55827 Black  -> 30077 (display 14308)
+UPDATE `spell_dbc` SET `Effect_1` = 6, `EffectAura_1` = 56, `ImplicitTargetA_1` = 1, `EffectMiscValue_1` = 30072 WHERE `ID` = 55831;
+UPDATE `spell_dbc` SET `Effect_1` = 6, `EffectAura_1` = 56, `ImplicitTargetA_1` = 1, `EffectMiscValue_1` = 30059 WHERE `ID` = 55830;
+UPDATE `spell_dbc` SET `Effect_1` = 6, `EffectAura_1` = 56, `ImplicitTargetA_1` = 1, `EffectMiscValue_1` = 30076 WHERE `ID` = 55828;
+UPDATE `spell_dbc` SET `Effect_1` = 6, `EffectAura_1` = 56, `ImplicitTargetA_1` = 1, `EffectMiscValue_1` = 30073 WHERE `ID` = 55829;
+UPDATE `spell_dbc` SET `Effect_1` = 6, `EffectAura_1` = 56, `ImplicitTargetA_1` = 1, `EffectMiscValue_1` = 30077 WHERE `ID` = 55827;
 
--- Per-flight morph action-lists (morphs respective GUIDs to correct display)
-DELETE FROM `smart_scripts` WHERE `entryorguid` IN (3005801, 3005802, 3005803, 3005804, 3005805) AND `source_type` = 9;
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(3005801, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 3, 0, 26747, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warden of the Chamber - Red - Morph to display 26747'),
-(3005802, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 3, 0, 26741, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warden of the Chamber - Bronze - Morph to display 26741'),
-(3005803, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 3, 0, 26749, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warden of the Chamber - Blue - Morph to display 26749'),
-(3005804, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 3, 0, 26748, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warden of the Chamber - Green - Morph to display 26748'),
-(3005805, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 3, 0, 14308, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warden of the Chamber - Black - Morph to display 14308');
-
--- Per-GUID RESPAWN (morphs respective GUIDs to correct display)
-DELETE FROM `smart_scripts` WHERE `entryorguid` IN (-131056, -131059, -131055, -131058, -105487, -105495, -105488, -105489) AND `source_type` = 0 AND `id` = 1;
-DELETE FROM `smart_scripts` WHERE `entryorguid` IN (-131063, -131064) AND `source_type` = 0 AND `id` = 0;
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(-131056, 0, 1, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 3005801, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warden of the Chamber - On Respawn - Red flight (morph)'),
-(-131059, 0, 1, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 3005801, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warden of the Chamber - On Respawn - Red flight (morph)'),
-(-131055, 0, 1, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 3005804, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warden of the Chamber - On Respawn - Green flight (morph)'),
-(-131058, 0, 1, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 3005804, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warden of the Chamber - On Respawn - Green flight (morph)'),
-(-105487, 0, 1, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 3005803, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warden of the Chamber - On Respawn - Blue flight (morph)'),
-(-105495, 0, 1, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 3005803, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warden of the Chamber - On Respawn - Blue flight (morph)'),
-(-105488, 0, 1, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 3005802, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warden of the Chamber - On Respawn - Bronze flight (morph)'),
-(-105489, 0, 1, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 3005802, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warden of the Chamber - On Respawn - Bronze flight (morph)'),
-(-131063, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 3005805, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warden of the Chamber - On Respawn - Black flight (morph)'),
-(-131064, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 3005805, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warden of the Chamber - On Respawn - Black flight (morph)');
-
--- Ruby Sanctum red wardens lie dead: GUIDs 131056 and 131059
--- Permanent Feign Death (29266) as a static spawn aura. (3.3.5a accurate)
-DELETE FROM `creature_addon` WHERE `guid` IN (131056, 131059);
+-- creature_addon: apply each warden's flight transform as a passive spawn aura.
+-- Per-GUID flight assignment from the sniff. The out-of-combat beam SAI in
+-- smart_scripts is stock and untouched.
+-- bytes2 = 1 sets SHEATH_STATE_MELEE (weapon drawn) so the equipped polearm
+-- renders in-hand; on the dragon model the sheathed polearm is not visible.
+--   Blue   105487, 105495 -> 55828
+--   Bronze 105488, 105489 -> 55830
+--   Green  131055, 131058 -> 55829
+--   Red    131056, 131059 -> 55831 + 29266 (Permanent Feign Death; 3.3.5a accurate)
+--   Black  131063, 131064 -> 55827
+DELETE FROM `creature_addon` WHERE `guid` IN (105487, 105488, 105489, 105495, 131055, 131056, 131058, 131059, 131063, 131064);
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
-(131056, 0, 0, 0, 1, 0, 0, '29266'),
-(131059, 0, 0, 0, 1, 0, 0, '29266');
+(105487, 0, 0, 0, 1, 0, 0, '55828'),
+(105488, 0, 0, 0, 1, 0, 0, '55830'),
+(105489, 0, 0, 0, 1, 0, 0, '55830'),
+(105495, 0, 0, 0, 1, 0, 0, '55828'),
+(131055, 0, 0, 0, 1, 0, 0, '55829'),
+(131056, 0, 0, 0, 1, 0, 0, '55831 29266'),
+(131058, 0, 0, 0, 1, 0, 0, '55829'),
+(131059, 0, 0, 0, 1, 0, 0, '55831 29266'),
+(131063, 0, 0, 0, 1, 0, 0, '55827'),
+(131064, 0, 0, 0, 1, 0, 0, '55827');
 
--- Correct blue warden 105487 facing to the sniffed orientation
-UPDATE `creature` SET `orientation` = 2.990109920501708984 WHERE `guid` = 105487;
-
--- The scaled Invisible Stalker (23155) GUID 131066 stop spawn
+-- Red fire wall that blocks Ruby Sanctum (Invisible Stalker (23155) GUID 131066) stop spawn (intentional)
 UPDATE `creature` SET `spawnMask` = 0 WHERE `guid` = 131066;
+
+-- Correct blue warden 105487 orientation
+UPDATE `creature` SET `orientation` = 2.990109920501708984 WHERE `guid` = 105487;
 
 -- ---------------------------------------------------------------------------
 -- Wyrmrest Protector (27953)
 -- ---------------------------------------------------------------------------
--- Single base model (bronze 14358) at scale 1, replacing the random
--- 14355/14357/14358/14359 pool; per-spawn flight appearance is driven by the
--- roll below so the model never desyncs from its polearm.
-DELETE FROM `creature_template_model` WHERE `CreatureID` = 27953;
-INSERT INTO `creature_template_model` (`CreatureID`, `Idx`, `CreatureDisplayID`, `DisplayScale`, `Probability`, `VerifiedBuild`) VALUES
-(27953, 0, 14358, 1, 1, 68275);
+-- spell_dbc: give the 6 effect-less "Protector Transform" spells a real
+-- SPELL_AURA_TRANSFORM effect, each pointing at the single-model "Wyrmrest
+-- Protector Visual" NPC for its flight (same mechanism as the wardens).
+--   50158 Red    -> 27952 (display 14357)
+--   51118 Blue   -> 28251 (display 14356)
+--   50160 Bronze -> 27955 (display 14358)
+--   50159 Green  -> 27954 (display 14359)
+--   51117 Black  -> 28250 (display 14355)
+--   51119 Nether -> 28252 (display 25257)
+UPDATE `spell_dbc` SET `Effect_1` = 6, `EffectAura_1` = 56, `ImplicitTargetA_1` = 1, `EffectMiscValue_1` = 27952 WHERE `ID` = 50158;
+UPDATE `spell_dbc` SET `Effect_1` = 6, `EffectAura_1` = 56, `ImplicitTargetA_1` = 1, `EffectMiscValue_1` = 28251 WHERE `ID` = 51118;
+UPDATE `spell_dbc` SET `Effect_1` = 6, `EffectAura_1` = 56, `ImplicitTargetA_1` = 1, `EffectMiscValue_1` = 27955 WHERE `ID` = 50160;
+UPDATE `spell_dbc` SET `Effect_1` = 6, `EffectAura_1` = 56, `ImplicitTargetA_1` = 1, `EffectMiscValue_1` = 27954 WHERE `ID` = 50159;
+UPDATE `spell_dbc` SET `Effect_1` = 6, `EffectAura_1` = 56, `ImplicitTargetA_1` = 1, `EffectMiscValue_1` = 28250 WHERE `ID` = 51117;
+UPDATE `spell_dbc` SET `Effect_1` = 6, `EffectAura_1` = 56, `ImplicitTargetA_1` = 1, `EffectMiscValue_1` = 28252 WHERE `ID` = 51119;
 
--- On respawn, roll one of six equal-chance dragonflights (action 87). RESPAWN
--- (not RESET) so the flight is stable through combat and only re-rolls on a new
--- spawn life. Combat SAI (ids 0-3: Net / Sunder Armor / Cleave / Mortal Strike)
--- is untouched.
+-- ---------------------------------------------------------------------------
+-- SmartAI: on respawn, roll one of 6 flights and apply that flight's transform
+-- aura + polearm. Entry-level id 4 fires CALL_RANDOM_TIMED_ACTIONLIST (87) over
+-- the six script9 lists 2795301-2795306; each list ADD_AURAs (75) the transform
+-- spell and EQUIPs (71) the matching polearm in the main hand. Stock combat SAI
+-- (source_type 0, ids 0-3: Net/Sunder/Cleave/Mortal Strike) is left untouched.
+--   2795301 Red    -> aura 50158, polearm 38488
+--   2795302 Blue   -> aura 51118, polearm 32729
+--   2795303 Bronze -> aura 50160, polearm 38491
+--   2795304 Green  -> aura 50159, polearm 38209
+--   2795305 Black  -> aura 51117, polearm 38487
+--   2795306 Nether -> aura 51119, polearm 38490
 DELETE FROM `smart_scripts` WHERE `entryorguid` = 27953 AND `source_type` = 0 AND `id` = 4;
-INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(27953, 0, 4, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 87, 2795301, 2795302, 2795303, 2795304, 2795305, 2795306, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wyrmrest Protector - On Respawn - Roll random dragonflight (morph + matching polearm)');
-
--- Flight action-lists: morph to the flight display (id 0) then equip its matching
--- polearm (id 1).
 DELETE FROM `smart_scripts` WHERE `entryorguid` IN (2795301, 2795302, 2795303, 2795304, 2795305, 2795306) AND `source_type` = 9;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(2795301, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 3, 0, 14357, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wyrmrest Protector - Red - Morph to display 14357'),
-(2795301, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 71, 0, 1, 38488, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wyrmrest Protector - Red - Equip polearm 38488'),
-(2795302, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 3, 0, 14358, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wyrmrest Protector - Bronze - Morph to display 14358'),
-(2795302, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 71, 0, 1, 38491, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wyrmrest Protector - Bronze - Equip polearm 38491'),
-(2795303, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 3, 0, 14356, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wyrmrest Protector - Blue - Morph to display 14356'),
-(2795303, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 71, 0, 1, 32729, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wyrmrest Protector - Blue - Equip polearm 32729'),
-(2795304, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 3, 0, 14359, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wyrmrest Protector - Green - Morph to display 14359'),
-(2795304, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 71, 0, 1, 38209, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wyrmrest Protector - Green - Equip polearm 38209'),
-(2795305, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 3, 0, 14355, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wyrmrest Protector - Black - Morph to display 14355'),
-(2795305, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 71, 0, 1, 38487, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wyrmrest Protector - Black - Equip polearm 38487'),
-(2795306, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 3, 0, 25257, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wyrmrest Protector - Nether - Morph to display 25257'),
-(2795306, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 71, 0, 1, 38490, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wyrmrest Protector - Nether - Equip polearm 38490');
+(27953, 0, 4, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 87, 2795301, 2795302, 2795303, 2795304, 2795305, 2795306, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wyrmrest Protector - On Respawn - Random flight transform + polearm'),
+(2795301, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 75, 50158, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wyrmrest Protector - Red - Transform aura'),
+(2795301, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 71, 0, 0, 38488, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wyrmrest Protector - Red - Equip polearm'),
+(2795302, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 75, 51118, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wyrmrest Protector - Blue - Transform aura'),
+(2795302, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 71, 0, 0, 32729, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wyrmrest Protector - Blue - Equip polearm'),
+(2795303, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 75, 50160, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wyrmrest Protector - Bronze - Transform aura'),
+(2795303, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 71, 0, 0, 38491, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wyrmrest Protector - Bronze - Equip polearm'),
+(2795304, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 75, 50159, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wyrmrest Protector - Green - Transform aura'),
+(2795304, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 71, 0, 0, 38209, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wyrmrest Protector - Green - Equip polearm'),
+(2795305, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 75, 51117, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wyrmrest Protector - Black - Transform aura'),
+(2795305, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 71, 0, 0, 38487, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wyrmrest Protector - Black - Equip polearm'),
+(2795306, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 75, 51119, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wyrmrest Protector - Nether - Transform aura'),
+(2795306, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 71, 0, 0, 38490, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Wyrmrest Protector - Nether - Equip polearm');
 
 -- Selected Protectors hold the low weapon stance (EMOTE_STATE_WORK 173) with the
 -- weapon kept drawn (bytes2 = 1 sheath state).
@@ -109,7 +129,5 @@ INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `e
 (131026, 0, 0, 0, 1, 173, 0, NULL),
 (131027, 0, 0, 0, 1, 173, 0, NULL);
 
--- Relocate Protector 131030 from an unsniffed upper-floor spot (3542.56,
--- 313.813, 116.85) down to the sniffed west-archway position. It is already
--- MovementType 0 / no path; display + polearm come from the roll above.
+-- Reposition Protector spawn 131030 to its sniffed location.
 UPDATE `creature` SET `position_x` = 3452.6472, `position_y` = 250.009, `position_z` = 52.378803, `orientation` = 3.298672199249267578 WHERE `guid` = 131030;
