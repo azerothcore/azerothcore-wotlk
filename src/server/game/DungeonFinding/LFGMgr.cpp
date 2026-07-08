@@ -2257,7 +2257,9 @@ namespace lfg
         {
             error = LFG_TELEPORTERROR_IN_VEHICLE;
         }
-        else if (player->GetCharmGUID() || player->IsInCombat())
+        // GetCharm() validates the charmed unit still exists and clears a stale reference,
+        // unlike GetCharmGUID(); a despawned vehicle must not permanently block the teleport.
+        else if (player->GetCharm() || player->IsInCombat())
         {
             error = LFG_TELEPORTERROR_COMBAT;
         }

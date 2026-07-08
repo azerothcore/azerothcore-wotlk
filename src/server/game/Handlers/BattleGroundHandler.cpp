@@ -412,7 +412,9 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recvData)
         return;
     }
 
-    if (_player->GetCharmGUID() || _player->IsInCombat())
+    // GetCharm() validates the charmed unit still exists and clears a stale reference,
+    // unlike GetCharmGUID(); a despawned vehicle must not permanently block BG entry.
+    if (_player->GetCharm() || _player->IsInCombat())
     {
         ChatHandler(_player->GetSession()).SendNotification(LANG_YOU_IN_COMBAT);
         return;
