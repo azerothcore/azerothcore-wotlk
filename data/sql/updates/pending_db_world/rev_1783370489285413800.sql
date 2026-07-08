@@ -14,7 +14,6 @@
 -- Give selected Protectors the low weapon stance (EMOTE_STATE_WORK 173).
 -- Relocate Protector 131030 to its sniffed spot, was incorrectly placed.
 -- ============================================================================
-
 -- ---------------------------------------------------------------------------
 -- Warden of the Chamber (30058)
 -- ---------------------------------------------------------------------------
