@@ -679,26 +679,29 @@ struct boss_malygos : public BossAI
             {
                 for (uint8 i = 0; i < NUM_MAX_SURGE_TARGETS; ++i)
                     _surgeTargetGUID[i].Clear();
-                me->CastSpell((Unit*)nullptr, SPELL_SURGE_OF_POWER_WARN_SELECTOR_25, true);
+
+                DoCastAOE(SPELL_SURGE_OF_POWER_WARN_SELECTOR_25, true);
                 me->m_Events.AddEventAtOffset([this]
                 {
-                    me->CastSpell((Unit*)nullptr, SPELL_PH3_SURGE_OF_POWER_25, true);
+                    DoCastAOE(SPELL_PH3_SURGE_OF_POWER_25, true);
                 }, 3s);
             }
             else
             {
                 for (uint8 i = 0; i < NUM_MAX_SURGE_TARGETS; ++i)
                     _surgeTargetGUID[i].Clear();
+
                 if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, false, true, SPELL_RIDE_RED_DRAGON_BUDDY))
                 {
                     if (Vehicle* vehicle = target->GetVehicleKit())
                         if (Unit* passenger = vehicle->GetPassenger(0))
                             if (Player* player = passenger->ToPlayer())
                                 Talk(EMOTE_SURGE_OF_POWER_WARNING_P3, player);
+
                     SetGUID(target->GetGUID(), DATA_FIRST_SURGE_TARGET_GUID);
                     me->m_Events.AddEventAtOffset([this]
                     {
-                        me->CastSpell((Unit*)nullptr, SPELL_PH3_SURGE_OF_POWER, true);
+                        DoCastAOE(SPELL_PH3_SURGE_OF_POWER, true);
                     }, 3s);
                 }
             }
