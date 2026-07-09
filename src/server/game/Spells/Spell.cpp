@@ -695,6 +695,10 @@ Spell::Spell(Unit* caster, SpellInfo const* info, TriggerCastFlags triggerFlags,
 
 Spell::~Spell()
 {
+    if (Player* modOwner = m_caster ? m_caster->GetSpellModOwner() : nullptr)
+        if (modOwner->m_spellModTakingSpell == this)
+            modOwner->SetSpellModTakingSpell(this, false);
+
     // unload scripts
     while (!m_loadedScripts.empty())
     {
@@ -4470,6 +4474,9 @@ void Spell::finish(bool ok)
     if (m_spellState == SPELL_STATE_FINISHED)
         return;
     m_spellState = SPELL_STATE_FINISHED;
+
+    if (Player* modOwner = m_caster->GetSpellModOwner())
+        modOwner->SetSpellModTakingSpell(this, false);
 
     if (m_spellInfo->IsChanneled())
         m_caster->UpdateInterruptMask();
