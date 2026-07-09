@@ -135,7 +135,7 @@ bool ConfusedMovementGenerator<T>::DoUpdate(T* unit, uint32 diff)
     {
         // waiting for next move
         i_nextMoveTime.Update(diff);
-        if (i_nextMoveTime.Passed() && unit->movespline->Finalized())
+        if (i_nextMoveTime.Passed())
         {
             // start moving
             unit->AddUnitState(UNIT_STATE_CONFUSED_MOVE);
