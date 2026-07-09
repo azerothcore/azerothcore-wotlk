@@ -15421,6 +15421,29 @@ void Unit::KnockbackFrom(float x, float y, float speedXY, float speedZ)
     {
         GetMotionMaster()->MoveKnockbackFrom(x, y, speedXY, speedZ);
     }
+    else if (!IsClientControlled())
+    {
+        // While feared/confused the client has no control over the unit (SetClientControl),
+        // so a SMSG_MOVE_KNOCK_BACK would be ignored or immediately overridden by the server
+        // side fleeing/confused splines. Perform the knockback server side instead; the
+        // fleeing/confused movement generator resumes once this spline is finalized.
+        if (speedXY < 0.1f)
+            return;
+
+        float moveTimeHalf = speedZ / Movement::gravity;
+        float dist = 2 * moveTimeHalf * speedXY;
+        float maxHeight = -Movement::computeFallElevation(moveTimeHalf, false, -speedZ);
+
+        Position dest = GetPosition();
+        MovePositionToFirstCollision(dest, dist, GetRelativeAngle(x, y) + float(M_PI));
+
+        Movement::MoveSplineInit init(this);
+        init.MoveTo(dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ());
+        init.SetParabolic(maxHeight, 0);
+        init.SetOrientationFixed(true);
+        init.SetVelocity(speedXY);
+        init.Launch();
+    }
     else
     {
         float vcos, vsin;
