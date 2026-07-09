@@ -172,6 +172,7 @@ enum UlduarNPCs
     NPC_THORIM                              = 32865,
     NPC_FREYA                               = 32906,
     NPC_VEZAX                               = 33271,
+    NPC_SARONITE_ANIMUS                     = 33524,
     NPC_SARA                                = 33134,
     NPC_YOGGSARON                           = 33288,
     NPC_BRAIN_OF_YOGG_SARON                 = 33890,
@@ -233,8 +234,6 @@ enum UlduarGameObjects
     GO_HODIR_CHEST_NORMAL_HERO              = 194308,
     GO_HODIR_CHEST_HARD                     = 194200,
     GO_HODIR_CHEST_HARD_HERO                = 194201,
-    GO_FREYA_CHEST                          = 194330, // Normal, -2 - elder offset
-    GO_FREYA_CHEST_HERO                     = 194331, // Hero, -2 - elder offset
     GO_MIMIRON_CHEST                        = 194789,
     GO_MIMIRON_CHEST_HARD                   = 194957,
     GO_MIMIRON_CHEST_HERO                   = 194956,
