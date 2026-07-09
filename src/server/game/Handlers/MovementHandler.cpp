@@ -842,7 +842,7 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket& recvData)
 
     // Relocate the mover to the acknowledged position. Otherwise the server (and the
     // MSG_MOVE_KNOCK_BACK broadcast below) keeps using the pre-knockback position until
-    // the next regular movement packet arrives, desyncing the unit for nearby clients.
+    // the next regular movement packet arrives, desyncing the unit for nearby clients
     if (!ProcessMovementInfo(movementInfo, mover, mover->ToPlayer(), recvData))
     {
         recvData.rfinish(); // prevent warnings spam
