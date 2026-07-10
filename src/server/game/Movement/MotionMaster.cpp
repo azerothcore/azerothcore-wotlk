@@ -21,12 +21,14 @@
 #include "CreatureAISelector.h"
 #include "EscortMovementGenerator.h"
 #include "FleeingMovementGenerator.h"
+#include "FormationMovementGenerator.h"
 #include "GameTime.h"
 #include "HomeMovementGenerator.h"
 #include "IdleMovementGenerator.h"
 #include "Log.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
+#include "Player.h"
 #include "PointMovementGenerator.h"
 #include "RandomMovementGenerator.h"
 #include "TargetedMovementGenerator.h"
@@ -466,6 +468,17 @@ void MotionMaster::MoveFollow(Unit* target, float dist, float angle, MovementSlo
     }
 }
 
+void MotionMaster::MoveFormation(Unit* leader, float dist, float angle, uint32 point1, uint32 point2)
+{
+    if (!leader || leader == _owner || _owner->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
+        return;
+
+    if (!_owner->IsCreature())
+        return;
+
+    Mutate(new FormationMovementGenerator(leader, dist, angle, point1, point2), MOTION_SLOT_IDLE);
+}
+
 /**
  * @brief The unit will move to a specific point. Doesn't work with UNIT_FLAG_DISABLE_MOVE
  *
@@ -526,9 +539,9 @@ void MotionMaster::MovePath(uint32 path_id, ForcedMovement forcedMovement, PathS
     }
 
     Movement::PointsArray points;
-    for (auto& point : *path)
+    for (auto const& node : path->Nodes)
     {
-        points.push_back(G3D::Vector3(point.second.x, point.second.y, point.second.z));
+        points.push_back(G3D::Vector3(node.X, node.Y, node.Z));
     }
 
     // pass the new PointsArray* to the appropriate MoveSplinePath function
@@ -607,7 +620,7 @@ void MotionMaster::MoveTakeoff(uint32 id, float x, float y, float z, float speed
 void MotionMaster::MoveKnockbackFrom(float srcX, float srcY, float speedXY, float speedZ)
 {
     //this function may make players fall below map
-    if (_owner->IsPlayer())
+    if (_owner->IsPlayer() && _owner->IsClientControlled())
         return;
 
     if (speedXY <= 0.1f)
@@ -626,6 +639,15 @@ void MotionMaster::MoveKnockbackFrom(float srcX, float srcY, float speedXY, floa
     init.SetParabolic(max_height, 0);
     init.SetOrientationFixed(true);
     init.SetVelocity(speedXY);
+
+    // Do not mutate an active fleeing/confused movement generator,
+    // doing so breaks the movement upon landing from the knockback
+    MovementGeneratorType slotType = GetMotionSlotType(MOTION_SLOT_CONTROLLED);
+    if (slotType == FLEEING_MOTION_TYPE || slotType == CONFUSED_MOTION_TYPE)
+    {
+        init.Launch();
+        return;
+    }
 
     Mutate(new EffectMovementGenerator(init, 0), MOTION_SLOT_CONTROLLED);
 }
@@ -825,7 +847,17 @@ void MotionMaster::MoveTaxiFlight(uint32 path, uint32 pathnode)
         {
             LOG_DEBUG("movement.motionmaster", "{} taxi to (Path {} node {})", _owner->GetName(), path, pathnode);
             FlightPathMovementGenerator* mgen = new FlightPathMovementGenerator(pathnode);
-            mgen->LoadPath(_owner->ToPlayer());
+            Player* player = _owner->ToPlayer();
+            if (!mgen->LoadPath(player))
+            {
+                LOG_ERROR("movement.motionmaster", "{} failed to build taxi path (Path {} node {}), clearing taxi destinations",
+                    _owner->GetName(), path, pathnode);
+                player->m_taxi.ClearTaxiDestinations();
+                player->Dismount();
+                delete mgen;
+                return;
+            }
+
             Mutate(mgen, MOTION_SLOT_CONTROLLED);
         }
         else
@@ -867,10 +899,10 @@ void MotionMaster::MoveDistract(uint32 timer)
 
 void MotionMaster::Mutate(MovementGenerator* m, MovementSlot slot)
 {
+    bool const delayed = (_cleanFlag & MMCF_UPDATE);
+
     while (MovementGenerator* curr = Impl[slot])
     {
-        bool delayed = (_top == slot && (_cleanFlag & MMCF_UPDATE));
-
         // clear slot AND decrease top immediately to avoid crashes when referencing null top in DirectDelete
         Impl[slot] = nullptr;
         while (!empty() && !top())
@@ -906,7 +938,7 @@ void MotionMaster::MoveWaypoint(uint32 path_id, bool repeatable, PathSource path
     if (_owner->HasUnitFlag(UNIT_FLAG_DISABLE_MOVE))
         return;
 
-    Mutate(new WaypointMovementGenerator<Creature>(path_id, pathSource, repeatable), MOTION_SLOT_IDLE);
+    Mutate(new WaypointMovementGenerator<Creature>(path_id, repeatable, pathSource), MOTION_SLOT_IDLE);
 
     LOG_DEBUG("movement.motionmaster", "{} ({}) start moving over path(Id:{}, repeatable: {})",
         _owner->IsPlayer() ? "Player" : "Creature", _owner->GetGUID().ToString(), path_id, repeatable ? "YES" : "NO");

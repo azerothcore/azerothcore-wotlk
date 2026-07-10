@@ -46,12 +46,7 @@ enum Spells
 struct boss_talon_king_ikiss : public BossAI
 {
     boss_talon_king_ikiss(Creature* creature) : BossAI(creature, DATA_IKISS), _spoken(false)
-    {
-        scheduler.SetValidator([this]
-        {
-            return !me->HasUnitState(UNIT_STATE_CASTING);
-        });
-    }
+    {    }
 
     void Reset() override
     {

@@ -16,11 +16,10 @@
  */
 
 #include "CombatAI.h"
+#include "Containers.h"
 #include "CreatureScript.h"
 #include "GameObjectAI.h"
 #include "GameObjectScript.h"
-#include "MoveSplineInit.h"
-#include "Opcodes.h"
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptMgr.h"
@@ -61,9 +60,11 @@ enum MalygosSpells
     SPELL_ARCANE_BREATH                 = 56272,
     SPELL_ARCANE_STORM                  = 61693,
 
+    SPELL_VORTEX_1                      = 56237,
     SPELL_VORTEX_VISUAL                 = 55873,
+    SPELL_VORTEX_DUMMY                  = 56105,
+    SPELL_VORTEX_TELEPORT               = 73040,
     SPELL_VORTEX_CONTROL_VEHICLE        = 56263,
-    SPELL_FREEZE_ANIM                   = 55883,
 
     SPELL_ARCANE_OVERLOAD               = 56430,
     SPELL_ARCANE_OVERLOAD_SUMMON        = 56429,
@@ -72,7 +73,7 @@ enum MalygosSpells
     SPELL_ARCANE_OVERLOAD_SIZE          = 56435,
     SPELL_ARCANE_OVERLOAD_PROTECTION    = 56438,
 
-    SPELL_SURGE_OF_POWER                = 56505, // no heroic version?
+    SPELL_SURGE_OF_POWER                = 56505,
     SPELL_SURGE_OF_POWER_DMG            = 56548,
 
     SPELL_DESTROY_PLATFORM_EFFECT       = 59099,
@@ -80,6 +81,10 @@ enum MalygosSpells
 
     SPELL_ARCANE_PULSE                  = 57432,
     SPELL_PH3_SURGE_OF_POWER            = 57407,
+    SPELL_PH3_SURGE_OF_POWER_25         = 60936,
+    SPELL_SURGE_OF_POWER_WARN_SELECTOR_25 = 60939,
+
+    SPELL_RIDE_RED_DRAGON_BUDDY         = 56071,
 
     SPELL_STATIC_FIELD_MAIN             = 57430,
     SPELL_STATIC_FIELD_SUMMON           = 57431,
@@ -168,6 +173,12 @@ enum Texts
     SAY_ALEXSTRASZA_FOUR  = 3,
 };
 
+enum MalygosData
+{
+    DATA_FIRST_SURGE_TARGET_GUID = 14,
+    NUM_MAX_SURGE_TARGETS        = 3,
+};
+
 enum Phases
 {
     PHASE_NONE = 0,
@@ -195,12 +206,8 @@ struct boss_malygos : public BossAI
     uint32 timer1, timer2;
     uint8 IntroCounter;
     bool bLockHealthCheck;
-
-    void InitializeAI() override
-    {
-        me->SetDisableGravity(true);
-        Reset();
-    }
+    bool _executingVortex;
+    ObjectGuid _surgeTargetGUID[NUM_MAX_SURGE_TARGETS];
 
     void Reset() override
     {
@@ -210,20 +217,36 @@ struct boss_malygos : public BossAI
         timer2 = INTRO_MOVEMENT_INTERVAL;
         IntroCounter = 0;
         bLockHealthCheck = false;
+        _executingVortex = false;
+        for (uint8 i = 0; i < NUM_MAX_SURGE_TARGETS; ++i)
+            _surgeTargetGUID[i].Clear();
 
         SetInvincibility(true);
         me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
         me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED);
         me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
-
+        me->SetDisableGravity(true);
         me->SetAnimTier(AnimTier::Fly);
 
         instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_YOU_DONT_HAVE_AN_ENTERNITY_EVENT);
     }
 
+    void SetGUID(ObjectGuid const& guid, int32 id) override
+    {
+        if (id >= DATA_FIRST_SURGE_TARGET_GUID && id < DATA_FIRST_SURGE_TARGET_GUID + NUM_MAX_SURGE_TARGETS)
+            _surgeTargetGUID[id - DATA_FIRST_SURGE_TARGET_GUID] = guid;
+    }
+
+    ObjectGuid GetGUID(int32 id) const override
+    {
+        if (id >= DATA_FIRST_SURGE_TARGET_GUID && id < DATA_FIRST_SURGE_TARGET_GUID + NUM_MAX_SURGE_TARGETS)
+            return _surgeTargetGUID[id - DATA_FIRST_SURGE_TARGET_GUID];
+        return ObjectGuid::Empty;
+    }
+
     void MovementInform(uint32 type, uint32 id) override
     {
-        if (type != POINT_MOTION_TYPE)
+        if (type != POINT_MOTION_TYPE && type != EFFECT_MOTION_TYPE)
             return;
 
         switch (id)
@@ -245,9 +268,8 @@ struct boss_malygos : public BossAI
             events.RescheduleEvent(EVENT_INTRO_LAND, 0ms, 1);
             break;
         case MI_POINT_VORTEX_CENTER:
-            if (Creature* trigger = me->SummonCreature(NPC_WORLD_TRIGGER_LAOI, CenterPos, TEMPSUMMON_TIMED_DESPAWN, 15000))
-                trigger->CastSpell(trigger, SPELL_VORTEX_VISUAL, true);
-            events.RescheduleEvent(EVENT_START_VORTEX_REAL, 1s, 1);
+            me->GetMotionMaster()->MoveIdle();
+            events.RescheduleEvent(EVENT_START_VORTEX_REAL, 0ms, 1);
             break;
         case MI_POINT_CENTER_GROUND_PH_2:
             events.RescheduleEvent(EVENT_START_PHASE_2_FLY_UP, 0ms, 1);
@@ -384,10 +406,20 @@ struct boss_malygos : public BossAI
             break;
         }
         case EVENT_SPELL_ARCANE_BREATH:
+            if (_executingVortex)
+            {
+                events.Repeat(12s, 15s);
+                break;
+            }
             me->CastSpell(me->GetVictim(), SPELL_ARCANE_BREATH, false);
             events.Repeat(12s, 15s);
             break;
         case EVENT_SPELL_ARCANE_STORM:
+            if (_executingVortex)
+            {
+                events.Repeat(10s, 15s);
+                break;
+            }
             me->CastCustomSpell(SPELL_ARCANE_STORM, SPELLVALUE_MAX_TARGETS, DUNGEON_MODE(5, 12), me, true);
             events.Repeat(10s, 15s);
             break;
@@ -407,6 +439,7 @@ struct boss_malygos : public BossAI
         break;
         case EVENT_START_VORTEX_0:
         {
+            _executingVortex = true;
             bLockHealthCheck = true;
             Talk(SAY_MAGIC_BLAST);
             EntryCheckPredicate pred(NPC_POWER_SPARK);
@@ -425,7 +458,9 @@ struct boss_malygos : public BossAI
         }
         break;
         case EVENT_VORTEX_FLY_TO_CENTER:
-            me->GetMotionMaster()->MovePoint(MI_POINT_VORTEX_CENTER, CenterPos.GetPositionX(), CenterPos.GetPositionY(), CenterPos.GetPositionZ() + 20.0f);
+            me->SetReactState(REACT_PASSIVE);
+            me->AttackStop();
+            me->GetMotionMaster()->MovePoint(MI_POINT_VORTEX_CENTER, VortexPos);
             break;
         case EVENT_START_VORTEX_REAL:
         {
@@ -433,63 +468,9 @@ struct boss_malygos : public BossAI
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
             me->HandleEmoteCommand(EMOTE_STATE_CUSTOM_SPELL_01);
 
-            Position pos;
-            float angle = (me->GetOrientation() >= M_PI / 4 ? me->GetOrientation() - M_PI / 4 : 7 * M_PI / 4 + me->GetOrientation());
-            pos.m_positionX = CenterPos.GetPositionX() + cos(angle) * 40.0f;
-            pos.m_positionY = CenterPos.GetPositionY() + std::sin(angle) * 40.0f;
-            pos.m_positionZ = CenterPos.GetPositionZ() + 20.0f;
-            pos.SetOrientation(pos.GetAngle(&CenterPos));
-
-            if (Creature* vp = me->SummonCreature(NPC_WORLD_TRIGGER_LAOI, pos, TEMPSUMMON_TIMED_DESPAWN, 14000))
-            {
-                vp->SetDisableGravity(true);
-
-                me->GetMap()->DoForAllPlayers([&](Player* player)
-                {
-                    if (!player->IsAlive() || player->IsGameMaster())
-                        return;
-
-                    Position plrpos;
-                    float playerAngle = CenterPos.GetAngle(player);
-                    plrpos.m_positionX = CenterPos.GetPositionX() + cos(playerAngle) * 5.0f;
-                    plrpos.m_positionY = CenterPos.GetPositionY() + std::sin(playerAngle) * 5.0f;
-                    plrpos.m_positionZ = CenterPos.GetPositionZ() + 18.0f;
-                    plrpos.SetOrientation(plrpos.GetAngle(&CenterPos));
-
-                    if (Creature* vortex = me->SummonCreature(NPC_VORTEX, plrpos, TEMPSUMMON_TIMED_DESPAWN, 15000))
-                    {
-                        player->CastSpell(player, SPELL_FREEZE_ANIM, true);
-                        player->CastSpell(vortex, SPELL_VORTEX_CONTROL_VEHICLE, true);
-                        if (!player->GetVehicle()) // didn't work somehow, try again with a different way, if fails - break
-                        {
-                            player->EnterVehicle(vortex, 0);
-                            if (!player->GetVehicle())
-                                return;
-                        }
-                        //player->ClearUnitState(UNIT_STATE_ONVEHICLE);
-
-                        Movement::MoveSplineInit init(player); // TODO: has to be removed and handled with vehicle exit and vehicle enter code
-                        init.MoveTo(CenterPos.GetPositionX(), CenterPos.GetPositionY(), CenterPos.GetPositionZ());
-                        init.SetFacing(player->GetOrientation());
-                        init.SetTransportExit();
-                        init.Launch();
-
-                        player->SetUnitMovementFlags(MOVEMENTFLAG_NONE);
-                        player->SetDisableGravity(true);
-
-                        WorldPacket data(SMSG_SPLINE_MOVE_UNROOT, 8);
-                        data << player->GetPackGUID();
-                        player->SendMessageToSet(&data, true);
-
-                        sScriptMgr->AnticheatSetUnderACKmount(player);
-
-                        player->SetGuidValue(PLAYER_FARSIGHT, vp->GetGUID());
-                        vortex->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
-                    }
-                });
-            }
-
-            events.RescheduleEvent(EVENT_VORTEX_LAND_0, 11s, 1);
+            me->CastSpell(me, SPELL_VORTEX_1, true);
+            me->CastSpell(me, SPELL_VORTEX_VISUAL, true);
+            me->CastSpell(me, SPELL_VORTEX_DUMMY, true);
             break;
         }
         case EVENT_VORTEX_LAND_0:
@@ -497,10 +478,12 @@ struct boss_malygos : public BossAI
             break;
         case EVENT_VORTEX_LAND_1:
         {
+            _executingVortex = false;
             bLockHealthCheck = false;
             EntryCheckPredicate pred(NPC_POWER_SPARK);
             summons.DoAction(ACTION_POWER_SPARK_FOLLOW, pred);
             me->RemoveUnitFlag(UNIT_FLAG_PACIFIED);
+            me->SetReactState(REACT_AGGRESSIVE);
             me->ResumeChasingVictim();
             events.RescheduleEvent(EVENT_START_VORTEX_0, 60s, 1);
             break;
@@ -691,19 +674,49 @@ struct boss_malygos : public BossAI
             events.Repeat(12s);
             break;
         case EVENT_SPELL_PH3_SURGE_OF_POWER:
-            me->CastSpell((Unit*)nullptr, SPELL_PH3_SURGE_OF_POWER, false);
+        {
+            if (Is25ManRaid())
+            {
+                for (uint8 i = 0; i < NUM_MAX_SURGE_TARGETS; ++i)
+                    _surgeTargetGUID[i].Clear();
+
+                DoCastAOE(SPELL_SURGE_OF_POWER_WARN_SELECTOR_25, true);
+                me->m_Events.AddEventAtOffset([this]
+                {
+                    DoCastAOE(SPELL_PH3_SURGE_OF_POWER_25, true);
+                }, 3s);
+            }
+            else
+            {
+                for (uint8 i = 0; i < NUM_MAX_SURGE_TARGETS; ++i)
+                    _surgeTargetGUID[i].Clear();
+
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, false, true, SPELL_RIDE_RED_DRAGON_BUDDY))
+                {
+                    if (Vehicle* vehicle = target->GetVehicleKit())
+                        if (Unit* passenger = vehicle->GetPassenger(0))
+                            if (Player* player = passenger->ToPlayer())
+                                Talk(EMOTE_SURGE_OF_POWER_WARNING_P3, player);
+
+                    SetGUID(target->GetGUID(), DATA_FIRST_SURGE_TARGET_GUID);
+                    me->m_Events.AddEventAtOffset([this]
+                    {
+                        DoCastAOE(SPELL_PH3_SURGE_OF_POWER, true);
+                    }, 3s);
+                }
+            }
             events.Repeat(7s);
             break;
+        }
         }
 
         DoMeleeAttackIfReady();
     }
 
-    void JustDied(Unit*  /*killer*/) override
+    void JustDied(Unit* /*killer*/) override
     {
         _JustDied();
         Talk(SAY_DEATH);
-        instance->DoUpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_KILL_CREATURE, NPC_MALYGOS, 1);
     }
 
     void KilledUnit(Unit* victim) override
@@ -779,104 +792,11 @@ struct boss_malygos : public BossAI
     }
 };
 
-#define VORTEX_DEFAULT_DIFF 250
-#define VORTEX_TRAVEL_TIME 3000
-
-struct npc_vortex_ride : public VehicleAI
-{
-    npc_vortex_ride(Creature* creature) : VehicleAI(creature)
-    {
-        vortexRadius = urand(22, 28);
-        float h = urand(15, 30);
-        float angle = CenterPos.GetAngle(me);
-        Position pos;
-        pos.m_positionX = CenterPos.GetPositionX() + vortexRadius * cos(angle);
-        pos.m_positionY = CenterPos.GetPositionY() + vortexRadius * std::sin(angle);
-        pos.m_positionZ = CenterPos.GetPositionZ() + h;
-        pos.SetOrientation(pos.GetAngle(&CenterPos));
-        me->SetPosition(pos);
-        timer = 0;
-        despawnTimer = 9500;
-        bUpdatedFlying = false;
-    }
-
-    uint32 timer;
-    uint32 despawnTimer;
-    bool bUpdatedFlying;
-    float vortexRadius;
-
-    void PassengerBoarded(Unit* pass, int8  /*seat*/, bool apply) override
-    {
-        if (!pass || apply || !pass->IsPlayer())
-            return;
-
-        Player* player = pass->ToPlayer();
-        float speed = player->GetDistance(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()) / (1.0f * 0.001f);
-        player->SetDisableGravity(false); // packet only would lead to issues elsewhere
-        player->GetMotionMaster()->MoveCharge(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), speed);
-        player->RemoveAura(SPELL_FREEZE_ANIM);
-        player->SetGuidValue(PLAYER_FARSIGHT, ObjectGuid::Empty);
-
-        sScriptMgr->AnticheatSetCanFlybyServer(player, false);
-        sScriptMgr->AnticheatSetUnderACKmount(player);
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (despawnTimer <= diff)
-        {
-            despawnTimer = 0;
-            me->UpdatePosition(CenterPos.GetPositionX(), CenterPos.GetPositionY(), CenterPos.GetPositionZ() + 18.0f, 0.0f, true);
-            me->StopMovingOnCurrentPos();
-            if (Vehicle* vehicle = me->GetVehicleKit())
-                vehicle->RemoveAllPassengers();
-            me->DespawnOrUnsummon();
-            return;
-        }
-        else
-            despawnTimer -= diff;
-
-        if (timer <= diff)
-        {
-            float angle = CenterPos.GetAngle(me);
-            float newangle = angle + 2 * M_PI / ((float)VORTEX_TRAVEL_TIME / VORTEX_DEFAULT_DIFF);
-            if (newangle >= 2 * M_PI)
-                newangle -= 2 * M_PI;
-            float newx = CenterPos.GetPositionX() + vortexRadius * cos(newangle);
-            float newy = CenterPos.GetPositionY() + vortexRadius * std::sin(newangle);
-            float arcangle = me->GetAngle(newx, newy);
-            float dist = 2 * me->GetDistance2d(newx, newy);
-            if (me->GetVehicleKit())
-                if (Unit* pass = me->GetVehicleKit()->GetPassenger(0))
-                    if (Player* player = pass->ToPlayer())
-                    {
-                        if (!bUpdatedFlying && timer)
-                        {
-                            bUpdatedFlying = true;
-                            player->SetDisableGravity(true);
-                        }
-
-                        player->SendMonsterMove(me->GetPositionX() + dist * cos(arcangle), me->GetPositionY() + dist * std::sin(arcangle), me->GetPositionZ(), VORTEX_DEFAULT_DIFF * 2, SPLINEFLAG_FLYING);
-                        me->Relocate(newx, newy);
-                    }
-
-            timer = (diff - timer <= VORTEX_DEFAULT_DIFF) ? VORTEX_DEFAULT_DIFF - (diff - timer) : 0;
-        }
-        else
-            timer -= diff;
-    }
-
-    void AttackStart(Unit*  /*who*/) override {}
-    void MoveInLineOfSight(Unit*  /*who*/) override {}
-    void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override { damage = 0; }
-};
-
 struct npc_power_spark : public NullCreatureAI
 {
     npc_power_spark(Creature* creature) : NullCreatureAI(creature)
     {
         _instance = me->GetInstanceScript();
-        me->CastSpell(me, SPELL_POWER_SPARK_VISUAL, false);
         _checkTimer = 1000;
         _moveTimer = 0;
     }
@@ -948,7 +868,15 @@ struct npc_power_spark : public NullCreatureAI
         {
             if (_instance)
                 if (Creature* malygos = _instance->GetCreature(DATA_MALYGOS))
+                {
+                    if (malygos->HasAura(SPELL_VORTEX_1))
+                    {
+                        me->GetMotionMaster()->MoveIdle();
+                        _moveTimer = 2000;
+                        return;
+                    }
                     me->GetMotionMaster()->MovePoint(0, *malygos);
+                }
             _moveTimer = 2000;
         }
         else
@@ -962,7 +890,10 @@ struct npc_nexus_lord : public ScriptedAI
     {
         me->SetReactState(REACT_PASSIVE);
         timer = 0;
-        me->CastSpell(me, SPELL_TELEPORT_VISUAL, true);
+        ScheduleUniqueTimedEvent(0s, [&]
+        {
+            DoCastSelf(SPELL_TELEPORT_VISUAL, true);
+        }, EVENT_TELEPORT_VISUAL);
     }
 
     uint16 timer;
@@ -1027,7 +958,10 @@ struct npc_scion_of_eternity : public ScriptedAI
     npc_scion_of_eternity(Creature* creature) : ScriptedAI(creature)
     {
         me->SetReactState(REACT_PASSIVE);
-        me->CastSpell(me, SPELL_TELEPORT_VISUAL, true);
+        ScheduleUniqueTimedEvent(0s, [&]
+        {
+            DoCastSelf(SPELL_TELEPORT_VISUAL, true);
+        }, EVENT_TELEPORT_VISUAL);
         ScheduleTimedEvent(20s, 25s, [&]
         {
             GuidVector guids;
@@ -1069,6 +1003,7 @@ struct npc_hover_disk : public VehicleAI
     npc_hover_disk(Creature* creature) : VehicleAI(creature)
     {
         events.Reset();
+        me->SetAnimTier(AnimTier::Fly);
     }
 
     EventMap events;
@@ -1078,6 +1013,7 @@ struct npc_hover_disk : public VehicleAI
         events.Reset();
         if (!who)
             return;
+
         if (apply)
         {
             if (who->IsPlayer())
@@ -1086,27 +1022,33 @@ struct npc_hover_disk : public VehicleAI
                 who->ApplySpellImmune(0, IMMUNITY_ID, SPELL_SURGE_OF_POWER_DMG, true);
                 me->SetSpeed(MOVE_RUN, 1.5f);
                 me->SetSpeed(MOVE_FLIGHT, 1.5f);
+                me->SetCanFly(true);
+                me->SetDisableGravity(true);
             }
             else if (who->GetEntry() == NPC_NEXUS_LORD)
             {
+                who->CastSpell(who, SPELL_TELEPORT_VISUAL);
                 me->SetSpeed(MOVE_RUN, 1.5f);
                 me->SetSpeed(MOVE_FLIGHT, 1.5f);
+                me->SetCanFly(true);
             }
             else
             {
+                who->CastSpell(who, SPELL_TELEPORT_VISUAL);
                 me->SetSpeed(MOVE_RUN, 0.6f);
                 me->SetSpeed(MOVE_FLIGHT, 0.6f);
+                me->SetCanFly(true);
             }
-
-            who->SetFacingTo(me->GetOrientation());
-            me->SetCanFly(true);
         }
         else
         {
-            me->GetMotionMaster()->MoveIdle();
-            me->DisableSpline();
+            me->StopMoving();
+            me->SetDisableGravity(false);
             me->SetCanFly(false);
             me->GetMotionMaster()->MoveLand(0, me->GetPositionX(), me->GetPositionY(), 267.24f, 10.0f);
+            me->SetImmuneToNPC(true);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            me->SetFaction(FACTION_FRIENDLY);
 
             if (who->IsPlayer())
             {
@@ -1225,7 +1167,10 @@ struct npc_alexstrasza : public ScriptedAI
 
 struct npc_eoe_wyrmrest_skytalon : public VehicleAI
 {
-    npc_eoe_wyrmrest_skytalon(Creature* creature) : VehicleAI(creature) { }
+    npc_eoe_wyrmrest_skytalon(Creature* creature) : VehicleAI(creature)
+    {
+        me->SetAnimTier(AnimTier::Fly);
+    }
 
     void IsSummonedBy(WorldObject* summoner) override
     {
@@ -1260,61 +1205,194 @@ struct npc_eoe_wyrmrest_skytalon : public VehicleAI
     }
 };
 
-struct go_the_focusing_iris : public GameObjectAI
+// 56105 - Vortex
+class spell_malygos_vortex_dummy : public SpellScript
 {
-    go_the_focusing_iris(GameObject* go) : GameObjectAI(go) { }
+    PrepareSpellScript(spell_malygos_vortex_dummy);
 
-    bool GossipHello(Player* /*user*/, bool /*reportUse*/) override
+    bool Load() override
     {
-        if (InstanceScript* instance = me->GetInstanceScript())
-            instance->SetData(DATA_IRIS_ACTIVATED, 0);
+        return GetCaster()->IsCreature();
+    }
 
-        return true;
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        Creature* caster = GetCaster()->ToCreature();
+        if (!caster)
+            return;
+
+        if (InstanceScript* instance = caster->GetInstanceScript())
+            instance->SetData(DATA_VORTEX_HANDLING, 0);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_malygos_vortex_dummy::HandleScript, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
+// 55873 - Vortex
+class spell_malygos_vortex_visual : public AuraScript
+{
+    PrepareAuraScript(spell_malygos_vortex_visual);
+
+    bool Load() override
+    {
+        return GetCaster()->IsCreature();
+    }
+
+    bool Validate(SpellInfo const* /*spell*/) override
+    {
+        return ValidateSpellInfo({ SPELL_VORTEX_1, SPELL_VORTEX_TELEPORT });
+    }
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Creature* caster = GetCaster()->ToCreature();
+        if (!caster)
+            return;
+
+        if (InstanceScript* instance = caster->GetInstanceScript())
+        {
+            if (Creature* trigger = ObjectAccessor::GetCreature(*caster, instance->GetGuidData(DATA_VORTEX_TRIGGER)))
+            {
+                caster->GetMap()->DoForAllPlayers([&](Player* player)
+                {
+                    if (player->IsAlive() && !player->IsGameMaster())
+                        trigger->CastSpell(player, SPELL_VORTEX_TELEPORT, true);
+                });
+            }
+        }
+
+        caster->GetMotionMaster()->MoveLand(MI_POINT_VORTEX_LAND, VortexLandPos);
+        caster->RemoveAura(SPELL_VORTEX_1);
+    }
+
+    void Register() override
+    {
+        AfterEffectRemove += AuraEffectRemoveFn(
+            spell_malygos_vortex_visual::OnRemove,
+            EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+// 57407 - Surge of Power (Phase 3 - 10-man)
 class spell_eoe_ph3_surge_of_power : public SpellScript
 {
     PrepareSpellScript(spell_eoe_ph3_surge_of_power);
 
-    ObjectGuid DrakeGUID[3];
-
     bool Load() override
     {
-        if (Unit* caster = GetCaster())
-            if (Creature* creature = caster->ToCreature())
-            {
-                uint8 i = 0;
-                std::list<Unit*> drakes;
-                creature->AI()->SelectTargetList(drakes, (creature->GetMap()->GetSpawnMode() == 0 ? 1 : 3), SelectTargetMethod::Random, 0, 0.0f, false, true, 57403 /*only drakes have this aura*/);
-                for (std::list<Unit*>::iterator itr = drakes.begin(); itr != drakes.end() && i < 3; ++itr)
-                {
-                    DrakeGUID[i++] = (*itr)->GetGUID();
-                    if (Vehicle* vehicle = (*itr)->GetVehicleKit())
-                        if (Unit* passenger = vehicle->GetPassenger(0))
-                            if (Player* player = passenger->ToPlayer())
-                                creature->AI()->Talk(EMOTE_SURGE_OF_POWER_WARNING_P3, player);
-                }
-            }
-
-        return true;
+        return GetCaster()->IsCreature();
     }
 
     void FilterTargets(std::list<WorldObject*>& targets)
     {
-        if (Unit* caster = GetCaster())
+        // The spell targets an area, but only the drake that received the fixate warning
+        // should be hit. The boss AI stores that drake's GUID; keep only that target.
+        Creature* caster = GetCaster()->ToCreature();
+        ObjectGuid targetGuid = caster->AI()->GetGUID(DATA_FIRST_SURGE_TARGET_GUID);
+
+        targets.remove_if([targetGuid](WorldObject* target)
         {
-            targets.clear();
-            for (uint8 i = 0; i < 3; ++i)
-                if (DrakeGUID[i])
-                    if (Unit* u = ObjectAccessor::GetUnit(*caster, DrakeGUID[i]))
-                        targets.push_back(u);
-        }
+            return target->GetGUID() != targetGuid;
+        });
     }
 
     void Register() override
     {
         OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_eoe_ph3_surge_of_power::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
+};
+
+// 60939 - Surge of Power (Warning Selector - 25-man)
+class spell_malygos_surge_of_power_warning_selector_25 : public SpellScript
+{
+    PrepareSpellScript(spell_malygos_surge_of_power_warning_selector_25);
+
+    bool Load() override
+    {
+        return GetCaster()->IsCreature();
+    }
+
+    bool Validate(SpellInfo const* /*spell*/) override
+    {
+        return ValidateSpellInfo({ SPELL_PH3_SURGE_OF_POWER_25 });
+    }
+
+    void SendThreeTargets(std::list<WorldObject*>& targets)
+    {
+        Creature* caster = GetCaster()->ToCreature();
+
+        // Keep only creatures with vehicle kits (drakes)
+        targets.remove_if([](WorldObject* target)
+        {
+            Creature* creature = target->ToCreature();
+            return !creature || !creature->GetVehicleKit();
+        });
+
+        if (targets.empty())
+            return;
+
+        Acore::Containers::RandomResize(targets, NUM_MAX_SURGE_TARGETS);
+
+        uint8 guidDataSlot = DATA_FIRST_SURGE_TARGET_GUID;
+        for (WorldObject* obj : targets)
+        {
+            Creature* target = obj->ToCreature();
+            caster->AI()->SetGUID(target->GetGUID(), guidDataSlot++);
+
+            if (Vehicle* vehicle = target->GetVehicleKit())
+                if (Unit* passenger = vehicle->GetPassenger(0))
+                    if (Player* player = passenger->ToPlayer())
+                        caster->AI()->Talk(EMOTE_SURGE_OF_POWER_WARNING_P3, player);
+        }
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_malygos_surge_of_power_warning_selector_25::SendThreeTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
+};
+
+// 60936 - Surge of Power (Phase 3 - 25-man)
+class spell_malygos_surge_of_power_25 : public SpellScript
+{
+    PrepareSpellScript(spell_malygos_surge_of_power_25);
+
+    bool Load() override
+    {
+        return GetCaster()->IsCreature();
+    }
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        Creature* caster = GetCaster()->ToCreature();
+
+        for (auto itr = targets.begin(); itr != targets.end();)
+        {
+            bool found = false;
+
+            for (uint8 i = DATA_FIRST_SURGE_TARGET_GUID;
+                i < DATA_FIRST_SURGE_TARGET_GUID + NUM_MAX_SURGE_TARGETS; ++i)
+            {
+                if ((*itr)->GetGUID() == caster->AI()->GetGUID(i))
+                {
+                    found = true;
+                    break;
+                }
+            }
+
+            if (!found)
+                targets.erase(itr++);
+            else
+                ++itr;
+        }
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_malygos_surge_of_power_25::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
     }
 };
 
@@ -1363,9 +1441,7 @@ void AddSC_boss_malygos()
 {
     RegisterEoECreatureAI(boss_malygos);
     RegisterEoECreatureAI(npc_power_spark);
-    RegisterEoECreatureAI(npc_vortex_ride);
     RegisterEoECreatureAI(npc_alexstrasza);
-    RegisterGameObjectAI(go_the_focusing_iris);
     RegisterEoECreatureAI(npc_nexus_lord);
     RegisterEoECreatureAI(npc_scion_of_eternity);
     RegisterEoECreatureAI(npc_hover_disk);
@@ -1374,4 +1450,8 @@ void AddSC_boss_malygos()
     RegisterSpellScript(spell_wyrmrest_skytalon_ride_red_dragon_buddy_trigger);
 
     RegisterSpellScript(spell_eoe_ph3_surge_of_power);
+    RegisterSpellScript(spell_malygos_surge_of_power_warning_selector_25);
+    RegisterSpellScript(spell_malygos_surge_of_power_25);
+    RegisterSpellScript(spell_malygos_vortex_dummy);
+    RegisterSpellScript(spell_malygos_vortex_visual);
 }

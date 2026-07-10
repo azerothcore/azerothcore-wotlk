@@ -96,6 +96,12 @@ public:
         return *this;
     }
 
+    TestSpellEntryHelper& WithAttributesEx3(uint32 attr)
+    {
+        _entry.AttributesEx3 = attr;
+        return *this;
+    }
+
     TestSpellEntryHelper& WithEffect(uint8 effIndex, uint32 effect, uint32 auraType = 0)
     {
         if (effIndex < MAX_SPELL_EFFECTS)
@@ -112,6 +118,33 @@ public:
         {
             _entry.EffectTriggerSpell[effIndex] = triggerSpell;
         }
+        return *this;
+    }
+
+    TestSpellEntryHelper& WithEffectBasePoints(uint8 effIndex, int32 basePoints)
+    {
+        if (effIndex < MAX_SPELL_EFFECTS)
+            _entry.EffectBasePoints[effIndex] = basePoints;
+        return *this;
+    }
+
+    TestSpellEntryHelper& WithEffectMiscValue(uint8 effIndex, int32 miscValue)
+    {
+        if (effIndex < MAX_SPELL_EFFECTS)
+            _entry.EffectMiscValue[effIndex] = miscValue;
+        return *this;
+    }
+
+    TestSpellEntryHelper& WithEffectDieSides(uint8 effIndex, int32 dieSides)
+    {
+        if (effIndex < MAX_SPELL_EFFECTS)
+            _entry.EffectDieSides[effIndex] = dieSides;
+        return *this;
+    }
+
+    TestSpellEntryHelper& WithAttributes(uint32 attr)
+    {
+        _entry.Attributes = attr;
         return *this;
     }
 
@@ -183,6 +216,12 @@ public:
         return *this;
     }
 
+    SpellInfoBuilder& WithAttributesEx3(uint32 attr)
+    {
+        _entryHelper.WithAttributesEx3(attr);
+        return *this;
+    }
+
     SpellInfoBuilder& WithEffect(uint8 effIndex, uint32 effect, uint32 auraType = 0)
     {
         _entryHelper.WithEffect(effIndex, effect, auraType);
@@ -192,6 +231,30 @@ public:
     SpellInfoBuilder& WithEffectTriggerSpell(uint8 effIndex, uint32 triggerSpell)
     {
         _entryHelper.WithEffectTriggerSpell(effIndex, triggerSpell);
+        return *this;
+    }
+
+    SpellInfoBuilder& WithEffectBasePoints(uint8 effIndex, int32 basePoints)
+    {
+        _entryHelper.WithEffectBasePoints(effIndex, basePoints);
+        return *this;
+    }
+
+    SpellInfoBuilder& WithEffectMiscValue(uint8 effIndex, int32 miscValue)
+    {
+        _entryHelper.WithEffectMiscValue(effIndex, miscValue);
+        return *this;
+    }
+
+    SpellInfoBuilder& WithEffectDieSides(uint8 effIndex, int32 dieSides)
+    {
+        _entryHelper.WithEffectDieSides(effIndex, dieSides);
+        return *this;
+    }
+
+    SpellInfoBuilder& WithAttributes(uint32 attr)
+    {
+        _entryHelper.WithAttributes(attr);
         return *this;
     }
 

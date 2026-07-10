@@ -16,6 +16,8 @@
  */
 
 #include "CreatureScript.h"
+#include "GameObject.h"
+#include "GameObjectAI.h"
 #include "GameObjectScript.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
@@ -70,212 +72,190 @@ enum EVENTS
     EVENT_CONFLAGRATION         = 4
 };
 
-class boss_razorgore : public CreatureScript
+struct boss_razorgore : public BossAI
 {
-public:
-    boss_razorgore() : CreatureScript("boss_razorgore") { }
+    boss_razorgore(Creature* creature) : BossAI(creature, DATA_RAZORGORE_THE_UNTAMED) { }
 
-    struct boss_razorgoreAI : public BossAI
+    void Reset() override
     {
-        boss_razorgoreAI(Creature* creature) : BossAI(creature, DATA_RAZORGORE_THE_UNTAMED) { }
-
-        void Reset() override
-        {
-            _Reset();
-            _charmerGUID.Clear();
-            secondPhase = false;
-            summons.DespawnAll();
-            instance->SetData(DATA_EGG_EVENT, NOT_STARTED);
-        }
-
-        void JustDied(Unit* /*killer*/) override
-        {
-            if (secondPhase)
-            {
-                _JustDied();
-            }
-            else
-            {
-                // Respawn shorty in case of failure during phase 1.
-                me->SetCorpseRemoveTime(25);
-                me->SetRespawnTime(30);
-                me->SaveRespawnTime();
-
-                // Might not be required, safe measure.
-                me->SetLootRecipient(nullptr);
-
-                instance->SetData(DATA_EGG_EVENT, FAIL);
-            }
-        }
-
-        bool CanAIAttack(Unit const* target) const override
-        {
-            return !(target->IsCreature() && !secondPhase);
-        }
-
-        void JustEngagedWith(Unit* /*who*/) override
-        {
-            _JustEngagedWith();
-
-            events.ScheduleEvent(EVENT_CLEAVE, 15s);
-            events.ScheduleEvent(EVENT_STOMP, 35s);
-            events.ScheduleEvent(EVENT_FIREBALL, 7s);
-            events.ScheduleEvent(EVENT_CONFLAGRATION, 12s);
-
-            instance->SetData(DATA_EGG_EVENT, IN_PROGRESS);
-        }
-
-        void DoChangePhase()
-        {
-            secondPhase = true;
-            _charmerGUID.Clear();
-            me->RemoveAllAuras();
-
-            DoCastSelf(SPELL_WARMING_FLAMES, true);
-
-            if (Creature* troops = instance->GetCreature(DATA_NEFARIAN_TROOPS))
-            {
-                troops->AI()->Talk(EMOTE_TROOPS_RETREAT);
-            }
-
-            for (ObjectGuid const& guid : _summonGUIDS)
-            {
-                if (Creature* creature = ObjectAccessor::GetCreature(*me, guid))
-                {
-                    if (creature->IsAlive())
-                    {
-                        creature->CombatStop(true);
-                        creature->SetReactState(REACT_PASSIVE);
-                        creature->GetMotionMaster()->MovePoint(0, Position(-7560.568848f, -1028.553345f, 408.491211f, 0.523858f));
-                    }
-                }
-            }
-        }
-
-        void SetGUID(ObjectGuid const& guid, int32 /*id*/) override
-        {
-            _charmerGUID = guid;
-        }
-
-        void OnCharmed(bool apply) override
-        {
-            if (apply)
-            {
-                if (Unit* charmer = ObjectAccessor::GetUnit(*me, _charmerGUID))
-                {
-                    charmer->CastSpell(charmer, SPELL_MIND_EXHAUSTION, true);
-                    charmer->CastSpell(me, SPELL_MINDCONTROL_VISUAL, false);
-                }
-            }
-            else
-            {
-                if (Unit* charmer = ObjectAccessor::GetUnit(*me, _charmerGUID))
-                {
-                    charmer->RemoveAurasDueToSpell(SPELL_MINDCONTROL_VISUAL);
-                    me->TauntApply(charmer);
-                }
-            }
-        }
-
-        void DoAction(int32 action) override
-        {
-            if (action == ACTION_PHASE_TWO)
-            {
-                DoChangePhase();
-            }
-
-            if (action == TALK_EGG_BROKEN_RAND)
-            {
-                Talk(urand(SAY_EGGS_BROKEN1, SAY_EGGS_BROKEN3));
-            }
-        }
-
-        void JustSummoned(Creature* summon) override
-        {
-            _summonGUIDS.push_back(summon->GetGUID());
-            summon->SetOwnerGUID(me->GetGUID());
-            summons.Summon(summon);
-        }
-
-        void SummonMovementInform(Creature* summon, uint32 movementType, uint32 /*pathId*/) override
-        {
-            if (movementType == POINT_MOTION_TYPE)
-            {
-                summon->DespawnOrUnsummon();
-            }
-        }
-
-        void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
-        {
-            if (!secondPhase && damage >= me->GetHealth())
-            {
-                Talk(SAY_DEATH);
-                DoCastAOE(SPELL_EXPLODE_ORB);
-                DoCastAOE(SPELL_EXPLOSION);
-            }
-        }
-
-        void UpdateAI(uint32 diff) override
-        {
-            if (!UpdateVictim())
-                return;
-
-            if (!me->IsCharmed())
-            {
-                events.Update(diff);
-            }
-
-            if (me->HasUnitState(UNIT_STATE_CASTING))
-                return;
-
-            while (uint32 eventId = events.ExecuteEvent())
-            {
-                switch (eventId)
-                {
-                    case EVENT_CLEAVE:
-                        DoCastVictim(SPELL_CLEAVE);
-                        events.ScheduleEvent(EVENT_CLEAVE, 7s, 10s);
-                        break;
-                    case EVENT_STOMP:
-                        DoCastVictim(SPELL_WARSTOMP);
-                        events.ScheduleEvent(EVENT_STOMP, 15s, 25s);
-                        break;
-                    case EVENT_FIREBALL:
-                        DoCastVictim(SPELL_FIREBALLVOLLEY);
-                        events.ScheduleEvent(EVENT_FIREBALL, 12s, 15s);
-                        break;
-                    case EVENT_CONFLAGRATION:
-                        DoCastVictim(SPELL_CONFLAGRATION);
-                        events.ScheduleEvent(EVENT_CONFLAGRATION, 30s);
-                        break;
-                }
-            }
-
-            DoMeleeAttackIfReady();
-        }
-
-    private:
-        bool secondPhase;
-        ObjectGuid _charmerGUID;
-        GuidVector _summonGUIDS;
-    };
-
-    CreatureAI* GetAI(Creature* creature) const override
-    {
-        return GetBlackwingLairAI<boss_razorgoreAI>(creature);
+        _Reset();
+        _charmerGUID.Clear();
+        secondPhase = false;
+        summons.DespawnAll();
+        instance->SetData(DATA_EGG_EVENT, NOT_STARTED);
     }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        if (secondPhase)
+        {
+            _JustDied();
+        }
+        else
+        {
+            // Respawn shorty in case of failure during phase 1.
+            me->SetCorpseRemoveTime(25);
+            me->SetRespawnTime(30);
+            me->SaveRespawnTime();
+
+            // Might not be required, safe measure.
+            me->SetLootRecipient(nullptr);
+
+            instance->SetData(DATA_EGG_EVENT, FAIL);
+        }
+    }
+
+    bool CanAIAttack(Unit const* target) const override
+    {
+        return !(target->IsCreature() && !secondPhase);
+    }
+
+    void JustEngagedWith(Unit* /*who*/) override
+    {
+        _JustEngagedWith();
+
+        events.ScheduleEvent(EVENT_CLEAVE, 15s);
+        events.ScheduleEvent(EVENT_STOMP, 35s);
+        events.ScheduleEvent(EVENT_FIREBALL, 7s);
+        events.ScheduleEvent(EVENT_CONFLAGRATION, 12s);
+
+        instance->SetData(DATA_EGG_EVENT, IN_PROGRESS);
+    }
+
+    void DoChangePhase()
+    {
+        secondPhase = true;
+        _charmerGUID.Clear();
+        me->RemoveAllAuras();
+
+        DoCastSelf(SPELL_WARMING_FLAMES, true);
+
+        if (Creature* troops = instance->GetCreature(DATA_NEFARIAN_TROOPS))
+            troops->AI()->Talk(EMOTE_TROOPS_RETREAT);
+
+        for (ObjectGuid const& guid : _summonGUIDS)
+        {
+            if (Creature* creature = ObjectAccessor::GetCreature(*me, guid))
+                if (creature->IsAlive())
+                {
+                    creature->CombatStop(true);
+                    creature->SetReactState(REACT_PASSIVE);
+                    creature->GetMotionMaster()->MovePoint(0, Position(-7560.568848f, -1028.553345f, 408.491211f, 0.523858f));
+                }
+        }
+    }
+
+    void SetGUID(ObjectGuid const& guid, int32 /*id*/) override
+    {
+        _charmerGUID = guid;
+    }
+
+    void OnCharmed(bool apply) override
+    {
+        if (apply)
+        {
+            if (Unit* charmer = ObjectAccessor::GetUnit(*me, _charmerGUID))
+            {
+                charmer->CastSpell(charmer, SPELL_MIND_EXHAUSTION, true);
+                charmer->CastSpell(me, SPELL_MINDCONTROL_VISUAL, false);
+            }
+        }
+        else
+        {
+            if (Unit* charmer = ObjectAccessor::GetUnit(*me, _charmerGUID))
+            {
+                charmer->RemoveAurasDueToSpell(SPELL_MINDCONTROL_VISUAL);
+                me->EngageWithTarget(charmer);
+                me->AddThreat(charmer, 100.0f);
+                me->AI()->AttackStart(charmer);
+            }
+        }
+    }
+
+    void DoAction(int32 action) override
+    {
+        if (action == ACTION_PHASE_TWO)
+            DoChangePhase();
+
+        if (action == TALK_EGG_BROKEN_RAND)
+            Talk(urand(SAY_EGGS_BROKEN1, SAY_EGGS_BROKEN3));
+    }
+
+    void JustSummoned(Creature* summon) override
+    {
+        _summonGUIDS.push_back(summon->GetGUID());
+        summon->SetOwnerGUID(me->GetGUID());
+        summons.Summon(summon);
+    }
+
+    void SummonMovementInform(Creature* summon, uint32 movementType, uint32 /*pathId*/) override
+    {
+        if (movementType == POINT_MOTION_TYPE)
+            summon->DespawnOrUnsummon();
+    }
+
+    void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
+    {
+        if (!secondPhase && damage >= me->GetHealth())
+        {
+            Talk(SAY_DEATH);
+            DoCastAOE(SPELL_EXPLODE_ORB);
+            DoCastAOE(SPELL_EXPLOSION);
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!UpdateVictim())
+            return;
+
+        if (!me->IsCharmed())
+            events.Update(diff);
+
+        if (me->HasUnitState(UNIT_STATE_CASTING))
+            return;
+
+        while (uint32 eventId = events.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+                case EVENT_CLEAVE:
+                    DoCastVictim(SPELL_CLEAVE);
+                    events.ScheduleEvent(EVENT_CLEAVE, 7s, 10s);
+                    break;
+                case EVENT_STOMP:
+                    DoCastVictim(SPELL_WARSTOMP);
+                    events.ScheduleEvent(EVENT_STOMP, 15s, 25s);
+                    break;
+                case EVENT_FIREBALL:
+                    DoCastVictim(SPELL_FIREBALLVOLLEY);
+                    events.ScheduleEvent(EVENT_FIREBALL, 12s, 15s);
+                    break;
+                case EVENT_CONFLAGRATION:
+                    DoCastVictim(SPELL_CONFLAGRATION);
+                    events.ScheduleEvent(EVENT_CONFLAGRATION, 30s);
+                    break;
+            }
+        }
+
+        DoMeleeAttackIfReady();
+    }
+
+private:
+    bool secondPhase;
+    ObjectGuid _charmerGUID;
+    GuidVector _summonGUIDS;
 };
 
-class go_orb_of_domination : public GameObjectScript
+struct go_orb_of_domination : public GameObjectAI
 {
-public:
-    go_orb_of_domination() : GameObjectScript("go_orb_of_domination") { }
+    go_orb_of_domination(GameObject* go) : GameObjectAI(go) { }
 
-    bool OnGossipHello(Player* player, GameObject* go) override
+    bool GossipHello(Player* player, bool /*reportUse*/) override
     {
-        if (InstanceScript* instance = go->GetInstanceScript())
+        if (InstanceScript* instance = me->GetInstanceScript())
             if (instance->GetData(DATA_EGG_EVENT) != DONE && !player->HasAura(SPELL_MIND_EXHAUSTION) && !player->GetPet())
-                if (Creature* razor = ObjectAccessor::GetCreature(*go, instance->GetGuidData(DATA_RAZORGORE_THE_UNTAMED)))
+                if (Creature* razor = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_RAZORGORE_THE_UNTAMED)))
                 {
                     razor->AI()->SetGUID(player->GetGUID());
                     razor->Attack(player, true);
@@ -292,12 +272,9 @@ class spell_egg_event : public SpellScript
     void HandleOnHit()
     {
         if (InstanceScript* instance = GetCaster()->GetInstanceScript())
-        {
             instance->SetData(DATA_EGG_EVENT, SPECIAL);
-        }
 
         if (Creature* razorgore = GetCaster()->ToCreature())
-        {
             if (GameObject* egg = GetHitGObj())
             {
                 razorgore->AI()->DoAction(TALK_EGG_BROKEN_RAND);
@@ -305,7 +282,6 @@ class spell_egg_event : public SpellScript
                 egg->UseDoorOrButton(10000);
                 egg->SetRespawnTime(WEEK);
             }
-        }
     }
 
     void Register() override
@@ -316,7 +292,7 @@ class spell_egg_event : public SpellScript
 
 void AddSC_boss_razorgore()
 {
-    new boss_razorgore();
-    new go_orb_of_domination();
+    RegisterBlackwingLairCreatureAI(boss_razorgore);
+    RegisterBlackwingLairGameObjectAI(go_orb_of_domination);
     RegisterSpellScript(spell_egg_event);
 }

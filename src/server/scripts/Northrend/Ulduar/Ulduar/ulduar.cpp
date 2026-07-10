@@ -23,6 +23,7 @@
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedGossip.h"
+#include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
@@ -136,7 +137,13 @@ public:
             if (spellInfo->Id == SPELL_TELEPORT)
             {
                 me->DespawnOrUnsummon();
-                me->GetInstanceScript()->SetData(TYPE_WATCHERS, _keeper);
+                InstanceScript* instance = me->GetInstanceScript();
+                uint32 mask = instance->GetPersistentData(
+                    PERSISTENT_DATA_WATCHERS_MASK);
+                instance->StorePersistentData(
+                    PERSISTENT_DATA_WATCHERS_MASK,
+                    mask | (1 << _keeper));
+                instance->SetData(EVENT_KEEPER_TELEPORTED, 0);
             }
         }
 
@@ -544,9 +551,44 @@ struct npc_salvaged_siege_engine : public VehicleAI
     }
 };
 
+// 64014 - Expedition Base Camp Teleport
+// 64024 - Conservatory of Life Teleport
+// 64025 - Halls of Invention Teleport
+// 64028 - Colossal Forge Teleport
+// 64029 - Shattered Walkway Teleport
+// 64030 - Antechamber of Ulduar Teleport
+// 64031 - Scrapyard Teleport
+// 64032 - Formation Grounds Teleport
+// 65042 - Prison of Yogg-Saron Teleport
+class spell_ulduar_teleporter : public SpellScript
+{
+    PrepareSpellScript(spell_ulduar_teleporter);
+
+    SpellCastResult CheckRequirement()
+    {
+        Unit* target = GetExplTargetUnit();
+        if (!target || !target->IsPlayer())
+            return SPELL_FAILED_DONT_REPORT;
+
+        if (target->IsInCombat())
+        {
+            Spell::SendCastResult(target->ToPlayer(), GetSpellInfo(), 0, SPELL_FAILED_AFFECTING_COMBAT);
+            return SPELL_FAILED_AFFECTING_COMBAT;
+        }
+
+        return SPELL_CAST_OK;
+    }
+
+    void Register() override
+    {
+        OnCheckCast += SpellCheckCastFn(spell_ulduar_teleporter::CheckRequirement);
+    }
+};
+
 void AddSC_ulduar()
 {
     new npc_ulduar_keeper();
+    RegisterSpellScript(spell_ulduar_teleporter);
     RegisterSpellScript(spell_ulduar_energy_sap_aura);
     RegisterUlduarCreatureAI(npc_ulduar_snow_mound);
     RegisterUlduarCreatureAI(npc_ulduar_storm_tempered_keeper);

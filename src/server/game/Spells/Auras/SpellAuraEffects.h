@@ -144,6 +144,7 @@ private:
     uint8 const m_effIndex;
     bool m_canBeRecalculated;
     bool m_isPeriodic;
+    bool m_isRecalculatingPassiveAuras = false;
 private:
     float CalcPeriodicCritChance(Unit const* caster, Unit const* target) const;
 
@@ -205,6 +206,7 @@ public:
     void HandleModThreat(AuraApplication const* aurApp, uint8 mode, bool apply) const;
     void HandleAuraModTotalThreat(AuraApplication const* aurApp, uint8 mode, bool apply) const;
     void HandleModTaunt(AuraApplication const* aurApp, uint8 mode, bool apply) const;
+    void HandleModDetaunt(AuraApplication const* aurApp, uint8 mode, bool apply) const;
     //  control
     void HandleModConfuse(AuraApplication const* aurApp, uint8 mode, bool apply) const;
     void HandleModFear(AuraApplication const* aurApp, uint8 mode, bool apply) const;
@@ -334,6 +336,7 @@ public:
     void HandlePeriodicPowerBurnAuraTick(Unit* target, Unit* caster) const;
 
     // aura effect proc handlers
+    void HandleBreakableCCAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo);
     void HandleProcTriggerSpellAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo);
     void HandleProcTriggerSpellWithValueAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo);
     void HandleProcTriggerDamageAuraProc(AuraApplication* aurApp, ProcEventInfo& eventInfo);

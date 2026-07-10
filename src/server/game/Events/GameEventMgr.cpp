@@ -300,7 +300,7 @@ void GameEventMgr::LoadEventVendors()
         // Get creature entry
         newEntry.Entry = 0;
         if (CreatureData const* data = sObjectMgr->GetCreatureData(guid))
-            newEntry.Entry = data->id1;
+            newEntry.Entry = data->id;
 
         // Validate vendor item
         if (!sObjectMgr->IsVendorItemValid(newEntry.Entry, newEntry.Item, newEntry.MaxCount, newEntry.Incrtime, newEntry.ExtendedCost, nullptr, nullptr, event_npc_flag))
@@ -614,9 +614,7 @@ void GameEventMgr::LoadEventModelEquipmentChangeData()
 
             ObjectGuid::LowType guid = fields[0].Get<uint32>();
             uint32 entry = fields[1].Get<uint32>();
-            uint32 entry2 = fields[2].Get<uint32>();
-            uint32 entry3 = fields[3].Get<uint32>();
-            uint16 eventId = fields[4].Get<uint8>();
+            uint16 eventId = fields[2].Get<uint8>();
 
             if (eventId >= _gameEventModelEquip.size())
             {
@@ -626,15 +624,15 @@ void GameEventMgr::LoadEventModelEquipmentChangeData()
 
             ModelEquipList& equiplist = _gameEventModelEquip[eventId];
             ModelEquip newModelEquipSet;
-            newModelEquipSet.ModelId = fields[5].Get<uint32>();
-            newModelEquipSet.EquipmentId = fields[6].Get<uint8>();
+            newModelEquipSet.ModelId = fields[3].Get<uint32>();
+            newModelEquipSet.EquipmentId = fields[4].Get<uint8>();
             newModelEquipSet.EquipementIdPrev = 0;
             newModelEquipSet.ModelIdPrev = 0;
 
             if (newModelEquipSet.EquipmentId > 0)
             {
                 int8 equipId = static_cast<int8>(newModelEquipSet.EquipmentId);
-                if ((!sObjectMgr->GetEquipmentInfo(entry, equipId)) || (entry2 && !sObjectMgr->GetEquipmentInfo(entry2, equipId)) || (entry3 && !sObjectMgr->GetEquipmentInfo(entry3, equipId)))
+                if (!sObjectMgr->GetEquipmentInfo(entry, equipId))
                 {
                     LOG_ERROR("sql.sql", "Table `game_event_model_equip` have creature (Guid: {}) with equipment_id {} not found in table `creature_equip_template`, set to no equipment.",
                         guid, newModelEquipSet.EquipmentId);
@@ -1961,21 +1959,23 @@ void GameEventMgr::SetHolidayEventTime(GameEventData& event)
     bool singleDate = ((holiday->Date[0] >> 24) & 0x1F) == 31; // Events with fixed date within year have - 1
 
     time_t curTime = GameTime::GetGameTime().count();
-    for (uint8 i = 0; i < MAX_HOLIDAY_DATES && holiday->Date[i]; ++i)
 
+    if (!singleDate)
+    {
+        time_t start = HolidayDateCalculator::FindStartTimeForStage(
+            holiday->Date, MAX_HOLIDAY_DATES, stageOffset, event.Length, curTime);
+        if (start)
+            event.Start = start;
+
+        return;
+    }
+
+    for (uint8 i = 0; i < MAX_HOLIDAY_DATES && holiday->Date[i]; ++i)
     {
         uint32 date = holiday->Date[i];
 
-        tm timeInfo;
-        if (singleDate)
-        {
-            timeInfo = Acore::Time::TimeBreakdown(curTime);
-            timeInfo.tm_year -= 1; // First try last year (event active through New Year)
-        }
-        else
-        {
-            timeInfo.tm_year = ((date >> 24) & 0x1F) + 100;
-        }
+        tm timeInfo = Acore::Time::TimeBreakdown(curTime);
+        timeInfo.tm_year -= 1; // First try last year (event active through New Year)
 
         timeInfo.tm_mon = (date >> 20) & 0xF;
         timeInfo.tm_mday = ((date >> 14) & 0x3F) + 1;
@@ -1986,12 +1986,12 @@ void GameEventMgr::SetHolidayEventTime(GameEventData& event)
 
         // try to get next start time (skip past dates)
         time_t startTime = mktime(&timeInfo);
-        if (curTime < startTime + event.Length * MINUTE)
+        if (curTime < startTime + stageOffset + event.Length * MINUTE)
         {
             event.Start = startTime + stageOffset;
             break;
         }
-        else if (singleDate)
+        else
         {
             tm tmCopy = Acore::Time::TimeBreakdown(curTime);
             int year = tmCopy.tm_year; // This year
@@ -1999,11 +1999,6 @@ void GameEventMgr::SetHolidayEventTime(GameEventData& event)
             tmCopy.tm_year = year;
             event.Start = mktime(&tmCopy) + stageOffset;
             break;
-        }
-        else
-        {
-            // date is due and not a singleDate event, try with next DBC date (dynamically calculated or overridden by game_event.start_time)
-            // if none is found we don't modify start date and use the one in game_event
         }
     }
 }

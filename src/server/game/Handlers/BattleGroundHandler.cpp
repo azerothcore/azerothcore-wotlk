@@ -47,9 +47,7 @@ void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket& recvData)
     if (!unit->IsBattleMaster())                             // it's not battlemaster
         return;
 
-    // Stop the npc if moving
-    if (uint32 pause = unit->GetMovementTemplate().GetInteractionPauseTimer())
-        unit->PauseMovement(pause);
+    unit->PauseMovementForInteraction();
     unit->SetHomePosition(unit->GetPosition());
 
     BattlegroundTypeId bgTypeId = sBattlegroundMgr->GetBattleMasterBG(unit->GetEntry());
@@ -163,7 +161,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
         {
             err = ERR_LFG_CANT_USE_BATTLEGROUND;
         }
-        else if (!_player->CanJoinToBattleground()) // has deserter debuff
+        else if (!_player->CanJoinToBattleground(bg)) // has deserter debuff
         {
             err = ERR_GROUP_JOIN_BATTLEGROUND_DESERTERS;
         }
@@ -254,7 +252,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
             }
         });
 
-        if (err)
+        if (err > 0)
         {
             err = grp->CanJoinBattlegroundQueue(bg, bgQueueTypeId, 0, bg->GetMaxPlayersPerTeam(), false, 0);
         }
@@ -414,7 +412,9 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recvData)
         return;
     }
 
-    if (_player->GetCharmGUID() || _player->IsInCombat())
+    // GetCharm() validates the charmed unit still exists and clears a stale reference,
+    // unlike GetCharmGUID(); a despawned vehicle must not permanently block BG entry.
+    if (_player->GetCharm() || _player->IsInCombat())
     {
         ChatHandler(_player->GetSession()).SendNotification(LANG_YOU_IN_COMBAT);
         return;
@@ -475,7 +475,7 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recvData)
     if (action == 1 && ginfo.ArenaType == 0)
     {
         // can't join with deserter, check it here right before joining to be sure
-        if (!_player->CanJoinToBattleground())
+        if (!_player->CanJoinToBattleground(bg))
         {
             WorldPacket data;
             sBattlegroundMgr->BuildGroupJoinedBattlegroundPacket(&data, ERR_GROUP_JOIN_BATTLEGROUND_DESERTERS);

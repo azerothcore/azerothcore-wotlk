@@ -54,6 +54,7 @@ struct AccountInfo
     bool IsLockedToIP = false;
     std::string LockCountry;
     std::string LastIP;
+    uint32 Flags;
     uint32 FailedLogins = 0;
     bool IsBanned = false;
     bool IsPermanentlyBanned = false;

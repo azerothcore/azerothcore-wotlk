@@ -20,6 +20,7 @@
 
 #include <utility>
 
+#include "ByteBuffer.h"
 #include "DBCStructure.h"
 #include "Field.h"
 #include "LFG.h"
@@ -450,6 +451,10 @@ namespace lfg
         void LoadRewards();
         /// Loads dungeons from dbc and adds teleport coords
         void LoadLFGDungeons(bool reload = false);
+        /// Filters out recently completed dungeons from the proposal set for the given players
+        LfgDungeonSet FilterCooldownDungeons(LfgDungeonSet const& dungeons, LfgRolesMap const& players);
+        /// Clears all dungeon cooldowns for all players
+        void ClearDungeonCooldowns();
 
         // Multiple files
         /// Check if given guid applied for random dungeon
@@ -558,8 +563,8 @@ namespace lfg
         void SendRaidBrowserJoinedPacket(Player* p, LfgDungeonSet& dungeons, std::string comment);
         void RBPacketAppendGroup(const RBInternalInfo& info, ByteBuffer& buffer);
         void RBPacketAppendPlayer(const RBInternalInfo& info, ByteBuffer& buffer);
-        void RBPacketBuildDifference(WorldPacket& differencePacket, uint32 dungeonId, uint32 deletedCounter, ByteBuffer& buffer_deleted, uint32 groupCounter, ByteBuffer& buffer_groups, uint32 playerCounter, ByteBuffer& buffer_players);
-        void RBPacketBuildFull(WorldPacket& fullPacket, uint32 dungeonId, RBInternalInfoMap& infoMap);
+        void RBPacketBuildDifference(WorldPacket& differencePacket, uint32 dungeonId, uint32 deletedCounter, ByteBuffer const& bufferDeleted, uint32 groupCounter, ByteBuffer const& bufferGroups, uint32 playerCounter, ByteBuffer const& bufferPlayers);
+        void RBPacketBuildFull(WorldPacket& fullPacket, uint32 dungeonId, RBInternalInfoMap const& infoMap);
 
         // LfgQueue
         /// Get last lfg state (NONE, DUNGEON or FINISHED_DUNGEON)
@@ -623,6 +628,12 @@ namespace lfg
         uint32 lastProposalId;                             ///< pussywizard, store it here because of splitting LFGMgr update into tasks
         uint32 m_raidBrowserUpdateTimer[2];                ///< pussywizard
         uint32 m_raidBrowserLastUpdatedDungeonId[2];       ///< pussywizard: for 2 factions
+        ByteBuffer _rbBufferDeleted;
+        ByteBuffer _rbBufferGroups;
+        ByteBuffer _rbBufferPlayers;
+        GuidSet _rbDeletedGroups;
+        GuidSet _rbDeletedGroupsToErase;
+        RBInternalInfoMap _rbCopy;
 
         LfgQueueContainer QueuesStore;                     ///< Queues
         LfgCachedDungeonContainer CachedDungeonMapStore;   ///< Stores all dungeons by groupType
@@ -636,6 +647,14 @@ namespace lfg
         LfgPlayerDataContainer PlayersStore;               ///< Player data
         LfgGroupDataContainer GroupsStore;                 ///< Group data
         bool m_Testing;
+
+        // Dungeon cooldown system - prevents same dungeon being assigned in a row
+        typedef std::unordered_map<uint32 /*dungeonId*/, TimePoint /*completionTime*/> LfgDungeonCooldownMap;
+        typedef std::unordered_map<ObjectGuid /*playerGuid*/, LfgDungeonCooldownMap> LfgDungeonCooldownContainer;
+        LfgDungeonCooldownContainer DungeonCooldownStore;  ///< Stores dungeon cooldowns per player
+        void AddDungeonCooldown(ObjectGuid guid, uint32 dungeonId);
+        void CleanupDungeonCooldowns();
+        [[nodiscard]] Seconds GetDungeonCooldownDuration() const;
     };
 
     template <typename T, FMT_ENABLE_IF(std::is_enum_v<T>)>
