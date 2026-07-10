@@ -98,4 +98,4 @@ INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `e
 (131027, 0, 0, 0, 1, 173, 0, NULL);
 
 -- Reposition Protector spawn 131030 to its sniffed location
-UPDATE `creature` SET `position_x` = 3452.6472, `position_y` = 250.009, `position_z` = 52.378803, `orientation` = 3.298672199249267578 WHERE `guid` = 131030;
+UPDATE `creature` SET `position_x` = 3452.6472, `position_y` = 250.009, `position_z` = 52.378803, `orientation` = 3.298672199249267578 WHERE `guid` = 131030 AND `id` = 27953;
