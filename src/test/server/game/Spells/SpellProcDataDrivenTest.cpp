@@ -394,7 +394,9 @@ TEST_F(SpellProcDatabaseTest, MeleeProcs_AllTriggerOnMelee)
 
     SCOPED_TRACE("Melee procs: " + std::to_string(tested) + " tested, " + std::to_string(passed) + " passed");
     if (tested > 0)
+    {
         EXPECT_EQ(passed, tested);
+    }
 }
 
 TEST_F(SpellProcDatabaseTest, SpellDamageProcs_AllTriggerOnSpellDamage)
@@ -427,7 +429,9 @@ TEST_F(SpellProcDatabaseTest, SpellDamageProcs_AllTriggerOnSpellDamage)
 
     SCOPED_TRACE("Spell damage procs: " + std::to_string(tested) + " tested, " + std::to_string(passed) + " passed");
     if (tested > 0)
+    {
         EXPECT_GT(passed, 0);
+    }
 }
 
 TEST_F(SpellProcDatabaseTest, HealProcs_AllTriggerOnHeal)
@@ -460,7 +464,9 @@ TEST_F(SpellProcDatabaseTest, HealProcs_AllTriggerOnHeal)
 
     SCOPED_TRACE("Heal procs: " + std::to_string(tested) + " tested, " + std::to_string(passed) + " passed");
     if (tested > 0)
+    {
         EXPECT_GT(passed, 0);
+    }
 }
 
 TEST_F(SpellProcDatabaseTest, PeriodicProcs_AllTriggerOnPeriodic)
@@ -493,7 +499,9 @@ TEST_F(SpellProcDatabaseTest, PeriodicProcs_AllTriggerOnPeriodic)
 
     SCOPED_TRACE("Periodic procs: " + std::to_string(tested) + " tested, " + std::to_string(passed) + " passed");
     if (tested > 0)
+    {
         EXPECT_GT(passed, 0);
+    }
 }
 
 TEST_F(SpellProcDatabaseTest, KillProcs_AllTriggerOnKill)
@@ -610,7 +618,9 @@ TEST_F(SpellProcDatabaseTest, DodgeProcs_OnlyTriggerOnDodge)
 
     SCOPED_TRACE("Dodge procs: " + std::to_string(tested) + " tested, " + std::to_string(passed) + " passed");
     if (tested > 0)
+    {
         EXPECT_EQ(passed, tested);
+    }
 }
 
 TEST_F(SpellProcDatabaseTest, ParryProcs_OnlyTriggerOnParry)
@@ -643,7 +653,9 @@ TEST_F(SpellProcDatabaseTest, ParryProcs_OnlyTriggerOnParry)
 
     SCOPED_TRACE("Parry procs: " + std::to_string(tested) + " tested, " + std::to_string(passed) + " passed");
     if (tested > 0)
+    {
         EXPECT_EQ(passed, tested);
+    }
 }
 
 TEST_F(SpellProcDatabaseTest, BlockProcs_OnlyTriggerOnBlock)
@@ -676,7 +688,9 @@ TEST_F(SpellProcDatabaseTest, BlockProcs_OnlyTriggerOnBlock)
 
     SCOPED_TRACE("Block procs: " + std::to_string(tested) + " tested, " + std::to_string(passed) + " passed");
     if (tested > 0)
+    {
         EXPECT_EQ(passed, tested);
+    }
 }
 
 // =============================================================================
