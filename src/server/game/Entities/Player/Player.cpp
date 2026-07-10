@@ -2839,7 +2839,6 @@ void Player::SendInitialSpells()
     }
 
     SendDirectMessage(&data);
-    SendUnlearnSpells();
 }
 
 void Player::SendUnlearnSpells()
@@ -2857,6 +2856,19 @@ void Player::SendUnlearnSpells()
 
         auto skillLineAbilities = sSpellMgr->GetSkillLineAbilityMapBounds(itr.first);
         if (skillLineAbilities.first == skillLineAbilities.second)
+            continue;
+
+        // Client already hides ranks that have a superseding rank
+        bool hasSupercedingRank = false;
+        for (auto slaItr = skillLineAbilities.first; slaItr != skillLineAbilities.second; ++slaItr)
+        {
+            if (slaItr->second->SupercededBySpell)
+            {
+                hasSupercedingRank = true;
+                break;
+            }
+        }
+        if (hasSupercedingRank)
             continue;
 
         uint32 nextRank = sSpellMgr->GetNextSpellInChain(itr.first);
@@ -2879,6 +2891,10 @@ bool Player::IsUnlearnNeededForSpell(uint32 spellId)
         auto skillLineAbilities = sSpellMgr->GetSkillLineAbilityMapBounds(spellId);
         if (skillLineAbilities.first != skillLineAbilities.second)
         {
+            for (auto itr = skillLineAbilities.first; itr != skillLineAbilities.second; ++itr)
+                if (itr->second->SupercededBySpell)
+                    return false;
+
             return true;
         }
     }
@@ -11674,10 +11690,7 @@ void Player::SendInitialPacketsBeforeAddToMap()
     SendDirectMessage(&data);
 
     SendInitialSpells();
-
-    data.Initialize(SMSG_SEND_UNLEARN_SPELLS, 4);
-    data << uint32(0);                                      // count, for (count) uint32;
-    SendDirectMessage(&data);
+    SendUnlearnSpells();
 
     SendInitialActionButtons();
     m_reputationMgr->SendInitialReputations();
