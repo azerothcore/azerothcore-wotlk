@@ -35,7 +35,7 @@ INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `e
 (131064, 0, 0, 0, 1, 0, 0, '55827');
 
 -- Red fire wall that blocks Ruby Sanctum (Invisible Stalker (23155) GUID 131066) stop spawn (intentional)
-UPDATE `creature` SET `spawnMask` = 0 WHERE `guid` = 131066;
+UPDATE `creature` SET `spawnMask` = 0 WHERE `guid` = 131066 AND `id` = 23155;
 
 -- Correct blue warden 105487 orientation
 UPDATE `creature` SET `orientation` = 2.990109920501708984 WHERE `guid` = 105487;
