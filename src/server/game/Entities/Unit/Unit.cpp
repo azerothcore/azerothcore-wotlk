@@ -15417,10 +15417,12 @@ void Unit::KnockbackFrom(float x, float y, float speedXY, float speedZ)
         }
     }
 
-    if (!player)
-    {
+    // While feared/confused the client has no control over the unit,
+    // so a SMSG_MOVE_KNOCK_BACK would be ignored or immediately overridden by the server
+    // side fleeing/confused splines. Perform the knockback server side instead; the
+    // fleeing/confused movement generator resumes once this spline is finalized
+    if (!player || !IsClientControlled())
         GetMotionMaster()->MoveKnockbackFrom(x, y, speedXY, speedZ);
-    }
     else
     {
         float vcos, vsin;
