@@ -27,3 +27,26 @@ Useful knobs:
   and `DOCKER_AUTH_EXTERNAL_PORT` change the AzerothCore host ports. The script
   defaults these to high ports to avoid clashing with local services.
 - `AC_PROMETHEUS_IMAGE` changes the Prometheus image.
+
+## Grafana dashboard
+
+`grafana/` contains a minimal Grafana dashboard for the exported worldserver
+metrics (`grafana/dashboards/azerothcore-worldserver.json`), provisioning
+config, and an optional compose overlay. Add the overlay to the stack to get a
+pre-provisioned Grafana with the dashboard at `http://localhost:3000/d/ac-worldserver`
+(anonymous admin login, no credentials needed):
+
+```bash
+docker compose --project-directory . \
+    -f docker-compose.yml \
+    -f apps/prometheus-test/docker-compose.yml \
+    -f apps/prometheus-test/grafana/docker-compose.yml up -d
+```
+
+The dashboard JSON can also be imported manually into any Grafana instance with
+a Prometheus datasource.
+
+Useful knobs:
+
+- `DOCKER_GRAFANA_EXTERNAL_PORT` changes the Grafana host port, default 3000.
+- `AC_GRAFANA_IMAGE` changes the Grafana image.
