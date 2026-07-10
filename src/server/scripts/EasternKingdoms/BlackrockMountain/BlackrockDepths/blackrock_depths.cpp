@@ -485,6 +485,14 @@ enum RocknotActions
     ACTION_LOVE_POTION = 1
 };
 
+enum NagmaraEvents
+{
+    EVENT_CHECK_REACH_ROCKNOT = 1,
+    EVENT_SAY_NAGMARA_2       = 2,
+    EVENT_CAST_LOVE_POTION    = 3,
+    EVENT_FOLLOW_ROCKNOT      = 4
+};
+
 struct npc_mistress_nagmara : public CreatureAI
 {
     npc_mistress_nagmara(Creature* creature) : CreatureAI(creature)
@@ -493,14 +501,12 @@ struct npc_mistress_nagmara : public CreatureAI
     }
 
     InstanceScript* instance;
-    uint8 phase;
-    uint32 phaseTimer;
+    EventMap events;
     ObjectGuid rocknotGuid;
 
     void Reset() override
     {
-        phase = 0;
-        phaseTimer = 0;
+        events.Reset();
         rocknotGuid.Clear();
     }
 
@@ -508,16 +514,13 @@ struct npc_mistress_nagmara : public CreatureAI
     {
         if (player->GetQuestRewardStatus(QUEST_POTION_LOVE))
         {
-            if (!instance || instance->GetData(TYPE_BAR) == DONE || instance->GetData(TYPE_BAR) == SPECIAL)
-                return;
-
             CloseGossipMenuFor(player);
 
             if (Creature* rocknot = me->FindNearestCreature(NPC_PRIVATE_ROCKNOT, 100.0f))
             {
-                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
-                me->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
-                rocknot->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
+                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+                rocknot->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+
                 rocknotGuid = rocknot->GetGUID();
                 
                 // Force walk and follow Rocknot
@@ -525,72 +528,63 @@ struct npc_mistress_nagmara : public CreatureAI
                 me->GetMotionMaster()->Clear();
                 me->GetMotionMaster()->MoveFollow(rocknot, 2.0f, 0.0f);
                 
-                phase = 1;
-                phaseTimer = 0;
+                // Kick off the EventMap sequence using chrono literals (1s = 1000ms)
+                events.ScheduleEvent(EVENT_CHECK_REACH_ROCKNOT, 1000ms);
             }
         }
     }
 
     void UpdateAI(uint32 diff) override
     {
-        if (!phase)
-            return;
+        events.Update(diff);
 
-        if (phaseTimer <= diff)
+        while (uint32 eventId = events.ExecuteEvent())
         {
-            Creature* rocknot = ObjectAccessor::GetCreature(*me, rocknotGuid);
-            if (!rocknot)
+            switch (eventId)
             {
-                phase = 0;
-                return;
-            }
-
-            switch (phase)
-            {
-                case 1:
-                    if (me->IsWithinDistInMap(rocknot, 5.0f))
+                case EVENT_CHECK_REACH_ROCKNOT:
+                    if (Creature* rocknot = ObjectAccessor::GetCreature(*me, rocknotGuid))
                     {
-                        me->GetMotionMaster()->Clear();
-                        me->SetFacingToObject(rocknot);
-                        rocknot->SetFacingToObject(me);
-                        Talk(SAY_NAGMARA_1);
-                        phase = 2;
-                        phaseTimer = 5000;
-                    }
-                    else
-                    {
-                        phaseTimer = 1000;
+                        if (me->IsWithinDistInMap(rocknot, 5.0f))
+                        {
+                            me->GetMotionMaster()->Clear();
+                            me->SetFacingToObject(rocknot);
+                            rocknot->SetFacingToObject(me);
+                            Talk(SAY_NAGMARA_1);
+                            events.ScheduleEvent(EVENT_SAY_NAGMARA_2, 5000ms);
+                        }
+                        else
+                        {
+                            // Keep checking every second if not in range yet
+                            events.ScheduleEvent(EVENT_CHECK_REACH_ROCKNOT, 1000ms);
+                        }
                     }
                     break;
-                case 2:
+                case EVENT_SAY_NAGMARA_2:
                     Talk(SAY_NAGMARA_2);
-                    phase = 3;
-                    phaseTimer = 4000;
+                    events.ScheduleEvent(EVENT_CAST_LOVE_POTION, 4000ms);
                     break;
-                case 3:
+                case EVENT_CAST_LOVE_POTION:
                     DoCast(me, SPELL_POTION_LOVE);
-                    if (rocknot->AI())
-                        rocknot->AI()->DoAction(ACTION_LOVE_POTION);
+                    if (Creature* rocknot = ObjectAccessor::GetCreature(*me, rocknotGuid))
+                    {
+                        if (rocknot->AI())
+                            rocknot->AI()->DoAction(ACTION_LOVE_POTION);
+                    }
                     
-                    // Wait 2 seconds for Rocknot's delay timer to kick in before she follows
-                    phase = 4;
-                    phaseTimer = 2000; 
+                    // Wait 2 seconds for Rocknot's delay timer to kick in before following
+                    events.ScheduleEvent(EVENT_FOLLOW_ROCKNOT, 2000ms);
                     break;
-                case 4:
-                    // Ensure she continues to walk as she follows him to the door
-                    me->SetWalk(true);
-                    me->GetMotionMaster()->Clear();
-                    me->GetMotionMaster()->MoveFollow(rocknot, 2.0f, 0.0f);
-                    phase = 5;
-                    phaseTimer = 0;
-                    break;
-                case 5:
-                    // Action handled passively while moving
+                case EVENT_FOLLOW_ROCKNOT:
+                    if (Creature* rocknot = ObjectAccessor::GetCreature(*me, rocknotGuid))
+                    {
+                        me->SetWalk(true);
+                        me->GetMotionMaster()->Clear();
+                        me->GetMotionMaster()->MoveFollow(rocknot, 2.0f, 0.0f);
+                    }
                     break;
             }
         }
-        else
-            phaseTimer -= diff;
     }
 };
 
