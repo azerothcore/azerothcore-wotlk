@@ -512,10 +512,9 @@ struct npc_mistress_nagmara : public CreatureAI
 
             if (Creature* rocknot = me->FindNearestCreature(NPC_PRIVATE_ROCKNOT, 100.0f))
             {
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-                rocknot->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP);
+                me->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
+                rocknot->RemoveNpcFlag(UNIT_NPC_FLAG_QUESTGIVER);
                 rocknotGuid = rocknot->GetGUID();
                 
                 // Force walk and follow Rocknot
@@ -634,14 +633,14 @@ struct npc_rocknot : public npc_escortAI
             _lovePotionEvent = true;
             
             // Strip interaction flags immediately so he can't be talked to
-            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+            me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
 
             // Give Nagmara 2 seconds to finish her spell cast visual before moving
             _walkToDoorTimer = 2000;
         }
     }
 
-void MovementInform(uint32 type, uint32 id) override
+    void MovementInform(uint32 type, uint32 id) override
     {
         if (type == POINT_MOTION_TYPE)
         {
