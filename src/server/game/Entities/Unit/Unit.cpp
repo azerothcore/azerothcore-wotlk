@@ -7425,22 +7425,21 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
     // set position before any AI calls/assistance
     //if (IsCreature())
     //    ToCreature()->SetCombatStartPosition(GetPositionX(), GetPositionY(), GetPositionZ());
-    if (creature)
+    // player-controlled creatures (pets, charms) enter combat on contact instead
+    // (melee swing execution or spell launch/hit, see Unit::AtTargetAttacked)
+    if (creature && !IsControlledByPlayer())
     {
         EngageWithTarget(victim);
 
-        if (!IsControlledByPlayer())
-        {
-            creature->SendAIReaction(AI_REACTION_HOSTILE);
+        creature->SendAIReaction(AI_REACTION_HOSTILE);
 
-            /// @todo: Implement aggro range, detection range and assistance range templates
-            if (!(creature->HasFlagsExtra(CREATURE_FLAG_EXTRA_DONT_CALL_ASSISTANCE)))
-                creature->CallAssistance();
+        /// @todo: Implement aggro range, detection range and assistance range templates
+        if (!(creature->HasFlagsExtra(CREATURE_FLAG_EXTRA_DONT_CALL_ASSISTANCE)))
+            creature->CallAssistance();
 
-            creature->SetAssistanceTimer(sWorld->getIntConfig(CONFIG_CREATURE_FAMILY_ASSISTANCE_PERIOD));
+        creature->SetAssistanceTimer(sWorld->getIntConfig(CONFIG_CREATURE_FAMILY_ASSISTANCE_PERIOD));
 
-            SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
-        }
+        SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
     }
 
     // delay offhand weapon attack by 50% of the base attack time
