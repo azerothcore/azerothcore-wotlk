@@ -455,6 +455,143 @@ private:
     uint32 _mightyBlowTimer;
 };
 
+// npc_mistress_nagmara
+enum GrimGuzzlerNPCs
+{
+    NPC_PRIVATE_ROCKNOT  = 9503,
+    NPC_MISTRESS_NAGMARA = 9500
+};
+
+enum NagmaraSpells
+{
+    SPELL_POTION_LOVE     = 14928,
+    SPELL_NAGMARA_ROCKNOT = 15064
+};
+
+enum NagmaraTexts
+{
+    SAY_NAGMARA_1 = 0,
+    SAY_NAGMARA_2 = 1,
+    EMOTE_NAGMARA = 2
+};
+
+enum NagmaraQuests
+{
+    QUEST_POTION_LOVE = 4201
+};
+
+enum RocknotActions
+{
+    ACTION_LOVE_POTION = 1
+};
+
+struct npc_mistress_nagmara : public CreatureAI
+{
+    npc_mistress_nagmara(Creature* creature) : CreatureAI(creature)
+    {
+        instance = creature->GetInstanceScript();
+    }
+
+    InstanceScript* instance;
+    uint8 phase;
+    uint32 phaseTimer;
+    ObjectGuid rocknotGuid;
+
+    void Reset() override
+    {
+        phase = 0;
+        phaseTimer = 0;
+        rocknotGuid.Clear();
+    }
+
+    void sGossipSelect(Player* player, uint32 /*menuId*/, uint32 /*gossipListId*/) override
+    {
+        if (player->GetQuestRewardStatus(QUEST_POTION_LOVE))
+        {
+            CloseGossipMenuFor(player);
+
+            if (Creature* rocknot = me->FindNearestCreature(NPC_PRIVATE_ROCKNOT, 100.0f))
+            {
+                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+                me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                rocknot->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+
+                rocknotGuid = rocknot->GetGUID();
+                
+                // Force walk and follow Rocknot
+                me->SetWalk(true);
+                me->GetMotionMaster()->Clear();
+                me->GetMotionMaster()->MoveFollow(rocknot, 2.0f, 0.0f);
+                
+                phase = 1;
+                phaseTimer = 0;
+            }
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (!phase)
+            return;
+
+        if (phaseTimer <= diff)
+        {
+            Creature* rocknot = ObjectAccessor::GetCreature(*me, rocknotGuid);
+            if (!rocknot)
+            {
+                phase = 0;
+                return;
+            }
+
+            switch (phase)
+            {
+                case 1:
+                    if (me->IsWithinDistInMap(rocknot, 5.0f))
+                    {
+                        me->GetMotionMaster()->Clear();
+                        me->SetFacingToObject(rocknot);
+                        rocknot->SetFacingToObject(me);
+                        Talk(SAY_NAGMARA_1);
+                        phase = 2;
+                        phaseTimer = 5000;
+                    }
+                    else
+                    {
+                        phaseTimer = 1000;
+                    }
+                    break;
+                case 2:
+                    Talk(SAY_NAGMARA_2);
+                    phase = 3;
+                    phaseTimer = 4000;
+                    break;
+                case 3:
+                    DoCast(me, SPELL_POTION_LOVE);
+                    if (rocknot->AI())
+                        rocknot->AI()->DoAction(ACTION_LOVE_POTION);
+                    
+                    // Wait 2 seconds for Rocknot's delay timer to kick in before she follows
+                    phase = 4;
+                    phaseTimer = 2000; 
+                    break;
+                case 4:
+                    // Ensure she continues to walk as she follows him to the door
+                    me->SetWalk(true);
+                    me->GetMotionMaster()->Clear();
+                    me->GetMotionMaster()->MoveFollow(rocknot, 2.0f, 0.0f);
+                    phase = 5;
+                    phaseTimer = 0;
+                    break;
+                case 5:
+                    // Action handled passively while moving
+                    break;
+            }
+        }
+        else
+            phaseTimer -= diff;
+    }
+};
+
 // npc_rocknot
 enum RocknotSays
 {
@@ -485,6 +622,57 @@ struct npc_rocknot : public npc_escortAI
 
         _breakKegTimer = 0;
         _breakDoorTimer = 0;
+        _walkToDoorTimer = 0;
+        _openDoorTimer = 0;
+        _lovePotionEvent = false;
+    }
+
+    void DoAction(int32 action) override
+    {
+        if (action == ACTION_LOVE_POTION)
+        {
+            _lovePotionEvent = true;
+            
+            // Strip interaction flags immediately so he can't be talked to
+            me->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
+
+            // Give Nagmara 2 seconds to finish her spell cast visual before moving
+            _walkToDoorTimer = 2000;
+        }
+    }
+
+void MovementInform(uint32 type, uint32 id) override
+    {
+        if (type == POINT_MOTION_TYPE)
+        {
+            if (id == 99 && _lovePotionEvent)
+            {
+                if (GameObject* door = instance->instance->GetGameObject(instance->GetGuidData(DATA_GO_BAR_DOOR)))
+                    me->SetFacingToObject(door);
+                
+                _openDoorTimer = 1500; 
+            }
+            else if (id == 100 && _lovePotionEvent)
+            {
+                if (instance)
+                    instance->SetData(TYPE_BAR, DONE);
+
+                if (Creature* nagmara = me->FindNearestCreature(NPC_MISTRESS_NAGMARA, 20.0f))
+                {
+                    me->SetFacingToObject(nagmara);
+                    nagmara->GetMotionMaster()->Clear(); 
+                    
+                    // Set her new home position so the server doesn't evade/reset her back to the bar
+                    nagmara->SetHomePosition(*nagmara);
+                    
+                    nagmara->SetFacingToObject(me);
+                    
+                    me->CastSpell(me, SPELL_NAGMARA_ROCKNOT, true);
+                    nagmara->CastSpell(nagmara, SPELL_NAGMARA_ROCKNOT, true);
+                }
+            }
+        }
+        npc_escortAI::MovementInform(type, id);
     }
 
     void sQuestReward(Player* /*player*/, Quest const* quest, uint32 /*opt*/) override
@@ -545,6 +733,41 @@ struct npc_rocknot : public npc_escortAI
 
     void UpdateAI(uint32 diff) override
     {
+        if (_walkToDoorTimer)
+        {
+            if (_walkToDoorTimer <= diff)
+            {
+                if (GameObject* door = instance->instance->GetGameObject(instance->GetGuidData(DATA_GO_BAR_DOOR)))
+                {
+                    // Calculate a coordinate exactly 2.5 yards in front of the door
+                    float angle = me->GetAngle(door);
+                    float x = door->GetPositionX() - 2.5f * std::cos(angle);
+                    float y = door->GetPositionY() - 2.5f * std::sin(angle);
+                    float z = door->GetPositionZ();
+
+                    me->SetWalk(true);
+                    me->GetMotionMaster()->MovePoint(99, x, y, z);
+                }
+                
+                _walkToDoorTimer = 0;
+            }
+            else _walkToDoorTimer -= diff;
+        }
+
+        if (_openDoorTimer)
+        {
+            if (_openDoorTimer <= diff)
+            {
+                // The dramatic pause is over. Open the door and walk through.
+                DoGo(DATA_GO_BAR_DOOR, 0); 
+                me->GetMotionMaster()->MovePoint(100, 878.1779f, -222.0662f, -49.96714f);
+                
+                _openDoorTimer = 0;
+            }
+            else _openDoorTimer -= diff;
+        }
+
+        // Standard Ale Event Timers
         if (_breakKegTimer)
         {
             if (_breakKegTimer <= diff)
@@ -570,7 +793,6 @@ struct npc_rocknot : public npc_escortAI
                 //for later, this event(s) has alot more to it.
                 //optionally, DONE can trigger bar to go hostile.
                 instance->SetData(TYPE_BAR, DONE);
-
                 _breakDoorTimer = 0;
             }
             else _breakDoorTimer -= diff;
@@ -583,6 +805,9 @@ private:
     InstanceScript* instance;
     uint32 _breakKegTimer;
     uint32 _breakDoorTimer;
+    uint32 _walkToDoorTimer;
+    uint32 _openDoorTimer;
+    bool _lovePotionEvent;
 };
 
 void AddSC_blackrock_depths()
@@ -591,6 +816,7 @@ void AddSC_blackrock_depths()
     new at_ring_of_law();
     RegisterBlackrockDepthsCreatureAI(npc_grimstone);
     RegisterBlackrockDepthsCreatureAI(npc_phalanx);
+    RegisterBlackrockDepthsCreatureAI(npc_mistress_nagmara);
     RegisterBlackrockDepthsCreatureAI(npc_rocknot);
     RegisterBlackrockDepthsCreatureAI(brd_ironhand_guardian);
 }
