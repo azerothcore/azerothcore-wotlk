@@ -38,7 +38,7 @@ INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `e
 UPDATE `creature` SET `spawnMask` = 0 WHERE `guid` = 131066 AND `id` = 23155;
 
 -- Correct blue warden 105487 orientation
-UPDATE `creature` SET `orientation` = 2.990109920501708984 WHERE `guid` = 105487;
+UPDATE `creature` SET `orientation` = 2.990109920501708984 WHERE `guid` = 105487 AND `id` = 30058;
 
 -- ---------------------------------------------------------------------------
 -- Wyrmrest Protector (27953)
