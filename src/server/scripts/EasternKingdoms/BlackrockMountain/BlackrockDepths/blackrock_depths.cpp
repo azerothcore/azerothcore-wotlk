@@ -508,6 +508,9 @@ struct npc_mistress_nagmara : public CreatureAI
     {
         if (player->GetQuestRewardStatus(QUEST_POTION_LOVE))
         {
+            if (!instance || instance->GetData(TYPE_BAR) == DONE || instance->GetData(TYPE_BAR) == SPECIAL)
+                return;
+
             CloseGossipMenuFor(player);
 
             if (Creature* rocknot = me->FindNearestCreature(NPC_PRIVATE_ROCKNOT, 100.0f))
@@ -746,6 +749,13 @@ struct npc_rocknot : public npc_escortAI
 
                     me->SetWalk(true);
                     me->GetMotionMaster()->MovePoint(99, x, y, z);
+                }
+                else
+                {
+                    // Fallback: If the door is missing from the grid, skip the pause 
+                    // and walk directly to the end to prevent soft-locking.
+                    me->SetWalk(true);
+                    me->GetMotionMaster()->MovePoint(100, 878.1779f, -222.0662f, -49.96714f);
                 }
                 
                 _walkToDoorTimer = 0;
