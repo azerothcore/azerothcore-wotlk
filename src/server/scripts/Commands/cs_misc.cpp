@@ -499,8 +499,21 @@ public:
             // Remove from LFG queues
             sLFGMgr->LeaveAllLfgQueues(player->GetGUID(), false);
 
+            // Book the reservation like the queue path does, so it is symmetric
+            // with RemovePlayerAtLeave's decrement and the 0-players/0-invited
+            // state can't let Battleground::Update delete the arena while players
+            // are still on the loading screen.
+            bg->IncreaseInvitedCount(teamId);
             player->SetBattlegroundId(bg->GetInstanceID(), bgTypeId, queueSlot, true, false, teamId);
-            sBattlegroundMgr->SendToBattleground(player, bg->GetInstanceID(), bgTypeId);
+
+            // A synchronous teleport failure would strand that reservation (the
+            // player never enters and never reaches RemovePlayerAtLeave), leaving
+            // the arena undeletable; release it and reset his bg data.
+            if (!sBattlegroundMgr->SendToBattleground(player, bg->GetInstanceID(), bgTypeId))
+            {
+                bg->DecreaseInvitedCount(teamId);
+                player->SetBattlegroundId(0, BATTLEGROUND_TYPE_NONE, PLAYER_MAX_BATTLEGROUND_QUEUES, false, false, TEAM_NEUTRAL);
+            }
         }
 
         handler->PSendSysMessage("Success! Players are now being teleported to the arena.");

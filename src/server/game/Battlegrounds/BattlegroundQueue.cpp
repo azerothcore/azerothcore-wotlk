@@ -1302,12 +1302,15 @@ int32 BattlegroundQueue::GetQueueAnnouncementTimer(uint32 bracketId) const
 
 void BattlegroundQueue::InviteGroupToBG(GroupQueueInfo* ginfo, Battleground* bg, TeamId teamId)
 {
+    // An already-invited group keeps the side it was invited under: writing
+    // teamId here would split a future re-invite's IncreaseInvitedCount from the
+    // original side's DecreaseInvitedCount at leave, desyncing the ledger.
+    if (ginfo->IsInvitedToBGInstanceGUID)
+        return;
+
     // set side if needed
     if (teamId != TEAM_NEUTRAL)
         ginfo->teamId = teamId;
-
-    if (ginfo->IsInvitedToBGInstanceGUID)
-        return;
 
     // set invitation
     ginfo->IsInvitedToBGInstanceGUID = bg->GetInstanceID();
