@@ -182,7 +182,7 @@ enum Spells
 
     // Darkfallen Noble
     SPELL_SHADOW_BOLT               = 72960,
-    SPELL_CHAINS_OF_SHADOW          = 72960,
+    SPELL_CHAINS_OF_SHADOW          = 70645,
 
     // Darkfallen Archmage
     SPELL_FIREBALL                  = 70409,
@@ -2056,8 +2056,8 @@ struct npc_icc_orb_controller : public ScriptedAI
     {
         _scheduler.Schedule(evading ? 5s : 1s, [this](TaskContext visual)
             {
-                ObjectGuid guid = Acore::Containers::SelectRandomContainerElement(_minionGuids);
-                if (Unit* minion = ObjectAccessor::GetUnit(*me, guid))
+                ObjectGuid mGuid = Acore::Containers::SelectRandomContainerElement(_minionGuids);
+                if (Unit* minion = ObjectAccessor::GetUnit(*me, mGuid))
                     minion->CastSpell(nullptr, SPELL_BLOOD_ORB_VISUAL);
                 visual.Repeat(_isLongRepeat ? 21s : 3s);
                 _isLongRepeat = !_isLongRepeat;
@@ -2404,7 +2404,7 @@ struct go_empowering_blood_orb : public GameObjectAI
 
     void HandleObjectUse()
     {
-        me->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
+        me->SetGameObjectFlag(GO_FLAG_IN_USE);
         me->SetGoAnimProgress(255);
         me->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
         if (Creature* trigger = ObjectAccessor::GetCreature(*me, _triggerGuid))
