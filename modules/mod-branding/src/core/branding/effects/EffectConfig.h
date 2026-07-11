@@ -23,6 +23,14 @@ namespace Branding
 
         // Role asymmetry (§7.9): tank effects are dramatic, dps restrained. In (0, 1], tank highest.
         virtual double RolePersonalScale(RoleContribution role) const = 0;
+
+        // §7.11 leveling-scoped branding (issue #77). A separate, account-keyed budget for sub-max
+        // characters in dungeons/invasions; independent of the §7.9 proficiency caps above.
+        virtual bool LevelingEnabled() const = 0;         // master switch for the whole behaviour
+        virtual double MaxLevelingMul() const = 0;        // its own cap, distinct from Max{Personal,Raid}Mul
+        virtual double LevelingStandingScale() const = 0; // per-maxed-brand contribution (mild)
+        virtual uint8_t MaxCharacterLevel() const = 0;    // the ding-to-cap boundary (e.g. 80)
+        virtual bool LevelingGrantsTransforms() const = 0;// grant §7.9 MechanicTransforms while leveling
     };
 }
 

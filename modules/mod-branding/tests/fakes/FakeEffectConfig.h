@@ -17,12 +17,23 @@ namespace Branding::Test
         double maxOverhealShieldFraction = 0.30;
         // None, Tank, Healer, Damage, Control, Support
         std::array<double, static_cast<size_t>(RoleContribution::COUNT)> rolePersonalScale{ { 0.5, 1.0, 0.7, 0.5, 0.6, 0.6 } };
+        // §7.11 leveling-scoped branding (issue #77).
+        bool levelingEnabled = true;
+        double maxLevelingMul = 4.0;
+        double levelingStandingScale = 0.5;   // +0.5x per maxed brand, up to the cap
+        uint8_t maxCharacterLevel = 80;
+        bool levelingGrantsTransforms = true;
 
         double MaxPersonalMul() const override { return maxPersonalMul; }
         double MaxRaidMul() const override { return maxRaidMul; }
         uint8_t MaxEffectLevel() const override { return maxEffectLevel; }
         double MaxOverhealShieldFraction() const override { return maxOverhealShieldFraction; }
         double RolePersonalScale(RoleContribution role) const override { return rolePersonalScale[static_cast<size_t>(role)]; }
+        bool LevelingEnabled() const override { return levelingEnabled; }
+        double MaxLevelingMul() const override { return maxLevelingMul; }
+        double LevelingStandingScale() const override { return levelingStandingScale; }
+        uint8_t MaxCharacterLevel() const override { return maxCharacterLevel; }
+        bool LevelingGrantsTransforms() const override { return levelingGrantsTransforms; }
     };
 
     class FakeItemBrandConfig : public IItemBrandConfig

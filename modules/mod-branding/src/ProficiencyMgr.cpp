@@ -62,6 +62,42 @@ namespace Branding
         } while (result->NextRow());
     }
 
+    void ProficiencyMgr::LoadAccountMaxedBrands(uint32_t accountId)
+    {
+        uint8_t& count = _accountMaxedBrands[accountId];
+        count = 0;
+
+        // Best (highest total_xp) per brand across every character on the account -- a brand is
+        // "maxed" on the account if any one character has graduated it (§7.11 standing input).
+        QueryResult result = CharacterDatabase.Query(
+            "SELECT cb.`brand`, MAX(cb.`total_xp`) FROM `character_branding` cb "
+            "JOIN `characters` c ON c.`guid` = cb.`guid` WHERE c.`account` = {} GROUP BY cb.`brand`",
+            accountId);
+        if (!result)
+            return;
+
+        do
+        {
+            Field* fields = result->Fetch();
+            uint8 const brand = fields[0].Get<uint8>();
+            if (brand >= static_cast<uint8>(BrandId::COUNT))
+                continue;
+
+            if (LevelForXp(fields[1].Get<uint64>(), _config) >= _config.MaxLevel())
+                ++count;
+        } while (result->NextRow());
+    }
+
+    uint8_t ProficiencyMgr::AccountMaxedBrandCount(uint32_t accountId)
+    {
+        auto it = _accountMaxedBrands.find(accountId);
+        if (it != _accountMaxedBrands.end())
+            return it->second;
+
+        LoadAccountMaxedBrands(accountId);
+        return _accountMaxedBrands[accountId];
+    }
+
     KnowledgeState& ProficiencyMgr::EnsureAccountKnowledge(uint32_t accountId)
     {
         auto it = _accountKnowledge.find(accountId);
@@ -80,8 +116,10 @@ namespace Branding
         if (!_config.Enabled() || !player)
             return;
 
+        uint32 const account = player->GetSession()->GetAccountId();
         LoadCharacterStates(player->GetGUID(), player->GetGUID().GetCounter());
-        LoadAccountKnowledge(player->GetSession()->GetAccountId());
+        LoadAccountKnowledge(account);
+        LoadAccountMaxedBrands(account);
     }
 
     void ProficiencyMgr::SavePlayer(Player* player)
@@ -119,7 +157,13 @@ namespace Branding
         KnowledgeState const& knowledge = _accountKnowledge[accountId];
 
         ProficiencyState& state = states[static_cast<size_t>(activity.activeBrand)];
-        return Branding::ApplyActivity(state, activity, knowledge, _config, _clock);
+        XpResult const result = Branding::ApplyActivity(state, activity, knowledge, _config, _clock);
+
+        // A fresh graduation changes the account's §7.11 standing; drop the cache so it recomputes.
+        if (result.reachedPrestige)
+            _accountMaxedBrands.erase(accountId);
+
+        return result;
     }
 
     double ProficiencyMgr::EffectStrength(ObjectGuid charGuid, uint32_t accountId, BrandId brand) const

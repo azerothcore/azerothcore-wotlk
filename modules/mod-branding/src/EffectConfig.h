@@ -20,6 +20,11 @@ namespace Branding
         uint8_t MaxEffectLevel() const override { return _maxEffectLevel; }
         double MaxOverhealShieldFraction() const override { return _maxOverhealShieldFraction; }
         double RolePersonalScale(RoleContribution role) const override { return _roleScale[static_cast<size_t>(role)]; }
+        bool LevelingEnabled() const override { return _levelingEnabled; }
+        double MaxLevelingMul() const override { return _maxLevelingMul; }
+        double LevelingStandingScale() const override { return _levelingStandingScale; }
+        uint8_t MaxCharacterLevel() const override { return _maxCharacterLevel; }
+        bool LevelingGrantsTransforms() const override { return _levelingGrantsTransforms; }
 
     private:
         bool _enabled = false;
@@ -29,6 +34,12 @@ namespace Branding
         double _maxOverhealShieldFraction = 0.30;   // overheal->shield cap, fraction of target max HP
         // None, Tank, Healer, Damage, Control, Support -- tank highest (dramatic), dps restrained.
         std::array<double, static_cast<size_t>(RoleContribution::COUNT)> _roleScale{ { 0.5, 1.0, 0.7, 0.5, 0.6, 0.6 } };
+        // §7.11 leveling-scoped branding (issue #77).
+        bool _levelingEnabled = true;
+        double _maxLevelingMul = 4.0;
+        double _levelingStandingScale = 0.5;
+        uint8_t _maxCharacterLevel = 80;
+        bool _levelingGrantsTransforms = true;
     };
 }
 

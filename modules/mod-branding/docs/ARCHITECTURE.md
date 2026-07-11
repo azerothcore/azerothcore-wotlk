@@ -958,6 +958,113 @@ the neutral lattice default until authored.
 
 ---
 
+### 7.11 Leveling-scoped branding (issue #77)
+
+**Decision (issue #77):** a character *below max level* may express branding **strongly** while inside a
+dungeon **or** an active open-world invasion — enough to make that content a deliberate cake-walk (the
+canonical scenario: a group with a Nature-healing druid tank breezing a low-level dungeon, or a
+low-level brander carving through an invasion). This is an explicit, opt-in power fantasy for
+**alt-friendly accounts**, and it is delivered *without* weakening the anti-P2W foundation (§1).
+
+**Why this is not a violation of §1.** The power a leveling character gets here is a **separate,
+scoped budget that evaporates at max level** — it is *not* per-character earned Proficiency (§7)
+retro-granted. A leveling alt has the **account's** Brand Knowledge (access) but ~0 earned Proficiency,
+so under §7.9 alone it would be inert. §7.11 adds a parallel expression path keyed on **account access**,
+active **only while `charLevel < MaxLevel` and only in the two contexts below**. At the cap it goes to
+`1.0` and the normal §7.9 earned-Proficiency path takes over — so a purchased/traded leveled *shell* is
+still inert at endgame (`CanExpressBrand`, §1). The dual-key at max level is untouched.
+
+**Gate — all three required:**
+
+1. `charLevel < cfg.MaxLevel`, **and**
+2. context is a **dungeon** (instanced 5-man) **or** an **active invasion** (§2.5 / §9.1
+   `EventType::Invasion`) the character is enrolled in, **and**
+3. `Branding.Leveling.Enable = 1` (servers can switch the whole behaviour off).
+
+Note this is orthogonal to the XP rule at §14.13.3's "below max level … normal leveling XP (decided)":
+that governs *how much XP* leveling invasion/dungeon activity grants; §7.11 governs *effect strength*.
+A sub-max character still earns normal leveling XP **and** now expresses a leveling-scoped branding
+budget in these two contexts.
+
+**Pure model (`core/effects/`, extends §7.9):**
+
+```cpp
+// Account-side achievement that feeds the leveling budget (NOT character proficiency).
+struct AccountBrandStanding {
+    uint8_t maxedBrands;     // count of brands the account has taken to max on some character
+    uint8_t knowledgeTier;   // account Brand-Knowledge tier (§6)
+};
+
+enum class LevelingContext : uint8_t { None, Dungeon, Invasion };
+
+// Leveling-scoped magnitude. Keyed on ACCOUNT standing + level, NOT earned proficiency.
+// Returns 1.0 (no effect) when the §7.11 gate is not satisfied.
+double LevelingMultiplier(uint8_t charLevel, LevelingContext ctx,
+                          AccountBrandStanding const&, IBrandingConfig const&);
+
+// Whether the leveling alt also gets the §7.9 MechanicTransform expression (HoT spread,
+// overheal->shield, damage->heal). Decided: YES — the transforms are the whole point of the
+// scenario (the druid-tank-nature-healing fantasy is a transform).
+bool LevelingGrantsTransforms(LevelingContext ctx, IBrandingConfig const&);
+```
+
+**Decided sub-questions (issue #77 discussion):**
+
+- **Magnitude source** — scales *mildly* with `AccountBrandStanding` (more maxed brands → a somewhat
+  stronger alt), **capped** by `cfg.MaxLevelingMul` (its own cap, distinct from `MaxPersonalMul` /
+  `MaxRaidMul`). This rewards the alt-friendly account without becoming an uncapped snowball.
+- **Contexts** — **dungeons and invasions only.** Not open-world questing/general leveling — that keeps
+  the power contained and testable, and preserves the pacing of the normal levelling track elsewhere.
+- **Group interaction (§2.2 / §2.5)** — bounded at the **group** level, not stacked per-brander, so a
+  full group of branders does not multiply into a degenerate one-shot; the cake-walk comes from the
+  budget, not from stacking.
+- **Transforms** — **granted** while leveling (`LevelingGrantsTransforms == true` for both contexts).
+
+**Composition order (unchanged from §2.1).** Scaling still applies first; in an invasion, event scaling
+overrides zone scaling (§2.1). A low-level dungeon is **not** downscaled (the character is already
+at-bracket), so `LevelingMultiplier` lands on an at-level baseline — that is the intended
+trivialization, now explicitly opted-in rather than an accident:
+
+```cpp
+ScaledStats  base = ApplyScaling(rawStats, context);            // §2.1 (event overrides zone)
+EffectiveStats out = (charLevel < cfg.MaxLevel && ctx != None)
+    ? ApplyLevelingBranding(base, accountStanding, ctx, ...)     // §7.11 path, account-keyed
+    : ApplyBranding(base, brandState, role, ...);                // §7.9 path, proficiency-keyed
+```
+
+**Invariants (tests, written first — red):**
+
+- `LevelingMultiplier(...) <= cfg.MaxLevelingMul` for **all** levels, contexts, and standings.
+- `LevelingMultiplier(charLevel == cfg.MaxLevel, ...) == 1.0` — the **hard boundary at ding-to-cap**;
+  at and above cap only the §7.9 earned path can produce a multiplier. (This is the invariant that
+  protects endgame balance.)
+- `LevelingMultiplier(..., LevelingContext::None, ...) == 1.0` — inert outside a dungeon/invasion.
+- `LevelingMultiplier` is **monotonically non-decreasing** in `AccountBrandStanding.maxedBrands`,
+  but bounded (mild scaling, capped).
+- **Anti-P2W parity with §1**: the leveling path consumes **account** standing only; it reads **no**
+  per-character earned Proficiency, and it produces `1.0` at max level — so a traded max-level body
+  gains nothing from §7.11 (`LevelingBranding_TradedShell_InertAtCap`).
+- Group-bounded: the effective leveling magnitude applied to a group is bounded independent of how many
+  branders are present (`LevelingBranding_GroupBounded_NoPerCapitaStacking`).
+
+**Config keys (added to `mod_branding.conf.dist`, read via §11 conventions):**
+`Branding.Leveling.Enable` (default 1), `Branding.Leveling.MaxLevelingMul`,
+`Branding.Leveling.StandingScale` (per-maxed-brand contribution), `Branding.Leveling.GrantTransforms`
+(default 1).
+
+**Adapter (Slice 7, thin).** The context classifier lives in the adapter: it reads
+`Map::IsDungeon()` / the active-invasion enrolment (§9.1) to produce `LevelingContext`, marshals the
+account standing (§6 Knowledge + maxed-brand count), calls the core, and applies the result exactly as
+§7.9 does (spikes → auras, windows → debuffs, transforms → spell-script behaviour). No `Player*`/`Creature*`
+stored past a tick (cache by `ObjectGuid`).
+
+**Linked, deferred:** the account XP-buff / alt-incentive idea raised alongside #77 (per-max-level-alt
+XP, paid character slots) is **not** part of this section — it is tracked separately and must be
+reconciled against the resolved §12 Q9 recommendation (do **not** do per-alt XP boosts; prefer a level
+*floor* + account perks) and the no-P2W rule before any adoption.
+
+---
+
 ## 8. Exploration, Discovery & Economy Model
 
 This system makes the **world itself content** and ties exploration into the closed economy loop.

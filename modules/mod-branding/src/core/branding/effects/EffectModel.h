@@ -62,6 +62,35 @@ namespace Branding
     double WindowedIncomingMultiplier(EffectProfile const& profile, uint8_t profLevel,
         uint64_t nowMs, IEffectConfig const& cfg);
 
+    // §7.11 leveling-scoped branding (issue #77). Account-side achievement that feeds the leveling
+    // budget -- NOT per-character earned Proficiency (§7). More maxed brands -> a mildly stronger alt.
+    struct AccountBrandStanding
+    {
+        uint8_t maxedBrands = 0;    // brands the account has taken to max on some character
+        uint8_t knowledgeTier = 0;  // account Brand-Knowledge tier (§6); reserved for future tuning
+    };
+
+    // The content context that unlocks the leveling budget (§7.11). Only Dungeon/Invasion qualify.
+    enum class LevelingContext : uint8_t
+    {
+        None = 0,   // open world / general leveling -- no budget
+        Dungeon,    // instanced 5-man
+        Invasion    // active open-world invasion (§2.5 / §9.1)
+    };
+
+    // §7.11: leveling-scoped magnitude, keyed on ACCOUNT standing + level, never earned proficiency.
+    // Returns 1.0 (no effect) unless the full gate holds: leveling enabled, ctx is Dungeon/Invasion,
+    // and charLevel < MaxCharacterLevel. At/above the cap it is exactly 1.0 (the §7.9 earned path takes
+    // over), so a traded max-level shell gains nothing (anti-P2W §1). Bounded by MaxLevelingMul and
+    // monotonically non-decreasing in standing; no per-brander stacking input (group-bounded).
+    double LevelingMultiplier(uint8_t charLevel, LevelingContext ctx, AccountBrandStanding const& standing,
+        IEffectConfig const& cfg);
+
+    // §7.11: whether a leveling alt also gets the §7.9 MechanicTransform expression (HoT spread,
+    // overheal->shield, ...). Decided YES for both contexts; gated by the config toggle and requires a
+    // qualifying (non-None) context.
+    bool LevelingGrantsTransforms(LevelingContext ctx, IEffectConfig const& cfg);
+
     // §7.9 #3 healer MechanicTransform: convert wasted overheal into a temporary absorb shield. The
     // shield is the overheal portion (heal beyond the target's missing health) scaled by effect
     // strength (mastery-gated, 0 at level 0), then hard-capped to MaxOverhealShieldFraction of the
