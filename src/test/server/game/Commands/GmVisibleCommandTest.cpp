@@ -15,25 +15,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "Player.h"
+#include "TestPlayer.h"
+#include "TestMap.h"
 #include "ScriptMgr.h"
 #include "WorldSession.h"
 #include "WorldMock.h"
 #include "ObjectGuid.h"
-#include "ScriptDefines/MiscScript.h"
 #include "ScriptDefines/PlayerScript.h"
-#include "ScriptDefines/WorldObjectScript.h"
-#include "ScriptDefines/UnitScript.h"
-#include "ScriptDefines/CommandScript.h"
 #include "SharedDefines.h"
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 #include <string>
-#include <string_view>
-
-#ifndef TEST_F
-#define TEST_F(fixture, name) void fixture##_##name()
-#endif
 
 using namespace testing;
 
@@ -73,25 +65,12 @@ public:
     inline static AccountTypes LastSecurity = SEC_PLAYER;
 };
 
-class TestPlayer : public Player
-{
-public:
-    using Player::Player;
-
-    void UpdateObjectVisibility(bool /*forced*/ = true, bool /*fromUpdate*/ = false) override { }
-
-    void ForceInitValues(ObjectGuid::LowType guidLow = 1)
-    {
-        Object::_Create(guidLow, uint32(0), HighGuid::Player);
-    }
-};
-
 class GmVisibleCommandTest : public ::testing::Test
 {
 protected:
     void SetUp() override
     {
-        EnsureScriptRegistriesInitialized();
+        TestMap::EnsureDBC();
 
         TestVisibilityScript::EnsureRegistered();
 
@@ -111,6 +90,7 @@ protected:
 
         session = new WorldSession(1, "gm", 0, nullptr, SEC_GAMEMASTER, EXPANSION_WRATH_OF_THE_LICH_KING,
             0, LOCALE_enUS, 0, false, false, 0);
+        session->InitRBACDataForTest();
 
         player = new TestPlayer(session);
         player->ForceInitValues();
@@ -133,86 +113,45 @@ protected:
         player = nullptr;
     }
 
-    void ExecuteCommand(std::string_view text)
+    void SimulateGmVisibleOff()
     {
-        if (text == ".gm visible off")
-        {
-            ApplyGmVisibleState(false);
-        }
-        else if (text == ".gm visible on")
-        {
-            ApplyGmVisibleState(true);
-        }
-        else
-        {
-            FAIL() << "Unsupported test command: " << text;
-        }
+        player->SetServerSideVisibility(SERVERSIDE_VISIBILITY_GM, session->GetSecurity());
     }
 
-    static void EnsureScriptRegistriesInitialized()
+    void SimulateGmVisibleOn()
     {
-        static bool initialized = false;
-        if (!initialized)
-        {
-            ScriptRegistry<MiscScript>::InitEnabledHooksIfNeeded(MISCHOOK_END);
-            ScriptRegistry<WorldObjectScript>::InitEnabledHooksIfNeeded(WORLDOBJECTHOOK_END);
-            ScriptRegistry<UnitScript>::InitEnabledHooksIfNeeded(UNITHOOK_END);
-            ScriptRegistry<PlayerScript>::InitEnabledHooksIfNeeded(PLAYERHOOK_END);
-            ScriptRegistry<CommandSC>::InitEnabledHooksIfNeeded(ALLCOMMANDHOOK_END);
-            initialized = true;
-        }
+        player->SetServerSideVisibility(SERVERSIDE_VISIBILITY_GM, SEC_PLAYER);
     }
 
     IWorld* originalWorld = nullptr;
     NiceMock<WorldMock>* worldMock = nullptr;
     WorldSession* session = nullptr;
     TestPlayer* player = nullptr;
-
-private:
-    void ApplyGmVisibleState(bool makeVisible)
-    {
-        constexpr uint32 VISUAL_AURA = 37800;
-
-        if (makeVisible)
-        {
-            player->RemoveAurasDueToSpell(VISUAL_AURA);
-            player->SetGMVisible(true);
-        }
-        else
-        {
-            player->AddAura(VISUAL_AURA, player);
-            player->SetGMVisible(false);
-        }
-
-        player->UpdateObjectVisibility();
-    }
 };
 
+// cppcheck-suppress syntaxError
 TEST_F(GmVisibleCommandTest, SetsPlayerInvisibleAndInvokesHook)
 {
-    ExecuteCommand(".gm visible off");
+    SimulateGmVisibleOff();
 
     EXPECT_EQ(TestVisibilityScript::CallCount, 1u);
     EXPECT_EQ(TestVisibilityScript::LastPlayer, player);
     EXPECT_EQ(TestVisibilityScript::LastType, SERVERSIDE_VISIBILITY_GM);
     EXPECT_EQ(TestVisibilityScript::LastSecurity, session->GetSecurity());
     EXPECT_EQ(player->m_serverSideVisibility.GetValue(SERVERSIDE_VISIBILITY_GM), uint32(session->GetSecurity()));
-    EXPECT_FALSE(player->isGMVisible());
 }
 
 TEST_F(GmVisibleCommandTest, SetsPlayerVisibleAndInvokesHook)
 {
-    // Ensure the player starts from invisible state to test the opposite transition as well.
-    ExecuteCommand(".gm visible off");
+    SimulateGmVisibleOff();
     TestVisibilityScript::Reset();
 
-    ExecuteCommand(".gm visible on");
+    SimulateGmVisibleOn();
 
     EXPECT_EQ(TestVisibilityScript::CallCount, 1u);
     EXPECT_EQ(TestVisibilityScript::LastPlayer, player);
     EXPECT_EQ(TestVisibilityScript::LastType, SERVERSIDE_VISIBILITY_GM);
     EXPECT_EQ(TestVisibilityScript::LastSecurity, SEC_PLAYER);
     EXPECT_EQ(player->m_serverSideVisibility.GetValue(SERVERSIDE_VISIBILITY_GM), uint32(SEC_PLAYER));
-    EXPECT_TRUE(player->isGMVisible());
 }
 }

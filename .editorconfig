@@ -5,7 +5,7 @@ indent_size = 4
 tab_width = 4
 insert_final_newline = true
 trim_trailing_whitespace = true
-max_line_length = 80
+max_line_length = 120
 
 [*.{json,ts,js,yml,sh}]
 charset = utf-8
@@ -14,4 +14,4 @@ indent_size = 2
 tab_width = 2
 insert_final_newline = true
 trim_trailing_whitespace = true
-max_line_length = 80
+max_line_length = 120

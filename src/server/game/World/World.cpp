@@ -56,11 +56,11 @@
 #include "InstanceSaveMgr.h"
 #include "ItemEnchantmentMgr.h"
 #include "LFGMgr.h"
+#include "Language.h"
 #include "Log.h"
 #include "LootItemStorage.h"
 #include "LootMgr.h"
 #include "M2Stores.h"
-#include "MMapFactory.h"
 #include "MapMgr.h"
 #include "Metric.h"
 #include "MotdMgr.h"
@@ -71,6 +71,7 @@
 #include "Player.h"
 #include "PlayerDump.h"
 #include "PoolMgr.h"
+#include "RaceMgr.h"
 #include "Realm.h"
 #include "ScriptMgr.h"
 #include "ServerMailMgr.h"
@@ -138,7 +139,6 @@ World::~World()
         delete command;
 
     VMAP::VMapFactory::clear();
-    MMAP::MMapFactory::clear();
 }
 
 std::unique_ptr<IWorld>& getWorldInstance()
@@ -283,17 +283,15 @@ void World::LoadConfigSettings(bool reload)
     }
 
     bool const enableIndoor = getBoolConfig(CONFIG_VMAP_INDOOR_CHECK);
-    bool const enableLOS = sConfigMgr->GetOption<bool>("vmap.enableLOS", true);
+    bool const enableLOS = getBoolConfig(CONFIG_VMAP_ENABLE_LOS);
     bool const enablePetLOS = getBoolConfig(CONFIG_PET_LOS);
-    bool const enableHeight = sConfigMgr->GetOption<bool>("vmap.enableHeight", true);
+    bool const enableHeight = getBoolConfig(CONFIG_VMAP_ENABLE_HEIGHT);
     if (!enableHeight)
         LOG_ERROR("server.loading", "VMap height checking disabled! Creatures movements and other various things WILL be broken! Expect no support.");
 
     VMAP::VMapFactory::createOrGetVMapMgr()->setEnableLineOfSightCalc(enableLOS);
     VMAP::VMapFactory::createOrGetVMapMgr()->setEnableHeightCalc(enableHeight);
     LOG_INFO("server.loading", "WORLD: VMap support included. LineOfSight:{}, getHeight:{}, indoorCheck:{} PetLOS:{}", enableLOS, enableHeight, enableIndoor, enablePetLOS);
-
-    MMAP::MMapFactory::InitializeDisabledMaps();
 
     // call ScriptMgr if we're reloading the configuration
     sScriptMgr->OnAfterConfigLoad(reload);
@@ -385,19 +383,11 @@ void World::SetInitialWorldSettings()
     // Load cinematic cameras
     LoadM2Cameras(_dataPath);
 
+    LOG_INFO("server.loading", "Loading Player race data...");
+    sRaceMgr->LoadRaces();
+
     // Load IP Location Database
     sIPLocation->Load();
-
-    std::vector<uint32> mapIds;
-    for (auto const& map : sMapStore)
-    {
-        mapIds.emplace_back(map->MapID);
-    }
-
-    vmmgr2->InitializeThreadUnsafe(mapIds);
-
-    MMAP::MMapMgr* mmmgr = MMAP::MMapFactory::createOrGetMMapMgr();
-    mmmgr->InitializeThreadUnsafe(mapIds);
 
     LOG_INFO("server.loading", "Loading Game Graveyard...");
     sGraveyard->LoadGraveyardFromDB();
@@ -428,6 +418,12 @@ void World::SetInitialWorldSettings()
 
     LOG_INFO("server.loading", "Loading SpellInfo Custom Attributes...");
     sSpellMgr->LoadSpellInfoCustomAttributes();
+
+    LOG_INFO("server.loading", "Loading Spell Jump Distances...");
+    sSpellMgr->LoadSpellJumpDistances();
+
+    LOG_INFO("server.loading", "Loading SpellInfo Immunity infos...");
+    sSpellMgr->LoadSpellInfoImmunities();
 
     LOG_INFO("server.loading", "Loading Player Totem models...");
     sObjectMgr->LoadPlayerTotemModels();
@@ -473,6 +469,9 @@ void World::SetInitialWorldSettings()
     sObjectMgr->SetDBCLocaleIndex(GetDefaultDbcLocale());        // Get once for all the locale index of DBC language (console/broadcasts)
     LOG_INFO("server.loading", ">> Localization Strings loaded in {} ms", GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
+
+    LOG_INFO("server.loading", "Loading Account Roles and Permissions...");
+    sAccountMgr->LoadRBAC();
 
     LOG_INFO("server.loading", "Loading Page Texts...");
     sObjectMgr->LoadPageTexts();
@@ -558,6 +557,9 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading Creature Base Stats...");
     sObjectMgr->LoadCreatureClassLevelStats();
 
+    LOG_INFO("server.loading", "Loading Spawn Group Templates...");
+    sObjectMgr->LoadSpawnGroupTemplates();
+
     LOG_INFO("server.loading", "Loading Creature Data...");
     sObjectMgr->LoadCreatures();
 
@@ -584,6 +586,9 @@ void World::SetInitialWorldSettings()
 
     LOG_INFO("server.loading", "Loading Gameobject Data...");
     sObjectMgr->LoadGameobjects();
+
+    LOG_INFO("server.loading", "Loading Spawn Group Data...");
+    sObjectMgr->LoadSpawnGroups();                                 // must be after LoadCreatures() and LoadGameobjects()
 
     LOG_INFO("server.loading", "Loading GameObject Addon Data...");
     sObjectMgr->LoadGameObjectAddons();                          // must be after LoadGameObjectTemplate() and LoadGameobjects()
@@ -678,6 +683,9 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading Spell Target Coordinates...");
     sSpellMgr->LoadSpellTargetPositions();
 
+    LOG_INFO("server.loading", "Loading Spell Cone definitions...");
+    sSpellMgr->LoadSpellCones();
+
     LOG_INFO("server.loading", "Loading Enchant Custom Attributes...");
     sSpellMgr->LoadEnchantCustomAttr();
 
@@ -757,6 +765,9 @@ void World::SetInitialWorldSettings()
     sObjectMgr->LoadProfanityNamesFromDB();
     sObjectMgr->LoadProfanityNamesFromDBC(); // Needs to be after LoadProfanityNamesFromDB()
 
+    LOG_INFO("server.loading", "Loading Chat Filter...");
+    sObjectMgr->LoadChatFilter();
+
     LOG_INFO("server.loading", "Loading GameObjects for Quests...");
     sObjectMgr->LoadGameObjectForQuests();
 
@@ -783,6 +794,9 @@ void World::SetInitialWorldSettings()
 
     LOG_INFO("server.loading", "Loading Waypoints...");
     sWaypointMgr->Load();
+
+    LOG_INFO("server.loading", "Loading Waypoint Addons...");
+    sWaypointMgr->LoadWaypointAddons();
 
     LOG_INFO("server.loading", "Loading SmartAI Waypoints...");
     sSmartWaypointMgr->LoadFromDB();
@@ -1437,10 +1451,15 @@ void World::_UpdateGameTime()
         ///- ... and it is overdue, stop the world (set m_stopEvent)
         if (_shutdownTimer <= elapsed.count())
         {
-            if (!(_shutdownMask & SHUTDOWN_MASK_IDLE) || sWorldSessionMgr->GetActiveAndQueuedSessionCount() == 0)
-                _stopEvent = true;                         // exist code already set
-            else
-                _shutdownTimer = 1;                        // minimum timer value to wait idle state
+            ///- ... unless a Wintergrasp battle is running and deferral is enabled, in which case the
+            ///  shutdown/restart is pushed past the end of the current battle and the world keeps running
+            if (!RescheduleShutdownForWintergrasp())
+            {
+                if (!(_shutdownMask & SHUTDOWN_MASK_IDLE) || sWorldSessionMgr->GetActiveAndQueuedSessionCount() == 0)
+                    _stopEvent = true;                     // exist code already set
+                else
+                    _shutdownTimer = 1;                    // minimum timer value to wait idle state
+            }
         }
         ///- ... else decrease it and if necessary display a shutdown countdown to the users
         else
@@ -1450,6 +1469,38 @@ void World::_UpdateGameTime()
             ShutdownMsg();
         }
     }
+}
+
+/// Defer a pending shutdown/restart if a Wintergrasp battle is currently running.
+/// Returns true when the shutdown timer was extended (world should keep running).
+bool World::RescheduleShutdownForWintergrasp()
+{
+    uint32 const bufferMinutes = getIntConfig(CONFIG_WINTERGRASP_DEFER_SHUTDOWN);
+    if (!bufferMinutes)
+        return false;
+
+    // Idle shutdowns wait for an empty server anyway; don't interfere with them
+    if (_shutdownMask & SHUTDOWN_MASK_IDLE)
+        return false;
+
+    Battlefield* wg = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
+    if (!wg || !wg->IsEnabled() || !wg->IsWarTime())
+        return false;
+
+    // GetTimer() is the battle time remaining in milliseconds
+    _shutdownTimer = wg->GetTimer() / IN_MILLISECONDS + bufferMinutes * MINUTE;
+
+    LOG_INFO("server.worldserver", "Server {} deferred: Wintergrasp battle in progress, rescheduled in {}",
+        (_shutdownMask & SHUTDOWN_MASK_RESTART ? "restart" : "shutdown"), secsToTimeString(_shutdownTimer));
+
+    sWorldSessionMgr->DoForAllOnlinePlayers([](Player* player)
+    {
+        LocaleConstant locale = player->GetSession()->GetSessionDbLocaleIndex();
+        sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, sObjectMgr->GetAcoreString(LANG_WG_SHUTDOWN_DEFERRED, locale), player);
+    });
+
+    ShutdownMsg(true);
+    return true;
 }
 
 /// Shutdown the server
@@ -1626,7 +1677,7 @@ void World::InitMonthlyQuestResetTime()
 void World::InitRandomBGResetTime()
 {
     Seconds wstime = Seconds(sWorldState->getWorldState(WORLD_STATE_CUSTOM_BG_DAILY_RESET_TIME));
-    _nextRandomBGReset = wstime > 0s ? wstime : Seconds(Acore::Time::GetNextTimeWithDayAndHour(-1, 6));
+    _nextRandomBGReset = wstime > 0s ? wstime : Seconds(Acore::Time::GetNextTimeWithDayAndHour(-1, getIntConfig(CONFIG_RANDOM_BG_RESET_HOUR)));
 
     if (wstime == 0s)
     {
@@ -1737,6 +1788,16 @@ void World::ResetEventSeasonalQuests(uint16 event_id)
             itr->second->GetPlayer()->ResetSeasonalQuestStatus(event_id);
 }
 
+void World::ReloadRBAC()
+{
+    // Passive reload, we mark the data as invalidated and next time a permission is checked it will be reloaded
+    LOG_INFO("rbac", "World::ReloadRBAC()");
+    WorldSessionMgr::SessionMap const& sessionMap = sWorldSessionMgr->GetAllSessions();
+    for (WorldSessionMgr::SessionMap::const_iterator itr = sessionMap.begin(); itr != sessionMap.end(); ++itr)
+        if (WorldSession* session = itr->second)
+            session->InvalidateRBACData();
+}
+
 void World::ResetRandomBG()
 {
     LOG_DEBUG("server.worldserver", "Random BG status reset for all characters.");
@@ -1749,7 +1810,7 @@ void World::ResetRandomBG()
         if (itr->second->GetPlayer())
             itr->second->GetPlayer()->SetRandomWinner(false);
 
-    _nextRandomBGReset = Seconds(Acore::Time::GetNextTimeWithDayAndHour(-1, 6));
+    _nextRandomBGReset = Seconds(Acore::Time::GetNextTimeWithDayAndHour(-1, getIntConfig(CONFIG_RANDOM_BG_RESET_HOUR)));
     sWorldState->setWorldState(WORLD_STATE_CUSTOM_BG_DAILY_RESET_TIME, _nextRandomBGReset.count());
 }
 

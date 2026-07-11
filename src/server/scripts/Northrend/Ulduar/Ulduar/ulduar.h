@@ -66,12 +66,6 @@ enum UlduarData
     DATA_UNBROKEN_ACHIEVEMENT               = 105,
     DATA_LEVIATHAN_DOORS                    = 106,
 
-    // Razorscales Harpoon Fire State GUIDs
-    DATA_HARPOON_FIRE_STATE_1               = 200,
-    DATA_HARPOON_FIRE_STATE_2               = 201,
-    DATA_HARPOON_FIRE_STATE_3               = 202,
-    DATA_HARPOON_FIRE_STATE_4               = 203,
-
     // Mimiron creatures
     DATA_MIMIRON_LEVIATHAN_MKII             = 301,
     DATA_MIMIRON_VX001                      = 302,
@@ -93,6 +87,7 @@ enum UlduarData
 
     // XT-002
     DATA_XT002_DOORS                        = 400,
+    DATA_XT002_HEART                        = 401,
 
     // Kologarn
     DATA_KOLOGARN_DOORS                     = 410,
@@ -149,6 +144,12 @@ enum UlduarData
     DATA_BRANN_MEMOTESAY                    = 801,
     DATA_BRANN_EASY_MODE                    = 802,
     DATA_BRANN_BASE_CAMP                    = 803,
+
+    // Observation Ring Keepers
+    DATA_FREYA_GOSSIP                       = 810,
+    DATA_HODIR_GOSSIP                       = 811,
+    DATA_MIMIRON_GOSSIP                     = 812,
+    DATA_THORIM_GOSSIP                      = 813,
 };
 
 enum UlduarNPCs
@@ -158,6 +159,9 @@ enum UlduarNPCs
     NPC_IGNIS                               = 33118,
     NPC_RAZORSCALE                          = 33186,
     NPC_XT002                               = 33293,
+    NPC_XT_TOY_PILE                         = 33337,
+    NPC_XS013_SCRAPBOT                      = 33343,
+    NPC_HEART_OF_DECONSTRUCTOR              = 33329,
     NPC_STEELBREAKER                        = 32867,
     NPC_MOLGEIM                             = 32927,
     NPC_BRUNDIR                             = 32857,
@@ -168,6 +172,7 @@ enum UlduarNPCs
     NPC_THORIM                              = 32865,
     NPC_FREYA                               = 32906,
     NPC_VEZAX                               = 33271,
+    NPC_SARONITE_ANIMUS                     = 33524,
     NPC_SARA                                = 33134,
     NPC_YOGGSARON                           = 33288,
     NPC_BRAIN_OF_YOGG_SARON                 = 33890,
@@ -229,8 +234,6 @@ enum UlduarGameObjects
     GO_HODIR_CHEST_NORMAL_HERO              = 194308,
     GO_HODIR_CHEST_HARD                     = 194200,
     GO_HODIR_CHEST_HARD_HERO                = 194201,
-    GO_FREYA_CHEST                          = 194330, // Normal, -2 - elder offset
-    GO_FREYA_CHEST_HERO                     = 194331, // Hero, -2 - elder offset
     GO_MIMIRON_CHEST                        = 194789,
     GO_MIMIRON_CHEST_HARD                   = 194957,
     GO_MIMIRON_CHEST_HERO                   = 194956,
@@ -304,6 +307,17 @@ enum UlduarGameObjects
     GO_DOODAD_UL_ULDUAR_TRAPDOOR_03         = 194253,
     GO_GIFT_OF_THE_OBSERVER_10              = 194821,
     GO_GIFT_OF_THE_OBSERVER_25              = 194822,
+};
+
+enum UlduarPersistentData
+{
+    PERSISTENT_DATA_WATCHERS_MASK           = 0,
+    PERSISTENT_DATA_CONSPEEDATORY,
+    PERSISTENT_DATA_UNBROKEN,
+    PERSISTENT_DATA_ALGALON_TIMER,
+    PERSISTENT_DATA_C_OF_ULDUAR_MASK,
+    PERSISTENT_DATA_MAGE_BARRIER,
+    MAX_PERSISTENT_DATA
 };
 
 enum UlduarMisc

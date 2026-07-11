@@ -21,6 +21,8 @@
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellAuras.h"
+#include "SpellScript.h"
+#include "SpellScriptLoader.h"
 #include "ulduar.h"
 
 enum FreyaSpells
@@ -45,8 +47,14 @@ enum FreyaSpells
     SPELL_GROUND_TREMOR_FREYA                   = 62437,
     SPELL_IRON_ROOTS_FREYA                      = 62862,
     SPELL_IRON_ROOTS_FREYA_DAMAGE               = 62861,
+    SPELL_UNSTABLE_SUN_BEAM_FREYA               = 62450,
     SPELL_UNSTABLE_SUN_FREYA_DAMAGE             = 62451,
     SPELL_UNSTABLE_SUN_VISUAL                   = 62216,
+
+    // CHANNEL STALKER VISUALS
+    SPELL_FREYA_DUMMY_GREEN                      = 63295,
+    SPELL_FREYA_DUMMY_YELLOW                     = 63292,
+    SPELL_FREYA_DUMMY_BLUE                       = 63294,
 
     // ELDERS
     SPELL_DRAINED_OF_POWER                      = 62467,
@@ -94,6 +102,7 @@ enum FreyaSpells
     // DETONATING LASHER
     SPELL_DETONATE                              = 62598,
     SPELL_FLAME_LASH                            = 62608,
+    SPELL_SUBMERGE_VISUAL                       = 28819,
 
     // ACHIEVEMENT
     SPELL_DEFORESTATION_CREDIT                  = 65015,
@@ -164,6 +173,7 @@ enum Texts
 enum FreyaNPCs
 {
     NPC_NATURE_BOMB                             = 34129,
+    NPC_CHANNEL_STALKER_FREYA                   = 33575,
     NPC_IRON_ROOT_TRIGGER                       = 33088,
     NPC_FREYA_UNSTABLE_SUN_BEAM                 = 33170,
     NPC_UNSTABLE_SUN_BRIGHTLEAF                 = 33050, // 10 SECS?
@@ -196,6 +206,10 @@ enum Misc
     DATA_BACK_TO_NATURE                         = 2,
 
     CRITERIA_LUMBERJACKED                       = 21686,
+
+    WAYPOINT_GREEN                              = 4, // path: 1365540
+    WAYPOINT_YELLOW                             = 10,
+    WAYPOINT_BLUE                               = 18,
 };
 
 struct boss_freya : public BossAI
@@ -279,14 +293,18 @@ struct boss_freya : public BossAI
                     ++_elderCount;
                 }
 
-                uint32 chestId = RAID_MODE(GO_FREYA_CHEST, GO_FREYA_CHEST_HERO);
-                chestId -= 2 * _elderCount; // offset
-
-                if (GameObject* go = me->SummonGameObject(chestId, 2345.61f, -71.20f, 425.104f, 3.0f, 0, 0, 0, 0, 0))
+                // Summon the chest via spell so it is a wild object not owned by Freya,
+                // otherwise it despawns with her when she teleports out. The spell is
+                // chosen by raid size and how many Elders empowered her.
+                // Order intentionally differs from TC/cMaNGOS to match AC's even/odd chest-loot grouping.
+                static constexpr uint32 summonChestSpell[2][4] =
                 {
-                    go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
-                    go->SetLootRecipient(me->GetMap());
-                }
+                    // 0 Elder, 1 Elder, 2 Elder, 3 Elder
+                    { 62957, 62955, 62953, 62950 }, // 10-man
+                    { 62958, 62956, 62954, 62952 }  // 25-man
+                };
+
+                me->CastSpell(me, summonChestSpell[me->GetMap()->Is25ManRaid() ? 1 : 0][_elderCount], true);
 
                 // Defeat credit
                 me->CastSpell(me, 65074, true); // credit
@@ -307,16 +325,6 @@ struct boss_freya : public BossAI
             me->DespawnOrUnsummon();
             instance->SetData(EVENT_KEEPER_TELEPORTED, DONE);
         }
-    }
-
-    void JustSummoned(Creature* cr) override
-    {
-        if (cr->GetEntry() == NPC_FREYA_UNSTABLE_SUN_BEAM)
-        {
-            cr->CastSpell(cr, SPELL_UNSTABLE_SUN_VISUAL, true);
-            cr->CastSpell(cr, SPELL_UNSTABLE_SUN_FREYA_DAMAGE, true);
-        }
-        BossAI::JustSummoned(cr);
     }
 
     void SpawnWave()
@@ -342,8 +350,16 @@ struct boss_freya : public BossAI
         else if (_waveNumber == 3)
         {
             Talk(SAY_SUMMON_LASHERS);
+            // Spread the lashers evenly in a ring around Freya instead of
+            // clustering them in one spot, matching retail.
             for (uint8 i = 0; i < 10; ++i)
-                me->SummonCreature(NPC_DETONATING_LASHER, me->GetPositionX() + urand(5, 20), me->GetPositionY() + urand(5, 20), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), 0, TEMPSUMMON_CORPSE_DESPAWN);
+            {
+                float angle = i * 2.0f * float(M_PI) / 10.0f + frand(-0.35f, 0.35f);
+                float dist = frand(18.0f, 28.0f);
+                float x = me->GetPositionX() + dist * std::cos(angle);
+                float y = me->GetPositionY() + dist * std::sin(angle);
+                me->SummonCreature(NPC_DETONATING_LASHER, x, y, me->GetMapHeight(x, y, me->GetPositionZ()), 0, TEMPSUMMON_CORPSE_DESPAWN);
+            }
         }
     }
 
@@ -574,12 +590,7 @@ struct boss_freya : public BossAI
                 events.Repeat(45s, 55s);
                 break;
             case EVENT_FREYA_UNSTABLE_SUN_BEAM:
-                me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX() + urand(7, 25), me->GetPositionY() + urand(7, 25), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
-                if (Is25ManRaid())
-                {
-                    me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX() + urand(7, 25), me->GetPositionY() + urand(7, 25), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
-                    me->SummonCreature(NPC_FREYA_UNSTABLE_SUN_BEAM, me->GetPositionX() + urand(7, 25), me->GetPositionY() + urand(7, 25), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), 0, TEMPSUMMON_TIMED_DESPAWN, 10000);
-                }
+                DoCastAOE(SPELL_UNSTABLE_SUN_BEAM_FREYA, true);
                 events.Repeat(38s, 48s);
                 break;
         }
@@ -590,6 +601,31 @@ struct boss_freya : public BossAI
     bool CheckEvadeIfOutOfCombatArea() const override
     {
         return me->GetPositionX() < 2135.0f;
+    }
+
+    void MovementInform(uint32 type, uint32 pointId) override
+    {
+        if (type != WAYPOINT_MOTION_TYPE)
+            return;
+
+        Unit* target = GetClosestCreatureWithEntry(me, NPC_CHANNEL_STALKER_FREYA, 30.0f);
+        if (!target)
+            return;
+
+        switch (pointId)
+        {
+            case WAYPOINT_GREEN:
+                DoCast(target, SPELL_FREYA_DUMMY_GREEN);
+                break;
+            case WAYPOINT_YELLOW:
+                DoCast(target, SPELL_FREYA_DUMMY_YELLOW);
+                break;
+            case WAYPOINT_BLUE:
+                DoCast(target, SPELL_FREYA_DUMMY_BLUE);
+                break;
+            default:
+                break;
+        }
     }
 };
 
@@ -946,6 +982,29 @@ struct boss_freya_summons : public ScriptedAI
     {
         _stackCount = 0;
         events.Reset();
+
+        // Detonating Lashers spawn submerged in the ground and stay passive for a
+        // few seconds, then burst out with the emerge/birth animation (driven by
+        // the SUBMERGED -> STAND stand state change, like XT-002) and only start
+        // attacking once it has played out, so the jump is not cut short by
+        // combat movement (see issue #26255). They remain hostile and attackable
+        // while submerged, matching retail.
+        if (me->GetEntry() == NPC_DETONATING_LASHER)
+        {
+            me->SetReactState(REACT_PASSIVE);
+            me->m_Events.AddEventAtOffset([this]()
+            {
+                me->RemoveAurasDueToSpell(SPELL_SUBMERGE_VISUAL);
+            }, 4s);
+            me->m_Events.AddEventAtOffset([this]()
+            {
+                me->SetReactState(REACT_AGGRESSIVE);
+                if (Unit* target = SelectTargetFromPlayerList(70))
+                    AttackStart(target);
+            }, 5s);
+            return;
+        }
+
         if (Unit* target = SelectTargetFromPlayerList(70))
             AttackStart(target);
     }
@@ -1023,7 +1082,7 @@ struct boss_freya_summons : public ScriptedAI
         switch (events.ExecuteEvent())
         {
             case EVENT_ANCIENT_CONSERVATOR_NATURE_FURY:
-                me->CastSpell(me->GetVictim(), SPELL_NATURE_FURY, false);
+                DoCastRandomTarget(SPELL_NATURE_FURY, 0, 100.0f, true, false, true, -SPELL_NATURE_FURY);
                 events.Repeat(14s);
                 break;
             case EVENT_ANCIENT_CONSERVATOR_GRIP:
@@ -1134,6 +1193,23 @@ private:
     uint32 const _elderCount;
 };
 
+// 62450 - Unstable Sun Beam
+class spell_freya_unstable_sun_beam : public SpellScript
+{
+    PrepareSpellScript(spell_freya_unstable_sun_beam);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+        Acore::Containers::RandomResize(targets, GetCaster()->GetMap()->Is25ManRaid() ? 3 : 1);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_freya_unstable_sun_beam::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
+};
+
 void AddSC_boss_freya()
 {
     RegisterUlduarCreatureAI(boss_freya);
@@ -1145,6 +1221,8 @@ void AddSC_boss_freya()
     RegisterUlduarCreatureAI(boss_freya_healthy_spore);
     RegisterUlduarCreatureAI(boss_freya_summons);
     RegisterUlduarCreatureAI(boss_freya_nature_bomb);
+
+    RegisterSpellScript(spell_freya_unstable_sun_beam);
 
     new achievement_freya_getting_back_to_nature();
     new achievement_freya_knock_on_wood("achievement_freya_knock_on_wood", 1);

@@ -138,6 +138,8 @@ void WorldConfig::BuildConfigCache()
 
     SetConfigValue<float>(RATE_DURABILITY_LOSS_ON_DEATH, "DurabilityLoss.OnDeath", 10.0f, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0.0f && value <= 100.0f; }, ">= 0 && <= 100");
 
+    SetConfigValue<float>(RATE_DURABILITY_LOSS_ON_SPIRIT_RESURRECT, "DurabilityLoss.OnSpiritResurrect", 25.0f, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0.0f && value <= 100.0f; }, ">= 0 && <= 100");
+
     SetConfigValue<float>(RATE_DURABILITY_LOSS_DAMAGE, "DurabilityLossChance.Damage", 0.5f, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0.0f; }, ">= 0");
     SetConfigValue<float>(RATE_DURABILITY_LOSS_ABSORB, "DurabilityLossChance.Absorb", 0.5f, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0.0f; }, ">= 0");
     SetConfigValue<float>(RATE_DURABILITY_LOSS_PARRY, "DurabilityLossChance.Parry", 0.05f, ConfigValueCache::Reloadable::Yes, [](float const& value) { return value >= 0.0f; }, ">= 0");
@@ -196,6 +198,11 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_STRICT_CHANNEL_NAMES, "StrictChannelNames", 0);
     SetConfigValue<uint32>(CONFIG_STRICT_PET_NAMES, "StrictPetNames", 0);
 
+    SetConfigValue<bool>(CONFIG_CHAT_FILTER_WHISPER, "ChatFilter.Whisper", true);
+    SetConfigValue<bool>(CONFIG_CHAT_FILTER_SAY, "ChatFilter.Say", false);
+    SetConfigValue<bool>(CONFIG_CHAT_FILTER_YELL, "ChatFilter.Yell", false);
+    SetConfigValue<bool>(CONFIG_CHAT_FILTER_EMOTE, "ChatFilter.Emote", false);
+
     SetConfigValue<bool>(CONFIG_ALLOW_TWO_SIDE_ACCOUNTS, "AllowTwoSide.Accounts", true);
     SetConfigValue<bool>(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CALENDAR, "AllowTwoSide.Interaction.Calendar", false);
     SetConfigValue<bool>(CONFIG_ALLOW_TWO_SIDE_INTERACTION_CHAT, "AllowTwoSide.Interaction.Chat", false);
@@ -204,11 +211,6 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<bool>(CONFIG_ALLOW_TWO_SIDE_INTERACTION_GUILD, "AllowTwoSide.Interaction.Guild", false);
     SetConfigValue<bool>(CONFIG_ALLOW_TWO_SIDE_INTERACTION_ARENA, "AllowTwoSide.Interaction.Arena", false);
     SetConfigValue<bool>(CONFIG_ALLOW_TWO_SIDE_INTERACTION_AUCTION, "AllowTwoSide.Interaction.Auction", false);
-    SetConfigValue<bool>(CONFIG_ALLOW_TWO_SIDE_INTERACTION_MAIL, "AllowTwoSide.Interaction.Mail", false);
-    SetConfigValue<bool>(CONFIG_ALLOW_TWO_SIDE_WHO_LIST, "AllowTwoSide.WhoList", false);
-    SetConfigValue<bool>(CONFIG_ALLOW_TWO_SIDE_ADD_FRIEND, "AllowTwoSide.AddFriend", false);
-    SetConfigValue<bool>(CONFIG_ALLOW_TWO_SIDE_TRADE, "AllowTwoSide.Trade", false);
-    SetConfigValue<bool>(CONFIG_ALLOW_TWO_SIDE_INTERACTION_EMOTE, "AllowTwoSide.Interaction.Emote", false);
 
     SetConfigValue<uint32>(CONFIG_MIN_PLAYER_NAME, "MinPlayerName", 2, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value > 0 && value <= MAX_PLAYER_NAME; }, "> 0 && <= MAX_PLAYER_NAME");
     SetConfigValue<uint32>(CONFIG_MIN_CHARTER_NAME, "MinCharterName", 2, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value > 0 && value <= MAX_CHARTER_NAME; }, "> 0 && <= MAX_CHARTER_NAME");
@@ -304,8 +306,6 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_LOGDB_CLEARINTERVAL, "LogDB.Opt.ClearInterval", 10, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value > 0; }, "> 0");
     SetConfigValue<uint32>(CONFIG_LOGDB_CLEARTIME, "LogDB.Opt.ClearTime", 1209600);
 
-    SetConfigValue<uint32>(CONFIG_TELEPORT_TIMEOUT_NEAR, "TeleportTimeoutNear", 25);
-    SetConfigValue<uint32>(CONFIG_TELEPORT_TIMEOUT_FAR, "TeleportTimeoutFar", 45);
     SetConfigValue<uint32>(CONFIG_MAX_ALLOWED_MMR_DROP, "MaxAllowedMMRDrop", 500);
     SetConfigValue<bool>(CONFIG_ENABLE_LOGIN_AFTER_DC, "EnableLoginAfterDC", true);
     SetConfigValue<bool>(CONFIG_DONT_CACHE_RANDOM_MOVEMENT_PATHS, "DontCacheRandomMovementPaths", false);
@@ -347,6 +347,17 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_CHATFLOOD_MUTE_TIME, "ChatFlood.MuteTime", 10);
     SetConfigValue<bool>(CONFIG_CHAT_MUTE_FIRST_LOGIN, "Chat.MuteFirstLogin", false);
     SetConfigValue<uint32>(CONFIG_CHAT_TIME_MUTE_FIRST_LOGIN, "Chat.MuteTimeFirstLogin", 120);
+
+    SetConfigValue<bool>(CONFIG_TRIAL_RESTRICTION_CHAT, "Trial.Restriction.Chat", true);
+    SetConfigValue<bool>(CONFIG_TRIAL_RESTRICTION_MAIL, "Trial.Restriction.Mail", true);
+    SetConfigValue<bool>(CONFIG_TRIAL_RESTRICTION_TRADE, "Trial.Restriction.Trade", true);
+    SetConfigValue<bool>(CONFIG_TRIAL_RESTRICTION_AUCTION, "Trial.Restriction.Auction", true);
+    SetConfigValue<bool>(CONFIG_TRIAL_RESTRICTION_PARTY, "Trial.Restriction.Party", true);
+    SetConfigValue<bool>(CONFIG_TRIAL_RESTRICTION_GUILD, "Trial.Restriction.Guild", true);
+    SetConfigValue<bool>(CONFIG_TRIAL_RESTRICTION_QUEUE, "Trial.Restriction.Queue", true);
+    SetConfigValue<uint32>(CONFIG_TRIAL_LEVEL_CAP, "Trial.LevelCap", 20);
+    SetConfigValue<uint32>(CONFIG_TRIAL_MONEY_CAP, "Trial.MoneyCap", 100000); // copper, 10 gold
+    SetConfigValue<uint32>(CONFIG_TRIAL_TRADE_SKILL_CAP, "Trial.TradeSkillCap", 100);
 
     SetConfigValue<uint32>(CONFIG_EVENT_ANNOUNCE, "Event.Announce", 0);
 
@@ -466,6 +477,7 @@ void WorldConfig::BuildConfigCache()
 
     SetConfigValue<bool>(CONFIG_OFFHAND_CHECK_AT_SPELL_UNLEARN, "OffhandCheckAtSpellUnlearn", true);
     SetConfigValue<bool>(CONFIG_CREATURE_REPOSITION_AGAINST_NPCS, "Creature.RepositionAgainstNpcs", true);
+    SetConfigValue<bool>(CONFIG_CREATURE_INSTANCE_TELEPORT_TO_UNREACHABLE_TARGET, "Creature.Instance.TeleportToUnreachableTarget", false);
     SetConfigValue<uint32>(CONFIG_CREATURE_STOP_FOR_PLAYER, "Creature.MovingStopTimeForPlayer", 180000);
 
     SetConfigValue<uint32>(CONFIG_WATER_BREATH_TIMER, "WaterBreath.Timer", 180000, ConfigValueCache::Reloadable::Yes, [](uint32 const& value) { return value > 0; }, "> 0");
@@ -499,6 +511,8 @@ void WorldConfig::BuildConfigCache()
 
     SetConfigValue<bool>(CONFIG_ALLOW_JOIN_BG_AND_LFG, "JoinBGAndLFG.Enable", false);
 
+    SetConfigValue<uint32>(CONFIG_LFG_MAIL_ITEM_ON_FULL_INVENTORY, "LFG.MailItemOnFullInventory", 0);
+
     SetConfigValue<bool>(CONFIG_LEAVE_GROUP_ON_LOGOUT, "LeaveGroupOnLogout.Enabled", false);
 
     SetConfigValue<uint32>(CONFIG_RANDOM_ROLL_MAXIMUM, "Group.RandomRollMaximum", 1000000);
@@ -523,8 +537,12 @@ void WorldConfig::BuildConfigCache()
 
     SetConfigValue<float>(CONFIG_RESPAWN_DYNAMICRATE_GAMEOBJECT, "Respawn.DynamicRateGameObject", 1.0f);
     SetConfigValue<uint32>(CONFIG_RESPAWN_DYNAMICMINIMUM_GAMEOBJECT, "Respawn.DynamicMinimumGameObject", 10);
+    SetConfigValue<bool>(CONFIG_RESPAWN_DYNAMIC_ESCORTNPC, "Respawn.DynamicEscortNPC", false);
+    SetConfigValue<bool>(CONFIG_RESPAWN_FORCE_COMPATIBILITY_MODE, "Respawn.ForceCompatibilityMode", false);
 
     SetConfigValue<bool>(CONFIG_VMAP_INDOOR_CHECK, "vmap.enableIndoorCheck", true);
+    SetConfigValue<bool>(CONFIG_VMAP_ENABLE_LOS, "vmap.enableLOS", true);
+    SetConfigValue<bool>(CONFIG_VMAP_ENABLE_HEIGHT, "vmap.enableHeight", true);
     SetConfigValue<bool>(CONFIG_PET_LOS, "vmap.petLOS", true);
 
     SetConfigValue<bool>(CONFIG_VMAP_BLIZZLIKE_PVP_LOS, "vmap.BlizzlikePvPLOS", true);
@@ -562,6 +580,7 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_LFG_OPTIONSMASK, "DungeonFinder.OptionsMask", 5);
     SetConfigValue<bool>(CONFIG_LFG_CAST_DESERTER, "DungeonFinder.CastDeserter", true);
     SetConfigValue<bool>(CONFIG_LFG_ALLOW_COMPLETED, "DungeonFinder.AllowCompleted", true);
+    SetConfigValue<uint32>(CONFIG_LFG_DUNGEON_SELECTION_COOLDOWN, "DungeonFinder.DungeonSelectionCooldown", 0);
 
     // DBC_ItemAttributes
     SetConfigValue<bool>(CONFIG_DBC_ENFORCE_ITEM_ATTRIBUTES, "DBC.EnforceItemAttributes", true);
@@ -592,6 +611,11 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_WINTERGRASP_NOBATTLETIME, "Wintergrasp.NoBattleTimer", 150);
     SetConfigValue<uint32>(CONFIG_WINTERGRASP_RESTART_AFTER_CRASH, "Wintergrasp.CrashRestartTimer", 10);
 
+    SetConfigValue<uint32>(CONFIG_WINTERGRASP_SKIP_BATTLE_SESSION_COUNT, "Wintergrasp.SkipBattleSessionCount", 3500);
+    SetConfigValue<bool>(CONFIG_WINTERGRASP_KICK_VOA_PLAYERS, "Wintergrasp.KickVoAPlayers", true, ConfigValueCache::Reloadable::No);
+    SetConfigValue<bool>(CONFIG_WINTERGRASP_ESSENCE_BOTH_FACTIONS, "Wintergrasp.EssenceBothFactions", false);
+    SetConfigValue<uint32>(CONFIG_WINTERGRASP_DEFER_SHUTDOWN, "Wintergrasp.DeferShutdownTimer", 0);
+
     SetConfigValue<uint32>(CONFIG_BIRTHDAY_TIME, "BirthdayTime", 1222964635);
     SetConfigValue<bool>(CONFIG_MINIGOB_MANABONK, "Minigob.Manabonk.Enable", true);
 
@@ -599,6 +623,10 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<bool>(CONFIG_ENABLE_CONTINENT_TRANSPORT_PRELOADING, "IsPreloadedContinentTransport.Enabled", false);
 
     SetConfigValue<bool>(CONFIG_IP_BASED_ACTION_LOGGING, "Allow.IP.Based.Action.Logging", false);
+
+    SetConfigValue<bool>(CONFIG_LOGSPAMREPORTS, "LogSpamReports", true);
+
+    SetConfigValue<bool>(CONFIG_CHATLOG_ENABLED, "ChatLog.Enable", false);
 
     // Whether to use LoS from game objects
     SetConfigValue<bool>(CONFIG_CHECK_GOBJECT_LOS, "CheckGameObjectLoS", true);
@@ -637,13 +665,12 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<bool>(CONFIG_DUNGEON_ACCESS_REQUIREMENTS_PORTAL_CHECK_ILVL, "DungeonAccessRequirements.PortalAvgIlevelCheck", false);
     SetConfigValue<bool>(CONFIG_DUNGEON_ACCESS_REQUIREMENTS_LFG_DBC_LEVEL_OVERRIDE, "DungeonAccessRequirements.LFGLevelDBCOverride", false);
     SetConfigValue<uint32>(CONFIG_DUNGEON_ACCESS_REQUIREMENTS_OPTIONAL_STRING_ID, "DungeonAccessRequirements.OptionalStringID", 0);
-    SetConfigValue<uint32>(CONFIG_NPC_EVADE_IF_NOT_REACHABLE, "NpcEvadeIfTargetIsUnreachable", 5);
-    SetConfigValue<uint32>(CONFIG_NPC_REGEN_TIME_IF_NOT_REACHABLE_IN_RAID, "NpcRegenHPTimeIfTargetIsUnreachable", 10);
     SetConfigValue<bool>(CONFIG_REGEN_HP_CANNOT_REACH_TARGET_IN_RAID, "NpcRegenHPIfTargetIsUnreachable", true);
 
     //Debug
     SetConfigValue<bool>(CONFIG_DEBUG_BATTLEGROUND, "Debug.Battleground", false);
     SetConfigValue<bool>(CONFIG_DEBUG_ARENA, "Debug.Arena", false);
+    SetConfigValue<bool>(CONFIG_DEBUG_LFG, "Debug.LFG", false);
 
     SetConfigValue<uint32>(CONFIG_GM_LEVEL_CHANNEL_MODERATION, "Channel.ModerationGMLevel", 1);
 
@@ -674,4 +701,8 @@ void WorldConfig::BuildConfigCache()
     SetConfigValue<uint32>(CONFIG_SCOURGEINVASION_COUNTER_THIRD, "ScourgeInvasion.CounterThird", 150);
 
     SetConfigValue<std::string>(CONFIG_NEW_CHAR_STRING, "PlayerStart.String", "");
+
+    // Achievement
+    SetConfigValue<uint32>(CONFIG_ACHIEVEMENT_REALM_FIRST_KILL_WINDOW, "Achievement.RealmFirstKillWindow", 60);
+    SetConfigValue<bool>(CONFIG_ACHIEVEMENT_REALM_FIRST_RACE_LIMIT_ONE_PER_CHARACTER, "Achievement.RealmFirstRaceLimitOnePerCharacter", true);
 }

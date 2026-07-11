@@ -374,7 +374,7 @@ namespace lfg
                 LfgDungeonSet temporal;
                 LfgDungeonSet& dungeons = QueueDataStore[check.guids[i]].dungeons;
                 std::set_intersection(proposalDungeons.begin(), proposalDungeons.end(), dungeons.begin(), dungeons.end(), std::inserter(temporal, temporal.begin()));
-                proposalDungeons = temporal;
+                std::swap(proposalDungeons, temporal);
             }
 
             if (proposalDungeons.empty())
@@ -415,7 +415,10 @@ namespace lfg
         proposal.cancelTime = GameTime::GetGameTime().count() + LFG_TIME_PROPOSAL;
         proposal.state = LFG_PROPOSAL_INITIATING;
         proposal.leader.Clear();
-        proposal.dungeonId = Acore::Containers::SelectRandomContainerElement(proposalDungeons);
+
+        // Filter out recently completed dungeons to prevent same dungeon in a row
+        LfgDungeonSet filteredDungeons = sLFGMgr->FilterCooldownDungeons(proposalDungeons, proposalRoles);
+        proposal.dungeonId = Acore::Containers::SelectRandomContainerElement(filteredDungeons);
 
         uint32 completedEncounters = 0;
         bool leader = false;

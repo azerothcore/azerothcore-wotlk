@@ -18,6 +18,9 @@
 #include "PlayerScript.h"
 #include "ScriptMgr.h"
 #include "ScriptMgrMacros.h"
+#include "World.h"
+
+#include <algorithm>
 
 void ScriptMgr::OnPlayerBeforeDurabilityRepair(Player* player, ObjectGuid npcGUID, ObjectGuid itemGUID, float& discountMod, uint8 guildBank)
 {
@@ -109,6 +112,11 @@ void ScriptMgr::OnPlayerTalentsReset(Player* player, bool noCost)
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_TALENTS_RESET, script->OnPlayerTalentsReset(player, noCost));
 }
 
+bool ScriptMgr::OnPlayerCanLearnTalent(Player* player, TalentEntry const* talent, uint32 rank)
+{
+    CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_LEARN_TALENT, !script->OnPlayerCanLearnTalent(player, talent, rank));
+}
+
 void ScriptMgr::OnPlayerAfterSpecSlotChanged(Player* player, uint8 newSlot)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_AFTER_SPEC_SLOT_CHANGED, script->OnPlayerAfterSpecSlotChanged(player, newSlot));
@@ -122,6 +130,11 @@ void ScriptMgr::OnPlayerMoneyChanged(Player* player, int32& amount)
 void ScriptMgr::OnPlayerBeforeLootMoney(Player* player, Loot* loot)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_LOOT_MONEY, script->OnPlayerBeforeLootMoney(player, loot));
+}
+
+void ScriptMgr::OnPlayerBeforeSendLoot(Player* player, ObjectGuid lootGuid, Loot* loot)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_SEND_LOOT, script->OnPlayerBeforeSendLoot(player, lootGuid, loot));
 }
 
 void ScriptMgr::OnPlayerGiveXP(Player* player, uint32& amount, Unit* victim, uint8 xpSource)
@@ -789,7 +802,7 @@ void ScriptMgr::OnPlayerSetServerSideVisibilityDetect(Player* player, ServerSide
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_SET_SERVER_SIDE_VISIBILITY_DETECT, script->OnPlayerSetServerSideVisibilityDetect(player, type, sec));
 }
 
-void ScriptMgr::OnPlayerResurrect(Player* player, float restore_percent, bool applySickness)
+void ScriptMgr::OnPlayerResurrect(Player* player, float restore_percent, bool& applySickness)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_PLAYER_RESURRECT, script->OnPlayerResurrect(player, restore_percent, applySickness));
 }
@@ -844,6 +857,11 @@ void ScriptMgr::OnPlayerQuestAbandon(Player* player, uint32 questId)
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_QUEST_ABANDON, script->OnPlayerQuestAbandon(player, questId));
 }
 
+void ScriptMgr::OnPlayerQuestAccept(Player* player, Quest const* quest)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_PLAYER_QUEST_ACCEPT, script->OnPlayerQuestAccept(player, quest));
+}
+
 // Player anti cheat
 void ScriptMgr::AnticheatSetCanFlybyServer(Player* player, bool apply)
 {
@@ -895,6 +913,11 @@ void ScriptMgr::OnPlayerUpdateSkill(Player* player, uint32 skillId, uint32 value
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_UPDATE_SKILL, script->OnPlayerUpdateSkill(player, skillId, value, max, step, newValue));
 }
 
+void ScriptMgr::OnPlayerSetSkill(Player* player, uint32 skillId, uint32 value, uint32 max, uint32 step, uint32 newValue)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_SET_SKILL, script->OnPlayerSetSkill(player, skillId, value, max, step, newValue));
+}
+
 bool ScriptMgr::OnPlayerCanResurrect(Player* player)
 {
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_RESURRECT, !script->OnPlayerCanResurrect(player));
@@ -918,6 +941,17 @@ void ScriptMgr::OnPlayerGetReputationPriceDiscount(Player const* player, Creatur
 void ScriptMgr::OnPlayerGetReputationPriceDiscount(Player const* player, FactionTemplateEntry const* factionTemplate, float& discount)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_GET_REPUTATION_PRICE_DISCOUNT, script->OnPlayerGetReputationPriceDiscount(player, factionTemplate, discount));
+}
+
+void ScriptMgr::OnPlayerLearnTaxiNode(Player const* player, uint32 nodeId)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_LEARN_TAXI_NODE, script->OnPlayerLearnTaxiNode(player, nodeId));
+}
+
+void ScriptMgr::OnPlayerBeforeGetLevelForXPGain(Player const* player, uint8& level)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_GET_LEVEL_FOR_XP_GAIN, script->OnPlayerBeforeGetLevelForXPGain(player, level));
+    level = std::clamp(level, uint8(1), uint8(sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL)));
 }
 
 PlayerScript::PlayerScript(const char* name, std::vector<uint16> enabledHooks)

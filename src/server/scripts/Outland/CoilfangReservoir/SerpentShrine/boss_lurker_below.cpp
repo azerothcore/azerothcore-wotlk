@@ -171,7 +171,6 @@ struct boss_the_lurker_below : public BossAI
             scheduler.CancelAll();
             DoCastSelf(SPELL_SUBMERGE_VISUAL);
             DoCastSelf(SPELL_CLEAR_ALL_DEBUFFS, true);
-            me->SetStandState(UNIT_STAND_STATE_SUBMERGED);
             me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
             for (uint8 i = 0; i < MAX_SUMMONS; ++i)
             {
@@ -187,7 +186,7 @@ struct boss_the_lurker_below : public BossAI
         scheduler.Schedule(timer, [this](TaskContext)
         {
             me->setAttackTimer(BASE_ATTACK, 6000);
-            me->SetStandState(UNIT_STAND_STATE_STAND);
+            me->RemoveAurasDueToSpell(SPELL_SUBMERGE_VISUAL);
             me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
 
             scheduler.CancelAll();
@@ -212,10 +211,9 @@ struct boss_the_lurker_below : public BossAI
         }
         else
         {
-            ThreatContainer::StorageType const& t_list = me->GetThreatMgr().GetThreatList();
-            for (ThreatReference const* ref : t_list)
+            for (ThreatReference const* ref : me->GetThreatMgr().GetUnsortedThreatList())
             {
-                if (Unit* threatTarget = ObjectAccessor::GetUnit(*me, ref->getUnitGuid()))
+                if (Unit* threatTarget = ref->GetVictim())
                 {
                     if (me->IsWithinMeleeRange(threatTarget))
                     {

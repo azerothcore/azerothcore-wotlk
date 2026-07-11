@@ -65,7 +65,6 @@ enum VezaxNpcs
 {
     // NPC_VEZAX                                = 33271,
     // NPC_VEZAX_BUNNY                          = 33500,
-    NPC_SARONITE_ANIMUS                         = 33524,
 };
 
 enum VezaxGOs
@@ -108,7 +107,7 @@ enum VaporsText
 
 struct boss_vezax : public BossAI
 {
-    boss_vezax(Creature* pCreature) : BossAI(pCreature, BOSS_VEZAX) { }
+    boss_vezax(Creature* creature) : BossAI(creature, BOSS_VEZAX) { }
 
     uint8 vaporsCount;
     bool hardmodeAvailable;
@@ -131,7 +130,7 @@ struct boss_vezax : public BossAI
         me->setActive(false);
     }
 
-    void JustEngagedWith(Unit*  /*pWho*/) override
+    void JustEngagedWith(Unit*  /*who*/) override
     {
         me->setActive(true);
         _JustEngagedWith();
@@ -326,13 +325,6 @@ struct boss_vezax : public BossAI
     {
         _JustDied();
         Talk(SAY_DEATH);
-
-        if (GameObject* door = me->FindNearestGameObject(GO_VEZAX_DOOR, 500.0f))
-            if (door->GetGoState() != GO_STATE_ACTIVE)
-            {
-                door->SetLootState(GO_READY);
-                door->UseDoorOrButton(0, false);
-            }
     }
 
     void KilledUnit(Unit* who) override
@@ -346,21 +338,21 @@ struct boss_vezax : public BossAI
 
 struct npc_ulduar_saronite_vapors : public NullCreatureAI
 {
-    npc_ulduar_saronite_vapors(Creature* pCreature) : NullCreatureAI(pCreature)
+    npc_ulduar_saronite_vapors(Creature* creature) : NullCreatureAI(creature)
     {
-        pInstance = pCreature->GetInstanceScript();
+        _instance = creature->GetInstanceScript();
         me->GetMotionMaster()->MoveRandom(4.0f);
     }
 
-    InstanceScript* pInstance;
+    InstanceScript* _instance;
 
     void JustDied(Unit*  /*killer*/) override
     {
         me->CastSpell(me, SPELL_SARONITE_VAPORS_AURA, true);
 
         // killed saronite vapors, hard mode unavailable
-        if (pInstance)
-            if (Creature* vezax = pInstance->GetCreature(BOSS_VEZAX))
+        if (_instance)
+            if (Creature* vezax = _instance->GetCreature(BOSS_VEZAX))
                 vezax->AI()->DoAction(1);
     }
 
@@ -372,31 +364,28 @@ struct npc_ulduar_saronite_vapors : public NullCreatureAI
 
 struct npc_ulduar_saronite_animus : public ScriptedAI
 {
-    npc_ulduar_saronite_animus(Creature* pCreature) : ScriptedAI(pCreature)
+    npc_ulduar_saronite_animus(Creature* creature) : ScriptedAI(creature)
     {
-        pInstance = pCreature->GetInstanceScript();
-        if (pInstance)
-            if (Creature* vezax = pInstance->GetCreature(BOSS_VEZAX))
-                vezax->AI()->JustSummoned(me);
+        _instance = creature->GetInstanceScript();
         timer = 0;
-        me->SetInCombatWithZone();
     }
 
-    InstanceScript* pInstance;
+    InstanceScript* _instance;
     uint16 timer;
 
     void JustDied(Unit*  /*killer*/) override
     {
         me->DespawnOrUnsummon(3s);
 
-        if (pInstance)
-            if (Creature* vezax = pInstance->GetCreature(BOSS_VEZAX))
+        if (_instance)
+            if (Creature* vezax = _instance->GetCreature(BOSS_VEZAX))
                 vezax->AI()->DoAction(2);
     }
 
     void UpdateAI(uint32 diff) override
     {
-        UpdateVictim();
+        if (!UpdateVictim())
+            return;
 
         timer += diff;
         if (timer >= 2000)
