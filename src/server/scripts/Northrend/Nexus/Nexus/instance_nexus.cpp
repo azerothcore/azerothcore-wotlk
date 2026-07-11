@@ -207,6 +207,7 @@ struct npc_crystalline_frayer : public ScriptedAI
     {
         _allowDeath = false;
         _inSeedPod = false;
+        me->SetIsCombatDisallowed(false);
         _scheduler.CancelAll();
 
         me->RemoveAllAuras();
