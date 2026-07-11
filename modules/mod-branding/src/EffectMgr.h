@@ -52,6 +52,15 @@ namespace Branding
         // brand and the system is enabled; false (leaving outputs untouched) otherwise.
         bool Resolve(Player* player, EffectProfile& profile, uint8_t& level) const;
 
+        // §7.11 (issue #77): the leveling context the player is in right now (Dungeon if in an
+        // instanced dungeon, Invasion if their zone has an active invasion, else None), and the
+        // account-keyed standing that feeds the leveling budget.
+        LevelingContext LevelingContextFor(Player* player) const;
+        AccountBrandStanding StandingFor(Player* player) const;
+
+        // §7.11 leveling budget for the player right now (>= 1.0), or 1.0 when it does not apply.
+        double LevelingMultiplierFor(Player* player) const;
+
         EffectConfig _config;
         uint32_t _overhealShieldSpell = 0;
     };

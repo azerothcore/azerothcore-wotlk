@@ -60,6 +60,11 @@ namespace Branding
         // validate brand selection against account-wide unlocks without a second DB read.
         KnowledgeState AccountKnowledge(uint32_t accountId) const;
 
+        // §7.11 leveling-scoped branding (issue #77): the account's "standing" input -- how many brands
+        // any character on the account has taken to max proficiency. Loaded on demand and cached per
+        // account (a single aggregation over the account's characters). Feeds AccountBrandStanding.
+        uint8_t AccountMaxedBrandCount(uint32_t accountId);
+
     private:
         ProficiencyMgr() = default;
 
@@ -67,6 +72,7 @@ namespace Branding
 
         void LoadCharacterStates(ObjectGuid guid, uint32_t lowGuid);
         void LoadAccountKnowledge(uint32_t accountId);
+        void LoadAccountMaxedBrands(uint32_t accountId);
 
         // Returns the cached knowledge for an account, loading it from the DB if not yet present.
         KnowledgeState& EnsureAccountKnowledge(uint32_t accountId);
@@ -75,6 +81,7 @@ namespace Branding
         ServerClock _clock;
         std::unordered_map<ObjectGuid, BrandStates> _charStates;
         std::unordered_map<uint32_t, KnowledgeState> _accountKnowledge;
+        std::unordered_map<uint32_t, uint8_t> _accountMaxedBrands;
     };
 }
 
