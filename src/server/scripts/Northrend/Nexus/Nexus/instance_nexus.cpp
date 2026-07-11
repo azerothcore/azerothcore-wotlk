@@ -256,6 +256,7 @@ struct npc_crystalline_frayer : public ScriptedAI
     void EnterSeedPod()
     {
         _inSeedPod = true;
+        me->SetIsCombatDisallowed(true);
         _scheduler.CancelGroup(GROUP_COMBAT);
 
         me->AttackStop();
@@ -283,6 +284,7 @@ struct npc_crystalline_frayer : public ScriptedAI
     void LeaveSeedPod()
     {
         _inSeedPod = false;
+        me->SetIsCombatDisallowed(false);
 
         Talk(SAY_EMOTE);
 
