@@ -104,10 +104,7 @@ bool BattlegroundBE::SetupBattleground()
             || !AddObject(BG_BE_OBJECT_DOOR_4, BG_BE_OBJECT_TYPE_DOOR_4, 6177.708f, 227.3481f, 3.604374f, -2.260201f, 0, 0, 0.9044551f, -0.4265689f, RESPAWN_IMMEDIATELY)
             // buffs
             || !AddObject(BG_BE_OBJECT_BUFF_1, BG_BE_OBJECT_TYPE_BUFF_1, 6249.042f, 275.3239f, 11.22033f, -1.448624f, 0, 0, 0.6626201f, -0.7489557f, 120)
-            || !AddObject(BG_BE_OBJECT_BUFF_2, BG_BE_OBJECT_TYPE_BUFF_2, 6228.26f, 249.566f, 11.21812f, -0.06981307f, 0, 0, 0.03489945f, -0.9993908f, 120)
-            // Arena Ready Marker
-            || !AddObject(BG_BE_OBJECT_READY_MARKER_1, ARENA_READY_MARKER_ENTRY, 6189.47f, 235.54f, 5.52f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 300)
-            || !AddObject(BG_BE_OBJECT_READY_MARKER_2, ARENA_READY_MARKER_ENTRY, 6287.19f, 288.25f, 5.33f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 300))
+            || !AddObject(BG_BE_OBJECT_BUFF_2, BG_BE_OBJECT_TYPE_BUFF_2, 6228.26f, 249.566f, 11.21812f, -0.06981307f, 0, 0, 0.03489945f, -0.9993908f, 120))
     {
         LOG_ERROR("sql.sql", "BatteGroundBE: Failed to spawn some object!");
         return false;
