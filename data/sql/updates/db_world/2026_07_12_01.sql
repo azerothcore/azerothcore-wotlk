@@ -1,3 +1,4 @@
+-- DB update 2026_07_12_00 -> 2026_07_12_01
 DELETE FROM `areatrigger_teleport` WHERE `ID` = 5206;
 INSERT INTO `areatrigger_teleport` (`ID`, `Name`, `target_map`, `target_position_x`, `target_position_y`, `target_position_z`, `target_orientation`) VALUES
 (5206, 'Gundrak (North Entrance)', 604, 1882.32, 631.027, 176.696, 3.1415927);
