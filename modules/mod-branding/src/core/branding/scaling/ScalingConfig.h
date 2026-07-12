@@ -32,11 +32,20 @@ namespace Branding
         virtual double CurrencyReductionExponent() const = 0;
         virtual double CurrencyMulFloor() const = 0;
 
-        // --- Branding-rank drop bonus (§2.7, issue #81) ---
-        // Instanced drop-chance multiplier from the party's top rank: mul = 1.0 + perRank * topRank,
-        // clamped to [1.0, cap].
-        virtual double RankDropBonusPerRank() const = 0;   // per-rank drop-chance bonus (e.g. 0.01 = +1%)
-        virtual double RankDropMulCap() const = 0;          // maximum multiplier (e.g. 1.5 = +50% cap)
+        // --- Branding Boon: selectable raid-wide economy rate (§2.7, issues #81, #83) ---
+        // Per-axis multiplier caps (the Drop cap is the migrated #81 +50%). Each axis is an
+        // independent DR bucket, so a raid can light up all three at once without cross-axis
+        // compounding. A lone maxed selector on an axis reaches exactly that axis's cap.
+        virtual double BoonDropCap() const = 0;   // e.g. 1.5 = at most +50% instanced drop chance
+        virtual double BoonXpCap() const = 0;     // e.g. 1.5 = at most +50% XP rate
+        virtual double BoonGoldCap() const = 0;   // e.g. 1.5 = at most +50% gold rate
+        // Geometric same-axis diminishing returns -- the SAME harsh curve as the §7.9 catalyst
+        // (production reads the shared Branding.Catalyst.StackDecay): 1st selector full, each
+        // subsequent one weighted decay^(i-1) (default 0.4 -> 1, 0.4, 0.16, ...).
+        virtual double BoonStackDecay() const = 0;
+        // Proficiency ceiling used to normalize a selector's rank into a [0,1] strength; equals the
+        // §7 proficiency MaxLevel (Branding.Level.Max, default 50).
+        virtual uint8_t BoonMaxRank() const = 0;
     };
 }
 

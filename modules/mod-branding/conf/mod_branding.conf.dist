@@ -190,23 +190,43 @@ Branding.Scaling.CurrencyReductionExponent = 2.0
 Branding.Scaling.CurrencyMulFloor = 0.05
 
 #
-#    Branding.DropRate.RankBonus.Enable
-#        Description: Instanced (dungeon/raid) drop-rate bonus (§2.7, issue #81). When enabled, the
-#                     per-item drop chance on CREATURE loot inside dungeons and raids is multiplied by
-#                     a factor that scales with the HIGHEST branding rank in the looter's party, so
-#                     farming ranks pays off and a high-rank member is worth bringing. Open-world,
-#                     gathering, and quest loot are never affected. It is a pure bonus (never a nerf).
+#    Branding.Boon.Enable
+#        Description: Branding Boon (§2.7, issues #81/#83): a selectable, raid-wide ECONOMY-VELOCITY
+#                     bonus -- never combat power. Each character selects ONE axis (Xp / Drop / Gold);
+#                     the boon then applies raid-wide for that axis. Drop multiplies per-item drop
+#                     chance on CREATURE loot inside dungeons/raids only (open-world, gathering and
+#                     quest loot are never affected -- this subsumes the former #81 drop bonus); Xp
+#                     multiplies awarded XP (post-cap proficiency XP is excluded); Gold multiplies
+#                     looted/quest coin. Always a pure bonus (>= 1.0), never a nerf.
 #        Default:     0 - (disabled)
 #
-#    Branding.DropRate.RankBonus.PerRank / Branding.DropRate.RankBonus.MulCap
-#        Description: multiplier = clamp(1.0 + PerRank * topRank, 1.0, MulCap). With the defaults a
-#                     party's rank-50 member yields exactly +50% drop chance (the "0.5x" of the issue).
-#        Default:     0.01 / 1.5  (+1% per rank, capped at +50%)
+#    Branding.Boon.DropCap / Branding.Boon.XpCap / Branding.Boon.GoldCap
+#        Description: Per-axis multiplier cap. Each axis is an INDEPENDENT diminishing-returns bucket,
+#                     so a raid may light up all three at once without cross-axis compounding. A lone
+#                     maxed selector on an axis reaches exactly that axis's cap (DropCap 1.5 reproduces
+#                     the old #81 +50% at rank 50). Per-axis strength = clamp(rank/Branding.Level.Max,
+#                     0, 1); same-axis selectors stack with the harsh catalyst DR below.
+#        Default:     1.5 / 1.5 / 1.5  (+50% cap per axis)
+#
+#    Branding.Boon.StackDecay
+#        Description: Geometric same-axis diminishing returns -- the SAME harsh curve as the catalyst
+#                     (§7.9). Best selector full, each subsequent one weighted decay^(i-1) (1, 0.4,
+#                     0.16, ...). Defaults to the shared Branding.Catalyst.StackDecay.
+#        Default:     0.4
+#
+#    Branding.Boon.ReselectCost
+#        Description: Copper charged to CHANGE an already-chosen boon axis via `.branding boon <axis>`
+#                     (issue #83: "should be very expensive to re-select"). The first pick (from None)
+#                     is free; each subsequent change costs this much. 0 disables the charge.
+#        Default:     1000000  (100 gold)
 #
 
-Branding.DropRate.RankBonus.Enable = 0
-Branding.DropRate.RankBonus.PerRank = 0.01
-Branding.DropRate.RankBonus.MulCap = 1.5
+Branding.Boon.Enable = 0
+Branding.Boon.DropCap = 1.5
+Branding.Boon.XpCap = 1.5
+Branding.Boon.GoldCap = 1.5
+Branding.Boon.StackDecay = 0.4
+Branding.Boon.ReselectCost = 1000000
 
 #
 #    Branding.Invasion.ScalingEnable

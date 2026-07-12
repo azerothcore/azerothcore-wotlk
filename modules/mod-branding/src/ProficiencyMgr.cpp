@@ -163,8 +163,23 @@ namespace Branding
 
         uint32 const account = player->GetSession()->GetAccountId();
         LoadCharacterStates(player->GetGUID(), player->GetGUID().GetCounter());
+        LoadBoonSelection(player->GetGUID(), player->GetGUID().GetCounter());
         LoadAccountKnowledge(account);
         LoadAccountMaxedBrands(account);
+    }
+
+    void ProficiencyMgr::LoadBoonSelection(ObjectGuid guid, uint32_t lowGuid)
+    {
+        _boon[guid] = BoonAxis::None;
+
+        QueryResult result = CharacterDatabase.Query(
+            "SELECT `axis` FROM `character_branding_boon` WHERE `guid` = {}", lowGuid);
+        if (!result)
+            return;
+
+        uint8 const axis = result->Fetch()[0].Get<uint8>();
+        if (axis <= static_cast<uint8>(BoonAxis::Gold))
+            _boon[guid] = static_cast<BoonAxis>(axis);
     }
 
     void ProficiencyMgr::SavePlayer(Player* player)
@@ -195,6 +210,25 @@ namespace Branding
     {
         _charStates.erase(guid);
         _topLevel.erase(guid);
+        _boon.erase(guid);
+    }
+
+    BoonAxis ProficiencyMgr::SelectedBoon(ObjectGuid charGuid) const
+    {
+        auto it = _boon.find(charGuid);
+        return it != _boon.end() ? it->second : BoonAxis::None;
+    }
+
+    void ProficiencyMgr::SetSelectedBoon(ObjectGuid charGuid, BoonAxis axis)
+    {
+        // Always called for a live player (the boon command), so populate the cache unconditionally
+        // -- even if LoadBoonSelection was skipped (e.g. the proficiency load path was gated off).
+        // Otherwise the write would silently drop and the command would falsely report success. The
+        // DB REPLACE is the durable record; the next login's LoadBoonSelection re-reads it.
+        _boon[charGuid] = axis;
+        CharacterDatabase.Execute(
+            "REPLACE INTO `character_branding_boon` (`guid`, `axis`) VALUES ({}, {})",
+            charGuid.GetCounter(), static_cast<uint32>(axis));
     }
 
     XpResult ProficiencyMgr::ApplyActivity(ObjectGuid charGuid, uint32_t accountId, XpActivity const& activity)

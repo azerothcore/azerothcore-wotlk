@@ -1,6 +1,8 @@
 #include "GroupScaling.h"
 #include <algorithm>
 #include <cmath>
+#include <functional>
+#include <vector>
 
 namespace Branding
 {
@@ -51,12 +53,64 @@ namespace Branding
         return reward;
     }
 
-    double RankDropRateMultiplier(uint8_t topRank, IScalingConfig const& cfg)
+    namespace
     {
-        double const mul = 1.0 + cfg.RankDropBonusPerRank() * static_cast<double>(topRank);
+        // Per-axis multiplier cap. `None` has no bonus. Floored at 1.0 by the caller.
+        double BoonAxisCap(BoonAxis axis, IScalingConfig const& cfg)
+        {
+            switch (axis)
+            {
+                case BoonAxis::Xp:   return cfg.BoonXpCap();
+                case BoonAxis::Drop: return cfg.BoonDropCap();
+                case BoonAxis::Gold: return cfg.BoonGoldCap();
+                case BoonAxis::None:
+                default:             return 1.0;
+            }
+        }
+    }
+
+    double BoonAxisMultiplier(BoonAxis axis, uint8_t const* ranks, std::size_t count,
+                              IScalingConfig const& cfg)
+    {
+        if (axis == BoonAxis::None || ranks == nullptr || count == 0)
+            return 1.0;
+
         // Floor the cap at 1.0: a misconfigured cap below 1.0 must not flip the bonus into a penalty
         // (and std::clamp with lo > hi is undefined behavior). Keeps the "never a penalty" invariant.
-        double const cap = std::max(1.0, cfg.RankDropMulCap());
+        double const cap = std::max(1.0, BoonAxisCap(axis, cfg));
+        double const decay = std::clamp(cfg.BoonStackDecay(), 0.0, 1.0);
+        double const maxRank = static_cast<double>(std::max<uint8_t>(1, cfg.BoonMaxRank()));
+
+        // Per-selector proficiency strength in [0, 1]; a rank-0 (or non-loaded) member contributes 0.
+        // This runs per dropped loot item (OnItemRoll), so avoid a heap allocation: a stack buffer
+        // covers every real roster (WoW raids cap at 40); an implausibly larger caller falls back to
+        // the heap for correctness. Sorting descending makes the result order-independent and
+        // monotonic in any single rank -- best selector carries full weight, each subsequent one is
+        // DR'd by decay^(position) (§7.9).
+        constexpr std::size_t kStackSelectors = 40;
+        double stackBuf[kStackSelectors];
+        std::vector<double> heapBuf;
+        double* strengths = stackBuf;
+        if (count > kStackSelectors)
+        {
+            heapBuf.resize(count);
+            strengths = heapBuf.data();
+        }
+
+        for (std::size_t i = 0; i < count; ++i)
+            strengths[i] = std::clamp(static_cast<double>(ranks[i]) / maxRank, 0.0, 1.0);
+
+        std::sort(strengths, strengths + count, std::greater<double>());
+
+        double acc = 0.0;
+        double weight = 1.0;
+        for (std::size_t i = 0; i < count; ++i)
+        {
+            acc += strengths[i] * weight;
+            weight *= decay;
+        }
+
+        double const mul = 1.0 + (cap - 1.0) * acc;
         return std::clamp(mul, 1.0, cap);
     }
 }

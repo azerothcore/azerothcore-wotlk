@@ -69,6 +69,48 @@ namespace
         }
     }
 
+    char const* BoonAxisName(BoonAxis axis)
+    {
+        switch (axis)
+        {
+            case BoonAxis::Xp:   return "XP";
+            case BoonAxis::Drop: return "Drop";
+            case BoonAxis::Gold: return "Gold";
+            case BoonAxis::None:
+            default:             return "None";
+        }
+    }
+
+    // Parse a boon axis token (name or id). Accepts none/xp/drop/gold, case-insensitive, or 0..3.
+    bool ParseBoonAxis(std::string_view token, BoonAxis& out)
+    {
+        std::string lowered(token);
+        std::transform(lowered.begin(), lowered.end(), lowered.begin(),
+            [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+
+        if (lowered == "none" || lowered == "0")
+        {
+            out = BoonAxis::None;
+            return true;
+        }
+        if (lowered == "xp" || lowered == "1")
+        {
+            out = BoonAxis::Xp;
+            return true;
+        }
+        if (lowered == "drop" || lowered == "2")
+        {
+            out = BoonAxis::Drop;
+            return true;
+        }
+        if (lowered == "gold" || lowered == "3")
+        {
+            out = BoonAxis::Gold;
+            return true;
+        }
+        return false;
+    }
+
     char const* RoleName(RoleContribution role)
     {
         switch (role)
@@ -165,6 +207,7 @@ public:
             { "itembrand",   HandleBrandingItemBrandCommand,   rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
             { "upgradeitem", HandleBrandingUpgradeItemCommand, rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
             { "etch",        HandleBrandingEtchCommand,        rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
+            { "boon",        HandleBrandingBoonCommand,        rbac::RBAC_PERM_COMMAND_DEBUG, Console::No },
             { "knowledge",  knowledgeCommandTable },
             { "insight",    insightCommandTable },
             { "allegiance", allegianceCommandTable },
@@ -928,6 +971,73 @@ public:
             default:
                 return false;
         }
+    }
+
+    // §2.7/#83: select this character's raid-wide Branding Boon axis (XP / Drop / Gold), or show the
+    // current choice when called with no argument. Changing an already-chosen axis is deliberately
+    // expensive (Branding.Boon.ReselectCost); the first pick from None is free.
+    static bool HandleBrandingBoonCommand(ChatHandler* handler, Optional<std::string_view> axisToken)
+    {
+        Player* player = handler->GetPlayer();
+        if (!player)
+        {
+            handler->SendErrorMessage("This command must be used in-world.");
+            return false;
+        }
+        if (!sScalingMgr->BoonEnabled())
+        {
+            handler->SendErrorMessage("The Branding Boon is disabled (Branding.Boon.Enable).");
+            return false;
+        }
+        // The boon draws its strength from branding proficiency ranks; without the module master
+        // (Branding.Enable) no ranks load and the boon is inert, so refuse rather than pretend.
+        if (!sProficiencyMgr->Config().Enabled())
+        {
+            handler->SendErrorMessage("Branding is disabled on this realm (Branding.Enable).");
+            return false;
+        }
+
+        ObjectGuid const guid = player->GetGUID();
+        BoonAxis const current = sProficiencyMgr->SelectedBoon(guid);
+
+        // No argument: report the current selection and usage.
+        if (!axisToken)
+        {
+            handler->PSendSysMessage("Current Branding Boon: {}. Use `.branding boon <none|xp|drop|gold>` to change.",
+                BoonAxisName(current));
+            return true;
+        }
+
+        BoonAxis axis;
+        if (!ParseBoonAxis(*axisToken, axis))
+        {
+            handler->SendErrorMessage("Unknown boon axis '{}'. Use none, xp, drop, or gold.", *axisToken);
+            return false;
+        }
+
+        if (axis == current)
+        {
+            handler->PSendSysMessage("Your Branding Boon is already {}.", BoonAxisName(axis));
+            return true;
+        }
+
+        // The first pick out of None is free; changing between real axes charges the re-select cost.
+        uint32 const cost = current == BoonAxis::None ? 0u : sScalingMgr->BoonReselectCost();
+        if (cost > 0 && !player->HasEnoughMoney(static_cast<int32>(cost)))
+        {
+            handler->SendErrorMessage("Re-selecting your Branding Boon costs {} copper -- you cannot afford it.", cost);
+            return false;
+        }
+
+        if (cost > 0)
+            player->ModifyMoney(-static_cast<int32>(cost));
+
+        sProficiencyMgr->SetSelectedBoon(guid, axis);
+        if (cost > 0)
+            handler->PSendSysMessage("Branding Boon set to {} for {} copper.", BoonAxisName(axis), cost);
+        else
+            handler->PSendSysMessage("Branding Boon set to {}.", BoonAxisName(axis));
+        return true;
     }
 };
 

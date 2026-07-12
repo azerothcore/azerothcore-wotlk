@@ -8,6 +8,7 @@
 #include "Log.h"
 #include "Player.h"
 #include <algorithm>
+#include <vector>
 
 namespace Branding
 {
@@ -67,19 +68,29 @@ namespace Branding
         return ScalingFactor(attacker->GetLevel(), targetLevel, _config);
     }
 
-    double ScalingMgr::RankLootMultiplier(Player const* looter) const
+    double ScalingMgr::BoonMultiplier(Player const* actor, BoonAxis axis) const
     {
-        if (!looter)
+        if (!actor || axis == BoonAxis::None)
             return 1.0;
 
-        // Highest branding rank across the party -- a full raid benefits from its best-farmed member
-        // (the "worth bringing" incentive, §2.7). Ungrouped looters fall back to their own rank.
-        uint8_t topRank = sProficiencyMgr->TopBrandLevel(looter->GetGUID());
-        if (Group const* group = looter->GetGroup())
-            for (auto const& member : group->GetMemberSlots())
-                topRank = std::max(topRank, sProficiencyMgr->TopBrandLevel(member.guid));
+        // Collect the branding rank of each group member who SELECTED this axis; the pure core sorts
+        // them best-first and applies the harsh same-axis DR (§7.9). A full raid benefits from its
+        // best-farmed selectors (the "worth bringing" incentive, §2.7). Ungrouped actors count only
+        // themselves. Reads only the ObjectGuid-keyed caches -- no Player* stored past the call.
+        std::vector<uint8_t> ranks;
+        auto consider = [&](ObjectGuid guid)
+        {
+            if (sProficiencyMgr->SelectedBoon(guid) == axis)
+                ranks.push_back(sProficiencyMgr->TopBrandLevel(guid));
+        };
 
-        return RankDropRateMultiplier(topRank, _config);
+        if (Group const* group = actor->GetGroup())
+            for (auto const& member : group->GetMemberSlots())
+                consider(member.guid);
+        else
+            consider(actor->GetGUID());
+
+        return BoonAxisMultiplier(axis, ranks.data(), ranks.size(), _config);
     }
 
     double ScalingMgr::CurrencyMulForGroup(uint8_t groupSize, uint8_t contentSize) const

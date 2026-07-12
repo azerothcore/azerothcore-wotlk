@@ -18,8 +18,11 @@ namespace Branding::Test
         double rareChanceMulMax = 2.0;
         double currencyReductionExponent = 2.0;
         double currencyMulFloor = 0.05;
-        double rankDropBonusPerRank = 0.01;
-        double rankDropMulCap = 1.5;
+        double boonDropCap = 1.5;
+        double boonXpCap = 1.5;
+        double boonGoldCap = 1.5;
+        double boonStackDecay = 0.4;
+        uint8_t boonMaxRank = 50;
 
         double StatScalingExponent() const override { return statScalingExponent; }
         double GroupHealthFloor() const override { return groupHealthFloor; }
@@ -30,8 +33,11 @@ namespace Branding::Test
         double RareChanceMulMax() const override { return rareChanceMulMax; }
         double CurrencyReductionExponent() const override { return currencyReductionExponent; }
         double CurrencyMulFloor() const override { return currencyMulFloor; }
-        double RankDropBonusPerRank() const override { return rankDropBonusPerRank; }
-        double RankDropMulCap() const override { return rankDropMulCap; }
+        double BoonDropCap() const override { return boonDropCap; }
+        double BoonXpCap() const override { return boonXpCap; }
+        double BoonGoldCap() const override { return boonGoldCap; }
+        double BoonStackDecay() const override { return boonStackDecay; }
+        uint8_t BoonMaxRank() const override { return boonMaxRank; }
     };
 }
 

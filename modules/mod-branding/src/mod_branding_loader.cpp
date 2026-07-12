@@ -8,6 +8,7 @@ void Addmod_brandingScripts()
     AddBrandingDiscoveryScripts();
     AddBrandingScalingScripts();
     AddBrandingDropRateScripts();
+    AddBrandingBoonScripts();
     AddBrandingInvasionScalingScripts();
     AddBrandingHeroicScripts();
     AddBrandingEventScripts();

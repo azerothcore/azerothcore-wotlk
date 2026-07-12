@@ -2,6 +2,7 @@
 #define MOD_BRANDING_CORE_SCALING_GROUPSCALING_H
 
 #include "ScalingConfig.h"
+#include <cstddef>
 #include <cstdint>
 
 namespace Branding
@@ -28,10 +29,26 @@ namespace Branding
 
     RewardScale RewardScaleForGroup(GroupContext const& group, IScalingConfig const& cfg);
 
-    // Instanced (dungeon/raid) drop-rate multiplier from the party's highest branding rank (§2.7,
-    // issue #81). Linear in rank, clamped to [1.0, cap]: a pure bonus (1.0 at rank 0, never a penalty)
-    // so farming ranks pays off and a high-rank member is worth bringing.
-    double RankDropRateMultiplier(uint8_t topRank, IScalingConfig const& cfg);
+    // The economy axis a character selects for the raid-wide Branding Boon (§2.7, issue #83). One
+    // active axis per character; the boon then applies raid-wide for that axis. `None` = opted out.
+    enum class BoonAxis : uint8_t
+    {
+        None = 0,
+        Xp   = 1,
+        Drop = 2,
+        Gold = 3,
+    };
+
+    // Raid-wide economy multiplier for ONE boon axis, from the proficiency ranks of the group
+    // members who selected it (§2.7, issues #81/#83). Each selector contributes a strength
+    // s = clamp(rank / BoonMaxRank, 0, 1); strengths are sorted descending (best carries) and
+    // stacked with the geometric §7.9 catalyst DR (BoonStackDecay), so:
+    //     mul = clamp(1 + (AxisCap - 1) * Σ_i s_i * decay^(i-1), 1, AxisCap)
+    // A lone maxed selector reaches exactly AxisCap (reproducing the old #81 +50% Drop bonus).
+    // Empty/None -> 1.0. A pure bonus (>= 1.0), monotonic in any selector's rank, capped per axis.
+    // Selector order does not matter (sorted internally). `ranks` may be null iff `count == 0`.
+    double BoonAxisMultiplier(BoonAxis axis, uint8_t const* ranks, std::size_t count,
+                              IScalingConfig const& cfg);
 }
 
 #endif // MOD_BRANDING_CORE_SCALING_GROUPSCALING_H

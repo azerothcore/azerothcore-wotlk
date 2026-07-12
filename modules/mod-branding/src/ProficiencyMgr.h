@@ -5,6 +5,7 @@
 #include "ServerClock.h"
 #include "branding/proficiency/Proficiency.h"
 #include "branding/proficiency/Types.h"
+#include "branding/scaling/GroupScaling.h"
 #include "ObjectGuid.h"
 #include <array>
 #include <cstddef>
@@ -54,6 +55,15 @@ namespace Branding
         // dropped item, so recomputing the per-brand level curve each time would be wasteful).
         uint8_t TopBrandLevel(ObjectGuid charGuid) const;
 
+        // §2.7 Branding Boon (issue #83): the raid-wide economy axis this character has selected
+        // (BoonAxis::None if the character isn't loaded or hasn't chosen). Cached; loaded on login.
+        BoonAxis SelectedBoon(ObjectGuid charGuid) const;
+
+        // Persist a new boon selection for a loaded character (cache + `character_branding_boon`).
+        // The expensive re-select cost is charged by the caller (command/vendor); this only stores
+        // the choice. No-op if the character isn't loaded.
+        void SetSelectedBoon(ObjectGuid charGuid, BoonAxis axis);
+
         // XP-bar progression for a brand on this character (issue #54): level + position within it.
         // Zeroed (level 0, no span) if the character isn't loaded. Pure decomposition over §7.4.
         LevelProgress BrandProgress(ObjectGuid charGuid, BrandId brand) const;
@@ -87,6 +97,7 @@ namespace Branding
         void LoadCharacterStates(ObjectGuid guid, uint32_t lowGuid);
         void LoadAccountKnowledge(uint32_t accountId);
         void LoadAccountMaxedBrands(uint32_t accountId);
+        void LoadBoonSelection(ObjectGuid guid, uint32_t lowGuid);
 
         // Returns the cached knowledge for an account, loading it from the DB if not yet present.
         KnowledgeState& EnsureAccountKnowledge(uint32_t accountId);
@@ -101,6 +112,7 @@ namespace Branding
         std::unordered_map<uint32_t, KnowledgeState> _accountKnowledge;
         std::unordered_map<uint32_t, uint8_t> _accountMaxedBrands;
         std::unordered_map<ObjectGuid, uint8_t> _topLevel;   // derived cache for TopBrandLevel (§2.7)
+        std::unordered_map<ObjectGuid, BoonAxis> _boon;      // per-character selected boon axis (§2.7/#83)
     };
 }
 

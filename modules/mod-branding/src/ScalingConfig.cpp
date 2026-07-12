@@ -1,5 +1,7 @@
 #include "ScalingConfig.h"
 #include "Configuration/Config.h"
+#include <algorithm>
+#include <limits>
 
 namespace Branding
 {
@@ -20,9 +22,20 @@ namespace Branding
         _currencyReductionExponent = sConfigMgr->GetOption<float>("Branding.Scaling.CurrencyReductionExponent", 2.0f);
         _currencyMulFloor = sConfigMgr->GetOption<float>("Branding.Scaling.CurrencyMulFloor", 0.05f);
 
-        // Branding-rank drop bonus (§2.7, issue #81): instanced drop rate scales with the party's top rank.
-        _rankDropBonusEnabled = sConfigMgr->GetOption<bool>("Branding.DropRate.RankBonus.Enable", false);
-        _rankDropBonusPerRank = sConfigMgr->GetOption<float>("Branding.DropRate.RankBonus.PerRank", 0.01f);
-        _rankDropMulCap = sConfigMgr->GetOption<float>("Branding.DropRate.RankBonus.MulCap", 1.5f);
+        // Branding Boon (§2.7, issues #81/#83): selectable raid-wide economy rate (Drop/Xp/Gold).
+        _boonEnabled = sConfigMgr->GetOption<bool>("Branding.Boon.Enable", false);
+        // Clamp to INT32_MAX: the cost is charged via Player::ModifyMoney(int32), so a larger value
+        // would wrap negative and REFUND the player instead of charging. (INT32_MAX copper ~= 214k
+        // gold is already an absurd re-select price, so the clamp never bites a sane config.)
+        _boonReselectCost = std::min<uint32_t>(sConfigMgr->GetOption<uint32_t>("Branding.Boon.ReselectCost", 1000000),
+            static_cast<uint32_t>(std::numeric_limits<int32_t>::max()));
+        _boonDropCap = sConfigMgr->GetOption<float>("Branding.Boon.DropCap", 1.5f);
+        _boonXpCap = sConfigMgr->GetOption<float>("Branding.Boon.XpCap", 1.5f);
+        _boonGoldCap = sConfigMgr->GetOption<float>("Branding.Boon.GoldCap", 1.5f);
+        // Same harsh DR as the §7.9 catalyst: default to the shared Branding.Catalyst.StackDecay.
+        _boonStackDecay = sConfigMgr->GetOption<float>("Branding.Boon.StackDecay",
+            sConfigMgr->GetOption<float>("Branding.Catalyst.StackDecay", 0.4f));
+        // Rank->strength normalization ceiling = the §7 proficiency MaxLevel (Branding.Level.Max).
+        _boonMaxRank = static_cast<uint8_t>(sConfigMgr->GetOption<uint32_t>("Branding.Level.Max", 50));
     }
 }

@@ -7,9 +7,10 @@
 
 using namespace Branding;
 
-// §2.7 branding-rank drop bonus (issue #81): instanced (dungeon/raid) creature drop rate scales with
-// the highest branding rank in the looter's party, so farming ranks pays off and a high-rank member
-// is worth bringing. Multiplies the engine's per-item roll chance; it is a pure bonus, never a nerf.
+// §2.7 Branding Boon -- Drop axis (issues #81/#83): instanced (dungeon/raid) creature drop rate
+// scales with the branding ranks of party members who SELECTED the Drop boon, so farming ranks pays
+// off and a high-rank member is worth bringing. Multiplies the engine's per-item roll chance; it is
+// a pure bonus, never a nerf. This subsumes the former always-on #81 top-rank drop bonus.
 class BrandingDropRateGlobalScript : public GlobalScript
 {
 public:
@@ -18,7 +19,7 @@ public:
     bool OnItemRoll(Player const* player, LootStoreItem const* /*lootStoreItem*/, float& chance,
         Loot& /*loot*/, LootStore const& store) override
     {
-        if (!player || !sScalingMgr->RankDropBonusEnabled())
+        if (!player || !sScalingMgr->BoonEnabled())
             return true;
 
         // Only instanced content (5-man dungeons + raids) -- IsDungeon() is false in the open world,
@@ -31,7 +32,7 @@ public:
         if (&store != &LootTemplates_Creature)
             return true;
 
-        chance *= static_cast<float>(sScalingMgr->RankLootMultiplier(player));
+        chance *= static_cast<float>(sScalingMgr->BoonMultiplier(player, BoonAxis::Drop));
         return true;
     }
 };

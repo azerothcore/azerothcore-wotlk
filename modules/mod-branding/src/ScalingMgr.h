@@ -2,6 +2,7 @@
 #define MOD_BRANDING_SRC_SCALINGMGR_H
 
 #include "ScalingConfig.h"
+#include "branding/scaling/GroupScaling.h"
 #include "branding/scaling/ZoneBracket.h"
 
 class Player;
@@ -18,13 +19,17 @@ namespace Branding
         void LoadConfig();
         bool Enabled() const { return _config.Enabled(); }
 
-        // §2.7 branding-rank drop bonus (issue #81): whether the instanced drop-rate hook is active.
-        bool RankDropBonusEnabled() const { return _config.RankDropBonusEnabled(); }
+        // §2.7 Branding Boon (issues #81/#83): whether the selectable raid-wide boon is active.
+        bool BoonEnabled() const { return _config.BoonEnabled(); }
 
-        // §2.7: instanced drop-chance multiplier from the highest branding rank in the looter's
-        // group (their own rank when ungrouped). Reads proficiency from the ObjectGuid-keyed cache;
-        // no Player* is stored past the call. 1.0 when no member has any rank.
-        double RankLootMultiplier(Player const* looter) const;
+        // Copper charged to change an already-chosen boon axis (0 = free / disabled charge, #83).
+        uint32_t BoonReselectCost() const { return _config.BoonReselectCost(); }
+
+        // §2.7: raid-wide multiplier for one boon axis, from the proficiency ranks of the group
+        // members who SELECTED that axis (the actor alone when ungrouped). Reads proficiency +
+        // selection from the ObjectGuid-keyed caches; no Player* is stored past the call. 1.0 when no
+        // selecting member has any rank. Drives the Drop/Xp/Gold application hooks.
+        double BoonMultiplier(Player const* actor, BoonAxis axis) const;
 
         // Load the admin-tunable per-zone bracket table (`branding_zone_bracket`) into the pure core.
         // Called on startup and `.reload config`; safe to call repeatedly (clears + repopulates).

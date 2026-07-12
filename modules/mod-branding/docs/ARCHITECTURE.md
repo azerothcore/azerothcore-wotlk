@@ -456,60 +456,104 @@ expressed under the §7 dual-key. The engine is currency-agnostic; the P2W gate 
 
 ---
 
-## 2.7 Branding-Rank Drop Bonus (issue #81)
+## 2.7 Branding Boon — selectable raid-wide economy rate (issues #81, #83)
 
-A seventh scaling consideration, orthogonal to §2.1–§2.6. Goal: **make instanced (dungeon/raid) drop
-rate scale with the highest branding rank in the party**, so farming ranks is worthwhile and a
-high-rank player is a sought-after group addition. This is a *drop-chance* multiplier on the
-existing engine loot roll, not a change to the §2.2/§2.4 reward-tier/quantity/currency math.
+A seventh scaling consideration, orthogonal to §2.1–§2.6, and **purely economy-velocity** (drop
+chance / XP rate / gold rate) — never combat power, per the core rule that brands change proc
+behaviour, not flat ±stats. Each character **selects one boon axis**; the boon then applies
+**raid-wide** so the whole group shares its best-farmed members' effort (the "worth bringing"
+incentive). This section **subsumes the former fixed drop bonus (#81)**: the drop bonus is now the
+**Drop axis** of this feature, no longer an always-on party-top-rank multiplier.
 
-### 2.7.1 The lever — the group's top rank
+Non-negotiables:
 
-The multiplier keys off the **maximum branding rank across all party members**, not the looter's own
-rank, so a full raid benefits from its single best-farmed member (the "worth bringing" incentive).
-A character's *rank* is their highest proficiency level across all brands (`ProficiencyMgr::TopBrandLevel`).
-Solo players use their own rank. Offline / unloaded members contribute rank 0.
+- **One axis per character.** A character has exactly one active boon: `Xp`, `Drop`, `Gold`, or
+  `None`. Re-selection is **deliberately expensive** (Insight cost, §18) so the choice is an
+  identity commitment, not a per-pull swap.
+- **Three independent DR buckets, three independent caps.** A raid MAY light up all three axes at
+  once; each axis is capped and diminished on its own. Economy velocity, spread across axes, never
+  compounds into one runaway multiplier on a single axis (design decision, issue #83).
+- **Harsh catalyst DR within an axis**, reusing the §7.9 curve (`StackDecay`): the best selector
+  carries full value, each additional same-axis selector adds geometrically less — the *same harsh
+  DR as branding*.
+- **Pure bonus, never a penalty** (≥ 1.0 on every axis); a rank-0 or non-selecting member
+  contributes nothing.
+
+### 2.7.1 The lever — per-axis, proficiency-weighted, DR-stacked
+
+For one axis, gather the ranks of the group members who selected that axis. Each contributes a
+proficiency **strength** `s = clamp(rank / MaxLevel, 0, 1)` (rank = `ProficiencyMgr::TopBrandLevel`,
+a character's highest proficiency across brands). Sort strengths **descending** (best carries), then
+apply geometric DR by position:
+
+```
+acc = Σ_i  s_i · StackDecay^(i-1)             // i = 1-based position, best selector first
+mul = clamp(1 + (AxisCap - 1) · acc, 1, AxisCap)
+```
+
+- A lone maxed selector (`s = 1`, `i = 1`) ⇒ `mul = AxisCap` (full). With `BoonDropCap = 1.5` this is
+  **identical to the old #81 +50% at rank 50** — a clean migration, not a nerf, and it preserves
+  "one maxed member carries the raid."
+- Each extra same-axis selector adds `StackDecay^(i-1)` of the headroom and clamps away past the cap
+  (`1st full, 2nd 0.4, 3rd 0.16, …` with the default `StackDecay = 0.4`).
+- Mid-rank raids benefit but never cheese the cap: three rank-25 drop-selectors give
+  `1 + 0.5·(0.5·1 + 0.5·0.4 + 0.5·0.16) = 1.39×`, not the cap.
+- Solo players use their own rank as the sole selector. Offline / unloaded members contribute nothing.
 
 ### 2.7.2 Pure core (`src/core/branding/scaling/GroupScaling.h`)
 
 ```cpp
-// Instanced drop-rate multiplier from the party's highest branding rank. Linear in rank,
-// clamped to [1.0, cap]. 1.0 at rank 0 (feature is a pure bonus, never a penalty).
-double RankDropRateMultiplier(uint8_t topRank, IScalingConfig const& cfg);
+enum class BoonAxis : uint8_t { None, Xp, Drop, Gold };
+
+// Raid-wide economy multiplier for ONE axis from the proficiency ranks of the members who selected
+// it. `ranks` is the list of selector ranks (any order; sorted best-first internally). Linear-in-
+// rank strength, geometric same-axis DR (§7.9 StackDecay), clamped to [1.0, AxisCap(axis)].
+// Empty list -> 1.0. Reproduces #81 exactly for a single maxed Drop selector.
+double BoonAxisMultiplier(BoonAxis axis, uint8_t const* ranks, std::size_t count,
+                          IScalingConfig const& cfg);
 ```
 
-```
-mul = clamp(1.0 + RankDropBonusPerRank * topRank, 1.0, RankDropMulCap)
-```
+`IScalingConfig` dials (per axis, so each tunes independently; all default modest):
 
-Two `IScalingConfig` dials: `RankDropBonusPerRank` (default `0.01`, i.e. +1% drop chance per rank)
-and `RankDropMulCap` (default `1.5`, i.e. at most +50% — the "0.5x" of the issue). With the default
-`MaxLevel = 50` proficiency ceiling, a maxed member lands exactly on the +50% cap.
+- `BoonDropCap` default `1.5` (the migrated #81 +50%).
+- `BoonXpCap` default `1.5`.
+- `BoonGoldCap` default `1.5`.
+- DR shared with §7.9 (`StackDecay`, default `0.4`).
 
-### 2.7.3 Wiring (adapter)
+The former `RankDropRateMultiplier` / `RankDropBonusPerRank` / `RankDropMulCap` are **removed**: the
+`0.01`-per-rank linear form is replaced by the normalized-to-cap form above (a maxed selector still
+lands exactly on the cap, so realm tuning of `BoonDropCap` keeps its old meaning).
 
-A `GlobalScript::OnItemRoll` hook (`src/DropRateScripts.cpp`) multiplies each loot item's roll
-`chance` by the core multiplier. Gated so it only touches instanced **creature** loot:
+### 2.7.3 Wiring (adapters)
 
-- Feature toggle `Branding.DropRate.RankBonus.Enable` (default off).
-- `player->GetMap()->IsDungeon()` — true for both 5-man dungeons and raid maps; false in the open
-  world (so world/gathering/quest loot is untouched, matching "dungeon and raid drop rate").
-- `&store == &LootTemplates_Creature` — only creature/boss drops, not skinning/GO/disenchant tables.
+`ScalingMgr::BoonMultiplier(Player const* actor, BoonAxis axis)` walks the group (`GetMemberSlots`),
+collects `TopBrandLevel` for each member whose **selected boon == axis** (falling back to the actor
+alone when ungrouped), and returns `BoonAxisMultiplier(axis, ranks…, cfg)`. It reads proficiency +
+selection from the `ObjectGuid`-keyed caches — no `Player*` is stored past the call.
 
-`ScalingMgr::RankLootMultiplier(Player const*)` walks the looter's group (`GetMemberSlots`), takes the
-max `TopBrandLevel` over members (falling back to the looter alone when ungrouped), and returns
-`RankDropRateMultiplier(topRank, cfg)`. It reads proficiency from the `ObjectGuid`-keyed cache — no
-`Player*` is stored past the call.
+Selection is persisted per character (`character_branding_boon`: `guid`, `axis`) and mutated only
+through the expensive re-select surface (command / vendor, Insight cost §18). One application hook
+per axis:
+
+- **Drop** — the existing `GlobalScript::OnItemRoll` (`src/DropRateScripts.cpp`), unchanged gating
+  (`IsDungeon()` + `&store == &LootTemplates_Creature`), now sourced from `BoonMultiplier(actor, Drop)`.
+- **Xp** — an `OnGiveXP`-class hook multiplying awarded XP. **Must not** amplify the §20 post-cap XP
+  that is redirected into proficiency, or a rank → bigger-boon → faster-rank loop snowballs.
+- **Gold** — a money-loot / quest-reward-gold hook, multiplying coin only.
+
+Master toggle `Branding.Boon.Enable` (default off) replaces `Branding.DropRate.RankBonus.Enable`.
 
 ### 2.7.4 Invariants (tested)
 
-- **Pure bonus, never a penalty**: `RankDropRateMultiplier(0, cfg) == 1.0`; the result is always
-  `>= 1.0` — even a misconfigured `RankDropMulCap < 1.0` is floored to `1.0` (a cap below the 1.0 floor
-  would otherwise be `std::clamp` UB and would flip the bonus into a penalty).
-- **Monotonic** non-decreasing in `topRank`.
-- **Clamped**: never exceeds `max(1.0, RankDropMulCap)` regardless of rank.
-- **Default calibration**: at rank 50 with defaults the multiplier is exactly `1.5`.
-- **Determinism**: same rank + config ⇒ identical multiplier.
+- **Pure bonus, never a penalty**: `BoonAxisMultiplier(axis, {}, cfg) == 1.0`; result always ≥ 1.0;
+  a misconfigured `AxisCap < 1.0` is floored to 1.0 (no `std::clamp` UB, no bonus→penalty flip).
+- **#81 migration parity**: `BoonAxisMultiplier(Drop, {50}, defaults) == 1.5` exactly.
+- **Monotonic** non-decreasing in any single selector's rank; **clamped** to `max(1.0, AxisCap)`.
+- **Harsh DR**: N same-axis selectors never exceed the cap; a lower-rank selector added after the
+  first never raises the result above what the best selector alone yields at the cap.
+- **Axis independence**: each axis reads only its own selectors and its own cap; no cross-axis term.
+- **Determinism**: same ranks + config ⇒ identical multiplier (selector order does not matter —
+  sorted internally).
 
 ---
 
