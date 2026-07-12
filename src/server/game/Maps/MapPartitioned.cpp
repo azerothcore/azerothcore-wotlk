@@ -92,14 +92,7 @@ uint32 MapPartition::GetPartitionIndex(float x) const
 void MapPartition::ProcessCreatureRespawn(ObjectGuid::LowType spawnId)
 {
     CreatureData const* data = sObjectMgr->GetCreatureData(spawnId);
-    if (!data)
-    {
-        RemoveCreatureRespawnTime(spawnId);
-        return;
-    }
-
-    // Skip spawns not belonging to this partition — the owning partition will process them
-    if (!IsPositionInPartition(data->posX))
+    if (data && !IsPositionInPartition(data->posX))
     {
         return;
     }
@@ -110,14 +103,7 @@ void MapPartition::ProcessCreatureRespawn(ObjectGuid::LowType spawnId)
 void MapPartition::ProcessGameObjectRespawn(ObjectGuid::LowType spawnId)
 {
     GameObjectData const* data = sObjectMgr->GetGameObjectData(spawnId);
-    if (!data)
-    {
-        RemoveGORespawnTime(spawnId);
-        return;
-    }
-
-    // Skip spawns not belonging to this partition — the owning partition will process them
-    if (!IsPositionInPartition(data->posX))
+    if (data && !IsPositionInPartition(data->posX))
     {
         return;
     }
