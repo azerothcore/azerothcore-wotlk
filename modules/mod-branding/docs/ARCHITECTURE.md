@@ -417,6 +417,45 @@ per player on top.
 
 ---
 
+## 2.6 Loot Re-itemization — integration with `mod-reforge` (issue #76)
+
+Heroic scaling (§2.4) makes a vanilla/TBC boss *encounter* level-80-relevant, but its drops are
+relevant only in **budget**, not **composition**: vanilla itemisation predates hit/haste/expertise/
+armor-pen and unified spellpower, so a proportionally-scaled old item is a correctly-sized,
+*wrongly-shaped* stat block — transmog only. The fix is to treat the drop as a **chassis** (preserved
+identity + a scaled stat budget) whose composition is **rebuilt**, with player-directed **reforging**
+to tune it.
+
+That re-itemisation/reforge logic is **not branding-specific** — it is a generic engine with zero
+branding dependencies. It therefore lives in its **own standalone module, `mod-reforge`** (pure-core
+`ArchetypeTemplate` / `ResolveSockets` / `ApplyReforge` over plain stat structs; see that module's
+ARCHITECTURE.md). mod-branding **depends on** mod-reforge exactly as `mod-branded-mercenary` depends on
+mod-branding: the engine is generic, this module supplies the **policy**.
+
+**What mod-branding provides (policy only):**
+
+- **Budget** — the stat budget fed into the `ItemChassis` comes from the §2.4 heroic tier scaling.
+- **Archetype** — resolved from role (§7.9 `RoleContribution`) + armour class + slot into
+  `mod-reforge`'s `ItemArchetype` (a *stat* archetype — distinct from the §10 *proc* archetype).
+- **Reforge cost** — each `ApplyReforge` is charged in §16 essence / §2.4.3 currency. This is what
+  finally gives that currency a *job*: it is not the reward, it is the tool that shapes the gear reward.
+- **Gem sockets** — heroic-overlay drops receive automatic sockets via `ResolveSockets`; the socket
+  count/cap policy (per slot/tier) and any essence gate are mod-branding config, prismatic by default.
+- **Signature carve-out** — items iconic for their *effect* (Thunderfury proc, Sulfuras) keep it and
+  scale via **branding** (§16); re-itemisation only ever rewrites the stat block, never the effect.
+
+**Composition order (extends §2.4.4):** §2.4 sets the budget → `mod-reforge` rebuilds composition
+(template + auto sockets) → optional player reforge → §7.9 branding applies per player last.
+
+**Anti-P2W consistency:** re-itemisation, reforging and sockets grant **no** proficiency and **no**
+branding power (stat composition only); a reforged/socketed item is inert power-wise until branded and
+expressed under the §7 dual-key. The engine is currency-agnostic; the P2W gate stays in mod-branding.
+
+> **Open questions** (tracked in `mod-reforge`): pre-filled vs empty chassis on drop; single vs
+> multi-stat reforge granularity; colored sockets + socket-set bonuses (v1 grants prismatic only).
+
+---
+
 ## 3. Module Layout
 
 One module. The pure core lives **under `src/`** (`src/core/`) because the AzerothCore module
