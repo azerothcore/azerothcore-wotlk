@@ -14,6 +14,9 @@ namespace Branding
         void Load();
         bool Enabled() const { return _enabled; }
 
+        // §2.7 branding-rank drop bonus (issue #81): toggled independently of the §2.1 downscaling.
+        bool RankDropBonusEnabled() const { return _rankDropBonusEnabled; }
+
         double StatScalingExponent() const override { return _exponent; }
         double GroupHealthFloor() const override { return _groupHealthFloor; }
         double GroupDamageFloor() const override { return _groupDamageFloor; }
@@ -23,6 +26,8 @@ namespace Branding
         double RareChanceMulMax() const override { return _rareChanceMulMax; }
         double CurrencyReductionExponent() const override { return _currencyReductionExponent; }
         double CurrencyMulFloor() const override { return _currencyMulFloor; }
+        double RankDropBonusPerRank() const override { return _rankDropBonusPerRank; }
+        double RankDropMulCap() const override { return _rankDropMulCap; }
 
     private:
         bool _enabled = false;
@@ -35,6 +40,9 @@ namespace Branding
         double _rareChanceMulMax = 2.0;
         double _currencyReductionExponent = 2.0;
         double _currencyMulFloor = 0.05;
+        bool _rankDropBonusEnabled = false;
+        double _rankDropBonusPerRank = 0.01;
+        double _rankDropMulCap = 1.5;
     };
 }
 

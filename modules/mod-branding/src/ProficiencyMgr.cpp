@@ -5,6 +5,7 @@
 #include "DatabaseEnv.h"
 #include "Log.h"
 #include "Player.h"
+#include <algorithm>
 
 namespace Branding
 {
@@ -28,7 +29,10 @@ namespace Branding
             "SELECT `brand`, `total_xp`, `recent_window`, `window_start` FROM `character_branding` WHERE `guid` = {}",
             lowGuid);
         if (!result)
+        {
+            RefreshTopLevel(guid);
             return;
+        }
 
         do
         {
@@ -42,6 +46,8 @@ namespace Branding
             state.recentXpWindow = fields[2].Get<uint32>();
             state.windowStartUnix = fields[3].Get<uint32>();
         } while (result->NextRow());
+
+        RefreshTopLevel(guid);
     }
 
     void ProficiencyMgr::LoadAccountKnowledge(uint32_t accountId)
@@ -149,6 +155,7 @@ namespace Branding
     void ProficiencyMgr::UnloadPlayer(ObjectGuid guid)
     {
         _charStates.erase(guid);
+        _topLevel.erase(guid);
     }
 
     XpResult ProficiencyMgr::ApplyActivity(ObjectGuid charGuid, uint32_t accountId, XpActivity const& activity)
@@ -163,6 +170,7 @@ namespace Branding
         if (result.reachedPrestige)
             _accountMaxedBrands.erase(accountId);
 
+        RefreshTopLevel(charGuid);   // keep the §2.7 top-level cache current after an XP gain
         return result;
     }
 
@@ -187,6 +195,28 @@ namespace Branding
             return 0;
 
         return LevelForXp(it->second[static_cast<size_t>(brand)].totalXp, _config);
+    }
+
+    uint8_t ProficiencyMgr::TopBrandLevel(ObjectGuid charGuid) const
+    {
+        auto it = _topLevel.find(charGuid);
+        return it != _topLevel.end() ? it->second : uint8_t{0};
+    }
+
+    void ProficiencyMgr::RefreshTopLevel(ObjectGuid charGuid)
+    {
+        auto it = _charStates.find(charGuid);
+        if (it == _charStates.end())
+        {
+            _topLevel.erase(charGuid);
+            return;
+        }
+
+        uint8_t top = 0;
+        for (ProficiencyState const& state : it->second)
+            top = std::max(top, LevelForXp(state.totalXp, _config));
+
+        _topLevel[charGuid] = top;
     }
 
     LevelProgress ProficiencyMgr::BrandProgress(ObjectGuid charGuid, BrandId brand) const

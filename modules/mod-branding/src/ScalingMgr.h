@@ -18,6 +18,14 @@ namespace Branding
         void LoadConfig();
         bool Enabled() const { return _config.Enabled(); }
 
+        // §2.7 branding-rank drop bonus (issue #81): whether the instanced drop-rate hook is active.
+        bool RankDropBonusEnabled() const { return _config.RankDropBonusEnabled(); }
+
+        // §2.7: instanced drop-chance multiplier from the highest branding rank in the looter's
+        // group (their own rank when ungrouped). Reads proficiency from the ObjectGuid-keyed cache;
+        // no Player* is stored past the call. 1.0 when no member has any rank.
+        double RankLootMultiplier(Player const* looter) const;
+
         // Load the admin-tunable per-zone bracket table (`branding_zone_bracket`) into the pure core.
         // Called on startup and `.reload config`; safe to call repeatedly (clears + repopulates).
         void LoadZoneBrackets();

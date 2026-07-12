@@ -456,6 +456,63 @@ expressed under the §7 dual-key. The engine is currency-agnostic; the P2W gate 
 
 ---
 
+## 2.7 Branding-Rank Drop Bonus (issue #81)
+
+A seventh scaling consideration, orthogonal to §2.1–§2.6. Goal: **make instanced (dungeon/raid) drop
+rate scale with the highest branding rank in the party**, so farming ranks is worthwhile and a
+high-rank player is a sought-after group addition. This is a *drop-chance* multiplier on the
+existing engine loot roll, not a change to the §2.2/§2.4 reward-tier/quantity/currency math.
+
+### 2.7.1 The lever — the group's top rank
+
+The multiplier keys off the **maximum branding rank across all party members**, not the looter's own
+rank, so a full raid benefits from its single best-farmed member (the "worth bringing" incentive).
+A character's *rank* is their highest proficiency level across all brands (`ProficiencyMgr::TopBrandLevel`).
+Solo players use their own rank. Offline / unloaded members contribute rank 0.
+
+### 2.7.2 Pure core (`src/core/branding/scaling/GroupScaling.h`)
+
+```cpp
+// Instanced drop-rate multiplier from the party's highest branding rank. Linear in rank,
+// clamped to [1.0, cap]. 1.0 at rank 0 (feature is a pure bonus, never a penalty).
+double RankDropRateMultiplier(uint8_t topRank, IScalingConfig const& cfg);
+```
+
+```
+mul = clamp(1.0 + RankDropBonusPerRank * topRank, 1.0, RankDropMulCap)
+```
+
+Two `IScalingConfig` dials: `RankDropBonusPerRank` (default `0.01`, i.e. +1% drop chance per rank)
+and `RankDropMulCap` (default `1.5`, i.e. at most +50% — the "0.5x" of the issue). With the default
+`MaxLevel = 50` proficiency ceiling, a maxed member lands exactly on the +50% cap.
+
+### 2.7.3 Wiring (adapter)
+
+A `GlobalScript::OnItemRoll` hook (`src/DropRateScripts.cpp`) multiplies each loot item's roll
+`chance` by the core multiplier. Gated so it only touches instanced **creature** loot:
+
+- Feature toggle `Branding.DropRate.RankBonus.Enable` (default off).
+- `player->GetMap()->IsDungeon()` — true for both 5-man dungeons and raid maps; false in the open
+  world (so world/gathering/quest loot is untouched, matching "dungeon and raid drop rate").
+- `&store == &LootTemplates_Creature` — only creature/boss drops, not skinning/GO/disenchant tables.
+
+`ScalingMgr::RankLootMultiplier(Player const*)` walks the looter's group (`GetMemberSlots`), takes the
+max `TopBrandLevel` over members (falling back to the looter alone when ungrouped), and returns
+`RankDropRateMultiplier(topRank, cfg)`. It reads proficiency from the `ObjectGuid`-keyed cache — no
+`Player*` is stored past the call.
+
+### 2.7.4 Invariants (tested)
+
+- **Pure bonus, never a penalty**: `RankDropRateMultiplier(0, cfg) == 1.0`; the result is always
+  `>= 1.0` — even a misconfigured `RankDropMulCap < 1.0` is floored to `1.0` (a cap below the 1.0 floor
+  would otherwise be `std::clamp` UB and would flip the bonus into a penalty).
+- **Monotonic** non-decreasing in `topRank`.
+- **Clamped**: never exceeds `max(1.0, RankDropMulCap)` regardless of rank.
+- **Default calibration**: at rank 50 with defaults the multiplier is exactly `1.5`.
+- **Determinism**: same rank + config ⇒ identical multiplier.
+
+---
+
 ## 3. Module Layout
 
 One module. The pure core lives **under `src/`** (`src/core/`) because the AzerothCore module

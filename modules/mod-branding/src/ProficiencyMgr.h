@@ -40,6 +40,12 @@ namespace Branding
         // Cached proficiency level for a brand (0 if the character isn't loaded). For inspection.
         uint8_t BrandLevel(ObjectGuid charGuid, BrandId brand) const;
 
+        // The character's overall branding "rank": highest proficiency level across all brands
+        // (0 if the character isn't loaded). Drives the §2.7 rank-based drop bonus (issue #81).
+        // O(1): reads a cached value refreshed on load/XP-gain (the loot-roll path calls this per
+        // dropped item, so recomputing the per-brand level curve each time would be wasteful).
+        uint8_t TopBrandLevel(ObjectGuid charGuid) const;
+
         // XP-bar progression for a brand on this character (issue #54): level + position within it.
         // Zeroed (level 0, no span) if the character isn't loaded. Pure decomposition over §7.4.
         LevelProgress BrandProgress(ObjectGuid charGuid, BrandId brand) const;
@@ -77,11 +83,16 @@ namespace Branding
         // Returns the cached knowledge for an account, loading it from the DB if not yet present.
         KnowledgeState& EnsureAccountKnowledge(uint32_t accountId);
 
+        // Recompute and cache the character's highest per-brand level. Called at the three sites that
+        // mutate _charStates (load, apply-activity, unload) so TopBrandLevel stays O(1) and current.
+        void RefreshTopLevel(ObjectGuid charGuid);
+
         BrandingConfig _config;
         ServerClock _clock;
         std::unordered_map<ObjectGuid, BrandStates> _charStates;
         std::unordered_map<uint32_t, KnowledgeState> _accountKnowledge;
         std::unordered_map<uint32_t, uint8_t> _accountMaxedBrands;
+        std::unordered_map<ObjectGuid, uint8_t> _topLevel;   // derived cache for TopBrandLevel (§2.7)
     };
 }
 

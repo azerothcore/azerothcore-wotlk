@@ -115,3 +115,72 @@ TEST(GroupScaling, CurrencyMonotonicBoundedAndFloored)
         prev = mul;
     }
 }
+
+// --- §2.7 branding-rank drop bonus (issue #81) ---
+
+// Rank 0 is a no-op: the feature is a pure bonus, never a penalty.
+TEST(RankDropRate, ZeroRankIsNeutral)
+{
+    FakeScalingConfig cfg;
+    EXPECT_DOUBLE_EQ(RankDropRateMultiplier(0, cfg), 1.0);
+}
+
+// The multiplier grows linearly with the party's top rank at the configured per-rank bonus.
+TEST(RankDropRate, LinearInRankBelowCap)
+{
+    FakeScalingConfig cfg;
+    cfg.rankDropBonusPerRank = 0.01;
+    cfg.rankDropMulCap = 1.5;
+    EXPECT_DOUBLE_EQ(RankDropRateMultiplier(10, cfg), 1.10);
+    EXPECT_DOUBLE_EQ(RankDropRateMultiplier(25, cfg), 1.25);
+}
+
+// Default calibration: a maxed rank-50 member lands exactly on the +50% cap.
+TEST(RankDropRate, DefaultsCapAtMaxRank)
+{
+    FakeScalingConfig cfg;   // defaults: 0.01/rank, cap 1.5
+    EXPECT_DOUBLE_EQ(RankDropRateMultiplier(50, cfg), 1.5);
+}
+
+// Clamped: rank beyond the cap point never exceeds the cap.
+TEST(RankDropRate, ClampedAtCap)
+{
+    FakeScalingConfig cfg;
+    cfg.rankDropBonusPerRank = 0.01;
+    cfg.rankDropMulCap = 1.5;
+    EXPECT_DOUBLE_EQ(RankDropRateMultiplier(200, cfg), 1.5);
+}
+
+// Monotonic non-decreasing in rank, and always a bonus (>= 1.0).
+TEST(RankDropRate, MonotonicAndAlwaysBonus)
+{
+    FakeScalingConfig cfg;
+    double prev = -1.0;
+    for (uint16_t rank = 0; rank <= 255; ++rank)
+    {
+        double const mul = RankDropRateMultiplier(static_cast<uint8_t>(rank), cfg);
+        EXPECT_GE(mul, prev);
+        EXPECT_GE(mul, 1.0);
+        EXPECT_LE(mul, cfg.rankDropMulCap);
+        prev = mul;
+    }
+}
+
+// Determinism.
+TEST(RankDropRate, Deterministic)
+{
+    FakeScalingConfig cfg;
+    EXPECT_DOUBLE_EQ(RankDropRateMultiplier(17, cfg), RankDropRateMultiplier(17, cfg));
+}
+
+// A misconfigured cap below 1.0 (admin typo, e.g. 0.5 for 1.5) must never turn the bonus into a
+// penalty. std::clamp(v, lo, hi) with lo > hi is undefined behavior, so the pure fn floors the cap at
+// 1.0 -- the "pure bonus, never a penalty" invariant holds regardless of config.
+TEST(RankDropRate, MisconfiguredCapBelowOneNeverPenalizes)
+{
+    FakeScalingConfig cfg;
+    cfg.rankDropBonusPerRank = 0.01;
+    cfg.rankDropMulCap = 0.5;   // nonsensical: below the 1.0 floor
+    for (uint8_t rank : {uint8_t(0), uint8_t(10), uint8_t(50), uint8_t(255)})
+        EXPECT_GE(RankDropRateMultiplier(rank, cfg), 1.0) << "rank=" << static_cast<int>(rank);
+}

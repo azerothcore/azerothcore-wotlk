@@ -31,6 +31,12 @@ namespace Branding
         // currencyMul = clamp(fraction^exp, floor, 1.0); exp >= 1 makes currency steeper than gear.
         virtual double CurrencyReductionExponent() const = 0;
         virtual double CurrencyMulFloor() const = 0;
+
+        // --- Branding-rank drop bonus (§2.7, issue #81) ---
+        // Instanced drop-chance multiplier from the party's top rank: mul = 1.0 + perRank * topRank,
+        // clamped to [1.0, cap].
+        virtual double RankDropBonusPerRank() const = 0;   // per-rank drop-chance bonus (e.g. 0.01 = +1%)
+        virtual double RankDropMulCap() const = 0;          // maximum multiplier (e.g. 1.5 = +50% cap)
     };
 }
 

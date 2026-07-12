@@ -19,5 +19,10 @@ namespace Branding
         // Branding-currency reduction (§2.4.3): currency falls off steeper than gear.
         _currencyReductionExponent = sConfigMgr->GetOption<float>("Branding.Scaling.CurrencyReductionExponent", 2.0f);
         _currencyMulFloor = sConfigMgr->GetOption<float>("Branding.Scaling.CurrencyMulFloor", 0.05f);
+
+        // Branding-rank drop bonus (§2.7, issue #81): instanced drop rate scales with the party's top rank.
+        _rankDropBonusEnabled = sConfigMgr->GetOption<bool>("Branding.DropRate.RankBonus.Enable", false);
+        _rankDropBonusPerRank = sConfigMgr->GetOption<float>("Branding.DropRate.RankBonus.PerRank", 0.01f);
+        _rankDropMulCap = sConfigMgr->GetOption<float>("Branding.DropRate.RankBonus.MulCap", 1.5f);
     }
 }

@@ -1,10 +1,13 @@
 #include "ScalingMgr.h"
+#include "ProficiencyMgr.h"
 #include "branding/scaling/GroupScaling.h"
 #include "branding/scaling/Scaling.h"
 #include "DatabaseEnv.h"
 #include "DBCStores.h"
+#include "Group.h"
 #include "Log.h"
 #include "Player.h"
+#include <algorithm>
 
 namespace Branding
 {
@@ -62,6 +65,21 @@ namespace Branding
 
         // Downward only: ScalingFactor returns 1.0 when the player is at or below the zone bracket.
         return ScalingFactor(attacker->GetLevel(), targetLevel, _config);
+    }
+
+    double ScalingMgr::RankLootMultiplier(Player const* looter) const
+    {
+        if (!looter)
+            return 1.0;
+
+        // Highest branding rank across the party -- a full raid benefits from its best-farmed member
+        // (the "worth bringing" incentive, §2.7). Ungrouped looters fall back to their own rank.
+        uint8_t topRank = sProficiencyMgr->TopBrandLevel(looter->GetGUID());
+        if (Group const* group = looter->GetGroup())
+            for (auto const& member : group->GetMemberSlots())
+                topRank = std::max(topRank, sProficiencyMgr->TopBrandLevel(member.guid));
+
+        return RankDropRateMultiplier(topRank, _config);
     }
 
     double ScalingMgr::CurrencyMulForGroup(uint8_t groupSize, uint8_t contentSize) const

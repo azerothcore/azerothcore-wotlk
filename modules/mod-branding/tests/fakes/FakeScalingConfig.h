@@ -18,6 +18,8 @@ namespace Branding::Test
         double rareChanceMulMax = 2.0;
         double currencyReductionExponent = 2.0;
         double currencyMulFloor = 0.05;
+        double rankDropBonusPerRank = 0.01;
+        double rankDropMulCap = 1.5;
 
         double StatScalingExponent() const override { return statScalingExponent; }
         double GroupHealthFloor() const override { return groupHealthFloor; }
@@ -28,6 +30,8 @@ namespace Branding::Test
         double RareChanceMulMax() const override { return rareChanceMulMax; }
         double CurrencyReductionExponent() const override { return currencyReductionExponent; }
         double CurrencyMulFloor() const override { return currencyMulFloor; }
+        double RankDropBonusPerRank() const override { return rankDropBonusPerRank; }
+        double RankDropMulCap() const override { return rankDropMulCap; }
     };
 }
 

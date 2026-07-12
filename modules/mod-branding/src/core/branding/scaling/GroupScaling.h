@@ -27,6 +27,11 @@ namespace Branding
     };
 
     RewardScale RewardScaleForGroup(GroupContext const& group, IScalingConfig const& cfg);
+
+    // Instanced (dungeon/raid) drop-rate multiplier from the party's highest branding rank (§2.7,
+    // issue #81). Linear in rank, clamped to [1.0, cap]: a pure bonus (1.0 at rank 0, never a penalty)
+    // so farming ranks pays off and a high-rank member is worth bringing.
+    double RankDropRateMultiplier(uint8_t topRank, IScalingConfig const& cfg);
 }
 
 #endif // MOD_BRANDING_CORE_SCALING_GROUPSCALING_H

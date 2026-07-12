@@ -50,4 +50,13 @@ namespace Branding
         reward.currencyMul = std::clamp(currency, cfg.CurrencyMulFloor(), 1.0);
         return reward;
     }
+
+    double RankDropRateMultiplier(uint8_t topRank, IScalingConfig const& cfg)
+    {
+        double const mul = 1.0 + cfg.RankDropBonusPerRank() * static_cast<double>(topRank);
+        // Floor the cap at 1.0: a misconfigured cap below 1.0 must not flip the bonus into a penalty
+        // (and std::clamp with lo > hi is undefined behavior). Keeps the "never a penalty" invariant.
+        double const cap = std::max(1.0, cfg.RankDropMulCap());
+        return std::clamp(mul, 1.0, cap);
+    }
 }
