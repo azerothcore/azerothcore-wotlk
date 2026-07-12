@@ -679,25 +679,29 @@ struct boss_malygos : public BossAI
             {
                 for (uint8 i = 0; i < NUM_MAX_SURGE_TARGETS; ++i)
                     _surgeTargetGUID[i].Clear();
-                me->CastSpell((Unit*)nullptr, SPELL_SURGE_OF_POWER_WARN_SELECTOR_25, true);
+
+                DoCastAOE(SPELL_SURGE_OF_POWER_WARN_SELECTOR_25, true);
                 me->m_Events.AddEventAtOffset([this]
                 {
-                    me->CastSpell((Unit*)nullptr, SPELL_PH3_SURGE_OF_POWER_25, true);
+                    DoCastAOE(SPELL_PH3_SURGE_OF_POWER_25, true);
                 }, 3s);
             }
             else
             {
+                for (uint8 i = 0; i < NUM_MAX_SURGE_TARGETS; ++i)
+                    _surgeTargetGUID[i].Clear();
+
                 if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, false, true, SPELL_RIDE_RED_DRAGON_BUDDY))
                 {
                     if (Vehicle* vehicle = target->GetVehicleKit())
                         if (Unit* passenger = vehicle->GetPassenger(0))
                             if (Player* player = passenger->ToPlayer())
                                 Talk(EMOTE_SURGE_OF_POWER_WARNING_P3, player);
-                    ObjectGuid targetGuid = target->GetGUID();
-                    me->m_Events.AddEventAtOffset([this, targetGuid]
+
+                    SetGUID(target->GetGUID(), DATA_FIRST_SURGE_TARGET_GUID);
+                    me->m_Events.AddEventAtOffset([this]
                     {
-                        if (Unit* delayedTarget = ObjectAccessor::GetUnit(*me, targetGuid))
-                            me->CastSpell(delayedTarget, SPELL_PH3_SURGE_OF_POWER, true);
+                        DoCastAOE(SPELL_PH3_SURGE_OF_POWER, true);
                     }, 3s);
                 }
             }
@@ -886,7 +890,10 @@ struct npc_nexus_lord : public ScriptedAI
     {
         me->SetReactState(REACT_PASSIVE);
         timer = 0;
-        me->CastSpell(me, SPELL_TELEPORT_VISUAL, true);
+        ScheduleUniqueTimedEvent(0s, [&]
+        {
+            DoCastSelf(SPELL_TELEPORT_VISUAL, true);
+        }, EVENT_TELEPORT_VISUAL);
     }
 
     uint16 timer;
@@ -951,7 +958,10 @@ struct npc_scion_of_eternity : public ScriptedAI
     npc_scion_of_eternity(Creature* creature) : ScriptedAI(creature)
     {
         me->SetReactState(REACT_PASSIVE);
-        me->CastSpell(me, SPELL_TELEPORT_VISUAL, true);
+        ScheduleUniqueTimedEvent(0s, [&]
+        {
+            DoCastSelf(SPELL_TELEPORT_VISUAL, true);
+        }, EVENT_TELEPORT_VISUAL);
         ScheduleTimedEvent(20s, 25s, [&]
         {
             GuidVector guids;
@@ -993,6 +1003,7 @@ struct npc_hover_disk : public VehicleAI
     npc_hover_disk(Creature* creature) : VehicleAI(creature)
     {
         events.Reset();
+        me->SetAnimTier(AnimTier::Fly);
     }
 
     EventMap events;
@@ -1002,6 +1013,7 @@ struct npc_hover_disk : public VehicleAI
         events.Reset();
         if (!who)
             return;
+
         if (apply)
         {
             if (who->IsPlayer())
@@ -1034,6 +1046,9 @@ struct npc_hover_disk : public VehicleAI
             me->SetDisableGravity(false);
             me->SetCanFly(false);
             me->GetMotionMaster()->MoveLand(0, me->GetPositionX(), me->GetPositionY(), 267.24f, 10.0f);
+            me->SetImmuneToNPC(true);
+            me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            me->SetFaction(FACTION_FRIENDLY);
 
             if (who->IsPlayer())
             {
@@ -1152,7 +1167,10 @@ struct npc_alexstrasza : public ScriptedAI
 
 struct npc_eoe_wyrmrest_skytalon : public VehicleAI
 {
-    npc_eoe_wyrmrest_skytalon(Creature* creature) : VehicleAI(creature) { }
+    npc_eoe_wyrmrest_skytalon(Creature* creature) : VehicleAI(creature)
+    {
+        me->SetAnimTier(AnimTier::Fly);
+    }
 
     void IsSummonedBy(WorldObject* summoner) override
     {
@@ -1263,15 +1281,22 @@ class spell_eoe_ph3_surge_of_power : public SpellScript
 {
     PrepareSpellScript(spell_eoe_ph3_surge_of_power);
 
+    bool Load() override
+    {
+        return GetCaster()->IsCreature();
+    }
+
     void FilterTargets(std::list<WorldObject*>& targets)
     {
-        // Target selection and warning are handled in boss AI.
-        // Here we just restrict area targets to the explicit cast target.
-        if (Unit* explTarget = GetExplTargetUnit())
+        // The spell targets an area, but only the drake that received the fixate warning
+        // should be hit. The boss AI stores that drake's GUID; keep only that target.
+        Creature* caster = GetCaster()->ToCreature();
+        ObjectGuid targetGuid = caster->AI()->GetGUID(DATA_FIRST_SURGE_TARGET_GUID);
+
+        targets.remove_if([targetGuid](WorldObject* target)
         {
-            targets.clear();
-            targets.push_back(explTarget);
-        }
+            return target->GetGUID() != targetGuid;
+        });
     }
 
     void Register() override
