@@ -1,14 +1,53 @@
 #include "ProficiencyMgr.h"
 #include "branding/proficiency/BrandXp.h"
+#include "branding/proficiency/KillSizing.h"
 #include "branding/proficiency/Knowledge.h"
 #include "branding/proficiency/Proficiency.h"
+#include "Creature.h"
+#include "DBCStores.h"
 #include "DatabaseEnv.h"
+#include "Formulas.h"
 #include "Log.h"
 #include "Player.h"
 #include <algorithm>
 
 namespace Branding
 {
+    namespace
+    {
+        // Vanilla con-color band -> our difficulty band. Red/orange/yellow are all "at or above
+        // level" and pay full worth; green and grey taper toward the floor (§7.4).
+        KillBand BandForColor(XPColorChar color)
+        {
+            switch (color)
+            {
+            case XP_GREEN:
+                return KillBand::Green;
+            case XP_GRAY:
+                return KillBand::Grey;
+            default:   // XP_RED / XP_ORANGE / XP_YELLOW
+                return KillBand::Full;
+            }
+        }
+
+        // Creature rank/flags -> classification weight lens (normal < elite < rare < worldboss).
+        // isWorldBoss() (type flag) wins; then rare (incl. rare-elite); then plain elite.
+        KillClassification ClassifyCreature(Creature const* killed)
+        {
+            if (killed->isWorldBoss())
+                return KillClassification::WorldBoss;
+
+            uint32 const rank = killed->GetCreatureTemplate()->rank;
+            if (rank == CREATURE_ELITE_RARE || rank == CREATURE_ELITE_RAREELITE)
+                return KillClassification::Rare;
+
+            if (killed->isElite())
+                return KillClassification::Elite;
+
+            return KillClassification::Normal;
+        }
+    }
+
     ProficiencyMgr* ProficiencyMgr::instance()
     {
         static ProficiencyMgr mgr;
@@ -172,6 +211,28 @@ namespace Branding
 
         RefreshTopLevel(charGuid);   // keep the §2.7 top-level cache current after an XP gain
         return result;
+    }
+
+    uint32_t ProficiencyMgr::KillBaseUnits(Player const* killer, Creature const* killed) const
+    {
+        if (!killer || !killed)
+            return 0;
+
+        uint8 const playerLevel = killer->GetLevel();
+
+        // "As if at-level" worth: BaseGain with mob_level == playerLevel strips the level-diff
+        // penalty, so an over-levelled kill starts from the same base as a level-appropriate one
+        // (§2.1 already equalises the effort). Use BaseGain, NOT Gain -- Gain applies the grey->0
+        // reduction we are deliberately replacing with a >0 floor.
+        uint32 const atLevelGain = Acore::XP::BaseGain(playerLevel, playerLevel,
+            GetContentLevelsForMapAndZone(killed->GetMapId(), killed->GetZoneId()));
+
+        // The con-color band is computed from the ACTUAL killed level, so it drives the difficulty
+        // taper; the classification lens scales normal < elite < rare < worldboss.
+        KillBand const band = BandForColor(Acore::XP::GetColorCode(playerLevel, killed->GetLevel()));
+        KillClassification const classification = ClassifyCreature(killed);
+
+        return Branding::KillBaseUnits(atLevelGain, band, classification, _config);
     }
 
     double ProficiencyMgr::EffectStrength(ObjectGuid charGuid, uint32_t accountId, BrandId brand) const

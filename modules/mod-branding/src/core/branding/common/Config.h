@@ -23,6 +23,13 @@ namespace Branding
         // Role contribution multiplier.
         virtual double RoleMul(RoleContribution role) const = 0;
 
+        // --- Per-kill proficiency sizing (§7.4) ---
+        // difficultyMul floor for trivial (grey) kills: >0 so grey/ambient kills still pay, <1 so
+        // trivial farming is viable but strictly worse per-effort than level-appropriate content.
+        virtual double GreyFloor() const = 0;
+        // Creature-classification weight (normal = 1.0 baseline; elite/rare/worldboss configurable).
+        virtual double ClassWeight(KillClassification classification) const = 0;
+
         // --- Diminishing returns (§7.4) ---
         // Recent-window XP above this soft cap starts decaying.
         virtual uint32_t DrSoftCap() const = 0;

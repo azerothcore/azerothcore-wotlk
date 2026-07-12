@@ -53,6 +53,30 @@ namespace Branding
         Support,
         COUNT
     };
+
+    // Con-color band of a kill relative to the killer's level (design §7.4). Mirrors the vanilla
+    // XP color bands (Formulas.h GetColorCode): Full covers red/orange/yellow (at/above level),
+    // Green is the reduced band, Grey is trivial. Drives difficultyMul -- Full = 1.0, tapering to
+    // the configured floor at Grey -- so an over-levelled kill is worth what the same effort is
+    // worth in level-appropriate content, WITHOUT the vanilla grey->0 cliff.
+    enum class KillBand : uint8_t
+    {
+        Full = 0,   // red / orange / yellow -- at or above the killer's level
+        Green,      // green -- below level but not trivial
+        Grey,       // grey -- trivial
+        COUNT
+    };
+
+    // Creature classification weight lens for per-kill proficiency (design §7.4): normal < elite
+    // < rare < worldboss. Normal is the 1.0 baseline; the others are configurable multipliers.
+    enum class KillClassification : uint8_t
+    {
+        Normal = 0,
+        Elite,
+        Rare,
+        WorldBoss,
+        COUNT
+    };
 }
 
 #endif // MOD_BRANDING_CORE_COMMON_BRAND_H

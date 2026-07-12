@@ -19,6 +19,11 @@ namespace Branding::Test
 
         double matchBonus = 1.25;
 
+        // Per-kill sizing (§7.4). Grey floor >0 so trivial kills still pay; class weights
+        // (indexed by KillClassification) default to 1.0 so sizing tests set only what they need.
+        double greyFloor = 0.25;
+        std::array<double, static_cast<size_t>(KillClassification::COUNT)> classWeight{ { 1.0, 1.0, 1.0, 1.0 } };
+
         // DR off by default (soft cap huge) so base tests are unaffected.
         uint32_t drSoftCap = 0xFFFFFFFFu;
         double drFloor = 0.1;
@@ -35,6 +40,9 @@ namespace Branding::Test
         double RelevanceMul(ActivitySource source) const override { return relevance[static_cast<size_t>(source)]; }
         double MatchBonus() const override { return matchBonus; }
         double RoleMul(RoleContribution role) const override { return roleMul[static_cast<size_t>(role)]; }
+
+        double GreyFloor() const override { return greyFloor; }
+        double ClassWeight(KillClassification classification) const override { return classWeight[static_cast<size_t>(classification)]; }
 
         uint32_t DrSoftCap() const override { return drSoftCap; }
         double DrFloor() const override { return drFloor; }

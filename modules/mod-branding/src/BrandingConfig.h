@@ -22,6 +22,9 @@ namespace Branding
         double MatchBonus() const override { return _matchBonus; }
         double RoleMul(RoleContribution role) const override { return _roleMul[static_cast<size_t>(role)]; }
 
+        double GreyFloor() const override { return _greyFloor; }
+        double ClassWeight(KillClassification classification) const override { return _classWeight[static_cast<size_t>(classification)]; }
+
         uint32_t DrSoftCap() const override { return _drSoftCap; }
         double DrFloor() const override { return _drFloor; }
         double DrSlope() const override { return _drSlope; }
@@ -37,6 +40,9 @@ namespace Branding
         std::array<double, static_cast<size_t>(ActivitySource::COUNT)> _relevance{ { 1.0, 1.0, 0.9, 0.5, 0.6, 0.8 } };
         std::array<double, static_cast<size_t>(RoleContribution::COUNT)> _roleMul{ { 1.0, 1.0, 1.0, 1.0, 1.1, 1.1 } };
         double _matchBonus = 1.25;
+        double _greyFloor = 0.25;   // difficultyMul floor for grey/trivial kills (§7.4)
+        // Classification weights indexed by KillClassification (normal = 1.0 baseline).
+        std::array<double, static_cast<size_t>(KillClassification::COUNT)> _classWeight{ { 1.0, 2.0, 3.0, 5.0 } };
         uint32_t _drSoftCap = 50000;
         double _drFloor = 0.1;
         double _drSlope = 0.00001;

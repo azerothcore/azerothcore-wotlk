@@ -20,8 +20,12 @@ public:
     }
 };
 
-// Player lifecycle + a demonstration activity hook. The full activity sources (invasions, raids,
-// gathering, ...) arrive with Slice 3; this single kill hook proves the load -> earn -> save loop.
+// Player lifecycle + the con-independent kill rail (§7.4, issue #32). `OnPlayerCreatureKill` fires
+// from Unit::Kill() unconditionally -- it is NOT gated on XP eligibility or con-color -- so a player
+// earns Proficiency from whatever they kill, wherever they kill it. The per-kill amount is sized "as
+// if at-level" then floored by difficulty so trivial kills still pay (>0) but never as much as
+// level-appropriate content (anti-farm). Source/role and content-brand still arrive with the Slice 3
+// contribution tracker (TODO).
 class BrandingProficiencyPlayerScript : public PlayerScript
 {
 public:
@@ -38,13 +42,24 @@ public:
         sProficiencyMgr->UnloadPlayer(player->GetGUID());
     }
 
-    void OnPlayerCreatureKill(Player* killer, Creature* /*killed*/) override
+    void OnPlayerCreatureKill(Player* killer, Creature* killed) override
     {
-        if (!killer || !sProficiencyMgr->Config().Enabled())
+        if (!killer || !killed || !sProficiencyMgr->Config().Enabled())
             return;
 
-        // The active brand comes from the player's selected loadout (§7.9, issue #02). Source/role
-        // and content-brand still arrive with the Slice 3 contribution tracker (TODO).
+        // Mirror vanilla's creature-level XP eligibility (NOT the con/level taper): totems, pets,
+        // critters and explicit no-XP creatures never reward. This filter is con-independent -- grey
+        // mob kills still qualify -- it only blocks summoned/filler targets that would otherwise be
+        // an unlimited proficiency font.
+        if (killed->IsTotem() || killed->IsPet() || killed->IsCritter()
+            || killed->HasFlagsExtra(CREATURE_FLAG_EXTRA_NO_XP))
+            return;
+
+        uint32 const baseUnits = sProficiencyMgr->KillBaseUnits(killer, killed);
+        if (baseUnits == 0)
+            return;
+
+        // The active brand comes from the player's selected loadout (§7.9, issue #02).
         BrandId const activeBrand = sLoadoutMgr->GetLoadout(killer->GetGUID()).activeBrand;
 
         XpActivity activity;
@@ -52,7 +67,7 @@ public:
         activity.activeBrand = activeBrand;
         activity.contentBrand = activeBrand;
         activity.role = RoleContribution::Damage;
-        activity.baseUnits = 1;
+        activity.baseUnits = baseUnits;
 
         sProficiencyMgr->ApplyActivity(killer->GetGUID(), killer->GetSession()->GetAccountId(), activity);
     }

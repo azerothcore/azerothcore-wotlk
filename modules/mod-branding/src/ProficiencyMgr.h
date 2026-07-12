@@ -34,6 +34,14 @@ namespace Branding
         // Grants XP for an activity, persisting nothing immediately (flushed on logout/periodic).
         XpResult ApplyActivity(ObjectGuid charGuid, uint32_t accountId, XpActivity const& activity);
 
+        // Per-kill Proficiency baseUnits (§7.4, issue #32): the "as if at-level" worth (level-diff
+        // penalty stripped via Acore::XP::BaseGain) scaled by the kill's con-color difficulty band
+        // and the creature's classification. Con-independent -- a grey/over-levelled kill still pays
+        // the floored amount, so proficiency is earnable anywhere. The AzerothCore glue (levels,
+        // zone content tier, color band, elite/rare/boss classification) lives here; the sizing
+        // formula itself is the pure Branding::KillBaseUnits. Neither pointer is stored.
+        uint32_t KillBaseUnits(Player const* killer, Creature const* killed) const;
+
         // Resolved, anti-P2W effect strength for a brand on the character's current account.
         double EffectStrength(ObjectGuid charGuid, uint32_t accountId, BrandId brand) const;
 

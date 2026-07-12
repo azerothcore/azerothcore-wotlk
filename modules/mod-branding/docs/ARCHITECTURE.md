@@ -527,13 +527,14 @@ modules/mod-branding/
 ├── src/                             # COMPILED INTO THE SERVER (AzerothCore collects src/ only)
 │   ├── core/                        # PURE C++20. No AzerothCore includes anywhere here.
 │   │   ├── common/                  # DI interfaces injected by adapters
-│   │   │   ├── Brand.h              # BrandId / ActivitySource / RoleContribution enums       ✓
+│   │   │   ├── Brand.h              # BrandId / ActivitySource / RoleContribution / KillBand    ✓
 │   │   │   ├── Clock.h              # IClock interface (inject time)                           ✓
 │   │   │   └── Config.h             # IBrandingConfig interface (inject tunables)             ✓
 │   │   ├── proficiency/             # ◀ SLICE 1
 │   │   │   ├── Types.h              # XpActivity, ProficiencyState, XpResult, KnowledgeState   ✓
 │   │   │   ├── BrandXp.{h,cpp}      # XP gain + modifiers + diminishing returns                ✓
 │   │   │   ├── Proficiency.{h,cpp}  # level curve, XP→level, effect strength                   ✓
+│   │   │   ├── KillSizing.{h,cpp}   # per-kill baseUnits: difficultyMul band + class weight     ✓
 │   │   │   └── Knowledge.{h,cpp}    # account access gates (earn + express, anti-P2W)          ✓
 │   │   ├── scaling/ (Slice 2)  contribution/ (Slice 3)  catalyst/ (Slice 4)  economy/ (Slice 5)
 │   ├── ServerClock.h                # IClock over GameTime (adapter)                          ✓
@@ -543,7 +544,7 @@ modules/mod-branding/
 └── tests/                           # GoogleTest. NOT compiled into the server (sibling of src/)
     ├── standalone/CMakeLists.txt    # builds branding_core_tests (FetchContent gtest 1.12.1)   ✓
     ├── fakes/                       # FakeClock, FakeConfig (DI test doubles)                  ✓
-    └── proficiency/                 # BrandXpTest, ProficiencyTest, KnowledgeTest (20 tests)   ✓
+    └── proficiency/                 # BrandXpTest, ProficiencyTest, KnowledgeTest, KillSizingTest ✓
 ```
 
 ### CMake strategy (the key to fast TDD)
@@ -744,6 +745,31 @@ Let `base = a.baseUnits * cfg.SourceWeight(a.source)`.
 - **Branded items:** do **not** add XP directly. They alter `SourceWeight`/`RelevanceMul` inputs
   (passed in via the activity/config), per design §6 ("modify XP sources and efficiency instead").
 
+**Per-kill `baseUnits` sizing (con-independent kill rail, §7.4 / issue #32).** The kill rail
+(`ProficiencyScripts::OnPlayerCreatureKill` → `ProficiencyMgr::KillBaseUnits`) fires from
+`Unit::Kill()` *unconditionally* — not gated on XP eligibility or con-color — so a player earns
+Proficiency from whatever they kill, wherever. The pure sizing helper (`core/…/proficiency/KillSizing`)
+computes `baseUnits = KillBaseUnits(atLevelGain, band, classification, cfg)`:
+- `atLevelGain = Acore::XP::BaseGain(playerLevel, playerLevel, content)` — the "as if at-level"
+  worth. Using `BaseGain` (not `Gain`) and `mob_level = playerLevel` strips the level-diff penalty,
+  so an over-levelled kill starts from the same base as level-appropriate content (§2.1 already
+  equalises the *effort*; reward tracks effort, not con-color).
+- `× DifficultyMul(band)` — `1.0` at/above level (red/orange/yellow), the midpoint at green, and
+  `cfg.GreyFloor()` (default 0.25) at grey. The floor is **>0** so grey/ambient kills still pay
+  (no vanilla grey→0 cliff that would re-break "anywhere") and **<1** so trivial farming is viable
+  but strictly worse per-effort — keeping "harder = more, trivial = less". The band comes from
+  `Acore::XP::GetColorCode(playerLevel, killedLevel)`.
+- `× cfg.ClassWeight(classification)` — `normal 1.0 < elite < rare < worldboss` (defaults 1/2/3/5),
+  from `Creature::isWorldBoss()` / rank (`CREATURE_ELITE_RARE`/`RAREELITE`) / `isElite()`.
+  Totems, pets, critters and `CREATURE_FLAG_EXTRA_NO_XP` creatures are filtered out (no reward),
+  mirroring vanilla creature eligibility — a con-independent filter, *not* a level gate.
+  The resulting `baseUnits` then runs through the normal source/match/DR pipeline above; the
+  recent-window DR (§7.5) is the second anti-farm guard. Composes with invasion scaling (#28):
+  scaled-up invasion mobs sit in the full-reward band, so the floor only bites for ambient trivial
+  kills — exactly where wanted. The post-cap XP redirect (`PostCapXpScripts`, #20) is retained as an
+  opt-in *secondary* level-appropriate path for non-kill XP at the player cap
+  (`Branding.PostCapXp.Enable`, default off) — the kill rail is the primary con-independent path.
+
 Level curve (**geometric per-rank**, decided — see §14.13.6): each rank's *increment* grows by a
 fixed factor, so the ladder steepens toward the top (a grindy endgame, not a grindy start). The
 **per-rank cost** is `rankCost(n) = round(cfg.RankBaseXp * cfg.RankGrowth^(n-1))`; the cumulative
@@ -782,6 +808,12 @@ min(1.0, level / cfg.MaxLevel)` baseline (config may reshape the curve).
 - DR window decays with injected clock advance → full XP restored after window.
 - branded-item efficiency changes alter gain via config, not as additive XP.
 - knowledge gate: locked brand ⇒ 0 XP.
+
+`KillSizingTest.cpp`
+- `DifficultyMul` band boundaries: `Full == 1.0`, `Grey == cfg.GreyFloor` (>0), `Green` strictly
+  between; floor of 1.0 flattens all bands; out-of-range floor clamped to `[0, 1]`.
+- `KillBaseUnits` sizing: at-level normal == gain; grey normal floored; class weight scales;
+  difficulty × class weight compose; grey pays less than at-level; zero gain ⇒ zero units.
 
 `ProficiencyTest.cpp`
 - `XpForLevel` monotonic increasing; `LevelForXp` is its inverse (round-trip within a level band).
