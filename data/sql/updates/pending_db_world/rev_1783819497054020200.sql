@@ -210,16 +210,27 @@ UPDATE `creature` SET `MovementType`= 2, `wander_distance`= 0 WHERE `guid`= 1258
 
 DELETE FROM `creature_addon` WHERE `guid`= 125869;
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
-(125869, 1258690, 0, 0, 0, 173, 0, NULL);
+(125869, 1258690, 0, 0, 1, 233, 0, NULL);
 
 DELETE FROM `waypoint_data` WHERE `id`= 1258690;
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `velocity`, `delay`, `smoothTransition`, `move_type`, `action`, `action_chance`, `wpguid`) VALUES
-(1258690, 1, 2435.5186, -5638.2393, 420.64365, NULL, 0, 10000, 0, 0, 0, 100, 0),
-(1258690, 2, 2431.862, -5645.493, 420.64664, NULL, 0, 10000, 0, 0, 0, 100, 0),
-(1258690, 3, 2451.4836, -5657.5786, 420.64786, NULL, 0, 10000, 0, 0, 0, 100, 0),
-(1258690, 4, 2466.9465, -5656.067, 420.64813, NULL, 0, 10000, 0, 0, 0, 100, 0),
-(1258690, 5, 2472.0898, -5647.986, 420.6463, NULL, 0, 10000, 0, 0, 0, 100, 0),
-(1258690, 6, 2449.722, -5646.9004, 420.64453, NULL, 0, 10000, 0, 0, 0, 100, 0);
+-- 16-point weave loop (close-range sniff); ~22-32s craft pause at the 4 anvils (pt 5,7,10,16)
+(1258690, 1, 2438.5435, -5634.903, 420.79996, NULL, 0, 0, 0, 0, 0, 100, 0),
+(1258690, 2, 2449.8833, -5641.199, 420.79996, NULL, 0, 0, 0, 0, 0, 100, 0),
+(1258690, 3, 2460.378, -5650.1074, 420.8016, NULL, 0, 0, 0, 0, 0, 100, 0),
+(1258690, 4, 2467.7244, -5654.838, 420.79996, NULL, 0, 0, 0, 0, 0, 100, 0),
+(1258690, 5, 2466.9749, -5656.5464, 420.79996, NULL, 0, 22000, 0, 0, 0, 100, 0),
+(1258690, 6, 2440.863, -5647.832, 420.79996, NULL, 0, 0, 0, 0, 0, 100, 0),
+(1258690, 7, 2433.588, -5649.348, 420.79996, NULL, 0, 32000, 0, 0, 0, 100, 0),
+(1258690, 8, 2449.2322, -5647.929, 420.79996, NULL, 0, 0, 0, 0, 0, 100, 0),
+(1258690, 9, 2456.4922, -5647.385, 420.77432, NULL, 0, 0, 0, 0, 0, 100, 0),
+(1258690, 10, 2466.7793, -5648.771, 420.79996, NULL, 0, 28000, 0, 0, 0, 100, 0),
+(1258690, 11, 2455.2024, -5647.0728, 420.78763, NULL, 0, 0, 0, 0, 0, 100, 0),
+(1258690, 12, 2447.792, -5646.166, 420.79996, NULL, 0, 0, 0, 0, 0, 100, 0),
+(1258690, 13, 2439.7908, -5641.177, 420.79996, NULL, 0, 0, 0, 0, 0, 100, 0),
+(1258690, 14, 2435.9255, -5634.6216, 420.72903, NULL, 0, 0, 0, 0, 0, 100, 0),
+(1258690, 15, 2432.0063, -5633.902, 420.7254, NULL, 0, 0, 0, 0, 0, 100, 0),
+(1258690, 16, 2431.6282, -5635.6772, 420.65244, NULL, 0, 25000, 0, 0, 0, 100, 0);
 
 DELETE FROM `creature_text` WHERE `CreatureID`= 28500;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
@@ -232,4 +243,4 @@ INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Lan
 
 DELETE FROM `smart_scripts` WHERE `entryorguid`= 28500 AND `source_type`= 0;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(28500, 0, 0, 0, 1, 0, 100, 0, 360000, 480000, 360000, 480000, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Corvus - ambient line at random ~7min');
+(28500, 0, 0, 0, 1, 0, 100, 0, 2100000, 2700000, 2100000, 2700000, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Corvus - ambient line at random ~40min');
