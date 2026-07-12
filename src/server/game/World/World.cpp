@@ -1655,11 +1655,11 @@ void World::InitRandomBGResetTime()
 void World::InitCalendarOldEventsDeletionTime()
 {
     Seconds currentDeletionTime = Seconds(sWorldState->getWorldState(WORLD_STATE_CUSTOM_DAILY_CALENDAR_DELETION_OLD_EVENTS_TIME));
-    Seconds nextDeletionTime = currentDeletionTime > 0s ? currentDeletionTime : Seconds(Acore::Time::GetNextTimeWithDayAndHour(-1, getIntConfig(CONFIG_CALENDAR_DELETE_OLD_EVENTS_HOUR)));
+    _nextCalendarOldEventsDeletionTime = currentDeletionTime > 0s ? currentDeletionTime : Seconds(Acore::Time::GetNextTimeWithDayAndHour(-1, getIntConfig(CONFIG_CALENDAR_DELETE_OLD_EVENTS_HOUR)));
 
     if (currentDeletionTime == 0s)
     {
-        sWorldState->setWorldState(WORLD_STATE_CUSTOM_DAILY_CALENDAR_DELETION_OLD_EVENTS_TIME, nextDeletionTime.count());
+        sWorldState->setWorldState(WORLD_STATE_CUSTOM_DAILY_CALENDAR_DELETION_OLD_EVENTS_TIME, _nextCalendarOldEventsDeletionTime.count());
     }
 }
 

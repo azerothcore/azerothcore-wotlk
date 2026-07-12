@@ -207,14 +207,16 @@ CalendarEventStore::iterator CalendarMgr::RemoveEvent(CalendarEvent* calendarEve
 
     if (currIt)
     {
+        auto nextIt = _events.erase(*currIt);
         delete calendarEvent;
-        return _events.erase(*currIt);
+        return nextIt;
     }
 
     if (auto it = _events.find(calendarEvent); it != _events.end())
     {
+        auto nextIt = _events.erase(it);
         delete calendarEvent;
-        return _events.erase(it);
+        return nextIt;
     }
 
     delete calendarEvent;
