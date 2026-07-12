@@ -10,23 +10,16 @@
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #
 
-# Since it's a Golang library (https://github.com/walkline/ToCloud9/tree/master/game-server/libsidecar), to
-# build a C library from Go sources on Windows, you need to use the GCC compiler. However, AzerothCore is
-# configured to use the MSVC compiler or clang-cl, and both of them are not compatible with GCC on Windows.
-#
-# This can be changed with implementation of one of these feature requests:
-#   https://github.com/golang/go/issues/17014
-#   https://github.com/golang/go/issues/20982
-
-if (WIN32 OR NOT USE_REAL_LIBSIDECAR)
+# Use stub implementation only when the real libsidecar is disabled.
+if (NOT USE_REAL_LIBSIDECAR)
 
     file(GLOB sources stub/*.c stub/*.h)
 
     add_library(libsidecar STATIC ${sources})
 
-    set_target_properties(libsidecar 
-      PROPERTIES 
-        LINKER_LANGUAGE 
+    set_target_properties(libsidecar
+      PROPERTIES
+        LINKER_LANGUAGE
           CXX
         INTERFACE_INCLUDE_DIRECTORIES
           ${CMAKE_CURRENT_SOURCE_DIR}/stub)
@@ -35,22 +28,39 @@ else()
     add_library(libsidecar SHARED IMPORTED GLOBAL)
 
     # Determine the correct library extension based on platform
-    if(APPLE)
+    if(WIN32)
+        set(LIBSIDECAR_EXTENSION "dll")
+        set(LIBSIDECAR_IMPORT_LIB "libsidecar.lib")
+    elseif(APPLE)
         set(LIBSIDECAR_EXTENSION "dylib")
     else()
         set(LIBSIDECAR_EXTENSION "so")
     endif()
 
-    set_target_properties(libsidecar
-      PROPERTIES
-        IMPORTED_LOCATION
-          ${CMAKE_CURRENT_SOURCE_DIR}/libsidecar.${LIBSIDECAR_EXTENSION}
-        INTERFACE_INCLUDE_DIRECTORIES
-          ${CMAKE_CURRENT_SOURCE_DIR}/include
-        IMPORTED_NO_SONAME true)
+    if(WIN32)
+        set_target_properties(libsidecar
+          PROPERTIES
+            IMPORTED_LOCATION
+              ${CMAKE_CURRENT_SOURCE_DIR}/libsidecar.${LIBSIDECAR_EXTENSION}
+            IMPORTED_IMPLIB
+              ${CMAKE_CURRENT_SOURCE_DIR}/${LIBSIDECAR_IMPORT_LIB}
+            INTERFACE_INCLUDE_DIRECTORIES
+              ${CMAKE_CURRENT_SOURCE_DIR}/include)
+    else()
+        set_target_properties(libsidecar
+          PROPERTIES
+            IMPORTED_LOCATION
+              ${CMAKE_CURRENT_SOURCE_DIR}/libsidecar.${LIBSIDECAR_EXTENSION}
+            INTERFACE_INCLUDE_DIRECTORIES
+              ${CMAKE_CURRENT_SOURCE_DIR}/include
+            IMPORTED_NO_SONAME
+              true)
 
-    set_target_properties(libsidecar PROPERTIES
-                          IMPORTED_LOCATION_NOCONFIG  "${CMAKE_INSTALL_RPATH}/libsidecar.${LIBSIDECAR_EXTENSION}"
-                          IMPORTED_SONAME_NOCONFIG libsidecar.${LIBSIDECAR_EXTENSION}
-    )
+        set_target_properties(libsidecar PROPERTIES
+            IMPORTED_LOCATION_NOCONFIG
+              "${CMAKE_INSTALL_RPATH}/libsidecar.${LIBSIDECAR_EXTENSION}"
+            IMPORTED_SONAME_NOCONFIG
+              "libsidecar.${LIBSIDECAR_EXTENSION}")
+    endif()
+
 endif()

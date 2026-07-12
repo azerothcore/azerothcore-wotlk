@@ -61,18 +61,18 @@ void TC9ProcessEventsHooks() { panicWithTC9Unavailable("TC9ProcessEventsHooks");
 void TC9ProcessGRPCOrHTTPRequests() { panicWithTC9Unavailable("TC9ProcessGRPCOrHTTPRequests"); }
 
 // TC9GetNextAvailableCharacterGuid returns next available characters GUID. Thread unsafe.
-GoUint64 TC9GetNextAvailableCharacterGuid(GoInt realmID) { panicWithTC9Unavailable("TC9GetNextAvailableCharacterGuid"); return 0; }
+uint64_t TC9GetNextAvailableCharacterGuid(int realmID) { panicWithTC9Unavailable("TC9GetNextAvailableCharacterGuid"); return 0; }
 
 // TC9GetNextAvailableItemGuid returns next available item GUID. Thread unsafe.
-GoUint64 TC9GetNextAvailableItemGuid(GoInt realmID) { panicWithTC9Unavailable("TC9GetNextAvailableItemGuid"); return 0; }
+uint64_t TC9GetNextAvailableItemGuid(int realmID) { panicWithTC9Unavailable("TC9GetNextAvailableItemGuid"); return 0; }
 
 // TC9GetNextAvailableInstanceGuid returns next available dungeon/raid instance GUID. Thread unsafe.
-GoUint64 TC9GetNextAvailableInstanceGuid(GoInt realmID) { panicWithTC9Unavailable("TC9GetNextAvailableInstanceGuid"); return 0; }
+uint64_t TC9GetNextAvailableInstanceGuid(int realmID) { panicWithTC9Unavailable("TC9GetNextAvailableInstanceGuid"); return 0; }
 
 // TC9InitLib inits lib by starting services like grpc and healthcheck.
 // Adds game server to the servers registry that will make this server visible for game load balancer.
 //
-void TC9InitLib(GoUint16 port, GoUint32 realmID, GoUint8 isCrossRealm, char* availableMaps, uint32_t** assignedMaps, int* assignedMapsSize) { panicWithTC9Unavailable("TC9InitLib"); }
+void TC9InitLib(uint16_t port, uint32_t realmID, uint8_t isCrossRealm, char* availableMaps, uint32_t** assignedMaps, int* assignedMapsSize) { panicWithTC9Unavailable("TC9InitLib"); }
 
 // TC9GracefulShutdown gracefully stops all running services.
 //
