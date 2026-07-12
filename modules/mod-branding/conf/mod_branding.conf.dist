@@ -785,6 +785,56 @@ Branding.Effect.OverhealShieldSpell = 48066
 Branding.Effect.DefaultRolePolicy = class
 
 #
+#    Branding.Leveling.Enable
+#        Description: Leveling-scoped branding (§7.11, issue #77). When on, a character BELOW max level
+#                     expresses a separate, account-keyed branding budget while inside a dungeon or an
+#                     active invasion -- a deliberate, opt-in power boost for alt-friendly accounts. The
+#                     budget is capped (MaxLevelingMul) and forced to 1.0 at max level, so the endgame
+#                     §7.9 earned-proficiency dual-key and the anti-P2W rule are untouched.
+#        Default:     1 - (enabled)
+#
+
+Branding.Leveling.Enable = 1
+
+#
+#    Branding.Leveling.MaxLevelingMul
+#        Description: Hard cap on the §7.11 leveling budget. Its OWN cap, distinct from the §7.9
+#                     Max{Personal,Raid}Mul dials. This is the main "how much of a cake-walk" dial.
+#        Default:     4.0
+#
+
+Branding.Leveling.MaxLevelingMul = 4.0
+
+#
+#    Branding.Leveling.StandingScale
+#        Description: Per-maxed-brand contribution to the leveling budget (mild scaling with account
+#                     achievement). Effective multiplier = 1 + maxedBrands * StandingScale, clamped to
+#                     MaxLevelingMul. There is no per-brander stacking, so a group stays bounded.
+#        Default:     0.5
+#
+
+Branding.Leveling.StandingScale = 0.5
+
+#
+#    Branding.Leveling.MaxCharacterLevel
+#        Description: The ding-to-cap boundary for §7.11. At or above this level the leveling budget is
+#                     exactly 1.0 and only the §7.9 earned path applies. Set to the realm's max level.
+#        Default:     80
+#
+
+Branding.Leveling.MaxCharacterLevel = 80
+
+#
+#    Branding.Leveling.GrantTransforms
+#        Description: Whether leveling alts also get the §7.9 MechanicTransforms (HoT spread,
+#                     overheal->shield, damage->heal) in the two contexts. The healer/tank transform is
+#                     the heart of the issue #77 scenario, so this defaults on.
+#        Default:     1 - (granted)
+#
+
+Branding.Leveling.GrantTransforms = 1
+
+#
 #    Branding.Catalyst.Enable
 #        Description: Catalyst stacking diminishing returns (§7.9/§9). A branded specialist's raid
 #                     multiplier diminishes as same-role specialists stack (1st full, 2nd reduced,

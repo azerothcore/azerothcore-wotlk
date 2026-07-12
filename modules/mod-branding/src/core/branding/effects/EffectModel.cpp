@@ -115,6 +115,27 @@ namespace Branding
         return personal > 0.0 ? 1.0 / personal : 1.0;
     }
 
+    double LevelingMultiplier(uint8_t charLevel, LevelingContext ctx, AccountBrandStanding const& standing,
+        IEffectConfig const& cfg)
+    {
+        // Full §7.11 gate: master switch, qualifying context, and strictly below the level cap. The
+        // ding-to-cap boundary is the invariant that protects endgame balance -- at/above cap only the
+        // §7.9 earned-proficiency path may produce a multiplier.
+        if (!cfg.LevelingEnabled() || ctx == LevelingContext::None || charLevel >= cfg.MaxCharacterLevel())
+            return 1.0;
+
+        // Mild, capped scaling with account standing. Additive per maxed brand, then clamped to the
+        // leveling cap -- no per-brander stacking input exists, so a group of branders stays bounded.
+        double const budget = static_cast<double>(standing.maxedBrands) * cfg.LevelingStandingScale();
+        double const multiplier = 1.0 + budget;
+        return std::clamp(multiplier, 1.0, cfg.MaxLevelingMul());
+    }
+
+    bool LevelingGrantsTransforms(LevelingContext ctx, IEffectConfig const& cfg)
+    {
+        return cfg.LevelingGrantsTransforms() && ctx != LevelingContext::None;
+    }
+
     uint32_t OverhealShieldAmount(uint32_t heal, uint32_t missingHealth, uint32_t maxHealth,
         uint8_t profLevel, IEffectConfig const& cfg)
     {
