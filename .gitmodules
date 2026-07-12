@@ -9,3 +9,7 @@
 [submodule "modules/mod-cinematics"]
 	path = modules/mod-cinematics
 	url = git@github.com:and-elf/mod-cinematics.git
+[submodule "modules/mod-dungeon-questgivers"]
+	path = modules/mod-dungeon-questgivers
+	url = git@github.com:and-elf/mod-dungeon-questgivers.git
+	branch = master
