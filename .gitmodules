@@ -13,3 +13,7 @@
 	path = modules/mod-dungeon-questgivers
 	url = git@github.com:and-elf/mod-dungeon-questgivers.git
 	branch = master
+[submodule "modules/mod-branding"]
+	path = modules/mod-branding
+	url = git@github.com:and-elf/mod-branding.git
+	branch = master
