@@ -179,7 +179,6 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (1258330, 5, 2446.33, -5619.11, 481.038, NULL, 5, 0, 1, 0, 0, 100, 0),
 (1258330, 6, 2468.88, -5620.94, 481.038, NULL, 5, 0, 1, 0, 0, 100, 0),
 (1258330, 7, 2486.97, -5604.07, 481.038, NULL, 5, 0, 1, 0, 0, 100, 0);
-
 -- SmartAI (5 patrollers)
 DELETE FROM `smart_scripts` WHERE `entryorguid` IN (-125826, -125827, -125828, -125831, -125832) AND `source_type`= 0;
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -203,10 +202,8 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (-125832, 0, 1, 0, 108, 0, 100, 0, 2, 0, 0, 0, 0, 0, 91, 9, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Gargoyle - takeoff A: STAND (flap)'),
 (-125832, 0, 2, 0, 108, 0, 100, 0, 5, 0, 0, 0, 0, 0, 90, 9, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Gargoyle - perch B: SUBMERGED (idle)'),
 (-125832, 0, 3, 0, 108, 0, 100, 0, 6, 0, 0, 0, 0, 0, 91, 9, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Gargoyle - takeoff B: STAND (flap)');
-
 -- Faction correction for vendors
 UPDATE `creature_template` SET `faction`= 2050 WHERE `entry` IN (28500, 29203, 29205, 29207, 29208);
-
 -- Master Siegesmith Corvus (Entry 28500, GUID 125869)
 UPDATE `creature_template` SET `AIName`= 'SmartAI' WHERE `entry`= 28500;
 UPDATE `creature` SET `MovementType`= 2, `wander_distance`= 0 WHERE `guid`= 125869;
