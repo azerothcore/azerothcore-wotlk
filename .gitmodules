@@ -2,6 +2,10 @@
 	path = modules/mod-branded-mercenary
 	url = git@github.com:and-elf/mod-branded-mercenary.git
 	branch = feat/fragment-branding-hire
+[submodule "modules/mod-reforge"]
+	path = modules/mod-reforge
+	url = git@github.com:and-elf/mod-reforge.git
+	branch = master
 [submodule "modules/mod-cinematics"]
 	path = modules/mod-cinematics
 	url = git@github.com:and-elf/mod-cinematics.git
