@@ -2056,6 +2056,9 @@ struct npc_icc_orb_controller : public ScriptedAI
     {
         _scheduler.Schedule(evading ? 5s : 1s, [this](TaskContext visual)
             {
+                if (_minionGuids.empty())
+                    return;
+
                 ObjectGuid mGuid = Acore::Containers::SelectRandomContainerElement(_minionGuids);
                 if (Unit* minion = ObjectAccessor::GetUnit(*me, mGuid))
                     minion->CastSpell(nullptr, SPELL_BLOOD_ORB_VISUAL);
@@ -2105,9 +2108,9 @@ struct npc_icc_orb_controller : public ScriptedAI
         if (_minionGuids.empty())
             return;
 
-        for (ObjectGuid guid : _minionGuids)
+        for (ObjectGuid minionGuid : _minionGuids)
         {
-            if (Creature* minion = ObjectAccessor::GetCreature(*me, guid))
+            if (Creature* minion = ObjectAccessor::GetCreature(*me, minionGuid))
                 if (minion->IsAIEnabled && !minion->IsInCombat())
                     minion->AI()->DoZoneInCombat(darkfallen);
         }
@@ -2131,6 +2134,13 @@ struct npc_icc_orb_controller : public ScriptedAI
     void UpdateAI(uint32 diff) override
     {
         _scheduler.Update(diff);
+
+        if (_isInCombat)
+        {
+            UpdateValidGuids();
+            if (_minionGuids.empty())
+                DoAction(ACTION_EVADE);
+        }
     }
 
 private:
@@ -2391,8 +2401,13 @@ struct go_empowering_blood_orb : public GameObjectAI
 
     void Reset() override
     {
+        if (Creature* trigger = ObjectAccessor::GetCreature(*me, _triggerGuid))
+            trigger->DespawnOrUnsummon();
+
         if (Creature* trigger = me->SummonCreature(NPC_ORB_VISUAL_STALKER, me->GetPosition(), TEMPSUMMON_MANUAL_DESPAWN))
             _triggerGuid = trigger->GetGUID();
+        else
+            _triggerGuid.Clear();
     }
 
     bool GossipHello(Player* player, bool /*reportUse*/) override
@@ -2524,10 +2539,13 @@ class spell_darkfallen_blood_mirror : public SpellScript
             });
 
         if (targets.size() < 2)
+        {
+            targets.clear();
             return;
+        }
 
+        Acore::Containers::RandomResize(targets, 2);
         _targets = targets;
-        Acore::Containers::RandomResize(_targets, 2);
     }
 
     void HandleMirror(SpellEffIndex /*effIndex*/)
