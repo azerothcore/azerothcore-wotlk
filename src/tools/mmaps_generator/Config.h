@@ -76,7 +76,7 @@ namespace MMAP
         std::string MMapsPath() const { return (_dataDir / "mmaps").string(); }
         std::string DataDirPath() const { return _dataDir.string(); }
 
-        std::vector<std::string> OffMeshConnections() const { return _offmeshConnection; }
+        std::vector<std::string> const& OffMeshConnections() const { return _offmeshConnections; }
 
     private:
         explicit Config();
@@ -156,7 +156,7 @@ namespace MMAP
 
         std::filesystem::path _dataDir;
 
-        std::vector<std::string> _offmeshConnection;
+        std::vector<std::string> _offmeshConnections;
     };
 }
 

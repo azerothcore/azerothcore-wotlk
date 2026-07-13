@@ -191,14 +191,13 @@ namespace MMAP
         tryBoolean(mmapsNode, "skipBattlegrounds", _skipBattlegrounds);
         tryBoolean(mmapsNode, "debugOutput", _debugOutput);
 
-        if (mmapsNode.contains("offmeshConnections") &&
-    mmapsNode["offmeshConnections"].is_sequence())
+        if (mmapsNode.contains("offmeshConnections") && mmapsNode["offmeshConnections"].is_sequence())
         {
-            _offmeshConnection = mmapsNode["offmeshConnections"].get_value<std::vector<std::string>>();
+            _offmeshConnections = mmapsNode["offmeshConnections"].get_value<std::vector<std::string>>();
         }
         else
         {
-            _offmeshConnection.clear();
+            _offmeshConnections.clear();
         }
 
         std::string dataDirPath;
@@ -238,7 +237,7 @@ namespace MMAP
                 if (mapNode.contains("verticesPerMapEdge"))
                     override.vertexPerMapEdge = mapNode["verticesPerMapEdge"].get_value<int>();
                 if (mapNode.contains("verticesPerTileEdge"))
-                    override.vertexPerMapEdge = mapNode["verticesPerTileEdge"].get_value<int>();
+                    override.vertexPerTileEdge = mapNode["verticesPerTileEdge"].get_value<int>();
                 if (mapNode.contains("cellSizeHorizontal"))
                     override.cellSizeHorizontal = mapNode["cellSizeHorizontal"].get_value<float>();
                 if (mapNode.contains("cellSizeVertical"))

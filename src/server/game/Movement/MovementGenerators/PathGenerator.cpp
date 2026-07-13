@@ -29,7 +29,6 @@ namespace
 {
     constexpr float BLADE_EDGE_ROPE_SNAP_DIST = 1.5f;
     constexpr float BLADE_EDGE_ROPE_SNAP_DIST2 = BLADE_EDGE_ROPE_SNAP_DIST * BLADE_EDGE_ROPE_SNAP_DIST;
-    constexpr float BLADE_EDGE_ROPE_PI = 3.14159265358979323846f;
 
     struct BladeEdgeArenaRope
     {
@@ -86,7 +85,7 @@ namespace
             return false;
 
         float const linearZ = rope.Start.z + (rope.End.z - rope.Start.z) * t;
-        float const sagZ = rope.Sag * std::sin(BLADE_EDGE_ROPE_PI * t);
+        float const sagZ = rope.Sag * std::sin(M_PI * t);
 
         closestPoint = { closestX, closestY, linearZ - sagZ };
         return true;
