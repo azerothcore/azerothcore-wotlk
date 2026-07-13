@@ -1229,7 +1229,12 @@ enum AcoreStrings
     LANG_MAIL_RETURN_ALREADY_RETURNED   = 5142,
     LANG_MAIL_RETURN_HOOK_BLOCKED       = 5143,
 
-    // Room for more strings    5144-9999
+    // Chat filter
+    LANG_CHATFILTER_EMOTE               = 5144,
+    LANG_CHATFILTER_SAY                 = 5145,
+    LANG_CHATFILTER_YELL                = 5146,
+
+    // Room for more strings    5147-9999
 
     // Level requirement notifications
     LANG_SAY_REQ                        = 6604,
@@ -1512,6 +1517,18 @@ enum AcoreStrings
 
     // Pet rename command
     LANG_PET_RENAME_INVALID             = 35453,
-    LANG_PET_RENAME_SUCCESS             = 35454
+    LANG_PET_RENAME_SUCCESS             = 35454,
+
+    // Wintergrasp shutdown deferral
+    LANG_WG_SHUTDOWN_DEFERRED           = 35455,
+
+    // npc showloot command
+    LANG_COMMAND_NOT_DEAD_OR_NO_LOOT    = 35456,
+    LANG_COMMAND_NPC_SHOWLOOT_HEADER    = 35457,
+    LANG_COMMAND_NPC_SHOWLOOT_MONEY     = 35458,
+    LANG_COMMAND_NPC_SHOWLOOT_ITEMS     = 35459,
+    LANG_COMMAND_NPC_SHOWLOOT_ENTRY     = 35460,
+    LANG_COMMAND_NPC_SHOWLOOT_QUEST     = 35461
+
 };
 #endif
