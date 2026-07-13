@@ -14344,7 +14344,7 @@ void Player::ResyncControlledUnitsAfterTeleport()
         if (!controlled || !controlled->IsInWorld() || !controlled->IsAlive())
             continue;
 
-        if (controlled->IsPet() || !controlled->IsCreature())
+        if (controlled->IsPet() || !controlled->IsControllableGuardian())
             continue;
 
         CharmInfo* ci = controlled->GetCharmInfo();
@@ -14364,7 +14364,6 @@ void Player::ResyncControlledUnitsAfterTeleport()
         ci->RemoveStayPosition();
         ci->SetForcedSpell(0);
         ci->SetForcedTargetGUID();
-
         if (!controlled->IsWithinDist3d(this, GetMap()->GetVisibilityRange() - 5.0f))
             controlled->NearTeleportTo(
                 GetPositionX(),
