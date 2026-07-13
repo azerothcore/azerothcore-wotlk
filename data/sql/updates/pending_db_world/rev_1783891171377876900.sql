@@ -18,7 +18,9 @@ UPDATE `creature_template` SET `faction`= 2050 WHERE `entry`= 29196;
 UPDATE `creature_template` SET `faction`= 2050 WHERE `entry`= 31094;
 -- Knight of the Ebon Blade (Entry 29202) - Command Center floor - weapon sheathing
 DELETE FROM `creature_addon` WHERE `guid` IN (125719, 125727, 125730, 125733, 125738, 125743, 125749, 125753);
-INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
++INSERT INTO `creature_addon` (
++    `guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`
++) VALUES
 (125719, 0, 0, 0, 0, 0, 0, NULL),
 (125727, 0, 0, 0, 0, 0, 0, NULL),
 (125730, 0, 0, 0, 0, 0, 0, NULL),
