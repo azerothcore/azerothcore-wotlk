@@ -364,7 +364,7 @@ struct boss_algalon_the_observer : public ScriptedAI
         }
 
         if (_instance)
-            _instance->SetData(BOSS_ALGALON, FAIL);
+            _instance->SetBossState(BOSS_ALGALON, FAIL);
 
         ScriptedAI::EnterEvadeMode(why);
     }
@@ -391,7 +391,7 @@ struct boss_algalon_the_observer : public ScriptedAI
         }
 
         if (_instance)
-            _instance->SetData(BOSS_ALGALON, NOT_STARTED);
+            _instance->SetBossState(BOSS_ALGALON, NOT_STARTED);
     }
 
     void KilledUnit(Unit* victim) override
@@ -446,7 +446,7 @@ struct boss_algalon_the_observer : public ScriptedAI
                 me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->InterruptNonMeleeSpells(false);
                 if (_instance)
-                    _instance->SetData(BOSS_ALGALON, NOT_STARTED);
+                    _instance->SetBossState(BOSS_ALGALON, NOT_STARTED);
                 break;
             case ACTION_INIT_ALGALON:
                 _firstPull = false;
@@ -660,7 +660,7 @@ struct boss_algalon_the_observer : public ScriptedAI
                     brann->AI()->DoAction(ACTION_FINISH_INTRO);
                 break;
             case EVENT_START_COMBAT:
-                _instance->SetData(BOSS_ALGALON, IN_PROGRESS);
+                _instance->SetBossState(BOSS_ALGALON, IN_PROGRESS);
                 Talk(SAY_ALGALON_AGGRO);
                 break;
             case EVENT_REMOVE_UNNATTACKABLE:
@@ -737,7 +737,7 @@ struct boss_algalon_the_observer : public ScriptedAI
             case EVENT_OUTRO_START:
                 if (_instance)
                 {
-                    _instance->SetData(BOSS_ALGALON, DONE);
+                    _instance->SetBossState(BOSS_ALGALON, DONE);
                     _instance->SetData(DATA_ALGALON_DEFEATED, 1);
                 }
                 break;
