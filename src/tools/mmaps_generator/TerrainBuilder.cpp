@@ -947,6 +947,7 @@ namespace MMAP
                        &p1[0], &p1[1], &p1[2],
                        &size) != 10)
             {
+                printf("Skipped off-mesh connection '%s': invalid format\n", line.c_str());
                 continue;
             }
 
