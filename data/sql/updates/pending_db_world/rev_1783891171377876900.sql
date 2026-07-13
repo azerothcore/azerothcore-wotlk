@@ -61,13 +61,11 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (1257280, 22, 2500.469, -5644.090, 377.130, NULL, 0, 0, 0, 0, 0, 100, 0),
 (1257280, 23, 2485.997, -5652.299, 377.080, NULL, 0, 0, 0, 0, 0, 100, 0),
 (1257280, 24, 2470.307, -5658.005, 377.048, NULL, 0, 0, 0, 0, 0, 100, 0);
-
 -- Follower 125729
 DELETE FROM `creature_formations` WHERE `leaderGUID`= 125728 OR `memberGUID` IN (125728, 125729);
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
 (125728, 125728, 0, 0, 7, 0, 0),
 (125728, 125729, 3, 270, 519, 0, 0);
-
 -- Knight of the Ebon Blade (Entry 29202, GUID 125746) - Command Center INNER ring patrol
 UPDATE `creature` SET `wander_distance`= 0, `MovementType`= 2 WHERE `guid`= 125746;
 
