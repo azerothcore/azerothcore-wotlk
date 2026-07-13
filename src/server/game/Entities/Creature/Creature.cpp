@@ -1925,6 +1925,11 @@ bool Creature::CanStartAttack(Unit const* who, bool force) const
         if (!_IsTargetAcceptable(who))
             return false;
 
+        // Totems never pull proximity aggro; they are only attacked in response
+        // to threat they generate themselves (e.g. Searing Totem)
+        if (who->IsTotem())
+            return false;
+
         if (IsNeutralToAll() || !IsWithinDistInMap(who, GetAggroRange(who) + m_CombatDistance, true, false, false))
             return false;
     }
@@ -2873,6 +2878,13 @@ void Creature::AtEngage(Unit* target)
         UpdateSpeed(MOVE_SWIM, true);
         UpdateSpeed(MOVE_FLIGHT, true);
     }
+
+    // Notify controlled creatures (guardians/pets) so they assist when
+    // the owner enters combat via assist/aggro chain, not only via damage.
+    for (Unit* controlled : m_Controlled)
+        if (Creature* cControlled = controlled->ToCreature())
+            if (CreatureAI* controlledAI = cControlled->AI())
+                controlledAI->OwnerAttackedBy(target);
 
     MovementGeneratorType const movetype = GetMotionMaster()->GetCurrentMovementGeneratorType();
     if (movetype == WAYPOINT_MOTION_TYPE || movetype == ESCORT_MOTION_TYPE || (IsAIEnabled && AI()->IsEscorted()))
