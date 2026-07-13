@@ -47,7 +47,8 @@ DoorData const doorData[] =
     { GO_KEEPERS_GATE,                 BOSS_THORIM,    DOOR_TYPE_PASSAGE    },
     { GO_KEEPERS_GATE,                 BOSS_FREYA,     DOOR_TYPE_PASSAGE    },
     { GO_VEZAX_DOOR,                   BOSS_VEZAX,     DOOR_TYPE_PASSAGE    },
-    { GO_YOGG_SARON_DOORS,             BOSS_YOGGSARON, DOOR_TYPE_ROOM       },
+    // GO_YOGG_SARON_DOORS is handled by boss_yoggsaron_sara: it closes 15 seconds
+    // after the pull, not immediately when the encounter enters IN_PROGRESS.
     { GO_DOODAD_UL_SIGILDOOR_03,       BOSS_ALGALON,   DOOR_TYPE_ROOM       },
     { GO_DOODAD_UL_UNIVERSEFLOOR_01,   BOSS_ALGALON,   DOOR_TYPE_ROOM       },
     { GO_DOODAD_UL_UNIVERSEFLOOR_02,   BOSS_ALGALON,   DOOR_TYPE_SPAWN_HOLE },
