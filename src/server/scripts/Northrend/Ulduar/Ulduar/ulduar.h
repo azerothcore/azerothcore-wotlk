@@ -114,6 +114,8 @@ enum UlduarData
 
     // Achievements
     DATA_DWARFAGEDDON                       = 700,
+    DATA_QUICK_SHAVE                        = 701,
+    DATA_IRON_DWARF_MEDIUM_RARE             = 702,
 
     // Tram
     DATA_CALL_TRAM                          = 710,
@@ -180,6 +182,16 @@ enum UlduarNPCs
 
     // Razorscale
     NPC_HARPOON_FIRE_STATE                  = 33282,
+    NPC_RAZORSCALE_SPAWNER                  = 33245,
+    NPC_RAZORSCALE_CONTROLLER               = 33233,
+    NPC_EXPEDITION_COMMANDER                = 33210,
+    NPC_EXPEDITION_ENGINEER                 = 33287,
+    NPC_EXPEDITION_DEFENDER                 = 33816,
+    NPC_EXPEDITION_TRAPPER                  = 33259,
+    NPC_DARK_RUNE_GUARDIAN                  = 33388,
+    NPC_DARK_RUNE_WATCHER                   = 33453,
+    NPC_DARK_RUNE_SENTINEL                  = 33846,
+    NPC_RAZORSCALE_DEVOURING_FLAME          = 34188,
 
     // Mimiron
     NPC_MIMIRON_LEVIATHAN_MKII              = 33432,
@@ -284,6 +296,14 @@ enum UlduarGameObjects
     GO_VEZAX_DOOR                           = 194750,
 
     GO_SNOW_MOUND                           = 194907,
+
+    // Razorscale
+    GO_RAZOR_HARPOON_1                      = 194519,
+    GO_RAZOR_HARPOON_2                      = 194541,
+    GO_RAZOR_HARPOON_3                      = 194542,
+    GO_RAZOR_HARPOON_4                      = 194543,
+    GO_RAZOR_BROKEN_HARPOON                 = 194565,
+    GO_RAZOR_MOLE_MACHINE                   = 194316,
 
     // Thorim
     GO_ARENA_LEVER_GATE                     = 194560,
