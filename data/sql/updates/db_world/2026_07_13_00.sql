@@ -1,3 +1,4 @@
+-- DB update 2026_07_12_02 -> 2026_07_13_00
 -- Hodir helpers (#26330): swap PACIFIED (131072) for IMMUNE_TO_NPC (512) per sniffs, so Freya's
 -- instance-wide Ground Tremor can't tag them and block her reset. SWIMMING kept where set;
 -- immunity is cleared on Hodir engage (boss_hodir.cpp).
