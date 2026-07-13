@@ -3184,6 +3184,16 @@ WaypointMovementStopTimeForPlayer = 120
 
 NpcRegenHPIfTargetIsUnreachable = 1
 
+#    Creature.Instance.TeleportToUnreachableTarget
+#        Description: In dungeons and raids, non-boss creatures that cannot path to their
+#                     target teleport to it instead of evading or regenerating in place
+#                     (retail-like behaviour). Bosses and player-controlled creatures are
+#                     not affected.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+Creature.Instance.TeleportToUnreachableTarget = 0
+
 #    Creatures.CustomIDs
 #        Description: The list of custom creatures with gossip dialogues hardcoded in core,
 #                     divided by "," without spaces.
@@ -3733,6 +3743,17 @@ Wintergrasp.KickVoAPlayers = 1
 #                          so both factions can access Vault of Archavon)
 
 Wintergrasp.EssenceBothFactions = 0
+
+#
+#     Wintergrasp.DeferShutdownTimer
+#         Description: Defer a scheduled server shutdown/restart if a Wintergrasp battle
+#                      is still in progress when the countdown elapses. It is rescheduled
+#                      to the battle's remaining time plus this many minutes of buffer.
+#                      Idle shutdowns are not affected.
+#         Default:     0 - (Disabled)
+#                      N - (Enabled, defer to remaining battle time + N minutes)
+
+Wintergrasp.DeferShutdownTimer = 0
 
 #
 ###################################################################################################

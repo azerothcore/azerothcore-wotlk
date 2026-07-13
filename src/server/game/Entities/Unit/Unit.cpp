@@ -7425,22 +7425,21 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
     // set position before any AI calls/assistance
     //if (IsCreature())
     //    ToCreature()->SetCombatStartPosition(GetPositionX(), GetPositionY(), GetPositionZ());
-    if (creature)
+    // player-controlled creatures (pets, charms) enter combat on contact instead
+    // (melee swing execution or spell launch/hit, see Unit::AtTargetAttacked)
+    if (creature && !IsControlledByPlayer())
     {
         EngageWithTarget(victim);
 
-        if (!IsControlledByPlayer())
-        {
-            creature->SendAIReaction(AI_REACTION_HOSTILE);
+        creature->SendAIReaction(AI_REACTION_HOSTILE);
 
-            /// @todo: Implement aggro range, detection range and assistance range templates
-            if (!(creature->HasFlagsExtra(CREATURE_FLAG_EXTRA_DONT_CALL_ASSISTANCE)))
-                creature->CallAssistance();
+        /// @todo: Implement aggro range, detection range and assistance range templates
+        if (!(creature->HasFlagsExtra(CREATURE_FLAG_EXTRA_DONT_CALL_ASSISTANCE)))
+            creature->CallAssistance();
 
-            creature->SetAssistanceTimer(sWorld->getIntConfig(CONFIG_CREATURE_FAMILY_ASSISTANCE_PERIOD));
+        creature->SetAssistanceTimer(sWorld->getIntConfig(CONFIG_CREATURE_FAMILY_ASSISTANCE_PERIOD));
 
-            SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
-        }
+        SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
     }
 
     // delay offhand weapon attack by 50% of the base attack time
@@ -15417,10 +15416,12 @@ void Unit::KnockbackFrom(float x, float y, float speedXY, float speedZ)
         }
     }
 
-    if (!player)
-    {
+    // While feared/confused the client has no control over the unit,
+    // so a SMSG_MOVE_KNOCK_BACK would be ignored or immediately overridden by the server
+    // side fleeing/confused splines. Perform the knockback server side instead; the
+    // fleeing/confused movement generator resumes once this spline is finalized
+    if (!player || !IsClientControlled())
         GetMotionMaster()->MoveKnockbackFrom(x, y, speedXY, speedZ);
-    }
     else
     {
         float vcos, vsin;
@@ -15849,7 +15850,6 @@ void Unit::_ExitVehicle(Position const* exitPosition)
         init.Launch();
         DisableSpline();
         KnockbackFrom(pos.GetPositionX(), pos.GetPositionY(), 10.0f, 20.0f);
-        CastSpell(this, VEHICLE_SPELL_PARACHUTE, true);
     }
 
     // xinef: move fall, should we support all creatures that exited vehicle in air? Currently Quest Drag and Drop only, Air Assault quest
