@@ -52,20 +52,11 @@ struct boss_void_reaver : public BossAI
     void Reset() override
     {
         BossAI::Reset();
-        _recentlySpoken = false;
     }
 
     void KilledUnit(Unit* /*victim*/) override
     {
-        if (!_recentlySpoken)
-        {
-            Talk(SAY_SLAY);
-            _recentlySpoken = true;
-            scheduler.Schedule(5s, [this](TaskContext)
-            {
-                _recentlySpoken = false;
-            });
-        }
+        Talk(SAY_SLAY);
     }
 
     void JustDied(Unit* killer) override
@@ -102,8 +93,6 @@ struct boss_void_reaver : public BossAI
         });
     }
 
-    private:
-        bool _recentlySpoken;
 };
 
 void AddSC_boss_void_reaver()
