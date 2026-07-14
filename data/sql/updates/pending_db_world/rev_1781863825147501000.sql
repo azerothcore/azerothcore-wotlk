@@ -5,11 +5,11 @@ INSERT INTO `command` (`name`, `security`, `help`) VALUES
 ('account flag add', 3, 'Syntax: .account flag add $account $flag\nSets an AccountFlag on $account. $flag is a symbolic name in either its full form (e.g. ACCOUNT_FLAG_TRIAL) or short form (e.g. TRIAL). ACCOUNT_FLAG_GM is managed automatically and cannot be changed manually.'),
 ('account flag remove', 3, 'Syntax: .account flag remove $account $flag\nClears an AccountFlag on $account. $flag is a symbolic name in either its full form (e.g. ACCOUNT_FLAG_TRIAL) or short form (e.g. TRIAL). ACCOUNT_FLAG_GM is managed automatically and cannot be changed manually.');
 
-DELETE FROM `acore_string` WHERE `entry` IN (35455, 35456, 35457, 35458, 35459, 35460);
+DELETE FROM `acore_string` WHERE `entry` IN (35462, 35463, 35464, 35465, 35466, 35467);
 INSERT INTO `acore_string` (`entry`, `content_default`) VALUES
-(35455, 'Account flags set on {} ({}):'),
-(35456, 'Account {} ({}) has no flags set.'),
-(35457, 'Unknown account flag: {}. Use a symbolic name (e.g. ACCOUNT_FLAG_TRIAL or TRIAL).'),
-(35458, 'ACCOUNT_FLAG_GM is managed automatically and cannot be changed manually.'),
-(35459, 'Added {} to account {} ({}).'),
-(35460, 'Removed {} from account {} ({}).');
+(35462, 'Account flags set on {} ({}):'),
+(35463, 'Account {} ({}) has no flags set.'),
+(35464, 'Unknown account flag: {}. Use a symbolic name (e.g. ACCOUNT_FLAG_TRIAL or TRIAL).'),
+(35465, 'ACCOUNT_FLAG_GM is managed automatically and cannot be changed manually.'),
+(35466, 'Added {} to account {} ({}).'),
+(35467, 'Removed {} from account {} ({}).');

@@ -792,8 +792,7 @@ bool Unit::IsWithinMeleeRange(Unit const* obj, float dist) const
 
     float maxdist = dist + GetMeleeRange(obj);
 
-    if ((IsPlayer() || obj->IsPlayer()) && HasLeewayMovement() && obj->HasLeewayMovement())
-        maxdist += LEEWAY_BONUS_RANGE;
+    maxdist += GetLeewayBonusRange(obj);
 
     return distsq < maxdist * maxdist;
 }
@@ -1233,7 +1232,18 @@ uint32 Unit::DealDamage(Unit* attacker, Unit* victim, uint32 damage, CleanDamage
             uint32 unDamage = health < damage ? health : damage;
             bool damagedByPlayer = unDamage && attacker && (attacker->IsPlayer() || attacker->m_movedByPlayer != nullptr
                 || attacker->GetCharmerGUID().IsPlayer());
-            victim->ToCreature()->LowerPlayerDamageReq(unDamage, damagedByPlayer);
+
+            uint8 attackerLevel = 0;
+            if (damagedByPlayer)
+            {
+                Player* attackerPlayer = attacker->GetCharmerOrOwnerPlayerOrPlayerItself();
+                if (!attackerPlayer && attacker->m_movedByPlayer)
+                    attackerPlayer = attacker->m_movedByPlayer->ToPlayer();
+                if (attackerPlayer)
+                    attackerLevel = attackerPlayer->GetLevel();
+            }
+
+            victim->ToCreature()->LowerPlayerDamageReq(unDamage, damagedByPlayer, attackerLevel);
         }
     }
 
@@ -7415,22 +7425,21 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
     // set position before any AI calls/assistance
     //if (IsCreature())
     //    ToCreature()->SetCombatStartPosition(GetPositionX(), GetPositionY(), GetPositionZ());
-    if (creature)
+    // player-controlled creatures (pets, charms) enter combat on contact instead
+    // (melee swing execution or spell launch/hit, see Unit::AtTargetAttacked)
+    if (creature && !IsControlledByPlayer())
     {
         EngageWithTarget(victim);
 
-        if (!IsControlledByPlayer())
-        {
-            creature->SendAIReaction(AI_REACTION_HOSTILE);
+        creature->SendAIReaction(AI_REACTION_HOSTILE);
 
-            /// @todo: Implement aggro range, detection range and assistance range templates
-            if (!(creature->HasFlagsExtra(CREATURE_FLAG_EXTRA_DONT_CALL_ASSISTANCE)))
-                creature->CallAssistance();
+        /// @todo: Implement aggro range, detection range and assistance range templates
+        if (!(creature->HasFlagsExtra(CREATURE_FLAG_EXTRA_DONT_CALL_ASSISTANCE)))
+            creature->CallAssistance();
 
-            creature->SetAssistanceTimer(sWorld->getIntConfig(CONFIG_CREATURE_FAMILY_ASSISTANCE_PERIOD));
+        creature->SetAssistanceTimer(sWorld->getIntConfig(CONFIG_CREATURE_FAMILY_ASSISTANCE_PERIOD));
 
-            SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
-        }
+        SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
     }
 
     // delay offhand weapon attack by 50% of the base attack time
@@ -7573,6 +7582,7 @@ void Unit::UpdatePetCombatState()
 void Unit::AtExitCombat()
 {
     RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_LEAVE_COMBAT);
+    sScriptMgr->OnUnitExitCombat(this);
 }
 
 void Unit::AtEngage(Unit* /*target*/)
@@ -10824,7 +10834,7 @@ bool Unit::_IsValidAttackTarget(Unit const* target, SpellInfo const* bySpell, Wo
         if (Player const* player = target->GetCharmerOrOwnerPlayerOrPlayerItself())
             isContestedPvp = player->HasPlayerFlag(PLAYER_FLAGS_CONTESTED_PVP);
 
-        if (!isContestedGuard && !isContestedPvp)
+        if (!isContestedGuard || !isContestedPvp)
             return false;
     }
 
@@ -11329,22 +11339,7 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
 
     if (forced && IsClientControlled())
     {
-        Player* player = const_cast<Player*>(GetClientControlling());
-        uint32 const counter = player->GetSession()->GetOrderCounter();
-
-        // register forced speed changes for WorldSession::HandleForceSpeedChangeAck
-        // and do it only for real sent packets and use run for run/mounted as client expected
-        ++player->m_forced_speed_changes[mtype];
-
-        WorldPacket data(speedOpcodes[static_cast<size_t>(SpeedOpcodeIndex::PC)], 18);
-        data << GetPackGUID();
-        data << counter;
-        if (mtype == MOVE_RUN)
-            data << uint8(0);                           // new 2.1.0
-
-        data << GetSpeed(mtype);
-        player->GetSession()->SendPacket(&data);
-        player->GetSession()->IncrementOrderCounter();
+        SendSpeedToController(mtype, const_cast<Player*>(GetClientControlling()));
     }
     else if (forced)
     {
@@ -11375,6 +11370,24 @@ void Unit::SetSpeed(UnitMoveType mtype, float rate, bool forced)
         }
         ToPlayer()->SetCanTeleport(true);
     }
+}
+
+void Unit::SendSpeedToController(UnitMoveType mtype, Player* target) const
+{
+    SpeedOpcodePair const& speedOpcodes = SetSpeed2Opc_table[mtype];
+    uint32 const counter = target->GetSession()->GetOrderCounter();
+
+    ++target->m_forced_speed_changes[mtype];
+
+    WorldPacket data(speedOpcodes[static_cast<size_t>(SpeedOpcodeIndex::PC)], 18);
+    data << GetPackGUID();
+    data << counter;
+    if (mtype == MOVE_RUN)
+        data << uint8(0);
+
+    data << GetSpeed(mtype);
+    target->GetSession()->SendPacket(&data);
+    target->GetSession()->IncrementOrderCounter();
 }
 
 void Unit::setDeathState(DeathState s, bool despawn)
@@ -14698,6 +14711,10 @@ bool Unit::SetCharmedBy(Unit* charmer, CharmType type, AuraApplication const* au
     _oldFactionId = GetFaction();
     SetFaction(charmer->GetFaction());
 
+    // snapshot current speed rates so we can detect speed changes
+    for (uint8 i = MOVE_WALK; i < MAX_MOVE_TYPE; ++i)
+        _charmStartSpeedRate[i] = m_speed_rate[i];
+
     // Set charmed
     charmer->SetCharm(this, true);
 
@@ -14849,9 +14866,6 @@ void Unit::RemoveCharmedBy(Unit* charmer)
     CastStop();
     AttackStop();
 
-    // xinef: update speed after charming
-    UpdateSpeed(MOVE_RUN, false);
-
     // xinef: do not break any controlled motion slot
     if (GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_CONTROLLED) == NULL_MOTION_TYPE)
     {
@@ -14954,7 +14968,15 @@ void Unit::RemoveCharmedBy(Unit* charmer)
         RemoveUnitMovementFlag(MOVEMENTFLAG_FLYING);
     }
     else
-        ToPlayer()->SetClientControl(this, true); // verified
+    {
+        Player* targetPlayer = ToPlayer();
+        targetPlayer->SetClientControl(this, true); // verified
+
+        // Re-sync only the speed types that changed during the charm.
+        for (uint8 i = MOVE_WALK; i < MAX_MOVE_TYPE; ++i)
+            if (m_speed_rate[i] != _charmStartSpeedRate[i])
+                SendSpeedToController(UnitMoveType(i), targetPlayer);
+    }
 
     // a guardian should always have charminfo
     if (playerCharmer && this != charmer->GetFirstControlled())
@@ -15394,10 +15416,12 @@ void Unit::KnockbackFrom(float x, float y, float speedXY, float speedZ)
         }
     }
 
-    if (!player)
-    {
+    // While feared/confused the client has no control over the unit,
+    // so a SMSG_MOVE_KNOCK_BACK would be ignored or immediately overridden by the server
+    // side fleeing/confused splines. Perform the knockback server side instead; the
+    // fleeing/confused movement generator resumes once this spline is finalized
+    if (!player || !IsClientControlled())
         GetMotionMaster()->MoveKnockbackFrom(x, y, speedXY, speedZ);
-    }
     else
     {
         float vcos, vsin;
@@ -15826,7 +15850,6 @@ void Unit::_ExitVehicle(Position const* exitPosition)
         init.Launch();
         DisableSpline();
         KnockbackFrom(pos.GetPositionX(), pos.GetPositionY(), 10.0f, 20.0f);
-        CastSpell(this, VEHICLE_SPELL_PARACHUTE, true);
     }
 
     // xinef: move fall, should we support all creatures that exited vehicle in air? Currently Quest Drag and Drop only, Air Assault quest
@@ -15838,7 +15861,7 @@ void Unit::_ExitVehicle(Position const* exitPosition)
     if ((!player || !(player->GetDelayedOperations() & DELAYED_VEHICLE_TELEPORT)) && vehicle->GetBase()->HasUnitTypeMask(UNIT_MASK_MINION))
         if (((Minion*)vehicleBase)->GetOwner() == this)
         {
-            if (!vehicleInfo || vehicleInfo->m_ID != 349)
+            if (!vehicleInfo || (vehicleInfo->m_ID != 349 && vehicleBase->GetEntry() != 28192))
             {
                 vehicle->Dismiss();
             }
