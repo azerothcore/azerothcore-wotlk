@@ -1192,6 +1192,21 @@ void SpellMgr::LoadSpellInfoCorrections()
     {
         spellInfo->Effects[EFFECT_0].TriggerSpell = 11971;
         spellInfo->Effects[EFFECT_0].Effect = SPELL_EFFECT_TRIGGER_SPELL_WITH_VALUE;
+        // Treat Sunder Armor as melee-dmg-class for proc system so talents
+        // like Sword Specialization / Sudden Death can trigger from it.
+        spellInfo->ProcFlags |= PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS;
+    });
+
+    // Rend (ensure treated as melee-dmg-class for procs)
+    ApplySpellFix({ 6547 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->ProcFlags |= PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS;
+    });
+
+    // Hamstring (ensure treated as melee-dmg-class for procs)
+    ApplySpellFix({ 25212 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->ProcFlags |= PROC_FLAG_DONE_SPELL_MELEE_DMG_CLASS;
     });
 
     // Improved Spell Reflection
