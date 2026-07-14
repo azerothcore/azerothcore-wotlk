@@ -700,7 +700,7 @@ struct boss_algalon_the_observer : public ScriptedAI
                         if (summon->GetEntry() == NPC_COLLAPSING_STAR)
                             ++activeStars;
 
-                uint8 missingStars = COLLAPSING_STAR_COUNT - std::min(_activeStars, uint8(COLLAPSING_STAR_COUNT));
+                uint8 missingStars = COLLAPSING_STAR_COUNT - std::min(activeStars, uint8(COLLAPSING_STAR_COUNT));
                 for (uint8 i = 0; i < missingStars; ++i)
                     me->SummonCreature(NPC_COLLAPSING_STAR, CollapsingStarPos[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
 
