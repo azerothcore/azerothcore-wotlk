@@ -693,16 +693,10 @@ struct boss_algalon_the_observer : public ScriptedAI
             {
                 Talk(SAY_ALGALON_COLLAPSING_STAR);
                 Talk(EMOTE_ALGALON_COLLAPSING_STAR);
-
-                uint8 activeStars = 0;
-                for (ObjectGuid const& guid : summons)
-                    if (Creature* summon = ObjectAccessor::GetCreature(*me, guid))
-                        if (summon->GetEntry() == NPC_COLLAPSING_STAR)
-                            ++activeStars;
-
-                uint8 missingStars = COLLAPSING_STAR_COUNT - std::min(activeStars, uint8(COLLAPSING_STAR_COUNT));
-                for (uint8 i = 0; i < missingStars; ++i)
-                    me->SummonCreature(NPC_COLLAPSING_STAR, CollapsingStarPos[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
+                uint8 activeStars = summons.GetEntryCount(NPC_COLLAPSING_STAR);
+                if (activeStars < COLLAPSING_STAR_COUNT)
+                    for (uint8 i = activeStars; i < COLLAPSING_STAR_COUNT; ++i)
+                        me->SummonCreature(NPC_COLLAPSING_STAR, CollapsingStarPos[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
 
                 events.Repeat(1min);
                 break;
