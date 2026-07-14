@@ -260,8 +260,7 @@ struct boss_kalecgos : public BossAI
 
     void KilledUnit(Unit* victim) override
     {
-        if (victim->IsPlayer() && roll_chance_i(50))
-            Talk(SAY_EVIL_SLAY);
+        Talk(SAY_EVIL_SLAY, victim);
     }
 
     private:

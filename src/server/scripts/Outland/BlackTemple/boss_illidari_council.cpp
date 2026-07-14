@@ -98,7 +98,6 @@ enum Misc
     EVENT_SPELL_VANISH_OUT              = 31,
     EVENT_SPELL_ENRAGE                  = 32,
 
-    EVENT_KILL_TALK                     = 100
 };
 
 class VerasEnvenom : public BasicEvent
@@ -262,11 +261,7 @@ struct boss_illidari_council_memberAI : public ScriptedAI
 
     void KilledUnit(Unit*) override
     {
-        if (!events.HasTimeUntilEvent(EVENT_KILL_TALK))
-        {
-            Talk(SAY_COUNCIL_SLAY);
-            events.ScheduleEvent(EVENT_KILL_TALK, 6s);
-        }
+        Talk(SAY_COUNCIL_SLAY);
     }
 
     void JustDied(Unit*) override

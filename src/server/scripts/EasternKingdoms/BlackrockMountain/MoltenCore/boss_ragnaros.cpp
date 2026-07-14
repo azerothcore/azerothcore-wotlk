@@ -209,8 +209,7 @@ struct boss_ragnaros : public BossAI
 
     void KilledUnit(Unit* victim) override
     {
-        if (roll_chance_i(25) && victim->IsPlayer())
-            Talk(SAY_KILL);
+        Talk(SAY_KILL, victim);
     }
 
     void AttackStart(Unit* target) override

@@ -67,7 +67,6 @@ struct boss_gruul : public BossAI
     void Reset() override
     {
         _Reset();
-        _recentlySpoken = false;
         _caveInTimer = 29s;
     }
 
@@ -119,18 +118,9 @@ struct boss_gruul : public BossAI
         });
     }
 
-    void KilledUnit(Unit* /*who*/) override
+    void KilledUnit(Unit* /*victim*/) override
     {
-        if (!_recentlySpoken)
-        {
-            Talk(SAY_SLAY);
-            _recentlySpoken = true;
-        }
-
-        scheduler.Schedule(5s, [this](TaskContext)
-        {
-            _recentlySpoken = false;
-        });
+        Talk(SAY_SLAY);
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -154,7 +144,6 @@ struct boss_gruul : public BossAI
 
 private:
     std::chrono::milliseconds _caveInTimer;
-    bool _recentlySpoken;
 };
 
 struct npc_invisible_tractor_beam_source : public NullCreatureAI

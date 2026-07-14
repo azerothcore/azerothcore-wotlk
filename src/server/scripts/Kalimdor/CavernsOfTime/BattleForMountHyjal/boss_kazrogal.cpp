@@ -52,7 +52,6 @@ public:
 
     void Reset() override
     {
-        _recentlySpoken = false;
         _markCounter = 0;
         BossAI::Reset();
     }
@@ -104,18 +103,10 @@ public:
             me->GetMotionMaster()->MoveWaypoint(HORDE_BOSS_PATH, false);
     }
 
-    void KilledUnit(Unit * victim) override
+    void KilledUnit(Unit* victim) override
     {
-        if (!_recentlySpoken && victim->IsPlayer() && me->IsAlive())
-        {
-            Talk(SAY_ONSLAY);
-            _recentlySpoken = true;
-
-            scheduler.Schedule(6s, [this](TaskContext)
-                {
-                    _recentlySpoken = false;
-                });
-        }
+        if (me->IsAlive())
+            Talk(SAY_ONSLAY, victim);
     }
 
     void JustDied(Unit * killer) override
@@ -125,7 +116,6 @@ public:
     }
 
 private:
-    bool _recentlySpoken;
     uint8 _markCounter;
 };
 

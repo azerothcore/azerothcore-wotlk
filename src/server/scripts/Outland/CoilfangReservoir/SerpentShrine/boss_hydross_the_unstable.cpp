@@ -87,12 +87,11 @@ enum WaterElementalPathIds
 
 struct boss_hydross_the_unstable : public BossAI
 {
-    boss_hydross_the_unstable(Creature* creature) : BossAI(creature, DATA_HYDROSS_THE_UNSTABLE), _recentlySpoken(false) { }
+    boss_hydross_the_unstable(Creature* creature) : BossAI(creature, DATA_HYDROSS_THE_UNSTABLE) { }
 
     void Reset() override
     {
         _Reset();
-        _recentlySpoken = false;
         SummonTaintedElementalOOC();
     }
 
@@ -249,15 +248,7 @@ struct boss_hydross_the_unstable : public BossAI
 
     void KilledUnit(Unit* /*victim*/) override
     {
-        if (!_recentlySpoken)
-        {
-            Talk(me->HasAura(SPELL_CORRUPTION) ? SAY_CORRUPT_SLAY : SAY_CLEAN_SLAY);
-            _recentlySpoken = true;
-        }
-        scheduler.Schedule(6s, [this](TaskContext)
-        {
-            _recentlySpoken = false;
-        });
+        Talk(me->HasAura(SPELL_CORRUPTION) ? SAY_CORRUPT_SLAY : SAY_CLEAN_SLAY);
     }
 
     void JustSummoned(Creature* summon) override
@@ -291,8 +282,6 @@ struct boss_hydross_the_unstable : public BossAI
         Talk(me->HasAura(SPELL_CORRUPTION) ? SAY_CORRUPT_DEATH : SAY_CLEAN_DEATH);
         BossAI::JustDied(killer);
     }
-private:
-    bool _recentlySpoken;
 };
 
 class spell_hydross_cleansing_field_aura : public AuraScript
