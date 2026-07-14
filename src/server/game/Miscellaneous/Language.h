@@ -1517,17 +1517,6 @@ enum AcoreStrings
 
     // Pet rename command
     LANG_PET_RENAME_INVALID             = 35453,
-    LANG_PET_RENAME_SUCCESS             = 35454,
-
-    // NPC showloot command
-    LANG_COMMAND_NPC_SHOWLOOT_ENTRY     = 35455,
-    LANG_COMMAND_NOT_DEAD_OR_NO_LOOT    = 35456,
-    LANG_COMMAND_NPC_SHOWLOOT_HEADER    = 35457,
-    LANG_COMMAND_NPC_SHOWLOOT_MONEY     = 35458,
-    LANG_COMMAND_NPC_SHOWLOOT_ITEMS     = 35459,
-    LANG_COMMAND_NPC_SHOWLOOT_QUEST     = 35460,
-
-    // Wintergrasp shutdown defer
-    LANG_WG_SHUTDOWN_DEFERRED           = 35461
+    LANG_PET_RENAME_SUCCESS             = 35454
 };
 #endif
