@@ -622,7 +622,7 @@ struct boss_algalon_the_observer : public ScriptedAI
 
     bool IsInRoom()
     {
-        if (me->GetExactDist2d(&me->GetHomePosition()) > 45.f || me->GetPositionZ() < 410.f)
+        if (me->GetExactDist2d(&me->GetHomePosition()) > 47.f || me->GetPositionZ() < 410.f)
         {
             DoAction(ACTION_ASCEND);
             return false;
