@@ -52,6 +52,45 @@ protected:
     {
         return (year % 4 == 0 && year % 100 != 0) || (year % 400 == 0);
     }
+
+    // Portable replacement for mktime() when only the date fields need rolling over.
+    // std::mktime rejects pre-1970 dates on MSVC, so tests covering years before 1970
+    // cannot rely on it to normalize month/day overflow (see HolidayDateCalculator.cpp).
+    void NormalizeTm(std::tm& date)
+    {
+        static int const table[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+        auto daysInMonth = [&](int y, int m)
+        {
+            return (m == 2 && IsLeapYear(y)) ? 29 : table[m - 1];
+        };
+
+        int year = date.tm_year + 1900;
+        int month = date.tm_mon + 1;
+        int day = date.tm_mday;
+
+        while (day > daysInMonth(year, month))
+        {
+            day -= daysInMonth(year, month);
+            if (++month > 12)
+            {
+                month = 1;
+                ++year;
+            }
+        }
+        while (day < 1)
+        {
+            if (--month < 1)
+            {
+                month = 12;
+                --year;
+            }
+            day += daysInMonth(year, month);
+        }
+
+        date.tm_year = year - 1900;
+        date.tm_mon = month - 1;
+        date.tm_mday = day;
+    }
 };
 
 // ============================================================
@@ -311,7 +350,7 @@ TEST_F(HolidayDateCalculatorTest, Noblegarden_DayAfterEaster_1900_2200)
         // Calculate expected Noblegarden date (Easter + 1)
         std::tm expectedNoblegarden = easter;
         expectedNoblegarden.tm_mday += 1;
-        mktime(&expectedNoblegarden); // Normalize (handles month rollover)
+        NormalizeTm(expectedNoblegarden); // Normalize (handles month rollover)
 
         // Get calculated Noblegarden from holiday rule
         HolidayRule noblegarden = { 181, HolidayCalculationType::EASTER_OFFSET, 0, 0, 0, 1 };
@@ -343,7 +382,7 @@ TEST_F(HolidayDateCalculatorTest, PilgrimsBounty_SundayBeforeThanksgiving_1900_2
         // Pilgrim's Bounty starts on Sunday before (4 days earlier)
         std::tm expectedPilgrims = thanksgiving;
         expectedPilgrims.tm_mday -= 4;
-        mktime(&expectedPilgrims);
+        NormalizeTm(expectedPilgrims);
 
         // Get calculated date using rule with -4 offset
         HolidayRule pilgrimsBounty = { 404, HolidayCalculationType::NTH_WEEKDAY, 11, 4, static_cast<int>(Weekday::THURSDAY), -4 };
