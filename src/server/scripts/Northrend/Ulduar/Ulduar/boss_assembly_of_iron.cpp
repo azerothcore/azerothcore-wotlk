@@ -135,6 +135,22 @@ static uint8 CountAliveBosses(InstanceScript* instance)
     return count;
 }
 
+// True while any council member other than `me` is still alive and engaged.
+// IsEngaged() (not IsInCombat()) survives Brundir's ~16s CombatStop during
+// Lightning Tendrils, so a lone survivor's reset cannot revive dead members.
+static bool IsAnyAssemblyMemberEngaged(InstanceScript* pInstance, Creature* me)
+{
+    if (!pInstance || !me)
+        return false;
+
+    for (uint8 i = 0; i < 3; ++i)
+        if (Creature* boss = pInstance->GetCreature(DATA_STEELBREAKER + i))
+            if (boss != me && boss->IsAlive() && boss->IsEngaged())
+                return true;
+
+    return false;
+}
+
 bool IsEncounterComplete(InstanceScript* pInstance, Creature* me)
 {
     if (!pInstance || !me)
@@ -186,12 +202,16 @@ struct boss_steelbreaker : public ScriptedAI
     void Reset() override
     {
         me->SetLootMode(0);
-        RespawnAssemblyOfIron(pInstance, me);
 
         _phase = 0;
         events.Reset();
-        if (pInstance)
-            pInstance->SetBossState(BOSS_ASSEMBLY, NOT_STARTED);
+
+        if (!IsAnyAssemblyMemberEngaged(pInstance, me))
+        {
+            RespawnAssemblyOfIron(pInstance, me);
+            if (pInstance)
+                pInstance->SetBossState(BOSS_ASSEMBLY, NOT_STARTED);
+        }
     }
 
     void JustReachedHome() override
@@ -376,14 +396,17 @@ struct boss_runemaster_molgeim : public ScriptedAI
     void Reset() override
     {
         me->SetLootMode(0);
-        RespawnAssemblyOfIron(pInstance, me);
 
         _phase = 0;
         events.Reset();
         summons.DespawnAll();
 
-        if (pInstance)
-            pInstance->SetBossState(BOSS_ASSEMBLY, NOT_STARTED);
+        if (!IsAnyAssemblyMemberEngaged(pInstance, me))
+        {
+            RespawnAssemblyOfIron(pInstance, me);
+            if (pInstance)
+                pInstance->SetBossState(BOSS_ASSEMBLY, NOT_STARTED);
+        }
 
         me->m_Events.AddEventAtOffset(new CastRunesEvent(*me), 8s);
     }
@@ -493,9 +516,7 @@ struct boss_runemaster_molgeim : public ScriptedAI
                 events.RescheduleEvent(EVENT_SHIELD_OF_RUNES, 27s, 34s);
                 break;
             case EVENT_RUNE_OF_DEATH:
-                if (Unit* target = SelectTarget(SelectTargetMethod::Random))
-                    me->CastSpell(target, SPELL_RUNE_OF_DEATH, true);
-
+                DoCastRandomTarget(SPELL_RUNE_OF_DEATH, 0, 0.0f, true, true);
                 Talk(SAY_MOLGEIM_RUNE_DEATH);
                 events.Repeat(30s, 40s);
                 break;
@@ -568,7 +589,6 @@ struct boss_stormcaller_brundir : public ScriptedAI
     {
         SetInvincibility(false);
         me->SetLootMode(0);
-        RespawnAssemblyOfIron(pInstance, me);
 
         _channelTimer = 0;
         _phase = 0;
@@ -580,8 +600,13 @@ struct boss_stormcaller_brundir : public ScriptedAI
         me->SetDisableGravity(false);
         me->SetRegeneratingHealth(true);
         me->SetReactState(REACT_AGGRESSIVE);
-        if (pInstance)
-            pInstance->SetBossState(BOSS_ASSEMBLY, NOT_STARTED);
+
+        if (!IsAnyAssemblyMemberEngaged(pInstance, me))
+        {
+            RespawnAssemblyOfIron(pInstance, me);
+            if (pInstance)
+                pInstance->SetBossState(BOSS_ASSEMBLY, NOT_STARTED);
+        }
     }
 
     void JustReachedHome() override
@@ -756,11 +781,13 @@ struct boss_stormcaller_brundir : public ScriptedAI
                     me->SetDisableGravity(true);
                     me->SetHover(true);
 
-                    me->CombatStop();
+                    // AttackStop (not CombatStop) so he stays in combat while REACT_PASSIVE;
+                    // otherwise UpdateVictim() sees engaged+passive+out-of-combat and evades
+                    // him mid-flight, resetting the whole encounter.
+                    me->AttackStop();
                     me->StopMoving();
                     me->SetReactState(REACT_PASSIVE);
                     me->SetGuidValue(UNIT_FIELD_TARGET, ObjectGuid::Empty);
-                    me->SetUnitFlag(UNIT_FLAG_STUNNED);
 
                     me->CastSpell(me, SPELL_LIGHTNING_TENDRILS, true);
                     me->CastSpell(me, SPELL_LIGHTNING_TENDRILS_2, true);
@@ -780,16 +807,17 @@ struct boss_stormcaller_brundir : public ScriptedAI
                 me->SetHover(false);
                 me->SetReactState(REACT_AGGRESSIVE);
                 me->SetDisableGravity(false);
-                if (Unit* flyTarget = ObjectAccessor::GetUnit(*me, _flyTargetGUID))
-                {
-                    me->Attack(flyTarget, false);
-                }
-
                 me->SetRegeneratingHealth(true);
-                _flyTargetGUID.Clear();
                 me->RemoveAura(sSpellMgr->GetSpellIdForDifficulty(SPELL_LIGHTNING_TENDRILS, me));
                 me->RemoveAura(SPELL_LIGHTNING_TENDRILS_2);
                 DoResetThreatList();
+
+                // AttackStart (not Attack) so MoveChase is re-issued; Attack() alone only
+                // sets the victim, leaving him landed but standing still.
+                if (Unit* flyTarget = ObjectAccessor::GetUnit(*me, _flyTargetGUID))
+                    AttackStart(flyTarget);
+
+                _flyTargetGUID.Clear();
                 events.CancelEvent(EVENT_LIGHTNING_FLIGHT);
                 break;
             case EVENT_ENRAGE:
