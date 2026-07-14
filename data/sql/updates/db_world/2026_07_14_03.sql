@@ -1,3 +1,4 @@
+-- DB update 2026_07_14_02 -> 2026_07_14_03
 -- Reusable option sets for creature text groups
 CREATE TABLE IF NOT EXISTS `creature_text_option_sets` (
     `SetID`         TINYINT UNSIGNED NOT NULL,
