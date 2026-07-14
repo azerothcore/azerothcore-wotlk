@@ -1,3 +1,4 @@
+-- DB update 2026_07_13_00 -> 2026_07_14_00
 -- -------------------------------------------
 -- Acherus: The Ebon Hold (Eastern Plaguelands, map 0)
 -- Ebon Hold Re-haul Part 1: Training Room (Upper Floor)
