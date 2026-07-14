@@ -25,6 +25,8 @@
 #include "SpellScriptLoader.h"
 #include "TemporarySummon.h"
 #include "zulfarrak.h"
+#include <unordered_set>
+#include <cmath>
 
 enum Misc
 {
@@ -125,6 +127,27 @@ public:
         ObjectGuid MurtaGUID;
         ObjectGuid ShadowpriestGUID;
 
+        struct GraveLocation
+        {
+            int32 x;
+            int32 y;
+
+            bool operator==(GraveLocation const& other) const
+            {
+                return x == other.x && y == other.y;
+            }
+        };
+
+        struct GraveLocationHash
+        {
+            std::size_t operator()(GraveLocation const& g) const
+            {
+                return (std::hash<int32>()(g.x) << 1) ^ std::hash<int32>()(g.y);
+            }
+        };
+
+        std::unordered_set<GraveLocation, GraveLocationHash> UsedGraves;
+
         GuidList addsAtBase;
         GuidList movedadds;
 
@@ -134,6 +157,17 @@ public:
         uint32 minor_wave_Timer;
         uint32 addGroupSize;
         uint32 waypoint;
+
+        bool ConsumeGrave(float x, float y)
+        {
+            GraveLocation loc
+            {
+                static_cast<int32>(std::round(x * 100.0f)),
+                static_cast<int32>(std::round(y * 100.0f))
+            };
+
+            return UsedGraves.insert(loc).second;
+        }
 
         void Initialize() override
         {
@@ -465,18 +499,44 @@ class spell_zulfarrak_summon_zulfarrak_zombies : public SpellScript
 
     void HandleSummon(SpellEffIndex effIndex)
     {
+        Creature* trigger = GetCaster()->ToCreature();
+        if (!trigger)
+            return;
+
+        WorldLocation const* dest = GetExplTargetDest();
+        if (!dest)
+            return;
+
         if (effIndex == EFFECT_0)
         {
+            if (InstanceScript* instance = trigger->GetInstanceScript())
+            {
+                auto* zf = static_cast<instance_zulfarrak::instance_zulfarrak_InstanceMapScript*>(instance);
+
+                // Only allow this grave to summon zombies once per instance.
+                if (!zf->ConsumeGrave(dest->GetPositionX(), dest->GetPositionY()))
+                {
+                    PreventHitDefaultEffect(EFFECT_0);
+                    PreventHitDefaultEffect(EFFECT_1);
+                    return;
+                }
+            }
+
+            // Original AzerothCore summon chance.
             if (roll_chance_i(30))
             {
-                PreventHitDefaultEffect(effIndex);
+                PreventHitDefaultEffect(EFFECT_0);
                 return;
             }
         }
-        else if (roll_chance_i(40))
+        else
         {
-            PreventHitDefaultEffect(effIndex);
-            return;
+            // Original AzerothCore summon chance.
+            if (roll_chance_i(40))
+            {
+                PreventHitDefaultEffect(EFFECT_1);
+                return;
+            }
         }
     }
 
