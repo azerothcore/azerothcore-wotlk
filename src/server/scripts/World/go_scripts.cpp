@@ -75,20 +75,6 @@ public:
     }
 };
 
-class go_arena_ready_marker : public GameObjectScript
-{
-public:
-    go_arena_ready_marker() : GameObjectScript("go_arena_ready_marker") { }
-
-    bool OnGossipHello(Player* player, GameObject* /*go*/) override
-    {
-        if (Battleground* bg = player->GetBattleground())
-            bg->ReadyMarkerClicked(player);
-
-        return false;
-    }
-};
-
 /*######
 ## go_ethereum_prison
 ######*/
@@ -1481,7 +1467,8 @@ public:
                 return true;
             }
 
-            player->CastSpell(player, stoneSpell, false);
+            // Cast as the warlock owner so the clicker's trinkets can't proc.
+            owner->CastSpell(player, stoneSpell, true);
 
             // Item has to actually be created to remove a charge on the well.
             if (player->HasItemCount(stoneId))
@@ -1888,7 +1875,6 @@ void AddSC_go_scripts()
 {
     new go_seer_of_zebhalak();
     new go_witherbark_totem_bundle();
-    new go_arena_ready_marker();
     new go_ethereum_prison();
     new go_ethereum_stasis();
     new go_resonite_cask();
