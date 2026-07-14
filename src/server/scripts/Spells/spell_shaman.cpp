@@ -86,7 +86,6 @@ enum ShamanSpells
     SPELL_SHAMAN_T10_ENHANCEMENT_4P_BONUS       = 70832,
     SPELL_SHAMAN_LAVA_BURST_BONUS_DAMAGE        = 71824,
     SPELL_SHAMAN_TOTEM_OF_WRATH_SPELL_POWER     = 63283,
-    SPELL_GENERIC_AURA_OF_DESPAIR               = 64848, // General Vezax (Ulduar)
 };
 
 enum ShamanSpellIcons
@@ -990,17 +989,8 @@ class spell_sha_elemental_focus : public AuraScript
 {
     PrepareAuraScript(spell_sha_elemental_focus);
 
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_GENERIC_AURA_OF_DESPAIR });
-    }
-
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        // Patch 3.2.0: Clearcasting effects are disabled during the General Vezax encounter
-        if (GetTarget()->HasAura(SPELL_GENERIC_AURA_OF_DESPAIR))
-            return false;
-
         if (SpellInfo const* procSpell = eventInfo.GetSpellInfo())
         {
             // Frostbrand Attack (mask0 = 0x1000000), Flametongue Attack (mask0 = 0x200000)

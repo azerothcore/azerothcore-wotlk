@@ -71,8 +71,7 @@ enum MageSpells
     SPELL_MAGE_MANA_SURGE                        = 37445,
     SPELL_MAGE_FROST_NOVA                        = 122,
     SPELL_MAGE_LIVING_BOMB_R1                    = 44457,
-    SPELL_MAGE_MISSILE_BARRAGE_PROC              = 44401,
-    SPELL_GENERIC_AURA_OF_DESPAIR                = 64848  // General Vezax (Ulduar)
+    SPELL_MAGE_MISSILE_BARRAGE_PROC              = 44401
 };
 
 enum MageSpellIcons
@@ -1517,28 +1516,6 @@ class spell_mage_ice_block : public SpellScript
     }
 };
 
-// -11213 - Arcane Concentration
-class spell_mage_arcane_concentration : public AuraScript
-{
-    PrepareAuraScript(spell_mage_arcane_concentration);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_GENERIC_AURA_OF_DESPAIR });
-    }
-
-    bool CheckProc(ProcEventInfo& /*eventInfo*/)
-    {
-        // Patch 3.2.0: Clearcasting effects are disabled during the General Vezax encounter
-        return !GetTarget()->HasAura(SPELL_GENERIC_AURA_OF_DESPAIR);
-    }
-
-    void Register() override
-    {
-        DoCheckProc += AuraCheckProcFn(spell_mage_arcane_concentration::CheckProc);
-    }
-};
-
 // 12536 - Clearcasting
 class spell_mage_clearcasting : public AuraScript
 {
@@ -1633,7 +1610,6 @@ class spell_mage_deep_freeze_immunity_state : public AuraScript
 void AddSC_mage_spell_scripts()
 {
     RegisterSpellScript(spell_mage_arcane_blast);
-    RegisterSpellScript(spell_mage_arcane_concentration);
     RegisterSpellScript(spell_mage_arcane_missiles);
     RegisterSpellScript(spell_mage_arcane_potency);
     RegisterSpellScript(spell_mage_blazing_speed);

@@ -90,7 +90,6 @@ enum DruidSpells
     SPELL_DRUID_BALANCE_T10_BONUS           = 70718,
     SPELL_DRUID_BALANCE_T10_BONUS_PROC      = 70721,
     SPELL_DRUID_LANGUISH                    = 71023,
-    SPELL_GENERIC_AURA_OF_DESPAIR           = 64848, // General Vezax (Ulduar)
     // T9 Feral Relic
     SPELL_DRUID_T9_FERAL_RELIC_BEAR         = 67354,
     SPELL_DRUID_T9_FERAL_RELIC_CAT          = 67355,
@@ -238,15 +237,11 @@ class spell_dru_omen_of_clarity : public AuraScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_DRUID_BALANCE_T10_BONUS, SPELL_DRUID_BALANCE_T10_BONUS_PROC, SPELL_GENERIC_AURA_OF_DESPAIR });
+        return ValidateSpellInfo({ SPELL_DRUID_BALANCE_T10_BONUS, SPELL_DRUID_BALANCE_T10_BONUS_PROC });
     }
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        // Patch 3.2.0: Clearcasting effects are disabled during the General Vezax encounter
-        if (GetTarget()->HasAura(SPELL_GENERIC_AURA_OF_DESPAIR))
-            return false;
-
         SpellInfo const* spellInfo = eventInfo.GetSpellInfo();
         if (!spellInfo)
             return true;
