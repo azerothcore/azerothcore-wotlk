@@ -690,12 +690,23 @@ struct boss_algalon_the_observer : public ScriptedAI
                 events.Repeat(15s + 500ms);
                 break;
             case EVENT_SUMMON_COLLAPSING_STAR:
+            {
                 Talk(SAY_ALGALON_COLLAPSING_STAR);
                 Talk(EMOTE_ALGALON_COLLAPSING_STAR);
-                for (uint8 i = 0; i < COLLAPSING_STAR_COUNT; ++i)
+
+                uint8 _activeStars = 0;
+                for (ObjectGuid const& guid : summons)
+                    if (Creature* summon = ObjectAccessor::GetCreature(*me, guid))
+                        if (summon->GetEntry() == NPC_COLLAPSING_STAR)
+                            ++_activeStars;
+
+                uint8 _missingStars = COLLAPSING_STAR_COUNT - std::min(_activeStars, uint8(COLLAPSING_STAR_COUNT));
+                for (uint8 i = 0; i < _missingStars; ++i)
                     me->SummonCreature(NPC_COLLAPSING_STAR, CollapsingStarPos[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
+
                 events.Repeat(1min);
                 break;
+            }
             case EVENT_COSMIC_SMASH:
                 Talk(EMOTE_ALGALON_COSMIC_SMASH);
                 me->CastCustomSpell(SPELL_COSMIC_SMASH, SPELLVALUE_MAX_TARGETS, RAID_MODE(1, 3), (Unit*)nullptr);
