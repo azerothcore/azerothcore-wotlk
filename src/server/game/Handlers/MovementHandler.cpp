@@ -840,14 +840,20 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket& recvData)
     movementInfo.guid = guid;
     ReadMovementInfo(recvData, &movementInfo);
 
-    mover->m_movementInfo = movementInfo;
+    // Relocate the mover to the acknowledged position. Otherwise the server (and the
+    // MSG_MOVE_KNOCK_BACK broadcast below) keeps using the pre-knockback position until
+    // the next regular movement packet arrives, desyncing the unit for nearby clients
+    if (!ProcessMovementInfo(movementInfo, mover, mover->ToPlayer(), recvData))
+    {
+        recvData.rfinish(); // prevent warnings spam
+        return;
+    }
 
     if (mover->IsPlayer() && static_cast<Player*>(mover)->IsFreeFlying())
         mover->SetCanFly(true);
 
     WorldPacket data(MSG_MOVE_KNOCK_BACK, 66);
-    data << guid.WriteAsPacked();
-    _player->m_mover->BuildMovementPacket(&data);
+    WriteMovementInfo(&data, &movementInfo);
     _player->SetCanTeleport(true);
     // knockback specific info
     data << movementInfo.jump.sinAngle;
