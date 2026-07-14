@@ -64,12 +64,6 @@ Map::~Map()
 
     if (!m_scriptSchedule.empty())
         sScriptMgr->DecreaseScheduledScriptCount(m_scriptSchedule.size());
-
-    for (MapPartition* partition : _partitions)
-    {
-        delete partition;
-    }
-    _partitions.clear();
 }
 
 Map::Map(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent) :
@@ -91,10 +85,10 @@ Map::Map(uint32 id, uint32 InstanceId, uint8 SpawnMode, Map* _parent) :
 
     // Splits the 64x64 map grid into 4 quadrants, this is good for 4 core cpu
     // Can expand the num of partitions, but they should be equal to the num of cpu cores the server is run on
-    _partitions.push_back(new MapPartition(this, 0, 31, 0, 31)); //Northwest
-    _partitions.push_back(new MapPartition(this, 32, 63, 0, 31)); //Northeast
-    _partitions.push_back(new MapPartition(this, 0, 31, 32, 63)); //Southwest
-    _partitions.push_back(new MapPartition(this, 32, 63, 32, 63)); //Southeast
+    _partitions.push_back(std::make_unique<MapPartition>(this, 0, 31, 0, 31)); //Northwest
+    _partitions.push_back(std::make_unique<MapPartition>(this, 32, 63, 0, 31)); //Northeast
+    _partitions.push_back(std::make_unique<MapPartition>(this, 0, 31, 32, 63)); //Southwest
+    _partitions.push_back(std::make_unique<MapPartition>(this, 32, 63, 32, 63)); //Southeast
 }
 
 // Hook called after map is created AND after added to map list
@@ -551,14 +545,15 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
 void Map::UpdateNonPlayerObjects(uint32 const diff)
 {
     // Fork-Join Model Multithreading
-    // Dispatches partitions simultaniously to C++ async thread pool
+    // Dispatches partitions simultaneously to C++ async thread pool
     std::vector<std::future<void>> futures;
-    for (MapPartition* partition : _partitions)
+    for (auto& partition : _partitions)
     {
-        futures.push_back(std::async(std::launch::async, [partition, diff]()
+        MapPartition* rawPartition = partition.get();
+        futures.push_back(std::async(std::launch::async, [rawPartition, diff]()
         {
-            // Runs on seperate cpu thread
-            partition->Update(diff);
+            // Runs on separate cpu thread
+            rawPartition->Update(diff);
         }));
     }
 
@@ -587,33 +582,6 @@ void Map::AddObjectToPendingUpdateList(WorldObject* obj)
     }
 }
 
-// Internal use only
-void Map::_AddObjectToUpdateList(WorldObject* obj)
-{
-    UpdatableMapObject* mapUpdatableObject = dynamic_cast<UpdatableMapObject*>(obj);
-    ASSERT(mapUpdatableObject && mapUpdatableObject->GetUpdateState() == UpdatableMapObject::UpdateState::PendingAdd);
-
-    mapUpdatableObject->SetUpdateState(UpdatableMapObject::UpdateState::Updating);
-    mapUpdatableObject->SetMapUpdateListOffset(_updatableObjectList.size());
-    _updatableObjectList.push_back(obj);
-}
-
-// Internal use only
-void Map::_RemoveObjectFromUpdateList(WorldObject* obj)
-{
-    UpdatableMapObject* mapUpdatableObject = dynamic_cast<UpdatableMapObject*>(obj);
-    ASSERT(mapUpdatableObject && mapUpdatableObject->GetUpdateState() == UpdatableMapObject::UpdateState::Updating);
-
-    if (obj != _updatableObjectList.back())
-    {
-        dynamic_cast<UpdatableMapObject*>(_updatableObjectList.back())->SetMapUpdateListOffset(mapUpdatableObject->GetMapUpdateListOffset());
-        std::swap(_updatableObjectList[mapUpdatableObject->GetMapUpdateListOffset()], _updatableObjectList.back());
-    }
-
-    _updatableObjectList.pop_back();
-    mapUpdatableObject->SetUpdateState(UpdatableMapObject::UpdateState::NotUpdating);
-}
-
 void Map::RemoveObjectFromMapUpdateList(WorldObject* obj)
 {
     if (!obj->CanBeAddedToMapUpdateList())
@@ -622,11 +590,9 @@ void Map::RemoveObjectFromMapUpdateList(WorldObject* obj)
     UpdatableMapObject* mapUpdatableObject = dynamic_cast<UpdatableMapObject*>(obj);
     if (!mapUpdatableObject)
         return;
-    if (mapUpdatableObject->GetUpdateState() == UpdatableMapObject::UpdateState::PendingAdd)
-        _pendingAddUpdatableObjectList.erase(obj);
-    else if (mapUpdatableObject->GetUpdateState() == UpdatableMapObject::UpdateState::Updating)
+    if (mapUpdatableObject->GetUpdateState() == UpdatableMapObject::UpdateState::Updating)
     {
-        for (MapPartition* p : _partitions)
+        for (auto& p : _partitions)
         {
             p->RemoveObject(obj);
         }
@@ -835,7 +801,7 @@ void Map::CreatureRelocation(Creature* creature, float x, float y, float z, floa
 
     if (old_cell.DiffGrid(new_cell) || old_cell.DiffCell(new_cell))
     {
-        //Removed EnsureGridLoaded(new_cell), runs syncronously in MoveAllCreatures later and will corrupt pathfinding if ran here
+        EnsureGridLoaded(new_cell);
         AddCreatureToMoveList(creature);
     }
     else
@@ -855,7 +821,7 @@ void Map::GameObjectRelocation(GameObject* go, float x, float y, float z, float 
 
     if (old_cell.DiffGrid(new_cell) || old_cell.DiffCell(new_cell))
     {
-        //Removed EnsureGridLoaded(new_cell), runs syncronously in MoveAllCreatures later and will corrupt pathfinding if ran here
+        EnsureGridLoaded(new_cell);
         AddGameObjectToMoveList(go);
     }
     else
@@ -3540,15 +3506,23 @@ std::string InstanceMap::GetDebugInfo() const
     return sstr.str();
 }
 
-// Finds which of the partitions the coordniates belongs to
+// Finds which of the partitions the coordinates belongs to
 MapPartition* Map::GetPartition(uint16 gridX, uint16 gridY)
 {
-    for (MapPartition* partition : _partitions)
+    for (auto& partition : _partitions)
     {
         if (partition->Contains(gridX, gridY))
         {
-            return partition;
+            return partition.get();
         }
     }
     return nullptr;
+}
+
+size_t Map::GetUpdatableObjectsCount() const
+{
+    size_t count = 0;
+    for (auto const& p : _partitions)
+        count += p->GetUpdatableObjectsCount();
+    return count;
 }

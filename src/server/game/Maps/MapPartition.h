@@ -65,13 +65,15 @@ public:
      * @brief Removes an entity from the partitions update loop
      * @param obj The entity leaving the partition
      */
-    void RemoveObject(WorldObject* obj);
+    bool RemoveObject(WorldObject* obj);
 
     /**
      * @brief Safely queues an entity to be added to this partition
      * @param obj the entity to queue
      */
     void QueueTransfer(WorldObject* obj);
+
+    size_t GetUpdatableObjectsCount() const { return _updatableObjects.size(); }
 
     /**
      * @brief Checks if a grid coordinate is within the partition

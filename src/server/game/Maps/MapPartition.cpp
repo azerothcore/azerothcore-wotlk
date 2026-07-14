@@ -25,7 +25,7 @@
 #include "DynamicObject.h"
 #include "Corpse.h"
 
-// Constructor: Initializes a MapPartition object with its parent map and grid boudnaries
+// Constructor: Initializes a MapPartition object with its parent map and grid boundaries
 MapPartition::MapPartition(Map* parent, uint16 minGridX, uint16 maxGridX, uint16 minGridY, uint16 maxGridY)
     : _parentMap(parent), _minX(minGridX), _maxX(maxGridX), _minY(minGridY), _maxY(maxGridY)
 {
@@ -44,7 +44,7 @@ void MapPartition::AddObject(WorldObject* obj)
 }
 
 // Removes a world object from being updated by this partition
-void MapPartition::RemoveObject(WorldObject* obj)
+bool MapPartition::RemoveObject(WorldObject* obj)
 {
     // Finds the objects exact index in the vector
     auto it = std::find(_updatableObjects.begin(), _updatableObjects.end(), obj);
@@ -54,12 +54,17 @@ void MapPartition::RemoveObject(WorldObject* obj)
         *it = _updatableObjects.back();
         _updatableObjects.pop_back();
 
-        UpdatableMapObject* mapUpdatableObject = dynamic_cast<UpdatableMapObject*>(obj);
-        if (mapUpdatableObject)
+        if (obj)
         {
-            mapUpdatableObject->SetUpdateState(UpdatableMapObject::UpdateState::NotUpdating);
+            UpdatableMapObject* mapUpdatableObject = dynamic_cast<UpdatableMapObject*>(obj);
+            if (mapUpdatableObject)
+            {
+                mapUpdatableObject->SetUpdateState(UpdatableMapObject::UpdateState::NotUpdating);
+            }
         }
+        return true;
     }
+    return false;
 }
 
 //Pushes a world object into the transfer queue
@@ -99,7 +104,7 @@ void MapPartition::Update(uint32 const diff)
         }
     }
 
-    // Conditionally increment i inside the loop to avoid skipping swaped elements
+    // Conditionally increment i inside the loop to avoid skipping swapped elements
     for (uint32 i = 0; i < _updatableObjects.size();)
     {
         WorldObject* obj = _updatableObjects[i];
@@ -107,7 +112,10 @@ void MapPartition::Update(uint32 const diff)
         // skips the loop if the object was deleted from memory or is not in the world
         if (!obj || !obj->IsInWorld())
         {
-            RemoveObject(obj);
+            if (!RemoveObject(obj))
+            {
+                ++i; // Forces increment to prevent infinite spin if obj isnt found
+            }
             continue;
         }
 

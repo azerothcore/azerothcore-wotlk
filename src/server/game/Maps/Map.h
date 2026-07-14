@@ -536,7 +536,7 @@ public:
         _updateObjects.erase(obj);
     }
 
-    size_t GetUpdatableObjectsCount() const { return _updatableObjectList.size(); }
+    size_t GetUpdatableObjectsCount() const;
 
     virtual std::string GetDebugInfo() const;
 
@@ -569,7 +569,7 @@ public:
     MapCollisionData const& GetMapCollisionData()  const { return _mapCollisionData; }
 
     MapPartition* GetPartition(uint16 gridX, uint16 gridY);
-    std::vector<MapPartition*> const& GetPartitions() const { return _partitions; }
+    std::vector<std::unique_ptr<MapPartition>> const& GetPartitions() const { return _partitions; }
 
     // protects i_objectsForDelayedVisibility when multiple partitions Uint::Update call insert() concurrently
     std::mutex _delayedVisibilityLock;
@@ -589,7 +589,7 @@ private:
     std::vector<Creature*> _creaturesToMove;
     std::vector<GameObject*> _gameObjectsToMove;
     std::vector<DynamicObject*> _dynamicObjectsToMove;
-    std::vector<MapPartition*> _partitions;
+    std::vector<std::unique_ptr<MapPartition>> _partitions;
 
     bool EnsureGridLoaded(Cell const& cell);
     MapGridType* GetMapGrid(uint16 const x, uint16 const y);
@@ -647,9 +647,6 @@ private:
 
     void UpdateNonPlayerObjects(uint32 const diff);
 
-    void _AddObjectToUpdateList(WorldObject* obj);
-    void _RemoveObjectFromUpdateList(WorldObject* obj);
-
     std::unordered_map<ObjectGuid::LowType /*dbGUID*/, time_t> _creatureRespawnTimes;
     std::unordered_map<ObjectGuid::LowType /*dbGUID*/, time_t> _goRespawnTimes;
 
@@ -702,13 +699,11 @@ private:
 
     // mutex prevents unordered_set corruption during the multithreaded MapPartition updates
     std::mutex _updateObjectsLock;
-    // protects _creaturesToMove, _gameObjectsToMove, _dynamicObjectsToMove when mutliple partitions trigger object relocations concurrently
+    // protects _creaturesToMove, _gameObjectsToMove, _dynamicObjectsToMove when multiple partitions trigger object relocations concurrently
     std::mutex _moveListLock;
 
     std::unordered_set<Object*> _updateObjects;
 
-    UpdatableObjectList _updatableObjectList;
-    PendingAddUpdatableObjectList _pendingAddUpdatableObjectList;
     IntervalTimer _updatableObjectListRecheckTimer;
     ZoneWideVisibleWorldObjectsMap _zoneWideVisibleWorldObjectsMap;
 };
