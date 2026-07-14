@@ -47,6 +47,7 @@ enum VezaxSpellData
     SPELL_CORRUPTED_WISDOM                      = 64646,
     SPELL_SHAMANISTIC_RAGE                      = 30823,
     SPELL_JUDGEMENTS_OF_THE_WISDOM_RANK_1       = 31876,
+    SPELL_DRUID_CLEARCASTING                    = 16870,
 
     SPELL_SUMMON_SARONITE_VAPORS                = 63081,
     NPC_SARONITE_VAPORS                         = 33488,
@@ -404,7 +405,7 @@ class spell_aura_of_despair_aura : public AuraScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_AURA_OF_DESPAIR_2, SPELL_CORRUPTED_RAGE, SPELL_CORRUPTED_WISDOM });
+        return ValidateSpellInfo({ SPELL_AURA_OF_DESPAIR_2, SPELL_CORRUPTED_RAGE, SPELL_CORRUPTED_WISDOM, SPELL_DRUID_CLEARCASTING });
     }
 
     void OnApply(AuraEffect const*  /*aurEff*/, AuraEffectHandleModes  /*mode*/)
@@ -416,6 +417,10 @@ class spell_aura_of_despair_aura : public AuraScript
                     return;
 
                 target->CastSpell(target, SPELL_AURA_OF_DESPAIR_2, true);
+
+                // Patch 3.2.0: Omen of Clarity can no longer trigger Clearcasting during the encounter
+                target->ApplySpellImmune(SPELL_AURA_OF_DESPAIR_2, IMMUNITY_ID, SPELL_DRUID_CLEARCASTING, true);
+
                 if (target->HasSpell(SPELL_SHAMANISTIC_RAGE))
                     caster->CastSpell(target, SPELL_CORRUPTED_RAGE, true);
                 else if (target->HasSpell(SPELL_JUDGEMENTS_OF_THE_WISDOM_RANK_1) || target->HasSpell(SPELL_JUDGEMENTS_OF_THE_WISDOM_RANK_1 + 1) || target->HasSpell(SPELL_JUDGEMENTS_OF_THE_WISDOM_RANK_1 + 2))
@@ -430,6 +435,8 @@ class spell_aura_of_despair_aura : public AuraScript
             target->RemoveAurasDueToSpell(SPELL_AURA_OF_DESPAIR_2);
             target->RemoveAurasDueToSpell(SPELL_CORRUPTED_RAGE);
             target->RemoveAurasDueToSpell(SPELL_CORRUPTED_WISDOM);
+
+            target->ApplySpellImmune(SPELL_AURA_OF_DESPAIR_2, IMMUNITY_ID, SPELL_DRUID_CLEARCASTING, false);
         }
     }
 
