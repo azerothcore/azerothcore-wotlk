@@ -426,6 +426,12 @@ void WorldConfig::BuildConfigCache()
 
     SetConfigValue<uint32>(CONFIG_BATTLEGROUND_PREP_TIME, "Battleground.PrepTime", 120);
     SetConfigValue<uint32>(CONFIG_BATTLEGROUND_OVERRIDE_LOWLEVELS_MINPLAYERS, "Battleground.Override.LowLevels.MinPlayers", 0);
+    SetConfigValue<uint32>(CONFIG_BATTLEGROUND_OVERRIDE_LOWLEVELS_MINPLAYERS_AV, "Battleground.Override.LowLevels.MinPlayers.AV", 0);
+    SetConfigValue<uint32>(CONFIG_BATTLEGROUND_OVERRIDE_LOWLEVELS_MINPLAYERS_WS, "Battleground.Override.LowLevels.MinPlayers.WS", 0);
+    SetConfigValue<uint32>(CONFIG_BATTLEGROUND_OVERRIDE_LOWLEVELS_MINPLAYERS_AB, "Battleground.Override.LowLevels.MinPlayers.AB", 0);
+    SetConfigValue<uint32>(CONFIG_BATTLEGROUND_OVERRIDE_LOWLEVELS_MINPLAYERS_EY, "Battleground.Override.LowLevels.MinPlayers.EY", 0);
+    SetConfigValue<uint32>(CONFIG_BATTLEGROUND_OVERRIDE_LOWLEVELS_MINPLAYERS_SA, "Battleground.Override.LowLevels.MinPlayers.SA", 0);
+    SetConfigValue<uint32>(CONFIG_BATTLEGROUND_OVERRIDE_LOWLEVELS_MINPLAYERS_IC, "Battleground.Override.LowLevels.MinPlayers.IC", 0);
     SetConfigValue<bool>(CONFIG_BATTLEGROUND_DISABLE_QUEST_SHARE_IN_BG, "Battleground.DisableQuestShareInBG", false);
     SetConfigValue<bool>(CONFIG_BATTLEGROUND_DISABLE_READY_CHECK_IN_BG, "Battleground.DisableReadyCheckInBG", false);
     SetConfigValue<bool>(CONFIG_BATTLEGROUND_CAST_DESERTER, "Battleground.CastDeserter", true);
