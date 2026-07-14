@@ -698,10 +698,10 @@ struct boss_algalon_the_observer : public ScriptedAI
                 for (ObjectGuid const& guid : summons)
                     if (Creature* summon = ObjectAccessor::GetCreature(*me, guid))
                         if (summon->GetEntry() == NPC_COLLAPSING_STAR)
-                            ++_activeStars;
+                            ++activeStars;
 
                 uint8 missingStars = COLLAPSING_STAR_COUNT - std::min(_activeStars, uint8(COLLAPSING_STAR_COUNT));
-                for (uint8 i = 0; i < _missingStars; ++i)
+                for (uint8 i = 0; i < missingStars; ++i)
                     me->SummonCreature(NPC_COLLAPSING_STAR, CollapsingStarPos[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
 
                 events.Repeat(1min);
