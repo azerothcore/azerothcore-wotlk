@@ -1,3 +1,4 @@
+-- DB update 2026_07_14_00 -> 2026_07_14_01
 -- -------------------------------------------
 -- Acherus: The Ebon Hold (Eastern Plaguelands, map 0)
 -- Ebon Hold Re-haul Part 2: Command Center (Bottom Floor)
