@@ -1,3 +1,4 @@
+-- DB update 2026_07_15_02 -> 2026_07_15_03
 -- Yogg Portal 'Descend Into Madness'
 -- Movement flags: DisableGravity + Root
 DELETE FROM `creature_template_movement` WHERE (`CreatureId` = 34072);
