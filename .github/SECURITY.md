@@ -23,10 +23,10 @@ We support the following versions of dependencies.
 ### Supported Operating Systems
 
 | Linux (Ubuntu) |       Status       |     Recommended      |
-| :------------- | :----------------: | :------------------: |
-| 24.04          | :white_check_mark: | :large_blue_diamond: |
-| 22.04          | :white_check_mark: |                      |
-| 20.04 ≤        |    :red_circle:    |                      |
+|:---------------| :----------------: | :------------------: |
+| 26.04          | :white_check_mark: | :large_blue_diamond: |
+| 24.04          | :white_check_mark: |                      |
+| 22.04 ≤        |    :red_circle:    |                      |
 
 | macOS |       Status       |     Recommended      |
 | :---- | :----------------: | :------------------: |
