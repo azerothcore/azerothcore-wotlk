@@ -18,6 +18,7 @@ This PR proposes changes to:
 > You are expected to fully understand the changes you submit and to be able to explain and justify them when maintainers ask.
 
 - [ ] AI tools (e.g. Claude, ChatGPT, or similar) were used entirely or partially to prepare this pull request. If checked, specify which tools and models below.
+   - Tools/models used:
 - [ ] I have read and understood the [AC guidelines for AI Agentic Engineering](https://www.azerothcore.org/wiki/agentic-engineering)
 
 ## Issues Addressed:
