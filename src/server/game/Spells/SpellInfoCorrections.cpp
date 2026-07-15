@@ -5345,6 +5345,13 @@ void SpellMgr::LoadSpellInfoCorrections()
     vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(1520)); // Wyrmrest Vanquisher
     vse->m_flags |= VEHICLE_SEAT_FLAG_PASSENGER_NOT_SELECTABLE;
 
+    // Salvaged Siege Engine (Ulduar) extra passenger seats: the only salvaged vehicle seats
+    // without this flag, leaving those passengers targetable by Flame Leviathan's AoE
+    vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(4026));
+    vse->m_flags |= VEHICLE_SEAT_FLAG_PASSENGER_NOT_SELECTABLE;
+    vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(4027));
+    vse->m_flags |= VEHICLE_SEAT_FLAG_PASSENGER_NOT_SELECTABLE;
+
     // pussywizard: fix z offset for some vehicles:
     vse = const_cast<VehicleSeatEntry*>(sVehicleSeatStore.LookupEntry(6206)); // Marrowgar - Bone Spike
     vse->m_attachmentOffsetZ = 4.0f;
