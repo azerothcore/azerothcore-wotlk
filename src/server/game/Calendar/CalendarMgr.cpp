@@ -483,7 +483,7 @@ uint32 CalendarMgr::GetPlayerNumPending(ObjectGuid guid)
 std::string CalendarEvent::BuildCalendarMailSubject(ObjectGuid remover) const
 {
     std::ostringstream strm;
-    strm << remover.ToString() << ':' << _title;
+    strm << remover.GetRawValue() << ':' << _title;
     return strm.str();
 }
 
