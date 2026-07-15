@@ -550,10 +550,12 @@ struct boss_thorim : public BossAI
                 if (_hardMode)
                     chestId += 1; // hard mode offset
 
-                if ((go = me->SummonGameObject(chestId, 2134.73f, -286.32f, 419.51f, 4.65f, 0, 0, 0, 0, 0)))
+                // Summoned by the map, not Thorim, so the chest survives his despawn during the outro.
+                if ((go = me->GetMap()->SummonGameObject(chestId, 2134.73f, -286.32f, 419.51f, 4.65f, 0, 0, 0, 0, 0)))
                 {
                     go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
                     go->SetLootRecipient(me->GetMap());
+                    go->SetRespawnTime(7 * DAY);
                 }
 
                 // Defeat credit
