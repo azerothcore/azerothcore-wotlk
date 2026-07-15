@@ -1317,13 +1317,11 @@ void SmartAI::WaypointReached(uint32 nodeId, uint32 pathId)
     }
 }
 
-void SmartAI::WaypointPathEnded(uint32 nodeId, uint32 pathId)
+void SmartAI::WaypointPathEnded(uint32 /*nodeId*/, uint32 /*pathId*/)
 {
-    if (!HasEscortState(SMART_ESCORT_ESCORTING))
-    {
-        GetScript()->ProcessEventsFor(SMART_EVENT_WAYPOINT_ENDED, nullptr, nodeId, pathId);
-        return;
-    }
+    // WAYPOINT_ENDED is fired from SmartAI::PathEndReached (the waypoint generator calls both
+    // hooks at path end); firing it here too made the event trigger twice. PathEndReached also
+    // runs first, while me->GetWaypointPath() is still valid for the event's pathId filter.
 }
 
 void SmartAI::DistancingEnded()
