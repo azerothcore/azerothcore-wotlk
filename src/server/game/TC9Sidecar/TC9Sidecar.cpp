@@ -28,6 +28,8 @@
 #include "UpdateTime.h"
 #include "WorldSessionMgr.h"
 
+#include <limits>
+
 #define AVAILABLE_MAPS_ALL_MAPS ""
 
 MonitoringDataCollectorResponse HandleMonitoringRequest();
@@ -157,6 +159,25 @@ void ToCloud9Sidecar::OnPlayerLeftBattleground(uint64 playerGUID, uint32 realmID
 void ToCloud9Sidecar::OnBattlegroundStatusChanged(uint32 instanceID, uint8 status)
 {
     TC9BattlegroundStatusChanged(instanceID, status);
+}
+
+bool ToCloud9Sidecar::NatsPublish(std::string const& subject, std::string const& payload)
+{
+    if (!_clusterModeEnabled)
+        return false;
+
+    if (payload.size() > size_t(std::numeric_limits<int>::max()))
+        return false;
+
+    return TC9NatsPublish(subject.c_str(), payload.c_str(), int(payload.size())) == 0;
+}
+
+bool ToCloud9Sidecar::NatsSubscribe(std::string const& subject, void (*handler)(const char*, const char*, int))
+{
+    if (!_clusterModeEnabled || !handler)
+        return false;
+
+    return TC9NatsSubscribe(subject.c_str(), handler) == 0;
 }
 
 void ToCloud9Sidecar::OnMapsReassigned(uint32* addedMaps, int addedMapsSize, uint32* removedMaps, int removedMapsSize)

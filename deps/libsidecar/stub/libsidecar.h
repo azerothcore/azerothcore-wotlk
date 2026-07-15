@@ -32,6 +32,13 @@ uint64_t TC9GetNextAvailableInstanceGuid(int realmID);
 /* Map loading notification */
 void TC9ReadyToAcceptPlayersFromMaps(uint32_t* maps, int mapsLen);
 
+/* Generic NATS pub/sub for in-process extensions. Subscribe callbacks run
+ * on the thread that calls TC9ProcessEventsHooks. Call after TC9InitLib.
+ * Both return 0 on success, -1 on error. */
+typedef void (*TC9NatsMessageHandler)(const char* subject, const char* payload, int payloadLen);
+int TC9NatsPublish(const char* subject, const char* payload, int payloadLen);
+int TC9NatsSubscribe(const char* subject, TC9NatsMessageHandler handler);
+
 /* Matchmaking notifications */
 void TC9PlayerLeftBattleground(uint64_t playerGUID, uint32_t realmID, uint32_t instanceID);
 void TC9BattlegroundStatusChanged(uint32_t instanceID, uint8_t status);

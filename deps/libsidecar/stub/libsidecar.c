@@ -117,6 +117,10 @@ void TC9SetOnMapsReassignedHook(OnMapsReassignedHook h) { panicWithTC9Unavailabl
 //
 void TC9SetMonitoringDataCollectorHandler(MonitoringDataCollectorHandler h) { panicWithTC9Unavailable("TC9SetOnMapsReassignedHook"); }
 
+// TC9NatsPublish/Subscribe generic NATS pub/sub for in-process extensions
+int TC9NatsPublish(const char* subject, const char* payload, int payloadLen) { panicWithTC9Unavailable("TC9NatsPublish"); return -1; }
+int TC9NatsSubscribe(const char* subject, TC9NatsMessageHandler handler) { panicWithTC9Unavailable("TC9NatsSubscribe"); return -1; }
+
 // TC9PlayerLeftBattleground notifies matchmaking server that player left battleground
 //
 void TC9PlayerLeftBattleground(uint64_t playerGUID, uint32_t realmID, uint32_t instanceID) { panicWithTC9Unavailable("TC9PlayerLeftBattleground"); }
