@@ -1,3 +1,4 @@
+-- DB update 2026_06_01_00 -> 2026_07_15_00
 -- RBAC permissions for core commands migrated off deprecated GM security levels.
 DELETE FROM `rbac_permissions` WHERE `id` BETWEEN 926 AND 938;
 INSERT INTO `rbac_permissions` (`id`, `name`) VALUES
