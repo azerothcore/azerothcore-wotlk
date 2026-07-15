@@ -952,6 +952,14 @@ struct npc_ulduar_leviathan_mkii : public ScriptedAI
         _events.Reset();
     }
 
+    void AttackStart(Unit* who) override
+    {
+        ScriptedAI::AttackStart(who);
+        // Unit::Attack clears the emote state on target switch, which would retract VX-001's arms
+        if (_phase == 4)
+            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
+    }
+
     void SetData(uint32 id, uint32 value) override
     {
         if (id == 1) // setting phase to start fighting
@@ -985,6 +993,8 @@ struct npc_ulduar_leviathan_mkii : public ScriptedAI
                     if (Unit* target = SelectTargetFromPlayerList(75.0f))
                         AttackStart(target);
                     DoZoneInCombat();
+                    // The assembled V0-L7R-ON animates through its vehicle base; this state keeps VX-001's arms deployed
+                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
                     _events.Reset();
                     _events.ScheduleEvent(EVENT_SPELL_SHOCK_BLAST, 20s);
                     _events.ScheduleEvent(EVENT_PROXIMITY_MINES_1, 6s);
@@ -1380,7 +1390,8 @@ struct npc_ulduar_vx001 : public ScriptedAI
                     if (Unit* vb = me->GetVehicleBase())
                     {
                         vb->SendMeleeAttackStop();
-                        vb->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
+                        // Keep the arms-deployed state so the model returns to it after the one-shot pulse animation
+                        vb->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
 
                         if (!_leftArm)
                         {
