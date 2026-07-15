@@ -317,6 +317,7 @@ enum UlduarPersistentData
     PERSISTENT_DATA_ALGALON_TIMER,
     PERSISTENT_DATA_C_OF_ULDUAR_MASK,
     PERSISTENT_DATA_MAGE_BARRIER,
+    PERSISTENT_DATA_ALGALON_FIRST_ATTEMPT,
     MAX_PERSISTENT_DATA
 };
 
@@ -342,6 +343,7 @@ enum UlduarMisc
     ACTION_FEEDS_ON_TEARS_FAILED            = 0,
     ACTION_INIT_ALGALON                     = 1,
     ACTION_DESPAWN_ALGALON                  = 2,
+    ACTION_REPLAY_ARRIVAL_VISUAL            = 9,
 
     TIMER_ALGALON_DEFEATED                  = 300,
     TIMER_ALGALON_TO_SUMMON                 = 200,

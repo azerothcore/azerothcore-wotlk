@@ -76,8 +76,9 @@ enum Spells
 
 enum Actions
 {
-    //ACTION_INIT_ALGALON       = 1, defined in ulduar.h
-    //ACTION_DESPAWN_ALGALON    = 2, defined in ulduar.h
+    //ACTION_INIT_ALGALON             = 1, defined in ulduar.h
+    //ACTION_DESPAWN_ALGALON          = 2, defined in ulduar.h
+    //ACTION_REPLAY_ARRIVAL_VISUAL    = 9, defined in ulduar.h
     ACTION_START_INTRO      = 3,
     ACTION_FINISH_INTRO     = 4,
     ACTION_ACTIVATE_STAR    = 5,
@@ -118,7 +119,7 @@ enum Events
     EVENT_INTRO_2                   = 7,
     EVENT_INTRO_3                   = 8,
     EVENT_INTRO_FINISH              = 9,
-    EVENT_START_COMBAT              = 10,
+    EVENT_ACTIVATE_EFFECTS          = 10,
     EVENT_INTRO_TIMER_DONE          = 11,
     EVENT_QUANTUM_STRIKE            = 12,
     EVENT_PHASE_PUNCH               = 13,
@@ -152,6 +153,8 @@ enum Events
 
     // Living Constellation
     EVENT_ARCANE_BARRAGE            = 41,
+
+    EVENT_SPEAK_AGGRO               = 42,
 };
 
 enum EncounterPhases
@@ -260,25 +263,53 @@ private:
     Unit* _caster;
 };
 
+// He respawns already sitting on his landing spot (TempSummon respawn uses
+// GetHomePosition(), which was pinned to AlgalonLandPos on the original intro), so a
+// MovePoint there is zero-distance and MovementInform(POINT_ALGALON_LAND) never fires
+// to clear gravity/the lightning glow. Clear them on a plain timer instead.
+class AlgalonArrivalVisualEndEvent : public BasicEvent
+{
+public:
+    AlgalonArrivalVisualEndEvent(Unit* algalon) : _algalon(algalon)
+    {
+    }
+
+    bool Execute(uint64 /*execTime*/, uint32 /*diff*/) override
+    {
+        _algalon->SetDisableGravity(false);
+        _algalon->RemoveAurasDueToSpell(SPELL_RIDE_THE_LIGHTNING);
+        return true;
+    }
+
+private:
+    Unit* _algalon;
+};
+
 struct boss_algalon_the_observer : public ScriptedAI
 {
     boss_algalon_the_observer(Creature* creature) : ScriptedAI(creature), summons(me)
     {
         _fedOnTears = true;
-        _firstPull = true;
         _fightWon = false;
         _instance = me->GetInstanceScript();
+        _firstResetSinceCreation = true;
     }
 
     EventMap events;
     SummonList summons;
     InstanceScript* _instance;
 
-    bool _firstPull;
     bool _fightWon;
     bool _phaseTwo;
     bool _fedOnTears;
     bool _heraldOfTheTitans;
+
+    // CreatureAI::EnterEvadeMode() calls Reset() synchronously, then - because Algalon
+    // has CREATURE_FLAG_EXTRA_HARD_RESET - despawns him and schedules a real TempSummon
+    // respawn ~20s later, which constructs a brand new AI instance and calls Reset()
+    // again as its very first call. This flag is only ever true on that first call, so
+    // it tells apart "about to despawn" resets from "just actually respawned" ones.
+    bool _firstResetSinceCreation;
 
     bool IsValidHeraldItem(ItemTemplate const* item)
     {
@@ -357,14 +388,15 @@ struct boss_algalon_the_observer : public ScriptedAI
             me->SetInCombatWithZone();
             return;
         }
-        else if (events.GetPhaseMask() & PHASE_NORMAL)
+
+        if (_instance)
+            _instance->SetBossState(BOSS_ALGALON, FAIL);
+
+        if (events.GetPhaseMask() & PHASE_NORMAL)
         {
             DoAction(ACTION_ASCEND);
             return;
         }
-
-        if (_instance)
-            _instance->SetBossState(BOSS_ALGALON, FAIL);
 
         ScriptedAI::EnterEvadeMode(why);
     }
@@ -385,13 +417,19 @@ struct boss_algalon_the_observer : public ScriptedAI
         _phaseTwo = false;
         _heraldOfTheTitans = true;
 
-        if (_instance->GetBossState(BOSS_ALGALON) == FAIL)
-        {
-            _firstPull = false;
-        }
+        bool const isFreshRespawn = _firstResetSinceCreation;
+        _firstResetSinceCreation = false;
 
-        if (_instance)
+        // FAIL means we wiped last attempt. Only replay the arrival visual on the
+        // fresh-respawn Reset() call (see _firstResetSinceCreation) - otherwise it
+        // plays on the dying instance a few seconds before it actually despawns,
+        // instead of when Algalon is really back. DOOR_TYPE_ROOM doors already treat
+        // FAIL the same as NOT_STARTED, so leaving the state as FAIL in between is safe.
+        if (_instance && isFreshRespawn && _instance->GetBossState(BOSS_ALGALON) == FAIL)
+        {
+            DoAction(ACTION_REPLAY_ARRIVAL_VISUAL);
             _instance->SetBossState(BOSS_ALGALON, NOT_STARTED);
+        }
     }
 
     void KilledUnit(Unit* victim) override
@@ -427,6 +465,18 @@ struct boss_algalon_the_observer : public ScriptedAI
                     events.ScheduleEvent(EVENT_INTRO_FINISH, 36s, 0, PHASE_ROLE_PLAY);
                     break;
                 }
+            case ACTION_REPLAY_ARRIVAL_VISUAL:
+                // Arrival + planet-channel visual only - no immune/RP lock, so repulls
+                // aren't gated on it. SPELL_SUMMON_AZEROTH's JustSummoned handler casts
+                // SPELL_REORIGINATION on the planet, same as the original intro.
+                me->SetUnitFlag2(UNIT_FLAG2_DO_NOT_FADE_IN);
+                me->SetDisableGravity(true);
+                me->CastSpell(me, SPELL_ARRIVAL, true);
+                me->CastSpell(me, SPELL_RIDE_THE_LIGHTNING, true);
+                summons.DespawnEntry(NPC_AZEROTH);
+                me->CastSpell((Unit*)nullptr, SPELL_SUMMON_AZEROTH, true);
+                me->m_Events.AddEventAtOffset(new AlgalonArrivalVisualEndEvent(me), 5s);
+                break;
             case ACTION_DESPAWN_ALGALON:
                 _fightWon = true;
                 events.Reset();
@@ -449,7 +499,8 @@ struct boss_algalon_the_observer : public ScriptedAI
                     _instance->SetBossState(BOSS_ALGALON, NOT_STARTED);
                 break;
             case ACTION_INIT_ALGALON:
-                _firstPull = false;
+                if (_instance)
+                    _instance->StorePersistentData(PERSISTENT_DATA_ALGALON_FIRST_ATTEMPT, 1);
                 _fedOnTears = false;
                 me->SetImmuneToPC(false);
                 break;
@@ -479,7 +530,31 @@ struct boss_algalon_the_observer : public ScriptedAI
             return;
         }
 
-        Milliseconds  introDelay = 0ms;
+        // introDelay: engage -> text 2 (stock's original first-pull/repeat-pull
+        // split, kept as-is). effectsDelay: text 2 -> door/floor effect (estimated
+        // text 2 spoken duration, no exact measurement available). combatStartDelay:
+        // effect -> he's actually attackable.
+        Milliseconds introDelay = 0ms;
+
+        // Despawns the planet summoned by the intro/replay-arrival visual - on repulls
+        // that visual runs again on every respawn (see ACTION_REPLAY_ARRIVAL_VISUAL).
+        summons.DespawnEntry(NPC_AZEROTH);
+
+        if (_instance->GetPersistentData(PERSISTENT_DATA_ALGALON_FIRST_ATTEMPT))
+        {
+            introDelay = 8s;
+        }
+        else
+        {
+            _instance->StorePersistentData(PERSISTENT_DATA_ALGALON_FIRST_ATTEMPT, 1);
+            Talk(SAY_ALGALON_START_TIMER);
+            introDelay = 22s;
+            _instance->SetData(DATA_DESPAWN_ALGALON, 0);
+        }
+
+        Milliseconds const effectsDelay = introDelay + 8s;
+        Milliseconds const combatStartDelay = effectsDelay + 10s;
+
         me->setActive(true);
         me->SetInCombatWithZone();
         me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
@@ -487,30 +562,17 @@ struct boss_algalon_the_observer : public ScriptedAI
         events.Reset();
         events.SetPhase(PHASE_ROLE_PLAY);
 
-        if (!_firstPull)
-        {
-            events.ScheduleEvent(EVENT_START_COMBAT, 0ms);
-            introDelay = 8s;
-        }
-        else
-        {
-            summons.DespawnEntry(NPC_AZEROTH);
-            _firstPull = false;
-            Talk(SAY_ALGALON_START_TIMER);
-            introDelay = 22s;
-            events.ScheduleEvent(EVENT_START_COMBAT, 14s);
-            _instance->SetData(DATA_DESPAWN_ALGALON, 0);
-        }
-
-        events.ScheduleEvent(EVENT_REMOVE_UNNATTACKABLE, introDelay - 500ms);
-        events.ScheduleEvent(EVENT_INTRO_TIMER_DONE, introDelay);
-        events.ScheduleEvent(EVENT_QUANTUM_STRIKE, 3500ms + introDelay);
-        events.ScheduleEvent(EVENT_PHASE_PUNCH, 15500ms + introDelay);
-        events.ScheduleEvent(EVENT_SUMMON_COLLAPSING_STAR, 16500ms + introDelay);
-        events.ScheduleEvent(EVENT_COSMIC_SMASH, 25s + introDelay);
-        events.ScheduleEvent(EVENT_ACTIVATE_LIVING_CONSTELLATION, 50500ms + introDelay);
-        events.ScheduleEvent(EVENT_BIG_BANG, 90s + introDelay);
-        events.ScheduleEvent(EVENT_ASCEND_TO_THE_HEAVENS, 360s + introDelay);
+        events.ScheduleEvent(EVENT_SPEAK_AGGRO, introDelay);
+        events.ScheduleEvent(EVENT_ACTIVATE_EFFECTS, effectsDelay);
+        events.ScheduleEvent(EVENT_REMOVE_UNNATTACKABLE, combatStartDelay - 500ms);
+        events.ScheduleEvent(EVENT_INTRO_TIMER_DONE, combatStartDelay);
+        events.ScheduleEvent(EVENT_QUANTUM_STRIKE, 3500ms + combatStartDelay);
+        events.ScheduleEvent(EVENT_PHASE_PUNCH, 15500ms + combatStartDelay);
+        events.ScheduleEvent(EVENT_SUMMON_COLLAPSING_STAR, 16500ms + combatStartDelay);
+        events.ScheduleEvent(EVENT_COSMIC_SMASH, 25s + combatStartDelay);
+        events.ScheduleEvent(EVENT_ACTIVATE_LIVING_CONSTELLATION, 50500ms + combatStartDelay);
+        events.ScheduleEvent(EVENT_BIG_BANG, 90s + combatStartDelay);
+        events.ScheduleEvent(EVENT_ASCEND_TO_THE_HEAVENS, 360s + combatStartDelay);
 
         events.ScheduleEvent(EVENT_CHECK_HERALD_ITEMS, 5s);
         DoCheckHeraldOfTheTitans();
@@ -659,8 +721,10 @@ struct boss_algalon_the_observer : public ScriptedAI
                 if (Creature* brann = _instance->GetCreature(DATA_BRANN_BRONZEBEARD_ALG))
                     brann->AI()->DoAction(ACTION_FINISH_INTRO);
                 break;
-            case EVENT_START_COMBAT:
+            case EVENT_ACTIVATE_EFFECTS:
                 _instance->SetBossState(BOSS_ALGALON, IN_PROGRESS);
+                break;
+            case EVENT_SPEAK_AGGRO:
                 Talk(SAY_ALGALON_AGGRO);
                 break;
             case EVENT_REMOVE_UNNATTACKABLE:
