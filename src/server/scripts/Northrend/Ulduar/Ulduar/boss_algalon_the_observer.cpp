@@ -265,7 +265,6 @@ struct boss_algalon_the_observer : public ScriptedAI
     boss_algalon_the_observer(Creature* creature) : ScriptedAI(creature), summons(me)
     {
         _fedOnTears = true;
-        _firstPull = true;
         _fightWon = false;
         _instance = me->GetInstanceScript();
     }
@@ -274,7 +273,6 @@ struct boss_algalon_the_observer : public ScriptedAI
     SummonList summons;
     InstanceScript* _instance;
 
-    bool _firstPull;
     bool _fightWon;
     bool _phaseTwo;
     bool _fedOnTears;
@@ -357,14 +355,15 @@ struct boss_algalon_the_observer : public ScriptedAI
             me->SetInCombatWithZone();
             return;
         }
-        else if (events.GetPhaseMask() & PHASE_NORMAL)
+
+        if (_instance)
+            _instance->SetBossState(BOSS_ALGALON, FAIL);
+
+        if (events.GetPhaseMask() & PHASE_NORMAL)
         {
             DoAction(ACTION_ASCEND);
             return;
         }
-
-        if (_instance)
-            _instance->SetBossState(BOSS_ALGALON, FAIL);
 
         ScriptedAI::EnterEvadeMode(why);
     }
@@ -384,11 +383,6 @@ struct boss_algalon_the_observer : public ScriptedAI
 
         _phaseTwo = false;
         _heraldOfTheTitans = true;
-
-        if (_instance->GetBossState(BOSS_ALGALON) == FAIL)
-        {
-            _firstPull = false;
-        }
 
         if (_instance)
             _instance->SetBossState(BOSS_ALGALON, NOT_STARTED);
@@ -449,7 +443,8 @@ struct boss_algalon_the_observer : public ScriptedAI
                     _instance->SetBossState(BOSS_ALGALON, NOT_STARTED);
                 break;
             case ACTION_INIT_ALGALON:
-                _firstPull = false;
+                if (_instance)
+                    _instance->StorePersistentData(PERSISTENT_DATA_ALGALON_FIRST_ATTEMPT, 1);
                 _fedOnTears = false;
                 me->SetImmuneToPC(false);
                 break;
@@ -487,21 +482,20 @@ struct boss_algalon_the_observer : public ScriptedAI
         events.Reset();
         events.SetPhase(PHASE_ROLE_PLAY);
 
-        if (!_firstPull)
+        if (_instance->GetPersistentData(PERSISTENT_DATA_ALGALON_FIRST_ATTEMPT))
         {
-            events.ScheduleEvent(EVENT_START_COMBAT, 0ms);
             introDelay = 8s;
         }
         else
         {
             summons.DespawnEntry(NPC_AZEROTH);
-            _firstPull = false;
+            _instance->StorePersistentData(PERSISTENT_DATA_ALGALON_FIRST_ATTEMPT, 1);
             Talk(SAY_ALGALON_START_TIMER);
             introDelay = 22s;
-            events.ScheduleEvent(EVENT_START_COMBAT, 14s);
             _instance->SetData(DATA_DESPAWN_ALGALON, 0);
         }
 
+        events.ScheduleEvent(EVENT_START_COMBAT, introDelay);
         events.ScheduleEvent(EVENT_REMOVE_UNNATTACKABLE, introDelay - 500ms);
         events.ScheduleEvent(EVENT_INTRO_TIMER_DONE, introDelay);
         events.ScheduleEvent(EVENT_QUANTUM_STRIKE, 3500ms + introDelay);
