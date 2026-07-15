@@ -202,13 +202,14 @@ public:
 # npc_plucky
 ######*/
 
-#define GOSSIP_P    "Please tell me the Phrase.."
-
 enum Plucky
 {
     QUEST_SCOOP             = 1950,
     SPELL_PLUCKY_HUMAN      = 9192,
-    SPELL_PLUCKY_CHICKEN    = 9220
+    SPELL_PLUCKY_CHICKEN    = 9220,
+
+    GOSSIP_MENU_PLUCKY      = 6626,
+    GOSSIP_OPTION_PHRASE    = 0
 };
 
 class npc_plucky : public CreatureScript
@@ -232,7 +233,7 @@ public:
     bool OnGossipHello(Player* player, Creature* creature) override
     {
         if (player->GetQuestStatus(QUEST_SCOOP) == QUEST_STATUS_INCOMPLETE)
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, GOSSIP_P, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, GOSSIP_MENU_PLUCKY, GOSSIP_OPTION_PHRASE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
         SendGossipMenuFor(player, 738, creature->GetGUID());
 
