@@ -1960,6 +1960,17 @@ void GameEventMgr::SetHolidayEventTime(GameEventData& event)
 
     time_t curTime = GameTime::GetGameTime().count();
 
+    if (holiday->Looping)
+    {
+        // Looping events (Battleground Call to Arms) carry a single past anchor in the DBC and
+        // recur via event.Occurence. Anchor to that DBC date so the window keeps the correct phase
+        // instead of inheriting the wrong time of day from a stale game_event.start_time.
+        if (time_t start = HolidayDateCalculator::FindLoopingStartTime(holiday->Date[0], stageOffset, event.Occurence, curTime))
+            event.Start = start;
+
+        return;
+    }
+
     if (!singleDate)
     {
         time_t start = HolidayDateCalculator::FindStartTimeForStage(
