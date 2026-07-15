@@ -16,6 +16,7 @@
  */
 
 #include "AchievementCriteriaScript.h"
+#include "CreatureScript.h"
 #include "CreatureGroups.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
