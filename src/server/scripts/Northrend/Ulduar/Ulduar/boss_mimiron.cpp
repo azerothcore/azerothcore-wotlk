@@ -264,7 +264,8 @@ enum Texts
 #define GetVX001() instance->GetCreature(DATA_MIMIRON_VX001)
 #define GetACU() instance->GetCreature(DATA_MIMIRON_ACU)
 
-Position const ACUSummonPos = { 2742.6265f, 2568.0571f, 377.22076f, 0.0f }; /// @todo: replace with sniffed position
+// Z is above hover height (15y) so that activating hover does not relocate the ACU upwards
+Position const ACUSummonPos = { 2744.650f, 2569.460f, 380.0f, 3.141593f };
 
 struct boss_mimiron : public BossAI
 {
@@ -1502,7 +1503,8 @@ struct npc_ulduar_aerial_command_unit : public ScriptedAI
         _isDefeated = false;
         _events.Reset();
         _summons.DespawnAll();
-        me->SetCombatMovement(false); /// @todo: research ACU behaviour
+        me->SetHover(false);
+        me->SetDisableGravity(true);
     }
 
     void SetData(uint32 id, uint32 value) override
@@ -1517,7 +1519,12 @@ struct npc_ulduar_aerial_command_unit : public ScriptedAI
                     break;
                 case 3:
                     _phase = 3;
+                    // Hover instead of disabled gravity: chase then keeps the ACU at
+                    // HoverHeight above ground instead of dragging it to ground level.
+                    me->SetDisableGravity(false);
+                    me->SetHover(true);
                     me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetImmuneToPC(false);
                     DoZoneInCombat();
                     _events.Reset();
                     _events.ScheduleEvent(EVENT_SUMMON_BOMB_BOT, 15s);
@@ -1549,16 +1556,11 @@ struct npc_ulduar_aerial_command_unit : public ScriptedAI
                 me->CastStop();
                 me->AttackStop();
                 me->SetReactState(REACT_PASSIVE);
-                me->SetDisableGravity(false);
                 me->GetMotionMaster()->MoveFall();
                 _events.DelayEvents(25s);
                 break;
             case DO_ENABLE_AERIAL:
-                me->SetDisableGravity(true);
-                me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 10.0f);
-                me->m_Events.AddEventAtOffset([&] {
-                    me->SetReactState(REACT_AGGRESSIVE);
-                }, 2s);
+                me->SetReactState(REACT_AGGRESSIVE);
                 break;
             case 1337:
                 _summons.DespawnAll();
@@ -1588,6 +1590,8 @@ struct npc_ulduar_aerial_command_unit : public ScriptedAI
                     me->InterruptNonMeleeSpells(false);
                     me->RemoveAllAurasExceptType(SPELL_AURA_CONTROL_VEHICLE);
 
+                    me->SetHover(false);
+                    me->SetDisableGravity(true);
                     me->GetMotionMaster()->MovePoint(0, 2744.65f, 2569.46f, 381.34f);
 
                     if (Creature* c = GetMimiron())
