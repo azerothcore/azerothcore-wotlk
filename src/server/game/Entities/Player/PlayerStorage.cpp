@@ -1863,6 +1863,10 @@ InventoryResult Player::CanEquipNewItem(uint8 slot, uint16& dest, uint32 item, b
     if (pItem)
     {
         InventoryResult result = CanEquipItem(slot, dest, pItem, swap);
+        // Random-property items queue themselves on creation (SetItemRandomProperties
+        // -> SetState(ITEM_CHANGED, owner)); the probe must leave the update queue
+        // before deletion or the queue keeps a pointer to freed memory.
+        pItem->RemoveFromUpdateQueueOf(const_cast<Player*>(this));
         delete pItem;
         return result;
     }
