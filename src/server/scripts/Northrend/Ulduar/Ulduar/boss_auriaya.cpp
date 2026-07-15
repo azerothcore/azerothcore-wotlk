@@ -16,7 +16,7 @@
  */
 
 #include "AchievementCriteriaScript.h"
-#include "CreatureScript.h"
+#include "CreatureGroups.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellAuraEffects.h"
@@ -90,6 +90,7 @@ enum Misc
     ACTION_FERAL_DEATH                  = 2,
     ACTION_DESPAWN_ADDS                 = 3,
     ACTION_FERAL_DEATH_WITH_STACK       = 4,
+    ACTION_SENTRY_DEATH                 = 5,
 
     DATA_CRAZY_CAT                      = 10,
     DATA_NINE_LIVES                     = 11,
@@ -102,6 +103,19 @@ struct boss_auriaya : public BossAI
     bool _feralDied{false};
     bool _nineLives{false};
 
+    void DespawnFormationMembers(bool onEvade = false)
+    {
+        if (CreatureGroup* formation = me->GetFormation())
+            for (auto const& [member, info] : formation->GetMembers())
+                if (member && member != me)
+                {
+                    if (onEvade)
+                        member->DespawnOnEvade();
+                    else
+                        member->DespawnOrUnsummon();
+                }
+    }
+
     void Reset() override
     {
         _feralDied = false;
@@ -110,10 +124,10 @@ struct boss_auriaya : public BossAI
         EntryCheckPredicate pred(NPC_FERAL_DEFENDER);
         summons.DoAction(ACTION_DESPAWN_ADDS, pred);
 
-        BossAI::Reset();
+        if (me->IsInEvadeMode())
+            DespawnFormationMembers(true);
 
-        for (uint8 i = 0; i < RAID_MODE(2, 4); ++i)
-            me->SummonCreature(NPC_SANCTUM_SENTRY, me->GetPositionX() + urand(4, 12), me->GetPositionY() + urand(4, 12), me->GetPositionZ());
+        BossAI::Reset();
 
         me->ApplySpellImmune(0, IMMUNITY_EFFECT, SPELL_EFFECT_INTERRUPT_CAST, false);
     }
@@ -126,22 +140,6 @@ struct boss_auriaya : public BossAI
             return _nineLives;
 
         return 0;
-    }
-
-    void JustSummoned(Creature* cr) override
-    {
-        if (cr->GetEntry() == NPC_SANCTUM_SENTRY)
-            cr->GetMotionMaster()->MoveFollow(me, 6, rand_norm() * 2 * 3.14f);
-        else
-            cr->SetInCombatWithZone();
-
-        summons.Summon(cr);
-    }
-
-    void SummonedCreatureDies(Creature* cr, Unit*) override
-    {
-        if (cr->GetEntry() == NPC_SANCTUM_SENTRY)
-            _feralDied = true;
     }
 
     void JustEngagedWith(Unit* who) override
@@ -171,6 +169,8 @@ struct boss_auriaya : public BossAI
         EntryCheckPredicate pred(NPC_FERAL_DEFENDER);
         summons.DoAction(ACTION_DESPAWN_ADDS, pred);
 
+        DespawnFormationMembers();
+
         BossAI::JustDied(killer);
         Talk(EMOTE_DEATH);
     }
@@ -181,6 +181,8 @@ struct boss_auriaya : public BossAI
             events.ScheduleEvent(EVENT_RESPAWN_FERAL_DEFENDER, 25s);
         else if (param == ACTION_FERAL_DEATH)
             _nineLives = true;
+        else if (param == ACTION_SENTRY_DEATH)
+            _feralDied = true;
     }
 
     void ExecuteEvent(uint32 eventId) override
@@ -227,6 +229,13 @@ struct boss_auriaya : public BossAI
 struct npc_auriaya_sanctum_sentry : public ScriptedAI
 {
     npc_auriaya_sanctum_sentry(Creature* creature) : ScriptedAI(creature) { }
+
+    void JustDied(Unit*) override
+    {
+        if (InstanceScript* instance = me->GetInstanceScript())
+            if (Creature* auriaya = instance->GetCreature(BOSS_AURIAYA))
+                auriaya->AI()->DoAction(ACTION_SENTRY_DEATH);
+    }
 
     void JustEngagedWith(Unit*) override
     {
