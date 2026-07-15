@@ -1,3 +1,4 @@
+-- DB update 2026_07_15_00 -> 2026_07_15_01
 -- Watcher Gashra's Enrage (52470) is a self-buff, but its -50% physical damage
 -- done effect (EFFECT_2) makes the core classify the whole aura as negative,
 -- so it shows as a debuff on the target frame.
