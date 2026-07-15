@@ -25,6 +25,7 @@
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "PoolMgr.h"
+#include "RBAC.h"
 
 using namespace Acore::ChatCommands;
 
@@ -37,8 +38,8 @@ public:
     {
         static ChatCommandTable poolCommandTable =
         {
-            { "info",    HandlePoolInfoCommand,    SEC_GAMEMASTER, Console::Yes },
-            { "lookup",  HandlePoolLookupCommand,  SEC_GAMEMASTER, Console::No  },
+            { "info",    HandlePoolInfoCommand,    rbac::RBAC_PERM_COMMAND_POOL_INFO,   Console::Yes },
+            { "lookup",  HandlePoolLookupCommand,  rbac::RBAC_PERM_COMMAND_POOL_LOOKUP, Console::No  },
         };
         static ChatCommandTable commandTable =
         {
