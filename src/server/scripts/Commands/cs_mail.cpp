@@ -26,6 +26,7 @@
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "ScriptMgr.h"
 #include "Timer.h"
 
@@ -40,8 +41,8 @@ public:
     {
         static ChatCommandTable mailCommandTable =
         {
-            { "list",   HandleMailListCommand,   SEC_GAMEMASTER, Console::Yes },
-            { "return", HandleMailReturnCommand,  SEC_GAMEMASTER, Console::Yes }
+            { "list",   HandleMailListCommand,   rbac::RBAC_PERM_COMMAND_MAIL_LIST,   Console::Yes },
+            { "return", HandleMailReturnCommand, rbac::RBAC_PERM_COMMAND_MAIL_RETURN, Console::Yes }
         };
 
         static ChatCommandTable commandTable =

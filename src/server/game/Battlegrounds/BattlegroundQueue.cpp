@@ -805,8 +805,7 @@ void BattlegroundQueue::BattlegroundQueueUpdate(uint32 diff, BattlegroundTypeId 
         }
     };
 
-    // battleground with free slot for player should be always in the beggining of the queue
-    // maybe it would be better to create bgfreeslotqueue for each bracket_id
+    // fill existing joinable battlegrounds, oldest first, before a new instance may form below
     BGFreeSlotQueueContainer& bgQueues = sBattlegroundMgr->GetBGFreeSlotQueueStore(bgTypeId);
     for (BGFreeSlotQueueContainer::iterator itr = bgQueues.begin(); itr != bgQueues.end();)
     {

@@ -869,6 +869,9 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading Creature Texts...");
     sCreatureTextMgr->LoadCreatureTexts();
 
+    LOG_INFO("server.loading", "Loading Creature Text Options...");
+    sCreatureTextMgr->LoadCreatureTextOptions();
+
     LOG_INFO("server.loading", "Loading Creature Text Locales...");
     sCreatureTextMgr->LoadCreatureTextLocales();
 
