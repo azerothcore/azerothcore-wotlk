@@ -687,8 +687,7 @@ void SmartAI::MovementInform(uint32 MovementType, uint32 Data)
     if (MovementType == POINT_MOTION_TYPE && Data == SMART_ESCORT_LAST_OOC_POINT)
         me->ClearUnitState(UNIT_STATE_EVADE);
 
-    // WAYPOINT_REACHED is fired from SmartAI::WaypointReached (the waypoint generator calls it
-    // alongside this and passes the pathId); firing it here too made the event trigger twice.
+    // WAYPOINT_REACHED is fired from WaypointReached() instead, to avoid a double trigger
     GetScript()->ProcessEventsFor(SMART_EVENT_MOVEMENTINFORM, nullptr, MovementType, Data);
     if (!HasEscortState(SMART_ESCORT_ESCORTING))
         return;
@@ -1319,9 +1318,7 @@ void SmartAI::WaypointReached(uint32 nodeId, uint32 pathId)
 
 void SmartAI::WaypointPathEnded(uint32 /*nodeId*/, uint32 /*pathId*/)
 {
-    // WAYPOINT_ENDED is fired from SmartAI::PathEndReached (the waypoint generator calls both
-    // hooks at path end); firing it here too made the event trigger twice. PathEndReached also
-    // runs first, while me->GetWaypointPath() is still valid for the event's pathId filter.
+    // // WAYPOINT_ENDED is fired from PathEndReached() instead, to avoid a double trigger
 }
 
 void SmartAI::DistancingEnded()
