@@ -948,7 +948,7 @@ BGFreeSlotQueueContainer& BattlegroundMgr::GetBGFreeSlotQueueStore(BattlegroundT
 
 void BattlegroundMgr::AddToBGFreeSlotQueue(BattlegroundTypeId bgTypeId, Battleground* bg)
 {
-    bgDataStore[bgTypeId].BGFreeSlotQueue.push_front(bg);
+    bgDataStore[bgTypeId].BGFreeSlotQueue.push_back(bg);
 }
 
 void BattlegroundMgr::RemoveFromBGFreeSlotQueue(BattlegroundTypeId bgTypeId, uint32 instanceId)

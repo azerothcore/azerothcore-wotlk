@@ -554,6 +554,8 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recvData)
             // leaks forever, permanently skewing team selection and blocking the
             // empty instance's cleanup.
             bg->DecreaseInvitedCount(teamId);
+            if (bg->HasFreeSlots())
+                bg->AddToBGFreeSlotQueue();
             _player->RemoveBattlegroundQueueId(bgQueueTypeId);
             _player->SetBattlegroundId(0, BATTLEGROUND_TYPE_NONE, PLAYER_MAX_BATTLEGROUND_QUEUES, false, false, TEAM_NEUTRAL);
 
