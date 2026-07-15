@@ -418,8 +418,9 @@ class spell_aura_of_despair_aura : public AuraScript
 
                 target->CastSpell(target, SPELL_AURA_OF_DESPAIR_2, true);
 
-                // Patch 3.2.0: Omen of Clarity can no longer trigger Clearcasting during the encounter
-                target->ApplySpellImmune(SPELL_AURA_OF_DESPAIR_2, IMMUNITY_ID, SPELL_DRUID_CLEARCASTING, true);
+                // Resto druids: Omen of Clarity can no longer trigger Clearcasting (Patch 3.2.0)
+                if (target->ToPlayer()->GetSpec() == TALENT_TREE_DRUID_RESTORATION)
+                    target->ApplySpellImmune(SPELL_AURA_OF_DESPAIR_2, IMMUNITY_ID, SPELL_DRUID_CLEARCASTING, true);
 
                 if (target->HasSpell(SPELL_SHAMANISTIC_RAGE))
                     caster->CastSpell(target, SPELL_CORRUPTED_RAGE, true);
