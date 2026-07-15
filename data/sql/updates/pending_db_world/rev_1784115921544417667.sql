@@ -7,7 +7,7 @@ SET @Z := 411.5189;
 SET @O := 1.818165;
 
 -- Update Auriaya's spawn to sniff position
-UPDATE `creature` SET `position_x` = @X, `position_y` = @Y, `position_z` = @Z, `orientation` = @O WHERE `id` = 33515;
+UPDATE `creature` SET `position_x` = @X, `position_y` = @Y, `position_z` = @Z, `orientation` = @O WHERE `id` = 33515 AND `guid` = @AURI;
 
 -- Add Sanctum Sentry spawns (10-man: 2 sentries, 25-man: 4 sentries)
 DELETE FROM `creature` WHERE `id` = 34014 AND `map` = 603;
