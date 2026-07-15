@@ -16,6 +16,7 @@
  */
 
 #include "AchievementCriteriaScript.h"
+#include "CreatureScript.h"
 #include "GameObjectAI.h"
 #include "GameObjectScript.h"
 #include "PassiveAI.h"
@@ -1148,7 +1149,6 @@ struct npc_razorscale_dark_rune_sentinel : public ScriptedAI
 {
     explicit npc_razorscale_dark_rune_sentinel(Creature* creature) : ScriptedAI(creature), _instance(creature->GetInstanceScript())
     { }
-
     void Reset() override
     {
         _events.Reset();
