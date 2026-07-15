@@ -1,3 +1,4 @@
+-- DB update 2026_07_15_03 -> 2026_07_15_04
 -- Sara should start friendly, becoming hostile when Yogg-Saron reveals himself (phase 2)
 UPDATE `creature_template` SET `faction` = 35 WHERE `entry` IN (33134, 34332);
 
