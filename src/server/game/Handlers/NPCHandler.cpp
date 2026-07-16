@@ -21,7 +21,6 @@
 #include "Creature.h"
 #include "DatabaseEnv.h"
 #include "GameGraveyard.h"
-#include "Language.h"
 #include "NPCPackets.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
