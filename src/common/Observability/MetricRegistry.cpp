@@ -74,7 +74,7 @@ namespace Acore::Observability
 
             void VisitSample(MetricFamilyView family, std::vector<Label> const& constantLabels, MetricVisitor& visitor) const
             {
-                visitor.VisitSample(family, { "", { std::span{ constantLabels }, std::span{ Labels } }, double(Value.load(std::memory_order_relaxed)) });
+                visitor.VisitSample(family, { "", { std::span{ constantLabels }, std::span{ Labels }, {} }, double(Value.load(std::memory_order_relaxed)) });
             }
 
             std::vector<Label> Labels;
@@ -87,7 +87,7 @@ namespace Acore::Observability
 
             void VisitSample(MetricFamilyView family, std::vector<Label> const& constantLabels, MetricVisitor& visitor) const
             {
-                visitor.VisitSample(family, { "", { std::span{ constantLabels }, std::span{ Labels } }, Value.load(std::memory_order_relaxed) });
+                visitor.VisitSample(family, { "", { std::span{ constantLabels }, std::span{ Labels }, {} }, Value.load(std::memory_order_relaxed) });
             }
 
             std::vector<Label> Labels;
@@ -115,8 +115,8 @@ namespace Acore::Observability
                 uint64 count = Count.load(std::memory_order_relaxed);
                 LabelView infLabel[] = { { "le", "+Inf" } };
                 visitor.VisitSample(family, { "_bucket", { std::span{ constantLabels }, std::span{ Labels }, infLabel }, double(count) });
-                visitor.VisitSample(family, { "_sum", { std::span{ constantLabels }, std::span{ Labels } }, Sum.load(std::memory_order_relaxed) });
-                visitor.VisitSample(family, { "_count", { std::span{ constantLabels }, std::span{ Labels } }, double(count) });
+                visitor.VisitSample(family, { "_sum", { std::span{ constantLabels }, std::span{ Labels }, {} }, Sum.load(std::memory_order_relaxed) });
+                visitor.VisitSample(family, { "_count", { std::span{ constantLabels }, std::span{ Labels }, {} }, double(count) });
             }
 
             std::vector<BucketBoundary> const& Buckets;
