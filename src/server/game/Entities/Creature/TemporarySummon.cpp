@@ -441,9 +441,9 @@ void Guardian::InitStats(uint32 duration)
     // auto-targets on its own (see npc_pet_dk_ebon_gargoyle in pet_dk.cpp) whenever no
     // explicit command has been issued, since AttackStart from a pet command simply takes
     // priority the same way it does for any other controllable guardian.
-    if (GetEntry() == NPC_EBON_GARGOYLE && !HasUnitTypeMask(UNIT_MASK_CONTROLLABLE_GUARDIAN))
+    if (GetEntry() == NPC_EBON_GARGOYLE && !IsControllableGuardian())
     {
-        m_unitTypeMask |= UNIT_MASK_CONTROLLABLE_GUARDIAN;
+        AddUnitTypeMask(UNIT_MASK_CONTROLLABLE_GUARDIAN);
         InitCharmInfo();
     }
 
