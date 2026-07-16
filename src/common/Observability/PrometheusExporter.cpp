@@ -33,7 +33,6 @@
 #include <exception>
 #include <memory>
 #include <optional>
-#include <stop_token>
 #include <thread>
 #include <utility>
 
@@ -61,7 +60,7 @@ namespace Acore::Observability
         }
     }
 
-    class PrometheusExporter::Impl : public std::enable_shared_from_this<PrometheusExporter::Impl>
+    class PrometheusExporter::Impl
     {
     public:
         explicit Impl(MetricRegistry& registry)
@@ -71,14 +70,8 @@ namespace Acore::Observability
               _acceptor(_strand),
               _registry(registry)
         {
-            _thread = std::jthread([this](std::stop_token stopToken)
+            _thread = std::jthread([this]
             {
-                std::stop_callback onStop(stopToken, [this]
-                {
-                    net::post(_strand, [this] { StopOnStrand(); });
-                    _workGuard.reset();
-                });
-
                 try
                 {
                     _ioContext.run();
@@ -92,27 +85,25 @@ namespace Acore::Observability
 
         void Shutdown()
         {
-            // Explicit join (rather than relying on ~jthread) ensures the io thread is
-            // drained before the last shared_ptr<Impl> ref can be released by a handler
-            // running on it — otherwise ~Impl could run on the io thread and ~jthread
-            // would self-join.
-            _thread.request_stop();
+            // Queued handlers are destroyed unrun, the io thread is joined before ~Impl,
+            // so handlers and sessions may reference *this without owning it.
+            _ioContext.stop();
             _thread.join();
         }
 
         void ApplyConfig(PrometheusEndpointConfig config)
         {
-            net::post(_strand, [self = shared_from_this(), config = std::move(config)]() mutable
+            net::post(_strand, [this, config = std::move(config)]() mutable
             {
-                self->ApplyConfigOnStrand(std::move(config));
+                ApplyConfigOnStrand(std::move(config));
             });
         }
 
         void Stop()
         {
-            net::post(_strand, [self = shared_from_this()]
+            net::post(_strand, [this]
             {
-                self->StopOnStrand();
+                StopOnStrand();
             });
         }
 
@@ -130,8 +121,8 @@ namespace Acore::Observability
         class Session : public std::enable_shared_from_this<Session>
         {
         public:
-            Session(tcp::socket&& socket, std::shared_ptr<Impl> exporter)
-                : _stream(std::move(socket)), _exporter(std::move(exporter))
+            Session(tcp::socket&& socket, Impl& exporter)
+                : _stream(std::move(socket)), _exporter(exporter)
             {
             }
 
@@ -181,7 +172,7 @@ namespace Acore::Observability
                     response.set(http::field::content_type, "text/plain; version=0.0.4; charset=utf-8");
 
                     if (_request.method() == http::verb::get)
-                        response.body() = _exporter->RenderMetrics();
+                        response.body() = _exporter.RenderMetrics();
                 }
 
                 response.prepare_payload();
@@ -205,7 +196,7 @@ namespace Acore::Observability
             beast::flat_buffer _buffer;
             http::request<http::string_body> _request;
             std::optional<http::response<http::string_body>> _response;
-            std::shared_ptr<Impl> _exporter;
+            Impl& _exporter;
         };
 
         void ApplyConfigOnStrand(PrometheusEndpointConfig config)
@@ -274,9 +265,9 @@ namespace Acore::Observability
             if (!_running.load(std::memory_order_relaxed))
                 return;
 
-            _acceptor.async_accept([self = shared_from_this()](boost::system::error_code error, tcp::socket socket)
+            _acceptor.async_accept([this](boost::system::error_code error, tcp::socket socket)
             {
-                self->OnAccept(error, std::move(socket));
+                OnAccept(error, std::move(socket));
             });
         }
 
@@ -294,7 +285,7 @@ namespace Acore::Observability
                 return;
             }
 
-            std::make_shared<Session>(std::move(socket), shared_from_this())->Start();
+            std::make_shared<Session>(std::move(socket), *this)->Start();
             DoAccept();
         }
 
@@ -325,7 +316,7 @@ namespace Acore::Observability
     };
 
     PrometheusExporter::PrometheusExporter(MetricRegistry& registry)
-        : _impl(std::make_shared<Impl>(registry))
+        : _impl(std::make_unique<Impl>(registry))
     {
     }
 
