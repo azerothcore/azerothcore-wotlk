@@ -76,6 +76,7 @@ public:
             { "loglevel",     HandleServerSetLogLevelCommand,    rbac::RBAC_PERM_COMMAND_SERVER_SET_LOGLEVEL, Console::Yes },
             { "motd",         HandleServerSetMotdCommand,        rbac::RBAC_PERM_COMMAND_SERVER_SET_MOTD,     Console::Yes },
             { "closed",       HandleServerSetClosedCommand,      rbac::RBAC_PERM_COMMAND_SERVER_SET_CLOSED,   Console::Yes },
+            { "security",     HandleServerSetSecurityCommand,    rbac::RBAC_PERM_COMMAND_SERVER_SET_SECURITY, Console::Yes },
         };
 
         static ChatCommandTable serverCommandTable =
@@ -270,6 +271,7 @@ public:
             handler->PSendSysMessage("Connected players: {}. Characters in world: {}. Queue: {}.", activeSessionCount, playerCount, queuedSessionCount);
 
         handler->PSendSysMessage("Connection peak: {}.", connPeak);
+        handler->PSendSysMessage(LANG_COMMAND_SERVER_INFO_SECURITY, uint32(sWorld->GetPlayerSecurityLimit()));
         handler->PSendSysMessage(LANG_UPTIME, secsToTimeString(GameTime::GetUptime().count()));
         handler->PSendSysMessage("Update time diff: {}ms. Last {} diffs summary:", sWorldUpdateTime.GetLastUpdateTime(), sWorldUpdateTime.GetDatasetSize());
         handler->PSendSysMessage("|- Mean: {}ms", sWorldUpdateTime.GetAverageUpdateTime());
@@ -598,6 +600,27 @@ public:
 
         handler->SendErrorMessage(LANG_USE_BOL);
         return false;
+    }
+
+    // Set the minimum security level allowed to log into this realm (realmlist.allowedSecurityLevel)
+    static bool HandleServerSetSecurityCommand(ChatHandler* handler, uint8 level)
+    {
+        if (level > SEC_ADMINISTRATOR)
+        {
+            handler->SendErrorMessage(LANG_COMMAND_SERVER_SET_SECURITY_ERROR, uint32(SEC_PLAYER), uint32(SEC_ADMINISTRATOR));
+            return false;
+        }
+
+        LoginDatabasePreparedStatement* stmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_REALMLIST_SECURITY_LEVEL);
+        stmt->SetData(0, level);
+        stmt->SetData(1, realm.Id.Realm);
+        LoginDatabase.Execute(stmt);
+
+        // Apply live; raising the limit kicks any now-disallowed sessions.
+        sWorld->SetPlayerSecurityLimit(AccountTypes(level));
+
+        handler->PSendSysMessage(LANG_COMMAND_SERVER_SET_SECURITY, uint32(level));
+        return true;
     }
 
     // Set the level of logging

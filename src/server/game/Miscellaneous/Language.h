@@ -1400,6 +1400,10 @@ enum AcoreStrings
 
     LANG_LFG_COOLDOWN_CLEARED                     = 11019,
 
+    LANG_COMMAND_SERVER_SET_SECURITY              = 11020,
+    LANG_COMMAND_SERVER_SET_SECURITY_ERROR        = 11021,
+    LANG_COMMAND_SERVER_INFO_SECURITY             = 11022,
+
     LANG_MUTED_PLAYER                             = 30000, // Mute for player 2 hour
 
     // Instant Flight
