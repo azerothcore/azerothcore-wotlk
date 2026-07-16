@@ -1556,11 +1556,26 @@ struct npc_ulduar_aerial_command_unit : public ScriptedAI
                 me->CastStop();
                 me->AttackStop();
                 me->SetReactState(REACT_PASSIVE);
+                // Raw flag removal first: MoveFall lands at ground + hover height, which would
+                // keep the ACU airborne, and SetHover(false) would relocate it without a spline.
+                // SetHover(false) afterwards is relocation-free and tells the client to stop
+                // hovering, else it keeps floating the grounded unit back up
+                me->RemoveUnitMovementFlag(MOVEMENTFLAG_HOVER);
                 me->GetMotionMaster()->MoveFall();
+                me->SetHover(false);
                 _events.DelayEvents(25s);
                 break;
             case DO_ENABLE_AERIAL:
-                me->SetReactState(REACT_AGGRESSIVE);
+                if (_isDefeated)
+                    break;
+                me->SetDisableGravity(true);
+                // 16y: above hover height (15y) so SetHover does not relocate it further up
+                me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 16.0f);
+                me->m_Events.AddEventAtOffset([&] {
+                    me->SetDisableGravity(false);
+                    me->SetHover(true);
+                    me->SetReactState(REACT_AGGRESSIVE);
+                }, 2s);
                 break;
             case 1337:
                 _summons.DespawnAll();
@@ -1590,7 +1605,6 @@ struct npc_ulduar_aerial_command_unit : public ScriptedAI
                     me->InterruptNonMeleeSpells(false);
                     me->RemoveAllAurasExceptType(SPELL_AURA_CONTROL_VEHICLE);
 
-                    me->SetHover(false);
                     me->SetDisableGravity(true);
                     me->GetMotionMaster()->MovePoint(0, 2744.65f, 2569.46f, 381.34f);
 
