@@ -52,7 +52,7 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
 
-          # The windows-latest runner image already ships CMake, Visual Studio 2022
+          # The windows-latest runner image already ships CMake, Visual Studio
           # (with the native desktop workload + MSVC) and OpenSSL, so we only need to
           # provide Boost and the MySQL client libraries. We fetch these directly
           # instead of via chocolatey, whose pinned packages keep breaking on CI
