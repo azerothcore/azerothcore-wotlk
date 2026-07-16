@@ -1239,7 +1239,7 @@ void SmartAI::SetFollow(Unit* target, float dist, float angle, uint32 credit, ui
     mFollowArrivedEntry = end;
     mFollowArrivedAlive = !aliveState; // negate - 0 is alive
     mFollowCreditType = creditType;
-    me->GetMotionMaster()->MoveFollow(target, mFollowDist, mFollowAngle);
+    me->GetMotionMaster()->MoveFollow(target, mFollowDist, mFollowAngle, MOTION_SLOT_ACTIVE, true, false);
 }
 
 void SmartAI::StopFollow(bool complete)

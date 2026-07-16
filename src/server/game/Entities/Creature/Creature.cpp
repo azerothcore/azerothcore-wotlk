@@ -1925,6 +1925,11 @@ bool Creature::CanStartAttack(Unit const* who, bool force) const
         if (!_IsTargetAcceptable(who))
             return false;
 
+        // Totems never pull proximity aggro; they are only attacked in response
+        // to threat they generate themselves (e.g. Searing Totem)
+        if (who->IsTotem())
+            return false;
+
         if (IsNeutralToAll() || !IsWithinDistInMap(who, GetAggroRange(who) + m_CombatDistance, true, false, false))
             return false;
     }
@@ -3810,6 +3815,21 @@ void Creature::ClearTextRepeatGroup(uint8 textGroup)
     CreatureTextRepeatGroup::iterator groupItr = m_textRepeat.find(textGroup);
     if (groupItr != m_textRepeat.end())
         groupItr->second.clear();
+}
+
+bool Creature::IsTextOnCooldown(uint8 textGroup) const
+{
+    auto itr = m_textCooldowns.find(textGroup);
+    if (itr == m_textCooldowns.end())
+        return false;
+
+    return GameTime::GetGameTime().count() < itr->second;
+}
+
+void Creature::SetTextCooldown(uint8 textGroup, uint32 cooldownMs)
+{
+    m_textCooldowns[textGroup] =
+        GameTime::GetGameTime().count() + ((cooldownMs + 999) / 1000);
 }
 
 void Creature::SetRespawnTime(uint32 respawn)
