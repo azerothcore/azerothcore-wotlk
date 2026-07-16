@@ -1709,6 +1709,12 @@ struct BattlegroundAVScore final : public BattlegroundScore
 {
     friend class BattlegroundAV;
 
+    [[nodiscard]] uint32 GetGraveyardsAssaulted() const { return GraveyardsAssaulted; }
+    [[nodiscard]] uint32 GetGraveyardsDefended() const { return GraveyardsDefended; }
+    [[nodiscard]] uint32 GetTowersAssaulted() const { return TowersAssaulted; }
+    [[nodiscard]] uint32 GetTowersDefended() const { return TowersDefended; }
+    [[nodiscard]] uint32 GetMinesCaptured() const { return MinesCaptured; }
+
 protected:
     explicit BattlegroundAVScore(ObjectGuid playerGuid) : BattlegroundScore(playerGuid) { }
 

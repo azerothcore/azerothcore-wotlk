@@ -395,6 +395,9 @@ struct BattlegroundSAScore final : public BattlegroundScore
 {
     friend class BattlegroundSA;
 
+    [[nodiscard]] uint32 GetDemolishersDestroyed() const { return DemolishersDestroyed; }
+    [[nodiscard]] uint32 GetGatesDestroyed() const { return GatesDestroyed; }
+
 protected:
     BattlegroundSAScore(ObjectGuid playerGuid) : BattlegroundScore(playerGuid) { }
 
