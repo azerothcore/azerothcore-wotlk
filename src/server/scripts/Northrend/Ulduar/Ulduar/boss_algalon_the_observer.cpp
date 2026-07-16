@@ -119,7 +119,7 @@ enum Events
     EVENT_INTRO_2                   = 7,
     EVENT_INTRO_3                   = 8,
     EVENT_INTRO_FINISH              = 9,
-    EVENT_ACTIVATE_EFFECTS          = 10,
+    EVENT_START_COMBAT              = 10,
     EVENT_INTRO_TIMER_DONE          = 11,
     EVENT_QUANTUM_STRIKE            = 12,
     EVENT_PHASE_PUNCH               = 13,
@@ -270,19 +270,23 @@ private:
 class AlgalonArrivalVisualEndEvent : public BasicEvent
 {
 public:
-    AlgalonArrivalVisualEndEvent(Unit* algalon) : _algalon(algalon)
+    AlgalonArrivalVisualEndEvent(Unit* algalon) : _map(algalon->GetMap()), _algalonGuid(algalon->GetGUID())
     {
     }
 
     bool Execute(uint64 /*execTime*/, uint32 /*diff*/) override
     {
-        _algalon->SetDisableGravity(false);
-        _algalon->RemoveAurasDueToSpell(SPELL_RIDE_THE_LIGHTNING);
+        if (Creature* algalon = _map->GetCreature(_algalonGuid))
+        {
+            algalon->SetDisableGravity(false);
+            algalon->RemoveAurasDueToSpell(SPELL_RIDE_THE_LIGHTNING);
+        }
         return true;
     }
 
 private:
-    Unit* _algalon;
+    Map* _map;
+    ObjectGuid _algalonGuid;
 };
 
 struct boss_algalon_the_observer : public ScriptedAI
@@ -563,7 +567,7 @@ struct boss_algalon_the_observer : public ScriptedAI
         events.SetPhase(PHASE_ROLE_PLAY);
 
         events.ScheduleEvent(EVENT_SPEAK_AGGRO, introDelay);
-        events.ScheduleEvent(EVENT_ACTIVATE_EFFECTS, effectsDelay);
+        events.ScheduleEvent(EVENT_START_COMBAT, effectsDelay);
         events.ScheduleEvent(EVENT_REMOVE_UNNATTACKABLE, combatStartDelay - 500ms);
         events.ScheduleEvent(EVENT_INTRO_TIMER_DONE, combatStartDelay);
         events.ScheduleEvent(EVENT_QUANTUM_STRIKE, 3500ms + combatStartDelay);
@@ -721,7 +725,7 @@ struct boss_algalon_the_observer : public ScriptedAI
                 if (Creature* brann = _instance->GetCreature(DATA_BRANN_BRONZEBEARD_ALG))
                     brann->AI()->DoAction(ACTION_FINISH_INTRO);
                 break;
-            case EVENT_ACTIVATE_EFFECTS:
+            case EVENT_START_COMBAT:
                 _instance->SetBossState(BOSS_ALGALON, IN_PROGRESS);
                 break;
             case EVENT_SPEAK_AGGRO:
