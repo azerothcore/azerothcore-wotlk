@@ -97,6 +97,32 @@ TEST(PrometheusTextFormatTest, EscapesBackslashQuoteAndNewline)
         "g{k=\"a\\\\b\\\"c\\nd\"} 0\n"));
 }
 
+TEST(PrometheusTextFormatTest, MultipleSeriesShareOneFamilyHeader)
+{
+    MetricRegistry registry;
+    auto loc = std::source_location::current();
+    registry.RegisterGauge("queue_depth", "Current queue depth", { { "queue", "ingest" } }, loc);
+    registry.RegisterGauge("queue_depth", "Current queue depth", { { "queue", "export" } }, loc);
+
+    EXPECT_THAT(PrometheusTextFormat::Serialize(registry), testing::Eq(
+        "# HELP queue_depth Current queue depth\n"
+        "# TYPE queue_depth gauge\n"
+        "queue_depth{queue=\"export\"} 0\n"
+        "queue_depth{queue=\"ingest\"} 0\n"));
+}
+
+TEST(PrometheusTextFormatTest, EscapesBackslashAndNewlineInHelp)
+{
+    MetricRegistry registry;
+    registry.RegisterCounter("c", "line1\nback\\slash", {},
+        std::source_location::current());
+
+    EXPECT_THAT(PrometheusTextFormat::Serialize(registry), testing::Eq(
+        "# HELP c line1\\nback\\\\slash\n"
+        "# TYPE c counter\n"
+        "c 0\n"));
+}
+
 TEST(PrometheusTextFormatTest, ConstantLabelsPrecedeSeriesLabels)
 {
     MetricRegistry registry;
