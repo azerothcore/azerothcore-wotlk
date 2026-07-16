@@ -63,6 +63,10 @@ namespace Acore::Observability
     public:
         ScopedHistogramTimer() { }
         explicit ScopedHistogramTimer(Histogram const&) { }
+        ScopedHistogramTimer(ScopedHistogramTimer const&) = delete;
+        ScopedHistogramTimer& operator=(ScopedHistogramTimer const&) = delete;
+        ScopedHistogramTimer(ScopedHistogramTimer&&) noexcept = default;
+        ScopedHistogramTimer& operator=(ScopedHistogramTimer&&) noexcept = default;
     };
 
     class Histogram

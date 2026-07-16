@@ -63,6 +63,25 @@ namespace Acore::Observability
             }
         }
 
+        void WriteEscapedHelp(std::string& out, std::string_view value)
+        {
+            for (char c : value)
+            {
+                switch (c)
+                {
+                    case '\\':
+                        out.append("\\\\");
+                        break;
+                    case '\n':
+                        out.append("\\n");
+                        break;
+                    default:
+                        out.push_back(c);
+                        break;
+                }
+            }
+        }
+
         void WriteLabels(std::string& out, LabelSetView labels)
         {
             bool first = true;
@@ -88,7 +107,11 @@ namespace Acore::Observability
             void VisitFamily(MetricFamilyView family) override
             {
                 if (!family.Help.empty())
-                    std::format_to(std::back_inserter(_out), "# HELP {} {}\n", family.Name, family.Help);
+                {
+                    std::format_to(std::back_inserter(_out), "# HELP {} ", family.Name);
+                    WriteEscapedHelp(_out, family.Help);
+                    _out.push_back('\n');
+                }
 
                 std::format_to(std::back_inserter(_out), "# TYPE {} {}\n", family.Name, TypeName(family.Kind));
             }
