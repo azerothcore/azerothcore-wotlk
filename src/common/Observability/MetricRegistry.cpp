@@ -432,12 +432,15 @@ namespace Acore::Observability
 
     Detail::HistogramSeries* MetricRegistry::FindIndexedHistogramSeries(Entry const& entry, std::size_t index) const
     {
-        return std::get<HistogramEntry>(entry.Data).IndexedSeries[index].load(std::memory_order_acquire);
+        auto& histogram = std::get<HistogramEntry>(entry.Data);
+        ASSERT(index < histogram.IndexedSeries.size(), "Indexed series {} out of bounds for '{}' ({} slots)", index, entry.Name, histogram.IndexedSeries.size());
+        return histogram.IndexedSeries[index].load(std::memory_order_acquire);
     }
 
     Detail::HistogramSeries& MetricRegistry::RegisterIndexedHistogramSeries(Entry& entry, std::size_t index, std::vector<Label> labels)
     {
         auto& histogram = std::get<HistogramEntry>(entry.Data);
+        ASSERT(index < histogram.IndexedSeries.size(), "Indexed series {} out of bounds for '{}' ({} slots)", index, entry.Name, histogram.IndexedSeries.size());
         auto& slot = histogram.IndexedSeries[index];
         auto fresh = std::make_unique<Detail::HistogramSeries>(histogram.Buckets, std::move(labels));
 
@@ -479,12 +482,15 @@ namespace Acore::Observability
 
     Detail::GaugeSeries* MetricRegistry::FindIndexedGaugeSeries(Entry const& entry, std::size_t index) const
     {
-        return std::get<GaugeEntry>(entry.Data).IndexedSeries[index].load(std::memory_order_acquire);
+        auto& gauge = std::get<GaugeEntry>(entry.Data);
+        ASSERT(index < gauge.IndexedSeries.size(), "Indexed series {} out of bounds for '{}' ({} slots)", index, entry.Name, gauge.IndexedSeries.size());
+        return gauge.IndexedSeries[index].load(std::memory_order_acquire);
     }
 
     Detail::GaugeSeries& MetricRegistry::RegisterIndexedGaugeSeries(Entry& entry, std::size_t index, std::vector<Label> labels)
     {
         auto& gauge = std::get<GaugeEntry>(entry.Data);
+        ASSERT(index < gauge.IndexedSeries.size(), "Indexed series {} out of bounds for '{}' ({} slots)", index, entry.Name, gauge.IndexedSeries.size());
         auto& slot = gauge.IndexedSeries[index];
         auto fresh = std::make_unique<Detail::GaugeSeries>(std::move(labels));
 
