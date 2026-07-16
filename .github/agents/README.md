@@ -19,14 +19,14 @@ The PR Reviewer agent is configured to review pull requests with deep understand
 - Testing and validation requirements
 - Security and quality standards
 
-**Key Feature**: This agent always references `/CLAUDE.md`, the C++ Code Standards wiki, and the SQL Standards wiki before reviewing any PR.
+**Key Feature**: This agent always references `/AGENTS.md`, the C++ Code Standards wiki, and the SQL Standards wiki before reviewing any PR.
 
 ## How It Works
 
 When an AI tool reviews a PR in this repository:
 
 1. The tool reads the appropriate agent configuration from this directory
-2. The agent configuration instructs it to read `/CLAUDE.md` for full project context
+2. The agent configuration instructs it to read `/AGENTS.md` for full project context
 3. For C++ changes, the agent also references the [C++ Code Standards wiki](https://github.com/azerothcore/wiki/blob/master/docs/cpp-code-standards.md)
 4. For SQL changes, the agent also references the [SQL Standards wiki](https://github.com/azerothcore/wiki/blob/master/docs/sql-standards.md)
 5. The agent applies project-specific rules during review
@@ -36,7 +36,7 @@ When an AI tool reviews a PR in this repository:
 
 If you're using AI tools to assist with contributions:
 
-1. Familiarize yourself with `/CLAUDE.md` - it contains essential project knowledge
+1. Familiarize yourself with `/AGENTS.md` - it contains essential project knowledge
 2. Review the [C++ Code Standards](https://github.com/azerothcore/wiki/blob/master/docs/cpp-code-standards.md) for C++ contributions
 3. Review the [SQL Standards](https://github.com/azerothcore/wiki/blob/master/docs/sql-standards.md) for database contributions
 4. The AI agents will help ensure your changes follow project standards
@@ -47,13 +47,13 @@ If you're using AI tools to assist with contributions:
 To update agent configurations:
 
 1. Edit the relevant `.md` file in this directory
-2. Ensure any changes align with documentation in `/CLAUDE.md` and the wiki standards
+2. Ensure any changes align with documentation in `/AGENTS.md` and the wiki standards
 3. Test the updated configuration with a sample PR review
 4. Commit changes following the project's commit message format
 
 ## References
 
-- Project guidelines: `/CLAUDE.md`
+- Project guidelines: `/AGENTS.md`
 - C++ standards: [C++ Code Standards](https://github.com/azerothcore/wiki/blob/master/docs/cpp-code-standards.md)
 - SQL standards: [SQL Standards](https://github.com/azerothcore/wiki/blob/master/docs/sql-standards.md)
 - PR template: `/pull_request_template.md`
