@@ -107,7 +107,7 @@ namespace Acore::Observability
 
                 for (std::size_t i = 0; i < Buckets.size(); ++i)
                 {
-                    cumulativeCount += BucketCounts[i].load(std::memory_order_relaxed);
+                    cumulativeCount += BucketCounts[i].load(std::memory_order_acquire);
                     LabelView extraLabels[] = { { "le", Buckets[i].LeLabel } };
                     visitor.VisitSample(family, { "_bucket", { std::span{ constantLabels }, std::span{ Labels }, extraLabels }, double(cumulativeCount) });
                 }
@@ -141,7 +141,7 @@ namespace Acore::Observability
             if (bucket != series.Buckets.end())
             {
                 std::size_t index = static_cast<std::size_t>(bucket - series.Buckets.begin());
-                series.BucketCounts[index].fetch_add(1, std::memory_order_relaxed);
+                series.BucketCounts[index].fetch_add(1, std::memory_order_release);
             }
         }
     }
