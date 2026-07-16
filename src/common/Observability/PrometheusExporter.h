@@ -49,7 +49,7 @@ namespace Acore::Observability
 
     private:
         class Impl;
-        std::shared_ptr<Impl> _impl;
+        std::unique_ptr<Impl> _impl;
     };
 }
 
