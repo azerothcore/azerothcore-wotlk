@@ -424,16 +424,25 @@ struct boss_algalon_the_observer : public ScriptedAI
         bool const isFreshRespawn = _firstResetSinceCreation;
         _firstResetSinceCreation = false;
 
+        bool const justFailed = _instance && _instance->GetBossState(BOSS_ALGALON) == FAIL;
+
         // FAIL means we wiped last attempt. Only replay the arrival visual on the
         // fresh-respawn Reset() call (see _firstResetSinceCreation) - otherwise it
         // plays on the dying instance a few seconds before it actually despawns,
-        // instead of when Algalon is really back. DOOR_TYPE_ROOM doors already treat
-        // FAIL the same as NOT_STARTED, so leaving the state as FAIL in between is safe.
-        if (_instance && isFreshRespawn && _instance->GetBossState(BOSS_ALGALON) == FAIL)
-        {
+        // instead of when Algalon is really back.
+        if (isFreshRespawn && justFailed)
             DoAction(ACTION_REPLAY_ARRIVAL_VISUAL);
+
+        // Resolve to NOT_STARTED every time, except on the evade-triggered
+        // pre-despawn call above (mid-life object, still FAIL) - that one must leave
+        // FAIL alone so the later fresh-respawn Reset() can still detect it and
+        // replay the visual. Also needed on the very first-ever Reset() (state starts
+        // TO_BE_DECIDED, not FAIL): InstanceScript::SetBossState() skips door updates
+        // on a TO_BE_DECIDED->x transition, so leaving it unresolved would make the
+        // *next* transition (IN_PROGRESS on first engage) silently skip opening the
+        // Universe Floor/Globe doors instead.
+        if (_instance && !(justFailed && !isFreshRespawn))
             _instance->SetBossState(BOSS_ALGALON, NOT_STARTED);
-        }
     }
 
     void KilledUnit(Unit* victim) override
@@ -534,25 +543,22 @@ struct boss_algalon_the_observer : public ScriptedAI
             return;
         }
 
-        // introDelay: engage -> text 2 (stock's original first-pull/repeat-pull
-        // split, kept as-is). effectsDelay: text 2 -> door/floor effect (estimated
-        // text 2 spoken duration, no exact measurement available). combatStartDelay:
-        // effect -> he's actually attackable.
-        Milliseconds introDelay = 0ms;
+        // introDelay: engage -> text 2. effectsDelay: text 2 -> door/floor effect
+        // (estimated text 2 spoken duration, no exact measurement available).
+        // combatStartDelay: effect -> he's actually attackable. Same on every pull,
+        // first or repeat - text 1 plays and the timing is identical either way.
+        Milliseconds const introDelay = 22s;
 
         // Despawns the planet summoned by the intro/replay-arrival visual - on repulls
         // that visual runs again on every respawn (see ACTION_REPLAY_ARRIVAL_VISUAL).
         summons.DespawnEntry(NPC_AZEROTH);
+        Talk(SAY_ALGALON_START_TIMER);
 
-        if (_instance->GetPersistentData(PERSISTENT_DATA_ALGALON_FIRST_ATTEMPT))
-        {
-            introDelay = 8s;
-        }
-        else
+        // One-time bookkeeping for a genuinely fresh attempt only - doesn't affect
+        // timing, which is identical on every pull.
+        if (!_instance->GetPersistentData(PERSISTENT_DATA_ALGALON_FIRST_ATTEMPT))
         {
             _instance->StorePersistentData(PERSISTENT_DATA_ALGALON_FIRST_ATTEMPT, 1);
-            Talk(SAY_ALGALON_START_TIMER);
-            introDelay = 22s;
             _instance->SetData(DATA_DESPAWN_ALGALON, 0);
         }
 
