@@ -172,8 +172,19 @@ namespace Acore::Observability
             std::size_t indexedSeriesCount = 0,
             std::source_location owner = std::source_location::current());
 
+        /**
+         * @brief Return a timer that records its elapsed lifetime into this family's series cached at the
+         *        specified @p index, creating that series with the specified @p labelName and @p labelValue
+         *        on first use. Return a no-op timer if observability is disabled or this family failed to
+         *        register.
+         *
+         * The behavior is undefined unless @p index is less than the @c indexedSeriesCount this family was
+         * constructed with.
+         */
+        ///@{
         [[nodiscard]] ScopedHistogramTimer MeasureIndexed(std::size_t index, StaticStringLiteral labelName, uint32 labelValue) const;
         [[nodiscard]] ScopedHistogramTimer MeasureIndexed(std::size_t index, StaticStringLiteral labelName, StaticStringLiteral labelValue) const;
+        ///@}
 
     private:
         MetricRegistry::Entry* _entry;
@@ -186,8 +197,18 @@ namespace Acore::Observability
             std::size_t indexedSeriesCount = 0,
             std::source_location owner = std::source_location::current());
 
+        /**
+         * @brief Set this family's gauge series cached at the specified @p index to the specified @p value,
+         *        creating that series with the specified @p labelName and @p labelValue on first use. Do
+         *        nothing if observability is disabled or this family failed to register.
+         *
+         * The behavior is undefined unless @p index is less than the @c indexedSeriesCount this family was
+         * constructed with.
+         */
+        ///@{
         void SetIndexed(std::size_t index, StaticStringLiteral labelName, uint32 labelValue, double value) const;
         void SetIndexed(std::size_t index, StaticStringLiteral labelName, StaticStringLiteral labelValue, double value) const;
+        ///@}
 
     private:
         MetricRegistry::Entry* _entry;
