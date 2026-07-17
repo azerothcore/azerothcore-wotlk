@@ -740,7 +740,7 @@ void Pet::CastPendingSpell()
 {
     if (!m_tempspell)
         return;
-    
+
     Unit* tempSpellTarget = nullptr;
     if (!m_tempspellTarget.IsEmpty())
         tempSpellTarget = ObjectAccessor::GetUnit(*this, m_tempspellTarget);
@@ -860,6 +860,16 @@ void Pet::CastPendingSpell()
 
         m_tempoldTarget = ObjectGuid::Empty;
         m_tempspellIsPositive = false;
+    }
+    else if (HasReactState(REACT_PASSIVE) && charmInfo->HasCommandState(COMMAND_FOLLOW))
+    {
+        // Do not use PetStopAttack here: it interrupts the spell just started above.
+        // Once the cast finishes, PetAI will see no victim and resume following the owner.
+        AttackStop();
+        charmInfo->SetIsCommandAttack(false);
+        charmInfo->SetIsAtStay(false);
+        charmInfo->SetIsFollowing(false);
+        charmInfo->SetIsReturning(false);
     }
 }
 
