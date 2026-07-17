@@ -386,13 +386,15 @@ struct boss_algalon_the_observer : public ScriptedAI
         me->CastSpell(me, SPELL_DUAL_WIELD, true);
         _phaseTwo = false;
         _heraldOfTheTitans = true;
-        if (_instance->GetBossState(BOSS_ALGALON) == FAIL)
-        {
-            _firstPull = false;
-            _instance->StorePersistentData(PERSISTENT_DATA_ALGALON_FIRST_PULL, 1);
-        }
         if (_instance)
+        {
+            if (_instance->GetBossState(BOSS_ALGALON) == FAIL)
+            {
+                _firstPull = false;
+                _instance->StorePersistentData(PERSISTENT_DATA_ALGALON_FIRST_PULL, 1);
+            }
             _instance->SetBossState(BOSS_ALGALON, NOT_STARTED);
+        }
     }
 
     void KilledUnit(Unit* victim) override
