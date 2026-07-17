@@ -456,7 +456,7 @@ struct boss_algalon_the_observer : public ScriptedAI
                 _fedOnTears = false;
                 me->SetImmuneToPC(false);
                 if (_instance)
-                    _instance->StorePersistentData(PERSISTENT_DATA_ALGALON_FIRST_PULL, 1);                
+                    _instance->StorePersistentData(PERSISTENT_DATA_ALGALON_FIRST_PULL, 1);
                 break;
             case ACTION_ASCEND:
                 summons.DespawnAll();
