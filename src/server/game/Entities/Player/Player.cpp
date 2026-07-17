@@ -9856,7 +9856,7 @@ void Player::ApplySpellMod(uint32 spellId, SpellModOp op, T& basevalue, Spell* s
         if (mod->type == SPELLMOD_FLAT)
         {
             // xinef: do not allow to consume more than one 100% crit increasing spell
-            if (mod->op == SPELLMOD_CRITICAL_CHANCE && totalflat >= 100)
+            if (mod->ShouldSkipGuaranteedCriticalChanceMod(totalflat))
                 return;
 
             int32 flatValue = mod->value;
