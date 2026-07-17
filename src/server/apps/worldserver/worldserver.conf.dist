@@ -3978,9 +3978,34 @@ Battleground.SpeedBuffRespawn = 150
 #
 #    Battleground.Override.LowLevels.MinPlayers
 #        Description: Overrides the minimum number of required players per team for all levels < MaxPlayerLevel
+#                     Used as fallback for any battleground without a per-battleground override (see below)
 #        Default:     0 (Disabled)
 
 Battleground.Override.LowLevels.MinPlayers = 0
+
+#
+#    Battleground.Override.LowLevels.MinPlayers.AV
+#    Battleground.Override.LowLevels.MinPlayers.WS
+#    Battleground.Override.LowLevels.MinPlayers.AB
+#    Battleground.Override.LowLevels.MinPlayers.EY
+#    Battleground.Override.LowLevels.MinPlayers.SA
+#    Battleground.Override.LowLevels.MinPlayers.IC
+#        Description: Per-battleground overrides of the minimum number of required players per team
+#                     for all levels < MaxPlayerLevel.
+#                     AV = Alterac Valley, WS = Warsong Gulch, AB = Arathi Basin,
+#                     EY = Eye of the Storm, SA = Strand of the Ancients, IC = Isle of Conquest
+#                     Resolution order: per-battleground key, then Battleground.Override.LowLevels.MinPlayers,
+#                     then the battleground_template DB value.
+#                     Matches entered through the Random Battleground queue always use the global
+#                     Battleground.Override.LowLevels.MinPlayers, never the per-battleground keys.
+#        Default:     0 (Disabled, use Battleground.Override.LowLevels.MinPlayers)
+
+Battleground.Override.LowLevels.MinPlayers.AV = 0
+Battleground.Override.LowLevels.MinPlayers.WS = 0
+Battleground.Override.LowLevels.MinPlayers.AB = 0
+Battleground.Override.LowLevels.MinPlayers.EY = 0
+Battleground.Override.LowLevels.MinPlayers.SA = 0
+Battleground.Override.LowLevels.MinPlayers.IC = 0
 
 #
 #    Battleground.Warsong.Flags

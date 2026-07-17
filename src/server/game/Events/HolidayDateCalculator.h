@@ -107,6 +107,11 @@ public:
     static time_t FindStartTimeForStage(const uint32_t* packedDates, uint8_t numDates,
         time_t stageOffset, uint32_t stageLengthMinutes, time_t curTime);
 
+    // Start time for a looping holiday event (Battleground Call to Arms): rolls the packed anchor
+    // forward by whole occurenceMinutes periods to the most recent occurrence. Returns 0 if anchor is 0.
+    static time_t FindLoopingStartTime(uint32_t packedAnchor, time_t stageOffset,
+        uint32_t occurenceMinutes, time_t curTime);
+
 private:
     // Julian Date conversions for lunar calculations
     static double DateToJulianDay(int year, int month, double day);

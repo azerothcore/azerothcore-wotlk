@@ -1428,3 +1428,86 @@ TEST_F(FindStartTimeForStageTest, AllDatesPast_ReturnsZero)
     time_t result = HolidayDateCalculator::FindStartTimeForStage(dates, 26, stageOffset, stageLengthMin, curTime);
     EXPECT_EQ(result, 0);
 }
+
+// ============================================================================
+// FindLoopingStartTime tests (Battleground Call to Arms)
+// ============================================================================
+
+class FindLoopingStartTimeTest : public ::testing::Test
+{
+protected:
+    static time_t MakeTime(int year, int month, int day, int hour = 0)
+    {
+        std::tm t = {};
+        t.tm_year = year - 1900;
+        t.tm_mon = month - 1;
+        t.tm_mday = day;
+        t.tm_hour = hour;
+        t.tm_isdst = -1;
+        return mktime(&t);
+    }
+
+    static uint32_t PackAnchor(int year, int month, int day, int hour, int minute)
+    {
+        uint32_t packed = 0;
+        packed |= (static_cast<uint32_t>(year - 2000) & 0x1F) << 24;
+        packed |= (static_cast<uint32_t>(month - 1) & 0xF) << 20;
+        packed |= (static_cast<uint32_t>(day - 1) & 0x3F) << 14;
+        packed |= (static_cast<uint32_t>(hour) & 0x1F) << 6;
+        packed |= (static_cast<uint32_t>(minute) & 0x3F);
+        return packed;
+    }
+
+    static constexpr uint32_t OCCURENCE_MIN = 60480; // 42 day cycle (AV Call to Arms)
+};
+
+TEST_F(FindLoopingStartTimeTest, ZeroAnchor_ReturnsZero)
+{
+    time_t curTime = MakeTime(2026, 6, 1);
+    EXPECT_EQ(HolidayDateCalculator::FindLoopingStartTime(0, 0, OCCURENCE_MIN, curTime), 0);
+}
+
+TEST_F(FindLoopingStartTimeTest, FutureAnchor_NotRolled)
+{
+    uint32_t anchor = PackAnchor(2026, 10, 30, 0, 0);
+    time_t curTime = MakeTime(2026, 6, 1);
+    EXPECT_EQ(HolidayDateCalculator::FindLoopingStartTime(anchor, 0, OCCURENCE_MIN, curTime),
+        MakeTime(2026, 10, 30));
+}
+
+// The bug: an ancient midnight anchor must roll forward preserving phase, not fall back to a stale start_time.
+TEST_F(FindLoopingStartTimeTest, AncientAnchor_RollsToMostRecentOccurrence)
+{
+    uint32_t anchor = PackAnchor(2007, 10, 26, 0, 0);
+    time_t curTime = MakeTime(2026, 2, 6, 12);
+
+    time_t result = HolidayDateCalculator::FindLoopingStartTime(anchor, 0, OCCURENCE_MIN, curTime);
+
+    time_t const period = static_cast<time_t>(OCCURENCE_MIN) * 60;
+    time_t const base = MakeTime(2007, 10, 26);
+
+    EXPECT_LE(result, curTime);
+    EXPECT_GT(result + period, curTime);
+    EXPECT_EQ((result - base) % period, 0);
+}
+
+TEST_F(FindLoopingStartTimeTest, StageOffsetApplied)
+{
+    uint32_t anchor = PackAnchor(2007, 10, 26, 0, 0);
+    time_t stageOffset = 96 * 3600;
+    time_t curTime = MakeTime(2026, 2, 6, 12);
+
+    time_t result = HolidayDateCalculator::FindLoopingStartTime(anchor, stageOffset, OCCURENCE_MIN, curTime);
+
+    time_t const period = static_cast<time_t>(OCCURENCE_MIN) * 60;
+    time_t const base = MakeTime(2007, 10, 26) + stageOffset;
+    EXPECT_EQ((result - base) % period, 0);
+}
+
+TEST_F(FindLoopingStartTimeTest, ZeroOccurence_ReturnsAnchor)
+{
+    uint32_t anchor = PackAnchor(2007, 10, 26, 0, 0);
+    time_t curTime = MakeTime(2026, 2, 6, 12);
+    EXPECT_EQ(HolidayDateCalculator::FindLoopingStartTime(anchor, 0, 0, curTime),
+        MakeTime(2007, 10, 26));
+}

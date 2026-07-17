@@ -186,8 +186,7 @@ struct boss_felmyst : public BossAI
 
     void KilledUnit(Unit* victim) override
     {
-        if (victim->IsPlayer() && roll_chance_i(50))
-            Talk(YELL_KILL);
+        Talk(YELL_KILL, victim);
     }
 
     void SpellHitTarget(Unit* target, const SpellInfo* spell) override

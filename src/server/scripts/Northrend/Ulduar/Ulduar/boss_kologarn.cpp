@@ -161,8 +161,12 @@ struct boss_kologarn : public BossAI
 
         void AttachLeftArm()
         {
-            if (Unit* arm = ObjectAccessor::GetCreature(*me, _left))
+            if (Creature* arm = ObjectAccessor::GetCreature(*me, _left))
+            {
                 arm->SetHealth(arm->GetMaxHealth());
+                // Clear the arm's combat-start state so it can re-pull the boss on a subsequent attempt.
+                arm->AI()->Reset();
+            }
             else if (Creature* accessory = me->SummonCreature(NPC_LEFT_ARM, *me, TEMPSUMMON_MANUAL_DESPAWN))
             {
                 accessory->AddUnitTypeMask(UNIT_MASK_ACCESSORY);
@@ -179,8 +183,12 @@ struct boss_kologarn : public BossAI
 
         void AttachRightArm()
         {
-            if (Unit* arm = ObjectAccessor::GetCreature(*me, _right))
+            if (Creature* arm = ObjectAccessor::GetCreature(*me, _right))
+            {
                 arm->SetHealth(arm->GetMaxHealth());
+                // Clear the arm's combat-start state so it can re-pull the boss on a subsequent attempt.
+                arm->AI()->Reset();
+            }
             else if (Creature* accessory = me->SummonCreature(NPC_RIGHT_ARM, *me, TEMPSUMMON_MANUAL_DESPAWN))
             {
                 accessory->AddUnitTypeMask(UNIT_MASK_ACCESSORY);
