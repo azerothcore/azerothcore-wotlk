@@ -700,6 +700,7 @@ enum RBACPermissions
     RBAC_PERM_COMMAND_SPELLINFO_EFFECTS                      = 936,
     RBAC_PERM_COMMAND_SPELLINFO_TARGETS                      = 937,
     RBAC_PERM_COMMAND_SPELLINFO_ALL                          = 938,
+    RBAC_PERM_COMMAND_SERVER_SET_SECURITY                    = 939,
     // custom permissions 1000+
     RBAC_PERM_MAX
 };
