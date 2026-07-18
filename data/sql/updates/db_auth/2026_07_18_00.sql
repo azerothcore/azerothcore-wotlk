@@ -1,3 +1,4 @@
+-- DB update 2026_07_15_00 -> 2026_07_18_00
 --
 DELETE FROM `rbac_permissions` WHERE `id` = 939;
 INSERT INTO `rbac_permissions` (`id`, `name`) VALUES
