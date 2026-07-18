@@ -2786,6 +2786,19 @@ void Map::ProcessCreatureRespawn(ObjectGuid::LowType spawnId)
         }
     }
 
+    // Check linked_respawn: don't spawn if the master creature is still dead.
+    // This mirrors the check in Creature::Respawn() for compat-mode creatures.
+    ObjectGuid dbtableHighGuid = ObjectGuid::Create<HighGuid::Unit>(data->id, spawnId);
+    time_t linkedRespawntime = GetLinkedRespawnTime(dbtableHighGuid);
+    if (linkedRespawntime)
+    {
+        // Master is still dead; re-queue at the master's respawn time + a small offset.
+        time_t now = GameTime::GetGameTime().count();
+        time_t newRespawnTime = (now > linkedRespawntime ? now : linkedRespawntime) + urand(5, MINUTE);
+        SaveCreatureRespawnTime(spawnId, newRespawnTime);
+        return;
+    }
+
     // Remove respawn time BEFORE LoadFromDB, otherwise the creature
     // reads it back and loads as DEAD instead of ALIVE
     RemoveCreatureRespawnTime(spawnId);
