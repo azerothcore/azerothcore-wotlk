@@ -607,7 +607,7 @@ public:
     {
         if (level > SEC_ADMINISTRATOR)
         {
-            handler->SendErrorMessage(LANG_COMMAND_SERVER_SET_SECURITY_ERROR, uint32(SEC_PLAYER), uint32(SEC_ADMINISTRATOR));
+            handler->SendErrorMessage(LANG_COMMAND_SERVER_SET_SECURITY_ERROR, SEC_PLAYER, SEC_ADMINISTRATOR);
             return false;
         }
 
@@ -619,7 +619,7 @@ public:
         // Apply live; raising the limit kicks any now-disallowed sessions.
         sWorld->SetPlayerSecurityLimit(AccountTypes(level));
 
-        handler->PSendSysMessage(LANG_COMMAND_SERVER_SET_SECURITY, uint32(level));
+        handler->PSendSysMessage(LANG_COMMAND_SERVER_SET_SECURITY, level);
         return true;
     }
 
