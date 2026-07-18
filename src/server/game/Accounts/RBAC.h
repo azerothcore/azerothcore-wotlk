@@ -687,7 +687,20 @@ enum RBACPermissions
     RBAC_PERM_COMMAND_CHATFILTER_LIST                        = 923,
     RBAC_PERM_COMMAND_CHATFILTER_ADD                         = 924,
     RBAC_PERM_COMMAND_CHATFILTER_REMOVE                      = 925,
-    RBAC_PERM_COMMAND_GROUP_INVITES                          = 926,
+    RBAC_PERM_COMMAND_AUTOBROADCAST_LIST                     = 926,
+    RBAC_PERM_COMMAND_AUTOBROADCAST_ADD                      = 927,
+    RBAC_PERM_COMMAND_AUTOBROADCAST_LOCALE                   = 928,
+    RBAC_PERM_COMMAND_AUTOBROADCAST_REMOVE                   = 929,
+    RBAC_PERM_COMMAND_MAIL_LIST                              = 930,
+    RBAC_PERM_COMMAND_MAIL_RETURN                            = 931,
+    RBAC_PERM_COMMAND_NPC_LOAD                               = 932,
+    RBAC_PERM_COMMAND_POOL_INFO                              = 933,
+    RBAC_PERM_COMMAND_POOL_LOOKUP                            = 934,
+    RBAC_PERM_COMMAND_SPELLINFO_ATTRIBUTES                   = 935,
+    RBAC_PERM_COMMAND_SPELLINFO_EFFECTS                      = 936,
+    RBAC_PERM_COMMAND_SPELLINFO_TARGETS                      = 937,
+    RBAC_PERM_COMMAND_SPELLINFO_ALL                          = 938,
+    RBAC_PERM_COMMAND_GROUP_INVITES                          = 939,
     // custom permissions 1000+
     RBAC_PERM_MAX
 };
