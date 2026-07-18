@@ -1,3 +1,4 @@
+-- DB update 2026_06_24_00 -> 2026_07_18_00
 -- petition_sign kept its (petitionguid, playerguid) primary key when the
 -- petition_id schema stopped writing petitionguid: every row inserts with
 -- petitionguid = 0, so the key collapses to (0, playerguid) and a character
