@@ -1,3 +1,4 @@
+-- DB update 2026_07_18_02 -> 2026_07_18_03
 DELETE FROM `command` WHERE `name`='group invites';
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
 ('group invites', 2, 'Syntax: .group invites on|off\r\nEnable/disable accepting group invites.');
