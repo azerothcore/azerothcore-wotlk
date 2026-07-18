@@ -15764,8 +15764,13 @@ void Player::PrepareCharmAISpells()
         if (!charmSpellId)
             continue;
 
-        for (uint32 nextRank = sSpellMgr->GetNextSpellInChain(charmSpellId); nextRank && HasSpell(nextRank); nextRank = sSpellMgr->GetNextSpellInChain(charmSpellId))
+        while (uint32 nextRank = sSpellMgr->GetNextSpellInChain(charmSpellId))
+        {
+            if (!HasSpell(nextRank))
+                break;
+
             charmSpellId = nextRank;
+        }
     }
 }
 
