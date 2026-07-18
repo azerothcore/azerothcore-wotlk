@@ -622,7 +622,7 @@ struct boss_algalon_the_observer : public ScriptedAI
 
     bool IsInRoom()
     {
-        if (me->GetExactDist2d(&me->GetHomePosition()) > 45.f || me->GetPositionZ() < 410.f)
+        if (me->GetExactDist2d(&me->GetHomePosition()) > 47.f || me->GetPositionZ() < 410.f)
         {
             DoAction(ACTION_ASCEND);
             return false;
@@ -690,12 +690,17 @@ struct boss_algalon_the_observer : public ScriptedAI
                 events.Repeat(15s + 500ms);
                 break;
             case EVENT_SUMMON_COLLAPSING_STAR:
+            {
                 Talk(SAY_ALGALON_COLLAPSING_STAR);
                 Talk(EMOTE_ALGALON_COLLAPSING_STAR);
-                for (uint8 i = 0; i < COLLAPSING_STAR_COUNT; ++i)
-                    me->SummonCreature(NPC_COLLAPSING_STAR, CollapsingStarPos[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
+                uint8 activeStars = summons.GetEntryCount(NPC_COLLAPSING_STAR);
+                if (activeStars < COLLAPSING_STAR_COUNT)
+                    for (uint8 i = activeStars; i < COLLAPSING_STAR_COUNT; ++i)
+                        me->SummonCreature(NPC_COLLAPSING_STAR, CollapsingStarPos[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
+
                 events.Repeat(1min);
                 break;
+            }
             case EVENT_COSMIC_SMASH:
                 Talk(EMOTE_ALGALON_COSMIC_SMASH);
                 me->CastCustomSpell(SPELL_COSMIC_SMASH, SPELLVALUE_MAX_TARGETS, RAID_MODE(1, 3), (Unit*)nullptr);
