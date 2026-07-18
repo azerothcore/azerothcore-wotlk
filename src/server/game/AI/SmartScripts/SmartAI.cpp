@@ -24,6 +24,7 @@
 #include "ObjectDefines.h"
 #include "ObjectMgr.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellMgr.h"
 #include "Vehicle.h"
 
@@ -711,7 +712,7 @@ void SmartAI::JustExitedCombat()
     CreatureAI::JustExitedCombat();
 }
 
-void SmartAI::EnterEvadeMode(EvadeReason /*why*/)
+void SmartAI::EnterEvadeMode(EvadeReason why)
 {
     if (mSuppressEvade)
         return;
@@ -763,6 +764,8 @@ void SmartAI::EnterEvadeMode(EvadeReason /*why*/)
         if (!me->HasUnitState(UNIT_STATE_EVADE))
             GetScript()->OnReset();
     }
+
+    sScriptMgr->OnUnitEnterEvadeMode(me, why);
 }
 
 void SmartAI::MoveInLineOfSight(Unit* who)
@@ -1236,7 +1239,7 @@ void SmartAI::SetFollow(Unit* target, float dist, float angle, uint32 credit, ui
     mFollowArrivedEntry = end;
     mFollowArrivedAlive = !aliveState; // negate - 0 is alive
     mFollowCreditType = creditType;
-    me->GetMotionMaster()->MoveFollow(target, mFollowDist, mFollowAngle);
+    me->GetMotionMaster()->MoveFollow(target, mFollowDist, mFollowAngle, MOTION_SLOT_ACTIVE, true, false);
 }
 
 void SmartAI::StopFollow(bool complete)

@@ -65,9 +65,9 @@ enum AccountTypes
 enum AccountFlag
 {
     ACCOUNT_FLAG_GM                   = 0x1,        // Account is GM
-    ACCOUNT_FLAG_NOKICK               = 0x2,        // NYI UNK
+    ACCOUNT_FLAG_NOKICK               = 0x2,        // Will not be logged out while AFK
     ACCOUNT_FLAG_COLLECTOR            = 0x4,        // NYI Collector's Edition
-    ACCOUNT_FLAG_TRIAL                = 0x8,        // NYI Trial account
+    ACCOUNT_FLAG_TRIAL                = 0x8,        // Trial account
     ACCOUNT_FLAG_CANCELLED            = 0x10,       // NYI UNK
     ACCOUNT_FLAG_IGR                  = 0x20,       // NYI Internet Game Room (Internet cafe?)
     ACCOUNT_FLAG_WHOLESALER           = 0x40,       // NYI UNK
@@ -93,7 +93,7 @@ enum AccountFlag
     ACCOUNT_FLAG_EXPANSION2_COLLECTOR = 0x4000000,  // NYI WotLK Collector's Edition
     ACCOUNT_FLAG_OVERMIND_LINKED      = 0x8000000,  // NYI Linked with Battle.net account
     ACCOUNT_FLAG_DEMOS                = 0x10000000, // NYI UNK
-    ACCOUNT_FLAG_DEATH_KNIGHT_OK      = 0x20000000, // NYI Has level 55 on account?
+    ACCOUNT_FLAG_DEATH_KNIGHT_OK      = 0x20000000, // Allowed to create Death Knight (account met heroic level requirement on WotLK+)
     // Below might be StarCraft II related
     ACCOUNT_FLAG_S2_REQUIRE_IGR       = 0x40000000, // NYI UNK
     ACCOUNT_FLAG_S2_TRIAL             = 0x80000000, // NYI UNK

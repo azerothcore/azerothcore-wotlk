@@ -282,6 +282,12 @@ void SmartAIMgr::LoadSmartAIFromDB()
                 if (temp.event.minMaxRepeat.repeatMin == 0 && temp.event.minMaxRepeat.repeatMax == 0)
                     temp.event.event_flags |= SMART_EVENT_FLAG_NOT_REPEATABLE;
                 break;
+            case SMART_EVENT_DAMAGED:
+                // health check mode stays below the threshold on every following hit, so force one-shot;
+                // normal mode keeps repeatMin/repeatMax as a cooldown (0 = fire on every hit), so leave it repeatable.
+                if (temp.event.minMaxRepeat.rangeMin)
+                    temp.event.event_flags |= SMART_EVENT_FLAG_NOT_REPEATABLE;
+                break;
             case SMART_EVENT_VICTIM_CASTING:
             case SMART_EVENT_FRIENDLY_IS_CC:
                 if (temp.event.friendlyCC.repeatMin == 0 && temp.event.friendlyCC.repeatMax == 0)
@@ -330,7 +336,7 @@ void SmartAIMgr::CheckIfSmartAIInDatabaseExists()
             // check GUID SAI
             for (auto const& pair : sObjectMgr->GetAllCreatureData())
             {
-                if (pair.second.id1 != creatureTemplate.Entry)
+                if (pair.second.id != creatureTemplate.Entry)
                     continue;
 
                 if (mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_CREATURE)].find((-1) * pair.first) != mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_CREATURE)].end())
@@ -1075,7 +1081,6 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             case SMART_EVENT_MANA_PCT:
             case SMART_EVENT_TARGET_HEALTH_PCT:
             case SMART_EVENT_TARGET_MANA_PCT:
-            case SMART_EVENT_DAMAGED:
             case SMART_EVENT_DAMAGED_TARGET:
             case SMART_EVENT_RECEIVE_HEAL:
                 if (!IsMinMaxValid(e, e.event.minMaxRepeat.min, e.event.minMaxRepeat.max))
@@ -1083,6 +1088,25 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
 
                 if (!IsMinMaxValid(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax))
                     return false;
+                break;
+            case SMART_EVENT_DAMAGED:
+                if (e.event.minMaxRepeat.rangeMin) // health check mode
+                {
+                    if (e.event.minMaxRepeat.rangeMin > 100)
+                    {
+                        LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} has invalid health pct value ({}), must be between 1 and 100, skipped.",
+                                     e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.event.minMaxRepeat.rangeMin);
+                        return false;
+                    }
+                }
+                else // normal mode
+                {
+                    if (!IsMinMaxValid(e, e.event.minMaxRepeat.min, e.event.minMaxRepeat.max))
+                        return false;
+
+                    if (!IsMinMaxValid(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax))
+                        return false;
+                }
                 break;
             case SMART_EVENT_AREA_RANGE:
             case SMART_EVENT_AREA_CASTING:
@@ -2100,7 +2124,7 @@ bool SmartAIMgr::IsTextValid(SmartScriptHolder const& e, uint32 id)
                         return false;
                     }
                     else
-                        entry = data->id1;
+                        entry = data->id;
                 }
                 else
                     entry = uint32(e.entryOrGuid);

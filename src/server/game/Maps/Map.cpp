@@ -307,7 +307,7 @@ bool Map::AddToMap(T* obj, bool checkTransport)
     if (obj->IsInWorld())
     {
         ASSERT(obj->IsInGrid());
-        obj->UpdateObjectVisibilityOnCreate();
+        obj->UpdateObjectVisibility(true);
         return true;
     }
 
@@ -344,7 +344,7 @@ bool Map::AddToMap(T* obj, bool checkTransport)
 
     //something, such as vehicle, needs to be update immediately
     //also, trigger needs to cast spell, if not update, cannot see visual
-    obj->UpdateObjectVisibility(true);
+    obj->UpdateObjectVisibilityOnCreate();
 
     // Post-visibility so accessories seat after the vehicle's create packet reaches clients.
     if (obj->IsCreature())
@@ -2784,6 +2784,19 @@ void Map::ProcessCreatureRespawn(ObjectGuid::LowType spawnId)
             RemoveCreatureRespawnTime(spawnId);
             return;
         }
+    }
+
+    // Check linked_respawn: don't spawn if the master creature is still dead.
+    // This mirrors the check in Creature::Respawn() for compat-mode creatures.
+    ObjectGuid dbtableHighGuid = ObjectGuid::Create<HighGuid::Unit>(data->id, spawnId);
+    time_t linkedRespawntime = GetLinkedRespawnTime(dbtableHighGuid);
+    if (linkedRespawntime)
+    {
+        // Master is still dead; re-queue at the master's respawn time + a small offset.
+        time_t now = GameTime::GetGameTime().count();
+        time_t newRespawnTime = (now > linkedRespawntime ? now : linkedRespawntime) + urand(5, MINUTE);
+        SaveCreatureRespawnTime(spawnId, newRespawnTime);
+        return;
     }
 
     // Remove respawn time BEFORE LoadFromDB, otherwise the creature
