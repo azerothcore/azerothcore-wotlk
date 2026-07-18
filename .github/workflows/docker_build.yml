@@ -7,6 +7,7 @@ on:
     types:
       - labeled
       - synchronize
+  workflow_dispatch:
 
 concurrency:
   # One concurrency group per workflow + ref.
@@ -125,3 +126,156 @@ jobs:
               "ref": "${{ github.ref_name }}",
               "sha": "${{ github.sha }}"
             }
+
+      # ----------------------------------------------------------------------
+      # Pre-imported DB image (acore/ac-wotlk-db)
+      #
+      # Kept LAST so a failure here cannot block the six images already pushed
+      # above (build and push are fused per step). It only marks the run failed.
+      #
+      # When it BUILDS (like the sibling images):
+      #   - labeled PR (run-build): build only, validate, no push
+      #   - master push: only when data/sql/** changed (core-only pushes leave the
+      #     existing :master DB image valid)
+      #   - workflow_dispatch: always (manual rebuild)
+      # When it PUSHES: only on master of the canonical repo.
+      # ----------------------------------------------------------------------
+      - name: Decide whether to build the DB image
+        id: db_gate
+        run: |
+          set -euo pipefail
+          build=false
+          case "${{ github.event_name }}" in
+            workflow_dispatch)
+              build=true ;;                       # manual rebuild
+            pull_request)
+              build=true ;;                       # labeled PR: validate, no push
+            *)
+              # push: on master, rebuild only when DB content changed. Compare
+              # against github.event.before with a targeted fetch (two-dot diff
+              # needs only the two commit objects, not the history between them).
+              # Fail safe toward rebuilding whenever the base can't be resolved.
+              if [ "${{ github.ref_name }}" = "master" ]; then
+                before="${{ github.event.before }}"
+                if [ -z "$before" ] || [ "$before" = "0000000000000000000000000000000000000000" ]; then
+                  build=true                      # no base → rebuild
+                elif ! git fetch --depth=1 origin "$before"; then
+                  build=true                      # base unfetchable → rebuild
+                else
+                  # Capture to a var (no pipe) to avoid set -o pipefail + SIGPIPE
+                  # false negatives from `grep -q`.
+                  changed="$(git diff --name-only "$before" "${{ github.sha }}" -- 'data/sql/**')"
+                  if [ -n "$changed" ]; then build=true; fi
+                fi
+              fi ;;
+          esac
+          echo "build=$build" >> "$GITHUB_OUTPUT"
+
+      - name: Import database and capture datadir
+        if: steps.db_gate.outputs.build == 'true'
+        run: |
+          set -euo pipefail
+
+          # Tear down the helper container/network on success or failure.
+          cleanup() {
+            docker rm -f acdb >/dev/null 2>&1 || true
+            docker network rm acnet >/dev/null 2>&1 || true
+          }
+          trap cleanup EXIT
+
+          docker network create acnet
+
+          mkdir -p mysql-seed
+          docker run -d --name acdb --network acnet \
+            -e MYSQL_ROOT_PASSWORD=password \
+            -v "$PWD/mysql-seed:/var/lib/mysql" \
+            mysql:8.4 --skip-log-bin
+
+          # The plain mysql image has no built-in healthcheck; poll explicitly.
+          # Poll over TCP from another container (same as dbimport connects): the
+          # image's first-boot temporary init server runs with --skip-networking,
+          # so a socket ping would falsely report "alive" before TCP 3306 is up,
+          # and dbimport does not retry its initial connection.
+          for i in $(seq 1 60); do
+            if docker run --rm --network acnet mysql:8.4 \
+                 mysqladmin ping -h acdb -uroot -ppassword --silent; then
+              break
+            fi
+            if [ "$i" -eq 60 ]; then
+              echo "MySQL did not become ready in time" >&2
+              docker logs acdb >&2 || true
+              exit 1
+            fi
+            sleep 2
+          done
+
+          # Import with the published db-import image (includes Eluna, no test
+          # modules). AutoSetup creates the acore_* databases. On master this is
+          # the image pushed earlier in this same job; on a labeled PR it is the
+          # current published :master, validating the pipeline mechanics (per-PR
+          # SQL content is already covered by dashboard-ci's dry-run).
+          docker pull "acore/ac-wotlk-db-import:master"
+          docker run --rm --network acnet \
+            -e AC_LOGIN_DATABASE_INFO="acdb;3306;root;password;acore_auth" \
+            -e AC_WORLD_DATABASE_INFO="acdb;3306;root;password;acore_world" \
+            -e AC_CHARACTER_DATABASE_INFO="acdb;3306;root;password;acore_characters" \
+            "acore/ac-wotlk-db-import:master"
+
+          # Native-install parity account for standalone/non-root clients.
+          docker exec acdb mysql -uroot -ppassword -e \
+            "CREATE USER 'acore'@'%' IDENTIFIED BY 'acore';
+             GRANT ALL PRIVILEGES ON acore_world.*      TO 'acore'@'%' WITH GRANT OPTION;
+             GRANT ALL PRIVILEGES ON acore_characters.* TO 'acore'@'%' WITH GRANT OPTION;
+             GRANT ALL PRIVILEGES ON acore_auth.*       TO 'acore'@'%' WITH GRANT OPTION;
+             FLUSH PRIVILEGES;"
+
+          # Clean shutdown so the InnoDB datadir is consistent before capture.
+          docker stop -t 120 acdb
+
+          # Bind-mounted files are owned by uid 999 (container mysql user); make
+          # them readable as the build context for the runner user.
+          sudo chown -R "$(id -u):$(id -g)" mysql-seed
+
+          # Minimal build context: only the datadir, not the ~GB repo.
+          mkdir -p db-ctx
+          mv mysql-seed db-ctx/
+
+      - name: Build (and push on master) pre-imported DB image
+        if: steps.db_gate.outputs.build == 'true'
+        run: |
+          set -euo pipefail
+          VERSION="$(jq -r '.version' acore.json)"
+
+          # Push only on master of the canonical repo (same condition as
+          # RUNNING_ON_PRIMARY_BRANCH, computed here to avoid its trailing newline).
+          if [ "${{ github.repository }}" = "azerothcore/azerothcore-wotlk" ] && [ "${{ github.ref_name }}" = "master" ]; then
+            # master: multi-arch (same arch-neutral datadir on each base) + push.
+            docker buildx build --platform linux/amd64,linux/arm64 \
+              -f apps/docker/Dockerfile.db \
+              -t "acore/ac-wotlk-db:master" \
+              -t "acore/ac-wotlk-db:${VERSION}" \
+              --push db-ctx
+          else
+            # PR validation: single-arch, load locally, smoke-test that it boots
+            # with the data baked in. No push (no Docker Hub login on PRs).
+            docker buildx build --platform linux/amd64 --load \
+              -f apps/docker/Dockerfile.db \
+              -t "acore/ac-wotlk-db:pr-test" db-ctx
+
+            trap 'docker rm -f acdb-test >/dev/null 2>&1 || true' EXIT
+            docker run -d --name acdb-test acore/ac-wotlk-db:pr-test
+            # Pre-initialized datadir: the entrypoint skips init and starts the
+            # real server directly, so a socket ping has no temp-server race here.
+            for i in $(seq 1 60); do
+              docker exec acdb-test mysqladmin ping -uroot -ppassword --silent && break
+              if [ "$i" -eq 60 ]; then
+                echo "DB image failed to boot" >&2; docker logs acdb-test >&2; exit 1
+              fi
+              sleep 2
+            done
+            for db in acore_auth acore_world acore_characters; do
+              docker exec acdb-test mysql -uroot -ppassword \
+                -e "USE $db; SELECT 1;" >/dev/null
+            done
+            echo "DB image booted and all three databases are present."
+          fi
