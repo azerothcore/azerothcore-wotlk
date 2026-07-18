@@ -2841,6 +2841,66 @@ void Player::SendInitialSpells()
     SendDirectMessage(&data);
 }
 
+void Player::SendUnlearnSpells()
+{
+    WorldPacket data(SMSG_SEND_UNLEARN_SPELLS, 4 + 4 * m_spells.size());
+
+    uint32 spellCount = 0;
+    size_t countPos = data.wpos();
+    data << uint32(spellCount);
+
+    for (auto const& itr : m_spells)
+    {
+        if (itr.second->State == PLAYERSPELL_REMOVED || itr.second->Active)
+            continue;
+
+        auto skillLineAbilities = sSpellMgr->GetSkillLineAbilityMapBounds(itr.first);
+        if (skillLineAbilities.first == skillLineAbilities.second)
+            continue;
+
+        // Client already hides ranks that have a superseding rank
+        bool hasSupercedingRank = false;
+        for (auto slaItr = skillLineAbilities.first; slaItr != skillLineAbilities.second; ++slaItr)
+        {
+            if (slaItr->second->SupercededBySpell)
+            {
+                hasSupercedingRank = true;
+                break;
+            }
+        }
+        if (hasSupercedingRank)
+            continue;
+
+        uint32 nextRank = sSpellMgr->GetNextSpellInChain(itr.first);
+        if (!nextRank || !HasSpell(nextRank))
+            continue;
+
+        data << uint32(itr.first);
+        ++spellCount;
+    }
+
+    data.put<uint32>(countPos, spellCount);
+    SendDirectMessage(&data);
+}
+
+bool Player::IsUnlearnNeededForSpell(uint32 spellId)
+{
+    SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(spellId);
+    if (spellInfo->IsRanked() && !spellInfo->IsStackableWithRanks())
+    {
+        auto skillLineAbilities = sSpellMgr->GetSkillLineAbilityMapBounds(spellId);
+        if (skillLineAbilities.first != skillLineAbilities.second)
+        {
+            for (auto itr = skillLineAbilities.first; itr != skillLineAbilities.second; ++itr)
+                if (itr->second->SupercededBySpell)
+                    return false;
+
+            return true;
+        }
+    }
+    return false;
+}
+
 void Player::RemoveMail(uint32 id)
 {
     for (PlayerMails::iterator itr = m_mail.begin(); itr != m_mail.end(); ++itr)
@@ -3066,6 +3126,10 @@ bool Player::addSpell(uint32 spellId, uint8 addSpecMask, bool updateActive, bool
                 if (nextSpellInfo->GetRank() < spellInfo->GetRank())
                 {
                     itr->second->Active = false;
+
+                    if (!isBeingLoaded() && IsUnlearnNeededForSpell(spellId))
+                        SendUnlearnSpells();
+
                     if (IsInWorld())
                     {
                         WorldPacket data(SMSG_SUPERCEDED_SPELL, 4 + 4);
@@ -3080,12 +3144,19 @@ bool Player::addSpell(uint32 spellId, uint8 addSpecMask, bool updateActive, bool
                     PlayerSpellMap::iterator itr2 = m_spells.find(spellInfo->Id);
                     if (itr2 != m_spells.end())
                         itr2->second->Active = false;
+
+                    if (!isBeingLoaded() && IsUnlearnNeededForSpell(spellId))
+                        SendUnlearnSpells();
+
                     return false;
                 }
             }
             nextSpellInfo = nextSpellInfo->GetNextRankSpell();
         }
     }
+
+    if (!isBeingLoaded() && IsUnlearnNeededForSpell(spellId))
+        SendUnlearnSpells();
 
     return true;
 }
@@ -3932,10 +4003,10 @@ bool Player::HasSpell(uint32 spell) const
     return (itr != m_spells.end() && itr->second->State != PLAYERSPELL_REMOVED && itr->second->IsInSpec(m_activeSpec));
 }
 
-bool Player::HasTalent(uint32 spell, uint8  /*spec*/) const
+bool Player::HasTalent(uint32 spell, uint8 spec) const
 {
     PlayerTalentMap::const_iterator itr = m_talents.find(spell);
-    return (itr != m_talents.end() && itr->second->State != PLAYERSPELL_REMOVED && itr->second->IsInSpec(m_activeSpec));
+    return (itr != m_talents.end() && itr->second->State != PLAYERSPELL_REMOVED && itr->second->IsInSpec(spec));
 }
 
 bool Player::HasActiveSpell(uint32 spell) const
@@ -5735,7 +5806,7 @@ void Player::SendMessageToSet(WorldPacket const* data, Player const* skipped_rcv
     if (skipped_rcvr != this)
         SendDirectMessage(data);
 
-    Acore::MessageDistDeliverer notifier(this, data, 0.0f, false, skipped_rcvr);
+    Acore::MessageDistDeliverer notifier(this, data, 0.0f, Acore::TeamFilter::All, skipped_rcvr);
     notifier.Visit(GetObjectVisibilityContainer().GetVisiblePlayersMap());
 }
 
@@ -7937,6 +8008,15 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
                 // get next RR player (for next loot)
                 if (groupRules && !go->loot.empty())
                     group->UpdateLooterGuid(go);
+
+                if (groupRules)
+                {
+                    GuidUnorderedSet const& allowedLooters = go->GetAllowedLooters();
+                    if (!allowedLooters.empty())
+                        for (ObjectGuid const& allowedGuid : allowedLooters)
+                            if (Player* allowedPlayer = ObjectAccessor::FindPlayer(allowedGuid))
+                                loot->FillNotNormalLootFor(allowedPlayer);
+                }
             }
             if (GameObjectTemplateAddon const* addon = go->GetTemplateAddon())
                 loot->generateMoneyLoot(addon->mingold, addon->maxgold);
@@ -8235,6 +8315,8 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
     if (permission != NONE_PERMISSION)
     {
         SetLootGUID(guid);
+
+        sScriptMgr->OnPlayerBeforeSendLoot(this, guid, loot);
 
         WorldPacket data(SMSG_LOOT_RESPONSE, (9 + 50));         // we guess size
         data << guid;
@@ -9450,7 +9532,7 @@ void Player::Say(std::string_view text, Language language, WorldObject const* /*
     SendDirectMessage(&data);
 
     // Special handling for messages, do not use visibility map for stealthed units
-    Acore::MessageDistDeliverer notifier(this, &data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), false, nullptr, true);
+    Acore::MessageDistDeliverer notifier(this, &data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY), Acore::TeamFilter::All, nullptr, true);
     Cell::VisitObjects(this, notifier, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_SAY));
 }
 
@@ -9478,7 +9560,7 @@ void Player::Yell(std::string_view text, Language language, WorldObject const* /
     SendDirectMessage(&data);
 
     // Special handling for messages, do not use visibility map for stealthed units
-    Acore::MessageDistDeliverer notifier(this, &data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL), false, nullptr, true);
+    Acore::MessageDistDeliverer notifier(this, &data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL), Acore::TeamFilter::All, nullptr, true);
     Cell::VisitObjects(this, notifier, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_YELL));
 }
 
@@ -9506,8 +9588,27 @@ void Player::TextEmote(std::string_view text, WorldObject const* /*= nullptr*/, 
     SendDirectMessage(&data);
 
     // Special handling for messages, do not use visibility map for stealthed units
-    Acore::MessageDistDeliverer notifier(this, &data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), !GetSession()->HasPermission(rbac::RBAC_PERM_TWO_SIDE_INTERACTION_CHAT), nullptr, true);
-    Cell::VisitObjects(this, notifier, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE));
+    if (GetSession()->HasPermission(rbac::RBAC_PERM_TWO_SIDE_INTERACTION_CHAT))
+    {
+        Acore::MessageDistDeliverer notifier(this, &data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), Acore::TeamFilter::All, nullptr, true);
+        Cell::VisitObjects(this, notifier, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE));
+    }
+    else
+    {
+        // Same faction
+        {
+            Acore::MessageDistDeliverer notifier(this, &data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), Acore::TeamFilter::OwnTeam, nullptr, true);
+            Cell::VisitObjects(this, notifier, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE));
+        }
+        // Opposite faction
+        {
+            WorldPacket data;
+            ChatHandler::BuildChatPacket(data, CHAT_MSG_EMOTE, LANG_UNIVERSAL, this, this, "");
+
+            Acore::MessageDistDeliverer notifier(this, &data, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE), Acore::TeamFilter::OtherTeam, nullptr, true);
+            Cell::VisitObjects(this, notifier, sWorld->getFloatConfig(CONFIG_LISTEN_RANGE_TEXTEMOTE));
+        }
+    }
 }
 
 void Player::TextEmote(uint32 textId, WorldObject const* target /*= nullptr*/, bool /*isBossEmote = false*/)
@@ -11639,10 +11740,7 @@ void Player::SendInitialPacketsBeforeAddToMap()
     SendDirectMessage(&data);
 
     SendInitialSpells();
-
-    data.Initialize(SMSG_SEND_UNLEARN_SPELLS, 4);
-    data << uint32(0);                                      // count, for (count) uint32;
-    SendDirectMessage(&data);
+    SendUnlearnSpells();
 
     SendInitialActionButtons();
     m_reputationMgr->SendInitialReputations();
@@ -11692,6 +11790,12 @@ void Player::SendInitialPacketsAfterAddToMap()
         if (!auraList.empty())
             auraList.front()->HandleEffect(this, AURA_EFFECT_HANDLE_SEND_FOR_CLIENT, true);
     }
+
+    // Explicitly synchronize CAN_FLY state with client on login to prevent
+    // players from retaining flight ability after disconnecting during a
+    // teleport from a flyable to non-flyable zone (e.g. entering an instance).
+    if (!HasIncreaseMountedFlightSpeedAura() && !HasFlyAura())
+        SetCanFly(false);
 
     // Fix mount, update block gets messed somewhere
     {
@@ -11775,6 +11879,13 @@ void Player::SendInitialPacketsAfterAddToMap()
     }
     else if (GetRaidDifficulty() != GetStoredRaidDifficulty())
         SendRaidDifficulty(GetGroup() != nullptr);
+
+    // Re-send any pending group loot rolls to this player when they enter a dungeon/raid.
+    if (Map* map = GetMap())
+        if (map->IsDungeon() || map->IsRaid())
+            if (Group* group = GetGroup())
+                group->SendPendingRollsToPlayer(this, map);
+
 }
 
 void Player::SendUpdateToOutOfRangeGroupMembers()
@@ -15983,6 +16094,24 @@ void Player::_LoadRandomBGStatus(PreparedQueryResult result)
 {
     if (result)
         m_IsBGRandomWinner = true;
+}
+
+float Player::GetTotalItemLevel() const
+{
+    float sum = 0;
+    uint8 level = GetLevel();
+
+    for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
+    {
+        // don't check tabard, ranged, offhand or shirt
+        if (i == EQUIPMENT_SLOT_TABARD || i == EQUIPMENT_SLOT_RANGED || i == EQUIPMENT_SLOT_OFFHAND || i == EQUIPMENT_SLOT_BODY)
+            continue;
+
+        if (m_items[i] && m_items[i]->GetTemplate())
+            sum += m_items[i]->GetTemplate()->GetItemLevelIncludingQuality(level);
+    }
+
+    return sum;
 }
 
 float Player::GetAverageItemLevel()

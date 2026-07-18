@@ -31,6 +31,7 @@
 #include "ThreatManager.h"
 #include "UnitDefines.h"
 #include "UnitUtils.h"
+#include <boost/container/flat_map.hpp>
 #include <functional>
 #include <utility>
 
@@ -666,15 +667,15 @@ public:
     typedef std::unordered_set<Unit*> AttackerSet;
     typedef std::set<Unit*> ControlSet;
 
-    typedef std::multimap<uint32,  Aura*> AuraMap;
+    typedef boost::container::flat_multimap<uint32,  Aura*> AuraMap;
     typedef std::pair<AuraMap::const_iterator, AuraMap::const_iterator> AuraMapBounds;
     typedef std::pair<AuraMap::iterator, AuraMap::iterator> AuraMapBoundsNonConst;
 
-    typedef std::multimap<uint32,  AuraApplication*> AuraApplicationMap;
+    typedef boost::container::flat_multimap<uint32,  AuraApplication*> AuraApplicationMap;
     typedef std::pair<AuraApplicationMap::const_iterator, AuraApplicationMap::const_iterator> AuraApplicationMapBounds;
     typedef std::pair<AuraApplicationMap::iterator, AuraApplicationMap::iterator> AuraApplicationMapBoundsNonConst;
 
-    typedef std::multimap<AuraStateType,  AuraApplication*> AuraStateAurasMap;
+    typedef boost::container::flat_multimap<AuraStateType,  AuraApplication*> AuraStateAurasMap;
     typedef std::pair<AuraStateAurasMap::const_iterator, AuraStateAurasMap::const_iterator> AuraStateAurasMapBounds;
 
     typedef std::vector<AuraEffect*> AuraEffectList;
@@ -1729,12 +1730,6 @@ public:
                              UNIT_STATE_ROOT | UNIT_STATE_STUNNED | UNIT_STATE_DISTRACTED) && !GetOwnerGUID();
     }
 
-    [[nodiscard]] bool HasLeewayMovement() const
-    {
-         return m_movementInfo.HasMovementFlag(MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_STRAFE_LEFT | MOVEMENTFLAG_STRAFE_RIGHT | MOVEMENTFLAG_FALLING)
-                && !IsWalking();
-    }
-
     void KnockbackFrom(float x, float y, float speedXY, float speedZ);
     void JumpTo(float speedXY, float speedZ, bool forward = true);
     void JumpTo(WorldObject* obj, float speedZ);
@@ -2170,7 +2165,7 @@ protected:
     AuraMap m_ownedAuras;
     AuraApplicationMap m_appliedAuras;
     AuraList m_removedAuras;
-    AuraMap::iterator m_auraUpdateIterator;
+    std::vector<Aura*> m_auraUpdateSnapshot; // _UpdateSpells scratch buffer
     uint32 m_removedAurasCount;
 
     AuraEffectList m_modAuras[TOTAL_AURAS];
