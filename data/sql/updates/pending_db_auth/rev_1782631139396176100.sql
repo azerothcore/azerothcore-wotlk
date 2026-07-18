@@ -1,7 +1,7 @@
-DELETE FROM `rbac_permissions` WHERE `id` = 939;
+DELETE FROM `rbac_permissions` WHERE `id` = 940;
 INSERT INTO `rbac_permissions` (`id`, `name`) VALUES
-(939, 'Command: group invites');
+(940, 'Command: group invites');
 
-DELETE FROM `rbac_linked_permissions` WHERE `linkedId` = 939;
+DELETE FROM `rbac_linked_permissions` WHERE `linkedId` = 940;
 INSERT INTO `rbac_linked_permissions` (`id`, `linkedId`) VALUES
-(197, 939);
+(197, 940);
