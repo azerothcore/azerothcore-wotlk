@@ -5,7 +5,7 @@
 -- -------------------------------------------
 -- Knight of the Ebon Blade (Entry 29202, GUIDs 125724 and 125726)
 -- Set SAI for 29202; set 'CanFly' flags due to AzerothCore limitation (can't set per-guid)
-UPDATE `creature_template` SET `AIName` = 'SmartAI', `flags_extra` = 66048 WHERE `entry` = 29202;
+UPDATE `creature_template` SET `AIName` = 'SmartAI', `flags_extra` = `flags_extra` |512 WHERE `entry` = 29202;
 -- Flight waypoints for 125724
 DELETE FROM `waypoint_data` WHERE `id` = 1257240;
 INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `delay`, `move_type`, `action`, `action_chance`, `wpguid`, `velocity`, `smoothTransition`) VALUES
