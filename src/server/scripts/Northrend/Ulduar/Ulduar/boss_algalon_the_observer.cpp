@@ -151,12 +151,12 @@ enum Events
     EVENT_DESPAWN_ALGALON_4         = 39,
     EVENT_DESPAWN_ALGALON_5         = 40,
 
-    // Living Constellation
-    EVENT_ARCANE_BARRAGE            = 41,
+    EVENT_INTRO_CHANNEL             = 41,
+    EVENT_INTRO_SUMMON              = 42,
+    EVENT_INTRO_DESCEND             = 43,
 
-    EVENT_INTRO_CHANNEL             = 42,
-    EVENT_INTRO_SUMMON              = 43,
-    EVENT_INTRO_DESCEND             = 44,
+    // Living Constellation
+    EVENT_ARCANE_BARRAGE            = 44,
 };
 
 enum EncounterPhases
