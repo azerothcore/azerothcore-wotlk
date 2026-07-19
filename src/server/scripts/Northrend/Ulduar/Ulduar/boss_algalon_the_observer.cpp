@@ -949,7 +949,7 @@ struct npc_living_constellation : public ScriptedAI
     void Reset() override
     {
         events.Reset();
-        events.ScheduleEvent(EVENT_ARCANE_BARRAGE, 2500ms);
+        events.ScheduleEvent(EVENT_ARCANE_BARRAGE, 5s);
         _isActive = false;
     }
 
@@ -1007,8 +1007,8 @@ struct npc_living_constellation : public ScriptedAI
         switch (events.ExecuteEvent())
         {
             case EVENT_ARCANE_BARRAGE:
-                me->CastCustomSpell(SPELL_ARCANE_BARRAGE, SPELLVALUE_MAX_TARGETS, 1, (Unit*)nullptr, true);
-                events.Repeat(2500ms);
+                me->CastCustomSpell(SPELL_ARCANE_BARRAGE, SPELLVALUE_MAX_TARGETS, 1, (Unit*)nullptr, false);
+                events.Repeat(5s);
                 break;
             case EVENT_RESUME_UPDATING:
                 events.SetPhase(0);
