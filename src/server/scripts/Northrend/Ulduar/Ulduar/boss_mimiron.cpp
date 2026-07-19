@@ -964,7 +964,10 @@ struct npc_ulduar_leviathan_mkii : public ScriptedAI
         ScriptedAI::AttackStart(who);
         // Unit::Attack clears the emote state on target switch, which would retract VX-001's arms
         if (_phase == 4)
+        {
             me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
+            me->HandleEmoteCommand(EMOTE_STATE_CUSTOM_SPELL_01);
+        }
     }
 
     void SetData(uint32 id, uint32 value) override
@@ -1065,7 +1068,15 @@ struct npc_ulduar_leviathan_mkii : public ScriptedAI
         _events.Update(diff);
 
         if (!me->HasUnitState(UNIT_STATE_CASTING))
+        {
+            bool wasAttackReady = me->isAttackReady();
             DoMeleeAttackIfReady();
+            // Each melee swing knocks the client out of the arms-deployed loop, retracting
+            // VX-001's arms. Field updates with an unchanged value are ignored by the client,
+            // so replay the state emote via SMSG_EMOTE, which is always applied.
+            if (_phase == 4 && wasAttackReady && !me->isAttackReady())
+                me->HandleEmoteCommand(EMOTE_STATE_CUSTOM_SPELL_01);
+        }
 
         Unit* cannon = GetS3();
         if (!cannon || cannon->HasUnitState(UNIT_STATE_CASTING) || me->HasUnitState(UNIT_STATE_CASTING) || me->HasSilenceAura())
