@@ -5202,6 +5202,16 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].BasePoints = 1;
     });
 
+    ApplySpellFix({
+        42292,  // PvP Trinket
+        59752,  // Every Man for Himself
+        19574,  // Bestial Wrath
+        34471   // The Beast Within
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_NO_SCHOOL_IMMUNITIES;
+    });
+
     // 51036 Summon Venture Co. Air Patrol
     ApplySpellFix({ 51036 }, [](SpellInfo* spellInfo)
     {
