@@ -1753,6 +1753,56 @@ float WorldObject::GetSightRange(WorldObject const* target) const
     return 0.0f;
 }
 
+float WorldObject::GetLeewayBonusRangeForTargets(Player const* player, Unit const* target)
+{
+    if (!player || !target)
+        return 0.0f;
+
+    constexpr uint32 leewayMoveFlags = MOVEMENTFLAG_FORWARD | MOVEMENTFLAG_STRAFE_LEFT | MOVEMENTFLAG_STRAFE_RIGHT | MOVEMENTFLAG_FALLING;
+    if (player->HasUnitMovementFlag(leewayMoveFlags) && !player->IsWalking() && target->HasUnitMovementFlag(leewayMoveFlags) && !target->IsWalking())
+        return LEEWAY_BONUS_RANGE;
+
+    return 0.0f;
+}
+
+float WorldObject::GetLeewayBonusRange(Unit const* target) const
+{
+    if (!target)
+        return 0.0f;
+
+    if (Player const* player = ToPlayer())
+        return GetLeewayBonusRangeForTargets(player, target);
+
+    if (Player const* playerTarget = target->ToPlayer())
+        return GetLeewayBonusRangeForTargets(playerTarget, ToUnit());
+
+    return 0.0f;
+}
+
+float WorldObject::GetLeewayBonusRadius() const
+{
+    if (Player const* player = ToPlayer())
+    {
+        bool hasLeewayMovement = false;
+
+        if (player->HasUnitState(UNIT_STATE_JUMPING) || player->HasUnitMovementFlag(MOVEMENTFLAG_FALLING))
+            hasLeewayMovement = true;
+        else
+        {
+            float speedXY = (player->m_movementInfo.jump.xyspeed > 0.0f)
+                ? player->m_movementInfo.jump.xyspeed
+                : player->GetSpeed(player->IsWalking() ? MOVE_WALK : MOVE_RUN);
+
+            hasLeewayMovement = speedXY > LEEWAY_MIN_MOVE_SPEED;
+        }
+
+        if (hasLeewayMovement)
+            return LEEWAY_BONUS_RANGE;
+    }
+
+    return 0.0f;
+}
+
 bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, bool distanceCheck, bool checkAlert) const
 {
     if (this == obj)
@@ -1770,24 +1820,23 @@ bool WorldObject::CanSeeOrDetect(WorldObject const* obj, bool ignoreStealth, boo
         if (Player const* player = ToPlayer())
         {
             if (cObj->IsAIEnabled && !cObj->AI()->CanBeSeen(player))
-            {
                 return false;
-            }
 
-            ConditionList conditions = sConditionMgr->GetConditionsForNotGroupedEntry(CONDITION_SOURCE_TYPE_CREATURE_VISIBILITY, cObj->GetEntry());
-            if (!sConditionMgr->IsObjectMeetToConditions((WorldObject*)this, (WorldObject*)obj, conditions))
-            {
+            if (!player->CanSeeObjectByVisibilityConditions(obj))
                 return false;
-            }
         }
     }
 
     // Gameobject scripts
     if (GameObject const* goObj = obj->ToGameObject())
     {
-        if (ToPlayer() && !goObj->AI()->CanBeSeen(ToPlayer()))
+        if (Player const* player = ToPlayer())
         {
-            return false;
+            if (!goObj->AI()->CanBeSeen(player))
+                return false;
+
+            if (!player->CanSeeObjectByVisibilityConditions(obj))
+                return false;
         }
     }
 
@@ -2124,7 +2173,7 @@ void WorldObject::SendMessageToSetInRange(WorldPacket const* data, float dist, b
 
 void WorldObject::SendMessageToSet(WorldPacket const* data, Player const* skipped_rcvr) const
 {
-    Acore::MessageDistDeliverer notifier(this, data, 0.0f, false, skipped_rcvr);
+    Acore::MessageDistDeliverer notifier(this, data, 0.0f, Acore::TeamFilter::All, skipped_rcvr);
     notifier.Visit(GetObjectVisibilityContainer().GetVisiblePlayersMap());
 }
 
@@ -2288,8 +2337,9 @@ TempSummon* Map::SummonCreature(uint32 entry, Position const& pos, SummonPropert
 
     summon->InitSummon();
 
-    // call MoveInLineOfSight for nearby creatures
-    Acore::AIRelocationNotifier notifier(*summon);
+    // call MoveInLineOfSight for nearby players and creatures; players are visited
+    // first (grid typelist order) so aggressive summons prefer them over pets/totems
+    Acore::AIRelocationNotifier notifier(*summon, true);
     Cell::VisitObjects(summon, notifier, GetVisibilityRange());
 
     return summon;

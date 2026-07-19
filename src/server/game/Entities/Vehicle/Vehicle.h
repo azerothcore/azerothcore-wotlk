@@ -96,6 +96,7 @@ private:
     uint32 _usableSeatNum;         // Number of seats that match VehicleSeatEntry::UsableByPlayer, used for proper display flags
     uint32 _creatureEntry;         // Can be different than me->GetBase()->GetEntry() in case of players
     Status _status;
+    bool _accessoriesInstalled;
 };
 
 class VehicleDespawnEvent : public BasicEvent

@@ -161,8 +161,12 @@ struct boss_kologarn : public BossAI
 
         void AttachLeftArm()
         {
-            if (Unit* arm = ObjectAccessor::GetCreature(*me, _left))
+            if (Creature* arm = ObjectAccessor::GetCreature(*me, _left))
+            {
                 arm->SetHealth(arm->GetMaxHealth());
+                // Clear the arm's combat-start state so it can re-pull the boss on a subsequent attempt.
+                arm->AI()->Reset();
+            }
             else if (Creature* accessory = me->SummonCreature(NPC_LEFT_ARM, *me, TEMPSUMMON_MANUAL_DESPAWN))
             {
                 accessory->AddUnitTypeMask(UNIT_MASK_ACCESSORY);
@@ -179,8 +183,12 @@ struct boss_kologarn : public BossAI
 
         void AttachRightArm()
         {
-            if (Unit* arm = ObjectAccessor::GetCreature(*me, _right))
+            if (Creature* arm = ObjectAccessor::GetCreature(*me, _right))
+            {
                 arm->SetHealth(arm->GetMaxHealth());
+                // Clear the arm's combat-start state so it can re-pull the boss on a subsequent attempt.
+                arm->AI()->Reset();
+            }
             else if (Creature* accessory = me->SummonCreature(NPC_RIGHT_ARM, *me, TEMPSUMMON_MANUAL_DESPAWN))
             {
                 accessory->AddUnitTypeMask(UNIT_MASK_ACCESSORY);
@@ -441,7 +449,6 @@ struct boss_kologarn : public BossAI
                 {
                     events.ScheduleEvent(EVENT_FOCUSED_EYEBEAM, 20s);
                     me->CastSpell(me, SPELL_FOCUSED_EYEBEAM_SUMMON, false);
-                    Talk(EMOTE_EYES);
                     return;
                 }
                 case EVENT_RESTORE_ARM_LEFT:
@@ -605,6 +612,7 @@ struct boss_kologarn_eyebeam : public ScriptedAI
             if (Creature* cr = _instance->GetCreature(BOSS_KOLOGARN))
             {
                 me->CastSpell(cr, me->GetEntry() == NPC_EYE_LEFT ? SPELL_FOCUSED_EYEBEAM_LEFT : SPELL_FOCUSED_EYEBEAM_RIGHT, true);
+                cr->AI()->Talk(EMOTE_EYES, player);
             }
         }
     }
@@ -702,28 +710,6 @@ struct boss_kologarn_pit_kill_bunny : public NullCreatureAI
     }
 };
 
-// predicate function to select non main tank target
-class StoneGripTargetSelector
-{
-public:
-    StoneGripTargetSelector(Creature* me, Unit const* victim) : _me(me), _victim(victim) {}
-
-    bool operator() (WorldObject* target) const
-    {
-        if (target == _victim && _me->GetThreatMgr().GetThreatListSize() > 1)
-            return true;
-
-        if (!target->IsPlayer())
-            return true;
-
-        return false;
-    }
-
-private:
-    Creature* _me;
-    Unit const* _victim;
-};
-
 class spell_ulduar_stone_grip_cast_target : public SpellScript
 {
     PrepareSpellScript(spell_ulduar_stone_grip_cast_target);
@@ -735,18 +721,12 @@ class spell_ulduar_stone_grip_cast_target : public SpellScript
 
     void FilterTargetsInitial(std::list<WorldObject*>& targets)
     {
-        // Remove "main tank" and non-player targets
-        targets.remove_if(StoneGripTargetSelector(GetCaster()->ToCreature(), GetCaster()->GetVictim()));
-        // Maximum affected targets per difficulty mode
-        uint32 maxTargets = GetSpellInfo()->Id == SPELL_STONE_GRIP ? 1 : 3;
+        if (Unit* victim = GetCaster()->GetVictim())
+            targets.remove_if(Acore::ObjectGUIDCheck(victim->GetGUID(), true));
 
-        // Return a random amount of targets based on maxTargets
-        while (maxTargets < targets.size())
-        {
-            std::list<WorldObject*>::iterator itr = targets.begin();
-            advance(itr, urand(0, targets.size() - 1));
-            targets.erase(itr);
-        }
+        targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+
+        Acore::Containers::RandomResize(targets, GetSpellInfo()->Id == SPELL_STONE_GRIP ? 1 : 3);
     }
 
     void Register() override

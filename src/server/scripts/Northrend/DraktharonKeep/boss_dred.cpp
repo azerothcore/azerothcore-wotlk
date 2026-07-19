@@ -66,37 +66,45 @@ public:
 
         void ScheduleTasks() override
         {
-            ScheduleTimedEvent(20s, [&] {
-                DoCastVictim(SPELL_GRIEVOUS_BITE);
-            }, 20s);
-
-            ScheduleTimedEvent(18s + 500ms, [&] {
-                DoCastVictim(SPELL_MANGLING_SLASH);
-            }, 20s);
-
             ScheduleTimedEvent(10s, 20s, [&] {
                 DoCastAOE(SPELL_FEARSOME_ROAR);
             }, 17s);
 
-            ScheduleTimedEvent(17s, [&] {
-                DoCastVictim(SPELL_PIERCING_SLASH);
-            }, 20s);
+            // Claw emote followed by Piercing Slash, Mangling Slash, Grievous Bite sequence
+            scheduler.Schedule(13s, 18s, [this](TaskContext context)
+            {
+                Talk(SAY_CLAW_EMOTE);
+                if (Unit* victim = me->GetVictim())
+                {
+                    me->setAttackTimer(BASE_ATTACK, 2000);
+                    me->AttackerStateUpdate(victim);
+                    if (me->GetVictim())
+                        me->AttackerStateUpdate(me->GetVictim());
+                    if (me->GetVictim())
+                        me->AttackerStateUpdate(me->GetVictim());
+                }
+
+                context.Schedule(1500ms, [this](TaskContext context)
+                {
+                    DoCastVictim(SPELL_PIERCING_SLASH);
+                    context.Schedule(1500ms, [this](TaskContext context)
+                    {
+                        DoCastVictim(SPELL_MANGLING_SLASH);
+                        context.Schedule(1500ms, [this](TaskContext /*context*/)
+                        {
+                            DoCastVictim(SPELL_GRIEVOUS_BITE);
+                        });
+                    });
+                });
+
+                context.Repeat(18s, 35s);
+            });
 
             if (IsHeroic())
             {
                 ScheduleTimedEvent(16s, [&] {
                     DoCastSelf(SPELL_RAPTOR_CALL);
                 }, 30s);
-
-                ScheduleTimedEvent(21s, [&] {
-                    Talk(SAY_CLAW_EMOTE);
-                    me->setAttackTimer(BASE_ATTACK, 2000);
-                    me->AttackerStateUpdate(me->GetVictim());
-                    if (me->GetVictim())
-                        me->AttackerStateUpdate(me->GetVictim());
-                    if (me->GetVictim())
-                        me->AttackerStateUpdate(me->GetVictim());
-                }, 20s);
             }
         }
 

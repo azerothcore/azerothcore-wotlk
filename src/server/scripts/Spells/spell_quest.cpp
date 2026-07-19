@@ -381,27 +381,20 @@ class spell_q12943_shadow_vault_decree : public SpellScript
 {
     PrepareSpellScript(spell_q12943_shadow_vault_decree);
 
-    SpellCastResult CheckRequirement()
-    {
-        // if thane is present and not in combat - allow cast
-        Unit* caster = GetCaster();
-        if (Creature* thane = caster->FindNearestCreature(NPC_THANE_UFRANG, 30.0f))
-            if (!thane->IsInCombat())
-                return SPELL_CAST_OK;
-
-        return SPELL_FAILED_CASTER_AURASTATE;
-    }
-
     void HandleScriptEffect(SpellEffIndex /*effIndex*/)
     {
         Unit* caster = GetCaster();
         if (Creature* thane = caster->FindNearestCreature(NPC_THANE_UFRANG, 30.0f))
+        {
+            if (thane->IsInCombat())
+                return;
+            thane->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
             thane->AI()->AttackStart(caster);
+        }
     }
 
     void Register() override
     {
-        OnCheckCast += SpellCheckCastFn(spell_q12943_shadow_vault_decree::CheckRequirement);
         OnEffectHitTarget += SpellEffectFn(spell_q12943_shadow_vault_decree::HandleScriptEffect, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 };
@@ -2519,6 +2512,29 @@ class spell_q9847_a_spirit_ally : public SpellScript
     }
 };
 
+enum WyrmrestSkytalon
+{
+    NPC_WYRMREST_SKYTALON = 32535
+};
+
+class spell_q13413_wyrmrest_skytalon_ride_periodic : public AuraScript
+{
+    PrepareAuraScript(spell_q13413_wyrmrest_skytalon_ride_periodic);
+
+    void HandlePeriodic(AuraEffect const* aurEff)
+    {
+        PreventDefaultAction();
+        if (Unit* target = GetTarget())
+            if (Creature* skytalon = target->FindNearestCreature(NPC_WYRMREST_SKYTALON, 20.0f))
+                target->CastSpell(skytalon, GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_q13413_wyrmrest_skytalon_ride_periodic::HandlePeriodic, EFFECT_0, SPELL_AURA_PERIODIC_TRIGGER_SPELL);
+    }
+};
+
 void AddSC_quest_spell_scripts()
 {
     RegisterSpellScript(spell_q5561_kodo_roundup_kodo_kombobulator);
@@ -2592,4 +2608,5 @@ void AddSC_quest_spell_scripts()
     RegisterSpellScript(spell_q4735_collect_rookery_egg);
     RegisterSpellScript(spell_q10651_q10692_book_of_fel_names);
     RegisterSpellScript(spell_q9847_a_spirit_ally);
+    RegisterSpellScript(spell_q13413_wyrmrest_skytalon_ride_periodic);
 }

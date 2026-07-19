@@ -577,6 +577,7 @@ enum PlayerExtraFlags
     PLAYER_EXTRA_PVP_DEATH          = 0x0100,               // store PvP death status until corpse creating.
     PLAYER_EXTRA_SHOW_DK_PET        = 0x0400,               // Marks if player should see ghoul on login screen
     PLAYER_EXTRA_GM_SPECTATOR       = 0x0800,
+    PLAYER_EXTRA_DECLINE_GROUP_INVITES = 0x1000,            // Set when the player opted out of receiving group invites
 };
 
 // 2^n values
@@ -1171,7 +1172,10 @@ public:
     void SetBeastMaster(bool on) { if (on) SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE); else RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE); }
     [[nodiscard]] bool isAcceptWhispers() const { return m_ExtraFlags & PLAYER_EXTRA_ACCEPT_WHISPERS; }
     void SetAcceptWhispers(bool on) { if (on) m_ExtraFlags |= PLAYER_EXTRA_ACCEPT_WHISPERS; else m_ExtraFlags &= ~PLAYER_EXTRA_ACCEPT_WHISPERS; }
+    [[nodiscard]] bool IsAcceptGroupInvites() const { return !(m_ExtraFlags & PLAYER_EXTRA_DECLINE_GROUP_INVITES); }
+    void SetAcceptGroupInvites(bool on) { if (on) m_ExtraFlags &= ~PLAYER_EXTRA_DECLINE_GROUP_INVITES; else m_ExtraFlags |= PLAYER_EXTRA_DECLINE_GROUP_INVITES; }
     [[nodiscard]] bool IsGameMaster() const { return m_ExtraFlags & PLAYER_EXTRA_GM_ON; }
+    [[nodiscard]] bool CanBeGameMaster() const;
     void SetGameMaster(bool on);
     [[nodiscard]] bool isGMChat() const { return m_ExtraFlags & PLAYER_EXTRA_GM_CHAT; }
     void SetGMChat(bool on) { if (on) m_ExtraFlags |= PLAYER_EXTRA_GM_CHAT; else m_ExtraFlags &= ~PLAYER_EXTRA_GM_CHAT; }
@@ -1244,6 +1248,8 @@ public:
     /// Handles whispers from Addons and players based on sender, receiver's guid and language.
     void Whisper(std::string_view text, Language language, Player* receiver, bool = false) override;
     void Whisper(uint32 textId, Player* target, bool isBossWhisper = false) override;
+    /// Returns true if @p text contains any word from the `chat_filter` DB table (substring, case-insensitive).
+    static bool IsChatFiltered(std::string_view text);
 
     /*********************************************************/
     /***                    STORAGE SYSTEM                 ***/
@@ -1556,9 +1562,9 @@ public:
     void SendQuestReward(Quest const* quest, uint32 XP);
     void SendQuestFailed(uint32 questId, InventoryResult reason = EQUIP_ERR_OK);
     void SendQuestTimerFailed(uint32 quest_id);
-    void SendCanTakeQuestResponse(uint32 msg) const;
+    void SendCanTakeQuestResponse(QuestFailedReason msg) const;
     void SendQuestConfirmAccept(Quest const* quest, Player* pReceiver);
-    void SendPushToPartyResponse(Player const* player, uint8 msg) const;
+    void SendPushToPartyResponse(Player const* player, QuestShareMessages msg) const;
     void SendQuestUpdateAddItem(Quest const* quest, uint32 item_idx, uint16 count);
     void SendQuestUpdateAddCreatureOrGo(Quest const* quest, ObjectGuid guid, uint32 creatureOrGO_idx, uint16 old_count, uint16 add_count);
     void SendQuestUpdateAddPlayer(Quest const* quest, uint16 old_count, uint16 add_count);
@@ -1658,6 +1664,9 @@ public:
     void UpdateNextMailTimeAndUnreads();
     void AddNewMailDeliverTime(time_t deliver_time);
 
+    void SendUnlearnSpells();
+    static bool IsUnlearnNeededForSpell(uint32 spellId);
+
     void RemoveMail(uint32 id);
 
     void AddMail(Mail* mail) { m_mail.push_front(mail); }// for call from WorldSession::SendMailTo
@@ -1667,6 +1676,7 @@ public:
     [[nodiscard]] PlayerMails const& GetMails() const { return m_mail; }
     void SendItemRetrievalMail(uint32 itemEntry, uint32 count); // Item retrieval mails sent by The Postmaster (34337)
     void SendItemRetrievalMail(std::vector<std::pair<uint32, uint32>> mailItems); // Item retrieval mails sent by The Postmaster (34337)
+    void SendItemRetrievalMail(Item* item); // As above, but for a pre-created item (preserves randomPropertyId)
 
     /*********************************************************/
     /*** MAILED ITEMS SYSTEM ***/
@@ -2285,6 +2295,7 @@ public:
     /*********************************************************/
 
     [[nodiscard]] bool InBattleground() const { return m_bgData.bgInstanceID != 0; }
+    [[nodiscard]] bool InBattlefield() const;   // True if the player is in Wintergrasp and it's war time.
     [[nodiscard]] bool InArena() const;
     [[nodiscard]] uint32 GetBattlegroundId() const { return m_bgData.bgInstanceID; }
     [[nodiscard]] BattlegroundTypeId GetBattlegroundTypeId() const { return m_bgData.bgTypeID; }
@@ -2313,7 +2324,7 @@ public:
     [[nodiscard]] TeamId GetBgTeamId() const { return m_bgData.bgTeamId != TEAM_NEUTRAL ? m_bgData.bgTeamId : GetTeamId(); }
 
     void LeaveBattleground(Battleground* bg = nullptr);
-    [[nodiscard]] bool CanJoinToBattleground() const;
+    [[nodiscard]] bool CanJoinToBattleground(Battleground const* bg) const;
     bool CanReportAfkDueToLimit();
     void ReportedAfkBy(Player* reporter);
     void ClearAfkReports() { m_bgData.bgAfkReporter.clear(); }
@@ -2581,6 +2592,7 @@ public:
 
     //bool isActiveObject() const { return true; }
     bool CanSeeSpellClickOn(Creature const* creature) const;
+    [[nodiscard]] bool CanSeeObjectByVisibilityConditions(WorldObject const* object) const;
     [[nodiscard]] bool CanSeeVendor(Creature const* creature) const;
     [[nodiscard]] bool CanSeeTrainer(Creature const* creature) const;
 
@@ -2592,6 +2604,7 @@ public:
     Spell* m_spellModTakingSpell;
 
     float GetAverageItemLevel();
+    [[nodiscard]] float GetTotalItemLevel() const;
     float GetAverageItemLevelForDF();
     bool isDebugAreaTriggers;
 

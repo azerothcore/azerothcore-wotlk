@@ -1532,6 +1532,8 @@ public:
 
         void Reset() override
         {
+            // EnterEvadeMode override leaves UNIT_STATE_EVADE set; clear it so the dummy stays attackable
+            me->ClearUnitState(UNIT_STATE_EVADE);
             me->SetControlled(true, UNIT_STATE_STUNNED);
             isVulnerable = false;
 
@@ -1659,7 +1661,7 @@ enum BlessedBanner
     NPC_ARGENT_MASON                    = 30900,
     NPC_REANIMATED_CAPTAIN              = 30986,
     NPC_SCOURGE_DRUDGE                  = 30984,
-    NPC_HIDEOUS_PLAGEBRINGER            = 30987,
+    NPC_HIDEOUS_PLAGUEBRINGER           = 30987,
     NPC_HALOF_THE_DEATHBRINGER          = 30989,
     NPC_LK                              = 31013,
 
@@ -1771,9 +1773,20 @@ public:
 
         void MoveInLineOfSight(Unit* /*who*/) override { }
 
-        void JustSummoned(Creature* Summoned) override
+        void JustSummoned(Creature* summon) override
         {
-            Summons.Summon(Summoned);
+            Summons.Summon(summon);
+            if (summon->GetEntry() == NPC_SCOURGE_DRUDGE || summon->GetEntry() == NPC_REANIMATED_CAPTAIN ||
+                summon->GetEntry() == NPC_HIDEOUS_PLAGUEBRINGER || summon->GetEntry() == NPC_HALOF_THE_DEATHBRINGER)
+            {
+                summon->SetHomePosition(DalforsPos[2]);
+                summon->SetReactState(REACT_PASSIVE);
+                summon->EngageWithTarget(me);
+                summon->m_Events.AddEventAtOffset([summon]()
+                {
+                    summon->SetReactState(REACT_AGGRESSIVE);
+                }, 2s);
+            }
         }
 
         void JustDied(Unit* /*killer*/) override
@@ -1926,36 +1939,16 @@ public:
                             if (Creature* LK = GetClosestCreatureWithEntry(me, NPC_LK, 100))
                                 LK->AI()->Talk(LK_TALK_3);
                         }
-                        if (Creature* tempsum = DoSummon(NPC_SCOURGE_DRUDGE, Mason3Pos[0]))
-                        {
-                            tempsum->SetHomePosition(DalforsPos[2]);
-                            tempsum->AI()->AttackStart(GetClosestCreatureWithEntry(me, NPC_BLESSED_BANNER, 100));
-                        }
+                        DoSummon(NPC_SCOURGE_DRUDGE, Mason3Pos[0]);
                         if (urand(0, 1) == 0)
                         {
-                            if (Creature* tempsum = DoSummon(NPC_HIDEOUS_PLAGEBRINGER, Mason1Pos[0]))
-                            {
-                                tempsum->SetHomePosition(DalforsPos[2]);
-                                tempsum->AI()->AttackStart(GetClosestCreatureWithEntry(me, NPC_BLESSED_BANNER, 100));
-                            }
-                            if (Creature* tempsum = DoSummon(NPC_HIDEOUS_PLAGEBRINGER, Mason2Pos[0]))
-                            {
-                                tempsum->SetHomePosition(DalforsPos[2]);
-                                tempsum->AI()->AttackStart(GetClosestCreatureWithEntry(me, NPC_BLESSED_BANNER, 100));
-                            }
+                            DoSummon(NPC_HIDEOUS_PLAGUEBRINGER, Mason1Pos[0]);
+                            DoSummon(NPC_HIDEOUS_PLAGUEBRINGER, Mason2Pos[0]);
                         }
                         else
                         {
-                            if (Creature* tempsum = DoSummon(NPC_REANIMATED_CAPTAIN, Mason1Pos[0]))
-                            {
-                                tempsum->SetHomePosition(DalforsPos[2]);
-                                tempsum->AI()->AttackStart(GetClosestCreatureWithEntry(me, NPC_BLESSED_BANNER, 100));
-                            }
-                            if (Creature* tempsum = DoSummon(NPC_REANIMATED_CAPTAIN, Mason2Pos[0]))
-                            {
-                                tempsum->SetHomePosition(DalforsPos[2]);
-                                tempsum->AI()->AttackStart(GetClosestCreatureWithEntry(me, NPC_BLESSED_BANNER, 100));
-                            }
+                            DoSummon(NPC_REANIMATED_CAPTAIN, Mason1Pos[0]);
+                            DoSummon(NPC_REANIMATED_CAPTAIN, Mason2Pos[0]);
                         }
 
                         PhaseCount++;
@@ -1970,22 +1963,12 @@ public:
                     {
                         if (Creature* LK = GetClosestCreatureWithEntry(me, NPC_LK, 100))
                             LK->AI()->Talk(LK_TALK_4);
-                        if (Creature* tempsum = DoSummon(NPC_SCOURGE_DRUDGE, Mason1Pos[0]))
-                        {
-                            tempsum->SetHomePosition(DalforsPos[2]);
-                            tempsum->AI()->AttackStart(GetClosestCreatureWithEntry(me, NPC_BLESSED_BANNER, 100));
-                        }
-                        if (Creature* tempsum = DoSummon(NPC_SCOURGE_DRUDGE, Mason2Pos[0]))
-                        {
-                            tempsum->SetHomePosition(DalforsPos[2]);
-                            tempsum->AI()->AttackStart(GetClosestCreatureWithEntry(me, NPC_BLESSED_BANNER, 100));
-                        }
+                        DoSummon(NPC_SCOURGE_DRUDGE, Mason1Pos[0]);
+                        DoSummon(NPC_SCOURGE_DRUDGE, Mason2Pos[0]);
                         if (Creature* tempsum = DoSummon(NPC_HALOF_THE_DEATHBRINGER, DalforsPos[0]))
                         {
                             HalofSpawned = true;
                             guidHalof = tempsum->GetGUID();
-                            tempsum->SetHomePosition(DalforsPos[2]);
-                            tempsum->AI()->AttackStart(GetClosestCreatureWithEntry(me, NPC_BLESSED_BANNER, 100));
                         }
                     }
                     break;
@@ -2002,7 +1985,7 @@ public:
                     if (Halof->isDead())
                     {
                         DoCast(me, SPELL_CRUSADERS_SPIRE_VICTORY, true);
-                        Summons.DespawnEntry(NPC_HIDEOUS_PLAGEBRINGER);
+                        Summons.DespawnEntry(NPC_HIDEOUS_PLAGUEBRINGER);
                         Summons.DespawnEntry(NPC_REANIMATED_CAPTAIN);
                         Summons.DespawnEntry(NPC_SCOURGE_DRUDGE);
                         Summons.DespawnEntry(NPC_HALOF_THE_DEATHBRINGER);

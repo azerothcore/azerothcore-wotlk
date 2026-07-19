@@ -28,7 +28,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}
     env:
-      BOOST_ROOT: C:\local\boost_1_82_0
+      BOOST_ROOT: C:\local\boost_1_87_0
     if: |
       github.repository == 'azerothcore/azerothcore-wotlk'
       && !github.event.pull_request.draft
@@ -37,12 +37,73 @@ jobs:
       - uses: actions/checkout@v4
       - name: ccache
         uses: hendrikmuhs/ccache-action@v1.2.13
+      # Cache the fetched Boost + MySQL client so we don't re-download ~350 MB
+      # and re-run the Boost installer on every run. The Test-Path guards in
+      # "Configure OS" short-circuit the install work when these are restored.
+      - name: Cache Boost & MySQL
+        uses: actions/cache@v4
+        with:
+          path: |
+            C:\local\boost_1_87_0
+            C:\tools\mysql\current
+          key: winbuild-deps:boost-1.87.0:mysql-8.4.9
       - name: Configure OS
-        shell: bash
-        env:
-          CONTINUOUS_INTEGRATION: true
+        shell: pwsh
         run: |
-          ./acore.sh install-deps
+          $ErrorActionPreference = 'Stop'
+
+          # The windows-latest runner image already ships CMake, Visual Studio
+          # (with the native desktop workload + MSVC) and OpenSSL, so we only need to
+          # provide Boost and the MySQL client libraries. We fetch these directly
+          # instead of via chocolatey, whose pinned packages keep breaking on CI
+          # (VS detection failures and slproweb removing old OpenSSL installers).
+
+          # --- Boost 1.87.0 (msvc-14.3, 64-bit) prebuilt binaries -> C:\local\boost_1_87_0 (BOOST_ROOT) ---
+          # Use the direct-download host; the plain /download URL serves an HTML interstitial.
+          if (-not (Test-Path 'C:\local\boost_1_87_0\boost'))
+          {
+              $boostExe = Join-Path $env:RUNNER_TEMP 'boost.exe'
+              Invoke-WebRequest -Uri 'https://master.dl.sourceforge.net/project/boost/boost-binaries/1.87.0/boost_1_87_0-msvc-14.3-64.exe?viasf=1' -OutFile $boostExe
+              $boostMB = (Get-Item $boostExe).Length / 1MB
+              Write-Host ("Downloaded Boost installer: {0:N1} MB" -f $boostMB)
+              if ($boostMB -lt 50) { throw "Boost installer download looks wrong ($([int]$boostMB) MB) - likely an HTML page." }
+              $boostProc = Start-Process -FilePath $boostExe -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/DIR=C:\local\boost_1_87_0' -Wait -PassThru
+              if ($boostProc.ExitCode -ne 0) { throw "Boost installer failed with exit code $($boostProc.ExitCode)." }
+              # Fail fast if the installer "succeeded" but didn't lay down the expected tree,
+              # instead of surfacing a cryptic error later during CMake configuration.
+              if (-not (Test-Path 'C:\local\boost_1_87_0\boost\version.hpp')) { throw 'Boost install missing headers at C:\local\boost_1_87_0\boost.' }
+              if (-not (Test-Path 'C:\local\boost_1_87_0\lib64-msvc-14.3')) { throw 'Boost install missing prebuilt libs at C:\local\boost_1_87_0\lib64-msvc-14.3.' }
+          }
+
+          # --- MySQL 8.4 client headers + libs -> C:\tools\mysql\current (path the build expects) ---
+          if (-not (Test-Path 'C:\tools\mysql\current\lib\mysqlclient.lib'))
+          {
+              # Use the archives CDN directly (keeps every version, unlike dev.mysql.com/get which only
+              # serves the current GA). A browser user-agent is required or Oracle returns an HTML error page.
+              $mysqlZip = Join-Path $env:RUNNER_TEMP 'mysql.zip'
+              Invoke-WebRequest -Uri 'https://cdn.mysql.com/archives/mysql-8.4/mysql-8.4.9-winx64.zip' -OutFile $mysqlZip -UserAgent 'Mozilla/5.0'
+              $mysqlMB = (Get-Item $mysqlZip).Length / 1MB
+              Write-Host ("Downloaded MySQL zip: {0:N1} MB" -f $mysqlMB)
+              if ($mysqlMB -lt 50) { throw "MySQL zip download looks wrong ($([int]$mysqlMB) MB)." }
+              New-Item -ItemType Directory -Force -Path 'C:\tools\mysql' | Out-Null
+              Expand-Archive -Path $mysqlZip -DestinationPath 'C:\tools\mysql' -Force
+              if (Test-Path 'C:\tools\mysql\current') { Remove-Item -Recurse -Force 'C:\tools\mysql\current' }
+              Rename-Item 'C:\tools\mysql\mysql-8.4.9-winx64' 'C:\tools\mysql\current'
+              # Fail fast if the archive layout changed and the client import library isn't
+              # where the build expects it, rather than failing later during CMake/link.
+              if (-not (Test-Path 'C:\tools\mysql\current\lib\mysqlclient.lib')) { throw 'MySQL client import library missing at C:\tools\mysql\current\lib\mysqlclient.lib.' }
+          }
+
+          # --- OpenSSL: use the copy already installed on the runner image ---
+          $opensslRoot = @($env:OPENSSL_ROOT_DIR, 'C:\Program Files\OpenSSL', 'C:\Program Files\OpenSSL-Win64') |
+              Where-Object { $_ -and (Test-Path (Join-Path $_ 'include\openssl\opensslv.h')) } |
+              Select-Object -First 1
+          if (-not $opensslRoot)
+          {
+              throw 'No OpenSSL development install found on the runner image.'
+          }
+          "OPENSSL_ROOT_DIR=$opensslRoot" | Out-File -FilePath $env:GITHUB_ENV -Append -Encoding utf8
+          Write-Host "Using OpenSSL at $opensslRoot"
       - name: Build
         shell: bash
         run: |

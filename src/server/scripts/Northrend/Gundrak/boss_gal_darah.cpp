@@ -47,11 +47,6 @@ enum Yells
     SAY_IMPALE                          = 5
 };
 
-enum Events
-{
-    EVENT_KILL_TALK                     = 1
-};
-
 struct boss_gal_darah : public BossAI
 {
     boss_gal_darah(Creature* creature) : BossAI(creature, DATA_GAL_DARAH) { }
@@ -155,15 +150,12 @@ struct boss_gal_darah : public BossAI
     {
         Talk(SAY_DEATH);
         BossAI::JustDied(killer);
+        instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_PUNCTURE);
     }
 
     void KilledUnit(Unit*) override
     {
-        if (!events.HasTimeUntilEvent(EVENT_KILL_TALK))
-        {
-            Talk(SAY_SLAY);
-            events.ScheduleEvent(EVENT_KILL_TALK, 6s);
-        }
+        Talk(SAY_SLAY);
     }
 
 private:

@@ -78,7 +78,6 @@ struct boss_lady_vashj : public BossAI
     void Reset() override
     {
         _count = 0;
-        _recentlySpoken = false;
         _batTimer = 20s;
         _playerAngle = 0.0f;
         BossAI::Reset();
@@ -94,15 +93,7 @@ struct boss_lady_vashj : public BossAI
 
     void KilledUnit(Unit* /*victim*/) override
     {
-        if (!_recentlySpoken)
-        {
-            Talk(SAY_SLAY);
-            _recentlySpoken = true;
-        }
-        scheduler.Schedule(6s, [this](TaskContext)
-        {
-            _recentlySpoken = false;
-        });
+        Talk(SAY_SLAY);
     }
 
     void JustDied(Unit* killer) override
@@ -128,7 +119,7 @@ struct boss_lady_vashj : public BossAI
                 summon->CastSpell(summon, SPELL_MAGIC_BARRIER);
                 break;
             case NPC_ENCHANTED_ELEMENTAL:
-                summon->GetMotionMaster()->MoveFollow(me, 0.0f, 0.0f, MOTION_SLOT_ACTIVE, false);
+                summon->GetMotionMaster()->MoveFollow(me, 0.0f, 0.0f, MOTION_SLOT_ACTIVE, false, false);
                 summon->SetWalk(true);
                 summon->SetReactState(REACT_PASSIVE);
                 break;
@@ -258,7 +249,6 @@ struct boss_lady_vashj : public BossAI
 
 private:
     float _playerAngle;
-    bool _recentlySpoken;
     bool _intro;
     int32 _count;
     std::chrono::seconds _batTimer;

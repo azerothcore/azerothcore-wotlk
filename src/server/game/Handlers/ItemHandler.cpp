@@ -871,9 +871,7 @@ void WorldSession::SendListInventory(ObjectGuid vendorGuid, uint32 vendorEntry)
         GetPlayer()->RemoveAurasByType(SPELL_AURA_FEIGN_DEATH);
     }
 
-    // Stop the npc if moving
-    if (uint32 pause = vendor->GetMovementTemplate().GetInteractionPauseTimer())
-        vendor->PauseMovement(pause);
+    vendor->PauseMovementForInteraction();
 
     // Update home position for patrolling NPCs only (prevents drift for stationary NPCs)
     if (vendor->GetDefaultMovementType() == WAYPOINT_MOTION_TYPE ||

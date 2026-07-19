@@ -20,6 +20,7 @@
 #include "GroupMgr.h"
 #include "Language.h"
 #include "Player.h"
+#include "RBAC.h"
 
 using namespace Acore::ChatCommands;
 
@@ -32,12 +33,13 @@ public:
     {
         static ChatCommandTable groupCommandTable =
         {
-            { "list",    HandleGroupListCommand,    SEC_GAMEMASTER, Console::Yes },
-            { "join",    HandleGroupJoinCommand,    SEC_GAMEMASTER, Console::No },
-            { "remove",  HandleGroupRemoveCommand,  SEC_GAMEMASTER, Console::No },
-            { "disband", HandleGroupDisbandCommand, SEC_GAMEMASTER, Console::No },
-            { "revive",  HandleGroupReviveCommand,  SEC_GAMEMASTER, Console::No },
-            { "leader",  HandleGroupLeaderCommand,  SEC_GAMEMASTER, Console::No }
+            { "list",    HandleGroupListCommand,    rbac::RBAC_PERM_COMMAND_GROUP_LIST,    Console::Yes },
+            { "join",    HandleGroupJoinCommand,    rbac::RBAC_PERM_COMMAND_GROUP_JOIN,    Console::No },
+            { "remove",  HandleGroupRemoveCommand,  rbac::RBAC_PERM_COMMAND_GROUP_REMOVE,  Console::No },
+            { "disband", HandleGroupDisbandCommand, rbac::RBAC_PERM_COMMAND_GROUP_DISBAND, Console::No },
+            { "revive",  HandleGroupReviveCommand,  rbac::RBAC_PERM_COMMAND_GROUP_REVIVE,  Console::No },
+            { "leader",  HandleGroupLeaderCommand,  rbac::RBAC_PERM_COMMAND_GROUP_LEADER,  Console::No },
+            { "invites", HandleGroupInvitesCommand, rbac::RBAC_PERM_COMMAND_GROUP_INVITES, Console::No }
         };
 
         static ChatCommandTable commandTable =
@@ -289,6 +291,21 @@ public:
             }
         }
 
+        return true;
+    }
+
+    // Enable/disable accepting group invites
+    static bool HandleGroupInvitesCommand(ChatHandler* handler, Optional<bool> args)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+        if (!args)
+        {
+            handler->PSendSysMessage(LANG_COMMAND_GROUP_INVITES_ACCEPTING, player->IsAcceptGroupInvites() ? handler->GetAcoreString(LANG_ON) : handler->GetAcoreString(LANG_OFF));
+            return true;
+        }
+
+        player->SetAcceptGroupInvites(*args);
+        handler->SendSysMessage(*args ? LANG_COMMAND_GROUP_INVITES_ON : LANG_COMMAND_GROUP_INVITES_OFF);
         return true;
     }
 };

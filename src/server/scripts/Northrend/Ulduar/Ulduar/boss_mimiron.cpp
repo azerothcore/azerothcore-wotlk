@@ -47,6 +47,9 @@ enum SpellData
     SPELL_MINE_EXPLOSION                            = 66351,
     SPELL_SUMMON_PROXIMITY_MINE                     = 65347,
 
+    // PHASE 1 -> 2 TRANSITION:
+    SPELL_ELEVATOR_KNOCKBACK                        = 65096, // Self-cast by the world trigger; sweeps players off the elevator as it rises
+
     // PHASE 2:
     SPELL_HEAT_WAVE                                 = 64533,
 
@@ -98,6 +101,7 @@ enum NPCs
     NPC_ASSAULT_BOT                                 = 34057,
     NPC_JUNK_BOT                                    = 33855,
     NPC_MAGNETIC_CORE                               = 34068,
+    NPC_WORLD_TRIGGER                               = 21252,
 };
 
 enum GOs
@@ -260,7 +264,8 @@ enum Texts
 #define GetVX001() instance->GetCreature(DATA_MIMIRON_VX001)
 #define GetACU() instance->GetCreature(DATA_MIMIRON_ACU)
 
-Position const ACUSummonPos = { 2742.6265f, 2568.0571f, 377.22076f, 0.0f }; /// @todo: replace with sniffed position
+// Z is above hover height (15y) so that activating hover does not relocate the ACU upwards
+Position const ACUSummonPos = { 2744.650f, 2569.460f, 380.0f, 3.141593f };
 
 struct boss_mimiron : public BossAI
 {
@@ -488,6 +493,8 @@ struct boss_mimiron : public BossAI
                     elevator->SetLootState(GO_READY);
                     elevator->UseDoorOrButton(0, false);
                     elevator->EnableCollision(false);
+                    if (Creature* trigger = me->SummonCreature(NPC_WORLD_TRIGGER, elevator->GetPositionX(), elevator->GetPositionY(), elevator->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 5000))
+                        trigger->CastSpell(trigger, SPELL_ELEVATOR_KNOCKBACK);
                 }
                 events.ScheduleEvent(EVENT_ELEVATOR_INTERVAL_1, 6s);
                 break;
@@ -752,10 +759,12 @@ struct boss_mimiron : public BossAI
                 // spawn chest
                 if (uint32 chestId = (_hardmode ? RAID_MODE(GO_MIMIRON_CHEST_HARD, GO_MIMIRON_CHEST_HERO_HARD) : RAID_MODE(GO_MIMIRON_CHEST, GO_MIMIRON_CHEST_HERO)))
                 {
-                    if (GameObject* go = me->SummonGameObject(chestId, 2744.65f, 2569.46f, 364.397f, 0, 0, 0, 0, 0, 0))
+                    // Summoned by the map, not Mimiron, so the chest survives his despawn during the outro.
+                    if (GameObject* go = me->GetMap()->SummonGameObject(chestId, 2744.65f, 2569.46f, 364.397f, 0, 0, 0, 0, 0, 0))
                     {
                         go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
                         go->SetLootRecipient(me->GetMap());
+                        go->SetRespawnTime(7 * DAY);
                     }
                 }
                 events.ScheduleEvent(EVENT_DISAPPEAR, 9s);
@@ -780,6 +789,9 @@ struct boss_mimiron : public BossAI
 
     void EnterEvadeMode(EvadeReason why) override
     {
+        // Once Mimiron turns friendly for the defeat RP, don't reset the encounter.
+        if (me->GetFaction() == FACTION_FRIENDLY)
+            return;
         if (_isEvading)
             return;
         _isEvading = true;
@@ -941,6 +953,14 @@ struct npc_ulduar_leviathan_mkii : public ScriptedAI
         _events.Reset();
     }
 
+    void AttackStart(Unit* who) override
+    {
+        ScriptedAI::AttackStart(who);
+        // Unit::Attack clears the emote state on target switch, which would retract VX-001's arms
+        if (_phase == 4)
+            me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
+    }
+
     void SetData(uint32 id, uint32 value) override
     {
         if (id == 1) // setting phase to start fighting
@@ -974,6 +994,8 @@ struct npc_ulduar_leviathan_mkii : public ScriptedAI
                     if (Unit* target = SelectTargetFromPlayerList(75.0f))
                         AttackStart(target);
                     DoZoneInCombat();
+                    // The assembled V0-L7R-ON animates through its vehicle base; this state keeps VX-001's arms deployed
+                    me->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
                     _events.Reset();
                     _events.ScheduleEvent(EVENT_SPELL_SHOCK_BLAST, 20s);
                     _events.ScheduleEvent(EVENT_PROXIMITY_MINES_1, 6s);
@@ -1369,7 +1391,8 @@ struct npc_ulduar_vx001 : public ScriptedAI
                     if (Unit* vb = me->GetVehicleBase())
                     {
                         vb->SendMeleeAttackStop();
-                        vb->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
+                        // Keep the arms-deployed state so the model returns to it after the one-shot pulse animation
+                        vb->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_CUSTOM_SPELL_01);
 
                         if (!_leftArm)
                         {
@@ -1491,7 +1514,8 @@ struct npc_ulduar_aerial_command_unit : public ScriptedAI
         _isDefeated = false;
         _events.Reset();
         _summons.DespawnAll();
-        me->SetCombatMovement(false); /// @todo: research ACU behaviour
+        me->SetHover(false);
+        me->SetDisableGravity(true);
     }
 
     void SetData(uint32 id, uint32 value) override
@@ -1506,7 +1530,12 @@ struct npc_ulduar_aerial_command_unit : public ScriptedAI
                     break;
                 case 3:
                     _phase = 3;
+                    // Hover instead of disabled gravity: chase then keeps the ACU at
+                    // HoverHeight above ground instead of dragging it to ground level.
+                    me->SetDisableGravity(false);
+                    me->SetHover(true);
                     me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetImmuneToPC(false);
                     DoZoneInCombat();
                     _events.Reset();
                     _events.ScheduleEvent(EVENT_SUMMON_BOMB_BOT, 15s);
@@ -1538,14 +1567,24 @@ struct npc_ulduar_aerial_command_unit : public ScriptedAI
                 me->CastStop();
                 me->AttackStop();
                 me->SetReactState(REACT_PASSIVE);
-                me->SetDisableGravity(false);
+                // Raw flag removal first: MoveFall lands at ground + hover height, which would
+                // keep the ACU airborne, and SetHover(false) would relocate it without a spline.
+                // SetHover(false) afterwards is relocation-free and tells the client to stop
+                // hovering, else it keeps floating the grounded unit back up
+                me->RemoveUnitMovementFlag(MOVEMENTFLAG_HOVER);
                 me->GetMotionMaster()->MoveFall();
+                me->SetHover(false);
                 _events.DelayEvents(25s);
                 break;
             case DO_ENABLE_AERIAL:
+                if (_isDefeated)
+                    break;
                 me->SetDisableGravity(true);
-                me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 10.0f);
+                // 16y: above hover height (15y) so SetHover does not relocate it further up
+                me->GetMotionMaster()->MovePoint(0, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 16.0f);
                 me->m_Events.AddEventAtOffset([&] {
+                    me->SetDisableGravity(false);
+                    me->SetHover(true);
                     me->SetReactState(REACT_AGGRESSIVE);
                 }, 2s);
                 break;
@@ -1577,6 +1616,7 @@ struct npc_ulduar_aerial_command_unit : public ScriptedAI
                     me->InterruptNonMeleeSpells(false);
                     me->RemoveAllAurasExceptType(SPELL_AURA_CONTROL_VEHICLE);
 
+                    me->SetDisableGravity(true);
                     me->GetMotionMaster()->MovePoint(0, 2744.65f, 2569.46f, 381.34f);
 
                     if (Creature* c = GetMimiron())

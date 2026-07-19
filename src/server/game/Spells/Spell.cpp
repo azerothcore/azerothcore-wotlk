@@ -52,6 +52,7 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include <cmath>
+#include <G3D/g3dmath.h>
 
 /// @todo: this import is not necessary for compilation and marked as unused by the IDE
 //  however, for some reasons removing it would cause a damn linking issue
@@ -1225,8 +1226,30 @@ void Spell::SelectImplicitConeTargets(SpellEffIndex effIndex, SpellImplicitTarge
     SpellTargetObjectTypes objectType = targetType.GetObjectType();
     SpellTargetCheckTypes selectionType = targetType.GetCheckType();
     ConditionList* condList = m_spellInfo->Effects[effIndex].ImplicitTargetConditions;
-    float coneAngle = M_PI / 2;
+    float coneAngle = G3D::toRadians(60.0f);
+    if (SpellCone const* sc = sSpellMgr->GetSpellCone(m_spellInfo->Id))
+        coneAngle = G3D::toRadians(static_cast<float>(sc->cone_degrees));
+    else
+    {
+        switch (targetType.GetTarget())
+        {
+            case TARGET_UNIT_CONE_ENEMY_24:
+                coneAngle = G3D::toRadians(24.0f);
+                break;
+            case TARGET_UNIT_CONE_ENEMY_54:
+                coneAngle = G3D::toRadians(54.0f);
+                break;
+            case TARGET_UNIT_CONE_ENEMY_104:
+                coneAngle = G3D::toRadians(104.0f);
+                break;
+            default:
+                break;
+        }
+    }
+
     float radius = m_spellInfo->Effects[effIndex].CalcRadius(m_caster) * m_spellValue->RadiusMod;
+
+    radius += m_caster->GetLeewayBonusRadius();
 
     if (uint32 containerTypeMask = GetSearcherTypeMask(objectType, condList))
     {
@@ -1315,6 +1338,17 @@ void Spell::SelectImplicitAreaTargets(SpellEffIndex effIndex, SpellImplicitTarge
     // Xinef: the distance should be increased by caster size, it is neglected in latter calculations
     std::list<WorldObject*> targets;
     float radius = m_spellInfo->Effects[effIndex].CalcRadius(m_caster) * m_spellValue->RadiusMod;
+    switch (targetType.GetTarget())
+    {
+        case TARGET_UNIT_SRC_AREA_ENEMY:
+        case TARGET_UNIT_CASTER_AREA_PARTY:
+        case TARGET_UNIT_CASTER_AREA_RAID:
+            radius += m_caster->GetLeewayBonusRadius();
+            break;
+        default:
+            break;
+    }
+
     SearchAreaTargets(targets, radius, center, referer, targetType.GetObjectType(), targetType.GetCheckType(), m_spellInfo->Effects[effIndex].ImplicitTargetConditions, Acore::WorldObjectSpellAreaTargetSearchReason::Area);
 
     CallScriptObjectAreaTargetSelectHandlers(targets, effIndex, targetType);
@@ -2111,8 +2145,8 @@ void Spell::SearchChainTargets(std::list<WorldObject*>& targets, uint32 chainTar
             jumpRadius = 7.5f;
             break;
         case SPELL_DAMAGE_CLASS_MELEE:
-            // 5y for swipe, cleave and similar
-            jumpRadius = 5.0f;
+            // 10y for swipe, cleave and similar
+            jumpRadius = 10.0f;
             break;
         case SPELL_DAMAGE_CLASS_NONE:
         case SPELL_DAMAGE_CLASS_MAGIC:
@@ -3917,6 +3951,44 @@ void Spell::_cast(bool skipCheck)
         }
     }
 
+    // CAST -> HIT -> FINISH ordering: fire CAST before handle_immediate so an aura
+    // applied during HIT (e.g. Arcane Potency from Clearcasting) isn't consumed by
+    // the same cast. Triggered spells skip this so periodic ticks (Blizzard etc.)
+    // don't burn cast-charge buffs.
+    if (m_originalCaster && !IsTriggered())
+    {
+        uint32 procAttacker = m_procAttacker;
+        if (!procAttacker)
+        {
+            bool IsPositive = m_spellInfo->IsPositive();
+            if (m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MAGIC)
+            {
+                procAttacker = IsPositive ? PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_POS : PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG;
+            }
+            else
+            {
+                procAttacker = IsPositive ? PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_POS : PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_NEG;
+            }
+        }
+
+        uint32 hitMask = PROC_HIT_NORMAL;
+
+        for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
+        {
+            if (ihit->missCondition != SPELL_MISS_NONE)
+                continue;
+
+            if (!ihit->crit)
+                continue;
+
+            hitMask |= PROC_HIT_CRITICAL;
+            break;
+        }
+
+        Unit::ProcSkillsAndAuras(m_originalCaster, nullptr, procAttacker, PROC_FLAG_NONE, hitMask, 1, BASE_ATTACK, m_spellInfo, m_triggeredByAuraSpell.spellInfo,
+            m_triggeredByAuraSpell.effectIndex, this, nullptr, nullptr, PROC_SPELL_PHASE_CAST);
+    }
+
     // Okay, everything is prepared. Now we need to distinguish between immediate and evented delayed spells
     if ((m_spellInfo->Speed > 0.0f && !m_spellInfo->IsChanneled())/* xinef: we dont need this || m_spellInfo->Id == 14157*/)
     {
@@ -3973,46 +4045,6 @@ void Spell::_cast(bool skipCheck)
 
     if (modOwner)
         modOwner->SetSpellModTakingSpell(this, false);
-
-    // Handle procs on cast - only for non-triggered spells
-    // Triggered spells (from auras, items, etc.) should not fire CAST phase procs
-    // as they are not player-initiated casts. This prevents issues like Arcane Potency
-    // charges being consumed by periodic damage effects (e.g., Blizzard ticks).
-    // Must be called AFTER handle_immediate() so spell mods (like Missile Barrage's
-    // duration reduction) are applied before the aura is consumed by the proc.
-    if (m_originalCaster && !IsTriggered())
-    {
-        uint32 procAttacker = m_procAttacker;
-        if (!procAttacker)
-        {
-            bool IsPositive = m_spellInfo->IsPositive();
-            if (m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MAGIC)
-            {
-                procAttacker = IsPositive ? PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_POS : PROC_FLAG_DONE_SPELL_MAGIC_DMG_CLASS_NEG;
-            }
-            else
-            {
-                procAttacker = IsPositive ? PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_POS : PROC_FLAG_DONE_SPELL_NONE_DMG_CLASS_NEG;
-            }
-        }
-
-        uint32 hitMask = PROC_HIT_NORMAL;
-
-        for (std::list<TargetInfo>::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
-        {
-            if (ihit->missCondition != SPELL_MISS_NONE)
-                continue;
-
-            if (!ihit->crit)
-                continue;
-
-            hitMask |= PROC_HIT_CRITICAL;
-            break;
-        }
-
-        Unit::ProcSkillsAndAuras(m_originalCaster, nullptr, procAttacker, PROC_FLAG_NONE, hitMask, 1, BASE_ATTACK, m_spellInfo, m_triggeredByAuraSpell.spellInfo,
-            m_triggeredByAuraSpell.effectIndex, this, nullptr, nullptr, PROC_SPELL_PHASE_CAST);
-    }
 
     if (std::vector<int32> const* spell_triggered = sSpellMgr->GetSpellLinked(m_spellInfo->Id))
     {
@@ -6828,7 +6860,7 @@ SpellCastResult Spell::CheckCasterAuras(bool preventionOnly) const
         return SPELL_CAST_OK;
 
     uint8 school_immune = 0;
-    uint32 mechanic_immune = 0;
+    uint64 mechanic_immune = 0;
     uint32 dispel_immune = 0;
 
     // Check if the spell grants school or mechanic immunity.
@@ -6840,7 +6872,7 @@ SpellCastResult Spell::CheckCasterAuras(bool preventionOnly) const
             if (m_spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_SCHOOL_IMMUNITY)
                 school_immune |= uint32(m_spellInfo->Effects[i].MiscValue);
             else if (m_spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_MECHANIC_IMMUNITY)
-                mechanic_immune |= 1 << uint32(m_spellInfo->Effects[i].MiscValue);
+                mechanic_immune |= 1ULL << uint32(m_spellInfo->Effects[i].MiscValue);
             else if (m_spellInfo->Effects[i].ApplyAuraName == SPELL_AURA_DISPEL_IMMUNITY)
                 dispel_immune |= SpellInfo::GetDispelMask(DispelType(m_spellInfo->Effects[i].MiscValue));
         }
@@ -6871,13 +6903,13 @@ SpellCastResult Spell::CheckCasterAuras(bool preventionOnly) const
             if (usableInStun)
             {
                 bool foundNotStun = false;
-                uint32 mask = (1 << MECHANIC_STUN) | (1 << MECHANIC_FREEZE) | (1 << MECHANIC_HORROR);
+                uint64 mask = (1ULL << MECHANIC_STUN) | (1ULL << MECHANIC_FREEZE) | (1ULL << MECHANIC_HORROR);
                 // Barkskin should skip sleep effects, sap and fears
                 if (m_spellInfo->Id == 22812)
-                    mask |= 1 << MECHANIC_SAPPED | 1 << MECHANIC_HORROR | 1 << MECHANIC_SLEEP;
+                    mask |= 1ULL << MECHANIC_SAPPED | 1ULL << MECHANIC_HORROR | 1ULL << MECHANIC_SLEEP;
                 // Hand of Freedom, can be used while sapped and while under fear-mechanic stuns (e.g. Intimidating Shout primary target)
                 if (m_spellInfo->Id == 1044)
-                    mask |= (1 << MECHANIC_SAPPED) | (1 << MECHANIC_FEAR);
+                    mask |= (1ULL << MECHANIC_SAPPED) | (1ULL << MECHANIC_FEAR);
                 Unit::AuraEffectList const& stunAuras = m_caster->GetAuraEffectsByType(SPELL_AURA_MOD_STUN);
                 for (Unit::AuraEffectList::const_iterator i = stunAuras.begin(); i != stunAuras.end(); ++i)
                 {
@@ -6936,13 +6968,13 @@ SpellCastResult Spell::CheckCasterAuras(bool preventionOnly) const
                         {
                             case SPELL_AURA_MOD_STUN:
                                 {
-                                    uint32 mask = 1 << MECHANIC_STUN;
+                                    uint64 mask = 1ULL << MECHANIC_STUN;
                                     // Barkskin should skip sleep effects, sap and fears
                                     if (m_spellInfo->Id == 22812)
-                                        mask |= 1 << MECHANIC_SAPPED | 1 << MECHANIC_HORROR | 1 << MECHANIC_SLEEP;
+                                        mask |= 1ULL << MECHANIC_SAPPED | 1ULL << MECHANIC_HORROR | 1ULL << MECHANIC_SLEEP;
                                     // Hand of Freedom, can be used while sapped and while under fear-mechanic stuns (e.g. Intimidating Shout primary target)
                                     if (m_spellInfo->Id == 1044)
-                                        mask |= (1 << MECHANIC_SAPPED) | (1 << MECHANIC_FEAR);
+                                        mask |= (1ULL << MECHANIC_SAPPED) | (1ULL << MECHANIC_FEAR);
 
                                     if (!usableInStun || !(auraInfo->GetAllEffectsMechanicMask() & mask))
                                         return SPELL_FAILED_STUNNED;
@@ -7068,8 +7100,9 @@ SpellCastResult Spell::CheckRange(bool strict)
             if (range_type == SPELL_RANGE_MELEE)
             {
                 float real_max_range = max_range;
-                if (!m_caster->IsCreature() && m_caster->HasLeewayMovement() && target->HasLeewayMovement())
-                    real_max_range -= MIN_MELEE_REACH; // Because of lag, we can not check too strictly here (is only used if both caster and target are moving)
+
+                if (m_caster->GetLeewayBonusRange(target) > 0.0f)
+                    real_max_range -= MIN_MELEE_REACH; // less strict when leeway applies
                 else
                     real_max_range -= 2 * MIN_MELEE_REACH;
 
@@ -7079,18 +7112,18 @@ SpellCastResult Spell::CheckRange(bool strict)
             else if (!m_caster->IsWithinCombatRange(target, max_range))
                 return SPELL_FAILED_OUT_OF_RANGE; //0x5A;
 
-            if (m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_RANGED && range_type == SPELL_RANGE_RANGED)
-            {
-                if (m_caster->IsWithinMeleeRange(target))
-                    return SPELL_FAILED_TOO_CLOSE;
-            }
-
             if (m_caster->IsPlayer() && (m_spellInfo->FacingCasterFlags & SPELL_FACING_FLAG_INFRONT) && !m_caster->HasInArc(static_cast<float>(M_PI), target) && !m_caster->IsWithinBoundaryRadius(target))
                 return SPELL_FAILED_UNIT_NOT_INFRONT;
         }
 
-        // Xinef: check min range for self casts
-        if (min_range && range_type != SPELL_RANGE_RANGED && m_caster->IsWithinCombatRange(target, min_range)) // skip this check if min_range = 0
+        // Check min range - for ranged spells, min range is the spell's min range + melee range (no leeway)
+        if (range_type == SPELL_RANGE_RANGED)
+        {
+            float minRangeCombined = min_range + m_caster->GetMeleeRange(target);
+            if (m_caster->IsWithinRange(target, minRangeCombined))
+                return SPELL_FAILED_TOO_CLOSE;
+        }
+        else if (min_range > 0 && m_caster->IsWithinCombatRange(target, min_range))
             return SPELL_FAILED_TOO_CLOSE;
     }
 
@@ -7104,7 +7137,7 @@ SpellCastResult Spell::CheckRange(bool strict)
 
     if (m_targets.HasDst() && !m_targets.HasTraj())
     {
-        if (!m_caster->IsWithinDist3d(m_targets.GetDstPos(), max_range))
+        if (!m_caster->IsWithinDist3d(m_targets.GetDstPos(), max_range + m_caster->GetLeewayBonusRadius()))
             return SPELL_FAILED_OUT_OF_RANGE;
         if (min_range && m_caster->IsWithinDist3d(m_targets.GetDstPos(), min_range))
             return SPELL_FAILED_TOO_CLOSE;

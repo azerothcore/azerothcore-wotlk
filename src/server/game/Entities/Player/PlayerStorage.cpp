@@ -49,6 +49,7 @@
 #include "Player.h"
 #include "QueryHolder.h"
 #include "QuestDef.h"
+#include "RBAC.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
 #include "ScriptObjectFwd.h"
@@ -346,7 +347,7 @@ uint32 Player::GetItemCount(uint32 item, bool inBankAlso, Item* skipItem) const
     if (skipItem && skipItem->GetTemplate()->GemProperties)
         for (uint8 i = EQUIPMENT_SLOT_START; i < INVENTORY_SLOT_ITEM_END; ++i)
             if (Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
-                if (pItem != skipItem && pItem->GetTemplate()->Socket[0].Color)
+                if (pItem != skipItem && pItem->HasSocket())
                     count += pItem->GetGemCountWithID(item);
 
     if (inBankAlso)
@@ -364,7 +365,7 @@ uint32 Player::GetItemCount(uint32 item, bool inBankAlso, Item* skipItem) const
         if (skipItem && skipItem->GetTemplate()->GemProperties)
             for (uint8 i = BANK_SLOT_ITEM_START; i < BANK_SLOT_ITEM_END; ++i)
                 if (Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
-                    if (pItem != skipItem && pItem->GetTemplate()->Socket[0].Color)
+                    if (pItem != skipItem && pItem->HasSocket())
                         count += pItem->GetGemCountWithID(item);
     }
 
@@ -753,7 +754,7 @@ bool Player::HasItemOrGemWithIdEquipped(uint32 item, uint32 count, uint8 except_
                 continue;
 
             Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i);
-            if (pItem && pItem->GetTemplate()->Socket[0].Color)
+            if (pItem && pItem->HasSocket())
             {
                 tempcount += pItem->GetGemCountWithID(item);
                 if (tempcount >= count)
@@ -1862,6 +1863,10 @@ InventoryResult Player::CanEquipNewItem(uint8 slot, uint16& dest, uint32 item, b
     if (pItem)
     {
         InventoryResult result = CanEquipItem(slot, dest, pItem, swap);
+        // Random-property items queue themselves on creation (SetItemRandomProperties
+        // -> SetState(ITEM_CHANGED, owner)); the probe must leave the update queue
+        // before deletion or the queue keeps a pointer to freed memory.
+        pItem->RemoveFromUpdateQueueOf(const_cast<Player*>(this));
         delete pItem;
         return result;
     }
@@ -2428,6 +2433,10 @@ InventoryResult Player::CanRollForItemInLFG(ItemTemplate const* proto, WorldObje
         SKILL_DAGGERS,  SKILL_THROWN,   SKILL_ASSASSINATION, SKILL_CROSSBOWS,   SKILL_WANDS,
         SKILL_FISHING
     }; //Copy from function Item::GetSkill()
+
+    // Anyone can roll need on this item
+    if (proto->HasFlag2(ITEM_FLAG2_EVERYONE_CAN_ROLL_NEED))
+        return EQUIP_ERR_OK;
 
     if ((proto->AllowableClass & getClassMask()) == 0 || (proto->AllowableRace & getRaceMask()) == 0)
         return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
@@ -4700,7 +4709,7 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
                 {
                     WeaponAttackType const attackType = Player::GetAttackBySlot(item->GetSlot());
                     if (attackType != MAX_ATTACK)
-                        UpdateDamageDoneMods(attackType);
+                        UpdateDamageDoneMods(attackType, apply ? -1 : slot);
                     break;
                 }
                 case ITEM_ENCHANTMENT_TYPE_USE_SPELL:
@@ -5024,7 +5033,9 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     m_name = fields[2].Get<std::string>();
 
     // check name limitations
-    if (ObjectMgr::CheckPlayerName(m_name) != CHAR_NAME_SUCCESS)
+    uint8 nameResult = ObjectMgr::CheckPlayerName(m_name);
+    if (nameResult != CHAR_NAME_SUCCESS &&
+        !(nameResult == CHAR_NAME_RESERVED && GetSession()->HasPermission(rbac::RBAC_PERM_SKIP_CHECK_CHARACTER_CREATION_RESERVEDNAME)))
     {
         CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
         stmt->SetData(0, uint16(AT_LOGIN_RENAME));
@@ -5397,6 +5408,11 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
 
     uint32 extraflags = fields[36].Get<uint16>();
 
+    // Mirror before the gate below so saved bits survive when the gate
+    // skips effect application; otherwise the next SaveToDB writes 0
+    // over them.
+    m_ExtraFlags = extraflags;
+
     _LoadPetStable(fields[37].Get<uint8>(), holder.GetPreparedResult(PLAYER_LOGIN_QUERY_LOAD_PET_SLOTS));
 
     m_atLoginFlags = fields[38].Get<uint16>();
@@ -5568,7 +5584,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     outDebugValues();
 
     // GM state
-    if (!AccountMgr::IsPlayerAccount(GetSession()->GetSecurity()))
+    if (GetSession()->HasPermission(rbac::RBAC_PERM_RESTORE_SAVED_GM_STATE))
     {
         switch (sWorld->getIntConfig(CONFIG_GM_LOGIN_STATE))
         {
@@ -6199,6 +6215,32 @@ Item* Player::_LoadMailedItem(ObjectGuid const& playerGuid, Player* player, uint
         CharacterDatabaseTransaction temp = CharacterDatabaseTransaction(nullptr);
         item->SaveToDB(temp);
         return nullptr;
+    }
+
+    // Rehydrate looters for BoP-tradeable mail items; only the LFG mail path writes this flag, gated on the same config.
+    if (item->IsBOPTradable() && sWorld->getBoolConfig(CONFIG_SET_BOP_ITEM_TRADEABLE))
+    {
+        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_ITEM_BOP_TRADE);
+        stmt->SetData(0, item->GetGUID().GetCounter());
+
+        if (PreparedQueryResult result = CharacterDatabase.Query(stmt))
+        {
+            AllowedLooterSet looters;
+            for (std::string_view guidStr : Acore::Tokenize((*result)[0].Get<std::string_view>(), ' ', false))
+            {
+                if (Optional<ObjectGuid::LowType> guid = Acore::StringTo<ObjectGuid::LowType>(guidStr))
+                    looters.insert(ObjectGuid::Create<HighGuid::Player>(*guid));
+                else
+                    LOG_WARN("entities.player.loading", "Player::_LoadMailedItem: invalid item_soulbound_trade_data GUID '{}' for item {}. Skipped.", guidStr, item->GetGUID().ToString());
+            }
+
+            if (looters.size() > 1 && proto->GetMaxStackSize() == 1 && item->IsSoulBound())
+                item->SetSoulboundTradeable(looters);
+            else
+                item->RemoveFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_BOP_TRADEABLE);
+        }
+        else
+            item->RemoveFlag(ITEM_FIELD_FLAGS, ITEM_FIELD_FLAG_BOP_TRADEABLE);
     }
 
     if (mail)

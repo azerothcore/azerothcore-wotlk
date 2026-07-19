@@ -18,12 +18,8 @@
 #include "Battleground.h"
 #include "ArenaSpectator.h"
 #include "ArenaTeam.h"
-#include "BattlegroundBE.h"
-#include "BattlegroundDS.h"
 #include "BattlegroundMgr.h"
-#include "BattlegroundNA.h"
-#include "BattlegroundRL.h"
-#include "BattlegroundRV.h"
+#include "BattlegroundUtils.h"
 #include "Chat.h"
 #include "ChatTextBuilder.h"
 #include "Creature.h"
@@ -39,6 +35,7 @@
 #include "ObjectMgr.h"
 #include "Pet.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
 #include "SpellAuras.h"
@@ -244,6 +241,12 @@ Battleground::~Battleground()
 
     for (auto const& itr : PlayerScores)
         delete itr.second;
+}
+
+uint32 Battleground::GetMinPlayersPerTeam() const
+{
+    uint32 lowLevelsOverride = GetLowLevelsMinPlayersOverride(GetBgTypeID());
+    return (lowLevelsOverride && !isTemplate() && !isMaxLevel() && !isArena()) ? lowLevelsOverride : m_MinPlayersPerTeam;
 }
 
 void Battleground::Update(uint32 diff)
@@ -532,6 +535,8 @@ inline void Battleground::_ProcessJoin(uint32 diff)
 
         // Mark setup as completed
         m_SetupCompleted = true;
+
+        sScriptMgr->OnBattlegroundSetup(this);
     }
 
     // First announcement at 120s or 60s (Depending on BG or Arena and configured time)
@@ -557,33 +562,6 @@ inline void Battleground::_ProcessJoin(uint32 diff)
 
         if (StartMessageIds[BG_STARTING_EVENT_THIRD])
             SendBroadcastText(StartMessageIds[BG_STARTING_EVENT_THIRD], CHAT_MSG_BG_SYSTEM_NEUTRAL);
-
-        if (isArena())
-            switch (GetBgTypeID())
-            {
-                case BATTLEGROUND_NA:
-                    DelObject(BG_NA_OBJECT_READY_MARKER_1);
-                    DelObject(BG_NA_OBJECT_READY_MARKER_2);
-                    break;
-                case BATTLEGROUND_BE:
-                    DelObject(BG_BE_OBJECT_READY_MARKER_1);
-                    DelObject(BG_BE_OBJECT_READY_MARKER_2);
-                    break;
-                case BATTLEGROUND_RL:
-                    DelObject(BG_RL_OBJECT_READY_MARKER_1);
-                    DelObject(BG_RL_OBJECT_READY_MARKER_2);
-                    break;
-                case BATTLEGROUND_DS:
-                    DelObject(BG_DS_OBJECT_READY_MARKER_1);
-                    DelObject(BG_DS_OBJECT_READY_MARKER_2);
-                    break;
-                case BATTLEGROUND_RV:
-                    DelObject(BG_RV_OBJECT_READY_MARKER_1);
-                    DelObject(BG_RV_OBJECT_READY_MARKER_2);
-                    break;
-                default:
-                    break;
-            }
     }
     // Delay expired (after configured prep time)
     else if (GetStartDelayTime() <= 0 && !(m_Events & BG_STARTING_EVENT_4))
@@ -674,7 +652,7 @@ inline void Battleground::_ProcessJoin(uint32 diff)
 
             // Announce BG starting
             if (sWorld->getBoolConfig(CONFIG_BATTLEGROUND_QUEUE_ANNOUNCER_ENABLE))
-                ChatHandler(nullptr).SendWorldText(LANG_BG_STARTED_ANNOUNCE_WORLD, GetName(), std::min(GetMinLevel(), (uint32)80), std::min(GetMaxLevel(), (uint32)80));
+                ChatHandler(nullptr).SendWorldTextOptional(LANG_BG_STARTED_ANNOUNCE_WORLD, ANNOUNCER_FLAG_DISABLE_PVP_START, GetName(), std::min(GetMinLevel(), (uint32)80), std::min(GetMaxLevel(), (uint32)80));
 
             sScriptMgr->OnBattlegroundStart(this);
         }
@@ -1060,6 +1038,11 @@ void Battleground::RemovePlayerAtLeave(Player* player)
     auto const& itr2 = PlayerScores.find(player->GetGUID().GetCounter());
     if (itr2 != PlayerScores.end())
     {
+        // Save stats to ArenaLogEntries before deleting score (for arena logging)
+        auto itr3 = ArenaLogEntries.find(player->GetGUID());
+        if (itr3 != ArenaLogEntries.end())
+            itr3->second.SaveStats(itr2->second->GetDamageDone(), itr2->second->GetHealingDone(), itr2->second->GetKillingBlows());
+
         delete itr2->second;
         PlayerScores.erase(itr2);
     }
@@ -1110,7 +1093,7 @@ void Battleground::RemovePlayerAtLeave(Player* player)
         SendPacketToTeam(teamId, &data, player, false);
 
         // cast deserter
-        if (isBattleground() && !player->IsGameMaster() && sWorld->getBoolConfig(CONFIG_BATTLEGROUND_CAST_DESERTER))
+        if (isBattleground() && !player->GetSession()->HasPermission(rbac::RBAC_PERM_NO_BATTLEGROUND_DESERTER_DEBUFF) && sWorld->getBoolConfig(CONFIG_BATTLEGROUND_CAST_DESERTER))
             if (status == STATUS_IN_PROGRESS || status == STATUS_WAIT_JOIN)
                 player->ScheduleDelayedOperation(DELAYED_SPELL_CAST_DESERTER);
 
@@ -1372,22 +1355,6 @@ void Battleground::SpectatorsSendPacket(WorldPacket& data)
 {
     for (SpectatorList::const_iterator itr = m_Spectators.begin(); itr != m_Spectators.end(); ++itr)
         (*itr)->SendDirectMessage(&data);
-}
-
-void Battleground::ReadyMarkerClicked(Player* p)
-{
-    if (!isArena() || GetStatus() >= STATUS_IN_PROGRESS || GetStartDelayTime() <= BG_START_DELAY_15S || (m_Events & BG_STARTING_EVENT_3) || p->IsSpectator())
-        return;
-    readyMarkerClickedSet.insert(p->GetGUID());
-    uint32 count = readyMarkerClickedSet.size();
-    uint32 req = ArenaTeam::GetReqPlayersForType(GetArenaType());
-    ChatHandler(p->GetSession()).SendNotification("You are marked as ready {}/{}", count, req);
-    if (count == req)
-    {
-        m_Events |= BG_STARTING_EVENT_2;
-        m_StartTime += GetStartDelayTime() - BG_START_DELAY_15S;
-        SetStartDelayTime(BG_START_DELAY_15S);
-    }
 }
 
 void Battleground::BuildPvPLogDataPacket(WorldPacket& data)
@@ -1711,7 +1678,6 @@ bool Battleground::AddSpiritGuide(uint32 type, float x, float y, float z, float 
 
     if (Creature* creature = AddCreature(entry, type, x, y, z, o))
     {
-        creature->setDeathState(DeathState::Dead);
         creature->SetGuidValue(UNIT_FIELD_CHANNEL_OBJECT, creature->GetGUID());
         // aura
         /// @todo: Fix display here

@@ -187,7 +187,6 @@ struct boss_kalecgos : public BossAI
                 me->SetRegeneratingHealth(false);
                 me->RemoveAllAuras();
                 me->SetReactState(REACT_PASSIVE);
-                me->CombatStop();
                 me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetFaction(FACTION_FRIENDLY);
             }, 1s);
@@ -261,8 +260,7 @@ struct boss_kalecgos : public BossAI
 
     void KilledUnit(Unit* victim) override
     {
-        if (victim->IsPlayer() && roll_chance_i(50))
-            Talk(SAY_EVIL_SLAY);
+        Talk(SAY_EVIL_SLAY, victim);
     }
 
     private:

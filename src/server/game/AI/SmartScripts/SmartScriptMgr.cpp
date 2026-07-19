@@ -282,6 +282,12 @@ void SmartAIMgr::LoadSmartAIFromDB()
                 if (temp.event.minMaxRepeat.repeatMin == 0 && temp.event.minMaxRepeat.repeatMax == 0)
                     temp.event.event_flags |= SMART_EVENT_FLAG_NOT_REPEATABLE;
                 break;
+            case SMART_EVENT_DAMAGED:
+                // health check mode stays below the threshold on every following hit, so force one-shot;
+                // normal mode keeps repeatMin/repeatMax as a cooldown (0 = fire on every hit), so leave it repeatable.
+                if (temp.event.minMaxRepeat.rangeMin)
+                    temp.event.event_flags |= SMART_EVENT_FLAG_NOT_REPEATABLE;
+                break;
             case SMART_EVENT_VICTIM_CASTING:
             case SMART_EVENT_FRIENDLY_IS_CC:
                 if (temp.event.friendlyCC.repeatMin == 0 && temp.event.friendlyCC.repeatMax == 0)
@@ -330,7 +336,7 @@ void SmartAIMgr::CheckIfSmartAIInDatabaseExists()
             // check GUID SAI
             for (auto const& pair : sObjectMgr->GetAllCreatureData())
             {
-                if (pair.second.id1 != creatureTemplate.Entry)
+                if (pair.second.id != creatureTemplate.Entry)
                     continue;
 
                 if (mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_CREATURE)].find((-1) * pair.first) != mEventMap[uint32(SmartScriptType::SMART_SCRIPT_TYPE_CREATURE)].end())
@@ -759,6 +765,7 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_MOUNT_TO_ENTRY_OR_MODEL: return sizeof(SmartAction::morphOrMount);
             case SMART_ACTION_SET_INGAME_PHASE_MASK: return sizeof(SmartAction::ingamePhaseMask);
             case SMART_ACTION_SET_DATA: return sizeof(SmartAction::setData);
+            case SMART_ACTION_INC_DATA: return sizeof(SmartAction::setData);
             case SMART_ACTION_MOVE_FORWARD: return sizeof(SmartAction::moveRandom);
             case SMART_ACTION_ATTACK_STOP: return NO_PARAMS;
             case SMART_ACTION_SET_VISIBILITY: return sizeof(SmartAction::visibility);
@@ -846,8 +853,8 @@ bool SmartAIMgr::CheckUnusedActionParams(SmartScriptHolder const& e)
             case SMART_ACTION_PLAY_ANIMKIT: return sizeof(SmartAction::raw);
             case SMART_ACTION_SCENE_PLAY: return sizeof(SmartAction::raw);
             case SMART_ACTION_SCENE_CANCEL: return sizeof(SmartAction::raw);
-            // case SMART_ACTION_SPAWN_SPAWNGROUP: return sizeof(SmartAction::groupSpawn);
-            // case SMART_ACTION_DESPAWN_SPAWNGROUP: return sizeof(SmartAction::groupSpawn);
+            case SMART_ACTION_SPAWN_SPAWNGROUP: return sizeof(SmartAction::groupSpawn);
+            case SMART_ACTION_DESPAWN_SPAWNGROUP: return sizeof(SmartAction::groupSpawn);
             // case SMART_ACTION_RESPAWN_BY_SPAWNID: return sizeof(SmartAction::respawnData);
             case SMART_ACTION_PLAY_CINEMATIC: return sizeof(SmartAction::cinematic);
             case SMART_ACTION_SET_MOVEMENT_SPEED: return sizeof(SmartAction::movementSpeed);
@@ -1013,12 +1020,21 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_SET_CAN_FLY:
         case SMART_ACTION_REMOVE_AURAS_BY_TYPE:
         case SMART_ACTION_REMOVE_MOVEMENT:
-        case SMART_ACTION_SPAWN_SPAWNGROUP:
-        case SMART_ACTION_DESPAWN_SPAWNGROUP:
         case SMART_ACTION_RESPAWN_BY_SPAWNID:
             LOG_ERROR("sql.sql", "SmartAIMgr: EntryOrGuid {} using event({}) has an action type that is not yet supported on AzerothCore ({}), skipped.",
                              e.entryOrGuid, e.event_id, e.GetActionType());
             return false;
+        case SMART_ACTION_SPAWN_SPAWNGROUP:
+        case SMART_ACTION_DESPAWN_SPAWNGROUP:
+        {
+            if (!sObjectMgr->GetSpawnGroupData(e.action.groupSpawn.groupId))
+            {
+                LOG_ERROR("sql.sql", "SmartAIMgr: EntryOrGuid {} using event({}) has action type {} with invalid spawn group id {}.",
+                    e.entryOrGuid, e.event_id, e.GetActionType(), e.action.groupSpawn.groupId);
+                return false;
+            }
+            break;
+        }
         default:
             break;
     }
@@ -1065,7 +1081,6 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
             case SMART_EVENT_MANA_PCT:
             case SMART_EVENT_TARGET_HEALTH_PCT:
             case SMART_EVENT_TARGET_MANA_PCT:
-            case SMART_EVENT_DAMAGED:
             case SMART_EVENT_DAMAGED_TARGET:
             case SMART_EVENT_RECEIVE_HEAL:
                 if (!IsMinMaxValid(e, e.event.minMaxRepeat.min, e.event.minMaxRepeat.max))
@@ -1073,6 +1088,25 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
 
                 if (!IsMinMaxValid(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax))
                     return false;
+                break;
+            case SMART_EVENT_DAMAGED:
+                if (e.event.minMaxRepeat.rangeMin) // health check mode
+                {
+                    if (e.event.minMaxRepeat.rangeMin > 100)
+                    {
+                        LOG_ERROR("sql.sql", "SmartAIMgr: Entry {} SourceType {} Event {} Action {} has invalid health pct value ({}), must be between 1 and 100, skipped.",
+                                     e.entryOrGuid, e.GetScriptType(), e.event_id, e.GetActionType(), e.event.minMaxRepeat.rangeMin);
+                        return false;
+                    }
+                }
+                else // normal mode
+                {
+                    if (!IsMinMaxValid(e, e.event.minMaxRepeat.min, e.event.minMaxRepeat.max))
+                        return false;
+
+                    if (!IsMinMaxValid(e, e.event.minMaxRepeat.repeatMin, e.event.minMaxRepeat.repeatMax))
+                        return false;
+                }
                 break;
             case SMART_EVENT_AREA_RANGE:
             case SMART_EVENT_AREA_CASTING:
@@ -1966,6 +2000,7 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_THREAT_SINGLE_PCT:
         case SMART_ACTION_SET_INST_DATA64:
         case SMART_ACTION_SET_DATA:
+        case SMART_ACTION_INC_DATA:
         case SMART_ACTION_MOVE_FORWARD:
         case SMART_ACTION_ESCORT_PAUSE:
         case SMART_ACTION_SET_FLY:
@@ -2045,6 +2080,8 @@ bool SmartAIMgr::IsEventValid(SmartScriptHolder& e)
         case SMART_ACTION_WORLD_SCRIPT:
         case SMART_ACTION_SET_GOSSIP_MENU:
         case SMART_ACTION_SUMMON_GAMEOBJECT_GROUP:
+        case SMART_ACTION_SPAWN_SPAWNGROUP:
+        case SMART_ACTION_DESPAWN_SPAWNGROUP:
             break;
         default:
             LOG_ERROR("sql.sql", "SmartAIMgr: Not handled action_type({}), event_type({}), Entry {} SourceType {} Event {}, skipped.", e.GetActionType(), e.GetEventType(), e.entryOrGuid, e.GetScriptType(), e.event_id);
@@ -2087,7 +2124,7 @@ bool SmartAIMgr::IsTextValid(SmartScriptHolder const& e, uint32 id)
                         return false;
                     }
                     else
-                        entry = data->id1;
+                        entry = data->id;
                 }
                 else
                     entry = uint32(e.entryOrGuid);

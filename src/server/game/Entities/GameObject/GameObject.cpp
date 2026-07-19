@@ -766,7 +766,7 @@ void GameObject::Update(uint32 diff)
                             {
                                 Group* group = sGroupMgr->GetGroupByGUID(lootingGroupLowGUID);
                                 if (group)
-                                    group->EndRoll(&loot, GetMap());
+                                    group->EndRoll(&loot);
                                 m_groupLootTimer = 0;
                                 lootingGroupLowGUID = 0;
                             }
@@ -1120,6 +1120,11 @@ bool GameObject::LoadGameObjectFromDB(ObjectGuid::LowType spawnId, Map* map, boo
 
     m_goData = data;
     m_spawnId = spawnId;
+
+    // Set respawn compatibility mode based on spawn group flags
+    SpawnGroupTemplateData const* groupData = sObjectMgr->GetSpawnGroupData(data->spawnGroupId);
+    _respawnCompatibilityMode = sWorld->getBoolConfig(CONFIG_RESPAWN_FORCE_COMPATIBILITY_MODE)
+        || !groupData || (groupData->flags & SPAWNGROUP_FLAG_COMPATIBILITY_MODE);
 
     if (!Create(map->GenerateLowGuid<HighGuid::GameObject>(), entry, map, phaseMask, x, y, z, ang, data->rotation, animprogress, go_state, artKit))
         return false;
@@ -1841,13 +1846,18 @@ void GameObject::Use(Unit* user)
                 if (GetUniqueUseCount() == info->summoningRitual.reqParticipants)
                     return;
 
+                SpellCastResult castResult;
                 if (info->summoningRitual.animSpell)
-                    player->CastSpell(player, info->summoningRitual.animSpell, true);
+                    castResult = player->CastSpell(player, info->summoningRitual.animSpell, true);
                 else
-                    player->CastSpell(player, GetSpellId(),
+                    castResult = player->CastSpell(player, GetSpellId(),
                         TriggerCastFlags(TRIGGERED_IGNORE_EFFECTS
+                                       | TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD
                                        | TRIGGERED_IGNORE_POWER_AND_REAGENT_COST
                                        | TRIGGERED_CAST_DIRECTLY));
+
+                if (castResult != SPELL_CAST_OK)
+                    return;
 
                 AddUniqueUse(player);
 

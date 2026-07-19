@@ -17,6 +17,7 @@
 
 #include "Chat.h"
 #include "ChatPackets.h"
+#include "RBAC.h"
 #include "GameTime.h"
 #include "Metric.h"
 #include "Player.h"
@@ -323,7 +324,12 @@ void WorldSessionMgr::AddSession_(WorldSession* session)
     // don't count this session when checking player limit
     --Sessions;
 
-    if (pLimit > 0 && Sessions >= pLimit && AccountMgr::IsPlayerAccount(session->GetSecurity()) && !session->CanSkipQueue() && !HasRecentlyDisconnected(session))
+    // Trial accounts do not get account-flag queue priority. RBAC_PERM_SKIP_QUEUE is still honored
+    // since it can be granted intentionally to specific accounts.
+    bool trialQueueRestricted = sWorld->getBoolConfig(CONFIG_TRIAL_RESTRICTION_QUEUE) && session->IsTrialAccount();
+    bool canSkipQueue = session->HasPermission(rbac::RBAC_PERM_SKIP_QUEUE) || (!trialQueueRestricted && session->CanSkipQueue());
+
+    if (pLimit > 0 && Sessions >= pLimit && !canSkipQueue && !HasRecentlyDisconnected(session))
     {
         AddQueuedPlayer(session);
         UpdateMaxSessionCounters();
@@ -390,7 +396,7 @@ void WorldSessionMgr::SendGlobalGMMessage(WorldPacket const* packet, WorldSessio
             itr->second->GetPlayer() &&
             itr->second->GetPlayer()->IsInWorld() &&
             itr->second != self &&
-            !AccountMgr::IsPlayerAccount(itr->second->GetSecurity()) &&
+            itr->second->HasPermission(rbac::RBAC_PERM_RECEIVE_GLOBAL_GM_TEXTMESSAGE) &&
             (teamId == TEAM_NEUTRAL || itr->second->GetPlayer()->GetTeamId() == teamId))
         {
             itr->second->SendPacket(packet);

@@ -80,6 +80,7 @@ public:
     [[nodiscard]] bool IsTrigger() const { return HasFlagsExtra(CREATURE_FLAG_EXTRA_TRIGGER); }
     [[nodiscard]] bool IsGuard() const { return HasFlagsExtra(CREATURE_FLAG_EXTRA_GUARD); }
     CreatureMovementData const& GetMovementTemplate() const;
+    void PauseMovementForInteraction();
     [[nodiscard]] bool CanWalk() const { return GetMovementTemplate().IsGroundAllowed(); }
     [[nodiscard]] bool CanSwim() const override;
     [[nodiscard]] bool CanEnterWater() const override;
@@ -221,6 +222,7 @@ public:
 
     bool LoadFromDB(ObjectGuid::LowType guid, Map* map, bool allowDuplicate = false) { return LoadCreatureFromDB(guid, map, false, allowDuplicate); }
     bool LoadCreatureFromDB(ObjectGuid::LowType guid, Map* map, bool addToMap = true, bool allowDuplicate = false);
+    [[nodiscard]] bool IsRespawnCompatibilityMode() const { return _respawnCompatibilityMode; }
     void SaveToDB();
 
     virtual void SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask);   // overriden in Pet
@@ -378,9 +380,10 @@ public:
     void SetLootRewardDisabled(bool disable) { DisableLootReward = disable; }
     [[nodiscard]] bool IsLootRewardDisabled() const { return DisableLootReward; }
     [[nodiscard]] bool IsDamageEnoughForLootingAndReward() const;
-    void LowerPlayerDamageReq(uint32 unDamage, bool damagedByPlayer = true);
+    void LowerPlayerDamageReq(uint32 unDamage, bool damagedByPlayer = true, uint8 attackerLevel = 0);
     void ResetPlayerDamageReq();
     [[nodiscard]] uint32 GetPlayerDamageReq() const;
+    [[nodiscard]] uint8 GetHighestPlayerAttackerLevel() const { return _highestPlayerAttackerLevel; }
 
     [[nodiscard]] uint32 GetOriginalEntry() const { return m_originalEntry; }
     void SetOriginalEntry(uint32 entry) { m_originalEntry = entry; }
@@ -407,6 +410,9 @@ public:
     CreatureTextRepeatIds const& GetTextRepeatGroup(uint8 textGroup);
     void SetTextRepeatId(uint8 textGroup, uint8 id);
     void ClearTextRepeatGroup(uint8 textGroup);
+
+    bool IsTextOnCooldown(uint8 textGroup) const;
+    void SetTextCooldown(uint8 textGroup, uint32 cooldownMs);
 
     bool IsFreeToMove();
     static constexpr uint32 MOVE_CIRCLE_CHECK_INTERVAL = 3000;
@@ -464,6 +470,8 @@ protected:
 
     ObjectGuid m_lootRecipient;
     ObjectGuid::LowType m_lootRecipientGroup;
+
+    bool _respawnCompatibilityMode{true};
 
     /// Timers
     time_t m_corpseRemoveTime;                          // (secs) timer for death or corpse disappearance
@@ -543,6 +551,7 @@ private:
     ObjectGuid _spellFocusTarget; ///> Saved target during spell focus for restoration
 
     CreatureTextRepeatGroup m_textRepeat;
+    std::unordered_map<uint8, uint32> m_textCooldowns; // groupID -> expiry time (s)
 
     bool _isMissingSwimmingFlagOutOfCombat;
 
@@ -550,6 +559,7 @@ private:
 
     uint32 _playerDamageReq;
     bool _damagedByPlayer;
+    uint8 _highestPlayerAttackerLevel;
     bool _isCombatMovementAllowed;
 };
 
