@@ -265,6 +265,9 @@ void Spell::EffectResurrectNew(SpellEffIndex effIndex)
     if (target->isResurrectRequested())       // already have one active request
         return;
 
+    if (target->GetCharm())                   // e.g. still possessing a Death Knight Raise Ally ghoul
+        return;
+
     uint32 health = damage;
     uint32 mana = m_spellInfo->Effects[effIndex].MiscValue;
     ExecuteLogEffectResurrect(effIndex, target);
@@ -4670,6 +4673,9 @@ void Spell::EffectResurrect(SpellEffIndex effIndex)
         return;
 
     if (target->isResurrectRequested())       // already have one active request
+        return;
+
+    if (target->GetCharm())                   // e.g. still possessing a Death Knight Raise Ally ghoul
         return;
 
     uint32 health = target->CountPctFromMaxHealth(damage);

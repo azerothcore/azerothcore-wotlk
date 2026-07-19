@@ -191,6 +191,10 @@ class spell_dk_raise_ally : public SpellScript
         if (unitTarget->IsAlive()) // not discovered attributeEx5?
             return SPELL_FAILED_TARGET_NOT_DEAD;
 
+        Player* player = unitTarget->ToPlayer();
+        if (player && (player->GetCharm() || player->GetCorpse())) // already possessing a ghoul, or already released as a plain ghost
+            return SPELL_FAILED_TARGET_AURASTATE;
+
         return SPELL_CAST_OK;
     }
 
