@@ -5208,6 +5208,24 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_CASTER);
     });
 
+    // 68415 Corrupted Rage
+    ApplySpellFix({ 68415 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_1].SpellClassMask = flag96(0, 0x20000, 0);
+    });
+
+    // 31930 Judgements of the Wise
+    ApplySpellFix({ 31930 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->SpellFamilyFlags = flag96(0x200, 0, 0);
+    });
+
+    // 64646 Corrupted Wisdom
+    ApplySpellFix({ 64646 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_1].SpellClassMask = flag96(0x200, 0, 0);
+    });
+
     // Shadowhorn Charge (Rank 1)
     ApplySpellFix({ 6921 }, [](SpellInfo* spellInfo)
     {
