@@ -1,3 +1,4 @@
+-- DB update 2026_07_19_06 -> 2026_07_19_07
 -- Auriaya and Sanctum Sentry: DB-based spawns and creature_formations
 SET @CGUID := 137532;
 SET @AURI := 137496;
