@@ -19,6 +19,7 @@
 #define ACORE_AREA_DEFINES_H
 
 #include "Define.h"
+#include <cstddef>
 
 enum AreaTableIDs : uint32
 {
@@ -270,7 +271,11 @@ enum MapIDs : uint32
     MAP_TRIAL_OF_THE_CHAMPION                = 650,
     MAP_PIT_OF_SARON                         = 658,
     MAP_HALLS_OF_REFLECTION                  = 668,
-    MAP_THE_RUBY_SANCTUM                     = 724
+    MAP_THE_RUBY_SANCTUM                     = 724,
+
+    MAX_MAP_ID                               = MAP_THE_RUBY_SANCTUM
 };
+
+constexpr std::size_t MAP_ID_METRIC_COUNT = static_cast<std::size_t>(MAX_MAP_ID) + 1;
 
 #endif

@@ -168,6 +168,13 @@ elseif (WITH_DETAILED_METRICS)
   add_definitions(-DWITH_DETAILED_METRICS)
 endif()
 
+if(WITHOUT_OBSERVABILITY)
+  message("")
+  message(" *** WITHOUT_OBSERVABILITY - WARNING!")
+  message(" *** Please note that this will disable all observability features (i.e. Prometheus exporter)")
+  add_definitions(-DWITHOUT_OBSERVABILITY)
+endif()
+
 if(MSAN)
     message("")
     message(" *** MSAN - WARNING!")

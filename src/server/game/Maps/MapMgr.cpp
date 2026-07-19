@@ -16,8 +16,11 @@
  */
 
 #include "MapMgr.h"
+#include "AreaDefines.h"
 #include "Chat.h"
+#include "Creature.h"
 #include "DatabaseEnv.h"
+#include "GameObject.h"
 #include "GridDefines.h"
 #include "GridTerrainLoader.h"
 #include "Group.h"
@@ -26,6 +29,7 @@
 #include "Language.h"
 #include "Log.h"
 #include "MapInstanced.h"
+#include "Observability.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -34,6 +38,25 @@
 #include "Transport.h"
 #include "World.h"
 #include "WorldPacket.h"
+#include <array>
+#include <optional>
+
+namespace
+{
+    Acore::Observability::GaugeFamily MapCreaturesFamily
+    {
+        "ac_map_creatures",
+        "Number of creatures currently loaded, aggregated by map id.",
+        MAP_ID_METRIC_COUNT
+    };
+
+    Acore::Observability::GaugeFamily MapGameObjectsFamily
+    {
+        "ac_map_gameobjects",
+        "Number of game objects currently loaded, aggregated by map id.",
+        MAP_ID_METRIC_COUNT
+    };
+}
 
 MapMgr::MapMgr()
 {
@@ -377,6 +400,51 @@ void MapMgr::GetNumPlayersInInstances(uint32& dungeons, uint32& battlegrounds, u
                 spectators += spect;
             }
         }
+    }
+}
+
+void MapMgr::UpdateAggregateMetrics()
+{
+    if (!Acore::Observability::IsEnabled())
+        return;
+
+    struct PerMapAccumulator
+    {
+        uint64 Creatures;
+        uint64 GameObjects;
+    };
+
+    static std::array<std::optional<PerMapAccumulator>, MAP_ID_METRIC_COUNT> counts{};
+
+    // Reset existing to 0 so we report maps that went to 0 at least once
+    for (auto& count : counts)
+        if (count)
+            count.emplace();
+
+    DoForAllMaps([&](Map* map)
+    {
+        uint32 mapId = map->GetId();
+        ASSERT(mapId < MAP_ID_METRIC_COUNT);
+
+        auto& count = counts[mapId];
+        if (!count)
+            count.emplace();
+
+        count->Creatures += uint64(map->GetObjectsStore().Size<Creature>());
+        count->GameObjects += uint64(map->GetObjectsStore().Size<GameObject>());
+    });
+
+    for (std::size_t mapId = 0; mapId < counts.size(); ++mapId)
+    {
+        auto& count = counts[mapId];
+        if (!count)
+            continue;
+
+        MapCreaturesFamily.SetIndexed(mapId, "map_id", mapId, double(count->Creatures));
+        MapGameObjectsFamily.SetIndexed(mapId, "map_id", mapId, double(count->GameObjects));
+
+        if (count->Creatures == 0 && count->GameObjects == 0)
+            count.reset();
     }
 }
 

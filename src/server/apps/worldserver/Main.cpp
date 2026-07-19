@@ -37,6 +37,7 @@
 #include "ModuleMgr.h"
 #include "ModulesScriptLoader.h"
 #include "MySQLThreading.h"
+#include "Observability.h"
 #include "OpenSSLCrypto.h"
 #include "OutdoorPvPMgr.h"
 #include "ProcessPriority.h"
@@ -284,6 +285,22 @@ int main(int argc, char** argv)
     LoginDatabase.DirectExecute("UPDATE realmlist SET flag = (flag & ~{}) | {} WHERE id = '{}'", REALM_FLAG_OFFLINE, REALM_FLAG_VERSION_MISMATCH, realm.Id.Realm);
 
     LoadRealmInfo(*ioContext);
+
+    sObservability->Initialize(realm.Name);
+    std::shared_ptr<void> sObservabilityHandle(nullptr, [](void*)
+    {
+        sObservability->Unload();
+    });
+
+    Acore::Observability::Info BuildInfo
+    {
+        "ac_build_info",
+        "Build information for the running worldserver.",
+        {
+            { "version", GitRevision::GetFullVersion() },
+            { "revision", GitRevision::GetHash() }
+        }
+    };
 
     sMetric->Initialize(realm.Name, *ioContext, []()
     {

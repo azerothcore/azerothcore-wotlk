@@ -412,6 +412,41 @@ Network.UseSocketActivation = 0
 ###################################################################################################
 
 ###################################################################################################
+# OBSERVABILITY
+#
+#    Observability.Enable
+#        Description: Global runtime switch for observability features.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+
+Observability.Enable = 0
+
+#
+#    Observability.Prometheus.Enable
+#        Description: Enable the Prometheus metrics exporter. Requires Observability.Enable.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+
+Observability.Prometheus.Enable = 1
+
+#
+#    Observability.Prometheus.IP
+#        Description: Bind Prometheus metrics exporter to an IP address.
+#        Default:     "127.0.0.1" - (Bind to localhost)
+
+Observability.Prometheus.IP = "127.0.0.1"
+
+#
+#    Observability.Prometheus.Port
+#        Description: TCP port for the Prometheus /metrics endpoint.
+#        Default:     9200
+
+Observability.Prometheus.Port = 9200
+
+#
+###################################################################################################
+
+###################################################################################################
 # REMOTE ACCESS
 #
 #    Ra.Enable
@@ -820,6 +855,9 @@ Log.Async.Enable = 0
 
 ###################################################################################################
 # METRIC
+# Deprecated: Kept for backward compatibility only.
+# This option has been superseded by the Observability configuration and will be removed in a
+# future release. Consider using Observability instead.
 #
 # These settings control the statistics sent to the metric database (currently InfluxDB)
 #

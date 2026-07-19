@@ -1,0 +1,17 @@
+services:
+  ac-grafana:
+    container_name: ac-grafana
+    image: ${AC_GRAFANA_IMAGE:-grafana/grafana:11.2.0}
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+    networks:
+      - ac-network
+    ports:
+      - ${DOCKER_GRAFANA_EXTERNAL_PORT:-3000}:3000
+    volumes:
+      - ${AC_PROMETHEUS_TEST_DIR:-./apps/prometheus-test}/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ${AC_PROMETHEUS_TEST_DIR:-./apps/prometheus-test}/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      - ac-prometheus
