@@ -202,6 +202,11 @@ class spell_dk_raise_ally : public SpellScript
     {
         if (Player* unitTarget = GetHitPlayer())
         {
+            if (!unitTarget->GetCorpse())
+                unitTarget->BuildPlayerRepop();
+
+            unitTarget->RemoveAurasDueToSpell(8326);
+
             unitTarget->CastSpell(unitTarget, GetEffectValue(), true);
             if (Unit* ghoul = unitTarget->GetCharm())
             {

@@ -329,6 +329,8 @@ struct npc_pet_dk_risen_ally : public PossessedAI
 
                     if (!player->GetCorpse())
                         player->BuildPlayerRepop();
+                    else if (!player->HasAura(8326))
+                        player->CastSpell(player, 8326, true);
                 }
     }
 };
