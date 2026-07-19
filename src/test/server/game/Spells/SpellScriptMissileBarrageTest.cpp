@@ -74,8 +74,6 @@ namespace MageSpellFlags
     constexpr uint32 ARCANE_BLAST       = 0x20000000;
     constexpr uint32 ARCANE_MISSILES    = 0x00000020;
     constexpr uint32 FIREBALL           = 0x00000001;
-    constexpr uint32 FROSTFIRE_BOLT     = 0x00000000;  // Uses SpellFamilyFlags[1]
-    constexpr uint32 ARCANE_BARRAGE     = 0x00000000;  // Uses SpellFamilyFlags[1]
 }
 
 // =============================================================================
