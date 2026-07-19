@@ -10817,8 +10817,8 @@ bool Unit::_IsValidAttackTarget(Unit const* target, SpellInfo const* bySpell, Wo
         return false;
 
     // CvC case - can attack each other only when one of them is hostile,
-    // OR when entry pairing is whitelisted to allow scripted combat to take place
-    // when blizzlike factions are otherwise non-hostile
+    // or when the entry pairing is whitelisted in `creature_hostile_override`. This allows scripted
+    // blizz-like combat events without altering sniffed/blizz-like factions
     if (!HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && !target->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED))
         return GetReactionTo(target) <= REP_HOSTILE || target->GetReactionTo(this) <= REP_HOSTILE
             || sObjectMgr->IsHostileOverride(GetEntry(), target->GetEntry())

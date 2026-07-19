@@ -41,6 +41,8 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <unordered_map>
+#include <unordered_set>
 
 class Item;
 struct DungeonProgressionRequirements;
@@ -782,6 +784,8 @@ public:
     [[nodiscard]] GameObjectTemplateAddon const* GetGameObjectTemplateAddon(uint32 entry) const;
     CreatureAddon const* GetCreatureTemplateAddon(uint32 entry);
     CreatureMovementData const* GetCreatureMovementOverride(ObjectGuid::LowType spawnId) const;
+    // Returns true if attackerEntry is whitelisted to attack targetEntry despite mutually-neutral factions (creature_hostile_override).
+    [[nodiscard]] bool IsHostileOverride(uint32 attackerEntry, uint32 targetEntry) const;
     ItemTemplate const* GetItemTemplate(uint32 entry);
     [[nodiscard]] ItemTemplateContainer const* GetItemTemplateStore() const { return &_itemTemplateStore; }
     [[nodiscard]] std::vector<ItemTemplate*> const* GetItemTemplateStoreFast() const { return &_itemTemplateStoreFast; }
@@ -1056,6 +1060,7 @@ public:
     void LoadPlayerShapeshiftModels();
     void LoadEquipmentTemplates();
     void LoadCreatureMovementOverrides();
+    void LoadCreatureHostileOverrides();
     void LoadGameObjectLocales();
     void LoadGameobjects();
     void LoadItemTemplates();
@@ -1664,6 +1669,8 @@ private:
     CreatureAddonContainer _creatureAddonStore;
     CreatureAddonContainer _creatureTemplateAddonStore;
     std::unordered_map<ObjectGuid::LowType, CreatureMovementData> _creatureMovementOverrides;
+    // attackerEntry -> set of targetEntries it may attack despite neutral factions (creature_hostile_override)
+    std::unordered_map<uint32, std::unordered_set<uint32>> _creatureHostileOverrides;
     GameObjectAddonContainer _gameObjectAddonStore;
     GameObjectQuestItemMap _gameObjectQuestItemStore;
     CreatureQuestItemMap _creatureQuestItemStore;
