@@ -15838,6 +15838,24 @@ void Player::PrepareCharmAISpells()
             }
         }
     }
+
+    // The selection above can leave a lower rank of a spell chain in a slot (e.g. the
+    // secondary damage slot for a caster whose top spells are ranks of one chain). While
+    // charmed the player should cast the highest rank it knows, so walk each slot up its
+    // chain to the top learned rank.
+    for (uint32& charmSpellId : m_charmAISpells)
+    {
+        if (!charmSpellId)
+            continue;
+
+        while (uint32 nextRank = sSpellMgr->GetNextSpellInChain(charmSpellId))
+        {
+            if (!HasActiveSpell(nextRank))
+                break;
+
+            charmSpellId = nextRank;
+        }
+    }
 }
 
 void Player::AddRefundReference(ObjectGuid itemGUID)
