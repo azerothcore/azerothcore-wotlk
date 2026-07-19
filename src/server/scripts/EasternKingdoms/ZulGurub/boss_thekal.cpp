@@ -209,11 +209,9 @@ struct boss_thekal : public BossAI
         if (me->IsEngaged())
         {
             if (!UpdateVictim())
-            {
                 return;
-            }
 
-            scheduler.Update(diff, std::bind(&BossAI::DoMeleeAttackIfReady, this));
+            scheduler.Update(diff, [this] { DoMeleeAttackIfReady(); });
         }
         else
         {
@@ -401,11 +399,9 @@ struct npc_zealot_lorkhan : public ScriptedAI
         if (me->IsEngaged())
         {
             if (!UpdateVictim())
-            {
                 return;
-            }
 
-            _scheduler.Update(diff, std::bind(&BossAI::DoMeleeAttackIfReady, this));
+            _scheduler.Update(diff, [this] { DoMeleeAttackIfReady(); });
         }
         else
         {
@@ -502,11 +498,9 @@ struct npc_zealot_zath : public ScriptedAI
         if (me->IsEngaged())
         {
             if (!UpdateVictim())
-            {
                 return;
-            }
 
-            _scheduler.Update(diff, std::bind(&BossAI::DoMeleeAttackIfReady, this));
+            _scheduler.Update(diff, [this] { DoMeleeAttackIfReady(); });
         }
         else
         {
