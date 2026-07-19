@@ -20,6 +20,7 @@
 #include "GameObjectAI.h"
 #include "GameObjectScript.h"
 #include "MapMgr.h"
+#include "MoveSplineInit.h"
 #include "ObjectMgr.h"
 #include "PassiveAI.h"
 #include "Player.h"
@@ -113,6 +114,7 @@ enum Events
     EVENT_SUMMON_ALGALON            = 3,
     EVENT_BRANN_OUTRO_1             = 4,
     EVENT_BRANN_OUTRO_2             = 5,
+    EVENT_BRANN_REACH_TALK_POINT    = 45,
 
     // Algalon the Observer
     EVENT_INTRO_1                   = 6,
@@ -209,7 +211,7 @@ Position const BrannIntroWaypoint[MAX_BRANN_WAYPOINTS_INTRO] =
     {1632.676f, -190.5927f, 427.2631f, 0.0f},
     {1631.497f, -214.2221f, 418.1152f, 0.0f},
     {1636.455f, -263.6647f, 417.3213f, 0.0f},
-    {1629.586f, -267.9792f, 417.3219f, 0.0f},
+    {1624.1223f, -267.04172f, 417.3216f, 4.7690268f},
     {1631.497f, -214.2221f, 418.1152f, 0.0f},
     {1632.676f, -190.5927f, 425.8831f, 0.0f},
     {1632.814f, -173.9334f, 427.2621f, 0.0f},
@@ -901,12 +903,6 @@ struct npc_brann_bronzebeard_algalon : public CreatureAI
                 delay = 8s;
                 me->SetWalk(true);
                 break;
-            case 6:
-                me->SetFacingTo(4.6156f);
-                me->SetWalk(false);
-                Talk(SAY_BRANN_ALGALON_INTRO_1);
-                events.ScheduleEvent(EVENT_SUMMON_ALGALON, 7500ms);
-                return;
             case 10:
                 me->DespawnOrUnsummon(1ms);
                 return;
@@ -929,7 +925,36 @@ struct npc_brann_bronzebeard_algalon : public CreatureAI
         {
             case EVENT_BRANN_MOVE_INTRO:
                 if (_currentPoint < MAX_BRANN_WAYPOINTS_INTRO)
-                    me->GetMotionMaster()->MovePoint(_currentPoint, BrannIntroWaypoint[_currentPoint]);
+                {
+                    if (_currentPoint == 5 || _currentPoint == 6)
+                    {
+                        // Straight-line move - this stretch crosses the not-yet-open universe floor,
+                        // so it isn't covered by the creature navmesh and MovePoint stalls partway.
+                        // No MovementInform for a raw spline, so "arrived" is handled off a timer
+                        // sized to the actual distance instead.
+                        Position const& dest = BrannIntroWaypoint[_currentPoint];
+                        Milliseconds travelTime = Milliseconds(uint32(me->GetExactDist2d(dest) / 2.5f * 1000)) + 500ms;
+                        Movement::MoveSplineInit init(me);
+                        init.MoveTo(dest.GetPositionX(), dest.GetPositionY(), dest.GetPositionZ());
+                        init.Launch();
+                        if (_currentPoint == 6)
+                            events.ScheduleEvent(EVENT_BRANN_REACH_TALK_POINT, travelTime);
+                        else
+                        {
+                            _currentPoint = 6;
+                            events.ScheduleEvent(EVENT_BRANN_MOVE_INTRO, travelTime);
+                        }
+                    }
+                    else
+                        me->GetMotionMaster()->MovePoint(_currentPoint, BrannIntroWaypoint[_currentPoint]);
+                }
+                break;
+            case EVENT_BRANN_REACH_TALK_POINT:
+                _currentPoint = 7;
+                me->SetFacingTo(4.7760954f);
+                me->SetWalk(false);
+                Talk(SAY_BRANN_ALGALON_INTRO_1);
+                events.ScheduleEvent(EVENT_SUMMON_ALGALON, 7500ms);
                 break;
             case EVENT_SUMMON_ALGALON:
                 if (me->GetInstanceScript() && !me->GetInstanceScript()->GetCreature(BOSS_ALGALON))
