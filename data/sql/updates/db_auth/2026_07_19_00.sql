@@ -1,3 +1,4 @@
+-- DB update 2026_07_18_01 -> 2026_07_19_00
 DELETE FROM `rbac_permissions` WHERE `id` IN (941, 942, 943, 944);
 INSERT INTO `rbac_permissions` (`id`, `name`) VALUES
 (941, 'Command: account flag'),

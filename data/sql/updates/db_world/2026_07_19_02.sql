@@ -1,3 +1,4 @@
+-- DB update 2026_07_19_01 -> 2026_07_19_02
 DELETE FROM `command` WHERE `name` IN ('account flag', 'account flag list', 'account flag add', 'account flag remove');
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
 ('account flag', 2, 'Syntax: .account flag $subcommand\nType .account flag to see the list of possible subcommands or .help account flag $subcommand to see info on subcommands.'),
