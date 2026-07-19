@@ -265,7 +265,7 @@ void Spell::EffectResurrectNew(SpellEffIndex effIndex)
     if (target->isResurrectRequested())       // already have one active request
         return;
 
-    if (target->GetCharm())                   // e.g. still possessing a Death Knight Raise Ally ghoul
+    if (target->GetCharm())
         return;
 
     uint32 health = damage;
@@ -4675,7 +4675,7 @@ void Spell::EffectResurrect(SpellEffIndex effIndex)
     if (target->isResurrectRequested())       // already have one active request
         return;
 
-    if (target->GetCharm())                   // e.g. still possessing a Death Knight Raise Ally ghoul
+    if (target->GetCharm())
         return;
 
     uint32 health = target->CountPctFromMaxHealth(damage);

@@ -69,7 +69,7 @@ void WorldSession::HandleRepopRequestOpcode(WorldPacket& recv_data)
         return; // silently return, client should display the error by itself
 
     if (GetPlayer()->GetCharm())
-        return; // e.g. still possessing a Death Knight Raise Ally ghoul - repopping now would strand it
+        return;
 
     // the world update order is sessions, players, creatures
     // the netcode runs in parallel with all of these
