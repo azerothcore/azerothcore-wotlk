@@ -491,7 +491,6 @@ struct boss_algalon_the_observer : public ScriptedAI
         me->SetImmuneToNPC(true);
         events.Reset();
         events.SetPhase(PHASE_ROLE_PLAY);
-        events.ScheduleEvent(EVENT_SAY_ALGALON_AGGRO, 14s);
         events.ScheduleEvent(EVENT_ALGALON_IN_PROGRESS, _firstPull ? 14s : 1500ms);
         Talk(SAY_ALGALON_START_TIMER);
         summons.DespawnEntry(NPC_AZEROTH);
@@ -500,16 +499,17 @@ struct boss_algalon_the_observer : public ScriptedAI
         {
             _firstPull = false;
             _instance->SetData(DATA_DESPAWN_ALGALON, 0);
-            introDelay = 22s;
+            events.ScheduleEvent(EVENT_SAY_ALGALON_AGGRO, 16s);
+            introDelay = 26s;
         }
         else
-            introDelay = 9s;
+            introDelay = 8500ms;
 
         events.ScheduleEvent(EVENT_INTRO_TIMER_DONE, introDelay);
         events.ScheduleEvent(EVENT_QUANTUM_STRIKE, 3500ms + introDelay);
         events.ScheduleEvent(EVENT_PHASE_PUNCH, 15500ms + introDelay);
         events.ScheduleEvent(EVENT_SUMMON_COLLAPSING_STAR, 16500ms + introDelay);
-        events.ScheduleEvent(EVENT_COSMIC_SMASH, 25s + introDelay);
+        events.ScheduleEvent(EVENT_COSMIC_SMASH, 26s + introDelay);
         events.ScheduleEvent(EVENT_ACTIVATE_LIVING_CONSTELLATION, 50500ms + introDelay);
         events.ScheduleEvent(EVENT_BIG_BANG, 90s + introDelay);
         events.ScheduleEvent(EVENT_ASCEND_TO_THE_HEAVENS, 360s + introDelay);
@@ -534,7 +534,7 @@ struct boss_algalon_the_observer : public ScriptedAI
             events.ScheduleEvent(EVENT_OUTRO_7, 55s + 500ms);
             events.ScheduleEvent(EVENT_OUTRO_8, 73s + 500ms);
             events.ScheduleEvent(EVENT_OUTRO_9, 85s + 500ms);
-            events.ScheduleEvent(EVENT_OUTRO_10, 101s + 500ms);
+            events.ScheduleEvent(EVENT_OUTRO_10, 111s);
             events.ScheduleEvent(EVENT_OUTRO_11, 117s + 500ms);
         }
     }
