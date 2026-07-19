@@ -1,3 +1,4 @@
+-- DB update 2026_07_18_04 -> 2026_07_19_00
 --
 -- Valithria Dreamwalker: turn the initial Risen Archmages (37868) from persistent
 -- creature spawns into summon groups on the Green Dragon Combat Trigger (38752).
