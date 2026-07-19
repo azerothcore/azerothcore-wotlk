@@ -218,6 +218,7 @@ public:
         // Shared
         EventMap _events;
         bool _mimironTramUsed;
+        bool _algalonResummonPending;
 
         void Initialize() override
         {
@@ -233,6 +234,7 @@ public:
             // Shared
             _events.Reset();
             _mimironTramUsed       = false;
+            _algalonResummonPending = false;
         }
 
         void FillInitialWorldStates(WorldPackets::WorldState::InitWorldStates& packet) override
@@ -278,7 +280,7 @@ public:
 
             uint32 algalonTimer =
                 GetPersistentData(PERSISTENT_DATA_ALGALON_TIMER);
-            if (!GetObjectGuid(BOSS_ALGALON) && algalonTimer
+            if (!GetObjectGuid(BOSS_ALGALON) && !_algalonResummonPending && algalonTimer
                 && (algalonTimer <= 60
                     || algalonTimer == TIMER_ALGALON_TO_SUMMON))
             {
@@ -707,6 +709,10 @@ public:
                     StorePersistentData(PERSISTENT_DATA_ALGALON_TIMER, 60);
                     _events.RescheduleEvent(EVENT_UPDATE_ALGALON_TIMER, 1min);
                     return;
+                case DATA_RESUMMON_ALGALON:
+                    _algalonResummonPending = true;
+                    _events.RescheduleEvent(EVENT_RESUMMON_ALGALON, 2s);
+                    return;
                 case DATA_ALGALON_SUMMON_STATE:
                 case DATA_ALGALON_DEFEATED:
                     DoUpdateWorldState(WORLD_STATE_ULDUAR_ALGALON_TIMER_ENABLED, 0);
@@ -930,7 +936,14 @@ public:
                     SetData(DATA_ALGALON_DEFEATED, 1);
                     if (Creature* algalon = GetCreature(BOSS_ALGALON))
                         algalon->AI()->DoAction(ACTION_DESPAWN_ALGALON);
+                    break;
                 }
+                case EVENT_RESUMMON_ALGALON:
+                    _algalonResummonPending = false;
+                    if (!GetCreature(BOSS_ALGALON))
+                        if (Creature* algalon = instance->SummonCreature(NPC_ALGALON, AlgalonSummonPos))
+                            algalon->AI()->DoAction(ACTION_START_INTRO);
+                    break;
             }
         }
 

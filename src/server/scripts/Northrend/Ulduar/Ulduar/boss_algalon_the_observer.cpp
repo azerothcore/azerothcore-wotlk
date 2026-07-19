@@ -20,11 +20,11 @@
 #include "GameObjectAI.h"
 #include "GameObjectScript.h"
 #include "MapMgr.h"
-#include "MoveSplineInit.h"
 #include "ObjectMgr.h"
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
+#include "ScriptMgr.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
 #include "ulduar.h"
@@ -78,7 +78,7 @@ enum Actions
 {
     //ACTION_INIT_ALGALON       = 1, defined in ulduar.h
     //ACTION_DESPAWN_ALGALON    = 2, defined in ulduar.h
-    ACTION_START_INTRO      = 3,
+    //ACTION_START_INTRO        = 3, defined in ulduar.h
     ACTION_FINISH_INTRO     = 4,
     ACTION_ACTIVATE_STAR    = 5,
     ACTION_BIG_BANG         = 6,
@@ -95,6 +95,7 @@ enum Misc
 
     POINT_ALGALON_LAND          = 1,
     POINT_ALGALON_OUTRO         = 2,
+    POINT_ALGALON_FLOAT         = 3,
 
     EVENT_ID_SUPERMASSIVE_START = 21697,
 
@@ -152,6 +153,10 @@ enum Events
 
     // Living Constellation
     EVENT_ARCANE_BARRAGE            = 41,
+
+    EVENT_INTRO_CHANNEL             = 42,
+    EVENT_INTRO_SUMMON              = 43,
+    EVENT_INTRO_DESCEND             = 44,
 };
 
 enum EncounterPhases
@@ -235,7 +240,8 @@ Position const CollapsingStarPos[COLLAPSING_STAR_COUNT] =
     {1622.451f, -321.1563f, 417.6188f, 4.677482f},
     {1615.060f, -291.6816f, 417.7796f, 3.490659f},
 };
-Position const AlgalonOutroPos = {1633.64f, -317.78f, 417.3211f, 0.0f};
+Position const AlgalonOutroPos = {1631.8004f, -314.48645f, 417.3222f, 1.5755974f};
+Position const AlgalonFloatPos = {1632.668f, -302.7656f, 420.3211f, 1.530165f};
 Position const BrannOutroPos[3] =
 {
     {1632.023f, -243.7434f, 417.9118f, 0.0f},
@@ -366,7 +372,18 @@ struct boss_algalon_the_observer : public ScriptedAI
         if (_instance)
             _instance->SetBossState(BOSS_ALGALON, FAIL);
 
-        ScriptedAI::EnterEvadeMode(why);
+        // Algalon has CREATURE_FLAG_EXTRA_HARD_RESET set (retail-accurate flags_extra), which
+        // would make CreatureAI::EnterEvadeMode auto-despawn him via DespawnOnEvade() and race
+        // with our own scripted wipe-recovery below. Replicate its non-boss-specific behaviour
+        // here instead of calling it, to skip that tail without touching the DB flag.
+        if (!_EnterEvadeMode(why))
+            return;
+
+        me->GetMotionMaster()->MoveTargetedHome();
+
+        Reset();
+
+        sScriptMgr->OnUnitEnterEvadeMode(me, why);
     }
 
     void Reset() override
@@ -388,6 +405,8 @@ struct boss_algalon_the_observer : public ScriptedAI
         if (_instance->GetBossState(BOSS_ALGALON) == FAIL)
         {
             _firstPull = false;
+            _instance->SetData(DATA_RESUMMON_ALGALON, 0);
+            me->DespawnOrUnsummon(1ms);
         }
 
         if (_instance)
@@ -413,15 +432,14 @@ struct boss_algalon_the_observer : public ScriptedAI
                     me->SetDisableGravity(true);
                     me->CastSpell(me, SPELL_ARRIVAL, true);
                     me->CastSpell(me, SPELL_RIDE_THE_LIGHTNING, true);
-                    me->GetMotionMaster()->MovePoint(POINT_ALGALON_LAND, AlgalonLandPos);
+                    me->GetMotionMaster()->MovePoint(POINT_ALGALON_FLOAT, AlgalonFloatPos);
                     me->SetHomePosition(AlgalonLandPos);
-                    Movement::MoveSplineInit init(me);
-                    init.MoveTo(AlgalonLandPos.GetPositionX(), AlgalonLandPos.GetPositionY(), AlgalonLandPos.GetPositionZ());
-                    init.SetOrientationFixed(true);
-                    init.Launch();
                     events.Reset();
                     events.SetPhase(PHASE_ROLE_PLAY);
                     events.ScheduleEvent(EVENT_INTRO_1, 5s, 0, PHASE_ROLE_PLAY);
+                    events.ScheduleEvent(EVENT_INTRO_CHANNEL, 6s, 0, PHASE_ROLE_PLAY);
+                    events.ScheduleEvent(EVENT_INTRO_SUMMON, 7s, 0, PHASE_ROLE_PLAY);
+                    events.ScheduleEvent(EVENT_INTRO_DESCEND, 10s, 0, PHASE_ROLE_PLAY);
                     events.ScheduleEvent(EVENT_INTRO_2, 15s, 0, PHASE_ROLE_PLAY);
                     events.ScheduleEvent(EVENT_INTRO_3, 23s, 0, PHASE_ROLE_PLAY);
                     events.ScheduleEvent(EVENT_INTRO_FINISH, 36s, 0, PHASE_ROLE_PLAY);
@@ -524,18 +542,7 @@ struct boss_algalon_the_observer : public ScriptedAI
         if (pointId == POINT_ALGALON_LAND)
             me->SetDisableGravity(false);
         else if (pointId == POINT_ALGALON_OUTRO)
-        {
-            me->SetFacingTo(1.605703f);
-            events.ScheduleEvent(EVENT_OUTRO_3, 1200ms);
-            events.ScheduleEvent(EVENT_OUTRO_4, 2400ms);
-            events.ScheduleEvent(EVENT_OUTRO_5, 8500ms);
-            events.ScheduleEvent(EVENT_OUTRO_6, 15s + 500ms);
-            events.ScheduleEvent(EVENT_OUTRO_7, 55s + 500ms);
-            events.ScheduleEvent(EVENT_OUTRO_8, 73s + 500ms);
-            events.ScheduleEvent(EVENT_OUTRO_9, 85s + 500ms);
-            events.ScheduleEvent(EVENT_OUTRO_10, 101s + 500ms);
-            events.ScheduleEvent(EVENT_OUTRO_11, 117s + 500ms);
-        }
+            me->SetFacingTo(AlgalonOutroPos.GetOrientation());
     }
 
     void JustSummoned(Creature* summon) override
@@ -644,14 +651,26 @@ struct boss_algalon_the_observer : public ScriptedAI
         {
             case EVENT_INTRO_1:
                 me->RemoveAurasDueToSpell(SPELL_RIDE_THE_LIGHTNING);
-                Talk(SAY_ALGALON_INTRO_1);
+                if (_firstPull)
+                    Talk(SAY_ALGALON_INTRO_1);
+                break;
+            case EVENT_INTRO_CHANNEL:
+                me->SetEmoteState(EMOTE_STATE_SPELL_CHANNEL_OMNI);
+                break;
+            case EVENT_INTRO_SUMMON:
+                me->CastSpell((Unit*)nullptr, SPELL_SUMMON_AZEROTH, true);
+                me->ClearEmoteState();
+                break;
+            case EVENT_INTRO_DESCEND:
+                me->GetMotionMaster()->MovePoint(POINT_ALGALON_LAND, AlgalonLandPos);
                 break;
             case EVENT_INTRO_2:
-                me->CastSpell((Unit*)nullptr, SPELL_SUMMON_AZEROTH, true);
-                Talk(SAY_ALGALON_INTRO_2);
+                if (_firstPull)
+                    Talk(SAY_ALGALON_INTRO_2);
                 break;
             case EVENT_INTRO_3:
-                Talk(SAY_ALGALON_INTRO_3);
+                if (_firstPull)
+                    Talk(SAY_ALGALON_INTRO_3);
                 break;
             case EVENT_INTRO_FINISH:
                 events.Reset();
@@ -754,9 +773,23 @@ struct boss_algalon_the_observer : public ScriptedAI
             {
                 Player* lootRecipent = me->GetLootRecipient();
                 _EnterEvadeMode();
+                // _EnterEvadeMode() adds UNIT_STATE_EVADE, which makes Creature::Update() stop
+                // calling UpdateAI() entirely - clear it or the rest of the outro (chest, kill
+                // credit, dialogue) never fires.
+                me->ClearUnitState(UNIT_STATE_EVADE);
                 // LootRecipent is cleared in _EnterEvadeMode, restore it
                 me->SetLootRecipient(lootRecipent);
+                me->GetMotionMaster()->Clear(false);
                 me->GetMotionMaster()->MovePoint(POINT_ALGALON_OUTRO, AlgalonOutroPos);
+                events.ScheduleEvent(EVENT_OUTRO_3, 3200ms);
+                events.ScheduleEvent(EVENT_OUTRO_4, 4400ms);
+                events.ScheduleEvent(EVENT_OUTRO_5, 10500ms);
+                events.ScheduleEvent(EVENT_OUTRO_6, 17s + 500ms);
+                events.ScheduleEvent(EVENT_OUTRO_7, 57s + 500ms);
+                events.ScheduleEvent(EVENT_OUTRO_8, 75s + 500ms);
+                events.ScheduleEvent(EVENT_OUTRO_9, 87s + 500ms);
+                events.ScheduleEvent(EVENT_OUTRO_10, 103s + 500ms);
+                events.ScheduleEvent(EVENT_OUTRO_11, 119s + 500ms);
                 break;
             }
             case EVENT_OUTRO_3:
@@ -878,6 +911,8 @@ struct npc_brann_bronzebeard_algalon : public CreatureAI
                 me->DespawnOrUnsummon(1ms);
                 return;
             case POINT_BRANN_OUTRO:
+                me->SetFacingTo(4.7950f); // faces AlgalonOutroPos
+                return;
             case POINT_BRANN_OUTRO_END:
                 return;
         }
