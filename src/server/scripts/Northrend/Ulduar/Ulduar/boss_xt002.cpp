@@ -18,6 +18,7 @@
 #include "AchievementCriteriaScript.h"
 #include "Containers.h"
 #include "CreatureScript.h"
+#include "GridNotifiers.h"
 #include "InstanceScript.h"
 #include "MotionMaster.h"
 #include "ObjectAccessor.h"
@@ -718,10 +719,7 @@ class spell_xt002_searing_light_gravity_bomb : public SpellScript
     void FilterTargets(std::list<WorldObject*>& targets)
     {
         if (Unit* victim = GetCaster()->GetVictim())
-        {
-            ObjectGuid victimGuid = victim->GetGUID();
-            targets.remove_if([victimGuid](WorldObject* target) { return target->GetGUID() == victimGuid; });
-        }
+            targets.remove_if(Acore::ObjectGUIDCheck(victim->GetGUID(), true));
 
         Acore::Containers::RandomResize(targets, 1);
     }
