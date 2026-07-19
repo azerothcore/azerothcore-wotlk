@@ -5208,6 +5208,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_DEST_CASTER);
     });
 
+    // Shadowhorn Charge (Rank 1)
+    ApplySpellFix({ 6921 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPPRESS_CASTER_PROCS;
+    });
+
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
     {
         SpellInfo* spellInfo = mSpellInfoMap[i];
@@ -5387,15 +5393,6 @@ void SpellMgr::LoadSpellInfoCorrections()
 
     LockEntry* key = const_cast<LockEntry*>(sLockStore.LookupEntry(36)); // 3366 Opening, allows to open without proper key
     key->Type[2] = LOCK_KEY_NONE;
-
-    // Shadowhorn Charge (Shadowhorn Stag / Elder Shadowhorn Stag) - this self-buff has DmgClass Melee,
-    // so its own cast fires a "done melee-class spell" proc against its own target (itself). That
-    // immediately consumes its Curse of the Shadowhorn (6922) proc-trigger charge on the caster before
-    // any real swing lands on a player.
-    ApplySpellFix({ 6921 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPPRESS_CASTER_PROCS;
-    });
 
     LOG_INFO("server.loading", ">> Loading spell dbc data corrections  in {} ms", GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
