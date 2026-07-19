@@ -121,7 +121,7 @@ enum Events
     EVENT_INTRO_2                   = 7,
     EVENT_INTRO_3                   = 8,
     EVENT_INTRO_FINISH              = 9,
-    EVENT_START_COMBAT              = 10,
+    EVENT_SAY_ALGALON_AGGRO         = 10,
     EVENT_INTRO_TIMER_DONE          = 11,
     EVENT_QUANTUM_STRIKE            = 12,
     EVENT_PHASE_PUNCH               = 13,
@@ -146,7 +146,7 @@ enum Events
     EVENT_OUTRO_11                  = 32,
     EVENT_ACTIVATE_LIVING_CONSTELLATION = 33,
     EVENT_CHECK_HERALD_ITEMS        = 34,
-    EVENT_REMOVE_UNNATTACKABLE      = 35,
+    EVENT_ALGALON_IN_PROGRESS       = 35,
     EVENT_DESPAWN_ALGALON_1         = 36,
     EVENT_DESPAWN_ALGALON_2         = 37,
     EVENT_DESPAWN_ALGALON_3         = 38,
@@ -272,10 +272,13 @@ struct boss_algalon_the_observer : public ScriptedAI
 {
     boss_algalon_the_observer(Creature* creature) : ScriptedAI(creature), summons(me)
     {
-        _fedOnTears = true;
-        _firstPull = true;
-        _fightWon = false;
         _instance = me->GetInstanceScript();
+        _fedOnTears = true;
+        _fightWon = false;
+        if (_instance)
+            _firstPull = !_instance->GetPersistentData(PERSISTENT_DATA_ALGALON_FIRST_PULL);
+        else
+            _firstPull = true;
     }
 
     EventMap events;
@@ -374,10 +377,6 @@ struct boss_algalon_the_observer : public ScriptedAI
         if (_instance)
             _instance->SetBossState(BOSS_ALGALON, FAIL);
 
-        // Algalon has CREATURE_FLAG_EXTRA_HARD_RESET set (retail-accurate flags_extra), which
-        // would make CreatureAI::EnterEvadeMode auto-despawn him via DespawnOnEvade() and race
-        // with our own scripted wipe-recovery below. Replicate its non-boss-specific behaviour
-        // here instead of calling it, to skip that tail without touching the DB flag.
         if (!_EnterEvadeMode(why))
             return;
 
@@ -400,19 +399,19 @@ struct boss_algalon_the_observer : public ScriptedAI
         me->SetSheath(SHEATH_STATE_UNARMED);
         me->SetFaction(190);
         me->CastSpell(me, SPELL_DUAL_WIELD, true);
-
         _phaseTwo = false;
         _heraldOfTheTitans = true;
-
-        if (_instance->GetBossState(BOSS_ALGALON) == FAIL)
-        {
-            _firstPull = false;
-            _instance->SetData(DATA_RESUMMON_ALGALON, 0);
-            me->DespawnOrUnsummon(1ms);
-        }
-
         if (_instance)
+        {
+            if (_instance->GetBossState(BOSS_ALGALON) == FAIL)
+            {
+                _firstPull = false;
+                _instance->StorePersistentData(PERSISTENT_DATA_ALGALON_FIRST_PULL, 1);
+                _instance->SetData(DATA_RESUMMON_ALGALON, 0);
+                me->DespawnOrUnsummon(1ms);
+            }
             _instance->SetBossState(BOSS_ALGALON, NOT_STARTED);
+        }
     }
 
     void KilledUnit(Unit* victim) override
@@ -472,6 +471,8 @@ struct boss_algalon_the_observer : public ScriptedAI
                 _firstPull = false;
                 _fedOnTears = false;
                 me->SetImmuneToPC(false);
+                if (_instance)
+                    _instance->StorePersistentData(PERSISTENT_DATA_ALGALON_FIRST_PULL, 1);
                 break;
             case ACTION_ASCEND:
                 summons.DespawnAll();
@@ -506,32 +507,28 @@ struct boss_algalon_the_observer : public ScriptedAI
         me->SetImmuneToNPC(true);
         events.Reset();
         events.SetPhase(PHASE_ROLE_PLAY);
+        events.ScheduleEvent(EVENT_ALGALON_IN_PROGRESS, _firstPull ? 14s : 1500ms);
+        Talk(SAY_ALGALON_START_TIMER);
+        summons.DespawnEntry(NPC_AZEROTH);
 
-        if (!_firstPull)
+        if (_firstPull)
         {
-            events.ScheduleEvent(EVENT_START_COMBAT, 0ms);
-            introDelay = 8s;
+            _firstPull = false;
+            _instance->SetData(DATA_DESPAWN_ALGALON, 0);
+            events.ScheduleEvent(EVENT_SAY_ALGALON_AGGRO, 16s);
+            introDelay = 26s;
         }
         else
-        {
-            summons.DespawnEntry(NPC_AZEROTH);
-            _firstPull = false;
-            Talk(SAY_ALGALON_START_TIMER);
-            introDelay = 22s;
-            events.ScheduleEvent(EVENT_START_COMBAT, 14s);
-            _instance->SetData(DATA_DESPAWN_ALGALON, 0);
-        }
+            introDelay = 8500ms;
 
-        events.ScheduleEvent(EVENT_REMOVE_UNNATTACKABLE, introDelay - 500ms);
         events.ScheduleEvent(EVENT_INTRO_TIMER_DONE, introDelay);
         events.ScheduleEvent(EVENT_QUANTUM_STRIKE, 3500ms + introDelay);
         events.ScheduleEvent(EVENT_PHASE_PUNCH, 15500ms + introDelay);
         events.ScheduleEvent(EVENT_SUMMON_COLLAPSING_STAR, 16500ms + introDelay);
-        events.ScheduleEvent(EVENT_COSMIC_SMASH, 25s + introDelay);
+        events.ScheduleEvent(EVENT_COSMIC_SMASH, 26s + introDelay);
         events.ScheduleEvent(EVENT_ACTIVATE_LIVING_CONSTELLATION, 50500ms + introDelay);
         events.ScheduleEvent(EVENT_BIG_BANG, 90s + introDelay);
         events.ScheduleEvent(EVENT_ASCEND_TO_THE_HEAVENS, 360s + introDelay);
-
         events.ScheduleEvent(EVENT_CHECK_HERALD_ITEMS, 5s);
         DoCheckHeraldOfTheTitans();
     }
@@ -680,16 +677,17 @@ struct boss_algalon_the_observer : public ScriptedAI
                 if (Creature* brann = _instance->GetCreature(DATA_BRANN_BRONZEBEARD_ALG))
                     brann->AI()->DoAction(ACTION_FINISH_INTRO);
                 break;
-            case EVENT_START_COMBAT:
-                _instance->SetBossState(BOSS_ALGALON, IN_PROGRESS);
+            case EVENT_SAY_ALGALON_AGGRO:
                 Talk(SAY_ALGALON_AGGRO);
                 break;
-            case EVENT_REMOVE_UNNATTACKABLE:
+            case EVENT_ALGALON_IN_PROGRESS:
+                if (_instance)
+                    _instance->SetBossState(BOSS_ALGALON, IN_PROGRESS);
+                break;
+            case EVENT_INTRO_TIMER_DONE:
                 me->SetSheath(SHEATH_STATE_MELEE);
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetImmuneToNPC(false);
-                break;
-            case EVENT_INTRO_TIMER_DONE:
                 events.SetPhase(PHASE_NORMAL);
                 me->CastSpell((Unit*)nullptr, SPELL_SUPERMASSIVE_FAIL, true);
                 // Hack: _IsValidTarget failed earlier due to flags, call AttackStart again
@@ -698,7 +696,6 @@ struct boss_algalon_the_observer : public ScriptedAI
                 if (Player* target = SelectTargetFromPlayerList(150.0f))
                     AttackStart(target);
                 me->SetInCombatWithZone();
-
                 for (uint32 i = 0; i < LIVING_CONSTELLATION_COUNT; ++i)
                     me->SummonCreature(NPC_LIVING_CONSTELLATION, ConstellationPos[i], TEMPSUMMON_DEAD_DESPAWN);
                 break;
@@ -775,9 +772,6 @@ struct boss_algalon_the_observer : public ScriptedAI
             {
                 Player* lootRecipent = me->GetLootRecipient();
                 _EnterEvadeMode();
-                // _EnterEvadeMode() adds UNIT_STATE_EVADE, which makes Creature::Update() stop
-                // calling UpdateAI() entirely - clear it or the rest of the outro (chest, kill
-                // credit, dialogue) never fires.
                 me->ClearUnitState(UNIT_STATE_EVADE);
                 // LootRecipent is cleared in _EnterEvadeMode, restore it
                 me->SetLootRecipient(lootRecipent);
@@ -790,7 +784,7 @@ struct boss_algalon_the_observer : public ScriptedAI
                 events.ScheduleEvent(EVENT_OUTRO_7, 57s + 500ms);
                 events.ScheduleEvent(EVENT_OUTRO_8, 75s + 500ms);
                 events.ScheduleEvent(EVENT_OUTRO_9, 87s + 500ms);
-                events.ScheduleEvent(EVENT_OUTRO_10, 103s + 500ms);
+                events.ScheduleEvent(EVENT_OUTRO_10, 113s);
                 events.ScheduleEvent(EVENT_OUTRO_11, 119s + 500ms);
                 break;
             }
@@ -907,7 +901,7 @@ struct npc_brann_bronzebeard_algalon : public CreatureAI
                 me->DespawnOrUnsummon(1ms);
                 return;
             case POINT_BRANN_OUTRO:
-                me->SetFacingTo(4.7950f); // faces AlgalonOutroPos
+                me->SetFacingTo(4.7950f);
                 return;
             case POINT_BRANN_OUTRO_END:
                 return;
@@ -928,10 +922,6 @@ struct npc_brann_bronzebeard_algalon : public CreatureAI
                 {
                     if (_currentPoint == 5 || _currentPoint == 6)
                     {
-                        // Straight-line move - this stretch crosses the not-yet-open universe floor,
-                        // so it isn't covered by the creature navmesh and MovePoint stalls partway.
-                        // No MovementInform for a raw spline, so "arrived" is handled off a timer
-                        // sized to the actual distance instead.
                         Position const& dest = BrannIntroWaypoint[_currentPoint];
                         Milliseconds travelTime = Milliseconds(uint32(me->GetExactDist2d(dest) / 2.5f * 1000)) + 500ms;
                         Movement::MoveSplineInit init(me);
