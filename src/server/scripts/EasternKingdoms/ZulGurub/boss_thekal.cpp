@@ -204,14 +204,14 @@ struct boss_thekal : public BossAI
 
     void UpdateAI(uint32 diff) override
     {
-        if (me->IsInCombat() && !UpdateVictim())
+        // Gate on IsEngaged, not IsInCombat: on a wipe the boss leaves combat while still engaged,
+        // and UpdateVictim must keep running to evade and clear the IN_PROGRESS state.
+        if (me->IsEngaged())
         {
-            return;
-        }
-        else if (me->IsInCombat())
-        {
-            scheduler.Update(diff,
-            std::bind(&BossAI::DoMeleeAttackIfReady, this));
+            if (!UpdateVictim())
+                return;
+
+            scheduler.Update(diff, [this] { DoMeleeAttackIfReady(); });
         }
         else
         {
@@ -396,14 +396,12 @@ struct npc_zealot_lorkhan : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
-        if (me->IsInCombat() && !UpdateVictim())
+        if (me->IsEngaged())
         {
-            return;
-        }
-        else if (me->IsInCombat())
-        {
-            _scheduler.Update(diff,
-            std::bind(&BossAI::DoMeleeAttackIfReady, this));
+            if (!UpdateVictim())
+                return;
+
+            _scheduler.Update(diff, [this] { DoMeleeAttackIfReady(); });
         }
         else
         {
@@ -497,14 +495,12 @@ struct npc_zealot_zath : public ScriptedAI
 
     void UpdateAI(uint32 diff) override
     {
-        if (me->IsInCombat() && !UpdateVictim())
+        if (me->IsEngaged())
         {
-            return;
-        }
-        else if (me->IsInCombat())
-        {
-            _scheduler.Update(diff,
-            std::bind(&BossAI::DoMeleeAttackIfReady, this));
+            if (!UpdateVictim())
+                return;
+
+            _scheduler.Update(diff, [this] { DoMeleeAttackIfReady(); });
         }
         else
         {
