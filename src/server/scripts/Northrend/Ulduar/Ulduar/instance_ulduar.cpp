@@ -624,6 +624,17 @@ public:
                     if (GetBossState(BOSS_FREYA) == DONE)
                         gameObject->SetRespawnTime(7 * DAY);
                     break;
+                // Freya Loot
+                case 194324:
+                case 194325:
+                case 194326:
+                case 194327:
+                case 194328:
+                case 194329:
+                case 194330:
+                case 194331:
+                    gameObject->SetLootRecipient(instance);
+                    break;
             }
         }
 
