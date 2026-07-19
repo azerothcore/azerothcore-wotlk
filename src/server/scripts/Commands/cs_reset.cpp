@@ -46,9 +46,14 @@ public:
             { "all",            HandleResetItemsAllCommand,                 rbac::RBAC_PERM_COMMAND_RESET, Console::Yes },
             { "allbags",        HandleResetItemsAllAndDeleteBagsCommand,    rbac::RBAC_PERM_COMMAND_RESET, Console::Yes },
         };
+        static ChatCommandTable resetCooldownCommandTable =
+        {
+            { "all", HandleResetCooldownAllCommand, rbac::RBAC_PERM_COMMAND_RESET, Console::Yes },
+        };
         static ChatCommandTable resetCommandTable =
         {
             { "achievements",   HandleResetAchievementsCommand, rbac::RBAC_PERM_COMMAND_RESET_ACHIEVEMENTS, Console::Yes },
+            { "cooldown",       resetCooldownCommandTable },
             { "honor",          HandleResetHonorCommand,        rbac::RBAC_PERM_COMMAND_RESET_HONOR,        Console::Yes },
             { "level",          HandleResetLevelCommand,        rbac::RBAC_PERM_COMMAND_RESET_LEVEL,        Console::Yes },
             { "spells",         HandleResetSpellsCommand,       rbac::RBAC_PERM_COMMAND_RESET_SPELLS,       Console::Yes },
@@ -77,6 +82,34 @@ public:
             playerTarget->ResetAchievements();
         else
             AchievementMgr::DeleteFromDB(target->GetGUID().GetCounter());
+
+        return true;
+    }
+
+    static bool HandleResetCooldownAllCommand(ChatHandler* handler, Optional<PlayerIdentifier> target)
+    {
+        if (!target)
+        {
+            target = PlayerIdentifier::FromTargetOrSelf(handler);
+        }
+
+        if (!target)
+        {
+            return false;
+        }
+
+        Player* playerTarget = target->GetConnectedPlayer();
+        if (!playerTarget)
+        {
+            handler->SendSysMessage(LANG_PLAYER_NOT_EXIST_OR_OFFLINE);
+            return false;
+        }
+
+        playerTarget->RemoveAllSpellCooldown();
+
+        ChatHandler(playerTarget->GetSession()).PSendSysMessage("Your spell cooldowns have been reset.");
+        if (!handler->GetSession() || handler->GetSession()->GetPlayer() != playerTarget)
+            handler->PSendSysMessage("Reset all spell cooldowns for {}.", handler->GetNameLink(playerTarget));
 
         return true;
     }
