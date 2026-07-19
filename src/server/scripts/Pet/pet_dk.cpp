@@ -329,8 +329,12 @@ struct npc_pet_dk_risen_ally : public PossessedAI
 
                     if (!player->GetCorpse())
                         player->BuildPlayerRepop();
-                    else if (!player->HasAura(8326))
-                        player->CastSpell(player, 8326, true);
+                    else if (!player->HasPlayerFlag(PLAYER_FLAGS_GHOST))
+                    {
+                        player->SetPlayerFlag(PLAYER_FLAGS_GHOST);
+                        player->m_serverSideVisibilityDetect.SetValue(
+                            SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_GHOST);
+                    }
                 }
     }
 };

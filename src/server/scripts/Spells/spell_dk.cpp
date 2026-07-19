@@ -205,7 +205,8 @@ class spell_dk_raise_ally : public SpellScript
             if (!unitTarget->GetCorpse())
                 unitTarget->BuildPlayerRepop();
 
-            unitTarget->RemoveAurasDueToSpell(8326);
+            unitTarget->RemovePlayerFlag(PLAYER_FLAGS_GHOST);
+            unitTarget->m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE);
 
             unitTarget->CastSpell(unitTarget, GetEffectValue(), true);
             if (Unit* ghoul = unitTarget->GetCharm())
