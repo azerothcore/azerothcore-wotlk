@@ -113,6 +113,14 @@ constexpr uint32 ACCOUNT_FLAGS_ALL =
     ACCOUNT_FLAG_OVERMIND_LINKED | ACCOUNT_FLAG_DEMOS | ACCOUNT_FLAG_DEATH_KNIGHT_OK |
     ACCOUNT_FLAG_S2_REQUIRE_IGR | ACCOUNT_FLAG_S2_TRIAL;
 
+struct AccountFlagName
+{
+    char const* full;
+    char const* shortName;
+};
+
+AC_COMMON_API extern AccountFlagName const accountFlagNames[MAX_ACCOUNT_FLAG];
+
 enum LocaleConstant
 {
     LOCALE_enUS = 0,
