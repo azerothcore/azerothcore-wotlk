@@ -2680,6 +2680,7 @@ void Spell::EffectDispel(SpellEffIndex effIndex)
         // Send dispelled spell info
         dataSuccess << uint32(itr->first->GetId());              // Spell Id
         dataSuccess << uint8(0);                        // 0 - dispelled !=0 cleansed
+        sScriptMgr->OnSpellDispel(m_caster, unitTarget, m_spellInfo->Id, itr->first->GetId(), false);
         unitTarget->RemoveAurasDueToSpellByDispel(itr->first->GetId(), m_spellInfo->Id, itr->first->GetCasterGUID(), m_caster, itr->second);
     }
     m_caster->SendMessageToSet(&dataSuccess, true);
@@ -3777,6 +3778,7 @@ void Spell::EffectInterruptCast(SpellEffIndex effIndex)
                     unitTarget->ProhibitSpellSchool(curSpellInfo->GetSchoolMask(), duration/*spellInfo->GetDuration()*/);
                 }
                 ExecuteLogEffectInterruptCast(effIndex, unitTarget, curSpellInfo->Id);
+                sScriptMgr->OnSpellInterrupt(m_caster, unitTarget, m_spellInfo->Id, curSpellInfo->Id);
                 unitTarget->InterruptSpell(CurrentSpellTypes(i), false);
             }
         }
@@ -5716,6 +5718,7 @@ void Spell::EffectStealBeneficialBuff(SpellEffIndex effIndex)
     {
         dataSuccess << uint32(itr->first);          // Spell Id
         dataSuccess << uint8(0);                    // 0 - steals !=0 transfers
+        sScriptMgr->OnSpellDispel(m_caster, unitTarget, m_spellInfo->Id, itr->first, true);
         unitTarget->RemoveAurasDueToSpellBySteal(itr->first, itr->second, m_caster);
     }
     m_caster->SendMessageToSet(&dataSuccess, true);

@@ -102,6 +102,19 @@ public:
 
     //Called Whenever the UNIT_BYTE2_FLAG_FFA_PVP Bit is set on the creature
     virtual void OnFfaPvpStateUpdate(Creature* /*creature*/, bool /*InPvp*/) {}
+
+    /**
+     * @brief Called when a creature is about to be despawned without
+     *        going through the normal death state. This covers both
+     *        TempSummon::UnSummon() and Creature::ForcedDespawn() paths
+     *        triggered by DespawnOrUnsummon().
+     *
+     * Use creature->IsAlive() to distinguish alive despawns (the
+     * client-visible "disappearing" case) from post-death cleanup.
+     *
+     * @param creature The creature about to be despawned
+     */
+    virtual void OnBeforeCreatureDespawn(Creature* /*creature*/) {}
 };
 
 #endif
