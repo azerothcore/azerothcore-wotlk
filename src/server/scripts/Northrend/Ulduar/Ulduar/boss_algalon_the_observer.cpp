@@ -526,7 +526,7 @@ struct boss_algalon_the_observer : public ScriptedAI
         events.ScheduleEvent(EVENT_PHASE_PUNCH, 15500ms + introDelay);
         events.ScheduleEvent(EVENT_SUMMON_COLLAPSING_STAR, 16500ms + introDelay);
         events.ScheduleEvent(EVENT_COSMIC_SMASH, 26s + introDelay);
-        events.ScheduleEvent(EVENT_ACTIVATE_LIVING_CONSTELLATION, 50500ms + introDelay);
+        events.ScheduleEvent(EVENT_ACTIVATE_LIVING_CONSTELLATION, 60s + introDelay);
         events.ScheduleEvent(EVENT_BIG_BANG, 90s + introDelay);
         events.ScheduleEvent(EVENT_ASCEND_TO_THE_HEAVENS, 360s + introDelay);
         events.ScheduleEvent(EVENT_CHECK_HERALD_ITEMS, 5s);
