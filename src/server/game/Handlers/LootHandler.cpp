@@ -40,6 +40,14 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
 
     recvData >> lootSlot;
 
+    // full CAIS restriction blocks item pickup from every loot source (GO/gather/item/corpse),
+    // not just the creature-corpse window guarded in HandleLootOpcode
+    if (player->HasPlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME))
+    {
+        player->SendLootError(lguid, LOOT_ERROR_PLAY_TIME_EXCEEDED);
+        return;
+    }
+
     if (lguid.IsGameObject())
     {
         GameObject* go = player->GetMap()->GetGameObject(lguid);
