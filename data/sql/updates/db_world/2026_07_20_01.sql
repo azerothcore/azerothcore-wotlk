@@ -1,3 +1,4 @@
+-- DB update 2026_07_20_00 -> 2026_07_20_01
 --
 DELETE FROM `command` WHERE `name` = 'debug update';
 INSERT INTO `command` (`name`, `security`, `help`) VALUES
