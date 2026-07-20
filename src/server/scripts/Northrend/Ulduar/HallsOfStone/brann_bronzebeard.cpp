@@ -355,7 +355,6 @@ struct brann_bronzebeard : public ScriptedAI
             if (!_EnterEvadeMode(why))
                 return;
 
-
             me->ClearUnitState(UNIT_STATE_EVADE);
             me->GetMotionMaster()->Clear(true);
 
