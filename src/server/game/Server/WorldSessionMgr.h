@@ -19,6 +19,7 @@
 #define __WORLDSESSIONMGR_H
 
 #include "Common.h"
+#include "Duration.h"
 #include "IWorld.h"
 #include "LockedQueue.h"
 #include "ObjectGuid.h"
@@ -29,6 +30,12 @@
 class Player;
 class WorldPacket;
 class WorldSession;
+
+struct AccountPlayHistory
+{
+    Seconds logoutTime = Seconds::zero();
+    Seconds playedTime = Seconds::zero(); // reset after 5 hours offline time
+};
 
 class WorldSessionMgr
 {
