@@ -380,9 +380,10 @@ public:
     void SetLootRewardDisabled(bool disable) { DisableLootReward = disable; }
     [[nodiscard]] bool IsLootRewardDisabled() const { return DisableLootReward; }
     [[nodiscard]] bool IsDamageEnoughForLootingAndReward() const;
-    void LowerPlayerDamageReq(uint32 unDamage, bool damagedByPlayer = true);
+    void LowerPlayerDamageReq(uint32 unDamage, bool damagedByPlayer = true, uint8 attackerLevel = 0);
     void ResetPlayerDamageReq();
     [[nodiscard]] uint32 GetPlayerDamageReq() const;
+    [[nodiscard]] uint8 GetHighestPlayerAttackerLevel() const { return _highestPlayerAttackerLevel; }
 
     [[nodiscard]] uint32 GetOriginalEntry() const { return m_originalEntry; }
     void SetOriginalEntry(uint32 entry) { m_originalEntry = entry; }
@@ -409,6 +410,9 @@ public:
     CreatureTextRepeatIds const& GetTextRepeatGroup(uint8 textGroup);
     void SetTextRepeatId(uint8 textGroup, uint8 id);
     void ClearTextRepeatGroup(uint8 textGroup);
+
+    bool IsTextOnCooldown(uint8 textGroup) const;
+    void SetTextCooldown(uint8 textGroup, uint32 cooldownMs);
 
     bool IsFreeToMove();
     static constexpr uint32 MOVE_CIRCLE_CHECK_INTERVAL = 3000;
@@ -547,6 +551,7 @@ private:
     ObjectGuid _spellFocusTarget; ///> Saved target during spell focus for restoration
 
     CreatureTextRepeatGroup m_textRepeat;
+    std::unordered_map<uint8, uint32> m_textCooldowns; // groupID -> expiry time (s)
 
     bool _isMissingSwimmingFlagOutOfCombat;
 
@@ -554,6 +559,7 @@ private:
 
     uint32 _playerDamageReq;
     bool _damagedByPlayer;
+    uint8 _highestPlayerAttackerLevel;
     bool _isCombatMovementAllowed;
 };
 

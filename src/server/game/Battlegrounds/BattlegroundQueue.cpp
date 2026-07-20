@@ -310,8 +310,23 @@ void BattlegroundQueue::RemovePlayer(ObjectGuid guid, bool decreaseInvitedCount)
 
     // if invited to bg, and should decrease invited count, then do it
     if (decreaseInvitedCount && groupInfo->IsInvitedToBGInstanceGUID)
+    {
         if (Battleground* bg = sBattlegroundMgr->GetBattleground(groupInfo->IsInvitedToBGInstanceGUID, groupInfo->BgTypeId))
+        {
             bg->DecreaseInvitedCount(groupInfo->teamId);
+
+            // re-enqueue BG if free slots reopened due to invite expiration
+            if (bg->HasFreeSlots())
+            {
+                bg->AddToBGFreeSlotQueue();
+
+                BattlegroundQueueTypeId queueTypeId =
+                    BattlegroundMgr::BGQueueTypeId(bg->GetBgTypeID(), bg->GetArenaType());
+
+                sBattlegroundMgr->ScheduleQueueUpdate(0, 0, queueTypeId, bg->GetBgTypeID(), bg->GetBracketId());
+            }
+        }
+    }
 
     // remove player queue info
     m_QueuedPlayers.erase(itr);
@@ -790,8 +805,7 @@ void BattlegroundQueue::BattlegroundQueueUpdate(uint32 diff, BattlegroundTypeId 
         }
     };
 
-    // battleground with free slot for player should be always in the beggining of the queue
-    // maybe it would be better to create bgfreeslotqueue for each bracket_id
+    // fill existing joinable battlegrounds, oldest first, before a new instance may form below
     BGFreeSlotQueueContainer& bgQueues = sBattlegroundMgr->GetBGFreeSlotQueueStore(bgTypeId);
     for (BGFreeSlotQueueContainer::iterator itr = bgQueues.begin(); itr != bgQueues.end();)
     {
@@ -1287,12 +1301,15 @@ int32 BattlegroundQueue::GetQueueAnnouncementTimer(uint32 bracketId) const
 
 void BattlegroundQueue::InviteGroupToBG(GroupQueueInfo* ginfo, Battleground* bg, TeamId teamId)
 {
+    // An already-invited group keeps the side it was invited under: writing
+    // teamId here would split a future re-invite's IncreaseInvitedCount from the
+    // original side's DecreaseInvitedCount at leave, desyncing the ledger.
+    if (ginfo->IsInvitedToBGInstanceGUID)
+        return;
+
     // set side if needed
     if (teamId != TEAM_NEUTRAL)
         ginfo->teamId = teamId;
-
-    if (ginfo->IsInvitedToBGInstanceGUID)
-        return;
 
     // set invitation
     ginfo->IsInvitedToBGInstanceGUID = bg->GetInstanceID();

@@ -108,7 +108,7 @@ class FlightPathMovementGenerator : public MovementGeneratorMedium< Player, Flig
             _endMapId = 0;
             _preloadTargetNode = 0;
         }
-        void LoadPath(Player* player);
+        bool LoadPath(Player* player);
         void DoInitialize(Player*);
         void DoReset(Player*);
         void DoFinalize(Player*);
