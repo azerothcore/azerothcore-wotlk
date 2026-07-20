@@ -37,6 +37,9 @@ enum FreyaSpells
     SPELL_TOUCH_OF_EONAR                        = 62528,
     SPELL_ATTUNED_TO_NATURE                     = 62519,
     SPELL_SUMMON_LIFEBINDER                     = 62870,
+    SPELL_SUMMON_WAVE_1                         = 62685, // Summon Ancient Conservator
+    SPELL_SUMMON_WAVE_3                         = 62686, // Summon Trio (Water Spirit, Storm Lasher, Snaplasher)
+    SPELL_SUMMON_WAVE_10                        = 62687, // Summon Detonating Lashers
     SPELL_SUNBEAM                               = 62623,
     SPELL_NATURE_BOMB_FLIGHT                    = 64648,
     SPELL_NATURE_BOMB_DAMAGE                    = 64587,
@@ -351,26 +354,16 @@ struct boss_freya : public BossAI
         {
             case GROUP_TRIO:
                 Talk(SAY_SUMMON_TRIO);
-                me->SummonCreature(NPC_ANCIENT_WATER_SPIRIT, me->GetPositionX() + urand(5, 15), me->GetPositionY() + urand(5, 15), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-                me->SummonCreature(NPC_STORM_LASHER, me->GetPositionX() + urand(5, 15), me->GetPositionY() + urand(5, 15), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
-                me->SummonCreature(NPC_SNAPLASHER, me->GetPositionX() + urand(5, 15), me->GetPositionY() + urand(5, 15), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()));
+                DoCast(SPELL_SUMMON_WAVE_3);
                 break;
-            case GROUP_CONSERVATOR: // Ancient Conservator
+            case GROUP_CONSERVATOR:
                 Talk(SAY_SUMMON_CONSERVATOR);
-                me->SummonCreature(NPC_ANCIENT_CONSERVATOR, me->GetPositionX() + urand(5, 15), me->GetPositionY() + urand(5, 15), me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ()), 0, TEMPSUMMON_CORPSE_DESPAWN);
+                DoCast(SPELL_SUMMON_WAVE_1);
                 break;
-            case GROUP_LASHERS: // Detonating Lashers
+            case GROUP_LASHERS:
                 Talk(SAY_SUMMON_LASHERS);
-                // Spread the lashers evenly in a ring around Freya instead of
-                // clustering them in one spot, matching retail.
                 for (uint8 i = 0; i < 10; ++i)
-                {
-                    float angle = i * 2.0f * float(M_PI) / 10.0f + frand(-0.35f, 0.35f);
-                    float dist = frand(18.0f, 28.0f);
-                    float x = me->GetPositionX() + dist * std::cos(angle);
-                    float y = me->GetPositionY() + dist * std::sin(angle);
-                    me->SummonCreature(NPC_DETONATING_LASHER, x, y, me->GetMapHeight(x, y, me->GetPositionZ()), 0, TEMPSUMMON_CORPSE_DESPAWN);
-                }
+                    DoCast(SPELL_SUMMON_WAVE_10);
                 break;
         }
     }
@@ -598,7 +591,7 @@ struct boss_freya : public BossAI
                 break;
             case EVENT_FREYA_IRON_ROOT:
                 Talk(EMOTE_IRON_ROOTS);
-                me->CastCustomSpell(SPELL_IRON_ROOTS_FREYA, SPELLVALUE_MAX_TARGETS, 1, me, false);
+                me->CastCustomSpell(SPELL_IRON_ROOTS_FREYA, SPELLVALUE_MAX_TARGETS, me->GetMap()->Is25ManRaid() ? 3 : 1, me, false);
                 events.Repeat(45s, 55s);
                 break;
             case EVENT_FREYA_UNSTABLE_SUN_BEAM:

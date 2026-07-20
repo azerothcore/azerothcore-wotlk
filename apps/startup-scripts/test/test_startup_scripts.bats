@@ -50,6 +50,86 @@ teardown() {
     [[ "$output" =~ "Test server starting" ]]
 }
 
+@test "starter: should refuse duplicate binary/config start" {
+    cat > "$TEST_DIR/bin/duplicate-server" << 'EOF'
+#!/usr/bin/env bash
+sleep 30
+EOF
+    chmod +x "$TEST_DIR/bin/duplicate-server"
+
+    "$TEST_DIR/bin/duplicate-server" -c "$TEST_DIR/test-server.conf" &
+    local duplicate_pid=$!
+
+    AC_STARTUP_GUARD_TIMEOUT=1 AC_STARTUP_GUARD_INTERVAL=1 run timeout 5s "$SCRIPT_DIR/starter" "$TEST_DIR/bin" "duplicate-server" "" "$TEST_DIR/test-server.conf" "" "" 0
+    kill "$duplicate_pid" 2>/dev/null || true
+    wait "$duplicate_pid" 2>/dev/null || true
+
+    debug_on_failure
+    [ "$status" -eq 0 ]
+    [[ "$output" =~ "Startup guard: refusing to start duplicate duplicate-server" ]]
+    [[ "$output" =~ "existing matching process" ]]
+}
+
+@test "starter: should refuse occupied configured worldserver ports" {
+    if ! command -v nc >/dev/null 2>&1; then
+        skip "nc is required for this test"
+    fi
+
+    cat > "$TEST_DIR/bin/worldserver" << 'EOF'
+#!/usr/bin/env bash
+echo "worldserver should not start"
+EOF
+    chmod +x "$TEST_DIR/bin/worldserver"
+
+    local listen_port=40123
+    cat > "$TEST_DIR/worldserver.conf" << EOF
+WorldServerPort = $listen_port
+SOAP.Enabled = 0
+EOF
+    nc -l 127.0.0.1 "$listen_port" >/dev/null &
+    local listener_pid=$!
+
+    AC_STARTUP_GUARD_TIMEOUT=1 AC_STARTUP_GUARD_INTERVAL=1 run timeout 5s "$SCRIPT_DIR/starter" "$TEST_DIR/bin" "worldserver" "" "$TEST_DIR/worldserver.conf" "" "" 0
+    kill "$listener_pid" 2>/dev/null || true
+    wait "$listener_pid" 2>/dev/null || true
+
+    debug_on_failure
+    [ "$status" -eq 0 ]
+    [[ "$output" =~ "Startup guard: refusing to start duplicate worldserver" ]]
+    [[ "$output" =~ "configured port(s) still listening: $listen_port" ]]
+}
+
+@test "starter: should parse config keys literally for startup guard" {
+    if ! command -v nc >/dev/null 2>&1; then
+        skip "nc is required for this test"
+    fi
+
+    cat > "$TEST_DIR/bin/worldserver" << 'EOF'
+#!/usr/bin/env bash
+echo "worldserver started"
+EOF
+    chmod +x "$TEST_DIR/bin/worldserver"
+
+    local listen_port=40124
+    cat > "$TEST_DIR/worldserver.conf" << EOF
+WorldServerPort = 40125
+SOAPXEnabled = 1
+SOAPXPort = $listen_port
+SOAP.Enabled = 0
+EOF
+    nc -l 127.0.0.1 "$listen_port" >/dev/null &
+    local listener_pid=$!
+
+    AC_STARTUP_GUARD_TIMEOUT=1 AC_STARTUP_GUARD_INTERVAL=1 run timeout 5s "$SCRIPT_DIR/starter" "$TEST_DIR/bin" "worldserver" "" "$TEST_DIR/worldserver.conf" "" "" 0
+    kill "$listener_pid" 2>/dev/null || true
+    wait "$listener_pid" 2>/dev/null || true
+
+    debug_on_failure
+    [ "$status" -eq 0 ]
+    [[ "$output" =~ "worldserver started" ]]
+    [[ ! "$output" =~ "Startup guard: refusing" ]]
+}
+
 # ===== SIMPLE RESTARTER TESTS =====
 
 @test "simple-restarter: should fail with missing parameters" {
