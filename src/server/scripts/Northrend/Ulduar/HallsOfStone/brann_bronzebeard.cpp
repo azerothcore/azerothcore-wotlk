@@ -201,7 +201,6 @@ struct brann_bronzebeard : public ScriptedAI
             me->LoadPath(PATH_ESCORT);
             me->GetMotionMaster()->MoveWaypoint(PATH_ESCORT, false);
             me->SetReactState(REACT_AGGRESSIVE);
-            me->SetImmuneToAll(true); // @TODO: He is cancelling the path when entering combat or when interacted with. Dunno fix for that yet.
             me->SetRegeneratingHealth(true);
             me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
             instance->SetBossState(BRANN_BRONZEBEARD, IN_PROGRESS);
@@ -209,7 +208,6 @@ struct brann_bronzebeard : public ScriptedAI
         case ACTION_START_TRIBUNAL: // Received via gossip
         {
             // DoCastSelf 51810 Brann Health Checker
-            me->SetImmuneToAll(false); // @TODO
             me->SetReactState(REACT_PASSIVE);
             me->RemoveNpcFlag(UNIT_NPC_FLAG_GOSSIP | UNIT_NPC_FLAG_QUESTGIVER);
             me->GetMotionMaster()->MovePoint(POINT_TRIBUNAL_CONSOLE, 897.1759f, 331.77386f, 203.70638f);
@@ -354,11 +352,18 @@ struct brann_bronzebeard : public ScriptedAI
     {
         if (instance && instance->GetBossState(BRANN_BRONZEBEARD) == IN_PROGRESS)
         {
-            // During escort: clear combat but don't call MoveTargetedHome(),
-            // so the WaypointMovementGenerator stays active and resumes.
-            _EnterEvadeMode(why);
+            if (!_EnterEvadeMode(why))
+                return;
+
+
+            me->ClearUnitState(UNIT_STATE_EVADE);
+            me->GetMotionMaster()->Clear(true);
+
+            // Don't reset to avoid re-arming flags
+            // He barely sees any combat, it's fine
             return;
         }
+
         ScriptedAI::EnterEvadeMode(why);
     }
 
@@ -376,6 +381,7 @@ struct brann_bronzebeard : public ScriptedAI
         // Each phase has one additional NPC and one head active.
         // Each phase takes approximately 100s
         instance->SetBossState(BOSS_TRIBUNAL_OF_AGES, IN_PROGRESS);
+        instance->SetData(DATA_BRANN_ACHIEVEMENT, true);
 
         if (Creature* cr = me->SummonCreature(NPC_KADDRAK, 928.0f, 331.276f, 219.73332f, 1.8326f, TEMPSUMMON_TIMED_DESPAWN, 580000))
             KaddrakGUID = cr->GetGUID();
@@ -891,7 +897,8 @@ struct brann_bronzebeard : public ScriptedAI
 
     void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
     {
-        if (damage && instance)
+        // Track damage for the achievement
+        if (damage && instance && instance->GetBossState(BOSS_TRIBUNAL_OF_AGES) == IN_PROGRESS)
             instance->SetData(DATA_BRANN_ACHIEVEMENT, false);
     }
 
@@ -901,15 +908,31 @@ struct brann_bronzebeard : public ScriptedAI
         ResetEvent();
         me->DespawnOrUnsummon(5s, 10s);
 
+        // Died during tribunal
         if (instance && instance->GetBossState(BOSS_TRIBUNAL_OF_AGES) == IN_PROGRESS)
         {
             instance->SetBossState(BOSS_TRIBUNAL_OF_AGES, NOT_STARTED);
+        }
+
+        // Died during escort
+        if (instance && instance->GetBossState(BRANN_BRONZEBEARD) == IN_PROGRESS)
+        {
+            instance->SetBossState(BRANN_BRONZEBEARD, NOT_STARTED);
         }
     }
 
     void UpdateAI(uint32 diff) override
     {
         scheduler.Update(diff);
+
+        // Here to avoid evades during the event
+        if (!instance || instance->GetBossState(BRANN_BRONZEBEARD) != IN_PROGRESS)
+            return;
+
+        if (!UpdateVictim())
+            return;
+
+        DoMeleeAttackIfReady();
     }
 
 private:
