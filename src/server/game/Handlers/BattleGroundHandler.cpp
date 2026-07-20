@@ -192,6 +192,8 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
         {
             err = ERR_BATTLEGROUND_NONE;
         }
+        else if (_player->HasPlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME)) // Assumed to only apply to full restriction rather than partial
+            err = ERR_GROUP_JOIN_BATTLEGROUND_FAIL; // ERR_ARENA_EXPIRED_CAIS does not seem to be a result, so using this error instead
 
         if (err <= 0)
         {
