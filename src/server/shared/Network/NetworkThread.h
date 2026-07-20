@@ -93,6 +93,8 @@ public:
 
     IoContextTcpSocket* GetSocketForAccept() { return &_acceptSocket; }
 
+    Acore::Asio::IoContext& GetIoContext() { return _ioContext; }
+
     void EnableProxyProtocol() { _proxyHeaderReadingEnabled = true; }
 
 protected:

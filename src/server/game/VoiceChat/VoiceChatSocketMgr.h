@@ -40,6 +40,9 @@ public:
 
     void Init(Acore::Asio::IoContext& ioContext)
     {
+        if (_threads)
+            return;
+
         _tcpNoDelay = sConfigMgr->GetOption<bool>("Network.TcpNodelay", true);
         // -1 means use default
         _socketSystemSendBufferSize = sConfigMgr->GetOption<int32>("Network.OutKBuff", -1);
@@ -53,6 +56,31 @@ public:
 
         for (int32 i = 0; i < _threadCount; ++i)
             _threads[i].Start();
+    }
+
+    bool IsInitialized() const { return _threads != nullptr; }
+
+    // io context of the voice network thread - sockets and the connector must
+    // live on it so all their asio handlers run on that single thread
+    Acore::Asio::IoContext& GetNetworkThreadIoContext()
+    {
+        ASSERT(_threads);
+        return _threads[0].GetIoContext();
+    }
+
+    // there is no acceptor to close, so the base StopNetwork can not be used
+    void Stop()
+    {
+        if (!_threads)
+            return;
+
+        for (int32 i = 0; i < _threadCount; ++i)
+            _threads[i].Stop();
+
+        Wait();
+
+        _threads.reset();
+        _threadCount = 0;
     }
 
     std::shared_ptr<VoiceChatSocket> OnSocketOpen(IoContextTcpSocket&& sock)

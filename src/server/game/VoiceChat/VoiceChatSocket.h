@@ -20,10 +20,14 @@
 
 #include "TcpSocket.h"
 #include "VoiceChatSharedDefines.h"
+#include <atomic>
 #include <boost/asio/ip/tcp.hpp>
+#include <mutex>
+#include <queue>
 
 using boost::asio::ip::tcp;
 
+// Connection of the worldserver to the voiceserver
 class VoiceChatSocket : public TcpSocket<VoiceChatSocket>
 {
 public:
@@ -31,16 +35,21 @@ public:
 
     void Start() override;
     bool Update() override;
+    // thread safe, may be called from the world thread
     void SendPacket(VoiceChatServerPacket const& pkt);
 
-    uint32 GetLastPacketReceiveTime() const { return _lastPacketReceiveTime; }
+    uint32 GetLastPacketReceiveTime() const { return _lastPacketReceiveTime.load(); }
 
 protected:
     bool ReadHeaderHandler();
     ReadDataHandlerResult ReadDataHandler();
 
 private:
-    uint32 _lastPacketReceiveTime;
+    std::atomic<uint32> _lastPacketReceiveTime;
+
+    // packets queued by the world thread, written on the network thread
+    std::mutex _sendQueueLock;
+    std::queue<MessageBuffer> _sendQueue;
 };
 
 #endif

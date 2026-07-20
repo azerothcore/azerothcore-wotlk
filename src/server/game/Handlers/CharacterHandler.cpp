@@ -1268,8 +1268,8 @@ void WorldSession::HandlePlayerLoginToCharInWorld(Player* pCurrChar)
         ChatHandler(pCurrChar->GetSession()).SendNotification(LANG_GM_ON);
 
     // join available voice channels
-    /*if (IsVoiceChatEnabled())
-        sVoiceChatMgr.JoinAvailableVoiceChatChannels(this);*/
+    if (IsVoiceChatEnabled())
+        sVoiceChatMgr->JoinAvailableVoiceChatChannels(this);
 
     m_playerLoading = false;
 }

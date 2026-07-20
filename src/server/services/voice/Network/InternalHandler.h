@@ -20,6 +20,7 @@
 
 #include "Errors.h"
 #include "VoiceChatSharedDefines.h"
+#include <array>
 #include <memory>
 
 class InternalSession;

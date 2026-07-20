@@ -28,6 +28,13 @@ void VoiceChatInternalOpcodeTable<InternalSession>::Init()
 
     DEFINE_INTERNAL_VOICECHAT_HANDLER(VoiceChatServerOpcodes::CMSG_PING,                 &InternalSession::HandlePing);
     DEFINE_INTERNAL_VOICECHAT_HANDLER(VoiceChatServerOpcodes::CMSG_CREATE_VOICE_SESSION, &InternalSession::HandleCreateVoiceSession);
+    DEFINE_INTERNAL_VOICECHAT_HANDLER(VoiceChatServerOpcodes::CMSG_DELETE_VOICE_SESSION, &InternalSession::HandleDeleteVoiceSession);
+    DEFINE_INTERNAL_VOICECHAT_HANDLER(VoiceChatServerOpcodes::CMSG_ADD_MEMBER,           &InternalSession::HandleAddMember);
+    DEFINE_INTERNAL_VOICECHAT_HANDLER(VoiceChatServerOpcodes::CMSG_REMOVE_MEMBER,        &InternalSession::HandleRemoveMember);
+    DEFINE_INTERNAL_VOICECHAT_HANDLER(VoiceChatServerOpcodes::CMSG_VOICE_MEMBER,         &InternalSession::HandleVoiceMember);
+    DEFINE_INTERNAL_VOICECHAT_HANDLER(VoiceChatServerOpcodes::CMSG_DEVOICE_MEMBER,       &InternalSession::HandleDevoiceMember);
+    DEFINE_INTERNAL_VOICECHAT_HANDLER(VoiceChatServerOpcodes::CMSG_MUTE_MEMBER,          &InternalSession::HandleMuteMember);
+    DEFINE_INTERNAL_VOICECHAT_HANDLER(VoiceChatServerOpcodes::CMSG_UNMUTE_MEMBER,        &InternalSession::HandleUnmuteMember);
 
 #undef DEFINE_INTERNAL_VOICECHAT_HANDLER
 }

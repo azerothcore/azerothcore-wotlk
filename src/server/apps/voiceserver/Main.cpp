@@ -129,7 +129,8 @@ int main(int argc, char** argv)
         return 1;
     }
 
-    std::string const internalBindIp = sConfigMgr->GetOption<std::string>("InternalBindIP", "0.0.0.0");
+    // by default only accept internal (worldserver) connections from localhost
+    std::string const internalBindIp = sConfigMgr->GetOption<std::string>("InternalBindIP", "127.0.0.1");
     if (!sInternalSocketMgr.StartNetwork(*ioContext, internalBindIp, internalPort))
     {
         LOG_ERROR("server.voiceserver", "Failed to initialize internal network");
@@ -138,6 +139,7 @@ int main(int argc, char** argv)
 
     std::shared_ptr<void> sSocketMgrHandle(nullptr, [](void*)
     {
+        sVoiceServer.Stop();
         sInternalSocketMgr.StopNetwork();
     });
 
@@ -153,8 +155,6 @@ int main(int argc, char** argv)
 
     // Start the io service worker loop
     ioContext->run();
-
-    sVoiceServer.Run();
 
     LOG_INFO("server.voiceserver", "Halting process...");
 

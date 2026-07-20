@@ -17,6 +17,8 @@
 
 #include "Chat.h"
 #include "CommandScript.h"
+#include "VoiceChatMgr.h"
+#include "World.h"
 
 using namespace Acore::ChatCommands;
 
@@ -44,63 +46,61 @@ public:
 
     static bool HandleVoiceChatDisconnectCommand(ChatHandler* handler)
     {
-        /*if (!sVoiceChatMgr.CanUseVoiceChat())
+        if (!sVoiceChatMgr->CanUseVoiceChat())
         {
-            handler->PSendSysMessage("Voice Chat is disabled or Voice Chat server is not connected!");
+            handler->PSendSysMessage("Voice Chat is disabled or the voice chat server is not connected!");
             return false;
         }
 
-        sVoiceChatMgr.SocketDisconnected();
-
-        int32 reconnectAttempts = sVoiceChatMgr.GetReconnectAttempts();
-        if (reconnectAttempts == 0)
-            handler->PSendSysMessage("Voice Chat server disconnected!");
-        else if (reconnectAttempts < 0)
-            handler->PSendSysMessage("Voice Chat server disconnected, reconnect enabled (infinite attempts)");
-        else if (reconnectAttempts > 0)
-            handler->PSendSysMessage("Voice Chat server disconnected, reconnect enabled ({} attempts)", reconnectAttempts);*/
+        sVoiceChatMgr->DisconnectSocket();
+        handler->PSendSysMessage("Voice Chat server disconnected, reconnecting automatically");
         return true;
     }
 
     static bool HandleVoiceChatDisableCommand(ChatHandler* handler)
     {
-        /*if (!sVoiceChatMgr.IsEnabled())
+        if (!sVoiceChatMgr->IsEnabled())
         {
             handler->PSendSysMessage("Voice Chat is already disabled");
             return true;
         }
 
-        sVoiceChatMgr.DisableVoiceChat();
-        handler->PSendSysMessage("Voice Chat disabled!");*/
+        // VoiceChatMgr follows the config value on its next update
+        sWorld->setBoolConfig(CONFIG_VOICE_CHAT_ENABLED, false);
+        handler->PSendSysMessage("Voice Chat disabled!");
         return true;
     }
 
     static bool HandleVoiceChatEnableCommand(ChatHandler* handler)
     {
-        /*if (sVoiceChatMgr.IsEnabled())
+        if (sVoiceChatMgr->IsEnabled())
         {
             handler->PSendSysMessage("Voice Chat is already enabled");
             return true;
         }
 
-        sVoiceChatMgr.EnableVoiceChat();
-        handler->PSendSysMessage("Voice Chat enabled!");*/
+        // VoiceChatMgr follows the config value on its next update
+        sWorld->setBoolConfig(CONFIG_VOICE_CHAT_ENABLED, true);
+        handler->PSendSysMessage("Voice Chat enabled!");
         return true;
     }
 
     static bool HandleVoiceChatStatsCommand(ChatHandler* handler)
     {
-        /*if (!sVoiceChatMgr.IsEnabled())
+        if (!sVoiceChatMgr->IsEnabled())
         {
             handler->PSendSysMessage("Voice Chat is disabled");
             return false;
         }
 
-        VoiceChatStatistics stats = sVoiceChatMgr.GetStatistics();
-        handler->PSendSysMessage("Voice Chat: channels: {}, active users: {}, voice chat enabled: {}, microphone enabled: {}", stats.Channels, stats.ActiveUsers, stats.TotalVoiceChatEnabled, stats.TotalVoiceMicEnabled);*/
+        if (!sVoiceChatMgr->CanUseVoiceChat())
+            handler->PSendSysMessage("Voice Chat server is not connected");
+
+        VoiceChatStatistics stats = sVoiceChatMgr->GetStatistics();
+        handler->PSendSysMessage("Voice Chat: channels: {}, active users: {}, voice chat enabled: {}, microphone enabled: {}",
+            stats.Channels, stats.ActiveUsers, stats.TotalVoiceChatEnabled, stats.TotalVoiceMicEnabled);
         return true;
     }
-
 };
 
 void AddSC_voicechat_commandscript()

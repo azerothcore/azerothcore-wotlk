@@ -22,6 +22,31 @@
 #include <cstddef>
 #include <Define.h>
 
+/*
+ * Internal protocol spoken between the worldserver (client side) and the
+ * voiceserver (server side) over TCP.
+ *
+ * Framing: VoiceChatServerPktHeader { uint16 size; uint8 cmd; } followed by
+ * the payload. `size` counts the cmd byte plus the payload.
+ *
+ * Voice channel ids are allocated by the worldserver and pushed to the
+ * voiceserver, so no id negotiation round trip is required. The voiceserver
+ * answers channel creation with SMSG_CREATE_VOICE_SESSION_RESPONSE so the
+ * worldserver can tear the channel down again if creation failed.
+ *
+ * Payloads:
+ *   CMSG_PING                          -> []
+ *   SMSG_PONG                          -> []
+ *   CMSG_CREATE_VOICE_SESSION          -> [uint16 channelId, uint8 channelType (VoiceChatChannelType)]
+ *   SMSG_CREATE_VOICE_SESSION_RESPONSE -> [uint16 channelId, uint8 error (0 = ok)]
+ *   CMSG_DELETE_VOICE_SESSION          -> [uint16 channelId]
+ *   CMSG_ADD_MEMBER                    -> [uint16 channelId, uint8 userId]
+ *   CMSG_REMOVE_MEMBER                 -> [uint16 channelId, uint8 userId]
+ *   CMSG_VOICE_MEMBER                  -> [uint16 channelId, uint8 userId]
+ *   CMSG_DEVOICE_MEMBER                -> [uint16 channelId, uint8 userId]
+ *   CMSG_MUTE_MEMBER                   -> [uint16 channelId, uint8 userId]
+ *   CMSG_UNMUTE_MEMBER                 -> [uint16 channelId, uint8 userId]
+ */
 enum class VoiceChatServerOpcodes : uint8
 {
     NULL_OPCODE,
@@ -30,8 +55,34 @@ enum class VoiceChatServerOpcodes : uint8
     SMSG_PONG,
     CMSG_CREATE_VOICE_SESSION,
     SMSG_CREATE_VOICE_SESSION_RESPONSE,
+    CMSG_DELETE_VOICE_SESSION,
+    CMSG_ADD_MEMBER,
+    CMSG_REMOVE_MEMBER,
+    CMSG_VOICE_MEMBER,
+    CMSG_DEVOICE_MEMBER,
+    CMSG_MUTE_MEMBER,
+    CMSG_UNMUTE_MEMBER,
 
     NUM_OPCODES,
+};
+
+// Voice channel types, shared with the game client protocol
+// (CMSG_SET_ACTIVE_VOICE_CHANNEL and friends use the same values).
+enum class VoiceChatChannelType : uint8
+{
+    Custom          = 0,
+    Battleground    = 1,
+    Group           = 2,
+    Raid            = 3,
+
+    Max
+};
+
+// Error codes for SMSG_CREATE_VOICE_SESSION_RESPONSE
+enum class VoiceChatCreateSessionResult : uint8
+{
+    Ok              = 0,
+    Failed          = 1,
 };
 
 struct VoiceChatServerPktHeader
@@ -42,8 +93,9 @@ struct VoiceChatServerPktHeader
     char const* data() const { return reinterpret_cast<const char*>(this); }
     std::size_t headerSize() const { return sizeof(VoiceChatServerPktHeader); }
 
-    bool IsValidSize() const { return size >= 1 && size < 10240; } //@todo
-    bool IsValidOpcode() const { return cmd < static_cast<uint8>(VoiceChatServerOpcodes::NUM_OPCODES); }
+    // largest internal packet payload is a handful of bytes, allow some headroom
+    bool IsValidSize() const { return size >= 1 && size < 256; }
+    bool IsValidOpcode() const { return cmd > static_cast<uint8>(VoiceChatServerOpcodes::NULL_OPCODE) && cmd < static_cast<uint8>(VoiceChatServerOpcodes::NUM_OPCODES); }
 };
 
 class VoiceChatServerPacket : public ByteBuffer

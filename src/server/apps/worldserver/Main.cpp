@@ -49,6 +49,7 @@
 #include "SharedDefines.h"
 #include "SteadyTimer.h"
 #include "Systemd.h"
+#include "VoiceChatMgr.h"
 #include "World.h"
 #include "WorldSessionMgr.h"
 #include "WorldSocket.h"
@@ -318,8 +319,6 @@ int main(int argc, char** argv)
         sScriptMgr->OnAfterUnloadAllMaps();
     });
 
-    //sVoiceChatMgr.Init();
-
     // Start the Remote Access port (acceptor) if enabled
     std::unique_ptr<AsyncAcceptor> raAcceptor;
     if (sConfigMgr->GetOption<bool>("Ra.Enable", false))
@@ -359,10 +358,15 @@ int main(int argc, char** argv)
         return 1;
     }
 
+    // Initialize the connection to the voiceserver (if enabled)
+    sVoiceChatMgr->Init();
+
     std::shared_ptr<void> sWorldSocketMgrHandle(nullptr, [](void*)
     {
         sWorldSessionMgr->KickAll();         // save and kick all players
         sWorldSessionMgr->UpdateSessions(1); // real players unload required UpdateSessions call
+
+        sVoiceChatMgr->Stop();
 
         sWorldSocketMgr.StopNetwork();
 

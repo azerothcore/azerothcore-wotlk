@@ -48,6 +48,7 @@
 #include "Transport.h"
 #include "Tokenize.h"
 #include "Vehicle.h"
+#include "VoiceChatMgr.h"
 #include "WardenWin.h"
 #include "World.h"
 #include "WorldGlobals.h"
@@ -760,7 +761,8 @@ void WorldSession::LogoutPlayer(bool save)
         sSocialMgr->RemovePlayerSocial(_player->GetGUID());
 
         // Leave voice chat if player disconnects
-        //sVoiceChatMgr.RemoveFromVoiceChatChannels(_player->GetGUID());
+        sVoiceChatMgr->RemoveFromVoiceChatChannels(_player->GetGUID());
+        SetCurrentVoiceChannelId(0);
 
         //! Call script hook before deletion
         sScriptMgr->OnPlayerLogout(_player);

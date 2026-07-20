@@ -36,6 +36,16 @@ void VoiceChatSocket::Start()
 
 bool VoiceChatSocket::Update()
 {
+    // move packets queued by the world thread to the socket write queue
+    {
+        std::lock_guard<std::mutex> guard(_sendQueueLock);
+        while (!_sendQueue.empty())
+        {
+            QueuePacket(std::move(_sendQueue.front()));
+            _sendQueue.pop();
+        }
+    }
+
     if (!TcpSocket<VoiceChatSocket>::Update())
         return false;
 
@@ -48,7 +58,7 @@ void VoiceChatSocket::SendPacket(VoiceChatServerPacket const& pkt)
         return;
 
     VoiceChatServerPktHeader header;
-    header.size = sizeof(header.cmd) + pkt.size();
+    header.size = uint16(sizeof(header.cmd) + pkt.size());
     header.cmd = static_cast<uint8>(pkt.GetOpcode());
 
     EndianConvertReverse(header.size);
@@ -59,7 +69,8 @@ void VoiceChatSocket::SendPacket(VoiceChatServerPacket const& pkt)
     if (!pkt.empty())
         buffer.Write(pkt.contents(), pkt.size());
 
-    QueuePacket(std::move(buffer));
+    std::lock_guard<std::mutex> guard(_sendQueueLock);
+    _sendQueue.push(std::move(buffer));
 }
 
 bool VoiceChatSocket::ReadHeaderHandler()
@@ -72,7 +83,7 @@ bool VoiceChatSocket::ReadHeaderHandler()
 
     if (!header->IsValidSize() || !header->IsValidOpcode())
     {
-        LOG_ERROR("network", "InternalSession::ReadHeaderHandler(): client {} sent malformed packet (size: {}, cmd: {})",
+        LOG_ERROR("voice-chat", "VoiceChatSocket::ReadHeaderHandler(): voiceserver {} sent malformed packet (size: {}, cmd: {})",
             GetRemoteIpAddress().to_string(), header->size, header->cmd);
 
         return false;
@@ -91,7 +102,7 @@ ReadDataHandlerResult VoiceChatSocket::ReadDataHandler()
     VoiceChatServerPktHeader* header = reinterpret_cast<VoiceChatServerPktHeader*>(_headerBuffer.GetReadPointer());
     VoiceChatServerOpcodes opcode = static_cast<VoiceChatServerOpcodes>(header->cmd);
 
-    LOG_TRACE("network", "Received opcode {} size {}", opcode, header->size);
+    LOG_TRACE("voice-chat", "Received opcode {} size {}", uint32(opcode), header->size);
 
     // SMSG_PONG needs no handling, only used to reset _lastPacketReceiveTime
     if (opcode == VoiceChatServerOpcodes::SMSG_PONG)

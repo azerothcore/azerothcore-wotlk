@@ -42,14 +42,6 @@ enum VoiceChatMemberFlags
     VOICECHAT_MEMBER_FLAG_VOICED      = 0x40,
 };
 
-enum class VoiceChatChannelType : uint8
-{
-    Custom          = 0,
-    Battleground    = 1,
-    Group           = 2,
-    Raid            = 3
-};
-
 enum VoiceChatState
 {
     VOICECHAT_DISCONNECTED  = 0,

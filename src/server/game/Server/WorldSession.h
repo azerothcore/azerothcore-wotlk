@@ -42,13 +42,13 @@ class InstanceSave;
 class Item;
 class LoginQueryHolder;
 class LoadPetFromDBQueryHolder;
+class Channel;
 class Object;
 class Pet;
 class Player;
 class Quest;
 class SpellCastTargets;
 class Unit;
-class VoiceChatChannel;
 class Warden;
 class WorldPacket;
 class WorldSocket;
@@ -205,6 +205,16 @@ namespace WorldPackets
         class PartyUnsilence;
         class ChannelSilence;
         class ChannelUnsilence;
+    }
+
+    namespace Quest
+    {
+        class QuestPushResultClient;
+        class QuestGiverQuestAutoLaunch;
+        class QuestLogSwapQuest;
+        class QuestLogRemoveQuest;
+        class QuestConfirmAcceptClient;
+        class PushQuestToParty;
     }
 
     namespace Calendar
@@ -636,8 +646,7 @@ public:
     bool IsVoiceChatEnabled() const { return _voiceEnabled; }
     bool IsMicEnabled() const { return _micEnabled; }
     uint16 GetCurrentVoiceChannelId() const { return _currentVoiceChannel; }
-    void SetCurrentVoiceChannelId(uint32 id) { _currentVoiceChannel = id; }
-    static void HandleAddMutedOpcodeCallBack(QueryResult* result, uint32);
+    void SetCurrentVoiceChannelId(uint16 id) { _currentVoiceChannel = id; }
     void HandleAddVoiceIgnoreOpcode(WorldPackets::VoiceChat::AddVoiceIgnore& packet);
     void HandleDeleteVoiceIgnoreOpcode(WorldPackets::VoiceChat::DeleteVoiceIgnore& packet);
     void HandleChannelSilenceOpcode(WorldPackets::VoiceChat::ChannelSilence& packet);
@@ -648,7 +657,7 @@ public:
     void HandleChannelVoiceOffOpcode(WorldPackets::VoiceChat::ChannelVoiceOff& packet);
     void HandleVoiceSessionEnableOpcode(WorldPackets::VoiceChat::VoiceSessionEnable& packet);
     void HandleSetActiveVoiceChannelOpcode(WorldPackets::VoiceChat::SetActiveVoiceChannel& packet);
-    void SetActiveVoiceChannel(VoiceChatChannel* voiceChannel, VoiceChatChannel* currentChannel, Player* player);
+    void SetActiveVoiceChannel(Channel* voiceChannel, Channel* currentChannel, Player* player);
 
     // Packets cooldown
     time_t GetCalendarEventCreationCooldown() const { return _calendarEventCreationCooldown; }
@@ -948,13 +957,13 @@ public:                                                 // opcodes handlers
     void HandleQuestgiverRequestRewardOpcode(WorldPacket& recvPacket);
     void HandleQuestQueryOpcode(WorldPacket& recvPacket);
     void HandleQuestgiverCancel(WorldPacket& recvData);
-    void HandleQuestLogSwapQuest(WorldPacket& recvData);
-    void HandleQuestLogRemoveQuest(WorldPacket& recvData);
-    void HandleQuestConfirmAccept(WorldPacket& recvData);
+    void HandleQuestLogSwapQuest(WorldPackets::Quest::QuestLogSwapQuest& packet);
+    void HandleQuestLogRemoveQuest(WorldPackets::Quest::QuestLogRemoveQuest& packet);
+    void HandleQuestConfirmAccept(WorldPackets::Quest::QuestConfirmAcceptClient& packet);
     void HandleQuestgiverCompleteQuest(WorldPacket& recvData);
-    void HandleQuestgiverQuestAutoLaunch(WorldPacket& recvPacket);
-    void HandlePushQuestToParty(WorldPacket& recvPacket);
-    void HandleQuestPushResult(WorldPacket& recvPacket);
+    void HandleQuestgiverQuestAutoLaunch(WorldPackets::Quest::QuestGiverQuestAutoLaunch& packet);
+    void HandlePushQuestToParty(WorldPackets::Quest::PushQuestToParty& packet);
+    void HandleQuestPushResult(WorldPackets::Quest::QuestPushResultClient& packet);
 
     void HandleMessagechatOpcode(WorldPacket& recvPacket);
     void SendPlayerNotFoundNotice(std::string const& name);

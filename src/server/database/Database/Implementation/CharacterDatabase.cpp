@@ -223,7 +223,7 @@ void CharacterDatabaseConnection::DoPrepareStatements()
     PrepareStatement(CHAR_UPD_CHANNEL_USAGE, "UPDATE channels SET lastUsed = UNIX_TIMESTAMP() WHERE channelId = ?", CONNECTION_ASYNC);
     PrepareStatement(CHAR_DEL_OLD_CHANNELS, "DELETE FROM channels WHERE lastUsed + ? < UNIX_TIMESTAMP()", CONNECTION_ASYNC);
     PrepareStatement(CHAR_DEL_OLD_CHANNELS_BANS, "DELETE cb.* FROM channels_bans cb LEFT JOIN channels cn ON cb.channelId=cn.channelId WHERE cn.channelId IS NULL OR cb.banTime <= UNIX_TIMESTAMP()", CONNECTION_ASYNC);
-    PrepareStatement(CHAR_DEL_OLD_CHANNELS_RIGHTS, "DELETE FROM channel_rights cr LEFT JOIN channels cn ON cr.channelId=cn.channelId WHERE cn.channelId IS NULL", CONNECTION_ASYNC);
+    PrepareStatement(CHAR_DEL_OLD_CHANNELS_RIGHTS, "DELETE cr.* FROM channels_rights cr LEFT JOIN channels cn ON cr.channelId=cn.channelId WHERE cn.channelId IS NULL", CONNECTION_ASYNC);
     PrepareStatement(CHAR_INS_CHANNEL_BAN, "REPLACE INTO channels_bans VALUES (?, ?, ?)", CONNECTION_ASYNC);
     PrepareStatement(CHAR_DEL_CHANNEL_BAN, "DELETE FROM channels_bans WHERE channelId = ? AND playerGUID = ?", CONNECTION_ASYNC);
 

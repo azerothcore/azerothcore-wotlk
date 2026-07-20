@@ -20,9 +20,13 @@
 
 #include "VoiceChatDefines.h"
 #include "WorldPacket.h"
+#include <map>
 #include <string>
+#include <unordered_map>
+#include <unordered_set>
 
 class Player;
+class WorldSession;
 
 #define CHANNEL_BAN_DURATION DAY*60
 
@@ -31,9 +35,9 @@ enum ChatNotify : uint8
 {
     CHAT_JOINED_NOTICE                = 0x00,           //+ "%s joined channel.";
     CHAT_LEFT_NOTICE                  = 0x01,           //+ "%s left channel.";
-    //CHAT_SUSPENDED_NOTICE           = 0x01,           // "%s left channel.";
+    //CHAT_SUSPENDED_NOTICE             = 0x01,           // "%s left channel.";
     CHAT_YOU_JOINED_NOTICE            = 0x02,           //+ "Joined Channel: [%s]"; -- You joined
-    //CHAT_YOU_CHANGED_NOTICE         = 0x02,           // "Changed Channel: [%s]";
+    //CHAT_YOU_CHANGED_NOTICE           = 0x02,           // "Changed Channel: [%s]";
     CHAT_YOU_LEFT_NOTICE              = 0x03,           //+ "Left Channel: [%s]"; -- You left
     CHAT_WRONG_PASSWORD_NOTICE        = 0x04,           //+ "Wrong password for %s.";
     CHAT_NOT_MEMBER_NOTICE            = 0x05,           //+ "Not on channel %s.";
@@ -73,7 +77,7 @@ enum ChannelFlags
 {
     CHANNEL_FLAG_NONE       = 0x00,
     CHANNEL_FLAG_CUSTOM     = 0x01,
-                           // 0x02
+    // 0x02
     CHANNEL_FLAG_TRADE      = 0x04,
     CHANNEL_FLAG_NOT_LFG    = 0x08,
     CHANNEL_FLAG_GENERAL    = 0x10,
@@ -90,29 +94,29 @@ enum ChannelFlags
 enum ChannelDBCFlags
 {
     CHANNEL_DBC_FLAG_NONE       = 0x00000,
-    CHANNEL_DBC_FLAG_INITIAL    = 0x00001, // General, Trade, LocalDefense, LFG
-    CHANNEL_DBC_FLAG_ZONE_DEP   = 0x00002, // General, Trade, LocalDefense, GuildRecruitment
-    CHANNEL_DBC_FLAG_GLOBAL     = 0x00004, // WorldDefense
-    CHANNEL_DBC_FLAG_TRADE      = 0x00008, // Trade, LFG
-    CHANNEL_DBC_FLAG_CITY_ONLY  = 0x00010, // Trade, GuildRecruitment, LFG
-    CHANNEL_DBC_FLAG_CITY_ONLY2 = 0x00020, // Trade, GuildRecruitment, LFG
-    CHANNEL_DBC_FLAG_DEFENSE    = 0x10000, // LocalDefense, WorldDefense
-    CHANNEL_DBC_FLAG_GUILD_REQ  = 0x20000, // GuildRecruitment
-    CHANNEL_DBC_FLAG_LFG        = 0x40000, // LFG
-    CHANNEL_DBC_FLAG_UNK1       = 0x80000  // General
+    CHANNEL_DBC_FLAG_INITIAL    = 0x00001,              // General, Trade, LocalDefense, LFG
+    CHANNEL_DBC_FLAG_ZONE_DEP   = 0x00002,              // General, Trade, LocalDefense, GuildRecruitment
+    CHANNEL_DBC_FLAG_GLOBAL     = 0x00004,              // WorldDefense
+    CHANNEL_DBC_FLAG_TRADE      = 0x00008,              // Trade, LFG
+    CHANNEL_DBC_FLAG_CITY_ONLY  = 0x00010,              // Trade, GuildRecruitment, LFG
+    CHANNEL_DBC_FLAG_CITY_ONLY2 = 0x00020,              // Trade, GuildRecruitment, LFG
+    CHANNEL_DBC_FLAG_DEFENSE    = 0x10000,              // LocalDefense, WorldDefense
+    CHANNEL_DBC_FLAG_GUILD_REQ  = 0x20000,              // GuildRecruitment
+    CHANNEL_DBC_FLAG_LFG        = 0x40000,              // LFG
+    CHANNEL_DBC_FLAG_UNK1       = 0x80000               // General
 };
 
 enum ChannelMemberFlags
 {
-    MEMBER_FLAG_NONE            = 0x00,
-    MEMBER_FLAG_OWNER           = 0x01,
-    MEMBER_FLAG_MODERATOR       = 0x02,
-    MEMBER_FLAG_VOICED          = 0x04,
-    MEMBER_FLAG_MUTED           = 0x08,
-    MEMBER_FLAG_CUSTOM          = 0x10,
-    MEMBER_FLAG_MIC_MUTED       = 0x20,
-//  MEMBER_FLAG_SESSION_ACTIVE  = 0x40,
-//                                0x80
+    MEMBER_FLAG_NONE        = 0x00,
+    MEMBER_FLAG_OWNER       = 0x01,
+    MEMBER_FLAG_MODERATOR   = 0x02,
+    MEMBER_FLAG_VOICED      = 0x04,
+    MEMBER_FLAG_MUTED       = 0x08,
+    MEMBER_FLAG_CUSTOM      = 0x10,
+    MEMBER_FLAG_MIC_MUTED   = 0x20
+                              // 0x40
+                              // 0x80
 };
 
 class ChannelRights
@@ -129,84 +133,71 @@ public:
 
 enum eChannelRights
 {
-    CHANNEL_RIGHT_FORCE_NO_ANNOUNCEMENTS = 0x001,
-    CHANNEL_RIGHT_FORCE_ANNOUNCEMENTS    = 0x002,
-    CHANNEL_RIGHT_NO_OWNERSHIP           = 0x004,
-    CHANNEL_RIGHT_CANT_SPEAK             = 0x008,
-    CHANNEL_RIGHT_CANT_BAN               = 0x010,
-    CHANNEL_RIGHT_CANT_KICK              = 0x020,
-    CHANNEL_RIGHT_CANT_MUTE              = 0x040,
-    CHANNEL_RIGHT_CANT_CHANGE_PASSWORD   = 0x080,
-    CHANNEL_RIGHT_DONT_PRESERVE          = 0x100,
+    CHANNEL_RIGHT_FORCE_NO_ANNOUNCEMENTS    = 0x001,
+    CHANNEL_RIGHT_FORCE_ANNOUNCEMENTS       = 0x002,
+    CHANNEL_RIGHT_NO_OWNERSHIP              = 0x004,
+    CHANNEL_RIGHT_CANT_SPEAK                = 0x008,
+    CHANNEL_RIGHT_CANT_BAN                  = 0x010,
+    CHANNEL_RIGHT_CANT_KICK                 = 0x020,
+    CHANNEL_RIGHT_CANT_MUTE                 = 0x040,
+    CHANNEL_RIGHT_CANT_CHANGE_PASSWORD      = 0x080,
+    CHANNEL_RIGHT_DONT_PRESERVE             = 0x100,
 };
 
 class Channel
 {
-    class PlayerInfo
+    struct PlayerInfo
     {
-    public:
-        PlayerInfo(Player const* player, bool gmStatus = false) :
-            _player(player), _flags(MEMBER_FLAG_NONE), _gmStatus(gmStatus) { }
+        ObjectGuid player;
+        uint8 flags;
+        Player* plrPtr; // pussywizard
 
-        [[nodiscard]] bool HasFlag(uint8 flag) const { return _flags & flag; }
-        void SetFlag(uint8 flag) { if (!HasFlag(flag)) _flags |= flag; }
-        [[nodiscard]] bool IsOwner() const { return _flags & MEMBER_FLAG_OWNER; }
+        [[nodiscard]] bool HasFlag(uint8 flag) const { return flags & flag; }
+        void SetFlag(uint8 flag) { if (!HasFlag(flag)) flags |= flag; }
+        [[nodiscard]] bool IsOwner() const { return flags & MEMBER_FLAG_OWNER; }
         void SetOwner(bool state)
         {
-            if (state)
-                _flags |= MEMBER_FLAG_OWNER;
-            else
-                _flags &= ~MEMBER_FLAG_OWNER;
+            if (state) flags |= MEMBER_FLAG_OWNER;
+            else flags &= ~MEMBER_FLAG_OWNER;
         }
         [[nodiscard]] bool IsOwnerGM() const { return _gmStatus; }
         void SetOwnerGM(bool on) { _gmStatus = on; }
-        [[nodiscard]] bool IsModerator() const { return _flags & MEMBER_FLAG_MODERATOR; }
+        [[nodiscard]] bool IsModerator() const { return flags & MEMBER_FLAG_MODERATOR; }
         void SetModerator(bool state)
         {
-            if (state)
-                _flags |= MEMBER_FLAG_MODERATOR;
-            else
-                _flags &= ~MEMBER_FLAG_MODERATOR;
+            if (state) flags |= MEMBER_FLAG_MODERATOR;
+            else flags &= ~MEMBER_FLAG_MODERATOR;
         }
-        [[nodiscard]] bool IsMuted() const { return _flags & MEMBER_FLAG_MUTED; }
+        [[nodiscard]] bool IsMuted() const { return flags & MEMBER_FLAG_MUTED; }
         void SetMuted(bool state)
         {
-            if (state)
-                _flags |= MEMBER_FLAG_MUTED;
-            else
-                _flags &= ~MEMBER_FLAG_MUTED;
+            if (state) flags |= MEMBER_FLAG_MUTED;
+            else flags &= ~MEMBER_FLAG_MUTED;
         }
-        [[nodiscard]] bool IsMicMuted() const { return _flags & MEMBER_FLAG_MIC_MUTED; }
+        [[nodiscard]] bool IsMicMuted() const { return flags & MEMBER_FLAG_MIC_MUTED; }
         void SetMicMuted(bool state)
         {
-            if (state)
-                _flags |= MEMBER_FLAG_MIC_MUTED;
-            else
-                _flags &= ~MEMBER_FLAG_MIC_MUTED;
+            if (state) flags |= MEMBER_FLAG_MIC_MUTED;
+            else flags &= ~MEMBER_FLAG_MIC_MUTED;
         }
-        [[nodiscard]] bool IsVoiced() const { return _flags & MEMBER_FLAG_VOICED; }
+        [[nodiscard]] bool IsVoiced() const { return flags & MEMBER_FLAG_VOICED; }
         void SetVoiced(bool state)
         {
-            if (state)
-                _flags |= MEMBER_FLAG_VOICED;
-            else
-                _flags &= ~MEMBER_FLAG_VOICED;
+            if (state) flags |= MEMBER_FLAG_VOICED;
+            else flags &= ~MEMBER_FLAG_VOICED;
         }
-
-        Player const& GetPlayer() const { return *_player; }
-        uint8 GetPlayerFlags() const { return _flags; }
     private:
-        Player const* _player;
-        uint8 _flags;
-        bool _gmStatus;
+        bool _gmStatus = false;
     };
 
 public:
     Channel(std::string const& name, uint32 channelDBCId, uint64 channelGuid, TeamId teamId = TEAM_NEUTRAL, bool announce = true, bool ownership = true);
-    Channel(VoiceChatChannelType voiceChannelType);
+    // constructs a voice-only channel (group/raid/battleground), owned by VoiceChatMgr
+    Channel(VoiceChatChannelType voiceChannelType, uint32 voiceGroupId, TeamId teamId = TEAM_NEUTRAL);
     [[nodiscard]] std::string const& GetName() const { return _name; }
     [[nodiscard]] uint32 GetChannelId() const { return _channelId; }
     [[nodiscard]] uint32 GetChannelDBId() const { return _channelDBId; }
+    [[nodiscard]] TeamId GetTeamId() const { return _teamId; }
     [[nodiscard]] bool IsConstant() const { return _channelId != 0; }
     [[nodiscard]] bool IsAnnounce() const { return _announce; }
     [[nodiscard]] bool IsLFG() const { return HasFlag(CHANNEL_FLAG_LFG); }
@@ -233,17 +224,15 @@ public:
     void UnsetModerator(Player const* player, std::string const& newname) { SetMode(player, newname, true, false); }
     void SetMute(Player const* player, std::string const& newname) { SetMode(player, newname, false, true); }
     void UnsetMute(Player const* player, std::string const& newname) { SetMode(player, newname, false, false); }
-    // inline void SetMicMute(Player* player, const char* targetName, bool set) { SetModeFlags(player, targetName, MEMBER_FLAG_MIC_MUTED, set); }
-    // inline void SetVoiced(Player* player, const char* targetName, bool set) { SetModeFlags(player, targetName, MEMBER_FLAG_VOICED, set); } // Not used
     void List(Player const* player, bool display = false);
     void Announce(Player const* player);
     void Say(ObjectGuid guid, std::string const& what, uint32 lang);
     void Invite(Player const* player, std::string const& newp);
     void Voice(ObjectGuid guid1, ObjectGuid guid2);
     void DeVoice(ObjectGuid guid1, ObjectGuid guid2);
-    void JoinNotify(Player const& p);
-    void LeaveNotify(Player const& p);
-    void FlagsNotify(Player const& p);
+    void JoinNotify(Player* p);
+    void LeaveNotify(Player* p);
+    void FlagsNotify(Player* p);
     static void CleanOldChannelsInDB();
     void ToggleModeration(Player* p);
 
@@ -254,15 +243,54 @@ public:
     void AddWatching(Player* p);
     void RemoveWatching(Player* p);
 
+    [[nodiscard]] uint8 GetPlayerFlags(ObjectGuid guid) const
+    {
+        PlayerContainer::const_iterator itr = playersStore.find(guid);
+        return itr != playersStore.end() ? itr->second.flags : 0;
+    }
+
+    // Voice chat
     bool IsVoiceEnabled() const { return HasFlag(CHANNEL_FLAG_VOICE); }
-    void ToggleVoice(Player* player = nullptr); // remove
+    void ToggleVoice(Player* player = nullptr);
+    // handles CMSG_CHANNEL_VOICE_ON: enables voice on this custom channel
     void VoiceOn(Player* player);
-    void SendVoiceRoster();
+
+    uint16 GetVoiceId() const { return _voiceId; }
+    void SetVoiceId(uint16 voiceId) { _voiceId = voiceId; }
+    uint64 GetVoiceSessionId() const { return _voiceSessionGuid; }
+    void SetVoiceSessionId(uint64 sessionId) { _voiceSessionGuid = sessionId; }
+    VoiceChatChannelType GetVoiceType() const { return _voiceType; }
+    void SetVoiceType(VoiceChatChannelType type) { _voiceType = type; }
+    uint32 GetVoiceGroupId() const { return _voiceGroupId; }
+
+    bool IsOnVoice(ObjectGuid guid) const;
+    VoiceChatMember* GetVoiceChatMember(ObjectGuid guid);
+    uint32 GetVoiceMemberCount() const { return _voiceMembers.size(); }
+    std::map<uint8, VoiceChatMember> const& GetVoiceMembers() const { return _voiceMembers; }
+    // drops all voice members and resets the voice session state
+    void DisbandVoiceSession();
+
+    void AddVoiceChatMember(ObjectGuid guid);
+    void RemoveVoiceChatMember(ObjectGuid guid);
+    // adds all eligible players of this (custom) channel to voice after the voice session was created
     void AddVoiceChatMembersAfterCreate();
+    void SetVoiceMassAdding(bool state) { _voiceMassAdding = state; }
+
+    void VoiceMember(ObjectGuid guid);
+    void DevoiceMember(ObjectGuid guid);
+    void MuteVoiceMember(ObjectGuid guid);
+    void UnmuteVoiceMember(ObjectGuid guid);
+    void ForceMuteVoiceMember(ObjectGuid guid);
+    void ForceUnmuteVoiceMember(ObjectGuid guid);
+    void SetVoiceMemberPriority(ObjectGuid guid, uint8 priority);
+
+    void SendVoiceRoster(bool toAll = false, ObjectGuid toPlayer = ObjectGuid::Empty);
+    void SendAvailableVoiceChannel(WorldSession* session);
+    void SendLeaveVoiceSession(WorldSession* session) const;
+    void SendLeaveVoiceSessionToAll(ObjectGuid guid);
 
     void SetChannelRights(ChannelRights&& channelRights);
 
-    uint16 GetVoiceId() const { return _voiceId; }
 private:
     // initial packet data (notify type and channel name)
     void MakeNotifyPacket(WorldPacket* data, uint8 notify_type);
@@ -312,34 +340,47 @@ private:
     bool ShouldAnnouncePlayer(Player const* player) const;
 
     void UpdateChannelInDB() const;
-    void UpdateChannelUsageInDB() const;
+    void UpdateChannelUseageInDB() const;
     void AddChannelBanToDB(ObjectGuid guid, uint32 time) const;
     void RemoveChannelBanFromDB(ObjectGuid guid) const;
 
-    [[nodiscard]] uint8 GetPlayerFlags(ObjectGuid guid) const
+    void SetModerator(ObjectGuid guid, bool set)
     {
-        PlayerContainer::const_iterator itr = playersStore.find(guid);
-        return itr != playersStore.end() ? itr->second.GetPlayerFlags() : 0;
+        PlayerInfo& pinfo = playersStore[guid];
+        if (pinfo.IsModerator() != set)
+        {
+            uint8 oldFlag = pinfo.flags;
+            pinfo.SetModerator(set);
+
+            WorldPacket data;
+            MakeModeChange(&data, guid, oldFlag);
+            SendToAll(&data);
+
+            FlagsNotify(pinfo.plrPtr);
+        }
     }
 
-    [[nodiscard]] PlayerInfo const* GetPlayerInfo(ObjectGuid guid) const
+    void SetMute(ObjectGuid guid, bool set)
     {
-        PlayerContainer::const_iterator itr = playersStore.find(guid);
-        return itr != playersStore.end() ? &itr->second : nullptr;
+        PlayerInfo& pinfo = playersStore[guid];
+        if (pinfo.IsMuted() != set)
+        {
+            uint8 oldFlag = pinfo.flags;
+            pinfo.SetMuted(set);
+
+            WorldPacket data;
+            MakeModeChange(&data, guid, oldFlag);
+            SendToAll(&data);
+        }
     }
 
-    [[nodiscard]] PlayerInfo* GetPlayerInfo(ObjectGuid guid)
-    {
-        PlayerContainer::iterator itr = playersStore.find(guid);
-        return itr != playersStore.end() ? &itr->second : nullptr;
-    }
-
-    void SetModerator(ObjectGuid guid, bool set);
-    void SetMute(ObjectGuid guid, bool set);
+    // Voice chat
+    uint8 GenerateVoiceUserId(ObjectGuid guid);
 
     typedef std::unordered_map<ObjectGuid, PlayerInfo> PlayerContainer;
     typedef std::unordered_map<ObjectGuid, uint32> BannedContainer;
     typedef std::unordered_set<Player*> PlayersWatchingContainer;
+    typedef std::map<uint8, VoiceChatMember> VoiceChatMembers;
 
     bool _announce;
     bool _moderation;
@@ -348,7 +389,7 @@ private:
     bool _isOwnerGM;
     uint8 _flags;
     uint32 _channelId;
-    uint64 _channelDBId;
+    uint32 _channelDBId;
     TeamId _teamId;
     ObjectGuid _ownerGUID;
     std::string _name;
@@ -362,5 +403,13 @@ private:
     uint64 _voiceSessionGuid;
     uint16 _voiceId;
     VoiceChatChannelType _voiceType;
+    uint32 _voiceGroupId;
+    bool _voiceMassAdding;
+    bool _voiceDeleting;
+    VoiceChatMembers _voiceMembers;
+    // user ids handed out while this voice session exists; intentionally not
+    // reused so the client does not display stale character names
+    std::unordered_map<ObjectGuid, uint8> _voiceUserIds;
+    uint8 _lastVoiceUserId;
 };
 #endif

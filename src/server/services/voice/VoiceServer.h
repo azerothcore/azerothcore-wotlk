@@ -18,12 +18,25 @@
 #ifndef VoiceServer_h_
 #define VoiceServer_h_
 
-#include <AsioHacksFwd.h>
-#include <Define.h>
+#include "Define.h"
+#include "IoContext.h"
 #include "UdpSocket.h"
 #include <boost/asio/ip/udp.hpp>
+#include <memory>
+#include <string>
 
 using boost::asio::ip::udp;
+
+// Receives voice datagrams from game clients and relays them to the other
+// voiced members of the sender's voice channel.
+class VoiceClientSocket : public UdpSocket
+{
+public:
+    explicit VoiceClientSocket(udp::socket&& socket) : UdpSocket(std::move(socket)) { }
+
+protected:
+    void ProcessPacket(UdpSocketPacket const& packet, udp::endpoint const& remoteEndpoint) override;
+};
 
 class VoiceServer
 {
@@ -37,10 +50,10 @@ public:
     VoiceServer();
 
     bool Start(Acore::Asio::IoContext& ioContext, std::string const& bindIp, uint16 const port);
-    void Run();
+    void Stop();
 
 private:
-    std::unique_ptr<UdpSocket> _socket;
+    std::unique_ptr<VoiceClientSocket> _socket;
 };
 
 #define sVoiceServer VoiceServer::Instance()

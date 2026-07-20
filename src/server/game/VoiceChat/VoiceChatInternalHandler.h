@@ -18,7 +18,10 @@
 #ifndef __VOICECHAT_INTERNALHANDLER_H__
 #define __VOICECHAT_INTERNALHANDLER_H__
 
+#include "Errors.h"
 #include "VoiceChatSharedDefines.h"
+#include <array>
+#include <memory>
 
 class VoiceChatMgr;
 

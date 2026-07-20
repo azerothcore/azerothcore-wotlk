@@ -18,46 +18,60 @@
 #ifndef __TCPASYNCCONNECTOR_H_
 #define __TCPASYNCCONNECTOR_H_
 
+#include "IoContext.h"
+#include "Log.h"
+#include "TcpSocket.h"
+#include <atomic>
 #include <boost/asio.hpp>
 #include <memory>
 
 using boost::asio::ip::tcp;
 
+/*
+ * Establishes outgoing TCP connections, optionally retrying until successful.
+ *
+ * ConnectOnce/ConnectRepeat/Stop are thread safe. All asio objects are only
+ * ever touched from the io context thread; the public entry points post their
+ * work there. The On* callbacks are invoked on the io context thread.
+ */
 class TcpAsyncConnector : public std::enable_shared_from_this<TcpAsyncConnector>
 {
 public:
-    TcpAsyncConnector(Acore::Asio::IoContext& context): _ioContext(&context), _socket(nullptr),
-        _connectTimer(context), _needsReconnect(false), _reconnectTimer(context) { }
-    ~TcpAsyncConnector() { Stop(); }
+    TcpAsyncConnector(Acore::Asio::IoContext& context) : _ioContext(&context), _socket(nullptr),
+        _connectTimer(context), _reconnectTimer(context), _needsReconnect(false), _active(false) { }
+
+    // handlers keep this object alive, so it is only ever destroyed once no
+    // callbacks are pending - the timer/socket destructors clean up themselves
+    virtual ~TcpAsyncConnector() = default;
 
     // Connect once to an endpoint with timeout
     bool ConnectOnce(tcp::endpoint const& endpoint, std::chrono::seconds timeout = std::chrono::seconds(10))
     {
-        if (_socket)
-            return false; // Connection already in progress, must wait until timed out.
+        if (_active.exchange(true))
+            return false; // connection attempt already in progress
 
         _endpoint = endpoint;
         _timeout = timeout;
+        _needsReconnect = false;
 
-        TryConnect();
+        Acore::Asio::post(*_ioContext, [self = shared_from_this()]() { self->TryConnect(); });
         return true;
     }
 
-    // Connect to an endpoint with timeout until successful
+    // Connect to an endpoint with timeout, retrying until successful
     bool ConnectRepeat(tcp::endpoint const& endpoint,
         std::chrono::seconds timeout = std::chrono::seconds(10),
         std::chrono::seconds reconnectTime = std::chrono::seconds(30))
     {
-        if (_socket)
-            return false; // Connection already in progress, must wait until timed out.
+        if (_active.exchange(true))
+            return false; // connection attempt already in progress
 
         _endpoint = endpoint;
         _timeout = timeout;
-
-        _needsReconnect = true;
         _reconnectTime = reconnectTime;
+        _needsReconnect = true;
 
-        TryConnect();
+        Acore::Asio::post(*_ioContext, [self = shared_from_this()]() { self->TryConnect(); });
         return true;
     }
 
@@ -65,64 +79,121 @@ public:
     void Stop()
     {
         _needsReconnect = false;
-        _connectTimer.cancel();
-        _reconnectTimer.cancel();
-        _socket->close();
-        _socket = nullptr;
+        _active = false;
+
+        Acore::Asio::post(*_ioContext, [self = shared_from_this()]() { self->HandleStop(); });
     }
 
-    bool IsAttemptingConnection() const { return _socket.get(); }
+    bool IsAttemptingConnection() const { return _active.load(); }
 
 private:
-    virtual void OnConnectionSuccess(std::unique_ptr<IoContextTcpSocket> socket) { }
+    virtual void OnConnectionSuccess(std::unique_ptr<IoContextTcpSocket> /*socket*/) { }
     virtual void OnConnectionFail() { }
     virtual void OnConnectionTimeout() { }
 
+    // everything below runs on the io context thread
+
+    void HandleStop()
+    {
+        _connectTimer.cancel();
+        _reconnectTimer.cancel();
+
+        if (_socket)
+        {
+            boost::system::error_code errorCode;
+            _socket->close(errorCode);
+            _socket = nullptr;
+        }
+    }
+
     void TryConnect()
     {
-        // Clean up old socket first
-        if (_socket)
-            _socket->close();
+        if (!_active.load())
+            return;
 
-        // Start timeout timer
-        _connectTimer.expires_after(_timeout);
-        _connectTimer.async_wait([self = shared_from_this()](boost::system::error_code const& ec)
+        try
         {
-            self->ConnectionTimeout(ec);
-        });
+            // clean up the previous attempt
+            if (_socket)
+            {
+                boost::system::error_code errorCode;
+                _socket->close(errorCode);
+            }
 
-        // Start async connect
-        _socket = std::make_unique<IoContextTcpSocket>(*_ioContext);
-        _socket->async_connect(_endpoint, [self = shared_from_this()](boost::system::error_code const& ec)
+            // start the timeout timer
+            _connectTimer.expires_after(_timeout);
+            _connectTimer.async_wait([self = shared_from_this()](boost::system::error_code const& ec)
+            {
+                self->ConnectionTimeout(ec);
+            });
+
+            // start the async connect
+            _socket = std::make_unique<IoContextTcpSocket>(*_ioContext);
+            _socket->async_connect(_endpoint, [self = shared_from_this()](boost::system::error_code const& ec)
+            {
+                self->SocketConnected(ec);
+            });
+        }
+        catch (boost::system::system_error const& err)
         {
-            self->SocketConnected(ec);
-        });
+            LOG_ERROR("network", "TcpAsyncConnector::TryConnect to {}:{} failed: {}",
+                _endpoint.address().to_string(), _endpoint.port(), err.what());
+
+            OnConnectionFail();
+
+            if (_active.load() && _needsReconnect.load())
+                StartReconnectTimer();
+        }
     }
 
     void SocketConnected(boost::system::error_code const& ec)
     {
-        if (!ec && _socket && _socket->is_open())
-            OnConnectionSuccess(std::move(_socket));
-        else
-        {
-            if (_needsReconnect)
-                StartReconnectTimer();
+        _connectTimer.cancel();
 
-            OnConnectionFail();
+        // stopped while the connect was in flight
+        if (!_active.load())
+        {
+            if (_socket)
+            {
+                boost::system::error_code errorCode;
+                _socket->close(errorCode);
+                _socket = nullptr;
+            }
+            return;
         }
 
-        // Cancel the connection timeout timer
-        _connectTimer.cancel();
+        if (!ec && _socket && _socket->is_open())
+        {
+            _active = false;
+            OnConnectionSuccess(std::move(_socket));
+            _socket = nullptr;
+        }
+        else
+        {
+            OnConnectionFail();
+
+            if (_needsReconnect.load())
+                StartReconnectTimer();
+        }
     }
 
     void ConnectionTimeout(boost::system::error_code const& ec)
     {
-        if (!ec)
-        {
-            if (_needsReconnect)
-                StartReconnectTimer();
+        // canceled - the connect completed or the connector was stopped
+        if (ec)
+            return;
 
-            OnConnectionTimeout();
+        if (!_active.load())
+            return;
+
+        OnConnectionTimeout();
+
+        // close the in-flight socket; the connect handler then fires with an
+        // error and takes the regular failure path (including reconnect)
+        if (_socket)
+        {
+            boost::system::error_code errorCode;
+            _socket->close(errorCode);
         }
     }
 
@@ -131,6 +202,12 @@ private:
         _reconnectTimer.expires_after(_reconnectTime);
         _reconnectTimer.async_wait([self = shared_from_this()](boost::system::error_code const& ec)
         {
+            if (ec)
+                return;
+
+            if (!self->_active.load() || !self->_needsReconnect.load())
+                return;
+
             self->TryConnect();
         });
     }
@@ -140,12 +217,13 @@ private:
 
     tcp::endpoint _endpoint;
     std::chrono::seconds _timeout;
+    std::chrono::seconds _reconnectTime;
 
     boost::asio::steady_timer _connectTimer;
-
-    bool _needsReconnect;
-    std::chrono::seconds _reconnectTime;
     boost::asio::steady_timer _reconnectTimer;
+
+    std::atomic<bool> _needsReconnect;
+    std::atomic<bool> _active;
 };
 
 #endif

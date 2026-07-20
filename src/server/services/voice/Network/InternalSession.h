@@ -26,6 +26,7 @@ class VoiceChatServerPacket;
 
 using boost::asio::ip::tcp;
 
+// A connection from a worldserver
 class InternalSession : public TcpSocket<InternalSession>
 {
     typedef TcpSocket<InternalSession> InternalSocket;
@@ -41,6 +42,13 @@ public:
 
     void HandlePing(VoiceChatServerPacket& packet);
     void HandleCreateVoiceSession(VoiceChatServerPacket& packet);
+    void HandleDeleteVoiceSession(VoiceChatServerPacket& packet);
+    void HandleAddMember(VoiceChatServerPacket& packet);
+    void HandleRemoveMember(VoiceChatServerPacket& packet);
+    void HandleVoiceMember(VoiceChatServerPacket& packet);
+    void HandleDevoiceMember(VoiceChatServerPacket& packet);
+    void HandleMuteMember(VoiceChatServerPacket& packet);
+    void HandleUnmuteMember(VoiceChatServerPacket& packet);
 
 protected:
     bool ReadHeaderHandler();

@@ -18,16 +18,11 @@
 #ifndef __UDPSOCKET_H__
 #define __UDPSOCKET_H__
 
+#include "Define.h"
+#include "Errors.h"
 #include "Log.h"
-#include "MessageBuffer.h"
-#include <atomic>
-#include <boost/asio.hpp>
 #include <boost/asio/ip/udp.hpp>
-#include <boost/bind.hpp>
-#include <functional>
-#include <memory>
-#include <queue>
-#include <type_traits>
+#include <cstring>
 
 using boost::asio::ip::udp;
 
@@ -37,7 +32,6 @@ struct UdpSocketPacketHeader
     uint32 signature;
     uint8 userId;
     uint16 channelId;
-    //uint16 frameId;
 };
 #pragma pack(pop)
 
@@ -46,17 +40,22 @@ struct UdpSocketPacketHeader
 class UdpSocketPacket
 {
 public:
-    UdpSocketPacket(uint8* data, uint32 length)
+    UdpSocketPacket(uint8 const* data, std::size_t length)
     {
-        memcpy(&m_data, data, length);
-        m_length = length;
+        ASSERT(length >= sizeof(UdpSocketPacketHeader) && length <= UDP_SOCKET_PACKET_MAX_SIZE);
+        std::memcpy(m_data, data, length);
+        m_length = static_cast<uint16>(length);
         m_header = reinterpret_cast<UdpSocketPacketHeader*>(m_data);
     }
 
     UdpSocketPacketHeader const& GetHeader() const { return *m_header; }
     UdpSocketPacketHeader& GetHeader() { return *m_header; }
-    uint8 const* GetPayload() const { return m_data; }
-    uint16 GetPayloadLength() const { return m_length; }
+    // full datagram, including the header
+    uint8 const* GetData() const { return m_data; }
+    uint16 GetDataLength() const { return m_length; }
+    // payload following the header
+    uint8 const* GetPayload() const { return m_data + sizeof(UdpSocketPacketHeader); }
+    uint16 GetPayloadLength() const { return m_length - sizeof(UdpSocketPacketHeader); }
 
 private:
     UdpSocketPacketHeader* m_header;
@@ -74,12 +73,18 @@ public:
         StartReceive();
     }
 
+    virtual ~UdpSocket() = default;
+
     void StartReceive()
     {
         _socket.async_receive_from(boost::asio::buffer(_buffer, UDP_SOCKET_BUFFER_SIZE), _senderEndpoint,
             [this](boost::system::error_code const errorCode, std::size_t const dataReceived)
             {
-                if (!errorCode && dataReceived >= sizeof(UdpSocketPacketHeader))
+                if (errorCode == boost::asio::error::operation_aborted)
+                    return;
+
+                // silently drop datagrams that cannot possibly be valid packets
+                if (!errorCode && dataReceived >= sizeof(UdpSocketPacketHeader) && dataReceived <= UDP_SOCKET_PACKET_MAX_SIZE)
                 {
                     UdpSocketPacket const packet(_buffer, dataReceived);
                     ProcessPacket(packet, _senderEndpoint);
@@ -89,11 +94,27 @@ public:
             });
     }
 
-protected:
-    void ProcessPacket(UdpSocketPacket const& packet, boost::asio::ip::udp::endpoint const& remoteEndpoint)
+    void SendTo(udp::endpoint const& target, uint8 const* data, std::size_t length)
     {
-        LOG_TRACE("network", "Received data from UDP socket. Payload size {}. Signature {}. UserID {} ChannelID {}",
-            packet.GetPayloadLength(), packet.GetHeader().signature, packet.GetHeader().userId, packet.GetHeader().channelId);
+        boost::system::error_code errorCode;
+        _socket.send_to(boost::asio::buffer(data, length), target, 0, errorCode);
+
+        if (errorCode)
+            LOG_DEBUG("network", "UdpSocket::SendTo failed sending {} bytes: {} ({})", length, errorCode.value(), errorCode.message());
+    }
+
+    void Close()
+    {
+        boost::system::error_code errorCode;
+        _socket.close(errorCode);
+    }
+
+protected:
+    virtual void ProcessPacket(UdpSocketPacket const& packet, udp::endpoint const& remoteEndpoint)
+    {
+        LOG_TRACE("network", "Received data on UDP socket from {}:{}. Payload size {}. Signature {}. UserID {} ChannelID {}",
+            remoteEndpoint.address().to_string(), remoteEndpoint.port(), packet.GetPayloadLength(),
+            packet.GetHeader().signature, packet.GetHeader().userId, packet.GetHeader().channelId);
     }
 
 private:

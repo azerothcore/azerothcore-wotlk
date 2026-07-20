@@ -19,13 +19,51 @@
 #define __Voice_Channel_H__
 
 #include "Define.h"
+#include "VoiceChatSharedDefines.h"
+#include <boost/asio/ip/udp.hpp>
+#include <map>
 
-class Channel
+class InternalSession;
+
+struct VoiceChannelMember
+{
+    // UDP endpoint the game client announced itself from (via the initial
+    // header-only datagram). Voice frames are relayed to this endpoint.
+    boost::asio::ip::udp::endpoint Endpoint;
+    bool HasEndpoint = false;
+    // may receive voice frames
+    bool Voiced = false;
+    // may not send voice frames
+    bool Muted = false;
+};
+
+class VoiceChannel
 {
 public:
+    VoiceChannel(uint16 channelId, VoiceChatChannelType type, InternalSession const* owner);
+
+    uint16 GetChannelId() const { return _channelId; }
+    VoiceChatChannelType GetType() const { return _type; }
+    InternalSession const* GetOwner() const { return _owner; }
+    uint32 GetMaxMembers() const { return _maxMembers; }
+
+    // returns nullptr if the member does not exist
+    VoiceChannelMember* GetMember(uint8 userId);
+    VoiceChannelMember const* GetMember(uint8 userId) const;
+
+    bool AddMember(uint8 userId);
+    void RemoveMember(uint8 userId);
+
+    std::map<uint8, VoiceChannelMember> const& GetMembers() const { return _members; }
 
 private:
-
+    uint16 _channelId;
+    VoiceChatChannelType _type;
+    // identifies the worldserver connection this channel belongs to, only
+    // ever used for comparison - never dereference it
+    InternalSession const* _owner;
+    uint32 _maxMembers;
+    std::map<uint8, VoiceChannelMember> _members;
 };
 
 #endif

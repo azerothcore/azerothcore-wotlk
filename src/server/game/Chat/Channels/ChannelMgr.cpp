@@ -115,6 +115,8 @@ Channel* ChannelMgr::GetOrCreateChannel(TeamId team, std::string const& name, ui
     {
         std::shared_ptr<Channel> channel = std::make_shared<Channel>(name, channelDBCId, 0, team);
         _channelsByName[team][wname] = channel;
+        if (uint32 dbId = channel->GetChannelDBId())
+            _channelsByGuid[dbId] = channel;
         return channel.get();
     }
 
