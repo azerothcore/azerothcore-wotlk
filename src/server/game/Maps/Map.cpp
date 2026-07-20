@@ -307,7 +307,7 @@ bool Map::AddToMap(T* obj, bool checkTransport)
     if (obj->IsInWorld())
     {
         ASSERT(obj->IsInGrid());
-        obj->UpdateObjectVisibilityOnCreate();
+        obj->UpdateObjectVisibility(true);
         return true;
     }
 
@@ -344,7 +344,7 @@ bool Map::AddToMap(T* obj, bool checkTransport)
 
     //something, such as vehicle, needs to be update immediately
     //also, trigger needs to cast spell, if not update, cannot see visual
-    obj->UpdateObjectVisibility(true);
+    obj->UpdateObjectVisibilityOnCreate();
 
     // Post-visibility so accessories seat after the vehicle's create packet reaches clients.
     if (obj->IsCreature())
@@ -376,9 +376,12 @@ bool Map::AddToMap(Transport* obj, bool /*checkTransport*/)
     _transports.insert(obj);
 
     // Broadcast creation to players
+    // Skip players that are not in world. Sending the create to their loading client
+    // could materialize a lingering transport on whatever map they are teleporting to.
+    // They get the correct transport list from SendInitTransports when added to their new map
     for (Map::PlayerList::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
     {
-        if (itr->GetSource()->GetTransport() != obj)
+        if (itr->GetSource()->IsInWorld() && itr->GetSource()->GetTransport() != obj)
         {
             UpdateData data;
             obj->BuildCreateUpdateBlockForPlayer(&data, itr->GetSource());
@@ -761,8 +764,10 @@ void Map::RemoveFromMap(Transport* obj, bool remove)
         obj->BuildOutOfRangeUpdateBlock(&data);
         WorldPacket packet;
         data.BuildPacket(packet);
+        // Skip players that are not in world
+        // Their client already received the destroy from SendRemoveTransports when leaving this map
         for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-            if (itr->GetSource()->GetTransport() != obj)
+            if (itr->GetSource()->IsInWorld() && itr->GetSource()->GetTransport() != obj)
                 itr->GetSource()->SendDirectMessage(&packet);
     }
 
@@ -1732,12 +1737,25 @@ uint32 Map::ApplyDynamicModeRespawnScaling(WorldObject const* obj, uint32 respaw
     if (obj->GetMap()->Instanceable())
         return respawnDelay;
 
-    // No quest givers or world bosses
     if (Creature const* creature = obj->ToCreature())
+    {
+        // Temporary spawns (no DB spawn id, e.g. summons / battlefield-spawned
+        // creatures such as Wintergrasp turrets) are not part of the respawn system.
+        if (!creature->GetSpawnId())
+            return respawnDelay;
+
+        // No quest givers or world bosses
         if (creature->IsQuestGiver() || creature->isWorldBoss()
             || (creature->GetCreatureTemplate()->rank == CREATURE_ELITE_RARE)
             || (creature->GetCreatureTemplate()->rank == CREATURE_ELITE_RAREELITE))
             return respawnDelay;
+    }
+    // Temporary gameobjects (no DB spawn id) are likewise excluded.
+    else if (GameObject const* go = obj->ToGameObject())
+    {
+        if (!go->GetSpawnId())
+            return respawnDelay;
+    }
 
     auto it = _zonePlayerCountMap.find(obj->GetZoneId());
     if (it == _zonePlayerCountMap.end())
@@ -2771,6 +2789,19 @@ void Map::ProcessCreatureRespawn(ObjectGuid::LowType spawnId)
             RemoveCreatureRespawnTime(spawnId);
             return;
         }
+    }
+
+    // Check linked_respawn: don't spawn if the master creature is still dead.
+    // This mirrors the check in Creature::Respawn() for compat-mode creatures.
+    ObjectGuid dbtableHighGuid = ObjectGuid::Create<HighGuid::Unit>(data->id, spawnId);
+    time_t linkedRespawntime = GetLinkedRespawnTime(dbtableHighGuid);
+    if (linkedRespawntime)
+    {
+        // Master is still dead; re-queue at the master's respawn time + a small offset.
+        time_t now = GameTime::GetGameTime().count();
+        time_t newRespawnTime = (now > linkedRespawntime ? now : linkedRespawntime) + urand(5, MINUTE);
+        SaveCreatureRespawnTime(spawnId, newRespawnTime);
+        return;
     }
 
     // Remove respawn time BEFORE LoadFromDB, otherwise the creature

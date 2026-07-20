@@ -63,7 +63,6 @@ bool handleArgs(int argc, char** argv,
                 int& tileY,
                 std::string& configFilePath,
                 bool& silent,
-                char*& offMeshInputPath,
                 char*& file,
                 unsigned int& threads)
 {
@@ -120,14 +119,6 @@ bool handleArgs(int argc, char** argv,
         {
             silent = true;
         }
-        else if (strcmp(argv[i], "--offMeshInput") == 0)
-        {
-            param = argv[++i];
-            if (!param)
-                return false;
-
-            offMeshInputPath = param;
-        }
         else
         {
             int map = atoi(argv[i]);
@@ -174,11 +165,10 @@ int main(int argc, char** argv)
     int mapnum = -1;
     int tileX = -1, tileY = -1;
     bool silent = false;
-    char* offMeshInputPath = nullptr;
     char* file = nullptr;
     std::string configFilePath = "mmaps-config.yaml";
     bool validParam = handleArgs(argc, argv, mapnum,
-                                 tileX, tileY, configFilePath, silent, offMeshInputPath, file, threads);
+                                 tileX, tileY, configFilePath, silent, file, threads);
 
     if (!validParam)
         return silent ? -1 : finish("You have specified invalid parameters", -1);
@@ -202,7 +192,7 @@ int main(int argc, char** argv)
     if (!checkDirectories(config->DataDirPath(), config->IsDebugOutputEnabled()))
         return silent ? -3 : finish("Press ENTER to close...", -3);
 
-    MapBuilder builder(&config.value(), mapnum, offMeshInputPath, threads);
+    MapBuilder builder(&config.value(), mapnum, threads);
 
     uint32 start = getMSTime();
     if (file)

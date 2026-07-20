@@ -309,44 +309,73 @@ class spell_item_titanium_seal_of_dalaran : public SpellScript
     }
 };
 
-enum AmplifyDish
+// 13180 - Gnomish Mind Control Cap
+// 67799 - Mind Amplification Dish
+enum AmplificationDish
 {
-    SPELL_AMPLIFY_30S               = 13180,
-    SPELL_AMPLIFY_10S               = 67799,
-    SPELL_MENTAL_BATTLE             = 67810,
-    SPELL_AMPLIFY_CHARM_30S         = 13181,
-    SPELL_AMPLIFY_CHARM_10S         = 26740,
+    SPELL_MIND_CONTROL_CAP             = 13180, // Gnomish Mind Control cap
+    SPELL_AMPLIFICATION_DISH           = 67799, // Mind Amplification Dish
+    SPELL_MENTAL_BATTLE                = 67810,
+    SPELL_MIND_CONTROL_CAP_CHARM_30S   = 13181,
+    SPELL_MIND_CONTROL_CAP_CHARM_10S   = 26740,
+    SPELL_DULLARD                      = 67809,
 };
 
 class spell_item_mind_amplify_dish : public SpellScript
 {
     PrepareSpellScript(spell_item_mind_amplify_dish)
 
+    bool Load() override
+    {
+        return GetCastItem() != nullptr;
+    }
+
+    bool Validate(SpellInfo const* /*spell*/) override
+    {
+        return ValidateSpellInfo({ SPELL_MIND_CONTROL_CAP_CHARM_10S, SPELL_MIND_CONTROL_CAP_CHARM_30S, SPELL_DULLARD, SPELL_MENTAL_BATTLE });
+    }
+
     void OnDummyEffect(SpellEffIndex effIndex)
     {
         PreventHitDefaultEffect(effIndex);
 
         Unit* caster = GetCaster();
-        if (Player* player = caster->ToPlayer())
+        Unit* target = GetHitUnit();
+        if (!caster || !target)
+            return;
+
+        // little protection
+        if (target->ToCreature() && target->ToCreature()->GetCreatureTemplate()->rank > CREATURE_ELITE_NORMAL)
+                return;
+
+        uint32 charmSpell = GetSpellInfo()->Id == SPELL_AMPLIFICATION_DISH ? SPELL_MIND_CONTROL_CAP_CHARM_10S : SPELL_MIND_CONTROL_CAP_CHARM_30S;
+
+        // 5% of the time - Backfire
+        // 65% of the time - Successful Mind Control.
+        // 30% of the time - Unsuccessful Mind Control.
+        int32 backfire = 5;
+        int32 failure = 30;
+
+        // Increased chance of failure when used against targets over level 60.
+        bool isIncreasedChanceOfFailure = GetSpellInfo()->Id == SPELL_MIND_CONTROL_CAP && target->GetLevel() > 60;
+        if (isIncreasedChanceOfFailure)
         {
-            if (Unit* target = GetHitUnit())
-            {
-                // little protection
-                if (target->ToCreature())
-                    if (target->ToCreature()->GetCreatureTemplate()->rank > CREATURE_ELITE_NORMAL)
-                        return;
-
-                if (GetSpellInfo()->Id != SPELL_AMPLIFY_10S)
-                    if (target->GetLevel() > 60)
-                        return;
-
-                uint8 pct = std::max(0, 20 + player->GetLevel() - target->GetLevel());
-                if (roll_chance_i(pct))
-                    player->CastSpell(target, SPELL_MENTAL_BATTLE, true);
-                else if (roll_chance_i(pct))
-                    player->CastSpell(target, GetSpellInfo()->Id == SPELL_AMPLIFY_10S ? SPELL_AMPLIFY_CHARM_10S : SPELL_AMPLIFY_CHARM_30S, true);
-            }
+            backfire = 20; // not verified
+            failure = 45; // not verified
         }
+
+        int32 roll = irand(0, 99);
+        if (roll < backfire)
+            target->CastSpell(caster, charmSpell, true, GetCastItem());
+        else if (roll < backfire + failure)
+        {
+            if (roll_chance_i(50)) // not verified
+                caster->CastSpell(target, SPELL_MENTAL_BATTLE, true, GetCastItem());
+            else
+                caster->CastSpell(caster, SPELL_DULLARD, true, GetCastItem());
+        }
+        else // success
+            caster->CastSpell(target, charmSpell, true, GetCastItem());
     }
 
     void Register() override
@@ -787,27 +816,25 @@ class spell_item_feast : public SpellScript
         Unit* caster = GetCaster();
         if (Player* player = caster->ToPlayer())
         {
-            LocaleConstant loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
-
+            uint32 textId = 0;
             switch (GetSpellInfo()->Id)
             {
                 case SPELL_GREAT_FEAST:
-                    if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(GREAT_FEAST_BROADCAST_TEXT_ID_PREPARE))
-                        player->TextEmote(bct->GetText(loc_idx, player->getGender()), player);
+                    textId = GREAT_FEAST_BROADCAST_TEXT_ID_PREPARE;
                     break;
                 case SPELL_FISH_FEAST:
-                    if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(FISH_FEAST_BROADCAST_TEXT_ID_PREPARE))
-                        player->TextEmote(bct->GetText(loc_idx, player->getGender()), player);
+                    textId = FISH_FEAST_BROADCAST_TEXT_ID_PREPARE;
                     break;
                 case SPELL_SMALL_FEAST:
-                    if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(SMALL_FEAST_BROADCAST_TEXT_ID_PREPARE))
-                        player->TextEmote(bct->GetText(loc_idx, player->getGender()), player);
+                    textId = SMALL_FEAST_BROADCAST_TEXT_ID_PREPARE;
                     break;
                 case SPELL_GIGANTIC_FEAST:
-                    if (BroadcastText const* bct = sObjectMgr->GetBroadcastText(GIGANTIC_FEAST_BROADCAST_TEXT_ID_PREPARE))
-                        player->TextEmote(bct->GetText(loc_idx, player->getGender()), player);
+                    textId = GIGANTIC_FEAST_BROADCAST_TEXT_ID_PREPARE;
+                    break;
+                default:
                     break;
             }
+            player->Unit::TextEmote(textId, player);
         }
     }
 

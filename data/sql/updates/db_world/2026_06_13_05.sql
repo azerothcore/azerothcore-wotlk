@@ -1,0 +1,3 @@
+-- DB update 2026_06_13_04 -> 2026_06_13_05
+--
+UPDATE `spell_cone` SET `ConeDegrees`=82 WHERE `ID` IN (55696, 55697, 50155, 15847, 23364, 25653, 50155);
