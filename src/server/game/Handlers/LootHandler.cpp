@@ -230,9 +230,11 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
             if (player->HasPlayerFlag(PLAYER_FLAGS_PARTIAL_PLAY_TIME))
                 finalGold /= 2;
 
+            // fire the hook regardless of the CAIS reduction, matching OnLootMoney below
+            sScriptMgr->OnPlayerAfterCreatureLootMoney(player);
+
             if (finalGold)
             {
-                sScriptMgr->OnPlayerAfterCreatureLootMoney(player);
                 player->ModifyMoney(finalGold);
                 player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_MONEY, finalGold);
 
