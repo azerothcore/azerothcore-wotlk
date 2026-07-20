@@ -611,13 +611,6 @@ struct boss_yoggsaron_sara : public ScriptedAI
         }
     }
 
-    void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
-    {
-        if (spellInfo->Id == SPELL_SANITY)
-            if (Aura* aur = target->GetAura(SPELL_SANITY))
-                aur->SetStackAmount(100);
-    }
-
     uint32 GetData(uint32 param) const override
     {
         if (param == DATA_GET_KEEPERS_COUNT)
@@ -2504,6 +2497,22 @@ class spell_yogg_saron_insane_aura : public AuraScript
     }
 };
 
+// 63050 - Sanity
+class spell_yogg_saron_sanity : public SpellScript
+{
+    PrepareSpellScript(spell_yogg_saron_sanity);
+
+    void ModSanityStacks()
+    {
+        GetSpell()->SetSpellValue(SPELLVALUE_AURA_STACK, 100);
+    }
+
+    void Register() override
+    {
+        BeforeCast += SpellCastFn(spell_yogg_saron_sanity::ModSanityStacks);
+    }
+};
+
 // 64169 - Sanity Well
 class spell_yogg_saron_sanity_well_aura : public AuraScript
 {
@@ -2862,6 +2871,7 @@ void AddSC_boss_yoggsaron()
     RegisterSpellScript(spell_yogg_saron_empowered_aura);
     RegisterSpellScript(spell_yogg_saron_insane_periodic_trigger);
     RegisterSpellScript(spell_yogg_saron_insane_aura);
+    RegisterSpellScript(spell_yogg_saron_sanity);
     RegisterSpellScript(spell_yogg_saron_sanity_well_aura);
     RegisterSpellScript(spell_keeper_freya_summon_sanity_well);
     RegisterSpellScript(spell_yogg_saron_sanity_reduce);

@@ -83,7 +83,7 @@ namespace MMAP
 
         void loadMap(uint32 mapID, uint32 tileX, uint32 tileY, MeshData& meshData);
         bool loadVMap(uint32 mapID, uint32 tileX, uint32 tileY, MeshData& meshData);
-        void loadOffMeshConnections(uint32 mapID, uint32 tileX, uint32 tileY, MeshData& meshData, char const* offMeshFilePath);
+        void loadOffMeshConnections(uint32 mapID, uint32 tileX, uint32 tileY, MeshData& meshData, std::vector<std::string> const& offMeshLines);
 
         [[nodiscard]] bool usesLiquids() const { return !m_skipLiquid; }
 

@@ -125,7 +125,6 @@ namespace MMAP
     public:
         MapBuilder(Config* config,
                    int mapid,
-                   char const* offMeshFilePath,
                    unsigned int threads);
 
         ~MapBuilder();
@@ -167,7 +166,6 @@ namespace MMAP
 
         bool m_debugOutput;
 
-        char const* m_offMeshFilePath;
         unsigned int m_threads;
         bool m_skipContinents;
         bool m_skipJunkMaps;
