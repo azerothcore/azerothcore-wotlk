@@ -93,7 +93,7 @@ enum AccountFlag
     ACCOUNT_FLAG_EXPANSION2_COLLECTOR = 0x4000000,  // NYI WotLK Collector's Edition
     ACCOUNT_FLAG_OVERMIND_LINKED      = 0x8000000,  // NYI Linked with Battle.net account
     ACCOUNT_FLAG_DEMOS                = 0x10000000, // NYI UNK
-    ACCOUNT_FLAG_DEATH_KNIGHT_OK      = 0x20000000, // NYI Has level 55 on account?
+    ACCOUNT_FLAG_DEATH_KNIGHT_OK      = 0x20000000, // Allowed to create Death Knight (account met heroic level requirement on WotLK+)
     // Below might be StarCraft II related
     ACCOUNT_FLAG_S2_REQUIRE_IGR       = 0x40000000, // NYI UNK
     ACCOUNT_FLAG_S2_TRIAL             = 0x80000000, // NYI UNK
@@ -112,6 +112,14 @@ constexpr uint32 ACCOUNT_FLAGS_ALL =
     ACCOUNT_FLAG_PENDING_UPGRADE | ACCOUNT_FLAG_RETAIL_FROM_TRIAL | ACCOUNT_FLAG_EXPANSION2_COLLECTOR |
     ACCOUNT_FLAG_OVERMIND_LINKED | ACCOUNT_FLAG_DEMOS | ACCOUNT_FLAG_DEATH_KNIGHT_OK |
     ACCOUNT_FLAG_S2_REQUIRE_IGR | ACCOUNT_FLAG_S2_TRIAL;
+
+struct AccountFlagName
+{
+    char const* full;
+    char const* shortName;
+};
+
+AC_COMMON_API extern AccountFlagName const accountFlagNames[MAX_ACCOUNT_FLAG];
 
 enum LocaleConstant
 {

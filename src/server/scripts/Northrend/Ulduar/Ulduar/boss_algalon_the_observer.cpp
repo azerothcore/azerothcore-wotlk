@@ -364,7 +364,7 @@ struct boss_algalon_the_observer : public ScriptedAI
         }
 
         if (_instance)
-            _instance->SetData(BOSS_ALGALON, FAIL);
+            _instance->SetBossState(BOSS_ALGALON, FAIL);
 
         ScriptedAI::EnterEvadeMode(why);
     }
@@ -391,7 +391,7 @@ struct boss_algalon_the_observer : public ScriptedAI
         }
 
         if (_instance)
-            _instance->SetData(BOSS_ALGALON, NOT_STARTED);
+            _instance->SetBossState(BOSS_ALGALON, NOT_STARTED);
     }
 
     void KilledUnit(Unit* victim) override
@@ -446,7 +446,7 @@ struct boss_algalon_the_observer : public ScriptedAI
                 me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->InterruptNonMeleeSpells(false);
                 if (_instance)
-                    _instance->SetData(BOSS_ALGALON, NOT_STARTED);
+                    _instance->SetBossState(BOSS_ALGALON, NOT_STARTED);
                 break;
             case ACTION_INIT_ALGALON:
                 _firstPull = false;
@@ -622,7 +622,7 @@ struct boss_algalon_the_observer : public ScriptedAI
 
     bool IsInRoom()
     {
-        if (me->GetExactDist2d(&me->GetHomePosition()) > 45.f || me->GetPositionZ() < 410.f)
+        if (me->GetExactDist2d(&me->GetHomePosition()) > 47.f || me->GetPositionZ() < 410.f)
         {
             DoAction(ACTION_ASCEND);
             return false;
@@ -660,7 +660,7 @@ struct boss_algalon_the_observer : public ScriptedAI
                     brann->AI()->DoAction(ACTION_FINISH_INTRO);
                 break;
             case EVENT_START_COMBAT:
-                _instance->SetData(BOSS_ALGALON, IN_PROGRESS);
+                _instance->SetBossState(BOSS_ALGALON, IN_PROGRESS);
                 Talk(SAY_ALGALON_AGGRO);
                 break;
             case EVENT_REMOVE_UNNATTACKABLE:
@@ -690,12 +690,17 @@ struct boss_algalon_the_observer : public ScriptedAI
                 events.Repeat(15s + 500ms);
                 break;
             case EVENT_SUMMON_COLLAPSING_STAR:
+            {
                 Talk(SAY_ALGALON_COLLAPSING_STAR);
                 Talk(EMOTE_ALGALON_COLLAPSING_STAR);
-                for (uint8 i = 0; i < COLLAPSING_STAR_COUNT; ++i)
-                    me->SummonCreature(NPC_COLLAPSING_STAR, CollapsingStarPos[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
+                uint8 activeStars = summons.GetEntryCount(NPC_COLLAPSING_STAR);
+                if (activeStars < COLLAPSING_STAR_COUNT)
+                    for (uint8 i = activeStars; i < COLLAPSING_STAR_COUNT; ++i)
+                        me->SummonCreature(NPC_COLLAPSING_STAR, CollapsingStarPos[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
+
                 events.Repeat(1min);
                 break;
+            }
             case EVENT_COSMIC_SMASH:
                 Talk(EMOTE_ALGALON_COSMIC_SMASH);
                 me->CastCustomSpell(SPELL_COSMIC_SMASH, SPELLVALUE_MAX_TARGETS, RAID_MODE(1, 3), (Unit*)nullptr);
@@ -737,7 +742,7 @@ struct boss_algalon_the_observer : public ScriptedAI
             case EVENT_OUTRO_START:
                 if (_instance)
                 {
-                    _instance->SetData(BOSS_ALGALON, DONE);
+                    _instance->SetBossState(BOSS_ALGALON, DONE);
                     _instance->SetData(DATA_ALGALON_DEFEATED, 1);
                 }
                 break;
@@ -944,7 +949,7 @@ struct npc_living_constellation : public ScriptedAI
     void Reset() override
     {
         events.Reset();
-        events.ScheduleEvent(EVENT_ARCANE_BARRAGE, 2500ms);
+        events.ScheduleEvent(EVENT_ARCANE_BARRAGE, 5s);
         _isActive = false;
     }
 
@@ -1002,8 +1007,8 @@ struct npc_living_constellation : public ScriptedAI
         switch (events.ExecuteEvent())
         {
             case EVENT_ARCANE_BARRAGE:
-                me->CastCustomSpell(SPELL_ARCANE_BARRAGE, SPELLVALUE_MAX_TARGETS, 1, (Unit*)nullptr, true);
-                events.Repeat(2500ms);
+                me->CastCustomSpell(SPELL_ARCANE_BARRAGE, SPELLVALUE_MAX_TARGETS, 1, (Unit*)nullptr, false);
+                events.Repeat(5s);
                 break;
             case EVENT_RESUME_UPDATING:
                 events.SetPhase(0);

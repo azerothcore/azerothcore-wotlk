@@ -30,14 +30,14 @@ jobs:
       fail-fast: true
       matrix:
         include:
-          - os: ubuntu-22.04
-            compiler:
-              CC: clang-15
-              CXX: clang++-15
           - os: ubuntu-24.04
             compiler:
               CC: clang-18
               CXX: clang++-18
+          - os: ubuntu-26.04
+            compiler:
+              CC: clang-20
+              CXX: clang++-20
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}-${{ matrix.compiler.CC }}-pch
     if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft

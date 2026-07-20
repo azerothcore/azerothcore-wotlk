@@ -20,6 +20,7 @@
 
 #include <utility>
 
+#include "ByteBuffer.h"
 #include "DBCStructure.h"
 #include "Field.h"
 #include "LFG.h"
@@ -562,8 +563,8 @@ namespace lfg
         void SendRaidBrowserJoinedPacket(Player* p, LfgDungeonSet& dungeons, std::string comment);
         void RBPacketAppendGroup(const RBInternalInfo& info, ByteBuffer& buffer);
         void RBPacketAppendPlayer(const RBInternalInfo& info, ByteBuffer& buffer);
-        void RBPacketBuildDifference(WorldPacket& differencePacket, uint32 dungeonId, uint32 deletedCounter, ByteBuffer& buffer_deleted, uint32 groupCounter, ByteBuffer& buffer_groups, uint32 playerCounter, ByteBuffer& buffer_players);
-        void RBPacketBuildFull(WorldPacket& fullPacket, uint32 dungeonId, RBInternalInfoMap& infoMap);
+        void RBPacketBuildDifference(WorldPacket& differencePacket, uint32 dungeonId, uint32 deletedCounter, ByteBuffer const& bufferDeleted, uint32 groupCounter, ByteBuffer const& bufferGroups, uint32 playerCounter, ByteBuffer const& bufferPlayers);
+        void RBPacketBuildFull(WorldPacket& fullPacket, uint32 dungeonId, RBInternalInfoMap const& infoMap);
 
         // LfgQueue
         /// Get last lfg state (NONE, DUNGEON or FINISHED_DUNGEON)
@@ -627,6 +628,12 @@ namespace lfg
         uint32 lastProposalId;                             ///< pussywizard, store it here because of splitting LFGMgr update into tasks
         uint32 m_raidBrowserUpdateTimer[2];                ///< pussywizard
         uint32 m_raidBrowserLastUpdatedDungeonId[2];       ///< pussywizard: for 2 factions
+        ByteBuffer _rbBufferDeleted;
+        ByteBuffer _rbBufferGroups;
+        ByteBuffer _rbBufferPlayers;
+        GuidSet _rbDeletedGroups;
+        GuidSet _rbDeletedGroupsToErase;
+        RBInternalInfoMap _rbCopy;
 
         LfgQueueContainer QueuesStore;                     ///< Queues
         LfgCachedDungeonContainer CachedDungeonMapStore;   ///< Stores all dungeons by groupType
