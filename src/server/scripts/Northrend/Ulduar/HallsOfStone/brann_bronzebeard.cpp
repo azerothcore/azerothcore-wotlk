@@ -662,6 +662,7 @@ struct brann_bronzebeard : public ScriptedAI
     {
         // Stop all combat abilities and spawning
         scheduler.CancelAll();
+        me->m_Events.KillAllEvents(false);
 
         // Schedule end sequence talks
         me->m_Events.AddEventAtOffset([this] {
