@@ -156,7 +156,7 @@ namespace MMAP
         bool isTransportMap(uint32 mapID) const;
         bool isContinentMap(uint32 mapID) const;
 
-        rcConfig getRecastConfig(ResolvedMeshConfig const&cfg, float bmin[3], float bmax[3]) const;
+        rcConfig getRecastConfig(ResolvedMeshConfig const& cfg, float bmin[3], float bmax[3]) const;
 
         uint32 percentageDone(uint32 totalTiles, uint32 totalTilesDone) const;
         uint32 currentPercentageDone() const;

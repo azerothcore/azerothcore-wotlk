@@ -76,7 +76,7 @@ namespace MMAP
     class TerrainBuilder
     {
     public:
-        TerrainBuilder(std::string const&mapsPath, bool skipLiquid);
+        TerrainBuilder(std::string const& mapsPath, bool skipLiquid);
         ~TerrainBuilder();
 
         TerrainBuilder(TerrainBuilder const& tb) = delete;

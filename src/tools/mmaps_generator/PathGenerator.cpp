@@ -24,7 +24,7 @@
 
 using namespace MMAP;
 
-bool checkDirectories(std::string const&dataDirPath, bool debugOutput)
+bool checkDirectories(std::string const& dataDirPath, bool debugOutput)
 {
     std::vector<std::string> dirFiles;
 

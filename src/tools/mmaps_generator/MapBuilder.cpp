@@ -1058,7 +1058,7 @@ namespace MMAP
         return header.recastConfig == desiredRecastConfig;
     }
 
-    rcConfig MapBuilder::getRecastConfig(ResolvedMeshConfig const&cfg, float bmin[3], float bmax[3]) const
+    rcConfig MapBuilder::getRecastConfig(ResolvedMeshConfig const& cfg, float bmin[3], float bmax[3]) const
     {
         rcConfig config;
         memset(&config, 0, sizeof(rcConfig));

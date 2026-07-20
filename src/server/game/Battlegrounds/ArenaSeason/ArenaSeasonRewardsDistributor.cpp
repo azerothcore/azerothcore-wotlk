@@ -24,7 +24,7 @@
 
 constexpr float minPctTeamGamesForMemberToGetReward = 30;
 
-void ArenaSeasonTeamRewarderImpl::RewardTeamWithRewardGroup(ArenaTeam *arenaTeam, ArenaSeasonRewardGroup const&rewardGroup)
+void ArenaSeasonTeamRewarderImpl::RewardTeamWithRewardGroup(ArenaTeam *arenaTeam, ArenaSeasonRewardGroup const& rewardGroup)
 {
     RewardWithMail(arenaTeam, rewardGroup);
     RewardWithAchievements(arenaTeam, rewardGroup);
