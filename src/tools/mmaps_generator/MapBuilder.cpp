@@ -55,10 +55,9 @@ namespace MMAP
             m_workerThread.join();
     }
 
-    MapBuilder::MapBuilder(Config* config, int mapid, const char* offMeshFilePath, unsigned int threads) :
+    MapBuilder::MapBuilder(Config* config, int mapid, unsigned int threads) :
         m_config             (config),
         m_debugOutput        (config->IsDebugOutputEnabled()),
-        m_offMeshFilePath    (offMeshFilePath),
         m_threads            (threads),
         m_skipContinents     (config->ShouldSkipContinents()),
         m_skipJunkMaps       (config->ShouldSkipJunkMaps()),
@@ -497,8 +496,7 @@ namespace MMAP
         // get bounds of current tile
         float bmin[3], bmax[3];
         m_mapBuilder->getTileBounds(tileX, tileY, allVerts.getCArray(), allVerts.size() / 3, bmin, bmax);
-
-        m_terrainBuilder->loadOffMeshConnections(mapID, tileX, tileY, meshData, m_mapBuilder->m_offMeshFilePath);
+        m_terrainBuilder->loadOffMeshConnections(mapID, tileX, tileY, meshData, m_mapBuilder->getConfig().OffMeshConnections());
 
         // build navmesh tile
         buildMoveMapTile(mapID, tileX, tileY, meshData, bmin, bmax, navMesh);
@@ -818,7 +816,7 @@ namespace MMAP
             }
             if (params.vertCount >= 0xffff)
             {
-                printf("%s Too many vertices!                      \n", tileString);
+                printf("%s Too many vertices! %d out of %d!        \n", tileString, params.vertCount, 0xffff);
                 break;
             }
             if (!params.vertCount || !params.verts)

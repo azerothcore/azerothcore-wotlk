@@ -204,7 +204,7 @@ public:
     void   RemoveInvite(Player* player);
     void   RemoveAllInvites();
     bool   AddLeaderInvite(Player* player);
-    bool   AddMember(Player* player);
+    bool   AddMember(Player* player, uint8 roles = 0);
     bool   RemoveMember(ObjectGuid guid, const RemoveMethod& method = GROUP_REMOVEMETHOD_DEFAULT, ObjectGuid kicker = ObjectGuid::Empty, const char* reason = nullptr);
     void   ChangeLeader(ObjectGuid guid);
     void   SetLootMethod(LootMethod method);
@@ -295,6 +295,7 @@ public:
     bool isRollLootActive() const;
     void SendLootStartRoll(uint32 CountDown, uint32 mapid, const Roll& r);
     void SendLootStartRollToPlayer(uint32 countDown, uint32 mapId, Player* p, bool canNeed, Roll const& r);
+    void SendPendingRollsToPlayer(Player* player, Map* map);
     void SendLootRoll(ObjectGuid SourceGuid, ObjectGuid TargetGuid, uint8 RollNumber, uint8 RollType, const Roll& r, bool autoPass = false);
     void SendLootRollWon(ObjectGuid SourceGuid, ObjectGuid TargetGuid, uint8 RollNumber, uint8 RollType, const Roll& r);
     void SendLootAllPassed(Roll const& roll);
@@ -303,9 +304,9 @@ public:
     void NeedBeforeGreed(Loot* loot, WorldObject* pLootedObject);
     void MasterLoot(Loot* loot, WorldObject* pLootedObject);
     Rolls::iterator GetRoll(ObjectGuid Guid);
-    void CountTheRoll(Rolls::iterator roll, Map* allowedMap);
+    void CountTheRoll(Rolls::iterator roll);
     bool CountRollVote(ObjectGuid playerGUID, ObjectGuid Guid, uint8 Choise);
-    void EndRoll(Loot* loot, Map* allowedMap);
+    void EndRoll(Loot* loot);
     void RemovePlayerFromRolls(ObjectGuid guid);
 
     // related to disenchant rolls

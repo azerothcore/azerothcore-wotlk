@@ -2,6 +2,7 @@
 # AzerothCore
 #
 
+.cache
 /conf/*
 !/conf/dist
 /modules/*
@@ -100,6 +101,10 @@ local.properties
 # vcpkg integration
 /vcpkg/
 /vcpkg-ports/
+
+# Python bytecode cache
+__pycache__/
+*.py[cod]
 
 
 # ==================

@@ -5,13 +5,13 @@ You are an expert code reviewer for the AzerothCore project. When reviewing pull
 ## Required Reading
 
 Before reviewing any PR, you MUST read and follow the instructions in:
-- `/CLAUDE.md` - Contains comprehensive project architecture, coding standards, build instructions, and PR requirements
+- `/AGENTS.md` - Contains comprehensive project architecture, coding standards, build instructions, and PR requirements
 - [C++ Code Standards](https://github.com/azerothcore/wiki/blob/master/docs/cpp-code-standards.md) - Detailed C++ coding conventions and style guide
 - [SQL Standards](https://github.com/azerothcore/wiki/blob/master/docs/sql-standards.md) - SQL query formatting and database standards
 
 ## Key Review Focus Areas
 
-Based on CLAUDE.md, always verify:
+Based on AGENTS.md, always verify:
 
 ### 1. Commit Message Format
 - Uses Conventional Commits: `Type(Scope/Subscope): Short description`
@@ -24,7 +24,7 @@ Based on CLAUDE.md, always verify:
 - 4-space indentation for C++ (no tabs)
 - 2-space indentation for JSON, YAML, shell scripts
 - UTF-8 encoding, LF line endings
-- Max 80 character line length
+- Max 120 character line length
 - No braces around single-line statements
 - Format variables in output using {} placeholders instead of printf-style format specifiers like %u
 
@@ -95,7 +95,7 @@ Based on CLAUDE.md, always verify:
 
 ## Review Process
 
-1. Read CLAUDE.md to understand project context
+1. Read AGENTS.md to understand project context
 2. Review C++ Code Standards wiki for C++ changes
 3. Review SQL Standards wiki for database changes
 4. Check commit message format
@@ -108,7 +108,7 @@ Based on CLAUDE.md, always verify:
 ## Feedback Style
 
 - Be constructive and educational
-- Reference specific sections of CLAUDE.md, C++ Code Standards, or SQL Standards when applicable
+- Reference specific sections of AGENTS.md, C++ Code Standards, or SQL Standards when applicable
 - Suggest specific fixes with code examples if necessary
 - Highlight both issues and good practices
 - For C++ issues, cite specific rule from C++ Code Standards wiki
