@@ -19,6 +19,7 @@
 #include "ArenaSpectator.h"
 #include "ArenaTeam.h"
 #include "BattlegroundMgr.h"
+#include "BattlegroundUtils.h"
 #include "Chat.h"
 #include "ChatTextBuilder.h"
 #include "Creature.h"
@@ -240,6 +241,12 @@ Battleground::~Battleground()
 
     for (auto const& itr : PlayerScores)
         delete itr.second;
+}
+
+uint32 Battleground::GetMinPlayersPerTeam() const
+{
+    uint32 lowLevelsOverride = GetLowLevelsMinPlayersOverride(GetBgTypeID());
+    return (lowLevelsOverride && !isTemplate() && !isMaxLevel() && !isArena()) ? lowLevelsOverride : m_MinPlayersPerTeam;
 }
 
 void Battleground::Update(uint32 diff)
