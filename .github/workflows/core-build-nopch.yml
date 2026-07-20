@@ -42,7 +42,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          full='{"include":[{"os":"ubuntu-22.04","compiler":{"CC":"clang-15","CXX":"clang++-15"}},{"os":"ubuntu-24.04","compiler":{"CC":"clang-18","CXX":"clang++-18"}},{"os":"ubuntu-24.04","compiler":{"CC":"gcc-14","CXX":"g++-14"}}]}'
+          full='{"include":[{"os":"ubuntu-24.04","compiler":{"CC":"clang-18","CXX":"clang++-18"}},{"os":"ubuntu-24.04","compiler":{"CC":"gcc-14","CXX":"g++-14"}},{"os":"ubuntu-26.04","compiler":{"CC":"clang-20","CXX":"clang++-20"}}]}'
           single='{"include":[{"os":"ubuntu-24.04","compiler":{"CC":"clang-18","CXX":"clang++-18"}}]}'
 
           matrix="$full"

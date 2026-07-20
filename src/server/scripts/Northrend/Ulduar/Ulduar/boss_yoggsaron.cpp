@@ -49,6 +49,8 @@ enum YoggSpells
     SPELL_TITANIC_STORM_PASSIVE         = 64171,
     SPELL_WEAKENED                      = 64162,
 
+    SPELL_TELEPORT_PORTAL_VISUAL        = 64416,
+
     // GLOBAL
     SPELL_SANITY_BASE                   = 63786,
     SPELL_SANITY                        = 63050,
@@ -70,6 +72,7 @@ enum YoggSpells
 
     // GUARDIANS OF YOGG-SARON
     SPELL_SHADOW_NOVA                   = 62714,
+    SPELL_SHADOW_NOVA_SARA              = 65719,
     SPELL_DARK_VOLLEY                   = 63038,
 
     // SARA P2
@@ -290,16 +293,16 @@ const uint32 TABLE_GOSSIP_ENTRY[4] = {NPC_FREYA_GOSSIP, NPC_HODIR_GOSSIP, NPC_MI
 
 static LocationsXY yoggPortalLoc[] =
 {
-    {1970.48f, -9.75f, 325.5f},
-    {1992.76f, -10.21f, 325.5f},
-    {1995.53f, -39.78f, 325.5f},
-    {1969.25f, -42.00f, 325.5f},
-    {1960.62f, -32.00f, 325.5f},
-    {1981.98f, -5.69f, 325.5f},
-    {1982.78f, -45.73f, 325.5f},
-    {2000.66f, -29.68f, 325.5f},
-    {1999.88f, -19.61f, 325.5f},
-    {1961.37f, -19.54f, 325.5f}
+    {1964.60f, -42.71f, 325.08f},
+    {1986.94f, -46.21f, 324.98f},
+    {1989.50f,  -6.70f, 325.08f},
+    {1965.52f,  -8.09f, 324.95f},
+    {2000.84f, -25.40f, 325.19f},
+    {1960.22f, -26.14f, 325.01f},
+    {1976.30f, -47.83f, 325.11f},
+    {1997.69f, -37.46f, 325.04f},
+    {1998.07f, -13.36f, 325.17f},
+    {1976.99f,  -3.96f, 325.17f}
 };
 
 enum Texts
@@ -452,6 +455,8 @@ struct boss_yoggsaron_sara : public ScriptedAI
         me->SetVisible(true);
         me->SetDisplayId(me->GetNativeDisplayId());
         me->SetDisableGravity(true);
+        me->SetFaction(FACTION_FRIENDLY);
+        me->ClearUnitState(UNIT_STATE_EVADE);
         EnableSara(false);
         SpawnClouds();
 
@@ -491,8 +496,6 @@ struct boss_yoggsaron_sara : public ScriptedAI
         DespawnGossipKeepers();
         // Engage Keepers
         summons.DoZoneInCombat();
-
-        me->CastSpell(me, SPELL_SANITY_BASE, true);
 
         events.ScheduleEvent(EVENT_SARA_P1_DOORS_CLOSE, 15s, 0, EVENT_PHASE_ONE);
         events.ScheduleEvent(EVENT_SARA_P1_BERSERK, 15min, 0, 0);
@@ -579,15 +582,15 @@ struct boss_yoggsaron_sara : public ScriptedAI
     void AddPortals()
     {
         _summonSpeed -= 0.1f;
-        Creature* cr = nullptr;
+        Creature* creature = nullptr;
 
         // Spawn Portals
         for (uint8 i = 0; i < RAID_MODE(4, 10); ++i)
         {
-            if ((cr = me->SummonCreature(NPC_DESCEND_INTO_MADNESS, yoggPortalLoc[i].x, yoggPortalLoc[i].y, yoggPortalLoc[i].z, 0, TEMPSUMMON_TIMED_DESPAWN, 25000)))
+            if ((creature = me->SummonCreature(NPC_DESCEND_INTO_MADNESS, yoggPortalLoc[i].x, yoggPortalLoc[i].y, yoggPortalLoc[i].z, 0, TEMPSUMMON_TIMED_DESPAWN, 25000)))
             {
-                cr->SetUnitFlag(UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NON_ATTACKABLE);
-                cr->SetArmor(_currentIllusion);
+                creature->SetArmor(_currentIllusion);
+                creature->CastSpell(creature, SPELL_TELEPORT_PORTAL_VISUAL, true);
             }
         }
 
@@ -606,13 +609,6 @@ struct boss_yoggsaron_sara : public ScriptedAI
         {
             Talk(SAY_SARA_KILL);
         }
-    }
-
-    void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
-    {
-        if (spellInfo->Id == SPELL_SANITY)
-            if (Aura* aur = target->GetAura(SPELL_SANITY))
-                aur->SetStackAmount(100);
     }
 
     uint32 GetData(uint32 param) const override
@@ -699,39 +695,33 @@ struct boss_yoggsaron_sara : public ScriptedAI
         me->CastSpell(me, SPELL_SHATTERED_ILLUSION, true);
     }
 
-    void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
+    void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
     {
         // Guardians can be spawned by walking into Ominous Clouds even when InitFight
         // never ran (e.g. Vezax not defeated); their novas must not start phase 2 then.
-        if (!_instance || _instance->GetBossState(BOSS_YOGGSARON) != IN_PROGRESS)
+        if (!_instance || _instance->GetBossState(BOSS_YOGGSARON) != IN_PROGRESS || !attacker || attacker->GetEntry() != NPC_GUARDIAN_OF_YS || _secondPhase)
         {
             damage = 0;
             return;
         }
 
-        if (who && who->GetEntry() == NPC_GUARDIAN_OF_YS && !_secondPhase)
+        // START PHASE 2
+        if (me->GetHealth() <= damage)
         {
-            damage = 25000;
+            _secondPhase = true;
+            damage = 0;
 
-            // START PHASE 2
-            if (me->GetHealth() <= damage)
-            {
-                _secondPhase = true;
-                damage = 0;
+            events.SetPhase(EVENT_PHASE_TWO);
+            me->SetHealth(me->GetMaxHealth());
+            me->SetInCombatWithZone();
+            me->SetFaction(FACTION_MONSTER_2);
 
-                events.SetPhase(EVENT_PHASE_TWO);
-                me->SetHealth(me->GetMaxHealth());
+            if (Creature* creature = me->SummonCreature(NPC_YOGG_SARON, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), M_PI))
+                creature->SetVisible(false);
 
-                if (Creature* cr = me->SummonCreature(NPC_YOGG_SARON, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), M_PI))
-                    cr->SetVisible(false);
-
-                _p2TalkTimer++;
-                Talk(SAY_SARA_TRANSFORM_1);
-            }
-            return;
+            _p2TalkTimer++;
+            Talk(SAY_SARA_TRANSFORM_1);
         }
-
-        damage = 0;
     }
 
     // Players who descend into a portal are teleported ~100 yd below to the illusion
@@ -1040,7 +1030,8 @@ struct boss_yoggsaron_guardian_of_ys : public ScriptedAI
 
     void JustDied(Unit*) override
     {
-        me->CastSpell((Unit*)nullptr, SPELL_SHADOW_NOVA, true);
+        DoCastAOE(SPELL_SHADOW_NOVA, true);
+        DoCastAOE(SPELL_SHADOW_NOVA_SARA, true);
     }
 
     void UpdateAI(uint32 diff) override
@@ -2101,7 +2092,8 @@ struct boss_yoggsaron_voice : public NullCreatureAI
 
     void Reset() override
     {
-        me->CastSpell(me, SPELL_INSANE_PERIODIC, true);
+        DoCastSelf(SPELL_INSANE_PERIODIC, true);
+        DoCastSelf(SPELL_SANITY_BASE, true);
     }
 
     void SpellHitTarget(Unit* target, SpellInfo const* spellInfo) override
@@ -2505,6 +2497,22 @@ class spell_yogg_saron_insane_aura : public AuraScript
     }
 };
 
+// 63050 - Sanity
+class spell_yogg_saron_sanity : public SpellScript
+{
+    PrepareSpellScript(spell_yogg_saron_sanity);
+
+    void ModSanityStacks()
+    {
+        GetSpell()->SetSpellValue(SPELLVALUE_AURA_STACK, 100);
+    }
+
+    void Register() override
+    {
+        BeforeCast += SpellCastFn(spell_yogg_saron_sanity::ModSanityStacks);
+    }
+};
+
 // 64169 - Sanity Well
 class spell_yogg_saron_sanity_well_aura : public AuraScript
 {
@@ -2863,6 +2871,7 @@ void AddSC_boss_yoggsaron()
     RegisterSpellScript(spell_yogg_saron_empowered_aura);
     RegisterSpellScript(spell_yogg_saron_insane_periodic_trigger);
     RegisterSpellScript(spell_yogg_saron_insane_aura);
+    RegisterSpellScript(spell_yogg_saron_sanity);
     RegisterSpellScript(spell_yogg_saron_sanity_well_aura);
     RegisterSpellScript(spell_keeper_freya_summon_sanity_well);
     RegisterSpellScript(spell_yogg_saron_sanity_reduce);

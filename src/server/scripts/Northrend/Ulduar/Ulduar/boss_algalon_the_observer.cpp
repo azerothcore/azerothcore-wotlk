@@ -118,7 +118,7 @@ enum Events
     EVENT_INTRO_2                   = 7,
     EVENT_INTRO_3                   = 8,
     EVENT_INTRO_FINISH              = 9,
-    EVENT_START_COMBAT              = 10,
+    EVENT_SAY_ALGALON_AGGRO         = 10,
     EVENT_INTRO_TIMER_DONE          = 11,
     EVENT_QUANTUM_STRIKE            = 12,
     EVENT_PHASE_PUNCH               = 13,
@@ -143,7 +143,7 @@ enum Events
     EVENT_OUTRO_11                  = 32,
     EVENT_ACTIVATE_LIVING_CONSTELLATION = 33,
     EVENT_CHECK_HERALD_ITEMS        = 34,
-    EVENT_REMOVE_UNNATTACKABLE      = 35,
+    EVENT_ALGALON_IN_PROGRESS       = 35,
     EVENT_DESPAWN_ALGALON_1         = 36,
     EVENT_DESPAWN_ALGALON_2         = 37,
     EVENT_DESPAWN_ALGALON_3         = 38,
@@ -264,10 +264,13 @@ struct boss_algalon_the_observer : public ScriptedAI
 {
     boss_algalon_the_observer(Creature* creature) : ScriptedAI(creature), summons(me)
     {
-        _fedOnTears = true;
-        _firstPull = true;
-        _fightWon = false;
         _instance = me->GetInstanceScript();
+        _fedOnTears = true;
+        _fightWon = false;
+        if (_instance)
+            _firstPull = !_instance->GetPersistentData(PERSISTENT_DATA_ALGALON_FIRST_PULL);
+        else
+            _firstPull = true;
     }
 
     EventMap events;
@@ -381,17 +384,17 @@ struct boss_algalon_the_observer : public ScriptedAI
         me->SetSheath(SHEATH_STATE_UNARMED);
         me->SetFaction(190);
         me->CastSpell(me, SPELL_DUAL_WIELD, true);
-
         _phaseTwo = false;
         _heraldOfTheTitans = true;
-
-        if (_instance->GetBossState(BOSS_ALGALON) == FAIL)
-        {
-            _firstPull = false;
-        }
-
         if (_instance)
+        {
+            if (_instance->GetBossState(BOSS_ALGALON) == FAIL)
+            {
+                _firstPull = false;
+                _instance->StorePersistentData(PERSISTENT_DATA_ALGALON_FIRST_PULL, 1);
+            }
             _instance->SetBossState(BOSS_ALGALON, NOT_STARTED);
+        }
     }
 
     void KilledUnit(Unit* victim) override
@@ -452,6 +455,8 @@ struct boss_algalon_the_observer : public ScriptedAI
                 _firstPull = false;
                 _fedOnTears = false;
                 me->SetImmuneToPC(false);
+                if (_instance)
+                    _instance->StorePersistentData(PERSISTENT_DATA_ALGALON_FIRST_PULL, 1);
                 break;
             case ACTION_ASCEND:
                 summons.DespawnAll();
@@ -486,32 +491,28 @@ struct boss_algalon_the_observer : public ScriptedAI
         me->SetImmuneToNPC(true);
         events.Reset();
         events.SetPhase(PHASE_ROLE_PLAY);
+        events.ScheduleEvent(EVENT_ALGALON_IN_PROGRESS, _firstPull ? 14s : 1500ms);
+        Talk(SAY_ALGALON_START_TIMER);
+        summons.DespawnEntry(NPC_AZEROTH);
 
-        if (!_firstPull)
+        if (_firstPull)
         {
-            events.ScheduleEvent(EVENT_START_COMBAT, 0ms);
-            introDelay = 8s;
+            _firstPull = false;
+            _instance->SetData(DATA_DESPAWN_ALGALON, 0);
+            events.ScheduleEvent(EVENT_SAY_ALGALON_AGGRO, 16s);
+            introDelay = 26s;
         }
         else
-        {
-            summons.DespawnEntry(NPC_AZEROTH);
-            _firstPull = false;
-            Talk(SAY_ALGALON_START_TIMER);
-            introDelay = 22s;
-            events.ScheduleEvent(EVENT_START_COMBAT, 14s);
-            _instance->SetData(DATA_DESPAWN_ALGALON, 0);
-        }
+            introDelay = 8500ms;
 
-        events.ScheduleEvent(EVENT_REMOVE_UNNATTACKABLE, introDelay - 500ms);
         events.ScheduleEvent(EVENT_INTRO_TIMER_DONE, introDelay);
         events.ScheduleEvent(EVENT_QUANTUM_STRIKE, 3500ms + introDelay);
         events.ScheduleEvent(EVENT_PHASE_PUNCH, 15500ms + introDelay);
         events.ScheduleEvent(EVENT_SUMMON_COLLAPSING_STAR, 16500ms + introDelay);
-        events.ScheduleEvent(EVENT_COSMIC_SMASH, 25s + introDelay);
-        events.ScheduleEvent(EVENT_ACTIVATE_LIVING_CONSTELLATION, 50500ms + introDelay);
+        events.ScheduleEvent(EVENT_COSMIC_SMASH, 26s + introDelay);
+        events.ScheduleEvent(EVENT_ACTIVATE_LIVING_CONSTELLATION, 60s + introDelay);
         events.ScheduleEvent(EVENT_BIG_BANG, 90s + introDelay);
         events.ScheduleEvent(EVENT_ASCEND_TO_THE_HEAVENS, 360s + introDelay);
-
         events.ScheduleEvent(EVENT_CHECK_HERALD_ITEMS, 5s);
         DoCheckHeraldOfTheTitans();
     }
@@ -533,7 +534,7 @@ struct boss_algalon_the_observer : public ScriptedAI
             events.ScheduleEvent(EVENT_OUTRO_7, 55s + 500ms);
             events.ScheduleEvent(EVENT_OUTRO_8, 73s + 500ms);
             events.ScheduleEvent(EVENT_OUTRO_9, 85s + 500ms);
-            events.ScheduleEvent(EVENT_OUTRO_10, 101s + 500ms);
+            events.ScheduleEvent(EVENT_OUTRO_10, 111s);
             events.ScheduleEvent(EVENT_OUTRO_11, 117s + 500ms);
         }
     }
@@ -622,7 +623,7 @@ struct boss_algalon_the_observer : public ScriptedAI
 
     bool IsInRoom()
     {
-        if (me->GetExactDist2d(&me->GetHomePosition()) > 45.f || me->GetPositionZ() < 410.f)
+        if (me->GetExactDist2d(&me->GetHomePosition()) > 47.f || me->GetPositionZ() < 410.f)
         {
             DoAction(ACTION_ASCEND);
             return false;
@@ -659,16 +660,17 @@ struct boss_algalon_the_observer : public ScriptedAI
                 if (Creature* brann = _instance->GetCreature(DATA_BRANN_BRONZEBEARD_ALG))
                     brann->AI()->DoAction(ACTION_FINISH_INTRO);
                 break;
-            case EVENT_START_COMBAT:
-                _instance->SetBossState(BOSS_ALGALON, IN_PROGRESS);
+            case EVENT_SAY_ALGALON_AGGRO:
                 Talk(SAY_ALGALON_AGGRO);
                 break;
-            case EVENT_REMOVE_UNNATTACKABLE:
+            case EVENT_ALGALON_IN_PROGRESS:
+                if (_instance)
+                    _instance->SetBossState(BOSS_ALGALON, IN_PROGRESS);
+                break;
+            case EVENT_INTRO_TIMER_DONE:
                 me->SetSheath(SHEATH_STATE_MELEE);
                 me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
                 me->SetImmuneToNPC(false);
-                break;
-            case EVENT_INTRO_TIMER_DONE:
                 events.SetPhase(PHASE_NORMAL);
                 me->CastSpell((Unit*)nullptr, SPELL_SUPERMASSIVE_FAIL, true);
                 // Hack: _IsValidTarget failed earlier due to flags, call AttackStart again
@@ -677,7 +679,6 @@ struct boss_algalon_the_observer : public ScriptedAI
                 if (Player* target = SelectTargetFromPlayerList(150.0f))
                     AttackStart(target);
                 me->SetInCombatWithZone();
-
                 for (uint32 i = 0; i < LIVING_CONSTELLATION_COUNT; ++i)
                     me->SummonCreature(NPC_LIVING_CONSTELLATION, ConstellationPos[i], TEMPSUMMON_DEAD_DESPAWN);
                 break;
@@ -690,12 +691,17 @@ struct boss_algalon_the_observer : public ScriptedAI
                 events.Repeat(15s + 500ms);
                 break;
             case EVENT_SUMMON_COLLAPSING_STAR:
+            {
                 Talk(SAY_ALGALON_COLLAPSING_STAR);
                 Talk(EMOTE_ALGALON_COLLAPSING_STAR);
-                for (uint8 i = 0; i < COLLAPSING_STAR_COUNT; ++i)
-                    me->SummonCreature(NPC_COLLAPSING_STAR, CollapsingStarPos[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
+                uint8 activeStars = summons.GetEntryCount(NPC_COLLAPSING_STAR);
+                if (activeStars < COLLAPSING_STAR_COUNT)
+                    for (uint8 i = activeStars; i < COLLAPSING_STAR_COUNT; ++i)
+                        me->SummonCreature(NPC_COLLAPSING_STAR, CollapsingStarPos[i], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 2000);
+
                 events.Repeat(1min);
                 break;
+            }
             case EVENT_COSMIC_SMASH:
                 Talk(EMOTE_ALGALON_COSMIC_SMASH);
                 me->CastCustomSpell(SPELL_COSMIC_SMASH, SPELLVALUE_MAX_TARGETS, RAID_MODE(1, 3), (Unit*)nullptr);
@@ -944,7 +950,7 @@ struct npc_living_constellation : public ScriptedAI
     void Reset() override
     {
         events.Reset();
-        events.ScheduleEvent(EVENT_ARCANE_BARRAGE, 2500ms);
+        events.ScheduleEvent(EVENT_ARCANE_BARRAGE, 5s);
         _isActive = false;
     }
 
@@ -1002,8 +1008,8 @@ struct npc_living_constellation : public ScriptedAI
         switch (events.ExecuteEvent())
         {
             case EVENT_ARCANE_BARRAGE:
-                me->CastCustomSpell(SPELL_ARCANE_BARRAGE, SPELLVALUE_MAX_TARGETS, 1, (Unit*)nullptr, true);
-                events.Repeat(2500ms);
+                me->CastCustomSpell(SPELL_ARCANE_BARRAGE, SPELLVALUE_MAX_TARGETS, 1, (Unit*)nullptr, false);
+                events.Repeat(5s);
                 break;
             case EVENT_RESUME_UPDATING:
                 events.SetPhase(0);

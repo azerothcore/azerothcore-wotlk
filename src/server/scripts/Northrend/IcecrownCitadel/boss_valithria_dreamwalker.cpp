@@ -139,23 +139,20 @@ enum Events
 
 enum Actions
 {
-    ACTION_ENTER_COMBAT = 1,
-    MISSED_PORTALS      = 2,
-    ACTION_DEATH        = 3,
+    ACTION_ENTER_COMBAT    = 1,
+    MISSED_PORTALS         = 2,
+    ACTION_DEATH           = 3,
+    ACTION_SETUP_ARCHMAGES = 4,
+};
+
+enum SummonGroups
+{
+    SUMMON_GROUP_ALL = 1,
+    SUMMON_GROUP_10  = 2,
+    SUMMON_GROUP_25  = 3,
 };
 
 Position const ValithriaSpawnPos = {4210.813f, 2484.443f, 364.9558f, 0.01745329f};
-
-class RisenArchmageCheck
-{
-public:
-    // look for all permanently spawned Risen Archmages that are not yet in combat
-    bool operator()(Creature* creature)
-    {
-        return creature->IsAlive() && creature->GetEntry() == NPC_RISEN_ARCHMAGE &&
-               creature->GetSpawnId() && !creature->IsInCombat();
-    }
-};
 
 struct ManaVoidSelector
 {
@@ -249,12 +246,8 @@ public:
                 creature->DespawnOrUnsummon();
                 return;
             case NPC_RISEN_ARCHMAGE:
-                if (!creature->GetSpawnId())
-                {
-                    creature->DespawnOrUnsummon();
-                    return;
-                }
-                break;
+                creature->DespawnOrUnsummon();
+                return;
             default:
                 return;
         }
@@ -498,6 +491,16 @@ public:
         {
             _Reset();
             me->SetReactState(REACT_PASSIVE);
+            summons.DespawnAll();
+
+            me->SummonCreatureGroup(SUMMON_GROUP_ALL);
+            if (Is25ManRaid())
+                me->SummonCreatureGroup(SUMMON_GROUP_25);
+            else
+                me->SummonCreatureGroup(SUMMON_GROUP_10);
+
+            EntryCheckPredicate pred(NPC_RISEN_ARCHMAGE);
+            summons.DoAction(ACTION_SETUP_ARCHMAGES, pred);
         }
 
         void JustEnteredCombat(Unit* target) override
@@ -522,12 +525,8 @@ public:
             if (Creature* lichKing = ObjectAccessor::GetCreature(*me, instance->GetGuidData(DATA_VALITHRIA_LICH_KING)))
                 lichKing->AI()->DoAction(ACTION_ENTER_COMBAT);
 
-            std::list<Creature*> archmages;
-            RisenArchmageCheck check;
-            Acore::CreatureListSearcher<RisenArchmageCheck> searcher(me, archmages, check);
-            Cell::VisitObjects(me, searcher, 100.0f);
-            for (std::list<Creature*>::iterator itr = archmages.begin(); itr != archmages.end(); ++itr)
-                (*itr)->AI()->DoAction(ACTION_ENTER_COMBAT);
+            EntryCheckPredicate pred(NPC_RISEN_ARCHMAGE);
+            summons.DoAction(ACTION_ENTER_COMBAT, pred);
         }
 
         void MoveInLineOfSight(Unit* /*who*/) override {}
@@ -675,7 +674,6 @@ public:
             _events.ScheduleEvent(EVENT_FROSTBOLT_VOLLEY, 5s, 15s);
             _events.ScheduleEvent(EVENT_MANA_VOID, 20s, 25s);
             _events.ScheduleEvent(EVENT_COLUMN_OF_FROST, 10s, 20s);
-            _isInitialArchmage = me->GetSpawnId() != 0;
         }
 
         void JustEnteredCombat(Unit* who) override
@@ -701,6 +699,8 @@ public:
         {
             if (action == ACTION_ENTER_COMBAT)
                 DoZoneInCombat();
+            else if (action == ACTION_SETUP_ARCHMAGES)
+                _isInitialArchmage = true;
         }
 
         void JustSummoned(Creature* summon) override
