@@ -19,7 +19,7 @@
 #include "InstanceMapScript.h"
 #include "InstanceScript.h"
 #include "Map.h"
-#include <set>
+#include <algorithm>
 #include "SpellScriptLoader.h"
 #include "shadow_labyrinth.h"
 #include "SpellScript.h"
@@ -58,11 +58,20 @@ public:
         }
 
         uint32 _ritualistsAliveCount;
-        std::set<ObjectGuid::LowType> _murmurReinforcementSpawnIds;
 
         void Initialize() override
         {
             _ritualistsAliveCount = 0;
+        }
+
+        static void SuppressReinforcementRespawn(Creature* creature)
+        {
+            creature->SetRespawnDelay(WEEK);
+            if (!creature->IsAlive())
+            {
+                creature->SetRespawnTime(WEEK);
+                creature->SaveRespawnTime();
+            }
         }
 
         void OnCreatureCreate(Creature* creature) override
@@ -79,20 +88,10 @@ public:
                     break;
                 case NPC_CABAL_SUMMONER:
                 case NPC_CABAL_SPELLBINDER:
-                    // Only the corridor reinforcements have a short respawn timer:
-                    // they respawn endlessly to be zapped during Murmur's intro event.
-                    if (creature->GetRespawnDelay() < MINUTE)
+                    if (GetBossState(DATA_MURMUR) == DONE && std::find(std::begin(MurmurReinforcementSpawnIds),
+                        std::end(MurmurReinforcementSpawnIds), creature->GetSpawnId()) != std::end(MurmurReinforcementSpawnIds))
                     {
-                        _murmurReinforcementSpawnIds.insert(creature->GetSpawnId());
-                        if (GetBossState(DATA_MURMUR) == DONE)
-                        {
-                            creature->SetRespawnDelay(WEEK);
-                            if (!creature->IsAlive())
-                            {
-                                creature->SetRespawnTime(WEEK);
-                                creature->SaveRespawnTime();
-                            }
-                        }
+                        SuppressReinforcementRespawn(creature);
                     }
                     break;
                 default:
@@ -108,20 +107,14 @@ public:
             // Once Murmur is dead his corridor reinforcements must stop respawning
             if (type == DATA_MURMUR && state == DONE)
             {
-                for (ObjectGuid::LowType spawnId : _murmurReinforcementSpawnIds)
+                for (ObjectGuid::LowType spawnId : MurmurReinforcementSpawnIds)
                 {
                     bool found = false;
                     auto const bounds = instance->GetCreatureBySpawnIdStore().equal_range(spawnId);
                     for (auto itr = bounds.first; itr != bounds.second; ++itr)
                     {
                         found = true;
-                        Creature* reinforcement = itr->second;
-                        reinforcement->SetRespawnDelay(WEEK);
-                        if (!reinforcement->IsAlive())
-                        {
-                            reinforcement->SetRespawnTime(WEEK);
-                            reinforcement->SaveRespawnTime();
-                        }
+                        SuppressReinforcementRespawn(itr->second);
                     }
 
                     if (!found)

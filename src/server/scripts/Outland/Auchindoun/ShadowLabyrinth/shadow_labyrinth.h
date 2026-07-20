@@ -50,6 +50,12 @@ enum slNPCandGO
 uint32 constexpr EncounterCount = 4;
 uint32 constexpr PersistentDataCount = 1;
 
+// Corridor Cabal Summoner/Spellbinder reinforcements, each an endless-respawn
+// feed hung off a trash group's Cabal Executioner formation leader. They stop
+// respawning once Murmur is dead so groups skipped en route to him don't keep
+// feeding forever. Spawn ids are guids from the creature spawn table.
+ObjectGuid::LowType constexpr MurmurReinforcementSpawnIds[] = { 146225, 146226, 146227, 146228, 146229 };
+
 template <class AI, class T>
 inline AI* GetShadowLabyrinthAI(T* obj)
 {
