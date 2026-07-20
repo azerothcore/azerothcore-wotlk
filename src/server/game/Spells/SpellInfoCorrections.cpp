@@ -5202,6 +5202,16 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].BasePoints = 1;
     });
 
+    ApplySpellFix({
+        42292,  // PvP Trinket
+        59752,  // Every Man for Himself
+        19574,  // Bestial Wrath
+        34471   // The Beast Within
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx2 |= SPELL_ATTR2_NO_SCHOOL_IMMUNITIES;
+    });
+
     // 51036 Summon Venture Co. Air Patrol
     ApplySpellFix({ 51036 }, [](SpellInfo* spellInfo)
     {
@@ -5224,6 +5234,12 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 64646 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_1].SpellClassMask = flag96(0x200, 0, 0);
+    });
+
+    // Shadowhorn Charge (Rank 1)
+    ApplySpellFix({ 6921 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPPRESS_CASTER_PROCS;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
