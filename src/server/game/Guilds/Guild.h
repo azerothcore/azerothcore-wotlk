@@ -690,6 +690,8 @@ public:
     std::string const& GetInfo() const { return m_info; }
 
     bool SetName(std::string_view const& name);
+    void SetMOTD(std::string_view motd);
+    void SetInfo(std::string_view info);
 
     // Handle client commands
     void HandleRoster(WorldSession* session);
@@ -778,6 +780,7 @@ public:
 
     [[nodiscard]] bool ModifyBankMoney(CharacterDatabaseTransaction trans, const uint64& amount, bool add) { return _ModifyBankMoney(trans, amount, add); }
     [[nodiscard]] uint32 GetMemberSize() const { return m_members.size(); }
+    [[nodiscard]] std::unordered_map<uint32, Member> const& GetUnorderedMembers() const { return m_members; }
 
 protected:
     uint32 m_id;
