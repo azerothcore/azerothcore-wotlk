@@ -29,7 +29,6 @@ Script:
       - 'src/server/scripts/**/*.cpp'
       - 'src/server/scripts/**/*.h'
 
-
 UnitTests:
 - changed-files:
     - any-glob-to-any-file: 'src/test/**/*'
@@ -75,8 +74,6 @@ Config:
       - '**/*.json'
       - '**/*.yml'
       - '**/*.yaml'
-      - '!**/docker-compose*.yml'
-      - '!**/docker-compose*.yaml'
       - '**/*.conf'
       - '**/*.cfg'
       - '**/*.nix'
