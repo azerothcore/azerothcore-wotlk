@@ -8,6 +8,12 @@ on:
       - opened
       - reopened
       - synchronize
+    # A PR that only touches data/ (SQL) leaves the C++ untouched, so there is
+    # nothing to compile. Dashboard CI runs on every PR unfiltered and already
+    # imports the SQL and starts a real worldserver, so coverage is unaffected.
+    # Pushes to master are not filtered and always build.
+    paths-ignore:
+      - 'data/**'
 
 concurrency:
   # One concurrency group per workflow + ref.
