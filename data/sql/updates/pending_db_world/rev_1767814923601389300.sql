@@ -45,18 +45,18 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `spawnMask`, `phaseMask`, `equipmen
 -- Ith'rix 25453
 (@GUID+1, 25453, 571, 1, 1, 0, 2563.398, 6056.7534, 157.0997, 0.675718843936920166, 300, 52237, 2, 'Part of What The Cold Wind Brings... Event'),
 -- Warsong Marksmen 25244 - reinforce on a 5min timer for as long as event 92 runs
-(@GUID+3 , 25244, 571, 1, 1, 1, 2770.6533, 6123.831, 91.788445, 3.885649919509887695, 300, 52237, 2, 'Part of What The Cold Wind Brings... Event'),
-(@GUID+4 , 25244, 571, 1, 1, 1, 2772.1545, 6125.37, 91.9547, 3.918198108673095703, 300, 52237, 2, 'Part of What The Cold Wind Brings... Event'),
-(@GUID+5 , 25244, 571, 1, 1, 1, 2774.0427, 6127.1343, 91.95686, 3.822271108627319335, 300, 52237, 2, 'Part of What The Cold Wind Brings... Event'),
-(@GUID+6 , 25244, 571, 1, 1, 1, 2775.6, 6128.577, 91.956795, 4.136430263519287109, 300, 52237, 2, 'Part of What The Cold Wind Brings... Event'),
-(@GUID+7 , 25244, 571, 1, 1, 1, 2777.2427, 6130.19, 91.95759, 0.48869219422340393, 300, 52237, 2, 'Part of What The Cold Wind Brings... Event'),
-(@GUID+8 , 25244, 571, 1, 1, 1, 2780.2751, 6132.911, 91.74803, 3.298672199249267578, 300, 52237, 2, 'Part of What The Cold Wind Brings... Event'),
-(@GUID+9 , 25244, 571, 1, 1, 1, 2781.4375, 6134.131, 90.92266, 0.104719758033752441, 300, 52237, 2, 'Part of What The Cold Wind Brings... Event'),
-(@GUID+10, 25244, 571, 1, 1, 1, 2782.5786, 6135.2393, 90.14071, 2.617993831634521484, 300, 52237, 2, 'Part of What The Cold Wind Brings... Event'),
-(@GUID+11, 25244, 571, 1, 1, 1, 2783.7375, 6136.151, 89.41592, 0.157079637050628662, 300, 52237, 2, 'Part of What The Cold Wind Brings... Event'),
-(@GUID+12, 25244, 571, 1, 1, 1, 2785.7144, 6137.814, 88.14427, 5.585053443908691406, 300, 52237, 2, 'Part of What The Cold Wind Brings... Event'),
-(@GUID+13, 25244, 571, 1, 1, 1, 2787.284, 6139.4194, 87.04321, 2.111848354339599609, 300, 52237, 2, 'Part of What The Cold Wind Brings... Event'),
-(@GUID+14, 25244, 571, 1, 1, 1, 2788.8938, 6140.902, 85.96647, 3.893373012542724609, 300, 52237, 2, 'Part of What The Cold Wind Brings... Event');
+(@GUID+3 , 25244, 571, 1, 1, 1, 2770.6533, 6123.831, 91.788445, 3.885649919509887695, 120, 52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+4 , 25244, 571, 1, 1, 1, 2772.1545, 6125.37, 91.9547, 3.918198108673095703, 120, 52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+5 , 25244, 571, 1, 1, 1, 2774.0427, 6127.1343, 91.95686, 3.822271108627319335, 120, 52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+6 , 25244, 571, 1, 1, 1, 2775.6, 6128.577, 91.956795, 4.136430263519287109, 120, 52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+7 , 25244, 571, 1, 1, 1, 2777.2427, 6130.19, 91.95759, 0.48869219422340393, 120, 52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+8 , 25244, 571, 1, 1, 1, 2780.2751, 6132.911, 91.74803, 3.298672199249267578, 120, 52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+9 , 25244, 571, 1, 1, 1, 2781.4375, 6134.131, 90.92266, 0.104719758033752441, 120, 52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+10, 25244, 571, 1, 1, 1, 2782.5786, 6135.2393, 90.14071, 2.617993831634521484, 120, 52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+11, 25244, 571, 1, 1, 1, 2783.7375, 6136.151, 89.41592, 0.157079637050628662, 120, 52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+12, 25244, 571, 1, 1, 1, 2785.7144, 6137.814, 88.14427, 5.585053443908691406, 120, 52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+13, 25244, 571, 1, 1, 1, 2787.284, 6139.4194, 87.04321, 2.111848354339599609, 120, 52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+14, 25244, 571, 1, 1, 1, 2788.8938, 6140.902, 85.96647, 3.893373012542724609, 120, 52237, 2, 'Part of What The Cold Wind Brings... Event');
 
 DELETE FROM `creature_summon_groups` WHERE `summonerId` = 25453 AND `summonerType` = 0 AND `groupId` = 0;
 INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `entry`, `position_x`, `position_y`, `position_z`, `orientation`, `summonType`, `summonTime`, `Comment`) VALUES
