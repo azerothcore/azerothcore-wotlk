@@ -137,7 +137,7 @@ namespace MMAP
         // builds list of maps, then builds all of mmap tiles (based on the skip settings)
         void buildMaps(Optional<uint32> mapID);
 
-        const Config& getConfig() const { return *m_config; }
+        Config const& getConfig() const { return *m_config; }
     private:
         // builds all mmap tiles for the specified map id (ignores skip settings)
         void buildMap(uint32 mapID);
@@ -156,7 +156,7 @@ namespace MMAP
         bool isTransportMap(uint32 mapID) const;
         bool isContinentMap(uint32 mapID) const;
 
-        rcConfig getRecastConfig(const ResolvedMeshConfig &cfg, float bmin[3], float bmax[3]) const;
+        rcConfig getRecastConfig(ResolvedMeshConfig const& cfg, float bmin[3], float bmax[3]) const;
 
         uint32 percentageDone(uint32 totalTiles, uint32 totalTilesDone) const;
         uint32 currentPercentageDone() const;

@@ -175,7 +175,7 @@ bool DBUpdater<T>::Create(DatabaseWorkerPool<T>& pool)
 {
     LOG_WARN("sql.updates", "Database \"{}\" does not exist", pool.GetConnectionInfo()->database);
 
-    const char* disableInteractive = std::getenv("AC_DISABLE_INTERACTIVE");
+    char const* disableInteractive = std::getenv("AC_DISABLE_INTERACTIVE");
 
     if (!sConfigMgr->isDryRun() && (disableInteractive == nullptr || std::strcmp(disableInteractive, "1") != 0))
     {
@@ -402,7 +402,7 @@ bool DBUpdater<T>::Populate(DatabaseWorkerPool<T>& pool)
 
     std::vector<std::filesystem::path> sqlFiles;
 
-    for (const auto &entry : std::filesystem::directory_iterator(DirPath))
+    for (auto const& entry : std::filesystem::directory_iterator(DirPath))
     {
         if (entry.path().extension() == ".sql")
             sqlFiles.push_back(entry.path());
@@ -410,7 +410,7 @@ bool DBUpdater<T>::Populate(DatabaseWorkerPool<T>& pool)
 
     std::sort(sqlFiles.begin(), sqlFiles.end());
 
-    for (const auto &file : sqlFiles)
+    for (auto const& file : sqlFiles)
     {
         LOG_INFO("sql.updates", ">> Applying \'{}\'...", file.filename().generic_string());
 
