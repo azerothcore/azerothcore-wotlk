@@ -85,17 +85,15 @@ runs:
       shell: bash
       env:
         CCACHE_DIR: $GITHUB_WORKSPACE/var/ccache
-      # CCACHE_MAXSIZE is kept small (2G) so several run-id cache generations
-      # coexist under GitHub's 10G per-repo cache limit before LRU eviction.
-      # CCACHE_COMPRESSLEVEL=3: level 9 burns CPU for marginal size gains; a low
-      # level is the recommended sweet spot for CI throughput.
+      # CCACHE_COMPRESSLEVEL=3: level 9 burns CPU for marginal size gains on a
+      # cache that never approaches max_size.
       run: |
         mkdir -p "$CCACHE_DIR"
         cat <<EOF >> "$GITHUB_ENV"
         CCACHE_BASEDIR=${GITHUB_WORKSPACE}
         CCACHE_DIR=${{ env.CCACHE_DIR }}
         CCACHE_HASHDIR=1
-        CCACHE_MAXSIZE=2G
+        CCACHE_MAXSIZE=5G
         CCACHE_SLOPPINESS=pch_defines,time_macros,include_file_mtime
         CCACHE_COMPRESS=1
         CCACHE_COMPRESSLEVEL=3

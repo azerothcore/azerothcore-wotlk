@@ -165,7 +165,7 @@ jobs:
           CCACHE_BASEDIR=${{ github.workspace }}
           CCACHE_DIR=${{ github.workspace }}/var/ccache
           CCACHE_HASHDIR=1
-          CCACHE_MAXSIZE=2G
+          CCACHE_MAXSIZE=5G
           CCACHE_SLOPPINESS=pch_defines,time_macros,include_file_mtime
           CCACHE_COMPRESS=1
           CCACHE_COMPRESSLEVEL=3
