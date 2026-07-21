@@ -631,6 +631,9 @@ void Player::CompleteQuest(uint32 quest_id)
     Quest const* qInfo = sObjectMgr->GetQuestTemplate(quest_id);
     if (qInfo && qInfo->HasFlag(QUEST_FLAGS_TRACKING))
     {
+        // auto-rewarded, so CAIS cannot gate it here: the status is already COMPLETE above and
+        // nothing re-triggers the quest, which would destroy the reward rather than defer it.
+        // RewardQuest still zeroes the money and GiveXP still blocks the XP.
         RewardQuest(qInfo, 0, this, false);
     }
 
