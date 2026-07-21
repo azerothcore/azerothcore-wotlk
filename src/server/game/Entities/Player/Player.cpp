@@ -12055,16 +12055,21 @@ void Player::resetSpells()
     if (HasAtLoginFlag(AT_LOGIN_RESET_SPELLS))
         RemoveAtLoginFlag(AT_LOGIN_RESET_SPELLS, true);
 
+    // Only remove spells a class trainer can teach - quest-reward, custom and default spells are
+    // left untouched, so the player never ends up with an empty spellbook needing a relog to fix.
+    // Re-learning happens the normal way, by visiting a trainer again (or a GM re-teaching them).
+    std::unordered_set<uint32> trainerSpellIds;
+    for (Trainer::Trainer const* trainer : sObjectMgr->GetClassTrainers(getClass()))
+        for (Trainer::Spell const& trainerSpell : trainer->GetSpells())
+            trainerSpellIds.insert(trainerSpell.SpellId);
+
     // make full copy of map (spells removed and marked as deleted at another spell remove
     // and we can't use original map for safe iterative with visit each spell at loop end
     PlayerSpellMap spellMap = GetSpellMap();
 
     for (PlayerSpellMap::const_iterator iter = spellMap.begin(); iter != spellMap.end(); ++iter)
-        removeSpell(iter->first, SPEC_MASK_ALL, false);
-
-    LearnDefaultSkills();
-    LearnCustomSpells();
-    learnQuestRewardedSpells();
+        if (trainerSpellIds.contains(iter->first))
+            removeSpell(iter->first, SPEC_MASK_ALL, false);
 }
 
 void Player::LearnCustomSpells()
