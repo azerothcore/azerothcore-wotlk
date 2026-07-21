@@ -384,7 +384,7 @@ struct boss_yoggsaron_sara : public ScriptedAI
     uint32 _initFight;
     uint8 _summonedGuardiansCount;
     uint32 _p2TalkTimer;
-    bool _secondPhase;
+    bool _secondPhase = false;
     float _summonSpeed;
     uint8 _currentIllusion;
     bool _isIllusionReversed;
@@ -439,9 +439,10 @@ struct boss_yoggsaron_sara : public ScriptedAI
 
     void Reset() override
     {
-        if (!_secondPhase) // Phase 1 wipe
+        // Whisper only on a real phase 1 wipe, not on the initial reset
+        if (!_secondPhase && _instance && _instance->GetBossState(BOSS_YOGGSARON) == IN_PROGRESS)
         {
-            if (Creature* voice = _instance ? _instance->GetCreature(DATA_VOICE_OF_YOGG_SARON) : nullptr)
+            if (Creature* voice = _instance->GetCreature(DATA_VOICE_OF_YOGG_SARON))
             {
                 me->GetMap()->DoForAllPlayers([&](Player* player)
                 {
@@ -696,9 +697,8 @@ struct boss_yoggsaron_sara : public ScriptedAI
             summons.DespawnEntry(NPC_FREYA_KEEPER);
             summons.DespawnEntry(NPC_THORIM_KEEPER);
             summons.DespawnEntry(NPC_SANITY_WELL);
-            if (_instance)
-                if (Creature* voice = _instance->GetCreature(DATA_VOICE_OF_YOGG_SARON))
-                    voice->AI()->DoAction(ACTION_VOICE_STOP);
+            if (Creature* voice = _instance ? _instance->GetCreature(DATA_VOICE_OF_YOGG_SARON) : nullptr)
+                voice->AI()->DoAction(ACTION_VOICE_STOP);
             me->KillSelf();
             return;
         }
