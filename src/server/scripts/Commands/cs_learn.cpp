@@ -162,8 +162,15 @@ public:
         return true;
     }
 
-    static bool HandleLearnAllMyTalentsCommand(ChatHandler* handler)
+    static bool HandleLearnAllMyTalentsCommand(ChatHandler* handler, Optional<uint8> tabArg)
     {
+        if (tabArg && (*tabArg < 1 || *tabArg > 3))
+        {
+            handler->PSendSysMessage("Invalid talent tab, use 1, 2 or 3.");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
         Player* player = handler->GetSession()->GetPlayer();
         uint32 classMask = player->getClassMask();
 
@@ -187,6 +194,10 @@ public:
                     continue;
 
                 if ((classMask & talentTabInfo->ClassMask) == 0)
+                    continue;
+
+                // tabpage is the 0-2 index of the tree in its class's UI order
+                if (tabArg && talentTabInfo->tabpage != *tabArg - 1)
                     continue;
 
                 // xinef: search highest talent rank
@@ -219,10 +230,17 @@ public:
             }
         } while (hadNew);
 
-        player->SetFreeTalentPoints(0);
+        // Learning a single tab doesn't spend any of the free-point pool (LearnTalent skips that
+        // accounting for command=true), so only zero it out once every tree has been maxed.
+        if (!tabArg)
+            player->SetFreeTalentPoints(0);
+
         player->SendTalentsInfoData(false);
 
-        handler->PSendSysMessage("You have activated all of your talents.");
+        if (tabArg)
+            handler->PSendSysMessage("You have activated all talents in tab {}.", *tabArg);
+        else
+            handler->PSendSysMessage("You have activated all of your talents.");
         return true;
     }
 
