@@ -219,8 +219,7 @@ struct boss_majordomo : public BossAI
 
     void KilledUnit(Unit* victim) override
     {
-        if (roll_chance_i(25) && victim->IsPlayer())
-            Talk(SAY_SLAY);
+        Talk(SAY_SLAY, victim);
     }
 
     void JustEngagedWith(Unit* /*attacker*/) override

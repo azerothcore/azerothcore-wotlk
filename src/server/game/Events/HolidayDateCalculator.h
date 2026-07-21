@@ -80,16 +80,16 @@ public:
     static std::tm CalculateWinterSolstice(int year);
 
     // Calculate holiday start date for a given year
-    static std::tm CalculateHolidayDate(const HolidayRule& rule, int year);
+    static std::tm CalculateHolidayDate(HolidayRule const& rule, int year);
 
     // Convert std::tm to WoW's packed date format
-    static uint32_t PackDate(const std::tm& date);
+    static uint32_t PackDate(std::tm const& date);
 
     // Convert WoW's packed date format to std::tm
     static std::tm UnpackDate(uint32_t packed);
 
     // Get all holiday rules
-    static const std::vector<HolidayRule>& GetHolidayRules();
+    static std::vector<HolidayRule> const& GetHolidayRules();
 
     // Calculate date for a specific holiday ID and year
     static uint32_t GetPackedHolidayDate(uint32_t holidayId, int year);
@@ -104,8 +104,13 @@ public:
     // For multi-stage holidays, stageOffset is the cumulative duration (in seconds) of all prior stages.
     // stageLengthMinutes is the duration of the current stage in minutes.
     // Returns the computed stage start time (startTime + stageOffset), or 0 if no valid date found.
-    static time_t FindStartTimeForStage(const uint32_t* packedDates, uint8_t numDates,
+    static time_t FindStartTimeForStage(uint32_t const* packedDates, uint8_t numDates,
         time_t stageOffset, uint32_t stageLengthMinutes, time_t curTime);
+
+    // Start time for a looping holiday event (Battleground Call to Arms): rolls the packed anchor
+    // forward by whole occurenceMinutes periods to the most recent occurrence. Returns 0 if anchor is 0.
+    static time_t FindLoopingStartTime(uint32_t packedAnchor, time_t stageOffset,
+        uint32_t occurenceMinutes, time_t curTime);
 
 private:
     // Julian Date conversions for lunar calculations

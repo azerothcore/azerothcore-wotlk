@@ -666,6 +666,52 @@ bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo
     for (PlayerCreateInfoItems::const_iterator item_id_itr = info->item.begin(); item_id_itr != info->item.end(); ++item_id_itr)
         StoreNewItemInBestSlots(item_id_itr->item_id, item_id_itr->item_amount);
 
+    // Collector's Edition starter gift voucher
+    if (GetSession()->HasAccountFlag(ACCOUNT_FLAG_COLLECTOR))
+    {
+        uint32 voucherId = 0;
+        if (IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_INIT))
+            voucherId = 39713; // Ebon Hold Gift Voucher
+        else
+        {
+            switch (createInfo->Race)
+            {
+                case RACE_HUMAN:
+                    voucherId = 14646; break; // Goldshire Gift Voucher
+                case RACE_DWARF:
+                case RACE_GNOME:
+                    voucherId = 14647; break; // Kharanos Gift Voucher
+                case RACE_NIGHTELF:
+                    voucherId = 14648; break; // Dolanaar Gift Voucher
+                case RACE_ORC:
+                case RACE_TROLL:
+                    voucherId = 14649; break; // Razor Hill Gift Voucher
+                case RACE_TAUREN:
+                    voucherId = 14650; break; // Bloodhoof Village Gift Voucher
+                case RACE_UNDEAD_PLAYER:
+                    voucherId = 14651; break; // Brill Gift Voucher
+                case RACE_BLOODELF:
+                    voucherId = 20938; break; // Falconwing Square Gift Voucher
+                case RACE_DRAENEI:
+                    voucherId = 22888; break; // Azure Watch Gift Voucher
+                default:
+                    break;
+            }
+        }
+
+        // Only guard against mail delivery if the item was actually stored, otherwise
+        // a full bag would suppress the mail fallback and lose the voucher permanently.
+        if (voucherId && StoreNewItemInBestSlots(voucherId, 1))
+        {
+            // Prevent characters from receiving duplicate vouchers through the mail system.
+            // voucherId doubles as the mail template id (item == templateID in the SQL data).
+            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_MAIL_SERVER_CHARACTER);
+            stmt->SetData(0, guidlow);
+            stmt->SetData(1, voucherId);
+            CharacterDatabase.Execute(stmt);
+        }
+    }
+
     // bags and main-hand weapon must equipped at this moment
     // now second pass for not equipped (offhand weapon/shield if it attempt equipped before main-hand weapon)
     // or ammo not equipped in special bag
@@ -2325,7 +2371,7 @@ void Player::UninviteFromGroup()
     }
 }
 
-void Player::RemoveFromGroup(Group* group, ObjectGuid guid, RemoveMethod method /* = GROUP_REMOVEMETHOD_DEFAULT*/, ObjectGuid kicker /* = ObjectGuid::Empty */, const char* reason /* = nullptr */)
+void Player::RemoveFromGroup(Group* group, ObjectGuid guid, RemoveMethod method /* = GROUP_REMOVEMETHOD_DEFAULT*/, ObjectGuid kicker /* = ObjectGuid::Empty */, char const* reason /* = nullptr */)
 {
     if (group)
     {
@@ -2356,24 +2402,16 @@ void Player::SendLogXPGain(uint32 GivenXP, Unit* victim, uint32 BonusXP, bool re
 void Player::GiveXP(uint32 xp, Unit* victim, float group_rate, bool isLFGReward)
 {
     if (xp < 1)
-    {
         return;
-    }
 
     if (!IsAlive() && !GetBattlegroundId() && !isLFGReward)
-    {
         return;
-    }
 
-    if (HasPlayerFlag(PLAYER_FLAGS_NO_XP_GAIN))
-    {
+    if (HasPlayerFlag(PLAYER_FLAGS_NO_XP_GAIN) || HasPlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME))
         return;
-    }
 
     if (victim && victim->IsCreature() && !victim->ToCreature()->hasLootRecipient())
-    {
         return;
-    }
 
     uint8 level = GetLevel();
     sScriptMgr->OnPlayerBeforeGetLevelForXPGain(this, level);
@@ -2398,6 +2436,9 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate, bool isLFGReward)
     if (level >= maxLevel)
         return;
 
+    if (HasPlayerFlag(PLAYER_FLAGS_PARTIAL_PLAY_TIME))
+        xp = std::max(1u, xp / 2);
+
     uint32 bonus_xp = 0;
     bool recruitAFriend = GetsRecruitAFriendBonus(true);
 
@@ -2410,9 +2451,7 @@ void Player::GiveXP(uint32 xp, Unit* victim, float group_rate, bool isLFGReward)
     // hooks and multipliers can modify the xp with a zero or negative value
     // check again before sending invalid xp to the client
     if (xp < 1)
-    {
         return;
-    }
 
     SendLogXPGain(xp, victim, bonus_xp, recruitAFriend, group_rate);
 
@@ -2841,6 +2880,66 @@ void Player::SendInitialSpells()
     SendDirectMessage(&data);
 }
 
+void Player::SendUnlearnSpells()
+{
+    WorldPacket data(SMSG_SEND_UNLEARN_SPELLS, 4 + 4 * m_spells.size());
+
+    uint32 spellCount = 0;
+    size_t countPos = data.wpos();
+    data << uint32(spellCount);
+
+    for (auto const& itr : m_spells)
+    {
+        if (itr.second->State == PLAYERSPELL_REMOVED || itr.second->Active)
+            continue;
+
+        auto skillLineAbilities = sSpellMgr->GetSkillLineAbilityMapBounds(itr.first);
+        if (skillLineAbilities.first == skillLineAbilities.second)
+            continue;
+
+        // Client already hides ranks that have a superseding rank
+        bool hasSupercedingRank = false;
+        for (auto slaItr = skillLineAbilities.first; slaItr != skillLineAbilities.second; ++slaItr)
+        {
+            if (slaItr->second->SupercededBySpell)
+            {
+                hasSupercedingRank = true;
+                break;
+            }
+        }
+        if (hasSupercedingRank)
+            continue;
+
+        uint32 nextRank = sSpellMgr->GetNextSpellInChain(itr.first);
+        if (!nextRank || !HasSpell(nextRank))
+            continue;
+
+        data << uint32(itr.first);
+        ++spellCount;
+    }
+
+    data.put<uint32>(countPos, spellCount);
+    SendDirectMessage(&data);
+}
+
+bool Player::IsUnlearnNeededForSpell(uint32 spellId)
+{
+    SpellInfo const* spellInfo = sSpellMgr->AssertSpellInfo(spellId);
+    if (spellInfo->IsRanked() && !spellInfo->IsStackableWithRanks())
+    {
+        auto skillLineAbilities = sSpellMgr->GetSkillLineAbilityMapBounds(spellId);
+        if (skillLineAbilities.first != skillLineAbilities.second)
+        {
+            for (auto itr = skillLineAbilities.first; itr != skillLineAbilities.second; ++itr)
+                if (itr->second->SupercededBySpell)
+                    return false;
+
+            return true;
+        }
+    }
+    return false;
+}
+
 void Player::RemoveMail(uint32 id)
 {
     for (PlayerMails::iterator itr = m_mail.begin(); itr != m_mail.end(); ++itr)
@@ -3066,6 +3165,10 @@ bool Player::addSpell(uint32 spellId, uint8 addSpecMask, bool updateActive, bool
                 if (nextSpellInfo->GetRank() < spellInfo->GetRank())
                 {
                     itr->second->Active = false;
+
+                    if (!isBeingLoaded() && IsUnlearnNeededForSpell(spellId))
+                        SendUnlearnSpells();
+
                     if (IsInWorld())
                     {
                         WorldPacket data(SMSG_SUPERCEDED_SPELL, 4 + 4);
@@ -3080,12 +3183,19 @@ bool Player::addSpell(uint32 spellId, uint8 addSpecMask, bool updateActive, bool
                     PlayerSpellMap::iterator itr2 = m_spells.find(spellInfo->Id);
                     if (itr2 != m_spells.end())
                         itr2->second->Active = false;
+
+                    if (!isBeingLoaded() && IsUnlearnNeededForSpell(spellId))
+                        SendUnlearnSpells();
+
                     return false;
                 }
             }
             nextSpellInfo = nextSpellInfo->GetNextRankSpell();
         }
     }
+
+    if (!isBeingLoaded() && IsUnlearnNeededForSpell(spellId))
+        SendUnlearnSpells();
 
     return true;
 }
@@ -7896,6 +8006,15 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
                 // get next RR player (for next loot)
                 if (groupRules && !go->loot.empty())
                     group->UpdateLooterGuid(go);
+
+                if (groupRules)
+                {
+                    GuidUnorderedSet const& allowedLooters = go->GetAllowedLooters();
+                    if (!allowedLooters.empty())
+                        for (ObjectGuid const& allowedGuid : allowedLooters)
+                            if (Player* allowedPlayer = ObjectAccessor::FindPlayer(allowedGuid))
+                                loot->FillNotNormalLootFor(allowedPlayer);
+                }
             }
             if (GameObjectTemplateAddon const* addon = go->GetTemplateAddon())
                 loot->generateMoneyLoot(addon->mingold, addon->maxgold);
@@ -8194,6 +8313,8 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type)
     if (permission != NONE_PERMISSION)
     {
         SetLootGUID(guid);
+
+        sScriptMgr->OnPlayerBeforeSendLoot(this, guid, loot);
 
         WorldPacket data(SMSG_LOOT_RESPONSE, (9 + 50));         // we guess size
         data << guid;
@@ -11315,7 +11436,7 @@ void Player::SetEntryPoint()
 
         if (GetMap()->IsDungeon())
         {
-            if (const GraveyardStruct* entry = sGraveyard->GetClosestGraveyard(this, GetTeamId()))
+            if (GraveyardStruct const* entry = sGraveyard->GetClosestGraveyard(this, GetTeamId()))
                 m_entryPointData.joinPos = WorldLocation(entry->Map, entry->x, entry->y, entry->z, 0.0f);
         }
         else if (!GetMap()->IsBattlegroundOrArena())
@@ -11617,10 +11738,7 @@ void Player::SendInitialPacketsBeforeAddToMap()
     SendDirectMessage(&data);
 
     SendInitialSpells();
-
-    data.Initialize(SMSG_SEND_UNLEARN_SPELLS, 4);
-    data << uint32(0);                                      // count, for (count) uint32;
-    SendDirectMessage(&data);
+    SendUnlearnSpells();
 
     SendInitialActionButtons();
     m_reputationMgr->SendInitialReputations();
@@ -11670,6 +11788,12 @@ void Player::SendInitialPacketsAfterAddToMap()
         if (!auraList.empty())
             auraList.front()->HandleEffect(this, AURA_EFFECT_HANDLE_SEND_FOR_CLIENT, true);
     }
+
+    // Explicitly synchronize CAN_FLY state with client on login to prevent
+    // players from retaining flight ability after disconnecting during a
+    // teleport from a flyable to non-flyable zone (e.g. entering an instance).
+    if (!HasIncreaseMountedFlightSpeedAura() && !HasFlyAura())
+        SetCanFly(false);
 
     // Fix mount, update block gets messed somewhere
     {
@@ -11753,6 +11877,13 @@ void Player::SendInitialPacketsAfterAddToMap()
     }
     else if (GetRaidDifficulty() != GetStoredRaidDifficulty())
         SendRaidDifficulty(GetGroup() != nullptr);
+
+    // Re-send any pending group loot rolls to this player when they enter a dungeon/raid.
+    if (Map* map = GetMap())
+        if (map->IsDungeon() || map->IsRaid())
+            if (Group* group = GetGroup())
+                group->SendPendingRollsToPlayer(this, map);
+
 }
 
 void Player::SendUpdateToOutOfRangeGroupMembers()
@@ -14167,7 +14298,7 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank, bool command /*= fa
         uint32 spentPoints = 0;
         if (talentInfo->Row > 0)
         {
-            const PlayerTalentMap& talentMap = GetTalentMap();
+            PlayerTalentMap const& talentMap = GetTalentMap();
             for (PlayerTalentMap::const_iterator itr = talentMap.begin(); itr != talentMap.end(); ++itr)
                 if (TalentSpellPos const* talentPos = GetTalentSpellPos(itr->first))
                     if (TalentEntry const* itrTalentInfo = sTalentStore.LookupEntry(talentPos->talent_id))
@@ -14309,7 +14440,7 @@ void Player::LearnPetTalent(ObjectGuid petGuid, uint32 talentId, uint32 talentRa
         for (uint32 i = 0; i < numRows; ++i)          // Loop through all talents.
         {
             // Someday, someone needs to revamp
-            const TalentEntry* tmpTalent = sTalentStore.LookupEntry(i);
+            TalentEntry const* tmpTalent = sTalentStore.LookupEntry(i);
             if (tmpTalent)                                  // the way talents are tracked
             {
                 if (tmpTalent->TalentTab == tTab)
@@ -14563,7 +14694,7 @@ void Player::BuildPlayerTalentsInfoData(WorldPacket* data)
         std::size_t pos = data->wpos();
         *data << uint8(talentIdCount);                      // [PH], talentIdCount
 
-        const PlayerTalentMap& talentMap = GetTalentMap();
+        PlayerTalentMap const& talentMap = GetTalentMap();
         for (PlayerTalentMap::const_iterator itr = talentMap.begin(); itr != talentMap.end(); ++itr)
             if (TalentSpellPos const* talentPos = GetTalentSpellPos(itr->first))
                 if (itr->second->State != PLAYERSPELL_REMOVED && itr->second->IsInSpec(specIdx)) // pussywizard
@@ -15524,7 +15655,7 @@ void Player::LoadActions(PreparedQueryResult result)
 
 void Player::GetTalentTreePoints(uint8 (&specPoints)[3]) const
 {
-    const PlayerTalentMap& talentMap = GetTalentMap();
+    PlayerTalentMap const& talentMap = GetTalentMap();
     for (PlayerTalentMap::const_iterator itr = talentMap.begin(); itr != talentMap.end(); ++itr)
         if (itr->second->State != PLAYERSPELL_REMOVED && itr->second->IsInSpec(GetActiveSpec()))
             if (TalentEntry const* talentInfo = sTalentStore.LookupEntry(itr->second->talentID))
@@ -15546,7 +15677,7 @@ void Player::GetTalentTreePoints(uint8 (&specPoints)[3]) const
 uint8 Player::GetMostPointsTalentTree() const
 {
     uint32 specPoints[3] = {0, 0, 0};
-    const PlayerTalentMap& talentMap = GetTalentMap();
+    PlayerTalentMap const& talentMap = GetTalentMap();
     for (PlayerTalentMap::const_iterator itr = talentMap.begin(); itr != talentMap.end(); ++itr)
         if (itr->second->State != PLAYERSPELL_REMOVED && itr->second->IsInSpec(GetActiveSpec()))
             if (TalentEntry const* talentInfo = sTalentStore.LookupEntry(itr->second->talentID))
@@ -15744,6 +15875,24 @@ void Player::PrepareCharmAISpells()
                 m_charmAISpells[SPELL_ROOT_OR_FEAR] = spellInfo->Id;
                 break;
             }
+        }
+    }
+
+    // The selection above can leave a lower rank of a spell chain in a slot (e.g. the
+    // secondary damage slot for a caster whose top spells are ranks of one chain). While
+    // charmed the player should cast the highest rank it knows, so walk each slot up its
+    // chain to the top learned rank.
+    for (uint32& charmSpellId : m_charmAISpells)
+    {
+        if (!charmSpellId)
+            continue;
+
+        while (uint32 nextRank = sSpellMgr->GetNextSpellInChain(charmSpellId))
+        {
+            if (!HasActiveSpell(nextRank))
+                break;
+
+            charmSpellId = nextRank;
         }
     }
 }
@@ -15961,6 +16110,24 @@ void Player::_LoadRandomBGStatus(PreparedQueryResult result)
 {
     if (result)
         m_IsBGRandomWinner = true;
+}
+
+float Player::GetTotalItemLevel() const
+{
+    float sum = 0;
+    uint8 level = GetLevel();
+
+    for (uint8 i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
+    {
+        // don't check tabard, ranged, offhand or shirt
+        if (i == EQUIPMENT_SLOT_TABARD || i == EQUIPMENT_SLOT_RANGED || i == EQUIPMENT_SLOT_OFFHAND || i == EQUIPMENT_SLOT_BODY)
+            continue;
+
+        if (m_items[i] && m_items[i]->GetTemplate())
+            sum += m_items[i]->GetTemplate()->GetItemLevelIncludingQuality(level);
+    }
+
+    return sum;
 }
 
 float Player::GetAverageItemLevel()

@@ -192,6 +192,8 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
         {
             err = ERR_BATTLEGROUND_NONE;
         }
+        else if (_player->HasPlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME)) // Assumed to only apply to full restriction rather than partial
+            err = ERR_GROUP_JOIN_BATTLEGROUND_FAIL; // ERR_ARENA_EXPIRED_CAIS does not seem to be a result, so using this error instead
 
         if (err <= 0)
         {
@@ -252,7 +254,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recvData)
             }
         });
 
-        if (err)
+        if (err > 0)
         {
             err = grp->CanJoinBattlegroundQueue(bg, bgQueueTypeId, 0, bg->GetMaxPlayersPerTeam(), false, 0);
         }
@@ -412,7 +414,9 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recvData)
         return;
     }
 
-    if (_player->GetCharmGUID() || _player->IsInCombat())
+    // GetCharm() validates the charmed unit still exists and clears a stale reference,
+    // unlike GetCharmGUID(); a despawned vehicle must not permanently block BG entry.
+    if (_player->GetCharm() || _player->IsInCombat())
     {
         ChatHandler(_player->GetSession()).SendNotification(LANG_YOU_IN_COMBAT);
         return;
@@ -542,7 +546,33 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recvData)
         sLFGMgr->LeaveAllLfgQueues(_player->GetGUID(), false);
 
         _player->SetBattlegroundId(bg->GetInstanceID(), bg->GetBgTypeID(), queueSlot, true, bgTypeId == BATTLEGROUND_RB, teamId);
-        sBattlegroundMgr->SendToBattleground(_player, ginfo.IsInvitedToBGInstanceGUID, bgTypeId);
+
+        if (!sBattlegroundMgr->SendToBattleground(_player, ginfo.IsInvitedToBGInstanceGUID, bgTypeId))
+        {
+            // The teleport never started (instance gone, or a synchronous
+            // TeleportTo veto such as a DK still locked to Ebon Hold). The accept
+            // already pulled the player out of the queue and he can't decline
+            // now, so undo the accept here -- otherwise the invited reservation
+            // leaks forever, permanently skewing team selection and blocking the
+            // empty instance's cleanup.
+            bg->DecreaseInvitedCount(teamId);
+            if (bg->HasFreeSlots())
+                bg->AddToBGFreeSlotQueue();
+            _player->RemoveBattlegroundQueueId(bgQueueTypeId);
+            _player->SetBattlegroundId(0, BATTLEGROUND_TYPE_NONE, PLAYER_MAX_BATTLEGROUND_QUEUES, false, false, TEAM_NEUTRAL);
+
+            sBattlegroundMgr->BuildBattlegroundStatusPacket(&data, bg, queueSlot, STATUS_NONE, 0, 0, 0, TEAM_NEUTRAL);
+            SendPacket(&data);
+
+            // Free slot -> let the queue refill it. BG only, like the sibling
+            // leave-queue path: an arena update needs its own type/rating.
+            if (!ginfo.ArenaType)
+                sBattlegroundMgr->ScheduleQueueUpdate(0, 0, bgQueueTypeId, bgTypeId, bracketEntry->GetBracketId());
+
+            LOG_ERROR("bg.battleground", "Battleground: player {} {} failed to teleport into bg {}, bgtype {}; released the invited reservation.",
+                _player->GetName(), _player->GetGUID().ToString(), bg->GetInstanceID(), bg->GetBgTypeID());
+            return;
+        }
 
         LOG_DEBUG("bg.battleground", "Battleground: player {} {} joined battle for bg {}, bgtype {}, queue type {}.", _player->GetName(), _player->GetGUID().ToString(), bg->GetInstanceID(), bg->GetBgTypeID(), bgQueueTypeId);
     }
@@ -763,13 +793,11 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket& recvData)
     {
         lfg::LfgState lfgState = sLFGMgr->GetState(GetPlayer()->GetGUID());
         if (GetPlayer()->InBattleground()) // currently in battleground
-        {
             err = ERR_BATTLEGROUND_NOT_IN_BATTLEGROUND;
-        }
         else if (lfgState > lfg::LFG_STATE_NONE && (lfgState != lfg::LFG_STATE_QUEUED || !sWorld->getBoolConfig(CONFIG_ALLOW_JOIN_BG_AND_LFG))) // using lfg system
-        {
             err = ERR_LFG_CANT_USE_BATTLEGROUND;
-        }
+        else if (GetPlayer()->HasPlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME)) // Assumed to only apply to full restriction rather than partial
+            err = ERR_GROUP_JOIN_BATTLEGROUND_FAIL; // ERR_ARENA_EXPIRED_CAIS does not seem to be a result, so using this error instead
 
         if (err <= 0)
         {
@@ -842,9 +870,7 @@ void WorldSession::HandleBattlemasterJoinArena(WorldPacket& recvData)
             grp->DoForAllMembers([&bgQueue, &err](Player* member)
             {
                 if (bgQueue.IsPlayerInvitedToRatedArena(member->GetGUID()))
-                {
                     err = ERR_BATTLEGROUND_JOIN_FAILED;
-                }
             });
         }
 

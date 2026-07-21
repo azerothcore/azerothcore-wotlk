@@ -128,7 +128,7 @@ struct argentPonyBanner
 {
     uint32 achievement;
     uint32 spell;
-    const char* text;
+    char const* text;
 };
 
 static std::unordered_map<uint8, argentPonyBanner> argentBanners = {
