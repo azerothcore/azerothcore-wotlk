@@ -214,7 +214,13 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
                     continue;
 
                 if ((*i)->HasPlayerFlag(PLAYER_FLAGS_PARTIAL_PLAY_TIME))
+                {
                     finalGold /= 2;
+
+                    // a halved share that rounds down to nothing is not worth announcing
+                    if (!finalGold)
+                        continue;
+                }
 
                 (*i)->ModifyMoney(finalGold);
                 (*i)->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_MONEY, finalGold);
@@ -228,16 +234,20 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
         else
         {
             uint32 finalGold = loot->gold;
+            bool award = !player->HasPlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME);
 
-            if (player->HasPlayerFlag(PLAYER_FLAGS_PARTIAL_PLAY_TIME))
+            if (award && player->HasPlayerFlag(PLAYER_FLAGS_PARTIAL_PLAY_TIME))
+            {
                 finalGold /= 2;
+
+                // a halved amount that rounds down to nothing is not worth announcing
+                award = finalGold != 0;
+            }
 
             // fire the hook regardless of the CAIS reduction, matching OnLootMoney below
             sScriptMgr->OnPlayerAfterCreatureLootMoney(player);
 
-            // full restriction awards nothing; otherwise award unconditionally so a zero amount
-            // still behaves as it did before CAIS
-            if (!player->HasPlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME))
+            if (award)
             {
                 player->ModifyMoney(finalGold);
                 player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_MONEY, finalGold);
