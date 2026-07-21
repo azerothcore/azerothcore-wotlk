@@ -666,6 +666,52 @@ bool Player::Create(ObjectGuid::LowType guidlow, CharacterCreateInfo* createInfo
     for (PlayerCreateInfoItems::const_iterator item_id_itr = info->item.begin(); item_id_itr != info->item.end(); ++item_id_itr)
         StoreNewItemInBestSlots(item_id_itr->item_id, item_id_itr->item_amount);
 
+    // Collector's Edition starter gift voucher
+    if (GetSession()->HasAccountFlag(ACCOUNT_FLAG_COLLECTOR))
+    {
+        uint32 voucherId = 0;
+        if (IsClass(CLASS_DEATH_KNIGHT, CLASS_CONTEXT_INIT))
+            voucherId = 39713; // Ebon Hold Gift Voucher
+        else
+        {
+            switch (createInfo->Race)
+            {
+                case RACE_HUMAN:
+                    voucherId = 14646; break; // Goldshire Gift Voucher
+                case RACE_DWARF:
+                case RACE_GNOME:
+                    voucherId = 14647; break; // Kharanos Gift Voucher
+                case RACE_NIGHTELF:
+                    voucherId = 14648; break; // Dolanaar Gift Voucher
+                case RACE_ORC:
+                case RACE_TROLL:
+                    voucherId = 14649; break; // Razor Hill Gift Voucher
+                case RACE_TAUREN:
+                    voucherId = 14650; break; // Bloodhoof Village Gift Voucher
+                case RACE_UNDEAD_PLAYER:
+                    voucherId = 14651; break; // Brill Gift Voucher
+                case RACE_BLOODELF:
+                    voucherId = 20938; break; // Falconwing Square Gift Voucher
+                case RACE_DRAENEI:
+                    voucherId = 22888; break; // Azure Watch Gift Voucher
+                default:
+                    break;
+            }
+        }
+
+        // Only guard against mail delivery if the item was actually stored, otherwise
+        // a full bag would suppress the mail fallback and lose the voucher permanently.
+        if (voucherId && StoreNewItemInBestSlots(voucherId, 1))
+        {
+            // Prevent characters from receiving duplicate vouchers through the mail system.
+            // voucherId doubles as the mail template id (item == templateID in the SQL data).
+            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_REP_MAIL_SERVER_CHARACTER);
+            stmt->SetData(0, guidlow);
+            stmt->SetData(1, voucherId);
+            CharacterDatabase.Execute(stmt);
+        }
+    }
+
     // bags and main-hand weapon must equipped at this moment
     // now second pass for not equipped (offhand weapon/shield if it attempt equipped before main-hand weapon)
     // or ammo not equipped in special bag
