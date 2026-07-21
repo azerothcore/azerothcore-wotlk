@@ -876,7 +876,14 @@ void SmartAI::JustEngagedWith(Unit* enemy)
 {
     // Xinef: Interrupt channeled spells
     if (IsAIControlled())
-        me->InterruptSpell(CURRENT_CHANNELED_SPELL, true, true);
+    {
+        if (Spell* spell = me->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
+        {
+            if (!spell->GetSpellInfo()->IsActionAllowedChannel())
+                me->InterruptSpell(CURRENT_CHANNELED_SPELL, true, true);
+        }
+    }
+
     GetScript()->ProcessEventsFor(SMART_EVENT_AGGRO, enemy);
 }
 
