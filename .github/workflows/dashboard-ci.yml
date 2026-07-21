@@ -138,21 +138,23 @@ jobs:
 
       - name: Echo cache key
         shell: bash
-        run: echo "Cache key -> ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}-${{ github.run_id }}"
+        run: echo "Cache key -> ccache:${{ matrix.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}-${{ github.run_id }}"
 
       # The primary key must be unique per run. A static key hits on itself from
       # the second run onward and the save is then skipped, freezing the cache
-      # at its first-run contents. The first restore-key picks up the most
-      # recent cache on this ref; the rest are the existing cross-workflow
-      # fallbacks to the linux-build action's keys.
+      # at its first-run contents. It is keyed on matrix.os rather than
+      # runner.os because both legs report Linux and share a run_id, so only the
+      # detected compiler would separate them. The first restore-key picks up
+      # the most recent cache for this leg on this ref; the rest keep runner.os
+      # because they are cross-workflow fallbacks to the linux-build action.
       - name: Restore ccache
         id: restore_ccache
         uses: actions/cache/restore@v4
         with:
           path: ${{ github.workspace }}/var/ccache
-          key: ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}-${{ github.run_id }}
+          key: ccache:${{ matrix.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}-${{ github.run_id }}
           restore-keys: |
-            ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}-
+            ccache:${{ matrix.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}-
             ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:true:pch=false:
             ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:false:pch=false:
             ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:true:pch=true:
@@ -282,11 +284,15 @@ jobs:
 
       # The per-run key can never collide with an existing cache, so the old
       # "only save on a cache miss" guard would always be true and is dropped.
+      # A failed build still compiled most of the tree and that work is worth
+      # keeping; a cancelled one is skipped so a superseded run cannot publish
+      # a half-populated cache as the newest for the ref.
       - name: Save ccache
+        if: ${{ !cancelled() }}
         uses: actions/cache/save@v4
         with:
           path: ${{ github.workspace }}/var/ccache
-          key: ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}-${{ github.run_id }}
+          key: ccache:${{ matrix.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}-${{ github.run_id }}
 
       - name: ccache stats (after)
         shell: bash
