@@ -127,6 +127,7 @@ enum UlduarData
     DATA_SARA                               = 760,
     DATA_BRAIN_OF_YOGG_SARON               = 761,
     DATA_YOGG_SARON_DOORS                   = 762,
+    DATA_VOICE_OF_YOGG_SARON                = 763,
 
     // Middle section
     DATA_ASSEMBLY_DOORS                     = 770,
@@ -192,6 +193,7 @@ enum UlduarNPCs
     NPC_ELDER_IRONBRANCH                    = 32913,
 
     // Yogg-Saron
+    NPC_VOICE_OF_YOGG_SARON                 = 33280,
     NPC_FREYA_GOSSIP                        = 33241,
     NPC_HODIR_GOSSIP                        = 33213,
     NPC_THORIM_GOSSIP                       = 33242,
