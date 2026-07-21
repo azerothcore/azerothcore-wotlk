@@ -1,3 +1,4 @@
+-- DB update 2026_07_18_00 -> 2026_07_21_00
 DELETE FROM `mail_server_template` WHERE `id` IN (14646, 14647, 14648, 14649, 14650, 14651, 20938, 22888, 39713);
 INSERT INTO `mail_server_template` (`id`, `senderEntry`, `moneyA`, `moneyH`, `subject`, `body`, `active`) VALUES
 (14646, 19506, 0, 0, 'A Very Special Delivery', 'Thank you for your purchase of the World of Warcraft Collector''s Edition! As a special gift of appreciation, we would like to present you with this gift voucher. Turn it in to receive a little companion to join you on your quest for adventure and glory!', 1),
