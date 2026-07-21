@@ -145,11 +145,13 @@ jobs:
       # at its first-run contents. It is keyed on matrix.os rather than
       # runner.os because both legs report Linux and share a run_id, so only the
       # detected compiler would separate them. The first restore-key picks up
-      # the most recent cache for this leg on this ref, the second any cache for
-      # this leg on any ref, which is how a PR's first run inherits master's.
-      # Both must use matrix.os to stay in the same namespace as the key. The
-      # rest keep runner.os: they are cross-workflow fallbacks to the
-      # linux-build action, whose keys are built from runner.os.
+      # the most recent cache for this leg on this ref; the second the most
+      # recent on any ref the run can reach, which is its own and the base
+      # branch, and is how a first run inherits master's. Both must use
+      # matrix.os to stay in the key's namespace.
+      # The runner.os entries below reach the linux-build action's caches, but
+      # only on the 24.04 leg: on 26.04 this workflow detects clang-21 while
+      # linux-build is passed clang-20, so nothing there lines up.
       - name: Restore ccache
         id: restore_ccache
         uses: actions/cache/restore@v4
