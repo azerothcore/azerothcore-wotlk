@@ -12055,21 +12055,36 @@ void Player::resetSpells()
     if (HasAtLoginFlag(AT_LOGIN_RESET_SPELLS))
         RemoveAtLoginFlag(AT_LOGIN_RESET_SPELLS, true);
 
-    // Only remove spells a class trainer can teach - quest-reward, custom and default spells are
-    // left untouched, so the player never ends up with an empty spellbook needing a relog to fix.
-    // Re-learning happens the normal way, by visiting a trainer again (or a GM re-teaching them).
-    std::unordered_set<uint32> trainerSpellIds;
+    // Only remove active (non-passive) spells this character could re-learn from a trainer, plus
+    // the active spells granted for free at creation (e.g. a Paladin's starting Seal of
+    // Righteousness/Holy Light) - weapon skills, languages, and other passive grants from that
+    // same creation list are left alone, along with quest-reward spells. The player never ends up
+    // with an empty spellbook: re-learning happens the normal way, by visiting a trainer again (or
+    // a GM re-teaching them).
+    std::unordered_set<uint32> resettableSpellIds;
     for (Trainer::Trainer const* trainer : sObjectMgr->GetClassTrainers(getClass()))
         for (Trainer::Spell const& trainerSpell : trainer->GetSpells())
-            trainerSpellIds.insert(trainerSpell.SpellId);
+            resettableSpellIds.insert(trainerSpell.SpellId);
+
+    if (PlayerInfo const* info = sObjectMgr->GetPlayerInfo(getRace(), getClass()))
+        for (uint32 spellId : info->customSpells)
+            resettableSpellIds.insert(spellId);
 
     // make full copy of map (spells removed and marked as deleted at another spell remove
     // and we can't use original map for safe iterative with visit each spell at loop end
     PlayerSpellMap spellMap = GetSpellMap();
 
     for (PlayerSpellMap::const_iterator iter = spellMap.begin(); iter != spellMap.end(); ++iter)
-        if (trainerSpellIds.contains(iter->first))
-            removeSpell(iter->first, SPEC_MASK_ALL, false);
+    {
+        if (!resettableSpellIds.contains(iter->first))
+            continue;
+
+        SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(iter->first);
+        if (spellInfo && spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE))
+            continue;
+
+        removeSpell(iter->first, SPEC_MASK_ALL, false);
+    }
 }
 
 void Player::LearnCustomSpells()
