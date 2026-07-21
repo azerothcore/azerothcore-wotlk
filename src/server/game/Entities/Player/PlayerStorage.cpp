@@ -5102,10 +5102,10 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     RemovePlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME);
     RemovePlayerFlag(PLAYER_FLAGS_PARTIAL_PLAY_TIME);
 
-    Seconds const accountPlayedTime = GetSession()->GetConsecutivePlayTime(GameTime::GetGameTime());
-
     if (GetSession()->IsAffectedByCAIS())
     {
+        Seconds const accountPlayedTime = GetSession()->GetConsecutivePlayTime(GameTime::GetGameTime());
+
         if (accountPlayedTime >= PLAY_TIME_LIMIT_FULL)
             SetPlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME);
         else if (accountPlayedTime >= PLAY_TIME_LIMIT_PARTIAL)
