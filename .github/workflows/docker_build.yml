@@ -41,7 +41,7 @@ jobs:
           sudo rm -rf /opt/ghc
           sudo rm -rf "$AGENT_TOOLSDIRECTORY"
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # The containers created in this workflow are used by
       # acore-docker, which has a dependency on mod-ale.
@@ -50,7 +50,7 @@ jobs:
       # build them locally (such as with `docker compose build`)
       - name: Download Eluna
         if: github.repository == 'azerothcore/azerothcore-wotlk' && github.ref_name == 'master'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: azerothcore/mod-ale
           path: modules/mod-ale

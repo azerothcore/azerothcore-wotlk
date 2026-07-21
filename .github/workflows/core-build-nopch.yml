@@ -53,7 +53,7 @@ jobs:
     name: ${{ matrix.os }}-${{ matrix.compiler.CC }}-nopch
     if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/linux-build
         with:
           CC: ${{ matrix.compiler.CC }}

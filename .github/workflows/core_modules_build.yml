@@ -49,7 +49,7 @@ jobs:
     name: ${{ matrix.os }}-${{ matrix.compiler.CC }}-nopch-modules
     if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         # This script installs a general list of modules to compile with
         # azerothcore. This is useful for ensuring that module compilation
         # functionality works.
