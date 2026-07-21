@@ -1746,34 +1746,111 @@ public:
 
         Player* playerTarget = player->GetConnectedPlayer();
 
-        if (!playerTarget)
-            return false;
-
         // Subtract
         if (count < 0)
         {
-            // Only have scam check on player accounts
-            if (playerTarget->GetSession()->GetSecurity() == SEC_PLAYER)
+            uint32 removeCount = uint32(-count);
+
+            if (playerTarget)
             {
-                if (!playerTarget->HasItemCount(itemId, 0))
+                // Only have scam check on player accounts
+                if (playerTarget->GetSession()->GetSecurity() == SEC_PLAYER)
                 {
-                    // output that player don't have any items to destroy
-                    handler->SendErrorMessage(LANG_REMOVEITEM_FAILURE, handler->GetNameLink(playerTarget), itemId);
+                    if (!playerTarget->HasItemCount(itemId, 0))
+                    {
+                        // output that player don't have any items to destroy
+                        handler->SendErrorMessage(LANG_REMOVEITEM_FAILURE, handler->GetNameLink(playerTarget), itemId);
+                        return false;
+                    }
+
+                    if (!playerTarget->HasItemCount(itemId, removeCount))
+                    {
+                        // output that player don't have as many items that you want to destroy
+                        handler->SendErrorMessage(LANG_REMOVEITEM_ERROR, handler->GetNameLink(playerTarget), itemId);
+                        return false;
+                    }
+                }
+
+                // output successful amount of destroyed items
+                playerTarget->DestroyItemCount(itemId, removeCount, true, false);
+                handler->PSendSysMessage(LANG_REMOVEITEM, itemId, removeCount, handler->GetNameLink(playerTarget));
+                return true;
+            }
+
+            // offline target: remove the items directly from the DB
+            std::string nameLink = handler->playerLink(player->GetName());
+
+            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_INVENTORY_STACKS_BY_ENTRY_AND_OWNER);
+            stmt->SetData(0, itemId);
+            stmt->SetData(1, player->GetGUID().GetCounter());
+            PreparedQueryResult result = CharacterDatabase.Query(stmt);
+
+            std::vector<std::pair<ObjectGuid::LowType, uint32>> stacks;
+            uint32 totalCount = 0;
+            if (result)
+            {
+                do
+                {
+                    Field* fields = result->Fetch();
+                    stacks.emplace_back(fields[0].Get<uint32>(), fields[1].Get<uint32>());
+                    totalCount += fields[1].Get<uint32>();
+                } while (result->NextRow());
+            }
+
+            // Only have scam check on player accounts
+            uint32 accountId = sCharacterCache->GetCharacterAccountIdByGuid(player->GetGUID());
+            if (AccountMgr::GetSecurity(accountId, realm.Id.Realm) == SEC_PLAYER)
+            {
+                if (!totalCount)
+                {
+                    handler->SendErrorMessage(LANG_REMOVEITEM_FAILURE, nameLink, itemId);
                     return false;
                 }
 
-                if (!playerTarget->HasItemCount(itemId, -count))
+                if (totalCount < removeCount)
                 {
-                    // output that player don't have as many items that you want to destroy
-                    handler->SendErrorMessage(LANG_REMOVEITEM_ERROR, handler->GetNameLink(playerTarget), itemId);
+                    handler->SendErrorMessage(LANG_REMOVEITEM_ERROR, nameLink, itemId);
                     return false;
                 }
             }
 
-            // output successful amount of destroyed items
-            playerTarget->DestroyItemCount(itemId, -count, true, false);
-            handler->PSendSysMessage(LANG_REMOVEITEM, itemId, -count, handler->GetNameLink(playerTarget));
+            CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+            uint32 remaining = removeCount;
+            for (auto const& [itemGuid, stackCount] : stacks)
+            {
+                if (!remaining)
+                    break;
+
+                if (stackCount <= remaining)
+                {
+                    remaining -= stackCount;
+                    Item::DeleteFromInventoryDB(trans, itemGuid);
+                    Item::DeleteFromDB(trans, itemGuid);
+
+                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GIFT);
+                    stmt->SetData(0, itemGuid);
+                    trans->Append(stmt);
+                }
+                else
+                {
+                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ITEM_COUNT);
+                    stmt->SetData(0, stackCount - remaining);
+                    stmt->SetData(1, itemGuid);
+                    trans->Append(stmt);
+                    remaining = 0;
+                }
+            }
+            CharacterDatabase.CommitTransaction(trans);
+
+            handler->PSendSysMessage(LANG_REMOVEITEM, itemId, removeCount, nameLink);
             return true;
+        }
+
+        // Adding items requires the target to be online
+        if (!playerTarget)
+        {
+            handler->SendErrorMessage(LANG_PLAYER_NOT_FOUND);
+            return false;
         }
 
         // Adding items
