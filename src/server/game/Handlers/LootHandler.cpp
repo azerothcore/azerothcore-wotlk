@@ -187,6 +187,15 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
 
     if (loot)
     {
+        // the money is zeroed and dropped from storage below no matter who is paid, so a fully
+        // restricted looter would destroy it rather than receive it. Bail before that teardown;
+        // reachable for windows not opened through HandleLootOpcode, e.g. chests and lockboxes.
+        if (player->HasPlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME))
+        {
+            player->SendLootError(guid, LOOT_ERROR_PLAY_TIME_EXCEEDED);
+            return;
+        }
+
         sScriptMgr->OnPlayerBeforeLootMoney(player, loot);
         loot->NotifyMoneyRemoved();
         if (shareMoney && player->GetGroup())      //item, pickpocket and players can be looted only single player
@@ -234,9 +243,9 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
         else
         {
             uint32 finalGold = loot->gold;
-            bool award = !player->HasPlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME);
+            bool award = true; // full restriction already returned above
 
-            if (award && player->HasPlayerFlag(PLAYER_FLAGS_PARTIAL_PLAY_TIME))
+            if (player->HasPlayerFlag(PLAYER_FLAGS_PARTIAL_PLAY_TIME))
             {
                 finalGold /= 2;
 
