@@ -78,7 +78,7 @@ private:
 public:
     BIH() { init_empty(); }
     template< class BoundsFunc, class PrimArray >
-    void build(const PrimArray& primitives, BoundsFunc& GetBounds, uint32 leafSize = 3, bool printStats = false)
+    void build(PrimArray const& primitives, BoundsFunc& GetBounds, uint32 leafSize = 3, bool printStats = false)
     {
         if (primitives.size() == 0)
         {
@@ -120,7 +120,7 @@ public:
     G3D::AABox const& bound() const { return bounds; }
 
     template<typename RayCallback>
-    void intersectRay(const G3D::Ray& r, RayCallback& intersectCallback, float& maxDist, bool stopAtFirstHit) const
+    void intersectRay(G3D::Ray const& r, RayCallback& intersectCallback, float& maxDist, bool stopAtFirstHit) const
     {
         float intervalMin = -1.f;
         float intervalMax = -1.f;
@@ -283,7 +283,7 @@ public:
     }
 
     template<typename IsectCallback>
-    void intersectPoint(const G3D::Vector3& p, IsectCallback& intersectCallback) const
+    void intersectPoint(G3D::Vector3 const& p, IsectCallback& intersectCallback) const
     {
         if (!bounds.contains(p))
         {
