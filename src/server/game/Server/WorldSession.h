@@ -501,6 +501,8 @@ public:
 
     // Playtime limit
     Seconds GetCreateTime() const { return _createTime; }
+    // Measured from session creation (authentication), so login queue and character select count
+    // toward the limits. Matches the VMaNGOS behaviour this is ported from.
     Seconds GetConsecutivePlayTime(Seconds now) const { return (now - _createTime) + _previousPlayTime; }
     Seconds GetPreviousPlayedTime() const { return _previousPlayTime; }
     void SetPreviousPlayedTime(Seconds playedTime) { _previousPlayTime = playedTime; }

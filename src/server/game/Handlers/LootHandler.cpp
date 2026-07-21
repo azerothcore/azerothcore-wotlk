@@ -216,9 +216,6 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
                 if ((*i)->HasPlayerFlag(PLAYER_FLAGS_PARTIAL_PLAY_TIME))
                     finalGold /= 2;
 
-                if (!finalGold)
-                    continue;
-
                 (*i)->ModifyMoney(finalGold);
                 (*i)->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_MONEY, finalGold);
 
@@ -232,16 +229,15 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
         {
             uint32 finalGold = loot->gold;
 
-            if (player->HasPlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME))
-                finalGold = 0;
-
             if (player->HasPlayerFlag(PLAYER_FLAGS_PARTIAL_PLAY_TIME))
                 finalGold /= 2;
 
             // fire the hook regardless of the CAIS reduction, matching OnLootMoney below
             sScriptMgr->OnPlayerAfterCreatureLootMoney(player);
 
-            if (finalGold)
+            // full restriction awards nothing; otherwise award unconditionally so a zero amount
+            // still behaves as it did before CAIS
+            if (!player->HasPlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME))
             {
                 player->ModifyMoney(finalGold);
                 player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_MONEY, finalGold);
