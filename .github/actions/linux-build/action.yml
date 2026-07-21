@@ -50,7 +50,7 @@ runs:
     # walk back from the most-recent cache on this branch to progressively
     # broader fallbacks (branch -> pch variant -> modules variant -> compiler).
     - name: Cache
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: ${{ github.workspace }}/var/ccache
         key: ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:pch=${{ inputs.pch }}:${{ github.ref_name }}-${{ github.run_id }}
