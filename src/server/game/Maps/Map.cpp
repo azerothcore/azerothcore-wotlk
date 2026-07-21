@@ -376,9 +376,12 @@ bool Map::AddToMap(Transport* obj, bool /*checkTransport*/)
     _transports.insert(obj);
 
     // Broadcast creation to players
+    // Skip players that are not in world. Sending the create to their loading client
+    // could materialize a lingering transport on whatever map they are teleporting to.
+    // They get the correct transport list from SendInitTransports when added to their new map
     for (Map::PlayerList::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
     {
-        if (itr->GetSource()->GetTransport() != obj)
+        if (itr->GetSource()->IsInWorld() && itr->GetSource()->GetTransport() != obj)
         {
             UpdateData data;
             obj->BuildCreateUpdateBlockForPlayer(&data, itr->GetSource());
@@ -761,8 +764,10 @@ void Map::RemoveFromMap(Transport* obj, bool remove)
         obj->BuildOutOfRangeUpdateBlock(&data);
         WorldPacket packet;
         data.BuildPacket(packet);
+        // Skip players that are not in world
+        // Their client already received the destroy from SendRemoveTransports when leaving this map
         for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-            if (itr->GetSource()->GetTransport() != obj)
+            if (itr->GetSource()->IsInWorld() && itr->GetSource()->GetTransport() != obj)
                 itr->GetSource()->SendDirectMessage(&packet);
     }
 
@@ -2786,6 +2791,19 @@ void Map::ProcessCreatureRespawn(ObjectGuid::LowType spawnId)
         }
     }
 
+    // Check linked_respawn: don't spawn if the master creature is still dead.
+    // This mirrors the check in Creature::Respawn() for compat-mode creatures.
+    ObjectGuid dbtableHighGuid = ObjectGuid::Create<HighGuid::Unit>(data->id, spawnId);
+    time_t linkedRespawntime = GetLinkedRespawnTime(dbtableHighGuid);
+    if (linkedRespawntime)
+    {
+        // Master is still dead; re-queue at the master's respawn time + a small offset.
+        time_t now = GameTime::GetGameTime().count();
+        time_t newRespawnTime = (now > linkedRespawntime ? now : linkedRespawntime) + urand(5, MINUTE);
+        SaveCreatureRespawnTime(spawnId, newRespawnTime);
+        return;
+    }
+
     // Remove respawn time BEFORE LoadFromDB, otherwise the creature
     // reads it back and loads as DEAD instead of ALIVE
     RemoveCreatureRespawnTime(spawnId);
@@ -2933,7 +2951,7 @@ void Map::LogEncounterFinished(EncounterCreditType type, uint32 creditEntry)
         if (Player* p = itr->GetSource())
         {
             std::string auraStr;
-            const Unit::AuraApplicationMap& a = p->GetAppliedAuras();
+            Unit::AuraApplicationMap const& a = p->GetAppliedAuras();
             for (auto iterator = a.begin(); iterator != a.end(); ++iterator)
             {
                 snprintf(buffer2, 255, "%u(%u) ", iterator->first, iterator->second->GetEffectMask());

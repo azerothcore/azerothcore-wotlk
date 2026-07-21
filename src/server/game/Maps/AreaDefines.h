@@ -236,6 +236,7 @@ enum MapIDs : uint32
     MAP_AUCHINDOUN_MANA_TOMBS                = 557,
     MAP_AUCHINDOUN_AUCHENAI_CRYPTS           = 558,
     MAP_THE_ESCAPE_FROM_DURNHOLDE            = 560,
+    MAP_BLADES_EDGE_ARENA                    = 562,
     MAP_BLACK_TEMPLE                         = 564,
     MAP_GRUULS_LAIR                          = 565,
     MAP_EYE_OF_THE_STORM                     = 566,

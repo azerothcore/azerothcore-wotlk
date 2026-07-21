@@ -30,7 +30,7 @@ enum MailHook
 class MailScript : public ScriptObject
 {
 protected:
-    MailScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
+    MailScript(char const* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     // Called before mail is sent

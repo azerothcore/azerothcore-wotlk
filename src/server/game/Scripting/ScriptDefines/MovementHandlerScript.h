@@ -31,7 +31,7 @@ enum MovementHook
 class MovementHandlerScript : public ScriptObject
 {
 protected:
-    MovementHandlerScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
+    MovementHandlerScript(char const* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     //Called whenever a player moves
