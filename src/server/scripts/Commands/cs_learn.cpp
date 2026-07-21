@@ -164,11 +164,6 @@ public:
             return false;
         }
 
-        // Picking a single tab also learns all trainer spells, same as ".learn all my class" -
-        // the plain no-arg command stays talents-only.
-        if (tabArg)
-            HandleLearnAllMyTrainerSpellsCommand(handler);
-
         Player* player = handler->GetSession()->GetPlayer();
         uint32 classMask = player->getClassMask();
 
@@ -227,6 +222,12 @@ public:
                     hadNew = true;
             }
         } while (hadNew);
+
+        // Picking a single tab also learns all trainer spells, same as ".learn all my class" -
+        // the plain no-arg command stays talents-only. Done after the talent loop so any trainer
+        // spell gated behind a talent from this tab is already available to teach.
+        if (tabArg)
+            HandleLearnAllMyTrainerSpellsCommand(handler);
 
         // LearnTalent doesn't touch the free-point pool for command=true - zero it out here too
         // (even for a single tab) so the player can't also spend the intact pool in the other
