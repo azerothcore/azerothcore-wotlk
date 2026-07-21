@@ -1362,12 +1362,16 @@ void Guardian::UpdateDamagePhysical(WeaponAttackType attType)
     float base_pct    = GetPctModifierValue(unitMod, BASE_PCT);
     float total_value = GetFlatModifierValue(unitMod, TOTAL_VALUE);
     float total_pct   = GetPctModifierValue(unitMod, TOTAL_PCT);
+    // Pets (hunter/warlock/etc.) set their base weapon damage through hand-tuned formulas in Guardian::InitStatsForLevel,
+    // so the template DamageModifier must not be applied on top of them. Only pure guardian summons (which keep the CLS
+    // weapon damage from Creature::SelectLevel) should honour it, mirroring Creature::UpdateDamagePhysical.
+    float dmgMultiplier = IsPet() ? 1.0f : GetCreatureTemplate()->DamageModifier; // = DamageModifier * _GetDamageMod(rank)
 
     float weapon_mindamage = GetWeaponDamageRange(BASE_ATTACK, MINDAMAGE);
     float weapon_maxdamage = GetWeaponDamageRange(BASE_ATTACK, MAXDAMAGE);
 
-    float mindamage = ((base_value + weapon_mindamage) * base_pct + total_value) * total_pct;
-    float maxdamage = ((base_value + weapon_maxdamage) * base_pct + total_value) * total_pct;
+    float mindamage = ((base_value + weapon_mindamage) * dmgMultiplier * base_pct + total_value) * total_pct;
+    float maxdamage = ((base_value + weapon_maxdamage) * dmgMultiplier * base_pct + total_value) * total_pct;
 
     if (mindamage < 0.0f || mindamage > 10000000.0f)
         mindamage = BASE_MINDAMAGE;
