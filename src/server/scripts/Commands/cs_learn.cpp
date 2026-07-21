@@ -164,6 +164,11 @@ public:
             return false;
         }
 
+        // Picking a single tab also learns all trainer spells, same as ".learn all my class" -
+        // the plain no-arg command stays talents-only.
+        if (tabArg)
+            HandleLearnAllMyTrainerSpellsCommand(handler);
+
         Player* player = handler->GetSession()->GetPlayer();
         uint32 classMask = player->getClassMask();
 
