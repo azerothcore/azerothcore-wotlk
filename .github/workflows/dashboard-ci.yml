@@ -137,15 +137,21 @@ jobs:
 
       - name: Echo cache key
         shell: bash
-        run: echo "Cache key -> ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}"
+        run: echo "Cache key -> ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}-${{ github.run_id }}"
 
+      # The primary key must be unique per run. A static key hits on itself from
+      # the second run onward and the save is then skipped, freezing the cache
+      # at its first-run contents. The first restore-key picks up the most
+      # recent cache on this ref; the rest are the existing cross-workflow
+      # fallbacks to the linux-build action's keys.
       - name: Restore ccache
         id: restore_ccache
         uses: actions/cache/restore@v4
         with:
           path: ${{ github.workspace }}/var/ccache
-          key: ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}
+          key: ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}-${{ github.run_id }}
           restore-keys: |
+            ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}-
             ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:true:pch=false:
             ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:false:pch=false:
             ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:true:pch=true:
@@ -167,7 +173,7 @@ jobs:
           CCACHE_MAXSIZE=5G
           CCACHE_SLOPPINESS=pch_defines,time_macros,include_file_mtime
           CCACHE_COMPRESS=1
-          CCACHE_COMPRESSLEVEL=9
+          CCACHE_COMPRESSLEVEL=3
           CCACHE_COMPILERCHECK=content
           CCACHE_LOGFILE=${{ github.workspace }}/var/ccache/cache.debug
           CMAKE_C_COMPILER_LAUNCHER=ccache
@@ -273,13 +279,13 @@ jobs:
         timeout-minutes: 30
         continue-on-error: false
 
-      # save only if we didn't hit the cache
+      # The per-run key can never collide with an existing cache, so the old
+      # "only save on a cache miss" guard would always be true and is dropped.
       - name: Save ccache
-        if: steps.restore_ccache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v4
         with:
           path: ${{ github.workspace }}/var/ccache
-          key: ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}
+          key: ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}-${{ github.run_id }}
 
       - name: ccache stats (after)
         shell: bash
