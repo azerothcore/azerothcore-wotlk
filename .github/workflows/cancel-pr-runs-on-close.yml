@@ -24,16 +24,14 @@ jobs:
         run: |
           set -euo pipefail
 
-          # Runs are matched on head_sha. The `pull_requests` field of a run is
-          # empty for PRs from a fork, which is nearly all of them here, so it
-          # cannot be used. head_branch is the fork's branch name and can collide
-          # between forks. Restricting to event=pull_request keeps push runs for
-          # the same commit out of the selection.
+          # --commit filters server-side on head_sha. A run's `pull_requests`
+          # field is empty for PRs from a fork, which is nearly all of them here,
+          # and head_branch can collide between forks, so the sha is the only
+          # reliable key. --event keeps push runs for the same commit out.
           ids="$(
-            for status in queued in_progress; do
-              gh api "repos/${GH_REPO}/actions/runs?event=pull_request&status=${status}&per_page=100" \
-                | jq -r --arg sha "$PR_SHA" '.workflow_runs[] | select(.head_sha == $sha) | .id'
-            done | sort -u
+            gh run list --commit "$PR_SHA" --event pull_request --limit 100 \
+              --json databaseId,status \
+              --jq '.[] | select(.status == "queued" or .status == "in_progress") | .databaseId'
           )"
 
           if [[ -z "$ids" ]]; then
