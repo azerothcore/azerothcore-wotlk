@@ -28,22 +28,11 @@ jobs:
           # field is empty for PRs from a fork, which is nearly all of them here,
           # and head_branch can collide between forks, so the sha is the only
           # reliable key. --event keeps push runs for the same commit out.
-          ids="$(
-            gh run list --commit "$PR_SHA" --event pull_request --limit 100 \
-              --json databaseId,status \
-              --jq '.[] | select(.status == "queued" or .status == "in_progress") | .databaseId'
-          )"
-
-          if [[ -z "$ids" ]]; then
-            echo "Nothing still running for $PR_SHA"
-            exit 0
-          fi
-
-          while read -r id; do
-            # A run that finishes between the listing and the cancel returns 409.
-            if gh run cancel "$id"; then
-              echo "Cancelled run $id"
-            else
-              echo "::warning::could not cancel run $id, it likely already finished"
-            fi
-          done <<< "$ids"
+          gh run list --commit "$PR_SHA" --event pull_request --limit 100 \
+            --json databaseId,status \
+            --jq '.[] | select(.status == "queued" or .status == "in_progress") | .databaseId' \
+          | while read -r id; do
+              # gh has no bulk cancel. A run that finishes between the listing
+              # and the cancel returns 409, which is not worth failing over.
+              gh run cancel "$id" || echo "::warning::run $id was already finished"
+            done
