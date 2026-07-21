@@ -1778,6 +1778,9 @@ public:
             }
 
             // offline target: remove the items directly from the DB
+            if (handler->HasLowerSecurity(nullptr, player->GetGUID()))
+                return false;
+
             std::string nameLink = handler->playerLink(player->GetName());
 
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_INVENTORY_STACKS_BY_ENTRY_AND_OWNER);
@@ -1797,21 +1800,18 @@ public:
                 } while (result->NextRow());
             }
 
+            if (!totalCount)
+            {
+                handler->SendErrorMessage(LANG_REMOVEITEM_FAILURE, nameLink, itemId);
+                return false;
+            }
+
             // Only have scam check on player accounts
             uint32 accountId = sCharacterCache->GetCharacterAccountIdByGuid(player->GetGUID());
-            if (AccountMgr::GetSecurity(accountId, realm.Id.Realm) == SEC_PLAYER)
+            if (AccountMgr::GetSecurity(accountId, realm.Id.Realm) == SEC_PLAYER && totalCount < removeCount)
             {
-                if (!totalCount)
-                {
-                    handler->SendErrorMessage(LANG_REMOVEITEM_FAILURE, nameLink, itemId);
-                    return false;
-                }
-
-                if (totalCount < removeCount)
-                {
-                    handler->SendErrorMessage(LANG_REMOVEITEM_ERROR, nameLink, itemId);
-                    return false;
-                }
+                handler->SendErrorMessage(LANG_REMOVEITEM_ERROR, nameLink, itemId);
+                return false;
             }
 
             CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
@@ -1830,6 +1830,18 @@ public:
                     stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_GIFT);
                     stmt->SetData(0, itemGuid);
                     trans->Append(stmt);
+
+                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_REFUND_INSTANCE);
+                    stmt->SetData(0, itemGuid);
+                    trans->Append(stmt);
+
+                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_BOP_TRADE);
+                    stmt->SetData(0, itemGuid);
+                    trans->Append(stmt);
+
+                    stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEMCONTAINER_CONTAINER);
+                    stmt->SetData(0, itemGuid);
+                    trans->Append(stmt);
                 }
                 else
                 {
@@ -1842,7 +1854,7 @@ public:
             }
             CharacterDatabase.CommitTransaction(trans);
 
-            handler->PSendSysMessage(LANG_REMOVEITEM, itemId, removeCount, nameLink);
+            handler->PSendSysMessage(LANG_REMOVEITEM, itemId, removeCount - remaining, nameLink);
             return true;
         }
 
