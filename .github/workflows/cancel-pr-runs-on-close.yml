@@ -21,18 +21,28 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
           PR_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_REPO: ${{ github.event.pull_request.head.repo.full_name }}
         run: |
           set -euo pipefail
 
-          # --commit filters server-side on head_sha. A run's `pull_requests`
-          # field is empty for PRs from a fork, which is nearly all of them here,
-          # and head_branch can collide between forks, so the sha is the only
-          # reliable key. --event keeps push runs for the same commit out.
-          gh run list --commit "$PR_SHA" --event pull_request --limit 100 \
-            --json databaseId,status \
-            --jq '.[] | select(.status == "queued" or .status == "in_progress") | .databaseId' \
+          # head_sha alone would let anyone cancel another PR's CI: push that
+          # PR's head commit to your own fork, open a PR and close it, and every
+          # run for the commit matches. So the run must also come from this PR's
+          # head repository. `gh run list` exposes neither head_repository nor
+          # the (fork-empty) pull_requests field, hence the raw API call.
+          gh api "repos/${GH_REPO}/actions/runs?event=pull_request&head_sha=${PR_SHA}&per_page=100" \
+            --jq '.workflow_runs[]
+                  | select(.head_repository.full_name == env.PR_REPO and .status != "completed")
+                  | .id' \
           | while read -r id; do
               # gh has no bulk cancel. A run that finishes between the listing
               # and the cancel returns 409, which is not worth failing over.
-              gh run cancel "$id" || echo "::warning::run $id was already finished"
+              if ! err=$(gh run cancel "$id" 2>&1); then
+                if echo "$err" | grep -Fq "HTTP 409"; then
+                  echo "::warning::run $id was already finished"
+                else
+                  echo "::error::Failed to cancel run $id: $err"
+                  exit 1
+                fi
+              fi
             done
