@@ -24,38 +24,6 @@ jobs:
           # unreachable from any other branch, so once the PR is closed they can
           # only occupy space. Deleting by this ref cannot touch master's caches.
           PR_REF: refs/pull/${{ github.event.pull_request.number }}/merge
-        run: |
-          set -euo pipefail
-
-          deleted=0
-          # A single PR can hold more entries than one page: the ccache key is
-          # unique per run, so a long-lived PR accumulates one entry per build
-          # leg per push. No iteration cap, or entries past the cap would be
-          # left behind silently; the no-progress check below is what
-          # terminates the loop.
-          while true; do
-            ids="$(gh cache list --ref "$PR_REF" --limit 100 --json id --jq '.[].id')"
-            # Not `[[ -z ]] && break`: under `set -e` a false test as the last
-            # command of the loop body would abort the script.
-            if [[ -z "$ids" ]]; then
-              break
-            fi
-
-            before=$deleted
-            while read -r id; do
-              if gh cache delete "$id"; then
-                deleted=$((deleted + 1))
-              else
-                echo "::warning::failed to delete cache $id"
-              fi
-            done <<< "$ids"
-
-            # Entries still listed but undeletable would otherwise be retried
-            # every round.
-            if [[ "$deleted" -eq "$before" ]]; then
-              echo "::warning::no progress, giving up with entries remaining"
-              break
-            fi
-          done
-
-          echo "Deleted $deleted cache entries for $PR_REF"
+        # --succeed-on-no-caches: without it gh exits 1 when the PR has no
+        # caches, which is the normal case for a PR that never ran CI.
+        run: gh cache delete --all --ref "$PR_REF" --succeed-on-no-caches
