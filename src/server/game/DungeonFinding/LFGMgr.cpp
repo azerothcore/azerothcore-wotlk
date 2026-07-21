@@ -2393,6 +2393,10 @@ namespace lfg
             if (!reward)
                 continue;
 
+            // CAIS full restriction: grant no dungeon reward and leave the daily available for later
+            if (player->HasPlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME))
+                continue;
+
             bool done = false;
             Quest const* quest = sObjectMgr->GetQuestTemplate(reward->firstQuest);
             if (!quest)
