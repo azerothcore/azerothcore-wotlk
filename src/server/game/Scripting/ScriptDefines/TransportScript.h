@@ -23,7 +23,7 @@
 class TransportScript : public ScriptObject, public UpdatableScript<Transport>
 {
 protected:
-    TransportScript(const char* name);
+    TransportScript(char const* name);
 
 public:
     [[nodiscard]] bool IsDatabaseBound() const override { return true; }
