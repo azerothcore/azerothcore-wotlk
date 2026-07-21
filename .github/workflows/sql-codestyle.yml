@@ -10,6 +10,12 @@ on:
       - "!README.md"
       - "!docs/**"
 
+concurrency:
+  # New commits on a PR cancel the still-running codestyle check on the old
+  # commit. github.ref is refs/pull/<N>/merge, so the group is stable per PR.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   triage:
     runs-on: ubuntu-latest

@@ -9,7 +9,9 @@ on:
       - synchronize
 
 concurrency:
-  group: ${{ github.head_ref }} || concat(${{ github.ref_name }}, ${{ github.workflow }})
+  # One concurrency group per workflow + ref (matches the other build workflows).
+  # PRs cancel superseded runs; branch pushes are isolated by ref.
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -35,9 +37,11 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/Library/Caches/ccache
-          key: ccache:${{ matrix.os }}:${{ github.ref_name }}
+          # Unique per run so the cache is re-saved every run instead of
+          # freezing on the first (a static key hits itself and skips upload).
+          key: ccache:${{ matrix.os }}:${{ github.ref_name }}-${{ github.run_id }}
           restore-keys: |
-            ccache:${{ matrix.os }}:${{ github.ref_name }}
+            ccache:${{ matrix.os }}:${{ github.ref_name }}-
             ccache:${{ matrix.os }}
       - name: reset ccache stats
         shell: bash
