@@ -1,3 +1,4 @@
+-- DB update 2026_07_20_01 -> 2026_07_21_00
 
 -- Add Missing Waypoint (Sniffed).
 DELETE FROM `waypoint_data` WHERE `id` = 12889700;
