@@ -2325,7 +2325,7 @@ void Player::UninviteFromGroup()
     }
 }
 
-void Player::RemoveFromGroup(Group* group, ObjectGuid guid, RemoveMethod method /* = GROUP_REMOVEMETHOD_DEFAULT*/, ObjectGuid kicker /* = ObjectGuid::Empty */, const char* reason /* = nullptr */)
+void Player::RemoveFromGroup(Group* group, ObjectGuid guid, RemoveMethod method /* = GROUP_REMOVEMETHOD_DEFAULT*/, ObjectGuid kicker /* = ObjectGuid::Empty */, char const* reason /* = nullptr */)
 {
     if (group)
     {
@@ -11397,7 +11397,7 @@ void Player::SetEntryPoint()
 
         if (GetMap()->IsDungeon())
         {
-            if (const GraveyardStruct* entry = sGraveyard->GetClosestGraveyard(this, GetTeamId()))
+            if (GraveyardStruct const* entry = sGraveyard->GetClosestGraveyard(this, GetTeamId()))
                 m_entryPointData.joinPos = WorldLocation(entry->Map, entry->x, entry->y, entry->z, 0.0f);
         }
         else if (!GetMap()->IsBattlegroundOrArena())
@@ -14259,7 +14259,7 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank, bool command /*= fa
         uint32 spentPoints = 0;
         if (talentInfo->Row > 0)
         {
-            const PlayerTalentMap& talentMap = GetTalentMap();
+            PlayerTalentMap const& talentMap = GetTalentMap();
             for (PlayerTalentMap::const_iterator itr = talentMap.begin(); itr != talentMap.end(); ++itr)
                 if (TalentSpellPos const* talentPos = GetTalentSpellPos(itr->first))
                     if (TalentEntry const* itrTalentInfo = sTalentStore.LookupEntry(talentPos->talent_id))
@@ -14401,7 +14401,7 @@ void Player::LearnPetTalent(ObjectGuid petGuid, uint32 talentId, uint32 talentRa
         for (uint32 i = 0; i < numRows; ++i)          // Loop through all talents.
         {
             // Someday, someone needs to revamp
-            const TalentEntry* tmpTalent = sTalentStore.LookupEntry(i);
+            TalentEntry const* tmpTalent = sTalentStore.LookupEntry(i);
             if (tmpTalent)                                  // the way talents are tracked
             {
                 if (tmpTalent->TalentTab == tTab)
@@ -14655,7 +14655,7 @@ void Player::BuildPlayerTalentsInfoData(WorldPacket* data)
         std::size_t pos = data->wpos();
         *data << uint8(talentIdCount);                      // [PH], talentIdCount
 
-        const PlayerTalentMap& talentMap = GetTalentMap();
+        PlayerTalentMap const& talentMap = GetTalentMap();
         for (PlayerTalentMap::const_iterator itr = talentMap.begin(); itr != talentMap.end(); ++itr)
             if (TalentSpellPos const* talentPos = GetTalentSpellPos(itr->first))
                 if (itr->second->State != PLAYERSPELL_REMOVED && itr->second->IsInSpec(specIdx)) // pussywizard
@@ -15616,7 +15616,7 @@ void Player::LoadActions(PreparedQueryResult result)
 
 void Player::GetTalentTreePoints(uint8 (&specPoints)[3]) const
 {
-    const PlayerTalentMap& talentMap = GetTalentMap();
+    PlayerTalentMap const& talentMap = GetTalentMap();
     for (PlayerTalentMap::const_iterator itr = talentMap.begin(); itr != talentMap.end(); ++itr)
         if (itr->second->State != PLAYERSPELL_REMOVED && itr->second->IsInSpec(GetActiveSpec()))
             if (TalentEntry const* talentInfo = sTalentStore.LookupEntry(itr->second->talentID))
@@ -15638,7 +15638,7 @@ void Player::GetTalentTreePoints(uint8 (&specPoints)[3]) const
 uint8 Player::GetMostPointsTalentTree() const
 {
     uint32 specPoints[3] = {0, 0, 0};
-    const PlayerTalentMap& talentMap = GetTalentMap();
+    PlayerTalentMap const& talentMap = GetTalentMap();
     for (PlayerTalentMap::const_iterator itr = talentMap.begin(); itr != talentMap.end(); ++itr)
         if (itr->second->State != PLAYERSPELL_REMOVED && itr->second->IsInSpec(GetActiveSpec()))
             if (TalentEntry const* talentInfo = sTalentStore.LookupEntry(itr->second->talentID))

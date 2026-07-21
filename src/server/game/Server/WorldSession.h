@@ -1223,7 +1223,7 @@ private:
     bool recoveryItem(Item* pItem);
 
     // logging helper
-    void LogUnexpectedOpcode(WorldPacket* packet, char const* status, const char* reason);
+    void LogUnexpectedOpcode(WorldPacket* packet, char const* status, char const* reason);
     void LogUnprocessedTail(WorldPacket* packet);
 
     // EnumData helpers

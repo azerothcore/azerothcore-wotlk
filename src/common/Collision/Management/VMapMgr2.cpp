@@ -59,7 +59,7 @@ namespace VMAP
         return fname.str();
     }
 
-    LoadResult VMapMgr2::existsMap(const char* basePath, unsigned int mapId, int x, int y)
+    LoadResult VMapMgr2::existsMap(char const* basePath, unsigned int mapId, int x, int y)
     {
         return StaticMapTree::CanLoadMap(std::string(basePath), mapId, x, y);
     }

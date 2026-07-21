@@ -32,7 +32,7 @@ namespace std
     template <>
     struct hash<std::pair<uint32_t, uint32_t>>
     {
-        std::size_t operator()(const std::pair<uint32_t, uint32_t>& p) const noexcept
+        std::size_t operator()(std::pair<uint32_t, uint32_t> const& p) const noexcept
         {
             return std::hash<uint64_t>()((static_cast<uint64_t>(p.first) << 32) | p.second);
         }

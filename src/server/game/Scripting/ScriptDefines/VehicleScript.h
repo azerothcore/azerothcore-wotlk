@@ -23,7 +23,7 @@
 class VehicleScript : public ScriptObject
 {
 protected:
-    VehicleScript(const char* name);
+    VehicleScript(char const* name);
 
 public:
     // Called after a vehicle is installed.
