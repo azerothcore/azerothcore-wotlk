@@ -100,12 +100,8 @@ public:
 
     static bool HandleLearnAllMyClassCommand(ChatHandler* handler)
     {
-        Player* player = handler->GetSession()->GetPlayer();
-        LearnAllMyTrainerSpells(player);
-        player->InitTalentForLevel();
-
-        handler->PSendSysMessage("You have learned all class spells and been granted {} free talent points to spend.", player->GetFreeTalentPoints());
-
+        HandleLearnAllMyTrainerSpellsCommand(handler);
+        HandleLearnAllMyTalentsCommand(handler, Optional<uint8>());
         HandleLearnAllMyQuestSpells(handler);
         return true;
     }
@@ -123,11 +119,12 @@ public:
         return true;
     }
 
-    static void LearnAllMyTrainerSpells(Player* player)
+    static bool HandleLearnAllMyTrainerSpellsCommand(ChatHandler* handler)
     {
-        if (!sChrClassesStore.LookupEntry(player->getClass()))
-            return;
+        if (!sChrClassesStore.LookupEntry(handler->GetSession()->GetPlayer()->getClass()))
+            return true;
 
+        Player* player = handler->GetPlayer();
         std::vector<Trainer::Trainer const*> const& trainers = sObjectMgr->GetClassTrainers(player->getClass());
 
         bool hadNew;
@@ -153,11 +150,7 @@ public:
                 }
             }
         } while (hadNew);
-    }
 
-    static bool HandleLearnAllMyTrainerSpellsCommand(ChatHandler* handler)
-    {
-        LearnAllMyTrainerSpells(handler->GetSession()->GetPlayer());
         handler->SendSysMessage(LANG_COMMAND_LEARN_CLASS_SPELLS);
         return true;
     }
@@ -230,17 +223,16 @@ public:
             }
         } while (hadNew);
 
-        // Learning a single tab doesn't spend any of the free-point pool (LearnTalent skips that
-        // accounting for command=true), so only zero it out once every tree has been maxed.
-        if (!tabArg)
-            player->SetFreeTalentPoints(0);
-
+        // LearnTalent doesn't touch the free-point pool for command=true - zero it out here too
+        // (even for a single tab) so the player can't also spend the intact pool in the other
+        // trees and end up over their level's talent point cap.
+        player->SetFreeTalentPoints(0);
         player->SendTalentsInfoData(false);
 
         if (tabArg)
-            handler->PSendSysMessage("You have activated all talents in tab {}.", *tabArg);
+            handler->PSendSysMessage(LANG_COMMAND_LEARN_CLASS_TALENTS_TAB, *tabArg);
         else
-            handler->PSendSysMessage("You have activated all of your talents.");
+            handler->SendSysMessage(LANG_COMMAND_LEARN_CLASS_TALENTS);
         return true;
     }
 
