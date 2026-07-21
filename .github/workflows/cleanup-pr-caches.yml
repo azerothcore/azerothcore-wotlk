@@ -30,8 +30,10 @@ jobs:
           deleted=0
           # A single PR can hold more entries than one page: the ccache key is
           # unique per run, so a long-lived PR accumulates one entry per build
-          # leg per push.
-          for _ in $(seq 1 10); do
+          # leg per push. No iteration cap, or entries past the cap would be
+          # left behind silently; the no-progress check below is what
+          # terminates the loop.
+          while true; do
             ids="$(gh cache list --ref "$PR_REF" --limit 100 --json id --jq '.[].id')"
             # Not `[[ -z ]] && break`: under `set -e` a false test as the last
             # command of the loop body would abort the script.
