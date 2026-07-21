@@ -101,8 +101,20 @@ public:
     static bool HandleLearnAllMyClassCommand(ChatHandler* handler)
     {
         HandleLearnAllMyTrainerSpellsCommand(handler);
-        HandleLearnAllMyTalentsCommand(handler);
+        HandleLearnAllMyClassTalentPointsCommand(handler);
         HandleLearnAllMyQuestSpells(handler);
+        return true;
+    }
+
+    // Unlike "learn all my talents" (which force-learns every talent), this only grants the free
+    // talent points the player's level entitles them to (71 at level 80) for them to spend
+    // normally through the talent UI.
+    static bool HandleLearnAllMyClassTalentPointsCommand(ChatHandler* handler)
+    {
+        Player* player = handler->GetSession()->GetPlayer();
+        player->InitTalentForLevel();
+
+        handler->SendSysMessage(LANG_COMMAND_LEARN_CLASS_TALENTS);
         return true;
     }
 
@@ -160,42 +172,57 @@ public:
         Player* player = handler->GetSession()->GetPlayer();
         uint32 classMask = player->getClassMask();
 
-        for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
+        // Player::LearnTalent still enforces cross-tree DependsOn prerequisites even when called
+        // with command=true (only the free-point and tier-row checks are skipped for that flag).
+        // sTalentStore isn't ordered by dependency, so a talent can be visited before the talent
+        // it depends on - repeat passes until nothing new gets learned so those catch up instead
+        // of being silently skipped.
+        bool hadNew;
+        do
         {
-            TalentEntry const* talentInfo = sTalentStore.LookupEntry(i);
-            if (!talentInfo)
-                continue;
-
-            TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TalentTab);
-            if (!talentTabInfo)
-                continue;
-
-            if ((classMask & talentTabInfo->ClassMask) == 0)
-                continue;
-
-            // xinef: search highest talent rank
-            uint32 spellId = 0;
-            uint8 rankId = MAX_TALENT_RANK;
-            for (int8 rank = MAX_TALENT_RANK - 1; rank >= 0; --rank)
+            hadNew = false;
+            for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
             {
-                if (talentInfo->RankID[rank] != 0)
+                TalentEntry const* talentInfo = sTalentStore.LookupEntry(i);
+                if (!talentInfo)
+                    continue;
+
+                TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TalentTab);
+                if (!talentTabInfo)
+                    continue;
+
+                if ((classMask & talentTabInfo->ClassMask) == 0)
+                    continue;
+
+                // xinef: search highest talent rank
+                uint32 spellId = 0;
+                uint8 rankId = MAX_TALENT_RANK;
+                for (int8 rank = MAX_TALENT_RANK - 1; rank >= 0; --rank)
                 {
-                    rankId = rank;
-                    spellId = talentInfo->RankID[rank];
-                    break;
+                    if (talentInfo->RankID[rank] != 0)
+                    {
+                        rankId = rank;
+                        spellId = talentInfo->RankID[rank];
+                        break;
+                    }
                 }
+
+                // xinef: some errors?
+                if (!spellId || rankId == MAX_TALENT_RANK)
+                    continue;
+
+                if (player->HasTalent(spellId, player->GetActiveSpec()))
+                    continue;
+
+                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+                if (!spellInfo || !SpellMgr::IsSpellValid(spellInfo))
+                    continue;
+
+                player->LearnTalent(talentInfo->TalentID, rankId, true);
+                if (player->HasTalent(spellId, player->GetActiveSpec()))
+                    hadNew = true;
             }
-
-            // xinef: some errors?
-            if (!spellId || rankId == MAX_TALENT_RANK)
-                continue;
-
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-            if (!spellInfo || !SpellMgr::IsSpellValid(spellInfo))
-                continue;
-
-            player->LearnTalent(talentInfo->TalentID, rankId, true);
-        }
+        } while (hadNew);
 
         player->SetFreeTalentPoints(0);
         player->SendTalentsInfoData(false);
