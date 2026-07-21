@@ -242,7 +242,7 @@ Position const CollapsingStarPos[COLLAPSING_STAR_COUNT] =
     {1622.451f, -321.1563f, 417.6188f, 4.677482f},
     {1615.060f, -291.6816f, 417.7796f, 3.490659f},
 };
-Position const AlgalonOutroPos = {1631.8004f, -314.48645f, 417.3222f, 1.5755974f};
+Position const AlgalonOutroPos = {1633.64f, -317.78f, 417.3211f, 1.605703f};
 Position const AlgalonFloatPos = {1632.668f, -302.7656f, 420.3211f, 1.530165f};
 Position const BrannOutroPos[3] =
 {
