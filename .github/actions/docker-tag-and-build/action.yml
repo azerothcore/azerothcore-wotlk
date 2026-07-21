@@ -37,12 +37,6 @@ runs:
         push: ${{ inputs.push }}
         tags: ${{ steps.meta.outputs.tags }}
         target:  ${{ inputs.component-name }}
-        # Reuse layers across runs via the GitHub Actions cache backend. Scoped
-        # per component so images don't clobber each other's cache.
-        cache-from: type=gha,scope=${{ inputs.component-name }}
-        # ignore-error keeps a cache-export failure (e.g. read-only token on a
-        # fork PR) from failing an otherwise-successful build.
-        cache-to: type=gha,mode=max,scope=${{ inputs.component-name }},ignore-error=true
         build-args: |
           USER_ID=1000
           GROUP_ID=1000
