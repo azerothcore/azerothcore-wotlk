@@ -417,14 +417,6 @@ bool Player::CanRewardQuest(Quest const* quest, bool msg)
     if (quest->GetRewOrReqMoney() < 0 && !HasEnoughMoney(-quest->GetRewOrReqMoney()))
         return false;
 
-    if (HasPlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME))
-    {
-        if (msg)
-            GetSession()->SendPlayTimeWarning(PTF_UNHEALTHY_TIME, 0);
-
-        return false;
-    }
-
     return true;
 }
 
@@ -481,6 +473,16 @@ bool Player::CanRewardQuest(Quest const* quest, uint32 reward, bool msg)
     // prevent receive reward with quest items in bank or for not completed quest
     if (!CanRewardQuest(quest, msg))
         return false;
+
+    // gate the actual turn-in here rather than in the overload above, which LFG also uses
+    // as a "already did today's random" probe
+    if (HasPlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME))
+    {
+        if (msg)
+            GetSession()->SendPlayTimeWarning(PTF_UNHEALTHY_TIME, 0);
+
+        return false;
+    }
 
     ItemPosCountVec dest;
     if (quest->GetRewChoiceItemsCount() > 0)
@@ -774,9 +776,15 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
         moneyRew += rewOrReqMoney;
     }
 
-    // CAIS partial restriction halves quest money reward, mirroring looted money and XP
-    if (moneyRew > 0 && HasPlayerFlag(PLAYER_FLAGS_PARTIAL_PLAY_TIME))
-        moneyRew /= 2;
+    // CAIS reduces quest money, mirroring looted money and XP. Applied here as well as at the
+    // turn-in gate because LFG and auto-complete quests reach RewardQuest without CanRewardQuest.
+    if (moneyRew > 0)
+    {
+        if (HasPlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME))
+            moneyRew = 0;
+        else if (HasPlayerFlag(PLAYER_FLAGS_PARTIAL_PLAY_TIME))
+            moneyRew /= 2;
+    }
 
     if (moneyRew)
     {
