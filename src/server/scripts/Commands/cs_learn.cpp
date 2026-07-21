@@ -114,7 +114,7 @@ public:
         Player* player = handler->GetSession()->GetPlayer();
         player->InitTalentForLevel();
 
-        handler->SendSysMessage(LANG_COMMAND_LEARN_CLASS_TALENTS);
+        handler->SendSysMessage(LANG_COMMAND_LEARN_CLASS_TALENT_POINTS);
         return true;
     }
 
