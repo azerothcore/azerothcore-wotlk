@@ -25,48 +25,26 @@ permissions:
   contents: read
 
 jobs:
-  # Decide how many build legs to run. A purely-DB PR (only data/** changed)
-  # leaves the C++ untouched, so the multi-compiler matrix is redundant: a
-  # single leg still runs the worldserver dry-run that validates the SQL. We
-  # collapse to one leg to save runners; any code/build change keeps the full
-  # matrix. Pushes to master always build the full matrix.
-  setup:
-    runs-on: ubuntu-latest
-    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
-    outputs:
-      matrix: ${{ steps.set.outputs.matrix }}
-    steps:
-      - uses: actions/checkout@v4
-      - name: Compute build matrix
-        id: set
-        shell: bash
-        run: |
-          set -euo pipefail
-          full='{"include":[{"os":"ubuntu-24.04","compiler":{"CC":"clang-18","CXX":"clang++-18"}},{"os":"ubuntu-24.04","compiler":{"CC":"gcc-14","CXX":"g++-14"}},{"os":"ubuntu-26.04","compiler":{"CC":"clang-20","CXX":"clang++-20"}}]}'
-          single='{"include":[{"os":"ubuntu-24.04","compiler":{"CC":"clang-18","CXX":"clang++-18"}}]}'
-
-          matrix="$full"
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            git fetch --no-tags --depth=1 origin "${{ github.base_ref }}"
-            changed="$(git diff --name-only FETCH_HEAD HEAD)"
-            echo "Changed files:"
-            echo "$changed"
-            # DB-only when every changed path is under data/ (grep -qv finds a
-            # line that is NOT data/; negating it means "all lines are data/").
-            if [[ -n "$changed" ]] && ! grep -qvE '^data/' <<< "$changed"; then
-              echo "Purely-DB change -> single build leg"
-              matrix="$single"
-            fi
-          fi
-          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
-
   build:
-    needs: setup
     strategy:
       fail-fast: true
-      matrix: ${{ fromJson(needs.setup.outputs.matrix) }}
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            compiler:
+              CC: clang-18
+              CXX: clang++-18
+          - os: ubuntu-24.04
+            compiler:
+              CC: gcc-14
+              CXX: g++-14
+          - os: ubuntu-26.04
+            compiler:
+              CC: clang-20
+              CXX: clang++-20
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}-${{ matrix.compiler.CC }}-nopch
+    if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/linux-build
