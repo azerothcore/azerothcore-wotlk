@@ -100,11 +100,11 @@ public:
 
     static bool HandleLearnAllMyClassCommand(ChatHandler* handler)
     {
-        HandleLearnAllMyTrainerSpellsCommand(handler);
-
         Player* player = handler->GetSession()->GetPlayer();
+        LearnAllMyTrainerSpells(player);
         player->InitTalentForLevel();
-        handler->SendSysMessage(LANG_COMMAND_LEARN_CLASS_TALENTS);
+
+        handler->PSendSysMessage("You have learned all class spells and been granted {} free talent points to spend.", player->GetFreeTalentPoints());
 
         HandleLearnAllMyQuestSpells(handler);
         return true;
@@ -123,12 +123,11 @@ public:
         return true;
     }
 
-    static bool HandleLearnAllMyTrainerSpellsCommand(ChatHandler* handler)
+    static void LearnAllMyTrainerSpells(Player* player)
     {
-        if (!sChrClassesStore.LookupEntry(handler->GetSession()->GetPlayer()->getClass()))
-            return true;
+        if (!sChrClassesStore.LookupEntry(player->getClass()))
+            return;
 
-        Player* player = handler->GetPlayer();
         std::vector<Trainer::Trainer const*> const& trainers = sObjectMgr->GetClassTrainers(player->getClass());
 
         bool hadNew;
@@ -154,7 +153,11 @@ public:
                 }
             }
         } while (hadNew);
+    }
 
+    static bool HandleLearnAllMyTrainerSpellsCommand(ChatHandler* handler)
+    {
+        LearnAllMyTrainerSpells(handler->GetSession()->GetPlayer());
         handler->SendSysMessage(LANG_COMMAND_LEARN_CLASS_SPELLS);
         return true;
     }
@@ -219,7 +222,7 @@ public:
         player->SetFreeTalentPoints(0);
         player->SendTalentsInfoData(false);
 
-        handler->SendSysMessage(LANG_COMMAND_LEARN_CLASS_TALENTS);
+        handler->PSendSysMessage("You have activated all of your talents.");
         return true;
     }
 
