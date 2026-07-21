@@ -669,7 +669,7 @@ void WorldSession::SendPlayTimeWarning(PlayTimeFlag flag, int32 playTimeRemainin
     WorldPackets::Misc::PlayTimeWarning playTimeWarning;
     playTimeWarning.Flag = flag;
     playTimeWarning.PlayTimeRemaining = playTimeRemaining;
-    GetPlayer()->SendDirectMessage(playTimeWarning.Write());
+    SendPacket(playTimeWarning.Write());
 }
 
 /// %Log the player out
