@@ -1,3 +1,4 @@
+-- DB update 2026_07_21_00 -> 2026_07_21_01
 -- Razorscale encounter rework: spell-based spawning via creature_summon_groups
 
 -- Remove static spawns for creatures now managed by creature_summon_groups
