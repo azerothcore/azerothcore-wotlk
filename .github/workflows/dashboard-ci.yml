@@ -41,8 +41,8 @@ jobs:
       fail-fast: true
       matrix:
         include:
-          - os: ubuntu-22.04
           - os: ubuntu-24.04
+          - os: ubuntu-26.04
     runs-on: ${{ matrix.os }}
     if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
     steps:
@@ -73,8 +73,8 @@ jobs:
       fail-fast: true
       matrix:
         include:
-          - os: ubuntu-22.04
           - os: ubuntu-24.04
+          - os: ubuntu-26.04
     runs-on: ${{ matrix.os }}
     if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
     steps:

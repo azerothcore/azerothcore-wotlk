@@ -343,7 +343,7 @@ std::vector<Battleground const*> BattlegroundMgr::GetActiveBattlegrounds()
     for (auto const& [bgType, bgData] : bgDataStore)
         for (auto const& [id, bg] : bgData._Battlegrounds)
             if (bg->GetStatus() == STATUS_WAIT_JOIN || bg->GetStatus() == STATUS_IN_PROGRESS)
-                result.push_back(static_cast<const Battleground*>(bg));
+                result.push_back(static_cast<Battleground const*>(bg));
 
     return result;
 }
@@ -948,7 +948,7 @@ BGFreeSlotQueueContainer& BattlegroundMgr::GetBGFreeSlotQueueStore(BattlegroundT
 
 void BattlegroundMgr::AddToBGFreeSlotQueue(BattlegroundTypeId bgTypeId, Battleground* bg)
 {
-    bgDataStore[bgTypeId].BGFreeSlotQueue.push_front(bg);
+    bgDataStore[bgTypeId].BGFreeSlotQueue.push_back(bg);
 }
 
 void BattlegroundMgr::RemoveFromBGFreeSlotQueue(BattlegroundTypeId bgTypeId, uint32 instanceId)

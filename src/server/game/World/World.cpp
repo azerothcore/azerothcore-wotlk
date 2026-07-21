@@ -265,7 +265,7 @@ void World::LoadConfigSettings(bool reload)
 #if AC_PLATFORM == AC_PLATFORM_UNIX || AC_PLATFORM == AC_PLATFORM_APPLE
     if (dataPath[0] == '~')
     {
-        const char* home = getenv("HOME");
+        char const* home = getenv("HOME");
         if (home)
             dataPath.replace(0, 1, home);
     }
@@ -869,6 +869,9 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading Creature Texts...");
     sCreatureTextMgr->LoadCreatureTexts();
 
+    LOG_INFO("server.loading", "Loading Creature Text Options...");
+    sCreatureTextMgr->LoadCreatureTextOptions();
+
     LOG_INFO("server.loading", "Loading Creature Text Locales...");
     sCreatureTextMgr->LoadCreatureTextLocales();
 
@@ -1283,6 +1286,12 @@ void World::Update(uint32 diff)
         stmt->SetData(2, realm.Id.Realm);
         stmt->SetData(3, uint32(GameTime::GetStartTime().count()));
         LoginDatabase.Execute(stmt);
+
+        // Re-assert this realm as online in case the offline flag was set externally (e.g. an authserver restart).
+        LoginDatabasePreparedStatement* onlineStmt = LoginDatabase.GetPreparedStatement(LOGIN_UPD_REALM_ONLINE);
+        onlineStmt->SetData(0, uint8(REALM_FLAG_OFFLINE));
+        onlineStmt->SetData(1, realm.Id.Realm);
+        LoginDatabase.Execute(onlineStmt);
     }
 
     ///- Process Game events when necessary

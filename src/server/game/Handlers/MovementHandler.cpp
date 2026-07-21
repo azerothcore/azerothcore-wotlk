@@ -35,6 +35,7 @@
 #include "ScriptMgr.h"
 #include "SpellAuras.h"
 #include "Transport.h"
+#include "UpdateData.h"
 #include "Vehicle.h"
 #include "WaypointMovementGenerator.h"
 #include "WorldPacket.h"
@@ -129,6 +130,14 @@ void WorldSession::HandleMoveWorldportAck()
     if (Transport* t = _player->GetTransport())
         if (!t->IsInMap(_player))
         {
+            // Client was never told to destroy its own transport
+            // Destroy it now or it keeps a phantom copy of the transport on the new map
+            UpdateData transData;
+            t->BuildOutOfRangeUpdateBlock(&transData);
+            WorldPacket packet;
+            transData.BuildPacket(packet);
+            _player->SendDirectMessage(&packet);
+
             t->RemovePassenger(_player);
             _player->m_transport = nullptr;
             _player->m_movementInfo.transport.Reset();

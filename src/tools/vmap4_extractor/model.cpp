@@ -67,7 +67,7 @@ bool Model::open()
     return true;
 }
 
-bool Model::ConvertToVMAPModel(const char* outfilename)
+bool Model::ConvertToVMAPModel(char const* outfilename)
 {
     int N[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     FILE* output = fopen(outfilename, "wb");

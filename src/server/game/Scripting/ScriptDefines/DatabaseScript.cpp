@@ -29,7 +29,7 @@ void ScriptMgr::OnAfterDatabaseLoadCreatureTemplates(std::vector<CreatureTemplat
     CALL_ENABLED_HOOKS(DatabaseScript, DATABASEHOOK_ON_AFTER_DATABASE_LOAD_CREATURETEMPLATES, script->OnAfterDatabaseLoadCreatureTemplates(creatureTemplates));
 }
 
-DatabaseScript::DatabaseScript(const char* name, std::vector<uint16> enabledHooks)
+DatabaseScript::DatabaseScript(char const* name, std::vector<uint16> enabledHooks)
     : ScriptObject(name, DATABASEHOOK_END)
 {
     // If empty - enable all available hooks.

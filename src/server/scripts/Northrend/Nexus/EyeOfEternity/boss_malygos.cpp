@@ -389,7 +389,10 @@ struct boss_malygos : public BossAI
         case EVENT_START_FIGHT:
         {
             instance->SetData(DATA_HIDE_IRIS_AND_PORTAL, 0);
+
+            instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_YOU_DONT_HAVE_AN_ENTERNITY_EVENT); // just in case at reset some players already left the instance
             instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, ACHIEV_YOU_DONT_HAVE_AN_ENTERNITY_EVENT);
+
             me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED);
             if (Unit* target = me->SelectNearestTarget(250.0f))
             {
