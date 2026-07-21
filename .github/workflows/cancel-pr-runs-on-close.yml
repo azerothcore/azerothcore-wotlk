@@ -18,7 +18,7 @@ jobs:
     steps:
       - name: Cancel workflow runs for this PR
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
           PR_SHA: ${{ github.event.pull_request.head.sha }}
           PR_REPO: ${{ github.event.pull_request.head.repo.full_name }}
