@@ -1,38 +1,5 @@
 SET @GUID := 53048;
-
--- "What The Cold Wind Brings..." - Borean Tundra world event.
---
--- Two clock events, back to back, both anchored by `start_time`:
---
---   92 Assault - fires at :00, length 15, ends :15
---   93 Ith'rix - fires at :15, length 20, ends :35
---
--- The Marksmen belong to BOTH events, the Sky Darkeners only to 92. So the
--- swarm runs :00-:15 and stops when the assault window closes, Ith'rix arrives
--- at :15 into a garrison that is still standing, and the Marksmen live through
--- his fight until 93 closes at :35. GameEventUnspawn skips any creature still
--- claimed by another active event (HasCreatureActiveEventExcept), so the
--- Marksmen are not touched at the :15 handover.
---
--- Nothing has to end anything: the two windows are contiguous, so the assault
--- stops on its own clock rather than by anyone's death.
---
--- CheckOneGameEvent is a pure modulo of wall-clock time, so both are exact
--- forever and survive restarts. Nothing starts them but the scheduler, and
--- nothing stops them but their own `length`.
---
--- Do NOT add SMART_ACTION_GAME_EVENT_STOP (111) against either of these.
--- StopEvent(id, overwrite=true) rewrites `Start` to (now - Length), which
--- permanently re-phases a clock event until the next worldserver restart.
--- That is what produced the original "overlapping events" report: 92 and 93
--- would drift apart and the boss would arrive without his opposition.
--- The boss ends the assault by despawning its creatures, not by stopping
--- the event - see Ith'rix's death rows below.
-SET @EVENT_OCCURENCE  := 60;
 SET @ANCHOR_ASSAULT   := '2000-01-01 00:00:00';
-SET @ANCHOR_BOSS      := '2000-01-01 00:15:00';
-SET @LENGTH_ASSAULT   := 15;
-SET @LENGTH_BOSS      := 20;
 
 DELETE FROM `creature_template_addon` WHERE (`entry` = 25439);
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
@@ -46,10 +13,7 @@ INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `b
 DELETE FROM `creature` WHERE (`id` = 25446) AND (`guid` IN (125432));
 DELETE FROM `creature_addon` WHERE `guid` IN (125432);
 
--- Delete stray Warsong Scout at (2861.79, 6388.8) - pollution from an uncurated
--- sniff import. Warsong Scout only ever exists as part of this event's intro,
--- and the intro no longer spawns him at all. Left in place he inherits the
--- entry's SmartAI and acts on his own 300s respawn with no event running.
+-- Delete stray Warsong Scout at (2861.79, 6388.8)
 DELETE FROM `creature` WHERE (`id` = 25439) AND (`guid` IN (104497));
 DELETE FROM `creature_addon` WHERE `guid` IN (104497);
 
@@ -75,31 +39,24 @@ DELETE FROM `creature_text` WHERE (`CreatureID` = 25453);
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
 (25453, 0, 0, 'I will take great pleasure in tearing the forces of the Horde apart... limb from limb and piece by piece...', 14, 0, 100, 0, 0, 0, 24672, 0, 'Ith\'rix the Harvester - What The Cold Wind Brings... Event');
 
--- New Spawns. @GUID+2 is deliberately unused - it held the Warsong Scout, whose
--- intro roleplay has been removed. The DELETE still covers it so re-applying
--- this file cleans up a Scout inserted by an earlier revision.
-DELETE FROM `creature` WHERE `guid` BETWEEN @GUID AND @GUID+24;
+DELETE FROM `creature` WHERE `guid` BETWEEN @GUID AND @GUID+24 AND `id` IN (25446, 25453, 25244) AND `map` = 571;
 INSERT INTO `creature` (`guid`, `id`, `map`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `VerifiedBuild`, `CreateObject`, `Comment`) VALUES
--- Warsong Captain 25446 - permanent, not an event member. He listens for the
--- events and reacts; he must never despawn with them.
-(@GUID+0, 25446, 571, 1, 1, 1, 2729.2375, 6082.6777, 73.63885, 3.368485450744628906, 120, 52237, 2, 'Part of What The Cold Wind Brings... Event'),
--- Ith'rix 25453. spawntimesecs must exceed the remainder of event 93's window
--- (he must not return inside his own 20min) but expire before the next window
--- opens at +55min, or he loads on a pending respawn. 1800 sits in that band.
-(@GUID+1, 25453, 571, 1, 1, 0, 2563.398, 6056.7534, 157.0997, 0.675718843936920166, 900, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+0, 25446, 571, 1, 1, 1, 2729.2375, 6082.6777, 73.63885, 3.368485450744628906, 120, 52237, 1, 'Part of What The Cold Wind Brings... Event'),
+-- Ith'rix 25453
+(@GUID+1, 25453, 571, 1, 1, 0, 2563.398, 6056.7534, 157.0997, 0.675718843936920166, 300, 52237, 2, 'Part of What The Cold Wind Brings... Event'),
 -- Warsong Marksmen 25244 - reinforce on a 5min timer for as long as event 92 runs
-(@GUID+3 , 25244, 571, 1, 1, 1, 2770.6533, 6123.831, 91.788445, 3.885649919509887695, 300, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
-(@GUID+4 , 25244, 571, 1, 1, 1, 2772.1545, 6125.37, 91.9547, 3.918198108673095703, 300, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
-(@GUID+5 , 25244, 571, 1, 1, 1, 2774.0427, 6127.1343, 91.95686, 3.822271108627319335, 300, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
-(@GUID+6 , 25244, 571, 1, 1, 1, 2775.6, 6128.577, 91.956795, 4.136430263519287109, 300, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
-(@GUID+7 , 25244, 571, 1, 1, 1, 2777.2427, 6130.19, 91.95759, 0.48869219422340393, 300, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
-(@GUID+8 , 25244, 571, 1, 1, 1, 2780.2751, 6132.911, 91.74803, 3.298672199249267578, 300, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
-(@GUID+9 , 25244, 571, 1, 1, 1, 2781.4375, 6134.131, 90.92266, 0.104719758033752441, 300, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
-(@GUID+10, 25244, 571, 1, 1, 1, 2782.5786, 6135.2393, 90.14071, 2.617993831634521484, 300, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
-(@GUID+11, 25244, 571, 1, 1, 1, 2783.7375, 6136.151, 89.41592, 0.157079637050628662, 300, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
-(@GUID+12, 25244, 571, 1, 1, 1, 2785.7144, 6137.814, 88.14427, 5.585053443908691406, 300, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
-(@GUID+13, 25244, 571, 1, 1, 1, 2787.284, 6139.4194, 87.04321, 2.111848354339599609, 300, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
-(@GUID+14, 25244, 571, 1, 1, 1, 2788.8938, 6140.902, 85.96647, 3.893373012542724609, 300, -52237, 2, 'Part of What The Cold Wind Brings... Event');
+(@GUID+3 , 25244, 571, 1, 1, 1, 2770.6533, 6123.831, 91.788445, 3.885649919509887695, 300, 52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+4 , 25244, 571, 1, 1, 1, 2772.1545, 6125.37, 91.9547, 3.918198108673095703, 300, 52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+5 , 25244, 571, 1, 1, 1, 2774.0427, 6127.1343, 91.95686, 3.822271108627319335, 300, 52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+6 , 25244, 571, 1, 1, 1, 2775.6, 6128.577, 91.956795, 4.136430263519287109, 300, 52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+7 , 25244, 571, 1, 1, 1, 2777.2427, 6130.19, 91.95759, 0.48869219422340393, 300, 52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+8 , 25244, 571, 1, 1, 1, 2780.2751, 6132.911, 91.74803, 3.298672199249267578, 300, 52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+9 , 25244, 571, 1, 1, 1, 2781.4375, 6134.131, 90.92266, 0.104719758033752441, 300, 52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+10, 25244, 571, 1, 1, 1, 2782.5786, 6135.2393, 90.14071, 2.617993831634521484, 300, 52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+11, 25244, 571, 1, 1, 1, 2783.7375, 6136.151, 89.41592, 0.157079637050628662, 300, 52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+12, 25244, 571, 1, 1, 1, 2785.7144, 6137.814, 88.14427, 5.585053443908691406, 300, 52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+13, 25244, 571, 1, 1, 1, 2787.284, 6139.4194, 87.04321, 2.111848354339599609, 300, 52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+14, 25244, 571, 1, 1, 1, 2788.8938, 6140.902, 85.96647, 3.893373012542724609, 300, 52237, 2, 'Part of What The Cold Wind Brings... Event');
 
 DELETE FROM `creature_summon_groups` WHERE `summonerId` = 25453 AND `summonerType` = 0 AND `groupId` = 0;
 INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `entry`, `position_x`, `position_y`, `position_z`, `orientation`, `summonType`, `summonTime`, `Comment`) VALUES
@@ -114,13 +71,8 @@ INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `
 (25453, 0, 0, 25451, 2586.2327, 6049.5854, 150.27066, 1.737332820892333984, 6, 10000, 'What the Cold Wind Brings...'),
 (25453, 0, 0, 25451, 2588.501, 6063.269, 147.57248, 3.455328941345214843,   6, 10000, 'What the Cold Wind Brings...');
 
--- Event membership. This is the only thing that spawns or despawns these
--- creatures on a schedule, and it works through the grid spawn data, so it
--- holds whether or not the grid is loaded.
 DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @GUID AND @GUID+24 AND `eventEntry` IN (92, 93, 94, 95);
 INSERT INTO `game_event_creature` (`eventEntry`, `guid`) VALUES
--- Marksmen belong to both windows, so they survive the :15 handover and stand
--- with the Captain through the boss fight.
 (92, @GUID+3 ),
 (92, @GUID+4 ),
 (92, @GUID+5 ),
@@ -136,7 +88,6 @@ INSERT INTO `game_event_creature` (`eventEntry`, `guid`) VALUES
 -- 93 Ith'rix
 (92, @GUID+1 );
 
--- 94 and 95 are retired - the sequence no longer needs per-phase events.
 DELETE FROM `game_event` WHERE `eventEntry` IN (92);
 INSERT INTO `game_event` (`eventEntry`, `start_time`, `end_time`, `occurence`, `length`, `description`, `announce`) VALUES
 (92, @ANCHOR_ASSAULT, NULL, 60, 30, 'What the Cold Wind Brings...', 2);
@@ -266,7 +217,6 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (@GUID+24, 5, 2684.2646, 6091.039, 86.899376 , NULL, 1),
 (@GUID+24, 6, 2701.3816, 6093.0586, 77.62164 , NULL, 1);
 
--- CREATURE_FLAG_EXTRA_DONT_OVERRIDE_ENTRY_SAI: load both entry and guid SAI.
 UPDATE `creature_template` SET `flags_extra` = `flags_extra`|134217728 WHERE (`entry` IN (25446, 25453, 25451, 25244, 25439));
 
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 25446;
@@ -276,15 +226,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (25446, 0, 1, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 5, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - In Combat - Say Line 5'),
 (25446, 0, 2, 0, 0, 0, 100, 0, 2000, 8000, 4000, 9000, 0, 0, 11, 12058, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - In Combat - Cast \'Chain Lightning\''),
 (25446, 0, 3, 0, 14, 0, 100, 0, 3000, 40, 10000, 14000, 0, 0, 11, 15799, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - Friendly Hurt - Cast \'Chain Heal\''),
--- The Captain no longer drives the sequence. He listens to the clock events and
--- reacts; the events themselves spawn and despawn everything.
 (25446, 0, 4, 0, 68, 0, 100, 0, 92, 0, 0, 0, 0, 0, 80, 2544600, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - On Game Event \'Assault\' Started - Run Muster Script'),
--- Invincibility has to be raised by BOTH events, not just the assault: the
--- windows are contiguous, and if it were cleared at :15 the Captain would face
--- Ith'rix unprotected. 93 also covers a standalone `.event start 93`. The
--- respawn reset is the real safety net - SMART_EVENT_GAME_EVENT_END never
--- reaches an unloaded grid, so without it the flag could stay on if the zone
--- empties mid-event.
 (25446, 0, 5, 0, 68, 0, 100, 0, 92, 0, 0, 0, 0, 0, 42, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - On Game Event \'Assault\' Started - Set Invincibility Hp 1'),
 (25446, 0, 6, 0, 68, 0, 100, 0, 93, 0, 0, 0, 0, 0, 42, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - On Game Event \'Ith\'rix\' Started - Set Invincibility Hp 1'),
 (25446, 0, 7, 0, 69, 0, 100, 0, 93, 0, 0, 0, 0, 0, 42, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - On Game Event \'Ith\'rix\' Ended - Reset Invincibility Hp'),
@@ -292,21 +234,11 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (25446, 0, 9, 0, 72, 0, 100, 0, 2, 0, 0, 0, 0, 0, 80, 2544601, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - On Action Received from Ith\'rix - Run Script End Event'),
 (25446, 0, 10, 0, 34, 0, 100, 0, 8, 1, 0, 0, 0, 0, 80, 2544602, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - On Reached Carapace - Run Gloat Script');
 
--- Muster: the yells only. Nothing here starts an event or spawns anything.
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2544600);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (2544600, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - Actionlist - Say Line 2'),
 (2544600, 9, 1, 0, 0, 0, 100, 0, 12000, 12000, 0, 0, 0, 0, 1, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - Actionlist - Say Line 3');
 
--- Ith'rix has fallen. The Sky Darkeners are already gone by now - their window
--- closed at :15, before he ever arrived - so nothing here has to chase them.
--- All this does is walk the Captain to the carapace.
---
--- Keep this list SHORT. SmartScript::SetScript9 refuses to start a new timed
--- actionlist while one is still running (allowOverride is 0 here), so if this
--- were still ticking when the Captain reaches the carapace it would swallow the
--- gloat script entirely. It must finish before he arrives; dismissing the
--- Marksmen therefore lives at the end of 2544602, not here.
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2544601);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (2544601, 9, 0, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 0, 59, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - Actionlist - Set Run Off'),
@@ -318,17 +250,9 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (2544602, 9, 1, 0, 0, 0, 100, 0, 4000, 4000, 0, 0, 0, 0, 1, 6, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - Actionlist - Say Line 6'),
 (2544602, 9, 2, 0, 0, 0, 100, 0, 6000, 6000, 0, 0, 0, 0, 1, 7, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - Actionlist - Say Line 7'),
 (2544602, 9, 3, 0, 0, 0, 100, 0, 5000, 5000, 0, 0, 0, 0, 69, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, 2729.2375, 6082.6777, 73.63885, 3.368485450744629, 'Warsong Captain - Actionlist - Move To Spawn'),
--- The Warsong Hold garrison shares entry 25244 and several of them stand within
--- 15-50y of the Captain, so the marksmen must NOT be despawned by entry+radius.
--- Relay an action instead: only the twelve event guids carry a handler for it,
--- so the garrison receives it and ignores it. Fires after 'take your trophies'.
--- Event 93's `length` still despawns them at :35 if this is ever missed.
 (2544602, 9, 4, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 0, 111, 92, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - Actionlist - End What the Cold Wind Brings...'),
 (2544602, 9, 5, 0, 0, 0, 100, 0, 13000, 13000, 0, 0, 0, 0, 59, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - Actionlist - Set Run On');
 
--- Warsong Scout keeps his combat SAI and his lines, but no longer opens the
--- event: the intro roleplay, his spawn, his path and his relay to the Captain
--- are all removed. Nothing spawns entry 25439 at present.
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 25439;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 25439);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -344,70 +268,55 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (25244, 0, 0, 0, 0, 0, 100, 0, 3000, 6000, 4000, 8000, 0, 0, 11, 38372, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - In Combat - Cast \'Shoot\''),
 (25244, 0, 1, 0, 2, 0, 100, 0, 0, 30, 0, 0, 0, 0, 11, 8599, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - Between 0-30% Health - Cast \'Enrage\'');
 
--- Guid-only rules for the twelve event marksmen. Action 3 (dismiss on Ith'rix's
--- death) lives here rather than on the entry so the Warsong Hold garrison,
--- which shares entry 25244, is never affected.
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` BETWEEN -(@GUID+14) AND -(@GUID+3));
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
 (-(@GUID+3), 0, 1001, 1002, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 103, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Set Rooted Off'),
 (-(@GUID+3), 0, 1002, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+3), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Start Path'),
 (-(@GUID+3), 0, 1003, 0, 109, 0, 100, 0, 0, (@GUID+3), 0, 0, 0, 0, 80, 2524400, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Path Finished - Run Script'),
-(-(@GUID+3), 0, 1004, 0, 72, 0, 100, 0, 3, 0, 0, 0, 0, 0, 41, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Action 3 - Despawn'),
 
 (-(@GUID+4), 0, 1001, 1002, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 103, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Set Rooted Off'),
 (-(@GUID+4), 0, 1002, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+4), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Start Path'),
 (-(@GUID+4), 0, 1003, 0, 109, 0, 100, 0, 0, (@GUID+4), 0, 0, 0, 0, 80, 2524400, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Path Finished - Run Script'),
-(-(@GUID+4), 0, 1004, 0, 72, 0, 100, 0, 3, 0, 0, 0, 0, 0, 41, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Action 3 - Despawn'),
 
 (-(@GUID+5), 0, 1001, 1002, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 103, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Set Rooted Off'),
 (-(@GUID+5), 0, 1002, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+5), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Start Path'),
 (-(@GUID+5), 0, 1003, 0, 109, 0, 100, 0, 0, (@GUID+5), 0, 0, 0, 0, 80, 2524400, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Path Finished - Run Script'),
-(-(@GUID+5), 0, 1004, 0, 72, 0, 100, 0, 3, 0, 0, 0, 0, 0, 41, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Action 3 - Despawn'),
 
 (-(@GUID+6), 0, 1001, 1002, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 103, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Set Rooted Off'),
 (-(@GUID+6), 0, 1002, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+6), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Start Path'),
 (-(@GUID+6), 0, 1003, 0, 109, 0, 100, 0, 0, (@GUID+6), 0, 0, 0, 0, 80, 2524400, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Path Finished - Run Script'),
-(-(@GUID+6), 0, 1004, 0, 72, 0, 100, 0, 3, 0, 0, 0, 0, 0, 41, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Action 3 - Despawn'),
 
 (-(@GUID+7), 0, 1001, 1002, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 103, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Set Rooted Off'),
 (-(@GUID+7), 0, 1002, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+7), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Start Path'),
 (-(@GUID+7), 0, 1003, 0, 109, 0, 100, 0, 0, (@GUID+7), 0, 0, 0, 0, 80, 2524400, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Path Finished - Run Script'),
-(-(@GUID+7), 0, 1004, 0, 72, 0, 100, 0, 3, 0, 0, 0, 0, 0, 41, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Action 3 - Despawn'),
 
 (-(@GUID+8), 0, 1001, 1002, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 103, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Set Rooted Off'),
 (-(@GUID+8), 0, 1002, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+8), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Start Path'),
 (-(@GUID+8), 0, 1003, 0, 109, 0, 100, 0, 0, (@GUID+8), 0, 0, 0, 0, 80, 2524400, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Path Finished - Run Script'),
-(-(@GUID+8), 0, 1004, 0, 72, 0, 100, 0, 3, 0, 0, 0, 0, 0, 41, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Action 3 - Despawn'),
 
 (-(@GUID+9), 0, 1001, 1002, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 103, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Set Rooted Off'),
 (-(@GUID+9), 0, 1002, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+9), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Start Path'),
 (-(@GUID+9), 0, 1003, 0, 109, 0, 100, 0, 0, (@GUID+9), 0, 0, 0, 0, 80, 2524400, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Path Finished - Run Script'),
-(-(@GUID+9), 0, 1004, 0, 72, 0, 100, 0, 3, 0, 0, 0, 0, 0, 41, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Action 3 - Despawn'),
 
 (-(@GUID+10), 0, 1001, 1002, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 103, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Set Rooted Off'),
 (-(@GUID+10), 0, 1002, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+10), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Start Path'),
 (-(@GUID+10), 0, 1003, 0, 109, 0, 100, 0, 0, (@GUID+10), 0, 0, 0, 0, 80, 2524400, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Path Finished - Run Script'),
-(-(@GUID+10), 0, 1004, 0, 72, 0, 100, 0, 3, 0, 0, 0, 0, 0, 41, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Action 3 - Despawn'),
 
 (-(@GUID+11), 0, 1001, 1002, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 103, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Set Rooted Off'),
 (-(@GUID+11), 0, 1002, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+11), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Start Path'),
 (-(@GUID+11), 0, 1003, 0, 109, 0, 100, 0, 0, (@GUID+11), 0, 0, 0, 0, 80, 2524400, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Path Finished - Run Script'),
-(-(@GUID+11), 0, 1004, 0, 72, 0, 100, 0, 3, 0, 0, 0, 0, 0, 41, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Action 3 - Despawn'),
 
 (-(@GUID+12), 0, 1001, 1002, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 103, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Set Rooted Off'),
 (-(@GUID+12), 0, 1002, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+12), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Start Path'),
 (-(@GUID+12), 0, 1003, 0, 109, 0, 100, 0, 0, (@GUID+12), 0, 0, 0, 0, 80, 2524400, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Path Finished - Run Script'),
-(-(@GUID+12), 0, 1004, 0, 72, 0, 100, 0, 3, 0, 0, 0, 0, 0, 41, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Action 3 - Despawn'),
 
 (-(@GUID+13), 0, 1001, 1002, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 103, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Set Rooted Off'),
 (-(@GUID+13), 0, 1002, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+13), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Start Path'),
 (-(@GUID+13), 0, 1003, 0, 109, 0, 100, 0, 0, (@GUID+13), 0, 0, 0, 0, 80, 2524400, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Path Finished - Run Script'),
-(-(@GUID+13), 0, 1004, 0, 72, 0, 100, 0, 3, 0, 0, 0, 0, 0, 41, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Action 3 - Despawn'),
 
 (-(@GUID+14), 0, 1001, 1002, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 103, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Set Rooted Off'),
 (-(@GUID+14), 0, 1002, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+14), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Respawn - Start Path'),
-(-(@GUID+14), 0, 1003, 0, 109, 0, 100, 0, 0, (@GUID+14), 0, 0, 0, 0, 80, 2524400, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Path Finished - Run Script'),
-(-(@GUID+14), 0, 1004, 0, 72, 0, 100, 0, 3, 0, 0, 0, 0, 0, 41, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Action 3 - Despawn');
+(-(@GUID+14), 0, 1003, 0, 109, 0, 100, 0, 0, (@GUID+14), 0, 0, 0, 0, 80, 2524400, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - On Path Finished - Run Script');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2524400);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -449,8 +358,9 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (25453, 0, 5, 6, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 45593, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - On Just Died - Cast \'Ith`rix`s Carapace\''),
 (25453, 0, 6, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 223, 2, 0, 0, 0, 0, 0, 19, 25446, 100, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - On Just Died - Relay to Warsong Captain End Event'),
 (25453, 0, 7, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 2545300, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - On Respawn - Remain Hidden'),
-(25453, 0, 8, 0, 1, 1, 100, 0, 900000, 900000, 0, 0, 0, 0, 80, 2545301, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - Out of Combat - Appear After 15 Minutes (Phase 1)'),
-(25453, 0, 9, 0, 72, 1, 100, 0, 1, 0, 0, 0, 0, 0, 88, 2545302, 25453011, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - On Action 1 Done - Summon Reinforcement (Phase 1)');
+(25453, 0, 8, 0, 1, 1, 100, 0, 900000, 900000, 0, 0, 0, 0, 80, 2545301, 2, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - Out of Combat - Appear After 15 Minutes (Phase 1)'),
+-- Spawns on himself instead of the sniffed spawns because Actionlist Range wasn't working
+(25453, 0, 9, 0, 72, 1, 100, 0, 1, 0, 0, 0, 0, 0, 80, 2545302, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - On Action 1 Done - Summon Reinforcement (Phase 1)');
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2545300);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
@@ -469,13 +379,4 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` BETWEEN 2545302 AND 2545311);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(2545302, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 12, 25451, 6, 10000, 0, 0, 0, 8, 0, 0, 0, 0, 2586.0503, 6045.1733, 149.66963, 5.983277797698974609, 'Ith\'rix the Harvester - Actionlist - Summon Creature \'Nerub\'ar Sky Darkener\''),
-(2545303, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 12, 25451, 6, 10000, 0, 0, 0, 8, 0, 0, 0, 0, 2592.336, 6055.209, 149.38055, 4.575495719909667968,   'Ith\'rix the Harvester - Actionlist - Summon Creature \'Nerub\'ar Sky Darkener\''),
-(2545304, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 12, 25451, 6, 10000, 0, 0, 0, 8, 0, 0, 0, 0, 2582.3564, 6072.7163, 150.72621, 0.256311208009719848, 'Ith\'rix the Harvester - Actionlist - Summon Creature \'Nerub\'ar Sky Darkener\''),
-(2545305, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 12, 25451, 6, 10000, 0, 0, 0, 8, 0, 0, 0, 0, 2586.5847, 6043.062, 150.77448, 6.154862403869628906,  'Ith\'rix the Harvester - Actionlist - Summon Creature \'Nerub\'ar Sky Darkener\''),
-(2545306, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 12, 25451, 6, 10000, 0, 0, 0, 8, 0, 0, 0, 0, 2590.9182, 6052.6157, 146.73918, 2.318624496459960937, 'Ith\'rix the Harvester - Actionlist - Summon Creature \'Nerub\'ar Sky Darkener\''),
-(2545307, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 12, 25451, 6, 10000, 0, 0, 0, 8, 0, 0, 0, 0, 2584.9631, 6067.6963, 148.27704, 1.537565231323242187, 'Ith\'rix the Harvester - Actionlist - Summon Creature \'Nerub\'ar Sky Darkener\''),
-(2545308, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 12, 25451, 6, 10000, 0, 0, 0, 8, 0, 0, 0, 0, 2588.828, 6049.6763, 146.88951, 2.722152233123779296,  'Ith\'rix the Harvester - Actionlist - Summon Creature \'Nerub\'ar Sky Darkener\''),
-(2545309, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 12, 25451, 6, 10000, 0, 0, 0, 8, 0, 0, 0, 0, 2585.2322, 6061.892, 151.63135, 0.06164625659584999,   'Ith\'rix the Harvester - Actionlist - Summon Creature \'Nerub\'ar Sky Darkener\''),
-(2545310, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 12, 25451, 6, 10000, 0, 0, 0, 8, 0, 0, 0, 0, 2586.2327, 6049.5854, 150.27066, 1.737332820892333984, 'Ith\'rix the Harvester - Actionlist - Summon Creature \'Nerub\'ar Sky Darkener\''),
-(2545311, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 12, 25451, 6, 10000, 0, 0, 0, 8, 0, 0, 0, 0, 2588.501, 6063.269, 147.57248, 3.455328941345214843,   'Ith\'rix the Harvester - Actionlist - Summon Creature \'Nerub\'ar Sky Darkener\'');
+(2545302, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 12, 25451, 6, 10000, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - Actionlist - Summon Creature \'Nerub\'ar Sky Darkener\'');
