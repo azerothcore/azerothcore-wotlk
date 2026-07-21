@@ -101,20 +101,12 @@ public:
     static bool HandleLearnAllMyClassCommand(ChatHandler* handler)
     {
         HandleLearnAllMyTrainerSpellsCommand(handler);
-        HandleLearnAllMyClassTalentPointsCommand(handler);
-        HandleLearnAllMyQuestSpells(handler);
-        return true;
-    }
 
-    // Unlike "learn all my talents" (which force-learns every talent), this only grants the free
-    // talent points the player's level entitles them to (71 at level 80) for them to spend
-    // normally through the talent UI.
-    static bool HandleLearnAllMyClassTalentPointsCommand(ChatHandler* handler)
-    {
         Player* player = handler->GetSession()->GetPlayer();
         player->InitTalentForLevel();
+        handler->SendSysMessage(LANG_COMMAND_LEARN_CLASS_TALENTS);
 
-        handler->SendSysMessage(LANG_COMMAND_LEARN_CLASS_TALENT_POINTS);
+        HandleLearnAllMyQuestSpells(handler);
         return true;
     }
 
