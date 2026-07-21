@@ -197,7 +197,7 @@ public:
                     continue;
 
                 // tabpage is the 0-2 index of the tree in its class's UI order
-                if (tabArg && talentTabInfo->tabpage != *tabArg - 1)
+                if (tabArg && talentTabInfo->tabpage != static_cast<uint32>(*tabArg) - 1)
                     continue;
 
                 // xinef: search highest talent rank
