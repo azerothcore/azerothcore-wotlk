@@ -901,7 +901,7 @@ struct npc_brann_bronzebeard_algalon : public CreatureAI
                 me->DespawnOrUnsummon(1ms);
                 return;
             case POINT_BRANN_OUTRO:
-                me->SetFacingTo(4.7950f);
+                me->SetFacingTo(4.6528215f);
                 return;
             case POINT_BRANN_OUTRO_END:
                 return;
