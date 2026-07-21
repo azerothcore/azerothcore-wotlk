@@ -5245,7 +5245,7 @@ void SpellMgr::LoadSpellInfoCorrections()
     // Drag Mine Cart
     ApplySpellFix({ 52414 }, [](SpellInfo* spellInfo)
     {
-        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ANY); 
+       spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ANY);
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)
