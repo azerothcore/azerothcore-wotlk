@@ -259,6 +259,8 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
             }
         }
 
+        // reports the amount that dropped, not the CAIS-reduced amount actually awarded;
+        // a script that grants money from this hook bypasses the play time restriction
         sScriptMgr->OnLootMoney(player, loot->gold);
 
         loot->gold = 0;
