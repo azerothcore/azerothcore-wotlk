@@ -359,7 +359,7 @@ public:
                     if (me->GetVictim())
                     {
                         std::list<Player*> myList;
-                        const Map::PlayerList& pl = me->GetMap()->GetPlayers();
+                        Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                         for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
                             if (Player* p = itr->GetSource())
                                 if (p->IsAlive() && p != me->GetVictim() && !p->IsGameMaster() && !p->HasAura(SPELL_UNCONTROLLABLE_FRENZY))
@@ -429,7 +429,7 @@ public:
                     if (!me->HasReactState(REACT_PASSIVE))
                     {
                         std::list<Player*> myList;
-                        const Map::PlayerList& pl = me->GetMap()->GetPlayers();
+                        Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                         for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
                             if (Player* p = itr->GetSource())
                                 if (p->IsAlive() && p != me->GetVictim() && p->GetGUID() != _offtankGUID && !p->IsGameMaster() && p->GetDistance(me) < 100.0f && !p->HasAura(SPELL_UNCONTROLLABLE_FRENZY))
@@ -452,7 +452,7 @@ public:
                     if (!me->HasReactState(REACT_PASSIVE))
                     {
                         std::list<Player*> myList;
-                        const Map::PlayerList& pl = me->GetMap()->GetPlayers();
+                        Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                         for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
                             if (Player* p = itr->GetSource())
                                 if (p->IsAlive() && p != me->GetVictim() && p->GetGUID() != _offtankGUID && !p->IsGameMaster() && !p->HasAura(SPELL_PACT_OF_THE_DARKFALLEN) && !p->HasAura(SPELL_UNCONTROLLABLE_FRENZY))
@@ -476,7 +476,7 @@ public:
                     if (!me->HasReactState(REACT_PASSIVE))
                     {
                         std::list<Player*> myList;
-                        const Map::PlayerList& pl = me->GetMap()->GetPlayers();
+                        Map::PlayerList const& pl = me->GetMap()->GetPlayers();
                         for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
                             if (Player* p = itr->GetSource())
                                 if (p->IsAlive() && p != me->GetVictim() && p->GetGUID() != _offtankGUID && !p->IsGameMaster() && !p->HasAura(SPELL_PACT_OF_THE_DARKFALLEN) && !p->HasAura(SPELL_UNCONTROLLABLE_FRENZY))
@@ -555,7 +555,7 @@ public:
 
         void EnterEvadeMode(EvadeReason why) override
         {
-            const Map::PlayerList& pl = me->GetMap()->GetPlayers();
+            Map::PlayerList const& pl = me->GetMap()->GetPlayers();
             for (Map::PlayerList::const_iterator itr = pl.begin(); itr != pl.end(); ++itr)
                 if (Player* p = itr->GetSource())
                     if (p->IsAlive() && p->HasAura(SPELL_UNCONTROLLABLE_FRENZY))
@@ -903,7 +903,7 @@ class spell_blood_queen_presence_of_the_darkfallen : public SpellScript
 class achievement_once_bitten_twice_shy : public AchievementCriteriaScript
 {
 public:
-    achievement_once_bitten_twice_shy(const char* name, uint8 spawnMode, bool wasVampire) : AchievementCriteriaScript(name), _spawnMode(spawnMode), _wasVampire(wasVampire) { }
+    achievement_once_bitten_twice_shy(char const* name, uint8 spawnMode, bool wasVampire) : AchievementCriteriaScript(name), _spawnMode(spawnMode), _wasVampire(wasVampire) { }
 
     bool OnCheck(Player* source, Unit* target, uint32 /*criteria_id*/) override
     {

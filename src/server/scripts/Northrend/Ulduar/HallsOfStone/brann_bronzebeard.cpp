@@ -92,7 +92,7 @@ enum events
 struct Yells
 {
     uint32 sound;
-    const char* text;
+    char const* text;
     uint32 creature, timer;
 };
 
