@@ -86,7 +86,7 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `spawnMask`, `phaseMask`, `equipmen
 -- Ith'rix 25453. spawntimesecs must exceed the remainder of event 93's window
 -- (he must not return inside his own 20min) but expire before the next window
 -- opens at +55min, or he loads on a pending respawn. 1800 sits in that band.
-(@GUID+1, 25453, 571, 1, 1, 0, 2563.398, 6056.7534, 157.0997, 0.675718843936920166, 1800, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
+(@GUID+1, 25453, 571, 1, 1, 0, 2563.398, 6056.7534, 157.0997, 0.675718843936920166, 900, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
 -- Warsong Marksmen 25244 - reinforce on a 5min timer for as long as event 92 runs
 (@GUID+3 , 25244, 571, 1, 1, 1, 2770.6533, 6123.831, 91.788445, 3.885649919509887695, 300, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
 (@GUID+4 , 25244, 571, 1, 1, 1, 2772.1545, 6125.37, 91.9547, 3.918198108673095703, 300, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
@@ -99,21 +99,20 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `spawnMask`, `phaseMask`, `equipmen
 (@GUID+11, 25244, 571, 1, 1, 1, 2783.7375, 6136.151, 89.41592, 0.157079637050628662, 300, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
 (@GUID+12, 25244, 571, 1, 1, 1, 2785.7144, 6137.814, 88.14427, 5.585053443908691406, 300, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
 (@GUID+13, 25244, 571, 1, 1, 1, 2787.284, 6139.4194, 87.04321, 2.111848354339599609, 300, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
-(@GUID+14, 25244, 571, 1, 1, 1, 2788.8938, 6140.902, 85.96647, 3.893373012542724609, 300, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
--- Sky Darkeners 25451. 10s is a gameplay dial, not a correctness one: a saved
--- respawn time only causes trouble if it is still in the FUTURE when the next
--- window opens (Creature.cpp LoadCreatureFromDB loads the creature dead). The
--- gap from :15 to the next :00 is 45min, so anything well under that is safe.
-(@GUID+15, 25451, 571, 1, 1, 0, 2586.0503, 6045.1733, 149.66963, 5.983277797698974609, 60, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
-(@GUID+16, 25451, 571, 1, 1, 0, 2592.336, 6055.209, 149.38055, 4.575495719909667968, 60, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
-(@GUID+17, 25451, 571, 1, 1, 0, 2582.3564, 6072.7163, 150.72621, 0.256311208009719848, 60, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
-(@GUID+18, 25451, 571, 1, 1, 0, 2586.5847, 6043.062, 150.77448, 6.154862403869628906, 60, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
-(@GUID+19, 25451, 571, 1, 1, 0, 2590.9182, 6052.6157, 146.73918, 2.318624496459960937, 60, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
-(@GUID+20, 25451, 571, 1, 1, 0, 2584.9631, 6067.6963, 148.27704, 1.537565231323242187, 60, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
-(@GUID+21, 25451, 571, 1, 1, 0, 2588.828, 6049.6763, 146.88951, 2.722152233123779296, 60, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
-(@GUID+22, 25451, 571, 1, 1, 0, 2585.2322, 6061.892, 151.63135, 0.06164625659584999, 60, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
-(@GUID+23, 25451, 571, 1, 1, 0, 2586.2327, 6049.5854, 150.27066, 1.737332820892333984, 60, -52237, 2, 'Part of What The Cold Wind Brings... Event'),
-(@GUID+24, 25451, 571, 1, 1, 0, 2588.501, 6063.269, 147.57248, 3.455328941345214843, 60, -52237, 2, 'Part of What The Cold Wind Brings... Event');
+(@GUID+14, 25244, 571, 1, 1, 1, 2788.8938, 6140.902, 85.96647, 3.893373012542724609, 300, -52237, 2, 'Part of What The Cold Wind Brings... Event');
+
+DELETE FROM `creature_summon_groups` WHERE `summonerId` = 25453 AND `summonerType` = 0 AND `groupId` = 0;
+INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `entry`, `position_x`, `position_y`, `position_z`, `orientation`, `summonType`, `summonTime`, `Comment`) VALUES
+(25453, 0, 0, 25451, 2586.0503, 6045.1733, 149.66963, 5.983277797698974609, 6, 10000, 'What the Cold Wind Brings...'),
+(25453, 0, 0, 25451, 2592.336, 6055.209, 149.38055, 4.575495719909667968,   6, 10000, 'What the Cold Wind Brings...'),
+(25453, 0, 0, 25451, 2582.3564, 6072.7163, 150.72621, 0.256311208009719848, 6, 10000, 'What the Cold Wind Brings...'),
+(25453, 0, 0, 25451, 2586.5847, 6043.062, 150.77448, 6.154862403869628906,  6, 10000, 'What the Cold Wind Brings...'),
+(25453, 0, 0, 25451, 2590.9182, 6052.6157, 146.73918, 2.318624496459960937, 6, 10000, 'What the Cold Wind Brings...'),
+(25453, 0, 0, 25451, 2584.9631, 6067.6963, 148.27704, 1.537565231323242187, 6, 10000, 'What the Cold Wind Brings...'),
+(25453, 0, 0, 25451, 2588.828, 6049.6763, 146.88951, 2.722152233123779296,  6, 10000, 'What the Cold Wind Brings...'),
+(25453, 0, 0, 25451, 2585.2322, 6061.892, 151.63135, 0.06164625659584999,   6, 10000, 'What the Cold Wind Brings...'),
+(25453, 0, 0, 25451, 2586.2327, 6049.5854, 150.27066, 1.737332820892333984, 6, 10000, 'What the Cold Wind Brings...'),
+(25453, 0, 0, 25451, 2588.501, 6063.269, 147.57248, 3.455328941345214843,   6, 10000, 'What the Cold Wind Brings...');
 
 -- Event membership. This is the only thing that spawns or despawns these
 -- creatures on a schedule, and it works through the grid spawn data, so it
@@ -134,41 +133,13 @@ INSERT INTO `game_event_creature` (`eventEntry`, `guid`) VALUES
 (92, @GUID+12),
 (92, @GUID+13),
 (92, @GUID+14),
-(93, @GUID+3 ),
-(93, @GUID+4 ),
-(93, @GUID+5 ),
-(93, @GUID+6 ),
-(93, @GUID+7 ),
-(93, @GUID+8 ),
-(93, @GUID+9 ),
-(93, @GUID+10),
-(93, @GUID+11),
-(93, @GUID+12),
-(93, @GUID+13),
-(93, @GUID+14),
--- 92 only: the swarm ends when the assault window closes at :15.
-(92, @GUID+15),
-(92, @GUID+16),
-(92, @GUID+17),
-(92, @GUID+18),
-(92, @GUID+19),
-(92, @GUID+20),
-(92, @GUID+21),
-(92, @GUID+22),
-(92, @GUID+23),
-(92, @GUID+24),
 -- 93 Ith'rix
-(93, @GUID+1 );
+(92, @GUID+1 );
 
 -- 94 and 95 are retired - the sequence no longer needs per-phase events.
-DELETE FROM `game_event` WHERE `eventEntry` IN (92, 93, 94, 95);
+DELETE FROM `game_event` WHERE `eventEntry` IN (92);
 INSERT INTO `game_event` (`eventEntry`, `start_time`, `end_time`, `occurence`, `length`, `description`, `announce`) VALUES
-(92, @ANCHOR_ASSAULT, NULL, @EVENT_OCCURENCE, @LENGTH_ASSAULT, 'What the Cold Wind Brings... Assault', 2),
--- Anchored 15 minutes past the hour, so Ith'rix arrives into an assault that is
--- already underway and outlasts it by 10 minutes.
--- `end_time` must stay NULL - a past end_time trips the Length-minutes-added-to-
--- a-seconds-timestamp bug in GameEventMgr::StopEvent.
-(93, @ANCHOR_BOSS, NULL, @EVENT_OCCURENCE, @LENGTH_BOSS, 'What the Cold Wind Brings... Ith\'rix', 0);
+(92, @ANCHOR_ASSAULT, NULL, 60, 30, 'What the Cold Wind Brings...', 2);
 
 DELETE FROM `waypoint_data` WHERE `id` = 254391;
 DELETE FROM `waypoint_data` WHERE `id` IN (@GUID+1,@GUID+3,@GUID+4,@GUID+5,@GUID+6,@GUID+7,@GUID+8,@GUID+9,@GUID+10,@GUID+11,@GUID+12,@GUID+13,@GUID+14,@GUID+15,@GUID+16,@GUID+17,@GUID+18,@GUID+19,@GUID+20,@GUID+21,@GUID+22,@GUID+23,@GUID+24);
@@ -352,7 +323,7 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 -- Relay an action instead: only the twelve event guids carry a handler for it,
 -- so the garrison receives it and ignores it. Fires after 'take your trophies'.
 -- Event 93's `length` still despawns them at :35 if this is ever missed.
-(2544602, 9, 4, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 0, 223, 3, 0, 0, 0, 0, 0, 11, 25244, 300, 0, 0, 0, 0, 0, 0, 'Warsong Captain - Actionlist - Dismiss Event Marksmen'),
+(2544602, 9, 4, 0, 0, 0, 100, 0, 2000, 2000, 0, 0, 0, 0, 111, 92, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - Actionlist - End What the Cold Wind Brings...'),
 (2544602, 9, 5, 0, 0, 0, 100, 0, 13000, 13000, 0, 0, 0, 0, 59, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Captain - Actionlist - Set Run On');
 
 -- Warsong Scout keeps his combat SAI and his lines, but no longer opens the
@@ -370,7 +341,7 @@ DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2543900
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 25244;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 25244);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(25244, 0, 0, 0, 0, 0, 100, 0, 5000, 10000, 6000, 12000, 0, 0, 11, 38372, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - In Combat - Cast \'Shoot\''),
+(25244, 0, 0, 0, 0, 0, 100, 0, 3000, 6000, 4000, 8000, 0, 0, 11, 38372, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - In Combat - Cast \'Shoot\''),
 (25244, 0, 1, 0, 2, 0, 100, 0, 0, 30, 0, 0, 0, 0, 11, 8599, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Warsong Marksman - Between 0-30% Health - Cast \'Enrage\'');
 
 -- Guid-only rules for the twelve event marksmen. Action 3 (dismiss on Ith'rix's
@@ -449,34 +420,62 @@ INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_
 (25451, 0, 0, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 41, 5000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Just Died - Despawn In 5000 ms'),
 (25451, 0, 1, 0, 0, 0, 100, 0, 9000, 13000, 17000, 23000, 0, 0, 11, 45587, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - In Combat - Cast \'Web Bolt\''),
 (25451, 0, 2, 0, 0, 0, 100, 0, 0, 1500, 1500, 2000, 0, 0, 11, 45577, 64, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - In Combat - Cast \'Venom Spit\''),
-(25451, 0, 3, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 239, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Respawn - Set Fly Mode');
+(25451, 0, 3, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 239, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Respawn - Set Fly Mode'),
+(25451, 0, 4, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 88, 2545100, 2545109, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Respawn - Start Random Path'),
+(25451, 0, 5, 0, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 223, 1, 0, 0, 0, 0, 0, 10, (@GUID+1), 25453, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Just Died - Request Reinforcement From Ith\'rix');
 
-DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` BETWEEN -(@GUID+24) AND -(@GUID+15));
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` BETWEEN 2545100 AND 2545109);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(-(@GUID+15), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+15), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Respawn - Start Path'),
-(-(@GUID+16), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+16), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Respawn - Start Path'),
-(-(@GUID+17), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+17), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Respawn - Start Path'),
-(-(@GUID+18), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+18), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Respawn - Start Path'),
-(-(@GUID+19), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+19), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Respawn - Start Path'),
-(-(@GUID+20), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+20), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Respawn - Start Path'),
-(-(@GUID+21), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+21), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Respawn - Start Path'),
-(-(@GUID+22), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+22), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Respawn - Start Path'),
-(-(@GUID+23), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+23), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Respawn - Start Path'),
-(-(@GUID+24), 0, 1001, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+24), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Respawn - Start Path');
+(2545100, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+15), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Respawn - Start Path'),
+(2545101, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+16), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Respawn - Start Path'),
+(2545102, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+17), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Respawn - Start Path'),
+(2545103, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+18), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Respawn - Start Path'),
+(2545104, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+19), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Respawn - Start Path'),
+(2545105, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+20), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Respawn - Start Path'),
+(2545106, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+21), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Respawn - Start Path'),
+(2545107, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+22), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Respawn - Start Path'),
+(2545108, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+23), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Respawn - Start Path'),
+(2545109, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+24), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Nerub\'ar Sky Darkener - On Respawn - Start Path');
 
 -- Ith'rix has no spawn but @GUID+1, so his whole script lives on the entry.
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 25453;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 25453);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(25453, 0, 0, 1, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 239, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - On Respawn - Set Fly Mode'),
-(25453, 0, 1, 2, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - On Respawn - Say Line 0'),
-(25453, 0, 2, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+1), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - On Respawn - Start Path'),
-(25453, 0, 3, 0, 109, 0, 100, 0, 0, (@GUID+1), 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 19, 25446, 100, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - On Path Finished - Start Attacking'),
-(25453, 0, 4, 0, 0, 0, 100, 0, 7000, 9000, 8000, 11000, 0, 0, 11, 25748, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - In Combat - Cast \'Poison Stinger\''),
-(25453, 0, 5, 0, 0, 0, 100, 0, 6000, 8000, 16000, 21000, 0, 0, 11, 34392, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - In Combat - Cast \'Stinger Rage\''),
-(25453, 0, 6, 0, 0, 0, 100, 0, 2000, 4000, 3000, 6000, 0, 0, 11, 45592, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - In Combat - Cast \'Venom Spit\''),
-(25453, 0, 7, 8, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 45593, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - On Just Died - Cast \'Ith`rix`s Carapace\''),
-(25453, 0, 8, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 223, 2, 0, 0, 0, 0, 0, 19, 25446, 100, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - On Just Died - Relay to Warsong Captain End Event');
+(25453, 0, 0, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 239, 3, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - On Respawn - Set Fly Mode'),
+(25453, 0, 1, 0, 109, 0, 100, 0, 0, 53049, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 19, 25446, 100, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - On Path Finished - Start Attacking'),
+(25453, 0, 2, 0, 0, 0, 100, 0, 7000, 9000, 8000, 11000, 0, 0, 11, 25748, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - In Combat - Cast \'Poison Stinger\''),
+(25453, 0, 3, 0, 0, 0, 100, 0, 6000, 8000, 16000, 21000, 0, 0, 11, 34392, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - In Combat - Cast \'Stinger Rage\''),
+(25453, 0, 4, 0, 0, 0, 100, 0, 2000, 4000, 3000, 6000, 0, 0, 11, 45592, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - In Combat - Cast \'Venom Spit\''),
+(25453, 0, 5, 6, 6, 0, 100, 0, 0, 0, 0, 0, 0, 0, 11, 45593, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - On Just Died - Cast \'Ith`rix`s Carapace\''),
+(25453, 0, 6, 0, 61, 0, 100, 0, 0, 0, 0, 0, 0, 0, 223, 2, 0, 0, 0, 0, 0, 19, 25446, 100, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - On Just Died - Relay to Warsong Captain End Event'),
+(25453, 0, 7, 0, 11, 0, 100, 0, 0, 0, 0, 0, 0, 0, 80, 2545300, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - On Respawn - Remain Hidden'),
+(25453, 0, 8, 0, 1, 1, 100, 0, 900000, 900000, 0, 0, 0, 0, 80, 2545301, 2, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - Out of Combat - Appear After 15 Minutes (Phase 1)'),
+(25453, 0, 9, 0, 72, 1, 100, 0, 1, 0, 0, 0, 0, 0, 88, 2545302, 25453011, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - On Action 1 Done - Summon Reinforcement (Phase 1)');
 
-DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = -(@GUID+1));
 DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2545300);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2545300, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - Actionlist - Set Event Phase 1'),
+(2545300, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 18, 768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - Actionlist - Set Flags Immune To Players & Immune To NPC\'s'),
+(2545300, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 47, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - Actionlist - Set Visibility Off'),
+(2545300, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 107, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - Actionlist - Summon First Wave');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` = 2545301);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2545301, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 22, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - Actionlist - Set Event Phase 0'),
+(2545301, 9, 1, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 232, (@GUID+1), 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - Actionlist - Start Path 123'),
+(2545301, 9, 2, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 19, 768, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - Actionlist - Remove Flags Immune To Players & Immune To NPC\'s'),
+(2545301, 9, 3, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 47, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - Actionlist - Set Visibility On'),
+(2545301, 9, 4, 0, 0, 0, 100, 0, 1200, 1200, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ith\'rix the Harvester - Actionlist - Say Line');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 9 AND `entryorguid` BETWEEN 2545302 AND 2545311);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(2545302, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 12, 25451, 6, 10000, 0, 0, 0, 8, 0, 0, 0, 0, 2586.0503, 6045.1733, 149.66963, 5.983277797698974609, 'Ith\'rix the Harvester - Actionlist - Summon Creature \'Nerub\'ar Sky Darkener\''),
+(2545303, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 12, 25451, 6, 10000, 0, 0, 0, 8, 0, 0, 0, 0, 2592.336, 6055.209, 149.38055, 4.575495719909667968,   'Ith\'rix the Harvester - Actionlist - Summon Creature \'Nerub\'ar Sky Darkener\''),
+(2545304, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 12, 25451, 6, 10000, 0, 0, 0, 8, 0, 0, 0, 0, 2582.3564, 6072.7163, 150.72621, 0.256311208009719848, 'Ith\'rix the Harvester - Actionlist - Summon Creature \'Nerub\'ar Sky Darkener\''),
+(2545305, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 12, 25451, 6, 10000, 0, 0, 0, 8, 0, 0, 0, 0, 2586.5847, 6043.062, 150.77448, 6.154862403869628906,  'Ith\'rix the Harvester - Actionlist - Summon Creature \'Nerub\'ar Sky Darkener\''),
+(2545306, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 12, 25451, 6, 10000, 0, 0, 0, 8, 0, 0, 0, 0, 2590.9182, 6052.6157, 146.73918, 2.318624496459960937, 'Ith\'rix the Harvester - Actionlist - Summon Creature \'Nerub\'ar Sky Darkener\''),
+(2545307, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 12, 25451, 6, 10000, 0, 0, 0, 8, 0, 0, 0, 0, 2584.9631, 6067.6963, 148.27704, 1.537565231323242187, 'Ith\'rix the Harvester - Actionlist - Summon Creature \'Nerub\'ar Sky Darkener\''),
+(2545308, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 12, 25451, 6, 10000, 0, 0, 0, 8, 0, 0, 0, 0, 2588.828, 6049.6763, 146.88951, 2.722152233123779296,  'Ith\'rix the Harvester - Actionlist - Summon Creature \'Nerub\'ar Sky Darkener\''),
+(2545309, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 12, 25451, 6, 10000, 0, 0, 0, 8, 0, 0, 0, 0, 2585.2322, 6061.892, 151.63135, 0.06164625659584999,   'Ith\'rix the Harvester - Actionlist - Summon Creature \'Nerub\'ar Sky Darkener\''),
+(2545310, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 12, 25451, 6, 10000, 0, 0, 0, 8, 0, 0, 0, 0, 2586.2327, 6049.5854, 150.27066, 1.737332820892333984, 'Ith\'rix the Harvester - Actionlist - Summon Creature \'Nerub\'ar Sky Darkener\''),
+(2545311, 9, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 12, 25451, 6, 10000, 0, 0, 0, 8, 0, 0, 0, 0, 2588.501, 6063.269, 147.57248, 3.455328941345214843,   'Ith\'rix the Harvester - Actionlist - Summon Creature \'Nerub\'ar Sky Darkener\'');
