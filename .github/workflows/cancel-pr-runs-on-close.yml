@@ -1,0 +1,51 @@
+name: cancel-pr-runs-on-close
+on:
+  # pull_request_target, not pull_request: for a PR from a fork the GITHUB_TOKEN
+  # of a pull_request run is read-only, so the cancel would 403. This workflow
+  # never checks out or runs PR code, so the elevated token is not exposed to it.
+  pull_request_target:
+    types:
+      - closed
+
+permissions:
+  actions: write
+
+jobs:
+  cancel:
+    runs-on: ubuntu-latest
+    name: cancel CI still running for the closed PR
+    if: github.repository == 'azerothcore/azerothcore-wotlk'
+    steps:
+      - name: Cancel workflow runs for this PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          PR_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+
+          # Runs are matched on head_sha. The `pull_requests` field of a run is
+          # empty for PRs from a fork, which is nearly all of them here, so it
+          # cannot be used. head_branch is the fork's branch name and can collide
+          # between forks. Restricting to event=pull_request keeps push runs for
+          # the same commit out of the selection.
+          ids="$(
+            for status in queued in_progress; do
+              gh api "repos/${GH_REPO}/actions/runs?event=pull_request&status=${status}&per_page=100" \
+                | jq -r --arg sha "$PR_SHA" '.workflow_runs[] | select(.head_sha == $sha) | .id'
+            done | sort -u
+          )"
+
+          if [[ -z "$ids" ]]; then
+            echo "Nothing still running for $PR_SHA"
+            exit 0
+          fi
+
+          while read -r id; do
+            # A run that finishes between the listing and the cancel returns 409.
+            if gh run cancel "$id"; then
+              echo "Cancelled run $id"
+            else
+              echo "::warning::could not cancel run $id, it likely already finished"
+            fi
+          done <<< "$ids"
