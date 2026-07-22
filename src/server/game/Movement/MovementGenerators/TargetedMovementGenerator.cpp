@@ -112,7 +112,8 @@ bool ChaseMovementGenerator<T>::DispatchSplineToPosition(T* owner, float x, floa
 
         // For pets, treat incomplete paths as failures to avoid clipping through geometry
         // Players and Player-controlled units have more erratic movement, skip failure
-        if (cOwner && (cOwner->IsPet() || cOwner->IsControlledByPlayer()) && !GetTarget()->IsCharmedOwnedByPlayerOrPlayer())
+        if (cOwner && (cOwner->IsPet() || cOwner->IsControlledByPlayer())
+            && !GetTarget()->IsCharmedOwnedByPlayerOrPlayer())
             if (pathType & PATHFIND_INCOMPLETE)
                 return false;
 
@@ -127,7 +128,8 @@ bool ChaseMovementGenerator<T>::DispatchSplineToPosition(T* owner, float x, floa
     // ring covers the navmesh. Retry against the nearest point on the ring, ignoring the
     // chase angle, via GetNearPoint2D: GetNearPoint's LoS repositioning must be avoided
     // here, it can rotate the point to the far side of the target.
-    if (pathFailed && (!_range || _range->MaxRange <= CONTACT_DISTANCE) && GetTarget()->GetCombatReach() > NOMINAL_MELEE_RANGE)
+    if (pathFailed && (!_range || _range->MaxRange <= CONTACT_DISTANCE)
+        && !GetTarget()->IsCharmedOwnedByPlayerOrPlayer() && GetTarget()->GetCombatReach() > NOMINAL_MELEE_RANGE)
     {
         GetTarget()->GetNearPoint2D(owner, x, y, 0.0f, GetTarget()->GetAngle(owner));
         z = GetTarget()->GetPositionZ();
