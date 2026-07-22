@@ -124,13 +124,14 @@ struct boss_ingvar_the_plunderer : public ScriptedAI
         // the death sequence, repeating the yell and delaying Annhylde
         if (me->HasUnitFlag2(UNIT_FLAG2_FEIGN_DEATH))
         {
-            damage = 0;
+            if (damage >= me->GetHealth())
+                damage = me->GetHealth() - 1;
             return;
         }
 
         if (me->GetDisplayId() == DISPLAYID_DEFAULT && damage >= me->GetHealth())
         {
-            damage = 0;
+            damage = me->GetHealth() - 1;
             me->InterruptNonMeleeSpells(true);
             me->RemoveAllAuras();
             me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
