@@ -156,7 +156,7 @@ public:
         return Acore::StringFormat(GetAcoreString(entry), std::forward<Args>(args)...);
     }
 
-    std::string const* GetModuleString(std::string module, uint32 id) const;
+    virtual std::string const* GetModuleString(std::string module, uint32 id) const;
 
     template<typename... Args>
     void PSendModuleSysMessage(std::string module, uint32 id, Args&&... args)
@@ -191,7 +191,7 @@ public:
     bool _ParseCommands(std::string_view text);
     virtual bool ParseCommands(std::string_view text);
 
-    void SendGlobalSysMessage(const char* str);
+    void SendGlobalSysMessage(char const* str);
 
     // function with different implementation for chat/console
     virtual bool IsHumanReadable() const { return true; }
@@ -203,7 +203,7 @@ public:
     bool HasLowerSecurity(Player* target, ObjectGuid guid = ObjectGuid::Empty, bool strong = false);
     bool HasLowerSecurityAccount(WorldSession* target, uint32 account, bool strong = false);
 
-    void SendGlobalGMSysMessage(const char* str);
+    void SendGlobalGMSysMessage(char const* str);
     Player* getSelectedPlayer() const;
     Creature* getSelectedCreature() const;
     Unit* getSelectedUnit() const;
@@ -223,7 +223,7 @@ public:
 
     uint32    extractSpellIdFromLink(char* text);
     ObjectGuid::LowType extractLowGuidFromLink(char* text, HighGuid& guidHigh);
-    bool GetPlayerGroupAndGUIDByName(const char* cname, Player*& player, Group*& group, ObjectGuid& guid, bool offline = false);
+    bool GetPlayerGroupAndGUIDByName(char const* cname, Player*& player, Group*& group, ObjectGuid& guid, bool offline = false);
     std::string extractPlayerNameFromLink(char* text);
     // select by arg (name/link) or in-game selection online/offline player
     bool extractPlayerTarget(char* args, Player** player, ObjectGuid* player_guid = nullptr, std::string* player_name = nullptr);
@@ -260,6 +260,7 @@ public:
 
     // overwrite functions
     std::string GetAcoreString(uint32 entry) const override;
+    std::string const* GetModuleString(std::string module, uint32 id) const override;
     void SendSysMessage(std::string_view, bool escapeCharacters) override;
     bool ParseCommands(std::string_view str) override;
     std::string GetNameLink() const override;

@@ -191,7 +191,7 @@ void ChatHandler::SendSysMessage(std::string_view str, bool escapeCharacters)
     }
 }
 
-void ChatHandler::SendGlobalSysMessage(const char* str)
+void ChatHandler::SendGlobalSysMessage(char const* str)
 {
     WorldPacket data;
     for (std::string_view line : Acore::Tokenize(str, '\n', true))
@@ -201,7 +201,7 @@ void ChatHandler::SendGlobalSysMessage(const char* str)
     }
 }
 
-void ChatHandler::SendGlobalGMSysMessage(const char* str)
+void ChatHandler::SendGlobalGMSysMessage(char const* str)
 {
     WorldPacket data;
     for (std::string_view line : Acore::Tokenize(str, '\n', true))
@@ -895,6 +895,11 @@ std::string CliHandler::GetAcoreString(uint32 entry) const
     return sObjectMgr->GetAcoreStringForDBCLocale(entry);
 }
 
+std::string const* CliHandler::GetModuleString(std::string module, uint32 id) const
+{
+    return sObjectMgr->GetModuleString(module, id, LocaleConstant(sObjectMgr->GetDBCLocaleIndex()));
+}
+
 void CliHandler::SendSysMessage(std::string_view str, bool /*escapeCharacters*/)
 {
     m_print(m_callbackArg, str);
@@ -923,7 +928,7 @@ bool CliHandler::needReportToTarget(Player* /*chr*/) const
     return true;
 }
 
-bool ChatHandler::GetPlayerGroupAndGUIDByName(const char* cname, Player*& player, Group*& group, ObjectGuid& guid, bool offline)
+bool ChatHandler::GetPlayerGroupAndGUIDByName(char const* cname, Player*& player, Group*& group, ObjectGuid& guid, bool offline)
 {
     player = nullptr;
     guid = ObjectGuid::Empty;

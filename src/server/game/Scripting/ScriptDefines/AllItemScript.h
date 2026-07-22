@@ -23,7 +23,7 @@
 class AllItemScript : public ScriptObject
 {
 protected:
-    AllItemScript(const char* name);
+    AllItemScript(char const* name);
 
 public:
     // Called when a player accepts a quest from the item.
@@ -42,7 +42,7 @@ public:
     virtual void OnItemGossipSelect(Player* /*player*/, Item* /*item*/, uint32 /*sender*/, uint32 /*action*/) { }
 
     // Called when a player selects an option in an item gossip window
-    virtual void OnItemGossipSelectCode(Player* /*player*/, Item* /*item*/, uint32 /*sender*/, uint32 /*action*/, const char* /*code*/) { }
+    virtual void OnItemGossipSelectCode(Player* /*player*/, Item* /*item*/, uint32 /*sender*/, uint32 /*action*/, char const* /*code*/) { }
 };
 
 #endif

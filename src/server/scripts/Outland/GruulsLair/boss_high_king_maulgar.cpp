@@ -69,7 +69,6 @@ struct boss_high_king_maulgar : public BossAI
     void Reset() override
     {
         _Reset();
-        _recentlySpoken = false;
         me->SetLootMode(0);
         ScheduleHealthCheckEvent(50, [&]{
             Talk(SAY_ENRAGE);
@@ -87,18 +86,9 @@ struct boss_high_king_maulgar : public BossAI
         });
     }
 
-    void KilledUnit(Unit*  /*victim*/) override
+    void KilledUnit(Unit* /*victim*/) override
     {
-        if (!_recentlySpoken)
-        {
-            Talk(SAY_SLAY);
-            _recentlySpoken = true;
-        }
-
-        scheduler.Schedule(5s, [this](TaskContext)
-        {
-            _recentlySpoken = false;
-        });
+        Talk(SAY_SLAY);
     }
 
     void JustDied(Unit* /*killer*/) override
@@ -158,8 +148,6 @@ struct boss_high_king_maulgar : public BossAI
 
         DoMeleeAttackIfReady();
     }
-private:
-    bool _recentlySpoken;
 };
 
 struct boss_olm_the_summoner : public ScriptedAI
@@ -181,15 +169,6 @@ struct boss_olm_the_summoner : public ScriptedAI
         _scheduler.CancelAll();
         summons.DespawnAll();
         instance->SetBossState(DATA_MAULGAR, NOT_STARTED);
-    }
-
-    void AttackStart(Unit* who) override
-    {
-        if (!who)
-            return;
-
-        if (me->Attack(who, true))
-            me->GetMotionMaster()->MoveChase(who, 25.0f);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -263,7 +242,7 @@ struct boss_kiggler_the_crazed : public ScriptedAI
             return;
 
         if (me->Attack(who, true))
-            me->GetMotionMaster()->MoveChase(who, 25.0f);
+            me->GetMotionMaster()->MoveChase(who, 40.0f);
     }
 
     void JustEngagedWith(Unit* /*who*/) override
@@ -342,7 +321,7 @@ struct boss_blindeye_the_seer : public ScriptedAI
                 DoCast(target, SPELL_HEAL);
             }
             context.Repeat(7200ms);
-        }).Schedule(37500s, [this](TaskContext context)
+        }).Schedule(37500ms, [this](TaskContext context)
         {
             DoCastSelf(SPELL_GREATER_PW_SHIELD);
             _scheduler.Schedule(1200ms, [this](TaskContext)

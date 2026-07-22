@@ -426,7 +426,7 @@ void WorldSession::HandleLogoutRequestOpcode(WorldPackets::Character::LogoutRequ
     bool preventAfkSanctuaryLogout = sWorld->getIntConfig(CONFIG_AFK_PREVENT_LOGOUT) == 1
                                      && GetPlayer()->isAFK() && sAreaTableStore.LookupEntry(GetPlayer()->GetAreaId())->IsSanctuary();
 
-    bool preventAfkLogout = sWorld->getIntConfig(CONFIG_AFK_PREVENT_LOGOUT) == 2
+    bool preventAfkLogout = ((sWorld->getIntConfig(CONFIG_AFK_PREVENT_LOGOUT) == 2) || HasAccountFlag(ACCOUNT_FLAG_NOKICK))
                             && GetPlayer()->isAFK();
 
     /// @todo: Possibly add RBAC permission to log out in combat

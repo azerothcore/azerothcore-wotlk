@@ -9,10 +9,10 @@ jobs:
     permissions: write-all
     if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: true
-      - uses: actions/labeler@v5
+      - uses: actions/labeler@v7
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           configuration-path: .github/labeler.yml

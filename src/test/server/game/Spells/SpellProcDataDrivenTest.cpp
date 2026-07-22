@@ -42,7 +42,7 @@ using namespace testing;
 struct ProcFlagScenario
 {
     uint32 procFlag;
-    const char* name;
+    char const* name;
     uint32 defaultHitMask;
     uint32 defaultSpellTypeMask;
     uint32 defaultSpellPhaseMask;
@@ -77,7 +77,7 @@ static const std::vector<ProcFlagScenario> PROC_FLAG_SCENARIOS = {
     { PROC_FLAG_DONE_TRAP_ACTIVATION,           "TrapActivation",         PROC_HIT_NORMAL, 0, PROC_SPELL_PHASE_HIT, true },
 };
 
-static const std::vector<std::pair<uint32, const char*>> HIT_MASK_SCENARIOS = {
+static const std::vector<std::pair<uint32, char const*>> HIT_MASK_SCENARIOS = {
     { PROC_HIT_NORMAL,      "Normal" },
     { PROC_HIT_CRITICAL,    "Critical" },
     { PROC_HIT_MISS,        "Miss" },
