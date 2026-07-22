@@ -25,7 +25,7 @@
 
 char const* GetPlainName(char const* FileName)
 {
-    const char* szTemp;
+    char const* szTemp;
 
     if ((szTemp = strrchr(FileName, '\\')) != nullptr)
         FileName = szTemp + 1;

@@ -58,7 +58,6 @@ public:
         boss_krik_thirAI(Creature* creature) : BossAI(creature, DATA_KRIKTHIR)
         {
             _initTalk = false;
-            _canTalk = true;
             _minionInCombat = false;
         }
 
@@ -79,7 +78,6 @@ public:
                 });
             });
 
-            _canTalk = true;
             _minionInCombat = false;
             _firstCall = true;
             _minionsEngaged = 0;
@@ -236,14 +234,7 @@ public:
 
         void KilledUnit(Unit* /*victim*/) override
         {
-            if (_canTalk)
-            {
-                _canTalk = false;
-                Talk(SAY_SLAY);
-                me->m_Events.AddEventAtOffset([&] {
-                    _canTalk = true;
-                }, 6s);
-            }
+            Talk(SAY_SLAY);
         }
 
         void SummonedCreatureDies(Creature* summon, Unit*) override
@@ -253,7 +244,6 @@ public:
 
     private:
         bool _initTalk;
-        bool _canTalk;
         bool _minionInCombat;
         uint8 _minionsEngaged;
         bool _firstCall;

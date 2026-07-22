@@ -61,49 +61,6 @@
 constexpr auto SPELL_STUCK = 7355;
 constexpr auto SPELL_FREEZE = 9454;
 
-struct AccountFlagText
-{
-    AccountFlag flag;
-    std::string text;
-};
-
-AccountFlagText const accountFlagText[MAX_ACCOUNT_FLAG] =
-{
-    { ACCOUNT_FLAG_GM, "ACCOUNT_FLAG_GM" },
-    { ACCOUNT_FLAG_NOKICK, "ACCOUNT_FLAG_NOKICK" },
-    { ACCOUNT_FLAG_COLLECTOR, "ACCOUNT_FLAG_COLLECTOR" },
-    { ACCOUNT_FLAG_TRIAL, "ACCOUNT_FLAG_TRIAL" },
-    { ACCOUNT_FLAG_CANCELLED, "ACCOUNT_FLAG_CANCELLED" },
-    { ACCOUNT_FLAG_IGR, "ACCOUNT_FLAG_IGR" },
-    { ACCOUNT_FLAG_WHOLESALER, "ACCOUNT_FLAG_WHOLESALER" },
-    { ACCOUNT_FLAG_PRIVILEGED, "ACCOUNT_FLAG_PRIVILEGED" },
-    { ACCOUNT_FLAG_EU_FORBID_ELV, "ACCOUNT_FLAG_EU_FORBID_ELV" },
-    { ACCOUNT_FLAG_EU_FORBID_BILLING, "ACCOUNT_FLAG_EU_FORBID_BILLING" },
-    { ACCOUNT_FLAG_RESTRICTED, "ACCOUNT_FLAG_RESTRICTED" },
-    { ACCOUNT_FLAG_REFERRAL, "ACCOUNT_FLAG_REFERRAL" },
-    { ACCOUNT_FLAG_BLIZZARD, "ACCOUNT_FLAG_BLIZZARD" },
-    { ACCOUNT_FLAG_RECURRING_BILLING, "ACCOUNT_FLAG_RECURRING_BILLING" },
-    { ACCOUNT_FLAG_NOELECTUP, "ACCOUNT_FLAG_NOELECTUP" },
-    { ACCOUNT_FLAG_KR_CERTIFICATE, "ACCOUNT_FLAG_KR_CERTIFICATE" },
-    { ACCOUNT_FLAG_EXPANSION_COLLECTOR, "ACCOUNT_FLAG_EXPANSION_COLLECTOR" },
-    { ACCOUNT_FLAG_DISABLE_VOICE, "ACCOUNT_FLAG_DISABLE_VOICE" },
-    { ACCOUNT_FLAG_DISABLE_VOICE_SPEAK, "ACCOUNT_FLAG_DISABLE_VOICE_SPEAK" },
-    { ACCOUNT_FLAG_REFERRAL_RESURRECT, "ACCOUNT_FLAG_REFERRAL_RESURRECT" },
-    { ACCOUNT_FLAG_EU_FORBID_CC, "ACCOUNT_FLAG_EU_FORBID_CC" },
-    { ACCOUNT_FLAG_OPENBETA_DELL, "ACCOUNT_FLAG_OPENBETA_DELL" },
-    { ACCOUNT_FLAG_PROPASS, "ACCOUNT_FLAG_PROPASS" },
-    { ACCOUNT_FLAG_PROPASS_LOCK, "ACCOUNT_FLAG_PROPASS_LOCK" },
-    { ACCOUNT_FLAG_PENDING_UPGRADE, "ACCOUNT_FLAG_PENDING_UPGRADE" },
-    { ACCOUNT_FLAG_RETAIL_FROM_TRIAL, "ACCOUNT_FLAG_RETAIL_FROM_TRIAL" },
-    { ACCOUNT_FLAG_EXPANSION2_COLLECTOR, "ACCOUNT_FLAG_EXPANSION2_COLLECTOR" },
-    { ACCOUNT_FLAG_OVERMIND_LINKED, "ACCOUNT_FLAG_OVERMIND_LINKED" },
-    { ACCOUNT_FLAG_DEMOS, "ACCOUNT_FLAG_DEMOS" },
-    { ACCOUNT_FLAG_DEATH_KNIGHT_OK, "ACCOUNT_FLAG_DEATH_KNIGHT_OK" },
-    { ACCOUNT_FLAG_S2_REQUIRE_IGR, "ACCOUNT_FLAG_S2_REQUIRE_IGR" },
-    { ACCOUNT_FLAG_S2_TRIAL, "ACCOUNT_FLAG_S2_TRIAL" },
-    // { ACCOUNT_FLAG_S2_RESTRICTED, "ACCOUNT_FLAG_S2_RESTRICTED" }
-};
-
 std::string const GetLocalizeCreatureName(Creature* creature, LocaleConstant locale)
 {
     auto creatureTemplate = sObjectMgr->GetCreatureTemplate(creature->GetEntry());
@@ -359,7 +316,7 @@ public:
                 break;
             }
 
-            const Group* g = plr->GetGroup();
+            Group const* g = plr->GetGroup();
 
             if (hcnt > 1)
             {
@@ -499,8 +456,21 @@ public:
             // Remove from LFG queues
             sLFGMgr->LeaveAllLfgQueues(player->GetGUID(), false);
 
+            // Book the reservation like the queue path does, so it is symmetric
+            // with RemovePlayerAtLeave's decrement and the 0-players/0-invited
+            // state can't let Battleground::Update delete the arena while players
+            // are still on the loading screen.
+            bg->IncreaseInvitedCount(teamId);
             player->SetBattlegroundId(bg->GetInstanceID(), bgTypeId, queueSlot, true, false, teamId);
-            sBattlegroundMgr->SendToBattleground(player, bg->GetInstanceID(), bgTypeId);
+
+            // A synchronous teleport failure would strand that reservation (the
+            // player never enters and never reaches RemovePlayerAtLeave), leaving
+            // the arena undeletable; release it and reset his bg data.
+            if (!sBattlegroundMgr->SendToBattleground(player, bg->GetInstanceID(), bgTypeId))
+            {
+                bg->DecreaseInvitedCount(teamId);
+                player->SetBattlegroundId(0, BATTLEGROUND_TYPE_NONE, PLAYER_MAX_BATTLEGROUND_QUEUES, false, false, TEAM_NEUTRAL);
+            }
         }
 
         handler->PSendSysMessage("Success! Players are now being teleported to the arena.");
@@ -2267,8 +2237,8 @@ public:
             uint32 accountFlags = playerTarget->GetSession()->GetAccountFlags();
             handler->PSendSysMessage(LANG_ACCOUNT_FLAGS_PINFO);
             for (uint8 i = 0; i < MAX_ACCOUNT_FLAG; i++)
-                if (accountFlags & static_cast<uint32>(accountFlagText[i].flag))
-                    handler->PSendSysMessage(LANG_SUBCMDS_LIST_ENTRY, accountFlagText[i].text);
+                if (accountFlags & (uint32(1) << i))
+                    handler->PSendSysMessage(LANG_SUBCMDS_LIST_ENTRY, accountFlagNames[i].full);
         }
 
         // Output VI. LANG_PINFO_ACC_LASTLOGIN
@@ -2492,7 +2462,7 @@ public:
 
         if (isAlive)
         {
-            handler->PSendSysMessage(LANG_RESPAWN_GUID_CREATURE_ALIVE, spawnId, creData->id1);
+            handler->PSendSysMessage(LANG_RESPAWN_GUID_CREATURE_ALIVE, spawnId, creData->id);
             return true;
         }
 
@@ -2508,7 +2478,7 @@ public:
             time_t now = GameTime::GetGameTime().count();
             map->SaveCreatureRespawnTime(spawnId, now);
         }
-        handler->PSendSysMessage(LANG_RESPAWN_GUID_CREATURE_QUEUED, spawnId, creData->id1);
+        handler->PSendSysMessage(LANG_RESPAWN_GUID_CREATURE_QUEUED, spawnId, creData->id);
         return true;
     }
 
@@ -2608,7 +2578,7 @@ public:
         for (auto const& [spawnId, creature] : map->GetCreatureBySpawnIdStore())
         {
             CreatureData const* data = sObjectMgr->GetCreatureData(spawnId);
-            if (!data || data->id1 != entry)
+            if (!data || data->id != entry)
                 continue;
             if (creature->isDead())
                 deadCreatures.push_back(creature);
@@ -2624,7 +2594,7 @@ public:
         for (auto const& [spawnId, respawnTime] : map->GetCreatureRespawnTimes())
         {
             CreatureData const* data = sObjectMgr->GetCreatureData(spawnId);
-            if (!data || data->id1 != entry)
+            if (!data || data->id != entry)
                 continue;
             if (sPoolMgr->IsPartOfAPool<Creature>(spawnId))
                 continue;

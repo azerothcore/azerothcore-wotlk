@@ -17,10 +17,13 @@
 #include "DBCStores.h"
 #include "ScriptMgr.h"
 #include "ScriptDefines/AllMapScript.h"
+#include "ScriptDefines/AllSpellScript.h"
 #include "ScriptDefines/GlobalScript.h"
 #include "ScriptDefines/MiscScript.h"
+#include "ScriptDefines/PlayerScript.h"
 #include "ScriptDefines/UnitScript.h"
 #include "ScriptDefines/WorldObjectScript.h"
+#include "ScriptDefines/CommandScript.h"
 
 TestMap::TestMap()
     : Map(0, 0, REGULAR_DIFFICULTY, nullptr)
@@ -55,8 +58,11 @@ TestMap::~TestMap()
     // Initialize all script registries so CALL_ENABLED_HOOKS doesn't
     // crash on uninitialized vectors during Object/Unit/Map operations
     ScriptRegistry<AllMapScript>::InitEnabledHooksIfNeeded(ALLMAPHOOK_END);
+    ScriptRegistry<AllSpellScript>::InitEnabledHooksIfNeeded(ALLSPELLHOOK_END);
     ScriptRegistry<GlobalScript>::InitEnabledHooksIfNeeded(GLOBALHOOK_END);
     ScriptRegistry<MiscScript>::InitEnabledHooksIfNeeded(MISCHOOK_END);
+    ScriptRegistry<PlayerScript>::InitEnabledHooksIfNeeded(PLAYERHOOK_END);
     ScriptRegistry<UnitScript>::InitEnabledHooksIfNeeded(UNITHOOK_END);
     ScriptRegistry<WorldObjectScript>::InitEnabledHooksIfNeeded(WORLDOBJECTHOOK_END);
+    ScriptRegistry<CommandSC>::InitEnabledHooksIfNeeded(ALLCOMMANDHOOK_END);
 }
