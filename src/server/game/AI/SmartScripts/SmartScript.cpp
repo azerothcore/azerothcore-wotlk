@@ -1503,7 +1503,6 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     target->ToUnit()->GetMotionMaster()->MovePoint(SMART_RANDOM_POINT, x, y, z);
                 }
             }
-            
             break;
         }
         case SMART_ACTION_RISE_UP:
