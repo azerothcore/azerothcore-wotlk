@@ -1940,9 +1940,9 @@ InventoryResult Player::CanEquipItem(uint8 slot, uint16& dest, Item* pItem, bool
             if (eslot == NULL_SLOT)
                 return EQUIP_ERR_ITEM_CANT_BE_EQUIPPED;
 
-            // Xinef: dont allow to equip items on disarmed slot
-            if (!CanUseAttackType(GetAttackBySlot(eslot)))
-                return EQUIP_ERR_NOT_WHILE_DISARMED;
+            // Blizzlike allows swapping gear on a disarmed slot (issue #26426) - you just
+            // can't use the new weapon until Disarm ends. EquipItem()/RemoveItem() keep the
+            // weapon's damage/dependent auras suppressed while the slot stays disarmed.
 
             res = CanUseItem(pItem, not_loading);
             if (res != EQUIP_ERR_OK)
@@ -2096,9 +2096,7 @@ InventoryResult Player::CanUnequipItem(uint16 pos, bool swap) const
                 return EQUIP_ERR_NOT_DURING_ARENA_MATCH;
     }
 
-    // Xinef: dont allow to unequip items on disarmed slot
-    if (!CanUseAttackType(GetAttackBySlot(pItem->GetSlot())))
-        return EQUIP_ERR_NOT_WHILE_DISARMED;
+    // Blizzlike allows unequipping a disarmed weapon too (issue #26426) - see CanEquipItem().
 
     if (!swap && pItem->IsNotEmptyBag())
         return EQUIP_ERR_CAN_ONLY_DO_WITH_EMPTY_BAGS;
@@ -2804,6 +2802,24 @@ Item* Player::EquipNewItem(uint16 pos, uint32 item, bool update)
     return EquipItem(pos, _item, update);
 }
 
+bool Player::GetDisarmedAttackType(uint8 slot, WeaponAttackType& attackType) const
+{
+    switch (slot)
+    {
+        case EQUIPMENT_SLOT_MAINHAND:
+            attackType = BASE_ATTACK;
+            return HasUnitFlag(UNIT_FLAG_DISARMED);
+        case EQUIPMENT_SLOT_OFFHAND:
+            attackType = OFF_ATTACK;
+            return HasUnitFlag2(UNIT_FLAG2_DISARM_OFFHAND);
+        case EQUIPMENT_SLOT_RANGED:
+            attackType = RANGED_ATTACK;
+            return HasUnitFlag2(UNIT_FLAG2_DISARM_RANGED);
+        default:
+            return false;
+    }
+}
+
 Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
 {
     AddEnchantmentDurations(pItem);
@@ -2827,6 +2843,20 @@ Item* Player::EquipItem(uint16 pos, Item* pItem, bool update)
                 AddItemsSetItem(this, pItem);
 
             _ApplyItemMods(pItem, slot, true);
+
+            // Blizzlike lets you swap weapons while disarmed, you just can't use the new one
+            // until Disarm ends (issue #26426). _ApplyItemMods() above already turned this
+            // weapon's damage/dependent auras on, so suppress them the same way
+            // AuraEffect::HandleAuraModDisarm suppresses whatever was equipped when Disarm
+            // first landed - it undoes this symmetrically once the aura is removed, regardless
+            // of which weapon ends up in the slot by then.
+            WeaponAttackType disarmAttackType;
+            if (pProto && GetDisarmedAttackType(slot, disarmAttackType))
+            {
+                ApplyItemDependentAuras(pItem, false);
+                _ApplyWeaponDamage(slot, pProto, nullptr, false);
+                UpdateWeaponDependentAuras(disarmAttackType);
+            }
 
             if (pProto && IsInCombat() && (pProto->Class == ITEM_CLASS_WEAPON || pProto->InventoryType == INVTYPE_RELIC) && m_weaponChangeTimer == 0)
             {
@@ -3002,6 +3032,17 @@ void Player::RemoveItem(uint8 bag, uint8 slot, bool update)
 
                 if (pProto && pProto->ItemSet)
                     RemoveItemsSetItem(this, pProto);
+
+                // Mirror of the EquipItem() suppression (issue #26426): this weapon's
+                // damage/dependent auras are currently suppressed because the slot is disarmed,
+                // so restore them to normal first - otherwise _ApplyItemMods(false) below would
+                // subtract a second time on top of the suppression and corrupt the stat.
+                WeaponAttackType disarmAttackType;
+                if (pProto && GetDisarmedAttackType(slot, disarmAttackType))
+                {
+                    ApplyItemDependentAuras(pItem, true);
+                    _ApplyWeaponDamage(slot, pProto, nullptr, true);
+                }
 
                 _ApplyItemMods(pItem, slot, false);
             }
