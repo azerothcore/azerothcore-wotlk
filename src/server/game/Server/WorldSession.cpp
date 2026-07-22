@@ -1538,12 +1538,13 @@ void WorldSession::HandleTC9PrepareForRedirect(WorldPacket& /*recvData*/)
     if (!sToCloud9Sidecar->ClusterModeEnabled())
         return;
 
-    Player * player = this->GetPlayer();
+    Player* player = this->GetPlayer();
     if (player == nullptr)
     {
         WorldPacket data(TC9_SMSG_READY_FOR_REDIRECT, 1);
         data << uint8(1); // 1 - Failed.
         SendPacket(&data);
+        return;
     }
 
     LOG_DEBUG("network", "Starting saving, AccountId = {}", GetAccountId());
@@ -1564,10 +1565,13 @@ void WorldSession::HandleTC9PrepareForRedirect(WorldPacket& /*recvData*/)
 
         LOG_DEBUG("network", "Saved, AccountId = %d", GetAccountId());
 
-        GetPlayer()->m_Events.AddEventAtOffset([this](){
+        Player* player = GetPlayer();
+        if (!player)
+            return;
+
+        player->m_Events.AddEventAtOffset([this](){
             KickPlayer("HandlePrepareForRedirect client redirected");
         }, 100ms);
-
     });
 }
 

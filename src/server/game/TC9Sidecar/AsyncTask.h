@@ -18,6 +18,7 @@
 #ifndef _ASYNC_TASK_H
 #define _ASYNC_TASK_H
 
+#include <functional>
 #include <future>
 
 template <typename T>
@@ -59,10 +60,12 @@ public:
 
     void ExecuteAsync()
     {
-        // Execute the asynchronous task
-        asyncTask = std::async(std::launch::async, [this]
+        // Capture the function by value so a moved AsyncTask does not leave
+        // the in-flight async holding a dangling this pointer.
+        AsyncFunction fn = asyncFunc;
+        asyncTask = std::async(std::launch::async, [fn = std::move(fn)]() mutable
         {
-            return asyncFunc();
+            return fn();
         });
     }
 

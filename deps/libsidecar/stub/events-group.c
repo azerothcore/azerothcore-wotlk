@@ -21,7 +21,7 @@ void SetOnGroupMemberAddedHook(OnGroupMemberAddedHook h) {
 }
 
 int CallOnGroupMemberAddedHook(uint32_t guid, uint64_t newMemberGuid) {
-    if (groupCreatedHook == 0) {
+    if (groupMemberAddedHook == 0) {
         return GroupHookStatusNoHook;
     }
     groupMemberAddedHook(guid, newMemberGuid);

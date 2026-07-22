@@ -758,55 +758,59 @@ InstancePlayerBind* InstanceSaveMgr::PlayerBindToInstance(ObjectGuid guid, Insta
     InstancePlayerBind& bind = playerBindStorage[guid]->m[save->GetDifficulty()][save->GetMapId()];
     ASSERT(!bind.perm || permanent); // ensure there's no changing permanent to temporary, this can be done only by unbinding
 
-    if (bind.save)
-    {
-        if (save != bind.save || permanent != bind.perm)
-        {
-            bind.extended = false;
-
-            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_INSTANCE);
-            stmt->SetData(0, save->GetInstanceId());
-            stmt->SetData(1, permanent);
-            stmt->SetData(2, guid.GetCounter());
-            stmt->SetData(3, bind.save->GetInstanceId());
-            CharacterDatabase.Execute(stmt);
-        }
+    if (sToCloud9Sidecar->ClusterModeEnabled() && sToCloud9Sidecar->IsMapAssigned(save->GetMapId())) {
+        return;
     }
-    else
-    {
-        // pussywizard: protect against mysql thread races!
-        // pussywizard: CHANGED MY MIND! DON'T SLOW DOWN THIS QUERY! HANDLE ONLY DURING LOADING FROM DB!
-        // example: enter instance -> bind -> update old id to new id -> exit -> delete new id
-        // if delete by new id is executed before update, then we end up with in db
-        /*CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
-        // ensure any for that map+difficulty is deleted!
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_GUID_MAP_DIFF); // DELETE ci FROM character_instance ci JOIN instance i ON ci.instance = i.id WHERE ci.guid = ? AND i.map = ? AND i.difficulty = ?
-        stmt->SetData(0, guidLow);
-        stmt->SetData(1, uint16(save->GetMapId()));
-        stmt->SetData(2, uint8(save->GetDifficulty()));
-        trans->Append(stmt);
-        stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_INSTANCE);
-        stmt->SetData(0, guidLow);
-        stmt->SetData(1, save->GetInstanceId());
-        stmt->SetData(2, permanent);
-        trans->Append(stmt);
-        CharacterDatabase.CommitTransaction(trans);*/
-
-        CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_INSTANCE);
-        stmt->SetData(0, guid.GetCounter());
-        stmt->SetData(1, save->GetInstanceId());
-        stmt->SetData(2, permanent);
-        CharacterDatabase.Execute(stmt);
-
-        if (player)
-            player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_RAID, 1);
-    }
-
-    if (bind.save != save)
-    {
         if (bind.save)
-            bind.save->RemovePlayer(guid, this);
-        save->AddPlayer(guid);
+        {
+            if (save != bind.save || permanent != bind.perm)
+            {
+                bind.extended = false;
+
+                CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_CHAR_INSTANCE);
+                stmt->SetData(0, save->GetInstanceId());
+                stmt->SetData(1, permanent);
+                stmt->SetData(2, guid.GetCounter());
+                stmt->SetData(3, bind.save->GetInstanceId());
+                CharacterDatabase.Execute(stmt);
+            }
+        }
+        else
+        {
+            // pussywizard: protect against mysql thread races!
+            // pussywizard: CHANGED MY MIND! DON'T SLOW DOWN THIS QUERY! HANDLE ONLY DURING LOADING FROM DB!
+            // example: enter instance -> bind -> update old id to new id -> exit -> delete new id
+            // if delete by new id is executed before update, then we end up with in db
+            /*CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+            // ensure any for that map+difficulty is deleted!
+            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_CHAR_INSTANCE_BY_GUID_MAP_DIFF); // DELETE ci FROM character_instance ci JOIN instance i ON ci.instance = i.id WHERE ci.guid = ? AND i.map = ? AND i.difficulty = ?
+            stmt->SetData(0, guidLow);
+            stmt->SetData(1, uint16(save->GetMapId()));
+            stmt->SetData(2, uint8(save->GetDifficulty()));
+            trans->Append(stmt);
+            stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_INSTANCE);
+            stmt->SetData(0, guidLow);
+            stmt->SetData(1, save->GetInstanceId());
+            stmt->SetData(2, permanent);
+            trans->Append(stmt);
+            CharacterDatabase.CommitTransaction(trans);*/
+
+            CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_INS_CHAR_INSTANCE);
+            stmt->SetData(0, guid.GetCounter());
+            stmt->SetData(1, save->GetInstanceId());
+            stmt->SetData(2, permanent);
+            CharacterDatabase.Execute(stmt);
+
+            if (player)
+                player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_COMPLETE_RAID, 1);
+        }
+
+        if (bind.save != save)
+        {
+            if (bind.save)
+                bind.save->RemovePlayer(guid, this);
+            save->AddPlayer(guid);
+        }
     }
 
     if (permanent)

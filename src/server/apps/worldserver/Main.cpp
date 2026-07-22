@@ -461,8 +461,10 @@ bool StartDB()
     LOG_INFO("server.loading", "Loading World Information...");
     LOG_INFO("server.loading", "> RealmID:              {}", realm.Id.Realm);
 
-    ///- Clean the database before starting
-    if (!sToCloud9Sidecar->ClusterModeEnabled())
+    ///- Clean the database before starting.
+    /// Cluster.Enabled is read from config here because sToCloud9Sidecar->Init()
+    /// has not run yet; ClusterModeEnabled() would still be the default false.
+    if (!sConfigMgr->GetOption<bool>("Cluster.Enabled", false))
         ClearOnlineAccounts();
 
     ///- Insert version info into DB

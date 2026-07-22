@@ -21,7 +21,7 @@ void SetRemoveItemsWithGuidsFromPlayerHandler(RemoveItemsWithGuidsFromPlayerHand
 }
 
 RemoveItemsWithGuidsFromPlayerResponse CallRemoveItemsWithGuidsFromPlayerHandler(uint64_t player_guid, uint64_t* items_guids, int items_guids_size, uint64_t assign_player_guid) {
-    if (getPlayerItemsByGuidsHandler == 0) {
+    if (removeItemsWithGuidsFromPlayerHandler == 0) {
         RemoveItemsWithGuidsFromPlayerResponse resp;
         resp.errorCode = PlayerItemErrorCodeNoHandler;
         return resp;
