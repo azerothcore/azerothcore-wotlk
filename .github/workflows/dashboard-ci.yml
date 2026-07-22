@@ -291,25 +291,16 @@ jobs:
       # The old "only save on a cache miss" guard is dropped: the per-run key
       # only ever collides on a re-run, since github.run_id is stable across
       # attempts, and there the save is a no-op anyway.
-      # A failed or cancelled run still compiled most of the tree and that work
-      # is worth keeping: for ccache a partial directory is a superset of the
-      # entry it was restored from. A run that died before the restore has no
-      # compiler id and no ccache dir to save, hence the outcome guard.
+      # A failed build still compiled most of the tree and that work is worth
+      # keeping. A cancelled one is skipped so a superseded run cannot publish
+      # a half-populated cache as the newest for the ref, and a run that died
+      # before the restore has no compiler id and no ccache dir to save.
       - name: Save ccache
-        if: ${{ always() && steps.restore_ccache.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.restore_ccache.outcome == 'success' }}
         uses: actions/cache/save@v4
         with:
           path: ${{ github.workspace }}/var/ccache
           key: ccache:${{ matrix.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}-${{ github.run_id }}
-
-      # Not always(): a cancelled run has a grace period the delete loop may not
-      # fit in, and skipping it only defers the prune to the next run.
-      - name: Prune superseded ccaches
-        if: ${{ !cancelled() && steps.restore_ccache.outcome == 'success' }}
-        uses: ./.github/actions/prune-ccache
-        with:
-          key-prefix: ccache:${{ matrix.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}-
-          keep-key: ccache:${{ matrix.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}-${{ github.run_id }}
 
       - name: ccache stats (after)
         shell: bash
