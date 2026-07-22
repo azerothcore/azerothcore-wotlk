@@ -187,7 +187,15 @@ public:
 
         if (target)
         {
+            // Undo everything ".learn all my class" grants, not just trainer/quest spells - talents
+            // live in a separate map that resetSpells() doesn't touch.
             playerTarget->resetSpells(/* bool myClassOnly */);
+            playerTarget->resetTalents(true);
+            playerTarget->SendTalentsInfoData(false);
+
+            // Force the same full spell resync a login does, otherwise some client-side state
+            // (e.g. stance switching) stays stuck on the pre-reset spell list until relogging.
+            playerTarget->SendInitialSpells();
 
             ChatHandler(playerTarget->GetSession()).SendSysMessage(LANG_RESET_SPELLS);
             if (!handler->GetSession() || handler->GetSession()->GetPlayer() != playerTarget)
@@ -196,7 +204,7 @@ public:
         else
         {
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ADD_AT_LOGIN_FLAG);
-            stmt->SetData(0, uint16(AT_LOGIN_RESET_SPELLS));
+            stmt->SetData(0, uint16(AT_LOGIN_RESET_SPELLS | AT_LOGIN_RESET_TALENTS));
             stmt->SetData(1, playerTarget->GetGUID().GetCounter());
             CharacterDatabase.Execute(stmt);
 

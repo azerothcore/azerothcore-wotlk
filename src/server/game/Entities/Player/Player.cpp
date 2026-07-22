@@ -12055,24 +12055,44 @@ void Player::resetSpells()
     if (HasAtLoginFlag(AT_LOGIN_RESET_SPELLS))
         RemoveAtLoginFlag(AT_LOGIN_RESET_SPELLS, true);
 
-    // Reset back to exactly what a freshly created level 1 character of this race/class starts
-    // with - removes everything else (trainer-taught, quest-reward, higher ranks, all of it) and
-    // re-grants any starting spells that are missing via the same path character creation uses.
-    std::unordered_set<uint32> defaultSpellIds;
-    if (sWorld->getBoolConfig(CONFIG_START_CUSTOM_SPELLS))
-        if (PlayerInfo const* info = sObjectMgr->GetPlayerInfo(getRace(), getClass()))
-            defaultSpellIds.insert(info->customSpells.begin(), info->customSpells.end());
+    // Undo exactly what ".learn all my class" grants - trainer-taught spells and quest-reward
+    // spells (talents are reset separately via resetTalents(), they live in their own map).
+    std::unordered_set<uint32> removableSpellIds;
+    for (Trainer::Trainer const* trainer : sObjectMgr->GetClassTrainers(getClass()))
+        for (Trainer::Spell const& trainerSpell : trainer->GetSpells())
+            removableSpellIds.insert(trainerSpell.SpellId);
+
+    for (auto const& questPair : sObjectMgr->GetQuestTemplates())
+    {
+        Quest const* quest = questPair.second;
+        if (!quest->GetRequiredClasses() || !SatisfyQuestClass(quest, false))
+            continue;
+
+        SpellInfo const* castSpellInfo = sSpellMgr->GetSpellInfo(quest->GetRewSpellCast());
+        if (!castSpellInfo)
+            continue;
+
+        for (uint8 i = 0; i < MAX_SPELL_EFFECTS; ++i)
+            if (castSpellInfo->Effects[i].Effect == SPELL_EFFECT_LEARN_SPELL && castSpellInfo->Effects[i].TriggerSpell)
+                removableSpellIds.insert(castSpellInfo->Effects[i].TriggerSpell);
+    }
+
+    // Never touch spells from this race/class's starting kit (e.g. a Warrior's Heroic Strike and
+    // Battle Stance) even if a trainer also teaches them - removeSpell()'s rank-chain cascade can
+    // leave stance-switching and similar broken in ways that don't get fixed until a relog, so the
+    // safest thing is to never remove these in the first place.
+    PlayerInfo const* info = sObjectMgr->GetPlayerInfo(getRace(), getClass());
+    if (info)
+        for (uint32 spellId : info->customSpells)
+            removableSpellIds.erase(spellId);
 
     // make full copy of map (spells removed and marked as deleted at another spell remove
     // and we can't use original map for safe iterative with visit each spell at loop end
     PlayerSpellMap spellMap = GetSpellMap();
 
     for (PlayerSpellMap::const_iterator iter = spellMap.begin(); iter != spellMap.end(); ++iter)
-        if (!defaultSpellIds.contains(iter->first))
+        if (removableSpellIds.contains(iter->first))
             removeSpell(iter->first, SPEC_MASK_ALL, false);
-
-    LearnDefaultSkills();
-    LearnCustomSpells();
 }
 
 void Player::LearnCustomSpells()
