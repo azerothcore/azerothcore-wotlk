@@ -168,3 +168,11 @@ WorldPacket const* WorldPackets::Misc::ComplainResult::Write()
 
     return &_worldPacket;
 }
+
+WorldPacket const* WorldPackets::Misc::PlayTimeWarning::Write()
+{
+    _worldPacket << Flag;
+    _worldPacket << PlayTimeRemaining;
+
+    return &_worldPacket;
+}

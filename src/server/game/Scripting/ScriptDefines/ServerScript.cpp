@@ -62,7 +62,7 @@ bool ScriptMgr::CanPacketReceive(WorldSession* session, WorldPacket const& packe
     CALL_ENABLED_BOOLEAN_HOOKS(ServerScript, SERVERHOOK_CAN_PACKET_RECEIVE, !script->CanPacketReceive(session, packet));
 }
 
-ServerScript::ServerScript(const char* name, std::vector<uint16> enabledHooks)
+ServerScript::ServerScript(char const* name, std::vector<uint16> enabledHooks)
     : ScriptObject(name, SERVERHOOK_END)
 {
     // If empty - enable all available hooks.

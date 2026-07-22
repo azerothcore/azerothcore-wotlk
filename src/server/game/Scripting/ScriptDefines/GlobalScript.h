@@ -54,7 +54,7 @@ enum GlobalHook
 class GlobalScript : public ScriptObject
 {
 protected:
-    GlobalScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
+    GlobalScript(char const* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     // items

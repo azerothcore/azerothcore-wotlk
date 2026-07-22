@@ -1031,7 +1031,7 @@ void GameObject::SaveToDB(bool saveAddon /*= false*/)
 
 void GameObject::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask, bool saveAddon /*= false*/)
 {
-    const GameObjectTemplate* goI = GetGOInfo();
+    GameObjectTemplate const* goI = GetGOInfo();
 
     if (!goI)
         return;
@@ -1431,7 +1431,7 @@ void GameObject::SetGoArtKit(uint8 kit)
 
 void GameObject::SetGoArtKit(uint8 artkit, GameObject* go, ObjectGuid::LowType lowguid)
 {
-    const GameObjectData* data = nullptr;
+    GameObjectData const* data = nullptr;
     if (go)
     {
         go->SetGoArtKit(artkit);
@@ -1846,13 +1846,18 @@ void GameObject::Use(Unit* user)
                 if (GetUniqueUseCount() == info->summoningRitual.reqParticipants)
                     return;
 
+                SpellCastResult castResult;
                 if (info->summoningRitual.animSpell)
-                    player->CastSpell(player, info->summoningRitual.animSpell, true);
+                    castResult = player->CastSpell(player, info->summoningRitual.animSpell, true);
                 else
-                    player->CastSpell(player, GetSpellId(),
+                    castResult = player->CastSpell(player, GetSpellId(),
                         TriggerCastFlags(TRIGGERED_IGNORE_EFFECTS
+                                       | TRIGGERED_IGNORE_SPELL_AND_CATEGORY_CD
                                        | TRIGGERED_IGNORE_POWER_AND_REAGENT_COST
                                        | TRIGGERED_CAST_DIRECTLY));
+
+                if (castResult != SPELL_CAST_OK)
+                    return;
 
                 AddUniqueUse(player);
 
@@ -2810,7 +2815,7 @@ void GameObject::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* t
                             dynFlags |= GO_DYNFLAG_LO_SPARKLE;
                         break;
                     case GAMEOBJECT_TYPE_TRANSPORT:
-                        if (const StaticTransport* t = ToStaticTransport())
+                        if (StaticTransport const* t = ToStaticTransport())
                             if (t->GetPauseTime())
                             {
                                 if (GetGoState() == GO_STATE_READY)
@@ -2827,7 +2832,7 @@ void GameObject::BuildValuesUpdate(uint8 updateType, ByteBuffer* data, Player* t
                         // else it's ignored
                         break;
                     case GAMEOBJECT_TYPE_MO_TRANSPORT:
-                        if (const MotionTransport* t = ToMotionTransport())
+                        if (MotionTransport const* t = ToMotionTransport())
                             pathProgress = int16(float(t->GetPathProgress()) / float(t->GetPeriod()) * 65535.0f);
                         break;
                     default:
