@@ -39,23 +39,64 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: echo cache key
+    # The key is built here rather than inline so the stream name appears once
+    # instead of in every restore-key, save and prune reference below.
+    #
+    # `tools` only enters the key when tools are actually built. tools-build and
+    # nopch-build are separate workflows that run concurrently with identical
+    # CC/CXX/modules/pch, so without it they share a stream and their prunes
+    # delete each other's entry. Adding the segment unconditionally would
+    # instead orphan every cache saved under the old key shape, which nothing
+    # would then prune.
+    - name: Build cache key
+      id: cachekey
       shell: bash
-      run: echo "Cache key -> ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:pch=${{ inputs.pch }}:${{ github.ref_name }}-${{ github.run_id }}"
+      run: |
+        stream="ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:pch=${{ inputs.pch }}"
+
+        if [[ "${{ inputs.tools }}" != "none" ]]
+        then
+          stream="$stream:tools=${{ inputs.tools }}"
+        fi
+
+        {
+          echo "stream=$stream"
+          echo "prefix=$stream:${{ github.ref_name }}-"
+          echo "key=$stream:${{ github.ref_name }}-${{ github.run_id }}"
+        } >> "$GITHUB_OUTPUT"
+
+        echo "Cache key -> $stream:${{ github.ref_name }}-${{ github.run_id }}"
+
+        # actions/cache/save fails the step outright when its path is missing,
+        # and the save below runs on always(). On a total restore miss the
+        # directory would not exist until ccache first writes to it, so a build
+        # that dies before that (failed apt, failed cmake) would collect a
+        # second, misleading red step.
+        mkdir -p "${{ github.workspace }}/var/ccache"
 
     # The primary key is unique per run (`-${{ github.run_id }}`) so every run
     # saves a fresh cache. A static key would hit on itself on the second run
     # and `actions/cache` would then skip the upload, freezing the cache after
     # the first commit on a branch (and permanently on master). The restore-keys
     # walk back from the most-recent cache on this branch to progressively
-    # broader fallbacks (branch -> pch variant -> modules variant -> compiler).
-    - name: Cache
-      uses: actions/cache@v6
+    # broader fallbacks: this branch, then any branch, then across the tools
+    # variants, then the modules variants, then any cache for this compiler.
+    # On a leg that builds no tools the first two are the same string, since
+    # the stream carries no tools segment there; a repeated restore-key is just
+    # a repeated lookup, and spelling both out keeps the tools leg able to
+    # inherit a non-tools cache on its first run.
+    #
+    # Restore and save are split (rather than actions/cache, which saves in a
+    # post step) so the prune at the end of this action runs after the upload.
+    - name: Restore ccache
+      id: restore_ccache
+      uses: actions/cache/restore@v6
       with:
         path: ${{ github.workspace }}/var/ccache
-        key: ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:pch=${{ inputs.pch }}:${{ github.ref_name }}-${{ github.run_id }}
+        key: ${{ steps.cachekey.outputs.key }}
         restore-keys: |
-          ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:pch=${{ inputs.pch }}:${{ github.ref_name }}-
+          ${{ steps.cachekey.outputs.prefix }}
+          ${{ steps.cachekey.outputs.stream }}
           ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:pch=${{ inputs.pch }}
           ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}
           ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}
@@ -222,3 +263,23 @@ runs:
     - name: ccache stats
       shell: bash
       run: ccache -s || true
+
+    # always() is deliberately wider than the actions/cache post step this
+    # replaces, which was post-if: success(). A failed or cancelled run still
+    # compiled most of the tree, and for ccache a partial directory is a
+    # superset of the entry it was restored from.
+    - name: Save ccache
+      if: ${{ always() }}
+      uses: actions/cache/save@v6
+      with:
+        path: ${{ github.workspace }}/var/ccache
+        key: ${{ steps.cachekey.outputs.key }}
+
+    # Not always(): a cancelled run has a grace period the delete loop may not
+    # fit in, and skipping it only defers the prune to the next run.
+    - name: Prune superseded ccaches
+      if: ${{ !cancelled() }}
+      uses: ./.github/actions/prune-ccache
+      with:
+        key-prefix: ${{ steps.cachekey.outputs.prefix }}
+        keep-key: ${{ steps.cachekey.outputs.key }}

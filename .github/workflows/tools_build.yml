@@ -8,6 +8,10 @@ on:
       - labeled
       - synchronize
 
+permissions:
+  actions: write
+  contents: read
+
 concurrency:
   # One concurrency group per workflow + ref.
   #
