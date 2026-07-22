@@ -206,6 +206,7 @@ class spell_dk_raise_ally : public SpellScript
                 unitTarget->BuildPlayerRepop();
 
             unitTarget->RemovePlayerFlag(PLAYER_FLAGS_GHOST);
+            unitTarget->m_serverSideVisibility.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE);
             unitTarget->m_serverSideVisibilityDetect.SetValue(SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_ALIVE);
 
             unitTarget->CastSpell(unitTarget, GetEffectValue(), true);

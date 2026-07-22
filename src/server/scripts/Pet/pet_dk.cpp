@@ -332,6 +332,8 @@ struct npc_pet_dk_risen_ally : public PossessedAI
                     else if (!player->HasPlayerFlag(PLAYER_FLAGS_GHOST))
                     {
                         player->SetPlayerFlag(PLAYER_FLAGS_GHOST);
+                        player->m_serverSideVisibility.SetValue(
+                            SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_GHOST);
                         player->m_serverSideVisibilityDetect.SetValue(
                             SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_GHOST);
                     }
