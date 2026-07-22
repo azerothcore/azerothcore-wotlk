@@ -36,7 +36,8 @@ void WorldSession::SendTaxiStatus(ObjectGuid guid)
 {
     Player* const player = GetPlayer();
     Creature* unit = ObjectAccessor::GetCreature(*player, guid);
-    if (!unit || unit->IsHostileTo(player) || !unit->HasNpcFlag(UNIT_NPC_FLAG_FLIGHTMASTER))
+    // reaction must be checked both ways: the Dark Portal flight masters are neutral toward opposite-faction players, while players are hostile toward them
+    if (!unit || unit->GetReactionTo(player) <= REP_UNFRIENDLY || player->IsHostileTo(unit) || !unit->HasNpcFlag(UNIT_NPC_FLAG_FLIGHTMASTER))
     {
         LOG_DEBUG("network", "WorldSession::SendTaxiStatus - Unit ({}) not found.", guid.ToString());
         return;
