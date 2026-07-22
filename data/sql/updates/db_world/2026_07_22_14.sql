@@ -1,3 +1,4 @@
+-- DB update 2026_07_22_13 -> 2026_07_22_14
 
 -- Change Tirisfal and Hearthglen Crusader row 2.
 UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 29103;
