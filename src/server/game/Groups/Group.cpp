@@ -629,8 +629,14 @@ bool Group::RemoveMember(ObjectGuid guid, RemoveMethod const& method /*= GROUP_R
         return m_memberSlots.size() > 0;
     }
 
-    // remove member and change leader (if need) only if strong more 2 members _before_ member remove (BG/BF allow 1 member group)
-    if (GetMembersCount() > ((isBGGroup() || isLFGGroup() || isBFGroup()) ? 1u : 2u))
+    // remove member and change leader (if need) only if strong more 2 members _before_ member remove (BG/BF allow 1 member group) —
+    // except in cluster mode, where this branch is taken for any size: the group
+    // service owns the group lifecycle and local Disband() is a no-op, so always
+    // unlink the removed member here; waiting for the disband event leaves the
+    // last two members with a dangling group pointer whenever that event is lost
+    // (group service restart).
+    if (GetMembersCount() > ((isBGGroup() || isLFGGroup() || isBFGroup()) ? 1u : 2u)
+        || (sToCloud9Sidecar->ClusterModeEnabled() && !isBGGroup() && !isBFGroup()))
     {
         Player* player = ObjectAccessor::FindConnectedPlayer(guid);
         if (player)
