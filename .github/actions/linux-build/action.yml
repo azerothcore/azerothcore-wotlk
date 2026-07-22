@@ -263,7 +263,7 @@ runs:
     # restore-keys would otherwise reach. Skip both save and prune in that case.
     - name: Check for a ccache dir
       id: ccache_dir
-      if: ${{ always() }}
+      if: ${{ !cancelled() }}
       shell: bash
       run: |
         if [[ -d "${{ github.workspace }}/var/ccache" ]]
@@ -274,19 +274,18 @@ runs:
           echo "No ccache directory; skipping save and prune."
         fi
 
-    # always() is deliberately wider than the actions/cache post step this
-    # replaces, which was post-if: success(). A failed or cancelled run still
-    # compiled most of the tree, and for ccache a partial directory is a
-    # superset of the entry it was restored from.
+    # Wider than the actions/cache post step this replaces, which was
+    # post-if: success(): a failed build still compiled most of the tree and
+    # that work is worth keeping. A cancelled one is skipped, since its cache is
+    # barely ahead of what it restored and the upload rarely fits the
+    # cancellation grace period anyway.
     - name: Save ccache
-      if: ${{ always() && steps.ccache_dir.outputs.exists == 'true' }}
+      if: ${{ !cancelled() && steps.ccache_dir.outputs.exists == 'true' }}
       uses: actions/cache/save@v6
       with:
         path: ${{ github.workspace }}/var/ccache
         key: ${{ steps.cachekey.outputs.key }}
 
-    # Not always(): a cancelled run has a grace period the delete loop may not
-    # fit in, and skipping it only defers the prune to the next run.
     - name: Prune superseded ccaches
       if: ${{ !cancelled() && steps.ccache_dir.outputs.exists == 'true' }}
       uses: ./.github/actions/prune-ccache
