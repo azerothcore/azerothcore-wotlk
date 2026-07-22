@@ -20,8 +20,6 @@
 */
 
 #include "World.h"
-#include <cmath>
-#include <boost/asio/ip/address.hpp>
 #include "AccountMgr.h"
 #include "AchievementMgr.h"
 #include "AddonMgr.h"

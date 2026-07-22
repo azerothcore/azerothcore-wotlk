@@ -16,7 +16,6 @@
  */
 
 #include "Transport.h"
-#include <chrono>
 #include "Cell.h"
 #include "CellImpl.h"
 #include "Common.h"
@@ -32,6 +31,7 @@
 #include "Spell.h"
 #include "Vehicle.h"
 #include "WorldModel.h"
+#include <chrono>
 
 namespace
 {
