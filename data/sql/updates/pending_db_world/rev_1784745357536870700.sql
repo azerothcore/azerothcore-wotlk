@@ -4,7 +4,7 @@ UPDATE `creature_template` SET `speed_walk` = 1, `speed_run` = 1.28968 WHERE (`e
 UPDATE `gameobject_template` SET `AIName` = 'SmartGameObjectAI' WHERE `entry` = 2715;
 DELETE FROM `smart_scripts` WHERE (`source_type` = 1 AND `entryorguid` = 2715);
 INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
-(2715, 1, 0, 0, 71, 0, 100, 0, 415, 0, 0, 0, 0, 0, 107, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Runed Pedestal - On Event 415 (Use Enchanted Agate) - Summon Creature Group');
+(2715, 1, 0, 0, 71, 0, 100, 0, 413, 0, 0, 0, 0, 0, 107, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Runed Pedestal - On Event 413 (Use Enchanted Agate) - Summon Creature Group');
 
 DELETE FROM `creature_summon_groups` WHERE `summonerId` = 2715 AND `summonerType` = 1 AND `groupId` = 0;
 INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `entry`, `position_x`, `position_y`, `position_z`, `orientation`, `summonType`, `summonTime`, `Comment`) VALUES
@@ -18,4 +18,4 @@ INSERT INTO `creature_summon_groups` (`summonerId`, `summonerType`, `groupId`, `
 
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 22) AND (`SourceGroup` = 1) AND (`SourceEntry` = 2715) AND (`SourceId` = 1) AND (`ElseGroup` = 0) AND (`ConditionTypeOrReference` = 29) AND (`ConditionTarget` = 1) AND (`ConditionValue1` = 2794) AND (`ConditionValue2` = 200) AND (`ConditionValue3` = 0);
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `NegativeCondition`, `ErrorType`, `ErrorTextId`, `ScriptName`, `Comment`) VALUES
-(22, 1, 2715, 1, 0, 29, 1, 2794, 200, 0, 1, 0, 0, '', 'Only Summon Creature Group if None are Already Spawned');
+(22, 1, 2715, 1, 0, 29, 1, 2794, 50, 0, 1, 0, 0, '', 'Only Summon Creature Group if None are Already Spawned');
