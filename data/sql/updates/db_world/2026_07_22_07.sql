@@ -1,3 +1,4 @@
+-- DB update 2026_07_22_06 -> 2026_07_22_07
 -- Dun Niffelem (area 4495): add missing spell_area entry so spell 55858 continues
 -- to apply after quest 12967 (Battling the Elements) is rewarded.
 -- All surrounding areas (4437-4440, 4455) have two entries for spell 55858:
