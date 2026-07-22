@@ -1,3 +1,4 @@
+-- DB update 2026_07_22_08 -> 2026_07_22_09
 -- Fel Creep - requires Cenarion Beacon in inventory
 DELETE FROM `conditions` WHERE `SourceTypeOrReferenceId` = 4 AND `SourceEntry` = 11514;
 INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `ConditionTypeOrReference`, `ConditionValue1`, `ConditionValue2`, `Comment`) VALUES
