@@ -56,6 +56,12 @@ public:
     void OnPlayerLeftBattleground(uint64 playerGUID, uint32 realmID, uint32 instanceID);
     void OnBattlegroundStatusChanged(uint32 instanceID, uint8 status);
 
+    // Generic NATS pub/sub (single choke point for in-process modules).
+    // No-ops outside cluster mode. Subscribe callbacks run on the world
+    // thread (ProcessHooks).
+    bool NatsPublish(std::string const& subject, std::string const& payload);
+    bool NatsSubscribe(std::string const& subject, void (*handler)(const char* subject, const char* payload, int payloadLen));
+
 private:
     static void OnMapsReassigned(uint32* addedMaps, int addedMapsSize, uint32* removedMaps, int removedMapsSize);
 
