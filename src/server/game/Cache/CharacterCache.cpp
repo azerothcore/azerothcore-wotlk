@@ -19,9 +19,11 @@
 #include "ArenaTeam.h"
 #include "DatabaseEnv.h"
 #include "Log.h"
+#include "MailMgr.h"
 #include "Player.h"
 #include "Timer.h"
 #include "World.h"
+#include <algorithm>
 #include <unordered_map>
 
 namespace
@@ -76,15 +78,7 @@ void CharacterCache::LoadCharacterCacheStorage()
             fields[4].Get<uint8>() /*gender*/, fields[3].Get<uint8>() /*race*/, fields[5].Get<uint8>() /*class*/, fields[6].Get<uint8>() /*level*/);
     } while (result->NextRow());
 
-    QueryResult mailCountResult = CharacterDatabase.Query("SELECT receiver, COUNT(receiver) FROM mail GROUP BY receiver");
-    if (mailCountResult)
-    {
-        do
-        {
-            Field* fields = mailCountResult->Fetch();
-            UpdateCharacterMailCount(ObjectGuid(HighGuid::Player, fields[0].Get<uint32>()), static_cast<int8>(fields[1].Get<uint64>()), true);
-        } while (mailCountResult->NextRow());
-    }
+    sMailMgr->LoadMailCounts();
 
     LOG_INFO("server.loading", ">> Loaded Character Infos For {} Characters in {} ms", _characterCacheStore.size(), GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
@@ -105,15 +99,7 @@ void CharacterCache::RefreshCacheEntry(uint32 lowGuid)
         AddCharacterCacheEntry(ObjectGuid::Create<HighGuid::Player>(fields[0].Get<uint32>()) /*guid*/, fields[2].Get<uint32>() /*account*/, fields[1].Get<std::string>() /*name*/, fields[4].Get<uint8>() /*gender*/, fields[3].Get<uint8>() /*race*/, fields[5].Get<uint8>() /*class*/, fields[6].Get<uint8>() /*level*/);
     } while (result->NextRow());
 
-    QueryResult mailCountResult = CharacterDatabase.Query("SELECT receiver, COUNT(receiver) FROM mail WHERE receiver = {} GROUP BY receiver", lowGuid);
-    if (mailCountResult)
-    {
-        do
-        {
-            Field* fields = mailCountResult->Fetch();
-            UpdateCharacterMailCount(ObjectGuid(HighGuid::Player, fields[0].Get<uint32>()), static_cast<int8>(fields[1].Get<uint64>()), true);
-        } while (mailCountResult->NextRow());
-    }
+    sMailMgr->RecountMailCount(lowGuid);
 }
 
 /*
@@ -216,27 +202,21 @@ void CharacterCache::UpdateCharacterArenaTeamId(ObjectGuid const& guid, uint8 sl
     itr->second.ArenaTeamId[slot] = arenaTeamId;
 }
 
-void CharacterCache::UpdateCharacterMailCount(ObjectGuid const& guid, int8 count, bool update)
+void CharacterCache::UpdateCharacterMailCount(ObjectGuid const& guid, int32 count, bool update)
 {
     auto itr = _characterCacheStore.find(guid);
     if (itr == _characterCacheStore.end())
-    {
         return;
-    }
 
     if (update)
     {
-        itr->second.MailCount = count;
+        itr->second.MailCount = static_cast<uint16>(std::max(count, 0));
         return;
     }
 
-    // Let's be safe and prevent overflow
-    if (!itr->second.MailCount && count < 0)
-    {
-        return;
-    }
-
-    itr->second.MailCount += count;
+    // A decrement below zero means an insert was missed somewhere; clamp so
+    // the error does not stick as a large positive count
+    itr->second.MailCount = static_cast<uint16>(std::max(static_cast<int32>(itr->second.MailCount) + count, 0));
 }
 
 void CharacterCache::UpdateCharacterGroup(ObjectGuid const& guid, ObjectGuid groupGUID)
