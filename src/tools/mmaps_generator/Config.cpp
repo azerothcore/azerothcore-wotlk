@@ -142,7 +142,11 @@ namespace MMAP
         config.vertexPerTileEdge = vertexPerTile;
         config.baseUnitDim = ComputeBaseUnitDim(vertexPerMap);
         config.tilesPerMapEdge = vertexPerMap / vertexPerTile;
-        config.maxSimplificationError = _global.maxSimplificationError;
+        config.maxSimplificationError = resolveFloat(
+            [](const TileOverride* t) { return t->maxSimplificationError; },
+            [](const MapOverride* m) { return m->maxSimplificationError; },
+            _global.maxSimplificationError
+        );
         config.cellSizeHorizontal = config.baseUnitDim;
         config.cellSizeVertical = config.baseUnitDim;
 
@@ -227,10 +231,14 @@ namespace MMAP
                     override.walkableClimb = mapNode["walkableClimb"].get_value<int>();
                 if (mapNode.contains("vertexPerMapEdge"))
                     override.vertexPerMapEdge = mapNode["vertexPerMapEdge"].get_value<int>();
+                if (mapNode.contains("vertexPerTileEdge"))
+                    override.vertexPerTileEdge = mapNode["vertexPerTileEdge"].get_value<int>();
                 if (mapNode.contains("cellSizeHorizontal"))
                     override.cellSizeHorizontal = mapNode["cellSizeHorizontal"].get_value<float>();
                 if (mapNode.contains("cellSizeVertical"))
                     override.cellSizeVertical = mapNode["cellSizeVertical"].get_value<float>();
+                if (mapNode.contains("maxSimplificationError"))
+                    override.maxSimplificationError = mapNode["maxSimplificationError"].get_value<float>();
 
                 // Tile overrides
                 if (mapNode.contains("tilesOverrides"))
@@ -257,6 +265,8 @@ namespace MMAP
                             tileOverride.walkableHeight = tileNode["walkableHeight"].get_value<int>();
                         if (tileNode.contains("walkableClimb"))
                             tileOverride.walkableClimb = tileNode["walkableClimb"].get_value<int>();
+                        if (tileNode.contains("maxSimplificationError"))
+                            tileOverride.maxSimplificationError = tileNode["maxSimplificationError"].get_value<float>();
 
                         override.tileOverrides[{tileX, tileY}] = std::move(tileOverride);
                     }

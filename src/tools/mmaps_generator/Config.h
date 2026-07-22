@@ -86,6 +86,7 @@ namespace MMAP
             std::optional<int> walkableRadius;
             std::optional<int> walkableHeight;
             std::optional<int> walkableClimb;
+            std::optional<float> maxSimplificationError;
         };
 
         struct MapOverride {
@@ -95,6 +96,7 @@ namespace MMAP
             std::optional<int> walkableClimb;
             std::optional<int> vertexPerMapEdge;
             std::optional<int> vertexPerTileEdge;
+            std::optional<float> maxSimplificationError;
 
             // The width/depth of each cell in the XZ-plane grid used for voxelization. [Units: world units]
             // A smaller value increases navmesh resolution but also memory and CPU usage.
