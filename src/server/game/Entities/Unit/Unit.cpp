@@ -816,7 +816,7 @@ bool Unit::IsWithinRange(Unit const* obj, float dist) const
     return distsq <= dist * dist;
 }
 
-bool Unit::IsWithinBoundaryRadius(const Unit* obj) const
+bool Unit::IsWithinBoundaryRadius(Unit const* obj) const
 {
     if (!obj || !IsInMap(obj) || !InSamePhase(obj))
         return false;
@@ -939,34 +939,8 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, uint32 effectMask, Unit 
     if (hasCheckedEffect && immuneToAllEffects)
         return true;
 
-    if (!spellInfo->HasAttribute(SPELL_ATTR2_NO_SCHOOL_IMMUNITIES))
-    {
-        if (spellInfo->Id == 42292 || spellInfo->Id == 59752 || spellInfo->Id == 19574 || spellInfo->Id == 34471)
-            return false;
-
-        SpellSchoolMask schoolMask = spellInfo->GetSchoolMask();
-        if (schoolMask != SPELL_SCHOOL_MASK_NONE)
-        {
-            SpellImmuneContainer const& schoolList = m_spellImmune[IMMUNITY_SCHOOL];
-            for (auto const& [immunitySchoolMask, immunityAuraId] : schoolList)
-            {
-                SpellInfo const* immuneSpellInfo = sSpellMgr->GetSpellInfo(immunityAuraId);
-                if (immunityAuraId == spellInfo->Id)
-                    continue;
-
-                if ((immunitySchoolMask & schoolMask) != schoolMask)
-                    continue;
-
-                if (IgnoresSchoolImmunityFromFriendlyCaster(caster, immunityAuraId, immuneSpellInfo))
-                    continue;
-
-                if (spellInfo->CanPierceImmuneAura(immuneSpellInfo))
-                    continue;
-
-                return true;
-            }
-        }
-    }
+    if (!spellInfo->HasAttribute(SPELL_ATTR2_NO_SCHOOL_IMMUNITIES) && HasSchoolImmunityForMask(spellInfo->GetSchoolMask(), caster, spellInfo))
+        return true;
 
     return false;
 }
@@ -4217,7 +4191,9 @@ void Unit::SetCurrentCastedSpell(Spell* pSpell)
                 if (m_currentSpells[CURRENT_AUTOREPEAT_SPELL] &&
                         m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_spellInfo->Id != 75)
                     InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
-                AddUnitState(UNIT_STATE_CASTING);
+
+                if (!pSpell->GetSpellInfo()->IsActionAllowedChannel())
+                    AddUnitState(UNIT_STATE_CASTING);
 
                 break;
             }
@@ -5257,7 +5233,7 @@ void Unit::RemoveAurasDueToSpellByDispel(uint32 spellId, uint32 dispellerSpellId
                                     {
                                         noxious->SetDuration(aura->GetDuration() * aureff->GetAmount() / 100);
                                         if (aura->GetUnitOwner())
-                                            if (const std::vector<int32>* spell_triggered = sSpellMgr->GetSpellLinked(-int32(aura->GetId())))
+                                            if (std::vector<int32> const* spell_triggered = sSpellMgr->GetSpellLinked(-int32(aura->GetId())))
                                                 for (std::vector<int32>::const_iterator itr = spell_triggered->begin(); itr != spell_triggered->end(); ++itr)
                                                     aura->GetUnitOwner()->RemoveAurasDueToSpell(*itr);
                                     }
@@ -7425,24 +7401,27 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
     else if (victim->IsCreature())
         victim->ToCreature()->UpdateLeashExtensionTime();
 
-    // set position before any AI calls/assistance
-    //if (IsCreature())
-    //    ToCreature()->SetCombatStartPosition(GetPositionX(), GetPositionY(), GetPositionZ());
-    // player-controlled creatures (pets, charms) enter combat on contact instead
-    // (melee swing execution or spell launch/hit, see Unit::AtTargetAttacked)
-    if (creature && !IsControlledByPlayer())
+    // Player-controlled creatures (pets, charms) enter combat on contact instead
+    // (melee swing execution or spell launch/hit, see Unit::AtTargetAttacked).
+    // Non-controllable guardians (e.g. Shaman Elementals, Infernal) have no attack
+    // command and must engage immediately so their AI can chase and attack.
+
+    if (creature && (!IsControlledByPlayer() || (IsGuardian() && !IsControllableGuardian())))
     {
         EngageWithTarget(victim);
 
-        creature->SendAIReaction(AI_REACTION_HOSTILE);
+        if (!IsControlledByPlayer())
+        {
+            creature->SendAIReaction(AI_REACTION_HOSTILE);
 
-        /// @todo: Implement aggro range, detection range and assistance range templates
-        if (!(creature->HasFlagsExtra(CREATURE_FLAG_EXTRA_DONT_CALL_ASSISTANCE)))
-            creature->CallAssistance();
+            /// @todo: Implement aggro range, detection range and assistance range templates
+            if (!(creature->HasFlagsExtra(CREATURE_FLAG_EXTRA_DONT_CALL_ASSISTANCE)))
+                creature->CallAssistance();
 
-        creature->SetAssistanceTimer(sWorld->getIntConfig(CONFIG_CREATURE_FAMILY_ASSISTANCE_PERIOD));
+            creature->SetAssistanceTimer(sWorld->getIntConfig(CONFIG_CREATURE_FAMILY_ASSISTANCE_PERIOD));
 
-        SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
+            SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_ONESHOT_NONE);
+        }
     }
 
     // delay offhand weapon attack by 50% of the base attack time
@@ -9857,6 +9836,32 @@ bool Unit::IgnoresSchoolImmunityFromFriendlyCaster(Unit const* caster, uint32 im
     return immunityAuraId == std::numeric_limits<uint32>::max();
 }
 
+bool Unit::HasSchoolImmunityForMask(SpellSchoolMask schoolMask, Unit const* caster, SpellInfo const* spellInfo) const
+{
+    if (schoolMask == SPELL_SCHOOL_MASK_NONE)
+        return false;
+
+    uint32 accumulatedMask = 0;
+    for (auto const& [immunitySchoolMask, immunityAuraId] : m_spellImmune[IMMUNITY_SCHOOL])
+    {
+        // Skip the spell's own immunity entry
+        if (spellInfo && immunityAuraId == spellInfo->Id)
+            continue;
+
+        SpellInfo const* immuneSpellInfo = sSpellMgr->GetSpellInfo(immunityAuraId);
+
+        if (IgnoresSchoolImmunityFromFriendlyCaster(caster, immunityAuraId, immuneSpellInfo))
+            continue;
+
+        if (spellInfo && immuneSpellInfo && spellInfo->CanPierceImmuneAura(immuneSpellInfo))
+            continue;
+
+        accumulatedMask |= immunitySchoolMask;
+    }
+
+    return (SpellSchoolMask(accumulatedMask) & schoolMask) == schoolMask;
+}
+
 bool Unit::IsImmunedToDamage(SpellSchoolMask schoolMask) const
 {
     if (schoolMask == SPELL_SCHOOL_MASK_NONE)
@@ -9932,68 +9937,10 @@ bool Unit::IsImmunedToSchool(SpellSchoolMask schoolMask) const
     });
 }
 
-bool Unit::IsImmunedToSchool(SpellInfo const* spellInfo) const
-{
-    if (spellInfo->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES) && !HasSpiritOfRedemptionAura())
-        return false;
-
-    uint32 schoolMask = spellInfo->GetSchoolMask();
-    if (schoolMask == SPELL_SCHOOL_MASK_NONE)
-    {
-        return false;
-    }
-
-    if (spellInfo->Id != 42292 && spellInfo->Id != 59752 && spellInfo->Id != 19574 && spellInfo->Id != 34471)
-    {
-        // Check IMMUNITY_SCHOOL: returns true if ALL schools in the mask are covered and spell can't pierce
-        SpellImmuneContainer const& schoolList = m_spellImmune[IMMUNITY_SCHOOL];
-        for (auto itr = schoolList.begin(); itr != schoolList.end(); ++itr)
-            if ((itr->first & schoolMask) == schoolMask && !spellInfo->CanPierceImmuneAura(sSpellMgr->GetSpellInfo(itr->second)))
-                return true;
-    }
-
-    return false;
-}
-
-bool Unit::IsImmunedToSchool(Spell const* spell) const
-{
-    SpellInfo const* spellInfo = spell->GetSpellInfo();
-    if (spellInfo->HasAttribute(SPELL_ATTR0_NO_IMMUNITIES) && !HasSpiritOfRedemptionAura())
-    {
-        return false;
-    }
-
-    uint32 schoolMask = spell->GetSpellSchoolMask();
-    if (schoolMask == SPELL_SCHOOL_MASK_NONE)
-    {
-        return false;
-    }
-
-    if (spellInfo->Id != 42292 && spellInfo->Id != 59752 && spellInfo->Id != 19574 && spellInfo->Id != 34471)
-    {
-        // Check IMMUNITY_SCHOOL: returns true if ALL schools in the mask are covered and spell can't pierce
-        SpellImmuneContainer const& schoolList = m_spellImmune[IMMUNITY_SCHOOL];
-        for (auto itr = schoolList.begin(); itr != schoolList.end(); ++itr)
-        {
-            SpellInfo const* immuneSpellInfo = sSpellMgr->GetSpellInfo(itr->second);
-            if ((itr->first & schoolMask) == schoolMask
-                && !IgnoresSchoolImmunityFromFriendlyCaster(spell->GetCaster(), itr->second, immuneSpellInfo)
-                && !spellInfo->CanPierceImmuneAura(immuneSpellInfo))
-            {
-                return true;
-            }
-        }
-    }
-
-    return false;
-}
-
 bool Unit::IsImmunedToDamageOrSchool(SpellSchoolMask schoolMask) const
 {
     if (schoolMask == SPELL_SCHOOL_MASK_NONE)
-    {
         return false;
-    }
 
     return IsImmunedToDamage(schoolMask) || IsImmunedToSchool(schoolMask);
 }
@@ -10099,27 +10046,8 @@ bool Unit::IsImmunedToSpell(SpellInfo const* spellInfo, Unit const* caster, Spel
 
     if (!spellInfo->HasAttribute(SPELL_ATTR2_NO_SCHOOL_IMMUNITIES))
     {
-        if (spellSchoolMask != SPELL_SCHOOL_MASK_NONE)
-        {
-            SpellImmuneContainer const& schoolList = m_spellImmune[IMMUNITY_SCHOOL];
-            for (auto itr = schoolList.begin(); itr != schoolList.end(); ++itr)
-            {
-                if (itr->second == spellInfo->Id)
-                    continue;
-
-                SpellInfo const* immuneSpellInfo = sSpellMgr->GetSpellInfo(itr->second);
-                if (!(itr->first & spellSchoolMask))
-                    continue;
-
-                if (IgnoresSchoolImmunityFromFriendlyCaster(caster, itr->second, immuneSpellInfo))
-                    continue;
-
-                if (spellInfo->CanPierceImmuneAura(immuneSpellInfo))
-                    continue;
-
-                return true;
-            }
-        }
+        if (HasSchoolImmunityForMask(spellSchoolMask, caster, spellInfo))
+            return true;
     }
 
     return false;
@@ -14516,7 +14444,7 @@ void Unit::SetRooted(bool apply, bool stun, bool logout)
 
 void Unit::SendMoveRoot(bool apply)
 {
-    const Player* client = GetClientControlling();
+    Player const* client = GetClientControlling();
 
     // Apply flags in-place when unit currently is not controlled by a player
     if (!client)
@@ -14535,7 +14463,7 @@ void Unit::SendMoveRoot(bool apply)
     if (!IsInWorld())
         return;
 
-    const PackedGuid& guid = GetPackGUID();
+    PackedGuid const& guid = GetPackGUID();
     // Wrath+ spline root: when unit is currently not controlled by a player
     if (!client)
     {

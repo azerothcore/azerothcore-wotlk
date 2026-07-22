@@ -54,7 +54,7 @@ struct BuildValuesCachePosPointers;
 class UnitScript : public ScriptObject
 {
 protected:
-    UnitScript(const char* name, bool addToScripts = true, std::vector<uint16> enabledHooks = std::vector<uint16>());
+    UnitScript(char const* name, bool addToScripts = true, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     // Called when a unit deals healing to another unit
