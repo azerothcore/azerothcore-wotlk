@@ -409,6 +409,10 @@ public:
 
         void JustDied(Unit*) override
         {
+            // Despawn event summons (Epoch etc.) here: the respawn system may
+            // destroy this creature and its AI instead of reusing them, so
+            // Reset() on the respawned Arthas can no longer reach these summons
+            summons.DespawnAll();
             RemoveEscortState(STATE_ESCORT_ESCORTING);
             if (pInstance)
                 pInstance->SetData(DATA_ARTHAS_REPOSITION, 2);
