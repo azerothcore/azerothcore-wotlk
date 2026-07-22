@@ -24,7 +24,7 @@
 
 using namespace MMAP;
 
-bool checkDirectories(const std::string &dataDirPath, bool debugOutput)
+bool checkDirectories(std::string const& dataDirPath, bool debugOutput)
 {
     std::vector<std::string> dirFiles;
 
@@ -152,7 +152,7 @@ bool handleArgs(int argc, char** argv,
     return true;
 }
 
-int finish(const char* message, int returnValue)
+int finish(char const* message, int returnValue)
 {
     printf("%s", message);
     getchar(); // Wait for user input

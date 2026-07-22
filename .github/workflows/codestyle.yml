@@ -10,15 +10,21 @@ on:
       - "!README.md"
       - "!docs/**"
 
+concurrency:
+  # New commits on a PR cancel the still-running codestyle check on the old
+  # commit. github.ref is refs/pull/<N>/merge, so the group is stable per PR.
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   triage:
     runs-on: ubuntu-latest
     name: C++
     if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Setup python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: '3.10'
       - name: AzerothCore codestyle
