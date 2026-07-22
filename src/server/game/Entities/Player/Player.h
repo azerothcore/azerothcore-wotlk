@@ -3010,6 +3010,8 @@ private:
     [[nodiscard]] bool HasDelayedTeleport() const { return m_bHasDelayedTeleport; }
     void SetHasDelayedTeleport(bool setting) { m_bHasDelayedTeleport = setting; }
 
+    uint8 GetLearnSpellSpecMask(uint32 spellId) const;
+
     MapReference m_mapRef;
 
     void UpdateCharmedAI();
