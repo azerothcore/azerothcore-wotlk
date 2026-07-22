@@ -36,7 +36,6 @@ jobs:
       # Split restore/save (rather than actions/cache, which saves in a post
       # step) so the prune below can run after the upload.
       - name: Restore ccache
-        id: restore_ccache
         uses: actions/cache/restore@v6
         with:
           path: ~/Library/Caches/ccache
@@ -48,12 +47,7 @@ jobs:
             ccache:${{ matrix.os }}
       - name: reset ccache stats
         shell: bash
-        # The mkdir is what keeps the save below valid: actions/cache/save
-        # fails the step outright when its path is missing, and on a total
-        # restore miss ccache has not created the directory yet.
-        run: |
-          mkdir -p ~/Library/Caches/ccache
-          ccache -z || true
+        run: ccache -z || true
       - name: Install latest bash
         run: brew install bash
       - name: Configure OS
@@ -64,12 +58,30 @@ jobs:
         shell: bash
         run: ccache -s || true
 
+      # The directory is absent only when the restore missed and the build died
+      # before ccache first wrote to it. Saving then would fail the step outright
+      # (actions/cache/save errors on a missing path) and, worse, publish an
+      # empty entry as the newest for this ref, shadowing the warm caches the
+      # restore-keys would otherwise reach. Skip both save and prune in that case.
+      - name: Check for a ccache dir
+        id: ccache_dir
+        if: ${{ always() }}
+        shell: bash
+        run: |
+          if [[ -d ~/Library/Caches/ccache ]]
+          then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "No ccache directory; skipping save and prune."
+          fi
+
       # always() is deliberately wider than the actions/cache post step this
       # replaces, which was post-if: success(). A failed or cancelled run still
       # compiled most of the tree, and for ccache a partial directory is a
       # superset of the entry it was restored from.
       - name: Save ccache
-        if: ${{ always() }}
+        if: ${{ always() && steps.ccache_dir.outputs.exists == 'true' }}
         uses: actions/cache/save@v6
         with:
           path: ~/Library/Caches/ccache
@@ -78,7 +90,7 @@ jobs:
       # Not always(): a cancelled run has a grace period the delete loop may not
       # fit in, and skipping it only defers the prune to the next run.
       - name: Prune superseded ccaches
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && steps.ccache_dir.outputs.exists == 'true' }}
         uses: ./.github/actions/prune-ccache
         with:
           key-prefix: ccache:${{ matrix.os }}:${{ github.ref_name }}-
