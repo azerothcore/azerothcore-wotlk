@@ -2251,8 +2251,8 @@ public:
     void UpdateAllWeaponDependentCritAuras();
 
     void _ApplyItemMods(Item* item, uint8 slot, bool apply);
-    // Returns true and fills attackType if `slot` is currently disarmed, so callers can keep
-    // the weapon in it suppressed (issue #26426: Blizzlike lets you swap gear while disarmed).
+    /// @brief Returns true and fills attackType if `slot` is currently disarmed, so callers
+    /// can keep the weapon in it suppressed (issue #26426: Blizzlike lets you swap gear while disarmed).
     bool GetDisarmedAttackType(uint8 slot, WeaponAttackType& attackType) const;
     void _RemoveAllItemMods();
     void _ApplyAllItemMods();
