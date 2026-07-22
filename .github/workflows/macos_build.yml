@@ -36,6 +36,7 @@ jobs:
       # Split restore/save (rather than actions/cache, which saves in a post
       # step) so the prune below can run after the upload.
       - name: Restore ccache
+        id: restore_ccache
         uses: actions/cache/restore@v6
         with:
           path: ~/Library/Caches/ccache
@@ -58,38 +59,28 @@ jobs:
         shell: bash
         run: ccache -s || true
 
-      # The directory is absent only when the restore missed and the build died
-      # before ccache first wrote to it. Saving then would fail the step outright
-      # (actions/cache/save errors on a missing path) and, worse, publish an
-      # empty entry as the newest for this ref, shadowing the warm caches the
-      # restore-keys would otherwise reach. Skip both save and prune in that case.
-      - name: Check for a ccache dir
-        id: ccache_dir
-        if: ${{ !cancelled() }}
-        shell: bash
-        run: |
-          if [[ -d ~/Library/Caches/ccache ]]
-          then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-            echo "No ccache directory; skipping save and prune."
-          fi
-
       # Wider than the actions/cache post step this replaces, which was
       # post-if: success(): a failed build still compiled most of the tree and
       # that work is worth keeping. A cancelled one is skipped, since its cache
       # is barely ahead of what it restored and the upload rarely fits the
       # cancellation grace period anyway.
+      #
+      # The cache-matched-key arm is what keeps a failed run from publishing a
+      # near-empty entry: with nothing restored and the build dead before it
+      # compiled anything, that entry would become the newest for this ref and
+      # shadow the warm caches the broader restore-keys reach, and the prune
+      # would then delete the rest of the stream.
       - name: Save ccache
-        if: ${{ !cancelled() && steps.ccache_dir.outputs.exists == 'true' }}
+        if: ${{ !cancelled() && (success() || steps.restore_ccache.outputs.cache-matched-key != '') }}
         uses: actions/cache/save@v6
         with:
           path: ~/Library/Caches/ccache
           key: ccache:${{ matrix.os }}:${{ github.ref_name }}-${{ github.run_id }}
 
+      # Same condition as the save: pruning without having saved would delete
+      # the stream's only usable entries.
       - name: Prune superseded ccaches
-        if: ${{ !cancelled() && steps.ccache_dir.outputs.exists == 'true' }}
+        if: ${{ !cancelled() && (success() || steps.restore_ccache.outputs.cache-matched-key != '') }}
         uses: ./.github/actions/prune-ccache
         with:
           key-prefix: ccache:${{ matrix.os }}:${{ github.ref_name }}-

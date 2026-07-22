@@ -4,11 +4,9 @@ inputs:
   key-prefix:
     description: cache key prefix identifying the stream, i.e. the full key without the run id
     required: true
-    type: string
   keep-key:
     description: full key written by this run, which must survive the prune
     required: true
-    type: string
 runs:
   using: composite
   steps:
