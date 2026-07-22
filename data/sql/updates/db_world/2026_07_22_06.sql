@@ -1,3 +1,4 @@
+-- DB update 2026_07_22_05 -> 2026_07_22_06
 -- Update creature_template.CreatureImmunitiesId for difficulty entries
 -- Onyxia (base 10184), difficulty_entry_1 (36538)
 UPDATE `creature_template` SET `CreatureImmunitiesId` = -362 WHERE `entry` = 10184;
