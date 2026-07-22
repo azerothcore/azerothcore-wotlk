@@ -40,11 +40,11 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
         if (!zone || !GetPlayer()->CanJoinConstantChannelInZone(channel, zone))
             return;
 
-        if (const ChatChannelsEntry* channel = sChatChannelsStore.LookupEntry(channelId))
+        if (ChatChannelsEntry const* channel = sChatChannelsStore.LookupEntry(channelId))
         {
-            const auto locale = GetSessionDbcLocale();
-            const std::string& zoneName = zone->area_name[locale];
-            const char* nameExt = nullptr;
+            auto const locale = GetSessionDbcLocale();
+            std::string const& zoneName = zone->area_name[locale];
+            char const* nameExt = nullptr;
             if (channel->flags & CHANNEL_DBC_FLAG_CITY_ONLY)
                 nameExt = sObjectMgr->GetAcoreStringForDBCLocale(LANG_CHANNEL_CITY).c_str();
             else
@@ -52,7 +52,7 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
 
             std::array<char, 128> buffer{};
 
-            const char* pattern = channel->pattern[locale];
+            char const* pattern = channel->pattern[locale];
 
             if (pattern)
                 std::snprintf(buffer.data(), buffer.size(), pattern, nameExt);

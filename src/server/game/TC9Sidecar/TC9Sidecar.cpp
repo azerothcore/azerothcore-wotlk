@@ -184,7 +184,7 @@ bool ToCloud9Sidecar::NatsPublish(std::string const& subject, std::string const&
     return TC9NatsPublish(subject.c_str(), payload.c_str(), int(payload.size())) == 0;
 }
 
-bool ToCloud9Sidecar::NatsSubscribe(std::string const& subject, void (*handler)(const char*, const char*, int))
+bool ToCloud9Sidecar::NatsSubscribe(std::string const& subject, void (*handler)(char const*, char const*, int))
 {
     if (!_clusterModeEnabled || !handler)
         return false;

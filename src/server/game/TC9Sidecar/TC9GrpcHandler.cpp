@@ -327,7 +327,6 @@ BattlegroundJoinCheckErrorCode ToCloud9GrpcHandler::CanPlayerJoinBattlegroundQue
     if (!player)
         return BattlegroundJoinCheckErrorCodePlayerNotFound;
 
-
     // Lets ignore RBAC checks for now.
     Battleground* bg = sBattlegroundMgr->GetBattlegroundTemplate(BATTLEGROUND_RB);
 

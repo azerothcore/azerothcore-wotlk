@@ -60,7 +60,7 @@ public:
     // No-ops outside cluster mode. Subscribe callbacks run on the world
     // thread (ProcessHooks).
     bool NatsPublish(std::string const& subject, std::string const& payload);
-    bool NatsSubscribe(std::string const& subject, void (*handler)(const char* subject, const char* payload, int payloadLen));
+    bool NatsSubscribe(std::string const& subject, void (*handler)(char const* subject, char const* payload, int payloadLen));
 
 private:
     static void OnMapsReassigned(uint32* addedMaps, int addedMapsSize, uint32* removedMaps, int removedMapsSize);

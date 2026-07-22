@@ -257,7 +257,6 @@ bool BattlefieldWG::Update(uint32 diff)
     // else
     //     m_saveTimer -= diff;
 
-
     return Battlefield::Update(diff);
 }
 

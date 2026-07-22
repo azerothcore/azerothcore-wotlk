@@ -295,7 +295,8 @@ std::size_t ChatHandler::BuildChatPacket(WorldPacket &data, ChatMsg chatType, La
             data << senderName;
             receiverGUIDPos = data.wpos();
             data << receiverGUID;
-            if (receiverGUID && !receiverGUID.IsPlayer() && !receiverGUID.IsPet()) {
+            if (receiverGUID && !receiverGUID.IsPlayer() && !receiverGUID.IsPet())
+            {
                 data << uint32(receiverName.length() + 1);
                 data << receiverName;
             }
@@ -311,7 +312,8 @@ std::size_t ChatHandler::BuildChatPacket(WorldPacket &data, ChatMsg chatType, La
         case CHAT_MSG_BG_SYSTEM_HORDE:
             receiverGUIDPos = data.wpos();
             data << receiverGUID;
-            if (receiverGUID && !receiverGUID.IsPlayer()) {
+            if (receiverGUID && !receiverGUID.IsPlayer())
+            {
                 data << uint32(receiverName.length() + 1);
                 data << receiverName;
             }
@@ -322,12 +324,14 @@ std::size_t ChatHandler::BuildChatPacket(WorldPacket &data, ChatMsg chatType, La
             data << receiverGUID;
             break;
         default:
-            if (gmMessage) {
+            if (gmMessage)
+            {
                 data << uint32(senderName.length() + 1);
                 data << senderName;
             }
 
-            if (chatType == CHAT_MSG_CHANNEL) {
+            if (chatType == CHAT_MSG_CHANNEL)
+            {
                 ASSERT(channelName.length() > 0);
                 data << channelName;
             }
