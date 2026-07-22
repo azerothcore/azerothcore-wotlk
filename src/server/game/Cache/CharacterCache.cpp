@@ -24,6 +24,7 @@
 #include "Timer.h"
 #include "World.h"
 #include <algorithm>
+#include <limits>
 #include <unordered_map>
 
 namespace
@@ -208,15 +209,19 @@ void CharacterCache::UpdateCharacterMailCount(ObjectGuid const& guid, int32 coun
     if (itr == _characterCacheStore.end())
         return;
 
+    constexpr int32 maxCount = std::numeric_limits<uint16>::max();
+
     if (update)
     {
-        itr->second.MailCount = static_cast<uint16>(std::max(count, 0));
+        itr->second.MailCount = static_cast<uint16>(std::clamp<int32>(count, 0, maxCount));
         return;
     }
 
-    // A decrement below zero means an insert was missed somewhere; clamp so
-    // the error does not stick as a large positive count
-    itr->second.MailCount = static_cast<uint16>(std::max(static_cast<int32>(itr->second.MailCount) + count, 0));
+    int32 newCount = static_cast<int32>(itr->second.MailCount) + count;
+    if (newCount < 0)
+        LOG_WARN("entities.player", "CharacterCache::UpdateCharacterMailCount: mail count for {} would go negative ({}), a mail insert was not reported; clamping to 0", guid.ToString(), newCount);
+
+    itr->second.MailCount = static_cast<uint16>(std::clamp(newCount, 0, maxCount));
 }
 
 void CharacterCache::UpdateCharacterGroup(ObjectGuid const& guid, ObjectGuid groupGUID)

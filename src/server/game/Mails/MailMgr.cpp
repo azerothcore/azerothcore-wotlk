@@ -134,6 +134,9 @@ void MailMgr::ReturnOrDeleteOldMails(bool serverUp)
             continue;
         }
 
+        // Keep each mail's correlated writes atomic
+        CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
+
         // Delete or return mail
         if (has_items)
         {
@@ -147,12 +150,12 @@ void MailMgr::ReturnOrDeleteOldMails(bool serverUp)
                 {
                     stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_ITEM_INSTANCE);
                     stmt->SetData(0, mailedItem.item_guid);
-                    CharacterDatabase.Execute(stmt);
+                    trans->Append(stmt);
                 }
 
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_ITEM_BY_ID);
                 stmt->SetData(0, m->messageID);
-                CharacterDatabase.Execute(stmt);
+                trans->Append(stmt);
             }
             else
             {
@@ -164,20 +167,22 @@ void MailMgr::ReturnOrDeleteOldMails(bool serverUp)
                 stmt->SetData(3, uint32(curTime));
                 stmt->SetData(4, uint8(MAIL_CHECK_MASK_RETURNED));
                 stmt->SetData(5, m->messageID);
-                CharacterDatabase.Execute(stmt);
+                trans->Append(stmt);
                 for (auto const& mailedItem : m->items)
                 {
                     // Update receiver in mail items for its proper delivery, and in instance_item for avoid lost item at sender delete
                     stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_MAIL_ITEM_RECEIVER);
                     stmt->SetData(0, m->sender);
                     stmt->SetData(1, mailedItem.item_guid);
-                    CharacterDatabase.Execute(stmt);
+                    trans->Append(stmt);
 
                     stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_ITEM_OWNER);
                     stmt->SetData(0, m->sender);
                     stmt->SetData(1, mailedItem.item_guid);
-                    CharacterDatabase.Execute(stmt);
+                    trans->Append(stmt);
                 }
+
+                CharacterDatabase.CommitTransaction(trans);
 
                 OnMailReturned(m->receiver, m->sender);
 
@@ -189,7 +194,9 @@ void MailMgr::ReturnOrDeleteOldMails(bool serverUp)
 
         stmt = CharacterDatabase.GetPreparedStatement(CHAR_DEL_MAIL_BY_ID);
         stmt->SetData(0, m->messageID);
-        CharacterDatabase.Execute(stmt);
+        trans->Append(stmt);
+
+        CharacterDatabase.CommitTransaction(trans);
 
         OnMailDeleted(m->receiver);
 
