@@ -1,3 +1,4 @@
+-- DB update 2026_07_22_10 -> 2026_07_22_11
 -- Wright Williams (28355) banter fix: groups 0-3 had Text/BroadcastTextId scrambled,
 -- making the Miles Sidney <-> Wright Williams conversations nonsensical, and group 3
 -- pointed at BroadcastTextId 27809 ("Skadi the Ruthless is within range...").
