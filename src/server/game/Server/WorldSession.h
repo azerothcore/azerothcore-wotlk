@@ -553,8 +553,6 @@ public:
     void SendSpiritResurrect();
     void SendBindPoint(Creature* npc);
 
-    void SendAttackStop(Unit const* enemy);
-
     void SendBattleGroundList(ObjectGuid guid, BattlegroundTypeId bgTypeId = BATTLEGROUND_RB);
 
     void SendTradeStatus(TradeStatusInfo const& info);
