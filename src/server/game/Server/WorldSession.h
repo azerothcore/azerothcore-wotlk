@@ -1306,6 +1306,7 @@ private:
     ObjectGuid m_currentBankerGUID;
     uint32 _offlineTime;
     bool _kicked;
+    bool _redirecting;                                      // cluster handoff in progress: suppress full-logout side effects
     // Packets cooldown
     time_t _calendarEventCreationCooldown;
 
