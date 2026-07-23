@@ -523,6 +523,19 @@ void InstanceSaveMgr::MergeWithNewInstanceSaves(InstanceMapLoadRows const& loadR
             continue;
         }
 
+        // Same row validation as AddInstanceSave for rows loaded on reassignment.
+        if (row.instanceId == 0)
+        {
+            LOG_ERROR("instance.save", "InstanceSaveMgr::MergeWithNewInstanceSaves: mapid = {}, wrong instanceid = {}!", row.mapId, row.instanceId);
+            continue;
+        }
+
+        if (row.difficulty >= (entry->IsRaid() ? MAX_RAID_DIFFICULTY : MAX_DUNGEON_DIFFICULTY))
+        {
+            LOG_ERROR("instance.save", "InstanceSaveMgr::MergeWithNewInstanceSaves: mapid = {}, instanceid = {}, wrong difficulty {}!", row.mapId, row.instanceId, row.difficulty);
+            continue;
+        }
+
         time_t extendedResetTime = 0;
         if (entry->IsRaid() || row.difficulty > DUNGEON_DIFFICULTY_NORMAL)
             extendedResetTime = GetExtendedResetTimeFor(row.mapId, Difficulty(row.difficulty));
