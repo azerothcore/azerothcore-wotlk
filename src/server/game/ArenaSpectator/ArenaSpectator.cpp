@@ -113,7 +113,7 @@ bool ArenaSpectator::HandleSpectatorSpectateCommand(ChatHandler* handler, std::s
     if (!player->m_Controlled.empty())
         errors.push_back("Can't be controlling creatures.");
 
-    const Unit::VisibleAuraMap* va = player->GetVisibleAuras();
+    Unit::VisibleAuraMap const* va = player->GetVisibleAuras();
     for (auto itr = va->begin(); itr != va->end(); ++itr)
         if (Aura* aura = itr->second->GetBase())
             if (!itr->second->IsPositive() && !aura->IsPermanent() && aura->GetDuration() < HOUR * IN_MILLISECONDS)
@@ -310,7 +310,7 @@ AC_GAME_API void ArenaSpectator::SendPacketTo(Player const* player, std::string&
 }
 
 template<>
-AC_GAME_API void ArenaSpectator::SendPacketTo(const Map* map, std::string&& message)
+AC_GAME_API void ArenaSpectator::SendPacketTo(Map const* map, std::string&& message)
 {
     if (!map->IsBattleArena())
         return;

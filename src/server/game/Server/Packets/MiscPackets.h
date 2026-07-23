@@ -236,6 +236,17 @@ namespace WorldPackets
 
             uint8 Unk = 0;
         };
+
+        class PlayTimeWarning final : public ServerPacket
+        {
+        public:
+            PlayTimeWarning() : ServerPacket(SMSG_PLAY_TIME_WARNING, 4 + 4) {}
+
+            WorldPacket const* Write() override;
+
+            uint32 Flag = 0; // PlayTimeFlag mask, set by WorldSession::SendPlayTimeWarning
+            int32 PlayTimeRemaining = 0;
+        };
     }
 }
 
