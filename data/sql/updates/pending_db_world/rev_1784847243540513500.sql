@@ -31,7 +31,7 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 UPDATE `creature` SET `wander_distance`= 0, `MovementType`= 0 WHERE `guid`= 100431;
 -- Glonn (Entry 28211, GUID 100704)
 UPDATE `creature` SET `wander_distance`= 0, `MovementType`= 0 WHERE `guid`= 100704;
--- Hound pack formation (leader 100735, hounds flank on opposite sides)
+-- Plague-dog pack formation (leader 100735, plague-dogs flank on opposite sides)
 DELETE FROM `creature_formations` WHERE `leaderGUID`= 100735 OR `memberGUID` IN (100735, 100431, 100704);
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
 (100735, 100735, 0, 0, 7, 0, 0),
