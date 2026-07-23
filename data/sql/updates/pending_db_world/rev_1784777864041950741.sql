@@ -1,7 +1,7 @@
 -- Sapphiron 25-player loot pool structure fix.
 
 UPDATE `creature_loot_template` SET `MinCount`=1, `MaxCount`=1
-  WHERE `Entry`=29991 AND `Item`=1 AND `Reference`=34135;
+    WHERE `Entry`=29991 AND `Item`=1 AND `Reference`=34135;
 
 -- Pool A (5 items)
 UPDATE `reference_loot_template` SET `GroupId`=1 WHERE `Entry`=34135 AND `Item`=40362; -- Gloves of Fast Reactions
