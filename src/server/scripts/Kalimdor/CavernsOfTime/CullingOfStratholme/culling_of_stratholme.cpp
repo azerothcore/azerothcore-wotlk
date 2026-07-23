@@ -187,6 +187,10 @@ enum Misc
     // Brandon Eiredeck crowd
     NPC_BRANDON_EIREDECK                    = 31023,
     SAY_BRANDON_CROWD_AMBIENT               = 3,
+
+    // Patricia O'Reilly crowd
+    SAY_AGITATED_CITIZEN_AMBIENT           = 2,
+    SAY_AGITATED_RESIDENT_AMBIENT          = 0,
 };
 
 enum Events
@@ -405,6 +409,7 @@ public:
 
         void JustDied(Unit*) override
         {
+            summons.DespawnAll();
             RemoveEscortState(STATE_ESCORT_ESCORTING);
             if (pInstance)
                 pInstance->SetData(DATA_ARTHAS_REPOSITION, 2);
@@ -1190,7 +1195,7 @@ public:
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                         me->CastSpell(target, SPELL_ARTHAS_EXORCISM, false);
 
-                    combatEvents.Repeat(7300ms);
+                    combatEvents.Repeat(7s, 14s);
                     break;
                 case EVENT_COMBAT_HEALTH_CHECK:
                     if (HealthBelowPct(40))
@@ -1247,8 +1252,8 @@ void npc_arthas::npc_arthasAI::JustEngagedWith(Unit* /*who*/)
     DoCast(me, SPELL_ARTHAS_AURA);
 
     // Fight
-    combatEvents.ScheduleEvent(EVENT_COMBAT_EXORCISM, 2s);
-    combatEvents.ScheduleEvent(EVENT_COMBAT_HEALTH_CHECK, 2s);
+    combatEvents.RescheduleEvent(EVENT_COMBAT_EXORCISM, 7s, 14s);
+    combatEvents.RescheduleEvent(EVENT_COMBAT_HEALTH_CHECK, 2s);
 }
 
 void npc_arthas::npc_arthasAI::ReorderInstance(uint32 data)
@@ -1426,7 +1431,7 @@ class npc_cos_chromie_start : public CreatureScript
 public:
     npc_cos_chromie_start() : CreatureScript("npc_cos_chromie_start") { }
 
-    bool OnQuestAccept(Player* /*player*/, Creature* creature, const Quest* quest) override
+    bool OnQuestAccept(Player* /*player*/, Creature* creature, Quest const* quest) override
     {
         if (quest->GetQuestId() == QUEST_DISPELLING_ILLUSIONS)
             if (InstanceScript* instance = creature->GetInstanceScript())
@@ -1484,7 +1489,7 @@ class npc_cos_chromie_middle : public CreatureScript
 public:
     npc_cos_chromie_middle() : CreatureScript("npc_cos_chromie_middle") { }
 
-    bool OnQuestAccept(Player*, Creature* creature, const Quest* pQuest) override
+    bool OnQuestAccept(Player*, Creature* creature, Quest const* pQuest) override
     {
         if (pQuest->GetQuestId() == QUEST_A_ROYAL_ESCORT)
             if (InstanceScript* pInstance = creature->GetInstanceScript())
@@ -1541,6 +1546,10 @@ public:
 
             isBrandonCrowd = me->GetDistance(2267.86f, 1144.93f, 138.403f) < 10.0f;
             ambientTalkTimer = isBrandonCrowd ? urand(5000, 15000) : 0;
+
+            isPatriciaCrowd = (me->GetEntry() == NPC_CITY_MAN3 || me->GetEntry() == NPC_CITY_MAN4) && me->GetDistance(2372.0f, 1199.0f, 135.0f) < 20.0f;
+            talkTimer = isPatriciaCrowd ? urand(5000, 10000) : 0;
+            emoteTimer = isPatriciaCrowd ? urand(1000, 3000) : 0;
         }
 
         bool locked;
@@ -1552,6 +1561,9 @@ public:
         uint8 stephanieDialoguePhase;
         bool isBrandonCrowd;
         uint32 ambientTalkTimer;
+        bool isPatriciaCrowd;
+        uint32 talkTimer;
+        uint32 emoteTimer;
 
         void Reset() override
         {
@@ -1665,6 +1677,27 @@ public:
                     ambientTalkTimer -= diff;
 
                 return;
+            }
+
+            // Agitated crowd near Patricia - active as soon as instance is loaded
+            if (isPatriciaCrowd)
+            {
+                if (talkTimer <= diff)
+                {
+                    Talk(me->GetEntry() == NPC_CITY_MAN3 ? SAY_AGITATED_CITIZEN_AMBIENT : SAY_AGITATED_RESIDENT_AMBIENT);
+                    talkTimer = urand(8000, 15000);
+                }
+                else
+                    talkTimer -= diff;
+
+                if (emoteTimer <= diff)
+                {
+                    static uint32 const agitatedEmotes[] = { 1, 5, 6, 14, 15, 25, 273, 274, 396 };
+                    me->HandleEmoteCommand(agitatedEmotes[urand(0, 8)]);
+                    emoteTimer = urand(1500, 2500);
+                }
+                else
+                    emoteTimer -= diff;
             }
 
             if (allowTimer)

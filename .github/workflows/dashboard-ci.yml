@@ -20,8 +20,9 @@ concurrency:
   #
   # - PRs use `refs/pull/<PR_NUMBER>/merge`, so new commits cancel older
   #   in-progress runs for the same PR.
-  # - When a PR is merged, a push to the target branch starts a new group,
-  #   canceling any still-running PR CI.
+  # - A merge does NOT cancel the PR's own runs: this group is keyed on
+  #   refs/pull/<N>/merge and the master push on refs/heads/master, so they
+  #   never share a group.
   # - Branch pushes are isolated by ref.
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -41,8 +42,8 @@ jobs:
       fail-fast: true
       matrix:
         include:
-          - os: ubuntu-22.04
           - os: ubuntu-24.04
+          - os: ubuntu-26.04
     runs-on: ${{ matrix.os }}
     if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
     steps:
@@ -73,8 +74,8 @@ jobs:
       fail-fast: true
       matrix:
         include:
-          - os: ubuntu-22.04
           - os: ubuntu-24.04
+          - os: ubuntu-26.04
     runs-on: ${{ matrix.os }}
     if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
     steps:
@@ -137,15 +138,29 @@ jobs:
 
       - name: Echo cache key
         shell: bash
-        run: echo "Cache key -> ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}"
+        run: echo "Cache key -> ccache:${{ matrix.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}-${{ github.run_id }}"
 
+      # The primary key must be unique per run. A static key hits on itself from
+      # the second run onward and the save is then skipped, freezing the cache
+      # at its first-run contents. It is keyed on matrix.os rather than
+      # runner.os because both legs report Linux and share a run_id, so only the
+      # detected compiler would separate them. The first restore-key picks up
+      # the most recent cache for this leg on this ref; the second the most
+      # recent on any ref the run can reach, which is its own and the base
+      # branch, and is how a first run inherits master's. Both must use
+      # matrix.os to stay in the key's namespace.
+      # The runner.os entries below reach the linux-build action's caches, but
+      # only on the 24.04 leg: on 26.04 this workflow detects clang-21 while
+      # linux-build is passed clang-20, so nothing there lines up.
       - name: Restore ccache
         id: restore_ccache
         uses: actions/cache/restore@v4
         with:
           path: ${{ github.workspace }}/var/ccache
-          key: ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}
+          key: ccache:${{ matrix.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}-${{ github.run_id }}
           restore-keys: |
+            ccache:${{ matrix.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}-
+            ccache:${{ matrix.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:
             ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:true:pch=false:
             ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:false:pch=false:
             ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:true:pch=true:
@@ -167,7 +182,7 @@ jobs:
           CCACHE_MAXSIZE=5G
           CCACHE_SLOPPINESS=pch_defines,time_macros,include_file_mtime
           CCACHE_COMPRESS=1
-          CCACHE_COMPRESSLEVEL=9
+          CCACHE_COMPRESSLEVEL=3
           CCACHE_COMPILERCHECK=content
           CCACHE_LOGFILE=${{ github.workspace }}/var/ccache/cache.debug
           CMAKE_C_COMPILER_LAUNCHER=ccache
@@ -273,13 +288,19 @@ jobs:
         timeout-minutes: 30
         continue-on-error: false
 
-      # save only if we didn't hit the cache
+      # The old "only save on a cache miss" guard is dropped: the per-run key
+      # only ever collides on a re-run, since github.run_id is stable across
+      # attempts, and there the save is a no-op anyway.
+      # A failed build still compiled most of the tree and that work is worth
+      # keeping. A cancelled one is skipped so a superseded run cannot publish
+      # a half-populated cache as the newest for the ref, and a run that died
+      # before the restore has no compiler id and no ccache dir to save.
       - name: Save ccache
-        if: steps.restore_ccache.outputs.cache-hit != 'true'
+        if: ${{ !cancelled() && steps.restore_ccache.outcome == 'success' }}
         uses: actions/cache/save@v4
         with:
           path: ${{ github.workspace }}/var/ccache
-          key: ccache:${{ runner.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}
+          key: ccache:${{ matrix.os }}:${{ steps.detect.outputs.cc_id }}_${{ steps.detect.outputs.cxx_id }}:${{ github.ref_name }}-${{ github.run_id }}
 
       - name: ccache stats (after)
         shell: bash
