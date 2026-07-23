@@ -18,6 +18,7 @@
 #ifndef _ASYNC_TASK_H
 #define _ASYNC_TASK_H
 
+#include "Errors.h"
 #include "Log.h"
 #include <chrono>
 #include <functional>
@@ -51,8 +52,10 @@ public:
             // Check if the asynchronous task is ready
             if (asyncTask.valid() && asyncTask.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
             {
-                // Contain exceptions here: get() rethrows anything the async
-                // function threw, and this runs inside World::Update.
+                // get() rethrows anything the async function threw. Swallowing it
+                // would wedge the cluster handoff (the completion callback signals
+                // map readiness to the registry), so fail fast with context and let
+                // the registry's crash recovery rebalance this node.
                 try
                 {
                     callbackFunc(asyncTask.get());
@@ -60,6 +63,7 @@ public:
                 catch (std::exception const& e)
                 {
                     LOG_ERROR("server.tc9", "AsyncTask failed: {}", e.what());
+                    ABORT("AsyncTask failed: {}", e.what());
                 }
                 isReady = true;
                 return true;
