@@ -18,6 +18,7 @@
 #ifndef _ASYNC_TASK_H
 #define _ASYNC_TASK_H
 
+#include "Log.h"
 #include <chrono>
 #include <functional>
 #include <future>
@@ -50,8 +51,16 @@ public:
             // Check if the asynchronous task is ready
             if (asyncTask.valid() && asyncTask.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
             {
-                // Invoke the callback with the result of the asynchronous task
-                callbackFunc(asyncTask.get());
+                // Contain exceptions here: get() rethrows anything the async
+                // function threw, and this runs inside World::Update.
+                try
+                {
+                    callbackFunc(asyncTask.get());
+                }
+                catch (std::exception const& e)
+                {
+                    LOG_ERROR("server.tc9", "AsyncTask failed: {}", e.what());
+                }
                 isReady = true;
                 return true;
             }
