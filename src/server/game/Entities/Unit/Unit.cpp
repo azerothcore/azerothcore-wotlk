@@ -3255,9 +3255,6 @@ void Unit::SendMeleeAttackStop(Unit const* victim) const
     // ClearUnitState(UNIT_STATE_MELEE_ATTACKING); // commented out for now
 
     WorldPackets::Combat::SAttackStop attackStop;
-
-    WorldPacket data(SMSG_ATTACKSTOP, (8 + 8 + 4));
-
     attackStop.Attacker = GetGUID();
     attackStop.Victim = Object::GetGUID(victim);
     attackStop.NowDead = !IsAlive();
