@@ -279,7 +279,12 @@ void Battleground::Update(uint32 diff)
         if (!GetInvitedCount(TEAM_HORDE) && !GetInvitedCount(TEAM_ALLIANCE))
         {
             m_SetDeleteThis = true;
-            SetStatus(STATUS_WAIT_LEAVE);
+
+            // Only needed for the sidecar notify inside SetStatus; queue and
+            // spectator code read the status within this manager pass, so do
+            // not change it on non-cluster servers.
+            if (sToCloud9Sidecar->ClusterModeEnabled())
+                SetStatus(STATUS_WAIT_LEAVE);
         }
 
         return;
