@@ -87,6 +87,7 @@ struct npc_pet_gen_soul_trader_beacon : public ScriptedAI
                 // Cast the token creation spell on the player owner, not on the pet
                 if (Player* owner = GetOwner())
                     me->CastSpell(owner, SPELL_CREATE_TOKEN, true);
+
                 Talk(2);
                 break;
         }
