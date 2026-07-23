@@ -338,8 +338,7 @@ void SmartAI::StopPath(uint32 DespawnTime, uint32 quest, bool fail)
     if (quest)
         mEscortQuestID = quest;
 
-    if (mCanRepeatPath)
-        mCanRepeatPath = false;
+    mCanRepeatPath = false;
 
     SetDespawnTime(DespawnTime);
 
