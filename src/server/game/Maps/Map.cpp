@@ -38,6 +38,7 @@
 #include "Pet.h"
 #include "PoolMgr.h"
 #include "ScriptMgr.h"
+#include "TC9Sidecar.h"
 #include "Transport.h"
 #include "VMapFactory.h"
 #include "Vehicle.h"
@@ -1674,7 +1675,7 @@ void Map::SendInitTransports(Player* player)
     // Hack to send out transports
     UpdateData transData;
     for (TransportsContainer::const_iterator itr = _transports.begin(); itr != _transports.end(); ++itr)
-        if (*itr != player->GetTransport() && player->InSamePhase(*itr))
+        if (*itr != player->GetTransport() && (!sToCloud9Sidecar->ClusterModeEnabled() || player->InSamePhase(*itr)))
             (*itr)->BuildCreateUpdateBlockForPlayer(&transData, player);
 
     if (!transData.HasData())
