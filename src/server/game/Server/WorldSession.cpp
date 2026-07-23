@@ -150,7 +150,6 @@ WorldSession::WorldSession(uint32 id, std::string&& name, uint32 accountFlags, s
 
     _offlineTime = 0;
     _kicked = false;
-    _redirecting = false;
 
     _timeSyncNextCounter = 0;
     _timeSyncTimer = 0;
@@ -677,10 +676,6 @@ void WorldSession::SendPlayTimeWarning(PlayTimeFlag flag, int32 playTimeRemainin
 /// %Log the player out
 void WorldSession::LogoutPlayer(bool save, bool redirecting)
 {
-    // Session teardown (socket close -> ~WorldSession) can't pass this flag, so honor the
-    // redirect state recorded when the cluster handoff was committed.
-    redirecting = redirecting || _redirecting;
-
     // finish pending transfers before starting the logout
     while (_player && _player->IsBeingTeleportedFar())
         HandleMoveWorldportAck();
@@ -1637,10 +1632,7 @@ void WorldSession::HandleTC9PrepareForRedirect(WorldPacket& /*recvData*/)
         if (!player)
             return;
 
-        // Set only when the kick actually fires: a stale flag on an abandoned
-        // handoff would suppress the real logout's side effects later.
         player->m_Events.AddEventAtOffset([this](){
-            _redirecting = true;
             KickPlayer("HandlePrepareForRedirect client redirected");
         }, 100ms);
     });
