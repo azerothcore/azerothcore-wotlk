@@ -23,17 +23,17 @@
 class AllCreatureScript : public ScriptObject
 {
 protected:
-    AllCreatureScript(const char* name);
+    AllCreatureScript(char const* name);
 
 public:
     // Called from End of Creature Update.
     virtual void OnAllCreatureUpdate(Creature* /*creature*/, uint32 /*diff*/) { }
 
     // Called just before the level of the creature is set.
-    virtual void OnBeforeCreatureSelectLevel(const CreatureTemplate* /*cinfo*/, Creature* /*creature*/, uint8& /*level*/) { }
+    virtual void OnBeforeCreatureSelectLevel(CreatureTemplate const* /*cinfo*/, Creature* /*creature*/, uint8& /*level*/) { }
 
     // Called from End of Creature SelectLevel.
-    virtual void OnCreatureSelectLevel(const CreatureTemplate* /*cinfo*/, Creature* /*creature*/) { }
+    virtual void OnCreatureSelectLevel(CreatureTemplate const* /*cinfo*/, Creature* /*creature*/) { }
 
     /**
      * @brief This hook runs after add creature in world
@@ -89,7 +89,7 @@ public:
      *
      * @return True if you want to continue, false if you want to disable
      */
-    [[nodiscard]] virtual bool CanCreatureGossipSelectCode(Player* /*player*/, Creature* /*creature*/, uint32 /*sender*/, uint32 /*action*/, const char* /*code*/) { return false; }
+    [[nodiscard]] virtual bool CanCreatureGossipSelectCode(Player* /*player*/, Creature* /*creature*/, uint32 /*sender*/, uint32 /*action*/, char const* /*code*/) { return false; }
 
     // Called when a player accepts a quest from the creature.
     [[nodiscard]] virtual bool CanCreatureQuestAccept(Player* /*player*/, Creature* /*creature*/, Quest const* /*quest*/) { return false; }

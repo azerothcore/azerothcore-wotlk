@@ -39,7 +39,7 @@ struct ResultIterator
     pointer operator->() { return _ptr; }
     ResultIterator& operator++() { if (!_ptr->NextRow()) _ptr = nullptr; return *this; }
 
-    bool operator!=(const ResultIterator& right) { return _ptr != right._ptr; }
+    bool operator!=(ResultIterator const& right) { return _ptr != right._ptr; }
 
 private:
     pointer _ptr;
