@@ -40,7 +40,8 @@ namespace
     std::chrono::system_clock::time_point const transportStartDate = std::chrono::system_clock::from_time_t(startTimestamp);
 
     // Calculates time of the next departure cycle.
-    std::chrono::system_clock::time_point calculateNextDepartureTime(int oneIterationInterval) {
+    std::chrono::system_clock::time_point calculateNextDepartureTime(int oneIterationInterval)
+    {
         std::chrono::system_clock::time_point currentTime = std::chrono::system_clock::now();
         std::chrono::milliseconds interval(oneIterationInterval);
         std::chrono::milliseconds timeSinceStart = std::chrono::duration_cast<std::chrono::milliseconds>(currentTime - transportStartDate);
