@@ -347,6 +347,8 @@ BattlegroundJoinCheckErrorCode ToCloud9GrpcHandler::CanPlayerJoinBattlegroundQue
 
     // Lets ignore RBAC checks for now.
     Battleground* bg = sBattlegroundMgr->GetBattlegroundTemplate(BATTLEGROUND_RB);
+    if (!bg)
+        return BattlegroundJoinCheckErrorCodeResponseIsFalse;
 
     // has deserter debuff
     if (!player->CanJoinToBattleground(bg))
