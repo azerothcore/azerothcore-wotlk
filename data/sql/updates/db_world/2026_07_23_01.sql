@@ -1,3 +1,4 @@
+-- DB update 2026_07_23_00 -> 2026_07_23_01
 --
 DELETE FROM `vehicle_template_accessory` WHERE `entry` = 32930;
 INSERT INTO `vehicle_template_accessory` (`entry`, `accessory_entry`, `seat_id`, `minion`, `description`, `summontype`, `summontimer`) VALUES
