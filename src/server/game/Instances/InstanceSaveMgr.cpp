@@ -484,6 +484,12 @@ void InstanceSaveMgr::LoadInstanceSavesAndBindsForMapIDs(std::vector<uint32> map
             time_t extendedResetTime = 0;
 
             MapEntry const* entry = sMapStore.LookupEntry(mapId);
+            if (!entry)
+            {
+                LOG_ERROR("instance.save", "InstanceSaveMgr::LoadInstanceSavesAndBindsForMapIDs: wrong mapid = {}, instanceid = {}!", mapId, instanceId);
+                continue;
+            }
+
             if (entry->IsRaid() || difficulty > DUNGEON_DIFFICULTY_NORMAL)
                 extendedResetTime = GetExtendedResetTimeFor(mapId, Difficulty(difficulty));
 
