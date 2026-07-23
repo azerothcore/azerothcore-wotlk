@@ -35,6 +35,7 @@
 #include "ScriptMgr.h"
 #include "SpellAuras.h"
 #include "Transport.h"
+#include "UpdateData.h"
 #include "Vehicle.h"
 #include "WaypointMovementGenerator.h"
 #include "WorldPacket.h"
@@ -129,6 +130,14 @@ void WorldSession::HandleMoveWorldportAck()
     if (Transport* t = _player->GetTransport())
         if (!t->IsInMap(_player))
         {
+            // Client was never told to destroy its own transport
+            // Destroy it now or it keeps a phantom copy of the transport on the new map
+            UpdateData transData;
+            t->BuildOutOfRangeUpdateBlock(&transData);
+            WorldPacket packet;
+            transData.BuildPacket(packet);
+            _player->SendDirectMessage(&packet);
+
             t->RemovePassenger(_player);
             _player->m_transport = nullptr;
             _player->m_movementInfo.transport.Reset();
@@ -840,14 +849,20 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket& recvData)
     movementInfo.guid = guid;
     ReadMovementInfo(recvData, &movementInfo);
 
-    mover->m_movementInfo = movementInfo;
+    // Relocate the mover to the acknowledged position. Otherwise the server (and the
+    // MSG_MOVE_KNOCK_BACK broadcast below) keeps using the pre-knockback position until
+    // the next regular movement packet arrives, desyncing the unit for nearby clients
+    if (!ProcessMovementInfo(movementInfo, mover, mover->ToPlayer(), recvData))
+    {
+        recvData.rfinish(); // prevent warnings spam
+        return;
+    }
 
     if (mover->IsPlayer() && static_cast<Player*>(mover)->IsFreeFlying())
         mover->SetCanFly(true);
 
     WorldPacket data(MSG_MOVE_KNOCK_BACK, 66);
-    data << guid.WriteAsPacked();
-    _player->m_mover->BuildMovementPacket(&data);
+    WriteMovementInfo(&data, &movementInfo);
     _player->SetCanTeleport(true);
     // knockback specific info
     data << movementInfo.jump.sinAngle;

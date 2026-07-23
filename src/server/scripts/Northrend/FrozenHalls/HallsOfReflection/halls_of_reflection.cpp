@@ -1458,7 +1458,7 @@ class at_hor_shadow_throne : public AreaTriggerScript
 public:
     at_hor_shadow_throne() : AreaTriggerScript("at_hor_shadow_throne") { }
 
-    bool OnTrigger(Player* player, const AreaTrigger* /*at*/) override
+    bool OnTrigger(Player* player, AreaTrigger const* /*at*/) override
     {
         InstanceScript* inst = player->GetInstanceScript();
         if (!inst)

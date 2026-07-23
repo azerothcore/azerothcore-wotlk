@@ -36,7 +36,7 @@ enum AllMapHook
 class AllMapScript : public ScriptObject
 {
 protected:
-    AllMapScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
+    AllMapScript(char const* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     /**

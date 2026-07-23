@@ -104,7 +104,7 @@ namespace AddonMgr
         m_knownAddons.emplace_back(addon.Name, addon.CRC);
     }
 
-    SavedAddon const* GetAddonInfo(const std::string& name)
+    SavedAddon const* GetAddonInfo(std::string const& name)
     {
         for (auto const& addon : m_knownAddons)
         {
