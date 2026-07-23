@@ -561,6 +561,8 @@ private:
     bool _damagedByPlayer;
     uint8 _highestPlayerAttackerLevel;
     bool _isCombatMovementAllowed;
+    /// Set when AIM_Initialize() ran InitializeAI(); skips redundant JustRespawned on first tick.
+    bool _spawnInitHandledByAIMInitialize;
 };
 
 class AssistDelayEvent : public BasicEvent
