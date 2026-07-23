@@ -40,6 +40,7 @@
 #include "ReputationMgr.h"
 #include "ScriptMgr.h"
 #include "SpellAuras.h"
+#include "TC9Sidecar.h"
 #include "Transport.h"
 #include "Util.h"
 #include "World.h"

@@ -27,6 +27,7 @@
 #include "SocialMgr.h"
 #include "Spell.h"
 #include "SpellMgr.h"
+#include "TC9Sidecar.h"
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"

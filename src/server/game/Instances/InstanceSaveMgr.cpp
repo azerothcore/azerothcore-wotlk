@@ -29,6 +29,7 @@
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
+#include "TC9Sidecar.h"
 #include "Timer.h"
 #include "Transport.h"
 #include "World.h"

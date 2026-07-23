@@ -31,6 +31,7 @@
 #include "RBAC.h"
 #include "ScriptMgr.h"
 #include "Spell.h"
+#include "TC9Sidecar.h"
 #include "WorldSession.h"
 
 BossBoundaryData::~BossBoundaryData()

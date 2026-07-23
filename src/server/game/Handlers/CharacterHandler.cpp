@@ -54,6 +54,7 @@
 #include "SpellAuraEffects.h"
 #include "SpellAuras.h"
 #include "StringConvert.h"
+#include "TC9Sidecar.h"
 #include "Tokenize.h"
 #include "Transport.h"
 #include "Util.h"

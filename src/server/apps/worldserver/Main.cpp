@@ -49,6 +49,7 @@
 #include "SharedDefines.h"
 #include "SteadyTimer.h"
 #include "Systemd.h"
+#include "TC9Sidecar.h"
 #include "World.h"
 #include "WorldSessionMgr.h"
 #include "WorldSocket.h"

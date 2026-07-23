@@ -20,13 +20,15 @@
 
 #include "ByteBuffer.h"
 #include "Define.h"
-#include "TC9Sidecar.h"
 #include <deque>
 #include <functional>
 #include <list>
 #include <set>
 #include <unordered_set>
 #include <vector>
+
+// Realm id packed into bits 32-47 of a player ObjectGuid; 0 means local / non-crossrealm.
+constexpr uint16 DEFAULT_NON_CROSSREALM_REALM_ID = 0;
 
 enum TypeID
 {
@@ -291,6 +293,7 @@ public:
 
 protected:
     static void HandleCounterOverflow(HighGuid high);
+    static bool GetClusterGuid(HighGuid high, uint16 realmId, ObjectGuid::LowType& clusterGuid);
     ObjectGuid::LowType _nextGuid;
 };
 
@@ -302,10 +305,9 @@ public:
 
     ObjectGuid::LowType Generate(uint16 realmId = DEFAULT_NON_CROSSREALM_REALM_ID) override
     {
-        if (high == HighGuid::Player && sToCloud9Sidecar->ClusterModeEnabled())
-            return ObjectGuid::LowType(sToCloud9Sidecar->GenerateCharacterGuid(realmId));
-        if (high == HighGuid::Item && sToCloud9Sidecar->ClusterModeEnabled())
-            return ObjectGuid::LowType(sToCloud9Sidecar->GenerateItemGuid(realmId));
+        ObjectGuid::LowType clusterGuid;
+        if (GetClusterGuid(high, realmId, clusterGuid))
+            return clusterGuid;
 
         if (_nextGuid >= ObjectGuid::GetMaxCounter(high) - 1)
             HandleCounterOverflow(high);

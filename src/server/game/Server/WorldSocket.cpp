@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "TC9Sidecar.h"
 #include "WorldSocket.h"
 #include "AccountMgr.h"
 #include "Config.h"

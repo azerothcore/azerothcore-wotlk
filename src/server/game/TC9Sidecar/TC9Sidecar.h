@@ -21,9 +21,9 @@
 #include "AsyncCallbackProcessor.h"
 #include "AsyncTask.h"
 #include "Common.h"
+#include "ObjectGuid.h"
 
 #define MAX_MAP_ID 800 // Probably too much, but let's lean towards caution.
-#define DEFAULT_NON_CROSSREALM_REALM_ID 0
 
 class ToCloud9Sidecar
 {

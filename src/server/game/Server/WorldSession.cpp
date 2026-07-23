@@ -19,6 +19,7 @@
     \ingroup u2w
 */
 
+#include "TC9Sidecar.h"
 #include "WorldSession.h"
 #include "AccountMgr.h"
 #include "BattlegroundMgr.h"

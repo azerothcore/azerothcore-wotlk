@@ -34,6 +34,7 @@
 #include "Player.h"
 #include "ScriptMgr.h"
 #include "SharedDefines.h"
+#include "TC9Sidecar.h"
 #include "UpdateFieldFlags.h"
 #include "Util.h"
 #include "World.h"

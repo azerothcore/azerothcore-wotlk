@@ -22,6 +22,7 @@
 #include "MapMgr.h"
 #include "Player.h"
 #include "SharedDefines.h"
+#include "TC9Sidecar.h"
 #include "UnitAI.h"
 #include "Weather.h"
 #include "WorldState.h"
