@@ -1,3 +1,4 @@
+-- DB update 2026_07_23_02 -> 2026_07_23_03
 --
 -- Spirit of the Vale (entry 17087, Azuremyst Isle) - gossip greeting was race-insensitive.
 -- Issue azerothcore/azerothcore-wotlk#14219 (chromiecraft/chromiecraft#4535).
