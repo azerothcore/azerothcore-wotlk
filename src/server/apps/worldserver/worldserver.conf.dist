@@ -4912,6 +4912,12 @@ Respawn.ForceCompatibilityMode = 0
 #
 #    Cluster.Enabled
 #        Description: Enables/disables cluster mode.
+#                     SECURITY: in cluster mode the ToCloud9 gateway is the trusted
+#                     authentication boundary. This worldserver then skips session-key
+#                     digest verification, packet encryption, warden, IP/country locks,
+#                     ban and minimum-security-level enforcement, and the
+#                     character-ownership check on login. The worldserver port must
+#                     only be reachable by the gateway, never directly by players.
 #        Default: 0 - (Disabled)
 #                 1 - (Enabled)
 
