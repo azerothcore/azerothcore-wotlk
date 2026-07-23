@@ -72,7 +72,7 @@ public:
     */
 };
 
-const char* GetPlainName(const char* FileName);
+char const* GetPlainName(char const* FileName);
 char* GetPlainName(char* FileName);
 char* GetExtension(char* FileName);
 void fixnamen(char* name, std::size_t len);

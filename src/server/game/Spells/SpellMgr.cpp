@@ -1011,7 +1011,7 @@ bool SpellMgr::IsArenaAllowedEnchancment(uint32 ench_id) const
     return mEnchantCustomAttr[ench_id];
 }
 
-const std::vector<int32>* SpellMgr::GetSpellLinked(int32 spell_id) const
+std::vector<int32> const* SpellMgr::GetSpellLinked(int32 spell_id) const
 {
     SpellLinkedMap::const_iterator itr = mSpellLinkedMap.find(spell_id);
     return itr != mSpellLinkedMap.end() ? &(itr->second) : nullptr;
@@ -3277,6 +3277,7 @@ void SpellMgr::LoadSpellInfoCustomAttributes()
                         case 44801: // Spectral Invisibility (Kalecgos, SWP)
                         case 46021: // Spectral Realm (SWP)
                         case 52951: // Chapel Invisibility (DK starting zone)
+                        case 43062: // Alpha Worg: Garwal's Invisibility
                             break;
                         default:
                             spellInfo->AuraInterruptFlags |= AURA_INTERRUPT_FLAG_CAST;

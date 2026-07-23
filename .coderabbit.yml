@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
-# CodeRabbit review config. Mirrors the hard rules in CLAUDE.md so the AI
+# CodeRabbit review config. Mirrors the hard rules in AGENTS.md so the AI
 # reviewer enforces project conventions on every PR.
 language: en-US
 
@@ -26,7 +26,7 @@ reviews:
     - path: "**/*.{cpp,h,hpp}"
       instructions: |
         AzerothCore C++ conventions (CI enforces these with -Werror; flag violations):
-        - C++20. 4-space indent, tabs forbidden. UTF-8, LF, max 80 columns, trailing newline.
+        - C++20. 4-space indent, tabs forbidden. UTF-8, LF, max 120 columns, trailing newline.
         - Allman braces. No braces around single-line statements. `if (x)`, never `if(x)` or `if ( x )`.
         - `auto const&` (not `const auto&`); `Type const*` (not `const Type*`).
         - Use fmt-style `{}` format specifiers, never printf-style `%u`/`%s`.
@@ -74,10 +74,10 @@ reviews:
 knowledge_base:
   code_guidelines:
     enabled: true
-    # CLAUDE.md is in CodeRabbit's defaults, but list it explicitly so the project's
+    # AGENTS.md is in CodeRabbit's defaults, but list it explicitly so the project's
     # full guideline doc is always pulled into review context.
     filePatterns:
-      - "CLAUDE.md"
+      - "AGENTS.md"
 
 chat:
   auto_reply: true

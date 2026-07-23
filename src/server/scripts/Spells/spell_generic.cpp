@@ -2539,7 +2539,7 @@ class spell_gen_vehicle_scaling : public SpellScript
     SpellCastResult CheckSeat()
     {
         if (Vehicle* veh = GetCaster()->GetVehicle())
-            if (const VehicleSeatEntry* seatEntry = veh->GetSeatForPassenger(GetCaster()))
+            if (VehicleSeatEntry const* seatEntry = veh->GetSeatForPassenger(GetCaster()))
                 if (seatEntry->m_flags & VEHICLE_SEAT_FLAG_CAN_CONTROL)
                     return SPELL_CAST_OK;
 
@@ -2563,28 +2563,28 @@ class spell_gen_vehicle_scaling_aura: public AuraScript
 
     void CalculateAmount(AuraEffect const* /*aurEff*/, int32& amount, bool& /*canBeRecalculated*/)
     {
-        Unit* caster = GetCaster();
-        float factor;
-        uint16 baseItemLevel;
+        Player* player = GetCaster()->ToPlayer();
 
         /// @todo Reserach coeffs for different vehicles
         switch (GetId())
         {
             case SPELL_GEAR_SCALING:
-                factor = 1.0f;
-                baseItemLevel = 205;
+            {
+                float avgILvl = player->GetAverageItemLevel();
+                if (avgILvl < 205.0f)
+                    return;
+
+                amount = static_cast<int32>(avgILvl - 205.0f);
                 break;
+            }
             default:
-                factor = 1.0f;
-                baseItemLevel = 170;
+            {
+                float totalILvl = player->GetTotalItemLevel();
+                float result = (totalILvl - 2500.0f) / 5.0f / 100.0f;
+                amount = static_cast<int32>(std::max(0.1f, result));
                 break;
+            }
         }
-
-        float avgILvl = caster->ToPlayer()->GetAverageItemLevel();
-        if (avgILvl < baseItemLevel)
-            return;                     /// @todo Research possibility of scaling down
-
-        amount = uint16((avgILvl - baseItemLevel) * factor);
     }
 
     void Register() override
@@ -6152,6 +6152,33 @@ class spell_gen_filter_party_level_80 : public SpellScript
     }
 };
 
+// 28819 Submerge Visual
+class spell_gen_submerge_visual : public AuraScript
+{
+    PrepareAuraScript(spell_gen_submerge_visual);
+
+    bool Load() override
+    {
+        return GetUnitOwner()->IsCreature();
+    }
+
+    void HandleEffectApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetUnitOwner()->SetStandState(UNIT_STAND_STATE_SUBMERGED);
+    }
+
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetUnitOwner()->SetStandState(UNIT_STAND_STATE_STAND);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_gen_submerge_visual::HandleEffectApply, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_gen_submerge_visual::HandleEffectRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 void AddSC_generic_spell_scripts()
 {
     RegisterSpellScript(spell_silithyst);
@@ -6340,4 +6367,5 @@ void AddSC_generic_spell_scripts()
     RegisterSpellScript(spell_gen_mirrored_soul);
     RegisterSpellScript(spell_gen_black_bow_of_the_betrayer);
     RegisterSpellScript(spell_gen_filter_party_level_80);
+    RegisterSpellScript(spell_gen_submerge_visual);
 }
