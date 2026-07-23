@@ -24,8 +24,10 @@ void WorldPackets::Combat::SetSheathed::Read()
 
 WorldPacket const* WorldPackets::Combat::SAttackStop::Write()
 {
-    _worldPacket << Attacker.WriteAsPacked();
-    _worldPacket << Victim.WriteAsPacked();
+    // Packed in place because ObjectGuid::WriteAsPacked() returns a PackedGuid by value, and each one
+    // heap-allocates its buffer. Use it again once TC's non-owning PackedGuidWriter is ported.
+    _worldPacket.appendPackGUID(Attacker.GetRawValue());
+    _worldPacket.appendPackGUID(Victim.GetRawValue());
     _worldPacket << uint32(NowDead);
 
     return &_worldPacket;
