@@ -718,7 +718,7 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket& recvData)
 
     constexpr uint32 readyEmote = 126;
 
-    // Handle confirmation redirect when the player types "/read" after the new node becomes available for redirection.
+    // Handle confirmation redirect when the player types "/ready" after the new node becomes available for redirection.
     if (text_emote == readyEmote && GetPlayer()->GetMap()->IsPlayerRedirectKickTimerActive())
     {
         HandleTC9PrepareForRedirect(recvData);
