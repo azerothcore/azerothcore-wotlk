@@ -168,12 +168,17 @@ uint32 MotionTransport::HandleFirstDepartureSync(uint32 diff)
         {
             if (Player* player = i->GetSource())
             {
+                // Same phase filter as Map::SendInitTransports: players outside
+                // the transport's phase must not get a create-block for it.
+                if (!player->InSamePhase(this))
+                    continue;
+
                 UpdateData transData;
                 this->BuildCreateUpdateBlockForPlayer(&transData, player);
 
                 WorldPacket packet;
                 transData.BuildPacket(packet);
-                player->GetSession()->SendPacket(&packet);
+                player->SendDirectMessage(&packet);
             }
         }
     }
