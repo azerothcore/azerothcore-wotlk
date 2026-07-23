@@ -49,6 +49,8 @@ void ToCloud9GroupHooks::OnGroupCreated(EventObjectGroup *group)
         g->AddMemberWithGuid(ObjectGuid(group->members[i]));
 
     sGroupMgr->AddGroup(g);
+    // Mark the service-assigned id used so a locally generated group can't collide with it.
+    sGroupMgr->RegisterGroupId(g->GetGUID().GetCounter());
 }
 
 void ToCloud9GroupHooks::OnGroupDisbanded(uint32 group)
