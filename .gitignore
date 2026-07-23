@@ -118,3 +118,4 @@ __pycache__/
 #  !modules/yourmodule
 #
 # ==================
+/data/sql/updates/pending_db_world/rev_26394_midsummer_despawn_fix.sql
