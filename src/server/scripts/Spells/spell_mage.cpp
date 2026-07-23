@@ -1637,11 +1637,23 @@ public:
     PrepareSpellScript(spell_mage_conjure_refreshment_table);
 
     // dest defaults to the caster's live facing; snap it to the portal so the table
-    // lands on it with the orientation the ritual was originally cast at.
+    // lands on it with the orientation the ritual was originally cast at. Filter by
+    // owner GUID (set in Spell::EffectTransmitted) so a same-rank portal from another
+    // caster nearby doesn't get picked instead of this caster's own.
     void SetDest(SpellDestination& dest)
     {
-        if (GameObject* portal = GetCaster()->FindNearestGameObject(_portalEntry, 20.0f))
-            dest.Relocate(*portal);
+        Unit* caster = GetCaster();
+
+        std::list<GameObject*> portals;
+        caster->GetGameObjectListWithEntryInGrid(portals, _portalEntry, 20.0f);
+        for (GameObject* portal : portals)
+        {
+            if (portal->GetOwnerGUID() == caster->GetGUID())
+            {
+                dest.Relocate(*portal);
+                break;
+            }
+        }
     }
 
     void Register() override
