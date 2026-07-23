@@ -6,10 +6,10 @@
 #include "DetourCommon.h"
 #include "Geometry.h"
 
-float dtQueryFilterExt::getCost(const float* pa, const float* pb,
-                const dtPolyRef /*prevRef*/, const dtMeshTile* /*prevTile*/, const dtPoly* /*prevPoly*/,
-                const dtPolyRef /*curRef*/, const dtMeshTile* /*curTile*/, const dtPoly* curPoly,
-                const dtPolyRef /*nextRef*/, const dtMeshTile* /*nextTile*/, const dtPoly* /*nextPoly*/) const
+float dtQueryFilterExt::getCost(float const* pa, float const* pb,
+                const dtPolyRef /*prevRef*/, dtMeshTile const* /*prevTile*/, dtPoly const* /*prevPoly*/,
+                const dtPolyRef /*curRef*/, dtMeshTile const* /*curTile*/, dtPoly const* curPoly,
+                const dtPolyRef /*nextRef*/, dtMeshTile const* /*nextTile*/, dtPoly const* /*nextPoly*/) const
 {
     float startX = pa[2], startY = pa[0], startZ = pa[1];
     float destX = pb[2], destY = pb[0], destZ = pb[1];

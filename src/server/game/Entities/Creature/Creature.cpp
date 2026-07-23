@@ -264,7 +264,7 @@ Creature::Creature(): Unit(), MovableMapObject(), m_groupLootTimer(0), lootingGr
     m_spawnId(0), m_equipmentId(0), m_originalEquipmentId(0), m_alreadyCallForHelp(false), m_AlreadyCallAssistance(false),
     m_AlreadySearchedAssistance(false), m_regenHealth(true), m_regenPower(true), m_AI_locked(false), m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL), m_originalEntry(0), _gossipMenuId(0), m_moveInLineOfSightDisabled(false), m_moveInLineOfSightStrictlyDisabled(false),
     m_homePosition(), m_transportHomePosition(), m_creatureInfo(nullptr), m_creatureData(nullptr), m_detectionDistance(20.0f),_sparringPct(0.0f), m_waypointID(0), m_path_id(0), m_formation(nullptr), m_lastLeashExtensionTime(nullptr),
-    _isMissingSwimmingFlagOutOfCombat(false), m_assistanceTimer(0), _playerDamageReq(0), _damagedByPlayer(false), _isCombatMovementAllowed(true)
+    _isMissingSwimmingFlagOutOfCombat(false), m_assistanceTimer(0), _playerDamageReq(0), _damagedByPlayer(false), _highestPlayerAttackerLevel(0), _isCombatMovementAllowed(true)
 {
     m_regenTimer = CREATURE_REGEN_INTERVAL;
     m_valuesCount = UNIT_END;
@@ -474,7 +474,7 @@ void Creature::RemoveCorpse(bool setSpawnTime, bool skipVisibility)
 /**
  * change the entry of creature until respawn
  */
-bool Creature::InitEntry(uint32 Entry, const CreatureData* data)
+bool Creature::InitEntry(uint32 Entry, CreatureData const* data)
 {
     CreatureTemplate const* normalInfo = sObjectMgr->GetCreatureTemplate(Entry);
     if (!normalInfo)
@@ -578,7 +578,7 @@ bool Creature::InitEntry(uint32 Entry, const CreatureData* data)
     return true;
 }
 
-bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changelevel, bool updateAI)
+bool Creature::UpdateEntry(uint32 Entry, CreatureData const* data, bool changelevel, bool updateAI)
 {
     if (!InitEntry(Entry, data))
         return false;
@@ -750,7 +750,7 @@ void Creature::Update(uint32 diff)
                 {
                     Group* group = sGroupMgr->GetGroupByGUID(lootingGroupLowGUID);
                     if (group)
-                        group->EndRoll(&loot, GetMap());
+                        group->EndRoll(&loot);
                     m_groupLootTimer = 0;
                     lootingGroupLowGUID = 0;
                 }
@@ -1148,7 +1148,7 @@ void Creature::Motion_Initialize()
         GetMotionMaster()->Initialize();
 }
 
-bool Creature::Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 vehId, float x, float y, float z, float ang, const CreatureData* data)
+bool Creature::Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 vehId, float x, float y, float z, float ang, CreatureData const* data)
 {
     ASSERT(map);
     SetMap(map);
@@ -1612,7 +1612,7 @@ float Creature::GetSpellDamageMod(int32 Rank)
     }
 }
 
-bool Creature::CreateFromProto(ObjectGuid::LowType guidlow, uint32 Entry, uint32 vehId, const CreatureData* data)
+bool Creature::CreateFromProto(ObjectGuid::LowType guidlow, uint32 Entry, uint32 vehId, CreatureData const* data)
 {
     SetZoneScript();
     if (GetZoneScript() && data)
@@ -1923,6 +1923,11 @@ bool Creature::CanStartAttack(Unit const* who, bool force) const
     if (!force)
     {
         if (!_IsTargetAcceptable(who))
+            return false;
+
+        // Totems never pull proximity aggro; they are only attacked in response
+        // to threat they generate themselves (e.g. Searing Totem)
+        if (who->IsTotem())
             return false;
 
         if (IsNeutralToAll() || !IsWithinDistInMap(who, GetAggroRange(who) + m_CombatDistance, true, false, false))
@@ -2874,6 +2879,13 @@ void Creature::AtEngage(Unit* target)
         UpdateSpeed(MOVE_FLIGHT, true);
     }
 
+    // Notify controlled creatures (guardians/pets) so they assist when
+    // the owner enters combat via assist/aggro chain, not only via damage.
+    for (Unit* controlled : m_Controlled)
+        if (Creature* cControlled = controlled->ToCreature())
+            if (CreatureAI* controlledAI = cControlled->AI())
+                controlledAI->OwnerAttackedBy(target);
+
     MovementGeneratorType const movetype = GetMotionMaster()->GetCurrentMovementGeneratorType();
     if (movetype == WAYPOINT_MOTION_TYPE || movetype == ESCORT_MOTION_TYPE || (IsAIEnabled && AI()->IsEscorted()))
     {
@@ -3805,6 +3817,21 @@ void Creature::ClearTextRepeatGroup(uint8 textGroup)
         groupItr->second.clear();
 }
 
+bool Creature::IsTextOnCooldown(uint8 textGroup) const
+{
+    auto itr = m_textCooldowns.find(textGroup);
+    if (itr == m_textCooldowns.end())
+        return false;
+
+    return GameTime::GetGameTime().count() < itr->second;
+}
+
+void Creature::SetTextCooldown(uint8 textGroup, uint32 cooldownMs)
+{
+    m_textCooldowns[textGroup] =
+        GameTime::GetGameTime().count() + ((cooldownMs + 999) / 1000);
+}
+
 void Creature::SetRespawnTime(uint32 respawn)
 {
     m_respawnTime = respawn ? GameTime::GetGameTime().count() + respawn : 0;
@@ -3836,7 +3863,7 @@ bool Creature::IsDamageEnoughForLootingAndReward() const
     return m_creatureInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_NO_PLAYER_DAMAGE_REQ) || (_playerDamageReq == 0 && _damagedByPlayer);
 }
 
-void Creature::LowerPlayerDamageReq(uint32 unDamage, bool damagedByPlayer /*= true*/)
+void Creature::LowerPlayerDamageReq(uint32 unDamage, bool damagedByPlayer /*= true*/, uint8 attackerLevel /*= 0*/)
 {
     if (_playerDamageReq)
         _playerDamageReq > unDamage ? _playerDamageReq -= unDamage : _playerDamageReq = 0;
@@ -3845,12 +3872,16 @@ void Creature::LowerPlayerDamageReq(uint32 unDamage, bool damagedByPlayer /*= tr
     {
         _damagedByPlayer = damagedByPlayer;
     }
+
+    if (attackerLevel > _highestPlayerAttackerLevel)
+        _highestPlayerAttackerLevel = attackerLevel;
 }
 
 void Creature::ResetPlayerDamageReq()
 {
     _playerDamageReq = GetHealth() / 2;
     _damagedByPlayer = false;
+    _highestPlayerAttackerLevel = 0;
 }
 
 uint32 Creature::GetPlayerDamageReq() const

@@ -8,14 +8,21 @@ on:
       - opened
       - reopened
       - synchronize
+    # A PR that only touches data/ (SQL) leaves the C++ untouched, so there is
+    # nothing to compile. Dashboard CI runs on every PR unfiltered and already
+    # imports the SQL and starts a real worldserver, so coverage is unaffected.
+    # Pushes to master are not filtered and always build.
+    paths-ignore:
+      - 'data/**'
 
 concurrency:
   # One concurrency group per workflow + ref.
   #
   # - PRs use `refs/pull/<PR_NUMBER>/merge`, so new commits cancel older
   #   in-progress runs for the same PR.
-  # - When a PR is merged, a push to the target branch starts a new group,
-  #   canceling any still-running PR CI.
+  # - A merge does NOT cancel the PR's own runs: this group is keyed on
+  #   refs/pull/<N>/merge and the master push on refs/heads/master, so they
+  #   never share a group. See the cancel-pr-runs-on-close workflow.
   # - Branch pushes are isolated by ref.
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -30,19 +37,19 @@ jobs:
       fail-fast: true
       matrix:
         include:
-          - os: ubuntu-22.04
-            compiler:
-              CC: clang-15
-              CXX: clang++-15
           - os: ubuntu-24.04
             compiler:
               CC: clang-18
               CXX: clang++-18
+          - os: ubuntu-26.04
+            compiler:
+              CC: clang-20
+              CXX: clang++-20
     runs-on: ${{ matrix.os }}
     name: ${{ matrix.os }}-${{ matrix.compiler.CC }}-pch
     if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/linux-build
         with:
           CC: ${{ matrix.compiler.CC }}

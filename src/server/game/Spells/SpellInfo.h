@@ -516,7 +516,7 @@ public:
     bool CheckTargetCreatureType(Unit const* target) const;
 
     bool IsAuraEffectEqual(SpellInfo const* otherSpellInfo) const;
-    bool ValidateAttribute6SpellDamageMods(Unit const* caster, const AuraEffect* auraEffect, bool isDot) const;
+    bool ValidateAttribute6SpellDamageMods(Unit const* caster, AuraEffect const* auraEffect, bool isDot) const;
 
     SpellSchoolMask GetSchoolMask() const;
     uint64 GetAllEffectsMechanicMask() const;

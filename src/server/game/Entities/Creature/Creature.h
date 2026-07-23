@@ -61,7 +61,7 @@ public:
 
     [[nodiscard]] bool isVendorWithIconSpeak() const;
 
-    bool Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 vehId, float x, float y, float z, float ang, const CreatureData* data = nullptr);
+    bool Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 vehId, float x, float y, float z, float ang, CreatureData const* data = nullptr);
     bool LoadCreaturesAddon(bool reload = false);
     void SelectLevel(bool changelevel = true);
     void LoadEquipment(int8 id = 1, bool force = false);
@@ -175,7 +175,7 @@ public:
 
     void UpdateMovementFlags();
     uint32 GetRandomId(uint32 id1, uint32 id2, uint32 id3);
-    bool UpdateEntry(uint32 entry, const CreatureData* data = nullptr, bool changelevel = true, bool updateAI = false);
+    bool UpdateEntry(uint32 entry, CreatureData const* data = nullptr, bool changelevel = true, bool updateAI = false);
     bool UpdateEntry(uint32 entry, bool updateAI) { return UpdateEntry(entry, nullptr, true, updateAI); }
     bool UpdateStats(Stats stat) override;
     bool UpdateAllStats() override;
@@ -342,15 +342,15 @@ public:
     [[nodiscard]] bool IsNotReachableAndNeedRegen() const;
 
     void SetPosition(float x, float y, float z, float o);
-    void SetPosition(const Position& pos) { SetPosition(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation()); }
+    void SetPosition(Position const& pos) { SetPosition(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation()); }
 
     void SetHomePosition(float x, float y, float z, float o) { m_homePosition.Relocate(x, y, z, o); }
-    void SetHomePosition(const Position& pos) { m_homePosition.Relocate(pos); }
+    void SetHomePosition(Position const& pos) { m_homePosition.Relocate(pos); }
     void GetHomePosition(float& x, float& y, float& z, float& ori) const { m_homePosition.GetPosition(x, y, z, ori); }
     [[nodiscard]] Position const& GetHomePosition() const { return m_homePosition; }
 
     void SetTransportHomePosition(float x, float y, float z, float o) { m_transportHomePosition.Relocate(x, y, z, o); }
-    void SetTransportHomePosition(const Position& pos) { m_transportHomePosition.Relocate(pos); }
+    void SetTransportHomePosition(Position const& pos) { m_transportHomePosition.Relocate(pos); }
     void GetTransportHomePosition(float& x, float& y, float& z, float& ori) const { m_transportHomePosition.GetPosition(x, y, z, ori); }
     [[nodiscard]] Position const& GetTransportHomePosition() const { return m_transportHomePosition; }
 
@@ -380,9 +380,10 @@ public:
     void SetLootRewardDisabled(bool disable) { DisableLootReward = disable; }
     [[nodiscard]] bool IsLootRewardDisabled() const { return DisableLootReward; }
     [[nodiscard]] bool IsDamageEnoughForLootingAndReward() const;
-    void LowerPlayerDamageReq(uint32 unDamage, bool damagedByPlayer = true);
+    void LowerPlayerDamageReq(uint32 unDamage, bool damagedByPlayer = true, uint8 attackerLevel = 0);
     void ResetPlayerDamageReq();
     [[nodiscard]] uint32 GetPlayerDamageReq() const;
+    [[nodiscard]] uint8 GetHighestPlayerAttackerLevel() const { return _highestPlayerAttackerLevel; }
 
     [[nodiscard]] uint32 GetOriginalEntry() const { return m_originalEntry; }
     void SetOriginalEntry(uint32 entry) { m_originalEntry = entry; }
@@ -409,6 +410,9 @@ public:
     CreatureTextRepeatIds const& GetTextRepeatGroup(uint8 textGroup);
     void SetTextRepeatId(uint8 textGroup, uint8 id);
     void ClearTextRepeatGroup(uint8 textGroup);
+
+    bool IsTextOnCooldown(uint8 textGroup) const;
+    void SetTextCooldown(uint8 textGroup, uint32 cooldownMs);
 
     bool IsFreeToMove();
     static constexpr uint32 MOVE_CIRCLE_CHECK_INTERVAL = 3000;
@@ -456,8 +460,8 @@ public:
     bool IsUpdateNeeded() override;
 
 protected:
-    bool CreateFromProto(ObjectGuid::LowType guidlow, uint32 Entry, uint32 vehId, const CreatureData* data = nullptr);
-    bool InitEntry(uint32 entry, const CreatureData* data = nullptr);
+    bool CreateFromProto(ObjectGuid::LowType guidlow, uint32 Entry, uint32 vehId, CreatureData const* data = nullptr);
+    bool InitEntry(uint32 entry, CreatureData const* data = nullptr);
 
     // vendor items
     VendorItemCounts m_vendorItemCounts;
@@ -547,6 +551,7 @@ private:
     ObjectGuid _spellFocusTarget; ///> Saved target during spell focus for restoration
 
     CreatureTextRepeatGroup m_textRepeat;
+    std::unordered_map<uint8, uint32> m_textCooldowns; // groupID -> expiry time (s)
 
     bool _isMissingSwimmingFlagOutOfCombat;
 
@@ -554,6 +559,7 @@ private:
 
     uint32 _playerDamageReq;
     bool _damagedByPlayer;
+    uint8 _highestPlayerAttackerLevel;
     bool _isCombatMovementAllowed;
 };
 

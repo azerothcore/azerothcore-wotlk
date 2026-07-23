@@ -40,6 +40,14 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket& recvData)
 
     recvData >> lootSlot;
 
+    // full CAIS restriction blocks item pickup from every loot source (GO/gather/item/corpse),
+    // not just the creature-corpse window guarded in HandleLootOpcode
+    if (player->HasPlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME))
+    {
+        player->SendLootError(lguid, LOOT_ERROR_PLAY_TIME_EXCEEDED);
+        return;
+    }
+
     if (lguid.IsGameObject())
     {
         GameObject* go = player->GetMap()->GetGameObject(lguid);
@@ -179,6 +187,15 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
 
     if (loot)
     {
+        // the money is zeroed and dropped from storage below no matter who is paid, so a fully
+        // restricted looter would destroy it rather than receive it. Bail before that teardown;
+        // reachable for windows not opened through HandleLootOpcode, e.g. chests and lockboxes.
+        if (player->HasPlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME))
+        {
+            player->SendLootError(guid, LOOT_ERROR_PLAY_TIME_EXCEEDED);
+            return;
+        }
+
         sScriptMgr->OnPlayerBeforeLootMoney(player, loot);
         loot->NotifyMoneyRemoved();
         if (shareMoney && player->GetGroup())      //item, pickpocket and players can be looted only single player
@@ -200,27 +217,59 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recvData*/)
 
             for (std::vector<Player*>::const_iterator i = playersNear.begin(); i != playersNear.end(); ++i)
             {
-                (*i)->ModifyMoney(goldPerPlayer);
-                (*i)->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_MONEY, goldPerPlayer);
+                uint32 finalGold = goldPerPlayer;
+
+                if ((*i)->HasPlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME))
+                    continue;
+
+                if ((*i)->HasPlayerFlag(PLAYER_FLAGS_PARTIAL_PLAY_TIME))
+                {
+                    finalGold /= 2;
+
+                    // a halved share that rounds down to nothing is not worth announcing
+                    if (!finalGold)
+                        continue;
+                }
+
+                (*i)->ModifyMoney(finalGold);
+                (*i)->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_MONEY, finalGold);
 
                 WorldPacket data(SMSG_LOOT_MONEY_NOTIFY, 4 + 1);
-                data << uint32(goldPerPlayer);
+                data << uint32(finalGold);
                 data << uint8(playersNear.size() > 1 ? 0 : 1);     // Controls the text displayed in chat. 0 is "Your share is..." and 1 is "You loot..."
                 (*i)->SendDirectMessage(&data);
             }
         }
         else
         {
-            sScriptMgr->OnPlayerAfterCreatureLootMoney(player);
-            player->ModifyMoney(loot->gold);
-            player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_MONEY, loot->gold);
+            uint32 finalGold = loot->gold;
+            bool award = true; // full restriction already returned above
 
-            WorldPacket data(SMSG_LOOT_MONEY_NOTIFY, 4 + 1);
-            data << uint32(loot->gold);
-            data << uint8(1);   // "You loot..."
-            SendPacket(&data);
+            if (player->HasPlayerFlag(PLAYER_FLAGS_PARTIAL_PLAY_TIME))
+            {
+                finalGold /= 2;
+
+                // a halved amount that rounds down to nothing is not worth announcing
+                award = finalGold != 0;
+            }
+
+            // fire the hook regardless of the CAIS reduction, matching OnLootMoney below
+            sScriptMgr->OnPlayerAfterCreatureLootMoney(player);
+
+            if (award)
+            {
+                player->ModifyMoney(finalGold);
+                player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_LOOT_MONEY, finalGold);
+
+                WorldPacket data(SMSG_LOOT_MONEY_NOTIFY, 4 + 1);
+                data << uint32(finalGold);
+                data << uint8(1);   // "You loot..."
+                SendPacket(&data);
+            }
         }
 
+        // reports the amount that dropped, not the CAIS-reduced amount actually awarded;
+        // a script that grants money from this hook bypasses the play time restriction
         sScriptMgr->OnLootMoney(player, loot->gold);
 
         loot->gold = 0;
@@ -242,15 +291,23 @@ void WorldSession::HandleLootOpcode(WorldPacket& recvData)
     ObjectGuid guid;
     recvData >> guid;
 
+    Player* player = GetPlayer();
+
     // Check possible cheat
-    if (!GetPlayer()->IsAlive() || !guid.IsCreatureOrVehicle())
+    if (!player->IsAlive() || !guid.IsCreatureOrVehicle())
         return;
 
-    // interrupt cast
-    if (GetPlayer()->IsNonMeleeSpellCast(false))
-        GetPlayer()->InterruptNonMeleeSpells(false);
+    if (player->HasPlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME))
+    {
+        player->SendLootError(guid, LOOT_ERROR_PLAY_TIME_EXCEEDED);
+        return;
+    }
 
-    GetPlayer()->SendLoot(guid, LOOT_CORPSE);
+    // interrupt cast
+    if (player->IsNonMeleeSpellCast(false))
+        player->InterruptNonMeleeSpells(false);
+
+    player->SendLoot(guid, LOOT_CORPSE);
 }
 
 void WorldSession::HandleLootReleaseOpcode(WorldPacket& recvData)
@@ -446,7 +503,7 @@ void WorldSession::HandleLootMasterGiveOpcode(WorldPacket& recvData)
         return;
     }
 
-    if (!_player->IsInRaidWith(target))
+    if (!_player->IsInRaidWith(target) || target->HasPlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME))
     {
         _player->SendLootError(lootguid, LOOT_ERROR_MASTER_OTHER);
         //LOG_DEBUG("network", "MasterLootItem: Player {} tried to give an item to ineligible player {} !", GetPlayer()->GetName(), target->GetName());

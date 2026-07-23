@@ -39,7 +39,7 @@ enum RemoveMethod : uint8;
 class GroupScript : public ScriptObject
 {
 protected:
-    GroupScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
+    GroupScript(char const* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     [[nodiscard]] bool IsDatabaseBound() const override { return false; }
@@ -51,7 +51,7 @@ public:
     virtual void OnInviteMember(Group* /*group*/, ObjectGuid /*guid*/) { }
 
     // Called when a member is removed from a group.
-    virtual void OnRemoveMember(Group* /*group*/, ObjectGuid /*guid*/, RemoveMethod /*method*/, ObjectGuid /*kicker*/, const char* /*reason*/) { }
+    virtual void OnRemoveMember(Group* /*group*/, ObjectGuid /*guid*/, RemoveMethod /*method*/, ObjectGuid /*kicker*/, char const* /*reason*/) { }
 
     // Called when the leader of a group is changed.
     virtual void OnChangeLeader(Group* /*group*/, ObjectGuid /*newLeaderGuid*/, ObjectGuid /*oldLeaderGuid*/) { }

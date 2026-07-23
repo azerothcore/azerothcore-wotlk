@@ -45,7 +45,7 @@ namespace lfg
         // Queue
         void SetRoles(uint8 roles);
         void SetComment(std::string const& comment);
-        void SetSelectedDungeons(const LfgDungeonSet& dungeons);
+        void SetSelectedDungeons(LfgDungeonSet const& dungeons);
 
         // General
         [[nodiscard]] LfgState GetState() const;

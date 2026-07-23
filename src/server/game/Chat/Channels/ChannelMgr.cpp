@@ -205,7 +205,7 @@ void ChannelMgr::LoadChannelRights()
     LOG_INFO("server.loading", " ");
 }
 
-const ChannelRights& ChannelMgr::GetChannelRightsFor(const std::string& name)
+ChannelRights const& ChannelMgr::GetChannelRightsFor(std::string const& name)
 {
     std::string nameStr = name;
     std::transform(nameStr.begin(), nameStr.end(), nameStr.begin(), ::tolower);
@@ -215,7 +215,7 @@ const ChannelRights& ChannelMgr::GetChannelRightsFor(const std::string& name)
     return channelRightsEmpty;
 }
 
-void ChannelMgr::SetChannelRightsFor(const std::string& name, const uint32& flags, const uint32& speakDelay, const std::string& joinmessage, const std::string& speakmessage, const std::set<uint32>& moderators)
+void ChannelMgr::SetChannelRightsFor(std::string const& name, uint32 const& flags, uint32 const& speakDelay, std::string const& joinmessage, std::string const& speakmessage, std::set<uint32> const& moderators)
 {
     std::string nameStr = name;
     std::transform(nameStr.begin(), nameStr.end(), nameStr.begin(), ::tolower);
