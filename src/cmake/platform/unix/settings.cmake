@@ -12,10 +12,8 @@
 
 # Package overloads - Linux
 if(CMAKE_SYSTEM_NAME MATCHES "Linux")
-  if (NOT NOJEM)
-    set(JEMALLOC_LIBRARY "jemalloc")
-    message(STATUS "UNIX: Using jemalloc")
-  endif()
+  set(MIMALLOC_LIBRARY "mimalloc")
+  message(STATUS "UNIX: Using mimalloc")
 endif()
 
 # set default configuration directory
