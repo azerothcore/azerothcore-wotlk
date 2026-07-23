@@ -56,6 +56,7 @@ enum LeviathanSpells
     // Shutdown spells
     SPELL_SYSTEMS_SHUTDOWN              = 62475,
     SPELL_OVERLOAD_CIRCUIT              = 62399,
+    SPELL_START_THE_ENGINE              = 62472,
 
     // hard mode
     SPELL_TOWER_OF_STORMS               = 65076,
@@ -84,6 +85,10 @@ enum LeviathanSpells
     SPELL_LIQUID_PYRITE                 = 62494,
     SPELL_DUSTY_EXPLOSION               = 63360,
     SPELL_DUST_CLOUD_IMPACT             = 54740,
+
+    // Hookshot
+    SPELL_HOOKSHOT_AURA                 = 62336,
+    SPELL_HOOKSHOT                      = 62323,
 };
 
 enum GosNpcs
@@ -115,12 +120,12 @@ enum Events
     EVENT_MISSILE                       = 2,
     EVENT_VENT                          = 3,
     EVENT_SPEED                         = 4,
-    EVENT_REINSTALL                     = 5,
     EVENT_HODIRS_FURY                   = 6,
     EVENT_FREYA                         = 7,
     EVENT_MIMIRONS_INFERNO              = 8,
     EVENT_THORIMS_HAMMER                = 9,
     EVENT_SOUND_BEGINNING               = 10,
+    EVENT_EJECT_PLAYERS                 = 11,
 };
 
 enum Texts
@@ -145,6 +150,7 @@ enum Texts
     FLAME_LEVIATHAN_EMOTE_NATURE        = 17,
     FLAME_LEVIATHAN_EMOTE_STORM         = 18,
     FLAME_LEVIATHAN_EMOTE_REACTIVATE    = 19,
+    FLAME_LEVIATHAN_EMOTE_OVERLOAD_START = 20,
 
     // NPC_BRANN_RADIO
     BRANN_RADIO_SAY_FL_START_0          = 0,
@@ -179,7 +185,6 @@ enum Misc
     ACTION_START_BRANN_EVENT            = 3,
     ACTION_DESPAWN_ADDS                 = 4,
     ACTION_DELAY_CANNON                 = 5,
-    ACTION_DESTROYED_TURRET             = 6,
 };
 
 const Position homePos = {322.39f, -14.5f, 409.8f, 3.14f};
@@ -197,7 +202,7 @@ struct boss_flame_leviathan : public BossAI
     uint32 _speakTimer;
     uint8 _towersCount;
     bool _shutdown;
-    uint32 _destroyedTurretCount;
+    uint8 _overloadCircuitCount;
 
     // Custom
     void BindPlayers();
@@ -284,7 +289,7 @@ struct boss_flame_leviathan : public BossAI
         _startTimer = 1;
         _speakTimer = 0;
         _towersCount = 0;
-        _destroyedTurretCount = 0;
+        _overloadCircuitCount = 0;
 
         if (instance->GetBossState(BOSS_LEVIATHAN) != SPECIAL)
         {
@@ -402,13 +407,6 @@ struct boss_flame_leviathan : public BossAI
                 else
                     Talk(FLAME_LEVIATHAN_SAY_TOWER_NONE);
                 return;
-            case EVENT_REINSTALL:
-                for (uint8 i = RAID_MODE(0, 2); i < 4; ++i)
-                    if (Unit* seat = vehicle->GetPassenger(i))
-                        if (seat->IsCreature())
-                            seat->ToCreature()->AI()->EnterEvadeMode();
-                Talk(FLAME_LEVIATHAN_EMOTE_REACTIVATE);
-                return;
             case EVENT_THORIMS_HAMMER:
                 SummonTowerHelpers(TOWER_OF_STORMS);
                 events.Repeat(1min, 2min);
@@ -430,6 +428,13 @@ struct boss_flame_leviathan : public BossAI
                 Talk(FLAME_LEVIATHAN_EMOTE_FROST);
                 Talk(FLAME_LEVIATHAN_SAY_TOWER_FROST);
                 return;
+            case EVENT_EJECT_PLAYERS:
+                for (int8 i = 0; i < 4; ++i)
+                    if (Unit* seat = vehicle->GetPassenger(i))
+                        if (Vehicle* seatVehicle = seat->GetVehicleKit())
+                            if (Unit* player = seatVehicle->GetPassenger(SEAT_PLAYER))
+                                player->ExitVehicle();
+                return;
         }
 
         if (me->isAttackReady() && !me->HasUnitState(UNIT_STATE_STUNNED))
@@ -438,20 +443,6 @@ struct boss_flame_leviathan : public BossAI
             {
                 me->CastSpell(me->GetVictim(), SPELL_BATTERING_RAM, false);
                 me->resetAttackTimer();
-            }
-        }
-    }
-
-    void DoAction(int32 action) override
-    {
-        if (action == ACTION_DESTROYED_TURRET)
-        {
-            ++_destroyedTurretCount;
-
-            if (_destroyedTurretCount == RAID_MODE<uint32>(2, 4))
-            {
-                _destroyedTurretCount = 0;
-                me->CastSpell(me, SPELL_SYSTEMS_SHUTDOWN, true);
             }
         }
     }
@@ -574,16 +565,37 @@ void boss_flame_leviathan::ScheduleEvents()
 
 void boss_flame_leviathan::SpellHit(Unit*  /*caster*/, SpellInfo const* spellInfo)
 {
-    if (spellInfo->Id == SPELL_SYSTEMS_SHUTDOWN)
+    if (spellInfo->Id == SPELL_OVERLOAD_CIRCUIT)
+    {
+        ++_overloadCircuitCount;
+        if (_overloadCircuitCount == 1)
+            Talk(FLAME_LEVIATHAN_EMOTE_OVERLOAD_START);
+
+        uint8 const threshold = me->GetMap()->Is25ManRaid() ? 4 : 2;
+        if (_overloadCircuitCount >= threshold)
+        {
+            _overloadCircuitCount = 0;
+            me->CastSpell(me, SPELL_SYSTEMS_SHUTDOWN, true);
+        }
+    }
+    else if (spellInfo->Id == SPELL_SYSTEMS_SHUTDOWN)
     {
         _shutdown = true; // ACHIEVEMENT
 
-        Talk(FLAME_LEVIATHAN_EMOTE_OVERLOAD);
-        Talk(FLAME_LEVIATHAN_EMOTE_REPAIR);
         Talk(FLAME_LEVIATHAN_SAY_OVERLOAD);
+        Talk(FLAME_LEVIATHAN_EMOTE_OVERLOAD);
 
-        events.DelayEvents(21ms);
-        events.ScheduleEvent(EVENT_REINSTALL, 20ms);
+        events.ScheduleEvent(EVENT_EJECT_PLAYERS, 3s);
+    }
+    else if (spellInfo->Id == SPELL_START_THE_ENGINE)
+    {
+        // Respawn turrets
+        for (uint8 i = 0; i < 4; ++i)
+            if (Unit* seat = vehicle->GetPassenger(i))
+                if (seat->IsCreature())
+                    seat->ToCreature()->AI()->EnterEvadeMode();
+
+        Talk(FLAME_LEVIATHAN_EMOTE_REACTIVATE);
     }
     else if (spellInfo->Id == 62522 /*SPELL_ELECTROSHOCK*/)
         me->InterruptNonMeleeSpells(false);
@@ -667,7 +679,11 @@ struct boss_flame_leviathan_seat : public VehicleAI
     }
 
     Vehicle* vehicle;
-    uint32 _despawnTimer;
+
+    // Despawn 2 seats in 10-man.
+    static constexpr uint32 DESPAWN_DELAY_10MAN = 2000;
+    bool _pending10ManDespawn;
+    uint32 _despawnCheckTimer;
 
     void EnterEvadeMode(EvadeReason /*why*/) override
     {
@@ -676,19 +692,20 @@ struct boss_flame_leviathan_seat : public VehicleAI
 
     void Reset() override
     {
-        _despawnTimer = !me->GetMap()->Is25ManRaid();
+        _pending10ManDespawn = !me->GetMap()->Is25ManRaid();
+        _despawnCheckTimer = 0;
     }
 
     void UpdateAI(uint32 diff) override
     {
-        if (_despawnTimer)
+        if (_pending10ManDespawn)
         {
-            _despawnTimer += diff;
-            if (_despawnTimer >= 2000)
+            _despawnCheckTimer += diff;
+            if (_despawnCheckTimer >= DESPAWN_DELAY_10MAN)
             {
-                _despawnTimer = 0;
-                if (Vehicle* veh = me->GetVehicle())
-                    if (veh->GetPassenger(0) == me || veh->GetPassenger(1) == me)
+                _pending10ManDespawn = false;
+                if (Vehicle* parentVehicle = me->GetVehicle())
+                    if (parentVehicle->GetPassenger(0) == me || parentVehicle->GetPassenger(1) == me)
                         me->DespawnOrUnsummon(1ms);
             }
         }
@@ -713,6 +730,14 @@ struct boss_flame_leviathan_seat : public VehicleAI
             {
                 if (apply)
                 {
+                    who->RemoveAurasDueToSpell(SPELL_HOOKSHOT);
+                    who->RemoveAurasDueToSpell(SPELL_HOOKSHOT_AURA);
+                }
+                else
+                    who->CastSpell(who, SPELL_SMOKE_TRAIL, true);
+
+                if (apply)
+                {
                     turret->ReplaceAllUnitFlags(UNIT_FLAG_NONE);
                     turret->GetAI()->AttackStart(who);
                     if (Creature* leviathan = me->GetVehicleCreatureBase())
@@ -726,6 +751,14 @@ struct boss_flame_leviathan_seat : public VehicleAI
                         turret->ToCreature()->AI()->EnterEvadeMode();
                 }
             }
+            if (Unit* device = me->GetVehicleKit()->GetPassenger(SEAT_DEVICE))
+            {
+                if (apply)
+                    device->SetNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
+                else
+                    device->RemoveNpcFlag(UNIT_NPC_FLAG_SPELLCLICK);
+            }
+
         }
     }
 };
@@ -755,12 +788,9 @@ struct boss_flame_leviathan_defense_turret : public TurretAI
         if (Player* player = killer->ToPlayer())
             player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_GET_KILLING_BLOWS, 1, 0, me);
 
-        if (Vehicle* vehicle = me->GetVehicle())
-            if (Unit* device = vehicle->GetPassenger(SEAT_DEVICE))
-                device->ReplaceAllUnitFlags(UNIT_FLAG_NONE); // unselectable
-
-        if (Creature* leviathan = _instance->GetCreature(BOSS_LEVIATHAN))
-            leviathan->AI()->DoAction(ACTION_DESTROYED_TURRET);
+        if (Vehicle* seatVehicle = me->GetVehicle())
+            if (Unit* device = seatVehicle->GetPassenger(SEAT_DEVICE))
+                device->CastSpell(device, SPELL_OVERLOAD_CIRCUIT, true);
     }
 
     bool CanAIAttack(Unit const* who) const override
@@ -806,10 +836,7 @@ struct boss_flame_leviathan_overload_device : public NullCreatureAI
             me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
 
             if (Unit* player = me->GetVehicle()->GetPassenger(SEAT_PLAYER))
-            {
-                me->GetVehicleBase()->CastSpell(player, SPELL_SMOKE_TRAIL, true);
                 player->ExitVehicle();
-            }
         }
     }
 };
@@ -1245,7 +1272,7 @@ class spell_systems_shutdown_aura : public AuraScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_GATHERING_SPEED });
+        return ValidateSpellInfo({ SPELL_GATHERING_SPEED, SPELL_OVERLOAD_CIRCUIT, SPELL_START_THE_ENGINE });
     }
 
     void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -1256,6 +1283,7 @@ class spell_systems_shutdown_aura : public AuraScript
 
         owner->SetControlled(true, UNIT_STATE_STUNNED);
         owner->RemoveAurasDueToSpell(SPELL_GATHERING_SPEED);
+        owner->RemoveAurasDueToSpell(SPELL_OVERLOAD_CIRCUIT);
         if (Vehicle* vehicle = owner->GetVehicleKit())
             if (Unit* cannon = vehicle->GetPassenger(SEAT_CANNON))
                 cannon->GetAI()->DoAction(ACTION_DELAY_CANNON);
@@ -1268,6 +1296,7 @@ class spell_systems_shutdown_aura : public AuraScript
             return;
 
         owner->SetControlled(false, UNIT_STATE_STUNNED);
+        owner->CastSpell(owner, SPELL_START_THE_ENGINE, true);
     }
 
     void Register() override
@@ -1352,55 +1381,85 @@ class spell_vehicle_throw_passenger : public SpellScript
 {
     PrepareSpellScript(spell_vehicle_throw_passenger);
 
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_HOOKSHOT_AURA });
+    }
+
     void HandleScript()
     {
-        Spell* baseSpell = GetSpell();
-        SpellCastTargets targets = baseSpell->m_targets;
-        if (Vehicle* vehicle = GetCaster()->GetVehicleKit())
-            if (Unit* passenger = vehicle->GetPassenger(3))
+        Vehicle* vehicle = GetCaster()->GetVehicleKit();
+        Unit* passenger = vehicle ? vehicle->GetPassenger(3) : nullptr;
+        if (!vehicle || !passenger)
+            return;
+
+        // Find nearest unoccupied Flame Leviathan seat near trajectory destination
+        Position const* dst = GetExplTargetDest();
+        if (!dst)
+            return;
+
+        constexpr float SEARCH_RADIUS = 99.0f;
+
+        std::list<WorldObject*> targetList;
+        Acore::WorldObjectSpellAreaTargetCheck check(SEARCH_RADIUS, dst, GetCaster(), GetCaster(), GetSpellInfo(), TARGET_CHECK_DEFAULT, nullptr);
+        Acore::WorldObjectListSearcher searcher(GetCaster(), targetList, check);
+        Cell::VisitObjects(GetCaster(), searcher, SEARCH_RADIUS);
+
+        Unit* seatTarget = nullptr;
+        float minDist = SEARCH_RADIUS * SEARCH_RADIUS;
+
+        for (WorldObject* obj : targetList)
+        {
+            Unit* unit = obj->ToUnit();
+            if (!unit || unit->GetEntry() != NPC_SEAT) continue;
+
+            Vehicle* seat = unit->GetVehicleKit();
+            Unit* device = seat ? seat->GetPassenger(SEAT_DEVICE) : nullptr;
+            if (!seat || seat->GetPassenger(0) || !device || device->GetCurrentSpell(CURRENT_CHANNELED_SPELL)) continue;
+
+            float dist = unit->GetExactDistSq(dst);
+            if (dist < minDist)
             {
-                // use 99 because it is 3d search
-                std::list<WorldObject*> targetList;
-                Acore::WorldObjectSpellAreaTargetCheck check(99, GetExplTargetDest(), GetCaster(), GetCaster(), GetSpellInfo(), TARGET_CHECK_DEFAULT, nullptr);
-                Acore::WorldObjectListSearcher<Acore::WorldObjectSpellAreaTargetCheck> searcher(GetCaster(), targetList, check);
-                Cell::VisitObjects(GetCaster(), searcher, 99.0f);
-                float minDist = 99 * 99;
-                Unit* target = nullptr;
-                for (std::list<WorldObject*>::iterator itr = targetList.begin(); itr != targetList.end(); ++itr)
-                {
-                    if (Unit* unit = (*itr)->ToUnit())
-                        if (unit->GetEntry() == NPC_SEAT)
-                            if (Vehicle* seat = unit->GetVehicleKit())
-                                if (!seat->GetPassenger(0))
-                                    if (Unit* device = seat->GetPassenger(2))
-                                        if (!device->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
-                                        {
-                                            float dist = unit->GetExactDistSq(targets.GetDstPos());
-                                            if (dist < minDist)
-                                            {
-                                                minDist = dist;
-                                                target = unit;
-                                            }
-                                        }
-                }
-                if (target && target->IsWithinDist2d(targets.GetDstPos(), GetSpellInfo()->Effects[EFFECT_0].CalcRadius() * 2)) // now we use *2 because the location of the seat is not correct
-                {
-                    passenger->ExitVehicle();
-                    passenger->EnterVehicle(target, 0);
-                }
-                else
-                {
-                    passenger->ExitVehicle();
-                    float x, y, z;
-                    targets.GetDstPos()->GetPosition(x, y, z);
-                    passenger->GetMotionMaster()->MoveJump(x, y, z, targets.GetSpeedXY(), targets.GetSpeedZ());
-                }
+                minDist = dist;
+                seatTarget = unit;
             }
+        }
+
+        // Launch passenger toward destination
+        float x, y, z;
+        dst->GetPosition(x, y, z);
+        passenger->ExitVehicle();
+        passenger->GetMotionMaster()->MoveJump(x, y, z, GetSpell()->m_targets.GetSpeedXY(), GetSpell()->m_targets.GetSpeedZ());
+
+        if (seatTarget && seatTarget->IsWithinDist2d(dst, GetSpellInfo()->Effects[EFFECT_0].CalcRadius() * 2)) // now we use *2 because the location of the seat is not correct
+            passenger->CastCustomSpell(SPELL_HOOKSHOT_AURA, SPELLVALUE_AURA_DURATION, 5000, passenger, true);
     }
 
     void Register() override
     {
         AfterCast += SpellCastFn(spell_vehicle_throw_passenger::HandleScript);
+    }
+};
+
+// 62336 Hookshot Aura
+class spell_hookshot_aura : public AuraScript
+{
+    PrepareAuraScript(spell_hookshot_aura);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_HOOKSHOT });
+    }
+
+    void OnPeriodic(AuraEffect const* aurEff)
+    {
+        PreventDefaultAction();
+        GetUnitOwner()->CastSpell(GetUnitOwner(), GetSpellInfo()->Effects[aurEff->GetEffIndex()].TriggerSpell, true);
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_hookshot_aura::OnPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -1473,31 +1532,6 @@ class spell_vehicle_grab_pyrite : public SpellScript
     void Register() override
     {
         OnEffectHitTarget += SpellEffectFn(spell_vehicle_grab_pyrite::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
-    }
-};
-
-class spell_vehicle_circuit_overload_aura : public AuraScript
-{
-    PrepareAuraScript(spell_vehicle_circuit_overload_aura);
-
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo({ SPELL_SYSTEMS_SHUTDOWN });
-    }
-
-    void OnPeriodic(AuraEffect const*  /*aurEff*/)
-    {
-        if (Unit* target = GetTarget())
-            if (int(target->GetAppliedAuras().count(SPELL_OVERLOAD_CIRCUIT)) >= (target->GetMap()->Is25ManRaid() ? 4 : 2))
-            {
-                target->CastSpell(target, SPELL_SYSTEMS_SHUTDOWN, true);
-                target->RemoveAurasDueToSpell(SPELL_OVERLOAD_CIRCUIT);
-            }
-    }
-
-    void Register() override
-    {
-        OnEffectPeriodic += AuraEffectPeriodicFn(spell_vehicle_circuit_overload_aura::OnPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -1757,9 +1791,9 @@ void AddSC_boss_flame_leviathan()
     RegisterSpellScript(spell_systems_shutdown_aura);
     RegisterSpellScript(spell_pursue);
     RegisterSpellScript(spell_vehicle_throw_passenger);
+    RegisterSpellScript(spell_hookshot_aura);
     RegisterSpellScript(spell_tar_blaze_aura);
     RegisterSpellScript(spell_vehicle_grab_pyrite);
-    RegisterSpellScript(spell_vehicle_circuit_overload_aura);
     RegisterSpellScript(spell_orbital_supports_aura);
     RegisterSpellScript(spell_thorims_hammer);
     RegisterSpellScript(spell_transitus_shield_beam_aura);
