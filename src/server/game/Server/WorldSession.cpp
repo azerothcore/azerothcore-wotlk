@@ -1637,8 +1637,10 @@ void WorldSession::HandleTC9PrepareForRedirect(WorldPacket& /*recvData*/)
         if (!player)
             return;
 
-        _redirecting = true;
+        // Set only when the kick actually fires: a stale flag on an abandoned
+        // handoff would suppress the real logout's side effects later.
         player->m_Events.AddEventAtOffset([this](){
+            _redirecting = true;
             KickPlayer("HandlePrepareForRedirect client redirected");
         }, 100ms);
     });
