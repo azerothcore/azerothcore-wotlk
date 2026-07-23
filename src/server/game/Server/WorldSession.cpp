@@ -1621,11 +1621,11 @@ void WorldSession::HandleTC9PrepareForRedirect(WorldPacket& /*recvData*/)
 
         if (!success)
         {
-            LOG_ERROR("network", "Failed to save player, AccountId = %d", GetAccountId());
+            LOG_ERROR("network", "Failed to save player, AccountId = {}", GetAccountId());
             return;
         }
 
-        LOG_DEBUG("network", "Saved, AccountId = %d", GetAccountId());
+        LOG_DEBUG("network", "Saved, AccountId = {}", GetAccountId());
 
         Player* player = GetPlayer();
         if (!player)
