@@ -514,6 +514,10 @@ InstanceMapLoadRows InstanceSaveMgr::LoadInstanceSavesAndBindsForMapIDs(std::vec
 // m_instanceSaveById, playerBindStorage, m_resetExtendedTimeByMapDifficulty and MapMgr here.
 void InstanceSaveMgr::MergeWithNewInstanceSaves(InstanceMapLoadRows const& loadResult)
 {
+    // Same guard as LoadCharacterBinds: without it, an unbind cascading into
+    // DeleteInstanceSaveIfNeeded would delete the very DB rows being merged.
+    lock_instLists = true;
+
     for (InstanceMapLoadRows::InstanceRow const& row : loadResult.instances)
     {
         MapEntry const* entry = sMapStore.LookupEntry(row.mapId);
@@ -549,8 +553,17 @@ void InstanceSaveMgr::MergeWithNewInstanceSaves(InstanceMapLoadRows const& loadR
         InstanceSaveHashMap::iterator currentSave = m_instanceSaveById.find(row.instanceId);
         if (currentSave != m_instanceSaveById.end())
         {
-            currentSave->second->m_playerList.clear();
-            delete currentSave->second;
+            InstanceSave* oldSave = currentSave->second;
+
+            // Unbind every player still pointing at the stale save before it is
+            // freed, in-memory only: the DB rows were just refetched and are
+            // rebound below. Iterate a copy, PlayerUnbindInstance mutates the list.
+            GuidList players = oldSave->m_playerList;
+            for (ObjectGuid const& playerGuid : players)
+                PlayerUnbindInstance(playerGuid, oldSave->GetMapId(), oldSave->GetDifficulty(), false);
+
+            m_instanceSaveById.erase(currentSave);
+            delete oldSave;
         }
         m_instanceSaveById[row.instanceId] = save;
     }
@@ -592,6 +605,8 @@ void InstanceSaveMgr::MergeWithNewInstanceSaves(InstanceMapLoadRows const& loadR
         if (row.perm)
             save->SetCanReset(false);
     }
+
+    lock_instLists = false;
 }
 
 void InstanceSaveMgr::ScheduleReset(time_t time, InstResetEvent event)
