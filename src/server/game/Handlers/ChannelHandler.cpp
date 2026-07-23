@@ -19,6 +19,7 @@
 #include "ObjectMgr.h"                                      // for normalizePlayerName
 #include "Player.h"
 #include "Language.h"
+#include "TC9Sidecar.h"
 #include <cctype>
 
 void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
@@ -40,24 +41,21 @@ void WorldSession::HandleJoinChannel(WorldPacket& recvPacket)
         if (!zone || !GetPlayer()->CanJoinConstantChannelInZone(channel, zone))
             return;
 
-        if (ChatChannelsEntry const* channel = sChatChannelsStore.LookupEntry(channelId))
+        // Cluster mode rebuilds the localized channel name so nodes agree on it;
+        // stock servers keep the client-supplied name.
+        if (sToCloud9Sidecar->ClusterModeEnabled())
         {
             auto const locale = GetSessionDbcLocale();
             std::string const& zoneName = zone->area_name[locale];
-            char const* nameExt = nullptr;
-            if (channel->flags & CHANNEL_DBC_FLAG_CITY_ONLY)
-                nameExt = sObjectMgr->GetAcoreStringForDBCLocale(LANG_CHANNEL_CITY).c_str();
-            else
-                nameExt = zoneName.c_str();
+            std::string const cityName = sObjectMgr->GetAcoreStringForDBCLocale(LANG_CHANNEL_CITY);
+            char const* nameExt = (channel->flags & CHANNEL_DBC_FLAG_CITY_ONLY) ? cityName.c_str() : zoneName.c_str();
 
             std::array<char, 128> buffer{};
-
-            char const* pattern = channel->pattern[locale];
-
-            if (pattern)
+            if (char const* pattern = channel->pattern[locale])
+            {
                 std::snprintf(buffer.data(), buffer.size(), pattern, nameExt);
-
-            channelName= buffer.data();
+                channelName = buffer.data();
+            }
         }
     }
 
