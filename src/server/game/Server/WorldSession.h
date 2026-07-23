@@ -108,7 +108,6 @@ namespace WorldPackets
     namespace Combat
     {
         class SetSheathed;
-        class SAttackStop;
     }
 
     namespace Guild
