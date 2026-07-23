@@ -433,6 +433,20 @@ Guardian::Guardian(SummonPropertiesEntry const* properties, ObjectGuid owner) : 
 
 void Guardian::InitStats(uint32 duration)
 {
+    // Ebon Gargoyle's SummonPropertiesEntry isn't Category/Type == PET, so the constructor
+    // above never marks it controllable - force it here once the real entry is known, so
+    // /petattack and the rest of the pet command set work for it. Must run before
+    // Minion::InitStats() below, since that's what calls owner->SetMinion(), which only
+    // registers the summon as controllable if this flag is already set by then. It still
+    // auto-targets on its own (see npc_pet_dk_ebon_gargoyle in pet_dk.cpp) whenever no
+    // explicit command has been issued, since AttackStart from a pet command simply takes
+    // priority the same way it does for any other controllable guardian.
+    if (GetEntry() == NPC_EBON_GARGOYLE && !IsControllableGuardian())
+    {
+        AddUnitTypeMask(UNIT_MASK_CONTROLLABLE_GUARDIAN);
+        InitCharmInfo();
+    }
+
     Minion::InitStats(duration);
 
     if (Unit* m_owner = GetOwner())
