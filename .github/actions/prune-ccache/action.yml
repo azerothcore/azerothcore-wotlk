@@ -1,0 +1,85 @@
+name: prune ccache
+description: delete the superseded ccache entries of one cache stream on this ref
+inputs:
+  key-prefix:
+    description: cache key prefix identifying the stream, i.e. the full key without the run id
+    required: true
+  keep-key:
+    description: full key written by this run, which must survive the prune
+    required: true
+runs:
+  using: composite
+  steps:
+    # Every build workflow keys its cache on `<stream>:<ref>-<run_id>` so that
+    # each run uploads a fresh entry (see the comment on the Restore step in
+    # .github/actions/linux-build). Nothing ever removed the previous entry, so
+    # a stream accumulated one full copy per run and only shed them once the
+    # repository hit the 10 GB quota and eviction kicked in. Only the newest
+    # entry of a stream is ever restored, so the older ones are dead weight.
+    - name: Prune superseded caches
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        GH_REPO: ${{ github.repository }}
+        KEY_PREFIX: ${{ inputs.key-prefix }}
+        KEEP_KEY: ${{ inputs.keep-key }}
+        # github.ref, not ref_name: `gh cache list --ref` wants the full ref.
+        CACHE_REF: ${{ github.ref }}
+      run: |
+        # `shell: bash` runs with errexit on. Turn it off: by the time this
+        # step runs the build has compiled, tested and uploaded, and a blip
+        # from the caches API must not turn that into a failed job.
+        set +e
+        set -uo pipefail
+
+        # gh's own --jq, so this does not depend on jq being on the image.
+        entries="$(gh cache list --ref "$CACHE_REF" --key "$KEY_PREFIX" --limit 100 \
+                     --json id,key --jq '.[] | [.id, .key] | @tsv')"
+        if [[ $? -ne 0 ]]
+        then
+          echo "Could not list caches for $KEY_PREFIX; nothing pruned."
+          exit 0
+        fi
+
+        if [[ -z "$entries" ]]
+        then
+          echo "No caches for $KEY_PREFIX on $CACHE_REF; nothing pruned."
+          exit 0
+        fi
+
+        # actions/cache/save reports a failed upload as a warning and still
+        # succeeds, so the entry this run meant to publish may not be there.
+        # Deleting the rest would leave the stream empty and the next build
+        # would compile cold, which is worse than keeping a stale entry. This
+        # also fails safe if KEEP_KEY ever arrives empty, where the inequality
+        # below would otherwise match every entry including this run's own.
+        # No pipeline here: with pipefail a `grep -q` that exits on the first
+        # match can SIGPIPE the writer and report 141, which would trip the
+        # guard even though KEEP_KEY was present.
+        if ! grep -qxF -- "$KEEP_KEY" <<< "$(cut -f2 <<< "$entries")"
+        then
+          echo "$KEEP_KEY is not in the cache list, so its upload did not land; nothing pruned."
+          exit 0
+        fi
+
+        # --key matches on prefix, so --ref is what keeps a prefix ending in
+        # "master-" from reaching a branch called "master-something": those
+        # caches live on refs/heads/master-something and are filtered out.
+        #
+        # A pull_request run from a fork gets a read-only GITHUB_TOKEN, so the
+        # delete 403s there. Those caches are reaped by cleanup-pr-caches when
+        # the PR closes, so a failure here must not fail the build either.
+        while IFS=$'\t' read -r id key
+        do
+          if [[ "$key" == "$KEEP_KEY" ]]
+          then
+            continue
+          fi
+
+          if gh cache delete "$id"
+          then
+            echo "Deleted superseded cache $id ($key)"
+          else
+            echo "Could not delete cache $id, leaving it to cleanup-pr-caches."
+          fi
+        done <<< "$entries"
