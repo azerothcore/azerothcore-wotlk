@@ -5428,6 +5428,22 @@ void SpellMgr::LoadSpellInfoCorrections()
     LockEntry* key = const_cast<LockEntry*>(sLockStore.LookupEntry(36)); // 3366 Opening, allows to open without proper key
     key->Type[2] = LOCK_KEY_NONE;
 
+    // Brazier of Beckoning (UBRS, issue #26695) - effect 1 (SPELL_EFFECT_DUMMY, TARGET_UNIT_NEARBY_ENTRY)
+    // has EffectRadiusIndex 0, which has no SpellRadius.dbc entry at all, so SpellEffectInfo::CalcRadius()
+    // falls through to 0 yards - the trigger creature search only succeeds if the brazier lands almost
+    // exactly on top of the invisible trigger NPC. The Beast's Chamber alone spans ~80y (Lord Valthalak
+    // Trigger guid 137927 to The Beast guid ~79y apart), so 100y comfortably covers the room with margin.
+    ApplySpellFix({
+        27184, // Mor Grayhoof Trigger
+        27190, // Isalien Trigger
+        27191, // Jarien and Sothos Trigger
+        27201, // Kormok Trigger
+        27202  // Lord Valthalak Trigger
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_1].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_100_YARDS);
+    });
+
     LOG_INFO("server.loading", ">> Loading spell dbc data corrections  in {} ms", GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
