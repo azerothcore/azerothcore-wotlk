@@ -1348,6 +1348,31 @@ class spell_hodir_starlight_aura : public AuraScript
     }
 };
 
+class spell_hodir_ice_shards : public SpellScript
+{
+    PrepareSpellScript(spell_hodir_ice_shards);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+
+        float radius = GetSpellInfo()->Effects[EFFECT_0].CalcRadius(caster);
+
+        targets.remove_if([caster, radius](WorldObject* obj)
+            {
+                return obj->GetExactDist2d(caster) > radius;
+            });
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_hodir_ice_shards::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_hodir_ice_shards::FilterTargets, EFFECT_1, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
+};
+
 class achievement_cheese_the_freeze : public AchievementCriteriaScript
 {
 public:
@@ -1435,6 +1460,7 @@ void AddSC_boss_hodir()
     RegisterSpellScript(spell_hodir_storm_cloud_aura);
     RegisterSpellScript(spell_hodir_toasty_fire_aura);
     RegisterSpellScript(spell_hodir_starlight_aura);
+    RegisterSpellScript(spell_hodir_ice_shards);
 
     new achievement_cheese_the_freeze();
     new achievement_getting_cold_in_here();
