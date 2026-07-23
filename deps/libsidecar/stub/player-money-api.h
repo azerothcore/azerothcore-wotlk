@@ -9,7 +9,7 @@ typedef enum PlayerMoneyErrorCode {
     PlayerMoneyErrorCodeNoError        = 0,
     PlayerMoneyErrorCodeNoHandler      = 1,
     PlayerMoneyErrorCodePlayerNotFound = 2,
-    PlayerMoneyErrorCodeToMuchMoney    = 3,
+    PlayerMoneyErrorCodeTooMuchMoney    = 3,
 } PlayerMoneyErrorCode;
 
 // GetMoneyForPlayer request.
