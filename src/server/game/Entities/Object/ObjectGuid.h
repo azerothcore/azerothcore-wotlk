@@ -305,7 +305,7 @@ public:
 
     ObjectGuid::LowType Generate(uint16 realmId = DEFAULT_NON_CROSSREALM_REALM_ID) override
     {
-        ObjectGuid::LowType clusterGuid;
+        ObjectGuid::LowType clusterGuid = 0;
         if (GetClusterGuid(high, realmId, clusterGuid))
             return clusterGuid;
 
