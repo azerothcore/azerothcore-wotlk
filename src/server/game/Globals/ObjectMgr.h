@@ -18,6 +18,7 @@
 #ifndef _OBJECTMGR_H
 #define _OBJECTMGR_H
 
+#include "AhoCorasick.h"
 #include "Bag.h"
 #include "ConditionMgr.h"
 #include "Creature.h"
@@ -38,6 +39,7 @@
 #include <functional>
 #include <limits>
 #include <map>
+#include <memory>
 #include <string>
 
 class Item;
@@ -1170,7 +1172,7 @@ public:
         if (map_itr == _mailLevelRewardStore.end())
             return nullptr;
 
-        for (const auto & set_itr : map_itr->second)
+        for (auto const& set_itr : map_itr->second)
             if (set_itr.raceMask & raceMask)
                 return &set_itr;
 
@@ -1418,6 +1420,10 @@ public:
     [[nodiscard]] bool IsProfanityName(std::string_view name) const;
     void AddProfanityPlayerName(std::string const& name);
 
+    // chat filter (substring chat content filter)
+    void LoadChatFilter();
+    [[nodiscard]] bool IsChatFiltered(std::string_view text) const;
+
     // name with valid structure and symbols
     static uint8 CheckPlayerName(std::string_view name, bool create = false);
     static PetNameInvalidReason CheckPetName(std::string_view name);
@@ -1490,7 +1496,7 @@ public:
         else
             return {};
     }
-    static inline void GetLocaleString(const std::vector<std::string>& data, int loc_idx, std::string& value)
+    static inline void GetLocaleString(std::vector<std::string> const& data, int loc_idx, std::string& value)
     {
         if (data.size() > std::size_t(loc_idx) && !data[loc_idx].empty())
             value = data[loc_idx];
@@ -1586,6 +1592,9 @@ private:
     //character profanity names
     typedef std::set<std::wstring> ProfanityNamesContainer;
     ProfanityNamesContainer _profanityNamesStore;
+
+    //chat filter (Aho-Corasick automaton; matches any banned word as substring of input)
+    std::unique_ptr<Acore::AhoCorasick<wchar_t>> _chatFilterAutomaton;
 
     GameTeleContainer _gameTeleStore;
 

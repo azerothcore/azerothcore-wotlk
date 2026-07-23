@@ -48,15 +48,31 @@ public:
         PlayerSetting setting;
         setting = player->GetPlayerSetting(AzerothcorePSSource, SETTING_ANNOUNCER_FLAGS);
 
+        char const* label = nullptr;
+
         if (type == "bg")
         {
             on ? setting.RemoveFlag(ANNOUNCER_FLAG_DISABLE_BG_QUEUE) : setting.AddFlag(ANNOUNCER_FLAG_DISABLE_BG_QUEUE);
             player->UpdatePlayerSetting(AzerothcorePSSource, SETTING_ANNOUNCER_FLAGS, setting.value);
+            label = "battleground queue";
         }
         else if (type == "arena")
         {
             on ? setting.RemoveFlag(ANNOUNCER_FLAG_DISABLE_ARENA_QUEUE) : setting.AddFlag(ANNOUNCER_FLAG_DISABLE_ARENA_QUEUE);
             player->UpdatePlayerSetting(AzerothcorePSSource, SETTING_ANNOUNCER_FLAGS, setting.value);
+            label = "arena queue";
+        }
+        else if (type == "pvpstart")
+        {
+            on ? setting.RemoveFlag(ANNOUNCER_FLAG_DISABLE_PVP_START) : setting.AddFlag(ANNOUNCER_FLAG_DISABLE_PVP_START);
+            player->UpdatePlayerSetting(AzerothcorePSSource, SETTING_ANNOUNCER_FLAGS, setting.value);
+            label = "PvP start";
+        }
+        else if (type == "pvpall")
+        {
+            on ? setting.RemoveFlag(ANNOUNCER_FLAG_DISABLE_PVP_ALL) : setting.AddFlag(ANNOUNCER_FLAG_DISABLE_PVP_ALL);
+            player->UpdatePlayerSetting(AzerothcorePSSource, SETTING_ANNOUNCER_FLAGS, setting.value);
+            label = "PvP";
         }
         else if (type == "autobroadcast")
         {
@@ -68,10 +84,11 @@ public:
 
             on ? setting.RemoveFlag(ANNOUNCER_FLAG_DISABLE_AUTOBROADCAST) : setting.AddFlag(ANNOUNCER_FLAG_DISABLE_AUTOBROADCAST);
             player->UpdatePlayerSetting(AzerothcorePSSource, SETTING_ANNOUNCER_FLAGS, setting.value);
+            label = "autobroadcast";
         }
 
         handler->SetSentErrorMessage(false);
-        handler->PSendSysMessage(on ? LANG_CMD_SETTINGS_ANNOUNCER_ON : LANG_CMD_SETTINGS_ANNOUNCER_OFF, type);
+        handler->PSendSysMessage(on ? LANG_CMD_SETTINGS_ANNOUNCER_ON : LANG_CMD_SETTINGS_ANNOUNCER_OFF, label ? label : type.c_str());
         return true;
     }
 };

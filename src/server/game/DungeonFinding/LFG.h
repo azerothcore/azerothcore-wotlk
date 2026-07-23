@@ -182,7 +182,7 @@ namespace lfg
             return 0;
         }
 
-        void insert(const ObjectGuid& g)
+        void insert(ObjectGuid const& g)
         {
             // avoid loops for performance
             if (!guids[0])
@@ -273,7 +273,7 @@ namespace lfg
             guids[4] = g;
         }
 
-        void force_insert_front(const ObjectGuid& g)
+        void force_insert_front(ObjectGuid const& g)
         {
             if (guids[3])
             {
@@ -294,7 +294,7 @@ namespace lfg
             guids[0] = g;
         }
 
-        void remove(const ObjectGuid& g)
+        void remove(ObjectGuid const& g)
         {
             // avoid loops for performance
             if (guids[0] == g)
@@ -427,12 +427,12 @@ namespace lfg
             }
         }
 
-        [[nodiscard]] bool hasGuid(const ObjectGuid& g) const
+        [[nodiscard]] bool hasGuid(ObjectGuid const& g) const
         {
             return g && (guids[0] == g || guids[1] == g || guids[2] == g || guids[3] == g || guids[4] == g);
         }
 
-        bool operator<(const Lfg5Guids& x) const
+        bool operator<(Lfg5Guids const& x) const
         {
             if (guids[0] <= x.guids[0])
             {
@@ -474,12 +474,12 @@ namespace lfg
             return false;
         }
 
-        bool operator==(const Lfg5Guids& x) const
+        bool operator==(Lfg5Guids const& x) const
         {
             return guids[0] == x.guids[0] && guids[1] == x.guids[1] && guids[2] == x.guids[2] && guids[3] == x.guids[3] && guids[4] == x.guids[4];
         }
 
-        void operator=(const Lfg5Guids& x)
+        void operator=(Lfg5Guids const& x)
         {
             guids = x.guids;
             delete roles;

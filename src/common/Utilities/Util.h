@@ -37,7 +37,7 @@ template<typename T, class S> struct Finder
     T S::* idMember_;
 
     Finder(T val, T S::* idMember) : val_(val), idMember_(idMember) {}
-    bool operator()(const std::pair<int, S>& obj) { return obj.second.*idMember_ == val_; }
+    bool operator()(std::pair<int, S> const& obj) { return obj.second.*idMember_ == val_; }
 };
 
 void stripLineInvisibleChars(std::string& src);
@@ -45,7 +45,7 @@ void stripLineInvisibleChars(std::string& src);
 AC_COMMON_API Optional<int32> MoneyStringToMoney(std::string_view moneyString);
 
 std::string secsToTimeString(uint64 timeInSecs, bool shortText = false);
-uint32 TimeStringToSecs(const std::string& timestring);
+uint32 TimeStringToSecs(std::string const& timestring);
 
 // Percentage calculation
 template <class T, class U>
@@ -353,13 +353,13 @@ std::wstring GetMainPartOfName(std::wstring const& wname, uint32 declension);
 AC_COMMON_API bool utf8ToConsole(std::string_view utf8str, std::string& conStr);
 AC_COMMON_API bool consoleToUtf8(std::string_view conStr, std::string& utf8str);
 AC_COMMON_API bool Utf8FitTo(std::string_view str, std::wstring_view search);
-AC_COMMON_API void utf8printf(FILE* out, const char* str, ...);
-AC_COMMON_API void vutf8printf(FILE* out, const char* str, va_list* ap);
+AC_COMMON_API void utf8printf(FILE* out, char const* str, ...);
+AC_COMMON_API void vutf8printf(FILE* out, char const* str, va_list* ap);
 AC_COMMON_API bool Utf8ToUpperOnlyLatin(std::string& utf8String);
 
 bool IsIPAddress(char const* ipaddress);
 
-uint32 CreatePIDFile(const std::string& filename);
+uint32 CreatePIDFile(std::string const& filename);
 uint32 GetPID();
 
 namespace Acore::Impl
@@ -506,7 +506,7 @@ public:
         part[2] = right.part[2];
         return *this;
     }
-    flag96(const flag96&) = default;
+    flag96(flag96 const&) = default;
     flag96(flag96&&) = default;
 
     inline flag96 operator&(flag96 const& right) const

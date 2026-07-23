@@ -128,7 +128,7 @@ enum SMART_EVENT
     SMART_EVENT_CHARMED                  = 29,      // onRemove (0 - on apply, 1 - on remove)
     SMART_EVENT_CHARMED_TARGET           = 30,      // NONE
     SMART_EVENT_SPELLHIT_TARGET          = 31,      // SpellID, School, CooldownMin, CooldownMax
-    SMART_EVENT_DAMAGED                  = 32,      // MinDmg, MaxDmg, CooldownMin, CooldownMax
+    SMART_EVENT_DAMAGED                  = 32,      // MinDmg, MaxDmg, CooldownMin, CooldownMax, rangeMin (hpPct, if set: health check mode, one-shot)
     SMART_EVENT_DAMAGED_TARGET           = 33,      // MinDmg, MaxDmg, CooldownMin, CooldownMax
     SMART_EVENT_MOVEMENTINFORM           = 34,      // MovementType(any), PointID, PathId(0 - any)
     SMART_EVENT_SUMMON_DESPAWNED         = 35,      // Entry, CooldownMin, CooldownMax
@@ -568,7 +568,7 @@ enum SMART_ACTION
     SMART_ACTION_CALL_GROUPEVENTHAPPENS             = 26,     // QuestID
     SMART_ACTION_COMBAT_STOP                        = 27,     // No Params
     SMART_ACTION_REMOVEAURASFROMSPELL               = 28,     // Spellid (0 removes all auras), charges (0 removes aura)
-    SMART_ACTION_FOLLOW                             = 29,     // Distance (0 = default), Angle (0 = default), EndCreatureEntry, credit, creditType (0monsterkill, 1event)
+    SMART_ACTION_FOLLOW                             = 29,     // Distance (0 = default), Angle (0 = default), EndCreatureEntry, credit, creditType (0monsterkill, 1event), aliveState (0 = creature must be alive, 1 = dead creature can trigger arrival)
     SMART_ACTION_RANDOM_PHASE                       = 30,     // PhaseId1, PhaseId2, PhaseId3...
     SMART_ACTION_RANDOM_PHASE_RANGE                 = 31,     // PhaseMin, PhaseMax
     SMART_ACTION_RESET_GOBJECT                      = 32,     //
@@ -726,8 +726,9 @@ enum SMART_ACTION
     SMART_ACTION_SET_ANIM_TIER                      = 239,    // animtier
     SMART_ACTION_SET_GOSSIP_MENU                    = 240,    // gossipMenuId
     SMART_ACTION_SUMMON_GAMEOBJECT_GROUP            = 241,    // group
+    SMART_ACTION_INC_DATA                           = 242,    // field, increment (uses aiDataSet, wipe-safe across evade)
 
-    SMART_ACTION_AC_END                             = 242,    // placeholder
+    SMART_ACTION_AC_END                             = 243,    // placeholder
 };
 
 enum class SmartActionSummonCreatureFlags

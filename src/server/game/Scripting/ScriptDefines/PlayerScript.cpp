@@ -32,7 +32,7 @@ void ScriptMgr::OnPlayerGossipSelect(Player* player, uint32 menu_id, uint32 send
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_GOSSIP_SELECT, script->OnPlayerGossipSelect(player, menu_id, sender, action));
 }
 
-void ScriptMgr::OnPlayerGossipSelectCode(Player* player, uint32 menu_id, uint32 sender, uint32 action, const char* code)
+void ScriptMgr::OnPlayerGossipSelectCode(Player* player, uint32 menu_id, uint32 sender, uint32 action, char const* code)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_GOSSIP_SELECT_CODE, script->OnPlayerGossipSelectCode(player, menu_id, sender, action, code));
 }
@@ -130,6 +130,11 @@ void ScriptMgr::OnPlayerMoneyChanged(Player* player, int32& amount)
 void ScriptMgr::OnPlayerBeforeLootMoney(Player* player, Loot* loot)
 {
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_LOOT_MONEY, script->OnPlayerBeforeLootMoney(player, loot));
+}
+
+void ScriptMgr::OnPlayerBeforeSendLoot(Player* player, ObjectGuid lootGuid, Loot* loot)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_BEFORE_SEND_LOOT, script->OnPlayerBeforeSendLoot(player, lootGuid, loot));
 }
 
 void ScriptMgr::OnPlayerGiveXP(Player* player, uint32& amount, Unit* victim, uint8 xpSource)
@@ -767,7 +772,7 @@ bool ScriptMgr::OnPlayerNotSetArenaTeamInfoField(Player* player, uint8 slot, Are
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_NOT_SET_ARENA_TEAM_INFO_FIELD, !script->OnPlayerNotSetArenaTeamInfoField(player, slot, type, value));
 }
 
-bool ScriptMgr::OnPlayerCanJoinLfg(Player* player, uint8 roles, lfg::LfgDungeonSet& dungeons, const std::string& comment)
+bool ScriptMgr::OnPlayerCanJoinLfg(Player* player, uint8 roles, lfg::LfgDungeonSet& dungeons, std::string const& comment)
 {
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_JOIN_LFG, !script->OnPlayerCanJoinLfg(player, roles, dungeons, comment));
 }
@@ -908,6 +913,11 @@ void ScriptMgr::OnPlayerUpdateSkill(Player* player, uint32 skillId, uint32 value
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_UPDATE_SKILL, script->OnPlayerUpdateSkill(player, skillId, value, max, step, newValue));
 }
 
+void ScriptMgr::OnPlayerSetSkill(Player* player, uint32 skillId, uint32 value, uint32 max, uint32 step, uint32 newValue)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_SET_SKILL, script->OnPlayerSetSkill(player, skillId, value, max, step, newValue));
+}
+
 bool ScriptMgr::OnPlayerCanResurrect(Player* player)
 {
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_RESURRECT, !script->OnPlayerCanResurrect(player));
@@ -944,7 +954,7 @@ void ScriptMgr::OnPlayerBeforeGetLevelForXPGain(Player const* player, uint8& lev
     level = std::clamp(level, uint8(1), uint8(sWorld->getIntConfig(CONFIG_MAX_PLAYER_LEVEL)));
 }
 
-PlayerScript::PlayerScript(const char* name, std::vector<uint16> enabledHooks)
+PlayerScript::PlayerScript(char const* name, std::vector<uint16> enabledHooks)
     : ScriptObject(name, PLAYERHOOK_END)
 {
     // If empty - enable all available hooks.
