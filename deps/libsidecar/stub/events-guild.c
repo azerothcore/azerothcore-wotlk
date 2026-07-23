@@ -8,10 +8,10 @@ void SetOnGuildMemberAddedHook(OnGuildMemberAddedHook h) {
 
 int CallOnGuildMemberAddedHook(uint64_t guild_id, uint64_t player_guid) {
     if (guildMemberAddedHook == 0) {
-        return NoHook;
+        return GuildHookStatusNoHook;
     }
     guildMemberAddedHook(guild_id, player_guid);
-    return OK;
+    return GuildHookStatusOK;
 }
 
 // GuildMemberLeft
@@ -22,10 +22,10 @@ void SetOnGuildMemberLeftHook(OnGuildMemberLeftHook h) {
 
 int CallOnGuildMemberLeftHook(uint64_t guild_id, uint64_t player_guid) {
     if (guildMemberLeftHook == 0) {
-        return NoHook;
+        return GuildHookStatusNoHook;
     }
     guildMemberLeftHook(guild_id, player_guid);
-    return OK;
+    return GuildHookStatusOK;
 }
 
 // GuildMemberRemoved
@@ -36,8 +36,8 @@ void SetOnGuildMemberRemovedHook(OnGuildMemberRemovedHook h) {
 
 int CallOnGuildMemberRemovedHook(uint64_t guild_id, uint64_t player_guid) {
     if (guildMemberRemovedHook == 0) {
-        return NoHook;
+        return GuildHookStatusNoHook;
     }
     guildMemberRemovedHook(guild_id, player_guid);
-    return OK;
+    return GuildHookStatusOK;
 }

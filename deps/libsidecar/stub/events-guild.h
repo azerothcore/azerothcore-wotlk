@@ -3,9 +3,9 @@
 
 #include <stdint.h>
 
-enum CallStatus {
-    OK = 0,
-    NoHook = 1
+enum GuildHookStatus {
+    GuildHookStatusOK = 0,
+    GuildHookStatusNoHook = 1
 };
 
 typedef void (*OnGuildMemberAddedHook) (uint64_t /*guild_id*/, uint64_t /*player_guid*/);
