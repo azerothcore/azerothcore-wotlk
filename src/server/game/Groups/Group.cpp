@@ -579,6 +579,10 @@ bool Group::AddMember(Player* player, uint8 roles /* = 0 */)
 
 void Group::AddMemberWithGuid(ObjectGuid guid)
 {
+    // Idempotent under sidecar event redelivery: never duplicate a MemberSlot.
+    if (IsMember(guid))
+        return;
+
     if (Player* player = ObjectAccessor::FindPlayer(guid))
     {
         AddMember(player);
@@ -605,6 +609,7 @@ void Group::AddMemberWithGuid(ObjectGuid guid)
 
     MemberSlot member;
     member.guid      = guid;
+    sCharacterCache->GetCharacterNameByGuid(guid, member.name);
     member.group     = subGroup;
     member.flags     = 0;
     member.roles     = 0;

@@ -16,6 +16,7 @@
  */
 
 #include "TC9GroupHooks.h"
+#include "CharacterCache.h"
 #include "Group.h"
 #include "GroupMgr.h"
 #include "Log.h"
@@ -24,15 +25,25 @@ void ToCloud9GroupHooks::OnGroupCreated(EventObjectGroup *group)
 {
     LOG_INFO("server", "Group created. ID: {}; Leader: {}.", group->guid, group->leader);
 
+    // Idempotent under sidecar event redelivery: a replayed create must not leak a second Group.
+    if (sGroupMgr->GetGroupByGUID(group->guid))
+        return;
+
     Group* g = new Group();
     g->m_guid = ObjectGuid(HighGuid::Group, group->guid);
     g->m_leaderGuid = ObjectGuid(group->leader);
+    sCharacterCache->GetCharacterNameByGuid(g->m_leaderGuid, g->m_leaderName);
     g->m_dungeonDifficulty = Difficulty(group->difficulty);
     g->m_raidDifficulty = Difficulty(group->raidDifficulty);
     g->m_lootMethod = LootMethod(group->lootMethod);
     g->m_lootThreshold = ItemQualities(group->lootThreshold);
+    g->m_looterGuid = ObjectGuid(group->looterGuid);
     g->m_masterLooterGuid = ObjectGuid(group->masterLooterGuid);
     g->m_groupType = GroupType(group->groupType);
+
+    // Must precede member insertion: it zeroes the subgroup counters that AddMemberWithGuid increments.
+    if (g->m_groupType & GROUPTYPE_RAID)
+        g->_initRaidSubGroupsCounter();
 
     for (int i = 0; i < group->membersSize; i++)
         g->AddMemberWithGuid(ObjectGuid(group->members[i]));
