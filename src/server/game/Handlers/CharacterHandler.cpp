@@ -701,7 +701,9 @@ void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recvData)
     ObjectGuid playerGuid;
     recvData >> playerGuid;
 
-    if (!sToCloud9Sidecar->ClusterModeEnabled() && (!playerGuid.IsPlayer() || !IsLegitCharacterForAccount(playerGuid)))
+    // The ownership check is delegated to the gateway in cluster mode, but a
+    // non-player GUID is invalid regardless of who authenticated the session.
+    if (!playerGuid.IsPlayer() || (!sToCloud9Sidecar->ClusterModeEnabled() && !IsLegitCharacterForAccount(playerGuid)))
     {
         LOG_ERROR("network", "Account ({}) can't login with that character ({}).", GetAccountId(), playerGuid.ToString());
         KickPlayer("Account can't login with this character");
