@@ -684,19 +684,15 @@ public:
             id3 = cData->id3;
         }
 
-        int64 curRespawnDelay = target->GetRespawnTimeEx() - GameTime::GetGameTime().count();
-        if (curRespawnDelay < 0)
-            curRespawnDelay = 0;
-
-        std::string curRespawnDelayStr = secsToTimeString(uint64(curRespawnDelay), true);
-        std::string defRespawnDelayStr = secsToTimeString(target->GetRespawnDelay(), true);
+        int64 const remaining = target->GetRespawnTimeEx() - GameTime::GetGameTime().count();
+        std::string const remainingStr = (remaining > 0) ? secsToTimeString(uint64(remaining), true) : "0";
 
         handler->PSendSysMessage(LANG_NPCINFO_CHAR,  target->GetSpawnId(), target->GetGUID().ToString(), entry, id1, id2, id3, displayid, nativeid, faction, npcflags);
         handler->PSendSysMessage(LANG_NPCINFO_LEVEL, target->GetLevel());
         handler->PSendSysMessage(LANG_NPCINFO_EQUIPMENT, target->GetCurrentEquipmentId(), target->GetOriginalEquipmentId());
         handler->PSendSysMessage(LANG_NPCINFO_HEALTH, target->GetCreateHealth(), target->GetMaxHealth(), target->GetHealth());
         handler->PSendSysMessage(LANG_NPCINFO_FLAGS, target->GetUnitFlags(), target->GetUnitFlags2(), target->GetDynamicFlags(), target->GetFaction());
-        handler->PSendSysMessage(LANG_COMMAND_RAWPAWNTIMES, defRespawnDelayStr, curRespawnDelayStr);
+        handler->PSendSysMessage(LANG_COMMAND_RAWPAWNTIMES, target->GetRespawnDelayMin(), target->GetRespawnDelayMax(), remainingStr);
         handler->PSendSysMessage(LANG_NPCINFO_LOOT,  cInfo->lootid, cInfo->pickpocketLootId, cInfo->SkinLootId);
         handler->PSendSysMessage(LANG_NPCINFO_DUNGEON_ID, target->GetInstanceId());
         handler->PSendSysMessage(LANG_NPCINFO_PHASEMASK, target->GetPhaseMask());
@@ -737,8 +733,8 @@ public:
             cData->npcflag);
         handler->PSendSysMessage(LANG_NPCINFO_PHASEMASK, cData->phaseMask);
         handler->PSendSysMessage(LANG_NPCINFO_POSITION, cData->posX, cData->posY, cData->posZ);
-        handler->PSendSysMessage("Map: {} Spawn time: {}s", cData->mapid,
-            cData->spawntimesecs);
+        handler->PSendSysMessage("Map: {} SpawnTime: {}s - {}s", cData->mapid,
+            cData->SpawnTimeSecMin, cData->SpawnTimeSecMax);
         handler->PSendSysMessage(LANG_NPCINFO_EQUIPMENT, cData->equipmentId, cData->equipmentId);
         handler->PSendSysMessage(LANG_NPCINFO_AIINFO, cInfo->AIName,
             sObjectMgr->GetScriptName(scriptId));
@@ -1176,7 +1172,8 @@ public:
 
         WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_CREATURE_SPAWN_TIME_SECS);
         stmt->SetData(0, spawnTime);
-        stmt->SetData(1, creature->GetSpawnId());
+        stmt->SetData(1, spawnTime);
+        stmt->SetData(2, creature->GetSpawnId());
         WorldDatabase.Execute(stmt);
 
         creature->SetRespawnDelay(spawnTime);

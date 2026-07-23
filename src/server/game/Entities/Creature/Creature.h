@@ -294,7 +294,9 @@ public:
     void SaveRespawnTime() override;
 
     [[nodiscard]] uint32 GetRespawnDelay() const { return m_respawnDelay; }
-    void SetRespawnDelay(uint32 delay) { m_respawnDelay = delay; }
+    void SetRespawnDelay(uint32 delay) { m_respawnDelay = m_respawnDelayMin = m_respawnDelayMax = delay; }
+    [[nodiscard]] uint32 GetRespawnDelayMin() const { return m_respawnDelayMin; }
+    [[nodiscard]] uint32 GetRespawnDelayMax() const { return m_respawnDelayMax; }
 
     uint32 GetCombatPulseDelay() const { return m_combatPulseDelay; }
     void SetCombatPulseDelay(uint32 delay) // (secs) interval at which the creature pulses the entire zone into combat (only works in dungeons)
@@ -477,7 +479,9 @@ protected:
     time_t m_corpseRemoveTime;                          // (secs) timer for death or corpse disappearance
     time_t m_respawnTime;                               // (secs) time of next respawn
     time_t m_respawnedTime;                             // (secs) time when creature respawned
-    uint32 m_respawnDelay;                              // (secs) delay between corpse disappearance and respawning
+    uint32 m_respawnDelay;                              // (secs) delay between corpse disappearance and respawning — re-rolled from [min, max] each cycle
+    uint32 m_respawnDelayMin;                           // (secs) lower bound persisted to `creature`.`SpawnTimeSecMin`
+    uint32 m_respawnDelayMax;                           // (secs) upper bound persisted to `creature`.`SpawnTimeSecMax`
     uint32 m_corpseDelay;                               // (secs) delay between death and corpse disappearance
     float m_wanderDistance;
     uint32 m_boundaryCheckTime;                         // (msecs) remaining time for next evade boundary check

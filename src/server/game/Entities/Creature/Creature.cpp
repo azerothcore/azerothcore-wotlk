@@ -259,7 +259,7 @@ bool TemporaryThreatModifierEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 }
 
 Creature::Creature(): Unit(), MovableMapObject(), m_groupLootTimer(0), lootingGroupLowGUID(0), m_lootRecipientGroup(0),
-    m_corpseRemoveTime(0), m_respawnTime(0), m_respawnDelay(300), m_corpseDelay(60), m_wanderDistance(0.0f), m_boundaryCheckTime(2500),
+    m_corpseRemoveTime(0), m_respawnTime(0), m_respawnDelay(300), m_respawnDelayMin(300), m_respawnDelayMax(300), m_corpseDelay(60), m_wanderDistance(0.0f), m_boundaryCheckTime(2500),
     m_transportCheckTimer(1000), lootPickPocketRestoreTime(0), m_combatPulseTime(0), m_combatPulseDelay(0), m_reactState(REACT_AGGRESSIVE), m_defaultMovementType(IDLE_MOTION_TYPE),
     m_spawnId(0), m_equipmentId(0), m_originalEquipmentId(0), m_alreadyCallForHelp(false), m_AlreadyCallAssistance(false),
     m_AlreadySearchedAssistance(false), m_regenHealth(true), m_regenPower(true), m_AI_locked(false), m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL), m_originalEntry(0), _gossipMenuId(0), m_moveInLineOfSightDisabled(false), m_moveInLineOfSightStrictlyDisabled(false),
@@ -1443,7 +1443,8 @@ void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
         data.orientation = GetTransOffsetO();
     }
 
-    data.spawntimesecs = m_respawnDelay;
+    data.SpawnTimeSecMin = m_respawnDelayMin;
+    data.SpawnTimeSecMax = m_respawnDelayMax;
     // prevent add data integrity problems
     data.wander_distance = GetDefaultMovementType() == IDLE_MOTION_TYPE ? 0.0f : m_wanderDistance;
     data.currentwaypoint = 0;
@@ -1477,7 +1478,8 @@ void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
     stmt->SetData(index++, GetPositionY());
     stmt->SetData(index++, GetPositionZ());
     stmt->SetData(index++, GetOrientation());
-    stmt->SetData(index++, m_respawnDelay);
+    stmt->SetData(index++, m_respawnDelayMin);
+    stmt->SetData(index++, m_respawnDelayMax);
     stmt->SetData(index++, m_wanderDistance);
     stmt->SetData(index++, 0);
     stmt->SetData(index++, GetHealth());
@@ -1733,7 +1735,9 @@ bool Creature::LoadCreatureFromDB(ObjectGuid::LowType spawnId, Map* map, bool ad
 
     m_wanderDistance = data->wander_distance;
 
-    m_respawnDelay = data->spawntimesecs;
+    m_respawnDelayMin = data->SpawnTimeSecMin;
+    m_respawnDelayMax = data->SpawnTimeSecMax;
+    m_respawnDelay = m_respawnDelayMin == m_respawnDelayMax ? m_respawnDelayMin : urand(m_respawnDelayMin, m_respawnDelayMax);
     m_deathState = DeathState::Alive;
 
     m_respawnTime  = GetMap()->GetCreatureRespawnTime(m_spawnId);
@@ -1957,6 +1961,9 @@ void Creature::setDeathState(DeathState state, bool despawn)
     if (state == DeathState::JustDied)
     {
         m_corpseRemoveTime = GameTime::GetGameTime().count() + m_corpseDelay;
+        m_respawnDelay = (m_respawnDelayMin == m_respawnDelayMax)
+            ? m_respawnDelayMin
+            : urand(m_respawnDelayMin, m_respawnDelayMax);
         uint32 dynamicRespawnDelay = GetMap()->ApplyDynamicModeRespawnScaling(this, m_respawnDelay);
         m_respawnTime = GameTime::GetGameTime().count() + dynamicRespawnDelay + m_corpseDelay;
 
@@ -2168,9 +2175,14 @@ void Creature::ForcedDespawn(Milliseconds timeMSToDespawn, Seconds forceRespawnT
     // Override respawn delay BEFORE setDeathState, because setDeathState(JustDied)
     // computes m_respawnTime = now + m_respawnDelay + m_corpseDelay and immediately
     // saves it to DB for bosses/elites. We must have the correct delay in place
-    // before that happens.
+    // before that happens. Collapse the [min,max] bounds too so setDeathState's
+    // per-cycle re-roll is a no-op for this forced cycle.
     if (forceRespawnTimer > 0s)
+    {
         m_respawnDelay = forceRespawnTimer.count();
+        m_respawnDelayMin = m_respawnDelay;
+        m_respawnDelayMax = m_respawnDelay;
+    }
 
     if (IsAlive())
         setDeathState(DeathState::JustDied, true);
@@ -2179,7 +2191,15 @@ void Creature::ForcedDespawn(Milliseconds timeMSToDespawn, Seconds forceRespawnT
     // After setDeathState, m_respawnTime includes m_corpseDelay which we don't
     // want for a forced respawn. Override it so RemoveCorpse's max() picks ours.
     if (forceRespawnTimer > 0s)
+    {
         m_respawnTime = GameTime::GetGameTime().count() + forceRespawnTimer.count();
+        // Restore the persisted bounds so the next natural death re-rolls from the original range.
+        if (m_creatureData)
+        {
+            m_respawnDelayMin = m_creatureData->SpawnTimeSecMin;
+            m_respawnDelayMax = m_creatureData->SpawnTimeSecMax;
+        }
+    }
 
     RemoveCorpse(true);
 
