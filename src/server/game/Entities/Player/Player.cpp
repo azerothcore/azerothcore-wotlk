@@ -10689,7 +10689,8 @@ void Player::SendTaxiNodeStatusMultiple()
     DoForAllVisibleWorldObjects([this](WorldObject* worldObject)
     {
         Creature* creature = worldObject->ToCreature();
-        if (!creature || creature->IsHostileTo(this))
+        // reaction must be checked both ways: the Dark Portal flight masters are neutral toward opposite-faction players, while players are hostile toward them
+        if (!creature || creature->GetReactionTo(this) <= REP_UNFRIENDLY || IsHostileTo(creature))
             return;
 
         if (!creature->HasNpcFlag(UNIT_NPC_FLAG_FLIGHTMASTER))
