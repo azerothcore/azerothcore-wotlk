@@ -36,7 +36,9 @@ enum MageSpells
     SPELL_SUMMON_MIRROR_IMAGE1          = 58831,
     SPELL_SUMMON_MIRROR_IMAGE2          = 58833,
     SPELL_SUMMON_MIRROR_IMAGE3          = 58834,
-    SPELL_SUMMON_MIRROR_IMAGE_GLYPH     = 65047
+    SPELL_SUMMON_MIRROR_IMAGE_GLYPH     = 65047,
+    SPELL_MAGE_MIRROR_IMAGE_FROSTBOLT   = 59638,
+    SPELL_MAGE_MIRROR_IMAGE_FIRE_BLAST  = 59637
 };
 
 class DeathEvent : public BasicEvent
@@ -202,24 +204,45 @@ struct npc_pet_mage_mirror_image : CasterAI
             return;
         }
 
-        checktarget += diff;
+        // A dead target, or one we lost sight of, is invalid: drop it and reselect.
+        // CanSeeOrDetect is comparatively expensive, so throttle the sight check to ~1s.
+        bool lostTarget = !me->GetVictim()->IsAlive();
 
+        checktarget += diff;
         if (checktarget >= 1000)
         {
-            if (!me->GetVictim()->IsAlive() || me->GetVictim()->HasBreakableByDamageCrowdControlAura() || !me->CanSeeOrDetect(me->GetVictim()))
-            {
-                MySelectNextTarget();
-                me->InterruptNonMeleeSpells(true);
-                return;
-            }
+            checktarget = 0;
+            if (!me->CanSeeOrDetect(me->GetVictim()))
+                lostTarget = true;
         }
 
+        if (lostTarget)
+        {
+            MySelectNextTarget();
+            me->InterruptNonMeleeSpells(false);
+            return;
+        }
+
+        // A cast already in progress when the crowd control lands is allowed to finish (3.1.2),
+        // except a Frostbolt on a target that is now Polymorphed: 3.2.0 cancels that cast so it
+        // cannot break the Polymorph. Other breakable CC keeps the "let it finish" behaviour.
         if (me->HasUnitState(UNIT_STATE_CASTING))
+        {
+            if (me->GetVictim()->HasAuraWithMechanic(1ULL << MECHANIC_POLYMORPH)
+                && me->FindCurrentSpellBySpellId(SPELL_MAGE_MIRROR_IMAGE_FROSTBOLT))
+                me->InterruptNonMeleeSpells(false, SPELL_MAGE_MIRROR_IMAGE_FROSTBOLT);
+
+            return;
+        }
+
+        // Never start a new cast on a target under a breakable-by-damage CC aura (Polymorph,
+        // Dragon's Breath, ...) - that is what would break the crowd control.
+        if (me->GetVictim()->HasBreakableByDamageCrowdControlAura(me))
             return;
 
         if (uint32 spellId = events.ExecuteEvent())
         {
-            events.RescheduleEvent(spellId, spellId == 59637 ? 6500ms : 2500ms);
+            events.RescheduleEvent(spellId, spellId == SPELL_MAGE_MIRROR_IMAGE_FIRE_BLAST ? 6500ms : 2500ms);
             me->CastSpell(me->GetVictim(), spellId, false);
         }
     }
