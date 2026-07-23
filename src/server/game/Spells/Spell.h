@@ -252,7 +252,7 @@ enum SpellEffectHandleMode
 // Xinef: special structure containing data for channel target spells
 struct ChannelTargetData
 {
-    ChannelTargetData(ObjectGuid cguid, const SpellDestination* dst) : channelGUID(cguid)
+    ChannelTargetData(ObjectGuid cguid, SpellDestination const* dst) : channelGUID(cguid)
     {
         if (dst)
             spellDst = *dst;

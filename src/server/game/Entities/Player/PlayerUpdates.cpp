@@ -2323,9 +2323,9 @@ bool Player::CanExecutePendingSpellCastRequest(SpellInfo const* spellInfo)
     return true;
 }
 
-const PendingSpellCastRequest* Player::GetCastRequest(uint32 category) const
+PendingSpellCastRequest const* Player::GetCastRequest(uint32 category) const
 {
-    for (const PendingSpellCastRequest& request : SpellQueue)
+    for (PendingSpellCastRequest const& request : SpellQueue)
         if (request.category == category)
             return &request;
     return nullptr;

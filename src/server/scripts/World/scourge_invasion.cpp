@@ -378,7 +378,7 @@ struct npc_necrotic_shard : public ScriptedAI
                 if (shard != me)
                     shard->DespawnOnEvade();
 
-            scheduler.Schedule(10s, [this](const TaskContext& /*context*/) // Check if Doodads are spawned 5 seconds after spawn. If not: spawn them
+            scheduler.Schedule(10s, [this](TaskContext const& /*context*/) // Check if Doodads are spawned 5 seconds after spawn. If not: spawn them
             {
                 std::list<GameObject*> objectList;
                 me->GetGameObjectListWithEntryInGrid(
@@ -842,7 +842,7 @@ struct npc_pallid_horror : public ScriptedAI
 
     void ScheduleTasks()
     {
-        scheduler.Schedule(0s, [this](const TaskContext& /*context*/)
+        scheduler.Schedule(0s, [this](TaskContext const& /*context*/)
         {
             SummonFlameshockers();
         }).Schedule(1s, [this](TaskContext context)
