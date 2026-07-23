@@ -81,7 +81,7 @@ void TC9GracefulShutdown() { panicWithTC9Unavailable("TC9GracefulShutdown"); }
 // TC9ReadyToAcceptPlayersFromMaps notifies servers registry that this server
 // loaded maps related data and ready to accept players from those maps.
 //
-void TC9ReadyToAcceptPlayersFromMaps(uint32_t* maps, int mapsLen) { panicWithTC9Unavailable("TC9GracefulShutdown"); }
+void TC9ReadyToAcceptPlayersFromMaps(uint32_t* maps, int mapsLen) { panicWithTC9Unavailable("TC9ReadyToAcceptPlayersFromMaps"); }
 
 // TC9SetCanPlayerInteractWithNPCAndFlagsHandler sets handler for can player interact with NPC and with given NPC flags request.
 //
@@ -115,7 +115,7 @@ void TC9SetOnMapsReassignedHook(OnMapsReassignedHook h) { panicWithTC9Unavailabl
 
 // TC9SetMonitoringDataCollectorHandler sets handler for getting data to handle monitoring request.
 //
-void TC9SetMonitoringDataCollectorHandler(MonitoringDataCollectorHandler h) { panicWithTC9Unavailable("TC9SetOnMapsReassignedHook"); }
+void TC9SetMonitoringDataCollectorHandler(MonitoringDataCollectorHandler h) { panicWithTC9Unavailable("TC9SetMonitoringDataCollectorHandler"); }
 
 // TC9NatsPublish/Subscribe generic NATS pub/sub for in-process extensions
 int TC9NatsPublish(const char* subject, const char* payload, int payloadLen) { panicWithTC9Unavailable("TC9NatsPublish"); return -1; }
