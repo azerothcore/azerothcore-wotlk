@@ -4567,7 +4567,7 @@ class spell_gen_ethereal_pet_aura : public AuraScript
         return levelDiff <= 9;
     }
 
-    void HandleProc(const AuraEffect* /*aurEff*/, ProcEventInfo& eventInfo)
+    void HandleProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
     {
         PreventDefaultAction();
 
