@@ -635,7 +635,7 @@ bool Group::RemoveMember(ObjectGuid guid, RemoveMethod const& method /*= GROUP_R
         return m_memberSlots.size() > 0;
     }
 
-    // remove member and change leader (if need) only if strong more 2 members _before_ member remove (BG/BF allow 1 member group) —
+    // remove member and change leader (if need) only if strong more 2 members _before_ member remove (BG/BF allow 1 member group),
     // except in cluster mode, where this branch is taken for any size: the group
     // service owns the group lifecycle and local Disband() is a no-op, so always
     // unlink the removed member here; waiting for the disband event leaves the
@@ -662,7 +662,9 @@ bool Group::RemoveMember(ObjectGuid guid, RemoveMethod const& method /*= GROUP_R
                 player->UpdateForQuestWorldObjects();
             }
 
-            if (!sToCloud9Sidecar->ClusterModeEnabled())
+            // BG/BF groups stay locally owned in cluster mode (see the gates above),
+            // so their removal packets must not be delegated to the group service.
+            if (!sToCloud9Sidecar->ClusterModeEnabled() || isBGGroup() || isBFGroup())
             {
                 WorldPacket data;
 
