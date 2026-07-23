@@ -246,7 +246,7 @@ void CharmInfo::SetPetNumber(uint32 petnumber, bool statwindow)
         _unit->SetUInt32Value(UNIT_FIELD_PETNUMBER, 0);
 }
 
-void CharmInfo::LoadPetActionBar(const std::string& data)
+void CharmInfo::LoadPetActionBar(std::string const& data)
 {
     std::vector<std::string_view> tokens = Acore::Tokenize(data, ' ', false);
 

@@ -23,7 +23,7 @@
 class ALEScript : public ScriptObject
 {
 protected:
-    ALEScript(const char* name);
+    ALEScript(char const* name);
 
 public:
     /**

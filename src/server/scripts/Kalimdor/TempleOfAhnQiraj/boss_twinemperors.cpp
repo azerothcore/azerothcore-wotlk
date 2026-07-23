@@ -409,7 +409,7 @@ class at_twin_emperors : public OnlyOnceAreaTriggerScript
 public:
     at_twin_emperors() : OnlyOnceAreaTriggerScript("at_twin_emperors") { }
 
-    bool _OnTrigger(Player* player, const AreaTrigger* /*at*/) override
+    bool _OnTrigger(Player* player, AreaTrigger const* /*at*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
         {

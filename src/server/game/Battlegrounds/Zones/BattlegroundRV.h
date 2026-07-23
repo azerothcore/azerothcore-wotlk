@@ -22,53 +22,50 @@
 
 enum BattlegroundRVObjectTypes
 {
-    BG_RV_OBJECT_BUFF_1,
-    BG_RV_OBJECT_BUFF_2,
-    BG_RV_OBJECT_FIRE_1,
-    BG_RV_OBJECT_FIRE_2,
-    BG_RV_OBJECT_FIREDOOR_1,
-    BG_RV_OBJECT_FIREDOOR_2,
+    BG_RV_OBJECT_BUFF_1     = 0,
+    BG_RV_OBJECT_BUFF_2     = 1,
+    BG_RV_OBJECT_FIRE_1     = 2,
+    BG_RV_OBJECT_FIRE_2     = 3,
+    BG_RV_OBJECT_FIREDOOR_1 = 4,
+    BG_RV_OBJECT_FIREDOOR_2 = 5,
 
-    BG_RV_OBJECT_PILAR_1,
-    BG_RV_OBJECT_PILAR_3,
-    BG_RV_OBJECT_GEAR_1,
-    BG_RV_OBJECT_GEAR_2,
+    BG_RV_OBJECT_PILAR_1    = 6,
+    BG_RV_OBJECT_PILAR_3    = 7,
+    BG_RV_OBJECT_GEAR_1     = 8,
+    BG_RV_OBJECT_GEAR_2     = 9,
 
-    BG_RV_OBJECT_PILAR_2,
-    BG_RV_OBJECT_PILAR_4,
-    BG_RV_OBJECT_PULLEY_1,
-    BG_RV_OBJECT_PULLEY_2,
+    BG_RV_OBJECT_PILAR_2    = 10,
+    BG_RV_OBJECT_PILAR_4    = 11,
+    BG_RV_OBJECT_PULLEY_1   = 12,
+    BG_RV_OBJECT_PULLEY_2   = 13,
 
-    BG_RV_OBJECT_ELEVATOR_1,
-    BG_RV_OBJECT_ELEVATOR_2,
+    BG_RV_OBJECT_ELEVATOR_1 = 14,
+    BG_RV_OBJECT_ELEVATOR_2 = 15,
 
-    BG_RV_OBJECT_READY_MARKER_1,
-    BG_RV_OBJECT_READY_MARKER_2,
-
-    BG_RV_OBJECT_MAX,
+    BG_RV_OBJECT_MAX        = 16
 };
 
 enum BattlegroundRVGameObjects
 {
-    BG_RV_OBJECT_TYPE_BUFF_1                     = 184663,
-    BG_RV_OBJECT_TYPE_BUFF_2                     = 184664,
-    BG_RV_OBJECT_TYPE_FIRE_1                     = 192704,
-    BG_RV_OBJECT_TYPE_FIRE_2                     = 192705,
+    BG_RV_OBJECT_TYPE_BUFF_1     = 184663,
+    BG_RV_OBJECT_TYPE_BUFF_2     = 184664,
+    BG_RV_OBJECT_TYPE_FIRE_1     = 192704,
+    BG_RV_OBJECT_TYPE_FIRE_2     = 192705,
 
-    BG_RV_OBJECT_TYPE_FIREDOOR_2                 = 192387,
-    BG_RV_OBJECT_TYPE_FIREDOOR_1                 = 192388,
-    BG_RV_OBJECT_TYPE_PULLEY_1                   = 192389,
-    BG_RV_OBJECT_TYPE_PULLEY_2                   = 192390,
-    BG_RV_OBJECT_TYPE_GEAR_1                     = 192393,
-    BG_RV_OBJECT_TYPE_GEAR_2                     = 192394,
+    BG_RV_OBJECT_TYPE_FIREDOOR_2 = 192387,
+    BG_RV_OBJECT_TYPE_FIREDOOR_1 = 192388,
+    BG_RV_OBJECT_TYPE_PULLEY_1   = 192389,
+    BG_RV_OBJECT_TYPE_PULLEY_2   = 192390,
+    BG_RV_OBJECT_TYPE_GEAR_1     = 192393,
+    BG_RV_OBJECT_TYPE_GEAR_2     = 192394,
 
-    BG_RV_OBJECT_TYPE_ELEVATOR_1                 = 194582,
-    BG_RV_OBJECT_TYPE_ELEVATOR_2                 = 194586,
+    BG_RV_OBJECT_TYPE_ELEVATOR_1 = 194582,
+    BG_RV_OBJECT_TYPE_ELEVATOR_2 = 194586,
 
-    BG_RV_OBJECT_TYPE_PILAR_1                    = 194583, // axe
-    BG_RV_OBJECT_TYPE_PILAR_2                    = 194584, // arena
-    BG_RV_OBJECT_TYPE_PILAR_3                    = 194585, // lightning
-    BG_RV_OBJECT_TYPE_PILAR_4                    = 194587, // ivory
+    BG_RV_OBJECT_TYPE_PILAR_1    = 194583, // axe
+    BG_RV_OBJECT_TYPE_PILAR_2    = 194584, // arena
+    BG_RV_OBJECT_TYPE_PILAR_3    = 194585, // lightning
+    BG_RV_OBJECT_TYPE_PILAR_4    = 194587, // ivory
 };
 
 enum BattlegroundRVData
