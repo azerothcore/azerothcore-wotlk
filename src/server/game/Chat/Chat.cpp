@@ -270,19 +270,18 @@ bool ChatHandler::ParseCommands(std::string_view text)
     return _ParseCommands(text.substr(1));
 }
 
-std::size_t ChatHandler::BuildChatPacket(WorldPacket &data, ChatMsg chatType, Language language, ObjectGuid senderGUID,
-                                         ObjectGuid receiverGUID, std::string_view message, uint8 chatTag,
-                                         std::string const &senderName /*= ""*/,
-                                         std::string const &receiverName /*= ""*/,
-                                         uint32 achievementId /*= 0*/, bool gmMessage /*= false*/,
-                                         std::string const &channelName /*= ""*/) {
+std::size_t ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg chatType, Language language, ObjectGuid senderGUID, ObjectGuid receiverGUID, std::string_view message, uint8 chatTag,
+                                    std::string const& senderName /*= ""*/, std::string const& receiverName /*= ""*/,
+                                    uint32 achievementId /*= 0*/, bool gmMessage /*= false*/, std::string const& channelName /*= ""*/)
+{
     std::size_t receiverGUIDPos = 0;
     data.Initialize(!gmMessage ? SMSG_MESSAGECHAT : SMSG_GM_MESSAGECHAT);
     data << uint8(chatType);
     data << int32(language);
     data << senderGUID;
-    data << uint32(0); // some flags
-    switch (chatType) {
+    data << uint32(0);  // some flags
+    switch (chatType)
+    {
         case CHAT_MSG_MONSTER_SAY:
         case CHAT_MSG_MONSTER_PARTY:
         case CHAT_MSG_MONSTER_YELL:
