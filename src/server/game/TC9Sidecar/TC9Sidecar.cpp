@@ -232,18 +232,17 @@ void ToCloud9Sidecar::OnMapsReassigned(uint32* addedMaps, int addedMapsSize, uin
 
     if (!newMapIDs.empty())
     {
-        auto instanceSaveStoragePtr = std::make_shared<InstanceSaveMgr::InstanceSaveHashMap>();
-        auto playerBindStoragePtr = std::make_shared<PlayerBindStorage>();
+        auto loadRowsPtr = std::make_shared<InstanceMapLoadRows>();
 
         AsyncTask<bool> task(
-           [instanceSaveStoragePtr, playerBindStoragePtr, newMapIDs]() -> bool {
+           [loadRowsPtr, newMapIDs]() -> bool {
                LOG_INFO("server", "Starting to load data for newly assigned maps...");
 
-               sInstanceSaveMgr->LoadInstanceSavesAndBindsForMapIDs(newMapIDs, *instanceSaveStoragePtr, *playerBindStoragePtr);
+               *loadRowsPtr = sInstanceSaveMgr->LoadInstanceSavesAndBindsForMapIDs(newMapIDs);
                return true;
            },
-           [instanceSaveStoragePtr, playerBindStoragePtr, newMapIDs](bool) {
-               sInstanceSaveMgr->MergeWithNewInstanceSaves(*instanceSaveStoragePtr, *playerBindStoragePtr);
+           [loadRowsPtr, newMapIDs](bool) {
+               sInstanceSaveMgr->MergeWithNewInstanceSaves(*loadRowsPtr);
                TC9ReadyToAcceptPlayersFromMaps((uint32_t*)newMapIDs.data(), newMapIDs.size());
 
                LOG_INFO("server", "Finished loading data for newly assigned maps.");
