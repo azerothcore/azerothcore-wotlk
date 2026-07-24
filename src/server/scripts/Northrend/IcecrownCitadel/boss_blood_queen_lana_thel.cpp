@@ -225,8 +225,10 @@ public:
             me->setActive(true);
             DoZoneInCombat();
             Talk(SAY_AGGRO);
+
             if (instance->GetBossState(DATA_BLOOD_QUEEN_LANA_THEL) != DONE)
                 instance->SetBossState(DATA_BLOOD_QUEEN_LANA_THEL, IN_PROGRESS);
+
             DoCastSelf(SPELL_CLEAR_ALL_STATUS_AILMENTS, true);
             _creditBloodQuickening = instance->GetData(DATA_BLOOD_QUICKENING_STATE) == IN_PROGRESS;
         }

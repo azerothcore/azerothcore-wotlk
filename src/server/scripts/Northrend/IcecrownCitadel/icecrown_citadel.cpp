@@ -20,9 +20,9 @@
 #include "AreaTriggerScript.h"
 #include "Cell.h"
 #include "CellImpl.h"
+#include "CreatureScript.h"
 #include "GameObject.h"
 #include "GameObjectAI.h"
-#include "CreatureScript.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "Group.h"
@@ -2062,6 +2062,7 @@ struct npc_icc_orb_controller : public ScriptedAI
                 ObjectGuid mGuid = Acore::Containers::SelectRandomContainerElement(_minionGuids);
                 if (Unit* minion = ObjectAccessor::GetUnit(*me, mGuid))
                     minion->CastSpell(nullptr, SPELL_BLOOD_ORB_VISUAL);
+
                 visual.Repeat(_isLongRepeat ? 21s : 3s);
                 _isLongRepeat = !_isLongRepeat;
             });
@@ -2279,6 +2280,7 @@ struct npc_darkfallen_noble : public DarkFallenAI
                     if (Unit* target = me->GetVictim())
                         if (Creature* vampiric = me->SummonCreature(NPC_VAMPIRIC_FIEND, target->GetPosition(), TEMPSUMMON_CORPSE_DESPAWN))
                             vampiric->AI()->AttackStart(target);
+
                     summonVampiric.Repeat(30s);
                 });
     }
@@ -2333,6 +2335,7 @@ struct npc_darkfallen_archmage : public DarkFallenAI
             {
                 if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0))
                     DoCast(target, SPELL_AMPLIFY_MAGIC);
+
                 amplifyMagic.Repeat(15s, 24s);
             })
             .Schedule(10s, [this](TaskContext blastWave)
@@ -2344,6 +2347,7 @@ struct npc_darkfallen_archmage : public DarkFallenAI
                 {
                     if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 0.0f, true, false, -SPELL_POLYMORPH))
                         DoCast(target, SPELL_POLYMORPH);
+
                     polymorph.Repeat(25s, 35s);
                 });
     }
@@ -2365,6 +2369,7 @@ struct npc_darkfallen_advisor : public DarkFallenAI
                 {
                     if (Unit* target = DoSelectLowestHpFriendly(40.0f))
                         DoCast(target, SPELL_SHROUD_OF_SPELL_WARDING);
+
                     immunity.Repeat(20s, 25s);
                 });
     }
@@ -2422,8 +2427,10 @@ struct go_empowering_blood_orb : public GameObjectAI
         me->SetGameObjectFlag(GO_FLAG_IN_USE);
         me->SetGoAnimProgress(255);
         me->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+
         if (Creature* trigger = ObjectAccessor::GetCreature(*me, _triggerGuid))
             trigger->DespawnOrUnsummon();
+
         _scheduler.Schedule(3s, [this](TaskContext /*context*/)
             {
                 me->Delete();
@@ -2436,6 +2443,7 @@ struct go_empowering_blood_orb : public GameObjectAI
         {
             if (Unit* target = ObjectAccessor::GetUnit(*me, guid))
                 me->CastSpell(target, SPELL_EMPOWERED_BLOOD_3);
+
             HandleObjectUse();
         }
     }
