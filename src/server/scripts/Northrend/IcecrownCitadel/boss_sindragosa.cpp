@@ -361,6 +361,12 @@ public:
             BossAI::EnterEvadeMode(why);
         }
 
+        void JustReachedHome() override
+        {
+            BossAI::JustReachedHome();
+            me->SetAnimTier(AnimTier::Ground);
+        }
+
         void KilledUnit(Unit* victim) override
         {
             if (victim->IsPlayer())
@@ -381,6 +387,7 @@ public:
 
                 me->setActive(true);
                 me->SetDisableGravity(true);
+                me->SetAnimTier(AnimTier::Fly);
                 me->SetUnitFlag(UNIT_FLAG_NON_ATTACKABLE);
                 me->SetSpeed(MOVE_RUN, 4.28571f);
                 float moveTime = me->GetExactDist(&SindragosaFlyInPos) / (me->GetSpeed(MOVE_RUN) * 0.001f);
@@ -582,6 +589,7 @@ public:
                     me->GetMotionMaster()->MoveIdle();
                     me->StopMoving();
                     me->SetDisableGravity(true);
+                    me->SetAnimTier(AnimTier::Fly);
                     me->GetMotionMaster()->MoveTakeoff(POINT_TAKEOFF, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ() + 20.0f, 10.0f);
                     events.CancelEventGroup(EVENT_GROUP_LAND_PHASE);
                     events.ScheduleEvent(EVENT_AIR_PHASE, 110s);
@@ -1208,6 +1216,7 @@ public:
             if (!_summoned)
             {
                 me->SetDisableGravity(true);
+                me->SetAnimTier(AnimTier::Fly);
             }
         }
 
@@ -1217,6 +1226,7 @@ public:
             if (_summoned)
             {
                 me->SetDisableGravity(false);
+                me->SetAnimTier(AnimTier::Ground);
             }
         }
 
@@ -1339,6 +1349,7 @@ public:
             if (!_summoned)
             {
                 me->SetDisableGravity(true);
+                me->SetAnimTier(AnimTier::Fly);
             }
         }
 
@@ -1348,6 +1359,7 @@ public:
             if (_summoned)
             {
                 me->SetDisableGravity(false);
+                me->SetAnimTier(AnimTier::Ground);
             }
         }
 
@@ -1443,6 +1455,7 @@ public:
 
                         me->AttackStop();
                         me->SetDisableGravity(true);
+                        me->SetAnimTier(AnimTier::Fly);
                         float floorZ = me->GetMapHeight(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ());
                         float destZ;
                         if (floorZ > 190.0f) destZ = floorZ + 25.0f;
