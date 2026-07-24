@@ -241,6 +241,16 @@ namespace Acore::ChatCommands
     using namespace ::Acore::Hyperlinks::LinkTags;
 }
 
+namespace fmt {
+template<>
+struct formatter<Acore::ChatCommands::Tail> : formatter<std::string_view> {
+    template <typename FormatContext>
+    auto format(Acore::ChatCommands::Tail const& t, FormatContext& ctx) const {
+        return formatter<std::string_view>::format(std::string_view(t), ctx);
+    }
+};
+} // namespace fmt
+
 namespace Acore::Impl
 {
     template <typename T>

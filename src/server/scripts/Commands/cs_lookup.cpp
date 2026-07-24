@@ -1599,6 +1599,12 @@ public:
         stmt->SetData(0, *ip);
         PreparedQueryResult result = LoginDatabase.Query(stmt);
 
+        if (!result)
+        {
+            handler->SendErrorMessage(LANG_IP_NOT_FOUND, *ip);
+            return false;
+        }
+
         return LookupPlayerSearchCommand(result, *limit ? *limit : -1, handler);
     }
 
@@ -1613,6 +1619,12 @@ public:
         stmt->SetData(0, account);
         PreparedQueryResult result = LoginDatabase.Query(stmt);
 
+        if (!result)
+        {
+            handler->SendErrorMessage(LANG_ACCOUNT_NOT_EXIST, account);
+            return false;
+        }
+
         return LookupPlayerSearchCommand(result, *limit ? *limit : -1, handler);
     }
 
@@ -1622,6 +1634,12 @@ public:
         stmt->SetData(0, email);
         PreparedQueryResult result = LoginDatabase.Query(stmt);
 
+        if (!result)
+        {
+            handler->SendErrorMessage(LANG_EMAIL_NOT_FOUND, email);
+            return false;
+        }
+
         return LookupPlayerSearchCommand(result, *limit ? *limit : -1, handler);
     }
 
@@ -1629,25 +1647,73 @@ public:
     {
         if (!result)
         {
-            handler->SendErrorMessage(LANG_NO_PLAYERS_FOUND);
+            // Safety net: callers (HandleLookupPlayer*Command) must validate `result` before invoking this.
+            // If we get here it's a bug in a sibling handler -- log it server-side and bail.
+            LOG_ERROR("misc", "LookupPlayerSearchCommand called with null result; a HandleLookupPlayer* handler is missing pre-validation.");
             return false;
         }
 
-        int32 counter = 0;
-        uint32 count = 0;
+        int32 counter = 0; // for characters
+        uint32 count = 0; // for accounts
         uint32 maxResults = sWorld->getIntConfig(CONFIG_MAX_RESULTS_LOOKUP_COMMANDS);
 
         do
         {
-            if (maxResults && count++ == maxResults)
+            if (maxResults && count == maxResults)
             {
                 handler->PSendSysMessage(LANG_COMMAND_LOOKUP_MAX_RESULTS, maxResults);
                 return true;
             }
 
+            ++count;
+
             Field* fields           = result->Fetch();
             uint32 accountId        = fields[0].Get<uint32>();
             std::string accountName = fields[1].Get<std::string>();
+            bool locked             = fields[2].Get<uint8>() != 0; // pulled from the initial query
+
+            // BANNED > LOCKED > MUTED (order of priority).
+            bool banned = false;
+            {
+                LoginDatabasePreparedStatement* stmtBan = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_BANNED);
+                stmtBan->SetData(0, accountId);
+                PreparedQueryResult banResult = LoginDatabase.Query(stmtBan);
+                if (banResult && banResult->GetRowCount() > 0)
+                    banned = true;
+            }
+
+            bool muted = false;
+            if (!banned && !locked) // If not banned or locked, check mute status
+            {
+                LoginDatabasePreparedStatement* stmtMute = LoginDatabase.GetPreparedStatement(LOGIN_SEL_ACCOUNT_MUTE_INFO);
+                stmtMute->SetData(0, accountId);
+                PreparedQueryResult muteResult = LoginDatabase.Query(stmtMute);
+                if (muteResult)
+                {
+                    uint32 now = uint32(time(nullptr));
+                    do
+                    {
+                        Field* muteFields = muteResult->Fetch();
+                        if (muteFields[0].Get<uint32>() + muteFields[1].Get<uint32>() > now)
+                        {
+                            muted = true;
+                            break;
+                        }
+                    } while (muteResult->NextRow());
+                }
+            }
+
+            std::string status;
+            if (banned)
+                status = " - [BANNED]";
+            else if (locked)
+                status = " - [LOCKED]";
+            else if (muted)
+                status = " - [MUTED]";
+
+            handler->PSendSysMessage(LANG_LOOKUP_PLAYER_ACCOUNT, accountName, accountId);
+            if (!status.empty())
+                handler->PSendSysMessage("  {}", status);
 
             CharacterDatabasePreparedStatement* stmt = CharacterDatabase.GetPreparedStatement(CHAR_SEL_CHAR_GUID_NAME_BY_ACC);
             stmt->SetData(0, accountId);
@@ -1655,8 +1721,6 @@ public:
 
             if (result2)
             {
-                handler->PSendSysMessage(LANG_LOOKUP_PLAYER_ACCOUNT, accountName, accountId);
-
                 do
                 {
                     Field* characterFields   = result2->Fetch();
@@ -1674,7 +1738,7 @@ public:
 
                     if (plevel > 0 && prace > 0 && prace <= RACE_DRAENEI && pclass > 0 && pclass <= CLASS_DRUID)
                     {
-                        handler->PSendSysMessage("  {} (GUID {}) - {} - {} - {}{}", name, guid, EnumUtils::ToTitle(Races(prace)), EnumUtils::ToTitle(Classes(pclass)), plevel, (online ? " - [ONLINE]" : ""));
+                        handler->PSendSysMessage("  {} (GUID: {}) - {} - {} - {}{}", name, guid, EnumUtils::ToTitle(Races(prace)), EnumUtils::ToTitle(Classes(pclass)), plevel, (online ? " - [ONLINE]" : ""));
                     }
                     else
                     {
@@ -1684,13 +1748,16 @@ public:
                     ++counter;
                 } while (result2->NextRow() && (limit == -1 || counter < limit));
             }
+            else // Account exists but has no characters; not an error condition.
+            {
+                handler->SendSysMessage(LANG_NO_PLAYERS_FOUND);
+            }
+
+            handler->SendSysMessage("");
         } while (result->NextRow());
 
-        if (!counter) // empty accounts only
-        {
-            handler->SendErrorMessage(LANG_NO_PLAYERS_FOUND);
-            return false;
-        }
+        handler->PSendSysMessage(LANG_LOOKUP_TOTAL_ACCOUNTS, count);
+        handler->PSendSysMessage(LANG_LOOKUP_TOTAL_CHARACTERS, counter);
 
         return true;
     }
