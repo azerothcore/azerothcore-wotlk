@@ -1,3 +1,4 @@
+-- DB update 2026_07_24_02 -> 2026_07_24_03
 -- Higher Learning
 UPDATE `smart_scripts` SET
     `action_type` = 41,
