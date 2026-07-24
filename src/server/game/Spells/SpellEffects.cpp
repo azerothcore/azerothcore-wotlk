@@ -3936,7 +3936,7 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                     case 47770:
                         {
                             char buf[128];
-                            const char* gender = "his";
+                            char const* gender = "his";
                             if (m_caster->getGender() > 0)
                                 gender = "her";
                             snprintf(buf, sizeof(buf), "%s rubs %s [Decahedral Dwarven Dice] between %s hands and rolls. One %u and one %u.", m_caster->GetName().c_str(), gender, gender, urand(1, 10), urand(1, 10));
