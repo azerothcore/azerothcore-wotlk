@@ -22,7 +22,6 @@
 #include "CellImpl.h"
 #include "Chat.h"
 #include "Corpse.h"
-#include "GameGraveyard.h"
 #include "GameTime.h"
 #include "InstanceSaveMgr.h"
 #include "Log.h"
@@ -520,15 +519,10 @@ void WorldSession::HandleMoverRelocation(MovementInfo& movementInfo, Unit* mover
                     if (plrMover->IsAlive())
                         plrMover->KillPlayer();
                 }
-                else if (!plrMover->HasPlayerFlag(PLAYER_FLAGS_IS_OUT_OF_BOUNDS))
-                {
-                    GraveyardStruct const* grave = sGraveyard->GetClosestGraveyard(plrMover, plrMover->GetTeamId());
-                    if (grave)
-                    {
-                        plrMover->TeleportTo(grave->Map, grave->x, grave->y, grave->z, plrMover->GetOrientation());
-                        plrMover->Relocate(grave->x, grave->y, grave->z, plrMover->GetOrientation());
-                    }
-                }
+                // Rescue only released ghosts: teleporting an unreleased body would move the corpse
+                // out of instances (e.g. Eye of Eternity platform destruction, issue #25757).
+                else if (plrMover->HasPlayerFlag(PLAYER_FLAGS_GHOST) && !plrMover->HasPlayerFlag(PLAYER_FLAGS_IS_OUT_OF_BOUNDS))
+                    plrMover->RepopAtGraveyard();
             }
         }
     }
