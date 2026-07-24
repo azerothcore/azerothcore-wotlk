@@ -73,7 +73,7 @@ enum eSpells
     SPELL_POWER_SPARK_GROUND_BUFF       = 55852,
     SPELL_POWER_SPARK_MALYGOS_BUFF      = 56152,
 
-    SPELL_TELEPORT_VISUAL               = 52096,
+    SPELL_TELEPORT_VISUAL               = 41232,
 
     SPELL_SCION_ARCANE_BARRAGE          = 56397,
     SPELL_ARCANE_SHOCK                  = 57058,

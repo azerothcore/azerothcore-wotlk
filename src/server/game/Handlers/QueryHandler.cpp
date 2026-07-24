@@ -170,7 +170,7 @@ void WorldSession::HandleGameObjectQueryOpcode(WorldPacket& recvData)
     ObjectGuid guid;
     recvData >> guid;
 
-    const GameObjectTemplate* info = sObjectMgr->GetGameObjectTemplate(entry);
+    GameObjectTemplate const* info = sObjectMgr->GetGameObjectTemplate(entry);
     if (info)
     {
         std::string Name;

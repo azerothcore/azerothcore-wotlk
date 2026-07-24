@@ -40,6 +40,7 @@
 #include "Language.h"
 #include "Log.h"
 #include "LootItemStorage.h"
+#include "MailMgr.h"
 #include "MapMgr.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
@@ -347,7 +348,7 @@ uint32 Player::GetItemCount(uint32 item, bool inBankAlso, Item* skipItem) const
     if (skipItem && skipItem->GetTemplate()->GemProperties)
         for (uint8 i = EQUIPMENT_SLOT_START; i < INVENTORY_SLOT_ITEM_END; ++i)
             if (Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
-                if (pItem != skipItem && pItem->GetTemplate()->Socket[0].Color)
+                if (pItem != skipItem && pItem->HasSocket())
                     count += pItem->GetGemCountWithID(item);
 
     if (inBankAlso)
@@ -365,7 +366,7 @@ uint32 Player::GetItemCount(uint32 item, bool inBankAlso, Item* skipItem) const
         if (skipItem && skipItem->GetTemplate()->GemProperties)
             for (uint8 i = BANK_SLOT_ITEM_START; i < BANK_SLOT_ITEM_END; ++i)
                 if (Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
-                    if (pItem != skipItem && pItem->GetTemplate()->Socket[0].Color)
+                    if (pItem != skipItem && pItem->HasSocket())
                         count += pItem->GetGemCountWithID(item);
     }
 
@@ -754,7 +755,7 @@ bool Player::HasItemOrGemWithIdEquipped(uint32 item, uint32 count, uint8 except_
                 continue;
 
             Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i);
-            if (pItem && pItem->GetTemplate()->Socket[0].Color)
+            if (pItem && pItem->HasSocket())
             {
                 tempcount += pItem->GetGemCountWithID(item);
                 if (tempcount >= count)
@@ -1863,6 +1864,10 @@ InventoryResult Player::CanEquipNewItem(uint8 slot, uint16& dest, uint32 item, b
     if (pItem)
     {
         InventoryResult result = CanEquipItem(slot, dest, pItem, swap);
+        // Random-property items queue themselves on creation (SetItemRandomProperties
+        // -> SetState(ITEM_CHANGED, owner)); the probe must leave the update queue
+        // before deletion or the queue keeps a pointer to freed memory.
+        pItem->RemoveFromUpdateQueueOf(const_cast<Player*>(this));
         delete pItem;
         return result;
     }
@@ -2429,6 +2434,10 @@ InventoryResult Player::CanRollForItemInLFG(ItemTemplate const* proto, WorldObje
         SKILL_DAGGERS,  SKILL_THROWN,   SKILL_ASSASSINATION, SKILL_CROSSBOWS,   SKILL_WANDS,
         SKILL_FISHING
     }; //Copy from function Item::GetSkill()
+
+    // Anyone can roll need on this item
+    if (proto->HasFlag2(ITEM_FLAG2_EVERYONE_CAN_ROLL_NEED))
+        return EQUIP_ERR_OK;
 
     if ((proto->AllowableClass & getClassMask()) == 0 || (proto->AllowableRace & getRaceMask()) == 0)
         return EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM;
@@ -5090,6 +5099,20 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
     SetByteValue(PLAYER_BYTES_3, 0, fields[5].Get<uint8>());
     SetByteValue(PLAYER_BYTES_3, 1, fields[54].Get<uint8>());
     ReplaceAllPlayerFlags((PlayerFlags)fields[16].Get<uint32>());
+
+    RemovePlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME);
+    RemovePlayerFlag(PLAYER_FLAGS_PARTIAL_PLAY_TIME);
+
+    if (GetSession()->IsAffectedByCAIS())
+    {
+        Seconds const accountPlayedTime = GetSession()->GetConsecutivePlayTime(GameTime::GetGameTime());
+
+        if (accountPlayedTime >= PLAY_TIME_LIMIT_FULL)
+            SetPlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME);
+        else if (accountPlayedTime >= PLAY_TIME_LIMIT_PARTIAL)
+            SetPlayerFlag(PLAYER_FLAGS_PARTIAL_PLAY_TIME);
+    }
+
     SetInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, fields[53].Get<uint32>());
 
     SetUInt64Value(PLAYER_FIELD_KNOWN_CURRENCIES, fields[52].Get<uint64>());
@@ -5203,7 +5226,7 @@ bool Player::LoadFromDB(ObjectGuid playerGuid, CharacterDatabaseQueryHolder cons
                 ResurrectPlayer(1.0f);
         }
 
-        const WorldLocation& _loc = GetEntryPoint();
+        WorldLocation const& _loc = GetEntryPoint();
         mapId = _loc.GetMapId();
         instanceId = 0;
 
@@ -5695,7 +5718,7 @@ bool Player::isAllowedToLoot(Creature const* creature)
     if (HasPendingBind())
         return false;
 
-    const Loot* loot = &creature->loot;
+    Loot const* loot = &creature->loot;
     if (loot->isLooted()) // nothing to loot or everything looted.
         return false;
 
@@ -6276,10 +6299,21 @@ void Player::_LoadMail(PreparedQueryResult mailsResult, PreparedQueryResult mail
             m->checked        = fields[10].Get<uint8>();
             m->stationery     = fields[11].Get<uint8>();
             m->mailTemplateId = fields[12].Get<int16>();
+            bool has_items    = fields[13].Get<bool>();
 
             if (cur_time > m->expire_time)
             {
-                LOG_DEBUG("entities.player", "Player::_LoadMail: Mail ({}) has expired - ignored.", m->messageID);
+                // Drop empty expired mail now; mail with items or money is left
+                // for ReturnOrDeleteOldMails, which owns return-to-sender handling
+                if (!has_items && !m->money && !m->COD)
+                {
+                    LOG_DEBUG("entities.player", "Player::_LoadMail: Mail ({}) has expired - deleted.", m->messageID);
+                    sMailMgr->DeleteEmptyExpiredMail(m->messageID, GetGUID().GetCounter());
+                }
+                else
+                    LOG_DEBUG("entities.player", "Player::_LoadMail: Mail ({}) has expired - ignored.", m->messageID);
+
+                delete m;
                 continue;
             }
 
@@ -6698,10 +6732,10 @@ void Player::SendSavedInstances()
     }
 }
 
-void Player::PrettyPrintRequirementsQuestList(const std::vector<const ProgressionRequirement*>& missingQuests) const
+void Player::PrettyPrintRequirementsQuestList(std::vector<ProgressionRequirement const*> const& missingQuests) const
 {
     LocaleConstant loc_idx = GetSession()->GetSessionDbLocaleIndex();
-    for (const ProgressionRequirement* missingReq : missingQuests)
+    for (ProgressionRequirement const* missingReq : missingQuests)
     {
         Quest const* questTemplate = sObjectMgr->GetQuestTemplate(missingReq->id);
         if (!questTemplate)
@@ -6735,10 +6769,10 @@ void Player::PrettyPrintRequirementsQuestList(const std::vector<const Progressio
     }
 }
 
-void Player::PrettyPrintRequirementsAchievementsList(const std::vector<const ProgressionRequirement*>& missingAchievements) const
+void Player::PrettyPrintRequirementsAchievementsList(std::vector<ProgressionRequirement const*> const& missingAchievements) const
 {
     LocaleConstant loc_idx = GetSession()->GetSessionDbLocaleIndex();
-    for (const ProgressionRequirement* missingReq : missingAchievements)
+    for (ProgressionRequirement const* missingReq : missingAchievements)
     {
         AchievementEntry const* achievementEntry = sAchievementStore.LookupEntry(missingReq->id);
         if (!achievementEntry)
@@ -6768,10 +6802,10 @@ void Player::PrettyPrintRequirementsAchievementsList(const std::vector<const Pro
     }
 }
 
-void Player::PrettyPrintRequirementsItemsList(const std::vector<const ProgressionRequirement*>& missingItems) const
+void Player::PrettyPrintRequirementsItemsList(std::vector<ProgressionRequirement const*> const& missingItems) const
 {
     LocaleConstant loc_idx = GetSession()->GetSessionDbLocaleIndex();
-    for (const ProgressionRequirement* missingReq : missingItems)
+    for (ProgressionRequirement const* missingReq : missingItems)
     {
         ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(missingReq->id);
         if (!itemTemplate)
@@ -6847,12 +6881,12 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
         }
 
         //Check all items
-        std::vector<const ProgressionRequirement*> missingPlayerItems;
-        std::vector<const ProgressionRequirement*> missingLeaderItems;
-        for (const ProgressionRequirement* itemRequirement : ar->items)
+        std::vector<ProgressionRequirement const*> missingPlayerItems;
+        std::vector<ProgressionRequirement const*> missingLeaderItems;
+        for (ProgressionRequirement const* itemRequirement : ar->items)
         {
             Player* checkPlayer = this;
-            std::vector<const ProgressionRequirement*>* missingItems = &missingPlayerItems;
+            std::vector<ProgressionRequirement const*>* missingItems = &missingPlayerItems;
             if (itemRequirement->checkLeaderOnly)
             {
                 checkPlayer = partyLeader;
@@ -6869,12 +6903,12 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
         }
 
         //Check all achievements
-        std::vector<const ProgressionRequirement*> missingPlayerAchievements;
-        std::vector<const ProgressionRequirement*> missingLeaderAchievements;
-        for (const ProgressionRequirement* achievementRequirement : ar->achievements)
+        std::vector<ProgressionRequirement const*> missingPlayerAchievements;
+        std::vector<ProgressionRequirement const*> missingLeaderAchievements;
+        for (ProgressionRequirement const* achievementRequirement : ar->achievements)
         {
             Player* checkPlayer = this;
-            std::vector<const ProgressionRequirement*>* missingAchievements = &missingPlayerAchievements;
+            std::vector<ProgressionRequirement const*>* missingAchievements = &missingPlayerAchievements;
             if (achievementRequirement->checkLeaderOnly)
             {
                 checkPlayer = partyLeader;
@@ -6891,12 +6925,12 @@ bool Player::Satisfy(DungeonProgressionRequirements const* ar, uint32 target_map
         }
 
         //Check all quests
-        std::vector<const ProgressionRequirement*> missingPlayerQuests;
-        std::vector<const ProgressionRequirement*> missingLeaderQuests;
-        for (const ProgressionRequirement* questRequirement : ar->quests)
+        std::vector<ProgressionRequirement const*> missingPlayerQuests;
+        std::vector<ProgressionRequirement const*> missingLeaderQuests;
+        for (ProgressionRequirement const* questRequirement : ar->quests)
         {
             Player* checkPlayer = this;
-            std::vector<const ProgressionRequirement*>* missingQuests = &missingPlayerQuests;
+            std::vector<ProgressionRequirement const*>* missingQuests = &missingPlayerQuests;
             if (questRequirement->checkLeaderOnly)
             {
                 checkPlayer = partyLeader;

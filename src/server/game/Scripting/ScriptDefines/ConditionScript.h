@@ -23,7 +23,7 @@
 class ConditionScript : public ScriptObject
 {
 protected:
-    ConditionScript(const char* name);
+    ConditionScript(char const* name);
 
 public:
     [[nodiscard]] bool IsDatabaseBound() const override { return true; }

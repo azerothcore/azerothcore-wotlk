@@ -338,6 +338,8 @@ void SmartAI::StopPath(uint32 DespawnTime, uint32 quest, bool fail)
     if (quest)
         mEscortQuestID = quest;
 
+    mCanRepeatPath = false;
+
     SetDespawnTime(DespawnTime);
 
     if (me->GetMotionMaster()->GetMotionSlotType(MOTION_SLOT_ACTIVE) == ESCORT_MOTION_TYPE)
@@ -876,7 +878,14 @@ void SmartAI::JustEngagedWith(Unit* enemy)
 {
     // Xinef: Interrupt channeled spells
     if (IsAIControlled())
-        me->InterruptSpell(CURRENT_CHANNELED_SPELL, true, true);
+    {
+        if (Spell* spell = me->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
+        {
+            if (!spell->GetSpellInfo()->IsActionAllowedChannel())
+                me->InterruptSpell(CURRENT_CHANNELED_SPELL, true, true);
+        }
+    }
+
     GetScript()->ProcessEventsFor(SMART_EVENT_AGGRO, enemy);
 }
 
@@ -1151,7 +1160,7 @@ void SmartAI::sGossipSelect(Player* player, uint32 sender, uint32 action)
     GetScript()->ProcessEventsFor(SMART_EVENT_GOSSIP_SELECT, player, sender, action);
 }
 
-void SmartAI::sGossipSelectCode(Player* /*player*/, uint32 /*sender*/, uint32 /*action*/, const char* /*code*/)
+void SmartAI::sGossipSelectCode(Player* /*player*/, uint32 /*sender*/, uint32 /*action*/, char const* /*code*/)
 {
 }
 
@@ -1239,7 +1248,7 @@ void SmartAI::SetFollow(Unit* target, float dist, float angle, uint32 credit, ui
     mFollowArrivedEntry = end;
     mFollowArrivedAlive = !aliveState; // negate - 0 is alive
     mFollowCreditType = creditType;
-    me->GetMotionMaster()->MoveFollow(target, mFollowDist, mFollowAngle);
+    me->GetMotionMaster()->MoveFollow(target, mFollowDist, mFollowAngle, MOTION_SLOT_ACTIVE, true, false);
 }
 
 void SmartAI::StopFollow(bool complete)
@@ -1404,7 +1413,7 @@ bool SmartGameObjectAI::GossipSelect(Player* player, uint32 sender, uint32 actio
 }
 
 // Called when a player selects a gossip with a code in the gameobject's gossip menu.
-bool SmartGameObjectAI::GossipSelectCode(Player* /*player*/, uint32 /*sender*/, uint32 /*action*/, const char* /*code*/)
+bool SmartGameObjectAI::GossipSelectCode(Player* /*player*/, uint32 /*sender*/, uint32 /*action*/, char const* /*code*/)
 {
     return false;
 }
