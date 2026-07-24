@@ -47,6 +47,9 @@ enum SpellData
     SPELL_MINE_EXPLOSION                            = 66351,
     SPELL_SUMMON_PROXIMITY_MINE                     = 65347,
 
+    // PHASE 1 -> 2 TRANSITION:
+    SPELL_ELEVATOR_KNOCKBACK                        = 65096, // Self-cast by the world trigger; sweeps players off the elevator as it rises
+
     // PHASE 2:
     SPELL_HEAT_WAVE                                 = 64533,
 
@@ -98,6 +101,7 @@ enum NPCs
     NPC_ASSAULT_BOT                                 = 34057,
     NPC_JUNK_BOT                                    = 33855,
     NPC_MAGNETIC_CORE                               = 34068,
+    NPC_WORLD_TRIGGER                               = 21252,
 };
 
 enum GOs
@@ -488,6 +492,8 @@ struct boss_mimiron : public BossAI
                     elevator->SetLootState(GO_READY);
                     elevator->UseDoorOrButton(0, false);
                     elevator->EnableCollision(false);
+                    if (Creature* trigger = me->SummonCreature(NPC_WORLD_TRIGGER, elevator->GetPositionX(), elevator->GetPositionY(), elevator->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN, 5000))
+                        trigger->CastSpell(trigger, SPELL_ELEVATOR_KNOCKBACK);
                 }
                 events.ScheduleEvent(EVENT_ELEVATOR_INTERVAL_1, 6s);
                 break;
@@ -752,10 +758,12 @@ struct boss_mimiron : public BossAI
                 // spawn chest
                 if (uint32 chestId = (_hardmode ? RAID_MODE(GO_MIMIRON_CHEST_HARD, GO_MIMIRON_CHEST_HERO_HARD) : RAID_MODE(GO_MIMIRON_CHEST, GO_MIMIRON_CHEST_HERO)))
                 {
-                    if (GameObject* go = me->SummonGameObject(chestId, 2744.65f, 2569.46f, 364.397f, 0, 0, 0, 0, 0, 0))
+                    // Summoned by the map, not Mimiron, so the chest survives his despawn during the outro.
+                    if (GameObject* go = me->GetMap()->SummonGameObject(chestId, 2744.65f, 2569.46f, 364.397f, 0, 0, 0, 0, 0, 0))
                     {
                         go->ReplaceAllGameObjectFlags((GameObjectFlags)0);
                         go->SetLootRecipient(me->GetMap());
+                        go->SetRespawnTime(7 * DAY);
                     }
                 }
                 events.ScheduleEvent(EVENT_DISAPPEAR, 9s);
@@ -780,6 +788,9 @@ struct boss_mimiron : public BossAI
 
     void EnterEvadeMode(EvadeReason why) override
     {
+        // Once Mimiron turns friendly for the defeat RP, don't reset the encounter.
+        if (me->GetFaction() == FACTION_FRIENDLY)
+            return;
         if (_isEvading)
             return;
         _isEvading = true;

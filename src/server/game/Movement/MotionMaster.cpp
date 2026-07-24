@@ -28,6 +28,7 @@
 #include "Log.h"
 #include "MoveSpline.h"
 #include "MoveSplineInit.h"
+#include "Player.h"
 #include "PointMovementGenerator.h"
 #include "RandomMovementGenerator.h"
 #include "TargetedMovementGenerator.h"
@@ -619,7 +620,7 @@ void MotionMaster::MoveTakeoff(uint32 id, float x, float y, float z, float speed
 void MotionMaster::MoveKnockbackFrom(float srcX, float srcY, float speedXY, float speedZ)
 {
     //this function may make players fall below map
-    if (_owner->IsPlayer())
+    if (_owner->IsPlayer() && _owner->IsClientControlled())
         return;
 
     if (speedXY <= 0.1f)
@@ -638,6 +639,15 @@ void MotionMaster::MoveKnockbackFrom(float srcX, float srcY, float speedXY, floa
     init.SetParabolic(max_height, 0);
     init.SetOrientationFixed(true);
     init.SetVelocity(speedXY);
+
+    // Do not mutate an active fleeing/confused movement generator,
+    // doing so breaks the movement upon landing from the knockback
+    MovementGeneratorType slotType = GetMotionSlotType(MOTION_SLOT_CONTROLLED);
+    if (slotType == FLEEING_MOTION_TYPE || slotType == CONFUSED_MOTION_TYPE)
+    {
+        init.Launch();
+        return;
+    }
 
     Mutate(new EffectMovementGenerator(init, 0), MOTION_SLOT_CONTROLLED);
 }
@@ -837,7 +847,17 @@ void MotionMaster::MoveTaxiFlight(uint32 path, uint32 pathnode)
         {
             LOG_DEBUG("movement.motionmaster", "{} taxi to (Path {} node {})", _owner->GetName(), path, pathnode);
             FlightPathMovementGenerator* mgen = new FlightPathMovementGenerator(pathnode);
-            mgen->LoadPath(_owner->ToPlayer());
+            Player* player = _owner->ToPlayer();
+            if (!mgen->LoadPath(player))
+            {
+                LOG_ERROR("movement.motionmaster", "{} failed to build taxi path (Path {} node {}), clearing taxi destinations",
+                    _owner->GetName(), path, pathnode);
+                player->m_taxi.ClearTaxiDestinations();
+                player->Dismount();
+                delete mgen;
+                return;
+            }
+
             Mutate(mgen, MOTION_SLOT_CONTROLLED);
         }
         else

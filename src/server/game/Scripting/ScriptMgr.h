@@ -613,6 +613,7 @@ public: /* BGScript */
     void OnBattlegroundEnd(Battleground* bg, TeamId winnerTeamId);
     void OnBattlegroundDestroy(Battleground* bg);
     void OnBattlegroundCreate(Battleground* bg);
+    void OnBattlegroundSetup(Battleground* bg);
     bool CanAddGroupToMatchingPool(BattlegroundQueue* queue, GroupQueueInfo* group, uint32 poolPlayerCount, Battleground* bg, BattlegroundBracketId bracketId);
     bool GetPlayerMatchmakingRating(ObjectGuid playerGuid, BattlegroundTypeId bgTypeId, float& outRating);
 

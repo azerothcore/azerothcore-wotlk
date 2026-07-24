@@ -56,6 +56,7 @@
 #include "InstanceSaveMgr.h"
 #include "ItemEnchantmentMgr.h"
 #include "LFGMgr.h"
+#include "Language.h"
 #include "Log.h"
 #include "LootItemStorage.h"
 #include "LootMgr.h"
@@ -1450,10 +1451,15 @@ void World::_UpdateGameTime()
         ///- ... and it is overdue, stop the world (set m_stopEvent)
         if (_shutdownTimer <= elapsed.count())
         {
-            if (!(_shutdownMask & SHUTDOWN_MASK_IDLE) || sWorldSessionMgr->GetActiveAndQueuedSessionCount() == 0)
-                _stopEvent = true;                         // exist code already set
-            else
-                _shutdownTimer = 1;                        // minimum timer value to wait idle state
+            ///- ... unless a Wintergrasp battle is running and deferral is enabled, in which case the
+            ///  shutdown/restart is pushed past the end of the current battle and the world keeps running
+            if (!RescheduleShutdownForWintergrasp())
+            {
+                if (!(_shutdownMask & SHUTDOWN_MASK_IDLE) || sWorldSessionMgr->GetActiveAndQueuedSessionCount() == 0)
+                    _stopEvent = true;                     // exist code already set
+                else
+                    _shutdownTimer = 1;                    // minimum timer value to wait idle state
+            }
         }
         ///- ... else decrease it and if necessary display a shutdown countdown to the users
         else
@@ -1463,6 +1469,38 @@ void World::_UpdateGameTime()
             ShutdownMsg();
         }
     }
+}
+
+/// Defer a pending shutdown/restart if a Wintergrasp battle is currently running.
+/// Returns true when the shutdown timer was extended (world should keep running).
+bool World::RescheduleShutdownForWintergrasp()
+{
+    uint32 const bufferMinutes = getIntConfig(CONFIG_WINTERGRASP_DEFER_SHUTDOWN);
+    if (!bufferMinutes)
+        return false;
+
+    // Idle shutdowns wait for an empty server anyway; don't interfere with them
+    if (_shutdownMask & SHUTDOWN_MASK_IDLE)
+        return false;
+
+    Battlefield* wg = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
+    if (!wg || !wg->IsEnabled() || !wg->IsWarTime())
+        return false;
+
+    // GetTimer() is the battle time remaining in milliseconds
+    _shutdownTimer = wg->GetTimer() / IN_MILLISECONDS + bufferMinutes * MINUTE;
+
+    LOG_INFO("server.worldserver", "Server {} deferred: Wintergrasp battle in progress, rescheduled in {}",
+        (_shutdownMask & SHUTDOWN_MASK_RESTART ? "restart" : "shutdown"), secsToTimeString(_shutdownTimer));
+
+    sWorldSessionMgr->DoForAllOnlinePlayers([](Player* player)
+    {
+        LocaleConstant locale = player->GetSession()->GetSessionDbLocaleIndex();
+        sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, sObjectMgr->GetAcoreString(LANG_WG_SHUTDOWN_DEFERRED, locale), player);
+    });
+
+    ShutdownMsg(true);
+    return true;
 }
 
 /// Shutdown the server
@@ -1639,7 +1677,7 @@ void World::InitMonthlyQuestResetTime()
 void World::InitRandomBGResetTime()
 {
     Seconds wstime = Seconds(sWorldState->getWorldState(WORLD_STATE_CUSTOM_BG_DAILY_RESET_TIME));
-    _nextRandomBGReset = wstime > 0s ? wstime : Seconds(Acore::Time::GetNextTimeWithDayAndHour(-1, 6));
+    _nextRandomBGReset = wstime > 0s ? wstime : Seconds(Acore::Time::GetNextTimeWithDayAndHour(-1, getIntConfig(CONFIG_RANDOM_BG_RESET_HOUR)));
 
     if (wstime == 0s)
     {
@@ -1772,7 +1810,7 @@ void World::ResetRandomBG()
         if (itr->second->GetPlayer())
             itr->second->GetPlayer()->SetRandomWinner(false);
 
-    _nextRandomBGReset = Seconds(Acore::Time::GetNextTimeWithDayAndHour(-1, 6));
+    _nextRandomBGReset = Seconds(Acore::Time::GetNextTimeWithDayAndHour(-1, getIntConfig(CONFIG_RANDOM_BG_RESET_HOUR)));
     sWorldState->setWorldState(WORLD_STATE_CUSTOM_BG_DAILY_RESET_TIME, _nextRandomBGReset.count());
 }
 
