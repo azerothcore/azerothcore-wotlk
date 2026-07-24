@@ -251,6 +251,8 @@ public:
                             summon->ToCreature()->AI()->Talk(EMOTE_TESLA_OVERLOAD);
                             summon->ToCreature()->CastSpell(me, SPELL_SHOCK_VISUAL, true);
                         }
+                        else // Stalagg and Feugen only feign death; the overload finishes them off
+                            summon->ToCreature()->KillSelf();
                     });
 
                     reviveTimer = 0;
@@ -369,6 +371,7 @@ public:
         uint32 pullTimer{};
         uint32 visualTimer{};
         bool overload;
+        bool isFeignDeath{};
         ObjectGuid myCoil;
 
         void Reset() override
@@ -376,6 +379,7 @@ public:
             pullTimer = 0;
             visualTimer = 1;
             overload = false;
+            isFeignDeath = false;
             events.Reset();
             me->SetControlled(false, UNIT_STATE_STUNNED);
             if (Creature* cr = me->FindNearestCreature(NPC_TESLA_COIL, 150.0f))
@@ -437,11 +441,16 @@ public:
             }
             else if (param == ACTION_RESTORE)
             {
-                if (!me->IsAlive())
+                if (isFeignDeath)
                 {
-                    me->Respawn();
-                    me->SetInCombatWithZone();
+                    isFeignDeath = false;
+                    me->SetFullHealth();
+                    me->SetStandState(UNIT_STAND_STATE_STAND);
+                    me->SetReactState(REACT_AGGRESSIVE);
+                    me->RemoveUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+                    me->SetControlled(false, UNIT_STATE_ROOT);
                     Talk(me->GetEntry() == NPC_STALAGG ? EMOTE_STAL_REVIVE : EMOTE_FEUG_REVIVE);
+                    me->SetInCombatWithZone();
                 }
                 else
                 {
@@ -451,13 +460,37 @@ public:
             }
         }
 
-        void JustDied(Unit* /*killer*/) override
+        // Fatal damage puts the minion in feign death instead of killing it, so a later
+        // ACTION_RESTORE can revive it without respawning (which would wipe AI state).
+        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
         {
+            if (damage < me->GetHealth())
+                return;
+
+            if (isFeignDeath) // don't take damage while feigning death
+            {
+                damage = 0;
+                return;
+            }
+
+            isFeignDeath = true;
+            damage = me->GetHealth() - 1;
+
             Talk(me->GetEntry() == NPC_STALAGG ? SAY_STAL_DEATH : SAY_FEUG_DEATH);
             Talk(me->GetEntry() == NPC_STALAGG ? EMOTE_STAL_DEATH : EMOTE_FEUG_DEATH);
 
-            if (Creature* cr = me->GetInstanceScript()->GetCreature(DATA_THADDIUS_BOSS))
-                cr->AI()->DoAction(ACTION_SUMMON_DIED);
+            if (Creature* thaddius = instance->GetCreature(DATA_THADDIUS_BOSS))
+                thaddius->AI()->DoAction(ACTION_SUMMON_DIED);
+
+            me->SetUnitFlag(UNIT_FLAG_NOT_SELECTABLE);
+            me->RemoveAllAuras();
+            me->SetReactState(REACT_PASSIVE);
+            me->AttackStop();
+            overload = false;
+            pullTimer = 0;
+            me->SetControlled(false, UNIT_STATE_STUNNED);
+            me->SetControlled(true, UNIT_STATE_ROOT);
+            me->SetStandState(UNIT_STAND_STATE_DEAD);
         }
 
         void KilledUnit(Unit* who) override
@@ -473,6 +506,9 @@ public:
 
         void UpdateAI(uint32 diff) override
         {
+            if (isFeignDeath)
+                return;
+
             if (visualTimer)
             {
                 visualTimer += diff;
