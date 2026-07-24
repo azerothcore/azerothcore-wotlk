@@ -342,7 +342,7 @@ void Arena::EndBattleground(TeamId winnerTeamId)
                         // update achievement BEFORE personal rating update
                         uint32 rating = player->GetArenaPersonalRating(winnerArenaTeam->GetSlot());
                         player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_RATED_ARENA, rating ? rating : 1);
-                        player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_ARENA, GetMapId());
+                        player->UpdateAchievementCriteria(ACHIEVEMENT_CRITERIA_TYPE_WIN_ARENA, GetMapId(), 0, player);
 
                         // Last standing - Rated 5v5 arena & be solely alive player
                         if (GetArenaType() == ARENA_TYPE_5v5 && aliveWinners == 1 && player->IsAlive())
