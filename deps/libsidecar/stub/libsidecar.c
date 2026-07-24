@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 void panicWithTC9Unavailable(const char* message) {
-    fprintf(stderr, "Tried to call '%s', but using stub for libsidecar. If your platform supported, use -DUSE_REAL_LIBSIDECAR=ON in cmake to use the real one.\n", message);
+    fprintf(stderr, "Tried to call '%s', but using stub for libsidecar. Use -DUSE_REAL_LIBSIDECAR=ON in cmake to use the real one.\n", message);
     exit(EXIT_FAILURE);
 }
 

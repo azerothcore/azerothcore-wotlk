@@ -10,9 +10,9 @@ extern "C" {
 #endif
 
 typedef enum PlayerMoneyErrorCode {
-    PlayerMoneyErrorCodeNoError        = 0,
-    PlayerMoneyErrorCodeNoHandler      = 1,
-    PlayerMoneyErrorCodePlayerNotFound = 2,
+    PlayerMoneyErrorCodeNoError         = 0,
+    PlayerMoneyErrorCodeNoHandler       = 1,
+    PlayerMoneyErrorCodePlayerNotFound  = 2,
     PlayerMoneyErrorCodeTooMuchMoney    = 3,
 } PlayerMoneyErrorCode;
 
