@@ -3932,17 +3932,6 @@ void Spell::EffectScriptEffect(SpellEffIndex effIndex)
                         }
                         break;
                     }*/
-                    // Roll Dice - Decahedral Dwarven Dice
-                    case 47770:
-                        {
-                            char buf[128];
-                            char const* gender = "his";
-                            if (m_caster->getGender() > 0)
-                                gender = "her";
-                            snprintf(buf, sizeof(buf), "%s rubs %s [Decahedral Dwarven Dice] between %s hands and rolls. One %u and one %u.", m_caster->GetName().c_str(), gender, gender, urand(1, 10), urand(1, 10));
-                            m_caster->TextEmote(buf);
-                            break;
-                        }
                     case 52173: // Coyote Spirit Despawn
                     case 60243: // Blood Parrot Despawn
                         if (unitTarget->IsCreature() && unitTarget->ToCreature()->IsSummon())
