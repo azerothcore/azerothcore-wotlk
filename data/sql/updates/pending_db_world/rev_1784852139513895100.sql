@@ -3,7 +3,7 @@
 -- The Avalanche sub-Zone Improvements Part 2: Urgreth of the Thousand Tombs
 -- NPC Updates, waypoints, etc
 -- -------------------------------------------
--- Urgreth of the Thousand Tombs (Entry 28103)
+-- Urgreth of the Thousand Tombs (Entry 28103, GUID 114741)
 -- Out of combat yell texts and emotes
 DELETE FROM `creature_text` WHERE `CreatureID`= 28103 AND `GroupID`= 1;
 INSERT INTO `creature_text` (`CreatureID`, `GroupID`, `ID`, `Text`, `Type`, `Language`, `Probability`, `Emote`, `Duration`, `Sound`, `BroadcastTextId`, `TextRange`, `comment`) VALUES
