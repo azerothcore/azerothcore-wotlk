@@ -962,7 +962,10 @@ void GameObject::DespawnOrUnsummon(Milliseconds delay /*= 0ms*/, Seconds forceRe
             }
 
             uint32 poolid = m_spawnId ? sPoolMgr->IsPartOfAPool<GameObject>(m_spawnId) : 0;
-            if (poolid)
+
+            // Keep the current pooled gameobject reserved until its respawn timer expires.
+            // GameObject::Update() will update the pool when the object is ready to respawn.
+            if (poolid && !m_respawnTime)
             {
                 sPoolMgr->UpdatePool<GameObject>(poolid, m_spawnId);
             }
