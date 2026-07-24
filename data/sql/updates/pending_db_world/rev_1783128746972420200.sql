@@ -3,7 +3,7 @@
 DELETE FROM `spell_script_names` WHERE `spell_id` IN (28443, 28697);
 INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
 (28443, 'spell_transform_ghost_visual'),
-(28697, 'spell_forgiveess_dummy_visual');
+(28697, 'spell_forgiveness_dummy_visual');
 
 -- Smartscript
 -- Deleted  28 due to SPELL_FORGIVENESS attack death
