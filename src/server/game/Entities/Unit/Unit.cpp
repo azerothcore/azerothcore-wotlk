@@ -6655,9 +6655,6 @@ void Unit::RemoveGameObjectsByType(GameobjectTypes type, bool del)
                 continue;
             }
 
-            LOG_DEBUG("entities.gameobject", "Removing owned gameobject by type (Owner: {} GO: {} Entry: {} Type: {} SpellId: {} Delete: {})",
-                GetGUID().ToString(), go->GetGUID().ToString(), go->GetEntry(), uint32(type), go->GetSpellId(), del);
-
             go->SetOwnerGUID(ObjectGuid::Empty);
             if (del)
             {
