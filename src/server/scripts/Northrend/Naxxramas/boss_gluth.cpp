@@ -76,18 +76,13 @@ public:
 
     struct boss_gluthAI : public BossAI
     {
-        explicit boss_gluthAI(Creature* c) : BossAI(c, BOSS_GLUTH), summons(me)
+        explicit boss_gluthAI(Creature* c) : BossAI(c, BOSS_GLUTH)
         {}
-
-        EventMap events;
-        SummonList summons;
 
         void Reset() override
         {
             BossAI::Reset();
             me->ApplySpellImmune(SPELL_INFECTED_WOUND, IMMUNITY_ID, SPELL_INFECTED_WOUND, true);
-            events.Reset();
-            summons.DespawnAll();
             me->SetReactState(REACT_AGGRESSIVE);
         }
 
@@ -137,12 +132,6 @@ public:
 
             if (who->IsPlayer())
                 instance->StorePersistentData(PERSISTENT_DATA_IMMORTAL_FAIL, 1);
-        }
-
-        void JustDied(Unit*  killer) override
-        {
-            BossAI::JustDied(killer);
-            summons.DespawnAll();
         }
 
         bool SelectPlayerInRoom()
