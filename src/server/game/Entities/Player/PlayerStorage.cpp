@@ -40,6 +40,7 @@
 #include "Language.h"
 #include "Log.h"
 #include "LootItemStorage.h"
+#include "MailMgr.h"
 #include "MapMgr.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
@@ -6298,10 +6299,21 @@ void Player::_LoadMail(PreparedQueryResult mailsResult, PreparedQueryResult mail
             m->checked        = fields[10].Get<uint8>();
             m->stationery     = fields[11].Get<uint8>();
             m->mailTemplateId = fields[12].Get<int16>();
+            bool has_items    = fields[13].Get<bool>();
 
             if (cur_time > m->expire_time)
             {
-                LOG_DEBUG("entities.player", "Player::_LoadMail: Mail ({}) has expired - ignored.", m->messageID);
+                // Drop empty expired mail now; mail with items or money is left
+                // for ReturnOrDeleteOldMails, which owns return-to-sender handling
+                if (!has_items && !m->money && !m->COD)
+                {
+                    LOG_DEBUG("entities.player", "Player::_LoadMail: Mail ({}) has expired - deleted.", m->messageID);
+                    sMailMgr->DeleteEmptyExpiredMail(m->messageID, GetGUID().GetCounter());
+                }
+                else
+                    LOG_DEBUG("entities.player", "Player::_LoadMail: Mail ({}) has expired - ignored.", m->messageID);
+
+                delete m;
                 continue;
             }
 
