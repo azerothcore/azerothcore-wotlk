@@ -41,6 +41,7 @@ enum Spells
 {
     SPELL_DUAL_WIELD                    = 42459,
     SPELL_BANISH                        = 37546,
+    SPELL_NEFARIAN_SHIELD               = 22663, // Nefarian's own "stand here immune until a condition is met" shield - instant self-buff, not channeled, not Banish-mechanic, so it isn't blocked by Leotheras's own boss CC immunities
     SPELL_TAUNT                         = 37548,
     SPELL_BERSERK                       = 26662,
     SPELL_WHIRLWIND                     = 37640,
@@ -83,6 +84,12 @@ struct boss_leotheras_the_blind : public BossAI
         DoCastSelf(SPELL_CLEAR_CONSUMING_MADNESS, true);
         DoCastSelf(SPELL_DUAL_WIELD, true);
         me->SetReactState(REACT_PASSIVE);
+
+        // Banished by the Greyheart Spellbinders until all 3 are dead. Unit flags
+        // (NON_ATTACKABLE/NOT_SELECTABLE) block the Spellbinders' own Green Beam nearby-entry
+        // target search on him too, so this uses an aura instead - cleared along with
+        // everything else by the RemoveAllAuras() below once all 3 are confirmed dead.
+        DoCastSelf(SPELL_NEFARIAN_SHIELD, true);
 
         ScheduleHealthCheckEvent(15, [&]{
             me->RemoveAurasDueToSpell(SPELL_WHIRLWIND);
