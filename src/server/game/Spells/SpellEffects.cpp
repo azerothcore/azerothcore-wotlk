@@ -5448,9 +5448,7 @@ void Spell::EffectTransmitted(SpellEffIndex effIndex)
         case GAMEOBJECT_TYPE_FISHINGNODE:
             {
                 if (m_caster->IsPlayer())
-                {
                     m_caster->RemoveGameObjectsByType(GAMEOBJECT_TYPE_FISHINGNODE, true);
-                }
 
                 m_caster->SetGuidValue(UNIT_FIELD_CHANNEL_OBJECT, pGameObj->GetGUID());
                 m_caster->AddGameObject(pGameObj);              // will removed at spell cancel
