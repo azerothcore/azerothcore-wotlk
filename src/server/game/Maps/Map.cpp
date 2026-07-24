@@ -38,6 +38,7 @@
 #include "Pet.h"
 #include "PoolMgr.h"
 #include "ScriptMgr.h"
+#include "TC9Sidecar.h"
 #include "Transport.h"
 #include "VMapFactory.h"
 #include "Vehicle.h"
@@ -517,6 +518,8 @@ void Map::Update(const uint32 t_diff, const uint32 s_diff, bool  /*thread*/)
     MoveAllDynamicObjectsInMoveList();
 
     HandleDelayedVisibility();
+
+    UpdatePlayersRedirectKickEvent(t_diff);
 
     UpdateWeather(t_diff);
     UpdateExpiredCorpses(t_diff);
@@ -1672,7 +1675,7 @@ void Map::SendInitTransports(Player* player)
     // Hack to send out transports
     UpdateData transData;
     for (TransportsContainer::const_iterator itr = _transports.begin(); itr != _transports.end(); ++itr)
-        if (*itr != player->GetTransport())
+        if (*itr != player->GetTransport() && (!sToCloud9Sidecar->ClusterModeEnabled() || player->InSamePhase(*itr)))
             (*itr)->BuildCreateUpdateBlockForPlayer(&transData, player);
 
     if (!transData.HasData())
@@ -1848,6 +1851,50 @@ uint32 Map::GetPlayersCountExceptGMs(bool aliveOnly /*= false*/) const
             if (!player->IsGameMaster() && (!aliveOnly || (player->IsAlive() && !player->HasSpiritOfRedemptionAura())))
                 ++count;
     return count;
+}
+
+void Map::StartPlayersRedirectKickTimer()
+{
+    for (MapRefMgr::iterator itr = m_mapRefMgr.begin(); itr != m_mapRefMgr.end(); ++itr)
+        itr->GetSource()->SendSystemMessage("Preparing to enter parallel dimension... One minute!\nAccelerate transfer: Teleport or type \"/ready\" in chat.");
+
+    _redirectKickTimer.Reset(60 * SECOND * IN_MILLISECONDS);
+    _lastAnnounceRedirectKickTimer.Reset(55 * SECOND * IN_MILLISECONDS);
+
+    _lastAnnounceRedirectKickTimer.Update(1);
+
+}
+
+void Map::StopPlayersRedirectKickTimer()
+{
+    _redirectKickTimer.Reset(0);
+    _lastAnnounceRedirectKickTimer.Reset(0);
+}
+
+void Map::UpdatePlayersRedirectKickEvent(uint32 diff)
+{
+    if (_redirectKickTimer.Passed())
+        return;
+
+    _redirectKickTimer.Update(diff);
+
+    if (_redirectKickTimer.Passed())
+    {
+        auto emptyPacket = WorldPacket();
+        for (MapRefMgr::iterator itr = m_mapRefMgr.begin(); itr != m_mapRefMgr.end(); ++itr)
+            itr->GetSource()->GetSession()->HandleTC9PrepareForRedirect(emptyPacket);
+
+        return;
+    }
+
+    if (_lastAnnounceRedirectKickTimer.Passed())
+        return;
+
+    _lastAnnounceRedirectKickTimer.Update(diff);
+
+    if (_lastAnnounceRedirectKickTimer.Passed())
+        for (MapRefMgr::iterator itr = m_mapRefMgr.begin(); itr != m_mapRefMgr.end(); ++itr)
+            itr->GetSource()->SendSystemMessage("Dimensional shift incoming! Prepare to transition in 5 seconds...");
 }
 
 void Map::SendToPlayers(WorldPacket const* data) const

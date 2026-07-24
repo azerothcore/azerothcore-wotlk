@@ -23,8 +23,8 @@
 #include "AccountMgr.h"
 #include "AchievementMgr.h"
 #include "AddonMgr.h"
-#include "ArenaTeamMgr.h"
 #include "ArenaSeasonMgr.h"
+#include "ArenaTeamMgr.h"
 #include "AuctionHouseMgr.h"
 #include "AutobroadcastMgr.h"
 #include "BattlefieldMgr.h"
@@ -41,8 +41,8 @@
 #include "CreatureAIRegistry.h"
 #include "CreatureGroups.h"
 #include "CreatureTextMgr.h"
-#include "DBCStores.h"
 #include "DatabaseEnv.h"
+#include "DBCStores.h"
 #include "DisableMgr.h"
 #include "DynamicVisibility.h"
 #include "GameEventMgr.h"
@@ -52,8 +52,8 @@
 #include "GridNotifiersImpl.h"
 #include "GroupMgr.h"
 #include "GuildMgr.h"
-#include "IPLocation.h"
 #include "InstanceSaveMgr.h"
+#include "IPLocation.h"
 #include "ItemEnchantmentMgr.h"
 #include "LFGMgr.h"
 #include "Language.h"
@@ -81,6 +81,7 @@
 #include "SmartAI.h"
 #include "SpellMgr.h"
 #include "TaskScheduler.h"
+#include "TC9Sidecar.h"
 #include "TicketMgr.h"
 #include "Transport.h"
 #include "TransportMgr.h"
@@ -1331,6 +1332,24 @@ void World::Update(uint32 diff)
     {
         METRIC_TIMER("world_update_time", METRIC_TAG("type", "Update world scripts"));
         sScriptMgr->OnWorldUpdate(diff);
+    }
+
+    if (sToCloud9Sidecar->ClusterModeEnabled())
+    {
+        {
+            METRIC_TIMER("world_update_time", METRIC_TAG("type", "Process TC9 async tasks"));
+            sToCloud9Sidecar->ProcessAsyncTasks();
+        }
+
+        {
+            METRIC_TIMER("world_update_time", METRIC_TAG("type", "Process TC9 hooks"));
+            sToCloud9Sidecar->ProcessHooks();
+        }
+
+        {
+            METRIC_TIMER("world_update_time", METRIC_TAG("type", "Process TC9 gRPC and HTTP requests"));
+            sToCloud9Sidecar->ProcessGrpcOrHttpRequests();
+        }
     }
 
     {

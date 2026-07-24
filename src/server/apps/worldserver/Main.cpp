@@ -49,10 +49,12 @@
 #include "SharedDefines.h"
 #include "SteadyTimer.h"
 #include "Systemd.h"
+#include "TC9Sidecar.h"
 #include "World.h"
 #include "WorldSessionMgr.h"
 #include "WorldSocket.h"
 #include "WorldSocketMgr.h"
+#include "libsidecar.h"
 #include <boost/asio/signal_set.hpp>
 #include <boost/program_options.hpp>
 #include <csignal>
@@ -365,7 +367,8 @@ int main(int argc, char** argv)
         sWorldSocketMgr.StopNetwork();
 
         ///- Clean database before leaving
-        ClearOnlineAccounts();
+        if (!sToCloud9Sidecar->ClusterModeEnabled())
+            ClearOnlineAccounts();
     });
 
     // Set server online (allow connecting now)
@@ -397,10 +400,14 @@ int main(int argc, char** argv)
         cliThread.reset(new std::thread(CliThread), &ShutdownCLIThread);
     }
 
+    sToCloud9Sidecar->Init(worldPort, realm.Id.Realm);
+
     WorldUpdateLoop();
 
     // Shutdown starts here
     threadPool.reset();
+
+    sToCloud9Sidecar->Deinit();
 
     sLog->SetSynchronous();
 
@@ -455,8 +462,11 @@ bool StartDB()
     LOG_INFO("server.loading", "Loading World Information...");
     LOG_INFO("server.loading", "> RealmID:              {}", realm.Id.Realm);
 
-    ///- Clean the database before starting
-    ClearOnlineAccounts();
+    ///- Clean the database before starting.
+    /// Cluster.Enabled is read from config here because sToCloud9Sidecar->Init()
+    /// has not run yet; ClusterModeEnabled() would still be the default false.
+    if (!sConfigMgr->GetOption<bool>("Cluster.Enabled", false))
+        ClearOnlineAccounts();
 
     ///- Insert version info into DB
     WorldDatabasePreparedStatement* stmt = WorldDatabase.GetPreparedStatement(WORLD_UPD_VERSION);

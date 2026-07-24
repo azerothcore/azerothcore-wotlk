@@ -85,3 +85,7 @@ recastnavigation (Recast is state of the art navigation mesh construction toolse
 fkYAML (A C++ header-only YAML library)
   https://github.com/fktn-k/fkYAML
   Version: 721edb3e1a817e527fd9e1e18a3bea300822522e
+
+libsidecar (enables interaction with other components when the worldserver is running in cluster mode. It requires building a shared library first and putting it in the corresponding folder.)
+  https://github.com/walkline/ToCloud9/tree/master/game-server/libsidecar
+  Version: master
