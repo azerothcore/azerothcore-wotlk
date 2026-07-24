@@ -30,11 +30,16 @@ enum DataTypes
     TYPE_BARON_FIGHT                    = 4,
     TYPE_MALLOW                         = 5,
     TYPE_BARTHILAS_RUN                  = 6,
+    TYPE_TIMMY                          = 7,
 
     DATA_BARON_RUN_NONE                 = 0,
     DATA_BARON_RUN_GATE                 = 1,
     DATA_JARIEN                         = 2,
-    DATA_SOTHOS                         = 3
+    DATA_SOTHOS                         = 3,
+
+    DATA_TIMMY_NONE                     = 0,
+    DATA_TIMMY_SPAWNED                  = 1,
+    DATA_TIMMY_DEAD                     = 2
 };
 
 enum CreatureIds
@@ -53,7 +58,12 @@ enum CreatureIds
     NPC_JARIEN                          = 16101,
     NPC_SOTHOS                          = 16102,
     NPC_SPIRIT_OF_JARIEN                = 16103,
-    NPC_SPIRIT_OF_SOTHOS                = 16104
+    NPC_SPIRIT_OF_SOTHOS                = 16104,
+    NPC_TIMMY_THE_CRUEL                 = 10808,
+    NPC_CRIMSON_GUARDSMAN               = 10418,
+    NPC_CRIMSON_CONJUROR                = 10419,
+    NPC_CRIMSON_INITIATE                = 10420,
+    NPC_CRIMSON_GALLANT                 = 10424
 };
 
 enum GameobjectIds
@@ -89,6 +99,7 @@ enum MiscIds
     SAY_BARON_0M                        = 4,
     SAY_BRAON_SUMMON_RAMSTEIN           = 5,
     SAY_BARON_GUARD_DEAD                = 6,
+    SAY_TIMMY_EMERGE                    = 0,
 
     EVENT_BARON_TIME                    = 1,
     EVENT_SPAWN_MINDLESS                = 2,
@@ -101,9 +112,13 @@ enum MiscIds
     EVENT_GATE2_TRAP                    = 9,
     EVENT_GATE2_DELAY                   = 10,
     EVENT_GATE2_CRITTER_DELAY           = 11,
+    EVENT_TIMMY_EMERGE                  = 12,
+    EVENT_TIMMY_RESPAWN                 = 13,
 
     SPELL_BARON_ULTIMATUM               = 27861
 };
+
+constexpr float CRUSADERS_SQUARE_RADIUS = 65.0f;
 
 template <class AI, class T>
 inline AI* GetStratholmeAI(T* obj)
