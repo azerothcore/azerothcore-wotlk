@@ -695,7 +695,9 @@ Spell::Spell(Unit* caster, SpellInfo const* info, TriggerCastFlags triggerFlags,
 
 Spell::~Spell()
 {
-    if (Player* modOwner = m_caster ? m_caster->GetSpellModOwner() : nullptr)
+    // FindMap() check: pending spell events are destroyed after the caster has left the map,
+    // where resolving a unit-summoned caster's owner through ObjectAccessor would assert
+    if (Player* modOwner = (m_caster && m_caster->FindMap()) ? m_caster->GetSpellModOwner() : nullptr)
         if (modOwner->m_spellModTakingSpell == this)
             modOwner->SetSpellModTakingSpell(this, false);
 
