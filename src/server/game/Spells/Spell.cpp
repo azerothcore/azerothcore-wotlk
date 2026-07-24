@@ -5654,6 +5654,10 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
     if (!m_caster->IsAlive() && !m_spellInfo->HasAttribute(SPELL_ATTR0_PASSIVE) && !(m_spellInfo->HasAttribute(SPELL_ATTR0_ALLOW_CAST_WHILE_DEAD) || (IsTriggered() && !m_triggeredByAuraSpell)))
         return SPELL_FAILED_CASTER_DEAD;
 
+    // check charmed state
+    if (m_spellInfo->HasAttribute(SPELL_ATTR5_NOT_AVALIABLE_WHILE_CHARMED) && m_caster->IsCharmed())
+        return SPELL_FAILED_CHARMED;
+
     // Spectator check
     if (m_caster->IsPlayer())
         if (((Player const*)m_caster)->IsSpectator() && m_spellInfo->Id != SPECTATOR_SPELL_BINDSIGHT)
