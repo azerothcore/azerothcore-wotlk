@@ -6640,6 +6640,32 @@ void Unit::RemoveGameObject(uint32 spellid, bool del)
     }
 }
 
+void Unit::RemoveGameObjectsByType(GameobjectTypes type, bool del)
+{
+    if (m_gameObj.empty())
+        return;
+
+    for (GameObjectList::iterator itr = m_gameObj.begin(); itr != m_gameObj.end();)
+    {
+        if (GameObject* go = ObjectAccessor::GetGameObject(*this, *itr))
+        {
+            if (go->GetGoType() != type)
+            {
+                ++itr;
+                continue;
+            }
+
+            go->SetOwnerGUID(ObjectGuid::Empty);
+            if (del)
+            {
+                go->SetRespawnTime(0);
+                go->Delete();
+            }
+        }
+        m_gameObj.erase(itr++);
+    }
+}
+
 void Unit::RemoveAllGameObjects()
 {
     while(!m_gameObj.empty())
