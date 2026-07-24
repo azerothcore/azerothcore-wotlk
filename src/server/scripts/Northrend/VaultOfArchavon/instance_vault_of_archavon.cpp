@@ -53,6 +53,10 @@ public:
             KoralonDeath = 0;
             checkTimer = 0;
             stoned = false;
+            warned15 = false;
+            warned2 = false;
+            kicked = false;
+            wasWarTime = false;
         }
 
         void OnPlayerEnter(Player* ) override
@@ -71,62 +75,93 @@ public:
         void Update(uint32 diff) override
         {
             checkTimer += diff;
-            if (checkTimer >= 60000)
+            if (checkTimer < 5000)
+                return;
+            checkTimer -= 5000;
+
+            if (!sWorld->getBoolConfig(CONFIG_WINTERGRASP_KICK_VOA_PLAYERS))
+                return;
+
+            Battlefield* bf = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG);
+            if (!bf)
+                return;
+
+            bool const warTime = bf->IsWarTime();
+            // Treat an already-active war as "timer at 0" so a jump straight
+            // past every threshold (GM-set timer, or a slow tick) still
+            // fires the missed warnings/stoning/kick retroactively instead
+            // of being skipped because IsWarTime() is already true.
+            uint32 const timer = warTime ? 0 : bf->GetTimer();
+
+            // War just ended: reset for a fresh countdown regardless of how
+            // Wintergrasp.NoBattleTimer is configured (don't rely on the
+            // absolute timer value, which could stay below 15 minutes forever
+            // on a short config and leave the flags stuck true).
+            if (wasWarTime && !warTime)
             {
-                checkTimer -= 60000; // one minute
-                if (!sWorld->getBoolConfig(CONFIG_WINTERGRASP_KICK_VOA_PLAYERS))
-                    return;
-                if (Battlefield* bf = sBattlefieldMgr->GetBattlefieldByBattleId(BATTLEFIELD_BATTLEID_WG))
-                {
-                    if (!bf->IsWarTime())
-                    {
-                        if (bf->GetTimer() <= (16 * MINUTE * IN_MILLISECONDS) && bf->GetTimer() >= (15 * MINUTE * IN_MILLISECONDS))
-                        {
-                            Map::PlayerList const& PlayerList = instance->GetPlayers();
-                            if (!PlayerList.IsEmpty())
-                                for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                                    if (Player* player = i->GetSource())
-                                        player->TextEmote("This instance will reset in 15 minutes.", nullptr, true);
-                        }
-                        else if (bf->GetTimer() <= (10 * MINUTE * IN_MILLISECONDS) && bf->GetTimer() >= (9 * MINUTE * IN_MILLISECONDS))
-                        {
-                            for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
-                                if (Creature* cr = instance->GetCreature(bossGUIDs[i]))
-                                    if (!cr->IsInCombat())
-                                    {
-                                        cr->RemoveAllAuras();
-                                        if (Aura* aur = cr->AddAura(SPELL_STONED_AURA, cr))
-                                        {
-                                            aur->SetMaxDuration(60 * MINUTE * IN_MILLISECONDS);
-                                            aur->SetDuration(60 * MINUTE * IN_MILLISECONDS);
-                                        }
-                                    }
+                if (stoned)
+                    for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
+                        if (Creature* cr = instance->GetCreature(bossGUIDs[i]))
+                            if (!cr->IsInCombat())
+                                cr->RemoveAllAuras();
 
-                            stoned = true;
-                        }
-                        else if (bf->GetTimer() <= (2 * MINUTE * IN_MILLISECONDS) && bf->GetTimer() > (MINUTE * IN_MILLISECONDS))
-                        {
-                            Map::PlayerList const& PlayerList = instance->GetPlayers();
-                            if (!PlayerList.IsEmpty())
-                                for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                                    if (Player* player = i->GetSource())
-                                        player->TextEmote("This instance is about to reset. Prepare to be removed.", nullptr, true);
-                        }
-                        else if (bf->GetTimer() <= MINUTE * IN_MILLISECONDS)
-                        {
-                            for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
-                                if (Creature* cr = instance->GetCreature(bossGUIDs[i]))
-                                    if (cr->IsInCombat() && cr->AI())
-                                        cr->AI()->EnterEvadeMode();
+                warned15 = false;
+                stoned = false;
+                warned2 = false;
+                kicked = false;
+            }
+            wasWarTime = warTime;
 
-                            Map::PlayerList const& PlayerList = instance->GetPlayers();
-                            if (!PlayerList.IsEmpty())
-                                for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
-                                    if (Player* player = i->GetSource())
-                                        player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY, player->m_homebindZ, player->GetOrientation());
+            if (!warTime && timer > 15 * MINUTE * IN_MILLISECONDS)
+                return;
+
+            if (!warned15 && timer <= 15 * MINUTE * IN_MILLISECONDS)
+            {
+                warned15 = true;
+                Map::PlayerList const& PlayerList = instance->GetPlayers();
+                for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                    if (Player* player = i->GetSource())
+                        player->TextEmote("This instance will reset in 15 minutes.", nullptr, true);
+            }
+
+            if (!stoned && timer <= 10 * MINUTE * IN_MILLISECONDS)
+            {
+                stoned = true;
+                for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
+                    if (Creature* cr = instance->GetCreature(bossGUIDs[i]))
+                        if (!cr->IsInCombat())
+                        {
+                            cr->RemoveAllAuras();
+                            if (Aura* aur = cr->AddAura(SPELL_STONED_AURA, cr))
+                            {
+                                aur->SetMaxDuration(60 * MINUTE * IN_MILLISECONDS);
+                                aur->SetDuration(60 * MINUTE * IN_MILLISECONDS);
+                            }
                         }
-                    }
-                }
+            }
+
+            if (!warned2 && timer <= 2 * MINUTE * IN_MILLISECONDS)
+            {
+                warned2 = true;
+                Map::PlayerList const& PlayerList = instance->GetPlayers();
+                for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                    if (Player* player = i->GetSource())
+                        player->TextEmote("This instance is about to reset. Prepare to be removed.", nullptr, true);
+            }
+
+            if (!kicked && timer <= MINUTE * IN_MILLISECONDS)
+            {
+                kicked = true;
+                for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
+                    if (Creature* cr = instance->GetCreature(bossGUIDs[i]))
+                        if (cr->IsInCombat() && cr->AI())
+                            cr->AI()->EnterEvadeMode();
+
+                Map::PlayerList const& PlayerList = instance->GetPlayers();
+                for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                    if (Player* player = i->GetSource())
+                        player->TeleportTo(player->m_homebindMapId, player->m_homebindX, player->m_homebindY,
+                            player->m_homebindZ, player->GetOrientation());
             }
         }
 
@@ -259,6 +294,10 @@ public:
         time_t KoralonDeath;
         uint32 checkTimer;
         bool stoned;
+        bool warned15;
+        bool warned2;
+        bool kicked;
+        bool wasWarTime;
 
         uint32 m_auiEncounter[MAX_ENCOUNTER];
         ObjectGuid bossGUIDs[MAX_ENCOUNTER];
