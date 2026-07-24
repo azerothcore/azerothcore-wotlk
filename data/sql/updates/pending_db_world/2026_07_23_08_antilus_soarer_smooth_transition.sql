@@ -1,0 +1,13 @@
+-- Issue #26757: "Antilus the Soarer" (5347) flies with a much slower wing-flap animation
+-- than the rest of its species. It's the only Frayfeather-family creature with a fixed
+-- patrol path (creature_addon.path_id 518400) - its siblings all move freely with
+-- unrestricted random movement instead.
+--
+-- The path's smoothTransition itself was fine (kept at 1, the original value); the actual
+-- fix is an explicit per-waypoint velocity (WaypointMovementGenerator.cpp:335-336: a
+-- waypoint's own Velocity, if > 0, overrides the creature's speed_flight stat for that
+-- transition). Base MOVE_FLIGHT is 7.0 yd/s (Unit.cpp baseMoveSpeed); 9.0 is a moderate
+-- bump for this patrol specifically (14.0 was tried live and felt too fast), without
+-- touching the creature's general speed_flight stat (left at 1.0, same as the rest of the
+-- family) so combat/chase speed stays unaffected.
+UPDATE `waypoint_data` SET `smoothTransition` = 1, `velocity` = 9.0 WHERE `id` = 518400;
