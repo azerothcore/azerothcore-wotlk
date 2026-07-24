@@ -4475,7 +4475,9 @@ void Spell::finish(bool ok)
         return;
     m_spellState = SPELL_STATE_FINISHED;
 
-    if (Player* modOwner = m_caster->GetSpellModOwner())
+    // FindMap() check: pending spell events are destroyed after the caster has left the map,
+    // where resolving a unit-summoned caster's owner through ObjectAccessor would assert
+    if (Player* modOwner = (m_caster && m_caster->FindMap()) ? m_caster->GetSpellModOwner() : nullptr)
         modOwner->SetSpellModTakingSpell(this, false);
 
     if (m_spellInfo->IsChanneled())
