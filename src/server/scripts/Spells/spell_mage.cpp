@@ -15,6 +15,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "GameObject.h"
 #include "Pet.h"
 #include "Player.h"
 #include "SpellAuraEffects.h"
@@ -1619,8 +1620,55 @@ class spell_mage_deep_freeze_immunity_state : public AuraScript
     }
 };
 
+enum RitualOfRefreshment
+{
+    SPELL_MAGE_CONJURE_REFRESHMENT_TABLE_R1 = 43985,
+    SPELL_MAGE_CONJURE_REFRESHMENT_TABLE_R2 = 58661,
+    GO_MAGE_REFRESHMENT_PORTAL_R1           = 186811,
+    GO_MAGE_REFRESHMENT_PORTAL_R2           = 193062
+};
+
+// 43985, 58661 - Conjure Refreshment Table
+class spell_mage_conjure_refreshment_table : public SpellScript
+{
+public:
+    spell_mage_conjure_refreshment_table(uint32 portalEntry) : _portalEntry(portalEntry) { }
+
+    PrepareSpellScript(spell_mage_conjure_refreshment_table);
+
+    // dest defaults to the caster's live facing; snap it to the portal so the table
+    // lands on it with the orientation the ritual was originally cast at. Filter by
+    // owner GUID (set in Spell::EffectTransmitted) so a same-rank portal from another
+    // caster nearby doesn't get picked instead of this caster's own.
+    void SetDest(SpellDestination& dest)
+    {
+        Unit* caster = GetCaster();
+
+        std::list<GameObject*> portals;
+        caster->GetGameObjectListWithEntryInGrid(portals, _portalEntry, 20.0f);
+        for (GameObject* portal : portals)
+        {
+            if (portal->GetOwnerGUID() == caster->GetGUID())
+            {
+                dest.Relocate(*portal);
+                break;
+            }
+        }
+    }
+
+    void Register() override
+    {
+        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_mage_conjure_refreshment_table::SetDest, EFFECT_0, TARGET_DEST_CASTER_FRONT);
+    }
+
+private:
+    uint32 _portalEntry;
+};
+
 void AddSC_mage_spell_scripts()
 {
+    RegisterSpellScriptWithArgs(spell_mage_conjure_refreshment_table, "spell_mage_conjure_refreshment_table_r1", GO_MAGE_REFRESHMENT_PORTAL_R1);
+    RegisterSpellScriptWithArgs(spell_mage_conjure_refreshment_table, "spell_mage_conjure_refreshment_table_r2", GO_MAGE_REFRESHMENT_PORTAL_R2);
     RegisterSpellScript(spell_mage_arcane_blast);
     RegisterSpellScript(spell_mage_arcane_missiles);
     RegisterSpellScript(spell_mage_arcane_potency);
