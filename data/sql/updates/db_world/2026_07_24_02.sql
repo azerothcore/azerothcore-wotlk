@@ -1,3 +1,4 @@
+-- DB update 2026_07_24_01 -> 2026_07_24_02
 -- --------------------------------------------------------------------------------------------
 -- Sholazar Basin (Northrend, map 571)
 -- The Avalanche sub-Zone Improvements Part 2: Urgreth of the Thousand Tombs
