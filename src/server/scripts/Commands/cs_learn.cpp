@@ -101,7 +101,7 @@ public:
     static bool HandleLearnAllMyClassCommand(ChatHandler* handler)
     {
         HandleLearnAllMyTrainerSpellsCommand(handler);
-        HandleLearnAllMyTalentsCommand(handler);
+        HandleLearnAllMyTalentsCommand(handler, Optional<uint8>());
         HandleLearnAllMyQuestSpells(handler);
         return true;
     }
@@ -155,52 +155,90 @@ public:
         return true;
     }
 
-    static bool HandleLearnAllMyTalentsCommand(ChatHandler* handler)
+    static bool HandleLearnAllMyTalentsCommand(ChatHandler* handler, Optional<uint8> tabArg)
     {
+        if (tabArg && (*tabArg < 1 || *tabArg > 3))
+        {
+            handler->PSendSysMessage("Invalid talent tab, use 1, 2 or 3.");
+            handler->SetSentErrorMessage(true);
+            return false;
+        }
+
         Player* player = handler->GetSession()->GetPlayer();
         uint32 classMask = player->getClassMask();
 
-        for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
+        // Player::LearnTalent still enforces cross-tree DependsOn prerequisites even when called
+        // with command=true (only the free-point and tier-row checks are skipped for that flag).
+        // sTalentStore isn't ordered by dependency, so a talent can be visited before the talent
+        // it depends on - repeat passes until nothing new gets learned so those catch up instead
+        // of being silently skipped.
+        bool hadNew;
+        do
         {
-            TalentEntry const* talentInfo = sTalentStore.LookupEntry(i);
-            if (!talentInfo)
-                continue;
-
-            TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TalentTab);
-            if (!talentTabInfo)
-                continue;
-
-            if ((classMask & talentTabInfo->ClassMask) == 0)
-                continue;
-
-            // xinef: search highest talent rank
-            uint32 spellId = 0;
-            uint8 rankId = MAX_TALENT_RANK;
-            for (int8 rank = MAX_TALENT_RANK - 1; rank >= 0; --rank)
+            hadNew = false;
+            for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
             {
-                if (talentInfo->RankID[rank] != 0)
+                TalentEntry const* talentInfo = sTalentStore.LookupEntry(i);
+                if (!talentInfo)
+                    continue;
+
+                TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TalentTab);
+                if (!talentTabInfo)
+                    continue;
+
+                if ((classMask & talentTabInfo->ClassMask) == 0)
+                    continue;
+
+                // tabpage is the 0-2 index of the tree in its class's UI order
+                if (tabArg && talentTabInfo->tabpage != static_cast<uint32>(*tabArg) - 1)
+                    continue;
+
+                // xinef: search highest talent rank
+                uint32 spellId = 0;
+                uint8 rankId = MAX_TALENT_RANK;
+                for (int8 rank = MAX_TALENT_RANK - 1; rank >= 0; --rank)
                 {
-                    rankId = rank;
-                    spellId = talentInfo->RankID[rank];
-                    break;
+                    if (talentInfo->RankID[rank] != 0)
+                    {
+                        rankId = rank;
+                        spellId = talentInfo->RankID[rank];
+                        break;
+                    }
                 }
+
+                // xinef: some errors?
+                if (!spellId || rankId == MAX_TALENT_RANK)
+                    continue;
+
+                if (player->HasTalent(spellId, player->GetActiveSpec()))
+                    continue;
+
+                SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
+                if (!spellInfo || !SpellMgr::IsSpellValid(spellInfo))
+                    continue;
+
+                player->LearnTalent(talentInfo->TalentID, rankId, true);
+                if (player->HasTalent(spellId, player->GetActiveSpec()))
+                    hadNew = true;
             }
+        } while (hadNew);
 
-            // xinef: some errors?
-            if (!spellId || rankId == MAX_TALENT_RANK)
-                continue;
+        // Picking a single tab also learns all trainer spells, same as ".learn all my class" -
+        // the plain no-arg command stays talents-only. Done after the talent loop so any trainer
+        // spell gated behind a talent from this tab is already available to teach.
+        if (tabArg)
+            HandleLearnAllMyTrainerSpellsCommand(handler);
 
-            SpellInfo const* spellInfo = sSpellMgr->GetSpellInfo(spellId);
-            if (!spellInfo || !SpellMgr::IsSpellValid(spellInfo))
-                continue;
-
-            player->LearnTalent(talentInfo->TalentID, rankId, true);
-        }
-
+        // LearnTalent doesn't touch the free-point pool for command=true - zero it out here too
+        // (even for a single tab) so the player can't also spend the intact pool in the other
+        // trees and end up over their level's talent point cap.
         player->SetFreeTalentPoints(0);
         player->SendTalentsInfoData(false);
 
-        handler->SendSysMessage(LANG_COMMAND_LEARN_CLASS_TALENTS);
+        if (tabArg)
+            handler->PSendSysMessage(LANG_COMMAND_LEARN_CLASS_TALENTS_TAB, *tabArg);
+        else
+            handler->SendSysMessage(LANG_COMMAND_LEARN_CLASS_TALENTS);
         return true;
     }
 
