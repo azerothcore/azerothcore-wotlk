@@ -127,7 +127,7 @@ void PlayerTaxi::AppendTaximaskTo(ByteBuffer& data, bool all)
     }
 }
 
-bool PlayerTaxi::LoadTaxiDestinationsFromString(const std::string& values, TeamId teamId)
+bool PlayerTaxi::LoadTaxiDestinationsFromString(std::string const& values, TeamId teamId)
 {
     ClearTaxiDestinations();
 

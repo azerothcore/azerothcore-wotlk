@@ -19,6 +19,7 @@
 #include "CommandScript.h"
 #include "Group.h"
 #include "Language.h"
+#include "MailMgr.h"
 #include "Player.h"
 #include "RBAC.h"
 
@@ -122,7 +123,7 @@ public:
 
                 sCharacterCache->UpdateCharacterAccountId(cPlayer->GetGUID(), cPlayer->GetSession()->GetAccountId());
                 sCharacterCache->UpdateCharacterGuildId(cPlayer->GetGUID(), cPlayer->GetGuildId());
-                sCharacterCache->UpdateCharacterMailCount(cPlayer->GetGUID(), cPlayer->GetMailSize(), true);
+                sMailMgr->RecountMailCount(cPlayer->GetGUID().GetCounter());
                 sCharacterCache->UpdateCharacterArenaTeamId(cPlayer->GetGUID(), ARENA_SLOT_2v2, cPlayer->GetArenaTeamId(ARENA_SLOT_2v2));
                 sCharacterCache->UpdateCharacterArenaTeamId(cPlayer->GetGUID(), ARENA_SLOT_3v3, cPlayer->GetArenaTeamId(ARENA_SLOT_3v3));
                 sCharacterCache->UpdateCharacterArenaTeamId(cPlayer->GetGUID(), ARENA_SLOT_5v5, cPlayer->GetArenaTeamId(ARENA_SLOT_5v5));

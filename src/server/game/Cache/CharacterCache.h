@@ -33,7 +33,7 @@ struct CharacterCacheEntry
     uint8 Race;
     uint8 Sex;
     uint8 Level;
-    uint8 MailCount;
+    uint16 MailCount;
     ObjectGuid::LowType GuildId;
     std::array<uint32, MAX_ARENA_SLOT> ArenaTeamId;
     ObjectGuid GroupGuid;
@@ -58,10 +58,6 @@ class AC_GAME_API CharacterCache
         void UpdateCharacterGuildId(ObjectGuid const& guid, ObjectGuid::LowType guildId);
         void UpdateCharacterArenaTeamId(ObjectGuid const& guid, uint8 slot, uint32 arenaTeamId);
 
-        void UpdateCharacterMailCount(ObjectGuid const& guid, int8 count, bool update = false);
-        void DecreaseCharacterMailCount(ObjectGuid const& guid) { UpdateCharacterMailCount(guid, -1); };
-        void IncreaseCharacterMailCount(ObjectGuid const& guid) { UpdateCharacterMailCount(guid, 1); };
-
         [[nodiscard]] bool HasCharacterCacheEntry(ObjectGuid const& guid) const;
         [[nodiscard]] CharacterCacheEntry const* GetCharacterCacheByGuid(ObjectGuid const& guid) const;
         [[nodiscard]] CharacterCacheEntry const* GetCharacterCacheByName(std::string const& name) const;
@@ -78,6 +74,15 @@ class AC_GAME_API CharacterCache
         [[nodiscard]] ObjectGuid::LowType GetCharacterGuildIdByGuid(ObjectGuid guid) const;
         [[nodiscard]] uint32 GetCharacterArenaTeamIdByGuid(ObjectGuid guid, uint8 type) const;
         [[nodiscard]] ObjectGuid GetCharacterGroupGuidByGuid(ObjectGuid guid) const;
+
+    private:
+        // Only MailMgr may touch the mail count, so every change is paired
+        // with the matching write to the `mail` table
+        void UpdateCharacterMailCount(ObjectGuid const& guid, int32 count, bool update = false);
+        void DecreaseCharacterMailCount(ObjectGuid const& guid) { UpdateCharacterMailCount(guid, -1); }
+        void IncreaseCharacterMailCount(ObjectGuid const& guid) { UpdateCharacterMailCount(guid, 1); }
+
+        friend class MailMgr;
 };
 
 #define sCharacterCache CharacterCache::instance()
