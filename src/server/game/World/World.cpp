@@ -585,6 +585,9 @@ void World::SetInitialWorldSettings()
     LOG_INFO("server.loading", "Loading Creature Movement Overrides...");
     sObjectMgr->LoadCreatureMovementOverrides(); // must be after LoadCreatures()
 
+    LOG_INFO("server.loading", "Loading Creature Hostile Overrides...");
+    sObjectMgr->LoadCreatureHostileOverrides(); // must be after LoadCreatureTemplates()
+
     LOG_INFO("server.loading", "Loading Gameobject Data...");
     sObjectMgr->LoadGameobjects();
 
