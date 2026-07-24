@@ -326,7 +326,17 @@ struct npc_pet_dk_risen_ally : public PossessedAI
                 {
                     player->RemoveAurasDueToSpell(SPELL_DK_RAISE_ALLY); // Remove Raise Ally aura
                     player->RemoveAurasDueToSpell(SPELL_GHOUL_FRENZY); // Remove Frenzy aura
-                    //player->ClearResurrectRequestData();
+
+                    if (!player->GetCorpse())
+                        player->BuildPlayerRepop();
+                    else if (!player->HasPlayerFlag(PLAYER_FLAGS_GHOST))
+                    {
+                        player->SetPlayerFlag(PLAYER_FLAGS_GHOST);
+                        player->m_serverSideVisibility.SetValue(
+                            SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_GHOST);
+                        player->m_serverSideVisibilityDetect.SetValue(
+                            SERVERSIDE_VISIBILITY_GHOST, GHOST_VISIBILITY_GHOST);
+                    }
                 }
     }
 };
