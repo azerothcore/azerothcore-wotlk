@@ -361,36 +361,27 @@ struct npc_target_dummy : ScriptedAI
 
     void Reset() override
     {
+        scheduler.CancelAll();
+        ClearUniqueTimedEventsDone();
+
         me->SetControlled(true, UNIT_STATE_STUNNED);
         me->SetLootRecipient(me->GetOwner());
-    }
 
-    void EnterEvadeMode(EvadeReason why) override
-    {
-        if (!_EnterEvadeMode(why))
-            return;
-
-        Reset();
-    }
-
-    void UpdateAI(uint32 diff) override
-    {
-        if (!me->HasUnitState(UNIT_STATE_STUNNED))
-            me->SetControlled(true, UNIT_STATE_STUNNED);
-
-        _cleanupTimer -= Milliseconds(diff);
-        if (_cleanupTimer <= 0s)
+        ScheduleUniqueTimedEvent(15s, [this]
         {
             me->SetLootRecipient(me->GetOwner()); // the dummy is lootable by the player who summoned it
             me->LowerPlayerDamageReq(me->GetMaxHealth());
             me->KillSelf();
-            _cleanupTimer = 600s;
-            return;
-        }
+        }, 1);
     }
 
-private:
-    Milliseconds _cleanupTimer{300s};
+    void UpdateAI(uint32 diff) override
+    {
+        scheduler.Update(diff);
+
+        if (!me->HasUnitState(UNIT_STATE_STUNNED))
+            me->SetControlled(true, UNIT_STATE_STUNNED);
+    }
 };
 
 /*########

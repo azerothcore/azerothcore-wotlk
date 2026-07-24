@@ -1,8 +1,8 @@
 -- Add creature_immunities row for engineering target dummies (GRIP + knockback immunity)
-SET @ID := -427;
+SET @ID := -428;
 DELETE FROM `creature_immunities` WHERE `ID` = @ID;
 INSERT INTO `creature_immunities` (`ID`, `SchoolMask`, `DispelTypeMask`, `MechanicsMask`, `Effects`, `Auras`, `ImmuneAoE`, `ImmuneChain`, `Comment`) VALUES
-(@ID, 0, 0, 64, '98,124,144,145', '', 0, 0, 'mech=0x20(GRIP), flags=IMMUNITY_KNOCKBACK, effects=98(KNOCK_BACK),124(PULL_TOWARDS),144(KNOCK_BACK_DEST),145(PULL_TOWARDS_DEST)');
+(@ID, 0, 0, 64, '98,124,144,145', '', 0, 0, 'mech=0x40(GRIP), flags=IMMUNITY_KNOCKBACK, effects=98(KNOCK_BACK),124(PULL_TOWARDS),144(KNOCK_BACK_DEST),145(PULL_TOWARDS_DEST)');
 
 -- Update target dummy creature templates to use the new immunity row
 UPDATE `creature_template` SET `CreatureImmunitiesId` = @ID WHERE `entry` IN (2673, 2674, 12426);
