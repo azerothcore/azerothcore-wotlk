@@ -700,7 +700,7 @@ class at_thaddius_entrance : public OnlyOnceAreaTriggerScript
 public:
     at_thaddius_entrance() : OnlyOnceAreaTriggerScript("at_thaddius_entrance") { }
 
-    bool _OnTrigger(Player* player, const AreaTrigger* /*trigger*/) override
+    bool _OnTrigger(Player* player, AreaTrigger const* /*trigger*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
             if (instance->GetBossState(BOSS_THADDIUS) != DONE)
