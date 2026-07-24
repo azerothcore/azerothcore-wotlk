@@ -5428,6 +5428,24 @@ void SpellMgr::LoadSpellInfoCorrections()
     LockEntry* key = const_cast<LockEntry*>(sLockStore.LookupEntry(36)); // 3366 Opening, allows to open without proper key
     key->Type[2] = LOCK_KEY_NONE;
 
+    // Brazier of Beckoning (UBRS, issue #26695) - effect 1 (SPELL_EFFECT_DUMMY, TARGET_UNIT_NEARBY_ENTRY)
+    // is a TARGET_REFERENCE_TYPE_CASTER search, so Spell::SelectImplicitNearbyTargets() never even
+    // looks at EffectRadiusIndex - it uses SpellInfo::GetMaxRange(), i.e. the spell's own RangeEntry
+    // (RangeIndex 5 = 40yd for all five variants). That same range also caps how far from the player
+    // the ground-target destination can be dropped, so both placement distance and trigger search
+    // were bound to the same 40yd leash from the caster. Widened to unlimited (index 13) so the
+    // trigger is found no matter where in the room the brazier is dropped.
+    ApplySpellFix({
+        27184, // Mor Grayhoof Trigger
+        27190, // Isalien Trigger
+        27191, // Jarien and Sothos Trigger
+        27201, // Kormok Trigger
+        27202  // Lord Valthalak Trigger
+        }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->RangeEntry = sSpellRangeStore.LookupEntry(13); // 50000yd
+    });
+
     LOG_INFO("server.loading", ">> Loading spell dbc data corrections  in {} ms", GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }

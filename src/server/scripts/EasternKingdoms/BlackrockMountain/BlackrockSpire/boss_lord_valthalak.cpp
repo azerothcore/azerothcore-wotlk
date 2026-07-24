@@ -84,6 +84,12 @@ struct boss_lord_valthalak : public BossAI
     {
         BossAI::JustDied(killer);
 
+        // The corpse needs to stay targetable for Lord Valthalak's Amulet (issue #26695
+        // follow-up) - StartTalking()'s NOT_SELECTABLE flag only gets cleared by
+        // StartFighting() once the intro finishes, so a death before that (or after an
+        // evade that re-set it) would otherwise leave the corpse permanently unselectable.
+        me->RemoveUnitFlag(UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
+
         instance->SetData(DATA_LORD_VALTHALAK, DONE);
     }
 
