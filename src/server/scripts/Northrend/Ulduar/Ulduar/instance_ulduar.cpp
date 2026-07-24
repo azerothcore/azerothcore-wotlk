@@ -47,7 +47,8 @@ DoorData const doorData[] =
     { GO_KEEPERS_GATE,                 BOSS_THORIM,    DOOR_TYPE_PASSAGE    },
     { GO_KEEPERS_GATE,                 BOSS_FREYA,     DOOR_TYPE_PASSAGE    },
     { GO_VEZAX_DOOR,                   BOSS_VEZAX,     DOOR_TYPE_PASSAGE    },
-    { GO_YOGG_SARON_DOORS,             BOSS_YOGGSARON, DOOR_TYPE_ROOM       },
+    // GO_YOGG_SARON_DOORS is handled by boss_yoggsaron_sara: it closes 15 seconds
+    // after the pull, not immediately when the encounter enters IN_PROGRESS.
     { GO_DOODAD_UL_SIGILDOOR_03,       BOSS_ALGALON,   DOOR_TYPE_ROOM       },
     { GO_DOODAD_UL_UNIVERSEFLOOR_01,   BOSS_ALGALON,   DOOR_TYPE_ROOM       },
     { GO_DOODAD_UL_UNIVERSEFLOOR_02,   BOSS_ALGALON,   DOOR_TYPE_SPAWN_HOLE },
@@ -113,6 +114,7 @@ ObjectData const creatureData[] =
     // Yogg-Saron helpers
     { NPC_SARA,                     DATA_SARA                   },
     { NPC_BRAIN_OF_YOGG_SARON,      DATA_BRAIN_OF_YOGG_SARON    },
+    { NPC_VOICE_OF_YOGG_SARON,      DATA_VOICE_OF_YOGG_SARON    },
     // Observation Ring Keepers
     { NPC_FREYA_GOSSIP,             DATA_FREYA_GOSSIP           },
     { NPC_HODIR_GOSSIP,             DATA_HODIR_GOSSIP           },
@@ -622,6 +624,17 @@ public:
                 case 189973: // Goldclover
                     if (GetBossState(BOSS_FREYA) == DONE)
                         gameObject->SetRespawnTime(7 * DAY);
+                    break;
+                // Freya Loot
+                case 194324:
+                case 194325:
+                case 194326:
+                case 194327:
+                case 194328:
+                case 194329:
+                case 194330:
+                case 194331:
+                    gameObject->SetLootRecipient(instance);
                     break;
             }
         }

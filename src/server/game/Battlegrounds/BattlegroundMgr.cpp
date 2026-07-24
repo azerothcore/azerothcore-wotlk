@@ -343,7 +343,7 @@ std::vector<Battleground const*> BattlegroundMgr::GetActiveBattlegrounds()
     for (auto const& [bgType, bgData] : bgDataStore)
         for (auto const& [id, bg] : bgData._Battlegrounds)
             if (bg->GetStatus() == STATUS_WAIT_JOIN || bg->GetStatus() == STATUS_IN_PROGRESS)
-                result.push_back(static_cast<const Battleground*>(bg));
+                result.push_back(static_cast<Battleground const*>(bg));
 
     return result;
 }
@@ -647,7 +647,7 @@ void BattlegroundMgr::BuildBattlegroundListPacket(WorldPacket* data, ObjectGuid 
     }
 }
 
-void BattlegroundMgr::SendToBattleground(Player* player, uint32 instanceId, BattlegroundTypeId bgTypeId)
+bool BattlegroundMgr::SendToBattleground(Player* player, uint32 instanceId, BattlegroundTypeId bgTypeId)
 {
     if (Battleground* bg = GetBattleground(instanceId, bgTypeId))
     {
@@ -655,12 +655,11 @@ void BattlegroundMgr::SendToBattleground(Player* player, uint32 instanceId, Batt
         Position const* pos = bg->GetTeamStartPosition(player->GetBgTeamId());
 
         LOG_DEBUG("bg.battleground", "BattlegroundMgr::SendToBattleground: Sending {} to map {}, {} (bgType {})", player->GetName(), mapid, pos->ToString(), bgTypeId);
-        player->TeleportTo(mapid, pos->GetPositionX(), pos->GetPositionY(), pos->GetPositionZ(), pos->GetOrientation());
+        return player->TeleportTo(mapid, pos->GetPositionX(), pos->GetPositionY(), pos->GetPositionZ(), pos->GetOrientation());
     }
-    else
-    {
-        LOG_ERROR("bg.battleground", "BattlegroundMgr::SendToBattleground: Instance {} (bgType {}) not found while trying to teleport player {}", instanceId, bgTypeId, player->GetName());
-    }
+
+    LOG_ERROR("bg.battleground", "BattlegroundMgr::SendToBattleground: Instance {} (bgType {}) not found while trying to teleport player {}", instanceId, bgTypeId, player->GetName());
+    return false;
 }
 
 void BattlegroundMgr::SendAreaSpiritHealerQueryOpcode(Player* player, Battleground* bg, ObjectGuid guid)
@@ -949,7 +948,7 @@ BGFreeSlotQueueContainer& BattlegroundMgr::GetBGFreeSlotQueueStore(BattlegroundT
 
 void BattlegroundMgr::AddToBGFreeSlotQueue(BattlegroundTypeId bgTypeId, Battleground* bg)
 {
-    bgDataStore[bgTypeId].BGFreeSlotQueue.push_front(bg);
+    bgDataStore[bgTypeId].BGFreeSlotQueue.push_back(bg);
 }
 
 void BattlegroundMgr::RemoveFromBGFreeSlotQueue(BattlegroundTypeId bgTypeId, uint32 instanceId)

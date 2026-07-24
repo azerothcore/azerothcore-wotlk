@@ -625,7 +625,7 @@ void CreatureAI::SetBoundary(CreatureBoundary const* boundary, bool negateBounda
     me->DoImmediateBoundaryCheck();
 }
 
-Creature* CreatureAI::DoSummon(uint32 entry, const Position& pos, uint32 despawnTime, TempSummonType summonType)
+Creature* CreatureAI::DoSummon(uint32 entry, Position const& pos, uint32 despawnTime, TempSummonType summonType)
 {
     return me->SummonCreature(entry, pos, summonType, despawnTime);
 }

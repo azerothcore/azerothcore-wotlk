@@ -131,7 +131,6 @@ enum Events
     EVENT_FIERY_COMBUSTION      = 5,
     EVENT_TAIL_LASH             = 6,
     EVENT_CHECK_HEALTH          = 7,
-    EVENT_KILL_TALK             = 8,
     EVENT_TRIGGER_BERSERK       = 9,
     EVENT_HALION_VISIBILITY     = 10,
 
@@ -310,11 +309,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->IsPlayer() && !events.HasTimeUntilEvent(EVENT_KILL_TALK))
-            {
-                Talk(SAY_KILL);
-                events.ScheduleEvent(EVENT_KILL_TALK, 6s);
-            }
+            Talk(SAY_KILL, victim);
         }
 
         void JustDied(Unit* killer) override
@@ -477,11 +472,7 @@ public:
 
         void KilledUnit(Unit* victim) override
         {
-            if (victim->IsPlayer() && !_events.HasTimeUntilEvent(EVENT_KILL_TALK))
-            {
-                Talk(SAY_KILL);
-                _events.ScheduleEvent(EVENT_KILL_TALK, 6s);
-            }
+            Talk(SAY_KILL, victim);
         }
 
         void JustDied(Unit* killer) override
