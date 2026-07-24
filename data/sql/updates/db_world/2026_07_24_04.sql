@@ -1,3 +1,4 @@
+-- DB update 2026_07_24_03 -> 2026_07_24_04
 -- --------------------------------------------------------------------------------------------
 -- Dragonblight (Northrend, map 571)
 -- Dead Mage Hunter (26477): permanent, randomized corpse appearance
