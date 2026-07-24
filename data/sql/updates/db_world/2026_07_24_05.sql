@@ -1,3 +1,4 @@
+-- DB update 2026_07_24_04 -> 2026_07_24_05
 --
 UPDATE `creature_template` SET `unit_flags`=33554432 WHERE `entry`=38463;
 UPDATE `creature_template` SET `ScriptName`='npc_icc_orb_controller' WHERE `entry`=38463;
