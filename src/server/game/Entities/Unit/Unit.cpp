@@ -10534,6 +10534,18 @@ void Unit::Dismount()
         data << player->GetCollisionHeight();
         player->SendDirectMessage(&data);
         player->GetSession()->IncrementOrderCounter();
+
+        // Client bug workaround: dismounting a flying mount while holding a movement key can
+        // leave the 3.3.5a client stuck playing the swim animation while falling (issue #25992).
+        // A small knockback nudges the client into re-evaluating its fall state cleanly.
+        // Kept below 1.0f to stay visually unnoticeable, but above the 0.1f threshold
+        // EffectKnockBack treats as a no-op (SpellEffects.cpp), so the client actually registers it.
+        if (IsFlying())
+        {
+            float x, y, z;
+            GetPosition(x, y, z);
+            KnockbackFrom(x, y, 0.5f, 0.5f);
+        }
     }
 
     WorldPacket data(SMSG_DISMOUNT, 8);
