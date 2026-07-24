@@ -67,18 +67,14 @@ public:
 
     struct boss_grobbulusAI : public BossAI
     {
-        explicit boss_grobbulusAI(Creature* c) : BossAI(c, BOSS_GROBBULUS), summons(me)
+        explicit boss_grobbulusAI(Creature* c) : BossAI(c, BOSS_GROBBULUS)
         {}
 
-        EventMap events;
-        SummonList summons;
         uint32 dropSludgeTimer{};
 
         void Reset() override
         {
             BossAI::Reset();
-            events.Reset();
-            summons.DespawnAll();
             dropSludgeTimer = 0;
         }
 
@@ -112,17 +108,6 @@ public:
                 cr->SetInCombatWithZone();
             }
             summons.Summon(cr);
-        }
-
-        void SummonedCreatureDespawn(Creature* summon) override
-        {
-            summons.Despawn(summon);
-        }
-
-        void JustDied(Unit*  killer) override
-        {
-            BossAI::JustDied(killer);
-            summons.DespawnAll();
         }
 
         void KilledUnit(Unit* who) override
