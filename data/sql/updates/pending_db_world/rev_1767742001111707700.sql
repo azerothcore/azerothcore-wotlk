@@ -28,4 +28,4 @@ DELETE FROM `creature_template_movement` WHERE `CreatureId`=36934;
 INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`) VALUES
 (36934,0,0,1,1,0,0);
 
-DELETE FROM `creature` WHERE `id`=38463;
+DELETE FROM `creature` WHERE `guid` IN (201220,201473,201559) AND `id`=38463;
