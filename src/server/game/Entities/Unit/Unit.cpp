@@ -28,6 +28,7 @@
 #include "Chat.h"
 #include "ChatPackets.h"
 #include "ChatTextBuilder.h"
+#include "CombatPackets.h"
 #include "Common.h"
 #include "ConditionMgr.h"
 #include "Creature.h"
@@ -3236,21 +3237,18 @@ void Unit::SendMeleeAttackStart(Unit* victim, Player* sendTo)
  * @brief Send to the client SMSG_ATTACKSTOP but doesn't clear UNIT_STATE_MELEE_ATTACKING on server side
  * or interrupt spells. Unless you know exactly what you're doing, use AttackStop() or RemoveAllAttackers() instead
  */
-void Unit::SendMeleeAttackStop(Unit* victim)
+void Unit::SendMeleeAttackStop(Unit const* victim) const
 {
     // pussywizard: calling SendMeleeAttackStop without clearing UNIT_STATE_MELEE_ATTACKING and then AttackStart the same player may spoil npc rotating!
     // pussywizard: this happens in some boss scripts, just add clearing here
     // ClearUnitState(UNIT_STATE_MELEE_ATTACKING); // commented out for now
 
-    WorldPacket data(SMSG_ATTACKSTOP, (8 + 8 + 4));
-    data << GetPackGUID();
+    WorldPackets::Combat::SAttackStop attackStop;
+    attackStop.Attacker = GetGUID();
+    attackStop.Victim = Object::GetGUID(victim);
+    attackStop.NowDead = !IsAlive();
 
-    if (victim)
-    {
-        data << victim->GetPackGUID();
-        data << (uint32)victim->isDead();
-    }
-    SendMessageToSet(&data, true);
+    SendMessageToSet(attackStop.Write(), true);
     LOG_DEBUG("entities.unit", "WORLD: Sent SMSG_ATTACKSTOP");
 
     if (victim)
@@ -6626,6 +6624,32 @@ void Unit::RemoveGameObject(uint32 spellid, bool del)
         if (GameObject* go = ObjectAccessor::GetGameObject(*this, *itr))
         {
             if (spellid > 0 && go->GetSpellId() != spellid)
+            {
+                ++itr;
+                continue;
+            }
+
+            go->SetOwnerGUID(ObjectGuid::Empty);
+            if (del)
+            {
+                go->SetRespawnTime(0);
+                go->Delete();
+            }
+        }
+        m_gameObj.erase(itr++);
+    }
+}
+
+void Unit::RemoveGameObjectsByType(GameobjectTypes type, bool del)
+{
+    if (m_gameObj.empty())
+        return;
+
+    for (GameObjectList::iterator itr = m_gameObj.begin(); itr != m_gameObj.end();)
+    {
+        if (GameObject* go = ObjectAccessor::GetGameObject(*this, *itr))
+        {
+            if (go->GetGoType() != type)
             {
                 ++itr;
                 continue;
