@@ -355,23 +355,22 @@ private:
     std::unordered_map<ObjectGuid, Milliseconds> _combatTimer;
 };
 
-struct npc_target_dummy : NullCreatureAI
+struct npc_target_dummy : ScriptedAI
 {
-    npc_target_dummy(Creature* creature) : NullCreatureAI(creature)
-    {
-        _deathTimer = 15s;
-    }
+    explicit npc_target_dummy(Creature* creature) : ScriptedAI(creature) { }
 
     void Reset() override
     {
         me->SetControlled(true, UNIT_STATE_STUNNED);
         me->SetLootRecipient(me->GetOwner());
-        me->SelectLevel();
     }
 
-    void DamageTaken(Unit*, uint32& damage, DamageEffectType, SpellSchoolMask) override
+    void EnterEvadeMode(EvadeReason why) override
     {
-        damage = 0;
+        if (!_EnterEvadeMode(why))
+            return;
+
+        Reset();
     }
 
     void UpdateAI(uint32 diff) override
@@ -379,18 +378,19 @@ struct npc_target_dummy : NullCreatureAI
         if (!me->HasUnitState(UNIT_STATE_STUNNED))
             me->SetControlled(true, UNIT_STATE_STUNNED);
 
-        _deathTimer -= Milliseconds(diff);
-        if (_deathTimer <= 0s)
+        _cleanupTimer -= Milliseconds(diff);
+        if (_cleanupTimer <= 0s)
         {
-            me->SetLootRecipient(me->GetOwner());
+            me->SetLootRecipient(me->GetOwner()); // the dummy is lootable by the player who summoned it
             me->LowerPlayerDamageReq(me->GetMaxHealth());
             me->KillSelf();
-            _deathTimer = 600s;
+            _cleanupTimer = 600s;
+            return;
         }
     }
 
 private:
-    Milliseconds _deathTimer;
+    Milliseconds _cleanupTimer{300s};
 };
 
 /*########
