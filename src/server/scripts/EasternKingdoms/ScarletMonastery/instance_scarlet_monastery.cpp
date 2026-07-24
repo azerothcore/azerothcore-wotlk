@@ -271,9 +271,9 @@ enum AshbringerSpell
 };
 
 // SPELL_FORGIVENESS               = 28697
-class spell_forgiveess_dummy_visual : public SpellScript
+class spell_forgiveness_dummy_visual : public SpellScript
 {
-    PrepareSpellScript(spell_forgiveess_dummy_visual);
+    PrepareSpellScript(spell_forgiveness_dummy_visual);
 
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
@@ -292,7 +292,7 @@ class spell_forgiveess_dummy_visual : public SpellScript
 
     void Register() override
     {
-        OnEffectHitTarget += SpellEffectFn(spell_forgiveess_dummy_visual::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+        OnEffectHitTarget += SpellEffectFn(spell_forgiveness_dummy_visual::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
     }
 };
 
@@ -319,6 +319,6 @@ class spell_transform_ghost_visual: public SpellScript
 void AddSC_instance_scarlet_monastery()
 {
     new instance_scarlet_monastery();
-    RegisterSpellScript(spell_forgiveess_dummy_visual);
+    RegisterSpellScript(spell_forgiveness_dummy_visual);
     RegisterSpellScript(spell_transform_ghost_visual);
 }
