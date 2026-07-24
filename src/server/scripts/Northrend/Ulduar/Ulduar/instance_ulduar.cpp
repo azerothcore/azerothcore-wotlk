@@ -114,6 +114,7 @@ ObjectData const creatureData[] =
     // Yogg-Saron helpers
     { NPC_SARA,                     DATA_SARA                   },
     { NPC_BRAIN_OF_YOGG_SARON,      DATA_BRAIN_OF_YOGG_SARON    },
+    { NPC_VOICE_OF_YOGG_SARON,      DATA_VOICE_OF_YOGG_SARON    },
     // Observation Ring Keepers
     { NPC_FREYA_GOSSIP,             DATA_FREYA_GOSSIP           },
     { NPC_HODIR_GOSSIP,             DATA_HODIR_GOSSIP           },
@@ -623,6 +624,17 @@ public:
                 case 189973: // Goldclover
                     if (GetBossState(BOSS_FREYA) == DONE)
                         gameObject->SetRespawnTime(7 * DAY);
+                    break;
+                // Freya Loot
+                case 194324:
+                case 194325:
+                case 194326:
+                case 194327:
+                case 194328:
+                case 194329:
+                case 194330:
+                case 194331:
+                    gameObject->SetLootRecipient(instance);
                     break;
             }
         }

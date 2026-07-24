@@ -271,7 +271,7 @@ public:
     ConditionList GetConditionsForSmartEvent(int32 entryOrGuid, uint32 eventId, uint32 sourceType);
     ConditionList GetConditionsForVehicleSpell(uint32 creatureId, uint32 spellId);
     ConditionList GetConditionsForNpcVendorEvent(uint32 creatureId, uint32 itemId);
-    ConditionList GetConditionsForObjectVisibility(const WorldObject* object) const;
+    ConditionList GetConditionsForObjectVisibility(WorldObject const* object) const;
 
 private:
     bool isSourceTypeValid(Condition* cond);

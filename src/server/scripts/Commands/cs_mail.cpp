@@ -23,9 +23,11 @@
 #include "GameTime.h"
 #include "Language.h"
 #include "Mail.h"
+#include "MailMgr.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "RBAC.h"
 #include "ScriptMgr.h"
 #include "Timer.h"
 
@@ -40,8 +42,8 @@ public:
     {
         static ChatCommandTable mailCommandTable =
         {
-            { "list",   HandleMailListCommand,   SEC_GAMEMASTER, Console::Yes },
-            { "return", HandleMailReturnCommand,  SEC_GAMEMASTER, Console::Yes }
+            { "list",   HandleMailListCommand,   rbac::RBAC_PERM_COMMAND_MAIL_LIST,   Console::Yes },
+            { "return", HandleMailReturnCommand, rbac::RBAC_PERM_COMMAND_MAIL_RETURN, Console::Yes }
         };
 
         static ChatCommandTable commandTable =
@@ -390,7 +392,7 @@ public:
 
         CharacterDatabase.CommitTransaction(trans);
 
-        sCharacterCache->DecreaseCharacterMailCount(ObjectGuid(HighGuid::Player, receiver));
+        sMailMgr->OnMailDeleted(receiver);
 
         handler->PSendSysMessage(LANG_MAIL_RETURN_SUCCESS, mailId, handler->playerLink(target.GetName()));
         return true;
