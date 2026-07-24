@@ -186,11 +186,9 @@ public:
 
     struct boss_gothikAI : public BossAI
     {
-        explicit boss_gothikAI(Creature* c) : BossAI(c, BOSS_GOTHIK), summons(me)
+        explicit boss_gothikAI(Creature* c) : BossAI(c, BOSS_GOTHIK)
         {}
 
-        EventMap events;
-        SummonList summons;
         bool secondPhase{};
         bool gateOpened{};
         bool lastTeleportDead{};
@@ -209,8 +207,6 @@ public:
         void Reset() override
         {
             BossAI::Reset();
-            events.Reset();
-            summons.DespawnAll();
             me->RemoveUnitFlag(UNIT_FLAG_DISABLE_MOVE);
             me->SetImmuneToPC(false);
             me->SetReactState(REACT_PASSIVE);
@@ -275,11 +271,6 @@ public:
             }
         }
 
-        void SummonedCreatureDespawn(Creature* cr) override
-        {
-            summons.Despawn(cr);
-        }
-
         void KilledUnit(Unit* who) override
         {
             if (!who->IsPlayer())
@@ -293,7 +284,6 @@ public:
         {
             BossAI::JustDied(killer);
             Talk(SAY_DEATH);
-            summons.DespawnAll();
         }
 
         void SummonHelpers(uint32 entry)

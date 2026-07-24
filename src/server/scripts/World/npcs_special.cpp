@@ -118,12 +118,6 @@ public:
                         {
                             sCreatureTextMgr->SendChat(me, CLEARWATER_SAY_END, 0, CHAT_MSG_MONSTER_YELL, LANG_UNIVERSAL, TEXT_RANGE_MAP);
                             finishWarning = true;
-                            // no one won - despawn
-                            if (!finished)
-                            {
-                                me->DespawnOrUnsummon();
-                                break;
-                            }
                         }
 
                         events.Repeat(1s);

@@ -62,6 +62,9 @@ enum SharedSpells
     SPELL_UNSATED_CRAVING               = 71168,
     SPELL_SHADOWS_FATE                  = 71169,
 
+    // Empowering Blood Orb
+    SPELL_EMPOWERED_BLOOD               = 70227,
+
     // Misc
     SPELL_WEB_BEAM                      = 69887,
     SPELL_WEB_BEAM2                     = 69986,
@@ -282,6 +285,13 @@ enum CreaturesIds
     NPC_KINETIC_BOMB_TARGET                     = 38458,
     NPC_KINETIC_BOMB                            = 38454,
     NPC_SHOCK_VORTEX                            = 38422,
+    NPC_DARKFALLEN_BLOOD_KNIGHT                 = 37595,
+    NPC_DARKFALLEN_NOBLE                        = 37663,
+    NPC_DARKFALLEN_ARCHMAGE                     = 37664,
+    NPC_DARKFALLEN_ADVISOR                      = 37571,
+    NPC_DARKFALLEN_TACTICIAN                    = 37666,
+    NPC_VAMPIRIC_FIEND                          = 37901,
+    NPC_ORB_VISUAL_STALKER                      = 38463,
 
     // Blood-Queen Lana'thel
     NPC_BLOOD_QUEEN_LANA_THEL                   = 37955,
@@ -434,6 +444,7 @@ enum GameObjectsIds
     GO_CRIMSON_HALL_DOOR                    = 201376,
     GO_BLOOD_ELF_COUNCIL_DOOR               = 201378,
     GO_BLOOD_ELF_COUNCIL_DOOR_RIGHT         = 201377,
+    GO_EMPOWERING_BLOOD_ORB                 = 201741,
 
     // Blood-Queen Lana'thel
     GO_DOODAD_ICECROWN_BLOODPRINCE_DOOR_01  = 201746,

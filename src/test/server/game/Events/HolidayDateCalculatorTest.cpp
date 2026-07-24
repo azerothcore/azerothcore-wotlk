@@ -21,7 +21,7 @@
 class HolidayDateCalculatorTest : public ::testing::Test
 {
 protected:
-    void ExpectDate(const std::tm& date, int year, int month, int day)
+    void ExpectDate(std::tm const& date, int year, int month, int day)
     {
         EXPECT_EQ(date.tm_year + 1900, year);
         EXPECT_EQ(date.tm_mon + 1, month);
@@ -409,7 +409,7 @@ TEST_F(HolidayDateCalculatorTest, FixedDateHolidays_ConsistentAcrossYears_1900_2
 {
     // Fixed date holidays should have same month/day every year
     // Note: Brewfest, Harvest Festival, and Winter Veil are now dynamic (not fixed date)
-    struct FixedHolidayTestCase { uint32_t holidayId; int month; int day; const char* name; };
+    struct FixedHolidayTestCase { uint32_t holidayId; int month; int day; char const* name; };
     std::vector<FixedHolidayTestCase> testCases = {
         { 341, 6, 21, "Midsummer Fire Festival" },
         { 62,  7,  4, "Fireworks Spectacular" },
@@ -687,7 +687,7 @@ TEST_F(HolidayDateCalculatorTest, WeekdayOnOrAfter_MonthBoundary_RollsIntoNextMo
 TEST_F(HolidayDateCalculatorTest, StressTest_AllCalculations_1900_2200)
 {
     // Run all holiday calculations for entire range to ensure no crashes
-    const std::vector<HolidayRule>& rules = HolidayDateCalculator::GetHolidayRules();
+    std::vector<HolidayRule> const& rules = HolidayDateCalculator::GetHolidayRules();
 
     int totalCalculations = 0;
 

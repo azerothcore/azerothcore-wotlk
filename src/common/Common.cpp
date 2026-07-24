@@ -30,6 +30,42 @@ char const* localeNames[TOTAL_LOCALES] =
     "ruRU"
 };
 
+AccountFlagName const accountFlagNames[MAX_ACCOUNT_FLAG] =
+{
+    { "ACCOUNT_FLAG_GM",                   "GM"                   },
+    { "ACCOUNT_FLAG_NOKICK",               "NOKICK"               },
+    { "ACCOUNT_FLAG_COLLECTOR",            "COLLECTOR"            },
+    { "ACCOUNT_FLAG_TRIAL",                "TRIAL"                },
+    { "ACCOUNT_FLAG_CANCELLED",            "CANCELLED"            },
+    { "ACCOUNT_FLAG_IGR",                  "IGR"                  },
+    { "ACCOUNT_FLAG_WHOLESALER",           "WHOLESALER"           },
+    { "ACCOUNT_FLAG_PRIVILEGED",           "PRIVILEGED"           },
+    { "ACCOUNT_FLAG_EU_FORBID_ELV",        "EU_FORBID_ELV"        },
+    { "ACCOUNT_FLAG_EU_FORBID_BILLING",    "EU_FORBID_BILLING"    },
+    { "ACCOUNT_FLAG_RESTRICTED",           "RESTRICTED"           },
+    { "ACCOUNT_FLAG_REFERRAL",             "REFERRAL"             },
+    { "ACCOUNT_FLAG_BLIZZARD",             "BLIZZARD"             },
+    { "ACCOUNT_FLAG_RECURRING_BILLING",    "RECURRING_BILLING"    },
+    { "ACCOUNT_FLAG_NOELECTUP",            "NOELECTUP"            },
+    { "ACCOUNT_FLAG_KR_CERTIFICATE",       "KR_CERTIFICATE"       },
+    { "ACCOUNT_FLAG_EXPANSION_COLLECTOR",  "EXPANSION_COLLECTOR"  },
+    { "ACCOUNT_FLAG_DISABLE_VOICE",        "DISABLE_VOICE"        },
+    { "ACCOUNT_FLAG_DISABLE_VOICE_SPEAK",  "DISABLE_VOICE_SPEAK"  },
+    { "ACCOUNT_FLAG_REFERRAL_RESURRECT",   "REFERRAL_RESURRECT"   },
+    { "ACCOUNT_FLAG_EU_FORBID_CC",         "EU_FORBID_CC"         },
+    { "ACCOUNT_FLAG_OPENBETA_DELL",        "OPENBETA_DELL"        },
+    { "ACCOUNT_FLAG_PROPASS",              "PROPASS"              },
+    { "ACCOUNT_FLAG_PROPASS_LOCK",         "PROPASS_LOCK"         },
+    { "ACCOUNT_FLAG_PENDING_UPGRADE",      "PENDING_UPGRADE"      },
+    { "ACCOUNT_FLAG_RETAIL_FROM_TRIAL",    "RETAIL_FROM_TRIAL"    },
+    { "ACCOUNT_FLAG_EXPANSION2_COLLECTOR", "EXPANSION2_COLLECTOR" },
+    { "ACCOUNT_FLAG_OVERMIND_LINKED",      "OVERMIND_LINKED"      },
+    { "ACCOUNT_FLAG_DEMOS",                "DEMOS"                },
+    { "ACCOUNT_FLAG_DEATH_KNIGHT_OK",      "DEATH_KNIGHT_OK"      },
+    { "ACCOUNT_FLAG_S2_REQUIRE_IGR",       "S2_REQUIRE_IGR"       },
+    { "ACCOUNT_FLAG_S2_TRIAL",             "S2_TRIAL"             }
+};
+
 bool IsLocaleValid(std::string const& locale)
 {
     for (int i = 0; i < TOTAL_LOCALES; ++i)
@@ -39,7 +75,7 @@ bool IsLocaleValid(std::string const& locale)
     return false;
 }
 
-LocaleConstant GetLocaleByName(const std::string& name)
+LocaleConstant GetLocaleByName(std::string const& name)
 {
     for (uint32 i = 0; i < TOTAL_LOCALES; ++i)
         if (name == localeNames[i])
