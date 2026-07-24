@@ -47,7 +47,6 @@ enum Misc
     EVENT_INTIDMDATING_ROAR         = 2,
     EVENT_SUMMON_ADDS1              = 3,
     EVENT_SUMMON_ADDS2              = 4,
-    EVENT_KILL_TALK                 = 5,
 
     // Onyx Flamecaller
     EVENT_BLAST_NOVA                = 6,
@@ -136,11 +135,7 @@ public:
 
         void KilledUnit(Unit*  /*victim*/) override
         {
-            if (!events.HasTimeUntilEvent(EVENT_KILL_TALK))
-            {
-                Talk(SAY_KILL);
-                events.ScheduleEvent(EVENT_KILL_TALK, 6s);
-            }
+            Talk(SAY_KILL);
         }
 
         void UpdateAI(uint32 diff) override

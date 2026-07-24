@@ -239,6 +239,33 @@ class spell_ulduar_energy_sap_aura : public AuraScript
     }
 };
 
+// 61906 - Random Aggro Periodic (5 sec)
+class spell_ulduar_random_aggro_periodic : public AuraScript
+{
+    PrepareAuraScript(spell_ulduar_random_aggro_periodic);
+
+    void HandleEffectPeriodic(AuraEffect const* /*aurEff*/)
+    {
+        Unit* target = GetTarget();
+        target->GetThreatMgr().ResetAllThreat();
+
+        Creature* creature = target->ToCreature();
+        if (!creature || !creature->IsAIEnabled)
+            return;
+
+        if (Unit* victim = creature->AI()->SelectTarget(SelectTargetMethod::Random, 0, 100.0f, true))
+        {
+            creature->AddThreat(victim, 3000000.0f);
+            creature->AI()->AttackStart(victim);
+        }
+    }
+
+    void Register() override
+    {
+        OnEffectPeriodic += AuraEffectPeriodicFn(spell_ulduar_random_aggro_periodic::HandleEffectPeriodic, EFFECT_0, SPELL_AURA_PERIODIC_DUMMY);
+    }
+};
+
 struct npc_ulduar_snow_mound : public ScriptedAI
 {
     npc_ulduar_snow_mound(Creature* creature) : ScriptedAI(creature)
@@ -590,6 +617,7 @@ void AddSC_ulduar()
     new npc_ulduar_keeper();
     RegisterSpellScript(spell_ulduar_teleporter);
     RegisterSpellScript(spell_ulduar_energy_sap_aura);
+    RegisterSpellScript(spell_ulduar_random_aggro_periodic);
     RegisterUlduarCreatureAI(npc_ulduar_snow_mound);
     RegisterUlduarCreatureAI(npc_ulduar_storm_tempered_keeper);
     RegisterUlduarCreatureAI(npc_ulduar_arachnopod_destroyer);

@@ -19,7 +19,7 @@
 #include "Log.h"
 #include "ScriptMgr.h"
 
-WorldMapScript::WorldMapScript(const char* name, uint32 mapId) :
+WorldMapScript::WorldMapScript(char const* name, uint32 mapId) :
     ScriptObject(name), MapScript<Map>(mapId)
 {
     ScriptRegistry<WorldMapScript>::AddScript(this);
