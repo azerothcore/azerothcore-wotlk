@@ -5,7 +5,7 @@
 -- -------------------------------------------
 -- Bythius the Flesh-Shaper (Entry 28212, GUID 100735)
 -- Patrol leader
-UPDATE `creature` SET `position_x`= 6093.8193, `position_y`= 3697.6428, `position_z`= 121.3801, `orientation`= 1.6121, `wander_distance`= 0, `MovementType`= 2 WHERE `guid`= 100735;
+UPDATE `creature` SET `position_x`= 6093.8193, `position_y`= 3697.6428, `position_z`= 121.3801, `orientation`= 1.6121, `wander_distance`= 0, `MovementType`= 2 WHERE `Entry` = 28212 AND `guid`= 100735;
 
 DELETE FROM `creature_addon` WHERE `guid`= 100735;
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
