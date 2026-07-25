@@ -462,7 +462,7 @@ public:
 
         // Fatal damage puts the minion in feign death instead of killing it, so a later
         // ACTION_RESTORE can revive it without respawning (which would wipe AI state).
-        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
+        void DamageTaken(Unit* /*attacker*/, uint32& damage, DamageEffectType, SpellSchoolMask) override
         {
             if (damage < me->GetHealth())
                 return;
@@ -491,6 +491,15 @@ public:
             me->SetControlled(false, UNIT_STATE_STUNNED);
             me->SetControlled(true, UNIT_STATE_ROOT);
             me->SetStandState(UNIT_STAND_STATE_DEAD);
+        }
+
+        void JustDied(Unit* /*killer*/) override
+        {
+            // covers deaths that bypass DamageTaken (e.g. .die command via Unit::Kill);
+            // the overload KillSelf() arrives with isFeignDeath still set, so it can't double-fire
+            if (!isFeignDeath)
+                if (Creature* thaddius = instance->GetCreature(DATA_THADDIUS_BOSS))
+                    thaddius->AI()->DoAction(ACTION_SUMMON_DIED);
         }
 
         void KilledUnit(Unit* who) override
