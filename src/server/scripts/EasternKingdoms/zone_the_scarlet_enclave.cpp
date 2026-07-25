@@ -100,7 +100,7 @@ class spell_q12641_death_comes_from_on_high_recall_eye : public SpellScript
 /*######
 ## Rain of Darkness
 ## Quest: If Chaos Drives, Let Suffering Hold The Reins.
-## Note: Increase Rain of Darkness (Trigger) Z Axis Spawn Point.  
+## Note: Increase Rain of Darkness (Trigger) Z Axis Spawn Point.
 ######*/
 
 // 51761 - Rain of Darkness
