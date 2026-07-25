@@ -142,7 +142,7 @@ struct boss_skeram : public BossAI
             me->RemoveCorpse();
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
         _JustEngagedWith();
         events.Reset();
@@ -154,7 +154,9 @@ struct boss_skeram : public BossAI
 
         if (!me->IsSummon())
         {
-            Talk(SAY_AGGRO);
+            // Resolve pets/guardians to their owner so gendered locales resolve $g against the puller
+            Player* puller = who->GetCharmerOrOwnerPlayerOrPlayerItself();
+            Talk(SAY_AGGRO, puller ? puller : who);
         }
     }
 
