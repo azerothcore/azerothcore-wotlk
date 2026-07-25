@@ -93,7 +93,10 @@ public:
     void LoadBattlegroundTemplates();
     void DeleteAllBattlegrounds();
 
-    void SendToBattleground(Player* player, uint32 InstanceID, BattlegroundTypeId bgTypeId);
+    // Returns false when the teleport could not start (instance gone, or a
+    // synchronous TeleportTo failure) so the accept path can release the
+    // otherwise-orphaned invited reservation.
+    bool SendToBattleground(Player* player, uint32 InstanceID, BattlegroundTypeId bgTypeId);
 
     /* Battleground queues */
     BattlegroundQueue& GetBattlegroundQueue(BattlegroundQueueTypeId bgQueueTypeId) { return m_BattlegroundQueues[bgQueueTypeId]; }

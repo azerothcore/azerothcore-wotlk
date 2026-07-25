@@ -34,7 +34,7 @@ enum WorldObjectHook
 class WorldObjectScript : public ScriptObject
 {
 protected:
-    WorldObjectScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
+    WorldObjectScript(char const* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     [[nodiscard]] bool IsDatabaseBound() const override { return false; }

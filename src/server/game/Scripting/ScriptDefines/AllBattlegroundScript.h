@@ -41,6 +41,7 @@ enum AllBattlegroundHook
     ALLBATTLEGROUNDHOOK_ON_BATTLEGROUND_END,
     ALLBATTLEGROUNDHOOK_ON_BATTLEGROUND_DESTROY,
     ALLBATTLEGROUNDHOOK_ON_BATTLEGROUND_CREATE,
+    ALLBATTLEGROUNDHOOK_ON_BATTLEGROUND_SETUP,
     ALLBATTLEGROUNDHOOK_CAN_ADD_GROUP_TO_MATCHING_POOL,
     ALLBATTLEGROUNDHOOK_GET_PLAYER_MATCHMAKING_RATING,
     ALLBATTLEGROUNDHOOK_END
@@ -56,7 +57,7 @@ struct GroupQueueInfo;
 class AllBattlegroundScript : public ScriptObject
 {
 protected:
-    AllBattlegroundScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
+    AllBattlegroundScript(char const* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     [[nodiscard]] bool IsDatabaseBound() const override { return false; }
@@ -138,6 +139,13 @@ public:
      * @param bg Contains information about the Battleground
      */
     virtual void OnBattlegroundCreate(Battleground* /*bg*/) { }
+
+    /**
+     * @brief This hook runs after the Battleground setup is completed (map is created and initial objects are spawned)
+     *
+     * @param bg Contains information about the Battleground
+     */
+    virtual void OnBattlegroundSetup(Battleground* /*bg*/) { }
 
     /**
      * @brief This hook runs before adding a group to the battleground matching pool
