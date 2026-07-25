@@ -16,7 +16,7 @@
 -- already proven to fire independent of any waypoint data. That chain starts from "Text 4 Over"
 -- (id 7, previously gated behind the same unreachable waypoint 3 - moved alongside the unlock
 -- so the dialogue leading up to it isn't itself stuck).
-DELETE FROM `smart_scripts` WHERE `entryorguid` = 15491 AND `source_type` = 0 AND `id` IN (7, 10, 38, 41);
+DELETE FROM `smart_scripts` WHERE `entryorguid` = 15491 AND `source_type` = 0 AND `id` IN (7, 10, 38, 41) AND `link` = 0;
 INSERT INTO `smart_scripts`
     (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `target_type`, `comment`)
 VALUES
