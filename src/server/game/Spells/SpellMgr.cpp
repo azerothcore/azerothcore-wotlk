@@ -2009,8 +2009,8 @@ void SpellMgr::LoadSpellProcs()
 
     mSpellProcMap.clear();                             // need for reload case
 
-    //                                                 0        1           2                3                 4                 5                 6          7              8              9         10              11                  12             13      14        15
-    QueryResult result = WorldDatabase.Query("SELECT SpellId, SchoolMask, SpellFamilyName, SpellFamilyMask0, SpellFamilyMask1, SpellFamilyMask2, ProcFlags, SpellTypeMask, SpellPhaseMask, HitMask, AttributesMask, DisableEffectsMask, ProcsPerMinute, Chance, Cooldown, Charges FROM spell_proc");
+    //                                                 0        1           2                3                 4                 5                 6          7              8              9         10              11                  12             13      14        15       16
+    QueryResult result = WorldDatabase.Query("SELECT SpellId, SchoolMask, SpellFamilyName, SpellFamilyMask0, SpellFamilyMask1, SpellFamilyMask2, ProcFlags, SpellTypeMask, SpellPhaseMask, HitMask, AttributesMask, DisableEffectsMask, ProcsPerMinute, Chance, Cooldown, Charges, ChargeDropDelay FROM spell_proc");
     if (!result)
     {
         LOG_WARN("server.loading", ">> Loaded 0 Spell Proc Conditions And Data. DB table `spell_proc` Is Empty.");
@@ -2065,6 +2065,7 @@ void SpellMgr::LoadSpellProcs()
         baseProcEntry.Chance             = fields[13].Get<float>();
         baseProcEntry.Cooldown           = Milliseconds(fields[14].Get<uint32>());
         baseProcEntry.Charges            = fields[15].Get<uint32>();
+        baseProcEntry.ChargeDropDelay    = Milliseconds(fields[16].Get<uint32>());
 
         while (spellInfo)
         {
@@ -2103,6 +2104,8 @@ void SpellMgr::LoadSpellProcs()
                 LOG_ERROR("sql.sql", "`spell_proc` table entry for SpellId {} has too big value in `Charges` field", spellId);
                 procEntry.Charges = 99;
             }
+            if (procEntry.ChargeDropDelay.count() && !procEntry.Charges)
+                LOG_ERROR("sql.sql", "`spell_proc` table entry for SpellId {} has `ChargeDropDelay` value defined, but `Charges` is 0 (infinite charges), the aura is never removed for the delay to apply", spellId);
             if (!procEntry.ProcFlags)
                 LOG_ERROR("sql.sql", "`spell_proc` table entry for SpellId {} doesn't have `ProcFlags` value defined, proc will not be triggered", spellId);
             if (procEntry.SpellTypeMask & ~PROC_SPELL_TYPE_MASK_ALL)

@@ -2337,7 +2337,14 @@ void Aura::ConsumeProcCharges(SpellProcEntry const* procEntry)
     else if (IsUsingCharges())
     {
         if (!GetCharges())
-            Remove();
+        {
+            // out of charges already blocks further procs (see CalcProcChance), so holding the
+            // aura here just keeps it visible/consumable for an instant cast queued in the same batch
+            if (procEntry->ChargeDropDelay.count())
+                SetDuration(procEntry->ChargeDropDelay.count());
+            else
+                Remove();
+        }
     }
 }
 
