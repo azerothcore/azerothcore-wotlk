@@ -890,6 +890,10 @@ void GameObject::Update(uint32 diff)
                     return;
                 }
 
+                // Re-roll the respawn delay each cycle (chests, gathering nodes despawn through here).
+                // Unconditional so a delay forced by an earlier despawn doesn't stick when Min == Max
+                m_respawnDelayTime = urand(m_respawnDelayTimeMin, m_respawnDelayTimeMax);
+
                 uint32 dynamicRespawnDelay = GetMap()->ApplyDynamicModeRespawnScaling(this, m_respawnDelayTime);
                 m_respawnTime = GameTime::GetGameTime().count() + dynamicRespawnDelay;
 
@@ -947,8 +951,8 @@ void GameObject::DespawnOrUnsummon(Milliseconds delay /*= 0ms*/, Seconds forceRe
             }
             else
             {
-                if (m_respawnDelayTimeMin != m_respawnDelayTimeMax)
-                    m_respawnDelayTime = urand(m_respawnDelayTimeMin, m_respawnDelayTimeMax);
+                // Unconditional so a delay forced by an earlier despawn doesn't stick when Min == Max
+                m_respawnDelayTime = urand(m_respawnDelayTimeMin, m_respawnDelayTimeMax);
                 respawnDelay = int32(m_respawnDelayTime);
             }
             // Apply the rolled/forced delay without going through SetRespawnTime → SetRespawnDelay,
