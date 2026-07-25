@@ -5428,6 +5428,17 @@ void SpellMgr::LoadSpellInfoCorrections()
     LockEntry* key = const_cast<LockEntry*>(sLockStore.LookupEntry(36)); // 3366 Opening, allows to open without proper key
     key->Type[2] = LOCK_KEY_NONE;
 
+    // Green Beam (Greyheart Spellbinder, Leotheras the Blind, SSC, issue #24701) - channeled,
+    // but its DBC Speed is a leftover 12 as if it were a one-shot missile. Spell.cpp treats any
+    // Speed>0 spell as "delayed" and rechecks UNIT_FLAG_NON_ATTACKABLE at effect-apply time,
+    // which makes this whiff on Leotheras while he's banished (he needs that flag to render
+    // the banish visual correctly, not just NOT_SELECTABLE - transparent otherwise). Zeroing
+    // Speed drops the recheck for this spell without touching Leotheras's flags at all.
+    ApplySpellFix({ 37626 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Speed = 0.0f;
+    });
+
     LOG_INFO("server.loading", ">> Loading spell dbc data corrections  in {} ms", GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
