@@ -2792,14 +2792,20 @@ void Map::ProcessCreatureRespawn(ObjectGuid::LowType spawnId)
     }
 
     // Check linked_respawn: don't spawn if the master creature is still dead.
-    // This mirrors the check in Creature::Respawn() for compat-mode creatures.
+    // This mirrors the check in Creature::Respawn() for compat-mode creatures:
+    // hard-reset creatures bypass it (they despawn on evade and must always
+    // come back), and a creature linked to itself never auto-respawns.
     ObjectGuid dbtableHighGuid = ObjectGuid::Create<HighGuid::Unit>(data->id, spawnId);
     time_t linkedRespawntime = GetLinkedRespawnTime(dbtableHighGuid);
-    if (linkedRespawntime)
+    CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(data->id);
+    if (linkedRespawntime && !(cInfo && cInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_HARD_RESET)))
     {
-        // Master is still dead; re-queue at the master's respawn time + a small offset.
         time_t now = GameTime::GetGameTime().count();
-        time_t newRespawnTime = (now > linkedRespawntime ? now : linkedRespawntime) + urand(5, MINUTE);
+        time_t newRespawnTime;
+        if (sObjectMgr->GetLinkedRespawnGuid(dbtableHighGuid) == dbtableHighGuid)
+            newRespawnTime = now + DAY; // if linking self, never respawn (check delayed to next day)
+        else
+            newRespawnTime = (now > linkedRespawntime ? now : linkedRespawntime) + urand(5, MINUTE); // master is still dead; re-queue at the master's respawn time + a small offset
         SaveCreatureRespawnTime(spawnId, newRespawnTime);
         return;
     }
@@ -2951,7 +2957,7 @@ void Map::LogEncounterFinished(EncounterCreditType type, uint32 creditEntry)
         if (Player* p = itr->GetSource())
         {
             std::string auraStr;
-            const Unit::AuraApplicationMap& a = p->GetAppliedAuras();
+            Unit::AuraApplicationMap const& a = p->GetAppliedAuras();
             for (auto iterator = a.begin(); iterator != a.end(); ++iterator)
             {
                 snprintf(buffer2, 255, "%u(%u) ", iterator->first, iterator->second->GetEffectMask());

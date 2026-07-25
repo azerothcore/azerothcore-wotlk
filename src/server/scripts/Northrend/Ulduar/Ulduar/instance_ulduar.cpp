@@ -114,6 +114,7 @@ ObjectData const creatureData[] =
     // Yogg-Saron helpers
     { NPC_SARA,                     DATA_SARA                   },
     { NPC_BRAIN_OF_YOGG_SARON,      DATA_BRAIN_OF_YOGG_SARON    },
+    { NPC_VOICE_OF_YOGG_SARON,      DATA_VOICE_OF_YOGG_SARON    },
     // Observation Ring Keepers
     { NPC_FREYA_GOSSIP,             DATA_FREYA_GOSSIP           },
     { NPC_HODIR_GOSSIP,             DATA_HODIR_GOSSIP           },

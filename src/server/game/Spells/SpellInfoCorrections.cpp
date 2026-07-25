@@ -3300,12 +3300,6 @@ void SpellMgr::LoadSpellInfoCorrections()
         spellInfo->Effects[EFFECT_0].MiscValue = 100;
     });
 
-    // Empowered Blood
-    ApplySpellFix({ 70227, 70232 }, [](SpellInfo* spellInfo)
-    {
-        spellInfo->AreaGroupId = 2452; // Whole icc instead of Crimson Halls only, remove when area calculation is fixed
-    });
-
     ApplySpellFix({ 74509 }, [](SpellInfo* spellInfo)
     {
         spellInfo->Effects[EFFECT_0].RadiusEntry = sSpellRadiusStore.LookupEntry(EFFECT_RADIUS_20_YARDS); // 20yd
@@ -5240,6 +5234,12 @@ void SpellMgr::LoadSpellInfoCorrections()
     ApplySpellFix({ 6921 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx3 |= SPELL_ATTR3_SUPPRESS_CASTER_PROCS;
+    });
+
+    // Drag Mine Cart
+    ApplySpellFix({ 52414 }, [](SpellInfo* spellInfo)
+    {
+       spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ANY);
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)

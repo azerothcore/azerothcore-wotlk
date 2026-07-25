@@ -95,7 +95,7 @@ class at_hol_hall_of_watchers : public OnlyOnceAreaTriggerScript
 public:
     at_hol_hall_of_watchers() : OnlyOnceAreaTriggerScript("at_hol_hall_of_watchers") {}
 
-    bool _OnTrigger(Player* player, const AreaTrigger* /*at*/) override
+    bool _OnTrigger(Player* player, AreaTrigger const* /*at*/) override
     {
         std::list<Creature*> creatures;
         player->GetCreatureListWithEntryInGrid(creatures, { NPC_TITANIUM_SIEGEBREAKER, NPC_TITANIUM_THUNDERER }, 50.0f);

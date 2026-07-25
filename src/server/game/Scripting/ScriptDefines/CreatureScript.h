@@ -24,7 +24,7 @@
 class CreatureScript : public ScriptObject, public UpdatableScript<Creature>
 {
 protected:
-    CreatureScript(const char* name);
+    CreatureScript(char const* name);
 
 public:
     [[nodiscard]] bool IsDatabaseBound() const override { return true; }
@@ -36,7 +36,7 @@ public:
     [[nodiscard]] virtual bool OnGossipSelect(Player* /*player*/, Creature* /*creature*/, uint32 /*sender*/, uint32 /*action*/) { return false; }
 
     // Called when a player selects a gossip with a code in the creature's gossip menu.
-    [[nodiscard]] virtual bool OnGossipSelectCode(Player* /*player*/, Creature* /*creature*/, uint32 /*sender*/, uint32 /*action*/, const char* /*code*/) { return false; }
+    [[nodiscard]] virtual bool OnGossipSelectCode(Player* /*player*/, Creature* /*creature*/, uint32 /*sender*/, uint32 /*action*/, char const* /*code*/) { return false; }
 
     // Called when a player accepts a quest from the creature.
     [[nodiscard]] virtual bool OnQuestAccept(Player* /*player*/, Creature* /*creature*/, Quest const* /*quest*/) { return false; }
