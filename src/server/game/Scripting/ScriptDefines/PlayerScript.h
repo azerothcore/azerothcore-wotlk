@@ -215,6 +215,7 @@ enum PlayerHook
     PLAYERHOOK_ON_GET_REPUTATION_PRICE_DISCOUNT,
     PLAYERHOOK_ON_LEARN_TAXI_NODE,
     PLAYERHOOK_ON_BEFORE_GET_LEVEL_FOR_XP_GAIN,
+    PLAYERHOOK_ON_UNLINK_FROM_DB,
     PLAYERHOOK_END
 };
 
@@ -513,6 +514,12 @@ public:
     [[nodiscard]] virtual bool OnPlayerCanGiveMailRewardAtGiveLevel(Player* /*player*/, uint8 /*level*/) { return true; }
 
     virtual void OnPlayerDeleteFromDB(CharacterDatabaseTransaction /*trans*/, uint32 /*guid*/) { }
+
+    /**
+     * @brief Called when a character is soft-deleted (unlinked from its account, CharDelete.Method = 1),
+     * before the unlink is executed, while all character data still exists in the database.
+     */
+    virtual void OnPlayerUnlinkFromDB(uint32 /*lowGuid*/) { }
 
     [[nodiscard]] virtual bool OnPlayerCanRepopAtGraveyard(Player* /*player*/) { return true; }
 

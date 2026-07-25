@@ -562,6 +562,11 @@ void ScriptMgr::OnPlayerDeleteFromDB(CharacterDatabaseTransaction trans, uint32 
     CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_DELETE_FROM_DB, script->OnPlayerDeleteFromDB(trans, guid));
 }
 
+void ScriptMgr::OnPlayerUnlinkFromDB(uint32 lowGuid)
+{
+    CALL_ENABLED_HOOKS(PlayerScript, PLAYERHOOK_ON_UNLINK_FROM_DB, script->OnPlayerUnlinkFromDB(lowGuid));
+}
+
 bool ScriptMgr::OnPlayerCanRepopAtGraveyard(Player* player)
 {
     CALL_ENABLED_BOOLEAN_HOOKS(PlayerScript, PLAYERHOOK_CAN_REPOP_AT_GRAVEYARD, !script->OnPlayerCanRepopAtGraveyard(player));

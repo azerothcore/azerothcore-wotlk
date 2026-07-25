@@ -398,6 +398,7 @@ public: /* PlayerScript */
     void OnPlayerRewardKillRewarder(Player* player, KillRewarder* rewarder, bool isDungeon, float& rate);
     bool OnPlayerCanGiveMailRewardAtGiveLevel(Player* player, uint8 level);
     void OnPlayerDeleteFromDB(CharacterDatabaseTransaction trans, uint32 guid);
+    void OnPlayerUnlinkFromDB(uint32 lowGuid);
     bool OnPlayerCanRepopAtGraveyard(Player* player);
     std::optional<bool> OnPlayerIsClass(Player const* player, Classes playerClass, ClassContext context);
     void OnPlayerGetMaxSkillValue(Player* player, uint32 skill, int32& result, bool IsPure);

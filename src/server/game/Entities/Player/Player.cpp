@@ -4387,6 +4387,8 @@ void Player::DeleteFromDB(ObjectGuid::LowType lowGuid, uint32 accountId, bool up
         // The character gets unlinked from the account, the name gets freed up and appears as deleted ingame
         case CHAR_DELETE_UNLINK:
             {
+                sScriptMgr->OnPlayerUnlinkFromDB(lowGuid);
+
                 stmt = CharacterDatabase.GetPreparedStatement(CHAR_UPD_DELETE_INFO);
 
                 stmt->SetData(0, lowGuid);
