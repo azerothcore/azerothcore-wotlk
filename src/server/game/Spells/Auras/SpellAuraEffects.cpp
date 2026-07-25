@@ -2224,6 +2224,14 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
         }
     }
 
+    // Disable flight before the boost aura (speed) is torn down below - HandleShapeshiftBoosts
+    // removes the linked speed aura, which force-syncs run speed to the client while it's still
+    // flagged as flying, snapping horizontal momentum to a stop instead of gliding (issue #26783).
+    // Flying mounts don't have this problem because their speed reset and SetCanFly(false) happen
+    // together in the same handler (HandleAuraModIncreaseFlightSpeed) - mirror that ordering here.
+    if (!apply && (form == FORM_FLIGHT || form == FORM_FLIGHT_EPIC))
+        target->SetCanFly(false);
+
     // adding/removing linked auras
     // add/remove the shapeshift aura's boosts
     HandleShapeshiftBoosts(target, apply);
