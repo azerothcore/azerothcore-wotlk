@@ -1,3 +1,4 @@
+-- DB update 2026_07_25_00 -> 2026_07_25_01
 -- SPELL_TRANSFORM_GHOST and SPELL_FORGIVENESS
 
 DELETE FROM `spell_script_names` WHERE `spell_id` IN (28443, 28697);
