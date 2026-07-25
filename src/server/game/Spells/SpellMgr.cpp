@@ -2105,7 +2105,9 @@ void SpellMgr::LoadSpellProcs()
                 procEntry.Charges = 99;
             }
             if (procEntry.ChargeDropDelay.count() && !procEntry.Charges)
-                LOG_ERROR("sql.sql", "`spell_proc` table entry for SpellId {} has `ChargeDropDelay` value defined, but `Charges` is 0 (infinite charges), the aura is never removed for the delay to apply", spellId);
+                LOG_ERROR("sql.sql",
+                    "`spell_proc` entry for SpellId {} has `ChargeDropDelay` but `Charges` is 0, never applies",
+                    spellId);
             if (!procEntry.ProcFlags)
                 LOG_ERROR("sql.sql", "`spell_proc` table entry for SpellId {} doesn't have `ProcFlags` value defined, proc will not be triggered", spellId);
             if (procEntry.SpellTypeMask & ~PROC_SPELL_TYPE_MASK_ALL)
@@ -2286,6 +2288,7 @@ void SpellMgr::LoadSpellProcs()
         procEntry.Chance          = static_cast<float>(spellInfo->ProcChance);
         procEntry.Cooldown        = Milliseconds::zero();
         procEntry.Charges         = spellInfo->ProcCharges;
+        procEntry.ChargeDropDelay = Milliseconds::zero();
 
         mSpellProcMap[spellInfo->Id] = procEntry;
         ++count;

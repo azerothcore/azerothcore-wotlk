@@ -297,7 +297,7 @@ struct SpellProcEntry
     float        Chance;                                     // if nonzero - owerwrite procChance field for given Spell.dbc entry, defines chance of proc to occur, not used if ProcsPerMinute set
     Milliseconds Cooldown;                                   // if nonzero - cooldown in secs for aura proc, applied to aura
     uint32       Charges;                                    // if nonzero - owerwrite procCharges field for given Spell.dbc entry, defines how many times proc can occur before aura remove, 0 - infinite
-    Milliseconds ChargeDropDelay;                            // if nonzero - keeps the aura alive (out of charges, can no longer proc) for this long after its last charge is consumed instead of removing it immediately, giving a brief grace window for an instant cast issued right as the last charge lands to still benefit from it
+    Milliseconds ChargeDropDelay;                            // ms grace window before removing an out-of-charges aura
 };
 
 typedef std::unordered_map<uint32, SpellProcEntry> SpellProcMap;
