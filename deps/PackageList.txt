@@ -19,9 +19,9 @@ G3D (a commercial-grade C++ 3D engine available as Open Source (BSD License)
 gperftools (Google Performance Tools)
   Version: external
 
-jemalloc (a general-purpose scalable concurrent malloc-implementation)
-  http://www.canonware.com/jemalloc/
-  Version: 5.2.1
+mimalloc (a general purpose allocator with excellent performance characteristics)
+  https://github.com/microsoft/mimalloc
+  Version: 2.3.2
 
 jsonpath (JSONPath implementation in Bash for filtering, merging and modifying JSON)
   https://github.com/mclarkson/JSONPath.sh.git
