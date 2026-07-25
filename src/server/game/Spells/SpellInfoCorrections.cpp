@@ -5422,6 +5422,23 @@ void SpellMgr::LoadSpellInfoCorrections()
     LockEntry* key = const_cast<LockEntry*>(sLockStore.LookupEntry(36)); // 3366 Opening, allows to open without proper key
     key->Type[2] = LOCK_KEY_NONE;
 
+    // Metamorphosis (Varedis, Shadowmoon Valley, issue #26641) - transforms him into a demon
+    // and buffs his damage (Effect 1), but grants no invulnerability, so players could always
+    // just melee him down at 50% HP regardless of the Book of Fel Names mechanic that's
+    // supposed to be required. Effect 2 is unused in the DBC; using it for a full
+    // SCHOOL_IMMUNITY aura matches contemporaneous player accounts of him being immune to all
+    // damage once transformed (see issue for sources). Already-existing
+    // spell_q10651_q10692_book_of_fel_names (spell_quest.cpp) strips this whole aura -
+    // transform, buff, and this immunity together - when the quest item is used on him; no
+    // changes needed there, it was only ever missing the immunity effect itself.
+    ApplySpellFix({ 36298 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->Effects[EFFECT_2].Effect = SPELL_EFFECT_APPLY_AURA;
+        spellInfo->Effects[EFFECT_2].ApplyAuraName = SPELL_AURA_SCHOOL_IMMUNITY;
+        spellInfo->Effects[EFFECT_2].MiscValue = 127; // all schools
+        spellInfo->Effects[EFFECT_2].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_CASTER);
+    });
+
     LOG_INFO("server.loading", ">> Loading spell dbc data corrections  in {} ms", GetMSTimeDiffToNow(oldMSTime));
     LOG_INFO("server.loading", " ");
 }
