@@ -5,7 +5,7 @@
 -- -------------------------------------------
 -- Bythius the Flesh-Shaper (Entry 28212, GUID 100735)
 -- Patrol leader
-UPDATE `creature` SET `position_x`= 6093.8193, `position_y`= 3697.6428, `position_z`= 121.3801, `orientation`= 1.6121, `wander_distance`= 0, `MovementType`= 2 WHERE `Entry` = 28212 AND `guid`= 100735;
+UPDATE `creature` SET `position_x`= 6093.8193, `position_y`= 3697.6428, `position_z`= 121.3801, `orientation`= 1.6121, `wander_distance`= 0, `MovementType`= 2 WHERE `guid`= 100735 AND `id` = 28212;
 
 DELETE FROM `creature_addon` WHERE `guid`= 100735;
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
@@ -28,9 +28,9 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
     (1007350, 13, 6104.4736, 3761.4934, 99.21134, NULL, 0, 0, 0, 0, 0, 100, 0),
     (1007350, 14, 6092.3813, 3732.4739, 111.712875, NULL, 0, 0, 0, 0, 0, 100, 0);
 -- Cerberon (Entry 28207, GUID 100431)
-UPDATE `creature` SET `wander_distance`= 0, `MovementType`= 0 WHERE `guid`= 100431;
+UPDATE `creature` SET `wander_distance`= 0, `MovementType`= 0 WHERE `guid`= 100431 AND `id` = 28207;
 -- Glonn (Entry 28211, GUID 100704)
-UPDATE `creature` SET `wander_distance`= 0, `MovementType`= 0 WHERE `guid`= 100704;
+UPDATE `creature` SET `wander_distance`= 0, `MovementType`= 0 WHERE `guid`= 100704 AND `id` = 28211;
 -- Plague-dog pack formation (leader 100735, plague-dogs flank on opposite sides)
 DELETE FROM `creature_formations` WHERE `leaderGUID`= 100735 OR `memberGUID` IN (100735, 100431, 100704);
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
