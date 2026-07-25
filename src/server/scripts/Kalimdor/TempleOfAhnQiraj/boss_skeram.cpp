@@ -16,6 +16,7 @@
  */
 
 #include "CreatureScript.h"
+#include "Player.h"
 #include "ScriptedCreature.h"
 #include "SpellScript.h"
 #include "SpellScriptLoader.h"
@@ -155,7 +156,7 @@ struct boss_skeram : public BossAI
         if (!me->IsSummon())
         {
             // Resolve pets/guardians to their owner so gendered locales resolve $g against the puller
-            Player* puller = who->GetCharmerOrOwnerPlayerOrPlayerItself();
+            Unit* puller = who->GetCharmerOrOwnerPlayerOrPlayerItself();
             Talk(SAY_AGGRO, puller ? puller : who);
         }
     }
