@@ -6252,7 +6252,11 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
 
                         if (pathFailed)
                         {
-                            if (oversizedTarget)
+                            // Skip the pre-generated path and let EffectCharge compute the destination via GetFirstCollisionPosition instead.
+                            bool oversizedSoftFail = oversizedTarget &&
+                                (m_preGeneratedPath->GetPathType() & (PATHFIND_INCOMPLETE | PATHFIND_FARFROMPOLY_END));
+
+                            if (oversizedSoftFail)
                                 m_preGeneratedPath.reset();
                             else
                                 return SPELL_FAILED_NOPATH;
