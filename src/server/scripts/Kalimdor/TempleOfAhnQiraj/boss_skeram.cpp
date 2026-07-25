@@ -142,7 +142,7 @@ struct boss_skeram : public BossAI
             me->RemoveCorpse();
     }
 
-    void JustEngagedWith(Unit* /*who*/) override
+    void JustEngagedWith(Unit* who) override
     {
         _JustEngagedWith();
         events.Reset();
@@ -154,7 +154,7 @@ struct boss_skeram : public BossAI
 
         if (!me->IsSummon())
         {
-            Talk(SAY_AGGRO);
+            Talk(SAY_AGGRO, who);
         }
     }
 
