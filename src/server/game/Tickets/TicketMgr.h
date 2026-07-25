@@ -150,7 +150,7 @@ public:
 
     void TeleportTo(Player* player) const;
     std::string FormatMessageString(ChatHandler& handler, bool detailed = false) const;
-    std::string FormatMessageString(ChatHandler& handler, const char* szClosedName, const char* szAssignedToName, const char* szUnassignedName, const char* szDeletedName) const;
+    std::string FormatMessageString(ChatHandler& handler, char const* szClosedName, char const* szAssignedToName, char const* szUnassignedName, char const* szDeletedName) const;
 
     void SetChatLog(std::list<uint32> time, std::string const& log);
     std::string const& GetChatLog() const { return _chatLog; }

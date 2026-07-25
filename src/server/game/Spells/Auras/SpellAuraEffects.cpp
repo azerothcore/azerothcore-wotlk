@@ -1440,7 +1440,7 @@ void AuraEffect::HandleShapeshiftBoosts(Unit* target, bool apply) const
 
         if (player)
         {
-            const PlayerSpellMap& sp_list = player->GetSpellMap();
+            PlayerSpellMap const& sp_list = player->GetSpellMap();
             for (PlayerSpellMap::const_iterator itr = sp_list.begin(); itr != sp_list.end(); ++itr)
             {
                 if (itr->second->State == PLAYERSPELL_REMOVED || !itr->second->IsInSpec(player->GetActiveSpec()))
@@ -1458,7 +1458,7 @@ void AuraEffect::HandleShapeshiftBoosts(Unit* target, bool apply) const
             }
 
             // xinef: talent stance auras are not on m_spells map, so iterate talents
-            const PlayerTalentMap& tl_list = player->GetTalentMap();
+            PlayerTalentMap const& tl_list = player->GetTalentMap();
             for (PlayerTalentMap::const_iterator itr = tl_list.begin(); itr != tl_list.end(); ++itr)
             {
                 if (itr->second->State == PLAYERSPELL_REMOVED || !itr->second->IsInSpec(player->GetActiveSpec()))
@@ -1604,7 +1604,7 @@ void AuraEffect::HandleShapeshiftBoosts(Unit* target, bool apply) const
             }
         }
 
-        const Unit::AuraEffectList& shapeshifts = target->GetAuraEffectsByType(SPELL_AURA_MOD_SHAPESHIFT);
+        Unit::AuraEffectList const& shapeshifts = target->GetAuraEffectsByType(SPELL_AURA_MOD_SHAPESHIFT);
         AuraEffect* newAura = nullptr;
         // Iterate through all the shapeshift auras that the target has, if there is another aura with SPELL_AURA_MOD_SHAPESHIFT, then this aura is being removed due to that one being applied
         for (Unit::AuraEffectList::const_iterator itr = shapeshifts.begin(); itr != shapeshifts.end(); ++itr)

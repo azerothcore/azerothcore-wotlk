@@ -316,7 +316,7 @@ public:
                 break;
             }
 
-            const Group* g = plr->GetGroup();
+            Group const* g = plr->GetGroup();
 
             if (hcnt > 1)
             {

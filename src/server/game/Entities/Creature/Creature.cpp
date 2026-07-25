@@ -474,7 +474,7 @@ void Creature::RemoveCorpse(bool setSpawnTime, bool skipVisibility)
 /**
  * change the entry of creature until respawn
  */
-bool Creature::InitEntry(uint32 Entry, const CreatureData* data)
+bool Creature::InitEntry(uint32 Entry, CreatureData const* data)
 {
     CreatureTemplate const* normalInfo = sObjectMgr->GetCreatureTemplate(Entry);
     if (!normalInfo)
@@ -578,7 +578,7 @@ bool Creature::InitEntry(uint32 Entry, const CreatureData* data)
     return true;
 }
 
-bool Creature::UpdateEntry(uint32 Entry, const CreatureData* data, bool changelevel, bool updateAI)
+bool Creature::UpdateEntry(uint32 Entry, CreatureData const* data, bool changelevel, bool updateAI)
 {
     if (!InitEntry(Entry, data))
         return false;
@@ -1148,7 +1148,7 @@ void Creature::Motion_Initialize()
         GetMotionMaster()->Initialize();
 }
 
-bool Creature::Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 vehId, float x, float y, float z, float ang, const CreatureData* data)
+bool Creature::Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 vehId, float x, float y, float z, float ang, CreatureData const* data)
 {
     ASSERT(map);
     SetMap(map);
@@ -1612,7 +1612,7 @@ float Creature::GetSpellDamageMod(int32 Rank)
     }
 }
 
-bool Creature::CreateFromProto(ObjectGuid::LowType guidlow, uint32 Entry, uint32 vehId, const CreatureData* data)
+bool Creature::CreateFromProto(ObjectGuid::LowType guidlow, uint32 Entry, uint32 vehId, CreatureData const* data)
 {
     SetZoneScript();
     if (GetZoneScript() && data)

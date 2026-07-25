@@ -43,8 +43,8 @@ public:
     static void LoadChannels();
 
     static void LoadChannelRights();
-    static const ChannelRights& GetChannelRightsFor(const std::string& name);
-    static void SetChannelRightsFor(const std::string& name, const uint32& flags, const uint32& speakDelay, const std::string& joinmessage, const std::string& speakmessage, const std::set<uint32>& moderators);
+    static ChannelRights const& GetChannelRightsFor(std::string const& name);
+    static void SetChannelRightsFor(std::string const& name, uint32 const& flags, uint32 const& speakDelay, std::string const& joinmessage, std::string const& speakmessage, std::set<uint32> const& moderators);
     static uint32 _channelIdMax;
 
 private:

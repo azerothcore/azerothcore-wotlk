@@ -38,7 +38,7 @@ class ArenaScript : public ScriptObject
 {
 protected:
 
-    ArenaScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
+    ArenaScript(char const* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
 
