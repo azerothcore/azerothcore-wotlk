@@ -99,8 +99,6 @@ struct boss_shade_of_akama : public BossAI
 {
     boss_shade_of_akama(Creature* creature) : BossAI(creature, DATA_SHADE_OF_AKAMA) { }
 
-    // Store guids, not Creature*: in dynamic spawn mode dead channelers are
-    // deleted on corpse removal, leaving cached pointers dangling until evade.
     GuidVector channelers;
     GuidVector generators;
 
