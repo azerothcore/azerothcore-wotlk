@@ -23,10 +23,22 @@
 -- sets him aggressive, right before the Phantasm shades spawn) using faction template 231
 -- (HostileMask includes Monster) - best-effort pick pending live confirmation it doesn't also
 -- make him attackable by players.
-DELETE FROM `smart_scripts` WHERE `entryorguid` = 11832 AND `source_type` = 0 AND `id` IN (45, 46, 47);
+--
+-- A third, separate break in the same family: after the fight, Remulos is supposed to walk
+-- back to his gossip spot and regain UNIT_NPC_FLAG_GOSSIP|QUESTGIVER (stripped at the very
+-- start of the encounter) via waypoint 12 of a *second* escort path (1183201, started at
+-- "Text 9 Over" - his last line of dialogue). That path also has zero rows in `waypoint_data`
+-- - same missing-data bug as Eranikus's landing path - so he can never regain those flags and
+-- the quest could never actually be turned in even after a successful fight. Fixed the same
+-- conservative way: moved the flag-restore and facing-reset off the unreachable waypoint onto
+-- "Text 9 Over" directly, without attempting to reconstruct the physical walk-back (no real
+-- coordinates available, and the walk-back animation isn't what blocks quest completion).
+DELETE FROM `smart_scripts` WHERE `entryorguid` = 11832 AND `source_type` = 0 AND `id` IN (34, 35, 45, 46, 47);
 INSERT INTO `smart_scripts`
     (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `target_type`, `target_param1`, `target_param2`, `comment`)
 VALUES
+    (11832, 0, 34, 0, 52, 0, 100, 0, 9, 11832, 0, 0, 82, 3, 0, 0, 1, 0, 0, 'Keeper Remulos - On Text 9 Over - Add Npc Flags Gossip & Questgiver'),
+    (11832, 0, 35, 0, 52, 0, 100, 0, 9, 11832, 0, 0, 66, 0, 0, 0, 1, 0, 0, 'Keeper Remulos - On Text 9 Over - Set Orientation Home Position'),
     (11832, 0, 45, 0, 40, 0, 100, 0, 21, 11832, 0, 0, 22, 1, 0, 0, 1, 0, 0, 'Keeper Remulos - On Waypoint 21 Reached - Set Event Phase 1 (engage-retry window)'),
     (11832, 0, 46, 0, 60, 1, 100, 0, 2000, 2000, 3000, 3000, 49, 0, 0, 0, 11, 15491, 30, 'Keeper Remulos - Update Pulse (Phase 1) - Retry Start Attacking Eranikus'),
     (11832, 0, 47, 0, 52, 0, 100, 0, 7, 11832, 0, 0, 2, 231, 0, 0, 1, 0, 0, 'Keeper Remulos - On Text 7 Over - Set Faction 231 (combat-capable, test)');
