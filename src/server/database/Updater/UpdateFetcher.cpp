@@ -374,20 +374,19 @@ UpdateResult UpdateFetcher::Update(bool const redundancyChecks,
         uint32 speed = 0;
         AppliedFileEntry const file = { filePath.filename().string(), hash, fileState, 0 };
 
-        switch (mode)
-        {
-            case MODE_APPLY:
-                speed = Apply(filePath);
-                [[fallthrough]];
-            case MODE_REHASH:
-                UpdateEntry(file, speed);
-                break;
-        }
+        // Only ever false in a dry run, which keeps going after a bad file; otherwise Apply throws.
+        bool const wasApplied = mode != MODE_APPLY || Apply(filePath, speed);
 
+        // Leaving a failed file unrecorded keeps the next start from treating it as done.
+        if (wasApplied)
+            UpdateEntry(file, speed);
+
+        // Erased even on failure: a leftover entry is treated as an orphaned row by the
+        // cleanup pass below and would be deleted.
         if (iter != applied.end())
             applied.erase(iter);
 
-        if (mode == MODE_APPLY)
+        if (mode == MODE_APPLY && wasApplied)
             ++importedUpdates;
     };
 
@@ -445,7 +444,7 @@ UpdateResult UpdateFetcher::Update(bool const redundancyChecks,
     return UpdateResult(importedUpdates, countRecentUpdates, countArchivedUpdates);
 }
 
-uint32 UpdateFetcher::Apply(Path const& path) const
+bool UpdateFetcher::Apply(Path const& path, uint32& speed) const
 {
     using Time = std::chrono::high_resolution_clock;
 
@@ -453,10 +452,12 @@ uint32 UpdateFetcher::Apply(Path const& path) const
     auto const begin = Time::now();
 
     // Update database
-    _applyFile(path);
+    bool const applied = _applyFile(path);
 
-    // Return the time it took the query to apply
-    return uint32(std::chrono::duration_cast<std::chrono::milliseconds>(Time::now() - begin).count());
+    // The time it took the query to apply
+    speed = uint32(std::chrono::duration_cast<std::chrono::milliseconds>(Time::now() - begin).count());
+
+    return applied;
 }
 
 void UpdateFetcher::UpdateEntry(AppliedFileEntry const& entry, uint32 const speed) const

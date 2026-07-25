@@ -247,18 +247,36 @@ jobs:
         run: |
           ./acore.sh test core
 
+      # This job runs zero-conf, so there is no Logger config and no Errors.log:
+      # the ci-error-check.sh used by the build workflows would be a no-op here.
+      # The grep is a second net in case the updater is ever made to swallow a
+      # failed import again, as #22610 did.
       - name: Test authserver dry-run
         run: |
           source ./acore.sh config load
           cd env/dist/bin
-          timeout 5m ./authserver -dry-run
+          timeout 5m ./authserver -dry-run 2>&1 | tee "$RUNNER_TEMP/authserver-dry-run.log"
+          status=${PIPESTATUS[0]}
+          [ "$status" -eq 0 ] || exit "$status"
+
+          if grep -qE "Applying of file .+ failed!" "$RUNNER_TEMP/authserver-dry-run.log"; then
+            echo "::error::A SQL update failed to apply during the authserver dry run"
+            exit 1
+          fi
         continue-on-error: false
 
       - name: Test worldserver dry-run
         run: |
           source ./acore.sh config load
           cd env/dist/bin
-          timeout 5m ./worldserver -dry-run
+          timeout 5m ./worldserver -dry-run 2>&1 | tee "$RUNNER_TEMP/worldserver-dry-run.log"
+          status=${PIPESTATUS[0]}
+          [ "$status" -eq 0 ] || exit "$status"
+
+          if grep -qE "Applying of file .+ failed!" "$RUNNER_TEMP/worldserver-dry-run.log"; then
+            echo "::error::A SQL update failed to apply during the worldserver dry run"
+            exit 1
+          fi
         continue-on-error: false
 
 
@@ -287,6 +305,26 @@ jobs:
           ./acore.sh sm delete authserver
         timeout-minutes: 30
         continue-on-error: false
+
+      # Proves the gate above actually gates. Must stay the last step that
+      # touches the databases: it deliberately leaves a broken update pending.
+      - name: Verify a broken SQL update fails the dry run
+        run: |
+          cat > data/sql/updates/pending_db_world/rev_9999999999999999999.sql <<'EOF'
+          DELETE FROM `ci_gate_probe_table_that_does_not_exist` WHERE `id` = 1;
+          EOF
+
+          source ./acore.sh config load
+          cd env/dist/bin
+          status=0
+          timeout 5m ./worldserver -dry-run || status=$?
+
+          # Exactly 1, so a hang (timeout returns 124) does not pass as a detection.
+          if [ "$status" -ne 1 ]; then
+            echo "::error::expected worldserver -dry-run to exit 1 on a broken SQL update, got $status"
+            exit 1
+          fi
+        timeout-minutes: 10
 
       # The old "only save on a cache miss" guard is dropped: the per-run key
       # only ever collides on a re-run, since github.run_id is stable across
