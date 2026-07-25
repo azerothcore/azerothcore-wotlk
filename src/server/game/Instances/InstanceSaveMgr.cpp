@@ -352,11 +352,15 @@ void InstanceSaveMgr::LoadResetTimes()
 
         if (t < now)
         {
-            // assume that expired instances have already been cleaned
-            // calculate the next reset time
-            t = (t / DAY) * DAY;
-            t += ((today - t) / period + 1) * period + diff;
-            CharacterDatabase.DirectExecute("UPDATE instance_reset SET resettime = '{}' WHERE mapid = '{}' AND difficulty = '{}'", (uint32)t, mapid, difficulty);
+            // The reset fell due while the server was offline. Queue an immediate, non-warning
+            // reset event (type 5) using the lapsed time instead of silently advancing past it -
+            // heroic/raid saves store resettime = 0 in `instance`, so nothing else ever clears
+            // their lockouts for a reset that was missed (see issue #26741). This fires on the
+            // very first Update() tick, by which point LoadInstanceSaves()/LoadCharacterBinds()
+            // have loaded the affected saves and binds, so _ResetOrWarnAll runs the same teardown
+            // a live reset does, including refreshing the in-memory/DB reset time correctly.
+            ScheduleReset(t, InstResetEvent(5, mapid, difficulty));
+            continue;
         }
 
         SetExtendedResetTimeFor(mapid, difficulty, t);
@@ -584,6 +588,9 @@ void InstanceSaveMgr::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, bool 
             period = DAY;
 
         uint32 next_reset = uint32(((resetTime + MINUTE) / DAY * DAY) + period + diff);
+        // catch up in one step if the server was offline across more than one reset period
+        while (next_reset <= uint32(now))
+            next_reset += period;
         SetResetTimeFor(mapid, difficulty, next_reset);
         SetExtendedResetTimeFor(mapid, difficulty, next_reset + period);
         ScheduleReset(time_t(next_reset - 3600), InstResetEvent(1, mapid, difficulty));
