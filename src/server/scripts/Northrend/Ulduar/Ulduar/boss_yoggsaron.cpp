@@ -422,19 +422,6 @@ struct boss_yoggsaron_sara : public ScriptedAI
         Position pos = me->GetHomePosition();
         me->NearTeleportTo(pos.GetPositionX(), pos.GetPositionY(), pos.GetPositionZ(), pos.GetOrientation());
 
-        bool isP1Wipe = !_secondPhase && _instance && _instance->GetBossState(BOSS_YOGGSARON) == IN_PROGRESS;
-
-        if (isP1Wipe)
-        {
-            if (Creature* voice = _instance->GetCreature(DATA_VOICE_OF_YOGG_SARON))
-            {
-                me->GetMap()->DoForAllPlayers([&](Player* player)
-                {
-                    voice->AI()->Talk(WHISPER_VOICE_PHASE_1_WIPE, player);
-                });
-            }
-        }
-
         HandleWipeRecovery();
     }
 
@@ -456,35 +443,10 @@ struct boss_yoggsaron_sara : public ScriptedAI
 
     void HandleWipeRecovery()
     {
-        summons.DoAction(ACTION_DESPAWN_ADDS);
-        events.Reset();
-        summons.DespawnAll();
-
-        // Sara stays invisible - respawn event will restore visibility
-        me->SetVisible(false);
-        me->SetDisplayId(me->GetNativeDisplayId());
-        me->SetDisableGravity(true);
-        me->SetFaction(FACTION_FRIENDLY);
-        me->ClearUnitState(UNIT_STATE_EVADE);
-        EnableSara(false);
-
-        _initFight = 1;
-        _summonedGuardiansCount = 0;
-        _p2TalkTimer = 0;
-        _secondPhase = false;
-        _summonSpeed = 1.0f;
-        _currentIllusion = urand(1, 3);
-        _isIllusionReversed = urand(0, 1);
-
-        if (_instance)
-        {
-            _instance->DoStopTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, CRITERIA_NOT_GETTING_OLDER);
-            _instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_SANITY);
-            if (Creature* voice = _instance->GetCreature(DATA_VOICE_OF_YOGG_SARON))
-                voice->AI()->DoAction(ACTION_VOICE_STOP);
-        }
-
         _isWipeRecovering = true;
+        Reset();
+        me->SetVisible(false);
+
         events.SetPhase(EVENT_PHASE_WIPE_RECOVERY);
         events.ScheduleEvent(EVENT_SARA_WIPE_OPEN_DOOR, 20s, 0, EVENT_PHASE_WIPE_RECOVERY);
         events.ScheduleEvent(EVENT_SARA_WIPE_RESPAWN, 30s, 0, EVENT_PHASE_WIPE_RECOVERY);
@@ -509,17 +471,20 @@ struct boss_yoggsaron_sara : public ScriptedAI
         events.Reset();
         summons.DespawnAll();
 
-        me->SetVisible(true);
+        if (!_isWipeRecovering)
+        {
+            me->SetVisible(true);
+            SpawnClouds();
+            UpdateKeeperSpawns();
+        }
+
         me->SetDisplayId(me->GetNativeDisplayId());
         me->SetDisableGravity(true);
         me->SetFaction(FACTION_FRIENDLY);
         me->ClearUnitState(UNIT_STATE_EVADE);
         EnableSara(false);
-        SpawnClouds();
 
         _initFight = 1;
-
-        UpdateKeeperSpawns();
         _summonedGuardiansCount = 0;
         _p2TalkTimer = 0;
         _secondPhase = false;
@@ -533,9 +498,12 @@ struct boss_yoggsaron_sara : public ScriptedAI
             _instance->DoRemoveAurasDueToSpellOnPlayers(SPELL_SANITY);
             if (Creature* voice = _instance->GetCreature(DATA_VOICE_OF_YOGG_SARON))
                 voice->AI()->DoAction(ACTION_VOICE_STOP);
-            _instance->SetBossState(BOSS_YOGGSARON, NOT_STARTED);
-            if (GameObject* go = _instance->GetGameObject(DATA_YOGG_SARON_DOORS))
-                go->SetGoState(GO_STATE_ACTIVE);
+            if (!_isWipeRecovering)
+            {
+                _instance->SetBossState(BOSS_YOGGSARON, NOT_STARTED);
+                if (GameObject* go = _instance->GetGameObject(DATA_YOGG_SARON_DOORS))
+                    go->SetGoState(GO_STATE_ACTIVE);
+            }
         }
     }
 
