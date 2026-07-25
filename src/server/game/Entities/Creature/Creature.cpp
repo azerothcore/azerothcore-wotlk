@@ -1492,6 +1492,15 @@ void Creature::SaveToDB(uint32 mapid, uint8 spawnMask, uint32 phaseMask)
     sScriptMgr->OnCreatureSaveToDB(this);
 }
 
+void Creature::SelectLevel(uint8 level)
+{
+    CreatureTemplate const* cInfo = GetCreatureTemplate();
+    uint32 rank = IsPet() ? 0 : cInfo->rank;
+    sScriptMgr->OnBeforeCreatureSelectLevel(cInfo, this, level);
+    SetLevel(level);
+    _SelectLevelStats(level, rank);
+}
+
 void Creature::SelectLevel(bool changelevel)
 {
     CreatureTemplate const* cInfo = GetCreatureTemplate();
@@ -1508,6 +1517,12 @@ void Creature::SelectLevel(bool changelevel)
     if (changelevel)
         SetLevel(level);
 
+    _SelectLevelStats(level, rank);
+}
+
+void Creature::_SelectLevelStats(uint8 level, uint32 rank)
+{
+    CreatureTemplate const* cInfo = GetCreatureTemplate();
     CreatureBaseStats const* stats = sObjectMgr->GetCreatureBaseStats(level, cInfo->unit_class);
 
     // health

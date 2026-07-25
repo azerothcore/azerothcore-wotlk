@@ -64,6 +64,7 @@ public:
     bool Create(ObjectGuid::LowType guidlow, Map* map, uint32 phaseMask, uint32 Entry, uint32 vehId, float x, float y, float z, float ang, CreatureData const* data = nullptr);
     bool LoadCreaturesAddon(bool reload = false);
     void SelectLevel(bool changelevel = true);
+    void SelectLevel(uint8 level);
     void LoadEquipment(int8 id = 1, bool force = false);
 
     [[nodiscard]] ObjectGuid::LowType GetSpawnId() const { return m_spawnId; }
@@ -554,6 +555,8 @@ private:
     std::unordered_map<uint8, uint32> m_textCooldowns; // groupID -> expiry time (s)
 
     bool _isMissingSwimmingFlagOutOfCombat;
+
+    void _SelectLevelStats(uint8 level, uint32 rank);
 
     uint32 m_assistanceTimer;
 
