@@ -156,7 +156,7 @@ struct boss_skeram : public BossAI
         {
             // Resolve pets/guardians to their owner so gendered locales resolve $g against the puller
             Player* puller = who->GetCharmerOrOwnerPlayerOrPlayerItself();
-            Talk(SAY_AGGRO, puller ? puller : who);
+            Talk(SAY_AGGRO, puller ? static_cast<Unit*>(puller) : who);
         }
     }
 
