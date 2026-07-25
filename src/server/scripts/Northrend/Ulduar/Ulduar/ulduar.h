@@ -114,6 +114,8 @@ enum UlduarData
 
     // Achievements
     DATA_DWARFAGEDDON                       = 700,
+    DATA_QUICK_SHAVE                        = 701,
+    DATA_IRON_DWARF_MEDIUM_RARE             = 702,
 
     // Tram
     DATA_CALL_TRAM                          = 710,
@@ -127,6 +129,7 @@ enum UlduarData
     DATA_SARA                               = 760,
     DATA_BRAIN_OF_YOGG_SARON               = 761,
     DATA_YOGG_SARON_DOORS                   = 762,
+    DATA_VOICE_OF_YOGG_SARON                = 763,
 
     // Middle section
     DATA_ASSEMBLY_DOORS                     = 770,
@@ -180,6 +183,16 @@ enum UlduarNPCs
 
     // Razorscale
     NPC_HARPOON_FIRE_STATE                  = 33282,
+    NPC_RAZORSCALE_SPAWNER                  = 33245,
+    NPC_RAZORSCALE_CONTROLLER               = 33233,
+    NPC_EXPEDITION_COMMANDER                = 33210,
+    NPC_EXPEDITION_ENGINEER                 = 33287,
+    NPC_EXPEDITION_DEFENDER                 = 33816,
+    NPC_EXPEDITION_TRAPPER                  = 33259,
+    NPC_DARK_RUNE_GUARDIAN                  = 33388,
+    NPC_DARK_RUNE_WATCHER                   = 33453,
+    NPC_DARK_RUNE_SENTINEL                  = 33846,
+    NPC_RAZORSCALE_DEVOURING_FLAME          = 34188,
 
     // Mimiron
     NPC_MIMIRON_LEVIATHAN_MKII              = 33432,
@@ -192,6 +205,7 @@ enum UlduarNPCs
     NPC_ELDER_IRONBRANCH                    = 32913,
 
     // Yogg-Saron
+    NPC_VOICE_OF_YOGG_SARON                 = 33280,
     NPC_FREYA_GOSSIP                        = 33241,
     NPC_HODIR_GOSSIP                        = 33213,
     NPC_THORIM_GOSSIP                       = 33242,
@@ -285,6 +299,14 @@ enum UlduarGameObjects
 
     GO_SNOW_MOUND                           = 194907,
 
+    // Razorscale
+    GO_RAZOR_HARPOON_1                      = 194519,
+    GO_RAZOR_HARPOON_2                      = 194541,
+    GO_RAZOR_HARPOON_3                      = 194542,
+    GO_RAZOR_HARPOON_4                      = 194543,
+    GO_RAZOR_BROKEN_HARPOON                 = 194565,
+    GO_RAZOR_MOLE_MACHINE                   = 194316,
+
     // Thorim
     GO_ARENA_LEVER_GATE                     = 194560,
     GO_ARENA_LEVER                          = 194264,
@@ -317,6 +339,7 @@ enum UlduarPersistentData
     PERSISTENT_DATA_ALGALON_TIMER,
     PERSISTENT_DATA_C_OF_ULDUAR_MASK,
     PERSISTENT_DATA_MAGE_BARRIER,
+    PERSISTENT_DATA_ALGALON_FIRST_PULL,
     MAX_PERSISTENT_DATA
 };
 

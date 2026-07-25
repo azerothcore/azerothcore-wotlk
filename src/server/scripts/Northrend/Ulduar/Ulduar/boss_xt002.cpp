@@ -18,6 +18,7 @@
 #include "AchievementCriteriaScript.h"
 #include "Containers.h"
 #include "CreatureScript.h"
+#include "GridNotifiers.h"
 #include "InstanceScript.h"
 #include "MotionMaster.h"
 #include "ObjectAccessor.h"
@@ -709,6 +710,26 @@ private:
     TaskScheduler _scheduler;
 };
 
+// 63018, 65121 - Searing Light / 63024, 64234 - Gravity Bomb
+// Both hit a single random player, never the current tank
+class spell_xt002_searing_light_gravity_bomb : public SpellScript
+{
+    PrepareSpellScript(spell_xt002_searing_light_gravity_bomb);
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        if (Unit* victim = GetCaster()->GetVictim())
+            targets.remove_if(Acore::ObjectGUIDCheck(victim->GetGUID(), true));
+
+        Acore::Containers::RandomResize(targets, 1);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_xt002_searing_light_gravity_bomb::FilterTargets, EFFECT_ALL, TARGET_UNIT_DEST_AREA_ENEMY);
+    }
+};
+
 // 63018, 65121 - Searing Light
 class spell_xt002_searing_light_spawn_life_spark : public AuraScript
 {
@@ -1057,6 +1078,7 @@ void AddSC_boss_xt002()
     RegisterUlduarCreatureAI(npc_boombot);
     RegisterUlduarCreatureAI(npc_life_spark);
     RegisterUlduarCreatureAI(npc_xt_void_zone);
+    RegisterSpellScript(spell_xt002_searing_light_gravity_bomb);
     RegisterSpellScript(spell_xt002_searing_light_spawn_life_spark);
     RegisterSpellScript(spell_xt002_gravity_bomb_aura);
     RegisterSpellScript(spell_xt002_gravity_bomb_damage);

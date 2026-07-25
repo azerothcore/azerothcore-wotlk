@@ -37,7 +37,7 @@ public:
         Exception(std::string  message): message(std::move(message))
         { }
         virtual ~Exception() = default;
-        const std::string& getMessage() {return message;}
+        std::string const& getMessage() {return message;}
     private:
         std::string message;
     };
@@ -67,7 +67,7 @@ public:
             assert(field < file.fieldCount);
             return *reinterpret_cast<int*>(offset + field * 4);
         }
-        [[nodiscard]] const char* getString(std::size_t field) const
+        [[nodiscard]] char const* getString(std::size_t field) const
         {
             assert(field < file.fieldCount);
             std::size_t stringOffset = getUInt(field);
@@ -97,16 +97,16 @@ public:
         }
         /// Return address of current instance
         Record const& operator*() const { return record; }
-        const Record* operator->() const
+        Record const* operator->() const
         {
             return &record;
         }
         /// Comparison
-        bool operator==(const Iterator& b) const
+        bool operator==(Iterator const& b) const
         {
             return record.offset == b.record.offset;
         }
-        bool operator!=(const Iterator& b) const
+        bool operator!=(Iterator const& b) const
         {
             return record.offset != b.record.offset;
         }

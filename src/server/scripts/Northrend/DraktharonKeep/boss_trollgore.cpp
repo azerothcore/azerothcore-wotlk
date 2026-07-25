@@ -55,8 +55,7 @@ enum Events
     EVENT_SPELL_CRUSH                   = 2,
     EVENT_SPELL_CONSUME                 = 3,
     EVENT_SPELL_CORPSE_EXPLODE          = 4,
-    EVENT_SPAWN_INVADERS                = 5,
-    EVENT_KILL_TALK                     = 6
+    EVENT_SPAWN_INVADERS                = 5
 };
 
 class boss_trollgore : public CreatureScript
@@ -102,11 +101,7 @@ public:
 
         void KilledUnit(Unit*  /*victim*/) override
         {
-            if (!events.HasTimeUntilEvent(EVENT_KILL_TALK))
-            {
-                Talk(SAY_KILL);
-                events.ScheduleEvent(EVENT_KILL_TALK, 6s);
-            }
+            Talk(SAY_KILL);
         }
 
         void JustSummoned(Creature* summon) override
