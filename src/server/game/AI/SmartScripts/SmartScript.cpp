@@ -4158,6 +4158,74 @@ void SmartScript::GetTargets(ObjectVector& targets, SmartScriptHolder const& e, 
             }
             break;
         }
+        case SMART_TARGET_BY_HEALTH_PCT:    //edit by Lyeus
+        {
+            uint32 const mask = e.target.byHealthPct.targetMask;
+            ObjectVector units;
+            WorldObject* lastTarget = nullptr;
+            uint32 lasthealthPct;
+            GetWorldObjectsInDist(units, static_cast<float>(e.target.byHealthPct.dist));
+
+            for (WorldObject* unit : units)
+            {
+                if (!IsCreature(unit) && !IsPlayer(unit))
+                    continue;
+
+                if (!unit->ToUnit()->IsAlive())
+                    continue;
+
+                if ((mask & SMART_TARGET_BY_HEALTH_PLAYER_ONLY) &&
+                    !IsPlayer(unit))
+                    continue;
+
+                if ((mask & SMART_TARGET_BY_HEALTH_EXCLUDE_SELF) &&
+                    me && me->GetGUID() == unit->GetGUID())
+                    continue;
+
+                // Only filter for enemy or ally if All_Factions is 0
+                if (!(mask & SMART_TARGET_BY_HEALTH_ALL_FACTIONS) && me)
+                {
+                    if (!(mask & SMART_TARGET_BY_HEALTH_ALLY_OR_ENEMY) &&
+                        me->IsHostileTo(unit->ToUnit()))
+                        continue;
+                    else if ((mask & SMART_TARGET_BY_HEALTH_ALLY_OR_ENEMY) &&
+                        !me->IsHostileTo(unit->ToUnit()))
+                        continue;
+                }
+
+                if (!(mask & SMART_TARGET_BY_HEALTH_INCLUDE_OOC) &&
+                    !unit->ToUnit()->IsInCombat())
+                    continue;
+
+                if ((mask & SMART_TARGET_BY_HEALTH_RAID_ONLY) &&
+                    me && !me->IsInRaidWith(unit->ToUnit()))
+                    continue;
+
+                if ((mask & SMART_TARGET_BY_HEALTH_GROUP_ONLY) &&
+                    me && !me->IsInPartyWith(unit->ToUnit()))
+                    continue;
+
+                uint32 healthPct = uint32(unit->ToUnit()->GetHealthPct());
+                if (healthPct > e.target.byHealthPct.max || healthPct < e.target.byHealthPct.min)
+                {
+                    continue;
+                }
+
+                //New valid target take place of old valid target if it has more or less life depending on parameter
+                if (!lastTarget ||
+                    ((mask & SMART_TARGET_BY_HEALTH_HIGHEST_HP) &&
+                        healthPct > lasthealthPct) ||
+                    (!(mask & SMART_TARGET_BY_HEALTH_HIGHEST_HP) &&
+                        healthPct < lasthealthPct))
+                {
+                    lastTarget = unit;
+                    lasthealthPct = healthPct;
+                }
+            }
+            if (lastTarget)
+                targets.push_back(lastTarget->ToUnit());
+            break;
+        }
         case SMART_TARGET_NONE:
         case SMART_TARGET_POSITION:
         default:
@@ -4713,6 +4781,7 @@ void SmartScript::ProcessEvent(SmartScriptHolder& e, Unit* unit, uint32 var0, ui
                     case SMART_TARGET_CLOSEST_PLAYER:
                     case SMART_TARGET_PLAYER_RANGE:
                     case SMART_TARGET_PLAYER_DISTANCE:
+                    case SMART_TARGET_BY_HEALTH_PCT:    //edit by Lyeus
                     {
                         ObjectVector targets;
                         GetTargets(targets, e);
