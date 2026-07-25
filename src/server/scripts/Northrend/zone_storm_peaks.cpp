@@ -227,16 +227,28 @@ public:
     {
         npc_time_lost_proto_drakeAI(Creature* creature) : ScriptedAI(creature) {}
 
+        bool _hiddenTimerArmed = false;
+
         void Reset() override
         {
             scheduler.CancelAll();
-            me->m_Events.KillAllEvents(false);
+        }
+
+        // Some respawns reuse this object instead of creating a new one, in
+        // which case InitializeAI() doesn't run - re-arm the hidden state here
+        // instead. The flag stops it from being armed twice when both do fire.
+        void JustRespawned() override
+        {
+            Reset();
+            if (!_hiddenTimerArmed)
+                ArmHiddenState();
         }
 
         void DoAction(int32 action) override
         {
             if (action == ACTION_TLPD_REVEAL)
             {
+                _hiddenTimerArmed = false;
                 me->SetVisible(true);
                 me->SetImmuneToAll(false);
                 me->GetMotionMaster()->MoveWaypoint(me->GetWaypointPath(), true);
@@ -248,6 +260,12 @@ public:
             ScriptedAI::InitializeAI();
             me->SetAnimTier(AnimTier::Fly);
             me->setActive(true);
+            ArmHiddenState();
+        }
+
+        void ArmHiddenState()
+        {
+            _hiddenTimerArmed = true;
             me->SetVisible(false);
             me->SetImmuneToAll(true);
             me->GetMotionMaster()->MoveIdle();

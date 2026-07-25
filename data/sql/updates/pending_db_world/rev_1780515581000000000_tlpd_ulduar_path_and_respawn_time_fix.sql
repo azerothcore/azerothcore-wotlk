@@ -1,5 +1,5 @@
 -- Adds a 5th patrol path for Time-Lost Proto Drake / Vyragosa circling Ulduar.
--- TLPD guid 39211 (path 5), Vyragosa guid 39212 (path 5), sub-pool 32496.
+-- TLPD guid 39211 (path 5), Vyragosa guid 39228 (path 5), sub-pool 32496.
 
 -- ---------------------------------------------------------------------------
 -- Waypoints – path 392110  (= guid 39211 * 10, TLPD Ulduar path)
@@ -48,21 +48,21 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 UPDATE `waypoint_data` SET `smoothTransition` = 1 WHERE `id` = 392110;
 
 -- ---------------------------------------------------------------------------
--- Creatures – TLPD (39211) and Vyragosa (39212) on path 5
+-- Creatures – TLPD (39211) and Vyragosa (39228) on path 5
 -- ---------------------------------------------------------------------------
 DELETE FROM `creature` WHERE `guid` = 39211 AND `id` = 32491;
-DELETE FROM `creature` WHERE `guid` = 39212 AND `id` = 32630;
+DELETE FROM `creature` WHERE `guid` = 39228 AND `id` = 32630;
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnMask`, `phaseMask`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `curhealth`, `curmana`, `MovementType`, `npcflag`, `unit_flags`, `dynamicflags`, `ScriptName`, `VerifiedBuild`, `CreateObject`, `Comment`) VALUES
-    (39211, 32491, 571, 67, 0, 1, 511, 0, 8545.776, -1879.3956, 1131.0109, 6.2809854, 21600, 0, 0, 1, 0, 2, 0, 0, 0, '', 58558, 1, 'Time-Lost Proto Drake - Path 5 (Ulduar)'),
-    (39212, 32630, 571, 67, 0, 1, 511, 0, 8545.776, -1879.3956, 1131.0109, 6.2809854, 21600, 0, 0, 1, 0, 2, 0, 0, 0, '', 58558, 1, 'Vyragosa - Path 5 (Ulduar)');
+    (39211, 32491, 571, 67, 0, 1, 511, 0, 8545.776, -1879.3956, 1131.0109, 6.2809854, 21600, 0, 0, 1, 0, 2, 0, 0, 0, '', 0, 1, 'Time-Lost Proto Drake - Path 5 (Ulduar)'),
+    (39228, 32630, 571, 67, 0, 1, 511, 0, 8545.776, -1879.3956, 1131.0109, 6.2809854, 21600, 0, 0, 1, 0, 2, 0, 0, 0, '', 0, 1, 'Vyragosa - Path 5 (Ulduar)');
 
 -- ---------------------------------------------------------------------------
 -- creature_addon – assign waypoint path for path 5 creatures
 -- ---------------------------------------------------------------------------
-DELETE FROM `creature_addon` WHERE `guid` IN (39211, 39212);
+DELETE FROM `creature_addon` WHERE `guid` IN (39211, 39228);
 INSERT INTO `creature_addon` (`guid`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
     (39211, 392110, 0, 0, 0, 0, 0, ''),
-    (39212, 392110, 0, 0, 0, 0, 0, '');
+    (39228, 392110, 0, 0, 0, 0, 0, '');
 
 -- ---------------------------------------------------------------------------
 -- Pool – sub-pool 32496 for path 5, linked into master pool 32491
@@ -74,7 +74,7 @@ INSERT INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 DELETE FROM `pool_creature` WHERE `pool_entry` = 32496;
 INSERT INTO `pool_creature` (`guid`, `pool_entry`, `chance`, `description`) VALUES
     (39211, 32496, 10, 'Time-Lost Proto Drake - Path 5 (Ulduar)'),
-    (39212, 32496,  0, 'Vyragosa - Path 5 (Ulduar)');
+    (39228, 32496,  0, 'Vyragosa - Path 5 (Ulduar)');
 
 DELETE FROM `pool_pool` WHERE `pool_id` = 32496 OR `mother_pool` = 32496;
 INSERT INTO `pool_pool` (`pool_id`, `mother_pool`, `chance`, `description`) VALUES

@@ -21,6 +21,21 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
     (392050,  8, 6525.3613,   -70.11849,  808.1164,  NULL, 0, 1),
     (392050,  9, 6400.468,   -192.77023,  704.8667,  NULL, 0, 1),
     (392050, 10, 6312.018,   -498.71994,  704.8667,  NULL, 0, 1),
-    (392050, 11, 6481.932,   -689.96844,  770.06104, NULL, 0, 1);
+    (392050, 11, 6455.723,   -562.87396,  814.643,   NULL, 0, 1),
+    (392050, 12, 6481.932,   -689.96844,  770.06104, NULL, 0, 1);
 
 UPDATE `waypoint_data` SET `smoothTransition` = 1 WHERE `id` = 392050;
+
+-- ---------------------------------------------------------------------------
+-- Drop Path 2 (392040) - duplicate of this Waterfall spawn, folded in above.
+-- ---------------------------------------------------------------------------
+DELETE FROM `waypoint_data` WHERE `id` = 392040;
+
+DELETE FROM `creature_addon` WHERE `guid` IN (39204, 39208);
+
+DELETE FROM `creature` WHERE `guid` = 39204 AND `id` = 32491;
+DELETE FROM `creature` WHERE `guid` = 39208 AND `id` = 32630;
+
+DELETE FROM `pool_creature` WHERE `pool_entry` = 32493;
+DELETE FROM `pool_pool` WHERE `pool_id` = 32493 OR `mother_pool` = 32493;
+DELETE FROM `pool_template` WHERE `entry` = 32493;
