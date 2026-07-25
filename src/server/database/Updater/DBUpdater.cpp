@@ -285,6 +285,8 @@ bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool, std::string_view modulesL
     [&](Path const & file) { return DBUpdater<T>::ApplyFile(pool, file); },
     [&](std::string const & query) -> QueryResult { return DBUpdater<T>::Retrieve(pool, query); }, DBUpdater<T>::GetDBModuleName(), modulesList);
 
+    uint32 const failedBefore = DBUpdaterUtil::GetFailedUpdateCount();
+
     UpdateResult result;
     try
     {
@@ -301,10 +303,17 @@ bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool, std::string_view modulesL
 
     std::string const info = Acore::StringFormat("Containing {} new and {} archived updates.", result.recent, result.archived);
 
-    if (!result.updated)
-        LOG_INFO("sql.updates", ">> {} database is up-to-date! {}", DBUpdater<T>::GetTableName(), info);
-    else
+    // The counter is process-wide, so only the files this database just walked past count here.
+    uint32 const failed = DBUpdaterUtil::GetFailedUpdateCount() - failedBefore;
+
+    if (failed)
+        LOG_ERROR("sql.updates", ">> {} {} failed to apply to the {} database, see the errors above.",
+            failed, failed == 1 ? "update" : "updates", DBUpdater<T>::GetTableName());
+
+    if (result.updated)
         LOG_INFO("sql.updates", ">> Applied {} {}. {}", result.updated, result.updated == 1 ? "query" : "queries", info);
+    else if (!failed)
+        LOG_INFO("sql.updates", ">> {} database is up-to-date! {}", DBUpdater<T>::GetTableName(), info);
 
     LOG_INFO("sql.updates", " ");
 
