@@ -4950,7 +4950,9 @@ void Spell::EffectCharge(SpellEffIndex /*effIndex*/)
         // Spell is not using explicit target - no generated path
         if (!m_preGeneratedPath)
         {
-            Position pos = unitTarget->GetFirstCollisionPosition(unitTarget->GetCombatReach(), unitTarget->GetRelativeAngle(m_caster));
+            float dist = std::max(m_caster->GetDistance(unitTarget) - unitTarget->GetCombatReach(), 0.0f);
+            float angle = m_caster->GetRelativeAngle(unitTarget);
+            Position pos = m_caster->GetFirstCollisionPosition(dist, angle);
             m_caster->GetMotionMaster()->MoveCharge(pos.m_positionX, pos.m_positionY, pos.m_positionZ, speed, EVENT_CHARGE, nullptr, false, 0.0f, targetGUID);
         }
         else
