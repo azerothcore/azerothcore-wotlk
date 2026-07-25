@@ -118,3 +118,11 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
 (1032785, 10, 92.51937, -3893.2766, 1.7101376, NULL),
 (1032785, 11, 101.15443, -3924.839, 2.2858443, NULL),
 (1032785, 12, 97.17545, -4024.8862, 1.5117704, NULL);
+
+DELETE FROM `creature_template_movement` WHERE (`CreatureId` = 24992);
+INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES
+(24992, 0, 0, 1, 1, 0, 0, 0);
+
+DELETE FROM `creature_template_addon` WHERE (`entry` = 23826);
+INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
+(23826, 0, 0, 0, 0, 0, 0, '42460');
