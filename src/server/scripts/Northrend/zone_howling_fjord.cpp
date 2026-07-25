@@ -15,13 +15,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "Containers.h"
 #include "CreatureScript.h"
+#include "GameObjectAI.h"
+#include "GameObjectScript.h"
+#include "Map.h"
+#include "MotionMaster.h"
 #include "PassiveAI.h"
 #include "Player.h"
 #include "ScriptedCreature.h"
 #include "ScriptedEscortAI.h"
 #include "SpellInfo.h"
 #include "SpellScript.h"
+#include "WaypointMgr.h"
 
 class npc_attracted_reef_bull : public CreatureScript
 {
@@ -417,6 +423,288 @@ class spell_the_cleansing_on_death_cast_on_master : public SpellScript
     }
 };
 
+/*######
+## Quest 11529: Sorlof's Booty
+######*/
+
+enum SorlofsBooty
+{
+    NPC_SORLOF                  = 24914,
+    NPC_THE_BIG_GUN             = 24992,
+
+    SPELL_CANNON_ASSAULT        = 45008,
+    SPELL_SORLOFS_BOOTY         = 45070,
+
+    // Sorlof answers the shelling with boulders of his own: a serverside aura (44964,
+    // on his creature_addon) throws 44965 at the ship every 3s, which lands 44966 on
+    // her crew and leaves 44967's Creeping Flames burning on the deck.
+    SPELL_BOULDER_ASSAULT_HIT   = 44966,
+    SPELL_BOULDER_ASSAULT_FIRE  = 44967,
+
+    // The Big Gun rides the Sister Mercy while Sorlof shadows her along the shore of
+    // Garvan's Reef, so he may only be shelled once she has drawn up level with him -
+    // the spells themselves carry the DBC's unlimited range.
+    CANNON_RANGE                = 100,
+
+    // The ship pings Sorlof from wherever she is on her lap, and the far side of the
+    // reef puts roughly 700 yards between them.
+    SORLOF_SEARCH_RANGE         = 1000,
+
+    SORLOF_WANDER_DISTANCE      = 10,
+
+    DATA_SORLOF_TAKE_PATH       = 1,
+    POINT_SORLOF_PATH           = 1000,
+
+    // The gun's own SmartAI announces the booty on this data set.
+    DATA_SORLOF_SLAIN           = 1,
+    DATA_SORLOF_SLAIN_VALUE     = 1
+};
+
+// 44965 - Boulder Assault
+class spell_sorlofs_booty_boulder_assault : public SpellScript
+{
+    PrepareSpellScript(spell_sorlofs_booty_boulder_assault);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_BOULDER_ASSAULT_HIT });
+    }
+
+    void FilterTargets(std::list<WorldObject*>& targets)
+    {
+        if (targets.empty())
+            return;
+
+        // One boulder per throw. The spell carries no target cap and the Sister Mercy
+        // is peppered with crew triggers across her decks and rigging, so settle on a
+        // single one to pelt rather than shelling all of them at once.
+        WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
+        targets.clear();
+        targets.push_back(target);
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        // Implicit target, narrowed to the Ellis Crew Trigger by `conditions`. Its 200
+        // yard reach is what keeps him from pelting a ship that is off round the reef.
+        if (Unit* caster = GetCaster())
+            caster->CastSpell(GetHitUnit(), SPELL_BOULDER_ASSAULT_HIT, true);
+    }
+
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_sorlofs_booty_boulder_assault::FilterTargets, EFFECT_0, TARGET_UNIT_SRC_AREA_ENTRY);
+        OnEffectHitTarget += SpellEffectFn(spell_sorlofs_booty_boulder_assault::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 44966 - Boulder Assault
+class spell_sorlofs_booty_boulder_assault_hit : public SpellScript
+{
+    PrepareSpellScript(spell_sorlofs_booty_boulder_assault_hit);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_BOULDER_ASSAULT_FIRE });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        // Cast by whatever the boulder struck, so the flames it summons are left where
+        // it landed rather than back at Sorlof.
+        if (Unit* target = GetHitUnit())
+            target->CastSpell(target, SPELL_BOULDER_ASSAULT_FIRE, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_sorlofs_booty_boulder_assault_hit::HandleScript, EFFECT_1, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// Departure events of the Sister Mercy's stops (TaxiPathNode.dbc path 778), mapped to
+// the shore path Sorlof walks to meet her at the next one. Leaving her final stop sends
+// him back down the coast to his spawn.
+uint32 GetSorlofPathForShipEvent(uint32 eventId)
+{
+    switch (eventId)
+    {
+        case 16501: return 1032780;
+        case 16502: return 1032781;
+        case 16503: return 1032782;
+        case 16504: return 1032783;
+        case 16510: return 1032784;
+        case 16511: return 1032785;
+        default:    return 0;
+    }
+}
+
+struct npc_sorlof : public ScriptedAI
+{
+    npc_sorlof(Creature* creature) : ScriptedAI(creature) { }
+
+    void Reset() override
+    {
+        _scheduler.CancelAll();
+        _pathId = 0;
+        _pathNode = 0;
+        me->SetRegeneratingHealth(true);
+    }
+
+    void SetData(uint32 id, uint32 value) override
+    {
+        if (id != DATA_SORLOF_TAKE_PATH)
+            return;
+
+        _pathId = value;
+        _pathNode = 0;
+        MoveToNextNode();
+    }
+
+    void MovementInform(uint32 type, uint32 id) override
+    {
+        if (type != POINT_MOTION_TYPE || id != POINT_SORLOF_PATH + _pathNode)
+            return;
+
+        ++_pathNode;
+        MoveToNextNode();
+    }
+
+    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
+    {
+        if (spell->Id != SPELL_CANNON_ASSAULT)
+            return;
+
+        // He knits himself back together only once the shelling has stopped, so every
+        // hit pushes the recovery back out again.
+        me->SetRegeneratingHealth(false);
+        _scheduler.CancelAll();
+        _scheduler.Schedule(15s, [this](TaskContext /*context*/)
+        {
+            me->SetRegeneratingHealth(true);
+        });
+    }
+
+    void JustDied(Unit* /*killer*/) override
+    {
+        DoCastSelf(SPELL_SORLOFS_BOOTY, true);
+
+        if (Creature* gun = me->FindNearestCreature(NPC_THE_BIG_GUN, CANNON_RANGE))
+            gun->AI()->SetData(DATA_SORLOF_SLAIN, DATA_SORLOF_SLAIN_VALUE);
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        _scheduler.Update(diff);
+
+        if (UpdateVictim())
+            DoMeleeAttackIfReady();
+    }
+
+private:
+    void MoveToNextNode()
+    {
+        WaypointPath const* path = sWaypointMgr->GetPath(_pathId);
+        if (!path)
+            return;
+
+        // Each leg ends with him milling about where the ship has drawn up, lobbing
+        // boulders at her crew until she weighs anchor again.
+        if (_pathNode >= path->Nodes.size())
+        {
+            me->GetMotionMaster()->MoveRandom(SORLOF_WANDER_DISTANCE);
+            return;
+        }
+
+        WaypointNode const& node = path->Nodes[_pathNode];
+        me->SetWalk(node.MoveType == WAYPOINT_MOVE_TYPE_WALK);
+        me->GetMotionMaster()->MovePoint(POINT_SORLOF_PATH + _pathNode, node.X, node.Y, node.Z);
+    }
+
+    TaskScheduler _scheduler;
+    uint32 _pathId{ 0 };
+    uint32 _pathNode{ 0 };
+};
+
+struct go_sister_mercy : public GameObjectAI
+{
+    go_sister_mercy(GameObject* go) : GameObjectAI(go) { }
+
+    // MotionTransport::DoEventIfAny fires this as the ship pulls away from each of her
+    // scripted stops, which is Sorlof's cue to set off for the next one.
+    void EventInform(uint32 eventId) override
+    {
+        uint32 pathId = GetSorlofPathForShipEvent(eventId);
+        if (!pathId)
+            return;
+
+        if (Creature* sorlof = me->FindNearestCreature(NPC_SORLOF, SORLOF_SEARCH_RANGE))
+            sorlof->AI()->SetData(DATA_SORLOF_TAKE_PATH, pathId);
+    }
+};
+
+// 45045 - Big Cannon Assault Primer
+class spell_sorlofs_booty_cannon_primer : public SpellScript
+{
+    PrepareSpellScript(spell_sorlofs_booty_cannon_primer);
+
+    bool Validate(SpellInfo const* spellInfo) override
+    {
+        return ValidateSpellInfo({ uint32(spellInfo->GetEffect(EFFECT_0).CalcValue()) });
+    }
+
+    void HandleScript(SpellEffIndex /*effIndex*/)
+    {
+        // Primes the gun: the clicker performs the actual, timed Big Gun Assault cast.
+        if (Unit* caster = GetCaster())
+            caster->CastSpell(caster, GetSpellInfo()->Effects[EFFECT_0].CalcValue(), false);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_sorlofs_booty_cannon_primer::HandleScript, EFFECT_0, SPELL_EFFECT_SCRIPT_EFFECT);
+    }
+};
+
+// 45013 - Big Gun Assault
+class spell_sorlofs_booty_big_gun_assault : public SpellScript
+{
+    PrepareSpellScript(spell_sorlofs_booty_big_gun_assault);
+
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_CANNON_ASSAULT });
+    }
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        // Implicit target of the dummy effect, resolved to The Big Gun by `conditions`.
+        Creature* gun = GetHitCreature();
+        if (!gun)
+            return;
+
+        Creature* sorlof = gun->FindNearestCreature(NPC_SORLOF, CANNON_RANGE);
+        if (!sorlof)
+            return;
+
+        // Only the static world may block the shot. The gun is a passenger of the
+        // Sister Mercy and that transport is not excluded from the dynamic tree, so a
+        // full line of sight check would have the ship occlude every ray leaving its
+        // own deck.
+        if (!gun->IsWithinLOSInMap(sorlof, VMAP::ModelIgnoreFlags::M2, LINEOFSIGHT_CHECK_VMAP))
+            return;
+
+        // Fired by the gun rather than by the clicker, so the crew - not the player -
+        // owns the kill. The quest item comes from the booty Sorlof drops on death.
+        gun->CastSpell(sorlof, SPELL_CANNON_ASSAULT, true);
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_sorlofs_booty_big_gun_assault::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
 void AddSC_howling_fjord()
 {
     new npc_attracted_reef_bull();
@@ -428,4 +716,10 @@ void AddSC_howling_fjord()
     RegisterSpellScript(spell_the_cleansing_cleansing_soul);
     RegisterSpellScript(spell_the_cleansing_mirror_image_script_effect);
     RegisterSpellScript(spell_the_cleansing_on_death_cast_on_master);
+    RegisterSpellScript(spell_sorlofs_booty_cannon_primer);
+    RegisterSpellScript(spell_sorlofs_booty_big_gun_assault);
+    RegisterSpellScript(spell_sorlofs_booty_boulder_assault);
+    RegisterSpellScript(spell_sorlofs_booty_boulder_assault_hit);
+    RegisterCreatureAI(npc_sorlof);
+    RegisterGameObjectAI(go_sister_mercy);
 }
