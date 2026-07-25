@@ -23,7 +23,7 @@
 class BattlegroundMapScript : public ScriptObject, public MapScript<BattlegroundMap>
 {
 protected:
-    BattlegroundMapScript(const char* name, uint32 mapId);
+    BattlegroundMapScript(char const* name, uint32 mapId);
 
 public:
     [[nodiscard]] bool isAfterLoadScript() const override { return true; }

@@ -1018,7 +1018,7 @@ class spell_midsummer_fling_torch : public SpellScript
         if (GetSpellInfo()->Id != SPELL_FLING_TORCH_DUMMY)
         {
             if (!handled)
-                if (const WorldLocation* loc = GetExplTargetDest())
+                if (WorldLocation const* loc = GetExplTargetDest())
                 {
                     caster->CastSpell(loc->GetPositionX(), loc->GetPositionY(), loc->GetPositionZ(), SPELL_MISSED_TORCH, true);
                     caster->RemoveAurasDueToSpell(SPELL_TORCH_COUNTER);
@@ -1113,7 +1113,7 @@ class spell_midsummer_juggling_torch : public SpellScript
         if (!caster || !caster->IsPlayer())
             return;
 
-        if (const WorldLocation* loc = GetExplTargetDest())
+        if (WorldLocation const* loc = GetExplTargetDest())
         {
             if (loc->GetExactDist(caster) < 3.0f)
             {

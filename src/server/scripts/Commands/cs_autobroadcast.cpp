@@ -20,6 +20,7 @@
 #include "CommandScript.h"
 #include "Config.h"
 #include "Language.h"
+#include "RBAC.h"
 
 using namespace Acore::ChatCommands;
 
@@ -32,10 +33,10 @@ public:
     {
         static ChatCommandTable autobroadcastCommandTable =
         {
-            { "list",   HandleAutobroadcastListCommand,   SEC_GAMEMASTER,    Console::Yes },
-            { "add",    HandleAutobroadcastAddCommand,    SEC_ADMINISTRATOR, Console::Yes },
-            { "locale", HandleAutobroadcastLocaleCommand, SEC_ADMINISTRATOR, Console::Yes },
-            { "remove", HandleAutobroadcastRemoveCommand, SEC_ADMINISTRATOR, Console::Yes }
+            { "list",   HandleAutobroadcastListCommand,   rbac::RBAC_PERM_COMMAND_AUTOBROADCAST_LIST,   Console::Yes },
+            { "add",    HandleAutobroadcastAddCommand,    rbac::RBAC_PERM_COMMAND_AUTOBROADCAST_ADD,    Console::Yes },
+            { "locale", HandleAutobroadcastLocaleCommand, rbac::RBAC_PERM_COMMAND_AUTOBROADCAST_LOCALE, Console::Yes },
+            { "remove", HandleAutobroadcastRemoveCommand, rbac::RBAC_PERM_COMMAND_AUTOBROADCAST_REMOVE, Console::Yes }
         };
 
         static ChatCommandTable commandTable =

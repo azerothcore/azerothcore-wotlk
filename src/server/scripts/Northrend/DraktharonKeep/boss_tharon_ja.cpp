@@ -60,8 +60,7 @@ enum Misc
     EVENT_SPELL_LIGHTNING_BREATH        = 5,
     EVENT_SPELL_POISON_CLOUD            = 6,
     EVENT_TURN_FLESH_REAL               = 9,
-    EVENT_TURN_BONES_REAL               = 10,
-    EVENT_KILL_TALK                     = 11
+    EVENT_TURN_BONES_REAL               = 10
 };
 
 class boss_tharon_ja : public CreatureScript
@@ -106,11 +105,7 @@ public:
 
         void KilledUnit(Unit* /*victim*/) override
         {
-            if (!events.HasTimeUntilEvent(EVENT_KILL_TALK))
-            {
-                Talk(SAY_KILL);
-                events.ScheduleEvent(EVENT_KILL_TALK, 6s);
-            }
+            Talk(SAY_KILL);
         }
 
         void DoAction(int32 param) override
