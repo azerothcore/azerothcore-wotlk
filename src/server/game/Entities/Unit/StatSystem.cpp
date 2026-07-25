@@ -1362,9 +1362,9 @@ void Guardian::UpdateDamagePhysical(WeaponAttackType attType)
     float base_pct    = GetPctModifierValue(unitMod, BASE_PCT);
     float total_value = GetFlatModifierValue(unitMod, TOTAL_VALUE);
     float total_pct   = GetPctModifierValue(unitMod, TOTAL_PCT);
-    // Pets (hunter/warlock/etc.) set their base weapon damage through hand-tuned formulas in Guardian::InitStatsForLevel,
-    // so the template DamageModifier must not be applied on top of them. Only pure guardian summons (which keep the CLS
-    // weapon damage from Creature::SelectLevel) should honour it, mirroring Creature::UpdateDamagePhysical.
+    // Pets set their base weapon damage through hand-tuned formulas in Guardian::InitStatsForLevel, so the template
+    // DamageModifier must not be applied on top of them. Guardian summons honour it, mirroring Creature::UpdateDamagePhysical.
+    // Note: non-pet guardians that are also hand-tuned there (elementals, snakes, ...) must keep DamageModifier = 1 in the DB.
     float dmgMultiplier = IsPet() ? 1.0f : GetCreatureTemplate()->DamageModifier; // = DamageModifier * _GetDamageMod(rank)
 
     float weapon_mindamage = GetWeaponDamageRange(BASE_ATTACK, MINDAMAGE);
