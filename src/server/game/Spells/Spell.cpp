@@ -5648,7 +5648,7 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
         return SPELL_FAILED_CASTER_DEAD;
 
     // check charmed state
-    if (m_spellInfo->HasAttribute(SPELL_ATTR5_NOT_AVALIABLE_WHILE_CHARMED) && m_caster->IsCharmed())
+    if (m_spellInfo->HasAttribute(SPELL_ATTR5_NOT_AVAILABLE_WHILE_CHARMED) && m_caster->IsCharmed())
         return SPELL_FAILED_CHARMED;
 
     // Spectator check
