@@ -1298,7 +1298,7 @@ float WorldObject::GetDistance(WorldObject const* obj) const
     return d > 0.0f ? d : 0.0f;
 }
 
-[[nodiscard]] float WorldObject::GetDistance(const Position& pos) const
+[[nodiscard]] float WorldObject::GetDistance(Position const& pos) const
 {
     float d = GetExactDist(&pos) - GetObjectSize();
     return d > 0.0f ? d : 0.0f;
@@ -1347,7 +1347,7 @@ bool WorldObject::IsInMap(WorldObject const* obj) const
     return IsInDist(x, y, z, dist + GetObjectSize());
 }
 
-bool WorldObject::IsWithinDist3d(const Position* pos, float dist) const
+bool WorldObject::IsWithinDist3d(Position const* pos, float dist) const
 {
     return IsInDist(pos, dist + GetObjectSize());
 }
@@ -1357,7 +1357,7 @@ bool WorldObject::IsWithinDist3d(const Position* pos, float dist) const
     return IsInDist2d(x, y, dist + GetObjectSize());
 }
 
-bool WorldObject::IsWithinDist2d(const Position* pos, float dist) const
+bool WorldObject::IsWithinDist2d(Position const* pos, float dist) const
 {
     return IsInDist2d(pos, dist + GetObjectSize());
 }
@@ -1555,7 +1555,7 @@ bool WorldObject::isInBack(WorldObject const* target, float arc) const
     return !HasInArc(2 * M_PI - arc, target);
 }
 
-void WorldObject::GetRandomPoint(const Position& pos, float distance, float& rand_x, float& rand_y, float& rand_z) const
+void WorldObject::GetRandomPoint(Position const& pos, float distance, float& rand_x, float& rand_y, float& rand_z) const
 {
     if (!distance)
     {
@@ -1576,7 +1576,7 @@ void WorldObject::GetRandomPoint(const Position& pos, float distance, float& ran
     UpdateGroundPositionZ(rand_x, rand_y, rand_z);            // update to LOS height if available
 }
 
-Position WorldObject::GetRandomPoint(const Position& srcPos, float distance) const
+Position WorldObject::GetRandomPoint(Position const& srcPos, float distance) const
 {
     float x, y, z;
     GetRandomPoint(srcPos, distance, x, y, z);
@@ -2441,7 +2441,7 @@ void WorldObject::ClearZoneScript()
     m_zoneScript = nullptr;
 }
 
-TempSummon* WorldObject::SummonCreature(uint32 entry, const Position& pos, TempSummonType spwtype, uint32 duration, uint32  /*vehId*/, SummonPropertiesEntry const* properties, bool visibleBySummonerOnly /*= false*/) const
+TempSummon* WorldObject::SummonCreature(uint32 entry, Position const& pos, TempSummonType spwtype, uint32 duration, uint32  /*vehId*/, SummonPropertiesEntry const* properties, bool visibleBySummonerOnly /*= false*/) const
 {
     if (Map* map = FindMap())
     {

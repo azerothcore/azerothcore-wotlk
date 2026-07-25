@@ -32,7 +32,7 @@ class DatabaseScript : public ScriptObject
 {
 protected:
 
-    DatabaseScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
+    DatabaseScript(char const* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
 

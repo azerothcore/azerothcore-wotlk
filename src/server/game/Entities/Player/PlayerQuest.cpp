@@ -288,7 +288,7 @@ bool Player::CanAddQuest(Quest const* quest, bool msg)
     return true;
 }
 
-bool Player::CanCompleteQuest(uint32 quest_id, const QuestStatusData* q_savedStatus)
+bool Player::CanCompleteQuest(uint32 quest_id, QuestStatusData const* q_savedStatus)
 {
     if (quest_id)
     {
@@ -474,6 +474,16 @@ bool Player::CanRewardQuest(Quest const* quest, uint32 reward, bool msg)
     if (!CanRewardQuest(quest, msg))
         return false;
 
+    // gate the actual turn-in here rather than in the overload above, which LFG also uses
+    // as a "already did today's random" probe
+    if (HasPlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME))
+    {
+        if (msg)
+            GetSession()->SendPlayTimeWarning(PTF_UNHEALTHY_TIME, 0);
+
+        return false;
+    }
+
     ItemPosCountVec dest;
     if (quest->GetRewChoiceItemsCount() > 0)
     {
@@ -621,6 +631,9 @@ void Player::CompleteQuest(uint32 quest_id)
     Quest const* qInfo = sObjectMgr->GetQuestTemplate(quest_id);
     if (qInfo && qInfo->HasFlag(QUEST_FLAGS_TRACKING))
     {
+        // auto-rewarded, so CAIS cannot gate it here: the status is already COMPLETE above and
+        // nothing re-triggers the quest, which would destroy the reward rather than defer it.
+        // RewardQuest still zeroes the money and GiveXP still blocks the XP.
         RewardQuest(qInfo, 0, this, false);
     }
 
@@ -764,6 +777,16 @@ void Player::RewardQuest(Quest const* quest, uint32 reward, Object* questGiver, 
     if (int32 rewOrReqMoney = quest->GetRewOrReqMoney(GetLevel()))
     {
         moneyRew += rewOrReqMoney;
+    }
+
+    // CAIS reduces quest money, mirroring looted money and XP. Applied here as well as at the
+    // turn-in gate because LFG and auto-complete quests reach RewardQuest without CanRewardQuest.
+    if (moneyRew > 0)
+    {
+        if (HasPlayerFlag(PLAYER_FLAGS_NO_PLAY_TIME))
+            moneyRew = 0;
+        else if (HasPlayerFlag(PLAYER_FLAGS_PARTIAL_PLAY_TIME))
+            moneyRew /= 2;
     }
 
     if (moneyRew)
@@ -2442,7 +2465,7 @@ void Player::SendCanTakeQuestResponse(QuestFailedReason msg) const
     LOG_DEBUG("network", "WORLD: Sent SMSG_QUESTGIVER_QUEST_INVALID");
 }
 
-void Player::SendQuestConfirmAccept(const Quest* quest, Player* pReceiver)
+void Player::SendQuestConfirmAccept(Quest const* quest, Player* pReceiver)
 {
     if (pReceiver)
     {
@@ -2451,7 +2474,7 @@ void Player::SendQuestConfirmAccept(const Quest* quest, Player* pReceiver)
 
         int loc_idx = pReceiver->GetSession()->GetSessionDbLocaleIndex();
         if (loc_idx >= 0)
-            if (const QuestLocale* pLocale = sObjectMgr->GetQuestLocale(quest->GetQuestId()))
+            if (QuestLocale const* pLocale = sObjectMgr->GetQuestLocale(quest->GetQuestId()))
                 ObjectMgr::GetLocaleString(pLocale->Title, loc_idx, strTitle);
 
         WorldPackets::Quest::QuestConfirmAccept questConfirmAccept;

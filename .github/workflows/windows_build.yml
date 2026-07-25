@@ -7,6 +7,14 @@ on:
     branches: [ "Playerbot", "test-staging" ]
 
 concurrency:
+  # One concurrency group per workflow + ref.
+  #
+  # - PRs use `refs/pull/<PR_NUMBER>/merge`, so new commits cancel older
+  #   in-progress runs for the same PR.
+  # - A merge does NOT cancel the PR's own runs: this group is keyed on
+  #   refs/pull/<N>/merge and the master push on refs/heads/master, so they
+  #   never share a group. See the cancel-pr-runs-on-close workflow.
+  # - Branch pushes are isolated by ref.
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
@@ -22,20 +30,14 @@ jobs:
       BOOST_ROOT: C:\local\boost_1_87_0
     steps:
       - name: Checkout AzerothCore
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Checkout Playerbot Module
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: mod-playerbots/mod-playerbots
           ref: ${{ github.ref_name == 'Playerbot' && 'master' || 'test-staging' }}
           path: modules/mod-playerbots
-
-      - name: Move repo to short path
-        shell: bash
-        run: |
-          mkdir C:/ac
-          cp -r . C:/ac/
 
       - name: ccache
         uses: hendrikmuhs/ccache-action@v1.2.13
@@ -43,7 +45,7 @@ jobs:
       # and re-run the Boost installer on every run. The Test-Path guards in
       # "Configure OS" short-circuit the install work when these are restored.
       - name: Cache Boost & MySQL
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             C:\local\boost_1_87_0
@@ -109,6 +111,5 @@ jobs:
       - name: Build
         shell: bash
         run: |
-          cd C:/ac
           export CTOOLS_BUILD=all
           ./acore.sh compiler build

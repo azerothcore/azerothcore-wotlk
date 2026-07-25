@@ -23,7 +23,7 @@
 class AchievementCriteriaScript : public ScriptObject
 {
 protected:
-    AchievementCriteriaScript(const char* name);
+    AchievementCriteriaScript(char const* name);
 
 public:
     [[nodiscard]] bool IsDatabaseBound() const override { return true; }

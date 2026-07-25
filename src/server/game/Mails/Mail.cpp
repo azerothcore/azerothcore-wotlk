@@ -24,6 +24,7 @@
 #include "GameTime.h"
 #include "Item.h"
 #include "Log.h"
+#include "MailMgr.h"
 #include "ObjectMgr.h"
 #include "Player.h"
 #include "ScriptMgr.h"
@@ -251,7 +252,7 @@ void MailDraft::SendMailTo(CharacterDatabaseTransaction trans, MailReceiver cons
         trans->Append(stmt);
     }
 
-    sCharacterCache->IncreaseCharacterMailCount(ObjectGuid(HighGuid::Player, receiver.GetPlayerGUIDLow()));
+    sMailMgr->OnMailSent(receiver.GetPlayerGUIDLow());
 
     // For online receiver update in game mail status and data
     if (pReceiver)

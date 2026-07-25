@@ -84,7 +84,7 @@ void ScriptMgr::OnDatabaseGetDBRevision(std::string& revision)
     });
 }
 
-DatabaseScript::DatabaseScript(const char* name, std::vector<uint16> enabledHooks)
+DatabaseScript::DatabaseScript(char const* name, std::vector<uint16> enabledHooks)
     : ScriptObject(name, DATABASEHOOK_END)
 {
     // If empty - enable all available hooks.

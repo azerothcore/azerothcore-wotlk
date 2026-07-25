@@ -11,6 +11,8 @@ on:
       - "test-staging"
 
 concurrency:
+  # One concurrency group per workflow + ref (matches the other build workflows).
+  # PRs cancel superseded runs; branch pushes are isolated by ref.
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
@@ -29,22 +31,24 @@ jobs:
     name: ${{ matrix.os }}
     steps:
       - name: Checkout AzerothCore
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Checkout Playerbot Module
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: mod-playerbots/mod-playerbots
           ref: ${{ github.ref_name == 'Playerbot' && 'master' || 'test-staging' }}
           path: modules/mod-playerbots
 
       - name: Cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/Library/Caches/ccache
-          key: ccache:${{ matrix.os }}:${{ github.ref_name }}
+          # Unique per run so the cache is re-saved every run instead of
+          # freezing on the first (a static key hits itself and skips upload).
+          key: ccache:${{ matrix.os }}:${{ github.ref_name }}-${{ github.run_id }}
           restore-keys: |
-            ccache:${{ matrix.os }}:${{ github.ref_name }}
+            ccache:${{ matrix.os }}:${{ github.ref_name }}-
             ccache:${{ matrix.os }}
 
       - name: reset ccache stats

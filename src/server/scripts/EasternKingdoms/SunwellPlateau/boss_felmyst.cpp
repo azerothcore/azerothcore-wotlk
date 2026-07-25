@@ -189,7 +189,7 @@ struct boss_felmyst : public BossAI
         Talk(YELL_KILL, victim);
     }
 
-    void SpellHitTarget(Unit* target, const SpellInfo* spell) override
+    void SpellHitTarget(Unit* target, SpellInfo const* spell) override
     {
         if (spell->Id == SPELL_STRAFE_TOP || spell->Id == SPELL_STRAFE_MIDDLE || spell->Id == SPELL_STRAFE_BOTTOM)
             target->CastSpell(target, SPELL_FOG_OF_CORRUPTION, true);

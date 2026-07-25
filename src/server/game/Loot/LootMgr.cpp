@@ -292,12 +292,12 @@ void LootStore::ReportNonExistingId(uint32 lootId) const
     LOG_ERROR("sql.sql", "Table '{}' Entry {} does not exist", GetName(), lootId);
 }
 
-void LootStore::ReportNonExistingId(uint32 lootId, const char* ownerType, uint32 ownerId) const
+void LootStore::ReportNonExistingId(uint32 lootId, char const* ownerType, uint32 ownerId) const
 {
     LOG_ERROR("sql.sql", "Table '{}' Entry {} does not exist but it is used by {} {}", GetName(), lootId, ownerType, ownerId);
 }
 
-void LootStore::ReportInvalidCount(uint32 lootId, const char* ownerType, uint32 ownerId, uint32 itemId, uint8 minCount, uint8 maxCount) const
+void LootStore::ReportInvalidCount(uint32 lootId, char const* ownerType, uint32 ownerId, uint32 itemId, uint8 minCount, uint8 maxCount) const
 {
     LOG_ERROR("sql.sql", "Table '{}' Entry {} used by {} entry {} item {} has minCount ( {} ) != maxCount ( {} ) which is not supported for this loot type.", GetName(), lootId, ownerType, ownerId, itemId, minCount, maxCount);
 }
@@ -913,7 +913,7 @@ bool Loot::hasItemFor(Player* player) const
         QuestItemList* q_list = q_itr->second;
         for (QuestItemList::const_iterator qi = q_list->begin(); qi != q_list->end(); ++qi)
         {
-            const LootItem& item = quest_items[qi->index];
+            LootItem const& item = quest_items[qi->index];
             if (!qi->is_looted && !item.is_looted)
                 return true;
         }
@@ -926,7 +926,7 @@ bool Loot::hasItemFor(Player* player) const
         QuestItemList* ffa_list = ffa_itr->second;
         for (QuestItemList::const_iterator fi = ffa_list->begin(); fi != ffa_list->end(); ++fi)
         {
-            const LootItem& item = items[fi->index];
+            LootItem const& item = items[fi->index];
             if (!fi->is_looted && !item.is_looted)
                 return true;
         }
@@ -939,7 +939,7 @@ bool Loot::hasItemFor(Player* player) const
         QuestItemList* conditional_list = nn_itr->second;
         for (QuestItemList::const_iterator ci = conditional_list->begin(); ci != conditional_list->end(); ++ci)
         {
-            const LootItem& item = items[ci->index];
+            LootItem const& item = items[ci->index];
             if (!ci->is_looted && !item.is_looted)
                 return true;
         }
