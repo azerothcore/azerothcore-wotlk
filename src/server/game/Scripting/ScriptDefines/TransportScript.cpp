@@ -70,7 +70,7 @@ void ScriptMgr::OnRelocate(Transport* transport, uint32 waypointId, uint32 mapId
     }
 }
 
-TransportScript::TransportScript(const char* name)
+TransportScript::TransportScript(char const* name)
     : ScriptObject(name)
 {
     ScriptRegistry<TransportScript>::AddScript(this);

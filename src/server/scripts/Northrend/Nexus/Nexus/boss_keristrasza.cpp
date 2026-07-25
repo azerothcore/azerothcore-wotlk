@@ -51,8 +51,7 @@ enum Events
     EVENT_CRYSTAL_CHAINS            = 2,
     EVENT_TAIL_SWEEP                = 3,
     EVENT_HEALTH_CHECK              = 4,
-    EVENT_ACHIEVEMENT_CHECK         = 5,
-    EVENT_KILL_TALK                 = 6
+    EVENT_ACHIEVEMENT_CHECK         = 5
 };
 
 struct boss_keristrasza : public BossAI
@@ -89,11 +88,7 @@ struct boss_keristrasza : public BossAI
 
     void KilledUnit(Unit*) override
     {
-        if (!events.HasTimeUntilEvent(EVENT_KILL_TALK))
-        {
-            Talk(SAY_SLAY);
-            events.ScheduleEvent(EVENT_KILL_TALK, 6s);
-        }
+        Talk(SAY_SLAY);
     }
 
     void SetData(uint32 type, uint32) override
