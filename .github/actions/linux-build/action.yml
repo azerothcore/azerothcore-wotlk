@@ -41,14 +41,21 @@ runs:
   steps:
     - name: echo cache key
       shell: bash
-      run: echo "Cache key -> ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:pch=${{ inputs.pch }}:${{ github.ref_name }}"
+      run: echo "Cache key -> ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:pch=${{ inputs.pch }}:${{ github.ref_name }}-${{ github.run_id }}"
 
+    # The primary key is unique per run (`-${{ github.run_id }}`) so every run
+    # saves a fresh cache. A static key would hit on itself on the second run
+    # and `actions/cache` would then skip the upload, freezing the cache after
+    # the first commit on a branch (and permanently on master). The restore-keys
+    # walk back from the most-recent cache on this branch to progressively
+    # broader fallbacks (branch -> pch variant -> modules variant -> compiler).
     - name: Cache
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: ${{ github.workspace }}/var/ccache
-        key: ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:pch=${{ inputs.pch }}:${{ github.ref_name }}
+        key: ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:pch=${{ inputs.pch }}:${{ github.ref_name }}-${{ github.run_id }}
         restore-keys: |
+          ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:pch=${{ inputs.pch }}:${{ github.ref_name }}-
           ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}:pch=${{ inputs.pch }}
           ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}:${{ inputs.modules }}
           ccache:${{ runner.os }}:${{ inputs.CC }}_${{ inputs.CXX }}
@@ -78,6 +85,8 @@ runs:
       shell: bash
       env:
         CCACHE_DIR: $GITHUB_WORKSPACE/var/ccache
+      # CCACHE_COMPRESSLEVEL=3: level 9 burns CPU for marginal size gains on a
+      # cache that never approaches max_size.
       run: |
         mkdir -p "$CCACHE_DIR"
         cat <<EOF >> "$GITHUB_ENV"
@@ -87,7 +96,7 @@ runs:
         CCACHE_MAXSIZE=5G
         CCACHE_SLOPPINESS=pch_defines,time_macros,include_file_mtime
         CCACHE_COMPRESS=1
-        CCACHE_COMPRESSLEVEL=9
+        CCACHE_COMPRESSLEVEL=3
         CCACHE_COMPILERCHECK=content
         CCACHE_LOGFILE=${{ env.CCACHE_DIR }}/cache.debug
         CC=${{ inputs.CC }}

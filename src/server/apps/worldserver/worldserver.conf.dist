@@ -3422,6 +3422,24 @@ DungeonAccessRequirements.OptionalStringID = 0
 ###################################################################################################
 
 ###################################################################################################
+# PLAY TIME LIMIT (CAIS)
+#
+#    CAIS.Enable
+#        Description: Enable the Chinese realm consecutive play time restrictions. After 3
+#                     hours of consecutive play, XP and looted money are halved; after 5
+#                     hours, the character can no longer gain XP, loot, or turn in quests.
+#                     Staying offline for 5 hours resets the accumulated time. The 3h/5h
+#                     thresholds are hardcoded client-side.
+#        Note:        A worldserver restart resets the accumulated time for every account.
+#        Default:     0 - Disabled
+#                     1 - Enabled
+
+CAIS.Enable = 0
+
+#
+###################################################################################################
+
+###################################################################################################
 # DUNGEON AND BATTLEGROUND FINDER
 #
 #    JoinBGAndLFG.Enable

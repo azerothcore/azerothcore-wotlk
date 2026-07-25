@@ -52,7 +52,7 @@ struct ArenaSeasonReward
     ArenaSeasonRewardType type{ARENA_SEASON_REWARD_TYPE_ITEM};
 
     // Used in unit tests.
-    bool operator==(const ArenaSeasonReward& other) const
+    bool operator==(ArenaSeasonReward const& other) const
     {
         return entry == other.entry && type == other.type;
     }
@@ -78,7 +78,7 @@ struct ArenaSeasonRewardGroup
     std::vector<ArenaSeasonReward> achievementRewards;
 
     // Used in unit tests.
-    bool operator==(const ArenaSeasonRewardGroup& other) const
+    bool operator==(ArenaSeasonRewardGroup const& other) const
     {
         return minCriteria == other.minCriteria &&
                maxCriteria == other.maxCriteria &&
