@@ -6247,7 +6247,7 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
                         bool oversizedTarget = target->GetCombatReach() > NOMINAL_MELEE_RANGE && !target->IsCharmedOwnedByPlayerOrPlayer();
 
                         bool pathFailed = (m_preGeneratedPath->GetPathType() & PATHFIND_SHORT) || !result ||
-                                          (m_preGeneratedPath->GetPathType() & (PATHFIND_NOPATH | PATHFIND_INCOMPLETE)) ||
+                                          (m_preGeneratedPath->GetPathType() & (PATHFIND_NOPATH | PATHFIND_INCOMPLETE | PATHFIND_FARFROMPOLY_END)) ||
                                           m_preGeneratedPath->IsInvalidDestinationZ(target); // Check position z, if not in a straight line
 
                         if (pathFailed)
