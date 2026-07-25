@@ -544,9 +544,6 @@ struct boss_yoggsaron_sara : public ScriptedAI
         if (!_instance)
             return;
 
-        if (_instance->GetBossState(BOSS_VEZAX) != DONE)
-            return;
-
         _instance->DoStartTimedAchievement(ACHIEVEMENT_TIMED_TYPE_EVENT, CRITERIA_NOT_GETTING_OLDER);
         _instance->SetBossState(BOSS_YOGGSARON, IN_PROGRESS);
         me->SetInCombatWithZone();
@@ -778,7 +775,6 @@ struct boss_yoggsaron_sara : public ScriptedAI
     void DamageTaken(Unit* attacker, uint32& damage, DamageEffectType /*damagetype*/, SpellSchoolMask /*damageSchoolMask*/) override
     {
         // Guardians can be spawned by walking into Ominous Clouds even when InitFight
-        // never ran (e.g. Vezax not defeated); their novas must not start phase 2 then.
         if (!_instance || _instance->GetBossState(BOSS_YOGGSARON) != IN_PROGRESS || !attacker || attacker->GetEntry() != NPC_GUARDIAN_OF_YS || _secondPhase)
         {
             damage = 0;
