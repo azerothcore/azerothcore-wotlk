@@ -1,0 +1,13 @@
+-- Issue #26442: Vaelen the Flayed (Icecrown, entry 30056), a chained-up captive NPC, joins the
+-- fight whenever a hostile mob is pulled near him. His own faction (2050) has HostileMask=0 and
+-- no listed enemies - he can never actually be hostile by faction rules - but his default
+-- reactstate (REACT_AGGRESSIVE, never overridden) is enough for him to assist against anything
+-- fighting nearby regardless of his own faction's hostility.
+--
+-- UNIT_FLAG_IMMUNE_TO_NPC (0x200) blocks him as a valid attack/assist target for and against
+-- NPCs at the engine level (Unit::_IsValidAttackTarget/_IsValidAssistTarget), which is the
+-- precise fix for this symptom - already confirmed working live (see PR #26766, same issue,
+-- same fix, not merged yet). His spawn row's unit_flags is 0, which ObjectMgr::ChooseCreatureFlags
+-- treats as "no override, inherit from creature_template" (not "force to zero"), so updating the
+-- template value below applies to this spawn.
+UPDATE `creature_template` SET `unit_flags` = `unit_flags`|512 WHERE `entry` = 30056;
