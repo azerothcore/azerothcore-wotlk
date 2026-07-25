@@ -1,6 +1,7 @@
--- Adds a generic "ghost charge" window for charge-based proc auras: keeps the aura
--- alive for ChargeDropDelay ms after its last charge is consumed instead of removing
--- it immediately, so an instant cast already queued in the same batch can still use it.
+-- Adds a generic "ghost charge" grace window for charge-based proc auras: keeps the
+-- aura alive for ChargeDropDelay ms after its last charge is consumed instead of
+-- removing it immediately, so an instant cast issued right as the last charge lands
+-- can still benefit from it.
 ALTER TABLE `spell_proc` ADD COLUMN `ChargeDropDelay` INT UNSIGNED NOT NULL DEFAULT 0 AFTER `Charges`;
 
 -- 74396 - Fingers of Frost (Mage): already has a row, just add the delay.
