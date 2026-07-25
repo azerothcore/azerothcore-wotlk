@@ -41,8 +41,8 @@ void ServerMailMgr::LoadMailServerTemplates()
 
     _serverMailStore.clear(); // for reload case
 
-    //                                                    0     1         2         3          4       5
-    QueryResult result = CharacterDatabase.Query("SELECT `id`, `moneyA`, `moneyH`, `subject`, `body`, `active` FROM `mail_server_template`");
+    //                                                    0     1              2         3         4          5       6
+    QueryResult result = CharacterDatabase.Query("SELECT `id`, `senderEntry`, `moneyA`, `moneyH`, `subject`, `body`, `active` FROM `mail_server_template`");
     if (!result)
     {
         LOG_INFO("server.loading", ">> Loaded 0 server mail rewards. DB table `mail_server_template` is empty.");
@@ -60,11 +60,12 @@ void ServerMailMgr::LoadMailServerTemplates()
 
         ServerMail& servMail = _serverMailStore[id];
         servMail.id          = id;
-        servMail.moneyA      = fields[1].Get<uint32>();
-        servMail.moneyH      = fields[2].Get<uint32>();
-        servMail.subject     = fields[3].Get<std::string>();
-        servMail.body        = fields[4].Get<std::string>();
-        servMail.active      = fields[5].Get<uint8>();
+        servMail.senderEntry = fields[1].Get<uint32>();
+        servMail.moneyA      = fields[2].Get<uint32>();
+        servMail.moneyH      = fields[3].Get<uint32>();
+        servMail.subject     = fields[4].Get<std::string>();
+        servMail.body        = fields[5].Get<std::string>();
+        servMail.active      = fields[6].Get<uint8>();
 
         // Skip non-activated entries
         if (!servMail.active)
@@ -74,6 +75,12 @@ void ServerMailMgr::LoadMailServerTemplates()
         {
             LOG_ERROR("sql.sql", "Table `mail_server_template` has moneyA {} or moneyH {} larger than MAX_MONEY_AMOUNT {} for id {}, skipped.", servMail.moneyA, servMail.moneyH, MAX_MONEY_AMOUNT, servMail.id);
             continue;
+        }
+
+        if (servMail.senderEntry && !sObjectMgr->GetCreatureTemplate(servMail.senderEntry))
+        {
+            LOG_ERROR("sql.sql", "Table `mail_server_template` has invalid senderEntry {} (no matching creature_template) for id {}, falling back to default sender.", servMail.senderEntry, servMail.id);
+            servMail.senderEntry = 0;
         }
     } while (result->NextRow());
 
@@ -281,7 +288,7 @@ void ServerMailMgr::LoadMailServerTemplatesConditions()
     } while (result->NextRow());
 }
 
-void ServerMailMgr::SendServerMail(Player* player, uint32 id, uint32 money,
+void ServerMailMgr::SendServerMail(Player* player, uint32 id, uint32 senderEntry, uint32 money,
     std::vector<ServerMailItems> const& items,
     std::vector<ServerMailCondition> const& conditions,
     std::string const& subject, std::string const& body) const
@@ -292,7 +299,9 @@ void ServerMailMgr::SendServerMail(Player* player, uint32 id, uint32 money,
 
     CharacterDatabaseTransaction trans = CharacterDatabase.BeginTransaction();
 
-    MailSender sender(MAIL_NORMAL, player->GetGUID().GetCounter(), MAIL_STATIONERY_GM);
+    MailSender sender = senderEntry
+        ? MailSender(MAIL_CREATURE, senderEntry, MAIL_STATIONERY_DEFAULT)
+        : MailSender(MAIL_NORMAL, player->GetGUID().GetCounter(), MAIL_STATIONERY_GM);
     MailDraft draft(subject, body);
 
     draft.AddMoney(money);

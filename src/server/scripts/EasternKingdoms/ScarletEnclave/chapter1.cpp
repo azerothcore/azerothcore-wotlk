@@ -101,6 +101,23 @@ class spell_q12641_death_comes_from_on_high_recall_eye : public SpellScript
     }
 };
 
+// 51761 - Rain of Darkness
+class spell_q12641_rain_of_darkness : public SpellScript
+{
+    PrepareSpellScript(spell_q12641_rain_of_darkness);
+
+    void ModDestHeight(SpellDestination& dest)
+    {
+        Position const offset = { 0.0f, 0.0f, 15.0f, 0.0f };
+        dest.RelocateOffset(offset);
+    }
+
+    void Register() override
+    {
+        OnDestinationTargetSelect += SpellDestinationTargetSelectFn(spell_q12641_rain_of_darkness::ModDestHeight, EFFECT_0, TARGET_DEST_CASTER_BACK);
+    }
+};
+
 enum GiftOfTheHarvester
 {
     NPC_GHOUL                   = 28845,
@@ -449,6 +466,7 @@ void AddSC_the_scarlet_enclave_c1()
 {
     RegisterSpellScript(spell_q12641_death_comes_from_on_high_summon_ghouls);
     RegisterSpellScript(spell_q12641_death_comes_from_on_high_recall_eye);
+    RegisterSpellScript(spell_q12641_rain_of_darkness);
     RegisterSpellScript(spell_item_gift_of_the_harvester);
     RegisterSpellScript(spell_q12698_the_gift_that_keeps_on_giving);
     new npc_scarlet_ghoul();

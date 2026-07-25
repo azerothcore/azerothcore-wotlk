@@ -38,7 +38,7 @@ enum AccountHook
 class AccountScript : public ScriptObject
 {
 protected:
-    AccountScript(const char* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
+    AccountScript(char const* name, std::vector<uint16> enabledHooks = std::vector<uint16>());
 
 public:
     // Called when an account logged in successfully

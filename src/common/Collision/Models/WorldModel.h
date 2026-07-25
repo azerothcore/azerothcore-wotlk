@@ -46,11 +46,11 @@ namespace VMAP
     class WmoLiquid
     {
     public:
-        WmoLiquid(uint32 width, uint32 height, const G3D::Vector3& corner, uint32 type);
-        WmoLiquid(const WmoLiquid& other);
+        WmoLiquid(uint32 width, uint32 height, G3D::Vector3 const& corner, uint32 type);
+        WmoLiquid(WmoLiquid const& other);
         ~WmoLiquid();
-        WmoLiquid& operator=(const WmoLiquid& other);
-        bool GetLiquidHeight(const G3D::Vector3& pos, float& liqHeight) const;
+        WmoLiquid& operator=(WmoLiquid const& other);
+        bool GetLiquidHeight(G3D::Vector3 const& pos, float& liqHeight) const;
         [[nodiscard]] uint32 GetType() const { return iType; }
         float* GetHeightStorage() { return iHeight; }
         uint8* GetFlagsStorage() { return iFlags; }
@@ -73,18 +73,18 @@ namespace VMAP
     {
     public:
         GroupModel() { }
-        GroupModel(const GroupModel& other);
-        GroupModel(uint32 mogpFlags, uint32 groupWMOID, const G3D::AABox& bound):
+        GroupModel(GroupModel const& other);
+        GroupModel(uint32 mogpFlags, uint32 groupWMOID, G3D::AABox const& bound):
             iBound(bound), iMogpFlags(mogpFlags), iGroupWMOID(groupWMOID), iLiquid(nullptr) { }
         ~GroupModel() { delete iLiquid; }
 
         //! pass mesh data to object and create BIH. Passed vectors get get swapped with old geometry!
         void setMeshData(std::vector<G3D::Vector3>& vert, std::vector<MeshTriangle>& tri);
         void setLiquidData(WmoLiquid*& liquid) { iLiquid = liquid; liquid = nullptr; }
-        bool IntersectRay(const G3D::Ray& ray, float& distance, bool stopAtFirstHit) const;
+        bool IntersectRay(G3D::Ray const& ray, float& distance, bool stopAtFirstHit) const;
         enum InsideResult { INSIDE = 0, MAYBE_INSIDE = 1, ABOVE = 2, OUT_OF_BOUNDS = -1 };
         InsideResult IsInsideObject(G3D::Ray const& ray, float& z_dist) const;
-        bool GetLiquidLevel(const G3D::Vector3& pos, float& liqHeight) const;
+        bool GetLiquidLevel(G3D::Vector3 const& pos, float& liqHeight) const;
         [[nodiscard]] uint32 GetLiquidType() const;
         bool writeToFile(FILE* wf);
         bool readFromFile(FILE* rf);
@@ -111,10 +111,10 @@ namespace VMAP
         //! pass group models to WorldModel and create BIH. Passed vector is swapped with old geometry!
         void setGroupModels(std::vector<GroupModel>& models);
         void setRootWmoID(uint32 id) { RootWMOID = id; }
-        bool IntersectRay(const G3D::Ray& ray, float& distance, bool stopAtFirstHit, ModelIgnoreFlags ignoreFlags) const;
-        bool GetLocationInfo(const G3D::Vector3& p, const G3D::Vector3& down, float& dist, GroupLocationInfo& info) const;
-        bool writeFile(const std::string& filename);
-        bool readFile(const std::string& filename);
+        bool IntersectRay(G3D::Ray const& ray, float& distance, bool stopAtFirstHit, ModelIgnoreFlags ignoreFlags) const;
+        bool GetLocationInfo(G3D::Vector3 const& p, G3D::Vector3 const& down, float& dist, GroupLocationInfo& info) const;
+        bool writeFile(std::string const& filename);
+        bool readFile(std::string const& filename);
         void GetGroupModels(std::vector<GroupModel>& outGroupModels);
         uint32 Flags;
     protected:

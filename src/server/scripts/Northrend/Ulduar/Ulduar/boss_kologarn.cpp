@@ -156,43 +156,35 @@ struct boss_kologarn : public BossAI
                 instance->SaveToDB();
             }
             Reset();
+            // Arms are vehicle accessories; the initial pair is seated by Map::AddToMap,
+            // so only wipe recovery needs to heal survivors or reinstall missing arms.
+            AttachLeftArm();
+            AttachRightArm();
             me->setActive(false);
         }
 
         void AttachLeftArm()
         {
-            if (Unit* arm = ObjectAccessor::GetCreature(*me, _left))
-                arm->SetHealth(arm->GetMaxHealth());
-            else if (Creature* accessory = me->SummonCreature(NPC_LEFT_ARM, *me, TEMPSUMMON_MANUAL_DESPAWN))
+            if (Creature* arm = ObjectAccessor::GetCreature(*me, _left))
             {
-                accessory->AddUnitTypeMask(UNIT_MASK_ACCESSORY);
-                if (!me->HandleSpellClick(accessory, 0))
-                    accessory->DespawnOrUnsummon();
-                else
-                {
-                    _left = accessory->GetGUID();
-                    accessory->SetOrientation(M_PI);
-                    accessory->CastSpell(accessory, SPELL_ARM_RESPAWN_VISUAL, true);
-                }
+                arm->SetHealth(arm->GetMaxHealth());
+                // Clear the arm's combat-start state so it can re-pull the boss on a subsequent attempt.
+                arm->AI()->Reset();
             }
+            else
+                vehicle->InstallAccessory(NPC_LEFT_ARM, 0, true, TEMPSUMMON_MANUAL_DESPAWN, 0);
         }
 
         void AttachRightArm()
         {
-            if (Unit* arm = ObjectAccessor::GetCreature(*me, _right))
-                arm->SetHealth(arm->GetMaxHealth());
-            else if (Creature* accessory = me->SummonCreature(NPC_RIGHT_ARM, *me, TEMPSUMMON_MANUAL_DESPAWN))
+            if (Creature* arm = ObjectAccessor::GetCreature(*me, _right))
             {
-                accessory->AddUnitTypeMask(UNIT_MASK_ACCESSORY);
-                if (!me->HandleSpellClick(accessory, 1))
-                    accessory->DespawnOrUnsummon();
-                else
-                {
-                    _right = accessory->GetGUID();
-                    accessory->SetOrientation(M_PI);
-                    accessory->CastSpell(accessory, SPELL_ARM_RESPAWN_VISUAL, true);
-                }
+                arm->SetHealth(arm->GetMaxHealth());
+                // Clear the arm's combat-start state so it can re-pull the boss on a subsequent attempt.
+                arm->AI()->Reset();
             }
+            else
+                vehicle->InstallAccessory(NPC_RIGHT_ARM, 1, true, TEMPSUMMON_MANUAL_DESPAWN, 0);
         }
 
         void Reset() override
@@ -212,9 +204,6 @@ struct boss_kologarn : public BossAI
                 if (GameObject* door = instance->GetGameObject(DATA_KOLOGARN_DOORS))
                     door->SetGoState(GO_STATE_ACTIVE);
             }
-
-            AttachLeftArm();
-            AttachRightArm();
 
             // Reset breath on pull
             breathReady = false;
@@ -318,35 +307,46 @@ struct boss_kologarn : public BossAI
 
         void PassengerBoarded(Unit* who, int8  /*seatId*/, bool apply) override
         {
+            if (apply)
+            {
+                if (who->GetEntry() == NPC_LEFT_ARM)
+                    _left = who->GetGUID();
+                else if (who->GetEntry() == NPC_RIGHT_ARM)
+                    _right = who->GetGUID();
+                else
+                    return;
+
+                who->SetOrientation(M_PI);
+                who->CastSpell(who, SPELL_ARM_RESPAWN_VISUAL, true);
+                return;
+            }
+
             if (!me->IsAlive() || instance->GetBossState(BOSS_KOLOGARN) != IN_PROGRESS)
                 return;
 
-            if (!apply)
+            // left arm
+            if (who->GetGUID() == _left)
             {
-                // left arm
-                if (who->GetGUID() == _left)
+                _left.Clear();
+                if (me->IsInCombat())
                 {
-                    _left.Clear();
-                    if (me->IsInCombat())
-                    {
-                        Talk(SAY_LEFT_ARM_GONE);
-                        events.ScheduleEvent(EVENT_RESTORE_ARM_LEFT, 50s);
-                    }
+                    Talk(SAY_LEFT_ARM_GONE);
+                    events.ScheduleEvent(EVENT_RESTORE_ARM_LEFT, 50s);
                 }
-                else
-                {
-                    _right.Clear();
-                    if (me->IsInCombat())
-                    {
-                        Talk(SAY_RIGHT_ARM_GONE);
-                        events.ScheduleEvent(EVENT_RESTORE_ARM_RIGHT, 50s);
-                    }
-                }
-
-                me->CastSpell(me, SPELL_ARM_DEAD, true);
-                if (!_right && !_left)
-                    events.ScheduleEvent(EVENT_STONE_SHOUT, 5s);
             }
+            else
+            {
+                _right.Clear();
+                if (me->IsInCombat())
+                {
+                    Talk(SAY_RIGHT_ARM_GONE);
+                    events.ScheduleEvent(EVENT_RESTORE_ARM_RIGHT, 50s);
+                }
+            }
+
+            me->CastSpell(me, SPELL_ARM_DEAD, true);
+            if (!_right && !_left)
+                events.ScheduleEvent(EVENT_STONE_SHOUT, 5s);
         }
 
         void DamageTaken(Unit* who, uint32& damage, DamageEffectType, SpellSchoolMask) override
@@ -702,28 +702,6 @@ struct boss_kologarn_pit_kill_bunny : public NullCreatureAI
     }
 };
 
-// predicate function to select non main tank target
-class StoneGripTargetSelector
-{
-public:
-    StoneGripTargetSelector(Creature* me, Unit const* victim) : _me(me), _victim(victim) {}
-
-    bool operator() (WorldObject* target) const
-    {
-        if (target == _victim && _me->GetThreatMgr().GetThreatListSize() > 1)
-            return true;
-
-        if (!target->IsPlayer())
-            return true;
-
-        return false;
-    }
-
-private:
-    Creature* _me;
-    Unit const* _victim;
-};
-
 class spell_ulduar_stone_grip_cast_target : public SpellScript
 {
     PrepareSpellScript(spell_ulduar_stone_grip_cast_target);
@@ -735,18 +713,12 @@ class spell_ulduar_stone_grip_cast_target : public SpellScript
 
     void FilterTargetsInitial(std::list<WorldObject*>& targets)
     {
-        // Remove "main tank" and non-player targets
-        targets.remove_if(StoneGripTargetSelector(GetCaster()->ToCreature(), GetCaster()->GetVictim()));
-        // Maximum affected targets per difficulty mode
-        uint32 maxTargets = GetSpellInfo()->Id == SPELL_STONE_GRIP ? 1 : 3;
+        if (Unit* victim = GetCaster()->GetVictim())
+            targets.remove_if(Acore::ObjectGUIDCheck(victim->GetGUID(), true));
 
-        // Return a random amount of targets based on maxTargets
-        while (maxTargets < targets.size())
-        {
-            std::list<WorldObject*>::iterator itr = targets.begin();
-            advance(itr, urand(0, targets.size() - 1));
-            targets.erase(itr);
-        }
+        targets.remove_if(Acore::ObjectTypeIdCheck(TYPEID_PLAYER, false));
+
+        Acore::Containers::RandomResize(targets, GetSpellInfo()->Id == SPELL_STONE_GRIP ? 1 : 3);
     }
 
     void Register() override

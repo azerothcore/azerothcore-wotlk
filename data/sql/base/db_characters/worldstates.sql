@@ -233,13 +233,13 @@ INSERT INTO `worldstates` VALUES
 (3801,0,NULL),
 (3802,1,NULL),
 (20001,1454691600,'NextArenaPointDistributionTime'),
-(20002,1773896400,'NextWeeklyQuestResetTime'),
-(20003,1773637200,'NextBGRandomDailyResetTime'),
+(20002,1780545600,'NextWeeklyQuestResetTime'),
+(20003,1780372800,'NextBGRandomDailyResetTime'),
 (20004,0,'cleaning_flags'),
-(20005,1773637200,'NextDailyQuestResetTime'),
-(20006,1773637200,'NextGuildDailyResetTime'),
-(20007,1775019600,'NextMonthlyQuestResetTime'),
-(20008,1773637200,NULL);
+(20005,1780372800,'NextDailyQuestResetTime'),
+(20006,1780372800,'NextGuildDailyResetTime'),
+(20007,1782878400,'NextMonthlyQuestResetTime'),
+(20008,1780372800,NULL);
 /*!40000 ALTER TABLE `worldstates` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -251,4 +251,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-03-15 20:39:59
+-- Dump completed on 2026-06-01 22:41:20

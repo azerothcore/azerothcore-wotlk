@@ -585,9 +585,9 @@ enum ShadowPriestSezzizEnum
 std::array<std::vector<std::pair<uint32, Position>>, 4> shadowpriestSezzizAdds =
 { {
     { { NPC_SANDFURY_ZEALOT, { 1874.12f, 1198.90f, 8.87f } }, { NPC_SANDFURY_ACOLYTE, { 1874.12f, 1198.90f, 8.87f } } },
-    { { NPC_SANDFURY_ACOLYTE, { 895.26f, 1199.09f, 8.87f } }, { NPC_SANDFURY_ACOLYTE, { 895.26f, 1199.088f, 8.87f } } },
-    { { NPC_SANDFURY_ZEALOT, { 1874.12f, 1198.90f, 8.87f } }, { NPC_SANDFURY_ACOLYTE, { 895.26f, 1199.09f, 8.87f } }, { NPC_SANDFURY_ACOLYTE, { 895.26f, 1199.09f, 8.87f } } },
-    { { NPC_SANDFURY_ZEALOT, { 895.26f, 1199.09f, 8.87f } }, { NPC_SANDFURY_ZEALOT, { 1874.12f, 1198.90f, 8.87f } }, { NPC_SANDFURY_ACOLYTE, { 1874.12f, 1198.90f } }, { NPC_SANDFURY_ACOLYTE, { 895.26f, 1199.09f, 8.87f } } }
+    { { NPC_SANDFURY_ACOLYTE, { 1895.26f, 1199.09f, 8.87f } }, { NPC_SANDFURY_ACOLYTE, { 1895.26f, 1199.088f, 8.87f } } },
+    { { NPC_SANDFURY_ZEALOT, { 1874.12f, 1198.90f, 8.87f } }, { NPC_SANDFURY_ACOLYTE, { 1895.26f, 1199.09f, 8.87f } }, { NPC_SANDFURY_ACOLYTE, { 1895.26f, 1199.09f, 8.87f } } },
+    { { NPC_SANDFURY_ZEALOT, { 1895.26f, 1199.09f, 8.87f } }, { NPC_SANDFURY_ZEALOT, { 1874.12f, 1198.90f, 8.87f } }, { NPC_SANDFURY_ACOLYTE, { 1874.12f, 1198.90f } }, { NPC_SANDFURY_ACOLYTE, { 1895.26f, 1199.09f, 8.87f } } }
 } };
 
 class npc_shadowpriest_sezziz : public CreatureScript

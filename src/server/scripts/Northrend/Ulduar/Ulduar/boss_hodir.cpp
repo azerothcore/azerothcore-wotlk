@@ -255,6 +255,12 @@ struct boss_hodir : public BossAI
         events.ScheduleEvent(EVENT_HARD_MODE_MISSED, 3min);
         Talk(TEXT_AGGRO);
 
+        // Helpers spawn IMMUNE_TO_NPC so idle bosses (e.g. Freya's Ground Tremor, #26330) can't tag
+        // them; drop it on engage. TODO: confirm timing - sniffs may clear it per-helper on unfreeze.
+        for (uint8 i = 0; i < 8; ++i)
+            if (Creature* helper = GetHelper(i))
+                helper->RemoveUnitFlag(UNIT_FLAG_IMMUNE_TO_NPC);
+
         if (instance->GetBossState(BOSS_HODIR) != DONE)
             instance->SetBossState(BOSS_HODIR, IN_PROGRESS);
     }
