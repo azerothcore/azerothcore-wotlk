@@ -59,7 +59,8 @@
     // ... both units must be allowed to enter combat
     if (a->IsCombatDisallowed() || b->IsCombatDisallowed())
         return false;
-    if (a->IsFriendlyTo(b) || b->IsFriendlyTo(a))
+    // ...not friendly, unless one side is hostile (asymmetric aggressor wins)
+    if ((a->IsFriendlyTo(b) || b->IsFriendlyTo(a)) && !a->IsHostileTo(b) && !b->IsHostileTo(a))
         return false;
     Player const* playerA = a->GetCharmerOrOwnerPlayerOrPlayerItself();
     Player const* playerB = b->GetCharmerOrOwnerPlayerOrPlayerItself();

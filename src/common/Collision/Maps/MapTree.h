@@ -32,15 +32,15 @@ namespace VMAP
 
     struct GroupLocationInfo
     {
-        const GroupModel* hitModel = nullptr;
+        GroupModel const* hitModel = nullptr;
         int32 rootId = -1;
     };
 
     struct LocationInfo
     {
         LocationInfo():  ground_Z(-G3D::inf()) { }
-        const ModelInstance* hitInstance{nullptr};
-        const GroupModel* hitModel{nullptr};
+        ModelInstance const* hitInstance{nullptr};
+        GroupModel const* hitModel{nullptr};
         float ground_Z;
         int32 rootId = -1;
     };
@@ -63,23 +63,23 @@ namespace VMAP
         std::string iBasePath;
 
     private:
-        bool GetIntersectionTime(const G3D::Ray& pRay, float& pMaxDist, bool StopAtFirstHit, ModelIgnoreFlags ignoreFlags) const;
+        bool GetIntersectionTime(G3D::Ray const& pRay, float& pMaxDist, bool StopAtFirstHit, ModelIgnoreFlags ignoreFlags) const;
         //bool containsLoadedMapTile(unsigned int pTileIdent) const { return(iLoadedMapTiles.containsKey(pTileIdent)); }
     public:
         static std::string getTileFileName(uint32 mapID, uint32 tileX, uint32 tileY);
         static uint32 packTileID(uint32 tileX, uint32 tileY) { return tileX << 16 | tileY; }
         static void unpackTileID(uint32 ID, uint32& tileX, uint32& tileY) { tileX = ID >> 16; tileY = ID & 0xFF; }
-        static LoadResult CanLoadMap(const std::string& basePath, uint32 mapID, uint32 tileX, uint32 tileY);
+        static LoadResult CanLoadMap(std::string const& basePath, uint32 mapID, uint32 tileX, uint32 tileY);
 
-        StaticMapTree(uint32 mapID, const std::string& basePath);
+        StaticMapTree(uint32 mapID, std::string const& basePath);
         ~StaticMapTree();
 
-        [[nodiscard]] bool isInLineOfSight(const G3D::Vector3& pos1, const G3D::Vector3& pos2, ModelIgnoreFlags ignoreFlags) const;
-        bool GetObjectHitPos(const G3D::Vector3& pos1, const G3D::Vector3& pos2, G3D::Vector3& pResultHitPos, float pModifyDist) const;
-        [[nodiscard]] float getHeight(const G3D::Vector3& pPos, float maxSearchDist) const;
-        bool GetLocationInfo(const G3D::Vector3& pos, LocationInfo& info) const;
+        [[nodiscard]] bool isInLineOfSight(G3D::Vector3 const& pos1, G3D::Vector3 const& pos2, ModelIgnoreFlags ignoreFlags) const;
+        bool GetObjectHitPos(G3D::Vector3 const& pos1, G3D::Vector3 const& pos2, G3D::Vector3& pResultHitPos, float pModifyDist) const;
+        [[nodiscard]] float getHeight(G3D::Vector3 const& pPos, float maxSearchDist) const;
+        bool GetLocationInfo(G3D::Vector3 const& pos, LocationInfo& info) const;
 
-        bool InitMap(const std::string& fname);
+        bool InitMap(std::string const& fname);
         void UnloadMap();
         bool LoadMapTile(uint32 tileX, uint32 tileY);
         void UnloadMapTile(uint32 tileX, uint32 tileY);

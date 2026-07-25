@@ -1,0 +1,13 @@
+-- DB update 2026_06_30_05 -> 2026_06_30_06
+--   60493  Dying Curse                    item 40255 (213) "Your spells have a chance..."
+--   60490  Embrace of the Spider          item 39229 (200) "Your spells have a chance..."
+--   64742  Pandora's Plea                 item 45490 (226) "Your spells have a chance..."
+--   60524  Majestic Dragon Figurine       item 40430 (200) "Each time you cast a spell..."
+--   49622  Je'Tze's Bell                  item 37835 (200) "Each time you cast a spell..."
+--   64738  Show of Faith                  item 45535 (239) "Each time you cast a spell..."
+--   65002  Sif's Remembrance              item 45929 (226) "Each time you cast a spell..."
+--   64999  Meteoric Inspiration           item 46051 (226) "Each spell cast within 20 seconds..."
+--   60519  Spark of Life                  item 37657 (200) "Each time you cast a damaging or healing spell..." (was 7 -> 3, matches TC)
+--   67698  Solace of the Defeated/Fallen  items 47041, 47271 (245)
+--   67752  Solace of the Defeated/Fallen  items 47059, 47432 (258)
+UPDATE `spell_proc` SET `SpellTypeMask` = 3 WHERE `SpellId` IN (60493, 60490, 64742, 60524, 49622, 64738, 65002, 64999, 60519, 67698, 67752);

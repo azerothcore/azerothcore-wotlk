@@ -166,7 +166,6 @@ struct violet_hold_trashAI : public npc_escortAI
     {
         Instance = c->GetInstanceScript();
         PortalLoc = Instance->GetData(DATA_PORTAL_LOCATION);
-        AddedWaypoints = false;
         UseAlternate = false;
     }
 
@@ -209,58 +208,59 @@ struct violet_hold_trashAI : public npc_escortAI
         ScriptedAI::MoveInLineOfSight(who);
     }
 
+    void InitializeAI() override
+    {
+        npc_escortAI::InitializeAI();
+
+        switch (PortalLoc)
+        {
+            case 0:
+                for (int i = 0; i < 6; i++)
+                    AddWaypoint(i, FirstPortalTrashWPs[i][0] + irand(-1, 1), FirstPortalTrashWPs[i][1] + irand(-1, 1), FirstPortalTrashWPs[i][2] + irand(-1, 1), 0);
+                me->SetHomePosition(FirstPortalTrashWPs[5][0], FirstPortalTrashWPs[5][1], FirstPortalTrashWPs[5][2], 3.149439f);
+                break;
+            case 1:
+                UseAlternate = (bool)urand(0, 1);
+                if (!UseAlternate)
+                {
+                    for (int i = 0; i < 9; i++)
+                        AddWaypoint(i, SecondPortalTrashWPs1[i][0] + irand(-1, 1), SecondPortalTrashWPs1[i][1] + irand(-1, 1), SecondPortalTrashWPs1[i][2], 0);
+                    me->SetHomePosition(SecondPortalTrashWPs1[8][0] + irand(-1, 1), SecondPortalTrashWPs1[8][1] + irand(-1, 1), SecondPortalTrashWPs1[8][2] + irand(-1, 1), 3.149439f);
+                }
+                else
+                {
+                    for (int i = 0; i < 8; i++)
+                        AddWaypoint(i, SecondPortalTrashWPs2[i][0] + irand(-1, 1), SecondPortalTrashWPs2[i][1] + irand(-1, 1), SecondPortalTrashWPs2[i][2], 0);
+                    me->SetHomePosition(SecondPortalTrashWPs2[7][0], SecondPortalTrashWPs2[7][1], SecondPortalTrashWPs2[7][2], 3.149439f);
+                }
+                break;
+            case 2:
+                for (int i = 0; i < 8; i++)
+                    AddWaypoint(i, ThirdPortalTrashWPs[i][0] + irand(-1, 1), ThirdPortalTrashWPs[i][1] + irand(-1, 1), ThirdPortalTrashWPs[i][2], 0);
+                me->SetHomePosition(ThirdPortalTrashWPs[7][0], ThirdPortalTrashWPs[7][1], ThirdPortalTrashWPs[7][2], 3.149439f);
+                break;
+            case 3:
+                for (int i = 0; i < 9; i++)
+                    AddWaypoint(i, FourthPortalTrashWPs[i][0] + irand(-1, 1), FourthPortalTrashWPs[i][1] + irand(-1, 1), FourthPortalTrashWPs[i][2], 0);
+                me->SetHomePosition(FourthPortalTrashWPs[8][0], FourthPortalTrashWPs[8][1], FourthPortalTrashWPs[8][2], 3.149439f);
+                break;
+            case 4:
+                for (int i = 0; i < 6; i++)
+                    AddWaypoint(i, FifthPortalTrashWPs[i][0] + irand(-1, 1), FifthPortalTrashWPs[i][1] + irand(-1, 1), FifthPortalTrashWPs[i][2], 0);
+                me->SetHomePosition(FifthPortalTrashWPs[5][0], FifthPortalTrashWPs[5][1], FifthPortalTrashWPs[5][2], 3.149439f);
+                break;
+            case 5:
+                for (int i = 0; i < 4; i++)
+                    AddWaypoint(i, SixthPoralTrashWPs[i][0] + irand(-1, 1), SixthPoralTrashWPs[i][1] + irand(-1, 1), SixthPoralTrashWPs[i][2], 0);
+                me->SetHomePosition(SixthPoralTrashWPs[3][0], SixthPoralTrashWPs[3][1], SixthPoralTrashWPs[3][2], 3.149439f);
+                break;
+        }
+        SetDespawnAtEnd(false);
+        Start(true);
+    }
+
     void UpdateAI(uint32 diff) override
     {
-        if (!AddedWaypoints)
-        {
-            AddedWaypoints = true;
-            switch (PortalLoc)
-            {
-                case 0:
-                    for (int i = 0; i < 6; i++)
-                        AddWaypoint(i, FirstPortalTrashWPs[i][0] + irand(-1, 1), FirstPortalTrashWPs[i][1] + irand(-1, 1), FirstPortalTrashWPs[i][2] + irand(-1, 1), 0);
-                    me->SetHomePosition(FirstPortalTrashWPs[5][0], FirstPortalTrashWPs[5][1], FirstPortalTrashWPs[5][2], 3.149439f);
-                    break;
-                case 1:
-                    UseAlternate = (bool)urand(0, 1);
-                    if (!UseAlternate)
-                    {
-                        for (int i = 0; i < 9; i++)
-                            AddWaypoint(i, SecondPortalTrashWPs1[i][0] + irand(-1, 1), SecondPortalTrashWPs1[i][1] + irand(-1, 1), SecondPortalTrashWPs1[i][2], 0);
-                        me->SetHomePosition(SecondPortalTrashWPs1[8][0] + irand(-1, 1), SecondPortalTrashWPs1[8][1] + irand(-1, 1), SecondPortalTrashWPs1[8][2] + irand(-1, 1), 3.149439f);
-                    }
-                    else
-                    {
-                        for (int i = 0; i < 8; i++)
-                            AddWaypoint(i, SecondPortalTrashWPs2[i][0] + irand(-1, 1), SecondPortalTrashWPs2[i][1] + irand(-1, 1), SecondPortalTrashWPs2[i][2], 0);
-                        me->SetHomePosition(SecondPortalTrashWPs2[7][0], SecondPortalTrashWPs2[7][1], SecondPortalTrashWPs2[7][2], 3.149439f);
-                    }
-                    break;
-                case 2:
-                    for (int i = 0; i < 8; i++)
-                        AddWaypoint(i, ThirdPortalTrashWPs[i][0] + irand(-1, 1), ThirdPortalTrashWPs[i][1] + irand(-1, 1), ThirdPortalTrashWPs[i][2], 0);
-                    me->SetHomePosition(ThirdPortalTrashWPs[7][0], ThirdPortalTrashWPs[7][1], ThirdPortalTrashWPs[7][2], 3.149439f);
-                    break;
-                case 3:
-                    for (int i = 0; i < 9; i++)
-                        AddWaypoint(i, FourthPortalTrashWPs[i][0] + irand(-1, 1), FourthPortalTrashWPs[i][1] + irand(-1, 1), FourthPortalTrashWPs[i][2], 0);
-                    me->SetHomePosition(FourthPortalTrashWPs[8][0], FourthPortalTrashWPs[8][1], FourthPortalTrashWPs[8][2], 3.149439f);
-                    break;
-                case 4:
-                    for (int i = 0; i < 6; i++)
-                        AddWaypoint(i, FifthPortalTrashWPs[i][0] + irand(-1, 1), FifthPortalTrashWPs[i][1] + irand(-1, 1), FifthPortalTrashWPs[i][2], 0);
-                    me->SetHomePosition(FifthPortalTrashWPs[5][0], FifthPortalTrashWPs[5][1], FifthPortalTrashWPs[5][2], 3.149439f);
-                    break;
-                case 5:
-                    for (int i = 0; i < 4; i++)
-                        AddWaypoint(i, SixthPoralTrashWPs[i][0] + irand(-1, 1), SixthPoralTrashWPs[i][1] + irand(-1, 1), SixthPoralTrashWPs[i][2], 0);
-                    me->SetHomePosition(SixthPoralTrashWPs[3][0], SixthPoralTrashWPs[3][1], SixthPoralTrashWPs[3][2], 3.149439f);
-                    break;
-            }
-            SetDespawnAtEnd(false);
-            Start(true);
-        }
-
         npc_escortAI::UpdateAI(diff);
     }
 
@@ -302,7 +302,6 @@ struct violet_hold_trashAI : public npc_escortAI
 
 protected:
     InstanceScript* Instance;
-    bool AddedWaypoints;
     uint32 PortalLoc;
     bool UseAlternate;
 };
@@ -834,7 +833,6 @@ struct npc_azure_saboteur : public npc_escortAI
         _boss = _instance->GetData(DATA_WAVE_COUNT) == 6
             ? _instance->GetPersistentData(PERSISTENT_DATA_FIRST_BOSS)
             : _instance->GetPersistentData(PERSISTENT_DATA_SECOND_BOSS);
-        _addedWaypoints = false;
         _isOpening = false;
     }
 
@@ -870,47 +868,48 @@ struct npc_azure_saboteur : public npc_escortAI
         }
     }
 
+    void InitializeAI() override
+    {
+        npc_escortAI::InitializeAI();
+
+        switch (_boss)
+        {
+            case BOSS_MORAGG:
+                for (int i = 0; i < 3; i++)
+                    AddWaypoint(i, SaboteurFinalPos1[i][0], SaboteurFinalPos1[i][1], SaboteurFinalPos1[i][2], 0);
+                me->SetHomePosition(SaboteurFinalPos1[2][0], SaboteurFinalPos1[2][1], SaboteurFinalPos1[2][2], 4.762346f);
+                break;
+            case BOSS_EREKEM:
+                for (int i = 0; i < 3; i++)
+                    AddWaypoint(i, SaboteurFinalPos2[i][0], SaboteurFinalPos2[i][1], SaboteurFinalPos2[i][2], 0);
+                me->SetHomePosition(SaboteurFinalPos2[2][0], SaboteurFinalPos2[2][1], SaboteurFinalPos2[2][2], 1.862674f);
+                break;
+            case BOSS_ICHORON:
+                for (int i = 0; i < 2; i++)
+                    AddWaypoint(i, SaboteurFinalPos3[i][0], SaboteurFinalPos3[i][1], SaboteurFinalPos3[i][2], 0);
+                me->SetHomePosition(SaboteurFinalPos3[1][0], SaboteurFinalPos3[1][1], SaboteurFinalPos3[1][2], 5.500638f);
+                break;
+            case BOSS_LAVANTHOR:
+                AddWaypoint(0, SaboteurFinalPos4[0], SaboteurFinalPos4[1], SaboteurFinalPos4[2], 0);
+                me->SetHomePosition(SaboteurFinalPos4[0], SaboteurFinalPos4[1], SaboteurFinalPos4[2], 3.991108f);
+                break;
+            case BOSS_XEVOZZ:
+                AddWaypoint(0, SaboteurFinalPos5[0], SaboteurFinalPos5[1], SaboteurFinalPos5[2], 0);
+                me->SetHomePosition(SaboteurFinalPos5[0], SaboteurFinalPos5[1], SaboteurFinalPos5[2], 1.100841f);
+                break;
+            case BOSS_ZURAMAT:
+                for (int i = 0; i < 5; i++)
+                    AddWaypoint(i, SaboteurFinalPos6[i][0], SaboteurFinalPos6[i][1], SaboteurFinalPos6[i][2], 0);
+                me->SetHomePosition(SaboteurFinalPos6[4][0], SaboteurFinalPos6[4][1], SaboteurFinalPos6[4][2], 0.983031f);
+                break;
+        }
+        SetDespawnAtEnd(false);
+        Start(true);
+    }
+
     void UpdateAI(uint32 diff) override
     {
         npc_escortAI::UpdateAI(diff);
-
-        if (!_addedWaypoints)
-        {
-            _addedWaypoints = true;
-            switch (_boss)
-            {
-                case BOSS_MORAGG:
-                    for (int i = 0; i < 3; i++)
-                        AddWaypoint(i, SaboteurFinalPos1[i][0], SaboteurFinalPos1[i][1], SaboteurFinalPos1[i][2], 0);
-                    me->SetHomePosition(SaboteurFinalPos1[2][0], SaboteurFinalPos1[2][1], SaboteurFinalPos1[2][2], 4.762346f);
-                    break;
-                case BOSS_EREKEM:
-                    for (int i = 0; i < 3; i++)
-                        AddWaypoint(i, SaboteurFinalPos2[i][0], SaboteurFinalPos2[i][1], SaboteurFinalPos2[i][2], 0);
-                    me->SetHomePosition(SaboteurFinalPos2[2][0], SaboteurFinalPos2[2][1], SaboteurFinalPos2[2][2], 1.862674f);
-                    break;
-                case BOSS_ICHORON:
-                    for (int i = 0; i < 2; i++)
-                        AddWaypoint(i, SaboteurFinalPos3[i][0], SaboteurFinalPos3[i][1], SaboteurFinalPos3[i][2], 0);
-                    me->SetHomePosition(SaboteurFinalPos3[1][0], SaboteurFinalPos3[1][1], SaboteurFinalPos3[1][2], 5.500638f);
-                    break;
-                case BOSS_LAVANTHOR:
-                    AddWaypoint(0, SaboteurFinalPos4[0], SaboteurFinalPos4[1], SaboteurFinalPos4[2], 0);
-                    me->SetHomePosition(SaboteurFinalPos4[0], SaboteurFinalPos4[1], SaboteurFinalPos4[2], 3.991108f);
-                    break;
-                case BOSS_XEVOZZ:
-                    AddWaypoint(0, SaboteurFinalPos5[0], SaboteurFinalPos5[1], SaboteurFinalPos5[2], 0);
-                    me->SetHomePosition(SaboteurFinalPos5[0], SaboteurFinalPos5[1], SaboteurFinalPos5[2], 1.100841f);
-                    break;
-                case BOSS_ZURAMAT:
-                    for (int i = 0; i < 5; i++)
-                        AddWaypoint(i, SaboteurFinalPos6[i][0], SaboteurFinalPos6[i][1], SaboteurFinalPos6[i][2], 0);
-                    me->SetHomePosition(SaboteurFinalPos6[4][0], SaboteurFinalPos6[4][1], SaboteurFinalPos6[4][2], 0.983031f);
-                    break;
-            }
-            SetDespawnAtEnd(false);
-            Start(true);
-        }
 
         if (_isOpening)
         {
@@ -951,7 +950,6 @@ struct npc_azure_saboteur : public npc_escortAI
 
 private:
     InstanceScript* _instance;
-    bool _addedWaypoints;
     uint8 _boss;
     bool _isOpening;
     EventMap _events;

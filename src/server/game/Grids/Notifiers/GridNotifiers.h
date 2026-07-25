@@ -91,9 +91,18 @@ namespace Acore
     {
         Unit& i_unit;
         bool isCreature;
-        explicit AIRelocationNotifier(Unit& unit) : i_unit(unit), isCreature(unit.IsCreature())  {}
+        bool includePlayers;
+        explicit AIRelocationNotifier(Unit& unit, bool includePlayers = false) : i_unit(unit), isCreature(unit.IsCreature()), includePlayers(includePlayers)  {}
         template<class T> void Visit(GridRefMgr<T>&) {}
         void Visit(CreatureMapType&);
+        void Visit(PlayerMapType&);
+    };
+
+    enum class TeamFilter
+    {
+        All,
+        OwnTeam,
+        OtherTeam,
     };
 
     struct MessageDistDeliverer
@@ -102,26 +111,49 @@ namespace Acore
         WorldPacket const* i_message;
         uint32 i_phaseMask;
         float i_distSq;
+        TeamFilter teamFilter;
         TeamId teamId;
         Player const* skipped_receiver;
         bool required3dDist;
-        MessageDistDeliverer(WorldObject const* src, WorldPacket const* msg, float dist, bool own_team_only = false, Player const* skipped = nullptr, bool req3dDist = false)
-            : i_source(src), i_message(msg), i_phaseMask(src->GetPhaseMask()), i_distSq(dist * dist)
-            , teamId((own_team_only && src->IsPlayer()) ? src->ToPlayer()->GetTeamId() : TEAM_NEUTRAL)
-            , skipped_receiver(skipped), required3dDist(req3dDist)
-        {
-        }
+
+        MessageDistDeliverer(WorldObject const* src, WorldPacket const* msg, float dist, TeamFilter teamFilter = TeamFilter::All, Player const* skipped = nullptr, bool req3dDist = false) :
+            i_source(src),
+            i_message(msg),
+            i_phaseMask(src->GetPhaseMask()),
+            i_distSq(dist * dist),
+            teamFilter(src->IsPlayer() ? teamFilter : TeamFilter::All),
+            teamId(src->IsPlayer() ? src->ToPlayer()->GetTeamId() : TEAM_NEUTRAL),
+            skipped_receiver(skipped),
+            required3dDist(req3dDist)
+        { }
+
         void Visit(VisiblePlayersMap const& m);
         void Visit(PlayerMapType& m);
         void Visit(CreatureMapType& m);
         void Visit(DynamicObjectMapType& m);
-        template<class SKIP> void Visit(GridRefMgr<SKIP>&) {}
 
-        void SendPacket(Player* player)
+        template <class SKIP> void Visit(GridRefMgr<SKIP>&) { }
+
+        void SendPacket(Player* player) const
         {
             // never send packet to self
-            if (player == i_source || (teamId != TEAM_NEUTRAL && player->GetTeamId() != teamId) || skipped_receiver == player)
+            if (player == i_source || skipped_receiver == player)
                 return;
+
+            switch (teamFilter)
+            {
+                default:
+                case TeamFilter::All:
+                    break;
+                case TeamFilter::OwnTeam:
+                    if (player->GetTeamId() != teamId)
+                        return;
+                    break;
+                case TeamFilter::OtherTeam:
+                    if (player->GetTeamId() == teamId)
+                        return;
+                    break;
+            }
 
             if (!player->HaveAtClient(i_source))
                 return;

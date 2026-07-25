@@ -26,7 +26,7 @@ void ScriptMgr::OnLootMoney(Player* player, uint32 gold)
     CALL_ENABLED_HOOKS(LootScript, LOOTHOOK_ON_LOOT_MONEY, script->OnLootMoney(player, gold));
 }
 
-LootScript::LootScript(const char* name, std::vector<uint16> enabledHooks)
+LootScript::LootScript(char const* name, std::vector<uint16> enabledHooks)
     : ScriptObject(name, LOOTHOOK_END)
 {
     // If empty - enable all available hooks.
