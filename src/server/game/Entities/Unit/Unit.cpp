@@ -7468,6 +7468,15 @@ bool Unit::Attack(Unit* victim, bool meleeAttack)
     return true;
 }
 
+bool Unit::ForceAttack(Unit* target)
+{
+    if (!target)
+        return false;
+
+    _forcedCombatTargets.insert(target->GetGUID());
+    return Attack(target, true);
+}
+
 /**
  * @brief Force the unit to stop attacking. This will clear UNIT_STATE_MELEE_ATTACKING,
  * Interrupt current spell, AI assistance, and call SendMeleeAttackStop() to the client
@@ -7512,6 +7521,7 @@ void Unit::CombatStop(bool includingCast, bool mutualPvP)
 
     AttackStop();
     RemoveAllAttackers();
+    _forcedCombatTargets.clear();
     if (IsPlayer())
         ToPlayer()->SendAttackSwingCancelAttack();     // melee and ranged forced attack cancel
     if (Creature* pCreature = ToCreature())
@@ -10560,6 +10570,18 @@ void Unit::Dismount()
         data << player->GetCollisionHeight();
         player->SendDirectMessage(&data);
         player->GetSession()->IncrementOrderCounter();
+
+        // Client bug workaround: dismounting a flying mount while holding a movement key can
+        // leave the 3.3.5a client stuck playing the swim animation while falling (issue #25992).
+        // A small knockback nudges the client into re-evaluating its fall state cleanly.
+        // Kept below 1.0f to stay visually unnoticeable, but above the 0.1f threshold
+        // EffectKnockBack treats as a no-op (SpellEffects.cpp), so the client actually registers it.
+        if (IsFlying())
+        {
+            float x, y, z;
+            GetPosition(x, y, z);
+            KnockbackFrom(x, y, 0.5f, 0.5f);
+        }
     }
 
     WorldPacket data(SMSG_DISMOUNT, 8);
@@ -10765,9 +10787,12 @@ bool Unit::_IsValidAttackTarget(Unit const* target, SpellInfo const* bySpell, Wo
             || ((GetEntry() != WORLD_TRIGGER && (!obj || !obj->isType(TYPEMASK_GAMEOBJECT | TYPEMASK_DYNAMICOBJECT))) && target->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && IsImmuneToPC()))
         return false;
 
-    // CvC case - can attack each other only when one of them is hostile
+    // CvC case - can attack each other only when one of them is hostile, or when the pairing
+    // was explicitly authorized via ForceAttack() for a scripted/SmartAI-driven combat
+    // sequence between otherwise mutually-neutral creatures (see issue #26659)
     if (!HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && !target->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED))
-        return GetReactionTo(target) <= REP_HOSTILE || target->GetReactionTo(this) <= REP_HOSTILE;
+        return GetReactionTo(target) <= REP_HOSTILE || target->GetReactionTo(this) <= REP_HOSTILE
+            || HasForcedCombatWith(target) || target->HasForcedCombatWith(this);
 
     // PvP, PvC, CvP case
     // can't attack friendly targets

@@ -1544,6 +1544,21 @@ void SmartScript::ProcessAction(SmartScriptHolder& e, Unit* unit, uint32 var0, u
                     unitTarget->AttackStop();
             break;
         }
+        case SMART_ACTION_FORCE_ATTACK_START:
+        {
+            if (!me)
+                break;
+
+            if (targets.empty())
+                break;
+
+            // authorizes combat even against a mutually non-hostile target (e.g. two Neutral
+            // creatures) - see Unit::ForceAttack() and issue #26659
+            if (Unit* target = Acore::Containers::SelectRandomContainerElement(targets)->ToUnit())
+                if (me->ForceAttack(target))
+                    me->GetMotionMaster()->MoveChase(target);
+            break;
+        }
         case SMART_ACTION_SUMMON_CREATURE:
         {
             EnumFlag<SmartActionSummonCreatureFlags> flags(static_cast<SmartActionSummonCreatureFlags>(e.action.summonCreature.flags));

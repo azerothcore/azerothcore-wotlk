@@ -895,6 +895,16 @@ public:
 
     bool Attack(Unit* victim, bool meleeAttack);
 
+    // Authorizes lethal combat against a target that would otherwise be rejected by
+    // _IsValidAttackTarget/_IsTargetAcceptable for being mutually non-hostile (e.g. two
+    // Neutral-faction creatures), for scripted/SmartAI-driven combat sequences confirmed
+    // against retail sniffs (see issue #26659 - Lady Alistra vs Cenarion Scout, and similar).
+    // Transient and in-memory only, cleared in CombatStop() - not a persistent faction
+    // change and not inferred from unrelated SetInCombatWith() calls, so it can't leak into
+    // existing non-lethal scripted encounters (RP sparring, etc).
+    bool ForceAttack(Unit* target);
+    [[nodiscard]] bool HasForcedCombatWith(Unit const* target) const { return _forcedCombatTargets.find(target->GetGUID()) != _forcedCombatTargets.end(); }
+
     void CastStop(uint32 except_spellid = 0, bool withInstant = true);
     bool AttackStop();
     void RemoveAllAttackers();
@@ -2148,6 +2158,7 @@ protected:
 
     AttackerSet m_attackers;
     Unit* m_attacking;
+    std::unordered_set<ObjectGuid> _forcedCombatTargets; // see ForceAttack()/HasForcedCombatWith()
 
     DeathState m_deathState;
 
