@@ -306,7 +306,7 @@ jobs:
         timeout-minutes: 30
         continue-on-error: false
 
-      # Proves the gate above actually gates.
+      # Proves the dry-run steps above actually fail on a bad import.
       - name: Verify a broken SQL update fails the dry run
         run: |
           # Absolute: the trap fires after the cd below.
@@ -320,9 +320,9 @@ jobs:
           source ./acore.sh config load
           cd env/dist/bin
 
-          # The exit code is the assertion here, so it has to survive the tee. Without this
-          # the step fails on a healthy tree as soon as it gains a `shell: bash`, which
-          # turns pipefail on and lets errexit abort on the expected exit 1.
+          # Without this the step fails on a healthy tree as soon as it gains a
+          # `shell: bash`: that turns pipefail on, so errexit aborts on the exit 1 the
+          # assertions below are here to check for.
           set +o pipefail
           timeout 5m ./worldserver -dry-run 2>&1 | tee "$RUNNER_TEMP/broken-update-dry-run.log"
           status=${PIPESTATUS[0]}
