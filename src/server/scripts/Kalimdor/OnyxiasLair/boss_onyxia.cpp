@@ -84,6 +84,15 @@ enum Phases
     PHASE_LANDED    // Phase 3 - Landed after Airphase - 40% health
 };
 
+// Ids 0-8 are reserved for the OnyxiaMoveData waypoints
+enum Points
+{
+    POINT_GROUND_SOUTH  = 10,
+    POINT_TAKEOFF       = 11,
+    POINT_PRE_LAND      = 12,
+    POINT_LAND          = 13
+};
+
 struct sOnyxMove
 {
     uint8 CurrId, DestId;
@@ -124,11 +133,12 @@ public:
 
     void Initialize()
     {
+        Phase = PHASE_NONE;
         CurrentWP = 0;
         whelpSpam = false;
         whelpCount = 0;
         whelpSpamTimer = 0;
-        bManyWhelpsAvailable = false;
+        manyWhelpsAvailable = false;
     }
 
     void SetPhase(uint8 ph)
@@ -168,8 +178,8 @@ public:
     {
         switch (param)
         {
-            case -1:
-                if (bManyWhelpsAvailable)
+            case ACTION_WHELP_SUMMONED:
+                if (manyWhelpsAvailable)
                 {
                     instance->SetData(DATA_WHELP_SUMMONED, 1);
                 }
@@ -244,19 +254,19 @@ public:
         {
             switch (id)
             {
-                case 10:
+                case POINT_GROUND_SOUTH:
                     me->SetFacingTo(OnyxiaMoveData[0].o);
                     events.ScheduleEvent(EVENT_LIFTOFF, 0ms);
                     break;
-                case 11:
+                case POINT_TAKEOFF:
                     me->SetFacingTo(OnyxiaMoveData[1].o);
                     events.ScheduleEvent(EVENT_FLY_S_TO_N, 0ms);
                     break;
-                case 12:
+                case POINT_PRE_LAND:
                     me->SetFacingTo(OnyxiaMoveData[1].o);
                     events.ScheduleEvent(EVENT_LAND, 0ms);
                     break;
-                case 13:
+                case POINT_LAND:
                     me->SetCanFly(false);
                     me->SetDisableGravity(false);
                     me->SetSpeed(MOVE_RUN, me->GetCreatureTemplate()->speed_run, false);
@@ -264,6 +274,15 @@ public:
                     break;
             }
         }
+    }
+
+    // Summons one whelp at each of the two side caves
+    void SummonWhelps()
+    {
+        float angle = rand_norm() * 2 * M_PI;
+        float dist  = rand_norm() * 4.0f;
+        me->CastSpell(-33.18f + std::cos(angle) * dist, -258.80f + std::sin(angle) * dist, -89.0f, SPELL_SUMMON_WHELP, true);
+        me->CastSpell(-32.535f + std::cos(angle) * dist, -170.190f + std::sin(angle) * dist, -89.0f, SPELL_SUMMON_WHELP, true);
     }
 
     void HandleWhelpSpam(const uint32 diff)
@@ -275,10 +294,7 @@ public:
                 whelpSpamTimer -= diff;
                 if (whelpSpamTimer <= 0)
                 {
-                    float angle = rand_norm() * 2 * M_PI;
-                    float dist  = rand_norm() * 4.0f;
-                    me->CastSpell(-33.18f + cos(angle) * dist, -258.80f + std::sin(angle) * dist, -89.0f, 17646, true);
-                    me->CastSpell(-32.535f + cos(angle) * dist, -170.190f + std::sin(angle) * dist, -89.0f, 17646, true);
+                    SummonWhelps();
                     whelpCount += 2;
                     whelpSpamTimer += 600;
                 }
@@ -319,8 +335,6 @@ public:
             return;
         }
 
-        DoMeleeAttackIfReady();
-
         switch (events.ExecuteEvent())
         {
             case EVENT_SPELL_WINGBUFFET:
@@ -353,7 +367,7 @@ public:
                 me->SetReactState(REACT_PASSIVE);
                 me->StopMoving();
                 DoResetThreatList();
-                me->GetMotionMaster()->MovePoint(10, OnyxiaMoveData[0].x, OnyxiaMoveData[0].y, OnyxiaMoveData[0].z);
+                me->GetMotionMaster()->MovePoint(POINT_GROUND_SOUTH, OnyxiaMoveData[0].x, OnyxiaMoveData[0].y, OnyxiaMoveData[0].z);
                 break;
             }
             case EVENT_LIFTOFF:
@@ -366,14 +380,14 @@ public:
                 me->SetDisableGravity(true);
                 me->SetOrientation(OnyxiaMoveData[0].o);
                 me->SendMovementFlagUpdate();
-                me->GetMotionMaster()->MoveTakeoff(11, OnyxiaMoveData[1].x + 1.0f, OnyxiaMoveData[1].y, OnyxiaMoveData[1].z, 12.0f);
-                bManyWhelpsAvailable = true;
+                me->GetMotionMaster()->MoveTakeoff(POINT_TAKEOFF, OnyxiaMoveData[1].x + 1.0f, OnyxiaMoveData[1].y, OnyxiaMoveData[1].z, 12.0f);
+                manyWhelpsAvailable = true;
 
                 events.RescheduleEvent(EVENT_END_MANY_WHELPS_TIME, 10s);
                 break;
             }
             case EVENT_END_MANY_WHELPS_TIME:
-                bManyWhelpsAvailable = false;
+                manyWhelpsAvailable = false;
                 break;
             case EVENT_FLY_S_TO_N:
             {
@@ -401,16 +415,16 @@ public:
             {
                 Talk(SAY_PHASE_3_TRANS);
                 me->SendMeleeAttackStop(me->GetVictim());
-                me->GetMotionMaster()->MoveLand(13, OnyxiaMoveData[0].x + 1.0f, OnyxiaMoveData[0].y, OnyxiaMoveData[0].z, 12.0f);
+                me->GetMotionMaster()->MoveLand(POINT_LAND, OnyxiaMoveData[0].x + 1.0f, OnyxiaMoveData[0].y, OnyxiaMoveData[0].z, 12.0f);
                 DoResetThreatList();
                 break;
             }
             case EVENT_SPELL_FIREBALL_FIRST:
             {
-                if (Unit* v = SelectTarget(SelectTargetMethod::Random, 0, 200.0f, true))
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200.0f, true))
                 {
-                    me->SetFacingToObject(v);
-                    DoCast(v, SPELL_FIREBALL);
+                    me->SetFacingToObject(target);
+                    DoCast(target, SPELL_FIREBALL);
                 }
 
                 events.ScheduleEvent(EVENT_SPELL_FIREBALL_SECOND, 4s);
@@ -418,24 +432,23 @@ public:
             }
             case EVENT_SPELL_FIREBALL_SECOND:
             {
-                if (Unit* v = SelectTarget(SelectTargetMethod::Random, 0, 200.0f, true))
+                if (Unit* target = SelectTarget(SelectTargetMethod::Random, 0, 200.0f, true))
                 {
-                    me->SetFacingToObject(v);
-                    DoCast(v, SPELL_FIREBALL);
+                    me->SetFacingToObject(target);
+                    DoCast(target, SPELL_FIREBALL);
                 }
 
-                uint8 rand = urand(0, 99);
-                if (rand < 33)
+                switch (urand(0, 2))
                 {
-                    events.ScheduleEvent(EVENT_PHASE_2_STEP_CW, 4s);
-                }
-                else if (rand < 66)
-                {
-                    events.ScheduleEvent(EVENT_PHASE_2_STEP_ACW, 4s);
-                }
-                else
-                {
-                    events.ScheduleEvent(EVENT_PHASE_2_STEP_ACROSS, 4s);
+                    case 0:
+                        events.ScheduleEvent(EVENT_PHASE_2_STEP_CW, 4s);
+                        break;
+                    case 1:
+                        events.ScheduleEvent(EVENT_PHASE_2_STEP_ACW, 4s);
+                        break;
+                    default:
+                        events.ScheduleEvent(EVENT_PHASE_2_STEP_ACROSS, 4s);
+                        break;
                 }
                 break;
             }
@@ -477,7 +490,7 @@ public:
             case EVENT_START_PHASE_3:
             {
                 me->SetSpeed(MOVE_RUN, 2.95f, false);
-                me->GetMotionMaster()->MovePoint(12, OnyxiaMoveData[1].x, OnyxiaMoveData[1].y, OnyxiaMoveData[1].z);
+                me->GetMotionMaster()->MovePoint(POINT_PRE_LAND, OnyxiaMoveData[1].x, OnyxiaMoveData[1].y, OnyxiaMoveData[1].z);
                 break;
             }
             case EVENT_PHASE_3_ATTACK:
@@ -509,27 +522,30 @@ public:
             }
             case EVENT_ERUPTION:
             {
-                if (Creature* trigger = me->SummonCreature(12758, *me, TEMPSUMMON_TIMED_DESPAWN, 1000))
+                if (Creature* trigger = me->SummonCreature(NPC_ONYXIA_TRIGGER, *me, TEMPSUMMON_TIMED_DESPAWN, 1000))
                 {
-                    trigger->CastSpell(trigger, 17731, false);
+                    trigger->CastSpell(trigger, SPELL_ERUPTION, false);
                 }
                 break;
             }
             case EVENT_SUMMON_WHELP:
             {
-                float angle = rand_norm() * 2 * M_PI;
-                float dist  = rand_norm() * 4.0f;
-                me->CastSpell(-33.18f + cos(angle) * dist, -258.80f + std::sin(angle) * dist, -89.0f, 17646, true);
-                me->CastSpell(-32.535f + cos(angle) * dist, -170.190f + std::sin(angle) * dist, -89.0f, 17646, true);
+                SummonWhelps();
                 events.Repeat(30s);
                 break;
             }
         }
+
+        DoMeleeAttackIfReady();
     }
 
     void SpellHitTarget(Unit* target, SpellInfo const* spell) override
     {
-        if (target->IsPlayer() && spell->DurationEntry && spell->DurationEntry->ID == 328 && spell->Effects[EFFECT_1].TargetA.GetTarget() == 1 && (spell->Effects[EFFECT_1].Amplitude == 50 || spell->Effects[EFFECT_1].Amplitude == 215)) // Deep Breath
+        // Deep Breath is a chain of dozens of triggered spells with no shared id,
+        // so identify a hit by the shape common to all of them
+        if (target->IsPlayer() && spell->DurationEntry && spell->DurationEntry->ID == 328
+            && spell->Effects[EFFECT_1].TargetA.GetTarget() == TARGET_UNIT_CASTER
+            && (spell->Effects[EFFECT_1].Amplitude == 50 || spell->Effects[EFFECT_1].Amplitude == 215))
         {
             instance->SetData(DATA_DEEP_BREATH_FAILED, 1);
         }
@@ -542,7 +558,7 @@ private:
     bool  whelpSpam;
     uint8 whelpCount;
     int32 whelpSpamTimer;
-    bool  bManyWhelpsAvailable;
+    bool  manyWhelpsAvailable;
 };
 
 struct npc_onyxian_lair_guard : public ScriptedAI
