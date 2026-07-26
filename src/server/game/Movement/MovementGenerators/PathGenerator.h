@@ -94,6 +94,12 @@ class PathGenerator
         // shortens the path until the destination is the specified distance from the target point
         void ShortenPathUntilDist(G3D::Vector3 const& point, float dist);
 
+        // walks the original (unsnapped) destination backward in small steps, from a path whose
+        // endpoint was never validated against the navmesh (PATHFIND_FARFROMPOLY), until a point
+        // with confirmed real ground close by is found, and truncates there. If no safe point is
+        // found anywhere along the path, it's left with only its starting point.
+        void ShortenPathUntilSafeGround();
+
         [[nodiscard]] float getPathLength() const
         {
             float len = 0.0f;
@@ -162,6 +168,7 @@ class PathGenerator
         dtPolyRef GetPathPolyByPosition(dtPolyRef const* polyPath, uint32 polyPathSize, float const* Point, float* Distance = nullptr) const;
         dtPolyRef GetPolyByLocation(float const* Point, float* Distance) const;
         [[nodiscard]] bool HaveTile(G3D::Vector3 const& p) const;
+        [[nodiscard]] bool HasWalkableNavmeshAt(G3D::Vector3 const& point, G3D::Vector3& snappedPoint) const;
 
         void BuildPolyPath(G3D::Vector3 const& startPos, G3D::Vector3 const& endPos);
         void BuildPointPath(float const* startPoint, float const* endPoint);

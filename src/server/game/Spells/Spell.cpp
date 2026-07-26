@@ -6261,7 +6261,25 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
                         else if (m_preGeneratedPath->IsInvalidDestinationZ(target)) // Check position z, if not in a straight line
                             return SPELL_FAILED_NOPATH;
 
-                        m_preGeneratedPath->ShortenPathUntilDist(G3D::Vector3(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ()), objSize); // move back
+                        // A path can come back as PATHFIND_NORMAL via a raw, unvalidated straight
+                        // line - e.g. while falling toward a target below - without either end
+                        // ever being confirmed on real, walkable navmesh. While falling, it's
+                        // usually the CASTER's own mid-air position that registers as far from a
+                        // polygon (PATHFIND_FARFROMPOLY_START), not the target's - so both flags
+                        // need checking, not just _END. This is what let charging Kologarn while
+                        // jumping carry the caster to his death (issue #26266): the straight line
+                        // ends near his model, over open space rather than the walkway. Rather
+                        // than fail the cast outright, walk the line backward until a point
+                        // confirmed on real navmesh is found and charge only that far - e.g. onto
+                        // the walkway in front of him instead of falling through where he stands.
+                        if (m_preGeneratedPath->GetPathType() & PATHFIND_FARFROMPOLY)
+                        {
+                            m_preGeneratedPath->ShortenPathUntilSafeGround();
+                            if (m_preGeneratedPath->GetPath().size() < 2)
+                                return SPELL_FAILED_NOPATH;
+                        }
+                        else
+                            m_preGeneratedPath->ShortenPathUntilDist(G3D::Vector3(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ()), objSize); // move back
                     }
                     if (Player* player = m_caster->ToPlayer())
                         player->SetCanTeleport(true);
