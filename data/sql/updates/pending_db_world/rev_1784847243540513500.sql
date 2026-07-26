@@ -39,3 +39,7 @@ INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, 
     (100735, 100735, 0, 0, 7, 0, 0),
     (100735, 100431, 15, 165, 519, 1, 8),
     (100735, 100704, 15, 205, 519, 1, 8);
+-- Remove Bythius SAI that spawns another set of plague-dogs
+UPDATE `creature_template` SET `AIName` = 'SmartAI' WHERE `entry` = 28212;
+
+DELETE FROM `smart_scripts` WHERE (`entryorguid` = 28212) AND (`source_type` = 0) AND (`id` IN (0, 1));
