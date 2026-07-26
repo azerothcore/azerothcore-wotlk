@@ -49,8 +49,7 @@ enum Events
     EVENT_ORMOROK_SPELL_REFLECTION          = 3,
     EVENT_ORMOROK_SUMMON                    = 4,
     EVENT_ORMOROK_HEALTH                    = 5,
-    EVENT_ORMOROK_SUMMON_SPIKES             = 6,
-    EVENT_KILL_TALK                         = 7
+    EVENT_ORMOROK_SUMMON_SPIKES             = 6
 };
 
 enum Misc
@@ -93,11 +92,7 @@ struct boss_ormorok : public BossAI
 
     void KilledUnit(Unit* /*victim*/) override
     {
-        if (!events.HasTimeUntilEvent(EVENT_KILL_TALK))
-        {
-            Talk(SAY_KILL);
-            events.ScheduleEvent(EVENT_KILL_TALK, 6s);
-        }
+        Talk(SAY_KILL);
     }
 
     void JustSummoned(Creature* summon) override

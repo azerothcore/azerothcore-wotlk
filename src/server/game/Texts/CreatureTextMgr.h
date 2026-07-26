@@ -71,9 +71,19 @@ struct CreatureTextId
     uint32 textId;
 };
 
+struct CreatureTextOptions
+{
+    uint32 cooldown;        // ms before this group can fire again
+    uint8  triggerChance;   // 0-100 chance to fire at all
+    bool   playerOnly;      // only fire if target is a player
+};
+
 typedef std::vector<CreatureTextEntry> CreatureTextGroup;              // texts in a group
 typedef std::unordered_map<uint8, CreatureTextGroup> CreatureTextHolder;    // groups for a creature by groupid
 typedef std::unordered_map<uint32, CreatureTextHolder> CreatureTextMap;     // all creatures by entry
+
+typedef std::unordered_map<uint8, CreatureTextOptions> CreatureTextOptionsMap;       // options per group
+typedef std::unordered_map<uint32, CreatureTextOptionsMap> CreatureTextOptionsContainer; // per creature entry
 
 typedef std::map<CreatureTextId, CreatureTextLocale> LocaleCreatureTextMap;
 
@@ -87,7 +97,9 @@ public:
     ~CreatureTextMgr() { }
     void LoadCreatureTexts();
     void LoadCreatureTextLocales();
+    void LoadCreatureTextOptions();
     CreatureTextMap  const& GetTextMap() const { return mTextMap; }
+    CreatureTextOptions const* GetTextOptions(uint32 entry, uint8 group) const;
 
     void SendSound(Creature* source, uint32 sound, ChatMsg msgType, WorldObject const* target, CreatureTextRange range, TeamId teamId, bool gmOnly);
     void SendEmote(Unit* source, uint32 emote);
@@ -105,6 +117,7 @@ private:
 
     CreatureTextMap mTextMap;
     LocaleCreatureTextMap mLocaleTextMap;
+    CreatureTextOptionsContainer mTextOptionsMap;
 };
 
 #define sCreatureTextMgr CreatureTextMgr::instance()

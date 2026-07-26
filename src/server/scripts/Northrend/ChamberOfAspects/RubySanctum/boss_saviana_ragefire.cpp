@@ -46,8 +46,7 @@ enum Events
     EVENT_CONFLAGRATION         = 4,
     EVENT_LAND_GROUND           = 5,
     EVENT_AIR_MOVEMENT          = 6,
-    EVENT_LAND_BACK             = 7,
-    EVENT_KILL_TALK             = 8
+    EVENT_LAND_BACK             = 7
 };
 
 enum Misc
@@ -121,11 +120,7 @@ public:
 
         void KilledUnit(Unit*  /*victim*/) override
         {
-            if (!events.HasTimeUntilEvent(EVENT_KILL_TALK))
-            {
-                Talk(SAY_KILL);
-                events.ScheduleEvent(EVENT_KILL_TALK, 6s);
-            }
+            Talk(SAY_KILL);
         }
 
         void UpdateAI(uint32 diff) override
