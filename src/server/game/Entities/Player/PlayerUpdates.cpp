@@ -2402,7 +2402,7 @@ void Player::ProcessSpellQueue()
     }
 }
 
-// pussywizard: save only the data flagged by AdditionalSavingAddMask shortly after
+// save only the data flagged by AdditionalSavingAddMask shortly after
 // important changes, so a crash loses at most a few seconds of them
 void Player::UpdateAdditionalSaves(uint32 p_time)
 {
@@ -2428,7 +2428,7 @@ void Player::UpdateAdditionalSaves(uint32 p_time)
     {
         _SaveQuestStatus(trans);
 
-        // xinef: if nothing changed, nothing will happen
+        // if nothing changed, nothing will happen
         _SaveDailyQuestStatus(trans);
         _SaveWeeklyQuestStatus(trans);
         _SaveSeasonalQuestStatus(trans);
