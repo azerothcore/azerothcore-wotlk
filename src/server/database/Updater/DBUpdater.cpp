@@ -282,10 +282,8 @@ bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool, std::string_view modulesL
         return false;
 
     UpdateFetcher updateFetcher(sourceDirectory, [&](std::string const & query) { DBUpdater<T>::Apply(pool, query); },
-    [&](Path const & file) { return DBUpdater<T>::ApplyFile(pool, file); },
+    [&](Path const & file) { DBUpdater<T>::ApplyFile(pool, file); },
     [&](std::string const & query) -> QueryResult { return DBUpdater<T>::Retrieve(pool, query); }, DBUpdater<T>::GetDBModuleName(), modulesList);
-
-    uint32 const failedBefore = DBUpdaterUtil::GetFailedUpdateCount();
 
     UpdateResult result;
     try
@@ -303,17 +301,10 @@ bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool, std::string_view modulesL
 
     std::string const info = Acore::StringFormat("Containing {} new and {} archived updates.", result.recent, result.archived);
 
-    // The counter is process-wide, so only the files this database just walked past count here.
-    uint32 const failed = DBUpdaterUtil::GetFailedUpdateCount() - failedBefore;
-
-    if (failed)
-        LOG_ERROR("sql.updates", ">> {} {} failed to apply to the {} database, see the errors above.",
-            failed, failed == 1 ? "update" : "updates", DBUpdater<T>::GetTableName());
-
-    if (result.updated)
-        LOG_INFO("sql.updates", ">> Applied {} {}. {}", result.updated, result.updated == 1 ? "query" : "queries", info);
-    else if (!failed)
+    if (!result.updated)
         LOG_INFO("sql.updates", ">> {} database is up-to-date! {}", DBUpdater<T>::GetTableName(), info);
+    else
+        LOG_INFO("sql.updates", ">> Applied {} {}. {}", result.updated, result.updated == 1 ? "query" : "queries", info);
 
     LOG_INFO("sql.updates", " ");
 
@@ -361,7 +352,7 @@ bool DBUpdater<T>::Update(DatabaseWorkerPool<T>& pool, std::vector<std::string> 
     }
 
     UpdateFetcher updateFetcher(sourceDirectory, [&](std::string const & query) { DBUpdater<T>::Apply(pool, query); },
-    [&](Path const & file) { return DBUpdater<T>::ApplyFile(pool, file); },
+    [&](Path const & file) { DBUpdater<T>::ApplyFile(pool, file); },
     [&](std::string const & query) -> QueryResult { return DBUpdater<T>::Retrieve(pool, query); }, DBUpdater<T>::GetDBModuleName(), setDirectories);
 
     UpdateResult result;
@@ -467,14 +458,14 @@ void DBUpdater<T>::Apply(DatabaseWorkerPool<T>& pool, std::string const& query)
 }
 
 template<class T>
-bool DBUpdater<T>::ApplyFile(DatabaseWorkerPool<T>& pool, Path const& path)
+void DBUpdater<T>::ApplyFile(DatabaseWorkerPool<T>& pool, Path const& path)
 {
-    return DBUpdater<T>::ApplyFile(pool, pool.GetConnectionInfo()->host, pool.GetConnectionInfo()->user, pool.GetConnectionInfo()->password,
-                                   pool.GetConnectionInfo()->port_or_socket, pool.GetConnectionInfo()->database, pool.GetConnectionInfo()->ssl, path);
+    DBUpdater<T>::ApplyFile(pool, pool.GetConnectionInfo()->host, pool.GetConnectionInfo()->user, pool.GetConnectionInfo()->password,
+                            pool.GetConnectionInfo()->port_or_socket, pool.GetConnectionInfo()->database, pool.GetConnectionInfo()->ssl, path);
 }
 
 template<class T>
-bool DBUpdater<T>::ApplyFile(DatabaseWorkerPool<T>& pool, std::string const& host, std::string const& user,
+void DBUpdater<T>::ApplyFile(DatabaseWorkerPool<T>& pool, std::string const& host, std::string const& user,
                              std::string const& password, std::string const& port_or_socket, std::string const& database, std::string const& ssl, Path const& path)
 {
     std::string configTempDir = sConfigMgr->GetOption<std::string>("TempDir", "");
@@ -560,11 +551,7 @@ bool DBUpdater<T>::ApplyFile(DatabaseWorkerPool<T>& pool, std::string const& hos
 
             throw UpdateException("update failed");
         }
-
-        return false;
     }
-
-    return true;
 }
 
 template class AC_DATABASE_API DBUpdater<LoginDatabaseConnection>;

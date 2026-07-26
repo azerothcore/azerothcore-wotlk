@@ -46,12 +46,12 @@ class AC_DATABASE_API UpdateFetcher
 public:
     UpdateFetcher(Path const& updateDirectory,
                   std::function<void(std::string const&)> const& apply,
-                  std::function<bool(Path const& path)> const& applyFile,
+                  std::function<void(Path const& path)> const& applyFile,
                   std::function<QueryResult(std::string const&)> const& retrieve, std::string const& dbModuleName, std::vector<std::string> const* setDirectories = nullptr);
 
     UpdateFetcher(Path const& updateDirectory,
         std::function<void(std::string const&)> const& apply,
-        std::function<bool(Path const& path)> const& applyFile,
+        std::function<void(Path const& path)> const& applyFile,
         std::function<QueryResult(std::string const&)> const& retrieve,
         std::string const& dbModuleName,
         std::string_view modulesList = {});
@@ -149,7 +149,7 @@ private:
 
     std::string ReadSQLUpdate(Path const& file) const;
 
-    bool Apply(Path const& path, uint32& speed) const;
+    uint32 Apply(Path const& path) const;
 
     void UpdateEntry(AppliedFileEntry const& entry, uint32 const speed = 0) const;
     void RenameEntry(std::string const& from, std::string const& to) const;
@@ -160,7 +160,7 @@ private:
     std::unique_ptr<Path> const _sourceDirectory;
 
     std::function<void(std::string const&)> const _apply;
-    std::function<bool(Path const& path)> const _applyFile;
+    std::function<void(Path const& path)> const _applyFile;
     std::function<QueryResult(std::string const&)> const _retrieve;
 
     // modules

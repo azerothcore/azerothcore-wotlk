@@ -39,7 +39,7 @@ struct UpdateFetcher::DirectoryEntry
 
 UpdateFetcher::UpdateFetcher(Path const& sourceDirectory,
                              std::function<void(std::string const&)> const& apply,
-                             std::function<bool(Path const& path)> const& applyFile,
+                             std::function<void(Path const& path)> const& applyFile,
                              std::function<QueryResult(std::string const&)> const& retrieve, std::string const& dbModuleName, std::vector<std::string> const* setDirectories /*= nullptr*/) :
     _sourceDirectory(std::make_unique<Path>(sourceDirectory)), _apply(apply), _applyFile(applyFile),
     _retrieve(retrieve), _dbModuleName(dbModuleName), _setDirectories(setDirectories)
@@ -48,7 +48,7 @@ UpdateFetcher::UpdateFetcher(Path const& sourceDirectory,
 
 UpdateFetcher::UpdateFetcher(Path const& sourceDirectory,
     std::function<void(std::string const&)> const& apply,
-    std::function<bool(Path const& path)> const& applyFile,
+    std::function<void(Path const& path)> const& applyFile,
     std::function<QueryResult(std::string const&)> const& retrieve,
     std::string const& dbModuleName,
     std::string_view modulesList /*= {}*/) :
@@ -374,19 +374,20 @@ UpdateResult UpdateFetcher::Update(bool const redundancyChecks,
         uint32 speed = 0;
         AppliedFileEntry const file = { filePath.filename().string(), hash, fileState, 0 };
 
-        // Only ever false in a dry run, which keeps going after a bad file; otherwise Apply throws.
-        bool const wasApplied = mode != MODE_APPLY || Apply(filePath, speed);
+        switch (mode)
+        {
+            case MODE_APPLY:
+                speed = Apply(filePath);
+                [[fallthrough]];
+            case MODE_REHASH:
+                UpdateEntry(file, speed);
+                break;
+        }
 
-        // Leaving a failed file unrecorded keeps the next start from treating it as done.
-        if (wasApplied)
-            UpdateEntry(file, speed);
-
-        // Erased even on failure: a leftover entry is treated as an orphaned row by the
-        // cleanup pass below and would be deleted.
         if (iter != applied.end())
             applied.erase(iter);
 
-        if (mode == MODE_APPLY && wasApplied)
+        if (mode == MODE_APPLY)
             ++importedUpdates;
     };
 
@@ -444,7 +445,7 @@ UpdateResult UpdateFetcher::Update(bool const redundancyChecks,
     return UpdateResult(importedUpdates, countRecentUpdates, countArchivedUpdates);
 }
 
-bool UpdateFetcher::Apply(Path const& path, uint32& speed) const
+uint32 UpdateFetcher::Apply(Path const& path) const
 {
     using Time = std::chrono::high_resolution_clock;
 
@@ -452,12 +453,10 @@ bool UpdateFetcher::Apply(Path const& path, uint32& speed) const
     auto const begin = Time::now();
 
     // Update database
-    bool const applied = _applyFile(path);
+    _applyFile(path);
 
-    // The time it took the query to apply
-    speed = uint32(std::chrono::duration_cast<std::chrono::milliseconds>(Time::now() - begin).count());
-
-    return applied;
+    // Return the time it took the query to apply
+    return uint32(std::chrono::duration_cast<std::chrono::milliseconds>(Time::now() - begin).count());
 }
 
 void UpdateFetcher::UpdateEntry(AppliedFileEntry const& entry, uint32 const speed) const

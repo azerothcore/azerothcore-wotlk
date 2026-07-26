@@ -93,10 +93,8 @@ public:
 private:
     static QueryResult Retrieve(DatabaseWorkerPool<T>& pool, std::string const& query);
     static void Apply(DatabaseWorkerPool<T>& pool, std::string const& query);
-    // Return false only in a dry run, where a failed file is recorded via
-    // DBUpdaterUtil::MarkUpdateFailed() instead of throwing. Otherwise they throw on failure.
-    static bool ApplyFile(DatabaseWorkerPool<T>& pool, Path const& path);
-    static bool ApplyFile(DatabaseWorkerPool<T>& pool, std::string const& host, std::string const& user,
+    static void ApplyFile(DatabaseWorkerPool<T>& pool, Path const& path);
+    static void ApplyFile(DatabaseWorkerPool<T>& pool, std::string const& host, std::string const& user,
                           std::string const& password, std::string const& port_or_socket, std::string const& database, std::string const& ssl, Path const& path);
 };
 

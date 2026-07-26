@@ -306,11 +306,14 @@ jobs:
         timeout-minutes: 30
         continue-on-error: false
 
-      # Proves the gate above actually gates. Must stay the last step that
-      # touches the databases: it deliberately leaves a broken update pending.
+      # Proves the gate above actually gates.
       - name: Verify a broken SQL update fails the dry run
         run: |
-          cat > data/sql/updates/pending_db_world/rev_9999999999999999999.sql <<'EOF'
+          # Absolute: the trap fires after the cd below.
+          probe="$PWD/data/sql/updates/pending_db_world/rev_9999999999999999999.sql"
+          trap 'rm -f "$probe"' EXIT
+
+          cat > "$probe" <<'EOF'
           DELETE FROM `ci_gate_probe_table_that_does_not_exist` WHERE `id` = 1;
           EOF
 
