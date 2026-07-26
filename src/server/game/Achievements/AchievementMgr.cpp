@@ -1775,7 +1775,7 @@ void AchievementMgr::UpdateAchievementCriteria(AchievementCriteriaTypes type, ui
                 {
                     // those requirements couldn't be found in the dbc
                     AchievementCriteriaDataSet const* data = sAchievementMgr->GetCriteriaDataSet(achievementCriteria);
-                    if (!data || !data->Meets(GetPlayer(), nullptr))
+                    if (!data || !data->Meets(GetPlayer(), unit))
                         continue;
 
                     // Check map id requirement
