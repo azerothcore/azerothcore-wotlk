@@ -211,7 +211,7 @@ public:
     //change active state of doors or buttons
     void DoUseDoorOrButton(ObjectGuid guid, uint32 withRestoreTime = 0, bool useAlternativeState = false);
 
-    //Respawns a GO having negative spawntimesecs in gameobject-table
+    //Respawns a GO having negative SpawnTimeSecMin in gameobject-table
     void DoRespawnGameObject(ObjectGuid guid, uint32 timeToDespawn = MINUTE);
 
     // Respawns a GO by instance storage index

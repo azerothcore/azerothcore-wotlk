@@ -337,14 +337,10 @@ public:
 
         if (target)
         {
-            int32 curRespawnDelay = int32(target->GetRespawnTimeEx() - GameTime::GetGameTime().count());
-            if (curRespawnDelay < 0)
-                curRespawnDelay = 0;
+            int64 const remaining = target->GetRespawnTimeEx() - GameTime::GetGameTime().count();
+            std::string const remainingStr = (remaining > 0) ? secsToTimeString(uint64(remaining), true) : "0";
 
-            std::string curRespawnDelayStr = secsToTimeString(curRespawnDelay, true);
-            std::string defRespawnDelayStr = secsToTimeString(target->GetRespawnDelay(), true);
-
-            handler->PSendSysMessage(LANG_COMMAND_RAWPAWNTIMES, defRespawnDelayStr, curRespawnDelayStr);
+            handler->PSendSysMessage(LANG_COMMAND_RAWPAWNTIMES, target->GetRespawnDelayMin(), target->GetRespawnDelayMax(), remainingStr);
         }
         return true;
     }

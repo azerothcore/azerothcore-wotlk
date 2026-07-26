@@ -716,7 +716,8 @@ struct GameObjectData : public SpawnData
     GameObjectData() : SpawnData(SPAWN_TYPE_GAMEOBJECT) {}
     uint32 id{0};                                                // entry in gameobject_template
     G3D::Quat rotation;
-    int32 spawntimesecs{0};
+    int32 SpawnTimeSecMin{0};
+    int32 SpawnTimeSecMax{0};
     uint32 animprogress{0};
     GOState go_state{GO_STATE_ACTIVE};
     uint8 artKit{0};

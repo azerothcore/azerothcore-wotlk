@@ -46,7 +46,7 @@ public:
         {
             //summoner dies here
             Unit::DealDamage(me, me, me->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
-            //override any database `spawntimesecs` to prevent duplicated summons
+            //override any database `SpawnTimeSecMin`/`SpawnTimeSecMax` to prevent duplicated summons
             uint32 rTime = me->GetRespawnDelay();
             if (rTime < 600)
                 me->SetRespawnDelay(600);

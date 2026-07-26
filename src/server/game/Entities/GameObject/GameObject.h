@@ -196,6 +196,8 @@ public:
     [[nodiscard]] bool isSpawnedByDefault() const { return m_spawnedByDefault; }
     void SetSpawnedByDefault(bool b) { m_spawnedByDefault = b; }
     [[nodiscard]] uint32 GetRespawnDelay() const { return m_respawnDelayTime; }
+    [[nodiscard]] uint32 GetRespawnDelayMin() const { return m_respawnDelayTimeMin; }
+    [[nodiscard]] uint32 GetRespawnDelayMax() const { return m_respawnDelayTimeMax; }
     void Refresh();
     void DespawnOrUnsummon(Milliseconds delay = 0ms, Seconds forcedRespawnTime = 0s);
     void Delete();
@@ -264,7 +266,7 @@ public:
     [[nodiscard]] bool hasInvolvedQuest(uint32 quest_id) const override;
     bool ActivateToQuest(Player* target) const;
     void UseDoorOrButton(uint32 time_to_restore = 0, bool alternative = false, Unit* user = nullptr);
-    // 0 = use `gameobject`.`spawntimesecs`
+    // 0 = use `gameobject`.`SpawnTimeSecMin`/`SpawnTimeSecMax`
     void ResetDoorOrButton();
 
     void TriggeringLinkedGameObject(uint32 trapEntry, Unit* target);
@@ -373,7 +375,9 @@ protected:
     bool        _respawnCompatibilityMode{true};
     uint32      m_spellId;
     time_t      m_respawnTime;                          // (secs) time of next respawn (or despawn if GO have owner()),
-    uint32      m_respawnDelayTime;                     // (secs) if 0 then current GO state no dependent from timer
+    uint32      m_respawnDelayTime;                     // (secs) if 0 then current GO state no dependent from timer; re-rolled from [min, max] each cycle
+    uint32      m_respawnDelayTimeMin;                  // (secs) lower bound of |SpawnTimeSecMin|
+    uint32      m_respawnDelayTimeMax;                  // (secs) upper bound of |SpawnTimeSecMax|
     uint32      m_despawnDelay;
     Seconds     m_despawnRespawnTime;                   // override respawn time after delayed despawn
     Seconds     m_restockTime;

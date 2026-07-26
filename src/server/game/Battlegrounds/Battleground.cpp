@@ -1487,7 +1487,8 @@ bool Battleground::AddObject(uint32 type, uint32 entry, float x, float y, float 
         data.rotation1      = rotation1;
         data.rotation2      = rotation2;
         data.rotation3      = rotation3;
-        data.spawntimesecs  = respawnTime;
+        data.SpawnTimeSecMin = respawnTime;
+        data.SpawnTimeSecMax = respawnTime;
         data.spawnMask      = 1;
         data.animprogress   = 100;
         data.go_state       = 1;
