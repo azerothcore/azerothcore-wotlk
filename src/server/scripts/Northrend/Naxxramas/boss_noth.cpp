@@ -86,12 +86,10 @@ public:
 
     struct boss_nothAI : public BossAI
     {
-        explicit boss_nothAI(Creature* c) : BossAI(c, BOSS_NOTH), summons(me)
+        explicit boss_nothAI(Creature* c) : BossAI(c, BOSS_NOTH)
         {}
 
         uint8 timesInBalcony;
-        EventMap events;
-        SummonList summons;
 
         void StartGroundPhase()
         {
@@ -140,8 +138,6 @@ public:
         void Reset() override
         {
             BossAI::Reset();
-            events.Reset();
-            summons.DespawnAll();
             me->CastSpell(me, SPELL_TELEPORT_BACK, true);
             me->SetControlled(false, UNIT_STATE_ROOT);
             me->SetReactState(REACT_AGGRESSIVE);
