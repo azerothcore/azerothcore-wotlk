@@ -48,6 +48,8 @@ enum WarriorSpells
     SPELL_WARRIOR_LAST_STAND_TRIGGERED              = 12976,
     SPELL_WARRIOR_RETALIATION_DAMAGE                = 20240,
     SPELL_WARRIOR_SLAM                              = 50783,
+    SPELL_WARRIOR_SUDDEN_DEATH_PROC                 = 52437,
+    SPELL_WARRIOR_SUDDEN_DEATH_R1                   = 29723,
     SPELL_WARRIOR_SUNDER_ARMOR                      = 58567,
     SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_1   = 12723,
     SPELL_WARRIOR_SWEEPING_STRIKES_EXTRA_ATTACK_2   = 26654,
@@ -75,7 +77,6 @@ enum WarriorSpells
 
 enum WarriorSpellIcons
 {
-    WARRIOR_ICON_ID_SUDDEN_DEATH                    = 1989,
     WARRIOR_ICON_ID_SECOND_WIND                     = 1697
 };
 
@@ -384,7 +385,8 @@ class spell_warr_execute : public SpellScript
 
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_WARRIOR_EXECUTE, SPELL_WARRIOR_GLYPH_OF_EXECUTION });
+        return ValidateSpellInfo({ SPELL_WARRIOR_EXECUTE, SPELL_WARRIOR_GLYPH_OF_EXECUTION,
+            SPELL_WARRIOR_SUDDEN_DEATH_PROC, SPELL_WARRIOR_SUDDEN_DEATH_R1 });
     }
 
     void SendMiss(SpellMissInfo missInfo)
@@ -410,11 +412,16 @@ class spell_warr_execute : public SpellScript
             int32 rageUsed = std::min<int32>(300 - spellInfo->CalcPowerCost(caster, SpellSchoolMask(spellInfo->SchoolMask)), caster->GetPower(POWER_RAGE));
             int32 newRage = std::max<int32>(0, caster->GetPower(POWER_RAGE) - rageUsed);
 
-            // Sudden Death rage save
-            if (AuraEffect* aurEff = caster->GetAuraEffect(SPELL_AURA_PROC_TRIGGER_SPELL, SPELLFAMILY_GENERIC, WARRIOR_ICON_ID_SUDDEN_DEATH, EFFECT_0))
+            // Sudden Death rage save - only while the Sudden Death proc buff (52437) is actually
+            // up, not just because the caster has points in the talent (29723/24/25), which is
+            // a separate, permanently-present aura that grants the chance to proc it.
+            if (caster->HasAura(SPELL_WARRIOR_SUDDEN_DEATH_PROC))
             {
-                int32 ragesave = aurEff->GetSpellInfo()->Effects[EFFECT_1].CalcValue() * 10;
-                newRage = std::max(newRage, ragesave);
+                if (AuraEffect* aurEff = caster->GetAuraEffectOfRankedSpell(SPELL_WARRIOR_SUDDEN_DEATH_R1, EFFECT_1))
+                {
+                    int32 ragesave = aurEff->GetSpellInfo()->Effects[EFFECT_1].CalcValue() * 10;
+                    newRage = std::max(newRage, ragesave);
+                }
             }
 
             caster->SetPower(POWER_RAGE, uint32(newRage));
