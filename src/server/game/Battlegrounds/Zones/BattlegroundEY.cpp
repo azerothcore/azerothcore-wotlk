@@ -135,7 +135,7 @@ void BattlegroundEY::UpdatePointsState()
         _capturePointInfo[point]._playersCount[TEAM_HORDE] = 0;
     }
 
-    const BattlegroundPlayerMap& bgPlayerMap = GetPlayers();
+    BattlegroundPlayerMap const& bgPlayerMap = GetPlayers();
     for (BattlegroundPlayerMap::const_iterator itr = bgPlayerMap.begin(); itr != bgPlayerMap.end(); ++itr)
     {
         itr->second->SendUpdateWorldState(WORLD_STATE_BATTLEGROUND_EY_PROGRESS_BAR_SHOW, BG_EY_PROGRESS_BAR_DONT_SHOW);

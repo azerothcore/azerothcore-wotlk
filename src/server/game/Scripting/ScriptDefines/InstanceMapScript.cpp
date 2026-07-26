@@ -26,7 +26,7 @@ InstanceScript* ScriptMgr::CreateInstanceScript(InstanceMap* map)
     return tempScript ? tempScript->GetInstanceScript(map) : nullptr;
 }
 
-InstanceMapScript::InstanceMapScript(const char* name, uint32 mapId) :
+InstanceMapScript::InstanceMapScript(char const* name, uint32 mapId) :
     ScriptObject(name), MapScript<InstanceMap>(mapId)
 {
     ScriptRegistry<InstanceMapScript>::AddScript(this);

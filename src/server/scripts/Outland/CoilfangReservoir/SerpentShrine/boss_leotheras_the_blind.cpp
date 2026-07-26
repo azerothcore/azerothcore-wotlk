@@ -83,7 +83,6 @@ struct boss_leotheras_the_blind : public BossAI
         DoCastSelf(SPELL_CLEAR_CONSUMING_MADNESS, true);
         DoCastSelf(SPELL_DUAL_WIELD, true);
         me->SetReactState(REACT_PASSIVE);
-        _recentlySpoken = false;
 
         ScheduleHealthCheckEvent(15, [&]{
             me->RemoveAurasDueToSpell(SPELL_WHIRLWIND);
@@ -242,8 +241,6 @@ struct boss_leotheras_the_blind : public BossAI
                 me->setAttackTimer(BASE_ATTACK, 2000);
         }
     }
-private:
-    bool _recentlySpoken;
 };
 
 struct npc_inner_demon : public ScriptedAI

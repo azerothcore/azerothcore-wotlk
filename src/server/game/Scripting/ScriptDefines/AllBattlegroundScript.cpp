@@ -104,6 +104,11 @@ void ScriptMgr::OnBattlegroundCreate(Battleground* bg)
     CALL_ENABLED_HOOKS(AllBattlegroundScript, ALLBATTLEGROUNDHOOK_ON_BATTLEGROUND_CREATE, script->OnBattlegroundCreate(bg));
 }
 
+void ScriptMgr::OnBattlegroundSetup(Battleground* bg)
+{
+    CALL_ENABLED_HOOKS(AllBattlegroundScript, ALLBATTLEGROUNDHOOK_ON_BATTLEGROUND_SETUP, script->OnBattlegroundSetup(bg));
+}
+
 bool ScriptMgr::CanAddGroupToMatchingPool(BattlegroundQueue* queue, GroupQueueInfo* group, uint32 poolPlayerCount, Battleground* bg, BattlegroundBracketId bracketId)
 {
     CALL_ENABLED_BOOLEAN_HOOKS(AllBattlegroundScript, ALLBATTLEGROUNDHOOK_CAN_ADD_GROUP_TO_MATCHING_POOL, !script->CanAddGroupToMatchingPool(queue, group, poolPlayerCount, bg, bracketId));
