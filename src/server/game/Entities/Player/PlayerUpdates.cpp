@@ -2442,8 +2442,7 @@ void Player::UpdateAdditionalSaves(uint32 p_time)
         // achievements are often earned together with skill or gold changes
         // (professions, riding, wealth), save those too to keep the DB consistent
         _SaveSkills(trans);
-        if (!(mask & ADDITIONAL_SAVING_INVENTORY_AND_GOLD))
-            SaveGoldToDB(trans);
+        SaveGoldToDB(trans);
     }
 
     CharacterDatabase.CommitTransaction(trans);
