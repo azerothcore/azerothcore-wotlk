@@ -1291,7 +1291,8 @@ void Guild::HandleSetMOTD(WorldSession* session, std::string_view motd)
     }
 }
 
-void Guild::SetMOTD(std::string_view motd) {
+void Guild::SetMOTD(std::string_view motd)
+{
     m_motd = motd;
 
     sScriptMgr->OnGuildMOTDChanged(this, m_motd);
@@ -1316,7 +1317,8 @@ void Guild::HandleSetInfo(WorldSession* session, std::string_view info)
     }
 }
 
-void Guild::SetInfo(std::string_view info) {
+void Guild::SetInfo(std::string_view info)
+{
     m_info = info;
 
     sScriptMgr->OnGuildInfoChanged(this, m_info);
