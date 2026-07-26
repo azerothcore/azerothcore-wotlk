@@ -373,10 +373,7 @@ bool ThreatManager::IsThreateningTo(Unit const* who, bool includeOffline) const 
 
 void ThreatManager::EvaluateSuppressed(bool canExpire)
 {
-    // Re-evaluates entries on OUR OWN threat list (who is threatening us), not _threatenedByMe
-    // (who we threaten - unrelated). TauntUpdate() relies on this to un-suppress a reference the
-    // instant it starts taunting, e.g. a target that was immune to our damage before taunting.
-    for (auto const& pair : _myThreatListEntries)
+    for (auto const& pair : _threatenedByMe)
     {
         bool const shouldBeSuppressed = pair.second->ShouldBeSuppressed();
         if (pair.second->IsOnline() && shouldBeSuppressed)
@@ -534,6 +531,18 @@ void ThreatManager::TauntUpdate()
             pair.second->UpdateTauntState(it->second);
         else
             pair.second->UpdateTauntState();
+
+        // A reference that just started taunting can never be suppressed
+        // (ShouldBeSuppressed() special-cases IsTaunting()) - but EvaluateSuppressed()
+        // below only refreshes _threatenedByMe (what WE threaten), not this list (what
+        // threatens US), so a reference that was created SUPPRESSED (e.g. the taunter was
+        // already immune to our damage before taunting) never gets cleared there. Do it
+        // here directly instead, right after its taunt state is set.
+        if (pair.second->IsSuppressed() && !pair.second->ShouldBeSuppressed())
+        {
+            pair.second->_online = ThreatReference::ONLINE_STATE_ONLINE;
+            pair.second->HeapNotifyIncreased();
+        }
     }
 
     // taunt aura update also re-evaluates all suppressed states (retail behavior)
