@@ -540,8 +540,8 @@ void DBUpdater<T>::ApplyFile(DatabaseWorkerPool<T>& pool, std::string const& hos
             "If you are a developer, please fix your sql query.",
             path.generic_string(), pool.GetConnectionInfo()->database);
 
-        // A dry run keeps going so every remaining file is still attempted; the failure is
-        // recorded instead of thrown so the caller can exit non-zero at the end.
+        // Recorded in both modes. A dry run does not throw below, so it keeps attempting the
+        // remaining files and this count is the only thing left to fail the run on.
         DBUpdaterUtil::MarkUpdateFailed();
 
         if (!sConfigMgr->isDryRun())

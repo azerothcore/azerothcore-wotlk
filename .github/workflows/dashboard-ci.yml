@@ -247,10 +247,10 @@ jobs:
         run: |
           ./acore.sh test core
 
-      # This job runs zero-conf, so there is no Logger config and no Errors.log:
-      # the startup-error check in .github/actions/linux-build has nothing to read
-      # here. The grep is a second net in case a later change stops the updater
-      # from failing the run on a bad import.
+      # This job runs zero-conf, so the core falls back to console-only logging and
+      # writes no Errors.log, which is what the build workflows scrape. The grep is a
+      # second net in case a later change stops the updater from failing the run on a
+      # bad import.
       - name: Test authserver dry-run
         run: |
           source ./acore.sh config load
@@ -320,9 +320,9 @@ jobs:
           source ./acore.sh config load
           cd env/dist/bin
 
-          # The exit code is the assertion here, so it must come from PIPESTATUS and not
-          # abort the step: without this the check inverts if the step ever gains a
-          # `shell: bash`, which turns pipefail on.
+          # The exit code is the assertion here, so it has to survive the tee. Without this
+          # the step fails on a healthy tree as soon as it gains a `shell: bash`, which
+          # turns pipefail on and lets errexit abort on the expected exit 1.
           set +o pipefail
           timeout 5m ./worldserver -dry-run 2>&1 | tee "$RUNNER_TEMP/broken-update-dry-run.log"
           status=${PIPESTATUS[0]}

@@ -60,9 +60,9 @@ public:
 
     static bool CheckExecutable();
 
-    // A dry run keeps going after a bad update file so a single run reports every broken
-    // query. Callers must check this and exit non-zero, otherwise CI goes green on a failed
-    // import.
+    // Counts every update file that failed to apply, in any mode. A dry run does not throw
+    // on a bad file, so it keeps going and a single run reports all of them; whoever ends
+    // the run must check this and exit non-zero, otherwise CI goes green on a failed import.
     static void MarkUpdateFailed();
     static uint32 GetFailedUpdateCount();
 
