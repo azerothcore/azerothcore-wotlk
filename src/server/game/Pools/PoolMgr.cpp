@@ -526,26 +526,12 @@ void PoolGroup<Quest>::SpawnObject(ActivePoolData& spawns, uint32 limit, uint32 
         sPoolMgr->SaveQuestsToDB(false, false, true);
 }
 
-// Method that does the respawn job on the specified creature
-template <>
-void PoolGroup<Creature>::ReSpawn1Object(PoolObject* obj)
+// Method that does the respawn job on the specified object
+template <typename T>
+void PoolGroup<T>::ReSpawn1Object(PoolObject* obj)
 {
     Despawn1Object(obj->guid);
     Spawn1Object(obj);
-}
-
-// Method that does the respawn job on the specified gameobject
-template <>
-void PoolGroup<GameObject>::ReSpawn1Object(PoolObject* obj)
-{
-    Despawn1Object(obj->guid);
-    Spawn1Object(obj);
-}
-
-// Nothing to do for a child Pool
-template <>
-void PoolGroup<Pool>::ReSpawn1Object(PoolObject* /*obj*/)
-{
 }
 
 // Nothing to do for a quest

@@ -1698,6 +1698,7 @@ public:
     void AddGameObject(GameObject* gameObj);
     void RemoveGameObject(GameObject* gameObj, bool del);
     void RemoveGameObject(uint32 spellid, bool del);
+    void RemoveGameObjectsByType(GameobjectTypes type, bool del);
     void RemoveAllGameObjects();
 
     /*********************************************************/
