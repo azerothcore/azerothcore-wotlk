@@ -39,19 +39,33 @@ std::string DBUpdaterUtil::GetCorrectedMySQLExecutable()
 
 bool DBUpdaterUtil::CheckExecutable()
 {
+    // absolute()'s throwing overload can fail on OS-level issues (e.g. an inaccessible current
+    // working directory); nothing above this call catches std::filesystem_error, so the
+    // non-throwing overload is used here instead of crashing the whole process over a path
+    // that couldn't be resolved.
+    std::error_code ec;
+
     std::filesystem::path exe(GetCorrectedMySQLExecutable());
     if (!is_regular_file(exe))
     {
         exe = Acore::SearchExecutableInPath("mysql");
         if (!exe.empty() && is_regular_file(exe))
         {
+            std::filesystem::path absoluteExe = absolute(exe, ec);
+            if (ec)
+            {
+                LOG_FATAL("sql.updates", "Failed to resolve absolute path for MySQL executable \'{}\': {}", exe.generic_string(), ec.message());
+                return false;
+            }
+
             // Correct the path to the cli
-            corrected_path() = absolute(exe).generic_string();
+            corrected_path() = absoluteExe.generic_string();
             return true;
         }
 
+        std::filesystem::path absoluteExe = absolute(exe, ec);
         LOG_FATAL("sql.updates", "Didn't find any executable MySQL binary at \'{}\' or in path, correct the path in the *.conf (\"MySQLExecutable\").",
-            absolute(exe).generic_string());
+            ec ? exe.generic_string() : absoluteExe.generic_string());
 
         return false;
     }

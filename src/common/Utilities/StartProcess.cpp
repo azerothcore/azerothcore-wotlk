@@ -107,6 +107,19 @@ namespace Acore
                 fclose(ptr);
         });
 
+        // Resolve the executable to an absolute path up front - std::filesystem::absolute's
+        // throwing overload can fail on OS-level issues (e.g. an inaccessible current working
+        // directory), and nothing above this call catches std::filesystem_error, so letting it
+        // throw here previously crashed the whole process instead of failing this one process
+        // start cleanly.
+        std::error_code ec;
+        std::string absoluteExecutable = std::filesystem::absolute(executable, ec).string();
+        if (ec)
+        {
+            LOG_ERROR(logger, "Failed to resolve absolute path for executable \"{}\": {}", executable, ec.message());
+            return EXIT_FAILURE;
+        }
+
         // Start the child process
         child c = [&]()
         {
@@ -114,7 +127,7 @@ namespace Acore
             {
                 // With binding stdin
                 return child{
-                    exe = std::filesystem::absolute(executable).string(),
+                    exe = absoluteExecutable,
                     args = argsVector,
                     env = environment(boost::this_process::environment()),
                     std_in = inputFile.get(),
@@ -126,7 +139,7 @@ namespace Acore
             {
                 // Without binding stdin
                 return child{
-                    exe = std::filesystem::absolute(executable).string(),
+                    exe = absoluteExecutable,
                     args = argsVector,
                     env = environment(boost::this_process::environment()),
 #if BOOST_VERSION < 108800
