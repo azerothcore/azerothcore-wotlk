@@ -28,9 +28,11 @@ INSERT INTO `waypoint_data` (`id`, `point`, `position_x`, `position_y`, `positio
     (1007350, 13, 6104.4736, 3761.4934, 99.21134, NULL, 0, 0, 0, 0, 0, 100, 0),
     (1007350, 14, 6092.3813, 3732.4739, 111.712875, NULL, 0, 0, 0, 0, 0, 100, 0);
 -- Cerberon (Entry 28207, GUID 100431)
-UPDATE `creature` SET `wander_distance`= 0, `MovementType`= 0 WHERE `guid`= 100431 AND `id` = 28207;
+-- Spawns in formation, 15 yd behind Bythius at 165 degrees
+UPDATE `creature` SET `position_x`= 6090.5401, `position_y`= 3683.0056, `position_z`= 126.22, `orientation`= 1.6121, `wander_distance`= 0, `MovementType`= 0 WHERE `guid`= 100431 AND `id` = 28207;
 -- Glonn (Entry 28211, GUID 100704)
-UPDATE `creature` SET `wander_distance`= 0, `MovementType`= 0 WHERE `guid`= 100704 AND `id` = 28211;
+-- Spawns in formation, 15 yd behind Bythius at 205 degrees
+UPDATE `creature` SET `position_x`= 6100.7147, `position_y`= 3684.3212, `position_z`= 127.55, `orientation`= 1.6121, `wander_distance`= 0, `MovementType`= 0 WHERE `guid`= 100704 AND `id` = 28211;
 -- Plague-dog pack formation (leader 100735, plague-dogs flank on opposite sides)
 DELETE FROM `creature_formations` WHERE `leaderGUID`= 100735 OR `memberGUID` IN (100735, 100431, 100704);
 INSERT INTO `creature_formations` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `groupAI`, `point_1`, `point_2`) VALUES
