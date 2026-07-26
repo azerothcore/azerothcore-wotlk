@@ -112,8 +112,17 @@ public:
         for (auto const& questPair : sObjectMgr->GetQuestTemplates())
         {
             Quest const* quest = questPair.second;
-            if (quest->GetRequiredClasses() && player->SatisfyQuestClass(quest, false))
-                player->learnQuestRewardedSpells(quest);
+            if (!quest->GetRequiredClasses() || !player->SatisfyQuestClass(quest, false))
+                continue;
+
+            // These quests are class-gated but not race-gated - both the Alliance and the Blood
+            // Elf paladin mount quests allow every race - so without this an Alliance paladin
+            // also collects the Blood Elf mounts.
+            int32 rewardSpellId = quest->GetRewSpellCast();
+            if (rewardSpellId > 0 && !player->IsSpellFitByClassAndRace(rewardSpellId))
+                continue;
+
+            player->learnQuestRewardedSpells(quest);
         }
 
         return true;
