@@ -28,6 +28,7 @@
 #include "Chat.h"
 #include "ChatPackets.h"
 #include "ChatTextBuilder.h"
+#include "CombatPackets.h"
 #include "Common.h"
 #include "ConditionMgr.h"
 #include "Creature.h"
@@ -816,7 +817,7 @@ bool Unit::IsWithinRange(Unit const* obj, float dist) const
     return distsq <= dist * dist;
 }
 
-bool Unit::IsWithinBoundaryRadius(const Unit* obj) const
+bool Unit::IsWithinBoundaryRadius(Unit const* obj) const
 {
     if (!obj || !IsInMap(obj) || !InSamePhase(obj))
         return false;
@@ -3236,21 +3237,18 @@ void Unit::SendMeleeAttackStart(Unit* victim, Player* sendTo)
  * @brief Send to the client SMSG_ATTACKSTOP but doesn't clear UNIT_STATE_MELEE_ATTACKING on server side
  * or interrupt spells. Unless you know exactly what you're doing, use AttackStop() or RemoveAllAttackers() instead
  */
-void Unit::SendMeleeAttackStop(Unit* victim)
+void Unit::SendMeleeAttackStop(Unit const* victim) const
 {
     // pussywizard: calling SendMeleeAttackStop without clearing UNIT_STATE_MELEE_ATTACKING and then AttackStart the same player may spoil npc rotating!
     // pussywizard: this happens in some boss scripts, just add clearing here
     // ClearUnitState(UNIT_STATE_MELEE_ATTACKING); // commented out for now
 
-    WorldPacket data(SMSG_ATTACKSTOP, (8 + 8 + 4));
-    data << GetPackGUID();
+    WorldPackets::Combat::SAttackStop attackStop;
+    attackStop.Attacker = GetGUID();
+    attackStop.Victim = Object::GetGUID(victim);
+    attackStop.NowDead = !IsAlive();
 
-    if (victim)
-    {
-        data << victim->GetPackGUID();
-        data << (uint32)victim->isDead();
-    }
-    SendMessageToSet(&data, true);
+    SendMessageToSet(attackStop.Write(), true);
     LOG_DEBUG("entities.unit", "WORLD: Sent SMSG_ATTACKSTOP");
 
     if (victim)
@@ -4191,7 +4189,9 @@ void Unit::SetCurrentCastedSpell(Spell* pSpell)
                 if (m_currentSpells[CURRENT_AUTOREPEAT_SPELL] &&
                         m_currentSpells[CURRENT_AUTOREPEAT_SPELL]->m_spellInfo->Id != 75)
                     InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
-                AddUnitState(UNIT_STATE_CASTING);
+
+                if (!pSpell->GetSpellInfo()->IsActionAllowedChannel())
+                    AddUnitState(UNIT_STATE_CASTING);
 
                 break;
             }
@@ -5231,7 +5231,7 @@ void Unit::RemoveAurasDueToSpellByDispel(uint32 spellId, uint32 dispellerSpellId
                                     {
                                         noxious->SetDuration(aura->GetDuration() * aureff->GetAmount() / 100);
                                         if (aura->GetUnitOwner())
-                                            if (const std::vector<int32>* spell_triggered = sSpellMgr->GetSpellLinked(-int32(aura->GetId())))
+                                            if (std::vector<int32> const* spell_triggered = sSpellMgr->GetSpellLinked(-int32(aura->GetId())))
                                                 for (std::vector<int32>::const_iterator itr = spell_triggered->begin(); itr != spell_triggered->end(); ++itr)
                                                     aura->GetUnitOwner()->RemoveAurasDueToSpell(*itr);
                                     }
@@ -6624,6 +6624,32 @@ void Unit::RemoveGameObject(uint32 spellid, bool del)
         if (GameObject* go = ObjectAccessor::GetGameObject(*this, *itr))
         {
             if (spellid > 0 && go->GetSpellId() != spellid)
+            {
+                ++itr;
+                continue;
+            }
+
+            go->SetOwnerGUID(ObjectGuid::Empty);
+            if (del)
+            {
+                go->SetRespawnTime(0);
+                go->Delete();
+            }
+        }
+        m_gameObj.erase(itr++);
+    }
+}
+
+void Unit::RemoveGameObjectsByType(GameobjectTypes type, bool del)
+{
+    if (m_gameObj.empty())
+        return;
+
+    for (GameObjectList::iterator itr = m_gameObj.begin(); itr != m_gameObj.end();)
+    {
+        if (GameObject* go = ObjectAccessor::GetGameObject(*this, *itr))
+        {
+            if (go->GetGoType() != type)
             {
                 ++itr;
                 continue;
@@ -14442,7 +14468,7 @@ void Unit::SetRooted(bool apply, bool stun, bool logout)
 
 void Unit::SendMoveRoot(bool apply)
 {
-    const Player* client = GetClientControlling();
+    Player const* client = GetClientControlling();
 
     // Apply flags in-place when unit currently is not controlled by a player
     if (!client)
@@ -14461,7 +14487,7 @@ void Unit::SendMoveRoot(bool apply)
     if (!IsInWorld())
         return;
 
-    const PackedGuid& guid = GetPackGUID();
+    PackedGuid const& guid = GetPackGUID();
     // Wrath+ spline root: when unit is currently not controlled by a player
     if (!client)
     {

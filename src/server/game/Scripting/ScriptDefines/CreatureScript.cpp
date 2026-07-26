@@ -60,7 +60,7 @@ bool ScriptMgr::OnGossipSelect(Player* player, Creature* creature, uint32 sender
     return tempScript ? tempScript->OnGossipSelect(player, creature, sender, action) : false;
 }
 
-bool ScriptMgr::OnGossipSelectCode(Player* player, Creature* creature, uint32 sender, uint32 action, const char* code)
+bool ScriptMgr::OnGossipSelectCode(Player* player, Creature* creature, uint32 sender, uint32 action, char const* code)
 {
     ASSERT(player);
     ASSERT(creature);
@@ -195,7 +195,7 @@ void ScriptMgr::OnCreatureUpdate(Creature* creature, uint32 diff)
     }
 }
 
-CreatureScript::CreatureScript(const char* name)
+CreatureScript::CreatureScript(char const* name)
     : ScriptObject(name)
 {
     ScriptRegistry<CreatureScript>::AddScript(this);

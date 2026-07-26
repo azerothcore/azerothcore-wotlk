@@ -1211,7 +1211,7 @@ class spell_anti_air_rocket_bomber : public SpellScript
     void HandleDummy(SpellEffIndex effIndex)
     {
         PreventHitDefaultEffect(effIndex);
-        const WorldLocation* loc = GetExplTargetDest();
+        WorldLocation const* loc = GetExplTargetDest();
         GetCaster()->CastSpell(loc->GetPositionX(), loc->GetPositionY(), loc->GetPositionZ(), GetSpellInfo()->Effects[effIndex].CalcValue(), true);
     }
 

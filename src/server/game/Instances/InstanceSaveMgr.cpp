@@ -354,7 +354,7 @@ void InstanceSaveMgr::LoadResetTimes()
         {
             // assume that expired instances have already been cleaned
             // calculate the next reset time
-            t = (t * DAY) / DAY;
+            t = (t / DAY) * DAY;
             t += ((today - t) / period + 1) * period + diff;
             CharacterDatabase.DirectExecute("UPDATE instance_reset SET resettime = '{}' WHERE mapid = '{}' AND difficulty = '{}'", (uint32)t, mapid, difficulty);
         }

@@ -80,9 +80,9 @@ public:
     virtual void LoadConfigSettings(bool reload = false) = 0;
     [[nodiscard]] virtual bool IsShuttingDown() const = 0;
     [[nodiscard]] virtual uint32 GetShutDownTimeLeft() const = 0;
-    virtual void ShutdownServ(uint32 time, uint32 options, uint8 exitcode, const std::string& reason = std::string()) = 0;
+    virtual void ShutdownServ(uint32 time, uint32 options, uint8 exitcode, std::string const& reason = std::string()) = 0;
     virtual void ShutdownCancel() = 0;
-    virtual void ShutdownMsg(bool show = false, Player* player = nullptr, const std::string& reason = std::string()) = 0;
+    virtual void ShutdownMsg(bool show = false, Player* player = nullptr, std::string const& reason = std::string()) = 0;
     virtual void Update(uint32 diff) = 0;
     virtual void setRate(ServerConfigs index, float value) = 0;
     [[nodiscard]] virtual float getRate(ServerConfigs index) const = 0;
