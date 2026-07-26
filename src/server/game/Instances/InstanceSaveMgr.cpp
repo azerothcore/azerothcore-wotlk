@@ -588,7 +588,10 @@ void InstanceSaveMgr::_ResetOrWarnAll(uint32 mapid, Difficulty difficulty, bool 
             period = DAY;
 
         uint32 next_reset = uint32(((resetTime + MINUTE) / DAY * DAY) + period + diff);
-        // catch up in one step if the server was offline across more than one reset period
+        // catch up in one step if the server was offline across more than one reset period.
+        // _ResetSave() below still only needs to run once regardless of how many periods were
+        // skipped: `extended` is a single-shot flag, not a per-period counter, so one pass
+        // still correctly drops it before the actual unbind on the following normal reset.
         while (next_reset <= uint32(now))
             next_reset += period;
         SetResetTimeFor(mapid, difficulty, next_reset);
