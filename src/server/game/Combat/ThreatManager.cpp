@@ -373,7 +373,10 @@ bool ThreatManager::IsThreateningTo(Unit const* who, bool includeOffline) const 
 
 void ThreatManager::EvaluateSuppressed(bool canExpire)
 {
-    for (auto const& pair : _threatenedByMe)
+    // Re-evaluates entries on OUR OWN threat list (who is threatening us), not _threatenedByMe
+    // (who we threaten - unrelated). TauntUpdate() relies on this to un-suppress a reference the
+    // instant it starts taunting, e.g. a target that was immune to our damage before taunting.
+    for (auto const& pair : _myThreatListEntries)
     {
         bool const shouldBeSuppressed = pair.second->ShouldBeSuppressed();
         if (pair.second->IsOnline() && shouldBeSuppressed)
