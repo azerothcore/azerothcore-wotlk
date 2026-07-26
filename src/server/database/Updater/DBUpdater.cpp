@@ -45,7 +45,8 @@ bool DBUpdaterUtil::CheckExecutable()
     // that couldn't be resolved.
     std::error_code ec;
 
-    std::filesystem::path exe(GetCorrectedMySQLExecutable());
+    std::filesystem::path const configuredExe(GetCorrectedMySQLExecutable());
+    std::filesystem::path exe(configuredExe);
     if (!is_regular_file(exe))
     {
         exe = Acore::SearchExecutableInPath("mysql");
@@ -54,7 +55,8 @@ bool DBUpdaterUtil::CheckExecutable()
             std::filesystem::path absoluteExe = absolute(exe, ec);
             if (ec)
             {
-                LOG_FATAL("sql.updates", "Failed to resolve absolute path for MySQL executable \'{}\': {}", exe.generic_string(), ec.message());
+                LOG_FATAL("sql.updates", "Failed to resolve absolute path for MySQL executable \'{}\': {}",
+                    exe.generic_string(), ec.message());
                 return false;
             }
 
@@ -63,9 +65,11 @@ bool DBUpdaterUtil::CheckExecutable()
             return true;
         }
 
-        std::filesystem::path absoluteExe = absolute(exe, ec);
-        LOG_FATAL("sql.updates", "Didn't find any executable MySQL binary at \'{}\' or in path, correct the path in the *.conf (\"MySQLExecutable\").",
-            ec ? exe.generic_string() : absoluteExe.generic_string());
+        std::filesystem::path absoluteConfiguredExe = absolute(configuredExe, ec);
+        LOG_FATAL("sql.updates",
+            "Didn't find any executable MySQL binary at \'{}\' or in path, correct the path in the "
+            "*.conf (\"MySQLExecutable\").",
+            ec ? configuredExe.generic_string() : absoluteConfiguredExe.generic_string());
 
         return false;
     }
