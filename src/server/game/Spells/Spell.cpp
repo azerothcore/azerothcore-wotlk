@@ -6278,8 +6278,13 @@ SpellCastResult Spell::CheckCast(bool strict, uint32* /*param1*/, uint32* /*para
                             if (m_preGeneratedPath->GetPath().size() < 2)
                                 return SPELL_FAILED_NOPATH;
                         }
-                        else
-                            m_preGeneratedPath->ShortenPathUntilDist(G3D::Vector3(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ()), objSize); // move back
+
+                        // still back off by the target's combat reach even after safe-ground
+                        // handling above - e.g. only the caster's own mid-air position was far
+                        // from a polygon and the target's spot was already fine, so the path
+                        // wasn't touched and still ends exactly on the target otherwise
+                        G3D::Vector3 const targetPos(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
+                        m_preGeneratedPath->ShortenPathUntilDist(targetPos, objSize); // move back
                     }
                     if (Player* player = m_caster->ToPlayer())
                         player->SetCanTeleport(true);

@@ -1213,7 +1213,8 @@ bool PathGenerator::HasWalkableNavmeshAt(G3D::Vector3 const& point, G3D::Vector3
     float const extents[VERTEX_SIZE] = { 2.5f, 3.0f, 2.5f };
     float closestPoint[VERTEX_SIZE];
     dtPolyRef polyRef = INVALID_POLYREF;
-    if (!dtStatusSucceed(_navMeshQuery->findNearestPoly(navPoint, extents, &_filter, &polyRef, closestPoint)) || polyRef == INVALID_POLYREF)
+    dtStatus const status = _navMeshQuery->findNearestPoly(navPoint, extents, &_filter, &polyRef, closestPoint);
+    if (!dtStatusSucceed(status) || polyRef == INVALID_POLYREF)
         return false;
 
     snappedPoint = G3D::Vector3(closestPoint[2], closestPoint[0], closestPoint[1]);
@@ -1252,7 +1253,7 @@ void PathGenerator::ShortenPathUntilSafeGround()
     G3D::Vector3 const dir = (end - start).direction();
     constexpr float step = 2.0f;
 
-    for (float travelled = totalDist - step; travelled > step; travelled -= step)
+    for (float travelled = totalDist - step; travelled > 0.0f; travelled -= step)
     {
         G3D::Vector3 const candidate = start + dir * travelled;
         if (HasWalkableNavmeshAt(candidate, snapped))
