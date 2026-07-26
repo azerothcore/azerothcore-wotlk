@@ -7473,8 +7473,14 @@ bool Unit::ForceAttack(Unit* target)
     if (!target)
         return false;
 
-    _forcedCombatTargets.insert(target->GetGUID());
-    return Attack(target, true);
+    ObjectGuid const targetGuid = target->GetGUID();
+    bool const inserted = _forcedCombatTargets.insert(targetGuid).second;
+    if (Attack(target, true))
+        return true;
+
+    if (inserted)
+        _forcedCombatTargets.erase(targetGuid);
+    return false;
 }
 
 /**
