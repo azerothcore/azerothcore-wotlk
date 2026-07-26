@@ -27,6 +27,7 @@
 #include "AuthSocketMgr.h"
 #include "Banner.h"
 #include "Config.h"
+#include "DBUpdater.h"
 #include "DatabaseEnv.h"
 #include "DatabaseLoader.h"
 #include "GitRevision.h"
@@ -149,6 +150,12 @@ int main(int argc, char** argv)
     // Stop auth server if dry run
     if (sConfigMgr->isDryRun())
     {
+        if (uint32 failed = DBUpdaterUtil::GetFailedUpdateCount())
+        {
+            LOG_FATAL("server.authserver", "Dry run completed with {} failed database update(s), terminating.", failed);
+            return 1;
+        }
+
         LOG_INFO("server.authserver", "Dry run completed, terminating.");
         return 0;
     }

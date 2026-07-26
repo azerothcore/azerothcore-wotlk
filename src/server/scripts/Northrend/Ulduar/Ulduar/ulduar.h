@@ -111,6 +111,7 @@ enum UlduarData
     DATA_UNIVERSE_GLOBE                     = 608,
     DATA_ALGALON_TRAPDOOR                   = 609,
     DATA_BRANN_BRONZEBEARD_ALG              = 610,
+    DATA_RESUMMON_ALGALON                   = 611,
 
     // Achievements
     DATA_DWARFAGEDDON                       = 700,
@@ -362,9 +363,11 @@ enum UlduarMisc
     ACTION_TOWER_OF_LIFE_DESTROYED          = 4,
 
     EVENT_UPDATE_ALGALON_TIMER              = 1,
+    EVENT_RESUMMON_ALGALON                  = 2,
     ACTION_FEEDS_ON_TEARS_FAILED            = 0,
     ACTION_INIT_ALGALON                     = 1,
     ACTION_DESPAWN_ALGALON                  = 2,
+    ACTION_START_INTRO                      = 3,
 
     TIMER_ALGALON_DEFEATED                  = 300,
     TIMER_ALGALON_TO_SUMMON                 = 200,
