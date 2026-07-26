@@ -1,3 +1,4 @@
+-- DB update 2026_07_26_01 -> 2026_07_26_02
 --
 -- Embalming Slime
 UPDATE `creature_template` SET `CreatureImmunitiesId` = -93 WHERE `entry` = 29355;
