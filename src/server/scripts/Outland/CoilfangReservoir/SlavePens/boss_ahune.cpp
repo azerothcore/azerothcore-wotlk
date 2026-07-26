@@ -304,11 +304,11 @@ struct npc_frozen_core : public ScriptedAI
 
     void JustDied(Unit* /*killer*/) override
     {
-        if (Creature* ahune = _instance->GetCreature(DATA_AHUNE))
-            Unit::Kill(me, ahune);
-
         DoCastSelf(SPELL_SUMMON_LOOT_MISSILE, true);
         DoCastSelf(SPELL_MINION_DESPAWNER, true);
+
+        if (Creature* ahune = _instance->GetCreature(DATA_AHUNE))
+            Unit::Kill(me, ahune);
     }
 
     void DoAction(int32 action) override

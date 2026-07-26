@@ -91,12 +91,12 @@ struct CoordPair
         , y_coord(y)
     {}
 
-    CoordPair(const CoordPair<LIMIT>& obj)
+    CoordPair(CoordPair<LIMIT> const& obj)
         : x_coord(obj.x_coord)
         , y_coord(obj.y_coord)
     {}
 
-    CoordPair<LIMIT>& operator=(const CoordPair<LIMIT>& obj)
+    CoordPair<LIMIT>& operator=(CoordPair<LIMIT> const& obj)
     {
         x_coord = obj.x_coord;
         y_coord = obj.y_coord;
@@ -157,13 +157,13 @@ struct CoordPair
 };
 
 template<uint32 LIMIT>
-bool operator==(const CoordPair<LIMIT>& p1, const CoordPair<LIMIT>& p2)
+bool operator==(CoordPair<LIMIT> const& p1, CoordPair<LIMIT> const& p2)
 {
     return (p1.x_coord == p2.x_coord && p1.y_coord == p2.y_coord);
 }
 
 template<uint32 LIMIT>
-bool operator!=(const CoordPair<LIMIT>& p1, const CoordPair<LIMIT>& p2)
+bool operator!=(CoordPair<LIMIT> const& p1, CoordPair<LIMIT> const& p2)
 {
     return !(p1 == p2);
 }

@@ -428,7 +428,7 @@ struct npc_ahnqiraji_critter : public ScriptedAI
         // Don't attack nearby players randomly if they are the Twin's pet bugs.
         if (CreatureData const* crData = me->GetCreatureData())
         {
-            ObjectGuid dbtableHighGuid = ObjectGuid::Create<HighGuid::Unit>(crData->id1, me->GetSpawnId());
+            ObjectGuid dbtableHighGuid = ObjectGuid::Create<HighGuid::Unit>(crData->id, me->GetSpawnId());
             ObjectGuid targetGuid = sObjectMgr->GetLinkedRespawnGuid(dbtableHighGuid);
 
             if (targetGuid.GetEntry() == NPC_VEKLOR)
@@ -547,7 +547,7 @@ class at_battleguard_sartura : public AreaTriggerScript
 public:
     at_battleguard_sartura() : AreaTriggerScript("at_battleguard_sartura") { }
 
-    bool OnTrigger(Player* player, const AreaTrigger* /*at*/) override
+    bool OnTrigger(Player* player, AreaTrigger const* /*at*/) override
     {
         if (InstanceScript* instance = player->GetInstanceScript())
         {

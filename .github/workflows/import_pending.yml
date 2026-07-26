@@ -12,7 +12,7 @@ jobs:
     permissions: write-all
     if: github.repository == 'azerothcore/azerothcore-wotlk' && !github.event.pull_request.draft
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           persist-credentials: false
           # If we're fetching all the history in a later step it makes sense to

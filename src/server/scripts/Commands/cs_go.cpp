@@ -223,7 +223,7 @@ public:
         std::string str = name.data(); // Making subtractions to the last character does not with in string_view
         WorldDatabase.EscapeString(str);
 
-        QueryResult result = WorldDatabase.Query("SELECT entry FROM creature_template WHERE name = \"{}\" LIMIT 1", str);
+        QueryResult result = WorldDatabase.Query("SELECT entry FROM creature_template WHERE name = '{}' LIMIT 1", str);
         if (!result)
         {
             handler->SendErrorMessage(LANG_COMMAND_GOCREATNOTFOUND);
@@ -609,7 +609,7 @@ public:
         CreatureData const* spawnpoint = nullptr;
         for (auto const& pair : sObjectMgr->GetAllCreatureData())
         {
-            if (pair.second.id1 != entry)
+            if (pair.second.id != entry)
             {
                 continue;
             }
@@ -633,7 +633,7 @@ public:
         std::vector<CreatureData const*> spawnpoints;
         for (auto const& pair : sObjectMgr->GetAllCreatureData())
         {
-            if (pair.second.id1 != entry)
+            if (pair.second.id != entry)
             {
                 continue;
             }

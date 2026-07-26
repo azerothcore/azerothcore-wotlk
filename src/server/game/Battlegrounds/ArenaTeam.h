@@ -152,7 +152,7 @@ public:
     static uint8 GetReqPlayersForType(uint32 type);
     [[nodiscard]] ObjectGuid GetCaptain() const { return CaptainGuid; }
     [[nodiscard]] std::string const& GetName() const       { return TeamName; }
-    [[nodiscard]] const ArenaTeamStats& GetStats() const { return Stats; }
+    [[nodiscard]] ArenaTeamStats const& GetStats() const { return Stats; }
     void SetArenaTeamStats(ArenaTeamStats& stats) { Stats = stats; }
 
     [[nodiscard]] uint32 GetRating() const          { return Stats.Rating; }
@@ -198,15 +198,15 @@ public:
     int32  GetMatchmakerRatingMod(uint32 ownRating, uint32 opponentRating, bool won);
     int32  GetRatingMod(uint32 ownRating, uint32 opponentRating, bool won);
     float  GetChanceAgainst(uint32 ownRating, uint32 opponentRating);
-    int32  WonAgainst(uint32 Own_MMRating, uint32 Opponent_MMRating, int32& rating_change, const Map* bgMap);
+    int32  WonAgainst(uint32 Own_MMRating, uint32 Opponent_MMRating, int32& rating_change, Map const* bgMap);
     void   MemberWon(Player* player, uint32 againstMatchmakerRating, int32 MatchmakerRatingChange);
-    int32  LostAgainst(uint32 Own_MMRating, uint32 Opponent_MMRating, int32& rating_change, const Map* bgMap);
+    int32  LostAgainst(uint32 Own_MMRating, uint32 Opponent_MMRating, int32& rating_change, Map const* bgMap);
     void   MemberLost(Player* player, uint32 againstMatchmakerRating, int32 MatchmakerRatingChange = -12);
 
     void UpdateArenaPointsHelper(std::map<ObjectGuid, uint32>& PlayerPoints);
 
     bool FinishWeek(); // returns true if arena team played this week
-    void FinishGame(int32 mod, const Map* bgMap);
+    void FinishGame(int32 mod, Map const* bgMap);
 
     void SetPreviousOpponents(uint32 arenaTeamId) { PreviousOpponents = arenaTeamId; }
     uint32 GetPreviousOpponents() { return PreviousOpponents; }

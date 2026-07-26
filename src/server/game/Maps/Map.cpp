@@ -376,9 +376,12 @@ bool Map::AddToMap(Transport* obj, bool /*checkTransport*/)
     _transports.insert(obj);
 
     // Broadcast creation to players
+    // Skip players that are not in world. Sending the create to their loading client
+    // could materialize a lingering transport on whatever map they are teleporting to.
+    // They get the correct transport list from SendInitTransports when added to their new map
     for (Map::PlayerList::const_iterator itr = GetPlayers().begin(); itr != GetPlayers().end(); ++itr)
     {
-        if (itr->GetSource()->GetTransport() != obj)
+        if (itr->GetSource()->IsInWorld() && itr->GetSource()->GetTransport() != obj)
         {
             UpdateData data;
             obj->BuildCreateUpdateBlockForPlayer(&data, itr->GetSource());
@@ -761,8 +764,10 @@ void Map::RemoveFromMap(Transport* obj, bool remove)
         obj->BuildOutOfRangeUpdateBlock(&data);
         WorldPacket packet;
         data.BuildPacket(packet);
+        // Skip players that are not in world
+        // Their client already received the destroy from SendRemoveTransports when leaving this map
         for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-            if (itr->GetSource()->GetTransport() != obj)
+            if (itr->GetSource()->IsInWorld() && itr->GetSource()->GetTransport() != obj)
                 itr->GetSource()->SendDirectMessage(&packet);
     }
 
@@ -1384,15 +1389,15 @@ LiquidData const Map::GetLiquidData(uint32 phaseMask, float x, float y, float z,
    return liquidData;
 }
 
-void Map::GetFullTerrainStatusForPosition(uint32 /*phaseMask*/, float x, float y, float z, float collisionHeight, PositionFullTerrainStatus& data, Optional<uint8> reqLiquidType)
+void Map::GetFullTerrainStatusForPosition(uint32 phaseMask, float x, float y, float z, float collisionHeight, PositionFullTerrainStatus& data, Optional<uint8> reqLiquidType)
 {
     GridTerrainData* gmap = GetGridTerrainData(x, y);
 
     VMAP::AreaAndLiquidData vmapData;
-    // VMAP::AreaAndLiquidData dynData;
+    VMAP::AreaAndLiquidData dynData;
     VMAP::AreaAndLiquidData* wmoData = nullptr;
     _mapCollisionData.GetStaticTree().GetAreaAndLiquidData(x, y, z, reqLiquidType, vmapData);
-    // _dynamicTree.GetAreaAndLiquidData(x, y, z, phaseMask, reqLiquidType, dynData);
+    _mapCollisionData.GetDynamicTree().GetAreaAndLiquidData(x, y, z, phaseMask, reqLiquidType, dynData);
 
     uint32 gridAreaId = 0;
     float gridMapHeight = INVALID_HEIGHT;
@@ -1419,7 +1424,6 @@ void Map::GetFullTerrainStatusForPosition(uint32 /*phaseMask*/, float x, float y
     // NOTE: Objects will not detect a case when a wmo providing area/liquid despawns from under them
     // but this is fine as these kind of objects are not meant to be spawned and despawned a lot
     // example: Lich King platform
-    /*
     if (dynData.floorZ > VMAP_INVALID_HEIGHT && G3D::fuzzyGe(z, dynData.floorZ - GROUND_HEIGHT_TOLERANCE) &&
         (G3D::fuzzyLt(z, gridMapHeight - GROUND_HEIGHT_TOLERANCE) || dynData.floorZ > gridMapHeight) &&
         (G3D::fuzzyLt(z, vmapData.floorZ - GROUND_HEIGHT_TOLERANCE) || dynData.floorZ > vmapData.floorZ))
@@ -1427,7 +1431,6 @@ void Map::GetFullTerrainStatusForPosition(uint32 /*phaseMask*/, float x, float y
         data.floorZ = dynData.floorZ;
         wmoData = &dynData;
     }
-    */
 
     if (wmoData)
     {
@@ -2786,6 +2789,25 @@ void Map::ProcessCreatureRespawn(ObjectGuid::LowType spawnId)
         }
     }
 
+    // Check linked_respawn: don't spawn if the master creature is still dead.
+    // This mirrors the check in Creature::Respawn() for compat-mode creatures:
+    // hard-reset creatures bypass it (they despawn on evade and must always
+    // come back), and a creature linked to itself never auto-respawns.
+    ObjectGuid dbtableHighGuid = ObjectGuid::Create<HighGuid::Unit>(data->id, spawnId);
+    time_t linkedRespawntime = GetLinkedRespawnTime(dbtableHighGuid);
+    CreatureTemplate const* cInfo = sObjectMgr->GetCreatureTemplate(data->id);
+    if (linkedRespawntime && !(cInfo && cInfo->HasFlagsExtra(CREATURE_FLAG_EXTRA_HARD_RESET)))
+    {
+        time_t now = GameTime::GetGameTime().count();
+        time_t newRespawnTime;
+        if (sObjectMgr->GetLinkedRespawnGuid(dbtableHighGuid) == dbtableHighGuid)
+            newRespawnTime = now + DAY; // if linking self, never respawn (check delayed to next day)
+        else
+            newRespawnTime = (now > linkedRespawntime ? now : linkedRespawntime) + urand(5, MINUTE); // master is still dead; re-queue at the master's respawn time + a small offset
+        SaveCreatureRespawnTime(spawnId, newRespawnTime);
+        return;
+    }
+
     // Remove respawn time BEFORE LoadFromDB, otherwise the creature
     // reads it back and loads as DEAD instead of ALIVE
     RemoveCreatureRespawnTime(spawnId);
@@ -2933,7 +2955,7 @@ void Map::LogEncounterFinished(EncounterCreditType type, uint32 creditEntry)
         if (Player* p = itr->GetSource())
         {
             std::string auraStr;
-            const Unit::AuraApplicationMap& a = p->GetAppliedAuras();
+            Unit::AuraApplicationMap const& a = p->GetAppliedAuras();
             for (auto iterator = a.begin(); iterator != a.end(); ++iterator)
             {
                 snprintf(buffer2, 255, "%u(%u) ", iterator->first, iterator->second->GetEffectMask());
