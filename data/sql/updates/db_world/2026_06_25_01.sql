@@ -2,13 +2,6 @@
 -- Consolidates final creature tuning, formation, waypoint, SmartAI, and condition updates.
 
 
--- -----------------------------------------------------------------------------
--- 1) Creature template final HP values
--- -----------------------------------------------------------------------------
-UPDATE `creature_template`
-SET `HealthModifier` = 12
-WHERE `entry` = 18946; -- Infernal Siegebreaker
-
 UPDATE `creature_template`
 SET `DamageModifier` = CASE `entry`
     WHEN 18944 THEN 2.4 -- Fel Soldier
@@ -16,10 +9,6 @@ SET `DamageModifier` = CASE `entry`
     WHEN 19005 THEN 11  -- Wrath Master
 END
 WHERE `entry` IN (18944, 18946, 19005);
-
-UPDATE `creature_template`
-SET `HealthModifier` = 40
-WHERE `entry` IN (18966, 18969); -- Justinius, Melgromm (2x over base 20)
 
 -- The two mage entries carried UNIT_FLAG_DISABLE_MOVE (0x4) in their template
 -- unit_flags, which rooted them in place: they teleported to the path start but
@@ -66,88 +55,6 @@ ON DUPLICATE KEY UPDATE
     `Random` = VALUES(`Random`),
     `InteractionPauseTimer` = VALUES(`InteractionPauseTimer`);
 
--- -----------------------------------------------------------------------------
--- 3) Army assist + retarget behavior (final values)
--- -----------------------------------------------------------------------------
-UPDATE `smart_scripts`
-SET `action_param1` = 90
-WHERE `source_type` = 0
-  AND `entryorguid` IN (18948, 18950)
-  AND `id` = 7
-  AND `action_type` = 39;
-
-DELETE FROM `smart_scripts`
-WHERE `source_type` = 0
-  AND `entryorguid` IN (18949, 18965, 18966, 18969, 18970, 18971, 18972, 18986)
-  AND `id` = 44;
-
-INSERT INTO `smart_scripts`
-(`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`,
- `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`,
- `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`,
- `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`,
- `target_x`, `target_y`, `target_z`, `target_o`, `comment`)
-VALUES
-(18949, 0, 44, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 39, 90, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Stormwind Mage - On Aggro - Call For Help'),
-(18965, 0, 44, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 39, 90, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Darnassian Archer - On Aggro - Call For Help'),
-(18966, 0, 44, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 39, 90, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Justinius the Harbinger - On Aggro - Call For Help'),
-(18969, 0, 44, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 39, 90, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Melgromm Highmountain - On Aggro - Call For Help'),
-(18970, 0, 44, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 39, 90, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Darkspear Axe Thrower - On Aggro - Call For Help'),
-(18971, 0, 44, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 39, 90, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Undercity Mage - On Aggro - Call For Help'),
-(18972, 0, 44, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 39, 90, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Orgrimmar Shaman - On Aggro - Call For Help'),
-(18986, 0, 44, 0, 4, 0, 100, 0, 0, 0, 0, 0, 0, 0, 39, 90, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Ironforge Paladin - On Aggro - Call For Help');
-
-DELETE FROM `smart_scripts`
-WHERE `source_type` = 0
-  AND `entryorguid` IN (18948, 18949, 18950, 18965, 18966, 18969, 18970, 18971, 18972, 18986)
-  AND `id` = 45;
-
-INSERT INTO `smart_scripts`
-(`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`,
- `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`,
- `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`,
- `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`,
- `target_x`, `target_y`, `target_z`, `target_o`, `comment`)
-VALUES
-(18948, 0, 45, 0, 5, 0, 100, 0, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 25, 60, 0, 0, 0, 0, 0, 0, 0, 'Stormwind Soldier - On Kill - Attack Closest Enemy'),
-(18949, 0, 45, 0, 5, 0, 100, 0, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 25, 60, 0, 0, 0, 0, 0, 0, 0, 'Stormwind Mage - On Kill - Attack Closest Enemy'),
-(18950, 0, 45, 0, 5, 0, 100, 0, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 25, 60, 0, 0, 0, 0, 0, 0, 0, 'Orgrimmar Grunt - On Kill - Attack Closest Enemy'),
-(18965, 0, 45, 0, 5, 0, 100, 0, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 25, 60, 0, 0, 0, 0, 0, 0, 0, 'Darnassian Archer - On Kill - Attack Closest Enemy'),
-(18966, 0, 45, 0, 5, 0, 100, 0, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 25, 60, 0, 0, 0, 0, 0, 0, 0, 'Justinius the Harbinger - On Kill - Attack Closest Enemy'),
-(18969, 0, 45, 0, 5, 0, 100, 0, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 25, 60, 0, 0, 0, 0, 0, 0, 0, 'Melgromm Highmountain - On Kill - Attack Closest Enemy'),
-(18970, 0, 45, 0, 5, 0, 100, 0, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 25, 60, 0, 0, 0, 0, 0, 0, 0, 'Darkspear Axe Thrower - On Kill - Attack Closest Enemy'),
-(18971, 0, 45, 0, 5, 0, 100, 0, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 25, 60, 0, 0, 0, 0, 0, 0, 0, 'Undercity Mage - On Kill - Attack Closest Enemy'),
-(18972, 0, 45, 0, 5, 0, 100, 0, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 25, 60, 0, 0, 0, 0, 0, 0, 0, 'Orgrimmar Shaman - On Kill - Attack Closest Enemy'),
-(18986, 0, 45, 0, 5, 0, 100, 0, 0, 0, 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 25, 60, 0, 0, 0, 0, 0, 0, 0, 'Ironforge Paladin - On Kill - Attack Closest Enemy');
-
-DELETE FROM `smart_scripts`
-WHERE `source_type` = 0
-  AND `entryorguid` IN (18948, 18949, 18950, 18965, 18966, 18969, 18970, 18971, 18972, 18986)
-  AND `id` = 70;
-
-DELETE FROM `smart_scripts`
-WHERE `source_type` = 0
-  AND `entryorguid` IN (18948, 18949, 18950, 18965, 18966, 18969, 18970, 18971, 18972, 18986)
-  AND `id` = 71;
-
-INSERT INTO `smart_scripts`
-(`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`,
- `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`,
- `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`,
- `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`,
- `target_x`, `target_y`, `target_z`, `target_o`, `comment`)
-VALUES
-(18948,0,71,0,0,0,100,0,1000,1500,2500,3500,0,0,49,0,0,0,0,0,0,25,55,0,0,0,0,0,0,0,'Stormwind Soldier - IC pulse - Retarget closest enemy'),
-(18949,0,71,0,0,0,100,0,1000,1500,2500,3500,0,0,49,0,0,0,0,0,0,25,55,0,0,0,0,0,0,0,'Stormwind Mage - IC pulse - Retarget closest enemy'),
-(18950,0,71,0,0,0,100,0,1000,1500,2500,3500,0,0,49,0,0,0,0,0,0,25,55,0,0,0,0,0,0,0,'Orgrimmar Grunt - IC pulse - Retarget closest enemy'),
-(18965,0,71,0,0,0,100,0,1000,1500,2500,3500,0,0,49,0,0,0,0,0,0,25,55,0,0,0,0,0,0,0,'Darnassian Archer - IC pulse - Retarget closest enemy'),
-(18966,0,71,0,0,0,100,0,1000,1500,2500,3500,0,0,49,0,0,0,0,0,0,25,55,0,0,0,0,0,0,0,'Justinius - IC pulse - Retarget closest enemy'),
-(18969,0,71,0,0,0,100,0,1000,1500,2500,3500,0,0,49,0,0,0,0,0,0,25,55,0,0,0,0,0,0,0,'Melgromm - IC pulse - Retarget closest enemy'),
-(18970,0,71,0,0,0,100,0,1000,1500,2500,3500,0,0,49,0,0,0,0,0,0,25,55,0,0,0,0,0,0,0,'Darkspear Axe Thrower - IC pulse - Retarget closest enemy'),
-(18971,0,71,0,0,0,100,0,1000,1500,2500,3500,0,0,49,0,0,0,0,0,0,25,55,0,0,0,0,0,0,0,'Undercity Mage - IC pulse - Retarget closest enemy'),
-(18972,0,71,0,0,0,100,0,1000,1500,2500,3500,0,0,49,0,0,0,0,0,0,25,55,0,0,0,0,0,0,0,'Orgrimmar Shaman - IC pulse - Retarget closest enemy'),
-(18986,0,71,0,0,0,100,0,1000,1500,2500,3500,0,0,49,0,0,0,0,0,0,25,55,0,0,0,0,0,0,0,'Ironforge Paladin - IC pulse - Retarget closest enemy');
-
 DELETE FROM `smart_scripts`
 WHERE `source_type` = 0
   AND `entryorguid` = 18969
@@ -161,47 +68,6 @@ INSERT INTO `smart_scripts`
  `target_x`, `target_y`, `target_z`, `target_o`, `comment`)
 VALUES
 (18969,0,73,0,0,0,100,0,6000,10000,22000,30000,0,0,11,33570,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Melgromm Highmountain - In Combat - Cast Strength of the Storm Totem');
-
--- Keep assist behavior enabled so the army responds together when one unit is attacked.
-UPDATE `smart_scripts`
-SET `event_chance` = 100
-WHERE `source_type` = 0
-  AND `entryorguid` IN (18948, 18950)
-  AND `id` = 7
-  AND `action_type` = 39;
-
-UPDATE `smart_scripts`
-SET `event_chance` = 100
-WHERE `source_type` = 0
-  AND `entryorguid` IN (18949, 18965, 18966, 18969, 18970, 18971, 18972, 18986)
-  AND `id` = 44
-  AND `action_type` = 39;
-
--- Creature respawn behavior: passive respawn state with state flip at waypoint 11.
--- Only apply to melee units and archers; casters keep default behavior.
-
-DELETE FROM `smart_scripts`
-WHERE `source_type` = 0
-  AND `entryorguid` IN (18948, 18949, 18950, 18965, 18966, 18969, 18970, 18971, 18972, 18986)
-  AND `id` = 90;
-
-INSERT INTO `smart_scripts`
-(`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`,
- `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`,
- `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`,
- `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`,
- `target_x`, `target_y`, `target_z`, `target_o`, `comment`)
-VALUES
-(18948,0,90,0,11,0,100,512,0,0,0,0,0,0,69,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormwind Soldier - On Respawn - Return to Spawn Point'),
-(18949,0,90,0,11,0,100,512,0,0,0,0,0,0,69,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Stormwind Mage - On Respawn - Return to Spawn Point'),
-(18950,0,90,0,11,0,100,512,0,0,0,0,0,0,69,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Orgrimmar Grunt - On Respawn - Return to Spawn Point'),
-(18965,0,90,0,11,0,100,512,0,0,0,0,0,0,69,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Darnassian Archer - On Respawn - Return to Spawn Point'),
-(18966,0,90,0,11,0,100,512,0,0,0,0,0,0,69,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Justinius the Harbinger - On Respawn - Return to Spawn Point'),
-(18969,0,90,0,11,0,100,512,0,0,0,0,0,0,69,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Melgromm Highmountain - On Respawn - Return to Spawn Point'),
-(18970,0,90,0,11,0,100,512,0,0,0,0,0,0,69,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Darkspear Axe Thrower - On Respawn - Return to Spawn Point'),
-(18971,0,90,0,11,0,100,512,0,0,0,0,0,0,69,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Undercity Mage - On Respawn - Return to Spawn Point'),
-(18972,0,90,0,11,0,100,512,0,0,0,0,0,0,69,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Orgrimmar Shaman - On Respawn - Return to Spawn Point'),
-(18986,0,90,0,11,0,100,512,0,0,0,0,0,0,69,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Ironforge Paladin - On Respawn - Return to Spawn Point');
 
 -- Darnassian Archer: use bow at range; melee auto-attacks handle close targets.
 DELETE FROM `smart_scripts`
@@ -1052,11 +918,6 @@ WHERE `source_type` = 0
   AND `event_type` = 6
   AND `action_type` = 70;
 
-UPDATE `creature`
-SET `spawntimesecs` = 0
-WHERE `map` = 530
-  AND `id` IN (18948, 18949, 18950, 18965, 18966, 18969, 18970, 18971, 18972, 18986);
-
 DELETE FROM `smart_scripts`
 WHERE `source_type` = 0
   AND `entryorguid` IN (18948, 18949, 18950, 18965, 18966, 18969, 18970, 18971, 18972, 18986)
@@ -1079,5 +940,4 @@ VALUES
 (18971,0,103,0,11,0,100,512,0,0,0,0,0,0,116,10,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Undercity Mage - On Respawn - Set corpse delay to 10s'),
 (18972,0,103,0,11,0,100,512,0,0,0,0,0,0,116,10,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Orgrimmar Shaman - On Respawn - Set corpse delay to 10s'),
 (18986,0,103,0,11,0,100,512,0,0,0,0,0,0,116,10,0,0,0,0,0,1,0,0,0,0,0,0,0,0,'Ironforge Paladin - On Respawn - Set corpse delay to 10s');
-
 
