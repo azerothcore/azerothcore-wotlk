@@ -909,7 +909,7 @@ public:
     void StopAttackingInvalidTarget();
     Unit* SelectNearbyTarget(Unit* exclude = nullptr, float dist = NOMINAL_MELEE_RANGE) const;
     Unit* SelectNearbyNoTotemTarget(Unit* exclude = nullptr, float dist = NOMINAL_MELEE_RANGE) const;
-    void SendMeleeAttackStop(Unit* victim = nullptr);
+    void SendMeleeAttackStop(Unit const* victim = nullptr) const;
     void SendMeleeAttackStart(Unit* victim, Player* sendTo = nullptr);
 
     [[nodiscard]] uint32 GetAttackTime(WeaponAttackType att) const
@@ -1698,6 +1698,7 @@ public:
     void AddGameObject(GameObject* gameObj);
     void RemoveGameObject(GameObject* gameObj, bool del);
     void RemoveGameObject(uint32 spellid, bool del);
+    void RemoveGameObjectsByType(GameobjectTypes type, bool del);
     void RemoveAllGameObjects();
 
     /*********************************************************/
