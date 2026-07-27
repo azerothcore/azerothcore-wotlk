@@ -1359,8 +1359,7 @@ struct npc_ulduar_vx001 : public ScriptedAI
                 _events.Repeat(10s);
                 break;
             case EVENT_SPELL_ROCKET_STRIKE:
-                // Not triggered: the client only fires UNIT_SPELLCAST_SUCCEEDED (used by boss mod addons) if SMSG_SPELL_GO is sent
-                me->CastSpell(me, _phase == 2 ? SPELL_ROCKET_STRIKE_SINGLE : SPELL_ROCKET_STRIKE_BOTH, false);
+                me->CastSpell(me, _phase == 2 ? SPELL_ROCKET_STRIKE_SINGLE : SPELL_ROCKET_STRIKE_BOTH);
                 _events.Repeat(20s);
                 _events.ScheduleEvent(EVENT_REINSTALL_ROCKETS, 10s);
                 break;
