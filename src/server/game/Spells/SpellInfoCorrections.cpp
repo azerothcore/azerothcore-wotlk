@@ -5242,14 +5242,16 @@ void SpellMgr::LoadSpellInfoCorrections()
        spellInfo->Effects[EFFECT_0].TargetA = SpellImplicitTargetInfo(TARGET_UNIT_TARGET_ANY);
     });
 
-    // Boulder Assault - Sorlof shelling the Sister Mercy's crew triggers, which are
-    // CREATURE_FLAG_EXTRA_TRIGGER and so cannot hold a threat list. Without this the
-    // hit engages him with a target he can never reach, leaving him with an empty
-    // threat list and evading - and healing to full - every three seconds. Its sibling
-    // Cannon Assault (45008) already carries the attribute.
+    // Boulder Assault (Sorlof's Booty)
     ApplySpellFix({ 44966 }, [](SpellInfo* spellInfo)
     {
         spellInfo->AttributesEx |= SPELL_ATTR1_NO_THREAT;
+    });
+
+    // Cannon Assault (Sorlof's Booty)
+    ApplySpellFix({ 45008 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->AttributesEx3 |= SPELL_ATTR3_ALWAYS_HIT;
     });
 
     for (uint32 i = 0; i < GetSpellInfoStoreSize(); ++i)

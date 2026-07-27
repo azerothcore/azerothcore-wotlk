@@ -450,6 +450,9 @@ enum SorlofsBooty
     DATA_SORLOF_TAKE_PATH       = 1,
     POINT_SORLOF_PATH           = 1000,
 
+    // He only knits himself back together once he has broken off and headed home
+    PATH_SORLOF_RETURN          = 1032785,
+
     // The gun's own SmartAI announces the booty on this data set.
     DATA_SORLOF_SLAIN           = 1
 };
@@ -531,7 +534,6 @@ struct npc_sorlof : public ScriptedAI
 
     void Reset() override
     {
-        _scheduler.CancelAll();
         _pathId = 0;
         _pathNode = 0;
         _advancePath = false;
@@ -546,6 +548,7 @@ struct npc_sorlof : public ScriptedAI
         _pathId = value;
         _pathNode = 0;
         _advancePath = true;
+        me->SetRegeneratingHealth(value == PATH_SORLOF_RETURN);
     }
 
     void MovementInform(uint32 type, uint32 id) override
@@ -557,20 +560,6 @@ struct npc_sorlof : public ScriptedAI
         _advancePath = true;
     }
 
-    void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
-    {
-        if (spell->Id != SPELL_CANNON_ASSAULT)
-            return;
-
-        // Regen if not killed within a broadside phase
-        me->SetRegeneratingHealth(false);
-        _scheduler.CancelAll();
-        _scheduler.Schedule(15s, [this](TaskContext /*context*/)
-        {
-            me->SetRegeneratingHealth(true);
-        });
-    }
-
     void JustDied(Unit* /*killer*/) override
     {
         DoCastSelf(SPELL_SORLOFS_BOOTY, true);
@@ -579,17 +568,11 @@ struct npc_sorlof : public ScriptedAI
             gun->AI()->SetData(DATA_SORLOF_SLAIN, DATA_SORLOF_SLAIN);
     }
 
-    void UpdateAI(uint32 diff) override
+    void UpdateAI(uint32 /*diff*/) override
     {
-        _scheduler.Update(diff);
-
-        // Never touched from MovementInform: that fires out of the generator's
-        // DoFinalize, and MotionMaster::DirectExpire resets whatever generator is on
-        // top once the callback returns. PointMovementGenerator::DoReset stops the
-        // unit, so a leg queued there is killed before it moves, reports finalized on
-        // the next tick and informs again - burning the whole path one node per tick
-        // without ever leaving the first one. Creature::Update runs UpdateAI after
-        // Unit::Update has finished driving the MotionMaster, so it is safe here.
+        // Deferred out of MovementInform: that fires from the generator's DoFinalize, and
+        // MotionMaster::DirectExpire then Resets the new top generator, whose DoReset stops
+        // the spline it just launched. UpdateAI runs after the MotionMaster, so it sticks.
         if (_advancePath)
         {
             _advancePath = false;
@@ -619,7 +602,6 @@ private:
         me->GetMotionMaster()->MovePoint(POINT_SORLOF_PATH + _pathNode, node.X, node.Y, node.Z);
     }
 
-    TaskScheduler _scheduler;
     uint32 _pathId{ 0 };
     uint32 _pathNode{ 0 };
     bool _advancePath{ false };
