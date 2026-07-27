@@ -10765,9 +10765,13 @@ bool Unit::_IsValidAttackTarget(Unit const* target, SpellInfo const* bySpell, Wo
             || ((GetEntry() != WORLD_TRIGGER && (!obj || !obj->isType(TYPEMASK_GAMEOBJECT | TYPEMASK_DYNAMICOBJECT))) && target->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && IsImmuneToPC()))
         return false;
 
-    // CvC case - can attack each other only when one of them is hostile
+    // CvC case - can attack each other only when one of them is hostile,
+    // or when the entry pairing is whitelisted in `creature_hostile_override`. This allows scripted
+    // blizz-like combat events without altering sniffed/blizz-like factions
     if (!HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED) && !target->HasUnitFlag(UNIT_FLAG_PLAYER_CONTROLLED))
-        return GetReactionTo(target) <= REP_HOSTILE || target->GetReactionTo(this) <= REP_HOSTILE;
+        return GetReactionTo(target) <= REP_HOSTILE || target->GetReactionTo(this) <= REP_HOSTILE
+            || sObjectMgr->IsHostileOverride(GetEntry(), target->GetEntry())
+            || sObjectMgr->IsHostileOverride(target->GetEntry(), GetEntry());
 
     // PvP, PvC, CvP case
     // can't attack friendly targets
