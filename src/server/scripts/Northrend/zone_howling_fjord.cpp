@@ -435,19 +435,14 @@ enum SorlofsBooty
     SPELL_CANNON_ASSAULT        = 45008,
     SPELL_SORLOFS_BOOTY         = 45070,
 
-    // Sorlof answers the shelling with boulders of his own: a serverside aura (44964,
-    // on his creature_addon) throws 44965 at the ship every 3s, which lands 44966 on
-    // her crew and leaves 44967's Creeping Flames burning on the deck.
+    // SPELL_BOULDER_ASSAULT_AURA  = 44964, // Serverside, triggers 44965 every 3s
     SPELL_BOULDER_ASSAULT_HIT   = 44966,
     SPELL_BOULDER_ASSAULT_FIRE  = 44967,
 
-    // The Big Gun rides the Sister Mercy while Sorlof shadows her along the shore of
-    // Garvan's Reef, so he may only be shelled once she has drawn up level with him -
-    // the spells themselves carry the DBC's unlimited range.
-    CANNON_RANGE                = 100,
+    // About the maximum range for broadside
+    CANNON_RANGE                = 200,
 
-    // The ship pings Sorlof from wherever she is on her lap, and the far side of the
-    // reef puts roughly 700 yards between them.
+    // The ship needs to ping Sorlof from wherever she is on her lap
     SORLOF_SEARCH_RANGE         = 1000,
 
     SORLOF_WANDER_DISTANCE      = 10,
@@ -456,8 +451,7 @@ enum SorlofsBooty
     POINT_SORLOF_PATH           = 1000,
 
     // The gun's own SmartAI announces the booty on this data set.
-    DATA_SORLOF_SLAIN           = 1,
-    DATA_SORLOF_SLAIN_VALUE     = 1
+    DATA_SORLOF_SLAIN           = 1
 };
 
 // 44965 - Boulder Assault
@@ -475,9 +469,7 @@ class spell_sorlofs_booty_boulder_assault : public SpellScript
         if (targets.empty())
             return;
 
-        // One boulder per throw. The spell carries no target cap and the Sister Mercy
-        // is peppered with crew triggers across her decks and rigging, so settle on a
-        // single one to pelt rather than shelling all of them at once.
+        // One boulder per throw from implicit targets (no limit in DBC)
         WorldObject* target = Acore::Containers::SelectRandomContainerElement(targets);
         targets.clear();
         targets.push_back(target);
@@ -485,8 +477,6 @@ class spell_sorlofs_booty_boulder_assault : public SpellScript
 
     void HandleScript(SpellEffIndex /*effIndex*/)
     {
-        // Implicit target, narrowed to the Ellis Crew Trigger by `conditions`. Its 200
-        // yard reach is what keeps him from pelting a ship that is off round the reef.
         if (Unit* caster = GetCaster())
             caster->CastSpell(GetHitUnit(), SPELL_BOULDER_ASSAULT_HIT, true);
     }
@@ -510,8 +500,6 @@ class spell_sorlofs_booty_boulder_assault_hit : public SpellScript
 
     void HandleScript(SpellEffIndex /*effIndex*/)
     {
-        // Cast by whatever the boulder struck, so the flames it summons are left where
-        // it landed rather than back at Sorlof.
         if (Unit* target = GetHitUnit())
             target->CastSpell(target, SPELL_BOULDER_ASSAULT_FIRE, true);
     }
@@ -522,19 +510,17 @@ class spell_sorlofs_booty_boulder_assault_hit : public SpellScript
     }
 };
 
-// Departure events of the Sister Mercy's stops (TaxiPathNode.dbc path 778), mapped to
-// the shore path Sorlof walks to meet her at the next one. Leaving her final stop sends
-// him back down the coast to his spawn.
 uint32 GetSorlofPathForShipEvent(uint32 eventId)
 {
     switch (eventId)
     {
+        // Departure events of the Sister Mercy's stops (TaxiPathNode.dbc path 778)
         case 16501: return 1032780;
         case 16502: return 1032781;
         case 16503: return 1032782;
         case 16504: return 1032783;
         case 16510: return 1032784;
-        case 16511: return 1032785;
+        case 16511: return 1032785; // Return to spawn
         default:    return 0;
     }
 }
@@ -548,6 +534,7 @@ struct npc_sorlof : public ScriptedAI
         _scheduler.CancelAll();
         _pathId = 0;
         _pathNode = 0;
+        _advancePath = false;
         me->SetRegeneratingHealth(true);
     }
 
@@ -558,7 +545,7 @@ struct npc_sorlof : public ScriptedAI
 
         _pathId = value;
         _pathNode = 0;
-        MoveToNextNode();
+        _advancePath = true;
     }
 
     void MovementInform(uint32 type, uint32 id) override
@@ -567,7 +554,7 @@ struct npc_sorlof : public ScriptedAI
             return;
 
         ++_pathNode;
-        MoveToNextNode();
+        _advancePath = true;
     }
 
     void SpellHit(Unit* /*caster*/, SpellInfo const* spell) override
@@ -575,8 +562,7 @@ struct npc_sorlof : public ScriptedAI
         if (spell->Id != SPELL_CANNON_ASSAULT)
             return;
 
-        // He knits himself back together only once the shelling has stopped, so every
-        // hit pushes the recovery back out again.
+        // Regen if not killed within a broadside phase
         me->SetRegeneratingHealth(false);
         _scheduler.CancelAll();
         _scheduler.Schedule(15s, [this](TaskContext /*context*/)
@@ -590,12 +576,25 @@ struct npc_sorlof : public ScriptedAI
         DoCastSelf(SPELL_SORLOFS_BOOTY, true);
 
         if (Creature* gun = me->FindNearestCreature(NPC_THE_BIG_GUN, CANNON_RANGE))
-            gun->AI()->SetData(DATA_SORLOF_SLAIN, DATA_SORLOF_SLAIN_VALUE);
+            gun->AI()->SetData(DATA_SORLOF_SLAIN, DATA_SORLOF_SLAIN);
     }
 
     void UpdateAI(uint32 diff) override
     {
         _scheduler.Update(diff);
+
+        // Never touched from MovementInform: that fires out of the generator's
+        // DoFinalize, and MotionMaster::DirectExpire resets whatever generator is on
+        // top once the callback returns. PointMovementGenerator::DoReset stops the
+        // unit, so a leg queued there is killed before it moves, reports finalized on
+        // the next tick and informs again - burning the whole path one node per tick
+        // without ever leaving the first one. Creature::Update runs UpdateAI after
+        // Unit::Update has finished driving the MotionMaster, so it is safe here.
+        if (_advancePath)
+        {
+            _advancePath = false;
+            MoveToNextNode();
+        }
 
         if (UpdateVictim())
             DoMeleeAttackIfReady();
@@ -608,8 +607,7 @@ private:
         if (!path)
             return;
 
-        // Each leg ends with him milling about where the ship has drawn up, lobbing
-        // boulders at her crew until she weighs anchor again.
+        // Each leg ends with him milling about where the ship has drawn up
         if (_pathNode >= path->Nodes.size())
         {
             me->GetMotionMaster()->MoveRandom(SORLOF_WANDER_DISTANCE);
@@ -624,14 +622,14 @@ private:
     TaskScheduler _scheduler;
     uint32 _pathId{ 0 };
     uint32 _pathNode{ 0 };
+    bool _advancePath{ false };
 };
 
 struct go_sister_mercy : public GameObjectAI
 {
     go_sister_mercy(GameObject* go) : GameObjectAI(go) { }
 
-    // MotionTransport::DoEventIfAny fires this as the ship pulls away from each of her
-    // scripted stops, which is Sorlof's cue to set off for the next one.
+    // Notify Sorlof the ship is departing towards the next broadside point
     void EventInform(uint32 eventId) override
     {
         uint32 pathId = GetSorlofPathForShipEvent(eventId);
@@ -678,7 +676,7 @@ class spell_sorlofs_booty_big_gun_assault : public SpellScript
 
     void HandleDummy(SpellEffIndex /*effIndex*/)
     {
-        // Implicit target of the dummy effect, resolved to The Big Gun by `conditions`.
+        // Implicit target of the dummy effect, resolved to The Big Gun by conditions
         Creature* gun = GetHitCreature();
         if (!gun)
             return;
@@ -687,15 +685,10 @@ class spell_sorlofs_booty_big_gun_assault : public SpellScript
         if (!sorlof)
             return;
 
-        // Only the static world may block the shot. The gun is a passenger of the
-        // Sister Mercy and that transport is not excluded from the dynamic tree, so a
-        // full line of sight check would have the ship occlude every ray leaving its
-        // own deck.
         if (!gun->IsWithinLOSInMap(sorlof, VMAP::ModelIgnoreFlags::M2, LINEOFSIGHT_CHECK_VMAP))
             return;
 
-        // Fired by the gun rather than by the clicker, so the crew - not the player -
-        // owns the kill. The quest item comes from the booty Sorlof drops on death.
+        // Fired by the gun rather than by the player, this is correct
         gun->CastSpell(sorlof, SPELL_CANNON_ASSAULT, true);
     }
 

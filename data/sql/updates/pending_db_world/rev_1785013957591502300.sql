@@ -39,6 +39,7 @@ UPDATE `creature` SET `position_x` = 97.17545, `position_y` = -4024.8862, `posit
 -- rigging. 44965 has no target cap, so the script picks one of them per throw.
 SET @CGUID := 73617;
 
+-- Crew Triggers for Boulder Targets
 DELETE FROM `creature` WHERE `id` = 24973 AND `guid` BETWEEN @CGUID+0 AND @CGUID+26;
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `CreateObject`, `VerifiedBuild`) VALUES
 (@CGUID+0 , 24973, 594, 495, 4077, -20.6305503845214843, 0.87925499677658081, 23.15439796447753906, 2.234021425247192382, 120, 1, 68887),
@@ -123,6 +124,12 @@ DELETE FROM `creature_template_movement` WHERE (`CreatureId` = 24992);
 INSERT INTO `creature_template_movement` (`CreatureId`, `Ground`, `Swim`, `Flight`, `Rooted`, `Chase`, `Random`, `InteractionPauseTimer`) VALUES
 (24992, 0, 0, 1, 1, 0, 0, 0);
 
+UPDATE `creature_template` SET `flags_extra` = `flags_extra`|128 WHERE (`entry` = 23826);
 DELETE FROM `creature_template_addon` WHERE (`entry` = 23826);
 INSERT INTO `creature_template_addon` (`entry`, `path_id`, `mount`, `bytes1`, `bytes2`, `emote`, `visibilityDistanceType`, `auras`) VALUES
 (23826, 0, 0, 0, 0, 0, 0, '42460');
+
+DELETE FROM `smart_scripts` WHERE (`source_type` = 0 AND `entryorguid` = 24911);
+INSERT INTO `smart_scripts` (`entryorguid`, `source_type`, `id`, `link`, `event_type`, `event_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `event_param5`, `event_param6`, `action_type`, `action_param1`, `action_param2`, `action_param3`, `action_param4`, `action_param5`, `action_param6`, `target_type`, `target_param1`, `target_param2`, `target_param3`, `target_param4`, `target_x`, `target_y`, `target_z`, `target_o`, `comment`) VALUES
+(24911, 0, 0, 1, 60, 0, 100, 0, 3400, 6200, 3400, 6200, 0, 0, 11, 44961, 64, 0, 0, 0, 0, 10, 103278, 24914, 0, 0, 0, 0, 0, 0, 'Cursed Sea Dog - On Update - Cast \'Shoot\' at Sorlof'),
+(24911, 0, 1, 0, 61, 0, 4, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Cursed Sea Dog - On Cast \'Shoot\' - Say Line');
