@@ -42,6 +42,7 @@
 #include "CreatureGroups.h"
 #include "CreatureTextMgr.h"
 #include "DBCStores.h"
+#include "DBUpdater.h"
 #include "DatabaseEnv.h"
 #include "DisableMgr.h"
 #include "DynamicVisibility.h"
@@ -1058,6 +1059,13 @@ void World::SetInitialWorldSettings()
     if (sConfigMgr->isDryRun())
     {
         sMapMgr->UnloadAll();
+
+        if (uint32 failed = DBUpdaterUtil::GetFailedUpdateCount())
+        {
+            LOG_FATAL("server.loading", "AzerothCore Dry Run Completed With {} Failed Database Update(s), Terminating.", failed);
+            exit(1);
+        }
+
         LOG_INFO("server.loading", "AzerothCore Dry Run Completed, Terminating.");
         exit(0);
     }
