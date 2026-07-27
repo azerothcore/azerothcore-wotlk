@@ -537,7 +537,7 @@ struct npc_sorlof : public ScriptedAI
         _pathId = 0;
         _pathNode = 0;
         _advancePath = false;
-        me->SetRegeneratingHealth(true);
+        me->SetRegeneratingHealth(false);
     }
 
     void SetData(uint32 id, uint32 value) override
