@@ -1,3 +1,4 @@
+-- DB update 2026_07_28_04 -> 2026_07_28_05
 --
 -- Invisibility and Stealth Detection
 UPDATE `creature_template_addon` SET `auras` = '18950' WHERE (`entry` IN (16024, 29355));
